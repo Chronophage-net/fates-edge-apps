@@ -298,7 +298,7 @@ jobs:
 
       - name: Create Dockerfile
         run: |
-          cat > Dockerfile << 'EOF'
+          cat > Dockerfile << 'DOCKER'
           FROM nginx:alpine
           COPY deploy/ /usr/share/nginx/html/
           RUN echo 'server { \
@@ -321,7 +321,7 @@ jobs:
               } \
           }' > /etc/nginx/conf.d/default.conf
           EXPOSE 80
-          EOF
+          DOCKER
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
