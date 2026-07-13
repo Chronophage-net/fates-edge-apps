@@ -36,31 +36,29 @@ jobs:
       fail-fast: false
       matrix:
         include:
+          # Web client — only included when allowed
           - name: web-client
             path: ttrpg/utilities/javascript/fates-edge-web-client
             build: true
             deploy: true
+            skip_condition: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.skip_web_deploy == 'true' }}
+
+          # Socket server
           - name: socket-server
             path: ttrpg/utilities/javascript/fates-edge-socket-server
             build: false
             deploy: false
+            skip_condition: false
+
+          # Desktop client
           - name: desktop-client
             path: ttrpg/utilities/javascript/fates-edge-desktop-client
             build: false
             deploy: false
+            skip_condition: false
 
-    # Conditions:
-    # - Always build on push
-    # - On workflow_dispatch, skip web deploy if requested
-    if: >
-      github.event_name == 'push' ||
-      (
-        github.event_name == 'workflow_dispatch' &&
-        (
-          matrix.name != 'web-client' ||
-          github.event.inputs.skip_web_deploy != 'true'
-        )
-      )
+    # FIX: job-level condition no longer references matrix.*
+    if: ${{ matrix.skip_condition != true }}
 
     steps:
       - uses: actions/checkout@v4
@@ -76,12 +74,12 @@ jobs:
         run: npm ci
 
       - name: Build project
-        if: matrix.build
+        if: ${{ matrix.build }}
         working-directory: ${{ matrix.path }}
         run: npm run build
 
       - name: Package project
-        if: matrix.name != 'web-client'
+        if: ${{ matrix.name != 'web-client' }}
         run: |
           mkdir -p artifacts
           tar -czf artifacts/${{ matrix.name }}.tar.gz \
@@ -100,7 +98,7 @@ jobs:
           if-no-files-found: ignore
 
       - name: Deploy Web Client
-        if: matrix.deploy
+        if: ${{ matrix.deploy }}
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.DEPLOY_TOKEN }}
