@@ -34,8 +34,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
-          cache-dependency-path: 'ttrpg/utilities/javascript/fates-edge-web-client/package-lock.json'
+        # NO CACHE PARAMETER HERE
 
       - name: Build web client
         working-directory: ttrpg/utilities/javascript/fates-edge-web-client
@@ -65,6 +64,7 @@ jobs:
           name: fates-edge-web-client
           path: artifacts/fates-edge-web-client.tar.gz
           retention-days: 30
+          if-no-files-found: error
 
   build-desktop-client:
     name: Build Desktop Client
@@ -77,8 +77,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
-          cache-dependency-path: 'ttrpg/utilities/javascript/fates-edge-desktop-client/package-lock.json'
+        # NO CACHE PARAMETER HERE
 
       - name: Install dependencies
         working-directory: ttrpg/utilities/javascript/fates-edge-desktop-client
@@ -101,6 +100,7 @@ jobs:
           name: fates-edge-desktop-client
           path: artifacts/fates-edge-desktop-client.tar.gz
           retention-days: 30
+          if-no-files-found: error
 
   build-socket-server:
     name: Build Socket Server
@@ -113,8 +113,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
-          cache-dependency-path: 'ttrpg/utilities/javascript/fates-edge-socket-server/package-lock.json'
+        # NO CACHE PARAMETER HERE
 
       - name: Install dependencies
         working-directory: ttrpg/utilities/javascript/fates-edge-socket-server
@@ -137,6 +136,7 @@ jobs:
           name: fates-edge-socket-server
           path: artifacts/fates-edge-socket-server.tar.gz
           retention-days: 30
+          if-no-files-found: error
 
   build-discord-bot:
     name: Build Discord Bot
@@ -149,8 +149,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
-          cache-dependency-path: 'ttrpg/utilities/fates-edge-discord-bot/package-lock.json'
+        # NO CACHE PARAMETER HERE
 
       - name: Install dependencies
         working-directory: ttrpg/utilities/fates-edge-discord-bot
@@ -173,6 +172,7 @@ jobs:
           name: fates-edge-discord-bot
           path: artifacts/fates-edge-discord-bot.tar.gz
           retention-days: 30
+          if-no-files-found: error
 
   package-roll20:
     name: Package Roll20 Integration
@@ -193,6 +193,7 @@ jobs:
           name: fates-edge-roll20
           path: artifacts/fates-edge-roll20.tar.gz
           retention-days: 30
+          if-no-files-found: error
 
   package-foundry-bridge:
     name: Package Foundry VTT Bridge
@@ -213,6 +214,7 @@ jobs:
           name: foundry-fates-edge-bridge
           path: artifacts/foundry-fates-edge-bridge.tar.gz
           retention-days: 30
+          if-no-files-found: error
 
   build-python-client:
     name: Build Python Client
@@ -250,6 +252,7 @@ jobs:
           name: fates-edge-python-client
           path: artifacts/
           retention-days: 30
+          if-no-files-found: error
 
   package-python-tool:
     name: Package Python CLI Tool
@@ -270,6 +273,7 @@ jobs:
           name: fates-edge-python-tool
           path: artifacts/fates-edge-python-tool.tar.gz
           retention-days: 30
+          if-no-files-found: error
 
   create-release:
     name: Create Release
@@ -316,6 +320,7 @@ jobs:
           name: fates-edge-apps-all
           path: fates-edge-apps-all.tar.gz
           retention-days: 30
+          if-no-files-found: error
 
       - name: Upload individual release artifacts
         uses: actions/upload-artifact@v4
@@ -323,6 +328,7 @@ jobs:
           name: fates-edge-release-assets
           path: release-assets/
           retention-days: 30
+          if-no-files-found: error
 
       - name: Create GitHub Release
         if: github.event.inputs.create_release == 'true' && github.event.inputs.release_version != ''
