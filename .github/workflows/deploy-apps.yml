@@ -290,11 +290,6 @@ jobs:
         with:
           path: artifacts/
 
-      - name: List downloaded artifacts
-        run: |
-          echo "Downloaded artifacts:"
-          find artifacts -type f -name "*.tar.gz" -o -name "*.whl" | sort
-
       - name: Create release assets directory
         run: |
           mkdir -p release-assets
@@ -310,7 +305,7 @@ jobs:
           echo "Checksums generated:"
           cat checksums.txt
 
-      - name: Create release tarball
+      - name: Create combined release tarball
         run: |
           tar -czf fates-edge-apps-all.tar.gz -C release-assets .
           echo "Created fates-edge-apps-all.tar.gz"
@@ -320,6 +315,13 @@ jobs:
         with:
           name: fates-edge-apps-all
           path: fates-edge-apps-all.tar.gz
+          retention-days: 30
+
+      - name: Upload individual release artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: fates-edge-release-assets
+          path: release-assets/
           retention-days: 30
 
       - name: Create GitHub Release
