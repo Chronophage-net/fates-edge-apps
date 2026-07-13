@@ -24,6 +24,13 @@ on:
 env:
   NODE_VERSION: 24
 
+permissions:
+  contents: read
+
+concurrency:
+  group: "pages-${{ github.ref }}"
+  cancel-in-progress: false
+
 jobs:
   # ============================================================
   # UNIVERSAL NODE BUILD (matrix)
@@ -36,29 +43,24 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          # Web client — only included when allowed
           - name: web-client
             path: ttrpg/utilities/javascript/fates-edge-web-client
             build: true
-            deploy: true
-            skip_condition: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.skip_web_deploy == 'true' }}
-
-          # Socket server
+            package: false
           - name: socket-server
             path: ttrpg/utilities/javascript/fates-edge-socket-server
             build: false
-            deploy: false
-            skip_condition: false
-
-          # Desktop client
+            package: true
           - name: desktop-client
             path: ttrpg/utilities/javascript/fates-edge-desktop-client
             build: false
-            deploy: false
-            skip_condition: false
+            package: true
 
-    # FIX: job-level condition no longer references matrix.*
-    if: ${{ matrix.skip_condition != true }}
+    # Only skip the web-client job when explicitly requested via dispatch input.
+    if: >
+      !(matrix.name == 'web-client' &&
+        github.event_name == 'workflow_dispatch' &&
+        github.event.inputs.skip_web_deploy == 'true')
 
     steps:
       - uses: actions/checkout@v4
@@ -79,7 +81,7 @@ jobs:
         run: npm run build
 
       - name: Package project
-        if: ${{ matrix.name != 'web-client' }}
+        if: ${{ matrix.package }}
         run: |
           mkdir -p artifacts
           tar -czf artifacts/${{ matrix.name }}.tar.gz \
@@ -88,24 +90,51 @@ jobs:
             --exclude=.git \
             .
 
-      - name: Upload artifact
+      - name: Upload build artifact
+        if: ${{ matrix.build }}
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ matrix.name }}
-          path: |
-            ${{ matrix.path }}/dist
-            artifacts/${{ matrix.name }}.tar.gz
-          if-no-files-found: ignore
+          name: ${{ matrix.name }}-dist
+          path: ${{ matrix.path }}/dist
+          if-no-files-found: error
 
-      - name: Deploy Web Client
-        if: ${{ matrix.deploy }}
-        uses: peaceiris/actions-gh-pages@v3
+      - name: Upload packaged artifact
+        if: ${{ matrix.package }}
+        uses: actions/upload-artifact@v4
         with:
-          github_token: ${{ secrets.DEPLOY_TOKEN }}
-          publish_dir: ${{ matrix.path }}/dist
-          publish_branch: gh-pages
-          force_orphan: true
-          commit_message: "Deploy web client from ${{ github.sha }}"
+          name: ${{ matrix.name }}-package
+          path: artifacts/${{ matrix.name }}.tar.gz
+          if-no-files-found: error
+
+      - name: Upload Pages artifact
+        if: ${{ matrix.name == 'web-client' }}
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ${{ matrix.path }}/dist
+
+  # ============================================================
+  # DEPLOY TO GITHUB PAGES (Pages source = "GitHub Actions")
+  # ============================================================
+  deploy-pages:
+    name: Deploy to GitHub Pages
+    needs: build
+    if: >
+      !(github.event_name == 'workflow_dispatch' &&
+        github.event.inputs.skip_web_deploy == 'true')
+    runs-on: ubuntu-latest
+
+    permissions:
+      pages: write
+      id-token: write
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: Deploy
+        id: deployment
+        uses: actions/deploy-pages@v4
 
   # ============================================================
   # RELEASE CREATION
@@ -120,15 +149,21 @@ jobs:
       github.event.inputs.create_release == 'true' &&
       github.event.inputs.release_version != ''
 
+    permissions:
+      contents: write
+
     steps:
-      - uses: actions/download-artifact@v4
+      - name: Download packaged artifacts
+        uses: actions/download-artifact@v4
         with:
+          pattern: '*-package'
           path: artifacts/
+          merge-multiple: true
 
       - name: Prepare release assets
         run: |
           mkdir -p release-assets
-          cp artifacts/**/*.tar.gz release-assets/
+          cp artifacts/*.tar.gz release-assets/
 
       - name: Generate checksums
         working-directory: release-assets
@@ -143,4 +178,4 @@ jobs:
             release-assets/*.tar.gz
             release-assets/checksums.txt
         env:
-          GITHUB_TOKEN: ${{ secrets.DEPLOY_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
