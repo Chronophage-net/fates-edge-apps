@@ -56,32 +56,35 @@ jobs:
             build: false
             package: true
 
-    # Only skip the web-client job when explicitly requested via dispatch input.
-    if: >
-      !(matrix.name == 'web-client' &&
-        github.event_name == 'workflow_dispatch' &&
-        github.event.inputs.skip_web_deploy == 'true')
+    # NOTE: the `matrix` context is not available in a job-level `if:`.
+    # It IS available in job-level `env:`, so compute the skip flag here
+    # and check it in each step's `if:` instead.
+    env:
+      SKIP_JOB: ${{ matrix.name == 'web-client' && github.event_name == 'workflow_dispatch' && github.event.inputs.skip_web_deploy == 'true' }}
 
     steps:
       - uses: actions/checkout@v4
+        if: ${{ env.SKIP_JOB != 'true' }}
 
       - uses: actions/setup-node@v4
+        if: ${{ env.SKIP_JOB != 'true' }}
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: npm
           cache-dependency-path: ${{ matrix.path }}/package-lock.json
 
       - name: Install dependencies
+        if: ${{ env.SKIP_JOB != 'true' }}
         working-directory: ${{ matrix.path }}
         run: npm ci
 
       - name: Build project
-        if: ${{ matrix.build }}
+        if: ${{ env.SKIP_JOB != 'true' && matrix.build }}
         working-directory: ${{ matrix.path }}
         run: npm run build
 
       - name: Package project
-        if: ${{ matrix.package }}
+        if: ${{ env.SKIP_JOB != 'true' && matrix.package }}
         run: |
           mkdir -p artifacts
           tar -czf artifacts/${{ matrix.name }}.tar.gz \
@@ -91,7 +94,7 @@ jobs:
             .
 
       - name: Upload build artifact
-        if: ${{ matrix.build }}
+        if: ${{ env.SKIP_JOB != 'true' && matrix.build }}
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.name }}-dist
@@ -99,7 +102,7 @@ jobs:
           if-no-files-found: error
 
       - name: Upload packaged artifact
-        if: ${{ matrix.package }}
+        if: ${{ env.SKIP_JOB != 'true' && matrix.package }}
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.name }}-package
@@ -107,7 +110,7 @@ jobs:
           if-no-files-found: error
 
       - name: Upload Pages artifact
-        if: ${{ matrix.name == 'web-client' }}
+        if: ${{ env.SKIP_JOB != 'true' && matrix.name == 'web-client' }}
         uses: actions/upload-pages-artifact@v3
         with:
           path: ${{ matrix.path }}/dist

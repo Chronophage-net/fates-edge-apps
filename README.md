@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # fates-edge-apps
 Fate'S Edge Applications, Server, Bots, Modules, and Clients - Javascript, Python, Discord, Roll20, Foundry
 =======
@@ -42,4 +41,3 @@ npm start
 ## License
 
 This repository is licensed under MIT License for code.
->>>>>>> 743c67a (Initial commit)
