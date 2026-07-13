@@ -1,36 +1,41 @@
-name: Build and Package Apps
+name: Build and Deploy
 
 on:
   push:
     branches:
       - main
     paths:
-      - 'ttrpg/utilities/**'
+      - 'ttrpg/utilities/javascript/fates-edge-web-client/**'
+      - 'ttrpg/utilities/javascript/fates-edge-socket-server/**'
+      - 'ttrpg/utilities/javascript/fates-edge-desktop-client/**'
       - '.github/workflows/build-package-apps.yml'
   workflow_dispatch:
     inputs:
+      skip_web_deploy:
+        description: 'Skip web client deployment'
+        type: boolean
+        default: false
+      create_release:
+        description: 'Create GitHub Release with all packages'
+        type: boolean
+        default: false
       release_version:
         description: 'Release version (e.g., v1.0.0)'
         type: string
         required: false
-      create_release:
-        description: 'Create GitHub Release'
-        type: boolean
-        default: false
 
 env:
   NODE_VERSION: 24
   PYTHON_VERSION: 3.11
 
-# Global defaults for all jobs
-defaults:
-  run:
-    shell: bash
-
 jobs:
-  build-web-client:
-    name: Build Web Client
+  # ============================================
+  # WEB CLIENT - BUILD AND DEPLOY
+  # ============================================
+  web-client:
+    name: Build and Deploy Web Client
     runs-on: ubuntu-latest
+    if: github.event.inputs.skip_web_deploy != 'true'
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -39,46 +44,52 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-        
-      - name: Install and build web client
+
+      - name: Install dependencies
         working-directory: ttrpg/utilities/javascript/fates-edge-web-client
         run: |
-          echo "Installing dependencies..."
-          npm install
-          
-          echo "Building web client..."
+          if [ -f "package-lock.json" ]; then
+            npm ci
+          else
+            npm install
+          fi
+
+      - name: Build web client
+        working-directory: ttrpg/utilities/javascript/fates-edge-web-client
+        run: |
           if grep -q '"build"' package.json 2>/dev/null; then
             npm run build
           else
-            echo "No build script found, using static files"
-            mkdir -p dist
-            cp -r . dist/ 2>/dev/null || true
+            echo "No build script found - check package.json"
+            exit 1
           fi
-          
-          echo "Build complete"
 
-      - name: Package web client
-        run: |
-          mkdir -p artifacts
-          tar -czf artifacts/fates-edge-web-client.tar.gz \
-            -C ttrpg/utilities/javascript/fates-edge-web-client \
-            --exclude='node_modules' \
-            --exclude='.git' \
-            --exclude='*.log' \
-            .
-          echo "Created fates-edge-web-client.tar.gz ($(du -h artifacts/fates-edge-web-client.tar.gz | cut -f1))"
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ttrpg/utilities/javascript/fates-edge-web-client/dist
+          publish_branch: gh-pages
+          force_orphan: true
+          commit_message: "Deploy web client from ${{ github.sha }}"
+          user_name: 'github-actions[bot]'
+          user_email: 'github-actions[bot]@users.noreply.github.com'
 
       - name: Upload web client artifact
         uses: actions/upload-artifact@v4
         with:
           name: fates-edge-web-client
-          path: artifacts/fates-edge-web-client.tar.gz
+          path: ttrpg/utilities/javascript/fates-edge-web-client/dist
           retention-days: 30
           if-no-files-found: error
 
-  build-desktop-client:
-    name: Build Desktop Client
+  # ============================================
+  # SOCKET SERVER - PACKAGE FOR DOWNLOAD
+  # ============================================
+  socket-server:
+    name: Package Socket Server
     runs-on: ubuntu-latest
+    if: github.event.inputs.create_release == 'true'
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -87,51 +98,15 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-         
-      - name: Install desktop client
-        working-directory: ttrpg/utilities/javascript/fates-edge-desktop-client
-        run: |
-          echo "Installing dependencies..."
-          npm install
-          echo "Install complete"
 
-      - name: Package desktop client
-        run: |
-          mkdir -p artifacts
-          tar -czf artifacts/fates-edge-desktop-client.tar.gz \
-            -C ttrpg/utilities/javascript/fates-edge-desktop-client \
-            --exclude='node_modules' \
-            --exclude='.git' \
-            --exclude='*.log' \
-            .
-          echo "Created fates-edge-desktop-client.tar.gz ($(du -h artifacts/fates-edge-desktop-client.tar.gz | cut -f1))"
-
-      - name: Upload desktop client artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: fates-edge-desktop-client
-          path: artifacts/fates-edge-desktop-client.tar.gz
-          retention-days: 30
-          if-no-files-found: error
-
-  build-socket-server:
-    name: Build Socket Server
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-         
-      - name: Install socket server
+      - name: Install dependencies
         working-directory: ttrpg/utilities/javascript/fates-edge-socket-server
         run: |
-          echo "Installing dependencies..."
-          npm install
-          echo "Install complete"
+          if [ -f "package-lock.json" ]; then
+            npm ci
+          else
+            npm install
+          fi
 
       - name: Package socket server
         run: |
@@ -140,9 +115,8 @@ jobs:
             -C ttrpg/utilities/javascript/fates-edge-socket-server \
             --exclude='node_modules' \
             --exclude='.git' \
-            --exclude='*.log' \
             .
-          echo "Created fates-edge-socket-server.tar.gz ($(du -h artifacts/fates-edge-socket-server.tar.gz | cut -f1))"
+          echo "Created fates-edge-socket-server.tar.gz"
 
       - name: Upload socket server artifact
         uses: actions/upload-artifact@v4
@@ -152,9 +126,13 @@ jobs:
           retention-days: 30
           if-no-files-found: error
 
-  build-discord-bot:
-    name: Build Discord Bot
+  # ============================================
+  # DESKTOP CLIENT - PACKAGE FOR DOWNLOAD
+  # ============================================
+  desktop-client:
+    name: Package Desktop Client
     runs-on: ubuntu-latest
+    if: github.event.inputs.create_release == 'true'
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -163,215 +141,61 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-  
 
-      - name: Install Discord botcache
-        working-directory: ttrpg/utilities/fates-edge-discord-bot
+      - name: Install dependencies
+        working-directory: ttrpg/utilities/javascript/fates-edge-desktop-client
         run: |
-          echo "Installing dependencies..."
-          npm install
-          echo "Install complete"
+          if [ -f "package-lock.json" ]; then
+            npm ci
+          else
+            npm install
+          fi
 
-      - name: Package Discord bot
+      - name: Package desktop client
         run: |
           mkdir -p artifacts
-          tar -czf artifacts/fates-edge-discord-bot.tar.gz \
-            -C ttrpg/utilities/fates-edge-discord-bot \
+          tar -czf artifacts/fates-edge-desktop-client.tar.gz \
+            -C ttrpg/utilities/javascript/fates-edge-desktop-client \
             --exclude='node_modules' \
             --exclude='.git' \
-            --exclude='*.log' \
-            --exclude='.env' \
             .
-          echo "Created fates-edge-discord-bot.tar.gz ($(du -h artifacts/fates-edge-discord-bot.tar.gz | cut -f1))"
+          echo "Created fates-edge-desktop-client.tar.gz"
 
-      - name: Upload Discord bot artifact
+      - name: Upload desktop client artifact
         uses: actions/upload-artifact@v4
         with:
-          name: fates-edge-discord-bot
-          path: artifacts/fates-edge-discord-bot.tar.gz
+          name: fates-edge-desktop-client
+          path: artifacts/fates-edge-desktop-client.tar.gz
           retention-days: 30
           if-no-files-found: error
 
-  package-roll20:
-    name: Package Roll20 Integration
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Package Roll20 integration
-        run: |
-          mkdir -p artifacts
-          tar -czf artifacts/fates-edge-roll20.tar.gz \
-            -C ttrpg/utilities/fates-edge-roll20 \
-            --exclude='.git' \
-            --exclude='*.log' \
-            .
-          echo "Created fates-edge-roll20.tar.gz ($(du -h artifacts/fates-edge-roll20.tar.gz | cut -f1))"
-
-      - name: Upload Roll20 artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: fates-edge-roll20
-          path: artifacts/fates-edge-roll20.tar.gz
-          retention-days: 30
-          if-no-files-found: error
-
-  package-foundry-bridge:
-    name: Package Foundry VTT Bridge
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Package Foundry VTT bridge
-        run: |
-          mkdir -p artifacts
-          tar -czf artifacts/foundry-fates-edge-bridge.tar.gz \
-            -C ttrpg/utilities/foundry_fates-edge-bridge \
-            --exclude='.git' \
-            --exclude='*.log' \
-            .
-          echo "Created foundry-fates-edge-bridge.tar.gz ($(du -h artifacts/foundry-fates-edge-bridge.tar.gz | cut -f1))"
-
-      - name: Upload Foundry bridge artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: foundry-fates-edge-bridge
-          path: artifacts/foundry-fates-edge-bridge.tar.gz
-          retention-days: 30
-          if-no-files-found: error
-
-  build-python-client:
-    name: Build Python Client
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Setup Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: ${{ env.PYTHON_VERSION }}
-
-      - name: Install build tools
-        run: |
-          python -m pip install --upgrade pip
-          pip install build wheel
-
-      - name: Build Python client package
-        working-directory: ttrpg/utilities/python/fates-edge-python-client
-        run: |
-          python -m build --sdist --wheel
-
-      - name: Package Python client
-        run: |
-          mkdir -p artifacts
-          # Copy sdist
-          cp ttrpg/utilities/python/fates-edge-python-client/dist/*.tar.gz artifacts/fates-edge-python-client.tar.gz 2>/dev/null || true
-          # Copy wheel
-          cp ttrpg/utilities/python/fates-edge-python-client/dist/*.whl artifacts/ 2>/dev/null || true
-          echo "Created Python client packages"
-
-      - name: Upload Python client artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: fates-edge-python-client
-          path: artifacts/
-          retention-days: 30
-          if-no-files-found: error
-
-  package-python-tool:
-    name: Package Python CLI Tool
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Package Python CLI tool
-        run: |
-          mkdir -p artifacts
-          tar -czf artifacts/fates-edge-python-tool.tar.gz \
-            -C ttrpg/utilities/python/fates_edge_tool \
-            --exclude='.git' \
-            --exclude='*.log' \
-            --exclude='*.pyc' \
-            --exclude='__pycache__' \
-          echo "Created fates-edge-python-tool.tar.gz ($(du -h artifacts/fates-edge-python-tool.tar.gz | cut -f1))"
-
-      - name: Upload Python tool artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: fates-edge-python-tool
-          path: artifacts/fates-edge-python-tool.tar.gz
-          retention-days: 30
-          if-no-files-found: error
-
+  # ============================================
+  # CREATE RELEASE
+  # ============================================
   create-release:
     name: Create Release
     runs-on: ubuntu-latest
-    needs:
-      - build-web-client
-      - build-desktop-client
-      - build-socket-server
-      - build-discord-bot
-      - package-roll20
-      - package-foundry-bridge
-      - build-python-client
-      - package-python-tool
-    if: github.event.inputs.create_release == 'true' || github.ref == 'refs/heads/main'
+    needs: [socket-server, desktop-client]
+    if: github.event.inputs.create_release == 'true' && github.event.inputs.release_version != ''
     steps:
       - name: Download all artifacts
         uses: actions/download-artifact@v4
         with:
           path: artifacts/
 
-      - name: List downloaded artifacts
-        run: |
-          echo "Downloaded artifacts:"
-          find artifacts -type f -name "*.tar.gz" -o -name "*.whl" | sort
-          echo ""
-          echo "Artifact sizes:"
-          find artifacts -type f -name "*.tar.gz" -o -name "*.whl" -exec du -h {} \; | sort
-
-      - name: Create release assets directory
+      - name: Create release assets
         run: |
           mkdir -p release-assets
-          # Find and copy all tarballs and wheels
-          find artifacts -type f \( -name "*.tar.gz" -o -name "*.whl" \) -exec cp {} release-assets/ \;
-          echo "Release assets:"
+          find artifacts -type f -name "*.tar.gz" -exec cp {} release-assets/ \;
           ls -la release-assets/
 
       - name: Generate checksums
         working-directory: release-assets
         run: |
           sha256sum * > checksums.txt
-          echo "Checksums generated:"
           cat checksums.txt
 
-      - name: Create combined release tarball
-        run: |
-          tar -czf fates-edge-apps-all.tar.gz -C release-assets .
-          echo "Created fates-edge-apps-all.tar.gz ($(du -h fates-edge-apps-all.tar.gz | cut -f1))"
-
-      - name: Upload combined release artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: fates-edge-apps-all
-          path: fates-edge-apps-all.tar.gz
-          retention-days: 30
-          if-no-files-found: error
-
-      - name: Upload individual release artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: fates-edge-release-assets
-          path: release-assets/
-          retention-days: 30
-          if-no-files-found: error
-
       - name: Create GitHub Release
-        if: github.event.inputs.create_release == 'true' && github.event.inputs.release_version != ''
         uses: softprops/action-gh-release@v1
         with:
           tag_name: ${{ github.event.inputs.release_version }}
@@ -380,8 +204,6 @@ jobs:
           prerelease: false
           files: |
             release-assets/*.tar.gz
-            release-assets/*.whl
             release-assets/checksums.txt
-            fates-edge-apps-all.tar.gz
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
