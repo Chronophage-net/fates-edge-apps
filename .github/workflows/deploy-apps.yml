@@ -68,10 +68,10 @@ jobs:
       contents: write
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         if: ${{ env.SKIP_JOB != 'true' }}
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v6
         if: ${{ env.SKIP_JOB != 'true' }}
         with:
           node-version: ${{ env.NODE_VERSION }}
@@ -83,7 +83,7 @@ jobs:
         run: |
           if [ ! -f package-lock.json ]; then
             echo "No package-lock.json found in ${{ matrix.path }} — generating one."
-            npm install --package-lock-only
+            npm install --package-lock-only --ignore-scripts
             echo "generated=true" >> "$GITHUB_OUTPUT"
           else
             echo "generated=false" >> "$GITHUB_OUTPUT"
@@ -91,7 +91,7 @@ jobs:
 
       - name: Commit generated lockfile
         if: ${{ env.SKIP_JOB != 'true' && steps.ensure-lockfile.outputs.generated == 'true' && github.event_name != 'pull_request' }}
-        uses: stefanzweifel/git-auto-commit-action@v5
+        uses: stefanzweifel/git-auto-commit-action@v7
         with:
           commit_message: "chore: add generated package-lock.json for ${{ matrix.name }}"
           file_pattern: ${{ matrix.path }}/package-lock.json
@@ -99,7 +99,7 @@ jobs:
 
       - name: Cache node modules
         if: ${{ env.SKIP_JOB != 'true' }}
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: ${{ matrix.path }}/node_modules
           key: ${{ runner.os }}-node-${{ matrix.name }}-${{ hashFiles(format('{0}/package-lock.json', matrix.path)) }}
@@ -128,7 +128,7 @@ jobs:
 
       - name: Upload build artifact
         if: ${{ env.SKIP_JOB != 'true' && matrix.build }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: ${{ matrix.name }}-dist
           path: ${{ matrix.path }}/dist
@@ -136,7 +136,7 @@ jobs:
 
       - name: Upload packaged artifact
         if: ${{ env.SKIP_JOB != 'true' && matrix.package }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: ${{ matrix.name }}-package
           path: artifacts/${{ matrix.name }}.tar.gz
@@ -192,7 +192,7 @@ jobs:
 
     steps:
       - name: Download packaged artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v6
         with:
           pattern: '*-package'
           path: artifacts/
