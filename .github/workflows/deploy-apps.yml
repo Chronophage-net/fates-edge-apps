@@ -22,6 +22,11 @@ env:
   NODE_VERSION: 24
   PYTHON_VERSION: 3.11
 
+# Global defaults for all jobs
+defaults:
+  run:
+    shell: bash
+
 jobs:
   build-web-client:
     name: Build Web Client
@@ -34,29 +39,34 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-        # NO CACHE PARAMETER HERE
-
-      - name: Build web client
+        
+      - name: Install and build web client
         working-directory: ttrpg/utilities/javascript/fates-edge-web-client
         run: |
-          if [ -f "package.json" ]; then
-            if [ -f "package-lock.json" ]; then
-              npm ci
-            else
-              npm install
-            fi
-          fi
+          echo "Installing dependencies..."
+          npm install
+          
+          echo "Building web client..."
           if grep -q '"build"' package.json 2>/dev/null; then
             npm run build
           else
             echo "No build script found, using static files"
+            mkdir -p dist
+            cp -r . dist/ 2>/dev/null || true
           fi
+          
+          echo "Build complete"
 
       - name: Package web client
         run: |
           mkdir -p artifacts
-          tar -czf artifacts/fates-edge-web-client.tar.gz -C ttrpg/utilities/javascript/fates-edge-web-client .
-          echo "Created fates-edge-web-client.tar.gz"
+          tar -czf artifacts/fates-edge-web-client.tar.gz \
+            -C ttrpg/utilities/javascript/fates-edge-web-client \
+            --exclude='node_modules' \
+            --exclude='.git' \
+            --exclude='*.log' \
+            .
+          echo "Created fates-edge-web-client.tar.gz ($(du -h artifacts/fates-edge-web-client.tar.gz | cut -f1))"
 
       - name: Upload web client artifact
         uses: actions/upload-artifact@v4
@@ -77,22 +87,24 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-        # NO CACHE PARAMETER HERE
-
-      - name: Install dependencies
+         
+      - name: Install desktop client
         working-directory: ttrpg/utilities/javascript/fates-edge-desktop-client
         run: |
-          if [ -f "package-lock.json" ]; then
-            npm ci
-          else
-            npm install
-          fi
+          echo "Installing dependencies..."
+          npm install
+          echo "Install complete"
 
       - name: Package desktop client
         run: |
           mkdir -p artifacts
-          tar -czf artifacts/fates-edge-desktop-client.tar.gz -C ttrpg/utilities/javascript/fates-edge-desktop-client .
-          echo "Created fates-edge-desktop-client.tar.gz"
+          tar -czf artifacts/fates-edge-desktop-client.tar.gz \
+            -C ttrpg/utilities/javascript/fates-edge-desktop-client \
+            --exclude='node_modules' \
+            --exclude='.git' \
+            --exclude='*.log' \
+            .
+          echo "Created fates-edge-desktop-client.tar.gz ($(du -h artifacts/fates-edge-desktop-client.tar.gz | cut -f1))"
 
       - name: Upload desktop client artifact
         uses: actions/upload-artifact@v4
@@ -113,22 +125,24 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-        # NO CACHE PARAMETER HERE
-
-      - name: Install dependencies
+         
+      - name: Install socket server
         working-directory: ttrpg/utilities/javascript/fates-edge-socket-server
         run: |
-          if [ -f "package-lock.json" ]; then
-            npm ci
-          else
-            npm install
-          fi
+          echo "Installing dependencies..."
+          npm install
+          echo "Install complete"
 
       - name: Package socket server
         run: |
           mkdir -p artifacts
-          tar -czf artifacts/fates-edge-socket-server.tar.gz -C ttrpg/utilities/javascript/fates-edge-socket-server .
-          echo "Created fates-edge-socket-server.tar.gz"
+          tar -czf artifacts/fates-edge-socket-server.tar.gz \
+            -C ttrpg/utilities/javascript/fates-edge-socket-server \
+            --exclude='node_modules' \
+            --exclude='.git' \
+            --exclude='*.log' \
+            .
+          echo "Created fates-edge-socket-server.tar.gz ($(du -h artifacts/fates-edge-socket-server.tar.gz | cut -f1))"
 
       - name: Upload socket server artifact
         uses: actions/upload-artifact@v4
@@ -149,22 +163,26 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-        # NO CACHE PARAMETER HERE
+  
 
-      - name: Install dependencies
+      - name: Install Discord botcache
         working-directory: ttrpg/utilities/fates-edge-discord-bot
         run: |
-          if [ -f "package-lock.json" ]; then
-            npm ci
-          else
-            npm install
-          fi
+          echo "Installing dependencies..."
+          npm install
+          echo "Install complete"
 
       - name: Package Discord bot
         run: |
           mkdir -p artifacts
-          tar -czf artifacts/fates-edge-discord-bot.tar.gz -C ttrpg/utilities/fates-edge-discord-bot .
-          echo "Created fates-edge-discord-bot.tar.gz"
+          tar -czf artifacts/fates-edge-discord-bot.tar.gz \
+            -C ttrpg/utilities/fates-edge-discord-bot \
+            --exclude='node_modules' \
+            --exclude='.git' \
+            --exclude='*.log' \
+            --exclude='.env' \
+            .
+          echo "Created fates-edge-discord-bot.tar.gz ($(du -h artifacts/fates-edge-discord-bot.tar.gz | cut -f1))"
 
       - name: Upload Discord bot artifact
         uses: actions/upload-artifact@v4
@@ -184,8 +202,12 @@ jobs:
       - name: Package Roll20 integration
         run: |
           mkdir -p artifacts
-          tar -czf artifacts/fates-edge-roll20.tar.gz -C ttrpg/utilities/fates-edge-roll20 .
-          echo "Created fates-edge-roll20.tar.gz"
+          tar -czf artifacts/fates-edge-roll20.tar.gz \
+            -C ttrpg/utilities/fates-edge-roll20 \
+            --exclude='.git' \
+            --exclude='*.log' \
+            .
+          echo "Created fates-edge-roll20.tar.gz ($(du -h artifacts/fates-edge-roll20.tar.gz | cut -f1))"
 
       - name: Upload Roll20 artifact
         uses: actions/upload-artifact@v4
@@ -205,8 +227,12 @@ jobs:
       - name: Package Foundry VTT bridge
         run: |
           mkdir -p artifacts
-          tar -czf artifacts/foundry-fates-edge-bridge.tar.gz -C ttrpg/utilities/foundry_fates-edge-bridge .
-          echo "Created foundry-fates-edge-bridge.tar.gz"
+          tar -czf artifacts/foundry-fates-edge-bridge.tar.gz \
+            -C ttrpg/utilities/foundry_fates-edge-bridge \
+            --exclude='.git' \
+            --exclude='*.log' \
+            .
+          echo "Created foundry-fates-edge-bridge.tar.gz ($(du -h artifacts/foundry-fates-edge-bridge.tar.gz | cut -f1))"
 
       - name: Upload Foundry bridge artifact
         uses: actions/upload-artifact@v4
@@ -227,7 +253,6 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: ${{ env.PYTHON_VERSION }}
-          cache: 'pip'
 
       - name: Install build tools
         run: |
@@ -242,7 +267,9 @@ jobs:
       - name: Package Python client
         run: |
           mkdir -p artifacts
+          # Copy sdist
           cp ttrpg/utilities/python/fates-edge-python-client/dist/*.tar.gz artifacts/fates-edge-python-client.tar.gz 2>/dev/null || true
+          # Copy wheel
           cp ttrpg/utilities/python/fates-edge-python-client/dist/*.whl artifacts/ 2>/dev/null || true
           echo "Created Python client packages"
 
@@ -264,8 +291,14 @@ jobs:
       - name: Package Python CLI tool
         run: |
           mkdir -p artifacts
-          tar -czf artifacts/fates-edge-python-tool.tar.gz -C ttrpg/utilities/python/fates_edge_tool .
-          echo "Created fates-edge-python-tool.tar.gz"
+          tar -czf artifacts/fates-edge-python-tool.tar.gz \
+            -C ttrpg/utilities/python/fates_edge_tool \
+            --exclude='.git' \
+            --exclude='*.log' \
+            --exclude='*.pyc' \
+            --exclude='__pycache__' \
+            .
+          echo "Created fates-edge-python-tool.tar.gz ($(du -h artifacts/fates-edge-python-tool.tar.gz | cut -f1))"
 
       - name: Upload Python tool artifact
         uses: actions/upload-artifact@v4
@@ -294,6 +327,14 @@ jobs:
         with:
           path: artifacts/
 
+      - name: List downloaded artifacts
+        run: |
+          echo "Downloaded artifacts:"
+          find artifacts -type f -name "*.tar.gz" -o -name "*.whl" | sort
+          echo ""
+          echo "Artifact sizes:"
+          find artifacts -type f -name "*.tar.gz" -o -name "*.whl" -exec du -h {} \; | sort
+
       - name: Create release assets directory
         run: |
           mkdir -p release-assets
@@ -312,7 +353,7 @@ jobs:
       - name: Create combined release tarball
         run: |
           tar -czf fates-edge-apps-all.tar.gz -C release-assets .
-          echo "Created fates-edge-apps-all.tar.gz"
+          echo "Created fates-edge-apps-all.tar.gz ($(du -h fates-edge-apps-all.tar.gz | cut -f1))"
 
       - name: Upload combined release artifact
         uses: actions/upload-artifact@v4
