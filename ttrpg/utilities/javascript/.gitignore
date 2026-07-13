@@ -7,4 +7,3 @@ build/
 
 # Node
 node_modules/
-package-lock.json  # If you're committing lock files, remove this line

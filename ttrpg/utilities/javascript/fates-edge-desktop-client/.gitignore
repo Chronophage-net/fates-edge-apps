@@ -1,6 +1,5 @@
 # Dependencies
 node_modules/
-package-lock.json
 yarn.lock
 
 # Build output
@@ -14,7 +13,6 @@ release/
 *.zip
 *.blockmap
 *.nupkg
-*.yml
 
 # Development
 *.log
