@@ -297,7 +297,6 @@ jobs:
             --exclude='*.log' \
             --exclude='*.pyc' \
             --exclude='__pycache__' \
-            .
           echo "Created fates-edge-python-tool.tar.gz ($(du -h artifacts/fates-edge-python-tool.tar.gz | cut -f1))"
 
       - name: Upload Python tool artifact
