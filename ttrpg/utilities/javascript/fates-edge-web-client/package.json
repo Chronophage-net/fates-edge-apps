@@ -1,0 +1,13 @@
+{
+  "name": "fates-edge-web-client",
+  "version": "4.1.0",
+  "description": "Fate's Edge Web Client",
+  "private": true,
+  "scripts": {
+    "build": "echo '✅ Web client ready - static files only'",
+    "test": "echo 'No tests configured'"
+  },
+  "dependencies": {
+    "socket.io-client": "^4.5.0"
+  }
+}

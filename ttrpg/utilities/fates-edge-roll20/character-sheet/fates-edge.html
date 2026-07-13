@@ -1,0 +1,173 @@
+<!-- Fate's Edge Character Sheet for Roll20 -->
+<!--
+  Simple character sheet for Fate's Edge.
+  This is a basic template - can be expanded based on your needs.
+-->
+
+<div class="fates-edge-sheet">
+    <h1>⚔️ Fate's Edge</h1>
+    
+    <div class="sheet-section">
+        <div class="field">
+            <label>Character Name</label>
+            <input type="text" name="attr_name" />
+        </div>
+        <div class="field">
+            <label>Player Name</label>
+            <input type="text" name="attr_player" />
+        </div>
+        <div class="field">
+            <label>Tier</label>
+            <input type="number" name="attr_tier" value="1" min="1" max="5" />
+        </div>
+    </div>
+
+    <div class="sheet-section">
+        <h2>Attributes</h2>
+        <div class="attributes-grid">
+            <div class="field">
+                <label>Body</label>
+                <input type="number" name="attr_body" value="1" min="0" max="5" />
+            </div>
+            <div class="field">
+                <label>Wits</label>
+                <input type="number" name="attr_wits" value="1" min="0" max="5" />
+            </div>
+            <div class="field">
+                <label>Spirit</label>
+                <input type="number" name="attr_spirit" value="1" min="0" max="5" />
+            </div>
+            <div class="field">
+                <label>Presence</label>
+                <input type="number" name="attr_presence" value="1" min="0" max="5" />
+            </div>
+        </div>
+    </div>
+
+    <div class="sheet-section">
+        <h2>Health</h2>
+        <div class="health-grid">
+            <div class="field">
+                <label>Harm</label>
+                <input type="number" name="attr_harm" value="0" min="0" max="3" />
+                <span class="hint">0-3 (3 = Incapacitated)</span>
+            </div>
+            <div class="field">
+                <label>Fatigue</label>
+                <input type="number" name="attr_fatigue" value="0" min="0" max="5" />
+                <span class="hint">Body = max</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="sheet-section">
+        <h2>Resources</h2>
+        <div class="resources-grid">
+            <div class="field">
+                <label>Boons</label>
+                <input type="number" name="attr_boons" value="0" min="0" max="5" />
+                <span class="hint">Max 5</span>
+            </div>
+            <div class="field">
+                <label>Obligation</label>
+                <input type="number" name="attr_obligation" value="0" min="0" max="10" />
+            </div>
+        </div>
+    </div>
+
+    <div class="sheet-section">
+        <h2>Skills</h2>
+        <div class="skills-grid">
+            <div class="field">
+                <label>Athletics</label>
+                <input type="number" name="attr_athletics" value="0" min="0" max="5" />
+            </div>
+            <div class="field">
+                <label>Melee</label>
+                <input type="number" name="attr_melee" value="0" min="0" max="5" />
+            </div>
+            <div class="field">
+                <label>Ranged</label>
+                <input type="number" name="attr_ranged" value="0" min="0" max="5" />
+            </div>
+            <div class="field">
+                <label>Stealth</label>
+                <input type="number" name="attr_stealth" value="0" min="0" max="5" />
+            </div>
+            <div class="field">
+                <label>Lore</label>
+                <input type="number" name="attr_lore" value="0" min="0" max="5" />
+            </div>
+            <div class="field">
+                <label>Sway</label>
+                <input type="number" name="attr_sway" value="0" min="0" max="5" />
+            </div>
+            <div class="field">
+                <label>Command</label>
+                <input type="number" name="attr_command" value="0" min="0" max="5" />
+            </div>
+            <div class="field">
+                <label>Insight</label>
+                <input type="number" name="attr_insight" value="0" min="0" max="5" />
+            </div>
+        </div>
+    </div>
+
+    <div class="sheet-section">
+        <h2>⚔️ VTT Sync Status</h2>
+        <div class="sync-status">
+            <span id="vtt-status">🔴 Disconnected</span>
+            <button class="vtt-sync-btn" onclick="syncCharacterToVTT()">Sync to VTT</button>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Styles are in fates-edge.css */
+</style>
+
+<script>
+    // Character sheet JavaScript
+    // This runs in the character sheet sandbox
+
+    // Function to sync character to VTT
+    function syncCharacterToVTT() {
+        // Get character data
+        const charData = {
+            name: getAttr('name'),
+            harm: getAttr('harm'),
+            fatigue: getAttr('fatigue'),
+            boons: getAttr('boons'),
+            tier: getAttr('tier'),
+            body: getAttr('body'),
+            wits: getAttr('wits'),
+            spirit: getAttr('spirit'),
+            presence: getAttr('presence')
+        };
+
+        // Send to VTT via API command
+        // This will be handled by the API script
+        sendChat('!fates-edge sync char ' + JSON.stringify(charData));
+
+        // Update status
+        document.getElementById('vtt-status').textContent = '🟡 Syncing...';
+        setTimeout(() => {
+            document.getElementById('vtt-status').textContent = '🟢 Synced';
+        }, 2000);
+    }
+
+    // Helper to get attribute value
+    function getAttr(name) {
+        const el = document.querySelector(`[name="attr_${name}"]`);
+        return el ? parseInt(el.value) || 0 : 0;
+    }
+
+    // Update status from API
+    on('change:attr_name', () => {
+        // Update VTT status when name changes
+        document.getElementById('vtt-status').textContent = '🟡 Unsaved';
+        setTimeout(() => {
+            document.getElementById('vtt-status').textContent = '🟢 Synced';
+        }, 1000);
+    });
+</script>

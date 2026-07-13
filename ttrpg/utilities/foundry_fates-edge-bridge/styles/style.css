@@ -1,0 +1,92 @@
+/* Fate's Edge Bridge - Styles */
+
+#fates-edge-status {
+    font-weight: bold;
+    padding: 2px 8px;
+    border-radius: 4px;
+    background: rgba(0,0,0,0.2);
+    display: inline-block;
+}
+
+#fates-edge-voice {
+    padding: 2px 8px;
+    border-radius: 4px;
+    background: rgba(0,0,0,0.2);
+    display: inline-block;
+    margin-left: 8px;
+}
+
+.fates-edge-button {
+    background: #d4af37;
+    color: #1a141a;
+    border: none;
+    padding: 4px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background 0.2s;
+}
+
+.fates-edge-button:hover {
+    background: #c4a027;
+}
+
+.fates-edge-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.fates-edge-status-connected {
+    color: #43b581;
+}
+
+.fates-edge-status-disconnected {
+    color: #f04747;
+}
+
+.fates-edge-status-connecting {
+    color: #faa61a;
+}
+
+/* Chat message styling */
+.fates-edge-chat-message {
+    border-left: 3px solid #d4af37;
+    padding-left: 8px;
+    margin: 4px 0;
+}
+
+.fates-edge-chat-message .sender {
+    font-weight: bold;
+    color: #d4af37;
+}
+
+/* Timer display */
+.fates-edge-timer {
+    background: rgba(0,0,0,0.2);
+    border-radius: 4px;
+    padding: 8px;
+    margin: 4px 0;
+}
+
+.fates-edge-timer .progress {
+    width: 100%;
+    height: 8px;
+    background: #333;
+    border-radius: 4px;
+    overflow: hidden;
+    margin-top: 4px;
+}
+
+.fates-edge-timer .progress .fill {
+    height: 100%;
+    border-radius: 4px;
+    transition: width 0.3s;
+}
+
+.fates-edge-timer .progress .fill.complete {
+    background: #cc3333;
+}
+
+.fates-edge-timer .progress .fill.active {
+    background: #d4af37;
+}

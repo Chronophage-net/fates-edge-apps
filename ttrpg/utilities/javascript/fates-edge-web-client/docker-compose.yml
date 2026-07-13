@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+  client:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: fates-edge-client:latest
+    container_name: fates-edge-client
+    ports:
+      - "8080:80"
+    environment:
+      - NODE_ENV=production
+      - API_URL=/api
+      - BUILD_DIR=/usr/share/nginx/html/build
+    volumes:
+      # Mount local build directory for development
+      - ./build:/usr/share/nginx/html/build:ro
+      # Mount local config
+      - ./config:/usr/share/nginx/html/config:ro
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - fates-edge-network
+
+networks:
+  fates-edge-network:
+    driver: bridge

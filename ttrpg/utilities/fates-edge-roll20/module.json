@@ -1,0 +1,8 @@
+{
+  "name": "fates-edge-roll20",
+  "title": "Fate's Edge Roll20 Module",
+  "description": "Fate's Edge VTT integration for Roll20",
+  "version": "4.1.0",
+  "author": "Fate's Edge Team",
+  "scripts": ["api/fates-edge-api.js"]
+}

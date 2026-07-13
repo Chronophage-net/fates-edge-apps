@@ -1,0 +1,70 @@
+{
+  "identity": {
+    "name": "",
+    "heritage": "",
+    "patron": "",
+    "tier": 1,
+    "xp": 0
+  },
+  "attributes": {
+    "body": 1,
+    "wits": 1,
+    "spirit": 1,
+    "presence": 1
+  },
+  "skills": {
+    "melee": 0,
+    "ranged": 0,
+    "brawl": 0,
+    "tactics": 0,
+    "athletics": 0,
+    "stealth": 0,
+    "endurance": 0,
+    "craft": 0,
+    "survival": 0,
+    "sway": 0,
+    "command": 0,
+    "deception": 0,
+    "performance": 0,
+    "insight": 0,
+    "lore": 0,
+    "investigation": 0,
+    "medicine": 0,
+    "arcana": 0,
+    "ritual": 0,
+    "mechanics": 0
+  },
+  "resources": {
+    "fatigue": 0,
+    "harm": 0,
+    "boons": 0,
+    "momentum": 0,
+    "obligation": 0,
+    "corruption": 0,
+    "leash": 0
+  },
+  "talents": [
+    {
+      "name": "Friendly Face",
+      "die_adjustment": 1,
+      "condition": "Social roll after socializing",
+      "cost": 2
+    }
+  ],
+  "assets": [
+    {
+      "name": "light armor",
+      "status": "Stable"
+    },
+    {
+      "name": "knife",
+      "status": "Stable"
+    }
+  ],
+  "followers": [],
+  "debt_timers": [],
+  "bonds": "1 Bond(s) taken",
+  "strings": "",
+  "notes": "Complications: 1\nComplications: 1\n",
+  "portrait": ""
+}

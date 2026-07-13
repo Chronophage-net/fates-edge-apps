@@ -1,0 +1,41 @@
+{
+  "identity": {
+    "name": "Credence",
+    "heritage": "Vilikara",
+    "patron": "Crom",
+    "tier": 1,
+    "xp": 0
+  },
+  "attributes": {
+    "body": 2,
+    "wits": 1,
+    "spirit": 1,
+    "presence": 2
+  },
+  "resources": {
+    "fatigue": 0,
+    "harm": 0,
+    "boons": 0,
+    "momentum": 0,
+    "obligation": 0,
+    "corruption": 0,
+    "leash": 0
+  },
+  "assets": [],
+  "followers": [
+    {
+      "name": "Jean",
+      "cap": 3,
+      "loyalty": "Faithful/Ready"
+    }
+  ],
+  "debt_timers": [
+    {
+      "name": "The Smullger's Cove",
+      "segments": 0
+    }
+  ],
+  "bonds": "",
+  "strings": "",
+  "notes": ""
+}

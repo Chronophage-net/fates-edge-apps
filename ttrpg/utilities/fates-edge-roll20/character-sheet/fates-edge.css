@@ -1,0 +1,136 @@
+/* Fate's Edge Character Sheet Styles */
+
+.fates-edge-sheet {
+    font-family: 'Georgia', serif;
+    padding: 1rem;
+    color: #e6dce8;
+    background: #1a141a;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.fates-edge-sheet h1 {
+    color: #d4af37;
+    font-size: 2rem;
+    border-bottom: 2px solid #d4af37;
+    padding-bottom: 0.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.fates-edge-sheet h2 {
+    color: #d4af37;
+    font-size: 1.2rem;
+    border-bottom: 1px solid #3a2f3a;
+    padding-bottom: 0.3rem;
+    margin: 1rem 0 0.5rem 0;
+}
+
+.sheet-section {
+    background: #231e29;
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    border: 1px solid #3a2f3a;
+}
+
+.field {
+    margin: 0.5rem 0;
+}
+
+.field label {
+    display: block;
+    font-size: 0.8rem;
+    font-weight: bold;
+    color: #b8aabf;
+    margin-bottom: 0.2rem;
+}
+
+.field input {
+    width: 100%;
+    padding: 0.4rem 0.6rem;
+    font-size: 1rem;
+    background: #1a141a;
+    color: #e6dce8;
+    border: 1px solid #3a2f3a;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+.field input:focus {
+    border-color: #d4af37;
+    outline: none;
+}
+
+.field .hint {
+    font-size: 0.7rem;
+    color: #6a5a6a;
+    display: block;
+    margin-top: 0.2rem;
+}
+
+.attributes-grid,
+.health-grid,
+.resources-grid,
+.skills-grid {
+    display: grid;
+    gap: 0.5rem;
+}
+
+.attributes-grid {
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+}
+
+.health-grid {
+    grid-template-columns: 1fr 1fr;
+}
+
+.resources-grid {
+    grid-template-columns: 1fr 1fr;
+}
+
+.skills-grid {
+    grid-template-columns: 1fr 1fr 1fr;
+}
+
+.sync-status {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.5rem;
+    background: #1a141a;
+    border-radius: 4px;
+}
+
+.sync-status span {
+    font-weight: bold;
+}
+
+.vtt-sync-btn {
+    background: #d4af37;
+    color: #1a141a;
+    border: none;
+    padding: 0.4rem 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background 0.2s;
+}
+
+.vtt-sync-btn:hover {
+    background: #c4a027;
+}
+
+/* Roll20 specific overrides */
+.roll20-wrapper .fates-edge-sheet input {
+    max-width: 100%;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+    .attributes-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+    .skills-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+}

@@ -1,0 +1,76 @@
+{
+  "id": "fates-edge-bridge",
+  "title": "Fate's Edge Bridge",
+  "description": "Connects Foundry VTT to the Fate's Edge WebSocket server for real-time sync of chat, dice rolls, characters, timers, and scenes.",
+  "version": "4.1.0",
+  "authors": [
+    {
+      "name": "Fate's Edge Team",
+      "email": "support@fates-edge.com",
+      "url": "https://fates-edge.com",
+      "discord": "https://discord.gg/fates-edge"
+    }
+  ],
+  "esmodules": [
+    "scripts/main.js"
+  ],
+  "styles": [
+    "styles/style.css"
+  ],
+  "languages": [
+    {
+      "lang": "en",
+      "name": "English",
+      "path": "lang/en.json"
+    }
+  ],
+  "compatibility": {
+    "minimum": "11",
+    "verified": "12",
+    "maximum": "12"
+  },
+  "socket": true,
+  "url": "https://github.com/fates-edge/foundry-bridge",
+  "manifest": "https://github.com/fates-edge/foundry-bridge/releases/latest/download/module.json",
+  "download": "https://github.com/fates-edge/foundry-bridge/releases/latest/download/fates-edge-bridge.zip",
+  "readme": "https://github.com/fates-edge/foundry-bridge/blob/main/README.md",
+  "changelog": "https://github.com/fates-edge/foundry-bridge/blob/main/CHANGELOG.md",
+  "bugs": "https://github.com/fates-edge/foundry-bridge/issues",
+  "allowBugReporter": true,
+  "media": [
+    {
+      "type": "icon",
+      "url": "https://fates-edge.com/images/fates-edge-icon.png"
+    },
+    {
+      "type": "screenshot",
+      "url": "https://fates-edge.com/images/foundry-bridge-screenshot-1.png"
+    },
+    {
+      "type": "screenshot",
+      "url": "https://fates-edge.com/images/foundry-bridge-screenshot-2.png"
+    }
+  ],
+  "minimumCoreVersion": "11",
+  "compatibleCoreVersion": "12",
+  "system": [],
+  "dependencies": [],
+  "conflicts": [],
+  "pack": [],
+  "packs": [],
+  "relationships": {
+    "requires": [],
+    "systems": [],
+    "modules": []
+  },
+  "flags": {
+    "hotReload": {
+      "extensions": [
+        "js",
+        "css",
+        "html",
+        "json"
+      ]
+    }
+  }
+}

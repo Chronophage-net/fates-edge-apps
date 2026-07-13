@@ -1,0 +1,66 @@
+<div class="fates-edge-settings">
+    <h2>⚔️ Fate's Edge Bridge</h2>
+    <p class="notes">Configure the connection to the Fate's Edge WebSocket server.</p>
+    
+    <div class="form-group">
+        <label>Server Status</label>
+        <div id="fates-edge-status" class="fates-edge-status-disconnected">🔴 Disconnected</div>
+    </div>
+    
+    <div class="form-group">
+        <button id="fates-edge-connect-btn" class="fates-edge-button">Connect Now</button>
+        <button id="fates-edge-disconnect-btn" class="fates-edge-button" style="background:#cc3333;color:white;">Disconnect</button>
+    </div>
+    
+    <div class="form-group">
+        <label>Server URL</label>
+        <input type="text" id="fates-edge-server-url" placeholder="ws://localhost:3000" />
+        <p class="notes">The WebSocket URL of your Fate's Edge server.</p>
+    </div>
+    
+    <div class="form-group">
+        <label>Room Code</label>
+        <input type="text" id="fates-edge-room-code" placeholder="ABC123" style="text-transform:uppercase;" />
+        <p class="notes">The room code to join.</p>
+    </div>
+    
+    <div class="form-group">
+        <label>Player Name</label>
+        <input type="text" id="fates-edge-player-name" placeholder="Your display name" />
+        <p class="notes">Your name shown to other VTT clients.</p>
+    </div>
+    
+    <div class="form-group">
+        <label>
+            <input type="checkbox" id="fates-edge-auto-connect" />
+            Auto-Connect on Foundry Load
+        </label>
+    </div>
+    
+    <div class="form-group">
+        <label>
+            <input type="checkbox" id="fates-edge-sync-chat" />
+            Sync Foundry Chat to VTT
+        </label>
+    </div>
+    
+    <div class="form-group">
+        <label>
+            <input type="checkbox" id="fates-edge-sync-rolls" />
+            Sync Foundry Rolls to VTT
+        </label>
+    </div>
+    
+    <div class="form-group">
+        <label>
+            <input type="checkbox" id="fates-edge-sync-actors" />
+            Sync Foundry Actors to VTT (experimental)
+        </label>
+    </div>
+    
+    <div class="form-group" style="margin-top:16px;border-top:1px solid #333;padding-top:16px;">
+        <h3>🔗 VTT Integration</h3>
+        <button id="fates-edge-sync-characters" class="fates-edge-button">📤 Sync Selected Actors to VTT</button>
+        <button id="fates-edge-sync-scene" class="fates-edge-button">🎬 Sync Current Scene</button>
+    </div>
+</div>

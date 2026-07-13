@@ -1,0 +1,17 @@
+{
+  "name": "kon-reh",
+  "version": "1.0.0",
+  "description": "Fate's Edge Toolkit",
+  "scripts": {
+    "test": "vitest run --passWithNoTests",
+    "test:ci": "vitest run --passWithNoTests --reporter=verbose",
+    "lint": "eslint . --ext .js",
+    "lint:ci": "eslint . --ext .js",
+    "build": "echo 'Build complete'",
+    "ci": "npm run lint:ci && npm run test:ci"
+  },
+  "devDependencies": {
+    "vitest": "^1.0.0",
+    "eslint": "^8.0.0"
+  }
+}

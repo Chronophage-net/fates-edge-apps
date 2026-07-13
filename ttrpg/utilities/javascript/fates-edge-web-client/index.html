@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Fate's Edge Toolkit v3.0 — Modular</title>
+    
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="css/base.css" />
+    <link rel="stylesheet" href="css/components.css" />
+    <link rel="stylesheet" href="css/layout.css" />
+    <link rel="stylesheet" href="css/themes.css" />
+    
+    <!-- Third-party libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/fuse.js@7.0.0"></script>
+    <!-- Socket.io for real-time -->
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+</head>
+<body>
+
+    <!-- ===== PASSWORD OVERLAY ===== -->
+    <div class="password-overlay" id="passwordOverlay" role="dialog" aria-label="Password gate">
+        <div class="gate-box">
+            <span class="gate-icon">🔒</span>
+            <div class="gate-title">Fate's Edge</div>
+            <div class="gate-sub">Enter the playtester password to continue</div>
+            <div class="gate-error" id="gateError"></div>
+            <input type="password" class="gate-input" id="gateInput" placeholder="••••••••" autocomplete="current-password" />
+            <button class="gate-btn" id="gateBtn">Unlock</button>
+            <div class="gate-foot">— playtester access only —</div>
+        </div>
+    </div>
+
+    <!-- ===== SIDEBAR ===== -->
+    <nav class="sidebar" id="sidebar" role="navigation">
+        <div class="sidebar-brand">
+            <span>⚔️</span>
+            Fate's Edge
+            <small>Toolkit v3.0</small>
+        </div>
+        <div class="sidebar-nav">
+            <button class="active" data-tab="home"><span class="icon">📜</span><span class="label">Home</span></button>
+            <button data-tab="dashboard"><span class="icon">📊</span><span class="label">Dashboard</span></button>
+            <button data-tab="characters"><span class="icon">👤</span><span class="label">Characters</span></button>
+            <button data-tab="builder"><span class="icon">🛠️</span><span class="label">Builder</span></button>
+            <button data-tab="roller"><span class="icon">🎲</span><span class="label">Dice</span></button>
+            <button data-tab="timers"><span class="icon">⏱️</span><span class="label">Timers</span></button>
+            <button data-tab="encounters"><span class="icon">⚔️</span><span class="label">Encounters</span></button>
+            <button data-tab="vtt"><span class="icon">💬</span><span class="label">VTT</span></button>
+            <button data-tab="docs"><span class="icon">📄</span><span class="label">Docs</span></button>
+            <button data-tab="search"><span class="icon">🔍</span><span class="label">Search</span></button>
+            <button data-tab="wiki"><span class="icon">📖</span><span class="label">Wiki</span></button>
+            <!-- REPLACED: Consequences and Regional Roller with unified Decks -->
+            <button data-tab="decks"><span class="icon">🃏</span><span class="label">Decks</span></button>
+            <button data-tab="settings"><span class="icon">⚙️</span><span class="label">Settings</span></button>
+        </div>
+        <div class="sidebar-footer">
+            <span id="save-status" class="saved-indicator saved">● Saved</span>
+            <button id="exportBtn" title="Export JSON">⬇</button>
+            <button id="importBtn" title="Import JSON">⬆</button>
+            <input type="file" id="importFile" accept=".json" style="display:none" />
+            <button id="theme-toggle" title="Toggle theme" aria-label="Toggle theme">🌙</button>
+        </div>
+    </nav>
+
+    <!-- ===== MAIN CONTENT ===== -->
+    <main class="main">
+        <!-- All tab content containers - populated by JavaScript -->
+        <div id="tab-home" class="tab-content active"></div>
+        <div id="tab-dashboard" class="tab-content"></div>
+        <div id="tab-characters" class="tab-content"></div>
+        <div id="tab-builder" class="tab-content"></div>
+        <div id="tab-roller" class="tab-content"></div>
+        <div id="tab-timers" class="tab-content"></div>
+        <div id="tab-encounters" class="tab-content"></div>
+        <div id="tab-vtt" class="tab-content"></div>
+        <div id="tab-docs" class="tab-content"></div>
+        <div id="tab-search" class="tab-content"></div>
+        <div id="tab-wiki" class="tab-content"></div>
+        <!-- REPLACED: Consequences and Regional Roller with unified Decks -->
+        <div id="tab-decks" class="tab-content"></div>
+        <div id="tab-settings" class="tab-content"></div>
+        
+        <!-- Hidden: kept for backward compatibility (will redirect) -->
+        <div id="tab-consequences" class="tab-content" style="display:none;"></div>
+        <div id="tab-regional" class="tab-content" style="display:none;"></div>
+    </main>
+
+    <!-- ===== MODALS ===== -->
+    <div class="modal-overlay" id="charModal">
+        <div class="modal">
+            <button class="close" id="charModalClose">&times;</button>
+            <h2 id="char-modal-title">Character Editor</h2>
+            <div id="char-editor-content"></div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="timerModal">
+        <div class="modal">
+            <button class="close" id="timerModalClose">&times;</button>
+            <h2 id="timer-modal-title">Timer Editor</h2>
+            <div id="timer-editor-content"></div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="wikiModal">
+        <div class="modal">
+            <button class="close" id="wikiModalClose">&times;</button>
+            <h2 id="wiki-modal-title">Wiki Entry</h2>
+            <div id="wiki-editor-content"></div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="talentModal">
+        <div class="modal">
+            <button class="close" id="talentModalClose">&times;</button>
+            <h2 id="talent-modal-title">Talent Editor</h2>
+            <div id="talent-editor-content"></div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="wizardModal">
+        <div class="modal" style="max-width:800px;">
+            <button class="close" id="wizardModalClose">&times;</button>
+            <h2 id="wizard-title">Character Wizard</h2>
+            <div id="wizard-steps"></div>
+            <div class="flex mt-1" id="wizard-nav">
+                <button class="btn" id="wizard-back">← Back</button>
+                <button class="btn btn-gold" id="wizard-next">Next →</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="encounterModal">
+        <div class="modal" style="max-width:900px;">
+            <button class="close" id="encounterModalClose">&times;</button>
+            <h2 id="encounter-modal-title">Encounter Editor</h2>
+            <div id="encounter-editor-content"></div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="npcModal">
+        <div class="modal" style="max-width:700px;">
+            <button class="close" id="npcModalClose">&times;</button>
+            <h2 id="npc-modal-title">NPC Editor</h2>
+            <div id="npc-editor-content"></div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="combatModal">
+        <div class="modal" style="max-width:800px;">
+            <button class="close" id="combatModalClose">&times;</button>
+            <h2 id="combat-modal-title">Combat Tracker</h2>
+            <div id="combat-editor-content"></div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="licenseModal">
+        <div class="modal">
+            <button class="close" id="licenseModalClose">&times;</button>
+            <h2>📜 License Notice</h2>
+            <div class="license-box" id="licenseContent"></div>
+        </div>
+    </div>
+
+    <!-- ===== TOAST CONTAINER ===== -->
+    <div id="toast-container"></div>
+
+    <!-- ===== APPLICATION ENTRY ===== -->
+    <script type="module" src="js/app.js"></script>
+</body>
+</html>

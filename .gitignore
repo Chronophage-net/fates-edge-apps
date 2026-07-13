@@ -1,0 +1,69 @@
+# Node
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+lerna-debug.log*
+*.local
+
+# Build outputs
+dist/
+build/
+*.exe
+*.dmg
+*.pkg
+*.deb
+*.rpm
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.venv/
+pip-log.txt
+pip-delete-this-directory.txt
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.mypy_cache/
+.dmypy.json
+dmypy.json
+*.egg-info/
+dist/
+build/
+*.egg
+
+# OS
+.DS_Store
+Thumbs.db
+Desktop.ini
+*.log
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Web client
+ttrpg/utilities/javascript/fates-edge-web-client/dist/
+ttrpg/utilities/javascript/fates-edge-web-client/.vite/
+
+# Desktop client
+ttrpg/utilities/javascript/fates-edge-desktop-client/dist/
+ttrpg/utilities/javascript/fates-edge-desktop-client/out/
+
+# Discord bot
+ttrpg/utilities/fates-edge-discord-bot/node_modules/

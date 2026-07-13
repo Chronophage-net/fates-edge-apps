@@ -1,0 +1,28 @@
+{
+  "campaign": {
+    "name": "The Sorm Riders",
+    "mandate": 0,
+    "crisis": 0,
+    "session": 2,
+    "last_session": "2026-07-03"
+  },
+  "clocks": [
+    {
+      "name": "Guard Attention",
+      "segments": 6,
+      "current": 1
+    }
+  ],
+  "factions": [],
+  "patrons": [],
+  "trust": {
+    "name": "Party Trust",
+    "tier": 1,
+    "xp": 0,
+    "assets": [],
+    "followers": []
+  },
+  "rivals": [],
+  "notes": "",
+  "npcs": []
+}
