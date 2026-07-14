@@ -1,8 +1,8 @@
 {
   "id": "fates-edge-bridge",
   "title": "Fate's Edge Bridge",
-  "description": "Connects Foundry VTT to the Fate's Edge WebSocket server for real-time sync of chat, dice rolls, characters, timers, and scenes.",
-  "version": "4.1.0",
+  "description": "Connects Foundry VTT to the Fate's Edge WebSocket server for real-time sync of chat, dice rolls, characters, timers, scenes, Deck of Consequences, Crown Spread, and modules.",
+  "version": "1.2.0",
   "authors": [
     {
       "name": "Fate's Edge Team",
@@ -30,12 +30,12 @@
     "maximum": "12"
   },
   "socket": true,
-  "url": "https://github.com/fates-edge/foundry-bridge",
-  "manifest": "https://github.com/fates-edge/foundry-bridge/releases/latest/download/module.json",
-  "download": "https://github.com/fates-edge/foundry-bridge/releases/latest/download/fates-edge-bridge.zip",
-  "readme": "https://github.com/fates-edge/foundry-bridge/blob/main/README.md",
-  "changelog": "https://github.com/fates-edge/foundry-bridge/blob/main/CHANGELOG.md",
-  "bugs": "https://github.com/fates-edge/foundry-bridge/issues",
+  "url": "https://github.com/fates-edge/fates-edge",
+  "manifest": "https://github.com/fates-edge/fates-edge/releases/latest/download/module.json",
+  "download": "https://github.com/fates-edge/fates-edge/releases/latest/download/fates-edge-bridge.zip",
+  "readme": "https://github.com/fates-edge/fates-edge/blob/main/README.md",
+  "changelog": "https://github.com/fates-edge/fates-edge/blob/main/CHANGELOG.md",
+  "bugs": "https://github.com/fates-edge/fates-edge/issues",
   "allowBugReporter": true,
   "media": [
     {
@@ -49,6 +49,14 @@
     {
       "type": "screenshot",
       "url": "https://fates-edge.com/images/foundry-bridge-screenshot-2.png"
+    },
+    {
+      "type": "screenshot",
+      "url": "https://fates-edge.com/images/foundry-bridge-screenshot-3.png"
+    },
+    {
+      "type": "cover",
+      "url": "https://fates-edge.com/images/foundry-bridge-cover.png"
     }
   ],
   "minimumCoreVersion": "11",
@@ -71,6 +79,21 @@
         "html",
         "json"
       ]
+    },
+    "fates-edge": {
+      "version": "1.2.0",
+      "features": [
+        "chat-sync",
+        "dice-sync",
+        "character-sync",
+        "timer-sync",
+        "scene-sync",
+        "deck-sync",
+        "crown-spread",
+        "module-management",
+        "region-support"
+      ],
+      "protocolVersion": 1
     }
   }
 }

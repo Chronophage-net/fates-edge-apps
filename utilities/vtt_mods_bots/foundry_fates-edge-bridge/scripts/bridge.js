@@ -1,5 +1,6 @@
 /**
- * Fate's Edge Bridge - Core WebSocket Connection
+ * Fate's Edge Bridge v1.2.0 - Core WebSocket Connection
+ * Supports Deck of Consequences, Crown Spread, Modules, and Regions
  */
 
 export const FatesEdgeBridge = {
@@ -11,6 +12,16 @@ export const FatesEdgeBridge = {
     reconnectAttempts: 0,
     maxReconnectAttempts: 10,
     heartbeatInterval: null,
+    
+    // State
+    deckState: {
+        cards: [],
+        history: [],
+        offset: 0,
+        remaining: 54
+    },
+    defaultRegion: 'Acasia',
+    loadedModules: [],
     
     // ============================================================
     // Initialization
@@ -26,6 +37,23 @@ export const FatesEdgeBridge = {
                 this.connect();
             }
         });
+        
+        // Register for chat message hooks
+        Hooks.on('chatMessage', (message) => {
+            this.hookChatMessage(message);
+        });
+        
+        // Register for dice roll hooks
+        Hooks.on('diceRoll', (roll) => {
+            this.hookDiceRoll(roll);
+        });
+        
+        // Register for scene change hooks
+        Hooks.on('canvasReady', () => {
+            this.hookSceneChange();
+        });
+        
+        console.log('⚔️ Fate\'s Edge Bridge v1.2.0 initialized');
     },
     
     // ============================================================
@@ -41,6 +69,7 @@ export const FatesEdgeBridge = {
         const serverUrl = game.settings.get('fates-edge-bridge', 'serverUrl');
         const roomCode = game.settings.get('fates-edge-bridge', 'roomCode');
         const playerName = game.settings.get('fates-edge-bridge', 'playerName') || game.user.name || 'Foundry GM';
+        this.defaultRegion = game.settings.get('fates-edge-bridge', 'defaultRegion') || 'Acasia';
         
         if (!serverUrl) {
             ui.notifications.warn('⚠️ Fate\'s Edge: No server URL configured');
@@ -53,10 +82,9 @@ export const FatesEdgeBridge = {
         }
         
         console.log(`🔗 Connecting to Fate's Edge server: ${serverUrl}`);
-        console.log(`🏠 Room: ${roomCode}, Player: ${playerName}`);
+        console.log(`🏠 Room: ${roomCode}, Player: ${playerName}, Region: ${this.defaultRegion}`);
         
         try {
-            // Determine protocol (ws or wss)
             const protocol = serverUrl.startsWith('https') ? 'wss' : 'ws';
             const wsUrl = serverUrl.replace(/^https?:\/\//, '');
             const fullUrl = `${protocol}://${wsUrl}`;
@@ -111,7 +139,7 @@ export const FatesEdgeBridge = {
         this.connected = true;
         this.reconnectAttempts = 0;
         
-        // Join the room
+        // Join the room with extended client data
         this.ws.send(JSON.stringify({
             type: 'join-room',
             roomCode: roomCode,
@@ -120,7 +148,8 @@ export const FatesEdgeBridge = {
                 role: game.user.isGM ? 'GM' : 'Player',
                 userId: game.user.id,
                 foundry: true,
-                version: game.data.version || 'unknown'
+                version: game.data.version || 'unknown',
+                region: this.defaultRegion
             }
         }));
         
@@ -176,6 +205,29 @@ export const FatesEdgeBridge = {
             case 'vtt-timers-updated':
                 this._handleVttTimersUpdate(data);
                 break;
+            // New Deck Events
+            case 'deck-drawn':
+                this._handleDeckDrawn(data);
+                break;
+            case 'deck-shuffled':
+                this._handleDeckShuffled(data);
+                break;
+            case 'crown-spread':
+                this._handleCrownSpread(data);
+                break;
+            // New Module Events
+            case 'module-list':
+                this._handleModuleList(data);
+                break;
+            case 'module-push':
+                this._handleModulePush(data);
+                break;
+            case 'module-cleanup':
+                this._handleModuleCleanup(data);
+                break;
+            case 'region-updated':
+                this._handleRegionUpdate(data);
+                break;
             case 'room-closed':
                 ui.notifications.warn('⚠️ Fate\'s Edge: Room closed by server');
                 this.disconnect();
@@ -205,7 +257,6 @@ export const FatesEdgeBridge = {
         
         this._updateStatusUI('disconnected');
         
-        // Attempt to reconnect if not manually disconnected
         if (event.code !== 1000) {
             this._attemptReconnect();
         }
@@ -242,16 +293,24 @@ export const FatesEdgeBridge = {
         
         this.clientId = data.clientId;
         
-        // Update Foundry with VTT state if present
         if (data.data && data.data.vtt) {
             this._syncVttState(data.data.vtt);
         }
         
-        // Display connected clients
+        if (data.data && data.data.deck) {
+            this.deckState.cards = data.data.deck.cards || [];
+            this.deckState.history = data.data.deck.history || [];
+            this.deckState.remaining = data.data.deck.cards?.length || 0;
+            this._updateDeckUI();
+        }
+        
         if (data.clients) {
             const clientNames = data.clients.map(c => c.data?.name || 'Unknown').join(', ');
             console.log(`👥 Clients in room: ${clientNames}`);
         }
+        
+        // Send region info
+        this._sendRegionUpdate(this.defaultRegion);
     },
     
     _handleStateUpdate(data) {
@@ -260,22 +319,21 @@ export const FatesEdgeBridge = {
         if (data.state && data.state.vtt) {
             this._syncVttState(data.state.vtt);
         }
+        if (data.state && data.state.deck) {
+            this.deckState.cards = data.state.deck.cards || [];
+            this.deckState.remaining = data.state.deck.cards?.length || 0;
+            this._updateDeckUI();
+        }
     },
     
     _handleChatMessage(data) {
         console.log('💬 Chat:', data.sender, ':', data.text);
         
-        // Display in Foundry chat
         const chatData = {
             user: game.user,
             content: `<b>[Fate's Edge] ${data.sender}:</b> ${data.text}`,
             whisper: []
         };
-        
-        // If this is from a specific client, maybe whisper to GM
-        if (data.sender && data.sender !== game.user.name) {
-            // Show to all
-        }
         
         ChatMessage.create(chatData);
     },
@@ -310,7 +368,6 @@ export const FatesEdgeBridge = {
     
     _handleVoiceStatus(data) {
         console.log('🎤 Voice status:', data);
-        // Update voice UI if needed
         this._updateVoiceUI(data);
     },
     
@@ -334,33 +391,199 @@ export const FatesEdgeBridge = {
     },
     
     // ============================================================
+    // Deck Handlers
+    // ============================================================
+    
+    _handleDeckDrawn(data) {
+        const cards = data.cards || [];
+        const synthesis = data.synthesis || '';
+        const region = data.region || this.defaultRegion;
+        const count = cards.length;
+        
+        this.deckState.remaining = data.remaining || (this.deckState.cards?.length || 0);
+        
+        console.log(`🃏 ${count} card${count > 1 ? 's' : ''} drawn from ${region}`);
+        
+        const cardNames = cards.map(c => {
+            if (c.is_joker) return '🃏 Joker';
+            return `${c.rank_name || c.rank} of ${c.suit_name || c.suit}`;
+        }).join(', ');
+        
+        const chatData = {
+            user: game.user,
+            content: `
+                <div style="border: 2px solid #d4af37; border-radius: 8px; padding: 10px; margin: 5px 0; background: rgba(212, 175, 55, 0.1);">
+                    <h3 style="color: #d4af37; margin-top: 0;">🃏 Deck Draw - ${region}</h3>
+                    <p><strong>${count} card${count > 1 ? 's' : ''} drawn:</strong></p>
+                    <p style="font-size: 0.9em;">${cardNames}</p>
+                    <hr style="border-color: #d4af37; margin: 5px 0;">
+                    <p style="font-style: italic;">${synthesis}</p>
+                    <p style="font-size: 0.8em; color: #888; margin-top: 5px;">Cards remaining: ${this.deckState.remaining}</p>
+                </div>
+            `,
+            whisper: []
+        };
+        
+        ChatMessage.create(chatData);
+        
+        // Also create a journal entry
+        this._createDeckJournal(`Deck Draw - ${region}`, `Cards: ${cardNames}\n\n${synthesis}`);
+        
+        this._updateDeckUI();
+    },
+    
+    _handleDeckShuffled(data) {
+        this.deckState.cards = [];
+        this.deckState.history = [];
+        this.deckState.remaining = data.remaining || 54;
+        
+        console.log(`🔀 Deck shuffled (${this.deckState.remaining} cards remaining)`);
+        
+        const chatData = {
+            user: game.user,
+            content: `
+                <div style="border: 2px solid #d4af37; border-radius: 8px; padding: 10px; margin: 5px 0; background: rgba(212, 175, 55, 0.1);">
+                    <h3 style="color: #d4af37; margin-top: 0;">🔀 Deck Shuffled</h3>
+                    <p>${this.deckState.remaining} cards remaining in the deck.</p>
+                </div>
+            `,
+            whisper: []
+        };
+        
+        ChatMessage.create(chatData);
+        this._updateDeckUI();
+    },
+    
+    _handleCrownSpread(data) {
+        const result = data.result || {};
+        const cards = data.cards || [];
+        const region = data.region || this.defaultRegion;
+        
+        console.log(`👑 Crown Spread from ${region}`);
+        
+        let msg = `<div style="border: 2px solid #d4af37; border-radius: 8px; padding: 10px; margin: 5px 0; background: rgba(212, 175, 55, 0.1);">`;
+        msg += `<h3 style="color: #d4af37; margin-top: 0;">👑 Crown Spread - ${region}</h3>`;
+        
+        const positions = ['🌱 Root', '🏔️ Crest', '👑 Crown', '🤝 Left Hand'];
+        if (result.positions) {
+            result.positions.forEach((p, i) => {
+                if (i < positions.length) {
+                    msg += `<p><strong>${positions[i]}:</strong> ${p.meaning || '...'}</p>`;
+                }
+            });
+        }
+        msg += `<p><strong>🌟 Wildcard:</strong> ${result.wildcard || '...'}</p>`;
+        msg += `</div>`;
+        
+        const chatData = {
+            user: game.user,
+            content: msg,
+            whisper: []
+        };
+        
+        ChatMessage.create(chatData);
+        
+        // Create a journal entry for the Crown Spread
+        let journalContent = `Crown Spread - ${region}\n\n`;
+        if (result.positions) {
+            result.positions.forEach((p, i) => {
+                if (i < positions.length) {
+                    journalContent += `${positions[i]}: ${p.meaning || '...'}\n\n`;
+                }
+            });
+        }
+        journalContent += `Wildcard: ${result.wildcard || '...'}`;
+        
+        this._createDeckJournal(`Crown Spread - ${region}`, journalContent);
+        this._updateDeckUI();
+    },
+    
+    _createDeckJournal(title, content) {
+        const journalName = `[Fate\'s Edge] ${title}`;
+        let journal = game.journal.find(j => j.name === journalName);
+        
+        const formattedContent = `<div style="font-family: 'Times New Roman', serif; padding: 10px;">${content.replace(/\n/g, '<br>')}</div>`;
+        
+        if (!journal) {
+            JournalEntry.create({
+                name: journalName,
+                content: formattedContent,
+                folder: null,
+                permissions: {
+                    default: 0,
+                    [game.user.id]: 3
+                }
+            });
+        } else {
+            journal.update({ content: formattedContent });
+        }
+    },
+    
+    // ============================================================
+    // Module Handlers
+    // ============================================================
+    
+    _handleModuleList(data) {
+        this.loadedModules = data.modules || [];
+        console.log(`📦 ${this.loadedModules.length} modules loaded`);
+        
+        if (this.loadedModules.length > 0) {
+            const names = this.loadedModules.map(m => m.name || m.id).join(', ');
+            ui.notifications.info(`📦 Fate's Edge: ${this.loadedModules.length} modules loaded`);
+            
+            const chatData = {
+                user: game.user,
+                content: `<b>📦 Loaded Modules:</b><br>${names}`,
+                whisper: []
+            };
+            ChatMessage.create(chatData);
+        }
+    },
+    
+    _handleModulePush(data) {
+        const module = data.module || {};
+        const name = module.manifest?.name || module.id || 'Unknown';
+        console.log(`📦 Module pushed: ${name}`);
+        ui.notifications.info(`📦 Fate's Edge: Module "${name}" pushed`);
+    },
+    
+    _handleModuleCleanup(data) {
+        const moduleId = data.moduleId || 'Unknown';
+        console.log(`🧹 Module cleanup: ${moduleId}`);
+        ui.notifications.info(`🧹 Fate's Edge: Module cleanup requested: ${moduleId}`);
+    },
+    
+    _handleRegionUpdate(data) {
+        if (data.region) {
+            this.defaultRegion = data.region;
+            console.log(`📍 Region updated to: ${this.defaultRegion}`);
+            ui.notifications.info(`📍 Fate's Edge: Region updated to ${this.defaultRegion}`);
+        }
+    },
+    
+    // ============================================================
     // Sync Functions
     // ============================================================
     
     _syncVttState(vttState) {
         if (!vttState) return;
         
-        // Sync characters
         if (vttState.characters) {
             this._syncCharacters(vttState.characters);
         }
         
-        // Sync timers
         if (vttState.timers) {
             this._syncTimers(vttState.timers);
         }
         
-        // Sync scene
         if (vttState.scene) {
             this._syncScene(vttState.scene);
         }
     },
     
     _syncCharacters(characters) {
-        // Update Foundry actors or create journal entries for VTT characters
         console.log('👥 Syncing characters:', characters);
         
-        // For now, just create a journal entry or update chat
         characters.forEach(char => {
             const charName = char.name || 'Unnamed';
             const content = `
@@ -370,14 +593,14 @@ export const FatesEdgeBridge = {
                 <p><b>Boons:</b> ${char.boons || 0}</p>
                 ${char.tier ? `<p><b>Tier:</b> ${char.tier}</p>` : ''}
                 ${char.description ? `<p>${char.description}</p>` : ''}
+                <hr>
+                <p><small>Synced from Fate's Edge VTT v1.2.0</small></p>
             `;
             
-            // Find or create a journal entry
-            const journalName = `VTT Character - ${charName}`;
+            const journalName = `[Fate's Edge] ${charName}`;
             let journal = game.journal.find(j => j.name === journalName);
             
             if (!journal) {
-                // Create new journal entry
                 JournalEntry.create({
                     name: journalName,
                     content: content,
@@ -388,7 +611,6 @@ export const FatesEdgeBridge = {
                     }
                 });
             } else {
-                // Update existing journal
                 journal.update({ content: content });
             }
         });
@@ -397,19 +619,23 @@ export const FatesEdgeBridge = {
     _syncTimers(timers) {
         console.log('⏱️ Syncing timers:', timers);
         
-        // Create or update journal entries for timers
         timers.forEach(timer => {
             const timerName = timer.name || 'Timer';
+            const progress = ((timer.current || 0) / (timer.segments || 1)) * 100;
+            const color = (timer.current || 0) >= (timer.segments || 1) ? '#cc3333' : '#d4af37';
+            
             const content = `
                 <h2>⏱️ ${timerName}</h2>
                 <p><b>Progress:</b> ${timer.current || 0}/${timer.segments || 0}</p>
                 <p><b>Status:</b> ${timer.current >= timer.segments ? '⚠️ COMPLETE' : '⏳ Active'}</p>
-                <div style="width:100%;height:10px;background:#333;border-radius:5px;overflow:hidden;">
-                    <div style="width:${((timer.current || 0) / (timer.segments || 1)) * 100}%;height:100%;background:${(timer.current || 0) >= (timer.segments || 1) ? '#cc3333' : '#d4af37'};border-radius:5px;transition:width 0.3s;"></div>
+                <div style="width:100%;height:10px;background:#333;border-radius:5px;overflow:hidden;border:1px solid #555;">
+                    <div style="width:${Math.min(progress, 100)}%;height:100%;background:${color};border-radius:5px;transition:width 0.3s;"></div>
                 </div>
+                <hr>
+                <p><small>Synced from Fate's Edge VTT v1.2.0</small></p>
             `;
             
-            const journalName = `VTT Timer - ${timerName}`;
+            const journalName = `[Fate's Edge] Timer - ${timerName}`;
             let journal = game.journal.find(j => j.name === journalName);
             
             if (!journal) {
@@ -432,7 +658,6 @@ export const FatesEdgeBridge = {
         console.log('🎬 Syncing scene:', sceneData);
         
         if (sceneData.name) {
-            // Try to find and activate the scene
             const scene = game.scenes.find(s => s.name === sceneData.name);
             if (scene && !scene.active) {
                 scene.activate();
@@ -467,7 +692,6 @@ export const FatesEdgeBridge = {
             return;
         }
         
-        // Parse dice expression
         const rollResult = this._parseDiceExpression(rollExpr);
         
         const message = {
@@ -482,6 +706,71 @@ export const FatesEdgeBridge = {
         };
         
         this.ws.send(JSON.stringify(message));
+    },
+    
+    // New: Deck Send Functions
+    sendDeckDraw(count = 1, region = null) {
+        if (!this.connected || !this.ws) {
+            ui.notifications.warn('⚠️ Fate\'s Edge: Not connected to server');
+            return;
+        }
+        
+        const regionName = region || this.defaultRegion;
+        const message = {
+            type: 'deck-draw',
+            count: Math.min(count, 5),
+            region: regionName
+        };
+        
+        this.ws.send(JSON.stringify(message));
+        console.log(`🃏 Drawing ${count} card${count > 1 ? 's' : ''} from ${regionName}`);
+    },
+    
+    sendCrownSpread(region = null) {
+        if (!this.connected || !this.ws) {
+            ui.notifications.warn('⚠️ Fate\'s Edge: Not connected to server');
+            return;
+        }
+        
+        const regionName = region || this.defaultRegion;
+        const message = {
+            type: 'deck-draw',
+            count: 5,
+            region: regionName
+        };
+        
+        this.ws.send(JSON.stringify(message));
+        console.log(`👑 Crown Spread from ${regionName}`);
+    },
+    
+    sendDeckShuffle() {
+        if (!this.connected || !this.ws) {
+            ui.notifications.warn('⚠️ Fate\'s Edge: Not connected to server');
+            return;
+        }
+        
+        this.ws.send(JSON.stringify({ type: 'deck-shuffle' }));
+        console.log('🔀 Deck shuffle requested');
+    },
+    
+    _sendRegionUpdate(region) {
+        if (!this.connected || !this.ws) return;
+        
+        this.ws.send(JSON.stringify({
+            type: 'set-region',
+            region: region
+        }));
+        console.log(`📍 Region updated to: ${region}`);
+    },
+    
+    sendModuleList() {
+        if (!this.connected || !this.ws) {
+            ui.notifications.warn('⚠️ Fate\'s Edge: Not connected to server');
+            return;
+        }
+        
+        this.ws.send(JSON.stringify({ type: 'module-list' }));
+        console.log('📦 Module list requested');
     },
     
     syncVttState(state) {
@@ -533,6 +822,24 @@ export const FatesEdgeBridge = {
     // ============================================================
     
     _parseDiceExpression(expr) {
+        // Support Fate/Fudge dice
+        if (expr.toLowerCase().includes('df')) {
+            const parts = expr.match(/^(\d*)dF([+-]\d+)?$/i);
+            if (parts) {
+                const count = parseInt(parts[1]) || 4;
+                const modifier = parseInt(parts[2]) || 0;
+                const rolls = [];
+                let total = 0;
+                for (let i = 0; i < count; i++) {
+                    const roll = Math.floor(Math.random() * 3) - 1;
+                    rolls.push(roll);
+                    total += roll;
+                }
+                total += modifier;
+                return { total, rolls };
+            }
+        }
+        
         const parts = expr.match(/^(\d+)d(\d+)([+-]\d+)?$/i);
         if (!parts) {
             const num = parseInt(expr) || 0;
@@ -583,7 +890,6 @@ export const FatesEdgeBridge = {
     },
     
     _updateVoiceUI(data) {
-        // Update voice status display
         const voiceEl = document.getElementById('fates-edge-voice');
         if (!voiceEl) return;
         
@@ -596,23 +902,38 @@ export const FatesEdgeBridge = {
         }
     },
     
+    _updateDeckUI() {
+        const deckEl = document.getElementById('fates-edge-deck');
+        if (deckEl) {
+            deckEl.innerHTML = `🃏 ${this.deckState.remaining}`;
+        }
+    },
+    
     // ============================================================
     // Foundry Hooks
     // ============================================================
     
-    // Called when a chat message is sent in Foundry
     hookChatMessage(message) {
-        // Optionally sync Foundry chat to the VTT
         if (game.settings.get('fates-edge-bridge', 'syncChat')) {
-            this.sendChatMessage(message.content, message.user?.name || 'Unknown');
+            // Don't sync our own messages
+            if (message.content && !message.content.includes('[Fate\'s Edge]')) {
+                this.sendChatMessage(message.content, message.user?.name || 'Unknown');
+            }
         }
     },
     
-    // Called when a dice roll is made in Foundry
     hookDiceRoll(roll) {
-        // Optionally sync Foundry rolls to the VTT
         if (game.settings.get('fates-edge-bridge', 'syncRolls')) {
             this.sendRoll(roll.formula, roll.total);
+        }
+    },
+    
+    hookSceneChange() {
+        if (game.settings.get('fates-edge-bridge', 'syncScenes')) {
+            const scene = game.scenes.active;
+            if (scene && scene.name) {
+                this.syncVttState({ scene: { name: scene.name } });
+            }
         }
     }
 };

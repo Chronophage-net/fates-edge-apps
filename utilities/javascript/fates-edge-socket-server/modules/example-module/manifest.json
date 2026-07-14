@@ -1,0 +1,9 @@
+{
+  "name": "Example Module",
+  "version": "1.0.0",
+  "description": "An example module for testing",
+  "author": "Fate's Edge",
+  "type": "module",
+  "icon": "📦",
+  "route": "/example"
+}

@@ -13,6 +13,14 @@
 import { getState, addArchive, clearRollHistory, clearChatHistory, saveState } from '../../core/state.js';
 import { clamp, escHtml } from '../../core/utils.js';
 import { showToast } from '../../components/Toast.js';
+import { 
+    getSelectedRegion, 
+    getRegionNames, 
+    quickDraw, 
+    quickCrownSpread,
+    setSelectedRegion,
+    onRegionChange
+} from '../decks/index.js';
 
 // ============================================================
 // STATE
@@ -363,21 +371,36 @@ function renderCampaignView() {
 }
 
 // ============================================================
-// CONSEQUENCES VIEW (Deck Integration)
+// CONSEQUENCES VIEW (Deck Integration with Region Selector)
 // ============================================================
 
 function renderConsequencesView() {
+    const regionNames = getRegionNames() || ['Acasia'];
+    const selectedRegion = getSelectedRegion() || 'Acasia';
+    
     return `
         <div class="consequences-view">
             <div class="panel">
                 <h3 class="panel-title">🃏 Deck of Consequences</h3>
                 <p class="text-muted">Draw cards from the Deck of Consequences or use the Crown Spread for campaign planning.</p>
                 
+                <!-- Region Selector -->
+                <div class="consequences-region-bar" style="display:flex;flex-wrap:wrap;gap:0.5rem;align-items:center;padding:0.5rem 0.8rem;margin:0.5rem 0;background:var(--bg3);border-radius:var(--radius);border-left:3px solid var(--gold);">
+                    <span style="font-size:0.85rem;color:var(--text2);">📍 Region:</span>
+                    <select id="scene-consequences-region-select" style="background:var(--bg2);color:var(--text);border:1px solid var(--border);border-radius:4px;padding:0.2rem 0.5rem;font-size:0.85rem;min-width:120px;">
+                        ${regionNames.map(name => `
+                            <option value="${name}" ${name === selectedRegion ? 'selected' : ''}>${name}</option>
+                        `).join('')}
+                        ${regionNames.length === 0 ? '<option value="Acasia">Acasia</option>' : ''}
+                    </select>
+                    <span style="font-size:0.75rem;color:var(--text3);" id="scene-consequences-region-indicator">📍 ${selectedRegion || 'Acasia'}</span>
+                </div>
+                
                 <div class="consequences-actions" style="display:flex;flex-wrap:wrap;gap:0.75rem;margin:1rem 0;">
-                    <button class="btn btn-gold" onclick="window.drawConsequence(1)">🃏 Draw 1</button>
-                    <button class="btn btn-gold" onclick="window.drawConsequence(2)">🃏 Draw 2</button>
-                    <button class="btn btn-gold" onclick="window.drawConsequence(3)">🃏 Draw 3</button>
-                    <button class="btn btn-primary" onclick="window.openCrownSpread()">👑 Crown Spread</button>
+                    <button class="btn btn-gold" onclick="window.quickDrawConsequence(1)">🃏 Draw 1</button>
+                    <button class="btn btn-gold" onclick="window.quickDrawConsequence(2)">🃏 Draw 2</button>
+                    <button class="btn btn-gold" onclick="window.quickDrawConsequence(3)">🃏 Draw 3</button>
+                    <button class="btn btn-primary" onclick="window.quickCrownSpreadFromScene()">👑 Crown Spread</button>
                     <button class="btn btn-secondary" onclick="window.shuffleDeck()">🔀 Shuffle</button>
                 </div>
                 
@@ -420,8 +443,6 @@ function renderConsequencesView() {
 // ============================================================
 // MODULE LOADERS
 // ============================================================
-
-// ✅ Only ONE declaration of moduleCache (at top of file)
 
 async function loadKanbanModule(containerEl) {
     try {
@@ -467,20 +488,35 @@ async function loadWhiteboardModule(containerEl) {
     }
 }
 
-// Window exposures for retry
-window.loadKanban = function() {
-    const containerEl = document.getElementById('scene-view-container');
-    if (containerEl) {
-        loadKanbanModule(containerEl);
-    }
-};
+// ============================================================
+// CONSEQUENCES VIEW EVENTS (attached after render)
+// ============================================================
 
-window.loadWhiteboard = function() {
-    const containerEl = document.getElementById('scene-view-container');
-    if (containerEl) {
-        loadWhiteboardModule(containerEl);
+function attachConsequencesEvents() {
+    // Region selector
+    const regionSelect = document.getElementById('scene-consequences-region-select');
+    if (regionSelect) {
+        regionSelect.addEventListener('change', async (e) => {
+            try {
+                await setSelectedRegion(e.target.value);
+                const indicator = document.getElementById('scene-consequences-region-indicator');
+                if (indicator) indicator.textContent = `📍 ${e.target.value}`;
+                showToast(`Region set to ${e.target.value}`, 'info');
+            } catch (err) {
+                console.warn('Region select error:', err);
+                showToast('Could not change region', 'error');
+            }
+        });
     }
-};
+    
+    // Register for region changes from other parts of the app
+    onRegionChange((regionName, regionData) => {
+        const indicator = document.getElementById('scene-consequences-region-indicator');
+        if (indicator) indicator.textContent = `📍 ${regionName}`;
+        const select = document.getElementById('scene-consequences-region-select');
+        if (select) select.value = regionName;
+    });
+}
 
 // ============================================================
 // WINDOW EXPOSURES (for onclick handlers)
@@ -727,35 +763,120 @@ window.removeCampaignTimer = function(index) {
     refreshView();
 };
 
-// Deck of Consequences / Crown Spread
-window.drawConsequence = function(count = 1) {
-    import('../decks/index.js').then(module => {
-        if (module.drawConsequence) {
-            module.drawConsequence(count);
-        } else if (module.default?.drawConsequence) {
-            module.default.drawConsequence(count);
-        } else {
-            showToast('Deck module not available', 'error');
+// ============================================================
+// DECK CONSEQUENCES - QUICK DRAW FUNCTIONS
+// ============================================================
+
+/**
+ * Quick draw with specified number of cards
+ * Shows result in the consequences view
+ */
+window.quickDrawConsequence = async function(count = 1) {
+    try {
+        const result = await quickDraw(count);
+        if (result) {
+            const resultEl = document.getElementById('consequence-result');
+            if (resultEl) {
+                resultEl.innerHTML = `
+                    <div style="padding:0.5rem;">
+                        <div style="font-weight:bold;color:var(--gold);margin-bottom:0.5rem;">
+                            🃏 ${count} Card${count > 1 ? 's' : ''} Drawn
+                        </div>
+                        <div style="color:var(--text2);margin-bottom:0.5rem;">
+                            ${result.cardNames}
+                        </div>
+                        <div style="background:var(--bg2);padding:0.75rem;border-radius:var(--radius);border-left:3px solid var(--gold);white-space:pre-wrap;">
+                            ${result.synthesis}
+                        </div>
+                    </div>
+                `;
+            }
+            
+            // Hide crown spread result if visible
+            const crownEl = document.getElementById('crown-spread-result');
+            if (crownEl) crownEl.style.display = 'none';
         }
-    }).catch(() => {
-        showToast('Deck module not available', 'error');
-    });
+    } catch (err) {
+        console.warn('Quick draw error:', err);
+        showToast('Could not draw cards', 'error');
+    }
 };
 
-window.openCrownSpread = function() {
-    import('../decks/index.js').then(module => {
-        if (module.openCrownSpread) {
-            module.openCrownSpread();
-        } else if (module.default?.openCrownSpread) {
-            module.default.openCrownSpread();
-        } else {
-            showToast('Crown Spread not available', 'error');
+/**
+ * Quick Crown Spread from scene-tools
+ * Shows result in the consequences view
+ */
+window.quickCrownSpreadFromScene = async function() {
+    try {
+        const result = await quickCrownSpread();
+        if (result) {
+            const resultEl = document.getElementById('consequence-result');
+            if (resultEl) {
+                resultEl.innerHTML = `
+                    <div style="padding:0.5rem;">
+                        <div style="font-weight:bold;color:var(--gold);margin-bottom:0.5rem;">
+                            👑 Crown Spread
+                        </div>
+                        <div style="color:var(--text2);margin-bottom:0.5rem;">
+                            ${result.cardNames}
+                        </div>
+                        <div style="background:var(--bg2);padding:0.75rem;border-radius:var(--radius);border-left:3px solid var(--gold);white-space:pre-wrap;">
+                            ${result.result.synthesis}
+                        </div>
+                    </div>
+                `;
+            }
+            
+            // Show crown spread details
+            const crownEl = document.getElementById('crown-spread-result');
+            if (crownEl) {
+                crownEl.style.display = 'block';
+                const cardsEl = document.getElementById('crown-spread-cards');
+                if (cardsEl) {
+                    cardsEl.innerHTML = result.mainCards.map((card, i) => {
+                        const positions = ['🌱 Root', '🏔️ Crest', '👑 Crown', '🤝 Left Hand'];
+                        const isJoker = card.isJoker || false;
+                        const symbol = isJoker ? '🃏' : (card.symbol || '♦');
+                        const rankName = isJoker ? 'Joker' : (card.rankName || card.rank);
+                        const color = isJoker ? 'var(--gold)' : (card.color || '#2980b9');
+                        return `
+                            <div style="background:var(--bg3);border:2px solid ${color};border-radius:var(--radius);padding:0.5rem;text-align:center;min-width:60px;">
+                                <div style="font-size:0.6rem;color:var(--text3);">${positions[i]}</div>
+                                <div style="font-size:1.8rem;color:${color};">${symbol}</div>
+                                <div style="font-size:0.6rem;color:var(--text2);">${rankName}</div>
+                            </div>
+                        `;
+                    }).join('');
+                    
+                    // Add wildcard
+                    const wildcardHTML = `
+                        <div style="background:var(--bg4);border:2px solid var(--gold);border-radius:var(--radius);padding:0.5rem;text-align:center;min-width:60px;box-shadow:0 0 20px rgba(212,175,55,0.3);">
+                            <div style="font-size:0.6rem;color:var(--gold);">🌟 Wild</div>
+                            <div style="font-size:1.8rem;color:var(--gold);">🃏</div>
+                            <div style="font-size:0.6rem;color:var(--gold);">Twist</div>
+                        </div>
+                    `;
+                    cardsEl.innerHTML += wildcardHTML;
+                }
+                
+                const interpEl = document.getElementById('crown-spread-interpretation');
+                if (interpEl) {
+                    interpEl.innerHTML = `
+                        <div style="margin-top:0.5rem;padding:0.5rem;background:var(--bg2);border-radius:var(--radius);">
+                            <strong>Wildcard Twist:</strong> ${result.result.wildcard}
+                            ${result.result.timer ? `<div style="margin-top:0.3rem;color:var(--text3);">⏱️ Timer: ${result.result.timer.segments} segments (${result.result.timer.card})</div>` : ''}
+                        </div>
+                    `;
+                }
+            }
         }
-    }).catch(() => {
-        showToast('Crown Spread not available', 'error');
-    });
+    } catch (err) {
+        console.warn('Crown spread error:', err);
+        showToast('Could not perform Crown Spread', 'error');
+    }
 };
 
+// Deck actions
 window.shuffleDeck = function() {
     import('../decks/index.js').then(module => {
         if (module.resetDeck) {
@@ -838,6 +959,10 @@ function refreshView() {
     } else {
         containerEl.innerHTML = renderView(activeTab);
         attachEvents();
+        // Re-attach consequences events if that's the active tab
+        if (activeTab === 'consequences') {
+            attachConsequencesEvents();
+        }
     }
 }
 
@@ -864,9 +989,17 @@ export function attachEvents() {
             } else {
                 containerEl.innerHTML = renderView(view);
                 attachEvents();
+                if (view === 'consequences') {
+                    attachConsequencesEvents();
+                }
             }
         });
     });
+    
+    // Attach consequences events if initially on that tab
+    if (activeTab === 'consequences') {
+        attachConsequencesEvents();
+    }
 }
 
 // ============================================================
@@ -876,6 +1009,9 @@ export function attachEvents() {
 export function onActivate() {
     console.log('[SceneTools] Activated');
     loadCampaignData();
+    if (activeTab === 'consequences') {
+        setTimeout(attachConsequencesEvents, 100);
+    }
 }
 
 export function onDeactivate() {

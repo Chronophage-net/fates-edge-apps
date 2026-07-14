@@ -8,6 +8,7 @@
 import { getState, saveState } from '../../core/state.js';
 import { escHtml } from '../../core/utils.js';
 import { showToast } from '../../components/Toast.js';
+import { getSelectedRegion, getRegionNames, quickDraw, quickCrownSpread, setSelectedRegion, onRegionChange } from '../decks/index.js';
 
 let container = null;
 let refreshInterval = null;
@@ -35,6 +36,59 @@ export function render(el) {
             <!-- Stats Grid -->
             <div class="dashboard-stats-grid" id="dash-stats">
                 ${renderStats()}
+            </div>
+
+            <!-- Quick Actions with Region Selector -->
+            <div class="panel" id="dash-actions-panel">
+                <div class="panel-header">
+                    <h3 class="panel-title">⚡ Quick Actions</h3>
+                    <div class="panel-actions">
+                        <button class="btn btn-sm btn-ghost" onclick="window.dashboardRefresh()">🔄</button>
+                    </div>
+                </div>
+                ${renderQuickActionsHTML()}
+                <div class="quick-actions-grid">
+                    <button class="quick-action-btn" onclick="window.sceneEndTrimBoons()">
+                        <span class="qa-icon">✂️</span>
+                        <span class="qa-label">Trim Boons</span>
+                        <span class="qa-desc">Set all Boons to 2</span>
+                    </button>
+                    <button class="quick-action-btn" onclick="window.resetAllTimers()">
+                        <span class="qa-icon">⏱️</span>
+                        <span class="qa-label">Reset Timers</span>
+                        <span class="qa-desc">Zero all timers</span>
+                    </button>
+                    <button class="quick-action-btn" onclick="window.newSession()">
+                        <span class="qa-icon">📦</span>
+                        <span class="qa-label">New Session</span>
+                        <span class="qa-desc">Archive and reset</span>
+                    </button>
+                    <button class="quick-action-btn" onclick="window.openCombatTracker()">
+                        <span class="qa-icon">⚔️</span>
+                        <span class="qa-label">Combat Tracker</span>
+                        <span class="qa-desc">Open combat tracker</span>
+                    </button>
+                    <button class="quick-action-btn" onclick="window.openKanban()">
+                        <span class="qa-icon">📋</span>
+                        <span class="qa-label">Kanban</span>
+                        <span class="qa-desc">Campaign board</span>
+                    </button>
+                    <button class="quick-action-btn" onclick="window.openWhiteboard()">
+                        <span class="qa-icon">✏️</span>
+                        <span class="qa-label">Whiteboard</span>
+                        <span class="qa-desc">Visual planning</span>
+                    </button>
+                    <button class="quick-action-btn" onclick="window.drawConsequence()">
+                        <span class="qa-icon">🃏</span>
+                        <span class="qa-label">Draw Consequence</span>
+                        <span class="qa-desc">Deck of Consequences</span>
+                    </button>
+                    <button class="quick-action-btn" onclick="window.openCrownSpread()">
+                        <span class="qa-icon">👑</span>
+                        <span class="qa-label">Crown Spread</span>
+                        <span class="qa-desc">Campaign planning</span>
+                    </button>
+                </div>
             </div>
 
             <!-- Main Grid -->
@@ -117,64 +171,103 @@ export function render(el) {
                     </div>
                 </div>
             </div>
-
-            <!-- Quick Actions -->
-            <div class="panel" id="dash-actions-panel">
-                <div class="panel-header">
-                    <h3 class="panel-title">⚡ Quick Actions</h3>
-                    <div class="panel-actions">
-                        <button class="btn btn-sm btn-ghost" onclick="window.dashboardRefresh()">🔄</button>
-                    </div>
-                </div>
-                <div class="quick-actions-grid">
-                    <button class="quick-action-btn" onclick="window.sceneEndTrimBoons()">
-                        <span class="qa-icon">✂️</span>
-                        <span class="qa-label">Trim Boons</span>
-                        <span class="qa-desc">Set all Boons to 2</span>
-                    </button>
-                    <button class="quick-action-btn" onclick="window.resetAllTimers()">
-                        <span class="qa-icon">⏱️</span>
-                        <span class="qa-label">Reset Timers</span>
-                        <span class="qa-desc">Zero all timers</span>
-                    </button>
-                    <button class="quick-action-btn" onclick="window.newSession()">
-                        <span class="qa-icon">📦</span>
-                        <span class="qa-label">New Session</span>
-                        <span class="qa-desc">Archive and reset</span>
-                    </button>
-                    <button class="quick-action-btn" onclick="window.openCombatTracker()">
-                        <span class="qa-icon">⚔️</span>
-                        <span class="qa-label">Combat Tracker</span>
-                        <span class="qa-desc">Open combat tracker</span>
-                    </button>
-                    <button class="quick-action-btn" onclick="window.openKanban()">
-                        <span class="qa-icon">📋</span>
-                        <span class="qa-label">Kanban</span>
-                        <span class="qa-desc">Campaign board</span>
-                    </button>
-                    <button class="quick-action-btn" onclick="window.openWhiteboard()">
-                        <span class="qa-icon">✏️</span>
-                        <span class="qa-label">Whiteboard</span>
-                        <span class="qa-desc">Visual planning</span>
-                    </button>
-                    <button class="quick-action-btn" onclick="window.drawConsequence()">
-                        <span class="qa-icon">🃏</span>
-                        <span class="qa-label">Draw Consequence</span>
-                        <span class="qa-desc">Deck of Consequences</span>
-                    </button>
-                    <button class="quick-action-btn" onclick="window.openCrownSpread()">
-                        <span class="qa-icon">👑</span>
-                        <span class="qa-label">Crown Spread</span>
-                        <span class="qa-desc">Campaign planning</span>
-                    </button>
-                </div>
-            </div>
         </div>
     `;
     
     update();
     startAutoRefresh();
     attachEvents();
+    attachQuickActionsEvents();
+}
+
+// ============================================================
+// QUICK ACTIONS HTML
+// ============================================================
+
+function renderQuickActionsHTML() {
+    const selectedRegion = getSelectedRegion() || 'Acasia';
+    const regionNames = getRegionNames();
+    
+    // Ensure we have at least one region
+    const regions = regionNames.length > 0 ? regionNames : ['Acasia'];
+    
+    return `
+        <div class="quick-actions-region-bar" style="display:flex;flex-wrap:wrap;gap:0.5rem;align-items:center;padding:0.5rem 0.8rem;margin-bottom:0.5rem;background:var(--bg3);border-radius:var(--radius);border-left:3px solid var(--gold);">
+            <span style="font-size:0.85rem;color:var(--text2);">📍 Region:</span>
+            <select id="dashboard-region-select" style="background:var(--bg2);color:var(--text);border:1px solid var(--border);border-radius:4px;padding:0.2rem 0.5rem;font-size:0.85rem;min-width:120px;">
+                ${regions.map(name => `
+                    <option value="${name}" ${name === selectedRegion ? 'selected' : ''}>${name}</option>
+                `).join('')}
+            </select>
+            <span style="font-size:0.75rem;color:var(--text3);" id="dashboard-region-indicator">📍 ${selectedRegion}</span>
+            <div style="display:flex;gap:0.3rem;flex-wrap:wrap;margin-left:auto;">
+                <button class="btn btn-xs btn-gold quick-draw-btn" data-count="1">🃏 1</button>
+                <button class="btn btn-xs btn-gold quick-draw-btn" data-count="2">🃏 2</button>
+                <button class="btn btn-xs btn-gold quick-draw-btn" data-count="3">🃏 3</button>
+                <button class="btn btn-xs btn-primary quick-crown-btn">👑 Crown</button>
+            </div>
+        </div>
+    `;
+}
+
+// ============================================================
+// QUICK ACTIONS EVENTS
+// ============================================================
+
+function attachQuickActionsEvents() {
+    // Region selector
+    const regionSelect = document.getElementById('dashboard-region-select');
+    if (regionSelect) {
+        regionSelect.addEventListener('change', async (e) => {
+            try {
+                await setSelectedRegion(e.target.value);
+                const indicator = document.getElementById('dashboard-region-indicator');
+                if (indicator) indicator.textContent = `📍 ${e.target.value}`;
+                showToast(`Region set to ${e.target.value}`, 'info');
+            } catch (err) {
+                console.warn('Region select error:', err);
+                showToast('Could not change region', 'error');
+            }
+        });
+    }
+    
+    // Register for region changes from other parts of the app
+    onRegionChange((regionName, regionData) => {
+        const indicator = document.getElementById('dashboard-region-indicator');
+        if (indicator) indicator.textContent = `📍 ${regionName}`;
+        const select = document.getElementById('dashboard-region-select');
+        if (select) select.value = regionName;
+    });
+    
+    // Quick draw buttons
+    document.querySelectorAll('.quick-draw-btn').forEach(btn => {
+        btn.addEventListener('click', async (e) => {
+            const count = parseInt(e.target.dataset.count, 10);
+            try {
+                const result = await quickDraw(count);
+                if (result) {
+                    showToast(`🎴 Drew ${result.cardNames}`, 'success');
+                }
+            } catch (err) {
+                console.warn('Draw error:', err);
+                showToast('Could not draw cards', 'error');
+            }
+        });
+    });
+    
+    // Crown spread button
+    const crownBtn = document.querySelector('.quick-crown-btn');
+    if (crownBtn) {
+        crownBtn.addEventListener('click', async () => {
+            try {
+                const { openCrownSpread } = await import('../decks/index.js');
+                openCrownSpread();
+            } catch (err) {
+                console.warn('Crown spread error:', err);
+                showToast('Could not open Crown Spread', 'error');
+            }
+        });
+    }
 }
 
 // ============================================================
@@ -678,15 +771,12 @@ window.newSession = function() {
     });
 };
 
-// In dashboard/index.js, update the drawConsequence function:
-
 window.drawConsequence = function() {
     import('../decks/index.js').then(module => {
-        // Try both default and named exports
         if (module.drawConsequence) {
-            module.drawConsequence(1);
+            module.drawConsequence();
         } else if (module.default?.drawConsequence) {
-            module.default.drawConsequence(1);
+            module.default.drawConsequence();
         } else {
             showToast('Deck module not available', 'error');
         }

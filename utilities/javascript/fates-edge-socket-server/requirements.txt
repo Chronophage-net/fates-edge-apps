@@ -1,0 +1,5 @@
+# requirements-cli.txt
+# Python dependencies for the CLI management tool
+
+requests>=2.31.0
+pyyaml>=6.0

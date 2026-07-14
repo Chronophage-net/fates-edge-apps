@@ -1,5 +1,5 @@
 /**
- * Fate's Edge Roll20 API Module
+ * Fate's Edge Roll20 API Module v1.2.0
  * Connects Roll20 to the Fate's Edge WebSocket Server
  * 
  * Features:
@@ -11,6 +11,10 @@
  * - Presence/voice indicators
  * - Auto-reconnect
  * - Player name mapping (Roll20 name → VTT name)
+ * - Deck of Consequences sync
+ * - Crown Spread support
+ * - Module management
+ * - Region support
  * 
  * Installation:
  * 1. In Roll20, go to Settings → API Scripts
@@ -21,6 +25,7 @@
  *    - FATES_EDGE_PLAYER_NAME: Optional (defaults to Roll20 display name)
  *    - FATES_EDGE_API_KEY: Your API key
  *    - FATES_EDGE_AUTO_CONNECT: true/false
+ *    - FATES_EDGE_DEFAULT_REGION: Acasia
  */
 
 // ============================================================
@@ -37,12 +42,12 @@ const CONFIG = {
     syncCharacters: getConfigVar('FATES_EDGE_SYNC_CHARACTERS', 'true') === 'true',
     syncTimers: getConfigVar('FATES_EDGE_SYNC_TIMERS', 'true') === 'true',
     syncScenes: getConfigVar('FATES_EDGE_SYNC_SCENES', 'true') === 'true',
-    playerName: getConfigVar('FATES_EDGE_PLAYER_NAME', '')
+    syncDeck: getConfigVar('FATES_EDGE_SYNC_DECK', 'true') === 'true',
+    playerName: getConfigVar('FATES_EDGE_PLAYER_NAME', ''),
+    defaultRegion: getConfigVar('FATES_EDGE_DEFAULT_REGION', 'Acasia')
 };
 
 function getConfigVar(name, defaultValue) {
-    // Roll20 API environment variables are accessible via global scope
-    // In Roll20, you set these in the API console
     if (typeof global !== 'undefined' && global[name] !== undefined) {
         return global[name];
     }
@@ -64,16 +69,24 @@ const MAX_RECONNECT_ATTEMPTS = 10;
 let heartbeatInterval = null;
 let clientId = null;
 
-// Track Roll20 state
+// Track state
 const vttCharacters = new Map();
 const vttTimers = [];
+const deckState = {
+    cards: [],
+    history: [],
+    offset: 0,
+    remaining: 54
+};
+let currentRegion = CONFIG.defaultRegion;
+let loadedModules = [];
 
 // ============================================================
 // Logging (Roll20-friendly)
 // ============================================================
 
 function log(message, level = 'info') {
-    const prefix = '⚔️ Fate\'s Edge:';
+    const prefix = '⚔️ Fate\'s Edge v1.2.0:';
     const timestamp = new Date().toISOString();
     switch (level) {
         case 'error':
@@ -117,8 +130,6 @@ function connect() {
     log(`Connecting to ${CONFIG.serverUrl} as ${getPlayerName()}...`);
 
     try {
-        // Roll20 uses a modified WebSocket implementation
-        // We need to use the 'wss' protocol if the server uses SSL
         const wsUrl = CONFIG.serverUrl;
         ws = new WebSocket(wsUrl);
 
@@ -190,7 +201,6 @@ function onOpen() {
     connected = true;
     reconnectAttempts = 0;
 
-    // Send authentication if API key is configured
     if (CONFIG.apiKey) {
         sendMessage({
             type: 'auth',
@@ -198,7 +208,7 @@ function onOpen() {
         });
     }
 
-    // Join room
+    // Join room with extended client data
     sendMessage({
         type: 'join-room',
         roomCode: CONFIG.roomCode,
@@ -206,7 +216,8 @@ function onOpen() {
             name: getPlayerName(),
             role: 'GM',
             platform: 'roll20',
-            version: '1.0.0'
+            version: '1.2.0',
+            region: currentRegion
         }
     });
 
@@ -221,7 +232,7 @@ function onOpen() {
     }, 30000);
 
     updateStatus('connected');
-    log(`Connected to room ${CONFIG.roomCode}`);
+    log(`Connected to room ${CONFIG.roomCode} (region: ${currentRegion})`);
 }
 
 function onMessage(event) {
@@ -285,6 +296,36 @@ function handleMessage(data) {
             handleVttTimersUpdate(data);
             break;
 
+        // New Deck Events
+        case 'deck-drawn':
+            handleDeckDrawn(data);
+            break;
+
+        case 'deck-shuffled':
+            handleDeckShuffled(data);
+            break;
+
+        case 'crown-spread':
+            handleCrownSpread(data);
+            break;
+
+        // New Module Events
+        case 'module-list':
+            handleModuleList(data);
+            break;
+
+        case 'module-push':
+            handleModulePush(data);
+            break;
+
+        case 'module-cleanup':
+            handleModuleCleanup(data);
+            break;
+
+        case 'region-updated':
+            handleRegionUpdate(data);
+            break;
+
         case 'room-closed':
             log('Room closed by server', 'warn');
             disconnect();
@@ -316,7 +357,6 @@ function onClose(event) {
 
     updateStatus('disconnected');
 
-    // Attempt to reconnect if not manually disconnected
     if (event.code !== 1000) {
         scheduleReconnect();
     }
@@ -334,11 +374,23 @@ function handleRoomState(data) {
         syncVttState(data.data.vtt);
     }
 
+    if (data.data && data.data.deck) {
+        deckState.cards = data.data.deck.cards || [];
+        deckState.history = data.data.deck.history || [];
+        deckState.remaining = data.data.deck.cards?.length || 0;
+    }
+
     // Log clients
     if (data.clients) {
         const names = data.clients.map(c => c.data?.name || 'Unknown').join(', ');
         log(`Clients in room: ${names}`);
     }
+
+    // Send region info
+    sendMessage({
+        type: 'set-region',
+        region: currentRegion
+    });
 }
 
 function handleStateUpdate(data) {
@@ -346,17 +398,19 @@ function handleStateUpdate(data) {
     if (data.state && data.state.vtt) {
         syncVttState(data.state.vtt);
     }
+    if (data.state && data.state.deck) {
+        deckState.cards = data.state.deck.cards || [];
+        deckState.remaining = data.state.deck.cards?.length || 0;
+    }
 }
 
 function handleChatMessage(data) {
     log(`💬 ${data.sender}: ${data.text}`);
 
     if (CONFIG.syncChat) {
-        // Send to Roll20 chat
         const msg = `[Fate's Edge] ${data.sender}: ${data.text}`;
         sendToChat(msg);
 
-        // Also show as a GM whisper if it's important
         if (data.sender !== getPlayerName()) {
             sendToChat(`⚠️ ${data.sender} says: ${data.text}`, 'gm');
         }
@@ -390,7 +444,6 @@ function handleClientLeft(data) {
 
 function handleVoiceStatus(data) {
     log(`🎤 Voice status: ${data.name} ${data.enabled ? 'enabled' : 'disabled'}`);
-    // Update voice UI state
     updateVoiceUI(data);
 }
 
@@ -412,6 +465,121 @@ function handleVttTimersUpdate(data) {
     log(`⏱️ Timers update: ${data.timers?.length || 0} timers`);
     if (data.timers) {
         syncTimers(data.timers);
+    }
+}
+
+// ============================================================
+// Deck Handlers
+// ============================================================
+
+function handleDeckDrawn(data) {
+    const cards = data.cards || [];
+    const synthesis = data.synthesis || '';
+    const region = data.region || currentRegion;
+    const count = cards.length;
+
+    deckState.cards = deckState.cards || [];
+    deckState.remaining = data.remaining || (deckState.cards.length);
+
+    log(`🃏 ${count} card${count > 1 ? 's' : ''} drawn from ${region}`);
+
+    if (CONFIG.syncDeck) {
+        const cardNames = cards.map(c => {
+            if (c.is_joker) return '🃏 Joker';
+            return `${c.rank_name || c.rank} of ${c.suit_name || c.suit}`;
+        }).join(', ');
+
+        const msg = `🃏 **${count} card${count > 1 ? 's' : ''} drawn from ${region}**\n${cardNames}\n\n${synthesis}`;
+        sendToChat(msg);
+
+        // Create a handout with the draw results
+        createDeckHandout(`Deck Draw - ${region}`, msg);
+    }
+}
+
+function handleDeckShuffled(data) {
+    deckState.cards = [];
+    deckState.history = [];
+    deckState.remaining = data.remaining || 54;
+
+    log(`🔀 Deck shuffled (${deckState.remaining} cards remaining)`);
+
+    if (CONFIG.syncDeck) {
+        sendToChat(`🔀 The Deck of Consequences has been shuffled. ${deckState.remaining} cards remaining.`);
+    }
+}
+
+function handleCrownSpread(data) {
+    const result = data.result || {};
+    const cards = data.cards || [];
+    const region = data.region || currentRegion;
+
+    log(`👑 Crown Spread from ${region}`);
+
+    if (CONFIG.syncDeck) {
+        let msg = `👑 **Crown Spread from ${region}**\n\n`;
+        msg += `🌱 **Root:** ${result.positions?.[0]?.meaning || '...'}\n`;
+        msg += `🏔️ **Crest:** ${result.positions?.[1]?.meaning || '...'}\n`;
+        msg += `👑 **Crown:** ${result.positions?.[2]?.meaning || '...'}\n`;
+        msg += `🤝 **Left Hand:** ${result.positions?.[3]?.meaning || '...'}\n`;
+        msg += `🌟 **Wildcard:** ${result.wildcard || '...'}`;
+
+        sendToChat(msg);
+
+        // Create a handout with the Crown Spread
+        createDeckHandout(`Crown Spread - ${region}`, msg);
+    }
+}
+
+function createDeckHandout(title, content) {
+    try {
+        // In Roll20, create a journal entry (handout)
+        if (typeof Campaign !== 'undefined' && Campaign.createJournalEntry) {
+            Campaign.createJournalEntry({
+                name: title,
+                content: content.replace(/\n/g, '<br>'),
+                gm: false,
+                players: true
+            });
+            log(`📄 Created handout: ${title}`);
+        }
+    } catch (err) {
+        log(`Failed to create handout: ${err.message}`, 'warn');
+    }
+}
+
+// ============================================================
+// Module Handlers
+// ============================================================
+
+function handleModuleList(data) {
+    loadedModules = data.modules || [];
+    log(`📦 ${loadedModules.length} modules loaded`);
+
+    if (loadedModules.length > 0) {
+        const names = loadedModules.map(m => m.name || m.id).join(', ');
+        sendToChat(`📦 Modules loaded: ${names}`);
+    }
+}
+
+function handleModulePush(data) {
+    const module = data.module || {};
+    const name = module.manifest?.name || module.id || 'Unknown';
+    log(`📦 Module pushed: ${name}`);
+    sendToChat(`📦 Module pushed: ${name}`);
+}
+
+function handleModuleCleanup(data) {
+    const moduleId = data.moduleId || 'Unknown';
+    log(`🧹 Module cleanup: ${moduleId}`);
+    sendToChat(`🧹 Module cleanup requested: ${moduleId}`);
+}
+
+function handleRegionUpdate(data) {
+    if (data.region) {
+        currentRegion = data.region;
+        log(`📍 Region updated to: ${currentRegion}`);
+        sendToChat(`📍 Region updated to: ${currentRegion}`);
     }
 }
 
@@ -443,10 +611,7 @@ function syncCharacters(characters) {
         vttCharacters.set(char.name || 'Unknown', char);
     });
 
-    // Update Roll20 character sheets if they exist
-    // Roll20 characters are accessed via the 'Campaign' object
     if (typeof Campaign !== 'undefined' && Campaign.characters) {
-        // Find matching characters and update their attributes
         Campaign.characters.forEach(roll20Char => {
             const vttChar = vttCharacters.get(roll20Char.name);
             if (vttChar) {
@@ -455,15 +620,12 @@ function syncCharacters(characters) {
         });
     }
 
-    // Create journal entries for VTT characters
     characters.forEach(char => {
         createOrUpdateJournalEntry(char);
     });
 }
 
 function updateCharacterSheet(roll20Char, vttChar) {
-    // Update Roll20 character attributes
-    // This uses Roll20's character sheet API
     const attributes = [
         { name: 'harm', value: vttChar.harm || 0 },
         { name: 'fatigue', value: vttChar.fatigue || 0 },
@@ -471,9 +633,6 @@ function updateCharacterSheet(roll20Char, vttChar) {
         { name: 'tier', value: vttChar.tier || 1 }
     ];
 
-    // Roll20 doesn't have a direct API for updating attributes from scripts
-    // The recommended approach is to use the 'set' method on the character
-    // Note: In Roll20 API, you need to be a GM to modify characters
     if (roll20Char.set) {
         attributes.forEach(attr => {
             roll20Char.set(attr.name, attr.value);
@@ -492,13 +651,29 @@ function createOrUpdateJournalEntry(char) {
         ${char.tier ? `<p><b>Tier:</b> ${char.tier}</p>` : ''}
         ${char.description ? `<p><i>${char.description}</i></p>` : ''}
         <hr>
-        <p><small>Synced from Fate's Edge VTT</small></p>
+        <p><small>Synced from Fate's Edge VTT v1.2.0</small></p>
     `;
 
-    // Create or update journal entry
-    // Note: Roll20 API doesn't have direct journal access from scripts
-    // This would need to be done through a macro or the UI
-    log(`Journal entry for ${name} would be created/updated`);
+    // Try to find existing journal entry
+    try {
+        if (typeof Campaign !== 'undefined' && Campaign.findJournalEntry) {
+            const existing = Campaign.findJournalEntry(name);
+            if (existing) {
+                existing.set('content', content);
+                log(`Updated journal entry: ${name}`);
+            } else if (Campaign.createJournalEntry) {
+                Campaign.createJournalEntry({
+                    name: name,
+                    content: content,
+                    gm: false,
+                    players: true
+                });
+                log(`Created journal entry: ${name}`);
+            }
+        }
+    } catch (err) {
+        log(`Failed to update journal: ${err.message}`, 'warn');
+    }
 }
 
 function syncTimers(timers) {
@@ -507,7 +682,6 @@ function syncTimers(timers) {
     vttTimers.length = 0;
     vttTimers.push(...timers);
 
-    // Display timers in chat or as a macro
     timers.forEach(timer => {
         const progress = ((timer.current || 0) / (timer.segments || 1) * 100);
         const bar = '▰'.repeat(Math.floor(progress / 10)) + '▱'.repeat(10 - Math.floor(progress / 10));
@@ -520,10 +694,7 @@ function syncScene(sceneData) {
     if (!CONFIG.syncScenes) return;
 
     if (sceneData.name) {
-        // Roll20 uses 'pages' instead of scenes
-        // In the API, you can switch pages with 'Campaign.setCurrentPage'
         if (typeof Campaign !== 'undefined' && Campaign.setCurrentPage) {
-            // Find the page with matching name
             const pages = Campaign.pages;
             const match = pages.find(p => p.name === sceneData.name);
             if (match) {
@@ -547,7 +718,6 @@ function sendMessage(data) {
         return;
     }
 
-    // Add API key if available
     if (CONFIG.apiKey && !data.apiKey) {
         data.apiKey = CONFIG.apiKey;
     }
@@ -574,9 +744,7 @@ function sendChatMessage(text) {
 function sendRoll(expr, reason = null) {
     if (!expr) return;
 
-    // Roll in Roll20 and send result
     try {
-        // Use Roll20's dice parser
         const roll = new Roll(expr);
         const total = roll.total;
         const rolls = roll.rolls;
@@ -596,25 +764,51 @@ function sendRoll(expr, reason = null) {
     }
 }
 
-function syncVttState(state) {
+// ============================================================
+// New: Deck Send Functions
+// ============================================================
+
+function sendDeckDraw(count = 1, region = null) {
+    const regionName = region || currentRegion;
     sendMessage({
-        type: 'sync-state',
-        state: { vtt: state }
+        type: 'deck-draw',
+        count: Math.min(count, 5),
+        region: regionName
     });
+    log(`🃏 Drawing ${count} card${count > 1 ? 's' : ''} from ${regionName}`);
 }
 
-function syncCharacters(characters) {
+function sendCrownSpread(region = null) {
+    const regionName = region || currentRegion;
     sendMessage({
-        type: 'vtt-characters-updated',
-        characters: characters
+        type: 'deck-draw',
+        count: 5,
+        region: regionName
     });
+    log(`👑 Crown Spread from ${regionName}`);
 }
 
-function syncTimers(timers) {
+function sendDeckShuffle() {
     sendMessage({
-        type: 'vtt-timers-updated',
-        timers: timers
+        type: 'deck-shuffle'
     });
+    log('🔀 Deck shuffle requested');
+}
+
+function sendRegionUpdate(region) {
+    currentRegion = region;
+    sendMessage({
+        type: 'set-region',
+        region: region
+    });
+    log(`📍 Region updated to: ${region}`);
+}
+
+function sendModuleList() {
+    sendMessage({
+        type: 'module-list'
+    });
+    log('📦 Module list requested');
 }
 
 // ============================================================
@@ -625,7 +819,6 @@ function getPlayerName() {
     if (CONFIG.playerName) {
         return CONFIG.playerName;
     }
-    // Try to get Roll20 player name
     try {
         if (typeof User !== 'undefined' && User.getActivePlayer) {
             const player = User.getActivePlayer();
@@ -640,7 +833,6 @@ function getPlayerName() {
 }
 
 function sendToChat(message, type = 'public') {
-    // Roll20 API sendChat function
     if (typeof sendChat !== 'undefined') {
         if (type === 'gm') {
             sendChat('GM', message);
@@ -648,43 +840,32 @@ function sendToChat(message, type = 'public') {
             sendChat('Fate\'s Edge', message);
         }
     } else {
-        // Fallback: use console
         console.log(`[CHAT] ${message}`);
     }
 }
 
 function updateStatus(status) {
-    // Update some visible indicator in Roll20
-    // This could be a macro or a custom API command
     const statusMsg = status === 'connected' 
-        ? '🟢 Connected to Fate\'s Edge' 
+        ? '🟢 Connected to Fate\'s Edge v1.2.0' 
         : '🔴 Disconnected from Fate\'s Edge';
     log(statusMsg);
 }
 
 function updateVoiceUI(data) {
-    // Update voice status display - could be used for macros
     const status = data.enabled ? '🎤 Voice On' : '🎤 Voice Off';
     log(`Voice: ${data.name} - ${status}`);
 }
 
 // ============================================================
-// API Commands for Roll20 Macros
+// API Commands for Roll20 Macros (Updated)
 // ============================================================
 
-// Register commands for use in Roll20 macros
-// These can be called via the API command system
-
 function registerCommands() {
-    // Roll20 API command registration
-    // Note: This uses the 'on' function from Roll20 API
     on('ready', () => {
         if (CONFIG.autoConnect) {
             connect();
         }
 
-        // Register commands
-        // !fates-edge connect|disconnect|status|send|roll|sync
         on('chat:message', (msg) => {
             if (msg.type !== 'api') return;
             const args = msg.content.split(' ');
@@ -707,6 +888,9 @@ function registerCommands() {
                     case 'status':
                         const status = connected ? '🟢 Connected' : '🔴 Disconnected';
                         sendToChat(`Fate's Edge status: ${status}`);
+                        sendToChat(`Region: ${currentRegion}`);
+                        sendToChat(`Deck: ${deckState.remaining} cards remaining`);
+                        sendToChat(`Modules: ${loadedModules.length} loaded`);
                         break;
 
                     case 'send':
@@ -724,6 +908,39 @@ function registerCommands() {
                         }
                         break;
 
+                    // New Commands
+                    case 'draw':
+                        const count = parseInt(param) || 1;
+                        sendDeckDraw(Math.min(count, 5));
+                        sendToChat(`🃏 Drawing ${Math.min(count, 5)} cards...`);
+                        break;
+
+                    case 'crown':
+                        sendCrownSpread(param || currentRegion);
+                        sendToChat(`👑 Crown Spread from ${param || currentRegion}...`);
+                        break;
+
+                    case 'shuffle':
+                        sendDeckShuffle();
+                        sendToChat('🔀 Shuffling deck...');
+                        break;
+
+                    case 'region':
+                        if (param) {
+                            sendRegionUpdate(param);
+                            sendToChat(`📍 Region set to: ${param}`);
+                        } else {
+                            sendToChat(`📍 Current region: ${currentRegion}`);
+                        }
+                        break;
+
+                    case 'modules':
+                        if (param === 'list') {
+                            sendModuleList();
+                            sendToChat('📦 Requesting module list...');
+                        }
+                        break;
+
                     case 'sync':
                         if (param === 'characters') {
                             const chars = collectCharacters();
@@ -731,17 +948,23 @@ function registerCommands() {
                             sendToChat(`📤 Synced ${chars.length} characters`);
                         } else if (param === 'scene') {
                             syncScene({ name: Campaign.currentPage.name });
+                            sendToChat(`🎬 Synced scene: ${Campaign.currentPage.name}`);
                         }
                         break;
 
                     default:
                         sendToChat(`
-                            Fate's Edge Commands:
+                            Fate's Edge v1.2.0 Commands:
                             !fates-edge connect - Connect to server
                             !fates-edge disconnect - Disconnect
-                            !fates-edge status - Show connection status
-                            !fates-edge send <message> - Send chat message
+                            !fates-edge status - Show status
+                            !fates-edge send <message> - Send chat
                             !fates-edge roll <dice> - Roll dice
+                            !fates-edge draw [N] - Draw N cards (1-5)
+                            !fates-edge crown [region] - Crown Spread
+                            !fates-edge shuffle - Shuffle deck
+                            !fates-edge region [name] - Set/get region
+                            !fates-edge modules list - List modules
                             !fates-edge sync characters - Sync characters
                             !fates-edge sync scene - Sync current scene
                         `);
@@ -795,24 +1018,19 @@ function parseDiceExpression(expr) {
 }
 
 // ============================================================
-// Roll20 Hooks
+// Roll20 Hooks (Updated)
 // ============================================================
 
-// Hook into Roll20 events
 try {
     // Chat message hook
     on('chat:message', (msg) => {
         if (msg.type !== 'general') return;
         if (!CONFIG.syncChat) return;
-        if (msg.who === 'Fate\'s Edge') return; // Skip our own messages
+        if (msg.who === 'Fate\'s Edge') return;
 
-        // Extract text content
         let text = msg.content;
-        // Strip HTML tags
         text = text.replace(/<[^>]+>/g, '');
-        // Strip 'Fate's Edge:' prefix if present
         text = text.replace(/^Fate's Edge:\s*/, '');
-        // Skip empty
         if (!text.trim()) return;
 
         sendChatMessage(text.trim());
@@ -823,7 +1041,6 @@ try {
         if (msg.type !== 'rollresult') return;
         if (!CONFIG.syncRolls) return;
 
-        // Parse the roll result
         const content = msg.content;
         const match = content.match(/<div[^>]*>(.*?)<\/div>/i);
         if (match) {
@@ -862,9 +1079,10 @@ try {
 // Register commands
 registerCommands();
 
-log('Fate\'s Edge Roll20 API module loaded');
+log('Fate\'s Edge Roll20 API module v1.2.0 loaded');
 log(`Server: ${CONFIG.serverUrl}`);
 log(`Room: ${CONFIG.roomCode}`);
+log(`Region: ${currentRegion}`);
 log(`Auto-connect: ${CONFIG.autoConnect}`);
 
 if (CONFIG.autoConnect) {
