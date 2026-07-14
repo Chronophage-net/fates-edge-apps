@@ -418,6 +418,10 @@ async function fetchRegionData(regionName) {
 // REGION CHANGE HANDLER
 // ============================================================
 
+/**
+ * Handle region change - called when the user selects a different region
+ * This is the function that scene-tools.js is trying to import
+ */
 async function handleRegionChange() {
     const select = document.getElementById('deck-region-select');
     if (!select) return;
@@ -1156,6 +1160,38 @@ export function registerRegionChange(callback) {
 }
 
 // ============================================================
+// REGION CHANGE EXPORT (FIX FOR scene-tools.js)
+// ============================================================
+
+/**
+ * onRegionChange - Called when the region changes
+ * This is the function that scene-tools.js is trying to import
+ * @param {string|Function} regionNameOrCallback - Region name or callback function
+ * @param {Function} callback - Optional callback when region name is provided
+ * @returns {Promise<void>}
+ */
+export async function onRegionChange(regionNameOrCallback, callback) {
+    // Handle callback registration if first arg is a function
+    if (typeof regionNameOrCallback === 'function') {
+        registerRegionChange(regionNameOrCallback);
+        return;
+    }
+    
+    // Handle region name change
+    if (typeof regionNameOrCallback === 'string') {
+        const regionName = regionNameOrCallback;
+        const success = await setSelectedRegion(regionName);
+        if (success && callback) {
+            callback(regionName, regionData);
+        }
+        return success;
+    }
+    
+    // Fallback: just trigger the current region change
+    await handleRegionChange();
+}
+
+// ============================================================
 // SHORTCUT FUNCTIONS FOR DASHBOARD QUICK BUTTONS
 // ============================================================
 
@@ -1284,6 +1320,7 @@ window.getSelectedRegion = getSelectedRegion;
 window.getRegionNames = getRegionNames;
 window.setSelectedRegion = setSelectedRegion;
 window.registerRegionChange = registerRegionChange;
+window.onRegionChange = onRegionChange;
 
 // ============================================================
 // EXPORT
@@ -1309,6 +1346,7 @@ export default {
     getRegionData,
     getCardMeaning,
     registerRegionChange,
+    onRegionChange, // <-- ADDED: This fixes the missing export
     quickDraw,
     quickCrownSpread
 };

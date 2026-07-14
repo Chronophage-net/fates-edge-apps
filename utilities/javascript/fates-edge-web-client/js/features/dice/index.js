@@ -9,10 +9,15 @@
 import { escHtml, safeParseInt } from '../../core/utils.js';
 import { addRoll, getState, saveState } from '../../core/state.js';
 // Import the core dice engine with deterministic RNG support
-import { performRoll, rollDie, getSeed, setSeed, generateSeed } from '../../core/dice.js';
+import { 
+    performRoll, 
+    rollDie, 
+    getSeed, 
+    setSeed, 
+    generateSeed 
+} from '../../core/dice.js';
 
 let container = null;
-
 
 // ============================================================
 // RENDER
@@ -642,210 +647,6 @@ export function destroy() {
     container = null;
 }
 
-// Add these to js/core/dice.js at the bottom, before the exports
-
-// ============================================================
-// DETERMINISTIC RNG / SEED MANAGEMENT
-// ============================================================
-
-// Xorshift128+ PRNG for deterministic random generation
-class Xorshift128 {
-    constructor(seed) {
-        this.seed = seed || Date.now();
-        this.state = this._seedToState(seed);
-    }
-    
-    _seedToState(seed) {
-        let s0 = 0;
-        let s1 = 0;
-        
-        if (typeof seed === 'number') {
-            s0 = seed;
-            s1 = seed + 0x9e3779b97f4a7c15;
-        } else if (typeof seed === 'string') {
-            let hash = 0;
-            for (let i = 0; i < seed.length; i++) {
-                hash = ((hash << 5) - hash) + seed.charCodeAt(i);
-                hash = hash & hash;
-            }
-            s0 = hash;
-            s1 = hash + 0x9e3779b97f4a7c15;
-        } else {
-            s0 = Date.now();
-            s1 = Date.now() + 0x9e3779b97f4a7c15;
-        }
-        
-        return { s0: BigInt(s0), s1: BigInt(s1) };
-    }
-    
-    random() {
-        let s0 = this.state.s0;
-        let s1 = this.state.s1;
-        
-        let x = s1;
-        let y = s0;
-        
-        x = x ^ (x << BigInt(23));
-        x = x ^ (x >> BigInt(17));
-        x = x ^ (y ^ (y >> BigInt(26)));
-        
-        this.state.s0 = y;
-        this.state.s1 = x;
-        
-        const result = Number((x + y) & BigInt(0xFFFFFFFFFFFFFFFF)) / 18446744073709551616;
-        return result;
-    }
-    
-    randomInt(min, max) {
-        return Math.floor(this.random() * (max - min)) + min;
-    }
-    
-    randomIntInclusive(min, max) {
-        return Math.floor(this.random() * (max - min + 1)) + min;
-    }
-}
-
-// Seed state
-let _seed = null;
-let _prng = null;
-
-// Load seed from localStorage on module load
-try {
-    const stored = localStorage.getItem('fates-edge-seed');
-    if (stored) {
-        _seed = stored;
-        _prng = new Xorshift128(stored);
-    }
-} catch (e) { /* ignore */ }
-
-// Also check for window seed (set by build script)
-if (!_seed && typeof window !== 'undefined' && window.__RANDOM_SEED) {
-    _seed = window.__RANDOM_SEED;
-    _prng = new Xorshift128(_seed);
-    try {
-        localStorage.setItem('fates-edge-seed', _seed);
-    } catch (e) { /* ignore */ }
-}
-
-/**
- * Get the current deterministic seed
- * @returns {string|null} Current seed or null if not set
- */
-export function getSeed() {
-    return _seed;
-}
-
-/**
- * Set the deterministic seed
- * @param {string|null} seed - New seed value, or null to disable deterministic mode
- * @returns {boolean} Success
- */
-export function setSeed(seed) {
-    _seed = seed;
-    if (seed) {
-        _prng = new Xorshift128(seed);
-        try {
-            localStorage.setItem('fates-edge-seed', seed);
-        } catch (e) { /* ignore */ }
-    } else {
-        _prng = null;
-        try {
-            localStorage.removeItem('fates-edge-seed');
-        } catch (e) { /* ignore */ }
-    }
-    return true;
-}
-
-/**
- * Generate a new random seed
- * @returns {string} New seed value
- */
-export function generateSeed() {
-    let newSeed;
-    try {
-        if (typeof window !== 'undefined' && window.crypto && window.crypto.getRandomValues) {
-            const array = new Uint32Array(4);
-            window.crypto.getRandomValues(array);
-            newSeed = array.reduce((acc, val) => acc + val.toString(16).padStart(8, '0'), '');
-        } else if (typeof crypto !== 'undefined' && crypto.randomBytes) {
-            const buffer = crypto.randomBytes(32);
-            newSeed = buffer.toString('hex');
-        } else {
-            newSeed = Date.now().toString(36) + Math.random().toString(36).substring(2, 8);
-        }
-    } catch (e) {
-        newSeed = Date.now().toString(36) + Math.random().toString(36).substring(2, 8);
-    }
-    return newSeed;
-}
-
-/**
- * Get a random number using deterministic PRNG if seeded, otherwise crypto/Math.random
- * @returns {number} Random number between 0 and 1
- */
-export function getRandom() {
-    if (_prng) {
-        return _prng.random();
-    }
-    // Fallback to crypto or Math.random
-    try {
-        if (typeof window !== 'undefined' && window.crypto && window.crypto.getRandomValues) {
-            const array = new Uint32Array(1);
-            window.crypto.getRandomValues(array);
-            return array[0] / 4294967296;
-        }
-    } catch (e) { /* ignore */ }
-    return Math.random();
-}
-
-/**
- * Get a random integer using deterministic PRNG if seeded
- * @param {number} min - Minimum value (inclusive)
- * @param {number} max - Maximum value (exclusive)
- * @returns {number} Random integer
- */
-export function getRandomInt(min, max) {
-    if (_prng) {
-        return _prng.randomInt(min, max);
-    }
-    return Math.floor(getRandom() * (max - min)) + min;
-}
-
-/**
- * Get a random integer inclusive using deterministic PRNG if seeded
- * @param {number} min - Minimum value (inclusive)
- * @param {number} max - Maximum value (inclusive)
- * @returns {number} Random integer
- */
-export function getRandomIntInclusive(min, max) {
-    if (_prng) {
-        return _prng.randomIntInclusive(min, max);
-    }
-    return Math.floor(getRandom() * (max - min + 1)) + min;
-}
-
-// Override the default rollDie to use deterministic RNG if seeded
-const _originalRollDie = rollDie;
-
-/**
- * Roll a single die with deterministic RNG support
- * @param {number} sides - Number of sides on the die
- * @returns {number} Roll result
- */
-export function rollDieDeterministic(sides) {
-    if (sides < 1) {
-        throw new Error('Die must have at least 1 side');
-    }
-    if (_prng) {
-        return _prng.randomInt(1, sides + 1);
-    }
-    return _originalRollDie(sides);
-}
-
-// Re-export rollDie with deterministic support
-// This replaces the original rollDie with the deterministic version
-const originalRollDie = rollDie;
-rollDie = rollDieDeterministic;
 // ============================================================
 // EXPORT DEFAULT
 // ============================================================
