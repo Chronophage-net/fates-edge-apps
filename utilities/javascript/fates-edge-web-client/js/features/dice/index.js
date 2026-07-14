@@ -6,7 +6,8 @@
  */
 
 // Import from core modules
-import { escHtml, safeParseInt } from '../../core/utils.js';
+// Import from core modules
+import { escHtml, safeParseInt, assert } from '../../core/utils.js';
 import { addRoll, getState, saveState } from '../../core/state.js';
 // Import the core dice engine with deterministic RNG support
 import { 
