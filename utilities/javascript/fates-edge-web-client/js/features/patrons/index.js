@@ -797,11 +797,13 @@ function renderPatronDetail(patronId) {
                 ` : ''}
             </div>
             
-            <div class="patron-detail-actions">
-                <button class="btn btn-primary" onclick="window.editPatron('${patron.id}')">✏️ Edit</button>
-                <button class="btn btn-danger" onclick="window.deletePatron('${patron.id}')">🗑️ Delete</button>
-                <button class="btn btn-secondary" onclick="window.closePatronModal()">Close</button>
-            </div>
+           // In renderPatronDetail, update the actions section:
+
+        <div class="patron-detail-actions" style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-top:1rem;padding-top:0.5rem;border-top:1px solid var(--border);">
+            <button class="btn btn-sm" onclick="window.editPatron('${patron.id}')" style="padding:0.3rem 0.8rem;font-size:0.8rem;">✏️ Edit</button>
+            <button class="btn btn-sm btn-danger" onclick="window.deletePatron('${patron.id}')" style="padding:0.3rem 0.8rem;font-size:0.8rem;">🗑️ Delete</button>
+            <button class="btn btn-sm btn-secondary" onclick="window.closePatronModal()" style="padding:0.3rem 0.8rem;font-size:0.8rem;">Close</button>
+        </div>
         </div>
     `;
 

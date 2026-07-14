@@ -383,6 +383,8 @@ function renderConsequencesView() {
 // MODULE LOADERS
 // ============================================================
 
+let moduleCache = {};
+
 async function loadKanbanModule(containerEl) {
     try {
         if (moduleCache.kanban) {
@@ -426,6 +428,21 @@ async function loadWhiteboardModule(containerEl) {
         `;
     }
 }
+
+// Window exposures for retry
+window.loadKanban = function() {
+    const containerEl = document.getElementById('scene-view-container');
+    if (containerEl) {
+        loadKanbanModule(containerEl);
+    }
+};
+
+window.loadWhiteboard = function() {
+    const containerEl = document.getElementById('scene-view-container');
+    if (containerEl) {
+        loadWhiteboardModule(containerEl);
+    }
+};
 
 // ============================================================
 // WINDOW EXPOSURES (for onclick handlers)

@@ -2348,3 +2348,63 @@ select {
         padding: 0.3rem 0.6rem;
     }
 }
+/* Patron detail button fixes */
+.patron-detail-actions .btn {
+    padding: 0.3rem 0.8rem !important;
+    font-size: 0.8rem !important;
+    min-height: auto !important;
+    line-height: 1.4 !important;
+}
+
+/* Rite expand buttons */
+.rite-header {
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.3rem 0.4rem;
+    border-radius: var(--radius-sm);
+    transition: background 0.2s ease;
+}
+
+.rite-header:hover {
+    background: var(--bg3);
+}
+
+.rite-expand-icon {
+    font-size: 0.7rem;
+    color: var(--text3);
+    margin-left: auto;
+    transition: transform 0.2s ease;
+}
+
+.rite-item .rite-details {
+    padding: 0.5rem 0.8rem;
+    margin: 0.2rem 0 0.3rem 0.8rem;
+    border-left: 2px solid var(--gold);
+    background: var(--bg2);
+    border-radius: var(--radius-sm);
+    font-size: 0.9rem;
+    color: var(--text2);
+}
+
+.rite-item .rite-details .rite-meta {
+    font-size: 0.8rem;
+    color: var(--text3);
+    margin-top: 0.2rem;
+}
+
+.rite-item .rite-details .rite-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.2rem;
+    margin-top: 0.3rem;
+}
+
+.rite-item .rite-details .rite-tags .badge-tag {
+    font-size: 0.6rem;
+    padding: 0.05rem 0.4rem;
+    border-radius: var(--radius-full);
+    background: var(--bg4);
+    color: var(--text2);
+}

@@ -678,10 +678,15 @@ window.newSession = function() {
     });
 };
 
+// In dashboard/index.js, update the drawConsequence function:
+
 window.drawConsequence = function() {
     import('../decks/index.js').then(module => {
+        // Try both default and named exports
         if (module.drawConsequence) {
             module.drawConsequence(1);
+        } else if (module.default?.drawConsequence) {
+            module.default.drawConsequence(1);
         } else {
             showToast('Deck module not available', 'error');
         }

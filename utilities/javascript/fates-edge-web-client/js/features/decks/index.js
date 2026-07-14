@@ -3,6 +3,7 @@
  * Decks feature - Deck of Consequences and Crown Spread
  * Supports single draw, multiple draw, and Crown Spread (4+1 wildcard).
  * Loads region data dynamically from /regions/.
+ * Supports WebSocket sync for multiplayer draws.
  */
 
 import { shuffleArray } from '../../core/utils.js';
@@ -83,6 +84,7 @@ let regionNames = [];
 let selectedRegion = null;
 let cardOffset = Math.floor(Math.random() * 1000);
 let isInitialized = false;
+let isSyncing = false;
 
 // ============================================================
 // HELPERS
@@ -119,6 +121,59 @@ function getWildcardMeaning(card, regionData) {
     const idx = Math.abs(hash) % twists.length;
     const cardName = card.isJoker ? 'Joker' : `${card.rankName} of ${card.suitName}`;
     return `✨ Twist (${cardName}): ${twists[idx]}`;
+}
+
+// ============================================================
+// WEBSOCKET SYNC
+// ============================================================
+
+async function getSyncManager() {
+    try {
+        const module = await import('../../core/sync/index.js');
+        return module.syncManager;
+    } catch {
+        return null;
+    }
+}
+
+function broadcastDraw(cards, type, region, synthesis) {
+    // Broadcast via WebSocket if available
+    getSyncManager().then(syncManager => {
+        if (syncManager && syncManager.isConnected && syncManager.send) {
+            const cardData = cards.map(c => ({
+                suit: c.suit,
+                rank: c.rank,
+                symbol: c.symbol,
+                rankName: c.rankName,
+                suitName: c.suitName,
+                isJoker: c.isJoker || false
+            }));
+            
+            syncManager.send({
+                type: 'deck_draw',
+                action: 'draw',
+                cards: cardData,
+                drawType: type,
+                region: region,
+                synthesis: synthesis,
+                timestamp: Date.now()
+            });
+            console.log('📡 Broadcasted deck draw via WebSocket');
+        }
+    }).catch(() => {});
+}
+
+function broadcastReset() {
+    getSyncManager().then(syncManager => {
+        if (syncManager && syncManager.isConnected && syncManager.send) {
+            syncManager.send({
+                type: 'deck_draw',
+                action: 'reset',
+                timestamp: Date.now()
+            });
+            console.log('📡 Broadcasted deck reset via WebSocket');
+        }
+    }).catch(() => {});
 }
 
 // ============================================================
@@ -499,7 +554,7 @@ function updateSpreadDescription() {
 }
 
 // ============================================================
-// DRAW - FIXED
+// DRAW
 // ============================================================
 
 export async function drawConsequence() {
@@ -516,7 +571,6 @@ export async function drawConsequence() {
 
     if (type === 'crown') {
         isCrown = true;
-        // Need 5 cards for Crown Spread (4 main + 1 wildcard)
         if (deck.length < 5) {
             showToast('Deck running low! Reshuffling...', 'warning');
             buildDeck();
@@ -604,6 +658,10 @@ export async function drawConsequence() {
         type: type === 'crown' ? 'Crown Spread' : `${type} Draw${type > 1 ? 's' : ''}`
     });
     renderDeckHistory();
+    
+    // Broadcast via WebSocket
+    broadcastDraw(cards, type, selectedRegion, synthesis);
+    
     showToast(`🃏 Drew ${cards.length} card${cards.length > 1 ? 's' : ''}`, 'success');
 }
 
@@ -744,6 +802,10 @@ export function resetDeck() {
     document.getElementById('crown-spread-details').style.display = 'none';
     document.getElementById('timer-result').style.display = 'none';
     document.getElementById('consequence-title').textContent = 'Cards Drawn';
+    
+    // Broadcast via WebSocket
+    broadcastReset();
+    
     showToast('Deck reshuffled with new random seeds.', 'success');
 }
 
@@ -828,14 +890,22 @@ export function attachEvents() {
     }
 }
 
+// ============================================================
+// CROWN SPREAD MODAL
+// ============================================================
 
-// ============================================================
-// CROWN SPREAD
-// ============================================================
+let crownSpreadModal = null;
 
 export function openCrownSpread() {
-    const modal = document.createElement('div');
-    modal.style.cssText = `
+    // If modal already exists, remove it first
+    if (crownSpreadModal && crownSpreadModal.parentNode) {
+        crownSpreadModal.remove();
+        crownSpreadModal = null;
+    }
+    
+    crownSpreadModal = document.createElement('div');
+    crownSpreadModal.className = 'crown-spread-modal';
+    crownSpreadModal.style.cssText = `
         position: fixed; top: 0; left: 0; width: 100%; height: 100%;
         background: rgba(0,0,0,0.85); display: flex; align-items: center; justify-content: center;
         z-index: 1000; padding: 1rem; backdrop-filter: blur(12px);
@@ -861,12 +931,14 @@ export function openCrownSpread() {
     fetchRegionData(regionName).then(data => {
         const result = synthesiseCrownSpread(mainCards, wildcard, data);
         
-        modal.innerHTML = `
+        crownSpreadModal.innerHTML = `
             <div style="background:var(--bg2);padding:2rem;border-radius:16px;max-width:800px;width:100%;max-height:90vh;overflow-y:auto;border:1px solid var(--border);">
                 <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;">
                     <h2 style="color:var(--gold);margin:0;">👑 Crown Spread</h2>
-                    <button onclick="this.closest('div').parentElement.remove()" 
-                            style="background:var(--bg3);border:1px solid var(--border);color:var(--text2);font-size:1.5rem;cursor:pointer;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;">✕</button>
+                    <button onclick="window.closeCrownSpread()" 
+                            style="background:var(--bg3);border:1px solid var(--border);color:var(--text2);font-size:1.5rem;cursor:pointer;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;transition:all 0.2s ease;">
+                        ✕
+                    </button>
                 </div>
                 
                 <div style="display:flex;gap:0.5rem;justify-content:center;flex-wrap:wrap;margin-bottom:1rem;">
@@ -914,24 +986,66 @@ export function openCrownSpread() {
                 ` : ''}
                 
                 <div style="margin-top:1rem;display:flex;gap:0.5rem;flex-wrap:wrap;">
-                    <button class="btn btn-gold" onclick="this.closest('div').parentElement.remove(); window.openCrownSpread();">🔄 New Spread</button>
-                    <button class="btn btn-secondary" onclick="this.closest('div').parentElement.remove();">Close</button>
+                    <button class="btn btn-gold" onclick="window.closeCrownSpread(); setTimeout(window.openCrownSpread, 100);">🔄 New Spread</button>
+                    <button class="btn btn-secondary" onclick="window.closeCrownSpread();">Close</button>
                 </div>
             </div>
         `;
         
-        document.body.appendChild(modal);
-        modal.addEventListener('click', (e) => {
-            if (e.target === modal) modal.remove();
+        document.body.appendChild(crownSpreadModal);
+        
+        // Broadcast via WebSocket
+        broadcastDraw(cards, 'crown', regionName, result.synthesis);
+        
+        // Click on backdrop to close
+        crownSpreadModal.addEventListener('click', (e) => {
+            if (e.target === crownSpreadModal) {
+                window.closeCrownSpread();
+            }
+        });
+        
+        // Escape key to close
+        document.addEventListener('keydown', function escHandler(e) {
+            if (e.key === 'Escape' && crownSpreadModal && crownSpreadModal.parentNode) {
+                window.closeCrownSpread();
+                document.removeEventListener('keydown', escHandler);
+            }
         });
     });
 }
 
+// Close Crown Spread modal
+window.closeCrownSpread = function() {
+    if (crownSpreadModal && crownSpreadModal.parentNode) {
+        crownSpreadModal.remove();
+        crownSpreadModal = null;
+    }
+    // Refresh the decks view to show updated deck count
+    const container = document.getElementById('scene-view-container');
+    if (container) {
+        const activeTab = document.querySelector('.scene-tab.active');
+        if (activeTab && activeTab.dataset.view === 'consequences') {
+            // Re-render consequences view
+            import('../decks/index.js').then(module => {
+                if (module.render) {
+                    module.render(container);
+                }
+            });
+        }
+    }
+    // Update deck count display
+    updateDeckCount();
+};
+
 // Expose to window
 window.openCrownSpread = openCrownSpread;
+window.closeCrownSpread = window.closeCrownSpread;
 window.createTimerFromCard = createTimerFromCard;
+window.drawConsequence = drawConsequence;
+window.resetDeck = resetDeck;
+
 // ============================================================
-// EXPORT - SINGLE DEFAULT EXPORT
+// EXPORT
 // ============================================================
 
 export default {
@@ -945,5 +1059,7 @@ export default {
     destroy,
     loadManifest,
     fetchRegionData,
-    buildDeck
+    buildDeck,
+    openCrownSpread,
+    closeCrownSpread: window.closeCrownSpread
 };
