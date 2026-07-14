@@ -1311,6 +1311,186 @@ window.getSelectedRegion = getSelectedRegion;
 window.getRegionNames = getRegionNames;
 window.setSelectedRegion = setSelectedRegion;
 
+// Add these near the bottom of the file, in the export section
+
+/**
+ * Get the currently selected region
+ * @returns {string|null} The selected region name or null if none selected
+ */
+export function getSelectedRegion() {
+    return selectedRegion;
+}
+
+/**
+ * Get all available region names
+ * @returns {string[]} Array of region names
+ */
+export function getRegionNames() {
+    return regionNames;
+}
+
+/**
+ * Set the selected region programmatically
+ * @param {string} regionName - The region name to select
+ * @returns {Promise<boolean>} True if successful, false otherwise
+ */
+export async function setSelectedRegion(regionName) {
+    if (!regionNames.includes(regionName)) {
+        console.warn(`[Decks] Region "${regionName}" not found`);
+        return false;
+    }
+    
+    selectedRegion = regionName;
+    const select = document.getElementById('deck-region-select');
+    if (select) {
+        select.value = regionName;
+        await onRegionChange();
+    }
+    return true;
+}
+
+/**
+ * Get the current region data
+ * @returns {object|null} The region data or null if not loaded
+ */
+export function getRegionData() {
+    return regionData;
+}
+
+/**
+ * Get a card meaning for a specific suit and rank in the current region
+ * @param {string} suit - The card suit
+ * @param {string} rank - The card rank
+ * @returns {string} The card meaning
+ */
+export function getCardMeaning(suit, rank) {
+    if (!regionData) {
+        return `A complication of ${suit} arises.`;
+    }
+    return getCardMeaningFromRegion(suit, rank, regionData);
+}
+
+/**
+ * Register a callback for region changes
+ * @param {Function} callback - Function(regionName, regionData)
+ */
+export function onRegionChange(callback) {
+    if (typeof callback === 'function') {
+        regionChangeCallbacks = regionChangeCallbacks || [];
+        regionChangeCallbacks.push(callback);
+        // Immediately call with current region if available
+        if (selectedRegion) {
+            callback(selectedRegion, regionData);
+        }
+    }
+}
+
+/**
+ * Quick draw with specified number of cards
+ * @param {number} count - Number of cards to draw (1-3)
+ * @param {string} regionName - Optional region name (uses current if not specified)
+ * @returns {Promise<object>} The draw result
+ */
+export async function quickDraw(count = 1, regionName = null) {
+    if (regionName) {
+        await setSelectedRegion(regionName);
+    }
+    
+    if (!selectedRegion) {
+        showToast('Please select a region first.', 'error');
+        return null;
+    }
+    
+    const data = await fetchRegionData(selectedRegion);
+    if (!data) return null;
+    
+    if (deck.length < count) {
+        showToast('Deck running low! Reshuffling...', 'warning');
+        buildDeck();
+    }
+    
+    const cards = [];
+    for (let i = 0; i < count; i++) {
+        if (deck.length === 0) buildDeck();
+        cards.push(deck.pop());
+    }
+    updateDeckCount();
+    
+    const synthesis = synthesiseConsequence(cards, data);
+    const cardNames = cards.map(c => c.isJoker ? '🃏 Joker' : `${c.rankName} of ${c.suitName}`).join(', ');
+    
+    // Add to history
+    deckHistory.push({
+        time: new Date().toLocaleTimeString(),
+        cards: cardNames,
+        synthesis: synthesis.replace(/\n/g, ' '),
+        type: `${count} Draw${count > 1 ? 's' : ''}`
+    });
+    renderDeckHistory();
+    
+    return {
+        cards,
+        synthesis,
+        cardNames,
+        type: count
+    };
+}
+
+/**
+ * Quick Crown Spread
+ * @param {string} regionName - Optional region name (uses current if not specified)
+ * @returns {Promise<object>} The Crown Spread result
+ */
+export async function quickCrownSpread(regionName = null) {
+    if (regionName) {
+        await setSelectedRegion(regionName);
+    }
+    
+    if (!selectedRegion) {
+        showToast('Please select a region first.', 'error');
+        return null;
+    }
+    
+    const data = await fetchRegionData(selectedRegion);
+    if (!data) return null;
+    
+    if (deck.length < 5) {
+        showToast('Deck running low! Reshuffling...', 'warning');
+        buildDeck();
+    }
+    
+    const cards = [];
+    for (let i = 0; i < 5; i++) {
+        if (deck.length === 0) buildDeck();
+        cards.push(deck.pop());
+    }
+    updateDeckCount();
+    
+    const mainCards = cards.slice(0, 4);
+    const wildcard = cards[4];
+    const result = synthesiseCrownSpread(mainCards, wildcard, data);
+    
+    const cardNames = cards.map(c => c.isJoker ? '🃏 Joker' : `${c.rankName} of ${c.suitName}`).join(', ');
+    deckHistory.push({
+        time: new Date().toLocaleTimeString(),
+        cards: cardNames,
+        synthesis: result.synthesis.replace(/\n/g, ' '),
+        type: 'Crown Spread'
+    });
+    renderDeckHistory();
+    
+    return {
+        cards,
+        mainCards,
+        wildcard,
+        result,
+        cardNames
+    };
+}
+// ============================================================
+// EXPORT
+// ============================================================
+
 // ============================================================
 // EXPORT
 // ============================================================
