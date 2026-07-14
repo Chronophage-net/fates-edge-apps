@@ -1867,4 +1867,484 @@ select {
     .main { padding: 0; max-width: 100%; }
     .panel, .doc-card, .modal { break-inside: avoid; box-shadow: none !important; border: 1px solid var(--border); }
     .btn, .btn-gold { background: var(--bg3) !important; color: var(--text) !important; border: 1px solid var(--border) !important; }
+}/* ============================================================
+   FACTIONS & ASSETS STYLES
+   ============================================================ */
+
+.factions-modern-layout {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.factions-header {
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 0.5rem;
+}
+
+.factions-title {
+    font-size: 1.8rem;
+    font-weight: 700;
+    margin: 0;
+    color: var(--text);
+}
+
+.factions-subtitle {
+    font-size: 1rem;
+    color: var(--text3);
+    margin: 0.25rem 0 0 0;
+}
+
+.factions-tabs {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 0.5rem;
+}
+
+.factions-tab {
+    padding: 0.5rem 1rem;
+    border: none;
+    background: transparent;
+    color: var(--text2);
+    cursor: pointer;
+    border-radius: var(--radius);
+    font-size: 0.9rem;
+    transition: all 0.2s;
+}
+
+.factions-tab:hover {
+    background: var(--bg2);
+    color: var(--text);
+}
+
+.factions-tab.active {
+    background: var(--bg2);
+    color: var(--gold);
+    font-weight: 600;
+}
+
+.factions-view-container {
+    min-height: 300px;
+}
+
+.factions-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem 1rem;
+    color: var(--text3);
+    gap: 1rem;
+    background: var(--bg2);
+    border-radius: var(--radius);
+}
+
+/* ===== FACTION SUMMARY ===== */
+.factions-summary {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.summary-card {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 0.8rem 1rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.2rem;
+}
+
+.summary-icon { font-size: 1.5rem; }
+.summary-label { font-size: 0.7rem; text-transform: uppercase; color: var(--text3); letter-spacing: 0.05em; }
+.summary-value { font-size: 1.4rem; font-weight: 700; color: var(--gold); }
+
+.summary-bar {
+    width: 100%;
+    height: 4px;
+    background: var(--bg4);
+    border-radius: var(--radius-full);
+    overflow: hidden;
+}
+
+.summary-bar-fill {
+    height: 100%;
+    border-radius: var(--radius-full);
+    transition: width var(--transition);
+}
+
+/* ===== FACTIONS GRID ===== */
+.factions-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.faction-card {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+}
+
+.faction-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    border-color: var(--gold);
+}
+
+.faction-card-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.faction-icon { font-size: 1.4rem; }
+.faction-name { font-size: 1rem; font-weight: 600; color: var(--text); flex: 1; }
+.faction-standing { font-size: 0.75rem; font-weight: 600; padding: 0.1rem 0.5rem; border-radius: var(--radius-full); background: var(--bg2); }
+
+.faction-agenda {
+    font-size: 0.85rem;
+    color: var(--text2);
+}
+
+.agenda-label { color: var(--text3); }
+.agenda-text { color: var(--text); }
+
+.faction-timer {
+    font-size: 0.8rem;
+    color: var(--text2);
+}
+
+.timer-bar {
+    width: 100%;
+    height: 4px;
+    background: var(--bg4);
+    border-radius: var(--radius-full);
+    overflow: hidden;
+    margin-top: 0.2rem;
+}
+
+.timer-bar-fill {
+    height: 100%;
+    background: var(--gold);
+    border-radius: var(--radius-full);
+    transition: width var(--transition);
+}
+
+.faction-hooks {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.3rem;
+    margin-top: 0.2rem;
+}
+
+.hook-tag {
+    font-size: 0.65rem;
+    padding: 0.05rem 0.4rem;
+    border-radius: var(--radius-full);
+    background: var(--bg4);
+    color: var(--text3);
+}
+
+/* ===== ASSETS GRID ===== */
+.assets-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.asset-card {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 0.8rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 0.2rem;
+}
+
+.asset-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    border-color: var(--gold);
+}
+
+.asset-card-tier {
+    font-size: 0.6rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text3);
+    background: var(--bg2);
+    padding: 0.1rem 0.5rem;
+    border-radius: var(--radius-full);
+}
+
+.asset-card-name { font-size: 0.95rem; font-weight: 600; color: var(--text); }
+.asset-card-type { font-size: 0.75rem; color: var(--text3); }
+.asset-card-status { font-size: 0.7rem; padding: 0.05rem 0.5rem; border-radius: var(--radius-full); }
+
+.asset-card-status.maintained { background: var(--green-glow); color: var(--green); }
+.asset-card-status.neglected { background: var(--gold-glow); color: var(--gold); }
+.asset-card-status.compromised { background: var(--red-glow); color: var(--red); }
+
+.asset-card-cost { font-size: 0.8rem; color: var(--gold); }
+
+/* ===== FOLLOWERS GRID ===== */
+.followers-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.follower-card {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 0.8rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.follower-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    border-color: var(--gold);
+}
+
+.follower-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.follower-name { font-size: 1rem; font-weight: 600; color: var(--text); }
+.follower-cap { font-size: 0.7rem; color: var(--gold); background: var(--bg2); padding: 0.05rem 0.4rem; border-radius: var(--radius-full); }
+
+.follower-role { font-size: 0.8rem; color: var(--text2); }
+.follower-states { display: flex; gap: 0.5rem; margin-top: 0.3rem; }
+.follower-state { font-size: 0.7rem; }
+.follower-desc { font-size: 0.75rem; color: var(--text3); margin-top: 0.3rem; }
+
+/* ===== TRUSTS GRID ===== */
+.trusts-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.trust-card {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 0.3rem;
+    border-top: 3px solid var(--blue);
+}
+
+.trust-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    border-color: var(--gold);
+}
+
+.trust-card-icon { font-size: 2rem; }
+.trust-card-name { font-size: 1.1rem; font-weight: 600; color: var(--text); }
+.trust-card-tier { font-size: 0.8rem; color: var(--gold); font-weight: 600; }
+
+.trust-card-stats {
+    display: flex;
+    gap: 0.8rem;
+    font-size: 0.8rem;
+    color: var(--text2);
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+/* ===== DETAIL VIEWS ===== */
+.faction-detail-header,
+.asset-detail-header,
+.follower-detail-header,
+.trust-detail-header {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border);
+}
+
+.faction-detail-icon,
+.asset-detail-icon,
+.follower-detail-icon,
+.trust-detail-icon {
+    font-size: 2.5rem;
+    line-height: 1;
+}
+
+.faction-detail-standing { font-size: 0.9rem; font-weight: 500; }
+
+.faction-detail-body,
+.asset-detail-body,
+.follower-detail-body,
+.trust-detail-body {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+}
+
+.faction-detail-section h3,
+.asset-detail-section h3,
+.follower-detail-section h3,
+.trust-detail-section h3 {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text2);
+    margin: 0 0 0.25rem 0;
+}
+
+.faction-detail-section ul {
+    list-style: none;
+    padding: 0;
+}
+
+.faction-detail-section ul li {
+    padding: 0.1rem 0;
+    padding-left: 0.5rem;
+    border-left: 2px solid var(--gold);
+    margin: 0.1rem 0;
+    font-size: 0.9rem;
+}
+
+.faction-detail-actions,
+.asset-detail-actions,
+.follower-detail-actions,
+.trust-detail-actions {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 1rem;
+    padding-top: 0.5rem;
+    border-top: 1px solid var(--border);
+    flex-wrap: wrap;
+}
+
+.timer-display {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+}
+
+.timer-controls {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 0.3rem;
+}
+
+.state-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
+}
+
+.state-item {
+    background: var(--bg2);
+    padding: 0.5rem;
+    border-radius: var(--radius);
+    text-align: center;
+}
+
+.state-label { font-size: 0.7rem; color: var(--text3); display: block; }
+.state-value { font-size: 1rem; font-weight: 600; }
+
+.state-controls {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 0.3rem;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+    gap: 0.5rem;
+}
+
+.stat-item {
+    background: var(--bg2);
+    padding: 0.5rem;
+    border-radius: var(--radius);
+    text-align: center;
+}
+
+.stat-item .stat-label { font-size: 0.7rem; color: var(--text3); display: block; }
+.stat-item .stat-value { font-size: 1rem; font-weight: 600; color: var(--text); }
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+    .factions-summary {
+        grid-template-columns: 1fr 1fr 1fr;
+    }
+    
+    .factions-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+    
+    .followers-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+    
+    .trusts-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+    
+    .state-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 480px) {
+    .factions-summary {
+        grid-template-columns: 1fr;
+    }
+    
+    .factions-grid,
+    .followers-grid,
+    .trusts-grid,
+    .assets-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .factions-tabs {
+        flex-wrap: nowrap;
+        overflow-x: auto;
+    }
+    
+    .factions-tab {
+        white-space: nowrap;
+        font-size: 0.8rem;
+        padding: 0.3rem 0.6rem;
+    }
 }

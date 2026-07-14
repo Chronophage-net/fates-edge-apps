@@ -60,7 +60,7 @@
                 <span class="nav-icon">🛠️</span>
                 <span class="nav-label">Builder</span>
             </button>
-            <button class="nav-item" data-tab="roller" title="Dice Roller">
+            <button class="nav-item" data-tab="dice" title="Dice Roller">
                 <span class="nav-icon">🎲</span>
                 <span class="nav-label">Dice</span>
             </button>
@@ -71,6 +71,10 @@
             <button class="nav-item" data-tab="encounters" title="Encounters">
                 <span class="nav-icon">⚔️</span>
                 <span class="nav-label">Encounters</span>
+            </button>
+            <button class="nav-item" data-tab="factions" title="Factions & Assets">
+                <span class="nav-icon">🏛️</span>
+                <span class="nav-label">Factions</span>
             </button>
             <button class="nav-item" data-tab="vtt" title="Virtual Tabletop">
                 <span class="nav-icon">💬</span>
@@ -123,9 +127,10 @@
         <div id="tab-dashboard" class="tab-content"></div>
         <div id="tab-characters" class="tab-content"></div>
         <div id="tab-builder" class="tab-content"></div>
-        <div id="tab-roller" class="tab-content"></div>
+        <div id="tab-dice" class="tab-content"></div>
         <div id="tab-timers" class="tab-content"></div>
         <div id="tab-encounters" class="tab-content"></div>
+        <div id="tab-factions" class="tab-content"></div>
         <div id="tab-vtt" class="tab-content"></div>
         <div id="tab-docs" class="tab-content"></div>
         <div id="tab-search" class="tab-content"></div>
@@ -205,6 +210,14 @@
             <button class="modal-close" id="combatModalClose">&times;</button>
             <h2 id="combat-modal-title">Combat Tracker</h2>
             <div id="combat-editor-content"></div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="factionModal">
+        <div class="modal" style="max-width:700px;">
+            <button class="modal-close" id="factionModalClose">&times;</button>
+            <h2 id="faction-modal-title">Faction Editor</h2>
+            <div id="faction-editor-content"></div>
         </div>
     </div>
 

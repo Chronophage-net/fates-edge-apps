@@ -19,6 +19,7 @@ class ModuleLoader {
             'dice': './features/dice/index.js',
             'docs': './features/docs/index.js',
             'encounters': './features/encounters/index.js',
+            'factions': './features/factions/index.js',
             'home': './features/home/index.js',
             'patrons': './features/patrons/index.js',
             'search': './features/search/index.js',
