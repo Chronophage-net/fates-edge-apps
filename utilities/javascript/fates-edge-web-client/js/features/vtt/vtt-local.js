@@ -3,6 +3,13 @@
  * Uses the reactive store for all UI updates.
  */
 
+// ASSERT FIX
+function assert(condition, message) {
+    if (!condition) {
+        throw new Error(message || 'Assertion failed');
+    }
+}
+
 import { vttStore } from '../../core/vtt-store.js';
 import { getState, addChatMessage, clearChatHistory, getCharacter } from '../../core/state.js';
 import { performRoll } from '../../core/dice.js';

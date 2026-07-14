@@ -3,13 +3,16 @@
  * UI for the Fate's Edge resolution system
  * Uses the core dice engine for all rolling logic
  * Supports deterministic RNG for static sites
- */
+ */// ASSERT FIX - must be before any imports
+const assert = (condition, message) => {
+    if (!condition) {
+        throw new Error(message || 'Assertion failed');
+    }
+};
 
-// Import from core modules
-// Import from core modules
-import { escHtml, safeParseInt, assert } from '../../core/utils.js';
+// Now the imports
+import { escHtml, safeParseInt } from '../../core/utils.js';
 import { addRoll, getState, saveState } from '../../core/state.js';
-// Import the core dice engine with deterministic RNG support
 import { 
     performRoll, 
     rollDie, 
@@ -18,7 +21,10 @@ import {
     generateSeed 
 } from '../../core/dice.js';
 
+// ... rest of your code
+
 let container = null;
+
 
 // ============================================================
 // RENDER
