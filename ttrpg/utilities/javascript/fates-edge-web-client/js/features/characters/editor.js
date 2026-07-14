@@ -1,7 +1,7 @@
 /**
  * Character editor modal
- * FIXED: Proper state management, reliable event handling, wiki integration
- * FIXED: Modal cleanup and closing behavior
+ * FIXED: Modal properly destroys itself on save
+ * FIXED: Complete cleanup of DOM elements and event listeners
  */
 
 import { getState, getCharacter, addCharacter, updateCharacter, generateId } from '../../core/state.js';
@@ -20,7 +20,9 @@ const editorState = {
     initialized: false,
     modalElement: null,
     escListener: null,
-    overlayListener: null
+    overlayListener: null,
+    saveListener: null,
+    cancelListeners: []
 };
 
 // ============================================================
@@ -73,12 +75,9 @@ export function openEditor(id) {
     
     initEditor();
     
-    // Get or create modal
-    let modal = document.getElementById('charModal');
-    if (!modal) {
-        modal = createModal();
-        document.body.appendChild(modal);
-    }
+    // Create fresh modal
+    const modal = createModal();
+    document.body.appendChild(modal);
     
     const title = document.getElementById('char-modal-title');
     const content = document.getElementById('char-editor-content');
@@ -116,24 +115,36 @@ export function openEditor(id) {
 }
 
 export function closeEditor() {
+    // Remove modal from DOM completely
     const modal = document.getElementById('charModal');
     if (modal) {
-        modal.style.display = 'none';
-        document.body.classList.remove('modal-open');
+        modal.remove(); // This removes it from the DOM entirely
     }
     
-    // Clean up event listeners
+    document.body.classList.remove('modal-open');
+    
+    // Clean up all event listeners
     if (editorState.escListener) {
         document.removeEventListener('keydown', editorState.escListener);
         editorState.escListener = null;
     }
-    if (editorState.overlayListener) {
-        const modalEl = document.getElementById('charModal');
-        if (modalEl) {
-            modalEl.removeEventListener('click', editorState.overlayListener);
+    
+    if (editorState.saveListener) {
+        const saveBtn = document.getElementById('ce-save-btn');
+        if (saveBtn) {
+            saveBtn.removeEventListener('click', editorState.saveListener);
         }
-        editorState.overlayListener = null;
+        editorState.saveListener = null;
     }
+    
+    // Clean up cancel listeners
+    editorState.cancelListeners.forEach(listener => {
+        const btn = listener.btn;
+        if (btn) {
+            btn.removeEventListener('click', listener.handler);
+        }
+    });
+    editorState.cancelListeners = [];
     
     editorState.isOpen = false;
     editorState.currentId = null;
@@ -221,40 +232,41 @@ function createNewCharacter() {
 // ============================================================
 
 function attachEditorEvents() {
-    // Save button
+    // Save button - store listener for cleanup
     const saveBtn = document.getElementById('ce-save-btn');
     if (saveBtn) {
-        const newBtn = saveBtn.cloneNode(true);
-        saveBtn.parentNode.replaceChild(newBtn, saveBtn);
-        newBtn.addEventListener('click', saveEditor);
+        // Remove any existing listeners
+        if (editorState.saveListener) {
+            saveBtn.removeEventListener('click', editorState.saveListener);
+        }
+        editorState.saveListener = saveEditor;
+        saveBtn.addEventListener('click', editorState.saveListener);
     }
     
-    // Cancel/Close buttons
+    // Cancel/Close buttons - store listeners for cleanup
     const closeBtns = ['ce-cancel-btn', 'charModalClose'];
     for (const id of closeBtns) {
         const btn = document.getElementById(id);
         if (btn) {
-            const newBtn = btn.cloneNode(true);
-            btn.parentNode.replaceChild(newBtn, btn);
-            newBtn.addEventListener('click', closeEditor);
+            const handler = closeEditor;
+            btn.addEventListener('click', handler);
+            editorState.cancelListeners.push({ btn, handler });
         }
     }
     
-    // Close on overlay click (using stored listener for cleanup)
+    // Close on overlay click
     const modal = document.getElementById('charModal');
     if (modal) {
-        if (editorState.overlayListener) {
-            modal.removeEventListener('click', editorState.overlayListener);
-        }
-        editorState.overlayListener = (e) => {
+        const handler = (e) => {
             if (e.target === modal) {
                 closeEditor();
             }
         };
-        modal.addEventListener('click', editorState.overlayListener);
+        modal.addEventListener('click', handler);
+        editorState.overlayListener = handler;
     }
     
-    // Keyboard shortcut (using stored listener for cleanup)
+    // Keyboard shortcut
     if (editorState.escListener) {
         document.removeEventListener('keydown', editorState.escListener);
     }
@@ -486,7 +498,7 @@ export function saveEditor() {
             updateCharacter(editorState.currentId, c);
         }
         
-        // Close the modal FIRST
+        // Close the modal FIRST (this removes it from DOM)
         closeEditor();
         
         // Then refresh the characters list
@@ -594,16 +606,6 @@ export function addCEDynamicFromWiki(type, entryId) {
 // ============================================================
 
 function setupEditorEvents() {
-    // Modal close on overlay
-    const modal = document.getElementById('charModal');
-    if (modal) {
-        modal.addEventListener('click', (e) => {
-            if (e.target === modal) {
-                closeEditor();
-            }
-        });
-    }
-    
     // Keyboard shortcuts
     document.addEventListener('keydown', (e) => {
         if (!editorState.isOpen) return;

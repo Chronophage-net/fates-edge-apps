@@ -1,9 +1,9 @@
 /**
-* Settings feature - Manage data, backups, and preferences
-* ⚠️ ALL RIGHTS RESERVED - Fate's Edge is © Nicholas A. Gasper
-* SRD portions are CC BY-NC-SA 4.0
-* See license modal for full terms
-**/
+ * Settings feature - Manage data, backups, and preferences
+ * ⚠️ ALL RIGHTS RESERVED - Fate's Edge is © Nicholas A. Gasper
+ * SRD portions are CC BY-NC-SA 4.0
+ * See license modal for full terms
+ **/
 
 import { 
     getState as getAppState,
@@ -37,29 +37,79 @@ let container = null;
 // ============================================================
 // LICENSE & COPYRIGHT NOTICE
 // ============================================================
+
 const LICENSE_TEXT = `
-FATE'S EDGE — COPYRIGHT NOTICE
-================================
+╔══════════════════════════════════════════════════════════════╗
+║                                                              ║
+║                     FATE'S EDGE                              ║
+║                                                              ║
+║                      COPYRIGHT NOTICE                        ║
+║                                                              ║
+╠══════════════════════════════════════════════════════════════╣
+║                                                              ║
+║  Fate's Edge is © Nicholas A. Gasper. All Rights Reserved.   ║
+║                                                              ║
+║  ── Dual License ──                                          ║
+║                                                              ║
+║  The System Reference Document (SRD) and Essentials guide    ║
+║  are licensed under the Creative Commons Attribution-        ║
+║  NonCommercial-ShareAlike 4.0 International License          ║
+║  (CC BY-NC-SA 4.0).                                          ║
+║                                                              ║
+║  ═════════════════════════════════════════════════════════   ║
+║                                                              ║
+║  ALL OTHER CONTENT IS ALL RIGHTS RESERVED, including but    ║
+║  not limited to:                                             ║
+║                                                              ║
+║    • Setting lore (Acasia, Aeler, Vhasia, the Curse, etc.)  ║
+║    • Original characters, NPCs, and named figures           ║
+║    • Faction descriptions and campaign-specific content     ║
+║    • Proprietary magic systems (Runekeeper, Invoker,        ║
+║      Cantor, Summoner, etc.)                                ║
+║    • Artwork, maps, and graphical elements                  ║
+║    • Original prose, framing devices, and narrative text    ║
+║    • The Deck of Consequences and Crown Spread systems      ║
+║    • The Travel Framework and regional generators          ║
+║    • Any content not explicitly marked as SRD              ║
+║                                                              ║
+║  ── Code License ──                                          ║
+║                                                              ║
+║  The source code for this toolkit is licensed under the     ║
+║  MIT License. See the LICENSE file in the repository.       ║
+║                                                              ║
+║  ── Permissions ──                                           ║
+║                                                              ║
+║  For permissions regarding proprietary content, contact:    ║
+║  support@fates-edge.com                                     ║
+║                                                              ║
+║                                                              ║
+║  "The coin that never spends is the one you don't           ║
+║   remember taking."                                         ║
+║          — Serafine of the Velvet Touch                     ║
+║                                                              ║
+╚══════════════════════════════════════════════════════════════╝
+`;
 
-Fate's Edge is © Nicholas A. Gasper. All rights reserved.
+const LICENSE_SUMMARY = `
+FATE'S EDGE — LICENSE SUMMARY
+=============================
 
-The System Reference Document (SRD) and Essentials guide are
-licensed under the Creative Commons Attribution-NonCommercial-
-ShareAlike 4.0 International License (CC BY-NC-SA 4.0).
+📜 Fate's Edge is © Nicholas A. Gasper. All Rights Reserved.
 
-ALL OTHER CONTENT IS ALL RIGHTS RESERVED, including but not
-limited to:
-- Setting lore (Acasia, Aeler, Vhasia, the Curse, etc.)
-- Original characters, NPCs, and named figures
-- Faction descriptions and campaign-specific content
-- Proprietary magic systems (Runekeeper, Invoker, Cantor, etc.)
-- Artwork, maps, and graphical elements
-- Original prose, framing devices, and narrative text
-- The Deck of Consequences and Crown Spread systems
-- The Travel Framework and regional generators
-- Any content not explicitly marked as SRD
+📖 The SRD and Essentials guide are licensed under 
+   CC BY-NC-SA 4.0 (Creative Commons Attribution-NonCommercial-ShareAlike 4.0)
 
-For permissions, contact: support@fates-edge.com
+🔒 ALL OTHER CONTENT is All Rights Reserved:
+   • Setting lore, original characters, factions
+   • Proprietary magic systems (Runekeeper, Invoker, Cantor, etc.)
+   • Artwork, maps, graphical elements
+   • Original prose, narrative text
+   • Deck of Consequences, Crown Spread, Travel Framework
+   • Any content not explicitly marked as SRD
+
+💻 The toolkit source code is MIT Licensed.
+
+📧 For permissions: support@fates-edge.com
 
 "The coin that never spends is the one you don't remember taking."
 — Serafine of the Velvet Touch
@@ -328,7 +378,9 @@ export function render(el) {
                 <p><strong>Fate's Edge</strong> is © Nicholas A. Gasper. <strong>All Rights Reserved.</strong></p>
                 <p>The <strong>SRD</strong> and <strong>Essentials</strong> guide are licensed under CC BY-NC-SA 4.0.</p>
                 <p>All other content — setting lore, original characters, proprietary magic systems, artwork, etc. — is <strong>All Rights Reserved</strong>.</p>
+                <p><strong>Code:</strong> MIT License</p>
                 <button class="btn btn-sm mt-1" id="settings-license-btn">📜 Full License</button>
+                <button class="btn btn-sm mt-1" id="settings-license-summary-btn">📋 Summary</button>
             </div>
         </div>
         
@@ -338,7 +390,8 @@ export function render(el) {
         <div class="panel settings-panel">
             <h3>About</h3>
             <p class="text-muted">Fate's Edge Toolkit v3.0 — Modular Edition with WebSocket & Voice<br />All data stays in your browser.</p>
-            <p class="text-muted small mt-1">© Nicholas A. Gasper. All Rights Reserved.</p>
+            <p class="text-muted small mt-1">© ${new Date().getFullYear()} Nicholas A. Gasper. All Rights Reserved.</p>
+            <p class="text-muted small">The SRD and Essentials are CC BY-NC-SA 4.0. Code is MIT.</p>
         </div>
     `;
     
@@ -763,6 +816,7 @@ export function attachEvents() {
     
     // License
     document.getElementById('settings-license-btn')?.addEventListener('click', openLicenseModal);
+    document.getElementById('settings-license-summary-btn')?.addEventListener('click', openLicenseSummaryModal);
     
     // WebSocket
     document.getElementById('settings-ws-test')?.addEventListener('click', testWSConnectionHandler);
@@ -1130,7 +1184,7 @@ function setTheme(mode) {
 }
 
 // ============================================================
-// LICENSE MODAL
+// LICENSE MODALS
 // ============================================================
 
 function openLicenseModal() {
@@ -1139,11 +1193,23 @@ function openLicenseModal() {
     const content = document.getElementById('licenseContent');
     if (content) {
         content.innerHTML = `
-            <h4>Dual License</h4>
-            <p><strong>Fate's Edge</strong> is copyright © Nicholas A. Gasper.</p>
-            <p>The <strong>SRD</strong> portions and <strong>Essentials</strong> guide are licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a>.</p>
-            <p>All other content — setting lore, original characters, proprietary magic systems, artwork, etc. — is <strong>All Rights Reserved</strong>.</p>
-            <p style="margin-top:1rem;font-style:italic;">"The coin that never spends is the one you don't remember taking." — Serafine of the Velvet Touch</p>
+            <div style="font-family:var(--font-mono);white-space:pre-wrap;font-size:0.85rem;line-height:1.6;color:var(--text2);">
+                ${LICENSE_TEXT}
+            </div>
+        `;
+    }
+    modal.classList.add('open');
+}
+
+function openLicenseSummaryModal() {
+    const modal = document.getElementById('licenseModal');
+    if (!modal) return;
+    const content = document.getElementById('licenseContent');
+    if (content) {
+        content.innerHTML = `
+            <div style="font-family:var(--font-mono);white-space:pre-wrap;font-size:0.9rem;line-height:1.8;color:var(--text2);">
+                ${LICENSE_SUMMARY}
+            </div>
         `;
     }
     modal.classList.add('open');

@@ -1,400 +1,659 @@
 /**
- * Encounter Editor - Create and edit encounters with adversary management
+ * Character editor modal
+ * FIXED: Modal properly destroys itself on save
+ * FIXED: Complete cleanup of DOM elements and event listeners
  */
 
-import { getState, saveState } from '../../core/state.js';
+import { getState, getCharacter, addCharacter, updateCharacter, generateId } from '../../core/state.js';
+import { ALL_SKILLS, defaultSkills } from '../../core/dice.js';
+import { escHtml, safeParseInt, clamp } from '../../core/utils.js';
 import { showToast } from '../../components/Toast.js';
-import { escHtml } from '../../core/utils.js';
 
-let currentEditorId = null;
-let modal = null;
-let templateOverlay = null;
+// ============================================================
+// STATE
+// ============================================================
 
-// Quick adversary templates from Witnessed Prey
-const ADVERSARY_TEMPLATES = [
-    { name: 'Bandit Rabble (TL 1)', body: 'Body 2, Wits 1, Spirit 1, Presence 1. Harm: 2. Key: Melee 1. Rabble — On a Miss, GM gains 1 SB.' },
-    { name: 'City Watch Recruit (TL 2)', body: 'Body 2, Wits 1, Spirit 1, Presence 2. Harm: 3. Key: Melee 1, Command 1. Alarm — On Partial/Miss, advance Reinforcements timer.' },
-    { name: 'Cult Novice (TL 1)', body: 'Body 1, Wits 1, Spirit 2, Presence 1. Harm: 2. Key: Lore 1, Sway 1. Faith\'s Crumble — Can be discredited.' },
-    { name: 'Assassin (TL 3)', body: 'Body 3, Wits 3, Spirit 2, Presence 2. Harm: 4. Key: Stealth 3, Melee 2. First Strike — Dominant on first round.' },
-    { name: 'Ghostly Anchor (TL 3)', body: 'Spirit 4, Lore 2, Harm 3. Unfinished Business — Cannot be harmed until anchor addressed. Bargain — May offer a deal.' },
-    { name: 'Hobgoblin (TL 2-3)', body: 'Body 3, Wits 2, Spirit 2, Presence 2. Harm: 4. Key: Melee 3, Command 2. Tactical Awareness — Cannot be surprised.' },
-    { name: 'Bugbear (TL 3)', body: 'Body 4, Wits 3, Spirit 2, Presence 1. Harm: 5. Key: Melee 4, Stealth 3. Surprise Strike — +2 Harm from Hidden.' },
-    { name: 'Lesser Vampire (TL 3)', body: 'Body 3, Wits 3, Spirit 3, Presence 3. Harm: 5. Key: Melee 2, Sway 2. Blood Drain — Heals on hit.' }
-];
+const editorState = {
+    currentId: null,
+    isNew: false,
+    isOpen: false,
+    initialized: false,
+    modalElement: null,
+    escListener: null,
+    overlayListener: null,
+    saveListener: null,
+    cancelListeners: []
+};
 
-/**
- * Open the encounter editor
- */
+// ============================================================
+// INITIALIZATION
+// ============================================================
+
+function initEditor() {
+    if (editorState.initialized) return;
+    
+    // Use event delegation
+    document.addEventListener('click', (e) => {
+        const target = e.target;
+        
+        // Handle add buttons
+        if (target.matches('[data-editor-add]')) {
+            const type = target.dataset.editorAdd;
+            addCEDynamic(type);
+            e.preventDefault();
+        }
+        
+        // Handle remove buttons
+        if (target.matches('.editor-remove-btn')) {
+            const row = target.closest('.dynamic-row');
+            if (row) row.remove();
+            e.preventDefault();
+        }
+        
+        // Handle wiki add
+        if (target.matches('[data-editor-wiki-add]')) {
+            const type = target.dataset.editorWikiAdd;
+            const select = document.getElementById(`ce-${type}-wiki`);
+            if (select && select.value) {
+                addCEDynamicFromWiki(type, select.value);
+                select.value = '';
+            }
+            e.preventDefault();
+        }
+    });
+    
+    editorState.initialized = true;
+}
+
+// ============================================================
+// PUBLIC API
+// ============================================================
+
 export function openEditor(id) {
-    const state = getState();
-    if (!state.encounters) state.encounters = [];
-    const entry = id ? state.encounters.find(e => String(e.id) === String(id)) : null;
-    currentEditorId = id;
-
-    // Build modal
-    modal = document.createElement('div');
-    modal.style.cssText = `
-        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-        background: rgba(0,0,0,0.8); display: flex; align-items: center; justify-content: center;
-        z-index: 1000; padding: 1rem;
-    `;
-    modal.id = 'encounter-editor-modal';
-    
-    const adversaryList = entry?.adversaries || [];
-    
-    modal.innerHTML = `
-        <div style="background: var(--bg2); padding: 1.5rem 2rem; border-radius: var(--radius); max-width: 700px; width: 100%; max-height: 90vh; overflow-y: auto; border: 1px solid var(--border);">
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;">
-                <h2 style="margin:0;color:var(--gold);">${entry ? '✏️ Edit Encounter' : '🆕 New Encounter'}</h2>
-                <button id="enc-modal-close" style="background:none;border:none;color:var(--text2);font-size:1.5rem;cursor:pointer;">✕</button>
-            </div>
-            
-            <div class="field">
-                <label>Title *</label>
-                <input id="enc-title" value="${entry ? escHtml(entry.title) : ''}" style="width:100%;" placeholder="e.g., Ambush at the Bridge" />
-            </div>
-            
-            <div class="field">
-                <label>Description</label>
-                <textarea id="enc-body" rows="3" style="width:100%;" placeholder="Describe the encounter...">${entry ? escHtml(entry.body) : ''}</textarea>
-            </div>
-            
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.8rem;">
-                <div class="field">
-                    <label>Location</label>
-                    <input id="enc-location" value="${entry ? escHtml(entry.location || '') : ''}" style="width:100%;" placeholder="Where?" />
-                </div>
-                <div class="field">
-                    <label>Difficulty (1-5)</label>
-                    <input id="enc-difficulty" type="number" min="1" max="5" value="${entry ? entry.difficulty : 3}" style="width:100%;" />
-                </div>
-            </div>
-            
-            <div class="field">
-                <label>Status</label>
-                <select id="enc-status" style="width:100%;">
-                    <option value="draft" ${entry?.status === 'draft' ? 'selected' : ''}>📝 Draft</option>
-                    <option value="active" ${entry?.status === 'active' ? 'selected' : ''}>⚔️ Active</option>
-                    <option value="resolved" ${entry?.status === 'resolved' ? 'selected' : ''}>✅ Resolved</option>
-                    <option value="archived" ${entry?.status === 'archived' ? 'selected' : ''}>📦 Archived</option>
-                </select>
-            </div>
-            
-            <div style="border-top:1px solid var(--border);padding-top:0.8rem;margin-top:0.8rem;">
-                <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.3rem;">
-                    <h4 style="margin:0;">👾 Adversaries</h4>
-                    <div style="display:flex;gap:0.3rem;">
-                        <button class="btn btn-xs btn-primary" id="enc-add-adversary">+ Add</button>
-                        <button class="btn btn-xs btn-ghost" id="enc-add-template">📋 Template</button>
-                    </div>
-                </div>
-                <div id="enc-adversary-list" style="margin-top:0.3rem;max-height:150px;overflow-y:auto;">
-                    ${adversaryList.map((a, i) => `
-                        <div style="display:flex;justify-content:space-between;align-items:center;padding:0.2rem 0.4rem;background:var(--bg3);border-radius:4px;margin-bottom:0.2rem;font-size:0.85rem;">
-                            <span style="flex:1;">${escHtml(a.name)}</span>
-                            <button class="btn btn-xs btn-ghost enc-remove-adversary" data-index="${i}" style="color:var(--red);">✕</button>
-                        </div>
-                    `).join('')}
-                    ${adversaryList.length === 0 ? '<div style="color:var(--text3);font-size:0.8rem;padding:0.3rem;">No adversaries added yet.</div>' : ''}
-                </div>
-            </div>
-            
-            <div style="display:flex;gap:0.5rem;margin-top:1rem;border-top:1px solid var(--border);padding-top:1rem;">
-                <button class="btn btn-gold" id="enc-save" style="flex:1;">💾 Save</button>
-                <button class="btn btn-ghost" id="enc-cancel">Cancel</button>
-            </div>
-        </div>
-    `;
-    document.body.appendChild(modal);
-    
-    // Event listeners
-    modal.querySelector('#enc-modal-close')?.addEventListener('click', closeEditor);
-    modal.querySelector('#enc-cancel')?.addEventListener('click', closeEditor);
-    modal.addEventListener('click', (e) => { if (e.target === modal) closeEditor(); });
-    
-    modal.querySelector('#enc-save')?.addEventListener('click', saveEncounter);
-    modal.querySelector('#enc-add-adversary')?.addEventListener('click', addAdversary);
-    modal.querySelector('#enc-add-template')?.addEventListener('click', () => openTemplateSelector());
-    
-    modal.querySelectorAll('.enc-remove-adversary').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            const idx = parseInt(btn.dataset.index);
-            removeAdversary(idx);
-        });
-    });
-}
-
-function closeEditor() {
-    // Close template overlay first if open
-    closeTemplateSelector();
-    
-    if (modal) {
-        // Remove modal from DOM
-        if (modal.parentNode) {
-            modal.parentNode.removeChild(modal);
-        }
-        modal = null;
-    }
-    currentEditorId = null;
-}
-
-function closeTemplateSelector() {
-    if (templateOverlay) {
-        // Remove template overlay from DOM
-        if (templateOverlay.parentNode) {
-            templateOverlay.parentNode.removeChild(templateOverlay);
-        }
-        templateOverlay = null;
-    }
-}
-
-function addAdversary() {
-    const listEl = document.getElementById('enc-adversary-list');
-    if (!listEl) return;
-    
-    const name = prompt('Enter adversary name:');
-    if (!name) return;
-    
-    const body = prompt('Enter adversary details (stats, traits):') || '';
-    
-    // Get current list
-    const state = getState();
-    const entry = currentEditorId ? state.encounters.find(e => String(e.id) === String(currentEditorId)) : null;
-    if (!entry) {
-        // Create temporary list
-        const tempList = [];
-        const existing = listEl.querySelectorAll('.enc-remove-adversary');
-        existing.forEach(btn => {
-            const idx = parseInt(btn.dataset.index);
-            // We need to track this differently
-        });
-        // Simpler: re-render
-        renderAdversaryList([...getAdversariesFromDOM(), { name, body }]);
-        return;
-    }
-    
-    if (!entry.adversaries) entry.adversaries = [];
-    entry.adversaries.push({ name, body });
-    renderAdversaryList(entry.adversaries);
-    showToast(`Added "${name}"`, 'success');
-}
-
-/**
- * Open a template selector dropdown instead of a number prompt
- */
-function openTemplateSelector() {
-    // Close any existing template overlay
-    closeTemplateSelector();
-    
-    // Create a small modal/overlay for template selection
-    templateOverlay = document.createElement('div');
-    templateOverlay.style.cssText = `
-        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-        background: rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center;
-        z-index: 2000; padding: 1rem;
-    `;
-    templateOverlay.id = 'template-selector-overlay';
-    
-    const optionsHtml = ADVERSARY_TEMPLATES.map((t, i) => 
-        `<option value="${i}">${t.name}</option>`
-    ).join('');
-    
-    templateOverlay.innerHTML = `
-        <div style="background: var(--bg2); padding: 1.5rem 2rem; border-radius: var(--radius); max-width: 500px; width: 100%; border: 1px solid var(--border);">
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;">
-                <h3 style="margin:0;color:var(--gold);">📋 Select Adversary Template</h3>
-                <button id="template-close" style="background:none;border:none;color:var(--text2);font-size:1.5rem;cursor:pointer;">✕</button>
-            </div>
-            
-            <div class="field">
-                <label>Template</label>
-                <select id="template-select" style="width:100%;padding:0.5rem;border-radius:var(--radius);border:1px solid var(--border);background:var(--bg2);color:var(--text);">
-                    <option value="">— Select a template —</option>
-                    ${optionsHtml}
-                </select>
-            </div>
-            
-            <div id="template-preview" style="margin-top:0.5rem;padding:0.5rem;background:var(--bg3);border-radius:var(--radius);font-size:0.85rem;color:var(--text2);min-height:60px;display:none;">
-                <strong>Preview:</strong>
-                <span id="template-preview-body"></span>
-            </div>
-            
-            <div style="display:flex;gap:0.5rem;margin-top:1rem;border-top:1px solid var(--border);padding-top:1rem;">
-                <button class="btn btn-gold" id="template-confirm" style="flex:1;">✅ Add Template</button>
-                <button class="btn btn-ghost" id="template-cancel">Cancel</button>
-            </div>
-        </div>
-    `;
-    document.body.appendChild(templateOverlay);
-    
-    // Preview on select change
-    const select = templateOverlay.querySelector('#template-select');
-    const preview = templateOverlay.querySelector('#template-preview');
-    const previewBody = templateOverlay.querySelector('#template-preview-body');
-    
-    select.addEventListener('change', () => {
-        const idx = parseInt(select.value);
-        if (!isNaN(idx) && idx >= 0 && idx < ADVERSARY_TEMPLATES.length) {
-            const template = ADVERSARY_TEMPLATES[idx];
-            previewBody.textContent = template.body;
-            preview.style.display = 'block';
-        } else {
-            preview.style.display = 'none';
-        }
-    });
-    
-    // Confirm button
-    templateOverlay.querySelector('#template-confirm').addEventListener('click', () => {
-        const idx = parseInt(select.value);
-        if (isNaN(idx) || idx < 0 || idx >= ADVERSARY_TEMPLATES.length) {
-            showToast('Please select a template.', 'error');
-            return;
-        }
-        
-        const template = ADVERSARY_TEMPLATES[idx];
-        const state = getState();
-        const entry = currentEditorId ? state.encounters.find(e => String(e.id) === String(currentEditorId)) : null;
-        
-        if (!entry) {
-            // Create a new encounter with this template
-            const newEntry = {
-                id: 'enc-' + Date.now() + '-' + Math.random().toString(36).substr(2, 4),
-                title: template.name,
-                body: template.body,
-                difficulty: 3,
-                status: 'draft',
-                adversaries: [{ name: template.name, body: template.body }],
-                created: Date.now()
-            };
-            state.encounters.push(newEntry);
-            saveState();
-            // Remove the template selector overlay
-            closeTemplateSelector();
-            closeEditor();
-            // Re-render list
-            if (window.renderEncounters) window.renderEncounters();
-            showToast(`🃏 Created from "${template.name}"`, 'success');
-            return;
-        }
-        
-        if (!entry.adversaries) entry.adversaries = [];
-        entry.adversaries.push({ name: template.name, body: template.body });
-        renderAdversaryList(entry.adversaries);
-        closeTemplateSelector();
-        showToast(`Added "${template.name}"`, 'success');
-    });
-    
-    // Cancel / Close
-    templateOverlay.querySelector('#template-cancel').addEventListener('click', closeTemplateSelector);
-    templateOverlay.querySelector('#template-close').addEventListener('click', closeTemplateSelector);
-    templateOverlay.addEventListener('click', (e) => {
-        if (e.target === templateOverlay) closeTemplateSelector();
-    });
-}
-
-function getAdversariesFromDOM() {
-    const list = [];
-    const items = document.querySelectorAll('#enc-adversary-list .enc-remove-adversary');
-    items.forEach(btn => {
-        const idx = parseInt(btn.dataset.index);
-        const name = btn.parentElement.querySelector('span')?.textContent || '';
-        list.push({ name, body: '' });
-    });
-    return list;
-}
-
-function renderAdversaryList(adversaries) {
-    const listEl = document.getElementById('enc-adversary-list');
-    if (!listEl) return;
-    
-    listEl.innerHTML = adversaries.map((a, i) => `
-        <div style="display:flex;justify-content:space-between;align-items:center;padding:0.2rem 0.4rem;background:var(--bg3);border-radius:4px;margin-bottom:0.2rem;font-size:0.85rem;">
-            <span style="flex:1;cursor:pointer;" title="${escHtml(a.body || '')}">${escHtml(a.name)}</span>
-            <button class="btn btn-xs btn-ghost enc-remove-adversary" data-index="${i}" style="color:var(--red);">✕</button>
-        </div>
-    `).join('');
-    
-    if (adversaries.length === 0) {
-        listEl.innerHTML = '<div style="color:var(--text3);font-size:0.8rem;padding:0.3rem;">No adversaries added yet.</div>';
-    }
-    
-    // Attach remove events
-    listEl.querySelectorAll('.enc-remove-adversary').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            const idx = parseInt(btn.dataset.index);
-            removeAdversary(idx);
-        });
-    });
-}
-
-function removeAdversary(idx) {
-    const state = getState();
-    const entry = currentEditorId ? state.encounters.find(e => String(e.id) === String(currentEditorId)) : null;
-    if (!entry) return;
-    if (!entry.adversaries) return;
-    entry.adversaries.splice(idx, 1);
-    renderAdversaryList(entry.adversaries);
-    showToast('Adversary removed.', 'info');
-}
-
-function saveEncounter() {
-    const title = document.getElementById('enc-title')?.value.trim();
-    const body = document.getElementById('enc-body')?.value.trim();
-    const location = document.getElementById('enc-location')?.value.trim();
-    const difficulty = parseInt(document.getElementById('enc-difficulty')?.value || '3', 10);
-    const status = document.getElementById('enc-status')?.value || 'draft';
-    
-    if (!title) {
-        showToast('Title is required.', 'error');
-        return;
-    }
-    
-    const state = getState();
-    if (!state.encounters) state.encounters = [];
-    
-    // Get adversaries from DOM
-    const adversaryItems = document.querySelectorAll('#enc-adversary-list .enc-remove-adversary');
-    const adversaries = [];
-    adversaryItems.forEach(btn => {
-        const name = btn.parentElement.querySelector('span')?.textContent || '';
-        adversaries.push({ name, body: '' });
-    });
-    
-    if (currentEditorId) {
-        // Update existing
-        const entry = state.encounters.find(e => String(e.id) === String(currentEditorId));
-        if (entry) {
-            entry.title = title;
-            entry.body = body;
-            entry.location = location;
-            entry.difficulty = difficulty;
-            entry.status = status;
-            entry.adversaries = adversaries;
-        }
-    } else {
-        // Create new
-        const newEntry = {
-            id: 'enc-' + Date.now() + '-' + Math.random().toString(36).substr(2, 4),
-            title,
-            body,
-            location,
-            difficulty,
-            status,
-            adversaries,
-            created: Date.now()
-        };
-        state.encounters.push(newEntry);
-    }
-    
-    saveState();
-    
-    // Close the modal first
+    // Close any existing editor first
     closeEditor();
     
-    // Then re-render the list
-    if (window.renderEncounters) window.renderEncounters();
+    initEditor();
     
-    showToast(`✅ Encounter "${title}" saved.`, 'success');
+    // Create fresh modal
+    const modal = createModal();
+    document.body.appendChild(modal);
+    
+    const title = document.getElementById('char-modal-title');
+    const content = document.getElementById('char-editor-content');
+    
+    if (!modal || !title || !content) {
+        showToast('Editor modal not found. Please refresh.', 'error');
+        return;
+    }
+    
+    let c;
+    if (id) {
+        c = getCharacter(id);
+        if (!c) {
+            showToast('Character not found', 'error');
+            return;
+        }
+        editorState.currentId = id;
+        editorState.isNew = false;
+        title.textContent = 'Edit Character';
+    } else {
+        c = createNewCharacter();
+        editorState.currentId = c.id;
+        editorState.isNew = true;
+        title.textContent = 'New Character';
+    }
+    
+    editorState.isOpen = true;
+    editorState.modalElement = modal;
+    content.innerHTML = buildEditorHTML(c);
+    modal.style.display = 'flex';
+    document.body.classList.add('modal-open');
+    
+    // Attach event listeners after rendering
+    attachEditorEvents();
 }
 
-export default { openEditor };
+export function closeEditor() {
+    // Remove modal from DOM completely
+    const modal = document.getElementById('charModal');
+    if (modal) {
+        modal.remove(); // This removes it from the DOM entirely
+    }
+    
+    document.body.classList.remove('modal-open');
+    
+    // Clean up all event listeners
+    if (editorState.escListener) {
+        document.removeEventListener('keydown', editorState.escListener);
+        editorState.escListener = null;
+    }
+    
+    if (editorState.saveListener) {
+        const saveBtn = document.getElementById('ce-save-btn');
+        if (saveBtn) {
+            saveBtn.removeEventListener('click', editorState.saveListener);
+        }
+        editorState.saveListener = null;
+    }
+    
+    // Clean up cancel listeners
+    editorState.cancelListeners.forEach(listener => {
+        const btn = listener.btn;
+        if (btn) {
+            btn.removeEventListener('click', listener.handler);
+        }
+    });
+    editorState.cancelListeners = [];
+    
+    editorState.isOpen = false;
+    editorState.currentId = null;
+    editorState.isNew = false;
+    editorState.modalElement = null;
+}
+
+// ============================================================
+// MODAL CREATION
+// ============================================================
+
+function createModal() {
+    const modal = document.createElement('div');
+    modal.id = 'charModal';
+    modal.className = 'modal-overlay';
+    modal.style.cssText = `
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.8);
+        z-index: 9999;
+        align-items: center;
+        justify-content: center;
+        padding: 1rem;
+    `;
+    
+    modal.innerHTML = `
+        <div class="modal-content" style="
+            background: var(--bg2);
+            border-radius: var(--radius);
+            max-width: 900px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            padding: 1.5rem 2rem;
+            border: 1px solid var(--border);
+            position: relative;
+        ">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;">
+                <h2 id="char-modal-title" style="margin:0;color:var(--gold);">Character Editor</h2>
+                <button id="charModalClose" style="background:none;border:none;color:var(--text2);font-size:1.5rem;cursor:pointer;padding:0.2rem 0.5rem;">✕</button>
+            </div>
+            <div id="char-editor-content"></div>
+        </div>
+    `;
+    
+    return modal;
+}
+
+// ============================================================
+// HELPERS
+// ============================================================
+
+function createNewCharacter() {
+    return {
+        id: generateId(),
+        name: '',
+        heritage: '',
+        background: '',
+        patron: '',
+        tier: 'I',
+        xp: 32,
+        body: 3,
+        wits: 2,
+        spirit: 1,
+        presence: 1,
+        skills: defaultSkills(),
+        talents: [],
+        assets: [],
+        equipment: [],
+        bonds: [],
+        complications: [],
+        harm: 0,
+        fatigue: 0,
+        boons: 0,
+        vtt: false
+    };
+}
+
+// ============================================================
+// EVENT ATTACHMENT
+// ============================================================
+
+function attachEditorEvents() {
+    // Save button - store listener for cleanup
+    const saveBtn = document.getElementById('ce-save-btn');
+    if (saveBtn) {
+        // Remove any existing listeners
+        if (editorState.saveListener) {
+            saveBtn.removeEventListener('click', editorState.saveListener);
+        }
+        editorState.saveListener = saveEditor;
+        saveBtn.addEventListener('click', editorState.saveListener);
+    }
+    
+    // Cancel/Close buttons - store listeners for cleanup
+    const closeBtns = ['ce-cancel-btn', 'charModalClose'];
+    for (const id of closeBtns) {
+        const btn = document.getElementById(id);
+        if (btn) {
+            const handler = closeEditor;
+            btn.addEventListener('click', handler);
+            editorState.cancelListeners.push({ btn, handler });
+        }
+    }
+    
+    // Close on overlay click
+    const modal = document.getElementById('charModal');
+    if (modal) {
+        const handler = (e) => {
+            if (e.target === modal) {
+                closeEditor();
+            }
+        };
+        modal.addEventListener('click', handler);
+        editorState.overlayListener = handler;
+    }
+    
+    // Keyboard shortcut
+    if (editorState.escListener) {
+        document.removeEventListener('keydown', editorState.escListener);
+    }
+    editorState.escListener = (e) => {
+        if (!editorState.isOpen) return;
+        if (e.key === 'Escape') {
+            closeEditor();
+        }
+    };
+    document.addEventListener('keydown', editorState.escListener);
+}
+
+// ============================================================
+// BUILD EDITOR HTML
+// ============================================================
+
+function buildEditorHTML(c) {
+    const skillInputs = ALL_SKILLS.map(s => {
+        const key = s.toLowerCase();
+        const val = c.skills?.[key] ?? 0;
+        return `
+            <div class="skill-item">
+                <label>${s}</label>
+                <input type="number" id="ce-sk-${key}" value="${val}" min="0" max="5" />
+            </div>
+        `;
+    }).join('');
+    
+    const talentRows = (c.talents || []).map((t, i) => dynamicRowHTML('talent', i, t)).join('');
+    const assetRows = (c.assets || []).map((a, i) => dynamicRowHTML('asset', i, a)).join('');
+    const equipRows = (c.equipment || []).map((e, i) => dynamicRowHTML('equipment', i, e)).join('');
+    const bondRows = (c.bonds || []).map((b, i) => dynamicRowHTML('bond', i, b)).join('');
+    const compRows = (c.complications || []).map((x, i) => dynamicRowHTML('complication', i, x)).join('');
+    
+    return `
+        <div class="editor-form">
+            <div class="form-row">
+                <div class="field"><label>Name *</label><input id="ce-name" value="${escHtml(c.name)}" /></div>
+                <div class="field"><label>Heritage</label><input id="ce-heritage" value="${escHtml(c.heritage || '')}" /></div>
+            </div>
+            <div class="form-row">
+                <div class="field"><label>Background</label><input id="ce-background" value="${escHtml(c.background || '')}" /></div>
+                <div class="field"><label>Patron</label><input id="ce-patron" value="${escHtml(c.patron || '')}" /></div>
+            </div>
+            <div class="form-row">
+                <div class="field"><label>Tier</label><input id="ce-tier" value="${escHtml(c.tier || 'I')}" /></div>
+                <div class="field"><label>Starting XP</label><input type="number" id="ce-xp" value="${c.xp || 32}" min="0" max="36" /></div>
+                <div class="field" style="display:flex;align-items:end;">
+                    <label class="inline-check"><input type="checkbox" id="ce-vtt" ${c.vtt ? 'checked' : ''} /> Push to VTT</label>
+                </div>
+            </div>
+            
+            <h3 style="margin:0.8rem 0 0.4rem;">Attributes</h3>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.4rem;">
+                <div class="stat-item"><label>Body</label><input type="number" id="ce-body" value="${c.body}" min="1" max="5" /></div>
+                <div class="stat-item"><label>Wits</label><input type="number" id="ce-wits" value="${c.wits}" min="1" max="5" /></div>
+                <div class="stat-item"><label>Spirit</label><input type="number" id="ce-spirit" value="${c.spirit}" min="1" max="5" /></div>
+                <div class="stat-item"><label>Presence</label><input type="number" id="ce-presence" value="${c.presence}" min="1" max="5" /></div>
+            </div>
+            
+            <h3 style="margin:0.8rem 0 0.4rem;">Status</h3>
+            <div class="form-row">
+                <div class="field small"><label>Harm</label><input type="number" id="ce-harm" value="${c.harm || 0}" min="0" max="3" /></div>
+                <div class="field small"><label>Fatigue</label><input type="number" id="ce-fatigue" value="${c.fatigue || 0}" min="0" /></div>
+                <div class="field small"><label>Boons</label><input type="number" id="ce-boons" value="${c.boons || 0}" min="0" max="5" /></div>
+            </div>
+            
+            <h3 style="margin:0.8rem 0 0.4rem;">Talents</h3>
+            ${wikiPickerHTML('talent', 'talents')}
+            <div class="dynamic-list" id="ce-talent-list">${talentRows}</div>
+            
+            <h3 style="margin:0.8rem 0 0.4rem;">Assets</h3>
+            ${wikiPickerHTML('asset', 'assets')}
+            <div class="dynamic-list" id="ce-asset-list">${assetRows}</div>
+            
+            <h3 style="margin:0.8rem 0 0.4rem;">Equipment</h3>
+            ${wikiPickerHTML('equipment', 'equipment')}
+            <div class="dynamic-list" id="ce-equipment-list">${equipRows}</div>
+            
+            <h3 style="margin:0.8rem 0 0.4rem;">Bonds</h3>
+            <button class="btn btn-sm" data-editor-add="bond">+ Add Bond</button>
+            <div class="dynamic-list" id="ce-bond-list">${bondRows}</div>
+            
+            <h3 style="margin:0.8rem 0 0.4rem;">Complications</h3>
+            <button class="btn btn-sm" data-editor-add="complication">+ Add Complication</button>
+            <div class="dynamic-list" id="ce-complication-list">${compRows}</div>
+            
+            <h3 style="margin:0.8rem 0 0.4rem;">Skills</h3>
+            <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:0.3rem;font-size:0.85rem;">${skillInputs}</div>
+            
+            <div class="flex mt-1" style="gap:0.5rem;">
+                <button class="btn btn-gold" id="ce-save-btn">💾 Save</button>
+                <button class="btn" id="ce-cancel-btn">Cancel</button>
+            </div>
+        </div>
+    `;
+}
+
+// ============================================================
+// ROW HTML BUILDERS
+// ============================================================
+
+function dynamicRowHTML(type, idx, item = {}) {
+    if (type === 'bond' || type === 'complication') {
+        return `
+            <div class="dynamic-row ce-${type}-row" data-index="${idx}">
+                <input type="text" class="ce-${type}-name" placeholder="${type === 'bond' ? 'Bond name' : 'Complication name'}" value="${escHtml(item.name || '')}" />
+                <input type="text" class="ce-${type}-desc" placeholder="Description" value="${escHtml(item.desc || '')}" style="flex:2;" />
+                <label class="inline-check">
+                    <input type="checkbox" class="ce-${type}-start" ${item.start !== false ? 'checked' : ''} /> 
+                    +2 XP
+                </label>
+                <button class="btn btn-xs editor-remove-btn">✕</button>
+            </div>
+        `;
+    }
+    
+    return `
+        <div class="dynamic-row ce-${type}-row" data-index="${idx}">
+            <input type="text" class="ce-${type}-name" placeholder="Name" value="${escHtml(item.name || '')}" style="flex:2;" />
+            <input type="number" class="ce-${type}-cost" placeholder="XP" value="${item.cost || 0}" min="0" style="width:70px;" />
+            <button class="btn btn-xs editor-remove-btn">✕</button>
+        </div>
+    `;
+}
+
+// ============================================================
+// WIKI PICKER
+// ============================================================
+
+function wikiPickerHTML(type, cat) {
+    const state = getState();
+    const wikiEntries = state.wikiEntries || [];
+    const options = wikiEntries
+        .filter(e => e.category === cat)
+        .map(e => `
+            <option value="${escHtml(String(e.id))}">
+                ${escHtml(e.title)}${e.cost != null ? ' (' + e.cost + ' XP)' : ''}
+            </option>
+        `)
+        .join('');
+    
+    return `
+        <div class="form-row" style="margin:0.3rem 0;">
+            <div class="field" style="flex:2;">
+                <select id="ce-${type}-wiki">
+                    <option value="">Select from wiki…</option>
+                    ${options}
+                </select>
+            </div>
+            <button class="btn btn-sm" data-editor-wiki-add="${type}">Add from Wiki</button>
+            <button class="btn btn-sm" data-editor-add="${type}">+ Custom</button>
+        </div>
+    `;
+}
+
+// ============================================================
+// SAVE EDITOR
+// ============================================================
+
+export function saveEditor() {
+    const g = s => document.querySelector(s);
+    const v = s => g(s)?.value || '';
+    const n = s => safeParseInt(g(s)?.value);
+    
+    // Validate name
+    const name = v('#ce-name');
+    if (!name || !name.trim()) {
+        showToast('Character name is required.', 'error');
+        const nameInput = document.querySelector('#ce-name');
+        if (nameInput) {
+            nameInput.style.borderColor = 'var(--red)';
+            nameInput.focus();
+            setTimeout(() => nameInput.style.borderColor = '', 3000);
+        }
+        return;
+    }
+    
+    let c;
+    if (editorState.isNew) {
+        c = createNewCharacter();
+        c.id = editorState.currentId;
+    } else {
+        c = getCharacter(editorState.currentId);
+        if (!c) {
+            showToast('Character not found', 'error');
+            return;
+        }
+    }
+    
+    try {
+        // Basic fields
+        c.name = name.trim();
+        c.heritage = v('#ce-heritage');
+        c.background = v('#ce-background');
+        c.patron = v('#ce-patron');
+        c.tier = v('#ce-tier') || 'I';
+        c.xp = clamp(n('#ce-xp'), 0, 36);
+        
+        // Attributes
+        c.body = clamp(n('#ce-body'), 1, 5);
+        c.wits = clamp(n('#ce-wits'), 1, 5);
+        c.spirit = clamp(n('#ce-spirit'), 1, 5);
+        c.presence = clamp(n('#ce-presence'), 1, 5);
+        
+        // Status
+        c.harm = clamp(n('#ce-harm'), 0, 3);
+        c.fatigue = Math.max(0, n('#ce-fatigue'));
+        c.boons = clamp(n('#ce-boons'), 0, 5);
+        c.vtt = document.getElementById('ce-vtt')?.checked || false;
+        
+        // Skills
+        if (!c.skills) c.skills = defaultSkills();
+        ALL_SKILLS.forEach(s => {
+            c.skills[s.toLowerCase()] = clamp(n('#ce-sk-' + s.toLowerCase()), 0, 5);
+        });
+        
+        // Dynamic lists
+        c.talents = readDynamicList('talent');
+        c.assets = readDynamicList('asset');
+        c.equipment = readDynamicList('equipment');
+        c.bonds = readDynamicList('bond');
+        c.complications = readDynamicList('complication');
+        
+        // Save
+        if (editorState.isNew) {
+            addCharacter(c);
+        } else {
+            updateCharacter(editorState.currentId, c);
+        }
+        
+        // Close the modal FIRST (this removes it from DOM)
+        closeEditor();
+        
+        // Then refresh the characters list
+        import('./index.js').then(module => {
+            if (module.renderCharList) {
+                module.renderCharList();
+            }
+        });
+        
+        showToast(`Character "${c.name}" saved successfully.`, 'success');
+        
+    } catch (error) {
+        console.error('[Editor] Error saving character:', error);
+        showToast('Error saving character. Please try again.', 'error');
+    }
+}
+
+// ============================================================
+// READ DYNAMIC LISTS
+// ============================================================
+
+function readDynamicList(type) {
+    const items = [];
+    const rows = document.querySelectorAll('.ce-' + type + '-row');
+    
+    for (const row of rows) {
+        if (type === 'bond' || type === 'complication') {
+            const nameInput = row.querySelector('.ce-' + type + '-name');
+            const descInput = row.querySelector('.ce-' + type + '-desc');
+            const startCheck = row.querySelector('.ce-' + type + '-start');
+            
+            const name = nameInput ? nameInput.value.trim() : '';
+            if (!name) continue;
+            
+            items.push({
+                name,
+                desc: descInput ? descInput.value.trim() : '',
+                start: startCheck ? startCheck.checked : false
+            });
+        } else {
+            const nameInput = row.querySelector('.ce-' + type + '-name');
+            const costInput = row.querySelector('.ce-' + type + '-cost');
+            
+            const name = nameInput ? nameInput.value.trim() : '';
+            if (!name) continue;
+            
+            items.push({
+                name,
+                cost: costInput ? safeParseInt(costInput.value, 0) : 0
+            });
+        }
+    }
+    
+    return items;
+}
+
+// ============================================================
+// DYNAMIC ROW ADDERS
+// ============================================================
+
+export function addCEDynamic(type) {
+    const container = document.getElementById('ce-' + type + '-list');
+    if (!container) {
+        console.warn(`[Editor] Container not found: ce-${type}-list`);
+        return;
+    }
+    
+    const idx = container.children.length;
+    const div = document.createElement('div');
+    div.innerHTML = dynamicRowHTML(type, idx, {});
+    const row = div.firstElementChild;
+    container.appendChild(row);
+    
+    // Focus the first input
+    const firstInput = row.querySelector('input[type="text"]');
+    if (firstInput) {
+        setTimeout(() => firstInput.focus(), 50);
+    }
+}
+
+export function addCEDynamicFromWiki(type, entryId) {
+    const state = getState();
+    const wikiEntries = state.wikiEntries || [];
+    const entry = wikiEntries.find(e => String(e.id) === String(entryId));
+    
+    if (!entry) {
+        showToast('Wiki entry not found.', 'error');
+        return;
+    }
+    
+    const container = document.getElementById('ce-' + type + '-list');
+    if (!container) return;
+    
+    const idx = container.children.length;
+    const cost = entry.cost != null ? entry.cost : 0;
+    const div = document.createElement('div');
+    div.innerHTML = dynamicRowHTML(type, idx, { name: entry.title, cost });
+    container.appendChild(div.firstElementChild);
+    
+    showToast(`Added "${entry.title}" from wiki.`, 'success');
+}
+
+// ============================================================
+// SETUP EVENTS
+// ============================================================
+
+function setupEditorEvents() {
+    // Keyboard shortcuts
+    document.addEventListener('keydown', (e) => {
+        if (!editorState.isOpen) return;
+        if (e.key === 'Escape') {
+            closeEditor();
+        } else if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+            // Ctrl+Enter or Cmd+Enter to save
+            e.preventDefault();
+            const saveBtn = document.getElementById('ce-save-btn');
+            if (saveBtn) saveBtn.click();
+        }
+    });
+}
+
+// ============================================================
+// INITIALIZE
+// ============================================================
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => {
+        initEditor();
+        setupEditorEvents();
+    });
+} else {
+    initEditor();
+    setupEditorEvents();
+}
+
+// ============================================================
+// EXPOSE GLOBALS
+// ============================================================
+
+Object.assign(window, {
+    addCEDynamic,
+    addCEDynamicFromWiki,
+    saveEditor,
+    closeEditor,
+    openEditor
+});
+
+// ============================================================
+// EXPORTS
+// ============================================================
+
+export default {
+    openEditor,
+    closeEditor,
+    saveEditor,
+    addCEDynamic,
+    addCEDynamicFromWiki
+};
