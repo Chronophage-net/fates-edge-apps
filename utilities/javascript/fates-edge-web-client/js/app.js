@@ -12,6 +12,8 @@ import { getUserAvatar } from './core/gravatar.js';
 import { moduleLoader } from './module-loader.js';
 
 // Import feature modules (dynamic imports for lazy loading)
+// In app.js, update the FEATURES object:
+
 const FEATURES = {
     home: () => import('./features/home/index.js'),
     dashboard: () => import('./features/dashboard/index.js'),
@@ -22,6 +24,7 @@ const FEATURES = {
     encounters: () => import('./features/encounters/index.js'),
     factions: () => import('./features/factions/index.js'),
     vtt: () => import('./features/vtt/index.js'),
+    'scene-tools': () => import('./features/dashboard/scene-tools.js'),  // ✅ ADD THIS
     docs: () => import('./features/docs/index.js'),
     search: () => import('./features/search/index.js'),
     wiki: () => import('./features/wiki/index.js'),
