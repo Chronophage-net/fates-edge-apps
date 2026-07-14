@@ -120,65 +120,23 @@ jobs:
         if: ${{ env.SKIP_JOB != 'true' }}
         working-directory: ${{ matrix.path }}
         run: npm ci
-      # Add this step after "Install dependencies" and before "Prepare Pages site"
 
+      # ============================================================
+      # GENERATE DETERMINISTIC SEED
+      # ============================================================
       - name: Generate deterministic seed
         if: ${{ env.SKIP_JOB != 'true' && matrix.name == 'web-client' }}
         working-directory: ${{ matrix.path }}
         run: |
           echo "🎲 Generating deterministic seed for static site..."
           node js/tools/generate-seed.js --force --output=.seed/random-seed.json
-          echo "✅ Seed generated: $(cat .seed/random-seed.json | jq -r '.seed' | cut -c1-8)..."
+          echo "✅ Seed generated"
           
           # Also copy seed to data directory for fallback
           mkdir -p data
           cp .seed/random-seed.json data/seed.json 2>/dev/null || true
           cp .seed/seed.js js/seed.js 2>/dev/null || true
 
-      - name: Build project
-        if: ${{ env.SKIP_JOB != 'true' && matrix.build }}
-        working-directory: ${{ matrix.path }}
-        run: npm run build
-
-      # Add seed files to the Pages site
-      - name: Prepare Pages site
-        if: ${{ env.SKIP_JOB != 'true' && matrix.name == 'web-client' }}
-        run: |
-          mkdir -p pages-site
-          rsync -a \
-            --exclude 'node_modules' \
-            --exclude 'Dockerfile*' \
-            --exclude 'docker-compose.yml' \
-            --exclude 'Makefile' \
-            --exclude 'package.json' \
-            --exclude 'package-lock.json' \
-            --exclude 'DESIGN.md' \
-            --exclude 'build.sh' \
-            --exclude 'vite.config.js' \
-            --exclude '.gitignore' \
-            --exclude '.DS_Store' \
-            --exclude 'js/tests' \
-            "${{ matrix.path }}/" pages-site/
-          
-          # Ensure seed files are included
-          echo "📦 Including seed files..."
-          mkdir -p pages-site/.seed
-          if [ -f "${{ matrix.path }}/.seed/random-seed.json" ]; then
-            cp "${{ matrix.path }}/.seed/random-seed.json" pages-site/.seed/
-            echo "✅ Copied seed to pages-site/.seed/"
-          fi
-          if [ -f "${{ matrix.path }}/.seed/seed.js" ]; then
-            cp "${{ matrix.path }}/.seed/seed.js" pages-site/
-            echo "✅ Copied seed.js to pages-site/"
-          fi
-          
-          # Also copy to data/ for fallback
-          mkdir -p pages-site/data
-          if [ -f "${{ matrix.path }}/.seed/random-seed.json" ]; then
-            cp "${{ matrix.path }}/.seed/random-seed.json" pages-site/data/seed.json
-            echo "✅ Copied seed to pages-site/data/seed.json"
-          fi
-          
       - name: Build project
         if: ${{ env.SKIP_JOB != 'true' && matrix.build }}
         working-directory: ${{ matrix.path }}
@@ -217,6 +175,9 @@ jobs:
           path: artifacts/${{ matrix.name }}.tar.gz
           if-no-files-found: error
 
+      # ============================================================
+      # PREPARE PAGES SITE WITH SEED FILES
+      # ============================================================
       - name: Prepare Pages site
         if: ${{ env.SKIP_JOB != 'true' && matrix.name == 'web-client' }}
         run: |
@@ -235,7 +196,29 @@ jobs:
             --exclude '.DS_Store' \
             --exclude 'js/tests' \
             "${{ matrix.path }}/" pages-site/
+          
+          # Ensure seed files are included
+          echo "📦 Including seed files..."
+          mkdir -p pages-site/.seed
+          if [ -f "${{ matrix.path }}/.seed/random-seed.json" ]; then
+            cp "${{ matrix.path }}/.seed/random-seed.json" pages-site/.seed/
+            echo "✅ Copied seed to pages-site/.seed/"
+          fi
+          if [ -f "${{ matrix.path }}/.seed/seed.js" ]; then
+            cp "${{ matrix.path }}/.seed/seed.js" pages-site/
+            echo "✅ Copied seed.js to pages-site/"
+          fi
+          
+          # Also copy to data/ for fallback
+          mkdir -p pages-site/data
+          if [ -f "${{ matrix.path }}/.seed/random-seed.json" ]; then
+            cp "${{ matrix.path }}/.seed/random-seed.json" pages-site/data/seed.json
+            echo "✅ Copied seed to pages-site/data/seed.json"
+          fi
 
+      # ============================================================
+      # COPY DATA FILES TO PAGES SITE
+      # ============================================================
       - name: Copy data files to Pages site
         if: ${{ env.SKIP_JOB != 'true' && matrix.name == 'web-client' }}
         run: |
@@ -261,7 +244,7 @@ jobs:
             echo "✅ Copied web-client/wiki.json → pages-site/wiki.json"
           else
             echo "⚠️ No wiki.json found"
-            echo '{"title": "Fate\'s Edge Wiki", "pages": []}' > pages-site/wiki.json
+            echo '{"title": "Fate'\''s Edge Wiki", "pages": []}' > pages-site/wiki.json
           fi
           
           # ============================================================
