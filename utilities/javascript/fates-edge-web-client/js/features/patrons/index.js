@@ -6,6 +6,24 @@
  * Data paths:
  * - Patron data: /data/patrons/{id}.json
  * - Patron manifest: /data/patrons/manifest.json
+ * 
+ * Patron data structure supports nested rites with descriptions:
+ * {
+ *   "name": "Patron Name",
+ *   "domain": "Domain",
+ *   "description": "HTML description",
+ *   "rites": [
+ *     {
+ *       "name": "Rite Name",
+ *       "description": "HTML description of the rite",
+ *       "tags": ["TAG1", "TAG2"],
+ *       "cost": "Mark +1 Obligation",
+ *       "duration": "Scene",
+ *       "action": "1 action",
+ *       "effect": "Effect description"
+ *     }
+ *   ]
+ * }
  */
 
 import { getState, saveState } from '../../core/state.js';
@@ -316,7 +334,8 @@ let state = {
     selectedAsset: null,
     viewMode: 'cosmic',
     isLoading: false,
-    dataLoaded: false
+    dataLoaded: false,
+    expandedRites: new Set() // Track which rites are expanded
 };
 
 // ============================================================
@@ -324,21 +343,17 @@ let state = {
 // ============================================================
 
 export function loadPatronData() {
-    // First try to load from state
     const saved = getState();
     if (saved.patrons) {
         state.cosmicPatrons = saved.patrons.cosmic || [];
         state.terrestrialPatrons = saved.patrons.terrestrial || [];
         state.trusts = saved.patrons.trusts || [];
-        // If we have data in state, use it
         if (state.cosmicPatrons.length > 0 || state.terrestrialPatrons.length > 0) {
             console.log(`📦 Loaded ${state.cosmicPatrons.length} cosmic patrons, ${state.terrestrialPatrons.length} terrestrial patrons from state`);
             state.dataLoaded = true;
             return;
         }
     }
-    
-    // Otherwise load from remote
     loadRemotePatrons();
 }
 
@@ -349,7 +364,6 @@ async function loadRemotePatrons() {
     try {
         console.log('📥 Loading patron data from remote...');
         
-        // Load manifest first
         const manifestRes = await fetch(PATRON_MANIFEST_PATH);
         if (!manifestRes.ok) {
             console.warn('Patron manifest not found, using defaults');
@@ -365,7 +379,6 @@ async function loadRemotePatrons() {
             return;
         }
         
-        // Load each patron
         const patrons = [];
         let loadedCount = 0;
         
@@ -374,7 +387,6 @@ async function loadRemotePatrons() {
                 const res = await fetch(`${PATRON_DATA_PATH}${patronId}.json`);
                 if (res.ok) {
                     const data = await res.json();
-                    // Ensure the data has an id
                     if (!data.id) data.id = patronId;
                     patrons.push(data);
                     loadedCount++;
@@ -392,7 +404,6 @@ async function loadRemotePatrons() {
             state.dataLoaded = true;
             console.log(`✅ Loaded ${patrons.length} patrons from remote`);
             
-            // Save to state
             const saved = getState();
             if (!saved.patrons) saved.patrons = {};
             saved.patrons.cosmic = patrons;
@@ -436,14 +447,12 @@ export function render(el) {
 
     container.innerHTML = `
         <div class="patrons-modern-layout">
-            <!-- Header -->
             <header class="patrons-header">
                 <h1 class="patrons-title">👁️ Patrons & Resources</h1>
                 <p class="patrons-subtitle">Cosmic patrons, terrestrial powers, and the assets they grant.</p>
                 ${!state.dataLoaded ? '<p class="text-muted" style="font-size:0.85rem;">⏳ Loading patron data...</p>' : `<p class="text-muted" style="font-size:0.85rem;">📚 ${state.cosmicPatrons.length} cosmic patrons loaded</p>`}
             </header>
 
-            <!-- Navigation Tabs -->
             <div class="patrons-tabs">
                 <button class="patrons-tab active" data-view="cosmic">🌟 Cosmic Patrons</button>
                 <button class="patrons-tab" data-view="terrestrial">🏛️ Terrestrial Patrons</button>
@@ -451,12 +460,10 @@ export function render(el) {
                 <button class="patrons-tab" data-view="assets">📦 Assets</button>
             </div>
 
-            <!-- View Container -->
             <div id="patrons-view-container" class="patrons-view-container">
                 ${renderView('cosmic')}
             </div>
 
-            <!-- Modals -->
             <div id="patron-modal" class="patron-modal" style="display:none;"></div>
             <div id="asset-modal" class="patron-modal" style="display:none;"></div>
         </div>
@@ -602,7 +609,6 @@ function renderTrusts() {
 // ============================================================
 
 function renderAllAssets() {
-    // Collect all assets from trusts
     const allAssets = [];
     state.trusts.forEach(t => {
         if (t.assets) {
@@ -642,7 +648,7 @@ function renderAllAssets() {
 }
 
 // ============================================================
-// DETAIL VIEWS
+// PATRON DETAIL WITH EXPANDABLE RITES
 // ============================================================
 
 function renderPatronDetail(patronId) {
@@ -652,8 +658,72 @@ function renderPatronDetail(patronId) {
         return;
     }
 
+    // Check if rites are objects (with descriptions) or just strings
+    const hasDetailedRites = patron.rites && patron.rites.length > 0 && typeof patron.rites[0] === 'object';
+    const ritesCount = patron.rites ? patron.rites.length : 0;
+
     const modal = document.getElementById('patron-modal');
     modal.style.display = 'block';
+    
+    let ritesHtml = '';
+    if (patron.rites && patron.rites.length > 0) {
+        if (hasDetailedRites) {
+            // Rites are objects with descriptions - render expandable
+            ritesHtml = `
+                <div class="patron-detail-section">
+                    <h3>🔮 Rites (${patron.rites.length})</h3>
+                    <div class="rites-list">
+                        ${patron.rites.map((r, idx) => {
+                            const hasDesc = r.description && r.description.length > 0;
+                            const isExpanded = state.expandedRites.has(`${patron.id}-${idx}`);
+                            const riteId = `${patron.id}-${idx}`;
+                            
+                            let detailsHtml = '';
+                            if (hasDesc) {
+                                detailsHtml = `
+                                    <div class="rite-details ${isExpanded ? 'expanded' : 'collapsed'}" 
+                                         id="rite-details-${riteId}"
+                                         style="${isExpanded ? '' : 'display:none;'}">
+                                        ${r.description}
+                                        ${r.cost ? `<div class="rite-meta"><strong>Cost:</strong> ${escHtml(r.cost)}</div>` : ''}
+                                        ${r.duration ? `<div class="rite-meta"><strong>Duration:</strong> ${escHtml(r.duration)}</div>` : ''}
+                                        ${r.action ? `<div class="rite-meta"><strong>Action:</strong> ${escHtml(r.action)}</div>` : ''}
+                                        ${r.effect ? `<div class="rite-meta"><strong>Effect:</strong> ${escHtml(r.effect)}</div>` : ''}
+                                        ${r.tags && r.tags.length > 0 ? `<div class="rite-tags">${r.tags.map(t => `<span class="badge badge-tag">${escHtml(t)}</span>`).join('')}</div>` : ''}
+                                    </div>
+                                `;
+                            }
+                            
+                            const expandIcon = hasDesc ? (isExpanded ? '▾' : '▸') : '';
+                            const expandClass = hasDesc ? 'rite-expandable' : '';
+                            
+                            return `
+                                <div class="rite-item ${expandClass}" data-rite-id="${riteId}">
+                                    <div class="rite-header" onclick="${hasDesc ? `window.toggleRite('${riteId}')` : ''}">
+                                        <span class="rite-name">${escHtml(r.name)}</span>
+                                        ${r.tier ? `<span class="rite-tier">${escHtml(r.tier)}</span>` : ''}
+                                        ${hasDesc ? `<span class="rite-expand-icon">${expandIcon}</span>` : ''}
+                                    </div>
+                                    ${detailsHtml}
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>
+                </div>
+            `;
+        } else {
+            // Rites are just strings - simple list
+            ritesHtml = `
+                <div class="patron-detail-section">
+                    <h3>🔮 Rites (${patron.rites.length})</h3>
+                    <ul>
+                        ${patron.rites.map(r => `<li>${escHtml(r)}</li>`).join('')}
+                    </ul>
+                </div>
+            `;
+        }
+    }
+
     modal.innerHTML = `
         <div class="modal-content patron-detail">
             <button class="modal-close" onclick="window.closePatronModal()">✕</button>
@@ -663,6 +733,7 @@ function renderPatronDetail(patronId) {
                     <h2>${escHtml(patron.name)}</h2>
                     <div class="patron-detail-domain">${escHtml(patron.domain || 'Unknown Domain')}</div>
                     ${patron.source === 'default' ? '<span class="badge badge-remote" style="font-size:0.7rem;">📦 Default Data</span>' : ''}
+                    ${hasDetailedRites ? `<span class="badge badge-rites" style="font-size:0.7rem;background:var(--gold);color:var(--bg);">${ritesCount} Rites</span>` : ''}
                 </div>
             </div>
             
@@ -679,19 +750,7 @@ function renderPatronDetail(patronId) {
                 </div>
                 ` : ''}
                 
-                ${patron.rites && patron.rites.length > 0 ? `
-                <div class="patron-detail-section">
-                    <h3>🔮 Rites (${patron.rites.length})</h3>
-                    <ul>
-                        ${patron.rites.map(r => {
-                            if (typeof r === 'string') {
-                                return `<li>${escHtml(r)}</li>`;
-                            }
-                            return `<li><strong>${escHtml(r.name)}</strong> (${escHtml(r.tier || 'Low')}) — ${escHtml(r.effect || '')}</li>`;
-                        }).join('')}
-                    </ul>
-                </div>
-                ` : ''}
+                ${ritesHtml}
                 
                 ${patron.rivals && patron.rivals.length > 0 ? `
                 <div class="patron-detail-section">
@@ -730,7 +789,7 @@ function renderPatronDetail(patronId) {
                 
                 ${patron.gift ? `
                 <div class="patron-detail-section">
-                    <h3>🎁 Patron\'s Gift</h3>
+                    <h3>🎁 Patron's Gift</h3>
                     <p><strong>${escHtml(patron.gift.name || 'Gift')}</strong></p>
                     <p>${escHtml(patron.gift.description || '')}</p>
                     ${patron.gift.cost ? `<p class="text-muted" style="font-size:0.85rem;">Cost: ${escHtml(patron.gift.cost)}</p>` : ''}
@@ -751,250 +810,33 @@ function renderPatronDetail(patronId) {
     });
 }
 
-function renderTerrestrialDetail(patronId) {
-    const patron = state.terrestrialPatrons.find(p => p.id === patronId);
-    if (!patron) {
-        showToast('Terrestrial patron not found', 'error');
-        return;
-    }
+// ============================================================
+// RITE TOGGLE
+// ============================================================
 
-    const modal = document.getElementById('patron-modal');
-    modal.style.display = 'block';
-    modal.innerHTML = `
-        <div class="modal-content patron-detail terrestrial-detail">
-            <button class="modal-close" onclick="window.closePatronModal()">✕</button>
-            <div class="patron-detail-header">
-                <div class="patron-detail-icon">🏛️</div>
-                <div>
-                    <h2>${escHtml(patron.name)}</h2>
-                    <div class="patron-detail-domain">${escHtml(patron.type || 'Terrestrial Patron')} · Tier ${patron.tier || 'I'}</div>
-                </div>
-            </div>
-            
-            <div class="patron-detail-body">
-                <div class="patron-detail-section">
-                    <h3>📖 Description</h3>
-                    <p>${escHtml(patron.description || 'No description.')}</p>
-                </div>
-                
-                <div class="patron-detail-section">
-                    <h3>📍 Location</h3>
-                    <p>${escHtml(patron.location || 'Unknown')}</p>
-                </div>
-                
-                <div class="patron-detail-section">
-                    <h3>💪 Leverage</h3>
-                    <p>${escHtml(patron.leverage || 'None listed')}</p>
-                </div>
-                
-                <div class="patron-detail-section">
-                    <h3>⚡ Debt Trigger</h3>
-                    <p>${escHtml(patron.debtTrigger || 'When Obligation fills, they call in a debt.')}</p>
-                </div>
-                
-                <div class="patron-detail-section">
-                    <h3>📦 Asset Capacity</h3>
-                    <p>${patron.assetSlots || 0} slots · Max Tier: ${patron.maxAssetTier || 'Minor'}</p>
-                </div>
-                
-                ${patron.quirk ? `
-                <div class="patron-detail-section">
-                    <h3>🎭 Quirk</h3>
-                    <p><em>${escHtml(patron.quirk)}</em></p>
-                </div>
-                ` : ''}
-            </div>
-            
-            <div class="patron-detail-actions">
-                <button class="btn btn-primary" onclick="window.editTerrestrial('${patron.id}')">✏️ Edit</button>
-                <button class="btn btn-danger" onclick="window.deleteTerrestrial('${patron.id}')">🗑️ Delete</button>
-                <button class="btn btn-secondary" onclick="window.closePatronModal()">Close</button>
-            </div>
-        </div>
-    `;
-
-    modal.addEventListener('click', (e) => {
-        if (e.target === modal) closePatronModal();
-    });
-}
-
-function renderTrustDetail(trustId) {
-    const trust = state.trusts.find(t => t.id === trustId);
-    if (!trust) {
-        showToast('Trust not found', 'error');
-        return;
-    }
-
-    const modal = document.getElementById('patron-modal');
-    modal.style.display = 'block';
-    modal.innerHTML = `
-        <div class="modal-content trust-detail">
-            <button class="modal-close" onclick="window.closePatronModal()">✕</button>
-            <div class="patron-detail-header">
-                <div class="patron-detail-icon">${trust.icon || '🤝'}</div>
-                <div>
-                    <h2>${escHtml(trust.name)}</h2>
-                    <div class="patron-detail-domain">Tier ${trust.tier || 'I'} Trust</div>
-                </div>
-            </div>
-            
-            <div class="patron-detail-body">
-                <div class="patron-detail-section">
-                    <h3>📖 Description</h3>
-                    <p>${escHtml(trust.description || 'A player trust formed by the party.')}</p>
-                </div>
-                
-                <div class="patron-detail-section">
-                    <h3>📊 Stats</h3>
-                    <div class="trust-stats-grid">
-                        <div class="trust-stat">
-                            <span class="stat-label">Asset Slots</span>
-                            <span class="stat-value">${trust.maxAssets || 2}</span>
-                        </div>
-                        <div class="trust-stat">
-                            <span class="stat-label">Max Asset Tier</span>
-                            <span class="stat-value">${trust.maxAssetTier || 'Standard'}</span>
-                        </div>
-                        <div class="trust-stat">
-                            <span class="stat-label">Obligation</span>
-                            <span class="stat-value">${trust.obligation || 0}/${trust.capacity || 4}</span>
-                        </div>
-                    </div>
-                </div>
-                
-                ${trust.assets && trust.assets.length > 0 ? `
-                <div class="patron-detail-section">
-                    <h3>📦 Assets (${trust.assets.length})</h3>
-                    <div class="asset-list">
-                        ${trust.assets.map(a => `
-                            <div class="asset-list-item" onclick="window.viewAsset('${a.id}')">
-                                <span class="asset-tier-badge">${a.tier || 'Minor'}</span>
-                                <span class="asset-name">${escHtml(a.name)}</span>
-                                <span class="asset-type">${escHtml(a.type || 'asset')}</span>
-                            </div>
-                        `).join('')}
-                    </div>
-                    <button class="btn btn-sm btn-primary" onclick="window.addAssetToTrust('${trust.id}')">➕ Add Asset</button>
-                </div>
-                ` : `
-                <div class="patron-detail-section">
-                    <p class="text-muted">No assets in this trust yet.</p>
-                    <button class="btn btn-sm btn-primary" onclick="window.addAssetToTrust('${trust.id}')">➕ Add Asset</button>
-                </div>
-                `}
-                
-                ${trust.followers && trust.followers.length > 0 ? `
-                <div class="patron-detail-section">
-                    <h3>👤 Followers (${trust.followers.length})</h3>
-                    <div class="follower-list">
-                        ${trust.followers.map(f => `
-                            <div class="follower-list-item">
-                                <span class="follower-name">${escHtml(f.name)}</span>
-                                <span class="follower-role">${escHtml(f.role || 'Follower')}</span>
-                                <span class="follower-cap">Cap ${f.cap || 1}</span>
-                                <span class="follower-state ${f.loyalty || 'Faithful'}">${f.loyalty || 'Faithful'}</span>
-                            </div>
-                        `).join('')}
-                    </div>
-                    <button class="btn btn-sm btn-primary" onclick="window.addFollowerToTrust('${trust.id}')">➕ Add Follower</button>
-                </div>
-                ` : `
-                <div class="patron-detail-section">
-                    <p class="text-muted">No followers in this trust yet.</p>
-                    <button class="btn btn-sm btn-primary" onclick="window.addFollowerToTrust('${trust.id}')">➕ Add Follower</button>
-                </div>
-                `}
-            </div>
-            
-            <div class="patron-detail-actions">
-                <button class="btn btn-primary" onclick="window.editTrust('${trust.id}')">✏️ Edit Trust</button>
-                <button class="btn btn-danger" onclick="window.deleteTrust('${trust.id}')">🗑️ Delete Trust</button>
-                <button class="btn btn-secondary" onclick="window.closePatronModal()">Close</button>
-            </div>
-        </div>
-    `;
-
-    modal.addEventListener('click', (e) => {
-        if (e.target === modal) closePatronModal();
-    });
-}
-
-function renderAssetDetail(assetId) {
-    // Find asset in any trust
-    let found = null;
-    let trustName = '';
-    for (const t of state.trusts) {
-        if (t.assets) {
-            const a = t.assets.find(asset => asset.id === assetId);
-            if (a) {
-                found = a;
-                trustName = t.name;
-                break;
-            }
+window.toggleRite = function(riteId) {
+    const details = document.getElementById(`rite-details-${riteId}`);
+    if (!details) return;
+    
+    const isExpanded = details.style.display !== 'none';
+    details.style.display = isExpanded ? 'none' : 'block';
+    
+    // Update the expand icon
+    const item = details.closest('.rite-item');
+    if (item) {
+        const icon = item.querySelector('.rite-expand-icon');
+        if (icon) {
+            icon.textContent = isExpanded ? '▸' : '▾';
         }
     }
-
-    if (!found) {
-        showToast('Asset not found', 'error');
-        return;
+    
+    // Track expanded state
+    if (isExpanded) {
+        state.expandedRites.delete(riteId);
+    } else {
+        state.expandedRites.add(riteId);
     }
-
-    const modal = document.getElementById('asset-modal');
-    modal.style.display = 'block';
-    modal.innerHTML = `
-        <div class="modal-content asset-detail">
-            <button class="modal-close" onclick="window.closeAssetModal()">✕</button>
-            <div class="asset-detail-header">
-                <div class="asset-detail-icon">📦</div>
-                <div>
-                    <h2>${escHtml(found.name)}</h2>
-                    <div class="asset-detail-tier">${found.tier || 'Minor'} Asset · ${escHtml(found.type || 'asset')}</div>
-                </div>
-            </div>
-            
-            <div class="asset-detail-body">
-                <div class="asset-detail-section">
-                    <h3>📖 Description</h3>
-                    <p>${escHtml(found.description || 'No description available.')}</p>
-                </div>
-                
-                <div class="asset-detail-section">
-                    <h3>💰 Cost</h3>
-                    <p>${found.cost || 4} XP</p>
-                </div>
-                
-                <div class="asset-detail-section">
-                    <h3>🏛️ Belongs to</h3>
-                    <p>${escHtml(trustName)}</p>
-                </div>
-                
-                ${found.freeUse ? `
-                <div class="asset-detail-section">
-                    <h3>🔄 Free Use (Once per session)</h3>
-                    <p>${escHtml(found.freeUse)}</p>
-                </div>
-                ` : ''}
-                
-                ${found.sceneSurge ? `
-                <div class="asset-detail-section">
-                    <h3>⚡ Scene Surge (1 Boon)</h3>
-                    <p>${escHtml(found.sceneSurge)}</p>
-                </div>
-                ` : ''}
-            </div>
-            
-            <div class="asset-detail-actions">
-                <button class="btn btn-primary" onclick="window.editAsset('${found.id}')">✏️ Edit Asset</button>
-                <button class="btn btn-danger" onclick="window.deleteAsset('${found.id}')">🗑️ Delete Asset</button>
-                <button class="btn btn-secondary" onclick="window.closeAssetModal()">Close</button>
-            </div>
-        </div>
-    `;
-
-    modal.addEventListener('click', (e) => {
-        if (e.target === modal) closeAssetModal();
-    });
-}
+};
 
 // ============================================================
 // MODAL CONTROLS

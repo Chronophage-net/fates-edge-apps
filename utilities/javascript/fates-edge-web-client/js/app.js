@@ -11,8 +11,9 @@ import { syncManager } from './core/sync/index.js';
 import { getUserAvatar } from './core/gravatar.js';
 import { moduleLoader } from './module-loader.js';
 
-// Import feature modules (dynamic imports for lazy loading)
-// In app.js, update the FEATURES object:
+// ============================================================
+// FEATURE MODULES (dynamic imports for lazy loading)
+// ============================================================
 
 const FEATURES = {
     home: () => import('./features/home/index.js'),
@@ -24,7 +25,7 @@ const FEATURES = {
     encounters: () => import('./features/encounters/index.js'),
     factions: () => import('./features/factions/index.js'),
     vtt: () => import('./features/vtt/index.js'),
-    'scene-tools': () => import('./features/dashboard/scene-tools.js'),  // ✅ ADD THIS
+    'scene-tools': () => import('./features/dashboard/scene-tools.js'),
     docs: () => import('./features/docs/index.js'),
     search: () => import('./features/search/index.js'),
     wiki: () => import('./features/wiki/index.js'),
@@ -33,22 +34,26 @@ const FEATURES = {
     settings: () => import('./features/settings/index.js')
 };
 
-// Route redirects for backward compatibility
+// ============================================================
+// ROUTE REDIRECTS
+// ============================================================
+
 const ROUTE_REDIRECTS = {
     'consequences': 'decks',
     'regional': 'decks',
     'roller': 'dice'
 };
 
-// Check if we're in test mode
+// ============================================================
+// TEST MODE
+// ============================================================
+
 const isTestMode = window.location.search.includes('test=true') || window.location.pathname.includes('/tests/');
 
 if (isTestMode) {
-    // Load test runner instead of main app
     console.log('🧪 Running in test mode');
     import('./tests/runner.js')
         .then(module => {
-            // Import all tests
             import('./tests/unit/operations.test.js');
             import('./tests/unit/offline-queue.test.js');
             import('./tests/unit/conflict.test.js');
@@ -56,7 +61,6 @@ if (isTestMode) {
             import('./tests/integration/sync-integration.test.js');
             import('./tests/integration/websocket-integration.test.js');
             
-            // Initialize and run
             if (module.initTestRunner) {
                 module.initTestRunner();
                 setTimeout(() => {
@@ -69,49 +73,48 @@ if (isTestMode) {
         .catch(err => {
             console.error('Failed to load test runner:', err);
         });
-    // Don't continue with normal app initialization
     throw new Error('Test mode active - stopping app initialization');
 }
 
-// Track if router has been initialized
+// ============================================================
+// STATE
+// ============================================================
+
 let routerInitialized = false;
 
-/**
- * Initialize the router once
- */
+// ============================================================
+// ROUTER INITIALIZATION
+// ============================================================
+
 function initializeRouter() {
     if (routerInitialized) return;
     routerInitialized = true;
     console.log('🔀 Initializing router...');
     initRouter();
     
-    // Check if there's a hash or query param for initial tab
     const hash = window.location.hash.slice(1);
     const urlParams = new URLSearchParams(window.location.search);
     let tab = urlParams.get('tab') || hash || 'home';
     
-    // Check for redirects
     if (ROUTE_REDIRECTS[tab]) {
         const newTab = ROUTE_REDIRECTS[tab];
         console.log(`↪️ Redirecting "${tab}" → "${newTab}"`);
         tab = newTab;
-        // Update URL hash without triggering navigation
         if (window.location.hash) {
             window.location.hash = newTab;
         }
     }
     
-    // Navigate to the initial tab
     setTimeout(() => {
         navigate(tab);
     }, 100);
 }
 
-/**
- * Show password overlay
- */
+// ============================================================
+// PASSWORD OVERLAY
+// ============================================================
+
 function showPasswordOverlay(state) {
-    // Check if overlay already exists
     let overlay = document.getElementById('passwordOverlay');
     if (overlay) {
         overlay.classList.add('open');
@@ -122,7 +125,6 @@ function showPasswordOverlay(state) {
         return;
     }
     
-    // Create overlay
     overlay = document.createElement('div');
     overlay.id = 'passwordOverlay';
     overlay.className = 'password-overlay open';
@@ -155,20 +157,17 @@ function showPasswordOverlay(state) {
     
     document.body.appendChild(overlay);
     
-    // Focus the input
     const input = document.getElementById('passwordInput');
     if (input) {
         setTimeout(() => input.focus(), 200);
     }
     
-    // Handle form submission
     const form = document.getElementById('passwordForm');
     form?.addEventListener('submit', async (e) => {
         e.preventDefault();
         await handlePasswordSubmit(state);
     });
     
-    // Handle Enter key on input
     input?.addEventListener('keydown', async (e) => {
         if (e.key === 'Enter') {
             e.preventDefault();
@@ -177,9 +176,6 @@ function showPasswordOverlay(state) {
     });
 }
 
-/**
- * Handle password submission
- */
 async function handlePasswordSubmit(state) {
     const input = document.getElementById('passwordInput');
     const errorEl = document.getElementById('passwordError');
@@ -196,7 +192,6 @@ async function handlePasswordSubmit(state) {
         return;
     }
     
-    // Disable button while checking
     if (submitBtn) {
         submitBtn.disabled = true;
         submitBtn.textContent = '⏳ Checking...';
@@ -206,7 +201,6 @@ async function handlePasswordSubmit(state) {
         const result = await checkPasswordGate(state, password);
         
         if (result.unlocked) {
-            // Success!
             unlockToolkit();
             const overlay = document.getElementById('passwordOverlay');
             if (overlay) {
@@ -215,10 +209,8 @@ async function handlePasswordSubmit(state) {
                     overlay.style.display = 'none';
                 }, 400);
             }
-            // Initialize the app
             onUnlockSuccess();
         } else {
-            // Failed
             errorEl.textContent = '❌ ' + (result.error || 'Invalid password. Please try again.');
             input.value = '';
             input.classList.add('error');
@@ -239,32 +231,28 @@ async function handlePasswordSubmit(state) {
     }
 }
 
-/**
- * Handle successful unlock
- */
 function onUnlockSuccess() {
     console.log('🔓 Toolkit unlocked');
     showToast('Welcome back!', 'success');
     initializeRouter();
 }
 
-/**
- * Initialize the application
- */
+// ============================================================
+// APP INITIALIZATION
+// ============================================================
+
 async function init() {
     console.log('Fate\'s Edge Toolkit v3.0 — Loading...');
     
     try {
-        // Load state from localStorage
         loadState();
         
-        // Register routes BEFORE checking password
         console.log('📋 Registering routes...');
         Object.entries(FEATURES).forEach(([tab, module]) => {
             registerRoute(tab, module);
         });
+        console.log('✅ Routes registered:', Object.keys(FEATURES));
         
-        // Set up save status indicator
         const saveStatus = document.getElementById('save-status');
         if (saveStatus) {
             onSave((status) => {
@@ -282,48 +270,32 @@ async function init() {
             });
         }
         
-        // Set up export/import
         setupImportExport();
-        
-        // Set up theme toggle
         setupTheme();
-        
-        // Set up modal close buttons
         setupModals();
-        
-        // Set up sync UI (must happen before password gate)
         setupSyncUI();
-        
-        // Set up settings tab render hook
         setupSettingsTabHook();
-        
-        // Set up navigation event listeners
         setupNavigation();
 
-        // Get state and check password
         const state = getState();
         const hasPassword = !!state.passwordHash;
         
         if (hasPassword) {
             console.log('🔐 Password required');
-            // Check if already unlocked via session
             const isUnlocked = isToolkitUnlocked();
             
             if (isUnlocked) {
                 console.log('🔓 Already unlocked from session');
                 onUnlockSuccess();
             } else {
-                // Show password overlay
                 showPasswordOverlay(state);
-                // Router will be initialized on unlock
             }
         } else {
             console.log('🔓 No password required');
-            // Initialize router immediately
             initializeRouter();
         }
         
-        // Preload decks module for faster loading
+        // Preload modules
         import('./features/decks/index.js')
             .then(module => {
                 console.log('🃏 Decks module loaded');
@@ -335,7 +307,6 @@ async function init() {
                 console.warn('Failed to preload decks module:', err);
             });
         
-        // Preload patrons module for faster loading
         import('./features/patrons/index.js')
             .then(module => {
                 console.log('👁️ Patrons module loaded');
@@ -347,7 +318,6 @@ async function init() {
                 console.warn('Failed to preload patrons module:', err);
             });
         
-        // Preload factions module for faster loading
         import('./features/factions/index.js')
             .then(module => {
                 console.log('🏛️ Factions module loaded');
@@ -359,7 +329,6 @@ async function init() {
                 console.warn('Failed to preload factions module:', err);
             });
         
-        // Load remote wiki in background
         import('./features/wiki/index.js')
             .then(module => {
                 if (module.loadRemoteWiki) {
@@ -370,7 +339,6 @@ async function init() {
                 console.warn('Failed to load wiki module:', err);
             });
         
-        // Set up sync event listeners after app is ready
         setupSyncEventListeners();
         
         console.log('Fate\'s Edge Toolkit v3.0 — Ready');
@@ -384,20 +352,15 @@ async function init() {
 // SETUP FUNCTIONS
 // ============================================================
 
-/**
- * Set up navigation event listeners
- */
 function setupNavigation() {
     const navButtons = document.querySelectorAll('.sidebar-nav .nav-item[data-tab]');
     navButtons.forEach(button => {
         button.addEventListener('click', () => {
             const tab = button.dataset.tab;
             if (tab) {
-                // Check for redirects
                 const targetTab = ROUTE_REDIRECTS[tab] || tab;
                 if (targetTab !== tab) {
                     console.log(`↪️ Redirecting "${tab}" → "${targetTab}"`);
-                    // Update data attribute to prevent future redirects
                     button.dataset.tab = targetTab;
                 }
                 navigate(targetTab);
@@ -406,9 +369,6 @@ function setupNavigation() {
     });
 }
 
-/**
- * Set up import/export functionality
- */
 function setupImportExport() {
     const exportBtn = document.getElementById('exportBtn');
     const importBtn = document.getElementById('importBtn');
@@ -446,14 +406,10 @@ function setupImportExport() {
     }
 }
 
-/**
- * Set up theme toggle
- */
 function setupTheme() {
     const toggle = document.getElementById('theme-toggle');
     if (!toggle) return;
     
-    // Load saved theme
     const theme = localStorage.getItem('fates-edge-theme');
     if (theme === 'light') {
         document.documentElement.classList.add('light');
@@ -483,14 +439,10 @@ function setupTheme() {
     });
 }
 
-/**
- * Set up sync UI
- */
 function setupSyncUI() {
     const settingsTab = document.getElementById('tab-settings');
     if (!settingsTab) return;
     
-    // Listen for settings tab being rendered
     const observer = new MutationObserver(() => {
         if (settingsTab.classList.contains('active')) {
             renderSyncUI();
@@ -498,30 +450,22 @@ function setupSyncUI() {
     });
     observer.observe(settingsTab, { attributes: true, attributeFilter: ['class'] });
     
-    // Also render immediately if already active
     if (settingsTab.classList.contains('active')) {
         renderSyncUI();
     }
 }
 
-/**
- * Render the sync UI in the settings panel
- */
 function renderSyncUI() {
-    // Check if sync panel already exists
     if (document.getElementById('sync-panel')) return;
     
     const settingsContent = document.getElementById('tab-settings');
     if (!settingsContent) return;
     
-    // Find the data management panel to insert after
     const dataPanel = settingsContent.querySelector('.panel:first-child');
     if (!dataPanel) return;
     
-    // Load saved user email
     const savedEmail = localStorage.getItem('fates-edge-user-email') || '';
     
-    // Create sync panel with Gravatar support
     const syncPanel = document.createElement('div');
     syncPanel.className = 'panel';
     syncPanel.id = 'sync-panel';
@@ -578,10 +522,8 @@ function renderSyncUI() {
         </div>
     `;
     
-    // Insert after data panel
     dataPanel.parentNode.insertBefore(syncPanel, dataPanel.nextSibling);
     
-    // Load saved settings
     const savedUrl = localStorage.getItem('fates-edge-sync-url') || '';
     const savedCode = localStorage.getItem('fates-edge-sync-code') || '';
     
@@ -598,19 +540,16 @@ function renderSyncUI() {
     if (urlInput) urlInput.value = savedUrl;
     if (codeInput) codeInput.value = savedCode;
     
-    // Save email preference
     if (emailInput) {
         emailInput.addEventListener('change', () => {
             const email = emailInput.value.trim();
             localStorage.setItem('fates-edge-user-email', email);
-            // Update client name with email if connected
             if (syncManager.isConnected) {
                 syncManager.setEmail(email);
             }
         });
     }
     
-    // Update avatar button
     if (avatarBtn) {
         avatarBtn.addEventListener('click', () => {
             if (emailInput) {
@@ -624,18 +563,15 @@ function renderSyncUI() {
         });
     }
     
-    // Show avatars toggle
     if (showAvatarsCheck) {
         const savedShowAvatars = localStorage.getItem('fates-edge-show-avatars') !== 'false';
         showAvatarsCheck.checked = savedShowAvatars;
         showAvatarsCheck.addEventListener('change', () => {
             localStorage.setItem('fates-edge-show-avatars', showAvatarsCheck.checked);
-            // Refresh presence display
             updatePresenceUI(syncManager.presence.getOnlineClients());
         });
     }
     
-    // Connect button handler
     if (connectBtn) {
         connectBtn.addEventListener('click', async () => {
             const url = urlInput.value.trim();
@@ -652,7 +588,6 @@ function renderSyncUI() {
                 return;
             }
             
-            // Save settings
             localStorage.setItem('fates-edge-sync-url', url);
             localStorage.setItem('fates-edge-sync-code', code);
             if (email) localStorage.setItem('fates-edge-user-email', email);
@@ -678,7 +613,6 @@ function renderSyncUI() {
         });
     }
     
-    // Disconnect button handler
     if (disconnectBtn) {
         disconnectBtn.addEventListener('click', () => {
             syncManager.disconnect();
@@ -689,7 +623,6 @@ function renderSyncUI() {
         });
     }
     
-    // Refresh button handler
     if (refreshBtn) {
         refreshBtn.addEventListener('click', () => {
             if (syncManager.isConnected) {
@@ -702,28 +635,19 @@ function renderSyncUI() {
     }
 }
 
-/**
- * Set up settings tab hook to re-render sync UI when settings tab is clicked
- */
 function setupSettingsTabHook() {
     const settingsBtn = document.querySelector('.sidebar-nav .nav-item[data-tab="settings"]');
     if (settingsBtn) {
         settingsBtn.addEventListener('click', () => {
-            // Re-render sync UI when settings tab is clicked
             setTimeout(renderSyncUI, 100);
         });
     }
 }
 
-/**
- * Set up sync event listeners
- */
 function setupSyncEventListeners() {
-    // Connection status
     syncManager.on('connection_change', (status) => {
         updateSyncStatusUI(status);
         
-        // Update connect/disconnect buttons
         const connectBtn = document.getElementById('sync-connect-btn');
         const disconnectBtn = document.getElementById('sync-disconnect-btn');
         if (connectBtn && disconnectBtn) {
@@ -737,25 +661,14 @@ function setupSyncEventListeners() {
         }
     });
     
-    // Presence updates
     syncManager.on('presence_update', (data) => {
         updatePresenceUI(data.clients);
     });
     
-    // Sync ready
     syncManager.on('sync_ready', (data) => {
         showToast('Sync ready! Connected to ' + (data.clients?.length || 0) + ' other users.', 'success');
     });
     
-    // Operation applied
-    syncManager.on('operation_applied', (operation) => {
-        // Optionally show a toast for significant operations
-        if (operation.type === 'add_character' || operation.type === 'update_character') {
-            // Show subtle notification
-        }
-    });
-    
-    // Sync errors
     syncManager.on('sync_error', (error) => {
         showToast('Sync error: ' + error.message, 'error');
     });
@@ -765,9 +678,6 @@ function setupSyncEventListeners() {
 // UI UPDATE FUNCTIONS
 // ============================================================
 
-/**
- * Update sync status UI
- */
 function updateSyncStatusUI(status) {
     const statusEl = document.getElementById('sync-status');
     if (!statusEl) return;
@@ -782,14 +692,10 @@ function updateSyncStatusUI(status) {
     }
 }
 
-/**
- * Generate avatar HTML with fallback
- */
 function generateAvatarHTML(email, name, size = 32) {
     const initial = (name || 'U')[0].toUpperCase();
     const avatarUrl = getUserAvatar(email, name, size);
     
-    // Generate fallback SVG
     const fallbackSvg = encodeURIComponent(`
         <svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
             <rect width="${size}" height="${size}" fill="#6C5CE7" rx="${size * 0.25}"/>
@@ -807,9 +713,6 @@ function generateAvatarHTML(email, name, size = 32) {
     `;
 }
 
-/**
- * Update presence UI with Gravatar support
- */
 function updatePresenceUI(clients) {
     const presenceEl = document.getElementById('presence-list');
     if (!presenceEl) return;
@@ -819,7 +722,6 @@ function updatePresenceUI(clients) {
         return;
     }
     
-    // Check if avatars should be shown
     const showAvatars = localStorage.getItem('fates-edge-show-avatars') !== 'false';
     
     presenceEl.innerHTML = clients.map(client => {
@@ -839,9 +741,6 @@ function updatePresenceUI(clients) {
     }).join('');
 }
 
-/**
- * Set up modal close buttons
- */
 function setupModals() {
     document.querySelectorAll('.modal .modal-close').forEach(btn => {
         btn.addEventListener('click', () => {
@@ -850,7 +749,6 @@ function setupModals() {
         });
     });
     
-    // Close modals on overlay click
     document.querySelectorAll('.modal-overlay').forEach(overlay => {
         overlay.addEventListener('click', (e) => {
             if (e.target === overlay) {
@@ -859,11 +757,9 @@ function setupModals() {
         });
     });
     
-    // Close modals on Escape key
     document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape') {
             document.querySelectorAll('.modal-overlay.open').forEach(m => {
-                // Don't close password overlay
                 if (!m.classList.contains('password-overlay')) {
                     m.classList.remove('open');
                 }
@@ -872,8 +768,6 @@ function setupModals() {
     });
 }
 
-// Initialize the app when DOM is ready
 document.addEventListener('DOMContentLoaded', init);
 
-// Export for testing
 export { init, moduleLoader, ROUTE_REDIRECTS };

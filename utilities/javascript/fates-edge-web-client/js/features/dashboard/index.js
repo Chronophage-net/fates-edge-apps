@@ -694,6 +694,8 @@ window.openCrownSpread = function() {
     import('../decks/index.js').then(module => {
         if (module.openCrownSpread) {
             module.openCrownSpread();
+        } else if (module.default?.openCrownSpread) {
+            module.default.openCrownSpread();
         } else {
             showToast('Crown Spread not available', 'error');
         }

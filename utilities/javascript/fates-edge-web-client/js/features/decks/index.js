@@ -828,6 +828,108 @@ export function attachEvents() {
     }
 }
 
+
+// ============================================================
+// CROWN SPREAD
+// ============================================================
+
+export function openCrownSpread() {
+    const modal = document.createElement('div');
+    modal.style.cssText = `
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(0,0,0,0.85); display: flex; align-items: center; justify-content: center;
+        z-index: 1000; padding: 1rem; backdrop-filter: blur(12px);
+        animation: fadeIn 0.3s ease;
+    `;
+    
+    // Draw 5 cards for Crown Spread
+    if (deck.length < 5) {
+        buildDeck();
+    }
+    const cards = [];
+    for (let i = 0; i < 5; i++) {
+        if (deck.length === 0) buildDeck();
+        cards.push(deck.pop());
+    }
+    updateDeckCount();
+    
+    const mainCards = cards.slice(0, 4);
+    const wildcard = cards[4];
+    
+    // Get region data
+    const regionName = selectedRegion || 'Acasia';
+    fetchRegionData(regionName).then(data => {
+        const result = synthesiseCrownSpread(mainCards, wildcard, data);
+        
+        modal.innerHTML = `
+            <div style="background:var(--bg2);padding:2rem;border-radius:16px;max-width:800px;width:100%;max-height:90vh;overflow-y:auto;border:1px solid var(--border);">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;">
+                    <h2 style="color:var(--gold);margin:0;">👑 Crown Spread</h2>
+                    <button onclick="this.closest('div').parentElement.remove()" 
+                            style="background:var(--bg3);border:1px solid var(--border);color:var(--text2);font-size:1.5rem;cursor:pointer;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;">✕</button>
+                </div>
+                
+                <div style="display:flex;gap:0.5rem;justify-content:center;flex-wrap:wrap;margin-bottom:1rem;">
+                    ${result.positions.map(p => `
+                        <div style="background:var(--bg3);border:2px solid ${p.isJoker ? 'var(--gold)' : p.color};border-radius:var(--radius);padding:0.5rem;text-align:center;min-width:70px;${p.isJoker ? 'box-shadow: 0 0 20px rgba(212,175,55,0.3);' : ''}">
+                            <div style="font-size:0.6rem;color:var(--text3);">${p.position.icon}</div>
+                            <div style="font-size:2rem;color:${p.isJoker ? 'var(--gold)' : p.color};">${p.isJoker ? '🃏' : p.symbol}</div>
+                            <div style="font-size:0.6rem;color:var(--text2);">${p.rankName}</div>
+                            <div style="font-size:0.5rem;color:var(--text3);">${p.position.label}</div>
+                        </div>
+                    `).join('')}
+                    <div style="background:var(--bg4);border:2px solid var(--gold);border-radius:var(--radius);padding:0.5rem;text-align:center;min-width:70px;box-shadow:0 0 20px rgba(212,175,55,0.3);">
+                        <div style="font-size:0.6rem;color:var(--gold);">🌟</div>
+                        <div style="font-size:2rem;color:var(--gold);">🃏</div>
+                        <div style="font-size:0.6rem;color:var(--gold);">Wild</div>
+                        <div style="font-size:0.5rem;color:var(--text3);">Twist</div>
+                    </div>
+                </div>
+                
+                <div style="background:var(--bg3);border-radius:var(--radius);padding:1rem;border-left:4px solid var(--gold);">
+                    ${result.positions.map((p, i) => `
+                        <div style="margin-bottom:0.5rem;padding-bottom:0.5rem;${i < 3 ? 'border-bottom:1px solid var(--border);' : ''}">
+                            <div style="display:flex;align-items:center;gap:0.5rem;">
+                                <span style="color:${p.isJoker ? 'var(--gold)' : p.color};">${p.position.icon}</span>
+                                <strong style="color:${p.isJoker ? 'var(--gold)' : p.color};">${p.position.label}</strong>
+                                <span style="color:var(--text3);font-size:0.8rem;">${p.rankName} of ${p.suitName}</span>
+                            </div>
+                            <div style="color:var(--text2);font-size:0.9rem;margin-left:1.5rem;">${p.regionMeaning || p.description}</div>
+                        </div>
+                    `).join('')}
+                    <div>
+                        <div style="display:flex;align-items:center;gap:0.5rem;">
+                            <span style="color:var(--gold);">🌟</span>
+                            <strong style="color:var(--gold);">Wildcard Twist</strong>
+                        </div>
+                        <div style="color:var(--text2);font-size:0.9rem;margin-left:1.5rem;">${result.wildcard}</div>
+                    </div>
+                </div>
+                
+                ${result.timer ? `
+                    <div style="margin-top:1rem;background:var(--bg3);border-radius:var(--radius);padding:0.5rem 1rem;border-left:4px solid var(--accent);">
+                        <strong>⏱️ Suggested Timer:</strong> ${result.timer.segments} segments (from ${result.timer.card})
+                        <button class="btn btn-sm btn-primary" onclick="window.createTimerFromCard('${result.timer.card}', ${result.timer.segments})" style="margin-left:0.5rem;">➕ Add Timer</button>
+                    </div>
+                ` : ''}
+                
+                <div style="margin-top:1rem;display:flex;gap:0.5rem;flex-wrap:wrap;">
+                    <button class="btn btn-gold" onclick="this.closest('div').parentElement.remove(); window.openCrownSpread();">🔄 New Spread</button>
+                    <button class="btn btn-secondary" onclick="this.closest('div').parentElement.remove();">Close</button>
+                </div>
+            </div>
+        `;
+        
+        document.body.appendChild(modal);
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) modal.remove();
+        });
+    });
+}
+
+// Expose to window
+window.openCrownSpread = openCrownSpread;
+window.createTimerFromCard = createTimerFromCard;
 // ============================================================
 // EXPORT - SINGLE DEFAULT EXPORT
 // ============================================================
