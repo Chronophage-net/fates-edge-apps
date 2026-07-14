@@ -31,6 +31,14 @@ import {
     sendWSMessage,
     onWSEvent
 } from '../../core/websocket.js';
+import { 
+    installPack, 
+    uninstallPack, 
+    getInstalledPacks, 
+    getPack,
+    getDocuments,
+    initPackManager
+} from '../../core/pack-manager.js';
 
 let container = null;
 
@@ -135,9 +143,69 @@ export function render(el) {
     const wsConnected = isWSConnected ? isWSConnected() : false;
     const wsStatus = getWSStatus ? getWSStatus() : 'disconnected';
     
+    // Get installed packs
+    const installedPacks = getInstalledPacks();
+    const packDocuments = getDocuments();
+    
     container.innerHTML = `
         <h1 class="page-title">⚙️ Settings</h1>
         <p class="page-sub">Manage your data, backups, and preferences.</p>
+        
+        <!-- ============================================================
+             PACK MANAGEMENT
+             ============================================================ -->
+        <div class="panel settings-panel" id="pack-management-panel">
+            <h3>📦 Pack Management</h3>
+            <p class="text-muted small">Install custom packs to extend the toolkit with new modules, documents, and data.</p>
+            
+            <div class="form-row">
+                <div class="field" style="flex:3;">
+                    <label>Install Pack</label>
+                    <input type="file" id="pack-file-input" accept=".zip" />
+                    <div class="field-hint">Select a .zip pack file to install</div>
+                </div>
+            </div>
+            
+            <div class="flex">
+                <button class="btn btn-gold" id="pack-install-btn">📦 Install Pack</button>
+                <button class="btn btn-sm" id="pack-refresh-btn">↻ Refresh</button>
+            </div>
+            
+            <div id="pack-install-feedback" class="mt-1" style="min-height:1.5rem;"></div>
+            
+            <div class="mt-1">
+                <h4 style="margin:0.5rem 0 0.2rem;font-size:0.95rem;">📋 Installed Packs</h4>
+                <div id="pack-list" class="pack-list">
+                    ${installedPacks.length === 0 ? '<div class="text-muted small">No packs installed.</div>' : ''}
+                    ${installedPacks.map(pack => `
+                        <div class="pack-item">
+                            <div class="pack-info">
+                                <span class="pack-name">${escHtml(pack.name)}</span>
+                                <span class="pack-version">v${escHtml(pack.version)}</span>
+                                <span class="pack-type">${pack.type}</span>
+                                <span class="pack-meta">${pack.author ? `by ${escHtml(pack.author)}` : ''} · ${new Date(pack.installed).toLocaleDateString()}</span>
+                            </div>
+                            <div class="flex">
+                                <button class="btn btn-xs btn-danger uninstall-pack-btn" data-id="${pack.id}">🗑️ Uninstall</button>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+            
+            <div class="mt-1">
+                <h4 style="margin:0.5rem 0 0.2rem;font-size:0.95rem;">📄 Pack Documents</h4>
+                <div id="pack-documents-list">
+                    ${packDocuments.length === 0 ? '<div class="text-muted small">No documents loaded from packs.</div>' : ''}
+                    ${packDocuments.map(doc => `
+                        <div class="pack-document-item">
+                            <span class="doc-title">${escHtml(doc.title)}</span>
+                            <span class="doc-category">${escHtml(doc.category || 'general')}</span>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+        </div>
         
         <!-- ============================================================
              WEBSOCKET SETTINGS
@@ -400,6 +468,65 @@ export function render(el) {
       
     // Initialize sync UI
     setTimeout(initSyncUI, 100);
+    
+    // Initialize pack manager
+    initPackManager();
+}
+
+// ============================================================
+// PACK MANAGEMENT FUNCTIONS
+// ============================================================
+
+async function handlePackInstall() {
+    const fileInput = document.getElementById('pack-file-input');
+    const feedback = document.getElementById('pack-install-feedback');
+    const installBtn = document.getElementById('pack-install-btn');
+    
+    if (!fileInput || !fileInput.files || fileInput.files.length === 0) {
+        feedback.innerHTML = '<span style="color:var(--red);">❌ Please select a .zip pack file.</span>';
+        showToast('Please select a pack file', 'error');
+        return;
+    }
+    
+    const file = fileInput.files[0];
+    
+    if (!file.name.endsWith('.zip')) {
+        feedback.innerHTML = '<span style="color:var(--red);">❌ File must be a .zip archive.</span>';
+        showToast('Invalid pack format', 'error');
+        return;
+    }
+    
+    feedback.innerHTML = '<span style="color:var(--gold);">⏳ Installing pack...</span>';
+    installBtn.disabled = true;
+    
+    try {
+        const result = await installPack(file);
+        feedback.innerHTML = `
+            <span style="color:var(--green);">✅ Pack "${result.name}" v${result.version} installed successfully!</span>
+            <span class="text-muted small"> ${result.modules?.length || 0} modules, ${result.documents?.length || 0} documents</span>
+        `;
+        showToast(`Pack "${result.name}" installed!`, 'success');
+        fileInput.value = '';
+        // Refresh the UI
+        render(container);
+    } catch (err) {
+        feedback.innerHTML = `<span style="color:var(--red);">❌ ${err.message}</span>`;
+        showToast('Install failed: ' + err.message, 'error');
+    } finally {
+        installBtn.disabled = false;
+    }
+}
+
+function handlePackUninstall(packId) {
+    if (!packId) return;
+    uninstallPack(packId);
+    // Refresh the UI
+    setTimeout(() => render(container), 500);
+}
+
+function refreshPackList() {
+    render(container);
+    showToast('Pack list refreshed', 'info');
 }
 
 // ============================================================
@@ -762,6 +889,25 @@ function saveWSSettings() {
 // ============================================================
 
 export function attachEvents() {
+    // Pack management
+    document.getElementById('pack-install-btn')?.addEventListener('click', handlePackInstall);
+    document.getElementById('pack-refresh-btn')?.addEventListener('click', refreshPackList);
+    document.getElementById('pack-file-input')?.addEventListener('change', (e) => {
+        const feedback = document.getElementById('pack-install-feedback');
+        if (e.target.files && e.target.files.length > 0) {
+            const file = e.target.files[0];
+            feedback.innerHTML = `<span class="text-muted">📎 Selected: ${file.name} (${(file.size / 1024).toFixed(1)} KB)</span>`;
+        }
+    });
+    
+    // Pack uninstall buttons (delegated)
+    document.getElementById('pack-list')?.addEventListener('click', (e) => {
+        const uninstallBtn = e.target.closest('.uninstall-pack-btn');
+        if (uninstallBtn) {
+            handlePackUninstall(uninstallBtn.dataset.id);
+        }
+    });
+    
     // Data management
     document.getElementById('settings-export-btn')?.addEventListener('click', exportAllData);
     document.getElementById('settings-import-btn')?.addEventListener('click', () => {

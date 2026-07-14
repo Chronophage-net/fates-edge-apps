@@ -7,7 +7,6 @@ on:
       - 'utilities/javascript/fates-edge-web-client/**'
       - 'utilities/javascript/fates-edge-socket-server/**'
       - 'utilities/javascript/fates-edge-desktop-client/**'
-      - 'utilities/javascript/data/**'
       - 'misc/**'
       - '.github/workflows/deploy-apps.yml'
 
@@ -164,20 +163,23 @@ jobs:
         run: |
           echo "📂 Copying data files to Pages site..."
           
+          # Determine the project root (where the workflow is triggered from)
+          # The checkout puts us at the repository root
+          PROJECT_ROOT="."
+          
           # ============================================================
           # WIKI.JSON — goes at site root
           # ============================================================
-          if [ -f wiki.json ]; then
-            cp wiki.json pages-site/wiki.json
-            echo "✅ Copied wiki.json → pages-site/wiki.json"
-          elif [ -f misc/wiki.json ]; then
-            cp misc/wiki.json pages-site/wiki.json
+          if [ -f "${PROJECT_ROOT}/misc/wiki.json" ]; then
+            cp "${PROJECT_ROOT}/misc/wiki.json" pages-site/wiki.json
             echo "✅ Copied misc/wiki.json → pages-site/wiki.json"
-          elif [ -f data/wiki.json ]; then
-            cp data/wiki.json pages-site/wiki.json
-            echo "✅ Copied data/wiki.json → pages-site/wiki.json"
+          elif [ -f "${PROJECT_ROOT}/utilities/javascript/fates-edge-web-client/wiki.json" ]; then
+            cp "${PROJECT_ROOT}/utilities/javascript/fates-edge-web-client/wiki.json" pages-site/wiki.json
+            echo "✅ Copied web-client/wiki.json → pages-site/wiki.json"
           else
             echo "⚠️ No wiki.json found"
+            # Create a minimal wiki.json to prevent 404s
+            echo '{"title": "Fate\'s Edge Wiki", "pages": []}' > pages-site/wiki.json
           fi
           
           # ============================================================
@@ -186,24 +188,24 @@ jobs:
           # ============================================================
           mkdir -p pages-site/regions
           
-          # Copy from regions/ directory (source)
-          if [ -d regions ]; then
-            echo "📁 Copying from regions/ directory..."
-            cp regions/*.json pages-site/regions/ 2>/dev/null || true
-            echo "✅ Copied regions/ → pages-site/regions/"
-          fi
-          
-          # Also check misc/regions/
-          if [ -d misc/regions ]; then
+          # Copy from misc/regions/ (primary source)
+          if [ -d "${PROJECT_ROOT}/misc/regions" ]; then
             echo "📁 Copying from misc/regions/ directory..."
-            cp misc/regions/*.json pages-site/regions/ 2>/dev/null || true
+            cp "${PROJECT_ROOT}/misc/regions"/*.json pages-site/regions/ 2>/dev/null || true
             echo "✅ Copied misc/regions/ → pages-site/regions/"
           fi
           
+          # Also check web-client/regions/
+          if [ -d "${PROJECT_ROOT}/utilities/javascript/fates-edge-web-client/regions" ]; then
+            echo "📁 Copying from web-client/regions/ directory..."
+            cp "${PROJECT_ROOT}/utilities/javascript/fates-edge-web-client/regions"/*.json pages-site/regions/ 2>/dev/null || true
+            echo "✅ Copied web-client/regions/ → pages-site/regions/"
+          fi
+          
           # Check data/regions/ as fallback
-          if [ -d data/regions ]; then
+          if [ -d "${PROJECT_ROOT}/data/regions" ]; then
             echo "📁 Copying from data/regions/ directory..."
-            cp data/regions/*.json pages-site/regions/ 2>/dev/null || true
+            cp "${PROJECT_ROOT}/data/regions"/*.json pages-site/regions/ 2>/dev/null || true
             echo "✅ Copied data/regions/ → pages-site/regions/"
           fi
           
@@ -226,9 +228,12 @@ jobs:
             REGION_MANIFEST="${REGION_MANIFEST}]"
             
             if [ "$REGION_MANIFEST" = "[]" ]; then
+              # Check if acasia.json exists
               if [ -f pages-site/regions/acasia.json ]; then
                 REGION_MANIFEST='["acasia"]'
               else
+                # Create a default acasia region
+                echo '{"name":"Acasia","slug":"acasia","description":"The shattered continent"}' > pages-site/regions/acasia.json
                 REGION_MANIFEST='["acasia"]'
               fi
             fi
@@ -243,25 +248,32 @@ jobs:
           # ============================================================
           mkdir -p pages-site/factions
           
-          # Copy from factions/ directory (source)
-          if [ -d factions ]; then
-            echo "📁 Copying from factions/ directory..."
-            cp factions/*.json pages-site/factions/ 2>/dev/null || true
-            echo "✅ Copied factions/ → pages-site/factions/"
-          fi
-          
-          # Also check misc/factions/
-          if [ -d misc/factions ]; then
+          # Copy from misc/factions/ (primary source)
+          if [ -d "${PROJECT_ROOT}/misc/factions" ]; then
             echo "📁 Copying from misc/factions/ directory..."
-            cp misc/factions/*.json pages-site/factions/ 2>/dev/null || true
+            cp "${PROJECT_ROOT}/misc/factions"/*.json pages-site/factions/ 2>/dev/null || true
             echo "✅ Copied misc/factions/ → pages-site/factions/"
           fi
           
+          # Also check web-client/factions/
+          if [ -d "${PROJECT_ROOT}/utilities/javascript/fates-edge-web-client/factions" ]; then
+            echo "📁 Copying from web-client/factions/ directory..."
+            cp "${PROJECT_ROOT}/utilities/javascript/fates-edge-web-client/factions"/*.json pages-site/factions/ 2>/dev/null || true
+            echo "✅ Copied web-client/factions/ → pages-site/factions/"
+          fi
+          
           # Check data/factions/ as fallback
-          if [ -d data/factions ]; then
+          if [ -d "${PROJECT_ROOT}/data/factions" ]; then
             echo "📁 Copying from data/factions/ directory..."
-            cp data/factions/*.json pages-site/factions/ 2>/dev/null || true
+            cp "${PROJECT_ROOT}/data/factions"/*.json pages-site/factions/ 2>/dev/null || true
             echo "✅ Copied data/factions/ → pages-site/factions/"
+          fi
+          
+          # Also check web-client/data/factions/
+          if [ -d "${PROJECT_ROOT}/utilities/javascript/fates-edge-web-client/data/factions" ]; then
+            echo "📁 Copying from web-client/data/factions/ directory..."
+            cp "${PROJECT_ROOT}/utilities/javascript/fates-edge-web-client/data/factions"/*.json pages-site/factions/ 2>/dev/null || true
+            echo "✅ Copied web-client/data/factions/ → pages-site/factions/"
           fi
           
           # Rename factions-manifest.json to manifest.json if needed
@@ -289,7 +301,8 @@ jobs:
             FACTION_MANIFEST="${FACTION_MANIFEST}]"
             
             if [ "$FACTION_MANIFEST" = "[]" ]; then
-              FACTION_MANIFEST='["velvet-court", "iron-league", "gray-ash", "ecktorian-censorate", "bloody-fist", "house-contarini"]'
+              # Create default factions from the tree structure
+              FACTION_MANIFEST='["bloody-fist", "ecktorian-censorate", "gray-ash", "house-contarini", "iron-league", "velvet-court"]'
             fi
             
             echo "$FACTION_MANIFEST" > pages-site/factions/manifest.json
@@ -302,24 +315,28 @@ jobs:
           # ============================================================
           mkdir -p pages-site/data/patrons
           
-          # Check data/patrons/ directory
-          if [ -d data/patrons ]; then
-            echo "📁 Copying from data/patrons/ directory..."
-            cp data/patrons/*.json pages-site/data/patrons/ 2>/dev/null || true
-            echo "✅ Copied data/patrons/ → pages-site/data/patrons/"
+          # Copy from misc/ (primary source - the_traveler.json is in misc/)
+          if [ -f "${PROJECT_ROOT}/misc/the_traveler.json" ]; then
+            cp "${PROJECT_ROOT}/misc/the_traveler.json" pages-site/data/patrons/traveler.json
+            echo "✅ Copied misc/the_traveler.json → pages-site/data/patrons/traveler.json"
           fi
           
-          # Also check misc/patrons/
-          if [ -d misc/patrons ]; then
-            echo "📁 Copying from misc/patrons/ directory..."
-            cp misc/patrons/*.json pages-site/data/patrons/ 2>/dev/null || true
-            echo "✅ Copied misc/patrons/ → pages-site/data/patrons/"
+          if [ -f "${PROJECT_ROOT}/misc/acasia.json" ]; then
+            cp "${PROJECT_ROOT}/misc/acasia.json" pages-site/data/patrons/acasia.json
+            echo "✅ Copied misc/acasia.json → pages-site/data/patrons/acasia.json"
+          fi
+          
+          # Also check web-client/data/patrons/
+          if [ -d "${PROJECT_ROOT}/utilities/javascript/fates-edge-web-client/data/patrons" ]; then
+            echo "📁 Copying from web-client/data/patrons/ directory..."
+            cp "${PROJECT_ROOT}/utilities/javascript/fates-edge-web-client/data/patrons"/*.json pages-site/data/patrons/ 2>/dev/null || true
+            echo "✅ Copied web-client/data/patrons/ → pages-site/data/patrons/"
           fi
           
           # Copy individual patron files from root if they exist
-          if [ -f the_traveler.json ]; then
-            cp the_traveler.json pages-site/data/patrons/traveler.json
-            echo "✅ Copied the_traveler.json → pages-site/data/patrons/traveler.json"
+          if [ -f "${PROJECT_ROOT}/the_traveler.json" ]; then
+            cp "${PROJECT_ROOT}/the_traveler.json" pages-site/data/patrons/traveler.json
+            echo "✅ Copied root/the_traveler.json → pages-site/data/patrons/traveler.json"
           fi
           
           # Generate patron manifest
@@ -340,10 +357,13 @@ jobs:
           PATRON_MANIFEST="${PATRON_MANIFEST}]"
           
           if [ "$PATRON_MANIFEST" = "[]" ]; then
+            # Create default patrons from existing files
             if [ -f pages-site/data/patrons/traveler.json ]; then
               PATRON_MANIFEST='["traveler"]'
             else
-              PATRON_MANIFEST='[]'
+              # Create a default patron
+              echo '{"id":"traveler","name":"The Traveler","description":"A mysterious wanderer"}' > pages-site/data/patrons/traveler.json
+              PATRON_MANIFEST='["traveler"]'
             fi
           fi
           
@@ -355,6 +375,7 @@ jobs:
           # ============================================================
           mkdir -p pages-site/data
           mkdir -p pages-site/data/regions
+          mkdir -p pages-site/data/factions
           
           # Copy region files to data/regions as backup
           if [ -d pages-site/regions ]; then
@@ -370,9 +391,17 @@ jobs:
           
           # Copy factions to data/factions as backup
           if [ -d pages-site/factions ]; then
-            mkdir -p pages-site/data/factions
             cp pages-site/factions/*.json pages-site/data/factions/ 2>/dev/null || true
             echo "✅ Copied factions to data/factions/ as backup"
+          fi
+          
+          # ============================================================
+          # PACK.JSON — for pack management
+          # ============================================================
+          if [ -f "${PROJECT_ROOT}/misc/pack.json" ]; then
+            mkdir -p pages-site/misc
+            cp "${PROJECT_ROOT}/misc/pack.json" pages-site/misc/pack.json
+            echo "✅ Copied misc/pack.json → pages-site/misc/pack.json"
           fi
           
           # ============================================================
@@ -399,6 +428,9 @@ jobs:
           echo ""
           echo "📂 Data/factions directory contents:"
           ls -la pages-site/data/factions/ || echo "  (empty)"
+          echo ""
+          echo "📂 Misc directory contents:"
+          ls -la pages-site/misc/ || echo "  (empty)"
 
       - name: Upload Pages artifact
         if: ${{ env.SKIP_JOB != 'true' && matrix.name == 'web-client' }}
