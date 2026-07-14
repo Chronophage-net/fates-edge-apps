@@ -19,7 +19,6 @@ const FEATURES = {
     home: () => import('./features/home/index.js'),
     dashboard: () => import('./features/dashboard/index.js'),
     characters: () => import('./features/characters/index.js'),
-    builder: () => import('./features/builder/index.js'),
     dice: () => import('./features/dice/index.js'),
     timers: () => import('./features/timers/index.js'),
     encounters: () => import('./features/encounters/index.js'),

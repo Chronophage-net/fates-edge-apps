@@ -14,7 +14,6 @@ class ModuleLoader {
             'presence': './core/presence/index.js',
             
             // Feature modules
-            'builder': './features/builder/index.js',
             'characters': './features/characters/index.js',
             'dashboard': './features/dashboard/index.js',
             'decks': './features/decks/index.js',
