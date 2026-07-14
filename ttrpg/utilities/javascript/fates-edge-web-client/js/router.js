@@ -10,7 +10,8 @@ let isInitialized = false;
 // Route redirects for backward compatibility
 const ROUTE_REDIRECTS = {
     'consequences': 'decks',
-    'regional': 'decks'
+    'regional': 'decks',
+    'roller': 'dice'
 };
 
 // Cache for loaded modules to prevent reloading
@@ -79,7 +80,7 @@ export async function navigate(tab, options = {}) {
     currentTab = resolvedTab;
     
     // Update sidebar
-    document.querySelectorAll('.sidebar-nav button[data-tab]').forEach(btn => {
+    document.querySelectorAll('.sidebar-nav .nav-item[data-tab]').forEach(btn => {
         const btnTab = btn.dataset.tab;
         // Check if this button should be active (handle redirects)
         const isActive = btnTab === resolvedTab || 
@@ -178,6 +179,7 @@ export async function navigate(tab, options = {}) {
             
             // Show success toast for redirects
             if (isRedirect) {
+                const { showToast } = await import('./components/Toast.js');
                 showToast(`↪️ Redirected to ${resolvedTab}`, 'info');
             }
             
@@ -191,6 +193,7 @@ export async function navigate(tab, options = {}) {
                     <button class="btn btn-sm mt-1" onclick="location.reload()">↻ Retry</button>
                 </div>
             `;
+            const { showToast } = await import('./components/Toast.js');
             showToast(`Failed to load ${resolvedTab}: ${err.message}`, 'error');
         }
     } else {
@@ -244,7 +247,7 @@ export function initRouter() {
     console.log('📋 Registered routes:', Array.from(routes.keys()));
     
     // Handle sidebar clicks
-    document.querySelectorAll('.sidebar-nav button[data-tab]').forEach(btn => {
+    document.querySelectorAll('.sidebar-nav .nav-item[data-tab]').forEach(btn => {
         btn.addEventListener('click', () => {
             const tab = btn.dataset.tab;
             if (tab) {

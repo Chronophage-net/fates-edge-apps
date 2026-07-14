@@ -1,576 +1,1397 @@
-/* features/patrons/patrons.css */
-
-/* ============================================================
-   PATRONS LAYOUT
-   ============================================================ */
-
-.patrons-modern-layout {
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
-}
-
-.patrons-header {
-    border-bottom: 1px solid var(--border);
-    padding-bottom: 0.5rem;
-}
-
-.patrons-title {
-    font-size: 1.8rem;
-    font-weight: 700;
-    margin: 0;
-    color: var(--text);
-}
-
-.patrons-subtitle {
-    font-size: 1rem;
-    color: var(--text3);
-    margin: 0.25rem 0 0 0;
-}
-
-/* ============================================================
-   TABS
-   ============================================================ */
-
-.patrons-tabs {
-    display: flex;
-    gap: 0.5rem;
-    flex-wrap: wrap;
-    border-bottom: 1px solid var(--border);
-    padding-bottom: 0.5rem;
-}
-
-.patrons-tab {
-    padding: 0.5rem 1rem;
-    border: none;
-    background: transparent;
-    color: var(--text2);
-    cursor: pointer;
-    border-radius: var(--radius);
-    font-size: 0.9rem;
-    transition: all 0.2s;
-}
-
-.patrons-tab:hover {
-    background: var(--bg2);
-    color: var(--text);
-}
-
-.patrons-tab.active {
-    background: var(--bg2);
-    color: var(--gold);
-    font-weight: 600;
-}
-
-/* ============================================================
-   VIEW CONTAINER
-   ============================================================ */
-
-.patrons-view-container {
-    min-height: 300px;
-}
-
-/* ============================================================
-   EMPTY STATE
-   ============================================================ */
-
-.patrons-empty {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 3rem 1rem;
-    color: var(--text3);
-    gap: 1rem;
-    background: var(--bg2);
-    border-radius: var(--radius);
-}
-
-/* ============================================================
-   PATRON GRIDS
-   ============================================================ */
-
-.patrons-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-    gap: 1rem;
-    margin-bottom: 1rem;
-}
-
-.trusts-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-    gap: 1rem;
-    margin-bottom: 1rem;
-}
-
-.assets-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: 1rem;
-    margin-bottom: 1rem;
-}
-
-/* ============================================================
-   PATRON CARDS
-   ============================================================ */
-
-.patron-card {
-    background: var(--bg3);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 1rem;
-    cursor: pointer;
-    transition: all 0.2s;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-    gap: 0.3rem;
-}
-
-.patron-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-    border-color: var(--gold);
-}
-
-.patron-card.cosmic {
-    border-top: 3px solid #7c3aed;
-}
-
-.patron-card.terrestrial {
-    border-top: 3px solid #f59e0b;
-}
-
-.patron-card-icon {
-    font-size: 2.5rem;
-    line-height: 1.2;
-}
-
-.patron-card-name {
-    font-size: 1.1rem;
-    font-weight: 600;
-    color: var(--text);
-}
-
-.patron-card-domain {
-    font-size: 0.85rem;
-    color: var(--text2);
-}
-
-.patron-card-type {
-    font-size: 0.7rem;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    color: var(--text3);
-    background: var(--bg2);
-    padding: 0.1rem 0.5rem;
-    border-radius: 8px;
-}
-
-.patron-card-tier {
-    font-size: 0.8rem;
-    color: var(--gold);
-    font-weight: 600;
-}
-
-.patron-card-location {
-    font-size: 0.8rem;
-    color: var(--text3);
-}
-
-.patron-card-tags {
-    display: flex;
-    gap: 0.3rem;
-    flex-wrap: wrap;
-    justify-content: center;
-    margin-top: 0.3rem;
-}
-
-.patron-tag {
-    font-size: 0.6rem;
-    padding: 0.1rem 0.5rem;
-    border-radius: 8px;
-    background: var(--bg2);
-    color: var(--text2);
-    border: 1px solid var(--border);
-}
-
-.patron-tag.rival {
-    border-color: #dc2626;
-    color: #dc2626;
-}
-
-/* ============================================================
-   TRUST CARDS
-   ============================================================ */
-
-.trust-card {
-    background: var(--bg3);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 1rem;
-    cursor: pointer;
-    transition: all 0.2s;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-    gap: 0.3rem;
-    border-top: 3px solid #06b6d4;
-}
-
-.trust-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-    border-color: var(--gold);
-}
-
-.trust-card-icon {
-    font-size: 2.5rem;
-    line-height: 1.2;
-}
-
-.trust-card-name {
-    font-size: 1.1rem;
-    font-weight: 600;
-    color: var(--text);
-}
-
-.trust-card-tier {
-    font-size: 0.8rem;
-    color: var(--gold);
-    font-weight: 600;
-}
-
-.trust-card-stats {
-    display: flex;
-    gap: 0.8rem;
-    font-size: 0.8rem;
-    color: var(--text2);
-    flex-wrap: wrap;
-    justify-content: center;
-}
-
-/* ============================================================
-   ASSET CARDS
-   ============================================================ */
-
-.asset-card {
-    background: var(--bg3);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 0.8rem;
-    cursor: pointer;
-    transition: all 0.2s;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-    gap: 0.2rem;
-}
-
-.asset-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-    border-color: var(--gold);
-}
-
-.asset-card-tier {
-    font-size: 0.6rem;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    color: var(--text3);
-    background: var(--bg2);
-    padding: 0.1rem 0.5rem;
-    border-radius: 8px;
-}
-
-.asset-card-name {
-    font-size: 0.95rem;
-    font-weight: 600;
-    color: var(--text);
-}
-
-.asset-card-type {
-    font-size: 0.75rem;
-    color: var(--text3);
-}
-
-.asset-card-trust {
-    font-size: 0.7rem;
-    color: var(--text2);
-}
-
-.asset-card-cost {
-    font-size: 0.8rem;
-    color: var(--gold);
-}
-
-/* ============================================================
-   ACTIONS
-   ============================================================ */
-
-.patrons-actions {
-    display: flex;
-    gap: 0.5rem;
-    flex-wrap: wrap;
-    padding-top: 0.5rem;
-    border-top: 1px solid var(--border);
-}
-
-/* ============================================================
-   MODALS
-   ============================================================ */
-
-.patron-modal {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0,0,0,0.7);
-    z-index: 1000;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 1rem;
-}
-
-.modal-content {
-    background: var(--bg);
-    border-radius: var(--radius);
-    max-width: 600px;
-    width: 100%;
-    max-height: 90vh;
-    overflow-y: auto;
-    padding: 1.5rem;
-    position: relative;
-    border: 1px solid var(--border);
-}
-
-.modal-close {
-    position: absolute;
-    top: 0.5rem;
-    right: 0.5rem;
-    background: none;
-    border: none;
-    color: var(--text2);
-    font-size: 1.2rem;
-    cursor: pointer;
-    padding: 0.25rem 0.5rem;
-    border-radius: var(--radius);
-}
-
-.modal-close:hover {
-    background: var(--bg3);
-    color: var(--text);
-}
-
-/* ============================================================
-   PATRON DETAIL
-   ============================================================ */
-
-.patron-detail-header {
-    display: flex;
-    gap: 1rem;
-    align-items: center;
-    margin-bottom: 1rem;
-    padding-bottom: 0.5rem;
-    border-bottom: 1px solid var(--border);
-}
-
-.patron-detail-icon {
-    font-size: 3rem;
-    line-height: 1;
-}
-
-.patron-detail-domain {
-    font-size: 0.9rem;
-    color: var(--text2);
-}
-
-.patron-detail-body {
-    display: flex;
-    flex-direction: column;
-    gap: 0.8rem;
-}
-
-.patron-detail-section h3 {
-    font-size: 0.9rem;
-    font-weight: 600;
-    color: var(--text2);
-    margin: 0 0 0.25rem 0;
-}
-
-.patron-detail-section p,
-.patron-detail-section ul {
-    margin: 0;
-    font-size: 0.9rem;
-    color: var(--text);
-}
-
-.patron-detail-section ul {
-    list-style: none;
-    padding: 0;
-}
-
-.patron-detail-section ul li {
-    padding: 0.1rem 0;
-    padding-left: 0.5rem;
-    border-left: 2px solid var(--gold);
-    margin: 0.1rem 0;
-}
-
-.patron-detail-actions {
-    display: flex;
-    gap: 0.5rem;
-    margin-top: 1rem;
-    padding-top: 0.5rem;
-    border-top: 1px solid var(--border);
-}
-
-/* ============================================================
-   TRUST DETAIL
-   ============================================================ */
-
-.trust-stats-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-    gap: 0.5rem;
-}
-
-.trust-stat {
-    background: var(--bg2);
-    padding: 0.5rem;
-    border-radius: var(--radius);
-    text-align: center;
-}
-
-.stat-label {
-    font-size: 0.7rem;
-    color: var(--text3);
-    display: block;
-}
-
-.stat-value {
-    font-size: 1.1rem;
-    font-weight: 600;
-    color: var(--text);
-}
-
-/* ============================================================
-   ASSET LIST
-   ============================================================ */
-
-.asset-list,
-.follower-list {
-    display: flex;
-    flex-direction: column;
-    gap: 0.3rem;
-}
-
-.asset-list-item,
-.follower-list-item {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.3rem 0.5rem;
-    background: var(--bg2);
-    border-radius: var(--radius);
-    cursor: pointer;
-    transition: all 0.2s;
-}
-
-.asset-list-item:hover,
-.follower-list-item:hover {
-    background: var(--bg3);
-}
-
-.asset-tier-badge {
-    font-size: 0.6rem;
-    text-transform: uppercase;
-    padding: 0.1rem 0.4rem;
-    border-radius: 8px;
-    background: var(--bg);
-    color: var(--text2);
-    border: 1px solid var(--border);
-}
-
-.asset-name,
-.follower-name {
-    font-weight: 500;
-    flex: 1;
-}
-
-.asset-type,
-.follower-role {
-    font-size: 0.75rem;
-    color: var(--text3);
-}
-
-.follower-cap {
-    font-size: 0.7rem;
-    color: var(--text2);
-    background: var(--bg);
-    padding: 0.1rem 0.4rem;
-    border-radius: 8px;
-}
-
-.follower-state {
-    font-size: 0.7rem;
-    padding: 0.1rem 0.4rem;
-    border-radius: 8px;
-}
-
-.follower-state.Faithful {
-    background: #065f46;
-    color: #6ee7b7;
-}
-
-.follower-state.Strained {
-    background: #78350f;
-    color: #fcd34d;
-}
-
-.follower-state.Broken {
-    background: #7f1d1d;
-    color: #fca5a5;
-}
-
-/* ============================================================
-   RESPONSIVE
-   ============================================================ */
-
-@media (max-width: 640px) {
-    .patrons-grid,
-    .trusts-grid,
-    .assets-grid {
-        grid-template-columns: 1fr 1fr;
+// features/patrons/index.js
+/**
+ * Patrons feature - Display and manage Patrons (Cosmic, Terrestrial, and Trusts)
+ * Similar to regional generation with card-based display
+ * 
+ * Data paths:
+ * - Patron data: /data/patrons/{id}.json
+ * - Patron manifest: /data/patrons/manifest.json
+ */
+
+import { getState, saveState } from '../../core/state.js';
+import { showToast } from '../../components/Toast.js';
+import { escHtml } from '../../core/utils.js';
+
+// ============================================================
+// CONSTANTS
+// ============================================================
+
+const PATRON_DATA_PATH = '/data/patrons/';
+const PATRON_MANIFEST_PATH = '/data/patrons/manifest.json';
+
+const PATRON_CATEGORIES = {
+    cosmic: 'Cosmic Patrons',
+    terrestrial: 'Terrestrial Patrons',
+    trust: 'Player Trusts'
+};
+
+const PATRON_ICONS = {
+    cosmic: '🌟',
+    terrestrial: '🏛️',
+    trust: '🤝'
+};
+
+// Default cosmic patrons (fallback if remote load fails)
+const DEFAULT_COSMIC_PATRONS = [
+    {
+        id: 'traveler',
+        name: 'The Traveler',
+        icon: '🚶',
+        domain: 'Ways & Journeys',
+        description: 'The eternal guide of roads, thresholds, and journeys. Watches from every crossroads and listens at every waymark. Honored with offerings before any significant trek.',
+        rites: ['Road-Sense', 'Traveler\'s Boon', 'Waymark', 'Bridge Between'],
+        rivals: ['Khemesh', 'Pale Shepherd'],
+        sigil: 'A spiral that ends in a fork',
+        corruption: 'Restlessness, inability to settle',
+        source: 'default'
+    },
+    {
+        id: 'oath-flame-light',
+        name: 'Oath of Flame & Light',
+        icon: '🔥',
+        domain: 'Dawn & Vows',
+        description: 'The patron of dawn, vows, and protection. Their followers kindle oaths and burn away lies. The unquenched flame judges truth and debt.',
+        rites: ['Kindle Vow', 'Lay on Hands', 'Radiant Smite'],
+        rivals: ['Malachai'],
+        sigil: 'A flame within a circle',
+        corruption: 'Unquenchable honesty, cannot lie',
+        source: 'default'
+    },
+    {
+        id: 'ikasha',
+        name: 'Ikasha, She Who Sleeps',
+        icon: '🌙',
+        domain: 'Shadow & Secrets',
+        description: 'The hush between footfalls, the patience of dark water. She does not command—she sleeps. In her dreams, she whispers possibilities.',
+        rites: ['Unlit Candle', 'Crossroads Raven', 'Umbral Reservoir'],
+        rivals: ['Witness', 'Silent Choir'],
+        sigil: 'A crescent moon with a closed eye',
+        corruption: 'Shadows lengthen, voice fades to a whisper',
+        source: 'default'
+    },
+    {
+        id: 'witness',
+        name: 'The Witness',
+        icon: '👁️',
+        domain: 'Truth & Revelation',
+        description: 'The patron of truth, memory, and inconvenient revelation. Watches every oath, records every broken promise. Does not forgive—but does remember.',
+        rites: ['Lingering Trace', 'Uncomfortable Question', 'Shared Burden'],
+        rivals: ['Seal-Breaker', 'Silent Choir'],
+        sigil: 'An unblinking eye',
+        corruption: 'Cannot look away from truth, must correct falsehoods',
+        source: 'default'
+    },
+    {
+        id: 'carrion-king',
+        name: 'The Carrion King',
+        icon: '💀',
+        domain: 'Decay & Renewal',
+        description: 'The patron of endings and new beginnings. Where things rot, new things grow. Not evil—merely inevitable.',
+        rites: ['Fertile Death', 'Borrowed Form', 'Eternal Cycle'],
+        rivals: [],
+        sigil: 'A crown of bones with a sprouting seed',
+        corruption: 'Scent of turned earth, animals are nervous',
+        source: 'default'
+    },
+    {
+        id: 'palinode',
+        name: 'Palinode, Queen of Encores',
+        icon: '🎭',
+        domain: 'Performance & Rapture',
+        description: 'The patron of performance, rapture, and the moment that must be repeated. Her followers are artists, skalds, and those who live for the encore.',
+        rites: ['Hymn Against Dread', 'Perfect Performance', 'Captivate Audience'],
+        rivals: [],
+        sigil: 'A mask with a single tear',
+        corruption: 'Cannot leave a performance incomplete',
+        source: 'default'
+    },
+    {
+        id: 'livaea',
+        name: 'Livaea, the Crimson Courtier',
+        icon: '💋',
+        domain: 'Seduction & Social Binding',
+        description: 'The patron of courtiers, concubines, and all who trade in desire. Every song is a seduction, every glance a contract, every touch a negotiation.',
+        rites: ['Golden Tongue', 'The Velvet Invitation', 'The Unrefusable Offer', 'The Crimson Masquerade'],
+        rivals: ['Malachai'],
+        sigil: 'A crimson kiss on a velvet field',
+        corruption: 'Eyes reflect desires, skin always warm',
+        source: 'default'
+    },
+    {
+        id: 'lucky-jack',
+        name: 'Lucky Jack, Lord of Thieves',
+        icon: '🪙',
+        domain: 'Luck & The Heist',
+        description: 'The Unspent Coin, the Magpie King. Patron of urchins, beggars, and thieves who plan their work. Every stroke of luck is a loan.',
+        rites: ['The Lucky Pick', 'The Crowd\'s Distraction', 'The Unseen Hand', 'The Magpie\'s Hoard'],
+        rivals: [],
+        sigil: 'A coin with a laughing face',
+        corruption: 'Compulsive gambling, debts that compound',
+        source: 'default'
+    },
+    {
+        id: 'aveh',
+        name: 'Aveh, the Rider Behind the Storm',
+        icon: '🌪️',
+        domain: 'Freedom & Erasure',
+        description: 'The faceless rider at the horizon\'s edge. Offers freedom at the cost of belonging. For those who need to vanish.',
+        rites: ['Unlatched Step', 'Forgotten Road', 'Unremembered Name'],
+        rivals: ['Ykrul spirit'],
+        sigil: 'A rider with no face',
+        corruption: 'Cannot stay in one place, connections fade',
+        source: 'default'
+    },
+    {
+        id: 'malachai',
+        name: 'Malachai, the Chained Angel',
+        icon: '⛓️',
+        domain: 'Curses & Corruption',
+        description: 'The patron of gamblers, addicts, and those who have sold themselves. Answers when the thief has nothing left to lose.',
+        rites: ['The Lucky Pick', 'The Debt Note', 'The Final Score'],
+        rivals: ['Oath of Flame & Light', 'Livaea'],
+        sigil: 'A broken chain',
+        corruption: 'Voice cracks, shadow hungers, counting coins you never had',
+        source: 'default'
+    },
+    {
+        id: 'sealed-gate',
+        name: 'The Sealed Gate',
+        icon: '🚪',
+        domain: 'Thresholds & Containment',
+        description: 'The patron of boundaries, thresholds, and what must remain sealed. Wards, banishments, and protective circles fall under their domain.',
+        rites: ['Sealed Threshold', 'Circle of Denial', 'Banishment Knot'],
+        rivals: ['Savage Heart'],
+        sigil: 'A door with nine locks',
+        corruption: 'Obsession with sealing things, paranoia',
+        source: 'default'
+    },
+    {
+        id: 'maelstraeus',
+        name: 'Maelstraeus, the Infernal Bargainer',
+        icon: '📜',
+        domain: 'Commerce & Exchange',
+        description: 'The patron of trade, bargains, and the weight of contracts. Every deal has a price, and Maelstraeus always collects.',
+        rites: ['Trading Grounds', 'Appraise Value', 'Weighted Contract'],
+        rivals: [],
+        sigil: 'A golden ledger',
+        corruption: 'Counting everything, weighing every word',
+        source: 'default'
+    }
+];
+
+// Default terrestrial patrons
+const DEFAULT_TERRESTRIAL_PATRONS = [
+    {
+        id: 'madam-serafine',
+        name: 'Madam Serafine',
+        type: 'creditor',
+        tier: 'IV',
+        description: 'Mistress of the Velvet Court. Controls information, forgery, and laundering in Silkstrand. Never wears the same dress twice. Has not slept in the same room for more than three nights in a decade.',
+        leverage: 'Information on every major official in Silkstrand. Secret passage into the Archivolt\'s sealed vault.',
+        debtTrigger: 'When Obligation fills, demands a service—a heist, a confession, or a secret delivered.',
+        quirk: 'She is still paying off a debt to Livaea, a debt that grows heavier with every year she does not ascend.',
+        location: 'Silkstrand',
+        assetSlots: 6,
+        maxAssetTier: 'Major',
+        source: 'default'
+    },
+    {
+        id: 'old-kes',
+        name: 'Old Kes',
+        type: 'fence',
+        tier: 'III',
+        description: 'The fence who taught the Silk Coin their trade. Can move any good, anywhere, within a week. Missing three fingers on his left hand—lost to a customs trap, kept in a jar as a warning.',
+        leverage: 'Contract with a Sidhi ship captain worth a small fortune.',
+        debtTrigger: 'When Obligation fills, demands a smuggling run or a difficult fence job.',
+        quirk: 'Keeps his severed fingers in a jar as a warning to himself.',
+        location: 'Silkstrand',
+        assetSlots: 4,
+        maxAssetTier: 'Standard',
+        source: 'default'
+    },
+    {
+        id: 'sister-agatha',
+        name: 'Sister Agatha',
+        type: 'sanctuary',
+        tier: 'II',
+        description: 'Gives sanctuary to thieves on the run. Her hospice is neutral ground—no violence permitted. The Watch respects her because she heals their wounded.',
+        leverage: 'Tattoo of a broken chain on her wrist—she was a freed slave from Ashaan.',
+        debtTrigger: 'When Obligation fills, demands work in her soup kitchen or protection for the poor.',
+        quirk: 'Never sleeps in the same place twice.',
+        location: 'Silkstrand',
+        assetSlots: 2,
+        maxAssetTier: 'Minor',
+        source: 'default'
+    },
+    {
+        id: 'prefect-marcellus',
+        name: 'Prefect Gaius Marcellus',
+        type: 'military',
+        tier: 'III',
+        description: 'Commander of the garrison at Castra Ferrum. Speaks in clipped phrases and never repeats himself. His brother died in a Ykrul raid—a wound he has never spoken of.',
+        leverage: 'Military escort, legal immunity, access to the tribunal.',
+        debtTrigger: 'When Obligation fills, demands a dangerous mission behind enemy lines.',
+        quirk: 'Carries his brother\'s signet ring on a chain around his neck.',
+        location: 'Castra Ferrum',
+        assetSlots: 4,
+        maxAssetTier: 'Standard',
+        source: 'default'
+    },
+    {
+        id: 'khatun-sarnai',
+        name: 'Khatun Sarnai',
+        type: 'tribal',
+        tier: 'III',
+        description: 'Proud, grieving chieftain of the Gray Ash Ykrul. Her nephew was killed by a Vilikari caravan. She will not trust Ecktorians, but respects those who keep their word.',
+        leverage: 'Remounts, safe camp, Ykrul guides.',
+        debtTrigger: 'When Obligation fills, demands a blood-price or a raid on a rival clan.',
+        quirk: 'Her daughter Yelü is the child of a legionary who defected.',
+        location: 'Violet Steppe',
+        assetSlots: 4,
+        maxAssetTier: 'Major',
+        source: 'default'
+    }
+];
+
+// Default Trusts
+const DEFAULT_TRUSTS = [
+    {
+        id: 'velvet-coin',
+        name: 'The Velvet Coin',
+        icon: '🪙',
+        tier: 'I',
+        description: 'A thieves\' guild operating in the shadows of Silkstrand. Founded by exiles from the Silk Coin, now a legitimate (and illegitimate) organization with hands in smuggling, information, and the occasional heist.',
+        maxAssets: 2,
+        maxAssetTier: 'Standard',
+        assets: [
+            {
+                id: 'safehouse-dye-district',
+                name: 'Safehouse: Dye District',
+                type: 'safehouse',
+                tier: 'Minor',
+                description: 'A converted spice warehouse near the Dye Yards. Hidden compartments, false walls, and a landlord who never saw you.',
+                cost: 4,
+                freeUse: 'Start an entry/exit scene Dominant',
+                sceneSurge: 'Produce a hidden egress; convert one pursuit consequence into a temporary complication'
+            },
+            {
+                id: 'informant-network',
+                name: 'Informant Network: Docks',
+                type: 'network',
+                tier: 'Minor',
+                description: 'Eyes and ears on the waterfront. Porters, lamplighters, and urchins who watch for coin and gossip.',
+                cost: 4,
+                freeUse: 'Targeted inquiry begins Dominant',
+                sceneSurge: 'Reveal a hidden schedule or route; mitigate 1 SB from ambush/surprise'
+            }
+        ],
+        followers: [
+            {
+                id: 'quick-lena',
+                name: '"Quick" Lena',
+                role: 'Informant',
+                cap: 2,
+                description: 'A Sidhi rogue with mismatched eyes and a nervous laugh. Owes a debt to a Sidhi smuggler named Peyton. Has a soft spot for urchins.',
+                loyalty: 'Faithful',
+                fitness: 'Ready'
+            }
+        ],
+        obligation: 2,
+        capacity: 4,
+        source: 'default'
+    }
+];
+
+// ============================================================
+// STATE
+// ============================================================
+
+let container = null;
+let state = {
+    cosmicPatrons: [],
+    terrestrialPatrons: [],
+    trusts: [],
+    selectedPatron: null,
+    selectedTrust: null,
+    selectedAsset: null,
+    viewMode: 'cosmic',
+    isLoading: false,
+    dataLoaded: false
+};
+
+// ============================================================
+// LOAD DATA
+// ============================================================
+
+export function loadPatronData() {
+    // First try to load from state
+    const saved = getState();
+    if (saved.patrons) {
+        state.cosmicPatrons = saved.patrons.cosmic || [];
+        state.terrestrialPatrons = saved.patrons.terrestrial || [];
+        state.trusts = saved.patrons.trusts || [];
+        // If we have data in state, use it
+        if (state.cosmicPatrons.length > 0 || state.terrestrialPatrons.length > 0) {
+            console.log(`📦 Loaded ${state.cosmicPatrons.length} cosmic patrons, ${state.terrestrialPatrons.length} terrestrial patrons from state`);
+            state.dataLoaded = true;
+            return;
+        }
     }
     
-    .patrons-tabs {
-        flex-wrap: nowrap;
-        overflow-x: auto;
-    }
+    // Otherwise load from remote
+    loadRemotePatrons();
+}
+
+async function loadRemotePatrons() {
+    if (state.isLoading) return;
+    state.isLoading = true;
     
-    .patrons-tab {
-        white-space: nowrap;
-        font-size: 0.8rem;
-        padding: 0.3rem 0.6rem;
-    }
-    
-    .modal-content {
-        padding: 1rem;
-        max-width: 100%;
+    try {
+        console.log('📥 Loading patron data from remote...');
+        
+        // Load manifest first
+        const manifestRes = await fetch(PATRON_MANIFEST_PATH);
+        if (!manifestRes.ok) {
+            console.warn('Patron manifest not found, using defaults');
+            loadDefaultPatrons();
+            return;
+        }
+        
+        const manifest = await manifestRes.json();
+        
+        if (!Array.isArray(manifest) || manifest.length === 0) {
+            console.warn('Patron manifest is empty, using defaults');
+            loadDefaultPatrons();
+            return;
+        }
+        
+        // Load each patron
+        const patrons = [];
+        let loadedCount = 0;
+        
+        for (const patronId of manifest) {
+            try {
+                const res = await fetch(`${PATRON_DATA_PATH}${patronId}.json`);
+                if (res.ok) {
+                    const data = await res.json();
+                    // Ensure the data has an id
+                    if (!data.id) data.id = patronId;
+                    patrons.push(data);
+                    loadedCount++;
+                    console.log(`✅ Loaded patron: ${data.name || patronId}`);
+                } else {
+                    console.warn(`⚠️ Could not load patron: ${patronId} (HTTP ${res.status})`);
+                }
+            } catch (e) {
+                console.warn(`⚠️ Error loading patron ${patronId}:`, e);
+            }
+        }
+        
+        if (patrons.length > 0) {
+            state.cosmicPatrons = patrons;
+            state.dataLoaded = true;
+            console.log(`✅ Loaded ${patrons.length} patrons from remote`);
+            
+            // Save to state
+            const saved = getState();
+            if (!saved.patrons) saved.patrons = {};
+            saved.patrons.cosmic = patrons;
+            saveState();
+        } else {
+            console.warn('No patrons loaded from remote, using defaults');
+            loadDefaultPatrons();
+        }
+    } catch (error) {
+        console.warn('Failed to load remote patrons:', error);
+        loadDefaultPatrons();
+    } finally {
+        state.isLoading = false;
     }
 }
 
-@media (max-width: 480px) {
-    .patrons-grid,
-    .trusts-grid,
-    .assets-grid {
-        grid-template-columns: 1fr;
+function loadDefaultPatrons() {
+    state.cosmicPatrons = [...DEFAULT_COSMIC_PATRONS];
+    state.terrestrialPatrons = [...DEFAULT_TERRESTRIAL_PATRONS];
+    state.trusts = [...DEFAULT_TRUSTS];
+    state.dataLoaded = true;
+    console.log(`📦 Using default patron data (${state.cosmicPatrons.length} cosmic, ${state.terrestrialPatrons.length} terrestrial)`);
+}
+
+function savePatronData() {
+    const saved = getState();
+    if (!saved.patrons) saved.patrons = {};
+    saved.patrons.cosmic = state.cosmicPatrons;
+    saved.patrons.terrestrial = state.terrestrialPatrons;
+    saved.patrons.trusts = state.trusts;
+    saveState();
+}
+
+// ============================================================
+// RENDER
+// ============================================================
+
+export function render(el) {
+    container = el;
+    loadPatronData();
+
+    container.innerHTML = `
+        <div class="patrons-modern-layout">
+            <!-- Header -->
+            <header class="patrons-header">
+                <h1 class="patrons-title">👁️ Patrons & Resources</h1>
+                <p class="patrons-subtitle">Cosmic patrons, terrestrial powers, and the assets they grant.</p>
+                ${!state.dataLoaded ? '<p class="text-muted" style="font-size:0.85rem;">⏳ Loading patron data...</p>' : `<p class="text-muted" style="font-size:0.85rem;">📚 ${state.cosmicPatrons.length} cosmic patrons loaded</p>`}
+            </header>
+
+            <!-- Navigation Tabs -->
+            <div class="patrons-tabs">
+                <button class="patrons-tab active" data-view="cosmic">🌟 Cosmic Patrons</button>
+                <button class="patrons-tab" data-view="terrestrial">🏛️ Terrestrial Patrons</button>
+                <button class="patrons-tab" data-view="trusts">🤝 Player Trusts</button>
+                <button class="patrons-tab" data-view="assets">📦 Assets</button>
+            </div>
+
+            <!-- View Container -->
+            <div id="patrons-view-container" class="patrons-view-container">
+                ${renderView('cosmic')}
+            </div>
+
+            <!-- Modals -->
+            <div id="patron-modal" class="patron-modal" style="display:none;"></div>
+            <div id="asset-modal" class="patron-modal" style="display:none;"></div>
+        </div>
+    `;
+
+    attachEvents();
+}
+
+function renderView(view) {
+    state.viewMode = view;
+    if (!state.dataLoaded) {
+        return `
+            <div class="patrons-empty">
+                <div style="font-size:3rem;">⏳</div>
+                <div>Loading patron data...</div>
+                <div class="text-muted" style="font-size:0.85rem;">Please wait</div>
+            </div>
+        `;
+    }
+    
+    switch(view) {
+        case 'cosmic': return renderCosmicPatrons();
+        case 'terrestrial': return renderTerrestrialPatrons();
+        case 'trusts': return renderTrusts();
+        case 'assets': return renderAllAssets();
+        default: return renderCosmicPatrons();
     }
 }
+
+// ============================================================
+// RENDER: COSMIC PATRONS
+// ============================================================
+
+function renderCosmicPatrons() {
+    if (state.cosmicPatrons.length === 0) {
+        return `
+            <div class="patrons-empty">
+                <div style="font-size:3rem;">🌟</div>
+                <div>No cosmic patrons loaded.</div>
+                <button class="btn btn-primary" onclick="window.loadDefaultPatrons()">📥 Load Defaults</button>
+            </div>
+        `;
+    }
+
+    return `
+        <div class="patrons-grid cosmic-grid">
+            ${state.cosmicPatrons.map(p => `
+                <div class="patron-card cosmic" onclick="window.viewPatron('${p.id}')">
+                    <div class="patron-card-icon">${p.icon || '🌟'}</div>
+                    <div class="patron-card-name">${escHtml(p.name)}</div>
+                    <div class="patron-card-domain">${escHtml(p.domain || 'Unknown')}</div>
+                    <div class="patron-card-tags">
+                        <span class="patron-tag">${p.rites ? p.rites.length + ' Rites' : 'No Rites'}</span>
+                        ${p.rivals && p.rivals.length > 0 ? `<span class="patron-tag rival">⚔️ ${p.rivals.length} Rivals</span>` : ''}
+                        ${p.source === 'default' ? '<span class="patron-tag" style="border-color:var(--text3);color:var(--text3);">📦 Default</span>' : ''}
+                    </div>
+                </div>
+            `).join('')}
+        </div>
+        <div class="patrons-actions">
+            <button class="btn btn-primary" onclick="window.addCosmicPatron()">➕ Add Cosmic Patron</button>
+            <button class="btn btn-secondary" onclick="window.refreshPatrons()">🔄 Refresh</button>
+        </div>
+    `;
+}
+
+// ============================================================
+// RENDER: TERRESTRIAL PATRONS
+// ============================================================
+
+function renderTerrestrialPatrons() {
+    if (state.terrestrialPatrons.length === 0) {
+        return `
+            <div class="patrons-empty">
+                <div style="font-size:3rem;">🏛️</div>
+                <div>No terrestrial patrons loaded.</div>
+                <button class="btn btn-primary" onclick="window.addTerrestrialPatron()">➕ Add Terrestrial Patron</button>
+            </div>
+        `;
+    }
+
+    return `
+        <div class="patrons-grid terrestrial-grid">
+            ${state.terrestrialPatrons.map(p => `
+                <div class="patron-card terrestrial" onclick="window.viewTerrestrial('${p.id}')">
+                    <div class="patron-card-type">${p.type || 'patron'}</div>
+                    <div class="patron-card-name">${escHtml(p.name)}</div>
+                    <div class="patron-card-tier">Tier ${p.tier || 'I'}</div>
+                    <div class="patron-card-location">📍 ${escHtml(p.location || 'Unknown')}</div>
+                    <div class="patron-card-tags">
+                        <span class="patron-tag">${p.assetSlots || 0} Asset Slots</span>
+                        <span class="patron-tag">${p.maxAssetTier || 'Minor'}</span>
+                    </div>
+                </div>
+            `).join('')}
+        </div>
+        <div class="patrons-actions">
+            <button class="btn btn-primary" onclick="window.addTerrestrialPatron()">➕ Add Terrestrial Patron</button>
+            <button class="btn btn-secondary" onclick="window.refreshPatrons()">🔄 Refresh</button>
+        </div>
+    `;
+}
+
+// ============================================================
+// RENDER: TRUSTS
+// ============================================================
+
+function renderTrusts() {
+    if (state.trusts.length === 0) {
+        return `
+            <div class="patrons-empty">
+                <div style="font-size:3rem;">🤝</div>
+                <div>No player trusts created yet.</div>
+                <button class="btn btn-primary" onclick="window.createTrust()">Create Trust</button>
+            </div>
+        `;
+    }
+
+    return `
+        <div class="trusts-grid">
+            ${state.trusts.map(t => `
+                <div class="trust-card" onclick="window.viewTrust('${t.id}')">
+                    <div class="trust-card-icon">${t.icon || '🤝'}</div>
+                    <div class="trust-card-name">${escHtml(t.name)}</div>
+                    <div class="trust-card-tier">Tier ${t.tier || 'I'}</div>
+                    <div class="trust-card-stats">
+                        <span>📦 ${t.assets ? t.assets.length : 0} Assets</span>
+                        <span>👤 ${t.followers ? t.followers.length : 0} Followers</span>
+                        <span>⚡ ${t.obligation || 0}/${t.capacity || 4} Obligation</span>
+                    </div>
+                </div>
+            `).join('')}
+        </div>
+        <div class="patrons-actions">
+            <button class="btn btn-primary" onclick="window.createTrust()">➕ Create Trust</button>
+            <button class="btn btn-secondary" onclick="window.refreshPatrons()">🔄 Refresh</button>
+        </div>
+    `;
+}
+
+// ============================================================
+// RENDER: ALL ASSETS
+// ============================================================
+
+function renderAllAssets() {
+    // Collect all assets from trusts
+    const allAssets = [];
+    state.trusts.forEach(t => {
+        if (t.assets) {
+            t.assets.forEach(a => {
+                allAssets.push({
+                    ...a,
+                    trustName: t.name,
+                    trustId: t.id
+                });
+            });
+        }
+    });
+
+    if (allAssets.length === 0) {
+        return `
+            <div class="patrons-empty">
+                <div style="font-size:3rem;">📦</div>
+                <div>No assets found. Create a trust and add assets.</div>
+                <button class="btn btn-primary" onclick="window.createTrust()">Create Trust</button>
+            </div>
+        `;
+    }
+
+    return `
+        <div class="assets-grid">
+            ${allAssets.map(a => `
+                <div class="asset-card" onclick="window.viewAsset('${a.id}')">
+                    <div class="asset-card-tier">${a.tier || 'Minor'}</div>
+                    <div class="asset-card-name">${escHtml(a.name)}</div>
+                    <div class="asset-card-type">${escHtml(a.type || 'asset')}</div>
+                    <div class="asset-card-trust">🏛️ ${escHtml(a.trustName)}</div>
+                    <div class="asset-card-cost">${a.cost || '?'} XP</div>
+                </div>
+            `).join('')}
+        </div>
+    `;
+}
+
+// ============================================================
+// DETAIL VIEWS
+// ============================================================
+
+function renderPatronDetail(patronId) {
+    const patron = state.cosmicPatrons.find(p => p.id === patronId);
+    if (!patron) {
+        showToast('Patron not found', 'error');
+        return;
+    }
+
+    const modal = document.getElementById('patron-modal');
+    modal.style.display = 'block';
+    modal.innerHTML = `
+        <div class="modal-content patron-detail">
+            <button class="modal-close" onclick="window.closePatronModal()">✕</button>
+            <div class="patron-detail-header">
+                <div class="patron-detail-icon">${patron.icon || '🌟'}</div>
+                <div>
+                    <h2>${escHtml(patron.name)}</h2>
+                    <div class="patron-detail-domain">${escHtml(patron.domain || 'Unknown Domain')}</div>
+                    ${patron.source === 'default' ? '<span class="badge badge-remote" style="font-size:0.7rem;">📦 Default Data</span>' : ''}
+                </div>
+            </div>
+            
+            <div class="patron-detail-body">
+                <div class="patron-detail-section">
+                    <h3>📖 Description</h3>
+                    <p>${escHtml(patron.description || 'No description available.')}</p>
+                </div>
+                
+                ${patron.lore ? `
+                <div class="patron-detail-section">
+                    <h3>📚 Lore</h3>
+                    <p style="white-space:pre-wrap;">${escHtml(patron.lore)}</p>
+                </div>
+                ` : ''}
+                
+                ${patron.rites && patron.rites.length > 0 ? `
+                <div class="patron-detail-section">
+                    <h3>🔮 Rites (${patron.rites.length})</h3>
+                    <ul>
+                        ${patron.rites.map(r => {
+                            if (typeof r === 'string') {
+                                return `<li>${escHtml(r)}</li>`;
+                            }
+                            return `<li><strong>${escHtml(r.name)}</strong> (${escHtml(r.tier || 'Low')}) — ${escHtml(r.effect || '')}</li>`;
+                        }).join('')}
+                    </ul>
+                </div>
+                ` : ''}
+                
+                ${patron.rivals && patron.rivals.length > 0 ? `
+                <div class="patron-detail-section">
+                    <h3>⚔️ Rivals</h3>
+                    <ul>
+                        ${patron.rivals.map(r => `<li>${escHtml(r)}</li>`).join('')}
+                    </ul>
+                </div>
+                ` : ''}
+                
+                <div class="patron-detail-section">
+                    <h3>🏷️ Sigil</h3>
+                    <p><em>${escHtml(patron.sigil || 'Unknown')}</em></p>
+                </div>
+                
+                ${patron.corruption ? `
+                <div class="patron-detail-section">
+                    <h3>⚠️ Corruption</h3>
+                    <p>${escHtml(patron.corruption)}</p>
+                </div>
+                ` : ''}
+                
+                ${patron.whispered ? `
+                <div class="patron-detail-section">
+                    <h3>🌙 Whispered in Taverns</h3>
+                    <p><em>"${escHtml(patron.whispered)}"</em></p>
+                </div>
+                ` : ''}
+                
+                ${patron.cult ? `
+                <div class="patron-detail-section">
+                    <h3>🕯️ Cult: ${escHtml(patron.cult.name || 'Followers')}</h3>
+                    <p>${escHtml(patron.cult.description || '')}</p>
+                </div>
+                ` : ''}
+                
+                ${patron.gift ? `
+                <div class="patron-detail-section">
+                    <h3>🎁 Patron\'s Gift</h3>
+                    <p><strong>${escHtml(patron.gift.name || 'Gift')}</strong></p>
+                    <p>${escHtml(patron.gift.description || '')}</p>
+                    ${patron.gift.cost ? `<p class="text-muted" style="font-size:0.85rem;">Cost: ${escHtml(patron.gift.cost)}</p>` : ''}
+                </div>
+                ` : ''}
+            </div>
+            
+            <div class="patron-detail-actions">
+                <button class="btn btn-primary" onclick="window.editPatron('${patron.id}')">✏️ Edit</button>
+                <button class="btn btn-danger" onclick="window.deletePatron('${patron.id}')">🗑️ Delete</button>
+                <button class="btn btn-secondary" onclick="window.closePatronModal()">Close</button>
+            </div>
+        </div>
+    `;
+
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) closePatronModal();
+    });
+}
+
+function renderTerrestrialDetail(patronId) {
+    const patron = state.terrestrialPatrons.find(p => p.id === patronId);
+    if (!patron) {
+        showToast('Terrestrial patron not found', 'error');
+        return;
+    }
+
+    const modal = document.getElementById('patron-modal');
+    modal.style.display = 'block';
+    modal.innerHTML = `
+        <div class="modal-content patron-detail terrestrial-detail">
+            <button class="modal-close" onclick="window.closePatronModal()">✕</button>
+            <div class="patron-detail-header">
+                <div class="patron-detail-icon">🏛️</div>
+                <div>
+                    <h2>${escHtml(patron.name)}</h2>
+                    <div class="patron-detail-domain">${escHtml(patron.type || 'Terrestrial Patron')} · Tier ${patron.tier || 'I'}</div>
+                </div>
+            </div>
+            
+            <div class="patron-detail-body">
+                <div class="patron-detail-section">
+                    <h3>📖 Description</h3>
+                    <p>${escHtml(patron.description || 'No description.')}</p>
+                </div>
+                
+                <div class="patron-detail-section">
+                    <h3>📍 Location</h3>
+                    <p>${escHtml(patron.location || 'Unknown')}</p>
+                </div>
+                
+                <div class="patron-detail-section">
+                    <h3>💪 Leverage</h3>
+                    <p>${escHtml(patron.leverage || 'None listed')}</p>
+                </div>
+                
+                <div class="patron-detail-section">
+                    <h3>⚡ Debt Trigger</h3>
+                    <p>${escHtml(patron.debtTrigger || 'When Obligation fills, they call in a debt.')}</p>
+                </div>
+                
+                <div class="patron-detail-section">
+                    <h3>📦 Asset Capacity</h3>
+                    <p>${patron.assetSlots || 0} slots · Max Tier: ${patron.maxAssetTier || 'Minor'}</p>
+                </div>
+                
+                ${patron.quirk ? `
+                <div class="patron-detail-section">
+                    <h3>🎭 Quirk</h3>
+                    <p><em>${escHtml(patron.quirk)}</em></p>
+                </div>
+                ` : ''}
+            </div>
+            
+            <div class="patron-detail-actions">
+                <button class="btn btn-primary" onclick="window.editTerrestrial('${patron.id}')">✏️ Edit</button>
+                <button class="btn btn-danger" onclick="window.deleteTerrestrial('${patron.id}')">🗑️ Delete</button>
+                <button class="btn btn-secondary" onclick="window.closePatronModal()">Close</button>
+            </div>
+        </div>
+    `;
+
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) closePatronModal();
+    });
+}
+
+function renderTrustDetail(trustId) {
+    const trust = state.trusts.find(t => t.id === trustId);
+    if (!trust) {
+        showToast('Trust not found', 'error');
+        return;
+    }
+
+    const modal = document.getElementById('patron-modal');
+    modal.style.display = 'block';
+    modal.innerHTML = `
+        <div class="modal-content trust-detail">
+            <button class="modal-close" onclick="window.closePatronModal()">✕</button>
+            <div class="patron-detail-header">
+                <div class="patron-detail-icon">${trust.icon || '🤝'}</div>
+                <div>
+                    <h2>${escHtml(trust.name)}</h2>
+                    <div class="patron-detail-domain">Tier ${trust.tier || 'I'} Trust</div>
+                </div>
+            </div>
+            
+            <div class="patron-detail-body">
+                <div class="patron-detail-section">
+                    <h3>📖 Description</h3>
+                    <p>${escHtml(trust.description || 'A player trust formed by the party.')}</p>
+                </div>
+                
+                <div class="patron-detail-section">
+                    <h3>📊 Stats</h3>
+                    <div class="trust-stats-grid">
+                        <div class="trust-stat">
+                            <span class="stat-label">Asset Slots</span>
+                            <span class="stat-value">${trust.maxAssets || 2}</span>
+                        </div>
+                        <div class="trust-stat">
+                            <span class="stat-label">Max Asset Tier</span>
+                            <span class="stat-value">${trust.maxAssetTier || 'Standard'}</span>
+                        </div>
+                        <div class="trust-stat">
+                            <span class="stat-label">Obligation</span>
+                            <span class="stat-value">${trust.obligation || 0}/${trust.capacity || 4}</span>
+                        </div>
+                    </div>
+                </div>
+                
+                ${trust.assets && trust.assets.length > 0 ? `
+                <div class="patron-detail-section">
+                    <h3>📦 Assets (${trust.assets.length})</h3>
+                    <div class="asset-list">
+                        ${trust.assets.map(a => `
+                            <div class="asset-list-item" onclick="window.viewAsset('${a.id}')">
+                                <span class="asset-tier-badge">${a.tier || 'Minor'}</span>
+                                <span class="asset-name">${escHtml(a.name)}</span>
+                                <span class="asset-type">${escHtml(a.type || 'asset')}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                    <button class="btn btn-sm btn-primary" onclick="window.addAssetToTrust('${trust.id}')">➕ Add Asset</button>
+                </div>
+                ` : `
+                <div class="patron-detail-section">
+                    <p class="text-muted">No assets in this trust yet.</p>
+                    <button class="btn btn-sm btn-primary" onclick="window.addAssetToTrust('${trust.id}')">➕ Add Asset</button>
+                </div>
+                `}
+                
+                ${trust.followers && trust.followers.length > 0 ? `
+                <div class="patron-detail-section">
+                    <h3>👤 Followers (${trust.followers.length})</h3>
+                    <div class="follower-list">
+                        ${trust.followers.map(f => `
+                            <div class="follower-list-item">
+                                <span class="follower-name">${escHtml(f.name)}</span>
+                                <span class="follower-role">${escHtml(f.role || 'Follower')}</span>
+                                <span class="follower-cap">Cap ${f.cap || 1}</span>
+                                <span class="follower-state ${f.loyalty || 'Faithful'}">${f.loyalty || 'Faithful'}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                    <button class="btn btn-sm btn-primary" onclick="window.addFollowerToTrust('${trust.id}')">➕ Add Follower</button>
+                </div>
+                ` : `
+                <div class="patron-detail-section">
+                    <p class="text-muted">No followers in this trust yet.</p>
+                    <button class="btn btn-sm btn-primary" onclick="window.addFollowerToTrust('${trust.id}')">➕ Add Follower</button>
+                </div>
+                `}
+            </div>
+            
+            <div class="patron-detail-actions">
+                <button class="btn btn-primary" onclick="window.editTrust('${trust.id}')">✏️ Edit Trust</button>
+                <button class="btn btn-danger" onclick="window.deleteTrust('${trust.id}')">🗑️ Delete Trust</button>
+                <button class="btn btn-secondary" onclick="window.closePatronModal()">Close</button>
+            </div>
+        </div>
+    `;
+
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) closePatronModal();
+    });
+}
+
+function renderAssetDetail(assetId) {
+    // Find asset in any trust
+    let found = null;
+    let trustName = '';
+    for (const t of state.trusts) {
+        if (t.assets) {
+            const a = t.assets.find(asset => asset.id === assetId);
+            if (a) {
+                found = a;
+                trustName = t.name;
+                break;
+            }
+        }
+    }
+
+    if (!found) {
+        showToast('Asset not found', 'error');
+        return;
+    }
+
+    const modal = document.getElementById('asset-modal');
+    modal.style.display = 'block';
+    modal.innerHTML = `
+        <div class="modal-content asset-detail">
+            <button class="modal-close" onclick="window.closeAssetModal()">✕</button>
+            <div class="asset-detail-header">
+                <div class="asset-detail-icon">📦</div>
+                <div>
+                    <h2>${escHtml(found.name)}</h2>
+                    <div class="asset-detail-tier">${found.tier || 'Minor'} Asset · ${escHtml(found.type || 'asset')}</div>
+                </div>
+            </div>
+            
+            <div class="asset-detail-body">
+                <div class="asset-detail-section">
+                    <h3>📖 Description</h3>
+                    <p>${escHtml(found.description || 'No description available.')}</p>
+                </div>
+                
+                <div class="asset-detail-section">
+                    <h3>💰 Cost</h3>
+                    <p>${found.cost || 4} XP</p>
+                </div>
+                
+                <div class="asset-detail-section">
+                    <h3>🏛️ Belongs to</h3>
+                    <p>${escHtml(trustName)}</p>
+                </div>
+                
+                ${found.freeUse ? `
+                <div class="asset-detail-section">
+                    <h3>🔄 Free Use (Once per session)</h3>
+                    <p>${escHtml(found.freeUse)}</p>
+                </div>
+                ` : ''}
+                
+                ${found.sceneSurge ? `
+                <div class="asset-detail-section">
+                    <h3>⚡ Scene Surge (1 Boon)</h3>
+                    <p>${escHtml(found.sceneSurge)}</p>
+                </div>
+                ` : ''}
+            </div>
+            
+            <div class="asset-detail-actions">
+                <button class="btn btn-primary" onclick="window.editAsset('${found.id}')">✏️ Edit Asset</button>
+                <button class="btn btn-danger" onclick="window.deleteAsset('${found.id}')">🗑️ Delete Asset</button>
+                <button class="btn btn-secondary" onclick="window.closeAssetModal()">Close</button>
+            </div>
+        </div>
+    `;
+
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) closeAssetModal();
+    });
+}
+
+// ============================================================
+// MODAL CONTROLS
+// ============================================================
+
+window.closePatronModal = function() {
+    document.getElementById('patron-modal').style.display = 'none';
+};
+
+window.closeAssetModal = function() {
+    document.getElementById('asset-modal').style.display = 'none';
+};
+
+window.viewPatron = function(id) {
+    renderPatronDetail(id);
+};
+
+window.viewTerrestrial = function(id) {
+    renderTerrestrialDetail(id);
+};
+
+window.viewTrust = function(id) {
+    renderTrustDetail(id);
+};
+
+window.viewAsset = function(id) {
+    renderAssetDetail(id);
+};
+
+window.loadDefaultPatrons = function() {
+    loadDefaultPatrons();
+    refreshView();
+    showToast('Loaded default patrons', 'success');
+};
+
+// ============================================================
+// CRUD OPERATIONS - COSMIC PATRONS
+// ============================================================
+
+window.addCosmicPatron = function() {
+    const name = prompt('Enter patron name:');
+    if (!name) return;
+    const domain = prompt('Enter patron domain:') || 'Unknown';
+    const icon = prompt('Enter patron icon (emoji):') || '🌟';
+
+    state.cosmicPatrons.push({
+        id: 'patron-' + Date.now(),
+        name,
+        domain,
+        icon,
+        description: prompt('Enter description:') || 'A cosmic patron of the Amaranthine.',
+        rites: prompt('Enter rites (comma-separated):')?.split(',').map(s => s.trim()) || [],
+        rivals: prompt('Enter rivals (comma-separated):')?.split(',').map(s => s.trim()) || [],
+        sigil: prompt('Enter sigil description:') || 'Unknown',
+        corruption: prompt('Enter corruption effect:') || 'None',
+        source: 'local'
+    });
+    savePatronData();
+    refreshView();
+    showToast(`Added patron: ${name}`, 'success');
+};
+
+window.editPatron = function(id) {
+    const patron = state.cosmicPatrons.find(p => p.id === id);
+    if (!patron) return;
+    const name = prompt('Enter patron name:', patron.name);
+    if (!name) return;
+    patron.name = name;
+    patron.domain = prompt('Enter patron domain:', patron.domain) || patron.domain;
+    patron.icon = prompt('Enter patron icon:', patron.icon) || patron.icon;
+    patron.description = prompt('Enter description:', patron.description) || patron.description;
+    patron.sigil = prompt('Enter sigil:', patron.sigil) || patron.sigil;
+    patron.corruption = prompt('Enter corruption:', patron.corruption) || patron.corruption;
+    patron.source = 'local';
+    savePatronData();
+    refreshView();
+    closePatronModal();
+    showToast(`Updated patron: ${name}`, 'success');
+};
+
+window.deletePatron = function(id) {
+    const patron = state.cosmicPatrons.find(p => p.id === id);
+    if (!patron) return;
+    if (!confirm(`Delete patron "${patron.name}"?`)) return;
+    state.cosmicPatrons = state.cosmicPatrons.filter(p => p.id !== id);
+    savePatronData();
+    refreshView();
+    closePatronModal();
+    showToast(`Deleted patron: ${patron.name}`, 'info');
+};
+
+// ============================================================
+// CRUD OPERATIONS - TERRESTRIAL PATRONS
+// ============================================================
+
+window.addTerrestrialPatron = function() {
+    const name = prompt('Enter terrestrial patron name:');
+    if (!name) return;
+
+    state.terrestrialPatrons.push({
+        id: 'terr-' + Date.now(),
+        name,
+        type: prompt('Enter type (creditor/fence/sanctuary/military/tribal):') || 'patron',
+        tier: prompt('Enter tier (I-V):') || 'I',
+        description: prompt('Enter description:') || 'A terrestrial patron of the Amaranthine.',
+        location: prompt('Enter location:') || 'Unknown',
+        leverage: prompt('Enter leverage:') || 'None listed',
+        debtTrigger: prompt('Enter debt trigger:') || 'When Obligation fills, they call in a debt.',
+        quirk: prompt('Enter quirk:') || '',
+        assetSlots: parseInt(prompt('Enter asset slots:') || '2'),
+        maxAssetTier: prompt('Enter max asset tier (Minor/Standard/Major):') || 'Minor',
+        source: 'local'
+    });
+    savePatronData();
+    refreshView();
+    showToast(`Added terrestrial patron: ${name}`, 'success');
+};
+
+window.editTerrestrial = function(id) {
+    const patron = state.terrestrialPatrons.find(p => p.id === id);
+    if (!patron) return;
+    const name = prompt('Enter name:', patron.name);
+    if (!name) return;
+    patron.name = name;
+    patron.type = prompt('Enter type:', patron.type) || patron.type;
+    patron.tier = prompt('Enter tier:', patron.tier) || patron.tier;
+    patron.description = prompt('Enter description:', patron.description) || patron.description;
+    patron.location = prompt('Enter location:', patron.location) || patron.location;
+    patron.leverage = prompt('Enter leverage:', patron.leverage) || patron.leverage;
+    patron.debtTrigger = prompt('Enter debt trigger:', patron.debtTrigger) || patron.debtTrigger;
+    patron.quirk = prompt('Enter quirk:', patron.quirk) || patron.quirk;
+    patron.assetSlots = parseInt(prompt('Enter asset slots:', patron.assetSlots) || '2');
+    patron.maxAssetTier = prompt('Enter max asset tier:', patron.maxAssetTier) || patron.maxAssetTier;
+    patron.source = 'local';
+    savePatronData();
+    refreshView();
+    closePatronModal();
+    showToast(`Updated terrestrial patron: ${name}`, 'success');
+};
+
+window.deleteTerrestrial = function(id) {
+    const patron = state.terrestrialPatrons.find(p => p.id === id);
+    if (!patron) return;
+    if (!confirm(`Delete terrestrial patron "${patron.name}"?`)) return;
+    state.terrestrialPatrons = state.terrestrialPatrons.filter(p => p.id !== id);
+    savePatronData();
+    refreshView();
+    closePatronModal();
+    showToast(`Deleted terrestrial patron: ${patron.name}`, 'info');
+};
+
+// ============================================================
+// CRUD OPERATIONS - TRUSTS
+// ============================================================
+
+window.createTrust = function() {
+    const name = prompt('Enter trust name:');
+    if (!name) return;
+
+    state.trusts.push({
+        id: 'trust-' + Date.now(),
+        name,
+        icon: prompt('Enter icon (emoji):') || '🤝',
+        tier: prompt('Enter tier (I-III):') || 'I',
+        description: prompt('Enter description:') || 'A player trust formed by the party.',
+        maxAssets: parseInt(prompt('Enter max asset slots:') || '2'),
+        maxAssetTier: prompt('Enter max asset tier (Minor/Standard/Major):') || 'Standard',
+        assets: [],
+        followers: [],
+        obligation: 0,
+        capacity: parseInt(prompt('Enter obligation capacity (Spirit+Presence):') || '4'),
+        source: 'local'
+    });
+    savePatronData();
+    refreshView();
+    showToast(`Created trust: ${name}`, 'success');
+};
+
+window.editTrust = function(id) {
+    const trust = state.trusts.find(t => t.id === id);
+    if (!trust) return;
+    const name = prompt('Enter trust name:', trust.name);
+    if (!name) return;
+    trust.name = name;
+    trust.icon = prompt('Enter icon:', trust.icon) || trust.icon;
+    trust.tier = prompt('Enter tier:', trust.tier) || trust.tier;
+    trust.description = prompt('Enter description:', trust.description) || trust.description;
+    trust.maxAssets = parseInt(prompt('Enter max asset slots:', trust.maxAssets) || '2');
+    trust.maxAssetTier = prompt('Enter max asset tier:', trust.maxAssetTier) || trust.maxAssetTier;
+    trust.capacity = parseInt(prompt('Enter obligation capacity:', trust.capacity) || '4');
+    trust.source = 'local';
+    savePatronData();
+    refreshView();
+    closePatronModal();
+    showToast(`Updated trust: ${name}`, 'success');
+};
+
+window.deleteTrust = function(id) {
+    const trust = state.trusts.find(t => t.id === id);
+    if (!trust) return;
+    if (!confirm(`Delete trust "${trust.name}"? This will delete all assets and followers in it.`)) return;
+    state.trusts = state.trusts.filter(t => t.id !== id);
+    savePatronData();
+    refreshView();
+    closePatronModal();
+    showToast(`Deleted trust: ${trust.name}`, 'info');
+};
+
+// ============================================================
+// CRUD OPERATIONS - ASSETS & FOLLOWERS IN TRUSTS
+// ============================================================
+
+window.addAssetToTrust = function(trustId) {
+    const trust = state.trusts.find(t => t.id === trustId);
+    if (!trust) return;
+
+    if (!trust.assets) trust.assets = [];
+
+    const name = prompt('Enter asset name:');
+    if (!name) return;
+
+    trust.assets.push({
+        id: 'asset-' + Date.now(),
+        name,
+        type: prompt('Enter asset type (safehouse/network/library/workshop/contract/etc.):') || 'asset',
+        tier: prompt('Enter tier (Minor/Standard/Major):') || 'Minor',
+        description: prompt('Enter description:') || 'An asset of the trust.',
+        cost: parseInt(prompt('Enter XP cost:') || '4'),
+        freeUse: prompt('Enter Free Use benefit (once/session):') || 'None',
+        sceneSurge: prompt('Enter Scene Surge benefit (1 Boon):') || 'None'
+    });
+
+    if (trust.assets.length > (trust.maxAssets || 2)) {
+        showToast(`Warning: Trust now has ${trust.assets.length} assets, exceeding its capacity of ${trust.maxAssets || 2}.`, 'warning');
+    }
+
+    savePatronData();
+    refreshView();
+    closePatronModal();
+    showToast(`Added asset: ${name} to ${trust.name}`, 'success');
+};
+
+window.addFollowerToTrust = function(trustId) {
+    const trust = state.trusts.find(t => t.id === trustId);
+    if (!trust) return;
+
+    if (!trust.followers) trust.followers = [];
+
+    const name = prompt('Enter follower name:');
+    if (!name) return;
+
+    trust.followers.push({
+        id: 'follower-' + Date.now(),
+        name,
+        role: prompt('Enter role:') || 'Follower',
+        cap: parseInt(prompt('Enter Cap (1-5):') || '1'),
+        description: prompt('Enter description:') || 'A follower of the trust.',
+        loyalty: prompt('Enter loyalty (Faithful/Strained/Broken):') || 'Faithful',
+        fitness: prompt('Enter fitness (Ready/Hurt/Down):') || 'Ready'
+    });
+
+    savePatronData();
+    refreshView();
+    closePatronModal();
+    showToast(`Added follower: ${name} to ${trust.name}`, 'success');
+};
+
+window.editAsset = function(id) {
+    let found = null;
+    let trust = null;
+    for (const t of state.trusts) {
+        if (t.assets) {
+            const a = t.assets.find(asset => asset.id === id);
+            if (a) {
+                found = a;
+                trust = t;
+                break;
+            }
+        }
+    }
+    if (!found || !trust) {
+        showToast('Asset not found', 'error');
+        return;
+    }
+
+    const name = prompt('Enter asset name:', found.name);
+    if (!name) return;
+    found.name = name;
+    found.type = prompt('Enter type:', found.type) || found.type;
+    found.tier = prompt('Enter tier:', found.tier) || found.tier;
+    found.description = prompt('Enter description:', found.description) || found.description;
+    found.cost = parseInt(prompt('Enter XP cost:', found.cost) || '4');
+    savePatronData();
+    refreshView();
+    closeAssetModal();
+    showToast(`Updated asset: ${name}`, 'success');
+};
+
+window.deleteAsset = function(id) {
+    let found = null;
+    let trust = null;
+    for (const t of state.trusts) {
+        if (t.assets) {
+            const a = t.assets.find(asset => asset.id === id);
+            if (a) {
+                found = a;
+                trust = t;
+                break;
+            }
+        }
+    }
+    if (!found || !trust) {
+        showToast('Asset not found', 'error');
+        return;
+    }
+    if (!confirm(`Delete asset "${found.name}" from ${trust.name}?`)) return;
+    trust.assets = trust.assets.filter(a => a.id !== id);
+    savePatronData();
+    refreshView();
+    closeAssetModal();
+    showToast(`Deleted asset: ${found.name}`, 'info');
+};
+
+// ============================================================
+// VIEW MANAGEMENT
+// ============================================================
+
+function refreshView() {
+    const container = document.getElementById('patrons-view-container');
+    if (container) {
+        container.innerHTML = renderView(state.viewMode);
+    }
+    attachEvents();
+}
+
+window.refreshPatrons = function() {
+    loadPatronData();
+    refreshView();
+    showToast('Patrons refreshed', 'success');
+};
+
+// ============================================================
+// EVENT LISTENERS
+// ============================================================
+
+export function attachEvents() {
+    document.querySelectorAll('.patrons-tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+            document.querySelectorAll('.patrons-tab').forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+            const view = tab.dataset.view;
+            const container = document.getElementById('patrons-view-container');
+            if (container) {
+                container.innerHTML = renderView(view);
+                attachEvents();
+            }
+        });
+    });
+}
+
+// ============================================================
+// LIFECYCLE METHODS
+// ============================================================
+
+export function onActivate() {
+    console.log('[Patrons] Activated');
+    if (!state.dataLoaded) {
+        loadPatronData();
+    }
+    refreshView();
+}
+
+export function onDeactivate() {
+    console.log('[Patrons] Deactivated');
+}
+
+export function refresh() {
+    loadPatronData();
+    refreshView();
+}
+
+export function destroy() {
+    container = null;
+}
+
+// ============================================================
+// EXPORTS
+// ============================================================
+
+export default {
+    render,
+    destroy,
+    onActivate,
+    onDeactivate,
+    refresh,
+    loadPatronData,
+    loadRemotePatrons,
+    loadDefaultPatrons,
+    savePatronData
+};

@@ -17,23 +17,24 @@ const FEATURES = {
     dashboard: () => import('./features/dashboard/index.js'),
     characters: () => import('./features/characters/index.js'),
     builder: () => import('./features/builder/index.js'),
-    roller: () => import('./features/dice/index.js'),
+    dice: () => import('./features/dice/index.js'),
     timers: () => import('./features/timers/index.js'),
     encounters: () => import('./features/encounters/index.js'),
+    factions: () => import('./features/factions/index.js'),
     vtt: () => import('./features/vtt/index.js'),
     docs: () => import('./features/docs/index.js'),
     search: () => import('./features/search/index.js'),
     wiki: () => import('./features/wiki/index.js'),
-    // REPLACED: consequences and regional with unified decks module
     decks: () => import('./features/decks/index.js'),
-    // Keep these for backward compatibility (will redirect in router)
+    patrons: () => import('./features/patrons/index.js'),
     settings: () => import('./features/settings/index.js')
 };
 
 // Route redirects for backward compatibility
 const ROUTE_REDIRECTS = {
     'consequences': 'decks',
-    'regional': 'decks'
+    'regional': 'decks',
+    'roller': 'dice'
 };
 
 // Check if we're in test mode
@@ -323,13 +324,36 @@ async function init() {
         import('./features/decks/index.js')
             .then(module => {
                 console.log('🃏 Decks module loaded');
-                // Optionally preload region data
                 if (module.loadManifest) {
                     module.loadManifest().catch(() => {});
                 }
             })
             .catch(err => {
                 console.warn('Failed to preload decks module:', err);
+            });
+        
+        // Preload patrons module for faster loading
+        import('./features/patrons/index.js')
+            .then(module => {
+                console.log('👁️ Patrons module loaded');
+                if (module.loadPatronData) {
+                    module.loadPatronData();
+                }
+            })
+            .catch(err => {
+                console.warn('Failed to preload patrons module:', err);
+            });
+        
+        // Preload factions module for faster loading
+        import('./features/factions/index.js')
+            .then(module => {
+                console.log('🏛️ Factions module loaded');
+                if (module.loadFactionData) {
+                    module.loadFactionData();
+                }
+            })
+            .catch(err => {
+                console.warn('Failed to preload factions module:', err);
             });
         
         // Load remote wiki in background
@@ -361,7 +385,7 @@ async function init() {
  * Set up navigation event listeners
  */
 function setupNavigation() {
-    const navButtons = document.querySelectorAll('.sidebar-nav button[data-tab]');
+    const navButtons = document.querySelectorAll('.sidebar-nav .nav-item[data-tab]');
     navButtons.forEach(button => {
         button.addEventListener('click', () => {
             const tab = button.dataset.tab;
@@ -679,7 +703,7 @@ function renderSyncUI() {
  * Set up settings tab hook to re-render sync UI when settings tab is clicked
  */
 function setupSettingsTabHook() {
-    const settingsBtn = document.querySelector('.sidebar-nav button[data-tab="settings"]');
+    const settingsBtn = document.querySelector('.sidebar-nav .nav-item[data-tab="settings"]');
     if (settingsBtn) {
         settingsBtn.addEventListener('click', () => {
             // Re-render sync UI when settings tab is clicked
@@ -816,7 +840,7 @@ function updatePresenceUI(clients) {
  * Set up modal close buttons
  */
 function setupModals() {
-    document.querySelectorAll('.modal .close').forEach(btn => {
+    document.querySelectorAll('.modal .modal-close').forEach(btn => {
         btn.addEventListener('click', () => {
             const overlay = btn.closest('.modal-overlay');
             if (overlay) overlay.classList.remove('open');

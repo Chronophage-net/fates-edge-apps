@@ -175,10 +175,13 @@ jobs:
             echo "⚠️ No wiki.json found in misc/ or data/"
           fi
           
-          # === REGION FILES — go in /regions/ directory ===
+          # ============================================================
+          # REGION FILES — go in /regions/ directory
+          # Used by the Decks module: /regions/manifest.json + /regions/{slug}.json
+          # ============================================================
           mkdir -p pages-site/regions
           
-          # acasia.json
+          # Copy acasia.json from misc
           if [ -f misc/acasia.json ]; then
             cp misc/acasia.json pages-site/regions/acasia.json
             echo "✅ Copied misc/acasia.json → pages-site/regions/acasia.json"
@@ -189,32 +192,7 @@ jobs:
             echo "⚠️ No acasia.json found"
           fi
           
-          # the_traveler.json
-          if [ -f misc/the_traveler.json ]; then
-            cp misc/the_traveler.json pages-site/regions/the_traveler.json
-            echo "✅ Copied misc/the_traveler.json → pages-site/regions/the_traveler.json"
-          elif [ -f ttrpg/utilities/javascript/data/regions/the_traveler.json ]; then
-            cp ttrpg/utilities/javascript/data/regions/the_traveler.json pages-site/regions/the_traveler.json
-            echo "✅ Copied ttrpg/utilities/javascript/data/regions/the_traveler.json → pages-site/regions/the_traveler.json"
-          else
-            echo "⚠️ No the_traveler.json found"
-          fi
-          
-          # Generate manifest.json from the region files we have
-          echo "📝 Generating manifest.json..."
-          MANIFEST='[]'
-          if [ -f pages-site/regions/acasia.json ]; then
-            MANIFEST='["acasia"]'
-            if [ -f pages-site/regions/the_traveler.json ]; then
-              MANIFEST='["acasia", "the_traveler"]'
-            fi
-          elif [ -f pages-site/regions/the_traveler.json ]; then
-            MANIFEST='["the_traveler"]'
-          fi
-          echo "$MANIFEST" > pages-site/regions/manifest.json
-          echo "✅ Generated manifest.json: $MANIFEST"
-          
-          # Also copy region files from the standard data/regions directory if they exist
+          # Copy any additional region files from standard location
           if [ -d ttrpg/utilities/javascript/data/regions ]; then
             echo "📁 Checking standard data/regions directory..."
             find ttrpg/utilities/javascript/data/regions -name "*.json" ! -name "manifest.json" | while read -r file; do
@@ -224,46 +202,121 @@ jobs:
                 echo "  ✅ Copied $filename from standard location"
               fi
             done
-            if [ -f ttrpg/utilities/javascript/data/regions/manifest.json ] && [ ! -f pages-site/regions/manifest.json ]; then
-              cp ttrpg/utilities/javascript/data/regions/manifest.json pages-site/regions/manifest.json
-              echo "✅ Copied manifest.json from standard location"
+          fi
+          
+          # === GENERATE REGION MANIFEST ===
+          echo "📝 Generating region manifest.json..."
+          REGION_MANIFEST="["
+          first=true
+          for file in pages-site/regions/*.json; do
+            if [ -f "$file" ] && [ "$(basename "$file")" != "manifest.json" ]; then
+              name=$(basename "$file" .json)
+              if [ "$first" = true ]; then
+                REGION_MANIFEST="${REGION_MANIFEST}\"${name}\""
+                first=false
+              else
+                REGION_MANIFEST="${REGION_MANIFEST}, \"${name}\""
+              fi
+            fi
+          done
+          REGION_MANIFEST="${REGION_MANIFEST}]"
+          
+          if [ "$REGION_MANIFEST" = "[]" ]; then
+            if [ -f pages-site/regions/acasia.json ]; then
+              REGION_MANIFEST='["acasia"]'
+            else
+              REGION_MANIFEST='[]'
             fi
           fi
           
-          # === DATA DIRECTORY (for other JSON files) ===
-          mkdir -p pages-site/data
-          if [ -f misc/wiki.json ]; then
-            cp misc/wiki.json pages-site/data/wiki.json
-            echo "✅ Copied wiki.json to pages-site/data/wiki.json (backup location)"
-          fi
+          echo "$REGION_MANIFEST" > pages-site/regions/manifest.json
+          echo "✅ Generated region manifest.json: $REGION_MANIFEST"
           
-          if [ -f misc/acasia.json ]; then
-            cp misc/acasia.json pages-site/data/acasia.json
-            echo "✅ Copied acasia.json to pages-site/data/acasia.json (backup location)"
-          fi
+          # ============================================================
+          # PATRON FILES — go in /data/patrons/ directory
+          # Used by the Patrons module: /data/patrons/manifest.json + /data/patrons/{id}.json
+          # ============================================================
+          mkdir -p pages-site/data/patrons
           
+          # Copy the_traveler.json from misc
           if [ -f misc/the_traveler.json ]; then
-            cp misc/the_traveler.json pages-site/data/the_traveler.json
-            echo "✅ Copied the_traveler.json to pages-site/data/the_traveler.json (backup location)"
+            cp misc/the_traveler.json pages-site/data/patrons/traveler.json
+            echo "✅ Copied misc/the_traveler.json → pages-site/data/patrons/traveler.json"
+          elif [ -f ttrpg/utilities/javascript/data/patrons/traveler.json ]; then
+            cp ttrpg/utilities/javascript/data/patrons/traveler.json pages-site/data/patrons/traveler.json
+            echo "✅ Copied ttrpg/utilities/javascript/data/patrons/traveler.json → pages-site/data/patrons/traveler.json"
+          else
+            echo "⚠️ No the_traveler.json found in misc/ or data/patrons/"
           fi
           
-          # === PATRON DATA ===
-          # Copy patron data if it exists
-          if [ -f ttrpg/utilities/javascript/data/patrons/manifest.json ]; then
-            mkdir -p pages-site/data/patrons
-            cp ttrpg/utilities/javascript/data/patrons/*.json pages-site/data/patrons/ 2>/dev/null || true
-            echo "✅ Copied patron data"
+          # Copy any additional patron files from standard location
+          if [ -d ttrpg/utilities/javascript/data/patrons ]; then
+            echo "📁 Checking standard data/patrons directory..."
+            find ttrpg/utilities/javascript/data/patrons -name "*.json" ! -name "manifest.json" | while read -r file; do
+              filename=$(basename "$file")
+              if [ ! -f "pages-site/data/patrons/$filename" ]; then
+                cp "$file" "pages-site/data/patrons/$filename"
+                echo "  ✅ Copied $filename from standard location"
+              fi
+            done
           fi
           
-          # === FACTION DATA ===
-          # Copy faction data if it exists
-          if [ -f ttrpg/utilities/javascript/data/factions/manifest.json ]; then
+          # === GENERATE PATRON MANIFEST ===
+          echo "📝 Generating patron manifest.json..."
+          PATRON_MANIFEST="["
+          first=true
+          for file in pages-site/data/patrons/*.json; do
+            if [ -f "$file" ] && [ "$(basename "$file")" != "manifest.json" ]; then
+              name=$(basename "$file" .json)
+              if [ "$first" = true ]; then
+                PATRON_MANIFEST="${PATRON_MANIFEST}\"${name}\""
+                first=false
+              else
+                PATRON_MANIFEST="${PATRON_MANIFEST}, \"${name}\""
+              fi
+            fi
+          done
+          PATRON_MANIFEST="${PATRON_MANIFEST}]"
+          
+          if [ "$PATRON_MANIFEST" = "[]" ]; then
+            if [ -f pages-site/data/patrons/traveler.json ]; then
+              PATRON_MANIFEST='["traveler"]'
+            else
+              PATRON_MANIFEST='[]'
+            fi
+          fi
+          
+          echo "$PATRON_MANIFEST" > pages-site/data/patrons/manifest.json
+          echo "✅ Generated patron manifest.json: $PATRON_MANIFEST"
+          
+          # ============================================================
+          # BACKUP COPIES
+          # ============================================================
+          mkdir -p pages-site/data
+          mkdir -p pages-site/data/regions
+          
+          # Copy region files to data/regions as backup
+          if [ -d pages-site/regions ]; then
+            cp pages-site/regions/*.json pages-site/data/regions/ 2>/dev/null || true
+            echo "✅ Copied regions to data/regions/ as backup"
+          fi
+          
+          # Copy wiki.json to data/ as backup
+          if [ -f pages-site/wiki.json ]; then
+            cp pages-site/wiki.json pages-site/data/wiki.json
+            echo "✅ Copied wiki.json to data/ as backup"
+          fi
+          
+          # === FACTION DATA (if it exists) ===
+          if [ -d ttrpg/utilities/javascript/data/factions ]; then
             mkdir -p pages-site/data/factions
             cp ttrpg/utilities/javascript/data/factions/*.json pages-site/data/factions/ 2>/dev/null || true
             echo "✅ Copied faction data"
           fi
           
-          # List the contents for debugging
+          # ============================================================
+          # DEBUG OUTPUT
+          # ============================================================
           echo ""
           echo "📂 Site root contents:"
           ls -la pages-site/ | head -20
@@ -273,6 +326,12 @@ jobs:
           echo ""
           echo "📂 Data directory contents:"
           ls -la pages-site/data/ || echo "  (empty)"
+          echo ""
+          echo "📂 Data/regions directory contents:"
+          ls -la pages-site/data/regions/ || echo "  (empty)"
+          echo ""
+          echo "📂 Data/patrons directory contents:"
+          ls -la pages-site/data/patrons/ || echo "  (empty)"
 
       - name: Upload Pages artifact
         if: ${{ env.SKIP_JOB != 'true' && matrix.name == 'web-client' }}
