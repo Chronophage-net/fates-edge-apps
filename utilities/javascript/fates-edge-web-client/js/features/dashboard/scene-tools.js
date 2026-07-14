@@ -20,7 +20,26 @@ import { showToast } from '../../components/Toast.js';
 
 let container = null;
 let activeTab = 'scene';
-let moduleCache = {};
+let moduleCache = {};  // ✅ Single declaration
+let whiteboardData = {
+    notes: [],
+    drawings: [],
+    stickyNotes: []
+};
+let kanbanData = {
+    columns: {
+        todo: { title: '📋 To Do', items: [] },
+        doing: { title: '🔄 Doing', items: [] },
+        done: { title: '✅ Done', items: [] },
+        blocked: { title: '🚫 Blocked', items: [] }
+    }
+};
+let campaignState = {
+    activeThreats: [],
+    opportunities: [],
+    campaignTimers: [],
+    notes: ''
+};
 
 // ============================================================
 // LOAD/SAVE
@@ -29,12 +48,19 @@ let moduleCache = {};
 function loadCampaignData() {
     const saved = getState();
     if (saved.campaign) {
-        // Individual modules handle their own data loading
+        whiteboardData = saved.campaign.whiteboard || { notes: [], drawings: [], stickyNotes: [] };
+        kanbanData = saved.campaign.kanban || { columns: { todo: { title: '📋 To Do', items: [] }, doing: { title: '🔄 Doing', items: [] }, done: { title: '✅ Done', items: [] }, blocked: { title: '🚫 Blocked', items: [] } } };
+        campaignState = saved.campaign.state || { activeThreats: [], opportunities: [], campaignTimers: [], notes: '' };
     }
 }
 
 function saveCampaignData() {
-    // Individual modules save their own data
+    const saved = getState();
+    if (!saved.campaign) saved.campaign = {};
+    saved.campaign.whiteboard = whiteboardData;
+    saved.campaign.kanban = kanbanData;
+    saved.campaign.state = campaignState;
+    saveState();
 }
 
 // ============================================================
@@ -47,13 +73,11 @@ export function render(el) {
 
     container.innerHTML = `
         <div class="scene-tools-modern-layout">
-            <!-- Header -->
             <header class="scene-tools-header">
                 <h1 class="scene-tools-title">🎯 Scene Tools</h1>
                 <p class="scene-tools-subtitle">Manage scenes, campaign tracking, whiteboard, and Kanban board.</p>
             </header>
 
-            <!-- Navigation Tabs -->
             <div class="scene-tools-tabs">
                 <button class="scene-tab active" data-view="scene">🎬 Scene</button>
                 <button class="scene-tab" data-view="kanban">📋 Kanban</button>
@@ -62,7 +86,6 @@ export function render(el) {
                 <button class="scene-tab" data-view="consequences">🃏 Consequences</button>
             </div>
 
-            <!-- View Container -->
             <div id="scene-view-container" class="scene-view-container">
                 ${renderView('scene')}
             </div>
@@ -96,7 +119,6 @@ function renderSceneView() {
 
     return `
         <div class="scene-view">
-            <!-- Quick Actions -->
             <div class="panel">
                 <h3 class="panel-title">⚡ Quick Actions</h3>
                 <div class="quick-actions-grid">
@@ -138,7 +160,6 @@ function renderSceneView() {
                 </div>
             </div>
 
-            <!-- Active Timers -->
             <div class="panel">
                 <div class="panel-header">
                     <h3 class="panel-title">⏱️ Active Timers</h3>
@@ -160,7 +181,6 @@ function renderSceneView() {
                 `}
             </div>
 
-            <!-- Active Encounters -->
             <div class="panel">
                 <div class="panel-header">
                     <h3 class="panel-title">⚔️ Active Encounters</h3>
@@ -179,7 +199,6 @@ function renderSceneView() {
                 `}
             </div>
 
-            <!-- Character Summary -->
             <div class="panel">
                 <h3 class="panel-title">👤 Characters</h3>
                 <div class="character-summary-grid">
@@ -198,17 +217,41 @@ function renderSceneView() {
 }
 
 // ============================================================
-// KANBAN VIEW - Loads the Kanban module
+// KANBAN VIEW
 // ============================================================
 
 function renderKanbanView() {
+    const columns = kanbanData.columns;
+    
     return `
-        <div class="kanban-loader">
+        <div class="kanban-view">
             <div class="panel">
-                <h3 class="panel-title">📋 Loading Kanban Board...</h3>
-                <div class="text-muted" style="text-align:center;padding:2rem;">
-                    <div style="font-size:2rem;margin-bottom:0.5rem;">⏳</div>
-                    <p>Loading campaign board...</p>
+                <div class="panel-header">
+                    <h3 class="panel-title">📋 Campaign Kanban</h3>
+                    <button class="btn btn-sm btn-primary" onclick="window.addKanbanItem()">+ Add Item</button>
+                </div>
+                <div class="kanban-board">
+                    ${Object.entries(columns).map(([key, col]) => `
+                        <div class="kanban-column" data-column="${key}">
+                            <div class="kanban-column-header">${col.title}</div>
+                            <div class="kanban-column-items">
+                                ${col.items.length === 0 ? '<p class="text-muted" style="font-size:0.8rem;padding:0.5rem;">Empty</p>' : ''}
+                                ${col.items.map((item, idx) => `
+                                    <div class="kanban-item" data-column="${key}" data-index="${idx}">
+                                        <div class="kanban-item-title">${escHtml(item.title)}</div>
+                                        ${item.description ? `<div class="kanban-item-desc">${escHtml(item.description)}</div>` : ''}
+                                        <div class="kanban-item-actions">
+                                            ${item.timer ? `<span class="kanban-timer">⏱️ ${item.timer}</span>` : ''}
+                                            ${item.encounter ? `<span class="kanban-encounter">⚔️ ${item.encounter}</span>` : ''}
+                                            <button class="btn btn-xs btn-ghost" onclick="window.moveKanbanItem('${key}', ${idx}, -1)">←</button>
+                                            <button class="btn btn-xs btn-ghost" onclick="window.moveKanbanItem('${key}', ${idx}, 1)">→</button>
+                                            <button class="btn btn-xs btn-danger" onclick="window.removeKanbanItem('${key}', ${idx})">✕</button>
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    `).join('')}
                 </div>
             </div>
         </div>
@@ -216,7 +259,7 @@ function renderKanbanView() {
 }
 
 // ============================================================
-// WHITEBOARD VIEW - Loads the Whiteboard module
+// WHITEBOARD VIEW
 // ============================================================
 
 function renderWhiteboardView() {
@@ -238,7 +281,6 @@ function renderWhiteboardView() {
 // ============================================================
 
 function renderCampaignView() {
-    // Load from state
     const saved = getState();
     const campaign = saved.campaign?.state || { activeThreats: [], opportunities: [], campaignTimers: [], notes: '' };
     const threats = campaign.activeThreats || [];
@@ -247,7 +289,6 @@ function renderCampaignView() {
 
     return `
         <div class="campaign-view">
-            <!-- Campaign Notes -->
             <div class="panel">
                 <h3 class="panel-title">📝 Campaign Notes</h3>
                 <textarea id="campaign-notes" rows="4" style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:0.75rem;color:var(--text);font-family:var(--font);">
@@ -256,7 +297,6 @@ function renderCampaignView() {
                 <button class="btn btn-sm btn-primary mt-1" onclick="window.saveCampaignNotes()">💾 Save Notes</button>
             </div>
 
-            <!-- Active Threats -->
             <div class="panel">
                 <div class="panel-header">
                     <h3 class="panel-title">⚠️ Active Threats</h3>
@@ -279,7 +319,6 @@ function renderCampaignView() {
                 `}
             </div>
 
-            <!-- Opportunities -->
             <div class="panel">
                 <div class="panel-header">
                     <h3 class="panel-title">🌟 Opportunities</h3>
@@ -298,7 +337,6 @@ function renderCampaignView() {
                 `}
             </div>
 
-            <!-- Campaign Timers -->
             <div class="panel">
                 <div class="panel-header">
                     <h3 class="panel-title">⏱️ Campaign Timers</h3>
@@ -383,7 +421,7 @@ function renderConsequencesView() {
 // MODULE LOADERS
 // ============================================================
 
-let moduleCache = {};
+// ✅ Only ONE declaration of moduleCache (at top of file)
 
 async function loadKanbanModule(containerEl) {
     try {
@@ -448,25 +486,9 @@ window.loadWhiteboard = function() {
 // WINDOW EXPOSURES (for onclick handlers)
 // ============================================================
 
-// Scene actions
 window.sceneEndTrimBoons = sceneEndTrimBoons;
 window.resetAllTimers = resetAllTimers;
 window.newSession = newSession;
-
-// Loaders
-window.loadKanban = function() {
-    const containerEl = document.getElementById('scene-view-container');
-    if (containerEl) {
-        loadKanbanModule(containerEl);
-    }
-};
-
-window.loadWhiteboard = function() {
-    const containerEl = document.getElementById('scene-view-container');
-    if (containerEl) {
-        loadWhiteboardModule(containerEl);
-    }
-};
 
 window.openKanban = function() {
     const tab = document.querySelector('.scene-tab[data-view="kanban"]');
@@ -841,7 +863,6 @@ export function attachEvents() {
                 await loadWhiteboardModule(containerEl);
             } else {
                 containerEl.innerHTML = renderView(view);
-                // Re-attach events for the new content
                 attachEvents();
             }
         });

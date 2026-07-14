@@ -557,6 +557,12 @@ function updateSpreadDescription() {
 // DRAW
 // ============================================================
 
+// In decks/index.js, add this function at the top level:
+
+let lastDrawResults = null;
+
+// Then modify drawConsequence to store results:
+
 export async function drawConsequence() {
     if (!selectedRegion) {
         showToast('Please select a region first.', 'error');
@@ -565,7 +571,7 @@ export async function drawConsequence() {
     const data = await fetchRegionData(selectedRegion);
     if (!data) return;
 
-    const type = document.getElementById('deck-draw-type').value;
+    const type = document.getElementById('deck-draw-type')?.value || '1';
     let cards = [];
     let isCrown = false;
 
@@ -580,7 +586,7 @@ export async function drawConsequence() {
             cards.push(deck.pop());
         }
     } else {
-        const count = parseInt(type, 10);
+        const count = parseInt(type, 10) || 1;
         if (deck.length < count) {
             showToast('Deck running low! Reshuffling...', 'warning');
             buildDeck();
@@ -649,6 +655,16 @@ export async function drawConsequence() {
         timerEl.style.display = 'none';
     }
 
+    // Store results for later display
+    lastDrawResults = {
+        cards: cards,
+        synthesis: synthesis,
+        isCrown: isCrown,
+        details: details,
+        timer: timer,
+        type: type
+    };
+
     // Add to history
     const cardStr = cards.map(c => c.isJoker ? `🃏${c.rank}` : `${c.rankName} of ${c.suitName}`).join(' | ');
     deckHistory.push({
@@ -662,7 +678,9 @@ export async function drawConsequence() {
     // Broadcast via WebSocket
     broadcastDraw(cards, type, selectedRegion, synthesis);
     
-    showToast(`🃏 Drew ${cards.length} card${cards.length > 1 ? 's' : ''}`, 'success');
+    // Enhanced toast with card names
+    const cardNames = cards.map(c => c.isJoker ? '🃏 Joker' : `${c.rankName} of ${c.suitName}`).join(', ');
+    showToast(`🃏 Drew ${cards.length} card${cards.length > 1 ? 's' : ''}: ${cardNames}`, 'success');
 }
 
 function synthesiseConsequence(cards, regionData) {
