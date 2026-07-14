@@ -1,851 +1,1310 @@
+// features/decks/index.js
 /**
- * Dashboard feature module - Comprehensive Campaign Dashboard
- * 
- * Integrates: Characters, Timers, Encounters, Factions, Patrons, 
- * Followers, Assets, Scene Tools, VTT, and Campaign Status
+ * Decks feature - Deck of Consequences and Crown Spread
+ * Supports single draw, multiple draw, and Crown Spread (4+1 wildcard).
+ * Loads region data dynamically from /regions/.
+ * Supports WebSocket sync for multiplayer draws.
  */
 
-import { getState, saveState } from '../../core/state.js';
-import { escHtml } from '../../core/utils.js';
+import { shuffleArray } from '../../core/utils.js';
 import { showToast } from '../../components/Toast.js';
-import { getSelectedRegion, getRegionNames, quickDraw, quickCrownSpread, setSelectedRegion, onRegionChange } from '../decks/index.js';
+import { getState, addTimer } from '../../core/state.js';
+
+// ============================================================
+// CONSTANTS
+// ============================================================
+
+const SUITS = ['hearts', 'spades', 'clubs', 'diamonds'];
+const RANKS = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
+const SUIT_SYMBOLS = { hearts: '♥', spades: '♠', clubs: '♣', diamonds: '♦' };
+const SUIT_COLORS = { hearts: '#c0392b', spades: '#2c3e50', clubs: '#27ae60', diamonds: '#2980b9' };
+const SUIT_NAMES = { hearts: 'Hearts', spades: 'Spades', clubs: 'Clubs', diamonds: 'Diamonds' };
+const RANK_NAMES = { 
+    'A': 'Ace', '2': 'Two', '3': 'Three', '4': 'Four', '5': 'Five',
+    '6': 'Six', '7': 'Seven', '8': 'Eight', '9': 'Nine', '10': 'Ten',
+    'J': 'Jack', 'Q': 'Queen', 'K': 'King'
+};
+
+const POKER_RANK = { 'A': 14, 'K': 13, 'Q': 12, 'J': 11, '10': 10, '9': 9, '8': 8, '7': 7, '6': 6, '5': 5, '4': 4, '3': 3, '2': 2 };
+const SUIT_ORDER = { 'spades': 4, 'hearts': 3, 'diamonds': 2, 'clubs': 1 };
+
+// Generic twist table for wildcard (extra card)
+const DEFAULT_TWISTS = [
+    "A sudden storm or environmental shift changes the scene.",
+    "An unexpected ally appears with conflicting motives.",
+    "A minor curse or blessing from a Patron alters the odds.",
+    "A forgotten debt is called in at the worst moment.",
+    "The ground beneath you gives way—literal or figurative.",
+    "A piece of evidence surfaces that reframes everything.",
+    "A rival's plan backfires, creating chaos for everyone.",
+    "A moment of clarity reveals a hidden truth.",
+];
+
+// Crown Spread positions with interpretive meaning
+const CROWN_POSITIONS = [
+    { 
+        key: 'root', 
+        label: 'Root', 
+        icon: '🌱', 
+        desc: 'The underlying tension or theme of the situation.',
+        interpretive: 'What has been growing beneath the surface? What unresolved debt, hidden grudge, or quiet truth has brought you to this moment?'
+    },
+    { 
+        key: 'crest', 
+        label: 'Crest', 
+        icon: '🏔️', 
+        desc: 'A key faction, patron, or influence that will rise.',
+        interpretive: 'What power is gathering strength? Who or what will demand your attention—and what will they ask of you?'
+    },
+    { 
+        key: 'crown', 
+        label: 'Crown', 
+        icon: '👑', 
+        desc: 'The climax image or major confrontation.',
+        interpretive: 'What is the shape of the storm that awaits? What must you face, and what will it cost to meet it?'
+    },
+    { 
+        key: 'left', 
+        label: 'Left Hand', 
+        icon: '🤝', 
+        desc: 'A bond, ally, or relationship that anchors play.',
+        interpretive: 'Who stands with you? What connection will be tested—and what will it take to keep it whole?'
+    },
+];
+
+// ============================================================
+// STATE
+// ============================================================
 
 let container = null;
-let refreshInterval = null;
+let deck = [];
+let deckHistory = [];
+let regionData = null;
+let regionNames = [];
+let selectedRegion = null;
+let cardOffset = Math.floor(Math.random() * 1000);
+let isInitialized = false;
+let isSyncing = false;
+let regionChangeCallbacks = [];
+
+// ============================================================
+// HELPERS
+// ============================================================
+
+function getRegionSlug(name) {
+    return name.toLowerCase().replace(/ /g, '_');
+}
+
+function getCardMeaningFromRegion(suit, rank, regionData) {
+    const suitKey = suit;
+    const arr = regionData[suitKey];
+    if (!arr || arr.length === 0) {
+        return `A complication of ${suit} arises.`;
+    }
+    const seed = suit + rank + cardOffset;
+    let hash = 0;
+    for (let i = 0; i < seed.length; i++) {
+        hash = ((hash << 5) - hash) + seed.charCodeAt(i);
+        hash = hash & hash;
+    }
+    const index = Math.abs(hash) % arr.length;
+    return arr[index];
+}
+
+function getWildcardMeaning(card, regionData) {
+    const twists = DEFAULT_TWISTS;
+    const seed = (card.suit || 'joker') + (card.rank || '') + cardOffset + 999;
+    let hash = 0;
+    for (let i = 0; i < seed.length; i++) {
+        hash = ((hash << 5) - hash) + seed.charCodeAt(i);
+        hash = hash & hash;
+    }
+    const idx = Math.abs(hash) % twists.length;
+    const cardName = card.isJoker ? 'Joker' : `${card.rankName} of ${card.suitName}`;
+    return `✨ Twist (${cardName}): ${twists[idx]}`;
+}
+
+// ============================================================
+// WEBSOCKET SYNC
+// ============================================================
+
+async function getSyncManager() {
+    try {
+        const module = await import('../../core/sync/index.js');
+        return module.syncManager;
+    } catch {
+        return null;
+    }
+}
+
+function broadcastDraw(cards, type, region, synthesis) {
+    getSyncManager().then(syncManager => {
+        if (syncManager && syncManager.isConnected && syncManager.send) {
+            const cardData = cards.map(c => ({
+                suit: c.suit,
+                rank: c.rank,
+                symbol: c.symbol,
+                rankName: c.rankName,
+                suitName: c.suitName,
+                isJoker: c.isJoker || false
+            }));
+            
+            syncManager.send({
+                type: 'deck_draw',
+                action: 'draw',
+                cards: cardData,
+                drawType: type,
+                region: region,
+                synthesis: synthesis,
+                timestamp: Date.now()
+            });
+            console.log('📡 Broadcasted deck draw via WebSocket');
+        }
+    }).catch(() => {});
+}
+
+function broadcastReset() {
+    getSyncManager().then(syncManager => {
+        if (syncManager && syncManager.isConnected && syncManager.send) {
+            syncManager.send({
+                type: 'deck_draw',
+                action: 'reset',
+                timestamp: Date.now()
+            });
+            console.log('📡 Broadcasted deck reset via WebSocket');
+        }
+    }).catch(() => {});
+}
+
+// ============================================================
+// CROWN SPREAD INTERPRETATION
+// ============================================================
+
+function interpretCrownCard(card, position, regionData) {
+    if (card.isJoker) {
+        return {
+            title: '🃏 Joker — The Wildcard',
+            description: 'The unexpected. The impossible. A force that does not follow the rules. This card breaks the pattern—what was certain is now uncertain. The Joker is the Hollow\'s laughter, the Patron\'s whim, the die that rolls off the table. Expect the unexpected, and prepare to adapt.',
+            regionMeaning: null
+        };
+    }
+
+    const regionMeaning = getCardMeaningFromRegion(card.suit, card.rank, regionData);
+    const rankName = RANK_NAMES[card.rank] || card.rank;
+    const suitName = SUIT_NAMES[card.suit];
+    const suitSymbol = SUIT_SYMBOLS[card.suit];
+    const color = SUIT_COLORS[card.suit];
+    
+    const positionFraming = {
+        root: `This is what has been growing beneath the surface—the root of the matter.`,
+        crest: `This is what is gathering strength—the rising force you cannot ignore.`,
+        crown: `This is the shape of the storm that awaits—the confrontation you must face.`,
+        left: `This is what anchors you—the bond, ally, or resource that will see you through.`
+    };
+
+    const description = `${positionFraming[position.key]}\n\n${regionMeaning}`;
+
+    return {
+        title: `${suitSymbol} ${rankName} of ${suitName}`,
+        description: description,
+        regionMeaning: regionMeaning,
+        suit: card.suit,
+        rank: card.rank,
+        color: color,
+        symbol: suitSymbol
+    };
+}
+
+function synthesiseCrownSpread(mainCards, wildcard, regionData) {
+    const positions = CROWN_POSITIONS;
+    const positionCards = mainCards.map((card, i) => {
+        const pos = positions[i];
+        const interpretation = interpretCrownCard(card, pos, regionData);
+        return {
+            ...interpretation,
+            position: pos,
+            card: card,
+            isJoker: card.isJoker,
+            rankName: card.isJoker ? 'Joker' : RANK_NAMES[card.rank],
+            suitName: card.isJoker ? '' : SUIT_NAMES[card.suit]
+        };
+    });
+
+    const cardsHtml = positionCards.map(p => `
+        <div class="crown-card" style="display:flex;flex-direction:column;align-items:center;gap:0.3rem;min-width:80px;">
+            <div style="background:var(--bg3);border:2px solid ${p.isJoker ? 'var(--gold)' : p.color};border-radius:var(--radius);padding:0.4rem;text-align:center;width:70px;height:100px;display:flex;flex-direction:column;align-items:center;justify-content:center;${p.isJoker ? 'box-shadow: 0 0 15px rgba(212,175,55,0.3);' : ''}">
+                <div style="font-size:0.7rem;color:var(--text3);">${p.position.icon}</div>
+                <div style="font-size:1.8rem;color:${p.isJoker ? 'var(--gold)' : p.color};">${p.isJoker ? '🃏' : p.symbol}</div>
+                <div style="font-size:0.6rem;color:var(--text2);">${p.isJoker ? 'Joker' : p.rankName}</div>
+            </div>
+            <div style="font-size:0.6rem;color:var(--text3);text-align:center;max-width:80px;">${p.position.label}</div>
+        </div>
+    `).join('');
+
+    const wildcardDisplay = `
+        <div class="crown-card wildcard" style="display:flex;flex-direction:column;align-items:center;gap:0.3rem;min-width:80px;">
+            <div style="background:var(--bg3);border:2px solid var(--gold);border-radius:var(--radius);padding:0.4rem;text-align:center;width:70px;height:100px;display:flex;flex-direction:column;align-items:center;justify-content:center;box-shadow: 0 0 20px rgba(212,175,55,0.4);animation:pulse-gold 1.5s ease-in-out infinite;">
+                <div style="font-size:0.7rem;color:var(--gold);">🌟</div>
+                <div style="font-size:1.8rem;color:var(--gold);">🃏</div>
+                <div style="font-size:0.6rem;color:var(--gold);">Wildcard</div>
+            </div>
+            <div style="font-size:0.6rem;color:var(--gold);text-align:center;max-width:80px;">Wildcard<br>Twist</div>
+        </div>
+    `;
+
+    const horizontalLayout = `
+        <div style="display:flex;justify-content:center;gap:0.5rem;padding:0.5rem;overflow-x:auto;flex-wrap:nowrap;">
+            ${cardsHtml}
+            <div style="display:flex;align-items:center;color:var(--text3);font-size:1.5rem;padding:0 0.2rem;">+</div>
+            ${wildcardDisplay}
+        </div>
+    `;
+
+    const verticalLayout = positionCards.map(p => `
+        <div style="display:grid;grid-template-columns:100px 1fr;gap:0.5rem;padding:0.5rem;background:var(--bg2);border-radius:var(--radius);margin-bottom:0.3rem;border-left:4px solid ${p.isJoker ? 'var(--gold)' : p.color};">
+            <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;">
+                <div style="font-size:1.5rem;color:${p.isJoker ? 'var(--gold)' : p.color};">${p.isJoker ? '🃏' : p.symbol}</div>
+                <div style="font-size:0.8rem;font-weight:600;color:var(--gold);">${p.isJoker ? 'Joker' : p.rankName}</div>
+                <div style="font-size:0.65rem;color:var(--text3);">${p.position.icon} ${p.position.label}</div>
+            </div>
+            <div style="display:flex;flex-direction:column;justify-content:center;">
+                <div style="font-size:0.8rem;color:var(--text2);font-weight:600;">${p.position.label}</div>
+                <div style="font-size:0.85rem;color:var(--text);line-height:1.4;white-space:pre-wrap;">${p.regionMeaning || p.description}</div>
+            </div>
+        </div>
+    `).join('');
+
+    const wildcardMeaning = getWildcardMeaning(wildcard, regionData);
+    const wildcardVertical = `
+        <div style="display:grid;grid-template-columns:100px 1fr;gap:0.5rem;padding:0.5rem;background:var(--bg4);border-radius:var(--radius);margin-top:0.3rem;border:2px solid var(--gold);">
+            <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;">
+                <div style="font-size:1.5rem;color:var(--gold);">🌟</div>
+                <div style="font-size:0.8rem;font-weight:600;color:var(--gold);">Wildcard</div>
+            </div>
+            <div style="display:flex;flex-direction:column;justify-content:center;">
+                <div style="font-size:0.8rem;color:var(--gold);font-weight:600;">Wildcard Twist</div>
+                <div style="font-size:0.85rem;color:var(--text);line-height:1.4;">${wildcardMeaning}</div>
+                <div style="font-size:0.7rem;color:var(--text3);margin-top:0.2rem;">The wildcard is the unexpected element—a factor no one saw coming.</div>
+            </div>
+        </div>
+    `;
+
+    let synthesis = `The Crown Spread reveals a story of tension and consequence.\n\n`;
+    
+    synthesis += `🌱 Root: ${positionCards[0].regionMeaning || positionCards[0].description}\n\n`;
+    synthesis += `🏔️ Crest: ${positionCards[1].regionMeaning || positionCards[1].description}\n\n`;
+    synthesis += `👑 Crown: ${positionCards[2].regionMeaning || positionCards[2].description}\n\n`;
+    synthesis += `🤝 Left Hand: ${positionCards[3].regionMeaning || positionCards[3].description}\n\n`;
+    synthesis += `🌟 Wildcard: ${wildcardMeaning}`;
+
+    const nonWildcards = mainCards.filter(c => !c.isJoker);
+    let highest = null;
+    if (nonWildcards.length > 0) {
+        highest = nonWildcards.reduce((a, b) => {
+            const rankA = POKER_RANK[a.rank] || 0;
+            const rankB = POKER_RANK[b.rank] || 0;
+            if (rankA !== rankB) return rankA > rankB ? a : b;
+            const suitA = SUIT_ORDER[a.suit] || 0;
+            const suitB = SUIT_ORDER[b.suit] || 0;
+            return suitA > suitB ? a : b;
+        });
+    } else {
+        highest = mainCards[0];
+    }
+    
+    let timer = null;
+    let timerCard = '';
+    if (highest) {
+        const rankVal = POKER_RANK[highest.rank] || 0;
+        let segments = 4;
+        if (rankVal >= 14) segments = 10;
+        else if (rankVal >= 13) segments = 8;
+        else if (rankVal >= 11) segments = 8;
+        else if (rankVal >= 10) segments = 6;
+        else if (rankVal >= 7) segments = 6;
+        else segments = 4;
+        timer = segments;
+        timerCard = `${highest.rankName} of ${highest.suitName}`;
+    }
+
+    if (timer) {
+        synthesis += `\n\n⏱️ The highest card (${timerCard}) suggests a timer of ${timer} segments—a pressure that will build until it breaks.`;
+    }
+
+    const details = `
+        <div class="crown-horizontal" style="margin-bottom:0.8rem;">
+            ${horizontalLayout}
+            <div style="text-align:center;font-size:0.7rem;color:var(--text3);margin-top:0.3rem;">
+                Click a card below to see its meaning
+            </div>
+        </div>
+        
+        <div class="crown-vertical" style="border-top:1px solid var(--border);padding-top:0.8rem;">
+            <div style="font-size:0.8rem;font-weight:600;color:var(--text2);margin-bottom:0.3rem;">📖 Card Meanings</div>
+            ${verticalLayout}
+            ${wildcardVertical}
+        </div>
+    `;
+
+    return {
+        synthesis,
+        details,
+        timer: timer ? { segments: timer, card: timerCard } : null,
+        positions: positionCards,
+        wildcard: wildcardMeaning,
+        horizontalLayout,
+        verticalLayout
+    };
+}
+
+// ============================================================
+// LOAD REGION DATA
+// ============================================================
+
+async function loadManifest() {
+    try {
+        const res = await fetch('/regions/manifest.json');
+        if (!res.ok) throw new Error('Manifest not found');
+        const data = await res.json();
+        if (Array.isArray(data)) {
+            regionNames = data.map(item => typeof item === 'string' ? item : item.name);
+        } else {
+            regionNames = [];
+        }
+    } catch (e) {
+        console.warn('[Decks] Could not load manifest:', e);
+        regionNames = ['Acasia'];
+        try {
+            const fallbackRes = await fetch('/regions/acasia.json');
+            if (fallbackRes.ok) {
+                regionNames = ['Acasia'];
+            }
+        } catch (fallbackErr) {
+            // No fallback, just use default
+        }
+        if (regionNames.length === 0) {
+            regionNames = ['Acasia'];
+        }
+    }
+}
+
+async function fetchRegionData(regionName) {
+    if (regionData && regionData.name === regionName) {
+        return regionData;
+    }
+    try {
+        const slug = getRegionSlug(regionName);
+        const res = await fetch(`/regions/${slug}.json`);
+        if (!res.ok) throw new Error(`Region "${regionName}" not found`);
+        const data = await res.json();
+        regionData = data;
+        return data;
+    } catch (e) {
+        console.warn(`[Decks] Error loading region ${regionName}:`, e);
+        const fallbackData = {
+            name: regionName,
+            description: `${regionName} - A region of Fate's Edge.`,
+            hearts: ["A matter of loyalty or love arises."],
+            spades: ["A conflict or struggle emerges."],
+            clubs: ["A physical challenge or obstacle appears."],
+            diamonds: ["A resource, treasure, or opportunity is found."]
+        };
+        regionData = fallbackData;
+        return fallbackData;
+    }
+}
+
+// ============================================================
+// REGION CHANGE HANDLER
+// ============================================================
+
+async function handleRegionChange() {
+    const select = document.getElementById('deck-region-select');
+    if (!select) return;
+    
+    const regionName = select.value;
+    const descEl = document.getElementById('region-description');
+
+    if (!regionName) {
+        if (descEl) descEl.textContent = 'Select a region to display its description.';
+        return;
+    }
+
+    selectedRegion = regionName;
+    const data = await fetchRegionData(regionName);
+    
+    if (descEl) {
+        if (data && data.description) {
+            descEl.innerHTML = data.description;
+        } else if (data) {
+            descEl.innerHTML = '<p class="region-text">No description available for this region.</p>';
+        } else {
+            descEl.textContent = 'Could not load region description.';
+        }
+    }
+    
+    // Notify any registered callbacks
+    regionChangeCallbacks.forEach(callback => {
+        try {
+            callback(regionName, data);
+        } catch (e) {
+            console.warn('Region change callback error:', e);
+        }
+    });
+}
+
+/**
+ * Register a callback for region changes
+ * @param {Function} callback - Function(regionName, regionData)
+ */
+export function registerRegionChange(callback) {
+    if (typeof callback === 'function') {
+        regionChangeCallbacks.push(callback);
+        // Immediately call with current region if available
+        if (selectedRegion) {
+            callback(selectedRegion, regionData);
+        }
+    }
+}
 
 // ============================================================
 // RENDER
 // ============================================================
 
-export function render(el) {
+export async function render(el) {
     container = el;
-    
+    await loadManifest();
+
+    let regionOptions = regionNames.map(n => `<option value="${n}">${n}</option>`).join('');
+    if (regionNames.length === 0) {
+        regionOptions = '<option value="">No regions found</option>';
+    }
+
     container.innerHTML = `
-        <div class="dashboard-modern-layout">
-            <!-- Header -->
-            <header class="dashboard-header">
-                <h1 class="page-title">📊 Campaign Dashboard</h1>
-                <p class="page-sub">Quick overview of your campaign state and tools.</p>
-                <div class="dashboard-status-bar">
-                    <span class="status-badge" id="dash-status">● Live</span>
-                    <span class="status-badge" id="dash-sync-status">● Local</span>
-                    <span class="status-badge" id="dash-timestamp">Updated: ${new Date().toLocaleTimeString()}</span>
-                </div>
-            </header>
+        <div class="decks-header">
+            <h1 class="page-title">🃏 Deck of Consequences</h1>
+            <p class="page-sub">Transform Story Beats (SB) into thematic complications. Choose a region and draw type.</p>
+        </div>
 
-            <!-- Stats Grid -->
-            <div class="dashboard-stats-grid" id="dash-stats">
-                ${renderStats()}
+        <div class="panel">
+            <div class="field" style="max-width:300px;">
+                <label>Region</label>
+                <select id="deck-region-select">
+                    <option value="">— Select Region —</option>
+                    ${regionOptions}
+                </select>
             </div>
-
-            <!-- Quick Actions with Region Selector -->
-            <div class="panel" id="dash-actions-panel">
-                <div class="panel-header">
-                    <h3 class="panel-title">⚡ Quick Actions</h3>
-                    <div class="panel-actions">
-                        <button class="btn btn-sm btn-ghost" onclick="window.dashboardRefresh()">🔄</button>
-                    </div>
-                </div>
-                ${renderQuickActionsHTML()}
-                <div class="quick-actions-grid">
-                    <button class="quick-action-btn" onclick="window.sceneEndTrimBoons()">
-                        <span class="qa-icon">✂️</span>
-                        <span class="qa-label">Trim Boons</span>
-                        <span class="qa-desc">Set all Boons to 2</span>
-                    </button>
-                    <button class="quick-action-btn" onclick="window.resetAllTimers()">
-                        <span class="qa-icon">⏱️</span>
-                        <span class="qa-label">Reset Timers</span>
-                        <span class="qa-desc">Zero all timers</span>
-                    </button>
-                    <button class="quick-action-btn" onclick="window.newSession()">
-                        <span class="qa-icon">📦</span>
-                        <span class="qa-label">New Session</span>
-                        <span class="qa-desc">Archive and reset</span>
-                    </button>
-                    <button class="quick-action-btn" onclick="window.openCombatTracker()">
-                        <span class="qa-icon">⚔️</span>
-                        <span class="qa-label">Combat Tracker</span>
-                        <span class="qa-desc">Open combat tracker</span>
-                    </button>
-                    <button class="quick-action-btn" onclick="window.openKanban()">
-                        <span class="qa-icon">📋</span>
-                        <span class="qa-label">Kanban</span>
-                        <span class="qa-desc">Campaign board</span>
-                    </button>
-                    <button class="quick-action-btn" onclick="window.openWhiteboard()">
-                        <span class="qa-icon">✏️</span>
-                        <span class="qa-label">Whiteboard</span>
-                        <span class="qa-desc">Visual planning</span>
-                    </button>
-                    <button class="quick-action-btn" onclick="window.drawConsequence()">
-                        <span class="qa-icon">🃏</span>
-                        <span class="qa-label">Draw Consequence</span>
-                        <span class="qa-desc">Deck of Consequences</span>
-                    </button>
-                    <button class="quick-action-btn" onclick="window.openCrownSpread()">
-                        <span class="qa-icon">👑</span>
-                        <span class="qa-label">Crown Spread</span>
-                        <span class="qa-desc">Campaign planning</span>
-                    </button>
-                </div>
-            </div>
-
-            <!-- Main Grid -->
-            <div class="dashboard-main-grid">
-                <!-- Left Column -->
-                <div class="dashboard-left">
-                    <!-- Characters -->
-                    <div class="panel" id="dash-characters-panel">
-                        <div class="panel-header">
-                            <h3 class="panel-title">👤 Characters</h3>
-                            <div class="panel-actions">
-                                <button class="btn btn-sm btn-ghost" onclick="window.dashboardRefresh()">🔄</button>
-                                <button class="btn btn-sm btn-primary" onclick="window.openCharacterBuilder()">+ New</button>
-                            </div>
-                        </div>
-                        <div id="dash-chars"><span class="text-muted">Loading…</span></div>
-                    </div>
-
-                    <!-- Active Timers -->
-                    <div class="panel" id="dash-timers-panel">
-                        <div class="panel-header">
-                            <h3 class="panel-title">⏱️ Active Timers</h3>
-                            <div class="panel-actions">
-                                <button class="btn btn-sm btn-ghost" onclick="window.dashboardRefresh()">🔄</button>
-                                <button class="btn btn-sm btn-primary" onclick="window.addTimerFromDash()">+ Add</button>
-                            </div>
-                        </div>
-                        <div id="dash-timers"><span class="text-muted">No active timers.</span></div>
-                    </div>
-
-                    <!-- Active Encounters -->
-                    <div class="panel" id="dash-encounters-panel">
-                        <div class="panel-header">
-                            <h3 class="panel-title">⚔️ Active Encounters</h3>
-                            <div class="panel-actions">
-                                <button class="btn btn-sm btn-ghost" onclick="window.dashboardRefresh()">🔄</button>
-                                <button class="btn btn-sm btn-primary" onclick="window.addEncounterFromDash()">+ Add</button>
-                            </div>
-                        </div>
-                        <div id="dash-encounters"><span class="text-muted">No active encounters.</span></div>
-                    </div>
-                </div>
-
-                <!-- Right Column -->
-                <div class="dashboard-right">
-                    <!-- Factions -->
-                    <div class="panel" id="dash-factions-panel">
-                        <div class="panel-header">
-                            <h3 class="panel-title">🏛️ Factions</h3>
-                            <div class="panel-actions">
-                                <button class="btn btn-sm btn-ghost" onclick="window.dashboardRefresh()">🔄</button>
-                                <button class="btn btn-sm btn-primary" onclick="window.openFactions()">View All</button>
-                            </div>
-                        </div>
-                        <div id="dash-factions"><span class="text-muted">No factions tracked.</span></div>
-                    </div>
-
-                    <!-- Patrons -->
-                    <div class="panel" id="dash-patrons-panel">
-                        <div class="panel-header">
-                            <h3 class="panel-title">🌟 Patrons</h3>
-                            <div class="panel-actions">
-                                <button class="btn btn-sm btn-ghost" onclick="window.dashboardRefresh()">🔄</button>
-                                <button class="btn btn-sm btn-primary" onclick="window.openPatrons()">View All</button>
-                            </div>
-                        </div>
-                        <div id="dash-patrons"><span class="text-muted">No patrons loaded.</span></div>
-                    </div>
-
-                    <!-- Followers & Assets -->
-                    <div class="panel" id="dash-followers-assets-panel">
-                        <div class="panel-header">
-                            <h3 class="panel-title">👤 Followers & 📦 Assets</h3>
-                            <div class="panel-actions">
-                                <button class="btn btn-sm btn-ghost" onclick="window.dashboardRefresh()">🔄</button>
-                                <button class="btn btn-sm btn-primary" onclick="window.openFactions()">Manage</button>
-                            </div>
-                        </div>
-                        <div id="dash-followers-assets"><span class="text-muted">No followers or assets.</span></div>
-                    </div>
-                </div>
+            <div id="region-description" style="margin-top:0.8rem;background:var(--bg2);padding:0.8rem 1rem;border-radius:var(--radius);border-left:4px solid var(--gold);color:var(--text2);font-size:0.9rem;">
+                Select a region to display its description.
             </div>
         </div>
+
+        <div class="panel">
+            <h3>Draw Type</h3>
+            <div class="deck-controls" style="display:flex;flex-wrap:wrap;gap:0.8rem;align-items:end;">
+                <div class="field" style="flex:0 0 200px;">
+                    <label>Cost / Draw</label>
+                    <select id="deck-draw-type">
+                        <option value="1">1 SB (1 card)</option>
+                        <option value="2" selected>2 SB (2 cards)</option>
+                        <option value="3">3 SB (3 cards)</option>
+                        <option value="crown">👑 Crown Spread (4+1 wildcard)</option>
+                    </select>
+                </div>
+                <button class="btn btn-gold" id="deck-draw-btn">🃏 Draw</button>
+                <button class="btn" id="deck-reshuffle-btn">↺ Reshuffle</button>
+                <span class="text-muted" id="deck-cards-remaining">54 cards</span>
+            </div>
+            <div id="spread-type-indicator" style="margin-top:0.4rem;font-size:0.85rem;color:var(--text2);">
+                <span id="spread-description">Single draw: one consequence</span>
+            </div>
+        </div>
+
+        <div class="panel" id="consequence-display">
+            <h3 id="consequence-title">Cards Drawn</h3>
+            <div id="crown-spread-cards" style="margin:0.8rem 0;display:none;"></div>
+            <div class="card-grid" id="drawn-cards" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:0.8rem;margin:0.8rem 0;"></div>
+            <div id="consequence-synthesis" class="consequence-synthesis" style="background:var(--bg3);border-left:4px solid var(--gold);padding:0.8rem 1rem;border-radius:var(--radius);margin-top:0.8rem;font-style:italic;white-space:pre-wrap;">
+                Draw cards to see a complication.
+            </div>
+            <div id="crown-spread-details" style="margin-top:0.8rem;display:none;"></div>
+            <div id="timer-result" style="margin-top:0.8rem;display:none;background:var(--bg3);padding:0.5rem 1rem;border-radius:var(--radius);border-left:4px solid var(--accent);"></div>
+        </div>
+
+        <div class="panel">
+            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;">
+                <h3 style="margin:0;">📜 History</h3>
+                <button class="btn btn-sm" id="deck-history-clear-btn">Clear History</button>
+            </div>
+            <div class="deck-history" id="deck-history" style="max-height:200px;overflow-y:auto;margin-top:0.5rem;"></div>
+        </div>
     `;
-    
-    update();
-    startAutoRefresh();
+
+    buildDeck();
+    renderDeckHistory();
     attachEvents();
-    attachQuickActionsEvents();
-}
+    updateSpreadDescription();
 
-// ============================================================
-// QUICK ACTIONS HTML
-// ============================================================
-
-function renderQuickActionsHTML() {
-    const selectedRegion = getSelectedRegion() || 'Acasia';
-    const regionNames = getRegionNames();
-    
-    // Ensure we have at least one region
-    const regions = regionNames.length > 0 ? regionNames : ['Acasia'];
-    
-    return `
-        <div class="quick-actions-region-bar" style="display:flex;flex-wrap:wrap;gap:0.5rem;align-items:center;padding:0.5rem 0.8rem;margin-bottom:0.5rem;background:var(--bg3);border-radius:var(--radius);border-left:3px solid var(--gold);">
-            <span style="font-size:0.85rem;color:var(--text2);">📍 Region:</span>
-            <select id="dashboard-region-select" style="background:var(--bg2);color:var(--text);border:1px solid var(--border);border-radius:4px;padding:0.2rem 0.5rem;font-size:0.85rem;min-width:120px;">
-                ${regions.map(name => `
-                    <option value="${name}" ${name === selectedRegion ? 'selected' : ''}>${name}</option>
-                `).join('')}
-            </select>
-            <span style="font-size:0.75rem;color:var(--text3);" id="dashboard-region-indicator">📍 ${selectedRegion}</span>
-            <div style="display:flex;gap:0.3rem;flex-wrap:wrap;margin-left:auto;">
-                <button class="btn btn-xs btn-gold quick-draw-btn" data-count="1">🃏 1</button>
-                <button class="btn btn-xs btn-gold quick-draw-btn" data-count="2">🃏 2</button>
-                <button class="btn btn-xs btn-gold quick-draw-btn" data-count="3">🃏 3</button>
-                <button class="btn btn-xs btn-primary quick-crown-btn">👑 Crown</button>
-            </div>
-        </div>
-    `;
-}
-
-// ============================================================
-// QUICK ACTIONS EVENTS
-// ============================================================
-
-function attachQuickActionsEvents() {
-    // Region selector
-    const regionSelect = document.getElementById('dashboard-region-select');
-    if (regionSelect) {
-        regionSelect.addEventListener('change', async (e) => {
-            try {
-                await setSelectedRegion(e.target.value);
-                const indicator = document.getElementById('dashboard-region-indicator');
-                if (indicator) indicator.textContent = `📍 ${e.target.value}`;
-                showToast(`Region set to ${e.target.value}`, 'info');
-            } catch (err) {
-                console.warn('Region select error:', err);
-                showToast('Could not change region', 'error');
-            }
-        });
+    const select = document.getElementById('deck-region-select');
+    if (select) {
+        select.addEventListener('change', handleRegionChange);
+        if (regionNames.length > 0) {
+            select.value = regionNames[0];
+            await handleRegionChange();
+            selectedRegion = regionNames[0];
+        } else if (selectedRegion) {
+            select.value = selectedRegion;
+            await handleRegionChange();
+        }
     }
     
-    // Register for region changes from other parts of the app
-    onRegionChange((regionName, regionData) => {
-        const indicator = document.getElementById('dashboard-region-indicator');
-        if (indicator) indicator.textContent = `📍 ${regionName}`;
-        const select = document.getElementById('dashboard-region-select');
-        if (select) select.value = regionName;
-    });
-    
-    // Quick draw buttons
-    document.querySelectorAll('.quick-draw-btn').forEach(btn => {
-        btn.addEventListener('click', async (e) => {
-            const count = parseInt(e.target.dataset.count, 10);
-            try {
-                const result = await quickDraw(count);
-                if (result) {
-                    showToast(`🎴 Drew ${result.cardNames}`, 'success');
-                }
-            } catch (err) {
-                console.warn('Draw error:', err);
-                showToast('Could not draw cards', 'error');
-            }
-        });
-    });
-    
-    // Crown spread button
-    const crownBtn = document.querySelector('.quick-crown-btn');
-    if (crownBtn) {
-        crownBtn.addEventListener('click', async () => {
-            try {
-                const { openCrownSpread } = await import('../decks/index.js');
-                openCrownSpread();
-            } catch (err) {
-                console.warn('Crown spread error:', err);
-                showToast('Could not open Crown Spread', 'error');
-            }
-        });
+    isInitialized = true;
+}
+
+// ============================================================
+// DECK MANAGEMENT
+// ============================================================
+
+function buildDeck() {
+    deck = [];
+    for (const suit of SUITS) {
+        for (const rank of RANKS) {
+            deck.push({
+                suit,
+                rank,
+                symbol: SUIT_SYMBOLS[suit],
+                color: SUIT_COLORS[suit],
+                suitName: SUIT_NAMES[suit],
+                rankName: RANK_NAMES[rank] || rank
+            });
+        }
+    }
+    deck.push({ suit: 'joker', rank: 'Red', symbol: '🃏', color: '#d4af37', isJoker: true, suitName: 'Joker', rankName: 'Red' });
+    deck.push({ suit: 'joker', rank: 'Black', symbol: '🃏', color: '#d4af37', isJoker: true, suitName: 'Joker', rankName: 'Black' });
+    shuffleArray(deck);
+    updateDeckCount();
+    console.log('🔀 Deck shuffled, total cards:', deck.length);
+}
+
+function updateDeckCount() {
+    const el = document.getElementById('deck-cards-remaining');
+    if (el) el.textContent = deck.length + ' cards';
+}
+
+function updateSpreadDescription() {
+    const type = document.getElementById('deck-draw-type')?.value;
+    const descEl = document.getElementById('spread-description');
+    if (!descEl) return;
+    if (type === 'crown') {
+        descEl.textContent = '👑 Crown Spread: 4 cards (Root, Crest, Crown, Left Hand) + 1 wildcard twist. Each card draws from the selected region\'s deck.';
+    } else if (type === '2') {
+        descEl.textContent = 'Two draws: a complication with an additional twist.';
+    } else if (type === '3') {
+        descEl.textContent = 'Three draws: a chain of consequences.';
+    } else {
+        descEl.textContent = 'Single draw: one focused consequence.';
     }
 }
 
 // ============================================================
-// STATS
+// DRAW
 // ============================================================
 
-function renderStats() {
-    const state = getState();
-    const characters = state.characters || [];
-    const timers = state.timers || [];
-    const encounters = state.encounters || [];
-    const factions = state.factions?.factions || [];
-    const patrons = state.patrons?.cosmic || [];
-    const followers = state.factions?.followers || [];
-    const assets = state.factions?.assets || [];
-    
-    const activeTimers = timers.filter(t => t.current < t.segments);
-    const completedTimers = timers.filter(t => t.current >= t.segments);
-    
-    return `
-        <div class="stat-card">
-            <span class="stat-icon">👤</span>
-            <span class="stat-value">${characters.length}</span>
-            <span class="stat-label">Characters</span>
-        </div>
-        <div class="stat-card">
-            <span class="stat-icon">⏱️</span>
-            <span class="stat-value">${activeTimers.length}</span>
-            <span class="stat-label">Active Timers</span>
-            <span class="stat-sub">${completedTimers.length} completed</span>
-        </div>
-        <div class="stat-card">
-            <span class="stat-icon">⚔️</span>
-            <span class="stat-value">${encounters.length}</span>
-            <span class="stat-label">Encounters</span>
-        </div>
-        <div class="stat-card">
-            <span class="stat-icon">🏛️</span>
-            <span class="stat-value">${factions.length}</span>
-            <span class="stat-label">Factions</span>
-        </div>
-        <div class="stat-card">
-            <span class="stat-icon">🌟</span>
-            <span class="stat-value">${patrons.length}</span>
-            <span class="stat-label">Patrons</span>
-        </div>
-        <div class="stat-card">
-            <span class="stat-icon">👤</span>
-            <span class="stat-value">${followers.length}</span>
-            <span class="stat-label">Followers</span>
-        </div>
-        <div class="stat-card">
-            <span class="stat-icon">📦</span>
-            <span class="stat-value">${assets.length}</span>
-            <span class="stat-label">Assets</span>
-        </div>
-        <div class="stat-card">
-            <span class="stat-icon">📊</span>
-            <span class="stat-value">${state.rollHistory?.length || 0}</span>
-            <span class="stat-label">Rolls</span>
-            <span class="stat-sub">${state.chatHistory?.length || 0} chat</span>
-        </div>
-    `;
-}
+let lastDrawResults = null;
 
-// ============================================================
-// UPDATE
-// ============================================================
-
-export function update() {
-    updateCharacters();
-    updateTimers();
-    updateEncounters();
-    updateFactions();
-    updatePatrons();
-    updateFollowersAssets();
-    updateStats();
-}
-
-function updateCharacters() {
-    const state = getState();
-    const el = document.getElementById('dash-chars');
-    if (!el) return;
-    
-    const chars = state.characters || [];
-    if (chars.length === 0) {
-        el.innerHTML = '<span class="text-muted">No characters yet. Create one in the Character Builder!</span>';
+export async function drawConsequence() {
+    if (!selectedRegion) {
+        showToast('Please select a region first.', 'error');
         return;
     }
-    
-    el.innerHTML = chars.map(c => {
-        const boons = c.boons || 0;
-        const fatigue = c.fatigue || 0;
-        const harm = c.harm || 0;
-        const boonClass = boons >= 3 ? 'boon-high' : boons >= 1 ? 'boon-mid' : 'boon-low';
-        const fatigueClass = fatigue >= 3 ? 'fatigue-high' : fatigue >= 1 ? 'fatigue-mid' : 'fatigue-low';
+    const data = await fetchRegionData(selectedRegion);
+    if (!data) return;
+
+    const type = document.getElementById('deck-draw-type')?.value || '1';
+    let cards = [];
+    let isCrown = false;
+
+    if (type === 'crown') {
+        isCrown = true;
+        if (deck.length < 5) {
+            showToast('Deck running low! Reshuffling...', 'warning');
+            buildDeck();
+        }
+        for (let i = 0; i < 5; i++) {
+            if (deck.length === 0) buildDeck();
+            cards.push(deck.pop());
+        }
+    } else {
+        const count = parseInt(type, 10) || 1;
+        if (deck.length < count) {
+            showToast('Deck running low! Reshuffling...', 'warning');
+            buildDeck();
+        }
+        for (let i = 0; i < count; i++) {
+            if (deck.length === 0) buildDeck();
+            cards.push(deck.pop());
+        }
+    }
+
+    updateDeckCount();
+    renderCards(cards, isCrown);
+
+    let synthesis, details = null, timer = null, cardDisplay = null;
+    if (isCrown) {
+        const mainCards = cards.slice(0, 4);
+        const wildcard = cards[4];
+        const result = synthesiseCrownSpread(mainCards, wildcard, data);
+        synthesis = result.synthesis;
+        details = result.details;
+        timer = result.timer;
+        cardDisplay = result.horizontalLayout;
         
-        return `
-            <div class="dashboard-char-item" onclick="window.openCharacter('${c.id}')">
-                <div class="char-info">
-                    <span class="char-name">${escHtml(c.name || 'Unnamed')}</span>
-                    <span class="char-detail">${escHtml(c.heritage || '')} · Tier ${c.tier || 'I'}</span>
-                </div>
-                <div class="char-stats">
-                    <span class="char-stat boon ${boonClass}" title="Boons">🪙 ${boons}</span>
-                    <span class="char-stat fatigue ${fatigueClass}" title="Fatigue">⚡ ${fatigue}</span>
-                    <span class="char-stat harm" title="Harm">❤️ ${harm}</span>
-                    ${c.vtt ? '<span class="char-stat vtt" title="VTT Connected">🟢</span>' : ''}
-                </div>
-            </div>
-        `;
-    }).join('');
-}
-
-function updateTimers() {
-    const state = getState();
-    const el = document.getElementById('dash-timers');
-    if (!el) return;
-    
-    const timers = state.timers || [];
-    const active = timers.filter(t => t.current < t.segments);
-    
-    if (active.length === 0) {
-        const completed = timers.filter(t => t.current >= t.segments);
-        el.innerHTML = `<span class="text-muted">No active timers.${completed.length > 0 ? ` ${completed.length} completed.` : ''}</span>`;
-        return;
-    }
-    
-    el.innerHTML = active.map(t => {
-        const pct = (t.current / t.segments) * 100;
-        const isUrgent = pct >= 80;
-        return `
-            <div class="dashboard-timer-item">
-                <div class="timer-info">
-                    <span class="timer-name">${escHtml(t.name)}</span>
-                    <span class="timer-progress-text">${t.current}/${t.segments}</span>
-                </div>
-                <div class="timer-bar-track">
-                    <div class="timer-bar-fill ${isUrgent ? 'urgent' : ''}" style="width:${pct}%;"></div>
-                </div>
-                <div class="timer-actions">
-                    <button class="btn btn-xs btn-ghost" onclick="window.tickTimer('${t.id}')">+1</button>
-                    <button class="btn btn-xs btn-ghost" onclick="window.completeTimer('${t.id}')">✓</button>
-                </div>
-            </div>
-        `;
-    }).join('');
-}
-
-function updateEncounters() {
-    const state = getState();
-    const el = document.getElementById('dash-encounters');
-    if (!el) return;
-    
-    const encounters = state.encounters || [];
-    if (encounters.length === 0) {
-        el.innerHTML = '<span class="text-muted">No active encounters. Create one in the Encounters module!</span>';
-        return;
-    }
-    
-    el.innerHTML = encounters.slice(0, 5).map(e => {
-        const status = e.status || 'active';
-        const statusClass = status === 'active' ? 'active' : status === 'resolved' ? 'resolved' : 'failed';
-        const adversaryCount = e.adversaries?.length || 0;
-        
-        return `
-            <div class="dashboard-encounter-item" onclick="window.openEncounter('${e.id}')">
-                <div class="encounter-info">
-                    <span class="encounter-name">${escHtml(e.name)}</span>
-                    <span class="encounter-status ${statusClass}">${status}</span>
-                </div>
-                <div class="encounter-detail">
-                    <span class="encounter-adversaries">👾 ${adversaryCount} adversaries</span>
-                    ${e.location ? `<span class="encounter-location">📍 ${escHtml(e.location)}</span>` : ''}
-                </div>
-                <div class="encounter-actions">
-                    <button class="btn btn-xs btn-primary" onclick="event.stopPropagation();window.openCombatTrackerForEncounter('${e.id}')">⚔️ Track</button>
-                </div>
-            </div>
-        `;
-    }).join('');
-}
-
-function updateFactions() {
-    const state = getState();
-    const el = document.getElementById('dash-factions');
-    if (!el) return;
-    
-    const factions = state.factions?.factions || [];
-    if (factions.length === 0) {
-        el.innerHTML = '<span class="text-muted">No factions tracked. Add some in the Factions module!</span>';
-        return;
-    }
-    
-    el.innerHTML = factions.slice(0, 4).map(f => {
-        const standing = f.standing || 0;
-        const standingLabel = standing >= 2 ? 'ally' : standing >= 1 ? 'friendly' : standing >= 0 ? 'neutral' : standing >= -1 ? 'unfriendly' : 'hostile';
-        const standingColor = standing >= 2 ? 'var(--green)' : standing >= 1 ? '#8ac49a' : standing >= 0 ? 'var(--text2)' : standing >= -1 ? 'var(--orange)' : 'var(--red)';
-        
-        return `
-            <div class="dashboard-faction-item" onclick="window.openFactionDetail('${f.id}')">
-                <div class="faction-info">
-                    <span class="faction-icon">${f.icon || '🏛️'}</span>
-                    <span class="faction-name">${escHtml(f.name)}</span>
-                    <span class="faction-standing" style="color:${standingColor};">${standingLabel}</span>
-                </div>
-                <div class="faction-agenda">${escHtml(f.agenda || 'No agenda')}</div>
-                <div class="faction-timer-mini">
-                    ⏱️ ${f.agendaTimer?.current || 0}/${f.agendaTimer?.segments || 6}
-                    <div class="timer-bar-track mini">
-                        <div class="timer-bar-fill" style="width:${((f.agendaTimer?.current || 0) / (f.agendaTimer?.segments || 6)) * 100}%;"></div>
-                    </div>
-                </div>
-            </div>
-        `;
-    }).join('');
-}
-
-function updatePatrons() {
-    const state = getState();
-    const el = document.getElementById('dash-patrons');
-    if (!el) return;
-    
-    const patrons = state.patrons?.cosmic || [];
-    if (patrons.length === 0) {
-        el.innerHTML = '<span class="text-muted">No patrons loaded. Add some in the Patrons module!</span>';
-        return;
-    }
-    
-    el.innerHTML = patrons.slice(0, 4).map(p => {
-        const ritesCount = p.rites?.length || 0;
-        const rivalsCount = p.rivals?.length || 0;
-        
-        return `
-            <div class="dashboard-patron-item" onclick="window.openPatronDetail('${p.id}')">
-                <div class="patron-info">
-                    <span class="patron-icon">${p.icon || '🌟'}</span>
-                    <span class="patron-name">${escHtml(p.name)}</span>
-                    <span class="patron-domain">${escHtml(p.domain || '')}</span>
-                </div>
-                <div class="patron-detail">
-                    <span class="patron-rites">🔮 ${ritesCount} rites</span>
-                    ${rivalsCount > 0 ? `<span class="patron-rivals">⚔️ ${rivalsCount} rivals</span>` : ''}
-                </div>
-            </div>
-        `;
-    }).join('');
-}
-
-function updateFollowersAssets() {
-    const state = getState();
-    const el = document.getElementById('dash-followers-assets');
-    if (!el) return;
-    
-    const followers = state.factions?.followers || [];
-    const assets = state.factions?.assets || [];
-    
-    if (followers.length === 0 && assets.length === 0) {
-        el.innerHTML = '<span class="text-muted">No followers or assets tracked. Manage them in the Factions module!</span>';
-        return;
-    }
-    
-    let html = '';
-    
-    if (followers.length > 0) {
-        html += `<div class="dash-followers-list">`;
-        followers.slice(0, 3).forEach(f => {
-            const loyalty = f.loyalty || 'faithful';
-            const fitness = f.fitness || 'ready';
-            const loyaltyEmoji = loyalty === 'faithful' ? '💚' : loyalty === 'strained' ? '⚠️' : '💔';
-            const fitnessEmoji = fitness === 'ready' ? '✅' : fitness === 'hurt' ? '🩹' : '❌';
-            
-            html += `
-                <div class="dash-follower-item">
-                    <span class="follower-name">${escHtml(f.name)}</span>
-                    <span class="follower-cap">Cap ${f.cap || 1}</span>
-                    <span class="follower-state">${loyaltyEmoji} ${loyalty}</span>
-                    <span class="follower-state">${fitnessEmoji} ${fitness}</span>
+        const cardsEl = document.getElementById('crown-spread-cards');
+        if (cardsEl) {
+            cardsEl.style.display = 'block';
+            cardsEl.innerHTML = `
+                <div style="background:var(--bg2);border-radius:var(--radius);padding:0.5rem;">
+                    ${cardDisplay}
                 </div>
             `;
-        });
-        html += `</div>`;
+        }
+    } else {
+        const cardsEl = document.getElementById('crown-spread-cards');
+        if (cardsEl) cardsEl.style.display = 'none';
+        synthesis = synthesiseConsequence(cards, data);
+    }
+
+    const synthesisEl = document.getElementById('consequence-synthesis');
+    if (synthesisEl) {
+        synthesisEl.innerHTML = `<strong>Consequence:</strong>\n${synthesis}`;
     }
     
-    if (assets.length > 0) {
-        html += `<div class="dash-assets-list">`;
-        assets.slice(0, 3).forEach(a => {
-            const status = a.status || 'maintained';
-            const statusEmoji = status === 'maintained' ? '✅' : status === 'neglected' ? '⚠️' : '❌';
-            
-            html += `
-                <div class="dash-asset-item">
-                    <span class="asset-name">${escHtml(a.name)}</span>
-                    <span class="asset-tier">${a.tier || 'Minor'}</span>
-                    <span class="asset-status">${statusEmoji} ${status}</span>
-                </div>
-            `;
-        });
-        html += `</div>`;
+    const detailsEl = document.getElementById('crown-spread-details');
+    if (details) {
+        detailsEl.style.display = 'block';
+        detailsEl.innerHTML = details;
+        const titleEl = document.getElementById('consequence-title');
+        if (titleEl) titleEl.textContent = '👑 Crown Spread';
+    } else {
+        if (detailsEl) detailsEl.style.display = 'none';
+        const titleEl = document.getElementById('consequence-title');
+        if (titleEl) titleEl.textContent = type === 'crown' ? '👑 Crown Spread' : `🃏 ${type} Draw${type > 1 ? 's' : ''}`;
     }
+
+    const timerEl = document.getElementById('timer-result');
+    if (timer) {
+        timerEl.style.display = 'block';
+        timerEl.innerHTML = `
+            <strong>⏱️ Suggested Timer:</strong> ${timer.segments} segments (from highest card: ${timer.card})
+            <button class="btn btn-sm btn-primary" id="create-timer-btn" style="margin-left:0.5rem;">➕ Add Timer</button>
+        `;
+        const btn = timerEl.querySelector('#create-timer-btn');
+        if (btn) {
+            btn.addEventListener('click', () => {
+                createTimerFromCard(timer.card, timer.segments);
+            });
+        }
+    } else {
+        timerEl.style.display = 'none';
+    }
+
+    // Store results for later display
+    lastDrawResults = {
+        cards: cards,
+        synthesis: synthesis,
+        isCrown: isCrown,
+        details: details,
+        timer: timer,
+        type: type
+    };
+
+    // Add to history
+    const cardStr = cards.map(c => c.isJoker ? `🃏${c.rank}` : `${c.rankName} of ${c.suitName}`).join(' | ');
+    deckHistory.push({
+        time: new Date().toLocaleTimeString(),
+        cards: cardStr,
+        synthesis: synthesis.replace(/\n/g, ' '),
+        type: type === 'crown' ? 'Crown Spread' : `${type} Draw${type > 1 ? 's' : ''}`
+    });
+    renderDeckHistory();
     
-    el.innerHTML = html;
+    // Broadcast via WebSocket
+    broadcastDraw(cards, type, selectedRegion, synthesis);
+    
+    // Enhanced toast with card names
+    const cardNames = cards.map(c => c.isJoker ? '🃏 Joker' : `${c.rankName} of ${c.suitName}`).join(', ');
+    showToast(`🃏 Drew ${cards.length} card${cards.length > 1 ? 's' : ''}: ${cardNames}`, 'success');
 }
 
-function updateStats() {
-    const el = document.getElementById('dash-stats');
-    if (el) {
-        el.innerHTML = renderStats();
+function synthesiseConsequence(cards, regionData) {
+    const entries = cards.map(c => {
+        if (c.isJoker) {
+            return getWildcardMeaning(c, regionData);
+        }
+        return getCardMeaningFromRegion(c.suit, c.rank, regionData);
+    });
+    if (entries.length === 1) {
+        return entries[0];
+    } else if (entries.length === 2) {
+        return `${entries[0]}\n\nThen, ${entries[1]}`;
+    } else {
+        return entries.map((e, i) => `${i+1}. ${e}`).join('\n\n');
     }
 }
 
 // ============================================================
-// AUTO REFRESH
+// CARD RENDERING
 // ============================================================
 
-function startAutoRefresh() {
-    if (refreshInterval) {
-        clearInterval(refreshInterval);
+function renderCards(cards, isCrown) {
+    const container = document.getElementById('drawn-cards');
+    if (!container) return;
+
+    if (isCrown) {
+        container.innerHTML = '';
+        return;
     }
-    refreshInterval = setInterval(() => {
-        update();
-    }, 30000); // Refresh every 30 seconds
+
+    container.innerHTML = cards.map((c, i) => {
+        let classes = 'card-slot';
+        if (c.isJoker) {
+            classes += ' joker';
+        } else {
+            classes += ' ' + c.suit;
+        }
+
+        let rankDisplay = c.isJoker ? 'Joker' : c.rank;
+        let symbolDisplay = c.isJoker ? '🃏' : c.symbol;
+        let borderColor = c.isJoker ? 'var(--gold)' : c.color;
+
+        return `
+            <div class="${classes}" style="background:var(--bg3);border:2px solid var(--border);border-radius:var(--radius);padding:0.4rem;text-align:center;font-weight:700;min-height:100px;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:border-color 0.2s, transform 0.2s;${!c.isJoker ? `border-left:6px solid ${borderColor};` : 'border-color: var(--gold); box-shadow: 0 0 10px rgba(212,175,55,0.3);'}">
+                <div class="rank" style="font-size:1rem;color:var(--text2);">${c.isJoker ? '' : rankDisplay}</div>
+                <div class="suit" style="font-size:2.5rem;line-height:1.2;color:${c.isJoker ? 'var(--gold)' : c.color}">${symbolDisplay}</div>
+                <div class="label" style="font-size:0.65rem;color:var(--text3);">${c.isJoker ? c.rank + ' Joker' : c.suitName}</div>
+            </div>
+        `;
+    }).join('');
 }
 
 // ============================================================
-// WINDOW EXPOSURES
+// TIMER CREATION
 // ============================================================
 
-window.dashboardRefresh = function() {
-    update();
-    showToast('🔄 Dashboard refreshed', 'info');
-};
-
-window.openCharacter = function(id) {
-    document.querySelector('.sidebar-nav .nav-item[data-tab="characters"]')?.click();
-    setTimeout(() => {
-        import('../characters/index.js').then(module => {
-            if (module.openEditor) {
-                module.openEditor(id);
-            }
-        });
-    }, 200);
-};
-
-window.openCharacterBuilder = function() {
-    document.querySelector('.sidebar-nav .nav-item[data-tab="characters"]')?.click();
-    setTimeout(() => {
-        import('../characters/index.js').then(module => {
-            if (module.openEditor) {
-                module.openEditor(null);
-            }
-        });
-    }, 200);
-};
-
-window.openFactions = function() {
-    document.querySelector('.sidebar-nav .nav-item[data-tab="factions"]')?.click();
-};
-
-window.openPatrons = function() {
-    document.querySelector('.sidebar-nav .nav-item[data-tab="patrons"]')?.click();
-};
-
-window.openFactionDetail = function(id) {
-    document.querySelector('.sidebar-nav .nav-item[data-tab="factions"]')?.click();
-    setTimeout(() => {
-        import('../factions/index.js').then(module => {
-            if (window.viewFaction) {
-                window.viewFaction(id);
-            }
-        });
-    }, 200);
-};
-
-window.openPatronDetail = function(id) {
-    document.querySelector('.sidebar-nav .nav-item[data-tab="patrons"]')?.click();
-    setTimeout(() => {
-        import('../patrons/index.js').then(module => {
-            if (window.viewPatron) {
-                window.viewPatron(id);
-            }
-        });
-    }, 200);
-};
-
-window.openEncounter = function(id) {
-    document.querySelector('.sidebar-nav .nav-item[data-tab="encounters"]')?.click();
-    setTimeout(() => {
-        import('../encounters/index.js').then(module => {
-            if (module.openEditor) {
-                module.openEditor(id);
-            }
-        });
-    }, 200);
-};
-
-window.addTimerFromDash = function() {
+function createTimerFromCard(cardName, segments) {
     import('../timers/index.js').then(module => {
         if (module.openTimerEditor) {
-            module.openTimerEditor(null);
-        }
-    }).catch(() => {
-        showToast('Timer module not available', 'error');
-    });
-};
-
-window.addEncounterFromDash = function() {
-    import('../encounters/index.js').then(module => {
-        if (module.openEncounterEditor) {
-            module.openEncounterEditor(null);
-        }
-    }).catch(() => {
-        showToast('Encounter module not available', 'error');
-    });
-};
-
-window.tickTimer = function(id) {
-    const state = getState();
-    const timer = state.timers.find(t => t.id === id);
-    if (timer) {
-        timer.current = Math.min(timer.current + 1, timer.segments);
-        saveState();
-        if (timer.current >= timer.segments) {
-            showToast(`⏱️ Timer "${timer.name}" completed!`, 'warning');
-        }
-        update();
-    }
-};
-
-window.completeTimer = function(id) {
-    const state = getState();
-    const timer = state.timers.find(t => t.id === id);
-    if (timer) {
-        timer.current = timer.segments;
-        saveState();
-        showToast(`⏱️ Timer "${timer.name}" completed!`, 'success');
-        update();
-    }
-};
-
-window.openCombatTracker = function() {
-    import('../encounters/combat.js').then(module => {
-        if (module.default?.openTracker) {
-            module.default.openTracker(null);
-        }
-    }).catch(() => {
-        showToast('Combat tracker not available', 'error');
-    });
-};
-
-window.openCombatTrackerForEncounter = function(id) {
-    import('../encounters/combat.js').then(module => {
-        if (module.default?.openTracker) {
-            module.default.openTracker(id);
-        }
-    }).catch(() => {
-        showToast('Combat tracker not available', 'error');
-    });
-};
-
-window.openKanban = function() {
-    document.querySelector('.sidebar-nav .nav-item[data-tab="scene-tools"]')?.click();
-    setTimeout(() => {
-        const container = document.getElementById('scene-view-container');
-        if (container) {
-            const kanbanTab = container.parentElement?.querySelector('.scene-tab[data-view="kanban"]');
-            if (kanbanTab) kanbanTab.click();
-        }
-    }, 200);
-};
-
-window.openWhiteboard = function() {
-    document.querySelector('.sidebar-nav .nav-item[data-tab="scene-tools"]')?.click();
-    setTimeout(() => {
-        const container = document.getElementById('scene-view-container');
-        if (container) {
-            const whiteboardTab = container.parentElement?.querySelector('.scene-tab[data-view="whiteboard"]');
-            if (whiteboardTab) whiteboardTab.click();
-        }
-    }, 200);
-};
-
-window.sceneEndTrimBoons = function() {
-    import('./scene-tools.js').then(module => {
-        module.sceneEndTrimBoons();
-        update();
-    });
-};
-
-window.resetAllTimers = function() {
-    import('./scene-tools.js').then(module => {
-        module.resetAllTimers();
-        update();
-    });
-};
-
-window.newSession = function() {
-    import('./scene-tools.js').then(module => {
-        module.newSession();
-        update();
-    });
-};
-
-window.drawConsequence = function() {
-    import('../decks/index.js').then(module => {
-        if (module.drawConsequence) {
-            module.drawConsequence();
-        } else if (module.default?.drawConsequence) {
-            module.default.drawConsequence();
+            module.openTimerEditor({
+                name: `Crown Spread: ${cardName}`,
+                segments: segments,
+                current: 0
+            });
+            showToast(`⏱️ Creating timer from ${cardName} (${segments} segments)`, 'success');
         } else {
-            showToast('Deck module not available', 'error');
+            const state = getState();
+            if (!state.timers) state.timers = [];
+            const newTimer = {
+                id: 'timer-' + Date.now() + '-' + Math.random().toString(36).substr(2, 4),
+                name: `Crown Spread: ${cardName}`,
+                segments: segments,
+                current: 0
+            };
+            state.timers.push(newTimer);
+            const event = new CustomEvent('timer-added', { detail: { timer: newTimer } });
+            document.dispatchEvent(event);
+            showToast(`⏱️ Timer created: ${newTimer.name} (${segments} segments)`, 'success');
         }
     }).catch(() => {
-        showToast('Deck module not available', 'error');
+        const state = getState();
+        if (!state.timers) state.timers = [];
+        const newTimer = {
+            id: 'timer-' + Date.now() + '-' + Math.random().toString(36).substr(2, 4),
+            name: `Crown Spread: ${cardName}`,
+            segments: segments,
+            current: 0
+        };
+        state.timers.push(newTimer);
+        document.dispatchEvent(new CustomEvent('timer-added', { detail: { timer: newTimer } }));
+        showToast(`⏱️ Timer created: ${newTimer.name} (${segments} segments)`, 'success');
     });
-};
-
-window.openCrownSpread = function() {
-    import('../decks/index.js').then(module => {
-        if (module.openCrownSpread) {
-            module.openCrownSpread();
-        } else if (module.default?.openCrownSpread) {
-            module.default.openCrownSpread();
-        } else {
-            showToast('Crown Spread not available', 'error');
-        }
-    }).catch(() => {
-        showToast('Crown Spread not available', 'error');
-    });
-};
+}
 
 // ============================================================
-// EVENT LISTENERS
+// HISTORY
 // ============================================================
 
-export function attachEvents() {
-    // Any additional event listeners can go here
+function renderDeckHistory() {
+    const el = document.getElementById('deck-history');
+    if (!el) return;
+    if (deckHistory.length === 0) {
+        el.innerHTML = '<span class="text-muted">No draws yet.</span>';
+        return;
+    }
+    el.innerHTML = deckHistory.slice().reverse().map(e =>
+        `<div style="padding:0.3rem 0;border-bottom:1px solid var(--border);font-size:0.8rem;display:flex;flex-wrap:wrap;gap:0.3rem;align-items:center;">
+            <span style="color:var(--text3);font-size:0.7rem;">[${e.time}]</span>
+            <span style="background:var(--bg3);padding:0.05rem 0.4rem;border-radius:8px;font-size:0.7rem;">${e.type}</span>
+            <span style="font-weight:500;">${e.cards}</span>
+            <span style="color:var(--text2);font-size:0.75rem;">→</span>
+            <span style="font-size:0.8rem;">${e.synthesis}</span>
+        </div>`
+    ).join('');
+}
+
+function clearDeckHistory() {
+    deckHistory = [];
+    renderDeckHistory();
+    showToast('Deck history cleared.', 'success');
+}
+
+// ============================================================
+// RESET
+// ============================================================
+
+export function resetDeck() {
+    cardOffset = Math.floor(Math.random() * 1000);
+    buildDeck();
+    const drawnCards = document.getElementById('drawn-cards');
+    if (drawnCards) drawnCards.innerHTML = '';
+    const crownCards = document.getElementById('crown-spread-cards');
+    if (crownCards) {
+        crownCards.innerHTML = '';
+        crownCards.style.display = 'none';
+    }
+    const synthesis = document.getElementById('consequence-synthesis');
+    if (synthesis) synthesis.innerHTML = 'Deck reshuffled. Draw to begin.';
+    const details = document.getElementById('crown-spread-details');
+    if (details) details.style.display = 'none';
+    const timer = document.getElementById('timer-result');
+    if (timer) timer.style.display = 'none';
+    const title = document.getElementById('consequence-title');
+    if (title) title.textContent = 'Cards Drawn';
+    
+    broadcastReset();
+    
+    showToast('Deck reshuffled with new random seeds.', 'success');
 }
 
 // ============================================================
 // LIFECYCLE METHODS
 // ============================================================
 
-export function onActivate() {
-    console.log('[Dashboard] Activated');
-    update();
-    startAutoRefresh();
+export async function onActivate() {
+    console.log('[Decks] Activated');
+    const select = document.getElementById('deck-region-select');
+    if (select && select.value) {
+        await handleRegionChange();
+    }
 }
 
 export function onDeactivate() {
-    console.log('[Dashboard] Deactivated');
-    if (refreshInterval) {
-        clearInterval(refreshInterval);
-        refreshInterval = null;
-    }
+    console.log('[Decks] Deactivated');
 }
 
-export function refresh() {
-    update();
+export async function refresh() {
+    console.log('[Decks] Refreshing');
+    await loadManifest();
+    const select = document.getElementById('deck-region-select');
+    if (select) {
+        const currentValue = select.value;
+        select.innerHTML = '<option value="">— Select Region —</option>';
+        regionNames.forEach(name => {
+            const opt = document.createElement('option');
+            opt.value = name;
+            opt.textContent = name;
+            select.appendChild(opt);
+        });
+        if (currentValue && regionNames.includes(currentValue)) {
+            select.value = currentValue;
+        } else if (regionNames.length > 0) {
+            select.value = regionNames[0];
+        }
+        await handleRegionChange();
+    }
 }
 
 export function destroy() {
-    if (refreshInterval) {
-        clearInterval(refreshInterval);
-        refreshInterval = null;
-    }
     container = null;
+    deck = [];
+    deckHistory = [];
+    regionData = null;
+    selectedRegion = null;
+    isInitialized = false;
+    regionChangeCallbacks = [];
 }
 
 // ============================================================
-// EXPORTS
+// EVENT LISTENERS
+// ============================================================
+
+export function attachEvents() {
+    const drawBtn = document.getElementById('deck-draw-btn');
+    if (drawBtn) {
+        const newBtn = drawBtn.cloneNode(true);
+        drawBtn.parentNode.replaceChild(newBtn, drawBtn);
+        newBtn.addEventListener('click', drawConsequence);
+    }
+    
+    const reshuffleBtn = document.getElementById('deck-reshuffle-btn');
+    if (reshuffleBtn) {
+        const newBtn = reshuffleBtn.cloneNode(true);
+        reshuffleBtn.parentNode.replaceChild(newBtn, reshuffleBtn);
+        newBtn.addEventListener('click', resetDeck);
+    }
+    
+    const clearBtn = document.getElementById('deck-history-clear-btn');
+    if (clearBtn) {
+        const newBtn = clearBtn.cloneNode(true);
+        clearBtn.parentNode.replaceChild(newBtn, clearBtn);
+        newBtn.addEventListener('click', clearDeckHistory);
+    }
+    
+    const typeSelect = document.getElementById('deck-draw-type');
+    if (typeSelect) {
+        const newSelect = typeSelect.cloneNode(true);
+        typeSelect.parentNode.replaceChild(newSelect, typeSelect);
+        newSelect.addEventListener('change', updateSpreadDescription);
+    }
+}
+
+// ============================================================
+// CROWN SPREAD MODAL
+// ============================================================
+
+let crownSpreadModal = null;
+
+export function openCrownSpread() {
+    if (crownSpreadModal && crownSpreadModal.parentNode) {
+        crownSpreadModal.remove();
+        crownSpreadModal = null;
+    }
+    
+    crownSpreadModal = document.createElement('div');
+    crownSpreadModal.className = 'crown-spread-modal';
+    crownSpreadModal.style.cssText = `
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(0,0,0,0.85); display: flex; align-items: center; justify-content: center;
+        z-index: 1000; padding: 1rem; backdrop-filter: blur(12px);
+        animation: fadeIn 0.3s ease;
+    `;
+    
+    if (deck.length < 5) {
+        buildDeck();
+    }
+    const cards = [];
+    for (let i = 0; i < 5; i++) {
+        if (deck.length === 0) buildDeck();
+        cards.push(deck.pop());
+    }
+    updateDeckCount();
+    
+    const mainCards = cards.slice(0, 4);
+    const wildcard = cards[4];
+    
+    const regionName = selectedRegion || 'Acasia';
+    fetchRegionData(regionName).then(data => {
+        const result = synthesiseCrownSpread(mainCards, wildcard, data);
+        
+        crownSpreadModal.innerHTML = `
+            <div style="background:var(--bg2);padding:2rem;border-radius:16px;max-width:800px;width:100%;max-height:90vh;overflow-y:auto;border:1px solid var(--border);">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;">
+                    <h2 style="color:var(--gold);margin:0;">👑 Crown Spread</h2>
+                    <button onclick="window.closeCrownSpread()" 
+                            style="background:var(--bg3);border:1px solid var(--border);color:var(--text2);font-size:1.5rem;cursor:pointer;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;transition:all 0.2s ease;">
+                        ✕
+                    </button>
+                </div>
+                
+                <div style="display:flex;gap:0.5rem;justify-content:center;flex-wrap:wrap;margin-bottom:1rem;">
+                    ${result.positions.map(p => `
+                        <div style="background:var(--bg3);border:2px solid ${p.isJoker ? 'var(--gold)' : p.color};border-radius:var(--radius);padding:0.5rem;text-align:center;min-width:70px;${p.isJoker ? 'box-shadow: 0 0 20px rgba(212,175,55,0.3);' : ''}">
+                            <div style="font-size:0.6rem;color:var(--text3);">${p.position.icon}</div>
+                            <div style="font-size:2rem;color:${p.isJoker ? 'var(--gold)' : p.color};">${p.isJoker ? '🃏' : p.symbol}</div>
+                            <div style="font-size:0.6rem;color:var(--text2);">${p.rankName}</div>
+                            <div style="font-size:0.5rem;color:var(--text3);">${p.position.label}</div>
+                        </div>
+                    `).join('')}
+                    <div style="background:var(--bg4);border:2px solid var(--gold);border-radius:var(--radius);padding:0.5rem;text-align:center;min-width:70px;box-shadow:0 0 20px rgba(212,175,55,0.3);">
+                        <div style="font-size:0.6rem;color:var(--gold);">🌟</div>
+                        <div style="font-size:2rem;color:var(--gold);">🃏</div>
+                        <div style="font-size:0.6rem;color:var(--gold);">Wild</div>
+                        <div style="font-size:0.5rem;color:var(--text3);">Twist</div>
+                    </div>
+                </div>
+                
+                <div style="background:var(--bg3);border-radius:var(--radius);padding:1rem;border-left:4px solid var(--gold);">
+                    ${result.positions.map((p, i) => `
+                        <div style="margin-bottom:0.5rem;padding-bottom:0.5rem;${i < 3 ? 'border-bottom:1px solid var(--border);' : ''}">
+                            <div style="display:flex;align-items:center;gap:0.5rem;">
+                                <span style="color:${p.isJoker ? 'var(--gold)' : p.color};">${p.position.icon}</span>
+                                <strong style="color:${p.isJoker ? 'var(--gold)' : p.color};">${p.position.label}</strong>
+                                <span style="color:var(--text3);font-size:0.8rem;">${p.rankName} of ${p.suitName}</span>
+                            </div>
+                            <div style="color:var(--text2);font-size:0.9rem;margin-left:1.5rem;">${p.regionMeaning || p.description}</div>
+                        </div>
+                    `).join('')}
+                    <div>
+                        <div style="display:flex;align-items:center;gap:0.5rem;">
+                            <span style="color:var(--gold);">🌟</span>
+                            <strong style="color:var(--gold);">Wildcard Twist</strong>
+                        </div>
+                        <div style="color:var(--text2);font-size:0.9rem;margin-left:1.5rem;">${result.wildcard}</div>
+                    </div>
+                </div>
+                
+                ${result.timer ? `
+                    <div style="margin-top:1rem;background:var(--bg3);border-radius:var(--radius);padding:0.5rem 1rem;border-left:4px solid var(--accent);">
+                        <strong>⏱️ Suggested Timer:</strong> ${result.timer.segments} segments (from ${result.timer.card})
+                        <button class="btn btn-sm btn-primary" onclick="window.createTimerFromCard('${result.timer.card}', ${result.timer.segments})" style="margin-left:0.5rem;">➕ Add Timer</button>
+                    </div>
+                ` : ''}
+                
+                <div style="margin-top:1rem;display:flex;gap:0.5rem;flex-wrap:wrap;">
+                    <button class="btn btn-gold" onclick="window.closeCrownSpread(); setTimeout(window.openCrownSpread, 100);">🔄 New Spread</button>
+                    <button class="btn btn-secondary" onclick="window.closeCrownSpread();">Close</button>
+                </div>
+            </div>
+        `;
+        
+        document.body.appendChild(crownSpreadModal);
+        
+        broadcastDraw(cards, 'crown', regionName, result.synthesis);
+        
+        crownSpreadModal.addEventListener('click', (e) => {
+            if (e.target === crownSpreadModal) {
+                window.closeCrownSpread();
+            }
+        });
+        
+        document.addEventListener('keydown', function escHandler(e) {
+            if (e.key === 'Escape' && crownSpreadModal && crownSpreadModal.parentNode) {
+                window.closeCrownSpread();
+                document.removeEventListener('keydown', escHandler);
+            }
+        });
+    });
+}
+
+// Close Crown Spread modal
+window.closeCrownSpread = function() {
+    if (crownSpreadModal && crownSpreadModal.parentNode) {
+        crownSpreadModal.remove();
+        crownSpreadModal = null;
+    }
+    updateDeckCount();
+};
+
+// ============================================================
+// EXPOSED REGION FUNCTIONS
+// ============================================================
+
+/**
+ * Get the currently selected region
+ * @returns {string|null} The selected region name or null if none selected
+ */
+export function getSelectedRegion() {
+    return selectedRegion;
+}
+
+/**
+ * Get all available region names
+ * @returns {string[]} Array of region names
+ */
+export function getRegionNames() {
+    return [...regionNames];
+}
+
+/**
+ * Set the selected region programmatically
+ * @param {string} regionName - The region name to select
+ * @returns {Promise<boolean>} True if successful, false otherwise
+ */
+export async function setSelectedRegion(regionName) {
+    if (!regionNames.includes(regionName)) {
+        console.warn(`[Decks] Region "${regionName}" not found`);
+        return false;
+    }
+    
+    selectedRegion = regionName;
+    const select = document.getElementById('deck-region-select');
+    if (select) {
+        select.value = regionName;
+        await handleRegionChange();
+    }
+    return true;
+}
+
+/**
+ * Get the current region data
+ * @returns {object|null} The region data or null if not loaded
+ */
+export function getRegionData() {
+    return regionData;
+}
+
+/**
+ * Get a card meaning for a specific suit and rank in the current region
+ * @param {string} suit - The card suit
+ * @param {string} rank - The card rank
+ * @returns {string} The card meaning
+ */
+export function getCardMeaning(suit, rank) {
+    if (!regionData) {
+        return `A complication of ${suit} arises.`;
+    }
+    return getCardMeaningFromRegion(suit, rank, regionData);
+}
+
+// ============================================================
+// SHORTCUT FUNCTIONS FOR DASHBOARD QUICK BUTTONS
+// ============================================================
+
+/**
+ * Quick draw with specified number of cards
+ * @param {number} count - Number of cards to draw (1-3)
+ * @param {string} regionName - Optional region name (uses current if not specified)
+ * @returns {Promise<object>} The draw result
+ */
+export async function quickDraw(count = 1, regionName = null) {
+    if (regionName) {
+        await setSelectedRegion(regionName);
+    }
+    
+    if (!selectedRegion) {
+        showToast('Please select a region first.', 'error');
+        return null;
+    }
+    
+    const data = await fetchRegionData(selectedRegion);
+    if (!data) return null;
+    
+    if (deck.length < count) {
+        showToast('Deck running low! Reshuffling...', 'warning');
+        buildDeck();
+    }
+    
+    const cards = [];
+    for (let i = 0; i < count; i++) {
+        if (deck.length === 0) buildDeck();
+        cards.push(deck.pop());
+    }
+    updateDeckCount();
+    
+    const synthesis = synthesiseConsequence(cards, data);
+    const cardNames = cards.map(c => c.isJoker ? '🃏 Joker' : `${c.rankName} of ${c.suitName}`).join(', ');
+    
+    broadcastDraw(cards, String(count), selectedRegion, synthesis);
+    
+    deckHistory.push({
+        time: new Date().toLocaleTimeString(),
+        cards: cardNames,
+        synthesis: synthesis.replace(/\n/g, ' '),
+        type: `${count} Draw${count > 1 ? 's' : ''}`
+    });
+    renderDeckHistory();
+    
+    showToast(`🎴 ${cardNames}`, 'success');
+    
+    return {
+        cards,
+        synthesis,
+        cardNames,
+        type: count
+    };
+}
+
+/**
+ * Quick Crown Spread
+ * @param {string} regionName - Optional region name (uses current if not specified)
+ * @returns {Promise<object>} The Crown Spread result
+ */
+export async function quickCrownSpread(regionName = null) {
+    if (regionName) {
+        await setSelectedRegion(regionName);
+    }
+    
+    if (!selectedRegion) {
+        showToast('Please select a region first.', 'error');
+        return null;
+    }
+    
+    const data = await fetchRegionData(selectedRegion);
+    if (!data) return null;
+    
+    if (deck.length < 5) {
+        showToast('Deck running low! Reshuffling...', 'warning');
+        buildDeck();
+    }
+    
+    const cards = [];
+    for (let i = 0; i < 5; i++) {
+        if (deck.length === 0) buildDeck();
+        cards.push(deck.pop());
+    }
+    updateDeckCount();
+    
+    const mainCards = cards.slice(0, 4);
+    const wildcard = cards[4];
+    const result = synthesiseCrownSpread(mainCards, wildcard, data);
+    
+    broadcastDraw(cards, 'crown', selectedRegion, result.synthesis);
+    
+    const cardNames = cards.map(c => c.isJoker ? '🃏 Joker' : `${c.rankName} of ${c.suitName}`).join(', ');
+    deckHistory.push({
+        time: new Date().toLocaleTimeString(),
+        cards: cardNames,
+        synthesis: result.synthesis.replace(/\n/g, ' '),
+        type: 'Crown Spread'
+    });
+    renderDeckHistory();
+    
+    showToast(`👑 Crown Spread: ${cardNames}`, 'success');
+    
+    return {
+        cards,
+        mainCards,
+        wildcard,
+        result,
+        cardNames
+    };
+}
+
+// Expose to window for onclick handlers
+window.openCrownSpread = openCrownSpread;
+window.closeCrownSpread = window.closeCrownSpread;
+window.createTimerFromCard = createTimerFromCard;
+window.drawConsequence = drawConsequence;
+window.resetDeck = resetDeck;
+window.quickDraw = quickDraw;
+window.quickCrownSpread = quickCrownSpread;
+window.getSelectedRegion = getSelectedRegion;
+window.getRegionNames = getRegionNames;
+window.setSelectedRegion = setSelectedRegion;
+
+// ============================================================
+// EXPORT
 // ============================================================
 
 export default {
     render,
-    destroy,
+    drawConsequence,
+    resetDeck,
+    attachEvents,
     onActivate,
     onDeactivate,
     refresh,
-    update
+    destroy,
+    loadManifest,
+    fetchRegionData,
+    buildDeck,
+    openCrownSpread,
+    closeCrownSpread: window.closeCrownSpread,
+    getSelectedRegion,
+    getRegionNames,
+    setSelectedRegion,
+    getRegionData,
+    getCardMeaning,
+    registerRegionChange,
+    quickDraw,
+    quickCrownSpread
 };

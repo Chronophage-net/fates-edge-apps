@@ -373,8 +373,7 @@ async function loadManifest() {
         }
     } catch (e) {
         console.warn('[Decks] Could not load manifest:', e);
-        regionNames = ['Acasia']; // Fallback default
-        // Create a fallback manifest if needed
+        regionNames = ['Acasia'];
         try {
             const fallbackRes = await fetch('/regions/acasia.json');
             if (fallbackRes.ok) {
@@ -402,7 +401,6 @@ async function fetchRegionData(regionName) {
         return data;
     } catch (e) {
         console.warn(`[Decks] Error loading region ${regionName}:`, e);
-        // Create fallback data
         const fallbackData = {
             name: regionName,
             description: `${regionName} - A region of Fate's Edge.`,
@@ -420,7 +418,7 @@ async function fetchRegionData(regionName) {
 // REGION CHANGE HANDLER
 // ============================================================
 
-async function onRegionChange() {
+async function handleRegionChange() {
     const select = document.getElementById('deck-region-select');
     if (!select) return;
     
@@ -453,20 +451,6 @@ async function onRegionChange() {
             console.warn('Region change callback error:', e);
         }
     });
-}
-
-/**
- * Register a callback for region changes
- * @param {Function} callback - Function(regionName, regionData)
- */
-export function onRegionChangeRegister(callback) {
-    if (typeof callback === 'function') {
-        regionChangeCallbacks.push(callback);
-        // Immediately call with current region if available
-        if (selectedRegion) {
-            callback(selectedRegion, regionData);
-        }
-    }
 }
 
 // ============================================================
@@ -549,14 +533,14 @@ export async function render(el) {
 
     const select = document.getElementById('deck-region-select');
     if (select) {
-        select.addEventListener('change', onRegionChange);
+        select.addEventListener('change', handleRegionChange);
         if (regionNames.length > 0) {
             select.value = regionNames[0];
-            await onRegionChange();
+            await handleRegionChange();
             selectedRegion = regionNames[0];
         } else if (selectedRegion) {
             select.value = selectedRegion;
-            await onRegionChange();
+            await handleRegionChange();
         }
     }
     
@@ -896,7 +880,7 @@ export async function onActivate() {
     console.log('[Decks] Activated');
     const select = document.getElementById('deck-region-select');
     if (select && select.value) {
-        await onRegionChange();
+        await handleRegionChange();
     }
 }
 
@@ -922,7 +906,7 @@ export async function refresh() {
         } else if (regionNames.length > 0) {
             select.value = regionNames[0];
         }
-        await onRegionChange();
+        await handleRegionChange();
     }
 }
 
@@ -977,7 +961,6 @@ export function attachEvents() {
 let crownSpreadModal = null;
 
 export function openCrownSpread() {
-    // If modal already exists, remove it first
     if (crownSpreadModal && crownSpreadModal.parentNode) {
         crownSpreadModal.remove();
         crownSpreadModal = null;
@@ -992,7 +975,6 @@ export function openCrownSpread() {
         animation: fadeIn 0.3s ease;
     `;
     
-    // Draw 5 cards for Crown Spread
     if (deck.length < 5) {
         buildDeck();
     }
@@ -1006,7 +988,6 @@ export function openCrownSpread() {
     const mainCards = cards.slice(0, 4);
     const wildcard = cards[4];
     
-    // Get region data
     const regionName = selectedRegion || 'Acasia';
     fetchRegionData(regionName).then(data => {
         const result = synthesiseCrownSpread(mainCards, wildcard, data);
@@ -1074,17 +1055,14 @@ export function openCrownSpread() {
         
         document.body.appendChild(crownSpreadModal);
         
-        // Broadcast via WebSocket
         broadcastDraw(cards, 'crown', regionName, result.synthesis);
         
-        // Click on backdrop to close
         crownSpreadModal.addEventListener('click', (e) => {
             if (e.target === crownSpreadModal) {
                 window.closeCrownSpread();
             }
         });
         
-        // Escape key to close
         document.addEventListener('keydown', function escHandler(e) {
             if (e.key === 'Escape' && crownSpreadModal && crownSpreadModal.parentNode) {
                 window.closeCrownSpread();
@@ -1100,12 +1078,11 @@ window.closeCrownSpread = function() {
         crownSpreadModal.remove();
         crownSpreadModal = null;
     }
-    // Update deck count display
     updateDeckCount();
 };
 
 // ============================================================
-// EXPOSED REGION FUNCTIONS
+// EXPOSED FUNCTIONS
 // ============================================================
 
 /**
@@ -1139,7 +1116,7 @@ export async function setSelectedRegion(regionName) {
     const select = document.getElementById('deck-region-select');
     if (select) {
         select.value = regionName;
-        await onRegionChange();
+        await handleRegionChange();
     }
     return true;
 }
@@ -1169,10 +1146,9 @@ export function getCardMeaning(suit, rank) {
  * Register a callback for region changes
  * @param {Function} callback - Function(regionName, regionData)
  */
-export function onRegionChange(callback) {
+export function registerRegionChange(callback) {
     if (typeof callback === 'function') {
         regionChangeCallbacks.push(callback);
-        // Immediately call with current region if available
         if (selectedRegion) {
             callback(selectedRegion, regionData);
         }
@@ -1217,10 +1193,8 @@ export async function quickDraw(count = 1, regionName = null) {
     const synthesis = synthesiseConsequence(cards, data);
     const cardNames = cards.map(c => c.isJoker ? '🃏 Joker' : `${c.rankName} of ${c.suitName}`).join(', ');
     
-    // Broadcast via WebSocket
     broadcastDraw(cards, String(count), selectedRegion, synthesis);
     
-    // Add to history
     deckHistory.push({
         time: new Date().toLocaleTimeString(),
         cards: cardNames,
@@ -1229,7 +1203,6 @@ export async function quickDraw(count = 1, regionName = null) {
     });
     renderDeckHistory();
     
-    // Show toast
     showToast(`🎴 ${cardNames}`, 'success');
     
     return {
@@ -1274,10 +1247,8 @@ export async function quickCrownSpread(regionName = null) {
     const wildcard = cards[4];
     const result = synthesiseCrownSpread(mainCards, wildcard, data);
     
-    // Broadcast via WebSocket
     broadcastDraw(cards, 'crown', selectedRegion, result.synthesis);
     
-    // Add to history
     const cardNames = cards.map(c => c.isJoker ? '🃏 Joker' : `${c.rankName} of ${c.suitName}`).join(', ');
     deckHistory.push({
         time: new Date().toLocaleTimeString(),
@@ -1287,7 +1258,6 @@ export async function quickCrownSpread(regionName = null) {
     });
     renderDeckHistory();
     
-    // Show toast
     showToast(`👑 Crown Spread: ${cardNames}`, 'success');
     
     return {
@@ -1299,7 +1269,10 @@ export async function quickCrownSpread(regionName = null) {
     };
 }
 
-// Expose to window for onclick handlers
+// ============================================================
+// WINDOW EXPOSURES
+// ============================================================
+
 window.openCrownSpread = openCrownSpread;
 window.closeCrownSpread = window.closeCrownSpread;
 window.createTimerFromCard = createTimerFromCard;
@@ -1310,186 +1283,7 @@ window.quickCrownSpread = quickCrownSpread;
 window.getSelectedRegion = getSelectedRegion;
 window.getRegionNames = getRegionNames;
 window.setSelectedRegion = setSelectedRegion;
-
-// Add these near the bottom of the file, in the export section
-
-/**
- * Get the currently selected region
- * @returns {string|null} The selected region name or null if none selected
- */
-export function getSelectedRegion() {
-    return selectedRegion;
-}
-
-/**
- * Get all available region names
- * @returns {string[]} Array of region names
- */
-export function getRegionNames() {
-    return regionNames;
-}
-
-/**
- * Set the selected region programmatically
- * @param {string} regionName - The region name to select
- * @returns {Promise<boolean>} True if successful, false otherwise
- */
-export async function setSelectedRegion(regionName) {
-    if (!regionNames.includes(regionName)) {
-        console.warn(`[Decks] Region "${regionName}" not found`);
-        return false;
-    }
-    
-    selectedRegion = regionName;
-    const select = document.getElementById('deck-region-select');
-    if (select) {
-        select.value = regionName;
-        await onRegionChange();
-    }
-    return true;
-}
-
-/**
- * Get the current region data
- * @returns {object|null} The region data or null if not loaded
- */
-export function getRegionData() {
-    return regionData;
-}
-
-/**
- * Get a card meaning for a specific suit and rank in the current region
- * @param {string} suit - The card suit
- * @param {string} rank - The card rank
- * @returns {string} The card meaning
- */
-export function getCardMeaning(suit, rank) {
-    if (!regionData) {
-        return `A complication of ${suit} arises.`;
-    }
-    return getCardMeaningFromRegion(suit, rank, regionData);
-}
-
-/**
- * Register a callback for region changes
- * @param {Function} callback - Function(regionName, regionData)
- */
-export function onRegionChange(callback) {
-    if (typeof callback === 'function') {
-        regionChangeCallbacks = regionChangeCallbacks || [];
-        regionChangeCallbacks.push(callback);
-        // Immediately call with current region if available
-        if (selectedRegion) {
-            callback(selectedRegion, regionData);
-        }
-    }
-}
-
-/**
- * Quick draw with specified number of cards
- * @param {number} count - Number of cards to draw (1-3)
- * @param {string} regionName - Optional region name (uses current if not specified)
- * @returns {Promise<object>} The draw result
- */
-export async function quickDraw(count = 1, regionName = null) {
-    if (regionName) {
-        await setSelectedRegion(regionName);
-    }
-    
-    if (!selectedRegion) {
-        showToast('Please select a region first.', 'error');
-        return null;
-    }
-    
-    const data = await fetchRegionData(selectedRegion);
-    if (!data) return null;
-    
-    if (deck.length < count) {
-        showToast('Deck running low! Reshuffling...', 'warning');
-        buildDeck();
-    }
-    
-    const cards = [];
-    for (let i = 0; i < count; i++) {
-        if (deck.length === 0) buildDeck();
-        cards.push(deck.pop());
-    }
-    updateDeckCount();
-    
-    const synthesis = synthesiseConsequence(cards, data);
-    const cardNames = cards.map(c => c.isJoker ? '🃏 Joker' : `${c.rankName} of ${c.suitName}`).join(', ');
-    
-    // Add to history
-    deckHistory.push({
-        time: new Date().toLocaleTimeString(),
-        cards: cardNames,
-        synthesis: synthesis.replace(/\n/g, ' '),
-        type: `${count} Draw${count > 1 ? 's' : ''}`
-    });
-    renderDeckHistory();
-    
-    return {
-        cards,
-        synthesis,
-        cardNames,
-        type: count
-    };
-}
-
-/**
- * Quick Crown Spread
- * @param {string} regionName - Optional region name (uses current if not specified)
- * @returns {Promise<object>} The Crown Spread result
- */
-export async function quickCrownSpread(regionName = null) {
-    if (regionName) {
-        await setSelectedRegion(regionName);
-    }
-    
-    if (!selectedRegion) {
-        showToast('Please select a region first.', 'error');
-        return null;
-    }
-    
-    const data = await fetchRegionData(selectedRegion);
-    if (!data) return null;
-    
-    if (deck.length < 5) {
-        showToast('Deck running low! Reshuffling...', 'warning');
-        buildDeck();
-    }
-    
-    const cards = [];
-    for (let i = 0; i < 5; i++) {
-        if (deck.length === 0) buildDeck();
-        cards.push(deck.pop());
-    }
-    updateDeckCount();
-    
-    const mainCards = cards.slice(0, 4);
-    const wildcard = cards[4];
-    const result = synthesiseCrownSpread(mainCards, wildcard, data);
-    
-    const cardNames = cards.map(c => c.isJoker ? '🃏 Joker' : `${c.rankName} of ${c.suitName}`).join(', ');
-    deckHistory.push({
-        time: new Date().toLocaleTimeString(),
-        cards: cardNames,
-        synthesis: result.synthesis.replace(/\n/g, ' '),
-        type: 'Crown Spread'
-    });
-    renderDeckHistory();
-    
-    return {
-        cards,
-        mainCards,
-        wildcard,
-        result,
-        cardNames
-    };
-}
-// ============================================================
-// EXPORT
-// ============================================================
+window.registerRegionChange = registerRegionChange;
 
 // ============================================================
 // EXPORT
@@ -1514,7 +1308,7 @@ export default {
     setSelectedRegion,
     getRegionData,
     getCardMeaning,
-    onRegionChange,
+    registerRegionChange,
     quickDraw,
     quickCrownSpread
 };
