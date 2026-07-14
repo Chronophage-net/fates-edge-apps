@@ -4,10 +4,10 @@ on:
   push:
     branches: [main]
     paths:
-      - 'ttrpg/utilities/javascript/fates-edge-web-client/**'
-      - 'ttrpg/utilities/javascript/fates-edge-socket-server/**'
-      - 'ttrpg/utilities/javascript/fates-edge-desktop-client/**'
-      - 'ttrpg/utilities/javascript/data/**'
+      - 'utilities/javascript/fates-edge-web-client/**'
+      - 'utilities/javascript/fates-edge-socket-server/**'
+      - 'utilities/javascript/fates-edge-desktop-client/**'
+      - 'utilities/javascript/data/**'
       - 'misc/**'
       - '.github/workflows/deploy-apps.yml'
 
@@ -47,15 +47,15 @@ jobs:
       matrix:
         include:
           - name: web-client
-            path: ttrpg/utilities/javascript/fates-edge-web-client
+            path: utilities/javascript/fates-edge-web-client
             build: false
             package: false
           - name: socket-server
-            path: ttrpg/utilities/javascript/fates-edge-socket-server
+            path: utilities/javascript/fates-edge-socket-server
             build: false
             package: true
           - name: desktop-client
-            path: ttrpg/utilities/javascript/fates-edge-desktop-client
+            path: utilities/javascript/fates-edge-desktop-client
             build: false
             package: true
 
