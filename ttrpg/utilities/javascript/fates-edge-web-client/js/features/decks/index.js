@@ -1,6 +1,6 @@
-// features/consequences/index.js
+// features/decks/index.js
 /**
- * Consequences feature - Deck of Consequences
+ * Decks feature - Deck of Consequences and Crown Spread
  * Supports single draw, multiple draw, and Crown Spread (4+1 wildcard).
  * Loads region data dynamically from /regions/.
  */
@@ -306,20 +306,18 @@ function synthesiseCrownSpread(mainCards, wildcard, regionData) {
 // LOAD REGION DATA
 // ============================================================
 
-// features/consequences/index.js - Fix loadManifest()
 async function loadManifest() {
     try {
         const res = await fetch('/regions/manifest.json');
         if (!res.ok) throw new Error('Manifest not found');
         const data = await res.json();
         if (Array.isArray(data)) {
-            // Handle both string array and object array
             regionNames = data.map(item => typeof item === 'string' ? item : item.name);
         } else {
             regionNames = [];
         }
     } catch (e) {
-        console.warn('[Consequences] Could not load manifest:', e);
+        console.warn('[Decks] Could not load manifest:', e);
         regionNames = [];
         showToast('Could not load region list. Check /regions/manifest.json', 'error');
     }
@@ -337,14 +335,14 @@ async function fetchRegionData(regionName) {
         regionData = data;
         return data;
     } catch (e) {
-        console.warn(`[Consequences] Error loading region ${regionName}:`, e);
+        console.warn(`[Decks] Error loading region ${regionName}:`, e);
         showToast(`Could not load region "${regionName}".`, 'error');
         return null;
     }
 }
 
 // ============================================================
-// RENDER - MAIN EXPORT
+// RENDER
 // ============================================================
 
 export async function render(el) {
@@ -357,7 +355,7 @@ export async function render(el) {
     }
 
     container.innerHTML = `
-        <div class="consequences-header">
+        <div class="decks-header">
             <h1 class="page-title">🃏 Deck of Consequences</h1>
             <p class="page-sub">Transform Story Beats (SB) into thematic complications. Choose a region and draw type.</p>
         </div>
@@ -365,7 +363,7 @@ export async function render(el) {
         <div class="panel">
             <div class="field" style="max-width:300px;">
                 <label>Region</label>
-                <select id="consequence-region-select">
+                <select id="deck-region-select">
                     <option value="">— Select Region —</option>
                     ${regionOptions}
                 </select>
@@ -421,9 +419,9 @@ export async function render(el) {
     attachEvents();
     updateSpreadDescription();
 
-    document.getElementById('consequence-region-select').addEventListener('change', onRegionChange);
+    document.getElementById('deck-region-select').addEventListener('change', onRegionChange);
     if (regionNames.length > 0) {
-        document.getElementById('consequence-region-select').value = regionNames[0];
+        document.getElementById('deck-region-select').value = regionNames[0];
         await onRegionChange();
         selectedRegion = regionNames[0];
     }
@@ -436,7 +434,7 @@ export async function render(el) {
 // ============================================================
 
 async function onRegionChange() {
-    const select = document.getElementById('consequence-region-select');
+    const select = document.getElementById('deck-region-select');
     const regionName = select.value;
     const descEl = document.getElementById('region-description');
 
@@ -447,7 +445,6 @@ async function onRegionChange() {
 
     const data = await fetchRegionData(regionName);
     if (data && data.description) {
-        // ✅ Use innerHTML to render HTML properly
         descEl.innerHTML = data.description;
     } else if (data) {
         descEl.innerHTML = '<p class="region-text">No description available for this region.</p>';
@@ -502,7 +499,7 @@ function updateSpreadDescription() {
 }
 
 // ============================================================
-// DRAW
+// DRAW - FIXED
 // ============================================================
 
 export async function drawConsequence() {
@@ -519,7 +516,8 @@ export async function drawConsequence() {
 
     if (type === 'crown') {
         isCrown = true;
-        while (deck.length < 5) {
+        // Need 5 cards for Crown Spread (4 main + 1 wildcard)
+        if (deck.length < 5) {
             showToast('Deck running low! Reshuffling...', 'warning');
             buildDeck();
         }
@@ -529,7 +527,7 @@ export async function drawConsequence() {
         }
     } else {
         const count = parseInt(type, 10);
-        while (deck.length < count) {
+        if (deck.length < count) {
             showToast('Deck running low! Reshuffling...', 'warning');
             buildDeck();
         }
@@ -597,6 +595,7 @@ export async function drawConsequence() {
         timerEl.style.display = 'none';
     }
 
+    // Add to history
     const cardStr = cards.map(c => c.isJoker ? `🃏${c.rank}` : `${c.rankName} of ${c.suitName}`).join(' | ');
     deckHistory.push({
         time: new Date().toLocaleTimeString(),
@@ -605,7 +604,7 @@ export async function drawConsequence() {
         type: type === 'crown' ? 'Crown Spread' : `${type} Draw${type > 1 ? 's' : ''}`
     });
     renderDeckHistory();
-    showToast(`Drawn ${cards.length} card${cards.length > 1 ? 's' : ''}.`, 'info');
+    showToast(`🃏 Drew ${cards.length} card${cards.length > 1 ? 's' : ''}`, 'success');
 }
 
 function synthesiseConsequence(cards, regionData) {
@@ -753,22 +752,21 @@ export function resetDeck() {
 // ============================================================
 
 export async function onActivate() {
-    console.log('[Consequences] Activated');
-    const select = document.getElementById('consequence-region-select');
+    console.log('[Decks] Activated');
+    const select = document.getElementById('deck-region-select');
     if (select && select.value) {
         await onRegionChange();
     }
 }
 
 export function onDeactivate() {
-    console.log('[Consequences] Deactivated');
-    // Clean up any intervals or listeners if needed
+    console.log('[Decks] Deactivated');
 }
 
 export async function refresh() {
-    console.log('[Consequences] Refreshing');
+    console.log('[Decks] Refreshing');
     await loadManifest();
-    const select = document.getElementById('consequence-region-select');
+    const select = document.getElementById('deck-region-select');
     if (select) {
         const currentValue = select.value;
         select.innerHTML = '<option value="">— Select Region —</option>';

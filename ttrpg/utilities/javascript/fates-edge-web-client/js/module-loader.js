@@ -6,6 +6,8 @@ class ModuleLoader {
         this.loading = new Map();
         this.container = document.getElementById('app-content');
         this.currentModule = null;
+        // In module-loader.js, add the new modules to modulePaths
+
         this.modulePaths = {
             // Core modules
             'sync': './core/sync/index.js',
@@ -21,11 +23,13 @@ class ModuleLoader {
             'encounters': './features/encounters/index.js',
             'factions': './features/factions/index.js',
             'home': './features/home/index.js',
+            'kanban': './features/kanban/index.js',        // NEW
             'patrons': './features/patrons/index.js',
             'search': './features/search/index.js',
             'settings': './features/settings/index.js',
             'timers': './features/timers/index.js',
             'vtt': './features/vtt/index.js',
+            'whiteboard': './features/whiteboard/index.js', // NEW
             'wiki': './features/wiki/index.js',
         };
     }

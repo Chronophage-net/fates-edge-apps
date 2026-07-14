@@ -5,7 +5,7 @@
  * Followers, Assets, Scene Tools, VTT, and Campaign Status
  */
 
-import { getState, getCharacter, saveState } from '../../core/state.js';
+import { getState, saveState } from '../../core/state.js';
 import { escHtml } from '../../core/utils.js';
 import { showToast } from '../../components/Toast.js';
 
@@ -147,15 +147,15 @@ export function render(el) {
                         <span class="qa-label">Combat Tracker</span>
                         <span class="qa-desc">Open combat tracker</span>
                     </button>
-                    <button class="quick-action-btn" onclick="window.openWhiteboard()">
-                        <span class="qa-icon">✏️</span>
-                        <span class="qa-label">Whiteboard</span>
-                        <span class="qa-desc">Campaign whiteboard</span>
-                    </button>
                     <button class="quick-action-btn" onclick="window.openKanban()">
                         <span class="qa-icon">📋</span>
                         <span class="qa-label">Kanban</span>
                         <span class="qa-desc">Campaign board</span>
+                    </button>
+                    <button class="quick-action-btn" onclick="window.openWhiteboard()">
+                        <span class="qa-icon">✏️</span>
+                        <span class="qa-label">Whiteboard</span>
+                        <span class="qa-desc">Visual planning</span>
                     </button>
                     <button class="quick-action-btn" onclick="window.drawConsequence()">
                         <span class="qa-icon">🃏</span>
@@ -509,7 +509,7 @@ window.dashboardRefresh = function() {
 };
 
 window.openCharacter = function(id) {
-    document.querySelector('.sidebar-nav button[data-tab="characters"]')?.click();
+    document.querySelector('.sidebar-nav .nav-item[data-tab="characters"]')?.click();
     setTimeout(() => {
         import('../characters/index.js').then(module => {
             if (module.openEditor) {
@@ -520,7 +520,7 @@ window.openCharacter = function(id) {
 };
 
 window.openCharacterBuilder = function() {
-    document.querySelector('.sidebar-nav button[data-tab="characters"]')?.click();
+    document.querySelector('.sidebar-nav .nav-item[data-tab="characters"]')?.click();
     setTimeout(() => {
         import('../characters/index.js').then(module => {
             if (module.openEditor) {
@@ -531,15 +531,15 @@ window.openCharacterBuilder = function() {
 };
 
 window.openFactions = function() {
-    document.querySelector('.sidebar-nav button[data-tab="factions"]')?.click();
+    document.querySelector('.sidebar-nav .nav-item[data-tab="factions"]')?.click();
 };
 
 window.openPatrons = function() {
-    document.querySelector('.sidebar-nav button[data-tab="patrons"]')?.click();
+    document.querySelector('.sidebar-nav .nav-item[data-tab="patrons"]')?.click();
 };
 
 window.openFactionDetail = function(id) {
-    document.querySelector('.sidebar-nav button[data-tab="factions"]')?.click();
+    document.querySelector('.sidebar-nav .nav-item[data-tab="factions"]')?.click();
     setTimeout(() => {
         import('../factions/index.js').then(module => {
             if (window.viewFaction) {
@@ -550,7 +550,7 @@ window.openFactionDetail = function(id) {
 };
 
 window.openPatronDetail = function(id) {
-    document.querySelector('.sidebar-nav button[data-tab="patrons"]')?.click();
+    document.querySelector('.sidebar-nav .nav-item[data-tab="patrons"]')?.click();
     setTimeout(() => {
         import('../patrons/index.js').then(module => {
             if (window.viewPatron) {
@@ -561,7 +561,7 @@ window.openPatronDetail = function(id) {
 };
 
 window.openEncounter = function(id) {
-    document.querySelector('.sidebar-nav button[data-tab="encounters"]')?.click();
+    document.querySelector('.sidebar-nav .nav-item[data-tab="encounters"]')?.click();
     setTimeout(() => {
         import('../encounters/index.js').then(module => {
             if (module.openEditor) {
@@ -635,25 +635,24 @@ window.openCombatTrackerForEncounter = function(id) {
     });
 };
 
-window.openWhiteboard = function() {
-    document.querySelector('.sidebar-nav button[data-tab="scene-tools"]')?.click();
-    setTimeout(() => {
-        const container = document.getElementById('scene-view-container');
-        if (container) {
-            // Switch to whiteboard tab
-            const whiteboardTab = container.parentElement?.querySelector('.scene-tab[data-view="whiteboard"]');
-            if (whiteboardTab) whiteboardTab.click();
-        }
-    }, 200);
-};
-
 window.openKanban = function() {
-    document.querySelector('.sidebar-nav button[data-tab="scene-tools"]')?.click();
+    document.querySelector('.sidebar-nav .nav-item[data-tab="scene-tools"]')?.click();
     setTimeout(() => {
         const container = document.getElementById('scene-view-container');
         if (container) {
             const kanbanTab = container.parentElement?.querySelector('.scene-tab[data-view="kanban"]');
             if (kanbanTab) kanbanTab.click();
+        }
+    }, 200);
+};
+
+window.openWhiteboard = function() {
+    document.querySelector('.sidebar-nav .nav-item[data-tab="scene-tools"]')?.click();
+    setTimeout(() => {
+        const container = document.getElementById('scene-view-container');
+        if (container) {
+            const whiteboardTab = container.parentElement?.querySelector('.scene-tab[data-view="whiteboard"]');
+            if (whiteboardTab) whiteboardTab.click();
         }
     }, 200);
 };

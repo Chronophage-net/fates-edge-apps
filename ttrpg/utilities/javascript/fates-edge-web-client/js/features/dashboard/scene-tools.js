@@ -20,25 +20,7 @@ import { showToast } from '../../components/Toast.js';
 
 let container = null;
 let activeTab = 'scene';
-let whiteboardData = {
-    notes: [],
-    drawings: [],
-    stickyNotes: []
-};
-let kanbanData = {
-    columns: {
-        todo: { title: '📋 To Do', items: [] },
-        doing: { title: '🔄 Doing', items: [] },
-        done: { title: '✅ Done', items: [] },
-        blocked: { title: '🚫 Blocked', items: [] }
-    }
-};
-let campaignState = {
-    activeThreats: [],
-    opportunities: [],
-    campaignTimers: [],
-    notes: ''
-};
+let moduleCache = {};
 
 // ============================================================
 // LOAD/SAVE
@@ -47,19 +29,12 @@ let campaignState = {
 function loadCampaignData() {
     const saved = getState();
     if (saved.campaign) {
-        whiteboardData = saved.campaign.whiteboard || { notes: [], drawings: [], stickyNotes: [] };
-        kanbanData = saved.campaign.kanban || { columns: { todo: { title: '📋 To Do', items: [] }, doing: { title: '🔄 Doing', items: [] }, done: { title: '✅ Done', items: [] }, blocked: { title: '🚫 Blocked', items: [] } } };
-        campaignState = saved.campaign.state || { activeThreats: [], opportunities: [], campaignTimers: [], notes: '' };
+        // Individual modules handle their own data loading
     }
 }
 
 function saveCampaignData() {
-    const saved = getState();
-    if (!saved.campaign) saved.campaign = {};
-    saved.campaign.whiteboard = whiteboardData;
-    saved.campaign.kanban = kanbanData;
-    saved.campaign.state = campaignState;
-    saveState();
+    // Individual modules save their own data
 }
 
 // ============================================================
@@ -145,6 +120,21 @@ function renderSceneView() {
                         <span class="qa-label">Combat Tracker</span>
                         <span class="qa-desc">Open combat tracker</span>
                     </button>
+                    <button class="quick-action-btn" onclick="window.openKanban()">
+                        <span class="qa-icon">📋</span>
+                        <span class="qa-label">Kanban Board</span>
+                        <span class="qa-desc">Campaign progress tracker</span>
+                    </button>
+                    <button class="quick-action-btn" onclick="window.openWhiteboard()">
+                        <span class="qa-icon">✏️</span>
+                        <span class="qa-label">Whiteboard</span>
+                        <span class="qa-desc">Visual planning canvas</span>
+                    </button>
+                    <button class="quick-action-btn" onclick="window.openCrownSpread()">
+                        <span class="qa-icon">👑</span>
+                        <span class="qa-label">Crown Spread</span>
+                        <span class="qa-desc">Campaign planning</span>
+                    </button>
                 </div>
             </div>
 
@@ -208,41 +198,17 @@ function renderSceneView() {
 }
 
 // ============================================================
-// KANBAN VIEW
+// KANBAN VIEW - Loads the Kanban module
 // ============================================================
 
 function renderKanbanView() {
-    const columns = kanbanData.columns;
-    
     return `
-        <div class="kanban-view">
+        <div class="kanban-loader">
             <div class="panel">
-                <div class="panel-header">
-                    <h3 class="panel-title">📋 Campaign Kanban</h3>
-                    <button class="btn btn-sm btn-primary" onclick="window.addKanbanItem()">+ Add Item</button>
-                </div>
-                <div class="kanban-board">
-                    ${Object.entries(columns).map(([key, col]) => `
-                        <div class="kanban-column" data-column="${key}">
-                            <div class="kanban-column-header">${col.title}</div>
-                            <div class="kanban-column-items">
-                                ${col.items.length === 0 ? '<p class="text-muted" style="font-size:0.8rem;padding:0.5rem;">Empty</p>' : ''}
-                                ${col.items.map((item, idx) => `
-                                    <div class="kanban-item" data-column="${key}" data-index="${idx}">
-                                        <div class="kanban-item-title">${escHtml(item.title)}</div>
-                                        ${item.description ? `<div class="kanban-item-desc">${escHtml(item.description)}</div>` : ''}
-                                        <div class="kanban-item-actions">
-                                            ${item.timer ? `<span class="kanban-timer">⏱️ ${item.timer}</span>` : ''}
-                                            ${item.encounter ? `<span class="kanban-encounter">⚔️ ${item.encounter}</span>` : ''}
-                                            <button class="btn btn-xs btn-ghost" onclick="window.moveKanbanItem('${key}', ${idx}, -1)">←</button>
-                                            <button class="btn btn-xs btn-ghost" onclick="window.moveKanbanItem('${key}', ${idx}, 1)">→</button>
-                                            <button class="btn btn-xs btn-danger" onclick="window.removeKanbanItem('${key}', ${idx})">✕</button>
-                                        </div>
-                                    </div>
-                                `).join('')}
-                            </div>
-                        </div>
-                    `).join('')}
+                <h3 class="panel-title">📋 Loading Kanban Board...</h3>
+                <div class="text-muted" style="text-align:center;padding:2rem;">
+                    <div style="font-size:2rem;margin-bottom:0.5rem;">⏳</div>
+                    <p>Loading campaign board...</p>
                 </div>
             </div>
         </div>
@@ -250,36 +216,17 @@ function renderKanbanView() {
 }
 
 // ============================================================
-// WHITEBOARD VIEW
+// WHITEBOARD VIEW - Loads the Whiteboard module
 // ============================================================
 
 function renderWhiteboardView() {
     return `
-        <div class="whiteboard-view">
+        <div class="whiteboard-loader">
             <div class="panel">
-                <div class="panel-header">
-                    <h3 class="panel-title">✏️ Campaign Whiteboard</h3>
-                    <div class="whiteboard-actions">
-                        <button class="btn btn-sm btn-primary" onclick="window.addWhiteboardNote()">+ Note</button>
-                        <button class="btn btn-sm btn-secondary" onclick="window.addWhiteboardSticky()">📌 Sticky</button>
-                        <button class="btn btn-sm btn-danger" onclick="window.clearWhiteboard()">🗑️ Clear</button>
-                    </div>
-                </div>
-                <div class="whiteboard-grid">
-                    ${whiteboardData.notes.map((note, idx) => `
-                        <div class="whiteboard-note">
-                            <div class="whiteboard-note-content">${escHtml(note)}</div>
-                            <button class="btn btn-xs btn-danger" onclick="window.removeWhiteboardNote(${idx})">✕</button>
-                        </div>
-                    `).join('')}
-                    ${whiteboardData.stickyNotes.map((sticky, idx) => `
-                        <div class="whiteboard-sticky" style="background:${sticky.color || '#ffd700'};">
-                            <div class="whiteboard-sticky-title">${escHtml(sticky.title || 'Note')}</div>
-                            <div class="whiteboard-sticky-content">${escHtml(sticky.content || '')}</div>
-                            <button class="btn btn-xs btn-danger" onclick="window.removeWhiteboardSticky(${idx})">✕</button>
-                        </div>
-                    `).join('')}
-                    ${whiteboardData.notes.length === 0 && whiteboardData.stickyNotes.length === 0 ? '<p class="text-muted">Whiteboard is empty. Add notes or stickies!</p>' : ''}
+                <h3 class="panel-title">✏️ Loading Whiteboard...</h3>
+                <div class="text-muted" style="text-align:center;padding:2rem;">
+                    <div style="font-size:2rem;margin-bottom:0.5rem;">⏳</div>
+                    <p>Loading whiteboard...</p>
                 </div>
             </div>
         </div>
@@ -291,9 +238,12 @@ function renderWhiteboardView() {
 // ============================================================
 
 function renderCampaignView() {
-    const threats = campaignState.activeThreats || [];
-    const opportunities = campaignState.opportunities || [];
-    const timers = campaignState.campaignTimers || [];
+    // Load from state
+    const saved = getState();
+    const campaign = saved.campaign?.state || { activeThreats: [], opportunities: [], campaignTimers: [], notes: '' };
+    const threats = campaign.activeThreats || [];
+    const opportunities = campaign.opportunities || [];
+    const timers = campaign.campaignTimers || [];
 
     return `
         <div class="campaign-view">
@@ -301,7 +251,7 @@ function renderCampaignView() {
             <div class="panel">
                 <h3 class="panel-title">📝 Campaign Notes</h3>
                 <textarea id="campaign-notes" rows="4" style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:0.75rem;color:var(--text);font-family:var(--font);">
-                    ${escHtml(campaignState.notes || '')}
+                    ${escHtml(campaign.notes || '')}
                 </textarea>
                 <button class="btn btn-sm btn-primary mt-1" onclick="window.saveCampaignNotes()">💾 Save Notes</button>
             </div>
@@ -430,22 +380,51 @@ function renderConsequencesView() {
 }
 
 // ============================================================
-// EVENT LISTENERS
+// MODULE LOADERS
 // ============================================================
 
-export function attachEvents() {
-    document.querySelectorAll('.scene-tab').forEach(tab => {
-        tab.addEventListener('click', () => {
-            document.querySelectorAll('.scene-tab').forEach(t => t.classList.remove('active'));
-            tab.classList.add('active');
-            const view = tab.dataset.view;
-            const container = document.getElementById('scene-view-container');
-            if (container) {
-                container.innerHTML = renderView(view);
-                attachEvents();
-            }
-        });
-    });
+async function loadKanbanModule(containerEl) {
+    try {
+        if (moduleCache.kanban) {
+            moduleCache.kanban.render(containerEl);
+            return;
+        }
+        const module = await import('../kanban/index.js');
+        moduleCache.kanban = module;
+        module.render(containerEl);
+    } catch (e) {
+        console.error('Failed to load Kanban module:', e);
+        containerEl.innerHTML = `
+            <div class="panel">
+                <h3 class="panel-title">📋 Kanban Board</h3>
+                <p class="text-muted">Campaign and scene progress tracker.</p>
+                <p class="text-muted" style="color:var(--red);">Error loading Kanban: ${e.message}</p>
+                <button class="btn btn-sm btn-primary mt-1" onclick="window.loadKanban()">🔄 Retry</button>
+            </div>
+        `;
+    }
+}
+
+async function loadWhiteboardModule(containerEl) {
+    try {
+        if (moduleCache.whiteboard) {
+            moduleCache.whiteboard.render(containerEl);
+            return;
+        }
+        const module = await import('../whiteboard/index.js');
+        moduleCache.whiteboard = module;
+        module.render(containerEl);
+    } catch (e) {
+        console.error('Failed to load Whiteboard module:', e);
+        containerEl.innerHTML = `
+            <div class="panel">
+                <h3 class="panel-title">✏️ Whiteboard</h3>
+                <p class="text-muted">Campaign whiteboard with drawing and notes.</p>
+                <p class="text-muted" style="color:var(--red);">Error loading Whiteboard: ${e.message}</p>
+                <button class="btn btn-sm btn-primary mt-1" onclick="window.loadWhiteboard()">🔄 Retry</button>
+            </div>
+        `;
+    }
 }
 
 // ============================================================
@@ -456,6 +435,31 @@ export function attachEvents() {
 window.sceneEndTrimBoons = sceneEndTrimBoons;
 window.resetAllTimers = resetAllTimers;
 window.newSession = newSession;
+
+// Loaders
+window.loadKanban = function() {
+    const containerEl = document.getElementById('scene-view-container');
+    if (containerEl) {
+        loadKanbanModule(containerEl);
+    }
+};
+
+window.loadWhiteboard = function() {
+    const containerEl = document.getElementById('scene-view-container');
+    if (containerEl) {
+        loadWhiteboardModule(containerEl);
+    }
+};
+
+window.openKanban = function() {
+    const tab = document.querySelector('.scene-tab[data-view="kanban"]');
+    if (tab) tab.click();
+};
+
+window.openWhiteboard = function() {
+    const tab = document.querySelector('.scene-tab[data-view="whiteboard"]');
+    if (tab) tab.click();
+};
 
 window.openCombatTracker = function() {
     import('../encounters/combat.js').then(module => {
@@ -518,11 +522,7 @@ window.tickTimer = function(id) {
         if (timer.current >= timer.segments) {
             showToast(`⏱️ Timer "${timer.name}" completed!`, 'warning');
         }
-        const container = document.getElementById('scene-view-container');
-        if (container) {
-            container.innerHTML = renderView(activeTab);
-            attachEvents();
-        }
+        refreshView();
     }
 };
 
@@ -538,11 +538,7 @@ window.addKanbanItem = function() {
     }
     kanbanData.columns[column].items.push({ title, description, timer: null, encounter: null });
     saveCampaignData();
-    const container = document.getElementById('scene-view-container');
-    if (container) {
-        container.innerHTML = renderView('kanban');
-        attachEvents();
-    }
+    refreshView();
     showToast(`📋 Added "${title}" to ${column}`, 'success');
 };
 
@@ -559,11 +555,7 @@ window.moveKanbanItem = function(column, index, direction) {
     kanbanData.columns[column].items.splice(index, 1);
     kanbanData.columns[targetCol].items.push(item);
     saveCampaignData();
-    const container = document.getElementById('scene-view-container');
-    if (container) {
-        container.innerHTML = renderView('kanban');
-        attachEvents();
-    }
+    refreshView();
     showToast(`📋 Moved to ${targetCol}`, 'success');
 };
 
@@ -572,11 +564,7 @@ window.removeKanbanItem = function(column, index) {
     const item = kanbanData.columns[column].items[index];
     kanbanData.columns[column].items.splice(index, 1);
     saveCampaignData();
-    const container = document.getElementById('scene-view-container');
-    if (container) {
-        container.innerHTML = renderView('kanban');
-        attachEvents();
-    }
+    refreshView();
     showToast(`🗑️ Removed "${item.title}"`, 'info');
 };
 
@@ -586,11 +574,7 @@ window.addWhiteboardNote = function() {
     if (!note) return;
     whiteboardData.notes.push(note);
     saveCampaignData();
-    const container = document.getElementById('scene-view-container');
-    if (container) {
-        container.innerHTML = renderView('whiteboard');
-        attachEvents();
-    }
+    refreshView();
     showToast('📝 Note added', 'success');
 };
 
@@ -601,32 +585,20 @@ window.addWhiteboardSticky = function() {
     const color = colors[Math.floor(Math.random() * colors.length)];
     whiteboardData.stickyNotes.push({ title, content, color });
     saveCampaignData();
-    const container = document.getElementById('scene-view-container');
-    if (container) {
-        container.innerHTML = renderView('whiteboard');
-        attachEvents();
-    }
+    refreshView();
     showToast('📌 Sticky added', 'success');
 };
 
 window.removeWhiteboardNote = function(index) {
     whiteboardData.notes.splice(index, 1);
     saveCampaignData();
-    const container = document.getElementById('scene-view-container');
-    if (container) {
-        container.innerHTML = renderView('whiteboard');
-        attachEvents();
-    }
+    refreshView();
 };
 
 window.removeWhiteboardSticky = function(index) {
     whiteboardData.stickyNotes.splice(index, 1);
     saveCampaignData();
-    const container = document.getElementById('scene-view-container');
-    if (container) {
-        container.innerHTML = renderView('whiteboard');
-        attachEvents();
-    }
+    refreshView();
 };
 
 window.clearWhiteboard = function() {
@@ -635,11 +607,7 @@ window.clearWhiteboard = function() {
     whiteboardData.stickyNotes = [];
     whiteboardData.drawings = [];
     saveCampaignData();
-    const container = document.getElementById('scene-view-container');
-    if (container) {
-        container.innerHTML = renderView('whiteboard');
-        attachEvents();
-    }
+    refreshView();
     showToast('🧹 Whiteboard cleared', 'info');
 };
 
@@ -660,11 +628,7 @@ window.addCampaignThreat = function() {
     const description = prompt('Description:') || '';
     campaignState.activeThreats.push({ name, severity, description, timer: null });
     saveCampaignData();
-    const container = document.getElementById('scene-view-container');
-    if (container) {
-        container.innerHTML = renderView('campaign');
-        attachEvents();
-    }
+    refreshView();
     showToast(`⚠️ Added threat: ${name}`, 'success');
 };
 
@@ -673,11 +637,7 @@ window.removeCampaignThreat = function(index) {
     if (!confirm(`Remove threat "${threat.name}"?`)) return;
     campaignState.activeThreats.splice(index, 1);
     saveCampaignData();
-    const container = document.getElementById('scene-view-container');
-    if (container) {
-        container.innerHTML = renderView('campaign');
-        attachEvents();
-    }
+    refreshView();
 };
 
 window.addCampaignOpportunity = function() {
@@ -686,11 +646,7 @@ window.addCampaignOpportunity = function() {
     const description = prompt('Description:') || '';
     campaignState.opportunities.push({ name, description });
     saveCampaignData();
-    const container = document.getElementById('scene-view-container');
-    if (container) {
-        container.innerHTML = renderView('campaign');
-        attachEvents();
-    }
+    refreshView();
     showToast(`🌟 Added opportunity: ${name}`, 'success');
 };
 
@@ -699,11 +655,7 @@ window.removeCampaignOpportunity = function(index) {
     if (!confirm(`Remove opportunity "${opp.name}"?`)) return;
     campaignState.opportunities.splice(index, 1);
     saveCampaignData();
-    const container = document.getElementById('scene-view-container');
-    if (container) {
-        container.innerHTML = renderView('campaign');
-        attachEvents();
-    }
+    refreshView();
 };
 
 window.addCampaignTimer = function() {
@@ -712,11 +664,7 @@ window.addCampaignTimer = function() {
     const segments = parseInt(prompt('Segments:', '6') || '6');
     campaignState.campaignTimers.push({ name, segments, current: 0 });
     saveCampaignData();
-    const container = document.getElementById('scene-view-container');
-    if (container) {
-        container.innerHTML = renderView('campaign');
-        attachEvents();
-    }
+    refreshView();
     showToast(`⏱️ Added timer: ${name}`, 'success');
 };
 
@@ -728,11 +676,7 @@ window.tickCampaignTimer = function(index) {
         if (timer.current >= timer.segments) {
             showToast(`⏱️ Campaign timer "${timer.name}" completed!`, 'warning');
         }
-        const container = document.getElementById('scene-view-container');
-        if (container) {
-            container.innerHTML = renderView('campaign');
-            attachEvents();
-        }
+        refreshView();
     }
 };
 
@@ -741,11 +685,7 @@ window.removeCampaignTimer = function(index) {
     if (!confirm(`Remove timer "${timer.name}"?`)) return;
     campaignState.campaignTimers.splice(index, 1);
     saveCampaignData();
-    const container = document.getElementById('scene-view-container');
-    if (container) {
-        container.innerHTML = renderView('campaign');
-        attachEvents();
-    }
+    refreshView();
 };
 
 // Deck of Consequences / Crown Spread
@@ -845,6 +785,53 @@ export function newSession() {
 }
 
 // ============================================================
+// VIEW MANAGEMENT
+// ============================================================
+
+function refreshView() {
+    const containerEl = document.getElementById('scene-view-container');
+    if (!containerEl) return;
+    
+    if (activeTab === 'kanban') {
+        loadKanbanModule(containerEl);
+    } else if (activeTab === 'whiteboard') {
+        loadWhiteboardModule(containerEl);
+    } else {
+        containerEl.innerHTML = renderView(activeTab);
+        attachEvents();
+    }
+}
+
+// ============================================================
+// EVENT LISTENERS
+// ============================================================
+
+export function attachEvents() {
+    document.querySelectorAll('.scene-tab').forEach(tab => {
+        tab.addEventListener('click', async () => {
+            document.querySelectorAll('.scene-tab').forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+            const view = tab.dataset.view;
+            const containerEl = document.getElementById('scene-view-container');
+            
+            if (!containerEl) return;
+            
+            activeTab = view;
+            
+            if (view === 'kanban') {
+                await loadKanbanModule(containerEl);
+            } else if (view === 'whiteboard') {
+                await loadWhiteboardModule(containerEl);
+            } else {
+                containerEl.innerHTML = renderView(view);
+                // Re-attach events for the new content
+                attachEvents();
+            }
+        });
+    });
+}
+
+// ============================================================
 // LIFECYCLE METHODS
 // ============================================================
 
@@ -860,16 +847,13 @@ export function onDeactivate() {
 
 export function refresh() {
     loadCampaignData();
-    const container = document.getElementById('scene-view-container');
-    if (container) {
-        container.innerHTML = renderView(activeTab);
-        attachEvents();
-    }
+    refreshView();
 }
 
 export function destroy() {
     container = null;
     saveCampaignData();
+    moduleCache = {};
 }
 
 // ============================================================
