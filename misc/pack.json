@@ -1,0 +1,36 @@
+{
+  "id": "my-custom-patron-pack",
+  "name": "My Custom Patron Pack",
+  "version": "1.0.0",
+  "type": "hybrid",
+  "author": "Your Name",
+  "description": "Adds a custom patron with rites and a new module",
+  "modules": [
+    {
+      "id": "my-patron-module",
+      "path": "features/patrons/custom/index.js",
+      "route": "custom-patrons",
+      "label": "Custom Patrons",
+      "icon": "🌟",
+      "type": "feature",
+      "source": "./src/features/patrons/custom/index.js"
+    }
+  ],
+  "documents": [
+    {
+      "id": "custom-patron-guide",
+      "title": "Custom Patron Guide",
+      "path": "docs/custom-patron-guide.md",
+      "category": "expansion",
+      "source": "./docs/custom-patron-guide.md"
+    }
+  ],
+  "data": {
+    "patrons": [
+      "data/patrons/custom-patron.json"
+    ],
+    "factions": [
+      "data/factions/custom-faction.json"
+    ]
+  }
+}
