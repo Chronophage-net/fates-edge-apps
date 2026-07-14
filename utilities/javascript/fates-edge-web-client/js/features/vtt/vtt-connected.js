@@ -4,16 +4,12 @@
  * Updated for v1.2.0 with Deck and Module support
  */
 // ASSERT FIX
-function assert(condition, message) {
-    if (!condition) {
-        throw new Error(message || 'Assertion failed');
-    }
-}
+
 import { vttStore } from '../../core/vtt-store.js';
 import { getState, clearChatHistory, getCharacter } from '../../core/state.js';
 import { performRoll } from '../../core/dice.js';
 import { showToast } from '../../components/Toast.js';
-import { escHtml } from '../../core/utils.js';
+import { escHtml, assert } from '../../core/utils.js';
 import {
     isConnectedToServer,
     syncState,

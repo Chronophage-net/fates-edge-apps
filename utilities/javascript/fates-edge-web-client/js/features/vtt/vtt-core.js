@@ -3,16 +3,9 @@
  * Each renderer subscribes to the store and updates its DOM element automatically.
  */
 
-// ASSERT FIX - must be before any imports
-const assert = (condition, message) => {
-    if (!condition) {
-        throw new Error(message || 'Assertion failed');
-    }
-};
-
 // Now the imports
 import { vttStore } from '../../core/vtt-store.js';
-import { escHtml } from '../../core/utils.js';
+import { escHtml, assert } from '../../core/utils.js';
 import { isConnectedToServer } from '../../core/websocket.js';
 
 // ============================================================
