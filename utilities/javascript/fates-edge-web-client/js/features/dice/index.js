@@ -2,13 +2,14 @@
  * Dice feature - Roll dice and view history
  * UI for the Fate's Edge resolution system
  * Uses the core dice engine for all rolling logic
+ * Supports deterministic RNG for static sites
  */
 
 // Import from core modules
 import { escHtml, safeParseInt } from '../../core/utils.js';
 import { addRoll, getState, saveState } from '../../core/state.js';
-// Import the core dice engine
-import { performRoll, rollDie } from '../../core/dice.js';
+// Import the core dice engine with deterministic RNG support
+import { performRoll, rollDie, getSeed, setSeed, generateSeed } from '../../core/dice.js';
 
 let container = null;
 
@@ -20,9 +21,26 @@ export function render(el) {
     console.log('🎲 Dice.render() called');
     
     container = el;
+    const seed = getSeed();
+    const isDeterministic = !!seed;
+    
     container.innerHTML = `
         <h1 class="page-title">🎲 Dice Roller</h1>
         <p class="page-sub">Roll dice with the Fate's Edge resolution system.</p>
+        
+        <!-- Seed Status -->
+        <div class="panel" style="padding:0.3rem 0.8rem;margin-bottom:0.5rem;background:var(--bg3);border-left:3px solid ${isDeterministic ? 'var(--gold)' : 'var(--text3)'};">
+            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.3rem;">
+                <span style="font-size:0.8rem;color:var(--text2);">
+                    ${isDeterministic ? '🎲 Deterministic RNG (seeded)' : '🔀 Cryptographic RNG (random)'}
+                    ${isDeterministic ? `<span style="font-size:0.6rem;color:var(--text3);font-family:monospace;">seed: ${seed.substring(0, 8)}...</span>` : ''}
+                </span>
+                <div style="display:flex;gap:0.3rem;flex-wrap:wrap;">
+                    <button class="btn btn-xs btn-ghost" id="seed-regenerate" title="Regenerate seed">🔄 New Seed</button>
+                    <button class="btn btn-xs btn-ghost" id="seed-clear" title="Clear seed (use crypto)">🧹 Clear Seed</button>
+                </div>
+            </div>
+        </div>
         
         <div class="panel">
             <div class="form-row">
@@ -85,6 +103,7 @@ export function render(el) {
                 <button class="btn btn-sm btn-ghost" data-roll-preset="social">💬 Social (2+2, DV3)</button>
                 <button class="btn btn-sm btn-ghost" data-roll-preset="magic">🔮 Magic (1+4, DV5)</button>
                 <button class="btn btn-sm btn-ghost" data-roll-preset="desperate">🔥 Desperate (2+2, DV4, Desperate)</button>
+                <button class="btn btn-sm btn-ghost" data-roll-preset="deterministic">🎲 Deterministic Demo</button>
             </div>
             
             <div class="flex">
@@ -153,6 +172,36 @@ function attachEvents() {
         });
     });
     
+    // Seed controls
+    const seedRegenerate = document.getElementById('seed-regenerate');
+    if (seedRegenerate) {
+        seedRegenerate.addEventListener('click', function() {
+            const newSeed = generateSeed();
+            setSeed(newSeed);
+            // Save to localStorage for persistence
+            try {
+                localStorage.setItem('fates-edge-seed', newSeed);
+            } catch (e) { /* ignore */ }
+            // Re-render to update UI
+            render(container);
+            showToast('🎲 New seed generated: ' + newSeed.substring(0, 8) + '...');
+        });
+    }
+    
+    const seedClear = document.getElementById('seed-clear');
+    if (seedClear) {
+        seedClear.addEventListener('click', function() {
+            if (confirm('Clear the deterministic seed? This will use cryptographic RNG instead.')) {
+                setSeed(null);
+                try {
+                    localStorage.removeItem('fates-edge-seed');
+                } catch (e) { /* ignore */ }
+                render(container);
+                showToast('🧹 Seed cleared. Using cryptographic RNG.');
+            }
+        });
+    }
+    
     // Enter key support
     document.addEventListener('keydown', (e) => {
         if (e.key === 'Enter' && container && container.contains(e.target)) {
@@ -172,7 +221,8 @@ function applyPreset(preset) {
         stealth: { attr: 2, skill: 3, dv: 4, position: 'controlled', boons: 0 },
         social: { attr: 2, skill: 2, dv: 3, position: 'controlled', boons: 0 },
         magic: { attr: 1, skill: 4, dv: 5, position: 'controlled', boons: 0 },
-        desperate: { attr: 2, skill: 2, dv: 4, position: 'desperate', boons: 0 }
+        desperate: { attr: 2, skill: 2, dv: 4, position: 'desperate', boons: 0 },
+        deterministic: { attr: 3, skill: 3, dv: 4, position: 'controlled', boons: 1 }
     };
     
     const p = presets[preset];
@@ -231,7 +281,7 @@ function handleRoll() {
             return;
         }
         
-        // Build roll data for history
+        // Build roll data for history with seed info
         const rollData = {
             id: Date.now().toString(),
             timestamp: new Date().toISOString(),
@@ -251,7 +301,9 @@ function handleRoll() {
             reRolls: result.reRolls,
             reRolledDice: result.reRolledDice,
             rerollSuccesses: result.rerollSuccesses,
-            rerollStoryBeats: result.rerollStoryBeats
+            rerollStoryBeats: result.rerollStoryBeats,
+            deterministic: result.deterministic || false,
+            seed: result.seed || null
         };
         
         // Add to state
@@ -316,6 +368,12 @@ function displayResult(result) {
         rerollDisplay = `(rerolled: ${result.reRolledDice.map(r => `${r.old}→${r.new}`).join(', ')})`;
     }
     
+    // Show seed info for deterministic rolls
+    let seedInfo = '';
+    if (result.deterministic && result.seed) {
+        seedInfo = `<div style="font-size:0.6rem;color:var(--text3);margin-top:0.2rem;">🎲 seeded: ${result.seed.substring(0, 8)}...</div>`;
+    }
+    
     // Animate the result
     resultEl.style.transition = 'transform 0.3s ease, opacity 0.3s ease';
     resultEl.style.transform = 'scale(0.95)';
@@ -337,6 +395,7 @@ function displayResult(result) {
                 ${escHtml(result.position || 'controlled')} position${result.boons > 0 ? ` +${result.boons} boons` : ''}
             </div>
             ${result.storyBeats > 0 ? `<div style="font-size:0.8rem;color:var(--gold);margin-top:0.2rem;">✨ ${result.storyBeats} Story Beat${result.storyBeats > 1 ? 's' : ''} for the GM</div>` : ''}
+            ${seedInfo}
         </div>
     `;
     
@@ -397,9 +456,13 @@ function renderHistory() {
                 };
                 const posIcon = posIcons[roll.position] || '';
                 
+                // Deterministic indicator
+                const detIndicator = roll.deterministic ? '🎲' : '🔀';
+                
                 return `
                     <div class="history-item" style="display:flex;justify-content:space-between;align-items:center;padding:0.3rem 0;border-bottom:1px solid var(--border);font-size:0.85rem;gap:0.5rem;">
                         <div style="display:flex;flex-wrap:wrap;gap:0.3rem;align-items:center;">
+                            <span style="font-size:0.7rem;color:var(--text3);">${detIndicator}</span>
                             <span style="font-weight:500;">${roll.attr || 0}+${roll.skill || 0}</span>
                             <span class="text-muted" style="font-size:0.75rem;">vs DV${roll.dv || 0}</span>
                             <span style="font-size:0.75rem;">${posIcon}</span>
@@ -453,6 +516,7 @@ function updateStats() {
         const partials = history.filter(r => r.outcomeClass === 'partial').length;
         const misses = history.filter(r => r.outcomeClass === 'miss').length;
         const storyBeats = history.reduce((sum, r) => sum + (r.storyBeats || 0), 0);
+        const deterministic = history.filter(r => r.deterministic).length;
         
         statsEl.innerHTML = `
             <span>📊 ${total} rolls</span>
@@ -460,11 +524,53 @@ function updateStats() {
             <span style="color:var(--orange);">⏳ ${partials}</span>
             <span style="color:var(--red);">❌ ${misses}</span>
             <span style="color:var(--gold);">✨ ${storyBeats}</span>
+            ${deterministic > 0 ? `<span style="color:var(--text3);font-size:0.7rem;">🎲 ${deterministic}</span>` : ''}
         `;
     } catch (error) {
         console.error('Error updating stats:', error);
         statsEl.textContent = '';
     }
+}
+
+// ============================================================
+// TOAST NOTIFICATION (simple fallback)
+// ============================================================
+
+function showToast(message) {
+    // Try to use the global toast system if available
+    if (window.showToast) {
+        window.showToast(message, 'info');
+        return;
+    }
+    
+    // Fallback: simple alert-style notification
+    const toast = document.createElement('div');
+    toast.style.cssText = `
+        position: fixed;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: var(--bg2);
+        color: var(--text);
+        padding: 0.8rem 1.5rem;
+        border-radius: var(--radius);
+        border: 1px solid var(--border);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        z-index: 9999;
+        font-size: 0.9rem;
+        max-width: 90%;
+        animation: slideUp 0.3s ease;
+    `;
+    toast.textContent = message;
+    document.body.appendChild(toast);
+    
+    setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transition = 'opacity 0.3s ease';
+        setTimeout(() => {
+            if (toast.parentNode) toast.parentNode.removeChild(toast);
+        }, 300);
+    }, 3000);
 }
 
 // ============================================================
@@ -479,7 +585,8 @@ function clearHistory() {
             saveState();
             renderHistory();
             updateStats();
-            document.getElementById('roll-result').style.display = 'none';
+            const resultEl = document.getElementById('roll-result');
+            if (resultEl) resultEl.style.display = 'none';
         } catch (error) {
             console.error('Error clearing history:', error);
             alert('Failed to clear history. Please try again.');
@@ -519,6 +626,14 @@ function exportHistory() {
 // ============================================================
 
 export function init(el) {
+    // Try to load seed from localStorage on init
+    try {
+        const storedSeed = localStorage.getItem('fates-edge-seed');
+        if (storedSeed) {
+            setSeed(storedSeed);
+        }
+    } catch (e) { /* ignore */ }
+    
     return render(el);
 }
 
