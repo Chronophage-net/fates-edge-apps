@@ -7,6 +7,8 @@ on:
       - 'ttrpg/utilities/javascript/fates-edge-web-client/**'
       - 'ttrpg/utilities/javascript/fates-edge-socket-server/**'
       - 'ttrpg/utilities/javascript/fates-edge-desktop-client/**'
+      - 'ttrpg/utilities/javascript/data/**'
+      - 'misc/**'
       - '.github/workflows/deploy-apps.yml'
 
   workflow_dispatch:
@@ -57,13 +59,9 @@ jobs:
             build: false
             package: true
 
-    # NOTE: the `matrix` context is not available in a job-level `if:`.
-    # It IS available in job-level `env:`, so compute the skip flag here
-    # and check it in each step's `if:` instead.
     env:
       SKIP_JOB: ${{ matrix.name == 'web-client' && github.event_name == 'workflow_dispatch' && github.event.inputs.skip_web_deploy == 'true' }}
 
-    # Needed so the "commit generated lockfile" step can push back to the repo.
     permissions:
       contents: write
 
@@ -161,6 +159,110 @@ jobs:
             --exclude 'js/tests' \
             "${{ matrix.path }}/" pages-site/
 
+      - name: Copy data files to Pages site
+        if: ${{ env.SKIP_JOB != 'true' && matrix.name == 'web-client' }}
+        run: |
+          echo "📂 Copying data files to Pages site..."
+          
+          # === WIKI.JSON — goes at site root ===
+          # The wiki feature loads from 'wiki.json' (relative to site root)
+          # So copy it to pages-site/wiki.json
+          if [ -f misc/wiki.json ]; then
+            cp misc/wiki.json pages-site/wiki.json
+            echo "✅ Copied misc/wiki.json → pages-site/wiki.json"
+          elif [ -f ttrpg/utilities/javascript/data/wiki.json ]; then
+            cp ttrpg/utilities/javascript/data/wiki.json pages-site/wiki.json
+            echo "✅ Copied ttrpg/utilities/javascript/data/wiki.json → pages-site/wiki.json"
+          else
+            echo "⚠️ No wiki.json found in misc/ or data/"
+          fi
+          
+          # === REGION FILES — go in /regions/ directory ===
+          # The consequences feature loads from '/regions/manifest.json' and '/regions/{slug}.json'
+          mkdir -p pages-site/regions
+          
+          # acasia.json
+          if [ -f misc/acasia.json ]; then
+            cp misc/acasia.json pages-site/regions/acasia.json
+            echo "✅ Copied misc/acasia.json → pages-site/regions/acasia.json"
+          elif [ -f ttrpg/utilities/javascript/data/regions/acasia.json ]; then
+            cp ttrpg/utilities/javascript/data/regions/acasia.json pages-site/regions/acasia.json
+            echo "✅ Copied ttrpg/utilities/javascript/data/regions/acasia.json → pages-site/regions/acasia.json"
+          else
+            echo "⚠️ No acasia.json found"
+          fi
+          
+          # the_traveler.json
+          if [ -f misc/the_traveler.json ]; then
+            cp misc/the_traveler.json pages-site/regions/the_traveler.json
+            echo "✅ Copied misc/the_traveler.json → pages-site/regions/the_traveler.json"
+          elif [ -f ttrpg/utilities/javascript/data/regions/the_traveler.json ]; then
+            cp ttrpg/utilities/javascript/data/regions/the_traveler.json pages-site/regions/the_traveler.json
+            echo "✅ Copied ttrpg/utilities/javascript/data/regions/the_traveler.json → pages-site/regions/the_traveler.json"
+          else
+            echo "⚠️ No the_traveler.json found"
+          fi
+          
+          # Generate manifest.json from the region files we have
+          echo "📝 Generating manifest.json..."
+          MANIFEST='[]'
+          if [ -f pages-site/regions/acasia.json ]; then
+            MANIFEST='["acasia"]'
+          elif [ -f pages-site/regions/the_traveler.json ] && [ "$MANIFEST" = '[]' ]; then
+            MANIFEST='["the_traveler"]'
+          elif [ -f pages-site/regions/acasia.json ] && [ -f pages-site/regions/the_traveler.json ]; then
+            MANIFEST='["acasia", "the_traveler"]'
+          fi
+          echo "$MANIFEST" > pages-site/regions/manifest.json
+          echo "✅ Generated manifest.json: $MANIFEST"
+          
+          # Also copy region files from the standard data/regions directory if they exist
+          if [ -d ttrpg/utilities/javascript/data/regions ]; then
+            echo "📁 Checking standard data/regions directory..."
+            find ttrpg/utilities/javascript/data/regions -name "*.json" ! -name "manifest.json" | while read -r file; do
+              filename=$(basename "$file")
+              # Skip if we already copied from misc
+              if [ ! -f "pages-site/regions/$filename" ]; then
+                cp "$file" "pages-site/regions/$filename"
+                echo "  ✅ Copied $filename from standard location"
+              fi
+            done
+            # Also copy manifest if it exists and we haven't generated one
+            if [ -f ttrpg/utilities/javascript/data/regions/manifest.json ] && [ ! -f pages-site/regions/manifest.json ]; then
+              cp ttrpg/utilities/javascript/data/regions/manifest.json pages-site/regions/manifest.json
+              echo "✅ Copied manifest.json from standard location"
+            fi
+          fi
+          
+          # === DATA DIRECTORY (for other JSON files) ===
+          # Some features might expect data files in /data/
+          mkdir -p pages-site/data
+          if [ -f misc/wiki.json ]; then
+            cp misc/wiki.json pages-site/data/wiki.json
+            echo "✅ Copied wiki.json to pages-site/data/wiki.json (backup location)"
+          fi
+          
+          if [ -f misc/acasia.json ]; then
+            cp misc/acasia.json pages-site/data/acasia.json
+            echo "✅ Copied acasia.json to pages-site/data/acasia.json (backup location)"
+          fi
+          
+          if [ -f misc/the_traveler.json ]; then
+            cp misc/the_traveler.json pages-site/data/the_traveler.json
+            echo "✅ Copied the_traveler.json to pages-site/data/the_traveler.json (backup location)"
+          fi
+          
+          # List the contents for debugging
+          echo ""
+          echo "📂 Site root contents:"
+          ls -la pages-site/ | head -20
+          echo ""
+          echo "📂 Regions directory contents:"
+          ls -la pages-site/regions/ || echo "  (empty)"
+          echo ""
+          echo "📂 Data directory contents:"
+          ls -la pages-site/data/ || echo "  (empty)"
+
       - name: Upload Pages artifact
         if: ${{ env.SKIP_JOB != 'true' && matrix.name == 'web-client' }}
         uses: actions/upload-pages-artifact@v3
@@ -168,7 +270,7 @@ jobs:
           path: pages-site
 
   # ============================================================
-  # DEPLOY TO GITHUB PAGES (Pages source = "GitHub Actions")
+  # DEPLOY TO GITHUB PAGES
   # ============================================================
   deploy-pages:
     name: Deploy to GitHub Pages

@@ -16,7 +16,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/fuse.js@7.0.0"></script>
-    <!-- Socket.io for real-time -->
     <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
 </head>
 <body>
@@ -24,11 +23,11 @@
     <!-- ===== PASSWORD OVERLAY ===== -->
     <div class="password-overlay" id="passwordOverlay" role="dialog" aria-label="Password gate">
         <div class="gate-box">
-            <span class="gate-icon">🔒</span>
+            <div class="gate-icon">⚔️</div>
             <div class="gate-title">Fate's Edge</div>
             <div class="gate-sub">Enter the playtester password to continue</div>
             <div class="gate-error" id="gateError"></div>
-            <input type="password" class="gate-input" id="gateInput" placeholder="••••••••" autocomplete="current-password" />
+            <input type="password" class="gate-input" id="gateInput" placeholder="Enter password…" autocomplete="current-password" />
             <button class="gate-btn" id="gateBtn">Unlock</button>
             <div class="gate-foot">— playtester access only —</div>
         </div>
@@ -37,38 +36,89 @@
     <!-- ===== SIDEBAR ===== -->
     <nav class="sidebar" id="sidebar" role="navigation">
         <div class="sidebar-brand">
-            <span>⚔️</span>
-            Fate's Edge
-            <small>Toolkit v3.0</small>
+            <span class="brand-icon">⚔️</span>
+            <div class="brand-text">
+                <span class="brand-name">Fate's Edge</span>
+                <span class="brand-version">v3.0</span>
+            </div>
         </div>
-        <div class="sidebar-nav">
-            <button class="active" data-tab="home"><span class="icon">📜</span><span class="label">Home</span></button>
-            <button data-tab="dashboard"><span class="icon">📊</span><span class="label">Dashboard</span></button>
-            <button data-tab="characters"><span class="icon">👤</span><span class="label">Characters</span></button>
-            <button data-tab="builder"><span class="icon">🛠️</span><span class="label">Builder</span></button>
-            <button data-tab="roller"><span class="icon">🎲</span><span class="label">Dice</span></button>
-            <button data-tab="timers"><span class="icon">⏱️</span><span class="label">Timers</span></button>
-            <button data-tab="encounters"><span class="icon">⚔️</span><span class="label">Encounters</span></button>
-            <button data-tab="vtt"><span class="icon">💬</span><span class="label">VTT</span></button>
-            <button data-tab="docs"><span class="icon">📄</span><span class="label">Docs</span></button>
-            <button data-tab="search"><span class="icon">🔍</span><span class="label">Search</span></button>
-            <button data-tab="wiki"><span class="icon">📖</span><span class="label">Wiki</span></button>
-            <!-- REPLACED: Consequences and Regional Roller with unified Decks -->
-            <button data-tab="decks"><span class="icon">🃏</span><span class="label">Decks</span></button>
-            <button data-tab="settings"><span class="icon">⚙️</span><span class="label">Settings</span></button>
+        
+        <div class="sidebar-nav" id="sidebarNav">
+            <button class="nav-item active" data-tab="home" title="Home">
+                <span class="nav-icon">📜</span>
+                <span class="nav-label">Home</span>
+            </button>
+            <button class="nav-item" data-tab="dashboard" title="Dashboard">
+                <span class="nav-icon">📊</span>
+                <span class="nav-label">Dashboard</span>
+            </button>
+            <button class="nav-item" data-tab="characters" title="Characters">
+                <span class="nav-icon">👤</span>
+                <span class="nav-label">Characters</span>
+            </button>
+            <button class="nav-item" data-tab="builder" title="Builder">
+                <span class="nav-icon">🛠️</span>
+                <span class="nav-label">Builder</span>
+            </button>
+            <button class="nav-item" data-tab="roller" title="Dice Roller">
+                <span class="nav-icon">🎲</span>
+                <span class="nav-label">Dice</span>
+            </button>
+            <button class="nav-item" data-tab="timers" title="Timers">
+                <span class="nav-icon">⏱️</span>
+                <span class="nav-label">Timers</span>
+            </button>
+            <button class="nav-item" data-tab="encounters" title="Encounters">
+                <span class="nav-icon">⚔️</span>
+                <span class="nav-label">Encounters</span>
+            </button>
+            <button class="nav-item" data-tab="vtt" title="Virtual Tabletop">
+                <span class="nav-icon">💬</span>
+                <span class="nav-label">VTT</span>
+            </button>
+            <button class="nav-item" data-tab="docs" title="Documentation">
+                <span class="nav-icon">📄</span>
+                <span class="nav-label">Docs</span>
+            </button>
+            <button class="nav-item" data-tab="search" title="Search">
+                <span class="nav-icon">🔍</span>
+                <span class="nav-label">Search</span>
+            </button>
+            <button class="nav-item" data-tab="wiki" title="Wiki">
+                <span class="nav-icon">📖</span>
+                <span class="nav-label">Wiki</span>
+            </button>
+            <button class="nav-item" data-tab="decks" title="Decks">
+                <span class="nav-icon">🃏</span>
+                <span class="nav-label">Decks</span>
+            </button>
+            <button class="nav-item" data-tab="patrons" title="Patrons">
+                <span class="nav-icon">👁️</span>
+                <span class="nav-label">Patrons</span>
+            </button>
+            <button class="nav-item" data-tab="settings" title="Settings">
+                <span class="nav-icon">⚙️</span>
+                <span class="nav-label">Settings</span>
+            </button>
         </div>
+        
         <div class="sidebar-footer">
-            <span id="save-status" class="saved-indicator saved">● Saved</span>
-            <button id="exportBtn" title="Export JSON">⬇</button>
-            <button id="importBtn" title="Import JSON">⬆</button>
-            <input type="file" id="importFile" accept=".json" style="display:none" />
-            <button id="theme-toggle" title="Toggle theme" aria-label="Toggle theme">🌙</button>
+            <div class="footer-status">
+                <span class="status-dot" id="save-status"></span>
+                <span class="status-label">Saved</span>
+            </div>
+            <div class="footer-actions">
+                <button class="footer-btn" id="exportBtn" title="Export JSON">⬇</button>
+                <button class="footer-btn" id="importBtn" title="Import JSON">⬆</button>
+                <input type="file" id="importFile" accept=".json" style="display:none" />
+                <button class="footer-btn" id="theme-toggle" title="Toggle theme" aria-label="Toggle theme">🌙</button>
+            </div>
         </div>
     </nav>
 
     <!-- ===== MAIN CONTENT ===== -->
     <main class="main">
-        <!-- All tab content containers - populated by JavaScript -->
+        <!-- All tab content containers -->
         <div id="tab-home" class="tab-content active"></div>
         <div id="tab-dashboard" class="tab-content"></div>
         <div id="tab-characters" class="tab-content"></div>
@@ -80,11 +130,11 @@
         <div id="tab-docs" class="tab-content"></div>
         <div id="tab-search" class="tab-content"></div>
         <div id="tab-wiki" class="tab-content"></div>
-        <!-- REPLACED: Consequences and Regional Roller with unified Decks -->
         <div id="tab-decks" class="tab-content"></div>
+        <div id="tab-patrons" class="tab-content"></div>
         <div id="tab-settings" class="tab-content"></div>
         
-        <!-- Hidden: kept for backward compatibility (will redirect) -->
+        <!-- Legacy hidden tabs -->
         <div id="tab-consequences" class="tab-content" style="display:none;"></div>
         <div id="tab-regional" class="tab-content" style="display:none;"></div>
     </main>
@@ -92,7 +142,7 @@
     <!-- ===== MODALS ===== -->
     <div class="modal-overlay" id="charModal">
         <div class="modal">
-            <button class="close" id="charModalClose">&times;</button>
+            <button class="modal-close" id="charModalClose">&times;</button>
             <h2 id="char-modal-title">Character Editor</h2>
             <div id="char-editor-content"></div>
         </div>
@@ -100,7 +150,7 @@
 
     <div class="modal-overlay" id="timerModal">
         <div class="modal">
-            <button class="close" id="timerModalClose">&times;</button>
+            <button class="modal-close" id="timerModalClose">&times;</button>
             <h2 id="timer-modal-title">Timer Editor</h2>
             <div id="timer-editor-content"></div>
         </div>
@@ -108,7 +158,7 @@
 
     <div class="modal-overlay" id="wikiModal">
         <div class="modal">
-            <button class="close" id="wikiModalClose">&times;</button>
+            <button class="modal-close" id="wikiModalClose">&times;</button>
             <h2 id="wiki-modal-title">Wiki Entry</h2>
             <div id="wiki-editor-content"></div>
         </div>
@@ -116,7 +166,7 @@
 
     <div class="modal-overlay" id="talentModal">
         <div class="modal">
-            <button class="close" id="talentModalClose">&times;</button>
+            <button class="modal-close" id="talentModalClose">&times;</button>
             <h2 id="talent-modal-title">Talent Editor</h2>
             <div id="talent-editor-content"></div>
         </div>
@@ -124,7 +174,7 @@
 
     <div class="modal-overlay" id="wizardModal">
         <div class="modal" style="max-width:800px;">
-            <button class="close" id="wizardModalClose">&times;</button>
+            <button class="modal-close" id="wizardModalClose">&times;</button>
             <h2 id="wizard-title">Character Wizard</h2>
             <div id="wizard-steps"></div>
             <div class="flex mt-1" id="wizard-nav">
@@ -136,7 +186,7 @@
 
     <div class="modal-overlay" id="encounterModal">
         <div class="modal" style="max-width:900px;">
-            <button class="close" id="encounterModalClose">&times;</button>
+            <button class="modal-close" id="encounterModalClose">&times;</button>
             <h2 id="encounter-modal-title">Encounter Editor</h2>
             <div id="encounter-editor-content"></div>
         </div>
@@ -144,7 +194,7 @@
 
     <div class="modal-overlay" id="npcModal">
         <div class="modal" style="max-width:700px;">
-            <button class="close" id="npcModalClose">&times;</button>
+            <button class="modal-close" id="npcModalClose">&times;</button>
             <h2 id="npc-modal-title">NPC Editor</h2>
             <div id="npc-editor-content"></div>
         </div>
@@ -152,7 +202,7 @@
 
     <div class="modal-overlay" id="combatModal">
         <div class="modal" style="max-width:800px;">
-            <button class="close" id="combatModalClose">&times;</button>
+            <button class="modal-close" id="combatModalClose">&times;</button>
             <h2 id="combat-modal-title">Combat Tracker</h2>
             <div id="combat-editor-content"></div>
         </div>
@@ -160,14 +210,14 @@
 
     <div class="modal-overlay" id="licenseModal">
         <div class="modal">
-            <button class="close" id="licenseModalClose">&times;</button>
+            <button class="modal-close" id="licenseModalClose">&times;</button>
             <h2>📜 License Notice</h2>
             <div class="license-box" id="licenseContent"></div>
         </div>
     </div>
 
     <!-- ===== TOAST CONTAINER ===== -->
-    <div id="toast-container"></div>
+    <div id="toast-container" role="status" aria-live="polite"></div>
 
     <!-- ===== APPLICATION ENTRY ===== -->
     <script type="module" src="js/app.js"></script>
