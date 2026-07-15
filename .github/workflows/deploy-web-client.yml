@@ -52,17 +52,20 @@ jobs:
           run-id: ${{ github.event.workflow_run.id }}
         continue-on-error: true
 
-      - name: Check if artifact was downloaded
-        id: check-artifact
+      # ✅ ADD THIS STEP
+      - name: Verify downloaded artifact
+        id: verify-download
         run: |
-          if [ -d "pages-site" ] && [ "$(ls -A pages-site)" ]; then
+          if [ -d "pages-site" ] && [ "$(ls -A pages-site 2>/dev/null)" ]; then
+            echo "✅ Pages artifact downloaded successfully"
             echo "downloaded=true" >> "$GITHUB_OUTPUT"
-            echo "✅ Artifact downloaded successfully"
+            echo "Contents:"
+            ls -la pages-site/ | head -20
           else
+            echo "⚠️ Pages artifact download failed or was empty"
             echo "downloaded=false" >> "$GITHUB_OUTPUT"
-            echo "⚠️ No artifact found, will build from source"
           fi
-
+          
       - name: Checkout web client source (fallback)
         if: github.event_name == 'workflow_dispatch' || steps.check-artifact.outputs.downloaded == 'false'
         uses: actions/checkout@v5
