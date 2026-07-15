@@ -4,7 +4,7 @@
  * Supports both Socket.io and plain WebSocket modes
  */
 
-import { getState, importData, saveState } from './state.js';
+import { getState, importData, saveState, updateState } from './state.js';
 import { showToast } from '../components/Toast.js';
 
 let socket = null;
@@ -503,6 +503,22 @@ export function sendEvent(eventData) {
     }
 }
 
+/**
+ * Send a message (alias for sendWSMessage / socket.emit)
+ */
+export function sendMessage(data) {
+    if (connectionMode === 'socketio') {
+        if (!socket || !socket.connected || !roomCode) {
+            console.warn('Cannot send message: not connected to server');
+            return false;
+        }
+        socket.emit('message', data);
+        return true;
+    } else {
+        return sendWSMessage(data);
+    }
+}
+
 // ============================================================
 // SHARED FUNCTIONS
 // ============================================================
@@ -655,5 +671,6 @@ export default {
     getRoomCode,
     getSocketId,
     getConnectionMode,
-    triggerEvent
+    triggerEvent,
+    sendMessage
 };

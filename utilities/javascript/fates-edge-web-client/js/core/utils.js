@@ -92,6 +92,27 @@ export function buildUrlWithParams(base, params = {}) {
 }
 
 /**
+ * Build a document URL with proper path
+ * @param {string} base - Base URL
+ * @param {string} docId - Document ID
+ * @param {Object} params - Additional query parameters
+ * @returns {string} Document URL
+ */
+export function buildDocumentUrl(base, docId, params = {}) {
+    if (!base) return '';
+    const url = new URL(base, window.location.origin);
+    if (docId) {
+        url.pathname = url.pathname.replace(/\/$/, '') + '/' + encodeURIComponent(docId);
+    }
+    for (const [key, value] of Object.entries(params)) {
+        if (value !== undefined && value !== null) {
+            url.searchParams.set(key, value);
+        }
+    }
+    return url.toString();
+}
+
+/**
  * Get base URL from state or location
  * @param {Object} state - State object
  * @param {string} defaultValue - Default value
@@ -311,6 +332,28 @@ export function getType(value) {
     return typeof value;
 }
 
+/**
+ * Clamp a number between min and max
+ * @param {number} value - Value to clamp
+ * @param {number} min - Minimum value
+ * @param {number} max - Maximum value
+ * @returns {number} Clamped value
+ */
+export function clamp(value, min, max) {
+    return Math.min(Math.max(value, min), max);
+}
+
+/**
+ * Linear interpolation between two values
+ * @param {number} a - Start value
+ * @param {number} b - End value
+ * @param {number} t - Interpolation factor (0-1)
+ * @returns {number} Interpolated value
+ */
+export function lerp(a, b, t) {
+    return a + (b - a) * t;
+}
+
 // ============================================================
 // ARRAY UTILITIES
 // ============================================================
@@ -389,6 +432,20 @@ export function sortBy(arr, key, ascending = true) {
         if (aVal > bVal) return ascending ? 1 : -1;
         return 0;
     });
+}
+
+/**
+ * Chunk an array into smaller arrays of a specified size
+ * @param {Array} arr - Array to chunk
+ * @param {number} size - Chunk size
+ * @returns {Array} Array of chunks
+ */
+export function chunkArray(arr, size) {
+    const chunks = [];
+    for (let i = 0; i < arr.length; i += size) {
+        chunks.push(arr.slice(i, i + size));
+    }
+    return chunks;
 }
 
 // ============================================================
@@ -477,6 +534,27 @@ export function isEmpty(obj) {
     if (Array.isArray(obj)) return obj.length === 0;
     if (typeof obj === 'object') return Object.keys(obj).length === 0;
     return false;
+}
+
+/**
+ * Deep clone an object
+ * @param {Object} obj - Object to clone
+ * @returns {Object} Cloned object
+ */
+export function deepClone(obj) {
+    if (obj === null || typeof obj !== 'object') return obj;
+    if (obj instanceof Date) return new Date(obj.getTime());
+    if (obj instanceof Array) return obj.map(item => deepClone(item));
+    if (obj instanceof Object) {
+        const cloned = {};
+        for (const key in obj) {
+            if (obj.hasOwnProperty(key)) {
+                cloned[key] = deepClone(obj[key]);
+            }
+        }
+        return cloned;
+    }
+    return obj;
 }
 
 // ============================================================
@@ -680,6 +758,26 @@ export function throttle(fn, delay = 250) {
     };
 }
 
+/**
+ * Debounce a function
+ * @param {Function} fn - Function to debounce
+ * @param {number} delay - Debounce delay in ms
+ * @returns {Function} Debounced function
+ */
+export function debounce(fn, delay = 250) {
+    let timeoutId = null;
+    
+    return function debounced(...args) {
+        if (timeoutId) {
+            clearTimeout(timeoutId);
+        }
+        timeoutId = setTimeout(() => {
+            timeoutId = null;
+            fn.apply(this, args);
+        }, delay);
+    };
+}
+
 // ============================================================
 // DICE UTILITIES (re-exported from dice.js to avoid duplicates)
 // ============================================================
@@ -712,6 +810,7 @@ const Utils = {
     getUrlParams,
     getUrlParam,
     buildUrlWithParams,
+    buildDocumentUrl,
     getBaseUrl,
     capitalize,
     toTitleCase,
@@ -733,6 +832,8 @@ const Utils = {
     isValidNumber,
     isValidInteger,
     getType,
+    clamp,
+    lerp,
     
     // Array
     shuffleArray,
@@ -741,6 +842,7 @@ const Utils = {
     sum,
     average,
     sortBy,
+    chunkArray,
     
     // Object
     getNested,
@@ -748,6 +850,7 @@ const Utils = {
     pick,
     omit,
     isEmpty,
+    deepClone,
     
     // Date
     timeAgo,
@@ -766,6 +869,7 @@ const Utils = {
     
     // Function
     throttle,
+    debounce,
 };
 
 export default Utils;

@@ -6,7 +6,7 @@
 import { vttStore } from '../../core/vtt-store.js';
 import { escHtml, getStorage, setHtml, createElement } from '../../core/utils.js';
 import { isConnectedToServer } from '../../core/websocket.js';
-import { getOutcomeColor } from '../../core/dice.js';
+import { getOutcomeColor, getOutcomeLabel, getOutcomeClass } from '../../core/dice.js';
 
 // ============================================================
 // Configuration
@@ -171,11 +171,13 @@ function renderRollDetails(rollData) {
     }).join(' ');
     
     const outcomeColor = getOutcomeColor(rollData.outcome || '');
+    const outcomeLabel = getOutcomeLabel(rollData.outcome || '');
+    const outcomeClass = getOutcomeClass(rollData.outcome || '');
     
     return `
         <div style="margin-top:0.2rem;padding:0.2rem 0.4rem;background:var(--bg2);border-radius:4px;font-size:0.7rem;">
             <div style="display:flex;flex-wrap:wrap;gap:0.3rem;align-items:center;">
-                <span class="outcome-tag ${rollData.outcomeClass || ''}" style="padding:0.05rem 0.6rem;border-radius:12px;font-weight:600;background:${outcomeColor};color:white;">${rollData.outcome || ''}</span>
+                <span class="outcome-tag ${outcomeClass}" style="padding:0.05rem 0.6rem;border-radius:12px;font-weight:600;background:${outcomeColor};color:white;">${outcomeLabel}</span>
                 <span>🎲 ${diceHtml}</span>
                 <span style="color:var(--text3);">S:${rollData.successes || 0} SB:${rollData.storyBeats || 0}</span>
             </div>

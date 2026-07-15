@@ -144,7 +144,7 @@ export function getCharacter(id) {
 
 export function addCharacter(character) {
     if (!character.id) {
-        character.id = generateId('char_');
+        character.id = generateId(8);
     }
     if (!character.createdAt) {
         character.createdAt = new Date().toISOString();
@@ -177,7 +177,7 @@ export function deleteCharacter(id) {
 
 export function addNPC(npc) {
     if (!npc.id) {
-        npc.id = generateId('npc_');
+        npc.id = generateId(8);
     }
     if (!npc.createdAt) {
         npc.createdAt = new Date().toISOString();
@@ -233,7 +233,7 @@ export function getCampaign(id) {
 
 export function addCampaign(campaign) {
     if (!campaign.id) {
-        campaign.id = generateId('camp_');
+        campaign.id = generateId(8);
     }
     if (!campaign.createdAt) {
         campaign.createdAt = new Date().toISOString();
@@ -275,7 +275,7 @@ export function getTimer(id) {
 
 export function addTimer(timer) {
     if (!timer.id) {
-        timer.id = generateId('timer_');
+        timer.id = generateId(8);
     }
     if (!timer.createdAt) {
         timer.createdAt = new Date().toISOString();
@@ -317,7 +317,7 @@ export function getEncounter(id) {
 
 export function addEncounter(encounter) {
     if (!encounter.id) {
-        encounter.id = generateId('enc_');
+        encounter.id = generateId(8);
     }
     if (!encounter.createdAt) {
         encounter.createdAt = new Date().toISOString();
@@ -359,7 +359,7 @@ export function getWikiEntry(id) {
 
 export function addWikiEntry(entry) {
     if (!entry.id) {
-        entry.id = generateId('wiki_');
+        entry.id = generateId(8);
     }
     if (!entry.createdAt) {
         entry.createdAt = new Date().toISOString();
@@ -401,7 +401,7 @@ export function getArchive(id) {
 
 export function addArchive(archive) {
     if (!archive.id) {
-        archive.id = generateId('arch_');
+        archive.id = generateId(8);
     }
     if (!archive.createdAt) {
         archive.createdAt = new Date().toISOString();
@@ -438,7 +438,7 @@ export function getDiceHistory() {
 
 export function addDiceRoll(roll) {
     if (!roll.id) {
-        roll.id = generateId('roll_');
+        roll.id = generateId(8);
     }
     if (!roll.timestamp) {
         roll.timestamp = new Date().toISOString();
@@ -468,7 +468,7 @@ export function clearRollHistory() {
 
 export function addChatMessage(message) {
     if (!message.id) {
-        message.id = generateId('chat_');
+        message.id = generateId(8);
     }
     if (!message.timestamp) {
         message.timestamp = new Date().toISOString();
