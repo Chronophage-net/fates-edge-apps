@@ -27,7 +27,7 @@ on:
         description: 'Version tag for release (e.g., v1.2.0)'
 
 env:
-  NODE_VERSION: 24
+  NODE_VERSION: 22          # ← changed to LTS version for stability
 
 permissions:
   contents: read
@@ -48,7 +48,7 @@ jobs:
         include:
           - name: web-client
             path: utilities/javascript/fates-edge-web-client
-            needs_node: false
+            needs_node: true      # ← FIX: Node is required for seed generation
             build: false
             package: false
           - name: socket-server
@@ -183,7 +183,6 @@ jobs:
           echo "📦 Preparing static site for GitHub Pages..."
           mkdir -p pages-site
           
-          # Copy the entire web client directory (it's already static HTML/CSS/JS)
           rsync -a \
             --exclude 'node_modules' \
             --exclude 'Dockerfile*' \
@@ -199,7 +198,6 @@ jobs:
             --exclude 'js/tests' \
             "${{ matrix.path }}/" pages-site/
           
-          # Include seed files
           echo "🌱 Including seed files..."
           mkdir -p pages-site/.seed pages-site/data
           if [ -f "${{ matrix.path }}/.seed/random-seed.json" ]; then
@@ -217,13 +215,11 @@ jobs:
         run: |
           echo "📂 Copying data files to Pages site..."
           
-          # LICENSE
           if [ -f "LICENSE.md" ]; then
             cp LICENSE.md pages-site/
             echo "✅ LICENSE.md copied"
           fi
           
-          # wiki.json
           echo "📄 Processing wiki.json..."
           WIKI_COPIED=false
           for src in "data/wiki.json" "misc/wiki.json" "${{ matrix.path }}/data/wiki.json"; do
@@ -241,7 +237,6 @@ jobs:
             echo "⚠️ No wiki.json found, created minimal version"
           fi
           
-          # Regions
           echo "🗺️ Processing region files..."
           mkdir -p pages-site/regions pages-site/data/regions
           for src_dir in "data/regions" "misc/regions" "${{ matrix.path }}/data/regions" "${{ matrix.path }}/regions"; do
@@ -253,7 +248,6 @@ jobs:
             fi
           done
           
-          # Factions
           echo "🏛️ Processing faction files..."
           mkdir -p pages-site/factions pages-site/data/factions
           for src_dir in "data/factions" "misc/factions" "${{ matrix.path }}/data/factions" "${{ matrix.path }}/factions"; do
@@ -265,7 +259,6 @@ jobs:
             fi
           done
           
-          # Patrons
           echo "👤 Processing patron files..."
           mkdir -p pages-site/data/patrons
           for src_dir in "data/patrons" "misc/patrons" "${{ matrix.path }}/data/patrons"; do
@@ -276,7 +269,6 @@ jobs:
             fi
           done
           
-          # Data directory root files
           if [ -d "data" ]; then
             for file in data/*.json data/*.js; do
               if [ -f "$file" ] && [ "$(basename "$file")" != "wiki.json" ] && [ "$(basename "$file")" != "seed.json" ]; then
@@ -309,7 +301,6 @@ jobs:
           ls -la pages-site/data/patrons/ 2>/dev/null | head -10 || echo "  (empty or not found)"
           echo ""
           
-          # Check for index.html
           if [ -f "pages-site/index.html" ]; then
             echo "✅ index.html found"
           else

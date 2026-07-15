@@ -68,17 +68,19 @@ jobs:
         if: github.event_name == 'workflow_dispatch' || steps.check-artifact.outputs.downloaded == 'false'
         uses: actions/setup-node@v6
         with:
-          node-version: 24
+          node-version: 22   # LTS
 
       - name: Build socket server (fallback)
         if: github.event_name == 'workflow_dispatch' || steps.check-artifact.outputs.downloaded == 'false'
         working-directory: utilities/javascript/fates-edge-socket-server
         run: |
           npm ci
-          mkdir -p socket-server-deploy
-          cp -r ./* socket-server-deploy/
-          # Copy data files if they exist
-          [ -d "../../../data" ] && cp -r ../../../data/* socket-server-deploy/data/ 2>/dev/null || true
+          mkdir -p ../../socket-server-deploy
+          rsync -a --exclude='node_modules' --exclude='.git' . ../../socket-server-deploy/
+          # Optionally copy data from web client data directory if needed
+          if [ -d "../fates-edge-web-client/data" ]; then
+            cp -r ../fates-edge-web-client/data ../../socket-server-deploy/data 2>/dev/null || true
+          fi
 
       - name: Prepare deployment artifact
         run: |
@@ -107,8 +109,6 @@ jobs:
           echo "🚀 Deploying socket server to Render (${{ github.event.inputs.environment || 'production' }})..."
           echo "Service ID: $RENDER_SERVICE_ID"
           
-          # Trigger deployment via Render API
-          # Valid values for clearCache: "clear" or "do_not_clear"
           RESPONSE=$(curl -s -X POST \
             -H "Authorization: Bearer $RENDER_API_KEY" \
             -H "Content-Type: application/json" \
@@ -123,7 +123,6 @@ jobs:
             echo "Deploy ID: $DEPLOY_ID"
             echo "📊 Dashboard: https://dashboard.render.com/web/$RENDER_SERVICE_ID/deploys/$DEPLOY_ID"
             
-            # Get deployment status
             echo "⏳ Checking deployment status..."
             sleep 5
             
@@ -161,7 +160,6 @@ jobs:
           
           echo "⚠️ Service may not be ready yet. Check manually at: $URL/api/health"
           
-          # Check if service is at least responding
           if curl -s -o /dev/null -w "%{http_code}" "$URL" | grep -q "200\|301\|302"; then
             echo "✅ Service is responding (may still be starting up)"
             exit 0
