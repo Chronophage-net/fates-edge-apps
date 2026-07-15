@@ -77,8 +77,11 @@ const CROWN_POSITIONS = [
 // DETERMINISTIC RNG (same pattern as dice module)
 // ============================================================
 
-let _seed = null;
-let _prng = null;
+// Use a module-level closure to avoid global conflicts
+const _deckSeedState = {
+    seed: null,
+    prng: null
+};
 
 // Xorshift128+ PRNG for deterministic random generation
 class Xorshift128 {
@@ -137,19 +140,20 @@ class Xorshift128 {
     }
 }
 
-function getDeckSeed() {
-    return _seed;
+// Seed management functions - exported
+export function getDeckSeed() {
+    return _deckSeedState.seed;
 }
 
-function setDeckSeed(seed) {
-    _seed = seed;
+export function setDeckSeed(seed) {
+    _deckSeedState.seed = seed;
     if (seed) {
-        _prng = new Xorshift128(seed);
+        _deckSeedState.prng = new Xorshift128(seed);
         try {
             localStorage.setItem('fates-edge-deck-seed', seed);
         } catch (e) { /* ignore */ }
     } else {
-        _prng = null;
+        _deckSeedState.prng = null;
         try {
             localStorage.removeItem('fates-edge-deck-seed');
         } catch (e) { /* ignore */ }
@@ -157,7 +161,7 @@ function setDeckSeed(seed) {
     return true;
 }
 
-function generateDeckSeed() {
+export function generateDeckSeed() {
     try {
         if (window && window.crypto && window.crypto.getRandomValues) {
             const array = new Uint32Array(4);
@@ -172,39 +176,39 @@ function generateDeckSeed() {
 try {
     const stored = localStorage.getItem('fates-edge-deck-seed');
     if (stored) {
-        _seed = stored;
-        _prng = new Xorshift128(stored);
+        _deckSeedState.seed = stored;
+        _deckSeedState.prng = new Xorshift128(stored);
         console.log('[Decks] Seed loaded from localStorage:', stored.substring(0, 8) + '...');
     }
 } catch (e) { /* ignore */ }
 
 // Also try to load from window seed (set by build script for static sites)
-if (!_seed && typeof window !== 'undefined' && window.__RANDOM_SEED) {
-    _seed = window.__RANDOM_SEED;
-    _prng = new Xorshift128(_seed);
+if (!_deckSeedState.seed && typeof window !== 'undefined' && window.__RANDOM_SEED) {
+    _deckSeedState.seed = window.__RANDOM_SEED;
+    _deckSeedState.prng = new Xorshift128(_deckSeedState.seed);
     try {
-        localStorage.setItem('fates-edge-deck-seed', _seed);
-        console.log('[Decks] Seed loaded from window.__RANDOM_SEED:', _seed.substring(0, 8) + '...');
+        localStorage.setItem('fates-edge-deck-seed', _deckSeedState.seed);
+        console.log('[Decks] Seed loaded from window.__RANDOM_SEED:', _deckSeedState.seed.substring(0, 8) + '...');
     } catch (e) { /* ignore */ }
 }
 
 // If no seed found, check if dice module has one (share seed across features)
-if (!_seed && typeof window !== 'undefined') {
+if (!_deckSeedState.seed && typeof window !== 'undefined') {
     try {
         const diceSeed = localStorage.getItem('fates-edge-seed');
         if (diceSeed) {
-            _seed = diceSeed;
-            _prng = new Xorshift128(_seed);
-            localStorage.setItem('fates-edge-deck-seed', _seed);
-            console.log('[Decks] Seed shared from dice module:', _seed.substring(0, 8) + '...');
+            _deckSeedState.seed = diceSeed;
+            _deckSeedState.prng = new Xorshift128(_deckSeedState.seed);
+            localStorage.setItem('fates-edge-deck-seed', _deckSeedState.seed);
+            console.log('[Decks] Seed shared from dice module:', _deckSeedState.seed.substring(0, 8) + '...');
         }
     } catch (e) { /* ignore */ }
 }
 
 // Deterministic random functions for deck operations
 function getDeckRandom() {
-    if (_prng) {
-        return _prng.random();
+    if (_deckSeedState.prng) {
+        return _deckSeedState.prng.random();
     }
     try {
         if (typeof window !== 'undefined' && window.crypto && window.crypto.getRandomValues) {
@@ -217,15 +221,15 @@ function getDeckRandom() {
 }
 
 function getDeckRandomInt(min, max) {
-    if (_prng) {
-        return _prng.randomInt(min, max);
+    if (_deckSeedState.prng) {
+        return _deckSeedState.prng.randomInt(min, max);
     }
     return Math.floor(getDeckRandom() * (max - min)) + min;
 }
 
 function getDeckRandomIntInclusive(min, max) {
-    if (_prng) {
-        return _prng.randomIntInclusive(min, max);
+    if (_deckSeedState.prng) {
+        return _deckSeedState.prng.randomIntInclusive(min, max);
     }
     return Math.floor(getDeckRandom() * (max - min + 1)) + min;
 }
@@ -641,7 +645,7 @@ export async function render(el) {
         regionOptions = '<option value="">No regions found</option>';
     }
 
-    const isDeterministic = !!_seed;
+    const isDeterministic = !!_deckSeedState.seed;
 
     container.innerHTML = `
         <div class="decks-header">
@@ -654,7 +658,7 @@ export async function render(el) {
             <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.3rem;">
                 <span style="font-size:0.8rem;color:var(--text2);">
                     ${isDeterministic ? '🎲 Deterministic RNG (seeded)' : '🔀 Cryptographic RNG (random)'}
-                    ${isDeterministic ? `<span style="font-size:0.6rem;color:var(--text3);font-family:monospace;">seed: ${_seed.substring(0, 8)}...</span>` : ''}
+                    ${isDeterministic ? `<span style="font-size:0.6rem;color:var(--text3);font-family:monospace;">seed: ${_deckSeedState.seed.substring(0, 8)}...</span>` : ''}
                 </span>
                 <div style="display:flex;gap:0.3rem;flex-wrap:wrap;">
                     <button class="btn btn-xs btn-ghost" id="deck-seed-regenerate" title="Regenerate seed">🔄 New Seed</button>
@@ -790,7 +794,7 @@ function buildDeck() {
     // Use deterministic shuffle if seed is set
     deck = deterministicShuffle(deck);
     updateDeckCount();
-    console.log('🔀 Deck shuffled, total cards:', deck.length, _seed ? '(deterministic)' : '(random)');
+    console.log('🔀 Deck shuffled, total cards:', deck.length, _deckSeedState.seed ? '(deterministic)' : '(random)');
 }
 
 function updateDeckCount() {
@@ -1090,7 +1094,7 @@ export function resetDeck() {
     // Broadcast via WebSocket
     broadcastReset();
     
-    showToast(`Deck reshuffled with new random seeds.${_seed ? ' (deterministic)' : ''}`, 'success');
+    showToast(`Deck reshuffled with new random seeds.${_deckSeedState.seed ? ' (deterministic)' : ''}`, 'success');
 }
 
 // ============================================================
@@ -1409,56 +1413,6 @@ export async function onRegionChange(regionNameOrCallback, callback) {
 }
 
 // ============================================================
-// SEED MANAGEMENT EXPORTS
-// ============================================================
-
-/**
- * Get the current deck seed
- * @returns {string|null} Current seed or null if not set
- *
- * export function getDeckSeed() {
- *   return _seed;
- * }
-*?
-/**
- * Set the deck seed for deterministic shuffles
- * @param {string|null} seed - The seed to use, or null to use random
- */
-export function setDeckSeed(seed) {
-    _seed = seed;
-    if (seed) {
-        _prng = new Xorshift128(seed);
-        try {
-            localStorage.setItem('fates-edge-deck-seed', seed);
-        } catch (e) { /* ignore */ }
-    } else {
-        _prng = null;
-        try {
-            localStorage.removeItem('fates-edge-deck-seed');
-        } catch (e) { /* ignore */ }
-    }
-    // Rebuild deck with new seed
-    if (isInitialized) {
-        buildDeck();
-    }
-}
-
-/**
- * Generate a new random seed for the deck
- * @returns {string} New seed
- */
-export function generateDeckSeed() {
-    try {
-        if (window && window.crypto && window.crypto.getRandomValues) {
-            const array = new Uint32Array(4);
-            window.crypto.getRandomValues(array);
-            return array.reduce((acc, val) => acc + val.toString(16).padStart(8, '0'), '');
-        }
-    } catch (e) { /* ignore */ }
-    return Date.now().toString(36) + Math.random().toString(36).substring(2, 8);
-}
-
-// ============================================================
 // SHORTCUT FUNCTIONS FOR DASHBOARD QUICK BUTTONS
 // ============================================================
 
@@ -1588,9 +1542,6 @@ window.getRegionNames = getRegionNames;
 window.setSelectedRegion = setSelectedRegion;
 window.registerRegionChange = registerRegionChange;
 window.onRegionChange = onRegionChange;
-window.getDeckSeed = getDeckSeed;
-window.setDeckSeed = setDeckSeed;
-window.generateDeckSeed = generateDeckSeed;
 
 // ============================================================
 // EXPORT
@@ -1618,8 +1569,5 @@ export default {
     registerRegionChange,
     onRegionChange,
     quickDraw,
-    quickCrownSpread,
-    getDeckSeed,
-    setDeckSeed,
-    generateDeckSeed
+    quickCrownSpread
 };
