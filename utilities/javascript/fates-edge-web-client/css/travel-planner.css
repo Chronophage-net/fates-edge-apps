@@ -1,0 +1,102 @@
+/* css/travel-planner.css */
+
+/* Travel Planner Container */
+.travel-planner {
+    padding: 0.5rem 0;
+}
+
+.travel-planner-header {
+    margin-bottom: 1rem;
+}
+
+/* Travel Cards */
+.travel-card {
+    position: relative;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    cursor: default;
+    user-select: none;
+}
+
+.travel-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+}
+
+.travel-card .card-ace {
+    box-shadow: 0 0 30px rgba(212, 175, 55, 0.2);
+}
+
+/* Travel Modal Animations */
+@keyframes fadeIn {
+    from { opacity: 0; transform: scale(0.95); }
+    to { opacity: 1; transform: scale(1); }
+}
+
+.travel-modal {
+    animation: fadeIn 0.3s ease;
+}
+
+/* Card Scroll Container */
+.travel-card-scroll {
+    scrollbar-width: thin;
+    scrollbar-color: var(--border) transparent;
+}
+
+.travel-card-scroll::-webkit-scrollbar {
+    height: 6px;
+}
+
+.travel-card-scroll::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.travel-card-scroll::-webkit-scrollbar-thumb {
+    background: var(--border);
+    border-radius: 3px;
+}
+
+/* Suit Colors */
+.suit-spades { color: #2c3e50; }
+.suit-hearts { color: #c0392b; }
+.suit-clubs { color: #27ae60; }
+.suit-diamonds { color: #2980b9; }
+
+/* Timer Badge */
+.timer-badge {
+    display: inline-block;
+    padding: 0.1rem 0.6rem;
+    border-radius: 12px;
+    font-size: 0.7rem;
+    font-weight: 600;
+}
+
+.timer-badge.short { background: var(--green); color: white; }
+.timer-badge.standard { background: var(--gold); color: #1a141a; }
+.timer-badge.extended { background: var(--orange); color: #1a141a; }
+.timer-badge.epic { background: var(--red); color: white; }
+
+/* History Items */
+.history-item {
+    transition: background 0.2s ease;
+}
+
+.history-item:hover {
+    background: var(--bg3);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .travel-card {
+        min-width: 120px !important;
+        padding: 0.6rem !important;
+    }
+    
+    .travel-card .card-rank {
+        font-size: 2rem !important;
+    }
+    
+    .travel-modal > div {
+        padding: 1rem !important;
+        max-width: 100% !important;
+    }
+}

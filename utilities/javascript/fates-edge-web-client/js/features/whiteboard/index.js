@@ -8,7 +8,7 @@
  * - Image upload for maps/reference
  * - Grid snap option
  * - Simple drawing tools (pen, eraser, line, rectangle, text)
- * - WebSocket sync for real-time collaboration
+ * - WebSocket sync for real-time collaboration (requires connection)
  */
 
 import { getState, saveState } from '../../core/state.js';
@@ -53,6 +53,7 @@ let panStart = { x: 0, y: 0 };
 let wsListeners = new Map();
 let isSyncing = false;
 let pendingSync = false;
+let isOfflineMode = false;
 
 // ============================================================
 // LOAD/SAVE
@@ -76,8 +77,10 @@ function saveWhiteboardData() {
     saved.whiteboard.images = state.images;
     saved.whiteboard.settings = state.settings;
     saveState();
-    // Broadcast to other clients
-    broadcastWhiteboardUpdate();
+    // Broadcast to other clients if connected
+    if (!isOfflineMode) {
+        broadcastWhiteboardUpdate();
+    }
 }
 
 // ============================================================
@@ -87,10 +90,18 @@ function saveWhiteboardData() {
 function setupWebSocketSync() {
     cleanupWebSocketListeners();
     
-    if (!isConnectedToServer()) {
-        console.log('[Whiteboard] Not connected to server, local mode only');
+    const connected = isConnectedToServer();
+    
+    if (!connected) {
+        console.log('[Whiteboard] Not connected to server - OFFLINE MODE');
+        isOfflineMode = true;
+        updateConnectionStatusUI(false);
         return;
     }
+    
+    isOfflineMode = false;
+    updateConnectionStatusUI(true);
+    console.log('[Whiteboard] WebSocket sync enabled');
     
     // Listen for whiteboard updates from other clients
     const updateHandler = (data) => {
@@ -102,23 +113,12 @@ function setupWebSocketSync() {
         // Merge incoming data
         const incoming = data.whiteboard;
         if (incoming.drawings) {
-            // Check if we have more drawings than the incoming
-            // If we have local changes that haven't been synced, merge them
-            if (state.drawings.length > incoming.drawings.length) {
-                // We have local drawings, keep them and add incoming
-                const existingIds = new Set(state.drawings.map(d => d.id));
-                const newDrawings = incoming.drawings.filter(d => !existingIds.has(d.id));
+            const existingIds = new Set(state.drawings.map(d => d.id));
+            const newDrawings = incoming.drawings.filter(d => !existingIds.has(d.id));
+            if (newDrawings.length > 0) {
                 state.drawings = [...state.drawings, ...newDrawings];
             } else if (incoming.drawings.length > state.drawings.length) {
-                // Incoming has more drawings, take them
                 state.drawings = incoming.drawings;
-            } else {
-                // Same length, merge any new ones
-                const existingIds = new Set(state.drawings.map(d => d.id));
-                const newDrawings = incoming.drawings.filter(d => !existingIds.has(d.id));
-                if (newDrawings.length > 0) {
-                    state.drawings = [...state.drawings, ...newDrawings];
-                }
             }
         }
         
@@ -146,7 +146,6 @@ function setupWebSocketSync() {
             state.settings = { ...state.settings, ...incoming.settings };
         }
         
-        // Save and refresh UI
         saveWhiteboardData();
         refreshUI();
         showToast('🔄 Whiteboard synced', 'info');
@@ -172,8 +171,6 @@ function setupWebSocketSync() {
     
     onEvent('room-state', roomStateHandler);
     wsListeners.set('room-state', roomStateHandler);
-    
-    console.log('[Whiteboard] WebSocket sync enabled');
 }
 
 function cleanupWebSocketListeners() {
@@ -189,7 +186,7 @@ function cleanupWebSocketListeners() {
 
 function broadcastWhiteboardUpdate() {
     if (isSyncing) return;
-    if (!isConnectedToServer()) return;
+    if (isOfflineMode || !isConnectedToServer()) return;
     
     try {
         const data = {
@@ -222,6 +219,26 @@ function updateStats() {
     }
 }
 
+function updateConnectionStatusUI(connected) {
+    const statusBadge = document.querySelector('.status-badge');
+    const statusText = document.querySelector('.status-text');
+    const overlay = document.getElementById('whiteboard-offline-overlay');
+    
+    if (statusBadge) {
+        statusBadge.textContent = connected ? '🟢 Live' : '📡 Local';
+        statusBadge.className = `status-badge ${connected ? 'connected' : 'local'}`;
+    }
+    
+    if (statusText) {
+        statusText.textContent = connected ? 'Connected - Real-time sync enabled' : 'Local Mode - No sync (connect to server for collaboration)';
+        statusText.style.color = connected ? 'var(--green)' : 'var(--orange)';
+    }
+    
+    if (overlay) {
+        overlay.style.display = connected ? 'none' : 'flex';
+    }
+}
+
 // ============================================================
 // RENDER
 // ============================================================
@@ -231,6 +248,7 @@ export function render(el) {
     loadWhiteboardData();
 
     const isConnected = isConnectedToServer();
+    isOfflineMode = !isConnected;
 
     container.innerHTML = `
         <div class="whiteboard-modern-layout">
@@ -242,8 +260,11 @@ export function render(el) {
                         <p class="whiteboard-subtitle">Draw, note, and plan your campaign visually.</p>
                     </div>
                     <div style="display:flex;gap:0.5rem;align-items:center;">
-                        <span class="status-badge ${isConnected ? 'connected' : 'local'}" style="font-size:0.7rem;">
+                        <span class="status-badge ${isConnected ? 'connected' : 'local'}" style="font-size:0.7rem;padding:0.2rem 0.6rem;border-radius:12px;background:${isConnected ? 'var(--green)' : 'var(--orange)'};color:white;">
                             ${isConnected ? '🟢 Live' : '📡 Local'}
+                        </span>
+                        <span class="status-text" style="font-size:0.75rem;color:${isConnected ? 'var(--green)' : 'var(--orange)'};">
+                            ${isConnected ? 'Real-time sync' : 'Local only'}
                         </span>
                         <span class="whiteboard-stats" style="font-size:0.75rem;color:var(--text3);">
                             ${state.drawings.length} drawings, ${state.notes.length} notes, ${state.images.length} images
@@ -252,8 +273,22 @@ export function render(el) {
                 </div>
             </header>
 
+            <!-- OFFLINE OVERLAY -->
+            <div id="whiteboard-offline-overlay" style="display:${isConnected ? 'none' : 'flex'};position:relative;margin-bottom:0.5rem;padding:1rem;background:var(--bg3);border:2px solid var(--orange);border-radius:var(--radius);align-items:center;justify-content:center;gap:0.8rem;flex-wrap:wrap;">
+                <div style="display:flex;align-items:center;gap:0.5rem;">
+                    <span style="font-size:1.5rem;">📡</span>
+                    <div>
+                        <div style="font-weight:600;color:var(--orange);">Local Mode</div>
+                        <div style="font-size:0.8rem;color:var(--text3);">Whiteboard is saved locally. Connect to server for real-time collaboration.</div>
+                    </div>
+                </div>
+                <button class="btn btn-sm btn-primary" id="whiteboard-connect-btn" style="flex-shrink:0;">
+                    🔗 Connect
+                </button>
+            </div>
+
             <!-- Toolbar -->
-            <div class="whiteboard-toolbar">
+            <div class="whiteboard-toolbar" style="${isConnected ? '' : 'opacity:0.7;pointer-events:none;'}">
                 <div class="tool-group">
                     <button class="tool-btn active" data-tool="pen" title="Pen">✏️</button>
                     <button class="tool-btn" data-tool="eraser" title="Eraser">🧹</button>
@@ -282,6 +317,11 @@ export function render(el) {
                 <canvas id="whiteboard-canvas"></canvas>
                 <!-- Overlay for notes and images -->
                 <div id="whiteboard-overlay"></div>
+                ${!isConnected ? `
+                    <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);pointer-events:none;z-index:50;opacity:0.15;font-size:5rem;font-weight:bold;color:var(--text3);white-space:nowrap;user-select:none;">
+                        📡 LOCAL MODE
+                    </div>
+                ` : ''}
             </div>
 
             <!-- Controls -->
@@ -300,6 +340,7 @@ export function render(el) {
     attachEvents();
     restoreDrawings();
     setupWebSocketSync();
+    updateConnectionStatusUI(isConnected);
 }
 
 // ============================================================
@@ -310,8 +351,8 @@ function initCanvas() {
     canvas = document.getElementById('whiteboard-canvas');
     if (!canvas) return;
     
-    const container = document.getElementById('whiteboard-canvas-container');
-    const rect = container.getBoundingClientRect();
+    const containerEl = document.getElementById('whiteboard-canvas-container');
+    const rect = containerEl.getBoundingClientRect();
     
     canvas.width = rect.width - 4;
     canvas.height = rect.height - 4;
@@ -418,6 +459,9 @@ function renderOverlay() {
 // ============================================================
 
 function startDrawing(e) {
+    if (isOfflineMode) {
+        showToast('📡 Local mode - drawings saved locally', 'info');
+    }
     if (currentTool === 'select' || currentTool === 'text') return;
     
     const rect = canvas.getBoundingClientRect();
@@ -533,6 +577,9 @@ function restoreDrawings() {
 // ============================================================
 
 function addWhiteboardNote() {
+    if (isOfflineMode) {
+        showToast('📡 Local mode - note saved locally', 'info');
+    }
     const content = prompt('Enter note content:');
     if (!content) return;
     
@@ -579,6 +626,9 @@ function deleteWhiteboardNote(noteId) {
 // ============================================================
 
 function uploadWhiteboardImage() {
+    if (isOfflineMode) {
+        showToast('📡 Local mode - image saved locally', 'info');
+    }
     const input = document.createElement('input');
     input.type = 'file';
     input.accept = 'image/*';
@@ -687,12 +737,30 @@ function exportWhiteboard() {
 }
 
 function forceSync() {
-    if (!isConnectedToServer()) {
-        showToast('Not connected to server', 'error');
+    if (isOfflineMode || !isConnectedToServer()) {
+        showToast('📡 Not connected to server - cannot sync', 'error');
         return;
     }
     broadcastWhiteboardUpdate();
     showToast('🔄 Sync requested', 'info');
+}
+
+function connectWhiteboard() {
+    // Trigger a reconnect attempt
+    const syncModule = document.querySelector('[data-module="sync"]');
+    if (syncModule) {
+        // Try to reconnect via the sync module
+        import('../../core/sync/index.js').then(module => {
+            if (module.syncManager) {
+                module.syncManager.reconnect?.();
+                showToast('🔄 Attempting to reconnect...', 'info');
+            }
+        }).catch(() => {
+            showToast('📡 Please check your connection and try again', 'error');
+        });
+    } else {
+        showToast('📡 Please connect via the Sync panel first', 'info');
+    }
 }
 
 // ============================================================
@@ -708,15 +776,22 @@ window.clearWhiteboardDrawings = clearWhiteboardDrawings;
 window.clearWhiteboardAll = clearWhiteboardAll;
 window.exportWhiteboard = exportWhiteboard;
 window.forceWhiteboardSync = forceSync;
+window.connectWhiteboard = connectWhiteboard;
 
 // ============================================================
 // EVENT LISTENERS
 // ============================================================
 
 export function attachEvents() {
+    // Connect button
+    document.getElementById('whiteboard-connect-btn')?.addEventListener('click', connectWhiteboard);
+
     // Tool buttons
     document.querySelectorAll('.tool-btn[data-tool]').forEach(btn => {
         btn.addEventListener('click', () => {
+            if (isOfflineMode) {
+                showToast('📡 Local mode - drawing saved locally', 'info');
+            }
             document.querySelectorAll('.tool-btn[data-tool]').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
             currentTool = btn.dataset.tool;
@@ -817,6 +892,19 @@ export function attachEvents() {
         restoreDrawings();
         renderOverlay();
     });
+
+    // Listen for connection changes
+    document.addEventListener('connection-change', (e) => {
+        const connected = e.detail?.connected || false;
+        isOfflineMode = !connected;
+        updateConnectionStatusUI(connected);
+        if (connected) {
+            setupWebSocketSync();
+            showToast('🔄 Whiteboard reconnected and syncing', 'success');
+        } else {
+            showToast('📡 Whiteboard in local mode', 'info');
+        }
+    });
 }
 
 // ============================================================
@@ -833,6 +921,7 @@ export function onActivate() {
             restoreDrawings();
             renderOverlay();
             updateStats();
+            updateConnectionStatusUI(!isOfflineMode);
         }, 100);
     }
 }
@@ -850,6 +939,7 @@ export function refresh() {
     renderOverlay();
     updateStats();
     setupWebSocketSync();
+    updateConnectionStatusUI(!isOfflineMode);
 }
 
 export function destroy() {

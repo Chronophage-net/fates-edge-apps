@@ -7,89 +7,124 @@
  */
 
 // Import from core modules
-import { escHtml, safeParseInt } from '../../core/utils.js';
-import { addRoll, getState, saveState } from '../../core/state.js';
+import { escHtml, safeParseInt } from '../core/utils.js';
+import { addRoll, getState, saveState } from '../core/state.js';
 // Import the core dice engine
-import { performRoll, rollDie } from '../../core/dice.js';
+import { performRoll, rollDie } from '../core/dice.js';
 // Import WebSocket for sync
 import { isConnectedToServer, onEvent, offEvent, sendMessage as sendWSMessage } from '../../core/websocket.js';
-
-// Try to import crypto module, use fallback if not available
-let cryptoGetSeed = null;
-let cryptoSetSeed = null;
-let cryptoGenerateSeed = null;
-
-try {
-    const cryptoModule = await import('../../core/crypto.js');
-    cryptoGetSeed = cryptoModule.getSeed || null;
-    cryptoSetSeed = cryptoModule.setSeed || null;
-    cryptoGenerateSeed = cryptoModule.generateSeed || null;
-} catch (e) {
-    console.debug('[Dice] Crypto module not available, using fallbacks');
-}
 
 let container = null;
 let wsListeners = new Map();
 
 // ============================================================
-// SEED MANAGEMENT (fallback if crypto.js doesn't have it)
+// CRYPTO MODULE - LAZY LOAD WITH FALLBACK
 // ============================================================
 
-// Try to use crypto functions, or use local fallback
+let cryptoModule = null;
+let cryptoLoadAttempted = false;
+
+async function getCryptoModule() {
+    if (cryptoModule) return cryptoModule;
+    if (cryptoLoadAttempted) return null;
+    
+    cryptoLoadAttempted = true;
+    try {
+        const module = await import('../../core/crypto.js');
+        cryptoModule = module;
+        console.log('[Dice] Crypto module loaded successfully');
+        return cryptoModule;
+    } catch (e) {
+        console.debug('[Dice] Crypto module not available, using fallback RNG');
+        return null;
+    }
+}
+
+// ============================================================
+// SEED MANAGEMENT
+// ============================================================
+
 let _seed = null;
+let _prng = null;
+
+// Xorshift128+ PRNG for deterministic random generation
+class Xorshift128 {
+    constructor(seed) {
+        this.seed = seed;
+        this.state = this._seedToState(seed);
+    }
+    
+    _seedToState(seed) {
+        let s0 = 0;
+        let s1 = 0;
+        
+        if (typeof seed === 'number') {
+            s0 = seed;
+            s1 = seed + 0x9e3779b97f4a7c15;
+        } else if (typeof seed === 'string') {
+            let hash = 0;
+            for (let i = 0; i < seed.length; i++) {
+                hash = ((hash << 5) - hash) + seed.charCodeAt(i);
+                hash = hash & hash;
+            }
+            s0 = hash;
+            s1 = hash + 0x9e3779b97f4a7c15;
+        } else {
+            s0 = Date.now();
+            s1 = Date.now() + 0x9e3779b97f4a7c15;
+        }
+        
+        return { s0: BigInt(s0), s1: BigInt(s1) };
+    }
+    
+    random() {
+        let s0 = this.state.s0;
+        let s1 = this.state.s1;
+        
+        let x = s1;
+        let y = s0;
+        
+        x = x ^ (x << BigInt(23));
+        x = x ^ (x >> BigInt(17));
+        x = x ^ (y ^ (y >> BigInt(26)));
+        
+        this.state.s0 = y;
+        this.state.s1 = x;
+        
+        const result = Number((x + y) & BigInt(0xFFFFFFFFFFFFFFFF)) / 18446744073709551616;
+        return result;
+    }
+    
+    randomInt(min, max) {
+        return Math.floor(this.random() * (max - min)) + min;
+    }
+    
+    randomIntInclusive(min, max) {
+        return Math.floor(this.random() * (max - min + 1)) + min;
+    }
+}
 
 function getSeed() {
-    // Try crypto module first
-    if (cryptoGetSeed) {
-        try {
-            return cryptoGetSeed();
-        } catch (e) {
-            console.debug('[Dice] Crypto getSeed failed, using fallback');
-        }
-    }
-    // Fallback: use localStorage or return null
-    try {
-        if (_seed) return _seed;
-        const stored = localStorage.getItem('fates-edge-seed');
-        if (stored) {
-            _seed = stored;
-            return _seed;
-        }
-    } catch (e) { /* ignore */ }
-    return null;
+    return _seed;
 }
 
 function setSeed(seed) {
-    // Try crypto module first
-    if (cryptoSetSeed) {
-        try {
-            return cryptoSetSeed(seed);
-        } catch (e) {
-            console.debug('[Dice] Crypto setSeed failed, using fallback');
-        }
-    }
-    // Fallback: store locally
     _seed = seed;
-    try {
-        if (seed) {
+    if (seed) {
+        _prng = new Xorshift128(seed);
+        try {
             localStorage.setItem('fates-edge-seed', seed);
-        } else {
+        } catch (e) { /* ignore */ }
+    } else {
+        _prng = null;
+        try {
             localStorage.removeItem('fates-edge-seed');
-        }
-    } catch (e) { /* ignore */ }
+        } catch (e) { /* ignore */ }
+    }
     return true;
 }
 
 function generateSeed() {
-    // Try crypto module first
-    if (cryptoGenerateSeed) {
-        try {
-            return cryptoGenerateSeed();
-        } catch (e) {
-            console.debug('[Dice] Crypto generateSeed failed, using fallback');
-        }
-    }
-    // Fallback: generate a random seed
     try {
         if (window && window.crypto && window.crypto.getRandomValues) {
             const array = new Uint32Array(4);
@@ -97,22 +132,71 @@ function generateSeed() {
             return array.reduce((acc, val) => acc + val.toString(16).padStart(8, '0'), '');
         }
     } catch (e) { /* ignore */ }
-    // Final fallback
     return Date.now().toString(36) + Math.random().toString(36).substring(2, 8);
 }
 
+// Initialize seed from localStorage on module load
+try {
+    const stored = localStorage.getItem('fates-edge-seed');
+    if (stored) {
+        _seed = stored;
+        _prng = new Xorshift128(stored);
+        console.log('[Dice] Seed loaded from localStorage:', stored.substring(0, 8) + '...');
+    }
+} catch (e) { /* ignore */ }
+
+// Also try to load from window seed (set by build script for static sites)
+if (!_seed && typeof window !== 'undefined' && window.__RANDOM_SEED) {
+    _seed = window.__RANDOM_SEED;
+    _prng = new Xorshift128(_seed);
+    try {
+        localStorage.setItem('fates-edge-seed', _seed);
+        console.log('[Dice] Seed loaded from window.__RANDOM_SEED:', _seed.substring(0, 8) + '...');
+    } catch (e) { /* ignore */ }
+}
+
 // ============================================================
-// TOAST NOTIFICATION (simple fallback)
+// DETERMINISTIC RNG FUNCTIONS
+// ============================================================
+
+function getRandom() {
+    if (_prng) {
+        return _prng.random();
+    }
+    try {
+        if (typeof window !== 'undefined' && window.crypto && window.crypto.getRandomValues) {
+            const array = new Uint32Array(1);
+            window.crypto.getRandomValues(array);
+            return array[0] / 4294967296;
+        }
+    } catch (e) { /* ignore */ }
+    return Math.random();
+}
+
+function getRandomInt(min, max) {
+    if (_prng) {
+        return _prng.randomInt(min, max);
+    }
+    return Math.floor(getRandom() * (max - min)) + min;
+}
+
+function getRandomIntInclusive(min, max) {
+    if (_prng) {
+        return _prng.randomIntInclusive(min, max);
+    }
+    return Math.floor(getRandom() * (max - min + 1)) + min;
+}
+
+// ============================================================
+// TOAST NOTIFICATION
 // ============================================================
 
 function showToast(message, type = 'info') {
-    // Try to use the global toast system if available
     if (window.showToast) {
         window.showToast(message, type);
         return;
     }
     
-    // Fallback: simple alert-style notification
     const colors = {
         info: 'var(--text)',
         success: 'var(--green)',
@@ -148,8 +232,6 @@ function showToast(message, type = 'info') {
         }, 300);
     }, 3000);
 }
-
-// ... rest of the file remains the same ...
 
 // ============================================================
 // RENDER
@@ -285,12 +367,10 @@ function setupWebSocketSync() {
         return;
     }
     
-    // Listen for roll results from other clients
     const rollHandler = (data) => {
         if (!data) return;
         console.log('[Dice] Received roll from server:', data);
         
-        // Add to history with remote flag
         const rollData = {
             ...data,
             id: data.id || `remote_${Date.now()}`,
@@ -302,12 +382,9 @@ function setupWebSocketSync() {
         addRoll(rollData);
         renderHistory();
         updateStats();
-        
-        // Show notification
         showToast(`🎲 ${data.sender || 'Remote'} rolled: ${data.outcome || 'Dice'}`, 'info');
     };
     
-    // Try to register with WebSocket event system
     try {
         onEvent('roll-result', rollHandler);
         wsListeners.set('roll-result', rollHandler);
@@ -333,7 +410,6 @@ function cleanupWebSocketListeners() {
 // ============================================================
 
 function attachEvents() {
-    // Roll button
     const rollBtn = document.getElementById('roll-btn');
     if (rollBtn) {
         const newBtn = rollBtn.cloneNode(true);
@@ -341,7 +417,6 @@ function attachEvents() {
         newBtn.addEventListener('click', handleRoll);
     }
     
-    // Clear button
     const clearBtn = document.getElementById('roll-clear-history');
     if (clearBtn) {
         const newBtn = clearBtn.cloneNode(true);
@@ -349,7 +424,6 @@ function attachEvents() {
         newBtn.addEventListener('click', clearHistory);
     }
     
-    // Export button
     const exportBtn = document.getElementById('roll-export-history');
     if (exportBtn) {
         const newBtn = exportBtn.cloneNode(true);
@@ -357,7 +431,6 @@ function attachEvents() {
         newBtn.addEventListener('click', exportHistory);
     }
     
-    // Preset buttons
     document.querySelectorAll('[data-roll-preset]').forEach(btn => {
         const newBtn = btn.cloneNode(true);
         btn.parentNode.replaceChild(newBtn, btn);
@@ -367,13 +440,11 @@ function attachEvents() {
         });
     });
     
-    // Seed controls
     const seedRegenerate = document.getElementById('seed-regenerate');
     if (seedRegenerate) {
         seedRegenerate.addEventListener('click', function() {
             const newSeed = generateSeed();
             setSeed(newSeed);
-            // Re-render to update UI
             render(container);
             showToast('🎲 New seed generated: ' + newSeed.substring(0, 8) + '...', 'success');
         });
@@ -390,7 +461,6 @@ function attachEvents() {
         });
     }
     
-    // Enter key support
     document.addEventListener('keydown', (e) => {
         if (e.key === 'Enter' && container && container.contains(e.target)) {
             const rollBtn = document.getElementById('roll-btn');
@@ -422,7 +492,6 @@ function applyPreset(preset) {
     document.getElementById('roll-position').value = p.position;
     document.getElementById('roll-boons').value = p.boons;
     
-    // Auto-roll after a brief delay
     setTimeout(() => {
         const rollBtn = document.getElementById('roll-btn');
         if (rollBtn) rollBtn.click();
@@ -435,7 +504,6 @@ function applyPreset(preset) {
 
 function handleRoll() {
     try {
-        // Get form values
         const attrEl = document.getElementById('roll-attr');
         const skillEl = document.getElementById('roll-skill');
         const dvEl = document.getElementById('roll-dv');
@@ -460,7 +528,6 @@ function handleRoll() {
         
         console.log('Rolling with:', { attr, skill, dv, position, boons });
         
-        // Use the core performRoll function
         const result = performRoll(attr, skill, dv, position, boons);
         
         if (!result || typeof result !== 'object') {
@@ -469,7 +536,6 @@ function handleRoll() {
             return;
         }
         
-        // Build roll data for history with seed info
         const rollData = {
             id: Date.now().toString(),
             timestamp: new Date().toISOString(),
@@ -495,15 +561,11 @@ function handleRoll() {
             sender: 'You'
         };
         
-        // Add to state
         addRoll(rollData);
-        
-        // Display result
         displayResult(result);
         renderHistory();
         updateStats();
         
-        // Broadcast via WebSocket if connected
         if (isConnectedToServer()) {
             try {
                 sendWSMessage('roll-result', rollData);
@@ -547,7 +609,6 @@ function displayResult(result) {
     
     const color = outcomeColors[result.outcomeClass] || 'var(--text)';
     
-    // Determine boon text
     let boonText = '';
     if (result.outcomeClass === 'partial') {
         boonText = ' (+1 Boon)';
@@ -555,25 +616,21 @@ function displayResult(result) {
         boonText = ' (+2 Boons)';
     }
     
-    // Format dice display
     const diceDisplay = result.dice && Array.isArray(result.dice) 
         ? result.dice.join(', ') 
         : '';
     
-    // Format reroll display
     let rerollDisplay = '';
     if (result.reRolls > 0 && result.reRolledDice && Array.isArray(result.reRolledDice)) {
         rerollDisplay = `(rerolled: ${result.reRolledDice.map(r => `${r.old}→${r.new}`).join(', ')})`;
     }
     
-    // Show seed info for deterministic rolls
     let seedInfo = '';
     const seed = getSeed();
     if (seed) {
         seedInfo = `<div style="font-size:0.6rem;color:var(--text3);margin-top:0.2rem;">🎲 seeded: ${seed.substring(0, 8)}...</div>`;
     }
     
-    // Animate the result
     resultEl.style.transition = 'transform 0.3s ease, opacity 0.3s ease';
     resultEl.style.transform = 'scale(0.95)';
     resultEl.style.opacity = '0.7';
@@ -598,7 +655,6 @@ function displayResult(result) {
         </div>
     `;
     
-    // Animate back
     setTimeout(() => {
         resultEl.style.transform = 'scale(1)';
         resultEl.style.opacity = '1';
@@ -626,7 +682,6 @@ function renderHistory() {
             try {
                 const time = roll.timestamp ? new Date(roll.timestamp).toLocaleTimeString() : '--:--:--';
                 
-                // Determine outcome color
                 let outcomeColor = 'var(--text2)';
                 if (roll.outcomeClass === 'clean-success' || roll.outcomeClass === 'success-with-sb') {
                     outcomeColor = 'var(--green)';
@@ -636,26 +691,21 @@ function renderHistory() {
                     outcomeColor = 'var(--red)';
                 }
                 
-                // Format dice
                 const diceDisplay = roll.dice && Array.isArray(roll.dice) 
                     ? roll.dice.join(',') 
                     : '';
                 
-                // Format re-rolls
                 let rerollDisplay = '';
                 if (roll.reRolls > 0 && roll.reRolledDice && Array.isArray(roll.reRolledDice)) {
                     rerollDisplay = ` ↻${roll.reRolledDice.map(r => `${r.old}→${r.new}`).join(', ')}`;
                 }
                 
-                // Position icon
                 const posIcons = {
                     dominant: '👑',
                     controlled: '⚖️',
                     desperate: '🔥'
                 };
                 const posIcon = posIcons[roll.position] || '';
-                
-                // Deterministic indicator
                 const detIndicator = roll.deterministic ? '🎲' : '🔀';
                 const sender = roll.remote ? `🌐 ${roll.sender || 'Remote'}` : detIndicator;
                 
@@ -683,8 +733,6 @@ function renderHistory() {
         }).filter(html => html !== '').join('');
         
         historyEl.innerHTML = html || '<span class="text-muted">No rolls yet.</span>';
-        
-        // Scroll to bottom
         historyEl.scrollTop = historyEl.scrollHeight;
     } catch (error) {
         console.error('Error rendering history:', error);
@@ -765,7 +813,6 @@ function exportHistory() {
             return;
         }
         
-        // Format for export
         const data = JSON.stringify(history, null, 2);
         const blob = new Blob([data], { type: 'application/json' });
         const url = URL.createObjectURL(blob);
@@ -787,7 +834,6 @@ function exportHistory() {
 // ============================================================
 
 export function init(el) {
-    // Try to load seed from localStorage on init
     try {
         const storedSeed = localStorage.getItem('fates-edge-seed');
         if (storedSeed) {
@@ -813,5 +859,9 @@ export default {
     destroy,
     getSeed,
     setSeed,
-    generateSeed
+    generateSeed,
+    getRandom,
+    getRandomInt,
+    getRandomIntInclusive,
+    Xorshift128
 };

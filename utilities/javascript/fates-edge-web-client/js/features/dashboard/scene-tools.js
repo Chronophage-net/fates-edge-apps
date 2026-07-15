@@ -10,6 +10,7 @@
  * - Campaign Dashboard with active threats and opportunities
  */
 
+import { render as renderTravelPlanner } from '../travel-planner/index.js';
 import { getState, addArchive, clearRollHistory, clearChatHistory, saveState } from '../../core/state.js';
 import { clamp, escHtml } from '../../core/utils.js';
 import { showToast } from '../../components/Toast.js';

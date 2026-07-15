@@ -3,20 +3,282 @@
  * UI for the Fate's Edge resolution system
  * Uses the core dice engine for all rolling logic
  * Supports deterministic RNG for static sites
- */// ASSERT FIX - must be before any imports
-// Now the imports
+ * Supports WebSocket sync for multiplayer
+ */
+
+// Import from core modules
 import { escHtml, safeParseInt } from '../../core/utils.js';
 import { addRoll, getState, saveState } from '../../core/state.js';
-import { 
-    performRoll, 
-    rollDie, 
-    getSeed, 
-    setSeed, 
-    generateSeed 
-} from '../../core/dice.js';
+// Import the core dice engine
+import { performRoll, rollDie } from '../../core/dice.js';
+// Import WebSocket for sync
+import { isConnectedToServer, onEvent, offEvent, sendMessage as sendWSMessage } from '../../core/websocket.js';
 
 let container = null;
+let wsListeners = new Map();
 
+// ============================================================
+// CRYPTO MODULE - LAZY LOAD WITH FALLBACK
+// ============================================================
+
+let cryptoModule = null;
+let cryptoLoadAttempted = false;
+
+async function getCryptoModule() {
+    if (cryptoModule) return cryptoModule;
+    if (cryptoLoadAttempted) return null;
+    
+    cryptoLoadAttempted = true;
+    try {
+        // Try to load the crypto module
+        const module = await import('../../core/crypto.js');
+        cryptoModule = module;
+        console.log('[Dice] Crypto module loaded successfully');
+        return cryptoModule;
+    } catch (e) {
+        console.debug('[Dice] Crypto module not available, using fallback RNG');
+        return null;
+    }
+}
+
+// ============================================================
+// SEED MANAGEMENT
+// ============================================================
+
+let _seed = null;
+let _prng = null;
+
+// Xorshift128+ PRNG for deterministic random generation
+class Xorshift128 {
+    constructor(seed) {
+        this.seed = seed;
+        this.state = this._seedToState(seed);
+    }
+    
+    _seedToState(seed) {
+        let s0 = 0;
+        let s1 = 0;
+        
+        if (typeof seed === 'number') {
+            s0 = seed;
+            s1 = seed + 0x9e3779b97f4a7c15;
+        } else if (typeof seed === 'string') {
+            let hash = 0;
+            for (let i = 0; i < seed.length; i++) {
+                hash = ((hash << 5) - hash) + seed.charCodeAt(i);
+                hash = hash & hash;
+            }
+            s0 = hash;
+            s1 = hash + 0x9e3779b97f4a7c15;
+        } else {
+            s0 = Date.now();
+            s1 = Date.now() + 0x9e3779b97f4a7c15;
+        }
+        
+        return { s0: BigInt(s0), s1: BigInt(s1) };
+    }
+    
+    random() {
+        let s0 = this.state.s0;
+        let s1 = this.state.s1;
+        
+        let x = s1;
+        let y = s0;
+        
+        x = x ^ (x << BigInt(23));
+        x = x ^ (x >> BigInt(17));
+        x = x ^ (y ^ (y >> BigInt(26)));
+        
+        this.state.s0 = y;
+        this.state.s1 = x;
+        
+        const result = Number((x + y) & BigInt(0xFFFFFFFFFFFFFFFF)) / 18446744073709551616;
+        return result;
+    }
+    
+    randomInt(min, max) {
+        return Math.floor(this.random() * (max - min)) + min;
+    }
+    
+    randomIntInclusive(min, max) {
+        return Math.floor(this.random() * (max - min + 1)) + min;
+    }
+}
+
+async function loadSeedFromCrypto() {
+    const crypto = await getCryptoModule();
+    if (crypto && crypto.getSeed) {
+        return crypto.getSeed();
+    }
+    return null;
+}
+
+async function saveSeedToCrypto(seed) {
+    const crypto = await getCryptoModule();
+    if (crypto && crypto.setSeed) {
+        return crypto.setSeed(seed);
+    }
+    return false;
+}
+
+async function generateSeedFromCrypto() {
+    const crypto = await getCryptoModule();
+    if (crypto && crypto.generateSeed) {
+        return crypto.generateSeed();
+    }
+    // Fallback: generate a random seed
+    try {
+        if (window && window.crypto && window.crypto.getRandomValues) {
+            const array = new Uint32Array(4);
+            window.crypto.getRandomValues(array);
+            return array.reduce((acc, val) => acc + val.toString(16).padStart(8, '0'), '');
+        }
+    } catch (e) { /* ignore */ }
+    return Date.now().toString(36) + Math.random().toString(36).substring(2, 8);
+}
+
+function getSeed() {
+    return _seed;
+}
+
+function setSeed(seed) {
+    _seed = seed;
+    if (seed) {
+        _prng = new Xorshift128(seed);
+        // Save to localStorage for persistence
+        try {
+            localStorage.setItem('fates-edge-seed', seed);
+        } catch (e) { /* ignore */ }
+        // Also save via crypto if available (async - fire and forget)
+        saveSeedToCrypto(seed).catch(() => {});
+    } else {
+        _prng = null;
+        try {
+            localStorage.removeItem('fates-edge-seed');
+        } catch (e) { /* ignore */ }
+        saveSeedToCrypto(null).catch(() => {});
+    }
+    return true;
+}
+
+async function generateSeed() {
+    const newSeed = await generateSeedFromCrypto();
+    setSeed(newSeed);
+    return newSeed;
+}
+
+// Initialize seed from localStorage on module load
+try {
+    const stored = localStorage.getItem('fates-edge-seed');
+    if (stored) {
+        _seed = stored;
+        _prng = new Xorshift128(stored);
+        console.log('[Dice] Seed loaded from localStorage:', stored.substring(0, 8) + '...');
+    }
+} catch (e) { /* ignore */ }
+
+// Also try to load from window seed (set by build script for static sites)
+if (!_seed && typeof window !== 'undefined' && window.__RANDOM_SEED) {
+    _seed = window.__RANDOM_SEED;
+    _prng = new Xorshift128(_seed);
+    try {
+        localStorage.setItem('fates-edge-seed', _seed);
+        console.log('[Dice] Seed loaded from window.__RANDOM_SEED:', _seed.substring(0, 8) + '...');
+    } catch (e) { /* ignore */ }
+}
+
+// Try to load from crypto module asynchronously (don't block)
+if (!_seed) {
+    loadSeedFromCrypto().then(seed => {
+        if (seed) {
+            _seed = seed;
+            _prng = new Xorshift128(seed);
+            console.log('[Dice] Seed loaded from crypto module:', seed.substring(0, 8) + '...');
+            try {
+                localStorage.setItem('fates-edge-seed', seed);
+            } catch (e) { /* ignore */ }
+        }
+    }).catch(() => {});
+}
+
+// ============================================================
+// DETERMINISTIC RNG FUNCTIONS
+// ============================================================
+
+function getRandom() {
+    if (_prng) {
+        return _prng.random();
+    }
+    // Fallback to crypto or Math.random
+    try {
+        if (typeof window !== 'undefined' && window.crypto && window.crypto.getRandomValues) {
+            const array = new Uint32Array(1);
+            window.crypto.getRandomValues(array);
+            return array[0] / 4294967296;
+        }
+    } catch (e) { /* ignore */ }
+    return Math.random();
+}
+
+function getRandomInt(min, max) {
+    if (_prng) {
+        return _prng.randomInt(min, max);
+    }
+    return Math.floor(getRandom() * (max - min)) + min;
+}
+
+function getRandomIntInclusive(min, max) {
+    if (_prng) {
+        return _prng.randomIntInclusive(min, max);
+    }
+    return Math.floor(getRandom() * (max - min + 1)) + min;
+}
+
+// ============================================================
+// TOAST NOTIFICATION
+// ============================================================
+
+function showToast(message, type = 'info') {
+    if (window.showToast) {
+        window.showToast(message, type);
+        return;
+    }
+    
+    const colors = {
+        info: 'var(--text)',
+        success: 'var(--green)',
+        error: 'var(--red)',
+        warning: 'var(--orange)'
+    };
+    
+    const toast = document.createElement('div');
+    toast.style.cssText = `
+        position: fixed;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: var(--bg2);
+        color: ${colors[type] || colors.info};
+        padding: 0.8rem 1.5rem;
+        border-radius: var(--radius);
+        border: 1px solid var(--border);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        z-index: 9999;
+        font-size: 0.9rem;
+        max-width: 90%;
+        animation: slideUp 0.3s ease;
+    `;
+    toast.textContent = message;
+    document.body.appendChild(toast);
+    
+    setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transition = 'opacity 0.3s ease';
+        setTimeout(() => {
+            if (toast.parentNode) toast.parentNode.removeChild(toast);
+        }, 300);
+    }, 3000);
+}
 
 // ============================================================
 // RENDER
@@ -28,17 +290,18 @@ export function render(el) {
     container = el;
     const seed = getSeed();
     const isDeterministic = !!seed;
+    const isConnected = isConnectedToServer();
     
     container.innerHTML = `
         <h1 class="page-title">🎲 Dice Roller</h1>
         <p class="page-sub">Roll dice with the Fate's Edge resolution system.</p>
         
-        <!-- Seed Status -->
-        <div class="panel" style="padding:0.3rem 0.8rem;margin-bottom:0.5rem;background:var(--bg3);border-left:3px solid ${isDeterministic ? 'var(--gold)' : 'var(--text3)'};">
+        <!-- Connection & Seed Status -->
+        <div class="panel" style="padding:0.3rem 0.8rem;margin-bottom:0.5rem;background:var(--bg3);border-left:3px solid ${isConnected ? 'var(--green)' : 'var(--text3)'};">
             <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.3rem;">
                 <span style="font-size:0.8rem;color:var(--text2);">
-                    ${isDeterministic ? '🎲 Deterministic RNG (seeded)' : '🔀 Cryptographic RNG (random)'}
-                    ${isDeterministic ? `<span style="font-size:0.6rem;color:var(--text3);font-family:monospace;">seed: ${seed.substring(0, 8)}...</span>` : ''}
+                    ${isConnected ? '🟢 Connected to server' : '📡 Local mode'}
+                    ${isDeterministic ? ` 🎲 Deterministic (seed: ${seed.substring(0, 8)}...)` : ' 🔀 Cryptographic RNG'}
                 </span>
                 <div style="display:flex;gap:0.3rem;flex-wrap:wrap;">
                     <button class="btn btn-xs btn-ghost" id="seed-regenerate" title="Regenerate seed">🔄 New Seed</button>
@@ -134,8 +397,62 @@ export function render(el) {
     attachEvents();
     renderHistory();
     updateStats();
+    setupWebSocketSync();
     
     return container;
+}
+
+// ============================================================
+// WEBSOCKET SYNC
+// ============================================================
+
+function setupWebSocketSync() {
+    cleanupWebSocketListeners();
+    
+    if (!isConnectedToServer()) {
+        console.log('[Dice] Not connected to server, local mode only');
+        return;
+    }
+    
+    // Listen for roll results from other clients
+    const rollHandler = (data) => {
+        if (!data) return;
+        console.log('[Dice] Received roll from server:', data);
+        
+        // Add to history with remote flag
+        const rollData = {
+            ...data,
+            id: data.id || `remote_${Date.now()}`,
+            timestamp: data.timestamp || new Date().toISOString(),
+            remote: true,
+            sender: data.sender || 'Remote'
+        };
+        
+        addRoll(rollData);
+        renderHistory();
+        updateStats();
+        
+        showToast(`🎲 ${data.sender || 'Remote'} rolled: ${data.outcome || 'Dice'}`, 'info');
+    };
+    
+    try {
+        onEvent('roll-result', rollHandler);
+        wsListeners.set('roll-result', rollHandler);
+        console.log('[Dice] WebSocket sync enabled');
+    } catch (e) {
+        console.warn('[Dice] Could not setup WebSocket sync:', e);
+    }
+}
+
+function cleanupWebSocketListeners() {
+    for (const [event, handler] of wsListeners) {
+        try {
+            offEvent(event, handler);
+        } catch (e) {
+            console.debug('[Dice] Error removing listener:', e);
+        }
+    }
+    wsListeners.clear();
 }
 
 // ============================================================
@@ -180,16 +497,10 @@ function attachEvents() {
     // Seed controls
     const seedRegenerate = document.getElementById('seed-regenerate');
     if (seedRegenerate) {
-        seedRegenerate.addEventListener('click', function() {
-            const newSeed = generateSeed();
-            setSeed(newSeed);
-            // Save to localStorage for persistence
-            try {
-                localStorage.setItem('fates-edge-seed', newSeed);
-            } catch (e) { /* ignore */ }
-            // Re-render to update UI
+        seedRegenerate.addEventListener('click', async function() {
+            const newSeed = await generateSeed();
             render(container);
-            showToast('🎲 New seed generated: ' + newSeed.substring(0, 8) + '...');
+            showToast('🎲 New seed generated: ' + newSeed.substring(0, 8) + '...', 'success');
         });
     }
     
@@ -198,11 +509,8 @@ function attachEvents() {
         seedClear.addEventListener('click', function() {
             if (confirm('Clear the deterministic seed? This will use cryptographic RNG instead.')) {
                 setSeed(null);
-                try {
-                    localStorage.removeItem('fates-edge-seed');
-                } catch (e) { /* ignore */ }
                 render(container);
-                showToast('🧹 Seed cleared. Using cryptographic RNG.');
+                showToast('🧹 Seed cleared. Using cryptographic RNG.', 'info');
             }
         });
     }
@@ -239,7 +547,6 @@ function applyPreset(preset) {
     document.getElementById('roll-position').value = p.position;
     document.getElementById('roll-boons').value = p.boons;
     
-    // Auto-roll after a brief delay
     setTimeout(() => {
         const rollBtn = document.getElementById('roll-btn');
         if (rollBtn) rollBtn.click();
@@ -252,7 +559,6 @@ function applyPreset(preset) {
 
 function handleRoll() {
     try {
-        // Get form values
         const attrEl = document.getElementById('roll-attr');
         const skillEl = document.getElementById('roll-skill');
         const dvEl = document.getElementById('roll-dv');
@@ -277,7 +583,6 @@ function handleRoll() {
         
         console.log('Rolling with:', { attr, skill, dv, position, boons });
         
-        // Use the core performRoll function
         const result = performRoll(attr, skill, dv, position, boons);
         
         if (!result || typeof result !== 'object') {
@@ -286,7 +591,6 @@ function handleRoll() {
             return;
         }
         
-        // Build roll data for history with seed info
         const rollData = {
             id: Date.now().toString(),
             timestamp: new Date().toISOString(),
@@ -307,17 +611,23 @@ function handleRoll() {
             reRolledDice: result.reRolledDice,
             rerollSuccesses: result.rerollSuccesses,
             rerollStoryBeats: result.rerollStoryBeats,
-            deterministic: result.deterministic || false,
-            seed: result.seed || null
+            deterministic: !!getSeed(),
+            seed: getSeed(),
+            sender: 'You'
         };
         
-        // Add to state
         addRoll(rollData);
-        
-        // Display result
         displayResult(result);
         renderHistory();
         updateStats();
+        
+        if (isConnectedToServer()) {
+            try {
+                sendWSMessage('roll-result', rollData);
+            } catch (e) {
+                console.warn('[Dice] Could not broadcast roll:', e);
+            }
+        }
     } catch (error) {
         console.error('Error during roll:', error);
         showError(error.message || 'An unexpected error occurred during the roll.');
@@ -354,7 +664,6 @@ function displayResult(result) {
     
     const color = outcomeColors[result.outcomeClass] || 'var(--text)';
     
-    // Determine boon text
     let boonText = '';
     if (result.outcomeClass === 'partial') {
         boonText = ' (+1 Boon)';
@@ -362,24 +671,21 @@ function displayResult(result) {
         boonText = ' (+2 Boons)';
     }
     
-    // Format dice display
     const diceDisplay = result.dice && Array.isArray(result.dice) 
         ? result.dice.join(', ') 
         : '';
     
-    // Format reroll display
     let rerollDisplay = '';
     if (result.reRolls > 0 && result.reRolledDice && Array.isArray(result.reRolledDice)) {
         rerollDisplay = `(rerolled: ${result.reRolledDice.map(r => `${r.old}→${r.new}`).join(', ')})`;
     }
     
-    // Show seed info for deterministic rolls
     let seedInfo = '';
-    if (result.deterministic && result.seed) {
-        seedInfo = `<div style="font-size:0.6rem;color:var(--text3);margin-top:0.2rem;">🎲 seeded: ${result.seed.substring(0, 8)}...</div>`;
+    const seed = getSeed();
+    if (seed) {
+        seedInfo = `<div style="font-size:0.6rem;color:var(--text3);margin-top:0.2rem;">🎲 seeded: ${seed.substring(0, 8)}...</div>`;
     }
     
-    // Animate the result
     resultEl.style.transition = 'transform 0.3s ease, opacity 0.3s ease';
     resultEl.style.transform = 'scale(0.95)';
     resultEl.style.opacity = '0.7';
@@ -404,7 +710,6 @@ function displayResult(result) {
         </div>
     `;
     
-    // Animate back
     setTimeout(() => {
         resultEl.style.transform = 'scale(1)';
         resultEl.style.opacity = '1';
@@ -432,7 +737,6 @@ function renderHistory() {
             try {
                 const time = roll.timestamp ? new Date(roll.timestamp).toLocaleTimeString() : '--:--:--';
                 
-                // Determine outcome color
                 let outcomeColor = 'var(--text2)';
                 if (roll.outcomeClass === 'clean-success' || roll.outcomeClass === 'success-with-sb') {
                     outcomeColor = 'var(--green)';
@@ -442,32 +746,28 @@ function renderHistory() {
                     outcomeColor = 'var(--red)';
                 }
                 
-                // Format dice
                 const diceDisplay = roll.dice && Array.isArray(roll.dice) 
                     ? roll.dice.join(',') 
                     : '';
                 
-                // Format re-rolls
                 let rerollDisplay = '';
                 if (roll.reRolls > 0 && roll.reRolledDice && Array.isArray(roll.reRolledDice)) {
                     rerollDisplay = ` ↻${roll.reRolledDice.map(r => `${r.old}→${r.new}`).join(', ')}`;
                 }
                 
-                // Position icon
                 const posIcons = {
                     dominant: '👑',
                     controlled: '⚖️',
                     desperate: '🔥'
                 };
                 const posIcon = posIcons[roll.position] || '';
-                
-                // Deterministic indicator
                 const detIndicator = roll.deterministic ? '🎲' : '🔀';
+                const sender = roll.remote ? `🌐 ${roll.sender || 'Remote'}` : detIndicator;
                 
                 return `
                     <div class="history-item" style="display:flex;justify-content:space-between;align-items:center;padding:0.3rem 0;border-bottom:1px solid var(--border);font-size:0.85rem;gap:0.5rem;">
                         <div style="display:flex;flex-wrap:wrap;gap:0.3rem;align-items:center;">
-                            <span style="font-size:0.7rem;color:var(--text3);">${detIndicator}</span>
+                            <span style="font-size:0.7rem;color:var(--text3);">${sender}</span>
                             <span style="font-weight:500;">${roll.attr || 0}+${roll.skill || 0}</span>
                             <span class="text-muted" style="font-size:0.75rem;">vs DV${roll.dv || 0}</span>
                             <span style="font-size:0.75rem;">${posIcon}</span>
@@ -488,8 +788,6 @@ function renderHistory() {
         }).filter(html => html !== '').join('');
         
         historyEl.innerHTML = html || '<span class="text-muted">No rolls yet.</span>';
-        
-        // Scroll to bottom
         historyEl.scrollTop = historyEl.scrollHeight;
     } catch (error) {
         console.error('Error rendering history:', error);
@@ -522,6 +820,7 @@ function updateStats() {
         const misses = history.filter(r => r.outcomeClass === 'miss').length;
         const storyBeats = history.reduce((sum, r) => sum + (r.storyBeats || 0), 0);
         const deterministic = history.filter(r => r.deterministic).length;
+        const remote = history.filter(r => r.remote).length;
         
         statsEl.innerHTML = `
             <span>📊 ${total} rolls</span>
@@ -530,52 +829,12 @@ function updateStats() {
             <span style="color:var(--red);">❌ ${misses}</span>
             <span style="color:var(--gold);">✨ ${storyBeats}</span>
             ${deterministic > 0 ? `<span style="color:var(--text3);font-size:0.7rem;">🎲 ${deterministic}</span>` : ''}
+            ${remote > 0 ? `<span style="color:var(--text3);font-size:0.7rem;">🌐 ${remote}</span>` : ''}
         `;
     } catch (error) {
         console.error('Error updating stats:', error);
         statsEl.textContent = '';
     }
-}
-
-// ============================================================
-// TOAST NOTIFICATION (simple fallback)
-// ============================================================
-
-function showToast(message) {
-    // Try to use the global toast system if available
-    if (window.showToast) {
-        window.showToast(message, 'info');
-        return;
-    }
-    
-    // Fallback: simple alert-style notification
-    const toast = document.createElement('div');
-    toast.style.cssText = `
-        position: fixed;
-        bottom: 20px;
-        left: 50%;
-        transform: translateX(-50%);
-        background: var(--bg2);
-        color: var(--text);
-        padding: 0.8rem 1.5rem;
-        border-radius: var(--radius);
-        border: 1px solid var(--border);
-        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-        z-index: 9999;
-        font-size: 0.9rem;
-        max-width: 90%;
-        animation: slideUp 0.3s ease;
-    `;
-    toast.textContent = message;
-    document.body.appendChild(toast);
-    
-    setTimeout(() => {
-        toast.style.opacity = '0';
-        toast.style.transition = 'opacity 0.3s ease';
-        setTimeout(() => {
-            if (toast.parentNode) toast.parentNode.removeChild(toast);
-        }, 300);
-    }, 3000);
 }
 
 // ============================================================
@@ -609,7 +868,6 @@ function exportHistory() {
             return;
         }
         
-        // Format for export
         const data = JSON.stringify(history, null, 2);
         const blob = new Blob([data], { type: 'application/json' });
         const url = URL.createObjectURL(blob);
@@ -630,12 +888,16 @@ function exportHistory() {
 // INITIALIZATION
 // ============================================================
 
-export function init(el) {
-    // Try to load seed from localStorage on init
+export async function init(el) {
+    // Try to load seed from crypto module if available
     try {
-        const storedSeed = localStorage.getItem('fates-edge-seed');
-        if (storedSeed) {
-            setSeed(storedSeed);
+        const crypto = await getCryptoModule();
+        if (crypto && crypto.getSeed) {
+            const seed = crypto.getSeed();
+            if (seed) {
+                setSeed(seed);
+                console.log('[Dice] Seed loaded from crypto module on init');
+            }
         }
     } catch (e) { /* ignore */ }
     
@@ -643,6 +905,7 @@ export function init(el) {
 }
 
 export function destroy() {
+    cleanupWebSocketListeners();
     container = null;
 }
 
@@ -654,4 +917,11 @@ export default {
     render,
     init,
     destroy,
+    getSeed,
+    setSeed,
+    generateSeed,
+    getRandom,
+    getRandomInt,
+    getRandomIntInclusive,
+    Xorshift128
 };
