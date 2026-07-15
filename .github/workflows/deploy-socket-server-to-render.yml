@@ -49,18 +49,29 @@ jobs:
           run-id: ${{ github.event.workflow_run.id }}
         continue-on-error: true
 
+      - name: Check if artifact was downloaded
+        id: check-artifact
+        run: |
+          if [ -d "socket-server-deploy" ] && [ "$(ls -A socket-server-deploy)" ]; then
+            echo "downloaded=true" >> "$GITHUB_OUTPUT"
+            echo "✅ Artifact downloaded successfully"
+          else
+            echo "downloaded=false" >> "$GITHUB_OUTPUT"
+            echo "⚠️ No artifact found, will build from source"
+          fi
+
       - name: Checkout and build socket server (fallback)
-        if: github.event_name == 'workflow_dispatch'
+        if: github.event_name == 'workflow_dispatch' || steps.check-artifact.outputs.downloaded == 'false'
         uses: actions/checkout@v5
 
       - name: Setup Node
-        if: github.event_name == 'workflow_dispatch'
+        if: github.event_name == 'workflow_dispatch' || steps.check-artifact.outputs.downloaded == 'false'
         uses: actions/setup-node@v6
         with:
           node-version: 24
 
       - name: Build socket server (fallback)
-        if: github.event_name == 'workflow_dispatch'
+        if: github.event_name == 'workflow_dispatch' || steps.check-artifact.outputs.downloaded == 'false'
         working-directory: utilities/javascript/fates-edge-socket-server
         run: |
           npm ci
@@ -97,10 +108,11 @@ jobs:
           echo "Service ID: $RENDER_SERVICE_ID"
           
           # Trigger deployment via Render API
+          # Valid values for clearCache: "clear" or "do_not_clear"
           RESPONSE=$(curl -s -X POST \
             -H "Authorization: Bearer $RENDER_API_KEY" \
             -H "Content-Type: application/json" \
-            -d '{"clearCache": "true"}' \
+            -d '{"clearCache": "clear"}' \
             https://api.render.com/v1/services/$RENDER_SERVICE_ID/deploys)
           
           echo "📡 Response: $RESPONSE"
@@ -110,9 +122,24 @@ jobs:
             echo "✅ Deployment triggered successfully!"
             echo "Deploy ID: $DEPLOY_ID"
             echo "📊 Dashboard: https://dashboard.render.com/web/$RENDER_SERVICE_ID/deploys/$DEPLOY_ID"
+            
+            # Get deployment status
+            echo "⏳ Checking deployment status..."
+            sleep 5
+            
+            STATUS_RESPONSE=$(curl -s \
+              -H "Authorization: Bearer $RENDER_API_KEY" \
+              https://api.render.com/v1/services/$RENDER_SERVICE_ID/deploys/$DEPLOY_ID)
+            
+            DEPLOY_STATUS=$(echo "$STATUS_RESPONSE" | grep -o '"status":"[^"]*"' | head -1 | cut -d'"' -f4)
+            echo "📊 Deployment status: $DEPLOY_STATUS"
           else
             ERROR_MSG=$(echo "$RESPONSE" | grep -o '"message":"[^"]*"' | head -1 | cut -d'"' -f4)
-            [ -n "$ERROR_MSG" ] && echo "❌ Deployment failed: $ERROR_MSG" || echo "❌ Deployment failed. Response: $RESPONSE"
+            if [ -n "$ERROR_MSG" ]; then
+              echo "❌ Deployment failed: $ERROR_MSG"
+            else
+              echo "❌ Deployment failed. Response: $RESPONSE"
+            fi
             exit 1
           fi
 
