@@ -16,7 +16,11 @@ on:
       skip_web_deploy:
         type: boolean
         default: false
-        description: 'Skip web client deployment to Pages'
+        description: 'Skip web client build & deployment to Pages'
+      skip_socket_deploy:
+        type: boolean
+        default: false
+        description: 'Skip socket server build & deployment to Render'
       create_release:
         type: boolean
         default: false
@@ -78,24 +82,28 @@ jobs:
             package: true
 
     env:
-      SKIP_JOB: ${{ matrix.name == 'web-client' && github.event_name == 'workflow_dispatch' && github.event.inputs.skip_web_deploy == 'true' }}
+      SKIP_JOB: >
+        ${{
+          (matrix.name == 'web-client' && github.event_name == 'workflow_dispatch' && github.event.inputs.skip_web_deploy == 'true') ||
+          (matrix.name == 'socket-server' && github.event_name == 'workflow_dispatch' && github.event.inputs.skip_socket_deploy == 'true')
+        }}
 
     permissions:
       contents: write
 
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v4
         if: ${{ env.SKIP_JOB != 'true' }}
 
       - name: Setup Node.js
         if: ${{ env.SKIP_JOB != 'true' && matrix.needs_node == 'true' }}
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
 
       - name: Cache node modules
         if: ${{ env.SKIP_JOB != 'true' && matrix.needs_node == 'true' }}
-        uses: actions/cache@v5
+        uses: actions/cache@v4
         with:
           path: ${{ matrix.path }}/node_modules
           key: ${{ runner.os }}-node-${{ matrix.name }}-${{ hashFiles(format('{0}/package-lock.json', matrix.path)) }}
@@ -143,7 +151,7 @@ jobs:
 
       - name: Upload build artifact
         if: ${{ env.SKIP_JOB != 'true' && matrix.build }}
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.name }}-dist
           path: ${{ matrix.path }}/dist
@@ -151,7 +159,7 @@ jobs:
 
       - name: Upload packaged artifact
         if: ${{ env.SKIP_JOB != 'true' && matrix.package }}
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.name }}-package
           path: artifacts/${{ matrix.name }}.tar.gz
@@ -168,7 +176,7 @@ jobs:
 
       - name: Upload build metadata
         if: ${{ env.SKIP_JOB != 'true' && matrix.name == 'socket-server' }}
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v4
         with:
           name: build-metadata-socket-server
           path: build-metadata/
@@ -312,8 +320,8 @@ jobs:
         uses: actions/upload-pages-artifact@v3
         with:
           path: pages-site
-    
-      # ============================================================
+
+  # ============================================================
   # DEPLOY JOB (Calls the reusable Deploy workflow)
   # ============================================================
   deploy:
@@ -329,6 +337,7 @@ jobs:
       contents: read
       pages: write
       id-token: write
+
   # ============================================================
   # DEPLOY RENDER JOB (Calls the reusable Render workflow)
   # ============================================================
@@ -338,7 +347,7 @@ jobs:
     if: >
       success() && (
         github.event_name == 'push' || 
-        github.event_name == 'workflow_dispatch'
+        (github.event_name == 'workflow_dispatch' && github.event.inputs.skip_socket_deploy != 'true')
       )
     uses: ./.github/workflows/deploy-socket-server-to-render.yml
     with:
