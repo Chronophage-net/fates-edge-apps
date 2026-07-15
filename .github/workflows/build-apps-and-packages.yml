@@ -312,3 +312,20 @@ jobs:
         uses: actions/upload-pages-artifact@v3
         with:
           path: pages-site
+    
+      # ============================================================
+  # DEPLOY JOB (Calls the reusable Deploy workflow)
+  # ============================================================
+  deploy:
+    name: Trigger Pages Deployment
+    needs: build
+    if: >
+      success() && (
+        github.event_name == 'push' || 
+        (github.event_name == 'workflow_dispatch' && github.event.inputs.skip_web_deploy != 'true')
+      )
+    uses: ./.github/workflows/deploy-web-client.yml
+    permissions:
+      contents: read
+      pages: write
+      id-token: write

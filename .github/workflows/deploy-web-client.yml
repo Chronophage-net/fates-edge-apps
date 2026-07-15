@@ -1,15 +1,12 @@
 name: Deploy Web Client to GitHub Pages
 
 on:
-  workflow_run:
-    workflows: ["Build Apps and Packages"]
-    types:
-      - completed
-    branches: [main]
-  workflow_dispatch:
+  workflow_call:
 
 permissions:
   contents: read
+  pages: write
+  id-token: write
 
 concurrency:
   group: "pages-${{ github.ref }}"
@@ -20,15 +17,7 @@ jobs:
     name: Deploy to GitHub Pages
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    if: >
-      (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success') ||
-      github.event_name == 'workflow_dispatch'
     
-    permissions:
-      pages: write
-      id-token: write
-      actions: read
-
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
@@ -37,8 +26,3 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
-        with:
-          # For workflow_run: use the build workflow's run ID
-          github_run_id: ${{ github.event.workflow_run.id }}
-          # For workflow_dispatch: this is empty, looks in current run
-          token: ${{ secrets.GITHUB_TOKEN }}
