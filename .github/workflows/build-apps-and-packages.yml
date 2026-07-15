@@ -344,11 +344,7 @@ jobs:
   deploy-render:
     name: Trigger Render Deployment
     needs: build
-    if: >
-      success() && (
-        github.event_name == 'push' || 
-        (github.event_name == 'workflow_dispatch' && github.event.inputs.skip_socket_deploy != 'true')
-      )
+    if: success()
     uses: ./.github/workflows/deploy-socket-server-to-render.yml
     with:
       environment: production
