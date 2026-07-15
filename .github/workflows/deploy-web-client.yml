@@ -46,18 +46,29 @@ jobs:
         if: github.event_name == 'workflow_run'
         uses: actions/download-artifact@v6
         with:
-          name: github-pages
+          name: github-pages  # This is the name upload-pages-artifact uses
           path: pages-site
           github-token: ${{ secrets.GITHUB_TOKEN }}
           run-id: ${{ github.event.workflow_run.id }}
         continue-on-error: true
 
-      - name: Checkout web client source
-        if: github.event_name == 'workflow_dispatch' || steps.download.outputs.downloaded != 'true'
+      - name: Check if artifact was downloaded
+        id: check-artifact
+        run: |
+          if [ -d "pages-site" ] && [ "$(ls -A pages-site)" ]; then
+            echo "downloaded=true" >> "$GITHUB_OUTPUT"
+            echo "✅ Artifact downloaded successfully"
+          else
+            echo "downloaded=false" >> "$GITHUB_OUTPUT"
+            echo "⚠️ No artifact found, will build from source"
+          fi
+
+      - name: Checkout web client source (fallback)
+        if: github.event_name == 'workflow_dispatch' || steps.check-artifact.outputs.downloaded == 'false'
         uses: actions/checkout@v5
 
       - name: Prepare static site for Pages (fallback)
-        if: github.event_name == 'workflow_dispatch' || steps.download.outputs.downloaded != 'true'
+        if: github.event_name == 'workflow_dispatch' || steps.check-artifact.outputs.downloaded == 'false'
         run: |
           echo "📦 Preparing static site for GitHub Pages..."
           mkdir -p pages-site
