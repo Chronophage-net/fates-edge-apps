@@ -45,44 +45,51 @@ jobs:
       url: https://fates-edge-socket-server.onrender.com
 
     steps:
+      # ============================================================
+      # 1. DOWNLOAD ARTIFACT (if called from build workflow)
+      # ============================================================
       - name: Download socket server package
         if: github.event_name == 'workflow_call'
         uses: actions/download-artifact@v4
         with:
           name: socket-server-package
-          path: socket-server-deploy
+          path: socket-server-package-download
 
-      - name: Check if artifact was downloaded
-        id: check-artifact
+      - name: Extract downloaded artifact
+        if: github.event_name == 'workflow_call'
         run: |
-          if [ -d "socket-server-deploy" ] && [ "$(ls -A socket-server-deploy)" ]; then
+          mkdir -p socket-server-deploy
+          if [ -f "socket-server-package-download/socket-server.tar.gz" ]; then
+            tar -xzf "socket-server-package-download/socket-server.tar.gz" -C socket-server-deploy
+            echo "✅ Extracted socket server package"
+            rm -rf socket-server-package-download
             echo "downloaded=true" >> "$GITHUB_OUTPUT"
-            echo "✅ Artifact downloaded successfully"
           else
+            echo "⚠️ No tar.gz found in downloaded artifact"
             echo "downloaded=false" >> "$GITHUB_OUTPUT"
-            echo "⚠️ No artifact found, will build from source"
           fi
+        id: extract
 
-      - name: Checkout and build socket server (fallback)
-        if: github.event_name == 'workflow_dispatch' || steps.check-artifact.outputs.downloaded == 'false'
+      # ============================================================
+      # 2. FALLBACK: BUILD FROM SOURCE (if no artifact or manual run)
+      # ============================================================
+      - name: Checkout source (fallback)
+        if: github.event_name == 'workflow_dispatch' || steps.extract.outputs.downloaded == 'false'
         uses: actions/checkout@v4
 
-      - name: Setup Node
-        if: github.event_name == 'workflow_dispatch' || steps.check-artifact.outputs.downloaded == 'false'
+      - name: Setup Node (fallback)
+        if: github.event_name == 'workflow_dispatch' || steps.extract.outputs.downloaded == 'false'
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
 
-      # ============================================================
-      # FIXED: Build socket server (fallback)
-      # ============================================================
-      - name: Build socket server (fallback)
-        if: github.event_name == 'workflow_dispatch' || steps.check-artifact.outputs.downloaded == 'false'
+      - name: Build socket server from source (fallback)
+        if: github.event_name == 'workflow_dispatch' || steps.extract.outputs.downloaded == 'false'
         working-directory: utilities/javascript/fates-edge-socket-server
         run: |
           npm ci
           
-          # Create a temporary directory outside the source
+          # Create temporary directory outside the source
           mkdir -p ../deploy-temp
           
           # Copy all contents except node_modules and .git
@@ -98,6 +105,9 @@ jobs:
           rm -rf ../socket-server-deploy
           mv ../deploy-temp ../socket-server-deploy
 
+      # ============================================================
+      # 3. PREPARE DEPLOYMENT PACKAGE
+      # ============================================================
       - name: Prepare deployment artifact
         run: |
           if [ ! -d "socket-server-deploy" ]; then
@@ -111,6 +121,9 @@ jobs:
           cd ..
           echo "✅ Socket server packaged for deployment"
 
+      # ============================================================
+      # 4. DEPLOY TO RENDER
+      # ============================================================
       - name: Deploy to Render
         env:
           RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
@@ -141,6 +154,9 @@ jobs:
             exit 1
           fi
 
+      # ============================================================
+      # 5. VERIFY DEPLOYMENT
+      # ============================================================
       - name: Verify deployment
         run: |
           echo "⏳ Waiting for service to be ready..."
