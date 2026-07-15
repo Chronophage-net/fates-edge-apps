@@ -52,7 +52,7 @@ const PATRON_ICONS = {
 // Default cosmic patrons (fallback if remote load fails)
 const DEFAULT_COSMIC_PATRONS = [
     {
-        id: 'traveler',
+        id: 'the_traveler',
         name: 'The Traveler',
         icon: '🚶',
         domain: 'Ways & Journeys',

@@ -1,0 +1,13 @@
+{
+  "name": "Grimmir (The Wild Speaker)",
+  "slug": "grimmir_the_wild_speaker",
+  "domain": "Seasons & Sacrifice",
+  "description": "<h1 class=\"patron-title\">Grimmir (The Wild Speaker)</h1><p class=\"region-text\">A patron of Seasons & Sacrifice. Details not yet extracted from source.</p>",
+  "summary": "A patron of Seasons & Sacrifice.",
+  "tags": [
+    "patron",
+    "grimmir_the_wild_speaker"
+  ],
+  "source": "base",
+  "file": "base_patron"
+}

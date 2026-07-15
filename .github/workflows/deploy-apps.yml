@@ -9,6 +9,7 @@ on:
       - 'utilities/javascript/fates-edge-desktop-client/**'
       - 'utilities/vtt_mods_bots/**'
       - 'misc/**'
+      - 'data/**'
       - '.github/workflows/deploy-apps.yml'
 
   workflow_dispatch:
@@ -129,13 +130,17 @@ jobs:
         working-directory: ${{ matrix.path }}
         run: |
           echo "🎲 Generating deterministic seed for static site..."
-          node js/tools/generate-seed.js --force --output=.seed/random-seed.json
-          echo "✅ Seed generated"
-          
-          # Also copy seed to data directory for fallback
-          mkdir -p data
-          cp .seed/random-seed.json data/seed.json 2>/dev/null || true
-          cp .seed/seed.js js/seed.js 2>/dev/null || true
+          if [ -f js/tools/generate-seed.js ]; then
+            node js/tools/generate-seed.js --force --output=.seed/random-seed.json
+            echo "✅ Seed generated"
+            
+            # Also copy seed to data directory for fallback
+            mkdir -p data
+            cp .seed/random-seed.json data/seed.json 2>/dev/null || true
+            cp .seed/seed.js js/seed.js 2>/dev/null || true
+          else
+            echo "⚠️ generate-seed.js not found, skipping seed generation"
+          fi
 
       - name: Build project
         if: ${{ env.SKIP_JOB != 'true' && matrix.build }}
@@ -230,186 +235,257 @@ jobs:
             echo "✅ Copied LICENSE.md to pages-site/"
           fi
           
-          # Determine the project root (where the workflow is triggered from)
+          # Determine the project root
           PROJECT_ROOT="."
           
           # ============================================================
-          # WIKI.JSON — goes at site root
+          # WIKI.JSON — from data/
           # ============================================================
-          if [ -f "${PROJECT_ROOT}/misc/wiki.json" ]; then
+          echo "📄 Processing wiki.json..."
+          WIKI_COPIED=false
+          
+          # Primary source: data/wiki.json
+          if [ -f "${PROJECT_ROOT}/data/wiki.json" ]; then
+            cp "${PROJECT_ROOT}/data/wiki.json" pages-site/wiki.json
+            cp "${PROJECT_ROOT}/data/wiki.json" pages-site/data/wiki.json
+            echo "✅ Copied data/wiki.json → pages-site/wiki.json and pages-site/data/wiki.json"
+            WIKI_COPIED=true
+          fi
+          
+          # Fallback: misc/wiki.json
+          if [ "$WIKI_COPIED" = false ] && [ -f "${PROJECT_ROOT}/misc/wiki.json" ]; then
             cp "${PROJECT_ROOT}/misc/wiki.json" pages-site/wiki.json
+            cp "${PROJECT_ROOT}/misc/wiki.json" pages-site/data/wiki.json
             echo "✅ Copied misc/wiki.json → pages-site/wiki.json"
-          elif [ -f "${PROJECT_ROOT}/utilities/javascript/fates-edge-web-client/wiki.json" ]; then
+            WIKI_COPIED=true
+          fi
+          
+          # Fallback: web-client/data/wiki.json
+          if [ "$WIKI_COPIED" = false ] && [ -f "${PROJECT_ROOT}/utilities/javascript/fates-edge-web-client/data/wiki.json" ]; then
+            cp "${PROJECT_ROOT}/utilities/javascript/fates-edge-web-client/data/wiki.json" pages-site/wiki.json
+            cp "${PROJECT_ROOT}/utilities/javascript/fates-edge-web-client/data/wiki.json" pages-site/data/wiki.json
+            echo "✅ Copied web-client/data/wiki.json → pages-site/wiki.json"
+            WIKI_COPIED=true
+          fi
+          
+          # Fallback: web-client/wiki.json
+          if [ "$WIKI_COPIED" = false ] && [ -f "${PROJECT_ROOT}/utilities/javascript/fates-edge-web-client/wiki.json" ]; then
             cp "${PROJECT_ROOT}/utilities/javascript/fates-edge-web-client/wiki.json" pages-site/wiki.json
+            cp "${PROJECT_ROOT}/utilities/javascript/fates-edge-web-client/wiki.json" pages-site/data/wiki.json
             echo "✅ Copied web-client/wiki.json → pages-site/wiki.json"
-          else
-            echo "⚠️ No wiki.json found"
+            WIKI_COPIED=true
+          fi
+          
+          # If still not found, create a minimal wiki
+          if [ "$WIKI_COPIED" = false ]; then
             echo '{"title": "Fate'\''s Edge Wiki", "pages": []}' > pages-site/wiki.json
+            echo '{"title": "Fate'\''s Edge Wiki", "pages": []}' > pages-site/data/wiki.json
+            echo "⚠️ No wiki.json found, created minimal version"
           fi
           
           # ============================================================
-          # REGION FILES — go in /regions/
-          # Used by: Decks module
+          # REGION FILES — from data/regions/
           # ============================================================
+          echo "🗺️ Processing region files..."
           mkdir -p pages-site/regions
+          mkdir -p pages-site/data/regions
           
-          # Copy from socket-server/data/regions/ (primary source for server data)
-          if [ -d "${PROJECT_ROOT}/utilities/javascript/fates-edge-socket-server/data/regions" ]; then
-            echo "📁 Copying from socket-server/data/regions/ directory..."
-            cp "${PROJECT_ROOT}/utilities/javascript/fates-edge-socket-server/data/regions"/*.json pages-site/regions/ 2>/dev/null || true
-            echo "✅ Copied socket-server/data/regions/ → pages-site/regions/"
-          fi
+          REGION_COPIED=false
           
-          # Copy from misc/regions/ (fallback)
-          if [ -d "${PROJECT_ROOT}/misc/regions" ]; then
-            echo "📁 Copying from misc/regions/ directory..."
-            cp "${PROJECT_ROOT}/misc/regions"/*.json pages-site/regions/ 2>/dev/null || true
-            echo "✅ Copied misc/regions/ → pages-site/regions/"
-          fi
-          
-          # Also check web-client/regions/
-          if [ -d "${PROJECT_ROOT}/utilities/javascript/fates-edge-web-client/regions" ]; then
-            echo "📁 Copying from web-client/regions/ directory..."
-            cp "${PROJECT_ROOT}/utilities/javascript/fates-edge-web-client/regions"/*.json pages-site/regions/ 2>/dev/null || true
-            echo "✅ Copied web-client/regions/ → pages-site/regions/"
-          fi
-          
-          # Check data/regions/ as fallback
+          # Primary source: data/regions/
           if [ -d "${PROJECT_ROOT}/data/regions" ]; then
             echo "📁 Copying from data/regions/ directory..."
             cp "${PROJECT_ROOT}/data/regions"/*.json pages-site/regions/ 2>/dev/null || true
-            echo "✅ Copied data/regions/ → pages-site/regions/"
+            cp "${PROJECT_ROOT}/data/regions"/*.json pages-site/data/regions/ 2>/dev/null || true
+            echo "✅ Copied data/regions/ → pages-site/regions/ and pages-site/data/regions/"
+            REGION_COPIED=true
           fi
           
-          # Ensure manifest exists
-          if [ ! -f pages-site/regions/manifest.json ]; then
-            echo "📝 Generating region manifest.json..."
-            REGION_MANIFEST="["
-            first=true
-            for file in pages-site/regions/*.json; do
-              if [ -f "$file" ] && [ "$(basename "$file")" != "manifest.json" ]; then
-                name=$(basename "$file" .json)
-                if [ "$first" = true ]; then
-                  REGION_MANIFEST="${REGION_MANIFEST}\"${name}\""
-                  first=false
-                else
-                  REGION_MANIFEST="${REGION_MANIFEST}, \"${name}\""
-                fi
-              fi
-            done
-            REGION_MANIFEST="${REGION_MANIFEST}]"
-            
-            if [ "$REGION_MANIFEST" = "[]" ]; then
-              if [ -f pages-site/regions/acasia.json ]; then
-                REGION_MANIFEST='["acasia"]'
+          # Fallback: misc/regions/
+          if [ "$REGION_COPIED" = false ] && [ -d "${PROJECT_ROOT}/misc/regions" ]; then
+            echo "📁 Copying from misc/regions/ directory..."
+            cp "${PROJECT_ROOT}/misc/regions"/*.json pages-site/regions/ 2>/dev/null || true
+            cp "${PROJECT_ROOT}/misc/regions"/*.json pages-site/data/regions/ 2>/dev/null || true
+            echo "✅ Copied misc/regions/ → pages-site/regions/"
+            REGION_COPIED=true
+          fi
+          
+          # Fallback: socket-server/data/regions/
+          if [ -d "${PROJECT_ROOT}/utilities/javascript/fates-edge-socket-server/data/regions" ]; then
+            echo "📁 Copying from socket-server/data/regions/ directory..."
+            cp "${PROJECT_ROOT}/utilities/javascript/fates-edge-socket-server/data/regions"/*.json pages-site/regions/ 2>/dev/null || true
+            cp "${PROJECT_ROOT}/utilities/javascript/fates-edge-socket-server/data/regions"/*.json pages-site/data/regions/ 2>/dev/null || true
+            echo "✅ Copied socket-server/data/regions/ → pages-site/regions/"
+            REGION_COPIED=true
+          fi
+          
+          # Fallback: web-client/data/regions/
+          if [ -d "${PROJECT_ROOT}/utilities/javascript/fates-edge-web-client/data/regions" ]; then
+            echo "📁 Copying from web-client/data/regions/ directory..."
+            cp "${PROJECT_ROOT}/utilities/javascript/fates-edge-web-client/data/regions"/*.json pages-site/regions/ 2>/dev/null || true
+            cp "${PROJECT_ROOT}/utilities/javascript/fates-edge-web-client/data/regions"/*.json pages-site/data/regions/ 2>/dev/null || true
+            echo "✅ Copied web-client/data/regions/ → pages-site/regions/"
+            REGION_COPIED=true
+          fi
+          
+          # Fallback: web-client/regions/
+          if [ -d "${PROJECT_ROOT}/utilities/javascript/fates-edge-web-client/regions" ]; then
+            echo "📁 Copying from web-client/regions/ directory..."
+            cp "${PROJECT_ROOT}/utilities/javascript/fates-edge-web-client/regions"/*.json pages-site/regions/ 2>/dev/null || true
+            cp "${PROJECT_ROOT}/utilities/javascript/fates-edge-web-client/regions"/*.json pages-site/data/regions/ 2>/dev/null || true
+            echo "✅ Copied web-client/regions/ → pages-site/regions/"
+            REGION_COPIED=true
+          fi
+          
+          # Generate manifest if needed
+          echo "📝 Generating region manifest.json..."
+          REGION_MANIFEST="["
+          first=true
+          for file in pages-site/regions/*.json; do
+            if [ -f "$file" ] && [ "$(basename "$file")" != "manifest.json" ]; then
+              name=$(basename "$file" .json)
+              if [ "$first" = true ]; then
+                REGION_MANIFEST="${REGION_MANIFEST}\"${name}\""
+                first=false
               else
-                echo '{"name":"Acasia","slug":"acasia","description":"The shattered continent"}' > pages-site/regions/acasia.json
-                REGION_MANIFEST='["acasia"]'
+                REGION_MANIFEST="${REGION_MANIFEST}, \"${name}\""
               fi
             fi
-            
-            echo "$REGION_MANIFEST" > pages-site/regions/manifest.json
-            echo "✅ Generated region manifest.json: $REGION_MANIFEST"
+          done
+          REGION_MANIFEST="${REGION_MANIFEST}]"
+          
+          if [ "$REGION_MANIFEST" = "[]" ]; then
+            if [ -f pages-site/regions/acasia.json ]; then
+              REGION_MANIFEST='["acasia"]'
+            else
+              echo '{"name":"Acasia","slug":"acasia","description":"The shattered continent","spades":[],"hearts":[],"clubs":[],"diamonds":[]}' > pages-site/regions/acasia.json
+              echo '{"name":"Acasia","slug":"acasia","description":"The shattered continent","spades":[],"hearts":[],"clubs":[],"diamonds":[]}' > pages-site/data/regions/acasia.json
+              REGION_MANIFEST='["acasia"]'
+            fi
           fi
           
+          echo "$REGION_MANIFEST" > pages-site/regions/manifest.json
+          echo "$REGION_MANIFEST" > pages-site/data/regions/manifest.json
+          echo "✅ Generated region manifest.json: $REGION_MANIFEST"
+          
           # ============================================================
-          # FACTION FILES — go in /factions/
-          # Used by: Factions module
+          # FACTION FILES — from data/factions/
           # ============================================================
+          echo "🏛️ Processing faction files..."
           mkdir -p pages-site/factions
+          mkdir -p pages-site/data/factions
           
-          # Copy from misc/factions/ (primary source)
-          if [ -d "${PROJECT_ROOT}/misc/factions" ]; then
-            echo "📁 Copying from misc/factions/ directory..."
-            cp "${PROJECT_ROOT}/misc/factions"/*.json pages-site/factions/ 2>/dev/null || true
-            echo "✅ Copied misc/factions/ → pages-site/factions/"
-          fi
+          FACTION_COPIED=false
           
-          # Also check web-client/factions/
-          if [ -d "${PROJECT_ROOT}/utilities/javascript/fates-edge-web-client/factions" ]; then
-            echo "📁 Copying from web-client/factions/ directory..."
-            cp "${PROJECT_ROOT}/utilities/javascript/fates-edge-web-client/factions"/*.json pages-site/factions/ 2>/dev/null || true
-            echo "✅ Copied web-client/factions/ → pages-site/factions/"
-          fi
-          
-          # Check data/factions/ as fallback
+          # Primary source: data/factions/
           if [ -d "${PROJECT_ROOT}/data/factions" ]; then
             echo "📁 Copying from data/factions/ directory..."
             cp "${PROJECT_ROOT}/data/factions"/*.json pages-site/factions/ 2>/dev/null || true
-            echo "✅ Copied data/factions/ → pages-site/factions/"
+            cp "${PROJECT_ROOT}/data/factions"/*.json pages-site/data/factions/ 2>/dev/null || true
+            echo "✅ Copied data/factions/ → pages-site/factions/ and pages-site/data/factions/"
+            FACTION_COPIED=true
           fi
           
-          # Also check web-client/data/factions/
+          # Fallback: misc/factions/
+          if [ "$FACTION_COPIED" = false ] && [ -d "${PROJECT_ROOT}/misc/factions" ]; then
+            echo "📁 Copying from misc/factions/ directory..."
+            cp "${PROJECT_ROOT}/misc/factions"/*.json pages-site/factions/ 2>/dev/null || true
+            cp "${PROJECT_ROOT}/misc/factions"/*.json pages-site/data/factions/ 2>/dev/null || true
+            echo "✅ Copied misc/factions/ → pages-site/factions/"
+            FACTION_COPIED=true
+          fi
+          
+          # Fallback: web-client/factions/
+          if [ -d "${PROJECT_ROOT}/utilities/javascript/fates-edge-web-client/factions" ]; then
+            echo "📁 Copying from web-client/factions/ directory..."
+            cp "${PROJECT_ROOT}/utilities/javascript/fates-edge-web-client/factions"/*.json pages-site/factions/ 2>/dev/null || true
+            cp "${PROJECT_ROOT}/utilities/javascript/fates-edge-web-client/factions"/*.json pages-site/data/factions/ 2>/dev/null || true
+            echo "✅ Copied web-client/factions/ → pages-site/factions/"
+            FACTION_COPIED=true
+          fi
+          
+          # Fallback: web-client/data/factions/
           if [ -d "${PROJECT_ROOT}/utilities/javascript/fates-edge-web-client/data/factions" ]; then
             echo "📁 Copying from web-client/data/factions/ directory..."
             cp "${PROJECT_ROOT}/utilities/javascript/fates-edge-web-client/data/factions"/*.json pages-site/factions/ 2>/dev/null || true
+            cp "${PROJECT_ROOT}/utilities/javascript/fates-edge-web-client/data/factions"/*.json pages-site/data/factions/ 2>/dev/null || true
             echo "✅ Copied web-client/data/factions/ → pages-site/factions/"
+            FACTION_COPIED=true
           fi
           
           # Rename factions-manifest.json to manifest.json if needed
           if [ -f pages-site/factions/factions-manifest.json ] && [ ! -f pages-site/factions/manifest.json ]; then
             mv pages-site/factions/factions-manifest.json pages-site/factions/manifest.json
+            cp pages-site/factions/manifest.json pages-site/data/factions/manifest.json
             echo "✅ Renamed factions-manifest.json → manifest.json"
           fi
           
-          # Ensure manifest exists
-          if [ ! -f pages-site/factions/manifest.json ]; then
-            echo "📝 Generating faction manifest.json..."
-            FACTION_MANIFEST="["
-            first=true
-            for file in pages-site/factions/*.json; do
-              if [ -f "$file" ] && [ "$(basename "$file")" != "manifest.json" ]; then
-                name=$(basename "$file" .json)
-                if [ "$first" = true ]; then
-                  FACTION_MANIFEST="${FACTION_MANIFEST}\"${name}\""
-                  first=false
-                else
-                  FACTION_MANIFEST="${FACTION_MANIFEST}, \"${name}\""
-                fi
+          # Generate manifest if needed
+          echo "📝 Generating faction manifest.json..."
+          FACTION_MANIFEST="["
+          first=true
+          for file in pages-site/factions/*.json; do
+            if [ -f "$file" ] && [ "$(basename "$file")" != "manifest.json" ]; then
+              name=$(basename "$file" .json)
+              if [ "$first" = true ]; then
+                FACTION_MANIFEST="${FACTION_MANIFEST}\"${name}\""
+                first=false
+              else
+                FACTION_MANIFEST="${FACTION_MANIFEST}, \"${name}\""
               fi
-            done
-            FACTION_MANIFEST="${FACTION_MANIFEST}]"
-            
-            if [ "$FACTION_MANIFEST" = "[]" ]; then
-              FACTION_MANIFEST='["bloody-fist", "ecktorian-censorate", "gray-ash", "house-contarini", "iron-league", "velvet-court"]'
             fi
-            
-            echo "$FACTION_MANIFEST" > pages-site/factions/manifest.json
-            echo "✅ Generated faction manifest.json: $FACTION_MANIFEST"
+          done
+          FACTION_MANIFEST="${FACTION_MANIFEST}]"
+          
+          if [ "$FACTION_MANIFEST" = "[]" ]; then
+            FACTION_MANIFEST='["bloody-fist", "ecktorian-censorate", "gray-ash", "house-contarini", "iron-league", "velvet-court"]'
           fi
           
+          echo "$FACTION_MANIFEST" > pages-site/factions/manifest.json
+          echo "$FACTION_MANIFEST" > pages-site/data/factions/manifest.json
+          echo "✅ Generated faction manifest.json: $FACTION_MANIFEST"
+          
           # ============================================================
-          # PATRON FILES — go in /data/patrons/
-          # Used by: Patrons module
+          # PATRON FILES — from data/patrons/
           # ============================================================
+          echo "👤 Processing patron files..."
           mkdir -p pages-site/data/patrons
           
-          # Copy from socket-server/data/patrons/ (primary source)
-          if [ -d "${PROJECT_ROOT}/utilities/javascript/fates-edge-socket-server/data/patrons" ]; then
+          PATRON_COPIED=false
+          
+          # Primary source: data/patrons/
+          if [ -d "${PROJECT_ROOT}/data/patrons" ]; then
+            echo "📁 Copying from data/patrons/ directory..."
+            cp "${PROJECT_ROOT}/data/patrons"/*.json pages-site/data/patrons/ 2>/dev/null || true
+            echo "✅ Copied data/patrons/ → pages-site/data/patrons/"
+            PATRON_COPIED=true
+          fi
+          
+          # Fallback: socket-server/data/patrons/
+          if [ "$PATRON_COPIED" = false ] && [ -d "${PROJECT_ROOT}/utilities/javascript/fates-edge-socket-server/data/patrons" ]; then
             echo "📁 Copying from socket-server/data/patrons/ directory..."
             cp "${PROJECT_ROOT}/utilities/javascript/fates-edge-socket-server/data/patrons"/*.json pages-site/data/patrons/ 2>/dev/null || true
             echo "✅ Copied socket-server/data/patrons/ → pages-site/data/patrons/"
+            PATRON_COPIED=true
           fi
           
-          # Copy from misc/ (fallback)
-          if [ -f "${PROJECT_ROOT}/misc/the_traveler.json" ]; then
-            cp "${PROJECT_ROOT}/misc/the_traveler.json" pages-site/data/patrons/traveler.json
-            echo "✅ Copied misc/the_traveler.json → pages-site/data/patrons/traveler.json"
-          fi
-          
-          if [ -f "${PROJECT_ROOT}/misc/acasia.json" ]; then
-            cp "${PROJECT_ROOT}/misc/acasia.json" pages-site/data/patrons/acasia.json
-            echo "✅ Copied misc/acasia.json → pages-site/data/patrons/acasia.json"
-          fi
-          
-          # Also check web-client/data/patrons/
-          if [ -d "${PROJECT_ROOT}/utilities/javascript/fates-edge-web-client/data/patrons" ]; then
+          # Fallback: web-client/data/patrons/
+          if [ "$PATRON_COPIED" = false ] && [ -d "${PROJECT_ROOT}/utilities/javascript/fates-edge-web-client/data/patrons" ]; then
             echo "📁 Copying from web-client/data/patrons/ directory..."
             cp "${PROJECT_ROOT}/utilities/javascript/fates-edge-web-client/data/patrons"/*.json pages-site/data/patrons/ 2>/dev/null || true
             echo "✅ Copied web-client/data/patrons/ → pages-site/data/patrons/"
+            PATRON_COPIED=true
           fi
           
-          # Generate patron manifest
+          # Fallback: misc/patrons/
+          if [ "$PATRON_COPIED" = false ] && [ -d "${PROJECT_ROOT}/misc/patrons" ]; then
+            echo "📁 Copying from misc/patrons/ directory..."
+            cp "${PROJECT_ROOT}/misc/patrons"/*.json pages-site/data/patrons/ 2>/dev/null || true
+            echo "✅ Copied misc/patrons/ → pages-site/data/patrons/"
+            PATRON_COPIED=true
+          fi
+          
+          # Generate manifest if needed
           echo "📝 Generating patron manifest.json..."
           PATRON_MANIFEST="["
           first=true
@@ -427,11 +503,11 @@ jobs:
           PATRON_MANIFEST="${PATRON_MANIFEST}]"
           
           if [ "$PATRON_MANIFEST" = "[]" ]; then
-            if [ -f pages-site/data/patrons/traveler.json ]; then
-              PATRON_MANIFEST='["traveler"]'
+            if [ -f pages-site/data/patrons/the_traveler.json ]; then
+              PATRON_MANIFEST='["the_traveler"]'
             else
-              echo '{"id":"traveler","name":"The Traveler","description":"A mysterious wanderer"}' > pages-site/data/patrons/traveler.json
-              PATRON_MANIFEST='["traveler"]'
+              echo '{"id":"the_traveler","name":"The Traveler","description":"A mysterious wanderer","domain":"Ways & Journeys","rites":[]}' > pages-site/data/patrons/the_traveler.json
+              PATRON_MANIFEST='["the_traveler"]'
             fi
           fi
           
@@ -439,11 +515,65 @@ jobs:
           echo "✅ Generated patron manifest.json: $PATRON_MANIFEST"
           
           # ============================================================
-          # BACKUP COPIES
+          # SEED.JS — from data/
           # ============================================================
-          mkdir -p pages-site/data
+          echo "🌱 Processing seed files..."
+          
+          if [ -f "${PROJECT_ROOT}/data/seed.js" ]; then
+            cp "${PROJECT_ROOT}/data/seed.js" pages-site/seed.js
+            cp "${PROJECT_ROOT}/data/seed.js" pages-site/data/seed.js
+            echo "✅ Copied data/seed.js → pages-site/seed.js"
+          fi
+          
+          if [ -f "${PROJECT_ROOT}/data/seed.json" ]; then
+            cp "${PROJECT_ROOT}/data/seed.json" pages-site/seed.json
+            cp "${PROJECT_ROOT}/data/seed.json" pages-site/data/seed.json
+            echo "✅ Copied data/seed.json → pages-site/seed.json"
+          fi
+          
+          # ============================================================
+          # MANIFEST-CORE.JSON — from data/
+          # ============================================================
+          echo "📋 Processing manifest-core.json..."
+          
+          if [ -f "${PROJECT_ROOT}/data/manifest-core.json" ]; then
+            cp "${PROJECT_ROOT}/data/manifest-core.json" pages-site/manifest-core.json
+            cp "${PROJECT_ROOT}/data/manifest-core.json" pages-site/data/manifest-core.json
+            echo "✅ Copied data/manifest-core.json → pages-site/manifest-core.json"
+          elif [ -f "${PROJECT_ROOT}/misc/manifest-core.json" ]; then
+            cp "${PROJECT_ROOT}/misc/manifest-core.json" pages-site/manifest-core.json
+            cp "${PROJECT_ROOT}/misc/manifest-core.json" pages-site/data/manifest-core.json
+            echo "✅ Copied misc/manifest-core.json → pages-site/manifest-core.json"
+          else
+            echo '{"version":"3.0","modules":["regions","factions","patrons"]}' > pages-site/manifest-core.json
+            echo '{"version":"3.0","modules":["regions","factions","patrons"]}' > pages-site/data/manifest-core.json
+            echo "⚠️ No manifest-core.json found, created minimal version"
+          fi
+          
+          # ============================================================
+          # PACK.JSON — for pack management
+          # ============================================================
+          echo "📦 Processing pack.json..."
+          
+          if [ -f "${PROJECT_ROOT}/data/pack.json" ]; then
+            mkdir -p pages-site/misc
+            cp "${PROJECT_ROOT}/data/pack.json" pages-site/misc/pack.json
+            echo "✅ Copied data/pack.json → pages-site/misc/pack.json"
+          elif [ -f "${PROJECT_ROOT}/misc/pack.json" ]; then
+            mkdir -p pages-site/misc
+            cp "${PROJECT_ROOT}/misc/pack.json" pages-site/misc/pack.json
+            echo "✅ Copied misc/pack.json → pages-site/misc/pack.json"
+          fi
+          
+          # ============================================================
+          # BACKUP COPIES TO DATA/
+          # ============================================================
+          echo "💾 Creating backup copies..."
+          
+          # Ensure all data is in the data/ directory structure
           mkdir -p pages-site/data/regions
           mkdir -p pages-site/data/factions
+          mkdir -p pages-site/data/patrons
           
           # Copy region files to data/regions as backup
           if [ -d pages-site/regions ]; then
@@ -451,25 +581,10 @@ jobs:
             echo "✅ Copied regions to data/regions/ as backup"
           fi
           
-          # Copy wiki.json to data/ as backup
-          if [ -f pages-site/wiki.json ]; then
-            cp pages-site/wiki.json pages-site/data/wiki.json
-            echo "✅ Copied wiki.json to data/ as backup"
-          fi
-          
-          # Copy factions to data/factions as backup
+          # Copy faction files to data/factions as backup
           if [ -d pages-site/factions ]; then
             cp pages-site/factions/*.json pages-site/data/factions/ 2>/dev/null || true
             echo "✅ Copied factions to data/factions/ as backup"
-          fi
-          
-          # ============================================================
-          # PACK.JSON — for pack management
-          # ============================================================
-          if [ -f "${PROJECT_ROOT}/misc/pack.json" ]; then
-            mkdir -p pages-site/misc
-            cp "${PROJECT_ROOT}/misc/pack.json" pages-site/misc/pack.json
-            echo "✅ Copied misc/pack.json → pages-site/misc/pack.json"
           fi
           
           # ============================================================
@@ -502,6 +617,8 @@ jobs:
           echo ""
           echo "📂 Misc directory contents:"
           ls -la pages-site/misc/ || echo "  (empty)"
+          echo ""
+          echo "✅ All data copied successfully!"
 
       - name: Upload Pages artifact
         if: ${{ env.SKIP_JOB != 'true' && matrix.name == 'web-client' }}
