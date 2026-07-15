@@ -424,3 +424,10 @@ export function playNotificationSound() {
         oscillator.stop(audioCtx.currentTime + 0.1);
     } catch (e) { /* ignore */ }
 }
+
+// ============================================================
+// RE-EXPORT for convenience
+// ============================================================
+
+// Re-export these so they can be imported from vtt-core
+export { getOutcomeColor, getOutcomeLabel, getOutcomeClass } from '../../core/dice.js';
