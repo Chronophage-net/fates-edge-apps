@@ -1,10 +1,3 @@
-/**
- * Settings feature - Manage data, backups, and preferences
- * ⚠️ ALL RIGHTS RESERVED - Fate's Edge is © Nicholas A. Gasper
- * SRD portions are CC BY-NC-SA 4.0
- * See license modal for full terms
- **/
-
 import { 
     getState as getAppState,
     getArchives, 
@@ -16,10 +9,11 @@ import {
     setBaseUrl,
     getBaseUrl,
     setPasswordHash,
-    saveState
+    saveState,
+    addCharacter  // ← Add this here
 } from '../../core/state.js';
 import { checkPasswordGate, hashPassword } from '../../core/password.js';
-import { escHtml, formatDate } from '../../core/utils.js';
+import { escHtml, formatDate } from '../../core/utils.js';  // ← Remove addCharacter from here
 import { showToast } from '../../components/Toast.js';
 import { getUserAvatar } from '../../core/gravatar.js';
 import { 

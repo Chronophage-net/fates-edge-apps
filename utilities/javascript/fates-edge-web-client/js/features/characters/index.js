@@ -5,14 +5,12 @@
 
 import { 
     getState, 
-    getCharacter, 
-    addCharacter, 
-    updateCharacter, 
-    deleteCharacter, 
+    
     saveState, 
     generateId,
     escHtml 
 } from '../../core/utils.js';
+import { getCharacter, addCharacter, updateCharacter, deleteCharacter, } from '../../core/state.js'
 import { createCharacterCard } from '../../components/CharacterCard.js';
 import { showToast } from '../../components/Toast.js';
 
