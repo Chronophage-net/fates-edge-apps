@@ -205,8 +205,8 @@ jobs:
             echo "✅ Copied seed to pages-site/.seed/"
           fi
           if [ -f "${{ matrix.path }}/.seed/seed.js" ]; then
-            cp "${{ matrix.path }}/.seed/seed.js" pages-site/
-            echo "✅ Copied seed.js to pages-site/"
+            cp "${{ matrix.path }}/.seed/seed.js" pages-site/.seed/
+            echo "✅ Copied seed.js to pages-site/.seed/"
           fi
           
           # Also copy to data/ for fallback
@@ -478,6 +478,9 @@ jobs:
           echo ""
           echo "📂 Site root contents:"
           ls -la pages-site/ | head -20
+          echo ""
+          echo "📂 .seed directory contents:"
+          ls -la pages-site/.seed/ || echo "  (empty)"
           echo ""
           echo "📂 Regions directory contents:"
           ls -la pages-site/regions/ || echo "  (empty)"
