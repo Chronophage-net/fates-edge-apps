@@ -15,8 +15,6 @@ import {
     generateSeed 
 } from '../../core/dice.js';
 
-// ... rest of your code
-
 let container = null;
 
 

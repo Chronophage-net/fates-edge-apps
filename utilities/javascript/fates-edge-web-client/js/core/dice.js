@@ -11,15 +11,22 @@ import { escHtml, safeParseInt } from '../../core/utils.js';
 import { addRoll, getState, saveState } from '../../core/state.js';
 // Import the core dice engine
 import { performRoll, rollDie } from '../../core/dice.js';
-// Import seed management from crypto (if it exists)
-// Fallback to local seed management if crypto doesn't have it
-import { 
-    getSeed as cryptoGetSeed, 
-    setSeed as cryptoSetSeed,
-    generateSeed as cryptoGenerateSeed 
-} from '../../core/crypto.js' assert { onError: 'ignore' };
 // Import WebSocket for sync
 import { isConnectedToServer, onEvent, offEvent, sendMessage as sendWSMessage } from '../../core/websocket.js';
+
+// Try to import crypto module, use fallback if not available
+let cryptoGetSeed = null;
+let cryptoSetSeed = null;
+let cryptoGenerateSeed = null;
+
+try {
+    const cryptoModule = await import('../../core/crypto.js');
+    cryptoGetSeed = cryptoModule.getSeed || null;
+    cryptoSetSeed = cryptoModule.setSeed || null;
+    cryptoGenerateSeed = cryptoModule.generateSeed || null;
+} catch (e) {
+    console.debug('[Dice] Crypto module not available, using fallbacks');
+}
 
 let container = null;
 let wsListeners = new Map();
@@ -33,8 +40,12 @@ let _seed = null;
 
 function getSeed() {
     // Try crypto module first
-    if (typeof cryptoGetSeed !== 'undefined' && cryptoGetSeed) {
-        return cryptoGetSeed();
+    if (cryptoGetSeed) {
+        try {
+            return cryptoGetSeed();
+        } catch (e) {
+            console.debug('[Dice] Crypto getSeed failed, using fallback');
+        }
     }
     // Fallback: use localStorage or return null
     try {
@@ -50,8 +61,12 @@ function getSeed() {
 
 function setSeed(seed) {
     // Try crypto module first
-    if (typeof cryptoSetSeed !== 'undefined' && cryptoSetSeed) {
-        return cryptoSetSeed(seed);
+    if (cryptoSetSeed) {
+        try {
+            return cryptoSetSeed(seed);
+        } catch (e) {
+            console.debug('[Dice] Crypto setSeed failed, using fallback');
+        }
     }
     // Fallback: store locally
     _seed = seed;
@@ -67,8 +82,12 @@ function setSeed(seed) {
 
 function generateSeed() {
     // Try crypto module first
-    if (typeof cryptoGenerateSeed !== 'undefined' && cryptoGenerateSeed) {
-        return cryptoGenerateSeed();
+    if (cryptoGenerateSeed) {
+        try {
+            return cryptoGenerateSeed();
+        } catch (e) {
+            console.debug('[Dice] Crypto generateSeed failed, using fallback');
+        }
     }
     // Fallback: generate a random seed
     try {
@@ -129,6 +148,8 @@ function showToast(message, type = 'info') {
         }, 300);
     }, 3000);
 }
+
+// ... rest of the file remains the same ...
 
 // ============================================================
 // RENDER
