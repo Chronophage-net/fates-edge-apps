@@ -186,6 +186,31 @@ export function padNumber(num, length = 2) {
     return String(num).padStart(length, '0');
 }
 
+/**
+ * Escape HTML special characters to prevent XSS
+ * @param {string} str - String to escape
+ * @returns {string} Escaped string
+ */
+export function escHtml(str) {
+    if (!str) return '';
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+}
+
+/**
+ * Truncate a string to max length with suffix
+ * @param {string} str - String to truncate
+ * @param {number} maxLength - Maximum length
+ * @param {string} suffix - Suffix to append (default: '...')
+ * @returns {string} Truncated string
+ */
+export function truncate(str, maxLength = 100, suffix = '...') {
+    if (!str) return '';
+    if (str.length <= maxLength) return str;
+    return str.slice(0, maxLength - suffix.length) + suffix;
+}
+
 // ============================================================
 // NUMBER UTILITIES
 // ============================================================
@@ -567,19 +592,6 @@ export function htmlToFragment(html) {
     return template.content;
 }
 
-/**
- * Truncate a string to max length with suffix
- * @param {string} str - String to truncate
- * @param {number} maxLength - Maximum length
- * @param {string} suffix - Suffix to append (default: '...')
- * @returns {string} Truncated string
- */
-export function truncate(str, maxLength = 100, suffix = '...') {
-    if (!str) return '';
-    if (str.length <= maxLength) return str;
-    return str.slice(0, maxLength - suffix.length) + suffix;
-}
-
 // ============================================================
 // STORAGE UTILITIES
 // ============================================================
@@ -709,6 +721,7 @@ const Utils = {
     pluralize,
     padNumber,
     truncate,
+    escHtml,
     
     // Number
     randomInt,
