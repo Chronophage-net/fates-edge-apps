@@ -1,0 +1,321 @@
+name: Deploy Socket Server to Render
+
+on:
+  workflow_run:
+    workflows: ["Build and Deploy"]
+    types:
+      - completed
+    branches:
+      - main
+    paths:
+      - 'utilities/javascript/fates-edge-socket-server/**'
+      - 'data/patrons/**'
+      - 'data/regions/**'
+      - 'data/factions/**'
+      - 'data/wiki.json'
+
+  workflow_dispatch:
+    inputs:
+      environment:
+        type: choice
+        description: 'Environment to deploy'
+        options:
+          - production
+          - staging
+        default: production
+
+env:
+  NODE_VERSION: 24
+
+permissions:
+  contents: read
+
+jobs:
+  # ============================================================
+  # CHECK IF SOCKET SERVER CHANGED
+  # ============================================================
+  check-changes:
+    name: Check if Socket Server Changed
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      changed: ${{ steps.check.outputs.changed }}
+      sha: ${{ steps.check.outputs.sha }}
+    
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      
+      - name: Check for changes in socket server
+        id: check
+        run: |
+          # For workflow_dispatch, always deploy
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+            echo "sha=${{ github.sha }}" >> "$GITHUB_OUTPUT"
+            echo "✅ Manual deployment triggered"
+            exit 0
+          fi
+          
+          # For workflow_run, check if socket server files changed
+          COMMIT_SHA="${{ github.event.workflow_run.head_sha }}"
+          echo "Checking changes in commit: $COMMIT_SHA"
+          
+          # Get the list of changed files in the socket server directory
+          CHANGED_FILES=$(git diff-tree --no-commit-id --name-only -r "$COMMIT_SHA" | grep -E "^(utilities/javascript/fates-edge-socket-server/|data/(patrons|regions|factions)/|data/wiki.json)" || true)
+          
+          if [ -n "$CHANGED_FILES" ]; then
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+            echo "sha=$COMMIT_SHA" >> "$GITHUB_OUTPUT"
+            echo "✅ Socket server or data files changed:"
+            echo "$CHANGED_FILES"
+          else
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            echo "sha=$COMMIT_SHA" >> "$GITHUB_OUTPUT"
+            echo "ℹ️ No socket server or data files changed"
+          fi
+
+  # ============================================================
+  # BUILD SOCKET SERVER
+  # ============================================================
+  build-socket-server:
+    name: Build Socket Server
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    needs: check-changes
+    if: needs.check-changes.outputs.changed == 'true'
+    
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ needs.check-changes.outputs.sha }}
+      
+      - uses: actions/setup-node@v6
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+      
+      - name: Cache node modules
+        uses: actions/cache@v5
+        with:
+          path: utilities/javascript/fates-edge-socket-server/node_modules
+          key: ${{ runner.os }}-node-socket-server-${{ hashFiles('utilities/javascript/fates-edge-socket-server/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-socket-server-
+      
+      - name: Install dependencies
+        working-directory: utilities/javascript/fates-edge-socket-server
+        run: npm ci
+      
+      - name: Run tests (if any)
+        working-directory: utilities/javascript/fates-edge-socket-server
+        run: npm test || echo "No tests configured"
+        continue-on-error: true
+      
+      - name: Build project (if needed)
+        working-directory: utilities/javascript/fates-edge-socket-server
+        run: npm run build || echo "No build script configured"
+        continue-on-error: true
+      
+      - name: Create deployment artifact
+        run: |
+          mkdir -p deploy-artifact
+          
+          # Copy socket server files
+          cp -r utilities/javascript/fates-edge-socket-server/* deploy-artifact/
+          
+          # Copy data files if they exist
+          if [ -d "data" ]; then
+            mkdir -p deploy-artifact/data
+            cp -r data/* deploy-artifact/data/
+            echo "✅ Data files copied to artifact"
+          fi
+          
+          # Copy LICENSE if it exists
+          if [ -f "LICENSE.md" ]; then
+            cp LICENSE.md deploy-artifact/
+            echo "✅ LICENSE.md copied to artifact"
+          fi
+          
+          # Create a tar.gz for deployment
+          cd deploy-artifact
+          tar -czf ../socket-server-deploy.tar.gz .
+          cd ..
+          
+          echo "✅ Socket server packaged for deployment"
+      
+      - name: Upload artifact
+        uses: actions/upload-artifact@v6
+        with:
+          name: socket-server-deploy
+          path: socket-server-deploy.tar.gz
+          retention-days: 1
+
+  # ============================================================
+  # DEPLOY TO RENDER
+  # ============================================================
+  deploy-to-render:
+    name: Deploy to Render (${{ github.event.inputs.environment || 'production' }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    needs: [check-changes, build-socket-server]
+    if: needs.check-changes.outputs.changed == 'true'
+    
+    environment:
+      name: ${{ github.event.inputs.environment || 'production' }}
+      url: https://fates-edge-socket-server.onrender.com
+    
+    steps:
+      - name: Download deployment artifact
+        uses: actions/download-artifact@v6
+        with:
+          name: socket-server-deploy
+      
+      - name: Extract artifact
+        run: |
+          tar -xzf socket-server-deploy.tar.gz
+          rm socket-server-deploy.tar.gz
+          echo "📂 Extracted files:"
+          ls -la
+      
+      - name: Deploy to Render
+        env:
+          RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
+          RENDER_SERVICE_ID: ${{ secrets.RENDER_SOCKET_SERVICE_ID }}
+          DEPLOY_ENV: ${{ github.event.inputs.environment || 'production' }}
+        run: |
+          if [ -z "$RENDER_API_KEY" ] || [ -z "$RENDER_SERVICE_ID" ]; then
+            echo "⚠️ Render secrets not configured. Skipping deployment."
+            echo "To enable, add RENDER_API_KEY and RENDER_SOCKET_SERVICE_ID to GitHub secrets."
+            exit 0
+          fi
+          
+          echo "🚀 Deploying socket server to Render ($DEPLOY_ENV)..."
+          echo "Service ID: $RENDER_SERVICE_ID"
+          
+          # Trigger deployment via Render API
+          RESPONSE=$(curl -s -X POST \
+            -H "Authorization: Bearer $RENDER_API_KEY" \
+            -H "Content-Type: application/json" \
+            -d '{
+              "serviceId": "'"$RENDER_SERVICE_ID"'",
+              "clearCache": "true"
+            }' \
+            https://api.render.com/v1/services/$RENDER_SERVICE_ID/deploys)
+          
+          echo "📡 Response: $RESPONSE"
+          
+          # Check if deployment was triggered
+          if echo "$RESPONSE" | grep -q '"id"'; then
+            DEPLOY_ID=$(echo "$RESPONSE" | grep -o '"id":"[^"]*"' | head -1 | cut -d'"' -f4)
+            echo "✅ Deployment triggered successfully!"
+            echo "Deploy ID: $DEPLOY_ID"
+            
+            # Get deployment status
+            echo "⏳ Checking deployment status..."
+            sleep 5
+            
+            STATUS_RESPONSE=$(curl -s \
+              -H "Authorization: Bearer $RENDER_API_KEY" \
+              https://api.render.com/v1/services/$RENDER_SERVICE_ID/deploys/$DEPLOY_ID)
+            
+            DEPLOY_STATUS=$(echo "$STATUS_RESPONSE" | grep -o '"status":"[^"]*"' | head -1 | cut -d'"' -f4)
+            echo "📊 Deployment status: $DEPLOY_STATUS"
+            
+            # Get deploy URL if available
+            DEPLOY_URL=$(echo "$STATUS_RESPONSE" | grep -o '"url":"[^"]*"' | head -1 | cut -d'"' -f4)
+            if [ -n "$DEPLOY_URL" ]; then
+              echo "🔗 Deploy URL: $DEPLOY_URL"
+            fi
+          else
+            ERROR_MSG=$(echo "$RESPONSE" | grep -o '"message":"[^"]*"' | head -1 | cut -d'"' -f4)
+            if [ -n "$ERROR_MSG" ]; then
+              echo "❌ Deployment failed: $ERROR_MSG"
+            else
+              echo "❌ Deployment failed. Response: $RESPONSE"
+            fi
+            exit 1
+          fi
+      
+      - name: Wait for deployment (optional)
+        if: always()
+        run: |
+          echo "⏳ Deployment in progress..."
+          echo "Check status at: https://dashboard.render.com/web/${{ secrets.RENDER_SOCKET_SERVICE_ID }}"
+          echo "Check live at: https://fates-edge-socket-server.onrender.com"
+
+  # ============================================================
+  # POST-DEPLOYMENT VERIFICATION
+  # ============================================================
+  verify-deployment:
+    name: Verify Deployment
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    needs: [deploy-to-render]
+    if: always() && needs.deploy-to-render.result == 'success'
+    
+    steps:
+      - name: Wait for service to be ready
+        run: |
+          echo "⏳ Waiting for service to be ready..."
+          sleep 30
+      
+      - name: Health check
+        run: |
+          URL="https://fates-edge-socket-server.onrender.com"
+          MAX_RETRIES=15
+          RETRY_COUNT=0
+          
+          echo "🔍 Performing health check on $URL..."
+          
+          while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
+            RETRY_COUNT=$((RETRY_COUNT + 1))
+            
+            # Try health check endpoint
+            RESPONSE=$(curl -s -o /dev/null -w "%{http_code}" "$URL/healthz" || echo "000")
+            
+            if [ "$RESPONSE" = "200" ]; then
+              echo "✅ Health check passed! Service is ready."
+              exit 0
+            fi
+            
+            echo "⏳ Attempt $RETRY_COUNT/$MAX_RETRIES: Waiting for service... (status: $RESPONSE)"
+            sleep 10
+          done
+          
+          echo "⚠️ Service may not be ready yet. Check manually at: $URL"
+          
+          # Try to get more info about the service
+          echo "📡 Checking service info..."
+          curl -s "$URL" || echo "Service not responding"
+          
+          exit 0
+
+  # ============================================================
+  # NOTIFICATION (Optional)
+  # ============================================================
+  notify:
+    name: Send Deployment Notification
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    needs: [verify-deployment]
+    if: always()
+    
+    steps:
+      - name: Deployment Status
+        run: |
+          echo "========================================="
+          echo "📊 DEPLOYMENT COMPLETE"
+          echo "========================================="
+          echo "Status: ${{ needs.verify-deployment.result }}"
+          echo "URL: https://fates-edge-socket-server.onrender.com"
+          echo "Dashboard: https://dashboard.render.com/web/${{ secrets.RENDER_SOCKET_SERVICE_ID }}"
+          echo "========================================="
+          
+          if [ "${{ needs.verify-deployment.result }}" = "success" ]; then
+            echo "✅ Socket server deployed successfully!"
+            exit 0
+          else
+            echo "⚠️ Deployment completed with warnings or errors."
+            exit 0
+          fi

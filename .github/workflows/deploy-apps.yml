@@ -181,6 +181,27 @@ jobs:
           if-no-files-found: error
 
       # ============================================================
+      # SAVE BUILD METADATA FOR SOCKET SERVER
+      # ============================================================
+      - name: Save build metadata
+        if: ${{ env.SKIP_JOB != 'true' && matrix.name == 'socket-server' }}
+        run: |
+          mkdir -p build-metadata
+          echo "${{ github.sha }}" > build-metadata/commit-sha.txt
+          echo "${{ github.run_id }}" > build-metadata/run-id.txt
+          echo "${{ github.run_number }}" > build-metadata/run-number.txt
+          echo "Build timestamp: $(date -u)" > build-metadata/build-time.txt
+          echo "✅ Build metadata saved for socket-server"
+
+      - name: Upload build metadata
+        if: ${{ env.SKIP_JOB != 'true' && matrix.name == 'socket-server' }}
+        uses: actions/upload-artifact@v6
+        with:
+          name: build-metadata-socket-server
+          path: build-metadata/
+          retention-days: 1
+
+      # ============================================================
       # PREPARE PAGES SITE WITH SEED FILES
       # ============================================================
       - name: Prepare Pages site
@@ -652,13 +673,97 @@ jobs:
         uses: actions/deploy-pages@v4
 
   # ============================================================
+  # DEPLOY SOCKET SERVER TO RENDER
+  # ============================================================
+  deploy-render:
+    name: Deploy Socket Server to Render
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    needs: build
+    if: always() && !cancelled()
+    
+    permissions:
+      contents: read
+      actions: read
+    
+    steps:
+      - name: Check if socket server was built
+        id: check-build
+        run: |
+          # Check if the socket-server build artifact exists
+          if [ -f "artifacts/socket-server-package/socket-server-package" ]; then
+            echo "built=true" >> "$GITHUB_OUTPUT"
+            echo "✅ Socket server package found"
+          else
+            echo "built=false" >> "$GITHUB_OUTPUT"
+            echo "⚠️ Socket server package not found, skipping deployment"
+          fi
+      
+      - name: Download socket server artifact
+        if: steps.check-build.outputs.built == 'true'
+        uses: actions/download-artifact@v6
+        with:
+          name: socket-server-package
+          path: socket-server-deploy
+      
+      - name: Deploy to Render
+        if: steps.check-build.outputs.built == 'true'
+        env:
+          RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
+          RENDER_SERVICE_ID: ${{ secrets.RENDER_SOCKET_SERVICE_ID }}
+        run: |
+          if [ -z "$RENDER_API_KEY" ] || [ -z "$RENDER_SERVICE_ID" ]; then
+            echo "⚠️ Render secrets not configured. Skipping deployment."
+            echo "To enable, add RENDER_API_KEY and RENDER_SOCKET_SERVICE_ID to GitHub secrets."
+            exit 0
+          fi
+          
+          echo "🚀 Deploying socket server to Render..."
+          echo "Service ID: $RENDER_SERVICE_ID"
+          
+          # Trigger deployment via Render API
+          RESPONSE=$(curl -s -X POST \
+            -H "Authorization: Bearer $RENDER_API_KEY" \
+            -H "Content-Type: application/json" \
+            -d '{
+              "serviceId": "'"$RENDER_SERVICE_ID"'",
+              "clearCache": "true"
+            }' \
+            https://api.render.com/v1/services/$RENDER_SERVICE_ID/deploys)
+          
+          echo "📡 Response: $RESPONSE"
+          
+          # Check if deployment was triggered
+          if echo "$RESPONSE" | grep -q '"id"'; then
+            DEPLOY_ID=$(echo "$RESPONSE" | grep -o '"id":"[^"]*"' | head -1 | cut -d'"' -f4)
+            echo "✅ Deployment triggered successfully!"
+            echo "Deploy ID: $DEPLOY_ID"
+            echo "Deploy URL: https://dashboard.render.com/web/$RENDER_SERVICE_ID/deploys/$DEPLOY_ID"
+          else
+            ERROR_MSG=$(echo "$RESPONSE" | grep -o '"message":"[^"]*"' | head -1 | cut -d'"' -f4)
+            if [ -n "$ERROR_MSG" ]; then
+              echo "❌ Deployment failed: $ERROR_MSG"
+            else
+              echo "❌ Deployment failed. Response: $RESPONSE"
+            fi
+            exit 1
+          fi
+      
+      - name: Wait for deployment (optional)
+        if: steps.check-build.outputs.built == 'true'
+        run: |
+          echo "⏳ Deployment in progress..."
+          echo "Check status at: https://dashboard.render.com/web/${{ secrets.RENDER_SOCKET_SERVICE_ID }}"
+          echo "Check live at: https://fates-edge-socket-server.onrender.com"
+
+  # ============================================================
   # RELEASE CREATION
   # ============================================================
   create-release:
     name: Create Release
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    needs: build
+    needs: [build, deploy-pages, deploy-render]
 
     if: >
       github.event_name == 'workflow_dispatch' &&
