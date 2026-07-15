@@ -1,13 +1,19 @@
 {
   "name": "fates-edge-web-client",
-  "version": "4.1.0",
-  "description": "Fate's Edge Web Client",
-  "private": true,
+  "version": "3.0.0",
+  "description": "Fate's Edge Toolkit Web Client",
   "scripts": {
-    "build": "echo '✅ Web client ready - static files only'",
-    "test": "echo 'No tests configured'"
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "serve": "npx serve -s dist -l ${PORT:-10000}",
+    "start": "npm run serve",
+    "seed": "node js/tools/generate-seed.js"
   },
   "dependencies": {
-    "socket.io-client": "^4.5.0"
+    "serve": "^14.2.0"
+  },
+  "devDependencies": {
+    "vite": "^5.0.0"
   }
 }
