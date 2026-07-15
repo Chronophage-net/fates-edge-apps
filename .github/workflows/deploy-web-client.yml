@@ -1,0 +1,94 @@
+name: Deploy Web Client
+
+on:
+  workflow_run:
+    workflows: ["Build Apps Packages"]
+    types:
+      - completed
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      environment:
+        type: choice
+        description: 'Environment to deploy'
+        options:
+          - github-pages
+          - preview
+        default: github-pages
+
+permissions:
+  contents: read
+
+concurrency:
+  group: "pages-${{ github.ref }}"
+  cancel-in-progress: false
+
+jobs:
+  deploy-pages:
+    name: Deploy to GitHub Pages
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    if: >
+      (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success') ||
+      github.event_name == 'workflow_dispatch'
+    
+    permissions:
+      pages: write
+      id-token: write
+      actions: read
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: Download web client artifact
+        if: github.event_name == 'workflow_run'
+        uses: actions/download-artifact@v6
+        with:
+          name: web-client-dist
+          path: web-client
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          run-id: ${{ github.event.workflow_run.id }}
+        continue-on-error: true
+
+      - name: Checkout and build web client
+        if: github.event_name == 'workflow_dispatch'
+        uses: actions/checkout@v5
+
+      - name: Setup Node
+        if: github.event_name == 'workflow_dispatch'
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+
+      - name: Build web client
+        if: github.event_name == 'workflow_dispatch'
+        working-directory: utilities/javascript/fates-edge-web-client
+        run: |
+          npm ci
+          npm run build
+
+      - name: Prepare Pages site
+        if: github.event_name == 'workflow_dispatch'
+        run: |
+          mkdir -p pages-site
+          cp -r utilities/javascript/fates-edge-web-client/dist/* pages-site/ || cp -r utilities/javascript/fates-edge-web-client/* pages-site/
+          
+          # Copy data files
+          [ -f "data/wiki.json" ] && cp data/wiki.json pages-site/
+          [ -d "data/regions" ] && cp -r data/regions pages-site/
+          [ -d "data/factions" ] && cp -r data/factions pages-site/
+          [ -d "data/patrons" ] && cp -r data/patrons pages-site/data/
+
+      - name: Use downloaded artifact
+        if: github.event_name == 'workflow_run'
+        run: |
+          mkdir -p pages-site
+          cp -r web-client/* pages-site/
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+        with:
+          path: pages-site

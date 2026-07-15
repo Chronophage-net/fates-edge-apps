@@ -1,0 +1,229 @@
+name: Build Apps and Packages
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'utilities/javascript/fates-edge-web-client/**'
+      - 'utilities/javascript/fates-edge-socket-server/**'
+      - 'utilities/javascript/fates-edge-desktop-client/**'
+      - 'utilities/vtt_mods_bots/**'
+      - 'misc/**'
+      - 'data/**'
+      - '.github/workflows/build-apps-and-packages.yml'
+  workflow_dispatch:
+    inputs:
+      skip_web_deploy:
+        type: boolean
+        default: false
+        description: 'Skip web client deployment to Pages'
+      create_release:
+        type: boolean
+        default: false
+        description: 'Create a GitHub Release'
+      release_version:
+        type: string
+        required: false
+        description: 'Version tag for release (e.g., v1.2.0)'
+
+env:
+  NODE_VERSION: 24
+
+permissions:
+  contents: read
+
+concurrency:
+  group: "build-${{ github.ref }}"
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: Build & Package (${{ matrix.name }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: web-client
+            path: utilities/javascript/fates-edge-web-client
+            build: false
+            package: false
+          - name: socket-server
+            path: utilities/javascript/fates-edge-socket-server
+            build: false
+            package: true
+          - name: desktop-client
+            path: utilities/javascript/fates-edge-desktop-client
+            build: false
+            package: true
+          - name: discord-bot
+            path: utilities/vtt_mods_bots/fates-edge-discord-bot
+            build: false
+            package: true
+          - name: roll20
+            path: utilities/vtt_mods_bots/fates-edge-roll20
+            build: false
+            package: true
+          - name: foundry-bridge
+            path: utilities/vtt_mods_bots/foundry_fates-edge-bridge
+            build: false
+            package: true
+
+    env:
+      SKIP_JOB: ${{ matrix.name == 'web-client' && github.event_name == 'workflow_dispatch' && github.event.inputs.skip_web_deploy == 'true' }}
+
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v5
+        if: ${{ env.SKIP_JOB != 'true' }}
+
+      - uses: actions/setup-node@v6
+        if: ${{ env.SKIP_JOB != 'true' }}
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Cache node modules
+        if: ${{ env.SKIP_JOB != 'true' }}
+        uses: actions/cache@v5
+        with:
+          path: ${{ matrix.path }}/node_modules
+          key: ${{ runner.os }}-node-${{ matrix.name }}-${{ hashFiles(format('{0}/package-lock.json', matrix.path)) }}
+          restore-keys: |
+            ${{ runner.os }}-node-${{ matrix.name }}-
+
+      - name: Install dependencies
+        if: ${{ env.SKIP_JOB != 'true' }}
+        working-directory: ${{ matrix.path }}
+        run: npm ci
+
+      - name: Generate deterministic seed
+        if: ${{ env.SKIP_JOB != 'true' && matrix.name == 'web-client' }}
+        working-directory: ${{ matrix.path }}
+        run: |
+          echo "🎲 Generating deterministic seed for static site..."
+          if [ -f js/tools/generate-seed.js ]; then
+            node js/tools/generate-seed.js --force --output=.seed/random-seed.json
+            echo "✅ Seed generated"
+            mkdir -p data
+            cp .seed/random-seed.json data/seed.json 2>/dev/null || true
+            cp .seed/seed.js js/seed.js 2>/dev/null || true
+          else
+            echo "⚠️ generate-seed.js not found, skipping seed generation"
+          fi
+
+      - name: Build project
+        if: ${{ env.SKIP_JOB != 'true' && matrix.build }}
+        working-directory: ${{ matrix.path }}
+        run: npm run build
+
+      - name: Package project
+        if: ${{ env.SKIP_JOB != 'true' && matrix.package }}
+        run: |
+          mkdir -p artifacts
+          if [ -f "LICENSE.md" ]; then
+            cp LICENSE.md ${{ matrix.path }}/LICENSE.md
+            echo "✅ Copied LICENSE.md to ${{ matrix.path }}/"
+          fi
+          tar -czf artifacts/${{ matrix.name }}.tar.gz \
+            -C ${{ matrix.path }} \
+            --exclude=node_modules \
+            --exclude=.git \
+            .
+
+      - name: Upload build artifact
+        if: ${{ env.SKIP_JOB != 'true' && matrix.build }}
+        uses: actions/upload-artifact@v6
+        with:
+          name: ${{ matrix.name }}-dist
+          path: ${{ matrix.path }}/dist
+          if-no-files-found: error
+
+      - name: Upload packaged artifact
+        if: ${{ env.SKIP_JOB != 'true' && matrix.package }}
+        uses: actions/upload-artifact@v6
+        with:
+          name: ${{ matrix.name }}-package
+          path: artifacts/${{ matrix.name }}.tar.gz
+          if-no-files-found: error
+
+      - name: Save build metadata
+        if: ${{ env.SKIP_JOB != 'true' && matrix.name == 'socket-server' }}
+        run: |
+          mkdir -p build-metadata
+          echo "${{ github.sha }}" > build-metadata/commit-sha.txt
+          echo "${{ github.run_id }}" > build-metadata/run-id.txt
+          echo "${{ github.run_number }}" > build-metadata/run-number.txt
+          echo "Build timestamp: $(date -u)" > build-metadata/build-time.txt
+
+      - name: Upload build metadata
+        if: ${{ env.SKIP_JOB != 'true' && matrix.name == 'socket-server' }}
+        uses: actions/upload-artifact@v6
+        with:
+          name: build-metadata-socket-server
+          path: build-metadata/
+          retention-days: 1
+
+      - name: Prepare Pages site
+        if: ${{ env.SKIP_JOB != 'true' && matrix.name == 'web-client' }}
+        run: |
+          mkdir -p pages-site
+          rsync -a \
+            --exclude 'node_modules' \
+            --exclude 'Dockerfile*' \
+            --exclude 'docker-compose.yml' \
+            --exclude 'Makefile' \
+            --exclude 'package.json' \
+            --exclude 'package-lock.json' \
+            --exclude 'DESIGN.md' \
+            --exclude 'build.sh' \
+            --exclude 'vite.config.js' \
+            --exclude '.gitignore' \
+            --exclude '.DS_Store' \
+            --exclude 'js/tests' \
+            "${{ matrix.path }}/" pages-site/
+          
+          # Include seed files
+          mkdir -p pages-site/.seed pages-site/data
+          [ -f "${{ matrix.path }}/.seed/random-seed.json" ] && cp "${{ matrix.path }}/.seed/random-seed.json" pages-site/.seed/ && cp "${{ matrix.path }}/.seed/random-seed.json" pages-site/data/seed.json
+          [ -f "${{ matrix.path }}/.seed/seed.js" ] && cp "${{ matrix.path }}/.seed/seed.js" pages-site/.seed/
+
+      - name: Copy data files to Pages site
+        if: ${{ env.SKIP_JOB != 'true' && matrix.name == 'web-client' }}
+        run: |
+          echo "📂 Copying data files to Pages site..."
+          [ -f "LICENSE.md" ] && cp LICENSE.md pages-site/LICENSE.md
+          
+          # Copy wiki.json
+          for src in "data/wiki.json" "misc/wiki.json" "${{ matrix.path }}/data/wiki.json"; do
+            if [ -f "$src" ]; then
+              cp "$src" pages-site/wiki.json
+              cp "$src" pages-site/data/wiki.json
+              echo "✅ Copied $src"
+              break
+            fi
+          done
+          
+          # Copy region files
+          for src_dir in "data/regions" "misc/regions" "${{ matrix.path }}/data/regions" "${{ matrix.path }}/regions"; do
+            [ -d "$src_dir" ] && cp -r "$src_dir"/* pages-site/regions/ 2>/dev/null || true
+          done
+          
+          # Copy faction files
+          for src_dir in "data/factions" "misc/factions" "${{ matrix.path }}/data/factions" "${{ matrix.path }}/factions"; do
+            [ -d "$src_dir" ] && cp -r "$src_dir"/* pages-site/factions/ 2>/dev/null || true
+          done
+          
+          # Copy patron files
+          for src_dir in "data/patrons" "misc/patrons" "${{ matrix.path }}/data/patrons"; do
+            [ -d "$src_dir" ] && cp -r "$src_dir"/* pages-site/data/patrons/ 2>/dev/null || true
+          done
+
+      - name: Upload Pages artifact
+        if: ${{ env.SKIP_JOB != 'true' && matrix.name == 'web-client' }}
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: pages-site
