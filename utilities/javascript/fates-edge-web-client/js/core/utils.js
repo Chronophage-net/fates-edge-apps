@@ -562,6 +562,32 @@ export function deepClone(obj) {
 // ============================================================
 
 /**
+ * Format a date with custom formatting
+ * @param {Date|string|number} date - Date to format
+ * @param {string} format - Format string (default: 'YYYY-MM-DD HH:mm:ss')
+ * @returns {string} Formatted date string
+ */
+export function formatDate(date, format = 'YYYY-MM-DD HH:mm:ss') {
+    const d = new Date(date);
+    if (isNaN(d.getTime())) return 'Invalid date';
+    
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    const hours = String(d.getHours()).padStart(2, '0');
+    const minutes = String(d.getMinutes()).padStart(2, '0');
+    const seconds = String(d.getSeconds()).padStart(2, '0');
+    
+    return format
+        .replace('YYYY', year)
+        .replace('MM', month)
+        .replace('DD', day)
+        .replace('HH', hours)
+        .replace('mm', minutes)
+        .replace('ss', seconds);
+}
+
+/**
  * Get time ago string (e.g., "2 hours ago")
  * @param {Date|string|number} date - Date to format
  * @returns {string} Time ago string
@@ -853,6 +879,7 @@ const Utils = {
     deepClone,
     
     // Date
+    formatDate,
     timeAgo,
     formatDuration,
     

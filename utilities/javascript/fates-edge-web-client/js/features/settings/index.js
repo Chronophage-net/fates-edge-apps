@@ -13,7 +13,7 @@ import {
     addCharacter  // ← Add this here
 } from '../../core/state.js';
 import { checkPasswordGate, hashPassword } from '../../core/password.js';
-import { escHtml, formatDate } from '../../core/utils.js';  // ← Remove addCharacter from here
+import { escHtml } from '../../core/utils.js';  // ← Remove addCharacter from here
 import { showToast } from '../../components/Toast.js';
 import { getUserAvatar } from '../../core/gravatar.js';
 import { 
