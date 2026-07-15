@@ -46,7 +46,7 @@ jobs:
 
     steps:
       # ============================================================
-      # 1. DOWNLOAD ARTIFACT (if called from build workflow)
+      # 1. DOWNLOAD & EXTRACT ARTIFACT (if called from build workflow)
       # ============================================================
       - name: Download socket server package
         if: github.event_name == 'workflow_call'
@@ -55,20 +55,38 @@ jobs:
           name: socket-server-package
           path: socket-server-package-download
 
-      - name: Extract downloaded artifact
+      - name: Debug - List download directory
         if: github.event_name == 'workflow_call'
         run: |
+          echo "📂 Contents of socket-server-package-download:"
+          ls -la socket-server-package-download/ || echo "Directory does not exist"
+          echo "🔍 Current working directory:"
+          pwd
+
+      - name: Extract downloaded artifact
+        if: github.event_name == 'workflow_call'
+        id: extract
+        run: |
           mkdir -p socket-server-deploy
-          if [ -f "socket-server-package-download/socket-server.tar.gz" ]; then
-            tar -xzf "socket-server-package-download/socket-server.tar.gz" -C socket-server-deploy
-            echo "✅ Extracted socket server package"
-            rm -rf socket-server-package-download
+          # Find any .tar.gz file in the download directory
+          TAR_FILE=$(find socket-server-package-download -name "*.tar.gz" | head -1)
+          if [ -n "$TAR_FILE" ]; then
+            echo "📦 Extracting $TAR_FILE ..."
+            tar -xzf "$TAR_FILE" -C socket-server-deploy
+            echo "✅ Extracted successfully"
             echo "downloaded=true" >> "$GITHUB_OUTPUT"
           else
-            echo "⚠️ No tar.gz found in downloaded artifact"
+            echo "⚠️ No .tar.gz found in downloaded artifact"
             echo "downloaded=false" >> "$GITHUB_OUTPUT"
           fi
-        id: extract
+          # Clean up download folder to save space
+          rm -rf socket-server-package-download
+
+      - name: Debug - List extracted directory
+        if: github.event_name == 'workflow_call'
+        run: |
+          echo "📂 Contents of socket-server-deploy after extraction:"
+          ls -la socket-server-deploy/ || echo "Directory does not exist"
 
       # ============================================================
       # 2. FALLBACK: BUILD FROM SOURCE (if no artifact or manual run)
@@ -89,32 +107,53 @@ jobs:
         run: |
           npm ci
           
-          # Create temporary directory outside the source
-          mkdir -p ../deploy-temp
+          # Create a clean deployment directory in the repo root
+          DEPLOY_DIR="../../socket-server-deploy"
+          rm -rf "$DEPLOY_DIR"
+          mkdir -p "$DEPLOY_DIR"
           
-          # Copy all contents except node_modules and .git
-          rsync -a --exclude='node_modules' --exclude='.git' ./ ../deploy-temp/
+          # Copy all files except node_modules and .git
+          # Use find to avoid copying the destination if it somehow appears
+          find . -not -path "./node_modules/*" -not -path "./.git/*" -type f -exec cp --parents {} "$DEPLOY_DIR" \;
+          # Copy directories structure (cp -r without self-copy)
+          rsync -a --exclude='node_modules' --exclude='.git' ./ "$DEPLOY_DIR/"
           
           # Copy data files from repo root if they exist
           if [ -d "../../data" ]; then
-            mkdir -p ../deploy-temp/data
-            cp -r ../../data/* ../deploy-temp/data/ 2>/dev/null || true
+            mkdir -p "$DEPLOY_DIR/data"
+            cp -r ../../data/* "$DEPLOY_DIR/data/" 2>/dev/null || true
           fi
           
-          # Move temp to the expected location in repo root
-          rm -rf ../socket-server-deploy
-          mv ../deploy-temp ../socket-server-deploy
+          echo "✅ Fallback build complete"
 
-      # ============================================================
-      # 3. PREPARE DEPLOYMENT PACKAGE
-      # ============================================================
-      - name: Prepare deployment artifact
+      - name: Debug - Check fallback build result
+        if: github.event_name == 'workflow_dispatch' || steps.extract.outputs.downloaded == 'false'
         run: |
-          if [ ! -d "socket-server-deploy" ]; then
-            echo "⚠️ Socket server build not found. Skipping deployment."
+          echo "📂 Checking socket-server-deploy after fallback build:"
+          if [ -d "socket-server-deploy" ]; then
+            ls -la socket-server-deploy/ | head -20
+          else
+            echo "❌ socket-server-deploy still missing!"
             exit 1
           fi
-          
+
+      # ============================================================
+      # 3. FINAL CHECK & PREPARE DEPLOYMENT PACKAGE
+      # ============================================================
+      - name: Final check before packaging
+        run: |
+          if [ ! -d "socket-server-deploy" ]; then
+            echo "❌ socket-server-deploy does not exist. Aborting."
+            exit 1
+          fi
+          if [ -z "$(ls -A socket-server-deploy)" ]; then
+            echo "❌ socket-server-deploy is empty. Aborting."
+            exit 1
+          fi
+          echo "✅ socket-server-deploy found and not empty."
+
+      - name: Prepare deployment artifact
+        run: |
           echo "📦 Preparing deployment package..."
           cd socket-server-deploy
           tar -czf ../socket-server.tar.gz .
@@ -163,7 +202,7 @@ jobs:
           sleep 60
           
           URL="https://fates-edge-socket-server.onrender.com"
-          MAX_RETRIES=20
+          MAX_RETRIES=30
           RETRY_COUNT=0
           
           while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
