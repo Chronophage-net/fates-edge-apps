@@ -73,14 +73,30 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
 
+      # ============================================================
+      # FIXED: Build socket server (fallback)
+      # ============================================================
       - name: Build socket server (fallback)
         if: github.event_name == 'workflow_dispatch' || steps.check-artifact.outputs.downloaded == 'false'
         working-directory: utilities/javascript/fates-edge-socket-server
         run: |
           npm ci
-          mkdir -p socket-server-deploy
-          cp -r ./* socket-server-deploy/
-          [ -d "../../../data" ] && cp -r ../../../data/* socket-server-deploy/data/ 2>/dev/null || true
+          
+          # Create a temporary directory outside the source
+          mkdir -p ../deploy-temp
+          
+          # Copy all contents except node_modules and .git
+          rsync -a --exclude='node_modules' --exclude='.git' ./ ../deploy-temp/
+          
+          # Copy data files from repo root if they exist
+          if [ -d "../../data" ]; then
+            mkdir -p ../deploy-temp/data
+            cp -r ../../data/* ../deploy-temp/data/ 2>/dev/null || true
+          fi
+          
+          # Move temp to the expected location in repo root
+          rm -rf ../socket-server-deploy
+          mv ../deploy-temp ../socket-server-deploy
 
       - name: Prepare deployment artifact
         run: |
