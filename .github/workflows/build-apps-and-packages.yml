@@ -329,3 +329,20 @@ jobs:
       contents: read
       pages: write
       id-token: write
+  # ============================================================
+  # DEPLOY RENDER JOB (Calls the reusable Render workflow)
+  # ============================================================
+  deploy-render:
+    name: Trigger Render Deployment
+    needs: build
+    if: >
+      success() && (
+        github.event_name == 'push' || 
+        github.event_name == 'workflow_dispatch'
+      )
+    uses: ./.github/workflows/deploy-socket-server-to-render.yml
+    with:
+      environment: production
+    permissions:
+      contents: read
+      actions: read

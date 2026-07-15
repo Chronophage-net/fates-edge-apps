@@ -1,11 +1,12 @@
 name: Deploy Socket Server to Render
 
 on:
-  workflow_run:
-    workflows: ["Build Apps and Packages"]
-    types:
-      - completed
-    branches: [main]
+  workflow_call:
+    inputs:
+      environment:
+        type: string
+        required: false
+        default: 'production'
   workflow_dispatch:
     inputs:
       environment:
@@ -21,7 +22,7 @@ on:
         default: false
 
 env:
-  NODE_VERSION: 22  # ← Match the build workflow
+  NODE_VERSION: 22
 
 permissions:
   contents: read
@@ -34,23 +35,22 @@ jobs:
     timeout-minutes: 15
     
     if: >
-      (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success') ||
-      github.event_name == 'workflow_dispatch'
+      always() && (
+        github.event_name == 'workflow_call' || 
+        github.event_name == 'workflow_dispatch'
+      )
 
     environment:
-      name: ${{ github.event.inputs.environment || 'production' }}
+      name: ${{ inputs.environment || github.event.inputs.environment || 'production' }}
       url: https://fates-edge-socket-server.onrender.com
 
     steps:
       - name: Download socket server package
-        if: github.event_name == 'workflow_run'
-        uses: actions/download-artifact@v6
+        if: github.event_name == 'workflow_call'
+        uses: actions/download-artifact@v4
         with:
           name: socket-server-package
           path: socket-server-deploy
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          run-id: ${{ github.event.workflow_run.id }}
-        continue-on-error: true
 
       - name: Check if artifact was downloaded
         id: check-artifact
@@ -65,13 +65,13 @@ jobs:
 
       - name: Checkout and build socket server (fallback)
         if: github.event_name == 'workflow_dispatch' || steps.check-artifact.outputs.downloaded == 'false'
-        uses: actions/checkout@v5
+        uses: actions/checkout@v4
 
       - name: Setup Node
         if: github.event_name == 'workflow_dispatch' || steps.check-artifact.outputs.downloaded == 'false'
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@v4
         with:
-          node-version: ${{ env.NODE_VERSION }}  # ← Use 22
+          node-version: ${{ env.NODE_VERSION }}
 
       - name: Build socket server (fallback)
         if: github.event_name == 'workflow_dispatch' || steps.check-artifact.outputs.downloaded == 'false'
@@ -80,7 +80,6 @@ jobs:
           npm ci
           mkdir -p socket-server-deploy
           cp -r ./* socket-server-deploy/
-          # Copy data files if they exist
           [ -d "../../../data" ] && cp -r ../../../data/* socket-server-deploy/data/ 2>/dev/null || true
 
       - name: Prepare deployment artifact
@@ -103,15 +102,11 @@ jobs:
         run: |
           if [ -z "$RENDER_API_KEY" ] || [ -z "$RENDER_SERVICE_ID" ]; then
             echo "⚠️ Render secrets not configured. Skipping deployment."
-            echo "To enable, add RENDER_API_KEY and RENDER_SOCKET_SERVICE_ID to GitHub secrets."
             exit 0
           fi
           
-          echo "🚀 Deploying socket server to Render (${{ github.event.inputs.environment || 'production' }})..."
-          echo "Service ID: $RENDER_SERVICE_ID"
+          echo "🚀 Deploying socket server to Render (${{ inputs.environment || github.event.inputs.environment || 'production' }})..."
           
-          # Trigger deployment via Render API
-          # Valid values: "clear" or "do_not_clear"
           RESPONSE=$(curl -s -X POST \
             -H "Authorization: Bearer $RENDER_API_KEY" \
             -H "Content-Type: application/json" \
@@ -124,24 +119,19 @@ jobs:
             DEPLOY_ID=$(echo "$RESPONSE" | grep -o '"id":"[^"]*"' | head -1 | cut -d'"' -f4)
             echo "✅ Deployment triggered successfully!"
             echo "Deploy ID: $DEPLOY_ID"
-            echo "📊 Dashboard: https://dashboard.render.com/web/$RENDER_SERVICE_ID/deploys/$DEPLOY_ID"
           else
             ERROR_MSG=$(echo "$RESPONSE" | grep -o '"message":"[^"]*"' | head -1 | cut -d'"' -f4)
-            if [ -n "$ERROR_MSG" ]; then
-              echo "❌ Deployment failed: $ERROR_MSG"
-            else
-              echo "❌ Deployment failed. Response: $RESPONSE"
-            fi
+            echo "❌ Deployment failed: $ERROR_MSG"
             exit 1
           fi
 
       - name: Verify deployment
         run: |
           echo "⏳ Waiting for service to be ready..."
-          sleep 60  # Give it a full minute before checking
+          sleep 60
           
           URL="https://fates-edge-socket-server.onrender.com"
-          MAX_RETRIES=20  # Increased from 10
+          MAX_RETRIES=20
           RETRY_COUNT=0
           
           while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
@@ -158,15 +148,3 @@ jobs:
           done
           
           echo "⚠️ Service may not be ready yet. Check manually at: $URL/api/health"
-          echo "📊 Dashboard: https://dashboard.render.com/web/${{ secrets.RENDER_SOCKET_SERVICE_ID }}"
-
-      - name: Deployment Summary
-        if: always()
-        run: |
-          echo "========================================="
-          echo "📊 DEPLOYMENT COMPLETE"
-          echo "========================================="
-          echo "Environment: ${{ github.event.inputs.environment || 'production' }}"
-          echo "URL: https://fates-edge-socket-server.onrender.com"
-          echo "Dashboard: https://dashboard.render.com/web/${{ secrets.RENDER_SOCKET_SERVICE_ID }}"
-          echo "========================================="
