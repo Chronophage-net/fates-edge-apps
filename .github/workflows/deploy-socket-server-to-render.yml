@@ -138,26 +138,27 @@ jobs:
       - name: Verify deployment
         run: |
           echo "⏳ Waiting for service to be ready..."
-          sleep 30
+          sleep 60  # Give it a full minute before checking
           
           URL="https://fates-edge-socket-server.onrender.com"
-          for i in {1..10}; do
+          MAX_RETRIES=20  # Increased from 10
+          RETRY_COUNT=0
+          
+          while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
+            RETRY_COUNT=$((RETRY_COUNT + 1))
             STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$URL/api/health" || echo "000")
+            
             if [ "$STATUS" = "200" ]; then
-              echo "✅ Health check passed!"
+              echo "✅ Health check passed! Service is ready."
               exit 0
             fi
-            echo "⏳ Attempt $i/10: Waiting for service... (status: $STATUS)"
-            sleep 10
+            
+            echo "⏳ Attempt $RETRY_COUNT/$MAX_RETRIES: Waiting for service... (status: $STATUS)"
+            sleep 15
           done
           
           echo "⚠️ Service may not be ready yet. Check manually at: $URL/api/health"
-          
-          # Check if service is at least responding
-          if curl -s -o /dev/null -w "%{http_code}" "$URL" | grep -q "200\|301\|302"; then
-            echo "✅ Service is responding (may still be starting up)"
-            exit 0
-          fi
+          echo "📊 Dashboard: https://dashboard.render.com/web/${{ secrets.RENDER_SOCKET_SERVICE_ID }}"
 
       - name: Deployment Summary
         if: always()

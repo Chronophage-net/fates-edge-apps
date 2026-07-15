@@ -374,6 +374,16 @@ function broadcastToRoom(roomCode, event, data) {
 // ============================================================
 
 // Health check with detailed stats
+
+app.get('/healthz', (req, res) => {
+    res.status(200).send('OK');
+});
+
+app.get('/api/healthz', (req, res) => {
+    res.status(200).send('OK');
+});
+
+
 app.get('/api/health', (req, res) => {
     const roomStats = Array.from(rooms.keys()).map(code => getRoomStats(code)).filter(Boolean);
     res.json({

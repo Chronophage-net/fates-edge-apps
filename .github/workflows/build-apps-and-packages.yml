@@ -27,7 +27,7 @@ on:
         description: 'Version tag for release (e.g., v1.2.0)'
 
 env:
-  NODE_VERSION: 22          # ← changed to LTS version for stability
+  NODE_VERSION: 22
 
 permissions:
   contents: read
@@ -48,7 +48,7 @@ jobs:
         include:
           - name: web-client
             path: utilities/javascript/fates-edge-web-client
-            needs_node: true      # ← FIX: Node is required for seed generation
+            needs_node: true
             build: false
             package: false
           - name: socket-server
