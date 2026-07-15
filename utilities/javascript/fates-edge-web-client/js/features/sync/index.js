@@ -8,7 +8,10 @@ let currentCampaignCode = null;
 
 export function renderSyncUI() {
     const panel = document.getElementById('sync-panel');
-    if (!panel) return;
+    if (!panel) {
+        console.warn('[Sync] Sync panel not found');
+        return;
+    }
     
     // Load saved settings
     const savedUrl = localStorage.getItem('fates-edge-sync-url') || 'ws://localhost:3000';
@@ -27,9 +30,9 @@ export function renderSyncUI() {
     // Connect button handler
     if (connectBtn) {
         connectBtn.addEventListener('click', async () => {
-            const url = urlInput.value.trim();
-            const code = codeInput.value.trim().toUpperCase();
-            const password = passInput.value.trim();
+            const url = urlInput ? urlInput.value.trim() : '';
+            const code = codeInput ? codeInput.value.trim().toUpperCase() : '';
+            const password = passInput ? passInput.value.trim() : '';
             
             if (!url) {
                 showToast('Please enter a server URL.', 'error');
@@ -44,23 +47,27 @@ export function renderSyncUI() {
             localStorage.setItem('fates-edge-sync-url', url);
             localStorage.setItem('fates-edge-sync-code', code);
             
-            connectBtn.disabled = true;
-            connectBtn.textContent = 'Connecting…';
+            if (connectBtn) {
+                connectBtn.disabled = true;
+                connectBtn.textContent = 'Connecting…';
+            }
             
             try {
                 await syncManager.connect(url, code, password);
                 isConnected = true;
                 currentCampaignCode = code;
-                connectBtn.style.display = 'none';
-                disconnectBtn.style.display = 'inline-flex';
+                if (connectBtn) connectBtn.style.display = 'none';
+                if (disconnectBtn) disconnectBtn.style.display = 'inline-flex';
                 updateStatusUI('connected', code);
                 showToast('Connected to campaign!', 'success');
             } catch (e) {
-                showToast('Connection failed: ' + e.message, 'error');
+                showToast('Connection failed: ' + (e.message || 'Unknown error'), 'error');
                 updateStatusUI('error', null);
             } finally {
-                connectBtn.disabled = false;
-                connectBtn.textContent = '🔗 Connect';
+                if (connectBtn) {
+                    connectBtn.disabled = false;
+                    connectBtn.textContent = '🔗 Connect';
+                }
             }
         });
     }
@@ -71,8 +78,8 @@ export function renderSyncUI() {
             syncManager.disconnect();
             isConnected = false;
             currentCampaignCode = null;
-            connectBtn.style.display = 'inline-flex';
-            disconnectBtn.style.display = 'none';
+            if (connectBtn) connectBtn.style.display = 'inline-flex';
+            if (disconnectBtn) disconnectBtn.style.display = 'none';
             updateStatusUI('disconnected', null);
             showToast('Disconnected.', 'info');
         });
@@ -93,36 +100,40 @@ export function renderSyncUI() {
     
     // Listen for sync events
     syncManager.on('connection_change', (status) => {
-        isConnected = status.connected;
-        if (status.connected) {
-            currentCampaignCode = status.campaignCode;
-            connectBtn.style.display = 'none';
-            disconnectBtn.style.display = 'inline-flex';
+        isConnected = status ? status.connected : false;
+        if (status && status.connected) {
+            currentCampaignCode = status.campaignCode || null;
+            if (connectBtn) connectBtn.style.display = 'none';
+            if (disconnectBtn) disconnectBtn.style.display = 'inline-flex';
             updateStatusUI('connected', status.campaignCode);
         } else {
             currentCampaignCode = null;
-            connectBtn.style.display = 'inline-flex';
-            disconnectBtn.style.display = 'none';
+            if (connectBtn) connectBtn.style.display = 'inline-flex';
+            if (disconnectBtn) disconnectBtn.style.display = 'none';
             updateStatusUI('disconnected', null);
         }
     });
     
     syncManager.on('presence_update', (data) => {
-        updatePresenceUI(data.clients);
+        if (data && data.clients) {
+            updatePresenceUI(data.clients);
+        } else {
+            updatePresenceUI([]);
+        }
     });
     
     // Check if we're already connected (restore state)
-    if (syncManager.isConnected && syncManager.campaignCode) {
+    if (syncManager && syncManager.isConnected && syncManager.campaignCode) {
         isConnected = true;
         currentCampaignCode = syncManager.campaignCode;
-        connectBtn.style.display = 'none';
-        disconnectBtn.style.display = 'inline-flex';
+        if (connectBtn) connectBtn.style.display = 'none';
+        if (disconnectBtn) disconnectBtn.style.display = 'inline-flex';
         updateStatusUI('connected', syncManager.campaignCode);
     }
     
     // Update presence if already connected
-    if (isConnected) {
-        const clients = syncManager.getClients?.() || [];
+    if (isConnected && syncManager && typeof syncManager.getClients === 'function') {
+        const clients = syncManager.getClients() || [];
         updatePresenceUI(clients);
     }
 }
@@ -133,7 +144,7 @@ function updateStatusUI(state, code) {
     
     switch (state) {
         case 'connected':
-            statusEl.innerHTML = `🟢 Connected to <strong>${code}</strong>`;
+            statusEl.innerHTML = `🟢 Connected to <strong>${code || 'Unknown'}</strong>`;
             statusEl.style.color = 'var(--green)';
             break;
         case 'disconnected':
@@ -160,13 +171,19 @@ function updatePresenceUI(clients) {
     }
     
     presenceEl.innerHTML = clients.map(client => {
-        const isYou = client.id === syncManager.clientId;
+        const isYou = client && syncManager && client.id === syncManager.clientId;
+        const status = client && client.status || 'offline';
+        const isOnline = status === 'online';
+        const name = client && client.name || 'Unknown';
+        const role = client && client.role || 'player';
+        const isAway = status === 'away';
+        
         return `
             <div style="display:flex;align-items:center;gap:0.5rem;padding:0.2rem 0;border-bottom:1px solid var(--border);">
-                <span class="status-dot" style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${client.status === 'online' ? 'var(--green)' : 'var(--red)'};"></span>
-                <span style="font-weight:${isYou ? '600' : '400'};">${client.name} ${isYou ? '(you)' : ''}</span>
-                <span class="text-muted small">${client.role || 'player'}</span>
-                ${client.status === 'away' ? '<span class="text-muted small">(away)</span>' : ''}
+                <span class="status-dot" style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${isOnline ? 'var(--green)' : 'var(--red)'};"></span>
+                <span style="font-weight:${isYou ? '600' : '400'};">${name} ${isYou ? '(you)' : ''}</span>
+                <span class="text-muted small">${role}</span>
+                ${isAway ? '<span class="text-muted small">(away)</span>' : ''}
             </div>
         `;
     }).join('');

@@ -5,27 +5,13 @@
 
 // Now the imports
 import { vttStore } from '../../core/vtt-store.js';
-import { escHtml, assert } from '../../core/utils.js';
+import { escHtml } from '../../core/utils.js';
 import { isConnectedToServer } from '../../core/websocket.js';
 
 // ============================================================
 // ASSERT helper (missing)
 // ============================================================
 
-/**
- * Simple assert function for development
- * @param {boolean} condition - The condition to check
- * @param {string} message - Error message if condition fails
- * @throws {Error} If condition is false
- *
-function assert(condition, message) {
-    if (!condition) {
-        const error = new Error(message || 'Assertion failed');
-        console.error('[VTT Core] Assertion failed:', error);
-        throw error;
-    }
-}
-*/
 // ============================================================
 // Configuration
 // ============================================================

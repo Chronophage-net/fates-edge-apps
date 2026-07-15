@@ -9,7 +9,7 @@ import { vttStore } from '../../core/vtt-store.js';
 import { getState, clearChatHistory, getCharacter } from '../../core/state.js';
 import { performRoll } from '../../core/dice.js';
 import { showToast } from '../../components/Toast.js';
-import { escHtml, assert } from '../../core/utils.js';
+import { escHtml } from '../../core/utils.js';
 import {
     isConnectedToServer,
     syncState,

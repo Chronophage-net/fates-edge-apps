@@ -4,12 +4,6 @@
  * Uses the core dice engine for all rolling logic
  * Supports deterministic RNG for static sites
  */// ASSERT FIX - must be before any imports
-const assert = (condition, message) => {
-    if (!condition) {
-        throw new Error(message || 'Assertion failed');
-    }
-};
-
 // Now the imports
 import { escHtml, safeParseInt } from '../../core/utils.js';
 import { addRoll, getState, saveState } from '../../core/state.js';

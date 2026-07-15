@@ -13,14 +13,6 @@
  * @param {string} message - Error message if condition fails
  * @throws {Error} If condition is false
  */
-export function assert(condition, message) {
-    if (!condition) {
-        const error = new Error(message || 'Assertion failed');
-        console.error('[Assert]', error);
-        throw error;
-    }
-}
-
 export function buildDocumentUrl(path) {
     if (path.startsWith('http://') || path.startsWith('https://')) {
         return path;
