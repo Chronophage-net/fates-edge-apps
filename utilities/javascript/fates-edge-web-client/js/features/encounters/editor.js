@@ -5,15 +5,13 @@
  */
 
 import { 
-    getState, 
-    getCharacter, 
-    addCharacter, 
-    updateCharacter, 
+    getState,  
     generateId,
     escHtml, 
     safeParseInt, 
     clamp 
 } from '../../core/utils.js';
+import { addCharacter, getCharacter, updateCharacter} from '../../core/state.js';
 import { ALL_SKILLS, defaultSkills } from '../../core/dice.js';
 import { showToast } from '../../components/Toast.js';
 

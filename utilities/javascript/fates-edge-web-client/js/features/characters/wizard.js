@@ -5,12 +5,12 @@
 
 import { 
     getState, 
-    addCharacter, 
     generateId,
     escHtml, 
     safeParseInt, 
     clamp 
 } from '../../core/utils.js';
+import { addCharacter} from '../../core/state.js';
 import { ALL_SKILLS, defaultSkills } from '../../core/dice.js';
 import { showToast } from '../../components/Toast.js';
 // ============================================================
