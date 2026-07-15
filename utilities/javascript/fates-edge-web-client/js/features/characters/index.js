@@ -3,11 +3,18 @@
  * Manages character creation, editing, and talent catalogue
  */
 
-import { getState, getCharacter, addCharacter, updateCharacter, 
-         deleteCharacter, saveState, generateId } from '../../core/state.js';
+import { 
+    getState, 
+    getCharacter, 
+    addCharacter, 
+    updateCharacter, 
+    deleteCharacter, 
+    saveState, 
+    generateId,
+    escHtml 
+} from '../../core/utils.js';
 import { createCharacterCard } from '../../components/CharacterCard.js';
 import { showToast } from '../../components/Toast.js';
-import { escHtml } from '../../core/utils.js';
 
 let container = null;
 let talentPanelVisible = false;

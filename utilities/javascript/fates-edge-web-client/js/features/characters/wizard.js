@@ -3,11 +3,16 @@
  * FIXED: Proper step management, data persistence, and validation
  */
 
-import { getState, addCharacter, generateId } from '../../core/state.js';
+import { 
+    getState, 
+    addCharacter, 
+    generateId,
+    escHtml, 
+    safeParseInt, 
+    clamp 
+} from '../../core/utils.js';
 import { ALL_SKILLS, defaultSkills } from '../../core/dice.js';
-import { escHtml, safeParseInt, clamp } from '../../core/utils.js';
 import { showToast } from '../../components/Toast.js';
-
 // ============================================================
 // STATE
 // ============================================================
