@@ -1415,11 +1415,11 @@ export async function onRegionChange(regionNameOrCallback, callback) {
 /**
  * Get the current deck seed
  * @returns {string|null} Current seed or null if not set
- */
-export function getDeckSeed() {
-    return _seed;
-}
-
+ *
+ * export function getDeckSeed() {
+ *   return _seed;
+ * }
+*?
 /**
  * Set the deck seed for deterministic shuffles
  * @param {string|null} seed - The seed to use, or null to use random
