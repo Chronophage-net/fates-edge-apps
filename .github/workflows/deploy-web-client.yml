@@ -46,46 +46,64 @@ jobs:
         if: github.event_name == 'workflow_run'
         uses: actions/download-artifact@v6
         with:
-          name: web-client-dist
-          path: web-client
+          name: web-client-pages-site
+          path: pages-site
           github-token: ${{ secrets.GITHUB_TOKEN }}
           run-id: ${{ github.event.workflow_run.id }}
         continue-on-error: true
 
-      - name: Checkout and build web client
+      - name: Checkout web client source
         if: github.event_name == 'workflow_dispatch'
         uses: actions/checkout@v5
 
-      - name: Setup Node
-        if: github.event_name == 'workflow_dispatch'
-        uses: actions/setup-node@v6
-        with:
-          node-version: 24
-
-      - name: Build web client
-        if: github.event_name == 'workflow_dispatch'
-        working-directory: utilities/javascript/fates-edge-web-client
-        run: |
-          npm ci
-          npm run build
-
-      - name: Prepare Pages site
+      - name: Prepare static site for Pages
         if: github.event_name == 'workflow_dispatch'
         run: |
           mkdir -p pages-site
-          cp -r utilities/javascript/fates-edge-web-client/dist/* pages-site/ || cp -r utilities/javascript/fates-edge-web-client/* pages-site/
           
-          # Copy data files
-          [ -f "data/wiki.json" ] && cp data/wiki.json pages-site/
-          [ -d "data/regions" ] && cp -r data/regions pages-site/
-          [ -d "data/factions" ] && cp -r data/factions pages-site/
-          [ -d "data/patrons" ] && cp -r data/patrons pages-site/data/
+          # Copy the entire web client directory (it's already static)
+          cp -r utilities/javascript/fates-edge-web-client/* pages-site/
+          
+          # Copy data files from the repository root
+          echo "📂 Copying data files to Pages site..."
+          
+          # Wiki
+          [ -f "data/wiki.json" ] && cp data/wiki.json pages-site/ || true
+          [ -f "misc/wiki.json" ] && cp misc/wiki.json pages-site/ || true
+          
+          # Regions
+          for src in "data/regions" "misc/regions" "utilities/javascript/fates-edge-web-client/regions"; do
+            [ -d "$src" ] && cp -r "$src" pages-site/regions 2>/dev/null || true
+          done
+          
+          # Factions
+          for src in "data/factions" "misc/factions" "utilities/javascript/fates-edge-web-client/factions"; do
+            [ -d "$src" ] && cp -r "$src" pages-site/factions 2>/dev/null || true
+          done
+          
+          # Patrons
+          for src in "data/patrons" "misc/patrons"; do
+            [ -d "$src" ] && cp -r "$src" pages-site/data/patrons 2>/dev/null || true
+          done
+          
+          # Seed files
+          [ -f "data/seed.json" ] && cp data/seed.json pages-site/ || true
+          [ -f "data/seed.js" ] && cp data/seed.js pages-site/ || true
+          
+          echo "✅ Static site prepared for deployment"
 
-      - name: Use downloaded artifact
-        if: github.event_name == 'workflow_run'
+      - name: Verify pages-site contents
+        if: github.event_name == 'workflow_dispatch'
         run: |
-          mkdir -p pages-site
-          cp -r web-client/* pages-site/
+          echo "📂 Pages site contents:"
+          ls -la pages-site/ | head -20
+          echo ""
+          echo "📄 Checking for index.html..."
+          if [ -f "pages-site/index.html" ]; then
+            echo "✅ index.html found"
+          else
+            echo "⚠️ index.html not found - this might be a problem"
+          fi
 
       - name: Deploy to GitHub Pages
         id: deployment
