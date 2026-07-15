@@ -10,10 +10,10 @@ import {
     getBaseUrl,
     setPasswordHash,
     saveState,
-    addCharacter  // ← Add this here
+    addCharacter
 } from '../../core/state.js';
 import { checkPasswordGate, hashPassword } from '../../core/password.js';
-import { escHtml, formatDate } from '../../core/utils.js';  // ← Remove addCharacter from here
+import { escHtml, formatDate } from '../../core/utils.js';
 import { showToast } from '../../components/Toast.js';
 import { getUserAvatar } from '../../core/gravatar.js';
 import { 
@@ -118,6 +118,15 @@ FATE'S EDGE — LICENSE SUMMARY
 `;
 
 // ============================================================
+// DEFAULT CONFIGURATION
+// ============================================================
+
+// Default WebSocket server URL - uses your Render.com deployment
+const DEFAULT_WS_URL = 'wss://fates-edge-socket-server.onrender.com';
+const DEFAULT_WS_ROOM = 'vtt-room';
+const DEFAULT_SERVER_URL = 'https://fates-edge-socket-server.onrender.com';
+
+// ============================================================
 // RENDER
 // ============================================================
 
@@ -127,8 +136,8 @@ export function render(el) {
     const archives = getArchives();
     const settings = state.settings || {};
     
-    // Get stored settings
-    const serverUrl = localStorage.getItem('fates-edge-server-url') || 'http://localhost:3000';
+    // Get stored settings with new defaults
+    const serverUrl = localStorage.getItem('fates-edge-server-url') || DEFAULT_SERVER_URL;
     const userEmail = localStorage.getItem('fates-edge-user-email') || '';
     const userName = localStorage.getItem('fates-edge-client-name') || '';
     const showAvatars = localStorage.getItem('fates-edge-show-avatars') !== 'false';
@@ -206,21 +215,21 @@ export function render(el) {
              ============================================================ -->
         <div class="panel settings-panel">
             <h3>🔗 WebSocket Connection</h3>
-            <p class="text-muted small">Configure the WebSocket server for real-time VTT features.</p>
+            <p class="text-muted small">Configure the WebSocket server for real-time VTT features. Default: <strong>${DEFAULT_WS_URL}</strong></p>
             
             <div class="form-row">
                 <div class="field" style="flex:3;">
                     <label>WebSocket Server URL</label>
                     <input type="text" id="settings-ws-url" 
-                           value="${escHtml(settings.wsUrl || 'wss://fates-edge-ws.onrender.com')}" 
-                           placeholder="wss://your-websocket-server.com" />
+                           value="${escHtml(settings.wsUrl || DEFAULT_WS_URL)}" 
+                           placeholder="${DEFAULT_WS_URL}" />
                     <div class="field-hint">The WebSocket server URL for VTT synchronization</div>
                 </div>
                 <div class="field" style="flex:1;">
                     <label>Room Name</label>
                     <input type="text" id="settings-ws-room" 
-                           value="${escHtml(settings.wsRoom || 'vtt-room')}" 
-                           placeholder="vtt-room" />
+                           value="${escHtml(settings.wsRoom || DEFAULT_WS_ROOM)}" 
+                           placeholder="${DEFAULT_WS_ROOM}" />
                     <div class="field-hint">Room to join for multiplayer</div>
                 </div>
             </div>
@@ -280,7 +289,7 @@ export function render(el) {
              ============================================================ -->
         <div class="panel settings-panel" id="sync-panel">
             <h3>🌐 Live Campaign</h3>
-            <p class="text-muted small">Connect to a campaign server for real-time collaboration with your group.</p>
+            <p class="text-muted small">Connect to a campaign server for real-time collaboration with your group. Default: <strong>${DEFAULT_SERVER_URL}</strong></p>
             
             <!-- User Profile Settings -->
             <div class="form-row" style="margin-bottom:0.6rem;">
@@ -323,7 +332,7 @@ export function render(el) {
             <div class="form-row">
                 <div class="field large">
                     <label>Server URL</label>
-                    <input type="text" id="sync-server-url" placeholder="ws://localhost:3000 or https://your-server.com" value="${escHtml(serverUrl)}" />
+                    <input type="text" id="sync-server-url" placeholder="${DEFAULT_SERVER_URL}" value="${escHtml(serverUrl)}" />
                 </div>
                 <div class="field">
                     <label>Campaign Code</label>
@@ -358,9 +367,9 @@ export function render(el) {
              ============================================================ -->
         <div class="panel settings-panel">
             <h3>📦 Campaign Sharing (HTTP)</h3>
-            <p class="text-muted small">Upload your current toolkit state to a campaign server, then share the generated code with your group. They can load it with the same code.</p>
+            <p class="text-muted small">Upload your current toolkit state to a campaign server, then share the generated code with your group. They can load it with the same code. Default: <strong>${DEFAULT_SERVER_URL}</strong></p>
             <div class="form-row">
-                <div class="field large"><label>Server URL</label><input type="text" id="campaign-server-url" placeholder="http://localhost:3000" value="${escHtml(serverUrl)}" /></div>
+                <div class="field large"><label>Server URL</label><input type="text" id="campaign-server-url" placeholder="${DEFAULT_SERVER_URL}" value="${escHtml(serverUrl)}" /></div>
                 <div class="field" style="flex:0 0 120px;"><label>Campaign Code</label><input type="text" id="campaign-code" placeholder="ABC123" maxlength="6" style="text-transform:uppercase;" /></div>
             </div>
             <div class="flex">
@@ -501,7 +510,6 @@ async function handlePackInstall() {
         `;
         showToast(`Pack "${result.name}" installed!`, 'success');
         fileInput.value = '';
-        // Refresh the UI
         render(container);
     } catch (err) {
         feedback.innerHTML = `<span style="color:var(--red);">❌ ${err.message}</span>`;
@@ -514,7 +522,6 @@ async function handlePackInstall() {
 function handlePackUninstall(packId) {
     if (!packId) return;
     uninstallPack(packId);
-    // Refresh the UI
     setTimeout(() => render(container), 500);
 }
 
@@ -527,12 +534,7 @@ function refreshPackList() {
 // SYNC UI INITIALIZATION
 // ============================================================
 
-/**
- * Initialize sync UI elements
- * FIXED: Properly handles missing sync module
- */
 function initSyncUI() {
-    // Update sync status display
     function updateSyncStatus(status) {
         const statusEl = document.getElementById('sync-status');
         const connectBtn = document.getElementById('sync-connect-btn');
@@ -548,7 +550,6 @@ function initSyncUI() {
             connectBtn.style.display = 'none';
             disconnectBtn.style.display = 'inline-block';
             
-            // Update presence list with avatars
             if (presenceList) {
                 const clients = status.clients || [];
                 if (clients.length > 1) {
@@ -583,15 +584,11 @@ function initSyncUI() {
         }
     }
     
-    // Try to import sync module
     import('../../core/sync/index.js')
         .then(module => {
             const { syncManager } = module;
-            
-            // Store reference for cleanup
             window.__syncManager = syncManager;
             
-            // Get initial status
             try {
                 const status = syncManager.getStatus ? syncManager.getStatus() : { isConnected: false };
                 updateSyncStatus(status);
@@ -600,7 +597,6 @@ function initSyncUI() {
                 updateSyncStatus({ isConnected: false });
             }
             
-            // Listen for sync events
             if (syncManager.on) {
                 syncManager.on('connection_change', updateSyncStatus);
                 syncManager.on('presence_update', updateSyncStatus);
@@ -610,7 +606,6 @@ function initSyncUI() {
         })
         .catch(e => {
             console.warn('⚠️ Sync module not available:', e.message);
-            // Update status to disconnected with a note
             const statusEl = document.getElementById('sync-status');
             if (statusEl) {
                 statusEl.innerHTML = '⚠️ Sync module unavailable';
@@ -624,7 +619,7 @@ function initSyncUI() {
 // ============================================================
 
 async function connectToSyncServer() {
-    const serverUrl = document.getElementById('sync-server-url').value.trim();
+    const serverUrl = document.getElementById('sync-server-url').value.trim() || DEFAULT_SERVER_URL;
     const campaignCode = document.getElementById('sync-campaign-code').value.trim();
     const password = document.getElementById('sync-password').value;
     const userName = document.getElementById('sync-user-name').value.trim() || 'Player';
@@ -642,10 +637,8 @@ async function connectToSyncServer() {
     try {
         const { syncManager } = await import('../../core/sync/index.js');
         
-        // Store credentials for reconnection
         syncManager.lastPassword = password;
         
-        // Save profile settings
         localStorage.setItem('fates-edge-client-name', userName);
         if (userEmail) localStorage.setItem('fates-edge-user-email', userEmail);
         localStorage.setItem('fates-edge-server-url', serverUrl);
@@ -692,7 +685,6 @@ function saveUserProfile() {
         localStorage.setItem('fates-edge-user-email', userEmail);
     }
     
-    // Update avatar preview
     const avatarPreview = document.getElementById('avatar-preview');
     const nameDisplay = document.getElementById('avatar-preview-name');
     const emailDisplay = document.getElementById('avatar-preview-email');
@@ -708,7 +700,6 @@ function saveUserProfile() {
         emailDisplay.textContent = userEmail || 'No email set';
     }
     
-    // Update sync manager if connected
     import('../../core/sync/index.js').then(module => {
         const { syncManager } = module;
         if (syncManager.isConnected && syncManager.setName) {
@@ -735,14 +726,12 @@ function saveUserProfile() {
 function toggleAvatars() {
     const showAvatars = document.getElementById('sync-show-avatars').checked;
     localStorage.setItem('fates-edge-show-avatars', String(showAvatars));
-    // Refresh presence list
     initSyncUI();
 }
 
 function toggleGravatars() {
     const useGravatars = document.getElementById('sync-use-gravatars').checked;
     localStorage.setItem('fates-edge-use-gravatars', String(useGravatars));
-    // Update avatar preview
     const email = document.getElementById('sync-user-email').value.trim();
     const name = document.getElementById('sync-user-name').value.trim();
     const avatarPreview = document.getElementById('avatar-preview');
@@ -760,8 +749,8 @@ function toggleGravatars() {
 // ============================================================
 
 function getWSSettingsFromUI() {
-    const wsUrl = document.getElementById('settings-ws-url')?.value || 'wss://fates-edge-ws.onrender.com';
-    const wsRoom = document.getElementById('settings-ws-room')?.value || 'vtt-room';
+    const wsUrl = document.getElementById('settings-ws-url')?.value || DEFAULT_WS_URL;
+    const wsRoom = document.getElementById('settings-ws-room')?.value || DEFAULT_WS_ROOM;
     const wsEnabled = document.getElementById('settings-ws-enabled')?.checked !== false;
     const wsReconnect = document.getElementById('settings-ws-reconnect')?.checked !== false;
     const wsReconnectInterval = parseInt(document.getElementById('settings-ws-interval')?.value || '3000', 10);
@@ -770,7 +759,7 @@ function getWSSettingsFromUI() {
 }
 
 async function testWSConnectionHandler() {
-    const url = document.getElementById('settings-ws-url')?.value;
+    const url = document.getElementById('settings-ws-url')?.value || DEFAULT_WS_URL;
     const resultDiv = document.getElementById('settings-ws-result');
     
     if (!url) {
@@ -807,7 +796,6 @@ async function testWSConnectionHandler() {
 function connectWSHandler() {
     const settings = getWSSettingsFromUI();
     
-    // Save settings to state
     const state = getState();
     state.settings = { ...state.settings, ...settings };
     saveState(state);
@@ -894,7 +882,6 @@ export function attachEvents() {
         }
     });
     
-    // Pack uninstall buttons (delegated)
     document.getElementById('pack-list')?.addEventListener('click', (e) => {
         const uninstallBtn = e.target.closest('.uninstall-pack-btn');
         if (uninstallBtn) {
@@ -1127,7 +1114,7 @@ function saveBaseUrl() {
 // ============================================================
 
 async function campaignUpload() {
-    const serverUrl = document.getElementById('campaign-server-url').value.trim() || 'http://localhost:3000';
+    const serverUrl = document.getElementById('campaign-server-url').value.trim() || DEFAULT_SERVER_URL;
     const feedback = document.getElementById('campaign-feedback');
     const btn = document.getElementById('campaign-upload-btn');
     btn.disabled = true;
@@ -1160,7 +1147,7 @@ async function campaignUpload() {
 }
 
 async function campaignLoad() {
-    const serverUrl = document.getElementById('campaign-server-url').value.trim() || 'http://localhost:3000';
+    const serverUrl = document.getElementById('campaign-server-url').value.trim() || DEFAULT_SERVER_URL;
     const code = document.getElementById('campaign-code').value.trim().toUpperCase();
     const feedback = document.getElementById('campaign-feedback');
     const btn = document.getElementById('campaign-load-btn');
@@ -1195,7 +1182,7 @@ async function campaignLoad() {
 }
 
 async function campaignDelete() {
-    const serverUrl = document.getElementById('campaign-server-url').value.trim() || 'http://localhost:3000';
+    const serverUrl = document.getElementById('campaign-server-url').value.trim() || DEFAULT_SERVER_URL;
     const code = document.getElementById('campaign-code').value.trim().toUpperCase();
     const feedback = document.getElementById('campaign-feedback');
     const btn = document.getElementById('campaign-delete-btn');

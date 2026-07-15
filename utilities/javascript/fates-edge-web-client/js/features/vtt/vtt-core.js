@@ -1,11 +1,12 @@
 /**
  * VTT Core – reactive rendering functions
  * Each renderer subscribes to the store and updates its DOM element automatically.
+ * Updated for unified WebSocket module with deck and module support.
  */
 
 import { vttStore } from '../../core/vtt-store.js';
 import { escHtml, getStorage, setHtml, createElement } from '../../core/utils.js';
-import { isConnectedToServer } from '../../core/websocket.js';
+import { isConnectedToServer, getRoomCode, getSocketId, getConnectionMode } from '../../core/websocket.js';
 import { getOutcomeColor, getOutcomeLabel, getOutcomeClass } from '../../core/dice.js';
 
 // ============================================================
@@ -23,6 +24,7 @@ export const SENDER_TYPES = {
     ROLL: 'Roll',
     OOC: 'OOC',
     GM: 'GM',
+    DECK: 'Deck',
 };
 
 // ============================================================
@@ -58,6 +60,8 @@ export function renderChat() {
     chatUnsubscribe = vttStore.subscribe('chatMessages', (messages) => {
         const allMessages = messages || [];
         const isConnected = isConnectedToServer();
+        const roomCode = isConnected ? getRoomCode() : null;
+        const mode = getConnectionMode ? getConnectionMode() : 'websocket';
 
         if (!Array.isArray(allMessages) || allMessages.length === 0) {
             setHtml(chatContainer, `
@@ -65,7 +69,8 @@ export function renderChat() {
                     <div style="font-size:2rem;margin-bottom:0.5rem;">💬</div>
                     <div style="font-size:0.85rem;">No messages yet</div>
                     <div style="font-size:0.75rem;margin-top:0.3rem;">
-                        ${isConnected ? '🌐 Connected to server' : '📡 Messages stay local'}
+                        ${isConnected ? `🌐 Connected to server${roomCode ? ` (${roomCode})` : ''}` : '📡 Messages stay local'}
+                        <span style="color:var(--text4);margin-left:0.3rem;">via ${mode}</span>
                     </div>
                     <div style="font-size:0.7rem;margin-top:0.5rem;color:var(--text4);">
                         Type /help for commands
@@ -88,12 +93,14 @@ export function renderChat() {
             const isSystem = sender === SENDER_TYPES.SYSTEM || sender === SENDER_TYPES.ROLL;
             const isOOC = sender === SENDER_TYPES.OOC;
             const isGM = sender === SENDER_TYPES.GM;
+            const isDeck = sender === SENDER_TYPES.DECK;
             const isLocal = msg.local !== false;
 
             let senderColor = 'var(--text)';
             if (isSystem) senderColor = 'var(--gold)';
             else if (isOOC) senderColor = 'var(--blue)';
             else if (isGM) senderColor = 'var(--red)';
+            else if (isDeck) senderColor = 'var(--purple)';
 
             const whisper = msg.whisper ? '🔒 ' : '';
             const recipient = msg.recipient && msg.recipient !== 'all' ? ` → ${escHtml(msg.recipient)}` : '';
@@ -138,6 +145,7 @@ export function renderChat() {
                         <span class="msg-status" style="font-size:0.6rem;color:${statusColor};margin-left:auto;" title="${statusTitle}">${statusIcon}</span>
                     </div>
                     ${msg.rollData ? renderRollDetails(msg.rollData) : ''}
+                    ${msg.deckData ? renderDeckDetails(msg.deckData) : ''}
                 </div>
             `;
         }
@@ -185,6 +193,21 @@ function renderRollDetails(rollData) {
     `;
 }
 
+function renderDeckDetails(deckData) {
+    if (!deckData) return '';
+    const cards = deckData.cards || [];
+    const cardNames = cards.map(c => 
+        c.is_joker ? '🃏 Joker' : `${c.rank_name || c.rank} of ${c.suit_name || c.suit}`
+    ).join(', ');
+    
+    return `
+        <div style="margin-top:0.2rem;padding:0.2rem 0.4rem;background:var(--bg2);border-radius:4px;font-size:0.7rem;color:var(--text3);">
+            <span>🃏 ${cardNames}</span>
+            ${deckData.remaining !== undefined ? `<span style="margin-left:0.5rem;">Remaining: ${deckData.remaining}</span>` : ''}
+        </div>
+    `;
+}
+
 // ============================================================
 // Party Status Grid (reactive)
 // ============================================================
@@ -208,9 +231,15 @@ export function renderVTTChars() {
             const harm = char.harm || 0;
             const fatigue = char.fatigue || 0;
             const boons = char.boons || 0;
+            const tier = char.tier || 1;
+            const isActive = char.active !== false;
             html += `
-                <div class="vtt-char-card" style="background:var(--bg3);border-radius:var(--radius);padding:0.4rem 0.6rem;border-left:3px solid var(--gold);transition:all 0.2s;">
-                    <div style="font-weight:600;font-size:0.9rem;">${escHtml(name)}</div>
+                <div class="vtt-char-card" style="background:var(--bg3);border-radius:var(--radius);padding:0.4rem 0.6rem;border-left:3px solid ${isActive ? 'var(--gold)' : 'var(--text3)'};transition:all 0.2s;${isActive ? '' : 'opacity:0.6;'}">
+                    <div style="font-weight:600;font-size:0.9rem;display:flex;align-items:center;gap:0.3rem;">
+                        ${isActive ? '🟢' : '⏸️'}
+                        ${escHtml(name)}
+                        <span style="font-size:0.6rem;color:var(--text3);background:var(--bg4);padding:0.05rem 0.4rem;border-radius:10px;">T${tier}</span>
+                    </div>
                     <div style="display:flex;gap:0.8rem;font-size:0.7rem;color:var(--text2);margin-top:0.15rem;">
                         <span>❤️ ${harm}</span>
                         <span>⚡ ${fatigue}</span>
@@ -245,14 +274,15 @@ export function renderVTTTimers() {
             const current = timer.current || 0;
             const segments = timer.segments || 1;
             const progress = segments > 0 ? Math.min((current / segments) * 100, 100) : 0;
+            const isComplete = progress >= 100;
             html += `
-                <div class="vtt-timer" style="margin-bottom:0.3rem;background:var(--bg3);border-radius:4px;padding:0.3rem 0.5rem;">
+                <div class="vtt-timer" style="margin-bottom:0.3rem;background:var(--bg3);border-radius:4px;padding:0.3rem 0.5rem;${isComplete ? 'border:1px solid var(--red);' : ''}">
                     <div style="display:flex;justify-content:space-between;font-size:0.8rem;">
                         <span>${escHtml(name)}</span>
-                        <span>${current}/${segments}</span>
+                        <span>${current}/${segments} ${isComplete ? '✅' : ''}</span>
                     </div>
                     <div style="width:100%;height:4px;background:var(--bg4);border-radius:2px;margin-top:2px;overflow:hidden;">
-                        <div style="width:${progress}%;height:100%;background:${progress >= 100 ? 'var(--red)' : 'var(--gold)'};border-radius:2px;transition:width 0.3s;"></div>
+                        <div style="width:${progress}%;height:100%;background:${isComplete ? 'var(--red)' : 'var(--gold)'};border-radius:2px;transition:width 0.3s;"></div>
                     </div>
                 </div>
             `;
@@ -262,7 +292,7 @@ export function renderVTTTimers() {
 }
 
 // ============================================================
-// Presence (reactive)
+// Presence (reactive with WebSocket integration)
 // ============================================================
 let presenceUnsubscribe = null;
 
@@ -273,22 +303,32 @@ export function renderLocalPresence() {
 
     if (presenceUnsubscribe) presenceUnsubscribe();
     presenceUnsubscribe = vttStore.subscribe('presence', (presence) => {
+        const isConnected = isConnectedToServer();
+        const roomCode = isConnected ? getRoomCode() : null;
+        const socketId = isConnected ? getSocketId() : null;
+        
         if (!presence || presence.length === 0) {
-            setHtml(presenceList, `<div style="color:var(--text3);padding:0.3rem 0;font-size:0.8rem;">No VTT characters</div>`);
+            setHtml(presenceList, `
+                <div style="color:var(--text3);padding:0.3rem 0;font-size:0.8rem;">
+                    ${isConnected ? '🌐 Connected, no other players' : '📡 Local mode'}
+                    ${roomCode ? ` (${roomCode})` : ''}
+                </div>
+            `);
             return;
         }
         const showAvatars = getStorage('fates-edge-show-avatars', 'true') !== 'false';
         let html = '';
         for (const p of presence) {
+            const isSelf = p.id === socketId;
             const avatarUrl = showAvatars
-                ? `https://ui-avatars.com/api/?name=${encodeURIComponent(p.name)}&size=32&background=2c3e50&color=fff`
+                ? p.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(p.name)}&size=32&background=2c3e50&color=fff`
                 : '';
             html += `
-                <div class="presence-item" style="display:flex;align-items:center;gap:0.5rem;padding:0.2rem 0;border-bottom:1px solid var(--border);">
-                    ${showAvatars ? `<img src="${avatarUrl}" alt="${p.name}" style="width:28px;height:28px;border-radius:50%;object-fit:cover;" />` : ''}
-                    <span style="font-weight:400;">${escHtml(p.name)}</span>
+                <div class="presence-item" style="display:flex;align-items:center;gap:0.5rem;padding:0.2rem 0;border-bottom:1px solid var(--border);${isSelf ? 'background:var(--bg4);border-radius:4px;padding:0.2rem 0.4rem;' : ''}">
+                    ${showAvatars ? `<img src="${avatarUrl}" alt="${p.name}" style="width:28px;height:28px;border-radius:50%;object-fit:cover;" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2232%22 height=%2232%22 viewBox=%220 0 32 32%22%3E%3Crect fill=%22%232c3e50%22 width=%2232%22 height=%2232%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22 dy=%22.35em%22 fill=%22%23fff%22 font-family=%22Arial%22 font-size=%2214%22%3E${encodeURIComponent(p.name.charAt(0))}%3C/text%3E%3C/svg%3E'" />` : ''}
+                    <span style="font-weight:${isSelf ? '600' : '400'};">${escHtml(p.name)}${isSelf ? ' (you)' : ''}</span>
                     <span style="font-size:0.7rem;color:var(--text2);background:var(--bg4);padding:0.05rem 0.4rem;border-radius:12px;">${p.tier ? `Tier ${p.tier}` : 'Player'}</span>
-                    <span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${p.online ? 'var(--green)' : 'var(--gold)'};margin-left:auto;" title="${p.online ? 'Online' : 'Local'}"></span>
+                    <span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${p.online !== false ? 'var(--green)' : 'var(--text3)'};margin-left:auto;" title="${p.online !== false ? 'Online' : 'Offline'}"></span>
                 </div>
             `;
         }

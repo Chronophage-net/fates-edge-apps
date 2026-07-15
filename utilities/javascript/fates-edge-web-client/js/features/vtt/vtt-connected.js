@@ -2,8 +2,8 @@
  * VTT Connected Mode – WebSocket sync, real‑time collaboration
  * Uses reactive store for all UI updates.
  * Updated for v1.2.0 with Deck and Module support
+ * Now uses the unified WebSocket module
  */
-// ASSERT FIX
 
 import { vttStore } from '../../core/vtt-store.js';
 import { getState, clearChatHistory, getCharacter } from '../../core/state.js';
@@ -15,10 +15,22 @@ import {
     syncState,
     sendChatMessage,
     sendRoll,
+    sendEvent,
     onEvent,
     offEvent,
     getRoomCode,
-    getSocketId
+    getSocketId,
+    drawCards,
+    shuffleDeck,
+    drawCrownSpread,
+    getDeckHistory,
+    clearDeckHistory,
+    requestModulePush,
+    requestModuleCleanup,
+    listModules,
+    onWSEvent,
+    offWSEvent,
+    getConnectionMode
 } from '../../core/websocket.js';
 import {
     setContainer,
@@ -64,7 +76,7 @@ let deckState = {
     cards: [],
     history: [],
     offset: 0,
-    remaining: 0
+    remaining: 54
 };
 let defaultRegion = 'Acasia';
 let loadedModules = [];
@@ -128,23 +140,26 @@ export function sendMessage(text, sender, recipient = 'all', metadata = {}) {
 }
 
 // ============================================================
-// DECK COMMANDS
+// DECK COMMANDS (using unified WebSocket module)
 // ============================================================
 
-function handleDeckDraw(count = 1, region = null) {
+async function handleDeckDraw(count = 1, region = null) {
     if (isDestroyed) return;
     const isConnected = isConnectedToServer();
     const regionName = region || defaultRegion;
     
     if (isConnected) {
         try {
-            // Send deck draw request via WebSocket
-            const ws = window.__ws;
-            if (ws && ws.connected) {
-                ws.send('deck-draw', { count, region: regionName });
-                showToast(`🃏 Drawing ${count} card${count > 1 ? 's' : ''} from ${regionName}...`, 'info');
+            const result = await drawCards(count, regionName);
+            if (result && result.error) {
+                showToast(`Deck draw failed: ${result.error}`, 'error');
             } else {
-                showToast('Not connected to server for deck draws.', 'error');
+                showToast(`🃏 Drew ${count} card${count > 1 ? 's' : ''} from ${regionName}`, 'success');
+                // Update deck state
+                if (result && result.remaining !== undefined) {
+                    deckState.remaining = result.remaining;
+                    updateDeckUI();
+                }
             }
         } catch (error) {
             console.warn('[VTT Connected] Failed to send deck draw:', error);
@@ -158,22 +173,27 @@ function handleDeckDraw(count = 1, region = null) {
         ).join(', ');
         const msg = `🃏 Drew ${count} card${count > 1 ? 's' : ''}: ${synthesis}`;
         sendMessage(msg, 'Deck', 'all');
+        deckState.remaining = Math.max(0, deckState.remaining - count);
+        updateDeckUI();
     }
 }
 
-function handleCrownSpread(region = null) {
+async function handleCrownSpread(region = null) {
     if (isDestroyed) return;
     const isConnected = isConnectedToServer();
     const regionName = region || defaultRegion;
     
     if (isConnected) {
         try {
-            const ws = window.__ws;
-            if (ws && ws.connected) {
-                ws.send('deck-draw', { count: 5, region: regionName });
-                showToast(`👑 Crown Spread from ${regionName}...`, 'info');
+            const result = await drawCrownSpread(regionName);
+            if (result && result.error) {
+                showToast(`Crown Spread failed: ${result.error}`, 'error');
             } else {
-                showToast('Not connected to server for Crown Spread.', 'error');
+                showToast(`👑 Crown Spread from ${regionName}`, 'success');
+                if (result && result.remaining !== undefined) {
+                    deckState.remaining = result.remaining;
+                    updateDeckUI();
+                }
             }
         } catch (error) {
             console.warn('[VTT Connected] Failed to send Crown Spread:', error);
@@ -184,18 +204,21 @@ function handleCrownSpread(region = null) {
     }
 }
 
-function handleDeckShuffle() {
+async function handleDeckShuffle() {
     if (isDestroyed) return;
     const isConnected = isConnectedToServer();
     
     if (isConnected) {
         try {
-            const ws = window.__ws;
-            if (ws && ws.connected) {
-                ws.send('deck-shuffle', {});
-                showToast('🔀 Deck shuffled.', 'success');
+            const result = await shuffleDeck();
+            if (result && result.error) {
+                showToast(`Shuffle failed: ${result.error}`, 'error');
             } else {
-                showToast('Not connected to server.', 'error');
+                showToast('🔀 Deck shuffled.', 'success');
+                if (result && result.remaining !== undefined) {
+                    deckState.remaining = result.remaining;
+                    updateDeckUI();
+                }
             }
         } catch (error) {
             console.warn('[VTT Connected] Failed to shuffle deck:', error);
@@ -204,6 +227,61 @@ function handleDeckShuffle() {
     } else {
         showToast('Deck shuffle requires server connection.', 'error');
     }
+}
+
+async function handleDeckHistory() {
+    if (isDestroyed) return;
+    const isConnected = isConnectedToServer();
+    
+    if (isConnected) {
+        try {
+            const result = await getDeckHistory();
+            if (result && result.error) {
+                showToast(`History failed: ${result.error}`, 'error');
+            } else if (result && result.history) {
+                const history = result.history;
+                if (history.length === 0) {
+                    showToast('📜 No deck history available.', 'info');
+                } else {
+                    const entries = history.slice(-5).map(h => 
+                        `${h.type}: ${h.cards}`
+                    ).join('\n');
+                    showToast(`📜 Recent draws:\n${entries}`, 'info');
+                }
+            }
+        } catch (error) {
+            console.warn('[VTT Connected] Failed to get deck history:', error);
+            showToast('Failed to get deck history.', 'error');
+        }
+    } else {
+        showToast('Deck history requires server connection.', 'error');
+    }
+}
+
+async function handleClearDeckHistory() {
+    if (isDestroyed) return;
+    const isConnected = isConnectedToServer();
+    
+    if (isConnected) {
+        try {
+            const result = await clearDeckHistory();
+            if (result && result.error) {
+                showToast(`Clear history failed: ${result.error}`, 'error');
+            } else {
+                showToast('🗑️ Deck history cleared.', 'success');
+            }
+        } catch (error) {
+            console.warn('[VTT Connected] Failed to clear deck history:', error);
+            showToast('Failed to clear deck history.', 'error');
+        }
+    } else {
+        showToast('Clear history requires server connection.', 'error');
+    }
+}
+
+function updateDeckUI() {
+    const countEl = q('#vtt-deck-count');
+    if (countEl) countEl.textContent = String(deckState.remaining || 0);
 }
 
 function buildLocalDeck(count) {
@@ -223,7 +301,6 @@ function buildLocalDeck(count) {
             });
         }
     }
-    // Shuffle
     for (let i = cards.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
         [cards[i], cards[j]] = [cards[j], cards[i]];
@@ -232,42 +309,48 @@ function buildLocalDeck(count) {
 }
 
 // ============================================================
-// MODULE COMMANDS
+// MODULE COMMANDS (using unified WebSocket module)
 // ============================================================
 
-function handleModuleList() {
+async function handleModuleList() {
     if (isDestroyed) return;
     const isConnected = isConnectedToServer();
     
     if (isConnected) {
         try {
-            const ws = window.__ws;
-            if (ws && ws.connected) {
-                ws.send('module-list', {});
-                showToast('📦 Requesting module list...', 'info');
-            } else {
-                showToast('Not connected to server.', 'error');
+            const result = await listModules();
+            if (result && result.error) {
+                showToast(`List modules failed: ${result.error}`, 'error');
+            } else if (result && result.modules) {
+                loadedModules = result.modules;
+                const count = loadedModules.length;
+                if (count === 0) {
+                    showToast('📦 No modules loaded.', 'info');
+                } else {
+                    const names = loadedModules.map(m => m.name || m.id).join(', ');
+                    showToast(`📦 ${count} module${count > 1 ? 's' : ''} loaded: ${names}`, 'info');
+                }
             }
         } catch (error) {
             console.warn('[VTT Connected] Failed to list modules:', error);
+            showToast('Failed to list modules.', 'error');
         }
     } else {
         showToast('Module list requires server connection.', 'error');
     }
 }
 
-function handleModulePush(moduleId) {
+async function handleModulePush(moduleId) {
     if (isDestroyed) return;
     const isConnected = isConnectedToServer();
     
     if (isConnected) {
         try {
-            const ws = window.__ws;
-            if (ws && ws.connected) {
-                ws.send('module-push', { moduleId });
-                showToast(`📦 Pushing module: ${moduleId}`, 'info');
+            const result = await requestModulePush(moduleId);
+            if (result && result.error) {
+                showToast(`Module push failed: ${result.error}`, 'error');
             } else {
-                showToast('Not connected to server.', 'error');
+                showToast(`📦 Module pushed: ${moduleId}`, 'success');
             }
         } catch (error) {
             console.warn('[VTT Connected] Failed to push module:', error);
@@ -275,6 +358,27 @@ function handleModulePush(moduleId) {
         }
     } else {
         showToast('Module push requires server connection.', 'error');
+    }
+}
+
+async function handleModuleCleanup(moduleId) {
+    if (isDestroyed) return;
+    const isConnected = isConnectedToServer();
+    
+    if (isConnected) {
+        try {
+            const result = await requestModuleCleanup(moduleId);
+            if (result && result.error) {
+                showToast(`Module cleanup failed: ${result.error}`, 'error');
+            } else {
+                showToast(`🧹 Module cleanup: ${moduleId}`, 'success');
+            }
+        } catch (error) {
+            console.warn('[VTT Connected] Failed to cleanup module:', error);
+            showToast('Module cleanup failed.', 'error');
+        }
+    } else {
+        showToast('Module cleanup requires server connection.', 'error');
     }
 }
 
@@ -430,8 +534,25 @@ function handleSlash(text) {
             handleDeckShuffle();
             break;
         }
+        case 'history': {
+            handleDeckHistory();
+            break;
+        }
+        case 'clear-history': {
+            handleClearDeckHistory();
+            break;
+        }
         case 'modules': {
             handleModuleList();
+            break;
+        }
+        case 'module': {
+            const moduleId = parts[1];
+            if (moduleId) {
+                handleModulePush(moduleId);
+            } else {
+                showToast('Usage: /module <moduleId>', 'error');
+            }
             break;
         }
         case 'region': {
@@ -439,13 +560,12 @@ function handleSlash(text) {
             if (region) {
                 defaultRegion = region;
                 showToast(`📍 Region set to: ${region}`, 'success');
+                const regionDisplay = q('#vtt-region-display');
+                if (regionDisplay) regionDisplay.textContent = region;
                 // Send to server
                 if (isConnectedToServer()) {
                     try {
-                        const ws = window.__ws;
-                        if (ws && ws.connected) {
-                            ws.send('set-region', { region });
-                        }
+                        sendEvent({ type: 'region-updated', region });
                     } catch (e) { /* ignore */ }
                 }
             } else {
@@ -463,12 +583,15 @@ function handleSlash(text) {
                 '/deck count [region] - Draw cards from deck',
                 '/crown [region] - Crown Spread',
                 '/shuffle - Shuffle deck',
+                '/history - Show deck history',
+                '/clear-history - Clear deck history',
                 '/modules - List loaded modules',
+                '/module <id> - Push a module',
                 '/region [name] - Get/set default region',
                 '/ooc text - Send out-of-character message',
                 '/status - Show party status',
                 '/clear - Clear chat',
-                `/help - Show this help`,
+                '/help - Show this help',
                 `Mode: ${mode} | Room: ${room} | Region: ${defaultRegion}`
             ].join('\n');
             sendMessage(helpText, 'System', 'all');
@@ -505,7 +628,7 @@ function handleSlash(text) {
 }
 
 // ============================================================
-// WEBSOCKET SYNC SETUP
+// WEBSOCKET SYNC SETUP (using unified WebSocket module)
 // ============================================================
 
 function setupWebSocketSync() {
@@ -527,7 +650,7 @@ function setupWebSocketSync() {
             timers: data.timers || [],
         });
     };
-    onEvent('state-updated', stateHandler);
+    onWSEvent('state-updated', stateHandler);
     wsListeners.set('state-updated', stateHandler);
 
     // Chat messages
@@ -542,7 +665,7 @@ function setupWebSocketSync() {
             playNotificationSound();
         }
     };
-    onEvent('chat-message', chatHandler);
+    onWSEvent('chat-message', chatHandler);
     wsListeners.set('chat-message', chatHandler);
 
     // Roll results
@@ -550,7 +673,7 @@ function setupWebSocketSync() {
         if (isDestroyed) return;
         showToast(`🎲 ${rollData.sender || 'Player'} rolled ${rollData.outcome}`, 'info');
     };
-    onEvent('roll-result', rollHandler);
+    onWSEvent('roll-result', rollHandler);
     wsListeners.set('roll-result', rollHandler);
 
     // Deck events
@@ -571,9 +694,10 @@ function setupWebSocketSync() {
         ).join(', ');
         const msg = `🃏 Drew ${cards.length} card${cards.length > 1 ? 's' : ''} from ${region}: ${cardNames}\n\n${synthesis}`;
         sendMessage(msg, 'Deck', 'all');
+        updateDeckUI();
         showToast(`🃏 Drew ${cards.length} cards from ${region}`, 'success');
     };
-    onEvent('deck-drawn', deckDrawHandler);
+    onWSEvent('deck-drawn', deckDrawHandler);
     wsListeners.set('deck-drawn', deckDrawHandler);
 
     const deckShuffleHandler = (data) => {
@@ -586,10 +710,42 @@ function setupWebSocketSync() {
         };
         const msg = '🔀 Deck shuffled.';
         sendMessage(msg, 'Deck', 'all');
+        updateDeckUI();
         showToast('🔀 Deck shuffled', 'success');
     };
-    onEvent('deck-shuffled', deckShuffleHandler);
+    onWSEvent('deck-shuffled', deckShuffleHandler);
     wsListeners.set('deck-shuffled', deckShuffleHandler);
+
+    const crownSpreadHandler = (data) => {
+        if (isDestroyed) return;
+        deckState = {
+            cards: data.cards || [],
+            history: deckState.history || [],
+            offset: Date.now(),
+            remaining: data.remaining || 0
+        };
+        const msg = `👑 Crown Spread: ${data.result?.synthesis || 'A powerful reading...'}`;
+        sendMessage(msg, 'Deck', 'all');
+        updateDeckUI();
+        showToast('👑 Crown Spread delivered', 'success');
+    };
+    onWSEvent('crown-spread', crownSpreadHandler);
+    wsListeners.set('crown-spread', crownSpreadHandler);
+
+    const deckHistoryHandler = (data) => {
+        if (isDestroyed) return;
+        // Handle history response
+        console.log('[VTT] Deck history received:', data);
+    };
+    onWSEvent('deck-history', deckHistoryHandler);
+    wsListeners.set('deck-history', deckHistoryHandler);
+
+    const deckHistoryClearedHandler = (data) => {
+        if (isDestroyed) return;
+        showToast('🗑️ Deck history cleared', 'info');
+    };
+    onWSEvent('deck-history-cleared', deckHistoryClearedHandler);
+    wsListeners.set('deck-history-cleared', deckHistoryClearedHandler);
 
     // Module events
     const moduleListHandler = (data) => {
@@ -603,7 +759,7 @@ function setupWebSocketSync() {
             showToast(`📦 ${count} module${count > 1 ? 's' : ''} loaded: ${names}`, 'info');
         }
     };
-    onEvent('module-list', moduleListHandler);
+    onWSEvent('module-list', moduleListHandler);
     wsListeners.set('module-list', moduleListHandler);
 
     const modulePushHandler = (data) => {
@@ -612,7 +768,7 @@ function setupWebSocketSync() {
         const name = module.manifest?.name || module.id || 'Unknown';
         showToast(`📦 Module pushed: ${name}`, 'success');
     };
-    onEvent('module-push', modulePushHandler);
+    onWSEvent('module-push', modulePushHandler);
     wsListeners.set('module-push', modulePushHandler);
 
     const moduleCleanupHandler = (data) => {
@@ -620,7 +776,7 @@ function setupWebSocketSync() {
         const moduleId = data.moduleId || 'Unknown';
         showToast(`🧹 Module cleanup: ${moduleId}`, 'info');
     };
-    onEvent('module-cleanup', moduleCleanupHandler);
+    onWSEvent('module-cleanup', moduleCleanupHandler);
     wsListeners.set('module-cleanup', moduleCleanupHandler);
 
     // Region update
@@ -628,10 +784,12 @@ function setupWebSocketSync() {
         if (isDestroyed) return;
         if (data.region) {
             defaultRegion = data.region;
+            const regionDisplay = q('#vtt-region-display');
+            if (regionDisplay) regionDisplay.textContent = defaultRegion;
             showToast(`📍 Region updated to: ${defaultRegion}`, 'info');
         }
     };
-    onEvent('region-updated', regionUpdateHandler);
+    onWSEvent('region-updated', regionUpdateHandler);
     wsListeners.set('region-updated', regionUpdateHandler);
 
     // Connection events
@@ -644,7 +802,7 @@ function setupWebSocketSync() {
         vttStore.setConnectionStatus('connected');
         showToast('Reconnected to server!', 'success');
     };
-    onEvent('connected', connectHandler);
+    onWSEvent('connected', connectHandler);
     wsListeners.set('connected', connectHandler);
 
     const disconnectHandler = () => {
@@ -652,7 +810,7 @@ function setupWebSocketSync() {
         vttStore.setConnectionStatus('local');
         showToast('Disconnected from server. Messages will be local.', 'warning');
     };
-    onEvent('disconnected', disconnectHandler);
+    onWSEvent('disconnected', disconnectHandler);
     wsListeners.set('disconnected', disconnectHandler);
 
     console.log('[VTT Connected] WebSocket sync enabled with deck/module support');
@@ -661,7 +819,7 @@ function setupWebSocketSync() {
 function cleanupWebSocketListeners() {
     for (const [event, handler] of wsListeners) {
         try {
-            offEvent(event, handler);
+            offWSEvent(event, handler);
         } catch (e) {
             console.debug('[VTT Connected] Error removing listener:', e);
         }
@@ -807,6 +965,7 @@ function attachEvents() {
             case 'vtt-deck-draw-3': handleDeckDraw(3); break;
             case 'vtt-deck-crown': handleCrownSpread(); break;
             case 'vtt-deck-shuffle': handleDeckShuffle(); break;
+            case 'vtt-deck-history': handleDeckHistory(); break;
             case 'vtt-modules-list': handleModuleList(); break;
         }
     };
@@ -854,6 +1013,7 @@ export function render(el) {
     const isConnected = isConnectedToServer();
     const roomCode = isConnected ? getRoomCode() : null;
     const socketId = isConnected ? getSocketId() : null;
+    const mode = getConnectionMode ? getConnectionMode() : 'websocket';
     const voiceStatus = getVoiceStatus();
     const voiceClients = getActiveVoiceClients();
     const deckCount = deckState.remaining || 0;
@@ -862,7 +1022,8 @@ export function render(el) {
         <div class="vtt-header" style="margin-bottom:1rem;">
             <h1 class="page-title" style="display:flex;align-items:center;gap:0.5rem;">
                 💬 VTT – Live Table
-                <span class="mode-indicator" style="font-size:0.7rem;font-weight:400;background:var(--bg3);padding:0.15rem 0.8rem;border-radius:20px;color:var(--green);">🌐 Connected</span>
+                <span class="mode-indicator" style="font-size:0.7rem;font-weight:400;background:var(--bg3);padding:0.15rem 0.8rem;border-radius:20px;color:var(--green);">${isConnected ? '🌐 Connected' : '📡 Local'}</span>
+                <span class="mode-indicator" style="font-size:0.6rem;font-weight:400;background:var(--bg3);padding:0.1rem 0.6rem;border-radius:12px;color:var(--text3);">${mode}</span>
             </h1>
             <p class="page-sub" style="margin:0.2rem 0 0;">Chat, party status, quick die roller, deck, and scene timers all in one view.</p>
         </div>
@@ -871,12 +1032,12 @@ export function render(el) {
         <div class="panel" style="padding:0.5rem 1rem;margin-bottom:1rem;">
             <div class="flex-between" style="flex-wrap:wrap;gap:0.5rem;">
                 <div class="flex" style="gap:0.5rem;flex-wrap:wrap;align-items:center;">
-                    <span class="connection-status" style="display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--green);"></span>
-                    <span class="text-muted small">🟢 Connected to server</span>
+                    <span class="connection-status" style="display:inline-block;width:10px;height:10px;border-radius:50%;background:${isConnected ? 'var(--green)' : 'var(--red)'};"></span>
+                    <span class="text-muted small">${isConnected ? '🟢 Connected' : '🔴 Disconnected'}</span>
                     ${roomCode ? `<span class="text-muted small">🔑 Room: <strong>${roomCode}</strong></span>` : ''}
                     ${socketId ? `<span class="text-muted small">👤 ${socketId.slice(0, 8)}</span>` : ''}
                     <span class="text-muted small">📍 ${defaultRegion}</span>
-                    <span class="text-muted small">🃏 ${deckCount}</span>
+                    <span class="text-muted small">🃏 <span id="vtt-deck-count-header">${deckCount}</span></span>
                 </div>
                 <div class="flex" style="gap:0.4rem;flex-wrap:wrap;align-items:center;">
                     <button class="btn btn-sm ${voiceInitialized ? 'btn-primary' : ''}" id="vtt-voice-toggle">${voiceInitialized ? '🎤 Voice On' : '🎤 Voice Off'}</button>
@@ -897,7 +1058,7 @@ export function render(el) {
             <div style="margin-top:0.4rem;padding-top:0.4rem;border-top:1px solid var(--border);">
                 <div class="flex-between">
                     <span class="text-muted small">👥 Party Members</span>
-                    <span class="text-muted small" id="vtt-mode-badge" style="background:var(--bg3);padding:0.1rem 0.6rem;border-radius:12px;font-size:0.7rem;">🌐 Online</span>
+                    <span class="text-muted small" id="vtt-mode-badge" style="background:var(--bg3);padding:0.1rem 0.6rem;border-radius:12px;font-size:0.7rem;">${isConnected ? '🌐 Online' : '📡 Local'}</span>
                 </div>
                 <div id="presence-list" style="margin-top:0.2rem;"></div>
             </div>
@@ -958,6 +1119,7 @@ export function render(el) {
                         <button class="btn btn-sm btn-gold" id="vtt-deck-draw-3">Draw 3</button>
                         <button class="btn btn-sm btn-primary" id="vtt-deck-crown">👑 Crown</button>
                         <button class="btn btn-sm" id="vtt-deck-shuffle">🔀</button>
+                        <button class="btn btn-sm btn-ghost" id="vtt-deck-history">📜</button>
                         <button class="btn btn-sm btn-ghost" id="vtt-modules-list">📦</button>
                     </div>
                     <div style="margin-top:0.3rem;font-size:0.7rem;color:var(--text3);">
@@ -1011,6 +1173,8 @@ export function render(el) {
     setInterval(() => {
         const countEl = q('#vtt-deck-count');
         if (countEl) countEl.textContent = String(deckState.remaining || 0);
+        const headerCountEl = q('#vtt-deck-count-header');
+        if (headerCountEl) headerCountEl.textContent = String(deckState.remaining || 0);
     }, 5000);
 
     console.log('[VTT Connected] Rendered with reactive store + deck/module support');
@@ -1060,7 +1224,15 @@ export default {
     deckDraw: handleDeckDraw,
     crownSpread: handleCrownSpread,
     deckShuffle: handleDeckShuffle,
+    deckHistory: handleDeckHistory,
+    clearDeckHistory: handleClearDeckHistory,
     moduleList: handleModuleList,
+    modulePush: handleModulePush,
+    moduleCleanup: handleModuleCleanup,
     getDefaultRegion: () => defaultRegion,
-    setDefaultRegion: (region) => { defaultRegion = region; }
+    setDefaultRegion: (region) => { 
+        defaultRegion = region;
+        const display = q('#vtt-region-display');
+        if (display) display.textContent = region;
+    }
 };
