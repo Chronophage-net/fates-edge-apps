@@ -1,12 +1,13 @@
 // js/module-loader.js - Robust module loader
 
+import { setHtml, createElement } from './core/utils.js';
+
 class ModuleLoader {
     constructor() {
         this.modules = new Map();
         this.loading = new Map();
         this.container = document.getElementById('app-content');
         this.currentModule = null;
-        // In module-loader.js, add the new modules to modulePaths
 
         this.modulePaths = {
             // Core modules
@@ -22,13 +23,15 @@ class ModuleLoader {
             'encounters': './features/encounters/index.js',
             'factions': './features/factions/index.js',
             'home': './features/home/index.js',
-            'kanban': './features/kanban/index.js',        // NEW
+            'kanban': './features/kanban/index.js',
             'patrons': './features/patrons/index.js',
+            'scene-tools': './features/dashboard/scene-tools.js', // NEW
             'search': './features/search/index.js',
             'settings': './features/settings/index.js',
             'timers': './features/timers/index.js',
+            'travel-planner': './features/travel-planner/index.js', // NEW - was missing
             'vtt': './features/vtt/index.js',
-            'whiteboard': './features/whiteboard/index.js', // NEW
+            'whiteboard': './features/whiteboard/index.js',
             'wiki': './features/wiki/index.js',
         };
     }
@@ -99,9 +102,12 @@ class ModuleLoader {
                 console.log(`🔄 Using default() as fallback for "${moduleName}"`);
                 module.render = module.default;
             } else {
-                // Create a placeholder render function
+                // Create a placeholder render function using utils
                 module.render = (el) => {
-                    el.innerHTML = `<h2>${moduleName}</h2><p>Module loaded but no render function found.</p>`;
+                    setHtml(el, `
+                        <h2>${moduleName}</h2>
+                        <p>Module loaded but no render function found.</p>
+                    `);
                     console.log(`📦 Module "${moduleName}" loaded as placeholder`);
                 };
             }
@@ -176,14 +182,17 @@ class ModuleLoader {
             module._container = container;
             
             // Clear container
-            container.innerHTML = '';
+            setHtml(container, '');
             
             // Render module
             if (typeof module.render === 'function') {
                 await module.render(container);
                 module._lastRender = Date.now();
             } else {
-                container.innerHTML = `<h2>${moduleName}</h2><p>Module has no render function.</p>`;
+                setHtml(container, `
+                    <h2>${moduleName}</h2>
+                    <p>Module has no render function.</p>
+                `);
             }
             
             // Activate the module
@@ -197,7 +206,7 @@ class ModuleLoader {
             return module;
         } catch (error) {
             console.error(`Failed to render module "${moduleName}":`, error);
-            container.innerHTML = `
+            setHtml(container, `
                 <div class="error" style="padding:2rem;text-align:center;background:var(--bg2);border-radius:var(--radius);border-left:4px solid var(--danger);">
                     <h2 style="color:var(--danger);margin-bottom:0.5rem;">Error loading module</h2>
                     <p style="color:var(--text2);">${error.message}</p>
@@ -206,7 +215,7 @@ class ModuleLoader {
                         🔄 Retry
                     </button>
                 </div>
-            `;
+            `);
         }
     }
 

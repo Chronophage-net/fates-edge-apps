@@ -2,6 +2,8 @@
  * State management for Fate's Edge Toolkit
  */
 
+import { generateId, getBaseUrl as utilsGetBaseUrl, getStorage, setStorage, removeStorage } from './utils.js';
+
 // ============================================================
 // STATE
 // ============================================================
@@ -32,10 +34,9 @@ const STORAGE_KEY = 'fates-edge-state';
 
 export function loadState() {
     try {
-        const saved = localStorage.getItem(STORAGE_KEY);
+        const saved = getStorage(STORAGE_KEY);
         if (saved) {
-            const parsed = JSON.parse(saved);
-            state = { ...DEFAULT_STATE, ...parsed };
+            state = { ...DEFAULT_STATE, ...saved };
         } else {
             state = { ...DEFAULT_STATE };
         }
@@ -48,7 +49,7 @@ export function loadState() {
 
 export function saveState() {
     try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+        setStorage(STORAGE_KEY, state);
         triggerSaveEvent('saved');
     } catch (e) {
         console.warn('Failed to save state:', e);
@@ -72,11 +73,7 @@ export function updateState(updates) {
 
 export function clearState() {
     state = { ...DEFAULT_STATE };
-    try {
-        localStorage.removeItem(STORAGE_KEY);
-    } catch (e) {
-        console.warn('Failed to clear state:', e);
-    }
+    removeStorage(STORAGE_KEY);
     triggerSaveEvent('cleared');
     return state;
 }
@@ -112,22 +109,12 @@ export function setStateValue(path, value) {
     return state;
 }
 
+/**
+ * Get base URL - uses utils implementation
+ * @returns {string} Base URL
+ */
 export function getBaseUrl() {
-    const pathname = window.location.pathname;
-    
-    if (pathname.includes('/kon-reh/')) {
-        return '/kon-reh/';
-    }
-    if (pathname.includes('/fates-edge-toolkit/')) {
-        return '/fates-edge-toolkit/';
-    }
-    
-    const match = pathname.match(/^\/([^/]+)\//);
-    if (match) {
-        return '/' + match[1] + '/';
-    }
-    
-    return '/';
+    return utilsGetBaseUrl(state);
 }
 
 export function setBaseUrl(url) {
@@ -140,14 +127,6 @@ export function setPasswordHash(hash) {
     state.passwordHash = hash;
     saveState();
     return state;
-}
-
-// ============================================================
-// GENERATE ID
-// ============================================================
-
-export function generateId(prefix = 'id_') {
-    return prefix + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
 }
 
 // ============================================================
@@ -601,9 +580,6 @@ export default {
     getBaseUrl,
     setBaseUrl,
     setPasswordHash,
-    
-    // ID generation
-    generateId,
     
     // Character operations
     getCharacters,

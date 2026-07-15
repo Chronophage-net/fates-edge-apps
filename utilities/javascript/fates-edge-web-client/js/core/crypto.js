@@ -3,6 +3,8 @@
  * v3.0 - Cryptographic utilities
  */
 
+import { generateId } from './utils.js';
+
 // ============================================================
 // HASHING
 // ============================================================
@@ -81,23 +83,6 @@ export function generateRandomPassword(length = 16) {
         password += chars[array[i] % chars.length];
     }
     return password;
-}
-
-/**
- * Generate a random ID
- * @param {number} length - The length of the ID
- * @returns {string} - Random alphanumeric ID
- */
-export function generateId(length = 8) {
-    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-    const array = new Uint8Array(length);
-    crypto.getRandomValues(array);
-    
-    let id = '';
-    for (let i = 0; i < length; i++) {
-        id += chars[array[i] % chars.length];
-    }
-    return id;
 }
 
 // ============================================================

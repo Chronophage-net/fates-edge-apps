@@ -10,6 +10,7 @@ import { showToast } from './components/Toast.js';
 import { syncManager } from './core/sync/index.js';
 import { getUserAvatar } from './core/gravatar.js';
 import { moduleLoader } from './module-loader.js';
+import { getStorage, setStorage, removeStorage } from './core/utils.js';
 
 // ============================================================
 // FEATURE MODULES (dynamic imports for lazy loading)
@@ -409,7 +410,7 @@ function setupTheme() {
     const toggle = document.getElementById('theme-toggle');
     if (!toggle) return;
     
-    const theme = localStorage.getItem('fates-edge-theme');
+    const theme = getStorage('fates-edge-theme');
     if (theme === 'light') {
         document.documentElement.classList.add('light');
         toggle.textContent = '☀️';
@@ -428,11 +429,11 @@ function setupTheme() {
         const isLight = document.documentElement.classList.contains('light');
         if (isLight) {
             document.documentElement.classList.remove('light');
-            localStorage.setItem('fates-edge-theme', 'dark');
+            setStorage('fates-edge-theme', 'dark');
             toggle.textContent = '🌙';
         } else {
             document.documentElement.classList.add('light');
-            localStorage.setItem('fates-edge-theme', 'light');
+            setStorage('fates-edge-theme', 'light');
             toggle.textContent = '☀️';
         }
     });
@@ -463,7 +464,7 @@ function renderSyncUI() {
     const dataPanel = settingsContent.querySelector('.panel:first-child');
     if (!dataPanel) return;
     
-    const savedEmail = localStorage.getItem('fates-edge-user-email') || '';
+    const savedEmail = getStorage('fates-edge-user-email') || '';
     
     const syncPanel = document.createElement('div');
     syncPanel.className = 'panel';
@@ -523,8 +524,8 @@ function renderSyncUI() {
     
     dataPanel.parentNode.insertBefore(syncPanel, dataPanel.nextSibling);
     
-    const savedUrl = localStorage.getItem('fates-edge-sync-url') || '';
-    const savedCode = localStorage.getItem('fates-edge-sync-code') || '';
+    const savedUrl = getStorage('fates-edge-sync-url') || '';
+    const savedCode = getStorage('fates-edge-sync-code') || '';
     
     const urlInput = document.getElementById('sync-server-url');
     const codeInput = document.getElementById('sync-campaign-code');
@@ -542,7 +543,7 @@ function renderSyncUI() {
     if (emailInput) {
         emailInput.addEventListener('change', () => {
             const email = emailInput.value.trim();
-            localStorage.setItem('fates-edge-user-email', email);
+            setStorage('fates-edge-user-email', email);
             if (syncManager.isConnected) {
                 syncManager.setEmail(email);
             }
@@ -553,7 +554,7 @@ function renderSyncUI() {
         avatarBtn.addEventListener('click', () => {
             if (emailInput) {
                 const email = emailInput.value.trim();
-                localStorage.setItem('fates-edge-user-email', email);
+                setStorage('fates-edge-user-email', email);
                 if (syncManager.isConnected) {
                     syncManager.setEmail(email);
                 }
@@ -563,10 +564,10 @@ function renderSyncUI() {
     }
     
     if (showAvatarsCheck) {
-        const savedShowAvatars = localStorage.getItem('fates-edge-show-avatars') !== 'false';
+        const savedShowAvatars = getStorage('fates-edge-show-avatars', 'true') !== 'false';
         showAvatarsCheck.checked = savedShowAvatars;
         showAvatarsCheck.addEventListener('change', () => {
-            localStorage.setItem('fates-edge-show-avatars', showAvatarsCheck.checked);
+            setStorage('fates-edge-show-avatars', showAvatarsCheck.checked ? 'true' : 'false');
             updatePresenceUI(syncManager.presence.getOnlineClients());
         });
     }
@@ -587,9 +588,9 @@ function renderSyncUI() {
                 return;
             }
             
-            localStorage.setItem('fates-edge-sync-url', url);
-            localStorage.setItem('fates-edge-sync-code', code);
-            if (email) localStorage.setItem('fates-edge-user-email', email);
+            setStorage('fates-edge-sync-url', url);
+            setStorage('fates-edge-sync-code', code);
+            if (email) setStorage('fates-edge-user-email', email);
             
             connectBtn.disabled = true;
             connectBtn.textContent = 'Connecting…';
@@ -721,7 +722,7 @@ function updatePresenceUI(clients) {
         return;
     }
     
-    const showAvatars = localStorage.getItem('fates-edge-show-avatars') !== 'false';
+    const showAvatars = getStorage('fates-edge-show-avatars', 'true') !== 'false';
     
     presenceEl.innerHTML = clients.map(client => {
         const isYou = client.id === syncManager.clientId;

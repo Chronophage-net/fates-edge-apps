@@ -1,54 +1,30 @@
 /**
- * Dice feature - Roll dice and view history
- * UI for the Fate's Edge resolution system
- * Uses the core dice engine for all rolling logic
- * Supports deterministic RNG for static sites
- * Supports WebSocket sync for multiplayer
+ * Core Dice Engine - Fate's Edge Resolution System
+ * 
+ * Provides the core dice rolling logic with support for:
+ * - Seeded deterministic RNG (for static/demo deployments)
+ * - Cryptographic RNG fallback
+ * - Xorshift128+ PRNG implementation
+ * - Story Beat generation on 1s
+ * - Full resolution with Position (Dominant/Controlled/Desperate)
+ * - Re-roll mechanics
+ * - Boon integration
+ * - Dice pool management
  */
 
-// Import from core modules
-import { escHtml, safeParseInt } from '../core/utils.js';
-import { addRoll, getState, saveState } from '../core/state.js';
-// Import the core dice engine
-import { performRoll, rollDie } from '../core/dice.js';
-// Import WebSocket for sync
-import { isConnectedToServer, onEvent, offEvent, sendMessage as sendWSMessage } from '../../core/websocket.js';
-
-let container = null;
-let wsListeners = new Map();
-
 // ============================================================
-// CRYPTO MODULE - LAZY LOAD WITH FALLBACK
+// DETERMINISTIC RNG - Xorshift128+ PRNG
 // ============================================================
 
-let cryptoModule = null;
-let cryptoLoadAttempted = false;
-
-async function getCryptoModule() {
-    if (cryptoModule) return cryptoModule;
-    if (cryptoLoadAttempted) return null;
-    
-    cryptoLoadAttempted = true;
-    try {
-        const module = await import('../../core/crypto.js');
-        cryptoModule = module;
-        console.log('[Dice] Crypto module loaded successfully');
-        return cryptoModule;
-    } catch (e) {
-        console.debug('[Dice] Crypto module not available, using fallback RNG');
-        return null;
-    }
-}
-
-// ============================================================
-// SEED MANAGEMENT
-// ============================================================
-
+// Module-level state (no global leaks)
 let _seed = null;
 let _prng = null;
 
-// Xorshift128+ PRNG for deterministic random generation
-class Xorshift128 {
+/**
+ * Xorshift128+ PRNG for deterministic random generation
+ * Used when a seed is set for reproducible random sequences
+ */
+export class Xorshift128 {
     constructor(seed) {
         this.seed = seed;
         this.state = this._seedToState(seed);
@@ -104,11 +80,24 @@ class Xorshift128 {
     }
 }
 
-function getSeed() {
+// ============================================================
+// SEED MANAGEMENT
+// ============================================================
+
+/**
+ * Get the current deterministic seed
+ * @returns {string|null} Current seed or null if not set
+ */
+export function getSeed() {
     return _seed;
 }
 
-function setSeed(seed) {
+/**
+ * Set the deterministic seed
+ * @param {string|null} seed - New seed value, or null to disable deterministic mode
+ * @returns {boolean} Success
+ */
+export function setSeed(seed) {
     _seed = seed;
     if (seed) {
         _prng = new Xorshift128(seed);
@@ -124,9 +113,13 @@ function setSeed(seed) {
     return true;
 }
 
-function generateSeed() {
+/**
+ * Generate a new random seed
+ * @returns {string} New seed value
+ */
+export function generateSeed() {
     try {
-        if (window && window.crypto && window.crypto.getRandomValues) {
+        if (typeof window !== 'undefined' && window.crypto && window.crypto.getRandomValues) {
             const array = new Uint32Array(4);
             window.crypto.getRandomValues(array);
             return array.reduce((acc, val) => acc + val.toString(16).padStart(8, '0'), '');
@@ -135,31 +128,11 @@ function generateSeed() {
     return Date.now().toString(36) + Math.random().toString(36).substring(2, 8);
 }
 
-// Initialize seed from localStorage on module load
-try {
-    const stored = localStorage.getItem('fates-edge-seed');
-    if (stored) {
-        _seed = stored;
-        _prng = new Xorshift128(stored);
-        console.log('[Dice] Seed loaded from localStorage:', stored.substring(0, 8) + '...');
-    }
-} catch (e) { /* ignore */ }
-
-// Also try to load from window seed (set by build script for static sites)
-if (!_seed && typeof window !== 'undefined' && window.__RANDOM_SEED) {
-    _seed = window.__RANDOM_SEED;
-    _prng = new Xorshift128(_seed);
-    try {
-        localStorage.setItem('fates-edge-seed', _seed);
-        console.log('[Dice] Seed loaded from window.__RANDOM_SEED:', _seed.substring(0, 8) + '...');
-    } catch (e) { /* ignore */ }
-}
-
-// ============================================================
-// DETERMINISTIC RNG FUNCTIONS
-// ============================================================
-
-function getRandom() {
+/**
+ * Get a random number using deterministic PRNG if seeded, otherwise crypto/Math.random
+ * @returns {number} Random number between 0 and 1
+ */
+export function getRandom() {
     if (_prng) {
         return _prng.random();
     }
@@ -173,14 +146,26 @@ function getRandom() {
     return Math.random();
 }
 
-function getRandomInt(min, max) {
+/**
+ * Get a random integer using deterministic PRNG if seeded
+ * @param {number} min - Minimum value (inclusive)
+ * @param {number} max - Maximum value (exclusive)
+ * @returns {number} Random integer
+ */
+export function getRandomInt(min, max) {
     if (_prng) {
         return _prng.randomInt(min, max);
     }
     return Math.floor(getRandom() * (max - min)) + min;
 }
 
-function getRandomIntInclusive(min, max) {
+/**
+ * Get a random integer inclusive using deterministic PRNG if seeded
+ * @param {number} min - Minimum value (inclusive)
+ * @param {number} max - Maximum value (inclusive)
+ * @returns {number} Random integer
+ */
+export function getRandomIntInclusive(min, max) {
     if (_prng) {
         return _prng.randomIntInclusive(min, max);
     }
@@ -188,680 +173,470 @@ function getRandomIntInclusive(min, max) {
 }
 
 // ============================================================
-// TOAST NOTIFICATION
+// SEED INITIALIZATION
 // ============================================================
 
-function showToast(message, type = 'info') {
-    if (window.showToast) {
-        window.showToast(message, type);
-        return;
+// Initialize seed from localStorage on module load
+try {
+    const stored = localStorage.getItem('fates-edge-seed');
+    if (stored) {
+        _seed = stored;
+        _prng = new Xorshift128(stored);
+        console.log('[Dice Core] Seed loaded from localStorage:', stored.substring(0, 8) + '...');
     }
-    
-    const colors = {
-        info: 'var(--text)',
-        success: 'var(--green)',
-        error: 'var(--red)',
-        warning: 'var(--orange)'
-    };
-    
-    const toast = document.createElement('div');
-    toast.style.cssText = `
-        position: fixed;
-        bottom: 20px;
-        left: 50%;
-        transform: translateX(-50%);
-        background: var(--bg2);
-        color: ${colors[type] || colors.info};
-        padding: 0.8rem 1.5rem;
-        border-radius: var(--radius);
-        border: 1px solid var(--border);
-        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-        z-index: 9999;
-        font-size: 0.9rem;
-        max-width: 90%;
-        animation: slideUp 0.3s ease;
-    `;
-    toast.textContent = message;
-    document.body.appendChild(toast);
-    
-    setTimeout(() => {
-        toast.style.opacity = '0';
-        toast.style.transition = 'opacity 0.3s ease';
-        setTimeout(() => {
-            if (toast.parentNode) toast.parentNode.removeChild(toast);
-        }, 300);
-    }, 3000);
-}
+} catch (e) { /* ignore */ }
 
-// ============================================================
-// RENDER
-// ============================================================
-
-export function render(el) {
-    console.log('🎲 Dice.render() called');
-    
-    container = el;
-    const seed = getSeed();
-    const isDeterministic = !!seed;
-    const isConnected = isConnectedToServer();
-    
-    container.innerHTML = `
-        <h1 class="page-title">🎲 Dice Roller</h1>
-        <p class="page-sub">Roll dice with the Fate's Edge resolution system.</p>
-        
-        <!-- Connection & Seed Status -->
-        <div class="panel" style="padding:0.3rem 0.8rem;margin-bottom:0.5rem;background:var(--bg3);border-left:3px solid ${isConnected ? 'var(--green)' : 'var(--text3)'};">
-            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.3rem;">
-                <span style="font-size:0.8rem;color:var(--text2);">
-                    ${isConnected ? '🟢 Connected to server' : '📡 Local mode'}
-                    ${isDeterministic ? ` 🎲 Deterministic (seed: ${seed.substring(0, 8)}...)` : ' 🔀 Cryptographic RNG'}
-                </span>
-                <div style="display:flex;gap:0.3rem;flex-wrap:wrap;">
-                    <button class="btn btn-xs btn-ghost" id="seed-regenerate" title="Regenerate seed">🔄 New Seed</button>
-                    <button class="btn btn-xs btn-ghost" id="seed-clear" title="Clear seed (use crypto)">🧹 Clear Seed</button>
-                </div>
-            </div>
-        </div>
-        
-        <div class="panel">
-            <div class="form-row">
-                <div class="field small">
-                    <label>Attribute</label>
-                    <select id="roll-attr">
-                        <option value="1">1</option>
-                        <option value="2" selected>2</option>
-                        <option value="3">3</option>
-                        <option value="4">4</option>
-                        <option value="5">5</option>
-                    </select>
-                </div>
-                <div class="field small">
-                    <label>Skill</label>
-                    <select id="roll-skill">
-                        <option value="0">0</option>
-                        <option value="1" selected>1</option>
-                        <option value="2">2</option>
-                        <option value="3">3</option>
-                        <option value="4">4</option>
-                        <option value="5">5</option>
-                    </select>
-                </div>
-                <div class="field small">
-                    <label>DV</label>
-                    <select id="roll-dv">
-                        <option value="2">2</option>
-                        <option value="3" selected>3</option>
-                        <option value="4">4</option>
-                        <option value="5">5</option>
-                        <option value="6">6</option>
-                    </select>
-                </div>
-                <div class="field small">
-                    <label>Position</label>
-                    <select id="roll-position">
-                        <option value="controlled" selected>Controlled</option>
-                        <option value="dominant">Dominant</option>
-                        <option value="desperate">Desperate</option>
-                    </select>
-                </div>
-                <div class="field small">
-                    <label>Boons</label>
-                    <select id="roll-boons">
-                        <option value="0" selected>0</option>
-                        <option value="1">1</option>
-                        <option value="2">2</option>
-                        <option value="3">3</option>
-                        <option value="4">4</option>
-                        <option value="5">5</option>
-                    </select>
-                </div>
-            </div>
-            
-            <!-- Quick Roll Presets -->
-            <div class="preset-rolls" style="display:flex;gap:0.4rem;flex-wrap:wrap;margin-bottom:0.5rem;">
-                <button class="btn btn-sm btn-ghost" data-roll-preset="combat">⚔️ Combat (3+2, DV3)</button>
-                <button class="btn btn-sm btn-ghost" data-roll-preset="stealth">👤 Stealth (2+3, DV4)</button>
-                <button class="btn btn-sm btn-ghost" data-roll-preset="social">💬 Social (2+2, DV3)</button>
-                <button class="btn btn-sm btn-ghost" data-roll-preset="magic">🔮 Magic (1+4, DV5)</button>
-                <button class="btn btn-sm btn-ghost" data-roll-preset="desperate">🔥 Desperate (2+2, DV4, Desperate)</button>
-                <button class="btn btn-sm btn-ghost" data-roll-preset="deterministic">🎲 Deterministic Demo</button>
-            </div>
-            
-            <div class="flex">
-                <button class="btn btn-gold" id="roll-btn">🎲 Roll</button>
-                <button class="btn btn-sm" id="roll-clear-history">🗑️ Clear History</button>
-                <button class="btn btn-sm" id="roll-export-history">📤 Export</button>
-            </div>
-        </div>
-        
-        <div id="roll-result" class="panel" style="display:none;"></div>
-        
-        <div class="panel">
-            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;">
-                <h3 style="margin:0;">📜 Roll History</h3>
-                <div id="roll-stats" style="font-size:0.8rem;color:var(--text2);"></div>
-            </div>
-            <div id="roll-history" style="max-height:300px;overflow-y:auto;margin-top:0.5rem;">
-                <span class="text-muted">No rolls yet.</span>
-            </div>
-        </div>
-    `;
-    
-    attachEvents();
-    renderHistory();
-    updateStats();
-    setupWebSocketSync();
-    
-    return container;
-}
-
-// ============================================================
-// WEBSOCKET SYNC
-// ============================================================
-
-function setupWebSocketSync() {
-    cleanupWebSocketListeners();
-    
-    if (!isConnectedToServer()) {
-        console.log('[Dice] Not connected to server, local mode only');
-        return;
-    }
-    
-    const rollHandler = (data) => {
-        if (!data) return;
-        console.log('[Dice] Received roll from server:', data);
-        
-        const rollData = {
-            ...data,
-            id: data.id || `remote_${Date.now()}`,
-            timestamp: data.timestamp || new Date().toISOString(),
-            remote: true,
-            sender: data.sender || 'Remote'
-        };
-        
-        addRoll(rollData);
-        renderHistory();
-        updateStats();
-        showToast(`🎲 ${data.sender || 'Remote'} rolled: ${data.outcome || 'Dice'}`, 'info');
-    };
-    
+// Also try to load from window seed (set by build script for static sites)
+if (!_seed && typeof window !== 'undefined' && window.__RANDOM_SEED) {
+    _seed = window.__RANDOM_SEED;
+    _prng = new Xorshift128(_seed);
     try {
-        onEvent('roll-result', rollHandler);
-        wsListeners.set('roll-result', rollHandler);
-        console.log('[Dice] WebSocket sync enabled');
-    } catch (e) {
-        console.warn('[Dice] Could not setup WebSocket sync:', e);
-    }
-}
-
-function cleanupWebSocketListeners() {
-    for (const [event, handler] of wsListeners) {
-        try {
-            offEvent(event, handler);
-        } catch (e) {
-            console.debug('[Dice] Error removing listener:', e);
-        }
-    }
-    wsListeners.clear();
+        localStorage.setItem('fates-edge-seed', _seed);
+        console.log('[Dice Core] Seed loaded from window.__RANDOM_SEED:', _seed.substring(0, 8) + '...');
+    } catch (e) { /* ignore */ }
 }
 
 // ============================================================
-// EVENTS
+// CORE DICE ROLLING
 // ============================================================
 
-function attachEvents() {
-    const rollBtn = document.getElementById('roll-btn');
-    if (rollBtn) {
-        const newBtn = rollBtn.cloneNode(true);
-        rollBtn.parentNode.replaceChild(newBtn, rollBtn);
-        newBtn.addEventListener('click', handleRoll);
+/**
+ * Roll a single die with deterministic RNG support
+ * @param {number} sides - Number of sides on the die (default: 10)
+ * @returns {number} Roll result (1 to sides)
+ */
+export function rollDie(sides = 10) {
+    if (sides < 1) {
+        throw new Error('Die must have at least 1 side');
     }
-    
-    const clearBtn = document.getElementById('roll-clear-history');
-    if (clearBtn) {
-        const newBtn = clearBtn.cloneNode(true);
-        clearBtn.parentNode.replaceChild(newBtn, clearBtn);
-        newBtn.addEventListener('click', clearHistory);
+    if (_prng) {
+        return _prng.randomInt(1, sides + 1);
     }
-    
-    const exportBtn = document.getElementById('roll-export-history');
-    if (exportBtn) {
-        const newBtn = exportBtn.cloneNode(true);
-        exportBtn.parentNode.replaceChild(newBtn, exportBtn);
-        newBtn.addEventListener('click', exportHistory);
-    }
-    
-    document.querySelectorAll('[data-roll-preset]').forEach(btn => {
-        const newBtn = btn.cloneNode(true);
-        btn.parentNode.replaceChild(newBtn, btn);
-        newBtn.addEventListener('click', function() {
-            const preset = this.dataset.rollPreset;
-            applyPreset(preset);
-        });
-    });
-    
-    const seedRegenerate = document.getElementById('seed-regenerate');
-    if (seedRegenerate) {
-        seedRegenerate.addEventListener('click', function() {
-            const newSeed = generateSeed();
-            setSeed(newSeed);
-            render(container);
-            showToast('🎲 New seed generated: ' + newSeed.substring(0, 8) + '...', 'success');
-        });
-    }
-    
-    const seedClear = document.getElementById('seed-clear');
-    if (seedClear) {
-        seedClear.addEventListener('click', function() {
-            if (confirm('Clear the deterministic seed? This will use cryptographic RNG instead.')) {
-                setSeed(null);
-                render(container);
-                showToast('🧹 Seed cleared. Using cryptographic RNG.', 'info');
-            }
-        });
-    }
-    
-    document.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter' && container && container.contains(e.target)) {
-            const rollBtn = document.getElementById('roll-btn');
-            if (rollBtn) rollBtn.click();
-        }
-    });
-}
-
-// ============================================================
-// PRESETS
-// ============================================================
-
-function applyPreset(preset) {
-    const presets = {
-        combat: { attr: 3, skill: 2, dv: 3, position: 'controlled', boons: 0 },
-        stealth: { attr: 2, skill: 3, dv: 4, position: 'controlled', boons: 0 },
-        social: { attr: 2, skill: 2, dv: 3, position: 'controlled', boons: 0 },
-        magic: { attr: 1, skill: 4, dv: 5, position: 'controlled', boons: 0 },
-        desperate: { attr: 2, skill: 2, dv: 4, position: 'desperate', boons: 0 },
-        deterministic: { attr: 3, skill: 3, dv: 4, position: 'controlled', boons: 1 }
-    };
-    
-    const p = presets[preset];
-    if (!p) return;
-    
-    document.getElementById('roll-attr').value = p.attr;
-    document.getElementById('roll-skill').value = p.skill;
-    document.getElementById('roll-dv').value = p.dv;
-    document.getElementById('roll-position').value = p.position;
-    document.getElementById('roll-boons').value = p.boons;
-    
-    setTimeout(() => {
-        const rollBtn = document.getElementById('roll-btn');
-        if (rollBtn) rollBtn.click();
-    }, 100);
-}
-
-// ============================================================
-// ROLL HANDLING
-// ============================================================
-
-function handleRoll() {
     try {
-        const attrEl = document.getElementById('roll-attr');
-        const skillEl = document.getElementById('roll-skill');
-        const dvEl = document.getElementById('roll-dv');
-        const positionEl = document.getElementById('roll-position');
-        const boonsEl = document.getElementById('roll-boons');
-        
-        if (!attrEl || !skillEl || !dvEl || !positionEl || !boonsEl) {
-            console.error('Form elements not found');
-            return;
-        }
-        
-        const attr = safeParseInt(attrEl.value, 2);
-        const skill = safeParseInt(skillEl.value, 1);
-        const dv = safeParseInt(dvEl.value, 3);
-        const position = positionEl.value;
-        const boons = safeParseInt(boonsEl.value, 0);
-        
-        if (isNaN(attr) || isNaN(skill) || isNaN(dv) || isNaN(boons)) {
-            showError('Invalid input values. Please check your selections.');
-            return;
-        }
-        
-        console.log('Rolling with:', { attr, skill, dv, position, boons });
-        
-        const result = performRoll(attr, skill, dv, position, boons);
-        
-        if (!result || typeof result !== 'object') {
-            console.error('Invalid result from performRoll:', result);
-            showError('Failed to perform roll. Please try again.');
-            return;
-        }
-        
-        const rollData = {
-            id: Date.now().toString(),
-            timestamp: new Date().toISOString(),
-            attr,
-            skill,
-            dv,
-            position,
-            boons,
-            pool: result.pool,
-            dice: result.dice,
-            initialDice: result.initialDice,
-            successes: result.successes,
-            storyBeats: result.storyBeats,
-            outcome: result.outcome,
-            resultText: result.resultText,
-            outcomeClass: result.outcomeClass,
-            reRolls: result.reRolls,
-            reRolledDice: result.reRolledDice,
-            rerollSuccesses: result.rerollSuccesses,
-            rerollStoryBeats: result.rerollStoryBeats,
-            deterministic: !!getSeed(),
-            seed: getSeed(),
-            sender: 'You'
-        };
-        
-        addRoll(rollData);
-        displayResult(result);
-        renderHistory();
-        updateStats();
-        
-        if (isConnectedToServer()) {
-            try {
-                sendWSMessage('roll-result', rollData);
-            } catch (e) {
-                console.warn('[Dice] Could not broadcast roll:', e);
-            }
-        }
-    } catch (error) {
-        console.error('Error during roll:', error);
-        showError(error.message || 'An unexpected error occurred during the roll.');
-    }
-}
-
-function showError(message) {
-    const resultEl = document.getElementById('roll-result');
-    if (resultEl) {
-        resultEl.style.display = 'block';
-        resultEl.innerHTML = `
-            <div style="text-align:center;padding:0.5rem;color:var(--red);">
-                <div style="font-weight:bold;">❌ Error</div>
-                <div style="font-size:0.9rem;color:var(--text2);">${escHtml(String(message))}</div>
-            </div>
-        `;
-    }
-}
-
-// ============================================================
-// DISPLAY
-// ============================================================
-
-function displayResult(result) {
-    const resultEl = document.getElementById('roll-result');
-    if (!resultEl) return;
-    
-    const outcomeColors = {
-        'clean-success': 'var(--green)',
-        'success-with-sb': 'var(--gold)',
-        'partial': 'var(--orange)',
-        'miss': 'var(--red)'
-    };
-    
-    const color = outcomeColors[result.outcomeClass] || 'var(--text)';
-    
-    let boonText = '';
-    if (result.outcomeClass === 'partial') {
-        boonText = ' (+1 Boon)';
-    } else if (result.outcomeClass === 'miss') {
-        boonText = ' (+2 Boons)';
-    }
-    
-    const diceDisplay = result.dice && Array.isArray(result.dice) 
-        ? result.dice.join(', ') 
-        : '';
-    
-    let rerollDisplay = '';
-    if (result.reRolls > 0 && result.reRolledDice && Array.isArray(result.reRolledDice)) {
-        rerollDisplay = `(rerolled: ${result.reRolledDice.map(r => `${r.old}→${r.new}`).join(', ')})`;
-    }
-    
-    let seedInfo = '';
-    const seed = getSeed();
-    if (seed) {
-        seedInfo = `<div style="font-size:0.6rem;color:var(--text3);margin-top:0.2rem;">🎲 seeded: ${seed.substring(0, 8)}...</div>`;
-    }
-    
-    resultEl.style.transition = 'transform 0.3s ease, opacity 0.3s ease';
-    resultEl.style.transform = 'scale(0.95)';
-    resultEl.style.opacity = '0.7';
-    
-    resultEl.style.display = 'block';
-    resultEl.innerHTML = `
-        <div style="text-align:center;padding:0.5rem;">
-            <div style="font-size:2rem;font-weight:bold;color:${color};">
-                ${escHtml(result.resultText || 'Unknown')}${boonText}
-            </div>
-            <div style="font-size:0.9rem;color:var(--text2);margin-top:0.3rem;">
-                Pool: ${result.pool || 0} | Successes: ${result.successes || 0} | DV: ${result.dv || 0} | Story Beats: ${result.storyBeats || 0}
-            </div>
-            <div style="font-size:0.8rem;color:var(--text3);margin-top:0.2rem;">
-                Dice: [${escHtml(diceDisplay)}] ${escHtml(rerollDisplay)}
-            </div>
-            <div style="font-size:0.7rem;color:var(--text3);margin-top:0.2rem;">
-                ${escHtml(result.position || 'controlled')} position${result.boons > 0 ? ` +${result.boons} boons` : ''}
-            </div>
-            ${result.storyBeats > 0 ? `<div style="font-size:0.8rem;color:var(--gold);margin-top:0.2rem;">✨ ${result.storyBeats} Story Beat${result.storyBeats > 1 ? 's' : ''} for the GM</div>` : ''}
-            ${seedInfo}
-        </div>
-    `;
-    
-    setTimeout(() => {
-        resultEl.style.transform = 'scale(1)';
-        resultEl.style.opacity = '1';
-    }, 100);
-}
-
-// ============================================================
-// HISTORY
-// ============================================================
-
-function renderHistory() {
-    const historyEl = document.getElementById('roll-history');
-    if (!historyEl) return;
-    
-    try {
-        const state = getState();
-        const history = state.diceHistory || [];
-        
-        if (history.length === 0) {
-            historyEl.innerHTML = '<span class="text-muted">No rolls yet.</span>';
-            return;
-        }
-        
-        const html = history.slice(0, 20).map((roll, index) => {
-            try {
-                const time = roll.timestamp ? new Date(roll.timestamp).toLocaleTimeString() : '--:--:--';
-                
-                let outcomeColor = 'var(--text2)';
-                if (roll.outcomeClass === 'clean-success' || roll.outcomeClass === 'success-with-sb') {
-                    outcomeColor = 'var(--green)';
-                } else if (roll.outcomeClass === 'partial') {
-                    outcomeColor = 'var(--orange)';
-                } else if (roll.outcomeClass === 'miss') {
-                    outcomeColor = 'var(--red)';
-                }
-                
-                const diceDisplay = roll.dice && Array.isArray(roll.dice) 
-                    ? roll.dice.join(',') 
-                    : '';
-                
-                let rerollDisplay = '';
-                if (roll.reRolls > 0 && roll.reRolledDice && Array.isArray(roll.reRolledDice)) {
-                    rerollDisplay = ` ↻${roll.reRolledDice.map(r => `${r.old}→${r.new}`).join(', ')}`;
-                }
-                
-                const posIcons = {
-                    dominant: '👑',
-                    controlled: '⚖️',
-                    desperate: '🔥'
-                };
-                const posIcon = posIcons[roll.position] || '';
-                const detIndicator = roll.deterministic ? '🎲' : '🔀';
-                const sender = roll.remote ? `🌐 ${roll.sender || 'Remote'}` : detIndicator;
-                
-                return `
-                    <div class="history-item" style="display:flex;justify-content:space-between;align-items:center;padding:0.3rem 0;border-bottom:1px solid var(--border);font-size:0.85rem;gap:0.5rem;">
-                        <div style="display:flex;flex-wrap:wrap;gap:0.3rem;align-items:center;">
-                            <span style="font-size:0.7rem;color:var(--text3);">${sender}</span>
-                            <span style="font-weight:500;">${roll.attr || 0}+${roll.skill || 0}</span>
-                            <span class="text-muted" style="font-size:0.75rem;">vs DV${roll.dv || 0}</span>
-                            <span style="font-size:0.75rem;">${posIcon}</span>
-                            <span style="color:${outcomeColor};font-weight:500;">${escHtml(String(roll.resultText || roll.outcome || 'Unknown'))}</span>
-                            ${roll.storyBeats > 0 ? ` <span style="color:var(--gold);font-weight:500;">✨${roll.storyBeats}</span>` : ''}
-                        </div>
-                        <div style="font-size:0.7rem;color:var(--text3);text-align:right;flex-shrink:0;">
-                            <span style="background:var(--bg3);padding:0.05rem 0.4rem;border-radius:8px;">[${escHtml(diceDisplay)}]</span>
-                            ${rerollDisplay}
-                            <span class="text-muted" style="margin-left:0.3rem;">${time}</span>
-                        </div>
-                    </div>
-                `;
-            } catch (err) {
-                console.error('Error rendering history item:', err);
-                return '';
-            }
-        }).filter(html => html !== '').join('');
-        
-        historyEl.innerHTML = html || '<span class="text-muted">No rolls yet.</span>';
-        historyEl.scrollTop = historyEl.scrollHeight;
-    } catch (error) {
-        console.error('Error rendering history:', error);
-        historyEl.innerHTML = '<span class="text-muted">Error loading history.</span>';
-    }
-}
-
-// ============================================================
-// STATS
-// ============================================================
-
-function updateStats() {
-    const statsEl = document.getElementById('roll-stats');
-    if (!statsEl) return;
-    
-    try {
-        const state = getState();
-        const history = state.diceHistory || [];
-        const total = history.length;
-        
-        if (total === 0) {
-            statsEl.textContent = '';
-            return;
-        }
-        
-        const successes = history.filter(r => 
-            r.outcomeClass === 'clean-success' || r.outcomeClass === 'success-with-sb'
-        ).length;
-        const partials = history.filter(r => r.outcomeClass === 'partial').length;
-        const misses = history.filter(r => r.outcomeClass === 'miss').length;
-        const storyBeats = history.reduce((sum, r) => sum + (r.storyBeats || 0), 0);
-        const deterministic = history.filter(r => r.deterministic).length;
-        const remote = history.filter(r => r.remote).length;
-        
-        statsEl.innerHTML = `
-            <span>📊 ${total} rolls</span>
-            <span style="color:var(--green);">✅ ${successes}</span>
-            <span style="color:var(--orange);">⏳ ${partials}</span>
-            <span style="color:var(--red);">❌ ${misses}</span>
-            <span style="color:var(--gold);">✨ ${storyBeats}</span>
-            ${deterministic > 0 ? `<span style="color:var(--text3);font-size:0.7rem;">🎲 ${deterministic}</span>` : ''}
-            ${remote > 0 ? `<span style="color:var(--text3);font-size:0.7rem;">🌐 ${remote}</span>` : ''}
-        `;
-    } catch (error) {
-        console.error('Error updating stats:', error);
-        statsEl.textContent = '';
-    }
-}
-
-// ============================================================
-// HISTORY MANAGEMENT
-// ============================================================
-
-function clearHistory() {
-    if (confirm('Clear all roll history?')) {
-        try {
-            const state = getState();
-            state.diceHistory = [];
-            saveState();
-            renderHistory();
-            updateStats();
-            const resultEl = document.getElementById('roll-result');
-            if (resultEl) resultEl.style.display = 'none';
-        } catch (error) {
-            console.error('Error clearing history:', error);
-            alert('Failed to clear history. Please try again.');
-        }
-    }
-}
-
-function exportHistory() {
-    try {
-        const state = getState();
-        const history = state.diceHistory || [];
-        
-        if (history.length === 0) {
-            alert('No roll history to export.');
-            return;
-        }
-        
-        const data = JSON.stringify(history, null, 2);
-        const blob = new Blob([data], { type: 'application/json' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `dice-history-${new Date().toISOString().slice(0,10)}.json`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-    } catch (error) {
-        console.error('Error exporting history:', error);
-        alert('Failed to export history. Please try again.');
-    }
-}
-
-// ============================================================
-// INITIALIZATION
-// ============================================================
-
-export function init(el) {
-    try {
-        const storedSeed = localStorage.getItem('fates-edge-seed');
-        if (storedSeed) {
-            setSeed(storedSeed);
+        if (typeof window !== 'undefined' && window.crypto && window.crypto.getRandomValues) {
+            const array = new Uint32Array(1);
+            window.crypto.getRandomValues(array);
+            return Math.floor((array[0] / 4294967296) * sides) + 1;
         }
     } catch (e) { /* ignore */ }
-    
-    return render(el);
+    return Math.floor(Math.random() * sides) + 1;
 }
 
-export function destroy() {
-    cleanupWebSocketListeners();
-    container = null;
+/**
+ * Roll multiple dice and return results
+ * @param {number} count - Number of dice to roll
+ * @param {number} sides - Number of sides on each die
+ * @returns {number[]} Array of roll results
+ */
+export function rollDice(count, sides = 10) {
+    const results = [];
+    for (let i = 0; i < count; i++) {
+        results.push(rollDie(sides));
+    }
+    return results;
+}
+
+/**
+ * Roll a dice pool and count successes (6+)
+ * @param {number} pool - Number of dice in the pool
+ * @param {number} sides - Number of sides on each die
+ * @returns {Object} { dice: number[], successes: number, storyBeats: number }
+ */
+export function rollPool(pool, sides = 10) {
+    const dice = rollDice(pool, sides);
+    const successes = dice.filter(r => r >= 6).length;
+    const storyBeats = dice.filter(r => r === 1).length;
+    return { dice, successes, storyBeats };
+}
+
+/**
+ * Core dice pool roll with Story Beat tracking
+ * @param {number} pool - Number of dice in the pool
+ * @param {number} dv - Difficulty Value to beat
+ * @param {Object} options - Additional options
+ * @param {number} options.reRolls - Number of re-rolls allowed (default: 0)
+ * @param {number} options.exploding - If truthy, 10s explode (roll again)
+ * @param {string} options.position - Position (dominant, controlled, desperate)
+ * @param {number} options.boons - Number of boons to add
+ * @returns {Object} Roll result with successes, dice, storyBeats, etc.
+ */
+export function performDicePoolRoll(pool, dv, options = {}) {
+    const {
+        position = 'controlled',
+        boons = 0,
+        reRolls = 0,
+        exploding = false
+    } = options;
+    
+    // Add boons to pool
+    const effectivePool = Math.min(pool + boons, 12);
+    let dice = rollDice(effectivePool);
+    let storyBeats = dice.filter(r => r === 1).length;
+    let successes = dice.filter(r => r >= 6).length;
+    let reRolledDice = [];
+    let reRollCount = 0;
+    let initialDice = [...dice];
+    
+    // Handle position effects
+    if (position === 'dominant') {
+        // Re-roll failures (dice < 6)
+        const failures = dice.filter(r => r < 6);
+        if (failures.length > 0) {
+            const rerollResults = rollDice(failures.length);
+            reRolledDice = failures.map((old, i) => ({ old, new: rerollResults[i] || 1 }));
+            reRollCount = rerollResults.length;
+            // Update dice array with re-roll results
+            let idx = 0;
+            dice = dice.map(r => {
+                if (r < 6 && idx < rerollResults.length) {
+                    return rerollResults[idx++];
+                }
+                return r;
+            });
+            // Recalculate successes and story beats
+            successes = dice.filter(r => r >= 6).length;
+            storyBeats = dice.filter(r => r === 1).length;
+        }
+    } else if (position === 'desperate') {
+        // Re-roll successes (dice >= 6)
+        const successDice = dice.filter(r => r >= 6);
+        if (successDice.length > 0) {
+            const rerollResults = rollDice(successDice.length);
+            reRolledDice = successDice.map((old, i) => ({ old, new: rerollResults[i] || 1 }));
+            reRollCount = rerollResults.length;
+            // Replace success dice with re-roll results
+            let idx = 0;
+            dice = dice.map(r => {
+                if (r >= 6 && idx < rerollResults.length) {
+                    return rerollResults[idx++];
+                }
+                return r;
+            });
+            // Recalculate successes and story beats
+            successes = dice.filter(r => r >= 6).length;
+            storyBeats = dice.filter(r => r === 1).length;
+        }
+    }
+    
+    // Handle exploding dice (10s roll again)
+    if (exploding) {
+        let explodedDice = [];
+        let explodeCount = 0;
+        let currentDice = dice;
+        let hasExploded = true;
+        let maxExplosions = 5;
+        
+        while (hasExploded && maxExplosions > 0) {
+            hasExploded = false;
+            const newDice = [];
+            for (const roll of currentDice) {
+                if (roll === 10 && maxExplosions > 0) {
+                    hasExploded = true;
+                    explodeCount++;
+                    const extraRoll = rollDie(10);
+                    explodedDice.push(extraRoll);
+                    newDice.push(extraRoll);
+                    maxExplosions--;
+                }
+            }
+            if (hasExploded) {
+                currentDice = newDice;
+                dice = [...dice, ...newDice];
+                // Update successes and story beats
+                successes = dice.filter(r => r >= 6).length;
+                storyBeats = dice.filter(r => r === 1).length;
+            }
+        }
+    }
+    
+    // Determine outcome
+    let outcome, outcomeClass, resultText;
+    if (successes >= dv) {
+        if (storyBeats > 0) {
+            outcome = 'Success with SB';
+            outcomeClass = 'success-with-sb';
+            resultText = 'Success with Story Beats';
+        } else {
+            outcome = 'Clean Success';
+            outcomeClass = 'clean-success';
+            resultText = 'Clean Success';
+        }
+    } else if (successes > 0) {
+        outcome = 'Partial';
+        outcomeClass = 'partial';
+        resultText = 'Partial Success';
+    } else {
+        outcome = 'Miss';
+        outcomeClass = 'miss';
+        resultText = 'Miss';
+    }
+    
+    return {
+        pool: effectivePool,
+        dice,
+        initialDice,
+        successes,
+        storyBeats,
+        dv,
+        position,
+        boons,
+        outcome,
+        outcomeClass,
+        resultText,
+        reRolls: reRollCount,
+        reRolledDice,
+        deterministic: !!_seed,
+        seed: _seed
+    };
 }
 
 // ============================================================
-// EXPORT DEFAULT
+// PERFORM ROLL (Full resolution with attribute + skill)
+// ============================================================
+
+/**
+ * Perform a full roll with attribute, skill, and position
+ * @param {number} attr - Attribute value
+ * @param {number} skill - Skill value
+ * @param {number} dv - Difficulty Value
+ * @param {string} position - Position (dominant, controlled, desperate)
+ * @param {number} boons - Number of boons to add
+ * @param {Object} options - Additional options
+ * @returns {Object} Full roll result
+ */
+export function performRoll(attr, skill, dv, position = 'controlled', boons = 0, options = {}) {
+    const basePool = Math.max(1, attr + skill);
+    const pool = Math.min(basePool + boons, 12); // Cap at 12 dice
+    
+    // Roll the initial pool
+    let dice = rollDice(pool);
+    let storyBeats = dice.filter(r => r === 1).length;
+    let successes = dice.filter(r => r >= 6).length;
+    let reRolls = 0;
+    let reRolledDice = [];
+    let rerollSuccesses = 0;
+    let rerollStoryBeats = 0;
+    let initialDice = [...dice];
+    
+    // Handle position effects
+    if (position === 'dominant') {
+        // Re-roll failures (dice < 6)
+        const failures = dice.filter(r => r < 6);
+        if (failures.length > 0) {
+            const rerollResults = rollDice(failures.length);
+            reRolledDice = failures.map((old, i) => ({ old, new: rerollResults[i] || 1 }));
+            reRolls = rerollResults.length;
+            rerollSuccesses = rerollResults.filter(r => r >= 6).length;
+            rerollStoryBeats = rerollResults.filter(r => r === 1).length;
+            // Update dice array with re-roll results
+            let idx = 0;
+            dice = dice.map(r => {
+                if (r < 6 && idx < rerollResults.length) {
+                    return rerollResults[idx++];
+                }
+                return r;
+            });
+            // Recalculate successes and story beats
+            successes = dice.filter(r => r >= 6).length;
+            storyBeats = dice.filter(r => r === 1).length;
+        }
+    } else if (position === 'desperate') {
+        // Re-roll successes (dice >= 6)
+        const successDice = dice.filter(r => r >= 6);
+        if (successDice.length > 0) {
+            const rerollResults = rollDice(successDice.length);
+            reRolledDice = successDice.map((old, i) => ({ old, new: rerollResults[i] || 1 }));
+            reRolls = rerollResults.length;
+            rerollSuccesses = rerollResults.filter(r => r >= 6).length;
+            rerollStoryBeats = rerollResults.filter(r => r === 1).length;
+            // Replace success dice with re-roll results
+            let idx = 0;
+            dice = dice.map(r => {
+                if (r >= 6 && idx < rerollResults.length) {
+                    return rerollResults[idx++];
+                }
+                return r;
+            });
+            // Recalculate successes and story beats
+            successes = dice.filter(r => r >= 6).length;
+            storyBeats = dice.filter(r => r === 1).length;
+        }
+    }
+    
+    // Determine outcome
+    let outcome, outcomeClass, resultText;
+    let storyBeatOutcome = '';
+    if (successes >= dv) {
+        if (storyBeats > 0) {
+            outcome = 'Success with SB';
+            outcomeClass = 'success-with-sb';
+            resultText = 'Success with Story Beats';
+            storyBeatOutcome = 'The action succeeds, but the GM gains Story Beats to spend on complications.';
+        } else {
+            outcome = 'Clean Success';
+            outcomeClass = 'clean-success';
+            resultText = 'Clean Success';
+            storyBeatOutcome = 'The action succeeds cleanly with no complications.';
+        }
+    } else if (successes > 0) {
+        outcome = 'Partial';
+        outcomeClass = 'partial';
+        resultText = 'Partial Success';
+        storyBeatOutcome = 'You make progress, but the situation remains unresolved. Gain 1 Boon.';
+    } else {
+        outcome = 'Miss';
+        outcomeClass = 'miss';
+        resultText = 'Miss';
+        storyBeatOutcome = 'The action fails. Gain 2 Boons. The GM gains Story Beats to escalate.';
+    }
+    
+    return {
+        pool,
+        dice,
+        initialDice,
+        successes,
+        storyBeats,
+        dv,
+        position,
+        boons,
+        attr,
+        skill,
+        outcome,
+        outcomeClass,
+        resultText,
+        storyBeatOutcome,
+        reRolls,
+        reRolledDice,
+        rerollSuccesses,
+        rerollStoryBeats,
+        deterministic: !!_seed,
+        seed: _seed
+    };
+}
+
+// ============================================================
+// ROLL HELPERS
+// ============================================================
+
+/**
+ * Check if a roll is a success
+ * @param {number} successes - Number of successes
+ * @param {number} dv - Difficulty Value
+ * @returns {boolean} True if success
+ */
+export function isSuccess(successes, dv) {
+    return successes >= dv;
+}
+
+/**
+ * Get the outcome label for a roll
+ * @param {number} successes - Number of successes
+ * @param {number} dv - Difficulty Value
+ * @param {number} storyBeats - Number of Story Beats
+ * @returns {string} Outcome label
+ */
+export function getOutcomeLabel(successes, dv, storyBeats = 0) {
+    if (successes >= dv) {
+        return storyBeats > 0 ? 'Success with SB' : 'Clean Success';
+    } else if (successes > 0) {
+        return 'Partial';
+    } else {
+        return 'Miss';
+    }
+}
+
+/**
+ * Get the outcome class for styling
+ * @param {string} outcome - Outcome label
+ * @returns {string} CSS class
+ */
+export function getOutcomeClass(outcome) {
+    const classes = {
+        'Clean Success': 'clean-success',
+        'Success with SB': 'success-with-sb',
+        'Partial': 'partial',
+        'Miss': 'miss'
+    };
+    return classes[outcome] || 'unknown';
+}
+
+/**
+ * Get the color for an outcome
+ * @param {string} outcome - Outcome label
+ * @returns {string} CSS color
+ */
+export function getOutcomeColor(outcome) {
+    const colors = {
+        'Clean Success': '#27ae60',
+        'Success with SB': '#f1c40f',
+        'Partial': '#e67e22',
+        'Miss': '#e74c3c'
+    };
+    return colors[outcome] || '#95a5a6';
+}
+
+// ============================================================
+// DICE POOL VISUALIZATION
+// ============================================================
+
+/**
+ * Get a visual representation of dice results
+ * @param {number[]} dice - Array of die results
+ * @returns {string[]} Array of visual representations
+ */
+export function visualizeDice(dice) {
+    return dice.map(r => {
+        if (r >= 6) return `[${r}✓]`;
+        if (r === 1) return `[${r}⚠]`;
+        return `[${r}]`;
+    });
+}
+
+/**
+ * Get dice HTML for display
+ * @param {number[]} dice - Array of die results
+ * @returns {string} HTML string
+ */
+export function diceToHtml(dice) {
+    return dice.map(r => {
+        let className = 'die';
+        if (r >= 6) className += ' success';
+        if (r === 1) className += ' story-beat';
+        if (r === 10) className += ' critical';
+        return `<span class="${className}">${r}</span>`;
+    }).join(' ');
+}
+
+// ============================================================
+// EXPORTS
 // ============================================================
 
 export default {
-    render,
-    init,
-    destroy,
+    // Classes
+    Xorshift128,
+    
+    // Seed management
     getSeed,
     setSeed,
     generateSeed,
+    
+    // Random functions
     getRandom,
     getRandomInt,
     getRandomIntInclusive,
-    Xorshift128
+    
+    // Dice rolling
+    rollDie,
+    rollDice,
+    rollPool,
+    performDicePoolRoll,
+    performRoll,
+    
+    // Helpers
+    isSuccess,
+    getOutcomeLabel,
+    getOutcomeClass,
+    getOutcomeColor,
+    visualizeDice,
+    diceToHtml
 };

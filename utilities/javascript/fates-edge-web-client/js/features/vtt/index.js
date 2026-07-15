@@ -60,24 +60,6 @@ export function render(el) {
     renderModule(el);
 }
 
-export function destroy() {
-    if (connectionListener) {
-        offEvent('connected', connectionListener);
-        offEvent('disconnected', connectionListener);
-        connectionListener = null;
-    }
-    if (currentModule) {
-        try {
-            currentModule.destroy();
-        } catch (e) {
-            console.warn('[VTT] Error destroying module:', e);
-        }
-        currentModule = null;
-        currentMode = null;
-        currentContainer = null;
-    }
-}
-
 // Re-export functions that might be needed externally (like sendMessage)
 export function sendMessage(text, sender, recipient = 'all', metadata = {}) {
     if (currentModule && currentModule.sendMessage) {
@@ -92,7 +74,6 @@ export function isWSConnected() {
 
 export default {
     render,
-    destroy,
     sendMessage,
     isWSConnected,
 };
