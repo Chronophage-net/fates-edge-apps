@@ -16,6 +16,9 @@ on:
           - preview
         default: github-pages
 
+env:
+  NODE_VERSION: 22  # ← Match the build workflow
+
 permissions:
   contents: read
 
@@ -42,132 +45,69 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
 
     steps:
-      - name: Download Pages artifact from build workflow
-        if: github.event_name == 'workflow_run'
-        uses: actions/download-artifact@v6
-        with:
-          name: github-pages
-          path: pages-site
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          run-id: ${{ github.event.workflow_run.id }}
-        continue-on-error: true
-
-      # ✅ ADD THIS STEP
-      - name: Verify downloaded artifact
-        id: verify-download
-        run: |
-          if [ -d "pages-site" ] && [ "$(ls -A pages-site 2>/dev/null)" ]; then
-            echo "✅ Pages artifact downloaded successfully"
-            echo "downloaded=true" >> "$GITHUB_OUTPUT"
-            echo "Contents:"
-            ls -la pages-site/ | head -20
-          else
-            echo "⚠️ Pages artifact download failed or was empty"
-            echo "downloaded=false" >> "$GITHUB_OUTPUT"
-          fi
-          
-      - name: Checkout web client source (fallback)
-        if: github.event_name == 'workflow_dispatch' || steps.check-artifact.outputs.downloaded == 'false'
+      # ============================================================
+      # FALLBACK: Build from source for manual dispatch
+      # ============================================================
+      - name: Checkout source (fallback for manual dispatch)
+        if: github.event_name == 'workflow_dispatch'
         uses: actions/checkout@v5
 
       - name: Setup Node (fallback)
-        if: github.event_name == 'workflow_dispatch' || steps.check-artifact.outputs.downloaded == 'false'
+        if: github.event_name == 'workflow_dispatch'
         uses: actions/setup-node@v6
         with:
-          node-version: 22
+          node-version: ${{ env.NODE_VERSION }}  # ← Use 22
 
-      - name: Generate seed (fallback)
-        if: github.event_name == 'workflow_dispatch' || steps.check-artifact.outputs.downloaded == 'false'
-        working-directory: utilities/javascript/fates-edge-web-client
+      - name: Prepare static site (fallback for manual dispatch)
+        if: github.event_name == 'workflow_dispatch'
         run: |
-          echo "🎲 Generating seed..."
-          if [ -f js/tools/generate-seed.js ]; then
-            node js/tools/generate-seed.js --force --output=.seed/random-seed.json
-            mkdir -p data
-            cp .seed/random-seed.json data/seed.json 2>/dev/null || true
-            cp .seed/seed.js js/seed.js 2>/dev/null || true
-          fi
-
-      - name: Prepare static site for Pages (fallback)
-        if: github.event_name == 'workflow_dispatch' || steps.check-artifact.outputs.downloaded == 'false'
-        run: |
-          echo "📦 Preparing static site for GitHub Pages..."
+          echo "📦 Preparing static site for GitHub Pages (manual dispatch)..."
           mkdir -p pages-site
           
-          rsync -a \
-            --exclude='node_modules' \
-            --exclude='Dockerfile*' \
-            --exclude='docker-compose.yml' \
-            --exclude='Makefile' \
-            --exclude='package.json' \
-            --exclude='package-lock.json' \
-            --exclude='DESIGN.md' \
-            --exclude='build.sh' \
-            --exclude='vite.config.js' \
-            --exclude='.gitignore' \
-            --exclude='.DS_Store' \
-            --exclude='js/tests' \
-            utilities/javascript/fates-edge-web-client/ pages-site/
+          # Copy the entire web client directory
+          cp -r utilities/javascript/fates-edge-web-client/* pages-site/
           
+          # Copy data files
           echo "📂 Copying data files..."
-          if [ -f "LICENSE.md" ]; then
-            cp LICENSE.md pages-site/
-          fi
+          [ -f "LICENSE.md" ] && cp LICENSE.md pages-site/
           
-          # wiki.json
-          for src in "data/wiki.json" "misc/wiki.json" "utilities/javascript/fates-edge-web-client/data/wiki.json"; do
-            if [ -f "$src" ]; then
-              cp "$src" pages-site/wiki.json
-              break
-            fi
+          for src in "data/wiki.json" "misc/wiki.json"; do
+            [ -f "$src" ] && cp "$src" pages-site/wiki.json && break
           done
           
-          # Regions
-          for src_dir in "data/regions" "misc/regions" "utilities/javascript/fates-edge-web-client/data/regions"; do
-            if [ -d "$src_dir" ]; then
-              cp -r "$src_dir" pages-site/regions 2>/dev/null || true
-              break
-            fi
+          for src in "data/regions" "misc/regions"; do
+            [ -d "$src" ] && cp -r "$src" pages-site/regions 2>/dev/null && break
           done
           
-          # Factions
-          for src_dir in "data/factions" "misc/factions" "utilities/javascript/fates-edge-web-client/data/factions"; do
-            if [ -d "$src_dir" ]; then
-              cp -r "$src_dir" pages-site/factions 2>/dev/null || true
-              break
-            fi
+          for src in "data/factions" "misc/factions"; do
+            [ -d "$src" ] && cp -r "$src" pages-site/factions 2>/dev/null && break
           done
           
-          # Patrons
-          for src_dir in "data/patrons" "misc/patrons" "utilities/javascript/fates-edge-web-client/data/patrons"; do
-            if [ -d "$src_dir" ]; then
+          for src in "data/patrons" "misc/patrons"; do
+            if [ -d "$src" ]; then
               mkdir -p pages-site/data
-              cp -r "$src_dir" pages-site/data/patrons 2>/dev/null || true
+              cp -r "$src" pages-site/data/patrons 2>/dev/null
               break
             fi
           done
-          
-          # Seed files (already generated above)
-          if [ -f "utilities/javascript/fates-edge-web-client/.seed/random-seed.json" ]; then
-            cp utilities/javascript/fates-edge-web-client/.seed/random-seed.json pages-site/data/seed.json 2>/dev/null || true
-          fi
           
           echo "✅ Static site prepared"
 
-      - name: Verify pages-site contents
-        run: |
-          echo "📂 Pages site structure:"
-          echo ""
-          echo "Root contents:"
-          ls -la pages-site/ | head -15
-          echo ""
-          
-          if [ -f "pages-site/index.html" ]; then
-            echo "✅ index.html found"
-          else
-            echo "⚠️ WARNING: index.html not found - site may not render correctly"
-          fi
+      - name: Upload Pages artifact (fallback for manual dispatch)
+        if: github.event_name == 'workflow_dispatch'
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: pages-site
 
+      # ============================================================
+      # DEPLOY TO PAGES
+      # ============================================================
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+        with:
+          # For workflow_run events: use the build workflow's run ID
+          # For workflow_dispatch: this is empty, uses current run's artifact
+          github_run_id: ${{ github.event.workflow_run.id }}
+          artifact_name: github-pages
+          token: ${{ secrets.GITHUB_TOKEN }}

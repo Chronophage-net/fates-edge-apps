@@ -20,6 +20,9 @@ on:
         description: 'Force deploy even if no changes'
         default: false
 
+env:
+  NODE_VERSION: 22  # ← Match the build workflow
+
 permissions:
   contents: read
   actions: read
@@ -68,19 +71,17 @@ jobs:
         if: github.event_name == 'workflow_dispatch' || steps.check-artifact.outputs.downloaded == 'false'
         uses: actions/setup-node@v6
         with:
-          node-version: 22   # LTS
+          node-version: ${{ env.NODE_VERSION }}  # ← Use 22
 
       - name: Build socket server (fallback)
         if: github.event_name == 'workflow_dispatch' || steps.check-artifact.outputs.downloaded == 'false'
         working-directory: utilities/javascript/fates-edge-socket-server
         run: |
           npm ci
-          mkdir -p ../../socket-server-deploy
-          rsync -a --exclude='node_modules' --exclude='.git' . ../../socket-server-deploy/
-          # Optionally copy data from web client data directory if needed
-          if [ -d "../fates-edge-web-client/data" ]; then
-            cp -r ../fates-edge-web-client/data ../../socket-server-deploy/data 2>/dev/null || true
-          fi
+          mkdir -p socket-server-deploy
+          cp -r ./* socket-server-deploy/
+          # Copy data files if they exist
+          [ -d "../../../data" ] && cp -r ../../../data/* socket-server-deploy/data/ 2>/dev/null || true
 
       - name: Prepare deployment artifact
         run: |
@@ -109,6 +110,8 @@ jobs:
           echo "🚀 Deploying socket server to Render (${{ github.event.inputs.environment || 'production' }})..."
           echo "Service ID: $RENDER_SERVICE_ID"
           
+          # Trigger deployment via Render API
+          # Valid values: "clear" or "do_not_clear"
           RESPONSE=$(curl -s -X POST \
             -H "Authorization: Bearer $RENDER_API_KEY" \
             -H "Content-Type: application/json" \
@@ -122,16 +125,6 @@ jobs:
             echo "✅ Deployment triggered successfully!"
             echo "Deploy ID: $DEPLOY_ID"
             echo "📊 Dashboard: https://dashboard.render.com/web/$RENDER_SERVICE_ID/deploys/$DEPLOY_ID"
-            
-            echo "⏳ Checking deployment status..."
-            sleep 5
-            
-            STATUS_RESPONSE=$(curl -s \
-              -H "Authorization: Bearer $RENDER_API_KEY" \
-              https://api.render.com/v1/services/$RENDER_SERVICE_ID/deploys/$DEPLOY_ID)
-            
-            DEPLOY_STATUS=$(echo "$STATUS_RESPONSE" | grep -o '"status":"[^"]*"' | head -1 | cut -d'"' -f4)
-            echo "📊 Deployment status: $DEPLOY_STATUS"
           else
             ERROR_MSG=$(echo "$RESPONSE" | grep -o '"message":"[^"]*"' | head -1 | cut -d'"' -f4)
             if [ -n "$ERROR_MSG" ]; then
@@ -160,6 +153,7 @@ jobs:
           
           echo "⚠️ Service may not be ready yet. Check manually at: $URL/api/health"
           
+          # Check if service is at least responding
           if curl -s -o /dev/null -w "%{http_code}" "$URL" | grep -q "200\|301\|302"; then
             echo "✅ Service is responding (may still be starting up)"
             exit 0
