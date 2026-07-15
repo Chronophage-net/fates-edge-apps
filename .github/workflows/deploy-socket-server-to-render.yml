@@ -2,7 +2,7 @@ name: Deploy Socket Server to Render
 
 on:
   workflow_run:
-    workflows: ["Build Apps Packages"]
+    workflows: ["Build Apps and Packages"]
     types:
       - completed
     branches: [main]
@@ -19,9 +19,6 @@ on:
         type: boolean
         description: 'Force deploy even if no changes'
         default: false
-
-env:
-  NODE_VERSION: 24
 
 permissions:
   contents: read
@@ -52,28 +49,24 @@ jobs:
           run-id: ${{ github.event.workflow_run.id }}
         continue-on-error: true
 
-      - name: Checkout and build socket server
-        if: github.event_name == 'workflow_dispatch' || steps.download.outputs.downloaded != 'true'
+      - name: Checkout and build socket server (fallback)
+        if: github.event_name == 'workflow_dispatch'
         uses: actions/checkout@v5
 
       - name: Setup Node
         if: github.event_name == 'workflow_dispatch'
         uses: actions/setup-node@v6
         with:
-          node-version: ${{ env.NODE_VERSION }}
+          node-version: 24
 
-      - name: Build socket server
+      - name: Build socket server (fallback)
         if: github.event_name == 'workflow_dispatch'
         working-directory: utilities/javascript/fates-edge-socket-server
         run: |
           npm ci
-          npm run build || echo "No build script configured"
-          
-          # Create deployment package
           mkdir -p socket-server-deploy
           cp -r ./* socket-server-deploy/
-          
-          # Copy data files
+          # Copy data files if they exist
           [ -d "../../../data" ] && cp -r ../../../data/* socket-server-deploy/data/ 2>/dev/null || true
 
       - name: Prepare deployment artifact
@@ -83,6 +76,7 @@ jobs:
             exit 1
           fi
           
+          echo "📦 Preparing deployment package..."
           cd socket-server-deploy
           tar -czf ../socket-server.tar.gz .
           cd ..
@@ -99,7 +93,7 @@ jobs:
             exit 0
           fi
           
-          echo "🚀 Deploying socket server to Render..."
+          echo "🚀 Deploying socket server to Render (${{ github.event.inputs.environment || 'production' }})..."
           echo "Service ID: $RENDER_SERVICE_ID"
           
           # Trigger deployment via Render API
@@ -152,6 +146,7 @@ jobs:
           echo "========================================="
           echo "📊 DEPLOYMENT COMPLETE"
           echo "========================================="
+          echo "Environment: ${{ github.event.inputs.environment || 'production' }}"
           echo "URL: https://fates-edge-socket-server.onrender.com"
           echo "Dashboard: https://dashboard.render.com/web/${{ secrets.RENDER_SOCKET_SERVICE_ID }}"
           echo "========================================="
