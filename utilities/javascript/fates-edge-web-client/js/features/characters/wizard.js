@@ -1,6 +1,8 @@
 /**
  * Character Wizard - Step-by-step character creation
  * FIXED: Proper step management, data persistence, and validation
+ * FIXED: XSS vulnerabilities with escHtml
+ * FIXED: Event listener cleanup
  */
 
 import { 
@@ -13,6 +15,7 @@ import {
 import { addCharacter} from '../../core/state.js';
 import { ALL_SKILLS, defaultSkills } from '../../core/dice.js';
 import { showToast } from '../../components/Toast.js';
+
 // ============================================================
 // STATE
 // ============================================================
@@ -21,7 +24,8 @@ const wizardState = {
     step: 0,
     data: null,
     isOpen: false,
-    initialized: false
+    initialized: false,
+    escapeHandler: null
 };
 
 // ============================================================
@@ -111,6 +115,12 @@ export function openWizard() {
  * Close the wizard
  */
 export function closeWizard() {
+    // Remove escape listener
+    if (wizardState.escapeHandler) {
+        document.removeEventListener('keydown', wizardState.escapeHandler);
+        wizardState.escapeHandler = null;
+    }
+    
     const modal = document.getElementById('wizardModal');
     if (modal) {
         modal.classList.remove('open');
@@ -503,7 +513,7 @@ function renderStep2(d) {
         const val = d.skills?.[key] ?? 0;
         return `
             <div class="skill-item">
-                <label>${s}</label>
+                <label>${escHtml(s)}</label>
                 <input type="number" id="wz-sk-${key}" value="${val}" min="0" max="5" />
             </div>
         `;
@@ -575,6 +585,13 @@ function renderStep4(d) {
     const totalBonus = Math.min(bondBonus + compBonus, 4);
     const startXp = 32 + totalBonus;
     
+    // Count total items for summary
+    const totalTalents = (d.talents || []).length;
+    const totalAssets = (d.assets || []).length;
+    const totalEquip = (d.equipment || []).length;
+    const totalBonds = (d.bonds || []).length;
+    const totalComps = (d.complications || []).length;
+    
     return `
         <div class="wizard-step active">
             <h3>Summary</h3>
@@ -596,15 +613,15 @@ function renderStep4(d) {
                 
                 <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;">
                     <div><span class="text-muted">Attributes:</span> B${d.body} W${d.wits} S${d.spirit} P${d.presence}</div>
-                    <div><span class="text-muted">Starting XP:</span> <strong>${startXp}</strong> (32 + ${totalBonus} bonus)</div>
+                    <div><span class="text-muted summary-xp-display">Starting XP:</span> <strong>${startXp}</strong> (32 + ${totalBonus} bonus)</div>
                 </div>
                 
-                <div style="margin-top:0.5rem;">
-                    <div><span class="text-muted">Talents:</span> ${(d.talents || []).map(t => t.name).join(', ') || '—'}</div>
-                    <div><span class="text-muted">Assets:</span> ${(d.assets || []).map(a => a.name).join(', ') || '—'}</div>
-                    <div><span class="text-muted">Equipment:</span> ${(d.equipment || []).map(e => e.name).join(', ') || '—'}</div>
-                    <div><span class="text-muted">Bonds:</span> ${(d.bonds || []).map(b => b.name).join(', ') || '—'}</div>
-                    <div><span class="text-muted">Complications:</span> ${(d.complications || []).map(c => c.name).join(', ') || '—'}</div>
+                <div style="margin-top:0.5rem;display:grid;grid-template-columns:1fr 1fr;gap:0.2rem 1rem;">
+                    <div><span class="text-muted">Talents:</span> ${totalTalents}</div>
+                    <div><span class="text-muted">Assets:</span> ${totalAssets}</div>
+                    <div><span class="text-muted">Equipment:</span> ${totalEquip}</div>
+                    <div><span class="text-muted">Bonds:</span> ${totalBonds}</div>
+                    <div><span class="text-muted">Complications:</span> ${totalComps}</div>
                 </div>
                 
                 <hr style="border-color:var(--border);margin:0.6rem 0;" />
@@ -629,7 +646,7 @@ function renderStep4(d) {
 }
 
 function updateSummaryXP() {
-    // Recalculate and display XP in step 4
+    // Recalculate and display XP in step 4 - updated to use the new display
     const d = wizardState.data;
     if (!d || wizardState.step !== 4) return;
     
@@ -638,15 +655,23 @@ function updateSummaryXP() {
     const totalBonus = Math.min(bondBonus + compBonus, 4);
     const startXp = 32 + totalBonus;
     
-    // Update the XP display
-    const xpDisplay = document.querySelector('#wizard-steps .summary-xp-display');
-    if (xpDisplay) {
-        xpDisplay.textContent = startXp;
+    // Update the XP display - look for the XP text in the summary
+    const xpElement = document.querySelector('.summary-xp-display');
+    if (xpElement) {
+        // Update just the number - preserve the label
+        const parent = xpElement.parentNode;
+        if (parent) {
+            const label = 'Starting XP:';
+            const currentText = parent.textContent;
+            if (currentText.includes(label)) {
+                parent.innerHTML = `<span class="text-muted">${label}</span> <strong>${startXp}</strong> (32 + ${totalBonus} bonus)`;
+            }
+        }
     }
 }
 
 // ============================================================
-// ROW HTML BUILDERS
+// ROW HTML BUILDERS (with escHtml for XSS protection)
 // ============================================================
 
 function wizardDynamicRowHtml(prefix, idx, name = '', cost = 0) {
@@ -790,7 +815,10 @@ function setupWizardEvents() {
     }
     
     // Keyboard shortcuts
-    document.addEventListener('keydown', (e) => {
+    if (wizardState.escapeHandler) {
+        document.removeEventListener('keydown', wizardState.escapeHandler);
+    }
+    wizardState.escapeHandler = (e) => {
         if (!wizardState.isOpen) return;
         
         if (e.key === 'Escape') {
@@ -803,7 +831,8 @@ function setupWizardEvents() {
                 nextBtn.click();
             }
         }
-    });
+    };
+    document.addEventListener('keydown', wizardState.escapeHandler);
 }
 
 // ============================================================

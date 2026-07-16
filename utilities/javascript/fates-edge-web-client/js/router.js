@@ -14,29 +14,30 @@ const ROUTE_REDIRECTS = {
     'builder': 'characters',
     'regional': 'decks',
     'roller': 'dice',
-    'scene-tools': 'gm-tools',  // redirect old name to new
+    'scene-tools': 'gm-tools'  // redirect old name to new
 };
 
 // Map of route names to module import paths
+// All imports are relative to the js/ directory, so use './features/...'
 const ROUTE_IMPORTS = {
-    home: () => import('../features/home/index.js'),
-    characters: () => import('../features/characters/index.js'),
-    dice: () => import('../features/dice/index.js'),
-    decks: () => import('../features/decks/index.js'),
-    encounters: () => import('../features/encounters/index.js'),
-    timers: () => import('../features/timers/index.js'),
-    factions: () => import('../features/factions/index.js'),
-    patrons: () => import('../features/patrons/index.js'),
-    docs: () => import('../features/docs/index.js'),
-    search: () => import('../features/search/index.js'),
-    settings: () => import('../features/settings/index.js'),
-    sync: () => import('../features/sync/index.js'),
-    whiteboard: () => import('../features/whiteboard/index.js'),
-    kanban: () => import('../features/kanban/index.js'),
-    wiki: () => import('../features/wiki/index.js'),
-    vtt: () => import('../features/vtt/index.js'),
-    'gm-tools': () => import('../features/gm-tools/index.js'),
-    // 'travel-planner' is not a top-level route; it's embedded in gm-tools
+    home: () => import('./features/home/index.js'),
+    characters: () => import('./features/characters/index.js'),
+    dice: () => import('./features/dice/index.js'),
+    decks: () => import('./features/decks/index.js'),
+    encounters: () => import('./features/encounters/index.js'),
+    timers: () => import('./features/timers/index.js'),
+    factions: () => import('./features/factions/index.js'),
+    patrons: () => import('./features/patrons/index.js'),
+    docs: () => import('./features/docs/index.js'),
+    search: () => import('./features/search/index.js'),
+    settings: () => import('./features/settings/index.js'),
+    sync: () => import('./features/sync/index.js'),
+    whiteboard: () => import('./features/whiteboard/index.js'),
+    kanban: () => import('./features/kanban/index.js'),
+    wiki: () => import('./features/wiki/index.js'),
+    vtt: () => import('./features/vtt/index.js'),
+    'gm-tools': () => import('./features/gm-tools/index.js'),
+    // 'travel-planner' is embedded in gm-tools
 };
 
 // Optional: routes that can be safely stubbed if missing
@@ -103,7 +104,7 @@ export async function navigate(tab, options = {}) {
         // If still not found, show placeholder
         if (!routes.has(resolvedTab)) {
             console.warn(`Route not found: ${resolvedTab} (original: ${tab})`);
-            const contentEl = document.getElementById(`tab-${resolvedTab}`);
+            const contentEl = getOrCreateContentElement(resolvedTab);
             if (contentEl) {
                 contentEl.innerHTML = renderPlaceholder(resolvedTab, 'Route not configured.');
             }
@@ -125,15 +126,11 @@ export async function navigate(tab, options = {}) {
         el.classList.remove('active');
     });
 
-    let contentEl = document.getElementById(`tab-${resolvedTab}`);
-    if (!contentEl) {
-        contentEl = document.getElementById(`tab-${tab}`);
-    }
-
+    const contentEl = getOrCreateContentElement(resolvedTab, tab);
     if (contentEl) {
         contentEl.classList.add('active');
     } else {
-        console.warn(`No content element found for tab: ${resolvedTab}`);
+        console.error(`Could not get or create content element for tab: ${resolvedTab}`);
         return;
     }
 
@@ -216,6 +213,39 @@ export async function navigate(tab, options = {}) {
     } else {
         contentEl.innerHTML = renderPlaceholder(resolvedTab, 'Module not configured for this route.');
     }
+}
+
+// ============================================================
+// CONTENT ELEMENT HELPERS
+// ============================================================
+
+function getOrCreateContentElement(resolvedTab, originalTab) {
+    // Try to find by resolved tab name
+    let contentEl = document.getElementById(`tab-${resolvedTab}`);
+    if (contentEl) return contentEl;
+
+    // Try by original tab name
+    if (originalTab && originalTab !== resolvedTab) {
+        contentEl = document.getElementById(`tab-${originalTab}`);
+        if (contentEl) return contentEl;
+    }
+
+    // Try to find any element with class 'tab-content'
+    contentEl = document.querySelector('.tab-content');
+    if (contentEl) {
+        // Reuse the first tab-content found
+        contentEl.id = `tab-${resolvedTab}`;
+        return contentEl;
+    }
+
+    // Create a new container inside the main area
+    const main = document.querySelector('main') || document.body;
+    contentEl = document.createElement('div');
+    contentEl.id = `tab-${resolvedTab}`;
+    contentEl.className = 'tab-content active';
+    main.appendChild(contentEl);
+    console.log(`Created temporary container for tab: ${resolvedTab}`);
+    return contentEl;
 }
 
 // ============================================================

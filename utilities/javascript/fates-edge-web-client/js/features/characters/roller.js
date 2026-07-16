@@ -6,6 +6,7 @@
 import { getCharacter, addRoll, saveState, getState } from '../../core/state.js';
 import { performRoll } from '../../core/dice.js';
 import { showToast } from '../../components/Toast.js';
+import { escHtml } from '../../core/utils.js';
 
 // ============================================================
 // CONSTANTS
@@ -15,6 +16,9 @@ const DEFAULT_DV = 3;
 const DEFAULT_POSITION = 'controlled';
 const DEFAULT_BOONS = 0;
 const MAX_ROLL_RESULTS = 100;
+
+// Keyboard shortcut handler reference for cleanup
+let keyboardShortcutHandler = null;
 
 // ============================================================
 // CHARACTER ROLLS
@@ -313,6 +317,7 @@ function sendToVTT(message, result) {
     // Try to get the VTT module
     import('../vtt/index.js')
         .then(module => {
+            // Try different ways the VTT module might expose chat functionality
             if (module.addChatMessage && typeof module.addChatMessage === 'function') {
                 module.addChatMessage({ 
                     text: message, 
@@ -327,10 +332,39 @@ function sendToVTT(message, result) {
                         reRolls: result.reRolls || 0
                     }
                 });
+            } else if (module.sendMessage && typeof module.sendMessage === 'function') {
+                // Some VTT modules export sendMessage directly
+                module.sendMessage(message, 'Roll', 'all', {
+                    rollData: {
+                        outcome: result.outcome,
+                        outcomeClass: result.outcomeClass,
+                        resultText: result.resultText,
+                        dice: result.dice,
+                        successes: result.successes,
+                        storyBeats: result.storyBeats || 0,
+                        reRolls: result.reRolls || 0
+                    }
+                });
+            } else if (module.default && typeof module.default.sendMessage === 'function') {
+                // Try default export
+                module.default.sendMessage(message, 'Roll', 'all', {
+                    rollData: {
+                        outcome: result.outcome,
+                        outcomeClass: result.outcomeClass,
+                        resultText: result.resultText,
+                        dice: result.dice,
+                        successes: result.successes,
+                        storyBeats: result.storyBeats || 0,
+                        reRolls: result.reRolls || 0
+                    }
+                });
+            } else {
+                console.warn('[CharacterRoller] VTT module loaded but no sendMessage or addChatMessage found');
             }
         })
         .catch(err => {
-            console.warn('[CharacterRoller] Could not send to VTT:', err);
+            // VTT module not available - that's fine, rolls are still stored locally
+            console.debug('[CharacterRoller] VTT module not available:', err.message);
         });
 }
 
@@ -416,15 +450,51 @@ export function exportRollHistory(id = null) {
 // KEYBOARD SHORTCUTS
 // ============================================================
 
-// Add global keyboard shortcut for quick rolls (Ctrl+Shift+R)
-document.addEventListener('keydown', (e) => {
-    if (e.ctrlKey && e.shiftKey && e.key === 'R') {
-        const activeChar = getState().characters?.find(c => c.active !== false);
-        if (activeChar) {
-            rollForCharacter(activeChar.id, { note: 'Quick roll' });
-        }
+/**
+ * Setup keyboard shortcuts for quick rolls
+ */
+export function setupKeyboardShortcuts() {
+    // Remove existing handler if any
+    if (keyboardShortcutHandler) {
+        document.removeEventListener('keydown', keyboardShortcutHandler);
+        keyboardShortcutHandler = null;
     }
-});
+    
+    keyboardShortcutHandler = (e) => {
+        if (e.ctrlKey && e.shiftKey && e.key === 'R') {
+            e.preventDefault();
+            const state = getState();
+            const activeChar = state.characters?.find(c => c.active !== false);
+            if (activeChar) {
+                rollForCharacter(activeChar.id, { note: 'Quick roll' });
+            } else if (state.characters && state.characters.length > 0) {
+                // If no active character, use the first one
+                rollForCharacter(state.characters[0].id, { note: 'Quick roll' });
+            } else {
+                showToast('No characters available for quick roll.', 'warning');
+            }
+        }
+    };
+    
+    document.addEventListener('keydown', keyboardShortcutHandler);
+}
+
+/**
+ * Clean up keyboard shortcuts
+ */
+export function cleanupKeyboardShortcuts() {
+    if (keyboardShortcutHandler) {
+        document.removeEventListener('keydown', keyboardShortcutHandler);
+        keyboardShortcutHandler = null;
+    }
+}
+
+// Auto-setup when module loads
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', setupKeyboardShortcuts);
+} else {
+    setupKeyboardShortcuts();
+}
 
 // ============================================================
 // EXPORTS
@@ -438,5 +508,7 @@ export default {
     getCharacterRollHistory,
     getRecentRolls,
     clearRollHistory,
-    exportRollHistory
+    exportRollHistory,
+    setupKeyboardShortcuts,
+    cleanupKeyboardShortcuts
 };

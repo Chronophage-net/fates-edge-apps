@@ -151,318 +151,366 @@ export function render(el) {
     const packDocuments = getDocuments();
     
     container.innerHTML = `
-        <h1 class="page-title">⚙️ Settings</h1>
-        <p class="page-sub">Manage your data, backups, and preferences.</p>
-        
-        <!-- ============================================================
-             PACK MANAGEMENT
-             ============================================================ -->
-        <div class="panel settings-panel" id="pack-management-panel">
-            <h3>📦 Pack Management</h3>
-            <p class="text-muted small">Install custom packs to extend the toolkit with new modules, documents, and data.</p>
+        <div class="settings-layout">
+            <header class="settings-header">
+                <h1 class="page-title">⚙️ Settings</h1>
+                <p class="page-sub">Manage your data, backups, and preferences.</p>
+            </header>
+
+            <!-- ============================================================
+                 QUICK STATS BAR
+                 ============================================================ -->
+            <div class="settings-stats">
+                <div class="stat-item"><span class="stat-label">💾 Storage</span><span class="stat-value">Local</span></div>
+                <div class="stat-item"><span class="stat-label">📦 Archives</span><span class="stat-value">${archives.length}</span></div>
+                <div class="stat-item"><span class="stat-label">📚 Packs</span><span class="stat-value">${installedPacks.length}</span></div>
+                <div class="stat-item"><span class="stat-label">🔐 Password</span><span class="stat-value ${state.passwordHash ? 'enabled' : 'disabled'}">${state.passwordHash ? '✅ Set' : '❌ Not set'}</span></div>
+            </div>
             
-            <div class="form-row">
-                <div class="field" style="flex:3;">
-                    <label>Install Pack</label>
-                    <input type="file" id="pack-file-input" accept=".zip" />
-                    <div class="field-hint">Select a .zip pack file to install</div>
+            <!-- ============================================================
+                 PACK MANAGEMENT
+                 ============================================================ -->
+            <div class="panel settings-panel" id="pack-management-panel">
+                <div class="panel-header">
+                    <h3>📦 Pack Management</h3>
+                    <span class="badge pack-count">${installedPacks.length} installed</span>
                 </div>
-            </div>
-            
-            <div class="flex">
-                <button class="btn btn-gold" id="pack-install-btn">📦 Install Pack</button>
-                <button class="btn btn-sm" id="pack-refresh-btn">↻ Refresh</button>
-            </div>
-            
-            <div id="pack-install-feedback" class="mt-1" style="min-height:1.5rem;"></div>
-            
-            <div class="mt-1">
-                <h4 style="margin:0.5rem 0 0.2rem;font-size:0.95rem;">📋 Installed Packs</h4>
-                <div id="pack-list" class="pack-list">
-                    ${installedPacks.length === 0 ? '<div class="text-muted small">No packs installed.</div>' : ''}
-                    ${installedPacks.map(pack => `
-                        <div class="pack-item">
-                            <div class="pack-info">
-                                <span class="pack-name">${escHtml(pack.name)}</span>
-                                <span class="pack-version">v${escHtml(pack.version)}</span>
-                                <span class="pack-type">${pack.type}</span>
-                                <span class="pack-meta">${pack.author ? `by ${escHtml(pack.author)}` : ''} · ${new Date(pack.installed).toLocaleDateString()}</span>
+                <p class="text-muted small">Install custom packs to extend the toolkit with new modules, documents, and data.</p>
+                
+                <div class="form-row">
+                    <div class="field" style="flex:3;">
+                        <label>Install Pack</label>
+                        <input type="file" id="pack-file-input" accept=".zip" />
+                        <div class="field-hint">Select a .zip pack file to install</div>
+                    </div>
+                </div>
+                
+                <div class="flex">
+                    <button class="btn btn-gold" id="pack-install-btn">📦 Install Pack</button>
+                    <button class="btn btn-sm btn-secondary" id="pack-refresh-btn">↻ Refresh</button>
+                </div>
+                
+                <div id="pack-install-feedback" class="mt-1" style="min-height:1.5rem;"></div>
+                
+                <div class="mt-1">
+                    <h4 style="margin:0.5rem 0 0.2rem;font-size:0.95rem;">📋 Installed Packs</h4>
+                    <div id="pack-list" class="pack-list">
+                        ${installedPacks.length === 0 ? '<div class="text-muted small">No packs installed.</div>' : ''}
+                        ${installedPacks.map(pack => `
+                            <div class="pack-item">
+                                <div class="pack-info">
+                                    <span class="pack-name">${escHtml(pack.name)}</span>
+                                    <span class="pack-version">v${escHtml(pack.version)}</span>
+                                    <span class="pack-type">${pack.type}</span>
+                                    <span class="pack-meta">${pack.author ? `by ${escHtml(pack.author)}` : ''} · ${new Date(pack.installed).toLocaleDateString()}</span>
+                                </div>
+                                <div class="flex">
+                                    <button class="btn btn-xs btn-danger uninstall-pack-btn" data-id="${pack.id}">🗑️ Uninstall</button>
+                                </div>
                             </div>
-                            <div class="flex">
-                                <button class="btn btn-xs btn-danger uninstall-pack-btn" data-id="${pack.id}">🗑️ Uninstall</button>
+                        `).join('')}
+                    </div>
+                </div>
+                
+                <div class="mt-1">
+                    <h4 style="margin:0.5rem 0 0.2rem;font-size:0.95rem;">📄 Pack Documents</h4>
+                    <div id="pack-documents-list">
+                        ${packDocuments.length === 0 ? '<div class="text-muted small">No documents loaded from packs.</div>' : ''}
+                        ${packDocuments.map(doc => `
+                            <div class="pack-document-item">
+                                <span class="doc-title">${escHtml(doc.title)}</span>
+                                <span class="doc-category">${escHtml(doc.category || 'general')}</span>
                             </div>
-                        </div>
-                    `).join('')}
+                        `).join('')}
+                    </div>
                 </div>
             </div>
             
-            <div class="mt-1">
-                <h4 style="margin:0.5rem 0 0.2rem;font-size:0.95rem;">📄 Pack Documents</h4>
-                <div id="pack-documents-list">
-                    ${packDocuments.length === 0 ? '<div class="text-muted small">No documents loaded from packs.</div>' : ''}
-                    ${packDocuments.map(doc => `
-                        <div class="pack-document-item">
-                            <span class="doc-title">${escHtml(doc.title)}</span>
-                            <span class="doc-category">${escHtml(doc.category || 'general')}</span>
-                        </div>
-                    `).join('')}
+            <!-- ============================================================
+                 WEBSOCKET SETTINGS
+                 ============================================================ -->
+            <div class="panel settings-panel">
+                <div class="panel-header">
+                    <h3>🔗 WebSocket Connection</h3>
+                    <span class="badge ${wsConnected ? 'connected' : 'disconnected'}">${wsConnected ? '🟢 Connected' : '🔴 Disconnected'}</span>
                 </div>
-            </div>
-        </div>
-        
-        <!-- ============================================================
-             WEBSOCKET SETTINGS
-             ============================================================ -->
-        <div class="panel settings-panel">
-            <h3>🔗 WebSocket Connection</h3>
-            <p class="text-muted small">Configure the WebSocket server for real-time VTT features. Default: <strong>${DEFAULT_WS_URL}</strong></p>
-            
-            <div class="form-row">
-                <div class="field" style="flex:3;">
-                    <label>WebSocket Server URL</label>
-                    <input type="text" id="settings-ws-url" 
-                           value="${escHtml(settings.wsUrl || DEFAULT_WS_URL)}" 
-                           placeholder="${DEFAULT_WS_URL}" />
-                    <div class="field-hint">The WebSocket server URL for VTT synchronization</div>
+                <p class="text-muted small">Configure the WebSocket server for real-time VTT features. Default: <strong>${DEFAULT_WS_URL}</strong></p>
+                
+                <div class="form-row">
+                    <div class="field" style="flex:3;">
+                        <label>WebSocket Server URL</label>
+                        <input type="text" id="settings-ws-url" 
+                               value="${escHtml(settings.wsUrl || DEFAULT_WS_URL)}" 
+                               placeholder="${DEFAULT_WS_URL}" />
+                        <div class="field-hint">The WebSocket server URL for VTT synchronization</div>
+                    </div>
+                    <div class="field" style="flex:1;">
+                        <label>Room Name</label>
+                        <input type="text" id="settings-ws-room" 
+                               value="${escHtml(settings.wsRoom || DEFAULT_WS_ROOM)}" 
+                               placeholder="${DEFAULT_WS_ROOM}" />
+                        <div class="field-hint">Room to join for multiplayer</div>
+                    </div>
                 </div>
-                <div class="field" style="flex:1;">
-                    <label>Room Name</label>
-                    <input type="text" id="settings-ws-room" 
-                           value="${escHtml(settings.wsRoom || DEFAULT_WS_ROOM)}" 
-                           placeholder="${DEFAULT_WS_ROOM}" />
-                    <div class="field-hint">Room to join for multiplayer</div>
+                
+                <div class="form-row">
+                    <div class="field" style="flex:0 0 auto;">
+                        <label class="inline-check">
+                            <input type="checkbox" id="settings-ws-enabled" 
+                                   ${settings.wsEnabled !== false ? 'checked' : ''} />
+                            Enable WebSocket
+                        </label>
+                    </div>
+                    <div class="field" style="flex:0 0 auto;">
+                        <label class="inline-check">
+                            <input type="checkbox" id="settings-ws-reconnect" 
+                                   ${settings.wsReconnect !== false ? 'checked' : ''} />
+                            Auto-reconnect
+                        </label>
+                    </div>
+                    <div class="field" style="flex:0 0 120px;">
+                        <label>Reconnect Interval</label>
+                        <input type="number" id="settings-ws-interval" 
+                               value="${settings.wsReconnectInterval || 3000}" 
+                               min="1000" max="10000" step="500" />
+                        <div class="field-hint">ms between reconnect attempts</div>
+                    </div>
                 </div>
-            </div>
-            
-            <div class="form-row">
-                <div class="field" style="flex:0 0 auto;">
-                    <label class="inline-check">
-                        <input type="checkbox" id="settings-ws-enabled" 
-                               ${settings.wsEnabled !== false ? 'checked' : ''} />
-                        Enable WebSocket
-                    </label>
+                
+                <div class="flex">
+                    <button class="btn btn-sm btn-secondary" id="settings-ws-test">🔍 Test Connection</button>
+                    <button class="btn btn-sm btn-gold" id="settings-ws-connect">🔗 Connect</button>
+                    <button class="btn btn-sm btn-secondary" id="settings-ws-disconnect">🔌 Disconnect</button>
+                    <span id="settings-ws-status" class="status-badge ${wsConnected ? 'connected' : 'disconnected'}">
+                        ${wsConnected ? '🟢 Connected' : '🔴 Disconnected'}
+                    </span>
                 </div>
-                <div class="field" style="flex:0 0 auto;">
-                    <label class="inline-check">
-                        <input type="checkbox" id="settings-ws-reconnect" 
-                               ${settings.wsReconnect !== false ? 'checked' : ''} />
-                        Auto-reconnect
-                    </label>
-                </div>
-                <div class="field" style="flex:0 0 120px;">
-                    <label>Reconnect Interval</label>
-                    <input type="number" id="settings-ws-interval" 
-                           value="${settings.wsReconnectInterval || 3000}" 
-                           min="1000" max="10000" step="500" />
-                    <div class="field-hint">ms between reconnect attempts</div>
-                </div>
-            </div>
-            
-            <div class="flex">
-                <button class="btn btn-sm" id="settings-ws-test">🔍 Test Connection</button>
-                <button class="btn btn-sm btn-gold" id="settings-ws-connect">🔗 Connect</button>
-                <button class="btn btn-sm" id="settings-ws-disconnect">🔌 Disconnect</button>
-                <span id="settings-ws-status" class="status-badge ${wsConnected ? 'connected' : 'disconnected'}">
-                    ${wsConnected ? '🟢 Connected' : '🔴 Disconnected'}
-                </span>
+                
+                <div id="settings-ws-result" class="mt-1" style="display:none;"></div>
             </div>
             
-            <div id="settings-ws-result" class="mt-1" style="display:none;"></div>
-        </div>
-        
-        <!-- ============================================================
-             DATA MANAGEMENT
-             ============================================================ -->
-        <div class="panel settings-panel">
-            <h3>💾 Data Management</h3>
-            <div class="flex">
-                <button class="btn btn-primary" id="settings-export-btn">📥 Export All Data (JSON)</button>
-                <button class="btn" id="settings-import-btn">📤 Import JSON</button>
-                <input type="file" id="settings-import-file" accept=".json" style="display:none" />
-                <button class="btn btn-danger" id="settings-clear-btn">🗑️ Clear All Data</button>
-            </div>
-            <p class="text-muted mt-1">Data is stored in your browser's local storage. Export regularly for backup.</p>
-        </div>
-        
-        <!-- ============================================================
-             LIVE CAMPAIGN (Sync)
-             ============================================================ -->
-        <div class="panel settings-panel" id="sync-panel">
-            <h3>🌐 Live Campaign</h3>
-            <p class="text-muted small">Connect to a campaign server for real-time collaboration with your group. Default: <strong>${DEFAULT_SERVER_URL}</strong></p>
-            
-            <!-- User Profile Settings -->
-            <div class="form-row" style="margin-bottom:0.6rem;">
-                <div class="field">
-                    <label>Your Name</label>
-                    <input type="text" id="sync-user-name" placeholder="Your display name" value="${escHtml(userName)}" />
-                </div>
-                <div class="field">
-                    <label>Your Email <span class="text-muted small">(for Gravatar)</span></label>
-                    <input type="email" id="sync-user-email" placeholder="your@email.com" value="${escHtml(userEmail)}" />
-                </div>
-                <div class="field" style="flex:0 0 auto;align-self:end;">
-                    <button class="btn btn-sm" id="sync-save-profile-btn">💾 Save Profile</button>
-                </div>
-            </div>
-            
-            <!-- Avatar Preview -->
-            <div class="avatar-preview-container">
-                <img id="avatar-preview" src="${getUserAvatar(userEmail, userName, 48)}" 
-                     alt="Your avatar" />
-                <div>
-                    <div class="avatar-name" id="avatar-preview-name">${userName || 'You'}</div>
-                    <div class="avatar-email" id="avatar-preview-email">${userEmail || 'No email set'}</div>
-                </div>
-            </div>
-            
-            <!-- Avatar Settings -->
-            <div class="flex mt-1" style="margin-bottom:0.6rem;padding:0.3rem 0.6rem;background:var(--bg3);border-radius:var(--radius);">
-                <label class="inline-check">
-                    <input type="checkbox" id="sync-show-avatars" ${showAvatars ? 'checked' : ''} />
-                    Show avatars in presence list
-                </label>
-                <label class="inline-check">
-                    <input type="checkbox" id="sync-use-gravatars" ${useGravatars ? 'checked' : ''} />
-                    Use Gravatar (fallback to initials)
-                </label>
-            </div>
-            
-            <!-- Connection Settings -->
-            <div class="form-row">
-                <div class="field large">
-                    <label>Server URL</label>
-                    <input type="text" id="sync-server-url" placeholder="${DEFAULT_SERVER_URL}" value="${escHtml(serverUrl)}" />
-                </div>
-                <div class="field">
-                    <label>Campaign Code</label>
-                    <input type="text" id="sync-campaign-code" placeholder="ABC123" maxlength="6" style="text-transform:uppercase;" />
-                </div>
-                <div class="field">
-                    <label>Password</label>
-                    <input type="password" id="sync-password" placeholder="Campaign password" />
-                </div>
-            </div>
-            
-            <div class="flex">
-                <button class="btn btn-gold" id="sync-connect-btn">🔗 Connect</button>
-                <button class="btn btn-danger" id="sync-disconnect-btn" style="display:none;">⛔ Disconnect</button>
-                <button class="btn btn-sm" id="sync-refresh-btn">↻ Refresh</button>
-            </div>
-            
-            <div id="sync-status" class="sync-status disconnected">
-                🔴 Disconnected
-            </div>
-            
-            <div class="mt-1">
-                <h4 style="margin:0.5rem 0 0.2rem;font-size:0.95rem;">👥 Online Players</h4>
-                <div id="presence-list" class="presence-list text-muted small">
-                    No other users online
-                </div>
-            </div>
-        </div>
-        
-        <!-- ============================================================
-             CAMPAIGN SHARING (HTTP)
-             ============================================================ -->
-        <div class="panel settings-panel">
-            <h3>📦 Campaign Sharing (HTTP)</h3>
-            <p class="text-muted small">Upload your current toolkit state to a campaign server, then share the generated code with your group. They can load it with the same code. Default: <strong>${DEFAULT_SERVER_URL}</strong></p>
-            <div class="form-row">
-                <div class="field large"><label>Server URL</label><input type="text" id="campaign-server-url" placeholder="${DEFAULT_SERVER_URL}" value="${escHtml(serverUrl)}" /></div>
-                <div class="field" style="flex:0 0 120px;"><label>Campaign Code</label><input type="text" id="campaign-code" placeholder="ABC123" maxlength="6" style="text-transform:uppercase;" /></div>
-            </div>
-            <div class="flex">
-                <button class="btn btn-gold" id="campaign-upload-btn">⬆ Upload Current State</button>
-                <button class="btn btn-primary" id="campaign-load-btn">⬇ Load State</button>
-                <button class="btn btn-danger" id="campaign-delete-btn">🗑️ Delete Campaign</button>
-            </div>
-            <div id="campaign-feedback" class="campaign-feedback mt-1"></div>
-        </div>
-        
-        <!-- ============================================================
-             PASSWORD PROTECTION
-             ============================================================ -->
-        <div class="panel settings-panel" id="password-settings-panel">
-            <h3 class="flex-between">
-                <span>🔐 Password Protection</span>
-                <span id="passwordStatusBadge" class="password-status-badge ${state.passwordHash ? 'enabled' : 'disabled'}">
-                    ${state.passwordHash ? '🔒 Enabled' : '🔓 Disabled'}
-                </span>
-            </h3>
-            <p class="text-muted small">Require a password to access the entire toolkit. Ideal for sharing with playtesters.</p>
-            <div id="passwordSettingsContent">
-                <div class="password-settings-row">
-                    <div class="field"><label>Current Password <span class="text-muted small">(required to change)</span></label><input type="password" id="ps-current-pw" placeholder="Enter current password" autocomplete="current-password" /></div>
-                    <div class="field"><label>New Password</label><input type="password" id="ps-new-pw" placeholder="New password (min 4 chars)" autocomplete="new-password" /></div>
-                    <div class="field"><label>Confirm</label><input type="password" id="ps-confirm-pw" placeholder="Confirm new password" autocomplete="new-password" /></div>
+            <!-- ============================================================
+                 DATA MANAGEMENT
+                 ============================================================ -->
+            <div class="panel settings-panel">
+                <div class="panel-header">
+                    <h3>💾 Data Management</h3>
                 </div>
                 <div class="flex">
-                    <button class="btn btn-gold" id="ps-save-btn">🔑 Set / Change Password</button>
-                    <button class="btn btn-danger" id="ps-remove-btn">🗝️ Remove Password</button>
+                    <button class="btn btn-primary" id="settings-export-btn">📥 Export All Data (JSON)</button>
+                    <button class="btn btn-secondary" id="settings-import-btn">📤 Import JSON</button>
+                    <input type="file" id="settings-import-file" accept=".json" style="display:none" />
+                    <button class="btn btn-danger" id="settings-clear-btn">🗑️ Clear All Data</button>
                 </div>
-                <div id="passwordSettingsFeedback" class="mt-1 small" style="min-height:1.4rem;"></div>
+                <p class="text-muted mt-1">Data is stored in your browser's local storage. Export regularly for backup.</p>
             </div>
-        </div>
-        
-        <!-- ============================================================
-             BASE URL
-             ============================================================ -->
-        <div class="panel settings-panel">
-            <h3>🌐 Document Base URL</h3>
-            <p class="text-muted small">Set the base URL used when generating shareable document links. Leave empty to auto-detect from the browser.</p>
-            <div class="form-row">
-                <div class="field large"><label>Base URL</label><input type="text" id="ps-base-url" placeholder="e.g. https://yourdomain.com/fates-edge/" value="${escHtml(state.baseUrl || '')}" /></div>
-                <div class="field" style="flex:0 0 auto;align-self:end;"><button class="btn btn-primary" id="ps-base-url-btn">💾 Save</button></div>
+            
+            <!-- ============================================================
+                 LIVE CAMPAIGN (Sync)
+                 ============================================================ -->
+            <div class="panel settings-panel" id="sync-panel">
+                <div class="panel-header">
+                    <h3>🌐 Live Campaign</h3>
+                    <span id="sync-status-badge" class="badge disconnected">🔴 Disconnected</span>
+                </div>
+                <p class="text-muted small">Connect to a campaign server for real-time collaboration with your group. Default: <strong>${DEFAULT_SERVER_URL}</strong></p>
+                
+                <!-- User Profile Settings -->
+                <div class="form-row" style="margin-bottom:0.6rem;">
+                    <div class="field">
+                        <label>Your Name</label>
+                        <input type="text" id="sync-user-name" placeholder="Your display name" value="${escHtml(userName)}" />
+                    </div>
+                    <div class="field">
+                        <label>Your Email <span class="text-muted small">(for Gravatar)</span></label>
+                        <input type="email" id="sync-user-email" placeholder="your@email.com" value="${escHtml(userEmail)}" />
+                    </div>
+                    <div class="field" style="flex:0 0 auto;align-self:end;">
+                        <button class="btn btn-sm btn-primary" id="sync-save-profile-btn">💾 Save Profile</button>
+                    </div>
+                </div>
+
+                <div class="field" style="flex:0 0 120px;">
+                    <label>Role</label>
+                    <select id="sync-user-role" style="height: 38px;">
+                        <option value="player" ${localStorage.getItem('fates-edge-client-role') === 'player' ? 'selected' : ''}>👤 Player</option>
+                        <option value="gm" ${localStorage.getItem('fates-edge-client-role') === 'gm' ? 'selected' : ''}>🎯 GM</option>
+                    </select>
+                </div>
+ 
+                <!-- Avatar Preview -->
+                <div class="avatar-preview-container">
+                    <img id="avatar-preview" src="${getUserAvatar(userEmail, userName, 48)}" 
+                         alt="Your avatar" />
+                    <div>
+                        <div class="avatar-name" id="avatar-preview-name">${userName || 'You'}</div>
+                        <div class="avatar-email" id="avatar-preview-email">${userEmail || 'No email set'}</div>
+                    </div>
+                </div>
+                
+                <!-- Avatar Settings -->
+                <div class="flex mt-1" style="margin-bottom:0.6rem;padding:0.3rem 0.6rem;background:var(--bg3);border-radius:var(--radius);flex-wrap:wrap;">
+                    <label class="inline-check">
+                        <input type="checkbox" id="sync-show-avatars" ${showAvatars ? 'checked' : ''} />
+                        Show avatars in presence list
+                    </label>
+                    <label class="inline-check">
+                        <input type="checkbox" id="sync-use-gravatars" ${useGravatars ? 'checked' : ''} />
+                        Use Gravatar (fallback to initials)
+                    </label>
+                </div>
+                
+                <!-- Connection Settings -->
+                <div class="form-row">
+                    <div class="field large">
+                        <label>Server URL</label>
+                        <input type="text" id="sync-server-url" placeholder="${DEFAULT_SERVER_URL}" value="${escHtml(serverUrl)}" />
+                    </div>
+                    <div class="field">
+                        <label>Campaign Code</label>
+                        <input type="text" id="sync-campaign-code" placeholder="ABC123" maxlength="6" style="text-transform:uppercase;" />
+                    </div>
+                    <div class="field">
+                        <label>Password</label>
+                        <input type="password" id="sync-password" placeholder="Campaign password" />
+                    </div>
+                </div>
+                
+                <div class="flex">
+                    <button class="btn btn-gold" id="sync-connect-btn">🔗 Connect</button>
+                    <button class="btn btn-danger" id="sync-disconnect-btn" style="display:none;">⛔ Disconnect</button>
+                    <button class="btn btn-sm btn-secondary" id="sync-refresh-btn">↻ Refresh</button>
+                </div>
+                
+                <div id="sync-status" class="sync-status disconnected">
+                    🔴 Disconnected
+                </div>
+                
+                <div class="mt-1">
+                    <h4 style="margin:0.5rem 0 0.2rem;font-size:0.95rem;">👥 Online Players</h4>
+                    <div id="presence-list" class="presence-list text-muted small">
+                        No other users online
+                    </div>
+                </div>
             </div>
-            <div id="baseUrlFeedback" class="mt-1 small" style="min-height:1.2rem;"></div>
-            <div class="text-muted small mt-1">Current document links will use: <span id="currentBaseUrlDisplay" style="color:var(--gold);">${getBaseUrl()}</span></div>
-        </div>
-        
-        <!-- ============================================================
-             SESSION ARCHIVES
-             ============================================================ -->
-        <div class="panel settings-panel">
-            <h3>📦 Session Archives</h3>
-            <div id="session-archives"></div>
-            <button class="btn btn-sm mt-1" id="settings-new-session">📦 New Session (archive current)</button>
-        </div>
-        
-        <!-- ============================================================
-             THEME & APPEARANCE
-             ============================================================ -->
-        <div class="panel settings-panel">
-            <h3>🎨 Theme & Appearance</h3>
-            <div class="flex">
-                <button class="btn btn-sm theme-btn" data-theme="dark">🌙 Dark</button>
-                <button class="btn btn-sm theme-btn" data-theme="light">☀️ Light</button>
-                <button class="btn btn-sm theme-btn" data-theme="auto">🔄 Auto</button>
+            
+            <!-- ============================================================
+                 CAMPAIGN SHARING (HTTP)
+                 ============================================================ -->
+            <div class="panel settings-panel">
+                <div class="panel-header">
+                    <h3>📦 Campaign Sharing (HTTP)</h3>
+                </div>
+                <p class="text-muted small">Upload your current toolkit state to a campaign server, then share the generated code with your group. They can load it with the same code. Default: <strong>${DEFAULT_SERVER_URL}</strong></p>
+                <div class="form-row">
+                    <div class="field large"><label>Server URL</label><input type="text" id="campaign-server-url" placeholder="${DEFAULT_SERVER_URL}" value="${escHtml(serverUrl)}" /></div>
+                    <div class="field" style="flex:0 0 120px;"><label>Campaign Code</label><input type="text" id="campaign-code" placeholder="ABC123" maxlength="6" style="text-transform:uppercase;" /></div>
+                </div>
+                <div class="flex">
+                    <button class="btn btn-gold" id="campaign-upload-btn">⬆ Upload Current State</button>
+                    <button class="btn btn-primary" id="campaign-load-btn">⬇ Load State</button>
+                    <button class="btn btn-danger" id="campaign-delete-btn">🗑️ Delete Campaign</button>
+                </div>
+                <div id="campaign-feedback" class="campaign-feedback mt-1"></div>
             </div>
-        </div>
-        
-        <!-- ============================================================
-             LICENSE & COPYRIGHT
-             ============================================================ -->
-        <div class="panel settings-panel">
-            <h3>📜 License & Copyright</h3>
-            <div class="license-box">
-                <p><strong>Fate's Edge</strong> is © Nicholas A. Gasper. <strong>All Rights Reserved.</strong></p>
-                <p>The <strong>SRD</strong> and <strong>Essentials</strong> guide are licensed under CC BY-NC-SA 4.0.</p>
-                <p>All other content — setting lore, original characters, proprietary magic systems, artwork, etc. — is <strong>All Rights Reserved</strong>.</p>
-                <p><strong>Code:</strong> MIT License</p>
-                <button class="btn btn-sm mt-1" id="settings-license-btn">📜 Full License</button>
-                <button class="btn btn-sm mt-1" id="settings-license-summary-btn">📋 Summary</button>
+            
+            <!-- ============================================================
+                 PASSWORD PROTECTION
+                 ============================================================ -->
+            <div class="panel settings-panel" id="password-settings-panel">
+                <div class="panel-header">
+                    <h3>🔐 Password Protection</h3>
+                    <span id="passwordStatusBadge" class="password-status-badge ${state.passwordHash ? 'enabled' : 'disabled'}">
+                        ${state.passwordHash ? '🔒 Enabled' : '🔓 Disabled'}
+                    </span>
+                </div>
+                <p class="text-muted small">Require a password to access the entire toolkit. Ideal for sharing with playtesters.</p>
+                <div id="passwordSettingsContent">
+                    <div class="password-settings-row">
+                        <div class="field"><label>Current Password <span class="text-muted small">(required to change)</span></label><input type="password" id="ps-current-pw" placeholder="Enter current password" autocomplete="current-password" /></div>
+                        <div class="field"><label>New Password</label><input type="password" id="ps-new-pw" placeholder="New password (min 4 chars)" autocomplete="new-password" /></div>
+                        <div class="field"><label>Confirm</label><input type="password" id="ps-confirm-pw" placeholder="Confirm new password" autocomplete="new-password" /></div>
+                    </div>
+                    <div class="flex">
+                        <button class="btn btn-gold" id="ps-save-btn">🔑 Set / Change Password</button>
+                        <button class="btn btn-danger" id="ps-remove-btn">🗝️ Remove Password</button>
+                    </div>
+                    <div id="passwordSettingsFeedback" class="mt-1 small" style="min-height:1.4rem;"></div>
+                </div>
             </div>
-        </div>
-        
-        <!-- ============================================================
-             ABOUT
-             ============================================================ -->
-        <div class="panel settings-panel">
-            <h3>About</h3>
-            <p class="text-muted">Fate's Edge Toolkit v3.0 — Modular Edition with WebSocket & Voice<br />All data stays in your browser.</p>
-            <p class="text-muted small mt-1">© ${new Date().getFullYear()} Nicholas A. Gasper. All Rights Reserved.</p>
-            <p class="text-muted small">The SRD and Essentials are CC BY-NC-SA 4.0. Code is MIT.</p>
+            
+            <!-- ============================================================
+                 BASE URL
+                 ============================================================ -->
+            <div class="panel settings-panel">
+                <div class="panel-header">
+                    <h3>🌐 Document Base URL</h3>
+                </div>
+                <p class="text-muted small">Set the base URL used when generating shareable document links. Leave empty to auto-detect from the browser.</p>
+                <div class="form-row">
+                    <div class="field large"><label>Base URL</label><input type="text" id="ps-base-url" placeholder="e.g. https://yourdomain.com/fates-edge/" value="${escHtml(state.baseUrl || '')}" /></div>
+                    <div class="field" style="flex:0 0 auto;align-self:end;"><button class="btn btn-primary" id="ps-base-url-btn">💾 Save</button></div>
+                </div>
+                <div id="baseUrlFeedback" class="mt-1 small" style="min-height:1.2rem;"></div>
+                <div class="text-muted small mt-1">Current document links will use: <span id="currentBaseUrlDisplay" style="color:var(--gold);">${getBaseUrl()}</span></div>
+            </div>
+            
+            <!-- ============================================================
+                 SESSION ARCHIVES
+                 ============================================================ -->
+            <div class="panel settings-panel">
+                <div class="panel-header">
+                    <h3>📦 Session Archives</h3>
+                    <span class="badge">${archives.length} archives</span>
+                </div>
+                <div id="session-archives"></div>
+                <button class="btn btn-sm btn-primary mt-1" id="settings-new-session">📦 New Session (archive current)</button>
+            </div>
+            
+            <!-- ============================================================
+                 THEME & APPEARANCE
+                 ============================================================ -->
+            <div class="panel settings-panel">
+                <div class="panel-header">
+                    <h3>🎨 Theme & Appearance</h3>
+                </div>
+                <div class="flex" style="gap:0.5rem;">
+                    <button class="btn btn-sm theme-btn" data-theme="dark">🌙 Dark</button>
+                    <button class="btn btn-sm theme-btn" data-theme="light">☀️ Light</button>
+                    <button class="btn btn-sm theme-btn" data-theme="auto">🔄 Auto</button>
+                </div>
+            </div>
+            
+            <!-- ============================================================
+                 LICENSE & COPYRIGHT
+                 ============================================================ -->
+            <div class="panel settings-panel">
+                <div class="panel-header">
+                    <h3>📜 License & Copyright</h3>
+                </div>
+                <div class="license-box">
+                    <p><strong>Fate's Edge</strong> is © Nicholas A. Gasper. <strong>All Rights Reserved.</strong></p>
+                    <p>The <strong>SRD</strong> and <strong>Essentials</strong> guide are licensed under CC BY-NC-SA 4.0.</p>
+                    <p>All other content — setting lore, original characters, proprietary magic systems, artwork, etc. — is <strong>All Rights Reserved</strong>.</p>
+                    <p><strong>Code:</strong> MIT License</p>
+                    <div class="flex" style="gap:0.5rem;margin-top:0.5rem;">
+                        <button class="btn btn-sm btn-secondary" id="settings-license-btn">📜 Full License</button>
+                        <button class="btn btn-sm btn-secondary" id="settings-license-summary-btn">📋 Summary</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- ============================================================
+                 ABOUT
+                 ============================================================ -->
+            <div class="panel settings-panel">
+                <div class="panel-header">
+                    <h3>ℹ️ About</h3>
+                </div>
+                <p class="text-muted">Fate's Edge Toolkit v4.0 — Modular Edition with WebSocket & Voice<br />All data stays in your browser.</p>
+                <p class="text-muted small mt-1">© ${new Date().getFullYear()} Nicholas A. Gasper. All Rights Reserved.</p>
+                <p class="text-muted small">The SRD and Essentials are CC BY-NC-SA 4.0. Code is MIT.</p>
+            </div>
         </div>
     `;
     
@@ -473,7 +521,11 @@ export function render(el) {
     setTimeout(initSyncUI, 100);
     
     // Initialize pack manager
-    initPackManager();
+    try {
+        initPackManager();
+    } catch (e) {
+        // Pack manager may not be available
+    }
 }
 
 // ============================================================
@@ -521,8 +573,13 @@ async function handlePackInstall() {
 
 function handlePackUninstall(packId) {
     if (!packId) return;
-    uninstallPack(packId);
-    setTimeout(() => render(container), 500);
+    try {
+        uninstallPack(packId);
+        setTimeout(() => render(container), 500);
+        showToast('Pack uninstalled', 'success');
+    } catch (e) {
+        showToast('Uninstall failed: ' + e.message, 'error');
+    }
 }
 
 function refreshPackList() {
@@ -537,6 +594,7 @@ function refreshPackList() {
 function initSyncUI() {
     function updateSyncStatus(status) {
         const statusEl = document.getElementById('sync-status');
+        const badgeEl = document.getElementById('sync-status-badge');
         const connectBtn = document.getElementById('sync-connect-btn');
         const disconnectBtn = document.getElementById('sync-disconnect-btn');
         const presenceList = document.getElementById('presence-list');
@@ -547,12 +605,16 @@ function initSyncUI() {
         if (status && status.isConnected) {
             statusEl.innerHTML = `🟢 Connected to ${status.campaignCode || 'campaign'}`;
             statusEl.className = 'sync-status connected';
+            if (badgeEl) {
+                badgeEl.textContent = `🟢 Connected`;
+                badgeEl.className = 'badge connected';
+            }
             connectBtn.style.display = 'none';
             disconnectBtn.style.display = 'inline-block';
             
             if (presenceList) {
                 const clients = status.clients || [];
-                if (clients.length > 1) {
+                if (clients.length > 0) {
                     presenceList.innerHTML = clients
                         .filter(client => client.id !== status.clientId)
                         .map(client => {
@@ -563,11 +625,11 @@ function initSyncUI() {
                                 <div class="presence-item">
                                     ${showAvatars ? `<img src="${avatarUrl}" alt="${client.name || 'User'}" class="avatar" loading="lazy" />` : ''}
                                     <span class="name">${escHtml(client.name || 'Anonymous')}</span>
-                                    <span class="role">${client.role === 'gm' ? 'GM' : 'Player'}</span>
+                                    <span class="role">${client.role === 'gm' ? '🎯 GM' : '👤 Player'}</span>
                                     <span class="status-dot ${client.status === 'online' ? 'online' : 'away'}"></span>
                                 </div>
                             `;
-                        }).join('');
+                        }).join('') || '<div style="color:var(--text2);padding:0.3rem 0;">Only you are connected</div>';
                 } else {
                     presenceList.innerHTML = '<div style="color:var(--text2);padding:0.3rem 0;">No other users online</div>';
                 }
@@ -575,6 +637,10 @@ function initSyncUI() {
         } else {
             statusEl.innerHTML = '🔴 Disconnected';
             statusEl.className = 'sync-status disconnected';
+            if (badgeEl) {
+                badgeEl.textContent = '🔴 Disconnected';
+                badgeEl.className = 'badge disconnected';
+            }
             connectBtn.style.display = 'inline-block';
             disconnectBtn.style.display = 'none';
             
@@ -584,6 +650,7 @@ function initSyncUI() {
         }
     }
     
+    // Try to load sync module
     import('../../core/sync/index.js')
         .then(module => {
             const { syncManager } = module;
@@ -607,51 +674,61 @@ function initSyncUI() {
         .catch(e => {
             console.warn('⚠️ Sync module not available:', e.message);
             const statusEl = document.getElementById('sync-status');
+            const badgeEl = document.getElementById('sync-status-badge');
             if (statusEl) {
                 statusEl.innerHTML = '⚠️ Sync module unavailable';
                 statusEl.className = 'sync-status error';
+            }
+            if (badgeEl) {
+                badgeEl.textContent = '⚠️ Unavailable';
+                badgeEl.className = 'badge error';
             }
         });
 }
 
 // ============================================================
-// CONNECT TO SYNC SERVER
+// CONNECT TO SYNC SERVER (FIXED)
 // ============================================================
 
 async function connectToSyncServer() {
-    const serverUrl = document.getElementById('sync-server-url').value.trim() || DEFAULT_SERVER_URL;
-    const campaignCode = document.getElementById('sync-campaign-code').value.trim();
-    const password = document.getElementById('sync-password').value;
-    const userName = document.getElementById('sync-user-name').value.trim() || 'Player';
-    const userEmail = document.getElementById('sync-user-email').value.trim();
-    const statusEl = document.getElementById('sync-status');
-    
+    const serverUrl = document.getElementById('sync-server-url')?.value.trim() || DEFAULT_SERVER_URL;
+    const campaignCode = document.getElementById('sync-campaign-code')?.value.trim().toUpperCase();
+    const password = document.getElementById('sync-password')?.value.trim();
+    const userName = document.getElementById('sync-user-name')?.value.trim() || 'Player';
+    const userEmail = document.getElementById('sync-user-email')?.value.trim() || '';
+    const userRole = document.getElementById('sync-user-role')?.value || 'player';
+
     if (!serverUrl || !campaignCode) {
         showToast('Please enter server URL and campaign code', 'error');
         return;
     }
-    
-    statusEl.innerHTML = '🔄 Connecting...';
-    statusEl.className = 'sync-status connecting';
-    
+
+    const statusEl = document.getElementById('sync-status');
+    if (statusEl) {
+        statusEl.innerHTML = '🔄 Connecting...';
+        statusEl.className = 'sync-status connecting';
+    }
+
     try {
         const { syncManager } = await import('../../core/sync/index.js');
-        
+
+        // Store password for reconnection attempts if needed
         syncManager.lastPassword = password;
-        
-        localStorage.setItem('fates-edge-client-name', userName);
-        if (userEmail) localStorage.setItem('fates-edge-user-email', userEmail);
-        localStorage.setItem('fates-edge-server-url', serverUrl);
-        
+        localStorage.setItem('fates-edge-client-role', userRole);
+
         await syncManager.connect(serverUrl, campaignCode, password, {
             name: userName,
-            email: userEmail
+            email: userEmail,
+            role: userRole
         });
-        
+
         showToast('Connected to campaign!', 'success');
+        // Update UI status (the sync module will emit events)
     } catch (e) {
-        statusEl.innerHTML = `❌ ${e.message}`;
-        statusEl.className = 'sync-status disconnected';
+        if (statusEl) {
+            statusEl.innerHTML = `❌ ${e.message}`;
+            statusEl.className = 'sync-status disconnected';
+        }
         showToast(`Connection failed: ${e.message}`, 'error');
     }
 }
@@ -714,7 +791,7 @@ function saveUserProfile() {
                 });
             }
         }
-    });
+    }).catch(() => {});
     
     showToast('Profile saved!', 'success');
 }
@@ -796,7 +873,7 @@ async function testWSConnectionHandler() {
 function connectWSHandler() {
     const settings = getWSSettingsFromUI();
     
-    const state = getState();
+    const state = getAppState();
     state.settings = { ...state.settings, ...settings };
     saveState(state);
     
@@ -829,7 +906,7 @@ function updateWSStatusDisplay() {
     const statusEl = document.getElementById('settings-ws-status');
     if (!statusEl) return;
     
-    const connected = isWSConnected();
+    const connected = isWSConnected ? isWSConnected() : false;
     
     statusEl.textContent = connected ? '🟢 Connected' : '🔴 Disconnected';
     statusEl.className = `status-badge ${connected ? 'connected' : 'disconnected'}`;
@@ -845,7 +922,7 @@ function updateWSStatusDisplay() {
 
 function saveWSSettings() {
     const settings = getWSSettingsFromUI();
-    const state = getState();
+    const state = getAppState();
     state.settings = { ...state.settings, ...settings };
     saveState(state);
     
@@ -918,6 +995,8 @@ export function attachEvents() {
                 module.syncManager.requestFullSync();
                 showToast('Refreshing sync...', 'info');
             }
+        }).catch(() => {
+            showToast('Sync module not available', 'warning');
         });
     });
     
@@ -968,7 +1047,7 @@ export function attachEvents() {
 // ============================================================
 
 export function exportAllData() {
-    const state = getState();
+    const state = getAppState();
     const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
@@ -1014,9 +1093,10 @@ async function savePasswordSettings() {
     const newPw = document.getElementById('ps-new-pw').value.trim();
     const confirmPw = document.getElementById('ps-confirm-pw').value.trim();
     const feedback = document.getElementById('passwordSettingsFeedback');
-    const state = getState();
+    const state = getAppState();
     
     feedback.textContent = '';
+    feedback.style.color = '';
     
     if (state.passwordHash) {
         if (!currentPw) {
@@ -1066,7 +1146,7 @@ async function savePasswordSettings() {
 
 async function removePassword() {
     if (!confirm('Remove password protection? Anyone will be able to access the toolkit.')) return;
-    const state = getState();
+    const state = getAppState();
     if (!state.passwordHash) {
         showToast('No password is set.', 'info');
         return;
@@ -1122,7 +1202,7 @@ async function campaignUpload() {
     feedback.className = 'campaign-feedback mt-1';
 
     try {
-        const state = getState();
+        const state = getAppState();
         const response = await fetch(`${serverUrl}/campaigns`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -1234,7 +1314,7 @@ function renderSessionArchives() {
                 <span class="name">${escHtml(a.label || 'Unnamed')}</span>
                 <span class="meta">${new Date(a.timestamp).toLocaleString()} · ${a.rollHistory?.length || 0} rolls</span>
             </div>
-            <div class="flex">
+            <div class="flex" style="gap:0.3rem;">
                 <button class="btn btn-xs btn-primary view-archive-btn" data-id="${a.id}">👁️</button>
                 <button class="btn btn-xs btn-danger delete-archive-btn" data-id="${a.id}">🗑️</button>
             </div>
@@ -1262,7 +1342,7 @@ function renderSessionArchives() {
 }
 
 function newSessionHandler() {
-    const state = getState();
+    const state = getAppState();
     if (state.rollHistory.length === 0 && state.chatHistory.length === 0) {
         showToast('No data to archive.', 'info');
         return;

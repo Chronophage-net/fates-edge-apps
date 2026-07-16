@@ -1,4 +1,4 @@
-// ttrpg/utilities/javascript/client/js/feature-importer.js
+// js/feature-importer.js
 
 import { getFeatureFlags, isFeatureEnabled } from './feature-flags.js';
 import { documentLoader } from './document-loader.js';
@@ -14,6 +14,13 @@ class FeatureImporter {
     this.moduleCache = new Map();
     this.packCache = new Map();
     this.loadedPacks = new Set();
+
+    // Alias map for feature modules that have moved or been renamed
+    this.featureAliases = {
+      'scene-tools': 'gm-tools',   // scene-tools moved to gm-tools
+      // Add others as needed
+    };
+
     this.importPaths = {
       core: '/js/modules/',
       features: '/js/features/',
@@ -60,7 +67,7 @@ class FeatureImporter {
   }
 
   /**
-   * Load core modules
+   * Load core modules (using loadFeatureModule)
    */
   async loadCoreModules() {
     const coreModules = [
@@ -68,20 +75,18 @@ class FeatureImporter {
       'timers', 
       'wiki',
       'encounters',
-      'npcs',
-      'chat',
-      'rolls',
+      // 'npcs', 'chat', 'rolls' are not top-level features - handled elsewhere
     ];
     
     for (const module of coreModules) {
       if (isFeatureEnabled(module)) {
-        await this.loadModule(`../modules/${module}.js`);
+        await this.loadFeatureModule(module);
       }
     }
   }
 
   /**
-   * Load advanced modules
+   * Load advanced modules (using loadFeatureModule)
    */
   async loadAdvancedModules() {
     const advancedModules = [
@@ -95,27 +100,34 @@ class FeatureImporter {
     
     for (const module of advancedModules) {
       if (isFeatureEnabled(module)) {
-        await this.loadModule(`../modules/${module}.js`);
+        await this.loadFeatureModule(module);
       }
     }
   }
 
   /**
    * Load a feature module (from features directory)
+   * Supports alias resolution (e.g., scene-tools → gm-tools)
    */
   async loadFeatureModule(moduleName) {
+    // Resolve alias if any
+    const resolvedName = this.featureAliases[moduleName] || moduleName;
+    
     try {
       // Check if already loaded
-      if (this.moduleCache.has(`feature:${moduleName}`)) {
-        return this.moduleCache.get(`feature:${moduleName}`);
+      if (this.moduleCache.has(`feature:${resolvedName}`)) {
+        return this.moduleCache.get(`feature:${resolvedName}`);
       }
       
-      const module = await import(`../features/${moduleName}/index.js`);
-      this.moduleCache.set(`feature:${moduleName}`, module);
-      console.log(`✅ Loaded feature module: ${moduleName}`);
+      // Dynamic import using resolved name
+      const module = await import(`../features/${resolvedName}/index.js`);
+      this.moduleCache.set(`feature:${resolvedName}`, module);
+      
+      const aliasMsg = (resolvedName !== moduleName) ? ` (via alias ${moduleName})` : '';
+      console.log(`✅ Loaded feature module: ${resolvedName}${aliasMsg}`);
       return module;
     } catch (e) {
-      console.warn(`⚠️ Failed to load feature module: ${moduleName}`, e);
+      console.warn(`⚠️ Failed to load feature module: ${moduleName}${resolvedName !== moduleName ? ` (resolved to ${resolvedName})` : ''}`, e);
       return null;
     }
   }
@@ -296,7 +308,8 @@ class FeatureImporter {
   }
 
   /**
-   * Load a single module
+   * Load a single module from a custom path (fallback / legacy)
+   * This is kept for backward compatibility but should not be used for features.
    */
   async loadModule(modulePath) {
     // Check cache
@@ -337,7 +350,7 @@ class FeatureImporter {
   }
 
   /**
-   * Get a loaded module
+   * Get a loaded module (legacy)
    */
   getModule(moduleName) {
     const modulePath = `../modules/${moduleName}.js`;
@@ -348,7 +361,8 @@ class FeatureImporter {
    * Get a loaded feature module
    */
   getFeatureModule(moduleName) {
-    return this.moduleCache.get(`feature:${moduleName}`) || null;
+    const resolvedName = this.featureAliases[moduleName] || moduleName;
+    return this.moduleCache.get(`feature:${resolvedName}`) || null;
   }
 
   /**
@@ -373,7 +387,7 @@ class FeatureImporter {
   }
 
   /**
-   * Check if module is loaded
+   * Check if module is loaded (legacy)
    */
   isModuleLoaded(moduleName) {
     const modulePath = `../modules/${moduleName}.js`;
@@ -384,7 +398,8 @@ class FeatureImporter {
    * Check if feature module is loaded
    */
   isFeatureLoaded(moduleName) {
-    return this.moduleCache.has(`feature:${moduleName}`);
+    const resolvedName = this.featureAliases[moduleName] || moduleName;
+    return this.moduleCache.has(`feature:${resolvedName}`);
   }
 
   /**
@@ -405,13 +420,9 @@ class FeatureImporter {
     
     console.log('🧪 Loading experimental features');
     
-    try {
-      // Example experimental features
-      // await this.loadModule('../experimental/ai-assistant.js');
-      // await this.loadModule('../experimental/voice-chat.js');
-    } catch (e) {
-      console.warn('Failed to load experimental modules:', e);
-    }
+    // Example experimental features - uncomment when ready
+    // await this.loadFeatureModule('ai-assistant');
+    // await this.loadFeatureModule('voice-chat');
   }
 
   /**

@@ -68,6 +68,31 @@ let campaignState = {
     vttEvents: []
 };
 
+
+// ============================================================
+// CHECK CONNECTED STATUS
+// ============================================================
+
+// Add this function to check room status via your sync manager
+function isViewOnlyMode() {
+    if (window.__syncManager && window.__syncManager.isConnected) {
+        try {
+            const status = window.__syncManager.getStatus();
+            const myRole = status.role; // 'gm' or 'player'
+            
+            // If I am a player, check if a GM is online
+            if (myRole === 'player') {
+                const clients = status.onlineClients || [];
+                const hasGM = clients.some(client => client.role === 'gm' && client.id !== status.clientId);
+                return hasGM;
+            }
+        } catch (e) {
+            console.warn('Could not get sync status for view-only check:', e);
+        }
+    }
+    return false;
+}
+
 // ============================================================
 // LOAD/SAVE
 // ============================================================

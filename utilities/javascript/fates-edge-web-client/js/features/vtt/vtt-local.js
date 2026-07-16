@@ -7,6 +7,7 @@ import { vttStore } from '../../core/vtt-store.js';
 import { getState, addChatMessage, clearChatHistory, getCharacter } from '../../core/state.js';
 import { performRoll } from '../../core/dice.js';
 import { showToast } from '../../components/Toast.js';
+import { escHtml } from '../../core/utils.js';  // <-- ADDED
 import {
   setContainer,
   q,
@@ -337,8 +338,43 @@ function attachEvents() {
         break;
       case 'vtt-roll-post-btn': rollLocal(true); break;
       case 'vtt-roll-only-btn': rollLocal(false); break;
-      case 'vtt-add-timer': import('../timers/index.js').then(m => m.openTimerEditor?.()).catch(() => showToast('Timer feature not available', 'error')); break;
-      case 'vtt-scene-end': import('../dashboard/scene-tools.js').then(m => { m.sceneEndTrimBoons?.(); renderVTTChars(); showToast('Scene ended, boons trimmed.', 'info'); }).catch(() => showToast('Scene end feature not available', 'error')); break;
+      case 'vtt-add-timer': {
+        // Direct timer creation fallback if timer module not available
+        const name = prompt('Timer name:', 'Scene Timer');
+        if (name) {
+          const segments = parseInt(prompt('Segments:', '6') || '6');
+          const state = getState();
+          const newTimer = { 
+            id: 'timer-' + Date.now() + '-' + Math.random().toString(36).substr(2, 4), 
+            name, 
+            segments, 
+            current: 0 
+          };
+          state.timers = state.timers || [];
+          state.timers.push(newTimer);
+          vttStore.updateTimers(state.timers);
+          sendMessage(`Timer created: ${name} (${segments} segments)`, 'System', 'all');
+          showToast(`Timer "${name}" created.`, 'success');
+        }
+        break;
+      }
+      case 'vtt-scene-end': {
+        // Direct state manipulation instead of importing scene-tools
+        const state = getState();
+        let trimmed = 0;
+        (state.characters || []).forEach(c => {
+          const before = c.boons || 0;
+          c.boons = Math.min(c.boons || 0, 2);
+          if (before > c.boons) trimmed += (before - c.boons);
+        });
+        vttStore.updateCharacters(state.characters || []);
+        if (trimmed > 0) {
+          showToast(`Scene ended: trimmed ${trimmed} excess Boons.`, 'success');
+        } else {
+          showToast('Scene ended: all Boons already at 2 or below.', 'info');
+        }
+        break;
+      }
       case 'vtt-voice-toggle': toggleVoice(); break;
       case 'vtt-mute-toggle': toggleMuteVoice(); break;
     }

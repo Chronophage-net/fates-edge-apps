@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content="Fate's Edge Toolkit v4.0 - A modular TTRPG companion." />
-    <title>Fate's Edge Toolkit v3.0</title>
+    <title>Fate's Edge Toolkit v4.0</title>
     
     <!-- Preconnect for CDN performance -->
     <link rel="preconnect" href="https://cdnjs.cloudflare.com" />
@@ -72,7 +72,7 @@
                 <span class="brand-icon">⚔️</span>
                 <div class="brand-text">
                     <span class="brand-name">Fate's Edge</span>
-                    <span class="brand-version">v3.0</span>
+                    <span class="brand-version">v4.0</span>
                 </div>
             </div>
             
@@ -114,7 +114,7 @@
                     <button class="nav-item" data-tab="vtt" title="Virtual Tabletop" role="tab">
                         <span class="nav-icon">💬</span> <span class="nav-label">VTT</span>
                     </button>
-                    <button class="nav-item" data-tab="scene-tools" title="Scene Tools" role="tab">
+                    <button class="nav-item" data-tab="scene-tools" title="Scene Tools (GM Tools)" role="tab">
                         <span class="nav-icon">🎯</span> <span class="nav-label">Scene Tools</span>
                     </button>
                     <button class="nav-item" data-tab="timers" title="Timers" role="tab">
@@ -155,25 +155,37 @@
 
         <!-- ===== MAIN CONTENT ===== -->
         <main class="main-content">
+            <!-- Core tabs -->
             <div id="tab-home" class="tab-content active" role="tabpanel"></div>
             <div id="tab-dashboard" class="tab-content" role="tabpanel"></div>
             <div id="tab-characters" class="tab-content" role="tabpanel"></div>
             <div id="tab-dice" class="tab-content" role="tabpanel"></div>
-            <div id="tab-timers" class="tab-content" role="tabpanel"></div>
+            
+            <!-- World tabs -->
             <div id="tab-encounters" class="tab-content" role="tabpanel"></div>
             <div id="tab-factions" class="tab-content" role="tabpanel"></div>
-            <div id="tab-vtt" class="tab-content" role="tabpanel"></div>
-            <div id="tab-scene-tools" class="tab-content" role="tabpanel"></div>
-            <div id="tab-docs" class="tab-content" role="tabpanel"></div>
-            <div id="tab-search" class="tab-content" role="tabpanel"></div>
             <div id="tab-wiki" class="tab-content" role="tabpanel"></div>
-            <div id="tab-decks" class="tab-content" role="tabpanel"></div>
             <div id="tab-patrons" class="tab-content" role="tabpanel"></div>
+            
+            <!-- Table tabs -->
+            <div id="tab-vtt" class="tab-content" role="tabpanel"></div>
+            <!-- scene-tools redirects to gm-tools via router -->
+            <div id="tab-scene-tools" class="tab-content" role="tabpanel"></div>
+            <!-- gm-tools is the actual module; router will use this if scene-tools is requested -->
+            <div id="tab-gm-tools" class="tab-content" role="tabpanel"></div>
+            <div id="tab-timers" class="tab-content" role="tabpanel"></div>
+            <div id="tab-decks" class="tab-content" role="tabpanel"></div>
+            
+            <!-- System tabs -->
+            <div id="tab-search" class="tab-content" role="tabpanel"></div>
+            <div id="tab-docs" class="tab-content" role="tabpanel"></div>
             <div id="tab-settings" class="tab-content" role="tabpanel"></div>
             
-            <!-- Legacy hidden tabs -->
+            <!-- Legacy/hidden tabs (redirected) -->
             <div id="tab-consequences" class="tab-content" style="display:none;"></div>
             <div id="tab-regional" class="tab-content" style="display:none;"></div>
+            <div id="tab-builder" class="tab-content" style="display:none;"></div>
+            <div id="tab-roller" class="tab-content" style="display:none;"></div>
         </main>
     </div>
 

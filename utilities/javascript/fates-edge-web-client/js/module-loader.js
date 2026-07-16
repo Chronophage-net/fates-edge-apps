@@ -16,20 +16,21 @@ class ModuleLoader {
             
             // Feature modules
             'characters': './features/characters/index.js',
-            'dashboard': './features/dashboard/index.js',
+            'dashboard': './features/dashboard/index.js',      // dashboard stays at dashboard
             'decks': './features/decks/index.js',
             'dice': './features/dice/index.js',
             'docs': './features/docs/index.js',
             'encounters': './features/encounters/index.js',
             'factions': './features/factions/index.js',
+            'gm-tools': './features/gm-tools/index.js',        // gm-tools route (new)
             'home': './features/home/index.js',
             'kanban': './features/kanban/index.js',
             'patrons': './features/patrons/index.js',
-            'scene-tools': './features/dashboard/scene-tools.js', // NEW
+            'scene-tools': './features/gm-tools/index.js',     // scene-tools → gm-tools (moved)
             'search': './features/search/index.js',
             'settings': './features/settings/index.js',
             'timers': './features/timers/index.js',
-            'travel-planner': './features/travel-planner/index.js', // NEW - was missing
+            'travel-planner': './features/travel-planner/index.js',
             'vtt': './features/vtt/index.js',
             'whiteboard': './features/whiteboard/index.js',
             'wiki': './features/wiki/index.js',
@@ -73,33 +74,45 @@ class ModuleLoader {
      * Actually load the module
      */
     async _doLoadModule(moduleName) {
-        const path = this.modulePaths[moduleName];
-        if (!path) {
-            throw new Error(`Unknown module: ${moduleName}`);
+        // Resolve alias if needed (scene-tools → gm-tools only)
+        // dashboard stays as dashboard
+        let resolvedName = moduleName;
+        const aliasMap = {
+            'scene-tools': 'gm-tools',
+            // 'dashboard' is NOT aliased - it stays as 'dashboard'
+        };
+        if (aliasMap[moduleName]) {
+            resolvedName = aliasMap[moduleName];
+            console.log(`↪️ ModuleLoader: Alias "${moduleName}" → "${resolvedName}"`);
         }
 
-        console.log(`🔍 Loading module "${moduleName}" from "${path}"`);
+        const path = this.modulePaths[resolvedName];
+        if (!path) {
+            throw new Error(`Unknown module: ${resolvedName} (original: ${moduleName})`);
+        }
+
+        console.log(`🔍 Loading module "${resolvedName}" from "${path}"`);
 
         // Dynamic import
         const module = await import(path);
         
         // Check if module has a render function
         if (typeof module.render !== 'function') {
-            console.warn(`⚠️ Module "${moduleName}" has no render function`);
+            console.warn(`⚠️ Module "${resolvedName}" has no render function`);
             console.log('Available exports:', Object.keys(module));
             
             // Try to find an alternative entry point
             if (typeof module.init === 'function') {
-                console.log(`🔄 Using init() as fallback for "${moduleName}"`);
+                console.log(`🔄 Using init() as fallback for "${resolvedName}"`);
                 module.render = module.init;
             } else if (module.default && typeof module.default.render === 'function') {
-                console.log(`🔄 Using default.render() as fallback for "${moduleName}"`);
+                console.log(`🔄 Using default.render() as fallback for "${resolvedName}"`);
                 module.render = module.default.render;
             } else if (typeof module.load === 'function') {
-                console.log(`🔄 Using load() as fallback for "${moduleName}"`);
+                console.log(`🔄 Using load() as fallback for "${resolvedName}"`);
                 module.render = module.load;
             } else if (typeof module.default === 'function') {
-                console.log(`🔄 Using default() as fallback for "${moduleName}"`);
+                console.log(`🔄 Using default() as fallback for "${resolvedName}"`);
                 module.render = module.default;
             } else {
                 // Create a placeholder render function using utils

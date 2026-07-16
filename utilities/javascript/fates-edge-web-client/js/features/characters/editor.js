@@ -2,6 +2,8 @@
  * Character editor modal
  * FIXED: Modal properly destroys itself on save
  * FIXED: Complete cleanup of DOM elements and event listeners
+ * FIXED: Overlay listener cleanup
+ * FIXED: Prevent duplicate listeners
  */
 
 import { 
@@ -124,6 +126,11 @@ export function closeEditor() {
     // Remove modal from DOM completely
     const modal = document.getElementById('charModal');
     if (modal) {
+        // Remove overlay listener
+        if (editorState.overlayListener) {
+            modal.removeEventListener('click', editorState.overlayListener);
+            editorState.overlayListener = null;
+        }
         modal.remove(); // This removes it from the DOM entirely
     }
     
@@ -260,9 +267,13 @@ function attachEditorEvents() {
         }
     }
     
-    // Close on overlay click
+    // Close on overlay click - remove existing first
     const modal = document.getElementById('charModal');
     if (modal) {
+        if (editorState.overlayListener) {
+            modal.removeEventListener('click', editorState.overlayListener);
+            editorState.overlayListener = null;
+        }
         const handler = (e) => {
             if (e.target === modal) {
                 closeEditor();
@@ -451,16 +462,11 @@ export function saveEditor() {
         return;
     }
     
-    let c;
-    if (editorState.isNew) {
-        c = createNewCharacter();
-        c.id = editorState.currentId;
-    } else {
-        c = getCharacter(editorState.currentId);
-        if (!c) {
-            showToast('Character not found', 'error');
-            return;
-        }
+    // Get the existing character by ID
+    let c = getCharacter(editorState.currentId);
+    if (!c) {
+        showToast('Character not found', 'error');
+        return;
     }
     
     try {
@@ -498,11 +504,7 @@ export function saveEditor() {
         c.complications = readDynamicList('complication');
         
         // Save
-        if (editorState.isNew) {
-            addCharacter(c);
-        } else {
-            updateCharacter(editorState.currentId, c);
-        }
+        updateCharacter(editorState.currentId, c);
         
         // Close the modal FIRST (this removes it from DOM)
         closeEditor();

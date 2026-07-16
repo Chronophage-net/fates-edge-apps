@@ -231,22 +231,32 @@ export function attachEvents() {
     const createBtn = document.getElementById('home-create-char');
     const createBtn2 = document.getElementById('home-create-char-btn');
     
-    function navigateToBuilder() {
-        const builderBtn = document.querySelector('.sidebar-nav button[data-tab="builder"]');
-        if (builderBtn) builderBtn.click();
+    function navigateToCharacters() {
+        // Navigate to the characters tab (which loads the wizard/editor)
+        const charBtn = document.querySelector('.sidebar-nav button[data-tab="characters"]');
+        if (charBtn) {
+            charBtn.click();
+        } else {
+            // Fallback: use router
+            import('../../router.js').then(module => {
+                module.navigate('characters');
+            }).catch(() => {
+                showToast('Character editor not available', 'error');
+            });
+        }
     }
     
     if (createBtn) {
         createBtn.addEventListener('click', (e) => {
             e.preventDefault();
-            navigateToBuilder();
+            navigateToCharacters();
         });
     }
     
     if (createBtn2) {
         createBtn2.addEventListener('click', (e) => {
             e.preventDefault();
-            navigateToBuilder();
+            navigateToCharacters();
         });
     }
 }

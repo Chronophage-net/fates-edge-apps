@@ -231,7 +231,7 @@ export class ConflictResolver {
   }
 
   // ============================================================
-  // Wiki Merge Methods
+  // Wiki Merge Methods (FIXED: wiki → wikiEntries)
   // ============================================================
 
   mergeWikiAdd(op1, op2, state) {
@@ -239,7 +239,7 @@ export class ConflictResolver {
       return { winner: op1, strategy: 'no_conflict', conflict: false };
     }
 
-    const existing = state.wiki.find(w => w.id === op1.value.id);
+    const existing = state.wikiEntries.find(w => w.id === op1.value.id);
     if (existing) {
       return {
         winner: existing,
@@ -264,11 +264,11 @@ export class ConflictResolver {
   }
 
   mergeWikiUpdate(op1, op2, state) {
-    return this.mergeEntityUpdate(op1, op2, state, 'wiki', 'wiki_entry_not_found');
+    return this.mergeEntityUpdate(op1, op2, state, 'wikiEntries', 'wiki_entry_not_found');
   }
 
   mergeWikiDelete(op1, op2, state) {
-    return this.mergeDelete(op1, state, 'wiki', 'wiki_entry');
+    return this.mergeDelete(op1, state, 'wikiEntries', 'wiki_entry');
   }
 
   // ============================================================
@@ -995,9 +995,9 @@ export class SyncManager {
       'add_timer': (state, op) => this._addEntity(state, 'timers', op),
       'tick_timer': (state, op) => this._tickTimer(state, op),
       'delete_timer': (state, op) => this._deleteEntity(state, 'timers', op),
-      'add_wiki_entry': (state, op) => this._addEntity(state, 'wiki', op),
-      'update_wiki_entry': (state, op) => this._updateEntity(state, 'wiki', op),
-      'delete_wiki_entry': (state, op) => this._deleteEntity(state, 'wiki', op),
+      'add_wiki_entry': (state, op) => this._addEntity(state, 'wikiEntries', op),
+      'update_wiki_entry': (state, op) => this._updateEntity(state, 'wikiEntries', op),
+      'delete_wiki_entry': (state, op) => this._deleteEntity(state, 'wikiEntries', op),
       'add_chat_message': (state, op) => this._addChatMessage(state, op),
       'add_roll': (state, op) => this._addRoll(state, op),
       'add_encounter': (state, op) => this._addEntity(state, 'encounters', op),
@@ -1056,17 +1056,33 @@ export class SyncManager {
     return false;
   }
 
+  // FIXED: chatHistory → chatMessages
   _addChatMessage(state, op) {
-    if (!state.chatHistory.some(m => m.id === op.value.id)) {
-      state.chatHistory.push(op.value);
+    if (!state.chatMessages) {
+      state.chatMessages = [];
+    }
+    if (!state.chatMessages.some(m => m.id === op.value.id)) {
+      state.chatMessages.push(op.value);
+      // Keep chat manageable
+      if (state.chatMessages.length > 200) {
+        state.chatMessages = state.chatMessages.slice(-200);
+      }
       return true;
     }
     return false;
   }
 
+  // FIXED: rollHistory → diceHistory
   _addRoll(state, op) {
-    if (!state.rollHistory.some(r => r.id === op.value.id)) {
-      state.rollHistory.push(op.value);
+    if (!state.diceHistory) {
+      state.diceHistory = [];
+    }
+    if (!state.diceHistory.some(r => r.id === op.value.id)) {
+      state.diceHistory.push(op.value);
+      // Keep history manageable
+      if (state.diceHistory.length > 100) {
+        state.diceHistory = state.diceHistory.slice(-100);
+      }
       return true;
     }
     return false;
@@ -1094,7 +1110,7 @@ export class SyncManager {
       'update_wiki_entry': 'wiki_changed',
       'delete_wiki_entry': 'wiki_changed',
       'add_chat_message': 'chat_updated',
-      'add_roll': 'roll_history_changed',
+      'add_roll': 'dice_history_changed',
       'add_encounter': 'encounters_changed',
       'update_encounter': 'encounters_changed',
       'delete_encounter': 'encounters_changed',

@@ -27,7 +27,8 @@ const FEATURES = {
     encounters: () => import('./features/encounters/index.js'),
     factions: () => import('./features/factions/index.js'),
     vtt: () => import('./features/vtt/index.js'),
-    'scene-tools': () => import('./features/dashboard/scene-tools.js'),
+    'gm-tools': () => import("./features/gm-tools/index.js"),
+    'scene-tools': () => import('./features/gm-tools/index.js'), // alias for backward compatibility
     docs: () => import('./features/docs/index.js'),
     search: () => import('./features/search/index.js'),
     wiki: () => import('./features/wiki/index.js'),
@@ -41,6 +42,7 @@ const ROUTE_REDIRECTS = {
     'regional': 'decks',
     'roller': 'dice',
     'builder': 'characters'
+    // scene-tools redirect is handled by the router itself
 };
 
 const isTestMode = window.location.search.includes('test=true') || window.location.pathname.includes('/tests/');
@@ -261,7 +263,7 @@ async function init() {
         setupSyncUI();
         setupSettingsTabHook();
         setupNavigation();
-        setupConflictModalListener(); // <-- Added
+        setupConflictModalListener();
 
         const state = getState();
         const hasPassword = !!state.passwordHash;

@@ -101,7 +101,6 @@ function deepMerge(target, ...sources) {
     return deepMerge(result, ...rest);
 }
 
-
 export function saveState() {
     try {
         setStorage(STORAGE_KEY, state);
@@ -215,7 +214,104 @@ export function mergeState(remoteState, version) {
         }
     }
 
-    // 5. Handle conflicts (show to user for resolution)
+    // 5. Merge campaign state (NEW)
+    if (remoteState.campaign && remoteState.campaign.state) {
+        const remoteCampaignState = remoteState.campaign.state;
+        const localCampaignState = state.campaign ? state.campaign.state : {};
+        
+        // Merge sessionLog (append-only, deduplicate by timestamp)
+        if (remoteCampaignState.sessionLog && Array.isArray(remoteCampaignState.sessionLog)) {
+            const localLog = localCampaignState.sessionLog || [];
+            const localTimestamps = new Set(localLog.map(e => e.timestamp));
+            remoteCampaignState.sessionLog.forEach(entry => {
+                if (!localTimestamps.has(entry.timestamp)) {
+                    localLog.push(entry);
+                }
+            });
+            // Sort by timestamp and limit
+            localLog.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+            if (localLog.length > 500) {
+                localCampaignState.sessionLog = localLog.slice(-500);
+            } else {
+                localCampaignState.sessionLog = localLog;
+            }
+        }
+        
+        // Merge sceneTags (deduplicate)
+        if (remoteCampaignState.sceneTags && Array.isArray(remoteCampaignState.sceneTags)) {
+            const localTags = localCampaignState.sceneTags || [];
+            const tagSet = new Set(localTags);
+            remoteCampaignState.sceneTags.forEach(tag => tagSet.add(tag));
+            localCampaignState.sceneTags = Array.from(tagSet);
+        }
+        
+        // Merge vttEvents (append-only, deduplicate by id)
+        if (remoteCampaignState.vttEvents && Array.isArray(remoteCampaignState.vttEvents)) {
+            const localEvents = localCampaignState.vttEvents || [];
+            const localIds = new Set(localEvents.map(e => e.id));
+            remoteCampaignState.vttEvents.forEach(event => {
+                if (!localIds.has(event.id)) {
+                    localEvents.push(event);
+                }
+            });
+            // Limit to 200 events
+            if (localEvents.length > 200) {
+                localCampaignState.vttEvents = localEvents.slice(-200);
+            } else {
+                localCampaignState.vttEvents = localEvents;
+            }
+        }
+        
+        // Merge activeThreats (append-only, deduplicate by id)
+        if (remoteCampaignState.activeThreats && Array.isArray(remoteCampaignState.activeThreats)) {
+            const localThreats = localCampaignState.activeThreats || [];
+            const localIds = new Set(localThreats.map(t => t.id));
+            remoteCampaignState.activeThreats.forEach(threat => {
+                if (!localIds.has(threat.id)) {
+                    localThreats.push(threat);
+                }
+            });
+            localCampaignState.activeThreats = localThreats;
+        }
+        
+        // Merge opportunities (append-only, deduplicate by id)
+        if (remoteCampaignState.opportunities && Array.isArray(remoteCampaignState.opportunities)) {
+            const localOpps = localCampaignState.opportunities || [];
+            const localIds = new Set(localOpps.map(o => o.id));
+            remoteCampaignState.opportunities.forEach(opp => {
+                if (!localIds.has(opp.id)) {
+                    localOpps.push(opp);
+                }
+            });
+            localCampaignState.opportunities = localOpps;
+        }
+        
+        // Merge campaignTimers (by id, remote wins on conflict)
+        if (remoteCampaignState.campaignTimers && Array.isArray(remoteCampaignState.campaignTimers)) {
+            const localTimers = localCampaignState.campaignTimers || [];
+            const remoteMap = new Map(remoteCampaignState.campaignTimers.map(t => [t.id, t]));
+            const merged = localTimers.map(t => remoteMap.get(t.id) || t);
+            remoteCampaignState.campaignTimers.forEach(t => {
+                if (!merged.some(m => m.id === t.id)) {
+                    merged.push(t);
+                }
+            });
+            localCampaignState.campaignTimers = merged;
+        }
+        
+        // Merge notes (remote overwrites if newer, or just concatenate)
+        if (remoteCampaignState.notes && localCampaignState.notes !== remoteCampaignState.notes) {
+            // For notes, we'll let the remote version win (or we could concatenate)
+            // Using remote wins for simplicity
+            localCampaignState.notes = remoteCampaignState.notes + (localCampaignState.notes ? '\n\n--- Remote Sync ---\n' + localCampaignState.notes : '');
+        }
+        
+        // Update the main campaign state
+        if (!state.campaign) state.campaign = { ...DEFAULT_STATE.campaign };
+        state.campaign.state = localCampaignState;
+    }
+
+    // 6. Handle conflicts (show to user for resolution)
     if (conflicts.length > 0) {
         pendingConflicts = [...pendingConflicts, ...conflicts];
         document.dispatchEvent(new CustomEvent('syncConflict', {
@@ -223,7 +319,7 @@ export function mergeState(remoteState, version) {
         }));
     }
 
-    // 6. Update version
+    // 7. Update version
     state._version = version;
     state._lastSync = Date.now();
     saveState();
@@ -341,6 +437,10 @@ export function addSessionLogEntry(message, type = 'info') {
         type: type
     };
     campaignState.sessionLog.push(entry);
+    // Keep log manageable
+    if (campaignState.sessionLog.length > 500) {
+        campaignState.sessionLog = campaignState.sessionLog.slice(-500);
+    }
     saveState();
     return entry;
 }
@@ -389,6 +489,42 @@ export function removeSceneTag(tag) {
 export function clearSceneTags() {
     const campaignState = getCampaignState();
     campaignState.sceneTags = [];
+    saveState();
+    return true;
+}
+
+// ============================================================
+// VTT EVENT OPERATIONS (NEW)
+// ============================================================
+
+export function addVTTEvent(event) {
+    const campaignState = getCampaignState();
+    if (!campaignState.vttEvents) {
+        campaignState.vttEvents = [];
+    }
+    if (!event.id) {
+        event.id = generateId(8);
+    }
+    if (!event.timestamp) {
+        event.timestamp = new Date().toISOString();
+    }
+    campaignState.vttEvents.push(event);
+    // Keep event history manageable
+    if (campaignState.vttEvents.length > 200) {
+        campaignState.vttEvents = campaignState.vttEvents.slice(-200);
+    }
+    saveState();
+    return event;
+}
+
+export function getVTTEvents() {
+    const campaignState = getCampaignState();
+    return campaignState.vttEvents || [];
+}
+
+export function clearVTTEvents() {
+    const campaignState = getCampaignState();
+    campaignState.vttEvents = [];
     saveState();
     return true;
 }
@@ -855,6 +991,9 @@ export default {
     addSceneTag,
     removeSceneTag,
     clearSceneTags,
+    addVTTEvent,
+    getVTTEvents,
+    clearVTTEvents,
     getCharacters,
     getCharacter,
     addCharacter,

@@ -2,6 +2,7 @@
 /**
  * Fate's Edge - WebSocket Server
  * Supports both Socket.io and plain WebSocket connections
+ * Includes unified presence tracking, GM role conflict resolution, and GM election polling.
  */
 
 const express = require('express');
@@ -88,7 +89,6 @@ const CROWN_POSITIONS = [
 
 const rooms = new Map();
 const regionDataCache = new Map();
-const wsClients = new Map(); // Track plain WebSocket clients by room
 const socketStats = {
     totalConnections: 0,
     socketIOConnections: 0,
@@ -131,13 +131,112 @@ function getRoomStats(roomCode) {
         code: room.code,
         name: room.name,
         clients: room.clients.size,
-        wsClients: wsClients.has(roomCode) ? wsClients.get(roomCode).size : 0,
-        totalClients: room.clients.size + (wsClients.has(roomCode) ? wsClients.get(roomCode).size : 0),
+        totalClients: room.clients.size,
         deckRemaining: room.deck?.length || 0,
         historyCount: room.deckHistory?.length || 0,
         lastActivity: room.lastActivity,
         created: room.created
     };
+}
+
+// Check if a GM already exists in the room
+function getExistingGm(room) {
+    for (const [id, client] of room.clients.entries()) {
+        if (client.role === 'gm') return client;
+    }
+    return null;
+}
+
+// Get unified list of clients for presence broadcasting
+function getClientsList(room) {
+    return Array.from(room.clients.values()).map(c => ({
+        id: c.id,
+        name: c.name,
+        role: c.role,
+        email: c.email || ''
+    }));
+}
+
+// ============================================================
+// GM ELECTION & ROLE MANAGEMENT
+// ============================================================
+
+function handleGmRequest(room, requesterId) {
+    const requester = room.clients.get(requesterId);
+    if (!requester) return;
+
+    const currentGm = getExistingGm(room);
+    if (!currentGm) {
+        // No GM, promote immediately
+        requester.role = 'gm';
+        room.clients.set(requesterId, requester);
+        
+        const clientsList = getClientsList(room);
+        broadcastToRoom(room.code, 'presence', { clients: clientsList });
+        broadcastToRoom(room.code, 'server_announcement', {
+            message: `👑 ${requester.name} has taken on the role of Game Master.`,
+            timestamp: Date.now()
+        });
+        
+        // Notify the requester directly of their new role
+        if (requester.type === 'socket.io' && requester.socket) {
+            requester.socket.emit('gm_role_update', { role: 'gm' });
+        } else if (requester.type === 'ws' && requester.ws && requester.ws.readyState === WebSocket.OPEN) {
+            requester.ws.send(JSON.stringify({ type: 'gm_role_update', role: 'gm' }));
+        }
+    } else {
+        // GM exists, request a vote
+        broadcastToRoom(room.code, 'gm_vote_request', {
+            requesterId: requesterId,
+            requesterName: requester.name,
+            currentGmId: currentGm.id,
+            currentGmName: currentGm.name,
+            timestamp: Date.now()
+        });
+        
+        // Notify the requester that they must wait
+        const waitMsg = `A GM is already present. A vote request has been sent to ${currentGm.name}.`;
+        if (requester.type === 'socket.io' && requester.socket) {
+            requester.socket.emit('server_announcement', { message: waitMsg, timestamp: Date.now() });
+        } else if (requester.type === 'ws' && requester.ws) {
+            requester.ws.send(JSON.stringify({ type: 'server_announcement', message: waitMsg, timestamp: Date.now() }));
+        }
+    }
+}
+
+function handleGmApproval(room, approverId, targetId) {
+    const approver = room.clients.get(approverId);
+    const target = room.clients.get(targetId);
+    
+    if (!approver || !target) return;
+    if (approver.role !== 'gm') return; // Only current GM can approve
+    
+    // Swap roles
+    approver.role = 'player';
+    target.role = 'gm';
+    
+    room.clients.set(approverId, approver);
+    room.clients.set(targetId, target);
+    
+    const clientsList = getClientsList(room);
+    broadcastToRoom(room.code, 'presence', { clients: clientsList });
+    broadcastToRoom(room.code, 'server_announcement', {
+        message: `👑 ${approver.name} has stepped down. ${target.name} is now the Game Master.`,
+        timestamp: Date.now()
+    });
+    
+    // Notify individuals of their new roles
+    if (approver.type === 'socket.io' && approver.socket) {
+        approver.socket.emit('gm_role_update', { role: 'player' });
+    } else if (approver.type === 'ws' && approver.ws) {
+        approver.ws.send(JSON.stringify({ type: 'gm_role_update', role: 'player' }));
+    }
+    
+    if (target.type === 'socket.io' && target.socket) {
+        target.socket.emit('gm_role_update', { role: 'gm' });
+    } else if (target.type === 'ws' && target.ws) {
+        target.ws.send(JSON.stringify({ type: 'gm_role_update', role: 'gm' }));
+    }
 }
 
 // ============================================================
@@ -348,6 +447,8 @@ async function loadRegionData(regionName) {
 
 function broadcastToRoom(roomCode, event, data) {
     const roomKey = roomCode.toUpperCase();
+    const room = rooms.get(roomKey);
+    if (!room) return;
     
     // Broadcast to Socket.io clients
     if (io) {
@@ -355,17 +456,19 @@ function broadcastToRoom(roomCode, event, data) {
         logDebug('Broadcast to Socket.io clients', { room: roomKey, event, clients: io.sockets.adapter.rooms.get(roomKey)?.size || 0 });
     }
     
-    // Broadcast to plain WebSocket clients
-    if (wsClients.has(roomKey)) {
+    // Broadcast to plain WebSocket clients stored in room.clients
+    if (room.clients.size > 0) {
         const message = JSON.stringify({ type: event, ...data });
         let sentCount = 0;
-        wsClients.get(roomKey).forEach(client => {
-            if (client.readyState === WebSocket.OPEN) {
-                client.send(message);
+        for (const [id, client] of room.clients.entries()) {
+            if (client.type === 'ws' && client.ws && client.ws.readyState === WebSocket.OPEN) {
+                client.ws.send(message);
                 sentCount++;
             }
-        });
-        logDebug('Broadcast to plain WebSocket clients', { room: roomKey, event, clients: sentCount });
+        }
+        if (sentCount > 0) {
+            logDebug('Broadcast to plain WebSocket clients', { room: roomKey, event, clients: sentCount });
+        }
     }
 }
 
@@ -549,7 +652,7 @@ app.post('/api/rooms/:code/deck/draw', authenticate, (req, res) => {
                 success: true,
                 code: roomCode,
                 ...result,
-                deliveredTo: room.clients.size + (wsClients.has(roomCode) ? wsClients.get(roomCode).size : 0)
+                deliveredTo: room.clients.size
             });
         }).catch(err => {
             logError('Error processing draw via API', { error: err.message });
@@ -579,7 +682,7 @@ app.post('/api/rooms/:code/deck/draw', authenticate, (req, res) => {
                 success: true,
                 code: roomCode,
                 ...result,
-                deliveredTo: room.clients.size + (wsClients.has(roomCode) ? wsClients.get(roomCode).size : 0)
+                deliveredTo: room.clients.size
             });
         });
     } catch (err) {
@@ -774,13 +877,13 @@ app.post('/api/modules/:id/push', authenticate, (req, res) => {
                 success: true,
                 module: moduleId,
                 room: roomKey,
-                clients: room.clients.size + (wsClients.has(roomKey) ? wsClients.get(roomKey).size : 0),
+                clients: room.clients.size,
                 message: `Module ${manifest.name} pushed to room ${roomKey}`
             });
         } else {
             let totalClients = 0;
             for (const [code, room] of rooms) {
-                const clientCount = room.clients.size + (wsClients.has(code) ? wsClients.get(code).size : 0);
+                const clientCount = room.clients.size;
                 if (clientCount > 0) {
                     broadcastToRoom(code, 'module-push', {
                         source: 'api',
@@ -831,7 +934,7 @@ app.post('/api/modules/:id/cleanup', authenticate, (req, res) => {
         } else {
             let totalClients = 0;
             for (const [code, room] of rooms) {
-                const clientCount = room.clients.size + (wsClients.has(code) ? wsClients.get(code).size : 0);
+                const clientCount = room.clients.size;
                 if (clientCount > 0) {
                     broadcastToRoom(code, 'module-cleanup', {
                         source: 'api',
@@ -886,7 +989,10 @@ app.get('/api/docs', (req, res) => {
         },
         websocket_events: {
             connection: 'Connect to Socket.io or plain WebSocket',
-            'join-room': 'Join a room: { roomCode, playerName } (Socket.io only)',
+            'join-room': 'Join a room: { roomCode, playerName, playerRole } (Socket.io only)',
+            'handshake': 'Join a room: { campaignCode, clientName, role } (Plain WS only)',
+            'request_gm': 'Request to become the GM',
+            'approve_gm': 'Approve a GM request (current GM only): { targetId }',
             'deck-draw': 'Draw cards: { count: 1, region: "Acasia" }',
             'deck-shuffle': 'Shuffle the deck: {}',
             'crown-spread': 'Draw a Crown Spread: { region: "Acasia" }',
@@ -898,7 +1004,7 @@ app.get('/api/docs', (req, res) => {
         },
         connections: {
             'socket.io': 'ws://localhost:10000 (use Socket.io client)',
-            'plain-websocket': 'ws://localhost:10000?room=ROOM_CODE (use standard WebSocket)'
+            'plain-websocket': 'ws://localhost:10000?room=ROOM_CODE or ws://localhost:10000/campaign/ROOM_CODE (use standard WebSocket)'
         }
     });
 });
@@ -942,10 +1048,17 @@ logInfo('WebSocket server initialized', {
 // ============================================================
 
 wss.on('connection', (ws, req) => {
-    // Parse room from URL
+    // Parse room from URL (supports both ?room=CODE and /campaign/CODE)
     const url = new URL(req.url, `http://${req.headers.host}`);
-    const room = url.searchParams.get('room') || 'default';
-    const roomKey = room.toUpperCase();
+    let room = url.searchParams.get('room');
+    if (!room) {
+        const pathParts = url.pathname.split('/').filter(Boolean);
+        if (pathParts.length >= 2 && pathParts[0] === 'campaign') {
+            room = pathParts[1];
+        }
+    }
+    
+    const roomKey = (room || 'default').toUpperCase();
     
     // Parse client info
     const clientId = `ws-${Date.now()}-${Math.random().toString(36).substr(2, 6)}`;
@@ -956,30 +1069,6 @@ wss.on('connection', (ws, req) => {
         ip: req.socket.remoteAddress,
         userAgent: req.headers['user-agent']
     });
-    
-    // Store client
-    if (!wsClients.has(roomKey)) {
-        wsClients.set(roomKey, new Set());
-    }
-    wsClients.get(roomKey).add(ws);
-    ws.clientId = clientId;
-    ws.room = roomKey;
-    socketStats.wsConnections++;
-    socketStats.totalConnections++;
-    
-    // Send welcome message
-    const welcomeMessage = {
-        type: 'connected',
-        clientId: clientId,
-        room: roomKey,
-        timestamp: Date.now(),
-        message: 'Connected to Fate\'s Edge WebSocket server',
-        protocols: ['socket.io', 'plain-websocket'],
-        serverVersion: '1.0.0'
-    };
-    
-    ws.send(JSON.stringify(welcomeMessage));
-    logDebug('Welcome message sent', { clientId, room: roomKey });
     
     // Get or create room state
     let roomState = rooms.get(roomKey);
@@ -999,6 +1088,29 @@ wss.on('connection', (ws, req) => {
         rooms.set(roomKey, roomState);
         logInfo('📋 Room created', { room: roomKey });
     }
+    
+    // Store client in unified room.clients map
+    ws.clientId = clientId;
+    ws.room = roomKey;
+    ws.clientData = { id: clientId, name: 'Player', role: 'player', email: '', type: 'ws', ws: ws };
+    roomState.clients.set(clientId, ws.clientData);
+    
+    socketStats.wsConnections++;
+    socketStats.totalConnections++;
+    
+    // Send welcome message
+    const welcomeMessage = {
+        type: 'connected',
+        clientId: clientId,
+        room: roomKey,
+        timestamp: Date.now(),
+        message: 'Connected to Fate\'s Edge WebSocket server',
+        protocols: ['socket.io', 'plain-websocket'],
+        serverVersion: '1.0.0'
+    };
+    
+    ws.send(JSON.stringify(welcomeMessage));
+    logDebug('Welcome message sent', { clientId, room: roomKey });
     
     // Send current room state (including whiteboard)
     ws.send(JSON.stringify({
@@ -1022,6 +1134,9 @@ wss.on('connection', (ws, req) => {
                 data: data
             });
             
+            const currentRoom = rooms.get(roomKey);
+            if (!currentRoom) return;
+            
             // Handle different message types
             switch(messageType) {
                 case 'ping':
@@ -1031,42 +1146,50 @@ wss.on('connection', (ws, req) => {
                     }));
                     break;
                     
+                case 'handshake':
+                    handlePlainWSHandshake(ws, currentRoom, data);
+                    break;
+
+                case 'request_gm':
+                    handleGmRequest(currentRoom, clientId);
+                    break;
+
+                case 'approve_gm':
+                    handleGmApproval(currentRoom, clientId, data.targetId);
+                    break;
+                    
                 case 'deck-draw':
-                    handlePlainWSDeckDraw(ws, roomKey, data);
+                    handlePlainWSDeckDraw(ws, currentRoom, data);
                     break;
                     
                 case 'deck-shuffle':
-                    handlePlainWSDeckShuffle(ws, roomKey);
+                    handlePlainWSDeckShuffle(ws, currentRoom);
                     break;
                     
                 case 'crown-spread':
-                    handlePlainWSCrownSpread(ws, roomKey, data);
+                    handlePlainWSCrownSpread(ws, currentRoom, data);
                     break;
                     
                 case 'deck-history':
-                    handlePlainWSDeckHistory(ws, roomKey);
+                    handlePlainWSDeckHistory(ws, currentRoom);
                     break;
                     
                 case 'deck-history-clear':
-                    handlePlainWSDeckHistoryClear(ws, roomKey);
+                    handlePlainWSDeckHistoryClear(ws, currentRoom);
                     break;
 
                 // [WHITEBOARD] Handle whiteboard events
                 case 'whiteboard-update':
-                    handlePlainWSWhiteboardUpdate(ws, roomKey, data);
+                    handlePlainWSWhiteboardUpdate(ws, currentRoom, data);
                     break;
 
                 case 'sync-request':
-                    handlePlainWSSyncRequest(ws, roomKey, data);
+                    handlePlainWSSyncRequest(ws, currentRoom, data);
                     break;
 
                 case 'sync-state':
                     // Client is pushing a full sync state – treat as update
-                    handlePlainWSWhiteboardUpdate(ws, roomKey, data);
-                    break;
-                case 'sync-state':
-                    // Client is pushing a full sync state – treat as update
-                    handlePlainWSWhiteboardUpdate(ws, roomKey, data);
+                    handlePlainWSWhiteboardUpdate(ws, currentRoom, data);
                     break;
 
                 // Relay broadcasts for media, voice, chat, and rolls
@@ -1079,6 +1202,9 @@ wss.on('connection', (ws, req) => {
                 case 'roll-dice':
                 case 'roll-result':
                 case 'event':
+                case 'operation':
+                case 'operation_ack':
+                case 'presence':
                     // Broadcast directly to the room so all clients get it
                     broadcastToRoom(roomKey, messageType, data);
                     break;
@@ -1087,9 +1213,9 @@ wss.on('connection', (ws, req) => {
                     ws.send(JSON.stringify({
                         type: 'error',
                         message: `Unknown message type: ${messageType}`,
-                        supportedTypes: ['ping', 'deck-draw', 'deck-shuffle', 'crown-spread', 'deck-history', 'deck-history-clear', 'whiteboard-update', 'sync-request', 'sync-state', 'media_recording', 'voice-offer', 'voice-answer', 'voice-ice-candidate', 'voice-status', 'chat-message', 'roll-dice', 'roll-result', 'event']
+                        supportedTypes: ['ping', 'handshake', 'request_gm', 'approve_gm', 'deck-draw', 'deck-shuffle', 'crown-spread', 'deck-history', 'deck-history-clear', 'whiteboard-update', 'sync-request', 'sync-state', 'media_recording', 'voice-offer', 'voice-answer', 'voice-ice-candidate', 'voice-status', 'chat-message', 'roll-dice', 'roll-result', 'event']
                     }));
-            } // <-- Make sure there is only ONE closing brace here for the switch
+            }
         } catch (error) {
             logError('Error parsing plain WS message', { 
                 clientId, 
@@ -1108,20 +1234,32 @@ wss.on('connection', (ws, req) => {
         logInfo('🔌 Plain WebSocket client disconnected', { 
             clientId, 
             room: roomKey,
-            remaining: wsClients.get(roomKey)?.size || 0
+            remaining: rooms.get(roomKey)?.clients.size || 0
         });
         
-        if (wsClients.has(roomKey)) {
-            wsClients.get(roomKey).delete(ws);
-            if (wsClients.get(roomKey).size === 0) {
-                wsClients.delete(roomKey);
-                
-                // Check if room has any Socket.io clients too
-                const hasSocketIOClients = io.sockets.adapter.rooms.get(roomKey)?.size > 0;
-                if (!hasSocketIOClients && rooms.has(roomKey)) {
-                    // Room might be empty, but we keep it for now
-                    logDebug('Room has no clients', { room: roomKey });
-                }
+        const room = rooms.get(roomKey);
+        if (room) {
+            const wasGm = room.clients.get(clientId)?.role === 'gm';
+            room.clients.delete(clientId);
+            
+            const clientsList = getClientsList(room);
+            broadcastToRoom(roomKey, 'presence', { clients: clientsList });
+            broadcastToRoom(roomKey, 'player-left', {
+                clientId: clientId,
+                clientName: ws.clientData?.name || 'Player',
+                clients: clientsList
+            });
+
+            if (wasGm) {
+                broadcastToRoom(roomKey, 'server_announcement', {
+                    message: `The Game Master has disconnected.`,
+                    timestamp: Date.now()
+                });
+            }
+            
+            if (room.clients.size === 0) {
+                rooms.delete(roomKey);
+                logInfo('🗑️ Room deleted (empty)', { room: roomKey });
             }
         }
         socketStats.wsConnections--;
@@ -1136,24 +1274,52 @@ wss.on('connection', (ws, req) => {
 // PLAIN WEBSOCKET HANDLER FUNCTIONS
 // ============================================================
 
-async function handlePlainWSDeckDraw(ws, roomKey, data) {
+function handlePlainWSHandshake(ws, room, data) {
+    let assignedRole = data.role || 'player';
+    const existingGm = getExistingGm(room);
+    
+    if (assignedRole === 'gm' && existingGm) {
+        assignedRole = 'player';
+        ws.send(JSON.stringify({ 
+            type: 'error', 
+            message: 'A GM is already hosting this room. You have joined as a Player.',
+            code: 'GM_CONFLICT'
+        }));
+    }
+
+    ws.clientData.name = data.clientName || 'Player';
+    ws.clientData.role = assignedRole;
+    ws.clientData.email = data.clientEmail || '';
+    room.clients.set(ws.clientId, ws.clientData);
+
+    const clientsList = getClientsList(room);
+    
+    ws.send(JSON.stringify({
+        type: 'handshake_ack',
+        success: true,
+        clientId: ws.clientId,
+        clientRole: assignedRole,
+        versionVector: {},
+        activeClients: clientsList
+    }));
+
+    broadcastToRoom(room.code, 'presence', { clients: clientsList });
+    broadcastToRoom(room.code, 'player-joined', {
+        clientId: ws.clientId,
+        clientName: ws.clientData.name,
+        role: ws.clientData.role,
+        clients: clientsList
+    });
+    
+    logInfo('👤 Player joined via plain WS Handshake', { 
+        room: room.code, 
+        name: ws.clientData.name,
+        role: ws.clientData.role
+    });
+}
+
+async function handlePlainWSDeckDraw(ws, room, data) {
     try {
-        let room = rooms.get(roomKey);
-        if (!room) {
-            room = {
-                name: `Room ${roomKey}`,
-                code: roomKey,
-                clients: new Map(),
-                deck: buildDeck(),
-                deckHistory: [],
-                deckOffset: Math.floor(Math.random() * 1000),
-                lastActivity: Date.now(),
-                created: Date.now(),
-                whiteboard: createDefaultWhiteboard() // [WHITEBOARD]
-            };
-            rooms.set(roomKey, room);
-        }
-        
         const { count = 1, region = 'Acasia' } = data;
         
         if (!room.deck || room.deck.length === 0) {
@@ -1209,7 +1375,7 @@ async function handlePlainWSDeckDraw(ws, roomKey, data) {
         room.lastActivity = Date.now();
         
         // Broadcast to both WebSocket and Socket.io clients
-        broadcastToRoom(roomKey, 'deck-drawn', result);
+        broadcastToRoom(room.code, 'deck-drawn', result);
         
         // Send success response to the requesting client
         ws.send(JSON.stringify({
@@ -1217,10 +1383,10 @@ async function handlePlainWSDeckDraw(ws, roomKey, data) {
             ...result
         }));
         
-        logInfo('Cards drawn via plain WS', { room: roomKey, count, region });
+        logInfo('Cards drawn via plain WS', { room: room.code, count, region });
         
     } catch (error) {
-        logError('Error in plain WS deck draw', { room: roomKey, error: error.message });
+        logError('Error in plain WS deck draw', { room: room.code, error: error.message });
         ws.send(JSON.stringify({
             type: 'error',
             message: 'Failed to draw cards: ' + error.message
@@ -1228,29 +1394,13 @@ async function handlePlainWSDeckDraw(ws, roomKey, data) {
     }
 }
 
-function handlePlainWSDeckShuffle(ws, roomKey) {
+function handlePlainWSDeckShuffle(ws, room) {
     try {
-        let room = rooms.get(roomKey);
-        if (!room) {
-            room = {
-                name: `Room ${roomKey}`,
-                code: roomKey,
-                clients: new Map(),
-                deck: buildDeck(),
-                deckHistory: [],
-                deckOffset: Math.floor(Math.random() * 1000),
-                lastActivity: Date.now(),
-                created: Date.now(),
-                whiteboard: createDefaultWhiteboard()
-            };
-            rooms.set(roomKey, room);
-        }
-        
         room.deck = buildDeck();
         room.deckOffset = Math.floor(Math.random() * 1000);
         room.lastActivity = Date.now();
         
-        broadcastToRoom(roomKey, 'deck-shuffled', {
+        broadcastToRoom(room.code, 'deck-shuffled', {
             remaining: room.deck.length,
             timestamp: Date.now()
         });
@@ -1261,10 +1411,10 @@ function handlePlainWSDeckShuffle(ws, roomKey) {
             timestamp: Date.now()
         }));
         
-        logInfo('Deck shuffled via plain WS', { room: roomKey });
+        logInfo('Deck shuffled via plain WS', { room: room.code });
         
     } catch (error) {
-        logError('Error in plain WS deck shuffle', { room: roomKey, error: error.message });
+        logError('Error in plain WS deck shuffle', { room: room.code, error: error.message });
         ws.send(JSON.stringify({
             type: 'error',
             message: 'Failed to shuffle deck: ' + error.message
@@ -1272,24 +1422,8 @@ function handlePlainWSDeckShuffle(ws, roomKey) {
     }
 }
 
-async function handlePlainWSCrownSpread(ws, roomKey, data) {
+async function handlePlainWSCrownSpread(ws, room, data) {
     try {
-        let room = rooms.get(roomKey);
-        if (!room) {
-            room = {
-                name: `Room ${roomKey}`,
-                code: roomKey,
-                clients: new Map(),
-                deck: buildDeck(),
-                deckHistory: [],
-                deckOffset: Math.floor(Math.random() * 1000),
-                lastActivity: Date.now(),
-                created: Date.now(),
-                whiteboard: createDefaultWhiteboard()
-            };
-            rooms.set(roomKey, room);
-        }
-        
         const { region = 'Acasia' } = data;
         
         if (!room.deck || room.deck.length < 5) {
@@ -1330,17 +1464,17 @@ async function handlePlainWSCrownSpread(ws, roomKey, data) {
             timestamp: Date.now()
         };
         
-        broadcastToRoom(roomKey, 'crown-spread', response);
+        broadcastToRoom(room.code, 'crown-spread', response);
         
         ws.send(JSON.stringify({
             type: 'crown-spread-success',
             ...response
         }));
         
-        logInfo('Crown spread via plain WS', { room: roomKey });
+        logInfo('Crown spread via plain WS', { room: room.code });
         
     } catch (error) {
-        logError('Error in plain WS crown spread', { room: roomKey, error: error.message });
+        logError('Error in plain WS crown spread', { room: room.code, error: error.message });
         ws.send(JSON.stringify({
             type: 'error',
             message: 'Failed to process crown spread: ' + error.message
@@ -1348,19 +1482,8 @@ async function handlePlainWSCrownSpread(ws, roomKey, data) {
     }
 }
 
-function handlePlainWSDeckHistory(ws, roomKey) {
+function handlePlainWSDeckHistory(ws, room) {
     try {
-        const room = rooms.get(roomKey);
-        if (!room) {
-            ws.send(JSON.stringify({
-                type: 'deck-history',
-                history: [],
-                count: 0,
-                total: 0
-            }));
-            return;
-        }
-        
         const history = (room.deckHistory || []).slice(-50);
         ws.send(JSON.stringify({
             type: 'deck-history',
@@ -1370,7 +1493,7 @@ function handlePlainWSDeckHistory(ws, roomKey) {
         }));
         
     } catch (error) {
-        logError('Error in plain WS deck history', { room: roomKey, error: error.message });
+        logError('Error in plain WS deck history', { room: room.code, error: error.message });
         ws.send(JSON.stringify({
             type: 'error',
             message: 'Failed to get deck history: ' + error.message
@@ -1378,21 +1501,12 @@ function handlePlainWSDeckHistory(ws, roomKey) {
     }
 }
 
-function handlePlainWSDeckHistoryClear(ws, roomKey) {
+function handlePlainWSDeckHistoryClear(ws, room) {
     try {
-        const room = rooms.get(roomKey);
-        if (!room) {
-            ws.send(JSON.stringify({
-                type: 'error',
-                message: 'Room not found'
-            }));
-            return;
-        }
-        
         room.deckHistory = [];
         room.lastActivity = Date.now();
         
-        broadcastToRoom(roomKey, 'deck-history-cleared', {
+        broadcastToRoom(room.code, 'deck-history-cleared', {
             timestamp: Date.now()
         });
         
@@ -1401,10 +1515,10 @@ function handlePlainWSDeckHistoryClear(ws, roomKey) {
             timestamp: Date.now()
         }));
         
-        logInfo('Deck history cleared via plain WS', { room: roomKey });
+        logInfo('Deck history cleared via plain WS', { room: room.code });
         
     } catch (error) {
-        logError('Error in plain WS deck history clear', { room: roomKey, error: error.message });
+        logError('Error in plain WS deck history clear', { room: room.code, error: error.message });
         ws.send(JSON.stringify({
             type: 'error',
             message: 'Failed to clear deck history: ' + error.message
@@ -1413,24 +1527,8 @@ function handlePlainWSDeckHistoryClear(ws, roomKey) {
 }
 
 // [WHITEBOARD] Plain WS handlers for whiteboard
-function handlePlainWSWhiteboardUpdate(ws, roomKey, data) {
+function handlePlainWSWhiteboardUpdate(ws, room, data) {
     try {
-        let room = rooms.get(roomKey);
-        if (!room) {
-            room = {
-                name: `Room ${roomKey}`,
-                code: roomKey,
-                clients: new Map(),
-                deck: buildDeck(),
-                deckHistory: [],
-                deckOffset: Math.floor(Math.random() * 1000),
-                lastActivity: Date.now(),
-                created: Date.now(),
-                whiteboard: createDefaultWhiteboard()
-            };
-            rooms.set(roomKey, room);
-        }
-
         // Extract whiteboard data - it may be in data.whiteboard or directly in data.state
         let newWhiteboard;
         if (data.whiteboard) {
@@ -1455,17 +1553,17 @@ function handlePlainWSWhiteboardUpdate(ws, roomKey, data) {
         room.lastActivity = Date.now();
 
         // Broadcast to all clients in the room (including sender)
-        broadcastToRoom(roomKey, 'whiteboard-update', {
+        broadcastToRoom(room.code, 'whiteboard-update', {
             whiteboard: room.whiteboard,
             timestamp: Date.now(),
             source: 'plain-ws',
             clientId: ws.clientId
         });
 
-        logDebug('Whiteboard updated via plain WS', { room: roomKey, clientId: ws.clientId });
+        logDebug('Whiteboard updated via plain WS', { room: room.code, clientId: ws.clientId });
 
     } catch (error) {
-        logError('Error in plain WS whiteboard update', { room: roomKey, error: error.message });
+        logError('Error in plain WS whiteboard update', { room: room.code, error: error.message });
         ws.send(JSON.stringify({
             type: 'error',
             message: 'Failed to update whiteboard: ' + error.message
@@ -1473,17 +1571,8 @@ function handlePlainWSWhiteboardUpdate(ws, roomKey, data) {
     }
 }
 
-function handlePlainWSSyncRequest(ws, roomKey, data) {
+function handlePlainWSSyncRequest(ws, room, data) {
     try {
-        const room = rooms.get(roomKey);
-        if (!room) {
-            ws.send(JSON.stringify({
-                type: 'error',
-                message: 'Room not found'
-            }));
-            return;
-        }
-
         // Respond with full sync-state
         ws.send(JSON.stringify({
             type: 'sync-state',
@@ -1491,10 +1580,10 @@ function handlePlainWSSyncRequest(ws, roomKey, data) {
             timestamp: Date.now()
         }));
 
-        logDebug('Sync request responded via plain WS', { room: roomKey, clientId: ws.clientId });
+        logDebug('Sync request responded via plain WS', { room: room.code, clientId: ws.clientId });
 
     } catch (error) {
-        logError('Error in plain WS sync request', { room: roomKey, error: error.message });
+        logError('Error in plain WS sync request', { room: room.code, error: error.message });
         ws.send(JSON.stringify({
             type: 'error',
             message: 'Failed to process sync request: ' + error.message
@@ -1518,8 +1607,12 @@ io.on('connection', (socket) => {
 
     // Client data
     socket.clientData = {
+        id: socket.id,
         name: 'Player',
-        room: null
+        role: 'player',
+        email: '',
+        type: 'socket.io',
+        socket: socket
     };
 
     // ============================================================
@@ -1527,7 +1620,7 @@ io.on('connection', (socket) => {
     // ============================================================
 
     socket.on('join-room', (data) => {
-        const { roomCode, playerName } = data;
+        const { roomCode, playerName, playerRole = 'player', playerEmail = '' } = data;
 
         if (!roomCode || !validateRoomCode(roomCode)) {
             logWarn('Invalid room code', { socketId: socket.id, roomCode });
@@ -1542,12 +1635,20 @@ io.on('connection', (socket) => {
             socket.leave(socket.room);
             const oldRoom = rooms.get(socket.room);
             if (oldRoom) {
+                const wasGm = oldRoom.clients.get(socket.id)?.role === 'gm';
                 oldRoom.clients.delete(socket.id);
+                const oldClientsList = getClientsList(oldRoom);
                 io.to(socket.room).emit('player-left', {
                     clientId: socket.id,
                     clientName: socket.clientData?.name || 'Player',
-                    clients: Array.from(oldRoom.clients.entries()).map(([id, name]) => ({ id, name }))
+                    clients: oldClientsList
                 });
+                if (wasGm) {
+                    broadcastToRoom(socket.room, 'server_announcement', {
+                        message: `The Game Master has disconnected.`,
+                        timestamp: Date.now()
+                    });
+                }
                 logDebug('Player left room', { socketId: socket.id, room: socket.room, remaining: oldRoom.clients.size });
             }
         }
@@ -1571,19 +1672,36 @@ io.on('connection', (socket) => {
             logInfo('📋 Room created via Socket.io', { room: roomKey });
         }
 
+        // --- CONFLICT RESOLUTION LOGIC ---
+        let assignedRole = playerRole;
+        const existingGm = getExistingGm(room);
+        if (assignedRole === 'gm' && existingGm) {
+            assignedRole = 'player';
+            socket.emit('error', { 
+                message: 'A GM is already hosting this room. You have joined as a Player.',
+                code: 'GM_CONFLICT'
+            });
+        }
+        // --- END CONFLICT RESOLUTION ---
+
         socket.join(roomKey);
         socket.room = roomKey;
         socket.clientData.name = playerName || 'Player';
-        room.clients.set(socket.id, socket.clientData.name);
+        socket.clientData.role = assignedRole;
+        socket.clientData.email = playerEmail;
+        room.clients.set(socket.id, socket.clientData);
         room.lastActivity = Date.now();
 
-        // Send room state to client (including whiteboard)
+        const clientsList = getClientsList(room);
+
+        // Send room state to client (including whiteboard and role)
         const roomState = {
             room: roomKey,
-            clients: Array.from(room.clients.entries()).map(([id, name]) => ({ id, name })),
+            clients: clientsList,
+            clientRole: assignedRole,
             deckRemaining: room.deck.length,
             deckHistory: room.deckHistory.slice(-20),
-            totalClients: room.clients.size + (wsClients.has(roomKey) ? wsClients.get(roomKey).size : 0),
+            totalClients: room.clients.size,
             // [WHITEBOARD] Include whiteboard
             whiteboard: room.whiteboard
         };
@@ -1593,15 +1711,38 @@ io.on('connection', (socket) => {
             socketId: socket.id, 
             room: roomKey, 
             name: socket.clientData.name,
+            role: socket.clientData.role,
             totalClients: roomState.totalClients
         });
 
         // Broadcast to room
-        io.to(roomKey).emit('player-joined', {
+        broadcastToRoom(roomKey, 'presence', { clients: clientsList });
+        broadcastToRoom(roomKey, 'player-joined', {
             clientId: socket.id,
             clientName: socket.clientData.name,
-            clients: Array.from(room.clients.entries()).map(([id, name]) => ({ id, name }))
+            role: socket.clientData.role,
+            clients: clientsList
         });
+    });
+
+    // ============================================================
+    // GM ELECTION & ROLE MANAGEMENT
+    // ============================================================
+
+    socket.on('request_gm', () => {
+        if (!socket.room) return;
+        const room = rooms.get(socket.room);
+        if (!room) return;
+        handleGmRequest(room, socket.id);
+    });
+
+    socket.on('approve_gm', (data) => {
+        if (!socket.room) return;
+        const room = rooms.get(socket.room);
+        if (!room) return;
+        const targetId = data?.targetId;
+        if (!targetId) return;
+        handleGmApproval(room, socket.id, targetId);
     });
 
     // ============================================================
@@ -2099,7 +2240,10 @@ io.on('connection', (socket) => {
         'chat-message', 
         'roll-dice', 
         'roll-result', 
-        'event'
+        'event',
+        'operation',
+        'operation_ack',
+        'presence'
     ];
     
     relayEvents.forEach(eventName => {
@@ -2122,25 +2266,31 @@ io.on('connection', (socket) => {
     // DISCONNECT
     // ============================================================
 
-
-    // ============================================================
-    // DISCONNECT
-    // ============================================================
-
     socket.on('disconnect', () => {
         socketStats.socketIOConnections--;
         
         if (socket.room) {
             const room = rooms.get(socket.room);
             if (room) {
+                const wasGm = room.clients.get(socket.id)?.role === 'gm';
                 room.clients.delete(socket.id);
-                io.to(socket.room).emit('player-left', {
+                
+                const clientsList = getClientsList(room);
+                broadcastToRoom(socket.room, 'presence', { clients: clientsList });
+                broadcastToRoom(socket.room, 'player-left', {
                     clientId: socket.id,
                     clientName: socket.clientData?.name || 'Player',
-                    clients: Array.from(room.clients.entries()).map(([id, name]) => ({ id, name }))
+                    clients: clientsList
                 });
+
+                if (wasGm) {
+                    broadcastToRoom(socket.room, 'server_announcement', {
+                        message: `The Game Master has disconnected.`,
+                        timestamp: Date.now()
+                    });
+                }
                 
-                const remainingClients = room.clients.size + (wsClients.has(socket.room) ? wsClients.get(socket.room).size : 0);
+                const remainingClients = room.clients.size;
                 logInfo('👤 Player left room via Socket.io', { 
                     room: socket.room, 
                     name: socket.clientData?.name || 'Player',
@@ -2174,7 +2324,7 @@ server.listen(PORT, '0.0.0.0', () => {
     console.log(`🚀 Server running on port ${PORT}`);
     console.log(`📊 Health: http://localhost:${PORT}/api/health`);
     console.log(`📚 API Docs: http://localhost:${PORT}/api/docs`);
-    console.log(`🔌 WebSocket (plain): ws://localhost:${PORT}?room=ROOM_CODE`);
+    console.log(`🔌 WebSocket (plain): ws://localhost:${PORT}?room=ROOM_CODE or /campaign/ROOM_CODE`);
     console.log(`🔌 WebSocket (Socket.io): http://localhost:${PORT}`);
     console.log(`📋 Rooms: ${rooms.size}`);
     console.log(`📊 Log Level: ${LOG_LEVEL}`);

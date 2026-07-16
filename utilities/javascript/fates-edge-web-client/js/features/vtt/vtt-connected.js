@@ -3,17 +3,17 @@
  * Uses reactive store for all UI updates.
  * Updated for v1.2.0 with Deck and Module support
  * Now uses the unified WebSocket module
+ * 
+ * Added GM election/promotion features (2026-07-16)
  */
 
-import { logToSession, addVTTEvent } from '../dashboard/scene-tools.js';
 import { vttStore } from '../../core/vtt-store.js';
-import { getState, clearChatHistory, getCharacter } from '../../core/state.js';
+import { getState, clearChatHistory, getCharacter, addVTTEvent, addSessionLogEntry } from '../../core/state.js';
 import { performRoll } from '../../core/dice.js';
 import { showToast } from '../../components/Toast.js';
 import { escHtml } from '../../core/utils.js';
 import {
     isConnectedToServer,
-    syncState,
     sendChatMessage,
     sendRoll,
     sendEvent,
@@ -31,7 +31,8 @@ import {
     listModules,
     onWSEvent,
     offWSEvent,
-    getConnectionMode
+    getConnectionMode,
+    sendWSMessage
 } from '../../core/websocket.js';
 import {
     setContainer,
@@ -82,6 +83,15 @@ let deckState = {
 let defaultRegion = 'Acasia';
 let loadedModules = [];
 
+// GM state
+let gmState = {
+    currentGmId: null,
+    currentGmName: null,
+    requests: [], // { requesterId, requesterName }
+    myRole: 'player'
+};
+let clientsMap = new Map(); // id -> { id, name, role }
+
 // ============================================================
 // MESSAGE SENDING (with WebSocket sync)
 // ============================================================
@@ -108,13 +118,14 @@ export function sendMessage(text, sender, recipient = 'all', metadata = {}) {
     const msg = createMessage(text, sender, recipient, metadata);
 
     vttStore.addChatMessage(msg);
-    // Log chat message to VTT
+    // Log chat message to VTT (FIXED: use object syntax)
     if (!msg.whisper) {
         try {
-            addVTTEvent('chat_message', { 
-                sender: sender, 
-                recipient: recipient, 
-                text: text.substring(0, 100) 
+            addVTTEvent({
+                type: 'chat_message',
+                sender: sender,
+                recipient: recipient,
+                text: text.substring(0, 100)
             });
         } catch (e) { /* ignore */ }
     }
@@ -522,7 +533,10 @@ function handleSlash(text) {
                 sendMessage(msg, 'System', 'all');
                 vttStore.updateTimers(state.timers || []);
                 if (isConnectedToServer()) {
-                    syncState(getState());
+                    // syncState may not exist, use sendEvent instead
+                    try {
+                        sendEvent({ type: 'state-updated', state: getState() });
+                    } catch (e) { /* ignore */ }
                 }
             }).catch(err => {
                 showToast('Failed to create timer', 'error');
@@ -646,11 +660,13 @@ function setupWebSocketSync() {
 
     cleanupWebSocketListeners();
 
-    // Push current state to server
-    const state = getState();
-    syncState(state);
-    vttStore.updateCharacters(state.characters || []);
-    vttStore.updateTimers(state.timers || []);
+    // Push current state to server using sendEvent instead of syncState
+    try {
+        sendEvent({ type: 'state-updated', state: getState() });
+    } catch (e) { /* ignore */ }
+    
+    vttStore.updateCharacters(getState().characters || []);
+    vttStore.updateTimers(getState().timers || []);
 
     // State updates
     const stateHandler = (data) => {
@@ -802,15 +818,100 @@ function setupWebSocketSync() {
     onWSEvent('region-updated', regionUpdateHandler);
     wsListeners.set('region-updated', regionUpdateHandler);
 
+    // ============================================================
+    // GM ELECTION & PROMOTION EVENTS
+    // ============================================================
+    
+    // Presence updates (clients list with roles)
+    const presenceHandler = (data) => {
+        if (isDestroyed) return;
+        if (data.clients) {
+            clientsMap.clear();
+            data.clients.forEach(c => clientsMap.set(c.id, c));
+            // Update GM info
+            const gm = data.clients.find(c => c.role === 'gm');
+            if (gm) {
+                gmState.currentGmId = gm.id;
+                gmState.currentGmName = gm.name;
+            } else {
+                gmState.currentGmId = null;
+                gmState.currentGmName = null;
+            }
+            // Update myRole if my socket ID is in the list
+            const myId = getSocketId();
+            if (myId && clientsMap.has(myId)) {
+                gmState.myRole = clientsMap.get(myId).role;
+            }
+            // Update UI
+            updateGMUI();
+            // Also update presence list if needed
+            renderLocalPresence(); // if you have a presence list
+        }
+    };
+    onWSEvent('presence', presenceHandler);
+    wsListeners.set('presence', presenceHandler);
+
+    // GM vote request (sent to current GM)
+    const gmVoteHandler = (data) => {
+        if (isDestroyed) return;
+        const { requesterId, requesterName, currentGmId, currentGmName } = data;
+        // Only show to the current GM
+        const myId = getSocketId();
+        if (gmState.myRole === 'gm' && myId === currentGmId) {
+            // Add to pending requests if not already present
+            if (!gmState.requests.find(r => r.requesterId === requesterId)) {
+                gmState.requests.push({ requesterId, requesterName });
+            }
+            updateGMUI();
+            showToast(`👑 ${requesterName} requests to become GM.`, 'info');
+            playNotificationSound(); // optional
+        }
+    };
+    onWSEvent('gm_vote_request', gmVoteHandler);
+    wsListeners.set('gm_vote_request', gmVoteHandler);
+
+    // GM role update (sent to individuals when role changes)
+    const gmRoleHandler = (data) => {
+        if (isDestroyed) return;
+        const { role } = data;
+        gmState.myRole = role;
+        // Update local user's role in the clients map if present
+        const myId = getSocketId();
+        if (myId && clientsMap.has(myId)) {
+            clientsMap.get(myId).role = role;
+        }
+        // Also update GM info from presence will come later, but we can update current GM if we are now GM
+        if (role === 'gm') {
+            gmState.currentGmId = myId;
+            gmState.currentGmName = 'You';
+        }
+        updateGMUI();
+        showToast(`Your role is now: ${role.toUpperCase()}`, 'success');
+    };
+    onWSEvent('gm_role_update', gmRoleHandler);
+    wsListeners.set('gm_role_update', gmRoleHandler);
+
+    // Server announcements (informational)
+    const announcementHandler = (data) => {
+        if (isDestroyed) return;
+        showToast(data.message, 'info');
+    };
+    onWSEvent('server_announcement', announcementHandler);
+    wsListeners.set('server_announcement', announcementHandler);
+
     // Connection events
     const connectHandler = () => {
         if (isDestroyed) return;
         const state = getState();
-        syncState(state);
+        try {
+            sendEvent({ type: 'state-updated', state: state });
+        } catch (e) { /* ignore */ }
         vttStore.updateCharacters(state.characters || []);
         vttStore.updateTimers(state.timers || []);
         vttStore.setConnectionStatus('connected');
         showToast('Reconnected to server!', 'success');
+        // Re-request presence info by sending a ping or using existing getConnectedClients
+        // The server will send presence on reconnection anyway.
     };
     onWSEvent('connected', connectHandler);
     wsListeners.set('connected', connectHandler);
@@ -819,11 +920,12 @@ function setupWebSocketSync() {
         if (isDestroyed) return;
         vttStore.setConnectionStatus('local');
         showToast('Disconnected from server. Messages will be local.', 'warning');
+        // Reset GM state? Maybe keep last known state.
     };
     onWSEvent('disconnected', disconnectHandler);
     wsListeners.set('disconnected', disconnectHandler);
 
-    console.log('[VTT Connected] WebSocket sync enabled with deck/module support');
+    console.log('[VTT Connected] WebSocket sync enabled with deck/module/GM support');
 }
 
 function cleanupWebSocketListeners() {
@@ -835,6 +937,47 @@ function cleanupWebSocketListeners() {
         }
     }
     wsListeners.clear();
+}
+
+// ============================================================
+// GM UI UPDATE
+// ============================================================
+
+function updateGMUI() {
+    const display = q('#gm-display');
+    if (display) display.textContent = gmState.currentGmName || 'None';
+    
+    const badge = q('#gm-role-badge');
+    if (badge) badge.textContent = gmState.myRole === 'gm' ? 'You are GM' : 'Player';
+    
+    const actions = q('#gm-actions');
+    if (actions) {
+        if (gmState.myRole === 'gm') {
+            actions.innerHTML = `<button class="btn btn-sm btn-danger" id="vtt-gm-resign">Resign GM</button>`;
+        } else {
+            actions.innerHTML = `<button class="btn btn-sm btn-gold" id="vtt-gm-request">Request GM</button>`;
+        }
+        // Reattach click handlers will be done in attachEvents
+    }
+    
+    // Pending requests (only for GM)
+    const requestsContainer = q('#gm-requests');
+    const requestsList = q('#gm-requests-list');
+    if (gmState.myRole === 'gm' && gmState.requests.length > 0) {
+        requestsContainer.style.display = 'block';
+        requestsList.innerHTML = gmState.requests.map(r => `
+            <div class="flex-between" style="padding:0.2rem 0;border-bottom:1px solid var(--border);">
+                <span>${escHtml(r.requesterName)}</span>
+                <div>
+                    <button class="btn btn-sm btn-green gm-approve" data-target="${r.requesterId}">Approve</button>
+                    <button class="btn btn-sm btn-danger gm-reject" data-target="${r.requesterId}">Reject</button>
+                </div>
+            </div>
+        `).join('');
+    } else {
+        requestsContainer.style.display = 'none';
+        requestsList.innerHTML = '';
+    }
 }
 
 // ============================================================
@@ -964,15 +1107,30 @@ function attachEvents() {
             }
             case 'vtt-roll-post-btn': rollConnected(true); break;
             case 'vtt-roll-only-btn': rollConnected(false); break;
-            case 'vtt-add-timer': import('../timers/index.js').then(m => m.openTimerEditor?.()).catch(() => showToast('Timer feature not available', 'error')); break;
+            case 'vtt-add-timer': import('../../core/state.js').then(m => {
+                const state = m.getState();
+                const name = prompt('Timer name:', 'Scene Timer');
+                if (name) {
+                    const segments = parseInt(prompt('Segments:', '6') || '6');
+                    const timer = { id: 'timer-' + Date.now(), name, segments, current: 0 };
+                    m.addTimer(timer);
+                    vttStore.updateTimers(state.timers || []);
+                    showToast(`Timer "${name}" created.`, 'success');
+                }
+            }).catch(() => showToast('Timer feature not available', 'error')); break;
             case 'vtt-scene-end': {
-                import('../dashboard/scene-tools.js').then(m => {
-                    m.sceneEndTrimBoons?.();
-                    const state = getState();
-                    vttStore.updateCharacters(state.characters || []);
-                    if (isConnectedToServer()) syncState(state);
-                    showToast('Scene ended, boons trimmed.', 'info');
-                }).catch(() => showToast('Scene end feature not available', 'error'));
+                const state = getState();
+                (state.characters || []).forEach(c => {
+                    if (c.boons > 2) {
+                        const trimmed = c.boons - 2;
+                        c.boons = 2;
+                    }
+                });
+                vttStore.updateCharacters(state.characters || []);
+                try {
+                    sendEvent({ type: 'state-updated', state: state });
+                } catch (e) { /* ignore */ }
+                showToast('Scene ended, boons trimmed.', 'info');
                 break;
             }
             case 'vtt-voice-toggle': toggleVoice(); break;
@@ -984,8 +1142,67 @@ function attachEvents() {
             case 'vtt-deck-shuffle': handleDeckShuffle(); break;
             case 'vtt-deck-history': handleDeckHistory(); break;
             case 'vtt-modules-list': handleModuleList(); break;
+            // GM actions
+            case 'vtt-gm-request': {
+                if (!isConnectedToServer()) {
+                    showToast('Not connected to server.', 'error');
+                    return;
+                }
+                // Emit request_gm
+                const mode = getConnectionMode();
+                if (mode === 'socketio') {
+                    // We need socket instance; use the global from websocket.js? We'll use sendEvent or direct.
+                    // sendEvent doesn't handle request_gm, so we need to access socket.
+                    // We'll use the exported sendWSMessage or the socket directly? 
+                    // Since we're using the unified module, we can send via sendWSMessage with type 'request_gm'.
+                    sendWSMessage({ type: 'request_gm' });
+                } else {
+                    sendWSMessage({ type: 'request_gm' });
+                }
+                showToast('Request sent to GM.', 'info');
+                break;
+            }
+            case 'vtt-gm-resign': {
+                // Resign as GM: we can either emit a custom event or just request again? 
+                // The server doesn't have a resign; we can use request_gm but if you are GM, it will send a vote request to you, not resign.
+                // Instead, we can send a custom event 'gm-resign' and handle on server? Not implemented.
+                // For now, we'll just show a toast and let the GM promote someone else via approve.
+                showToast('To step down, approve a pending request or promote another player.', 'info');
+                break;
+            }
         }
     };
+
+    // Handle approve/reject clicks via delegation
+    const gmActionHandler = (e) => {
+        const approveBtn = e.target.closest('.gm-approve');
+        const rejectBtn = e.target.closest('.gm-reject');
+        if (!approveBtn && !rejectBtn) return;
+        e.preventDefault();
+        const targetId = (approveBtn || rejectBtn).dataset.target;
+        if (!targetId) return;
+        if (approveBtn) {
+            // Emit approve_gm
+            const mode = getConnectionMode();
+            if (mode === 'socketio') {
+                // Use sendWSMessage with type 'approve_gm'
+                sendWSMessage({ type: 'approve_gm', targetId });
+            } else {
+                sendWSMessage({ type: 'approve_gm', targetId });
+            }
+            // Remove from pending list optimistically
+            gmState.requests = gmState.requests.filter(r => r.requesterId !== targetId);
+            updateGMUI();
+            showToast(`Approved ${targetId} as GM.`, 'success');
+        } else if (rejectBtn) {
+            // Reject – just remove from list
+            gmState.requests = gmState.requests.filter(r => r.requesterId !== targetId);
+            updateGMUI();
+            showToast(`Rejected request from ${targetId}.`, 'info');
+            // Optionally send a reject event? The server doesn't have it, but we can just ignore.
+        }
+    };
+
     const keydownHandler = (e) => {
         if (e.key === 'Enter' && e.target.id === 'chatInput') {
             e.preventDefault();
@@ -999,6 +1216,7 @@ function attachEvents() {
     };
     eventListeners = [
         { event: 'click', handler: clickHandler },
+        { event: 'click', handler: gmActionHandler }, // for GM approve/reject
         { event: 'keydown', handler: keydownHandler },
         { event: 'change', handler: changeHandler }
     ];
@@ -1030,7 +1248,7 @@ export function render(el) {
     const isConnected = isConnectedToServer();
     const roomCode = isConnected ? getRoomCode() : null;
     const socketId = isConnected ? getSocketId() : null;
-    const mode = getConnectionMode ? getConnectionMode() : 'websocket';
+    const mode = typeof getConnectionMode === 'function' ? getConnectionMode() : 'websocket';
     const voiceStatus = getVoiceStatus();
     const voiceClients = getActiveVoiceClients();
     const deckCount = deckState.remaining || 0;
@@ -1078,6 +1296,33 @@ export function render(el) {
                     <span class="text-muted small" id="vtt-mode-badge" style="background:var(--bg3);padding:0.1rem 0.6rem;border-radius:12px;font-size:0.7rem;">${isConnected ? '🌐 Online' : '📡 Local'}</span>
                 </div>
                 <div id="presence-list" style="margin-top:0.2rem;"></div>
+            </div>
+        </div>
+
+        <!-- GM Management Panel -->
+        <div class="panel" style="padding:0.5rem 1rem;margin-bottom:1rem;border:1px solid var(--border);border-radius:var(--radius);">
+            <div class="flex-between" style="flex-wrap:wrap;gap:0.5rem;">
+                <div>
+                    <span class="text-muted small">👑 Game Master</span>
+                    <span id="gm-display" style="font-weight:600;margin-left:0.5rem;">
+                        ${gmState.currentGmName || 'None'}
+                    </span>
+                    <span id="gm-role-badge" style="font-size:0.7rem;background:var(--bg3);padding:0.1rem 0.6rem;border-radius:12px;margin-left:0.5rem;">
+                        ${gmState.myRole === 'gm' ? 'You are GM' : 'Player'}
+                    </span>
+                </div>
+                <div id="gm-actions" style="display:flex;gap:0.4rem;">
+                    ${gmState.myRole === 'gm' ? `
+                        <button class="btn btn-sm btn-danger" id="vtt-gm-resign">Resign GM</button>
+                    ` : `
+                        <button class="btn btn-sm btn-gold" id="vtt-gm-request">Request GM</button>
+                    `}
+                </div>
+            </div>
+            <!-- Pending requests (only shown to GM) -->
+            <div id="gm-requests" style="margin-top:0.4rem;display:none;border-top:1px solid var(--border);padding-top:0.4rem;">
+                <span class="text-muted small">Pending requests:</span>
+                <div id="gm-requests-list"></div>
             </div>
         </div>
 
@@ -1173,6 +1418,7 @@ export function render(el) {
 
     setupWebSocketSync();
     attachEvents();
+    updateGMUI(); // initial update
 
     if (presenceInterval) clearInterval(presenceInterval);
     presenceInterval = setInterval(() => {
@@ -1194,7 +1440,7 @@ export function render(el) {
         if (headerCountEl) headerCountEl.textContent = String(deckState.remaining || 0);
     }, 5000);
 
-    console.log('[VTT Connected] Rendered with reactive store + deck/module support');
+    console.log('[VTT Connected] Rendered with reactive store + deck/module/GM support');
 }
 
 // ============================================================

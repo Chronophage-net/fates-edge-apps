@@ -14,6 +14,11 @@
  * @returns {string} Unique ID
  */
 export function generateId(length = 8) {
+    // Use crypto.randomUUID if available for stronger uniqueness
+    if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+        const uuid = crypto.randomUUID().replace(/-/g, '');
+        return uuid.slice(0, length);
+    }
     const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
     let result = '';
     for (let i = 0; i < length; i++) {
@@ -102,7 +107,9 @@ export function buildDocumentUrl(base, docId, params = {}) {
     if (!base) return '';
     const url = new URL(base, window.location.origin);
     if (docId) {
-        url.pathname = url.pathname.replace(/\/$/, '') + '/' + encodeURIComponent(docId);
+        let path = url.pathname.replace(/\/$/, '');
+        // Ensure single slash between path and docId
+        url.pathname = path + (path.endsWith('/') ? '' : '/') + encodeURIComponent(docId);
     }
     for (const [key, value] of Object.entries(params)) {
         if (value !== undefined && value !== null) {
@@ -119,10 +126,15 @@ export function buildDocumentUrl(base, docId, params = {}) {
  * @returns {string} Base URL
  */
 export function getBaseUrl(state = {}, defaultValue = '') {
-    return state.baseUrl || 
-           localStorage.getItem('fatesEdgeBaseUrl') || 
-           window.location.origin || 
-           defaultValue;
+    let url = state.baseUrl || 
+              localStorage.getItem('fatesEdgeBaseUrl') || 
+              window.location.origin || 
+              defaultValue;
+    // Ensure trailing slash for consistent concatenation
+    if (url && typeof url === 'string' && !url.endsWith('/')) {
+        url += '/';
+    }
+    return url;
 }
 
 /**
