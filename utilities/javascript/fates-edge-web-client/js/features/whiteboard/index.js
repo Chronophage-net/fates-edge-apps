@@ -1117,6 +1117,7 @@ export function attachEvents() {
     });
 }
 
+
 // ============================================================
 // LIFECYCLE METHODS
 // ============================================================
@@ -1219,6 +1220,40 @@ export function exportWhiteboard() {
     link.href = canvas.toDataURL('image/png');
     link.click();
     showToast('💾 Whiteboard exported', 'success');
+}
+
+// ============================================================
+// WHITEBOARD ACTIONS
+// ============================================================
+
+export function uploadWhiteboardImage() {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*';
+    input.onchange = (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+            const dataUrl = ev.target.result;
+            // Position image in the centre of the canvas
+            const containerEl = document.getElementById('whiteboard-canvas-container');
+            const rect = containerEl.getBoundingClientRect();
+            const x = (rect.width - 200) / 2;
+            const y = (rect.height - 200) / 2;
+            state.images.push({
+                id: 'img-' + Date.now(),
+                x: Math.max(0, x),
+                y: Math.max(0, y),
+                data: dataUrl
+            });
+            saveWhiteboardData();        // This triggers sync if online
+            renderOverlay();
+            showToast('🖼️ Image uploaded', 'success');
+        };
+        reader.readAsDataURL(file);
+    };
+    input.click();
 }
 
 export function clearWhiteboardDrawings() {

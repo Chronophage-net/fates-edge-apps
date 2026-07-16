@@ -684,11 +684,11 @@ function renderPatronDetail(patronId) {
                                     <div class="rite-details ${isExpanded ? 'expanded' : 'collapsed'}" 
                                          id="rite-details-${riteId}"
                                          style="${isExpanded ? '' : 'display:none;'}">
-                                        ${r.description}
+                                        ${r.description}   <!-- raw HTML -->
                                         ${r.cost ? `<div class="rite-meta"><strong>Cost:</strong> ${escHtml(r.cost)}</div>` : ''}
                                         ${r.duration ? `<div class="rite-meta"><strong>Duration:</strong> ${escHtml(r.duration)}</div>` : ''}
                                         ${r.action ? `<div class="rite-meta"><strong>Action:</strong> ${escHtml(r.action)}</div>` : ''}
-                                        ${r.effect ? `<div class="rite-meta"><strong>Effect:</strong> ${escHtml(r.effect)}</div>` : ''}
+                                        ${r.effect ? `<div class="rite-meta"><strong>Effect:</strong> ${r.effect}</div>` : ''}  <!-- raw HTML -->
                                         ${r.tags && r.tags.length > 0 ? `<div class="rite-tags">${r.tags.map(t => `<span class="badge badge-tag">${escHtml(t)}</span>`).join('')}</div>` : ''}
                                     </div>
                                 `;
@@ -725,7 +725,7 @@ function renderPatronDetail(patronId) {
     }
 
     modal.innerHTML = `
-        <div class="modal-content patron-detail">
+        <div class="modal-content patron-detail" style="width: 90%; max-width: 1200px; max-height: 90vh; overflow-y: auto;">
             <button class="modal-close" onclick="window.closePatronModal()">✕</button>
             <div class="patron-detail-header">
                 <div class="patron-detail-icon">${patron.icon || '🌟'}</div>
@@ -740,13 +740,13 @@ function renderPatronDetail(patronId) {
             <div class="patron-detail-body">
                 <div class="patron-detail-section">
                     <h3>📖 Description</h3>
-                    <p>${escHtml(patron.description || 'No description available.')}</p>
+                    <p>${patron.description || 'No description available.'}</p>   <!-- raw HTML -->
                 </div>
                 
                 ${patron.lore ? `
                 <div class="patron-detail-section">
                     <h3>📚 Lore</h3>
-                    <p style="white-space:pre-wrap;">${escHtml(patron.lore)}</p>
+                    <p style="white-space:pre-wrap;">${patron.lore}</p>   <!-- raw HTML -->
                 </div>
                 ` : ''}
                 
@@ -769,21 +769,21 @@ function renderPatronDetail(patronId) {
                 ${patron.corruption ? `
                 <div class="patron-detail-section">
                     <h3>⚠️ Corruption</h3>
-                    <p>${escHtml(patron.corruption)}</p>
+                    <p>${patron.corruption}</p>   <!-- raw HTML -->
                 </div>
                 ` : ''}
                 
                 ${patron.whispered ? `
                 <div class="patron-detail-section">
                     <h3>🌙 Whispered in Taverns</h3>
-                    <p><em>"${escHtml(patron.whispered)}"</em></p>
+                    <p><em>"${patron.whispered}"</em></p>   <!-- raw HTML -->
                 </div>
                 ` : ''}
                 
                 ${patron.cult ? `
                 <div class="patron-detail-section">
                     <h3>🕯️ Cult: ${escHtml(patron.cult.name || 'Followers')}</h3>
-                    <p>${escHtml(patron.cult.description || '')}</p>
+                    <p>${patron.cult.description || ''}</p>   <!-- raw HTML -->
                 </div>
                 ` : ''}
                 
@@ -791,19 +791,17 @@ function renderPatronDetail(patronId) {
                 <div class="patron-detail-section">
                     <h3>🎁 Patron's Gift</h3>
                     <p><strong>${escHtml(patron.gift.name || 'Gift')}</strong></p>
-                    <p>${escHtml(patron.gift.description || '')}</p>
+                    <p>${patron.gift.description || ''}</p>   <!-- raw HTML -->
                     ${patron.gift.cost ? `<p class="text-muted" style="font-size:0.85rem;">Cost: ${escHtml(patron.gift.cost)}</p>` : ''}
                 </div>
                 ` : ''}
             </div>
             
-           // In renderPatronDetail, update the actions section:
-
-        <div class="patron-detail-actions" style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-top:1rem;padding-top:0.5rem;border-top:1px solid var(--border);">
-            <button class="btn btn-sm" onclick="window.editPatron('${patron.id}')" style="padding:0.3rem 0.8rem;font-size:0.8rem;">✏️ Edit</button>
-            <button class="btn btn-sm btn-danger" onclick="window.deletePatron('${patron.id}')" style="padding:0.3rem 0.8rem;font-size:0.8rem;">🗑️ Delete</button>
-            <button class="btn btn-sm btn-secondary" onclick="window.closePatronModal()" style="padding:0.3rem 0.8rem;font-size:0.8rem;">Close</button>
-        </div>
+            <div class="patron-detail-actions" style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-top:1rem;padding-top:0.5rem;border-top:1px solid var(--border);">
+                <button class="btn btn-sm" onclick="window.editPatron('${patron.id}')" style="padding:0.3rem 0.8rem;font-size:0.8rem;">✏️ Edit</button>
+                <button class="btn btn-sm btn-danger" onclick="window.deletePatron('${patron.id}')" style="padding:0.3rem 0.8rem;font-size:0.8rem;">🗑️ Delete</button>
+                <button class="btn btn-sm btn-secondary" onclick="window.closePatronModal()" style="padding:0.3rem 0.8rem;font-size:0.8rem;">Close</button>
+            </div>
         </div>
     `;
 
