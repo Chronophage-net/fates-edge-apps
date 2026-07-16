@@ -1,0 +1,87 @@
+name: Create Release
+
+on:
+  # Automatic trigger: run when the build workflow finishes on main
+  workflow_run:
+    workflows: ["Build Apps and Packages"]   # must match the name of your build workflow
+    types:
+      - completed
+    branches:
+      - main
+
+  # Manual trigger: allows you to specify a run ID and version tag
+  workflow_dispatch:
+    inputs:
+      run_id:
+        description: 'Run ID of the build workflow to fetch artifacts from'
+        type: number
+        required: true
+      release_version:
+        description: 'Version tag for release (e.g., v1.2.0)'
+        type: string
+        required: true
+
+permissions:
+  contents: write   # needed to create a release and upload assets
+  actions: read     # needed to download artifacts from another workflow run
+
+jobs:
+  create-release:
+    runs-on: ubuntu-latest
+    if: >
+      github.event_name == 'workflow_dispatch' ||
+      (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success')
+
+    steps:
+      - name: Determine run ID to fetch artifacts from
+        id: get-run-id
+        run: |
+          if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+            RUN_ID="${{ github.event.inputs.run_id }}"
+          else
+            RUN_ID="${{ github.event.workflow_run.id }}"
+          fi
+          echo "run-id=$RUN_ID" >> $GITHUB_OUTPUT
+          echo "Using run ID: $RUN_ID"
+
+      - name: Download all packaged artifacts from the build run
+        uses: actions/download-artifact@v4
+        with:
+          # Use the run-id we determined
+          run-id: ${{ steps.get-run-id.outputs.run-id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          pattern: '*-package'       # matches artifacts named like "web-client-package", "socket-server-package", etc.
+          path: release-assets
+
+      - name: List downloaded files
+        run: |
+          echo "Files downloaded:"
+          find release-assets -type f -name "*.tar.gz" -ls
+
+      - name: Determine release tag
+        id: tag
+        run: |
+          if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+            TAG="${{ github.event.inputs.release_version }}"
+          else
+            # For automated runs, generate a tag from the build run number and date
+            BUILD_RUN_NUMBER="${{ github.event.workflow_run.run_number }}"
+            TAG="v$(date +'%Y.%m.%d')-build$BUILD_RUN_NUMBER"
+          fi
+          echo "tag=$TAG" >> $GITHUB_OUTPUT
+          echo "Release tag: $TAG"
+
+      - name: Create GitHub Release and upload assets
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.tag.outputs.tag }}
+          name: Release ${{ steps.tag.outputs.tag }}
+          body: |
+            Automated release from build workflow run #${{ steps.get-run-id.outputs.run-id }}
+            Commit: ${{ github.event.workflow_run.head_sha || github.sha }}
+          files: |
+            release-assets/*/*.tar.gz   # upload all tar.gz files (they're inside subdirectories)
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
