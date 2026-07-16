@@ -66,19 +66,36 @@ class ModuleLoader {
 
         console.log(`🔍 Loading module "${moduleName}" via dynamic import`);
 
-        // Dynamic import
-        let module = await importFn();
+        // 1. Import the module
+        const imported = await importFn();
 
-        // Normalise: if module has a default export that is an object with render, use that
-        if (module && typeof module.default === 'object' && module.default !== null) {
-            // If default has render, treat it as the main module
-            if (typeof module.default.render === 'function') {
-                module = module.default;
+        // 2. Normalize to a plain extensible object (imported namespace is frozen)
+        let module;
+
+        if (imported && typeof imported === 'object') {
+            // If the default export is a plain object with a render function, use it directly
+            if (imported.default && typeof imported.default === 'object' && imported.default !== null) {
+                if (typeof imported.default.render === 'function') {
+                    module = imported.default;          // it's already a plain object
+                } else {
+                    // Merge default with named exports (both are plain objects)
+                    module = { ...imported.default, ...imported };
+                    delete module.default;              // clean up
+                }
+            } else if (imported.default && typeof imported.default === 'function') {
+                // Default is a function (could be a constructor or a render function)
+                // We'll treat it as a render function if it takes an element
+                module = { render: imported.default };
             } else {
-                // Merge default with named exports (fallback)
-                module = { ...module.default, ...module };
+                // No default, just merge named exports
+                module = { ...imported };
             }
+        } else {
+            // Fallback: if import returns a function directly (unlikely)
+            module = { render: imported };
         }
+
+        // Now 'module' is guaranteed to be a plain, extensible object.
 
         // Ensure module has a render function
         if (typeof module.render !== 'function') {
@@ -108,31 +125,45 @@ class ModuleLoader {
             }
         }
 
-        // Add default lifecycle methods if missing
+        // Add default lifecycle methods if missing.
+        // We use a plain object, so we can freely add properties.
         module._moduleName = moduleName;
         module._lastRender = 0;
         module._refreshInterval = 30000; // 30s
+        module._refreshing = false;      // re-entrancy guard
 
+        // --- refresh: never calls onActivate ---
         if (typeof module.refresh !== 'function') {
             module.refresh = async function() {
-                console.log(`🔄 Refreshing module "${moduleName}"`);
-                if (this.onActivate) await this.onActivate();
-                if (this.render && this._container) {
-                    const container = this._container;
-                    const scrollPos = container.scrollTop;
-                    await this.render(container);
-                    if (scrollPos > 0) container.scrollTop = scrollPos;
+                if (this._refreshing) {
+                    console.warn(`🔄 Refresh already in progress for "${moduleName}", skipping`);
+                    return;
+                }
+                this._refreshing = true;
+                try {
+                    console.log(`🔄 Refreshing module "${moduleName}"`);
+                    if (this.render && this._container) {
+                        const container = this._container;
+                        const scrollPos = container.scrollTop;
+                        await this.render(container);
+                        if (scrollPos > 0) container.scrollTop = scrollPos;
+                        this._lastRender = Date.now();
+                    }
+                } finally {
+                    this._refreshing = false;
                 }
             };
         }
 
+        // --- onActivate: does NOT automatically refresh ---
         if (typeof module.onActivate !== 'function') {
             module.onActivate = async function() {
                 console.log(`👋 Module "${moduleName}" activated`);
-                if (this.refresh) await this.refresh();
+                // Subclasses can override. No automatic refresh.
             };
         }
 
+        // --- onDeactivate ---
         if (typeof module.onDeactivate !== 'function') {
             module.onDeactivate = function() {
                 console.log(`👋 Module "${moduleName}" deactivated`);
@@ -181,7 +212,7 @@ class ModuleLoader {
                 `);
             }
 
-            // Activate the new module
+            // Activate the new module (no automatic refresh – the module is already rendered)
             if (typeof module.onActivate === 'function') {
                 await module.onActivate();
             }
@@ -227,12 +258,11 @@ class ModuleLoader {
         console.log(`🔄 Refreshing current module: "${this.currentModule}"`);
         if (typeof module.refresh === 'function') {
             await module.refresh();
-        } else if (typeof module.onActivate === 'function') {
-            await module.onActivate();
         } else if (typeof module.render === 'function' && module._container) {
+            // fallback
             await module.render(module._container);
+            module._lastRender = Date.now();
         }
-        module._lastRender = Date.now();
     }
 
     /**
@@ -247,12 +277,10 @@ class ModuleLoader {
         console.log(`🔄 Refreshing module: "${moduleName}"`);
         if (typeof module.refresh === 'function') {
             await module.refresh();
-        } else if (typeof module.onActivate === 'function') {
-            await module.onActivate();
         } else if (typeof module.render === 'function' && module._container) {
             await module.render(module._container);
+            module._lastRender = Date.now();
         }
-        module._lastRender = Date.now();
     }
 
     /**

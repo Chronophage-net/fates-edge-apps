@@ -4,15 +4,9 @@
  * FIXED: Complete cleanup of DOM elements and event listeners
  */
 
-import { 
-    getState,  
-    generateId,
-    escHtml, 
-    safeParseInt, 
-    clamp 
-} from '../../core/utils.js';
-import { addCharacter, getCharacter, updateCharacter} from '../../core/state.js';
-import { ALL_SKILLS, defaultSkills } from '../../core/dice.js';
+import { getState, addCharacter, getCharacter, updateCharacter } from '../../core/state.js';
+import { generateId, escHtml, safeParseInt, clamp } from '../../core/utils.js';
+import { ALL_SKILLS } from '../../core/dice.js';  // if needed
 import { showToast } from '../../components/Toast.js';
 
 // ============================================================

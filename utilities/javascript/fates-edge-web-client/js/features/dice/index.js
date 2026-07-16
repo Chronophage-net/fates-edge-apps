@@ -7,7 +7,7 @@
  */
 
 // Import from core modules
-import { logToSession, addVTTEvent } from '../dashboard/scene-tools.js';
+import { logToSession, addVTTEvent } from '../gm-tools/index.js';
 import { escHtml, safeParseInt } from '../../core/utils.js';
 import { addRoll, getState, saveState } from '../../core/state.js';
 // Import the core dice engine

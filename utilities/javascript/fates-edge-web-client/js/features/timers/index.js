@@ -2,7 +2,7 @@
  * Timers feature - Track scene pressure and faction clocks
  */
 
-import { logToSession, addVTTEvent } from '../dashboard/scene-tools.js';
+import { logToSession, addVTTEvent } from '../gm-tools/index.js';
 import { getState, addTimer, deleteTimer, updateTimer, saveState } from '../../core/state.js';
 import { createTimerWidget } from '../../components/TimerWidget.js';
 import { escHtml, safeParseInt } from '../../core/utils.js';

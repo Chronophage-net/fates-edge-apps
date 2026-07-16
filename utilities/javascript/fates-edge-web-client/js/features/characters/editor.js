@@ -6,14 +6,8 @@
  * FIXED: Prevent duplicate listeners
  */
 
-import { 
-    getState,  
-    generateId,
-    escHtml, 
-    safeParseInt, 
-    clamp 
-} from '../../core/utils.js';
-import { addCharacter, getCharacter, updateCharacter} from '../../core/state.js';
+import { getState, addCharacter, getCharacter, updateCharacter } from '../../core/state.js';
+import { generateId, escHtml, safeParseInt, clamp } from '../../core/utils.js';
 import { ALL_SKILLS, defaultSkills } from '../../core/dice.js';
 import { showToast } from '../../components/Toast.js';
 

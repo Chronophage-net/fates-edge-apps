@@ -6,7 +6,7 @@
 import { getState, addEncounter, deleteEncounter, updateEncounter } from '../../core/state.js';
 import { escHtml } from '../../core/utils.js';
 import { showToast } from '../../components/Toast.js';
-import { logToSession, addVTTEvent } from '../dashboard/scene-tools.js';
+import { logToSession, addVTTEvent } from '../gm-tools/index.js';
 
 let container = null;
 

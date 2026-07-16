@@ -24,7 +24,7 @@ let _prng = null;
  * Xorshift128+ PRNG for deterministic random generation
  * Used when a seed is set for reproducible random sequences
  */
-export class Xorshift128 {
+class Xorshift128 {
     constructor(seed) {
         this.seed = seed;
         this.state = this._seedToState(seed);
@@ -88,7 +88,7 @@ export class Xorshift128 {
  * Get the current deterministic seed
  * @returns {string|null} Current seed or null if not set
  */
-export function getSeed() {
+function getSeed() {
     return _seed;
 }
 
@@ -97,7 +97,7 @@ export function getSeed() {
  * @param {string|null} seed - New seed value, or null to disable deterministic mode
  * @returns {boolean} Success
  */
-export function setSeed(seed) {
+function setSeed(seed) {
     _seed = seed;
     if (seed) {
         _prng = new Xorshift128(seed);
@@ -117,7 +117,7 @@ export function setSeed(seed) {
  * Generate a new random seed
  * @returns {string} New seed value
  */
-export function generateSeed() {
+function generateSeed() {
     try {
         if (typeof window !== 'undefined' && window.crypto && window.crypto.getRandomValues) {
             const array = new Uint32Array(4);
@@ -132,7 +132,7 @@ export function generateSeed() {
  * Get a random number using deterministic PRNG if seeded, otherwise crypto/Math.random
  * @returns {number} Random number between 0 and 1
  */
-export function getRandom() {
+function getRandom() {
     if (_prng) {
         return _prng.random();
     }
@@ -152,7 +152,7 @@ export function getRandom() {
  * @param {number} max - Maximum value (exclusive)
  * @returns {number} Random integer
  */
-export function getRandomInt(min, max) {
+function getRandomInt(min, max) {
     if (_prng) {
         return _prng.randomInt(min, max);
     }
@@ -165,7 +165,7 @@ export function getRandomInt(min, max) {
  * @param {number} max - Maximum value (inclusive)
  * @returns {number} Random integer
  */
-export function getRandomIntInclusive(min, max) {
+function getRandomIntInclusive(min, max) {
     if (_prng) {
         return _prng.randomIntInclusive(min, max);
     }
@@ -197,6 +197,51 @@ if (!_seed && typeof window !== 'undefined' && window.__RANDOM_SEED) {
 }
 
 // ============================================================
+// SKILLS DEFINITIONS
+// ============================================================
+
+/**
+ * All available skills in the game
+ */
+const ALL_SKILLS = [
+    'Fight',
+    'Shoot',
+    'Pilot',
+    'Fix',
+    'Hack',
+    'Mingle',
+    'Study',
+    'Survive',
+    'Tinker',
+    'Attune',
+    'Command',
+    'Consort',
+    'Finesse',
+    'Hunt',
+    'Prowl',
+    'Sway',
+    'Wreck',
+    'Doctor',
+    'Scout',
+    'Smith'
+];
+
+/**
+ * Default starting skills for new characters
+ * A subset of ALL_SKILLS that characters start with
+ */
+const defaultSkills = [
+    'Fight',
+    'Shoot',
+    'Pilot',
+    'Fix',
+    'Hack',
+    'Mingle',
+    'Study',
+    'Survive'
+];
+
+// ============================================================
 // CORE DICE ROLLING
 // ============================================================
 
@@ -205,7 +250,7 @@ if (!_seed && typeof window !== 'undefined' && window.__RANDOM_SEED) {
  * @param {number} sides - Number of sides on the die (default: 10)
  * @returns {number} Roll result (1 to sides)
  */
-export function rollDie(sides = 10) {
+function rollDie(sides = 10) {
     if (sides < 1) {
         throw new Error('Die must have at least 1 side');
     }
@@ -228,7 +273,7 @@ export function rollDie(sides = 10) {
  * @param {number} sides - Number of sides on each die
  * @returns {number[]} Array of roll results
  */
-export function rollDice(count, sides = 10) {
+function rollDice(count, sides = 10) {
     const results = [];
     for (let i = 0; i < count; i++) {
         results.push(rollDie(sides));
@@ -242,7 +287,7 @@ export function rollDice(count, sides = 10) {
  * @param {number} sides - Number of sides on each die
  * @returns {Object} { dice: number[], successes: number, storyBeats: number }
  */
-export function rollPool(pool, sides = 10) {
+function rollPool(pool, sides = 10) {
     const dice = rollDice(pool, sides);
     const successes = dice.filter(r => r >= 6).length;
     const storyBeats = dice.filter(r => r === 1).length;
@@ -260,7 +305,7 @@ export function rollPool(pool, sides = 10) {
  * @param {number} options.boons - Number of boons to add
  * @returns {Object} Roll result with successes, dice, storyBeats, etc.
  */
-export function performDicePoolRoll(pool, dv, options = {}) {
+function performDicePoolRoll(pool, dv, options = {}) {
     const {
         position = 'controlled',
         boons = 0,
@@ -404,7 +449,7 @@ export function performDicePoolRoll(pool, dv, options = {}) {
  * @param {Object} options - Additional options
  * @returns {Object} Full roll result
  */
-export function performRoll(attr, skill, dv, position = 'controlled', boons = 0, options = {}) {
+function performRoll(attr, skill, dv, position = 'controlled', boons = 0, options = {}) {
     const basePool = Math.max(1, attr + skill);
     const pool = Math.min(basePool + boons, 12); // Cap at 12 dice
     
@@ -524,7 +569,7 @@ export function performRoll(attr, skill, dv, position = 'controlled', boons = 0,
  * @param {number} dv - Difficulty Value
  * @returns {boolean} True if success
  */
-export function isSuccess(successes, dv) {
+function isSuccess(successes, dv) {
     return successes >= dv;
 }
 
@@ -535,7 +580,7 @@ export function isSuccess(successes, dv) {
  * @param {number} storyBeats - Number of Story Beats
  * @returns {string} Outcome label
  */
-export function getOutcomeLabel(successes, dv, storyBeats = 0) {
+function getOutcomeLabel(successes, dv, storyBeats = 0) {
     if (successes >= dv) {
         return storyBeats > 0 ? 'Success with SB' : 'Clean Success';
     } else if (successes > 0) {
@@ -550,7 +595,7 @@ export function getOutcomeLabel(successes, dv, storyBeats = 0) {
  * @param {string} outcome - Outcome label
  * @returns {string} CSS class
  */
-export function getOutcomeClass(outcome) {
+function getOutcomeClass(outcome) {
     const classes = {
         'Clean Success': 'clean-success',
         'Success with SB': 'success-with-sb',
@@ -565,7 +610,7 @@ export function getOutcomeClass(outcome) {
  * @param {string} outcome - Outcome label
  * @returns {string} CSS color
  */
-export function getOutcomeColor(outcome) {
+function getOutcomeColor(outcome) {
     const colors = {
         'Clean Success': '#27ae60',
         'Success with SB': '#f1c40f',
@@ -584,7 +629,7 @@ export function getOutcomeColor(outcome) {
  * @param {number[]} dice - Array of die results
  * @returns {string[]} Array of visual representations
  */
-export function visualizeDice(dice) {
+function visualizeDice(dice) {
     return dice.map(r => {
         if (r >= 6) return `[${r}✓]`;
         if (r === 1) return `[${r}⚠]`;
@@ -597,7 +642,7 @@ export function visualizeDice(dice) {
  * @param {number[]} dice - Array of die results
  * @returns {string} HTML string
  */
-export function diceToHtml(dice) {
+function diceToHtml(dice) {
     return dice.map(r => {
         let className = 'die';
         if (r >= 6) className += ' success';
@@ -611,32 +656,50 @@ export function diceToHtml(dice) {
 // EXPORTS
 // ============================================================
 
-export default {
-    // Classes
+// Named exports
+export {
     Xorshift128,
-    
-    // Seed management
     getSeed,
     setSeed,
     generateSeed,
-    
-    // Random functions
     getRandom,
     getRandomInt,
     getRandomIntInclusive,
-    
-    // Dice rolling
     rollDie,
     rollDice,
     rollPool,
     performDicePoolRoll,
     performRoll,
-    
-    // Helpers
     isSuccess,
     getOutcomeLabel,
     getOutcomeClass,
     getOutcomeColor,
     visualizeDice,
-    diceToHtml
+    diceToHtml,
+    ALL_SKILLS,
+    defaultSkills
+};
+
+// Default export for the module loader
+export default {
+    Xorshift128,
+    getSeed,
+    setSeed,
+    generateSeed,
+    getRandom,
+    getRandomInt,
+    getRandomIntInclusive,
+    rollDie,
+    rollDice,
+    rollPool,
+    performDicePoolRoll,
+    performRoll,
+    isSuccess,
+    getOutcomeLabel,
+    getOutcomeClass,
+    getOutcomeColor,
+    visualizeDice,
+    diceToHtml,
+    ALL_SKILLS,
+    defaultSkills
 };

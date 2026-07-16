@@ -17,10 +17,11 @@ import { getStorage, setStorage } from './core/utils.js';
 // TEST MODE HANDLING
 // ============================================================
 
+/*
 const isTestMode = window.location.search.includes('test=true') || window.location.pathname.includes('/tests/');
 if (isTestMode) {
     console.log('🧪 Running in test mode');
-    import('./tests/runner.js')
+     import('./tests/runner.js')
         .then(module => {
             import('./tests/unit/operations.test.js');
             import('./tests/unit/offline-queue.test.js');
@@ -32,9 +33,11 @@ if (isTestMode) {
             setTimeout(() => { if (module.runTests) module.runTests(); }, 500);
         })
         .catch(err => console.error('Test runner load failed:', err));
-    // Stop normal execution in test mode
+  
+   // Stop normal execution in test mode
     throw new Error('Test mode active – stopping app initialization');
 }
+*/
 
 // ============================================================
 // INITIALISATION

@@ -119,7 +119,7 @@ function saveCampaignData() {
 // SESSION LOG & VTT EVENTS
 // ============================================================
 
-export function logToSession(message, type = 'info') {
+function logToSession(message, type = 'info') {
     const state = getState();
     if (!state.campaign) state.campaign = {};
     if (!state.campaign.state) state.campaign.state = {};
@@ -138,7 +138,7 @@ export function logToSession(message, type = 'info') {
     }
 }
 
-export function addVTTEvent(type, data = {}) {
+function addVTTEvent(type, data = {}) {
     const state = getState();
     if (!state.campaign) state.campaign = {};
     if (!state.campaign.state) state.campaign.state = {};
@@ -154,11 +154,11 @@ export function addVTTEvent(type, data = {}) {
 // TAG INJECTOR
 // ============================================================
 
-export function getSceneTags() {
+function getSceneTags() {
     return getState().campaign?.state?.sceneTags || [];
 }
 
-export function addSceneTag(tag) {
+function addSceneTag(tag) {
     tag = tag.toUpperCase().trim();
     if (!tag) {
         showToast('Please enter a tag name.', 'warning');
@@ -180,7 +180,7 @@ export function addSceneTag(tag) {
     return true;
 }
 
-export function removeSceneTag(tag) {
+function removeSceneTag(tag) {
     const state = getState();
     if (!state.campaign?.state?.sceneTags) return false;
     state.campaign.state.sceneTags = state.campaign.state.sceneTags.filter(t => t !== tag);
@@ -190,7 +190,7 @@ export function removeSceneTag(tag) {
     return true;
 }
 
-export function clearSceneTags() {
+function clearSceneTags() {
     const state = getState();
     if (!state.campaign?.state?.sceneTags) return;
     state.campaign.state.sceneTags = [];
@@ -200,7 +200,7 @@ export function clearSceneTags() {
     showToast('All tags cleared.', 'info');
 }
 
-export function getTagEffects() {
+function getTagEffects() {
     const tags = getSceneTags();
     let dvMod = 0;
     let posMod = 0;
@@ -363,7 +363,7 @@ function displayQuickGenResult(html) {
 // RENDER
 // ============================================================
 
-export function render(el) {
+function render(el) {
     container = el;
     loadCampaignData();
 
@@ -1202,7 +1202,7 @@ window.shuffleDeck = function() {
 // CORE FUNCTIONS
 // ============================================================
 
-export function sceneEndTrimBoons() {
+function sceneEndTrimBoons() {
     const state = getState();
     let trimmed = 0;
     (state.characters || []).forEach(c => {
@@ -1215,7 +1215,7 @@ export function sceneEndTrimBoons() {
     else showToast('Scene end: all Boons already at 2 or below.', 'info');
 }
 
-export function resetAllTimers() {
+function resetAllTimers() {
     if (!confirm('Reset every timer to zero segments?')) return;
     const state = getState();
     (state.timers || []).forEach(t => t.current = 0);
@@ -1223,7 +1223,7 @@ export function resetAllTimers() {
     showToast('All timers reset.', 'success');
 }
 
-export function newSession() {
+function newSession() {
     const state = getState();
     if ((state.rollHistory || []).length === 0 && (state.chatHistory || []).length === 0) return showToast('No data to archive.', 'info');
     
@@ -1253,7 +1253,7 @@ function refreshView() {
     }
 }
 
-export function attachEvents() {
+function attachEvents() {
     document.querySelectorAll('.gm-tab').forEach(tab => {
         tab.addEventListener('click', async () => {
             document.querySelectorAll('.gm-tab').forEach(t => t.classList.replace('btn-gold', 'btn-secondary'));
@@ -1335,27 +1335,47 @@ function updateRecordingUI() {
 // LIFECYCLE
 // ============================================================
 
-export function onActivate() {
+function onActivate() {
     loadCampaignData();
     if (activeTab === 'consequences') setTimeout(attachConsequencesEvents, 100);
     if (activeTab === 'session') setTimeout(attachSessionEvents, 100);
 }
 
-export function onDeactivate() {
+function onDeactivate() {
     saveCampaignData();
 }
 
-export function refresh() {
+function refresh() {
     loadCampaignData();
     refreshView();
 }
 
-export function destroy() {
+function destroy() {
     container = null;
     saveCampaignData();
     moduleCache = {};
 }
 
+
+export {
+    render,
+    destroy,
+    onActivate,
+    onDeactivate,
+    refresh,
+    logToSession,
+    addVTTEvent,
+    addSceneTag,
+    removeSceneTag,
+    clearSceneTags,
+    getSceneTags,
+    getTagEffects,
+    sceneEndTrimBoons,
+    resetAllTimers,
+    newSession
+};
+
+// ✅ Default export (re‑exporting the same)
 export default {
     render,
     destroy,
@@ -1373,3 +1393,4 @@ export default {
     getSceneTags,
     getTagEffects
 };
+
