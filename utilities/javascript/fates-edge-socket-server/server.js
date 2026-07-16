@@ -1020,12 +1020,28 @@ wss.on('connection', (ws, req) => {
                 case 'deck-history-clear':
                     handlePlainWSDeckHistoryClear(ws, roomKey);
                     break;
+
+                // ---- NEW: VTT and sync messages ----
+                case 'sync-state':
+                case 'vtt-characters-updated':
+                case 'vtt-timers-updated':
+                case 'chat-message':
+                case 'roll-dice':
+                    // Forward the message to all clients in the room
+                    broadcastToRoom(roomKey, messageType, {
+                        ...data,
+                        source: 'ws',
+                        clientId: clientId,
+                        timestamp: Date.now()
+                    });
+                    break;
+                // ------------------------------------
                     
                 default:
                     ws.send(JSON.stringify({
                         type: 'error',
                         message: `Unknown message type: ${messageType}`,
-                        supportedTypes: ['ping', 'deck-draw', 'deck-shuffle', 'crown-spread', 'deck-history', 'deck-history-clear']
+                        supportedTypes: ['ping', 'deck-draw', 'deck-shuffle', 'crown-spread', 'deck-history', 'deck-history-clear', 'sync-state', 'vtt-characters-updated', 'vtt-timers-updated', 'chat-message', 'roll-dice']
                     }));
             }
         } catch (error) {
@@ -1835,6 +1851,80 @@ io.on('connection', (socket) => {
             });
         }
     });
+
+    // ============================================================
+    // NEW: VTT and sync messages (Socket.io)
+    // ============================================================
+    socket.on('sync-state', (data) => {
+        if (!socket.room) {
+            socket.emit('error', { message: 'Not in a room' });
+            return;
+        }
+        broadcastToRoom(socket.room, 'sync-state', {
+            ...data,
+            source: 'socket.io',
+            clientId: socket.id,
+            clientName: socket.clientData?.name || 'Player',
+            timestamp: Date.now()
+        });
+    });
+
+    socket.on('vtt-characters-updated', (data) => {
+        if (!socket.room) {
+            socket.emit('error', { message: 'Not in a room' });
+            return;
+        }
+        broadcastToRoom(socket.room, 'vtt-characters-updated', {
+            ...data,
+            source: 'socket.io',
+            clientId: socket.id,
+            clientName: socket.clientData?.name || 'Player',
+            timestamp: Date.now()
+        });
+    });
+
+    socket.on('vtt-timers-updated', (data) => {
+        if (!socket.room) {
+            socket.emit('error', { message: 'Not in a room' });
+            return;
+        }
+        broadcastToRoom(socket.room, 'vtt-timers-updated', {
+            ...data,
+            source: 'socket.io',
+            clientId: socket.id,
+            clientName: socket.clientData?.name || 'Player',
+            timestamp: Date.now()
+        });
+    });
+
+    socket.on('chat-message', (data) => {
+        if (!socket.room) {
+            socket.emit('error', { message: 'Not in a room' });
+            return;
+        }
+        broadcastToRoom(socket.room, 'chat-message', {
+            ...data,
+            source: 'socket.io',
+            clientId: socket.id,
+            clientName: socket.clientData?.name || 'Player',
+            timestamp: Date.now()
+        });
+    });
+
+    socket.on('roll-dice', (data) => {
+        if (!socket.room) {
+            socket.emit('error', { message: 'Not in a room' });
+            return;
+        }
+        broadcastToRoom(socket.room, 'roll-dice', {
+            ...data,
+            source: 'socket.io',
+            clientId: socket.id,
+            clientName: socket.clientData?.name || 'Player',
+            timestamp: Date.now()
+        });
+    });
+    // ============================================================
 
     // ============================================================
     // DISCONNECT

@@ -20,8 +20,7 @@ import {
     onWSEvent, 
     offWSEvent, 
     sendMessage as sendWSMessage,
-    getConnectionMode,
-    onEvent
+    getConnectionMode
 } from '../../core/websocket.js';
 
 // ============================================================
@@ -206,6 +205,27 @@ function setupWebSocketSync() {
     
     onWSEvent('room-state', roomStateHandler);
     wsListeners.set('room-state', roomStateHandler);
+
+    // NEW: Handle full sync-state messages (e.g., from forceSync)
+    const syncStateHandler = (data) => {
+        if (isSyncing) return;
+        if (!data || !data.state) return;
+        
+        console.log('[Whiteboard] Received full sync state');
+        const incoming = data.state;
+        if (incoming.drawings) state.drawings = incoming.drawings;
+        if (incoming.notes) state.notes = incoming.notes;
+        if (incoming.images) state.images = incoming.images;
+        if (incoming.settings) state.settings = { ...state.settings, ...incoming.settings };
+        if (incoming.gridCombat) state.gridCombat = { ...state.gridCombat, ...incoming.gridCombat };
+        
+        saveWhiteboardData();
+        refreshUI();
+        showToast('🔄 Whiteboard fully synced', 'success');
+    };
+    
+    onWSEvent('sync-state', syncStateHandler);
+    wsListeners.set('sync-state', syncStateHandler);
 }
 
 function cleanupWebSocketListeners() {
@@ -225,6 +245,7 @@ function broadcastWhiteboardUpdate() {
     
     try {
         const data = {
+            type: 'whiteboard-update',        // <-- fixed: include type inside object
             whiteboard: {
                 drawings: state.drawings,
                 notes: state.notes,
@@ -234,9 +255,43 @@ function broadcastWhiteboardUpdate() {
             },
             timestamp: Date.now()
         };
-        sendWSMessage('whiteboard-update', data);
+        sendWSMessage(data);
     } catch (e) {
         console.warn('[Whiteboard] Failed to broadcast update:', e);
+    }
+}
+
+/**
+ * Force a full sync: broadcast current state and request a fresh sync from server.
+ */
+function forceSync() {
+    if (isOfflineMode || !isConnectedToServer()) {
+        showToast('📡 Cannot sync – you are offline', 'warning');
+        return;
+    }
+
+    try {
+        // Broadcast our current state to all clients
+        const data = {
+            type: 'whiteboard-update',
+            whiteboard: {
+                drawings: state.drawings,
+                notes: state.notes,
+                images: state.images,
+                settings: state.settings,
+                gridCombat: state.gridCombat
+            },
+            timestamp: Date.now()
+        };
+        sendWSMessage(data);
+        
+        // Also request a full sync from the server (if supported)
+        sendWSMessage({ type: 'sync-request', target: 'whiteboard' });
+        
+        showToast('🔄 Whiteboard sync requested', 'success');
+    } catch (e) {
+        console.warn('[Whiteboard] Force sync failed:', e);
+        showToast('❌ Sync failed', 'error');
     }
 }
 
@@ -997,7 +1052,7 @@ export function attachEvents() {
     // Clear drawings button
     document.getElementById('whiteboard-clear-drawings')?.addEventListener('click', clearWhiteboardDrawings);
 
-    // Sync button
+    // Sync button – now calls forceSync
     document.getElementById('whiteboard-sync-btn')?.addEventListener('click', forceSync);
 
     // Canvas events
