@@ -1,4 +1,4 @@
-# Fate's Edge Toolkit v2.1 — with Campaign Sharing Server
+# Fate's Edge Toolkit v4.0.0a — with Campaign Sharing Server
 
 **Fate's Edge** is a narrative‑first TTRPG system. This repository provides a complete **web‑based toolkit** for running and playing the game, plus a **self‑hosted campaign server** that lets your group share the same campaign state via a short code.
 

@@ -23,7 +23,7 @@ on:
         description: 'Skip socket server build & deployment to Render'
       create_release:
         type: boolean
-        default: false
+        default: true
         description: 'Create a GitHub Release'
       release_version:
         type: string
