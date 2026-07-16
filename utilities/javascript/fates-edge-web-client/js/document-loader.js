@@ -5,6 +5,8 @@ import { getFeatureFlags, isFeatureEnabled, shouldBuildDocs } from './feature-fl
 /**
  * Document Loader - Dynamically loads documents based on availability
  * Supports loading from multiple sources including packs
+ * 
+ * UPDATED: All document paths now use /data/docs/ prefix
  */
 class DocumentLoader {
   constructor() {
@@ -205,6 +207,7 @@ class DocumentLoader {
 
   /**
    * Normalize a document entry
+   * UPDATED: Uses /data/docs/ prefix for all document paths
    */
   normalizeDocumentEntry(entry) {
     const path = entry.path || entry.file || '';
@@ -212,12 +215,30 @@ class DocumentLoader {
     const title = entry.title || file.replace(/\.html$/, '').replace(/_/g, ' ') || 'Untitled';
     const category = entry.category || 'other';
     
+    // Build path with /data/docs/ prefix
+    let docPath = path;
+    
+    // If path is empty or doesn't start with /data/docs/, construct it
+    if (!docPath || docPath === '' || docPath === '#') {
+      const fileName = file || entry.id || title.replace(/\s+/g, '_').toLowerCase() + '.html';
+      docPath = `/data/docs/${fileName}`;
+    } else if (!docPath.startsWith('/data/docs/') && !docPath.startsWith('http') && !docPath.startsWith('#')) {
+      // Remove leading slash if present to avoid double slash
+      const cleanPath = docPath.startsWith('/') ? docPath.substring(1) : docPath;
+      docPath = `/data/docs/${cleanPath}`;
+    }
+    
+    // Ensure path starts with /
+    if (!docPath.startsWith('/')) {
+      docPath = '/' + docPath;
+    }
+    
     return {
       ...entry,
       id: entry.id || file.replace(/\.html$/, ''),
       title: title,
       file: file,
-      path: path || `/docs/${file}`,
+      path: docPath,
       category: category,
       categoryLabel: entry.categoryLabel || this.getCategoryLabel(category),
       categoryClass: entry.categoryClass || category,
@@ -257,30 +278,32 @@ class DocumentLoader {
 
   /**
    * Load search index
+   * UPDATED: Uses /data/ prefix for search index
    */
   async loadSearchIndex() {
     try {
-      const response = await fetch('/search-index.json');
+      // Primary location: /data/search-index.json
+      const response = await fetch('/data/search-index.json');
       if (response.ok) {
         this.searchIndex = await response.json();
-        console.log(`🔍 Loaded search index with ${this.searchIndex.length} entries`);
-      } else {
-        // Try alternative paths
-        const altPaths = ['/data/search-index.json', '/docs/search-index.json'];
-        for (const altPath of altPaths) {
-          const altResponse = await fetch(altPath);
-          if (altResponse.ok) {
-            this.searchIndex = await altResponse.json();
-            console.log(`🔍 Loaded search index from ${altPath} with ${this.searchIndex.length} entries`);
-            break;
-          }
-        }
-        
-        if (!this.searchIndex) {
-          console.warn('⚠️ search_index.json not found');
-          this.searchIndex = [];
+        console.log(`🔍 Loaded search index from /data/search-index.json with ${this.searchIndex.length} entries`);
+        return;
+      }
+      
+      // Fallback: try legacy locations
+      const fallbackPaths = ['/search-index.json', '/docs/search-index.json'];
+      for (const fallbackPath of fallbackPaths) {
+        const fallbackResponse = await fetch(fallbackPath);
+        if (fallbackResponse.ok) {
+          this.searchIndex = await fallbackResponse.json();
+          console.log(`🔍 Loaded search index from ${fallbackPath} with ${this.searchIndex.length} entries`);
+          return;
         }
       }
+      
+      console.warn('⚠️ search-index.json not found');
+      this.searchIndex = [];
+      
     } catch (e) {
       console.warn('⚠️ Failed to load search index:', e);
       this.searchIndex = [];
@@ -289,6 +312,7 @@ class DocumentLoader {
 
   /**
    * Load individual document files
+   * UPDATED: Uses /data/docs/ prefix
    */
   async loadDocumentFiles() {
     if (!this.documents || this.documents.length === 0) {
@@ -316,7 +340,8 @@ class DocumentLoader {
     for (const batch of batches) {
       const loadPromises = batch.map(async (doc) => {
         try {
-          const path = doc.path || `/docs/${doc.file}`;
+          // Use the normalized path (already has /data/docs/ prefix)
+          const path = doc.path || `/data/docs/${doc.file}`;
           const response = await fetch(path);
           
           if (response.ok) {
@@ -346,6 +371,7 @@ class DocumentLoader {
 
   /**
    * Load minimal docs for testing
+   * UPDATED: Uses /data/docs/ prefix
    */
   loadMinimalDocs() {
     // Create minimal sample documents for testing
@@ -353,7 +379,7 @@ class DocumentLoader {
       {
         id: 'sample',
         file: 'sample.html',
-        path: '/docs/sample.html',
+        path: '/data/docs/sample.html',
         title: 'Sample Document',
         category: 'test',
         categoryLabel: 'Test Documents',
@@ -612,7 +638,10 @@ class DocumentLoader {
 // Singleton instance
 export const documentLoader = new DocumentLoader();
 
-// Helper to check if documents are available
+/**
+ * Check if documents are available
+ * Manifests remain at root level
+ */
 export async function checkDocumentsAvailable() {
   try {
     const response = await fetch('/manifest-full.json');
@@ -625,7 +654,9 @@ export async function checkDocumentsAvailable() {
   }
 }
 
-// Helper to list available documents
+/**
+ * List available documents from manifest
+ */
 export async function listAvailableDocuments() {
   try {
     const response = await fetch('/manifest-full.json');

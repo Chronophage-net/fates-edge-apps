@@ -1064,14 +1064,32 @@ wss.on('connection', (ws, req) => {
                     // Client is pushing a full sync state – treat as update
                     handlePlainWSWhiteboardUpdate(ws, roomKey, data);
                     break;
+                case 'sync-state':
+                    // Client is pushing a full sync state – treat as update
+                    handlePlainWSWhiteboardUpdate(ws, roomKey, data);
+                    break;
+
+                // Relay broadcasts for media, voice, chat, and rolls
+                case 'media_recording':
+                case 'voice-offer':
+                case 'voice-answer':
+                case 'voice-ice-candidate':
+                case 'voice-status':
+                case 'chat-message':
+                case 'roll-dice':
+                case 'roll-result':
+                case 'event':
+                    // Broadcast directly to the room so all clients get it
+                    broadcastToRoom(roomKey, messageType, data);
+                    break;
                     
                 default:
                     ws.send(JSON.stringify({
                         type: 'error',
                         message: `Unknown message type: ${messageType}`,
-                        supportedTypes: ['ping', 'deck-draw', 'deck-shuffle', 'crown-spread', 'deck-history', 'deck-history-clear', 'whiteboard-update', 'sync-request', 'sync-state']
+                        supportedTypes: ['ping', 'deck-draw', 'deck-shuffle', 'crown-spread', 'deck-history', 'deck-history-clear', 'whiteboard-update', 'sync-request', 'sync-state', 'media_recording', 'voice-offer', 'voice-answer', 'voice-ice-candidate', 'voice-status', 'chat-message', 'roll-dice', 'roll-result', 'event']
                     }));
-            }
+            } // <-- Make sure there is only ONE closing brace here for the switch
         } catch (error) {
             logError('Error parsing plain WS message', { 
                 clientId, 
@@ -1084,6 +1102,7 @@ wss.on('connection', (ws, req) => {
             }));
         }
     });
+
     
     ws.on('close', () => {
         logInfo('🔌 Plain WebSocket client disconnected', { 
@@ -2034,7 +2053,7 @@ io.on('connection', (socket) => {
                 room: socket.room, 
                 error: error.message 
             });
-            socket.emit('error', { message: 'Failed to update whiteboard: ' + error.message });
+            socket.emit('error', { message: 'Failed -to update whiteboard: ' + error.message });
         }
     });
 
@@ -2062,11 +2081,47 @@ io.on('connection', (socket) => {
         });
     });
 
-    // Also handle 'sync-state' from client as an update (if they send it)
     socket.on('sync-state', (data) => {
         // Treat same as whiteboard-update
         socket.emit('whiteboard-update', data);
     });
+
+    // ============================================================
+    // [NEW] RELAY HANDLERS (Media, Voice, Chat, Rolls)
+    // ============================================================
+    // Catch-all relay for client-to-client broadcasts
+    const relayEvents = [
+        'media_recording', 
+        'voice-offer', 
+        'voice-answer', 
+        'voice-ice-candidate', 
+        'voice-status', 
+        'chat-message', 
+        'roll-dice', 
+        'roll-result', 
+        'event'
+    ];
+    
+    relayEvents.forEach(eventName => {
+        socket.on(eventName, (data) => {
+            if (!socket.room) {
+                socket.emit('error', { message: 'Not in a room' });
+                return;
+            }
+            
+            // Broadcast to everyone in the room (both Socket.io and WS clients)
+            broadcastToRoom(socket.room, eventName, {
+                ...data,
+                clientId: socket.id,
+                clientName: socket.clientData?.name || 'Player'
+            });
+        });
+    });
+
+    // ============================================================
+    // DISCONNECT
+    // ============================================================
+
 
     // ============================================================
     // DISCONNECT

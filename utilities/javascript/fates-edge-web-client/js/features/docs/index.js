@@ -1,4 +1,4 @@
-// features/docs/index.js - Simplified version that just works
+// features/docs/index.js - Updated to use /data/docs/ instead of /docs/
 
 import { escHtml } from '../../core/utils.js';
 import { showToast } from '../../components/Toast.js';
@@ -123,7 +123,7 @@ function attachDocEvents() {
 }
 
 // ============================================================
-// LOAD DOCUMENT LIST - SIMPLIFIED
+// LOAD DOCUMENT LIST - UPDATED: uses /data/docs/ prefix
 // ============================================================
 
 export function loadDocList() {
@@ -202,37 +202,40 @@ export function loadDocList() {
     }
     
     function processManifest(manifest) {
-        // Normalize each document
+        // Normalize each document — all paths now use /data/docs/ prefix
         allDocs = manifest.map(doc => {
             let path = doc.path || doc.file || '';
             let file = doc.file || path.split('/').pop() || doc.id || '';
             
-            // Normalize path
-            if (path && !path.startsWith('/') && !path.startsWith('#') && !path.startsWith('http')) {
-                path = '/docs/' + path;
-            }
-            if (path && path.startsWith('/') && !path.startsWith('/docs/') && !path.startsWith('/data/')) {
-                path = '/docs' + path;
+            // Normalize path: prefix with /data/docs/ if not already
+            if (path && !path.startsWith('/data/docs/') && !path.startsWith('#') && !path.startsWith('http')) {
+                // Remove leading slash if present to avoid double slash
+                const cleanPath = path.startsWith('/') ? path.substring(1) : path;
+                path = '/data/docs/' + cleanPath;
+            } else if (path && path.startsWith('/') && !path.startsWith('/data/docs/')) {
+                // If it starts with / but not /data/docs/, fix it
+                const cleanPath = path.substring(1);
+                path = '/data/docs/' + cleanPath;
             }
             
-            // If no valid path, construct from file
+            // If no valid path, construct from file or id
             if (!path || path === '' || path === '#') {
-                if (file && file !== '') {
-                    if (!file.endsWith('.html')) {
-                        file = file + '.html';
+                let fileName = file;
+                if (fileName && fileName !== '') {
+                    if (!fileName.endsWith('.html')) {
+                        fileName = fileName + '.html';
                     }
-                    path = '/docs/' + file;
                 } else if (doc.id) {
-                    const id = doc.id.endsWith('.html') ? doc.id : doc.id + '.html';
-                    path = '/docs/' + id;
+                    fileName = doc.id.endsWith('.html') ? doc.id : doc.id + '.html';
                 } else if (doc.title) {
-                    const titleFile = doc.title.replace(/\s+/g, '_').toLowerCase() + '.html';
-                    path = '/docs/' + titleFile;
+                    fileName = doc.title.replace(/\s+/g, '_').toLowerCase() + '.html';
                 } else {
-                    path = '/docs/unknown.html';
+                    fileName = 'unknown.html';
                 }
+                path = '/data/docs/' + fileName;
             }
             
+            // Ensure path starts with /
             if (!path.startsWith('/')) {
                 path = '/' + path;
             }
@@ -429,7 +432,7 @@ function updateDocStats(count) {
 }
 
 // ============================================================
-// LOAD DOCUMENT
+// LOAD DOCUMENT - UPDATED: fetches from /data/docs/
 // ============================================================
 
 export function loadDocument(docPath, preserveTheme = false) {
@@ -443,15 +446,17 @@ export function loadDocument(docPath, preserveTheme = false) {
     titleEl.textContent = 'Loading…';
     viewer.innerHTML = '<div class="loading" style="display:flex;align-items:center;justify-content:center;height:100%;min-height:400px;color:var(--text2);font-style:italic;padding:2rem;">Loading document…</div>';
 
-    // Build path to fetch
+    // Build path to fetch — use /data/docs/ prefix
     let fetchPath = docPath;
     
-    if (fetchPath && !fetchPath.startsWith('/docs/') && !fetchPath.startsWith('#') && !fetchPath.startsWith('http')) {
-        if (!fetchPath.startsWith('/')) {
-            fetchPath = '/docs/' + fetchPath;
-        } else if (fetchPath.startsWith('/') && !fetchPath.startsWith('/docs/')) {
-            fetchPath = '/docs' + fetchPath;
-        }
+    if (fetchPath && !fetchPath.startsWith('/data/docs/') && !fetchPath.startsWith('#') && !fetchPath.startsWith('http')) {
+        // Remove leading slash if present to avoid double slash
+        const cleanPath = fetchPath.startsWith('/') ? fetchPath.substring(1) : fetchPath;
+        fetchPath = '/data/docs/' + cleanPath;
+    } else if (fetchPath && fetchPath.startsWith('/') && !fetchPath.startsWith('/data/docs/')) {
+        // If it starts with / but not /data/docs/, fix it
+        const cleanPath = fetchPath.substring(1);
+        fetchPath = '/data/docs/' + cleanPath;
     }
 
     console.log(`📄 Loading: ${fetchPath}`);

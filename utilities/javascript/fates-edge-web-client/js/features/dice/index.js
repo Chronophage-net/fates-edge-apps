@@ -7,6 +7,7 @@
  */
 
 // Import from core modules
+import { logToSession, addVTTEvent } from '../dashboard/scene-tools.js';
 import { escHtml, safeParseInt } from '../../core/utils.js';
 import { addRoll, getState, saveState } from '../../core/state.js';
 // Import the core dice engine
@@ -585,6 +586,24 @@ function handleRoll() {
         
         const result = performRoll(attr, skill, dv, position, boons);
         
+        // Log to session and VTT
+        try {
+        const outcomeText = result.resultText || result.outcome || 'Unknown';
+        logToSession(`🎲 Dice roll: ${outcomeText} (${result.successes || 0} successes, ${result.storyBeats || 0} SB)`, 'info');
+        addVTTEvent('dice_roll', {
+            attr: attr,
+            skill: skill,
+            dv: dv,
+            position: position,
+            pool: result.pool,
+            dice: result.dice,
+            successes: result.successes,
+            storyBeats: result.storyBeats,
+            outcome: result.outcome,
+            outcomeClass: result.outcomeClass
+        });
+
+} catch (e) { /* ignore */ }
         if (!result || typeof result !== 'object') {
             console.error('Invalid result from performRoll:', result);
             showError('Failed to perform roll. Please try again.');

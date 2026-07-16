@@ -5,6 +5,7 @@
  * Now uses the unified WebSocket module
  */
 
+import { logToSession, addVTTEvent } from '../dashboard/scene-tools.js';
 import { vttStore } from '../../core/vtt-store.js';
 import { getState, clearChatHistory, getCharacter } from '../../core/state.js';
 import { performRoll } from '../../core/dice.js';
@@ -107,7 +108,16 @@ export function sendMessage(text, sender, recipient = 'all', metadata = {}) {
     const msg = createMessage(text, sender, recipient, metadata);
 
     vttStore.addChatMessage(msg);
-
+    // Log chat message to VTT
+    if (!msg.whisper) {
+        try {
+            addVTTEvent('chat_message', { 
+                sender: sender, 
+                recipient: recipient, 
+                text: text.substring(0, 100) 
+            });
+        } catch (e) { /* ignore */ }
+    }
     if (isConnected) {
         try {
             sendChatMessage(msg);
@@ -832,6 +842,13 @@ function cleanupWebSocketListeners() {
 // ============================================================
 
 async function toggleVoice() {
+    // Initialize media module for session recording
+    try {
+        const state = getState();
+        const userId = state.sessionId || 'vtt-' + Date.now().toString(36);
+        const { initMediaModule } = await import('../../core/media.js');
+        initMediaModule(userId);
+    } catch (e) { /* ignore */ }
     if (isDestroyed) return;
     if (!voiceInitialized) {
         const success = await initVoice();

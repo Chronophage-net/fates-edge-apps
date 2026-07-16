@@ -7,14 +7,16 @@
  * - Text notes with positioning
  * - Image upload for maps/reference
  * - Grid snap option with multiple grid types (square, hex, isometric)
- * - Simple drawing tools (pen, eraser, line, rectangle, text)
+ * - Simple drawing tools (pen, eraser, line, rectangle, ruler, text)
  * - WebSocket sync for real-time collaboration
- * - Grid combat mode with tactical overlays
+ * - Grid combat mode with tactical overlays (ZoC, Flanking, Drag & Drop)
+ * - Records movements to media manifest for VOD creators
  */
 
 import { getState, saveState } from '../../core/state.js';
 import { showToast } from '../../components/Toast.js';
 import { escHtml } from '../../core/utils.js';
+import { logRecordingEvent } from '../../core/media.js'; // New: For recording transcripts
 import { 
     isConnectedToServer, 
     onWSEvent, 
@@ -34,9 +36,9 @@ const GRID_TYPES = {
 };
 
 const GRID_COLORS = {
-    SQUARE: 'rgba(255,255,255,0.08)',
-    HEX: 'rgba(255,215,0,0.08)',
-    ISOMETRIC: 'rgba(100,200,255,0.08)'
+    SQUARE: 'rgba(212, 175, 55, 0.08)',
+    HEX: 'rgba(212, 175, 55, 0.08)',
+    ISOMETRIC: 'rgba(212, 175, 55, 0.08)'
 };
 
 // ============================================================
@@ -59,30 +61,32 @@ let state = {
     gridCombat: {
         enabled: false,
         gridType: 'square',
-        cellSize: 30,
+        cellSize: 40,
         showCoordinates: true,
         showZones: false,
         tokens: []
     },
     settings: {
         gridSnap: false,
-        gridSize: 20,
-        backgroundColor: '#1a1a2e',
+        gridSize: 40,
+        backgroundColor: 'var(--bg2)',
         gridType: 'square',
         showGrid: true
     }
 };
 let activeNoteId = null;
 let selectedImage = null;
-let zoomLevel = 1;
-let panOffset = { x: 0, y: 0 };
-let isPanning = false;
-let panStart = { x: 0, y: 0 };
 let wsListeners = new Map();
 let isSyncing = false;
-let pendingSync = false;
 let isOfflineMode = false;
 let gridCombatActive = false;
+
+// New state for tactical interactions
+let isDraggingToken = false;
+let draggedToken = null;
+let tokenStartPos = null;
+let rulerStart = null;
+let rulerEnd = null;
 
 // ============================================================
 // LOAD/SAVE
@@ -123,7 +127,6 @@ function setupWebSocketSync() {
     const connected = isConnectedToServer();
     
     if (!connected) {
-        console.log('[Whiteboard] Not connected to server - OFFLINE MODE');
         isOfflineMode = true;
         updateConnectionStatusUI(false);
         return;
@@ -131,63 +134,24 @@ function setupWebSocketSync() {
     
     isOfflineMode = false;
     updateConnectionStatusUI(true);
-    console.log('[Whiteboard] WebSocket sync enabled via', getConnectionMode ? getConnectionMode() : 'websocket');
     
-    // Listen for whiteboard updates from other clients
     const updateHandler = (data) => {
-        if (isSyncing) return;
-        if (!data || !data.whiteboard) return;
-        
-        console.log('[Whiteboard] Received update from server');
+        if (isSyncing || !data || !data.whiteboard) return;
         
         const incoming = data.whiteboard;
-        if (incoming.drawings) {
-            const existingIds = new Set(state.drawings.map(d => d.id));
-            const newDrawings = incoming.drawings.filter(d => !existingIds.has(d.id));
-            if (newDrawings.length > 0) {
-                state.drawings = [...state.drawings, ...newDrawings];
-            } else if (incoming.drawings.length > state.drawings.length) {
-                state.drawings = incoming.drawings;
-            }
-        }
-        
-        if (incoming.notes) {
-            const existingIds = new Set(state.notes.map(n => n.id));
-            const newNotes = incoming.notes.filter(n => !existingIds.has(n.id));
-            if (newNotes.length > 0) {
-                state.notes = [...state.notes, ...newNotes];
-            } else if (incoming.notes.length > state.notes.length) {
-                state.notes = incoming.notes;
-            }
-        }
-        
-        if (incoming.images) {
-            const existingIds = new Set(state.images.map(i => i.id));
-            const newImages = incoming.images.filter(i => !existingIds.has(i.id));
-            if (newImages.length > 0) {
-                state.images = [...state.images, ...newImages];
-            } else if (incoming.images.length > state.images.length) {
-                state.images = incoming.images;
-            }
-        }
-        
-        if (incoming.settings) {
-            state.settings = { ...state.settings, ...incoming.settings };
-        }
-        
-        if (incoming.gridCombat) {
-            state.gridCombat = { ...state.gridCombat, ...incoming.gridCombat };
-        }
+        if (incoming.drawings) state.drawings = incoming.drawings;
+        if (incoming.notes) state.notes = incoming.notes;
+        if (incoming.images) state.images = incoming.images;
+        if (incoming.settings) state.settings = { ...state.settings, ...incoming.settings };
+        if (incoming.gridCombat) state.gridCombat = { ...state.gridCombat, ...incoming.gridCombat };
         
         saveWhiteboardData();
         refreshUI();
-        showToast('🔄 Whiteboard synced', 'info');
     };
     
     onWSEvent('whiteboard-update', updateHandler);
     wsListeners.set('whiteboard-update', updateHandler);
     
-    // Also listen for initial room state
     const roomStateHandler = (data) => {
         if (data && data.whiteboard) {
             isSyncing = true;
@@ -199,19 +163,14 @@ function setupWebSocketSync() {
             saveWhiteboardData();
             refreshUI();
             isSyncing = false;
-            console.log('[Whiteboard] Initial state loaded from server');
         }
     };
     
     onWSEvent('room-state', roomStateHandler);
     wsListeners.set('room-state', roomStateHandler);
 
-    // NEW: Handle full sync-state messages (e.g., from forceSync)
     const syncStateHandler = (data) => {
-        if (isSyncing) return;
-        if (!data || !data.state) return;
-        
-        console.log('[Whiteboard] Received full sync state');
+        if (isSyncing || !data || !data.state) return;
         const incoming = data.state;
         if (incoming.drawings) state.drawings = incoming.drawings;
         if (incoming.notes) state.notes = incoming.notes;
@@ -221,7 +180,6 @@ function setupWebSocketSync() {
         
         saveWhiteboardData();
         refreshUI();
-        showToast('🔄 Whiteboard fully synced', 'success');
     };
     
     onWSEvent('sync-state', syncStateHandler);
@@ -230,49 +188,15 @@ function setupWebSocketSync() {
 
 function cleanupWebSocketListeners() {
     for (const [event, handler] of wsListeners) {
-        try {
-            offWSEvent(event, handler);
-        } catch (e) {
-            console.debug('[Whiteboard] Error removing listener:', e);
-        }
+        try { offWSEvent(event, handler); } catch (e) {}
     }
     wsListeners.clear();
 }
 
 function broadcastWhiteboardUpdate() {
-    if (isSyncing) return;
-    if (isOfflineMode || !isConnectedToServer()) return;
-    
+    if (isSyncing || isOfflineMode || !isConnectedToServer()) return;
     try {
-        const data = {
-            type: 'whiteboard-update',        // <-- fixed: include type inside object
-            whiteboard: {
-                drawings: state.drawings,
-                notes: state.notes,
-                images: state.images,
-                settings: state.settings,
-                gridCombat: state.gridCombat
-            },
-            timestamp: Date.now()
-        };
-        sendWSMessage(data);
-    } catch (e) {
-        console.warn('[Whiteboard] Failed to broadcast update:', e);
-    }
-}
-
-/**
- * Force a full sync: broadcast current state and request a fresh sync from server.
- */
-function forceSync() {
-    if (isOfflineMode || !isConnectedToServer()) {
-        showToast('📡 Cannot sync – you are offline', 'warning');
-        return;
-    }
-
-    try {
-        // Broadcast our current state to all clients
-        const data = {
+        sendWSMessage({
             type: 'whiteboard-update',
             whiteboard: {
                 drawings: state.drawings,
@@ -282,17 +206,18 @@ function forceSync() {
                 gridCombat: state.gridCombat
             },
             timestamp: Date.now()
-        };
-        sendWSMessage(data);
-        
-        // Also request a full sync from the server (if supported)
-        sendWSMessage({ type: 'sync-request', target: 'whiteboard' });
-        
-        showToast('🔄 Whiteboard sync requested', 'success');
-    } catch (e) {
-        console.warn('[Whiteboard] Force sync failed:', e);
-        showToast('❌ Sync failed', 'error');
+        });
+    } catch (e) {}
+}
+
+function forceSync() {
+    if (isOfflineMode || !isConnectedToServer()) {
+        showToast('Cannot sync – you are offline', 'warning');
+        return;
     }
+    broadcastWhiteboardUpdate();
+    sendWSMessage({ type: 'sync-request', target: 'whiteboard' });
+    showToast('Whiteboard sync requested', 'success');
 }
 
 function refreshUI() {
@@ -300,9 +225,7 @@ function refreshUI() {
         restoreDrawings();
         renderOverlay();
         updateStats();
-        if (gridCombatActive) {
-            renderGridCombat();
-        }
+        if (gridCombatActive) renderGridCombat();
     }
 }
 
@@ -322,12 +245,9 @@ function updateConnectionStatusUI(connected) {
         statusBadge.textContent = connected ? '🟢 Live' : '📡 Local';
         statusBadge.className = `status-badge ${connected ? 'connected' : 'local'}`;
     }
-    
     if (statusText) {
-        statusText.textContent = connected ? 'Connected - Real-time sync enabled' : 'Local Mode - No sync';
-        statusText.style.color = connected ? 'var(--green)' : 'var(--orange)';
+        statusText.textContent = connected ? 'Real-time sync enabled' : 'Local Mode - No sync';
     }
-    
     if (overlay) {
         overlay.style.display = connected ? 'none' : 'flex';
     }
@@ -343,73 +263,51 @@ function toggleGridCombat() {
     saveWhiteboardData();
     
     const btn = document.getElementById('whiteboard-grid-combat');
+    const addTokenBtn = document.getElementById('whiteboard-add-token');
+    
     if (btn) {
         btn.textContent = gridCombatActive ? '⚔️ Combat ON' : '⚔️ Combat OFF';
         btn.className = gridCombatActive ? 'btn btn-sm btn-danger' : 'btn btn-sm btn-secondary';
     }
-    
-    if (gridCombatActive) {
-        showToast('⚔️ Grid Combat Mode enabled', 'success');
-        renderGridCombat();
-    } else {
-        showToast('Grid Combat Mode disabled', 'info');
-        restoreDrawings();
-        renderOverlay();
+    if (addTokenBtn) {
+        addTokenBtn.style.display = gridCombatActive ? 'inline-block' : 'none';
     }
+    
+    showToast(gridCombatActive ? '⚔️ Grid Combat Mode enabled' : 'Grid Combat disabled', gridCombatActive ? 'success' : 'info');
+    restoreDrawings();
+    renderGridCombat();
 }
 
 function renderGridCombat() {
     if (!ctx || !gridCombatActive) return;
     
     const gc = state.gridCombat;
-    const cellSize = gc.cellSize || 30;
-    const gridType = gc.gridType || 'square';
+    const cellSize = gc.cellSize || 40;
     
-    // Draw combat grid overlay
     ctx.save();
     ctx.globalAlpha = 0.3;
     
-    if (gridType === 'hex') {
-        drawHexGrid(cellSize);
-    } else if (gridType === 'isometric') {
-        drawIsometricGrid(cellSize);
-    } else {
-        drawSquareGrid(cellSize);
-    }
+    if (gc.gridType === 'hex') drawHexGrid(cellSize);
+    else if (gc.gridType === 'isometric') drawIsometricGrid(cellSize);
+    else drawSquareGrid(cellSize);
     
     ctx.restore();
     
-    // Draw coordinates
-    if (gc.showCoordinates) {
-        drawCoordinates(cellSize, gridType);
-    }
+    if (gc.showCoordinates) drawCoordinates(cellSize, gc.gridType);
+    if (gc.showZones) drawZonesOfControl(cellSize, gc.gridType);
     
-    // Draw Zones of Control if enabled
-    if (gc.showZones) {
-        drawZonesOfControl(cellSize, gridType);
-    }
-    
-    // Draw tokens
-    drawTokens(cellSize, gridType);
+    drawTokens(cellSize, gc.gridType);
 }
 
 function drawSquareGrid(cellSize) {
     if (!ctx) return;
     ctx.strokeStyle = GRID_COLORS.SQUARE;
     ctx.lineWidth = 1;
-    
     for (let x = 0; x < canvas.width; x += cellSize) {
-        ctx.beginPath();
-        ctx.moveTo(x, 0);
-        ctx.lineTo(x, canvas.height);
-        ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, canvas.height); ctx.stroke();
     }
-    
     for (let y = 0; y < canvas.height; y += cellSize) {
-        ctx.beginPath();
-        ctx.moveTo(0, y);
-        ctx.lineTo(canvas.width, y);
-        ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(canvas.width, y); ctx.stroke();
     }
 }
 
@@ -417,25 +315,20 @@ function drawHexGrid(cellSize) {
     if (!ctx) return;
     ctx.strokeStyle = GRID_COLORS.HEX;
     ctx.lineWidth = 1;
-    
     const hexHeight = cellSize * Math.sqrt(3);
     const hexWidth = cellSize * 2;
-    
     for (let row = 0; row < canvas.height / hexHeight + 2; row++) {
         for (let col = 0; col < canvas.width / hexWidth + 2; col++) {
             const x = col * hexWidth + (row % 2) * cellSize;
             const y = row * hexHeight * 0.75;
-            
             ctx.beginPath();
             for (let i = 0; i < 6; i++) {
                 const angle = Math.PI / 180 * (60 * i - 30);
                 const hx = x + cellSize * Math.cos(angle);
                 const hy = y + cellSize * Math.sin(angle);
-                if (i === 0) ctx.moveTo(hx, hy);
-                else ctx.lineTo(hx, hy);
+                if (i === 0) ctx.moveTo(hx, hy); else ctx.lineTo(hx, hy);
             }
-            ctx.closePath();
-            ctx.stroke();
+            ctx.closePath(); ctx.stroke();
         }
     }
 }
@@ -444,22 +337,18 @@ function drawIsometricGrid(cellSize) {
     if (!ctx) return;
     ctx.strokeStyle = GRID_COLORS.ISOMETRIC;
     ctx.lineWidth = 1;
-    
     const isoWidth = cellSize * 2;
     const isoHeight = cellSize;
-    
     for (let row = 0; row < canvas.height / isoHeight + 2; row++) {
         for (let col = 0; col < canvas.width / isoWidth + 2; col++) {
             const x = col * isoWidth + (row % 2) * cellSize;
             const y = row * isoHeight;
-            
             ctx.beginPath();
             ctx.moveTo(x, y + isoHeight / 2);
             ctx.lineTo(x + cellSize, y);
             ctx.lineTo(x + isoWidth, y + isoHeight / 2);
             ctx.lineTo(x + cellSize, y + isoHeight);
-            ctx.closePath();
-            ctx.stroke();
+            ctx.closePath(); ctx.stroke();
         }
     }
 }
@@ -467,18 +356,15 @@ function drawIsometricGrid(cellSize) {
 function drawCoordinates(cellSize, gridType) {
     if (!ctx) return;
     ctx.save();
-    ctx.fillStyle = 'rgba(255,255,255,0.3)';
+    ctx.fillStyle = 'rgba(255,255,255,0.2)';
     ctx.font = '8px monospace';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    
-    const step = cellSize;
     let col = 0;
-    for (let x = step/2; x < canvas.width; x += step) {
+    for (let x = cellSize/2; x < canvas.width; x += cellSize) {
         let row = 0;
-        for (let y = step/2; y < canvas.height; y += step) {
-            const label = `${String.fromCharCode(65 + col)}${row + 1}`;
-            ctx.fillText(label, x, y);
+        for (let y = cellSize/2; y < canvas.height; y += cellSize) {
+            ctx.fillText(`${String.fromCharCode(65 + col)}${row + 1}`, x, y);
             row++;
         }
         col++;
@@ -486,26 +372,43 @@ function drawCoordinates(cellSize, gridType) {
     ctx.restore();
 }
 
+function checkTacticalStatus(token) {
+    const cellSize = state.gridCombat.cellSize || 40;
+    const enemies = state.gridCombat.tokens.filter(t => t.faction !== token.faction && t.id !== token.id);
+    
+    const oppositePositions = [
+        { dx: -cellSize, dy: 0, oppDx: cellSize, oppDy: 0 },
+        { dx: 0, dy: -cellSize, oppDx: 0, oppDy: cellSize }
+    ];
+    
+    let isFlanked = false;
+    for (const pos of oppositePositions) {
+        const e1 = enemies.find(e => Math.abs(e.x - (token.x + pos.dx)) < 5 && Math.abs(e.y - (token.y + pos.dy)) < 5);
+        const e2 = enemies.find(e => Math.abs(e.x - (token.x + pos.oppDx)) < 5 && Math.abs(e.y - (token.y + pos.oppDy)) < 5);
+        if (e1 && e2) { isFlanked = true; break; }
+    }
+    
+    const inEnemyZoC = enemies.some(e => {
+        const dx = Math.abs(e.x - token.x);
+        const dy = Math.abs(e.y - token.y);
+        return (dx <= cellSize && dy <= cellSize);
+    });
+    
+    return { isFlanked, inEnemyZoC };
+}
+
 function drawZonesOfControl(cellSize, gridType) {
     if (!ctx) return;
-    // Draw ZoC around tokens
     const tokens = state.gridCombat.tokens || [];
     for (const token of tokens) {
-        const x = token.x || 0;
-        const y = token.y || 0;
-        
         ctx.save();
-        ctx.strokeStyle = 'rgba(255,100,100,0.3)';
-        ctx.fillStyle = 'rgba(255,100,100,0.05)';
+        ctx.strokeStyle = token.faction === 'enemy' ? 'rgba(196, 90, 90, 0.4)' : 'rgba(90, 138, 181, 0.4)';
+        ctx.fillStyle = token.faction === 'enemy' ? 'rgba(196, 90, 90, 0.05)' : 'rgba(90, 138, 181, 0.05)';
         ctx.lineWidth = 1;
-        ctx.setLineDash([3, 3]);
-        
-        // Draw ZoC circle (1 cell radius)
-        const radius = cellSize * 1.5;
+        ctx.setLineDash([4, 4]);
         ctx.beginPath();
-        ctx.arc(x + cellSize/2, y + cellSize/2, radius, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.stroke();
+        ctx.arc(token.x + cellSize/2, token.y + cellSize/2, cellSize * 1.5, 0, Math.PI * 2);
+        ctx.fill(); ctx.stroke();
         ctx.restore();
     }
 }
@@ -514,51 +417,37 @@ function drawTokens(cellSize, gridType) {
     if (!ctx) return;
     const tokens = state.gridCombat.tokens || [];
     for (const token of tokens) {
-        const x = token.x || 0;
-        const y = token.y || 0;
-        
+        const tacStatus = checkTacticalStatus(token);
         ctx.save();
         
-        // Token background
-        const color = token.color || '#d4af37';
-        ctx.fillStyle = color;
-        ctx.shadowColor = 'rgba(0,0,0,0.5)';
-        ctx.shadowBlur = 10;
-        
-        // Draw token shape
-        const size = cellSize * 0.8;
-        if (token.shape === 'circle') {
-            ctx.beginPath();
-            ctx.arc(x + cellSize/2, y + cellSize/2, size/2, 0, Math.PI * 2);
-            ctx.fill();
-        } else if (token.shape === 'diamond') {
-            ctx.beginPath();
-            ctx.moveTo(x + cellSize/2, y);
-            ctx.lineTo(x + cellSize, y + cellSize/2);
-            ctx.lineTo(x + cellSize/2, y + cellSize);
-            ctx.lineTo(x, y + cellSize/2);
-            ctx.closePath();
-            ctx.fill();
-        } else {
-            // Square
-            ctx.fillRect(x + (cellSize - size)/2, y + (cellSize - size)/2, size, size);
+        if (tacStatus.isFlanked) {
+            ctx.strokeStyle = '#e8c84a'; // Gold for flanked
+            ctx.lineWidth = 3;
+            ctx.setLineDash([6, 6]);
+            ctx.strokeRect(token.x - 3, token.y - 3, cellSize + 6, cellSize + 6);
+            ctx.setLineDash([]);
         }
         
-        // Token label
+        ctx.fillStyle = token.color || '#d4af37';
+        ctx.shadowColor = 'rgba(0,0,0,0.6)';
+        ctx.shadowBlur = 8;
+        
+        ctx.beginPath();
+        ctx.arc(token.x + cellSize/2, token.y + cellSize/2, cellSize * 0.4, 0, Math.PI * 2);
+        ctx.fill();
+        
         ctx.shadowBlur = 0;
         ctx.fillStyle = 'white';
-        ctx.font = 'bold 10px sans-serif';
+        ctx.font = 'bold 12px sans-serif';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
-        ctx.fillText(token.label || '?', x + cellSize/2, y + cellSize/2);
+        ctx.fillText(token.label?.substring(0, 3) || '?', token.x + cellSize/2, token.y + cellSize/2);
         
-        // Token health/status indicators
-        if (token.harm !== undefined) {
-            ctx.fillStyle = 'rgba(255,50,50,0.8)';
-            ctx.font = '8px sans-serif';
-            ctx.fillText(`❤️${token.harm}`, x + cellSize/2, y + cellSize + 10);
+        if (token.harm > 0) {
+            ctx.fillStyle = '#d97a7a';
+            ctx.font = '9px sans-serif';
+            ctx.fillText(`❤${token.harm}`, token.x + cellSize/2, token.y + cellSize + 8);
         }
-        
         ctx.restore();
     }
 }
@@ -569,42 +458,43 @@ function addGridToken() {
         return;
     }
     
-    const name = prompt('Token label:', 'Monster');
+    const name = prompt('Token label:', 'Guard');
     if (!name) return;
+    const faction = prompt('Faction (ally or enemy):', 'enemy')?.toLowerCase() || 'enemy';
+    const bodyStr = prompt('Body Attribute (for movement):', '3');
+    const body = parseInt(bodyStr) || 3;
     
     const containerEl = document.getElementById('whiteboard-canvas-container');
     const rect = containerEl.getBoundingClientRect();
-    const cellSize = state.gridCombat.cellSize || 30;
+    const cellSize = state.gridCombat.cellSize || 40;
     
-    // Snap to grid
-    const x = Math.floor((rect.width / 2 - 50) / cellSize) * cellSize;
-    const y = Math.floor((rect.height / 2 - 50) / cellSize) * cellSize;
+    const x = Math.floor((rect.width / 2 - cellSize/2) / cellSize) * cellSize;
+    const y = Math.floor((rect.height / 2 - cellSize/2) / cellSize) * cellSize;
     
-    const colors = ['#e74c3c', '#3498db', '#2ecc71', '#f39c12', '#9b59b6', '#1abc9c'];
+    const colors = faction === 'ally' ? ['#5a8ab5', '#6baa7a', '#7aa8d0'] : ['#c45a5a', '#d48a5a', '#d97a7a'];
     
     if (!state.gridCombat.tokens) state.gridCombat.tokens = [];
     state.gridCombat.tokens.push({
         id: 'token-' + Date.now(),
         label: name,
+        faction: faction,
+        body: body,
         x: x,
         y: y,
         color: colors[state.gridCombat.tokens.length % colors.length],
-        shape: ['circle', 'square', 'diamond'][state.gridCombat.tokens.length % 3],
         harm: 0,
         fatigue: 0,
-        tier: 1
+        tags: []
     });
     
     saveWhiteboardData();
     renderGridCombat();
+    logRecordingEvent('token_add', `${name} (${faction}) added to the board.`);
     showToast(`⚔️ Token "${name}" added`, 'success');
 }
 
 function clearGridTokens() {
-    if (!gridCombatActive) {
-        showToast('Enable Grid Combat mode first', 'error');
-        return;
-    }
+    if (!gridCombatActive) return;
     if (!confirm('Remove all tokens?')) return;
     state.gridCombat.tokens = [];
     saveWhiteboardData();
@@ -625,94 +515,83 @@ export function render(el) {
     gridCombatActive = state.gridCombat.enabled || false;
 
     container.innerHTML = `
-        <div class="whiteboard-modern-layout">
-            <!-- Header -->
-            <header class="whiteboard-header">
-                <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;">
-                    <div>
-                        <h1 class="whiteboard-title">✏️ Campaign Whiteboard</h1>
-                        <p class="whiteboard-subtitle">Draw, note, and plan your campaign visually.</p>
-                    </div>
-                    <div style="display:flex;gap:0.5rem;align-items:center;flex-wrap:wrap;">
-                        <span class="status-badge ${isConnected ? 'connected' : 'local'}" style="font-size:0.7rem;padding:0.2rem 0.6rem;border-radius:12px;background:${isConnected ? 'var(--green)' : 'var(--orange)'};color:white;">
-                            ${isConnected ? '🟢 Live' : '📡 Local'}
-                        </span>
-                        <span class="status-text" style="font-size:0.75rem;color:${isConnected ? 'var(--green)' : 'var(--orange)'};">
-                            ${isConnected ? 'Real-time sync' : 'Local only'}
-                        </span>
-                        <span class="whiteboard-stats" style="font-size:0.75rem;color:var(--text3);">
-                            ${state.drawings.length} drawings, ${state.notes.length} notes, ${state.images.length} images
-                        </span>
-                    </div>
+        <div class="whiteboard-modern-layout flex flex-col gap-2">
+            <header class="flex-between">
+                <div>
+                    <h1 class="page-title">Campaign Whiteboard</h1>
+                    <p class="page-sub">Draw, note, and plan your tactical encounters visually.</p>
+                </div>
+                <div class="flex gap-1 flex-center">
+                    <span class="status-badge badge ${isConnected ? 'badge-green' : 'badge-red'}">
+                        ${isConnected ? '🟢 Live' : '📡 Local'}
+                    </span>
+                    <span class="status-text text-muted text-sm">
+                        ${isConnected ? 'Real-time sync' : 'Local only'}
+                    </span>
                 </div>
             </header>
 
-            <!-- OFFLINE OVERLAY -->
-            <div id="whiteboard-offline-overlay" style="display:${isConnected ? 'none' : 'flex'};position:relative;margin-bottom:0.5rem;padding:1rem;background:var(--bg3);border:2px solid var(--orange);border-radius:var(--radius);align-items:center;justify-content:center;gap:0.8rem;flex-wrap:wrap;">
-                <div style="display:flex;align-items:center;gap:0.5rem;">
-                    <span style="font-size:1.5rem;">📡</span>
-                    <div>
-                        <div style="font-weight:600;color:var(--orange);">Local Mode</div>
-                        <div style="font-size:0.8rem;color:var(--text3);">Whiteboard is saved locally. Connect to server for real-time collaboration.</div>
-                    </div>
+            <div id="whiteboard-offline-overlay" class="panel flex gap-2 flex-center" style="display:${isConnected ? 'none' : 'flex'}; border: 1px solid var(--orange);">
+                <span style="font-size: 1.5rem;">📡</span>
+                <div class="flex-1">
+                    <div class="text-gold font-bold">Local Mode</div>
+                    <div class="text-muted text-sm">Whiteboard is saved locally. Connect to server for real-time collaboration.</div>
                 </div>
-                <button class="btn btn-sm btn-primary" id="whiteboard-connect-btn" style="flex-shrink:0;">
-                    🔗 Connect
-                </button>
+                <button class="btn btn-sm btn-primary" id="whiteboard-connect-btn">🔗 Connect</button>
             </div>
 
             <!-- Toolbar -->
-            <div class="whiteboard-toolbar" style="display:flex;flex-wrap:wrap;gap:0.4rem;padding:0.4rem;background:var(--bg3);border-radius:var(--radius);margin-bottom:0.5rem;align-items:center;">
-                <div class="tool-group" style="display:flex;gap:0.2rem;flex-wrap:wrap;">
-                    <button class="tool-btn active" data-tool="pen" title="Pen">✏️</button>
-                    <button class="tool-btn" data-tool="eraser" title="Eraser">🧹</button>
-                    <button class="tool-btn" data-tool="line" title="Line">📏</button>
-                    <button class="tool-btn" data-tool="rectangle" title="Rectangle">▭</button>
-                    <button class="tool-btn" data-tool="text" title="Text">📝</button>
-                    <button class="tool-btn" data-tool="select" title="Select/Move">👆</button>
+            <div class="panel flex gap-1 flex-center" style="padding: 0.5rem;">
+                <div class="flex gap-1">
+                    <button class="btn btn-sm ${currentTool === 'pen' ? 'btn-gold' : 'btn-secondary'}" data-tool="pen">✏️</button>
+                    <button class="btn btn-sm ${currentTool === 'eraser' ? 'btn-gold' : 'btn-secondary'}" data-tool="eraser">🧹</button>
+                    <button class="btn btn-sm ${currentTool === 'line' ? 'btn-gold' : 'btn-secondary'}" data-tool="line">📏</button>
+                    <button class="btn btn-sm ${currentTool === 'rectangle' ? 'btn-gold' : 'btn-secondary'}" data-tool="rectangle">▭</button>
+                    <button class="btn btn-sm ${currentTool === 'ruler' ? 'btn-gold' : 'btn-secondary'}" data-tool="ruler" title="Measure">📐</button>
+                    <button class="btn btn-sm ${currentTool === 'select' ? 'btn-gold' : 'btn-secondary'}" data-tool="select" title="Drag Tokens">👆</button>
                 </div>
-                <div class="tool-group" style="display:flex;gap:0.3rem;align-items:center;flex-wrap:wrap;">
-                    <input type="color" id="whiteboard-color" value="${currentColor}" style="width:30px;height:30px;padding:0;border:none;border-radius:4px;cursor:pointer;" />
+                <div class="flex gap-1 flex-center">
+                    <input type="color" id="whiteboard-color" value="${currentColor}" style="width:32px;height:32px;padding:0;border:none;background:none;cursor:pointer;" />
                     <input type="range" id="whiteboard-size" min="1" max="20" value="${currentSize}" style="width:80px;" />
-                    <span id="size-label" style="font-size:0.7rem;color:var(--text3);">${currentSize}px</span>
                 </div>
-                <div class="tool-group" style="display:flex;gap:0.3rem;flex-wrap:wrap;align-items:center;">
-                    <label class="inline-check" style="font-size:0.7rem;">
-                        <input type="checkbox" id="whiteboard-grid" ${state.settings.gridSnap ? 'checked' : ''} />
-                        Grid Snap
+                <div class="flex gap-1 flex-center">
+                    <label class="text-muted text-sm flex gap-1 flex-center">
+                        <input type="checkbox" id="whiteboard-grid" ${state.settings.gridSnap ? 'checked' : ''} style="width:auto;"/> Snap
                     </label>
-                    <button class="btn btn-sm btn-secondary" id="whiteboard-grid-combat">${gridCombatActive ? '⚔️ Combat ON' : '⚔️ Combat OFF'}</button>
+                    <button class="btn btn-sm ${gridCombatActive ? 'btn-danger' : 'btn-secondary'}" id="whiteboard-grid-combat">
+                        ${gridCombatActive ? '⚔️ Combat ON' : '⚔️ Combat OFF'}
+                    </button>
                     <button class="btn btn-sm btn-secondary" id="whiteboard-add-token" style="${gridCombatActive ? '' : 'display:none;'}">🎯 Add Token</button>
-                    <button class="btn btn-sm btn-ghost" id="whiteboard-clear" title="Clear All">🗑️</button>
-                    <button class="btn btn-sm btn-ghost" id="whiteboard-export" title="Export as Image">💾</button>
                 </div>
             </div>
 
             <!-- Canvas Container -->
-            <div class="whiteboard-canvas-container" id="whiteboard-canvas-container" style="position:relative;width:100%;height:60vh;min-height:400px;background:var(--bg2);border-radius:var(--radius);overflow:hidden;border:1px solid var(--border);">
-                <canvas id="whiteboard-canvas" style="width:100%;height:100%;display:block;"></canvas>
-                <!-- Overlay for notes and images -->
+            <div class="panel relative overflow-hidden" id="whiteboard-canvas-container" style="height: 65vh; min-height: 400px; padding: 0;">
+                <canvas id="whiteboard-canvas" style="width:100%;height:100%;display:block;cursor:crosshair;"></canvas>
                 <div id="whiteboard-overlay" style="position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;"></div>
                 ${!isConnected ? `
-                    <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);pointer-events:none;z-index:50;opacity:0.15;font-size:4rem;font-weight:bold;color:var(--text3);white-space:nowrap;user-select:none;">
-                        📡 LOCAL MODE
+                    <div class="absolute flex-center" style="top:50%;left:50%;transform:translate(-50%,-50%);pointer-events:none;opacity:0.1;font-size:4rem;font-weight:bold;color:var(--text3);white-space:nowrap;">
+                        LOCAL MODE
                     </div>
                 ` : ''}
-                <!-- Grid Combat Legend -->
-                <div id="grid-combat-legend" style="position:absolute;bottom:10px;right:10px;background:rgba(0,0,0,0.7);padding:0.3rem 0.6rem;border-radius:4px;font-size:0.6rem;color:var(--text3);display:${gridCombatActive ? 'block' : 'none'};">
-                    <div>ZoC: Red dashed</div>
-                    <div>● Tokens: Click to select</div>
-                </div>
             </div>
 
             <!-- Controls -->
-            <div class="whiteboard-controls" style="display:flex;flex-wrap:wrap;gap:0.4rem;padding:0.4rem 0;align-items:center;">
+            <div class="panel flex gap-1 flex-center">
                 <button class="btn btn-sm btn-primary" id="whiteboard-add-note">📝 Add Note</button>
-                <button class="btn btn-sm btn-secondary" id="whiteboard-upload-image">🖼️ Upload Image</button>
-                <button class="btn btn-sm btn-secondary" id="whiteboard-clear-drawings">🧹 Clear Drawing</button>
-                <button class="btn btn-sm btn-ghost" id="whiteboard-sync-btn" title="Force sync">🔄</button>
-                <span class="text-muted whiteboard-stats" style="font-size:0.8rem;">${state.drawings.length} drawings, ${state.notes.length} notes, ${state.images.length} images</span>
+                <button class="btn btn-sm btn-secondary" id="whiteboard-upload-image">🖼️ Upload Map</button>
+                <button class="btn btn-sm btn-ghost" id="whiteboard-clear-drawings">🧹 Clear Draw</button>
+                <button class="btn btn-sm btn-ghost" id="whiteboard-clear" title="Clear All">🗑️ Clear All</button>
+                <button class="btn btn-sm btn-gold" id="whiteboard-export" title="Export as Image">💾 Export</button>
+                <button class="btn btn-sm btn-secondary" id="whiteboard-sync-btn" title="Force sync">🔄 Sync</button>
+                <span class="text-muted whiteboard-stats text-sm flex-1 text-right">${state.drawings.length} drawings, ${state.notes.length} notes, ${state.images.length} images</span>
             </div>
+            <!-- Grid Combat Legend -->
+            <div id="grid-combat-legend" style="position:absolute;bottom:10px;right:10px;background:rgba(10,10,15,0.8);padding:0.3rem 0.6rem;border-radius:var(--radius-sm);font-size:0.65rem;color:var(--text3);display:${gridCombatActive ? 'block' : 'none'};border:1px solid var(--border);pointer-events:none;z-index:20;">
+                <div><span style="color:var(--red);">⬤</span> Enemy ZoC | <span style="color:var(--blue);">⬤</span> Ally ZoC</div>
+                <div><span style="color:var(--gold);">▭</span> Flanked (Dominant)</div>
+            </div>
+
         </div>
     `;
 
@@ -723,9 +602,7 @@ export function render(el) {
     setupWebSocketSync();
     updateConnectionStatusUI(isConnected);
     
-    if (gridCombatActive) {
-        renderGridCombat();
-    }
+    if (gridCombatActive) renderGridCombat();
 }
 
 // ============================================================
@@ -735,73 +612,44 @@ export function render(el) {
 function initCanvas() {
     canvas = document.getElementById('whiteboard-canvas');
     if (!canvas) return;
-    
     const containerEl = document.getElementById('whiteboard-canvas-container');
     const rect = containerEl.getBoundingClientRect();
-    
-    // Set canvas size to match container
     canvas.width = rect.width || 800;
     canvas.height = rect.height || 600;
-    
     ctx = canvas.getContext('2d');
     ctx.strokeStyle = currentColor;
     ctx.lineWidth = currentSize;
     ctx.lineCap = 'round';
     ctx.lineJoin = 'round';
-    
-    // Set background
-    ctx.fillStyle = state.settings.backgroundColor || '#1a1a2e';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    
-    if (state.settings.showGrid !== false) {
-        drawGrid();
-    }
-    
-    // Redraw existing drawings
-    state.drawings.forEach(drawing => {
-        drawStroke(drawing);
-    });
+    restoreDrawings();
 }
 
 function drawGrid() {
     if (!ctx) return;
-    
-    const gridSize = state.settings.gridSize || 20;
+    const gridSize = state.settings.gridSize || 40;
     const gridType = state.settings.gridType || 'square';
-    
-    if (gridType === 'hex') {
-        drawHexGrid(gridSize * 1.5);
-    } else if (gridType === 'isometric') {
-        drawIsometricGrid(gridSize);
-    } else {
+    if (gridType === 'hex') drawHexGrid(gridSize * 1.5);
+    else if (gridType === 'isometric') drawIsometricGrid(gridSize);
+    else {
         ctx.strokeStyle = 'rgba(255,255,255,0.05)';
         ctx.lineWidth = 1;
-        
         for (let x = 0; x < canvas.width; x += gridSize) {
-            ctx.beginPath();
-            ctx.moveTo(x, 0);
-            ctx.lineTo(x, canvas.height);
-            ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, canvas.height); ctx.stroke();
         }
-        
         for (let y = 0; y < canvas.height; y += gridSize) {
-            ctx.beginPath();
-            ctx.moveTo(0, y);
-            ctx.lineTo(canvas.width, y);
-            ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(canvas.width, y); ctx.stroke();
         }
     }
 }
 
 function drawStroke(drawing) {
-    if (!ctx || !drawing.points || drawing.points.length < 2) return;
-    
+    if (!ctx || !drawing.points || drawing.points.length < 1) return;
     ctx.save();
     ctx.strokeStyle = drawing.color || '#d4af37';
     ctx.lineWidth = drawing.size || 3;
     ctx.lineCap = 'round';
     ctx.lineJoin = 'round';
-    
+    if (drawing.tool === 'eraser') ctx.globalCompositeOperation = 'destination-out';
     ctx.beginPath();
     ctx.moveTo(drawing.points[0].x, drawing.points[0].y);
     for (let i = 1; i < drawing.points.length; i++) {
@@ -813,11 +661,8 @@ function drawStroke(drawing) {
 
 function snapToGrid(x, y) {
     if (!state.settings.gridSnap) return { x, y };
-    const gridSize = state.settings.gridSize || 20;
-    return {
-        x: Math.round(x / gridSize) * gridSize,
-        y: Math.round(y / gridSize) * gridSize
-    };
+    const gridSize = state.settings.gridSize || 40;
+    return { x: Math.round(x / gridSize) * gridSize, y: Math.round(y / gridSize) * gridSize };
 }
 
 // ============================================================
@@ -827,25 +672,20 @@ function snapToGrid(x, y) {
 function renderOverlay() {
     const overlay = document.getElementById('whiteboard-overlay');
     if (!overlay) return;
-
-    // Notes
-    let notesHtml = state.notes.map((note) => `
-        <div class="whiteboard-note-overlay" style="position:absolute;left:${note.x}px;top:${note.y}px;background:${note.color || '#ffd700'};padding:0.4rem 0.6rem;border-radius:8px;min-width:80px;max-width:180px;box-shadow:0 4px 12px rgba(0,0,0,0.3);cursor:pointer;z-index:10;color:#1a141a;font-size:0.8rem;pointer-events:auto;">
-            <div class="note-content">${escHtml(note.content)}</div>
-            <div class="note-actions" style="display:flex;gap:0.2rem;margin-top:0.2rem;">
-                <button class="btn btn-xs btn-ghost" onclick="window.editWhiteboardNote('${note.id}')" style="font-size:0.6rem;padding:0.1rem 0.3rem;">✏️</button>
-                <button class="btn btn-xs btn-danger" onclick="window.deleteWhiteboardNote('${note.id}')" style="font-size:0.6rem;padding:0.1rem 0.3rem;">✕</button>
+    let notesHtml = state.notes.map(note => `
+        <div class="glass" style="position:absolute;left:${note.x}px;top:${note.y}px;padding:0.4rem 0.6rem;border-radius:var(--radius-sm);min-width:80px;max-width:180px;cursor:pointer;z-index:10;color:var(--text);font-size:0.8rem;pointer-events:auto;border:1px solid var(--gold);">
+            <div>${escHtml(note.content)}</div>
+            <div class="flex gap-1 mt-1">
+                <button class="btn btn-xs btn-ghost" onclick="window.editWhiteboardNote('${note.id}')">✏️</button>
+                <button class="btn btn-xs btn-danger" onclick="window.deleteWhiteboardNote('${note.id}')">✕</button>
             </div>
         </div>
     `).join('');
 
-    // Images
-    let imagesHtml = state.images.map((img) => `
-        <div class="whiteboard-image-overlay" style="position:absolute;left:${img.x}px;top:${img.y}px;cursor:pointer;z-index:5;border:2px solid var(--border);border-radius:4px;box-shadow:0 4px 12px rgba(0,0,0,0.3);pointer-events:auto;">
-            <img src="${img.data}" style="max-width:180px;max-height:180px;border-radius:4px;display:block;" />
-            <div class="image-actions" style="position:absolute;top:-8px;right:-8px;">
-                <button class="btn btn-xs btn-danger" onclick="window.deleteWhiteboardImage('${img.id}')" style="font-size:0.6rem;padding:0.1rem 0.3rem;">✕</button>
-            </div>
+    let imagesHtml = state.images.map(img => `
+        <div style="position:absolute;left:${img.x}px;top:${img.y}px;cursor:pointer;z-index:5;pointer-events:auto;">
+            <img src="${img.data}" style="max-width:250px;max-height:250px;border-radius:4px;display:block;border:1px solid var(--border);" />
+            <button class="btn btn-xs btn-danger absolute" style="top:-8px;right:-8px;" onclick="window.deleteWhiteboardImage('${img.id}')">✕</button>
         </div>
     `).join('');
 
@@ -857,25 +697,43 @@ function renderOverlay() {
 // ============================================================
 
 function startDrawing(e) {
-    if (isOfflineMode) {
-        showToast('📡 Local mode - drawings saved locally', 'info');
-    }
-    if (currentTool === 'select' || currentTool === 'text') return;
-    
     const rect = canvas.getBoundingClientRect();
     const x = (e.clientX || e.touches?.[0]?.clientX || 0) - rect.left;
     const y = (e.clientY || e.touches?.[0]?.clientY || 0) - rect.top;
-    
-    isDrawing = true;
     const pos = snapToGrid(x, y);
-    lastX = pos.x;
-    lastY = pos.y;
+
+    // Token Dragging
+    if (currentTool === 'select' && gridCombatActive) {
+        const cellSize = state.gridCombat.cellSize || 40;
+        const clickedToken = state.gridCombat.tokens.find(t => 
+            Math.abs(t.x - pos.x) < cellSize && Math.abs(t.y - pos.y) < cellSize
+        );
+        if (clickedToken) {
+            isDraggingToken = true;
+            draggedToken = clickedToken;
+            tokenStartPos = { x: clickedToken.x, y: clickedToken.y };
+            canvas.style.cursor = 'grabbing';
+            return;
+        }
+    }
+
+    // Ruler Tool
+    if (currentTool === 'ruler') {
+        isDrawing = true;
+        rulerStart = pos;
+        rulerEnd = pos;
+        return;
+    }
+
+    if (currentTool === 'select' || currentTool === 'text') return;
+    isDrawing = true;
+    lastX = pos.x; lastY = pos.y;
     
     if (currentTool === 'pen' || currentTool === 'eraser') {
         const drawing = {
             id: 'draw-' + Date.now() + '-' + Math.random().toString(36).substr(2, 6),
             points: [{ x: pos.x, y: pos.y }],
-            color: currentTool === 'eraser' ? state.settings.backgroundColor || '#1a1a2e' : currentColor,
+            color: currentTool === 'eraser' ? '#000' : currentColor,
             size: currentTool === 'eraser' ? currentSize * 3 : currentSize,
             tool: currentTool,
             timestamp: Date.now()
@@ -885,17 +743,57 @@ function startDrawing(e) {
         saveWhiteboardData();
     } else if (currentTool === 'line' || currentTool === 'rectangle') {
         state._shapeStart = { x: pos.x, y: pos.y };
-        state._shapeType = currentTool;
     }
 }
 
 function draw(e) {
-    if (!isDrawing) return;
-    
+    if (!isDrawing && !isDraggingToken) return;
     const rect = canvas.getBoundingClientRect();
     const x = (e.clientX || e.touches?.[0]?.clientX || 0) - rect.left;
     const y = (e.clientY || e.touches?.[0]?.clientY || 0) - rect.top;
     const pos = snapToGrid(x, y);
+
+    // Token Dragging
+    if (isDraggingToken && draggedToken) {
+        draggedToken.x = pos.x;
+        draggedToken.y = pos.y;
+        restoreDrawings();
+        renderGridCombat();
+        return;
+    }
+
+    // Ruler Drawing
+    if (currentTool === 'ruler' && rulerStart) {
+        rulerEnd = pos;
+        restoreDrawings();
+        renderGridCombat();
+        
+        const dx = rulerEnd.x - rulerStart.x;
+        const dy = rulerEnd.y - rulerStart.y;
+        const distPixels = Math.sqrt(dx*dx + dy*dy);
+        const cellSize = state.gridCombat.cellSize || 40;
+        const cells = Math.round(distPixels / cellSize);
+        const feet = cells * 5;
+        
+        ctx.save();
+        ctx.strokeStyle = '#6baa7a'; // Green
+        ctx.lineWidth = 2;
+        ctx.setLineDash([6, 6]);
+        ctx.beginPath();
+        ctx.moveTo(rulerStart.x, rulerStart.y);
+        ctx.lineTo(rulerEnd.x, rulerEnd.y);
+        ctx.stroke();
+        ctx.setLineDash([]);
+        
+        ctx.fillStyle = 'rgba(10,10,15,0.9)';
+        ctx.fillRect(rulerEnd.x + 10, rulerEnd.y - 20, 80, 22);
+        ctx.fillStyle = '#fff';
+        ctx.font = '12px sans-serif';
+        ctx.textAlign = 'left';
+        ctx.fillText(`${cells} cells (${feet}ft)`, rulerEnd.x + 15, rulerEnd.y - 5);
+        ctx.restore();
+        return;
+    }
     
     if (currentTool === 'pen' || currentTool === 'eraser') {
         const drawing = state.drawings[state.drawings.length - 1];
@@ -909,15 +807,11 @@ function draw(e) {
         ctx.save();
         ctx.strokeStyle = currentColor;
         ctx.lineWidth = currentSize;
-        
         const start = state._shapeStart;
         if (start) {
             if (currentTool === 'line') {
-                ctx.beginPath();
-                ctx.moveTo(start.x, start.y);
-                ctx.lineTo(pos.x, pos.y);
-                ctx.stroke();
-            } else if (currentTool === 'rectangle') {
+                ctx.beginPath(); ctx.moveTo(start.x, start.y); ctx.lineTo(pos.x, pos.y); ctx.stroke();
+            } else {
                 ctx.strokeRect(start.x, start.y, pos.x - start.x, pos.y - start.y);
             }
         }
@@ -926,6 +820,49 @@ function draw(e) {
 }
 
 function endDrawing(e) {
+    // Handle Token Drop
+    if (isDraggingToken) {
+        if (draggedToken && tokenStartPos) {
+            const cellSize = state.gridCombat.cellSize || 40;
+            const dx = draggedToken.x - tokenStartPos.x;
+            const dy = draggedToken.y - tokenStartPos.y;
+            const cellsMoved = Math.round(Math.sqrt(dx*dx + dy*dy) / cellSize);
+            
+            if (cellsMoved > 0) {
+                logRecordingEvent('token_move', `${draggedToken.label} moved ${cellsMoved} cells (${cellsMoved * 5} ft).`);
+                const tacStatus = checkTacticalStatus(draggedToken);
+                if (tacStatus.isFlanked) {
+                    logRecordingEvent('tactical_event', `${draggedToken.label} is now FLANKED! (Attacker gains Dominant).`);
+                    showToast(`${draggedToken.label} is Flanked!`, 'warning');
+                } else if (tacStatus.inEnemyZoC) {
+                    logRecordingEvent('tactical_event', `${draggedToken.label} entered enemy ZoC (Controlled).`);
+                    showToast(`${draggedToken.label} entered ZoC!`, 'warning');
+                }
+                saveWhiteboardData();
+            }
+        }
+        isDraggingToken = false;
+        draggedToken = null;
+        tokenStartPos = null;
+        canvas.style.cursor = 'grab';
+        return;
+    }
+
+    // Handle Ruler End
+    if (currentTool === 'ruler' && rulerStart && rulerEnd) {
+        const dx = rulerEnd.x - rulerStart.x;
+        const dy = rulerEnd.y - rulerStart.y;
+        const cellSize = state.gridCombat.cellSize || 40;
+        const cells = Math.round(Math.sqrt(dx*dx + dy*dy) / cellSize);
+        logRecordingEvent('measurement', `GM measured ${cells} cells (${cells * 5} ft).`);
+        isDrawing = false;
+        rulerStart = null;
+        rulerEnd = null;
+        restoreDrawings();
+        renderGridCombat();
+        return;
+    }
+
     if (!isDrawing) return;
     isDrawing = false;
     
@@ -935,48 +872,28 @@ function endDrawing(e) {
         const y = (e.clientY || e.changedTouches?.[0]?.clientY || 0) - rect.top;
         const pos = snapToGrid(x, y);
         const start = state._shapeStart;
-        
         if (start) {
-            const drawing = {
+            state.drawings.push({
                 id: 'draw-' + Date.now() + '-' + Math.random().toString(36).substr(2, 6),
-                points: [
-                    { x: start.x, y: start.y },
-                    { x: pos.x, y: pos.y }
-                ],
+                points: [{ x: start.x, y: start.y }, { x: pos.x, y: pos.y }],
                 color: currentColor,
                 size: currentSize,
                 tool: currentTool,
-                shape: currentTool,
                 timestamp: Date.now()
-            };
-            state.drawings.push(drawing);
+            });
             saveWhiteboardData();
             restoreDrawings();
             state._shapeStart = null;
         }
     }
-    
-    lastX = 0;
-    lastY = 0;
 }
 
 function restoreDrawings() {
     if (!ctx) return;
-    
-    ctx.fillStyle = state.settings.backgroundColor || '#1a1a2e';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    
-    if (state.settings.showGrid !== false) {
-        drawGrid();
-    }
-    
-    state.drawings.forEach(drawing => {
-        drawStroke(drawing);
-    });
-    
-    if (gridCombatActive) {
-        renderGridCombat();
-    }
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    if (state.settings.showGrid !== false) drawGrid();
+    state.drawings.forEach(drawStroke);
+    if (gridCombatActive) renderGridCombat();
 }
 
 // ============================================================
@@ -984,190 +901,97 @@ function restoreDrawings() {
 // ============================================================
 
 export function attachEvents() {
-    // Connect button
-    document.getElementById('whiteboard-connect-btn')?.addEventListener('click', connectWhiteboard);
+    document.getElementById('whiteboard-connect-btn')?.addEventListener('click', () => {
+        import('../../core/websocket.js').then(ws => ws.default.initWebSocket()).catch(() => {});
+    });
 
-    // Tool buttons
-    document.querySelectorAll('.tool-btn[data-tool]').forEach(btn => {
+    document.querySelectorAll('.btn[data-tool]').forEach(btn => {
         btn.addEventListener('click', () => {
-            if (isOfflineMode) {
-                showToast('📡 Local mode - drawing saved locally', 'info');
-            }
-            document.querySelectorAll('.tool-btn[data-tool]').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
+            document.querySelectorAll('.btn[data-tool]').forEach(b => b.className = 'btn btn-sm btn-secondary');
+            btn.className = 'btn btn-sm btn-gold';
             currentTool = btn.dataset.tool;
             if (canvas) {
-                canvas.style.cursor = currentTool === 'pen' ? 'crosshair' : 
-                                       currentTool === 'eraser' ? 'cell' :
-                                       currentTool === 'select' ? 'grab' : 'crosshair';
+                canvas.style.cursor = currentTool === 'select' ? 'grab' : 'crosshair';
             }
         });
     });
 
-    // Color picker
-    const colorInput = document.getElementById('whiteboard-color');
-    if (colorInput) {
-        colorInput.addEventListener('input', (e) => {
-            currentColor = e.target.value;
-        });
-    }
-
-    // Size slider
-    const sizeInput = document.getElementById('whiteboard-size');
-    if (sizeInput) {
-        sizeInput.addEventListener('input', (e) => {
-            currentSize = parseInt(e.target.value);
-            document.getElementById('size-label').textContent = currentSize + 'px';
-        });
-    }
-
-    // Grid toggle
-    const gridToggle = document.getElementById('whiteboard-grid');
-    if (gridToggle) {
-        gridToggle.addEventListener('change', (e) => {
-            state.settings.gridSnap = e.target.checked;
-            saveWhiteboardData();
-            restoreDrawings();
-        });
-    }
-
-    // Grid Combat toggle
+    document.getElementById('whiteboard-color')?.addEventListener('input', (e) => currentColor = e.target.value);
+    document.getElementById('whiteboard-size')?.addEventListener('input', (e) => currentSize = parseInt(e.target.value));
+    document.getElementById('whiteboard-grid')?.addEventListener('change', (e) => {
+        state.settings.gridSnap = e.target.checked;
+        saveWhiteboardData();
+    });
+    
     document.getElementById('whiteboard-grid-combat')?.addEventListener('click', toggleGridCombat);
-    
-    // Add Token button
     document.getElementById('whiteboard-add-token')?.addEventListener('click', addGridToken);
-    
-    // Clear all button
     document.getElementById('whiteboard-clear')?.addEventListener('click', clearWhiteboardAll);
-
-    // Export button
     document.getElementById('whiteboard-export')?.addEventListener('click', exportWhiteboard);
-
-    // Add note button
     document.getElementById('whiteboard-add-note')?.addEventListener('click', addWhiteboardNote);
-
-    // Upload image button
     document.getElementById('whiteboard-upload-image')?.addEventListener('click', uploadWhiteboardImage);
-
-    // Clear drawings button
     document.getElementById('whiteboard-clear-drawings')?.addEventListener('click', clearWhiteboardDrawings);
-
-    // Sync button – now calls forceSync
     document.getElementById('whiteboard-sync-btn')?.addEventListener('click', forceSync);
 
-    // Canvas events
     if (canvas) {
         canvas.addEventListener('mousedown', startDrawing);
         canvas.addEventListener('mousemove', draw);
         canvas.addEventListener('mouseup', endDrawing);
         canvas.addEventListener('mouseleave', endDrawing);
-        
-        canvas.addEventListener('touchstart', (e) => {
-            e.preventDefault();
-            const touch = e.touches[0];
-            const mouseEvent = new MouseEvent('mousedown', {
-                clientX: touch.clientX,
-                clientY: touch.clientY
-            });
-            startDrawing(mouseEvent);
-        });
-        
-        canvas.addEventListener('touchmove', (e) => {
-            e.preventDefault();
-            const touch = e.touches[0];
-            const mouseEvent = new MouseEvent('mousemove', {
-                clientX: touch.clientX,
-                clientY: touch.clientY
-            });
-            draw(mouseEvent);
-        });
-        
-        canvas.addEventListener('touchend', (e) => {
-            e.preventDefault();
-            const touch = e.changedTouches[0];
-            const mouseEvent = new MouseEvent('mouseup', {
-                clientX: touch.clientX,
-                clientY: touch.clientY
-            });
-            endDrawing(mouseEvent);
-        });
+        canvas.addEventListener('touchstart', (e) => { e.preventDefault(); startDrawing(e.touches[0]); });
+        canvas.addEventListener('touchmove', (e) => { e.preventDefault(); draw(e.touches[0]); });
+        canvas.addEventListener('touchend', (e) => { e.preventDefault(); endDrawing(e.changedTouches[0]); });
     }
 
-    // Window resize
-    window.addEventListener('resize', () => {
-        initCanvas();
-        restoreDrawings();
-        renderOverlay();
-        if (gridCombatActive) {
-            renderGridCombat();
+    window.addEventListener('resize', () => { initCanvas(); restoreDrawings(); renderOverlay(); });
+
+    window.editWhiteboardNote = (id) => {
+        const note = state.notes.find(n => n.id === id);
+        if (note) {
+            const newContent = prompt('Edit note:', note.content);
+            if (newContent !== null) { note.content = newContent; saveWhiteboardData(); renderOverlay(); }
         }
-    });
-
-    // Listen for connection changes
-    document.addEventListener('connection-change', (e) => {
-        const connected = e.detail?.connected || false;
-        isOfflineMode = !connected;
-        updateConnectionStatusUI(connected);
-        if (connected) {
-            setupWebSocketSync();
-            showToast('🔄 Whiteboard reconnected and syncing', 'success');
-        } else {
-            showToast('📡 Whiteboard in local mode', 'info');
-        }
-    });
-}
-
-
-// ============================================================
-// LIFECYCLE METHODS
-// ============================================================
-
-export function onActivate() {
-    console.log('[Whiteboard] Activated');
-    loadWhiteboardData();
-    setupWebSocketSync();
-    if (container) {
-        setTimeout(() => {
-            initCanvas();
-            restoreDrawings();
-            renderOverlay();
-            updateStats();
-            updateConnectionStatusUI(!isOfflineMode);
-            if (gridCombatActive) {
-                renderGridCombat();
+    };
+    window.deleteWhiteboardNote = (id) => {
+        state.notes = state.notes.filter(n => n.id !== id);
+        saveWhiteboardData(); renderOverlay();
+    };
+    window.deleteWhiteboardImage = (id) => {
+        state.images = state.images.filter(i => i.id !== id);
+        saveWhiteboardData(); renderOverlay();
+            // Listen for connection changes
+        document.addEventListener('connection-change', (e) => {
+            const connected = e.detail?.connected || false;
+            isOfflineMode = !connected;
+            updateConnectionStatusUI(connected);
+            if (connected) {
+                setupWebSocketSync();
+                showToast('🔄 Whiteboard reconnected and syncing', 'success');
+            } else {
+                showToast('📡 Whiteboard in local mode', 'info');
             }
-        }, 100);
-    }
+        });
+    };
+    
 }
 
-export function onDeactivate() {
-    console.log('[Whiteboard] Deactivated');
+// ============================================================
+// ACTIONS
+// ============================================================
+
+export function addWhiteboardNote() {
+    const content = prompt('Note content:', 'New note');
+    if (!content) return;
+    const containerEl = document.getElementById('whiteboard-canvas-container');
+    const rect = containerEl.getBoundingClientRect();
+    state.notes.push({
+        id: 'note-' + Date.now(),
+        x: rect.width / 2 - 50,
+        y: rect.height / 2 - 50,
+        content: content
+    });
     saveWhiteboardData();
-    cleanupWebSocketListeners();
-}
-
-export function refresh() {
-    loadWhiteboardData();
-    initCanvas();
-    restoreDrawings();
     renderOverlay();
-    updateStats();
-    setupWebSocketSync();
-    updateConnectionStatusUI(!isOfflineMode);
-    if (gridCombatActive) {
-        renderGridCombat();
-    }
 }
-
-export function destroy() {
-    container = null;
-    saveWhiteboardData();
-    cleanupWebSocketListeners();
-}
-
-// ============================================================
-// WHITEBOARD ACTIONS (missing implementations)
-// ============================================================
 
 export function uploadWhiteboardImage() {
     const input = document.createElement('input');
@@ -1178,17 +1002,13 @@ export function uploadWhiteboardImage() {
         if (!file) return;
         const reader = new FileReader();
         reader.onload = (ev) => {
-            const dataUrl = ev.target.result;
-            // Position image in the centre of the canvas
             const containerEl = document.getElementById('whiteboard-canvas-container');
             const rect = containerEl.getBoundingClientRect();
-            const x = (rect.width - 200) / 2;
-            const y = (rect.height - 200) / 2;
             state.images.push({
                 id: 'img-' + Date.now(),
-                x: Math.max(0, x),
-                y: Math.max(0, y),
-                data: dataUrl
+                x: rect.width / 2 - 100,
+                y: rect.height / 2 - 100,
+                data: ev.target.result
             });
             saveWhiteboardData();
             renderOverlay();
@@ -1199,9 +1019,16 @@ export function uploadWhiteboardImage() {
     input.click();
 }
 
-// Also implement other missing functions referenced in the code:
+export function clearWhiteboardDrawings() {
+    if (!confirm('Clear all drawings only?')) return;
+    state.drawings = [];
+    saveWhiteboardData();
+    restoreDrawings();
+    updateStats();
+}
+
 export function clearWhiteboardAll() {
-    if (!confirm('Delete everything (drawings, notes, images)?')) return;
+    if (!confirm('Delete everything (drawings, notes, images, tokens)?')) return;
     state.drawings = [];
     state.notes = [];
     state.images = [];
@@ -1215,71 +1042,56 @@ export function clearWhiteboardAll() {
 
 export function exportWhiteboard() {
     if (!canvas) return;
+    // Create a temporary canvas to draw background + tokens cleanly for export
+    const tempCanvas = document.createElement('canvas');
+    tempCanvas.width = canvas.width;
+    tempCanvas.height = canvas.height;
+    const tempCtx = tempCanvas.getContext('2d');
+    tempCtx.fillStyle = '#12121a'; // bg2
+    tempCtx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
+    tempCtx.drawImage(canvas, 0, 0);
+
     const link = document.createElement('a');
     link.download = 'whiteboard-' + Date.now() + '.png';
-    link.href = canvas.toDataURL('image/png');
+    link.href = tempCanvas.toDataURL('image/png');
     link.click();
     showToast('💾 Whiteboard exported', 'success');
 }
 
 // ============================================================
-// WHITEBOARD ACTIONS
+// LIFECYCLE
 // ============================================================
 
-export function uploadWhiteboardImage() {
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = 'image/*';
-    input.onchange = (e) => {
-        const file = e.target.files[0];
-        if (!file) return;
-        const reader = new FileReader();
-        reader.onload = (ev) => {
-            const dataUrl = ev.target.result;
-            // Position image in the centre of the canvas
-            const containerEl = document.getElementById('whiteboard-canvas-container');
-            const rect = containerEl.getBoundingClientRect();
-            const x = (rect.width - 200) / 2;
-            const y = (rect.height - 200) / 2;
-            state.images.push({
-                id: 'img-' + Date.now(),
-                x: Math.max(0, x),
-                y: Math.max(0, y),
-                data: dataUrl
-            });
-            saveWhiteboardData();        // This triggers sync if online
-            renderOverlay();
-            showToast('🖼️ Image uploaded', 'success');
-        };
-        reader.readAsDataURL(file);
-    };
-    input.click();
+export function onActivate() {
+    loadWhiteboardData();
+    setupWebSocketSync();
+    if (container) {
+        setTimeout(() => { initCanvas(); restoreDrawings(); renderOverlay(); updateStats(); }, 100);
+    }
 }
 
-export function clearWhiteboardDrawings() {
-    if (!confirm('Clear all drawings only (notes & images stay)?')) return;
-    state.drawings = [];
+export function onDeactivate() {
     saveWhiteboardData();
-    restoreDrawings();
-    updateStats();
-    showToast('🧹 Drawings cleared', 'info');
+    cleanupWebSocketListeners();
 }
-// ============================================================
-// EXPORTS
-// ============================================================
+
+export function refresh() {
+    loadWhiteboardData();
+    initCanvas();
+    restoreDrawings();
+    renderOverlay();
+    updateStats();
+    setupWebSocketSync();
+}
+
+export function destroy() {
+    container = null;
+    saveWhiteboardData();
+    cleanupWebSocketListeners();
+}
 
 export default {
-    render,
-    destroy,
-    onActivate,
-    onDeactivate,
-    refresh,
-    loadWhiteboardData,
-    saveWhiteboardData,
-    forceSync,
-    addWhiteboardNote,
-    uploadWhiteboardImage,
-    toggleGridCombat,
-    addGridToken,
-    clearGridTokens
+    render, destroy, onActivate, onDeactivate, refresh,
+    loadWhiteboardData, saveWhiteboardData, forceSync,
+    addWhiteboardNote, uploadWhiteboardImage, toggleGridCombat, addGridToken, clearGridTokens
 };

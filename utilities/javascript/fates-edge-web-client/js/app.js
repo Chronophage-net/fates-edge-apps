@@ -3,8 +3,9 @@
  * v3.0 - Modular Architecture
  */
 
+import { initMediaModule } from './core/media.js';
 import './core/highlight-tags.js'; // This auto-runs initTagHighlighting()
-import { loadState, onSave, getState, getBaseUrl, mergeState } from './core/state.js';
+import { loadState, onSave, getState, getBaseUrl, mergeState, resolveConflict } from './core/state.js';
 import { checkPasswordGate, isToolkitUnlocked, onUnlock as onPasswordUnlock, unlockToolkit } from './core/password.js';
 import { initRouter, registerRoute, navigate } from './router.js';
 import { showToast } from './components/Toast.js';
@@ -35,19 +36,12 @@ const FEATURES = {
     settings: () => import('./features/settings/index.js')
 };
 
-// ============================================================
-// ROUTE REDIRECTS
-// ============================================================
-
 const ROUTE_REDIRECTS = {
     'consequences': 'decks',
     'regional': 'decks',
-    'roller': 'dice'
+    'roller': 'dice',
+    'builder': 'characters'
 };
-
-// ============================================================
-// TEST MODE
-// ============================================================
 
 const isTestMode = window.location.search.includes('test=true') || window.location.pathname.includes('/tests/');
 
@@ -77,15 +71,7 @@ if (isTestMode) {
     throw new Error('Test mode active - stopping app initialization');
 }
 
-// ============================================================
-// STATE
-// ============================================================
-
 let routerInitialized = false;
-
-// ============================================================
-// ROUTER INITIALIZATION
-// ============================================================
 
 function initializeRouter() {
     if (routerInitialized) return;
@@ -110,10 +96,6 @@ function initializeRouter() {
         navigate(tab);
     }, 100);
 }
-
-// ============================================================
-// PASSWORD OVERLAY
-// ============================================================
 
 function showPasswordOverlay(state) {
     let overlay = document.getElementById('passwordOverlay');
@@ -238,16 +220,18 @@ function onUnlockSuccess() {
     initializeRouter();
 }
 
-// ============================================================
-// APP INITIALIZATION
-// ============================================================
-
 async function init() {
     console.log('Fate\'s Edge Toolkit v3.0 — Loading...');
     
     try {
         loadState();
-        
+        try {
+            const state = getState();
+            const userId = state.sessionId || 'app-' + Date.now().toString(36);
+            initMediaModule(userId);
+        } catch (e) {
+            console.warn('Failed to initialize media module:', e);
+        }
         console.log('📋 Registering routes...');
         Object.entries(FEATURES).forEach(([tab, module]) => {
             registerRoute(tab, module);
@@ -277,6 +261,7 @@ async function init() {
         setupSyncUI();
         setupSettingsTabHook();
         setupNavigation();
+        setupConflictModalListener(); // <-- Added
 
         const state = getState();
         const hasPassword = !!state.passwordHash;
@@ -296,49 +281,29 @@ async function init() {
             initializeRouter();
         }
         
-        // Preload modules
         import('./features/decks/index.js')
             .then(module => {
-                console.log('🃏 Decks module loaded');
-                if (module.loadManifest) {
-                    module.loadManifest().catch(() => {});
-                }
+                if (module.loadManifest) module.loadManifest().catch(() => {});
             })
-            .catch(err => {
-                console.warn('Failed to preload decks module:', err);
-            });
+            .catch(err => console.warn('Failed to preload decks module:', err));
         
         import('./features/patrons/index.js')
             .then(module => {
-                console.log('👁️ Patrons module loaded');
-                if (module.loadPatronData) {
-                    module.loadPatronData();
-                }
+                if (module.loadPatronData) module.loadPatronData();
             })
-            .catch(err => {
-                console.warn('Failed to preload patrons module:', err);
-            });
+            .catch(err => console.warn('Failed to preload patrons module:', err));
         
         import('./features/factions/index.js')
             .then(module => {
-                console.log('🏛️ Factions module loaded');
-                if (module.loadFactionData) {
-                    module.loadFactionData();
-                }
+                if (module.loadFactionData) module.loadFactionData();
             })
-            .catch(err => {
-                console.warn('Failed to preload factions module:', err);
-            });
+            .catch(err => console.warn('Failed to preload factions module:', err));
         
         import('./features/wiki/index.js')
             .then(module => {
-                if (module.loadRemoteWiki) {
-                    module.loadRemoteWiki().catch(() => {});
-                }
+                if (module.loadRemoteWiki) module.loadRemoteWiki().catch(() => {});
             })
-            .catch(err => {
-                console.warn('Failed to load wiki module:', err);
-            });
+            .catch(err => console.warn('Failed to load wiki module:', err));
         
         setupSyncEventListeners();
         
@@ -350,8 +315,78 @@ async function init() {
 }
 
 // ============================================================
-// SETUP FUNCTIONS
+// CONFLICT MODAL LISTENER
 // ============================================================
+function setupConflictModalListener() {
+    document.addEventListener('syncConflict', (e) => {
+        showConflictModal(e.detail.conflicts);
+    });
+}
+
+function showConflictModal(conflicts) {
+    if (!conflicts || conflicts.length === 0) return;
+    
+    let modal = document.getElementById('conflictModal');
+    if (!modal) {
+        modal = document.createElement('div');
+        modal.id = 'conflictModal';
+        modal.className = 'modal-overlay';
+        document.body.appendChild(modal);
+    }
+    
+    modal.innerHTML = `
+        <div class="modal" style="max-width: 600px;">
+            <div class="modal-header">
+                <h3>⚠️ Sync Conflict Detected</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                ${conflicts.map(c => `
+                    <div class="panel" style="margin-bottom: 1rem;">
+                        <h4>${c.type === 'character' ? 'Character' : 'Entity'} "${c.local.name || c.id}" was edited simultaneously.</h4>
+                        <div style="display: flex; gap: 1rem;">
+                            <div style="flex: 1;">
+                                <strong>Your version:</strong>
+                                <pre style="white-space: pre-wrap; font-size: 0.85rem; background: var(--bg3); padding: 0.5rem;">${JSON.stringify(c.local, null, 2)}</pre>
+                            </div>
+                            <div style="flex: 1;">
+                                <strong>Remote version:</strong>
+                                <pre style="white-space: pre-wrap; font-size: 0.85rem; background: var(--bg3); padding: 0.5rem;">${JSON.stringify(c.remote, null, 2)}</pre>
+                            </div>
+                        </div>
+                    </div>
+                `).join('')}
+            </div>
+            <div class="modal-footer">
+                <button class="btn" id="conflict-keep-local">Keep Yours</button>
+                <button class="btn" id="conflict-use-remote">Use Remote</button>
+                <button class="btn btn-gold" id="conflict-merge">Merge Both</button>
+            </div>
+        </div>
+    `;
+    
+    modal.classList.add('open');
+    
+    modal.querySelector('.modal-close').addEventListener('click', () => modal.classList.remove('open'));
+    
+    conflicts.forEach(c => {
+        modal.querySelector('#conflict-keep-local').addEventListener('click', () => {
+            resolveConflict(c.id, 'local');
+            showToast('Kept local version.', 'info');
+            modal.classList.remove('open');
+        });
+        modal.querySelector('#conflict-use-remote').addEventListener('click', () => {
+            resolveConflict(c.id, 'remote');
+            showToast('Applied remote version.', 'info');
+            modal.classList.remove('open');
+        });
+        modal.querySelector('#conflict-merge').addEventListener('click', () => {
+            resolveConflict(c.id, 'merge');
+            showToast('Merged both versions.', 'success');
+            modal.classList.remove('open');
+        });
+    });
+}
 
 function setupNavigation() {
     const navButtons = document.querySelectorAll('.sidebar-nav .nav-item[data-tab]');
@@ -361,7 +396,6 @@ function setupNavigation() {
             if (tab) {
                 const targetTab = ROUTE_REDIRECTS[tab] || tab;
                 if (targetTab !== tab) {
-                    console.log(`↪️ Redirecting "${tab}" → "${targetTab}"`);
                     button.dataset.tab = targetTab;
                 }
                 navigate(targetTab);
@@ -379,9 +413,7 @@ function setupImportExport() {
         exportBtn.addEventListener('click', async () => {
             try {
                 const { exportAllData } = await import('./features/settings/index.js');
-                if (exportAllData) {
-                    exportAllData();
-                }
+                if (exportAllData) exportAllData();
             } catch (error) {
                 console.error('Failed to export data:', error);
                 showToast('Failed to export data', 'error');
@@ -390,15 +422,11 @@ function setupImportExport() {
     }
     
     if (importBtn && importFile) {
-        importBtn.addEventListener('click', () => {
-            importFile.click();
-        });
+        importBtn.addEventListener('click', () => importFile.click());
         importFile.addEventListener('change', async (event) => {
             try {
                 const { importAllData } = await import('./features/settings/index.js');
-                if (importAllData) {
-                    importAllData(event);
-                }
+                if (importAllData) importAllData(event);
             } catch (error) {
                 console.error('Failed to import data:', error);
                 showToast('Failed to import data', 'error');
@@ -597,9 +625,7 @@ function renderSyncUI() {
             connectBtn.textContent = 'Connecting…';
             
             try {
-                await syncManager.connect(url, code, password, { 
-                    email: email 
-                });
+                await syncManager.connect(url, code, password, { email: email });
                 connectBtn.style.display = 'none';
                 disconnectBtn.style.display = 'inline-flex';
                 updateSyncStatusUI({ connected: true, campaignCode: code });
@@ -648,7 +674,6 @@ function setupSettingsTabHook() {
 function setupSyncEventListeners() {
     syncManager.on('connection_change', (status) => {
         updateSyncStatusUI(status);
-        
         const connectBtn = document.getElementById('sync-connect-btn');
         const disconnectBtn = document.getElementById('sync-disconnect-btn');
         if (connectBtn && disconnectBtn) {
@@ -674,10 +699,6 @@ function setupSyncEventListeners() {
         showToast('Sync error: ' + error.message, 'error');
     });
 }
-
-// ============================================================
-// UI UPDATE FUNCTIONS
-// ============================================================
 
 function updateSyncStatusUI(status) {
     const statusEl = document.getElementById('sync-status');
@@ -727,7 +748,6 @@ function updatePresenceUI(clients) {
     
     presenceEl.innerHTML = clients.map(client => {
         const isYou = client.id === syncManager.clientId;
-        
         return `
             <div class="presence-item" style="display:flex;align-items:center;gap:0.5rem;padding:0.3rem 0;border-bottom:1px solid var(--border);">
                 ${showAvatars ? generateAvatarHTML(client.email, client.name, 32) : `
@@ -736,7 +756,6 @@ function updatePresenceUI(clients) {
                 <span style="font-weight:${isYou ? '600' : '400'};">${client.name || 'Unknown'} ${isYou ? '(you)' : ''}</span>
                 <span class="text-muted small" style="font-size:0.7rem;background:var(--bg4);padding:0.05rem 0.4rem;border-radius:12px;">${client.role || 'player'}</span>
                 ${client.status === 'away' ? '<span class="text-muted small">(away)</span>' : ''}
-                ${showAvatars ? '' : `<span class="status-dot" style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${client.status === 'online' ? 'var(--green)' : 'var(--gold)'};margin-left:auto;"></span>`}
             </div>
         `;
     }).join('');

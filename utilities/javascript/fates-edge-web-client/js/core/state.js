@@ -1,5 +1,6 @@
 /**
  * State management for Fate's Edge Toolkit
+ * v3.0 - With Real-Time Sync Merging
  */
 
 import { generateId, getBaseUrl as utilsGetBaseUrl, getStorage, setStorage, removeStorage } from './utils.js';
@@ -22,11 +23,40 @@ const DEFAULT_STATE = {
     npcs: [],
     chatMessages: [],
     baseUrl: '',
+    _version: {},
+    _lastSync: 0,
+    campaign: {
+        whiteboard: {
+            notes: [],
+            drawings: [],
+            stickyNotes: [],
+        },
+        kanban: {
+            columns: {
+                todo: { title: '📋 To Do', items: [] },
+                doing: { title: '🔄 Doing', items: [] },
+                done: { title: '✅ Done', items: [] },
+                blocked: { title: '🚫 Blocked', items: [] }
+            }
+        },
+        state: {
+            activeThreats: [],
+            opportunities: [],
+            campaignTimers: [],
+            notes: '',
+            sessionLog: [],
+            sceneTags: [],
+            vttEvents: []
+        }
+    }
 };
 
 let state = { ...DEFAULT_STATE };
 let saveCallbacks = [];
 const STORAGE_KEY = 'fates-edge-state';
+
+// Track pending sync conflicts
+let pendingConflicts = [];
 
 // ============================================================
 // STATE OPERATIONS
@@ -36,7 +66,7 @@ export function loadState() {
     try {
         const saved = getStorage(STORAGE_KEY);
         if (saved) {
-            state = { ...DEFAULT_STATE, ...saved };
+            state = deepMerge({ ...DEFAULT_STATE }, saved);
         } else {
             state = { ...DEFAULT_STATE };
         }
@@ -46,6 +76,31 @@ export function loadState() {
     }
     return state;
 }
+
+/**
+ * Deep merge helper for nested objects (supports multiple sources)
+ */
+function deepMerge(target, ...sources) {
+    if (!sources.length) return target;
+    const [source, ...rest] = sources;
+    
+    if (source === null || typeof source !== 'object') {
+        return deepMerge(target, ...rest);
+    }
+    
+    const result = Array.isArray(target) ? [...target] : { ...target };
+    
+    for (const key of Object.keys(source)) {
+        if (source[key] && typeof source[key] === 'object' && !Array.isArray(source[key])) {
+            result[key] = deepMerge(result[key] || {}, source[key]);
+        } else {
+            result[key] = source[key];
+        }
+    }
+    
+    return deepMerge(result, ...rest);
+}
+
 
 export function saveState() {
     try {
@@ -78,8 +133,134 @@ export function clearState() {
     return state;
 }
 
-export function mergeState(updates) {
-    return updateState(updates);
+/**
+ * Merge remote state with local state, detecting conflicts
+ * @param {object} remoteState - State from server
+ * @param {object} version - Version vector
+ */
+export function mergeState(remoteState, version) {
+    const conflicts = [];
+
+    // 1. Merge characters
+    if (remoteState.characters) {
+        state.characters = state.characters || [];
+        remoteState.characters.forEach(remoteChar => {
+            const localChar = state.characters.find(c => c.id === remoteChar.id);
+            if (localChar) {
+                // Check if local version is newer
+                if ((localChar._syncVersion || 0) > (remoteChar._syncVersion || 0)) {
+                    conflicts.push({
+                        type: 'character',
+                        id: remoteChar.id,
+                        local: localChar,
+                        remote: remoteChar,
+                        resolution: 'pending'
+                    });
+                } else {
+                    // Remote is newer or same version
+                    const idx = state.characters.indexOf(localChar);
+                    state.characters[idx] = remoteChar;
+                }
+            } else {
+                // New character from remote
+                state.characters.push(remoteChar);
+            }
+        });
+    }
+
+    // 2. Merge timers
+    if (remoteState.timers) {
+        state.timers = state.timers || [];
+        remoteState.timers.forEach(remoteTimer => {
+            const localTimer = state.timers.find(t => t.id === remoteTimer.id);
+            if (localTimer) {
+                if ((remoteTimer.lastTick || 0) > (localTimer.lastTick || 0)) {
+                    const idx = state.timers.indexOf(localTimer);
+                    state.timers[idx] = remoteTimer;
+                }
+            } else {
+                state.timers.push(remoteTimer);
+            }
+        });
+    }
+
+    // 3. Merge wiki entries
+    if (remoteState.wikiEntries) {
+        state.wikiEntries = state.wikiEntries || [];
+        remoteState.wikiEntries.forEach(remoteEntry => {
+            const localEntry = state.wikiEntries.find(w => w.id === remoteEntry.id);
+            if (localEntry) {
+                if ((remoteEntry.lastEdited || 0) > (localEntry.lastEdited || 0)) {
+                    const idx = state.wikiEntries.indexOf(localEntry);
+                    state.wikiEntries[idx] = remoteEntry;
+                }
+            } else {
+                state.wikiEntries.push(remoteEntry);
+            }
+        });
+    }
+
+    // 4. Merge chat (append-only)
+    if (remoteState.chatMessages) {
+        state.chatMessages = state.chatMessages || [];
+        const localIds = new Set(state.chatMessages.map(m => m.id));
+        remoteState.chatMessages.forEach(msg => {
+            if (!localIds.has(msg.id)) {
+                state.chatMessages.push(msg);
+            }
+        });
+        // Keep chat history under limit
+        if (state.chatMessages.length > 200) {
+            state.chatMessages = state.chatMessages.slice(-200);
+        }
+    }
+
+    // 5. Handle conflicts (show to user for resolution)
+    if (conflicts.length > 0) {
+        pendingConflicts = [...pendingConflicts, ...conflicts];
+        document.dispatchEvent(new CustomEvent('syncConflict', {
+            detail: { conflicts }
+        }));
+    }
+
+    // 6. Update version
+    state._version = version;
+    state._lastSync = Date.now();
+    saveState();
+}
+
+export function getPendingConflicts() {
+    return pendingConflicts;
+}
+
+export function resolveConflict(conflictId, choice) {
+    const conflict = pendingConflicts.find(c => c.id === conflictId);
+    if (!conflict) return;
+
+    switch (choice) {
+        case 'local':
+            // Keep local version, do nothing to state
+            break;
+        case 'remote':
+            // Use remote version
+            const idx = state.characters.indexOf(conflict.local);
+            if (idx !== -1) state.characters[idx] = conflict.remote;
+            break;
+        case 'merge':
+            // Deep merge
+            const merged = { ...conflict.local, ...conflict.remote };
+            merged._syncVersion = Math.max(
+                conflict.local._syncVersion || 0,
+                conflict.remote._syncVersion || 0
+            ) + 1;
+            const mergeIdx = state.characters.indexOf(conflict.local);
+            if (mergeIdx !== -1) state.characters[mergeIdx] = merged;
+            break;
+    }
+
+    // Remove resolved conflict
+    pendingConflicts = pendingConflicts.filter(c => c.id !== conflictId);
+    saveState();
 }
 
 export function getStateValue(path, defaultValue = null) {
@@ -109,10 +290,6 @@ export function setStateValue(path, value) {
     return state;
 }
 
-/**
- * Get base URL - uses utils implementation
- * @returns {string} Base URL
- */
 export function getBaseUrl() {
     return utilsGetBaseUrl(state);
 }
@@ -127,6 +304,93 @@ export function setPasswordHash(hash) {
     state.passwordHash = hash;
     saveState();
     return state;
+}
+
+// ============================================================
+// CAMPAIGN STATE OPERATIONS
+// ============================================================
+
+export function getCampaignState() {
+    if (!state.campaign) {
+        state.campaign = { ...DEFAULT_STATE.campaign };
+        saveState();
+    }
+    if (!state.campaign.state) {
+        state.campaign.state = { ...DEFAULT_STATE.campaign.state };
+        saveState();
+    }
+    return state.campaign.state;
+}
+
+export function updateCampaignState(updates) {
+    const campaignState = getCampaignState();
+    Object.assign(campaignState, updates);
+    saveState();
+    return campaignState;
+}
+
+export function addSessionLogEntry(message, type = 'info') {
+    const campaignState = getCampaignState();
+    if (!campaignState.sessionLog) {
+        campaignState.sessionLog = [];
+    }
+    const entry = {
+        timestamp: new Date().toISOString(),
+        time: new Date().toLocaleTimeString(),
+        message: message,
+        type: type
+    };
+    campaignState.sessionLog.push(entry);
+    saveState();
+    return entry;
+}
+
+export function getSessionLog() {
+    const campaignState = getCampaignState();
+    return campaignState.sessionLog || [];
+}
+
+export function clearSessionLog() {
+    const campaignState = getCampaignState();
+    campaignState.sessionLog = [];
+    saveState();
+    return true;
+}
+
+export function getSceneTags() {
+    const campaignState = getCampaignState();
+    return campaignState.sceneTags || [];
+}
+
+export function addSceneTag(tag) {
+    const campaignState = getCampaignState();
+    if (!campaignState.sceneTags) {
+        campaignState.sceneTags = [];
+    }
+    const normalizedTag = tag.toUpperCase().trim();
+    if (!normalizedTag) return false;
+    if (campaignState.sceneTags.includes(normalizedTag)) return false;
+    campaignState.sceneTags.push(normalizedTag);
+    saveState();
+    return true;
+}
+
+export function removeSceneTag(tag) {
+    const campaignState = getCampaignState();
+    if (!campaignState.sceneTags) return false;
+    const normalizedTag = tag.toUpperCase().trim();
+    const index = campaignState.sceneTags.indexOf(normalizedTag);
+    if (index === -1) return false;
+    campaignState.sceneTags.splice(index, 1);
+    saveState();
+    return true;
+}
+
+export function clearSceneTags() {
+    const campaignState = getCampaignState();
+    campaignState.sceneTags = [];
+    saveState();
+    return true;
 }
 
 // ============================================================
@@ -149,6 +413,7 @@ export function addCharacter(character) {
     if (!character.createdAt) {
         character.createdAt = new Date().toISOString();
     }
+    character._syncVersion = Date.now();
     state.characters = [...(state.characters || []), character];
     saveState();
     return character;
@@ -159,7 +424,12 @@ export function updateCharacter(id, updates) {
     const index = characters.findIndex(c => c.id === id);
     if (index === -1) return null;
     
-    const updated = { ...characters[index], ...updates, updatedAt: new Date().toISOString() };
+    const updated = { 
+        ...characters[index], 
+        ...updates, 
+        updatedAt: new Date().toISOString(),
+        _syncVersion: Date.now()
+    };
     state.characters = [...characters.slice(0, index), updated, ...characters.slice(index + 1)];
     saveState();
     return updated;
@@ -364,6 +634,7 @@ export function addWikiEntry(entry) {
     if (!entry.createdAt) {
         entry.createdAt = new Date().toISOString();
     }
+    entry.lastEdited = Date.now();
     state.wikiEntries = [...(state.wikiEntries || []), entry];
     saveState();
     return entry;
@@ -374,7 +645,7 @@ export function updateWikiEntry(id, updates) {
     const index = wikiEntries.findIndex(w => w.id === id);
     if (index === -1) return null;
     
-    const updated = { ...wikiEntries[index], ...updates, updatedAt: new Date().toISOString() };
+    const updated = { ...wikiEntries[index], ...updates, updatedAt: new Date().toISOString(), lastEdited: Date.now() };
     state.wikiEntries = [...wikiEntries.slice(0, index), updated, ...wikiEntries.slice(index + 1)];
     saveState();
     return updated;
@@ -501,13 +772,7 @@ export function importData(data) {
             throw new Error('Invalid data format');
         }
         
-        const merged = { ...DEFAULT_STATE, ...state, ...data };
-        
-        for (const key of Object.keys(DEFAULT_STATE)) {
-            if (!(key in merged)) {
-                merged[key] = DEFAULT_STATE[key];
-            }
-        }
+        const merged = deepMerge({ ...DEFAULT_STATE }, state, data);
         
         state = merged;
         saveState();
@@ -567,7 +832,6 @@ function triggerSaveEvent(status) {
 // ============================================================
 
 export default {
-    // State operations
     loadState,
     saveState,
     forceSave,
@@ -575,78 +839,67 @@ export default {
     updateState,
     clearState,
     mergeState,
+    getPendingConflicts,
+    resolveConflict,
     getStateValue,
     setStateValue,
     getBaseUrl,
     setBaseUrl,
     setPasswordHash,
-    
-    // Character operations
+    getCampaignState,
+    updateCampaignState,
+    addSessionLogEntry,
+    getSessionLog,
+    clearSessionLog,
+    getSceneTags,
+    addSceneTag,
+    removeSceneTag,
+    clearSceneTags,
     getCharacters,
     getCharacter,
     addCharacter,
     updateCharacter,
     deleteCharacter,
-    
-    // NPC operations
     addNPC,
     getNPCs,
     getNPC,
     getCharacterNPCs,
-    
-    // Campaign operations
     getCampaigns,
     getCampaign,
     addCampaign,
     updateCampaign,
     deleteCampaign,
-    
-    // Timer operations
     getTimers,
     getTimer,
     addTimer,
     updateTimer,
     deleteTimer,
-    
-    // Encounter operations
     getEncounters,
     getEncounter,
     addEncounter,
     updateEncounter,
     deleteEncounter,
-    
-    // Wiki operations
     getWikiEntries,
     getWikiEntry,
     addWikiEntry,
     updateWikiEntry,
     deleteWikiEntry,
-    
-    // Archive operations
     getArchives,
     getArchive,
     addArchive,
     updateArchive,
     deleteArchive,
-    
-    // Dice operations
     getDiceHistory,
     addDiceRoll,
     addRoll,
     clearDiceHistory,
     clearRollHistory,
-    
-    // Chat operations
     addChatMessage,
     getChatMessages,
     clearChatHistory,
-    
-    // Data import/export
     importData,
     exportData,
     clearAllData,
-    
-    // Save status
     onSave,
     offSave,
 };

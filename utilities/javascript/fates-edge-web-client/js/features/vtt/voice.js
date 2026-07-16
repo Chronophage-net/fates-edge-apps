@@ -5,6 +5,8 @@
  * Updated for unified WebSocket module.
  */
 
+import { initMediaModule } from '../../core/media.js';
+import { getState } from '../../core/state.js';
 import { VoiceChat } from '../../components/VoiceChat.js';
 import { onEvent, sendEvent, getSocketId, isConnectedToServer, onWSEvent, offWSEvent } from '../../core/websocket.js';
 import { showToast } from '../../components/Toast.js';
@@ -61,6 +63,21 @@ export function onVoiceClientsChanged(callback) {
 }
 
 // ============================================================
+// MEDIA MODULE INITIALIZATION
+// ============================================================
+
+async function initializeMediaModule() {
+    try {
+        const state = getState();
+        const userId = state.sessionId || 'voice-' + Date.now().toString(36);
+        initMediaModule(userId);
+        console.log('[Voice] Media module initialized');
+    } catch (e) {
+        console.warn('[Voice] Could not initialize media module:', e);
+    }
+}
+
+// ============================================================
 // VOICE INITIALIZATION
 // ============================================================
 
@@ -78,6 +95,9 @@ export async function initVoice() {
     }
     
     try {
+        // Initialize media module for session recording
+        await initializeMediaModule();
+        
         voiceChat = new VoiceChat();
         const success = await voiceChat.init();
         if (!success) {

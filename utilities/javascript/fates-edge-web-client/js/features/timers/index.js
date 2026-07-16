@@ -2,6 +2,7 @@
  * Timers feature - Track scene pressure and faction clocks
  */
 
+import { logToSession, addVTTEvent } from '../dashboard/scene-tools.js';
 import { getState, addTimer, deleteTimer, updateTimer, saveState } from '../../core/state.js';
 import { createTimerWidget } from '../../components/TimerWidget.js';
 import { escHtml, safeParseInt } from '../../core/utils.js';
@@ -58,10 +59,21 @@ function tickTimer(id) {
     const timer = getState().timers.find(t => t.id === id);
     if (!timer) return;
     timer.current = Math.min(timer.current + 1, timer.segments);
+    // Log timer tick
+    try {
+        logToSession(`⏱️ Timer ticked: ${timer.name} (${timer.current}/${timer.segments})`, 'info');
+        addVTTEvent('timer_ticked', { name: timer.name, current: timer.current, segments: timer.segments });
+    } catch (e) { /* ignore */ }
     saveState();
     renderTimers();
     if (timer.current >= timer.segments) {
+        // Log timer completion
+        try {
+            logToSession(`⏱️ Timer completed: ${timer.name}`, 'warning');
+            addVTTEvent('timer_complete', { name: timer.name, id: timer.id });
+        } catch (e) { /* ignore */ }
         showToast(`Timer "${timer.name}" completed!`, 'warning');
+        
     }
 }
 

@@ -10,6 +10,7 @@
 import { shuffleArray } from '../../core/utils.js';
 import { showToast } from '../../components/Toast.js';
 import { getState, addTimer } from '../../core/state.js';
+import { logRecordingEvent } from '../../core/media.js';
 
 // ============================================================
 // CONSTANTS
@@ -74,7 +75,89 @@ const CROWN_POSITIONS = [
 ];
 
 // ============================================================
-// DETERMINISTIC RNG (same pattern as dice module)
+// ACE EFFECTS
+// ============================================================
+
+const ACE_EFFECTS = {
+    generic: [
+        { emoji: '👻', text: 'The Hollow takes notice. A pale figure watches from the corner of your eye.' },
+        { emoji: '🔔', text: 'A bell rings without being struck. The ninth chime is silent.' },
+        { emoji: '🌫️', text: 'Mist rolls in, carrying whispers of a debt unpaid.' },
+        { emoji: '🕯️', text: 'A candle gutters and relights itself, burning blue.' },
+        { emoji: '🃏', text: 'The Joker\'s wildcard manifests — the unexpected becomes inevitable.' },
+        { emoji: '🌙', text: 'The moon flickers. For a moment, you see two shadows.' },
+        { emoji: '⚖️', text: 'A scale appears in the air, weighing something you cannot see.' },
+        { emoji: '🕸️', text: 'A spider web glistens in the corner, its threads forming a pattern you almost recognize.' }
+    ],
+    acasia: [
+        { emoji: '🌿', text: 'The Curse stirs. A crossroads behind you now leads to a place you have already been.' },
+        { emoji: '🪦', text: 'A broken milestone weeps rust. The empire\'s ghost is counting.' },
+        { emoji: '🔥', text: 'A free company’s banner flickers in the distance, its colors changed.' }
+    ],
+    ecktoria: [
+        { emoji: '🏛️', text: 'A statue turns its head to watch you. The marble is warm.' },
+        { emoji: '⚜️', text: 'A seal appears on your documents that you did not stamp. The Vigil is watching.' },
+        { emoji: '🔥', text: 'The Everflame burns blue. A forgotten precedent surfaces.' }
+    ],
+    vhasia: [
+        { emoji: '☀️', text: 'The sun fractures. You see a reflection of Lence in every mirror.' },
+        { emoji: '🗡️', text: 'A knight’s gorget unbuckles on its own. Chivalry is a weight.' },
+        { emoji: '👑', text: 'A crown sits on a throne that was empty a moment ago. The claimant is watching.' }
+    ],
+    viterra: [
+        { emoji: '🌳', text: 'A hedge grows where no hedge was before. The boundary has moved.' },
+        { emoji: '⚖️', text: 'A legal duel is declared in your name. You have one hour to prepare.' },
+        { emoji: '🛡️', text: 'The Queen\'s Justiciar passes by. She does not see you—yet.' }
+    ],
+    ykrul: [
+        { emoji: '🐺', text: 'A wolf howls in the distance. The steppe is counting its debts.' },
+        { emoji: '🌾', text: 'A white squall approaches. The wind carries the names of the dead.' },
+        { emoji: '⚔️', text: 'A hostage string is cut. A feud rekindles.' }
+    ],
+    silkstrand: [
+        { emoji: '🌊', text: 'The canals run red. The dye-water curse awakens.' },
+        { emoji: '🕊️', text: 'A bridge token appears in your pocket. No one knows who left it.' },
+        { emoji: '📜', text: 'A contract is voided in invisible ink. You owe nothing—and everything.' }
+    ],
+    mistlands: [
+        { emoji: '🔔', text: 'A bell-line fails. Something steps through the gap.' },
+        { emoji: '🧂', text: 'The salt pans turn gray. The wards are weakening.' },
+        { emoji: '🌫️', text: 'The mist takes a name. You feel lighter.' }
+    ],
+    thepyrgos: [
+        { emoji: '🔑', text: 'A stair appears where none should be. The Unfinished Stair calls.' },
+        { emoji: '📚', text: 'An archive shelf unlocks itself. A forbidden truth is revealed.' },
+        { emoji: '🔔', text: 'A bell tolls nine times. The Synod is in session.' }
+    ],
+    ubral: [
+        { emoji: '🪨', text: 'A cairn adds a new stone. The dead have voted.' },
+        { emoji: '⚔️', text: 'A guest-right is broken. Blood will answer.' },
+        { emoji: '🐎', text: 'A riderless horse appears on the ridge. It waits for you.' }
+    ],
+    valewood: [
+        { emoji: '🌲', text: 'A star-road phases into existence. The forest remembers.' },
+        { emoji: '🍃', text: 'A leaf falls upward, pointing to a hidden threshold.' },
+        { emoji: '👑', text: 'The Hazel Queen’s laughter echoes through the trees.' }
+    ],
+    aelinnel: [
+        { emoji: '🔮', text: 'A geas forms on your tongue. Choose your next words carefully.' },
+        { emoji: '🌿', text: 'The Green Gate opens at the wrong hour. Roads rewire.' },
+        { emoji: '🕊️', text: 'A fae courtier offers a gift. Accepting may cost more than you know.' }
+    ],
+    aelaerem: [
+        { emoji: '🍎', text: 'The Hollow walks. The ninth cup is poured.' },
+        { emoji: '🐦', text: 'The watch-geese fall silent. Someone is coming.' },
+        { emoji: '🌾', text: 'The scarecrow turns to face you. It knows your name.' }
+    ],
+    zakov: [
+        { emoji: '🌊', text: 'The tide turns early. The reef is hungry.' },
+        { emoji: '💎', text: 'A crystalline shard glows in the dark. The Reaping stirs.' },
+        { emoji: '🏴‍☠️', text: 'The Salt Prince raises the levy. Every ship pays.' }
+    ],
+};
+
+// ============================================================
+// DETERMINISTIC RNG
 // ============================================================
 
 // Use a module-level closure to avoid global conflicts
@@ -83,7 +166,6 @@ const _deckSeedState = {
     prng: null
 };
 
-// Xorshift128+ PRNG for deterministic random generation
 class Xorshift128 {
     constructor(seed) {
         this.seed = seed;
@@ -140,7 +222,7 @@ class Xorshift128 {
     }
 }
 
-// Seed management functions - exported
+// Seed management functions
 export function getDeckSeed() {
     return _deckSeedState.seed;
 }
@@ -172,7 +254,7 @@ export function generateDeckSeed() {
     return Date.now().toString(36) + Math.random().toString(36).substring(2, 8);
 }
 
-// Initialize seed from localStorage on module load
+// Initialize seed from localStorage
 try {
     const stored = localStorage.getItem('fates-edge-deck-seed');
     if (stored) {
@@ -234,7 +316,6 @@ function getDeckRandomIntInclusive(min, max) {
     return Math.floor(getDeckRandom() * (max - min + 1)) + min;
 }
 
-// Deterministic shuffle using the seeded PRNG
 function deterministicShuffle(array) {
     const arr = [...array];
     for (let i = arr.length - 1; i > 0; i--) {
@@ -297,6 +378,27 @@ function getWildcardMeaning(card, regionData) {
     const idx = Math.abs(hash) % twists.length;
     const cardName = card.isJoker ? 'Joker' : `${card.rankName} of ${card.suitName}`;
     return `✨ Twist (${cardName}): ${twists[idx]}`;
+}
+
+function getAceEffect(region, card) {
+    const regionKey = region ? region.toLowerCase() : 'generic';
+    let effects = ACE_EFFECTS[regionKey];
+    if (!effects) {
+        const match = Object.keys(ACE_EFFECTS).find(key => 
+            key !== 'generic' && regionKey.includes(key)
+        );
+        if (match) effects = ACE_EFFECTS[match];
+    }
+    if (!effects) effects = ACE_EFFECTS.generic;
+    
+    const seed = (card?.suit || '') + (card?.rank || '') + 'deck';
+    let hash = 0;
+    for (let i = 0; i < seed.length; i++) {
+        hash = ((hash << 5) - hash) + seed.charCodeAt(i);
+        hash = hash & hash;
+    }
+    const idx = Math.abs(hash) % effects.length;
+    return effects[idx];
 }
 
 // ============================================================
@@ -593,10 +695,6 @@ async function fetchRegionData(regionName) {
 // REGION CHANGE HANDLER
 // ============================================================
 
-/**
- * Handle region change - called when the user selects a different region
- * This is the function that scene-tools.js is trying to import
- */
 async function handleRegionChange() {
     const select = document.getElementById('deck-region-select');
     if (!select) return;
@@ -622,7 +720,6 @@ async function handleRegionChange() {
         }
     }
     
-    // Notify any registered callbacks
     regionChangeCallbacks.forEach(callback => {
         try {
             callback(regionName, data);
@@ -745,7 +842,6 @@ export async function render(el) {
         seedRegenerate.addEventListener('click', function() {
             const newSeed = generateDeckSeed();
             setDeckSeed(newSeed);
-            // Also share with dice module if it exists
             try {
                 localStorage.setItem('fates-edge-seed', newSeed);
             } catch (e) { /* ignore */ }
@@ -791,10 +887,14 @@ function buildDeck() {
     deck.push({ suit: 'joker', rank: 'Red', symbol: '🃏', color: '#d4af37', isJoker: true, suitName: 'Joker', rankName: 'Red' });
     deck.push({ suit: 'joker', rank: 'Black', symbol: '🃏', color: '#d4af37', isJoker: true, suitName: 'Joker', rankName: 'Black' });
     
-    // Use deterministic shuffle if seed is set
     deck = deterministicShuffle(deck);
     updateDeckCount();
     console.log('🔀 Deck shuffled, total cards:', deck.length, _deckSeedState.seed ? '(deterministic)' : '(random)');
+    
+    // Log shuffle
+    if (typeof logRecordingEvent === 'function') {
+        logRecordingEvent('deck_shuffle', `Deck shuffled. ${deck.length} cards remaining.`);
+    }
 }
 
 function updateDeckCount() {
@@ -861,6 +961,14 @@ export async function drawConsequence() {
     renderCards(cards, isCrown);
 
     let synthesis, details = null, timer = null, cardDisplay = null;
+    let aceEffect = null;
+
+    const aces = cards.filter(c => c.rank === 'A' && !c.isJoker);
+    if (aces.length > 0) {
+        const aceCard = aces[0];
+        aceEffect = getAceEffect(selectedRegion, aceCard);
+    }
+
     if (isCrown) {
         const mainCards = cards.slice(0, 4);
         const wildcard = cards[4];
@@ -879,10 +987,32 @@ export async function drawConsequence() {
                 </div>
             `;
         }
+        
+        // Log Crown Spread
+        if (typeof logRecordingEvent === 'function') {
+            const cardNames = mainCards.map(c => `${c.rankName} of ${c.suitName}`).join(', ');
+            logRecordingEvent('crown_spread', `Crown Spread: ${cardNames} | Wildcard: ${wildcard.isJoker ? 'Joker' : `${wildcard.rankName} of ${wildcard.suitName}`} | Region: ${selectedRegion}`);
+        }
     } else {
         const cardsEl = document.getElementById('crown-spread-cards');
         if (cardsEl) cardsEl.style.display = 'none';
         synthesis = synthesiseConsequence(cards, data);
+        
+        // Log regular draw
+        if (typeof logRecordingEvent === 'function') {
+            const cardNames = cards.map(c => `${c.rankName} of ${c.suitName}`).join(', ');
+            logRecordingEvent('deck_draw', `${cards.length} card(s) drawn: ${cardNames} | Region: ${selectedRegion}`);
+        }
+    }
+
+    let aceHtml = '';
+    if (aceEffect) {
+        aceHtml = `\n\n♠️ **Ace Effect:** ${aceEffect.emoji} ${aceEffect.text}`;
+        synthesis += aceHtml;
+        showToast(`♠️ Ace Effect: ${aceEffect.text}`, 'warning');
+        if (typeof logRecordingEvent === 'function') {
+            logRecordingEvent('deck_ace', `♠️ Ace Effect: ${aceEffect.emoji} ${aceEffect.text} (${selectedRegion})`);
+        }
     }
 
     const synthesisEl = document.getElementById('consequence-synthesis');
@@ -919,30 +1049,28 @@ export async function drawConsequence() {
         timerEl.style.display = 'none';
     }
 
-    // Store results for later display
     lastDrawResults = {
         cards: cards,
         synthesis: synthesis,
         isCrown: isCrown,
         details: details,
         timer: timer,
-        type: type
+        type: type,
+        aceEffect: aceEffect
     };
 
-    // Add to history
     const cardStr = cards.map(c => c.isJoker ? `🃏${c.rank}` : `${c.rankName} of ${c.suitName}`).join(' | ');
     deckHistory.push({
         time: new Date().toLocaleTimeString(),
         cards: cardStr,
         synthesis: synthesis.replace(/\n/g, ' '),
-        type: type === 'crown' ? 'Crown Spread' : `${type} Draw${type > 1 ? 's' : ''}`
+        type: type === 'crown' ? 'Crown Spread' : `${type} Draw${type > 1 ? 's' : ''}`,
+        aceEffect: aceEffect ? `${aceEffect.emoji} ${aceEffect.text}` : null
     });
     renderDeckHistory();
     
-    // Broadcast via WebSocket
     broadcastDraw(cards, type, selectedRegion, synthesis);
     
-    // Enhanced toast with card names
     const cardNames = cards.map(c => c.isJoker ? '🃏 Joker' : `${c.rankName} of ${c.suitName}`).join(', ');
     showToast(`🃏 Drew ${cards.length} card${cards.length > 1 ? 's' : ''}: ${cardNames}`, 'success');
 }
@@ -1011,6 +1139,9 @@ function createTimerFromCard(cardName, segments) {
                 current: 0
             });
             showToast(`⏱️ Creating timer from ${cardName} (${segments} segments)`, 'success');
+            if (typeof logRecordingEvent === 'function') {
+                logRecordingEvent('timer_created', `Timer created from Crown Spread: ${cardName} (${segments} segments)`);
+            }
         } else {
             const state = getState();
             if (!state.timers) state.timers = [];
@@ -1024,6 +1155,9 @@ function createTimerFromCard(cardName, segments) {
             const event = new CustomEvent('timer-added', { detail: { timer: newTimer } });
             document.dispatchEvent(event);
             showToast(`⏱️ Timer created: ${newTimer.name} (${segments} segments)`, 'success');
+            if (typeof logRecordingEvent === 'function') {
+                logRecordingEvent('timer_created', `Timer created: ${newTimer.name} (${segments} segments)`);
+            }
         }
     }).catch(() => {
         const state = getState();
@@ -1037,6 +1171,9 @@ function createTimerFromCard(cardName, segments) {
         state.timers.push(newTimer);
         document.dispatchEvent(new CustomEvent('timer-added', { detail: { timer: newTimer } }));
         showToast(`⏱️ Timer created: ${newTimer.name} (${segments} segments)`, 'success');
+        if (typeof logRecordingEvent === 'function') {
+            logRecordingEvent('timer_created', `Timer created: ${newTimer.name} (${segments} segments)`);
+        }
     });
 }
 
@@ -1058,6 +1195,7 @@ function renderDeckHistory() {
             <span style="font-weight:500;">${e.cards}</span>
             <span style="color:var(--text2);font-size:0.75rem;">→</span>
             <span style="font-size:0.8rem;">${e.synthesis}</span>
+            ${e.aceEffect ? `<span style="color:var(--gold);font-size:0.7rem;">${e.aceEffect}</span>` : ''}
         </div>`
     ).join('');
 }
@@ -1066,6 +1204,9 @@ function clearDeckHistory() {
     deckHistory = [];
     renderDeckHistory();
     showToast('Deck history cleared.', 'success');
+    if (typeof logRecordingEvent === 'function') {
+        logRecordingEvent('deck_history_cleared', 'Deck history cleared');
+    }
 }
 
 // ============================================================
@@ -1091,8 +1232,11 @@ export function resetDeck() {
     const title = document.getElementById('consequence-title');
     if (title) title.textContent = 'Cards Drawn';
     
-    // Broadcast via WebSocket
     broadcastReset();
+    
+    if (typeof logRecordingEvent === 'function') {
+        logRecordingEvent('deck_reset', 'Deck reset and reshuffled');
+    }
     
     showToast(`Deck reshuffled with new random seeds.${_deckSeedState.seed ? ' (deterministic)' : ''}`, 'success');
 }
@@ -1217,6 +1361,12 @@ export function openCrownSpread() {
     fetchRegionData(regionName).then(data => {
         const result = synthesiseCrownSpread(mainCards, wildcard, data);
         
+        // Log Crown Spread
+        if (typeof logRecordingEvent === 'function') {
+            const cardNames = mainCards.map(c => `${c.rankName} of ${c.suitName}`).join(', ');
+            logRecordingEvent('crown_spread_modal', `Crown Spread (modal): ${cardNames} | Wildcard: ${wildcard.isJoker ? 'Joker' : `${wildcard.rankName} of ${wildcard.suitName}`} | Region: ${regionName}`);
+        }
+        
         crownSpreadModal.innerHTML = `
             <div style="background:var(--bg2);padding:2rem;border-radius:16px;max-width:800px;width:100%;max-height:90vh;overflow-y:auto;border:1px solid var(--border);">
                 <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;">
@@ -1297,7 +1447,6 @@ export function openCrownSpread() {
     });
 }
 
-// Close Crown Spread modal
 window.closeCrownSpread = function() {
     if (crownSpreadModal && crownSpreadModal.parentNode) {
         crownSpreadModal.remove();
@@ -1310,27 +1459,14 @@ window.closeCrownSpread = function() {
 // EXPOSED FUNCTIONS
 // ============================================================
 
-/**
- * Get the currently selected region
- * @returns {string|null} The selected region name or null if none selected
- */
 export function getSelectedRegion() {
     return selectedRegion;
 }
 
-/**
- * Get all available region names
- * @returns {string[]} Array of region names
- */
 export function getRegionNames() {
     return [...regionNames];
 }
 
-/**
- * Set the selected region programmatically
- * @param {string} regionName - The region name to select
- * @returns {Promise<boolean>} True if successful, false otherwise
- */
 export async function setSelectedRegion(regionName) {
     if (!regionNames.includes(regionName)) {
         console.warn(`[Decks] Region "${regionName}" not found`);
@@ -1346,20 +1482,10 @@ export async function setSelectedRegion(regionName) {
     return true;
 }
 
-/**
- * Get the current region data
- * @returns {object|null} The region data or null if not loaded
- */
 export function getRegionData() {
     return regionData;
 }
 
-/**
- * Get a card meaning for a specific suit and rank in the current region
- * @param {string} suit - The card suit
- * @param {string} rank - The card rank
- * @returns {string} The card meaning
- */
 export function getCardMeaning(suit, rank) {
     if (!regionData) {
         return `A complication of ${suit} arises.`;
@@ -1367,10 +1493,6 @@ export function getCardMeaning(suit, rank) {
     return getCardMeaningFromRegion(suit, rank, regionData);
 }
 
-/**
- * Register a callback for region changes
- * @param {Function} callback - Function(regionName, regionData)
- */
 export function registerRegionChange(callback) {
     if (typeof callback === 'function') {
         regionChangeCallbacks.push(callback);
@@ -1380,25 +1502,12 @@ export function registerRegionChange(callback) {
     }
 }
 
-// ============================================================
-// REGION CHANGE EXPORT (FIX FOR scene-tools.js)
-// ============================================================
-
-/**
- * onRegionChange - Called when the region changes
- * This is the function that scene-tools.js is trying to import
- * @param {string|Function} regionNameOrCallback - Region name or callback function
- * @param {Function} callback - Optional callback when region name is provided
- * @returns {Promise<void>}
- */
 export async function onRegionChange(regionNameOrCallback, callback) {
-    // Handle callback registration if first arg is a function
     if (typeof regionNameOrCallback === 'function') {
         registerRegionChange(regionNameOrCallback);
         return;
     }
     
-    // Handle region name change
     if (typeof regionNameOrCallback === 'string') {
         const regionName = regionNameOrCallback;
         const success = await setSelectedRegion(regionName);
@@ -1408,20 +1517,13 @@ export async function onRegionChange(regionNameOrCallback, callback) {
         return success;
     }
     
-    // Fallback: just trigger the current region change
     await handleRegionChange();
 }
 
 // ============================================================
-// SHORTCUT FUNCTIONS FOR DASHBOARD QUICK BUTTONS
+// SHORTCUT FUNCTIONS
 // ============================================================
 
-/**
- * Quick draw with specified number of cards
- * @param {number} count - Number of cards to draw (1-3)
- * @param {string} regionName - Optional region name (uses current if not specified)
- * @returns {Promise<object>} The draw result
- */
 export async function quickDraw(count = 1, regionName = null) {
     if (regionName) {
         await setSelectedRegion(regionName);
@@ -1450,31 +1552,46 @@ export async function quickDraw(count = 1, regionName = null) {
     const synthesis = synthesiseConsequence(cards, data);
     const cardNames = cards.map(c => c.isJoker ? '🃏 Joker' : `${c.rankName} of ${c.suitName}`).join(', ');
     
-    broadcastDraw(cards, String(count), selectedRegion, synthesis);
+    let aceEffect = null;
+    let synthesisWithAce = synthesis;
+    const aces = cards.filter(c => c.rank === 'A' && !c.isJoker);
+    if (aces.length > 0) {
+        const aceCard = aces[0];
+        aceEffect = getAceEffect(selectedRegion, aceCard);
+        synthesisWithAce += `\n\n♠️ **Ace Effect:** ${aceEffect.emoji} ${aceEffect.text}`;
+        showToast(`♠️ Ace Effect: ${aceEffect.text}`, 'warning');
+        if (typeof logRecordingEvent === 'function') {
+            logRecordingEvent('quick_draw_ace', `♠️ Ace Effect: ${aceEffect.emoji} ${aceEffect.text} (${selectedRegion})`);
+        }
+    }
+    
+    broadcastDraw(cards, String(count), selectedRegion, synthesisWithAce);
     
     deckHistory.push({
         time: new Date().toLocaleTimeString(),
         cards: cardNames,
-        synthesis: synthesis.replace(/\n/g, ' '),
-        type: `${count} Draw${count > 1 ? 's' : ''}`
+        synthesis: synthesisWithAce.replace(/\n/g, ' '),
+        type: `${count} Draw${count > 1 ? 's' : ''}`,
+        aceEffect: aceEffect ? `${aceEffect.emoji} ${aceEffect.text}` : null
     });
     renderDeckHistory();
+    
+    // Log quick draw
+    if (typeof logRecordingEvent === 'function') {
+        logRecordingEvent('quick_draw', `${count} card(s) drawn: ${cardNames} | Region: ${selectedRegion}`);
+    }
     
     showToast(`🎴 ${cardNames}`, 'success');
     
     return {
         cards,
-        synthesis,
+        synthesis: synthesisWithAce,
         cardNames,
-        type: count
+        type: count,
+        aceEffect: aceEffect
     };
 }
 
-/**
- * Quick Crown Spread
- * @param {string} regionName - Optional region name (uses current if not specified)
- * @returns {Promise<object>} The Crown Spread result
- */
 export async function quickCrownSpread(regionName = null) {
     if (regionName) {
         await setSelectedRegion(regionName);
@@ -1504,16 +1621,35 @@ export async function quickCrownSpread(regionName = null) {
     const wildcard = cards[4];
     const result = synthesiseCrownSpread(mainCards, wildcard, data);
     
-    broadcastDraw(cards, 'crown', selectedRegion, result.synthesis);
+    let aceEffect = null;
+    let synthesisWithAce = result.synthesis;
+    const aces = mainCards.filter(c => c.rank === 'A' && !c.isJoker);
+    if (aces.length > 0) {
+        const aceCard = aces[0];
+        aceEffect = getAceEffect(selectedRegion, aceCard);
+        synthesisWithAce += `\n\n♠️ **Ace Effect:** ${aceEffect.emoji} ${aceEffect.text}`;
+        showToast(`♠️ Ace Effect: ${aceEffect.text}`, 'warning');
+        if (typeof logRecordingEvent === 'function') {
+            logRecordingEvent('crown_spread_ace', `♠️ Ace Effect: ${aceEffect.emoji} ${aceEffect.text} (${selectedRegion})`);
+        }
+    }
+    
+    broadcastDraw(cards, 'crown', selectedRegion, synthesisWithAce);
     
     const cardNames = cards.map(c => c.isJoker ? '🃏 Joker' : `${c.rankName} of ${c.suitName}`).join(', ');
     deckHistory.push({
         time: new Date().toLocaleTimeString(),
         cards: cardNames,
-        synthesis: result.synthesis.replace(/\n/g, ' '),
-        type: 'Crown Spread'
+        synthesis: synthesisWithAce.replace(/\n/g, ' '),
+        type: 'Crown Spread',
+        aceEffect: aceEffect ? `${aceEffect.emoji} ${aceEffect.text}` : null
     });
     renderDeckHistory();
+    
+    // Log Crown Spread
+    if (typeof logRecordingEvent === 'function') {
+        logRecordingEvent('crown_spread_quick', `Crown Spread: ${cardNames} | Region: ${selectedRegion}`);
+    }
     
     showToast(`👑 Crown Spread: ${cardNames}`, 'success');
     
@@ -1521,8 +1657,9 @@ export async function quickCrownSpread(regionName = null) {
         cards,
         mainCards,
         wildcard,
-        result,
-        cardNames
+        result: { ...result, synthesis: synthesisWithAce },
+        cardNames,
+        aceEffect
     };
 }
 

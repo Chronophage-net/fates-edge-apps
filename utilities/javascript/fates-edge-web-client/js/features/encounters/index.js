@@ -6,6 +6,7 @@
 import { getState, addEncounter, deleteEncounter, updateEncounter } from '../../core/state.js';
 import { escHtml } from '../../core/utils.js';
 import { showToast } from '../../components/Toast.js';
+import { logToSession, addVTTEvent } from '../dashboard/scene-tools.js';
 
 let container = null;
 
@@ -282,6 +283,17 @@ function createEncounterFromAdversary(name, body) {
     };
     state.encounters.push(newEntry);
     saveState();
+    
+    // Log encounter creation
+    try {
+        logToSession(`⚔️ Encounter created: ${newEntry.title}`, 'warning');
+        addVTTEvent('encounter_created', { 
+            name: newEntry.title, 
+            id: newEntry.id,
+            status: newEntry.status 
+        });
+    } catch (e) { /* ignore */ }
+    
     renderEncounters();
     showToast(`🃏 Created encounter from "${name}"`, 'success');
 }
@@ -292,6 +304,13 @@ function createEncounterFromAdversary(name, body) {
 function deleteEncounterHandler(id) {
     if (!confirm('Delete encounter?')) return;
     const state = getState();
+    const encounter = state.encounters.find(e => e.id === id);
+    if (encounter) {
+        try {
+            logToSession(`🗑️ Encounter deleted: ${encounter.title}`, 'info');
+            addVTTEvent('encounter_deleted', { name: encounter.title, id: encounter.id });
+        } catch (e) { /* ignore */ }
+    }
     state.encounters = (state.encounters || []).filter(e => e.id !== id);
     saveState();
     renderEncounters();

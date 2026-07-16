@@ -11,6 +11,7 @@
  * - Voice chat support
  * - State sync
  * - Room management
+ * - Media recording broadcasts
  */
 
 import { getState, importData, saveState, updateState } from './state.js';
@@ -88,7 +89,10 @@ const eventHandlers = {
     'voice-offer': [],
     'voice-answer': [],
     'voice-ice-candidate': [],
-    'voice-status': []
+    'voice-status': [],
+
+    // Media events (Added for media.js compatibility)
+    'media_recording': []
 };
 
 // ============================================================
@@ -383,6 +387,11 @@ function handleWebSocketMessage(data) {
             
         case 'event':
             triggerEvent('event', data);
+            break;
+
+        // Added to route media events to media.js via the sync wrapper
+        case 'media_recording':
+            triggerEvent('media_recording', data);
             break;
             
         case 'error':
@@ -760,6 +769,11 @@ function setupSocketIOListeners() {
     socket.on('voice-status', (data) => {
         triggerEvent('voice-status', data);
     });
+
+    // Media events (Added for media.js compatibility)
+    socket.on('media_recording', (data) => {
+        triggerEvent('media_recording', data);
+    });
     
     // Other events
     socket.on('event', (data) => {
@@ -1020,6 +1034,27 @@ export function sendEvent(eventData) {
         return sendWSMessage({ 
             type: 'event', 
             ...eventData, 
+            socketId, 
+            room: roomCode 
+        });
+    }
+}
+
+/**
+ * Send media broadcast (shared)
+ * Added to provide a unified API for media.js to broadcast through sync/index.js
+ */
+export function sendMediaBroadcast(data) {
+    if (connectionMode === 'socketio') {
+        if (!socket || !socket.connected || !roomCode) {
+            return false;
+        }
+        socket.emit('media_recording', { ...data, room: roomCode });
+        return true;
+    } else {
+        return sendWSMessage({ 
+            type: 'media_recording', 
+            ...data, 
             socketId, 
             room: roomCode 
         });
@@ -1385,6 +1420,7 @@ export default {
     sendRoll,
     sendEvent,
     getConnectedClients,
+    sendMediaBroadcast, // Added for media.js compatibility
     
     // Deck operations (now return Promises)
     drawCards,
