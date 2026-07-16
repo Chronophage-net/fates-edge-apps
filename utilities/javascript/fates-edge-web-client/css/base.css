@@ -2408,3 +2408,14 @@ select {
     background: var(--bg4);
     color: var(--text2);
 }
+.tag {
+  background: #ffd700;
+  color: #1a1a2e;
+  padding: 0.1rem 0.4rem;
+  border-radius: 4px;
+  font-weight: 600;
+  font-size: 0.9em;
+  box-decoration-break: clone; /* for multiline tags */
+  -webkit-box-decoration-break: clone;
+  white-space: nowrap; /* optional: prevents tags from breaking across lines */
+}

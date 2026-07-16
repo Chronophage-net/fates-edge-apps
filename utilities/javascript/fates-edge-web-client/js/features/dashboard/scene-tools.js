@@ -8,9 +8,9 @@
  * - Encounter & Timer Integration
  * - Deck of Consequences / Crown Spread Integration
  * - Campaign Dashboard with active threats and opportunities
+ * - Travel Planner (Cartomancy-based journey generation)  <-- NEW
  */
 
-import { render as renderTravelPlanner } from '../travel-planner/index.js';
 import { getState, addArchive, clearRollHistory, clearChatHistory, saveState } from '../../core/state.js';
 import { clamp, escHtml } from '../../core/utils.js';
 import { showToast } from '../../components/Toast.js';
@@ -29,7 +29,7 @@ import {
 
 let container = null;
 let activeTab = 'scene';
-let moduleCache = {};  // ✅ Single declaration
+let moduleCache = {};          // caches kanban, whiteboard, travel
 let whiteboardData = {
     notes: [],
     drawings: [],
@@ -84,7 +84,7 @@ export function render(el) {
         <div class="scene-tools-modern-layout">
             <header class="scene-tools-header">
                 <h1 class="scene-tools-title">🎯 Scene Tools</h1>
-                <p class="scene-tools-subtitle">Manage scenes, campaign tracking, whiteboard, and Kanban board.</p>
+                <p class="scene-tools-subtitle">Manage scenes, campaign tracking, whiteboard, Kanban board, and journey planning.</p>
             </header>
 
             <div class="scene-tools-tabs">
@@ -93,6 +93,7 @@ export function render(el) {
                 <button class="scene-tab" data-view="whiteboard">✏️ Whiteboard</button>
                 <button class="scene-tab" data-view="campaign">🏛️ Campaign</button>
                 <button class="scene-tab" data-view="consequences">🃏 Consequences</button>
+                <button class="scene-tab" data-view="travel">🗺️ Travel</button>   <!-- NEW -->
             </div>
 
             <div id="scene-view-container" class="scene-view-container">
@@ -112,6 +113,7 @@ function renderView(view) {
         case 'whiteboard': return renderWhiteboardView();
         case 'campaign': return renderCampaignView();
         case 'consequences': return renderConsequencesView();
+        case 'travel': return renderTravelView();    // NEW
         default: return renderSceneView();
     }
 }
@@ -165,6 +167,11 @@ function renderSceneView() {
                         <span class="qa-icon">👑</span>
                         <span class="qa-label">Crown Spread</span>
                         <span class="qa-desc">Campaign planning</span>
+                    </button>
+                    <button class="quick-action-btn" onclick="window.openTravelPlanner()">   <!-- NEW -->
+                        <span class="qa-icon">🗺️</span>
+                        <span class="qa-label">Travel Planner</span>
+                        <span class="qa-desc">Plan journeys with Cartomancy</span>
                     </button>
                 </div>
             </div>
@@ -442,6 +449,27 @@ function renderConsequencesView() {
 }
 
 // ============================================================
+// TRAVEL VIEW (NEW)
+// ============================================================
+
+function renderTravelView() {
+    return `
+        <div class="travel-loader">
+            <div class="panel">
+                <h3 class="panel-title">🗺️ Loading Travel Planner...</h3>
+                <div class="text-muted" style="text-align:center;padding:2rem;">
+                    <div style="font-size:2rem;margin-bottom:0.5rem;">⏳</div>
+                    <p>Loading travel planner...</p>
+                </div>
+                <div style="text-align:center;margin-top:0.5rem;">
+                    <button class="btn btn-sm btn-primary" onclick="window.loadTravelPlanner()">🔄 Load</button>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+// ============================================================
 // MODULE LOADERS
 // ============================================================
 
@@ -484,6 +512,48 @@ async function loadWhiteboardModule(containerEl) {
                 <p class="text-muted">Campaign whiteboard with drawing and notes.</p>
                 <p class="text-muted" style="color:var(--red);">Error loading Whiteboard: ${e.message}</p>
                 <button class="btn btn-sm btn-primary mt-1" onclick="window.loadWhiteboard()">🔄 Retry</button>
+            </div>
+        `;
+    }
+}
+
+// ============================================================
+// TRAVEL PLANNER LOADER (NEW)
+// ============================================================
+
+async function loadTravelPlannerModule(containerEl) {
+    try {
+        if (moduleCache.travel) {
+            // Re-render if already loaded
+            if (moduleCache.travel.render) {
+                moduleCache.travel.render(containerEl);
+            }
+            return;
+        }
+        
+        const module = await import('../travel-planner/index.js');
+        moduleCache.travel = module;
+        
+        if (module.render) {
+            module.render(containerEl);
+        } else if (module.default?.render) {
+            module.default.render(containerEl);
+        } else {
+            containerEl.innerHTML = `
+                <div class="panel">
+                    <h3 class="panel-title">🗺️ Travel Planner</h3>
+                    <p class="text-muted" style="color:var(--red);">Travel planner module loaded but render function not found.</p>
+                </div>
+            `;
+        }
+    } catch (e) {
+        console.error('Failed to load Travel Planner module:', e);
+        containerEl.innerHTML = `
+            <div class="panel">
+                <h3 class="panel-title">🗺️ Travel Planner</h3>
+                <p class="text-muted">Plan journeys using the Cartomancy system.</p>
+                <p class="text-muted" style="color:var(--red);">Error loading Travel Planner: ${e.message}</p>
+                <button class="btn btn-sm btn-primary mt-1" onclick="window.loadTravelPlanner()">🔄 Retry</button>
             </div>
         `;
     }
@@ -535,6 +605,18 @@ window.openKanban = function() {
 window.openWhiteboard = function() {
     const tab = document.querySelector('.scene-tab[data-view="whiteboard"]');
     if (tab) tab.click();
+};
+
+window.openTravelPlanner = function() {          // NEW
+    const tab = document.querySelector('.scene-tab[data-view="travel"]');
+    if (tab) tab.click();
+};
+
+window.loadTravelPlanner = function() {          // NEW
+    const containerEl = document.getElementById('scene-view-container');
+    if (containerEl) {
+        loadTravelPlannerModule(containerEl);
+    }
 };
 
 window.openCombatTracker = function() {
@@ -957,6 +1039,8 @@ function refreshView() {
         loadKanbanModule(containerEl);
     } else if (activeTab === 'whiteboard') {
         loadWhiteboardModule(containerEl);
+    } else if (activeTab === 'travel') {          // NEW
+        loadTravelPlannerModule(containerEl);
     } else {
         containerEl.innerHTML = renderView(activeTab);
         attachEvents();
@@ -987,6 +1071,8 @@ export function attachEvents() {
                 await loadKanbanModule(containerEl);
             } else if (view === 'whiteboard') {
                 await loadWhiteboardModule(containerEl);
+            } else if (view === 'travel') {          // NEW
+                await loadTravelPlannerModule(containerEl);
             } else {
                 containerEl.innerHTML = renderView(view);
                 attachEvents();

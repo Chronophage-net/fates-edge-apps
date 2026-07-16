@@ -3,6 +3,7 @@
  * v3.0 - Modular Architecture
  */
 
+import './core/highlight-tags.js'; // This auto-runs initTagHighlighting()
 import { loadState, onSave, getState, getBaseUrl, mergeState } from './core/state.js';
 import { checkPasswordGate, isToolkitUnlocked, onUnlock as onPasswordUnlock, unlockToolkit } from './core/password.js';
 import { initRouter, registerRoute, navigate } from './router.js';

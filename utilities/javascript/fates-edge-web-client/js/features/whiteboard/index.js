@@ -1165,6 +1165,71 @@ export function destroy() {
 }
 
 // ============================================================
+// WHITEBOARD ACTIONS (missing implementations)
+// ============================================================
+
+export function uploadWhiteboardImage() {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*';
+    input.onchange = (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+            const dataUrl = ev.target.result;
+            // Position image in the centre of the canvas
+            const containerEl = document.getElementById('whiteboard-canvas-container');
+            const rect = containerEl.getBoundingClientRect();
+            const x = (rect.width - 200) / 2;
+            const y = (rect.height - 200) / 2;
+            state.images.push({
+                id: 'img-' + Date.now(),
+                x: Math.max(0, x),
+                y: Math.max(0, y),
+                data: dataUrl
+            });
+            saveWhiteboardData();
+            renderOverlay();
+            showToast('🖼️ Image uploaded', 'success');
+        };
+        reader.readAsDataURL(file);
+    };
+    input.click();
+}
+
+// Also implement other missing functions referenced in the code:
+export function clearWhiteboardAll() {
+    if (!confirm('Delete everything (drawings, notes, images)?')) return;
+    state.drawings = [];
+    state.notes = [];
+    state.images = [];
+    state.gridCombat.tokens = [];
+    saveWhiteboardData();
+    restoreDrawings();
+    renderOverlay();
+    updateStats();
+    showToast('🗑️ Whiteboard cleared', 'info');
+}
+
+export function exportWhiteboard() {
+    if (!canvas) return;
+    const link = document.createElement('a');
+    link.download = 'whiteboard-' + Date.now() + '.png';
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+    showToast('💾 Whiteboard exported', 'success');
+}
+
+export function clearWhiteboardDrawings() {
+    if (!confirm('Clear all drawings only (notes & images stay)?')) return;
+    state.drawings = [];
+    saveWhiteboardData();
+    restoreDrawings();
+    updateStats();
+    showToast('🧹 Drawings cleared', 'info');
+}
+// ============================================================
 // EXPORTS
 // ============================================================
 

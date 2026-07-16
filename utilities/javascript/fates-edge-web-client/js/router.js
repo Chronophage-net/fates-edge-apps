@@ -12,6 +12,7 @@ let isInitialized = false;
 // Route redirects for backward compatibility
 const ROUTE_REDIRECTS = {
     'consequences': 'decks',
+    'builder': 'characters',   // <-- add this
     'regional': 'decks'
 };
 
