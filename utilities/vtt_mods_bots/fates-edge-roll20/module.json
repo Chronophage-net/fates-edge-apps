@@ -1,8 +1,36 @@
 {
   "name": "fates-edge-roll20",
-  "title": "Fate's Edge Roll20 Module",
-  "description": "Fate's Edge VTT integration for Roll20",
-  "version": "4.1.0",
+  "title": "Fate's Edge Bridge for Roll20",
+  "description": "Connects Roll20 to the Fate's Edge VTT server with chat, dice, deck, and GM management.",
+  "version": "1.3.0",
   "author": "Fate's Edge Team",
-  "scripts": ["api/fates-edge-api.js"]
+  "scripts": ["api/fates-edge-api.js"],
+  "css": [],
+  "dependencies": [],
+  "minimumCoreVersion": "1.0.0",
+  "compatibleCoreVersion": "1.0.0",
+  "url": "https://github.com/fates-edge/fates-edge",
+  "manifest": "https://github.com/fates-edge/fates-edge/releases/latest/download/module.json",
+  "download": "https://github.com/fates-edge/fates-edge/releases/latest/download/fates-edge-roll20.zip",
+  "readme": "https://github.com/fates-edge/fates-edge/blob/main/utilities/vtt_mods_bots/fates-edge-roll20/README.md",
+  "changelog": "https://github.com/fates-edge/fates-edge/blob/main/CHANGELOG.md",
+  "bugs": "https://github.com/fates-edge/fates-edge/issues",
+  "allowBugReporter": true,
+  "media": [
+    {
+      "type": "icon",
+      "url": "https://fates-edge.com/images/fates-edge-icon.png"
+    }
+  ],
+  "features": [
+    "chat-sync",
+    "dice-sync",
+    "deck-sync",
+    "crown-spread",
+    "module-management",
+    "region-support",
+    "gm-management",
+    "gm-election",
+    "gm-promotion"
+  ]
 }

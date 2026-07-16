@@ -1,13 +1,12 @@
-```markdown
 # Fate's Edge Socket Server & CLI Management Tool
 
-[![Version](https://img.shields.io/badge/version-1.2.0-blue.svg)](https://github.com/fates-edge/fates-edge)
+[![Version](https://img.shields.io/badge/version-1.3.0-blue.svg)](https://github.com/fates-edge/fates-edge)
 [![Node.js](https://img.shields.io/badge/node-%3E%3D18-brightgreen.svg)](https://nodejs.org)
 [![Python](https://img.shields.io/badge/python-%3E%3D3.8-blue.svg)](https://python.org)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Docker](https://img.shields.io/badge/docker-ready-blue.svg)](https://docker.com)
 
-The **Fate's Edge Socket Server** is the real-time backbone of the Fate's Edge VTT ecosystem. It provides WebSocket and HTTP API services for multiplayer gaming, real-time collaboration, and campaign management.
+The **Fate's Edge Socket Server** is the real-time backbone of the Fate's Edge VTT ecosystem. It provides WebSocket and HTTP API services for multiplayer gaming, real-time collaboration, and campaign management, including **Game Master election and promotion** features.
 
 ## 📋 Table of Contents
 
@@ -55,6 +54,14 @@ The **Fate's Edge Socket Server** is the real-time backbone of the Fate's Edge V
 - **Module Pushing** - Push modules to connected clients
 - **Module Cleanup** - Remove modules from clients
 - **Module Listing** - List available modules
+
+### Game Master Management 🆕
+- **GM Election** – Any player can request to become GM.
+- **GM Promotion** – Current GM can approve a pending request, transferring the role.
+- **Role Conflict Resolution** – Only one GM per room; requests are automatically denied if a GM exists.
+- **Vote Requests** – When a player requests GM while one is present, the current GM receives a vote request.
+- **Presence Updates** – Clients are notified of all connected users and their roles.
+- **Role Broadcasts** – All clients see real‑time role changes and server announcements.
 
 ### CLI Management Tool
 - **Interactive Shell** - Full-featured CLI with tab completion
@@ -453,6 +460,9 @@ curl -X POST http://localhost:3000/api/modules/example-module/push \
 | `module-push` | `{moduleId}` | Request module push |
 | `module-cleanup` | `{moduleId}` | Request module cleanup |
 | `set-region` | `{region}` | Set default region |
+| **GM Events** | | |
+| `request_gm` | `{}` | Request to become Game Master |
+| `approve_gm` | `{targetId}` | Approve a GM request (current GM only) |
 
 ### Server → Client
 
@@ -471,6 +481,11 @@ curl -X POST http://localhost:3000/api/modules/example-module/push \
 | `module-push` | `{module}` | Module pushed |
 | `module-cleanup` | `{moduleId}` | Module cleanup |
 | `region-updated` | `{region}` | Region updated |
+| **GM Events** | | |
+| `presence` | `{clients: [...]}` | Full client list with roles (sent on join and on changes) |
+| `gm_vote_request` | `{requesterId, requesterName, currentGmId, currentGmName}` | Sent to current GM when a player requests GM |
+| `gm_role_update` | `{clientId, role}` | Sent to the affected client when their role changes |
+| `server_announcement` | `{message}` | Public announcement (e.g., "X is now GM") |
 
 ## 🐳 Docker
 
@@ -481,7 +496,7 @@ curl -X POST http://localhost:3000/api/modules/example-module/push \
 docker build -t fates-edge-server .
 
 # Build with custom tag
-docker build -t fates-edge-server:1.2.0 .
+docker build -t fates-edge-server:1.3.0 .
 ```
 
 ### Run Container
@@ -600,6 +615,13 @@ sudo ufw allow 3000
 # Check for proxy issues
 # Make sure websocket connections are allowed through proxies
 ```
+
+#### GM Role Conflicts
+
+If a GM request fails, ensure:
+- The requesting client sends `request_gm` only when no GM exists (or after a vote).
+- The current GM uses `approve_gm` with the correct target ID.
+- All clients are connected and receiving presence updates.
 
 ### Logs
 

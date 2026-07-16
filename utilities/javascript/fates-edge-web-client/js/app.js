@@ -1,52 +1,23 @@
 /**
- * Fate's Edge Toolkit - Main Application Entry Point
- * v3.0 - Modular Architecture
+ * Fate's Edge Toolkit – Main Application Entry Point
+ * v3.1 – Unified router integration, cleaned up.
  */
 
 import { initMediaModule } from './core/media.js';
-import './core/highlight-tags.js'; // This auto-runs initTagHighlighting()
-import { loadState, onSave, getState, getBaseUrl, mergeState, resolveConflict } from './core/state.js';
-import { checkPasswordGate, isToolkitUnlocked, onUnlock as onPasswordUnlock, unlockToolkit } from './core/password.js';
-import { initRouter, registerRoute, navigate } from './router.js';
+import './core/highlight-tags.js';
+import { loadState, onSave, getState, mergeState, resolveConflict } from './core/state.js';
+import { checkPasswordGate, isToolkitUnlocked, unlockToolkit } from './core/password.js';
+import { initRouter, navigate, ROUTE_REDIRECTS, preloadModule } from './router.js';
 import { showToast } from './components/Toast.js';
 import { syncManager } from './core/sync/index.js';
 import { getUserAvatar } from './core/gravatar.js';
-import { moduleLoader } from './module-loader.js';
-import { getStorage, setStorage, removeStorage } from './core/utils.js';
+import { getStorage, setStorage } from './core/utils.js';
 
 // ============================================================
-// FEATURE MODULES (dynamic imports for lazy loading)
+// TEST MODE HANDLING
 // ============================================================
-
-const FEATURES = {
-    home: () => import('./features/home/index.js'),
-    dashboard: () => import('./features/dashboard/index.js'),
-    characters: () => import('./features/characters/index.js'),
-    dice: () => import('./features/dice/index.js'),
-    timers: () => import('./features/timers/index.js'),
-    encounters: () => import('./features/encounters/index.js'),
-    factions: () => import('./features/factions/index.js'),
-    vtt: () => import('./features/vtt/index.js'),
-    'gm-tools': () => import("./features/gm-tools/index.js"),
-    'scene-tools': () => import('./features/gm-tools/index.js'), // alias for backward compatibility
-    docs: () => import('./features/docs/index.js'),
-    search: () => import('./features/search/index.js'),
-    wiki: () => import('./features/wiki/index.js'),
-    decks: () => import('./features/decks/index.js'),
-    patrons: () => import('./features/patrons/index.js'),
-    settings: () => import('./features/settings/index.js')
-};
-
-const ROUTE_REDIRECTS = {
-    'consequences': 'decks',
-    'regional': 'decks',
-    'roller': 'dice',
-    'builder': 'characters'
-    // scene-tools redirect is handled by the router itself
-};
 
 const isTestMode = window.location.search.includes('test=true') || window.location.pathname.includes('/tests/');
-
 if (isTestMode) {
     console.log('🧪 Running in test mode');
     import('./tests/runner.js')
@@ -57,21 +28,17 @@ if (isTestMode) {
             import('./tests/unit/presence.test.js');
             import('./tests/integration/sync-integration.test.js');
             import('./tests/integration/websocket-integration.test.js');
-            
-            if (module.initTestRunner) {
-                module.initTestRunner();
-                setTimeout(() => {
-                    if (module.runTests) {
-                        module.runTests();
-                    }
-                }, 500);
-            }
+            if (module.initTestRunner) module.initTestRunner();
+            setTimeout(() => { if (module.runTests) module.runTests(); }, 500);
         })
-        .catch(err => {
-            console.error('Failed to load test runner:', err);
-        });
-    throw new Error('Test mode active - stopping app initialization');
+        .catch(err => console.error('Test runner load failed:', err));
+    // Stop normal execution in test mode
+    throw new Error('Test mode active – stopping app initialization');
 }
+
+// ============================================================
+// INITIALISATION
+// ============================================================
 
 let routerInitialized = false;
 
@@ -80,24 +47,85 @@ function initializeRouter() {
     routerInitialized = true;
     console.log('🔀 Initializing router...');
     initRouter();
-    
-    const hash = window.location.hash.slice(1);
-    const urlParams = new URLSearchParams(window.location.search);
-    let tab = urlParams.get('tab') || hash || 'home';
-    
-    if (ROUTE_REDIRECTS[tab]) {
-        const newTab = ROUTE_REDIRECTS[tab];
-        console.log(`↪️ Redirecting "${tab}" → "${newTab}"`);
-        tab = newTab;
-        if (window.location.hash) {
-            window.location.hash = newTab;
-        }
-    }
-    
-    setTimeout(() => {
-        navigate(tab);
-    }, 100);
+    // The router handles hash and initial navigation internally
 }
+
+function onUnlockSuccess() {
+    console.log('🔓 Toolkit unlocked');
+    showToast('Welcome back!', 'success');
+    initializeRouter();
+}
+
+async function init() {
+    console.log('Fate\'s Edge Toolkit v3.1 — Loading...');
+
+    try {
+        // 1. Load state
+        loadState();
+        const state = getState();
+
+        // 2. Init media (requires user ID)
+        const userId = state.sessionId || 'app-' + Date.now().toString(36);
+        initMediaModule(userId);
+
+        // 3. Setup save indicator
+        const saveStatus = document.getElementById('save-status');
+        if (saveStatus) {
+            onSave((status) => {
+                saveStatus.className = 'saved-indicator';
+                if (status === 'saving') {
+                    saveStatus.textContent = '○ Saving…';
+                    saveStatus.classList.add('saving');
+                } else if (status === 'saved') {
+                    saveStatus.textContent = '● Saved';
+                    saveStatus.classList.add('saved');
+                } else {
+                    saveStatus.textContent = '⚠ Error';
+                    saveStatus.classList.add('error');
+                }
+            });
+        }
+
+        // 4. Setup UI components
+        setupImportExport();
+        setupTheme();
+        setupModals();
+        setupSyncUI();
+        setupSettingsTabHook();
+        setupNavigation();
+        setupConflictModalListener();
+
+        // 5. Password gate
+        const hasPassword = !!state.passwordHash;
+        if (hasPassword) {
+            console.log('🔐 Password required');
+            if (isToolkitUnlocked()) {
+                console.log('🔓 Already unlocked from session');
+                onUnlockSuccess();
+            } else {
+                showPasswordOverlay(state);
+            }
+        } else {
+            console.log('🔓 No password required');
+            initializeRouter();
+        }
+
+        // 6. Preload common modules in background
+        preloadCommonModules();
+
+        // 7. Sync event listeners
+        setupSyncEventListeners();
+
+        console.log('✅ Fate\'s Edge Toolkit v3.1 — Ready');
+    } catch (error) {
+        console.error('❌ Failed to initialize app:', error);
+        showToast('Failed to initialize application. Please refresh.', 'error');
+    }
+}
+
+// ============================================================
+// PASSWORD OVERLAY
+// ============================================================
 
 function showPasswordOverlay(state) {
     let overlay = document.getElementById('passwordOverlay');
@@ -109,24 +137,24 @@ function showPasswordOverlay(state) {
         }
         return;
     }
-    
+
     overlay = document.createElement('div');
     overlay.id = 'passwordOverlay';
     overlay.className = 'password-overlay open';
-    
+
     overlay.innerHTML = `
         <div class="gate-box">
             <span class="gate-icon">🔐</span>
             <h2 class="gate-title">Password Required</h2>
             <p class="gate-sub">This toolkit is password protected. Enter the password to continue.</p>
-            
+
             <div id="passwordError" class="gate-error"></div>
-            
+
             <form id="passwordForm" style="display:contents;">
-                <input 
-                    type="password" 
-                    id="passwordInput" 
-                    class="gate-input" 
+                <input
+                    type="password"
+                    id="passwordInput"
+                    class="gate-input"
                     placeholder="Enter password..."
                     autofocus
                     autocomplete="current-password"
@@ -135,24 +163,24 @@ function showPasswordOverlay(state) {
                     🔓 Unlock
                 </button>
             </form>
-            
+
             <div class="gate-foot">🔑 Required to access the toolkit</div>
         </div>
     `;
-    
+
     document.body.appendChild(overlay);
-    
+
     const input = document.getElementById('passwordInput');
     if (input) {
         setTimeout(() => input.focus(), 200);
     }
-    
+
     const form = document.getElementById('passwordForm');
     form?.addEventListener('submit', async (e) => {
         e.preventDefault();
         await handlePasswordSubmit(state);
     });
-    
+
     input?.addEventListener('keydown', async (e) => {
         if (e.key === 'Enter') {
             e.preventDefault();
@@ -165,26 +193,26 @@ async function handlePasswordSubmit(state) {
     const input = document.getElementById('passwordInput');
     const errorEl = document.getElementById('passwordError');
     const submitBtn = document.getElementById('passwordSubmitBtn');
-    
+
     if (!input || !errorEl) return;
-    
+
     const password = input.value.trim();
-    
+
     if (!password) {
         errorEl.textContent = '⚠️ Please enter a password.';
         input.classList.add('error');
         setTimeout(() => input.classList.remove('error'), 1000);
         return;
     }
-    
+
     if (submitBtn) {
         submitBtn.disabled = true;
         submitBtn.textContent = '⏳ Checking...';
     }
-    
+
     try {
         const result = await checkPasswordGate(state, password);
-        
+
         if (result.unlocked) {
             unlockToolkit();
             const overlay = document.getElementById('passwordOverlay');
@@ -216,191 +244,22 @@ async function handlePasswordSubmit(state) {
     }
 }
 
-function onUnlockSuccess() {
-    console.log('🔓 Toolkit unlocked');
-    showToast('Welcome back!', 'success');
-    initializeRouter();
-}
-
-async function init() {
-    console.log('Fate\'s Edge Toolkit v3.0 — Loading...');
-    
-    try {
-        loadState();
-        try {
-            const state = getState();
-            const userId = state.sessionId || 'app-' + Date.now().toString(36);
-            initMediaModule(userId);
-        } catch (e) {
-            console.warn('Failed to initialize media module:', e);
-        }
-        console.log('📋 Registering routes...');
-        Object.entries(FEATURES).forEach(([tab, module]) => {
-            registerRoute(tab, module);
-        });
-        console.log('✅ Routes registered:', Object.keys(FEATURES));
-        
-        const saveStatus = document.getElementById('save-status');
-        if (saveStatus) {
-            onSave((status) => {
-                saveStatus.className = 'saved-indicator';
-                if (status === 'saving') {
-                    saveStatus.textContent = '○ Saving…';
-                    saveStatus.classList.add('saving');
-                } else if (status === 'saved') {
-                    saveStatus.textContent = '● Saved';
-                    saveStatus.classList.add('saved');
-                } else {
-                    saveStatus.textContent = '⚠ Error';
-                    saveStatus.classList.add('error');
-                }
-            });
-        }
-        
-        setupImportExport();
-        setupTheme();
-        setupModals();
-        setupSyncUI();
-        setupSettingsTabHook();
-        setupNavigation();
-        setupConflictModalListener();
-
-        const state = getState();
-        const hasPassword = !!state.passwordHash;
-        
-        if (hasPassword) {
-            console.log('🔐 Password required');
-            const isUnlocked = isToolkitUnlocked();
-            
-            if (isUnlocked) {
-                console.log('🔓 Already unlocked from session');
-                onUnlockSuccess();
-            } else {
-                showPasswordOverlay(state);
-            }
-        } else {
-            console.log('🔓 No password required');
-            initializeRouter();
-        }
-        
-        import('./features/decks/index.js')
-            .then(module => {
-                if (module.loadManifest) module.loadManifest().catch(() => {});
-            })
-            .catch(err => console.warn('Failed to preload decks module:', err));
-        
-        import('./features/patrons/index.js')
-            .then(module => {
-                if (module.loadPatronData) module.loadPatronData();
-            })
-            .catch(err => console.warn('Failed to preload patrons module:', err));
-        
-        import('./features/factions/index.js')
-            .then(module => {
-                if (module.loadFactionData) module.loadFactionData();
-            })
-            .catch(err => console.warn('Failed to preload factions module:', err));
-        
-        import('./features/wiki/index.js')
-            .then(module => {
-                if (module.loadRemoteWiki) module.loadRemoteWiki().catch(() => {});
-            })
-            .catch(err => console.warn('Failed to load wiki module:', err));
-        
-        setupSyncEventListeners();
-        
-        console.log('Fate\'s Edge Toolkit v3.0 — Ready');
-    } catch (error) {
-        console.error('Failed to initialize app:', error);
-        showToast('Failed to initialize application. Please refresh.', 'error');
-    }
-}
-
 // ============================================================
-// CONFLICT MODAL LISTENER
+// UI SETUP FUNCTIONS
 // ============================================================
-function setupConflictModalListener() {
-    document.addEventListener('syncConflict', (e) => {
-        showConflictModal(e.detail.conflicts);
-    });
-}
-
-function showConflictModal(conflicts) {
-    if (!conflicts || conflicts.length === 0) return;
-    
-    let modal = document.getElementById('conflictModal');
-    if (!modal) {
-        modal = document.createElement('div');
-        modal.id = 'conflictModal';
-        modal.className = 'modal-overlay';
-        document.body.appendChild(modal);
-    }
-    
-    modal.innerHTML = `
-        <div class="modal" style="max-width: 600px;">
-            <div class="modal-header">
-                <h3>⚠️ Sync Conflict Detected</h3>
-                <button class="modal-close">&times;</button>
-            </div>
-            <div class="modal-body">
-                ${conflicts.map(c => `
-                    <div class="panel" style="margin-bottom: 1rem;">
-                        <h4>${c.type === 'character' ? 'Character' : 'Entity'} "${c.local.name || c.id}" was edited simultaneously.</h4>
-                        <div style="display: flex; gap: 1rem;">
-                            <div style="flex: 1;">
-                                <strong>Your version:</strong>
-                                <pre style="white-space: pre-wrap; font-size: 0.85rem; background: var(--bg3); padding: 0.5rem;">${JSON.stringify(c.local, null, 2)}</pre>
-                            </div>
-                            <div style="flex: 1;">
-                                <strong>Remote version:</strong>
-                                <pre style="white-space: pre-wrap; font-size: 0.85rem; background: var(--bg3); padding: 0.5rem;">${JSON.stringify(c.remote, null, 2)}</pre>
-                            </div>
-                        </div>
-                    </div>
-                `).join('')}
-            </div>
-            <div class="modal-footer">
-                <button class="btn" id="conflict-keep-local">Keep Yours</button>
-                <button class="btn" id="conflict-use-remote">Use Remote</button>
-                <button class="btn btn-gold" id="conflict-merge">Merge Both</button>
-            </div>
-        </div>
-    `;
-    
-    modal.classList.add('open');
-    
-    modal.querySelector('.modal-close').addEventListener('click', () => modal.classList.remove('open'));
-    
-    conflicts.forEach(c => {
-        modal.querySelector('#conflict-keep-local').addEventListener('click', () => {
-            resolveConflict(c.id, 'local');
-            showToast('Kept local version.', 'info');
-            modal.classList.remove('open');
-        });
-        modal.querySelector('#conflict-use-remote').addEventListener('click', () => {
-            resolveConflict(c.id, 'remote');
-            showToast('Applied remote version.', 'info');
-            modal.classList.remove('open');
-        });
-        modal.querySelector('#conflict-merge').addEventListener('click', () => {
-            resolveConflict(c.id, 'merge');
-            showToast('Merged both versions.', 'success');
-            modal.classList.remove('open');
-        });
-    });
-}
 
 function setupNavigation() {
-    const navButtons = document.querySelectorAll('.sidebar-nav .nav-item[data-tab]');
-    navButtons.forEach(button => {
-        button.addEventListener('click', () => {
-            const tab = button.dataset.tab;
+    // Sidebar clicks are already handled by router.js.
+    // This is kept for any extra redirection logic if needed.
+    document.querySelectorAll('.sidebar-nav .nav-item[data-tab]').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const tab = btn.dataset.tab;
             if (tab) {
                 const targetTab = ROUTE_REDIRECTS[tab] || tab;
                 if (targetTab !== tab) {
-                    button.dataset.tab = targetTab;
+                    btn.dataset.tab = targetTab; // update for next time
                 }
-                navigate(targetTab);
+                navigate(targetTab); // router will update hash
             }
         });
     });
@@ -410,7 +269,7 @@ function setupImportExport() {
     const exportBtn = document.getElementById('exportBtn');
     const importBtn = document.getElementById('importBtn');
     const importFile = document.getElementById('importFile');
-    
+
     if (exportBtn) {
         exportBtn.addEventListener('click', async () => {
             try {
@@ -422,7 +281,7 @@ function setupImportExport() {
             }
         });
     }
-    
+
     if (importBtn && importFile) {
         importBtn.addEventListener('click', () => importFile.click());
         importFile.addEventListener('change', async (event) => {
@@ -440,7 +299,7 @@ function setupImportExport() {
 function setupTheme() {
     const toggle = document.getElementById('theme-toggle');
     if (!toggle) return;
-    
+
     const theme = getStorage('fates-edge-theme');
     if (theme === 'light') {
         document.documentElement.classList.add('light');
@@ -455,7 +314,7 @@ function setupTheme() {
             toggle.textContent = '☀️';
         }
     }
-    
+
     toggle.addEventListener('click', () => {
         const isLight = document.documentElement.classList.contains('light');
         if (isLight) {
@@ -470,17 +329,48 @@ function setupTheme() {
     });
 }
 
+function setupModals() {
+    document.querySelectorAll('.modal .modal-close').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const overlay = btn.closest('.modal-overlay');
+            if (overlay) overlay.classList.remove('open');
+        });
+    });
+
+    document.querySelectorAll('.modal-overlay').forEach(overlay => {
+        overlay.addEventListener('click', (e) => {
+            if (e.target === overlay) {
+                overlay.classList.remove('open');
+            }
+        });
+    });
+
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+            document.querySelectorAll('.modal-overlay.open').forEach(m => {
+                if (!m.classList.contains('password-overlay')) {
+                    m.classList.remove('open');
+                }
+            });
+        }
+    });
+}
+
+// ============================================================
+// SYNC UI SETUP
+// ============================================================
+
 function setupSyncUI() {
     const settingsTab = document.getElementById('tab-settings');
     if (!settingsTab) return;
-    
+
     const observer = new MutationObserver(() => {
         if (settingsTab.classList.contains('active')) {
             renderSyncUI();
         }
     });
     observer.observe(settingsTab, { attributes: true, attributeFilter: ['class'] });
-    
+
     if (settingsTab.classList.contains('active')) {
         renderSyncUI();
     }
@@ -488,22 +378,22 @@ function setupSyncUI() {
 
 function renderSyncUI() {
     if (document.getElementById('sync-panel')) return;
-    
+
     const settingsContent = document.getElementById('tab-settings');
     if (!settingsContent) return;
-    
+
     const dataPanel = settingsContent.querySelector('.panel:first-child');
     if (!dataPanel) return;
-    
+
     const savedEmail = getStorage('fates-edge-user-email') || '';
-    
+
     const syncPanel = document.createElement('div');
     syncPanel.className = 'panel';
     syncPanel.id = 'sync-panel';
     syncPanel.innerHTML = `
         <h3>🌐 Live Campaign</h3>
         <p class="text-muted small">Connect to a campaign server for real-time collaboration with your group.</p>
-        
+
         <div class="form-row">
             <div class="field large">
                 <label>Server URL</label>
@@ -518,7 +408,7 @@ function renderSyncUI() {
                 <input type="password" id="sync-password" placeholder="Campaign password" />
             </div>
         </div>
-        
+
         <div class="form-row">
             <div class="field large">
                 <label>Your Email <span class="text-muted small">(for Gravatar avatar)</span></label>
@@ -528,17 +418,17 @@ function renderSyncUI() {
                 <button class="btn btn-sm" id="sync-update-avatar-btn">🔄 Update Avatar</button>
             </div>
         </div>
-        
+
         <div class="flex">
             <button class="btn btn-gold" id="sync-connect-btn">🔗 Connect</button>
             <button class="btn btn-danger" id="sync-disconnect-btn" style="display:none;">⛔ Disconnect</button>
             <button class="btn btn-sm" id="sync-refresh-btn">↻ Refresh</button>
         </div>
-        
+
         <div id="sync-status" class="mt-1" style="font-size:0.9rem;padding:0.3rem 0.6rem;border-radius:var(--radius);background:var(--bg3);">
             🔴 Disconnected
         </div>
-        
+
         <div class="mt-1">
             <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.5rem;">
                 <h4 style="margin:0;font-size:0.95rem;">👥 Online Players</h4>
@@ -552,12 +442,12 @@ function renderSyncUI() {
             </div>
         </div>
     `;
-    
+
     dataPanel.parentNode.insertBefore(syncPanel, dataPanel.nextSibling);
-    
+
     const savedUrl = getStorage('fates-edge-sync-url') || '';
     const savedCode = getStorage('fates-edge-sync-code') || '';
-    
+
     const urlInput = document.getElementById('sync-server-url');
     const codeInput = document.getElementById('sync-campaign-code');
     const passInput = document.getElementById('sync-password');
@@ -567,10 +457,10 @@ function renderSyncUI() {
     const refreshBtn = document.getElementById('sync-refresh-btn');
     const avatarBtn = document.getElementById('sync-update-avatar-btn');
     const showAvatarsCheck = document.getElementById('sync-show-avatars');
-    
+
     if (urlInput) urlInput.value = savedUrl;
     if (codeInput) codeInput.value = savedCode;
-    
+
     if (emailInput) {
         emailInput.addEventListener('change', () => {
             const email = emailInput.value.trim();
@@ -580,7 +470,7 @@ function renderSyncUI() {
             }
         });
     }
-    
+
     if (avatarBtn) {
         avatarBtn.addEventListener('click', () => {
             if (emailInput) {
@@ -593,7 +483,7 @@ function renderSyncUI() {
             }
         });
     }
-    
+
     if (showAvatarsCheck) {
         const savedShowAvatars = getStorage('fates-edge-show-avatars', 'true') !== 'false';
         showAvatarsCheck.checked = savedShowAvatars;
@@ -602,14 +492,14 @@ function renderSyncUI() {
             updatePresenceUI(syncManager.presence.getOnlineClients());
         });
     }
-    
+
     if (connectBtn) {
         connectBtn.addEventListener('click', async () => {
             const url = urlInput.value.trim();
             const code = codeInput.value.trim().toUpperCase();
             const password = passInput.value.trim();
             const email = emailInput ? emailInput.value.trim() : '';
-            
+
             if (!url) {
                 showToast('Please enter a server URL.', 'error');
                 return;
@@ -618,14 +508,14 @@ function renderSyncUI() {
                 showToast('Please enter a campaign code.', 'error');
                 return;
             }
-            
+
             setStorage('fates-edge-sync-url', url);
             setStorage('fates-edge-sync-code', code);
             if (email) setStorage('fates-edge-user-email', email);
-            
+
             connectBtn.disabled = true;
             connectBtn.textContent = 'Connecting…';
-            
+
             try {
                 await syncManager.connect(url, code, password, { email: email });
                 connectBtn.style.display = 'none';
@@ -641,7 +531,7 @@ function renderSyncUI() {
             }
         });
     }
-    
+
     if (disconnectBtn) {
         disconnectBtn.addEventListener('click', () => {
             syncManager.disconnect();
@@ -651,7 +541,7 @@ function renderSyncUI() {
             showToast('Disconnected.', 'info');
         });
     }
-    
+
     if (refreshBtn) {
         refreshBtn.addEventListener('click', () => {
             if (syncManager.isConnected) {
@@ -688,15 +578,15 @@ function setupSyncEventListeners() {
             }
         }
     });
-    
+
     syncManager.on('presence_update', (data) => {
         updatePresenceUI(data.clients);
     });
-    
+
     syncManager.on('sync_ready', (data) => {
         showToast('Sync ready! Connected to ' + (data.clients?.length || 0) + ' other users.', 'success');
     });
-    
+
     syncManager.on('sync_error', (error) => {
         showToast('Sync error: ' + error.message, 'error');
     });
@@ -705,7 +595,7 @@ function setupSyncEventListeners() {
 function updateSyncStatusUI(status) {
     const statusEl = document.getElementById('sync-status');
     if (!statusEl) return;
-    
+
     if (status.connected) {
         statusEl.innerHTML = `🟢 Connected to <strong>${status.campaignCode || 'campaign'}</strong>`;
         statusEl.style.color = 'var(--green)';
@@ -716,38 +606,17 @@ function updateSyncStatusUI(status) {
     }
 }
 
-function generateAvatarHTML(email, name, size = 32) {
-    const initial = (name || 'U')[0].toUpperCase();
-    const avatarUrl = getUserAvatar(email, name, size);
-    
-    const fallbackSvg = encodeURIComponent(`
-        <svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
-            <rect width="${size}" height="${size}" fill="#6C5CE7" rx="${size * 0.25}"/>
-            <text x="${size/2}" y="${size * 0.65}" text-anchor="middle" 
-                  font-family="Arial" font-weight="bold" font-size="${size * 0.45}" fill="white">${initial}</text>
-        </svg>
-    `);
-    const fallbackDataUrl = `data:image/svg+xml,${fallbackSvg}`;
-    
-    return `
-        <img src="${avatarUrl}" alt="${name || 'User'}" 
-             style="width:${size}px;height:${size}px;border-radius:50%;object-fit:cover;background:var(--bg3);border:2px solid var(--border);flex-shrink:0;" 
-             loading="lazy" 
-             onerror="this.src='${fallbackDataUrl.replace(/'/g, "\\'")}'" />
-    `;
-}
-
 function updatePresenceUI(clients) {
     const presenceEl = document.getElementById('presence-list');
     if (!presenceEl) return;
-    
+
     if (!clients || clients.length === 0) {
         presenceEl.innerHTML = '<span class="text-muted">No other users online</span>';
         return;
     }
-    
+
     const showAvatars = getStorage('fates-edge-show-avatars', 'true') !== 'false';
-    
+
     presenceEl.innerHTML = clients.map(client => {
         const isYou = client.id === syncManager.clientId;
         return `
@@ -763,33 +632,119 @@ function updatePresenceUI(clients) {
     }).join('');
 }
 
-function setupModals() {
-    document.querySelectorAll('.modal .modal-close').forEach(btn => {
-        btn.addEventListener('click', () => {
-            const overlay = btn.closest('.modal-overlay');
-            if (overlay) overlay.classList.remove('open');
-        });
-    });
-    
-    document.querySelectorAll('.modal-overlay').forEach(overlay => {
-        overlay.addEventListener('click', (e) => {
-            if (e.target === overlay) {
-                overlay.classList.remove('open');
-            }
-        });
-    });
-    
-    document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape') {
-            document.querySelectorAll('.modal-overlay.open').forEach(m => {
-                if (!m.classList.contains('password-overlay')) {
-                    m.classList.remove('open');
-                }
-            });
-        }
+function generateAvatarHTML(email, name, size = 32) {
+    const initial = (name || 'U')[0].toUpperCase();
+    const avatarUrl = getUserAvatar(email, name, size);
+
+    const fallbackSvg = encodeURIComponent(`
+        <svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
+            <rect width="${size}" height="${size}" fill="#6C5CE7" rx="${size * 0.25}"/>
+            <text x="${size/2}" y="${size * 0.65}" text-anchor="middle"
+                  font-family="Arial" font-weight="bold" font-size="${size * 0.45}" fill="white">${initial}</text>
+        </svg>
+    `);
+    const fallbackDataUrl = `data:image/svg+xml,${fallbackSvg}`;
+
+    return `
+        <img src="${avatarUrl}" alt="${name || 'User'}"
+             style="width:${size}px;height:${size}px;border-radius:50%;object-fit:cover;background:var(--bg3);border:2px solid var(--border);flex-shrink:0;"
+             loading="lazy"
+             onerror="this.src='${fallbackDataUrl.replace(/'/g, "\\'")}'" />
+    `;
+}
+
+// ============================================================
+// CONFLICT MODAL
+// ============================================================
+
+function setupConflictModalListener() {
+    document.addEventListener('syncConflict', (e) => {
+        showConflictModal(e.detail.conflicts);
     });
 }
 
+function showConflictModal(conflicts) {
+    if (!conflicts || conflicts.length === 0) return;
+
+    let modal = document.getElementById('conflictModal');
+    if (!modal) {
+        modal = document.createElement('div');
+        modal.id = 'conflictModal';
+        modal.className = 'modal-overlay';
+        document.body.appendChild(modal);
+    }
+
+    modal.innerHTML = `
+        <div class="modal" style="max-width: 600px;">
+            <div class="modal-header">
+                <h3>⚠️ Sync Conflict Detected</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                ${conflicts.map(c => `
+                    <div class="panel" style="margin-bottom: 1rem;">
+                        <h4>${c.type === 'character' ? 'Character' : 'Entity'} "${c.local.name || c.id}" was edited simultaneously.</h4>
+                        <div style="display: flex; gap: 1rem;">
+                            <div style="flex: 1;">
+                                <strong>Your version:</strong>
+                                <pre style="white-space: pre-wrap; font-size: 0.85rem; background: var(--bg3); padding: 0.5rem;">${JSON.stringify(c.local, null, 2)}</pre>
+                            </div>
+                            <div style="flex: 1;">
+                                <strong>Remote version:</strong>
+                                <pre style="white-space: pre-wrap; font-size: 0.85rem; background: var(--bg3); padding: 0.5rem;">${JSON.stringify(c.remote, null, 2)}</pre>
+                            </div>
+                        </div>
+                    </div>
+                `).join('')}
+            </div>
+            <div class="modal-footer">
+                <button class="btn" id="conflict-keep-local">Keep Yours</button>
+                <button class="btn" id="conflict-use-remote">Use Remote</button>
+                <button class="btn btn-gold" id="conflict-merge">Merge Both</button>
+            </div>
+        </div>
+    `;
+
+    modal.classList.add('open');
+
+    modal.querySelector('.modal-close').addEventListener('click', () => modal.classList.remove('open'));
+
+    conflicts.forEach(c => {
+        modal.querySelector('#conflict-keep-local').addEventListener('click', () => {
+            resolveConflict(c.id, 'local');
+            showToast('Kept local version.', 'info');
+            modal.classList.remove('open');
+        });
+        modal.querySelector('#conflict-use-remote').addEventListener('click', () => {
+            resolveConflict(c.id, 'remote');
+            showToast('Applied remote version.', 'info');
+            modal.classList.remove('open');
+        });
+        modal.querySelector('#conflict-merge').addEventListener('click', () => {
+            resolveConflict(c.id, 'merge');
+            showToast('Merged both versions.', 'success');
+            modal.classList.remove('open');
+        });
+    });
+}
+
+// ============================================================
+// BACKGROUND PRELOAD
+// ============================================================
+
+function preloadCommonModules() {
+    // Preload often-used modules to speed up navigation
+    const common = ['home', 'characters', 'dice'];
+    common.forEach(tab => {
+        preloadModule(tab).catch(() => {});
+    });
+}
+
+// ============================================================
+// START
+// ============================================================
+
 document.addEventListener('DOMContentLoaded', init);
 
-export { init, moduleLoader, ROUTE_REDIRECTS };
+// Export anything needed elsewhere
+export { init };

@@ -1,47 +1,32 @@
-// js/module-loader.js - Robust module loader
+// js/module-loader.js - Robust module loader (integrated with router)
 
-import { setHtml, createElement } from './core/utils.js';
+import { setHtml } from './core/utils.js';
 
 class ModuleLoader {
     constructor() {
-        this.modules = new Map();
-        this.loading = new Map();
+        this.modules = new Map();           // loaded modules
+        this.loading = new Map();           // in-progress loads
+        this.importFns = new Map();         // route name -> import function
         this.container = document.getElementById('app-content');
         this.currentModule = null;
-
-        this.modulePaths = {
-            // Core modules
-            'sync': './core/sync/index.js',
-            'presence': './core/presence/index.js',
-            
-            // Feature modules
-            'characters': './features/characters/index.js',
-            'dashboard': './features/dashboard/index.js',      // dashboard stays at dashboard
-            'decks': './features/decks/index.js',
-            'dice': './features/dice/index.js',
-            'docs': './features/docs/index.js',
-            'encounters': './features/encounters/index.js',
-            'factions': './features/factions/index.js',
-            'gm-tools': './features/gm-tools/index.js',        // gm-tools route (new)
-            'home': './features/home/index.js',
-            'kanban': './features/kanban/index.js',
-            'patrons': './features/patrons/index.js',
-            'scene-tools': './features/gm-tools/index.js',     // scene-tools → gm-tools (moved)
-            'search': './features/search/index.js',
-            'settings': './features/settings/index.js',
-            'timers': './features/timers/index.js',
-            'travel-planner': './features/travel-planner/index.js',
-            'vtt': './features/vtt/index.js',
-            'whiteboard': './features/whiteboard/index.js',
-            'wiki': './features/wiki/index.js',
-        };
     }
 
     /**
-     * Load a module by name
+     * Register a route with its import function
+     */
+    registerRoute(name, importFn) {
+        if (typeof importFn !== 'function') {
+            throw new Error(`Import function for route "${name}" must be a function`);
+        }
+        this.importFns.set(name, importFn);
+        console.log(`📌 ModuleLoader: registered route "${name}"`);
+    }
+
+    /**
+     * Load a module by name (returns the module object)
      */
     async loadModule(moduleName) {
-        // Check if already loaded
+        // Check cache
         if (this.modules.has(moduleName)) {
             console.log(`📦 Module "${moduleName}" already loaded`);
             return this.modules.get(moduleName);
@@ -71,95 +56,83 @@ class ModuleLoader {
     }
 
     /**
-     * Actually load the module
+     * Internal load: gets import function, calls it, and normalises the module
      */
     async _doLoadModule(moduleName) {
-        // Resolve alias if needed (scene-tools → gm-tools only)
-        // dashboard stays as dashboard
-        let resolvedName = moduleName;
-        const aliasMap = {
-            'scene-tools': 'gm-tools',
-            // 'dashboard' is NOT aliased - it stays as 'dashboard'
-        };
-        if (aliasMap[moduleName]) {
-            resolvedName = aliasMap[moduleName];
-            console.log(`↪️ ModuleLoader: Alias "${moduleName}" → "${resolvedName}"`);
+        const importFn = this.importFns.get(moduleName);
+        if (!importFn) {
+            throw new Error(`No import function registered for module "${moduleName}"`);
         }
 
-        const path = this.modulePaths[resolvedName];
-        if (!path) {
-            throw new Error(`Unknown module: ${resolvedName} (original: ${moduleName})`);
-        }
-
-        console.log(`🔍 Loading module "${resolvedName}" from "${path}"`);
+        console.log(`🔍 Loading module "${moduleName}" via dynamic import`);
 
         // Dynamic import
-        const module = await import(path);
-        
-        // Check if module has a render function
+        let module = await importFn();
+
+        // Normalise: if module has a default export that is an object with render, use that
+        if (module && typeof module.default === 'object' && module.default !== null) {
+            // If default has render, treat it as the main module
+            if (typeof module.default.render === 'function') {
+                module = module.default;
+            } else {
+                // Merge default with named exports (fallback)
+                module = { ...module.default, ...module };
+            }
+        }
+
+        // Ensure module has a render function
         if (typeof module.render !== 'function') {
-            console.warn(`⚠️ Module "${resolvedName}" has no render function`);
-            console.log('Available exports:', Object.keys(module));
-            
-            // Try to find an alternative entry point
+            console.warn(`⚠️ Module "${moduleName}" has no render function. Available exports:`, Object.keys(module));
+
+            // Try alternative entry points
             if (typeof module.init === 'function') {
-                console.log(`🔄 Using init() as fallback for "${resolvedName}"`);
+                console.log(`🔄 Using init() as fallback for "${moduleName}"`);
                 module.render = module.init;
             } else if (module.default && typeof module.default.render === 'function') {
-                console.log(`🔄 Using default.render() as fallback for "${resolvedName}"`);
                 module.render = module.default.render;
             } else if (typeof module.load === 'function') {
-                console.log(`🔄 Using load() as fallback for "${resolvedName}"`);
                 module.render = module.load;
-            } else if (typeof module.default === 'function') {
-                console.log(`🔄 Using default() as fallback for "${resolvedName}"`);
-                module.render = module.default;
+            } else if (typeof module === 'function') {
+                module.render = module;
             } else {
-                // Create a placeholder render function using utils
+                // Create a placeholder render
                 module.render = (el) => {
                     setHtml(el, `
-                        <h2>${moduleName}</h2>
-                        <p>Module loaded but no render function found.</p>
+                        <div class="panel">
+                            <h3>📄 ${moduleName}</h3>
+                            <p class="text-muted">Module loaded but no render function found.</p>
+                            <p class="text-muted small" style="font-size:0.8rem;color:var(--text3);">Please check exports.</p>
+                        </div>
                     `);
-                    console.log(`📦 Module "${moduleName}" loaded as placeholder`);
                 };
             }
         }
 
-        // Ensure module has refresh and lifecycle methods
+        // Add default lifecycle methods if missing
         module._moduleName = moduleName;
         module._lastRender = 0;
-        module._refreshInterval = 30000; // 30 seconds default
-        
-        // Add default refresh method if not provided
+        module._refreshInterval = 30000; // 30s
+
         if (typeof module.refresh !== 'function') {
             module.refresh = async function() {
                 console.log(`🔄 Refreshing module "${moduleName}"`);
-                if (this.onActivate) {
-                    await this.onActivate();
-                }
+                if (this.onActivate) await this.onActivate();
                 if (this.render && this._container) {
                     const container = this._container;
                     const scrollPos = container.scrollTop;
                     await this.render(container);
-                    if (scrollPos > 0) {
-                        container.scrollTop = scrollPos;
-                    }
+                    if (scrollPos > 0) container.scrollTop = scrollPos;
                 }
             };
         }
-        
-        // Add default onActivate if not provided
+
         if (typeof module.onActivate !== 'function') {
             module.onActivate = async function() {
                 console.log(`👋 Module "${moduleName}" activated`);
-                if (this.refresh && typeof this.refresh === 'function') {
-                    await this.refresh();
-                }
+                if (this.refresh) await this.refresh();
             };
         }
-        
-        // Add default onDeactivate if not provided
+
         if (typeof module.onDeactivate !== 'function') {
             module.onDeactivate = function() {
                 console.log(`👋 Module "${moduleName}" deactivated`);
@@ -170,17 +143,17 @@ class ModuleLoader {
     }
 
     /**
-     * Render a module into the container with lifecycle management
+     * Render a module into a container (handles deactivation/activation)
      */
     async renderModule(moduleName, targetElement = null) {
         const container = targetElement || this.container;
         if (!container) {
-            console.error('No container element found');
+            console.error('No container element found for rendering');
             return;
         }
 
         try {
-            // Deactivate current module if it exists and is different
+            // Deactivate current module if different
             if (this.currentModule && this.currentModule !== moduleName) {
                 const currentMod = this.modules.get(this.currentModule);
                 if (currentMod && typeof currentMod.onDeactivate === 'function') {
@@ -188,43 +161,41 @@ class ModuleLoader {
                 }
             }
 
-            // Load the module
+            // Load (or retrieve) the module
             const module = await this.loadModule(moduleName);
-            
+
             // Store container reference
             module._container = container;
-            
-            // Clear container
+
+            // Clear container and render
             setHtml(container, '');
-            
-            // Render module
             if (typeof module.render === 'function') {
                 await module.render(container);
                 module._lastRender = Date.now();
             } else {
                 setHtml(container, `
-                    <h2>${moduleName}</h2>
-                    <p>Module has no render function.</p>
+                    <div class="panel">
+                        <h3>⚠️ Error</h3>
+                        <p class="text-muted">Module "${moduleName}" has no render function.</p>
+                    </div>
                 `);
             }
-            
-            // Activate the module
+
+            // Activate the new module
             if (typeof module.onActivate === 'function') {
                 await module.onActivate();
             }
-            
-            // Update current module
+
             this.currentModule = moduleName;
-            
             return module;
         } catch (error) {
             console.error(`Failed to render module "${moduleName}":`, error);
             setHtml(container, `
-                <div class="error" style="padding:2rem;text-align:center;background:var(--bg2);border-radius:var(--radius);border-left:4px solid var(--danger);">
-                    <h2 style="color:var(--danger);margin-bottom:0.5rem;">Error loading module</h2>
-                    <p style="color:var(--text2);">${error.message}</p>
-                    <p style="color:var(--text3);font-size:0.85rem;margin-top:0.5rem;">Module: ${moduleName}</p>
-                    <button class="btn btn-primary" onclick="window.moduleLoader?.retryModule('${moduleName}')" style="margin-top:1rem;">
+                <div class="panel" style="border-left:4px solid var(--danger);">
+                    <h3 style="color:var(--danger);">❌ Error loading module</h3>
+                    <p class="text-muted">${error.message || 'Unknown error'}</p>
+                    <pre style="font-size:0.7rem;background:var(--bg3);padding:0.5rem;overflow:auto;max-height:150px;">${error.stack || ''}</pre>
+                    <button class="btn btn-primary mt-1" onclick="window.moduleLoader?.retryModule('${moduleName}')">
                         🔄 Retry
                     </button>
                 </div>
@@ -248,15 +219,12 @@ class ModuleLoader {
             console.warn('No module currently loaded to refresh');
             return;
         }
-        
         const module = this.modules.get(this.currentModule);
         if (!module) {
             console.warn(`Module "${this.currentModule}" not found`);
             return;
         }
-        
         console.log(`🔄 Refreshing current module: "${this.currentModule}"`);
-        
         if (typeof module.refresh === 'function') {
             await module.refresh();
         } else if (typeof module.onActivate === 'function') {
@@ -264,7 +232,6 @@ class ModuleLoader {
         } else if (typeof module.render === 'function' && module._container) {
             await module.render(module._container);
         }
-        
         module._lastRender = Date.now();
     }
 
@@ -277,9 +244,7 @@ class ModuleLoader {
             console.warn(`Module "${moduleName}" not found`);
             return;
         }
-        
         console.log(`🔄 Refreshing module: "${moduleName}"`);
-        
         if (typeof module.refresh === 'function') {
             await module.refresh();
         } else if (typeof module.onActivate === 'function') {
@@ -287,12 +252,11 @@ class ModuleLoader {
         } else if (typeof module.render === 'function' && module._container) {
             await module.render(module._container);
         }
-        
         module._lastRender = Date.now();
     }
 
     /**
-     * Unload a module
+     * Unload a module (cleanup)
      */
     unloadModule(moduleName) {
         const module = this.modules.get(moduleName);
@@ -310,6 +274,22 @@ class ModuleLoader {
             this.currentModule = null;
         }
         console.log(`🗑️ Module "${moduleName}" unloaded`);
+    }
+
+    /**
+     * Preload a module without rendering
+     */
+    async preloadModule(moduleName) {
+        if (this.isLoaded(moduleName)) return this.getModule(moduleName);
+        console.log(`📦 Preloading module "${moduleName}"`);
+        return this.loadModule(moduleName);
+    }
+
+    /**
+     * Preload multiple modules
+     */
+    async preloadModules(moduleNames) {
+        return Promise.allSettled(moduleNames.map(name => this.preloadModule(name)));
     }
 
     /**
@@ -334,50 +314,11 @@ class ModuleLoader {
     }
 
     /**
-     * Get list of all available modules
-     */
-    getAvailableModules() {
-        return Object.keys(this.modulePaths);
-    }
-
-    /**
-     * Check if a module needs refresh (based on TTL)
-     */
-    needsRefresh(moduleName, ttl = 30000) {
-        const module = this.modules.get(moduleName);
-        if (!module) return false;
-        const now = Date.now();
-        const lastRender = module._lastRender || 0;
-        return (now - lastRender) > ttl;
-    }
-
-    /**
-     * Preload a module without rendering
-     */
-    async preloadModule(moduleName) {
-        if (this.isLoaded(moduleName)) {
-            return this.getModule(moduleName);
-        }
-        console.log(`📦 Preloading module "${moduleName}"`);
-        return this.loadModule(moduleName);
-    }
-
-    /**
-     * Preload multiple modules
-     */
-    async preloadModules(moduleNames) {
-        const promises = moduleNames.map(name => this.preloadModule(name));
-        return Promise.allSettled(promises);
-    }
-
-    /**
      * Clear all loaded modules
      */
     clearAll() {
         for (const [name, module] of this.modules) {
-            if (typeof module.destroy === 'function') {
-                module.destroy();
-            }
+            if (typeof module.destroy === 'function') module.destroy();
         }
         this.modules.clear();
         this.currentModule = null;
@@ -393,18 +334,17 @@ class ModuleLoader {
             loadingModules: this.loading.size,
             currentModule: this.currentModule,
             moduleNames: Array.from(this.modules.keys()),
-            availableModules: this.getAvailableModules()
+            registeredRoutes: Array.from(this.importFns.keys()),
         };
     }
 }
 
-// Create and export singleton - ONLY ONE DEFAULT EXPORT
+// Create and export singleton
 export const moduleLoader = new ModuleLoader();
 
-// Add global helper for retry
+// Global helper for retry
 if (typeof window !== 'undefined') {
     window.moduleLoader = moduleLoader;
 }
 
-// Single default export
 export default moduleLoader;

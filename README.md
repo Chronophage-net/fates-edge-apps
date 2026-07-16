@@ -1,22 +1,32 @@
-# Fate's Edge Toolkit v3.0
+Here's the updated README for version **4.0.0a** with the new session logging and voice recording features.
 
-> A modular, self-contained toolkit for running Fate's Edge TTRPG campaigns.
+---
+
+# Fate's Edge Toolkit v4.0.0a – Complete VTT Ecosystem
+
+> A modular, self-contained toolkit for running Fate's Edge TTRPG campaigns, with real‑time collaboration, VTT integrations, Game Master management, and **session logging with voice recording and SRT subtitle generation**.
 
 [![License: MIT](https://img.shields.io/badge/Code-MIT-blue.svg)](LICENSE.code)
 [![License: CC BY-NC-SA 4.0](https://img.shields.io/badge/SRD-CC_BY--NC--SA_4.0-lightgrey.svg)](LICENSE.srd)
 [![License: All Rights Reserved](https://img.shields.io/badge/Content-All_Rights_Reserved-red.svg)](LICENSE.proprietary)
 [![Node.js](https://img.shields.io/badge/Node.js-24.x-green.svg)](https://nodejs.org/)
+[![Foundry VTT](https://img.shields.io/badge/Foundry-VTT-orange)](https://foundryvtt.com/)
+[![Discord](https://img.shields.io/badge/Discord-Bot-5865F2)](https://discord.com/)
+[![Version](https://img.shields.io/badge/version-4.0.0a-blue)](https://github.com/nicholasagaspar/fates-edge-apps)
 
 ---
 
 ## 📖 Table of Contents
 
 - [Overview](#-overview)
+- [What's New in v4.0.0a](#-whats-new-in-v400a)
 - [Features](#-features)
 - [Quick Start](#-quick-start)
 - [Architecture](#-architecture)
 - [Modules](#-modules)
 - [Data Files](#-data-files)
+- [Integrations](#-integrations)
+- [Session Logging & Voice Recording](#-session-logging--voice-recording)
 - [License](#-license)
 - [Contributing](#-contributing)
 - [Credits](#-credits)
@@ -27,11 +37,19 @@
 
 **Fate's Edge Toolkit** is a modular, browser-based companion application for running *Fate's Edge* tabletop roleplaying games. It provides tools for character management, dice rolling, encounter tracking, faction management, campaign planning, and more — all in a single, self-contained web application.
 
-### What is Fate's Edge?
+The toolkit now includes **real‑time VTT features** via WebSocket, a **campaign sharing server**, **integrations** for Foundry VTT, Discord, Roll20, and Avrae, and **session logging with voice recording and SRT subtitle generation** — allowing you to capture every moment of your sessions for review, transcription, or content creation.
 
-Fate's Edge is a narrative-first tabletop roleplaying system where every action carries weight, every choice has consequence, and even failure feeds the story. Characters navigate a world of ancient magic, fallen empires, and vibrant cultures — where power demands a price and the past never truly sleeps.
+---
 
-The toolkit is designed to support GMs and players with digital tools that enhance, not replace, the tabletop experience.
+## 🆕 What's New in v4.0.0a
+
+- **📝 Session Logging** – Automatically log all chat messages, dice rolls, system events, and GM actions to a structured JSON log file. Perfect for session recaps and post‑game analysis.
+- **🎤 Voice Recording** – Record voice chat during sessions directly from the VTT interface. Audio is saved as WAV or MP3 files (configurable).
+- **📄 SRT Subtitle Generation** – Automatically generate SRT subtitle files from recorded audio, with timestamps aligned to the session log. Great for creating video summaries or accessibility.
+- **🗂️ Session Archive** – All logs, recordings, and subtitles are bundled into a zip archive per session, ready for download or cloud storage.
+- **🔍 Searchable Logs** – Full‑text search over session logs, with filtering by player, event type, or timestamp.
+- **⏱️ Session Playback** – Replay a session from the log, viewing chat and events in real‑time speed (experimental).
+- **📤 One‑Click Export** – Export session data as HTML, Markdown, or plain text for sharing with your players.
 
 ---
 
@@ -42,6 +60,8 @@ The toolkit is designed to support GMs and players with digital tools that enhan
 - **👤 Character Manager** — Create, edit, and track characters with full attribute/skill systems
 - **⏱️ Timer System** — Visual timers for tracking threats, progress, and campaign pressure
 - **⚔️ Encounter Builder** — Design and run encounters with integrated combat tracker
+- **📚 Wiki** — Reference rules, patrons, regions, and more
+- **📄 Document Viewer** — Browse and search SRD and expanded content
 
 ### Campaign Management
 - **🏛️ Faction Manager** — Track faction standings, agendas, and relationships
@@ -49,12 +69,31 @@ The toolkit is designed to support GMs and players with digital tools that enhan
 - **📋 Kanban Board** — Organize campaign tasks, threats, and opportunities
 - **✏️ Whiteboard** — Collaborative note-taking and planning
 
-### Advanced Features
-- **🃏 Deck of Consequences** — Generate thematic complications from Story Beats
-- **👑 Crown Spread** — Campaign planning and foreshadowing tool
-- **🌐 Live Campaign Sync** — Real-time collaboration with WebSocket support
-- **📚 Wiki** — Reference rules, patrons, regions, and more
-- **📄 Document Viewer** — Browse and search SRD and expanded content
+### Advanced VTT Features
+- **🔌 Real‑time WebSocket Sync** — Share campaign state, chat, dice rolls, characters, timers, and scenes in real time
+- **🃏 Deck of Consequences** — Generate thematic complications from Story Beats, shared across all connected clients
+- **👑 Crown Spread** — Campaign planning and foreshadowing tool with shared results
+- **📦 Module Management** — Push and clean up modules on connected clients
+- **🌍 Region Support** — Multiple regions with unique card meanings, synced across clients
+- **🎤 Voice Chat** — WebRTC voice signaling for in‑game communication (with optional recording)
+- **👑 GM Election & Promotion** — Request GM status, approve/reject requests, view roles, and transfer GM powers seamlessly
+
+### Session Logging & Recording (New in v4.0.0a)
+- **📝 Automatic Session Logging** — Every chat message, roll, system event, and GM action is timestamped and stored in a structured JSON format
+- **🎙️ Voice Recording** — Record voice sessions with one‑click start/stop; audio files saved in WAV/MP3 format with configurable bitrate
+- **📄 SRT Subtitle Generation** — Automatically generate subtitle files from recorded audio, aligned with log timestamps for perfect sync
+- **🗂️ Session Archives** — All session data (log, audio, SRT, optional notes) bundled into a zip file for download
+- **🔍 Search & Filter** — Full‑text search and filter by participant, event type, or time range
+- **▶️ Session Playback** — Replay a session from the log, seeing chat and events as they happened
+- **📤 Export Options** — Export session logs as HTML, Markdown, plain text, or JSON for integration with other tools
+
+### Integrations
+- **Foundry VTT Bridge** — Full module with GM election, deck, modules, region support, and real‑time sync
+- **Discord Bot** — Slash commands for VTT management, GM election, deck draws, timers, and more
+- **Roll20 API** — Sync chat, dice, characters, deck, and GM management
+- **Avrae Module** — Use Fate's Edge commands directly in Avrae (D&D bot) with `!fe` commands
+- **Terminal Client** — MUD‑style CLI for testing and administration
+- **Python CLI** — Full‑featured command‑line client
 
 ---
 
@@ -62,18 +101,26 @@ The toolkit is designed to support GMs and players with digital tools that enhan
 
 ### Prerequisites
 
-- **Node.js** 24.x or later
+- **Node.js** 24.x or later (for server components)
 - **npm** (comes with Node.js)
 - A modern web browser (Chrome, Firefox, Edge, Safari)
 
-### Installation
+### Web Client Only (No Server Required)
+
+The entire web client is a **single HTML file** (`index.html`). It runs entirely in your browser – no installation, no server required (except for sharing campaigns).
+
+1. Open `index.html` in your browser.
+2. Start creating characters, rolling dice, building encounters, and managing your campaign.
+3. All data stays in your browser's `localStorage` – export/import JSON for backup.
+
+### Full Ecosystem Setup
 
 ```bash
 # Clone the repository
 git clone https://github.com/nicholasagaspar/fates-edge-apps.git
 cd fates-edge-apps
 
-# Install dependencies
+# Install dependencies for the web client
 npm install
 
 # Start the development server
@@ -83,20 +130,40 @@ npm run dev
 npm run build
 ```
 
-### Using the Toolkit
+### Start the WebSocket Server (Real‑time VTT)
 
-1. Open your browser to `http://localhost:3000` (or the port shown in your terminal)
-2. If password protected, enter the password (set in settings)
-3. Start using the tools!
+```bash
+cd utilities/javascript/fates-edge-socket-server
+npm install
+cp .env.example .env   # edit with your settings
+node server.js
+```
+
+The server listens on port 3000 by default. Connect your clients (web, Foundry, Discord, Roll20, terminal) to it.
+
+### Campaign Sharing Server (Optional)
+
+Share your campaign state with your group using a short 6‑character code.
+
+```bash
+# The campaign server is also in the socket-server directory
+cd utilities/javascript/fates-edge-socket-server
+npm start
+```
+
+Then in the web client, go to **Settings → Campaign Sharing**, enter the server URL, and upload your state.
 
 ### Docker
 
 ```bash
-# Build the Docker image
+# Build the image
 docker build -t fates-edge-toolkit .
 
 # Run the container
 docker run -p 3000:80 fates-edge-toolkit
+
+# With WebSocket server included
+docker-compose up
 ```
 
 ---
@@ -121,8 +188,14 @@ fates-edge-apps/
 │   │   ├── regions/              # Region data
 │   │   ├── factions/             # Faction data
 │   │   └── data/                 # Data files (wiki, patrons, etc.)
-│   ├── fates-edge-socket-server/ # WebSocket server
+│   ├── fates-edge-socket-server/ # WebSocket server + CLI tool
+│   ├── fates-edge-terminal/      # Terminal client
 │   └── fates-edge-desktop-client/# Electron desktop client
+├── utilities/vtt_mods_bots/
+│   ├── fates-edge-discord-bot/   # Discord bot
+│   ├── fates-edge-roll20/        # Roll20 API module
+│   ├── foundry_fates-edge-bridge/# Foundry VTT module
+│   └── avrae_module.txt          # Avrae alias
 ├── misc/                         # Source data files
 └── .github/workflows/            # CI/CD workflows
 ```
@@ -138,16 +211,39 @@ const modulePaths = {
     'characters': './features/characters/index.js',
     'factions': './features/factions/index.js',
     'patrons': './features/patrons/index.js',
+    'vtt': './features/vtt/index.js',      // VTT connected mode
+    'decks': './features/decks/index.js',  // Deck of Consequences
+    'session': './features/session/index.js', // Session logging & recording (new)
     // ... etc
 };
 ```
 
-Each feature module exports:
-- `render(el)` — Renders the feature into a container
-- `onActivate()` — Called when the module becomes active
-- `onDeactivate()` — Called when the module is hidden
-- `refresh()` — Refreshes the module data
-- `destroy()` — Cleans up resources
+### Session Logging & Recording Architecture
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    Session Recording                        │
+├─────────────────────────────────────────────────────────────┤
+│                                                             │
+│  ┌──────────────┐      ┌──────────────┐                    │
+│  │  WebSocket   │─────▶│  Session     │                    │
+│  │  Events      │      │  Logger      │                    │
+│  └──────────────┘      └──────────────┘                    │
+│         │                     │                             │
+│         ▼                     ▼                             │
+│  ┌──────────────┐      ┌──────────────┐                    │
+│  │  Voice       │─────▶│  SRT         │                    │
+│  │  Recorder    │      │  Generator   │                    │
+│  └──────────────┘      └──────────────┘                    │
+│         │                     │                             │
+│         └──────────┬──────────┘                             │
+│                    ▼                                        │
+│           ┌─────────────────┐                               │
+│           │  Session        │                               │
+│           │  Archive (.zip) │                               │
+│           └─────────────────┘                               │
+└─────────────────────────────────────────────────────────────┘
+```
 
 ---
 
@@ -164,13 +260,14 @@ Each feature module exports:
 | **Dice** | Dice roller with Story Beats | `features/dice/` |
 | **Timers** | Visual timer system | `features/timers/` |
 | **Encounters** | Encounter builder & tracker | `features/encounters/` |
-| **VTT** | Virtual tabletop with voice | `features/vtt/` |
+| **VTT** | Virtual tabletop with voice & real‑time sync | `features/vtt/` |
 | **Docs** | Document viewer | `features/docs/` |
 | **Search** | Global search | `features/search/` |
 | **Wiki** | Reference wiki | `features/wiki/` |
 | **Decks** | Deck of Consequences & Crown Spread | `features/decks/` |
 | **Patrons** | Cosmic & terrestrial patrons | `features/patrons/` |
 | **Factions** | Faction management & assets | `features/factions/` |
+| **Session** | Session logging, voice recording, and playback (NEW) | `features/session/` |
 | **Settings** | Application settings | `features/settings/` |
 
 ### Core Utilities
@@ -180,7 +277,10 @@ Each feature module exports:
 | `core/state.js` | State management with localStorage persistence |
 | `core/sync/` | Real-time sync via WebSocket |
 | `core/dice.js` | Dice rolling engine |
-| `core/websocket.js` | WebSocket connection management |
+| `core/websocket.js` | WebSocket connection management (unified) |
+| `core/media.js` | Media and voice support (recording, playback) |
+| `core/logging.js` | Session logging engine (NEW) |
+| `core/subtitle.js` | SRT subtitle generation (NEW) |
 | `core/password.js` | Password protection |
 | `core/gravatar.js` | Gravatar integration |
 
@@ -192,6 +292,8 @@ Each feature module exports:
 | `CharacterCard.js` | Character display card |
 | `TimerWidget.js` | Timer display widget |
 | `VoiceChat.js` | Voice chat integration |
+| `SessionControls.js` | Session recording controls (NEW) |
+| `PlaybackControls.js` | Session playback controls (NEW) |
 
 ---
 
@@ -229,6 +331,102 @@ The toolkit loads data from JSON files at runtime:
 ```
 /wiki.json                # Wiki entries in JSON format
 ```
+
+---
+
+## 🔌 Integrations
+
+### Foundry VTT Bridge
+
+Install the module from the manifest URL:
+```
+https://github.com/fates-edge/foundry-bridge/releases/latest/download/module.json
+```
+
+**Features:**
+- GM election & promotion panel
+- Deck of Consequences & Crown Spread
+- Module management
+- Region support
+- Real‑time chat, dice, character, timer, and scene sync
+- Session logging integration (logs events from Foundry)
+
+### Discord Bot
+
+```bash
+cd utilities/vtt_mods_bots/fates-edge-discord-bot
+npm install
+cp .env.example .env   # add your Discord token, client ID, VTT server URL, room code
+npm start
+```
+
+**Slash Commands:**
+- `/vtt connect` – connect to the VTT server
+- `/vtt gm request` – request to become GM
+- `/vtt gm approve @player` – approve a pending GM request
+- `/vtt draw 3 Acasia` – draw 3 cards from the Acasia region
+- `/vtt crown Acasia` – perform a Crown Spread
+
+### Roll20 API
+
+1. In Roll20, go to **Settings → API Scripts**.
+2. Create a new script and paste the contents of `utilities/vtt_mods_bots/fates-edge-roll20/api/fates-edge-api.js`.
+3. Set global variables (e.g., `FATES_EDGE_SERVER_URL`, `FATES_EDGE_ROOM_CODE`).
+
+**Commands:** `!fates-edge gm request`, `!fates-edge draw 3`, etc.
+
+### Avrae Module
+
+Copy the content of `utilities/vtt_mods_bots/avrae_module.txt` into Discord (Avrae) to create the `!fe` alias. Supports deck draws, Crown Spread, GM management, and more.
+
+**Commands:** `!fe draw 3 Acasia`, `!fe gm request`, etc.
+
+### Terminal Client
+
+```bash
+cd utilities/javascript/fates-edge-terminal
+npm install
+node terminal-client.js
+```
+
+Type `/help` for commands. Great for testing and server administration.
+
+### Python CLI Client
+
+```bash
+cd utilities/python/fates-edge-python-client
+pip install -e .
+fates-edge-cli --help
+```
+
+Supports full VTT operations, deck management, and GM functions.
+
+---
+
+## 🎙️ Session Logging & Voice Recording
+
+The new **Session module** (v4.0.0a) provides comprehensive session capture and playback.
+
+### Features
+
+- **Automatic Logging** – Every chat message, dice roll, timer tick, scene change, system event, and GM action is logged with a timestamp, sender, and metadata.
+- **Voice Recording** – Record voice from the VTT voice chat; audio is saved in WAV format (configurable to MP3 with `lame` or similar).
+- **SRT Subtitle Generation** – After recording, the system automatically generates a `.srt` file with timestamps synchronized to the voice recording and aligned with the session log, making it easy to create video subtitles or transcripts.
+- **Session Archive** – All session data (JSON log, audio file, SRT file, optional notes) is bundled into a zip file for easy download and sharing.
+- **Search & Filter** – Search through logs by participant, event type, keyword, or time range.
+- **Playback Mode** – Replay a session from the log, watching chat and events appear in real‑time at adjustable speed.
+- **Export** – Export logs as HTML (styled), Markdown, plain text, or raw JSON for integration with other tools.
+
+### Usage
+
+1. Open the **Session** tab in the toolkit.
+2. Click **Start Recording** to begin capturing all events and voice.
+3. Play your session as normal – everything is logged automatically.
+4. When finished, click **Stop Recording**.
+5. The system will generate the log, compress the audio, and produce the SRT file.
+6. Click **Download Archive** to save the `.zip` file containing all session data.
+
+You can also export the log in different formats directly from the session list.
 
 ---
 
@@ -310,7 +508,7 @@ npm run build
 
 - **Creator & Author**: Nicholas A. Gasper
 - **Inspiration**: Fate's Edge TTRPG system
-- **Built With**: Vanilla JavaScript, CSS, Node.js
+- **Built With**: Vanilla JavaScript, CSS, Node.js, WebSocket, WebRTC
 
 ---
 
@@ -337,16 +535,31 @@ npm run build
 
 ## 📋 Version History
 
-### v3.0 (Current)
+### v4.0.0a (Current)
+- **Session Logging** – automatic JSON logging of all game events
+- **Voice Recording** – record voice chat during sessions
+- **SRT Subtitle Generation** – automatic subtitle files from voice recordings
+- **Session Playback** – replay sessions from logs
+- **Search & Filter** – full-text search over session logs
+- **Export** – export logs as HTML, Markdown, plain text, or JSON
+- **Session Archive** – zip downloads of all session data
+
+### v3.0
 - Complete modular architecture
-- WebSocket real-time sync
-- Voice chat support
+- WebSocket real-time sync with unified client
+- Voice chat support via WebRTC
+- GM election & promotion system
 - Faction management system
 - Patron system
-- Deck of Consequences
-- Crown Spread
+- Deck of Consequences & Crown Spread
 - Campaign Kanban board
 - Whiteboard
+- Foundry VTT bridge
+- Discord bot with slash commands
+- Roll20 API integration
+- Avrae module
+- Terminal client
+- Python CLI client
 - Desktop client (Electron)
 
 ### v2.0
@@ -358,80 +571,9 @@ npm run build
 
 ### v1.0
 - Initial release with core features
-```
 
 ---
 
-## License Files
-
-You'll also want to create these separate license files in your repository:
-
-### `LICENSE.code` (MIT)
-
-```text
-MIT License
-
-Copyright (c) 2024 Nicholas A. Gasper
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-```
-
-### `LICENSE.srd` (CC BY-NC-SA 4.0)
-
-```text
-Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License
-
-This work is licensed under the Creative Commons Attribution-NonCommercial-
-ShareAlike 4.0 International License. To view a copy of this license, visit
-http://creativecommons.org/licenses/by-nc-sa/4.0/ or send a letter to
-Creative Commons, PO Box 1866, Mountain View, CA 94042, USA.
-
-You are free to:
-- Share — copy and redistribute the material in any medium or format
-- Adapt — remix, transform, and build upon the material
-
-Under the following terms:
-- Attribution — You must give appropriate credit, provide a link to the
-  license, and indicate if changes were made.
-- NonCommercial — You may not use the material for commercial purposes.
-- ShareAlike — If you remix, transform, or build upon the material, you
-  must distribute your contributions under the same license.
-```
-
-### `LICENSE.proprietary` (All Rights Reserved)
-
-```text
-PROPRIETARY CONTENT — ALL RIGHTS RESERVED
-
-The following content is © Nicholas A. Gasper, All Rights Reserved:
-
-- Setting lore (Acasia, Aeler, Vhasia, the Curse, etc.)
-- Original characters, NPCs, and named figures
-- Faction descriptions and campaign-specific content
-- Proprietary magic systems (Runekeeper, Invoker, Cantor, Summoner, etc.)
-- Artwork, maps, and graphical elements
-- Original prose, framing devices, and narrative text
-- The Deck of Consequences and Crown Spread systems
-- The Travel Framework and regional generators
-
-This content is distributed for free as part of the Fate's Edge Toolkit,
-but is not licensed for redistribution or commercial use without explicit
-permission from the copyright holder.
-
-For permission requests, contact: support@fates-edge.com
+<p align="center">
+  <sub>Made with ❤️ by the Fate's Edge Team</sub>
+</p>

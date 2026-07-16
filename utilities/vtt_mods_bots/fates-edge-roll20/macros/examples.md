@@ -11,8 +11,9 @@
 6. [Scene Macros](#scene-macros)
 7. [Combat Macros](#combat-macros)
 8. [GM Macros](#gm-macros)
-9. [Utility Macros](#utility-macros)
-10. [Advanced API Scripts](#advanced-api-scripts)
+9. [GM Election & Promotion](#gm-election--promotion)
+10. [Utility Macros](#utility-macros)
+11. [Advanced API Scripts](#advanced-api-scripts)
 
 ---
 
@@ -434,6 +435,71 @@ function updateTimerBar(name) {
 
 ---
 
+## GM Election & Promotion
+
+### GM Management Commands (new in v1.3.0)
+
+| Command | Description | Example |
+|---------|-------------|---------|
+| `!fates-edge gm request` | Request to become GM | `!fates-edge gm request` |
+| `!fates-edge gm approve <player>` | Approve a pending GM request (GM only) | `!fates-edge gm approve "Aria"` |
+| `!fates-edge gm reject <player>` | Reject a pending GM request (GM only) | `!fates-edge gm reject "Thorn"` |
+| `!fates-edge gm status` | Show current GM and pending requests | `!fates-edge gm status` |
+| `!fates-edge gm list` | List all connected clients with roles | `!fates-edge gm list` |
+
+### GM Election Macros
+
+```javascript
+// Request to become GM
+!fates-edge gm request
+!fates-edge send "👑 GM request sent. Waiting for approval."
+
+// Approve a request (by player name or ID)
+!fates-edge gm approve "Aria"
+!fates-edge send "✅ Approved Aria as GM."
+
+// Reject a request
+!fates-edge gm reject "Thorn"
+!fates-edge send "❌ Rejected Thorn's GM request."
+
+// Show GM status
+!fates-edge gm status
+// Output:
+// 👑 Current GM: GM Name
+// 📋 Pending requests: 2
+//    - PlayerOne
+//    - PlayerTwo
+
+// List all connected clients with roles
+!fates-edge gm list
+// Output:
+// 👥 Clients
+// 👑 GM (you) — gm
+// Aria — player
+// Thorn — player
+
+// Auto-approve first pending request (GM only)
+const reqs = FatesEdge.getPendingRequests();
+if (reqs.length > 0) {
+    FatesEdge.approveGM(reqs[0].requesterId);
+    sendChat('GM', `Auto-approved ${reqs[0].requesterName} as GM.`);
+}
+
+// Check if you are the GM
+if (FatesEdge.getMyRole() === 'gm') {
+    sendChat('GM', 'You are the Game Master!');
+} else {
+    sendChat('GM', 'You are a player.');
+}
+
+// Broadcast current GM status to chat
+const gm = FatesEdge.getCurrentGM();
+const gmName = gm ? gm.name : 'None';
+sendChat('GM Status', `Current GM: ${gmName}`);
+```
+
+---
+
 ## Utility Macros
 
 ### Utility Commands
@@ -480,7 +546,7 @@ function updateTimerBar(name) {
 
 ```javascript
 // ============================================================
-// Fate's Edge - Complete Roll20 Integration
+// Fate's Edge - Complete Roll20 Integration v1.3.0
 // ============================================================
 
 // Configuration
@@ -516,6 +582,8 @@ on('ready', () => {
             case 'sync': cmdSync(params); break;
             case 'timer': cmdTimer(params); break;
             case 'scene': cmdScene(params.join(' ')); break;
+            // GM commands
+            case 'gm': cmdGM(params); break;
             case 'help': cmdHelp(); break;
             default: sendChat('Fate\'s Edge', `Unknown command: ${command}`);
         }
@@ -538,6 +606,9 @@ function cmdStatus() {
     sendChat('Fate\'s Edge', `📊 Status: ${status}`);
     sendChat('Fate\'s Edge', `📡 Server: ${CONFIG.serverUrl}`);
     sendChat('Fate\'s Edge', `🏠 Room: ${CONFIG.roomCode}`);
+    const gm = FatesEdge.getCurrentGM();
+    sendChat('Fate\'s Edge', `👑 GM: ${gm ? gm.name : 'None'}`);
+    sendChat('Fate\'s Edge', `🎭 Your role: ${FatesEdge.getMyRole()}`);
 }
 
 function cmdSend(message) {
@@ -570,7 +641,6 @@ function cmdSync(params) {
             break;
         default:
             if (subcommand) {
-                // Sync specific character by name
                 const char = Campaign.characters.find(c => 
                     c.name.toLowerCase() === subcommand.toLowerCase()
                 );
@@ -649,7 +719,6 @@ function cmdTimer(params) {
 
 function cmdScene(name) {
     if (!name) return;
-    // Find page by name
     const pages = Campaign.pages;
     const match = pages.find(p => p.name.toLowerCase().includes(name.toLowerCase()));
     if (match) {
@@ -658,6 +727,85 @@ function cmdScene(name) {
         syncScene({ name: match.name });
     } else {
         sendChat('Fate\'s Edge', `⚠️ Page not found: ${name}`);
+    }
+}
+
+// GM command handler
+function cmdGM(params) {
+    const subcommand = params[0] || '';
+    const param = params.slice(1).join(' ');
+
+    switch (subcommand) {
+        case 'request':
+            FatesEdge.requestGM();
+            sendChat('Fate\'s Edge', '👑 GM request sent.');
+            break;
+        case 'approve':
+            if (!param) {
+                sendChat('Fate\'s Edge', '❌ Please specify a player: !fates-edge gm approve <player>');
+                break;
+            }
+            const approveTarget = Object.values(FatesEdge.getClients()).find(c => 
+                c.id === param || c.name.toLowerCase() === param.toLowerCase()
+            );
+            if (!approveTarget) {
+                sendChat('Fate\'s Edge', `❌ Player "${param}" not found.`);
+                break;
+            }
+            FatesEdge.approveGM(approveTarget.id);
+            sendChat('Fate\'s Edge', `✅ Approved ${approveTarget.name} as GM.`);
+            break;
+        case 'reject':
+            if (!param) {
+                sendChat('Fate\'s Edge', '❌ Please specify a player: !fates-edge gm reject <player>');
+                break;
+            }
+            const rejectTarget = Object.values(FatesEdge.getClients()).find(c => 
+                c.id === param || c.name.toLowerCase() === param.toLowerCase()
+            );
+            if (!rejectTarget) {
+                sendChat('Fate\'s Edge', `❌ Player "${param}" not found.`);
+                break;
+            }
+            FatesEdge.rejectGM(rejectTarget.id);
+            sendChat('Fate\'s Edge', `❌ Rejected ${rejectTarget.name} as GM.`);
+            break;
+        case 'status':
+            const gm = FatesEdge.getCurrentGM();
+            const gmName = gm ? gm.name : 'None';
+            const pending = FatesEdge.getPendingRequests();
+            let msg = `👑 **GM Status**\nCurrent GM: ${gmName}`;
+            if (pending.length > 0) {
+                msg += `\n📋 Pending requests: ${pending.length}`;
+                pending.forEach(r => msg += `\n   - ${r.requesterName}`);
+            } else {
+                msg += `\n📋 No pending requests.`;
+            }
+            sendChat('Fate\'s Edge', msg);
+            break;
+        case 'list':
+            const clients = Object.values(FatesEdge.getClients());
+            if (clients.length === 0) {
+                sendChat('Fate\'s Edge', '👥 No clients in room.');
+                break;
+            }
+            const list = clients.map(c => {
+                const isGM = c.id === gmId ? '👑 ' : '';
+                const isSelf = c.id === clientId ? ' (you)' : '';
+                return `${isGM}${c.name}${isSelf} — ${c.role}`;
+            }).join('\n');
+            sendChat('Fate\'s Edge', `👥 **Clients**\n${list}`);
+            break;
+        default:
+            sendChat('Fate\'s Edge', `
+👑 GM Commands:
+!fates-edge gm request        - Request to become GM
+!fates-edge gm approve <name> - Approve a pending GM request (GM only)
+!fates-edge gm reject <name>  - Reject a pending GM request (GM only)
+!fates-edge gm status         - Show current GM and pending requests
+!fates-edge gm list           - List all clients with roles
+`);
+            break;
     }
 }
 
@@ -679,6 +827,7 @@ function cmdHelp() {
         !fates-edge timer remove <name> - Remove timer
         !fates-edge timer reset <name> - Reset timer
         !fates-edge scene <name> - Switch scene
+        !fates-edge gm ... - GM management (see !fates-edge gm help)
         !fates-edge help - Show this help
     `);
 }
@@ -720,6 +869,12 @@ function cmdHelp() {
 // GM
 !fates-edge gm "They see the trap"
 !fates-edge reveal "You found a key"
+
+// GM Election & Promotion (v1.3.0)
+!fates-edge gm request
+!fates-edge gm approve "Aria"
+!fates-edge gm status
+!fates-edge gm list
 ```
 
 ---
@@ -731,3 +886,5 @@ function cmdHelp() {
 3. Timers persist until removed or server restarts
 4. Character sync requires matching names between Roll20 and VTT
 5. Scene sync works with Roll20 pages (maps)
+6. GM commands require the v1.3.0 API script (or later)
+7. Players can only request GM; only the current GM can approve/reject

@@ -1,98 +1,623 @@
-{
-  "name": "fates-edge-client",
-  "version": "4.1.0",
-  "description": "Fate's Edge VTT Desktop Client",
-  "main": "electron.js",
-  "author": "Fate's Edge",
-  "license": "MIT",
-  "private": true,
-  "scripts": {
-    "start": "electron .",
-    "dev": "electron . --dev",
-    "build": "node scripts/build.js",
-    "build:mac": "electron-builder --mac --universal",
-    "build:win": "electron-builder --win",
-    "build:linux": "electron-builder --linux",
-    "build:all": "npm run build:mac && npm run build:win && npm run build:linux",
-    "postinstall": "electron-builder install-app-deps"
-  },
-  "dependencies": {
-    "electron-updater": "^6.1.7",
-    "electron-store": "^8.1.0",
-    "electron-log": "^5.0.1"
-  },
-  "devDependencies": {
-    "electron": "^28.0.0",
-    "electron-builder": "^24.9.1",
-    "electron-builder-squirrel-windows": "^24.9.1",
-    "eslint": "^8.55.0",
-    "rimraf": "^5.0.5"
-  },
-  "build": {
-    "appId": "com.fatesedge.client",
-    "productName": "Fate's Edge",
-    "directories": {
-      "output": "dist"
-    },
-    "files": [
-      "electron.js",
-      "preload.js",
-      "package.json",
-      "!node_modules/.bin",
-      "!**/*.map"
-    ],
-    "win": {
-      "target": [
-        "nsis",
-        "portable"
-      ],
-      "icon": "build/icon.ico",
-      "publisherName": "Fate's Edge"
-    },
-    "mac": {
-      "target": [
-        "dmg",
-        "zip"
-      ],
-      "icon": "build/icon.icns",
-      "category": "public.app-category.games",
-      "hardenedRuntime": true,
-      "gatekeeperAssess": false,
-      "entitlements": "build/entitlements.mac.plist"
-    },
-    "linux": {
-      "target": [
-        "AppImage",
-        "deb",
-        "rpm"
-      ],
-      "icon": "build/icon.png",
-      "category": "Game"
-    },
-    "nsis": {
-      "oneClick": false,
-      "allowToChangeInstallationDirectory": true,
-      "createDesktopShortcut": true,
-      "createStartMenuShortcut": true
-    },
-    "dmg": {
-      "contents": [
-        {
-          "x": 410,
-          "y": 150,
-          "type": "link",
-          "path": "/Applications"
-        },
-        {
-          "x": 130,
-          "y": 150,
-          "type": "file"
+/**
+ * Fate's Edge Roll20 API v1.3.0
+ * Supports Deck of Consequences, Crown Spread, Modules, and GM Election/Promotion
+ */
+
+var FatesEdge = (function() {
+    // ============================================================
+    // CONFIGURATION
+    // ============================================================
+    const CONFIG = {
+        serverUrl: 'ws://localhost:3000',  // Override via settings or script
+        roomCode: '',
+        apiKey: '',
+        reconnectDelay: 3000,
+        maxReconnectAttempts: 5,
+        pingInterval: 30000
+    };
+
+    // ============================================================
+    // STATE
+    // ============================================================
+    let ws = null;
+    let connected = false;
+    let reconnectAttempts = 0;
+    let reconnectTimer = null;
+    let heartbeatInterval = null;
+    let roomCode = null;
+    let clientId = null;
+
+    // GM State
+    let clients = {};           // clientId -> { id, name, role, ... }
+    let gmId = null;            // clientId of current GM
+    let pendingRequests = [];   // [ { requesterId, requesterName }, ... ]
+    let myRole = 'player';      // role of this Roll20 client
+
+    // Deck state
+    let deckState = {
+        cards: [],
+        history: [],
+        remaining: 54
+    };
+    let defaultRegion = 'Acasia';
+
+    // ============================================================
+    // LOGGING
+    // ============================================================
+    function log(msg, level = 'info') {
+        const prefix = `[FatesEdge]`;
+        if (level === 'error') {
+            console.error(prefix, msg);
+        } else if (level === 'warn') {
+            console.warn(prefix, msg);
+        } else {
+            console.log(prefix, msg);
         }
-      ]
-    },
-    "publish": {
-      "provider": "github",
-      "releaseType": "release"
     }
-  }
-}
+
+    // ============================================================
+    // WEBSOCKET CONNECTION
+    // ============================================================
+    function connect() {
+        if (connected) {
+            log('Already connected');
+            return;
+        }
+
+        const url = CONFIG.serverUrl;
+        if (!url) {
+            log('Server URL not configured', 'error');
+            return;
+        }
+        if (!CONFIG.roomCode) {
+            log('Room code not configured', 'error');
+            return;
+        }
+
+        log(`Connecting to ${url} ...`);
+        try {
+            ws = new WebSocket(url);
+            ws.onopen = onOpen;
+            ws.onmessage = onMessage;
+            ws.onerror = onError;
+            ws.onclose = onClose;
+        } catch (e) {
+            log(`Connection error: ${e.message}`, 'error');
+            scheduleReconnect();
+        }
+    }
+
+    function disconnect() {
+        if (heartbeatInterval) {
+            clearInterval(heartbeatInterval);
+            heartbeatInterval = null;
+        }
+        if (reconnectTimer) {
+            clearTimeout(reconnectTimer);
+            reconnectTimer = null;
+        }
+        if (ws) {
+            try { ws.close(); } catch (e) {}
+            ws = null;
+        }
+        connected = false;
+        clientId = null;
+        log('Disconnected');
+        // Reset GM state
+        clients = {};
+        gmId = null;
+        pendingRequests = [];
+        myRole = 'player';
+    }
+
+    function scheduleReconnect() {
+        if (reconnectAttempts >= CONFIG.maxReconnectAttempts) {
+            log('Max reconnect attempts reached', 'error');
+            return;
+        }
+        const delay = Math.min(CONFIG.reconnectDelay * Math.pow(1.5, reconnectAttempts), 30000);
+        reconnectAttempts++;
+        log(`Reconnecting in ${delay}ms (attempt ${reconnectAttempts})`);
+        reconnectTimer = setTimeout(() => {
+            if (!connected) connect();
+        }, delay);
+    }
+
+    // ============================================================
+    // WEBSOCKET EVENT HANDLERS
+    // ============================================================
+    function onOpen() {
+        log('WebSocket connected');
+        connected = true;
+        reconnectAttempts = 0;
+
+        // Join room
+        const joinMsg = {
+            type: 'join-room',
+            roomCode: CONFIG.roomCode,
+            clientData: {
+                name: 'Roll20 GM',
+                role: 'Player',
+                platform: 'roll20',
+                version: '1.3.0'
+            }
+        };
+        ws.send(JSON.stringify(joinMsg));
+
+        // Start heartbeat
+        heartbeatInterval = setInterval(() => {
+            if (connected && ws && ws.readyState === WebSocket.OPEN) {
+                ws.send(JSON.stringify({ type: 'ping' }));
+            }
+        }, CONFIG.pingInterval);
+
+        log(`Joined room ${CONFIG.roomCode}`);
+        // Notify Roll20 chat
+        sendChatMessage('System', 'Fate\'s Edge: Connected to server.');
+    }
+
+    function onMessage(event) {
+        try {
+            const data = JSON.parse(event.data);
+            handleMessage(data);
+        } catch (e) {
+            log(`Failed to parse message: ${e.message}`, 'warn');
+        }
+    }
+
+    function onError(err) {
+        log(`WebSocket error: ${err.message}`, 'error');
+        scheduleReconnect();
+    }
+
+    function onClose(event) {
+        log(`WebSocket closed: ${event.code} - ${event.reason || 'No reason'}`);
+        connected = false;
+        clientId = null;
+        if (heartbeatInterval) {
+            clearInterval(heartbeatInterval);
+            heartbeatInterval = null;
+        }
+        if (event.code !== 1000) {
+            scheduleReconnect();
+        }
+        sendChatMessage('System', 'Fate\'s Edge: Disconnected from server.');
+    }
+
+    // ============================================================
+    // MESSAGE HANDLER
+    // ============================================================
+    function handleMessage(data) {
+        switch (data.type) {
+            case 'room-state':
+                handleRoomState(data);
+                break;
+            case 'state-updated':
+                handleStateUpdate(data);
+                break;
+            case 'chat-message':
+                handleChatMessage(data);
+                break;
+            case 'roll-result':
+                handleRollResult(data);
+                break;
+            case 'client-joined':
+                handleClientJoined(data);
+                break;
+            case 'client-left':
+                handleClientLeft(data);
+                break;
+            case 'deck-drawn':
+                handleDeckDrawn(data);
+                break;
+            case 'deck-shuffled':
+                handleDeckShuffled(data);
+                break;
+            case 'crown-spread':
+                handleCrownSpread(data);
+                break;
+            case 'module-list':
+                handleModuleList(data);
+                break;
+            case 'module-push':
+                handleModulePush(data);
+                break;
+            case 'module-cleanup':
+                handleModuleCleanup(data);
+                break;
+            case 'region-updated':
+                handleRegionUpdate(data);
+                break;
+            // GM Events
+            case 'presence':
+                handlePresence(data);
+                break;
+            case 'gm_vote_request':
+                handleGmVoteRequest(data);
+                break;
+            case 'gm_role_update':
+                handleGmRoleUpdate(data);
+                break;
+            case 'server_announcement':
+                handleServerAnnouncement(data);
+                break;
+            case 'room-closed':
+                sendChatMessage('System', 'Fate\'s Edge: Room closed by server.');
+                disconnect();
+                break;
+            case 'pong':
+                // heartbeat response
+                break;
+            default:
+                log(`Unhandled message type: ${data.type}`, 'debug');
+        }
+    }
+
+    // ============================================================
+    // HANDLERS
+    // ============================================================
+    function handleRoomState(data) {
+        clientId = data.clientId;
+        if (data.data && data.data.deck) {
+            deckState.cards = data.data.deck.cards || [];
+            deckState.remaining = data.data.deck.cards?.length || 0;
+        }
+        if (data.clients) {
+            updateClients(data.clients);
+        }
+        log(`Room state received. Client ID: ${clientId}`);
+    }
+
+    function handleStateUpdate(data) {
+        if (data.state && data.state.deck) {
+            deckState.cards = data.state.deck.cards || [];
+            deckState.remaining = data.state.deck.cards?.length || 0;
+        }
+    }
+
+    function handleChatMessage(data) {
+        const sender = data.sender || 'Unknown';
+        const text = data.text || '';
+        sendChatMessage(sender, text);
+    }
+
+    function handleRollResult(data) {
+        const sender = data.sender || 'Unknown';
+        const expr = data.expr || '';
+        const result = data.result || 0;
+        const reason = data.reason || '';
+        let msg = `${sender} rolled ${expr} = ${result}`;
+        if (reason) msg += ` (${reason})`;
+        sendChatMessage('Dice', msg);
+    }
+
+    function handleClientJoined(data) {
+        const name = data.data?.name || 'Unknown';
+        sendChatMessage('System', `${name} joined the room.`);
+        if (data.clients) {
+            updateClients(data.clients);
+        }
+    }
+
+    function handleClientLeft(data) {
+        sendChatMessage('System', `A client left the room.`);
+        // Remove client from local map
+        if (data.clientId) {
+            delete clients[data.clientId];
+            if (gmId === data.clientId) {
+                gmId = null;
+                updateGmFromClients();
+            }
+        }
+        updateGmUI();
+    }
+
+    // ============================================================
+    // DECK HANDLERS
+    // ============================================================
+    function handleDeckDrawn(data) {
+        const cards = data.cards || [];
+        const synthesis = data.synthesis || '';
+        const region = data.region || 'Acasia';
+        const count = cards.length;
+        const cardNames = cards.map(c => {
+            if (c.is_joker) return '🃏 Joker';
+            return `${c.rank_name || c.rank} of ${c.suit_name || c.suit}`;
+        }).join(', ');
+        deckState.remaining = data.remaining || deckState.remaining;
+        sendChatMessage('Deck', `Drew ${count} cards from ${region}: ${cardNames}\n\n${synthesis}`);
+    }
+
+    function handleDeckShuffled(data) {
+        deckState.remaining = data.remaining || 54;
+        sendChatMessage('Deck', `Deck shuffled. ${deckState.remaining} cards remaining.`);
+    }
+
+    function handleCrownSpread(data) {
+        const result = data.result || {};
+        const synthesis = result.synthesis || 'No synthesis';
+        sendChatMessage('Crown Spread', synthesis);
+    }
+
+    function handleModuleList(data) {
+        const modules = data.modules || [];
+        if (modules.length === 0) {
+            sendChatMessage('Modules', 'No modules loaded.');
+        } else {
+            const names = modules.map(m => m.name || m.id).join(', ');
+            sendChatMessage('Modules', `Loaded: ${names}`);
+        }
+    }
+
+    function handleModulePush(data) {
+        const module = data.module || {};
+        const name = module.manifest?.name || module.id || 'Unknown';
+        sendChatMessage('Modules', `Module pushed: ${name}`);
+    }
+
+    function handleModuleCleanup(data) {
+        const id = data.moduleId || 'Unknown';
+        sendChatMessage('Modules', `Module cleanup requested: ${id}`);
+    }
+
+    function handleRegionUpdate(data) {
+        if (data.region) {
+            defaultRegion = data.region;
+            sendChatMessage('System', `Region updated to: ${defaultRegion}`);
+        }
+    }
+
+    // ============================================================
+    // GM HANDLERS
+    // ============================================================
+    function handlePresence(data) {
+        if (data.clients) {
+            updateClients(data.clients);
+            updateGmUI();
+        }
+    }
+
+    function handleGmVoteRequest(data) {
+        const { requesterId, requesterName, currentGmId, currentGmName } = data;
+        // Only show if we are the current GM
+        if (myRole === 'gm' && clientId === currentGmId) {
+            if (!pendingRequests.find(r => r.requesterId === requesterId)) {
+                pendingRequests.push({ requesterId, requesterName });
+            }
+            updateGmUI();
+            // Notify in chat
+            sendChatMessage('GM', `${requesterName} requests to become GM. Use !gm approve <name> or !gm reject <name>`);
+        }
+    }
+
+    function handleGmRoleUpdate(data) {
+        const { clientId: targetId, role } = data;
+        if (targetId === clientId) {
+            myRole = role;
+        }
+        if (clients[targetId]) {
+            clients[targetId].role = role;
+        }
+        if (role === 'gm') {
+            gmId = targetId;
+        } else if (gmId === targetId) {
+            updateGmFromClients();
+        }
+        updateGmUI();
+        const name = clients[targetId]?.name || targetId;
+        sendChatMessage('System', `${name} is now ${role.toUpperCase()}.`);
+    }
+
+    function handleServerAnnouncement(data) {
+        sendChatMessage('Announcement', data.message);
+    }
+
+    // ============================================================
+    // CLIENT & GM HELPERS
+    // ============================================================
+    function updateClients(clientsArray) {
+        clients = {};
+        clientsArray.forEach(c => {
+            clients[c.id] = c;
+            if (c.role === 'gm') gmId = c.id;
+        });
+        if (!clientsArray.some(c => c.role === 'gm')) {
+            gmId = null;
+        }
+        if (clientId && clients[clientId]) {
+            myRole = clients[clientId].role;
+        }
+    }
+
+    function updateGmFromClients() {
+        for (let id in clients) {
+            if (clients[id].role === 'gm') {
+                gmId = id;
+                return;
+            }
+        }
+        gmId = null;
+    }
+
+    function updateGmUI() {
+        // In Roll20, we can't easily update a UI panel, but we can send a /w gm command or set a state variable.
+        // We'll store current GM in a state variable for macros to query.
+        state.set('fatesEdgeGmId', gmId);
+        state.set('fatesEdgeMyRole', myRole);
+        state.set('fatesEdgePendingRequests', pendingRequests);
+    }
+
+    // ============================================================
+    // SEND FUNCTIONS
+    // ============================================================
+    function send(type, data) {
+        if (!connected || !ws || ws.readyState !== WebSocket.OPEN) {
+            log('Not connected, cannot send message', 'warn');
+            return false;
+        }
+        const message = { type, ...data };
+        ws.send(JSON.stringify(message));
+        return true;
+    }
+
+    function sendChatMessage(sender, text) {
+        // Send to Roll20 chat
+        let msg = `/em [Fate's Edge] ${sender}: ${text}`;
+        sendChat('Fate\'s Edge', msg);
+    }
+
+    function sendRoll(expr, reason) {
+        const result = parseDice(expr);
+        send('roll-dice', {
+            expr: expr,
+            result: result.total,
+            rolls: result.rolls,
+            total: result.total,
+            reason: reason || 'Roll',
+            sender: 'Roll20 GM',
+            timestamp: Date.now()
+        });
+        return result;
+    }
+
+    // ============================================================
+    // PUBLIC API
+    // ============================================================
+    const publicAPI = {
+        // Connection
+        connect: connect,
+        disconnect: disconnect,
+        isConnected: function() { return connected; },
+
+        // Chat & Rolls
+        sendChat: sendChatMessage,
+        roll: sendRoll,
+
+        // Deck
+        drawCards: function(count, region) {
+            send('deck-draw', { count: count || 1, region: region || defaultRegion });
+        },
+        shuffleDeck: function() {
+            send('deck-shuffle', {});
+        },
+        crownSpread: function(region) {
+            send('deck-draw', { count: 5, region: region || defaultRegion });
+        },
+        getDeckStatus: function() {
+            return { remaining: deckState.remaining };
+        },
+
+        // Modules
+        listModules: function() {
+            send('module-list', {});
+        },
+        pushModule: function(moduleId) {
+            send('module-push-request', { moduleId: moduleId });
+        },
+        cleanupModule: function(moduleId) {
+            send('module-cleanup-request', { moduleId: moduleId });
+        },
+
+        // Region
+        setRegion: function(region) {
+            defaultRegion = region;
+            send('set-region', { region: region });
+        },
+        getRegion: function() { return defaultRegion; },
+
+        // ============================================================
+        // GM PUBLIC METHODS
+        // ============================================================
+        requestGM: function() {
+            if (!connected) { log('Not connected', 'error'); return; }
+            send('request_gm', {});
+            sendChatMessage('System', 'GM request sent.');
+        },
+
+        approveGM: function(targetId) {
+            if (!connected) { log('Not connected', 'error'); return; }
+            if (myRole !== 'gm') { log('Only current GM can approve', 'error'); return; }
+            send('approve_gm', { targetId: targetId });
+            // Remove from pending list optimistically
+            pendingRequests = pendingRequests.filter(r => r.requesterId !== targetId);
+            updateGmUI();
+            sendChatMessage('System', `Approved GM for ${targetId}`);
+        },
+
+        rejectGM: function(targetId) {
+            // Server doesn't have reject, but we remove from local list
+            pendingRequests = pendingRequests.filter(r => r.requesterId !== targetId);
+            updateGmUI();
+            sendChatMessage('System', `Rejected GM request from ${targetId}`);
+        },
+
+        getCurrentGM: function() {
+            return gmId ? clients[gmId] : null;
+        },
+
+        getPendingRequests: function() {
+            return pendingRequests;
+        },
+
+        getClients: function() {
+            return clients;
+        },
+
+        getMyRole: function() {
+            return myRole;
+        },
+
+        // ============================================================
+        // CONFIGURATION
+        // ============================================================
+        setConfig: function(config) {
+            if (config.serverUrl) CONFIG.serverUrl = config.serverUrl;
+            if (config.roomCode) CONFIG.roomCode = config.roomCode;
+            if (config.apiKey) CONFIG.apiKey = config.apiKey;
+            if (config.reconnectDelay) CONFIG.reconnectDelay = config.reconnectDelay;
+            if (config.maxReconnectAttempts) CONFIG.maxReconnectAttempts = config.maxReconnectAttempts;
+            if (config.pingInterval) CONFIG.pingInterval = config.pingInterval;
+        },
+
+        getConfig: function() {
+            return { ...CONFIG };
+        }
+    };
+
+    // ============================================================
+    // DICE PARSER (internal)
+    // ============================================================
+    function parseDice(expr) {
+        // Simple dice parser (dN)
+        const parts = expr.match(/^(\d+)d(\d+)([+-]\d+)?$/i);
+        if (!parts) {
+            const num = parseInt(expr) || 0;
+            return { total: num, rolls: [num] };
+        }
+        const count = parseInt(parts[1]);
+        const sides = parseInt(parts[2]);
+        const mod = parseInt(parts[3]) || 0;
+        const rolls = [];
+        let total = 0;
+        for (let i = 0; i < count; i++) {
+            const r = Math.floor(Math.random() * sides) + 1;
+            rolls.push(r);
+            total += r;
+        }
+        total += mod;
+        return { total, rolls };
+    }
+
+    // ============================================================
+    // INITIALIZE – Auto-connect if configured
+    // ============================================================
+    // Roll20 scripts run in a sandbox; we can check if config is stored in state.
+    // For now, we'll rely on explicit calls.
+
+    log('Fate\'s Edge Roll20 API v1.3.0 loaded.');
+
+    return publicAPI;
+})();
+
+// Expose to global for macro use
+window.FatesEdge = FatesEdge;

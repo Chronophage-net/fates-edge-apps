@@ -1,5 +1,5 @@
 /**
- * Fate's Edge Roll20 API Module v1.2.0
+ * Fate's Edge Roll20 API Module v1.3.0
  * Connects Roll20 to the Fate's Edge WebSocket Server
  * 
  * Features:
@@ -15,6 +15,7 @@
  * - Crown Spread support
  * - Module management
  * - Region support
+ * - GM election & promotion (new in v1.3.0)
  * 
  * Installation:
  * 1. In Roll20, go to Settings → API Scripts
@@ -81,12 +82,18 @@ const deckState = {
 let currentRegion = CONFIG.defaultRegion;
 let loadedModules = [];
 
+// GM State
+let clients = {};           // clientId -> { id, name, role, ... }
+let gmId = null;            // clientId of current GM
+let pendingRequests = [];   // [ { requesterId, requesterName }, ... ]
+let myRole = 'player';      // role of this Roll20 client
+
 // ============================================================
 // Logging (Roll20-friendly)
 // ============================================================
 
 function log(message, level = 'info') {
-    const prefix = '⚔️ Fate\'s Edge v1.2.0:';
+    const prefix = '⚔️ Fate\'s Edge v1.3.0:';
     const timestamp = new Date().toISOString();
     switch (level) {
         case 'error':
@@ -167,6 +174,11 @@ function disconnect() {
     connected = false;
     clientId = null;
     reconnectAttempts = 0;
+    // Reset GM state
+    clients = {};
+    gmId = null;
+    pendingRequests = [];
+    myRole = 'player';
     log('Disconnected');
     updateStatus('disconnected');
 }
@@ -216,7 +228,7 @@ function onOpen() {
             name: getPlayerName(),
             role: 'GM',
             platform: 'roll20',
-            version: '1.2.0',
+            version: '1.3.0',
             region: currentRegion
         }
     });
@@ -296,7 +308,7 @@ function handleMessage(data) {
             handleVttTimersUpdate(data);
             break;
 
-        // New Deck Events
+        // Deck Events
         case 'deck-drawn':
             handleDeckDrawn(data);
             break;
@@ -309,7 +321,7 @@ function handleMessage(data) {
             handleCrownSpread(data);
             break;
 
-        // New Module Events
+        // Module Events
         case 'module-list':
             handleModuleList(data);
             break;
@@ -324,6 +336,25 @@ function handleMessage(data) {
 
         case 'region-updated':
             handleRegionUpdate(data);
+            break;
+
+        // ============================================================
+        // GM EVENTS (new in v1.3.0)
+        // ============================================================
+        case 'presence':
+            handlePresence(data);
+            break;
+
+        case 'gm_vote_request':
+            handleGmVoteRequest(data);
+            break;
+
+        case 'gm_role_update':
+            handleGmRoleUpdate(data);
+            break;
+
+        case 'server_announcement':
+            handleServerAnnouncement(data);
             break;
 
         case 'room-closed':
@@ -380,8 +411,9 @@ function handleRoomState(data) {
         deckState.remaining = data.data.deck.cards?.length || 0;
     }
 
-    // Log clients
+    // Update GM state if clients are provided
     if (data.clients) {
+        updateClients(data.clients);
         const names = data.clients.map(c => c.data?.name || 'Unknown').join(', ');
         log(`Clients in room: ${names}`);
     }
@@ -435,11 +467,22 @@ function handleClientJoined(data) {
     const name = data.data?.name || 'Unknown';
     log(`👤 ${name} joined the room`);
     sendToChat(`👤 ${name} has joined the Fate's Edge session.`);
+    if (data.clients) {
+        updateClients(data.clients);
+    }
 }
 
 function handleClientLeft(data) {
     log(`👤 Client left: ${data}`);
+    if (data.clientId) {
+        delete clients[data.clientId];
+        if (gmId === data.clientId) {
+            gmId = null;
+            updateGmFromClients();
+        }
+    }
     sendToChat(`👤 A client has left the Fate's Edge session.`);
+    updateGMUI();
 }
 
 function handleVoiceStatus(data) {
@@ -584,6 +627,89 @@ function handleRegionUpdate(data) {
 }
 
 // ============================================================
+// GM Handlers (new in v1.3.0)
+// ============================================================
+
+function handlePresence(data) {
+    if (data.clients) {
+        updateClients(data.clients);
+        updateGMUI();
+    }
+}
+
+function handleGmVoteRequest(data) {
+    const { requesterId, requesterName, currentGmId, currentGmName } = data;
+    // Only show if we are the current GM
+    if (myRole === 'gm' && clientId === currentGmId) {
+        if (!pendingRequests.find(r => r.requesterId === requesterId)) {
+            pendingRequests.push({ requesterId, requesterName });
+        }
+        updateGMUI();
+        // Notify in chat
+        sendToChat(`👑 ${requesterName} requests to become GM. Use !fates-edge gm approve <name> or !fates-edge gm reject <name>`, 'gm');
+    }
+}
+
+function handleGmRoleUpdate(data) {
+    const { clientId: targetId, role } = data;
+    if (targetId === clientId) {
+        myRole = role;
+    }
+    if (clients[targetId]) {
+        clients[targetId].role = role;
+    }
+    if (role === 'gm') {
+        gmId = targetId;
+    } else if (gmId === targetId) {
+        updateGmFromClients();
+    }
+    updateGMUI();
+    const name = clients[targetId]?.name || targetId;
+    sendToChat(`👑 ${name} is now ${role.toUpperCase()}.`);
+}
+
+function handleServerAnnouncement(data) {
+    sendToChat(`📢 ${data.message}`);
+}
+
+// ============================================================
+// Client & GM Helpers
+// ============================================================
+
+function updateClients(clientsArray) {
+    clients = {};
+    clientsArray.forEach(c => {
+        clients[c.id] = c;
+        if (c.role === 'gm') gmId = c.id;
+    });
+    if (!clientsArray.some(c => c.role === 'gm')) {
+        gmId = null;
+    }
+    if (clientId && clients[clientId]) {
+        myRole = clients[clientId].role;
+    }
+}
+
+function updateGmFromClients() {
+    for (let id in clients) {
+        if (clients[id].role === 'gm') {
+            gmId = id;
+            return;
+        }
+    }
+    gmId = null;
+}
+
+function updateGMUI() {
+    // Store GM state in variables for macros
+    if (typeof state !== 'undefined') {
+        state.set('fatesEdgeGmId', gmId);
+        state.set('fatesEdgeMyRole', myRole);
+        state.set('fatesEdgePendingRequests', pendingRequests);
+    }
+}
+
+// ============================================================
 // Sync Functions
 // ============================================================
 
@@ -651,10 +777,9 @@ function createOrUpdateJournalEntry(char) {
         ${char.tier ? `<p><b>Tier:</b> ${char.tier}</p>` : ''}
         ${char.description ? `<p><i>${char.description}</i></p>` : ''}
         <hr>
-        <p><small>Synced from Fate's Edge VTT v1.2.0</small></p>
+        <p><small>Synced from Fate's Edge VTT v1.3.0</small></p>
     `;
 
-    // Try to find existing journal entry
     try {
         if (typeof Campaign !== 'undefined' && Campaign.findJournalEntry) {
             const existing = Campaign.findJournalEntry(name);
@@ -765,7 +890,7 @@ function sendRoll(expr, reason = null) {
 }
 
 // ============================================================
-// New: Deck Send Functions
+// Deck Send Functions
 // ============================================================
 
 function sendDeckDraw(count = 1, region = null) {
@@ -812,6 +937,58 @@ function sendModuleList() {
 }
 
 // ============================================================
+// GM Public Methods (new in v1.3.0)
+// ============================================================
+
+function requestGM() {
+    if (!connected) {
+        log('Not connected - cannot request GM', 'error');
+        return;
+    }
+    sendMessage({ type: 'request_gm' });
+    sendToChat('👑 GM request sent. Waiting for approval.');
+}
+
+function approveGM(targetId) {
+    if (!connected) {
+        log('Not connected - cannot approve GM', 'error');
+        return;
+    }
+    if (myRole !== 'gm') {
+        log('Only current GM can approve', 'error');
+        return;
+    }
+    sendMessage({ type: 'approve_gm', targetId });
+    // Remove from pending list optimistically
+    pendingRequests = pendingRequests.filter(r => r.requesterId !== targetId);
+    updateGMUI();
+    sendToChat(`✅ Approved GM for ${targetId}`);
+}
+
+function rejectGM(targetId) {
+    // Server doesn't have reject, but we remove from local list
+    pendingRequests = pendingRequests.filter(r => r.requesterId !== targetId);
+    updateGMUI();
+    sendToChat(`❌ Rejected GM request from ${targetId}`);
+}
+
+function getCurrentGM() {
+    return gmId ? clients[gmId] : null;
+}
+
+function getPendingRequests() {
+    return pendingRequests;
+}
+
+function getClients() {
+    return clients;
+}
+
+function getMyRole() {
+    return myRole;
+}
+
+// ============================================================
 // Utility Functions
 // ============================================================
 
@@ -846,7 +1023,7 @@ function sendToChat(message, type = 'public') {
 
 function updateStatus(status) {
     const statusMsg = status === 'connected' 
-        ? '🟢 Connected to Fate\'s Edge v1.2.0' 
+        ? '🟢 Connected to Fate\'s Edge v1.3.0' 
         : '🔴 Disconnected from Fate\'s Edge';
     log(statusMsg);
 }
@@ -869,12 +1046,13 @@ function registerCommands() {
         on('chat:message', (msg) => {
             if (msg.type !== 'api') return;
             const args = msg.content.split(' ');
+            const command = args[0];
 
-            if (args[0] === '!fates-edge') {
-                const command = args[1] || '';
+            if (command === '!fates-edge') {
+                const subcommand = args[1] || '';
                 const param = args.slice(2).join(' ');
 
-                switch (command) {
+                switch (subcommand) {
                     case 'connect':
                         connect();
                         sendToChat('Connecting to Fate\'s Edge...');
@@ -891,6 +1069,9 @@ function registerCommands() {
                         sendToChat(`Region: ${currentRegion}`);
                         sendToChat(`Deck: ${deckState.remaining} cards remaining`);
                         sendToChat(`Modules: ${loadedModules.length} loaded`);
+                        const gm = getCurrentGM();
+                        sendToChat(`GM: ${gm ? gm.name : 'None'}`);
+                        sendToChat(`Your role: ${myRole}`);
                         break;
 
                     case 'send':
@@ -908,7 +1089,7 @@ function registerCommands() {
                         }
                         break;
 
-                    // New Commands
+                    // Deck Commands
                     case 'draw':
                         const count = parseInt(param) || 1;
                         sendDeckDraw(Math.min(count, 5));
@@ -952,22 +1133,87 @@ function registerCommands() {
                         }
                         break;
 
+                    // ============================================================
+                    // GM Subcommands (new in v1.3.0)
+                    // ============================================================
+                    case 'gm':
+                        const gmSub = args[2] || '';
+                        const gmParam = args.slice(3).join(' ');
+
+                        if (gmSub === 'request') {
+                            requestGM();
+                        } else if (gmSub === 'approve') {
+                            if (!gmParam) {
+                                sendToChat('Usage: !fates-edge gm approve <playerId>');
+                                break;
+                            }
+                            // Find client by name or ID
+                            const target = Object.values(clients).find(c => 
+                                c.id === gmParam || c.name.toLowerCase() === gmParam.toLowerCase()
+                            );
+                            if (!target) {
+                                sendToChat(`❌ Player "${gmParam}" not found. Use !fates-edge gm list to see clients.`);
+                                break;
+                            }
+                            approveGM(target.id);
+                        } else if (gmSub === 'reject') {
+                            if (!gmParam) {
+                                sendToChat('Usage: !fates-edge gm reject <playerId>');
+                                break;
+                            }
+                            const target = Object.values(clients).find(c => 
+                                c.id === gmParam || c.name.toLowerCase() === gmParam.toLowerCase()
+                            );
+                            if (!target) {
+                                sendToChat(`❌ Player "${gmParam}" not found.`);
+                                break;
+                            }
+                            rejectGM(target.id);
+                        } else if (gmSub === 'status') {
+                            const gm = getCurrentGM();
+                            const gmName = gm ? gm.name : 'None';
+                            const pending = getPendingRequests();
+                            sendToChat(`👑 **GM Status**\nCurrent GM: ${gmName}\nPending requests: ${pending.length}`);
+                            if (pending.length > 0) {
+                                const list = pending.map(r => r.requesterName).join(', ');
+                                sendToChat(`Requests from: ${list}`);
+                            }
+                        } else if (gmSub === 'list') {
+                            const clientList = Object.values(clients).map(c => {
+                                const isGM = c.id === gmId ? '👑 ' : '';
+                                const isSelf = c.id === clientId ? ' (you)' : '';
+                                return `${isGM}${c.name}${isSelf} — ${c.role}`;
+                            }).join('\n');
+                            sendToChat(`👥 **Clients**\n${clientList}`);
+                        } else {
+                            sendToChat(`
+GM Commands:
+!fates-edge gm request        - Request to become GM
+!fates-edge gm approve <name> - Approve a pending GM request (GM only)
+!fates-edge gm reject <name>  - Reject a pending GM request (GM only)
+!fates-edge gm status         - Show current GM and pending requests
+!fates-edge gm list           - List all clients with roles
+`);
+                        }
+                        break;
+
                     default:
                         sendToChat(`
-                            Fate's Edge v1.2.0 Commands:
-                            !fates-edge connect - Connect to server
-                            !fates-edge disconnect - Disconnect
-                            !fates-edge status - Show status
-                            !fates-edge send <message> - Send chat
-                            !fates-edge roll <dice> - Roll dice
-                            !fates-edge draw [N] - Draw N cards (1-5)
-                            !fates-edge crown [region] - Crown Spread
-                            !fates-edge shuffle - Shuffle deck
-                            !fates-edge region [name] - Set/get region
-                            !fates-edge modules list - List modules
-                            !fates-edge sync characters - Sync characters
-                            !fates-edge sync scene - Sync current scene
-                        `);
+Fate's Edge v1.3.0 Commands:
+!fates-edge connect - Connect to server
+!fates-edge disconnect - Disconnect
+!fates-edge status - Show status
+!fates-edge send <message> - Send chat
+!fates-edge roll <dice> - Roll dice
+!fates-edge draw [N] - Draw N cards (1-5)
+!fates-edge crown [region] - Crown Spread
+!fates-edge shuffle - Shuffle deck
+!fates-edge region [name] - Set/get region
+!fates-edge modules list - List modules
+!fates-edge sync characters - Sync characters
+!fates-edge sync scene - Sync current scene
+!fates-edge gm ... - GM management (see !fates-edge gm help)
+`);
                 }
             }
         });
@@ -1018,7 +1264,7 @@ function parseDiceExpression(expr) {
 }
 
 // ============================================================
-// Roll20 Hooks (Updated)
+// Roll20 Hooks
 // ============================================================
 
 try {
@@ -1079,7 +1325,7 @@ try {
 // Register commands
 registerCommands();
 
-log('Fate\'s Edge Roll20 API module v1.2.0 loaded');
+log('Fate\'s Edge Roll20 API module v1.3.0 loaded');
 log(`Server: ${CONFIG.serverUrl}`);
 log(`Room: ${CONFIG.roomCode}`);
 log(`Region: ${currentRegion}`);
