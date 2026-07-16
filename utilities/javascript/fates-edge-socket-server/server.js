@@ -370,6 +370,32 @@ function broadcastToRoom(roomCode, event, data) {
 }
 
 // ============================================================
+// [WHITEBOARD] Helper to create default whiteboard state
+// ============================================================
+function createDefaultWhiteboard() {
+    return {
+        drawings: [],
+        notes: [],
+        images: [],
+        settings: {
+            gridSnap: false,
+            gridSize: 20,
+            backgroundColor: '#ffffff',
+            gridType: 'square',
+            showGrid: true
+        },
+        gridCombat: {
+            enabled: false,
+            gridType: 'square',
+            cellSize: 40,
+            showCoordinates: false,
+            showZones: false,
+            tokens: []
+        }
+    };
+}
+
+// ============================================================
 // API ROUTES
 // ============================================================
 
@@ -966,18 +992,22 @@ wss.on('connection', (ws, req) => {
             deckHistory: [],
             deckOffset: Math.floor(Math.random() * 1000),
             lastActivity: Date.now(),
-            created: Date.now()
+            created: Date.now(),
+            // [WHITEBOARD] Add whiteboard state
+            whiteboard: createDefaultWhiteboard()
         };
         rooms.set(roomKey, roomState);
         logInfo('📋 Room created', { room: roomKey });
     }
     
-    // Send current room state
+    // Send current room state (including whiteboard)
     ws.send(JSON.stringify({
         type: 'room-state',
         room: roomKey,
         deckRemaining: roomState.deck?.length || 0,
         historyCount: roomState.deckHistory?.length || 0,
+        // [WHITEBOARD] Include whiteboard state
+        whiteboard: roomState.whiteboard,
         timestamp: Date.now()
     }));
     
@@ -1021,27 +1051,25 @@ wss.on('connection', (ws, req) => {
                     handlePlainWSDeckHistoryClear(ws, roomKey);
                     break;
 
-                // ---- NEW: VTT and sync messages ----
-                case 'sync-state':
-                case 'vtt-characters-updated':
-                case 'vtt-timers-updated':
-                case 'chat-message':
-                case 'roll-dice':
-                    // Forward the message to all clients in the room
-                    broadcastToRoom(roomKey, messageType, {
-                        ...data,
-                        source: 'ws',
-                        clientId: clientId,
-                        timestamp: Date.now()
-                    });
+                // [WHITEBOARD] Handle whiteboard events
+                case 'whiteboard-update':
+                    handlePlainWSWhiteboardUpdate(ws, roomKey, data);
                     break;
-                // ------------------------------------
+
+                case 'sync-request':
+                    handlePlainWSSyncRequest(ws, roomKey, data);
+                    break;
+
+                case 'sync-state':
+                    // Client is pushing a full sync state – treat as update
+                    handlePlainWSWhiteboardUpdate(ws, roomKey, data);
+                    break;
                     
                 default:
                     ws.send(JSON.stringify({
                         type: 'error',
                         message: `Unknown message type: ${messageType}`,
-                        supportedTypes: ['ping', 'deck-draw', 'deck-shuffle', 'crown-spread', 'deck-history', 'deck-history-clear', 'sync-state', 'vtt-characters-updated', 'vtt-timers-updated', 'chat-message', 'roll-dice']
+                        supportedTypes: ['ping', 'deck-draw', 'deck-shuffle', 'crown-spread', 'deck-history', 'deck-history-clear', 'whiteboard-update', 'sync-request', 'sync-state']
                     }));
             }
         } catch (error) {
@@ -1101,7 +1129,8 @@ async function handlePlainWSDeckDraw(ws, roomKey, data) {
                 deckHistory: [],
                 deckOffset: Math.floor(Math.random() * 1000),
                 lastActivity: Date.now(),
-                created: Date.now()
+                created: Date.now(),
+                whiteboard: createDefaultWhiteboard() // [WHITEBOARD]
             };
             rooms.set(roomKey, room);
         }
@@ -1192,7 +1221,8 @@ function handlePlainWSDeckShuffle(ws, roomKey) {
                 deckHistory: [],
                 deckOffset: Math.floor(Math.random() * 1000),
                 lastActivity: Date.now(),
-                created: Date.now()
+                created: Date.now(),
+                whiteboard: createDefaultWhiteboard()
             };
             rooms.set(roomKey, room);
         }
@@ -1235,7 +1265,8 @@ async function handlePlainWSCrownSpread(ws, roomKey, data) {
                 deckHistory: [],
                 deckOffset: Math.floor(Math.random() * 1000),
                 lastActivity: Date.now(),
-                created: Date.now()
+                created: Date.now(),
+                whiteboard: createDefaultWhiteboard()
             };
             rooms.set(roomKey, room);
         }
@@ -1362,6 +1393,96 @@ function handlePlainWSDeckHistoryClear(ws, roomKey) {
     }
 }
 
+// [WHITEBOARD] Plain WS handlers for whiteboard
+function handlePlainWSWhiteboardUpdate(ws, roomKey, data) {
+    try {
+        let room = rooms.get(roomKey);
+        if (!room) {
+            room = {
+                name: `Room ${roomKey}`,
+                code: roomKey,
+                clients: new Map(),
+                deck: buildDeck(),
+                deckHistory: [],
+                deckOffset: Math.floor(Math.random() * 1000),
+                lastActivity: Date.now(),
+                created: Date.now(),
+                whiteboard: createDefaultWhiteboard()
+            };
+            rooms.set(roomKey, room);
+        }
+
+        // Extract whiteboard data - it may be in data.whiteboard or directly in data.state
+        let newWhiteboard;
+        if (data.whiteboard) {
+            newWhiteboard = data.whiteboard;
+        } else if (data.state) {
+            // For sync-state, the client may send { state: { ... } }
+            newWhiteboard = data.state;
+        } else {
+            // Assume the whole data is the whiteboard object
+            newWhiteboard = data;
+        }
+
+        // Ensure we have all required fields
+        room.whiteboard = {
+            drawings: newWhiteboard.drawings || [],
+            notes: newWhiteboard.notes || [],
+            images: newWhiteboard.images || [],
+            settings: { ...room.whiteboard.settings, ...(newWhiteboard.settings || {}) },
+            gridCombat: { ...room.whiteboard.gridCombat, ...(newWhiteboard.gridCombat || {}) }
+        };
+
+        room.lastActivity = Date.now();
+
+        // Broadcast to all clients in the room (including sender)
+        broadcastToRoom(roomKey, 'whiteboard-update', {
+            whiteboard: room.whiteboard,
+            timestamp: Date.now(),
+            source: 'plain-ws',
+            clientId: ws.clientId
+        });
+
+        logDebug('Whiteboard updated via plain WS', { room: roomKey, clientId: ws.clientId });
+
+    } catch (error) {
+        logError('Error in plain WS whiteboard update', { room: roomKey, error: error.message });
+        ws.send(JSON.stringify({
+            type: 'error',
+            message: 'Failed to update whiteboard: ' + error.message
+        }));
+    }
+}
+
+function handlePlainWSSyncRequest(ws, roomKey, data) {
+    try {
+        const room = rooms.get(roomKey);
+        if (!room) {
+            ws.send(JSON.stringify({
+                type: 'error',
+                message: 'Room not found'
+            }));
+            return;
+        }
+
+        // Respond with full sync-state
+        ws.send(JSON.stringify({
+            type: 'sync-state',
+            state: room.whiteboard,
+            timestamp: Date.now()
+        }));
+
+        logDebug('Sync request responded via plain WS', { room: roomKey, clientId: ws.clientId });
+
+    } catch (error) {
+        logError('Error in plain WS sync request', { room: roomKey, error: error.message });
+        ws.send(JSON.stringify({
+            type: 'error',
+            message: 'Failed to process sync request: ' + error.message
+        }));
+    }
+}
+
 // ============================================================
 // SOCKET.IO HANDLERS
 // ============================================================
@@ -1423,7 +1544,9 @@ io.on('connection', (socket) => {
                 deckHistory: [],
                 deckOffset: Math.floor(Math.random() * 1000),
                 lastActivity: Date.now(),
-                created: Date.now()
+                created: Date.now(),
+                // [WHITEBOARD] Add whiteboard state
+                whiteboard: createDefaultWhiteboard()
             };
             rooms.set(roomKey, room);
             logInfo('📋 Room created via Socket.io', { room: roomKey });
@@ -1435,13 +1558,15 @@ io.on('connection', (socket) => {
         room.clients.set(socket.id, socket.clientData.name);
         room.lastActivity = Date.now();
 
-        // Send room state to client
+        // Send room state to client (including whiteboard)
         const roomState = {
             room: roomKey,
             clients: Array.from(room.clients.entries()).map(([id, name]) => ({ id, name })),
             deckRemaining: room.deck.length,
             deckHistory: room.deckHistory.slice(-20),
-            totalClients: room.clients.size + (wsClients.has(roomKey) ? wsClients.get(roomKey).size : 0)
+            totalClients: room.clients.size + (wsClients.has(roomKey) ? wsClients.get(roomKey).size : 0),
+            // [WHITEBOARD] Include whiteboard
+            whiteboard: room.whiteboard
         };
         
         socket.emit('room-joined', roomState);
@@ -1853,78 +1978,95 @@ io.on('connection', (socket) => {
     });
 
     // ============================================================
-    // NEW: VTT and sync messages (Socket.io)
+    // [WHITEBOARD] Socket.io event handlers
     // ============================================================
+
+    socket.on('whiteboard-update', (data) => {
+        if (!socket.room) {
+            socket.emit('error', { message: 'Not in a room' });
+            return;
+        }
+
+        const room = rooms.get(socket.room);
+        if (!room) {
+            socket.emit('error', { message: 'Room not found' });
+            return;
+        }
+
+        try {
+            // Extract whiteboard data
+            let newWhiteboard;
+            if (data.whiteboard) {
+                newWhiteboard = data.whiteboard;
+            } else if (data.state) {
+                newWhiteboard = data.state;
+            } else {
+                newWhiteboard = data;
+            }
+
+            // Update room state
+            room.whiteboard = {
+                drawings: newWhiteboard.drawings || [],
+                notes: newWhiteboard.notes || [],
+                images: newWhiteboard.images || [],
+                settings: { ...room.whiteboard.settings, ...(newWhiteboard.settings || {}) },
+                gridCombat: { ...room.whiteboard.gridCombat, ...(newWhiteboard.gridCombat || {}) }
+            };
+
+            room.lastActivity = Date.now();
+
+            // Broadcast to all clients in the room (including sender)
+            broadcastToRoom(socket.room, 'whiteboard-update', {
+                whiteboard: room.whiteboard,
+                timestamp: Date.now(),
+                source: 'socket.io',
+                clientId: socket.id,
+                clientName: socket.clientData?.name || 'Player'
+            });
+
+            logDebug('Whiteboard updated via Socket.io', { 
+                room: socket.room, 
+                client: socket.clientData?.name 
+            });
+
+        } catch (error) {
+            logError('Error in Socket.io whiteboard update', { 
+                room: socket.room, 
+                error: error.message 
+            });
+            socket.emit('error', { message: 'Failed to update whiteboard: ' + error.message });
+        }
+    });
+
+    socket.on('sync-request', (data) => {
+        if (!socket.room) {
+            socket.emit('error', { message: 'Not in a room' });
+            return;
+        }
+
+        const room = rooms.get(socket.room);
+        if (!room) {
+            socket.emit('error', { message: 'Room not found' });
+            return;
+        }
+
+        // Respond with full sync-state
+        socket.emit('sync-state', {
+            state: room.whiteboard,
+            timestamp: Date.now()
+        });
+
+        logDebug('Sync request responded via Socket.io', { 
+            room: socket.room, 
+            client: socket.clientData?.name 
+        });
+    });
+
+    // Also handle 'sync-state' from client as an update (if they send it)
     socket.on('sync-state', (data) => {
-        if (!socket.room) {
-            socket.emit('error', { message: 'Not in a room' });
-            return;
-        }
-        broadcastToRoom(socket.room, 'sync-state', {
-            ...data,
-            source: 'socket.io',
-            clientId: socket.id,
-            clientName: socket.clientData?.name || 'Player',
-            timestamp: Date.now()
-        });
+        // Treat same as whiteboard-update
+        socket.emit('whiteboard-update', data);
     });
-
-    socket.on('vtt-characters-updated', (data) => {
-        if (!socket.room) {
-            socket.emit('error', { message: 'Not in a room' });
-            return;
-        }
-        broadcastToRoom(socket.room, 'vtt-characters-updated', {
-            ...data,
-            source: 'socket.io',
-            clientId: socket.id,
-            clientName: socket.clientData?.name || 'Player',
-            timestamp: Date.now()
-        });
-    });
-
-    socket.on('vtt-timers-updated', (data) => {
-        if (!socket.room) {
-            socket.emit('error', { message: 'Not in a room' });
-            return;
-        }
-        broadcastToRoom(socket.room, 'vtt-timers-updated', {
-            ...data,
-            source: 'socket.io',
-            clientId: socket.id,
-            clientName: socket.clientData?.name || 'Player',
-            timestamp: Date.now()
-        });
-    });
-
-    socket.on('chat-message', (data) => {
-        if (!socket.room) {
-            socket.emit('error', { message: 'Not in a room' });
-            return;
-        }
-        broadcastToRoom(socket.room, 'chat-message', {
-            ...data,
-            source: 'socket.io',
-            clientId: socket.id,
-            clientName: socket.clientData?.name || 'Player',
-            timestamp: Date.now()
-        });
-    });
-
-    socket.on('roll-dice', (data) => {
-        if (!socket.room) {
-            socket.emit('error', { message: 'Not in a room' });
-            return;
-        }
-        broadcastToRoom(socket.room, 'roll-dice', {
-            ...data,
-            source: 'socket.io',
-            clientId: socket.id,
-            clientName: socket.clientData?.name || 'Player',
-            timestamp: Date.now()
-        });
-    });
-    // ============================================================
 
     // ============================================================
     // DISCONNECT
