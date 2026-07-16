@@ -32,6 +32,10 @@
       "syncActors": {
         "name": "Sync Actors to VTT",
         "hint": "Sync selected Foundry actors to the VTT as characters (experimental)"
+      },
+      "gmFeaturesEnabled": {
+        "name": "Enable GM Management Features",
+        "hint": "Enable Game Master election, promotion, and management UI"
       }
     },
     "status": {
@@ -54,6 +58,30 @@
       "error": "❌ Connection error: {message}",
       "syncSuccess": "✅ Synced to VTT",
       "syncError": "❌ Sync failed: {message}"
+    },
+    "gm": {
+      "title": "Game Master Management",
+      "currentGm": "Current GM:",
+      "roleBadge": {
+        "youAreGm": "You are GM",
+        "player": "Player"
+      },
+      "buttons": {
+        "resign": "Resign GM",
+        "request": "Request GM",
+        "approve": "Approve",
+        "reject": "Reject"
+      },
+      "pendingRequests": "Pending Requests:",
+      "clients": "Clients ({count}):",
+      "notifications": {
+        "requestSent": "GM request sent. Waiting for approval.",
+        "resignInfo": "To resign, approve a pending request or use /vtt gm approve to promote someone else.",
+        "approved": "Approved GM for {name}",
+        "rejected": "Rejected request from {name}",
+        "roleUpdated": "Your role is now: {role}",
+        "gmChanged": "{name} is now the Game Master"
+      }
     }
   }
 }

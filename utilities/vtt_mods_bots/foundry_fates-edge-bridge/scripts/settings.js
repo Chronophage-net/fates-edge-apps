@@ -1,5 +1,6 @@
 /**
  * Fate's Edge Bridge - Settings Configuration
+ * Updated with GM Election/Promotion settings
  */
 
 export const registerSettings = function() {
@@ -150,6 +151,35 @@ export const registerSettings = function() {
         config: true,
         type: Boolean,
         default: true
+    });
+    
+    // ============================================================
+    // GM Features
+    // ============================================================
+    
+    game.settings.register('fates-edge-bridge', 'gmFeaturesEnabled', {
+        name: 'Enable GM Management Features',
+        hint: 'Enable Game Master election, promotion, and management UI',
+        scope: 'world',
+        config: true,
+        type: Boolean,
+        default: true,
+        onChange: () => {
+            // Refresh UI to show/hide GM button
+            const gmBtn = document.getElementById('fates-edge-gm-btn');
+            if (gmBtn) {
+                gmBtn.style.display = game.settings.get('fates-edge-bridge', 'gmFeaturesEnabled') ? 'inline-block' : 'none';
+            }
+            // Also close GM dialog if disabled
+            if (!game.settings.get('fates-edge-bridge', 'gmFeaturesEnabled')) {
+                const dialog = document.querySelector('.fates-edge-gm-dialog');
+                if (dialog) {
+                    // Find the close button or trigger close
+                    const closeBtn = dialog.closest('.dialog')?.querySelector('.dialog-close');
+                    if (closeBtn) closeBtn.click();
+                }
+            }
+        }
     });
     
     // ============================================================

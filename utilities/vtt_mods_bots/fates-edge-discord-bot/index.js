@@ -13,7 +13,7 @@ const path = require('path');
 // Import utilities
 const VTTClient = require('./utils/websocket');
 const logger = require('./utils/logger');
-const config = require('./utils/config');
+const config = require('./utils/config');  // <-- load config
 
 // ============================================================
 // Discord Client Setup
@@ -30,6 +30,9 @@ const client = new Client({
 });
 
 client.commands = new Collection();
+client.config = config;  // <-- ATTACH CONFIG TO CLIENT
+
+// Initialize VTT client with config
 client.vtt = new VTTClient(config.vtt);
 
 // ============================================================
@@ -180,6 +183,8 @@ client.login(process.env.DISCORD_TOKEN)
         if (process.env.WEBHOOK_PORT) {
             startWebhookServer();
         }
+        // Optionally connect VTT after login
+        // client.vtt.connect(); // If you want auto-connect on startup
     })
     .catch(err => {
         logger.error('❌ Failed to login:', err);

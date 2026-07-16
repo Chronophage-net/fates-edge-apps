@@ -15,7 +15,8 @@ function loadConfig() {
         vtt: {
             serverUrl: process.env.VTT_SERVER_URL || 'ws://localhost:3000',
             apiKey: process.env.VTT_API_KEY,
-            roomCode: process.env.VTT_ROOM_CODE || ''
+            roomCode: process.env.VTT_ROOM_CODE || '',
+            logChannel: process.env.VTT_LOG_CHANNEL || ''  // <-- ADDED
         },
         bot: {
             prefix: process.env.PREFIX || '!',

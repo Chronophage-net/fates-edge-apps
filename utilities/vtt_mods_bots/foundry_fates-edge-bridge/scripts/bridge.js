@@ -1,6 +1,6 @@
 /**
  * Fate's Edge Bridge v1.2.0 - Core WebSocket Connection
- * Supports Deck of Consequences, Crown Spread, Modules, and Regions
+ * Supports Deck of Consequences, Crown Spread, Modules, Regions, and GM Election/Promotion
  */
 
 export const FatesEdgeBridge = {
@@ -22,6 +22,12 @@ export const FatesEdgeBridge = {
     },
     defaultRegion: 'Acasia',
     loadedModules: [],
+    
+    // GM State
+    clients: new Map(),          // clientId -> { id, name, role, ... }
+    gmId: null,                  // clientId of current GM
+    pendingRequests: [],         // { requesterId, requesterName }
+    myRole: 'player',            // role of the Foundry client itself
     
     // ============================================================
     // Initialization
@@ -53,7 +59,7 @@ export const FatesEdgeBridge = {
             this.hookSceneChange();
         });
         
-        console.log('⚔️ Fate\'s Edge Bridge v1.2.0 initialized');
+        console.log('⚔️ Fate\'s Edge Bridge v1.2.0 initialized (with GM support)');
     },
     
     // ============================================================
@@ -126,8 +132,15 @@ export const FatesEdgeBridge = {
         this.clientId = null;
         this.reconnectAttempts = 0;
         
+        // Clear GM state
+        this.clients.clear();
+        this.gmId = null;
+        this.pendingRequests = [];
+        this.myRole = 'player';
+        
         console.log('🔌 Disconnected from Fate\'s Edge server');
         this._updateStatusUI('disconnected');
+        this._updateGmUI(); // refresh GM UI
     },
     
     // ============================================================
@@ -228,6 +241,21 @@ export const FatesEdgeBridge = {
             case 'region-updated':
                 this._handleRegionUpdate(data);
                 break;
+            // ============================================================
+            // GM Election & Promotion Events
+            // ============================================================
+            case 'presence':
+                this._handlePresence(data);
+                break;
+            case 'gm_vote_request':
+                this._handleGmVoteRequest(data);
+                break;
+            case 'gm_role_update':
+                this._handleGmRoleUpdate(data);
+                break;
+            case 'server_announcement':
+                this._handleServerAnnouncement(data);
+                break;
             case 'room-closed':
                 ui.notifications.warn('⚠️ Fate\'s Edge: Room closed by server');
                 this.disconnect();
@@ -305,12 +333,15 @@ export const FatesEdgeBridge = {
         }
         
         if (data.clients) {
+            // Update client list and GM state
+            this._updateClients(data.clients);
             const clientNames = data.clients.map(c => c.data?.name || 'Unknown').join(', ');
             console.log(`👥 Clients in room: ${clientNames}`);
         }
         
         // Send region info
         this._sendRegionUpdate(this.defaultRegion);
+        this._updateGmUI(); // initial GM UI
     },
     
     _handleStateUpdate(data) {
@@ -359,10 +390,24 @@ export const FatesEdgeBridge = {
         const name = data.data?.name || 'Unknown';
         console.log(`👤 Client joined: ${name}`);
         ui.notifications.info(`👤 Fate's Edge: ${name} joined the room`);
+        // Update clients if full list provided
+        if (data.clients) {
+            this._updateClients(data.clients);
+            this._updateGmUI();
+        }
     },
     
     _handleClientLeft(data) {
         console.log(`👤 Client left: ${data}`);
+        // Remove from local client map if we know the ID
+        if (data.clientId) {
+            this.clients.delete(data.clientId);
+            if (this.gmId === data.clientId) {
+                this.gmId = null;
+                this._updateGmFromClients();
+            }
+            this._updateGmUI();
+        }
         ui.notifications.info(`👤 Fate's Edge: A client left the room`);
     },
     
@@ -562,6 +607,64 @@ export const FatesEdgeBridge = {
     },
     
     // ============================================================
+    // GM Handlers
+    // ============================================================
+    
+    _handlePresence(data) {
+        console.log('👥 Presence update:', data);
+        if (data.clients) {
+            this._updateClients(data.clients);
+            this._updateGmUI();
+        }
+    },
+    
+    _handleGmVoteRequest(data) {
+        console.log('👑 GM vote request:', data);
+        const { requesterId, requesterName, currentGmId, currentGmName } = data;
+        
+        // Only show if we are the current GM
+        if (this.myRole === 'gm' && this.clientId === currentGmId) {
+            // Store pending request if not already
+            if (!this.pendingRequests.find(r => r.requesterId === requesterId)) {
+                this.pendingRequests.push({ requesterId, requesterName });
+            }
+            this._updateGmUI();
+            ui.notifications.info(`👑 ${requesterName} requests to become GM. Use the GM panel to approve.`);
+        }
+    },
+    
+    _handleGmRoleUpdate(data) {
+        console.log('👑 GM role update:', data);
+        const { clientId, role } = data;
+        
+        // Update our local role if it's for us
+        if (clientId === this.clientId) {
+            this.myRole = role;
+        }
+        
+        // Update client in map
+        const client = this.clients.get(clientId);
+        if (client) {
+            client.role = role;
+        }
+        
+        // Update gmId
+        if (role === 'gm') {
+            this.gmId = clientId;
+        } else if (this.gmId === clientId) {
+            this._updateGmFromClients();
+        }
+        
+        this._updateGmUI();
+        ui.notifications.info(`👑 ${this.clients.get(clientId)?.name || clientId} is now ${role.toUpperCase()}.`);
+    },
+    
+    _handleServerAnnouncement(data) {
+        console.log('📢 Server announcement:', data);
+        ui.notifications.info(`📢 Fate's Edge: ${data.message}`);
+    },
+    
+    // ============================================================
     // Sync Functions
     // ============================================================
     
@@ -664,6 +767,35 @@ export const FatesEdgeBridge = {
                 ui.notifications.info(`🌐 Fate's Edge: Switched to scene "${sceneData.name}"`);
             }
         }
+    },
+    
+    // ============================================================
+    // Client & GM Internal Helpers
+    // ============================================================
+    
+    _updateClients(clientsArray) {
+        this.clients.clear();
+        clientsArray.forEach(c => {
+            this.clients.set(c.id, c);
+            if (c.role === 'gm') this.gmId = c.id;
+        });
+        if (!clientsArray.some(c => c.role === 'gm')) {
+            this.gmId = null;
+        }
+        // Update myRole if my clientId is known
+        if (this.clientId && this.clients.has(this.clientId)) {
+            this.myRole = this.clients.get(this.clientId).role;
+        }
+    },
+    
+    _updateGmFromClients() {
+        for (const [id, client] of this.clients) {
+            if (client.role === 'gm') {
+                this.gmId = id;
+                return;
+            }
+        }
+        this.gmId = null;
     },
     
     // ============================================================
@@ -772,6 +904,70 @@ export const FatesEdgeBridge = {
         this.ws.send(JSON.stringify({ type: 'module-list' }));
         console.log('📦 Module list requested');
     },
+    
+    // ============================================================
+    // GM Public Methods
+    // ============================================================
+    
+    /**
+     * Request to become Game Master
+     */
+    requestGM() {
+        if (!this.connected || !this.ws) {
+            ui.notifications.warn('⚠️ Fate\'s Edge: Not connected to server');
+            return;
+        }
+        this.ws.send(JSON.stringify({ type: 'request_gm' }));
+        console.log('👑 GM request sent');
+        ui.notifications.info('👑 GM request sent. Waiting for approval.');
+    },
+    
+    /**
+     * Approve a GM request (only valid if current GM)
+     * @param {string} targetId - clientId of the requester
+     */
+    approveGM(targetId) {
+        if (!this.connected || !this.ws) {
+            ui.notifications.warn('⚠️ Fate\'s Edge: Not connected to server');
+            return;
+        }
+        if (!targetId) {
+            console.warn('approveGM called without targetId');
+            return;
+        }
+        this.ws.send(JSON.stringify({ type: 'approve_gm', targetId }));
+        // Remove from pending list optimistically
+        this.pendingRequests = this.pendingRequests.filter(r => r.requesterId !== targetId);
+        this._updateGmUI();
+        console.log(`👑 Approved GM for ${targetId}`);
+        ui.notifications.info(`✅ GM approved for ${targetId}`);
+    },
+    
+    /**
+     * Get current GM client object, or null
+     */
+    getCurrentGM() {
+        return this.gmId ? this.clients.get(this.gmId) : null;
+    },
+    
+    /**
+     * Get list of pending GM requests
+     */
+    getPendingGMRequests() {
+        return this.pendingRequests;
+    },
+    
+    /**
+     * Clear pending requests (e.g., after approval/rejection)
+     */
+    clearPendingGMRequests() {
+        this.pendingRequests = [];
+        this._updateGmUI();
+    },
+    
+    // ============================================================
+    // Sync Functions
+    // ============================================================
     
     syncVttState(state) {
         if (!this.connected || !this.ws) {
@@ -907,6 +1103,19 @@ export const FatesEdgeBridge = {
         if (deckEl) {
             deckEl.innerHTML = `🃏 ${this.deckState.remaining}`;
         }
+    },
+    
+    _updateGmUI() {
+        // This is called whenever GM state changes.
+        // The main.js will listen to 'gmStateChanged' event and refresh the UI.
+        // We also update the global variable for UI access.
+        Hooks.call('fates-edge-gm-state-changed', {
+            clients: this.clients,
+            gmId: this.gmId,
+            pendingRequests: this.pendingRequests,
+            myRole: this.myRole,
+            currentGM: this.getCurrentGM()
+        });
     },
     
     // ============================================================

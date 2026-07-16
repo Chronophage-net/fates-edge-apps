@@ -1,5 +1,6 @@
 /**
  * WebSocket Client for Fate's Edge VTT Server
+ * Extended with GM election/promotion support
  */
 
 const WebSocket = require('ws');
@@ -19,6 +20,12 @@ class VTTClient extends EventEmitter {
         this.heartbeatInterval = null;
         this.roomCode = config.roomCode;
         this.pendingMessages = [];
+
+        // GM state per room (only one room per client instance)
+        this.clients = new Map();        // clientId -> { id, name, role, ... }
+        this.gmId = null;               // clientId of current GM
+        this.pendingRequests = [];       // { requesterId, requesterName }
+        this.myRole = 'player';
     }
 
     connect(roomCode = this.roomCode) {
@@ -70,6 +77,11 @@ class VTTClient extends EventEmitter {
         this.connected = false;
         this.clientId = null;
         this.emit('disconnected');
+        // Reset GM state
+        this.clients.clear();
+        this.gmId = null;
+        this.pendingRequests = [];
+        this.myRole = 'player';
     }
 
     send(type, data = {}) {
@@ -162,6 +174,7 @@ class VTTClient extends EventEmitter {
                 this.emit('room-state', message);
                 logger.info(`📦 Room state received. Client ID: ${this.clientId}`);
                 if (message.clients) {
+                    this._updateClients(message.clients);
                     const names = message.clients.map(c => c.data?.name || 'Unknown').join(', ');
                     logger.info(`👥 Clients in room: ${names}`);
                 }
@@ -183,11 +196,20 @@ class VTTClient extends EventEmitter {
                 this.emit('client-joined', message);
                 const name = message.data?.name || 'Unknown';
                 logger.info(`👤 ${name} joined the room`);
+                // Update clients if the server provides the full list
+                if (message.clients) {
+                    this._updateClients(message.clients);
+                }
                 break;
 
             case 'client-left':
                 this.emit('client-left', message);
                 logger.info(`👤 Client left: ${message.clientId}`);
+                // Remove client from local state
+                this.clients.delete(message.clientId);
+                if (this.gmId === message.clientId) this.gmId = null;
+                // Possibly re-evaluate GM from remaining clients
+                this._updateGmFromClients();
                 break;
 
             case 'vtt-state-updated':
@@ -208,6 +230,49 @@ class VTTClient extends EventEmitter {
                 this.disconnect();
                 break;
 
+            // ============================================================
+            // GM ELECTION & PROMOTION EVENTS
+            // ============================================================
+            case 'presence':
+                if (message.clients) {
+                    this._updateClients(message.clients);
+                }
+                this.emit('presence', message);
+                break;
+
+            case 'gm_vote_request':
+                // Store pending request (if not already)
+                const { requesterId, requesterName, currentGmId, currentGmName } = message;
+                if (!this.pendingRequests.find(r => r.requesterId === requesterId)) {
+                    this.pendingRequests.push({ requesterId, requesterName });
+                }
+                this.emit('gmVoteRequest', message);
+                break;
+
+            case 'gm_role_update':
+                // Update our local role if we are the target
+                if (message.clientId === this.clientId) {
+                    this.myRole = message.role;
+                }
+                // Also update the client in our map
+                const client = this.clients.get(message.clientId);
+                if (client) {
+                    client.role = message.role;
+                }
+                // If it's the GM, update gmId
+                if (message.role === 'gm') {
+                    this.gmId = message.clientId;
+                } else if (this.gmId === message.clientId) {
+                    // If the GM was demoted, find new GM from remaining clients
+                    this._updateGmFromClients();
+                }
+                this.emit('gmRoleUpdate', message);
+                break;
+
+            case 'server_announcement':
+                this.emit('serverAnnouncement', message);
+                break;
+
             case 'pong':
                 // Heartbeat response - ignore
                 break;
@@ -218,56 +283,83 @@ class VTTClient extends EventEmitter {
         }
     }
 
-    _onError(error) {
-        logger.error(`❌ WebSocket error: ${error.message}`);
-        this.emit('error', error);
-        this._scheduleReconnect();
-    }
+    // ============================================================
+    // Internal helper methods
+    // ============================================================
 
-    _onClose(code, reason) {
-        logger.info(`🔌 WebSocket closed: ${code} - ${reason || 'No reason'}`);
-        this.connected = false;
-        this.clientId = null;
-        this._cleanup();
-
-        if (code !== 1000) {
-            this._scheduleReconnect();
+    _updateClients(clientsArray) {
+        this.clients.clear();
+        clientsArray.forEach(c => {
+            this.clients.set(c.id, c);
+            if (c.role === 'gm') this.gmId = c.id;
+        });
+        // If no GM found, set gmId to null
+        if (!clientsArray.some(c => c.role === 'gm')) {
+            this.gmId = null;
         }
-        this.emit('disconnected', { code, reason });
-    }
-
-    _cleanup() {
-        if (this.heartbeatInterval) {
-            clearInterval(this.heartbeatInterval);
-            this.heartbeatInterval = null;
-        }
-        if (this.reconnectTimer) {
-            clearTimeout(this.reconnectTimer);
-            this.reconnectTimer = null;
+        // Update myRole if my clientId is known
+        if (this.clientId && this.clients.has(this.clientId)) {
+            this.myRole = this.clients.get(this.clientId).role;
         }
     }
 
-    _scheduleReconnect() {
-        if (this.reconnectAttempts >= this.maxReconnectAttempts) {
-            logger.error('❌ Max reconnection attempts reached');
-            this.emit('reconnect-failed');
-            return;
-        }
-
-        const delay = Math.min(1000 * Math.pow(1.5, this.reconnectAttempts), 30000);
-        this.reconnectAttempts++;
-
-        logger.info(`🔄 Reconnecting in ${delay}ms (attempt ${this.reconnectAttempts}/${this.maxReconnectAttempts})`);
-
-        this.reconnectTimer = setTimeout(() => {
-            if (!this.connected) {
-                this.connect();
+    _updateGmFromClients() {
+        let newGm = null;
+        for (const [id, client] of this.clients) {
+            if (client.role === 'gm') {
+                newGm = id;
+                break;
             }
-        }, delay);
+        }
+        this.gmId = newGm;
     }
 
     // ============================================================
-    // Public API Methods
+    // Public API Methods – GM actions
+    // ============================================================
+
+    /**
+     * Request to become Game Master (send to server)
+     */
+    requestGM() {
+        this.send('request_gm');
+    }
+
+    /**
+     * Approve a GM request (only valid if current GM)
+     * @param {string} targetId - clientId of the requester
+     */
+    approveGM(targetId) {
+        if (!targetId) {
+            logger.warn('approveGM called without targetId');
+            return;
+        }
+        this.send('approve_gm', { targetId });
+    }
+
+    /**
+     * Get current GM client object, or null
+     */
+    getCurrentGM() {
+        return this.gmId ? this.clients.get(this.gmId) : null;
+    }
+
+    /**
+     * Get list of pending GM requests
+     */
+    getPendingGMRequests() {
+        return this.pendingRequests;
+    }
+
+    /**
+     * Clear pending requests (e.g., after approval/rejection)
+     */
+    clearPendingGMRequests() {
+        this.pendingRequests = [];
+    }
+
+    // ============================================================
+    // Existing public API methods
     // ============================================================
 
     sendChatMessage(text, sender = 'Discord Bot') {
@@ -279,7 +371,6 @@ class VTTClient extends EventEmitter {
     }
 
     sendRoll(expr, reason = null, sender = 'Discord Bot') {
-        // Parse dice expression
         const result = this._parseDice(expr);
         this.send('roll-dice', {
             expr,

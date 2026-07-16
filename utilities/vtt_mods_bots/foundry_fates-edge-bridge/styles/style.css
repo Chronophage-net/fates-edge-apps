@@ -1,4 +1,31 @@
 /* Fate's Edge Bridge - Styles */
+/* Updated with GM panel and UI enhancements */
+
+/* ============================================================
+   Status Bar
+   ============================================================ */
+
+#fates-edge-status-container {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-left: 8px;
+    padding: 4px 10px;
+    background: rgba(0, 0, 0, 0.6);
+    border-radius: 4px;
+    font-size: 12px;
+    cursor: default;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+#fates-edge-status-container:hover {
+    background: rgba(0, 0, 0, 0.8);
+    border-color: rgba(212, 175, 55, 0.3);
+}
+
+#fates-edge-status-container .status-item {
+    cursor: default;
+}
 
 #fates-edge-status {
     font-weight: bold;
@@ -6,6 +33,14 @@
     border-radius: 4px;
     background: rgba(0,0,0,0.2);
     display: inline-block;
+    min-width: 90px;
+    cursor: pointer;
+}
+
+#fates-edge-deck {
+    min-width: 40px;
+    font-weight: bold;
+    cursor: pointer;
 }
 
 #fates-edge-voice {
@@ -14,7 +49,187 @@
     background: rgba(0,0,0,0.2);
     display: inline-block;
     margin-left: 8px;
+    min-width: 50px;
+    cursor: pointer;
 }
+
+#fates-edge-region {
+    min-width: 70px;
+    cursor: pointer;
+}
+
+#fates-edge-gm-btn {
+    background: rgba(212, 175, 55, 0.15);
+    border: 1px solid #d4af37;
+    border-radius: 4px;
+    color: #d4af37;
+    padding: 2px 8px;
+    font-size: 11px;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+}
+
+#fates-edge-gm-btn:hover {
+    background: rgba(212, 175, 55, 0.3);
+}
+
+/* Status colors */
+.fates-edge-status-connected {
+    color: #43b581 !important;
+}
+
+.fates-edge-status-disconnected {
+    color: #f04747 !important;
+}
+
+.fates-edge-status-connecting {
+    color: #faa61a !important;
+}
+
+/* ============================================================
+   GM Panel (Dialog)
+   ============================================================ */
+
+.fates-edge-gm-panel {
+    padding: 10px;
+    font-family: inherit;
+}
+
+.fates-edge-gm-panel .gm-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #444;
+}
+
+.fates-edge-gm-panel .gm-header .gm-label {
+    font-weight: bold;
+    color: #d4af37;
+}
+
+.fates-edge-gm-panel .gm-header .gm-name {
+    margin-left: 8px;
+}
+
+.fates-edge-gm-panel .gm-role-badge {
+    background: #444;
+    color: #aaa;
+    padding: 2px 10px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: bold;
+}
+
+.fates-edge-gm-panel .gm-role-badge.is-gm {
+    background: #d4af37;
+    color: #222;
+}
+
+.fates-edge-gm-panel .gm-actions {
+    margin-bottom: 10px;
+}
+
+.fates-edge-gm-panel .gm-actions button {
+    border: none;
+    padding: 6px 14px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.fates-edge-gm-panel .gm-actions .gm-request-btn {
+    background: #d4af37;
+    color: #222;
+}
+
+.fates-edge-gm-panel .gm-actions .gm-request-btn:hover {
+    background: #e6c84d;
+}
+
+.fates-edge-gm-panel .gm-actions .gm-resign-btn {
+    background: #d9534f;
+    color: white;
+}
+
+.fates-edge-gm-panel .gm-actions .gm-resign-btn:hover {
+    background: #c9302c;
+}
+
+.fates-edge-gm-panel .gm-pending-requests {
+    margin-top: 10px;
+    border-top: 1px solid #444;
+    padding-top: 10px;
+}
+
+.fates-edge-gm-panel .gm-pending-requests .pending-label {
+    font-weight: bold;
+    color: #faa61a;
+}
+
+.fates-edge-gm-panel .gm-request-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 4px 0;
+    border-bottom: 1px solid #333;
+}
+
+.fates-edge-gm-panel .gm-request-item .request-name {
+    flex: 1;
+}
+
+.fates-edge-gm-panel .gm-request-item .gm-approve-btn {
+    background: #43b581;
+    border: none;
+    color: white;
+    padding: 2px 10px;
+    border-radius: 3px;
+    cursor: pointer;
+    margin-right: 4px;
+}
+
+.fates-edge-gm-panel .gm-request-item .gm-approve-btn:hover {
+    background: #2d8f6a;
+}
+
+.fates-edge-gm-panel .gm-request-item .gm-reject-btn {
+    background: #d9534f;
+    border: none;
+    color: white;
+    padding: 2px 10px;
+    border-radius: 3px;
+    cursor: pointer;
+}
+
+.fates-edge-gm-panel .gm-request-item .gm-reject-btn:hover {
+    background: #b94541;
+}
+
+.fates-edge-gm-panel .gm-clients-list {
+    margin-top: 15px;
+    border-top: 1px solid #444;
+    padding-top: 10px;
+}
+
+.fates-edge-gm-panel .gm-clients-list .clients-label {
+    font-weight: bold;
+    color: #8ac49a;
+}
+
+.fates-edge-gm-panel .gm-clients-list .client-item {
+    padding: 2px 0;
+    font-size: 0.9em;
+}
+
+.fates-edge-gm-panel .gm-clients-list .client-item .client-role {
+    color: #aaa;
+}
+
+/* ============================================================
+   Buttons (General)
+   ============================================================ */
 
 .fates-edge-button {
     background: #d4af37;
@@ -36,19 +251,10 @@
     cursor: not-allowed;
 }
 
-.fates-edge-status-connected {
-    color: #43b581;
-}
+/* ============================================================
+   Chat Messages
+   ============================================================ */
 
-.fates-edge-status-disconnected {
-    color: #f04747;
-}
-
-.fates-edge-status-connecting {
-    color: #faa61a;
-}
-
-/* Chat message styling */
 .fates-edge-chat-message {
     border-left: 3px solid #d4af37;
     padding-left: 8px;
@@ -60,7 +266,10 @@
     color: #d4af37;
 }
 
-/* Timer display */
+/* ============================================================
+   Timers
+   ============================================================ */
+
 .fates-edge-timer {
     background: rgba(0,0,0,0.2);
     border-radius: 4px;
@@ -89,4 +298,50 @@
 
 .fates-edge-timer .progress .fill.active {
     background: #d4af37;
+}
+
+/* ============================================================
+   Deck & Crown Spread Cards (Chat embeds)
+   ============================================================ */
+
+.fates-edge-deck-card {
+    border: 2px solid #d4af37;
+    border-radius: 8px;
+    padding: 10px;
+    margin: 5px 0;
+    background: rgba(212, 175, 55, 0.1);
+}
+
+.fates-edge-deck-card .card-title {
+    color: #d4af37;
+    margin-top: 0;
+}
+
+.fates-edge-deck-card .card-synthesis {
+    font-style: italic;
+}
+
+.fates-edge-deck-card .card-footer {
+    font-size: 0.8em;
+    color: #888;
+    margin-top: 5px;
+}
+
+/* ============================================================
+   Responsive adjustments for Foundry UI
+   ============================================================ */
+
+@media (max-width: 768px) {
+    #fates-edge-status-container {
+        flex-wrap: wrap;
+        gap: 4px;
+        padding: 4px 6px;
+    }
+    #fates-edge-status-container span {
+        font-size: 10px;
+    }
+    #fates-edge-gm-btn {
+        font-size: 10px;
+        padding: 1px 6px;
+    }
 }

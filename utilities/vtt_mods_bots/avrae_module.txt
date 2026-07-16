@@ -1,0 +1,79 @@
+<!drac2>
+import requests
+import json
+
+API_BASE = "https://your-fates-edge-server.com/api"
+API_KEY = "YOUR_API_KEY"
+
+def make_request(endpoint, method="GET", data=None):
+    try:
+        url = f"{API_BASE}{endpoint}"
+        headers = {"Authorization": f"Bearer {API_KEY}"}
+        if method == "GET":
+            response = requests.get(url, headers=headers)
+        else:
+            response = requests.post(url, json=data, headers=headers)
+        return response.json()
+    except Exception as e:
+        return {"error": str(e)}
+
+args = &ARGS&
+cmd = args[0].lower() if args else "help"
+
+if cmd == "draw":
+    count = min(int(args[1]) if len(args) > 1 else 1, 5)
+    region = args[2] if len(args) > 2 else "Acasia"
+    result = make_request("/deck/draw", "POST", {"count": count, "region": region})
+    
+    if result.get("error"):
+        return f"❌ {result['error']}"
+    
+    cards = result.get("cards", [])
+    synthesis = result.get("synthesis", "")
+    card_list = "\n".join([f"• {c['rankName']} of {c['suitName']}" for c in cards])
+    return f"🃏 **Drew {count} from {region}**\n{card_list}\n\n{synthesis}"
+
+elif cmd == "crown":
+    region = args[1] if len(args) > 1 else "Acasia"
+    result = make_request("/deck/crown", "POST", {"region": region})
+    if result.get("error"):
+        return f"❌ {result['error']}"
+    
+    positions = result.get("result", {}).get("positions", [])
+    output = "👑 **Crown Spread**\n"
+    for pos in positions:
+        output += f"{pos['icon']} **{pos['label']}**: {pos['meaning']}\n"
+    return output
+
+elif cmd == "gm":
+    if len(args) < 2:
+        return "❌ Usage: `!fe gm request|status|approve <player>`"
+    
+    subcmd = args[1].lower()
+    if subcmd == "request":
+        result = make_request("/gm/request", "POST")
+        return "👑 GM request sent." if not result.get("error") else f"❌ {result['error']}"
+    elif subcmd == "status":
+        result = make_request("/gm/status")
+        if result.get("error"):
+            return f"❌ {result['error']}"
+        return f"👑 **GM**: {result.get('gmName', 'None')}\n📋 **Pending**: {result.get('pending', 0)}"
+    elif subcmd == "approve":
+        if len(args) < 3:
+            return "❌ Specify a player: `!fe gm approve <player>`"
+        target = args[2]
+        result = make_request(f"/gm/approve/{target}", "POST")
+        return f"✅ Approved {target} as GM." if not result.get("error") else f"❌ {result['error']}"
+    else:
+        return "❌ Unknown GM subcommand."
+
+else:
+    return """**Fate's Edge VTT Commands**
+`!fe draw [count] [region]` - Draw cards (1-5)
+`!fe crown [region]` - Crown spread reading
+`!fe gm request` - Request GM
+`!fe gm status` - GM status
+`!fe gm approve <player>` - Approve GM (GM only)
+`!fe help` - This help
+"""
+</drac2>
