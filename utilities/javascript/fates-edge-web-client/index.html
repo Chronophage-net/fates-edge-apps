@@ -1,279 +1,283 @@
-/**
- * Application router – handles navigation and delegates module management to moduleLoader.
- * v3.2 – Integrated with module-loader.js, includes dashboard route.
- */
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Fate's Edge Toolkit v4.0 - A modular TTRPG companion." />
+    <title>Fate's Edge Toolkit v4.0</title>
+    
+    <!-- Preconnect for CDN performance -->
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com" />
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" />
+    
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="css/base.css" />
+    <link rel="stylesheet" href="css/components.css" />
+    <link rel="stylesheet" href="css/layout.css" />
+    <link rel="stylesheet" href="css/themes.css" />
+    
+    <!-- Seed loading script -->
+    <script>
+        (function() {
+            if (window.__RANDOM_SEED) return;
+            try {
+                const stored = localStorage.getItem('fates-edge-seed');
+                if (stored) { window.__RANDOM_SEED = stored; return; }
+            } catch (e) {}
+            
+            fetch('.seed/random-seed.json')
+                .then(r => r.json())
+                .then(data => {
+                    if (data && data.seed) {
+                        window.__RANDOM_SEED = data.seed;
+                        try { localStorage.setItem('fates-edge-seed', data.seed); } catch (e) {}
+                    }
+                })
+                .catch(() => fetch('data/seed.json')
+                    .then(r => r.json())
+                    .then(data => { if (data && data.seed) window.__RANDOM_SEED = data.seed; })
+                    .catch(() => {})
+                );
+        })();
+    </script>
+    <script src="seed.js" defer></script>
 
-import { showToast } from './components/Toast.js';
-import { moduleLoader } from './module-loader.js';
+    <!-- Third-party libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/fuse.js@7.0.0" defer></script>
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js" defer></script>
+</head>
+<body>
 
-// ============================================================
-// CONSTANTS & CONFIGURATION
-// ============================================================
+    <!-- ===== PASSWORD OVERLAY ===== -->
+    <div class="password-overlay" id="passwordOverlay" role="dialog" aria-modal="true" aria-label="Password gate">
+        <div class="gate-box">
+            <div class="gate-icon">⚔️</div>
+            <div class="gate-title">Fate's Edge</div>
+            <div class="gate-sub">Enter the playtester password to continue</div>
+            <div class="gate-error" id="gateError"></div>
+            <input type="password" class="gate-input" id="gateInput" placeholder="Enter password…" autocomplete="current-password" />
+            <button class="gate-btn" id="gateBtn">Unlock</button>
+            <div class="gate-foot">— playtester access only —</div>
+        </div>
+    </div>
 
-// Route redirects for backward compatibility
-export const ROUTE_REDIRECTS = {
-    'consequences': 'decks',
-    'builder': 'characters',
-    'regional': 'decks',
-    'roller': 'dice',
-    'scene-tools': 'gm-tools',   // old name → new
-};
-
-// Map of route names to module import paths (relative to js/)
-const ROUTE_IMPORTS = {
-    home:        () => import('./features/home/index.js'),
-    dashboard:   () => import('./features/dashboard/index.js'),  // <-- added
-    characters:  () => import('./features/characters/index.js'),
-    dice:        () => import('./features/dice/index.js'),
-    decks:       () => import('./features/decks/index.js'),
-    encounters:  () => import('./features/encounters/index.js'),
-    timers:      () => import('./features/timers/index.js'),
-    factions:    () => import('./features/factions/index.js'),
-    patrons:     () => import('./features/patrons/index.js'),
-    docs:        () => import('./features/docs/index.js'),
-    search:      () => import('./features/search/index.js'),
-    settings:    () => import('./features/settings/index.js'),
-    sync:        () => import('./features/sync/index.js'),
-    whiteboard:  () => import('./features/whiteboard/index.js'),
-    kanban:      () => import('./features/kanban/index.js'),
-    wiki:        () => import('./features/wiki/index.js'),
-    vtt:         () => import('./features/vtt/index.js'),
-    'gm-tools':  () => import('./features/gm-tools/index.js'),
-};
-
-// ============================================================
-// STATE
-// ============================================================
-
-let currentTab = 'home';
-let activeCallbacks = [];
-let isInitialized = false;
-
-// ============================================================
-// RESOLVE TAB (with redirects)
-// ============================================================
-
-function resolveTab(tab) {
-    const redirect = ROUTE_REDIRECTS[tab];
-    if (redirect) {
-        console.log(`↪️ Router: Redirecting "${tab}" → "${redirect}"`);
-        return redirect;
-    }
-    return tab;
-}
-
-// ============================================================
-// CONTENT ELEMENT MANAGEMENT
-// ============================================================
-
-function getOrCreateContentElement(resolvedTab) {
-    // Try by ID
-    let el = document.getElementById(`tab-${resolvedTab}`);
-    if (el) return el;
-
-    // Fallback: find any .tab-content
-    el = document.querySelector('.tab-content');
-    if (el) {
-        el.id = `tab-${resolvedTab}`;
-        return el;
-    }
-
-    // Create new inside <main> or <body>
-    const container = document.querySelector('main') || document.body;
-    el = document.createElement('div');
-    el.id = `tab-${resolvedTab}`;
-    el.className = 'tab-content';
-    container.appendChild(el);
-    console.log(`🆕 Created content container for tab: ${resolvedTab}`);
-    return el;
-}
-
-// ============================================================
-// NAVIGATION (CORE)
-// ============================================================
-
-export async function navigate(tab, options = {}) {
-    const resolved = resolveTab(tab);
-    const isRedirect = resolved !== tab;
-
-    // If it's a redirect, update URL hash and call again
-    if (isRedirect && !options._fromRedirect) {
-        if (window.location.hash) {
-            window.history.replaceState(null, '', `#${resolved}`);
-        }
-        return navigate(resolved, { ...options, _fromRedirect: true });
-    }
-
-    // Ensure routes are registered (lazy init)
-    if (moduleLoader.importFns.size === 0) {
-        registerAllRoutes();
-    }
-
-    // Check if route exists in loader
-    if (!moduleLoader.importFns.has(resolved)) {
-        console.warn(`⚠️ Route not found: ${resolved} (original: ${tab})`);
-        const contentEl = getOrCreateContentElement(resolved);
-        contentEl.innerHTML = `
-            <div class="panel">
-                <h3>📄 Unknown Route</h3>
-                <p class="text-muted">The route "${resolved}" is not registered.</p>
-                <button class="btn btn-sm mt-1" onclick="window.location.hash='home'">🏠 Go Home</button>
+    <!-- ===== APP SHELL ===== -->
+    <div class="app-shell">
+        <!-- ===== SIDEBAR ===== -->
+        <aside class="sidebar" id="sidebar" role="navigation" aria-label="Main Navigation">
+            <div class="sidebar-brand">
+                <span class="brand-icon">⚔️</span>
+                <div class="brand-text">
+                    <span class="brand-name">Fate's Edge</span>
+                    <span class="brand-version">v4.0</span>
+                </div>
             </div>
-        `;
-        return;
-    }
+            
+            <nav class="sidebar-nav" id="sidebarNav" aria-label="Module Navigation">
+                <div class="nav-group">
+                    <span class="nav-group-title">Core</span>
+                    <button class="nav-item active" data-tab="home" title="Home" role="tab" aria-selected="true">
+                        <span class="nav-icon">📜</span> <span class="nav-label">Home</span>
+                    </button>
+                    <button class="nav-item" data-tab="dashboard" title="Dashboard" role="tab">
+                        <span class="nav-icon">📊</span> <span class="nav-label">Dashboard</span>
+                    </button>
+                    <button class="nav-item" data-tab="characters" title="Characters" role="tab">
+                        <span class="nav-icon">👤</span> <span class="nav-label">Characters</span>
+                    </button>
+                    <button class="nav-item" data-tab="dice" title="Dice Roller" role="tab">
+                        <span class="nav-icon">🎲</span> <span class="nav-label">Dice</span>
+                    </button>
+                </div>
 
-    // Update current tab
-    currentTab = resolved;
+                <div class="nav-group">
+                    <span class="nav-group-title">World</span>
+                    <button class="nav-item" data-tab="encounters" title="Encounters" role="tab">
+                        <span class="nav-icon">⚔️</span> <span class="nav-label">Encounters</span>
+                    </button>
+                    <button class="nav-item" data-tab="factions" title="Factions & Assets" role="tab">
+                        <span class="nav-icon">🏛️</span> <span class="nav-label">Factions</span>
+                    </button>
+                    <button class="nav-item" data-tab="wiki" title="Wiki" role="tab">
+                        <span class="nav-icon">📖</span> <span class="nav-label">Wiki</span>
+                    </button>
+                    <button class="nav-item" data-tab="patrons" title="Patrons" role="tab">
+                        <span class="nav-icon">👁️</span> <span class="nav-label">Patrons</span>
+                    </button>
+                </div>
 
-    // Update sidebar active state
-    document.querySelectorAll('.sidebar-nav button[data-tab]').forEach(btn => {
-        const btnTab = btn.dataset.tab;
-        const isActive = btnTab === resolved || ROUTE_REDIRECTS[btnTab] === resolved;
-        btn.classList.toggle('active', isActive);
-    });
+                <div class="nav-group">
+                    <span class="nav-group-title">Table</span>
+                    <button class="nav-item" data-tab="vtt" title="Virtual Tabletop" role="tab">
+                        <span class="nav-icon">💬</span> <span class="nav-label">VTT</span>
+                    </button>
+                    <button class="nav-item" data-tab="scene-tools" title="Scene Tools (GM Tools)" role="tab">
+                        <span class="nav-icon">🎯</span> <span class="nav-label">Scene Tools</span>
+                    </button>
+                    <button class="nav-item" data-tab="timers" title="Timers" role="tab">
+                        <span class="nav-icon">⏱️</span> <span class="nav-label">Timers</span>
+                    </button>
+                    <button class="nav-item" data-tab="decks" title="Decks" role="tab">
+                        <span class="nav-icon">🃏</span> <span class="nav-label">Decks</span>
+                    </button>
+                </div>
 
-    // Hide all tab contents, show the active one
-    document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-    const contentEl = getOrCreateContentElement(resolved);
-    contentEl.classList.add('active');
+                <div class="nav-group">
+                    <span class="nav-group-title">System</span>
+                    <button class="nav-item" data-tab="search" title="Search" role="tab">
+                        <span class="nav-icon">🔍</span> <span class="nav-label">Search</span>
+                    </button>
+                    <button class="nav-item" data-tab="docs" title="Documentation" role="tab">
+                        <span class="nav-icon">📄</span> <span class="nav-label">Docs</span>
+                    </button>
+                    <button class="nav-item" data-tab="settings" title="Settings" role="tab">
+                        <span class="nav-icon">⚙️</span> <span class="nav-label">Settings</span>
+                    </button>
+                </div>
+            </nav>
+            
+            <div class="sidebar-footer">
+                <div class="footer-status">
+                    <span class="status-dot" id="save-status"></span>
+                    <span class="status-label">Saved</span>
+                </div>
+                <div class="footer-actions">
+                    <button class="footer-btn" id="exportBtn" title="Export JSON" aria-label="Export Data">⬇</button>
+                    <button class="footer-btn" id="importBtn" title="Import JSON" aria-label="Import Data">⬆</button>
+                    <input type="file" id="importFile" accept=".json" style="display:none" />
+                    <button class="footer-btn" id="theme-toggle" title="Toggle theme" aria-label="Toggle Theme">🌙</button>
+                </div>
+            </div>
+        </aside>
 
-    // Delegate rendering to moduleLoader
-    try {
-        await moduleLoader.renderModule(resolved, contentEl);
-        activeCallbacks.forEach(cb => cb(resolved, moduleLoader.getModule(resolved)));
-        if (isRedirect) {
-            showToast(`↪️ Redirected to ${resolved}`, 'info');
-        }
-    } catch (err) {
-        // The loader already shows an error UI, but we also want to log and notify
-        console.error(`Router: Error rendering module "${resolved}":`, err);
-        showToast(`Failed to load ${resolved}: ${err.message}`, 'error');
-    }
-}
+        <!-- ===== MAIN CONTENT ===== -->
+        <main class="main-content">
+            <!-- Core tabs -->
+            <div id="tab-home" class="tab-content active" role="tabpanel"></div>
+            <div id="tab-dashboard" class="tab-content" role="tabpanel"></div>
+            <div id="tab-characters" class="tab-content" role="tabpanel"></div>
+            <div id="tab-dice" class="tab-content" role="tabpanel"></div>
+            
+            <!-- World tabs -->
+            <div id="tab-encounters" class="tab-content" role="tabpanel"></div>
+            <div id="tab-factions" class="tab-content" role="tabpanel"></div>
+            <div id="tab-wiki" class="tab-content" role="tabpanel"></div>
+            <div id="tab-patrons" class="tab-content" role="tabpanel"></div>
+            
+            <!-- Table tabs -->
+            <div id="tab-vtt" class="tab-content" role="tabpanel"></div>
+            <!-- scene-tools redirects to gm-tools via router -->
+            <div id="tab-scene-tools" class="tab-content" role="tabpanel"></div>
+            <!-- gm-tools is the actual module; router will use this if scene-tools is requested -->
+            <div id="tab-gm-tools" class="tab-content" role="tabpanel"></div>
+            <div id="tab-timers" class="tab-content" role="tabpanel"></div>
+            <div id="tab-decks" class="tab-content" role="tabpanel"></div>
+            
+            <!-- System tabs -->
+            <div id="tab-search" class="tab-content" role="tabpanel"></div>
+            <div id="tab-docs" class="tab-content" role="tabpanel"></div>
+            <div id="tab-settings" class="tab-content" role="tabpanel"></div>
+            
+            <!-- Legacy/hidden tabs (redirected) -->
+            <div id="tab-consequences" class="tab-content" style="display:none;"></div>
+            <div id="tab-regional" class="tab-content" style="display:none;"></div>
+            <div id="tab-builder" class="tab-content" style="display:none;"></div>
+            <div id="tab-roller" class="tab-content" style="display:none;"></div>
+        </main>
+    </div>
 
-// ============================================================
-// ROUTE REGISTRATION
-// ============================================================
+    <!-- ===== MODALS ===== -->
+    <div class="modal-overlay" id="charModal" role="dialog" aria-modal="true">
+        <div class="modal">
+            <button class="modal-close" id="charModalClose" aria-label="Close">&times;</button>
+            <h2 id="char-modal-title">Character Editor</h2>
+            <div id="char-editor-content"></div>
+        </div>
+    </div>
 
-function registerAllRoutes() {
-    for (const [tab, importer] of Object.entries(ROUTE_IMPORTS)) {
-        moduleLoader.registerRoute(tab, importer);
-    }
-    console.log(`🔀 Router: ${Object.keys(ROUTE_IMPORTS).length} routes registered with moduleLoader.`);
-}
+    <div class="modal-overlay" id="timerModal" role="dialog" aria-modal="true">
+        <div class="modal">
+            <button class="modal-close" id="timerModalClose" aria-label="Close">&times;</button>
+            <h2 id="timer-modal-title">Timer Editor</h2>
+            <div id="timer-editor-content"></div>
+        </div>
+    </div>
 
-// Public method to add/override a route (use only if needed)
-export function registerRoute(tab, importFn, options = {}) {
-    moduleLoader.registerRoute(tab, importFn);
-}
+    <div class="modal-overlay" id="wikiModal" role="dialog" aria-modal="true">
+        <div class="modal">
+            <button class="modal-close" id="wikiModalClose" aria-label="Close">&times;</button>
+            <h2 id="wiki-modal-title">Wiki Entry</h2>
+            <div id="wiki-editor-content"></div>
+        </div>
+    </div>
 
-// ============================================================
-// PUBLIC API
-// ============================================================
+    <div class="modal-overlay" id="talentModal" role="dialog" aria-modal="true">
+        <div class="modal">
+            <button class="modal-close" id="talentModalClose" aria-label="Close">&times;</button>
+            <h2 id="talent-modal-title">Talent Editor</h2>
+            <div id="talent-editor-content"></div>
+        </div>
+    </div>
 
-export function onNavigate(callback) {
-    activeCallbacks.push(callback);
-}
+    <div class="modal-overlay" id="wizardModal" role="dialog" aria-modal="true">
+        <div class="modal" style="max-width:800px;">
+            <button class="modal-close" id="wizardModalClose" aria-label="Close">&times;</button>
+            <h2 id="wizard-title">Character Wizard</h2>
+            <div id="wizard-steps"></div>
+            <div class="flex mt-1" id="wizard-nav">
+                <button class="btn" id="wizard-back">← Back</button>
+                <button class="btn btn-gold" id="wizard-next">Next →</button>
+            </div>
+        </div>
+    </div>
 
-export function getCurrentTab() {
-    return currentTab;
-}
+    <div class="modal-overlay" id="encounterModal" role="dialog" aria-modal="true">
+        <div class="modal" style="max-width:900px;">
+            <button class="modal-close" id="encounterModalClose" aria-label="Close">&times;</button>
+            <h2 id="encounter-modal-title">Encounter Editor</h2>
+            <div id="encounter-editor-content"></div>
+        </div>
+    </div>
 
-export function isActiveTab(tab) {
-    return currentTab === resolveTab(tab);
-}
+    <div class="modal-overlay" id="npcModal" role="dialog" aria-modal="true">
+        <div class="modal" style="max-width:700px;">
+            <button class="modal-close" id="npcModalClose" aria-label="Close">&times;</button>
+            <h2 id="npc-modal-title">NPC Editor</h2>
+            <div id="npc-editor-content"></div>
+        </div>
+    </div>
 
-export async function refreshCurrentTab() {
-    if (currentTab) {
-        await moduleLoader.refreshModule(currentTab);
-    }
-}
+    <div class="modal-overlay" id="combatModal" role="dialog" aria-modal="true">
+        <div class="modal" style="max-width:800px;">
+            <button class="modal-close" id="combatModalClose" aria-label="Close">&times;</button>
+            <h2 id="combat-modal-title">Combat Tracker</h2>
+            <div id="combat-editor-content"></div>
+        </div>
+    </div>
 
-export async function preloadModule(tab) {
-    const resolved = resolveTab(tab);
-    return moduleLoader.preloadModule(resolved);
-}
+    <div class="modal-overlay" id="factionModal" role="dialog" aria-modal="true">
+        <div class="modal" style="max-width:700px;">
+            <button class="modal-close" id="factionModalClose" aria-label="Close">&times;</button>
+            <h2 id="faction-modal-title">Faction Editor</h2>
+            <div id="faction-editor-content"></div>
+        </div>
+    </div>
 
-export function clearModuleCache(tab) {
-    if (tab) {
-        moduleLoader.unloadModule(resolveTab(tab));
-    } else {
-        moduleLoader.clearAll();
-    }
-}
+    <div class="modal-overlay" id="licenseModal" role="dialog" aria-modal="true">
+        <div class="modal">
+            <button class="modal-close" id="licenseModalClose" aria-label="Close">&times;</button>
+            <h2>📜 License Notice</h2>
+            <div class="license-box" id="licenseContent"></div>
+        </div>
+    </div>
 
-export function getRoutes() {
-    return Array.from(moduleLoader.importFns.keys());
-}
+    <!-- ===== TOAST CONTAINER ===== -->
+    <div id="toast-container" role="status" aria-live="polite"></div>
 
-export function hasRoute(tab) {
-    return moduleLoader.importFns.has(resolveTab(tab));
-}
-
-export function getCachedModule(tab) {
-    return moduleLoader.getModule(resolveTab(tab)) || null;
-}
-
-// ============================================================
-// INITIALIZATION
-// ============================================================
-
-export function initRouter() {
-    if (isInitialized) return;
-    isInitialized = true;
-
-    // Register all default routes
-    registerAllRoutes();
-
-    console.log(`🔀 Router initialized. Redirects:`, ROUTE_REDIRECTS);
-
-    // Sidebar click handlers
-    document.querySelectorAll('.sidebar-nav button[data-tab]').forEach(btn => {
-        btn.addEventListener('click', () => {
-            const tab = btn.dataset.tab;
-            if (tab) {
-                const resolved = resolveTab(tab);
-                window.location.hash = resolved;
-                navigate(tab);
-            }
-        });
-    });
-
-    // Hash change listener
-    window.addEventListener('hashchange', () => {
-        const tab = window.location.hash.slice(1) || 'home';
-        if (tab !== currentTab) {
-            navigate(tab);
-        }
-    });
-
-    // Initial navigation
-    let initialTab = window.location.hash.slice(1) || 'home';
-    const resolvedInit = resolveTab(initialTab);
-    if (resolvedInit !== initialTab) {
-        window.history.replaceState(null, '', `#${resolvedInit}`);
-    }
-    // Defer to let DOM settle
-    setTimeout(() => navigate(initialTab), 50);
-}
-
-// ============================================================
-// EXPORT
-// ============================================================
-
-export default {
-    initRouter,
-    navigate,
-    registerRoute,
-    onNavigate,
-    getCurrentTab,
-    isActiveTab,
-    refreshCurrentTab,
-    preloadModule,
-    clearModuleCache,
-    getRoutes,
-    hasRoute,
-    getCachedModule,
-    ROUTE_REDIRECTS,
-};
+    <!-- ===== APPLICATION ENTRY ===== -->
+    <script type="module" src="js/app.js"></script>
+</body>
+</html>
