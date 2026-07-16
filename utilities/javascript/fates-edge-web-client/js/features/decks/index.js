@@ -326,6 +326,25 @@ function deterministicShuffle(array) {
 }
 
 // ============================================================
+// UTILITY: Joker Detection
+// ============================================================
+
+/**
+ * Safely check if a card is a Joker.
+ * Cards can have `isJoker` property OR a rank of 'Joker'/'joker'.
+ */
+function isJokerCard(card) {
+    if (!card) return false;
+    if (card.isJoker === true) return true;
+    if (typeof card.rank === 'string') {
+        const rankLower = card.rank.toLowerCase();
+        if (rankLower === 'joker') return true;
+    }
+    if (typeof card.suit === 'string' && card.suit.toLowerCase() === 'joker') return true;
+    return false;
+}
+
+// ============================================================
 // STATE
 // ============================================================
 
@@ -369,14 +388,15 @@ function getCardMeaningFromRegion(suit, rank, regionData) {
 
 function getWildcardMeaning(card, regionData) {
     const twists = DEFAULT_TWISTS;
-    const seed = (card.suit || 'joker') + (card.rank || '') + cardOffset + 999;
+    const seed = (card?.suit || 'joker') + (card?.rank || '') + cardOffset + 999;
     let hash = 0;
     for (let i = 0; i < seed.length; i++) {
         hash = ((hash << 5) - hash) + seed.charCodeAt(i);
         hash = hash & hash;
     }
     const idx = Math.abs(hash) % twists.length;
-    const cardName = card.isJoker ? 'Joker' : `${card.rankName} of ${card.suitName}`;
+    const isJoker = isJokerCard(card);
+    const cardName = isJoker ? 'Joker' : `${card?.rankName || card?.rank || '?'} of ${card?.suitName || card?.suit || '?'}`;
     return `✨ Twist (${cardName}): ${twists[idx]}`;
 }
 
@@ -423,7 +443,7 @@ function broadcastDraw(cards, type, region, synthesis) {
                 symbol: c.symbol,
                 rankName: c.rankName,
                 suitName: c.suitName,
-                isJoker: c.isJoker || false
+                isJoker: isJokerCard(c)
             }));
             
             syncManager.send({
@@ -458,7 +478,7 @@ function broadcastReset() {
 // ============================================================
 
 function interpretCrownCard(card, position, regionData) {
-    if (card.isJoker) {
+    if (isJokerCard(card)) {
         return {
             title: '🃏 Joker — The Wildcard',
             description: 'The unexpected. The impossible. A force that does not follow the rules. This card breaks the pattern—what was certain is now uncertain. The Joker is the Hollow\'s laughter, the Patron\'s whim, the die that rolls off the table. Expect the unexpected, and prepare to adapt.',
@@ -501,9 +521,9 @@ function synthesiseCrownSpread(mainCards, wildcard, regionData) {
             ...interpretation,
             position: pos,
             card: card,
-            isJoker: card.isJoker,
-            rankName: card.isJoker ? 'Joker' : RANK_NAMES[card.rank],
-            suitName: card.isJoker ? '' : SUIT_NAMES[card.suit]
+            isJoker: isJokerCard(card),
+            rankName: isJokerCard(card) ? 'Joker' : RANK_NAMES[card.rank],
+            suitName: isJokerCard(card) ? '' : SUIT_NAMES[card.suit]
         };
     });
 
@@ -574,7 +594,7 @@ function synthesiseCrownSpread(mainCards, wildcard, regionData) {
     synthesis += `🤝 Left Hand: ${positionCards[3].regionMeaning || positionCards[3].description}\n\n`;
     synthesis += `🌟 Wildcard: ${wildcardMeaning}`;
 
-    const nonWildcards = mainCards.filter(c => !c.isJoker);
+    const nonWildcards = mainCards.filter(c => !isJokerCard(c));
     let highest = null;
     if (nonWildcards.length > 0) {
         highest = nonWildcards.reduce((a, b) => {
@@ -591,7 +611,7 @@ function synthesiseCrownSpread(mainCards, wildcard, regionData) {
     
     let timer = null;
     let timerCard = '';
-    if (highest) {
+    if (highest && !isJokerCard(highest)) {
         const rankVal = POKER_RANK[highest.rank] || 0;
         let segments = 4;
         if (rankVal >= 14) segments = 10;
@@ -602,6 +622,10 @@ function synthesiseCrownSpread(mainCards, wildcard, regionData) {
         else segments = 4;
         timer = segments;
         timerCard = `${highest.rankName} of ${highest.suitName}`;
+    } else if (highest) {
+        // If highest is a Joker, timer is 4
+        timer = 4;
+        timerCard = 'Joker (Wildcard)';
     }
 
     if (timer) {
@@ -635,60 +659,158 @@ function synthesiseCrownSpread(mainCards, wildcard, regionData) {
 }
 
 // ============================================================
-// LOAD REGION DATA
+// LOAD REGION DATA (Fixed)
 // ============================================================
 
+/**
+ * Load the region manifest from multiple possible sources.
+ * Tries: /data/regions/manifest.json → /data/docs/manifest-core.json → /data/docs/manifest-full.json → /regions/manifest.json
+ * If no manifest found, discovers region files by scanning common region slugs.
+ * Falls back to a default list if all else fails.
+ */
 async function loadManifest() {
-    try {
-        const res = await fetch('/regions/manifest.json');
-        if (!res.ok) throw new Error('Manifest not found');
-        const data = await res.json();
-        if (Array.isArray(data)) {
-            regionNames = data.map(item => typeof item === 'string' ? item : item.name);
-        } else {
-            regionNames = [];
-        }
-    } catch (e) {
-        console.warn('[Decks] Could not load manifest:', e);
-        regionNames = ['Acasia'];
+    // Try multiple paths for manifest
+    const paths = [
+        '/data/regions/manifest.json',
+        '/data/docs/manifest-core.json',
+        '/data/docs/manifest-full.json',
+        '/regions/manifest.json'  // legacy fallback
+    ];
+    
+    let manifestData = null;
+    let loadedFrom = null;
+    
+    for (const path of paths) {
         try {
-            const fallbackRes = await fetch('/regions/acasia.json');
-            if (fallbackRes.ok) {
-                regionNames = ['Acasia'];
+            const res = await fetch(path);
+            if (res.ok) {
+                const data = await res.json();
+                if (Array.isArray(data)) {
+                    manifestData = data;
+                    loadedFrom = path;
+                    break;
+                } else if (data && typeof data === 'object') {
+                    // Could be a dictionary of region names or a manifest object
+                    if (data.regions && Array.isArray(data.regions)) {
+                        manifestData = data.regions;
+                        loadedFrom = path;
+                        break;
+                    }
+                    // If it's an object with keys that look like region names, use keys
+                    const keys = Object.keys(data);
+                    if (keys.length > 0 && keys.every(k => typeof k === 'string')) {
+                        manifestData = keys;
+                        loadedFrom = path;
+                        break;
+                    }
+                }
             }
-        } catch (fallbackErr) {
-            // No fallback, just use default
+        } catch (e) { /* ignore */ }
+    }
+    
+    if (manifestData && Array.isArray(manifestData) && manifestData.length > 0) {
+        regionNames = manifestData.map(item => typeof item === 'string' ? item : item.name || item);
+        console.log(`[Decks] Loaded ${regionNames.length} regions from ${loadedFrom}`);
+        return;
+    }
+    
+    // If no manifest found, try to discover region files by scanning common paths
+    console.warn('[Decks] No manifest found, attempting to discover region files...');
+    
+    // Common region slugs from the Fate's Edge setting
+    const possibleRegionSlugs = [
+        'acasia', 'ecktoria', 'vhasia', 'viterra', 'ykrul', 
+        'silkstrand', 'mistlands', 'thepyrgos', 'ubral', 
+        'valewood', 'aelinnel', 'aelaerem', 'zakov'
+    ];
+    
+    let discovered = [];
+    
+    // First try: fetch a list via a directory listing (if enabled)
+    try {
+        const dirRes = await fetch('/data/regions/');
+        if (dirRes.ok) {
+            const html = await dirRes.text();
+            // Look for .json files in the listing
+            const matches = html.match(/href="([^"]+\.json)"/gi);
+            if (matches) {
+                const slugs = matches.map(m => {
+                    const match = m.match(/href="([^"]+)"/i);
+                    if (match) {
+                        return match[1].replace(/\.json$/, '');
+                    }
+                    return null;
+                }).filter(Boolean);
+                discovered = slugs.map(s => s.charAt(0).toUpperCase() + s.slice(1));
+                discovered = [...new Set(discovered)];
+            }
         }
-        if (regionNames.length === 0) {
-            regionNames = ['Acasia'];
+    } catch (e) { /* ignore */ }
+    
+    // If directory listing didn't work, try individual files
+    if (discovered.length === 0) {
+        for (const slug of possibleRegionSlugs) {
+            try {
+                const res = await fetch(`/data/regions/${slug}.json`);
+                if (res.ok) {
+                    discovered.push(slug.charAt(0).toUpperCase() + slug.slice(1));
+                }
+            } catch (e) { /* ignore */ }
         }
     }
+    
+    if (discovered.length > 0) {
+        regionNames = discovered;
+        console.log(`[Decks] Discovered ${regionNames.length} region files:`, regionNames);
+        return;
+    }
+    
+    // Final fallback: use the core regions that are guaranteed to exist
+    regionNames = ['Acasia', 'Ecktoria', 'Vhasia', 'Viterra', 'Ykrul', 'Silkstrand'];
+    console.log('[Decks] Using fallback region list:', regionNames);
 }
 
+/**
+ * Fetch region data for a specific region.
+ * Tries /data/regions/{slug}.json first, then falls back to /regions/{slug}.json.
+ */
 async function fetchRegionData(regionName) {
     if (regionData && regionData.name === regionName) {
         return regionData;
     }
-    try {
-        const slug = getRegionSlug(regionName);
-        const res = await fetch(`/regions/${slug}.json`);
-        if (!res.ok) throw new Error(`Region "${regionName}" not found`);
-        const data = await res.json();
-        regionData = data;
-        return data;
-    } catch (e) {
-        console.warn(`[Decks] Error loading region ${regionName}:`, e);
-        const fallbackData = {
-            name: regionName,
-            description: `${regionName} - A region of Fate's Edge.`,
-            hearts: ["A matter of loyalty or love arises."],
-            spades: ["A conflict or struggle emerges."],
-            clubs: ["A physical challenge or obstacle appears."],
-            diamonds: ["A resource, treasure, or opportunity is found."]
-        };
-        regionData = fallbackData;
-        return fallbackData;
+    
+    const slug = getRegionSlug(regionName);
+    
+    // Try multiple paths
+    const paths = [
+        `/data/regions/${slug}.json`,
+        `/regions/${slug}.json`
+    ];
+    
+    for (const path of paths) {
+        try {
+            const res = await fetch(path);
+            if (res.ok) {
+                const data = await res.json();
+                regionData = data;
+                console.log(`[Decks] Loaded region data for ${regionName} from ${path}`);
+                return data;
+            }
+        } catch (e) { /* ignore */ }
     }
+    
+    // Fallback data
+    console.warn(`[Decks] Error loading region ${regionName}, using fallback`);
+    const fallbackData = {
+        name: regionName,
+        description: `${regionName} - A region of Fate's Edge.`,
+        hearts: ["A matter of loyalty or love arises."],
+        spades: ["A conflict or struggle emerges."],
+        clubs: ["A physical challenge or obstacle appears."],
+        diamonds: ["A resource, treasure, or opportunity is found."]
+    };
+    regionData = fallbackData;
+    return fallbackData;
 }
 
 // ============================================================
@@ -880,7 +1002,8 @@ function buildDeck() {
                 symbol: SUIT_SYMBOLS[suit],
                 color: SUIT_COLORS[suit],
                 suitName: SUIT_NAMES[suit],
-                rankName: RANK_NAMES[rank] || rank
+                rankName: RANK_NAMES[rank] || rank,
+                isJoker: false  // Explicitly set isJoker false
             });
         }
     }
@@ -963,7 +1086,7 @@ export async function drawConsequence() {
     let synthesis, details = null, timer = null, cardDisplay = null;
     let aceEffect = null;
 
-    const aces = cards.filter(c => c.rank === 'A' && !c.isJoker);
+    const aces = cards.filter(c => c.rank === 'A' && !isJokerCard(c));
     if (aces.length > 0) {
         const aceCard = aces[0];
         aceEffect = getAceEffect(selectedRegion, aceCard);
@@ -991,7 +1114,7 @@ export async function drawConsequence() {
         // Log Crown Spread
         if (typeof logRecordingEvent === 'function') {
             const cardNames = mainCards.map(c => `${c.rankName} of ${c.suitName}`).join(', ');
-            logRecordingEvent('crown_spread', `Crown Spread: ${cardNames} | Wildcard: ${wildcard.isJoker ? 'Joker' : `${wildcard.rankName} of ${wildcard.suitName}`} | Region: ${selectedRegion}`);
+            logRecordingEvent('crown_spread', `Crown Spread: ${cardNames} | Wildcard: ${isJokerCard(wildcard) ? 'Joker' : `${wildcard.rankName} of ${wildcard.suitName}`} | Region: ${selectedRegion}`);
         }
     } else {
         const cardsEl = document.getElementById('crown-spread-cards');
@@ -1059,7 +1182,7 @@ export async function drawConsequence() {
         aceEffect: aceEffect
     };
 
-    const cardStr = cards.map(c => c.isJoker ? `🃏${c.rank}` : `${c.rankName} of ${c.suitName}`).join(' | ');
+    const cardStr = cards.map(c => isJokerCard(c) ? `🃏${c.rank}` : `${c.rankName} of ${c.suitName}`).join(' | ');
     deckHistory.push({
         time: new Date().toLocaleTimeString(),
         cards: cardStr,
@@ -1071,13 +1194,13 @@ export async function drawConsequence() {
     
     broadcastDraw(cards, type, selectedRegion, synthesis);
     
-    const cardNames = cards.map(c => c.isJoker ? '🃏 Joker' : `${c.rankName} of ${c.suitName}`).join(', ');
+    const cardNames = cards.map(c => isJokerCard(c) ? '🃏 Joker' : `${c.rankName} of ${c.suitName}`).join(', ');
     showToast(`🃏 Drew ${cards.length} card${cards.length > 1 ? 's' : ''}: ${cardNames}`, 'success');
 }
 
 function synthesiseConsequence(cards, regionData) {
     const entries = cards.map(c => {
-        if (c.isJoker) {
+        if (isJokerCard(c)) {
             return getWildcardMeaning(c, regionData);
         }
         return getCardMeaningFromRegion(c.suit, c.rank, regionData);
@@ -1092,7 +1215,7 @@ function synthesiseConsequence(cards, regionData) {
 }
 
 // ============================================================
-// CARD RENDERING
+// CARD RENDERING (Fixed)
 // ============================================================
 
 function renderCards(cards, isCrown) {
@@ -1105,22 +1228,24 @@ function renderCards(cards, isCrown) {
     }
 
     container.innerHTML = cards.map((c, i) => {
+        const isJoker = isJokerCard(c);
         let classes = 'card-slot';
-        if (c.isJoker) {
+        if (isJoker) {
             classes += ' joker';
         } else {
             classes += ' ' + c.suit;
         }
 
-        let rankDisplay = c.isJoker ? 'Joker' : c.rank;
-        let symbolDisplay = c.isJoker ? '🃏' : c.symbol;
-        let borderColor = c.isJoker ? 'var(--gold)' : c.color;
+        let rankDisplay = isJoker ? 'Joker' : (c.rank || '?');
+        let symbolDisplay = isJoker ? '🃏' : (c.symbol || SUIT_SYMBOLS[c.suit] || '♦');
+        let borderColor = isJoker ? 'var(--gold)' : (c.color || SUIT_COLORS[c.suit] || '#2980b9');
+        let suitName = isJoker ? 'Joker' : (c.suitName || SUIT_NAMES[c.suit] || '');
 
         return `
-            <div class="${classes}" style="background:var(--bg3);border:2px solid var(--border);border-radius:var(--radius);padding:0.4rem;text-align:center;font-weight:700;min-height:100px;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:border-color 0.2s, transform 0.2s;${!c.isJoker ? `border-left:6px solid ${borderColor};` : 'border-color: var(--gold); box-shadow: 0 0 10px rgba(212,175,55,0.3);'}">
-                <div class="rank" style="font-size:1rem;color:var(--text2);">${c.isJoker ? '' : rankDisplay}</div>
-                <div class="suit" style="font-size:2.5rem;line-height:1.2;color:${c.isJoker ? 'var(--gold)' : c.color}">${symbolDisplay}</div>
-                <div class="label" style="font-size:0.65rem;color:var(--text3);">${c.isJoker ? c.rank + ' Joker' : c.suitName}</div>
+            <div class="${classes}" style="background:var(--bg3);border:2px solid var(--border);border-radius:var(--radius);padding:0.4rem;text-align:center;font-weight:700;min-height:100px;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:border-color 0.2s, transform 0.2s;${!isJoker ? `border-left:6px solid ${borderColor};` : 'border-color: var(--gold); box-shadow: 0 0 10px rgba(212,175,55,0.3);'}">
+                <div class="rank" style="font-size:1rem;color:var(--text2);">${isJoker ? '' : rankDisplay}</div>
+                <div class="suit" style="font-size:2.5rem;line-height:1.2;color:${isJoker ? 'var(--gold)' : borderColor}">${symbolDisplay}</div>
+                <div class="label" style="font-size:0.65rem;color:var(--text3);">${isJoker ? 'Joker' : suitName}</div>
             </div>
         `;
     }).join('');
@@ -1364,7 +1489,7 @@ export function openCrownSpread() {
         // Log Crown Spread
         if (typeof logRecordingEvent === 'function') {
             const cardNames = mainCards.map(c => `${c.rankName} of ${c.suitName}`).join(', ');
-            logRecordingEvent('crown_spread_modal', `Crown Spread (modal): ${cardNames} | Wildcard: ${wildcard.isJoker ? 'Joker' : `${wildcard.rankName} of ${wildcard.suitName}`} | Region: ${regionName}`);
+            logRecordingEvent('crown_spread_modal', `Crown Spread (modal): ${cardNames} | Wildcard: ${isJokerCard(wildcard) ? 'Joker' : `${wildcard.rankName} of ${wildcard.suitName}`} | Region: ${regionName}`);
         }
         
         crownSpreadModal.innerHTML = `
@@ -1550,11 +1675,11 @@ export async function quickDraw(count = 1, regionName = null) {
     updateDeckCount();
     
     const synthesis = synthesiseConsequence(cards, data);
-    const cardNames = cards.map(c => c.isJoker ? '🃏 Joker' : `${c.rankName} of ${c.suitName}`).join(', ');
+    const cardNames = cards.map(c => isJokerCard(c) ? '🃏 Joker' : `${c.rankName} of ${c.suitName}`).join(', ');
     
     let aceEffect = null;
     let synthesisWithAce = synthesis;
-    const aces = cards.filter(c => c.rank === 'A' && !c.isJoker);
+    const aces = cards.filter(c => c.rank === 'A' && !isJokerCard(c));
     if (aces.length > 0) {
         const aceCard = aces[0];
         aceEffect = getAceEffect(selectedRegion, aceCard);
@@ -1623,7 +1748,7 @@ export async function quickCrownSpread(regionName = null) {
     
     let aceEffect = null;
     let synthesisWithAce = result.synthesis;
-    const aces = mainCards.filter(c => c.rank === 'A' && !c.isJoker);
+    const aces = mainCards.filter(c => c.rank === 'A' && !isJokerCard(c));
     if (aces.length > 0) {
         const aceCard = aces[0];
         aceEffect = getAceEffect(selectedRegion, aceCard);
@@ -1636,7 +1761,7 @@ export async function quickCrownSpread(regionName = null) {
     
     broadcastDraw(cards, 'crown', selectedRegion, synthesisWithAce);
     
-    const cardNames = cards.map(c => c.isJoker ? '🃏 Joker' : `${c.rankName} of ${c.suitName}`).join(', ');
+    const cardNames = cards.map(c => isJokerCard(c) ? '🃏 Joker' : `${c.rankName} of ${c.suitName}`).join(', ');
     deckHistory.push({
         time: new Date().toLocaleTimeString(),
         cards: cardNames,

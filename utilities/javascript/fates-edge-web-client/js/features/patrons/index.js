@@ -6,6 +6,7 @@
  * Data paths:
  * - Patron data: /data/patrons/{id}.json
  * - Patron manifest: /data/patrons/manifest.json
+ * - Fallback: /data/docs/manifest-core.json (if it contains patron IDs)
  * 
  * Patron data structure supports nested rites with descriptions:
  * {
@@ -35,7 +36,60 @@ import { escHtml } from '../../core/utils.js';
 // ============================================================
 
 const PATRON_DATA_PATH = '/data/patrons/';
-const PATRON_MANIFEST_PATH = '/data/patrons/manifest.json';
+const PATRON_MANIFEST_PATHS = [
+    '/data/patrons/manifest.json',
+    '/data/docs/manifest-core.json',
+    '/data/docs/manifest-full.json',
+    '/patrons/manifest.json'  // legacy fallback
+];
+
+// Known patron slugs from the setting (for discovery fallback)
+const KNOWN_PATRON_SLUGS = [
+    'aveh_the_rider_behind_the_storm',
+    'carrion_king',
+    'gaila_the_laughing_light',
+    'grimmir_the_old_man_of_the_forest',
+    'ibeji_the_twin_stones',
+    'ikasha_she_who_sleeps',
+    'inaea_angel_of_the_spider',
+    'isoka_angel_of_serpents',
+    'khemesh_the_abyssal_maw',
+    'kuva_the_sky_that_takes_many_names',
+    'livaea_the_crimson_courtier',
+    'lucky_jack_the_lord_of_thieves',
+    'lunara_the_silver_quiet',
+    'mab_queen_of_courts',
+    'maelstraeus_the_infernal_bargainer',
+    'malachai_the_cruel_messenger',
+    'morag_the_hag_weaver_of_hidden_costs',
+    'moriraath_the_destroyer',
+    'mykkiel_arbiter_of_the_covenant',
+    'nidhoggr_the_worldworm',
+    'nimorith_the_gray_benefactor',
+    'oath_of_flame__light',
+    'oath_of_flame_light',
+    'oath_of_mercy_and_grace',
+    'oya_the_wind_of_the_sahel',
+    'palinode_queen_of_encores',
+    'rayn_mistress_of_the_sea',
+    'solara_the_still_mirror',
+    'the_breath_of_the_first_forge_the_spark_in_the_makers_hand',
+    'the_carrion_king_lord_of_decay_and_renewal',
+    'the_clockwork_monad_the_iterative_forge',
+    'the_confessor_beneath_the_bell',
+    'the_gallows_bell',
+    'the_inquisitor_prime_the_iron_hand_of_purity',
+    'the_ninth_beyond_comprehension',
+    'the_pale_shepherd_guide_of_transitions',
+    'the_sacred_geometry_architect_of_perfect_forms',
+    'the_unbroken_way_the_way_of_balance',
+    'thrysos_king_of_revels',
+    'varnek_karn_the_deaths_negotiator',
+    'venara_the_unbroken_thread',
+    'vorthak_the_hunger_unbound',
+    'xhakthul_the_thunderspeaker',
+    'zephyria_the_first_bloom'
+];
 
 const PATRON_CATEGORIES = {
     cosmic: 'Cosmic Patrons',
@@ -339,7 +393,7 @@ let state = {
 };
 
 // ============================================================
-// LOAD DATA
+// LOAD DATA (Fixed with manifest discovery)
 // ============================================================
 
 export function loadPatronData() {
@@ -364,59 +418,143 @@ async function loadRemotePatrons() {
     try {
         console.log('📥 Loading patron data from remote...');
         
-        const manifestRes = await fetch(PATRON_MANIFEST_PATH);
-        if (!manifestRes.ok) {
-            console.warn('Patron manifest not found, using defaults');
-            loadDefaultPatrons();
-            return;
-        }
+        // Try to find manifest from multiple paths
+        let manifestData = null;
+        let loadedFrom = null;
         
-        const manifest = await manifestRes.json();
-        
-        if (!Array.isArray(manifest) || manifest.length === 0) {
-            console.warn('Patron manifest is empty, using defaults');
-            loadDefaultPatrons();
-            return;
-        }
-        
-        const patrons = [];
-        let loadedCount = 0;
-        
-        for (const patronId of manifest) {
+        for (const path of PATRON_MANIFEST_PATHS) {
             try {
-                const res = await fetch(`${PATRON_DATA_PATH}${patronId}.json`);
+                const res = await fetch(path);
                 if (res.ok) {
                     const data = await res.json();
-                    if (!data.id) data.id = patronId;
-                    patrons.push(data);
-                    loadedCount++;
-                    console.log(`✅ Loaded patron: ${data.name || patronId}`);
-                } else {
-                    console.warn(`⚠️ Could not load patron: ${patronId} (HTTP ${res.status})`);
+                    // Check if it's an array of strings or objects
+                    if (Array.isArray(data)) {
+                        manifestData = data;
+                        loadedFrom = path;
+                        console.log(`✅ Found patron manifest at ${path} (${data.length} entries)`);
+                        break;
+                    } else if (data && typeof data === 'object') {
+                        // Could be an object with a 'patrons' key, or keys as patron IDs
+                        if (data.patrons && Array.isArray(data.patrons)) {
+                            manifestData = data.patrons;
+                            loadedFrom = path;
+                            console.log(`✅ Found patron manifest (patrons array) at ${path}`);
+                            break;
+                        }
+                        // If it's an object where keys look like patron IDs, use them
+                        const keys = Object.keys(data);
+                        if (keys.length > 0 && keys.every(k => typeof k === 'string' && !k.startsWith('_'))) {
+                            manifestData = keys;
+                            loadedFrom = path;
+                            console.log(`✅ Using object keys as patron list from ${path}`);
+                            break;
+                        }
+                    }
                 }
-            } catch (e) {
-                console.warn(`⚠️ Error loading patron ${patronId}:`, e);
+            } catch (e) { /* ignore */ }
+        }
+        
+        // If we have a manifest, load each patron
+        if (manifestData && Array.isArray(manifestData) && manifestData.length > 0) {
+            const patrons = [];
+            let loadedCount = 0;
+            
+            for (const entry of manifestData) {
+                // Entry could be a string ID or an object with id
+                let patronId = typeof entry === 'string' ? entry : (entry.id || entry.slug || entry.name);
+                if (!patronId) continue;
+                
+                // Clean up ID: remove any path separators, lowercase, and replace spaces with dashes
+                patronId = String(patronId).toLowerCase().replace(/[^a-z0-9_-]/g, '');
+                
+                try {
+                    const res = await fetch(`${PATRON_DATA_PATH}${patronId}.json`);
+                    if (res.ok) {
+                        const data = await res.json();
+                        if (!data.id) data.id = patronId;
+                        patrons.push(data);
+                        loadedCount++;
+                    } else {
+                        console.warn(`⚠️ Could not load patron: ${patronId} (HTTP ${res.status})`);
+                    }
+                } catch (e) {
+                    console.warn(`⚠️ Error loading patron ${patronId}:`, e);
+                }
+            }
+            
+            if (patrons.length > 0) {
+                state.cosmicPatrons = patrons;
+                state.dataLoaded = true;
+                console.log(`✅ Loaded ${patrons.length} patrons from remote manifest (${loadedFrom})`);
+                
+                const saved = getState();
+                if (!saved.patrons) saved.patrons = {};
+                saved.patrons.cosmic = patrons;
+                saveState();
+                state.isLoading = false;
+                return;
             }
         }
         
-        if (patrons.length > 0) {
-            state.cosmicPatrons = patrons;
+        // No manifest found or no patrons loaded from it. Try discovery by scanning known slugs.
+        console.warn('No patron manifest found or loaded, attempting discovery...');
+        const discovered = [];
+        for (const slug of KNOWN_PATRON_SLUGS) {
+            try {
+                const res = await fetch(`${PATRON_DATA_PATH}${slug}.json`);
+                if (res.ok) {
+                    const data = await res.json();
+                    if (!data.id) data.id = slug;
+                    discovered.push(data);
+                }
+            } catch (e) { /* ignore */ }
+        }
+        
+        if (discovered.length > 0) {
+            state.cosmicPatrons = discovered;
             state.dataLoaded = true;
-            console.log(`✅ Loaded ${patrons.length} patrons from remote`);
-            
+            console.log(`✅ Discovered ${discovered.length} patron files`);
+            // Save to state and also generate manifest for future
             const saved = getState();
             if (!saved.patrons) saved.patrons = {};
-            saved.patrons.cosmic = patrons;
+            saved.patrons.cosmic = discovered;
             saveState();
-        } else {
-            console.warn('No patrons loaded from remote, using defaults');
-            loadDefaultPatrons();
+            // Also try to save a manifest
+            try {
+                const manifestList = discovered.map(p => p.id || p.name);
+                await saveManifest(manifestList);
+            } catch (e) { /* ignore */ }
+            state.isLoading = false;
+            return;
         }
+        
+        // Final fallback: use defaults
+        console.warn('No patrons loaded from remote, using defaults');
+        loadDefaultPatrons();
     } catch (error) {
         console.warn('Failed to load remote patrons:', error);
         loadDefaultPatrons();
     } finally {
         state.isLoading = false;
+    }
+}
+
+/**
+ * Save a manifest file to the server (requires write access - may not work in static builds)
+ * This is a best-effort attempt; if it fails, it's not critical.
+ */
+async function saveManifest(manifestList) {
+    try {
+        const res = await fetch('/api/manifest/patrons', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(manifestList)
+        });
+        if (res.ok) {
+            console.log('✅ Patron manifest saved');
+        }
+    } catch (e) {
+        // Silently fail - manifest saving is optional
     }
 }
 
@@ -855,15 +993,159 @@ window.viewPatron = function(id) {
 };
 
 window.viewTerrestrial = function(id) {
-    renderTerrestrialDetail(id);
+    // Placeholder: render terrestrial detail similarly
+    const patron = state.terrestrialPatrons.find(p => p.id === id);
+    if (!patron) {
+        showToast('Terrestrial patron not found', 'error');
+        return;
+    }
+    const modal = document.getElementById('patron-modal');
+    modal.style.display = 'block';
+    modal.innerHTML = `
+        <div class="modal-content patron-detail" style="width: 80%; max-width: 800px; max-height: 90vh; overflow-y: auto;">
+            <button class="modal-close" onclick="window.closePatronModal()">✕</button>
+            <div class="patron-detail-header">
+                <div class="patron-detail-icon">🏛️</div>
+                <div>
+                    <h2>${escHtml(patron.name)}</h2>
+                    <div class="patron-detail-domain">${escHtml(patron.type || 'Terrestrial Patron')}</div>
+                    <div class="patron-detail-domain">Tier ${escHtml(patron.tier || 'I')}</div>
+                </div>
+            </div>
+            <div class="patron-detail-body">
+                <div class="patron-detail-section">
+                    <h3>📖 Description</h3>
+                    <p>${patron.description || 'No description available.'}</p>
+                </div>
+                ${patron.location ? `<div class="patron-detail-section"><h3>📍 Location</h3><p>${escHtml(patron.location)}</p></div>` : ''}
+                ${patron.leverage ? `<div class="patron-detail-section"><h3>💰 Leverage</h3><p>${patron.leverage}</p></div>` : ''}
+                ${patron.debtTrigger ? `<div class="patron-detail-section"><h3>⚡ Debt Trigger</h3><p>${patron.debtTrigger}</p></div>` : ''}
+                ${patron.quirk ? `<div class="patron-detail-section"><h3>🌀 Quirk</h3><p>${patron.quirk}</p></div>` : ''}
+                <div class="patron-detail-section">
+                    <h3>📊 Stats</h3>
+                    <ul>
+                        <li>Asset Slots: ${patron.assetSlots || 0}</li>
+                        <li>Max Asset Tier: ${patron.maxAssetTier || 'Minor'}</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="patron-detail-actions">
+                <button class="btn btn-sm" onclick="window.editTerrestrial('${patron.id}')">✏️ Edit</button>
+                <button class="btn btn-sm btn-danger" onclick="window.deleteTerrestrial('${patron.id}')">🗑️ Delete</button>
+                <button class="btn btn-sm btn-secondary" onclick="window.closePatronModal()">Close</button>
+            </div>
+        </div>
+    `;
 };
 
 window.viewTrust = function(id) {
-    renderTrustDetail(id);
+    const trust = state.trusts.find(t => t.id === id);
+    if (!trust) {
+        showToast('Trust not found', 'error');
+        return;
+    }
+    const modal = document.getElementById('patron-modal');
+    modal.style.display = 'block';
+    modal.innerHTML = `
+        <div class="modal-content patron-detail" style="width: 80%; max-width: 800px; max-height: 90vh; overflow-y: auto;">
+            <button class="modal-close" onclick="window.closePatronModal()">✕</button>
+            <div class="patron-detail-header">
+                <div class="patron-detail-icon">${trust.icon || '🤝'}</div>
+                <div>
+                    <h2>${escHtml(trust.name)}</h2>
+                    <div class="patron-detail-domain">Trust · Tier ${trust.tier || 'I'}</div>
+                </div>
+            </div>
+            <div class="patron-detail-body">
+                <div class="patron-detail-section">
+                    <h3>📖 Description</h3>
+                    <p>${trust.description || 'No description available.'}</p>
+                </div>
+                <div class="patron-detail-section">
+                    <h3>📊 Stats</h3>
+                    <ul>
+                        <li>Max Assets: ${trust.maxAssets || 2}</li>
+                        <li>Max Asset Tier: ${trust.maxAssetTier || 'Standard'}</li>
+                        <li>Obligation: ${trust.obligation || 0}/${trust.capacity || 4}</li>
+                    </ul>
+                </div>
+                ${trust.assets && trust.assets.length > 0 ? `
+                <div class="patron-detail-section">
+                    <h3>📦 Assets (${trust.assets.length})</h3>
+                    <ul>
+                        ${trust.assets.map(a => `<li>${escHtml(a.name)} (${escHtml(a.tier || 'Minor')})</li>`).join('')}
+                    </ul>
+                </div>
+                ` : ''}
+                ${trust.followers && trust.followers.length > 0 ? `
+                <div class="patron-detail-section">
+                    <h3>👤 Followers (${trust.followers.length})</h3>
+                    <ul>
+                        ${trust.followers.map(f => `<li>${escHtml(f.name)} (Cap ${f.cap})</li>`).join('')}
+                    </ul>
+                </div>
+                ` : ''}
+            </div>
+            <div class="patron-detail-actions">
+                <button class="btn btn-sm" onclick="window.editTrust('${trust.id}')">✏️ Edit</button>
+                <button class="btn btn-sm btn-primary" onclick="window.addAssetToTrust('${trust.id}')">➕ Add Asset</button>
+                <button class="btn btn-sm btn-primary" onclick="window.addFollowerToTrust('${trust.id}')">➕ Add Follower</button>
+                <button class="btn btn-sm btn-danger" onclick="window.deleteTrust('${trust.id}')">🗑️ Delete</button>
+                <button class="btn btn-sm btn-secondary" onclick="window.closePatronModal()">Close</button>
+            </div>
+        </div>
+    `;
 };
 
 window.viewAsset = function(id) {
-    renderAssetDetail(id);
+    let found = null;
+    let trust = null;
+    for (const t of state.trusts) {
+        if (t.assets) {
+            const a = t.assets.find(asset => asset.id === id);
+            if (a) {
+                found = a;
+                trust = t;
+                break;
+            }
+        }
+    }
+    if (!found || !trust) {
+        showToast('Asset not found', 'error');
+        return;
+    }
+    const modal = document.getElementById('asset-modal');
+    modal.style.display = 'block';
+    modal.innerHTML = `
+        <div class="modal-content patron-detail" style="width: 70%; max-width: 600px;">
+            <button class="modal-close" onclick="window.closeAssetModal()">✕</button>
+            <div class="patron-detail-header">
+                <div class="patron-detail-icon">📦</div>
+                <div>
+                    <h2>${escHtml(found.name)}</h2>
+                    <div class="patron-detail-domain">${escHtml(found.type || 'Asset')} · ${escHtml(found.tier || 'Minor')}</div>
+                    <div class="patron-detail-domain">🏛️ ${escHtml(trust.name)}</div>
+                </div>
+            </div>
+            <div class="patron-detail-body">
+                <div class="patron-detail-section">
+                    <h3>📖 Description</h3>
+                    <p>${found.description || 'No description available.'}</p>
+                </div>
+                <div class="patron-detail-section">
+                    <h3>💰 Cost</h3>
+                    <p>${found.cost || '?'} XP</p>
+                </div>
+                ${found.freeUse ? `<div class="patron-detail-section"><h3>✨ Free Use</h3><p>${found.freeUse}</p></div>` : ''}
+                ${found.sceneSurge ? `<div class="patron-detail-section"><h3>⚡ Scene Surge</h3><p>${found.sceneSurge}</p></div>` : ''}
+            </div>
+            <div class="patron-detail-actions">
+                <button class="btn btn-sm" onclick="window.editAsset('${found.id}')">✏️ Edit</button>
+                <button class="btn btn-sm btn-danger" onclick="window.deleteAsset('${found.id}')">🗑️ Delete</button>
+                <button class="btn btn-sm btn-secondary" onclick="window.closeAssetModal()">Close</button>
+            </div>
+        </div>
+    `;
 };
 
 window.loadDefaultPatrons = function() {

@@ -1,4 +1,4 @@
-// features/docs/index.js - Updated to use /data/docs/ instead of /docs/
+// features/docs/index.js - Document Library with /data/docs/ manifest discovery
 
 import { escHtml } from '../../core/utils.js';
 import { showToast } from '../../components/Toast.js';
@@ -6,6 +6,26 @@ import { showToast } from '../../components/Toast.js';
 let allDocs = [];
 let currentDocPath = null;
 let isDarkMode = false;
+
+// ============================================================
+// CONSTANTS
+// ============================================================
+
+const DOCS_BASE_PATH = '/data/docs/';
+
+// Manifest paths to try in order
+const MANIFEST_PATHS = [
+    '/data/docs/manifest.json',
+    '/data/docs/manifest-core.json',
+    '/data/docs/manifest-full.json'
+];
+
+// Known HTML files in /data/docs/ (from the tree)
+const KNOWN_DOC_FILES = [
+    'Fates_-_Edge_-_-Essentials.html',
+    'Fates_-_Edge_-_-Game_-_Master_-_Screen.html',
+    'Fates_-_Edge_-_-Systems_-_Reference_-_Document..html'
+];
 
 // ============================================================
 // RENDER
@@ -123,7 +143,7 @@ function attachDocEvents() {
 }
 
 // ============================================================
-// LOAD DOCUMENT LIST - UPDATED: uses /data/docs/ prefix
+// LOAD DOCUMENT LIST - Smart manifest discovery
 // ============================================================
 
 export function loadDocList() {
@@ -132,33 +152,18 @@ export function loadDocList() {
 
     container.innerHTML = '<div class="empty-state" style="color:var(--text2);text-align:center;padding:2rem;font-style:italic;min-width:100%;">📄 Loading documents…</div>';
 
-    // Try manifest locations - these are the only places we should look
-    const manifestUrls = [
-        '/manifest-full.json',
-        '/manifest-core.json'
-    ];
-    
+    // Try manifest locations (primary: /data/docs/manifest.json)
     let currentIndex = 0;
     
     function tryNextManifest() {
-        if (currentIndex >= manifestUrls.length) {
-            // All manifests failed - show helpful message
-            container.innerHTML = `
-                <div class="empty-state" style="color:var(--text2);text-align:center;padding:2rem;font-style:italic;min-width:100%;">
-                    <div style="font-size:2rem;margin-bottom:0.5rem;">📭</div>
-                    <p>No documents available.</p>
-                    <p class="text-muted" style="font-size:0.85rem;">No manifest found. Check that documents are built and deployed.</p>
-                    <button class="btn btn-sm btn-primary" onclick="document.getElementById('doc-refresh-btn')?.click()" style="margin-top:0.5rem;">
-                        🔄 Retry
-                    </button>
-                </div>
-            `;
-            allDocs = [];
-            updateDocStats(0);
+        if (currentIndex >= MANIFEST_PATHS.length) {
+            // No manifest found — try to discover files
+            console.warn('📭 No manifest found, attempting discovery...');
+            discoverDocFiles();
             return;
         }
         
-        const url = manifestUrls[currentIndex];
+        const url = MANIFEST_PATHS[currentIndex];
         console.log(`📄 Fetching manifest: ${url}`);
         
         fetch(url)
@@ -201,21 +206,107 @@ export function loadDocList() {
             });
     }
     
+    function discoverDocFiles() {
+        // Attempt to fetch directory listing (if enabled)
+        fetch(DOCS_BASE_PATH)
+            .then(res => {
+                if (res.ok) {
+                    return res.text();
+                }
+                throw new Error('Directory listing not available');
+            })
+            .then(html => {
+                // Parse directory listing for .html files
+                const files = [];
+                const regex = /href="([^"]+\.html)"/gi;
+                let match;
+                while ((match = regex.exec(html)) !== null) {
+                    const file = match[1];
+                    // Exclude index.html if present
+                    if (file !== 'index.html') {
+                        files.push(file);
+                    }
+                }
+                if (files.length > 0) {
+                    console.log(`📄 Discovered ${files.length} HTML files:`, files);
+                    buildManifestFromFiles(files);
+                } else {
+                    // Fallback to known files
+                    buildManifestFromFiles(KNOWN_DOC_FILES);
+                }
+            })
+            .catch(() => {
+                // Fallback to known files
+                console.warn('Could not fetch directory listing, using known files');
+                buildManifestFromFiles(KNOWN_DOC_FILES);
+            });
+    }
+    
+    function buildManifestFromFiles(files) {
+        const docs = files.map(file => {
+            const title = file
+                .replace('.html', '')
+                .replace(/_/g, ' ')
+                .replace(/-\s*/g, ' ')
+                .trim();
+            // Determine category from filename
+            let category = 'other';
+            if (file.toLowerCase().includes('srd')) category = 'srd';
+            else if (file.toLowerCase().includes('core')) category = 'core';
+            else if (file.toLowerCase().includes('essentials')) category = 'essentials';
+            else if (file.toLowerCase().includes('gm')) category = 'gm';
+            else if (file.toLowerCase().includes('player')) category = 'player';
+            else if (file.toLowerCase().includes('reference')) category = 'reference';
+            return {
+                id: file,
+                path: DOCS_BASE_PATH + file,
+                title: title,
+                file: file,
+                category: category,
+                categoryLabel: formatCategoryLabel(category),
+                categoryClass: getCategoryBadgeClass(category),
+                core: category === 'core' || category === 'essentials',
+                active: true,
+                has_sections: false,
+                section_count: 0,
+                sections: [],
+                author: null
+            };
+        });
+        
+        if (docs.length === 0) {
+            // If still no docs, show empty state
+            container.innerHTML = `
+                <div class="empty-state" style="color:var(--text2);text-align:center;padding:2rem;font-style:italic;min-width:100%;">
+                    <div style="font-size:2rem;margin-bottom:0.5rem;">📭</div>
+                    <p>No documents available.</p>
+                    <p class="text-muted" style="font-size:0.85rem;">No HTML documents found in ${DOCS_BASE_PATH}.</p>
+                    <button class="btn btn-sm btn-primary" onclick="document.getElementById('doc-refresh-btn')?.click()" style="margin-top:0.5rem;">
+                        🔄 Retry
+                    </button>
+                </div>
+            `;
+            allDocs = [];
+            updateDocStats(0);
+            return;
+        }
+        
+        processManifest(docs);
+    }
+    
     function processManifest(manifest) {
-        // Normalize each document — all paths now use /data/docs/ prefix
+        // Normalize each document — ensure path uses /data/docs/ prefix
         allDocs = manifest.map(doc => {
             let path = doc.path || doc.file || '';
             let file = doc.file || path.split('/').pop() || doc.id || '';
             
             // Normalize path: prefix with /data/docs/ if not already
-            if (path && !path.startsWith('/data/docs/') && !path.startsWith('#') && !path.startsWith('http')) {
-                // Remove leading slash if present to avoid double slash
+            if (path && !path.startsWith(DOCS_BASE_PATH) && !path.startsWith('#') && !path.startsWith('http')) {
                 const cleanPath = path.startsWith('/') ? path.substring(1) : path;
-                path = '/data/docs/' + cleanPath;
-            } else if (path && path.startsWith('/') && !path.startsWith('/data/docs/')) {
-                // If it starts with / but not /data/docs/, fix it
+                path = DOCS_BASE_PATH + cleanPath;
+            } else if (path && path.startsWith('/') && !path.startsWith(DOCS_BASE_PATH)) {
                 const cleanPath = path.substring(1);
-                path = '/data/docs/' + cleanPath;
+                path = DOCS_BASE_PATH + cleanPath;
             }
             
             // If no valid path, construct from file or id
@@ -232,7 +323,7 @@ export function loadDocList() {
                 } else {
                     fileName = 'unknown.html';
                 }
-                path = '/data/docs/' + fileName;
+                path = DOCS_BASE_PATH + fileName;
             }
             
             // Ensure path starts with /
@@ -432,7 +523,7 @@ function updateDocStats(count) {
 }
 
 // ============================================================
-// LOAD DOCUMENT - UPDATED: fetches from /data/docs/
+// LOAD DOCUMENT - Fetches from /data/docs/ with prefix
 // ============================================================
 
 export function loadDocument(docPath, preserveTheme = false) {
@@ -446,17 +537,15 @@ export function loadDocument(docPath, preserveTheme = false) {
     titleEl.textContent = 'Loading…';
     viewer.innerHTML = '<div class="loading" style="display:flex;align-items:center;justify-content:center;height:100%;min-height:400px;color:var(--text2);font-style:italic;padding:2rem;">Loading document…</div>';
 
-    // Build path to fetch — use /data/docs/ prefix
+    // Build path to fetch — ensure /data/docs/ prefix
     let fetchPath = docPath;
     
-    if (fetchPath && !fetchPath.startsWith('/data/docs/') && !fetchPath.startsWith('#') && !fetchPath.startsWith('http')) {
-        // Remove leading slash if present to avoid double slash
+    if (fetchPath && !fetchPath.startsWith(DOCS_BASE_PATH) && !fetchPath.startsWith('#') && !fetchPath.startsWith('http')) {
         const cleanPath = fetchPath.startsWith('/') ? fetchPath.substring(1) : fetchPath;
-        fetchPath = '/data/docs/' + cleanPath;
-    } else if (fetchPath && fetchPath.startsWith('/') && !fetchPath.startsWith('/data/docs/')) {
-        // If it starts with / but not /data/docs/, fix it
+        fetchPath = DOCS_BASE_PATH + cleanPath;
+    } else if (fetchPath && fetchPath.startsWith('/') && !fetchPath.startsWith(DOCS_BASE_PATH)) {
         const cleanPath = fetchPath.substring(1);
-        fetchPath = '/data/docs/' + cleanPath;
+        fetchPath = DOCS_BASE_PATH + cleanPath;
     }
 
     console.log(`📄 Loading: ${fetchPath}`);
