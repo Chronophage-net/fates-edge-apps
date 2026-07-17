@@ -50,7 +50,7 @@ jobs:
           path: release-assets
         continue-on-error: true
 
-      - name: Create release-assets directory if it doesn't exist
+      - name: Ensure release-assets exists
         run: mkdir -p release-assets
 
       - name: List downloaded files
