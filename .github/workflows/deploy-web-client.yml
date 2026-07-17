@@ -33,7 +33,7 @@ jobs:
       - name: Download Pages artifact
         uses: actions/download-artifact@v4
         with:
-          name: github-pages
+          name: pages-site
           path: pages-site
 
       - name: Verify artifact contents
@@ -42,7 +42,7 @@ jobs:
           ls -la pages-site | head -20 || true
 
           if [ ! -f "pages-site/index.html" ]; then
-            echo "❌ ERROR: github-pages artifact is missing index.html"
+            echo "❌ ERROR: pages-site artifact is missing index.html"
             exit 1
           fi
 
