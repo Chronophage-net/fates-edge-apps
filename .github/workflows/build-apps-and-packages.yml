@@ -204,12 +204,12 @@ jobs:
             fi
           done
 
-      # 👇 Only upload when the preparation actually ran
-      - name: Upload pages-site artifact
+      # ⬇️ **Changed:** upload as "github-pages" (the default expected by deploy-pages)
+      - name: Upload Pages artifact
         if: matrix.name == 'web-client' && (github.event_name != 'workflow_dispatch' || github.event.inputs.skip_web_deploy != 'true')
         uses: actions/upload-artifact@v4
         with:
-          name: pages-site
+          name: github-pages
           path: pages-site
 
   deploy-pages:

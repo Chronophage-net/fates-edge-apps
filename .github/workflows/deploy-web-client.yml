@@ -26,28 +26,11 @@ jobs:
     if: inputs.skip_deploy != 'true'
 
     environment:
-      name: github-pages                 # ← required for GitHub Pages
+      name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
 
     steps:
-      - name: Download Pages artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: pages-site                # ← matches the upload in the build workflow
-          path: pages-site
-
-      - name: Verify artifact contents
-        run: |
-          echo "Contents of pages-site:"
-          ls -la pages-site | head -20 || true
-
-          if [ ! -f "pages-site/index.html" ]; then
-            echo "❌ ERROR: pages-site artifact is missing index.html"
-            exit 1
-          fi
-
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
-        with:
-          path: pages-site                # ← use the downloaded folder (no second download)
+        # No inputs – it automatically fetches the artifact named "github-pages"
