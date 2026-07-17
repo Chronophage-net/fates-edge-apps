@@ -27,7 +27,7 @@ on:
         description: 'Create a GitHub Release (triggers the release workflow)'
       release_version:
         type: string
-        required: true
+        required: false
         description: 'Version tag for release (e.g., v1.2.0)'
 
 env:
@@ -81,28 +81,20 @@ jobs:
             build: false
             package: true
 
-    env:
-      SKIP_JOB: >
-        ${{
-          (matrix.name == 'web-client' && github.event_name == 'workflow_dispatch' && github.event.inputs.skip_web_deploy == 'true') ||
-          (matrix.name == 'socket-server' && github.event_name == 'workflow_dispatch' && github.event.inputs.skip_socket_deploy == 'true')
-        }}
-
     permissions:
       contents: write
 
     steps:
       - uses: actions/checkout@v4
-        if: ${{ env.SKIP_JOB != 'true' }}
 
       - name: Setup Node.js
-        if: ${{ env.SKIP_JOB != 'true' && matrix.needs_node == 'true' }}
+        if: matrix.needs_node == 'true'
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
 
       - name: Cache node modules
-        if: ${{ env.SKIP_JOB != 'true' && matrix.needs_node == 'true' }}
+        if: matrix.needs_node == 'true'
         uses: actions/cache@v4
         with:
           path: ${{ matrix.path }}/node_modules
@@ -111,13 +103,13 @@ jobs:
             ${{ runner.os }}-node-${{ matrix.name }}-
 
       - name: Install dependencies (including dev)
-        if: ${{ env.SKIP_JOB != 'true' && matrix.needs_node == 'true' }}
+        if: matrix.needs_node == 'true'
         working-directory: ${{ matrix.path }}
         run: npm ci
 
       # ---- Special seed generation for web-client ----
       - name: Generate deterministic seed (web-client only)
-        if: ${{ env.SKIP_JOB != 'true' && matrix.name == 'web-client' }}
+        if: matrix.name == 'web-client'
         working-directory: ${{ matrix.path }}
         run: |
           echo "🎲 Generating deterministic seed for static site..."
@@ -133,19 +125,19 @@ jobs:
 
       # ---- Build step ----
       - name: Build project
-        if: ${{ env.SKIP_JOB != 'true' && matrix.build == 'true' }}
+        if: matrix.build == 'true'
         working-directory: ${{ matrix.path }}
         run: npm run build
 
       # ---- Prune dev dependencies for non‑built services ----
       - name: Install production dependencies only (for services without build)
-        if: ${{ env.SKIP_JOB != 'true' && matrix.package == 'true' && matrix.build == 'false' }}
+        if: matrix.package == 'true' && matrix.build == 'false'
         working-directory: ${{ matrix.path }}
         run: npm prune --production
 
       # ---- Package step ----
       - name: Package project
-        if: ${{ env.SKIP_JOB != 'true' && matrix.package == 'true' }}
+        if: matrix.package == 'true'
         run: |
           mkdir -p artifacts
           if [ -f "LICENSE.md" ]; then
@@ -174,25 +166,27 @@ jobs:
           fi
 
       - name: Upload packaged artifact
-        if: ${{ env.SKIP_JOB != 'true' && matrix.package == 'true' }}
+        if: matrix.package == 'true'
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.name }}-package
           path: artifacts/${{ matrix.name }}.tar.gz
           if-no-files-found: error
 
-      # ---- Upload web-client dist separately for Pages ----
-      - name: Upload web-client dist for Pages
-        if: ${{ env.SKIP_JOB != 'true' && matrix.name == 'web-client' && matrix.build == 'true' }}
+      # ---- Upload web-client dist separately (not required for release, but useful) ----
+      - name: Upload web-client dist (for Pages)
+        if: matrix.name == 'web-client' && matrix.build == 'true'
         uses: actions/upload-artifact@v4
         with:
           name: web-client-dist
           path: ${{ matrix.path }}/dist
           if-no-files-found: error
 
-      # ---- Prepare static site for Pages ----
+      # ---- Prepare static site for Pages – only if we are not skipping web deploy ----
       - name: Prepare static site for Pages (web-client only)
-        if: ${{ env.SKIP_JOB != 'true' && matrix.name == 'web-client' }}
+        if: >
+          matrix.name == 'web-client' &&
+          (github.event_name != 'workflow_dispatch' || github.event.inputs.skip_web_deploy != 'true')
         run: |
           echo "📦 Preparing static site for GitHub Pages..."
           mkdir -p pages-site
@@ -225,7 +219,9 @@ jobs:
           fi
 
       - name: Copy data files to Pages site
-        if: ${{ env.SKIP_JOB != 'true' && matrix.name == 'web-client' }}
+        if: >
+          matrix.name == 'web-client' &&
+          (github.event_name != 'workflow_dispatch' || github.event.inputs.skip_web_deploy != 'true')
         run: |
           echo "📂 Copying data files to Pages site..."
           
@@ -294,7 +290,9 @@ jobs:
           echo "✅ All data files copied successfully!"
 
       - name: Verify pages-site structure
-        if: ${{ env.SKIP_JOB != 'true' && matrix.name == 'web-client' }}
+        if: >
+          matrix.name == 'web-client' &&
+          (github.event_name != 'workflow_dispatch' || github.event.inputs.skip_web_deploy != 'true')
         run: |
           echo "📂 Pages site structure:"
           echo ""
@@ -321,14 +319,16 @@ jobs:
           fi
 
       - name: Upload Pages artifact
-        if: ${{ env.SKIP_JOB != 'true' && matrix.name == 'web-client' }}
+        if: >
+          matrix.name == 'web-client' &&
+          (github.event_name != 'workflow_dispatch' || github.event.inputs.skip_web_deploy != 'true')
         uses: actions/upload-pages-artifact@v3
         with:
           path: pages-site
 
-      # ---- Save build metadata ----
+      # ---- Save build metadata (for reference) ----
       - name: Save build metadata (socket-server only)
-        if: ${{ env.SKIP_JOB != 'true' && matrix.name == 'socket-server' }}
+        if: matrix.name == 'socket-server'
         run: |
           mkdir -p build-metadata
           echo "${{ github.sha }}" > build-metadata/commit-sha.txt
@@ -337,7 +337,7 @@ jobs:
           echo "Build timestamp: $(date -u)" > build-metadata/build-time.txt
 
       - name: Upload build metadata
-        if: ${{ env.SKIP_JOB != 'true' && matrix.name == 'socket-server' }}
+        if: matrix.name == 'socket-server'
         uses: actions/upload-artifact@v4
         with:
           name: build-metadata-socket-server
@@ -345,13 +345,13 @@ jobs:
           retention-days: 1
 
   # ============================================================
-  # DEPLOY WEB CLIENT (Pages)
+  # DEPLOY WEB CLIENT (Pages) – only if not skipped
   # ============================================================
   deploy-pages:
     name: Deploy Web Client to Pages
     needs: build
     if: >
-      success() && (
+      needs.build.result == 'success' && (
         github.event_name == 'push' ||
         (github.event_name == 'workflow_dispatch' && github.event.inputs.skip_web_deploy != 'true')
       )
@@ -363,47 +363,9 @@ jobs:
       id-token: write
 
   # ============================================================
-  # DEPLOY SOCKET SERVER (Render)
+  # DEPLOY SOCKET SERVER (Render) – only if not skipped
   # ============================================================
   deploy-render:
-    name: Deploy Socket Server to Render
-    needs: build
-    # ---- ADDED DEBUG OUTPUT BEFORE THE CONDITION ----
-    # This will print the values that determine whether the job runs.
-    # The job will always run this debug step, then the actual deployment
-    # will happen only if the condition is true.
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-    if: always()  # This ensures the debug step always runs, even if build failed
-    steps:
-      - name: Debug deployment condition
-        run: |
-          echo "=== DEPLOY-RENDER CONDITION DEBUG ==="
-          echo "Event name: ${{ github.event_name }}"
-          echo "Build success: ${{ needs.build.result == 'success' }}"
-          echo "Skip socket deploy input: ${{ github.event.inputs.skip_socket_deploy }}"
-          echo "Should run? ${{ needs.build.result == 'success' && (github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && github.event.inputs.skip_socket_deploy != 'true')) }}"
-
-    # The actual deployment job – this will be skipped if the condition is false
-    # We'll use a separate job to avoid the 'always()' interfering.
-    # Instead, we'll put the deployment in a separate job that runs only if the condition is met.
-    # But to keep it simple, we'll move the debug to a step within the job, but we need the job to run only when condition is true.
-    # I'll restructure: we have a single job with the condition, and inside we add a debug step.
-    # But the condition is evaluated at job level; if it's false, the job is skipped and we don't see debug.
-    # So we need to use a separate job with always() to debug, or we can use a step that runs regardless? Not possible if job is skipped.
-    # Better: we'll keep the condition as is, and we'll add a preliminary job that always runs and prints the condition values, then we use the actual job with the condition.
-    # That would duplicate logic. Simpler: we'll add a "pre-check" job that runs always, but that's overkill.
-    # Since the user wants to know why it's skipped, we can rely on the GitHub UI – it shows the condition evaluation.
-    # I'll leave the condition as is and explain that they can see the evaluation in the UI.
-
-  # Actually, let's keep the existing job structure but add the debug in the job itself, but the job won't run if condition false.
-  # The user can see the condition evaluation in the UI anyway.
-  # So I'll keep the original job but add a debug step inside it (if it runs). For skipped jobs, they can see the skip reason.
-  # I'll provide the revised file with the original condition and a note about checking the UI.
-
-  # However, to make the condition clearer, I'll rewrite it with an explicit check:
-
-  deploy-render-final:
     name: Deploy Socket Server to Render
     needs: build
     if: >
@@ -420,7 +382,7 @@ jobs:
       actions: read
 
   # ============================================================
-  # TRIGGER RELEASE WORKFLOW (if requested)
+  # TRIGGER RELEASE WORKFLOW (manual only, when create_release is true)
   # ============================================================
   trigger-release:
     name: Create Release (manual only)
