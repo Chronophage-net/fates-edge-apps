@@ -1,5 +1,3 @@
-# From the repository workflow: name: Build Apps and Packages
-# Trigger: on: push: branches: [main]
 name: Build Apps and Packages
 
 on:
@@ -18,11 +16,9 @@ on:
       skip_web_deploy:
         type: boolean
         default: false
-        description: 'Skip web client deployment to Pages'
       skip_socket_deploy:
         type: boolean
         default: false
-        description: 'Skip socket server deployment to Render'
 
 env:
   NODE_VERSION: 22
@@ -92,11 +88,11 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ${{ matrix.path }}/node_modules
-          key: ${{ runner.os }}-node-${{ matrix.name }}-${{ hashFiles(format('{0}/package-lock.json', matrix.path)) }}${{ hashFiles(format('{0}/pnpm-lock.yaml', matrix.path)) }}${{ hashFiles(format('{0}/yarn.lock', matrix.path)) }}
+          key: ${{ runner.os }}-node-${{ matrix.name }}-${{ hashFiles(format('{0}/package-lock.json', matrix.path)) }}
           restore-keys: |
             ${{ runner.os }}-node-${{ matrix.name }}-
 
-      - name: Install dependencies (including dev)
+      - name: Install dependencies
         if: matrix.needs_node == 'true'
         working-directory: ${{ matrix.path }}
         run: npm ci
@@ -105,15 +101,12 @@ jobs:
         if: matrix.name == 'web-client'
         working-directory: ${{ matrix.path }}
         run: |
-          echo "🎲 Generating deterministic seed for static site..."
+          echo "Generating deterministic seed..."
           if [ -f js/tools/generate-seed.js ]; then
             node js/tools/generate-seed.js --force --output=.seed/random-seed.json
-            echo "✅ Seed generated"
             mkdir -p data
-            cp .seed/random-seed.json data/seed.json 2>/dev/null || true
-            cp .seed/seed.js js/seed.js 2>/dev/null || true
-          else
-            echo "⚠️ generate-seed.js not found, skipping seed generation"
+            cp .seed/random-seed.json data/seed.json || true
+            cp .seed/seed.js js/seed.js || true
           fi
 
       - name: Build project
@@ -121,7 +114,7 @@ jobs:
         working-directory: ${{ matrix.path }}
         run: npm run build
 
-      - name: Install production dependencies only (for services without build)
+      - name: Install production dependencies (no-build packages)
         if: matrix.package == 'true' && matrix.build == 'false'
         working-directory: ${{ matrix.path }}
         run: npm prune --production
@@ -130,31 +123,18 @@ jobs:
         if: matrix.package == 'true'
         run: |
           mkdir -p artifacts
-          # Ensure LICENSE is included in packaged artifacts when present
           if [ -f LICENSE.md ]; then
             cp LICENSE.md ${{ matrix.path }}/LICENSE.md || true
-            echo "✅ Copied LICENSE.md to ${{ matrix.path }}/"
           fi
 
-          if [ "${{ matrix.build }}" == "true" ]; then
-            if [ -d "${{ matrix.path }}/dist" ]; then
-              tar -czf artifacts/${{ matrix.name }}.tar.gz -C ${{ matrix.path }}/dist .
-              echo "✅ Packaged build output (dist/) for ${{ matrix.name }}"
-            else
-              echo "⚠️ No dist/ folder found for ${{ matrix.name }}, packaging source instead"
-              tar -czf artifacts/${{ matrix.name }}.tar.gz \
-                -C ${{ matrix.path }} \
-                --exclude=node_modules \
-                --exclude=.git \
-                .
-            fi
+          if [ "${{ matrix.build }}" == "true" ] && [ -d "${{ matrix.path }}/dist" ]; then
+            tar -czf artifacts/${{ matrix.name }}.tar.gz -C ${{ matrix.path }}/dist .
           else
-            # For non-build packages include production node_modules (pruned earlier)
             tar -czf artifacts/${{ matrix.name }}.tar.gz \
               -C ${{ matrix.path }} \
+              --exclude=node_modules \
               --exclude=.git \
               .
-            echo "✅ Packaged source with production node_modules for ${{ matrix.name }}"
           fi
 
       - name: Upload packaged artifact
@@ -163,193 +143,95 @@ jobs:
         with:
           name: ${{ matrix.name }}-package
           path: artifacts/${{ matrix.name }}.tar.gz
-          if-no-files-found: error
 
-      - name: Prepare static site for Pages (web-client only)
-        if: >
-          matrix.name == 'web-client' &&
-          (github.event_name != 'workflow_dispatch' || github.event.inputs.skip_web_deploy != 'true')
+      # -----------------------------
+      # Prepare Pages site (web-client)
+      # -----------------------------
+      - name: Prepare static site for Pages
+        if: matrix.name == 'web-client' && (github.event_name != 'workflow_dispatch' || github.event.inputs.skip_web_deploy != 'true')
         run: |
-          echo "📦 Preparing static site for GitHub Pages..."
           mkdir -p pages-site
-          
           rsync -a \
-            --exclude 'node_modules' \
-            --exclude 'Dockerfile*' \
-            --exclude 'docker-compose.yml' \
-            --exclude 'Makefile' \
-            --exclude 'package.json' \
-            --exclude 'package-lock.json' \
-            --exclude 'DESIGN.md' \
-            --exclude 'build.sh' \
-            --exclude 'vite.config.js' \
-            --exclude '.gitignore' \
-            --exclude '.DS_Store' \
-            --exclude 'js/tests' \
+            --exclude node_modules \
+            --exclude Dockerfile* \
+            --exclude docker-compose.yml \
+            --exclude Makefile \
+            --exclude package.json \
+            --exclude package-lock.json \
+            --exclude DESIGN.md \
+            --exclude build.sh \
+            --exclude vite.config.js \
+            --exclude .gitignore \
+            --exclude .DS_Store \
+            --exclude js/tests \
             "${{ matrix.path }}/" pages-site/
-          
-          echo "🌱 Including seed files..."
+
           mkdir -p pages-site/.seed pages-site/data
           if [ -f "${{ matrix.path }}/.seed/random-seed.json" ]; then
             cp "${{ matrix.path }}/.seed/random-seed.json" pages-site/.seed/
             cp "${{ matrix.path }}/.seed/random-seed.json" pages-site/data/seed.json
-            echo "✅ Seed files copied"
           fi
           if [ -f "${{ matrix.path }}/.seed/seed.js" ]; then
             cp "${{ matrix.path }}/.seed/seed.js" pages-site/.seed/
-            echo "✅ seed.js copied"
           fi
 
-      - name: Copy data files to Pages site
-        if: >
-          matrix.name == 'web-client' &&
-          (github.event_name != 'workflow_dispatch' || github.event.inputs.skip_web_deploy != 'true')
+      - name: Copy data files
+        if: matrix.name == 'web-client' && (github.event_name != 'workflow_dispatch' || github.event.inputs.skip_web_deploy != 'true')
         run: |
-          echo "📂 Copying data files to Pages site..."
-          
-          if [ -f "LICENSE.md" ]; then
-            cp LICENSE.md pages-site/
-            echo "✅ LICENSE.md copied"
-          fi
-          
-          echo "📄 Processing wiki.json..."
-          WIKI_COPIED=false
+          mkdir -p pages-site/data pages-site/data/regions pages-site/data/factions pages-site/data/patrons
+
+          # wiki.json
           for src in "data/wiki.json" "misc/wiki.json" "${{ matrix.path }}/data/wiki.json"; do
             if [ -f "$src" ]; then
               cp "$src" pages-site/wiki.json
-              cp "$src" pages-site/data/wiki.json 2>/dev/null || true
-              echo "✅ wiki.json copied from $src"
-              WIKI_COPIED=true
+              cp "$src" pages-site/data/wiki.json || true
               break
             fi
           done
-          if [ "$WIKI_COPIED" = false ]; then
-            echo '{"title": "Fate'\''s Edge Wiki", "pages": []}' > pages-site/wiki.json
-            echo '{"title": "Fate'\''s Edge Wiki", "pages": []}' > pages-site/data/wiki.json
-            echo "⚠️ No wiki.json found, created minimal version"
-          fi
-          
-          echo "🗺️ Processing region files..."
-          mkdir -p pages-site/data/regions
-          for src_dir in "data/data/regions" "misc/data/regions" "${{ matrix.path }}/data/regions"; do
-            if [ -d "$src_dir" ]; then
-              cp -r "$src_dir"/* pages-site/data/regions/ 2>/dev/null || true
-              echo "✅ Regions copied from $src_dir"
-              break
-            fi
-          done
-          
-          echo "🏛️ Processing faction files..."
-          mkdir -p pages-site/factions pages-site/data/factions
-          for src_dir in "data/factions" "misc/factions" "${{ matrix.path }}/data/factions" "${{ matrix.path }}/factions"; do
-            if [ -d "$src_dir" ]; then
-              cp -r "$src_dir"/* pages-site/factions/ 2>/dev/null || true
-              cp -r "$src_dir"/* pages-site/data/factions/ 2>/dev/null || true
-              echo "✅ Factions copied from $src_dir"
-              break
-            fi
-          done
-          
-          echo "👤 Processing patron files..."
-          mkdir -p pages-site/data/patrons
-          for src_dir in "data/patrons" "misc/patrons" "${{ matrix.path }}/data/patrons"; do
-            if [ -d "$src_dir" ]; then
-              cp -r "$src_dir"/* pages-site/data/patrons/ 2>/dev/null || true
-              echo "✅ Patrons copied from $src_dir"
-              break
-            fi
-          done
-          
-          if [ -d "data" ]; then
-            for file in data/*.json data/*.js; do
-              if [ -f "$file" ] && [ "$(basename "$file")" != "wiki.json" ] && [ "$(basename "$file")" != "seed.json" ]; then
-                cp "$file" pages-site/data/ 2>/dev/null || true
-              fi
-            done
-            echo "✅ Additional data files copied"
-          fi
-          
-          echo "✅ All data files copied successfully!"
 
-      - name: Verify pages-site structure
-        if: >
-          matrix.name == 'web-client' &&
-          (github.event_name != 'workflow_dispatch' || github.event.inputs.skip_web_deploy != 'true')
-        run: |
-          echo "📂 Pages site structure:"
-          echo ""
-          echo "Root contents:"
-          ls -la pages-site/ | head -15
-          echo ""
-          echo "Data directory:"
-          ls -la pages-site/data/ 2>/dev/null | head -10 || echo "  (empty or not found)"
-          echo ""
-          echo "Regions directory:"
-          ls -la pages-site/data/regions/ 2>/dev/null | head -10 || echo "  (empty or not found)"
-          echo ""
-          echo "Factions directory:"
-          ls -la pages-site/factions/ 2>/dev/null | head -10 || echo "  (empty or not found)"
-          echo ""
-          echo "Patrons directory:"
-          ls -la pages-site/data/patrons/ 2>/dev/null | head -10 || echo "  (empty or not found)"
-          echo ""
-          
-          if [ -f "pages-site/index.html" ]; then
-            echo "✅ index.html found"
-          else
-            echo "⚠️ WARNING: index.html not found - site may not render correctly"
-          fi
+          # regions
+          for src in "data/data/regions" "misc/data/regions" "${{ matrix.path }}/data/regions"; do
+            if [ -d "$src" ]; then
+              cp -r "$src"/* pages-site/data/regions/
+              break
+            fi
+          done
 
-      - name: Upload pages-site artifact (for Pages)
-        if: matrix.name == 'web-client' && matrix.build == 'true' && (github.event_name != 'workflow_dispatch' || github.event.inputs.skip_web_deploy != 'true')
+          # factions
+          for src in "data/factions" "misc/factions" "${{ matrix.path }}/data/factions" "${{ matrix.path }}/factions"; do
+            if [ -d "$src" ]; then
+              cp -r "$src"/* pages-site/data/factions/
+              break
+            fi
+          done
+
+          # patrons
+          for src in "data/patrons" "misc/patrons" "${{ matrix.path }}/data/patrons"; do
+            if [ -d "$src" ]; then
+              cp -r "$src"/* pages-site/data/patrons/
+              break
+            fi
+          done
+
+      - name: Upload pages-site artifact
+        if: matrix.name == 'web-client'
         uses: actions/upload-artifact@v4
         with:
           name: pages-site
           path: pages-site
-          if-no-files-found: error
 
-      - name: Save build metadata (socket-server only)
-        if: matrix.name == 'socket-server'
-        run: |
-          mkdir -p build-metadata
-          echo "${{ github.sha }}" > build-metadata/commit-sha.txt
-          echo "${{ github.run_id }}" > build-metadata/run-id.txt
-          echo "${{ github.run_number }}" > build-metadata/run-number.txt
-          echo "Build timestamp: $(date -u)" > build-metadata/build-time.txt
+  deploy-pages:
+    name: Deploy Web Client to Pages
+    needs: build
+    if: success() && (github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && github.event.inputs.skip_web_deploy != 'true'))
+    uses: ./.github/workflows/deploy-web-client.yml
+    secrets: inherit
 
-      - name: Upload build metadata
-        if: matrix.name == 'socket-server'
-        uses: actions/upload-artifact@v4
-        with:
-          name: build-metadata-socket-server
-          path: build-metadata/
-          retention-days: 1
-
-# ============================================================
-# DEPLOY WEB CLIENT (Pages) – only if not skipped
-# ============================================================
-deploy-pages:
-  name: Deploy Web Client to Pages
-  needs: build
-  if: success() && (github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && github.event.inputs.skip_web_deploy != 'true'))
-  uses: ./.github/workflows/deploy-web-client.yml
-  secrets: inherit
-  permissions:
-    contents: read
-    pages: write
-    id-token: write
-
-# ============================================================
-# DEPLOY SOCKET SERVER (Render) – only if not skipped
-# ============================================================
-deploy-render:
-  name: Deploy Socket Server to Render
-  needs: build
-  if: success() && (github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && github.event.inputs.skip_socket_deploy != 'true'))
-  uses: ./.github/workflows/deploy-socket-server-to-render.yml
-  with:
-    environment: production
-  secrets: inherit
-  permissions:
-    contents: read
-    actions: read
+  deploy-render:
+    name: Deploy Socket Server to Render
+    needs: build
+    if: success() && (github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && github.event.inputs.skip_socket_deploy != 'true'))
+    uses: ./.github/workflows/deploy-socket-server-to-render.yml
+    with:
+      environment: production
+    secrets: inherit
