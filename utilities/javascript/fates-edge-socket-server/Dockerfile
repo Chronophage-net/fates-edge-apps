@@ -30,7 +30,7 @@ COPY server-start.js ./server.js
 # ---------------------------------------------------------------
 # Copy data directory
 # ---------------------------------------------------------------
-COPY data/ ./data/
+#COPY data/ ./data/
 
 # ---------------------------------------------------------------
 # Python CLI Tool
@@ -49,7 +49,7 @@ RUN chmod +x /usr/local/bin/fates-edge-cli
 COPY modules/ ./modules/
 
 # Ensure directories exist
-RUN mkdir -p /app/logs /app/modules
+RUN mkdir -p /app/logs /app/modules /data
 
 # ---------------------------------------------------------------
 # Health Check (FIX: use /healthz)
