@@ -1,3 +1,5 @@
+# From the repository workflow: name: Build Apps and Packages
+# Trigger: on: push: branches: [main]
 name: Build Apps and Packages
 
 on:
@@ -90,7 +92,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ${{ matrix.path }}/node_modules
-          key: ${{ runner.os }}-node-${{ matrix.name }}-${{ hashFiles(format('{0}/package-lock.json', matrix.path)) }}
+          key: ${{ runner.os }}-node-${{ matrix.name }}-${{ hashFiles(format('{0}/package-lock.json', matrix.path)) }}${{ hashFiles(format('{0}/pnpm-lock.yaml', matrix.path)) }}${{ hashFiles(format('{0}/yarn.lock', matrix.path)) }}
           restore-keys: |
             ${{ runner.os }}-node-${{ matrix.name }}-
 
@@ -128,8 +130,9 @@ jobs:
         if: matrix.package == 'true'
         run: |
           mkdir -p artifacts
-          if [ -f "LICENSE.md" ]; then
-            cp LICENSE.md ${{ matrix.path }}/LICENSE.md
+          # Ensure LICENSE is included in packaged artifacts when present
+          if [ -f LICENSE.md ]; then
+            cp LICENSE.md ${{ matrix.path }}/LICENSE.md || true
             echo "✅ Copied LICENSE.md to ${{ matrix.path }}/"
           fi
 
@@ -146,6 +149,7 @@ jobs:
                 .
             fi
           else
+            # For non-build packages include production node_modules (pruned earlier)
             tar -czf artifacts/${{ matrix.name }}.tar.gz \
               -C ${{ matrix.path }} \
               --exclude=.git \
@@ -159,14 +163,6 @@ jobs:
         with:
           name: ${{ matrix.name }}-package
           path: artifacts/${{ matrix.name }}.tar.gz
-          if-no-files-found: error
-
-      - name: Upload web-client dist (for Pages)
-        if: matrix.name == 'web-client' && matrix.build == 'true'
-        uses: actions/upload-artifact@v4
-        with:
-          name: web-client-dist
-          path: ${{ matrix.path }}/dist
           if-no-files-found: error
 
       - name: Prepare static site for Pages (web-client only)
@@ -255,10 +251,10 @@ jobs:
           done
           
           echo "👤 Processing patron files..."
-          mkdir -p pages-site/data/regions
-          for src_dir in "data/data/regions" "misc/data/regions" "${{ matrix.path }}/data/regions"; do
+          mkdir -p pages-site/data/patrons
+          for src_dir in "data/patrons" "misc/patrons" "${{ matrix.path }}/data/patrons"; do
             if [ -d "$src_dir" ]; then
-              cp -r "$src_dir"/* pages-site/data/regions/ 2>/dev/null || true
+              cp -r "$src_dir"/* pages-site/data/patrons/ 2>/dev/null || true
               echo "✅ Patrons copied from $src_dir"
               break
             fi
@@ -295,7 +291,7 @@ jobs:
           ls -la pages-site/factions/ 2>/dev/null | head -10 || echo "  (empty or not found)"
           echo ""
           echo "Patrons directory:"
-          ls -la pages-site/data/regions/ 2>/dev/null | head -10 || echo "  (empty or not found)"
+          ls -la pages-site/data/patrons/ 2>/dev/null | head -10 || echo "  (empty or not found)"
           echo ""
           
           if [ -f "pages-site/index.html" ]; then
@@ -304,13 +300,13 @@ jobs:
             echo "⚠️ WARNING: index.html not found - site may not render correctly"
           fi
 
-      - name: Upload Pages artifact
-        if: >
-          matrix.name == 'web-client' &&
-          (github.event_name != 'workflow_dispatch' || github.event.inputs.skip_web_deploy != 'true')
-        uses: actions/upload-pages-artifact@v3
+      - name: Upload pages-site artifact (for Pages)
+        if: matrix.name == 'web-client' && matrix.build == 'true' && (github.event_name != 'workflow_dispatch' || github.event.inputs.skip_web_deploy != 'true')
+        uses: actions/upload-artifact@v4
         with:
+          name: pages-site
           path: pages-site
+          if-no-files-found: error
 
       - name: Save build metadata (socket-server only)
         if: matrix.name == 'socket-server'
@@ -329,31 +325,31 @@ jobs:
           path: build-metadata/
           retention-days: 1
 
-  # ============================================================
-  # DEPLOY WEB CLIENT (Pages) – only if not skipped
-  # ============================================================
-  deploy-pages:
-    name: Deploy Web Client to Pages
-    needs: build
-    if: success() && (github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && github.event.inputs.skip_web_deploy != 'true'))
-    uses: ./.github/workflows/deploy-web-client.yml
-    secrets: inherit
-    permissions:
-      contents: read
-      pages: write
-      id-token: write
+# ============================================================
+# DEPLOY WEB CLIENT (Pages) – only if not skipped
+# ============================================================
+deploy-pages:
+  name: Deploy Web Client to Pages
+  needs: build
+  if: success() && (github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && github.event.inputs.skip_web_deploy != 'true'))
+  uses: ./.github/workflows/deploy-web-client.yml
+  secrets: inherit
+  permissions:
+    contents: read
+    pages: write
+    id-token: write
 
-  # ============================================================
-  # DEPLOY SOCKET SERVER (Render) – only if not skipped
-  # ============================================================
-  deploy-render:
-    name: Deploy Socket Server to Render
-    needs: build
-    if: success() && (github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && github.event.inputs.skip_socket_deploy != 'true'))
-    uses: ./.github/workflows/deploy-socket-server-to-render.yml
-    with:
-      environment: production
-    secrets: inherit
-    permissions:
-      contents: read
-      actions: read
+# ============================================================
+# DEPLOY SOCKET SERVER (Render) – only if not skipped
+# ============================================================
+deploy-render:
+  name: Deploy Socket Server to Render
+  needs: build
+  if: success() && (github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && github.event.inputs.skip_socket_deploy != 'true'))
+  uses: ./.github/workflows/deploy-socket-server-to-render.yml
+  with:
+    environment: production
+  secrets: inherit
+  permissions:
+    contents: read
+    actions: read

@@ -41,7 +41,11 @@ jobs:
           echo "run-id=$RUN_ID" >> $GITHUB_OUTPUT
           echo "Using run ID: $RUN_ID"
 
+      - name: Ensure release-assets exists
+        run: mkdir -p release-assets
+
       - name: Download packaged artifacts
+        id: download
         uses: actions/download-artifact@v4
         with:
           run-id: ${{ steps.get-run-id.outputs.run-id }}
@@ -49,9 +53,6 @@ jobs:
           pattern: '*-package'
           path: release-assets
         continue-on-error: true
-
-      - name: Ensure release-assets exists
-        run: mkdir -p release-assets
 
       - name: List downloaded files
         run: |
@@ -69,25 +70,30 @@ jobs:
             TAG="v$(date +'%Y.%m.%d')-build$BUILD_RUN_NUMBER-$SHORT_SHA"
           fi
           echo "tag=$TAG" >> $GITHUB_OUTPUT
+          echo "Determined tag: $TAG"
 
-      - name: Check if any artifacts exist
-        id: check-artifacts
+      - name: Check for artifacts and build release body
+        id: release_body
         run: |
-          if [ -d "release-assets" ] && [ -n "$(find release-assets -type f -name '*.tar.gz' | head -1)" ]; then
-            echo "found=true" >> $GITHUB_OUTPUT
-          else
-            echo "found=false" >> $GITHUB_OUTPUT
+          FOUND=false
+          if [ -n "$(find release-assets -type f -name '*.tar.gz' | head -1 2>/dev/null)" ]; then
+            FOUND=true
           fi
+          BODY="Automated release from build run #${{ steps.get-run-id.outputs.run-id }}\nCommit: ${GITHUB_SHA}"
+          if [ "$FOUND" = "false" ]; then
+            BODY="$BODY\n\n⚠️ **No packaged artifacts were found in the build run.**"
+          fi
+          echo "found=$FOUND" >> $GITHUB_OUTPUT
+          echo "body<<EOF" >> $GITHUB_OUTPUT
+          echo "$BODY" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ steps.tag.outputs.tag }}
           name: Release ${{ steps.tag.outputs.tag }}
-          body: |
-            Automated release from build run #${{ steps.get-run-id.outputs.run-id }}
-            Commit: ${{ github.event.workflow_run.head_sha || github.sha }}
-            ${{ steps.check-artifacts.outputs.found == 'false' && '⚠️ **No packaged artifacts were found in the build run.**' || '' }}
+          body: ${{ steps.release_body.outputs.body }}
           files: |
             release-assets/*/*.tar.gz
           draft: false

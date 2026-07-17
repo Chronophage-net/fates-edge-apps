@@ -2,6 +2,15 @@ name: Deploy Web Client to GitHub Pages
 
 on:
   workflow_call:
+    inputs:
+      artifact-name:
+        type: string
+        required: false
+        default: 'pages-site'
+      skip_deploy:
+        type: boolean
+        required: false
+        default: false
 
 permissions:
   contents: read
@@ -17,12 +26,32 @@ jobs:
     name: Deploy to GitHub Pages
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    
+
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
 
     steps:
+      - name: Ensure workspace
+        run: mkdir -p pages-site
+
+      - name: Download pages artifact (if present)
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ inputs.artifact-name }}
+          path: pages-site
+        continue-on-error: true
+
+      - name: Verify pages-site contents
+        run: |
+          echo "Root of pages-site:"
+          ls -la pages-site | head -20 || true
+          if [ ! -f "pages-site/index.html" ] && [ ! -d "pages-site" ]; then
+            echo "⚠️ pages-site appears empty. Ensure the build job uploaded the artifact named '${{ inputs.artifact-name }}'."
+          fi
+
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+        with:
+          path: pages-site
