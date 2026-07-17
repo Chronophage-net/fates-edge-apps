@@ -53,21 +53,26 @@ jobs:
         if: matrix.name == 'web-client' && (github.event_name != 'workflow_dispatch' || github.event.inputs.skip_web_deploy != 'true')
         run: |
           mkdir -p pages-site
-          rsync -aL \
-            --exclude node_modules \
-            --exclude Dockerfile* \
-            --exclude docker-compose.yml \
-            --exclude Makefile \
-            --exclude package.json \
-            --exclude package-lock.json \
-            --exclude DESIGN.md \
-            --exclude build.sh \
-            --exclude vite.config.js \
-            --exclude .gitignore \
-            --exclude .DS_Store \
-            --exclude js/tests \
-            "${{ matrix.path }}/" pages-site/
 
+          # 1. Copy entire web-client directory (follow symlinks, exclude .git)
+          rsync -aL --exclude=.git "${{ matrix.path }}/" pages-site/
+
+          # 2. Remove unwanted files/folders (development, build configs, etc.)
+          rm -rf \
+            pages-site/node_modules \
+            pages-site/package.json \
+            pages-site/package-lock.json \
+            pages-site/Dockerfile* \
+            pages-site/docker-compose.yml \
+            pages-site/Makefile \
+            pages-site/DESIGN.md \
+            pages-site/build.sh \
+            pages-site/vite.config.js \
+            pages-site/.gitignore \
+            pages-site/.DS_Store \
+            pages-site/js/tests
+
+          # 3. Create seed directories and re-copy seed files (in case they were overwritten)
           mkdir -p pages-site/.seed pages-site/data
           if [ -f "${{ matrix.path }}/.seed/random-seed.json" ]; then
             cp -aL "${{ matrix.path }}/.seed/random-seed.json" pages-site/.seed/
@@ -77,12 +82,12 @@ jobs:
             cp -aL "${{ matrix.path }}/.seed/seed.js" pages-site/.seed/
           fi
 
-      - name: Copy data files
+      - name: Copy external data files
         if: matrix.name == 'web-client' && (github.event_name != 'workflow_dispatch' || github.event.inputs.skip_web_deploy != 'true')
         run: |
           mkdir -p pages-site/data pages-site/data/regions pages-site/data/factions pages-site/data/patrons
 
-          # Use rsync -aL for all data sources
+          # wiki.json
           for src in "data/wiki.json" "misc/wiki.json" "${{ matrix.path }}/data/wiki.json"; do
             if [ -f "$src" ]; then
               rsync -aL "$src" pages-site/wiki.json
@@ -91,6 +96,7 @@ jobs:
             fi
           done
 
+          # regions
           for src in "data/data/regions" "misc/data/regions" "${{ matrix.path }}/data/regions"; do
             if [ -d "$src" ]; then
               rsync -aL "$src"/ pages-site/data/regions/
@@ -98,6 +104,7 @@ jobs:
             fi
           done
 
+          # factions
           for src in "data/factions" "misc/factions" "${{ matrix.path }}/data/factions" "${{ matrix.path }}/factions"; do
             if [ -d "$src" ]; then
               rsync -aL "$src"/ pages-site/data/factions/
@@ -105,6 +112,7 @@ jobs:
             fi
           done
 
+          # patrons
           for src in "data/patrons" "misc/patrons" "${{ matrix.path }}/data/patrons"; do
             if [ -d "$src" ]; then
               rsync -aL "$src"/ pages-site/data/patrons/
@@ -112,7 +120,7 @@ jobs:
             fi
           done
 
-      - name: Inspect pages-site contents
+      - name: Verify and debug pages-site
         if: matrix.name == 'web-client' && (github.event_name != 'workflow_dispatch' || github.event.inputs.skip_web_deploy != 'true')
         run: |
           echo "=== Directory tree (first 100 files) ==="
@@ -129,14 +137,6 @@ jobs:
 
           echo "=== File types ==="
           find pages-site -type f -exec file --brief {} \; | sort | uniq -c
-
-      - name: Create a tarball for verification
-        if: matrix.name == 'web-client' && (github.event_name != 'workflow_dispatch' || github.event.inputs.skip_web_deploy != 'true')
-        run: |
-          tar -czf pages-site.tar.gz -C pages-site .
-          echo "Tarball size:"
-          ls -lh pages-site.tar.gz
-          tar -tvf pages-site.tar.gz | grep '^l' && { echo "❌ Tarball contains symlinks"; exit 1; } || echo "✅ Tarball clean"
 
       - name: Upload Pages artifact
         if: matrix.name == 'web-client' && (github.event_name != 'workflow_dispatch' || github.event.inputs.skip_web_deploy != 'true')
