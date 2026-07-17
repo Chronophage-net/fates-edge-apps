@@ -46,79 +46,121 @@ jobs:
       - uses: actions/checkout@v4
       # ... (Node setup, cache, install, build, package steps are unchanged)
 
-      # -----------------------------
-      # Prepare Pages site (web-client) – REVISED
-      # -----------------------------
+     # ============================================================
+      # PREPARE STATIC SITE FOR PAGES (web-client only)
+      # ============================================================
       - name: Prepare static site for Pages
-        if: matrix.name == 'web-client' && (github.event_name != 'workflow_dispatch' || github.event.inputs.skip_web_deploy != 'true')
+        if: ${{ env.SKIP_JOB != 'true' && matrix.name == 'web-client' }}
         run: |
+          echo "📦 Preparing static site for GitHub Pages..."
           mkdir -p pages-site
 
-          # 1. Copy entire web-client directory (follow symlinks, exclude .git)
-          rsync -aL --exclude=.git "${{ matrix.path }}/" pages-site/
+          rsync -aL \
+            --exclude 'node_modules' \
+            --exclude 'Dockerfile*' \
+            --exclude 'docker-compose.yml' \
+            --exclude 'Makefile' \
+            --exclude 'package.json' \
+            --exclude 'package-lock.json' \
+            --exclude 'DESIGN.md' \
+            --exclude 'build.sh' \
+            --exclude 'vite.config.js' \
+            --exclude '.gitignore' \
+            --exclude '.DS_Store' \
+            --exclude 'js/tests' \
+            "${{ matrix.path }}/" pages-site/
 
-          # 2. Remove unwanted files/folders (development, build configs, etc.)
-          rm -rf \
-            pages-site/node_modules \
-            pages-site/package.json \
-            pages-site/package-lock.json \
-            pages-site/Dockerfile* \
-            pages-site/docker-compose.yml \
-            pages-site/Makefile \
-            pages-site/DESIGN.md \
-            pages-site/build.sh \
-            pages-site/vite.config.js \
-            pages-site/.gitignore \
-            pages-site/.DS_Store \
-            pages-site/js/tests
-
-          # 3. Create seed directories and re-copy seed files (in case they were overwritten)
+          echo "🌱 Including seed files..."
           mkdir -p pages-site/.seed pages-site/data
           if [ -f "${{ matrix.path }}/.seed/random-seed.json" ]; then
             cp -aL "${{ matrix.path }}/.seed/random-seed.json" pages-site/.seed/
             cp -aL "${{ matrix.path }}/.seed/random-seed.json" pages-site/data/seed.json
+            echo "✅ Seed files copied"
           fi
           if [ -f "${{ matrix.path }}/.seed/seed.js" ]; then
             cp -aL "${{ matrix.path }}/.seed/seed.js" pages-site/.seed/
+            echo "✅ seed.js copied"
           fi
 
-      - name: Copy external data files
-        if: matrix.name == 'web-client' && (github.event_name != 'workflow_dispatch' || github.event.inputs.skip_web_deploy != 'true')
-        run: |
-          mkdir -p pages-site/data pages-site/data/regions pages-site/data/factions pages-site/data/patrons
+        - name: Copy data files to Pages site
+          if: ${{ env.SKIP_JOB != 'true' && matrix.name == 'web-client' }}
+          run: |
+            echo "📂 Copying data files to Pages site..."
 
-          # wiki.json
-          for src in "data/wiki.json" "misc/wiki.json" "${{ matrix.path }}/data/wiki.json"; do
-            if [ -f "$src" ]; then
-              rsync -aL "$src" pages-site/wiki.json
-              rsync -aL "$src" pages-site/data/wiki.json || true
-              break
+            if [ -f "LICENSE.md" ]; then
+              cp -aL LICENSE.md pages-site/
+              echo "✅ LICENSE.md copied"
             fi
-          done
 
-          # regions
-          for src in "data/data/regions" "misc/data/regions" "${{ matrix.path }}/data/regions"; do
-            if [ -d "$src" ]; then
-              rsync -aL "$src"/ pages-site/data/regions/
-              break
+            echo "📄 Processing wiki.json..."
+            WIKI_COPIED=false
+            for src in "data/wiki.json" "misc/wiki.json" "${{ matrix.path }}/data/wiki.json"; do
+              if [ -f "$src" ]; then
+                cp -aL "$src" pages-site/wiki.json
+                cp -aL "$src" pages-site/data/wiki.json 2>/dev/null || true
+                echo "✅ wiki.json copied from $src"
+                WIKI_COPIED=true
+                break
+              fi
+            done
+            if [ "$WIKI_COPIED" = false ]; then
+              echo '{"title": "Fate'\''s Edge Wiki", "pages": []}' > pages-site/wiki.json
+              echo '{"title": "Fate'\''s Edge Wiki", "pages": []}' > pages-site/data/wiki.json
+              echo "⚠️ No wiki.json found, created minimal version"
             fi
-          done
 
-          # factions
-          for src in "data/factions" "misc/factions" "${{ matrix.path }}/data/factions" "${{ matrix.path }}/factions"; do
-            if [ -d "$src" ]; then
-              rsync -aL "$src"/ pages-site/data/factions/
-              break
-            fi
-          done
+            echo "🗺️ Processing region files..."
+            mkdir -p pages-site/regions pages-site/data/regions
+            for src_dir in "data/regions" "misc/regions" "${{ matrix.path }}/data/regions" "${{ matrix.path }}/regions"; do
+              if [ -d "$src_dir" ]; then
+                cp -aL "$src_dir"/* pages-site/regions/ 2>/dev/null || true
+                cp -aL "$src_dir"/* pages-site/data/regions/ 2>/dev/null || true
+                echo "✅ Regions copied from $src_dir"
+                break
+              fi
+            done
 
-          # patrons
-          for src in "data/patrons" "misc/patrons" "${{ matrix.path }}/data/patrons"; do
-            if [ -d "$src" ]; then
-              rsync -aL "$src"/ pages-site/data/patrons/
-              break
+            echo "🏛️ Processing faction files..."
+            mkdir -p pages-site/factions pages-site/data/factions
+            for src_dir in "data/factions" "misc/factions" "${{ matrix.path }}/data/factions" "${{ matrix.path }}/factions"; do
+              if [ -d "$src_dir" ]; then
+                cp -aL "$src_dir"/* pages-site/factions/ 2>/dev/null || true
+                cp -aL "$src_dir"/* pages-site/data/factions/ 2>/dev/null || true
+                echo "✅ Factions copied from $src_dir"
+                break
+              fi
+            done
+
+            echo "👤 Processing patron files..."
+            mkdir -p pages-site/data/patrons
+            for src_dir in "data/patrons" "misc/patrons" "${{ matrix.path }}/data/patrons"; do
+              if [ -d "$src_dir" ]; then
+                cp -aL "$src_dir"/* pages-site/data/patrons/ 2>/dev/null || true
+                echo "✅ Patrons copied from $src_dir"
+                break
+              fi
+            done
+
+            if [ -d "data" ]; then
+              for file in data/*.json data/*.js; do
+                if [ -f "$file" ] && [ "$(basename "$file")" != "wiki.json" ] && [ "$(basename "$file")" != "seed.json" ]; then
+                  cp -aL "$file" pages-site/data/ 2>/dev/null || true
+                fi
+              done
+              echo "✅ Additional data files copied"
             fi
-          done
+
+            echo "✅ All data files copied successfully!"
+
+        - name: Verify no symlinks in pages-site
+          if: ${{ env.SKIP_JOB != 'true' && matrix.name == 'web-client' }}
+          run: |
+            if find pages-site -type l | grep -q .; then
+              echo "❌ Symlinks found:"
+              find pages-site -type l
+              exit 1
+            fi
+            echo "✅ No symlinks"
 
       - name: Verify and debug pages-site
         if: matrix.name == 'web-client' && (github.event_name != 'workflow_dispatch' || github.event.inputs.skip_web_deploy != 'true')
