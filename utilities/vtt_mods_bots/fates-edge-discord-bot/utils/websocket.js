@@ -1,6 +1,6 @@
 /**
  * WebSocket Client for Fate's Edge VTT Server
- * Extended with GM election/promotion support
+ * Extended with GM election/promotion support + Ban/Kick
  */
 
 const WebSocket = require('ws');
@@ -175,7 +175,7 @@ class VTTClient extends EventEmitter {
                 logger.info(`📦 Room state received. Client ID: ${this.clientId}`);
                 if (message.clients) {
                     this._updateClients(message.clients);
-                    const names = message.clients.map(c => c.data?.name || 'Unknown').join(', ');
+                    const names = message.clients.map(c => c.name || c.data?.name || 'Unknown').join(', ');
                     logger.info(`👥 Clients in room: ${names}`);
                 }
                 break;
@@ -273,6 +273,15 @@ class VTTClient extends EventEmitter {
                 this.emit('serverAnnouncement', message);
                 break;
 
+            // ============================================================
+            // BAN / KICK EVENTS
+            // ============================================================
+            case 'kicked':
+                logger.warn(`🚫 Bot was kicked: ${message.reason || 'No reason'}`);
+                this.emit('kicked', message);
+                // Optionally disconnect – the server will close the connection.
+                break;
+
             case 'pong':
                 // Heartbeat response - ignore
                 break;
@@ -290,7 +299,12 @@ class VTTClient extends EventEmitter {
     _updateClients(clientsArray) {
         this.clients.clear();
         clientsArray.forEach(c => {
-            this.clients.set(c.id, c);
+            this.clients.set(c.id, {
+                id: c.id,
+                name: c.name || c.data?.name || 'Unknown',
+                role: c.role || 'player',
+                email: c.email || ''
+            });
             if (c.role === 'gm') this.gmId = c.id;
         });
         // If no GM found, set gmId to null
@@ -356,6 +370,50 @@ class VTTClient extends EventEmitter {
      */
     clearPendingGMRequests() {
         this.pendingRequests = [];
+    }
+
+    // ============================================================
+    // NEW: Ban / Kick Methods
+    // ============================================================
+
+    /**
+     * Find a client ID by name (case‑insensitive)
+     * @param {string} name - player name
+     * @returns {string|null} clientId or null if not found
+     */
+    getClientIdByName(name) {
+        for (const [id, client] of this.clients) {
+            if (client.name && client.name.toLowerCase() === name.toLowerCase()) {
+                return id;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Kick a client (requires GM role on the server)
+     * @param {string} targetId - client ID
+     * @param {string} [reason] - optional reason
+     */
+    kickClient(targetId, reason = 'Kicked by Discord admin') {
+        this.send('kick_client', { targetId, reason });
+    }
+
+    /**
+     * Ban a client (requires GM role on the server)
+     * @param {string} targetId - client ID
+     * @param {string} [reason] - optional reason
+     */
+    banClient(targetId, reason = 'Banned by Discord admin') {
+        this.send('ban_client', { targetId, reason });
+    }
+
+    /**
+     * Unban a client
+     * @param {string} targetId - client ID to unban
+     */
+    unbanClient(targetId) {
+        this.send('unban_client', { targetId });
     }
 
     // ============================================================

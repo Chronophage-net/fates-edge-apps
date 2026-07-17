@@ -8,7 +8,7 @@ API_KEY = "YOUR_API_KEY"
 def make_request(endpoint, method="GET", data=None):
     try:
         url = f"{API_BASE}{endpoint}"
-        headers = {"Authorization": f"Bearer {API_KEY}"}
+        headers = {"x-api-key": API_KEY}
         if method == "GET":
             response = requests.get(url, headers=headers)
         else:
@@ -17,13 +17,27 @@ def make_request(endpoint, method="GET", data=None):
     except Exception as e:
         return {"error": str(e)}
 
+def get_room_code():
+    # In a real bot, this would be obtained from the active campaign/room mapping.
+    # For this example, we'll assume a fixed room code, replace with your logic.
+    return "YOUR_ROOM_CODE"
+
+def get_client_id_by_name(name):
+    room_code = get_room_code()
+    clients = make_request(f"/rooms/{room_code}/clients").get("clients", [])
+    for c in clients:
+        if c["name"].lower() == name.lower():
+            return c["id"]
+    return None
+
 args = &ARGS&
 cmd = args[0].lower() if args else "help"
 
 if cmd == "draw":
     count = min(int(args[1]) if len(args) > 1 else 1, 5)
     region = args[2] if len(args) > 2 else "Acasia"
-    result = make_request("/deck/draw", "POST", {"count": count, "region": region})
+    room_code = get_room_code()
+    result = make_request(f"/rooms/{room_code}/deck/draw", "POST", {"count": count, "region": region})
     
     if result.get("error"):
         return f"❌ {result['error']}"
@@ -35,7 +49,8 @@ if cmd == "draw":
 
 elif cmd == "crown":
     region = args[1] if len(args) > 1 else "Acasia"
-    result = make_request("/deck/crown", "POST", {"region": region})
+    room_code = get_room_code()
+    result = make_request(f"/rooms/{room_code}/deck/crown", "POST", {"region": region})
     if result.get("error"):
         return f"❌ {result['error']}"
     
@@ -51,29 +66,86 @@ elif cmd == "gm":
     
     subcmd = args[1].lower()
     if subcmd == "request":
-        result = make_request("/gm/request", "POST")
-        return "👑 GM request sent." if not result.get("error") else f"❌ {result['error']}"
+        # GM request via API would need an endpoint (we didn't add one)
+        # Use existing WebSocket-based method? Not possible. We'll skip for now.
+        return "❌ GM request via REST API is not implemented. Use WebSocket bot."
     elif subcmd == "status":
-        result = make_request("/gm/status")
-        if result.get("error"):
-            return f"❌ {result['error']}"
-        return f"👑 **GM**: {result.get('gmName', 'None')}\n📋 **Pending**: {result.get('pending', 0)}"
+        # We'd need a GM status endpoint, not yet. Use client list to find GM.
+        room_code = get_room_code()
+        clients = make_request(f"/rooms/{room_code}/clients").get("clients", [])
+        gm = next((c for c in clients if c.get("role") == "gm"), None)
+        if gm:
+            return f"👑 **GM**: {gm['name']}\n👥 **Players**: {len(clients)-1}"
+        else:
+            return "👑 No GM currently."
     elif subcmd == "approve":
-        if len(args) < 3:
-            return "❌ Specify a player: `!fe gm approve <player>`"
-        target = args[2]
-        result = make_request(f"/gm/approve/{target}", "POST")
-        return f"✅ Approved {target} as GM." if not result.get("error") else f"❌ {result['error']}"
+        # Also not implemented via REST.
+        return "❌ GM approve via REST API is not implemented."
     else:
         return "❌ Unknown GM subcommand."
+
+elif cmd == "players":
+    room_code = get_room_code()
+    clients = make_request(f"/rooms/{room_code}/clients").get("clients", [])
+    if not clients:
+        return "📭 No players in the room."
+    output = "👥 **Players in Room**\n"
+    for c in clients:
+        output += f"`{c['id']}` - **{c['name']}** ({c['role']})\n"
+    return output
+
+elif cmd == "kick":
+    if len(args) < 2:
+        return "❌ Usage: `!fe kick <player name or ID> [reason]`"
+    target = args[1]
+    reason = " ".join(args[2:]) if len(args) > 2 else "Kicked by Avrae admin"
+    room_code = get_room_code()
+    client_id = target
+    # If not an ID-like string, resolve by name
+    if not (target.startswith("ws-") or len(target) == 20):
+        client_id = get_client_id_by_name(target)
+        if not client_id:
+            return f"❌ Player '{target}' not found."
+    result = make_request(f"/rooms/{room_code}/clients/{client_id}/kick", "POST", {"reason": reason})
+    if result.get("error"):
+        return f"❌ {result['error']}"
+    return f"👢 Kicked {client_id} ({target})."
+
+elif cmd == "ban":
+    if len(args) < 2:
+        return "❌ Usage: `!fe ban <player name or ID> [reason]`"
+    target = args[1]
+    reason = " ".join(args[2:]) if len(args) > 2 else "Banned by Avrae admin"
+    room_code = get_room_code()
+    client_id = target
+    if not (target.startswith("ws-") or len(target) == 20):
+        client_id = get_client_id_by_name(target)
+        if not client_id:
+            return f"❌ Player '{target}' not found."
+    result = make_request(f"/rooms/{room_code}/clients/{client_id}/ban", "POST", {"reason": reason})
+    if result.get("error"):
+        return f"❌ {result['error']}"
+    return f"🚫 Banned {client_id} ({target})."
+
+elif cmd == "unban":
+    if len(args) < 2:
+        return "❌ Usage: `!fe unban <client ID>`"
+    target_id = args[1]
+    room_code = get_room_code()
+    result = make_request(f"/rooms/{room_code}/clients/{target_id}/unban", "POST")
+    if result.get("error"):
+        return f"❌ {result['error']}"
+    return f"✅ Unbanned {target_id}."
 
 else:
     return """**Fate's Edge VTT Commands**
 `!fe draw [count] [region]` - Draw cards (1-5)
 `!fe crown [region]` - Crown spread reading
-`!fe gm request` - Request GM
-`!fe gm status` - GM status
-`!fe gm approve <player>` - Approve GM (GM only)
+`!fe gm status` - Show current GM
+`!fe players` - List players in the room
+`!fe kick <player> [reason]` - Kick a player
+`!fe ban <player> [reason]` - Ban a player
+`!fe unban <clientId>` - Unban a client ID
 `!fe help` - This help
 """
 </drac2>

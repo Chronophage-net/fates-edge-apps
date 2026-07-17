@@ -1,0 +1,252 @@
+/**
+ * Fate's Edge - Room & Client Management + Ban/Kick
+ */
+
+const WebSocket = require('ws');
+
+// ---------- State ----------
+const rooms = new Map();
+
+// ---------- Helpers ----------
+function validateRoomCode(code) {
+    return typeof code === 'string' && code.length >= 4 && code.length <= 10 && /^[A-Z0-9]+$/.test(code);
+}
+
+function getRoom(code) {
+    if (!validateRoomCode(code)) {
+        throw new Error('Invalid room code format');
+    }
+    const room = rooms.get(code.toUpperCase());
+    if (!room) throw new Error(`Room ${code} not found`);
+    return room;
+}
+
+function getRoomStats(roomCode) {
+    const room = rooms.get(roomCode);
+    if (!room) return null;
+    return {
+        code: room.code,
+        name: room.name,
+        clients: room.clients.size,
+        deckRemaining: room.deck?.length || 0,
+        historyCount: room.deckHistory?.length || 0,
+        lastActivity: room.lastActivity,
+        created: room.created
+    };
+}
+
+function getExistingGm(room) {
+    for (const [, client] of room.clients) {
+        if (client.role === 'gm') return client;
+    }
+    return null;
+}
+
+function getClientsList(room) {
+    return Array.from(room.clients.values()).map(c => ({
+        id: c.id,
+        name: c.name,
+        role: c.role,
+        email: c.email || ''
+    }));
+}
+
+// ---------- Ban/Kick ----------
+// Ban storage: room.banned Set of client IDs (or IPs).
+// On room creation we'll add empty banned Set.
+
+function kickClient(room, targetId, reason = 'Kicked by GM') {
+    const target = room.clients.get(targetId);
+    if (!target) return false;
+
+    // Notify the target
+    if (target.type === 'socket.io' && target.socket) {
+        target.socket.emit('kicked', { reason });
+        target.socket.leave(room.code);
+        target.socket.disconnect(true);
+    } else if (target.type === 'ws' && target.ws) {
+        target.ws.send(JSON.stringify({ type: 'kicked', reason }));
+        target.ws.close(4001, reason);
+    }
+
+    room.clients.delete(targetId);
+    return true;
+}
+
+function banClient(room, targetId, reason = 'Banned by GM') {
+    // Ban works by storing client ID; you could also store IP.
+    // The target is immediately kicked and added to banned list.
+    if (!room.banned) room.banned = new Set();
+    room.banned.add(targetId);
+
+    // If they are in the room, kick them
+    if (room.clients.has(targetId)) {
+        kickClient(room, targetId, reason);
+    }
+}
+
+function unbanClient(room, targetId) {
+    if (room.banned) {
+        return room.banned.delete(targetId);
+    }
+    return false;
+}
+
+function isBanned(room, clientId) {
+    return room.banned ? room.banned.has(clientId) : false;
+}
+
+// ---------- GM Election ----------
+function handleGmRequest(room, requesterId) {
+    const requester = room.clients.get(requesterId);
+    if (!requester) return;
+
+    const currentGm = getExistingGm(room);
+    if (!currentGm) {
+        requester.role = 'gm';
+        room.clients.set(requesterId, requester);
+        const clientsList = getClientsList(room);
+        broadcastToRoom(room.code, 'presence', { clients: clientsList });
+        broadcastToRoom(room.code, 'server_announcement', {
+            message: `👑 ${requester.name} has taken on the role of Game Master.`,
+            timestamp: Date.now()
+        });
+        // Notify directly
+        if (requester.type === 'socket.io' && requester.socket) {
+            requester.socket.emit('gm_role_update', { role: 'gm' });
+        } else if (requester.type === 'ws' && requester.ws && requester.ws.readyState === WebSocket.OPEN) {
+            requester.ws.send(JSON.stringify({ type: 'gm_role_update', role: 'gm' }));
+        }
+    } else {
+        // Vote request
+        broadcastToRoom(room.code, 'gm_vote_request', {
+            requesterId,
+            requesterName: requester.name,
+            currentGmId: currentGm.id,
+            currentGmName: currentGm.name,
+            timestamp: Date.now()
+        });
+        const waitMsg = `A GM is already present. A vote request has been sent to ${currentGm.name}.`;
+        if (requester.type === 'socket.io' && requester.socket) {
+            requester.socket.emit('server_announcement', { message: waitMsg, timestamp: Date.now() });
+        } else if (requester.type === 'ws' && requester.ws) {
+            requester.ws.send(JSON.stringify({ type: 'server_announcement', message: waitMsg, timestamp: Date.now() }));
+        }
+    }
+}
+
+function handleGmApproval(room, approverId, targetId) {
+    const approver = room.clients.get(approverId);
+    const target = room.clients.get(targetId);
+    if (!approver || !target) return;
+    if (approver.role !== 'gm') return;
+
+    approver.role = 'player';
+    target.role = 'gm';
+    room.clients.set(approverId, approver);
+    room.clients.set(targetId, target);
+
+    const clientsList = getClientsList(room);
+    broadcastToRoom(room.code, 'presence', { clients: clientsList });
+    broadcastToRoom(room.code, 'server_announcement', {
+        message: `👑 ${approver.name} has stepped down. ${target.name} is now the Game Master.`,
+        timestamp: Date.now()
+    });
+
+    if (approver.type === 'socket.io' && approver.socket) {
+        approver.socket.emit('gm_role_update', { role: 'player' });
+    } else if (approver.type === 'ws' && approver.ws) {
+        approver.ws.send(JSON.stringify({ type: 'gm_role_update', role: 'player' }));
+    }
+    if (target.type === 'socket.io' && target.socket) {
+        target.socket.emit('gm_role_update', { role: 'gm' });
+    } else if (target.type === 'ws' && target.ws) {
+        target.ws.send(JSON.stringify({ type: 'gm_role_update', role: 'gm' }));
+    }
+}
+
+// ---------- Broadcast (needs io reference) ----------
+let io = null;
+function setIo(ioInstance) { io = ioInstance; }
+
+function broadcastToRoom(roomCode, event, data) {
+    const roomKey = roomCode.toUpperCase();
+    const room = rooms.get(roomKey);
+    if (!room) return;
+
+    if (io) {
+        io.to(roomKey).emit(event, data);
+    }
+
+    const message = JSON.stringify({ type: event, ...data });
+    for (const [, client] of room.clients) {
+        if (client.type === 'ws' && client.ws && client.ws.readyState === WebSocket.OPEN) {
+            client.ws.send(message);
+        }
+    }
+}
+
+// ---------- Room Creation ----------
+function createRoom(roomCode) {
+    const roomKey = roomCode.toUpperCase();
+    if (rooms.has(roomKey)) return rooms.get(roomKey);
+
+    const { buildDeck } = require('./deck.js');
+    const room = {
+        name: `Room ${roomKey}`,
+        code: roomKey,
+        clients: new Map(),
+        deck: buildDeck(),
+        deckHistory: [],
+        deckOffset: Math.floor(Math.random() * 1000),
+        lastActivity: Date.now(),
+        created: Date.now(),
+        whiteboard: createDefaultWhiteboard(),
+        banned: new Set()   // new ban list
+    };
+    rooms.set(roomKey, room);
+    return room;
+}
+
+function createDefaultWhiteboard() {
+    return {
+        drawings: [],
+        notes: [],
+        images: [],
+        settings: {
+            gridSnap: false,
+            gridSize: 20,
+            backgroundColor: '#ffffff',
+            gridType: 'square',
+            showGrid: true
+        },
+        gridCombat: {
+            enabled: false,
+            gridType: 'square',
+            cellSize: 40,
+            showCoordinates: false,
+            showZones: false,
+            tokens: []
+        }
+    };
+}
+
+// ---------- Exports ----------
+module.exports = {
+    rooms,
+    validateRoomCode,
+    getRoom,
+    getRoomStats,
+    getExistingGm,
+    getClientsList,
+    kickClient,
+    banClient,
+    unbanClient,
+    isBanned,
+    handleGmRequest,
+    handleGmApproval,
+    setIo,
+    broadcastToRoom,
+    createRoom,
+    createDefaultWhiteboard,
+};

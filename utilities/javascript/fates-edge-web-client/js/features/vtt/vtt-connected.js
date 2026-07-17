@@ -835,7 +835,12 @@ function setupWebSocketSync() {
             }
             const myId = getSocketId();
             if (myId && clientsMap.has(myId)) {
-                gmState.myRole = clientsMap.get(myId).role;
+                const myClient = clientsMap.get(myId);
+                if (gmState.myRole !== myClient.role) {
+                    gmState.myRole = myClient.role;
+                    // Notify sidebar of role change
+                    document.dispatchEvent(new CustomEvent('gmRoleUpdate', { detail: { role: myClient.role } }));
+                }
             }
             updateGMUI();
             renderLocalPresence();
@@ -864,6 +869,7 @@ function setupWebSocketSync() {
         if (isDestroyed) return;
         const { role } = data;
         gmState.myRole = role;
+        document.dispatchEvent(new CustomEvent('gmRoleUpdate', { detail: { role } }));
         const myId = getSocketId();
         if (myId && clientsMap.has(myId)) {
             clientsMap.get(myId).role = role;

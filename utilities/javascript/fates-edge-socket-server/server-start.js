@@ -4,7 +4,7 @@
  * Used by the CLI tool to start the server
  */
 
-const server = require('./server.js');
+const server = require('./server/server.js');
 
 // If run directly, start the server
 if (require.main === module) {

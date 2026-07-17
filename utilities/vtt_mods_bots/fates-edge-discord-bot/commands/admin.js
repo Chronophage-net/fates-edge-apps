@@ -1,5 +1,5 @@
 /**
- * Admin Commands
+ * Admin Commands – VTT Management + Ban/Kick
  */
 
 const { SlashCommandBuilder, EmbedBuilder, PermissionsBitField } = require('discord.js');
@@ -9,32 +9,29 @@ module.exports = {
         .setName('vttadmin')
         .setDescription('Admin commands for VTT bot')
         .setDefaultMemberPermissions(PermissionsBitField.Flags.Administrator)
-        .addSubcommand(subcommand =>
-            subcommand
-                .setName('broadcast')
+        // Existing subcommands
+        .addSubcommand(sub =>
+            sub.setName('broadcast')
                 .setDescription('Broadcast a message to all VTT clients')
-                .addStringOption(option =>
-                    option.setName('message')
+                .addStringOption(opt =>
+                    opt.setName('message')
                         .setDescription('Message to broadcast')
                         .setRequired(true)
                 )
         )
-        .addSubcommand(subcommand =>
-            subcommand
-                .setName('sync')
+        .addSubcommand(sub =>
+            sub.setName('sync')
                 .setDescription('Force sync state')
         )
-        .addSubcommand(subcommand =>
-            subcommand
-                .setName('stats')
+        .addSubcommand(sub =>
+            sub.setName('stats')
                 .setDescription('Show bot statistics')
         )
-        .addSubcommand(subcommand =>
-            subcommand
-                .setName('deck')
+        .addSubcommand(sub =>
+            sub.setName('deck')
                 .setDescription('Manage VTT deck')
-                .addStringOption(option =>
-                    option.setName('action')
+                .addStringOption(opt =>
+                    opt.setName('action')
                         .setDescription('Action to perform')
                         .setRequired(true)
                         .addChoices(
@@ -44,12 +41,11 @@ module.exports = {
                         )
                 )
         )
-        .addSubcommand(subcommand =>
-            subcommand
-                .setName('modules')
+        .addSubcommand(sub =>
+            sub.setName('modules')
                 .setDescription('Manage VTT modules')
-                .addStringOption(option =>
-                    option.setName('action')
+                .addStringOption(opt =>
+                    opt.setName('action')
                         .setDescription('Action to perform')
                         .setRequired(true)
                         .addChoices(
@@ -58,19 +54,60 @@ module.exports = {
                             { name: 'cleanup', value: 'cleanup' }
                         )
                 )
-                .addStringOption(option =>
-                    option.setName('module-id')
+                .addStringOption(opt =>
+                    opt.setName('module-id')
                         .setDescription('Module ID (for push/cleanup)')
                         .setRequired(false)
                 )
         )
-        .addSubcommand(subcommand =>
-            subcommand
-                .setName('region')
+        .addSubcommand(sub =>
+            sub.setName('region')
                 .setDescription('Set default region for deck draws')
-                .addStringOption(option =>
-                    option.setName('region')
+                .addStringOption(opt =>
+                    opt.setName('region')
                         .setDescription('Region name')
+                        .setRequired(true)
+                )
+        )
+        // ── New subcommands ──
+        .addSubcommand(sub =>
+            sub.setName('players')
+                .setDescription('List players currently in the VTT room')
+        )
+        .addSubcommand(sub =>
+            sub.setName('kick')
+                .setDescription('Kick a player from the VTT room')
+                .addStringOption(opt =>
+                    opt.setName('target')
+                        .setDescription('Player name or client ID')
+                        .setRequired(true)
+                )
+                .addStringOption(opt =>
+                    opt.setName('reason')
+                        .setDescription('Reason for kick')
+                        .setRequired(false)
+                )
+        )
+        .addSubcommand(sub =>
+            sub.setName('ban')
+                .setDescription('Ban a player from the VTT room')
+                .addStringOption(opt =>
+                    opt.setName('target')
+                        .setDescription('Player name or client ID')
+                        .setRequired(true)
+                )
+                .addStringOption(opt =>
+                    opt.setName('reason')
+                        .setDescription('Reason for ban')
+                        .setRequired(false)
+                )
+        )
+        .addSubcommand(sub =>
+            sub.setName('unban')
+                .setDescription('Unban a client')
+                .addStringOption(opt =>
+                    opt.setName('client-id')
+                        .setDescription('The client ID to unban')
                         .setRequired(true)
                 )
         ),
@@ -82,24 +119,16 @@ module.exports = {
 
         try {
             switch (subcommand) {
-                case 'broadcast':
-                    await handleBroadcast(interaction, client);
-                    break;
-                case 'sync':
-                    await handleSync(interaction, client);
-                    break;
-                case 'stats':
-                    await handleStats(interaction, client);
-                    break;
-                case 'deck':
-                    await handleDeck(interaction, client);
-                    break;
-                case 'modules':
-                    await handleModules(interaction, client);
-                    break;
-                case 'region':
-                    await handleRegion(interaction, client);
-                    break;
+                case 'broadcast':   return handleBroadcast(interaction, client);
+                case 'sync':        return handleSync(interaction, client);
+                case 'stats':       return handleStats(interaction, client);
+                case 'deck':        return handleDeck(interaction, client);
+                case 'modules':     return handleModules(interaction, client);
+                case 'region':      return handleRegion(interaction, client);
+                case 'players':     return handlePlayers(interaction, client);
+                case 'kick':        return handleKick(interaction, client);
+                case 'ban':         return handleBan(interaction, client);
+                case 'unban':       return handleUnban(interaction, client);
             }
         } catch (err) {
             await interaction.editReply(`❌ Error: ${err.message}`);
@@ -107,22 +136,20 @@ module.exports = {
     }
 };
 
+// ─── Existing handlers ──────────────────────────────────────
+
 async function handleBroadcast(interaction, client) {
     const message = interaction.options.getString('message');
-
     if (!client.vtt.connected) {
         return interaction.editReply('❌ Not connected to VTT server.');
     }
-
     client.vtt.sendChatMessage(`📢 **Broadcast:** ${message}`, 'System');
-
     const embed = new EmbedBuilder()
         .setColor(0xd4af37)
         .setTitle('📢 Broadcast Sent')
         .setDescription(message)
         .setFooter({ text: `Sent by ${interaction.user.username}` })
         .setTimestamp();
-
     await interaction.editReply({ embeds: [embed] });
 }
 
@@ -130,9 +157,7 @@ async function handleSync(interaction, client) {
     if (!client.vtt.connected) {
         return interaction.editReply('❌ Not connected to VTT server.');
     }
-
     client.vtt.send('sync-state', { force: true });
-
     await interaction.editReply('✅ Sync request sent to VTT server.');
 }
 
@@ -140,7 +165,6 @@ async function handleStats(interaction, client) {
     const deckState = client.vtt.deck || { cards: [], history: [] };
     const modules = client.vtt.modules || [];
     const region = client.vtt.defaultRegion || 'Acasia';
-    
     const embed = new EmbedBuilder()
         .setTitle('🤖 Bot Statistics')
         .setColor(0xd4af37)
@@ -159,17 +183,14 @@ async function handleStats(interaction, client) {
             { name: '📊 Uptime', value: getUptime(), inline: true }
         )
         .setTimestamp();
-
     await interaction.editReply({ embeds: [embed] });
 }
 
 async function handleDeck(interaction, client) {
     const action = interaction.options.getString('action');
-
     if (!client.vtt.connected) {
         return interaction.editReply('❌ Not connected to VTT server.');
     }
-
     switch (action) {
         case 'shuffle':
             client.vtt.send('deck-shuffle', {});
@@ -197,11 +218,9 @@ async function handleDeck(interaction, client) {
 async function handleModules(interaction, client) {
     const action = interaction.options.getString('action');
     const moduleId = interaction.options.getString('module-id');
-
     if (!client.vtt.connected) {
         return interaction.editReply('❌ Not connected to VTT server.');
     }
-
     switch (action) {
         case 'list':
             client.vtt.send('module-list', {});
@@ -235,6 +254,89 @@ async function handleRegion(interaction, client) {
     client.vtt.send('set-region', { region });
     await interaction.editReply(`📍 Default region set to: ${region}`);
 }
+
+// ─── New handlers ───────────────────────────────────────────
+
+function getPlayerList(client) {
+    if (!client.vtt.clients || client.vtt.clients.size === 0) {
+        return 'No players currently in the room.';
+    }
+    const entries = [];
+    for (const [id, info] of client.vtt.clients) {
+        entries.push(`\`${id}\` – **${info.name}** (${info.role})`);
+    }
+    return entries.join('\n');
+}
+
+async function handlePlayers(interaction, client) {
+    if (!client.vtt.connected) {
+        return interaction.editReply('❌ Not connected to VTT server.');
+    }
+    const list = getPlayerList(client);
+    const embed = new EmbedBuilder()
+        .setColor(0xd4af37)
+        .setTitle('👥 Players in Room')
+        .setDescription(list)
+        .setTimestamp();
+    await interaction.editReply({ embeds: [embed] });
+}
+
+async function resolveTarget(client, target) {
+    // If target looks like a client ID (ws-... or socket.io id), use it directly
+    if (target.startsWith('ws-') || target.length === 20) {
+        return target;
+    }
+    // Otherwise, search by name
+    if (!client.vtt.clients || client.vtt.clients.size === 0) {
+        throw new Error('No player data available. Cannot resolve name.');
+    }
+    const id = client.vtt.getClientIdByName(target);
+    if (!id) throw new Error(`Player "${target}" not found.`);
+    return id;
+}
+
+async function handleKick(interaction, client) {
+    if (!client.vtt.connected) {
+        return interaction.editReply('❌ Not connected to VTT server.');
+    }
+    const target = interaction.options.getString('target');
+    const reason = interaction.options.getString('reason') || 'Kicked by admin';
+    let clientId;
+    try {
+        clientId = await resolveTarget(client, target);
+    } catch (e) {
+        return interaction.editReply(`❌ ${e.message}`);
+    }
+    client.vtt.send('kick_client', { targetId: clientId, reason });
+    await interaction.editReply(`👢 Kicked \`${clientId}\` (Reason: ${reason})`);
+}
+
+async function handleBan(interaction, client) {
+    if (!client.vtt.connected) {
+        return interaction.editReply('❌ Not connected to VTT server.');
+    }
+    const target = interaction.options.getString('target');
+    const reason = interaction.options.getString('reason') || 'Banned by admin';
+    let clientId;
+    try {
+        clientId = await resolveTarget(client, target);
+    } catch (e) {
+        return interaction.editReply(`❌ ${e.message}`);
+    }
+    client.vtt.send('ban_client', { targetId: clientId, reason });
+    await interaction.editReply(`🚫 Banned \`${clientId}\` (Reason: ${reason})`);
+}
+
+async function handleUnban(interaction, client) {
+    if (!client.vtt.connected) {
+        return interaction.editReply('❌ Not connected to VTT server.');
+    }
+    const clientId = interaction.options.getString('client-id');
+    client.vtt.send('unban_client', { targetId: clientId });
+    await interaction.editReply(`✅ Unbanned \`${clientId}\`.`);
+}
+
+// ─── Helpers ─────────────────────────────────────────────────
 
 function getUptime() {
     const uptime = process.uptime();

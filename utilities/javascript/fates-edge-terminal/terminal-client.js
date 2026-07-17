@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 /**
- * Fate's Edge Terminal Client v1.3.0
+ * Fate's Edge Terminal Client v1.4.0
  * A MUD-style CLI client for the Fate's Edge WebSocket server.
  * 
  * Features:
@@ -13,8 +13,10 @@
  * - Region setting
  * - Presence and client list
  * - ANSI colored output
+ * - Admin mode (kick/ban/unban via REST API) when API key provided
  * 
- * Usage: node terminal-client.js
+ * Usage: node terminal-client.js [--api-key <key>]
+ *        or set API_KEY environment variable
  */
 
 const WebSocket = require('ws');
@@ -29,10 +31,34 @@ const CONFIG = {
     defaultServerUrl: 'ws://localhost:3000',
     defaultRoom: 'ABC123',
     defaultName: 'Terminal Player',
-    defaultPassword: 'password123', // Replace with actual auth if needed
+    defaultPassword: 'password123',
     reconnectDelay: 3000,
     maxReconnectAttempts: 5
 };
+
+// ============================================================
+// Admin API key (from env or command line)
+// ============================================================
+let adminApiKey = process.env.API_KEY || null;
+
+// Simple command line argument parsing for --api-key
+for (let i = 2; i < process.argv.length; i++) {
+    if (process.argv[i] === '--api-key' && i + 1 < process.argv.length) {
+        adminApiKey = process.argv[++i];
+    }
+}
+
+const ADMIN_MODE = !!adminApiKey;
+
+// Derive REST API base URL from the server URL (ws:// -> http://)
+function getApiBaseUrl(serverUrl) {
+    // Replace ws:// or wss:// with http:// or https://
+    const httpUrl = serverUrl.replace(/^ws/, 'http');
+    // Remove trailing slash if present
+    return httpUrl.replace(/\/$/, '') + '/api';
+}
+
+let apiBaseUrl = getApiBaseUrl(CONFIG.defaultServerUrl);
 
 // ============================================================
 // ANSI Colors
@@ -175,7 +201,7 @@ function printHelp() {
     process.stdout.write('\r\x1b[K');
     console.log(`
 ${colors.magenta}╔══════════════════════════════════════════════════════════════╗
-║  Fate's Edge Terminal Client v1.3.0 - Commands               ║
+║  Fate's Edge Terminal Client v1.4.0 - Commands               ║
 ╚══════════════════════════════════════════════════════════════╝${colors.reset}
 
 ${colors.yellow}Connection:${colors.reset}
@@ -213,8 +239,125 @@ ${colors.yellow}Other:${colors.reset}
   /who                        Request presence update
   /help                       Show this help
   /quit / exit                Quit the client
+${ADMIN_MODE ? `
+${colors.yellow}Admin (API Key Active):${colors.reset}
+  /admin players              List all clients (via REST API)
+  /admin kick <player|id> [reason]  Kick a player
+  /admin ban <player|id> [reason]   Ban a player
+  /admin unban <clientId>     Unban a client ID
+` : ''}
 `);
     rl.prompt(true);
+}
+
+// ============================================================
+// REST API helper (Admin mode)
+// ============================================================
+
+function makeApiRequest(endpoint, method = 'GET', data = null) {
+    const url = `${apiBaseUrl}${endpoint}`;
+    const options = {
+        method,
+        headers: {
+            'Content-Type': 'application/json',
+            'x-api-key': adminApiKey
+        }
+    };
+    if (data && method !== 'GET') {
+        options.body = JSON.stringify(data);
+    }
+    return fetch(url, options)
+        .then(res => {
+            if (!res.ok) {
+                return res.text().then(text => {
+                    throw new Error(`HTTP ${res.status}: ${text}`);
+                });
+            }
+            return res.json();
+        });
+}
+
+async function getClientIdFromApi(name) {
+    if (!ADMIN_MODE || !roomCode) return null;
+    try {
+        const result = await makeApiRequest(`/rooms/${roomCode}/clients`);
+        const clientsList = result.clients || [];
+        const client = clientsList.find(c => c.name && c.name.toLowerCase() === name.toLowerCase());
+        return client ? client.id : null;
+    } catch (err) {
+        printSystemMessage(`API error: ${err.message}`, colors.red);
+        return null;
+    }
+}
+
+async function handleAdminCommand(args) {
+    if (!ADMIN_MODE) {
+        printSystemMessage('Admin mode not available. Set API_KEY environment variable or pass --api-key.', colors.red);
+        return;
+    }
+    if (!roomCode) {
+        printSystemMessage('Not connected to a room. Admin commands require a room code.', colors.red);
+        return;
+    }
+
+    const subCmd = args[0]?.toLowerCase();
+    const arg1 = args[1];
+    const reason = args.slice(2).join(' ') || 'Admin action from terminal';
+
+    try {
+        switch (subCmd) {
+            case 'players':
+            case 'list':
+                const listResult = await makeApiRequest(`/rooms/${roomCode}/clients`);
+                const clientList = listResult.clients || [];
+                printSystemMessage(`👥 Clients in room (${clientList.length}):`);
+                clientList.forEach(c => {
+                    console.log(`  \`${c.id}\` - ${c.name} (${c.role})`);
+                });
+                rl.prompt(true);
+                break;
+
+            case 'kick':
+                if (!arg1) { printSystemMessage('Usage: /admin kick <player name or ID> [reason]', colors.red); return; }
+                const kickTargetId = await resolveTargetId(arg1);
+                if (!kickTargetId) return;
+                await makeApiRequest(`/rooms/${roomCode}/clients/${kickTargetId}/kick`, 'POST', { reason });
+                printSystemMessage(`👢 Kicked ${arg1} (${kickTargetId})`);
+                break;
+
+            case 'ban':
+                if (!arg1) { printSystemMessage('Usage: /admin ban <player name or ID> [reason]', colors.red); return; }
+                const banTargetId = await resolveTargetId(arg1);
+                if (!banTargetId) return;
+                await makeApiRequest(`/rooms/${roomCode}/clients/${banTargetId}/ban`, 'POST', { reason });
+                printSystemMessage(`🚫 Banned ${arg1} (${banTargetId})`);
+                break;
+
+            case 'unban':
+                if (!arg1) { printSystemMessage('Usage: /admin unban <client ID>', colors.red); return; }
+                await makeApiRequest(`/rooms/${roomCode}/clients/${arg1}/unban`, 'POST');
+                printSystemMessage(`✅ Unbanned ${arg1}`);
+                break;
+
+            default:
+                printSystemMessage('Admin commands: players, kick, ban, unban');
+        }
+    } catch (err) {
+        printSystemMessage(`Admin error: ${err.message}`, colors.red);
+    }
+}
+
+async function resolveTargetId(identifier) {
+    // If it looks like a client ID (ws-... or 20-character hex), use directly
+    if (identifier.startsWith('ws-') || /^[a-f0-9]{20}$/i.test(identifier)) {
+        return identifier;
+    }
+    // Otherwise, resolve by name via API
+    const id = await getClientIdFromApi(identifier);
+    if (!id) {
+        printSystemMessage(`Player "${identifier}" not found.`, colors.red);
+    }
+    return id;
 }
 
 // ============================================================
@@ -229,6 +372,7 @@ function connectToServer(url = serverUrl, room = roomCode) {
 
     serverUrl = url;
     roomCode = room;
+    apiBaseUrl = getApiBaseUrl(serverUrl);   // update REST API base URL
 
     printSystemMessage(`Connecting to ${serverUrl}/${roomCode}...`);
 
@@ -245,7 +389,7 @@ function connectToServer(url = serverUrl, room = roomCode) {
                 password: password,
                 clientName: clientName,
                 role: 'player',
-                version: '1.3.0'
+                version: '1.4.0'
             };
             ws.send(JSON.stringify(handshake));
         });
@@ -314,7 +458,7 @@ function scheduleReconnect() {
 }
 
 // ============================================================
-// Message Handler
+// Message Handler (WebSocket)
 // ============================================================
 
 function handleMessage(message) {
@@ -324,7 +468,6 @@ function handleMessage(message) {
             if (message.activeClients && message.activeClients.length > 0) {
                 const names = message.activeClients.map(c => c.name).join(', ');
                 printSystemMessage(`Players online: ${names}`);
-                // Update local clients
                 updateClients(message.activeClients);
             }
             break;
@@ -419,7 +562,6 @@ function handleMessage(message) {
             const requesterName = message.requesterName;
             const currentGmId = message.currentGmId;
             const currentGmName = message.currentGmName;
-            // Only show if we are the current GM
             if (myRole === 'gm' && ws && ws.clientId === currentGmId) {
                 if (!pendingRequests.find(r => r.requesterId === requesterId)) {
                     pendingRequests.push({ requesterId, requesterName });
@@ -453,7 +595,6 @@ function handleMessage(message) {
             break;
 
         case 'room-state':
-            // Initial room state (includes clients, deck, etc.)
             if (message.clients) {
                 updateClients(message.clients);
             }
@@ -484,7 +625,6 @@ function handleMessage(message) {
             break;
 
         default:
-            // Log unknown types for debugging
             process.stdout.write('\r\x1b[K');
             console.log(`${colors.gray}[Unknown] ${JSON.stringify(message)}${colors.reset}`);
             rl.prompt(true);
@@ -543,10 +683,8 @@ function sendMessage(type, data = {}) {
 // ============================================================
 
 function rollDice(formula) {
-    // Simple dice parser: NdM (+/- modifier)
     const parts = formula.match(/^(\d+)d(\d+)([+-]\d+)?$/i);
     if (!parts) {
-        // Try as a single number or expression with +/-
         const num = parseInt(formula);
         if (!isNaN(num)) {
             return { formula, total: num, rolls: [num] };
@@ -617,21 +755,21 @@ rl.on('line', (input) => {
                     printSystemMessage(`GM: ${gm ? gm.name : 'None'}`);
                     printSystemMessage(`Your role: ${myRole}`);
                     printSystemMessage(`Clients: ${Object.keys(clients).length}`);
+                    if (ADMIN_MODE) {
+                        printSystemMessage(`Admin mode: ✅ (API key set)`, colors.green);
+                    }
                 }
                 break;
 
-            // Name
             case 'name':
                 if (argStr) {
                     clientName = argStr;
                     printSystemMessage(`Name set to: ${clientName}`);
-                    // Optionally update server with new name (not implemented in server)
                 } else {
                     printSystemMessage(`Current name: ${clientName}`);
                 }
                 break;
 
-            // Roll
             case 'roll':
             case 'r':
                 if (!argStr) {
@@ -643,7 +781,6 @@ rl.on('line', (input) => {
                     printSystemMessage(rollData.error, colors.red);
                     break;
                 }
-                // Send to server
                 if (sendMessage('roll_result', {
                     value: {
                         sender: clientName,
@@ -656,7 +793,7 @@ rl.on('line', (input) => {
                 }
                 break;
 
-            // Deck commands
+            // Deck
             case 'draw':
                 const count = parseInt(args[0]) || 1;
                 const region = args[1] || defaultRegion;
@@ -680,7 +817,6 @@ rl.on('line', (input) => {
                 printSystemMessage(`Deck remaining: ${deckRemaining} cards`);
                 break;
 
-            // Region
             case 'region':
                 if (args[0]) {
                     defaultRegion = args[0];
@@ -691,7 +827,7 @@ rl.on('line', (input) => {
                 }
                 break;
 
-            // GM commands
+            // GM
             case 'gm':
                 const gmCmd = args[0]?.toLowerCase() || '';
                 const gmArg = args.slice(1).join(' ');
@@ -778,7 +914,11 @@ rl.on('line', (input) => {
                 }
                 break;
 
-            // Who / presence
+            // Admin mode (REST API)
+            case 'admin':
+                handleAdminCommand(args);
+                break;
+
             case 'who':
                 if (connected) {
                     sendMessage('sync_request', { entity: 'presence' });
@@ -819,13 +959,11 @@ rl.on('line', (input) => {
 });
 
 // ============================================================
-// Helper: Find client by ID or name
+// Helper: Find client by ID or name (from in-memory WS state)
 // ============================================================
 
 function findClient(idOrName) {
-    // Try exact ID first
     if (clients[idOrName]) return clients[idOrName];
-    // Try case-insensitive name match
     const lower = idOrName.toLowerCase();
     for (let id in clients) {
         if (clients[id].name && clients[id].name.toLowerCase() === lower) {
@@ -840,19 +978,19 @@ function findClient(idOrName) {
 // ============================================================
 
 console.log(`${colors.magenta}╔══════════════════════════════════════════════════════════════╗`);
-console.log(`${colors.magenta}║              Fate's Edge Terminal Client v1.3.0              ║`);
+console.log(`${colors.magenta}║              Fate's Edge Terminal Client v1.4.0              ║`);
 console.log(`${colors.magenta}╚══════════════════════════════════════════════════════════════╝${colors.reset}`);
 console.log(`Type ${colors.yellow}/help${colors.reset} for commands.`);
 console.log(`Set your name with ${colors.yellow}/name <Your Name>${colors.reset}`);
 console.log(`Connect with ${colors.yellow}/connect [url] [room]${colors.reset}`);
-console.log(`Type anything else to send a chat message.`);
+if (ADMIN_MODE) {
+    console.log(`${colors.green}Admin mode enabled. Use /admin for player management.${colors.reset}`);
+} else {
+    console.log(`${colors.dim}Tip: Set API_KEY env to enable admin commands (kick/ban/unban).${colors.reset}`);
+}
 console.log('');
 
 rl.prompt();
-
-// ============================================================
-// Cleanup on exit
-// ============================================================
 
 process.on('SIGINT', () => {
     if (ws) ws.close();

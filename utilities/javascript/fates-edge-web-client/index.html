@@ -16,6 +16,146 @@
     <link rel="stylesheet" href="css/layout.css" />
     <link rel="stylesheet" href="css/themes.css" />
     
+    <!-- Improved sidebar styling -->
+    <style>
+        :root {
+            --sidebar-bg: linear-gradient(180deg, #1a1a2e 0%, #16213e 100%);
+            --sidebar-border: #2a2a4a;
+            --nav-item-hover-bg: rgba(212,175,55,0.12);
+            --nav-item-active-bg: rgba(212,175,55,0.22);
+            --nav-item-active-border: #d4af37;
+            --nav-text: #c8c8d0;
+            --nav-icon-color: #a0a0b0;
+        }
+        .sidebar {
+            background: var(--sidebar-bg);
+            border-right: 1px solid var(--sidebar-border);
+            display: flex;
+            flex-direction: column;
+            padding: 0;
+            transition: width 0.2s ease;
+        }
+        .sidebar-brand {
+            padding: 1.2rem 1rem 0.8rem;
+            border-bottom: 1px solid var(--sidebar-border);
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+        .brand-icon {
+            font-size: 1.8rem;
+        }
+        .brand-name {
+            font-weight: 700;
+            font-size: 1.3rem;
+            color: var(--nav-text);
+        }
+        .brand-version {
+            display: block;
+            font-size: 0.7rem;
+            opacity: 0.6;
+            margin-top: 2px;
+        }
+        .sidebar-nav {
+            flex: 1;
+            overflow-y: auto;
+            padding: 0.5rem 0;
+        }
+        .nav-group {
+            margin-bottom: 1.2rem;
+        }
+        .nav-group-title {
+            display: block;
+            padding: 0.2rem 1.2rem;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            color: var(--nav-icon-color);
+            margin-bottom: 0.3rem;
+            opacity: 0.75;
+        }
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 0.7rem;
+            width: 100%;
+            padding: 0.55rem 1.2rem;
+            background: transparent;
+            border: none;
+            border-left: 3px solid transparent;
+            color: var(--nav-text);
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            text-align: left;
+        }
+        .nav-item:hover {
+            background: var(--nav-item-hover-bg);
+            border-left-color: var(--nav-item-active-border);
+        }
+        .nav-item.active {
+            background: var(--nav-item-active-bg);
+            border-left-color: var(--nav-item-active-border);
+            font-weight: 600;
+        }
+        .nav-item:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            background: transparent;
+            border-left-color: transparent;
+        }
+        .nav-item:disabled:hover {
+            background: transparent;
+        }
+        .nav-icon {
+            font-size: 1.2rem;
+            width: 1.6rem;
+            text-align: center;
+        }
+        .nav-label {
+            flex: 1;
+        }
+        .sidebar-footer {
+            padding: 0.5rem 1.2rem;
+            border-top: 1px solid var(--sidebar-border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .footer-status {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #4caf50;
+        }
+        .status-label {
+            font-size: 0.75rem;
+            color: var(--nav-text);
+        }
+        .footer-actions {
+            display: flex;
+            gap: 0.3rem;
+        }
+        .footer-btn {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--sidebar-border);
+            color: var(--nav-text);
+            padding: 0.25rem 0.45rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: background 0.15s;
+        }
+        .footer-btn:hover {
+            background: rgba(255,255,255,0.1);
+        }
+    </style>
+
     <!-- Seed loading script -->
     <script>
         (function() {
@@ -114,14 +254,19 @@
                     <button class="nav-item" data-tab="vtt" title="Virtual Tabletop" role="tab">
                         <span class="nav-icon">💬</span> <span class="nav-label">VTT</span>
                     </button>
-                    <button class="nav-item" data-tab="scene-tools" title="Scene Tools (GM Tools)" role="tab">
-                        <span class="nav-icon">🎯</span> <span class="nav-label">Scene Tools</span>
+                    <!-- GM Tools (formerly Scene Tools) – disabled when role is player -->
+                    <button class="nav-item" data-tab="gm-tools" title="GM Tools" role="tab" id="nav-gm-tools">
+                        <span class="nav-icon">🎯</span> <span class="nav-label">GM Tools</span>
                     </button>
                     <button class="nav-item" data-tab="timers" title="Timers" role="tab">
                         <span class="nav-icon">⏱️</span> <span class="nav-label">Timers</span>
                     </button>
                     <button class="nav-item" data-tab="decks" title="Decks" role="tab">
                         <span class="nav-icon">🃏</span> <span class="nav-label">Decks</span>
+                    </button>
+                    <!-- Whiteboard -->
+                    <button class="nav-item" data-tab="whiteboard" title="Whiteboard" role="tab">
+                        <span class="nav-icon">✏️</span> <span class="nav-label">Whiteboard</span>
                     </button>
                 </div>
 
@@ -169,12 +314,10 @@
             
             <!-- Table tabs -->
             <div id="tab-vtt" class="tab-content" role="tabpanel"></div>
-            <!-- scene-tools redirects to gm-tools via router -->
-            <div id="tab-scene-tools" class="tab-content" role="tabpanel"></div>
-            <!-- gm-tools is the actual module; router will use this if scene-tools is requested -->
             <div id="tab-gm-tools" class="tab-content" role="tabpanel"></div>
             <div id="tab-timers" class="tab-content" role="tabpanel"></div>
             <div id="tab-decks" class="tab-content" role="tabpanel"></div>
+            <div id="tab-whiteboard" class="tab-content" role="tabpanel"></div>
             
             <!-- System tabs -->
             <div id="tab-search" class="tab-content" role="tabpanel"></div>
@@ -186,6 +329,7 @@
             <div id="tab-regional" class="tab-content" style="display:none;"></div>
             <div id="tab-builder" class="tab-content" style="display:none;"></div>
             <div id="tab-roller" class="tab-content" style="display:none;"></div>
+            <div id="tab-scene-tools" class="tab-content" style="display:none;"></div>
         </main>
     </div>
 
@@ -276,6 +420,37 @@
 
     <!-- ===== TOAST CONTAINER ===== -->
     <div id="toast-container" role="status" aria-live="polite"></div>
+
+    <!-- ===== ROLE-BASED FEATURE TOGGLING ===== -->
+    <script>
+        // Global function to enable/disable GM Tools sidebar button
+        window.setGmToolsDisabled = function(disabled) {
+            const btn = document.getElementById('nav-gm-tools');
+            if (btn) {
+                btn.disabled = disabled;
+                btn.title = disabled ? 'Disabled by Server Admin' : 'GM Tools';
+            }
+        };
+
+        // Listen for role updates from VTT module (gmRoleUpdate custom event)
+        document.addEventListener('gmRoleUpdate', (e) => {
+            const role = e.detail?.role;
+            window.setGmToolsDisabled(role !== 'gm');
+        });
+
+        // Presence update fallback (if role is transmitted via presence event)
+        document.addEventListener('presenceUpdate', (e) => {
+            const myId = window.__vttClientId || (window.vttState && window.vttState.socketId);
+            if (!myId || !e.detail || !e.detail.clients) return;
+            const me = e.detail.clients.find(c => c.id === myId);
+            if (me) {
+                window.setGmToolsDisabled(me.role !== 'gm');
+            }
+        });
+
+        // The VTT module will set this when connected
+        window.__vttClientId = null;
+    </script>
 
     <!-- ===== APPLICATION ENTRY ===== -->
     <script type="module" src="js/app.js"></script>

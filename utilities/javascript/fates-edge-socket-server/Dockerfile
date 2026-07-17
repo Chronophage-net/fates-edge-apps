@@ -1,4 +1,3 @@
-# Multi-stage build for optional PDF conversion tools
 FROM node:20-alpine AS builder
 
 # Build argument: set to 'true' to include PDF conversion tools
@@ -18,13 +17,18 @@ RUN if [ "$ENABLE_UPLOAD" = "true" ]; then \
             && npm install multer --save-optional; \
     fi
 
-# Copy the server code
-COPY server.js ./
-COPY server-start.js ./
+# ---------------------------------------------------------------
+# Copy the modular server files into /app (merge server/* into root)
+# ---------------------------------------------------------------
+# This places server.js, config.js, deck.js, etc. directly in /app.
+COPY server/ ./
 
-# ============================================================
+# Copy the data directory (region files, manifests, etc.) if it exists
+COPY data/ ./data/
+
+# ---------------------------------------------------------------
 # CLI Tool Layer
-# ============================================================
+# ---------------------------------------------------------------
 
 # Install Python for CLI tool
 RUN apk add --no-cache python3 py3-pip python3-dev
@@ -40,32 +44,32 @@ RUN chmod +x /usr/local/bin/fates-edge-cli
 # Copy module directory if exists
 COPY modules/ ./modules/
 
-# Create directories for data, logs, and modules
-RUN mkdir -p /app/data /app/logs /app/modules
+# Create directories for data, logs, and modules (data already copied)
+RUN mkdir -p /app/logs /app/modules
 
-# ============================================================
+# ---------------------------------------------------------------
 # Health Check
-# ============================================================
+# ---------------------------------------------------------------
 
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
-    CMD node -e "require('http').get('http://localhost:3000/health', (r) => { process.exit(r.statusCode === 200 ? 0 : 1) })"
+    CMD node -e "require('http').get('http://localhost:${PORT:-3000}/health', (r) => { process.exit(r.statusCode === 200 ? 0 : 1) })"
 
-# ============================================================
+# ---------------------------------------------------------------
 # Expose Ports
-# ============================================================
+# ---------------------------------------------------------------
 
 # WebSocket/HTTP server port
 EXPOSE 3000
 
-# ============================================================
+# ---------------------------------------------------------------
 # Volumes
-# ============================================================
+# ---------------------------------------------------------------
 
 VOLUME ["/app/data", "/app/logs", "/app/modules"]
 
-# ============================================================
+# ---------------------------------------------------------------
 # Environment Variables
-# ============================================================
+# ---------------------------------------------------------------
 
 # Server configuration
 ENV PORT=3000
@@ -79,9 +83,9 @@ ENV NODE_ENV=production
 # CLI configuration
 ENV FATES_EDGE_SERVER_URL=http://localhost:3000
 
-# ============================================================
+# ---------------------------------------------------------------
 # Entry Point & Command
-# ============================================================
+# ---------------------------------------------------------------
 
 # Entry point provides CLI access
 ENTRYPOINT ["/usr/local/bin/fates-edge-cli"]
