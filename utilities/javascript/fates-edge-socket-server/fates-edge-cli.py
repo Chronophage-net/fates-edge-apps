@@ -6,6 +6,7 @@ For managing the Fate's Edge WebSocket server, rooms, users, and modules.
 Features:
 - Server lifecycle management (start/stop/restart)
 - Room management with deck operations
+- Client management (list, kick, ban, unban)  <-- NEW
 - Module management (push/cleanup/list)
 - Grid Combat support
 - Whiteboard sync
@@ -14,16 +15,15 @@ Features:
 
 Usage:
     fates-edge-cli --help
-    fates-edge-cli server start [--port PORT] [--host HOST]
+    fates-edge-cli server start [--port PORT] [--host HOST] [--api-key KEY]
     fates-edge-cli server stop
     fates-edge-cli server restart
     fates-edge-cli status
     fates-edge-cli rooms list
-    fates-edge-cli rooms grid-combat CODE [--enable|--disable] [--grid-type square|hex|isometric]
-    fates-edge-cli rooms token add CODE --name NAME [--x X] [--y Y] [--color COLOR] [--shape circle|square|diamond]
-    fates-edge-cli rooms token remove CODE --id TOKEN_ID
-    fates-edge-cli rooms token list CODE
-    fates-edge-cli whiteboard sync CODE
+    fates-edge-cli rooms clients list CODE
+    fates-edge-cli rooms client kick CODE --id CLIENT_ID [--reason REASON]
+    fates-edge-cli rooms client ban CODE --id CLIENT_ID [--reason REASON]
+    fates-edge-cli rooms client unban CODE --id CLIENT_ID
     ...
 """
 
@@ -50,7 +50,7 @@ from urllib.parse import urljoin
 # Constants
 # ============================================================
 
-VERSION = "1.3.0"
+VERSION = "1.4.0"  # bumped version
 DEFAULT_CONFIG_PATH = Path.home() / ".fates-edge" / "cli-config.json"
 DEFAULT_SERVER_URL = "http://localhost:10000"
 DEFAULT_API_KEY = ""
@@ -173,11 +173,11 @@ class ServerClient:
     
     def health(self) -> Dict:
         """Get server health"""
-        return self._request('GET', '/api/health')
+        return self._request('GET', '/api/healthz')
     
     def status(self) -> Dict:
-        """Get server status"""
-        return self._request('GET', '/api/status')
+        """Get server status (via health)"""
+        return self._request('GET', '/api/healthz')
     
     def list_rooms(self) -> List[Dict]:
         """List all rooms"""
@@ -273,6 +273,26 @@ class ServerClient:
         """List tokens in a room"""
         result = self._request('GET', f'/api/rooms/{code}/tokens')
         return result.get('tokens', [])
+    
+    # ============================================================
+    # NEW: Client management
+    # ============================================================
+    def get_clients(self, code: str) -> List[Dict]:
+        """List clients in a room"""
+        result = self._request('GET', f'/api/rooms/{code}/clients')
+        return result.get('clients', [])
+    
+    def kick_client(self, code: str, client_id: str, reason: str = 'Kicked by CLI') -> Dict:
+        """Kick a client from a room"""
+        return self._request('POST', f'/api/rooms/{code}/clients/{client_id}/kick', {'reason': reason})
+    
+    def ban_client(self, code: str, client_id: str, reason: str = 'Banned by CLI') -> Dict:
+        """Ban a client from a room"""
+        return self._request('POST', f'/api/rooms/{code}/clients/{client_id}/ban', {'reason': reason})
+    
+    def unban_client(self, code: str, client_id: str) -> Dict:
+        """Unban a client from a room"""
+        return self._request('POST', f'/api/rooms/{code}/clients/{client_id}/unban')
 
 # ============================================================
 # Server Control Commands
@@ -282,6 +302,7 @@ def cmd_server_start(args, config: Config):
     """Start the Fate's Edge server"""
     port = args.port or os.environ.get('PORT', 10000)
     host = args.host or '0.0.0.0'
+    api_key = args.api_key or os.environ.get('API_KEY', '')
     
     # Check if server is already running
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -309,6 +330,8 @@ def cmd_server_start(args, config: Config):
         env = os.environ.copy()
         env['PORT'] = str(port)
         env['HOST'] = host
+        if api_key:
+            env['API_KEY'] = api_key
         
         # Start process
         process = subprocess.Popen(
@@ -325,15 +348,20 @@ def cmd_server_start(args, config: Config):
         # Check if process is still running
         if process.poll() is None:
             print_success(f"Server started on {host}:{port} (PID: {process.pid})")
-            print_info(f"API Key: {os.environ.get('API_KEY', 'Check server logs for API key')}")
+            if api_key:
+                print_info(f"API Key: {api_key}")
+            else:
+                print_info("API Key: (Check server logs for API key if not set)")
             print_info(f"WebSocket: ws://{host}:{port}")
             print_info(f"HTTP: http://{host}:{port}")
-            print_info(f"Health Check: http://{host}:{port}/api/health")
+            print_info(f"Health Check: http://{host}:{port}/api/healthz")
             
             # Save PID to config
             config.set('server_pid', process.pid)
             config.set('server_port', port)
             config.set('server_host', host)
+            if api_key:
+                config.set('api_key', api_key)
             
             return True
         else:
@@ -485,6 +513,7 @@ class CLI:
         server_start = server_subparsers.add_parser('start', help='Start server')
         server_start.add_argument('--port', type=int, help='Port to listen on')
         server_start.add_argument('--host', default='0.0.0.0', help='Host to bind to')
+        server_start.add_argument('--api-key', help='API key to set in environment')
         
         server_subparsers.add_parser('stop', help='Stop server')
         server_subparsers.add_parser('restart', help='Restart server')
@@ -497,14 +526,17 @@ class CLI:
         rooms_parser = subparsers.add_parser('rooms', help='Manage rooms')
         rooms_subparsers = rooms_parser.add_subparsers(dest='action', help='Room actions')
         
+        # Basic room actions
         rooms_subparsers.add_parser('list', help='List all rooms')
         rooms_create = rooms_subparsers.add_parser('create', help='Create a room')
         rooms_create.add_argument('--name', required=True, help='Room name')
         rooms_create.add_argument('--password', help='Room password')
-        rooms_subparsers.add_parser('delete', help='Delete a room')
-        rooms_subparsers.add_parser('info', help='Get room details')
+        rooms_delete = rooms_subparsers.add_parser('delete', help='Delete a room')
+        rooms_delete.add_argument('code', help='Room code')
+        rooms_info = rooms_subparsers.add_parser('info', help='Get room details')
+        rooms_info.add_argument('code', help='Room code')
         
-        # Room deck operations
+        # Deck operations
         deck_parser = rooms_subparsers.add_parser('draw', help='Draw cards from deck')
         deck_parser.add_argument('code', help='Room code')
         deck_parser.add_argument('--count', type=int, default=1, help='Number of cards to draw')
@@ -523,6 +555,15 @@ class CLI:
         
         history_clear = rooms_subparsers.add_parser('deck-history-clear', help='Clear deck history')
         history_clear.add_argument('code', help='Room code')
+        
+        # Chat & VTT
+        chat_parser = rooms_subparsers.add_parser('chat', help='Send chat message')
+        chat_parser.add_argument('code', help='Room code')
+        chat_parser.add_argument('--message', required=True, help='Message to send')
+        chat_parser.add_argument('--sender', default='CLI', help='Sender name')
+        
+        vtt_parser = rooms_subparsers.add_parser('vtt', help='Get VTT state')
+        vtt_parser.add_argument('code', help='Room code')
         
         # Grid Combat
         grid_parser = rooms_subparsers.add_parser('grid-combat', help='Toggle grid combat mode')
@@ -550,16 +591,6 @@ class CLI:
         token_list = token_subparsers.add_parser('list', help='List tokens')
         token_list.add_argument('code', help='Room code')
         
-        # Chat
-        chat_parser = rooms_subparsers.add_parser('chat', help='Send chat message')
-        chat_parser.add_argument('code', help='Room code')
-        chat_parser.add_argument('--message', required=True, help='Message to send')
-        chat_parser.add_argument('--sender', default='CLI', help='Sender name')
-        
-        # VTT
-        vtt_parser = rooms_subparsers.add_parser('vtt', help='Get VTT state')
-        vtt_parser.add_argument('code', help='Room code')
-        
         # Whiteboard
         whiteboard_parser = rooms_subparsers.add_parser('whiteboard', help='Get whiteboard state')
         whiteboard_parser.add_argument('code', help='Room code')
@@ -567,6 +598,29 @@ class CLI:
         whiteboard_sync = rooms_subparsers.add_parser('whiteboard-sync', help='Sync whiteboard')
         whiteboard_sync.add_argument('code', help='Room code')
         whiteboard_sync.add_argument('--file', help='JSON file to sync')
+        
+        # ============================================================
+        # NEW: Client management under rooms
+        # ============================================================
+        clients_parser = rooms_subparsers.add_parser('clients', help='Manage clients in a room')
+        clients_subparsers = clients_parser.add_subparsers(dest='clients_action')
+        
+        clients_list = clients_subparsers.add_parser('list', help='List clients in a room')
+        clients_list.add_argument('code', help='Room code')
+        
+        client_kick = clients_subparsers.add_parser('kick', help='Kick a client from a room')
+        client_kick.add_argument('code', help='Room code')
+        client_kick.add_argument('--id', required=True, help='Client ID')
+        client_kick.add_argument('--reason', default='Kicked by CLI', help='Reason for kick')
+        
+        client_ban = clients_subparsers.add_parser('ban', help='Ban a client from a room')
+        client_ban.add_argument('code', help='Room code')
+        client_ban.add_argument('--id', required=True, help='Client ID')
+        client_ban.add_argument('--reason', default='Banned by CLI', help='Reason for ban')
+        
+        client_unban = clients_subparsers.add_parser('unban', help='Unban a client from a room')
+        client_unban.add_argument('code', help='Room code')
+        client_unban.add_argument('--id', required=True, help='Client ID')
         
         # Modules
         modules_parser = subparsers.add_parser('modules', help='Manage modules')
@@ -620,11 +674,11 @@ class CLI:
         """Print help message"""
         print("""
 ╔══════════════════════════════════════════════════════════════╗
-║              Fate's Edge CLI v1.3.0                        ║
+║              Fate's Edge CLI v1.4.0                        ║
 ╠══════════════════════════════════════════════════════════════╣
 ║                                                              ║
 ║  Server Management:                                          ║
-║    server start [--port PORT] [--host HOST]  Start server   ║
+║    server start [--port PORT] [--host HOST] [--api-key KEY] ║
 ║    server stop                         Stop server           ║
 ║    server restart                      Restart server        ║
 ║                                                              ║
@@ -644,6 +698,12 @@ class CLI:
 ║    rooms deck-history-clear CODE      Clear deck history     ║
 ║    rooms chat CODE --message MSG      Send chat message      ║
 ║    rooms vtt CODE                     Get VTT state          ║
+║                                                              ║
+║  Client Management (NEW):                                    ║
+║    rooms clients list CODE           List clients in room   ║
+║    rooms clients kick CODE --id ID   Kick a client          ║
+║    rooms clients ban CODE --id ID    Ban a client           ║
+║    rooms clients unban CODE --id ID  Unban a client         ║
 ║                                                              ║
 ║  Grid Combat:                                                 ║
 ║    rooms grid-combat CODE [--enable|--disable]              ║
@@ -743,6 +803,9 @@ class CLI:
                     print(f"  {key}: {value}")
             if 'deck' in room:
                 print(f"  deck_remaining: {len(room['deck'])} cards")
+            # Also show banned list if available
+            if 'banned' in room:
+                print(f"  banned_count: {len(room['banned'])}")
         elif args.action == 'draw':
             result = self.client.deck_draw(args.code, args.count, args.region)
             print_success(f"Drew {args.count} card(s) from {args.region}")
@@ -841,6 +904,32 @@ class CLI:
                         print(f"  {token.get('id')}: {token.get('name')} ({token.get('shape')}) at ({token.get('x', 0)}, {token.get('y', 0)})")
                 else:
                     print_info("No tokens in room")
+        # ============================================================
+        # NEW: Client management
+        # ============================================================
+        elif args.action == 'clients':
+            if args.clients_action == 'list':
+                clients = self.client.get_clients(args.code)
+                if clients:
+                    print_header(f"Clients in room {args.code} ({len(clients)})")
+                    for client in clients:
+                        role_icon = '👑' if client.get('role') == 'gm' else '👤'
+                        print(f"  {role_icon} {client.get('id')}: {client.get('name')} ({client.get('role')})")
+                        if client.get('email'):
+                            print(f"     Email: {client.get('email')}")
+                else:
+                    print_info("No clients in room")
+            elif args.clients_action == 'kick':
+                self.client.kick_client(args.code, args.id, args.reason)
+                print_success(f"Client {args.id} kicked from room {args.code}")
+            elif args.clients_action == 'ban':
+                self.client.ban_client(args.code, args.id, args.reason)
+                print_success(f"Client {args.id} banned from room {args.code}")
+            elif args.clients_action == 'unban':
+                self.client.unban_client(args.code, args.id)
+                print_success(f"Client {args.id} unbanned from room {args.code}")
+            else:
+                print_error(f"Unknown clients action: {args.clients_action}")
         else:
             print_error(f"Unknown room action: {args.action}")
     

@@ -24,7 +24,8 @@ RUN if [ "$ENABLE_UPLOAD" = "true" ]; then \
 # Copy server files
 # ---------------------------------------------------------------
 COPY server/ ./server/
-COPY server-start.js ./
+# FIX: Copy the main server file to the root as server.js
+COPY server-start.js ./server.js
 
 # ---------------------------------------------------------------
 # Copy data directory
@@ -36,7 +37,6 @@ COPY data/ ./data/
 # ---------------------------------------------------------------
 RUN apk add --no-cache python3 py3-pip python3-dev
 
-# Your project contains requirements.txt, not requirements-cli.txt
 COPY requirements.txt ./
 RUN pip3 install --no-cache-dir -r requirements.txt
 
@@ -52,10 +52,10 @@ COPY modules/ ./modules/
 RUN mkdir -p /app/logs /app/modules
 
 # ---------------------------------------------------------------
-# Health Check
+# Health Check (FIX: use /healthz)
 # ---------------------------------------------------------------
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
-    CMD node -e "require('http').get('http://localhost:${PORT:-3000}/health', (r) => { process.exit(r.statusCode === 200 ? 0 : 1) })"
+    CMD node -e "require('http').get('http://localhost:${PORT:-3000}/healthz', (r) => { process.exit(r.statusCode === 200 ? 0 : 1) })"
 
 # ---------------------------------------------------------------
 # Expose Ports
