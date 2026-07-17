@@ -24,7 +24,7 @@ on:
       create_release:
         type: boolean
         default: true
-        description: 'Create a GitHub Release'
+        description: 'Create a GitHub Release (triggers the release workflow)'
       release_version:
         type: string
         required: false
@@ -53,17 +53,17 @@ jobs:
           - name: web-client
             path: utilities/javascript/fates-edge-web-client
             needs_node: true
-            build: false
-            package: false
+            build: true          # generate dist/
+            package: true        # create a tarball of dist/
           - name: socket-server
             path: utilities/javascript/fates-edge-socket-server
             needs_node: true
-            build: false
+            build: false         # no build step, just source + deps
             package: true
           - name: desktop-client
             path: utilities/javascript/fates-edge-desktop-client
             needs_node: true
-            build: false
+            build: true          # assume npm run build produces a distributable
             package: true
           - name: discord-bot
             path: utilities/vtt_mods_bots/fates-edge-discord-bot
@@ -110,12 +110,13 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-node-${{ matrix.name }}-
 
-      - name: Install dependencies
+      - name: Install dependencies (including dev)
         if: ${{ env.SKIP_JOB != 'true' && matrix.needs_node == 'true' }}
         working-directory: ${{ matrix.path }}
         run: npm ci
 
-      - name: Generate deterministic seed
+      # ---- Special step for web-client: generate deterministic seed ----
+      - name: Generate deterministic seed (web-client only)
         if: ${{ env.SKIP_JOB != 'true' && matrix.name == 'web-client' }}
         working-directory: ${{ matrix.path }}
         run: |
@@ -130,62 +131,74 @@ jobs:
             echo "⚠️ generate-seed.js not found, skipping seed generation"
           fi
 
+      # ---- Build step (only if matrix.build is true) ----
       - name: Build project
-        if: ${{ env.SKIP_JOB != 'true' && matrix.build }}
+        if: ${{ env.SKIP_JOB != 'true' && matrix.build == 'true' }}
         working-directory: ${{ matrix.path }}
         run: npm run build
 
+      # ---- Prepare production dependencies for non‑built Node.js projects ----
+      - name: Install production dependencies only (for services without build)
+        if: ${{ env.SKIP_JOB != 'true' && matrix.package == 'true' && matrix.build == 'false' }}
+        working-directory: ${{ matrix.path }}
+        run: |
+          # Remove dev dependencies to shrink package size
+          npm prune --production
+          # Optionally, you can also run `npm ci --only=production` if you prefer
+
+      # ---- Package step ----
       - name: Package project
-        if: ${{ env.SKIP_JOB != 'true' && matrix.package }}
+        if: ${{ env.SKIP_JOB != 'true' && matrix.package == 'true' }}
         run: |
           mkdir -p artifacts
           if [ -f "LICENSE.md" ]; then
             cp LICENSE.md ${{ matrix.path }}/LICENSE.md
             echo "✅ Copied LICENSE.md to ${{ matrix.path }}/"
           fi
-          tar -czf artifacts/${{ matrix.name }}.tar.gz \
-            -C ${{ matrix.path }} \
-            --exclude=node_modules \
-            --exclude=.git \
-            .
 
-      - name: Upload build artifact
-        if: ${{ env.SKIP_JOB != 'true' && matrix.build }}
-        uses: actions/upload-artifact@v4
-        with:
-          name: ${{ matrix.name }}-dist
-          path: ${{ matrix.path }}/dist
-          if-no-files-found: error
+          # Decide what to package
+          if [ "${{ matrix.build }}" == "true" ]; then
+            # For built projects: package the build output (dist/ or equivalent)
+            # Assumption: the build output is in ${{ matrix.path }}/dist
+            if [ -d "${{ matrix.path }}/dist" ]; then
+              tar -czf artifacts/${{ matrix.name }}.tar.gz -C ${{ matrix.path }}/dist .
+              echo "✅ Packaged build output (dist/) for ${{ matrix.name }}"
+            else
+              echo "⚠️ No dist/ folder found for ${{ matrix.name }}, packaging source instead"
+              tar -czf artifacts/${{ matrix.name }}.tar.gz \
+                -C ${{ matrix.path }} \
+                --exclude=node_modules \
+                --exclude=.git \
+                .
+            fi
+          else
+            # For Node.js services (no build): package source + node_modules (production only)
+            tar -czf artifacts/${{ matrix.name }}.tar.gz \
+              -C ${{ matrix.path }} \
+              --exclude=.git \
+              .
+            echo "✅ Packaged source with production node_modules for ${{ matrix.name }}"
+          fi
 
       - name: Upload packaged artifact
-        if: ${{ env.SKIP_JOB != 'true' && matrix.package }}
+        if: ${{ env.SKIP_JOB != 'true' && matrix.package == 'true' }}
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.name }}-package
           path: artifacts/${{ matrix.name }}.tar.gz
           if-no-files-found: error
 
-      - name: Save build metadata
-        if: ${{ env.SKIP_JOB != 'true' && matrix.name == 'socket-server' }}
-        run: |
-          mkdir -p build-metadata
-          echo "${{ github.sha }}" > build-metadata/commit-sha.txt
-          echo "${{ github.run_id }}" > build-metadata/run-id.txt
-          echo "${{ github.run_number }}" > build-metadata/run-number.txt
-          echo "Build timestamp: $(date -u)" > build-metadata/build-time.txt
-
-      - name: Upload build metadata
-        if: ${{ env.SKIP_JOB != 'true' && matrix.name == 'socket-server' }}
+      # ---- Upload build output separately for web-client (for Pages) ----
+      - name: Upload web-client dist for Pages
+        if: ${{ env.SKIP_JOB != 'true' && matrix.name == 'web-client' && matrix.build == 'true' }}
         uses: actions/upload-artifact@v4
         with:
-          name: build-metadata-socket-server
-          path: build-metadata/
-          retention-days: 1
+          name: web-client-dist
+          path: ${{ matrix.path }}/dist
+          if-no-files-found: error
 
-      # ============================================================
-      # PREPARE STATIC SITE FOR PAGES (web-client only)
-      # ============================================================
-      - name: Prepare static site for Pages
+      # ---- Prepare static site for Pages (includes data files) ----
+      - name: Prepare static site for Pages (web-client only)
         if: ${{ env.SKIP_JOB != 'true' && matrix.name == 'web-client' }}
         run: |
           echo "📦 Preparing static site for GitHub Pages..."
@@ -246,10 +259,9 @@ jobs:
           fi
           
           echo "🗺️ Processing region files..."
-          mkdir -p pages-site/data/regions pages-site/data/regions
-          for src_dir in "data/data/regions" "misc/data/regions" "${{ matrix.path }}/data/regions" "${{ matrix.path }}/data/regions"; do
+          mkdir -p pages-site/data/regions
+          for src_dir in "data/data/regions" "misc/data/regions" "${{ matrix.path }}/data/regions"; do
             if [ -d "$src_dir" ]; then
-              cp -r "$src_dir"/* pages-site/data/regions/ 2>/dev/null || true
               cp -r "$src_dir"/* pages-site/data/regions/ 2>/dev/null || true
               echo "✅ Regions copied from $src_dir"
               break
@@ -321,11 +333,29 @@ jobs:
         with:
           path: pages-site
 
+      # ---- Save build metadata (for reference) ----
+      - name: Save build metadata (socket-server only)
+        if: ${{ env.SKIP_JOB != 'true' && matrix.name == 'socket-server' }}
+        run: |
+          mkdir -p build-metadata
+          echo "${{ github.sha }}" > build-metadata/commit-sha.txt
+          echo "${{ github.run_id }}" > build-metadata/run-id.txt
+          echo "${{ github.run_number }}" > build-metadata/run-number.txt
+          echo "Build timestamp: $(date -u)" > build-metadata/build-time.txt
+
+      - name: Upload build metadata
+        if: ${{ env.SKIP_JOB != 'true' && matrix.name == 'socket-server' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-metadata-socket-server
+          path: build-metadata/
+          retention-days: 1
+
   # ============================================================
-  # DEPLOY JOB (Calls the reusable Deploy workflow)
+  # DEPLOY WEB CLIENT (Pages)
   # ============================================================
-  deploy:
-    name: Trigger Pages Deployment
+  deploy-pages:
+    name: Deploy Web Client to Pages
     needs: build
     if: >
       success() && (
@@ -340,10 +370,10 @@ jobs:
       id-token: write
 
   # ============================================================
-  # DEPLOY RENDER JOB (Calls the reusable Render workflow)
+  # DEPLOY SOCKET SERVER (Render)
   # ============================================================
   deploy-render:
-    name: Trigger Render Deployment
+    name: Deploy Socket Server to Render
     needs: build
     if: >
       success() && (
@@ -357,3 +387,34 @@ jobs:
     permissions:
       contents: read
       actions: read
+
+  # ============================================================
+  # TRIGGER RELEASE WORKFLOW (if requested)
+  # ============================================================
+  trigger-release:
+    name: Trigger Release Creation
+    needs: build
+    if: >
+      success() &&
+      (github.event_name == 'workflow_dispatch' && github.event.inputs.create_release == 'true')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      actions: write
+    steps:
+      - name: Dispatch release workflow
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const runId = context.runId;
+            const version = '${{ github.event.inputs.release_version }}' || `v${new Date().toISOString().slice(0,10)}-build${context.runNumber}`;
+            await github.rest.actions.createWorkflowDispatch({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              workflow_id: 'create-release.yml',
+              ref: 'main',
+              inputs: {
+                run_id: runId.toString(),
+                release_version: version
+              }
+            });

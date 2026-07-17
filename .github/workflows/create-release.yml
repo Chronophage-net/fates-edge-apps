@@ -47,10 +47,9 @@ jobs:
       - name: Download all packaged artifacts from the build run
         uses: actions/download-artifact@v4
         with:
-          # Use the run-id we determined
           run-id: ${{ steps.get-run-id.outputs.run-id }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          pattern: '*-package'       # matches artifacts named like "web-client-package", "socket-server-package", etc.
+          pattern: '*-package'       # matches artifacts like web-client-package, socket-server-package, etc.
           path: release-assets
 
       - name: List downloaded files
@@ -64,9 +63,10 @@ jobs:
           if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
             TAG="${{ github.event.inputs.release_version }}"
           else
-            # For automated runs, generate a tag from the build run number and date
             BUILD_RUN_NUMBER="${{ github.event.workflow_run.run_number }}"
-            TAG="v$(date +'%Y.%m.%d')-build$BUILD_RUN_NUMBER"
+            # Include short SHA for uniqueness
+            SHORT_SHA=$(echo "${{ github.event.workflow_run.head_sha }}" | cut -c1-7)
+            TAG="v$(date +'%Y.%m.%d')-build$BUILD_RUN_NUMBER-$SHORT_SHA"
           fi
           echo "tag=$TAG" >> $GITHUB_OUTPUT
           echo "Release tag: $TAG"
@@ -80,7 +80,7 @@ jobs:
             Automated release from build workflow run #${{ steps.get-run-id.outputs.run-id }}
             Commit: ${{ github.event.workflow_run.head_sha || github.sha }}
           files: |
-            release-assets/*/*.tar.gz   # upload all tar.gz files (they're inside subdirectories)
+            release-assets/*/*.tar.gz
           draft: false
           prerelease: false
         env:

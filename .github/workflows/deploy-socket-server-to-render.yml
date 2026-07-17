@@ -106,17 +106,17 @@ jobs:
         working-directory: utilities/javascript/fates-edge-socket-server
         run: |
           npm ci
+          # Install production deps only
+          npm prune --production
           
           # Create a clean deployment directory in the repo root
           DEPLOY_DIR="../../socket-server-deploy"
           rm -rf "$DEPLOY_DIR"
           mkdir -p "$DEPLOY_DIR"
           
-          # Copy all files except node_modules and .git
-          # Use find to avoid copying the destination if it somehow appears
-          find . -not -path "./node_modules/*" -not -path "./.git/*" -type f -exec cp --parents {} "$DEPLOY_DIR" \;
-          # Copy directories structure (cp -r without self-copy)
-          rsync -a --exclude='node_modules' --exclude='.git' ./ "$DEPLOY_DIR/"
+          # Copy all files except node_modules and .git, but we actually want to keep node_modules
+          # So we copy everything including node_modules (which now has only production deps)
+          rsync -a --exclude='.git' ./ "$DEPLOY_DIR/"
           
           # Copy data files from repo root if they exist
           if [ -d "../../data" ]; then
