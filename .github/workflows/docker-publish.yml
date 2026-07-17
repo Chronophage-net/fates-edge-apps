@@ -1,0 +1,54 @@
+name: Build & Push Docker Images
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  docker:
+    name: Build & Push Docker Images
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build & Push Socket Server
+        uses: docker/build-push-action@v6
+        with:
+          context: ./utilities/javascript/fates-edge-socket-server
+          file: ./utilities/javascript/fates-edge-socket-server/Dockerfile
+          push: true
+          tags: |
+            chronophage/fates-edge:socket-server
+            chronophage/fates-edge:socket-server-${{ github.sha }}
+
+      - name: Build & Push Web Client
+        uses: docker/build-push-action@v6
+        with:
+          context: ./utilities/javascript/fates-edge-web-client
+          file: ./utilities/javascript/fates-edge-web-client/Dockerfile
+          push: true
+          tags: |
+            chronophage/fates-edge:web-client
+            chronophage/fates-edge:web-client-${{ github.sha }}
+
+      - name: Build & Push Web Client (dev)
+        uses: docker/build-push-action@v6
+        with:
+          context: ./utilities/javascript/fates-edge-web-client
+          file: ./utilities/javascript/fates-edge-web-client/Dockerfile.dev
+          push: true
+          tags: |
+            chronophage/fates-edge:web-client-dev
+            chronophage/fates-edge:web-client-dev-${{ github.sha }}
