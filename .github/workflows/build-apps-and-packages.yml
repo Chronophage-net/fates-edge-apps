@@ -142,7 +142,8 @@ jobs:
         if: matrix.name == 'web-client' && (github.event_name != 'workflow_dispatch' || github.event.inputs.skip_web_deploy != 'true')
         run: |
           mkdir -p pages-site
-          rsync -a \
+          # Use -aL to follow symlinks and copy actual file content (avoid symlinks)
+          rsync -aL \
             --exclude node_modules \
             --exclude Dockerfile* \
             --exclude docker-compose.yml \
@@ -204,7 +205,17 @@ jobs:
             fi
           done
 
-      # ⬇️ **Changed:** upload as "github-pages" (the default expected by deploy-pages)
+      # Optional: verify no symlinks exist in pages-site (fail if any)
+      - name: Verify no symlinks in pages-site
+        if: matrix.name == 'web-client' && (github.event_name != 'workflow_dispatch' || github.event.inputs.skip_web_deploy != 'true')
+        run: |
+          if find pages-site -type l | grep -q .; then
+            echo "❌ Symlinks found in pages-site:"
+            find pages-site -type l
+            exit 1
+          fi
+          echo "✅ No symlinks found."
+
       - name: Upload Pages artifact
         if: matrix.name == 'web-client' && (github.event_name != 'workflow_dispatch' || github.event.inputs.skip_web_deploy != 'true')
         uses: actions/upload-artifact@v4
