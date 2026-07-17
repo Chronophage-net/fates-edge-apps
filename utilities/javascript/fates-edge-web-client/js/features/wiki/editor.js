@@ -1,10 +1,11 @@
 /**
  * Wiki Editor – Markdown editor for wiki entries
  * Provides a modal editor for creating and editing wiki entries.
+ * FIXED: Removed unused sanitizeHtml import.
  */
 
 import { getState, addWikiEntry, updateWikiEntry, saveState } from '../../core/state.js';
-import { escHtml, sanitizeHtml } from '../../core/utils.js';
+import { escHtml } from '../../core/utils.js';  // only escHtml needed
 import { showToast } from '../../components/Toast.js';
 
 let modalOverlay = null;

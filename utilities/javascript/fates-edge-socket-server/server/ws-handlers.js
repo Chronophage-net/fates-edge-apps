@@ -1,5 +1,6 @@
 /**
  * Fate's Edge - Plain WebSocket Handlers
+ * v2 – Sender exclusion to prevent self‑echo
  */
 
 const WebSocket = require('ws');
@@ -43,6 +44,7 @@ function setupWSS(wss) {
         socketStats.wsConnections++;
         socketStats.totalConnections++;
 
+        // Send connected message
         ws.send(JSON.stringify({
             type: 'connected',
             clientId,
@@ -53,6 +55,7 @@ function setupWSS(wss) {
             serverVersion: '1.0.0'
         }));
 
+        // Send room state
         ws.send(JSON.stringify({
             type: 'room-state',
             room: roomKey,
@@ -62,6 +65,7 @@ function setupWSS(wss) {
             timestamp: Date.now()
         }));
 
+        // ─── Message handler ──────────────────────────────────────────
         ws.on('message', (message) => {
             try {
                 const data = JSON.parse(message);
@@ -73,60 +77,74 @@ function setupWSS(wss) {
                     case 'ping':
                         ws.send(JSON.stringify({ type: 'pong', timestamp: Date.now() }));
                         break;
+
                     case 'handshake':
                         handleHandshake(ws, currentRoom, data);
                         break;
+
                     case 'request_gm':
                         room.handleGmRequest(currentRoom, clientId);
                         break;
+
                     case 'approve_gm':
                         room.handleGmApproval(currentRoom, clientId, data.targetId);
                         break;
+
                     case 'deck-draw':
                         handleDeckDraw(ws, currentRoom, data);
                         break;
+
                     case 'deck-shuffle':
                         handleDeckShuffle(ws, currentRoom);
                         break;
+
                     case 'crown-spread':
                         handleCrownSpread(ws, currentRoom, data);
                         break;
+
                     case 'deck-history':
                         handleDeckHistory(ws, currentRoom);
                         break;
+
                     case 'deck-history-clear':
                         handleDeckHistoryClear(ws, currentRoom);
                         break;
+
                     case 'whiteboard-update':
                     case 'sync-state':
                         handleWhiteboardUpdate(ws, currentRoom, data);
                         break;
+
                     case 'sync-request':
                         handleSyncRequest(ws, currentRoom);
                         break;
 
-                    // Ban/Kick
+                    case 'state-updated':
+                        // Broadcast to all other clients
+                        room.broadcastToRoom(roomKey, 'state-updated', data, ws.clientId);
+                        break;
+
                     case 'kick_client':
                         if (ws.clientData.role === 'gm') {
                             room.kickClient(currentRoom, data.targetId, data.reason || 'Kicked');
-                            room.broadcastToRoom(roomKey, 'presence', { clients: room.getClientsList(currentRoom) });
+                            room.broadcastToRoom(roomKey, 'presence', { clients: room.getClientsList(currentRoom) }, ws.clientId);
                         }
                         break;
+
                     case 'ban_client':
                         if (ws.clientData.role === 'gm') {
                             room.banClient(currentRoom, data.targetId, data.reason || 'Banned');
-                            room.broadcastToRoom(roomKey, 'presence', { clients: room.getClientsList(currentRoom) });
+                            room.broadcastToRoom(roomKey, 'presence', { clients: room.getClientsList(currentRoom) }, ws.clientId);
                         }
                         break;
+
                     case 'unban_client':
                         if (ws.clientData.role === 'gm') {
                             room.unbanClient(currentRoom, data.targetId);
-                            // send confirmation
                             ws.send(JSON.stringify({ type: 'unban_client_ack', targetId: data.targetId }));
                         }
                         break;
 
-                    // Relay events
                     case 'media_recording':
                     case 'voice-offer':
                     case 'voice-answer':
@@ -139,13 +157,17 @@ function setupWSS(wss) {
                     case 'operation':
                     case 'operation_ack':
                     case 'presence':
-                        room.broadcastToRoom(roomKey, messageType, data);
+                    case 'module-push':
+                    case 'module-cleanup':
+                        room.broadcastToRoom(roomKey, messageType, data, ws.clientId);
                         break;
+
                     default:
                         ws.send(JSON.stringify({
                             type: 'error',
                             message: `Unknown message type: ${messageType}`
                         }));
+
                 }
             } catch (error) {
                 logger.error('Error parsing plain WS message', { clientId, error: error.message });
@@ -153,23 +175,24 @@ function setupWSS(wss) {
             }
         });
 
+        // ─── Close handler ──────────────────────────────────────────
         ws.on('close', () => {
             logger.info('🔌 Plain WebSocket client disconnected', { clientId, room: roomKey });
             const r = room.rooms.get(roomKey);
             if (r) {
                 const wasGm = r.clients.get(clientId)?.role === 'gm';
                 r.clients.delete(clientId);
-                room.broadcastToRoom(roomKey, 'presence', { clients: room.getClientsList(r) });
+                room.broadcastToRoom(roomKey, 'presence', { clients: room.getClientsList(r) }, clientId);
                 room.broadcastToRoom(roomKey, 'player-left', {
                     clientId,
                     clientName: ws.clientData?.name || 'Player',
                     clients: room.getClientsList(r)
-                });
+                }, clientId);
                 if (wasGm) {
                     room.broadcastToRoom(roomKey, 'server_announcement', {
                         message: 'The Game Master has disconnected.',
                         timestamp: Date.now()
-                    });
+                    }, clientId);
                 }
                 if (r.clients.size === 0) {
                     room.rooms.delete(roomKey);
@@ -185,7 +208,7 @@ function setupWSS(wss) {
     });
 }
 
-// ---- Handler stubs (same logic as original) ----
+// ─── Handler implementations (with sender exclusion) ──────────────────
 
 function handleHandshake(ws, roomState, data) {
     let assignedRole = data.role || 'player';
@@ -201,8 +224,13 @@ function handleHandshake(ws, roomState, data) {
 
     const clientsList = room.getClientsList(roomState);
     ws.send(JSON.stringify({ type: 'handshake_ack', success: true, clientId: ws.clientId, clientRole: assignedRole, versionVector: {}, activeClients: clientsList }));
-    room.broadcastToRoom(roomState.code, 'presence', { clients: clientsList });
-    room.broadcastToRoom(roomState.code, 'player-joined', { clientId: ws.clientId, clientName: ws.clientData.name, role: ws.clientData.role, clients: clientsList });
+    room.broadcastToRoom(roomState.code, 'presence', { clients: clientsList }, ws.clientId);
+    room.broadcastToRoom(roomState.code, 'player-joined', {
+        clientId: ws.clientId,
+        clientName: ws.clientData.name,
+        role: ws.clientData.role,
+        clients: clientsList
+    }, ws.clientId);
 }
 
 async function handleDeckDraw(ws, roomState, data) {
@@ -243,7 +271,7 @@ async function handleDeckDraw(ws, roomState, data) {
         if (roomState.deckHistory.length > 100) roomState.deckHistory = roomState.deckHistory.slice(-100);
 
         roomState.lastActivity = Date.now();
-        room.broadcastToRoom(roomState.code, 'deck-drawn', result);
+        room.broadcastToRoom(roomState.code, 'deck-drawn', result, ws.clientId);
         ws.send(JSON.stringify({ type: 'deck-drawn-success', ...result }));
     } catch (error) {
         logger.error('Error in plain WS deck draw', { room: roomState.code, error: error.message });
@@ -255,7 +283,7 @@ function handleDeckShuffle(ws, roomState) {
     roomState.deck = deck.buildDeck();
     roomState.deckOffset = Math.floor(Math.random() * 1000);
     roomState.lastActivity = Date.now();
-    room.broadcastToRoom(roomState.code, 'deck-shuffled', { remaining: roomState.deck.length, timestamp: Date.now() });
+    room.broadcastToRoom(roomState.code, 'deck-shuffled', { remaining: roomState.deck.length, timestamp: Date.now() }, ws.clientId);
     ws.send(JSON.stringify({ type: 'deck-shuffled-success', remaining: roomState.deck.length, timestamp: Date.now() }));
 }
 
@@ -292,7 +320,7 @@ async function handleCrownSpread(ws, roomState, data) {
             remaining: roomState.deck.length,
             timestamp: Date.now()
         };
-        room.broadcastToRoom(roomState.code, 'crown-spread', response);
+        room.broadcastToRoom(roomState.code, 'crown-spread', response, ws.clientId);
         ws.send(JSON.stringify({ type: 'crown-spread-success', ...response }));
     } catch (error) {
         logger.error('Error in plain WS crown spread', { room: roomState.code, error: error.message });
@@ -308,7 +336,7 @@ function handleDeckHistory(ws, roomState) {
 function handleDeckHistoryClear(ws, roomState) {
     roomState.deckHistory = [];
     roomState.lastActivity = Date.now();
-    room.broadcastToRoom(roomState.code, 'deck-history-cleared', { timestamp: Date.now() });
+    room.broadcastToRoom(roomState.code, 'deck-history-cleared', { timestamp: Date.now() }, ws.clientId);
     ws.send(JSON.stringify({ type: 'deck-history-cleared-success', timestamp: Date.now() }));
 }
 
@@ -325,9 +353,8 @@ function handleWhiteboardUpdate(ws, roomState, data) {
     room.broadcastToRoom(roomState.code, 'whiteboard-update', {
         whiteboard: roomState.whiteboard,
         timestamp: Date.now(),
-        source: 'plain-ws',
-        clientId: ws.clientId
-    });
+        source: 'plain-ws'
+    }, ws.clientId);
 }
 
 function handleSyncRequest(ws, roomState) {

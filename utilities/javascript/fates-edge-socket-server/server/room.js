@@ -52,14 +52,10 @@ function getClientsList(room) {
 }
 
 // ---------- Ban/Kick ----------
-// Ban storage: room.banned Set of client IDs (or IPs).
-// On room creation we'll add empty banned Set.
-
 function kickClient(room, targetId, reason = 'Kicked by GM') {
     const target = room.clients.get(targetId);
     if (!target) return false;
 
-    // Notify the target
     if (target.type === 'socket.io' && target.socket) {
         target.socket.emit('kicked', { reason });
         target.socket.leave(room.code);
@@ -74,12 +70,8 @@ function kickClient(room, targetId, reason = 'Kicked by GM') {
 }
 
 function banClient(room, targetId, reason = 'Banned by GM') {
-    // Ban works by storing client ID; you could also store IP.
-    // The target is immediately kicked and added to banned list.
     if (!room.banned) room.banned = new Set();
     room.banned.add(targetId);
-
-    // If they are in the room, kick them
     if (room.clients.has(targetId)) {
         kickClient(room, targetId, reason);
     }
@@ -111,14 +103,12 @@ function handleGmRequest(room, requesterId) {
             message: `👑 ${requester.name} has taken on the role of Game Master.`,
             timestamp: Date.now()
         });
-        // Notify directly
         if (requester.type === 'socket.io' && requester.socket) {
             requester.socket.emit('gm_role_update', { role: 'gm' });
         } else if (requester.type === 'ws' && requester.ws && requester.ws.readyState === WebSocket.OPEN) {
             requester.ws.send(JSON.stringify({ type: 'gm_role_update', role: 'gm' }));
         }
     } else {
-        // Vote request
         broadcastToRoom(room.code, 'gm_vote_request', {
             requesterId,
             requesterName: requester.name,
@@ -165,22 +155,38 @@ function handleGmApproval(room, approverId, targetId) {
     }
 }
 
-// ---------- Broadcast (needs io reference) ----------
+// ---------- Broadcast (with sender exclusion) ----------
 let io = null;
 function setIo(ioInstance) { io = ioInstance; }
 
-function broadcastToRoom(roomCode, event, data) {
+/**
+ * Broadcast an event to all clients in a room.
+ * @param {string} roomCode - Room identifier
+ * @param {string} event - Event name
+ * @param {object} data - Event payload
+ * @param {string|null} senderId - Optional client ID to exclude from plain WebSocket broadcast (self‑echo prevention)
+ */
+function broadcastToRoom(roomCode, event, data, senderId = null) {
     const roomKey = roomCode.toUpperCase();
     const room = rooms.get(roomKey);
     if (!room) return;
 
-    if (io) {
-        io.to(roomKey).emit(event, data);
+    // Build payload with sender info if provided
+    const payload = { ...data };
+    if (senderId) {
+        payload.clientId = senderId;
     }
 
-    const message = JSON.stringify({ type: event, ...data });
+    // Socket.io broadcast (includes sender, but client can ignore via clientId check)
+    if (io) {
+        io.to(roomKey).emit(event, payload);
+    }
+
+    // Plain WebSocket broadcast (skip sender)
+    const message = JSON.stringify({ type: event, ...payload });
     for (const [, client] of room.clients) {
         if (client.type === 'ws' && client.ws && client.ws.readyState === WebSocket.OPEN) {
+            if (senderId && client.id === senderId) continue; // skip sender
             client.ws.send(message);
         }
     }
@@ -202,7 +208,7 @@ function createRoom(roomCode) {
         lastActivity: Date.now(),
         created: Date.now(),
         whiteboard: createDefaultWhiteboard(),
-        banned: new Set()   // new ban list
+        banned: new Set()
     };
     rooms.set(roomKey, room);
     return room;

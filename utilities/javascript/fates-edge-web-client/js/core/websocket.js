@@ -223,6 +223,20 @@ export function connectWebSocket(room = null, url = null) {
             state.wsSocketId = socketId;
             updateState(state);
             
+            let pingInterval = null;
+
+            // Start keep‑alive pings
+            if (pingInterval) clearInterval(pingInterval);
+            pingInterval = setInterval(() => {
+                if (ws && ws.readyState === WebSocket.OPEN) {
+                    ws.send(JSON.stringify({ type: 'ping', timestamp: Date.now() }));
+                }
+            }, 30000); // 30 seconds
+
+            // Also reset any reconnect timer
+            clearTimeout(reconnectTimer);
+            reconnectAttempts = 0;
+            
             triggerEvent('connected', { 
                 socketId, 
                 room: roomName,
@@ -234,6 +248,7 @@ export function connectWebSocket(room = null, url = null) {
         };
         
         ws.onclose = (event) => {
+            clearInterval(pingInterval);
             clearTimeout(timeoutId);
             console.log('🔌 WebSocket disconnected:', event.code, event.reason);
             wsStatus = 'disconnected';

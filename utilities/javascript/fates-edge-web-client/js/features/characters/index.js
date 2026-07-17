@@ -1,6 +1,7 @@
 /**
  * Characters feature module
  * Manages character creation, editing, and talent catalogue
+ * FIXED: Wizard import with robust error handling and logging.
  */
 
 import { generateId, escHtml } from '../../core/utils.js';
@@ -488,11 +489,25 @@ export function attachEvents() {
         
         // Wizard button
         if (target.id === 'wizardCharBtn' || target.closest('#wizardCharBtn')) {
-            import('./wizard.js').then(module => {
-                if (module.openWizard) module.openWizard();
-                else showToast('Wizard module not available.', 'error');
-            }).catch(() => showToast('Failed to load wizard.', 'error'));
             e.preventDefault();
+            console.log('[Characters] Opening character wizard...');
+            import('./wizard.js')
+                .then(module => {
+                    console.log('[Characters] Wizard module loaded:', module);
+                    if (module.openWizard) {
+                        module.openWizard();
+                    } else if (module.default && module.default.openWizard) {
+                        // If using default export
+                        module.default.openWizard();
+                    } else {
+                        console.error('[Characters] openWizard not found in wizard module');
+                        showToast('Wizard module has no openWizard export.', 'error');
+                    }
+                })
+                .catch(err => {
+                    console.error('[Characters] Failed to load wizard:', err);
+                    showToast('Failed to load wizard: ' + (err.message || err), 'error');
+                });
         }
         
         // Talents button (scroll to panel)

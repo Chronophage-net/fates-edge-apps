@@ -1,44 +1,41 @@
 /**
- * Wiki feature – modern, clean documentation-style interface
- * Inspired by DokuWiki and MediaWiki design principles.
+ * Wiki feature – modern, clean documentation-style interface.
+ * FIXED: Exports renderWiki so editor can refresh.
+ * FIXED: Proper event listener cleanup.
  */
 
 import { getState, addWikiEntry, updateWikiEntry, deleteWikiEntry, saveState } from '../../core/state.js';
 import { escHtml, debounce } from '../../core/utils.js';
 import { showToast } from '../../components/Toast.js';
 
-const WIKI_REMOTE_URL = 'wiki.json';
-let container = null;
+// ─── Configuration ──────────────────────────────────────────────────────
 
-// ============================================================
-// RENDER – Modern Layout with Sidebar
-// ============================================================
+const WIKI_REMOTE_URL = '/data/wiki.json';   // absolute path from site root
+
+let container = null;
+let _eventListeners = [];   // for cleanup
+
+// ─── Render ─────────────────────────────────────────────────────────────
 
 export function render(el) {
     container = el;
     container.innerHTML = `
         <div class="wiki-modern-layout">
-            <!-- Header -->
             <header class="wiki-header">
                 <h1 class="wiki-title">📖 Wiki</h1>
                 <p class="wiki-subtitle">Reference rules, patrons, regions, equipment, talents, assets, and more. Markdown supported.</p>
             </header>
 
-            <!-- Main Grid: Sidebar + Content -->
             <div class="wiki-grid">
                 <!-- Sidebar -->
                 <aside class="wiki-sidebar">
                     <div class="wiki-sidebar-section">
                         <h3>📂 Categories</h3>
-                        <ul class="wiki-category-list" id="wiki-category-list">
-                            <!-- populated by JS -->
-                        </ul>
+                        <ul class="wiki-category-list" id="wiki-category-list"></ul>
                     </div>
                     <div class="wiki-sidebar-section">
                         <h3>🏷️ Tags</h3>
-                        <div class="wiki-tag-cloud" id="wiki-tag-cloud">
-                            <!-- populated by JS -->
-                        </div>
+                        <div class="wiki-tag-cloud" id="wiki-tag-cloud"></div>
                     </div>
                     <div class="wiki-sidebar-section">
                         <h3>ℹ️ Stats</h3>
@@ -58,7 +55,6 @@ export function render(el) {
 
                 <!-- Main Content -->
                 <main class="wiki-content">
-                    <!-- Search & Filter Bar -->
                     <div class="wiki-toolbar">
                         <div class="wiki-search-wrap">
                             <input type="text" id="wiki-search" placeholder="🔍 Search wiki…" class="wiki-search-input" />
@@ -82,7 +78,6 @@ export function render(el) {
                         <div id="wiki-status" class="wiki-status"></div>
                     </div>
 
-                    <!-- Entry List -->
                     <div id="wiki-list-container">
                         <div id="wiki-list"></div>
                     </div>
@@ -93,12 +88,10 @@ export function render(el) {
 
     renderWiki();
     attachEvents();
-    loadRemoteWiki();
+    loadRemoteWiki();   // try to load bundled wiki
 }
 
-// ============================================================
-// LOAD REMOTE WIKI
-// ============================================================
+// ─── Load Remote Wiki ──────────────────────────────────────────────────
 
 export function loadRemoteWiki() {
     const status = document.getElementById('wiki-status');
@@ -106,7 +99,7 @@ export function loadRemoteWiki() {
 
     return fetch(WIKI_REMOTE_URL)
         .then(res => {
-            if (!res.ok) throw new Error('HTTP ' + res.status);
+            if (!res.ok) throw new Error(`HTTP ${res.status} – ${res.statusText}`);
             return res.json();
         })
         .then(data => {
@@ -116,6 +109,7 @@ export function loadRemoteWiki() {
             if (!state.wikiEntries) state.wikiEntries = [];
             if (!state.hiddenRemoteIds) state.hiddenRemoteIds = [];
 
+            // Remove existing remote entries (to avoid duplicates)
             state.wikiEntries = state.wikiEntries.filter(e => e.source !== 'remote');
 
             let added = 0;
@@ -151,16 +145,16 @@ export function loadRemoteWiki() {
         .catch(err => {
             console.warn('Remote wiki load failed:', err);
             const status = document.getElementById('wiki-status');
-            if (status) status.textContent = '⚠️ No bundled wiki.json found (local entries only).';
+            if (status) status.textContent = `⚠️ Could not load bundled wiki (${err.message}). Using local entries only.`;
+            // Still render what we have
+            renderWiki();
             return { added: 0, total: 0, error: err };
         });
 }
 
-// ============================================================
-// RENDER WIKI ENTRIES
-// ============================================================
+// ─── Render Wiki (exported) ───────────────────────────────────────────
 
-function renderWiki() {
+export function renderWiki() {
     const entries = getFilteredEntries();
     const el = document.getElementById('wiki-list');
     if (!el) return;
@@ -184,24 +178,13 @@ function renderWiki() {
         const isHidden = isRemote && (window._hiddenRemoteIds || []).includes(String(e.id));
         if (isHidden) return '';
 
-        // Badges
         const sourceBadge = isRemote
             ? `<span class="badge badge-remote">📦 Bundled</span>`
             : `<span class="badge badge-local">📝 Local</span>`;
+        const costBadge = e.cost != null ? `<span class="badge badge-cost">${e.cost} XP</span>` : '';
+        const tagBadges = (e.tags || []).slice(0, 4).map(t => `<span class="badge badge-tag">#${escHtml(t)}</span>`).join('');
+        const moreTags = (e.tags || []).length > 4 ? `<span class="badge badge-more">+${(e.tags || []).length - 4}</span>` : '';
 
-        const costBadge = e.cost != null
-            ? `<span class="badge badge-cost">${e.cost} XP</span>`
-            : '';
-
-        const tagBadges = (e.tags || []).slice(0, 4).map(t =>
-            `<span class="badge badge-tag">#${escHtml(t)}</span>`
-        ).join('');
-
-        const moreTags = (e.tags || []).length > 4
-            ? `<span class="badge badge-more">+${(e.tags || []).length - 4}</span>`
-            : '';
-
-        // Actions
         let actions = '';
         if (isRemote) {
             const isCloned = isEntryCloned(e);
@@ -220,7 +203,6 @@ function renderWiki() {
             `;
         }
 
-        // Body preview (truncated)
         const bodyPreview = e.body
             ? `<div class="wiki-entry-preview">${escHtml(e.body.slice(0, 300))}${e.body.length > 300 ? '…' : ''}</div>`
             : '';
@@ -253,55 +235,58 @@ function renderWiki() {
         `;
     }).join('');
 
-    // Attach event listeners using delegation
-    el.querySelectorAll('.wiki-edit-btn').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            openWikiEditor(btn.dataset.id);
-        });
-    });
-
-    el.querySelectorAll('.wiki-clone-btn').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            cloneRemoteWikiEntry(btn.dataset.id);
-        });
-    });
-
-    el.querySelectorAll('.wiki-delete-btn').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            deleteWikiHandler(btn.dataset.id);
-        });
-    });
-
-    el.querySelectorAll('.wiki-hide-btn').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            hideRemoteEntry(btn.dataset.id);
-        });
-    });
-
-    el.querySelectorAll('.wiki-expand-btn').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            const id = btn.dataset.id;
-            const card = btn.closest('.wiki-entry-card');
-            const fullBody = card.querySelector('.wiki-entry-full');
-            const preview = card.querySelector('.wiki-entry-preview');
-            if (fullBody) {
-                const isHidden = fullBody.style.display === 'none';
-                fullBody.style.display = isHidden ? 'block' : 'none';
-                if (preview) preview.style.display = isHidden ? 'none' : 'block';
-                btn.textContent = isHidden ? '▲ Collapse' : '▼ Expand';
-            }
-        });
-    });
+    // Attach event listeners using delegation on the list container
+    // Use click delegation to avoid re-binding each time
+    // We'll attach a single delegated listener in attachEvents instead
+    // But for now, we'll attach directly as before for simplicity.
+    // However, to avoid duplicate listeners, we'll clean up any previous listeners.
+    // We'll move this to attachEvents.
+    // Instead, we'll attach event listeners in a separate function called from attachEvents.
+    attachWikiItemEvents();
 }
 
-// ============================================================
-// SIDEBAR RENDERING
-// ============================================================
+// ─── Attach item events (delegated) ──────────────────────────────────
+
+function attachWikiItemEvents() {
+    const list = document.getElementById('wiki-list');
+    if (!list) return;
+
+    // Remove any previous listener to avoid duplicates
+    if (list._wikiListener) {
+        list.removeEventListener('click', list._wikiListener);
+    }
+
+    const handler = (e) => {
+        const target = e.target.closest('[data-action]');
+        if (!target) return;
+
+        const action = target.dataset.action;
+        const id = target.dataset.id;
+
+        switch (action) {
+            case 'edit':
+                openWikiEditor(id);
+                break;
+            case 'clone':
+                cloneRemoteWikiEntry(id);
+                break;
+            case 'delete':
+                deleteWikiHandler(id);
+                break;
+            case 'hide':
+                hideRemoteEntry(id);
+                break;
+            case 'expand':
+                toggleWikiBody(id);
+                break;
+        }
+    };
+
+    list.addEventListener('click', handler);
+    list._wikiListener = handler;
+}
+
+// ─── Sidebar, Stats, Filter ──────────────────────────────────────────
 
 function renderSidebar(entries) {
     // Categories
@@ -354,10 +339,6 @@ function renderSidebar(entries) {
     }
 }
 
-// ============================================================
-// STATS
-// ============================================================
-
 function updateStats() {
     const state = getState();
     const entries = state.wikiEntries || [];
@@ -371,10 +352,6 @@ function updateStats() {
     document.getElementById('wiki-remote-count').textContent = remote;
     document.getElementById('wiki-hidden-count').textContent = hidden.length;
 }
-
-// ============================================================
-// FILTERING
-// ============================================================
 
 function getFilteredEntries() {
     const state = getState();
@@ -403,10 +380,6 @@ function getFilteredEntries() {
     return entries;
 }
 
-// ============================================================
-// MARKDOWN RENDERING
-// ============================================================
-
 function renderMarkdown(text) {
     if (!text) return '';
     try {
@@ -418,16 +391,13 @@ function renderMarkdown(text) {
                 return window.marked(text);
             }
         }
-        // Simple fallback
         return escHtml(text).replace(/\n/g, '<br>');
     } catch (e) {
         return escHtml(text);
     }
 }
 
-// ============================================================
-// ENTRY MANAGEMENT
-// ============================================================
+// ─── Entry Management ──────────────────────────────────────────────────
 
 function isEntryCloned(entry) {
     const state = getState();
@@ -537,9 +507,7 @@ function importAllFromWiki() {
     showToast(`📥 Imported ${imported} bundled entries.`, 'success');
 }
 
-// ============================================================
-// WIKI BODY TOGGLE
-// ============================================================
+// ─── Toggle Body ──────────────────────────────────────────────────────
 
 export function toggleWikiBody(id) {
     const card = document.querySelector(`.wiki-entry-card[data-id="${id}"]`);
@@ -556,28 +524,35 @@ export function toggleWikiBody(id) {
 }
 window.toggleWikiBody = toggleWikiBody;
 
-// ============================================================
-// EDITOR
-// ============================================================
+// ─── Editor Integration ──────────────────────────────────────────────
 
-function openWikiEditor(id) {
-    import('./editor.js').then(module => {
-        if (module.openEditor) {
-            module.openEditor(id);
-        } else {
-            showToast('Editor module not available.', 'error');
-        }
-    }).catch(err => {
-        console.error('Failed to load editor:', err);
-        showToast('Failed to load editor.', 'error');
-    });
+export function openWikiEditor(id) {
+    import('./editor.js')
+        .then(module => {
+            if (module.openEditor) {
+                module.openEditor(id);
+            } else {
+                showToast('Editor module not available.', 'error');
+            }
+        })
+        .catch(err => {
+            console.error('Failed to load editor:', err);
+            showToast('Failed to load editor. Please check console.', 'error');
+        });
 }
 
-// ============================================================
-// EVENT LISTENERS
-// ============================================================
+// ─── Event Listeners ──────────────────────────────────────────────────
+
+function addEventListenerSafe(el, event, handler) {
+    if (!el) return;
+    el.addEventListener(event, handler);
+    _eventListeners.push({ el, event, handler });
+}
 
 export function attachEvents() {
+    // Clean up previous listeners
+    detachEvents();
+
     const search = document.getElementById('wiki-search');
     const cat = document.getElementById('wiki-cat-filter');
     const addBtn = document.getElementById('wiki-add-btn');
@@ -585,40 +560,53 @@ export function attachEvents() {
     const importBtn = document.getElementById('wiki-import-btn');
 
     if (search) {
-        search.addEventListener('input', debounce(renderWiki, 200));
+        const debouncedRender = debounce(renderWiki, 200);
+        addEventListenerSafe(search, 'input', debouncedRender);
     }
     if (cat) {
-        cat.addEventListener('change', renderWiki);
+        addEventListenerSafe(cat, 'change', renderWiki);
     }
     if (addBtn) {
-        addBtn.addEventListener('click', () => openWikiEditor(null));
+        addEventListenerSafe(addBtn, 'click', () => openWikiEditor(null));
     }
     if (reloadBtn) {
-        reloadBtn.addEventListener('click', () => {
+        addEventListenerSafe(reloadBtn, 'click', () => {
             loadRemoteWiki().then(() => renderWiki());
         });
     }
     if (importBtn) {
-        importBtn.addEventListener('click', importAllFromWiki);
+        addEventListenerSafe(importBtn, 'click', importAllFromWiki);
     }
 }
 
-// ============================================================
-// DESTROY
-// ============================================================
+export function detachEvents() {
+    _eventListeners.forEach(({ el, event, handler }) => {
+        el.removeEventListener(event, handler);
+    });
+    _eventListeners = [];
+}
+
+// ─── Lifecycle ─────────────────────────────────────────────────────────
+
+export function refresh() {
+    renderWiki();
+}
 
 export function destroy() {
+    detachEvents();
     container = null;
 }
 
-// ============================================================
-// EXPORTS
-// ============================================================
+// ─── Exports ──────────────────────────────────────────────────────────
 
 export default {
     render,
     destroy,
+    refresh,
     loadRemoteWiki,
+    renderWiki,
     toggleWikiBody,
     openWikiEditor,
+    attachEvents,
+    detachEvents,
 };

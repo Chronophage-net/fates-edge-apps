@@ -1,5 +1,6 @@
 /**
  * Fate's Edge - Socket.io Handlers
+ * v2 – Sender exclusion for all client‑originated broadcasts.
  */
 
 const room = require('./room.js');
@@ -26,6 +27,7 @@ function setupSocketIO(io) {
             socket: socket
         };
 
+        // ─── Join Room ──────────────────────────────────────────────
         socket.on('join-room', (data) => {
             const { roomCode, playerName, playerRole = 'player', playerEmail = '' } = data;
             if (!roomCode || !room.validateRoomCode(roomCode)) {
@@ -42,16 +44,17 @@ function setupSocketIO(io) {
                     const wasGm = oldRoom.clients.get(socket.id)?.role === 'gm';
                     oldRoom.clients.delete(socket.id);
                     const oldClientsList = room.getClientsList(oldRoom);
-                    io.to(socket.room).emit('player-left', {
+                    // Broadcast player-left with sender exclusion
+                    room.broadcastToRoom(socket.room, 'player-left', {
                         clientId: socket.id,
                         clientName: socket.clientData?.name || 'Player',
                         clients: oldClientsList
-                    });
+                    }, socket.id);
                     if (wasGm) {
                         room.broadcastToRoom(socket.room, 'server_announcement', {
                             message: 'The Game Master has disconnected.',
                             timestamp: Date.now()
-                        });
+                        }, socket.id);
                     }
                 }
             }
@@ -97,15 +100,17 @@ function setupSocketIO(io) {
                 whiteboard: currentRoom.whiteboard
             });
 
-            room.broadcastToRoom(roomKey, 'presence', { clients: clientsList });
+            // Broadcast with sender exclusion
+            room.broadcastToRoom(roomKey, 'presence', { clients: clientsList }, socket.id);
             room.broadcastToRoom(roomKey, 'player-joined', {
                 clientId: socket.id,
                 clientName: socket.clientData.name,
                 role: socket.clientData.role,
                 clients: clientsList
-            });
+            }, socket.id);
         });
 
+        // ─── GM requests ────────────────────────────────────────────
         socket.on('request_gm', () => {
             if (!socket.room) return;
             const r = room.rooms.get(socket.room);
@@ -122,7 +127,7 @@ function setupSocketIO(io) {
             room.handleGmApproval(r, socket.id, targetId);
         });
 
-        // Deck operations
+        // ─── Deck operations ────────────────────────────────────────
         socket.on('deck-draw', async (data) => {
             if (!socket.room) return socket.emit('error', { message: 'Not in a room' });
             const r = room.rooms.get(socket.room);
@@ -150,7 +155,6 @@ function setupSocketIO(io) {
                     type: isCrown ? 'crown' : String(count),
                     region,
                     remaining: r.deck.length,
-                    clientId: socket.id,
                     clientName: socket.clientData?.name || 'Player',
                     timestamp: Date.now()
                 };
@@ -160,14 +164,13 @@ function setupSocketIO(io) {
                     cards: drawn.map(c => c.isJoker ? `🃏${c.rank}` : `${c.rankName} of ${c.suitName}`).join(' | '),
                     synthesis: typeof synthesis === 'string' ? synthesis : (synthesis?.synthesis || synthesis),
                     type: isCrown ? 'Crown Spread' : `${count} Draw${count > 1 ? 's' : ''}`,
-                    clientId: socket.id,
                     clientName: socket.clientData?.name || 'Player',
                     timestamp: Date.now()
                 });
                 if (r.deckHistory.length > 100) r.deckHistory = r.deckHistory.slice(-100);
 
                 r.lastActivity = Date.now();
-                room.broadcastToRoom(socket.room, 'deck-drawn', result);
+                room.broadcastToRoom(socket.room, 'deck-drawn', result, socket.id);
             } catch (error) {
                 logger.error('Error in Socket.io deck draw', { error: error.message });
                 socket.emit('error', { message: error.message });
@@ -182,11 +185,10 @@ function setupSocketIO(io) {
             r.deckOffset = Math.floor(Math.random() * 1000);
             r.lastActivity = Date.now();
             room.broadcastToRoom(socket.room, 'deck-shuffled', {
-                clientId: socket.id,
                 clientName: socket.clientData?.name || 'Player',
                 remaining: r.deck.length,
                 timestamp: Date.now()
-            });
+            }, socket.id);
         });
 
         socket.on('deck-history', (callback) => {
@@ -204,10 +206,9 @@ function setupSocketIO(io) {
             r.deckHistory = [];
             r.lastActivity = Date.now();
             room.broadcastToRoom(socket.room, 'deck-history-cleared', {
-                clientId: socket.id,
                 clientName: socket.clientData?.name || 'Player',
                 timestamp: Date.now()
-            });
+            }, socket.id);
         });
 
         socket.on('crown-spread', async (data) => {
@@ -232,7 +233,6 @@ function setupSocketIO(io) {
                     cards: cards.map(c => c.isJoker ? `🃏${c.rank}` : `${c.rankName} of ${c.suitName}`).join(' | '),
                     synthesis: result.synthesis,
                     type: 'Crown Spread',
-                    clientId: socket.id,
                     clientName: socket.clientData?.name || 'Player',
                     timestamp: Date.now()
                 });
@@ -241,17 +241,16 @@ function setupSocketIO(io) {
                     success: true,
                     cards, mainCards, wildcard,
                     result, remaining: r.deck.length,
-                    clientId: socket.id,
                     clientName: socket.clientData?.name || 'Player',
                     timestamp: Date.now()
                 };
-                room.broadcastToRoom(socket.room, 'crown-spread', response);
+                room.broadcastToRoom(socket.room, 'crown-spread', response, socket.id);
             } catch (error) {
                 socket.emit('error', { message: 'Failed to process crown spread: ' + error.message });
             }
         });
 
-        // Module management
+        // ─── Module management ──────────────────────────────────────
         socket.on('module-push-request', (data, callback) => {
             const { moduleId } = data || {};
             if (!moduleId) return callback?.({ error: 'Module ID required' });
@@ -278,7 +277,7 @@ function setupSocketIO(io) {
                         clientName: socket.clientData?.name || 'Player',
                         module: moduleData,
                         timestamp: Date.now()
-                    });
+                    }, socket.id);
                 }
                 callback?.({ success: true, module: moduleData });
             } catch (error) {
@@ -295,7 +294,7 @@ function setupSocketIO(io) {
                     source: socket.id,
                     clientName: socket.clientData?.name || 'Player',
                     timestamp: Date.now()
-                });
+                }, socket.id);
             }
             callback?.({ success: true, moduleId });
         });
@@ -330,7 +329,7 @@ function setupSocketIO(io) {
             if (typeof callback === 'function') callback({ modules, count: modules.length, timestamp: Date.now() });
         });
 
-        // Whiteboard
+        // ─── Whiteboard ─────────────────────────────────────────────
         socket.on('whiteboard-update', (data) => {
             if (!socket.room) return socket.emit('error', { message: 'Not in a room' });
             const r = room.rooms.get(socket.room);
@@ -348,9 +347,8 @@ function setupSocketIO(io) {
                 whiteboard: r.whiteboard,
                 timestamp: Date.now(),
                 source: 'socket.io',
-                clientId: socket.id,
                 clientName: socket.clientData?.name || 'Player'
-            });
+            }, socket.id);
         });
 
         socket.on('sync-request', () => {
@@ -364,7 +362,7 @@ function setupSocketIO(io) {
             socket.emit('whiteboard-update', data);
         });
 
-        // Relay events
+        // ─── Relay events ───────────────────────────────────────────
         const relayEvents = [
             'media_recording', 'voice-offer', 'voice-answer', 'voice-ice-candidate',
             'voice-status', 'chat-message', 'roll-dice', 'roll-result',
@@ -375,19 +373,18 @@ function setupSocketIO(io) {
                 if (!socket.room) return socket.emit('error', { message: 'Not in a room' });
                 room.broadcastToRoom(socket.room, eventName, {
                     ...data,
-                    clientId: socket.id,
                     clientName: socket.clientData?.name || 'Player'
-                });
+                }, socket.id);
             });
         });
 
-        // Ban/Kick
+        // ─── Ban/Kick ───────────────────────────────────────────────
         socket.on('kick_client', (data) => {
             if (!socket.room || socket.clientData.role !== 'gm') return;
             const r = room.rooms.get(socket.room);
             if (!r) return;
             room.kickClient(r, data.targetId, data.reason || 'Kicked by GM');
-            room.broadcastToRoom(socket.room, 'presence', { clients: room.getClientsList(r) });
+            room.broadcastToRoom(socket.room, 'presence', { clients: room.getClientsList(r) }, socket.id);
         });
 
         socket.on('ban_client', (data) => {
@@ -395,7 +392,7 @@ function setupSocketIO(io) {
             const r = room.rooms.get(socket.room);
             if (!r) return;
             room.banClient(r, data.targetId, data.reason || 'Banned by GM');
-            room.broadcastToRoom(socket.room, 'presence', { clients: room.getClientsList(r) });
+            room.broadcastToRoom(socket.room, 'presence', { clients: room.getClientsList(r) }, socket.id);
         });
 
         socket.on('unban_client', (data) => {
@@ -406,7 +403,7 @@ function setupSocketIO(io) {
             socket.emit('unban_client_ack', { targetId: data.targetId });
         });
 
-        // Disconnect
+        // ─── Disconnect ─────────────────────────────────────────────
         socket.on('disconnect', () => {
             socketStats.socketIOConnections--;
             if (socket.room) {
@@ -414,17 +411,18 @@ function setupSocketIO(io) {
                 if (r) {
                     const wasGm = r.clients.get(socket.id)?.role === 'gm';
                     r.clients.delete(socket.id);
-                    room.broadcastToRoom(socket.room, 'presence', { clients: room.getClientsList(r) });
+                    // Broadcast with sender exclusion
+                    room.broadcastToRoom(socket.room, 'presence', { clients: room.getClientsList(r) }, socket.id);
                     room.broadcastToRoom(socket.room, 'player-left', {
                         clientId: socket.id,
                         clientName: socket.clientData?.name || 'Player',
                         clients: room.getClientsList(r)
-                    });
+                    }, socket.id);
                     if (wasGm) {
                         room.broadcastToRoom(socket.room, 'server_announcement', {
                             message: 'The Game Master has disconnected.',
                             timestamp: Date.now()
-                        });
+                        }, socket.id);
                     }
                     if (r.clients.size === 0) {
                         room.rooms.delete(socket.room);
