@@ -333,6 +333,7 @@ jobs:
         (github.event_name == 'workflow_dispatch' && github.event.inputs.skip_web_deploy != 'true')
       )
     uses: ./.github/workflows/deploy-web-client.yml
+    secrets: inherit
     permissions:
       contents: read
       pages: write
@@ -344,10 +345,15 @@ jobs:
   deploy-render:
     name: Trigger Render Deployment
     needs: build
-    if: success()
+    if: >
+      success() && (
+        github.event_name == 'push' ||
+        (github.event_name == 'workflow_dispatch' && github.event.inputs.skip_socket_deploy != 'true')
+      )
     uses: ./.github/workflows/deploy-socket-server-to-render.yml
     with:
       environment: production
+    secrets: inherit
     permissions:
       contents: read
       actions: read

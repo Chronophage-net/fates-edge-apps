@@ -1,18 +1,14 @@
 /**
  * Character Wizard - Step-by-step character creation
- * FIXED: Proper step management, data persistence, and validation
- * FIXED: XSS vulnerabilities with escHtml
- * FIXED: Event listener cleanup
+ * ✅ Modal auto-created if missing
+ * ✅ Improved validation with inline feedback
+ * ✅ Better UI with progress indicator
+ * ✅ Robust event handling and cleanup
+ * ✅ XSS protected with escHtml
  */
 
-import { 
-    getState, 
-    generateId,
-    escHtml, 
-    safeParseInt, 
-    clamp 
-} from '../../core/utils.js';
-import { addCharacter} from '../../core/state.js';
+import { generateId, escHtml, safeParseInt, clamp } from '../../core/utils.js';
+import { addCharacter } from '../../core/state.js';
 import { ALL_SKILLS, defaultSkills } from '../../core/dice.js';
 import { showToast } from '../../components/Toast.js';
 
@@ -25,8 +21,53 @@ const wizardState = {
     data: null,
     isOpen: false,
     initialized: false,
-    escapeHandler: null
+    escapeHandler: null,
+    modal: null
 };
+
+// ============================================================
+// MODAL CREATION (if missing)
+// ============================================================
+
+function ensureModal() {
+    let modal = document.getElementById('wizardModal');
+    if (modal) return modal;
+
+    // Build modal from scratch
+    modal = document.createElement('div');
+    modal.id = 'wizardModal';
+    modal.className = 'modal';
+    modal.setAttribute('role', 'dialog');
+    modal.setAttribute('aria-modal', 'true');
+    modal.style.display = 'none';
+
+    modal.innerHTML = `
+        <div class="modal-overlay"></div>
+        <div class="modal-content" style="max-width:720px;max-height:90vh;overflow-y:auto;padding:1.5rem;">
+            <div class="modal-header" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;">
+                <h3 id="wizard-title" style="margin:0;">Character Wizard</h3>
+                <button id="wizardModalClose" class="btn btn-ghost" style="font-size:1.8rem;line-height:1;padding:0 0.3rem;">&times;</button>
+            </div>
+
+            <!-- Progress indicator -->
+            <div id="wizard-progress" style="display:flex;gap:0.5rem;margin-bottom:1.2rem;justify-content:center;">
+                ${[1,2,3,4,5].map(i => `
+                    <div class="wizard-progress-step" data-step="${i-1}" style="flex:1;height:4px;background:var(--border);border-radius:2px;transition:background 0.3s;"></div>
+                `).join('')}
+            </div>
+
+            <div id="wizard-steps" class="modal-body"></div>
+
+            <div class="modal-footer" style="display:flex;justify-content:space-between;margin-top:1.2rem;padding-top:0.8rem;border-top:1px solid var(--border);">
+                <button id="wizard-back" class="btn btn-secondary">← Back</button>
+                <button id="wizard-next" class="btn btn-gold">Next →</button>
+            </div>
+        </div>
+    `;
+
+    document.body.appendChild(modal);
+    return modal;
+}
 
 // ============================================================
 // INITIALIZATION
@@ -34,30 +75,33 @@ const wizardState = {
 
 function initWizard() {
     if (wizardState.initialized) return;
-    
-    // Use event delegation for dynamic content
+
+    // Event delegation for dynamic list items (add/remove)
     document.addEventListener('click', (e) => {
         const target = e.target;
-        
-        // Handle add buttons
+
         if (target.matches('[data-wizard-add]')) {
             const prefix = target.dataset.wizardAdd;
             addWizardDynamic(prefix);
             e.preventDefault();
         }
-        
-        // Handle remove buttons (delegated)
+
         if (target.matches('.wizard-remove-btn')) {
             const row = target.closest('.dynamic-row');
-            if (row) {
-                row.remove();
-                // Trigger save of current step data
-                collectWizardStep();
-            }
+            if (row) row.remove();
+            collectWizardStep();
             e.preventDefault();
         }
+
+        // Checkbox change triggers XP recalculation in summary
+        if (target.matches('.wz-bond-start, .wz-comp-start')) {
+            if (wizardState.isOpen && wizardState.step === 4) {
+                setTimeout(updateSummaryXP, 50);
+            }
+        }
     });
-    
+
+    // Also handle dynamic add via custom events for button clicks in non-delegated areas
     wizardState.initialized = true;
 }
 
@@ -65,12 +109,13 @@ function initWizard() {
 // PUBLIC API
 // ============================================================
 
-/**
- * Open the character wizard
- */
 export function openWizard() {
     initWizard();
-    
+
+    // Ensure modal exists
+    const modal = ensureModal();
+    wizardState.modal = modal;
+
     // Reset state
     const data = {
         id: generateId(),
@@ -94,37 +139,33 @@ export function openWizard() {
         fatigue: 0,
         boons: 0,
         vtt: true,
-        // Track which step has data to prevent data loss
         _stepDataCollected: {}
     };
-    
+
     wizardState.data = data;
     wizardState.step = 0;
     wizardState.isOpen = true;
-    
-    const modal = document.getElementById('wizardModal');
-    if (modal) {
-        modal.classList.add('open');
-        renderWizardStep();
-    } else {
-        showToast('Wizard modal not found. Please refresh.', 'error');
-    }
+
+    // Show modal
+    modal.classList.add('open');
+    modal.style.display = 'flex';
+
+    renderWizardStep();
+    setupWizardEvents();
 }
 
-/**
- * Close the wizard
- */
 export function closeWizard() {
-    // Remove escape listener
     if (wizardState.escapeHandler) {
         document.removeEventListener('keydown', wizardState.escapeHandler);
         wizardState.escapeHandler = null;
     }
-    
-    const modal = document.getElementById('wizardModal');
+
+    const modal = wizardState.modal || document.getElementById('wizardModal');
     if (modal) {
         modal.classList.remove('open');
+        modal.style.display = 'none';
     }
+
     wizardState.isOpen = false;
     wizardState.data = null;
     wizardState.step = 0;
@@ -136,7 +177,6 @@ export function closeWizard() {
 
 export function wizardBack() {
     if (wizardState.step > 0 && wizardState.data) {
-        // Save current step before going back
         collectWizardStep();
         wizardState.step--;
         renderWizardStep();
@@ -148,12 +188,9 @@ export function wizardNext() {
         showToast('Wizard not initialized.', 'error');
         return;
     }
-    
-    // Collect and validate current step
-    if (!collectWizardStep()) {
-        return; // Validation failed
-    }
-    
+
+    if (!collectWizardStep()) return; // validation failed
+
     if (wizardState.step < 4) {
         wizardState.step++;
         renderWizardStep();
@@ -169,51 +206,42 @@ export function wizardNext() {
 function collectWizardStep() {
     const d = wizardState.data;
     if (!d) return false;
-    
+
     const step = wizardState.step;
-    
+
     try {
         switch (step) {
-            case 0:
-                return collectBasicInfo(d);
-            case 1:
-                return collectAttributes(d);
-            case 2:
-                return collectSkills(d);
-            case 3:
-                return collectDynamicItems(d);
-            default:
-                return true;
+            case 0: return collectBasicInfo(d);
+            case 1: return collectAttributes(d);
+            case 2: return collectSkills(d);
+            case 3: return collectDynamicItems(d);
+            default: return true;
         }
     } catch (error) {
-        console.error('[Wizard] Error collecting step data:', error);
+        console.error('[Wizard] Collection error:', error);
         showToast('Error collecting data. Please try again.', 'error');
         return false;
     }
 }
 
 function collectBasicInfo(d) {
-    const name = getValue('#wz-name');
-    if (!name || !name.trim()) {
+    const nameInput = document.querySelector('#wz-name');
+    const name = nameInput ? nameInput.value.trim() : '';
+    if (!name) {
         showToast('Character name is required.', 'error');
-        // Highlight the field
-        const nameInput = document.querySelector('#wz-name');
         if (nameInput) {
             nameInput.style.borderColor = 'var(--red)';
             nameInput.focus();
-            setTimeout(() => {
-                nameInput.style.borderColor = '';
-            }, 3000);
+            setTimeout(() => nameInput.style.borderColor = '', 3000);
         }
         return false;
     }
-    
-    d.name = name.trim();
+
+    d.name = name;
     d.heritage = getValue('#wz-heritage');
     d.background = getValue('#wz-background');
     d.patron = getValue('#wz-patron');
     d.tier = getValue('#wz-tier') || 'I';
-    
     d._stepDataCollected[0] = true;
     return true;
 }
@@ -239,7 +267,6 @@ function collectSkills(d) {
 }
 
 function collectDynamicItems(d) {
-    // Read from DOM with proper error handling
     d.talents = readWizardDynamicList('wz-talent');
     d.assets = readWizardDynamicList('wz-asset');
     d.equipment = readWizardDynamicList('wz-equip');
@@ -270,63 +297,49 @@ function getNumber(selector) {
 function readWizardDynamicList(prefix) {
     const items = [];
     const rows = document.querySelectorAll(`.${prefix}-row`);
-    
     for (const row of rows) {
         const nameInput = row.querySelector(`.${prefix}-name`) || row.querySelector('input[type="text"]');
         const costInput = row.querySelector(`.${prefix}-cost`) || row.querySelector('input[type="number"]');
-        
         const name = nameInput ? nameInput.value.trim() : '';
         const cost = costInput ? safeParseInt(costInput.value, 0) : 0;
-        
-        if (name) {
-            items.push({ name, cost });
-        }
+        if (name) items.push({ name, cost });
     }
-    
     return items;
 }
 
 function readWizardBondList() {
     const items = [];
     const rows = document.querySelectorAll('.wz-bond-row');
-    
     for (const row of rows) {
         const nameInput = row.querySelector('.wz-bond-name');
         const descInput = row.querySelector('.wz-bond-desc');
         const startCheck = row.querySelector('.wz-bond-start');
-        
         const name = nameInput ? nameInput.value.trim() : '';
         if (!name) continue;
-        
         items.push({
             name,
             desc: descInput ? descInput.value.trim() : '',
             start: startCheck ? startCheck.checked : false
         });
     }
-    
     return items;
 }
 
 function readWizardCompList() {
     const items = [];
     const rows = document.querySelectorAll('.wz-comp-row');
-    
     for (const row of rows) {
         const nameInput = row.querySelector('.wz-comp-name');
         const descInput = row.querySelector('.wz-comp-desc');
         const startCheck = row.querySelector('.wz-comp-start');
-        
         const name = nameInput ? nameInput.value.trim() : '';
         if (!name) continue;
-        
         items.push({
             name,
             desc: descInput ? descInput.value.trim() : '',
             start: startCheck ? startCheck.checked : false
         });
     }
-    
     return items;
 }
 
@@ -340,51 +353,38 @@ function finishWizard() {
         showToast('No character data to save.', 'error');
         return;
     }
-    
-    // Final validation
+
     if (!d.name || !d.name.trim()) {
         showToast('Character name is required.', 'error');
         wizardState.step = 0;
         renderWizardStep();
         return;
     }
-    
-    // Calculate starting XP with bonds and complications
+
     const bondBonus = (d.bonds || []).filter(b => b.start).length * 2;
     const compBonus = (d.complications || []).filter(c => c.start).length * 2;
-    const startBonus = Math.min(bondBonus + compBonus, 4); // Max 4 bonus XP
-    d.xp = 32 + startBonus;
-    
-    // Determine if we should push to VTT
+    const totalBonus = Math.min(bondBonus + compBonus, 4);
+    d.xp = 32 + totalBonus;
+
     const pushCheck = document.getElementById('wz-push-vtt');
-    if (pushCheck) {
-        d.vtt = pushCheck.checked;
-    }
-    
-    // Save the character
+    if (pushCheck) d.vtt = pushCheck.checked;
+
     try {
         addCharacter(d);
         showToast(`✨ Character "${d.name}" created successfully!`, 'success');
-        
-        // Close wizard
         closeWizard();
-        
+
         // Refresh character list
         import('./index.js').then(module => {
-            if (module.renderCharList) {
-                module.renderCharList();
-            }
+            if (module.renderCharList) module.renderCharList();
         });
-        
-        // Navigate to VTT if requested
+
         if (d.vtt) {
             const vttBtn = document.querySelector('.sidebar-nav button[data-tab="vtt"]');
-            if (vttBtn) {
-                setTimeout(() => vttBtn.click(), 300);
-            }
+            if (vttBtn) setTimeout(() => vttBtn.click(), 300);
         }
     } catch (error) {
-        console.error('[Wizard] Error saving character:', error);
+        console.error('[Wizard] Save error:', error);
         showToast('Error saving character. Please try again.', 'error');
     }
 }
@@ -396,27 +396,29 @@ function finishWizard() {
 function renderWizardStep() {
     const d = wizardState.data;
     if (!d) return;
-    
+
     const stepsEl = document.getElementById('wizard-steps');
     const nextBtn = document.getElementById('wizard-next');
     const backBtn = document.getElementById('wizard-back');
     const titleEl = document.getElementById('wizard-title');
-    const modal = document.getElementById('wizardModal');
-    
+
     if (!stepsEl || !nextBtn || !backBtn) {
-        console.warn('[Wizard] Required elements not found');
+        console.warn('[Wizard] Required elements missing');
         return;
     }
-    
-    // Update UI
+
     if (titleEl) {
         titleEl.textContent = `Character Wizard — Step ${wizardState.step + 1} of 5`;
     }
-    
+
     backBtn.style.display = wizardState.step === 0 ? 'none' : 'inline-block';
     nextBtn.textContent = wizardState.step === 4 ? '✨ Finish' : 'Next →';
-    
-    // Build step HTML
+
+    // Update progress
+    document.querySelectorAll('.wizard-progress-step').forEach((el, idx) => {
+        el.style.background = idx <= wizardState.step ? 'var(--gold)' : 'var(--border)';
+    });
+
     let html = '';
     try {
         switch (wizardState.step) {
@@ -428,48 +430,52 @@ function renderWizardStep() {
             default: html = '<p>Unknown step</p>';
         }
     } catch (error) {
-        console.error('[Wizard] Error rendering step:', error);
+        console.error('[Wizard] Render error:', error);
         html = '<p class="error">Error rendering step. Please refresh.</p>';
     }
-    
+
     stepsEl.innerHTML = html;
-    
-    // Recalculate XP in step 4
+
     if (wizardState.step === 4) {
-        updateSummaryXP();
+        setTimeout(updateSummaryXP, 50);
     }
+
+    // Focus first input for better UX
+    const firstInput = stepsEl.querySelector('input, select, textarea');
+    if (firstInput) setTimeout(() => firstInput.focus(), 100);
 }
 
 // ============================================================
-// STEP RENDERERS
+// STEP RENDERERS (improved layout and styling)
 // ============================================================
 
 function renderStep0(d) {
     return `
         <div class="wizard-step active">
-            <h3>Who are you?</h3>
-            <p class="text-muted" style="font-size:0.85rem;margin-bottom:0.8rem;">Tell us about your character's identity.</p>
-            <div class="form-row">
-                <div class="field"><label>Name *</label>
-                    <input id="wz-name" value="${escHtml(d.name)}" placeholder="Enter character name..." />
-                    <span class="field-hint">This is required.</span>
+            <h3 style="margin-top:0;">🪪 Identity</h3>
+            <p class="text-muted" style="font-size:0.9rem;margin-bottom:1rem;">Tell us who your character is.</p>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.8rem;">
+                <div class="field">
+                    <label>Name <span style="color:var(--red);">*</span></label>
+                    <input id="wz-name" value="${escHtml(d.name)}" placeholder="Enter character name..." autofocus />
+                    <span class="field-hint" style="color:var(--text3);font-size:0.75rem;">Required</span>
                 </div>
-                <div class="field"><label>Heritage</label>
+                <div class="field">
+                    <label>Heritage</label>
                     <input id="wz-heritage" value="${escHtml(d.heritage)}" placeholder="e.g., Human, Elf, Dwarf" />
                 </div>
-            </div>
-            <div class="form-row">
-                <div class="field"><label>Background</label>
-                    <input id="wz-background" value="${escHtml(d.background)}" placeholder="e.g., Soldier, Scholar, Outlaw" />
+                <div class="field">
+                    <label>Background</label>
+                    <input id="wz-background" value="${escHtml(d.background)}" placeholder="e.g., Soldier, Scholar" />
                 </div>
-                <div class="field"><label>Patron</label>
-                    <input id="wz-patron" value="${escHtml(d.patron)}" placeholder="e.g., A god, a mentor, or an organization" />
+                <div class="field">
+                    <label>Patron</label>
+                    <input id="wz-patron" value="${escHtml(d.patron)}" placeholder="God, mentor, or organization" />
                 </div>
-            </div>
-            <div class="form-row">
-                <div class="field small"><label>Tier</label>
-                    <input id="wz-tier" value="${escHtml(d.tier)}" placeholder="e.g., I, II, III" />
-                    <span class="field-hint">Optional tier indicator (I, II, III, etc.)</span>
+                <div class="field" style="grid-column:1/2;">
+                    <label>Tier</label>
+                    <input id="wz-tier" value="${escHtml(d.tier)}" placeholder="e.g., I, II, III" style="max-width:100px;" />
+                    <span class="field-hint" style="color:var(--text3);font-size:0.75rem;">Optional tier indicator</span>
                 </div>
             </div>
         </div>
@@ -479,29 +485,20 @@ function renderStep0(d) {
 function renderStep1(d) {
     return `
         <div class="wizard-step active">
-            <h3>Attributes (1–5)</h3>
-            <p class="text-muted" style="font-size:0.85rem;margin-bottom:0.8rem;">Distribute your character's core attributes.</p>
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.8rem;">
-                <div class="stat-item">
-                    <label>Body</label>
-                    <input type="number" id="wz-body" value="${d.body}" min="1" max="5" />
-                    <span class="field-hint">Physical prowess</span>
-                </div>
-                <div class="stat-item">
-                    <label>Wits</label>
-                    <input type="number" id="wz-wits" value="${d.wits}" min="1" max="5" />
-                    <span class="field-hint">Mental acuity</span>
-                </div>
-                <div class="stat-item">
-                    <label>Spirit</label>
-                    <input type="number" id="wz-spirit" value="${d.spirit}" min="1" max="5" />
-                    <span class="field-hint">Willpower and intuition</span>
-                </div>
-                <div class="stat-item">
-                    <label>Presence</label>
-                    <input type="number" id="wz-presence" value="${d.presence}" min="1" max="5" />
-                    <span class="field-hint">Charisma and social influence</span>
-                </div>
+            <h3 style="margin-top:0;">⚡ Attributes (1–5)</h3>
+            <p class="text-muted" style="font-size:0.9rem;margin-bottom:1rem;">Distribute your core attributes. Higher is better.</p>
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:0.8rem;">
+                ${['Body','Wits','Spirit','Presence'].map((attr, i) => {
+                    const id = ['body','wits','spirit','presence'][i];
+                    const val = d[id] ?? 0;
+                    return `
+                        <div class="stat-item" style="background:var(--bg2);padding:0.5rem;border-radius:var(--radius);text-align:center;">
+                            <label style="font-weight:600;">${attr}</label>
+                            <input type="number" id="wz-${id}" value="${val}" min="1" max="5" style="width:100%;text-align:center;font-size:1.2rem;" />
+                            <span class="field-hint" style="font-size:0.7rem;color:var(--text3);">1–5</span>
+                        </div>
+                    `;
+                }).join('')}
             </div>
         </div>
     `;
@@ -512,18 +509,18 @@ function renderStep2(d) {
         const key = s.toLowerCase();
         const val = d.skills?.[key] ?? 0;
         return `
-            <div class="skill-item">
-                <label>${escHtml(s)}</label>
-                <input type="number" id="wz-sk-${key}" value="${val}" min="0" max="5" />
+            <div style="display:flex;align-items:center;gap:0.3rem;background:var(--bg2);padding:0.2rem 0.4rem;border-radius:4px;">
+                <label style="flex:1;font-size:0.85rem;">${escHtml(s)}</label>
+                <input type="number" id="wz-sk-${key}" value="${val}" min="0" max="5" style="width:50px;text-align:center;" />
             </div>
         `;
     }).join('');
-    
+
     return `
         <div class="wizard-step active">
-            <h3>Skills (0–5)</h3>
-            <p class="text-muted" style="font-size:0.85rem;margin-bottom:0.8rem;">Set your character's skill ranks.</p>
-            <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:0.4rem;font-size:0.85rem;">
+            <h3 style="margin-top:0;">📚 Skills (0–5)</h3>
+            <p class="text-muted" style="font-size:0.9rem;margin-bottom:1rem;">Set your character's skill ranks.</p>
+            <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:0.4rem;">
                 ${skillsHtml}
             </div>
         </div>
@@ -531,50 +528,30 @@ function renderStep2(d) {
 }
 
 function renderStep3(d) {
-    const talentRows = (d.talents || []).map((t, i) => 
-        wizardDynamicRowHtml('wz-talent', i, t.name, t.cost)
-    ).join('');
-    
-    const assetRows = (d.assets || []).map((a, i) => 
-        wizardDynamicRowHtml('wz-asset', i, a.name, a.cost)
-    ).join('');
-    
-    const equipRows = (d.equipment || []).map((e, i) => 
-        wizardDynamicRowHtml('wz-equip', i, e.name, e.cost)
-    ).join('');
-    
-    const bondRows = (d.bonds || []).map((b, i) => 
-        wizardBondRowHtml(i, b)
-    ).join('');
-    
-    const compRows = (d.complications || []).map((c, i) => 
-        wizardCompRowHtml(i, c)
-    ).join('');
-    
+    const dynamicList = (prefix, label, rows, rowFn) => `
+        <div style="margin-top:0.6rem;">
+            <h4 style="margin:0.4rem 0 0.2rem;">${label}</h4>
+            <div id="${prefix}-list">${rows}</div>
+            <button class="btn btn-sm btn-secondary" data-wizard-add="${prefix}">+ Add ${label}</button>
+        </div>
+    `;
+
+    const talentRows = (d.talents || []).map((t, i) => wizardDynamicRowHtml('wz-talent', i, t.name, t.cost)).join('');
+    const assetRows = (d.assets || []).map((a, i) => wizardDynamicRowHtml('wz-asset', i, a.name, a.cost)).join('');
+    const equipRows = (d.equipment || []).map((e, i) => wizardDynamicRowHtml('wz-equip', i, e.name, e.cost)).join('');
+    const bondRows = (d.bonds || []).map((b, i) => wizardBondRowHtml(i, b)).join('');
+    const compRows = (d.complications || []).map((c, i) => wizardCompRowHtml(i, c)).join('');
+
     return `
         <div class="wizard-step active">
-            <h3>Talents, Assets, Equipment, Bonds &amp; Complications</h3>
-            <p class="text-muted" style="font-size:0.85rem;margin-bottom:0.8rem;">Add the details that make your character unique.</p>
-            
-            <h4>Talents</h4>
-            <div id="wz-talent-list">${talentRows}</div>
-            <button class="btn btn-sm" data-wizard-add="wz-talent">+ Add Talent</button>
-            
-            <h4 class="mt-1">Assets</h4>
-            <div id="wz-asset-list">${assetRows}</div>
-            <button class="btn btn-sm" data-wizard-add="wz-asset">+ Add Asset</button>
-            
-            <h4 class="mt-1">Equipment</h4>
-            <div id="wz-equip-list">${equipRows}</div>
-            <button class="btn btn-sm" data-wizard-add="wz-equip">+ Add Equipment</button>
-            
-            <h4 class="mt-1">Bonds <span class="text-muted" style="font-size:0.75rem;">(+2 start XP each, max +4)</span></h4>
-            <div id="wz-bond-list">${bondRows}</div>
-            <button class="btn btn-sm" data-wizard-add="wz-bond">+ Add Bond</button>
-            
-            <h4 class="mt-1">Complications <span class="text-muted" style="font-size:0.75rem;">(+2 start XP each, max +4)</span></h4>
-            <div id="wz-comp-list">${compRows}</div>
-            <button class="btn btn-sm" data-wizard-add="wz-comp">+ Add Complication</button>
+            <h3 style="margin-top:0;">🧩 Details</h3>
+            <p class="text-muted" style="font-size:0.9rem;margin-bottom:0.5rem;">Add talents, assets, equipment, bonds, and complications.</p>
+            ${dynamicList('wz-talent', 'Talents', talentRows)}
+            ${dynamicList('wz-asset', 'Assets', assetRows)}
+            ${dynamicList('wz-equip', 'Equipment', equipRows)}
+            ${dynamicList('wz-bond', 'Bonds', bondRows)}
+            ${dynamicList('wz-comp', 'Complications', compRows)}
+            <p class="text-muted" style="font-size:0.8rem;margin-top:0.5rem;">Bonds and complications marked with checkbox give +2 starting XP each (max +4 total).</p>
         </div>
     `;
 }
@@ -584,130 +561,98 @@ function renderStep4(d) {
     const compBonus = (d.complications || []).filter(c => c.start).length * 2;
     const totalBonus = Math.min(bondBonus + compBonus, 4);
     const startXp = 32 + totalBonus;
-    
-    // Count total items for summary
+
     const totalTalents = (d.talents || []).length;
     const totalAssets = (d.assets || []).length;
     const totalEquip = (d.equipment || []).length;
     const totalBonds = (d.bonds || []).length;
     const totalComps = (d.complications || []).length;
-    
+
     return `
         <div class="wizard-step active">
-            <h3>Summary</h3>
-            <div style="background:var(--bg3);padding:1.2rem;border-radius:var(--radius);">
-                <div style="display:flex;justify-content:space-between;align-items:start;flex-wrap:wrap;">
+            <h3 style="margin-top:0;">📋 Summary</h3>
+            <div style="background:var(--bg2);padding:1rem;border-radius:var(--radius);">
+                <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:0.5rem;">
                     <div>
-                        <h4 style="margin:0 0 0.2rem 0;">${escHtml(d.name || 'Unnamed')}</h4>
-                        <p class="text-muted" style="margin:0;">
+                        <h4 style="margin:0 0 0.2rem;">${escHtml(d.name || 'Unnamed')}</h4>
+                        <p style="margin:0;font-size:0.9rem;color:var(--text2);">
                             ${escHtml(d.heritage || '')} ${d.background ? '· ' + escHtml(d.background) : ''}
                             ${d.patron ? '· ' + escHtml(d.patron) : ''}
                         </p>
                     </div>
-                    <span style="background:var(--gold);color:var(--bg);padding:0.2rem 0.8rem;border-radius:20px;font-weight:600;">
-                        Tier ${escHtml(d.tier || 'I')}
-                    </span>
+                    <span style="background:var(--gold);color:var(--bg);padding:0.2rem 0.8rem;border-radius:20px;font-weight:600;align-self:start;">Tier ${escHtml(d.tier || 'I')}</span>
                 </div>
-                
                 <hr style="border-color:var(--border);margin:0.6rem 0;" />
-                
-                <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;">
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.3rem 1rem;">
                     <div><span class="text-muted">Attributes:</span> B${d.body} W${d.wits} S${d.spirit} P${d.presence}</div>
-                    <div><span class="text-muted summary-xp-display">Starting XP:</span> <strong>${startXp}</strong> (32 + ${totalBonus} bonus)</div>
-                </div>
-                
-                <div style="margin-top:0.5rem;display:grid;grid-template-columns:1fr 1fr;gap:0.2rem 1rem;">
+                    <div><span class="text-muted">Starting XP:</span> <strong id="wizard-summary-xp">${startXp}</strong> (32 + ${totalBonus} bonus)</div>
                     <div><span class="text-muted">Talents:</span> ${totalTalents}</div>
                     <div><span class="text-muted">Assets:</span> ${totalAssets}</div>
                     <div><span class="text-muted">Equipment:</span> ${totalEquip}</div>
                     <div><span class="text-muted">Bonds:</span> ${totalBonds}</div>
                     <div><span class="text-muted">Complications:</span> ${totalComps}</div>
                 </div>
-                
                 <hr style="border-color:var(--border);margin:0.6rem 0;" />
-                
                 <div style="display:flex;gap:1.5rem;flex-wrap:wrap;">
-                    <label class="inline-check">
-                        <input type="checkbox" id="wz-push-vtt" ${d.vtt ? 'checked' : ''} /> 
-                        Push to VTT
-                    </label>
-                    <label class="inline-check">
-                        <input type="checkbox" id="wz-add-to-campaign" checked /> 
-                        Add to campaign
-                    </label>
+                    <label><input type="checkbox" id="wz-push-vtt" ${d.vtt ? 'checked' : ''} /> Push to VTT</label>
+                    <label><input type="checkbox" id="wz-add-to-campaign" checked /> Add to campaign</label>
                 </div>
             </div>
-            
-            <p class="text-muted" style="font-size:0.8rem;margin-top:0.8rem;">
-                💡 Review the summary above. Click "Finish" to create your character.
-            </p>
+            <p class="text-muted" style="font-size:0.85rem;margin-top:0.8rem;">Review the summary above, then click <strong>Finish</strong> to create your character.</p>
         </div>
     `;
 }
 
 function updateSummaryXP() {
-    // Recalculate and display XP in step 4 - updated to use the new display
+    if (wizardState.step !== 4) return;
     const d = wizardState.data;
-    if (!d || wizardState.step !== 4) return;
-    
+    if (!d) return;
+
     const bondBonus = (d.bonds || []).filter(b => b.start).length * 2;
     const compBonus = (d.complications || []).filter(c => c.start).length * 2;
     const totalBonus = Math.min(bondBonus + compBonus, 4);
     const startXp = 32 + totalBonus;
-    
-    // Update the XP display - look for the XP text in the summary
-    const xpElement = document.querySelector('.summary-xp-display');
-    if (xpElement) {
-        // Update just the number - preserve the label
-        const parent = xpElement.parentNode;
-        if (parent) {
-            const label = 'Starting XP:';
-            const currentText = parent.textContent;
-            if (currentText.includes(label)) {
-                parent.innerHTML = `<span class="text-muted">${label}</span> <strong>${startXp}</strong> (32 + ${totalBonus} bonus)`;
-            }
-        }
-    }
+
+    const xpEl = document.getElementById('wizard-summary-xp');
+    if (xpEl) xpEl.textContent = startXp;
 }
 
 // ============================================================
-// ROW HTML BUILDERS (with escHtml for XSS protection)
+// ROW HTML BUILDERS
 // ============================================================
 
 function wizardDynamicRowHtml(prefix, idx, name = '', cost = 0) {
     return `
-        <div class="dynamic-row ${prefix}-row" data-index="${idx}">
-            <input type="text" class="${prefix}-name" placeholder="Name" value="${escHtml(name || '')}" />
-            <input type="number" class="${prefix}-cost" placeholder="XP cost" value="${cost || 0}" min="0" style="width:70px;" />
-            <button class="btn btn-xs wizard-remove-btn">✕</button>
+        <div class="dynamic-row ${prefix}-row" data-index="${idx}" style="display:flex;gap:0.3rem;margin:0.2rem 0;align-items:center;">
+            <input type="text" class="${prefix}-name" placeholder="Name" value="${escHtml(name || '')}" style="flex:2;" />
+            <input type="number" class="${prefix}-cost" placeholder="XP" value="${cost || 0}" min="0" style="width:60px;" />
+            <button class="btn btn-xs wizard-remove-btn" style="padding:0 0.4rem;">✕</button>
         </div>
     `;
 }
 
 function wizardBondRowHtml(idx, item = {}) {
     return `
-        <div class="dynamic-row wz-bond-row" data-index="${idx}">
-            <input type="text" class="wz-bond-name" placeholder="Bond name" value="${escHtml(item.name || '')}" />
-            <input type="text" class="wz-bond-desc" placeholder="Description" value="${escHtml(item.desc || '')}" style="flex:2;" />
-            <label class="inline-check">
-                <input type="checkbox" class="wz-bond-start" ${item.start !== false ? 'checked' : ''} /> 
-                +2 XP
+        <div class="dynamic-row wz-bond-row" data-index="${idx}" style="display:flex;gap:0.3rem;margin:0.2rem 0;align-items:center;flex-wrap:wrap;">
+            <input type="text" class="wz-bond-name" placeholder="Bond name" value="${escHtml(item.name || '')}" style="flex:1;min-width:100px;" />
+            <input type="text" class="wz-bond-desc" placeholder="Description" value="${escHtml(item.desc || '')}" style="flex:2;min-width:120px;" />
+            <label style="font-size:0.8rem;display:flex;align-items:center;gap:0.2rem;">
+                <input type="checkbox" class="wz-bond-start" ${item.start !== false ? 'checked' : ''} /> +2 XP
             </label>
-            <button class="btn btn-xs wizard-remove-btn">✕</button>
+            <button class="btn btn-xs wizard-remove-btn" style="padding:0 0.4rem;">✕</button>
         </div>
     `;
 }
 
 function wizardCompRowHtml(idx, item = {}) {
     return `
-        <div class="dynamic-row wz-comp-row" data-index="${idx}">
-            <input type="text" class="wz-comp-name" placeholder="Complication name" value="${escHtml(item.name || '')}" />
-            <input type="text" class="wz-comp-desc" placeholder="Description" value="${escHtml(item.desc || '')}" style="flex:2;" />
-            <label class="inline-check">
-                <input type="checkbox" class="wz-comp-start" ${item.start !== false ? 'checked' : ''} /> 
-                +2 XP
+        <div class="dynamic-row wz-comp-row" data-index="${idx}" style="display:flex;gap:0.3rem;margin:0.2rem 0;align-items:center;flex-wrap:wrap;">
+            <input type="text" class="wz-comp-name" placeholder="Complication name" value="${escHtml(item.name || '')}" style="flex:1;min-width:100px;" />
+            <input type="text" class="wz-comp-desc" placeholder="Description" value="${escHtml(item.desc || '')}" style="flex:2;min-width:120px;" />
+            <label style="font-size:0.8rem;display:flex;align-items:center;gap:0.2rem;">
+                <input type="checkbox" class="wz-comp-start" ${item.start !== false ? 'checked' : ''} /> +2 XP
             </label>
-            <button class="btn btn-xs wizard-remove-btn">✕</button>
+            <button class="btn btn-xs wizard-remove-btn" style="padding:0 0.4rem;">✕</button>
         </div>
     `;
 }
@@ -722,109 +667,58 @@ export function addWizardDynamic(prefix) {
         console.warn(`[Wizard] Container not found: ${prefix}-list`);
         return;
     }
-    
+
     const idx = container.children.length;
+    let html;
+    if (prefix === 'wz-bond') {
+        html = wizardBondRowHtml(idx);
+    } else if (prefix === 'wz-comp') {
+        html = wizardCompRowHtml(idx);
+    } else {
+        html = wizardDynamicRowHtml(prefix, idx);
+    }
+
     const div = document.createElement('div');
-    div.innerHTML = wizardDynamicRowHtml(prefix, idx);
+    div.innerHTML = html;
     const row = div.firstElementChild;
     container.appendChild(row);
-    
-    // Focus the name input
+
     const nameInput = row.querySelector('input[type="text"]');
-    if (nameInput) {
-        setTimeout(() => nameInput.focus(), 50);
-    }
-    
-    // Auto-collect data after adding
-    setTimeout(() => collectWizardStep(), 10);
-}
-
-export function addWizardBond() {
-    const container = document.getElementById('wz-bond-list');
-    if (!container) {
-        console.warn('[Wizard] Bond list container not found');
-        return;
-    }
-    
-    const idx = container.children.length;
-    const div = document.createElement('div');
-    div.innerHTML = wizardBondRowHtml(idx);
-    const row = div.firstElementChild;
-    container.appendChild(row);
-    
-    // Focus the name input
-    const nameInput = row.querySelector('.wz-bond-name');
-    if (nameInput) {
-        setTimeout(() => nameInput.focus(), 50);
-    }
-    
-    setTimeout(() => collectWizardStep(), 10);
-}
-
-export function addWizardComp() {
-    const container = document.getElementById('wz-comp-list');
-    if (!container) {
-        console.warn('[Wizard] Complication list container not found');
-        return;
-    }
-    
-    const idx = container.children.length;
-    const div = document.createElement('div');
-    div.innerHTML = wizardCompRowHtml(idx);
-    const row = div.firstElementChild;
-    container.appendChild(row);
-    
-    // Focus the name input
-    const nameInput = row.querySelector('.wz-comp-name');
-    if (nameInput) {
-        setTimeout(() => nameInput.focus(), 50);
-    }
-    
-    setTimeout(() => collectWizardStep(), 10);
+    if (nameInput) setTimeout(() => nameInput.focus(), 50);
+    setTimeout(collectWizardStep, 10);
 }
 
 // ============================================================
-// SETUP EVENT LISTENERS
+// EVENT SETUP
 // ============================================================
 
 function setupWizardEvents() {
-    const modal = document.getElementById('wizardModal');
+    const modal = wizardState.modal || document.getElementById('wizardModal');
     const backBtn = document.getElementById('wizard-back');
     const nextBtn = document.getElementById('wizard-next');
     const closeBtn = document.getElementById('wizardModalClose');
-    
-    if (backBtn) {
-        backBtn.addEventListener('click', wizardBack);
-    }
-    
-    if (nextBtn) {
-        nextBtn.addEventListener('click', wizardNext);
-    }
-    
-    if (closeBtn) {
-        closeBtn.addEventListener('click', closeWizard);
-    }
-    
+
+    if (backBtn) backBtn.addEventListener('click', wizardBack);
+    if (nextBtn) nextBtn.addEventListener('click', wizardNext);
+    if (closeBtn) closeBtn.addEventListener('click', closeWizard);
+
     // Close on overlay click
     if (modal) {
-        modal.addEventListener('click', (e) => {
-            if (e.target === modal) {
-                closeWizard();
-            }
-        });
+        const overlay = modal.querySelector('.modal-overlay');
+        if (overlay) {
+            overlay.addEventListener('click', closeWizard);
+        }
     }
-    
+
     // Keyboard shortcuts
     if (wizardState.escapeHandler) {
         document.removeEventListener('keydown', wizardState.escapeHandler);
     }
     wizardState.escapeHandler = (e) => {
         if (!wizardState.isOpen) return;
-        
         if (e.key === 'Escape') {
             closeWizard();
         } else if (e.key === 'Enter' && !e.target.matches('textarea')) {
-            // Don't trigger on textareas, but do on input fields
             const nextBtn = document.getElementById('wizard-next');
             if (nextBtn) {
                 e.preventDefault();
@@ -839,27 +733,25 @@ function setupWizardEvents() {
 // INITIALIZE ON LOAD
 // ============================================================
 
-// Use DOMContentLoaded for setup
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => {
-        initWizard();
-        setupWizardEvents();
-    });
-} else {
+function init() {
     initWizard();
+    // Ensure modal is created early (optional)
+    ensureModal();
     setupWizardEvents();
 }
 
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+} else {
+    init();
+}
+
 // ============================================================
-// EXPOSE GLOBALS (for inline handlers)
+// EXPOSE GLOBALS (for inline handlers if needed)
 // ============================================================
 
-// Export functions to window for inline onclick handlers
-// Use Object.assign to avoid overwriting existing properties
 Object.assign(window, {
     addWizardDynamic,
-    addWizardBond,
-    addWizardComp,
     wizardBack,
     wizardNext,
     closeWizard
@@ -874,7 +766,5 @@ export default {
     closeWizard,
     wizardBack,
     wizardNext,
-    addWizardDynamic,
-    addWizardBond,
-    addWizardComp
+    addWizardDynamic
 };

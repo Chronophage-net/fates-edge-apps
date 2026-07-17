@@ -8,7 +8,6 @@
 import { getState, saveState } from '../../core/state.js';
 import { escHtml } from '../../core/utils.js';
 import { showToast } from '../../components/Toast.js';
-import { getSelectedRegion, getRegionNames, quickDraw, quickCrownSpread, setSelectedRegion, registerRegionChange } from '../decks/index.js';
 
 let container = null;
 let refreshInterval = null;
@@ -19,10 +18,6 @@ let refreshInterval = null;
 
 export function render(el) {
     container = el;
-    
-    const selectedRegion = getSelectedRegion() || 'Acasia';
-    const regionNames = getRegionNames();
-    const regions = regionNames.length > 0 ? regionNames : ['Acasia'];
     
     container.innerHTML = `
         <div class="dashboard-modern-layout">
@@ -42,29 +37,12 @@ export function render(el) {
                 ${renderStats()}
             </div>
 
-            <!-- Quick Actions with Region Selector -->
+            <!-- Quick Actions (Player‑Facing) -->
             <div class="panel" id="dash-actions-panel">
                 <div class="panel-header">
                     <h3 class="panel-title">⚡ Quick Actions</h3>
                     <div class="panel-actions">
                         <button class="btn btn-sm btn-ghost" onclick="window.dashboardRefresh()">🔄</button>
-                    </div>
-                </div>
-                
-                <!-- Region Selector Bar -->
-                <div class="quick-actions-region-bar" style="display:flex;flex-wrap:wrap;gap:0.5rem;align-items:center;padding:0.4rem 0.8rem;margin-bottom:0.5rem;background:var(--bg3);border-radius:var(--radius);border-left:3px solid var(--gold);">
-                    <span style="font-size:0.8rem;color:var(--text2);">📍 Region:</span>
-                    <select id="dashboard-region-select" style="background:var(--bg2);color:var(--text);border:1px solid var(--border);border-radius:4px;padding:0.15rem 0.4rem;font-size:0.8rem;min-width:100px;">
-                        ${regions.map(name => `
-                            <option value="${name}" ${name === selectedRegion ? 'selected' : ''}>${name}</option>
-                        `).join('')}
-                    </select>
-                    <span style="font-size:0.65rem;color:var(--text3);" id="dashboard-region-indicator">📍 ${selectedRegion}</span>
-                    <div style="display:flex;gap:0.2rem;flex-wrap:wrap;margin-left:auto;">
-                        <button class="btn btn-xs btn-gold quick-draw-btn" data-count="1">🃏 1</button>
-                        <button class="btn btn-xs btn-gold quick-draw-btn" data-count="2">🃏 2</button>
-                        <button class="btn btn-xs btn-gold quick-draw-btn" data-count="3">🃏 3</button>
-                        <button class="btn btn-xs btn-primary quick-crown-btn">👑 Crown</button>
                     </div>
                 </div>
                 
@@ -95,20 +73,20 @@ export function render(el) {
                         <span class="qa-label">Kanban</span>
                         <span class="qa-desc">Campaign board</span>
                     </button>
-                    <button class="quick-action-btn" onclick="window.openWhiteboard()">
+                    <button class="quick-action-btn" onclick="window.location.hash='dice'">
+                        <span class="qa-icon">🎲</span>
+                        <span class="qa-label">Dice Roller</span>
+                        <span class="qa-desc">Roll some dice</span>
+                    </button>
+                    <button class="quick-action-btn" onclick="window.location.hash='vtt'">
+                        <span class="qa-icon">🌐</span>
+                        <span class="qa-label">VTT</span>
+                        <span class="qa-desc">Virtual Tabletop</span>
+                    </button>
+                    <button class="quick-action-btn" onclick="window.location.hash='whiteboard'">
                         <span class="qa-icon">✏️</span>
                         <span class="qa-label">Whiteboard</span>
                         <span class="qa-desc">Visual planning</span>
-                    </button>
-                    <button class="quick-action-btn" onclick="window.drawConsequence()">
-                        <span class="qa-icon">🃏</span>
-                        <span class="qa-label">Draw Consequence</span>
-                        <span class="qa-desc">Deck of Consequences</span>
-                    </button>
-                    <button class="quick-action-btn" onclick="window.openCrownSpread()">
-                        <span class="qa-icon">👑</span>
-                        <span class="qa-label">Crown Spread</span>
-                        <span class="qa-desc">Campaign planning</span>
                     </button>
                 </div>
             </div>
@@ -202,7 +180,6 @@ export function render(el) {
     update();
     startAutoRefresh();
     attachEvents();
-    attachQuickActionsEvents();
 }
 
 // ============================================================
@@ -580,184 +557,6 @@ function injectDashboardStyles() {
 }
 
 // ============================================================
-// QUICK ACTIONS EVENTS
-// ============================================================
-
-function attachQuickActionsEvents() {
-    // Region selector
-    const regionSelect = document.getElementById('dashboard-region-select');
-    if (regionSelect) {
-        regionSelect.addEventListener('change', async (e) => {
-            try {
-                await setSelectedRegion(e.target.value);
-                const indicator = document.getElementById('dashboard-region-indicator');
-                if (indicator) indicator.textContent = `📍 ${e.target.value}`;
-                showToast(`Region set to ${e.target.value}`, 'info');
-            } catch (err) {
-                console.warn('Region select error:', err);
-                showToast('Could not change region', 'error');
-            }
-        });
-    }
-    
-    // Register for region changes from other parts of the app
-    registerRegionChange((regionName, regionData) => {
-        const indicator = document.getElementById('dashboard-region-indicator');
-        if (indicator) indicator.textContent = `📍 ${regionName}`;
-        const select = document.getElementById('dashboard-region-select');
-        if (select) select.value = regionName;
-    });
-    
-    // Quick draw buttons - show result in modal
-    document.querySelectorAll('.quick-draw-btn').forEach(btn => {
-        btn.addEventListener('click', async (e) => {
-            const count = parseInt(e.target.dataset.count, 10);
-            try {
-                const result = await quickDraw(count);
-                if (result) {
-                    showDrawResultModal(result);
-                }
-            } catch (err) {
-                console.warn('Draw error:', err);
-                showToast('Could not draw cards', 'error');
-            }
-        });
-    });
-    
-    // Crown spread button - show result in modal
-    const crownBtn = document.querySelector('.quick-crown-btn');
-    if (crownBtn) {
-        crownBtn.addEventListener('click', async () => {
-            try {
-                const result = await quickCrownSpread();
-                if (result) {
-                    showCrownSpreadModal(result);
-                }
-            } catch (err) {
-                console.warn('Crown spread error:', err);
-                showToast('Could not perform Crown Spread', 'error');
-            }
-        });
-    }
-}
-
-// ============================================================
-// MODAL HELPERS
-// ============================================================
-
-function showDrawResultModal(result) {
-    // Remove existing modal if any
-    const existing = document.querySelector('.quick-result-modal');
-    if (existing) existing.remove();
-    
-    const modal = document.createElement('div');
-    modal.className = 'quick-result-modal';
-    modal.style.cssText = `
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0,0,0,0.7);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        z-index: 10000;
-        backdrop-filter: blur(4px);
-        animation: fadeIn 0.2s ease;
-    `;
-    
-    const cardNames = result.cards.map(c => 
-        c.isJoker ? '🃏 Joker' : `${c.rankName} of ${c.suitName}`
-    ).join(', ');
-    
-    modal.innerHTML = `
-        <div style="background:var(--bg2);border-radius:var(--radius);padding:1.5rem;max-width:450px;width:90%;border:1px solid var(--border);box-shadow:0 8px 32px rgba(0,0,0,0.4);max-height:80vh;overflow-y:auto;">
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.8rem;">
-                <h3 style="margin:0;color:var(--gold);">🃏 Draw ${result.type} Card${result.type > 1 ? 's' : ''}</h3>
-                <button onclick="this.closest('.quick-result-modal').remove()" 
-                        style="background:var(--bg3);border:1px solid var(--border);color:var(--text2);font-size:1.2rem;cursor:pointer;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;">
-                    ✕
-                </button>
-            </div>
-            <div style="font-size:0.85rem;color:var(--text2);margin-bottom:0.5rem;">${cardNames}</div>
-            <div style="background:var(--bg3);padding:0.8rem;border-radius:var(--radius);border-left:3px solid var(--gold);font-size:0.9rem;white-space:pre-wrap;color:var(--text);">
-                ${result.synthesis}
-            </div>
-            <button onclick="this.closest('.quick-result-modal').remove()" 
-                    style="margin-top:0.8rem;padding:0.3rem 1.2rem;background:var(--gold);color:#1a1a2e;border:none;border-radius:var(--radius);cursor:pointer;font-weight:600;">
-                Close
-            </button>
-        </div>
-    `;
-    
-    document.body.appendChild(modal);
-    
-    // Click outside to close
-    modal.addEventListener('click', (e) => {
-        if (e.target === modal) modal.remove();
-    });
-}
-
-function showCrownSpreadModal(result) {
-    // Remove existing modal if any
-    const existing = document.querySelector('.quick-result-modal');
-    if (existing) existing.remove();
-    
-    const modal = document.createElement('div');
-    modal.className = 'quick-result-modal';
-    modal.style.cssText = `
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0,0,0,0.7);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        z-index: 10000;
-        backdrop-filter: blur(4px);
-        animation: fadeIn 0.2s ease;
-    `;
-    
-    const positions = ['🌱 Root', '🏔️ Crest', '👑 Crown', '🤝 Left Hand'];
-    const positionMeanings = result.result.positions.map((p, i) => 
-        `<div style="margin-bottom:0.3rem;"><strong>${positions[i]}:</strong> ${p.meaning}</div>`
-    ).join('');
-    
-    modal.innerHTML = `
-        <div style="background:var(--bg2);border-radius:var(--radius);padding:1.5rem;max-width:500px;width:90%;border:1px solid var(--border);box-shadow:0 8px 32px rgba(0,0,0,0.4);max-height:80vh;overflow-y:auto;">
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.8rem;">
-                <h3 style="margin:0;color:var(--gold);">👑 Crown Spread</h3>
-                <button onclick="this.closest('.quick-result-modal').remove()" 
-                        style="background:var(--bg3);border:1px solid var(--border);color:var(--text2);font-size:1.2rem;cursor:pointer;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;">
-                    ✕
-                </button>
-            </div>
-            <div style="background:var(--bg3);padding:0.8rem;border-radius:var(--radius);font-size:0.9rem;color:var(--text);">
-                ${positionMeanings}
-                <div style="margin-top:0.5rem;padding-top:0.5rem;border-top:1px solid var(--border);">
-                    <strong style="color:var(--gold);">🌟 Wildcard:</strong> ${result.result.wildcard}
-                </div>
-                ${result.result.timer ? `<div style="margin-top:0.3rem;font-size:0.8rem;color:var(--text3);">⏱️ Timer: ${result.result.timer.segments} segments (${result.result.timer.card})</div>` : ''}
-            </div>
-            <button onclick="this.closest('.quick-result-modal').remove()" 
-                    style="margin-top:0.8rem;padding:0.3rem 1.2rem;background:var(--gold);color:#1a1a2e;border:none;border-radius:var(--radius);cursor:pointer;font-weight:600;">
-                Close
-            </button>
-        </div>
-    `;
-    
-    document.body.appendChild(modal);
-    
-    // Click outside to close
-    modal.addEventListener('click', (e) => {
-        if (e.target === modal) modal.remove();
-    });
-}
-
-// ============================================================
 // STATS
 // ============================================================
 
@@ -1076,7 +875,7 @@ function startAutoRefresh() {
     }
     refreshInterval = setInterval(() => {
         update();
-    }, 30000); // Refresh every 30 seconds
+    }, 30000);
 }
 
 // ============================================================
@@ -1088,15 +887,12 @@ window.dashboardRefresh = function() {
     showToast('🔄 Dashboard refreshed', 'info');
 };
 
-// ... (keep all the window.open* functions from the original)
-// ... (they are assumed to exist elsewhere)
-
 // ============================================================
 // EVENT LISTENERS
 // ============================================================
 
 export function attachEvents() {
-    // Any additional event listeners can go here
+    // No custom event bindings needed — all buttons use inline onclick
 }
 
 // ============================================================

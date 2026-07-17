@@ -3,7 +3,17 @@
  * Fate's Edge - WebSocket Server
  * Supports both Socket.io and plain WebSocket connections
  * Includes unified presence tracking, GM role conflict resolution, and GM election polling.
+ * 
+ * Configuration: environment variables (with .env support) and optional config file (config.json).
+ * Graceful shutdown on SIGTERM/SIGINT; port conflict handling with retry.
  */
+
+// Load .env if present (optional dependency)
+try {
+    require('dotenv').config();
+} catch (e) {
+    // dotenv not installed – ignore, we'll use system environment variables
+}
 
 const express = require('express');
 const http = require('http');
@@ -14,11 +24,55 @@ const fs = require('fs');
 const path = require('path');
 
 // ============================================================
+// CONFIGURATION LOADING
+// ============================================================
+
+/**
+ * Load configuration from environment variables and an optional config file.
+ * Priority: environment variables override config file values.
+ */
+function loadConfig() {
+    const config = {
+        port: parseInt(process.env.PORT, 10) || 10000,
+        host: process.env.HOST || '0.0.0.0',
+        logLevel: process.env.LOG_LEVEL || 'INFO',
+        corsOrigin: process.env.CORS_ORIGIN || '*',
+        // Additional configurable options
+        maxDeckHistory: parseInt(process.env.MAX_DECK_HISTORY, 10) || 100,
+        healthEndpoint: process.env.HEALTH_ENDPOINT || '/api/health',
+        statsInterval: parseInt(process.env.STATS_INTERVAL, 10) || 30000,
+    };
+
+    // Try to load a config file (config.json) from the same directory
+    const configFilePath = process.env.CONFIG_FILE || path.join(__dirname, 'config.json');
+    if (fs.existsSync(configFilePath)) {
+        try {
+            const fileConfig = JSON.parse(fs.readFileSync(configFilePath, 'utf-8'));
+            // Merge file config (env vars take precedence)
+            for (const key in fileConfig) {
+                if (!(key in process.env)) {
+                    config[key] = fileConfig[key];
+                }
+            }
+            console.log(`[CONFIG] Loaded configuration from ${configFilePath}`);
+        } catch (err) {
+            console.error(`[CONFIG] Failed to parse config file ${configFilePath}: ${err.message}`);
+        }
+    } else {
+        console.log(`[CONFIG] No config file found at ${configFilePath}; using environment/defaults.`);
+    }
+
+    return config;
+}
+
+const config = loadConfig();
+
+// ============================================================
 // EXPRESS APP SETUP
 // ============================================================
 
 const app = express();
-app.use(cors());
+app.use(cors({ origin: config.corsOrigin }));
 app.use(express.json());
 
 // ============================================================
@@ -32,11 +86,9 @@ const LOG_LEVELS = {
     ERROR: 3
 };
 
-const LOG_LEVEL = process.env.LOG_LEVEL || 'INFO';
-
 function log(level, message, data = null) {
     const levelNum = LOG_LEVELS[level] || LOG_LEVELS.INFO;
-    const currentLevel = LOG_LEVELS[LOG_LEVEL] || LOG_LEVELS.INFO;
+    const currentLevel = LOG_LEVELS[config.logLevel] || LOG_LEVELS.INFO;
     
     if (levelNum < currentLevel) return;
     
@@ -503,7 +555,6 @@ function createDefaultWhiteboard() {
 // ============================================================
 
 // Health check with detailed stats
-
 app.get('/healthz', (req, res) => {
     res.status(200).send('OK');
 });
@@ -512,8 +563,7 @@ app.get('/api/healthz', (req, res) => {
     res.status(200).send('OK');
 });
 
-
-app.get('/api/health', (req, res) => {
+app.get(config.healthEndpoint, (req, res) => {
     const roomStats = Array.from(rooms.keys()).map(code => getRoomStats(code)).filter(Boolean);
     res.json({
         status: 'ok',
@@ -638,8 +688,8 @@ app.post('/api/rooms/:code/deck/draw', authenticate, (req, res) => {
                 timestamp: Date.now()
             });
 
-            if (room.deckHistory.length > 100) {
-                room.deckHistory = room.deckHistory.slice(-100);
+            if (room.deckHistory.length > config.maxDeckHistory) {
+                room.deckHistory = room.deckHistory.slice(-config.maxDeckHistory);
             }
 
             room.lastActivity = Date.now();
@@ -968,7 +1018,7 @@ app.get('/api/data/docs', (req, res) => {
         description: "API for managing deck draws and module distribution in Fate's Edge",
         endpoints: {
             health: {
-                get: 'GET /api/health - Server health check with stats'
+                get: `GET ${config.healthEndpoint} - Server health check with stats`
             },
             rooms: {
                 get: 'GET /api/rooms - List all rooms with stats'
@@ -1003,8 +1053,8 @@ app.get('/api/data/docs', (req, res) => {
             'module-list': 'List available modules: {}'
         },
         connections: {
-            'socket.io': 'ws://localhost:10000 (use Socket.io client)',
-            'plain-websocket': 'ws://localhost:10000?room=ROOM_CODE or ws://localhost:10000/campaign/ROOM_CODE (use standard WebSocket)'
+            'socket.io': `ws://localhost:${config.port} (use Socket.io client)`,
+            'plain-websocket': `ws://localhost:${config.port}?room=ROOM_CODE or ws://localhost:${config.port}/campaign/ROOM_CODE (use standard WebSocket)`
         }
     });
 });
@@ -1018,7 +1068,7 @@ const server = http.createServer(app);
 // Initialize Socket.io
 const io = socketIo(server, {
     cors: {
-        origin: "*",
+        origin: config.corsOrigin,
         methods: ["GET", "POST"],
         credentials: true
     },
@@ -1082,7 +1132,6 @@ wss.on('connection', (ws, req) => {
             deckOffset: Math.floor(Math.random() * 1000),
             lastActivity: Date.now(),
             created: Date.now(),
-            // [WHITEBOARD] Add whiteboard state
             whiteboard: createDefaultWhiteboard()
         };
         rooms.set(roomKey, roomState);
@@ -1118,7 +1167,6 @@ wss.on('connection', (ws, req) => {
         room: roomKey,
         deckRemaining: roomState.deck?.length || 0,
         historyCount: roomState.deckHistory?.length || 0,
-        // [WHITEBOARD] Include whiteboard state
         whiteboard: roomState.whiteboard,
         timestamp: Date.now()
     }));
@@ -1178,7 +1226,6 @@ wss.on('connection', (ws, req) => {
                     handlePlainWSDeckHistoryClear(ws, currentRoom);
                     break;
 
-                // [WHITEBOARD] Handle whiteboard events
                 case 'whiteboard-update':
                     handlePlainWSWhiteboardUpdate(ws, currentRoom, data);
                     break;
@@ -1192,7 +1239,6 @@ wss.on('connection', (ws, req) => {
                     handlePlainWSWhiteboardUpdate(ws, currentRoom, data);
                     break;
 
-                // Relay broadcasts for media, voice, chat, and rolls
                 case 'media_recording':
                 case 'voice-offer':
                 case 'voice-answer':
@@ -1229,7 +1275,6 @@ wss.on('connection', (ws, req) => {
         }
     });
 
-    
     ws.on('close', () => {
         logInfo('🔌 Plain WebSocket client disconnected', { 
             clientId, 
@@ -1368,16 +1413,14 @@ async function handlePlainWSDeckDraw(ws, room, data) {
             timestamp: Date.now()
         });
         
-        if (room.deckHistory.length > 100) {
-            room.deckHistory = room.deckHistory.slice(-100);
+        if (room.deckHistory.length > config.maxDeckHistory) {
+            room.deckHistory = room.deckHistory.slice(-config.maxDeckHistory);
         }
         
         room.lastActivity = Date.now();
         
-        // Broadcast to both WebSocket and Socket.io clients
         broadcastToRoom(room.code, 'deck-drawn', result);
         
-        // Send success response to the requesting client
         ws.send(JSON.stringify({
             type: 'deck-drawn-success',
             ...result
@@ -1526,22 +1569,17 @@ function handlePlainWSDeckHistoryClear(ws, room) {
     }
 }
 
-// [WHITEBOARD] Plain WS handlers for whiteboard
 function handlePlainWSWhiteboardUpdate(ws, room, data) {
     try {
-        // Extract whiteboard data - it may be in data.whiteboard or directly in data.state
         let newWhiteboard;
         if (data.whiteboard) {
             newWhiteboard = data.whiteboard;
         } else if (data.state) {
-            // For sync-state, the client may send { state: { ... } }
             newWhiteboard = data.state;
         } else {
-            // Assume the whole data is the whiteboard object
             newWhiteboard = data;
         }
 
-        // Ensure we have all required fields
         room.whiteboard = {
             drawings: newWhiteboard.drawings || [],
             notes: newWhiteboard.notes || [],
@@ -1552,7 +1590,6 @@ function handlePlainWSWhiteboardUpdate(ws, room, data) {
 
         room.lastActivity = Date.now();
 
-        // Broadcast to all clients in the room (including sender)
         broadcastToRoom(room.code, 'whiteboard-update', {
             whiteboard: room.whiteboard,
             timestamp: Date.now(),
@@ -1573,7 +1610,6 @@ function handlePlainWSWhiteboardUpdate(ws, room, data) {
 
 function handlePlainWSSyncRequest(ws, room, data) {
     try {
-        // Respond with full sync-state
         ws.send(JSON.stringify({
             type: 'sync-state',
             state: room.whiteboard,
@@ -1665,7 +1701,6 @@ io.on('connection', (socket) => {
                 deckOffset: Math.floor(Math.random() * 1000),
                 lastActivity: Date.now(),
                 created: Date.now(),
-                // [WHITEBOARD] Add whiteboard state
                 whiteboard: createDefaultWhiteboard()
             };
             rooms.set(roomKey, room);
@@ -1702,7 +1737,6 @@ io.on('connection', (socket) => {
             deckRemaining: room.deck.length,
             deckHistory: room.deckHistory.slice(-20),
             totalClients: room.clients.size,
-            // [WHITEBOARD] Include whiteboard
             whiteboard: room.whiteboard
         };
         
@@ -1813,13 +1847,12 @@ io.on('connection', (socket) => {
                 timestamp: Date.now()
             });
 
-            if (room.deckHistory.length > 100) {
-                room.deckHistory = room.deckHistory.slice(-100);
+            if (room.deckHistory.length > config.maxDeckHistory) {
+                room.deckHistory = room.deckHistory.slice(-config.maxDeckHistory);
             }
 
             room.lastActivity = Date.now();
             
-            // Broadcast to all clients in room (both Socket.io and plain WS)
             broadcastToRoom(socket.room, 'deck-drawn', result);
             
             logInfo('Cards drawn via Socket.io', { 
@@ -2041,7 +2074,6 @@ io.on('connection', (socket) => {
                 }
             }
 
-            // If in a room, broadcast to room
             if (socket.room) {
                 broadcastToRoom(socket.room, 'module-push', {
                     source: socket.id,
@@ -2154,7 +2186,6 @@ io.on('connection', (socket) => {
         }
 
         try {
-            // Extract whiteboard data
             let newWhiteboard;
             if (data.whiteboard) {
                 newWhiteboard = data.whiteboard;
@@ -2164,7 +2195,6 @@ io.on('connection', (socket) => {
                 newWhiteboard = data;
             }
 
-            // Update room state
             room.whiteboard = {
                 drawings: newWhiteboard.drawings || [],
                 notes: newWhiteboard.notes || [],
@@ -2175,7 +2205,6 @@ io.on('connection', (socket) => {
 
             room.lastActivity = Date.now();
 
-            // Broadcast to all clients in the room (including sender)
             broadcastToRoom(socket.room, 'whiteboard-update', {
                 whiteboard: room.whiteboard,
                 timestamp: Date.now(),
@@ -2194,7 +2223,7 @@ io.on('connection', (socket) => {
                 room: socket.room, 
                 error: error.message 
             });
-            socket.emit('error', { message: 'Failed -to update whiteboard: ' + error.message });
+            socket.emit('error', { message: 'Failed to update whiteboard: ' + error.message });
         }
     });
 
@@ -2210,7 +2239,6 @@ io.on('connection', (socket) => {
             return;
         }
 
-        // Respond with full sync-state
         socket.emit('sync-state', {
             state: room.whiteboard,
             timestamp: Date.now()
@@ -2230,7 +2258,6 @@ io.on('connection', (socket) => {
     // ============================================================
     // [NEW] RELAY HANDLERS (Media, Voice, Chat, Rolls)
     // ============================================================
-    // Catch-all relay for client-to-client broadcasts
     const relayEvents = [
         'media_recording', 
         'voice-offer', 
@@ -2253,7 +2280,6 @@ io.on('connection', (socket) => {
                 return;
             }
             
-            // Broadcast to everyone in the room (both Socket.io and WS clients)
             broadcastToRoom(socket.room, eventName, {
                 ...data,
                 clientId: socket.id,
@@ -2297,7 +2323,6 @@ io.on('connection', (socket) => {
                     remaining: remainingClients
                 });
 
-                // Clean up empty rooms
                 if (remainingClients === 0) {
                     rooms.delete(socket.room);
                     logInfo('🗑️ Room deleted (empty)', { room: socket.room });
@@ -2313,26 +2338,97 @@ io.on('connection', (socket) => {
 });
 
 // ============================================================
-// START SERVER
+// GRACEFUL SHUTDOWN HANDLING
 // ============================================================
 
-const PORT = process.env.PORT || 10000;
-server.listen(PORT, '0.0.0.0', () => {
-    console.log('\n' + '='.repeat(70));
-    console.log(`🎯 Fate's Edge WebSocket Server v1.0.0`);
-    console.log('='.repeat(70));
-    console.log(`🚀 Server running on port ${PORT}`);
-    console.log(`📊 Health: http://localhost:${PORT}/api/health`);
-    console.log(`📚 API Docs: http://localhost:${PORT}/api/data/docs`);
-    console.log(`🔌 WebSocket (plain): ws://localhost:${PORT}?room=ROOM_CODE or /campaign/ROOM_CODE`);
-    console.log(`🔌 WebSocket (Socket.io): http://localhost:${PORT}`);
-    console.log(`📋 Rooms: ${rooms.size}`);
-    console.log(`📊 Log Level: ${LOG_LEVEL}`);
-    console.log('='.repeat(70));
-    console.log('✅ Server ready for connections\n');
-});
+let shuttingDown = false;
 
-// Log stats every 30 seconds
+function gracefulShutdown(signal) {
+    if (shuttingDown) return;
+    shuttingDown = true;
+    
+    logInfo(`🛑 Received ${signal}. Shutting down gracefully...`);
+    console.log(`\n🛑 Shutting down Fate's Edge server...`);
+    
+    // Close the HTTP server first, which will stop accepting new connections
+    server.close((err) => {
+        if (err) {
+            logError('Error closing HTTP server', { error: err.message });
+            process.exit(1);
+        }
+        logInfo('HTTP server closed.');
+        
+        // Close Socket.io server
+        io.close(() => {
+            logInfo('Socket.io server closed.');
+            
+            // Close plain WebSocket server
+            wss.close(() => {
+                logInfo('WebSocket server closed.');
+                logInfo('✅ Graceful shutdown complete.');
+                process.exit(0);
+            });
+        });
+    });
+    
+    // Force shutdown after 10 seconds if not completed
+    setTimeout(() => {
+        logError('Forced shutdown after timeout.');
+        process.exit(1);
+    }, 10000).unref();
+}
+
+process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
+process.on('SIGINT', () => gracefulShutdown('SIGINT'));
+
+// ============================================================
+// START SERVER WITH PORT CONFLICT RETRY
+// ============================================================
+
+const MAX_PORT_RETRIES = 5;
+let currentPort = config.port;
+
+function startServer(port, retriesLeft) {
+    server.listen(port, config.host, () => {
+        console.log('\n' + '='.repeat(70));
+        console.log(`🎯 Fate's Edge WebSocket Server v1.0.0`);
+        console.log('='.repeat(70));
+        console.log(`🚀 Server running on ${config.host}:${port}`);
+        console.log(`📊 Health: http://localhost:${port}${config.healthEndpoint}`);
+        console.log(`📚 API Docs: http://localhost:${port}/api/data/docs`);
+        console.log(`🔌 WebSocket (plain): ws://localhost:${port}?room=ROOM_CODE or /campaign/ROOM_CODE`);
+        console.log(`🔌 WebSocket (Socket.io): http://localhost:${port}`);
+        console.log(`📋 Rooms: ${rooms.size}`);
+        console.log(`📊 Log Level: ${config.logLevel}`);
+        console.log('='.repeat(70));
+        console.log('✅ Server ready for connections\n');
+    });
+
+    server.on('error', (err) => {
+        if (err.code === 'EADDRINUSE') {
+            if (retriesLeft > 0) {
+                logWarn(`Port ${port} is in use. Trying next port (${port + 1})...`);
+                currentPort = port + 1;
+                server.close(); // Close the server (it wasn't listening anyway, but just in case)
+                startServer(currentPort, retriesLeft - 1);
+            } else {
+                logError(`Port ${port} is in use and no retries left. Exiting.`);
+                console.error(`❌ Could not start server on any port after ${MAX_PORT_RETRIES} attempts.`);
+                process.exit(1);
+            }
+        } else {
+            logError('Server error', { error: err.message });
+            process.exit(1);
+        }
+    });
+}
+
+startServer(currentPort, MAX_PORT_RETRIES);
+
+// ============================================================
+// STATS LOGGING
+// ============================================================
+
 setInterval(() => {
     const totalClients = socketStats.socketIOConnections + socketStats.wsConnections;
     if (totalClients > 0 || rooms.size > 0) {
@@ -2344,7 +2440,7 @@ setInterval(() => {
             uptime: Math.floor((Date.now() - socketStats.startTime) / 1000) + 's'
         });
     }
-}, 30000);
+}, config.statsInterval);
 
 // ============================================================
 // EXPORTS

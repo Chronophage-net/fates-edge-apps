@@ -7,13 +7,11 @@
 
 import { logRecordingEvent } from '../../core/media.js';
 import { showToast } from '../../components/Toast.js';
-import { getState, addTimer } from '../../core/state.js';
+import { addTimer } from '../../core/state.js';
 import { 
     getSelectedRegion, 
     getRegionNames, 
-    setSelectedRegion,
-    getRegionData as getDeckRegionData,
-    registerRegionChange
+    setSelectedRegion
 } from '../decks/index.js';
 
 // ============================================================
@@ -338,11 +336,24 @@ initTravelSeed();
 // ============================================================
 
 function generateCard(deck) {
-    if (deck.length === 0) {
-        deck = buildDeck();
+    // Ensure we have a deck with cards
+    if (!deck || deck.length === 0) {
+        console.warn('[generateCard] Deck is empty, building a fresh one.');
+        // Rebuild the caller's deck by mutating it (so caller sees the change)
+        const fresh = buildDeck();
+        deck.length = 0;
+        deck.push(...fresh);
     }
+
     const idx = getTravelRandomInt(0, deck.length);
     const card = deck.splice(idx, 1)[0];
+
+    if (!card) {
+        console.error('[generateCard] Failed to draw a card. deck.length:', deck.length, 'idx:', idx);
+        // Fallback to a safe card (this should rarely happen)
+        return { suit: 'spades', rank: 'A' };
+    }
+
     return card;
 }
 
@@ -634,7 +645,6 @@ function attachEvents() {
         copyBtn.addEventListener('click', handleCopy);
     }
     
-    // NEW: Export & Import
     const exportBtn = document.getElementById('travel-export-btn');
     if (exportBtn) {
         exportBtn.addEventListener('click', handleExport);
@@ -735,44 +745,21 @@ function handleAddTimer() {
                 segments: segments,
                 current: 0
             });
-            showToast(`⏱️ Creating timer: ${timerName} (${segments} segments)`, 'success');
-            if (typeof logRecordingEvent === 'function') {
-                logRecordingEvent('travel_timer_created', `Timer created: ${timerName} (${segments} segments)`);
-            }
+            showToast(`⏱️ Opening Timer Editor...`, 'info');
         } else {
-            const state = getState();
-            if (!state.timers) state.timers = [];
-            const newTimer = {
-                id: 'travel-timer-' + Date.now() + '-' + Math.random().toString(36).substr(2, 4),
-                name: timerName,
-                segments: segments,
-                current: 0
-            };
-            state.timers.push(newTimer);
-            const event = new CustomEvent('timer-added', { detail: { timer: newTimer } });
-            document.dispatchEvent(event);
-            showToast(`⏱️ Timer created: ${newTimer.name} (${segments} segments)`, 'success');
-            if (typeof logRecordingEvent === 'function') {
-                logRecordingEvent('travel_timer_created', `Timer created: ${newTimer.name} (${segments} segments)`);
-            }
+            const createdTimer = addTimer({ name: timerName, segments, current: 0 });
+            document.dispatchEvent(new CustomEvent('timer-added', { detail: { timer: createdTimer } }));
+            showToast(`⏱️ Timer created: ${createdTimer.name} (${segments} segments)`, 'success');
         }
     }).catch(() => {
-        const state = getState();
-        if (!state.timers) state.timers = [];
-        const newTimer = {
-            id: 'travel-timer-' + Date.now() + '-' + Math.random().toString(36).substr(2, 4),
-            name: timerName,
-            segments: segments,
-            current: 0
-        };
-        state.timers.push(newTimer);
-        const event = new CustomEvent('timer-added', { detail: { timer: newTimer } });
-        document.dispatchEvent(event);
-        showToast(`⏱️ Timer created: ${newTimer.name} (${segments} segments)`, 'success');
-        if (typeof logRecordingEvent === 'function') {
-            logRecordingEvent('travel_timer_created', `Timer created: ${newTimer.name} (${segments} segments)`);
-        }
+        const createdTimer = addTimer({ name: timerName, segments, current: 0 });
+        document.dispatchEvent(new CustomEvent('timer-added', { detail: { timer: createdTimer } }));
+        showToast(`⏱️ Timer created: ${createdTimer.name} (${segments} segments)`, 'success');
     });
+
+    if (typeof logRecordingEvent === 'function') {
+        logRecordingEvent('travel_timer_created', `Timer created: ${timerName} (${segments} segments)`);
+    }
 }
 
 function handleCopy() {
@@ -825,7 +812,6 @@ function handleExport() {
 }
 
 function handleImport() {
-    // Create a hidden file input
     const input = document.createElement('input');
     input.type = 'file';
     input.accept = '.json';
@@ -844,7 +830,6 @@ function handleImport() {
             try {
                 const data = JSON.parse(event.target.result);
                 
-                // Validate required fields
                 const required = ['startRegion', 'destRegion', 'legs', 'totalSegments', 'numLegs', 'timestamp'];
                 const missing = required.filter(field => !(field in data));
                 if (missing.length > 0) {
@@ -853,14 +838,12 @@ function handleImport() {
                     return;
                 }
                 
-                // Validate legs array
                 if (!Array.isArray(data.legs) || data.legs.length === 0) {
                     showToast('Invalid journey file: legs must be a non-empty array.', 'error');
                     document.body.removeChild(input);
                     return;
                 }
                 
-                // Check each leg has required fields
                 const legRequired = ['place', 'actor', 'pressure', 'leverage', 'timerSegments', 'timerCard', 'cardDetails'];
                 for (let i = 0; i < data.legs.length; i++) {
                     const leg = data.legs[i];
@@ -872,10 +855,8 @@ function handleImport() {
                     }
                 }
                 
-                // Ensure aceEffects exists
                 if (!data.aceEffects) data.aceEffects = [];
                 
-                // Set as current journey
                 currentJourney = data;
                 displayJourney(data);
                 addToHistory(data);
@@ -988,7 +969,10 @@ function renderHistory() {
         el.innerHTML = '<span class="text-muted">No journeys planned yet.</span>';
         return;
     }
-    el.innerHTML = journeyHistory.slice().reverse().map(j => {
+    
+    // Fix: Calculate the real index using the map callback to avoid O(n²) lookups and broken references
+    el.innerHTML = journeyHistory.slice().reverse().map((j, revIdx) => {
+        const realIdx = journeyHistory.length - 1 - revIdx;
         const aceCount = j.aceEffects ? j.aceEffects.length : 0;
         return `
         <div style="padding:0.3rem 0;border-bottom:1px solid var(--border);display:flex;flex-wrap:wrap;gap:0.3rem;align-items:center;">
@@ -996,7 +980,7 @@ function renderHistory() {
             <span style="font-weight:500;">${j.startRegion} → ${j.destRegion}</span>
             <span style="font-size:0.8rem;color:var(--text2);">(${j.numLegs} legs, ${j.totalSegments} segments)</span>
             ${aceCount > 0 ? `<span style="color:var(--gold);font-size:0.8rem;">♠️ ${aceCount} Ace</span>` : ''}
-            <button class="btn btn-xs btn-ghost" data-journey-index="${journeyHistory.length - 1 - journeyHistory.slice().reverse().indexOf(j)}" style="margin-left:auto;">👁️ View</button>
+            <button class="btn btn-xs btn-ghost" data-journey-index="${realIdx}" style="margin-left:auto;">👁️ View</button>
         </div>
     `}).join('');
     

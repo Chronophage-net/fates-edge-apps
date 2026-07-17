@@ -1,6 +1,7 @@
 /**
  * Character roller - Quick rolls for characters
- * Supports characters, NPCs, and custom roll configurations
+ * Now with region-aware naming for characters and NPCs
+ * Integrates with decks module for region data
  */
 
 import { getCharacter, addRoll, saveState, getState } from '../../core/state.js';
@@ -17,8 +18,157 @@ const DEFAULT_POSITION = 'controlled';
 const DEFAULT_BOONS = 0;
 const MAX_ROLL_RESULTS = 100;
 
+// Fallback region names if decks module isn't available
+const FALLBACK_REGIONS = [
+    'Acasia', 'Ecktoria', 'Vhasia', 'Viterra', 'Ykrul', 
+    'Silkstrand', 'Mistlands', 'The Pyrgos', 'Ubral', 
+    'Valewood', 'Aelinnel', 'Aelaerem', 'Zakov'
+];
+
+// Region-specific name suffixes and prefixes for character generation
+const REGION_NAME_STYLES = {
+    'acasia': { 
+        prefixes: ['Al', 'Ar', 'Bel', 'Cal', 'Dal', 'El', 'Gal', 'Hal', 'Ith', 'Kal', 'Lor', 'Mer', 'Nor', 'Or', 'Pal', 'Quin', 'Ral', 'Sel', 'Thal', 'Val'],
+        suffixes: ['ain', 'an', 'ar', 'as', 'el', 'en', 'er', 'eth', 'ian', 'iel', 'is', 'ith', 'on', 'or', 'os', 'us', 'yn', 'ys']
+    },
+    'ecktoria': {
+        prefixes: ['Ae', 'Ca', 'Ce', 'Ci', 'Co', 'Cu', 'De', 'Di', 'Do', 'Ec', 'Ed', 'Fa', 'Fe', 'Fi', 'Fo', 'Ga', 'Ge', 'Gi', 'Go', 'Ha'],
+        suffixes: ['ia', 'ius', 'ix', 'on', 'or', 'um', 'us', 'yn']
+    },
+    'vhasia': {
+        prefixes: ['An', 'Ar', 'Da', 'Eo', 'Er', 'Es', 'Eth', 'Ev', 'Fa', 'Fi', 'Ga', 'Ge', 'Gi', 'Go', 'Gra', 'Ha', 'He', 'Ho', 'Hy', 'Ia'],
+        suffixes: ['el', 'en', 'es', 'eth', 'ian', 'iel', 'il', 'is', 'ith', 'ix', 'on', 'or', 'os', 'us', 'yn']
+    },
+    'viterra': {
+        prefixes: ['Al', 'An', 'Ar', 'Ber', 'Car', 'Cor', 'Dar', 'Der', 'El', 'Er', 'Far', 'Fer', 'Gar', 'Ger', 'Har', 'Her', 'Kar', 'Ker', 'Lar', 'Ler'],
+        suffixes: ['ain', 'an', 'en', 'er', 'es', 'eth', 'ian', 'iel', 'is', 'ith', 'on', 'or', 'os', 'us', 'yn']
+    },
+    'ykrul': {
+        prefixes: ['Ba', 'Bo', 'Bu', 'Da', 'Do', 'Du', 'Ga', 'Go', 'Gu', 'Ha', 'Ho', 'Hu', 'Ka', 'Ko', 'Ku', 'Ma', 'Mo', 'Mu', 'Na', 'No'],
+        suffixes: ['ak', 'al', 'an', 'ar', 'ek', 'el', 'en', 'er', 'ik', 'il', 'in', 'ir', 'ok', 'ol', 'on', 'or', 'uk', 'ul', 'un', 'ur']
+    },
+    'silkstrand': {
+        prefixes: ['Ai', 'Ay', 'Ca', 'Ce', 'Ci', 'Da', 'De', 'Di', 'Ea', 'Ei', 'Fa', 'Fi', 'Ga', 'Ge', 'Gi', 'Ha', 'He', 'Hi', 'Ia', 'Ka'],
+        suffixes: ['a', 'e', 'i', 'o', 'u', 'ae', 'ai', 'ea', 'ei', 'ia', 'ie', 'oe', 'ua', 'ue', 'ui']
+    },
+    'mistlands': {
+        prefixes: ['Ao', 'Bra', 'Bro', 'Dro', 'Eo', 'Era', 'Eri', 'Fen', 'Fro', 'Gao', 'Gra', 'Gri', 'Hra', 'Hro', 'Iro', 'Iva', 'Kra', 'Kro', 'Lor', 'Lra'],
+        suffixes: ['d', 'el', 'en', 'er', 'eth', 'ian', 'iel', 'is', 'ith', 'on', 'or', 'os', 'us', 'yn']
+    },
+    'thepyrgos': {
+        prefixes: ['An', 'Ar', 'Ath', 'Cos', 'Cri', 'Dem', 'Di', 'Dio', 'Ere', 'Eri', 'Gan', 'Geo', 'Hep', 'Her', 'Ion', 'Kos', 'Ly', 'Mys', 'Nep', 'Pyr'],
+        suffixes: ['eon', 'es', 'ian', 'iel', 'is', 'ith', 'on', 'or', 'os', 'us', 'yn']
+    },
+    'ubral': {
+        prefixes: ['Ae', 'An', 'Ar', 'As', 'Aur', 'Eo', 'Er', 'Es', 'Gra', 'Gri', 'Hae', 'Hal', 'Har', 'Hau', 'Io', 'Ion', 'Ir', 'Is', 'Kau', 'Kri'],
+        suffixes: ['ael', 'al', 'an', 'ar', 'el', 'en', 'er', 'eth', 'ian', 'iel', 'is', 'ith', 'on', 'or', 'os', 'us', 'yn']
+    },
+    'valewood': {
+        prefixes: ['Al', 'An', 'Ar', 'Bal', 'Bel', 'Bry', 'Cal', 'Cam', 'Dar', 'Ed', 'El', 'Em', 'Ery', 'Fen', 'Gael', 'Glen', 'Haf', 'Hal', 'Hed', 'Hel'],
+        suffixes: ['an', 'ar', 'el', 'en', 'er', 'eth', 'ian', 'iel', 'is', 'ith', 'on', 'or', 'os', 'us', 'yn', 'ys']
+    },
+    'aelinnel': {
+        prefixes: ['Ae', 'Aer', 'Al', 'An', 'Ar', 'Eo', 'Er', 'Es', 'Ev', 'Fa', 'Fe', 'Fi', 'Fo', 'Ge', 'Gi', 'Go', 'Ha', 'He', 'Hi', 'Ho'],
+        suffixes: ['ael', 'ain', 'an', 'ar', 'el', 'en', 'er', 'eth', 'ian', 'iel', 'is', 'ith', 'on', 'or', 'os', 'us', 'yn']
+    },
+    'aelaerem': {
+        prefixes: ['Ae', 'Aer', 'Al', 'An', 'Ar', 'Aur', 'Eo', 'Er', 'Es', 'Ev', 'Fa', 'Fe', 'Fi', 'Fo', 'Ge', 'Gi', 'Go', 'Ha', 'He', 'Hi'],
+        suffixes: ['ael', 'ain', 'an', 'ar', 'el', 'en', 'er', 'eth', 'ian', 'iel', 'is', 'ith', 'on', 'or', 'os', 'us', 'yn']
+    },
+    'zakov': {
+        prefixes: ['Al', 'An', 'Ar', 'As', 'Av', 'Az', 'Bel', 'Ber', 'Ce', 'Cor', 'Dal', 'Dar', 'Eo', 'Er', 'Es', 'Ev', 'Ez', 'Fer', 'Ga', 'Gar'],
+        suffixes: ['ain', 'an', 'ar', 'el', 'en', 'er', 'eth', 'ian', 'iel', 'is', 'ith', 'on', 'or', 'os', 'us', 'yn']
+    }
+};
+
+// ============================================================
+// STATE
+// ============================================================
+
+let container = null;
+let selectedRegion = null;
+let regionNames = [];
+let isReady = false;
+
 // Keyboard shortcut handler reference for cleanup
 let keyboardShortcutHandler = null;
+
+// ============================================================
+// REGION MANAGEMENT
+// ============================================================
+
+/**
+ * Load region data from the decks module
+ */
+async function loadRegions() {
+    try {
+        const decksModule = await import('../decks/index.js');
+        if (decksModule.getRegionNames && decksModule.getSelectedRegion) {
+            const names = decksModule.getRegionNames();
+            if (names && names.length > 0) {
+                regionNames = names;
+                selectedRegion = decksModule.getSelectedRegion() || names[0];
+                console.log('[CharacterRoller] Loaded regions from decks module:', regionNames);
+                return true;
+            }
+        }
+    } catch (e) {
+        console.warn('[CharacterRoller] Could not load decks module:', e);
+    }
+    
+    // Fallback: use hardcoded list
+    regionNames = FALLBACK_REGIONS;
+    selectedRegion = regionNames[0];
+    console.log('[CharacterRoller] Using fallback regions:', regionNames);
+    return true;
+}
+
+/**
+ * Get a random region name
+ */
+function getRandomRegion() {
+    if (regionNames.length === 0) return 'Acasia';
+    return regionNames[Math.floor(Math.random() * regionNames.length)];
+}
+
+/**
+ * Generate a region-appropriate name
+ */
+function generateRegionName(region = null) {
+    const regionKey = (region || selectedRegion || getRandomRegion()).toLowerCase();
+    const style = REGION_NAME_STYLES[regionKey] || REGION_NAME_STYLES['acasia'];
+    
+    const prefix = style.prefixes[Math.floor(Math.random() * style.prefixes.length)];
+    const suffix = style.suffixes[Math.floor(Math.random() * style.suffixes.length)];
+    
+    return prefix + suffix;
+}
+
+/**
+ * Get a list of generated names for a region
+ */
+function generateRegionNames(count = 10, region = null) {
+    const names = [];
+    const used = new Set();
+    let attempts = 0;
+    const maxAttempts = count * 3;
+    
+    while (names.length < count && attempts < maxAttempts) {
+        attempts++;
+        const name = generateRegionName(region);
+        if (!used.has(name)) {
+            used.add(name);
+            names.push(name);
+        }
+    }
+    
+    // If we couldn't generate enough unique names, add generic ones
+    while (names.length < count) {
+        names.push(`Character_${names.length + 1}`);
+    }
+    
+    return names;
+}
 
 // ============================================================
 // CHARACTER ROLLS
@@ -287,6 +437,214 @@ export function rollForCharacters(ids, options = {}) {
 }
 
 // ============================================================
+// REGION-AWARE RENDER
+// ============================================================
+
+export async function renderRollerUI(el) {
+    container = el;
+    await loadRegions();
+    isReady = true;
+    
+    container.innerHTML = `
+        <div class="roller-container">
+            <div class="panel">
+                <h3 style="margin-top:0;">🎲 Quick Roll</h3>
+                <div style="display:flex;flex-wrap:wrap;gap:0.8rem;align-items:end;">
+                    <div class="field" style="flex:1;min-width:120px;">
+                        <label>Region</label>
+                        <select id="roller-region-select">
+                            ${regionNames.map(name => 
+                                `<option value="${name}" ${name === selectedRegion ? 'selected' : ''}>${name}</option>`
+                            ).join('')}
+                        </select>
+                    </div>
+                    <div class="field" style="flex:1;min-width:100px;">
+                        <label>Attribute (1-5)</label>
+                        <input type="number" id="roller-attr" value="3" min="1" max="5" />
+                    </div>
+                    <div class="field" style="flex:1;min-width:100px;">
+                        <label>Skill (0-5)</label>
+                        <input type="number" id="roller-skill" value="0" min="0" max="5" />
+                    </div>
+                    <div class="field" style="flex:1;min-width:100px;">
+                        <label>DV</label>
+                        <input type="number" id="roller-dv" value="3" min="0" max="10" />
+                    </div>
+                    <div class="field" style="flex:0 0 140px;">
+                        <label>Position</label>
+                        <select id="roller-position">
+                            <option value="dominant">Dominant</option>
+                            <option value="controlled" selected>Controlled</option>
+                            <option value="desperate">Desperate</option>
+                        </select>
+                    </div>
+                    <div class="field" style="flex:0 0 100px;">
+                        <label>Boons</label>
+                        <input type="number" id="roller-boons" value="0" min="0" max="5" />
+                    </div>
+                </div>
+                <div style="display:flex;gap:0.5rem;margin-top:0.8rem;flex-wrap:wrap;">
+                    <button class="btn btn-gold" id="roller-roll-btn">🎲 Roll</button>
+                    <button class="btn btn-secondary" id="roller-generate-npc-btn">👤 Generate NPC Name</button>
+                    <button class="btn btn-secondary" id="roller-generate-names-btn">📋 Generate Names</button>
+                </div>
+            </div>
+            
+            <div class="panel" id="roller-result-panel" style="display:none;">
+                <h3 id="roller-result-title">Roll Result</h3>
+                <div id="roller-result-content"></div>
+            </div>
+            
+            <div class="panel" id="roller-name-panel" style="display:none;">
+                <h3>📋 Region Names (${selectedRegion || 'Acasia'})</h3>
+                <div id="roller-name-list" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:0.3rem;max-height:200px;overflow-y:auto;"></div>
+            </div>
+        </div>
+    `;
+    
+    attachRollerEvents();
+}
+
+// ============================================================
+// ROLLER EVENTS
+// ============================================================
+
+function attachRollerEvents() {
+    // Region selector change
+    const regionSelect = document.getElementById('roller-region-select');
+    if (regionSelect) {
+        regionSelect.addEventListener('change', () => {
+            selectedRegion = regionSelect.value;
+            // Update decks module if available
+            import('../decks/index.js').then(module => {
+                if (module.setSelectedRegion) {
+                    module.setSelectedRegion(selectedRegion);
+                }
+            }).catch(() => {});
+        });
+    }
+    
+    // Roll button
+    const rollBtn = document.getElementById('roller-roll-btn');
+    if (rollBtn) {
+        rollBtn.addEventListener('click', handleRollerRoll);
+    }
+    
+    // Generate NPC name
+    const genNpcBtn = document.getElementById('roller-generate-npc-btn');
+    if (genNpcBtn) {
+        genNpcBtn.addEventListener('click', handleGenerateNPC);
+    }
+    
+    // Generate names list
+    const genNamesBtn = document.getElementById('roller-generate-names-btn');
+    if (genNamesBtn) {
+        genNamesBtn.addEventListener('click', handleGenerateNames);
+    }
+}
+
+function handleRollerRoll() {
+    const attr = parseInt(document.getElementById('roller-attr')?.value || '3', 10);
+    const skill = parseInt(document.getElementById('roller-skill')?.value || '0', 10);
+    const dv = parseInt(document.getElementById('roller-dv')?.value || '3', 10);
+    const position = document.getElementById('roller-position')?.value || 'controlled';
+    const boons = parseInt(document.getElementById('roller-boons')?.value || '0', 10);
+    
+    const note = `Quick roll (${selectedRegion || 'Acasia'})`;
+    
+    const result = customRoll({ attr, skill, dv, position, boons, note, silent: false });
+    
+    if (result) {
+        displayRollResult(result);
+    }
+}
+
+function handleGenerateNPC() {
+    const region = selectedRegion || getRandomRegion();
+    const name = generateRegionName(region);
+    showToast(`👤 Generated NPC: ${name} (${region})`, 'success');
+    
+    // Display in result panel
+    const panel = document.getElementById('roller-result-panel');
+    const content = document.getElementById('roller-result-content');
+    const title = document.getElementById('roller-result-title');
+    
+    if (panel && content && title) {
+        panel.style.display = 'block';
+        title.textContent = '👤 Generated NPC';
+        content.innerHTML = `
+            <div style="background:var(--bg3);padding:0.8rem 1rem;border-radius:var(--radius);border-left:4px solid var(--gold);">
+                <div style="font-size:1.4rem;font-weight:600;color:var(--gold);">${escHtml(name)}</div>
+                <div style="color:var(--text2);font-size:0.9rem;">Region: ${escHtml(region)}</div>
+                <div style="color:var(--text3);font-size:0.8rem;margin-top:0.3rem;">Click "Generate Names" to see more options.</div>
+            </div>
+        `;
+    }
+}
+
+function handleGenerateNames() {
+    const region = selectedRegion || getRandomRegion();
+    const names = generateRegionNames(16, region);
+    
+    const panel = document.getElementById('roller-name-panel');
+    const list = document.getElementById('roller-name-list');
+    
+    if (panel && list) {
+        panel.style.display = 'block';
+        list.innerHTML = names.map(name => `
+            <div style="background:var(--bg2);padding:0.3rem 0.6rem;border-radius:4px;font-size:0.9rem;text-align:center;border:1px solid var(--border);">
+                ${escHtml(name)}
+            </div>
+        `).join('');
+        
+        // Update panel title
+        const title = panel.querySelector('h3');
+        if (title) {
+            title.textContent = `📋 Region Names (${region})`;
+        }
+    }
+}
+
+function displayRollResult(result) {
+    const panel = document.getElementById('roller-result-panel');
+    const content = document.getElementById('roller-result-content');
+    const title = document.getElementById('roller-result-title');
+    
+    if (!panel || !content || !title) return;
+    
+    panel.style.display = 'block';
+    title.textContent = '🎲 Roll Result';
+    
+    const outcomeEmoji = {
+        'critical': '💥',
+        'success': '✅',
+        'partial': '⚠️',
+        'failure': '❌',
+        'desperate': '🔥'
+    }[result.outcome] || '🎲';
+    
+    content.innerHTML = `
+        <div style="background:var(--bg3);padding:0.8rem 1rem;border-radius:var(--radius);border-left:4px solid var(--gold);">
+            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;">
+                <div>
+                    <span style="font-size:1.2rem;">${outcomeEmoji}</span>
+                    <strong style="font-size:1.1rem;color:var(--gold);">${result.outcome.toUpperCase()}</strong>
+                </div>
+                <div style="font-size:0.9rem;color:var(--text2);">
+                    ${result.dice ? result.dice.join(' ') : ''}
+                </div>
+            </div>
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(80px,1fr));gap:0.3rem;margin-top:0.5rem;font-size:0.85rem;">
+                <div><span class="text-muted">Successes:</span> ${result.successes || 0}</div>
+                <div><span class="text-muted">Story Beats:</span> ${result.storyBeats || 0}</div>
+                ${result.reRolls ? `<div><span class="text-muted">Re-rolls:</span> ${result.reRolls}</div>` : ''}
+                ${result.note ? `<div style="grid-column:1/-1;"><span class="text-muted">Note:</span> ${escHtml(result.note)}</div>` : ''}
+            </div>
+        </div>
+    `;
+}
+
+// ============================================================
 // HELPER FUNCTIONS
 // ============================================================
 
@@ -294,10 +652,10 @@ export function rollForCharacters(ids, options = {}) {
  * Build a chat message from roll results
  */
 function buildRollMessage(name, result, attr, skill, dv, position) {
-    const diceStr = result.dice.join(' ');
+    const diceStr = result.dice ? result.dice.join(' ') : '[]';
     let msg = `[${result.outcome}] ${name}: ${attr}+${skill} vs DV${dv} (${position}) → `;
     msg += diceStr;
-    msg += ` | S:${result.successes} SB:${result.storyBeats || 0}`;
+    msg += ` | S:${result.successes || 0} SB:${result.storyBeats || 0}`;
     
     if (result.reRolls > 0) {
         msg += ` | Re-rolls: ${result.reRolledDice?.map(r => `${r.old}→${r.new}`).join(', ') || result.reRolls}`;
@@ -489,10 +847,18 @@ export function cleanupKeyboardShortcuts() {
     }
 }
 
+// ============================================================
+// INITIALIZATION
+// ============================================================
+
 // Auto-setup when module loads
 if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', setupKeyboardShortcuts);
+    document.addEventListener('DOMContentLoaded', () => {
+        loadRegions();
+        setupKeyboardShortcuts();
+    });
 } else {
+    loadRegions();
     setupKeyboardShortcuts();
 }
 
@@ -510,5 +876,11 @@ export default {
     clearRollHistory,
     exportRollHistory,
     setupKeyboardShortcuts,
-    cleanupKeyboardShortcuts
+    cleanupKeyboardShortcuts,
+    renderRollerUI,
+    generateRegionName,
+    generateRegionNames,
+    getRegionNames: () => regionNames,
+    getSelectedRegion: () => selectedRegion,
+    loadRegions
 };

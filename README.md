@@ -1,6 +1,7 @@
 Here's the updated README for version **4.0.0a** with the new session logging and voice recording features.
 
 ---
+[![Build Apps and Packages](https://github.com/Chronophage-net/fates-edge-apps/actions/workflows/build-apps-and-packages.yml/badge.svg)](https://github.com/Chronophage-net/fates-edge-apps/actions/workflows/build-apps-and-packages.yml)
 
 # Fate's Edge Toolkit v4.0.0a – Complete VTT Ecosystem
 

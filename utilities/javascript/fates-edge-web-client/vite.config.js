@@ -5,33 +5,26 @@ import { resolve } from 'path';
 import fs from 'fs';
 
 export default defineConfig({
-    // Base URL - change if deploying to a subpath
     base: '/',
-    
-    // Development server configuration
     server: {
         port: 5173,
         open: true,
-        // Handle SPA routing - all routes fallback to index.html
-        historyApiFallback: true,
-        // Allow serving files from the project root (for /data/, /data/regions/, etc.)
+        // ❌ REMOVE invalid option – Vite already handles SPA fallback
+        // historyApiFallback: true,
+
+        // Allow serving files from the project root
         fs: {
-            // Allow serving files from one level up from the root (if needed)
             allow: ['.'],
         },
-        // Watch for changes in data files
         watch: {
             usePolling: true,
             interval: 100,
         },
     },
-    
-    // Preview server for production build
     preview: {
         port: 4173,
         open: true,
     },
-    
     build: {
         outDir: 'dist',
         emptyOutDir: true,
@@ -44,25 +37,12 @@ export default defineConfig({
                 chunkFileNames: 'assets/[name].[hash].js',
                 assetFileNames: 'assets/[name].[hash].[ext]',
             },
-            // Exclude test files from the build
-            external: [],
         },
-        // Copy static assets from the root (including data/ regions/ etc.)
-        // We'll handle data copying via the build script or manual step
         assetsDir: 'assets',
         copyPublicDir: true,
         minify: 'esbuild',
         sourcemap: false,
-        // Ensure that the data directories are included in the build
-        // By default, Vite only copies the public directory.
-        // Since we have data at root, we need to either:
-        // 1. Move data to public/ (not ideal)
-        // 2. Use a plugin to copy data/ to dist/
-        // 3. In the workflow, copy data/ to dist/ after build (done)
-        // For local dev, Vite serves from root, so data/ is accessible.
     },
-    
-    // Resolve aliases for cleaner imports
     resolve: {
         alias: {
             '@': resolve(__dirname, './'),
@@ -72,26 +52,48 @@ export default defineConfig({
             '@data': resolve(__dirname, './data'),
         },
     },
-    
-    // Optimize dependencies (exclude tests)
     optimizeDeps: {
         exclude: ['**/tests/**/*'],
     },
-    
-    // Define environment variables
     define: {
         'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'development'),
     },
-    
-    // Log the data directories on startup for debugging
+
+    // 🆕 ADD custom middleware to serve /data/docs before the SPA fallback
     configureServer(server) {
+        // Intercept requests to /data/docs and serve the actual file
+        server.middlewares.use('/data/docs', (req, res, next) => {
+            // Remove query string if present
+            const urlPath = req.url.split('?')[0];
+            // Build the absolute path to the requested file
+            const filePath = resolve(__dirname, 'data', 'docs', urlPath);
+
+            // If the file exists, send it with the correct content type
+            if (fs.existsSync(filePath)) {
+                const ext = filePath.split('.').pop().toLowerCase();
+                const mimeTypes = {
+                    html: 'text/html',
+                    css: 'text/css',
+                    js: 'application/javascript',
+                    json: 'application/json',
+                };
+                res.setHeader('Content-Type', mimeTypes[ext] || 'application/octet-stream');
+                res.end(fs.readFileSync(filePath, 'utf-8'));
+                return;
+            }
+            // File not found → let Vite continue (will fallback to index.html for SPA)
+            next();
+        });
+
+        // Log data paths on startup (unchanged, except fix the incorrect paths)
         server.httpServer?.once('listening', () => {
             console.log('\n📂 Dev server started. Checking data paths...');
             const dataPath = resolve(__dirname, 'data');
-            const regionsPath = resolve(__dirname, 'data/data/regions');
-            const patronsPath = resolve(__dirname, 'data/data/regions');
-            const docsPath = resolve(__dirname, 'data/data/docs');
-            
+            // ✅ FIX: correct paths (removed double data/)
+            const regionsPath = resolve(__dirname, 'data', 'regions');
+            const patronsPath = resolve(__dirname, 'data', 'patrons');
+            const docsPath = resolve(__dirname, 'data', 'docs');
+
             if (fs.existsSync(dataPath)) {
                 console.log(`  ✅ ${dataPath}`);
                 if (fs.existsSync(regionsPath)) {

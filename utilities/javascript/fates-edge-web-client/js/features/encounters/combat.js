@@ -1,9 +1,11 @@
 /**
  * Combat Tracker - Advanced initiative and timer tracking
  * Integrated with Factions, Rivals, Followers, Assets, and Patrons
+ * ✅ Keyboard shortcuts: Space = next turn, R = reset timer
+ * ✅ Cleaner UI with better feedback
  */
 
-import { getState, saveState } from '../../core/state.js';
+import { getState } from '../../core/state.js';
 import { showToast } from '../../components/Toast.js';
 import { escHtml } from '../../core/utils.js';
 
@@ -17,8 +19,8 @@ let timerMax = 6;
 let timerName = 'Combat Timer';
 let isTimerRunning = false;
 let timerInterval = null;
-let isAnimating = false;
 let combatLog = [];
+let keyHandler = null;  // Store for cleanup
 
 // ============================================================
 // INTEGRATION HELPERS
@@ -78,16 +80,16 @@ function getLinkedRival(combatantName) {
 // MAIN FUNCTIONS
 // ============================================================
 
-/**
- * Open combat tracker for an encounter
- */
 export function openTracker(encounterId) {
     const state = getState();
     const encounter = state.encounters?.find(e => String(e.id) === String(encounterId));
+    if (!encounter) {
+        showToast('Encounter not found.', 'error');
+        return;
+    }
     
     currentEncounterId = encounterId;
     
-    // Initialize combatants from encounter or create empty
     if (encounter?.adversaries) {
         combatants = (encounter.adversaries || []).map(a => ({
             id: 'combat-' + Date.now() + '-' + Math.random().toString(36).substr(2, 4),
@@ -125,11 +127,11 @@ export function openTracker(encounterId) {
 }
 
 // ============================================================
-// RENDER
+// RENDER TRACKER
 // ============================================================
 
 function renderTracker() {
-    // Build modal with improved styling
+    // Build modal
     modal = document.createElement('div');
     modal.style.cssText = `
         position: fixed; top: 0; left: 0; width: 100%; height: 100%;
@@ -257,6 +259,7 @@ function renderTracker() {
                     </h2>
                     <div style="color:var(--text2);font-size:0.9rem;margin-top:0.25rem;">
                         ${combatants.length} combatants · Round ${round} · ${combatants.filter(c => c.status === 'active').length} active
+                        <span style="margin-left:0.5rem;font-size:0.7rem;color:var(--text3);">[Space: next turn, R: reset timer]</span>
                     </div>
                 </div>
                 <button id="combat-close" style="
@@ -521,7 +524,10 @@ function renderTracker() {
     `;
     document.body.appendChild(modal);
     
-    // Event listeners
+    // ============================================================
+    // EVENT LISTENERS
+    // ============================================================
+    
     modal.querySelector('#combat-close')?.addEventListener('click', closeTracker);
     modal.querySelector('#combat-close-tracker')?.addEventListener('click', closeTracker);
     modal.addEventListener('click', (e) => { if (e.target === modal) closeTracker(); });
@@ -564,7 +570,6 @@ function renderTracker() {
     // Click on combatant to focus
     modal.querySelectorAll('.combatant-entry').forEach(el => {
         el.addEventListener('click', (e) => {
-            // Don't trigger if clicking a button inside
             if (e.target.closest('button')) return;
             const idx = parseInt(el.dataset.index);
             if (!isNaN(idx) && idx >= 0 && idx < combatants.length && combatants[idx].status === 'active') {
@@ -605,13 +610,47 @@ function renderTracker() {
             removeCombatant(idx);
         });
     });
+    
+    // ============================================================
+    // KEYBOARD SHORTCUTS
+    // ============================================================
+    
+    if (keyHandler) {
+        document.removeEventListener('keydown', keyHandler);
+        keyHandler = null;
+    }
+    
+    keyHandler = (e) => {
+        if (!modal || !modal.parentNode) {
+            document.removeEventListener('keydown', keyHandler);
+            keyHandler = null;
+            return;
+        }
+        // Space to advance turn (only if not typing in input/textarea/select)
+        if (e.key === ' ' && !e.target.matches('input, textarea, select')) {
+            e.preventDefault();
+            const nextBtn = modal.querySelector('#combat-next');
+            if (nextBtn) nextBtn.click();
+        }
+        // R to reset timer
+        if (e.key === 'r' && !e.target.matches('input, textarea, select')) {
+            e.preventDefault();
+            const resetBtn = modal.querySelector('#combat-timer-reset');
+            if (resetBtn) resetBtn.click();
+        }
+    };
+    document.addEventListener('keydown', keyHandler);
 }
 
 // ============================================================
-// HELPERS
+// CLOSE TRACKER (with cleanup)
 // ============================================================
 
 function closeTracker() {
+    if (keyHandler) {
+        document.removeEventListener('keydown', keyHandler);
+        keyHandler = null;
+    }
     if (timerInterval) {
         clearInterval(timerInterval);
         timerInterval = null;
@@ -622,6 +661,10 @@ function closeTracker() {
     modal = null;
     currentEncounterId = null;
 }
+
+// ============================================================
+// HELPERS
+// ============================================================
 
 function addLog(type, message) {
     const time = new Date().toLocaleTimeString();
@@ -693,14 +736,11 @@ function importFromFactions() {
         showToast('No factions data found. Load some factions first.', 'warning');
         return;
     }
-    
     const factions = state.factions.factions || [];
     if (factions.length === 0) {
         showToast('No factions to import from.', 'warning');
         return;
     }
-    
-    // Show faction list for selection
     const options = factions.map((f, i) => `${i+1}. ${f.name} (${f.standing !== undefined ? 'Standing: ' + f.standing : 'Neutral'})`).join('\n');
     const choice = prompt(`Select a faction to import as a combatant:\n${options}\n\nEnter number:`);
     if (!choice) return;
@@ -709,7 +749,6 @@ function importFromFactions() {
         showToast('Invalid selection', 'error');
         return;
     }
-    
     const faction = factions[idx];
     combatants.push({
         id: 'combat-' + Date.now() + '-' + Math.random().toString(36).substr(2, 4),
@@ -734,7 +773,6 @@ function importFromFactions() {
 
 function sortCombatants() {
     combatants.sort((a, b) => {
-        // Active first, then by initiative
         if (a.status === 'defeated' && b.status !== 'defeated') return 1;
         if (a.status !== 'defeated' && b.status === 'defeated') return -1;
         return b.initiative - a.initiative;
@@ -751,11 +789,8 @@ function nextCombatant() {
         showToast('No active combatants.', 'info');
         return;
     }
-    
-    // Find next active combatant after current index
     let nextIndex = (activeIndex + 1) % combatants.length;
     let attempts = 0;
-    
     while (attempts < combatants.length) {
         if (combatants[nextIndex].status === 'active') {
             activeIndex = nextIndex;
@@ -767,14 +802,11 @@ function nextCombatant() {
         nextIndex = (nextIndex + 1) % combatants.length;
         attempts++;
     }
-    
-    // If we get here, wrap to next round
     endRound();
 }
 
 function endRound() {
     round++;
-    // Reset to first active combatant
     let firstActive = combatants.findIndex(c => c.status === 'active');
     if (firstActive !== -1) {
         activeIndex = firstActive;
@@ -782,8 +814,6 @@ function endRound() {
     addLog('info', `Round ${round} begins`);
     renderTracker();
     showToast(`🔚 Round ${round} begins`, 'info');
-    
-    // Tick timer automatically
     timerSegments = Math.min(timerSegments + 1, timerMax);
     if (timerSegments >= timerMax) {
         addLog('warning', 'Timer completed!');
@@ -795,9 +825,7 @@ function damageCombatant(idx) {
     const amount = parseInt(prompt('Damage amount:', '1') || '1');
     if (idx >= 0 && idx < combatants.length) {
         const combatant = combatants[idx];
-        const oldHarm = combatant.harm;
         combatant.harm = Math.min(combatant.harm + amount, combatant.maxHarm);
-        
         if (combatant.harm >= combatant.maxHarm && combatant.status !== 'defeated') {
             combatant.status = 'defeated';
             addLog('damage', `${combatant.name} is defeated!`);
@@ -814,14 +842,12 @@ function healCombatant(idx) {
     const amount = parseInt(prompt('Heal amount:', '1') || '1');
     if (idx >= 0 && idx < combatants.length) {
         const combatant = combatants[idx];
-        const oldHarm = combatant.harm;
         combatant.harm = Math.max(combatant.harm - amount, 0);
-        
         if (combatant.status === 'defeated' && combatant.harm < combatant.maxHarm) {
             combatant.status = 'active';
             addLog('heal', `${combatant.name} revived!`);
             showToast(`💚 ${combatant.name} revived!`, 'success');
-        } else if (oldHarm > combatant.harm) {
+        } else {
             addLog('heal', `${combatant.name} healed for ${amount} (${combatant.harm}/${combatant.maxHarm})`);
             showToast(`💚 ${combatant.name} healed for ${amount}`, 'success');
         }
@@ -832,7 +858,6 @@ function healCombatant(idx) {
 function toggleCombatant(idx) {
     if (idx >= 0 && idx < combatants.length) {
         const combatant = combatants[idx];
-        const oldStatus = combatant.status;
         combatant.status = combatant.status === 'active' ? 'inactive' : 'active';
         addLog('info', `${combatant.name} ${combatant.status === 'active' ? 'activated' : 'deactivated'}`);
         showToast(`${combatant.name} ${combatant.status === 'active' ? 'activated' : 'deactivated'}`, 'info');

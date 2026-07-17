@@ -5,6 +5,7 @@
  * Now uses the unified WebSocket module
  * 
  * Added GM election/promotion features (2026-07-16)
+ * ✅ Whiteboard button added to header.
  */
 
 import { vttStore } from '../../core/vtt-store.js';
@@ -176,7 +177,6 @@ async function handleDeckDraw(count = 1, region = null) {
                 showToast(`Deck draw failed: ${result.error}`, 'error');
             } else {
                 showToast(`🃏 Drew ${count} card${count > 1 ? 's' : ''} from ${regionName}`, 'success');
-                // Update deck state
                 if (result && result.remaining !== undefined) {
                     deckState.remaining = result.remaining;
                     updateDeckUI();
@@ -533,7 +533,6 @@ function handleSlash(text) {
                 sendMessage(msg, 'System', 'all');
                 vttStore.updateTimers(state.timers || []);
                 if (isConnectedToServer()) {
-                    // syncState may not exist, use sendEvent instead
                     try {
                         sendEvent({ type: 'state-updated', state: getState() });
                     } catch (e) { /* ignore */ }
@@ -586,7 +585,6 @@ function handleSlash(text) {
                 showToast(`📍 Region set to: ${region}`, 'success');
                 const regionDisplay = q('#vtt-region-display');
                 if (regionDisplay) regionDisplay.textContent = region;
-                // Send to server
                 if (isConnectedToServer()) {
                     try {
                         sendEvent({ type: 'region-updated', region });
@@ -760,7 +758,6 @@ function setupWebSocketSync() {
 
     const deckHistoryHandler = (data) => {
         if (isDestroyed) return;
-        // Handle history response
         console.log('[VTT] Deck history received:', data);
     };
     onWSEvent('deck-history', deckHistoryHandler);
@@ -828,7 +825,6 @@ function setupWebSocketSync() {
         if (data.clients) {
             clientsMap.clear();
             data.clients.forEach(c => clientsMap.set(c.id, c));
-            // Update GM info
             const gm = data.clients.find(c => c.role === 'gm');
             if (gm) {
                 gmState.currentGmId = gm.id;
@@ -837,50 +833,41 @@ function setupWebSocketSync() {
                 gmState.currentGmId = null;
                 gmState.currentGmName = null;
             }
-            // Update myRole if my socket ID is in the list
             const myId = getSocketId();
             if (myId && clientsMap.has(myId)) {
                 gmState.myRole = clientsMap.get(myId).role;
             }
-            // Update UI
             updateGMUI();
-            // Also update presence list if needed
-            renderLocalPresence(); // if you have a presence list
+            renderLocalPresence();
         }
     };
     onWSEvent('presence', presenceHandler);
     wsListeners.set('presence', presenceHandler);
 
-    // GM vote request (sent to current GM)
     const gmVoteHandler = (data) => {
         if (isDestroyed) return;
         const { requesterId, requesterName, currentGmId, currentGmName } = data;
-        // Only show to the current GM
         const myId = getSocketId();
         if (gmState.myRole === 'gm' && myId === currentGmId) {
-            // Add to pending requests if not already present
             if (!gmState.requests.find(r => r.requesterId === requesterId)) {
                 gmState.requests.push({ requesterId, requesterName });
             }
             updateGMUI();
             showToast(`👑 ${requesterName} requests to become GM.`, 'info');
-            playNotificationSound(); // optional
+            playNotificationSound();
         }
     };
     onWSEvent('gm_vote_request', gmVoteHandler);
     wsListeners.set('gm_vote_request', gmVoteHandler);
 
-    // GM role update (sent to individuals when role changes)
     const gmRoleHandler = (data) => {
         if (isDestroyed) return;
         const { role } = data;
         gmState.myRole = role;
-        // Update local user's role in the clients map if present
         const myId = getSocketId();
         if (myId && clientsMap.has(myId)) {
             clientsMap.get(myId).role = role;
         }
-        // Also update GM info from presence will come later, but we can update current GM if we are now GM
         if (role === 'gm') {
             gmState.currentGmId = myId;
             gmState.currentGmName = 'You';
@@ -891,7 +878,6 @@ function setupWebSocketSync() {
     onWSEvent('gm_role_update', gmRoleHandler);
     wsListeners.set('gm_role_update', gmRoleHandler);
 
-    // Server announcements (informational)
     const announcementHandler = (data) => {
         if (isDestroyed) return;
         showToast(data.message, 'info');
@@ -910,8 +896,6 @@ function setupWebSocketSync() {
         vttStore.updateTimers(state.timers || []);
         vttStore.setConnectionStatus('connected');
         showToast('Reconnected to server!', 'success');
-        // Re-request presence info by sending a ping or using existing getConnectedClients
-        // The server will send presence on reconnection anyway.
     };
     onWSEvent('connected', connectHandler);
     wsListeners.set('connected', connectHandler);
@@ -920,7 +904,6 @@ function setupWebSocketSync() {
         if (isDestroyed) return;
         vttStore.setConnectionStatus('local');
         showToast('Disconnected from server. Messages will be local.', 'warning');
-        // Reset GM state? Maybe keep last known state.
     };
     onWSEvent('disconnected', disconnectHandler);
     wsListeners.set('disconnected', disconnectHandler);
@@ -957,10 +940,8 @@ function updateGMUI() {
         } else {
             actions.innerHTML = `<button class="btn btn-sm btn-gold" id="vtt-gm-request">Request GM</button>`;
         }
-        // Reattach click handlers will be done in attachEvents
     }
     
-    // Pending requests (only for GM)
     const requestsContainer = q('#gm-requests');
     const requestsList = q('#gm-requests-list');
     if (gmState.myRole === 'gm' && gmState.requests.length > 0) {
@@ -981,7 +962,7 @@ function updateGMUI() {
 }
 
 // ============================================================
-// VOICE (WebSocket signaling + UI) – uses store for client list
+// VOICE (WebSocket signaling + UI)
 // ============================================================
 
 async function toggleVoice() {
@@ -1142,38 +1123,22 @@ function attachEvents() {
             case 'vtt-deck-shuffle': handleDeckShuffle(); break;
             case 'vtt-deck-history': handleDeckHistory(); break;
             case 'vtt-modules-list': handleModuleList(); break;
-            // GM actions
             case 'vtt-gm-request': {
                 if (!isConnectedToServer()) {
                     showToast('Not connected to server.', 'error');
                     return;
                 }
-                // Emit request_gm
-                const mode = getConnectionMode();
-                if (mode === 'socketio') {
-                    // We need socket instance; use the global from websocket.js? We'll use sendEvent or direct.
-                    // sendEvent doesn't handle request_gm, so we need to access socket.
-                    // We'll use the exported sendWSMessage or the socket directly? 
-                    // Since we're using the unified module, we can send via sendWSMessage with type 'request_gm'.
-                    sendWSMessage({ type: 'request_gm' });
-                } else {
-                    sendWSMessage({ type: 'request_gm' });
-                }
+                sendWSMessage({ type: 'request_gm' });
                 showToast('Request sent to GM.', 'info');
                 break;
             }
             case 'vtt-gm-resign': {
-                // Resign as GM: we can either emit a custom event or just request again? 
-                // The server doesn't have a resign; we can use request_gm but if you are GM, it will send a vote request to you, not resign.
-                // Instead, we can send a custom event 'gm-resign' and handle on server? Not implemented.
-                // For now, we'll just show a toast and let the GM promote someone else via approve.
                 showToast('To step down, approve a pending request or promote another player.', 'info');
                 break;
             }
         }
     };
 
-    // Handle approve/reject clicks via delegation
     const gmActionHandler = (e) => {
         const approveBtn = e.target.closest('.gm-approve');
         const rejectBtn = e.target.closest('.gm-reject');
@@ -1182,24 +1147,14 @@ function attachEvents() {
         const targetId = (approveBtn || rejectBtn).dataset.target;
         if (!targetId) return;
         if (approveBtn) {
-            // Emit approve_gm
-            const mode = getConnectionMode();
-            if (mode === 'socketio') {
-                // Use sendWSMessage with type 'approve_gm'
-                sendWSMessage({ type: 'approve_gm', targetId });
-            } else {
-                sendWSMessage({ type: 'approve_gm', targetId });
-            }
-            // Remove from pending list optimistically
+            sendWSMessage({ type: 'approve_gm', targetId });
             gmState.requests = gmState.requests.filter(r => r.requesterId !== targetId);
             updateGMUI();
             showToast(`Approved ${targetId} as GM.`, 'success');
         } else if (rejectBtn) {
-            // Reject – just remove from list
             gmState.requests = gmState.requests.filter(r => r.requesterId !== targetId);
             updateGMUI();
             showToast(`Rejected request from ${targetId}.`, 'info');
-            // Optionally send a reject event? The server doesn't have it, but we can just ignore.
         }
     };
 
@@ -1216,7 +1171,7 @@ function attachEvents() {
     };
     eventListeners = [
         { event: 'click', handler: clickHandler },
-        { event: 'click', handler: gmActionHandler }, // for GM approve/reject
+        { event: 'click', handler: gmActionHandler },
         { event: 'keydown', handler: keydownHandler },
         { event: 'change', handler: changeHandler }
     ];
@@ -1259,6 +1214,7 @@ export function render(el) {
                 💬 VTT – Live Table
                 <span class="mode-indicator" style="font-size:0.7rem;font-weight:400;background:var(--bg3);padding:0.15rem 0.8rem;border-radius:20px;color:var(--green);">${isConnected ? '🌐 Connected' : '📡 Local'}</span>
                 <span class="mode-indicator" style="font-size:0.6rem;font-weight:400;background:var(--bg3);padding:0.1rem 0.6rem;border-radius:12px;color:var(--text3);">${mode}</span>
+                <button class="btn btn-sm" onclick="window.location.hash='whiteboard'" title="Open Whiteboard">✏️ Whiteboard</button>
             </h1>
             <p class="page-sub" style="margin:0.2rem 0 0;">Chat, party status, quick die roller, deck, and scene timers all in one view.</p>
         </div>
@@ -1319,7 +1275,6 @@ export function render(el) {
                     `}
                 </div>
             </div>
-            <!-- Pending requests (only shown to GM) -->
             <div id="gm-requests" style="margin-top:0.4rem;display:none;border-top:1px solid var(--border);padding-top:0.4rem;">
                 <span class="text-muted small">Pending requests:</span>
                 <div id="gm-requests-list"></div>
@@ -1418,7 +1373,7 @@ export function render(el) {
 
     setupWebSocketSync();
     attachEvents();
-    updateGMUI(); // initial update
+    updateGMUI();
 
     if (presenceInterval) clearInterval(presenceInterval);
     presenceInterval = setInterval(() => {
@@ -1432,7 +1387,6 @@ export function render(el) {
         vttStore.updateTimers(state.timers || []);
     }, VTT_CONFIG.presenceUpdateInterval);
 
-    // Update deck count periodically
     setInterval(() => {
         const countEl = q('#vtt-deck-count');
         if (countEl) countEl.textContent = String(deckState.remaining || 0);
@@ -1483,7 +1437,6 @@ export default {
     destroy,
     sendMessage,
     getContainer: () => container,
-    // Expose deck functions for external use
     deckDraw: handleDeckDraw,
     crownSpread: handleCrownSpread,
     deckShuffle: handleDeckShuffle,

@@ -91,8 +91,16 @@ const eventHandlers = {
     'voice-ice-candidate': [],
     'voice-status': [],
 
-    // Media events (Added for media.js compatibility)
-    'media_recording': []
+    // Media events
+    'media_recording': [],
+
+    // NEW: GM and VTT events
+    'module-list': [],
+    'region-updated': [],
+    'presence': [],
+    'gm_vote_request': [],
+    'gm_role_update': [],
+    'server_announcement': []
 };
 
 // ============================================================
@@ -389,9 +397,43 @@ function handleWebSocketMessage(data) {
             triggerEvent('event', data);
             break;
 
-        // Added to route media events to media.js via the sync wrapper
         case 'media_recording':
             triggerEvent('media_recording', data);
+            break;
+
+        // ============================================================
+        // NEW: GM and VTT events
+        // ============================================================
+        case 'module-list':
+            triggerEvent('module-list', data);
+            // Optionally, you can update a module store here
+            break;
+
+        case 'region-updated':
+            triggerEvent('region-updated', data);
+            // You might want to refresh region data in the decks module
+            break;
+
+        case 'presence':
+            triggerEvent('presence', data);
+            // Update online users list
+            break;
+
+        case 'gm_vote_request':
+            triggerEvent('gm_vote_request', data);
+            // Show a vote request UI
+            break;
+
+        case 'gm_role_update':
+            triggerEvent('gm_role_update', data);
+            // Update GM role assignment
+            break;
+
+        case 'server_announcement':
+            triggerEvent('server_announcement', data);
+            if (data.message) {
+                showToast(data.message, 'info');
+            }
             break;
             
         case 'error':
@@ -406,9 +448,11 @@ function handleWebSocketMessage(data) {
             break;
             
         default:
-            const event = new CustomEvent('ws-message', { detail: data });
-            document.dispatchEvent(event);
+            // For any unhandled event, dispatch a custom event and also trigger the generic 'event'
+            const customEvent = new CustomEvent('ws-message', { detail: data });
+            document.dispatchEvent(customEvent);
             triggerEvent('event', data);
+            // Optional debug: console.debug('Unhandled WebSocket event type:', type);
     }
 }
 
@@ -770,9 +814,39 @@ function setupSocketIOListeners() {
         triggerEvent('voice-status', data);
     });
 
-    // Media events (Added for media.js compatibility)
+    // Media events
     socket.on('media_recording', (data) => {
         triggerEvent('media_recording', data);
+    });
+
+    // ============================================================
+    // NEW: GM and VTT events (Socket.io)
+    // ============================================================
+    socket.on('module-list', (data) => {
+        triggerEvent('module-list', data);
+    });
+
+    socket.on('region-updated', (data) => {
+        triggerEvent('region-updated', data);
+    });
+
+    socket.on('presence', (data) => {
+        triggerEvent('presence', data);
+    });
+
+    socket.on('gm_vote_request', (data) => {
+        triggerEvent('gm_vote_request', data);
+    });
+
+    socket.on('gm_role_update', (data) => {
+        triggerEvent('gm_role_update', data);
+    });
+
+    socket.on('server_announcement', (data) => {
+        triggerEvent('server_announcement', data);
+        if (data.message) {
+            showToast(data.message, 'info');
+        }
     });
     
     // Other events
@@ -1042,7 +1116,6 @@ export function sendEvent(eventData) {
 
 /**
  * Send media broadcast (shared)
- * Added to provide a unified API for media.js to broadcast through sync/index.js
  */
 export function sendMediaBroadcast(data) {
     if (connectionMode === 'socketio') {
@@ -1420,7 +1493,7 @@ export default {
     sendRoll,
     sendEvent,
     getConnectedClients,
-    sendMediaBroadcast, // Added for media.js compatibility
+    sendMediaBroadcast,
     
     // Deck operations (now return Promises)
     drawCards,

@@ -1,13 +1,15 @@
 /**
  * VTT Local Mode – no WebSocket, everything stays in the browser.
  * Uses the reactive store for all UI updates.
+ * ✅ Whiteboard button added; voice button disabled when no server.
  */
 
 import { vttStore } from '../../core/vtt-store.js';
 import { getState, addChatMessage, clearChatHistory, getCharacter } from '../../core/state.js';
 import { performRoll } from '../../core/dice.js';
 import { showToast } from '../../components/Toast.js';
-import { escHtml } from '../../core/utils.js';  // <-- ADDED
+import { escHtml } from '../../core/utils.js';
+import { isConnectedToServer } from '../../core/websocket.js'; // needed for voice availability check
 import {
   setContainer,
   q,
@@ -274,8 +276,6 @@ function toggleMuteVoice() {
 }
 
 function updateVoiceUI() {
-  // The reactive renderVoiceClients() already updates the list.
-  // We just need to update the mute button status if voice is initialized.
   if (!voiceInitialized) return;
   const status = getVoiceStatus();
   const muteBtn = q('#vtt-mute-toggle');
@@ -329,8 +329,6 @@ function attachEvents() {
       case 'chat-send-btn': e.preventDefault(); handleSendMessage(); break;
       case 'vtt-clear-chat': clearChatHistory?.(); vttStore.clearChat(); showToast('Chat cleared.', 'success'); break;
       case 'vtt-refresh-btn': 
-        // Force refresh – we can just trigger a re-render of characters (store already has them)
-        // But we can also read from legacy state and update store if needed
         const legacyState = getState();
         vttStore.updateCharacters(legacyState.characters || []);
         vttStore.updateTimers(legacyState.timers || []);
@@ -339,7 +337,6 @@ function attachEvents() {
       case 'vtt-roll-post-btn': rollLocal(true); break;
       case 'vtt-roll-only-btn': rollLocal(false); break;
       case 'vtt-add-timer': {
-        // Direct timer creation fallback if timer module not available
         const name = prompt('Timer name:', 'Scene Timer');
         if (name) {
           const segments = parseInt(prompt('Segments:', '6') || '6');
@@ -359,7 +356,6 @@ function attachEvents() {
         break;
       }
       case 'vtt-scene-end': {
-        // Direct state manipulation instead of importing scene-tools
         const state = getState();
         let trimmed = 0;
         (state.characters || []).forEach(c => {
@@ -412,8 +408,9 @@ export function render(el) {
   setContainer(el);
   if (!el) return;
 
-  // Build HTML (same as before)
   const voiceClients = getActiveVoiceClients();
+  const voiceAvailable = isConnectedToServer(); // false in local mode
+
   const voiceClientsHtml = voiceClients.map(id => {
     const client = getVoiceClient(id);
     const isSpeaking = client?.speaking ? 'var(--gold)' : 'var(--bg3)';
@@ -429,6 +426,7 @@ export function render(el) {
       <h1 class="page-title" style="display:flex;align-items:center;gap:0.5rem;">
         💬 VTT – Live Table
         <span class="mode-indicator" style="font-size:0.7rem;font-weight:400;background:var(--bg3);padding:0.15rem 0.8rem;border-radius:20px;color:var(--gold);">📡 Local</span>
+        <button class="btn btn-sm" onclick="window.location.hash='whiteboard'" title="Open Whiteboard">✏️ Whiteboard</button>
       </h1>
       <p class="page-sub" style="margin:0.2rem 0 0;">Chat, party status, quick die roller, and scene timers all in one view.</p>
     </div>
@@ -438,8 +436,11 @@ export function render(el) {
           <span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--gold);"></span>
           <span class="text-muted small">📡 Local mode (no server)</span>
         </div>
-        <div class="flex" style="gap:0.4rem;flex-wrap:wrap;">
-          <button class="btn btn-sm ${voiceInitialized ? 'btn-primary' : ''}" id="vtt-voice-toggle">${voiceInitialized ? '🎤 Voice On' : '🎤 Voice Off'}</button>
+        <div class="flex" style="gap:0.4rem;flex-wrap:wrap;align-items:center;">
+          <button class="btn btn-sm ${voiceInitialized ? 'btn-primary' : ''}" id="vtt-voice-toggle"
+            ${voiceAvailable ? '' : 'disabled'} title="${voiceAvailable ? 'Toggle voice chat' : 'Voice requires a server connection'}">
+            ${voiceAvailable ? (voiceInitialized ? '🎤 Voice On' : '🎤 Voice Off') : '🎤 Voice (unavailable)'}
+          </button>
           ${voiceInitialized ? `<button class="btn btn-sm ${getVoiceStatus()?.muted ? 'btn-danger' : 'btn-green'}" id="vtt-mute-toggle">${getVoiceStatus()?.muted ? '🔇 Muted' : '🎙️ Live'}</button>` : ''}
           <span class="text-muted small" id="voice-clients-count">${voiceClients.length} voice users</span>
         </div>
@@ -536,8 +537,6 @@ export function render(el) {
       presenceInterval = null;
       return;
     }
-    // We don't need to re-render; store already has characters.
-    // Just ensure presence is updated (it's derived from characters + connection)
     const state = getState();
     vttStore.updateCharacters(state.characters || []);
     vttStore.updateTimers(state.timers || []);

@@ -1,9 +1,11 @@
 /**
  * Encounters feature - Manage combat and social encounters
  * Includes quick reference from The Witnessed Prey
+ * ✅ Fixed "New Encounter" button with proper editor integration
+ * ✅ Improved UI and search
  */
 
-import { getState, addEncounter, deleteEncounter, updateEncounter } from '../../core/state.js';
+import { getState, saveState } from '../../core/state.js';
 import { escHtml } from '../../core/utils.js';
 import { showToast } from '../../components/Toast.js';
 import { logToSession, addVTTEvent } from '../gm-tools/index.js';
@@ -66,22 +68,23 @@ const QUICK_TIMERS = [
     { name: 'Hunt [6]', effect: 'When full, attacks openly with Dominant Position.' }
 ];
 
-/**
- * Render the encounters tab
- */
+// ============================================================
+// RENDER
+// ============================================================
+
 export function render(el) {
     container = el;
     container.innerHTML = `
         <div class="encounters-layout">
-            <header class="encounters-header">
+            <header class="encounters-header" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.5rem;margin-bottom:1rem;">
                 <div>
-                    <h1 class="page-title">⚔️ Encounters</h1>
-                    <p class="page-sub">Build encounters, track combat, and reference adversaries.</p>
+                    <h1 class="page-title" style="margin:0;">⚔️ Encounters</h1>
+                    <p class="page-sub" style="margin:0.2rem 0 0;">Build encounters, track combat, and reference adversaries.</p>
                 </div>
                 <button class="btn btn-gold" id="add-encounter-btn">+ New Encounter</button>
             </header>
 
-            <div class="encounters-grid">
+            <div class="encounters-grid" style="display:grid;grid-template-columns:1fr 300px;gap:1rem;">
                 <!-- Left: Encounter List -->
                 <div class="encounters-main">
                     <div class="panel">
@@ -96,7 +99,7 @@ export function render(el) {
                 </div>
 
                 <!-- Right: Quick Reference -->
-                <div class="encounters-sidebar">
+                <div class="encounters-sidebar" style="display:flex;flex-direction:column;gap:0.8rem;">
                     <!-- Quick Adversaries -->
                     <div class="panel">
                         <h3 style="margin-top:0;">🃏 Quick Adversaries</h3>
@@ -137,9 +140,10 @@ export function render(el) {
     attachEvents();
 }
 
-/**
- * Render quick reference cards
- */
+// ============================================================
+// RENDER QUICK REFERENCE
+// ============================================================
+
 function renderQuickReference() {
     // Adversaries
     const advEl = document.getElementById('quick-adversaries');
@@ -151,7 +155,6 @@ function renderQuickReference() {
             </div>
         `).join('');
         
-        // Click to create encounter from adversary
         advEl.querySelectorAll('.quick-adversary').forEach(el => {
             el.addEventListener('click', () => {
                 const name = el.dataset.name;
@@ -185,9 +188,10 @@ function renderQuickReference() {
     }
 }
 
-/**
- * Render encounters
- */
+// ============================================================
+// RENDER ENCOUNTERS
+// ============================================================
+
 function renderEncounters() {
     const el = document.getElementById('encounter-list');
     if (!el) return;
@@ -264,9 +268,10 @@ window.toggleEncounterBody = function(id) {
     if (el) el.style.display = el.style.display === 'none' ? 'block' : 'none';
 };
 
-/**
- * Create encounter from quick adversary
- */
+// ============================================================
+// ENCOUNTER OPERATIONS
+// ============================================================
+
 function createEncounterFromAdversary(name, body) {
     const state = getState();
     if (!state.encounters) state.encounters = [];
@@ -284,7 +289,6 @@ function createEncounterFromAdversary(name, body) {
     state.encounters.push(newEntry);
     saveState();
     
-    // Log encounter creation
     try {
         logToSession(`⚔️ Encounter created: ${newEntry.title}`, 'warning');
         addVTTEvent('encounter_created', { 
@@ -298,9 +302,6 @@ function createEncounterFromAdversary(name, body) {
     showToast(`🃏 Created encounter from "${name}"`, 'success');
 }
 
-/**
- * Delete encounter handler
- */
 function deleteEncounterHandler(id) {
     if (!confirm('Delete encounter?')) return;
     const state = getState();
@@ -317,50 +318,49 @@ function deleteEncounterHandler(id) {
     showToast('Encounter deleted.', 'success');
 }
 
-/**
- * Open encounter editor
- */
 function openEncounterEditor(id) {
     import('./editor.js').then(module => {
         module.openEditor(id);
-    }).catch(() => {
-        showToast('Editor not available.', 'error');
+    }).catch(err => {
+        console.error('Failed to load encounter editor:', err);
+        showToast('Encounter editor not available.', 'error');
     });
 }
 
-/**
- * Open combat tracker
- */
 function openCombatTracker(id) {
     import('./combat.js').then(module => {
         module.openTracker(id);
-    }).catch(() => {
+    }).catch(err => {
+        console.error('Failed to load combat tracker:', err);
         showToast('Combat tracker not available.', 'error');
     });
 }
 
-/**
- * Attach event listeners
- */
+// ============================================================
+// EVENT LISTENERS
+// ============================================================
+
 export function attachEvents() {
-    document.getElementById('add-encounter-btn')?.addEventListener('click', () => {
-        openEncounterEditor(null);
-    });
+    const addBtn = document.getElementById('add-encounter-btn');
+    if (addBtn) {
+        // Replace to avoid duplicate listeners
+        const newBtn = addBtn.cloneNode(true);
+        addBtn.parentNode.replaceChild(newBtn, addBtn);
+        newBtn.addEventListener('click', () => {
+            openEncounterEditor(null);
+        });
+    }
     
-    document.getElementById('encounter-search')?.addEventListener('input', renderEncounters);
+    const search = document.getElementById('encounter-search');
+    if (search) {
+        search.addEventListener('input', renderEncounters);
+    }
 }
 
-function saveState() {
-    // Save to localStorage
-    try {
-        const state = getState();
-        localStorage.setItem('fates-edge-state', JSON.stringify(state));
-    } catch (e) { /* ignore */ }
-}
+// ============================================================
+// LIFECYCLE
+// ============================================================
 
-/**
- * Destroy
- */
 export function destroy() {
     container = null;
 }
