@@ -1,15 +1,18 @@
-FROM node:20-alpine AS builder
+# Use modern Node
+FROM node:24-alpine AS builder
 
-# Build argument: set to 'true' to include PDF conversion tools
+# Build argument: enable upload features
 ARG ENABLE_UPLOAD=false
 
 WORKDIR /app
 
-# Copy package files and install production dependencies
+# ---------------------------------------------------------------
+# Install Node dependencies
+# ---------------------------------------------------------------
 COPY package*.json ./
 RUN npm ci --only=production
 
-# If upload is enabled, install system packages and optional Node dependencies
+# Optional upload tools
 RUN if [ "$ENABLE_UPLOAD" = "true" ]; then \
         apk add --no-cache \
             pdf2htmlEX \
@@ -18,60 +21,55 @@ RUN if [ "$ENABLE_UPLOAD" = "true" ]; then \
     fi
 
 # ---------------------------------------------------------------
-# Copy the modular server files into /app (merge server/* into root)
+# Copy server files
 # ---------------------------------------------------------------
-# This places server.js, config.js, deck.js, etc. directly in /app.
-COPY server/ ./
+COPY server/ ./server/
+COPY server-start.js ./
 
-# Copy the data directory (region files, manifests, etc.) if it exists
+# ---------------------------------------------------------------
+# Copy data directory
+# ---------------------------------------------------------------
 COPY data/ ./data/
 
 # ---------------------------------------------------------------
-# CLI Tool Layer
+# Python CLI Tool
 # ---------------------------------------------------------------
-
-# Install Python for CLI tool
 RUN apk add --no-cache python3 py3-pip python3-dev
 
-# Copy CLI requirements and install Python dependencies
-COPY requirements-cli.txt ./
-RUN pip3 install --no-cache-dir -r requirements-cli.txt
+# Your project contains requirements.txt, not requirements-cli.txt
+COPY requirements.txt ./
+RUN pip3 install --no-cache-dir -r requirements.txt
 
-# Copy CLI tool and make it executable
 COPY fates-edge-cli.py /usr/local/bin/fates-edge-cli
 RUN chmod +x /usr/local/bin/fates-edge-cli
 
-# Copy module directory if exists
+# ---------------------------------------------------------------
+# Modules
+# ---------------------------------------------------------------
 COPY modules/ ./modules/
 
-# Create directories for data, logs, and modules (data already copied)
+# Ensure directories exist
 RUN mkdir -p /app/logs /app/modules
 
 # ---------------------------------------------------------------
 # Health Check
 # ---------------------------------------------------------------
-
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
     CMD node -e "require('http').get('http://localhost:${PORT:-3000}/health', (r) => { process.exit(r.statusCode === 200 ? 0 : 1) })"
 
 # ---------------------------------------------------------------
 # Expose Ports
 # ---------------------------------------------------------------
-
-# WebSocket/HTTP server port
 EXPOSE 3000
 
 # ---------------------------------------------------------------
 # Volumes
 # ---------------------------------------------------------------
-
 VOLUME ["/app/data", "/app/logs", "/app/modules"]
 
 # ---------------------------------------------------------------
 # Environment Variables
 # ---------------------------------------------------------------
-
-# Server configuration
 ENV PORT=3000
 ENV ENABLE_UPLOAD=${ENABLE_UPLOAD}
 ENV AUTO_CREATE_ROOMS=false
@@ -79,16 +77,10 @@ ENV ENABLE_RATE_LIMITING=true
 ENV ENABLE_CACHING=false
 ENV ENABLE_SESSIONS=true
 ENV NODE_ENV=production
-
-# CLI configuration
 ENV FATES_EDGE_SERVER_URL=http://localhost:3000
 
 # ---------------------------------------------------------------
 # Entry Point & Command
 # ---------------------------------------------------------------
-
-# Entry point provides CLI access
 ENTRYPOINT ["/usr/local/bin/fates-edge-cli"]
-
-# Default command: start the server
 CMD ["server", "start"]

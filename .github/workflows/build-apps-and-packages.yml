@@ -3,14 +3,7 @@ name: Build Apps and Packages
 on:
   push:
     branches: [main]
-    paths:
-      - 'utilities/javascript/fates-edge-web-client/**'
-      - 'utilities/javascript/fates-edge-socket-server/**'
-      - 'utilities/javascript/fates-edge-desktop-client/**'
-      - 'utilities/vtt_mods_bots/**'
-      - 'misc/**'
-      - 'data/**'
-      - '.github/workflows/build-apps-and-packages.yml'
+     
   workflow_dispatch:
     inputs:
       skip_web_deploy:
