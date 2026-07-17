@@ -1,4 +1,4 @@
-// features/docs/index.js - Document Library with /data/docs/ manifest discovery
+// feature/docs/index.js - Document Library with /data/docs/ manifest discovery
 
 import { escHtml } from '../../core/utils.js';
 import { showToast } from '../../components/Toast.js';

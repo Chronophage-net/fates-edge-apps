@@ -8,12 +8,12 @@
   "modules": [
     {
       "id": "my-patron-module",
-      "path": "features/patrons/custom/index.js",
+      "path": "feature/regions/custom/index.js",
       "route": "custom-patrons",
       "label": "Custom Patrons",
       "icon": "🌟",
       "type": "feature",
-      "source": "./src/features/patrons/custom/index.js"
+      "source": "./src/feature/regions/custom/index.js"
     }
   ],
   "documents": [
@@ -22,12 +22,12 @@
       "title": "Custom Patron Guide",
       "path": "docs/custom-patron-guide.md",
       "category": "expansion",
-      "source": "./docs/custom-patron-guide.md"
+      "source": "./data/docs/custom-patron-guide.md"
     }
   ],
   "data": {
     "patrons": [
-      "data/patrons/custom-patron.json"
+      "data/data/regions/custom-patron.json"
     ],
     "factions": [
       "data/factions/custom-faction.json"

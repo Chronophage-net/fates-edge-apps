@@ -348,7 +348,7 @@ async function mergeFactionData(data) {
 }
 
 async function mergeRegionData(data) {
-    // Regions are loaded from /regions/ at runtime
+    // Regions are loaded from /data/regions/ at runtime
     // For now, we'll store them in state for later persistence
     const state = getState();
     if (!state.regions) state.regions = {};

@@ -961,7 +961,7 @@ app.post('/api/modules/:id/cleanup', authenticate, (req, res) => {
 });
 
 // API Documentation
-app.get('/api/docs', (req, res) => {
+app.get('/api/data/docs', (req, res) => {
     res.json({
         title: "Fate's Edge API Documentation",
         version: "1.0.0",
@@ -2323,7 +2323,7 @@ server.listen(PORT, '0.0.0.0', () => {
     console.log('='.repeat(70));
     console.log(`🚀 Server running on port ${PORT}`);
     console.log(`📊 Health: http://localhost:${PORT}/api/health`);
-    console.log(`📚 API Docs: http://localhost:${PORT}/api/docs`);
+    console.log(`📚 API Docs: http://localhost:${PORT}/api/data/docs`);
     console.log(`🔌 WebSocket (plain): ws://localhost:${PORT}?room=ROOM_CODE or /campaign/ROOM_CODE`);
     console.log(`🔌 WebSocket (Socket.io): http://localhost:${PORT}`);
     console.log(`📋 Rooms: ${rooms.size}`);

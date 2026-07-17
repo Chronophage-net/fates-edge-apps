@@ -208,34 +208,34 @@ jobs:
 
       # ============================================================
       # BUILD STEP: Copies SRD/Essentials + builds LaTeX docs,
-      # all into _site/docs/
+      # all into _site/data/docs/
       # ============================================================
-      - name: Build all documents into _site/docs
+      - name: Build all documents into _site/data/docs
         if: steps.check-commit.outputs.should_build == 'true'
         run: |
-          echo "📚 Building all documents into _site/docs..."
-          mkdir -p _site/docs
+          echo "📚 Building all documents into _site/data/docs..."
+          mkdir -p _site/data/docs
 
-          # --- Step 1: Copy SRD into _site/docs ---
+          # --- Step 1: Copy SRD into _site/data/docs ---
           if [ -f "ttrpg/srd/fates-edge-srd-main.html" ]; then
-            cp ttrpg/srd/fates-edge-srd-main.html _site/docs/
+            cp ttrpg/srd/fates-edge-srd-main.html _site/data/docs/
             echo "✅ SRD copied to docs/fates-edge-srd-main.html"
           elif [ -f "ttrpg/srd/srd.html" ]; then
-            cp ttrpg/srd/srd.html _site/docs/fates-edge-srd-main.html
+            cp ttrpg/srd/srd.html _site/data/docs/fates-edge-srd-main.html
             echo "✅ SRD copied to docs/fates-edge-srd-main.html (from srd.html)"
           else
             echo "⚠️ No SRD HTML file found"
           fi
 
-          # --- Step 2: Copy Essentials into _site/docs ---
+          # --- Step 2: Copy Essentials into _site/data/docs ---
           if [ -f "ttrpg/essentials/essentials.html" ]; then
-            cp ttrpg/essentials/essentials.html _site/docs/
+            cp ttrpg/essentials/essentials.html _site/data/docs/
             echo "✅ Essentials copied to docs/essentials.html"
           else
             echo "⚠️ No Essentials HTML file found"
           fi
 
-          # --- Step 3: Build HTML from LaTeX (outputs to _site/docs) ---
+          # --- Step 3: Build HTML from LaTeX (outputs to _site/data/docs) ---
           if [ -f "tools/latex_to_html.py" ] && [ -f "build_config.toml" ]; then
             echo "🔄 Building HTML documents from LaTeX..."
 
@@ -291,7 +291,7 @@ jobs:
 
               title = doc.get("title", tex_path.stem.replace("_", " ").title())
               author = doc.get("author", "")
-              output_dir = "_site/docs"
+              output_dir = "_site/data/docs"
               output_file = html_name
 
               cmd = [
@@ -411,12 +411,12 @@ jobs:
               <p class="subtitle">A TTRPG system of tactical combat and narrative depth.</p>
             </div>
             <div class="card">
-              <a href="/docs/fates-edge-srd-main.html">📜 SRD</a>
+              <a href="/data/docs/fates-edge-srd-main.html">📜 SRD</a>
               <p>System Reference Document - Core rules</p>
               <span class="badge">Core</span>
             </div>
             <div class="card">
-              <a href="/docs/essentials.html">⚡ Essentials</a>
+              <a href="/data/docs/essentials.html">⚡ Essentials</a>
               <p>Essential rules for quick play</p>
               <span class="badge">Core</span>
             </div>
@@ -465,12 +465,12 @@ jobs:
             echo "✅ Keeping existing SPA index.html"
           fi
 
-          # --- Step 5: Generate manifests (core + full) from _site/docs ---
+          # --- Step 5: Generate manifests (core + full) from _site/data/docs ---
           cat > /tmp/gen_manifests.py << 'PYEOF'
           import json
           from pathlib import Path
 
-          docs_dir = Path("_site/docs")
+          docs_dir = Path("_site/data/docs")
           core_docs = []
           extra_docs = []
 
@@ -481,7 +481,7 @@ jobs:
                   "id": "srd",
                   "title": "Fate's Edge SRD",
                   "file": "fates-edge-srd-main.html",
-                  "path": "/docs/fates-edge-srd-main.html",
+                  "path": "/data/docs/fates-edge-srd-main.html",
                   "category": "srd",
                   "categoryLabel": "System Reference Document",
                   "core": True,
@@ -495,14 +495,14 @@ jobs:
                   "id": "essentials",
                   "title": "Fate's Edge Essentials",
                   "file": "essentials.html",
-                  "path": "/docs/essentials.html",
+                  "path": "/data/docs/essentials.html",
                   "category": "essentials",
                   "categoryLabel": "Essentials",
                   "core": True,
                   "active": True
               })
 
-          # Additional docs – any other .html file in _site/docs
+          # Additional docs – any other .html file in _site/data/docs
           if docs_dir.exists():
               for html_file in sorted(docs_dir.glob("*.html")):
                   if html_file.name not in ["fates-edge-srd-main.html", "essentials.html", "index.html"]:
@@ -510,7 +510,7 @@ jobs:
                           "id": html_file.stem,
                           "title": html_file.stem.replace("_", " ").title(),
                           "file": html_file.name,
-                          "path": f"/docs/{html_file.name}",
+                          "path": f"/data/docs/{html_file.name}",
                           "category": "other",
                           "categoryLabel": "Document",
                           "core": False,
@@ -537,13 +537,13 @@ jobs:
                   "total_count": len(all_docs),
                   "active_count": len(all_docs),
                   "fullManifestUrl": "/manifest-full.json",
-                  "docsStatusUrl": "/docs-status.json"
+                  "docsStatusUrl": "/data/docs-status.json"
               }, f, indent=2)
           print(f"✅ Full manifest: {len(all_docs)} documents")
 
           # Status
           import time
-          with open("_site/docs-status.json", "w") as f:
+          with open("_site/data/docs-status.json", "w") as f:
               json.dump({
                   "status": "available",
                   "active_count": len(all_docs),
@@ -615,8 +615,8 @@ jobs:
           echo "📁 _site/"
           ls -la _site/ || echo "  (empty or missing)"
           echo ""
-          echo "📁 _site/docs/"
-          ls -la _site/docs/ 2>/dev/null || echo "  (not found)"
+          echo "📁 _site/data/docs/"
+          ls -la _site/data/docs/ 2>/dev/null || echo "  (not found)"
           echo ""
           echo "Total files: $(find _site -type f 2>/dev/null | wc -l)"
           echo "HTML files: $(find _site -name '*.html' 2>/dev/null | wc -l)"
@@ -789,14 +789,14 @@ jobs:
             --exclude='*.pdf' \
             ./ _site/
           # Create docs directory and copy core docs
-          mkdir -p _site/docs
+          mkdir -p _site/data/docs
           if [ -f "ttrpg/srd/fates-edge-srd-main.html" ]; then
-            cp ttrpg/srd/fates-edge-srd-main.html _site/docs/
+            cp ttrpg/srd/fates-edge-srd-main.html _site/data/docs/
           elif [ -f "ttrpg/srd/srd.html" ]; then
-            cp ttrpg/srd/srd.html _site/docs/fates-edge-srd-main.html
+            cp ttrpg/srd/srd.html _site/data/docs/fates-edge-srd-main.html
           fi
           if [ -f "ttrpg/essentials/essentials.html" ]; then
-            cp ttrpg/essentials/essentials.html _site/docs/
+            cp ttrpg/essentials/essentials.html _site/data/docs/
           fi
           # Generate a manifest that lists only the core docs
           cat > _site/manifest-core.json << 'EOF'
@@ -807,7 +807,7 @@ jobs:
                 "id": "srd",
                 "title": "Fate's Edge SRD",
                 "file": "fates-edge-srd-main.html",
-                "path": "/docs/fates-edge-srd-main.html",
+                "path": "/data/docs/fates-edge-srd-main.html",
                 "category": "srd",
                 "categoryLabel": "System Reference Document",
                 "core": true,
@@ -817,7 +817,7 @@ jobs:
                 "id": "essentials",
                 "title": "Fate's Edge Essentials",
                 "file": "essentials.html",
-                "path": "/docs/essentials.html",
+                "path": "/data/docs/essentials.html",
                 "category": "essentials",
                 "categoryLabel": "Essentials",
                 "core": true,
@@ -831,7 +831,7 @@ jobs:
           # Use the core manifest as the full manifest (so the SPA sees only these)
           cp _site/manifest-core.json _site/manifest-full.json
           # Create docs-status.json
-          echo '{"status":"available","active_count":2,"total_count":2,"timestamp":"'$(date +%s)'"}' > _site/docs-status.json
+          echo '{"status":"available","active_count":2,"total_count":2,"timestamp":"'$(date +%s)'"}' > _site/data/docs-status.json
           # Optionally, create a minimal build-lock (disabled)
           echo '{"locked":false}' > _site/build-lock.json
 

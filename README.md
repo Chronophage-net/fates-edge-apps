@@ -210,7 +210,7 @@ const modulePaths = {
     'home': './features/home/index.js',
     'characters': './features/characters/index.js',
     'factions': './features/factions/index.js',
-    'patrons': './features/patrons/index.js',
+    'patrons': './feature/regions/index.js',
     'vtt': './features/vtt/index.js',      // VTT connected mode
     'decks': './features/decks/index.js',  // Deck of Consequences
     'session': './features/session/index.js', // Session logging & recording (new)
@@ -261,11 +261,11 @@ const modulePaths = {
 | **Timers** | Visual timer system | `features/timers/` |
 | **Encounters** | Encounter builder & tracker | `features/encounters/` |
 | **VTT** | Virtual tabletop with voice & real‑time sync | `features/vtt/` |
-| **Docs** | Document viewer | `features/docs/` |
+| **Docs** | Document viewer | `feature/docs/` |
 | **Search** | Global search | `features/search/` |
 | **Wiki** | Reference wiki | `features/wiki/` |
 | **Decks** | Deck of Consequences & Crown Spread | `features/decks/` |
-| **Patrons** | Cosmic & terrestrial patrons | `features/patrons/` |
+| **Patrons** | Cosmic & terrestrial patrons | `feature/regions/` |
 | **Factions** | Faction management & assets | `features/factions/` |
 | **Session** | Session logging, voice recording, and playback (NEW) | `features/session/` |
 | **Settings** | Application settings | `features/settings/` |
@@ -301,9 +301,9 @@ const modulePaths = {
 
 The toolkit loads data from JSON files at runtime:
 
-### Regions (`/regions/`)
+### Regions (`/data/regions/`)
 ```
-/regions/
+/data/regions/
 ├── manifest.json         # List of available regions
 └── acasia.json          # Acasia region data
 ```
@@ -320,9 +320,9 @@ The toolkit loads data from JSON files at runtime:
 └── house-contarini.json  # House Contarini
 ```
 
-### Patrons (`/data/patrons/`)
+### Patrons (`/data/regions/`)
 ```
-/data/patrons/
+/data/regions/
 ├── manifest.json         # List of available patrons
 └── traveler.json         # The Traveler patron data
 ```

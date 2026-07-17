@@ -246,10 +246,10 @@ jobs:
           fi
           
           echo "🗺️ Processing region files..."
-          mkdir -p pages-site/regions pages-site/data/regions
-          for src_dir in "data/regions" "misc/regions" "${{ matrix.path }}/data/regions" "${{ matrix.path }}/regions"; do
+          mkdir -p pages-site/data/regions pages-site/data/regions
+          for src_dir in "data/data/regions" "misc/data/regions" "${{ matrix.path }}/data/regions" "${{ matrix.path }}/data/regions"; do
             if [ -d "$src_dir" ]; then
-              cp -r "$src_dir"/* pages-site/regions/ 2>/dev/null || true
+              cp -r "$src_dir"/* pages-site/data/regions/ 2>/dev/null || true
               cp -r "$src_dir"/* pages-site/data/regions/ 2>/dev/null || true
               echo "✅ Regions copied from $src_dir"
               break
@@ -268,10 +268,10 @@ jobs:
           done
           
           echo "👤 Processing patron files..."
-          mkdir -p pages-site/data/patrons
-          for src_dir in "data/patrons" "misc/patrons" "${{ matrix.path }}/data/patrons"; do
+          mkdir -p pages-site/data/regions
+          for src_dir in "data/data/regions" "misc/data/regions" "${{ matrix.path }}/data/regions"; do
             if [ -d "$src_dir" ]; then
-              cp -r "$src_dir"/* pages-site/data/patrons/ 2>/dev/null || true
+              cp -r "$src_dir"/* pages-site/data/regions/ 2>/dev/null || true
               echo "✅ Patrons copied from $src_dir"
               break
             fi
@@ -300,13 +300,13 @@ jobs:
           ls -la pages-site/data/ 2>/dev/null | head -10 || echo "  (empty or not found)"
           echo ""
           echo "Regions directory:"
-          ls -la pages-site/regions/ 2>/dev/null | head -10 || echo "  (empty or not found)"
+          ls -la pages-site/data/regions/ 2>/dev/null | head -10 || echo "  (empty or not found)"
           echo ""
           echo "Factions directory:"
           ls -la pages-site/factions/ 2>/dev/null | head -10 || echo "  (empty or not found)"
           echo ""
           echo "Patrons directory:"
-          ls -la pages-site/data/patrons/ 2>/dev/null | head -10 || echo "  (empty or not found)"
+          ls -la pages-site/data/regions/ 2>/dev/null | head -10 || echo "  (empty or not found)"
           echo ""
           
           if [ -f "pages-site/index.html" ]; then

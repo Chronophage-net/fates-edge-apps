@@ -25,8 +25,8 @@ class FeatureImporter {
       core: '/js/modules/',
       features: '/js/features/',
       packs: '/packs/',
-      regions: '/regions/',
-      patrons: '/patrons/',
+      regions: '/data/regions/',
+      patrons: '/data/regions/',
     };
   }
 
@@ -143,7 +143,7 @@ class FeatureImporter {
       }
       
       // Load region manifest
-      const response = await fetch('/regions/manifest.json');
+      const response = await fetch('/data/regions/manifest.json');
       if (!response.ok) {
         console.warn('⚠️ No region manifest found');
         return null;
@@ -183,7 +183,7 @@ class FeatureImporter {
    */
   async loadRegionPack(slug) {
     try {
-      const response = await fetch(`/regions/${slug}.json`);
+      const response = await fetch(`/data/regions/${slug}.json`);
       if (!response.ok) return null;
       const data = await response.json();
       return data;

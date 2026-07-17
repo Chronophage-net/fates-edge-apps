@@ -58,7 +58,7 @@ async function buildPack() {
     // Add documents
     if (manifest.documents) {
         for (const doc of manifest.documents) {
-            const sourcePath = path.resolve(doc.source || `./docs/${doc.path}`);
+            const sourcePath = path.resolve(doc.source || `./data/docs/${doc.path}`);
             if (fs.existsSync(sourcePath)) {
                 archive.file(sourcePath, { name: doc.path });
                 console.log(`📄 Added document: ${doc.path}`);

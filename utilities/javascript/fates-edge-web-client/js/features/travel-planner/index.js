@@ -150,7 +150,7 @@ async function fetchRegionData(regionName) {
     }
     try {
         const slug = getRegionSlug(regionName);
-        const res = await fetch(`/regions/${slug}.json`);
+        const res = await fetch(`/data/regions/${slug}.json`);
         if (!res.ok) throw new Error(`Region "${regionName}" not found`);
         const data = await res.json();
         regionDataCache[regionName] = data;

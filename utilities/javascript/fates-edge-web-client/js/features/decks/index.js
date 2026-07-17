@@ -2,7 +2,7 @@
 /**
  * Decks feature - Deck of Consequences and Crown Spread
  * Supports single draw, multiple draw, and Crown Spread (4+1 wildcard).
- * Loads region data dynamically from /regions/.
+ * Loads region data dynamically from /data/regions/.
  * Supports WebSocket sync for multiplayer draws.
  * Uses deterministic RNG for static/demo deployments.
  */
@@ -664,7 +664,7 @@ function synthesiseCrownSpread(mainCards, wildcard, regionData) {
 
 /**
  * Load the region manifest from multiple possible sources.
- * Tries: /data/regions/manifest.json → /data/docs/manifest-core.json → /data/docs/manifest-full.json → /regions/manifest.json
+ * Tries: /data/regions/manifest.json → /data/docs/manifest-core.json → /data/docs/manifest-full.json → /data/regions/manifest.json
  * If no manifest found, discovers region files by scanning common region slugs.
  * Falls back to a default list if all else fails.
  */
@@ -674,7 +674,7 @@ async function loadManifest() {
         '/data/regions/manifest.json',
         '/data/docs/manifest-core.json',
         '/data/docs/manifest-full.json',
-        '/regions/manifest.json'  // legacy fallback
+        '/data/regions/manifest.json'  // legacy fallback
     ];
     
     let manifestData = null;
@@ -772,7 +772,7 @@ async function loadManifest() {
 
 /**
  * Fetch region data for a specific region.
- * Tries /data/regions/{slug}.json first, then falls back to /regions/{slug}.json.
+ * Tries /data/regions/{slug}.json first, then falls back to /data/regions/{slug}.json.
  */
 async function fetchRegionData(regionName) {
     if (regionData && regionData.name === regionName) {
@@ -784,7 +784,7 @@ async function fetchRegionData(regionName) {
     // Try multiple paths
     const paths = [
         `/data/regions/${slug}.json`,
-        `/regions/${slug}.json`
+        `/data/regions/${slug}.json`
     ];
     
     for (const path of paths) {

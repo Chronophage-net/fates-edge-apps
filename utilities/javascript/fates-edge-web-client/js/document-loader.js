@@ -291,7 +291,7 @@ class DocumentLoader {
       }
       
       // Fallback: try legacy locations
-      const fallbackPaths = ['/search-index.json', '/docs/search-index.json'];
+      const fallbackPaths = ['/search-index.json', '/data/docs/search-index.json'];
       for (const fallbackPath of fallbackPaths) {
         const fallbackResponse = await fetch(fallbackPath);
         if (fallbackResponse.ok) {

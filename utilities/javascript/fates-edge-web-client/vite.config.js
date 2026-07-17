@@ -14,7 +14,7 @@ export default defineConfig({
         open: true,
         // Handle SPA routing - all routes fallback to index.html
         historyApiFallback: true,
-        // Allow serving files from the project root (for /data/, /regions/, etc.)
+        // Allow serving files from the project root (for /data/, /data/regions/, etc.)
         fs: {
             // Allow serving files from one level up from the root (if needed)
             allow: ['.'],
@@ -88,9 +88,9 @@ export default defineConfig({
         server.httpServer?.once('listening', () => {
             console.log('\n📂 Dev server started. Checking data paths...');
             const dataPath = resolve(__dirname, 'data');
-            const regionsPath = resolve(__dirname, 'data/regions');
-            const patronsPath = resolve(__dirname, 'data/patrons');
-            const docsPath = resolve(__dirname, 'data/docs');
+            const regionsPath = resolve(__dirname, 'data/data/regions');
+            const patronsPath = resolve(__dirname, 'data/data/regions');
+            const docsPath = resolve(__dirname, 'data/data/docs');
             
             if (fs.existsSync(dataPath)) {
                 console.log(`  ✅ ${dataPath}`);

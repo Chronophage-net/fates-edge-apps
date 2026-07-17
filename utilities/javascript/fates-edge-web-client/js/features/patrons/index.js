@@ -1,11 +1,11 @@
-// features/patrons/index.js
+// feature/regions/index.js
 /**
  * Patrons feature - Display and manage Patrons (Cosmic, Terrestrial, and Trusts)
  * Similar to regional generation with card-based display
  * 
  * Data paths:
- * - Patron data: /data/patrons/{id}.json
- * - Patron manifest: /data/patrons/manifest.json
+ * - Patron data: /data/regions/{id}.json
+ * - Patron manifest: /data/regions/manifest.json
  * - Fallback: /data/docs/manifest-core.json (if it contains patron IDs)
  * 
  * Patron data structure supports nested rites with descriptions:
@@ -35,12 +35,12 @@ import { escHtml } from '../../core/utils.js';
 // CONSTANTS
 // ============================================================
 
-const PATRON_DATA_PATH = '/data/patrons/';
+const PATRON_DATA_PATH = '/data/regions/';
 const PATRON_MANIFEST_PATHS = [
-    '/data/patrons/manifest.json',
+    '/data/regions/manifest.json',
     '/data/docs/manifest-core.json',
     '/data/docs/manifest-full.json',
-    '/patrons/manifest.json'  // legacy fallback
+    '/data/regions/manifest.json'  // legacy fallback
 ];
 
 // Known patron slugs from the setting (for discovery fallback)
@@ -545,7 +545,7 @@ async function loadRemotePatrons() {
  */
 async function saveManifest(manifestList) {
     try {
-        const res = await fetch('/api/manifest/patrons', {
+        const res = await fetch('/api/manifest/data/regions', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(manifestList)

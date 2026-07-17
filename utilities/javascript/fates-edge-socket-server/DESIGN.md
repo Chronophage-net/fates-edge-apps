@@ -107,7 +107,7 @@ Fate's Edge is a real-time Virtual Tabletop (VTT) server built with Node.js, Exp
 | GET | `/api/stats` | Server statistics (requires auth) |
 | GET | `/api/analytics` | Detailed analytics (requires master key) |
 | GET | `/api/status` | CLI-friendly status endpoint |
-| GET | `/api/docs` | API documentation |
+| GET | `/api/data/docs` | API documentation |
 
 ### PDF Conversion (Optional)
 

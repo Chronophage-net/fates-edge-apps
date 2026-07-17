@@ -1483,8 +1483,8 @@ const MIGRATIONS = [
 ### Documentation
 - [WebSocket Protocol](https://datatracker.ietf.org/doc/html/rfc6455)
 - [Operational Transformation](https://en.wikipedia.org/wiki/Operational_transformation)
-- [Redis Pub/Sub](https://redis.io/docs/manual/pubsub/)
-- [IndexedDB API](https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API)
+- [Redis Pub/Sub](https://redis.io/data/docs/manual/pubsub/)
+- [IndexedDB API](https://developer.mozilla.org/en-US/data/docs/Web/API/IndexedDB_API)
 
 ### Similar Tools
 - [Foundry VTT](https://foundryvtt.com/) - Self-hosted VTT

@@ -251,7 +251,7 @@ This project is licensed under the MIT License – see the [LICENSE](LICENSE) fi
 ## 📚 Documentation
 
 - [Fate's Edge Server](https://github.com/fates-edge/fates-edge-server)
-- [API Documentation](https://fates-edge.com/api/docs)
+- [API Documentation](https://fates-edge.com/api/data/docs)
 - [Foundry VTT Wiki](https://foundryvtt.wiki)
 
 ---

@@ -677,7 +677,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 📞 Support
 
-- **Documentation**: [https://fates-edge.com/docs](https://fates-edge.com/docs)
+- **Documentation**: [https://fates-edge.com/data/docs](https://fates-edge.com/data/docs)
 - **Discord**: [https://discord.gg/fates-edge](https://discord.gg/fates-edge)
 - **GitHub Issues**: [https://github.com/fates-edge/fates-edge/issues](https://github.com/fates-edge/fates-edge/issues)
 - **Email**: support@fates-edge.com
