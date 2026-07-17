@@ -34,16 +34,10 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
 
-    if: >
-      always() && (
-        github.event_name == 'workflow_call' ||
-        github.event_name == 'workflow_dispatch'
-      )
-
     environment:
       name: ${{ inputs.environment || github.event.inputs.environment || 'production' }}
       url: https://fates-edge-socket-server.onrender.com
-
+      
     steps:
       # ============================================================
       # 1. DOWNLOAD & EXTRACT ARTIFACT (if called from build workflow)

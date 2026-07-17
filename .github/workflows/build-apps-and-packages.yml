@@ -330,39 +330,12 @@ jobs:
           retention-days: 1
 
   # ============================================================
-  # DEBUG JOB – always runs and prints condition values
-  # ============================================================
-  debug-condition:
-    name: Debug Deploy Conditions
-    runs-on: ubuntu-latest
-    if: always()   # always run, even if build failed
-    needs: build   # waits for build to finish
-    steps:
-      - name: Print condition values
-        run: |
-          echo "=== DEPLOY CONDITION DEBUG ==="
-          echo "Event name: ${{ github.event_name }}"
-          echo "Build result: ${{ needs.build.result }}"
-          echo "skip_web_deploy input: '${{ github.event.inputs.skip_web_deploy }}'"
-          echo "skip_socket_deploy input: '${{ github.event.inputs.skip_socket_deploy }}'"
-          echo ""
-          echo "Web deploy condition: needs.build.result == 'success' && (github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && github.event.inputs.skip_web_deploy != 'true'))"
-          echo "Web should run? ${{ needs.build.result == 'success' && (github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && github.event.inputs.skip_web_deploy != 'true')) }}"
-          echo ""
-          echo "Socket deploy condition: needs.build.result == 'success' && (github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && github.event.inputs.skip_socket_deploy != 'true'))"
-          echo "Socket should run? ${{ needs.build.result == 'success' && (github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && github.event.inputs.skip_socket_deploy != 'true')) }}"
-
-  # ============================================================
-  # DEPLOY WEB CLIENT (Pages)
+  # DEPLOY WEB CLIENT (Pages) – only if not skipped
   # ============================================================
   deploy-pages:
     name: Deploy Web Client to Pages
-    needs: [build, debug-condition]   # waits for both
-    if: >
-      needs.build.result == 'success' && (
-        github.event_name == 'push' ||
-        (github.event_name == 'workflow_dispatch' && github.event.inputs.skip_web_deploy != 'true')
-      )
+    needs: build
+    if: success() && (github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && github.event.inputs.skip_web_deploy != 'true'))
     uses: ./.github/workflows/deploy-web-client.yml
     secrets: inherit
     permissions:
@@ -371,16 +344,12 @@ jobs:
       id-token: write
 
   # ============================================================
-  # DEPLOY SOCKET SERVER (Render)
+  # DEPLOY SOCKET SERVER (Render) – only if not skipped
   # ============================================================
   deploy-render:
     name: Deploy Socket Server to Render
-    needs: [build, debug-condition]
-    if: >
-      needs.build.result == 'success' && (
-        github.event_name == 'push' ||
-        (github.event_name == 'workflow_dispatch' && github.event.inputs.skip_socket_deploy != 'true')
-      )
+    needs: build
+    if: success() && (github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && github.event.inputs.skip_socket_deploy != 'true'))
     uses: ./.github/workflows/deploy-socket-server-to-render.yml
     with:
       environment: production
