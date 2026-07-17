@@ -101,7 +101,6 @@ jobs:
         if: matrix.name == 'web-client'
         working-directory: ${{ matrix.path }}
         run: |
-          echo "Generating deterministic seed..."
           if [ -f js/tools/generate-seed.js ]; then
             node js/tools/generate-seed.js --force --output=.seed/random-seed.json
             mkdir -p data
@@ -225,6 +224,10 @@ jobs:
     needs: build
     if: success() && (github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && github.event.inputs.skip_web_deploy != 'true'))
     uses: ./.github/workflows/deploy-web-client.yml
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
     secrets: inherit
 
   deploy-render:
@@ -232,6 +235,9 @@ jobs:
     needs: build
     if: success() && (github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && github.event.inputs.skip_socket_deploy != 'true'))
     uses: ./.github/workflows/deploy-socket-server-to-render.yml
+    permissions:
+      contents: read
+      actions: read
     with:
       environment: production
     secrets: inherit

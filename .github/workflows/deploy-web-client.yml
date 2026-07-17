@@ -27,27 +27,32 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
 
+    # Honor skip_deploy
+    if: inputs.skip_deploy != 'true'
+
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
 
     steps:
-      - name: Ensure workspace
+      - name: Prepare workspace
         run: mkdir -p pages-site
 
-      - name: Download pages artifact (if present)
+      - name: Download pages artifact
         uses: actions/download-artifact@v4
         with:
           name: ${{ inputs.artifact-name }}
           path: pages-site
-        continue-on-error: true
 
       - name: Verify pages-site contents
         run: |
           echo "Root of pages-site:"
           ls -la pages-site | head -20 || true
-          if [ ! -f "pages-site/index.html" ] && [ ! -d "pages-site" ]; then
-            echo "⚠️ pages-site appears empty. Ensure the build job uploaded the artifact named '${{ inputs.artifact-name }}'."
+
+          if [ ! -f "pages-site/index.html" ]; then
+            echo "❌ ERROR: pages-site artifact is missing index.html"
+            echo "Artifact '${{ inputs.artifact-name }}' may not have been uploaded by the build workflow."
+            exit 1
           fi
 
       - name: Deploy to GitHub Pages

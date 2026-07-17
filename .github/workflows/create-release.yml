@@ -39,7 +39,6 @@ jobs:
             RUN_ID="${{ github.event.workflow_run.id }}"
           fi
           echo "run-id=$RUN_ID" >> $GITHUB_OUTPUT
-          echo "Using run ID: $RUN_ID"
 
       - name: Ensure release-assets exists
         run: mkdir -p release-assets
@@ -49,7 +48,6 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           run-id: ${{ steps.get-run-id.outputs.run-id }}
-          github-token: ${{ secrets.GITHUB_TOKEN }}
           pattern: '*-package'
           path: release-assets
         continue-on-error: true
@@ -70,19 +68,21 @@ jobs:
             TAG="v$(date +'%Y.%m.%d')-build$BUILD_RUN_NUMBER-$SHORT_SHA"
           fi
           echo "tag=$TAG" >> $GITHUB_OUTPUT
-          echo "Determined tag: $TAG"
 
       - name: Check for artifacts and build release body
         id: release_body
         run: |
           FOUND=false
-          if [ -n "$(find release-assets -type f -name '*.tar.gz' | head -1 2>/dev/null)" ]; then
+          if [ -n "$(find release-assets -type f -name '*.tar.gz' | head -1)" ]; then
             FOUND=true
           fi
+
           BODY="Automated release from build run #${{ steps.get-run-id.outputs.run-id }}\nCommit: ${GITHUB_SHA}"
-          if [ "$FOUND" = "false" ]; then
+
+          if [ "$FOUND" = false ]; then
             BODY="$BODY\n\n⚠️ **No packaged artifacts were found in the build run.**"
           fi
+
           echo "found=$FOUND" >> $GITHUB_OUTPUT
           echo "body<<EOF" >> $GITHUB_OUTPUT
           echo "$BODY" >> $GITHUB_OUTPUT
@@ -98,5 +98,3 @@ jobs:
             release-assets/*/*.tar.gz
           draft: false
           prerelease: false
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
