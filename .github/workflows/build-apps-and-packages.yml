@@ -21,14 +21,6 @@ on:
         type: boolean
         default: false
         description: 'Skip socket server deployment to Render'
-      create_release:
-        type: boolean
-        default: true
-        description: 'Create a GitHub Release (triggers the release workflow)'
-      release_version:
-        type: string
-        required: false
-        description: 'Version tag for release (e.g., v1.2.0)'
 
 env:
   NODE_VERSION: 22
@@ -107,7 +99,6 @@ jobs:
         working-directory: ${{ matrix.path }}
         run: npm ci
 
-      # ---- Special seed generation for web-client ----
       - name: Generate deterministic seed (web-client only)
         if: matrix.name == 'web-client'
         working-directory: ${{ matrix.path }}
@@ -123,19 +114,16 @@ jobs:
             echo "⚠️ generate-seed.js not found, skipping seed generation"
           fi
 
-      # ---- Build step ----
       - name: Build project
         if: matrix.build == 'true'
         working-directory: ${{ matrix.path }}
         run: npm run build
 
-      # ---- Prune dev dependencies for non‑built services ----
       - name: Install production dependencies only (for services without build)
         if: matrix.package == 'true' && matrix.build == 'false'
         working-directory: ${{ matrix.path }}
         run: npm prune --production
 
-      # ---- Package step ----
       - name: Package project
         if: matrix.package == 'true'
         run: |
@@ -173,7 +161,6 @@ jobs:
           path: artifacts/${{ matrix.name }}.tar.gz
           if-no-files-found: error
 
-      # ---- Upload web-client dist separately (not required for release, but useful) ----
       - name: Upload web-client dist (for Pages)
         if: matrix.name == 'web-client' && matrix.build == 'true'
         uses: actions/upload-artifact@v4
@@ -182,7 +169,6 @@ jobs:
           path: ${{ matrix.path }}/dist
           if-no-files-found: error
 
-      # ---- Prepare static site for Pages – only if we are not skipping web deploy ----
       - name: Prepare static site for Pages (web-client only)
         if: >
           matrix.name == 'web-client' &&
@@ -326,7 +312,6 @@ jobs:
         with:
           path: pages-site
 
-      # ---- Save build metadata (for reference) ----
       - name: Save build metadata (socket-server only)
         if: matrix.name == 'socket-server'
         run: |
@@ -380,35 +365,3 @@ jobs:
     permissions:
       contents: read
       actions: read
-
-  # ============================================================
-  # TRIGGER RELEASE WORKFLOW (manual only, when create_release is true)
-  # ============================================================
-  trigger-release:
-    name: Create Release (manual only)
-    needs: build
-    if: >
-      needs.build.result == 'success' &&
-      github.event_name == 'workflow_dispatch' &&
-      github.event.inputs.create_release == 'true'
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-      actions: write
-    steps:
-      - name: Dispatch release workflow
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const runId = context.runId;
-            const version = '${{ github.event.inputs.release_version }}' || `v${new Date().toISOString().slice(0,10)}-build${context.runNumber}`;
-            await github.rest.actions.createWorkflowDispatch({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              workflow_id: 'create-release.yml',
-              ref: 'main',
-              inputs: {
-                run_id: runId.toString(),
-                release_version: version
-              }
-            });
