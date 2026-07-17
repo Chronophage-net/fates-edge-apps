@@ -26,14 +26,14 @@ jobs:
     if: inputs.skip_deploy != 'true'
 
     environment:
-      name: github-pages
+      name: github-pages                 # ← required for GitHub Pages
       url: ${{ steps.deployment.outputs.page_url }}
 
     steps:
       - name: Download Pages artifact
         uses: actions/download-artifact@v4
         with:
-          name: pages-site
+          name: pages-site                # ← matches the upload in the build workflow
           path: pages-site
 
       - name: Verify artifact contents
@@ -49,3 +49,5 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+        with:
+          path: pages-site                # ← use the downloaded folder (no second download)

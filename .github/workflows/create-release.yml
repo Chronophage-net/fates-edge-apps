@@ -22,9 +22,16 @@ permissions:
   contents: write
   actions: read
 
+# Prevent multiple release jobs from running concurrently
+# If a new release is triggered while one is in progress, cancel the old one
+concurrency:
+  group: "release-${{ github.ref }}"
+  cancel-in-progress: true
+
 jobs:
   create-release:
     runs-on: ubuntu-latest
+    # For workflow_run, only proceed if the build succeeded
     if: >
       github.event_name == 'workflow_dispatch' ||
       (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success')
@@ -50,12 +57,31 @@ jobs:
           run-id: ${{ steps.get-run-id.outputs.run-id }}
           pattern: '*-package'
           path: release-assets
+          # Use GitHub token to authenticate – required for downloading from different workflow runs
+          github-token: ${{ secrets.GITHUB_TOKEN }}
         continue-on-error: true
 
-      - name: List downloaded files
+      - name: List downloaded files and build file list
+        id: files
         run: |
-          echo "Files downloaded:"
-          find release-assets -type f -name "*.tar.gz" -ls || echo "No .tar.gz files found"
+          # Find all .tar.gz files, store the list
+          FILES=$(find release-assets -type f -name "*.tar.gz" | sort)
+          if [ -n "$FILES" ]; then
+            echo "found=true" >> $GITHUB_OUTPUT
+            # Build a bullet list of file names for the release body
+            FILE_LIST=""
+            for f in $FILES; do
+              # Extract the package name from the path: e.g., release-assets/web-client-package/web-client.tar.gz
+              PKG_NAME=$(basename "$(dirname "$f")")
+              FILE_LIST="$FILE_LIST\n- $PKG_NAME"
+            done
+            echo "file_list=$FILE_LIST" >> $GITHUB_OUTPUT
+            echo "file_count=$(echo "$FILES" | wc -l)" >> $GITHUB_OUTPUT
+            echo "Found $(echo "$FILES" | wc -l) artifacts"
+          else
+            echo "found=false" >> $GITHUB_OUTPUT
+            echo "No artifacts found"
+          fi
 
       - name: Determine release tag
         id: tag
@@ -69,32 +95,46 @@ jobs:
           fi
           echo "tag=$TAG" >> $GITHUB_OUTPUT
 
-      - name: Check for artifacts and build release body
-        id: release_body
+      - name: Create release body
+        id: body
         run: |
-          FOUND=false
-          if [ -n "$(find release-assets -type f -name '*.tar.gz' | head -1)" ]; then
-            FOUND=true
+          if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+            TRIGGER="Manual trigger"
+          else
+            TRIGGER="Automated from build run #${{ github.event.workflow_run.run_number }}"
+          fi
+          COMMIT_SHA="${{ github.event.workflow_run.head_sha || github.sha }}"
+          SHORT_SHA=$(echo "$COMMIT_SHA" | cut -c1-7)
+          BODY="**$TRIGGER**\n"
+          BODY="$BODY- Commit: \`$SHORT_SHA\`\n"
+          BODY="$BODY- Run ID: ${{ steps.get-run-id.outputs.run-id }}\n\n"
+
+          if [ "${{ steps.files.outputs.found }}" == "true" ]; then
+            BODY="$BODY### 📦 Included Packages\n${{ steps.files.outputs.file_list }}\n"
+          else
+            BODY="$BODY⚠️ **No packaged artifacts were found in the build run.**\n"
           fi
 
-          BODY="Automated release from build run #${{ steps.get-run-id.outputs.run-id }}\nCommit: ${GITHUB_SHA}"
-
-          if [ "$FOUND" = false ]; then
-            BODY="$BODY\n\n⚠️ **No packaged artifacts were found in the build run.**"
-          fi
-
-          echo "found=$FOUND" >> $GITHUB_OUTPUT
+          # Save body to output (multi-line)
           echo "body<<EOF" >> $GITHUB_OUTPUT
-          echo "$BODY" >> $GITHUB_OUTPUT
+          echo -e "$BODY" >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
 
       - name: Create GitHub Release
+        # Only run if at least one artifact was found
+        if: steps.files.outputs.found == 'true'
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ steps.tag.outputs.tag }}
           name: Release ${{ steps.tag.outputs.tag }}
-          body: ${{ steps.release_body.outputs.body }}
+          body: ${{ steps.body.outputs.body }}
           files: |
             release-assets/*/*.tar.gz
           draft: false
           prerelease: false
+
+      - name: Skip release (no artifacts)
+        if: steps.files.outputs.found != 'true'
+        run: |
+          echo "No artifacts found. Skipping release creation."
+          exit 0
