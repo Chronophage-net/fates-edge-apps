@@ -22,6 +22,11 @@ concurrency:
   group: "build-${{ github.ref }}"
   cancel-in-progress: false
 
+# Condition to only run web-client pages steps if we actually intend to deploy
+# This saves CI minutes when manually skipping web deploy
+define: &should_deploy_web 
+  matrix.name == 'web-client' && (github.event_name == 'push' || github.event.inputs.skip_web_deploy != 'true')
+
 jobs:
   build:
     name: Build & Package (${{ matrix.name }})
@@ -50,7 +55,7 @@ jobs:
       # PREPARE STATIC SITE FOR PAGES (web-client only)
       # ============================================================
       - name: Prepare static site for Pages
-        if: ${{ env.SKIP_JOB != 'true' && matrix.name == 'web-client' }}
+        if: ${{ env.SKIP_JOB != 'true' && matrix.name == 'web-client' && (github.event_name == 'push' || github.event.inputs.skip_web_deploy != 'true') }}
         run: |
           echo "📦 Preparing static site for GitHub Pages..."
           mkdir -p pages-site
@@ -83,7 +88,7 @@ jobs:
           fi
 
       - name: Copy data files to Pages site
-        if: ${{ env.SKIP_JOB != 'true' && matrix.name == 'web-client' }}
+        if: ${{ env.SKIP_JOB != 'true' && matrix.name == 'web-client' && (github.event_name == 'push' || github.event.inputs.skip_web_deploy != 'true') }}
         run: |
           echo "📂 Copying data files to Pages site..."
 
@@ -152,18 +157,8 @@ jobs:
 
           echo "✅ All data files copied successfully!"
 
-      - name: Verify no symlinks in pages-site
-        if: ${{ env.SKIP_JOB != 'true' && matrix.name == 'web-client' }}
-        run: |
-          if find pages-site -type l | grep -q .; then
-            echo "❌ Symlinks found:"
-            find pages-site -type l
-            exit 1
-          fi
-          echo "✅ No symlinks"
-
       - name: Verify and debug pages-site
-        if: matrix.name == 'web-client' && (github.event_name != 'workflow_dispatch' || github.event.inputs.skip_web_deploy != 'true')
+        if: ${{ env.SKIP_JOB != 'true' && matrix.name == 'web-client' && (github.event_name == 'push' || github.event.inputs.skip_web_deploy != 'true') }}
         run: |
           echo "=== Directory tree (first 100 files) ==="
           find pages-site -type f | head -100
@@ -172,16 +167,26 @@ jobs:
           du -sh pages-site
 
           echo "=== Checking for symlinks ==="
-          find pages-site -type l && { echo "❌ Symlinks found"; exit 1; } || echo "✅ No symlinks"
+          if find pages-site -type l | grep -q .; then
+            echo "❌ Symlinks found:"
+            find pages-site -type l
+            exit 1
+          fi
+          echo "✅ No symlinks"
 
           echo "=== Checking for hard links ==="
-          find pages-site -type f -links +1 && { echo "❌ Hard links found"; exit 1; } || echo "✅ No hard links"
+          if find pages-site -type f -links +1 | grep -q .; then
+            echo "❌ Hard links found:"
+            find pages-site -type f -links +1
+            exit 1
+          fi
+          echo "✅ No hard links"
 
           echo "=== File types ==="
           find pages-site -type f -exec file --brief {} \; | sort | uniq -c
 
       - name: Upload Pages artifact
-        if: matrix.name == 'web-client' && (github.event_name != 'workflow_dispatch' || github.event.inputs.skip_web_deploy != 'true')
+        if: matrix.name == 'web-client' && (github.event_name == 'push' || github.event.inputs.skip_web_deploy != 'true')
         uses: actions/upload-artifact@v4
         with:
           name: github-pages
@@ -190,10 +195,9 @@ jobs:
   deploy-pages:
     name: Deploy Web Client to Pages
     needs: build
+    # The job is skipped entirely if skip_web_deploy is true, so no need to pass inputs down
     if: success() && (github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && github.event.inputs.skip_web_deploy != 'true'))
     uses: ./.github/workflows/deploy-web-client.yml
-    with:
-      skip_deploy: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.skip_web_deploy == 'true' }}
     permissions:
       contents: read
       pages: write

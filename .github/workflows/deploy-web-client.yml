@@ -2,11 +2,6 @@ name: Deploy Web Client to GitHub Pages
 
 on:
   workflow_call:
-    inputs:
-      skip_deploy:
-        type: boolean
-        required: false
-        default: false
 
 permissions:
   contents: read
@@ -22,8 +17,6 @@ jobs:
     name: Deploy to GitHub Pages
     runs-on: ubuntu-latest
     timeout-minutes: 10
-
-    if: inputs.skip_deploy != true
 
     environment:
       name: github-pages
