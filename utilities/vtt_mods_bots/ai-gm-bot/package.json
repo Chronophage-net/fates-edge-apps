@@ -1,0 +1,13 @@
+{
+  "name": "fates-edge-ai-gm-bot",
+  "version": "1.0.0",
+  "description": "Extensible AI Game Master bot for Fate's Edge WebSocket server",
+  "main": "ai-gm-bot.js",
+  "scripts": {
+    "start": "node ai-gm-bot.js"
+  },
+  "dependencies": {
+    "ws": "^8.16.0",
+    "openai": "^4.28.0"
+  }
+}
