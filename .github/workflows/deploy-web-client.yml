@@ -23,7 +23,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
 
-    if: inputs.skip_deploy != 'true'
+    if: inputs.skip_deploy != true
 
     environment:
       name: github-pages

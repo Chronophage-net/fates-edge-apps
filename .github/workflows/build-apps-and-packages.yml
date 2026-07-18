@@ -192,6 +192,8 @@ jobs:
     needs: build
     if: success() && (github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && github.event.inputs.skip_web_deploy != 'true'))
     uses: ./.github/workflows/deploy-web-client.yml
+    with:
+      skip_deploy: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.skip_web_deploy == 'true' }}
     permissions:
       contents: read
       pages: write
