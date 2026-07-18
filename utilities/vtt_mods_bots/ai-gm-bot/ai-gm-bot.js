@@ -1,51 +1,52 @@
 #!/usr/bin/env node
-/**
- * AI GM Bot – Fate’s Edge (WS client)
- *
- * Connects to a Fate’s Edge WebSocket server, claims the GM role,
- * watches player activity and returns AI‑generated GM narration.
- *
- * Features:
- *   • Auto‑configuration via configure‑bot.js when .env is missing/incomplete.
- *   • Driver selection (Ollama/OpenAI/DeepSeek) via AI_PROVIDER env var.
- *   • WS reconnection with exponential back‑off.
- *   • Full console logging (info/debug/warn/error).
- *   • GM election handling (request_gm / approve_gm).
- *   • Simple conversation history per room (last N messages) for context.
- *   • Graceful shutdown (SIGINT) and unhandled‑exception safety.
- */
-
 'use strict';
-const fs   = require('fs');
+
+const fs = require('fs');
 const path = require('path');
 const { spawnSync } = require('child_process');
 const WebSocket = require('ws');
 
 // -------------------------------------------------------------------
-// 0️⃣  Bootstrap – load .env or run the configurator if needed
+// 0. Manual .env loader (no dotenv dependency)
 // -------------------------------------------------------------------
-const envPath   = path.resolve(process.cwd(), '.env');
-const requiredEnvByProvider = {
-  ollama:   ['OLLAMA_BASE_URL', 'OLLAMA_MODEL'],
-  openai:   ['OPENAI_API_KEY'],
-  deepseek: ['DEEPSEEK_API_KEY']
-};
-
-function envIsReady() {
-  if (fs.existsSync(envPath)) {
-    require('dotenv').config({ path: envPath });
+function loadEnvFile(filePath) {
+  if (!fs.existsSync(filePath)) return;
+  const lines = fs.readFileSync(filePath, 'utf-8').split(/\r?\n/);
+  for (const line of lines) {
+    const trimmed = line.trim();
+    if (!trimmed || trimmed.startsWith('#')) continue;
+    const idx = trimmed.indexOf('=');
+    if (idx === -1) continue;
+    const key = trimmed.slice(0, idx).trim();
+    const val = trimmed.slice(idx + 1).trim();
+    const cleanVal = (val.startsWith('"') && val.endsWith('"')) || (val.startsWith("'") && val.endsWith("'"))
+      ? val.slice(1, -1)
+      : val;
+    process.env[key] = cleanVal;
   }
+}
 
+const envPath = path.resolve(process.cwd(), '.env');
+loadEnvFile(envPath);
+
+// -------------------------------------------------------------------
+// 1. Configuration validation
+// -------------------------------------------------------------------
+function envIsReady() {
   const provider = (process.env.AI_PROVIDER || 'ollama').toLowerCase();
-  const required = requiredEnvByProvider[provider];
-  if (!required) {
-    console.error(`❌ Unknown AI provider "${provider}". Supported: ${Object.keys(requiredEnvByProvider).join(', ')}`);
+  const requiredVars = {
+    ollama: ['OLLAMA_BASE_URL', 'OLLAMA_MODEL'],
+    openai: ['OPENAI_API_KEY'],
+    deepseek: ['DEEPSEEK_API_KEY']
+  };
+  const vars = requiredVars[provider];
+  if (!vars) {
+    console.error(`❌ Unknown AI provider "${provider}". Supported: ollama, openai, deepseek`);
     return false;
   }
-  for (const v of required) {
-    const val = process.env[v];
-    if (!val || val.trim() === '') {
-      console.warn(`⚠️  Missing or empty env var: ${v}`);
+  for (const v of vars) {
+    if (!process.env[v]) {
+      console.warn(`⚠️  Missing env var: ${v}`);
       return false;
     }
   }
@@ -54,315 +55,286 @@ function envIsReady() {
 
 if (!envIsReady()) {
   console.warn('\n⚠️  .env missing or incomplete – launching configuration helper…\n');
-  const result = spawnSync('node', ['./configure-bot.js'], {
-    stdio: 'inherit',
-    shell: true
-  });
+  const result = spawnSync('node', ['./configure-bot.js'], { stdio: 'inherit', shell: true });
   if (result.error) {
     console.error('❌ Failed to launch configure-bot.js:', result.error);
     process.exit(1);
   }
-  if (fs.existsSync(envPath)) {
-    require('dotenv').config({ path: envPath });
-    console.log('✅ .env (re)loaded after configuration.');
-  } else {
-    console.error('❌ Configuration did not produce a .env file. Exiting.');
+  loadEnvFile(envPath);
+  if (!envIsReady()) {
+    console.error('❌ Configuration still incomplete. Exiting.');
     process.exit(1);
   }
 }
 
 // -------------------------------------------------------------------
-// 1️⃣  Core imports
+// 2. Driver selection and instantiation
 // -------------------------------------------------------------------
-const AIDriver = require('./drivers/ai-driver');
+const AI_PROVIDER = (process.env.AI_PROVIDER || 'ollama').toLowerCase();
 
-const drivers = {
-  ollama:   require('./drivers/ollama-driver'),
-  openai:   require('./drivers/openai-driver'),
-  deepseek: require('./drivers/deepseek-driver')
-};
-
-// -------------------------------------------------------------------
-// 2️⃣  Choose & instantiate the driver
-// -------------------------------------------------------------------
-const provider = (process.env.AI_PROVIDER || 'ollama').toLowerCase();
-const DriverClass = drivers[provider];
-
-if (!DriverClass) {
-  console.error(`❌ Unsupported AI provider "${provider}". Choose one of: ${Object.keys(drivers).join(', ')}`);
-  process.exit(1);
-}
-
-// Driver‑specific options
 let driver;
 try {
-  if (provider === 'ollama') {
-    driver = new DriverClass({
-      baseUrl:      process.env.OLLAMA_BASE_URL || 'http://localhost:11434',
-      model:        process.env.OLLAMA_MODEL   || 'mistral',
-      apiKey:       process.env.OLLAMA_API_KEY  || null,
-      timeout:      Number(process.env.OLLAMA_TIMEOUT || 15000),
-      temperature:  Number(process.env.OLLAMA_TEMPERATURE || 0.7),
-      topP:         Number(process.env.OLLAMA_TOP_P || 0.9)
-    });
-  } else if (provider === 'openai') {
-    driver = new DriverClass({
-      apiKey:      process.env.OPENAI_API_KEY,
-      model:       process.env.OPENAI_MODEL || 'gpt-4o-mini',
-      temperature: Number(process.env.OPENAI_TEMPERATURE || 0.7),
-      maxTokens:   Number(process.env.OPENAI_MAX_TOKENS || 512)
-    });
-  } else if (provider === 'deepseek') {
-    driver = new DriverClass({
-      apiKey:      process.env.DEEPSEEK_API_KEY,
-      model:       process.env.DEEPSEEK_MODEL || 'deepseek-chat',
-      temperature: Number(process.env.DEEPSEEK_TEMPERATURE || 0.8),
-      maxTokens:   Number(process.env.DEEPSEEK_MAX_TOKENS || 400)
-    });
+  if (AI_PROVIDER === 'ollama') {
+    const OllamaDriver = require('./drivers/ollama-driver');
+    driver = new OllamaDriver();
+    console.log(`🤖 Loaded Ollama driver (model: ${process.env.OLLAMA_MODEL})`);
+  } else if (AI_PROVIDER === 'openai') {
+    const OpenAIDriver = require('./drivers/openai-driver');
+    driver = new OpenAIDriver(process.env.OPENAI_API_KEY, process.env.AI_MODEL || 'gpt-4o-mini');
+    console.log(`🤖 Loaded OpenAI driver (model: ${driver.model})`);
+  } else if (AI_PROVIDER === 'deepseek') {
+    const DeepSeekDriver = require('./drivers/deepseek-driver');
+    driver = new DeepSeekDriver();
+    console.log(`🤖 Loaded DeepSeek driver (model: ${process.env.DEEPSEEK_MODEL || 'deepseek-chat'})`);
+  } else {
+    console.error(`❌ Unsupported AI provider: ${AI_PROVIDER}`);
+    process.exit(1);
   }
 } catch (e) {
-  console.error(`❌ Failed to instantiate ${provider} driver:`, e);
+  console.error(`❌ Failed to load driver: ${e.message}`);
   process.exit(1);
 }
 
 // -------------------------------------------------------------------
-// 2️⃣½  Get driver metadata for logging (must happen **before** we log)
+// 3. Configuration constants
 // -------------------------------------------------------------------
-const DriverMeta = DriverClass.meta || {
-  name: provider,
-  description: 'No description provided'
-};
-console.info(`🤖 Using ${DriverMeta.name} driver (${provider})`);
+const WS_URL = process.env.WS_URL || 'ws://localhost:10000';
+const ROOM_CODE = process.env.ROOM || 'ABC123';
+const BOT_NAME = process.env.BOT_NAME || 'AI_GM';
+const SYSTEM_PROMPT = process.env.SYSTEM_PROMPT ||
+  'You are the Game Master for a Fate\'s Edge session. Provide vivid, concise narration.';
+const MAX_HISTORY = parseInt(process.env.MAX_HISTORY || '20', 10);
 
 // -------------------------------------------------------------------
-// 3️⃣  WS client configuration
+// 4. State
 // -------------------------------------------------------------------
-const WS_URL = process.env.FATE_WS_URL || 'ws://localhost:10000';
-const ROOM_CODE = process.env.FATE_ROOM_CODE || 'ABC123'; // change via .env if needed
-const BOT_NAME  = process.env.BOT_NAME || 'FateAI‑GM';
-const MAX_HISTORY = Number(process.env.MAX_HISTORY || 20); // how many past msgs to keep
-
 let ws = null;
+let connected = false;
+let myRole = 'player';
+let conversation = [];
+let reconnectTimer = null;
 let reconnectAttempts = 0;
-const MAX_RECONNECT_DELAY = 30000; // ms
-let isGM = false; // updated via server events
-let conversation = []; // array of {role, content} for LLM prompt
+const MAX_RECONNECT_DELAY = 30000;
 
 // -------------------------------------------------------------------
-// 4️⃣  Helper: build LLM prompt from conversation + system prompt
+// 5. WebSocket helpers
 // -------------------------------------------------------------------
-function buildPrompt() {
-  const system = process.env.SYSTEM_PROMPT ||
-    'You are the Game Master for a Fate’s Edge session. Provide vivid, concise narration that respects the fiction, uses Story Beats when appropriate, and keeps the story moving.';
-  const hist = conversation.slice(-MAX_HISTORY).map(m => `${m.role}: ${m.content}`).join('\n');
-  return `${system}\n\n${hist}\n\nGM:`;
-}
-
-// -------------------------------------------------------------------
-// 5️⃣  Helper: send a chat message as the bot (GM)
-// -------------------------------------------------------------------
-function sendGMChat(text) {
-  if (!ws || ws.readyState !== WebSocket.OPEN) {
-    console.warn('⚠️  WS not open – cannot send GM chat');
-    return;
+function sendWS(type, data = {}) {
+  if (ws && ws.readyState === WebSocket.OPEN) {
+    const payload = { type, ...data };
+    ws.send(JSON.stringify(payload));
+    console.log(`⬆️  Sent: ${type}`);
   }
-  const payload = {
-    type: 'chat-message',
-    text,
-    sender: BOT_NAME,
-    // optional: you could also add a timestamp
-  };
-  ws.send(JSON.stringify(payload));
-  console.info(`💬 GM chat sent (${text.length} chars)`);
+}
+
+function sendChat(text) {
+  sendWS('chat-message', { text, sender: BOT_NAME, timestamp: Date.now() });
 }
 
 // -------------------------------------------------------------------
-// 6️⃣  WS connection logic
+// 6. Connection & reconnection
 // -------------------------------------------------------------------
-function connectWS() {
-  console.info(`🔌 Connecting to Fate’s Edge WS at ${WS_URL}?room=${ROOM_CODE}`);
+function connect() {
+  if (reconnectTimer) {
+    clearTimeout(reconnectTimer);
+    reconnectTimer = null;
+  }
+  console.log(`🔌 Connecting to ${WS_URL}?room=${ROOM_CODE}`);
   ws = new WebSocket(`${WS_URL}?room=${ROOM_CODE}`);
 
   ws.on('open', () => {
-    console.log('🟢 WS connection opened');
-    reconnectAttempts = 0; // reset back‑off on success
-    // Perform initial handshake claiming GM role
-    const handshake = {
+    connected = true;
+    reconnectAttempts = 0;
+    console.log('🟢 WebSocket connected');
+    ws.send(JSON.stringify({
       type: 'handshake',
       campaignCode: ROOM_CODE,
       clientName: BOT_NAME,
-      role: 'gm', // we ask to be GM right away
-      clientEmail: process.env.BOT_EMAIL || ''
-    };
-    ws.send(JSON.stringify(handshake));
-    console.info(`🤝 Handshake sent – requesting GM role for ${BOT_NAME}`);
+      role: 'gm',
+      password: '',
+      clientEmail: ''
+    }));
   });
 
   ws.on('message', (data) => {
-    let msg;
     try {
-      msg = JSON.parse(data.toString());
+      const msg = JSON.parse(data.toString());
+      // Log all incoming messages (truncated)
+      console.log(`⬇️  ${msg.type}`, JSON.stringify(msg).slice(0, 120));
+      handleMessage(msg);
     } catch (e) {
-      console.warn('⚠️  Received non‑JSON WS message:', data.toString());
-      return;
+      console.warn('⚠️  Non‑JSON message:', data.toString());
     }
-
-    console.debug(`📥 WS event "${msg.type}" from ${msg.sender || 'unknown'}:`, msg);
-
-    // -----------------------------------------------------------------
-    // 6.1 Handshake acknowledgement
-    // -----------------------------------------------------------------
-    if (msg.type === 'handshake_ack') {
-      if (msg.success) {
-        isGM = msg.clientRole === 'gm' || msg.role === 'gm';
-        console.info(`✅ Handshake success – clientId=${msg.clientId}, role=${msg.clientRole || msg.role}`);
-        if (!isGM) {
-          console.info('⚠️  Server did not grant GM role – will request via election');
-          // Ask the current GM for permission
-          ws.send(JSON.stringify({ type: 'request_gm' }));
-        }
-      } else {
-        console.error('❌ Handshake failed:', msg);
-      }
-      return;
-    }
-
-    // -----------------------------------------------------------------
-    // 6.2 GM election messages
-    // -----------------------------------------------------------------
-    if (msg.type === 'gm_vote_request') {
-      // Current GM asks us to approve a requester – we are the GM, so approve
-      if (isGM) {
-        console.info(`🗳️  GM vote request for ${msg.requesterName} (${msg.requesterId}) – approving`);
-        ws.send(JSON.stringify({
-          type: 'approve_gm',
-          targetId: msg.requesterId
-        }));
-      } else {
-        // We are not GM – just ignore (the real GM will handle)
-      }
-      return;
-    }
-
-    if (msg.type === 'gm_role_update') {
-      const newRole = msg.role;
-      console.info(`🔁 Role update: ${isGM ? 'GM' : 'player'} → ${newRole}`);
-      isGM = (newRole === 'gm');
-      return;
-    }
-
-    // -----------------------------------------------------------------
-    // 6.3 Presence / client list (useful for debugging)
-    // -----------------------------------------------------------------
-    if (msg.type === 'presence') {
-      console.debug(`👥 Presence update – ${msg.clients?.length || 0} clients`);
-      return;
-    }
-
-    // -----------------------------------------------------------------
-    // 6.4 Player‑originated events that trigger a GM response
-    // -----------------------------------------------------------------
-    const isPlayerMsg = msg.sender && msg.sender !== BOT_NAME;
-    const triggersGM = ['chat-message', 'roll-dice', 'deck-drawn'].includes(msg.type);
-
-    if (isPlayerMsg && triggersGM) {
-      // Add the player's message to conversation history
-      conversation.push({
-        role: msg.sender,
-        content: msg.type === 'chat-message' ? msg.text :
-                 msg.type === 'roll-dice'   ? `rolled ${msg.expr} = ${msg.total}` :
-                 msg.type === 'deck-drawn'  ? `drew ${msg.cards.length} card(s)` :
-                 JSON.stringify(msg)
-      });
-
-      // Keep history bounded
-      if (conversation.length > MAX_HISTORY * 2) conversation.splice(0, conversation.length - MAX_HISTORY);
-
-      // Build prompt and query LLM
-      (async () => {
-        try {
-          const prompt = buildPrompt();
-          console.debug(`🧠 LLM prompt (${prompt.length} chars)`);
-          const reply = await driver.generateResponse({ systemPrompt: process.env.SYSTEM_PROMPT, messages: conversation.slice(-MAX_HISTORY) });
-          // Trim any leading/trailing whitespace and ensure we don't echo the prompt
-          const cleanReply = reply.trim();
-          if (cleanReply) {
-            sendGMChat(cleanReply);
-            // Also add the GM's own response to history so the LLM sees it
-            conversation.push({ role: BOT_NAME, content: cleanReply });
-          }
-        } catch (err) {
-          console.error(`❌ LLM generation failed:`, err.message);
-          sendGMChat('*The world hesitates… the dice hang in the air. Something interferes with the weave of fate. Please try again.*');
-        }
-      })();
-      return;
-    }
-
-    // -----------------------------------------------------------------
-    // 6.5 Other server‑to‑client broadcasts (just log)
-    // -----------------------------------------------------------------
-    // You can handle additional event types here if you want the bot to react
-    // (e.g., whiteboard updates, module pushes, etc.).
   });
 
-  ws.on('close', (code, reason) => {
-    console.info(`🔚 WS connection closed (code ${code}) – ${reason}`);
-    isGM = false;
+  ws.on('close', (code) => {
+    connected = false;
+    console.log(`🔌 Disconnected (code ${code})`);
     scheduleReconnect();
   });
 
   ws.on('error', (err) => {
-    console.error(`🔴 WS error:`, err);
-    // The WS client will close on error; reconnect logic lives in 'close' handler.
+    console.error('🔴 WebSocket error:', err.message);
   });
 }
 
-// -------------------------------------------------------------------
-// 7️⃣  Reconnection with exponential back‑off
-// -------------------------------------------------------------------
 function scheduleReconnect() {
   const delay = Math.min(1000 * 2 ** reconnectAttempts, MAX_RECONNECT_DELAY);
-  console.info(`⏳ Scheduling reconnect in ${delay}ms (attempt ${reconnectAttempts + 1})`);
-  setTimeout(() => {
+  console.log(`⏳ Reconnecting in ${delay}ms (attempt ${reconnectAttempts + 1})`);
+  reconnectTimer = setTimeout(() => {
     reconnectAttempts++;
-    connectWS();
+    connect();
   }, delay);
 }
 
 // -------------------------------------------------------------------
-// 8️⃣  Start the bot
+// 7. Message handler – normalized parsing
 // -------------------------------------------------------------------
-console.log('\n🚀 AI GM Bot (WS client) starting…');
-console.log(`   Node version   : ${process.version}`);
-console.log(`   WS URL         : ${WS_URL}`);
-console.log(`   Room code      : ${ROOM_CODE}`);
-console.log(`   Bot name       : ${BOT_NAME}`);
-console.log(`   AI provider    : ${provider} (${DriverMeta.name})`);
-console.log(`   Model          : ${driver.model || '(model info not exposed)'}`);
-console.log(`   Timeout (ms)   : ${driver.timeout || 'N/A'}`);
-console.log(`   Temperature    : ${driver.temperature || 'N/A'}`);
-console.log(`   Top‑p          : ${driver.topP || 'N/A'}\n`);
+function handleMessage(msg) {
+  // 7a. Handshake
+  if (msg.type === 'handshake_ack') {
+    myRole = msg.clientRole || msg.role || 'player';
+    console.log(`🤝 Handshake OK. Role: ${myRole}`);
+    if (myRole !== 'gm') {
+      console.log('📢 I am not the GM – will request GM role.');
+      sendWS('request_gm');
+    } else {
+      console.log('👑 I am the Game Master!');
+      sendChat('*The AI Game Master has joined.*');
+    }
+    return;
+  }
 
-connectWS();
+  // 7b. GM election
+  if (msg.type === 'gm_vote_request') {
+    if (myRole === 'gm') {
+      console.log(`🗳️  Approving GM request from ${msg.requesterName}`);
+      sendWS('approve_gm', { targetId: msg.requesterId });
+    }
+    return;
+  }
+
+  if (msg.type === 'gm_role_update') {
+    const newRole = msg.role;
+    console.log(`🔁 Role changed: ${myRole} → ${newRole}`);
+    myRole = newRole;
+    if (myRole === 'gm') sendChat('*I am now the Game Master.*');
+    return;
+  }
+
+  // 7c. Presence
+  if (msg.type === 'presence') {
+    console.debug(`👥 ${msg.clients?.length || 0} clients in room`);
+    return;
+  }
+
+  // 7d. Extract text & sender from various message formats
+  let text = '';
+  let sender = 'Unknown';
+
+  // Web client format: { type: 'chat-message', message: { text, sender, ... }, socketId, room }
+  if (msg.type === 'chat-message' && msg.message) {
+    text = msg.message.text || '';
+    sender = msg.message.sender || 'Unknown';
+  }
+  // Terminal client format: { type: 'chat_message', value: { text, sender, ... } }
+  else if (msg.type === 'chat_message' && msg.value) {
+    text = msg.value.text || '';
+    sender = msg.value.sender || 'Unknown';
+  }
+  // Legacy direct format
+  else if (msg.type === 'chat-message') {
+    text = msg.text || '';
+    sender = msg.sender || 'Unknown';
+  }
+
+  if (!text && !sender) return; // not a text message
+
+  console.log(`💬 [${sender}] ${text}`);
+
+  // 7e. Always handle !gm commands (tool mode)
+  if (text.startsWith('!gm')) {
+    handleBotCommand(sender, text);
+    return;
+  }
+
+  // 7f. If we are GM, generate AI narration
+  if (myRole === 'gm') {
+    conversation.push({ role: sender, content: text });
+    if (conversation.length > MAX_HISTORY) conversation.shift();
+
+    (async () => {
+      try {
+        const reply = await driver.generateResponse({
+          systemPrompt: SYSTEM_PROMPT,
+          messages: conversation.slice(-MAX_HISTORY)
+        });
+        const clean = reply.trim();
+        if (clean) {
+          sendChat(clean);
+          conversation.push({ role: BOT_NAME, content: clean });
+        }
+      } catch (err) {
+        console.error('❌ LLM error:', err.message);
+        sendChat('*The story pauses. (AI error)*');
+      }
+    })();
+  }
+
+  // Optional: add roll results to conversation
+  if (msg.type === 'roll-result' && myRole === 'gm') {
+    const rollText = `${sender} rolled ${msg.expr || 'dice'} = ${msg.total}`;
+    conversation.push({ role: sender, content: rollText });
+    if (conversation.length > MAX_HISTORY) conversation.shift();
+  }
+}
 
 // -------------------------------------------------------------------
-// 9️⃣  Graceful shutdown
+// 8. Bot command handler (tool mode)
+// -------------------------------------------------------------------
+function handleBotCommand(sender, text) {
+  const parts = text.split(/\s+/);
+  const cmd = parts[1]?.toLowerCase();
+  if (cmd === 'help') {
+    sendChat('Available commands: !gm help, !gm status, !gm dice XdY');
+  } else if (cmd === 'status') {
+    sendChat(`I am ${myRole === 'gm' ? 'the Game Master' : 'a helper bot (GM is someone else)'}.`);
+  } else if (cmd === 'dice' && parts[2]) {
+    const formula = parts[2];
+    const match = formula.match(/^(\d+)d(\d+)$/i);
+    if (match) {
+      const count = parseInt(match[1]);
+      const sides = parseInt(match[2]);
+      const rolls = [];
+      let total = 0;
+      for (let i = 0; i < count; i++) {
+        const r = Math.floor(Math.random() * sides) + 1;
+        rolls.push(r);
+        total += r;
+      }
+      sendChat(`${sender} requested a roll: ${formula} → [${rolls.join(', ')}] = ${total}`);
+    } else {
+      sendChat('Usage: !gm dice 2d6');
+    }
+  } else {
+    sendChat('Unknown command. Try !gm help');
+  }
+}
+
+// -------------------------------------------------------------------
+// 9. Startup
+// -------------------------------------------------------------------
+console.log('🚀 AI GM Bot starting…');
+console.log(`   WS: ${WS_URL}   Room: ${ROOM_CODE}   Name: ${BOT_NAME}`);
+connect();
+
+// -------------------------------------------------------------------
+// 10. Graceful shutdown
 // -------------------------------------------------------------------
 process.on('SIGINT', () => {
-  console.log('\n🛑 Received SIGINT – shutting down gracefully…');
+  console.log('\n🛑 Shutting down…');
   if (ws && ws.readyState === WebSocket.OPEN) {
-    ws.close(1000, 'Shutdown requested');
+    ws.close(1000, 'Shutdown');
   }
   process.exit(0);
 });
-
-process.on('unhandledRejection', (reason, promise) => {
-  console.error('💥 Unhandled Rejection at:', promise, 'reason:', reason);
-});
-
-process.on('uncaughtException', (err) => {
-  console.error('💥 Uncaught Exception:', err);
-  process.exit(1);
-});
-

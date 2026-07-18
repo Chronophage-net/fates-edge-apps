@@ -40,7 +40,7 @@ jobs:
 
     steps:
       - name: Download socket server package
-        if: github.event_name == 'workflow_call'
+        if: github.event_name == 'workflow_dispatch'
         uses: actions/download-artifact@v4
         with:
           name: socket-server-package
@@ -48,7 +48,7 @@ jobs:
         continue-on-error: true
 
       - name: Extract downloaded artifact (if found)
-        if: github.event_name == 'workflow_call'
+        if: github.event_name == 'workflow_dispatch'
         id: extract
         run: |
           mkdir -p "${{ github.workspace }}/socket-server-deploy"

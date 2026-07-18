@@ -1,4 +1,4 @@
-name: Build & Push Docker Images
+name: Build & Publish Docker Images
 
 on:
   workflow_call:
@@ -26,7 +26,7 @@ on:
 
 permissions:
   contents: read
-  packages: write   # if you also push to GitHub Container Registry
+  packages: write
 
 env:
   DOCKER_USER: ${{ secrets.DOCKERHUB_USERNAME }}
@@ -40,7 +40,6 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        # Define which apps have a Dockerfile
         app:
           - name: socket-server
             context: ./utilities/javascript/fates-edge-socket-server
@@ -48,10 +47,6 @@ jobs:
           - name: web-client
             context: ./utilities/javascript/fates-edge-web-client
             dockerfile: ./utilities/javascript/fates-edge-web-client/Dockerfile
-          # Add more if you have them:
-          # - name: discord-bot
-          #   context: ./fates-edge-discord-bot
-          #   dockerfile: ./fates-edge-discord-bot/Dockerfile
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -71,17 +66,13 @@ jobs:
       - name: Determine tags
         id: tags
         run: |
-          # Base tag: either the input version, 'latest', or SHA
           VERSION="${{ inputs.version }}"
           if [ -z "$VERSION" ]; then
-            # If triggered by push, use 'latest' + SHA
             VERSION="latest"
           fi
           SHA="${{ github.sha }}"
           APP="${{ matrix.app.name }}"
-          # Build tag list: base:version, base:app-version, base:app-sha
           TAGS="${IMAGE_BASE}:${VERSION},${IMAGE_BASE}:${APP}-${VERSION},${IMAGE_BASE}:${APP}-${SHA}"
-          # If version is semantic, also add app:version and app:latest
           if [[ "$VERSION" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
             TAGS="${TAGS},${IMAGE_BASE}:${APP}-${VERSION},${IMAGE_BASE}:${APP}-latest"
           fi
@@ -93,8 +84,8 @@ jobs:
           context: ${{ matrix.app.context }}
           file: ${{ matrix.app.dockerfile }}
           platforms: linux/amd64,linux/arm64
-          push: ${{ inputs.push != false }}
+          push: ${{ inputs.push == true || inputs.push == 'true' }}
           tags: ${{ steps.tags.outputs.tags }}
           cache-from: type=gha,scope=${{ matrix.app.name }}
           cache-to: type=gha,mode=max,scope=${{ matrix.app.name }}
-          provenance: false   # optional, set true if you need attestations
+          provenance: false
