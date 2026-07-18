@@ -18,10 +18,15 @@ function loadEnvFile(filePath) {
     const idx = trimmed.indexOf('=');
     if (idx === -1) continue;
     const key = trimmed.slice(0, idx).trim();
-    const val = trimmed.slice(idx + 1).trim();
+    let val = trimmed.slice(idx + 1).trim();
+    // Remove inline comments (everything after # that is not inside quotes)
+    const commentIdx = val.indexOf('#');
+    if (commentIdx !== -1) {
+        val = val.slice(0, commentIdx).trim();
+    }
     const cleanVal = (val.startsWith('"') && val.endsWith('"')) || (val.startsWith("'") && val.endsWith("'"))
-      ? val.slice(1, -1)
-      : val;
+        ? val.slice(1, -1)
+        : val;
     process.env[key] = cleanVal;
   }
 }
@@ -85,7 +90,7 @@ try {
   } else if (AI_PROVIDER === 'deepseek') {
     const DeepSeekDriver = require('./drivers/deepseek-driver');
     driver = new DeepSeekDriver();
-    console.log(`🤖 Loaded DeepSeek driver (model: ${process.env.DEEPSEEK_MODEL || 'deepseek-chat'})`);
+    console.log(`🤖 Loaded DeepSeek driver (model: ${process.env.DEEPSEEK_MODEL || 'deepseek-v4-pro'})`);
   } else {
     console.error(`❌ Unsupported AI provider: ${AI_PROVIDER}`);
     process.exit(1);
@@ -111,7 +116,7 @@ const MAX_HISTORY = parseInt(process.env.MAX_HISTORY || '20', 10);
 let ws = null;
 let connected = false;
 let myRole = 'player';
-let conversation = [];
+let conversation = [];          // each item { role: 'user'|'assistant'|'system', content }
 let reconnectTimer = null;
 let reconnectAttempts = 0;
 const MAX_RECONNECT_DELAY = 30000;
@@ -191,6 +196,9 @@ function scheduleReconnect() {
 // 7. Message handler – normalized parsing
 // -------------------------------------------------------------------
 function handleMessage(msg) {
+  // Ignore state-sync messages
+  if (msg.type === 'state-updated') return;
+
   // 7a. Handshake
   if (msg.type === 'handshake_ack') {
     myRole = msg.clientRole || msg.role || 'player';
@@ -260,7 +268,8 @@ function handleMessage(msg) {
 
   // 7f. If we are GM, generate AI narration
   if (myRole === 'gm') {
-    conversation.push({ role: sender, content: text });
+    // Add user message to conversation with correct role
+    conversation.push({ role: 'user', content: `${sender}: ${text}` });
     if (conversation.length > MAX_HISTORY) conversation.shift();
 
     (async () => {
@@ -272,7 +281,8 @@ function handleMessage(msg) {
         const clean = reply.trim();
         if (clean) {
           sendChat(clean);
-          conversation.push({ role: BOT_NAME, content: clean });
+          conversation.push({ role: 'assistant', content: clean });
+          if (conversation.length > MAX_HISTORY) conversation.shift();
         }
       } catch (err) {
         console.error('❌ LLM error:', err.message);
@@ -284,7 +294,7 @@ function handleMessage(msg) {
   // Optional: add roll results to conversation
   if (msg.type === 'roll-result' && myRole === 'gm') {
     const rollText = `${sender} rolled ${msg.expr || 'dice'} = ${msg.total}`;
-    conversation.push({ role: sender, content: rollText });
+    conversation.push({ role: 'user', content: rollText });
     if (conversation.length > MAX_HISTORY) conversation.shift();
   }
 }
@@ -324,9 +334,22 @@ function handleBotCommand(sender, text) {
 // -------------------------------------------------------------------
 // 9. Startup
 // -------------------------------------------------------------------
-console.log('🚀 AI GM Bot starting…');
-console.log(`   WS: ${WS_URL}   Room: ${ROOM_CODE}   Name: ${BOT_NAME}`);
-connect();
+(async function main() {
+  console.log('🚀 AI GM Bot starting…');
+  console.log(`   WS: ${WS_URL}   Room: ${ROOM_CODE}   Name: ${BOT_NAME}`);
+
+  // Initialize the AI driver (connection test, model pulling, etc.)
+  if (driver && typeof driver.initialize === 'function') {
+    try {
+      await driver.initialize();
+    } catch (e) {
+      console.error('Driver initialization failed:', e.message);
+      // Continue anyway – the driver may still work for individual calls
+    }
+  }
+
+  connect();
+})();
 
 // -------------------------------------------------------------------
 // 10. Graceful shutdown

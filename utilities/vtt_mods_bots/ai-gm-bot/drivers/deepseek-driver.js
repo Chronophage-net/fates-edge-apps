@@ -7,7 +7,7 @@ class DeepSeekDriver extends AIDriver {
         if (!this.apiKey) {
             throw new Error('DEEPSEEK_API_KEY environment variable is required for DeepSeek driver');
         }
-        this.model = process.env.DEEPSEEK_MODEL || 'deepseek-chat';
+        this.model = process.env.DEEPSEEK_MODEL || 'deepseek-v4-pro';
         this.maxTokens = parseInt(process.env.DEEPSEEK_MAX_TOKENS || '400', 10);
         this.temperature = parseFloat(process.env.DEEPSEEK_TEMPERATURE || '0.8');
     }
@@ -44,7 +44,6 @@ class DeepSeekDriver extends AIDriver {
             console.log(`✅ DeepSeek connection OK (model: ${this.model})`);
         } catch (e) {
             console.error(`❌ DeepSeek initialization error: ${e.message}`);
-            // We don't exit; the bot will run but AI generation will fail later.
         }
     }
 
@@ -54,26 +53,30 @@ class DeepSeekDriver extends AIDriver {
             ...context.messages
         ];
 
+        const body = {
+            model: this.model,
+            messages,
+            max_tokens: this.maxTokens,
+            temperature: this.temperature,
+            stream: false
+        };
+
         const response = await fetch('https://api.deepseek.com/v1/chat/completions', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${this.apiKey}`
             },
-            body: JSON.stringify({
-                model: this.model,
-                messages,
-                max_tokens: this.maxTokens,
-                temperature: this.temperature,
-                stream: false
-            })
+            body: JSON.stringify(body)
         });
 
         if (!response.ok) {
             const errText = await response.text();
+            console.error('DeepSeek request payload:', JSON.stringify(body, null, 2).slice(0, 500));
             let errMsg = `DeepSeek API error (${response.status}): ${errText}`;
             if (response.status === 401) errMsg = 'DeepSeek API key is invalid (401).';
             if (response.status === 429) errMsg = 'DeepSeek rate limit exceeded (429). Slow down.';
+            if (response.status === 400) errMsg = `DeepSeek bad request (400): ${errText}`;
             if (response.status === 500) errMsg = 'DeepSeek server error (500). Try again later.';
             throw new Error(errMsg);
         }
@@ -90,7 +93,7 @@ class DeepSeekDriver extends AIDriver {
 
 DeepSeekDriver.meta = {
     name: 'DeepSeek',
-    description: 'Uses the DeepSeek Chat API. Requires an API key.',
+    description: 'Uses the DeepSeek V4 API (deepseek-v4-pro or deepseek-v4-flash). Requires an API key.',
     requiredEnv: ['DEEPSEEK_API_KEY']
 };
 
