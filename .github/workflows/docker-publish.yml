@@ -1,21 +1,66 @@
 name: Build & Push Docker Images
 
 on:
-  push:
-    branches: [main]
+  workflow_call:
+    inputs:
+      version:
+        description: 'Release version (e.g., v1.2.3)'
+        required: false
+        type: string
+      push:
+        description: 'Push images to registry'
+        required: false
+        default: true
+        type: boolean
   workflow_dispatch:
+    inputs:
+      version:
+        description: 'Release version (e.g., v1.2.3)'
+        required: false
+        type: string
+      push:
+        description: 'Push images to registry'
+        required: false
+        default: true
+        type: boolean
 
 permissions:
   contents: read
+  packages: write   # if you also push to GitHub Container Registry
+
+env:
+  DOCKER_USER: ${{ secrets.DOCKERHUB_USERNAME }}
+  DOCKER_PASS: ${{ secrets.DOCKERHUB_TOKEN }}
+  REGISTRY: docker.io
+  IMAGE_BASE: chronophage/fates-edge
 
 jobs:
-  docker:
-    name: Build & Push Docker Images
+  docker-build:
+    name: Build & Push
     runs-on: ubuntu-latest
-
+    strategy:
+      matrix:
+        # Define which apps have a Dockerfile
+        app:
+          - name: socket-server
+            context: ./utilities/javascript/fates-edge-socket-server
+            dockerfile: ./utilities/javascript/fates-edge-socket-server/Dockerfile
+          - name: web-client
+            context: ./utilities/javascript/fates-edge-web-client
+            dockerfile: ./utilities/javascript/fates-edge-web-client/Dockerfile
+          # Add more if you have them:
+          # - name: discord-bot
+          #   context: ./fates-edge-discord-bot
+          #   dockerfile: ./fates-edge-discord-bot/Dockerfile
     steps:
-      - name: Checkout repository
+      - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
 
       - name: Log in to Docker Hub
         uses: docker/login-action@v3
@@ -23,32 +68,33 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Build & Push Socket Server
-        uses: docker/build-push-action@v6
-        with:
-          context: ./utilities/javascript/fates-edge-socket-server
-          file: ./utilities/javascript/fates-edge-socket-server/Dockerfile
-          push: true
-          tags: |
-            chronophage/fates-edge:socket-server
-            chronophage/fates-edge:socket-server-${{ github.sha }}
+      - name: Determine tags
+        id: tags
+        run: |
+          # Base tag: either the input version, 'latest', or SHA
+          VERSION="${{ inputs.version }}"
+          if [ -z "$VERSION" ]; then
+            # If triggered by push, use 'latest' + SHA
+            VERSION="latest"
+          fi
+          SHA="${{ github.sha }}"
+          APP="${{ matrix.app.name }}"
+          # Build tag list: base:version, base:app-version, base:app-sha
+          TAGS="${IMAGE_BASE}:${VERSION},${IMAGE_BASE}:${APP}-${VERSION},${IMAGE_BASE}:${APP}-${SHA}"
+          # If version is semantic, also add app:version and app:latest
+          if [[ "$VERSION" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            TAGS="${TAGS},${IMAGE_BASE}:${APP}-${VERSION},${IMAGE_BASE}:${APP}-latest"
+          fi
+          echo "tags=${TAGS}" >> $GITHUB_OUTPUT
 
-      - name: Build & Push Web Client
+      - name: Build and push
         uses: docker/build-push-action@v6
         with:
-          context: ./utilities/javascript/fates-edge-web-client
-          file: ./utilities/javascript/fates-edge-web-client/Dockerfile
-          push: true
-          tags: |
-            chronophage/fates-edge:web-client
-            chronophage/fates-edge:web-client-${{ github.sha }}
-
-      - name: Build & Push Web Client (dev)
-        uses: docker/build-push-action@v6
-        with:
-          context: ./utilities/javascript/fates-edge-web-client
-          file: ./utilities/javascript/fates-edge-web-client/Dockerfile.dev
-          push: true
-          tags: |
-            chronophage/fates-edge:web-client-dev
-            chronophage/fates-edge:web-client-dev-${{ github.sha }}
+          context: ${{ matrix.app.context }}
+          file: ${{ matrix.app.dockerfile }}
+          platforms: linux/amd64,linux/arm64
+          push: ${{ inputs.push != false }}
+          tags: ${{ steps.tags.outputs.tags }}
+          cache-from: type=gha,scope=${{ matrix.app.name }}
+          cache-to: type=gha,mode=max,scope=${{ matrix.app.name }}
+          provenance: false   # optional, set true if you need attestations

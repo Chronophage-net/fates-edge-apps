@@ -1,0 +1,288 @@
+name: Build All Apps & Create Release
+
+on:
+  push:
+    branches:
+      - main                 # adjust if your default branch differs
+    tags:
+      - 'v*'                 # triggers on tags like v1.2.3
+  workflow_dispatch:         # manual trigger (use to force a release)
+
+permissions:
+  contents: write            # needed to create releases and upload assets
+  actions: read              # needed to download artifacts in reusable workflows
+  pages: write               # needed for GitHub Pages deployment
+  id-token: write            # for Pages authentication
+
+env:
+  NODE_VERSION: 22
+  PYTHON_VERSION: '3.10'     # adjust if needed
+
+jobs:
+  # --------------------------------------------------------------------
+  # 1. Build all applications and package them as artifacts
+  # --------------------------------------------------------------------
+  build:
+    name: Build & Package Apps
+    runs-on: ubuntu-latest
+    outputs:
+      release_tag: ${{ steps.version.outputs.release_tag }}
+      release_name: ${{ steps.version.outputs.release_name }}
+      prerelease: ${{ steps.version.outputs.prerelease }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0      # fetch all tags
+
+      # ---- Determine version (tag or build number) ----
+      - name: Determine release version
+        id: version
+        run: |
+          # If this commit is tagged with a semantic version (vX.Y.Z), use it
+          if [[ "${{ github.ref_type }}" == "tag" && "${{ github.ref_name }}" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            TAG="${{ github.ref_name }}"
+            echo "release_tag=${TAG}" >> $GITHUB_OUTPUT
+            echo "release_name=${TAG}" >> $GITHUB_OUTPUT
+            echo "prerelease=false" >> $GITHUB_OUTPUT
+          else
+            # Generate a build number from date + run number
+            BUILD_DATE=$(date +'%Y-%m-%d')
+            RUN_NUM="${{ github.run_number }}"
+            BUILD_TAG="build-${BUILD_DATE}-${RUN_NUM}"
+            echo "release_tag=${BUILD_TAG}" >> $GITHUB_OUTPUT
+            echo "release_name=Build #${RUN_NUM} (${BUILD_DATE})" >> $GITHUB_OUTPUT
+            echo "prerelease=true" >> $GITHUB_OUTPUT
+          fi
+
+      # ---- Setup Node.js (with global cache for all npm steps) ----
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          # Caches ~/.npm across all steps – safe because npm ci uses lockfiles
+
+      # ---- Setup Python (for Python client) ----
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      # ---- Build fates-edge-web-client ----
+      - name: Build Web Client
+        run: |
+          cd utilities/javascript/fates-edge-web-client
+          npm ci
+          npm run build
+      - name: Package Web Client
+        run: |
+          cd utilities/javascript/fates-edge-web-client
+          tar -czf ../../../web-client.tar.gz dist/
+      - name: Upload Web Client artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: web-client-build
+          path: web-client.tar.gz
+
+      # ---- Build fates-edge-desktop-client ----
+      - name: Build Desktop Client
+        run: |
+          cd utilities/javascript/fates-edge-desktop-client
+          npm ci
+          npm run build      # adjust if your build command differs
+      - name: Package Desktop Client
+        run: |
+          cd utilities/javascript/fates-edge-desktop-client
+          # Assuming build output is in 'build' or 'dist'; adjust as needed
+          if [ -d "build" ]; then
+            tar -czf ../../../desktop-client.tar.gz build/
+          elif [ -d "dist" ]; then
+            tar -czf ../../../desktop-client.tar.gz dist/
+          else
+            echo "⚠️ No build directory found; skipping desktop package"
+          fi
+      - name: Upload Desktop Client artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: desktop-client-package
+          path: desktop-client.tar.gz
+        continue-on-error: true  # allow rest of the workflow to continue even if desktop build fails
+
+      # ---- Build fates-edge-socket-server ----
+      - name: Build Socket Server
+        run: |
+          cd utilities/javascript/fates-edge-socket-server
+          npm ci
+          npm prune --production
+      - name: Package Socket Server
+        run: |
+          cd utilities/javascript/fates-edge-socket-server
+          tar -czf ../../../socket-server.tar.gz .
+      - name: Upload Socket Server artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: socket-server-package
+          path: socket-server.tar.gz
+
+      # ---- Build fates-edge-discord-bot ----
+      - name: Build Discord Bot
+        run: |
+          cd fates-edge-discord-bot
+          npm ci
+          npm prune --production
+      - name: Package Discord Bot
+        run: |
+          cd fates-edge-discord-bot
+          tar -czf ../discord-bot.tar.gz .
+      - name: Upload Discord Bot artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: discord-bot-package
+          path: discord-bot.tar.gz
+
+      # ---- Build fates-edge-terminal (optional, if present) ----
+      - name: Build Terminal Client (if applicable)
+        run: |
+          if [ -f "utilities/javascript/fates-edge-terminal/package.json" ]; then
+            cd utilities/javascript/fates-edge-terminal
+            npm ci || true
+            npm run build || true
+            tar -czf ../../../terminal-client.tar.gz . || true
+          fi
+        continue-on-error: true
+      - name: Upload Terminal Client artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: terminal-client-package
+          path: terminal-client.tar.gz
+        continue-on-error: true
+
+      # ---- Build Python client ----
+      - name: Package Python Client
+        run: |
+          cd utilities/python/fates-edge-python-client
+          tar -czf ../../../python-client.tar.gz .
+      - name: Upload Python Client artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: python-client-package
+          path: python-client.tar.gz
+
+      # ---- Build Foundry module ----
+      - name: Package Foundry Module
+        run: |
+          cd foundry_fates-edge-bridge
+          tar -czf ../foundry-module.tar.gz .
+      - name: Upload Foundry Module artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: foundry-module-package
+          path: foundry-module.tar.gz
+
+      # ---- Build Roll20 module ----
+      - name: Package Roll20 Module
+        run: |
+          cd fates-edge-roll20
+          tar -czf ../roll20-module.tar.gz .
+      - name: Upload Roll20 Module artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: roll20-module-package
+          path: roll20-module.tar.gz
+
+  # --------------------------------------------------------------------
+  # 2. Create GitHub Release and attach all artifacts
+  # --------------------------------------------------------------------
+  create-release:
+    name: Create Release
+    runs-on: ubuntu-latest
+    needs: build
+    # Only run if the build job succeeded
+    if: needs.build.result == 'success'
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts/
+
+      - name: Create Release and upload assets
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ needs.build.outputs.release_tag }}
+          name: ${{ needs.build.outputs.release_name }}
+          draft: ${{ needs.build.outputs.prerelease == 'true' }}
+          prerelease: ${{ needs.build.outputs.prerelease == 'true' }}
+          body: |
+            ## Automatic build
+            - **Date**: ${{ github.event.head_commit.timestamp || github.event.repository.updated_at }}
+            - **Commit**: ${{ github.sha }}
+            - **Triggered by**: ${{ github.triggering_actor }}
+
+            Attached are packaged builds of all Fates Edge components.
+          files: artifacts/*/*.tar.gz
+          generate_release_notes: false   # set to true for auto-generated release notes
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  # --------------------------------------------------------------------
+  # 3. Deploy web client to GitHub Pages (only from main branch pushes)
+  # --------------------------------------------------------------------
+  deploy-pages:
+    name: Deploy Web Client to Pages
+    runs-on: ubuntu-latest
+    needs: build
+    # Only deploy on main branch pushes (not on tags, to avoid double-triggering)
+    if: github.ref == 'refs/heads/main'
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Download web client artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: web-client-build
+          path: web-client
+
+      - name: Extract web client
+        run: |
+          mkdir -p web-client-extracted
+          tar -xzf web-client/web-client.tar.gz -C web-client-extracted/
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: web-client-extracted/
+
+      - name: Deploy to Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+
+  # --------------------------------------------------------------------
+  # 4. Deploy Socket Server to Render (ONLY for semantic version tags)
+  # --------------------------------------------------------------------
+  deploy-socket-to-render:
+    name: Deploy Socket Server to Render
+    runs-on: ubuntu-latest
+    needs: create-release
+    # Only deploy when we have a real semantic version (not a build-number draft)
+    if: needs.build.outputs.prerelease == 'false'
+    uses: ./.github/workflows/deploy-socket-server.yml
+    with:
+      environment: production
+    secrets: inherit
+
+  # --------------------------------------------------------------------
+  # 5. Build & Push Docker Images (ONLY for semantic version tags)
+  # --------------------------------------------------------------------
+  docker-push:
+    name: Build & Push Docker Images
+    runs-on: ubuntu-latest
+    needs: create-release
+    # Only push when we have a real semantic version (not a build-number draft)
+    if: needs.build.outputs.prerelease == 'false'
+    uses: ./.github/workflows/docker-publish.yml
+    with:
+      version: ${{ needs.build.outputs.release_tag }}
+      push: true
+    secrets: inherit
