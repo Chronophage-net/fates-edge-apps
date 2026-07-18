@@ -13,6 +13,7 @@ permissions:
   actions: read               # needed to download artifacts in reusable workflows
   pages: write                # needed for GitHub Pages deployment
   id-token: write             # for Pages authentication
+  packages: write    # ← add this line
 
 env:
   NODE_VERSION: 22
