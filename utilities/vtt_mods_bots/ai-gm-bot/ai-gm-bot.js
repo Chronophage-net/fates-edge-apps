@@ -1,5 +1,5 @@
-const AIDriver = require('../ai-driver');
-const fetch = require('node-fetch'); // or built-in fetch
+const AIDriver = require('./drivers/ai-driver');
+// const fetch = require('node-fetch'); // or built-in fetch
 
 class OllamaDriver extends AIDriver {
     constructor(model = 'mistral') {

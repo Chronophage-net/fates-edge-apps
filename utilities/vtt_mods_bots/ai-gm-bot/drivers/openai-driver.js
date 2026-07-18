@@ -1,5 +1,5 @@
 const { OpenAI } = require('openai');
-const AIDriver = require('../ai-driver');
+const AIDriver = require('./ai-driver');
 
 class OpenAIDriver extends AIDriver {
     constructor(apiKey, model = 'gpt-4o-mini') {
@@ -24,5 +24,12 @@ class OpenAIDriver extends AIDriver {
         return completion.choices[0].message.content.trim();
     }
 }
+
+// Metadata for the configuration wizard
+OpenAIDriver.meta = {
+    name: 'OpenAI',
+    description: 'Uses GPT-4o-mini (or another OpenAI model). Requires an API key.',
+    requiredEnv: ['OPENAI_API_KEY']
+};
 
 module.exports = OpenAIDriver;
