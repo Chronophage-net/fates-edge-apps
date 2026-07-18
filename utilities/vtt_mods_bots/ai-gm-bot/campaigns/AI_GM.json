@@ -1,0 +1,67 @@
+{
+  "facts": {},
+  "summary": "",
+  "conversation": [
+    {
+      "role": "user",
+      "content": "Billy: status"
+    },
+    {
+      "role": "assistant",
+      "content": "Billy, you're a mess. A deep gash across your ribs weeps red, each breath a fresh sting. Your shield arm trembles, but your blade is still up, the edge slick with your own blood. You're running on fumes—one solid hit from dropping."
+    },
+    {
+      "role": "user",
+      "content": "Billy: Head to town, find a healer"
+    },
+    {
+      "role": "assistant",
+      "content": "Clutching your side, you stumble down the muddy track toward the village lights. Each step jolts the wound, and the world blurs at the edges. By the time you reach the gate, your legs are rubber. A night watchman squints at you, then calls for help.\n\nTwo strong arms loop under yours, half-carrying you to a low stone house fragrant with herbs. The healer, a sharp-eyed woman with ink-stained fingers, helps you onto a clean cot.\n\n\"Lie still,\" she murmurs, cutting away your tunic. \"You've lost a lot of blood, but you'll live—if you rest. A silver coin covers the poultice and the stitching.\"\n\n*What do you do?*"
+    },
+    {
+      "role": "user",
+      "content": "Billy: sleep and heal my fatigue"
+    },
+    {
+      "role": "assistant",
+      "content": "You nod, eyelids already heavy. The healer works quickly, needle darting through flesh while you grit your teeth. A cool, herbal-smelling poultice presses against the wound, and she wraps it tight. The pain ebbs to a dull throb.\n\n\"Rest now,\" she says, dimming the lamp.\n\nYou sink into the cot, the world fading. No dreams, just the deep, black pull of exhaustion.\n\nWhen you wake, pale morning light slants through the window. The gash is a neat, closed seam under fresh bandages. Your limbs feel heavy but steady. You’re still tired, but the bleeding has stopped and you can move without the room spinning.\n\n*What do you do?*"
+    },
+    {
+      "role": "user",
+      "content": "Billy: I explore the town"
+    },
+    {
+      "role": "assistant",
+      "content": "You push yourself up slowly, testing your ribs. The stitches hold. The healer is across the room grinding herbs; she glances over and gives a curt nod. \"Take it easy. You paid for the night, but don't go tearing those open again.\"\n\nOut the door, the town stretches before you in crisp morning air. It's small but lively—cobblestone streets freshly swept, market stalls creaking open. You catch the scent of baking bread and the distant ring of a blacksmith's hammer. A tavern sign creaks in the breeze: **The Weary Wolf**. Across the square, a notice board bristles with parchments near a modest stone chapel. Townsfolk bustle past, giving your bandaged chest a wary glance.\n\n*Where do you go? The market? The tavern? The notice board? Or somewhere else?*"
+    },
+    {
+      "role": "user",
+      "content": "Billy: I read the notice board"
+    },
+    {
+      "role": "assistant",
+      "content": "You cross the square, weaving through a farmer hauling turnips and a street kid chasing a stray chicken. The notice board is a weathered oak plank, layered with parchments in various states of decay. A few catch your eye:\n\n• **WANTED — Edward \"Scab\" Merrick**  \n*A poacher turned bandit, last seen in Elswood. 50 silver alive, 25 dead. See Captain Voss at the garrison.*\n\n• **HELP NEEDED — Miller's Daughter Missing**  \n*She vanished three nights past. No sign of struggle. Distraught father offering his grandmother's silver locket for answers. Inquire at the millhouse on the river.*\n\n• **ADVENTURERS WANTED — The Sunken Vault**  \n*Seeking stout arms and sharp minds for a delve into old ruins east of town. Danger pay. Split of treasures. Ask for Grimly at The Weary Wolf.*\n\n• **Seasonal Festival — Two Days Hence**  \n*Pumpkin carving, mead tent, and a pig chase. Sponsored by Mayor Tully. Volunteers needed for the pie-eating contest.*\n\nA few smaller scraps flutter beneath—lost cats, firewood for sale, a scrawled warning about doppelgangers that seems mostly ignored"
+    },
+    {
+      "role": "user",
+      "content": "Billy: !roll"
+    },
+    {
+      "role": "assistant",
+      "content": "As you lean in to study the parchments, you catch a flicker of movement from a half-torn notice flapping at the bottom corner. Beneath it, a fresh, hastily scrawled poster is barely visible.\n\n*Roll a d20...*  \n🎲 **14**\n\nYou peel back the torn poster, revealing:\n\n• **CARAVAN GUARDS NEEDED — URGENT**  \n*Departing at noon for Thornhold. Pay is 15 silver plus meals. Bandits hit the last two wagons. Inquire at the east gate, ask for Merchant Aldo. Leave today.*\n\nThe ink is still damp, likely pinned up moments ago. A job like that could put coin in your pocket and get you out of town before anyone asks too many questions about your wound."
+    },
+    {
+      "role": "user",
+      "content": "Unknown: "
+    },
+    {
+      "role": "user",
+      "content": "Unknown: "
+    },
+    {
+      "role": "assistant",
+      "content": "You stare at the damp ink. A noon departure—cutting it close. The smell of fresh bread from the market stalls drifts over, and you notice a few more townsfolk trickling into the square. The blacksmith's hammer has stopped. A church bell tolls nine times.\n\n*What does Billy do?*"
+    }
+  ],
+  "messagesSinceLastSummary": 8
+}

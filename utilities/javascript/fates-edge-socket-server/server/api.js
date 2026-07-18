@@ -1,6 +1,7 @@
 /**
  * Fate's Edge - Express API Routes
  * v2 – added ban/kick/players endpoints for admin tools
+ * v3 – added character‑state endpoints (harm, fatigue, obligation, boons)
  */
 
 const express = require('express');
@@ -100,7 +101,7 @@ function createApiRouter(appConfig) {
             const regionData = await deck.loadRegionData(region);
             const isCrown = count === 5;
             const synthesis = isCrown
-                ? deck.synthesiseCrownSpread(drawn.slice(0,4), drawn[4], regionData)
+                ? deck.synthesiseCrownSpread(drawn.slice(0, 4), drawn[4], regionData)
                 : deck.synthesiseConsequence(drawn, regionData);
 
             const result = {
@@ -141,7 +142,7 @@ function createApiRouter(appConfig) {
                 if (r.deck.length === 0) r.deck = deck.buildDeck();
                 cards.push(r.deck.pop());
             }
-            const mainCards = cards.slice(0,4);
+            const mainCards = cards.slice(0, 4);
             const wildcard = cards[4];
 
             const regionData = await deck.loadRegionData(region);
@@ -364,6 +365,56 @@ function createApiRouter(appConfig) {
         }
     });
 
+    // ── NEW: Character‑state endpoints (harm, fatigue, obligation, boons) ─────
+    // Helper to ensure the room has a character map
+    function ensureCharState(r) {
+        if (!r.characterState) r.characterState = {};
+    }
+
+    // POST /rooms/:code/characters/:name/:field   body: { delta: number }
+    const charFields = ['harm', 'fatigue', 'obligation', 'boons'];
+    charFields.forEach(field => {
+        router.post(`/api/rooms/:code/characters/:name/${field}`, authenticate, (req, res) => {
+            try {
+                const r = room.getRoom(req.params.code);
+                if (!r) return res.status(404).json({ error: 'Room not found' });
+                ensureCharState(r);
+                const name = req.params.name;
+                if (!r.characterState[name]) {
+                    r.characterState[name] = { harm: 0, fatigue: 0, obligation: 0, boons: 0 };
+                }
+                const delta = typeof req.body.delta === 'number' ? req.body.delta : 0;
+                // update the field, never let it drop below 0
+                r.characterState[name][field] = Math.max(0, r.characterState[name][field] + delta);
+                r.lastActivity = Date.now();
+
+                // broadcast the change so all clients see it instantly
+                room.broadcastToRoom(r.code, 'character-update', {
+                    name,
+                    field,
+                    value: r.characterState[name][field]
+                });
+
+                res.json({ success: true, name, field: field, value: r.characterState[name][field] });
+            } catch (err) {
+                res.status(500).json({ error: err.message });
+            }
+        });
+    });
+
+    // GET /rooms/:code/characters/:name   – retrieve current stats
+    router.get('/api/rooms/:code/characters/:name', authenticate, (req, res) => {
+        try {
+            const r = room.getRoom(req.params.code);
+            if (!r) return res.status(404).json({ error: 'Room not found' });
+            const state = r.characterState ? r.characterState[req.params.name] : null;
+            if (!state) return res.status(404).json({ error: 'Character not found' });
+            res.json({ name: req.params.name, ...state });
+        } catch (err) {
+            res.status(500).json({ error: err.message });
+        }
+    });
+
     // ── API Docs (updated) ──────────────────────────────────────
     router.get('/api/data/docs', (req, res) => {
         res.json({
@@ -390,11 +441,52 @@ function createApiRouter(appConfig) {
                     list: 'GET /api/modules - List available modules',
                     push: 'POST /api/modules/:id/push - Push module to clients',
                     cleanup: 'POST /api/modules/:id/cleanup - Clean up module from clients'
+                },
+                characters: {
+                    harm: 'POST /api/rooms/:code/characters/:name/harm - Adjust harm (body: {delta:number})',
+                    fatigue: 'POST /api/rooms/:code/characters/:name/fatigue - Adjust fatigue',
+                    obligation: 'POST /api/rooms/:code/characters/:name/obligation - Adjust obligation',
+                    boons: 'POST /api/rooms/:code/characters/:name/boons - Adjust boons',
+                    get: 'GET /api/rooms/:code/characters/:name - Retrieve current stats'
                 }
             }
         });
     });
+    // ── Campaign Sharing ───────────────────────────────────────
+    const campaignsDir = path.join(__dirname, 'campaigns');
+    if (!fs.existsSync(campaignsDir)) {
+        fs.mkdirSync(campaignsDir, { recursive: true });
+    }
 
+    // POST /api/rooms/:code/campaigns – store campaign state, returns a unique code
+    router.post('/api/rooms/:code/campaigns', authenticate, (req, res) => {
+        try {
+            // Validate that the room exists
+            room.getRoom(req.params.code);
+            const code = Math.random().toString(36).substring(2, 8).toUpperCase();
+            const filePath = path.join(campaignsDir, `${code}.json`);
+            fs.writeFileSync(filePath, JSON.stringify(req.body, null, 2));
+            res.json({ success: true, code });
+        } catch (err) {
+            res.status(err.message.includes('not found') ? 404 : 500).json({ error: err.message });
+        }
+    });
+
+    // GET /api/rooms/:code/campaigns/:campaignCode – retrieve stored campaign
+    router.get('/api/rooms/:code/campaigns/:campaignCode', authenticate, (req, res) => {
+        try {
+            // Validate room exists
+            room.getRoom(req.params.code);
+            const filePath = path.join(campaignsDir, `${req.params.campaignCode.toUpperCase()}.json`);
+            if (!fs.existsSync(filePath)) {
+                return res.status(404).json({ error: 'Campaign not found' });
+            }
+            const data = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
+            res.json(data);
+        } catch (err) {
+            res.status(err.message.includes('not found') ? 404 : 500).json({ error: err.message });
+        }
+    });
     return router;
 }
 
