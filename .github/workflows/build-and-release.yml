@@ -13,7 +13,7 @@ permissions:
   actions: read               # needed to download artifacts in reusable workflows
   pages: write                # needed for GitHub Pages deployment
   id-token: write             # for Pages authentication
-  packages: write    # ← add this line
+  packages: write             # needed by docker-publish.yml (reusable workflow) to push images
 
 env:
   NODE_VERSION: 22
@@ -129,13 +129,13 @@ jobs:
       # ---- Build fates-edge-discord-bot ----
       - name: Build Discord Bot
         run: |
-          cd fates-edge-discord-bot
+          cd utilities/vtt_mods_bots/fates-edge-discord-bot
           npm ci
           npm prune --production
       - name: Package Discord Bot
         run: |
-          cd fates-edge-discord-bot
-          tar -czf ../discord-bot.tar.gz .
+          cd utilities/vtt_mods_bots/fates-edge-discord-bot
+          tar -czf ../../../discord-bot.tar.gz .
       - name: Upload Discord Bot artifact
         uses: actions/upload-artifact@v4
         with:
@@ -173,8 +173,8 @@ jobs:
       # ---- Build Foundry module ----
       - name: Package Foundry Module
         run: |
-          cd foundry_fates-edge-bridge
-          tar -czf ../foundry-module.tar.gz .
+          cd utilities/vtt_mods_bots/foundry_fates-edge-bridge
+          tar -czf ../../../foundry-module.tar.gz .
       - name: Upload Foundry Module artifact
         uses: actions/upload-artifact@v4
         with:
@@ -184,8 +184,8 @@ jobs:
       # ---- Build Roll20 module ----
       - name: Package Roll20 Module
         run: |
-          cd fates-edge-roll20
-          tar -czf ../roll20-module.tar.gz .
+          cd utilities/vtt_mods_bots/fates-edge-roll20
+          tar -czf ../../../roll20-module.tar.gz .
       - name: Upload Roll20 Module artifact
         uses: actions/upload-artifact@v4
         with:
