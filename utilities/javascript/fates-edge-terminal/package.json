@@ -1,13 +1,21 @@
 {
-  "name": "fates-edge-terminal",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "name": "edge-terminal",
+  "version": "2.2.0",
+  "description": "Terminal client for the Fate's Edge MUD (WebSocket + ANSI banners)",
+  "main": "terminal-client.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node terminal-client.js",
+    "test": "echo \"No tests specified\" && exit 0"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": [
+    "mud",
+    "terminal",
+    "websocket",
+    "ansi",
+    "bbs",
+    "fates-edge"
+  ],
+  "author": "Fate's Edge Community",
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {

@@ -1,6 +1,6 @@
 /**
  * Fate's Edge - Socket.io Handlers
- * v2 – Sender exclusion for all client‑originated broadcasts.
+ * v3 – Uniform behaviour with plain WebSocket, added password, region, and flexible fields.
  */
 
 const room = require('./room.js');
@@ -29,7 +29,16 @@ function setupSocketIO(io) {
 
         // ─── Join Room ──────────────────────────────────────────────
         socket.on('join-room', (data) => {
-            const { roomCode, playerName, playerRole = 'player', playerEmail = '' } = data;
+            // Flexible payload: accept either clientData object or flat fields
+            const {
+                roomCode,
+                password,
+                clientData = {},
+                playerName = clientData.name || 'Player',
+                playerRole = clientData.role || 'player',
+                playerEmail = clientData.email || ''
+            } = data || {};
+
             if (!roomCode || !room.validateRoomCode(roomCode)) {
                 socket.emit('error', { message: 'Invalid room code' });
                 return;
@@ -44,7 +53,6 @@ function setupSocketIO(io) {
                     const wasGm = oldRoom.clients.get(socket.id)?.role === 'gm';
                     oldRoom.clients.delete(socket.id);
                     const oldClientsList = room.getClientsList(oldRoom);
-                    // Broadcast player-left with sender exclusion
                     room.broadcastToRoom(socket.room, 'player-left', {
                         clientId: socket.id,
                         clientName: socket.clientData?.name || 'Player',
@@ -72,6 +80,13 @@ function setupSocketIO(io) {
                 return;
             }
 
+            // Password check (if room has one)
+            if (currentRoom.password && currentRoom.password !== password) {
+                socket.emit('error', { message: 'Incorrect room password.' });
+                socket.disconnect(true);
+                return;
+            }
+
             // GM conflict
             let assignedRole = playerRole;
             const existingGm = room.getExistingGm(currentRoom);
@@ -82,7 +97,7 @@ function setupSocketIO(io) {
 
             socket.join(roomKey);
             socket.room = roomKey;
-            socket.clientData.name = playerName || 'Player';
+            socket.clientData.name = playerName;
             socket.clientData.role = assignedRole;
             socket.clientData.email = playerEmail;
             currentRoom.clients.set(socket.id, socket.clientData);
@@ -90,6 +105,16 @@ function setupSocketIO(io) {
 
             const clientsList = room.getClientsList(currentRoom);
 
+            // Consistent handshake acknowledgment (like plain WebSocket)
+            socket.emit('handshake_ack', {
+                success: true,
+                clientId: socket.id,
+                clientRole: assignedRole,
+                versionVector: {},
+                activeClients: clientsList
+            });
+
+            // Also keep room-joined for backwards compatibility
             socket.emit('room-joined', {
                 room: roomKey,
                 clients: clientsList,
@@ -250,6 +275,20 @@ function setupSocketIO(io) {
             }
         });
 
+        // ─── Region ──────────────────────────────────────────────────
+        socket.on('set-region', (data) => {
+            if (!socket.room) return socket.emit('error', { message: 'Not in a room' });
+            const r = room.rooms.get(socket.room);
+            if (!r) return socket.emit('error', { message: 'Room not found' });
+            const region = data?.region;
+            if (!region) return socket.emit('error', { message: 'Region name required' });
+            // Store in room's data (if you track it)
+            if (!r.data) r.data = {};
+            r.data.region = region;
+            r.lastActivity = Date.now();
+            room.broadcastToRoom(socket.room, 'region-updated', { region, clientName: socket.clientData?.name || 'Player' }, socket.id);
+        });
+
         // ─── Module management ──────────────────────────────────────
         socket.on('module-push-request', (data, callback) => {
             const { moduleId } = data || {};
@@ -351,10 +390,14 @@ function setupSocketIO(io) {
             }, socket.id);
         });
 
-        socket.on('sync-request', () => {
+        // ─── Sync requests ──────────────────────────────────────────
+        socket.on('sync-request', (data) => {
             if (!socket.room) return socket.emit('error', { message: 'Not in a room' });
             const r = room.rooms.get(socket.room);
             if (!r) return socket.emit('error', { message: 'Room not found' });
+            // Send presence update (like /who)
+            socket.emit('presence', { clients: room.getClientsList(r) });
+            // Also send whiteboard state
             socket.emit('sync-state', { state: r.whiteboard, timestamp: Date.now() });
         });
 
@@ -411,7 +454,6 @@ function setupSocketIO(io) {
                 if (r) {
                     const wasGm = r.clients.get(socket.id)?.role === 'gm';
                     r.clients.delete(socket.id);
-                    // Broadcast with sender exclusion
                     room.broadcastToRoom(socket.room, 'presence', { clients: room.getClientsList(r) }, socket.id);
                     room.broadcastToRoom(socket.room, 'player-left', {
                         clientId: socket.id,
