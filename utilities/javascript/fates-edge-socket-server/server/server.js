@@ -22,7 +22,9 @@ const ioHandlers = require('./socketio-handlers.js');
 // ---------- Express ----------
 const app = express();
 app.use(cors({ origin: config.corsOrigin }));
-app.use(express.json());
+// Increase payload limit for campaign state (which can be large)
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 app.use(api.createApiRouter(config));
 
 // ---------- HTTP server ----------
@@ -75,17 +77,15 @@ const MAX_PORT_RETRIES = 5;
 let currentPort = config.port;
 
 function startServer(port, retriesLeft) {
-    // Remove any leftover listeners from previous retries
     server.removeAllListeners('error');
     server.removeAllListeners('listening');
 
-    // Register fresh error handler BEFORE listen to catch EADDRINUSE
     server.on('error', (err) => {
         if (err.code === 'EADDRINUSE') {
             if (retriesLeft > 0) {
                 logger.warn(`Port ${port} is in use. Trying next port (${port + 1})...`);
                 currentPort = port + 1;
-                server.close(); // close the attempted server
+                server.close();
                 startServer(currentPort, retriesLeft - 1);
             } else {
                 logger.error(`Port ${port} is in use and no retries left. Exiting.`);

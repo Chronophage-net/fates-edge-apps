@@ -126,6 +126,7 @@ const API_KEY = process.env.API_KEY || '';
 
 // Server API base URL
 const CAMPAIGN_API_URL = process.env.CAMPAIGN_API_URL || 'http://localhost:10000/api';
+const CAMPAIGN_CODE_FILE = path.resolve(process.cwd(), 'campaigns', `${ROOM_CODE.toUpperCase()}_code.txt`);
 
 // -------------------------------------------------------------------
 // 4. Build system prompt with rulebook and GM instructions
@@ -156,7 +157,7 @@ function loadCampaign() {
   if (saved) {
     campaignState = saved;
     charactersModule.loadCharacters(campaignState.characters || {});
-    console.log('📂 Loaded campaign state.');
+    console.log('📂 Loaded campaign state from disk.');
   } else {
     campaignState = {
       facts: {},
@@ -173,7 +174,8 @@ function loadCampaign() {
         defaultDV: 3
       },
       sb: 0,
-      messagesSinceLastSummary: 0
+      messagesSinceLastSummary: 0,
+      campaignCode: null
     };
     campaignModule.save(ROOM_CODE, campaignState);
     console.log('📂 Created new campaign state.');
@@ -186,12 +188,114 @@ function saveCampaign() {
 }
 
 // -------------------------------------------------------------------
-// 6. Sync characters from server API (full discovery + sync)
+// 6. Campaign sync with server (pull on join, push on save)
+// -------------------------------------------------------------------
+async function loadCampaignFromServer() {
+  if (!API_KEY) {
+    console.warn('⚠️ API_KEY not set – skipping server campaign load.');
+    return false;
+  }
+
+  let campaignCode = campaignState.campaignCode;
+  if (!campaignCode && fs.existsSync(CAMPAIGN_CODE_FILE)) {
+    try {
+      campaignCode = fs.readFileSync(CAMPAIGN_CODE_FILE, 'utf-8').trim();
+      campaignState.campaignCode = campaignCode;
+    } catch (e) { /* ignore */ }
+  }
+
+  if (!campaignCode) {
+    console.log('ℹ️ No campaign code found – starting fresh.');
+    return false;
+  }
+
+  try {
+    console.log(`🔄 Loading campaign ${campaignCode} from server...`);
+    const data = await apiRequest('GET', ['campaigns', campaignCode]);
+    if (data) {
+      campaignState.facts = data.facts || {};
+      campaignState.summary = data.summary || '';
+      campaignState.conversation = data.conversation || [];
+      campaignState.characters = data.characters || {};
+      campaignState.scene = data.scene || campaignState.scene;
+      campaignState.messagesSinceLastSummary = 0;
+      campaignState.campaignCode = campaignCode;
+      charactersModule.loadCharacters(campaignState.characters || {});
+      console.log(`✅ Loaded campaign ${campaignCode} from server.`);
+      return true;
+    }
+  } catch (e) {
+    if (e.message.includes('404')) {
+      console.log(`ℹ️ Campaign ${campaignCode} not found on server – starting fresh.`);
+      campaignState.campaignCode = null;
+    } else {
+      console.warn(`⚠️ Failed to load campaign from server: ${e.message}`);
+    }
+  }
+  return false;
+}
+
+async function saveCampaignToServer() {
+  if (!API_KEY) return false;
+
+  try {
+    // Build minimal payload to avoid "PayloadTooLargeError"
+    const payload = {
+      summary: campaignState.summary || '',
+      facts: campaignState.facts || {},
+      characters: campaignState.characters || {},
+      scene: campaignState.scene || {},
+      // Only send last 10 messages to keep size small
+      conversation: (campaignState.conversation || []).slice(-10),
+      campaignCode: campaignState.campaignCode
+    };
+    const result = await apiRequest('POST', ['campaigns'], payload);
+    if (result && result.code) {
+      campaignState.campaignCode = result.code;
+      try {
+        fs.writeFileSync(CAMPAIGN_CODE_FILE, result.code);
+      } catch (e) { /* ignore */ }
+      console.log(`📤 Campaign saved to server (code: ${result.code})`);
+      return true;
+    }
+  } catch (e) {
+    // If payload too large, log and try again with even smaller payload
+    if (e.message.includes('PayloadTooLarge') || e.message.includes('request entity too large')) {
+      console.warn('⚠️ Campaign payload too large – saving without conversation history.');
+      try {
+        const tinyPayload = {
+          summary: campaignState.summary || '',
+          facts: campaignState.facts || {},
+          characters: campaignState.characters || {},
+          scene: campaignState.scene || {},
+          conversation: [],
+          campaignCode: campaignState.campaignCode
+        };
+        const result = await apiRequest('POST', ['campaigns'], tinyPayload);
+        if (result && result.code) {
+          campaignState.campaignCode = result.code;
+          try {
+            fs.writeFileSync(CAMPAIGN_CODE_FILE, result.code);
+          } catch (e) { /* ignore */ }
+          console.log(`📤 Campaign saved to server (without history, code: ${result.code})`);
+          return true;
+        }
+      } catch (e2) {
+        console.warn(`⚠️ Failed to save campaign even without history: ${e2.message}`);
+      }
+    } else {
+      console.warn(`⚠️ Failed to save campaign to server: ${e.message}`);
+    }
+  }
+  return false;
+}
+
+// -------------------------------------------------------------------
+// 7. Sync characters from server API (full discovery + sync)
 // -------------------------------------------------------------------
 async function syncCharactersFromServer() {
   if (!API_KEY) {
-    console.warn('⚠️ API_KEY not set in .env – skipping character sync.');
-    console.warn('   Add API_KEY=your-key to .env to enable sync.');
+    console.warn('⚠️ API_KEY not set – skipping character sync.');
     return;
   }
 
@@ -239,7 +343,7 @@ async function syncCharactersFromServer() {
 }
 
 // -------------------------------------------------------------------
-// 7. WebSocket and connection management
+// 8. WebSocket and connection management
 // -------------------------------------------------------------------
 let ws = null;
 let connected = false;
@@ -247,6 +351,7 @@ let myRole = 'player';
 let reconnectTimer = null;
 let reconnectAttempts = 0;
 const MAX_RECONNECT_DELAY = 30000;
+let campaignLoaded = false;
 
 function connect() {
   if (reconnectTimer) { clearTimeout(reconnectTimer); reconnectTimer = null; }
@@ -291,7 +396,7 @@ function sendChat(text) {
 }
 
 // -------------------------------------------------------------------
-// 8. API helpers (for character updates, etc.)
+// 9. API helpers (for character updates, etc.)
 // -------------------------------------------------------------------
 function apiRequest(method, pathSegments, body = null) {
   const url = `${CAMPAIGN_API_URL}/rooms/${ROOM_CODE}/${pathSegments.join('/')}`;
@@ -333,7 +438,7 @@ function apiRequest(method, pathSegments, body = null) {
 }
 
 // -------------------------------------------------------------------
-// 9. Summarisation (delegated to campaign module)
+// 10. Summarisation (delegated to campaign module)
 // -------------------------------------------------------------------
 async function summariseStory() {
   if (!driver) return;
@@ -341,11 +446,12 @@ async function summariseStory() {
   if (newSummary) {
     campaignState.summary = newSummary;
     saveCampaign();
+    await saveCampaignToServer();
   }
 }
 
 // -------------------------------------------------------------------
-// 10. Message handler
+// 11. Message handler
 // -------------------------------------------------------------------
 function handleMessage(msg) {
   if (msg.type === 'state-updated') return;
@@ -359,9 +465,15 @@ function handleMessage(msg) {
     } else {
       console.log('👑 I am the Game Master!');
       sendChat('*The AI Game Master has joined.*');
-      // Room is now created – sync characters from server
+
       (async () => {
+        const loaded = await loadCampaignFromServer();
         await syncCharactersFromServer();
+        if (!campaignState.campaignCode) {
+          await saveCampaignToServer();
+        }
+        campaignLoaded = true;
+        console.log('📂 Campaign sync complete.');
       })();
     }
     return;
@@ -379,7 +491,6 @@ function handleMessage(msg) {
 
   if (msg.type === 'presence') { console.debug(`👥 ${msg.clients?.length || 0} clients in room`); return; }
 
-  // Extract text
   let text = '', sender = 'Unknown';
   if (msg.type === 'chat-message' && msg.message) { text = msg.message.text || ''; sender = msg.message.sender || 'Unknown'; }
   else if (msg.type === 'chat_message' && msg.value) { text = msg.value.text || ''; sender = msg.value.sender || 'Unknown'; }
@@ -390,7 +501,6 @@ function handleMessage(msg) {
 
   if (sender === BOT_NAME) return;
 
-  // --- Handle roll results: automatically add SB ---
   if (msg.type === 'roll-result') {
     const sbGain = msg.storyBeats || 0;
     if (sbGain > 0) {
@@ -405,7 +515,6 @@ function handleMessage(msg) {
     return;
   }
 
-  // --- Bot commands (!gm) ---
   if (text.startsWith('!gm')) {
     (async () => {
       try {
@@ -426,6 +535,7 @@ function handleMessage(msg) {
         } else if (response) {
           sendChat(String(response));
         }
+        await saveCampaignToServer();
       } catch (err) {
         console.error('❌ Command handler error:', err.message);
         sendChat('*Error processing command.*');
@@ -434,7 +544,6 @@ function handleMessage(msg) {
     return;
   }
 
-  // --- AI narration (only if GM) ---
   if (myRole !== 'gm') return;
 
   campaignState.conversation = campaignState.conversation || [];
@@ -480,6 +589,7 @@ function handleMessage(msg) {
         campaignState.conversation.push({ role: 'assistant', content: clean });
         if (campaignState.conversation.length > MAX_HISTORY * 2) campaignState.conversation.splice(0, campaignState.conversation.length - MAX_HISTORY);
         saveCampaign();
+        await saveCampaignToServer();
       }
     } catch (err) {
       console.error('❌ LLM error:', err.message);
@@ -489,19 +599,14 @@ function handleMessage(msg) {
 }
 
 // -------------------------------------------------------------------
-// 11. Startup
+// 12. Startup
 // -------------------------------------------------------------------
 (async function main() {
   console.log('🚀 AI GM Bot starting…');
   console.log(`   WS: ${WS_URL}   Room: ${ROOM_CODE}   Name: ${BOT_NAME}`);
 
-  // Load campaign from disk
   loadCampaign();
 
-  // DO NOT sync here – wait for handshake
-  // await syncCharactersFromServer();
-
-  // Pre‑load world facts (regions, patrons, etc.)
   await worldModule.loadWorldFacts((key, value) => {
     campaignState.facts[key] = value;
   });
@@ -516,7 +621,12 @@ function handleMessage(msg) {
 
 process.on('SIGINT', () => {
   console.log('\n🛑 Shutting down…');
-  if (campaignState) saveCampaign();
+  if (campaignState) {
+    saveCampaign();
+    (async () => {
+      await saveCampaignToServer();
+    })();
+  }
   if (ws && ws.readyState === WebSocket.OPEN) ws.close(1000, 'Shutdown');
-  process.exit(0);
+  setTimeout(() => process.exit(0), 1000);
 });
