@@ -3,6 +3,7 @@
  * v2 – added ban/kick/players endpoints for admin tools
  * v3 – added character‑state endpoints (harm, fatigue, obligation, boons)
  * v4 – added leash, corruption, character list, and bulk character state sync
+ * v5 – added global character roster export
  */
 
 const express = require('express');
@@ -361,6 +362,37 @@ function createApiRouter(appConfig) {
         }
     });
 
+    // ── Character roster export (global) ──────────────────────────
+    // NEW: Exports all character states across all rooms
+    router.get('/api/characters/export', authenticate, (req, res) => {
+        try {
+            const result = {
+                rooms: {},
+                timestamp: Date.now()
+            };
+            for (const [code, r] of room.rooms) {
+                const roomData = {
+                    name: r.name || code,
+                    characters: {}
+                };
+                if (r.characterState) {
+                    for (const [name, stats] of Object.entries(r.characterState)) {
+                        // Ensure all tracked fields are present
+                        const entry = { name };
+                        CHAR_FIELDS.forEach(f => {
+                            entry[f] = stats[f] ?? 0;
+                        });
+                        roomData.characters[name] = entry;
+                    }
+                }
+                result.rooms[code] = roomData;
+            }
+            res.json(result);
+        } catch (err) {
+            res.status(500).json({ error: err.message });
+        }
+    });
+
     // ── Character‑state endpoints ──────────────────────────────
     // Helper to ensure room has character state map
     function ensureCharState(r) {
@@ -509,7 +541,7 @@ function createApiRouter(appConfig) {
     router.get('/api/data/docs', (req, res) => {
         res.json({
             title: "Fate's Edge API Documentation",
-            version: "4.0.0",
+            version: "5.0.0",
             endpoints: {
                 health: { get: `GET ${config.healthEndpoint} - Server health check with stats` },
                 rooms: { get: 'GET /api/rooms - List all rooms with stats' },
@@ -534,8 +566,9 @@ function createApiRouter(appConfig) {
                 },
                 characters: {
                     get: 'GET /api/rooms/:code/characters/:name - Get character stats',
-                    list: 'GET /api/rooms/:code/characters - List all characters',
+                    list: 'GET /api/rooms/:code/characters - List all characters in a room',
                     update: 'POST /api/rooms/:code/characters/update - Bulk update multiple characters',
+                    export: 'GET /api/characters/export - Export all character rosters across all rooms',
                     fields: {
                         harm: 'POST /api/rooms/:code/characters/:name/harm - Adjust harm',
                         fatigue: 'POST /api/rooms/:code/characters/:name/fatigue - Adjust fatigue',
