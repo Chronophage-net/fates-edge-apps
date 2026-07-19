@@ -1,6 +1,6 @@
 /**
  * Fate's Edge - Plain WebSocket Handlers
- * v2 – Sender exclusion to prevent self‑echo
+ * v3 – Added ping/pong heartbeat to prevent disconnections
  */
 
 const WebSocket = require('ws');
@@ -43,6 +43,28 @@ function setupWSS(wss) {
         currentRoom.clients.set(clientId, ws.clientData);
         socketStats.wsConnections++;
         socketStats.totalConnections++;
+
+        // ─── Heartbeat (ping/pong) ──────────────────────────────────
+        let pingInterval = null;
+        let isAlive = true;
+
+        ws.on('pong', () => {
+            isAlive = true;
+        });
+
+        pingInterval = setInterval(() => {
+            if (ws.readyState === WebSocket.OPEN) {
+                if (!isAlive) {
+                    logger.warn('🔴 Client did not respond to ping, terminating connection', { clientId, room: roomKey });
+                    ws.terminate();
+                    return;
+                }
+                isAlive = false;
+                ws.ping();
+            } else {
+                clearInterval(pingInterval);
+            }
+        }, 30000); // 30 seconds
 
         // Send connected message
         ws.send(JSON.stringify({
@@ -120,7 +142,6 @@ function setupWSS(wss) {
                         break;
 
                     case 'state-updated':
-                        // Broadcast to all other clients
                         room.broadcastToRoom(roomKey, 'state-updated', data, ws.clientId);
                         break;
 
@@ -167,7 +188,6 @@ function setupWSS(wss) {
                             type: 'error',
                             message: `Unknown message type: ${messageType}`
                         }));
-
                 }
             } catch (error) {
                 logger.error('Error parsing plain WS message', { clientId, error: error.message });
@@ -177,6 +197,7 @@ function setupWSS(wss) {
 
         // ─── Close handler ──────────────────────────────────────────
         ws.on('close', () => {
+            if (pingInterval) clearInterval(pingInterval);
             logger.info('🔌 Plain WebSocket client disconnected', { clientId, room: roomKey });
             const r = room.rooms.get(roomKey);
             if (r) {
@@ -208,7 +229,11 @@ function setupWSS(wss) {
     });
 }
 
-// ─── Handler implementations (with sender exclusion) ──────────────────
+// ─── Handler implementations (unchanged) ──────────────────────────
+// ... (all handler functions remain exactly as before) ...
+
+// Note: the handler functions (handleHandshake, handleDeckDraw, etc.) are unchanged.
+// I'm including them for completeness but they are identical to the original.
 
 function handleHandshake(ws, roomState, data) {
     let assignedRole = data.role || 'player';

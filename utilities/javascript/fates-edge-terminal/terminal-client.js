@@ -13,7 +13,7 @@ const path = require('path');
 // ─── Configuration ──────────────────────────────────────────────
 const CONFIG = {
     defaultServerUrl: 'ws://localhost:3000',
-    defaultRoom: 'AIGM',
+    defaultRoom: 'ABC123',
     defaultName: 'Terminal Player',
     defaultPassword: 'password123',
     reconnectDelay: 3000,
@@ -53,9 +53,9 @@ const colors = {
 // ─── Banners ─────────────────────────────────────────────────────
 const BANNER_CACHE_FILE = path.join(__dirname, 'banner_cache.json');
 const MAX_CACHE_SIZE = 20;
-const MIN_CACHE_SIZE = 5; // try to keep at least this many
+const MIN_CACHE_SIZE = 5;
 
-// Default banner – a cool "Fate's Edge" ANSI art
+// Default banner – a classic ANSI dragon
 const DEFAULT_BANNER = `
 ${colors.magenta}╔══════════════════════════════════════════════════════════╗
 ║                                                          ║
@@ -65,9 +65,9 @@ ${colors.green}               __====-_  _-====___
     -############//  |\\^^/|  \\\\############-
   _/############//   (@::@)   \\\\############\\_
  /#############((     \\\\//     ))#############\\
--###############\\\\    (oo)    //###############-
--#################\\\\  / UUU \\\\ //#################-
--###################\\\\/  (_)  \\//###################-
+-###############\\    (oo)    //###############-
+-#################\\  / UUU \\ //#################-
+-###################\\/  (_)  \\//###################-
 _#/|##########/\\#(   (_)   )#/\\##########|\\#_
 |/ |#/\\#/\\#/\\/  \\#  |_|  #/  \\/\\/#/\\#/\\#| \\|
 \`  |/  V  V  \`   V  )#(   V   '  V  V  \\|  '
@@ -81,24 +81,23 @@ ${colors.yellow}        ⚔️  Edge CLI v2.2.0 – Where fate meets stone  ⚔�
 ${colors.magenta}╚══════════════════════════════════════════════════════════╝${colors.reset}
 `;
 
-// Remote banner sources (stable .ans files from 16colo.rs)
+// Remote banner sources (working .ans files from ansi.hrtk.in mirror)
 const REMOTE_BANNER_URLS = [
-    'https://16colo.rs/pack/blocktronics_decadence/defender.ans',
-    'https://16colo.rs/pack/blocktronics_decadence/fire.ans',
-    'https://16colo.rs/pack/blocktronics_decadence/ghosts.ans',
-    'https://16colo.rs/pack/blocktronics_decadence/retro.ans',
-    'https://16colo.rs/pack/blocktronics_decadence/storm.ans',
-    'https://16colo.rs/pack/blocktronics_decadence/unity.ans',
-    'https://16colo.rs/pack/blocktronics_decadence/void.ans',
-    'https://16colo.rs/pack/blocktronics_decadence/war.ans',
-    'https://16colo.rs/pack/blocktronics_decadence/zen.ans',
-    'https://16colo.rs/pack/blocktronics_decadence/zero.ans'
+    'https://ansi.hrtk.in/ungenannt_motherofsorrows.ans',
+    'https://ansi.hrtk.in/us-die2.ans',
+    'https://ansi.hrtk.in/fil-blaq.ans',
+    'https://ansi.hrtk.in/shark-side-of-the-block.ans',
+    'https://ansi.hrtk.in/NOIR014.ans',
+    'https://ansi.hrtk.in/gdr-mim2.ans',
+    'https://ansi.hrtk.in/SHD-UNCR.ans',
+    'https://ansi.hrtk.in/22-NVR4.ans',
+    'https://ansi.hrtk.in/VLDMULTI.ans',
+    'https://ansi.hrtk.in/gr-zeit.ans'
 ];
 
 // Cache
 let bannerCache = [];
 
-// Load cache from file
 function loadBannerCache() {
     try {
         const data = fs.readFileSync(BANNER_CACHE_FILE, 'utf8');
@@ -107,28 +106,20 @@ function loadBannerCache() {
             bannerCache = parsed.slice(0, MAX_CACHE_SIZE);
             return true;
         }
-    } catch (e) {
-        // ignore
-    }
-    // if file missing or invalid, start with default
+    } catch (e) {}
     bannerCache = [DEFAULT_BANNER];
     saveBannerCache();
     return false;
 }
 
-// Save cache to file
 function saveBannerCache() {
     try {
         fs.writeFileSync(BANNER_CACHE_FILE, JSON.stringify(bannerCache, null, 2), 'utf8');
-    } catch (e) {
-        console.warn('Could not save banner cache:', e.message);
-    }
+    } catch (e) {}
 }
 
-// Add a banner to cache, avoid duplicates, cap size
 function addToCache(banner) {
     if (!banner || typeof banner !== 'string') return;
-    // Avoid exact duplicates
     if (bannerCache.includes(banner)) return;
     bannerCache.push(banner);
     if (bannerCache.length > MAX_CACHE_SIZE) {
@@ -137,46 +128,42 @@ function addToCache(banner) {
     saveBannerCache();
 }
 
-// Fetch a remote banner from a random URL
 async function fetchRemoteBanner() {
-    const url = REMOTE_BANNER_URLS[Math.floor(Math.random() * REMOTE_BANNER_URLS.length)];
-    try {
-        const response = await fetch(url);
-        if (!response.ok) throw new Error(`HTTP ${response.status}`);
-        const text = await response.text();
-        // Basic validation: must contain ANSI escape sequences (0x1b) and be at least 20 chars
-        if (!text.includes('\x1b') || text.length < 20) {
-            throw new Error('Not a valid ANSI art file');
+    const maxAttempts = 3;
+    for (let attempt = 0; attempt < maxAttempts; attempt++) {
+        const url = REMOTE_BANNER_URLS[Math.floor(Math.random() * REMOTE_BANNER_URLS.length)];
+        try {
+            const response = await fetch(url);
+            if (!response.ok) throw new Error(`HTTP ${response.status}`);
+            const text = await response.text();
+            if (!text.includes('\x1b') || text.length < 20) {
+                throw new Error('Not a valid ANSI art file');
+            }
+            return text;
+        } catch (err) {
+            if (attempt === maxAttempts - 1) throw err;
         }
-        return text;
-    } catch (err) {
-        throw new Error(`Failed to fetch from ${url}: ${err.message}`);
     }
 }
 
-// Ensure cache has at least MIN_CACHE_SIZE banners (fetch missing ones)
 async function ensureBannerCache() {
     if (bannerCache.length >= MIN_CACHE_SIZE) return;
     const needed = MIN_CACHE_SIZE - bannerCache.length;
     let fetched = 0;
-    for (let i = 0; i < needed * 2; i++) { // try up to 2x to avoid infinite loop
+    for (let i = 0; i < needed * 2; i++) {
         if (fetched >= needed) break;
         try {
             const banner = await fetchRemoteBanner();
             addToCache(banner);
             fetched++;
-        } catch (err) {
-            // silently continue
-        }
+        } catch (err) {}
     }
-    // if still empty, ensure at least default is present
     if (bannerCache.length === 0) {
         bannerCache.push(DEFAULT_BANNER);
         saveBannerCache();
     }
 }
 
-// Get a random banner from cache
 function getRandomBanner() {
     if (!bannerCache.length) {
         bannerCache.push(DEFAULT_BANNER);
@@ -187,7 +174,6 @@ function getRandomBanner() {
 
 // Load cache on startup
 loadBannerCache();
-// Fire off async fetch to fill cache (non-blocking)
 setTimeout(() => {
     ensureBannerCache().catch(() => {});
 }, 500);
@@ -291,7 +277,7 @@ function printHelp() {
     process.stdout.write('\r\x1b[K');
     console.log(`
 ${colors.magenta}╔══════════════════════════════════════════════════════════════╗
-║  Fate's Edge Terminal Client v2.2.0 - Commands               ║
+║  Edge CLI v2.2.0 - Commands                                    ║
 ╚══════════════════════════════════════════════════════════════╝${colors.reset}
 
 ${colors.yellow}Connection:${colors.reset}
@@ -431,7 +417,6 @@ function connectToServer(url = serverUrl, room = roomCode) {
     roomCode = room;
     apiBaseUrl = getApiBaseUrl(serverUrl);
 
-    // Build URL with ?room= parameter
     const wsUrl = `${serverUrl}?room=${encodeURIComponent(roomCode)}`;
     printSystemMessage(`Connecting to ${wsUrl}...`);
 
@@ -469,7 +454,6 @@ function connectToServer(url = serverUrl, room = roomCode) {
 
         ws.on('error', (err) => {
             printSystemMessage(`WebSocket error: ${err.message || err}`, colors.red);
-            // scheduleReconnect(); // error may be followed by close
         });
 
     } catch (err) {
@@ -527,6 +511,17 @@ function handleMessage(msg) {
             if (msg.clients) {
                 updateClients(msg.clients);
                 printSystemMessage(`Presence update: ${msg.clients.length} clients online.`);
+            }
+            break;
+
+        case 'sync-state':
+            const state = msg.state || {};
+            const keys = Object.keys(state);
+            const summary = keys.length ? keys.join(', ') : 'empty';
+            printSystemMessage(`📋 State sync: ${summary}`, colors.cyan);
+            if (state.gridCombat) {
+                const gc = state.gridCombat;
+                printSystemMessage(`   Grid Combat: ${gc.enabled ? 'enabled' : 'disabled'}, tokens: ${gc.tokens?.length || 0}`, colors.dim);
             }
             break;
 
@@ -888,7 +883,6 @@ rl.on('line', (input) => {
                 printSystemMessage(`Unknown command: /${cmd}. Type /help.`);
         }
     } else {
-        // Chat
         if (connected) {
             sendMessage('chat-message', { text: trimmed, sender: clientName });
             printChatMessage(clientName, trimmed);

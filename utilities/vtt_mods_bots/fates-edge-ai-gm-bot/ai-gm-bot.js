@@ -235,9 +235,46 @@ async function loadCampaignFromServer() {
   return false;
 }
 
-async function saveCampaignToServer() {
+// ---- Debounced save to server ----
+let saveTimeout = null;
+let savePending = false;
+let saveInProgress = false;
+
+async function saveCampaignToServer(force = false) {
   if (!API_KEY) return false;
 
+  // If a save is already in progress, just mark it as pending and return
+  if (saveInProgress) {
+    savePending = true;
+    return false;
+  }
+
+  // Debounce: if force is false, wait 5 seconds before actually saving
+  if (!force) {
+    if (saveTimeout) {
+      clearTimeout(saveTimeout);
+      saveTimeout = null;
+    }
+    return new Promise((resolve) => {
+      saveTimeout = setTimeout(async () => {
+        saveTimeout = null;
+        await doSave();
+        resolve(true);
+      }, 5000);
+    });
+  } else {
+    // Immediate save, clear any pending timeout
+    if (saveTimeout) {
+      clearTimeout(saveTimeout);
+      saveTimeout = null;
+    }
+    return await doSave();
+  }
+}
+
+async function doSave() {
+  if (saveInProgress) return false;
+  saveInProgress = true;
   try {
     // Build minimal payload to avoid "PayloadTooLargeError"
     const payload = {
@@ -256,6 +293,12 @@ async function saveCampaignToServer() {
         fs.writeFileSync(CAMPAIGN_CODE_FILE, result.code);
       } catch (e) { /* ignore */ }
       console.log(`📤 Campaign saved to server (code: ${result.code})`);
+      // If there is a pending save, trigger it now (but we'll let the debounce handle it)
+      if (savePending) {
+        savePending = false;
+        // Start a new debounced save after this one finishes
+        saveCampaignToServer(false);
+      }
       return true;
     }
   } catch (e) {
@@ -286,6 +329,8 @@ async function saveCampaignToServer() {
     } else {
       console.warn(`⚠️ Failed to save campaign to server: ${e.message}`);
     }
+  } finally {
+    saveInProgress = false;
   }
   return false;
 }
@@ -330,6 +375,8 @@ async function syncCharactersFromServer() {
       }
     }
     saveCampaign();
+    // Save to server after sync (but debounced)
+    await saveCampaignToServer(false);
     console.log(`✅ Synced ${synced} characters from server.`);
   } catch (e) {
     if (e.message.includes('401') || e.message.includes('API key')) {
@@ -373,7 +420,11 @@ function connect() {
     } catch (e) { console.warn('⚠️  Non‑JSON message:', data.toString()); }
   });
 
-  ws.on('close', (code) => { connected = false; console.log(`🔌 Disconnected (code ${code})`); scheduleReconnect(); });
+  ws.on('close', (code, reason) => {
+    connected = false;
+    console.log(`🔌 Disconnected (code ${code})${reason ? `: ${reason}` : ''}`);
+    scheduleReconnect();
+  });
   ws.on('error', (err) => console.error('🔴 WebSocket error:', err.message));
 }
 
@@ -446,7 +497,8 @@ async function summariseStory() {
   if (newSummary) {
     campaignState.summary = newSummary;
     saveCampaign();
-    await saveCampaignToServer();
+    // Save to server after summarisation (debounced)
+    await saveCampaignToServer(false);
   }
 }
 
@@ -470,7 +522,7 @@ function handleMessage(msg) {
         const loaded = await loadCampaignFromServer();
         await syncCharactersFromServer();
         if (!campaignState.campaignCode) {
-          await saveCampaignToServer();
+          await saveCampaignToServer(false);
         }
         campaignLoaded = true;
         console.log('📂 Campaign sync complete.');
@@ -512,9 +564,12 @@ function handleMessage(msg) {
     campaignState.conversation.push({ role: 'user', content: rollText });
     if (campaignState.conversation.length > MAX_HISTORY * 2) campaignState.conversation.splice(0, campaignState.conversation.length - MAX_HISTORY);
     saveCampaign();
+    // Save to server after roll-result (debounced)
+    saveCampaignToServer(false);
     return;
   }
 
+  // ---- Handle player commands (!gm ...) ----
   if (text.startsWith('!gm')) {
     (async () => {
       try {
@@ -535,7 +590,8 @@ function handleMessage(msg) {
         } else if (response) {
           sendChat(String(response));
         }
-        await saveCampaignToServer();
+        // Command may have changed state, so save to server (debounced)
+        await saveCampaignToServer(false);
       } catch (err) {
         console.error('❌ Command handler error:', err.message);
         sendChat('*Error processing command.*');
@@ -544,6 +600,12 @@ function handleMessage(msg) {
     return;
   }
 
+  // ---- Only process chat messages from players (not system messages) ----
+  // But we've already filtered system messages (presence, etc.) above.
+  // Also skip if the message is from the bot itself.
+  if (sender === BOT_NAME) return;
+
+  // ---- GM bot responds to player chat ----
   if (myRole !== 'gm') return;
 
   campaignState.conversation = campaignState.conversation || [];
@@ -589,7 +651,8 @@ function handleMessage(msg) {
         campaignState.conversation.push({ role: 'assistant', content: clean });
         if (campaignState.conversation.length > MAX_HISTORY * 2) campaignState.conversation.splice(0, campaignState.conversation.length - MAX_HISTORY);
         saveCampaign();
-        await saveCampaignToServer();
+        // Save to server after GM response (debounced)
+        await saveCampaignToServer(false);
       }
     } catch (err) {
       console.error('❌ LLM error:', err.message);
@@ -623,10 +686,14 @@ process.on('SIGINT', () => {
   console.log('\n🛑 Shutting down…');
   if (campaignState) {
     saveCampaign();
+    // Force immediate save on shutdown
     (async () => {
-      await saveCampaignToServer();
+      await saveCampaignToServer(true);
+      if (ws && ws.readyState === WebSocket.OPEN) ws.close(1000, 'Shutdown');
+      setTimeout(() => process.exit(0), 1000);
     })();
+  } else {
+    if (ws && ws.readyState === WebSocket.OPEN) ws.close(1000, 'Shutdown');
+    setTimeout(() => process.exit(0), 1000);
   }
-  if (ws && ws.readyState === WebSocket.OPEN) ws.close(1000, 'Shutdown');
-  setTimeout(() => process.exit(0), 1000);
 });

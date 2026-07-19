@@ -1,14 +1,11 @@
 /**
  * Fate's Edge - Express API Routes
- * v2 – added ban/kick/players endpoints for admin tools
- * v3 – added character‑state endpoints (harm, fatigue, obligation, boons)
- * v4 – added leash, corruption, character list, and bulk character state sync
- * v5 – added global character roster export
- * v6 – campaign filenames now prefixed with room code; automatic consolidation (keeps last 2 per room)
+ * v7 – asynchronous file I/O + pluggable storage module
  */
 
 const express = require('express');
 const fs = require('fs');
+const fsPromises = fs.promises;
 const path = require('path');
 const room = require('./room.js');
 const deck = require('./deck.js');
@@ -22,11 +19,60 @@ function authenticate(req, res, next) {
     next();
 }
 
+// ─── Pluggable storage ──────────────────────────────────────────────
+let storage = null;
+try {
+    // If you create a storage.js module exporting { saveCampaign, loadCampaign, ... }
+    // it will be used instead of the file system.
+    storage = require('./storage.js');
+    console.log('📦 Using custom storage module for campaigns.');
+} catch (e) {
+    // Fallback to file system (asynchronous)
+    storage = {
+        async saveCampaign(roomCode, campaignCode, data) {
+            const campaignsDir = path.join(__dirname, 'campaigns');
+            await fsPromises.mkdir(campaignsDir, { recursive: true });
+            const fileName = `${roomCode}-${campaignCode}.json`;
+            const filePath = path.join(campaignsDir, fileName);
+            await fsPromises.writeFile(filePath, JSON.stringify(data, null, 2));
+            // Consolidate: keep only last 2
+            const files = await getCampaignFilesAsync(roomCode, campaignsDir);
+            const MAX_CAMPAIGNS = 2;
+            if (files.length > MAX_CAMPAIGNS) {
+                const toDelete = files.slice(MAX_CAMPAIGNS);
+                for (const file of toDelete) {
+                    try { await fsPromises.unlink(file.path); } catch (e) { /* ignore */ }
+                }
+            }
+            return campaignCode;
+        },
+        async loadCampaign(roomCode, campaignCode) {
+            const campaignsDir = path.join(__dirname, 'campaigns');
+            const fileName = `${roomCode}-${campaignCode}.json`;
+            const filePath = path.join(campaignsDir, fileName);
+            const data = await fsPromises.readFile(filePath, 'utf-8');
+            return JSON.parse(data);
+        }
+    };
+    console.log('📁 Using file system storage for campaigns.');
+}
+
+async function getCampaignFilesAsync(roomCode, campaignsDir) {
+    const files = await fsPromises.readdir(campaignsDir);
+    const filtered = files.filter(f => f.startsWith(`${roomCode}-`) && f.endsWith('.json'));
+    const stats = await Promise.all(filtered.map(async (f) => {
+        const fullPath = path.join(campaignsDir, f);
+        const stat = await fsPromises.stat(fullPath);
+        return { name: f, path: fullPath, mtime: stat.mtime };
+    }));
+    return stats.sort((a, b) => b.mtime - a.mtime); // newest first
+}
+
 function createApiRouter(appConfig) {
     config = appConfig;
     const router = express.Router();
 
-    // Health
+    // ─── Health ──────────────────────────────────────────────────────
     router.get('/healthz', (req, res) => res.status(200).send('OK'));
     router.get('/api/healthz', (req, res) => res.status(200).send('OK'));
     router.get(config.healthEndpoint, (req, res) => {
@@ -42,13 +88,13 @@ function createApiRouter(appConfig) {
         });
     });
 
-    // Room list
+    // ─── Room list ──────────────────────────────────────────────────
     router.get('/api/rooms', authenticate, (req, res) => {
         const roomStats = Array.from(room.rooms.keys()).map(code => room.getRoomStats(code)).filter(Boolean);
         res.json({ rooms: roomStats, count: roomStats.length, timestamp: Date.now() });
     });
 
-    // ── Deck endpoints (unchanged) ─────────────────────────────
+    // ─── Deck endpoints (unchanged) ────────────────────────────────
     router.get('/api/rooms/:code/deck', authenticate, (req, res) => {
         try {
             const r = room.getRoom(req.params.code);
@@ -204,7 +250,7 @@ function createApiRouter(appConfig) {
         }
     });
 
-    // ── Clients: list, kick, ban, unban ────────────────────────
+    // ─── Clients: list, kick, ban, unban ───────────────────────────
     router.get('/api/rooms/:code/clients', authenticate, (req, res) => {
         try {
             const r = room.getRoom(req.params.code);
@@ -259,7 +305,7 @@ function createApiRouter(appConfig) {
         }
     });
 
-    // ── Modules (unchanged) ─────────────────────────────────────
+    // ─── Modules (unchanged) ──────────────────────────────────────
     router.get('/api/modules', authenticate, (req, res) => {
         const modules = [];
         const modulesPath = path.join(__dirname, 'modules');
@@ -363,7 +409,7 @@ function createApiRouter(appConfig) {
         }
     });
 
-    // ── Character roster export (global) ──────────────────────────
+    // ─── Character roster export (global) ──────────────────────────
     router.get('/api/characters/export', authenticate, (req, res) => {
         try {
             const result = {
@@ -392,7 +438,7 @@ function createApiRouter(appConfig) {
         }
     });
 
-    // ── Character‑state endpoints ──────────────────────────────
+    // ─── Character‑state endpoints ──────────────────────────────
     function ensureCharState(r) {
         if (!r.characterState) r.characterState = {};
     }
@@ -493,53 +539,20 @@ function createApiRouter(appConfig) {
         }
     });
 
-    // ── Campaign sharing ──────────────────────────────────────────
-    const campaignsDir = path.join(__dirname, 'campaigns');
-    if (!fs.existsSync(campaignsDir)) {
-        fs.mkdirSync(campaignsDir, { recursive: true });
-    }
+    // ─── Campaign sharing (now asynchronous) ──────────────────────
+    // The storage module is used if available; otherwise filesystem.
 
-    // Helper: get all campaign files for a given room code, sorted by mtime descending
-    function getCampaignFiles(roomCode) {
-        const files = fs.readdirSync(campaignsDir)
-            .filter(f => f.startsWith(`${roomCode}-`) && f.endsWith('.json'))
-            .map(f => ({
-                name: f,
-                path: path.join(campaignsDir, f),
-                mtime: fs.statSync(path.join(campaignsDir, f)).mtime
-            }));
-        return files.sort((a, b) => b.mtime - a.mtime); // newest first
-    }
-
-    // POST – store a new campaign snapshot
-    router.post('/api/rooms/:code/campaigns', authenticate, (req, res) => {
+    router.post('/api/rooms/:code/campaigns', authenticate, async (req, res) => {
         try {
             const roomCode = req.params.code.toUpperCase();
             room.getRoom(roomCode); // verify room exists
 
-            // Generate a random 6-character alphanumeric suffix
+            // If the client provides an existing campaign code, we could overwrite it,
+            // but here we always generate a new code (as before).
             const random = Math.random().toString(36).substring(2, 8);
-            const campaignCode = random; // this is what we return to the client
-            const fileName = `${roomCode}-${campaignCode}.json`;
-            const filePath = path.join(campaignsDir, fileName);
+            const campaignCode = random;
 
-            // Write the campaign data
-            fs.writeFileSync(filePath, JSON.stringify(req.body, null, 2));
-
-            // Consolidate: keep only the last 2 campaign files for this room
-            const MAX_CAMPAIGNS = 2;
-            const files = getCampaignFiles(roomCode);
-            if (files.length > MAX_CAMPAIGNS) {
-                // files are already sorted newest first, so delete all after the first MAX_CAMPAIGNS
-                const toDelete = files.slice(MAX_CAMPAIGNS);
-                for (const file of toDelete) {
-                    try {
-                        fs.unlinkSync(file.path);
-                    } catch (e) {
-                        // ignore deletion errors
-                    }
-                }
-            }
+            await storage.saveCampaign(roomCode, campaignCode, req.body);
 
             res.json({ success: true, code: campaignCode, room: roomCode, message: 'Campaign stored' });
         } catch (err) {
@@ -547,30 +560,27 @@ function createApiRouter(appConfig) {
         }
     });
 
-    // GET – retrieve a stored campaign by its random code (suffix)
-    router.get('/api/rooms/:code/campaigns/:campaignCode', authenticate, (req, res) => {
+    router.get('/api/rooms/:code/campaigns/:campaignCode', authenticate, async (req, res) => {
         try {
             const roomCode = req.params.code.toUpperCase();
             room.getRoom(roomCode); // verify room exists
             const campaignCode = req.params.campaignCode;
-            // Build filename: <roomCode>-<campaignCode>.json
-            const fileName = `${roomCode}-${campaignCode}.json`;
-            const filePath = path.join(campaignsDir, fileName);
-            if (!fs.existsSync(filePath)) {
-                return res.status(404).json({ error: 'Campaign not found' });
-            }
-            const data = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
+
+            const data = await storage.loadCampaign(roomCode, campaignCode);
             res.json(data);
         } catch (err) {
-            res.status(err.message.includes('not found') ? 404 : 500).json({ error: err.message });
+            if (err.code === 'ENOENT' || err.message.includes('not found')) {
+                return res.status(404).json({ error: 'Campaign not found' });
+            }
+            res.status(500).json({ error: err.message });
         }
     });
 
-    // ── API Docs (updated) ──────────────────────────────────────
+    // ─── API Docs ──────────────────────────────────────────────────
     router.get('/api/data/docs', (req, res) => {
         res.json({
             title: "Fate's Edge API Documentation",
-            version: "6.0.0",
+            version: "7.0.0",
             endpoints: {
                 health: { get: `GET ${config.healthEndpoint} - Server health check with stats` },
                 rooms: { get: 'GET /api/rooms - List all rooms with stats' },
