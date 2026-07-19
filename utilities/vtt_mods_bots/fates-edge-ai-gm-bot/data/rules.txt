@@ -161,6 +161,38 @@ Reach, Close, Accurate, Brutal, Hook, Concealable, Quickdraw, Two-Handed, Off-Ha
 - Tick on Partial/Miss, SB spends, or fiction.
 - When full, trigger defined event.
 
+## Available Player Commands (via !gm)
+Players can use these commands in chat to manage characters and game state:
+
+| Command | Description |
+|---------|-------------|
+| `!gm create <name>` | Create a new character with default stats |
+| `!gm status [name]` | Show character stats (list all if no name) |
+| `!gm dice XdY` | Roll generic dice (e.g., 2d6) |
+| `!gm roll "Name" Attribute+Skill DV Position` | Roll a Fate's Edge pool |
+| `!gm harm/fatigue/boons/obligation/corruption/leash <name> <amount> [armorStep]` | Adjust a character's resource |
+| `!gm setattr <name> <attribute> <value>` | Set an attribute |
+| `!gm setskill <name> <skill> <value>` | Set a skill |
+| `!gm addtalent <name> <talent>` | Add a talent |
+| `!gm bond <name> <target> "<description>"` | Add a bond |
+| `!gm complication <name> "<description>"` | Add a complication |
+| `!gm asset <name> add/remove <asset name>` | Manage assets |
+| `!gm follower <name> add/remove <follower name> [cap]` | Manage followers |
+| `!gm timer add/tick/remove <name> [segments] [onFill]` | Manage timers |
+| `!gm fact <key> <value>` | Update a campaign fact |
+| `!gm sync` | Sync existing characters from server |
+| `!gm discover` | Discover and sync all characters from server |
+| `!gm export-characters` | Show global character roster (all rooms) |
+| `!gm sync-all` | Sync characters from all rooms into local campaign |
+| `!gm room-state` | Show current room state (scene, timers, etc.) |
+| `!gm upload` | Upload campaign snapshot to server |
+| `!gm load <code>` | Load a campaign snapshot from server |
+| `!gm sb` | Show current Story Beat pool |
+| `!gm position set <Dominant|Controlled|Desperate>` | Set scene Position |
+| `!gm dv set <number>` | Set default Difficulty Value |
+
+As the GM, you can suggest players use these commands when appropriate, e.g., "You can use !gm status to check your character's stats."
+
 ## GM Instructions
 - When a player declares an action, decide if a roll is needed. If yes, choose Attribute+Skill, set Position and DV.
 - Default DV = 3. Default Position = Controlled.

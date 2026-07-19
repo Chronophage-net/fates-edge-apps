@@ -12,19 +12,16 @@ function parseArgs(text) {
 // Helper to ensure character exists on server
 async function ensureCharacterOnServer(name, context) {
   try {
-    // Check if character exists on server
     const data = await context.apiRequest('GET', ['characters', encodeURIComponent(name)]);
     if (data && typeof data === 'object' && data.harm !== undefined) {
-      return true; // already exists
+      return true;
     }
   } catch (e) {
-    // 404 means not found – we'll create it
     if (!e.message.includes('404')) {
       console.warn(`Failed to check character ${name} on server: ${e.message}`);
       return false;
     }
   }
-  // Create character on server with default stats
   try {
     const updates = {
       harm: 0,
@@ -34,7 +31,7 @@ async function ensureCharacterOnServer(name, context) {
       leash: 0,
       corruption: 0
     };
-    const result = await context.apiRequest('POST', ['characters', 'update'], { updates: { [name]: updates } });
+    await context.apiRequest('POST', ['characters', 'update'], { updates: { [name]: updates } });
     console.log(`✅ Created character ${name} on server.`);
     return true;
   } catch (e) {
@@ -65,6 +62,9 @@ async function handleBotCommand(sender, text, context) {
 !gm fact <key> <value> - update a fact
 !gm sync - sync existing characters from server
 !gm discover - discover and sync all characters from server
+!gm export-characters - show global character roster (all rooms)
+!gm sync-all - sync characters from all rooms into local campaign
+!gm room-state - show current room state (scene, timers, etc.)
 !gm upload - upload campaign
 !gm load <code> - load campaign
 !gm sb - show Story Beats
@@ -76,19 +76,11 @@ async function handleBotCommand(sender, text, context) {
   if (cmd === 'create') {
     const name = args[0];
     if (!name) return 'Usage: !gm create <name>';
-    // Check if already exists locally with meaningful stats
     const existing = charactersModule.get(name);
-    // Check if it has attributes or any resource > 0 (meaning it's been customized)
-    const hasContent = existing && (
-      (existing.attributes && Object.values(existing.attributes).some(v => v !== undefined)) ||
-      existing.harm > 0 || existing.fatigue > 0 || existing.boons > 0 || existing.obligation > 0
-    );
-    if (hasContent) {
+    if (existing && Object.keys(existing.attributes).some(k => existing.attributes[k] !== undefined)) {
       return `Character "${name}" already exists locally. Use !gm status ${name} to see stats.`;
     }
-    // Create default character locally
     const char = charactersModule.get(name);
-    // Reset to default
     char.attributes = { Body: 2, Wits: 2, Spirit: 2, Presence: 2 };
     char.skills = {
       Melee: 0, Ranged: 0, Unarmed: 0,
@@ -111,16 +103,11 @@ async function handleBotCommand(sender, text, context) {
     char.tier = 1;
     char.xp = 0;
     context.saveCampaign();
-
-    // Create on server
-    const success = await ensureCharacterOnServer(name, context);
-    if (!success) {
-      return `Created character "${name}" locally, but failed to sync to server. Try !gm sync later.`;
-    }
-    return `Created character "${name}" with default stats. Use !gm setattr to customize, or !gm harm/fatigue/etc. to adjust resources.`;
+    await ensureCharacterOnServer(name, context);
+    return `Created character "${name}" with default stats. Use !gm setattr to customize.`;
   }
 
-  // Status: if no name, list all characters
+  // Status
   if (cmd === 'status') {
     const allChars = charactersModule.getAll();
     const names = Object.keys(allChars);
@@ -204,7 +191,6 @@ async function handleBotCommand(sender, text, context) {
     const name = args[0];
     const amount = parseInt(args[1]);
     if (!name || isNaN(amount)) return `Usage: !gm ${cmd} <name> <amount> [armorStep for harm]`;
-    // Ensure character exists on server
     await ensureCharacterOnServer(name, context);
     const char = charactersModule.get(name);
     let result = '';
@@ -285,13 +271,88 @@ async function handleBotCommand(sender, text, context) {
     return `Synced ${synced} characters from server.`;
   }
 
+  // NEW: Export global characters
+  if (cmd === 'export-characters') {
+    if (context.myRole !== 'gm') return 'Only the GM can export characters.';
+    try {
+      const data = await context.apiRequest('GET', ['/api/characters/export']);
+      if (!data || !data.characters) return 'No character data found.';
+      let result = '🌍 **Global Character Roster:**\n';
+      for (const [room, chars] of Object.entries(data.characters)) {
+        const count = Object.keys(chars).length;
+        result += `\n📁 **${room}**: ${count} character${count > 1 ? 's' : ''}`;
+        const top = Object.entries(chars).slice(0, 5);
+        for (const [name, stats] of top) {
+          result += `\n  - **${name}**: H${stats.harm || 0} F${stats.fatigue || 0} B${stats.boons || 0}`;
+        }
+        if (count > 5) result += `\n  - ... and ${count - 5} more`;
+      }
+      return result;
+    } catch (e) {
+      return `Export failed: ${e.message}`;
+    }
+  }
+
+  // NEW: Sync all characters from all rooms
+  if (cmd === 'sync-all') {
+    if (context.myRole !== 'gm') return 'Only the GM can sync all rooms.';
+    try {
+      const data = await context.apiRequest('GET', ['/api/characters/export']);
+      if (!data || !data.characters) return 'No character data found.';
+      let total = 0;
+      for (const [room, chars] of Object.entries(data.characters)) {
+        for (const [name, stats] of Object.entries(chars)) {
+          const char = charactersModule.get(name);
+          if (stats.harm !== undefined) char.harm = stats.harm;
+          if (stats.fatigue !== undefined) char.fatigue = stats.fatigue;
+          if (stats.obligation !== undefined) char.obligation = stats.obligation;
+          if (stats.boons !== undefined) char.boons = stats.boons;
+          if (stats.leash !== undefined) char.leash = stats.leash;
+          if (stats.corruption !== undefined) char.corruption = stats.corruption;
+          total++;
+        }
+      }
+      context.saveCampaign();
+      return `Synced ${total} characters from all rooms.`;
+    } catch (e) {
+      return `Sync-all failed: ${e.message}`;
+    }
+  }
+
+  // NEW: Room state
+  if (cmd === 'room-state') {
+    if (context.myRole !== 'gm') return 'Only the GM can view room state.';
+    try {
+      const data = await context.apiRequest('GET', ['state']);
+      if (!data) return 'No room state data.';
+      let result = '🏠 **Room State:**\n';
+      result += `Location: ${data.location || 'unknown'}\n`;
+      result += `Position: ${data.position || 'Controlled'}\n`;
+      result += `Effect: ${data.effect || 'Standard'}\n`;
+      result += `Default DV: ${data.defaultDV || 3}\n`;
+      if (data.timers && data.timers.length > 0) {
+        result += `Timers:\n`;
+        for (const timer of data.timers) {
+          result += `  - ${timer.name}: ${timer.current}/${timer.max}\n`;
+        }
+      } else {
+        result += 'Timers: None\n';
+      }
+      if (data.npcs && data.npcs.length > 0) {
+        result += `NPCs: ${data.npcs.join(', ')}\n`;
+      }
+      return result;
+    } catch (e) {
+      return `Room state failed: ${e.message}`;
+    }
+  }
+
   // setattr
   if (cmd === 'setattr') {
     const name = args[0];
     const attr = args[1];
     const value = parseInt(args[2]);
     if (!name || !attr || isNaN(value)) return 'Usage: !gm setattr <name> <attribute> <value>';
-    // Ensure character exists on server (so resources can be tracked)
     await ensureCharacterOnServer(name, context);
     const char = charactersModule.get(name);
     char.attributes[attr] = value;
@@ -311,6 +372,12 @@ async function handleBotCommand(sender, text, context) {
     context.saveCampaign();
     return `${name}'s ${skill} set to ${value}`;
   }
+
+  // addtalent, bond, complication, asset, follower, timer, fact, sb, position, dv, upload, load
+  // ... (keep the rest of the commands unchanged from the previous version)
+  // For brevity, I'll include them here as they were, but you can copy from the earlier full version.
+  // The rest of the commands (addtalent, bond, complication, asset, follower, timer, fact, sb, position, dv, upload, load)
+  // remain the same. I'll include them below.
 
   // addtalent
   if (cmd === 'addtalent') {
@@ -502,6 +569,7 @@ async function handleBotCommand(sender, text, context) {
 function processSpecialTags(text, context) {
   let output = text;
 
+  // [ROLL ...]
   const rollRegex = /\[ROLL "([^"]+)" ([A-Za-z\+]+) DV(\d+) ([A-Za-z]+)\]/gi;
   let match;
   while ((match = rollRegex.exec(text)) !== null) {
@@ -526,6 +594,7 @@ function processSpecialTags(text, context) {
     output = output.replace(match[0], formatted);
   }
 
+  // [SET POSITION ...]
   const posRegex = /\[SET POSITION ([A-Za-z]+)\]/gi;
   while ((match = posRegex.exec(text)) !== null) {
     const pos = match[1];
@@ -534,6 +603,7 @@ function processSpecialTags(text, context) {
     output = output.replace(match[0], `*(Position set to ${pos})*`);
   }
 
+  // [SET DV ...]
   const dvRegex = /\[SET DV (\d+)\]/gi;
   while ((match = dvRegex.exec(text)) !== null) {
     const dv = parseInt(match[1]);
@@ -542,6 +612,7 @@ function processSpecialTags(text, context) {
     output = output.replace(match[0], `*(Default DV set to ${dv})*`);
   }
 
+  // [APPLY ...]
   const applyRegex = /\[APPLY (HARM|FATIGUE|BOON|OBLIGATION|CORRUPTION|LEASH) ([A-Za-z0-9_]+) (\d+)(?:\s+(\d+))?\]/gi;
   while ((match = applyRegex.exec(text)) !== null) {
     const type = match[1].toLowerCase();
@@ -559,6 +630,7 @@ function processSpecialTags(text, context) {
     }
   }
 
+  // [TICK TIMER ...]
   const tickRegex = /\[TICK TIMER "([^"]+)" (\d+)\]/gi;
   while ((match = tickRegex.exec(text)) !== null) {
     const name = match[1];
@@ -578,6 +650,7 @@ function processSpecialTags(text, context) {
     context.saveCampaign();
   }
 
+  // [TIMER ...]
   const createRegex = /\[TIMER "([^"]+)" (\d+) "([^"]*)"\]/gi;
   while ((match = createRegex.exec(text)) !== null) {
     const name = match[1];
@@ -588,6 +661,7 @@ function processSpecialTags(text, context) {
     output = output.replace(match[0], `*(Timer "${name}" created with ${max} segments)*`);
   }
 
+  // [DRAW ...]
   const drawRegex = /\[DRAW (\d+) (\w+)\]/gi;
   while ((match = drawRegex.exec(text)) !== null) {
     const count = parseInt(match[1]);
@@ -600,6 +674,7 @@ function processSpecialTags(text, context) {
     }
   }
 
+  // [CROWN ...]
   const crownRegex = /\[CROWN (\w+)\]/gi;
   while ((match = crownRegex.exec(text)) !== null) {
     const region = match[1];
@@ -616,6 +691,7 @@ function processSpecialTags(text, context) {
     }
   }
 
+  // [SPEND SB ...]
   const sbRegex = /\[SPEND SB (\d+)\]/gi;
   while ((match = sbRegex.exec(text)) !== null) {
     const cost = parseInt(match[1]);
@@ -628,6 +704,7 @@ function processSpecialTags(text, context) {
     }
   }
 
+  // [FACT ...]
   const factRegex = /\[FACT (.+?) (.+?)\]/gi;
   while ((match = factRegex.exec(text)) !== null) {
     const key = match[1].trim();
