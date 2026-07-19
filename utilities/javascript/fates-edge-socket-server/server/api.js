@@ -4,6 +4,7 @@
  * v3 – added character‑state endpoints (harm, fatigue, obligation, boons)
  * v4 – added leash, corruption, character list, and bulk character state sync
  * v5 – added global character roster export
+ * v6 – campaign filenames now prefixed with room code; automatic consolidation (keeps last 2 per room)
  */
 
 const express = require('express');
@@ -363,7 +364,6 @@ function createApiRouter(appConfig) {
     });
 
     // ── Character roster export (global) ──────────────────────────
-    // NEW: Exports all character states across all rooms
     router.get('/api/characters/export', authenticate, (req, res) => {
         try {
             const result = {
@@ -377,7 +377,6 @@ function createApiRouter(appConfig) {
                 };
                 if (r.characterState) {
                     for (const [name, stats] of Object.entries(r.characterState)) {
-                        // Ensure all tracked fields are present
                         const entry = { name };
                         CHAR_FIELDS.forEach(f => {
                             entry[f] = stats[f] ?? 0;
@@ -394,15 +393,12 @@ function createApiRouter(appConfig) {
     });
 
     // ── Character‑state endpoints ──────────────────────────────
-    // Helper to ensure room has character state map
     function ensureCharState(r) {
         if (!r.characterState) r.characterState = {};
     }
 
-    // Allowed fields for character state
     const CHAR_FIELDS = ['harm', 'fatigue', 'obligation', 'boons', 'leash', 'corruption'];
 
-    // POST /rooms/:code/characters/:name/:field   body: { delta: number }
     CHAR_FIELDS.forEach(field => {
         router.post(`/api/rooms/:code/characters/:name/${field}`, authenticate, (req, res) => {
             try {
@@ -412,16 +408,13 @@ function createApiRouter(appConfig) {
                 const name = req.params.name;
                 if (!r.characterState[name]) {
                     r.characterState[name] = {};
-                    // Initialize all fields to 0
                     CHAR_FIELDS.forEach(f => { r.characterState[name][f] = 0; });
                 }
                 const delta = typeof req.body.delta === 'number' ? req.body.delta : 0;
-                // Update the field, never below 0
                 const current = r.characterState[name][field] || 0;
                 r.characterState[name][field] = Math.max(0, current + delta);
                 r.lastActivity = Date.now();
 
-                // Broadcast change
                 room.broadcastToRoom(r.code, 'character-update', {
                     name,
                     field,
@@ -435,14 +428,12 @@ function createApiRouter(appConfig) {
         });
     });
 
-    // GET /rooms/:code/characters/:name   – retrieve current stats for one character
     router.get('/api/rooms/:code/characters/:name', authenticate, (req, res) => {
         try {
             const r = room.getRoom(req.params.code);
             if (!r) return res.status(404).json({ error: 'Room not found' });
             const state = r.characterState ? r.characterState[req.params.name] : null;
             if (!state) return res.status(404).json({ error: 'Character not found' });
-            // Return all fields (ensure they exist)
             const result = { name: req.params.name };
             CHAR_FIELDS.forEach(f => {
                 result[f] = state[f] ?? 0;
@@ -453,7 +444,6 @@ function createApiRouter(appConfig) {
         }
     });
 
-    // GET /rooms/:code/characters   – list all characters and their stats
     router.get('/api/rooms/:code/characters', authenticate, (req, res) => {
         try {
             const r = room.getRoom(req.params.code);
@@ -473,8 +463,6 @@ function createApiRouter(appConfig) {
         }
     });
 
-    // ── Bulk update: POST /rooms/:code/characters/update ─────
-    // body: { updates: { name: { field: value, ... } } }
     router.post('/api/rooms/:code/characters/update', authenticate, (req, res) => {
         try {
             const r = room.getRoom(req.params.code);
@@ -505,28 +493,69 @@ function createApiRouter(appConfig) {
         }
     });
 
-    // ── Campaign sharing (unchanged) ──────────────────────────
+    // ── Campaign sharing ──────────────────────────────────────────
     const campaignsDir = path.join(__dirname, 'campaigns');
     if (!fs.existsSync(campaignsDir)) {
         fs.mkdirSync(campaignsDir, { recursive: true });
     }
 
+    // Helper: get all campaign files for a given room code, sorted by mtime descending
+    function getCampaignFiles(roomCode) {
+        const files = fs.readdirSync(campaignsDir)
+            .filter(f => f.startsWith(`${roomCode}-`) && f.endsWith('.json'))
+            .map(f => ({
+                name: f,
+                path: path.join(campaignsDir, f),
+                mtime: fs.statSync(path.join(campaignsDir, f)).mtime
+            }));
+        return files.sort((a, b) => b.mtime - a.mtime); // newest first
+    }
+
+    // POST – store a new campaign snapshot
     router.post('/api/rooms/:code/campaigns', authenticate, (req, res) => {
         try {
-            room.getRoom(req.params.code);
-            const code = Math.random().toString(36).substring(2, 8).toUpperCase();
-            const filePath = path.join(campaignsDir, `${code}.json`);
+            const roomCode = req.params.code.toUpperCase();
+            room.getRoom(roomCode); // verify room exists
+
+            // Generate a random 6-character alphanumeric suffix
+            const random = Math.random().toString(36).substring(2, 8);
+            const campaignCode = random; // this is what we return to the client
+            const fileName = `${roomCode}-${campaignCode}.json`;
+            const filePath = path.join(campaignsDir, fileName);
+
+            // Write the campaign data
             fs.writeFileSync(filePath, JSON.stringify(req.body, null, 2));
-            res.json({ success: true, code });
+
+            // Consolidate: keep only the last 2 campaign files for this room
+            const MAX_CAMPAIGNS = 2;
+            const files = getCampaignFiles(roomCode);
+            if (files.length > MAX_CAMPAIGNS) {
+                // files are already sorted newest first, so delete all after the first MAX_CAMPAIGNS
+                const toDelete = files.slice(MAX_CAMPAIGNS);
+                for (const file of toDelete) {
+                    try {
+                        fs.unlinkSync(file.path);
+                    } catch (e) {
+                        // ignore deletion errors
+                    }
+                }
+            }
+
+            res.json({ success: true, code: campaignCode, room: roomCode, message: 'Campaign stored' });
         } catch (err) {
             res.status(err.message.includes('not found') ? 404 : 500).json({ error: err.message });
         }
     });
 
+    // GET – retrieve a stored campaign by its random code (suffix)
     router.get('/api/rooms/:code/campaigns/:campaignCode', authenticate, (req, res) => {
         try {
-            room.getRoom(req.params.code);
-            const filePath = path.join(campaignsDir, `${req.params.campaignCode.toUpperCase()}.json`);
+            const roomCode = req.params.code.toUpperCase();
+            room.getRoom(roomCode); // verify room exists
+            const campaignCode = req.params.campaignCode;
+            // Build filename: <roomCode>-<campaignCode>.json
+            const fileName = `${roomCode}-${campaignCode}.json`;
+            const filePath = path.join(campaignsDir, fileName);
             if (!fs.existsSync(filePath)) {
                 return res.status(404).json({ error: 'Campaign not found' });
             }
@@ -541,7 +570,7 @@ function createApiRouter(appConfig) {
     router.get('/api/data/docs', (req, res) => {
         res.json({
             title: "Fate's Edge API Documentation",
-            version: "5.0.0",
+            version: "6.0.0",
             endpoints: {
                 health: { get: `GET ${config.healthEndpoint} - Server health check with stats` },
                 rooms: { get: 'GET /api/rooms - List all rooms with stats' },
@@ -579,8 +608,8 @@ function createApiRouter(appConfig) {
                     }
                 },
                 campaigns: {
-                    upload: 'POST /api/rooms/:code/campaigns - Store campaign state',
-                    download: 'GET /api/rooms/:code/campaigns/:campaignCode - Retrieve stored campaign'
+                    upload: 'POST /api/rooms/:code/campaigns - Store campaign state (returns a random code)',
+                    download: 'GET /api/rooms/:code/campaigns/:campaignCode - Retrieve stored campaign using the returned code'
                 }
             }
         });
