@@ -1,0 +1,186 @@
+{
+  "facts": {
+    "file_npcs": "{\"Bandit\":{\"cap\":1,\"harm\":1,\"armor\":\"None\",\"dice_pools\":{\"Melee\":2,\"Ranged\":2},\"special\":\"Cowardly – when outnumbered or after taking Harm, test Spirit (DV 3) or flee.\"},\"Guard\":{\"cap\":2,\"harm\":2,\"armor\":\"Light\",\"dice_pools\":{\"Melee\":4,\"Athletics\":4},\"special\":\"Patrol Training – +1 die to Notice when searching an area.\"},\"Knight\":{\"cap\":3,\"harm\":3,\"armor\":\"Heavy\",\"dice_pools\":{\"Melee\":6,\"Command\":5},\"special\":\"Challenge – once/scene, force an enemy to engage in melee (Resist with Spirit, DV 4). Mounted.\"},\"Cultist\":{\"cap\":1,\"harm\":1,\"armor\":\"None\",\"dice_pools\":{\"Arcana\":4,\"Deception\":4},\"special\":\"Ritual Chant – when three or more act together, they may perform a Low Rite as a group action.\"},\"Bandit Leader\":{\"cap\":3,\"harm\":3,\"armor\":\"Medium\",\"dice_pools\":{\"Melee\":6,\"Command\":5},\"special\":\"Rally – once/scene, restore 1 Morale to a nearby bandit. Dirty Fighting – may spend 1 Boon to impose –1 die on target's next defense.\"},\"Lesser Spirit\":{\"cap\":1,\"harm\":1,\"armor\":\"None (incorporeal – half physical Harm)\",\"dice_pools\":{\"Stealth\":5,\"Arcana\":4},\"special\":\"Incorporeal Movement – passes through small gaps. Sunlight Sensitivity – while in direct sunlight, –1 die to all actions.\"},\"Greater Spirit\":{\"cap\":3,\"harm\":3,\"armor\":\"Heavy (or Light + immunity)\",\"dice_pools\":{\"primary\":7},\"special\":\"Elemental Aura – creatures in Close suffer 1 Fatigue per round. Immutable – immune to poison and disease.\"},\"Wraith\":{\"cap\":2,\"harm\":2,\"armor\":\"None (incorporeal)\",\"dice_pools\":{\"Stealth\":6,\"Spirit+Resolve\":6},\"special\":\"Life Drain – on a successful touch attack, target marks 1 Fatigue and wraith clears 1 Fatigue.\"},\"Wolf\":{\"cap\":1,\"harm\":2,\"armor\":\"None\",\"dice_pools\":{\"Melee\":5,\"Athletics\":5},\"special\":\"Pack Tactics – when two or more wolves attack the same target, each gains +1 die. Blood Scent – +2 dice to track wounded prey.\"},\"Dire Bear\":{\"cap\":4,\"harm\":4,\"armor\":\"Medium\",\"dice_pools\":{\"Melee\":8,\"Endurance\":8},\"special\":\"Terrifying Roar – all in Near test Resolve (DV 4) or become Shaken. Maul – on a Critical Hit, target is knocked prone and suffers +1 Harm.\"}}",
+    "file_patrons": "{\"The Traveler\":{\"theme\":\"Ways, Journeys, Safe Passage\",\"rites\":{\"low\":[{\"name\":\"Road‑Sense\",\"obligation\":4,\"effect\":\"+1 die to avoid ambushes/delays; create Path Memory timer.\"},{\"name\":\"Traveler's Boon\",\"obligation\":5,\"effect\":\"Ignore one level of difficult terrain or bureaucracy; share with ally.\"}],\"standard\":[{\"name\":\"Waymark\",\"obligation\":8,\"effect\":\"Declare a lane as permitted/easy; allies gain improved Position.\"}],\"high\":[{\"name\":\"Crown of Crossings\",\"obligation\":13,\"effect\":\"Allies +1 die to movement; pursuers –1 die; finish a travel timer segment free.\"}]},\"corruption_bloom\":{\"benefit\":\"Wayfarer's Luck: reroll one failed travel roll per scene.\",\"burden\":\"Restless Spirit: cannot stay in one place more than a week without marking Fatigue.\"}},\"Oath of Flame & Light\":{\"theme\":\"Dawn, Vows, Protection, Smiting\",\"rites\":{\"low\":[{\"name\":\"Kindle Vow\",\"obligation\":4,\"effect\":\"Declare a vow; gain +1 die to actions fulfilling it.\"},{\"name\":\"Lay on Hands\",\"obligation\":5,\"effect\":\"Cleanse affliction, downgrade Harm, or remove Fatigue.\"}],\"standard\":[{\"name\":\"Radiant Smite\",\"obligation\":9,\"effect\":\"Next melee strike flares with dawnfire; +1 Effect or +1 Harm vs. oath‑breakers.\"}],\"high\":[{\"name\":\"Covenant Blaze\",\"obligation\":13,\"effect\":\"Halo allies; oath‑breakers suffer SB and Harm.\"}]},\"corruption_bloom\":{\"benefit\":\"Oathbound Strength: +1 die when upholding vows.\",\"burden\":\"Rigid Honor: must uphold vows even when disadvantageous; –1 die to flexible actions.\"}},\"Inaea (Angel of the Spider)\":{\"theme\":\"Webs, Mercy, Connection, Patient Predation\",\"rites\":{\"low\":[{\"name\":\"Hearth‑Thread Knot\",\"obligation\":5,\"effect\":\"Bind two willing targets; both gain +1 die to Aid each other.\"},{\"name\":\"Snaring Filament\",\"obligation\":5,\"effect\":\"Lay an invisible snare; first hostile crossing suffers –2 dice.\"}],\"standard\":[{\"name\":\"Strand of Inevitability\",\"obligation\":8,\"effect\":\"Link two actors; force SB or gain +2 dice on Setup rolls.\"}],\"high\":[{\"name\":\"Binding Knot\",\"obligation\":11,\"effect\":\"Bind parties to a mutual oath; breaking inflicts 2 SB.\"}]},\"corruption_bloom\":{\"benefit\":\"Web‑Sense: sense hidden ties (debts, rivalries) once/scene.\",\"burden\":\"Empathic Overload: suffer 1 Fatigue when immersed in strong conflict.\"}},\"The Witness\":{\"theme\":\"Truth, Memory, Revelation\",\"rites\":{\"low\":[{\"name\":\"Lingering Trace\",\"obligation\":4,\"effect\":\"+1 die to investigate a specific trace.\"},{\"name\":\"Uncomfortable Question\",\"obligation\":5,\"effect\":\"Force truth or mark Fatigue + Guilty Tell.\"}],\"standard\":[{\"name\":\"Immutable Record\",\"obligation\":7,\"effect\":\"Bind an agreement; breach causes SB and Oathbreaker's Mark.\"}],\"high\":[{\"name\":\"Final Reckoning\",\"obligation\":13,\"effect\":\"All present must speak a hidden truth; liars suffer Harm 2.\"}]},\"corruption_bloom\":{\"benefit\":\"Truth's Sight: +1 die to detect deception.\",\"burden\":\"Compulsive Honesty: must correct obvious falsehoods even when tactically disadvantageous.\"}},\"Carrion King\":{\"theme\":\"Decay, Renewal, Patient Hunger\",\"rites\":{\"low\":[{\"name\":\"Rot's Touch\",\"obligation\":4,\"effect\":\"Cause a small object to decay (rope snaps, lock rusts).\"},{\"name\":\"Earthen Bed\",\"obligation\":5,\"effect\":\"Rest as if a full day; clear 2 Fatigue.\"}],\"standard\":[{\"name\":\"Carrion's Call\",\"obligation\":7,\"effect\":\"Summon carrion insects; target suffers –1 die physical.\"}],\"high\":[{\"name\":\"Harvest of the Dead\",\"obligation\":12,\"effect\":\"Allies gain +2 dice and clear Fatigue; body crumbles.\"}]},\"corruption_bloom\":{\"benefit\":\"Rot‑Sense: +1 die to notice decay, poison, hidden death.\",\"burden\":\"Compost‑Stained: –1 die to social rolls with the fastidious.\"}},\"Ikasha (She Who Sleeps)\":{\"theme\":\"Shadow, Secrets, Latent Potential, Thresholds\",\"rites\":{\"low\":[{\"name\":\"Unlit Candle\",\"obligation\":6,\"effect\":\"+1 die to Stealth/Subterfuge; declare a minor detail 'forgotten'.\"},{\"name\":\"Crossroads Raven\",\"obligation\":5,\"effect\":\"Reroll one failed navigation/pursuit roll or force enemy to lose minor action.\"}],\"standard\":[{\"name\":\"Umbral Reservoir\",\"obligation\":8,\"effect\":\"Clear 1 Fatigue or gain +2 dice on Stealth/Resolve.\"}],\"high\":[{\"name\":\"Umbral Dream\",\"obligation\":14,\"effect\":\"Shadow Form (intangible, +2 Stealth) or Hidden Path (bypass obstacle).\"}]},\"corruption_bloom\":{\"benefit\":\"Shadow's Whisper: +1 die to Deception when lying in darkness.\",\"burden\":\"Truth Echoes: occasionally speak in riddles or half‑truths.\"}},\"Grimmir (Old Man of the Forest)\":{\"theme\":\"Primal Mystery, Seasonal Sacrifice, Nature's Will\",\"rites\":{\"low\":[{\"name\":\"Blood Offering\",\"obligation\":4,\"effect\":\"+1 die to Survival/Stealth in natural terrain; ask one yes/no question about a hidden threat.\"},{\"name\":\"Speaking Roots\",\"obligation\":5,\"effect\":\"+2 dice to Investigation/Lore about a natural place.\"}],\"standard\":[{\"name\":\"Twisted Path\",\"obligation\":7,\"effect\":\"Target suffers –1 die to navigation/movement.\"}],\"high\":[{\"name\":\"Cycle's Crown\",\"obligation\":14,\"effect\":\"Become avatar of the season; gain seasonal bonuses and command plant life.\"}]},\"corruption_bloom\":{\"benefit\":\"Seasonal Sense: +1 die to predict weather and natural events.\",\"burden\":\"Cyclical Mood: –1 die to actions that defy the season.\"}},\"Palinode (Queen of Encores)\":{\"theme\":\"Performance, Rapture, Unfinished Art\",\"rites\":{\"low\":[{\"name\":\"Hymn Against Dread\",\"obligation\":4,\"effect\":\"Allies gain +2 dice to resist Fear.\"},{\"name\":\"Single True Note\",\"obligation\":5,\"effect\":\"+2 dice to Performance for a scene; other rolls –1 die.\"}],\"standard\":[{\"name\":\"Hooked Chorus\",\"obligation\":7,\"effect\":\"Target must join or suffer –1 die social.\"}],\"high\":[{\"name\":\"Crownpiece\",\"obligation\":14,\"effect\":\"Create a transcendent masterpiece; +2 dice to creative rolls for session.\"}]},\"corruption_bloom\":{\"benefit\":\"Perfect Pitch: +1 die to Performance.\",\"burden\":\"Restless Ear: distracted by any flaw; –1 die to non‑performance focus.\"}}}",
+    "file_spells": "{\"Light\":{\"tags\":[\"ILLUMINATE\"],\"dv\":2,\"effect\":\"Create a small sustained light (torch‑brightness) for the scene.\",\"notes\":\"No backlash risk; lasts until dismissed.\"},\"Heal (Cantrip)\":{\"tags\":[\"HEAL\"],\"dv\":2,\"effect\":\"Remove 1 Fatigue from yourself or a touched ally. Does not heal Harm.\",\"notes\":\"Requires touch.\"},\"Shield of Air\":{\"tags\":[\"AIR\",\"DEFEND\"],\"dv\":3,\"effect\":\"+1 die to next defense roll.\",\"notes\":\"One use.\"},\"Flame Cloak\":{\"tags\":[\"FIRE\",\"AREA\",\"DEFEND\"],\"dv\":4,\"effect\":\"Enemies –1 die to approach; caster +1 to defense vs. melee.\",\"notes\":\"Two actions; creates difficult terrain.\"},\"Teleport (Self)\":{\"tags\":[\"AIR\",\"FOLD\"],\"dv\":4,\"effect\":\"Teleport self within Near range.\",\"notes\":\"Dangerous tag (+2 DV). Leaves faint afterimage.\"},\"Wall of Stone\":{\"tags\":[\"EARTH\",\"BARRIER\",\"FORTIFY\"],\"dv\":4,\"effect\":\"Summon a 10‑foot stone wall. Provides cover; obstructs movement.\",\"notes\":\"Scene duration; Integrity Timer 4.\"},\"Heal Harm (with Purify)\":{\"tags\":[\"HEAL\",\"PURIFY\"],\"dv\":5,\"effect\":\"Restore 1 level of Harm (e.g., Harm 2 → 1).\",\"notes\":\"Requires two actions; surcharge +2 DV. Also neutralises poison/disease.\"},\"Fleet Step\":{\"tags\":[\"AIR\",\"HASTE\",\"MOVE\"],\"dv\":3,\"effect\":\"Double movement speed for one exchange.\",\"notes\":\"Requires open area.\"},\"Sleep's Gentle Touch\":{\"tags\":[\"WATER\",\"DREAM\",\"COMMAND\"],\"dv\":4,\"effect\":\"One target falls asleep (scene duration; Resist: Spirit+Resolve DV 2).\",\"notes\":\"Harm wakes target. Dangerous if used in combat.\"},\"Storm's Fury\":{\"tags\":[\"AIR\",\"STORM\",\"AREA\",\"FORCE\"],\"dv\":6,\"effect\":\"30‑foot storm cloud; lightning strikes random targets (Harm 2).\",\"notes\":\"Scene duration; reduces visibility. Dangerous tag (+2 DV).\"},\"Earth's Tremor\":{\"tags\":[\"EARTH\",\"QUAKE\",\"AREA\"],\"dv\":5,\"effect\":\"20‑foot tremor; enemies test Body+Athletics (DV 3) or fall prone.\",\"notes\":\"Destabilises structures; affects all in area.\"}}"
+  },
+  "summary": "**Campaign Summary:**  \nYou are in the **Rusty Tankard**, a tense tavern in an unnamed city. Key characters include **Sera Vex**, a scarred woman offering silver for a cask from the old aqueducts; **Rik**, a wiry knife-wielding man spooked by Sera; the **barkeep**, a weathered informant; and **Tomas**, a drain worker who knows the tunnels. You paid Tomas **three silver** to guide you personally.  \n\n**Current situation:** A mysterious note, mimicking your handwriting, claims the cask is a decoy and the real prize lies in an **old chapel beneath the North Gate**. The note warns Sera is a liar and includes a sketch of the **three-ring crest** Sera described. The barkeep confirms Sera \"doesn't leave loose ends.\"  \n\n**Unresolved threads:**  \n- Who sent the note, and why?  \n- Is Sera betraying you, or is the note a trap?  \n- The aqueducts vs. the chapel—which holds the true prize?  \n- Sera slipped out a back door; Rik watches you; Tomas awaits payment and guidance.  \n\nYou hold the note, the barkeep watches, and the room waits for your next move.",
+  "conversation": [
+    {
+      "role": "user",
+      "content": "Unknown: "
+    },
+    {
+      "role": "user",
+      "content": "Unknown: "
+    },
+    {
+      "role": "assistant",
+      "content": "I am ready. The world of Fate's Edge awaits. Tell me where you begin, and I will paint the scene."
+    },
+    {
+      "role": "assistant",
+      "content": "I am the Game Master for a session of **Fate's Edge**. The world is gritty, alive, and shaped by the choices you make. I will narrate vividly, use the mechanics when needed, and keep the story moving. My pool of Story Beats is currently 0.\n\n---\n\n### The Setting\n\nThe rain has stopped, leaving the cobblestones of **Thornhollow** slick and gleaming under a bruised twilight sky. The air smells of wet woodsmoke, damp wool, and the faint metallic tang of the nearby tanneries. You stand at the mouth of a narrow alley, the sign of **The Drowned Rat** creaking overhead—a tavern that caters to those who prefer their business off the books.\n\nYou have come here for a reason. Perhaps you seek a smuggler with a key to the city’s old aqueducts. Perhaps you were hired to retrieve a ledger hidden in the cellar. Or perhaps you are simply looking for a warm fire and a drink that doesn’t taste like rust.\n\nThe door hangs slightly ajar, a sliver of amber light spilling out. From within, you hear a low murmur of voices, the clink of cups, and—suddenly—the sharp crash of a chair being knocked over.\n\n---\n\n**What do you do?**"
+    },
+    {
+      "role": "user",
+      "content": "Roll: [Clean Success] 3+2 vs DV3 (controlled) → 4 9 7 6 8 | S:4 SB:0 — Clean Success"
+    },
+    {
+      "role": "user",
+      "content": "Unknown rolled dice = undefined"
+    },
+    {
+      "role": "assistant",
+      "content": "The door groans as you push it open, the amber light spilling across your face. The interior of **The Drowned Rat** is exactly as rough as its exterior promised—low rafters, a smoky fire, and a dozen hard-eyed patrons nursing their cups.\n\nThe crash you heard came from the far corner. A wiry man in a stained leather vest is on his feet, his chair lying on its side behind him. His face is flushed, his hand resting on the hilt of a knife. Across from him, a broad-shouldered woman with a scar across her brow sits perfectly still, her hands flat on the table, a faint smirk playing on her lips.\n\nThe barkeep—a bald man with a towel over his shoulder—looks up as you enter. His eyes flick to you, then back to the confrontation. He says nothing, but his hand drifts beneath the counter.\n\nThe wiry man notices you. He sizes you up in a glance, then sneers. \"This don't concern you, stranger. Turn around, walk out, and keep your teeth.\"\n\nThe woman at the table chuckles. \"Don't mind him. He's just sore 'cause I caught him cheating.\" She tilts her head at you. \"You look like someone who might appreciate a fair game. Or a job.\"\n\n**What do you do?**"
+    },
+    {
+      "role": "user",
+      "content": "Roll: [Partial] 3+1 vs DV3 (controlled) → 10 3 3 2 | S:1 SB:0 — Partial Success"
+    },
+    {
+      "role": "user",
+      "content": "Unknown rolled dice = undefined"
+    },
+    {
+      "role": "user",
+      "content": "Roll: [Partial] 3+1 vs DV3 (controlled) → 2 9 3 4 | S:1 SB:0 — Partial Success"
+    },
+    {
+      "role": "user",
+      "content": "Unknown rolled dice = undefined"
+    },
+    {
+      "role": "user",
+      "content": "Roll: [Partial] 3+1 vs DV3 (controlled) → 3 7 1 4 | S:1 SB:1 — Partial Success"
+    },
+    {
+      "role": "user",
+      "content": "Unknown rolled dice = undefined"
+    },
+    {
+      "role": "user",
+      "content": "Roll: [Partial] 3+1 vs DV3 (controlled) → 6 8 4 4 | S:2 SB:0 — Partial Success"
+    },
+    {
+      "role": "user",
+      "content": "Unknown rolled dice = undefined"
+    },
+    {
+      "role": "assistant",
+      "content": "You hold the wiry man's gaze for a long moment. He doesn't back down, but his hand falters on the knife hilt. The woman's smirk widens.\n\n\"Fair enough,\" she says, pushing a chair out with her foot. \"Take a seat. Name's **Sera Vex**. I've got a job that pays in silver, not trouble.\"\n\nThe wiry man snorts, righting his chair and sitting back down with a mutter. \"Fine. Keep your secrets.\" He grabs his cup and drains it, but his eyes keep flicking to you.\n\nSera ignores him. She leans forward, lowering her voice. \"I need someone to fetch something from the old aqueducts beneath the city. A sealed cask, marked with a three-ring crest. The water's risen lately—makes it tricky. But you look like you can handle a little water.\"\n\nShe pauses, studying your face. \"The pay is ten silver now, ten more when I have the cask in hand. Interested?\"\n\nThe fire crackles. The bar settles back into its low murmur. The wiry man is still watching, but his attention is on his drink now.\n\n**What do you do?**"
+    },
+    {
+      "role": "assistant",
+      "content": "You offer a noncommittal grunt and move toward the bar, keeping your hands visible. The wiry man watches you for a moment, then scoffs and turns back to the woman, muttering something about \"cowards and rats.\"\n\nThe barkeep meets your eyes as you approach. He's a slab of a man, his face weathered and his knuckles scarred. He doesn't smile, but he doesn't reach for the weapon under the counter either.\n\n\"What'll it be?\" His voice is a low rumble. \"Got ale that'll put hair on your chest, or something stronger if you're lookin' to forget.\"\n\nFrom the corner of your eye, you see the woman at the table lean back, her smirk never fading. The wiry man is now standing, his hand still on his knife, but he's hesitating. She's got him spooked.\n\nThe barkeep follows your gaze. \"That's **Sera**. She's been comin' here for years. Always lookin' for... help.\" He wipes a glass with a rag that's seen better days. \"She pays well, if you're the type who don't ask too many questions.\"\n\nHe sets the glass down. \"Or you can have your drink and be on your way. Your choice.\"\n\n**What do you do?**"
+    },
+    {
+      "role": "assistant",
+      "content": "The tension in the room thickens like cold grease. The wiry man's hand tightens on his knife, but the scarred woman's smirk widens. The barkeep's hand is still beneath the counter. The other patrons watch with the detached interest of men who have seen blood spilled over less.\n\nYou have a moment to act before this situation goes sideways. The dice have spoken—partial success. You get what you want, but not cleanly. A complication is brewing.\n\n**What do you do?**"
+    },
+    {
+      "role": "user",
+      "content": "Unknown: "
+    },
+    {
+      "role": "user",
+      "content": "Deck: 🃏 Drew 1 card from Acasia: Black of joker\n\n✨ Twist (Joker): A piece of evidence surfaces that reframes everything."
+    },
+    {
+      "role": "assistant",
+      "content": "I notice you're sending multiple rolls in sequence without any narration between them. Let me interpret this as a single extended attempt to read the room and gather information.\n\n---\n\nYou lean against the bar, ordering a mulled ale. Your eyes sweep the room, taking in the details—the nervous twitch of the barkeep's fingers, the way the scarred woman's smirk doesn't quite reach her eyes, the wiry man's knuckles white on his knife hilt.\n\nThe barkeep slides your drink across the counter. \"That's Rik and Sera,\" he mutters, nodding toward the pair. \"Rik's been running a shell game for the last hour. Sera called him out. Now he's trying to save face.\" He wipes the counter with a rag. \"Normally I'd throw 'em both out, but Sera's paid for the corner table all night. And Rik... well, he's got friends.\"\n\nHe glances at you meaningfully. \"You look like you can handle yourself. But if you're smart, you'll drink your ale and stay out of it.\"\n\nFrom the corner, Rik's voice rises again. \"I said *sit down*, lady. Or I'll make you.\"\n\nSera's hand moves—slowly—to a leather satchel at her side. \"You can try, little man.\"\n\nThe tension is a wire about to snap.\n\n**What do you do?**"
+    },
+    {
+      "role": "assistant",
+      "content": "Sera Vex catches your eye as you rise, her expression unreadable. She gives a single, slow nod—acknowledgment, not dismissal. You've made your choice. She'll find you if she wants to, or she won't.\n\nThe barkeep slides a clay cup across the worn wood. It's filled with a dark, bitter-smelling ale that leaves a faint sheen of oil on the surface. He watches you take the first sip with the patience of a man who's seen a thousand strangers do the same.\n\nThe wiry man is still at his table, nursing his drink. The scarred woman is gone, slipped out through a back door while you weren't watching. The tension in the room has eased, replaced by the low murmur of quiet conversations.\n\nA heavy-set man in a patched coat scrapes his stool closer. He smells of wet wool and fish. \"Heard you were askin' about the aqueducts,\" he mutters, not quite meeting your eyes. \"I know a way in. One that don't involve swimmin' through the dark.\"\n\nHe glances at the barkeep, who gives an almost imperceptible nod.\n\n\"Name's **Tomas**. I work the drains for the city. I know the tunnels.\" He drums his fingers on the bar. \"For a silver piece, I'll draw you a map. For three, I'll take you there myself.\"\n\n**What do you do?**"
+    },
+    {
+      "role": "assistant",
+      "content": "The barkeep's hand emerges from beneath the counter—not with a weapon, but with a small, folded piece of parchment. He slides it across the bar toward you, his expression unreadable.\n\n\"This came for you,\" he says, his voice low. \"Courier dropped it off about an hour ago. Said it was urgent.\"\n\nYou unfold the parchment. The handwriting is cramped, hurried, but unmistakably yours—or at least, a perfect imitation of it. The message reads:\n\n> *\"The cask in the aqueduct is a decoy. The real prize is in the old chapel beneath the North Gate. Sera is a liar. Trust no one. Meet me at the hollow oak at midnight.\"*\n\nThere is no signature. But at the bottom, there is a faint sketch—a three-ring crest, exactly as Sera described.\n\nYour blood runs cold. Someone is playing a deeper game. The wiry man is still watching you, his knife still in hand. Sera's smirk has not faded, but her eyes are sharp, tracking your reaction.\n\nThe barkeep busies himself with a glass, but his voice carries just to you: \"I don't know who wrote it. But I know Sera. She's not the type to leave loose ends.\"\n\n**What do you do?**"
+    },
+    {
+      "role": "user",
+      "content": "Billy: I pay the three silver"
+    },
+    {
+      "role": "assistant",
+      "content": "You reach into your pouch and slide three silver coins across the bar. They clink softly against the worn wood. Tomas's eyes widen slightly—that's more than he expected you to agree to on the spot.\n\nHe scoops the coins up with a grimy hand, pocketing them quickly. \"Right then. Good coin.\" He glances around the room, then leans in. \"We go tonight. The tide in the tunnels is lowest just past midnight. Meet me at the base of the **Old Water Tower**, the one with the broken wheel. I'll have lanterns and rope.\"\n\nHe straightens, his voice returning to a normal murmur. \"Don't be late. And don't bring company.\" His eyes flick meaningfully toward the wiry man still nursing his drink, and toward the door Sera vanished through.\n\nThe barkeep gives a grunt of approval. \"Smart man. Tomas knows those tunnels better than the rats.\"\n\nThe wiry man—Rik—stands abruptly, tossing a few coppers on his table. He shoots you a look that's equal parts suspicion and contempt, then pushes through the front door into the night.\n\nThe bar settles into its usual rhythm. You have a few hours before midnight.\n\n**What do you do between now and then?**"
+    },
+    {
+      "role": "user",
+      "content": "Billy: I listen to the crowd; see what I can learn."
+    },
+    {
+      "role": "assistant",
+      "content": "You settle back against the bar, nursing your ale, and let the room's murmur wash over you. The barkeep busies himself nearby—close enough to listen if you ask, but not hovering.\n\nYou catch fragments:\n\n- **Two dockworkers** at a corner table grumble about \"the Night Market being shut down\" and \"the Guild cracking down on unlicensed trade.\" One mentions a \"three-ring brand\" being found on seized goods.\n\n- **A woman in a hooded cloak** sits alone near the fire, reading a worn book. She hasn't looked up once, but her cup is untouched.\n\n- **An old man with a gnarled walking stick** mutters to himself near the door, something about \"water rising in the old channels\" and \"things that should stay buried.\"\n\nThe barkeep leans in, wiping the counter. \"The old man's half-mad, but he's not wrong. The aqueducts have been flooding more lately. Some say it's the spring melt. Others say something's blocked the main sluice.\" He shrugs. \"Tomas knows the safe paths.\"\n\nHe pauses, then adds quietly: \"The woman with the book? She's been here three nights running. Never talks to anyone. Leaves at midnight sharp.\"\n\n**Anything else you want to investigate before heading to the Old Water Tower?**"
+    },
+    {
+      "role": "user",
+      "content": "Unknown: "
+    },
+    {
+      "role": "user",
+      "content": "Deck: 👑 Crown Spread: The Crown Spread reveals a story of tension and consequence.\n\n🌱 Root: The unexpected. The impossible. A force that does not follow the rules.\n\n🏔️ Crest: A physical challenge or obstacle appears.\n\n👑 Crown: A conflict or struggle emerges.\n\n🤝 Left Hand: A matter of loyalty or love arises.\n\n🌟 Wildcard: ✨ Twist (Queen of Spades): A rival's plan backfires, creating chaos for everyone."
+    },
+    {
+      "role": "assistant",
+      "content": "I notice you sent an empty message. Let me continue the scene.\n\n---\n\nThe minutes tick by. The hooded woman closes her book at precisely midnight, tucks it under her arm, and slips out the back door without a word to anyone. The old man muttering about the rising water shuffles out shortly after, his walking stick tapping a slow rhythm on the floorboards.\n\nThe barkeep rings the last call bell. \"Time's almost up. You've got about twenty minutes to make the Water Tower.\"\n\nHe holds your gaze for a moment. \"One more thing, stranger. Tomas is reliable, but he's scared of something down there. He won't say what. Keep your wits about you.\"\n\nHe turns to wipe down the counter, signaling the conversation is over.\n\nThe night air hits you as you step outside—cool and damp, carrying the smell of wet stone and distant river. The streets are mostly empty. A few figures huddle in doorways. The Old Water Tower's broken wheel is a dark silhouette against the moonlit sky, four blocks north.\n\nYou make your way through the quiet streets. A cat darts across your path. Somewhere, a dog barks once and falls silent.\n\nAs you approach the Water Tower, you see a faint lantern glow from its base. A figure waits in the shadows—Tomas, by the build.\n\nBut there's something else. A second figure, smaller, standing a few paces behind him.\n\n**What do you do?**"
+    },
+    {
+      "role": "assistant",
+      "content": "The room seems to shift around you as the patterns become clear. You take a long draught of your ale, letting the fragments settle into something resembling understanding.\n\n**Root – The Unexpected:** The note. The perfect mimicry of your handwriting. Someone knows more about you than they should, or has access to magic that can imitate such things. This is not a simple job. Something impossible is at play.\n\n**Crest – A Physical Challenge:** The aqueducts. Flooded, dark, treacherous. Tomas knows the way, but the rising water and \"things that should stay buried\" promise danger beneath the city.\n\n**Crown – A Conflict Emerges:** Sera and Rik. The Guild cracking down. The three-ring brand on seized goods. You're walking into a web of competing interests—and whoever sent that note wants you at the center of it.\n\n**Left Hand – A Matter of Loyalty:** The woman with the book. Three nights running, leaves at midnight. She hasn't acknowledged you, but she's *here*. Watching? Waiting? And Tomas—he took your silver, but is his loyalty bought, or does he have his own agenda?\n\n**Wildcard – Queen of Spades:** As you watch, the hooded woman finally looks up from her book. Her eyes meet yours for just a moment—cold, calculating—before she stands, tucks the book under her arm, and walks toward the back door.\n\nShe pauses at the threshold, glances over her shoulder, and says—just loud enough for you to hear—*\"The hollow oak is a lie. The real meeting is at the broken wheel.\"*\n\nThen she's gone into the night.\n\nThe room feels colder. The barkeep stares at the door, then at you. \"Well,\" he says slowly, \"that's new.\"\n\n**What do you do?**"
+    }
+  ],
+  "characters": {
+    "lyra": {
+      "attributes": {
+        "Body": 2,
+        "Wits": 2,
+        "Spirit": 2,
+        "Presence": 2
+      },
+      "skills": {
+        "Melee": 0,
+        "Ranged": 0,
+        "Unarmed": 0,
+        "Athletics": 0,
+        "Stealth": 0,
+        "Endurance": 0,
+        "Craft": 0,
+        "Sway": 0,
+        "Deception": 0,
+        "Subterfuge": 0,
+        "Performance": 0,
+        "Insight": 0,
+        "Lore": 0,
+        "Investigation": 0,
+        "Medicine": 0,
+        "Arcana": 0
+      },
+      "talents": [],
+      "bonds": [],
+      "complications": [],
+      "harm": 0,
+      "fatigue": 0,
+      "boons": 0,
+      "obligation": 0,
+      "corruption": 0,
+      "leash": 0,
+      "assets": [],
+      "followers": [],
+      "xp": 0,
+      "tier": 1
+    }
+  },
+  "scene": {
+    "location": "",
+    "npcs": [],
+    "timers": [],
+    "activeComplications": [],
+    "position": "Controlled",
+    "effect": "Standard",
+    "defaultDV": 3
+  },
+  "sb": 1,
+  "messagesSinceLastSummary": 3
+}

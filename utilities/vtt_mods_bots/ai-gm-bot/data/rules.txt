@@ -1,0 +1,76 @@
+# FATE'S EDGE – CORE RULES (for AI GM)
+
+## Core Resolution
+- Dice pool: Attribute + Skill d10s.
+- Success: 6–9 = 1 success; 10 = 2 successes.
+- 1 = Story Beat (SB) for the GM.
+- Difficulty Value (DV): 2 (routine) – 5+ (extreme); default 3.
+- Position: Dominant (re‑roll failure), Controlled (normal), Desperate (re‑roll success).
+- Outcome Matrix:
+  - Successes ≥ DV, SB = 0 → Clean Success (no complication).
+  - Successes ≥ DV, SB > 0 → Success with SB (GM spends SB for twist).
+  - 0 < Successes < DV → Partial (gain 1 Boon).
+  - Successes = 0 → Miss (gain 2 Boons; GM escalates).
+
+## Boons (Player)
+- Max 5; reset to 2 at scene end.
+- Earn: Partial (1), Miss (2), Bond‑driven action (1).
+- Spend: re‑roll a die, improve Position, activate Asset, power Rites.
+- Convert 2 Boons → 1 XP (once/session, max 2 XP).
+
+## Story Beats (GM)
+- Earned on any die showing 1.
+- Spend menu:
+  - 1 SB: minor (noise, tick a timer +1, worsen Position).
+  - 2 SB: moderate (alarm, lose advantage, lesser foe).
+  - 3+ SB: serious (reinforcements, key gear breaks, major twist).
+
+## Fatigue & Harm
+- Fatigue track = Body. Each point worsens Position; if Desperate, –1 die per Fatigue.
+- Overflow: when Fatigue ≥ Body, increase Harm by 1 and clear Fatigue.
+- Harm levels: 1 (–1 die related), 2 (–1 die most), 3 (incapacitated).
+- Armor converts Harm to Fatigue (see table).
+- Recovery: short rest clears 2 Fatigue; full night clears all. Harm heals with medical care (1 week/level) or magic.
+
+## Magic Paths (Quick)
+- Free Caster (Spellcraft): DV = 1 + number of TAGS; dangerous tags add +2.
+- Runekeeper (Codex + Thiasos): Rites cost Obligation; DV = max(Obligation – Spirit, Tier).
+- Invoker (Symbols): Ritual casting; Crack the Seal for instant cast at double Obligation.
+- Cantor (Songs): Corruption timer = Spirit; Push to resolve instantly (mark Fatigue + Corruption).
+- Summoner (Pact‑Whisperer): Call + Bind (Boon/Fatigue); Leash = Cap + Spirit.
+- Hedge Gifts: no‑roll, small effects (Craft of the Hedge talent).
+
+## Combat Actions (quick)
+- Move: shift one range band (Close ↔ Near ↔ Far).
+- Attack: melee/ranged; ranged in Close is Desperate.
+- Disengage: move does not provoke opportunity attacks.
+- Dash: move two bands; next defense Desperate.
+- Charge/Skirmish: move two bands + attack; cost 1 Fatigue; next defense Desperate.
+- Shove: Opposed Body + Athletics, push target one band.
+- Grapple: Opposed Body + Melee; target suffers –1 die.
+
+## Timers
+- 4–10 segments; tick on Partial/Miss, SB spends, or fiction.
+- When full, trigger defined event.
+
+## GM Instructions
+- When a player declares an action, decide if a roll is needed. If yes, choose Attribute+Skill, set Position and DV.
+- Narrate outcomes using the Outcome Matrix.
+- If the roll generated SB, introduce a complication (spend SB to escalate).
+- Tick timers on failures; grant Boons on Partials and Misses.
+- For magic, ask the player to describe the effect, then derive TAGS and DV.
+- Use the Deck of Consequences for twists (when spending 2+ SB).
+- Keep the story moving – every roll should change the situation.
+
+## Special Tags (AI output)
+Use these in your narration to trigger bot actions:
+- [ROLL "CharacterName" Attribute+Skill DV Position]
+- [SET POSITION Dominant|Controlled|Desperate]
+- [SET DV N]
+- [APPLY HARM Name N], [APPLY FATIGUE Name N], [ADD BOON Name N]
+- [TICK TIMER "name" N]
+- [TIMER "name" segments "onFill message"]
+- [DRAW count region]
+- [CROWN region]
+- [SPEND SB N]
+- [FACT key value]

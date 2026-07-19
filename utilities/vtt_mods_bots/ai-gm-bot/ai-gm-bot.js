@@ -77,9 +77,11 @@ if (!envIsReady()) {
 }
 
 // -------------------------------------------------------------------
-// 2. Driver selection and instantiation
+// 2. Load modules and drivers
 // -------------------------------------------------------------------
 const AI_PROVIDER = (process.env.AI_PROVIDER || 'ollama').toLowerCase();
+
+// Drivers
 let driver;
 try {
   if (AI_PROVIDER === 'ollama') {
@@ -93,7 +95,7 @@ try {
   } else if (AI_PROVIDER === 'deepseek') {
     const DeepSeekDriver = require('./drivers/deepseek-driver');
     driver = new DeepSeekDriver();
-    console.log(`🤖 Loaded DeepSeek driver (model: ${process.env.DEEPSEEK_MODEL || 'deepseek-v4-pro'})`);
+    console.log(`🤖 Loaded DeepSeek driver (model: ${process.env.DEEPSEEK_MODEL || 'deepseek-chat'})`);
   } else {
     console.error(`❌ Unsupported AI provider: ${AI_PROVIDER}`);
     process.exit(1);
@@ -103,6 +105,15 @@ try {
   process.exit(1);
 }
 
+// Modules
+const campaignModule = require('./modules/campaigns');
+const charactersModule = require('./modules/characters');
+const diceModule = require('./modules/dice');
+const timersModule = require('./modules/timers');
+const deckModule = require('./modules/decks');
+const worldModule = require('./modules/world');
+const commandHandler = require('./modules/commands');
+
 // -------------------------------------------------------------------
 // 3. Configuration constants
 // -------------------------------------------------------------------
@@ -111,93 +122,182 @@ const ROOM_CODE = process.env.ROOM || 'ABC123';
 const BOT_NAME = process.env.BOT_NAME || 'AI_GM';
 const MAX_HISTORY = parseInt(process.env.MAX_HISTORY || '20', 10);
 const SUMMARISE_EVERY = parseInt(process.env.SUMMARISE_EVERY || '10', 10);
+const API_KEY = process.env.API_KEY || '';
 
 // Server API base URL
 const CAMPAIGN_API_URL = process.env.CAMPAIGN_API_URL || 'http://localhost:10000/api';
 
 // -------------------------------------------------------------------
-// 4. Load rulebook & build system prompt
+// 4. Build system prompt with rulebook and GM instructions
 // -------------------------------------------------------------------
-const rulePath = path.resolve(process.cwd(), 'rules.txt');
+const rulePath = path.resolve(process.cwd(), 'data', 'rules.txt');
 let rulebook = '';
 try {
   if (fs.existsSync(rulePath)) {
     rulebook = fs.readFileSync(rulePath, 'utf-8').trim();
-    console.log('📖 Loaded rulebook (rules.txt).');
+    console.log('📖 Loaded rulebook (data/rules.txt).');
   }
 } catch (e) {}
 
 const BASE_SYSTEM_PROMPT = (rulebook ? rulebook + '\n\n' : '') + (process.env.SYSTEM_PROMPT ||
   'You are the Game Master for a Fate\'s Edge session. Provide vivid, concise narration. Use game mechanics appropriately.') +
-  '\n\nYou have a pool of Story Beats (SB). When you want to introduce a complication, write [SPEND SB N] to spend N beats. The bot will deduct them and you can narrate the complication. You may also create timers with [TIMER "name" segments], draw from the Deck of Consequences with [DRAW count region], or perform a Crown Spread with [CROWN region].';
+  '\n\nYou have a pool of Story Beats (SB). When you want to introduce a complication, write [SPEND SB N] to spend N beats. The bot will deduct them and you can narrate the complication. You may also create timers with [TIMER "name" segments "onFill message"], draw from the Deck of Consequences with [DRAW count region], or perform a Crown Spread with [CROWN region].\n\n' +
+  'When a player’s action requires a roll, output [ROLL "CharacterName" Attribute+Skill DV Position]. The bot will resolve it and append the result.\n' +
+  'You can set Position with [SET POSITION Dominant|Controlled|Desperate], set DV with [SET DV N], and apply resource changes with [APPLY HARM Name N], [APPLY FATIGUE Name N], [ADD BOON Name N], etc.\n' +
+  'Tick timers with [TICK TIMER "name" N].';
 
 // -------------------------------------------------------------------
-// 5. Campaign state management
+// 5. Campaign state (loaded from disk)
 // -------------------------------------------------------------------
-const CAMPAIGNS_DIR = path.resolve(process.cwd(), 'campaigns');
-if (!fs.existsSync(CAMPAIGNS_DIR)) fs.mkdirSync(CAMPAIGNS_DIR, { recursive: true });
-const getCampaignFilePath = (roomCode) => path.join(CAMPAIGNS_DIR, `${roomCode.toUpperCase()}.json`);
+let campaignState = {};
 
-let campaignState = {
-  facts: {},
-  summary: '',
-  conversation: [],
-  messagesSinceLastSummary: 0,
-  characters: {},
-  sb: 0        // Story Beat pool
-};
+function loadCampaign() {
+  const saved = campaignModule.load(ROOM_CODE);
+  if (saved) {
+    campaignState = saved;
+    charactersModule.loadCharacters(campaignState.characters || {});
+    console.log('📂 Loaded campaign state.');
+  } else {
+    campaignState = {
+      facts: {},
+      summary: '',
+      conversation: [],
+      characters: {},
+      scene: {
+        location: '',
+        npcs: [],
+        timers: [],
+        activeComplications: [],
+        position: 'Controlled',
+        effect: 'Standard',
+        defaultDV: 3
+      },
+      sb: 0,
+      messagesSinceLastSummary: 0
+    };
+    campaignModule.save(ROOM_CODE, campaignState);
+    console.log('📂 Created new campaign state.');
+  }
+}
 
-function loadCampaignState(roomCode) {
-  const filePath = getCampaignFilePath(roomCode);
+function saveCampaign() {
+  campaignState.characters = charactersModule.getAll();
+  campaignModule.save(ROOM_CODE, campaignState);
+}
+
+// -------------------------------------------------------------------
+// 6. Sync characters from server API (full discovery + sync)
+// -------------------------------------------------------------------
+async function syncCharactersFromServer() {
+  if (!API_KEY) {
+    console.warn('⚠️ API_KEY not set in .env – skipping character sync.');
+    console.warn('   Add API_KEY=your-key to .env to enable sync.');
+    return;
+  }
+
   try {
-    if (fs.existsSync(filePath)) {
-      const data = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
-      return data;
+    console.log('🔄 Fetching character list from server...');
+    const listData = await apiRequest('GET', ['characters']);
+    if (!listData || !listData.characters) {
+      console.log('ℹ️ No character data from server (empty response).');
+      return;
     }
+
+    const serverChars = listData.characters;
+    const names = Object.keys(serverChars);
+    if (names.length === 0) {
+      console.log('ℹ️ No characters on server.');
+      return;
+    }
+
+    console.log(`🔄 Syncing ${names.length} characters from server...`);
+    let synced = 0;
+    for (const name of names) {
+      const char = charactersModule.get(name);
+      const data = serverChars[name];
+      if (data) {
+        if (data.harm !== undefined) char.harm = data.harm;
+        if (data.fatigue !== undefined) char.fatigue = data.fatigue;
+        if (data.obligation !== undefined) char.obligation = data.obligation;
+        if (data.boons !== undefined) char.boons = data.boons;
+        if (data.leash !== undefined) char.leash = data.leash;
+        if (data.corruption !== undefined) char.corruption = data.corruption;
+        synced++;
+      }
+    }
+    saveCampaign();
+    console.log(`✅ Synced ${synced} characters from server.`);
   } catch (e) {
-    console.error(`❌ Failed to load campaign state for ${roomCode}:`, e.message);
-  }
-  return null;
-}
-
-function saveCampaignState(roomCode) {
-  if (!campaignState) return;
-  const filePath = getCampaignFilePath(roomCode);
-  try {
-    fs.writeFileSync(filePath, JSON.stringify(campaignState, null, 2));
-  } catch (e) {
-    console.error(`❌ Failed to save campaign state for ${roomCode}:`, e.message);
+    if (e.message.includes('401') || e.message.includes('API key')) {
+      console.warn('⚠️ API key invalid or missing. Check API_KEY in .env');
+    } else if (e.message.includes('ECONNREFUSED')) {
+      console.warn('⚠️ Server not reachable. Make sure the server is running.');
+    } else {
+      console.warn(`⚠️ Failed to sync characters from server: ${e.message}`);
+    }
   }
 }
 
 // -------------------------------------------------------------------
-// 6. Character state cache
+// 7. WebSocket and connection management
 // -------------------------------------------------------------------
-let characterState = {};
+let ws = null;
+let connected = false;
+let myRole = 'player';
+let reconnectTimer = null;
+let reconnectAttempts = 0;
+const MAX_RECONNECT_DELAY = 30000;
 
-function getChar(name) {
-  const key = name.toLowerCase();
-  if (!characterState[key]) {
-    characterState[key] = { harm: 0, fatigue: 0, obligation: 0, boons: 0 };
+function connect() {
+  if (reconnectTimer) { clearTimeout(reconnectTimer); reconnectTimer = null; }
+  console.log(`🔌 Connecting to ${WS_URL}?room=${ROOM_CODE}`);
+  ws = new WebSocket(`${WS_URL}?room=${ROOM_CODE}`);
+
+  ws.on('open', () => {
+    connected = true;
+    reconnectAttempts = 0;
+    console.log('🟢 WebSocket connected');
+    ws.send(JSON.stringify({ type: 'handshake', campaignCode: ROOM_CODE, clientName: BOT_NAME, role: 'gm', password: '', clientEmail: '' }));
+  });
+
+  ws.on('message', (data) => {
+    try {
+      const msg = JSON.parse(data.toString());
+      console.log(`⬇️  ${msg.type}`, JSON.stringify(msg).slice(0, 120));
+      handleMessage(msg);
+    } catch (e) { console.warn('⚠️  Non‑JSON message:', data.toString()); }
+  });
+
+  ws.on('close', (code) => { connected = false; console.log(`🔌 Disconnected (code ${code})`); scheduleReconnect(); });
+  ws.on('error', (err) => console.error('🔴 WebSocket error:', err.message));
+}
+
+function scheduleReconnect() {
+  const delay = Math.min(1000 * 2 ** reconnectAttempts, MAX_RECONNECT_DELAY);
+  console.log(`⏳ Reconnecting in ${delay}ms (attempt ${reconnectAttempts + 1})`);
+  reconnectTimer = setTimeout(() => { reconnectAttempts++; connect(); }, delay);
+}
+
+function sendWS(type, data = {}) {
+  if (ws && ws.readyState === WebSocket.OPEN) {
+    ws.send(JSON.stringify({ type, ...data }));
+    console.log(`⬆️  Sent: ${type}`);
   }
-  return characterState[key];
 }
 
-function persistChar(name) {
-  const key = name.toLowerCase();
-  campaignState.characters = campaignState.characters || {};
-  campaignState.characters[key] = characterState[key];
-  saveCampaignState(ROOM_CODE);
+function sendChat(text) {
+  const msg = typeof text === 'string' ? text : String(text);
+  sendWS('chat-message', { text: msg, sender: BOT_NAME, timestamp: Date.now() });
 }
 
 // -------------------------------------------------------------------
-// 7. HTTP helper for server API
+// 8. API helpers (for character updates, etc.)
 // -------------------------------------------------------------------
 function apiRequest(method, pathSegments, body = null) {
   const url = `${CAMPAIGN_API_URL}/rooms/${ROOM_CODE}/${pathSegments.join('/')}`;
   const headers = {
     'Content-Type': 'application/json',
-    'x-api-key': process.env.API_KEY || ''
+    'x-api-key': API_KEY
   };
   const bodyStr = body ? JSON.stringify(body) : undefined;
   if (bodyStr) headers['Content-Length'] = Buffer.byteLength(bodyStr);
@@ -233,146 +333,19 @@ function apiRequest(method, pathSegments, body = null) {
 }
 
 // -------------------------------------------------------------------
-// 8. Shared state
-// -------------------------------------------------------------------
-let ws = null;
-let connected = false;
-let myRole = 'player';
-let reconnectTimer = null;
-let reconnectAttempts = 0;
-const MAX_RECONNECT_DELAY = 30000;
-
-// -------------------------------------------------------------------
-// 9. Facts management
-// -------------------------------------------------------------------
-function factsToText() {
-  const entries = Object.entries(campaignState.facts || {});
-  if (entries.length === 0) return '';
-  return entries.map(([k, v]) => `- ${k}: ${v}`).join('\n');
-}
-
-function updateFact(key, value) {
-  campaignState.facts[key] = value;
-  saveCampaignState(ROOM_CODE);
-  console.log(`📌 Fact updated: ${key} = ${value}`);
-}
-
-// -------------------------------------------------------------------
-// 10. Pre‑load world knowledge from static files
-// -------------------------------------------------------------------
-async function loadWorldFacts() {
-  const apiBase = CAMPAIGN_API_URL.replace(/\/api$/, '');  // e.g. http://localhost:10000
-  try {
-    // Wiki
-    const wikiRes = await fetch(`${apiBase}/data/wiki.json`);
-    if (wikiRes.ok) {
-      const wiki = await wikiRes.json();
-      if (Array.isArray(wiki)) {
-        wiki.forEach(entry => updateFact(`wiki_${entry.id || entry.title}`, entry.title + ': ' + (entry.content || '').slice(0, 200)));
-      }
-    }
-  } catch (e) { /* ignore */ }
-
-  try {
-    // Regions
-    const regionsDir = path.resolve(process.cwd(), '..', '..', '..', 'data', 'regions');  // adjust path as needed
-    if (fs.existsSync(regionsDir)) {
-      const files = fs.readdirSync(regionsDir).filter(f => f.endsWith('.json'));
-      for (const file of files) {
-        const data = JSON.parse(fs.readFileSync(path.join(regionsDir, file), 'utf-8'));
-        const name = data.name || path.basename(file, '.json');
-        updateFact(`region_${name.toLowerCase()}`, data.description || '');
-      }
-    }
-  } catch (e) { /* ignore */ }
-
-  try {
-    // Patrons
-    const patronsManifest = await fetch(`${apiBase}/data/patrons/manifest.json`);
-    if (patronsManifest.ok) {
-      const manifest = await patronsManifest.json();
-      if (Array.isArray(manifest)) {
-        for (const patronFile of manifest) {
-          const patronData = await fetch(`${apiBase}/data/patrons/${patronFile}`).then(r => r.json());
-          updateFact(`patron_${patronData.name}`, `${patronData.domain || ''}: ${patronData.description || ''}`);
-        }
-      }
-    }
-  } catch (e) { /* ignore */ }
-
-  console.log('🌍 Pre‑loaded world facts.');
-}
-
-// -------------------------------------------------------------------
-// 11. Summarisation
+// 9. Summarisation (delegated to campaign module)
 // -------------------------------------------------------------------
 async function summariseStory() {
   if (!driver) return;
-  const existing = campaignState.summary ? `Previous summary:\n${campaignState.summary}\n\n` : '';
-  const recent = (campaignState.conversation || []).slice(-SUMMARISE_EVERY).map(m => `${m.role}: ${m.content}`).join('\n');
-  const prompt = existing + recent + '\n\nWrite a concise campaign summary (max 200 words) including key characters, locations, and unresolved plot threads.';
-  try {
-    const fresh = await driver.generateResponse({
-      systemPrompt: 'You are a summariser. Output only the summary text.',
-      messages: [{ role: 'user', content: prompt }]
-    });
-    campaignState.summary = fresh.trim();
-    saveCampaignState(ROOM_CODE);
-    console.log('📄 New campaign summary generated.');
-  } catch (e) {
-    console.error('Summarisation failed:', e.message);
+  const newSummary = await campaignModule.summarise(campaignState, driver, SUMMARISE_EVERY);
+  if (newSummary) {
+    campaignState.summary = newSummary;
+    saveCampaign();
   }
 }
 
 // -------------------------------------------------------------------
-// 12. WebSocket helpers
-// -------------------------------------------------------------------
-function sendWS(type, data = {}) {
-  if (ws && ws.readyState === WebSocket.OPEN) {
-    ws.send(JSON.stringify({ type, ...data }));
-    console.log(`⬆️  Sent: ${type}`);
-  }
-}
-
-function sendChat(text) {
-  sendWS('chat-message', { text, sender: BOT_NAME, timestamp: Date.now() });
-}
-
-// -------------------------------------------------------------------
-// 13. Connection
-// -------------------------------------------------------------------
-function connect() {
-  if (reconnectTimer) { clearTimeout(reconnectTimer); reconnectTimer = null; }
-  console.log(`🔌 Connecting to ${WS_URL}?room=${ROOM_CODE}`);
-  ws = new WebSocket(`${WS_URL}?room=${ROOM_CODE}`);
-
-  ws.on('open', () => {
-    connected = true;
-    reconnectAttempts = 0;
-    console.log('🟢 WebSocket connected');
-    ws.send(JSON.stringify({ type: 'handshake', campaignCode: ROOM_CODE, clientName: BOT_NAME, role: 'gm', password: '', clientEmail: '' }));
-  });
-
-  ws.on('message', (data) => {
-    try {
-      const msg = JSON.parse(data.toString());
-      console.log(`⬇️  ${msg.type}`, JSON.stringify(msg).slice(0, 120));
-      handleMessage(msg);
-    } catch (e) { console.warn('⚠️  Non‑JSON message:', data.toString()); }
-  });
-
-  ws.on('close', (code) => { connected = false; console.log(`🔌 Disconnected (code ${code})`); scheduleReconnect(); });
-  ws.on('error', (err) => console.error('🔴 WebSocket error:', err.message));
-}
-
-function scheduleReconnect() {
-  const delay = Math.min(1000 * 2 ** reconnectAttempts, MAX_RECONNECT_DELAY);
-  console.log(`⏳ Reconnecting in ${delay}ms (attempt ${reconnectAttempts + 1})`);
-  reconnectTimer = setTimeout(() => { reconnectAttempts++; connect(); }, delay);
-}
-
-// -------------------------------------------------------------------
-// 14. Message handler
+// 10. Message handler
 // -------------------------------------------------------------------
 function handleMessage(msg) {
   if (msg.type === 'state-updated') return;
@@ -380,8 +353,17 @@ function handleMessage(msg) {
   if (msg.type === 'handshake_ack') {
     myRole = msg.clientRole || msg.role || 'player';
     console.log(`🤝 Handshake OK. Role: ${myRole}`);
-    if (myRole !== 'gm') { console.log('📢 I am not the GM – will request GM role.'); sendWS('request_gm'); }
-    else { console.log('👑 I am the Game Master!'); sendChat('*The AI Game Master has joined.*'); }
+    if (myRole !== 'gm') {
+      console.log('📢 I am not the GM – will request GM role.');
+      sendWS('request_gm');
+    } else {
+      console.log('👑 I am the Game Master!');
+      sendChat('*The AI Game Master has joined.*');
+      // Room is now created – sync characters from server
+      (async () => {
+        await syncCharactersFromServer();
+      })();
+    }
     return;
   }
 
@@ -406,7 +388,7 @@ function handleMessage(msg) {
 
   console.log(`💬 [${sender}] ${text}`);
 
-  if (sender === BOT_NAME) return; // prevent self-loop
+  if (sender === BOT_NAME) return;
 
   // --- Handle roll results: automatically add SB ---
   if (msg.type === 'roll-result') {
@@ -414,16 +396,43 @@ function handleMessage(msg) {
     if (sbGain > 0) {
       campaignState.sb = (campaignState.sb || 0) + sbGain;
       console.log(`📈 +${sbGain} Story Beats (total: ${campaignState.sb})`);
+      saveCampaign();
     }
     const rollText = `${sender} rolled ${msg.expr || 'dice'} = ${msg.total}`;
     campaignState.conversation.push({ role: 'user', content: rollText });
     if (campaignState.conversation.length > MAX_HISTORY * 2) campaignState.conversation.splice(0, campaignState.conversation.length - MAX_HISTORY);
-    saveCampaignState(ROOM_CODE);
-    // Continue to narration
+    saveCampaign();
+    return;
   }
 
-  // --- Bot commands ---
-  if (text.startsWith('!gm')) { handleBotCommand(sender, text); return; }
+  // --- Bot commands (!gm) ---
+  if (text.startsWith('!gm')) {
+    (async () => {
+      try {
+        const response = await commandHandler.handleBotCommand(sender, text, {
+          campaignState,
+          characters: charactersModule,
+          dice: diceModule,
+          timers: timersModule,
+          deck: deckModule,
+          ws,
+          sendChat,
+          saveCampaign,
+          apiRequest,
+          myRole
+        });
+        if (response && typeof response === 'string') {
+          sendChat(response);
+        } else if (response) {
+          sendChat(String(response));
+        }
+      } catch (err) {
+        console.error('❌ Command handler error:', err.message);
+        sendChat('*Error processing command.*');
+      }
+    })();
+    return;
+  }
 
   // --- AI narration (only if GM) ---
   if (myRole !== 'gm') return;
@@ -442,7 +451,7 @@ function handleMessage(msg) {
     try {
       let fullSystemPrompt = BASE_SYSTEM_PROMPT;
       if (campaignState.summary) fullSystemPrompt += '\n\nCampaign Summary:\n' + campaignState.summary;
-      const factsText = factsToText();
+      const factsText = campaignModule.factsToText(campaignState.facts);
       if (factsText) fullSystemPrompt += '\n\nCurrent World Facts:\n' + factsText;
       fullSystemPrompt += `\n\nStory Beats available: ${campaignState.sb || 0}.`;
 
@@ -451,13 +460,26 @@ function handleMessage(msg) {
         messages: campaignState.conversation.slice(-MAX_HISTORY)
       });
 
-      let clean = processSpecialCommands(reply.trim());
+      let clean = reply.trim();
+
+      clean = commandHandler.processSpecialTags(clean, {
+        campaignState,
+        characters: charactersModule,
+        dice: diceModule,
+        timers: timersModule,
+        deck: deckModule,
+        ws,
+        sendChat,
+        saveCampaign,
+        apiRequest,
+        myRole
+      });
 
       if (clean) {
         sendChat(clean);
         campaignState.conversation.push({ role: 'assistant', content: clean });
         if (campaignState.conversation.length > MAX_HISTORY * 2) campaignState.conversation.splice(0, campaignState.conversation.length - MAX_HISTORY);
-        saveCampaignState(ROOM_CODE);
+        saveCampaign();
       }
     } catch (err) {
       console.error('❌ LLM error:', err.message);
@@ -467,191 +489,23 @@ function handleMessage(msg) {
 }
 
 // -------------------------------------------------------------------
-// 15. Special command processor (extracted from AI output)
-// -------------------------------------------------------------------
-function processSpecialCommands(text) {
-  let output = text;
-
-  // SPEND SB
-  const sbRegex = /\[SPEND SB (\d+)\]/gi;
-  let match;
-  while ((match = sbRegex.exec(text)) !== null) {
-    const cost = parseInt(match[1]);
-    if (campaignState.sb >= cost) {
-      campaignState.sb -= cost;
-      console.log(`💸 Spent ${cost} SB. Remaining: ${campaignState.sb}`);
-      output = output.replace(match[0], `*(Spent ${cost} Story Beat${cost > 1 ? 's' : ''})*`);
-    } else {
-      output = output.replace(match[0], '*(Not enough SB)*');
-    }
-  }
-
-  // TIMER
-  const timerRegex = /\[TIMER "([^"]+)" (\d+)\]/gi;
-  while ((match = timerRegex.exec(text)) !== null) {
-    const name = match[1];
-    const segments = parseInt(match[2]);
-    sendWS('event', { type: 'add-timer', name, segments });
-    sendChat(`Timer created: ${name} (${segments} segments)`);
-    output = output.replace(match[0], `*(Timer started: ${name})*`);
-  }
-
-  // DECK DRAW
-  const drawRegex = /\[DRAW (\d+) (\w+)\]/gi;
-  while ((match = drawRegex.exec(text)) !== null) {
-    const count = parseInt(match[1]);
-    const region = match[2];
-    sendWS('deck-draw', { count, region });
-    output = output.replace(match[0], `*(Drawing ${count} cards from ${region}…)*`);
-  }
-
-  // CROWN SPREAD
-  const crownRegex = /\[CROWN (\w+)\]/gi;
-  while ((match = crownRegex.exec(text)) !== null) {
-    const region = match[1];
-    sendWS('crown-spread', { region });
-    output = output.replace(match[0], `*(Performing Crown Spread for ${region}…)*`);
-  }
-
-  // FACT updates
-  const factRegex = /\[FACT (.+?) (.+?)\]/gi;
-  while ((match = factRegex.exec(text)) !== null) {
-    const key = match[1].trim();
-    const value = match[2].trim();
-    updateFact(key, value);
-    output = output.replace(match[0], '');
-  }
-
-  return output;
-}
-
-// -------------------------------------------------------------------
-// 16. Bot command handler (tool mode + resource management + campaign sharing)
-// -------------------------------------------------------------------
-async function uploadCampaign() {
-  try {
-    const data = await apiRequest('POST', ['campaigns'], campaignState);
-    sendChat(`Campaign uploaded! Share code: ${data.code}`);
-  } catch (e) { sendChat(`Upload failed: ${e.message}`); }
-}
-
-async function loadCampaign(code) {
-  try {
-    const data = await apiRequest('GET', ['campaigns', code]);
-    campaignState.facts = { ...campaignState.facts, ...data.facts };
-    campaignState.summary = data.summary || campaignState.summary;
-    campaignState.conversation = [...campaignState.conversation, ...(data.conversation || [])].slice(-MAX_HISTORY * 2);
-    if (data.characters) {
-      campaignState.characters = { ...campaignState.characters, ...data.characters };
-      for (const [k, v] of Object.entries(data.characters)) characterState[k] = { ...v };
-    }
-    saveCampaignState(ROOM_CODE);
-    sendChat(`Campaign ${code} loaded!`);
-  } catch (e) { sendChat(`Load failed: ${e.message}`); }
-}
-
-function handleBotCommand(sender, text) {
-  const parts = text.split(/\s+/);
-  const cmd = parts[1]?.toLowerCase();
-
-  if (cmd === 'help') {
-    sendChat('Available commands: !gm help, !gm status, !gm dice XdY, !gm fact key value, !gm harm/fatigue/obligation/boon/clear <name> <amount>, !gm upload, !gm load <code>, !gm sb');
-    return;
-  }
-
-  if (cmd === 'sb') {
-    sendChat(`Current Story Beat pool: ${campaignState.sb || 0}`);
-    return;
-  }
-
-  if (cmd === 'status') {
-    if (parts[2]) {
-      const name = parts.slice(2).join(' ');
-      const c = getChar(name);
-      sendChat(`${name} → Harm: ${c.harm}, Fatigue: ${c.fatigue}, Obligation: ${c.obligation}, Boons: ${c.boons}`);
-    } else {
-      sendChat(`I am ${myRole === 'gm' ? 'the Game Master' : 'a helper bot (GM is someone else)'}.`);
-    }
-    return;
-  }
-
-  if (cmd === 'dice' && parts[2]) {
-    const formula = parts[2];
-    const match = formula.match(/^(\d+)d(\d+)$/i);
-    if (match) {
-      const count = parseInt(match[1]), sides = parseInt(match[2]);
-      const rolls = []; let total = 0;
-      for (let i = 0; i < count; i++) { const r = Math.floor(Math.random() * sides) + 1; rolls.push(r); total += r; }
-      sendChat(`${sender} requested a roll: ${formula} → [${rolls.join(', ')}] = ${total}`);
-    } else sendChat('Usage: !gm dice 2d6');
-    return;
-  }
-
-  if (cmd === 'fact' && parts[2] && parts[3]) {
-    updateFact(parts[2], parts.slice(3).join(' '));
-    sendChat(`Fact updated: ${parts[2]} = ${parts.slice(3).join(' ')}`);
-    return;
-  }
-
-  if (cmd === 'upload') { uploadCampaign(); return; }
-  if (cmd === 'load' && parts[2]) { loadCampaign(parts[2]); return; }
-
-  // Resource commands (GM only)
-  if (myRole !== 'gm') { sendChat('Only the Game Master can run resource commands.'); return; }
-
-  const targetName = parts[2];
-  if (!targetName) { sendChat('Usage: !gm <harm|fatigue|obligation|boon|clear> <name> [value]'); return; }
-
-  const amount = parts[3] ? parseInt(parts[3], 10) : 1;
-  if (isNaN(amount)) { sendChat('Amount must be a number.'); return; }
-
-  const applyDelta = async (field, delta) => {
-    try {
-      await apiRequest('POST', ['characters', encodeURIComponent(targetName), field], { delta });
-      const c = getChar(targetName);
-      c[field] = Math.max(0, c[field] + delta);
-      persistChar(targetName);
-      sendChat(`${targetName}'s ${field} changed by ${delta >= 0 ? '+' : ''}${delta} → now ${c[field]}`);
-    } catch (e) { sendChat(`*Failed to update ${targetName}'s ${field} (see console)*`); }
-  };
-
-  switch (cmd) {
-    case 'harm': applyDelta('harm', amount); break;
-    case 'fatigue': applyDelta('fatigue', amount); break;
-    case 'obligation': applyDelta('obligation', amount); break;
-    case 'boon': applyDelta('boons', amount); break;
-    case 'clear':
-      const field = parts[3]?.toLowerCase();
-      if (!['harm', 'fatigue', 'obligation', 'boons'].includes(field)) { sendChat('Valid fields: harm, fatigue, obligation, boons.'); return; }
-      const clearAmt = parts[4] ? parseInt(parts[4], 10) : Infinity;
-      applyDelta(field, -Math.min(clearAmt, getChar(targetName)[field]));
-      break;
-    default: sendChat('Unknown command. Try !gm help');
-  }
-}
-
-// -------------------------------------------------------------------
-// 17. Startup
+// 11. Startup
 // -------------------------------------------------------------------
 (async function main() {
   console.log('🚀 AI GM Bot starting…');
   console.log(`   WS: ${WS_URL}   Room: ${ROOM_CODE}   Name: ${BOT_NAME}`);
 
-  // Load campaign state
-  const saved = loadCampaignState(ROOM_CODE);
-  if (saved) {
-    campaignState = saved;
-    if (campaignState.characters) {
-      for (const [k, v] of Object.entries(campaignState.characters)) characterState[k] = { ...v };
-    }
-    console.log('📂 Loaded campaign state.');
-  } else {
-    campaignState = { facts: {}, summary: '', conversation: [], messagesSinceLastSummary: 0, characters: {}, sb: 0 };
-    saveCampaignState(ROOM_CODE);
-  }
+  // Load campaign from disk
+  loadCampaign();
 
-  // Pre‑load world facts (regions, patrons, wiki)
-  await loadWorldFacts();
+  // DO NOT sync here – wait for handshake
+  // await syncCharactersFromServer();
+
+  // Pre‑load world facts (regions, patrons, etc.)
+  await worldModule.loadWorldFacts((key, value) => {
+    campaignState.facts[key] = value;
+  });
+  saveCampaign();
 
   if (driver && typeof driver.initialize === 'function') {
     try { await driver.initialize(); } catch (e) { console.error('Driver init failed:', e.message); }
@@ -662,7 +516,7 @@ function handleBotCommand(sender, text) {
 
 process.on('SIGINT', () => {
   console.log('\n🛑 Shutting down…');
-  if (campaignState) saveCampaignState(ROOM_CODE);
+  if (campaignState) saveCampaign();
   if (ws && ws.readyState === WebSocket.OPEN) ws.close(1000, 'Shutdown');
   process.exit(0);
 });
