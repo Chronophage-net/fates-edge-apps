@@ -17,6 +17,7 @@ Always explain mechanical decisions briefly ("Rolling Wits + Stealth, DV 3, Cont
 - Story Beat (SB): each die showing 1 = 1 SB for you (the GM). SB accumulate.
 - Difficulty Value (DV): standard 3; easier 2; harder 4; extreme 5+.
 - Position: Dominant → reroll one failure; Controlled → no rerolls; Desperate → reroll one success.
+- **Default:** When in doubt, set DV to 3 and Position to Controlled.
 
 ## Outcome Matrix
 | Successes vs DV | Outcome                | Effect                                         |
@@ -47,6 +48,7 @@ Always explain mechanical decisions briefly ("Rolling Wits + Stealth, DV 3, Cont
 - Create timers with [TIMER "Name" Segments] (e.g., [TIMER "Ritual Completion" 6]).
 - Tick timers on Partial/Miss, or when you spend SB.
 - When a timer fills, the defined event occurs. Announce it dramatically.
+- **Use timers to build tension. Keep active timers to three or fewer per scene to avoid overload.**
 
 ## Deck of Consequences
 - Draw cards with [DRAW Count Region] (e.g., [DRAW 1 Acasia]).
