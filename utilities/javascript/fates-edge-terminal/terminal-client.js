@@ -14,6 +14,7 @@
  * - Presence and client list
  * - ANSI colored output
  * - Admin mode (kick/ban/unban via REST API) when API key provided
+ * - Old-school BBS ASCII art banner (/banner)
  * 
  * Usage: node terminal-client.js [--api-key <key>]
  *        or set API_KEY environment variable
@@ -77,6 +78,25 @@ const colors = {
     gray: "\x1b[90m",
     white: "\x1b[37m"
 };
+
+// ============================================================
+// BBS ASCII Art Banner
+// ============================================================
+
+const BBS_ART = `
+${colors.magenta}################################################################################${colors.reset}
+${colors.cyan}##${colors.reset}                                                                              ${colors.cyan}##${colors.reset}
+${colors.cyan}##${colors.reset}     ███████╗ █████╗ ████████╗███████╗███████╗    ███████╗██████╗  ██████╗ ███████╗    ${colors.cyan}##${colors.reset}
+${colors.cyan}##${colors.reset}     ██╔════╝██╔══██╗╚══██╔══╝██╔════╝██╔════╝    ██╔════╝██╔══██╗██╔════╝ ██╔════╝    ${colors.cyan}##${colors.reset}
+${colors.cyan}##${colors.reset}     █████╗  ███████║   ██║   █████╗  █████╗      █████╗  ██████╔╝██║  ███╗█████╗      ${colors.cyan}##${colors.reset}
+${colors.cyan}##${colors.reset}     ██╔══╝  ██╔══██║   ██║   ██╔══╝  ██╔══╝      ██╔══╝  ██╔══██╗██║   ██║██╔══╝      ${colors.cyan}##${colors.reset}
+${colors.cyan}##${colors.reset}     ██║     ██║  ██║   ██║   ███████╗███████╗    ███████╗██║  ██║╚██████╔╝███████╗    ${colors.cyan}##${colors.reset}
+${colors.cyan}##${colors.reset}     ╚═╝     ╚═╝  ╚═╝   ╚═╝   ╚══════╝╚══════╝    ╚══════╝╚═╝  ╚═╝ ╚═════╝ ╚══════╝    ${colors.cyan}##${colors.reset}
+${colors.cyan}##${colors.reset}                                                                              ${colors.cyan}##${colors.reset}
+${colors.cyan}##${colors.reset}         ${colors.yellow}⚔️  Fate's Edge – Terminal Client v1.4.0  ⚔️${colors.reset}        ${colors.cyan}##${colors.reset}
+${colors.cyan}##${colors.reset}                                                                              ${colors.cyan}##${colors.reset}
+${colors.magenta}################################################################################${colors.reset}
+`;
 
 // ============================================================
 // State
@@ -237,6 +257,7 @@ ${colors.yellow}Region:${colors.reset}
 
 ${colors.yellow}Other:${colors.reset}
   /who                        Request presence update
+  /banner                     Display the BBS ASCII art banner
   /help                       Show this help
   /quit / exit                Quit the client
 ${ADMIN_MODE ? `
@@ -919,6 +940,12 @@ rl.on('line', (input) => {
                 handleAdminCommand(args);
                 break;
 
+            // BBS ASCII art banner
+            case 'banner':
+                console.log(BBS_ART);
+                rl.prompt(true);
+                break;
+
             case 'who':
                 if (connected) {
                     sendMessage('sync_request', { entity: 'presence' });
@@ -977,9 +1004,9 @@ function findClient(idOrName) {
 // Initial Welcome
 // ============================================================
 
-console.log(`${colors.magenta}╔══════════════════════════════════════════════════════════════╗`);
-console.log(`${colors.magenta}║              Fate's Edge Terminal Client v1.4.0              ║`);
-console.log(`${colors.magenta}╚══════════════════════════════════════════════════════════════╝${colors.reset}`);
+// Print the BBS banner on startup
+console.log(BBS_ART);
+
 console.log(`Type ${colors.yellow}/help${colors.reset} for commands.`);
 console.log(`Set your name with ${colors.yellow}/name <Your Name>${colors.reset}`);
 console.log(`Connect with ${colors.yellow}/connect [url] [room]${colors.reset}`);
