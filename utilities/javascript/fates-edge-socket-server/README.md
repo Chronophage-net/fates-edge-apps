@@ -1,6 +1,6 @@
 # Fate's Edge Socket Server & CLI Management Tool
 
-[![Version](https://img.shields.io/badge/version-1.3.0-blue.svg)](https://github.com/fates-edge/fates-edge)
+[![Version](https://img.shields.io/badge/version-6.0.0-blue.svg)](https://github.com/fates-edge/fates-edge)
 [![Node.js](https://img.shields.io/badge/node-%3E%3D18-brightgreen.svg)](https://nodejs.org)
 [![Python](https://img.shields.io/badge/python-%3E%3D3.8-blue.svg)](https://python.org)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
@@ -54,6 +54,11 @@ The **Fate's Edge Socket Server** is the real-time backbone of the Fate's Edge V
 - **Module Pushing** - Push modules to connected clients
 - **Module Cleanup** - Remove modules from clients
 - **Module Listing** - List available modules
+
+### Character & Campaign Management 🆕
+- **Global Character Roster Export** – Fetch all characters and their stats (harm, fatigue, obligation, boons, leash, corruption) across every room in one JSON response.
+- **Campaign Sharing** – Upload and download campaign states. Each snapshot is stored as `<roomCode>-<random>.json`; the server automatically keeps only the **two most recent** snapshots per room to prevent storage bloat.
+- **Per-Room Character State** – Individual endpoints to adjust harm, fatigue, obligation, boons, leash, and corruption for any character.
 
 ### Game Master Management 🆕
 - **GM Election** – Any player can request to become GM.
@@ -403,6 +408,26 @@ curl -H "X-API-Key: your-api-key" http://localhost:3000/api/rooms
 | POST | `/api/modules/:id/push` | Push module |
 | POST | `/api/modules/:id/cleanup` | Cleanup module |
 
+#### Character & Campaign Management
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/rooms/:code/characters` | List all characters in a room (with stats) |
+| GET | `/api/rooms/:code/characters/:name` | Get stats for a specific character |
+| POST | `/api/rooms/:code/characters/:name/harm` | Adjust harm (delta) |
+| POST | `/api/rooms/:code/characters/:name/fatigue` | Adjust fatigue (delta) |
+| POST | `/api/rooms/:code/characters/:name/obligation` | Adjust obligation (delta) |
+| POST | `/api/rooms/:code/characters/:name/boons` | Adjust boons (delta) |
+| POST | `/api/rooms/:code/characters/:name/leash` | Adjust leash (delta) |
+| POST | `/api/rooms/:code/characters/:name/corruption` | Adjust corruption (delta) |
+| POST | `/api/rooms/:code/characters/update` | Bulk update multiple characters (set values) |
+| **GET** | **`/api/characters/export`** | **Export all character rosters across all rooms (global)** |
+| POST | `/api/rooms/:code/campaigns` | Store a campaign state snapshot (returns a random code) |
+| GET | `/api/rooms/:code/campaigns/:campaignCode` | Retrieve a stored campaign snapshot |
+
+> **Campaign Storage Details**  
+> Snapshots are saved as `<roomCode>-<campaignCode>.json` in the `campaigns/` directory. The server automatically keeps only the **two most recent** snapshots per room, deleting older ones to prevent storage bloat. The `campaignCode` is a random 6‑character alphanumeric string returned by the POST endpoint.
+
 #### VTT Operations
 
 | Method | Endpoint | Description |
@@ -443,6 +468,18 @@ curl -X POST http://localhost:3000/api/modules/example-module/push \
   -H "X-API-Key: your-api-key" \
   -H "Content-Type: application/json" \
   -d '{"roomCode": "ABC123"}'
+
+# Export all characters
+curl -H "X-API-Key: your-api-key" http://localhost:3000/api/characters/export
+
+# Store a campaign snapshot
+curl -X POST http://localhost:3000/api/rooms/ABC123/campaigns \
+  -H "X-API-Key: your-api-key" \
+  -H "Content-Type: application/json" \
+  -d '{"scene": "Tavern", "npcs": [...]}'
+
+# Retrieve a campaign snapshot (using the returned code)
+curl -H "X-API-Key: your-api-key" http://localhost:3000/api/rooms/ABC123/campaigns/def456
 ```
 
 ## 🔌 WebSocket Events
@@ -496,7 +533,7 @@ curl -X POST http://localhost:3000/api/modules/example-module/push \
 docker build -t fates-edge-server .
 
 # Build with custom tag
-docker build -t fates-edge-server:1.3.0 .
+docker build -t fates-edge-server:6.0.0 .
 ```
 
 ### Run Container
