@@ -5,6 +5,9 @@
  * Loads region data dynamically from /data/regions/.
  * Supports WebSocket sync for multiplayer draws.
  * Uses deterministic RNG for static/demo deployments.
+ *
+ * Region descriptions are parsed from LaTeX-like markup into clean HTML
+ * using regionDescriptionParser.
  */
 
 import { shuffleArray } from '../../core/utils.js';
@@ -12,11 +15,6 @@ import { showToast } from '../../components/Toast.js';
 import { getState, addTimer } from '../../core/state.js';
 import { logRecordingEvent } from '../../core/media.js';
 import { parseRegionDescription } from '../../utils/regionDescriptionParser.js';
-
-// ---------------------------------------------------------------------------
-// MANIFEST LOADING — uses /data/regions/manifest.json, generates if missing,
-//                    updates if filesystem regions are not in the manifest
-// ---------------------------------------------------------------------------
 
 // ============================================================
 // CONSTANTS
@@ -98,7 +96,7 @@ const ACE_EFFECTS = {
     acasia: [
         { emoji: '🌿', text: 'The Curse stirs. A crossroads behind you now leads to a place you have already been.' },
         { emoji: '🪦', text: 'A broken milestone weeps rust. The empire\'s ghost is counting.' },
-        { emoji: '🔥', text: 'A free company’s banner flickers in the distance, its colors changed.' }
+        { emoji: '🔥', text: 'A free company\'s banner flickers in the distance, its colors changed.' }
     ],
     ecktoria: [
         { emoji: '🏛️', text: 'A statue turns its head to watch you. The marble is warm.' },
@@ -107,7 +105,7 @@ const ACE_EFFECTS = {
     ],
     vhasia: [
         { emoji: '☀️', text: 'The sun fractures. You see a reflection of Lence in every mirror.' },
-        { emoji: '🗡️', text: 'A knight’s gorget unbuckles on its own. Chivalry is a weight.' },
+        { emoji: '🗡️', text: 'A knight\'s gorget unbuckles on its own. Chivalry is a weight.' },
         { emoji: '👑', text: 'A crown sits on a throne that was empty a moment ago. The claimant is watching.' }
     ],
     viterra: [
@@ -143,7 +141,7 @@ const ACE_EFFECTS = {
     valewood: [
         { emoji: '🌲', text: 'A star-road phases into existence. The forest remembers.' },
         { emoji: '🍃', text: 'A leaf falls upward, pointing to a hidden threshold.' },
-        { emoji: '👑', text: 'The Hazel Queen’s laughter echoes through the trees.' }
+        { emoji: '👑', text: 'The Hazel Queen\'s laughter echoes through the trees.' }
     ],
     aelinnel: [
         { emoji: '🔮', text: 'A geas forms on your tongue. Choose your next words carefully.' },
@@ -162,17 +160,10 @@ const ACE_EFFECTS = {
     ],
 };
 
-
-const KNOWN_REGION_SLUGS = [
-    'acasia', 'ecktoria', 'vhasia', 'viterra', 'ykrul',
-    'silkstrand', 'mistlands', 'thepyrgos', 'ubral',
-    'valewood', 'aelinnel', 'aelaerem', 'zakov'
-];
 // ============================================================
 // DETERMINISTIC RNG
 // ============================================================
 
-// Use a module-level closure to avoid global conflicts
 const _deckSeedState = {
     seed: null,
     prng: null
@@ -234,7 +225,6 @@ class Xorshift128 {
     }
 }
 
-// Seed management functions
 export function getDeckSeed() {
     return _deckSeedState.seed;
 }
@@ -341,10 +331,6 @@ function deterministicShuffle(array) {
 // UTILITY: Joker Detection
 // ============================================================
 
-/**
- * Safely check if a card is a Joker.
- * Cards can have `isJoker` property OR a rank of 'Joker'/'joker'.
- */
 function isJokerCard(card) {
     if (!card) return false;
     if (card.isJoker === true) return true;
@@ -437,23 +423,15 @@ function getAceEffect(region, card) {
 // CROWN SPREAD DRAW: ONE OF EACH SUIT
 // ============================================================
 
-/**
- * Draws exactly one card from each of the four suits (hearts, spades, clubs, diamonds)
- * from the current deck. Removes those cards from the deck.
- * If a suit is missing (should not happen with a full deck), it reshuffles and retries.
- * Returns an array of 4 cards.
- */
 function drawOneOfEachSuit() {
     const suits = ['hearts', 'spades', 'clubs', 'diamonds'];
     const cards = [];
     
-    // Ensure we have enough cards overall
     if (deck.length < 4) {
         buildDeck();
     }
     
     for (const suit of suits) {
-        // Find a card of this suit that is NOT a Joker
         let index = -1;
         for (let i = 0; i < deck.length; i++) {
             if (deck[i].suit === suit && !isJokerCard(deck[i])) {
@@ -463,14 +441,10 @@ function drawOneOfEachSuit() {
         }
         
         if (index === -1) {
-            // No card of this suit in the deck – reshuffle and try again
-            // This should be extremely rare (only if deck is corrupted or extremely depleted)
             buildDeck();
-            // Recursive call to try again with a fresh deck
             return drawOneOfEachSuit();
         }
         
-        // Remove the card and add to result
         cards.push(deck.splice(index, 1)[0]);
     }
     
@@ -679,7 +653,6 @@ function synthesiseCrownSpread(mainCards, wildcard, regionData) {
         timer = segments;
         timerCard = `${highest.rankName} of ${highest.suitName}`;
     } else if (highest) {
-        // If highest is a Joker, timer is 4
         timer = 4;
         timerCard = 'Joker (Wildcard)';
     }
@@ -715,15 +688,20 @@ function synthesiseCrownSpread(mainCards, wildcard, regionData) {
 }
 
 // ============================================================
-// LOAD REGION DATA (Fixed)
+// MANIFEST LOADING — uses /data/regions/manifest.json, generates if missing,
+//                    updates if filesystem regions are not in the manifest
 // ============================================================
 
-/**
- * Load the region manifest from multiple possible sources.
- * Tries: /data/regions/manifest.json → /data/docs/manifest-core.json → /data/docs/manifest-full.json → /data/regions/manifest.json
- * If no manifest found, discovers region files by scanning common region slugs.
- * Falls back to a default list if all else fails.
- */
+const KNOWN_REGION_SLUGS = [
+    'acasia', 'ecktoria', 'vhasia', 'viterra', 'ykrul',
+    'silkstrand', 'mistlands', 'thepyrgos', 'ubral',
+    'valewood', 'aelinnel', 'aelaerem', 'zakov'
+];
+
+function capitalize(s) {
+    return s.charAt(0).toUpperCase() + s.slice(1);
+}
+
 async function loadManifest() {
     // 1. Try loading existing manifest
     try {
@@ -735,12 +713,9 @@ async function loadManifest() {
                     typeof item === 'string' ? item : item.name || item
                 );
                 console.log(`[Decks] Loaded ${regionNames.length} regions from manifest.json`);
-
-                // 2. Check for new regions not in manifest
                 await checkAndUpdateManifest(regionNames);
                 return;
             }
-            // Handle object-with-regions form
             if (data.regions && Array.isArray(data.regions)) {
                 regionNames = data.regions.map(r => typeof r === 'string' ? r : r.name || r);
                 console.log(`[Decks] Loaded ${regionNames.length} regions from manifest.json (object form)`);
@@ -750,13 +725,12 @@ async function loadManifest() {
         }
     } catch (e) { /* ignore */ }
 
-    // 3. No manifest — discover regions
+    // 2. No manifest — discover regions
     console.warn('[Decks] No manifest found, discovering regions...');
     const discovered = await discoverRegions();
 
     if (discovered.length > 0) {
         regionNames = discovered;
-        // Cache in localStorage and try to persist
         await saveManifest(discovered);
     } else {
         regionNames = ['Acasia', 'Ecktoria', 'Vhasia', 'Viterra', 'Ykrul', 'Silkstrand'];
@@ -801,11 +775,9 @@ async function discoverRegions() {
 }
 
 async function checkAndUpdateManifest(existingRegions) {
-    // Check if filesystem has regions not in the manifest
     try {
         const cachedCheck = localStorage.getItem('fates-edge-manifest-checked');
         const now = Date.now();
-        // Only re-check once per hour
         if (cachedCheck && (now - parseInt(cachedCheck)) < 3600000) return;
 
         localStorage.setItem('fates-edge-manifest-checked', String(now));
@@ -821,9 +793,7 @@ async function checkAndUpdateManifest(existingRegions) {
     } catch (e) { /* ignore */ }
 }
 
-
 async function saveManifest(names) {
-    // Try to PUT to the server
     try {
         await fetch('/data/regions/manifest.json', {
             method: 'PUT',
@@ -832,28 +802,22 @@ async function saveManifest(names) {
         });
         console.log('[Decks] Manifest saved to /data/regions/manifest.json');
         return;
-    } catch (e) { /* ignore — likely no server endpoint */ }
+    } catch (e) { /* ignore */ }
 
-    // Cache in localStorage as fallback
     try {
         localStorage.setItem('fates-edge-region-manifest', JSON.stringify(names));
         console.log('[Decks] Manifest cached in localStorage (no write endpoint available)');
     } catch (e2) { /* ignore */ }
 }
 
-function capitalize(s) {
-    return s.charAt(0).toUpperCase() + s.slice(1);
-}
-/**
- * Fetch region data for a specific region.
- * Tries /data/regions/{slug}.json first, then falls back to /data/regions/{slug}.json.
- */
+// ============================================================
+// FETCH REGION DATA
+// ============================================================
+
 async function fetchRegionData(regionName) {
     const slug = getRegionSlug(regionName);
     const paths = [
         `/data/regions/${slug}.json`,
-        // If you have another location, add it here, e.g.:
-        // `/data/docs/regions/${slug}.json`
     ];
 
     let data = null;
@@ -870,13 +834,11 @@ async function fetchRegionData(regionName) {
         }
     }
 
-    // If we got data, validate it has the required suit arrays
     if (data && data.hearts && data.spades && data.clubs && data.diamonds) {
         regionData = data;
         return data;
     }
 
-    // Otherwise, use fallback
     console.warn(`[Decks] No valid region data for ${regionName}, using fallback`);
     const fallbackData = {
         name: regionName,
@@ -891,7 +853,7 @@ async function fetchRegionData(regionName) {
 }
 
 // ============================================================
-// REGION CHANGE HANDLER
+// REGION CHANGE HANDLER — uses parseRegionDescription for rendering
 // ============================================================
 
 async function handleRegionChange() {
@@ -922,7 +884,6 @@ async function handleRegionChange() {
         try { cb(regionName, data); } catch (e) { /* ignore */ }
     });
 }
-
 
 // ============================================================
 // RENDER
@@ -967,7 +928,7 @@ export async function render(el) {
                     ${regionOptions}
                 </select>
             </div>
-            <div id="region-description" style="margin-top:0.8rem;background:var(--bg2);padding:0.8rem 1rem;border-radius:var(--radius);border-left:4px solid var(--gold);color:var(--text2);font-size:0.9rem;">
+            <div id="region-description" style="margin-top:0.8rem;background:var(--bg2);padding:0.8rem 1rem;border-radius:var(--radius);border-left:4px solid var(--gold);color:var(--text2);font-size:1rem;line-height:1.6;max-height:60vh;overflow-y:auto;">
                 Select a region to display its description.
             </div>
         </div>
@@ -1076,7 +1037,7 @@ function buildDeck() {
                 color: SUIT_COLORS[suit],
                 suitName: SUIT_NAMES[suit],
                 rankName: RANK_NAMES[rank] || rank,
-                isJoker: false  // Explicitly set isJoker false
+                isJoker: false
             });
         }
     }
@@ -1087,7 +1048,6 @@ function buildDeck() {
     updateDeckCount();
     console.log('🔀 Deck shuffled, total cards:', deck.length, _deckSeedState.seed ? '(deterministic)' : '(random)');
     
-    // Log shuffle
     if (typeof logRecordingEvent === 'function') {
         logRecordingEvent('deck_shuffle', `Deck shuffled. ${deck.length} cards remaining.`);
     }
@@ -1133,14 +1093,11 @@ export async function drawConsequence() {
 
     if (type === 'crown') {
         isCrown = true;
-        // Ensure deck has enough cards (4 for suits + 1 wildcard)
         if (deck.length < 5) {
             showToast('Deck running low! Reshuffling...', 'warning');
             buildDeck();
         }
-        // Draw one card of each suit
-        const mainCards = drawOneOfEachSuit(); // returns 4 cards
-        // Draw wildcard (5th card)
+        const mainCards = drawOneOfEachSuit();
         if (deck.length === 0) buildDeck();
         const wildcard = deck.pop();
         cards = [...mainCards, wildcard];
@@ -1187,7 +1144,6 @@ export async function drawConsequence() {
             `;
         }
         
-        // Log Crown Spread
         if (typeof logRecordingEvent === 'function') {
             const cardNames = mainCards.map(c => `${c.rankName} of ${c.suitName}`).join(', ');
             logRecordingEvent('crown_spread', `Crown Spread: ${cardNames} | Wildcard: ${isJokerCard(wildcard) ? 'Joker' : `${wildcard.rankName} of ${wildcard.suitName}`} | Region: ${selectedRegion}`);
@@ -1197,7 +1153,6 @@ export async function drawConsequence() {
         if (cardsEl) cardsEl.style.display = 'none';
         synthesis = synthesiseConsequence(cards, data);
         
-        // Log regular draw
         if (typeof logRecordingEvent === 'function') {
             const cardNames = cards.map(c => `${c.rankName} of ${c.suitName}`).join(', ');
             logRecordingEvent('deck_draw', `${cards.length} card(s) drawn: ${cardNames} | Region: ${selectedRegion}`);
@@ -1291,7 +1246,7 @@ function synthesiseConsequence(cards, regionData) {
 }
 
 // ============================================================
-// CARD RENDERING (Fixed)
+// CARD RENDERING
 // ============================================================
 
 function renderCards(cards, isCrown) {
@@ -1548,9 +1503,7 @@ export function openCrownSpread() {
     if (deck.length < 5) {
         buildDeck();
     }
-    // Draw one of each suit for the main cards
     const mainCards = drawOneOfEachSuit();
-    // Draw wildcard
     if (deck.length === 0) buildDeck();
     const wildcard = deck.pop();
     const cards = [...mainCards, wildcard];
@@ -1560,7 +1513,6 @@ export function openCrownSpread() {
     fetchRegionData(regionName).then(data => {
         const result = synthesiseCrownSpread(mainCards, wildcard, data);
         
-        // Log Crown Spread
         if (typeof logRecordingEvent === 'function') {
             const cardNames = mainCards.map(c => `${c.rankName} of ${c.suitName}`).join(', ');
             logRecordingEvent('crown_spread_modal', `Crown Spread (modal): ${cardNames} | Wildcard: ${isJokerCard(wildcard) ? 'Joker' : `${wildcard.rankName} of ${wildcard.suitName}`} | Region: ${regionName}`);
@@ -1775,7 +1727,6 @@ export async function quickDraw(count = 1, regionName = null) {
     });
     renderDeckHistory();
     
-    // Log quick draw
     if (typeof logRecordingEvent === 'function') {
         logRecordingEvent('quick_draw', `${count} card(s) drawn: ${cardNames} | Region: ${selectedRegion}`);
     }
@@ -1809,9 +1760,7 @@ export async function quickCrownSpread(regionName = null) {
         buildDeck();
     }
     
-    // Draw one of each suit
     const mainCards = drawOneOfEachSuit();
-    // Draw wildcard
     if (deck.length === 0) buildDeck();
     const wildcard = deck.pop();
     const cards = [...mainCards, wildcard];
@@ -1844,7 +1793,6 @@ export async function quickCrownSpread(regionName = null) {
     });
     renderDeckHistory();
     
-    // Log Crown Spread
     if (typeof logRecordingEvent === 'function') {
         logRecordingEvent('crown_spread_quick', `Crown Spread: ${cardNames} | Region: ${selectedRegion}`);
     }

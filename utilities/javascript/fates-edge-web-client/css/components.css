@@ -1,3 +1,4 @@
+```css
 /* ============================================================
    COMPONENTS – Buttons, Cards, Modals, Forms, Toasts, etc.
    ============================================================ */
@@ -597,41 +598,208 @@ select {
 }
 .wiki-entry-title:hover { text-decoration: underline; }
 
-/* ----- Region description (used in wiki) ----- */
+/* ============================================================
+   REGION DESCRIPTION — parsed LaTeX-like markup rendering
+   Used by Deck of Consequences region panel and Wiki region view.
+   All styles use theme CSS variables — no hardcoded colors.
+   ============================================================ */
+
+/* --- Container --- */
+#region-description,
 .region-description {
-    font-family: var(--font-serif, 'Georgia', serif);
-    line-height: 1.8;
+    font-size: 1rem;
+    line-height: 1.6;
     color: var(--text);
+    max-height: 60vh;
+    overflow-y: auto;
+    padding: 0.5rem;
 }
+#region-description p,
+.region-description p {
+    margin: 0.5rem 0;
+    line-height: 1.6;
+}
+
+/* --- Region title (h2 from <h1> in source) --- */
 .region-title {
-    font-size: 2.8rem;
-    font-weight: 700;
-    color: var(--gold);
-    text-align: center;
-    border-bottom: 3px solid var(--gold);
-    padding-bottom: 0.5rem;
+    font-size: 1.6rem;
+    font-weight: bold;
+    margin: 0 0 0.8rem;
+    color: var(--text);
+    line-height: 1.3;
 }
-.region-description h2.region-section { color: var(--gold); font-size: 1.8rem; border-bottom: 2px solid var(--border-color); }
-.region-description h3.region-subsection { color: var(--gold); font-size: 1.4rem; }
-.region-description blockquote.region-quote {
-    margin: 1.2rem 0;
-    padding: 0.8rem 1.5rem;
-    border-left: 4px solid var(--gold);
-    background: var(--bg3);
+
+/* --- tcolorbox (themed section boxes) --- */
+.region-box {
+    background: var(--bg2);
+    border-left: 4px solid var(--accent-gold, var(--gold));
     border-radius: var(--radius);
-    font-style: italic;
+    margin: 1rem 0;
+    overflow: hidden;
 }
-.region-description table.region-table {
+.region-box-title {
+    font-weight: bold;
+    color: var(--gold);
+    padding: 0.8rem 1.2rem;
+    font-size: 1.25rem;
+    background: var(--bg3);
+    border-bottom: 1px solid var(--border-color);
+    line-height: 1.3;
+}
+.region-box-content {
+    padding: 1rem 1.2rem;
+}
+
+/* --- Section headings (from *{} with colon or short content) --- */
+.region-section-heading {
+    font-size: 1.1rem;
+    font-weight: bold;
+    color: var(--gold);
+    margin: 1rem 0 0.4rem;
+    line-height: 1.4;
+    padding-bottom: 0.2rem;
+    border-bottom: 1px solid var(--border-color);
+}
+.region-section-heading:first-child {
+    margin-top: 0;
+}
+
+/* --- Label + description sections (from *{} long content) --- */
+.region-section {
+    margin: 0.6rem 0;
+    line-height: 1.6;
+}
+.region-label {
+    font-weight: bold;
+    color: var(--text);
+    font-size: 1rem;
+}
+.region-desc {
+    color: var(--text-muted);
+    font-size: 1rem;
+}
+
+/* --- Standalone heading (short *{} without colon) --- */
+.region-heading {
+    font-weight: bold;
+    color: var(--gold);
+    font-size: 1.1rem;
+    margin: 0.8rem 0 0.3rem;
+}
+
+/* --- Tables (tabular / longtable) --- */
+.region-table {
     width: 100%;
     border-collapse: collapse;
-    margin: 1rem 0;
+    margin: 0.8rem 0;
+    font-size: 0.95rem;
+}
+.region-table th {
+    text-align: left;
+    padding: 0.5rem 0.7rem;
+    background: var(--bg3);
+    color: var(--text-muted);
+    font-weight: bold;
+    border-bottom: 2px solid var(--border-color);
     font-size: 0.9rem;
 }
-.region-description table.region-table td {
-    padding: 0.5rem 0.8rem;
-    border: 1px solid var(--border-color);
+.region-table td {
+    padding: 0.45rem 0.7rem;
+    border-bottom: 1px solid var(--border-color);
+    vertical-align: top;
+    line-height: 1.5;
 }
-.region-description table.region-table td:first-child { font-weight: 600; color: var(--gold); }
+.region-table td:first-child {
+    font-weight: 600;
+    color: var(--gold);
+}
+.region-table tr:last-child td {
+    border-bottom: none;
+}
+.region-table tr:hover td {
+    background: var(--bg2);
+}
+
+/* --- Lists (itemize / enumerate) --- */
+.region-list {
+    margin: 0.6rem 0;
+    padding-left: 1.8rem;
+    line-height: 1.6;
+}
+.region-list li {
+    margin: 0.4rem 0;
+    line-height: 1.5;
+}
+
+/* --- Notes (e.g. "At N segments:" after lists) --- */
+.region-note {
+    font-style: italic;
+    color: var(--text-muted);
+    margin: 0.4rem 0;
+    padding-left: 0.5rem;
+    border-left: 2px solid var(--border-color);
+}
+
+/* --- Description lists (Entanglements, etc.) --- */
+.region-description-list {
+    margin: 0.6rem 0;
+    padding-left: 0;
+}
+.region-description-list dt {
+    font-weight: bold;
+    color: var(--gold);
+    margin-top: 0.6rem;
+    font-size: 1rem;
+}
+.region-description-list dd {
+    margin: 0.2rem 0 0.4rem 1.2rem;
+    line-height: 1.6;
+    color: var(--text);
+}
+
+/* --- Blockquotes (quote environments) --- */
+.region-quote {
+    margin: 0.8rem 0;
+    padding: 0.8rem 1.2rem;
+    border-left: 4px solid var(--gold);
+    background: var(--bg3);
+    border-radius: 0 var(--radius) var(--radius) 0;
+}
+.quote-speaker {
+    font-weight: bold;
+    font-style: italic;
+    color: var(--gold);
+    margin-bottom: 0.5rem;
+    font-size: 0.95rem;
+}
+.quote-text {
+    color: var(--text);
+    font-style: italic;
+    line-height: 1.6;
+    font-size: 1rem;
+}
+
+/* --- Em (from ``text'') --- */
+#region-description em,
+.region-description em {
+    color: var(--accent-gold, var(--gold));
+    font-style: italic;
+}
+
+/* --- Scrollbar styling for description container --- */
+#region-description::-webkit-scrollbar,
+.region-description::-webkit-scrollbar {
+    width: 6px;
+}
+#region-description::-webkit-scrollbar-thumb,
+.region-description::-webkit-scrollbar-thumb {
+    background: var(--bg4);
+    border-radius: var(--radius-full);
+}
+#region-description::-webkit-scrollbar-track,
+.region-description::-webkit-scrollbar-track {
+    background: transparent;
+}
 
 /* ----- Animation keyframes (global) ----- */
 @keyframes pulse {
@@ -658,66 +826,32 @@ select {
     .wiki-grid { grid-template-columns: 1fr; }
     .wiki-sidebar { position: static; max-height: none; }
     .patrons-grid, .factions-grid, .trusts-grid, .assets-grid { grid-template-columns: 1fr 1fr; }
+    .region-title { font-size: 1.4rem; }
+    .region-box-title { font-size: 1.1rem; }
+    .region-table { font-size: 0.85rem; }
+    .region-table th, .region-table td { padding: 0.35rem 0.5rem; }
 }
 @media (max-width: 480px) {
     .patrons-grid, .factions-grid, .trusts-grid, .assets-grid { grid-template-columns: 1fr; }
     .modal { padding: 0.8rem; }
     .toast { max-width: 100%; }
-}/* Region description styling */
-.region-box {
-    background: var(--bg2, #1a1a2e);
-    border-left: 4px solid var(--accent, #2980b9);
-    border-radius: 8px;
-    margin: 0.8rem 0;
-    overflow: hidden;
+    .region-table { font-size: 0.8rem; }
+    .region-description-list dd { margin-left: 0.6rem; }
 }
-.region-box-title {
-    font-weight: bold;
-    color: var(--gold, #d4af37);
-    padding: 0.6rem 1rem;
-    font-size: 1.1rem;
-    background: var(--bg3, #16213e);
-    border-bottom: 1px solid var(--border, rgba(255,255,255,0.1));
-}
-.region-box-content { padding: 0.8rem 1rem; }
-.region-section { margin: 0.4rem 0; line-height: 1.5; }
-.region-label { font-weight: bold; color: var(--text2, #a0a0c0); }
-.region-desc { color: var(--text, #e0e0e0); }
-.region-heading { font-weight: bold; color: var(--text2, #a0a0c0); margin: 0.6rem 0 0.3rem; }
-.region-title { font-size: 1.4rem; margin: 0 0 0.5rem; }
-.region-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin: 0.5rem 0;
-    font-size: 0.85rem;
-}
-.region-table th {
-    text-align: left;
-    padding: 0.4rem 0.6rem;
-    background: var(--bg3, #16213e);
-    color: var(--text2, #a0a0c0);
-    border-bottom: 2px solid var(--border, rgba(255,255,255,0.15));
-}
-.region-table td {
-    padding: 0.35rem 0.6rem;
-    border-bottom: 1px solid var(--border, rgba(255,255,255,0.08));
-    vertical-align: top;
-}
-.region-list { margin: 0.5rem 0; padding-left: 1.5rem; }
-.region-list li { margin: 0.3rem 0; line-height: 1.4; }
-.region-quote {
-    margin: 0.6rem 0;
-    padding: 0.8rem 1.2rem;
-    border-left: 4px solid var(--gold, #d4af37);
-    background: var(--bg3, #16213e);
-    border-radius: 0 8px 8px 0;
-}
-.quote-speaker {
-    font-weight: bold;
-    font-style: italic;
-    color: var(--gold, #d4af37);
-    margin-bottom: 0.4rem;
-    font-size: 0.85rem;
-}
-.quote-text { color: var(--text, #e0e0e0); font-style: italic; line-height: 1.5; }
+```
 
+Key changes:
+
+| Area | Before | After |
+|---|---|---|
+| **Duplicate `.region-title`** | Two conflicting definitions (2.8rem serif + 1.4rem sans) | Single definition at 1.6rem, bold, using `var(--text)` |
+| **Hardcoded fallbacks** | `#1a1a2e`, `#16213e`, `#d4af37`, `rgba(255,255,255,0.1)` everywhere | All use theme CSS vars (`var(--bg2)`, `var(--bg3)`, `var(--gold)`, `var(--border-color)`) |
+| **Missing classes** | No `.region-section-heading`, `.region-description-list`, `.region-note` | All three added with proper styling |
+| **Font sizes** | Base 0.9rem, tables 0.85rem | Base 1rem, tables 0.95rem, box title 1.25rem |
+| **Line height** | 1.4-1.5 | 1.6 throughout for readability |
+| **Table first column** | No special styling | `font-weight: 600; color: var(--gold)` to highlight NPC/faction names |
+| **Table hover** | None | `tr:hover td { background: var(--bg2) }` |
+| **`em` styling** | None | `color: var(--gold); font-style: italic` for `` ``code'' `` rendered text |
+| **Scrollbars** | Unstyled | Thin styled scrollbars matching theme |
+| **Old serif `.region-description`** | `font-family: serif; line-height: 1.8` with conflicting h2/h3/blockquote/table rules | Consolidated into the new system — same font as rest of app, consistent vars |
+| **Responsive** | No region-specific breakpoints | Added font-size and padding reductions for tables/description lists at 820px and 480px |
