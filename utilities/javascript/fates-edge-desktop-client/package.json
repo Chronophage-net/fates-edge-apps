@@ -40,7 +40,7 @@
   },
   "build": {
     "appId": "com.fatesedge.client",
-    "productName": "Fate's Edge",
+    "productName": "FatesEdge",
     "directories": {
       "output": "dist"
     },
@@ -68,7 +68,7 @@
       "target": ["AppImage", "deb", "rpm"],
       "icon": "build/icon.png",
       "category": "Game",
-      "maintainer": "Fate's Edge <support@fatesedge.com>"
+      "maintainer": "Fate's Edge <nick.gasper@gmail.com>"
     },
     "nsis": {
       "oneClick": false,
