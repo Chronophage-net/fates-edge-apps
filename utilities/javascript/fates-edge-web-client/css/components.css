@@ -1,4 +1,3 @@
-```css
 /* ============================================================
    COMPONENTS – Buttons, Cards, Modals, Forms, Toasts, etc.
    ============================================================ */
@@ -838,20 +837,3 @@ select {
     .region-table { font-size: 0.8rem; }
     .region-description-list dd { margin-left: 0.6rem; }
 }
-```
-
-Key changes:
-
-| Area | Before | After |
-|---|---|---|
-| **Duplicate `.region-title`** | Two conflicting definitions (2.8rem serif + 1.4rem sans) | Single definition at 1.6rem, bold, using `var(--text)` |
-| **Hardcoded fallbacks** | `#1a1a2e`, `#16213e`, `#d4af37`, `rgba(255,255,255,0.1)` everywhere | All use theme CSS vars (`var(--bg2)`, `var(--bg3)`, `var(--gold)`, `var(--border-color)`) |
-| **Missing classes** | No `.region-section-heading`, `.region-description-list`, `.region-note` | All three added with proper styling |
-| **Font sizes** | Base 0.9rem, tables 0.85rem | Base 1rem, tables 0.95rem, box title 1.25rem |
-| **Line height** | 1.4-1.5 | 1.6 throughout for readability |
-| **Table first column** | No special styling | `font-weight: 600; color: var(--gold)` to highlight NPC/faction names |
-| **Table hover** | None | `tr:hover td { background: var(--bg2) }` |
-| **`em` styling** | None | `color: var(--gold); font-style: italic` for `` ``code'' `` rendered text |
-| **Scrollbars** | Unstyled | Thin styled scrollbars matching theme |
-| **Old serif `.region-description`** | `font-family: serif; line-height: 1.8` with conflicting h2/h3/blockquote/table rules | Consolidated into the new system — same font as rest of app, consistent vars |
-| **Responsive** | No region-specific breakpoints | Added font-size and padding reductions for tables/description lists at 820px and 480px |

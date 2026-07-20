@@ -14,7 +14,7 @@ import { shuffleArray } from '../../core/utils.js';
 import { showToast } from '../../components/Toast.js';
 import { getState, addTimer } from '../../core/state.js';
 import { logRecordingEvent } from '../../core/media.js';
-import { parseRegionDescription } from '../../utils/regionDescriptionParser.js';
+import { parseRegionDescription } from './region-parser.js';
 
 // ============================================================
 // CONSTANTS
