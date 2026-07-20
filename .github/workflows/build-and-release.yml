@@ -62,7 +62,6 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: npm
-          # Caches ~/.npm across all steps – safe because npm ci uses lockfiles
 
       # ---- Setup Python (for Python client) ----
       - name: Setup Python
@@ -248,7 +247,10 @@ jobs:
       - name: Extract web client
         run: |
           mkdir -p web-client-extracted
-          tar -xzf web-client/web-client.tar.gz -C web-client-extracted/
+          # 🔥 FIX: strip the 'dist/' prefix so files are served from root
+          tar -xzf web-client/web-client.tar.gz -C web-client-extracted/ --strip-components=1
+          # Optional: add .nojekyll if you have underscores in filenames
+          touch web-client-extracted/.nojekyll
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
