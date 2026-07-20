@@ -3,12 +3,15 @@
   "version": "4.1.1",
   "description": "Fate's Edge VTT Desktop Client",
   "main": "electron.js",
-  "author": "Fate's Edge",
+  "author": {
+    "name": "Fate's Edge",
+    "email": "nick.gasper@gmail.com"
+  },
   "license": "MIT",
   "private": true,
   "repository": {
     "type": "git",
-    "url": "https://github.com/Chronophage-net/fates-edge-apps.git"
+    "url": "https://github.com/fates-edge-apps/fates-edge-apps.git"
   },
   "scripts": {
     "start": "electron .",
@@ -64,7 +67,8 @@
     "linux": {
       "target": ["AppImage", "deb", "rpm"],
       "icon": "build/icon.png",
-      "category": "Game"
+      "category": "Game",
+      "maintainer": "Fate's Edge <support@fatesedge.com>"
     },
     "nsis": {
       "oneClick": false,
