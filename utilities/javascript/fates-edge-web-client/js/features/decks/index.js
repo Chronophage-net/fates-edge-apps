@@ -11,6 +11,12 @@ import { shuffleArray } from '../../core/utils.js';
 import { showToast } from '../../components/Toast.js';
 import { getState, addTimer } from '../../core/state.js';
 import { logRecordingEvent } from '../../core/media.js';
+import { parseRegionDescription } from '../../utils/regionDescriptionParser.js';
+
+// ---------------------------------------------------------------------------
+// MANIFEST LOADING — uses /data/regions/manifest.json, generates if missing,
+//                    updates if filesystem regions are not in the manifest
+// ---------------------------------------------------------------------------
 
 // ============================================================
 // CONSTANTS
@@ -156,6 +162,12 @@ const ACE_EFFECTS = {
     ],
 };
 
+
+const KNOWN_REGION_SLUGS = [
+    'acasia', 'ecktoria', 'vhasia', 'viterra', 'ykrul',
+    'silkstrand', 'mistlands', 'thepyrgos', 'ubral',
+    'valewood', 'aelinnel', 'aelaerem', 'zakov'
+];
 // ============================================================
 // DETERMINISTIC RNG
 // ============================================================
@@ -713,107 +725,125 @@ function synthesiseCrownSpread(mainCards, wildcard, regionData) {
  * Falls back to a default list if all else fails.
  */
 async function loadManifest() {
-    // Try multiple paths for manifest
-    const paths = [
-        '/data/regions/manifest.json',
-        '/data/docs/manifest-core.json',
-        '/data/docs/manifest-full.json',
-        '/data/regions/manifest.json'  // legacy fallback
-    ];
-    
-    let manifestData = null;
-    let loadedFrom = null;
-    
-    for (const path of paths) {
-        try {
-            const res = await fetch(path);
-            if (res.ok) {
-                const data = await res.json();
-                if (Array.isArray(data)) {
-                    manifestData = data;
-                    loadedFrom = path;
-                    break;
-                } else if (data && typeof data === 'object') {
-                    // Could be a dictionary of region names or a manifest object
-                    if (data.regions && Array.isArray(data.regions)) {
-                        manifestData = data.regions;
-                        loadedFrom = path;
-                        break;
-                    }
-                    // If it's an object with keys that look like region names, use keys
-                    const keys = Object.keys(data);
-                    if (keys.length > 0 && keys.every(k => typeof k === 'string')) {
-                        manifestData = keys;
-                        loadedFrom = path;
-                        break;
-                    }
-                }
+    // 1. Try loading existing manifest
+    try {
+        const res = await fetch('/data/regions/manifest.json');
+        if (res.ok) {
+            const data = await res.json();
+            if (Array.isArray(data) && data.length > 0) {
+                regionNames = data.map(item =>
+                    typeof item === 'string' ? item : item.name || item
+                );
+                console.log(`[Decks] Loaded ${regionNames.length} regions from manifest.json`);
+
+                // 2. Check for new regions not in manifest
+                await checkAndUpdateManifest(regionNames);
+                return;
             }
-        } catch (e) { /* ignore */ }
+            // Handle object-with-regions form
+            if (data.regions && Array.isArray(data.regions)) {
+                regionNames = data.regions.map(r => typeof r === 'string' ? r : r.name || r);
+                console.log(`[Decks] Loaded ${regionNames.length} regions from manifest.json (object form)`);
+                await checkAndUpdateManifest(regionNames);
+                return;
+            }
+        }
+    } catch (e) { /* ignore */ }
+
+    // 3. No manifest — discover regions
+    console.warn('[Decks] No manifest found, discovering regions...');
+    const discovered = await discoverRegions();
+
+    if (discovered.length > 0) {
+        regionNames = discovered;
+        // Cache in localStorage and try to persist
+        await saveManifest(discovered);
+    } else {
+        regionNames = ['Acasia', 'Ecktoria', 'Vhasia', 'Viterra', 'Ykrul', 'Silkstrand'];
+        console.log('[Decks] Using fallback region list:', regionNames);
     }
-    
-    if (manifestData && Array.isArray(manifestData) && manifestData.length > 0) {
-        regionNames = manifestData.map(item => typeof item === 'string' ? item : item.name || item);
-        console.log(`[Decks] Loaded ${regionNames.length} regions from ${loadedFrom}`);
-        return;
-    }
-    
-    // If no manifest found, try to discover region files by scanning common paths
-    console.warn('[Decks] No manifest found, attempting to discover region files...');
-    
-    // Common region slugs from the Fate's Edge setting
-    const possibleRegionSlugs = [
-        'acasia', 'ecktoria', 'vhasia', 'viterra', 'ykrul', 
-        'silkstrand', 'mistlands', 'thepyrgos', 'ubral', 
-        'valewood', 'aelinnel', 'aelaerem', 'zakov'
-    ];
-    
-    let discovered = [];
-    
-    // First try: fetch a list via a directory listing (if enabled)
+}
+
+async function discoverRegions() {
+    const discovered = [];
+
+    // Try directory listing
     try {
         const dirRes = await fetch('/data/regions/');
         if (dirRes.ok) {
             const html = await dirRes.text();
-            // Look for .json files in the listing
             const matches = html.match(/href="([^"]+\.json)"/gi);
             if (matches) {
-                const slugs = matches.map(m => {
+                matches.forEach(m => {
                     const match = m.match(/href="([^"]+)"/i);
-                    if (match) {
-                        return match[1].replace(/\.json$/, '');
+                    if (match && !match[1].includes('manifest')) {
+                        const slug = match[1].replace(/\.json$/, '').replace(/^[\/]+/, '');
+                        discovered.push(capitalize(slug));
                     }
-                    return null;
-                }).filter(Boolean);
-                discovered = slugs.map(s => s.charAt(0).toUpperCase() + s.slice(1));
-                discovered = [...new Set(discovered)];
+                });
             }
         }
     } catch (e) { /* ignore */ }
-    
-    // If directory listing didn't work, try individual files
+
+    // Fallback: probe known slugs
     if (discovered.length === 0) {
-        for (const slug of possibleRegionSlugs) {
+        for (const slug of KNOWN_REGION_SLUGS) {
             try {
                 const res = await fetch(`/data/regions/${slug}.json`);
                 if (res.ok) {
-                    discovered.push(slug.charAt(0).toUpperCase() + slug.slice(1));
+                    discovered.push(capitalize(slug));
                 }
             } catch (e) { /* ignore */ }
         }
     }
-    
-    if (discovered.length > 0) {
-        regionNames = discovered;
-        console.log(`[Decks] Discovered ${regionNames.length} region files:`, regionNames);
-        return;
-    }
-    
-    // Final fallback: use the core regions that are guaranteed to exist
-    regionNames = ['Acasia', 'Ecktoria', 'Vhasia', 'Viterra', 'Ykrul', 'Silkstrand'];
-    console.log('[Decks] Using fallback region list:', regionNames);
+
+    return [...new Set(discovered)];
 }
 
+async function checkAndUpdateManifest(existingRegions) {
+    // Check if filesystem has regions not in the manifest
+    try {
+        const cachedCheck = localStorage.getItem('fates-edge-manifest-checked');
+        const now = Date.now();
+        // Only re-check once per hour
+        if (cachedCheck && (now - parseInt(cachedCheck)) < 3600000) return;
+
+        localStorage.setItem('fates-edge-manifest-checked', String(now));
+
+        const discovered = await discoverRegions();
+        const newRegions = discovered.filter(r => !existingRegions.includes(r));
+
+        if (newRegions.length > 0) {
+            regionNames = [...new Set([...existingRegions, ...newRegions])];
+            await saveManifest(regionNames);
+            console.log(`[Decks] Found ${newRegions.length} new regions, manifest updated:`, newRegions);
+        }
+    } catch (e) { /* ignore */ }
+}
+
+
+async function saveManifest(names) {
+    // Try to PUT to the server
+    try {
+        await fetch('/data/regions/manifest.json', {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(names)
+        });
+        console.log('[Decks] Manifest saved to /data/regions/manifest.json');
+        return;
+    } catch (e) { /* ignore — likely no server endpoint */ }
+
+    // Cache in localStorage as fallback
+    try {
+        localStorage.setItem('fates-edge-region-manifest', JSON.stringify(names));
+        console.log('[Decks] Manifest cached in localStorage (no write endpoint available)');
+    } catch (e2) { /* ignore */ }
+}
+
+function capitalize(s) {
+    return s.charAt(0).toUpperCase() + s.slice(1);
+}
 /**
  * Fetch region data for a specific region.
  * Tries /data/regions/{slug}.json first, then falls back to /data/regions/{slug}.json.
@@ -877,11 +907,12 @@ async function handleRegionChange() {
 
     selectedRegion = regionName;
     const data = await fetchRegionData(regionName);
-    // data is now correctly loaded (or fallback)
 
     if (descEl) {
         if (data && data.description) {
-            descEl.innerHTML = data.description;
+            // Parse the LaTeX-like markup into clean HTML
+            const parsed = parseRegionDescription(data.description);
+            descEl.innerHTML = parsed;
         } else {
             descEl.textContent = 'No description available.';
         }
@@ -891,6 +922,8 @@ async function handleRegionChange() {
         try { cb(regionName, data); } catch (e) { /* ignore */ }
     });
 }
+
+
 // ============================================================
 // RENDER
 // ============================================================
