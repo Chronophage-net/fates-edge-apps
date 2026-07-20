@@ -20,8 +20,9 @@ env:
   PYTHON_VERSION: '3.10'
 
 jobs:
-  build:
-    name: Build & Package Apps
+  # ─── Build Non-Desktop Components ──────────────────────────────
+  build-components:
+    name: Build Components
     runs-on: ubuntu-latest
     outputs:
       release_tag: ${{ steps.version.outputs.release_tag }}
@@ -55,42 +56,82 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: npm
+          cache-dependency-path: |
+            utilities/javascript/fates-edge-web-client/package-lock.json
+            utilities/javascript/fates-edge-socket-server/package-lock.json
+            utilities/vtt_mods_bots/fates-edge-discord-bot/package-lock.json
 
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
           python-version: ${{ env.PYTHON_VERSION }}
 
-      # ─── Web Client ────────────────────────────────────────────────
+      # ─── Web Client ────────────────────────────────────────────
+      # The web client is mostly static files. The build just generates
+      # seed.js into dist/. We assemble a staging directory with ALL
+      # deployable files (static + generated), so nothing gets lost.
+
       - name: Build Web Client
         run: |
           cd utilities/javascript/fates-edge-web-client
           npm ci
           npm run build
-          cp -r data dist/   # copy data folder into dist
+          echo "--- dist/ contents after build ---"
+          ls -la dist/ 2>/dev/null || echo "(no dist/ directory)"
 
-      - name: Verify data folder in dist
+      - name: Stage web client for deployment
         run: |
-          cd utilities/javascript/fates-edge-web-client
-          if [ ! -d "dist/data" ]; then
-            echo "❌ data folder missing from dist!"
+          STAGING="$GITHUB_WORKSPACE/web-client-staging"
+          rm -rf "$STAGING"
+          mkdir -p "$STAGING"
+
+          # Copy ALL static files from the web client root, excluding
+          # dev/build artifacts. rsync preserves directory structure
+          # and handles everything (index.html, js/, css/, data/, etc.)
+          rsync -a \
+            --exclude='node_modules' \
+            --exclude='package.json' \
+            --exclude='package-lock.json' \
+            --exclude='scripts' \
+            --exclude='.git' \
+            --exclude='.eslintrc*' \
+            --exclude='.eslintignore' \
+            --exclude='dist' \
+            utilities/javascript/fates-edge-web-client/ "$STAGING/"
+
+          # Overlay the generated build output (seed.js etc.) on top
+          if [ -d "utilities/javascript/fates-edge-web-client/dist" ]; then
+            cp -a utilities/javascript/fates-edge-web-client/dist/. "$STAGING/"
+          fi
+
+      - name: Verify data folder in staging
+        run: |
+          STAGING="$GITHUB_WORKSPACE/web-client-staging"
+          if [ ! -d "$STAGING/data" ]; then
+            echo "❌ data folder missing from staging!"
+            echo "--- staging contents ---"
+            ls -la "$STAGING/"
             exit 1
           fi
-          echo "✅ data folder present in dist"
-          ls -la dist/data/
+          echo "✅ data folder is present in staging"
+          ls -la "$STAGING/data/"
 
       - name: Package Web Client
         run: |
-          cd utilities/javascript/fates-edge-web-client
-          tar -czf ../../../web-client.tar.gz dist/
+          # Tar from the staging root — no dist/ prefix in the archive.
+          # This means extraction is a simple one-liner with no mv/rmdir.
+          tar -czf web-client.tar.gz -C web-client-staging .
 
       - name: Inspect web client tarball (data/ check)
         run: |
-          if ! tar -tzf web-client.tar.gz | grep -q '^dist/data/'; then
+          if ! tar -tzf web-client.tar.gz | grep -q 'data/'; then
             echo "❌ data folder not found in tarball!"
+            tar -tzf web-client.tar.gz | head -30
             exit 1
           fi
           echo "✅ data folder is present in tarball"
+          echo "--- tarball top-level entries ---"
+          tar -tzf web-client.tar.gz | head -20
 
       - name: Upload Web Client artifact
         uses: actions/upload-artifact@v4
@@ -98,66 +139,7 @@ jobs:
           name: web-client-build
           path: web-client.tar.gz
 
-      # ─── Desktop Client (platform-specific) ──────────────────────
-      - name: Install system dependencies for desktop build
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y wine nsis genisoimage
-
-      - name: Build Desktop Client (all platforms)
-        run: |
-          cd utilities/javascript/fates-edge-desktop-client
-          npm ci
-          echo "$(pwd)/node_modules/.bin" >> $GITHUB_PATH
-          npm run build:all
-
-      - name: Verify Desktop Client build
-        run: |
-          cd utilities/javascript/fates-edge-desktop-client
-          if [ ! -d "dist" ] || [ -z "$(ls -A dist)" ]; then
-            echo "❌ Desktop build failed – dist directory is empty"
-            exit 1
-          fi
-
-      - name: Package Desktop Client (macOS)
-        run: |
-          cd utilities/javascript/fates-edge-desktop-client
-          mkdir -p ../../../desktop-mac
-          cp dist/*.dmg dist/*.zip ../../../desktop-mac/ 2>/dev/null || true
-          cd ../../../desktop-mac
-          tar -czf ../desktop-mac.tar.gz .
-
-      - name: Package Desktop Client (Windows)
-        run: |
-          cd utilities/javascript/fates-edge-desktop-client
-          mkdir -p ../../../desktop-win
-          cp dist/*.exe ../../../desktop-win/ 2>/dev/null || true
-          cd ../../../desktop-win
-          tar -czf ../desktop-win.tar.gz .
-
-      - name: Package Desktop Client (Linux)
-        run: |
-          cd utilities/javascript/fates-edge-desktop-client
-          mkdir -p ../../../desktop-linux
-          cp dist/*.AppImage dist/*.deb dist/*.rpm ../../../desktop-linux/ 2>/dev/null || true
-          cd ../../../desktop-linux
-          tar -czf ../desktop-linux.tar.gz .
-
-      - name: Upload Desktop Client artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: desktop-client-mac
-          path: desktop-mac.tar.gz
-      - uses: actions/upload-artifact@v4
-        with:
-          name: desktop-client-win
-          path: desktop-win.tar.gz
-      - uses: actions/upload-artifact@v4
-        with:
-          name: desktop-client-linux
-          path: desktop-linux.tar.gz
-
-      # ─── Socket Server ────────────────────────────────────────────
+      # ─── Socket Server ──────────────────────────────────────────
       - name: Build Socket Server
         run: |
           cd utilities/javascript/fates-edge-socket-server
@@ -175,7 +157,7 @@ jobs:
           name: socket-server-package
           path: socket-server.tar.gz
 
-      # ─── Discord Bot ──────────────────────────────────────────────
+      # ─── Discord Bot ────────────────────────────────────────────
       - name: Build Discord Bot
         run: |
           cd utilities/vtt_mods_bots/fates-edge-discord-bot
@@ -193,7 +175,7 @@ jobs:
           name: discord-bot-package
           path: discord-bot.tar.gz
 
-      # ─── Terminal Client ──────────────────────────────────────────
+      # ─── Terminal Client ────────────────────────────────────────
       - name: Build Terminal Client
         run: |
           if [ -f "utilities/javascript/fates-edge-terminal/package.json" ]; then
@@ -221,7 +203,7 @@ jobs:
           path: terminal-client.tar.gz
         continue-on-error: true
 
-      # ─── Python Client ────────────────────────────────────────────
+      # ─── Python Client ──────────────────────────────────────────
       - name: Package Python Client
         run: |
           cd utilities/python/fates-edge-python-client
@@ -233,7 +215,7 @@ jobs:
           name: python-client-package
           path: python-client.tar.gz
 
-      # ─── Foundry Module ───────────────────────────────────────────
+      # ─── Foundry Module ─────────────────────────────────────────
       - name: Package Foundry Module
         run: |
           cd utilities/vtt_mods_bots/foundry_fates-edge-bridge
@@ -245,7 +227,7 @@ jobs:
           name: foundry-module-package
           path: foundry-module.tar.gz
 
-      # ─── Roll20 Module ────────────────────────────────────────────
+      # ─── Roll20 Module ──────────────────────────────────────────
       - name: Package Roll20 Module
         run: |
           cd utilities/vtt_mods_bots/fates-edge-roll20
@@ -257,12 +239,86 @@ jobs:
           name: roll20-module-package
           path: roll20-module.tar.gz
 
+  # ─── Desktop Client (platform-specific matrix) ─────────────────
+  build-desktop:
+    name: Build Desktop (${{ matrix.platform }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: macos-latest
+            platform: mac
+            artifact_name: desktop-client-mac
+          - os: windows-latest
+            platform: win
+            artifact_name: desktop-client-win
+          - os: ubuntu-latest
+            platform: linux
+            artifact_name: desktop-client-linux
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: utilities/javascript/fates-edge-desktop-client/package-lock.json
+
+      - name: Install Linux build dependencies
+        if: matrix.platform == 'linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y rpm
+
+      - name: Install dependencies
+        working-directory: utilities/javascript/fates-edge-desktop-client
+        shell: bash
+        # dmg-license is in optionalDependencies, so npm ci
+        # skips it automatically on non-Darwin platforms.
+        run: npm ci
+
+      - name: Build and package
+        working-directory: utilities/javascript/fates-edge-desktop-client
+        shell: bash
+        # Runs "node scripts/build.js" (compile) then the
+        # platform-specific electron-builder command.
+        run: npm run build && npm run build:${{ matrix.platform }}
+
+      - name: Verify build output
+        working-directory: utilities/javascript/fates-edge-desktop-client
+        shell: bash
+        run: |
+          if [ ! -d "dist" ] || [ -z "$(ls -A dist)" ]; then
+            echo "❌ Desktop build failed – dist directory is empty"
+            exit 1
+          fi
+          echo "✅ dist contents:"
+          ls -la dist/
+
+      - name: Upload Desktop artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.artifact_name }}
+          path: |
+            utilities/javascript/fates-edge-desktop-client/dist/*.dmg
+            utilities/javascript/fates-edge-desktop-client/dist/*.zip
+            utilities/javascript/fates-edge-desktop-client/dist/*.exe
+            utilities/javascript/fates-edge-desktop-client/dist/*.AppImage
+            utilities/javascript/fates-edge-desktop-client/dist/*.deb
+            utilities/javascript/fates-edge-desktop-client/dist/*.rpm
+          if-no-files-found: warn
+
   # ─── Create Release ──────────────────────────────────────────────
   create-release:
     name: Create Release
     runs-on: ubuntu-latest
-    needs: build
-    if: needs.build.result == 'success'
+    needs: [build-components, build-desktop]
+    if: needs.build-components.result == 'success' && needs.build-desktop.result == 'success'
     steps:
       - name: Download all artifacts
         uses: actions/download-artifact@v4
@@ -272,10 +328,10 @@ jobs:
       - name: Create Release and upload assets
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ needs.build.outputs.release_tag }}
-          name: ${{ needs.build.outputs.release_name }}
-          draft: ${{ needs.build.outputs.prerelease == 'true' }}
-          prerelease: ${{ needs.build.outputs.prerelease == 'true' }}
+          tag_name: ${{ needs.build-components.outputs.release_tag }}
+          name: ${{ needs.build-components.outputs.release_name }}
+          draft: ${{ needs.build-components.outputs.prerelease == 'true' }}
+          prerelease: ${{ needs.build-components.outputs.prerelease == 'true' }}
           body: |
             ## Automatic build
             - **Date**: ${{ github.event.head_commit.timestamp || github.event.repository.updated_at }}
@@ -283,7 +339,11 @@ jobs:
             - **Triggered by**: ${{ github.triggering_actor }}
 
             Attached are packaged builds of all Fates Edge components.
-          files: artifacts/*/*.tar.gz
+          files: |
+            artifacts/*/*.tar.gz
+            artifacts/desktop-client-mac/*
+            artifacts/desktop-client-win/*
+            artifacts/desktop-client-linux/*
           generate_release_notes: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -292,7 +352,7 @@ jobs:
   deploy-pages:
     name: Deploy Web Client to Pages
     runs-on: ubuntu-latest
-    needs: build
+    needs: build-components
     if: github.ref == 'refs/heads/main'
     environment:
       name: github-pages
@@ -306,28 +366,34 @@ jobs:
 
       - name: Extract web client
         run: |
-          mkdir -p web-client-extracted
-          tar -xzf web-client/web-client.tar.gz -C web-client-extracted/
-          # Move contents of dist/ to root
-          if [ -d "web-client-extracted/dist" ]; then
-            mv web-client-extracted/dist/* web-client-extracted/
-            rmdir web-client-extracted/dist
-          fi
-          touch web-client-extracted/.nojekyll
+          mkdir -p web-client-deploy
+          # The tarball has files at the root level (no dist/ prefix)
+          # because we tarred from the staging directory directly.
+          # So extraction is a single command — no mv, no rmdir, no
+          # strip-components. Everything lands in the right place.
+          tar -xzf web-client/web-client.tar.gz -C web-client-deploy/
+          touch web-client-deploy/.nojekyll
 
-      - name: Verify extracted data folder
+      - name: Verify extracted contents
         run: |
-          if [ ! -d "web-client-extracted/data" ]; then
+          echo "--- Deploy directory contents ---"
+          ls -la web-client-deploy/
+
+          if [ ! -d "web-client-deploy/data" ]; then
             echo "❌ data folder missing after extraction!"
             exit 1
           fi
           echo "✅ data folder is present"
-          ls -la web-client-extracted/data/
+          ls -la web-client-deploy/data/
+
+          if [ ! -f "web-client-deploy/index.html" ]; then
+            echo "⚠️ index.html not found in deploy directory"
+          fi
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: web-client-extracted/
+          path: web-client-deploy/
 
       - name: Deploy to Pages
         id: deployment
@@ -336,8 +402,8 @@ jobs:
   # ─── Deploy Socket Server to Render ─────────────────────────────
   deploy-socket-to-render:
     name: Deploy Socket Server to Render
-    needs: [build, create-release]
-    if: needs.build.outputs.prerelease == 'false'
+    needs: [build-components, create-release]
+    if: needs.build-components.outputs.prerelease == 'false'
     uses: ./.github/workflows/deploy-socket-server.yml
     with:
       environment: production
@@ -346,10 +412,10 @@ jobs:
   # ─── Build & Push Docker Images ──────────────────────────────────
   docker-push:
     name: Build & Push Docker Images
-    needs: [build, create-release]
-    if: needs.build.outputs.prerelease == 'false'
+    needs: [build-components, create-release]
+    if: needs.build-components.outputs.prerelease == 'false'
     uses: ./.github/workflows/docker-publish.yml
     with:
-      version: ${{ needs.build.outputs.release_tag }}
+      version: ${{ needs.build-components.outputs.release_tag }}
       push: true
     secrets: inherit
