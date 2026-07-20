@@ -67,16 +67,27 @@ jobs:
           cd utilities/javascript/fates-edge-web-client
           npm ci
           npm run build
-          cp -r data dist/   # ensure data folder is included
+          cp -r data dist/   # copy data folder into dist
 
-      - name: Verify Web Client build
+      - name: Verify data folder in dist
         run: |
-          test -f utilities/javascript/fates-edge-web-client/dist/index.html || exit 1
+          cd utilities/javascript/fates-edge-web-client
+          if [ ! -d "dist/data" ]; then
+            echo "❌ data folder missing from dist!"
+            exit 1
+          fi
+          echo "✅ data folder present in dist"
+          ls -la dist/data/
 
       - name: Package Web Client
         run: |
           cd utilities/javascript/fates-edge-web-client
           tar -czf ../../../web-client.tar.gz dist/
+
+      - name: Inspect web client tarball
+        run: |
+          tar -tzf web-client.tar.gz | grep -E '^(dist/)?data/' | head -10
+          # Should show data/ entries
 
       - name: Upload Web Client artifact
         uses: actions/upload-artifact@v4
@@ -285,20 +296,31 @@ jobs:
           name: web-client-build
           path: web-client
 
-      - name: Extract web client
+      - name: Extract web client  
         run: |
-          mkdir -p web-client-extracted
-          tar -xzf web-client/web-client.tar.gz -C web-client-extracted/ --strip-components=1
-          touch web-client-extracted/.nojekyll
+        mkdir -p web-client-extracted
+        tar -xzf web-client/web-client.tar.gz -C web-client-extracted/
+        # Move contents of dist/ to root
+        if [ -d "web-client-extracted/dist" ]; then
+          mv web-client-extracted/dist/* web-client-extracted/
+          rmdir web-client-extracted/dist
+        fi
+        touch web-client-extracted/.nojekyll
+        # Verify data folder is present
+        if [ ! -d "web-client-extracted/data" ]; then
+          echo "❌ data folder missing after extraction!"
+          exit 1
+        fi
+        echo "✅ data folder present in extraction"
 
-      - name: Upload Pages artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: web-client-extracted/
+          - name: Upload Pages artifact
+            uses: actions/upload-pages-artifact@v3
+            with:
+              path: web-client-extracted/
 
-      - name: Deploy to Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+          - name: Deploy to Pages
+            id: deployment
+            uses: actions/deploy-pages@v4
 
   # ─── Deploy Socket Server to Render ─────────────────────────────
   deploy-socket-to-render:
