@@ -1,6 +1,6 @@
 {
   "name": "fates-edge-client",
-  "version": "4.1.0",
+  "version": "4.1.1",
   "description": "Fate's Edge VTT Desktop Client",
   "main": "electron.js",
   "author": "Fate's Edge",
@@ -26,7 +26,8 @@
     "electron-builder": "^24.9.1",
     "electron-builder-squirrel-windows": "^24.9.1",
     "eslint": "^8.55.0",
-    "rimraf": "^5.0.5"
+    "rimraf": "^5.0.5",
+    "dmg-license": "^1.0.11"
   },
   "build": {
     "appId": "com.fatesedge.client",
@@ -42,18 +43,12 @@
       "!**/*.map"
     ],
     "win": {
-      "target": [
-        "nsis",
-        "portable"
-      ],
+      "target": ["nsis", "portable"],
       "icon": "build/icon.ico",
       "publisherName": "Fate's Edge"
     },
     "mac": {
-      "target": [
-        "dmg",
-        "zip"
-      ],
+      "target": ["dmg", "zip"],
       "icon": "build/icon.icns",
       "category": "public.app-category.games",
       "hardenedRuntime": true,
@@ -61,11 +56,7 @@
       "entitlements": "build/entitlements.mac.plist"
     },
     "linux": {
-      "target": [
-        "AppImage",
-        "deb",
-        "rpm"
-      ],
+      "target": ["AppImage", "deb", "rpm"],
       "icon": "build/icon.png",
       "category": "Game"
     },
