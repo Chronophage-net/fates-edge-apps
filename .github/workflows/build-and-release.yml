@@ -298,27 +298,27 @@ jobs:
 
       - name: Extract web client  
         run: |
-        mkdir -p web-client-extracted
-        tar -xzf web-client/web-client.tar.gz -C web-client-extracted/
-        # Move contents of dist/ to root
-        if [ -d "web-client-extracted/dist" ]; then
-          mv web-client-extracted/dist/* web-client-extracted/
-          rmdir web-client-extracted/dist
-        fi
-        touch web-client-extracted/.nojekyll
-        # Verify data folder is present
-        if [ ! -d "web-client-extracted/data" ]; then
-          echo "❌ data folder missing after extraction!"
-          exit 1
-        fi
-        echo "✅ data folder present in extraction"
+          mkdir -p web-client-extracted
+          tar -xzf web-client/web-client.tar.gz -C web-client-extracted/
+          # Move contents of dist/ to root
+          if [ -d "web-client-extracted/dist" ]; then
+            mv web-client-extracted/dist/* web-client-extracted/
+            rmdir web-client-extracted/dist
+          fi
+          touch web-client-extracted/.nojekyll
+          # Verify data folder is present
+          if [ ! -d "web-client-extracted/data" ]; then
+            echo "❌ data folder missing after extraction!"
+            exit 1
+          fi
+          echo "✅ data folder present in extraction"
 
-          - name: Upload Pages artifact
-            uses: actions/upload-pages-artifact@v3
-            with:
-              path: web-client-extracted/
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: web-client-extracted/
 
-          - name: Deploy to Pages
+      - name: Deploy to Pages
             id: deployment
             uses: actions/deploy-pages@v4
 
