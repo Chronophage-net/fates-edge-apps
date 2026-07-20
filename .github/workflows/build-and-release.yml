@@ -102,13 +102,12 @@ jobs:
       - name: Install system dependencies for desktop build
         run: |
           sudo apt-get update
-          sudo apt-get install -y wine makensis genisoimage
+          sudo apt-get install -y wine nsis genisoimage
 
       - name: Build Desktop Client (all platforms)
         run: |
           cd utilities/javascript/fates-edge-desktop-client
           npm ci
-          # Add node_modules/.bin to PATH so electron-builder is found
           echo "$(pwd)/node_modules/.bin" >> $GITHUB_PATH
           npm run build:all
 
