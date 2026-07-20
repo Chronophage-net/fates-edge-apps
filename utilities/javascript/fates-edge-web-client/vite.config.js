@@ -1,7 +1,6 @@
 import { defineConfig } from 'vite';
 import { resolve } from 'path';
 import fs from 'fs';
-import { viteStaticCopy } from 'vite-plugin-static-copy';   // <-- new import
 
 export default defineConfig({
     base: '/',
@@ -53,18 +52,6 @@ export default defineConfig({
     define: {
         'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'development'),
     },
-
-    // 🆕 Copy the entire data/ folder to dist/
-    plugins: [
-        viteStaticCopy({
-            targets: [
-                {
-                    src: 'data',               // source relative to project root
-                    dest: '.',                 // destination inside dist (dist/data)
-                },
-            ],
-        }),
-    ],
 
     // Dev server middleware (unchanged)
     configureServer(server) {
