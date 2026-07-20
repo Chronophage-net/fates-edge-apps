@@ -67,10 +67,6 @@ jobs:
           python-version: ${{ env.PYTHON_VERSION }}
 
       # ─── Web Client ────────────────────────────────────────────
-      # The web client is mostly static files. The build just generates
-      # seed.js into dist/. We assemble a staging directory with ALL
-      # deployable files (static + generated), so nothing gets lost.
-
       - name: Build Web Client
         run: |
           cd utilities/javascript/fates-edge-web-client
@@ -85,10 +81,11 @@ jobs:
           rm -rf "$STAGING"
           mkdir -p "$STAGING"
 
-          # Copy ALL static files from the web client root, excluding
-          # dev/build artifacts. rsync preserves directory structure
-          # and handles everything (index.html, js/, css/, data/, etc.)
-          rsync -a \
+          # rsync -aL: -a = archive mode, -L = follow symlinks and copy
+          # the actual content. This ensures that if data/docs or
+          # data/regions are symlinks, their real content is copied
+          # rather than creating broken symlinks in the staging dir.
+          rsync -aL \
             --exclude='node_modules' \
             --exclude='package.json' \
             --exclude='package-lock.json' \
@@ -104,34 +101,66 @@ jobs:
             cp -a utilities/javascript/fates-edge-web-client/dist/. "$STAGING/"
           fi
 
-      - name: Verify data folder in staging
+      - name: Verify data folders in staging
         run: |
           STAGING="$GITHUB_WORKSPACE/web-client-staging"
+
+          echo "--- staging top-level ---"
+          ls -la "$STAGING/"
+
+          # Verify data/ exists
           if [ ! -d "$STAGING/data" ]; then
-            echo "❌ data folder missing from staging!"
-            echo "--- staging contents ---"
-            ls -la "$STAGING/"
+            echo "❌ data/ folder missing from staging!"
             exit 1
           fi
-          echo "✅ data folder is present in staging"
+          echo "✅ data/ is present"
           ls -la "$STAGING/data/"
+
+          # Verify data/docs/ exists with content
+          if [ ! -d "$STAGING/data/docs" ]; then
+            echo "❌ data/docs/ subfolder missing from staging!"
+            exit 1
+          fi
+          echo "✅ data/docs/ is present"
+          ls -la "$STAGING/data/docs/"
+
+          # Verify data/regions/ exists with content
+          if [ ! -d "$STAGING/data/regions" ]; then
+            echo "❌ data/regions/ subfolder missing from staging!"
+            exit 1
+          fi
+          echo "✅ data/regions/ is present"
+          ls -la "$STAGING/data/regions/"
+
+          # Show full recursive tree of data/ for debugging
+          echo "--- Full data/ tree ---"
+          find "$STAGING/data" -type f | head -50
+          DIR_COUNT=$(find "$STAGING/data" -type d | wc -l)
+          FILE_COUNT=$(find "$STAGING/data" -type f | wc -l)
+          echo "data/ contains $DIR_COUNT directories and $FILE_COUNT files"
 
       - name: Package Web Client
         run: |
-          # Tar from the staging root — no dist/ prefix in the archive.
-          # This means extraction is a simple one-liner with no mv/rmdir.
           tar -czf web-client.tar.gz -C web-client-staging .
 
       - name: Inspect web client tarball (data/ check)
         run: |
+          echo "--- tarball data/ entries ---"
+          tar -tzf web-client.tar.gz | grep '^\.\/data\|^data' | head -50
+
           if ! tar -tzf web-client.tar.gz | grep -q 'data/'; then
-            echo "❌ data folder not found in tarball!"
-            tar -tzf web-client.tar.gz | head -30
+            echo "❌ data/ folder not found in tarball!"
             exit 1
           fi
-          echo "✅ data folder is present in tarball"
-          echo "--- tarball top-level entries ---"
-          tar -tzf web-client.tar.gz | head -20
+          if ! tar -tzf web-client.tar.gz | grep -q 'data/docs'; then
+            echo "❌ data/docs/ not found in tarball!"
+            exit 1
+          fi
+          if ! tar -tzf web-client.tar.gz | grep -q 'data/regions'; then
+            echo "❌ data/regions/ not found in tarball!"
+            exit 1
+          fi
+          echo "✅ data/, data/docs/, and data/regions/ are all present in tarball"
 
       - name: Upload Web Client artifact
         uses: actions/upload-artifact@v4
@@ -278,16 +307,19 @@ jobs:
       - name: Install dependencies
         working-directory: utilities/javascript/fates-edge-desktop-client
         shell: bash
-        # dmg-license is in optionalDependencies, so npm ci
-        # skips it automatically on non-Darwin platforms.
         run: npm ci
 
-      - name: Build and package
+      - name: Configure repository for electron-builder
         working-directory: utilities/javascript/fates-edge-desktop-client
         shell: bash
-        # Runs "node scripts/build.js" (compile) then the
-        # platform-specific electron-builder command.
-        run: npm run build && npm run build:${{ matrix.platform }}
+        run: |
+          npm pkg set repository.type=git
+          npm pkg set repository.url="https://github.com/${GITHUB_REPOSITORY}.git"
+
+      - name: Package with electron-builder
+        working-directory: utilities/javascript/fates-edge-desktop-client
+        shell: bash
+        run: npm run build:${{ matrix.platform }} -- --publish never
 
       - name: Verify build output
         working-directory: utilities/javascript/fates-edge-desktop-client
@@ -367,24 +399,44 @@ jobs:
       - name: Extract web client
         run: |
           mkdir -p web-client-deploy
-          # The tarball has files at the root level (no dist/ prefix)
-          # because we tarred from the staging directory directly.
-          # So extraction is a single command — no mv, no rmdir, no
-          # strip-components. Everything lands in the right place.
           tar -xzf web-client/web-client.tar.gz -C web-client-deploy/
           touch web-client-deploy/.nojekyll
 
       - name: Verify extracted contents
         run: |
-          echo "--- Deploy directory contents ---"
+          echo "--- Deploy directory top-level ---"
           ls -la web-client-deploy/
 
+          # Verify data/
           if [ ! -d "web-client-deploy/data" ]; then
-            echo "❌ data folder missing after extraction!"
+            echo "❌ data/ folder missing after extraction!"
             exit 1
           fi
-          echo "✅ data folder is present"
+          echo "✅ data/ is present"
           ls -la web-client-deploy/data/
+
+          # Verify data/docs/
+          if [ ! -d "web-client-deploy/data/docs" ]; then
+            echo "❌ data/docs/ subfolder missing after extraction!"
+            exit 1
+          fi
+          echo "✅ data/docs/ is present"
+          ls -la web-client-deploy/data/docs/
+
+          # Verify data/regions/
+          if [ ! -d "web-client-deploy/data/regions" ]; then
+            echo "❌ data/regions/ subfolder missing after extraction!"
+            exit 1
+          fi
+          echo "✅ data/regions/ is present"
+          ls -la web-client-deploy/data/regions/
+
+          # Full recursive listing for debugging
+          echo "--- Full data/ tree ---"
+          find web-client-deploy/data -type f | head -50
+          DIR_COUNT=$(find web-client-deploy/data -type d | wc -l)
+          FILE_COUNT=$(find web-client-deploy/data -type f | wc -l)
+          echo "data/ contains $DIR_COUNT directories and $FILE_COUNT files"
 
           if [ ! -f "web-client-deploy/index.html" ]; then
             echo "⚠️ index.html not found in deploy directory"

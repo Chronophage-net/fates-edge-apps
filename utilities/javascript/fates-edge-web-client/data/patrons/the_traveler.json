@@ -1,0 +1,66 @@
+{
+  "name": "The Traveler",
+  "slug": "the_traveler",
+  "domain": "Ways \\& Journeys",
+  "description": "<div class=\"patron-header\">\n            <h1 class=\"patron-title\">The Traveler</h1>\n            <hr class=\"region-divider\">\n        </div>\n        <p class=\"region-text\">*{Lore The Traveler is the eternal guide of the road, guardian of those who walk the paths between what is and what might be. Among the Fhara caravans and Kuvani traders along the Way of Silk, the Traveler is invoked at every crossroads, honored with small offerings at each waypoint, and consulted before every major journey.</p> <p class=\"region-text\">The Traveler is not merely one who shows the way --- they are the way, existing in the pause between steps and in the choice of which path to take when roads fork. Every journey is both physical and spiritual; to move from one place to another is to transform, and the road itself becomes a teacher.</p> <p class=\"region-text\">Across the known world, the Traveler wears many faces. In Kahfagia, the Traveler is the Lantern-Bearer, whose light guides ships through uncharted waters. In Ykrul, the Traveler is the Hoof-Print, the spirit of the steppe road that appears as a single arrowhead left at a crossroads. In Aeler, the Traveler is the Ways-Stone, carved into every mile marker by True-Masons to ensure the road remembers those who walk it. In the Mistlands, the Traveler is invoked with a single unknotted bell-rope --- a sign that the fog may part for one who walks humbly. Wherever a traveler sets foot, the Traveler is already there, waiting to see which road they choose.</p> <p class=\"region-text\">quote \"One foot in a promise, and the road will meet you halfway. But break your word to the way, and the way will break you.\" quote</p> <p class=\"region-text\">*{Domain Focus itemize Wayfinding: navigation, route-finding, safe passage Journeys: travel, pilgrimage, exploration Thresholds of Movement: doors, bridges, crossroads, borders Road Covenants: promises made on the road, hospitality to travelers itemize</p> <p class=\"region-text\">*{Thiasos and Codex (Runekeeper Options)</p> <p class=\"region-text\">A Runekeeper sworn to the Traveler does not bind a familiar of hearth and home --- they bind a companion of the open road. Their Thiasos is a small beast or mythological being that embodies movement and guidance: a gray hare that never tires, a sparrow that knows every shortcut, a small fox that leaves no tracks, a dung beetle that rolls its ball unerringly toward the nearest water, or a tiny brass compass that hums when the bearer is on the true path. This creature requires no food, but it must walk at least a mile each day (or be allowed to roam freely in a new place). If confined for more than a day, it becomes Compromised (it grows lethargic and its guidance becomes unreliable, imposing --1 die on all Navigation and Lore rolls for its bearer until it is exercised).</p> <p class=\"region-text\">The Codex of the Traveler is never a stationary book. It may be a leather strap knotted with directions, a set of scrolls kept in different saddlebags, a map that redraws itself after each journey, or a pilgrim's diary whose blank pages fill with route descriptions as the bearer walks. Because the road resists being captured in ink, the Codex requires upkeep: the Runekeeper must spend an hour each week walking a new path and annotating it, or the Rites stored there become faded (treat as Compromised until updated).</p> <p class=\"region-text\">*{Patron's Gift (Imbuement)</p> <p class=\"region-text\">Once per scene as an action, a Runekeeper of the Traveler may touch a held item (weapon, tool, or cloak) and whisper a waymark. For the rest of the scene, the item grants +1 die to Navigation or Lore rolls, and the first time each scene the bearer would be slowed by difficult terrain or a bureaucratic delay, they may ignore it (the road opens for them). After the scene, the user marks +1 Obligation to the Traveler.</p>",
+  "summary": "The Traveler *{Lore The Traveler is the eternal guide of the road, guardian of those who walk the paths between what is and what might be.",
+  "tags": [],
+  "source": "patron",
+  "file": "traveler.tex",
+  "rites": [
+    {
+      "name": "Rite of Road-Sense",
+      "description": "<p class=\"region-text\">(Basic, 4 XP) Scene; Self; No. Tags: , Materials: A road-nail or waystone pebble. Effect: Unerringly pick the fastest safe route in Near/Far. Gain +1 die to avoid ambushes or delays. Create a 4-segment Path Memory timer to ignore difficult terrain once. Push It: Spot one hidden bypass, but generate 1 SB (Clubs). Cost: Mark +1 Obligation (total +1) or Mark +1 Fatigue. Cost: Mark +0 Obligation. Requires: Familiar (Invoke: 1 Boon). Invoke: 1 action. Duration: Scene.</p>",
+      "tags": [],
+      "cost": "Mark +1 Obligation (total +1) or Mark +1 Fatigue. \\\\",
+      "duration": "Scene.",
+      "action": null,
+      "effect": "Unerringly pick the fastest safe route in Near/Far. Gain +1 die to avoid ambushes or delays. Create a 4-segment Path Memory timer to ignore difficult terrain once. \\\\"
+    },
+    {
+      "name": "Rite of the Traveler's Boon",
+      "description": "<p class=\"region-text\">(Basic, 5 XP) Scene; Self/Ally; No. Tags: , , Materials: Thread tied at the wrist. Effect: Ignore one level of difficult terrain or bureaucratic delay; +1 Effect to travel or escape checks. If shared, create a 2-segment Shared Journey bond with an ally. Push It: Extend to one more ally; mark 1 SB (Diamonds). Cost: Mark +1 Obligation (total +1) or Mark +1 Fatigue. Cost: Mark +0 Obligation. Requires: Familiar (Invoke: 1 Boon). Invoke: 1 action. Duration: Scene.</p>",
+      "tags": [],
+      "cost": "Mark +1 Obligation (total +1) or Mark +1 Fatigue. \\\\",
+      "duration": "Scene.",
+      "action": null,
+      "effect": "Ignore one level of difficult terrain or bureaucratic delay; +1 Effect to travel or escape checks. If shared, create a 2-segment Shared Journey bond with an ally. \\\\"
+    },
+    {
+      "name": "Rite of the Waymark",
+      "description": "<p class=\"region-text\">(Advanced, 8 XP) Scene; Near; No. Tags: , , Materials: A chalk mark or small cairn. Effect: Declare a lane as permitted or easy. Allies gain improved Position/Effect or ignore one obstacle. Create a 6-segment Marked Path timer. Push It: The lane persists between scenes; the first enemy to exploit it forces 1 SB (Spades). Cost: Mark +1 Obligation (total +2) or Mark +1 Fatigue. Cost: Mark +1 Obligation. Requires: Familiar + Codex (Invoke: 1 Boon). Invoke: 1 action. Duration: Scene.</p>",
+      "tags": [],
+      "cost": "Mark +1 Obligation (total +2) or Mark +1 Fatigue. \\\\",
+      "duration": "Scene.",
+      "action": null,
+      "effect": "Declare a lane as permitted or easy. Allies gain improved Position/Effect or ignore one obstacle. Create a 6-segment Marked Path timer. \\\\"
+    },
+    {
+      "name": "Rite of the Bridge Between",
+      "description": "<p class=\"region-text\">(Advanced, 7 XP) Instant; Near; No. Tags: , , Materials: Two pinches of road-dust clapped. Effect: Relocate a willing target within Far along a visible or named route. Unwilling targets may resist (Body+Resolve DV 3). Create a 4-segment Pathway Established timer. Push It: Carry one extra ally or bundle; arrivals are off-balance. Cost: Mark +1 Obligation (total +2) or Mark +1 Fatigue. Cost: Mark +1 Obligation. Requires: Familiar + Codex (Invoke: 1 Boon). Invoke: 1 action. Duration: Instant.</p>",
+      "tags": [],
+      "cost": "Mark +1 Obligation (total +2) or Mark +1 Fatigue. \\\\",
+      "duration": "Instant.",
+      "action": null,
+      "effect": "Relocate a willing target within Far along a visible or named route. Unwilling targets may resist (Body+Resolve DV 3). Create a 4-segment Pathway Established timer. \\\\"
+    },
+    {
+      "name": "Rite of the Crown of Crossings",
+      "description": "<p class=\"region-text\">(Master, 13 XP) Scene; Zone; No. Tags: , , , Materials: A brass compass missing its needle. Effect: Call the Road: allies gain +1 die to move or evade; pursuers suffer --1 die. Once, declare \"the long way is short\" to finish a travel timer segment for free. Enemies must test (Wits+Command DV 4) or suffer --1 die to movement. Push It: Seal a hostile route briefly; generate 2 SB (Clubs/Diamonds). Cost: Mark +1 Obligation (total +3) or Mark +1 Fatigue. Cost: Mark +2 Obligation. Requires: Familiar + Codex + Tier III (Invoke: 2 Boons). Invoke: 1 action. Duration: Scene.</p>",
+      "tags": [],
+      "cost": "Mark +1 Obligation (total +3) or Mark +1 Fatigue. \\\\",
+      "duration": "Scene.",
+      "action": null,
+      "effect": "Call the Road: allies gain +1 die to move or evade; pursuers suffer --1 die. Once, declare ``the long way is short'' to finish a travel timer segment for free. Enemies must test (Wits+Command DV 4) or suffer --1 die to movement. \\\\"
+    },
+    {
+      "name": "Rite of the Wayfarer's Covenant",
+      "description": "<p class=\"region-text\">(Master, 14 XP) Extended; Near; No. Tags: , , , Materials: Waystones from multiple regions. Effect: Bind present parties to safe passage. While honored: +2 Effect on travel, reroll one failed travel roll per scene. Breaking the oath inflicts Harm 1 (Fatigue) and marks the breaker as Oathbreaker of the Road (--2 dice to travel rolls). Push It: Breaking the covenant inflicts Harm 2 (Stress) and attracts hostile Wayward spirits. Cost: Mark +1 Obligation (total +3) or Mark +1 Fatigue. Cost: Mark +2 Obligation. Requires: Familiar + Codex + Tier III (Invoke: 2 Boons). Invoke: Extended action. Duration: Campaign (while honored).</p>",
+      "tags": [],
+      "cost": "Mark +1 Obligation (total +3) or Mark +1 Fatigue. \\\\",
+      "duration": "Campaign (while honored).",
+      "action": null,
+      "effect": "Bind present parties to safe passage. While honored: +2 Effect on travel, reroll one failed travel roll per scene. Breaking the oath inflicts Harm 1 (Fatigue) and marks the breaker as Oathbreaker of the Road (--2 dice to travel rolls). \\\\"
+    }
+  ]
+}

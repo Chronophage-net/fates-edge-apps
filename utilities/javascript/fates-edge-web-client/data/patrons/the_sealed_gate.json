@@ -1,0 +1,66 @@
+{
+  "name": "The Sealed Gate",
+  "slug": "the_sealed_gate",
+  "domain": "Thresholds \\& Containment",
+  "description": "<div class=\"patron-header\">\n            <h1 class=\"patron-title\">The Sealed Gate</h1>\n            <hr class=\"region-divider\">\n        </div>\n        <p class=\"region-text\">*{Lore The Sealed Gate stands where realities meet, embodying the sacred power of thresholds, boundaries, and containment. Its followers are wardens, exorcists, and philosophers of separation who believe some things must be kept apart for the world to function. The Gate manifests as an impassive judge whose shifting sigils --- binding runes, exclusion marks, or acceptance glyphs --- determine what may cross.</p> <p class=\"region-text\">Among the peoples of Fate's Edge, the Sealed Gate is known as the patron of abjurists, exorcists, and sentinels. In Aeler, the Gate is called the Stone Seal, invoked by True-Masons who carve permanent wards into mountain passes. In Thepyrgos, the Gate is the Unbreakable Lock, whose sigils are painted on every archive door that holds forbidden texts. In the Mistlands, the Gate is the Bell-Line Keeper, the force that makes the bell-wards hold against the Direwood. Wherever something must be kept in or kept out, the Sealed Gate's servants are there --- silent, patient, and absolute.</p> <p class=\"region-text\">quote \"You define what passes and what remains. Every boundary remembers your judgment.\" quote</p> <p class=\"region-text\">*{Domain Focus itemize Thresholds: doors, portals, borders between realms Containment: wards, bindings, imprisonment of dangerous forces Exclusion: banishment, quarantine, protection through separation Permission: safe passage, authorized access, controlled crossing itemize</p> <p class=\"region-text\">*{Thiasos and Codex (Runekeeper Options)</p> <p class=\"region-text\">A Runekeeper sworn to the Sealed Gate does not bind a living creature --- they bind a threshold given will. Their Thiasos is a small object imbued with boundary-sense: a bronze key that fits no lock yet trembles when a boundary is near, a brass bell that rings only when a ward is about to break, or a small iron gate that stands on the Runekeeper's desk and opens only when a lie is spoken. This object requires no food, but it must be anointed with oil and placed on a threshold at dawn each day. If neglected for a week, the Thiasos becomes Compromised (it emits a low hum that imposes --1 die on Stealth rolls for its bearer).</p> <p class=\"region-text\">The Codex of the Sealed Gate is never a simple book. It may be a leather strap carved with runes that tighten when a ward is violated, a set of iron rings linked in a chain, or the inside of a lock. Because boundaries are physical, the Codex requires upkeep: the Runekeeper must spend an hour each week testing each seal (touching, ringing, or whispering to it), or the Rites stored there become uncertain (treat as Compromised until restored).</p> <p class=\"region-text\">*{Patron's Gift (Imbuement)</p> <p class=\"region-text\">Once per scene as an action, a Runekeeper of the Sealed Gate may touch a held item (weapon, shield, or tool) and speak a word of exclusion. For the rest of the scene, the item grants +1 die to Defend or Resist rolls, and the first time each scene the bearer would be moved against their will (shoved, pulled, or teleported), they may ignore it. After the scene, the user marks +1 Obligation to the Sealed Gate.</p>",
+  "summary": "The Sealed Gate *{Lore The Sealed Gate stands where realities meet, embodying the sacred power of thresholds, boundaries, and containment. Its followers are wardens, exorcists, and philosophers of separation who believe some things must be kept apart for the world to function.",
+  "tags": [],
+  "source": "patron",
+  "file": "sealed-gate.tex",
+  "rites": [
+    {
+      "name": "Rite of the Sealed Threshold",
+      "description": "<p class=\"region-text\">(Basic, 4 XP) Scene; Touch; No. Tags: , Materials: Chalk, iron dust, or sanctified cord. Effect: Mark a doorway or passage as sealed. Unauthorized crossing tests Spirit+Resolve (DV 3) or suffers a Position penalty. Creates a 4-segment Ward Integrity timer. Push It: The barrier becomes a visible shimmer, imposing --1 die on attempts to cross it. Cost: Mark +1 Obligation (total +2) or Mark +1 Fatigue. Cost: Mark +1 Obligation. Requires: Familiar (Invoke: 1 Boon). Invoke: 1 action. Duration: Scene (Ward Integrity timer: 4 segments).</p>",
+      "tags": [],
+      "cost": "Mark +1 Obligation (total +2) or Mark +1 Fatigue. \\\\",
+      "duration": "Scene (Ward Integrity timer: 4 segments).",
+      "action": null,
+      "effect": "Mark a doorway or passage as sealed. Unauthorized crossing tests Spirit+Resolve (DV 3) or suffers a Position penalty. Creates a 4-segment Ward Integrity timer. \\\\"
+    },
+    {
+      "name": "Rite of the Key's Rebuke",
+      "description": "<p class=\"region-text\">(Basic, 5 XP) Instant; Near; No. Tags: , Materials: A gesture of denial or a barrier symbol. Effect: The target must test Body+Resolve (DV 3) or be pushed back from the threshold. On success, create a Rebuke Echo token granting +1 die to the next boundary defense. Push It: The rebuke lingers --- the target cannot cross this threshold for the rest of the scene. Cost: Mark +1 Obligation (total +2) or Mark +1 Fatigue. Cost: Mark +1 Obligation. Requires: Familiar (Invoke: 1 Boon). Invoke: 1 action. Duration: Instant.</p>",
+      "tags": [],
+      "cost": "Mark +1 Obligation (total +2) or Mark +1 Fatigue. \\\\",
+      "duration": "Instant.",
+      "action": null,
+      "effect": "The target must test Body+Resolve (DV 3) or be pushed back from the threshold. On success, create a Rebuke Echo token granting +1 die to the next boundary defense. \\\\"
+    },
+    {
+      "name": "Rite of the Circle of Denial",
+      "description": "<p class=\"region-text\">(Advanced, 8 XP) Scene; Zone; No. Tags: , , Materials: A salt ring, iron filings, or boundary stones. Effect: Create a protective circle. Supernatural beings test against the caster's Spirit+Arcana (DV 4) to cross. Mortals suffer --2 dice to force entry. Creates a 6-segment Circle Integrity timer. Push It: The circle becomes a two-way barrier (no one can cross). Cost: Mark +1 Obligation (total +2) or Mark +1 Fatigue. Cost: Mark +1 Obligation. Requires: Familiar + Codex (Invoke: 1 Boon). Invoke: 1 action. Duration: Scene (Circle Integrity timer: 6 segments).</p>",
+      "tags": [],
+      "cost": "Mark +1 Obligation (total +2) or Mark +1 Fatigue. \\\\",
+      "duration": "Scene (Circle Integrity timer: 6 segments).",
+      "action": null,
+      "effect": "Create a protective circle. Supernatural beings test against the caster's Spirit+Arcana (DV 4) to cross. Mortals suffer --2 dice to force entry. Creates a 6-segment Circle Integrity timer. \\\\"
+    },
+    {
+      "name": "Rite of the Writ of Passage",
+      "description": "<p class=\"region-text\">(Advanced, 7 XP) Scene; Zone; No. Tags: , , Materials: Signed authorization or spoken permissions. Effect: Designate an authorized passage route. Allies gain Position +1 when using the route. Unauthorized intruders suffer --1 die to movement or stealth. Creates an 8-segment Writ Authority timer. Push It: Extend authorization to additional allies; mark +1 Obligation. Cost: Mark +1 Obligation (total +2) or Mark +1 Fatigue. Cost: Mark +1 Obligation. Requires: Familiar + Codex (Invoke: 1 Boon). Invoke: 1 action. Duration: Scene (Writ Authority timer: 8 segments).</p>",
+      "tags": [],
+      "cost": "Mark +1 Obligation (total +2) or Mark +1 Fatigue. \\\\",
+      "duration": "Scene (Writ Authority timer: 8 segments).",
+      "action": null,
+      "effect": "Designate an authorized passage route. Allies gain Position +1 when using the route. Unauthorized intruders suffer --1 die to movement or stealth. Creates an 8-segment Writ Authority timer. \\\\"
+    },
+    {
+      "name": "Rite of the Banishment Knot",
+      "description": "<p class=\"region-text\">(Master, 13 XP) Instant; Near; No. Tags: , , Materials: A knotted cord sealed with a gate-sigil. Effect: The target supernatural entity tests against the caster's Spirit+Resolve (DV = entity Cap). On success, the entity is forced to immediately depart the scene. A failed attempt creates a 4-segment Banishment Backlash timer. Push It: The banishment lasts until the next moon phase. Cost: Mark +1 Obligation (total +3) or Mark +1 Fatigue. Cost: Mark +2 Obligation. Requires: Familiar + Codex + Tier III (Invoke: 2 Boons). Invoke: 1 action. Duration: Instant.</p>",
+      "tags": [],
+      "cost": "Mark +1 Obligation (total +3) or Mark +1 Fatigue. \\\\",
+      "duration": "Instant.",
+      "action": null,
+      "effect": "The target supernatural entity tests against the caster's Spirit+Resolve (DV = entity Cap). On success, the entity is forced to immediately depart the scene. A failed attempt creates a 4-segment Banishment Backlash timer. \\\\"
+    },
+    {
+      "name": "Rite of the Consecrated Barrier",
+      "description": "<p class=\"region-text\">(Master, 14 XP) Extended; Zone; No. Tags: , , , Materials: Relics from three traditions, boundary markers, a trespasser's acknowledgment. Effect: Consecrate an area against all unauthorized passage. The tests required scale with the intrusion attempt's severity. A 10-segment Sacred Boundary timer tracks the barrier's strength. Push It: Make the barrier semi-permanent (lasts one season); start a Maintenance [6] timer. Cost: Mark +1 Obligation (total +3) or Mark +1 Fatigue. Cost: Mark +2 Obligation. Requires: Familiar + Codex + Tier III (Invoke: 2 Boons). Invoke: Extended action. Duration: Session (Sacred Boundary timer: 10 segments).</p>",
+      "tags": [],
+      "cost": "Mark +1 Obligation (total +3) or Mark +1 Fatigue. \\\\",
+      "duration": "Session (Sacred Boundary timer: 10 segments).",
+      "action": null,
+      "effect": "Consecrate an area against all unauthorized passage. The tests required scale with the intrusion attempt's severity. A 10-segment Sacred Boundary timer tracks the barrier's strength. \\\\"
+    }
+  ]
+}
