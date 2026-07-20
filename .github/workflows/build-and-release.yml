@@ -84,10 +84,13 @@ jobs:
           cd utilities/javascript/fates-edge-web-client
           tar -czf ../../../web-client.tar.gz dist/
 
-      - name: Inspect web client tarball
+      - name: Inspect web client tarball (data/ check)
         run: |
-          tar -tzf web-client.tar.gz | grep -E '^(dist/)?data/' | head -10
-          # Should show data/ entries
+          if ! tar -tzf web-client.tar.gz | grep -q '^dist/data/'; then
+            echo "❌ data folder not found in tarball!"
+            exit 1
+          fi
+          echo "✅ data folder is present in tarball"
 
       - name: Upload Web Client artifact
         uses: actions/upload-artifact@v4
@@ -190,7 +193,6 @@ jobs:
           if [ -f "utilities/javascript/fates-edge-terminal/package.json" ]; then
             cd utilities/javascript/fates-edge-terminal
             npm ci
-            # run build if exists, otherwise just prepare
             npm run build 2>/dev/null || echo "No build script, skipping"
           else
             echo "Terminal client not found – skipping"
@@ -211,7 +213,7 @@ jobs:
         with:
           name: terminal-client-package
           path: terminal-client.tar.gz
-        continue-on-error: true   # allow if terminal isn't present
+        continue-on-error: true
 
       # ─── Python Client ────────────────────────────────────────────
       - name: Package Python Client
@@ -296,7 +298,7 @@ jobs:
           name: web-client-build
           path: web-client
 
-      - name: Extract web client  
+      - name: Extract web client
         run: |
           mkdir -p web-client-extracted
           tar -xzf web-client/web-client.tar.gz -C web-client-extracted/
@@ -306,12 +308,15 @@ jobs:
             rmdir web-client-extracted/dist
           fi
           touch web-client-extracted/.nojekyll
-          # Verify data folder is present
+
+      - name: Verify extracted data folder
+        run: |
           if [ ! -d "web-client-extracted/data" ]; then
             echo "❌ data folder missing after extraction!"
             exit 1
           fi
-          echo "✅ data folder present in extraction"
+          echo "✅ data folder is present"
+          ls -la web-client-extracted/data/
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
@@ -319,8 +324,8 @@ jobs:
           path: web-client-extracted/
 
       - name: Deploy to Pages
-            id: deployment
-            uses: actions/deploy-pages@v4
+        id: deployment
+        uses: actions/deploy-pages@v4
 
   # ─── Deploy Socket Server to Render ─────────────────────────────
   deploy-socket-to-render:
