@@ -68,11 +68,6 @@ export function render(el) {
                         <span class="qa-label">Combat Tracker</span>
                         <span class="qa-desc">Open combat tracker</span>
                     </button>
-                    <button class="quick-action-btn" onclick="window.openKanban()">
-                        <span class="qa-icon">📋</span>
-                        <span class="qa-label">Kanban</span>
-                        <span class="qa-desc">Campaign board</span>
-                    </button>
                     <button class="quick-action-btn" onclick="window.location.hash='dice'">
                         <span class="qa-icon">🎲</span>
                         <span class="qa-label">Dice Roller</span>
