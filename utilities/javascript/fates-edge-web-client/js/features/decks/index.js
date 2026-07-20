@@ -422,6 +422,50 @@ function getAceEffect(region, card) {
 }
 
 // ============================================================
+// CROWN SPREAD DRAW: ONE OF EACH SUIT
+// ============================================================
+
+/**
+ * Draws exactly one card from each of the four suits (hearts, spades, clubs, diamonds)
+ * from the current deck. Removes those cards from the deck.
+ * If a suit is missing (should not happen with a full deck), it reshuffles and retries.
+ * Returns an array of 4 cards.
+ */
+function drawOneOfEachSuit() {
+    const suits = ['hearts', 'spades', 'clubs', 'diamonds'];
+    const cards = [];
+    
+    // Ensure we have enough cards overall
+    if (deck.length < 4) {
+        buildDeck();
+    }
+    
+    for (const suit of suits) {
+        // Find a card of this suit that is NOT a Joker
+        let index = -1;
+        for (let i = 0; i < deck.length; i++) {
+            if (deck[i].suit === suit && !isJokerCard(deck[i])) {
+                index = i;
+                break;
+            }
+        }
+        
+        if (index === -1) {
+            // No card of this suit in the deck – reshuffle and try again
+            // This should be extremely rare (only if deck is corrupted or extremely depleted)
+            buildDeck();
+            // Recursive call to try again with a fresh deck
+            return drawOneOfEachSuit();
+        }
+        
+        // Remove the card and add to result
+        cards.push(deck.splice(index, 1)[0]);
+    }
+    
+    return cards;
+}
+
+// ============================================================
 // WEBSOCKET SYNC
 // ============================================================
 
@@ -775,32 +819,35 @@ async function loadManifest() {
  * Tries /data/regions/{slug}.json first, then falls back to /data/regions/{slug}.json.
  */
 async function fetchRegionData(regionName) {
-    if (regionData && regionData.name === regionName) {
-        return regionData;
-    }
-    
     const slug = getRegionSlug(regionName);
-    
-    // Try multiple paths
     const paths = [
         `/data/regions/${slug}.json`,
-        `/data/regions/${slug}.json`
+        // If you have another location, add it here, e.g.:
+        // `/data/docs/regions/${slug}.json`
     ];
-    
+
+    let data = null;
     for (const path of paths) {
         try {
             const res = await fetch(path);
             if (res.ok) {
-                const data = await res.json();
-                regionData = data;
+                data = await res.json();
                 console.log(`[Decks] Loaded region data for ${regionName} from ${path}`);
-                return data;
+                break;
             }
-        } catch (e) { /* ignore */ }
+        } catch (e) {
+            console.warn(`[Decks] Fetch failed for ${path}:`, e);
+        }
     }
-    
-    // Fallback data
-    console.warn(`[Decks] Error loading region ${regionName}, using fallback`);
+
+    // If we got data, validate it has the required suit arrays
+    if (data && data.hearts && data.spades && data.clubs && data.diamonds) {
+        regionData = data;
+        return data;
+    }
+
+    // Otherwise, use fallback
+    console.warn(`[Decks] No valid region data for ${regionName}, using fallback`);
     const fallbackData = {
         name: regionName,
         description: `${regionName} - A region of Fate's Edge.`,
@@ -820,7 +867,6 @@ async function fetchRegionData(regionName) {
 async function handleRegionChange() {
     const select = document.getElementById('deck-region-select');
     if (!select) return;
-    
     const regionName = select.value;
     const descEl = document.getElementById('region-description');
 
@@ -831,26 +877,20 @@ async function handleRegionChange() {
 
     selectedRegion = regionName;
     const data = await fetchRegionData(regionName);
-    
+    // data is now correctly loaded (or fallback)
+
     if (descEl) {
         if (data && data.description) {
             descEl.innerHTML = data.description;
-        } else if (data) {
-            descEl.innerHTML = '<p class="region-text">No description available for this region.</p>';
         } else {
-            descEl.textContent = 'Could not load region description.';
+            descEl.textContent = 'No description available.';
         }
     }
-    
-    regionChangeCallbacks.forEach(callback => {
-        try {
-            callback(regionName, data);
-        } catch (e) {
-            console.warn('Region change callback error:', e);
-        }
+
+    regionChangeCallbacks.forEach(cb => {
+        try { cb(regionName, data); } catch (e) { /* ignore */ }
     });
 }
-
 // ============================================================
 // RENDER
 // ============================================================
@@ -1060,14 +1100,17 @@ export async function drawConsequence() {
 
     if (type === 'crown') {
         isCrown = true;
+        // Ensure deck has enough cards (4 for suits + 1 wildcard)
         if (deck.length < 5) {
             showToast('Deck running low! Reshuffling...', 'warning');
             buildDeck();
         }
-        for (let i = 0; i < 5; i++) {
-            if (deck.length === 0) buildDeck();
-            cards.push(deck.pop());
-        }
+        // Draw one card of each suit
+        const mainCards = drawOneOfEachSuit(); // returns 4 cards
+        // Draw wildcard (5th card)
+        if (deck.length === 0) buildDeck();
+        const wildcard = deck.pop();
+        cards = [...mainCards, wildcard];
     } else {
         const count = parseInt(type, 10) || 1;
         if (deck.length < count) {
@@ -1472,15 +1515,13 @@ export function openCrownSpread() {
     if (deck.length < 5) {
         buildDeck();
     }
-    const cards = [];
-    for (let i = 0; i < 5; i++) {
-        if (deck.length === 0) buildDeck();
-        cards.push(deck.pop());
-    }
+    // Draw one of each suit for the main cards
+    const mainCards = drawOneOfEachSuit();
+    // Draw wildcard
+    if (deck.length === 0) buildDeck();
+    const wildcard = deck.pop();
+    const cards = [...mainCards, wildcard];
     updateDeckCount();
-    
-    const mainCards = cards.slice(0, 4);
-    const wildcard = cards[4];
     
     const regionName = selectedRegion || 'Acasia';
     fetchRegionData(regionName).then(data => {
@@ -1735,15 +1776,14 @@ export async function quickCrownSpread(regionName = null) {
         buildDeck();
     }
     
-    const cards = [];
-    for (let i = 0; i < 5; i++) {
-        if (deck.length === 0) buildDeck();
-        cards.push(deck.pop());
-    }
+    // Draw one of each suit
+    const mainCards = drawOneOfEachSuit();
+    // Draw wildcard
+    if (deck.length === 0) buildDeck();
+    const wildcard = deck.pop();
+    const cards = [...mainCards, wildcard];
     updateDeckCount();
     
-    const mainCards = cards.slice(0, 4);
-    const wildcard = cards[4];
     const result = synthesiseCrownSpread(mainCards, wildcard, data);
     
     let aceEffect = null;
