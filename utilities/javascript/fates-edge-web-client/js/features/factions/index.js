@@ -6,6 +6,7 @@
  * Data paths:
  * - Faction data: /factions/{id}.json
  * - Faction manifest: /factions/manifest.json
+ * - Fallback: /data/factions/
  */
 
 import { getState, saveState } from '../../core/state.js';
@@ -19,9 +20,18 @@ import { escHtml } from '../../core/utils.js';
 const FACTION_DATA_PATH = '/factions/';
 const FACTION_MANIFEST_PATH = '/factions/manifest.json';
 
-// Fallback paths for local development
 const FALLBACK_DATA_PATH = '/data/factions/';
 const FALLBACK_MANIFEST_PATH = '/data/factions/manifest.json';
+
+// Known faction slugs for discovery fallback
+const KNOWN_FACTION_SLUGS = [
+    'velvet-court',
+    'iron-league',
+    'gray-ash',
+    'ecktorian-censorate',
+    'bloody-fist',
+    'house-contarini'
+];
 
 const FACTION_STANDINGS = {
     '-3': { label: 'Enemy', color: '#c45a5a', icon: '💀', desc: 'Actively works against the party' },
@@ -250,7 +260,8 @@ let state = {
     trusts: [],
     viewMode: 'factions',
     isLoading: false,
-    dataLoaded: false
+    dataLoaded: false,
+    usingFallback: false
 };
 
 // ============================================================
@@ -258,7 +269,6 @@ let state = {
 // ============================================================
 
 export function loadFactionData() {
-    // First try to load from state
     const saved = getState();
     if (saved.factions) {
         state.factions = saved.factions.factions || [];
@@ -269,6 +279,7 @@ export function loadFactionData() {
         if (state.factions.length > 0 || state.assets.length > 0) {
             console.log(`📦 Loaded from state: ${state.factions.length} factions, ${state.assets.length} assets, ${state.followers.length} followers, ${state.trusts.length} trusts`);
             state.dataLoaded = true;
+            state.usingFallback = false;
             return;
         }
     }
@@ -285,6 +296,7 @@ async function loadRemoteFactions() {
         
         let manifestRes = await fetch(FACTION_MANIFEST_PATH);
         let dataPath = FACTION_DATA_PATH;
+        let manifestFound = false;
         
         if (!manifestRes.ok) {
             console.log('📥 Primary manifest not found, trying fallback...');
@@ -292,59 +304,143 @@ async function loadRemoteFactions() {
             if (manifestRes.ok) {
                 dataPath = FALLBACK_DATA_PATH;
                 console.log('📥 Using fallback data path:', dataPath);
+                manifestFound = true;
             }
+        } else {
+            manifestFound = true;
         }
         
-        if (!manifestRes.ok) {
-            console.warn('Faction manifest not found, using defaults');
-            loadDefaultFactions();
-            return;
-        }
+        let factions = [];
         
-        const manifest = await manifestRes.json();
-        
-        if (!Array.isArray(manifest) || manifest.length === 0) {
-            console.warn('Faction manifest is empty, using defaults');
-            loadDefaultFactions();
-            return;
-        }
-        
-        const factions = [];
-        
-        for (const factionId of manifest) {
-            try {
-                const res = await fetch(`${dataPath}${factionId}.json`);
-                if (res.ok) {
-                    const data = await res.json();
-                    if (!data.id) data.id = factionId;
-                    factions.push(data);
-                    console.log(`✅ Loaded faction: ${data.name || factionId}`);
-                } else {
-                    console.warn(`⚠️ Could not load faction: ${factionId} (HTTP ${res.status})`);
+        if (manifestFound && manifestRes.ok) {
+            const manifest = await manifestRes.json();
+            if (Array.isArray(manifest) && manifest.length > 0) {
+                for (const factionId of manifest) {
+                    try {
+                        const res = await fetch(`${dataPath}${factionId}.json`);
+                        if (res.ok) {
+                            const data = await res.json();
+                            if (!data.id) data.id = factionId;
+                            factions.push(data);
+                            console.log(`✅ Loaded faction: ${data.name || factionId}`);
+                        } else {
+                            console.warn(`⚠️ Could not load faction: ${factionId} (HTTP ${res.status})`);
+                        }
+                    } catch (e) {
+                        console.warn(`⚠️ Error loading faction ${factionId}:`, e);
+                    }
                 }
-            } catch (e) {
-                console.warn(`⚠️ Error loading faction ${factionId}:`, e);
             }
         }
         
-        if (factions.length > 0) {
+        // If manifest missing or empty, try discovery
+        if (factions.length === 0) {
+            console.warn('📥 No manifest or no factions loaded. Attempting discovery...');
+            const discovered = await discoverFactions(dataPath);
+            if (discovered.length > 0) {
+                factions = discovered;
+                console.log(`✅ Discovered ${factions.length} factions`);
+                await saveFactionManifest(factions.map(f => f.id || f.name), dataPath);
+            }
+        }
+        
+        // If still no factions, use defaults and generate manifest
+        if (factions.length === 0) {
+            console.warn('📥 No factions discovered. Using defaults and generating manifest.');
+            state.usingFallback = true;
+            loadDefaultFactions();
+            const defaultIds = state.factions.map(f => f.id || f.name);
+            await saveFactionManifest(defaultIds, dataPath);
+            showToast('⚠️ No faction files found. Using default factions.', 'warning');
+        } else {
             state.factions = factions;
             state.dataLoaded = true;
-            console.log(`✅ Loaded ${factions.length} factions from remote`);
-            
-            const saved = getState();
-            if (!saved.factions) saved.factions = {};
-            saved.factions.factions = factions;
-            saveState();
-        } else {
-            console.warn('No factions loaded from remote, using defaults');
-            loadDefaultFactions();
+            state.usingFallback = false;
         }
+        
+        // Save to global state
+        const saved = getState();
+        if (!saved.factions) saved.factions = {};
+        saved.factions.factions = state.factions;
+        saveState();
+        
     } catch (error) {
         console.warn('Failed to load remote factions:', error);
+        state.usingFallback = true;
         loadDefaultFactions();
+        showToast('⚠️ Error loading factions. Using defaults.', 'error');
     } finally {
         state.isLoading = false;
+    }
+}
+
+async function discoverFactions(dataPath) {
+    const discovered = [];
+    
+    // Try directory listing
+    try {
+        const dirRes = await fetch(dataPath);
+        if (dirRes.ok) {
+            const html = await dirRes.text();
+            const matches = html.match(/href="([^"]+\.json)"/gi);
+            if (matches) {
+                for (const m of matches) {
+                    const match = m.match(/href="([^"]+)"/i);
+                    if (match && !match[1].includes('manifest')) {
+                        let slug = match[1].replace(/\.json$/, '');
+                        slug = slug.split('/').pop();
+                        try {
+                            const res = await fetch(`${dataPath}${slug}.json`);
+                            if (res.ok) {
+                                const data = await res.json();
+                                if (!data.id) data.id = slug;
+                                discovered.push(data);
+                            }
+                        } catch (e) { /* ignore */ }
+                    }
+                }
+            }
+        }
+    } catch (e) { /* ignore */ }
+    
+    // Fallback to known slugs
+    if (discovered.length === 0) {
+        for (const slug of KNOWN_FACTION_SLUGS) {
+            try {
+                const res = await fetch(`${dataPath}${slug}.json`);
+                if (res.ok) {
+                    const data = await res.json();
+                    if (!data.id) data.id = slug;
+                    discovered.push(data);
+                }
+            } catch (e) { /* ignore */ }
+        }
+    }
+    
+    return discovered;
+}
+
+async function saveFactionManifest(names, dataPath) {
+    const manifestPath = dataPath === FACTION_DATA_PATH ? FACTION_MANIFEST_PATH : FALLBACK_MANIFEST_PATH;
+    try {
+        const res = await fetch(manifestPath, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(names)
+        });
+        if (res.ok) {
+            console.log(`✅ Faction manifest saved to ${manifestPath}`);
+            return;
+        }
+    } catch (e) {
+        console.warn('Could not save manifest via PUT, falling back to localStorage.', e);
+    }
+    
+    try {
+        localStorage.setItem('fates-edge-faction-manifest', JSON.stringify(names));
+        console.log('Faction manifest cached in localStorage');
+    } catch (e2) {
+        console.warn('Could not save manifest to localStorage.', e2);
     }
 }
 
@@ -354,6 +450,7 @@ function loadDefaultFactions() {
     state.followers = [...DEFAULT_FOLLOWERS];
     state.trusts = [...DEFAULT_TRUSTS];
     state.dataLoaded = true;
+    state.usingFallback = true;
     console.log(`📦 Using default faction data (${state.factions.length} factions, ${state.assets.length} assets, ${state.followers.length} followers, ${state.trusts.length} trusts)`);
 }
 
@@ -375,6 +472,8 @@ export function render(el) {
     container = el;
     loadFactionData();
 
+    const usingFallback = state.usingFallback;
+
     container.innerHTML = `
         <div class="factions-modern-layout">
             <header class="factions-header">
@@ -382,6 +481,7 @@ export function render(el) {
                 <p class="factions-subtitle">Manage factions, assets, followers, and trusts.</p>
                 ${!state.dataLoaded ? '<p class="text-muted" style="font-size:0.85rem;">⏳ Loading faction data...</p>' : 
                   `<p class="text-muted" style="font-size:0.85rem;">📚 ${state.factions.length} factions, ${state.assets.length} assets, ${state.followers.length} followers</p>`}
+                ${usingFallback ? `<div style="color:var(--warn);font-size:0.85rem;margin-top:0.3rem;">⚠️ No faction files found – using fallback defaults.</div>` : ''}
             </header>
 
             <div class="factions-tabs">
@@ -498,7 +598,7 @@ function renderFactions() {
                             `).join('')}
                             ${(f.hooks || []).length > 2 ? `<span class="hook-tag">+${f.hooks.length - 2}</span>` : ''}
                         </div>
-                        ${f.source === 'default' ? '<span class="badge badge-remote" style="font-size:0.6rem;">📦 Default</span>' : ''}
+                        ${f.source === 'default' || state.usingFallback ? '<span class="badge badge-remote" style="font-size:0.6rem;">📦 Default</span>' : ''}
                     </div>
                 `;
             }).join('')}
@@ -540,7 +640,7 @@ function renderAssets() {
                         <div class="asset-card-type">${escHtml(a.type || 'asset')}</div>
                         <div class="asset-card-status" style="color:${status.color};">${status.icon} ${status.label}</div>
                         <div class="asset-card-cost">${a.cost || 4} XP</div>
-                        ${a.source === 'default' ? '<span class="badge badge-remote" style="font-size:0.6rem;">📦 Default</span>' : ''}
+                        ${a.source === 'default' || state.usingFallback ? '<span class="badge badge-remote" style="font-size:0.6rem;">📦 Default</span>' : ''}
                     </div>
                 `;
             }).join('')}
@@ -586,7 +686,7 @@ function renderFollowers() {
                             <span class="follower-state" style="color:${fitness.color};">${fitness.icon} ${fitness.label}</span>
                         </div>
                         ${f.description ? `<div class="follower-desc">${escHtml(f.description)}</div>` : ''}
-                        ${f.source === 'default' ? '<span class="badge badge-remote" style="font-size:0.6rem;">📦 Default</span>' : ''}
+                        ${f.source === 'default' || state.usingFallback ? '<span class="badge badge-remote" style="font-size:0.6rem;">📦 Default</span>' : ''}
                     </div>
                 `;
             }).join('')}
@@ -627,7 +727,7 @@ function renderTrusts() {
                         <span>👤 ${t.followers?.length || 0} Followers</span>
                         <span>⚡ ${t.obligation || 0}/${t.capacity || 4}</span>
                     </div>
-                    ${t.source === 'default' ? '<span class="badge badge-remote" style="font-size:0.6rem;">📦 Default</span>' : ''}
+                    ${t.source === 'default' || state.usingFallback ? '<span class="badge badge-remote" style="font-size:0.6rem;">📦 Default</span>' : ''}
                 </div>
             `).join('')}
         </div>
@@ -788,7 +888,7 @@ function renderAssetDetail(assetId) {
                 </div>
                 ` : ''}
 
-                ${asset.source === 'default' ? '<span class="badge badge-remote">📦 Default Asset</span>' : ''}
+                ${asset.source === 'default' || state.usingFallback ? '<span class="badge badge-remote">📦 Default Asset</span>' : ''}
             </div>
 
             <div class="asset-detail-actions">
@@ -851,7 +951,7 @@ function renderFollowerDetail(followerId) {
                     </div>
                 </div>
 
-                ${follower.source === 'default' ? '<span class="badge badge-remote">📦 Default Follower</span>' : ''}
+                ${follower.source === 'default' || state.usingFallback ? '<span class="badge badge-remote">📦 Default Follower</span>' : ''}
             </div>
 
             <div class="follower-detail-actions">
@@ -937,7 +1037,7 @@ function renderTrustDetail(trustId) {
                     <button class="btn btn-sm btn-primary" onclick="window.addTrustFollower('${trust.id}')">➕ Add Follower</button>
                 </div>
 
-                ${trust.source === 'default' ? '<span class="badge badge-remote">📦 Default Trust</span>' : ''}
+                ${trust.source === 'default' || state.usingFallback ? '<span class="badge badge-remote">📦 Default Trust</span>' : ''}
             </div>
 
             <div class="trust-detail-actions">

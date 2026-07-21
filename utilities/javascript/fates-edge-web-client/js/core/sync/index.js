@@ -571,10 +571,14 @@ export class SyncManager {
    */
   connect(serverUrl, campaignCode, password, options = {}) {
     if (this.isConnected || this.isConnecting) {
-      console.warn('Already connected or connecting');
-      return Promise.resolve();
+        console.warn('Already connected or connecting');
+        return Promise.resolve();
     }
 
+    // If serverUrl not provided, try to read from localStorage (same key as websocket.js)
+    if (!serverUrl) {
+        serverUrl = localStorage.getItem('fates-edge-ws-url') || 'ws://localhost:10000';
+    }
     this.serverUrl = serverUrl;
     this.campaignCode = campaignCode.toUpperCase();
     this.clientName = options.name || this.clientName;
@@ -671,10 +675,20 @@ export class SyncManager {
   /**
    * Build WebSocket URL from server URL and campaign code
    */
-  buildWebSocketUrl(serverUrl, campaignCode) {
-    let wsUrl = serverUrl.replace(/^http/, 'ws');
-    wsUrl = wsUrl.replace(/\/$/, '');
-    return `${wsUrl}/campaign/${campaignCode}`;
+/**
+ * Build WebSocket URL from server URL and campaign code
+ * Now uses ?room=... instead of /campaign/...
+ */
+buildWebSocketUrl(serverUrl, campaignCode) {
+    let base = serverUrl.trim();
+    const isSecure = typeof window !== 'undefined' && window.location.protocol === 'https:';
+    if (!base.startsWith('ws://') && !base.startsWith('wss://')) {
+        base = (isSecure ? 'wss://' : 'ws://') + base;
+    }
+    base = base.replace(/\/+$/, '');
+    // Append room as query parameter (same as VTT module)
+    const separator = base.includes('?') ? '&' : '?';
+    return `${base}${separator}room=${campaignCode}`;
   }
 
   /**

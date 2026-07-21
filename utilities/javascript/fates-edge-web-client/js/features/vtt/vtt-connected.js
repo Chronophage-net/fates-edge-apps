@@ -6,6 +6,9 @@
  * 
  * Added GM election/promotion features (2026-07-16)
  * ✅ Whiteboard button added to header.
+ * ✅ Auto‑push characters to server on handshake.
+ * ✅ Voice chat integration.
+ * ✅ Dynamic API endpoint derivation from WebSocket URL.
  */
 
 import { vttStore } from '../../core/vtt-store.js';
@@ -22,6 +25,7 @@ import {
     offEvent,
     getRoomCode,
     getSocketId,
+    getApiBaseUrl,          // ← dynamically derived from WebSocket connection
     drawCards,
     shuffleDeck,
     drawCrownSpread,
@@ -93,6 +97,9 @@ let gmState = {
 };
 let clientsMap = new Map(); // id -> { id, name, role }
 
+// Character push guard
+let charactersPushed = false;
+
 // ============================================================
 // MESSAGE SENDING (with WebSocket sync)
 // ============================================================
@@ -119,7 +126,7 @@ export function sendMessage(text, sender, recipient = 'all', metadata = {}) {
     const msg = createMessage(text, sender, recipient, metadata);
 
     vttStore.addChatMessage(msg);
-    // Log chat message to VTT (FIXED: use object syntax)
+    // Log chat message to VTT
     if (!msg.whisper) {
         try {
             addVTTEvent({
@@ -303,6 +310,8 @@ async function handleClearDeckHistory() {
 function updateDeckUI() {
     const countEl = q('#vtt-deck-count');
     if (countEl) countEl.textContent = String(deckState.remaining || 0);
+    const headerCountEl = q('#vtt-deck-count-header');
+    if (headerCountEl) headerCountEl.textContent = String(deckState.remaining || 0);
 }
 
 function buildLocalDeck(count) {
@@ -650,6 +659,105 @@ function handleSlash(text) {
 }
 
 // ============================================================
+// CHARACTER PUSH TO SERVER (with dynamic API endpoint)
+// ============================================================
+
+async function pushCharactersToServer() {
+    const roomCode = getRoomCode();
+    if (!roomCode || typeof roomCode !== 'string' || roomCode.trim() === '') {
+        console.warn('[VTT] No valid room code, cannot push characters.');
+        return;
+    }
+
+    let apiKey = localStorage.getItem('fates-edge-api-key');
+    if (!apiKey) {
+        const input = prompt('Enter the server API key (or leave blank if not required):', 'your-secret-key-here');
+        if (input !== null) {
+            apiKey = input.trim();
+            if (apiKey) localStorage.setItem('fates-edge-api-key', apiKey);
+        }
+        if (!apiKey) {
+            console.warn('[VTT] No API key – character sync disabled.');
+            return;
+        }
+    }
+
+    const state = getState();
+    const characters = state.characters || [];
+    if (characters.length === 0) {
+        console.log('[VTT] No characters to push.');
+        return;
+    }
+
+    const updates = {};
+    characters.forEach(c => {
+        if (c.name) {
+            updates[c.name] = {
+                harm: c.harm || 0,
+                fatigue: c.fatigue || 0,
+                obligation: c.obligation || 0,
+                boons: c.boons || 0,
+                leash: c.leash || 0,
+                corruption: c.corruption || 0
+            };
+        }
+    });
+
+    if (Object.keys(updates).length === 0) {
+        console.log('[VTT] No valid character data to push.');
+        return;
+    }
+
+    // ---- Build endpoint ----
+    let apiBase = getApiBaseUrl();
+    if (apiBase && typeof apiBase === 'string') {
+        // CRITICAL: strip any query string (e.g., ?room=...) and trailing slash
+        apiBase = apiBase.split('?')[0].replace(/\/+$/, '');
+        if (apiBase === '') apiBase = null;
+    }
+
+    let endpoint;
+    if (apiBase) {
+        endpoint = `${apiBase}/rooms/${roomCode}/characters/update`;
+    } else {
+        const origin = window.location.origin || '';
+        endpoint = `${origin}/api/rooms/${roomCode}/characters/update`;
+    }
+
+    console.log('[VTT] Pushing characters to endpoint:', endpoint); // for debugging
+
+    try {
+        const response = await fetch(endpoint, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'x-api-key': apiKey
+            },
+            body: JSON.stringify({ updates })
+        });
+
+        if (response.ok) {
+            console.log(`✅ Pushed ${Object.keys(updates).length} characters to room ${roomCode}.`);
+            if (!charactersPushed) {
+                showToast(`📤 Characters synced to server for room ${roomCode}.`, 'success');
+                charactersPushed = true;
+            }
+        } else {
+            const text = await response.text();
+            console.warn(`❌ Failed to push characters: ${response.status} ${text}`);
+            if (!charactersPushed) {
+                showToast(`❌ Failed to sync characters (${response.status}). Check API key.`, 'error');
+            }
+        }
+    } catch (e) {
+        console.warn('❌ Error pushing characters:', e);
+        if (!charactersPushed) {
+            showToast('❌ Error syncing characters. Check connection.', 'error');
+        }
+    }
+}
+
+// ============================================================
 // WEBSOCKET SYNC SETUP (using unified WebSocket module)
 // ============================================================
 
@@ -658,7 +766,7 @@ function setupWebSocketSync() {
 
     cleanupWebSocketListeners();
 
-    // Push current state to server using sendEvent instead of syncState
+    // Push current state to server using sendEvent
     try {
         sendEvent({ type: 'state-updated', state: getState() });
     } catch (e) { /* ignore */ }
@@ -678,14 +786,16 @@ function setupWebSocketSync() {
     wsListeners.set('state-updated', stateHandler);
 
     // Chat messages
-    const chatHandler = (message) => {
+    const chatHandler = (data) => {
         if (isDestroyed) return;
+        // Extract the inner message if it's nested under `message` key
+        const msg = data.message || data;
         vttStore.addChatMessage({
-            ...message,
+            ...msg,
             local: false,
             sent: true
         });
-        if (message.sender !== 'GM' && message.sender !== 'System') {
+        if (msg.sender !== 'GM' && msg.sender !== 'System') {
             playNotificationSound();
         }
     };
@@ -730,7 +840,7 @@ function setupWebSocketSync() {
             cards: [],
             history: [],
             offset: Date.now(),
-            remaining: data.remaining || 54
+            remaining: data.remaining || 0
         };
         const msg = '🔀 Deck shuffled.';
         sendMessage(msg, 'Deck', 'all');
@@ -902,6 +1012,9 @@ function setupWebSocketSync() {
         vttStore.updateTimers(state.timers || []);
         vttStore.setConnectionStatus('connected');
         showToast('Reconnected to server!', 'success');
+        // Re-push characters after reconnect
+        charactersPushed = false;
+        pushCharactersToServer();
     };
     onWSEvent('connected', connectHandler);
     wsListeners.set('connected', connectHandler);
@@ -910,9 +1023,20 @@ function setupWebSocketSync() {
         if (isDestroyed) return;
         vttStore.setConnectionStatus('local');
         showToast('Disconnected from server. Messages will be local.', 'warning');
+        charactersPushed = false;
     };
     onWSEvent('disconnected', disconnectHandler);
     wsListeners.set('disconnected', disconnectHandler);
+
+    // ─── AUTO-PUSH ON HANDSHAKE ────────────────────────────────────
+    const handshakeHandler = (data) => {
+        if (data.success && !charactersPushed) {
+            // Wait a moment for room to be fully established
+            setTimeout(() => pushCharactersToServer(), 500);
+        }
+    };
+    onWSEvent('handshake_ack', handshakeHandler);
+    wsListeners.set('handshake_ack', handshakeHandler);
 
     console.log('[VTT Connected] WebSocket sync enabled with deck/module/GM support');
 }
@@ -1401,6 +1525,10 @@ export function render(el) {
     }, 5000);
 
     console.log('[VTT Connected] Rendered with reactive store + deck/module/GM support');
+    // Expose to console for debugging
+    window.getState = getState;
+    window.vttStore = vttStore;
+    window.pushCharactersToServer = pushCharactersToServer;
 }
 
 // ============================================================
@@ -1456,5 +1584,15 @@ export default {
         defaultRegion = region;
         const display = q('#vtt-region-display');
         if (display) display.textContent = region;
-    }
+    },
+    pushCharactersToServer, // exposed for manual trigger if needed
+    // Voice functions (exposed for integration)
+    initVoice,
+    toggleMute,
+    getVoiceStatus,
+    cleanupVoice,
+    getActiveVoiceClients,
+    getVoiceClient,
+    initiateVoiceCall,
+    onVoiceClientsChanged
 };

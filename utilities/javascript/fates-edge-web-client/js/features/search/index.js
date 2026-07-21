@@ -4,6 +4,7 @@
  * ✅ Falls back to local Fuse.js index
  * ✅ Auto‑generates index from /data/ static files if missing
  * ✅ Uses sessionStorage cache for generated index
+ * ✅ Debug logging to help diagnose issues
  */
 
 import { escHtml, buildDocumentUrl, getBaseUrl } from '../../core/utils.js';
@@ -24,7 +25,7 @@ const FALLBACK_ENTRIES = [
 // ------------------------------------------------------------------
 // 1. CONFIGURATION – Solr URL (set via global or env)
 // ------------------------------------------------------------------
-const SOLR_URL = window.__SOLR_URL || null;          // e.g. 'http://localhost:8983/solr/fatesedge/select'
+const SOLR_URL = window.__SOLR_URL || null;
 
 // ------------------------------------------------------------------
 // 2. RENDER
@@ -40,9 +41,10 @@ export function render(el) {
                     <input type="text" id="search-input" placeholder="Type your search…" autofocus />
                 </div>
                 <button class="btn btn-gold" id="search-button">Search</button>
+                <button class="btn btn-secondary" id="search-rebuild-btn">🔄 Rebuild Index</button>
             </div>
+            <div id="search-status" class="text-muted small mt-1" style="padding:0.3rem 0;"></div>
             <div id="search-results" class="mt-1" style="max-height:500px;overflow-y:auto;"></div>
-            <div id="search-status" class="text-muted small mt-1"></div>
         </div>
     `;
     loadSearchIndex();
@@ -53,53 +55,42 @@ export function render(el) {
 export function init(el) { return render(el); }
 
 // ------------------------------------------------------------------
-// 3. INDEX LOADING (Solr → local JSON → dynamic build → fallback)
+// 3. INDEX LOADING
 // ------------------------------------------------------------------
 async function loadSearchIndex() {
     if (isLoading) return;
     isLoading = true;
-    const status = document.getElementById('search-status');
-    if (status) status.textContent = 'Loading search index…';
+    updateStatus('Loading search index…', 'info');
 
     // 3a. Try Solr first (if configured)
     if (SOLR_URL) {
         const solrOk = await checkSolr();
         if (solrOk) {
-            if (status) status.textContent = '✅ Connected to Solr.';
+            updateStatus('✅ Connected to Solr.', 'success');
             isInitialized = true;
             isLoading = false;
             return;
         }
-        if (status) status.textContent = '⚠️ Solr unavailable, falling back to local index.';
+        updateStatus('⚠️ Solr unavailable, falling back to local index.', 'warning');
     }
 
-    // 3b. Load Fuse.js if needed
+    // 3b. Load Fuse.js
     const FuseLib = await loadFuseLibrary();
     if (!FuseLib) {
-        if (status) status.textContent = '⚠️ Failed to load search library.';
+        updateStatus('⚠️ Failed to load search library. Using fallback.', 'warning');
         isLoading = false;
         useFallbackIndex();
         return;
     }
 
-    // 3c. Try to load the pre‑built search_index.json
-    const prebuilt = await loadPrebuiltIndex();
-    if (prebuilt && prebuilt.length > 0) {
-        buildFuseIndex(FuseLib, prebuilt);
-        if (status) status.textContent = `✅ ${prebuilt.length} entries indexed.`;
-        isInitialized = true;
-        isLoading = false;
-        return;
-    }
-
-    // 3d. Try sessionStorage cache (dynamically built on previous visit)
+    // 3c. Try sessionStorage cache first (fastest)
     const cached = sessionStorage.getItem('searchIndex');
     if (cached) {
         try {
             const parsed = JSON.parse(cached);
             if (Array.isArray(parsed) && parsed.length > 0) {
                 buildFuseIndex(FuseLib, parsed);
-                if (status) status.textContent = '✅ Index loaded from cache.';
+                updateStatus(`✅ ${parsed.length} entries indexed (cache).`, 'success');
                 isInitialized = true;
                 isLoading = false;
                 return;
@@ -107,21 +98,41 @@ async function loadSearchIndex() {
         } catch (e) { /* ignore */ }
     }
 
-    // 3e. Dynamic index builder – fetch data from /data/ static files
-    if (status) status.textContent = '🔍 Generating search index from data files…';
+    // 3d. Try pre-built search_index.json
+    const prebuilt = await loadPrebuiltIndex();
+    if (prebuilt && prebuilt.length > 0) {
+        buildFuseIndex(FuseLib, prebuilt);
+        try { sessionStorage.setItem('searchIndex', JSON.stringify(prebuilt)); } catch (e) {}
+        updateStatus(`✅ ${prebuilt.length} entries indexed (pre-built).`, 'success');
+        isInitialized = true;
+        isLoading = false;
+        return;
+    }
+
+    // 3e. Dynamic index builder
+    updateStatus('🔍 Generating search index from data files…', 'info');
     const dynamic = await buildDynamicIndex();
     if (dynamic && dynamic.length > 0) {
-        // Store in sessionStorage for next time
         try { sessionStorage.setItem('searchIndex', JSON.stringify(dynamic)); } catch (e) {}
         buildFuseIndex(FuseLib, dynamic);
-        if (status) status.textContent = `✅ ${dynamic.length} entries indexed (dynamic).`;
+        updateStatus(`✅ ${dynamic.length} entries indexed (dynamic).`, 'success');
         isInitialized = true;
         isLoading = false;
         return;
     }
 
     // 3f. Everything failed → hardcoded fallback
+    updateStatus('⚠️ Using fallback index (search limited).', 'warning');
     useFallbackIndex();
+}
+
+function updateStatus(msg, type = 'info') {
+    const status = document.getElementById('search-status');
+    if (!status) return;
+    status.textContent = msg;
+    status.style.color = type === 'success' ? 'var(--green)' :
+                         type === 'warning' ? 'var(--gold)' :
+                         type === 'error' ? 'var(--red)' : 'var(--text3)';
 }
 
 // ------------------------------------------------------------------
@@ -153,11 +164,11 @@ async function solrSearch(query) {
             url: doc.url || '#',
             type: doc.type || 'document',
             category: doc.category || '',
-            score: 1 - (doc.score ? doc.score / 100 : 0),  // approximate for display
+            score: 1 - (doc.score ? doc.score / 100 : 0),
         }));
     } catch (err) {
         console.error('Solr search error:', err);
-        return null;  // fall back to local Fuse
+        return null;
     }
 }
 
@@ -176,7 +187,7 @@ async function loadFuseLibrary() {
 }
 
 // ------------------------------------------------------------------
-// 6. PRE‑BUILT INDEX LOADER (search_index.json)
+// 6. PRE‑BUILT INDEX LOADER
 // ------------------------------------------------------------------
 async function loadPrebuiltIndex() {
     const baseUrl = getBaseUrl();
@@ -202,95 +213,138 @@ async function loadPrebuiltIndex() {
 // ------------------------------------------------------------------
 async function buildDynamicIndex() {
     const entries = [];
+    const baseUrl = getBaseUrl();
 
-    // 7a. Load wiki.json
-    try {
-        const wiki = await fetch('/data/wiki.json').then(r => r.json());
-        if (Array.isArray(wiki)) {
-            wiki.forEach(item => entries.push({
+    // Helper to safely fetch and parse JSON
+    async function fetchJSON(url) {
+        try {
+            const res = await fetch(url, { cache: 'no-cache' });
+            if (!res.ok) return null;
+            return await res.json();
+        } catch { return null; }
+    }
+
+    // 7a. Wiki
+    const wikiData = await fetchJSON('/data/wiki.json');
+    if (Array.isArray(wikiData)) {
+        wikiData.forEach(item => {
+            entries.push({
                 title: item.title || item.name || 'Wiki Entry',
                 content: item.content || item.description || '',
                 url: item.url || '#',
                 type: 'wiki',
                 category: item.category || 'Wiki'
-            }));
-        }
-    } catch (e) { /* ignore */ }
+            });
+        });
+    }
 
-    // 7b. Load faction manifest
-    try {
-        const factions = await fetch('/data/factions/manifest.json').then(r => r.json());
-        if (Array.isArray(factions)) {
-            factions.forEach(f => entries.push({
-                title: f.name,
-                content: f.description || '',
-                url: `#/factions/${f.id || f.name}`,
-                type: 'faction',
-                category: 'Factions'
-            }));
+    // 7b. Factions (manifest + individual files)
+    const factionManifest = await fetchJSON('/data/factions/manifest.json');
+    if (Array.isArray(factionManifest)) {
+        for (const f of factionManifest) {
+            const id = typeof f === 'string' ? f : f.id || f.name;
+            if (!id) continue;
+            // Try to load the actual faction file for more content
+            const factionData = await fetchJSON(`/data/factions/${id}.json`);
+            if (factionData) {
+                entries.push({
+                    title: factionData.name || id,
+                    content: factionData.description || factionData.agenda || '',
+                    url: `#/factions/${id}`,
+                    type: 'faction',
+                    category: 'Factions'
+                });
+            } else {
+                entries.push({
+                    title: id,
+                    content: '',
+                    url: `#/factions/${id}`,
+                    type: 'faction',
+                    category: 'Factions'
+                });
+            }
         }
-    } catch (e) { /* ignore */ }
+    }
 
-    // 7c. Load patron manifest
-    try {
-        const patrons = await fetch('/data/patrons/manifest.json').then(r => r.json());
-        if (Array.isArray(patrons)) {
-            patrons.forEach(p => entries.push({
-                title: p.name,
-                content: p.description || '',
-                url: `#/patrons/${p.id || p.name}`,
-                type: 'patron',
-                category: 'Patrons'
-            }));
+    // 7c. Patrons (cosmic)
+    const patronManifest = await fetchJSON('/data/patrons/manifest.json');
+    if (Array.isArray(patronManifest)) {
+        for (const p of patronManifest) {
+            const id = typeof p === 'string' ? p : p.id || p.name;
+            if (!id) continue;
+            const patronData = await fetchJSON(`/data/patrons/${id}.json`);
+            if (patronData) {
+                // Extract description from nested structure
+                let desc = '';
+                if (patronData.lore && patronData.lore.description) desc = patronData.lore.description;
+                else if (patronData.description) desc = typeof patronData.description === 'string' ? patronData.description : JSON.stringify(patronData.description);
+                entries.push({
+                    title: patronData.name || patronData.title || id,
+                    content: desc || patronData.subtitle || '',
+                    url: `#/patrons/${id}`,
+                    type: 'patron',
+                    category: 'Patrons'
+                });
+            } else {
+                entries.push({
+                    title: id,
+                    content: '',
+                    url: `#/patrons/${id}`,
+                    type: 'patron',
+                    category: 'Patrons'
+                });
+            }
         }
-    } catch (e) { /* ignore */ }
+    }
 
-    // 7d. Load region data (manual list from known files)
-    const regionFiles = ['acasia', 'ecktoria', 'silkstrand', 'vhasia', 'ykrul'];
-    for (const region of regionFiles) {
-        try {
-            const r = await fetch(`/data/regions/${region}.json`).then(r => r.json());
+    // 7d. Regions (try to find region files)
+    const knownRegions = ['acasia', 'ecktoria', 'silkstrand', 'vhasia', 'ykrul', 'valewood', 'aelinnel', 'aelaerem', 'aeler', 'mistlands', 'thepyrgos', 'ubral', 'zakov', 'kahfagia'];
+    for (const region of knownRegions) {
+        const regionData = await fetchJSON(`/data/regions/${region}.json`);
+        if (regionData) {
+            let desc = '';
+            if (regionData.overview) {
+                desc = regionData.overview.tagline || '';
+                if (regionData.overview.genre) desc += ' ' + regionData.overview.genre;
+                if (regionData.overview.mood) desc += ' ' + regionData.overview.mood;
+            }
             entries.push({
-                title: r.name || region,
-                content: r.description || '',
+                title: regionData.title || regionData.name || region,
+                content: desc || '',
                 url: `#/regions/${region}`,
                 type: 'region',
                 category: 'Regions'
             });
-        } catch (e) { /* ignore */ }
+        }
     }
 
-    // 7e. Load docs manifest (core) to get document metadata
-    try {
-        const manifest = await fetch('/data/docs/manifest-core.json').then(r => r.json());
-        const docs = manifest.documents || manifest;
-        if (Array.isArray(docs)) {
-            docs.forEach(d => {
-                if (d.title) {
-                    entries.push({
-                        title: d.title,
-                        content: d.description || d.title,
-                        url: buildDocumentUrl(`/data/docs/${d.file || d.id || ''}`),
-                        type: 'document',
-                        category: d.category || 'Documents'
-                    });
-                }
-            });
-        }
-    } catch (e) { /* ignore */ }
+    // 7e. Core documents from manifest
+    const docManifest = await fetchJSON('/data/docs/manifest-core.json');
+    if (docManifest && docManifest.documents) {
+        docManifest.documents.forEach(d => {
+            if (d.title) {
+                entries.push({
+                    title: d.title,
+                    content: d.description || d.title,
+                    url: buildDocumentUrl(`/data/docs/${d.file || d.id || ''}`),
+                    type: 'document',
+                    category: d.category || 'Documents'
+                });
+            }
+        });
+    }
 
-    // 7f. If nothing found, return null (will fall back to hardcoded)
-    if (entries.length === 0) return null;
-
-    // Remove duplicates by title (crude)
+    // Deduplicate
     const seen = new Set();
     const deduped = entries.filter(e => {
-        const key = e.title.toLowerCase();
+        const key = (e.title + e.type).toLowerCase();
         if (seen.has(key)) return false;
         seen.add(key);
         return true;
     });
-    return deduped;
+
+    console.log(`[Search] Built dynamic index with ${deduped.length} entries`);
+    return deduped.length > 0 ? deduped : null;
 }
 
 // ------------------------------------------------------------------
@@ -313,17 +367,13 @@ function buildFuseIndex(FuseLib, indexData) {
 }
 
 function useFallbackIndex() {
-    const status = document.getElementById('search-status');
     searchIndex = FALLBACK_ENTRIES;
     if (typeof Fuse !== 'undefined') {
         buildFuseIndex(Fuse, FALLBACK_ENTRIES);
     }
-    if (status) {
-        status.textContent = '⚠️ Using fallback index (search limited)';
-        status.style.color = 'var(--gold)';
-    }
     isInitialized = true;
     isLoading = false;
+    updateStatus(`⚠️ Using fallback index (${FALLBACK_ENTRIES.length} entries).`, 'warning');
 }
 
 // ------------------------------------------------------------------
@@ -345,7 +395,6 @@ export async function performSearch(query) {
             renderResults(solrResults, query);
             return;
         }
-        // If Solr fails or returns nothing, fall back to Fuse
     }
 
     if (!fuse) {
@@ -374,7 +423,7 @@ function renderResults(items, query) {
         const title = item.title || 'Untitled';
         const content = item.content || '';
         const rawUrl = item.url || '#';
-        const url = buildDocumentUrl(rawUrl);
+        const url = rawUrl.startsWith('#') ? rawUrl : buildDocumentUrl(rawUrl);
 
         const typeMap = {
             'srd': '📖 SRD', 'document': '📄 Document', 'wiki': '📚 Wiki',
@@ -387,7 +436,7 @@ function renderResults(items, query) {
 
         return `
             <div class="search-result" style="padding:0.5rem 0;border-bottom:1px solid var(--border);">
-                <a href="${url}" target="_blank" style="font-weight:600;color:var(--gold);">${escHtml(title)}</a>
+                <a href="${url}" ${url.startsWith('#') ? `onclick="window.location.hash='${url.substring(1)}';return false;"` : `target="_blank"`} style="font-weight:600;color:var(--gold);">${escHtml(title)}</a>
                 <span class="text-muted small"> (${typeLabel})</span>
                 ${item.category ? `<span class="text-muted small"> • ${escHtml(item.category)}</span>` : ''}
                 ${item.score !== undefined && item.score < 100 ? `<span class="text-muted small" style="font-size:0.7rem;"> • ${item.score}% match</span>` : ''}
@@ -396,9 +445,7 @@ function renderResults(items, query) {
     }).join('');
 
     container.innerHTML = html;
-
-    const status = document.getElementById('search-status');
-    if (status) status.textContent = `Found ${items.length} results for "${query}"`;
+    updateStatus(`Found ${items.length} results for "${query}"`, 'success');
 }
 
 // ------------------------------------------------------------------
@@ -425,6 +472,26 @@ export function attachEvents() {
             if (inputEl) performSearch(inputEl.value.trim());
         });
     }
+
+    const rebuildBtn = container.querySelector('#search-rebuild-btn');
+    if (rebuildBtn) {
+        const newBtn = rebuildBtn.cloneNode(true);
+        rebuildBtn.parentNode.replaceChild(newBtn, rebuildBtn);
+        newBtn.addEventListener('click', async () => {
+            updateStatus('🔄 Rebuilding index…', 'info');
+            sessionStorage.removeItem('searchIndex');
+            fuse = null;
+            searchIndex = [];
+            isInitialized = false;
+            isLoading = false;
+            const results = document.getElementById('search-results');
+            if (results) results.innerHTML = '';
+            await loadSearchIndex();
+            if (isInitialized) {
+                updateStatus('✅ Index rebuilt successfully.', 'success');
+            }
+        });
+    }
 }
 
 export function search(query) {
@@ -434,6 +501,7 @@ export function search(query) {
 
 export function reloadIndex() {
     fuse = null; searchIndex = []; isInitialized = false; isLoading = false;
+    sessionStorage.removeItem('searchIndex');
     loadSearchIndex();
 }
 

@@ -10,13 +10,14 @@
  * - Simple drawing tools (pen, eraser, line, rectangle, ruler, text)
  * - WebSocket sync for real-time collaboration
  * - Grid combat mode with tactical overlays (ZoC, Flanking, Drag & Drop)
+ * - Kon'reh Board Game integration
  * - Records movements to media manifest for VOD creators
  */
 
 import { getState, saveState } from '../../core/state.js';
 import { showToast } from '../../components/Toast.js';
 import { escHtml } from '../../core/utils.js';
-import { logRecordingEvent } from '../../core/media.js'; // New: For recording transcripts
+import { logRecordingEvent } from '../../core/media.js'; 
 import { 
     isConnectedToServer, 
     onWSEvent, 
@@ -24,6 +25,7 @@ import {
     sendMessage as sendWSMessage,
     getConnectionMode
 } from '../../core/websocket.js';
+import { openKonrehModal } from './kon-reh.js';
 
 // ============================================================
 // CONSTANTS
@@ -81,12 +83,14 @@ let isSyncing = false;
 let isOfflineMode = false;
 let gridCombatActive = false;
 
-// New state for tactical interactions
 let isDraggingToken = false;
 let draggedToken = null;
 let tokenStartPos = null;
 let rulerStart = null;
 let rulerEnd = null;
+
+let konrehGame = null;
+let konrehActive = false;
 
 // ============================================================
 // LOAD/SAVE
@@ -270,7 +274,11 @@ function toggleGridCombat() {
         btn.className = gridCombatActive ? 'btn btn-sm btn-danger' : 'btn btn-sm btn-secondary';
     }
     if (addTokenBtn) {
-        addTokenBtn.style.display = gridCombatActive ? 'inline-block' : 'none';
+        addTokenBtn.style.display = gridCombatActive && !konrehActive ? 'inline-block' : 'none';
+    }
+    
+    if (!gridCombatActive && konrehActive) {
+        toggleKonreh(); // Turn off Kon'reh if grid combat is disabled
     }
     
     showToast(gridCombatActive ? '⚔️ Grid Combat Mode enabled' : 'Grid Combat disabled', gridCombatActive ? 'success' : 'info');
@@ -293,10 +301,45 @@ function renderGridCombat() {
     
     ctx.restore();
     
-    if (gc.showCoordinates) drawCoordinates(cellSize, gc.gridType);
+    if (gc.showCoordinates && !konrehActive) drawCoordinates(cellSize, gc.gridType); // Hide standard coords in Kon'reh to avoid clutter
     if (gc.showZones) drawZonesOfControl(cellSize, gc.gridType);
     
     drawTokens(cellSize, gc.gridType);
+    
+    if (konrehActive) drawKonrehBoardOverlay(cellSize);
+}
+
+function drawKonrehBoardOverlay(cellSize) {
+    if (!ctx) return;
+    ctx.save();
+    
+    // Highlight the 8x8 board bounds
+    ctx.strokeStyle = 'rgba(212, 175, 55, 0.8)';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(0, 0, cellSize * 8, cellSize * 8);
+    
+    // Highlight Apexes and Sanctums
+    const drawApexMarker = (x, y, label, color) => {
+        ctx.fillStyle = color;
+        ctx.fillRect(x * cellSize, y * cellSize, cellSize, cellSize);
+        ctx.fillStyle = 'rgba(255,255,255,0.6)';
+        ctx.font = 'bold 10px monospace';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(label, x * cellSize + cellSize/2, y * cellSize + cellSize/2);
+    };
+    
+    drawApexMarker(0, 0, 'H1', '#4a90d9'); // P1 Home
+    drawApexMarker(7, 7, 'H2', '#d94a4a'); // P2 Home
+    drawApexMarker(0, 7, 'S', '#d4af37');  // Sanctum
+    drawApexMarker(7, 0, 'S', '#d4af37');  // Sanctum
+    
+    // Highlight the Cross (Central Four)
+    ctx.strokeStyle = 'rgba(107, 170, 122, 0.8)';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(3 * cellSize, 3 * cellSize, cellSize * 2, cellSize * 2);
+    
+    ctx.restore();
 }
 
 function drawSquareGrid(cellSize) {
@@ -420,8 +463,8 @@ function drawTokens(cellSize, gridType) {
         const tacStatus = checkTacticalStatus(token);
         ctx.save();
         
-        if (tacStatus.isFlanked) {
-            ctx.strokeStyle = '#e8c84a'; // Gold for flanked
+        if (tacStatus.isFlanked && !konrehActive) {
+            ctx.strokeStyle = '#e8c84a'; 
             ctx.lineWidth = 3;
             ctx.setLineDash([6, 6]);
             ctx.strokeRect(token.x - 3, token.y - 3, cellSize + 6, cellSize + 6);
@@ -453,8 +496,8 @@ function drawTokens(cellSize, gridType) {
 }
 
 function addGridToken() {
-    if (!gridCombatActive) {
-        showToast('Enable Grid Combat mode first', 'error');
+    if (!gridCombatActive || konrehActive) {
+        showToast('Disable Kon\'reh mode to add custom tokens', 'error');
         return;
     }
     
@@ -500,6 +543,67 @@ function clearGridTokens() {
     saveWhiteboardData();
     renderGridCombat();
     showToast('🗑️ All tokens removed', 'info');
+}
+
+// ============================================================
+// KON'REH INTEGRATION
+// ============================================================
+
+function toggleKonreh() {
+    if (!gridCombatActive) {
+        toggleGridCombat(); 
+    }
+
+    if (konrehActive) {
+        konrehActive = false;
+        konrehGame = null;
+        showToast("Kon'reh mode disabled", 'info');
+        const btn = document.getElementById('whiteboard-konreh');
+        if (btn) btn.className = 'btn btn-sm btn-secondary';
+        const addTokenBtn = document.getElementById('whiteboard-add-token');
+        if (addTokenBtn) addTokenBtn.style.display = 'inline-block';
+        return;
+    }
+
+    konrehGame = new KonrehGame();
+    konrehActive = true;
+    state.gridCombat.cellSize = 64; 
+    state.gridCombat.gridType = 'square';
+    
+    const btn = document.getElementById('whiteboard-konreh');
+    if (btn) btn.className = 'btn btn-sm btn-gold';
+    
+    const addTokenBtn = document.getElementById('whiteboard-add-token');
+    if (addTokenBtn) addTokenBtn.style.display = 'none';
+    
+    state.gridCombat.tokens = [];
+    const cellSize = state.gridCombat.cellSize;
+    for (const id in konrehGame.pieces) {
+        const p = konrehGame.pieces[id];
+        if (p.isAlive) {
+            let color = '#d4af37';
+            if (p.type === 'blue') color = p.player === 1 ? '#4a90d9' : '#d94a4a';
+            if (p.type === 'red') color = '#d94a4a';
+            if (p.type === 'orange') color = '#d9a54a';
+            if (p.type === 'green') color = '#4ad97a';
+            
+            state.gridCombat.tokens.push({
+                id: p.id,
+                label: p.type.charAt(0).toUpperCase(),
+                faction: p.player === 1 ? 'ally' : 'enemy',
+                x: p.x * cellSize,
+                y: p.y * cellSize,
+                color: color,
+                harm: 0,
+                fatigue: 0,
+                tags: []
+            });
+        }
+    }
+    saveWhiteboardData();
+    restoreDrawings();
+    renderGridCombat();
+    showToast("🌀 Kon'reh Mode enabled! Drag pieces to play.", 'success');
 }
 
 // ============================================================
@@ -561,7 +665,8 @@ export function render(el) {
                     <button class="btn btn-sm ${gridCombatActive ? 'btn-danger' : 'btn-secondary'}" id="whiteboard-grid-combat">
                         ${gridCombatActive ? '⚔️ Combat ON' : '⚔️ Combat OFF'}
                     </button>
-                    <button class="btn btn-sm btn-secondary" id="whiteboard-add-token" style="${gridCombatActive ? '' : 'display:none;'}">🎯 Add Token</button>
+                    <button class="btn btn-sm btn-secondary" id="whiteboard-add-token" style="${gridCombatActive && !konrehActive ? '' : 'display:none;'}">🎯 Add Token</button>
+                    <button class="btn btn-sm ${konrehActive ? 'btn-gold' : 'btn-secondary'}" id="whiteboard-konreh">🌀 Kon'reh</button>
                 </div>
             </div>
 
@@ -660,8 +765,8 @@ function drawStroke(drawing) {
 }
 
 function snapToGrid(x, y) {
-    if (!state.settings.gridSnap) return { x, y };
-    const gridSize = state.settings.gridSize || 40;
+    if (!state.settings.gridSnap && !konrehActive) return { x, y };
+    const gridSize = konrehActive ? (state.gridCombat.cellSize || 64) : (state.settings.gridSize || 40);
     return { x: Math.round(x / gridSize) * gridSize, y: Math.round(y / gridSize) * gridSize };
 }
 
@@ -702,7 +807,6 @@ function startDrawing(e) {
     const y = (e.clientY || e.touches?.[0]?.clientY || 0) - rect.top;
     const pos = snapToGrid(x, y);
 
-    // Token Dragging
     if (currentTool === 'select' && gridCombatActive) {
         const cellSize = state.gridCombat.cellSize || 40;
         const clickedToken = state.gridCombat.tokens.find(t => 
@@ -717,7 +821,6 @@ function startDrawing(e) {
         }
     }
 
-    // Ruler Tool
     if (currentTool === 'ruler') {
         isDrawing = true;
         rulerStart = pos;
@@ -753,16 +856,24 @@ function draw(e) {
     const y = (e.clientY || e.touches?.[0]?.clientY || 0) - rect.top;
     const pos = snapToGrid(x, y);
 
-    // Token Dragging
     if (isDraggingToken && draggedToken) {
-        draggedToken.x = pos.x;
-        draggedToken.y = pos.y;
+        const cellSize = state.gridCombat.cellSize || 40;
+        if (konrehActive && konrehGame) {
+            const targetX = Math.floor(pos.x / cellSize);
+            const targetY = Math.floor(pos.y / cellSize);
+            if (targetX >= 0 && targetX < 8 && targetY >= 0 && targetY < 8) {
+                draggedToken.x = targetX * cellSize;
+                draggedToken.y = targetY * cellSize;
+            }
+        } else {
+            draggedToken.x = pos.x;
+            draggedToken.y = pos.y;
+        }
         restoreDrawings();
         renderGridCombat();
         return;
     }
 
-    // Ruler Drawing
     if (currentTool === 'ruler' && rulerStart) {
         rulerEnd = pos;
         restoreDrawings();
@@ -776,7 +887,7 @@ function draw(e) {
         const feet = cells * 5;
         
         ctx.save();
-        ctx.strokeStyle = '#6baa7a'; // Green
+        ctx.strokeStyle = '#6baa7a'; 
         ctx.lineWidth = 2;
         ctx.setLineDash([6, 6]);
         ctx.beginPath();
@@ -820,10 +931,53 @@ function draw(e) {
 }
 
 function endDrawing(e) {
-    // Handle Token Drop
     if (isDraggingToken) {
         if (draggedToken && tokenStartPos) {
             const cellSize = state.gridCombat.cellSize || 40;
+            
+            if (konrehActive && konrehGame) {
+                const fromX = Math.floor(tokenStartPos.x / cellSize);
+                const fromY = Math.floor(tokenStartPos.y / cellSize);
+                const toX = Math.floor(draggedToken.x / cellSize);
+                const toY = Math.floor(draggedToken.y / cellSize);
+                
+                const validMoves = konrehGame.getValidMoves(draggedToken.id);
+                const validMove = validMoves.find(m => m.x === toX && m.y === toY);
+                
+                if (validMove) {
+                    konrehGame.makeMove(draggedToken.id, validMove);
+                    
+                    if (validMove.capture) {
+                        state.gridCombat.tokens = state.gridCombat.tokens.filter(t => t.id !== validMove.targetId);
+                    }
+                    
+                    if (validMove.slideEnd) {
+                        draggedToken.x = validMove.slideEnd.x * cellSize;
+                        draggedToken.y = validMove.slideEnd.y * cellSize;
+                    } else {
+                        draggedToken.x = toX * cellSize;
+                        draggedToken.y = toY * cellSize;
+                    }
+                    
+                    logRecordingEvent('konreh_move', `Moved ${draggedToken.label} to (${toX}, ${toY}).`);
+                    showToast(`Valid Kon'reh Move`, 'success');
+                } else {
+                    draggedToken.x = tokenStartPos.x;
+                    draggedToken.y = tokenStartPos.y;
+                    showToast("Invalid Kon'reh move!", 'error');
+                }
+                
+                saveWhiteboardData();
+                restoreDrawings();
+                renderGridCombat();
+                
+                isDraggingToken = false;
+                draggedToken = null;
+                tokenStartPos = null;
+                canvas.style.cursor = 'grab';
+                return;
+            }
+            
             const dx = draggedToken.x - tokenStartPos.x;
             const dy = draggedToken.y - tokenStartPos.y;
             const cellsMoved = Math.round(Math.sqrt(dx*dx + dy*dy) / cellSize);
@@ -848,7 +1002,6 @@ function endDrawing(e) {
         return;
     }
 
-    // Handle Ruler End
     if (currentTool === 'ruler' && rulerStart && rulerEnd) {
         const dx = rulerEnd.x - rulerStart.x;
         const dy = rulerEnd.y - rulerStart.y;
@@ -925,12 +1078,17 @@ export function attachEvents() {
     
     document.getElementById('whiteboard-grid-combat')?.addEventListener('click', toggleGridCombat);
     document.getElementById('whiteboard-add-token')?.addEventListener('click', addGridToken);
+    document.getElementById('whiteboard-konreh')?.addEventListener('click', toggleKonreh);
     document.getElementById('whiteboard-clear')?.addEventListener('click', clearWhiteboardAll);
     document.getElementById('whiteboard-export')?.addEventListener('click', exportWhiteboard);
     document.getElementById('whiteboard-add-note')?.addEventListener('click', addWhiteboardNote);
     document.getElementById('whiteboard-upload-image')?.addEventListener('click', uploadWhiteboardImage);
     document.getElementById('whiteboard-clear-drawings')?.addEventListener('click', clearWhiteboardDrawings);
     document.getElementById('whiteboard-sync-btn')?.addEventListener('click', forceSync);
+    document.getElementById('whiteboard-konreh')?.addEventListener('click', () => {
+    openKonrehModal();
+    });
+
 
     if (canvas) {
         canvas.addEventListener('mousedown', startDrawing);
@@ -958,20 +1116,19 @@ export function attachEvents() {
     window.deleteWhiteboardImage = (id) => {
         state.images = state.images.filter(i => i.id !== id);
         saveWhiteboardData(); renderOverlay();
-            // Listen for connection changes
-        document.addEventListener('connection-change', (e) => {
-            const connected = e.detail?.connected || false;
-            isOfflineMode = !connected;
-            updateConnectionStatusUI(connected);
-            if (connected) {
-                setupWebSocketSync();
-                showToast('🔄 Whiteboard reconnected and syncing', 'success');
-            } else {
-                showToast('📡 Whiteboard in local mode', 'info');
-            }
-        });
     };
     
+    document.addEventListener('connection-change', (e) => {
+        const connected = e.detail?.connected || false;
+        isOfflineMode = !connected;
+        updateConnectionStatusUI(connected);
+        if (connected) {
+            setupWebSocketSync();
+            showToast('🔄 Whiteboard reconnected and syncing', 'success');
+        } else {
+            showToast('📡 Whiteboard in local mode', 'info');
+        }
+    });
 }
 
 // ============================================================
@@ -1033,6 +1190,7 @@ export function clearWhiteboardAll() {
     state.notes = [];
     state.images = [];
     state.gridCombat.tokens = [];
+    if (konrehActive) toggleKonreh();
     saveWhiteboardData();
     restoreDrawings();
     renderOverlay();
@@ -1042,12 +1200,11 @@ export function clearWhiteboardAll() {
 
 export function exportWhiteboard() {
     if (!canvas) return;
-    // Create a temporary canvas to draw background + tokens cleanly for export
     const tempCanvas = document.createElement('canvas');
     tempCanvas.width = canvas.width;
     tempCanvas.height = canvas.height;
     const tempCtx = tempCanvas.getContext('2d');
-    tempCtx.fillStyle = '#12121a'; // bg2
+    tempCtx.fillStyle = '#12121a'; 
     tempCtx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
     tempCtx.drawImage(canvas, 0, 0);
 

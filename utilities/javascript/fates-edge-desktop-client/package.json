@@ -1,6 +1,6 @@
 {
   "name": "fates-edge-client",
-  "version": "4.1.1",
+  "version": "4.1.2",
   "description": "Fate's Edge VTT Desktop Client",
   "main": "electron.js",
   "author": {

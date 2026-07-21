@@ -48,11 +48,11 @@ export function render(el) {
             <div class="char-list" id="char-list"></div>
         </div>
         
-        <!-- Talent Catalogue - Compact -->
+        <!-- Talent Catalog - Compact -->
         <div class="panel" id="talent-panel" style="position:relative;">
             <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.5rem;">
                 <div style="display:flex;align-items:center;gap:0.5rem;">
-                    <h3 style="margin:0;">🧠 Talent Catalogue</h3>
+                    <h3 style="margin:0;">🧠 Talent Catalog</h3>
                     <span class="text-muted" style="font-size:0.7rem;" id="talent-count"></span>
                 </div>
                 <div style="display:flex;gap:0.3rem;">

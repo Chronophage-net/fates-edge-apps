@@ -173,6 +173,20 @@ function normalizeSocketURL(url) {
 }
 
 // ============================================================
+// STATE (add these near the top)
+// ============================================================
+
+let currentServerUrl = null;   // e.g., "ws://foobar:12345" or "https://..."
+let cachedApiBase = null;      // computed HTTP API base URL
+
+// Helper to get API port override (from config, env, or localStorage)
+function getApiPortOverride() {
+    // Try environment variable, then localStorage, then fallback to null
+    const port = import.meta.env?.VITE_API_PORT || localStorage.getItem('fates-edge-api-port');
+    return port ? parseInt(port, 10) : null;
+}
+
+// ============================================================
 // PLAIN WEBSOCKET MODE
 // ============================================================
 
@@ -214,7 +228,9 @@ export function connectWebSocket(room = null, url = null) {
             wsStatus = 'connected';
             isConnected = true;
             roomCode = roomName;
-            
+            currentServerUrl = ws.url;          // Store the full WebSocket URL
+            cachedApiBase = null;
+
             socketId = `ws_${Date.now()}_${Math.random().toString(36).substr(2, 6)}`;
             
             const state = getState();
@@ -639,7 +655,9 @@ export function initSocketIO(serverUrl = null, options = {}) {
                     socketId = socket.id;
                     reconnectAttempts = 0;
                     wsStatus = 'connected';
-                    
+                    currentServerUrl = socket.io.uri;   // e.g., "https://foobar:12345" (Socket.io uses http(s))
+                    cachedApiBase = null;
+
                     const state = getState();
                     state.wsStatus = 'connected';
                     state.wsSocketId = socketId;
@@ -1149,6 +1167,44 @@ export function sendMediaBroadcast(data) {
     }
 }
 
+/**
+ * Returns the HTTP API base URL (e.g., "http://foobar:1000/api")
+ * derived from the WebSocket/Socket.io connection URL.
+ * Falls back to an empty string (relative path) if not connected.
+ */
+export function getApiBaseUrl() {
+    if (cachedApiBase !== null) return cachedApiBase;
+
+    if (!currentServerUrl) {
+        // Not connected – fallback to relative path
+        cachedApiBase = '';
+        return cachedApiBase;
+    }
+
+    try {
+        const url = new URL(currentServerUrl);
+        
+        // Convert ws(s) → http(s)
+        url.protocol = url.protocol.replace('ws', 'http');
+        
+        // Override port if configured
+        const apiPort = getApiPortOverride();
+        if (apiPort !== null) {
+            url.port = String(apiPort);
+        }
+        
+        // Append '/api' (or adjust if your API uses a different path)
+        url.pathname = '/api';
+        
+        cachedApiBase = url.toString().replace(/\/$/, '');
+        return cachedApiBase;
+    } catch (e) {
+        console.warn('[WebSocket] Failed to derive API base URL:', e);
+        cachedApiBase = '';
+        return cachedApiBase;
+    }
+}
+
 // ============================================================
 // DECK OPERATIONS
 // ============================================================
@@ -1508,6 +1564,7 @@ export default {
     sendRoll,
     sendEvent,
     getConnectedClients,
+    getApiBaseUrl,
     sendMediaBroadcast,
     
     // Deck operations (now return Promises)

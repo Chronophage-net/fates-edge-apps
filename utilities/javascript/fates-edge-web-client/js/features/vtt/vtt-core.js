@@ -140,8 +140,7 @@ export function renderChat() {
                     <div style="display:flex;align-items:center;gap:0.3rem;flex-wrap:wrap;">
                         <span style="color:var(--text2);font-size:0.7rem;">${escHtml(time)}</span>
                         <strong style="color:${senderColor};">${escHtml(sender)}${recipient}:</strong>
-                        <span style="word-break:break-word;">${whisper}${escHtml(String(text))}</span>
-                        ${modeBadge}
+                        <span style="word-break:break-word;">${whisper}${sender === 'GM' ? text : escHtml(String(text))}</span>                        ${modeBadge}
                         <span class="msg-status" style="font-size:0.6rem;color:${statusColor};margin-left:auto;" title="${statusTitle}">${statusIcon}</span>
                     </div>
                     ${msg.rollData ? renderRollDetails(msg.rollData) : ''}
