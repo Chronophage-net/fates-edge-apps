@@ -225,7 +225,7 @@ async function buildDynamicIndex() {
     }
 
     // 7a. Wiki
-    const wikiData = await fetchJSON('/data/wiki.json');
+    const wikiData = await fetchJSON('./data/wiki.json');
     if (Array.isArray(wikiData)) {
         wikiData.forEach(item => {
             entries.push({
@@ -239,7 +239,7 @@ async function buildDynamicIndex() {
     }
 
     // 7b. Factions (manifest + individual files)
-    const factionManifest = await fetchJSON('/data/factions/manifest.json');
+    const factionManifest = await fetchJSON('./data/factions/manifest.json');
     if (Array.isArray(factionManifest)) {
         for (const f of factionManifest) {
             const id = typeof f === 'string' ? f : f.id || f.name;
@@ -267,7 +267,7 @@ async function buildDynamicIndex() {
     }
 
     // 7c. Patrons (cosmic)
-    const patronManifest = await fetchJSON('/data/patrons/manifest.json');
+    const patronManifest = await fetchJSON('./data/patrons/manifest.json');
     if (Array.isArray(patronManifest)) {
         for (const p of patronManifest) {
             const id = typeof p === 'string' ? p : p.id || p.name;
@@ -319,7 +319,7 @@ async function buildDynamicIndex() {
     }
 
     // 7e. Core documents from manifest
-    const docManifest = await fetchJSON('/data/docs/manifest-core.json');
+    const docManifest = await fetchJSON('./data/docs/manifest-core.json');
     if (docManifest && docManifest.documents) {
         docManifest.documents.forEach(d => {
             if (d.title) {

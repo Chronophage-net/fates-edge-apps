@@ -222,7 +222,7 @@ class DocumentLoader {
     if (!docPath || docPath === '' || docPath === '#') {
       const fileName = file || entry.id || title.replace(/\s+/g, '_').toLowerCase() + '.html';
       docPath = `/data/docs/${fileName}`;
-    } else if (!docPath.startsWith('/data/docs/') && !docPath.startsWith('http') && !docPath.startsWith('#')) {
+    } else if (!docPath.startsWith('./data/docs/') && !docPath.startsWith('http') && !docPath.startsWith('#')) {
       // Remove leading slash if present to avoid double slash
       const cleanPath = docPath.startsWith('/') ? docPath.substring(1) : docPath;
       docPath = `/data/docs/${cleanPath}`;
@@ -283,7 +283,7 @@ class DocumentLoader {
   async loadSearchIndex() {
     try {
       // Primary location: /data/search-index.json
-      const response = await fetch('/data/search-index.json');
+      const response = await fetch('./data/search-index.json');
       if (response.ok) {
         this.searchIndex = await response.json();
         console.log(`🔍 Loaded search index from /data/search-index.json with ${this.searchIndex.length} entries`);
@@ -291,7 +291,7 @@ class DocumentLoader {
       }
       
       // Fallback: try legacy locations
-      const fallbackPaths = ['/search-index.json', '/data/docs/search-index.json'];
+      const fallbackPaths = ['/search-index.json', './data/docs/search-index.json'];
       for (const fallbackPath of fallbackPaths) {
         const fallbackResponse = await fetch(fallbackPath);
         if (fallbackResponse.ok) {
@@ -379,7 +379,7 @@ class DocumentLoader {
       {
         id: 'sample',
         file: 'sample.html',
-        path: '/data/docs/sample.html',
+        path: './data/docs/sample.html',
         title: 'Sample Document',
         category: 'test',
         categoryLabel: 'Test Documents',

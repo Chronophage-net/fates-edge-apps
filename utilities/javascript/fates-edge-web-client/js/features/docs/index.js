@@ -11,13 +11,13 @@ let isDarkMode = false;
 // CONSTANTS
 // ============================================================
 
-const DOCS_BASE_PATH = '/data/docs/';
+const DOCS_BASE_PATH = './data/docs/';
 
 // Manifest paths to try in order
 const MANIFEST_PATHS = [
-    '/data/docs/manifest.json',
-    '/data/docs/manifest-core.json',
-    '/data/docs/manifest-full.json'
+    './data/docs/manifest.json',
+    './data/docs/manifest-core.json',
+    './data/docs/manifest-full.json'
 ];
 
 // Known HTML files in /data/docs/ (from the tree)

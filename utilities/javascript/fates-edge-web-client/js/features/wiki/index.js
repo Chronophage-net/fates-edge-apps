@@ -10,7 +10,7 @@ import { showToast } from '../../components/Toast.js';
 
 // ─── Configuration ──────────────────────────────────────────────────────
 
-const WIKI_REMOTE_URL = '/data/wiki.json';   // absolute path from site root
+const WIKI_REMOTE_URL = './data/wiki.json';   // absolute path from site root
 
 let container = null;
 let _eventListeners = [];   // for cleanup

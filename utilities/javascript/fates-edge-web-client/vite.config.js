@@ -55,7 +55,7 @@ export default defineConfig({
 
     // Dev server middleware (unchanged)
     configureServer(server) {
-        server.middlewares.use('/data/docs', (req, res, next) => {
+        server.middlewares.use('./data/docs', (req, res, next) => {
             const urlPath = req.url.split('?')[0];
             const filePath = resolve(__dirname, 'data', 'docs', urlPath);
             if (fs.existsSync(filePath)) {

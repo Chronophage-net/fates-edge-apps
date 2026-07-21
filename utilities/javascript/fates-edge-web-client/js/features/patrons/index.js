@@ -24,18 +24,18 @@ import { escHtml } from '../../core/utils.js';
 // CONSTANTS
 // ============================================================
 
-const COSMIC_DATA_PATH = '/data/patrons/';
-const COSMIC_MANIFEST_PATH = '/data/patrons/manifest.json';
+const COSMIC_DATA_PATH = './data/patrons/';
+const COSMIC_MANIFEST_PATH = './data/patrons/manifest.json';
 
-const TERRESTRIAL_DATA_PATH = '/data/terrestrial/';
-const TERRESTRIAL_MANIFEST_PATH = '/data/terrestrial/manifest.json';
-const TERRESTRIAL_FALLBACK_DATA_PATH = '/data/factions/';
-const TERRESTRIAL_FALLBACK_MANIFEST_PATH = '/data/factions/manifest.json';
+const TERRESTRIAL_DATA_PATH = './data/terrestrial/';
+const TERRESTRIAL_MANIFEST_PATH = './data/terrestrial/manifest.json';
+const TERRESTRIAL_FALLBACK_DATA_PATH = './data/factions/';
+const TERRESTRIAL_FALLBACK_MANIFEST_PATH = './data/factions/manifest.json';
 
-const RELIGION_DATA_PATH = '/data/religions/';
+const RELIGION_DATA_PATH = './data/religions/';
 const RELIGION_MANIFEST_PATHS = [
-    '/data/religions/manifest.json',
-    '/data/docs/religions-manifest.json'
+    './data/religions/manifest.json',
+    './data/docs/religions-manifest.json'
 ];
 
 const KNOWN_COSMIC_PATRON_SLUGS = [

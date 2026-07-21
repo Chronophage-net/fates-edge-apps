@@ -20,8 +20,8 @@ import { escHtml } from '../../core/utils.js';
 const FACTION_DATA_PATH = '/factions/';
 const FACTION_MANIFEST_PATH = '/factions/manifest.json';
 
-const FALLBACK_DATA_PATH = '/data/factions/';
-const FALLBACK_MANIFEST_PATH = '/data/factions/manifest.json';
+const FALLBACK_DATA_PATH = './data/factions/';
+const FALLBACK_MANIFEST_PATH = './data/factions/manifest.json';
 
 // Known faction slugs for discovery fallback
 const KNOWN_FACTION_SLUGS = [

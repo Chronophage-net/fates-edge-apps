@@ -43,8 +43,8 @@ import { parseRegionDescription } from './region-parser.js';
 // CONSTANTS
 // ============================================================
 
-const REGION_DIR = '/data/regions';
-const MANIFEST_PATH = '/data/regions/manifest.json';
+const REGION_DIR = './data/regions';
+const MANIFEST_PATH = './data/regions/manifest.json';
 
 const SUITS = ['hearts', 'spades', 'clubs', 'diamonds'];
 const RANKS = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
