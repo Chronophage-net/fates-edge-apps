@@ -1788,8 +1788,5 @@ export default {
     registerRegionChange,
     onRegionChange,
     quickDraw,
-    quickCrownSpread,
-    fetchRegionData
+    quickCrownSpread
 };
-export { ACE_EFFECTS };
-export { fetchRegionData };

@@ -1,3 +1,4 @@
+// features/travel-planner/index.js
 /**
  * Travel Planner - Cartomancy-based journey generation
  * Uses the Deck of Consequences to plan journeys with place, actor, pressure, and leverage.
@@ -7,15 +8,12 @@
 import { logRecordingEvent } from '../../core/media.js';
 import { showToast } from '../../components/Toast.js';
 import { addTimer } from '../../core/state.js';
-import { ACE_EFFECTS } from '../decks/index.js';
-// import { ACE_EFFECTS as DECK_ACE_EFFECTS } from '../decks/index.js';
-import {
-    getSelectedRegion,
-    getRegionNames,
-    setSelectedRegion,
-    fetchRegionData      // <-- import the transformed data loader
+import { 
+    getSelectedRegion, 
+    getRegionNames, 
+    setSelectedRegion
 } from '../decks/index.js';
-export { ACE_EFFECTS };
+
 // ============================================================
 // CONSTANTS
 // ============================================================
@@ -42,41 +40,148 @@ const TRAVEL_ROLES = [
 ];
 
 // ============================================================
+// ACE EFFECTS (Travel Edition)
+// ============================================================
+
+const ACE_EFFECTS = {
+    generic: [
+        { emoji: '🌀', text: 'The road loops back on itself. You\'ve been here before.' },
+        { emoji: '🌉', text: 'A bridge appears where none was marked. The crossing is free—for now.' },
+        { emoji: '🌫️', text: 'Fog rolls in, erasing the horizon. Trust your instincts.' },
+        { emoji: '🕯️', text: 'A wayfarer\'s lantern glows in the distance. It leads you off the path.' },
+        { emoji: '🗝️', text: 'A locked gate opens without a key. What waits beyond is watching.' },
+        { emoji: '🌙', text: 'The moon rises early. Shadows stretch toward places you cannot see.' },
+        { emoji: '⛰️', text: 'A landmark appears where none should be. The mountain has moved.' },
+        { emoji: '💧', text: 'A spring flows where the map shows dry ground. The water tastes of iron.' }
+    ],
+    acasia: [
+        { emoji: '🌿', text: 'The Curse shifts. A milepost points the wrong way—you are being watched.' },
+        { emoji: '🪦', text: 'A broken bridge spans a dry river. The toll is a forgotten name.' },
+        { emoji: '🔥', text: 'A free company\'s banner flutters on the horizon. They\'ve seen you.' }
+    ],
+    ecktoria: [
+        { emoji: '🏛️', text: 'A Triumph Stair appears in the middle of the road. Climbing it may change your destination.' },
+        { emoji: '⚜️', text: 'A Vigil seal glows on the roadside. You are being recorded.' },
+        { emoji: '🔥', text: 'The Everflame flickers ahead. A heretic is being burned tonight.' }
+    ],
+    vhasia: [
+        { emoji: '☀️', text: 'The sun splits into two shadows. Your path forks into two futures.' },
+        { emoji: '🗡️', text: 'A knight in rusted armor stands at the crossroads. They ask for a vow.' },
+        { emoji: '👑', text: 'A crown lies in the mud. Picking it up makes you a claimant.' }
+    ],
+    viterra: [
+        { emoji: '🌳', text: 'A hedge has grown across the road overnight. The boundary has moved.' },
+        { emoji: '⚖️', text: 'A Justiciar\'s seal hangs from a branch. A legal challenge is imminent.' },
+        { emoji: '🛡️', text: 'A Queen\'s Progress banner flutters ahead. You may be pressed into service.' }
+    ],
+    ykrul: [
+        { emoji: '🐺', text: 'A pack of wolves shadows you. They are not hunting—they are counting.' },
+        { emoji: '🌾', text: 'The steppe grass bends in a pattern. A hostile camp lies just beyond.' },
+        { emoji: '⚔️', text: 'A hostage string lies across the trail. Someone has broken an oath.' }
+    ],
+    silkstrand: [
+        { emoji: '🌊', text: 'The canals flow backward. The tide is carrying secrets.' },
+        { emoji: '🕊️', text: 'A bridge toll is waived—but the toll-taker asks for a promise instead.' },
+        { emoji: '📜', text: 'A manifest washes ashore. The cargo is listed as "nothing."' }
+    ],
+    mistlands: [
+        { emoji: '🔔', text: 'A bell-line hums in the distance. The wards are thin here.' },
+        { emoji: '🧂', text: 'Salt scatters across the path. The Direwood is close.' },
+        { emoji: '🌫️', text: 'The mist takes a shape—a face you recognize. It does not speak.' }
+    ],
+    thepyrgos: [
+        { emoji: '🔑', text: 'A stair leads upward where the road should flatten. The city is watching.' },
+        { emoji: '📚', text: 'A book lies open on a milestone. Its words shift as you read.' },
+        { emoji: '🔔', text: 'A bell tolls nine times. The Synod has issued a decree.' }
+    ],
+    ubral: [
+        { emoji: '🪨', text: 'A cairn has been disturbed. The dead are restless.' },
+        { emoji: '⚔️', text: 'A guest-right token lies broken on the path. Feud is inevitable.' },
+        { emoji: '🐎', text: 'A riderless horse stands at the ford. It waits for a rider.' }
+    ],
+    valewood: [
+        { emoji: '🌲', text: 'A star-road shard glows on the forest floor. The path is ancient.' },
+        { emoji: '🍃', text: 'A leaf falls upward, pointing to a hidden grove.' },
+        { emoji: '👑', text: 'The Hazel Queen\'s laughter echoes through the trees. She knows you are passing.' }
+    ],
+    aelinnel: [
+        { emoji: '🔮', text: 'A geas forms on the wind. Your next word may bind you.' },
+        { emoji: '🌿', text: 'The Green Gate shimmers ahead. The toll is a truth you have never told.' },
+        { emoji: '🕊️', text: 'A fae courier passes you without a word. They carry a message meant for you.' }
+    ],
+    aelaerem: [
+        { emoji: '🍎', text: 'The Hollow walks beside you. The ninth step is yours.' },
+        { emoji: '🐦', text: 'The watch-geese are silent. Something is coming.' },
+        { emoji: '🌾', text: 'A scarecrow stands in the middle of the road. It turns to face you.' }
+    ],
+    zakov: [
+        { emoji: '🌊', text: 'The tide rises unusually fast. A hidden cove is revealed.' },
+        { emoji: '💎', text: 'A crystalline shard washes up. The Reaping\'s corruption is close.' },
+        { emoji: '🏴‍☠️', text: 'A pirate ship is beached ahead. The crew is gone.' }
+    ]
+};
+
+// ============================================================
+// STATE
+// ============================================================
+
+let container = null;
+let selectedStartRegion = null;
+let selectedDestRegion = null;
+let journeyHistory = [];
+let currentJourney = null;
+let isInitialized = false;
+let regionList = [];
+let regionDataCache = {};
+
+// ============================================================
 // HELPERS
 // ============================================================
 
-function getBasePath() {
-    return import.meta.env?.BASE_URL || './';
+function getRegionSlug(name) {
+    return name.toLowerCase().replace(/ /g, '_');
 }
 
-// ----- We now use the decks module's fetchRegionData -----
-// The local cache is no longer needed; the decks module caches internally.
+async function fetchRegionData(regionName) {
+    if (regionDataCache[regionName]) {
+        return regionDataCache[regionName];
+    }
+    try {
+        const slug = getRegionSlug(regionName);
+        const res = await fetch(`/data/regions/${slug}.json`);
+        if (!res.ok) throw new Error(`Region "${regionName}" not found`);
+        const data = await res.json();
+        regionDataCache[regionName] = data;
+        return data;
+    } catch (e) {
+        console.warn(`[TravelPlanner] Error loading region ${regionName}:`, e);
+        const fallbackData = {
+            name: regionName,
+            description: `${regionName} - A region of Fate's Edge.`,
+            hearts: ["A matter of loyalty or love arises."],
+            spades: ["A conflict or struggle emerges."],
+            clubs: ["A physical challenge or obstacle appears."],
+            diamonds: ["A resource, treasure, or opportunity is found."]
+        };
+        regionDataCache[regionName] = fallbackData;
+        return fallbackData;
+    }
+}
 
-/**
- * Get the meaning for a specific (suit, rank) from the transformed region data.
- * This matches the decks module's rank-specific lookup.
- */
 function getCardMeaningFromRegion(suit, rank, regionData) {
-    if (!regionData) return `A complication of ${suit} arises.`;
-    const suitMap = regionData[suit];
-    if (!suitMap) return `A complication of ${suit} arises.`;
-    
-    // If the exact rank exists, use it
-    if (suitMap[rank]) return suitMap[rank];
-    
-    // Otherwise, pick a random meaning from the same suit (if any entries exist)
-    const entries = Object.values(suitMap);
-    if (entries.length === 0) return `A complication of ${suit} arises.`;
-    
-    // Deterministic pseudo‑random selection based on the rank string (for consistency)
-    const seed = rank + suit;
+    const suitKey = suit;
+    const arr = regionData[suitKey];
+    if (!arr || arr.length === 0) {
+        return `A complication of ${suit} arises.`;
+    }
+    const seed = suit + rank;
     let hash = 0;
     for (let i = 0; i < seed.length; i++) {
         hash = ((hash << 5) - hash) + seed.charCodeAt(i);
         hash = hash & hash;
     }
-    const idx = Math.abs(hash) % entries.length;
-    return entries[idx];
+    const index = Math.abs(hash) % arr.length;
+    return arr[index];
 }
 
 function getTimerSizeFromRank(rank) {
@@ -107,13 +212,13 @@ function getAceEffect(region, card) {
     const regionKey = region ? region.toLowerCase() : 'generic';
     let effects = ACE_EFFECTS[regionKey];
     if (!effects) {
-        const match = Object.keys(ACE_EFFECTS).find(key =>
+        const match = Object.keys(ACE_EFFECTS).find(key => 
             key !== 'generic' && regionKey.includes(key)
         );
         if (match) effects = ACE_EFFECTS[match];
     }
     if (!effects) effects = ACE_EFFECTS.generic;
-
+    
     const seed = (card?.suit || '') + (card?.rank || '') + 'travel';
     let hash = 0;
     for (let i = 0; i < seed.length; i++) {
@@ -136,11 +241,11 @@ class Xorshift128 {
         this.seed = seed;
         this.state = this._seedToState(seed);
     }
-
+    
     _seedToState(seed) {
         let s0 = 0;
         let s1 = 0;
-
+        
         if (typeof seed === 'number') {
             s0 = seed;
             s1 = seed + 0x9e3779b97f4a7c15;
@@ -156,28 +261,28 @@ class Xorshift128 {
             s0 = Date.now();
             s1 = Date.now() + 0x9e3779b97f4a7c15;
         }
-
+        
         return { s0: BigInt(s0), s1: BigInt(s1) };
     }
-
+    
     random() {
         let s0 = this.state.s0;
         let s1 = this.state.s1;
-
+        
         let x = s1;
         let y = s0;
-
+        
         x = x ^ (x << BigInt(23));
         x = x ^ (x >> BigInt(17));
         x = x ^ (y ^ (y >> BigInt(26)));
-
+        
         this.state.s0 = y;
         this.state.s1 = x;
-
+        
         const result = Number((x + y) & BigInt(0xFFFFFFFFFFFFFFFF)) / 18446744073709551616;
         return result;
     }
-
+    
     randomInt(min, max) {
         return Math.floor(this.random() * (max - min)) + min;
     }
@@ -231,8 +336,10 @@ initTravelSeed();
 // ============================================================
 
 function generateCard(deck) {
+    // Ensure we have a deck with cards
     if (!deck || deck.length === 0) {
         console.warn('[generateCard] Deck is empty, building a fresh one.');
+        // Rebuild the caller's deck by mutating it (so caller sees the change)
         const fresh = buildDeck();
         deck.length = 0;
         deck.push(...fresh);
@@ -243,6 +350,7 @@ function generateCard(deck) {
 
     if (!card) {
         console.error('[generateCard] Failed to draw a card. deck.length:', deck.length, 'idx:', idx);
+        // Fallback to a safe card (this should rarely happen)
         return { suit: 'spades', rank: 'A' };
     }
 
@@ -268,15 +376,14 @@ function generateLeg(deck, regionData, regionName, legIndex) {
     const heart = generateCard(deck);
     const club = generateCard(deck);
     const diamond = generateCard(deck);
-
+    
     const cards = { spade, heart, club, diamond };
-
-    // Use rank-specific meanings
+    
     const place = getCardMeaningFromRegion('spades', spade.rank, regionData);
     const actor = getCardMeaningFromRegion('hearts', heart.rank, regionData);
     const pressure = getCardMeaningFromRegion('clubs', club.rank, regionData);
     const leverage = getCardMeaningFromRegion('diamonds', diamond.rank, regionData);
-
+    
     const highestRank = [spade, heart, club, diamond].reduce((a, b) => {
         const rankA = POKER_RANK[a.rank] || 0;
         const rankB = POKER_RANK[b.rank] || 0;
@@ -287,7 +394,7 @@ function generateLeg(deck, regionData, regionName, legIndex) {
     });
     const timerSegments = getTimerSizeFromRank(highestRank.rank);
     const timerCard = `${getRankName(highestRank.rank)} of ${getSuitName(highestRank.suit)}`;
-
+    
     const allCards = [spade, heart, club, diamond];
     const aces = allCards.filter(c => c.rank === 'A');
     let aceEffect = null;
@@ -298,9 +405,9 @@ function generateLeg(deck, regionData, regionName, legIndex) {
             logRecordingEvent('travel_leg_ace', `♠️ Travel Ace Effect: ${aceEffect.emoji} ${aceEffect.text} (Leg ${legIndex + 1}, ${regionName})`);
         }
     }
-
+    
     const synthesis = `Place: ${place}\nActor: ${actor}\nPressure: ${pressure}\nLeverage: ${leverage}`;
-
+    
     return {
         cards,
         place,
@@ -325,28 +432,19 @@ async function generateJourneyAsync(startRegion, destRegion, numLegs = 3) {
         showToast('Please select both start and destination regions.', 'error');
         return null;
     }
-
-    // Use the decks module's fetch – it returns the transformed data
-    let data;
-    try {
-        data = await fetchRegionData(destRegion);
-    } catch (e) {
-        console.error('[TravelPlanner] Failed to fetch region data:', e);
-        showToast('Could not load region data for destination.', 'error');
-        return null;
-    }
-
+    
+    const data = await fetchRegionData(destRegion);
     if (!data) {
         showToast('Could not load region data.', 'error');
         return null;
     }
-
+    
     const deck = buildDeck();
     const legs = [];
     let totalTimer = 0;
     let highestCardOverall = null;
     let allAceEffects = [];
-
+    
     for (let i = 0; i < numLegs; i++) {
         const leg = generateLeg(deck, data, destRegion, i);
         legs.push(leg);
@@ -370,19 +468,19 @@ async function generateJourneyAsync(startRegion, destRegion, numLegs = 3) {
             }
         }
     }
-
+    
     const totalSegments = Math.min(totalTimer, 10);
-
+    
     let overallSynthesis = `Journey from ${startRegion} to ${destRegion}. ${legs.length} leg(s). ` +
         legs.map((leg, i) => `Leg ${i+1}: ${leg.place} | ${leg.actor} | ${leg.pressure} | ${leg.leverage}`).join('; ');
-
+    
     if (allAceEffects.length > 0) {
         overallSynthesis += '\n\n♠️ **Ace Effects:**\n' +
             allAceEffects.map((e, i) => `${e.emoji} ${e.text}`).join('\n');
     }
-
+    
     const roles = TRAVEL_ROLES.map(role => ({ ...role, assigned: true }));
-
+    
     const journey = {
         startRegion,
         destRegion,
@@ -396,34 +494,24 @@ async function generateJourneyAsync(startRegion, destRegion, numLegs = 3) {
         timestamp: new Date().toISOString(),
         aceEffects: allAceEffects
     };
-
+    
     currentJourney = journey;
-
+    
+    // Comprehensive logging
     if (typeof logRecordingEvent === 'function') {
         logRecordingEvent('journey_generated', `🗺️ Journey: ${journey.startRegion} → ${journey.destRegion} (${journey.numLegs} legs, ${journey.totalSegments} segments, ${journey.aceEffects.length} Ace effects)`);
         if (allAceEffects.length > 0) {
             const aceSummary = allAceEffects.map(e => `${e.emoji} ${e.text}`).join('; ');
             logRecordingEvent('journey_ace_summary', `♠️ Ace effects: ${aceSummary}`);
         }
+        // Log each leg's details
         legs.forEach((leg, idx) => {
             logRecordingEvent('journey_leg', `Leg ${idx+1}: Place: ${leg.place} | Actor: ${leg.actor} | Pressure: ${leg.pressure} | Leverage: ${leg.leverage} | Timer: ${leg.timerSegments} segments`);
         });
     }
-
+    
     return journey;
 }
-
-// ============================================================
-// STATE
-// ============================================================
-
-let container = null;
-let selectedStartRegion = null;
-let selectedDestRegion = null;
-let journeyHistory = [];
-let currentJourney = null;
-let isInitialized = false;
-let regionList = [];
 
 // ============================================================
 // RENDER
@@ -431,26 +519,26 @@ let regionList = [];
 
 export async function render(el) {
     container = el;
-
+    
     const regionNames = getRegionNames() || ['Acasia', 'Ecktoria', 'Vhasia', 'Viterra', 'Ykrul', 'Silkstrand'];
     if (regionNames.length === 0) {
         regionNames = ['Acasia'];
     }
     regionList = regionNames;
-
+    
     let currentRegion = getSelectedRegion() || regionNames[0];
     selectedStartRegion = currentRegion;
     selectedDestRegion = regionNames.length > 1 ? regionNames[1] : regionNames[0];
-
+    
     const isDeterministic = !!travelSeed;
-
+    
     container.innerHTML = `
         <div class="travel-planner">
             <div class="travel-planner-header">
                 <h1 class="page-title">🗺️ Travel Planner</h1>
                 <p class="page-sub">Plan journeys using the Cartomancy system. Draw cards to generate places, actors, pressures, and leverage for each leg.</p>
             </div>
-
+            
             <div class="panel" style="padding:0.3rem 0.8rem;margin-bottom:0.5rem;background:var(--bg3);border-left:3px solid ${isDeterministic ? 'var(--gold)' : 'var(--text3)'};">
                 <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.3rem;">
                     <span style="font-size:0.8rem;color:var(--text2);">
@@ -459,7 +547,7 @@ export async function render(el) {
                     </span>
                 </div>
             </div>
-
+            
             <div class="panel">
                 <h3>Journey Configuration</h3>
                 <div style="display:flex;flex-wrap:wrap;gap:1rem;align-items:end;">
@@ -494,7 +582,7 @@ export async function render(el) {
                     <span style="color:var(--gold);">♠ Ace cards trigger special journey omens!</span>
                 </div>
             </div>
-
+            
             <div id="travel-journey-display" class="panel" style="display:none;">
                 <div id="travel-journey-header">
                     <h3 id="travel-journey-title">Journey</h3>
@@ -510,7 +598,7 @@ export async function render(el) {
                     <button class="btn btn-sm btn-secondary" id="travel-import-btn">📥 Import</button>
                 </div>
             </div>
-
+            
             <div class="panel">
                 <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;">
                     <h3 style="margin:0;">📜 Journey History</h3>
@@ -522,7 +610,7 @@ export async function render(el) {
             </div>
         </div>
     `;
-
+    
     attachEvents();
     isInitialized = true;
 }
@@ -536,37 +624,37 @@ function attachEvents() {
     if (generateBtn) {
         generateBtn.addEventListener('click', handleGenerate);
     }
-
+    
     const reshuffleBtn = document.getElementById('travel-reshuffle-btn');
     if (reshuffleBtn) {
         reshuffleBtn.addEventListener('click', handleReshuffle);
     }
-
+    
     const clearBtn = document.getElementById('travel-history-clear-btn');
     if (clearBtn) {
         clearBtn.addEventListener('click', handleClearHistory);
     }
-
+    
     const addTimerBtn = document.getElementById('travel-add-timer-btn');
     if (addTimerBtn) {
         addTimerBtn.addEventListener('click', handleAddTimer);
     }
-
+    
     const copyBtn = document.getElementById('travel-copy-btn');
     if (copyBtn) {
         copyBtn.addEventListener('click', handleCopy);
     }
-
+    
     const exportBtn = document.getElementById('travel-export-btn');
     if (exportBtn) {
         exportBtn.addEventListener('click', handleExport);
     }
-
+    
     const importBtn = document.getElementById('travel-import-btn');
     if (importBtn) {
         importBtn.addEventListener('click', handleImport);
     }
-
+    
     const startSelect = document.getElementById('travel-start-region');
     if (startSelect) {
         startSelect.addEventListener('change', (e) => {
@@ -589,23 +677,23 @@ async function handleGenerate() {
     const startSelect = document.getElementById('travel-start-region');
     const destSelect = document.getElementById('travel-dest-region');
     const legsSelect = document.getElementById('travel-legs');
-
+    
     if (!startSelect || !destSelect || !legsSelect) {
         showToast('Form elements not found.', 'error');
         return;
     }
-
+    
     const start = startSelect.value;
     const dest = destSelect.value;
     const numLegs = parseInt(legsSelect.value, 10) || 3;
-
+    
     if (start === dest) {
         showToast('Start and destination regions must be different.', 'warning');
         return;
     }
-
+    
     showToast('Generating journey...', 'info');
-
+    
     try {
         const journey = await generateJourneyAsync(start, dest, numLegs);
         if (!journey) {
@@ -616,7 +704,7 @@ async function handleGenerate() {
         addToHistory(journey);
         const aceCount = journey.aceEffects ? journey.aceEffects.length : 0;
         showToast(`Journey from ${start} to ${dest} generated with ${numLegs} leg(s). ${aceCount > 0 ? `♠️ ${aceCount} Ace effect(s) triggered!` : ''}`, 'success');
-
+        
         if (typeof logRecordingEvent === 'function') {
             logRecordingEvent('travel_planner_generate', `User generated journey: ${start} → ${dest} (${numLegs} legs)`);
         }
@@ -649,7 +737,7 @@ function handleAddTimer() {
     }
     const timerName = `Travel: ${currentJourney.startRegion} → ${currentJourney.destRegion}`;
     const segments = currentJourney.totalSegments || 6;
-
+    
     import('../timers/index.js').then(module => {
         if (module.openTimerEditor) {
             module.openTimerEditor({
@@ -699,7 +787,7 @@ function handleExport() {
         showToast('No journey to export.', 'error');
         return;
     }
-
+    
     try {
         const json = JSON.stringify(currentJourney, null, 2);
         const blob = new Blob([json], { type: 'application/json' });
@@ -712,7 +800,7 @@ function handleExport() {
         a.click();
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
-
+        
         showToast('Journey exported successfully.', 'success');
         if (typeof logRecordingEvent === 'function') {
             logRecordingEvent('travel_export', `Exported journey: ${currentJourney.startRegion} → ${currentJourney.destRegion} (${currentJourney.numLegs} legs)`);
@@ -729,19 +817,19 @@ function handleImport() {
     input.accept = '.json';
     input.style.display = 'none';
     document.body.appendChild(input);
-
+    
     input.onchange = function(e) {
         const file = e.target.files[0];
         if (!file) {
             document.body.removeChild(input);
             return;
         }
-
+        
         const reader = new FileReader();
         reader.onload = function(event) {
             try {
                 const data = JSON.parse(event.target.result);
-
+                
                 const required = ['startRegion', 'destRegion', 'legs', 'totalSegments', 'numLegs', 'timestamp'];
                 const missing = required.filter(field => !(field in data));
                 if (missing.length > 0) {
@@ -749,13 +837,13 @@ function handleImport() {
                     document.body.removeChild(input);
                     return;
                 }
-
+                
                 if (!Array.isArray(data.legs) || data.legs.length === 0) {
                     showToast('Invalid journey file: legs must be a non-empty array.', 'error');
                     document.body.removeChild(input);
                     return;
                 }
-
+                
                 const legRequired = ['place', 'actor', 'pressure', 'leverage', 'timerSegments', 'timerCard', 'cardDetails'];
                 for (let i = 0; i < data.legs.length; i++) {
                     const leg = data.legs[i];
@@ -766,13 +854,13 @@ function handleImport() {
                         return;
                     }
                 }
-
+                
                 if (!data.aceEffects) data.aceEffects = [];
-
+                
                 currentJourney = data;
                 displayJourney(data);
                 addToHistory(data);
-
+                
                 showToast(`Journey imported: ${data.startRegion} → ${data.destRegion} (${data.numLegs} legs)`, 'success');
                 if (typeof logRecordingEvent === 'function') {
                     logRecordingEvent('travel_import', `Imported journey: ${data.startRegion} → ${data.destRegion} (${data.numLegs} legs)`);
@@ -783,15 +871,15 @@ function handleImport() {
             }
             document.body.removeChild(input);
         };
-
+        
         reader.onerror = function() {
             showToast('Error reading file.', 'error');
             document.body.removeChild(input);
         };
-
+        
         reader.readAsText(file);
     };
-
+    
     input.click();
 }
 
@@ -803,7 +891,7 @@ function displayJourney(journey) {
     const display = document.getElementById('travel-journey-display');
     if (!display) return;
     display.style.display = 'block';
-
+    
     const title = document.getElementById('travel-journey-title');
     if (title) {
         title.textContent = `🗺️ Journey: ${journey.startRegion} → ${journey.destRegion}`;
@@ -817,7 +905,7 @@ function displayJourney(journey) {
             ${journey.aceEffects && journey.aceEffects.length > 0 ? `<span style="margin-left:1rem;color:var(--gold);">♠️ ${journey.aceEffects.length} Ace effect(s)</span>` : ''}
         `;
     }
-
+    
     const legsContainer = document.getElementById('travel-journey-legs');
     if (legsContainer) {
         legsContainer.innerHTML = journey.legs.map((leg, idx) => {
@@ -853,18 +941,18 @@ function displayJourney(journey) {
             </div>
         `}).join('');
     }
-
+    
     const synth = document.getElementById('travel-journey-synthesis');
     if (synth) {
         synth.textContent = journey.overallSynthesis;
     }
-
+    
     const timerResult = document.getElementById('travel-timer-result');
     if (timerResult) {
         if (journey.totalSegments > 0) {
             timerResult.style.display = 'block';
             timerResult.innerHTML = `
-                <strong>⏱️ Suggested Travel Timer:</strong> ${journey.totalSegments} segments
+                <strong>⏱️ Suggested Travel Timer:</strong> ${journey.totalSegments} segments 
                 (based on highest card per leg, combined).
                 <span style="font-size:0.8rem;color:var(--text3);">Click "Add Timer" to create.</span>
             `;
@@ -881,7 +969,8 @@ function renderHistory() {
         el.innerHTML = '<span class="text-muted">No journeys planned yet.</span>';
         return;
     }
-
+    
+    // Fix: Calculate the real index using the map callback to avoid O(n²) lookups and broken references
     el.innerHTML = journeyHistory.slice().reverse().map((j, revIdx) => {
         const realIdx = journeyHistory.length - 1 - revIdx;
         const aceCount = j.aceEffects ? j.aceEffects.length : 0;
@@ -894,7 +983,7 @@ function renderHistory() {
             <button class="btn btn-xs btn-ghost" data-journey-index="${realIdx}" style="margin-left:auto;">👁️ View</button>
         </div>
     `}).join('');
-
+    
     el.querySelectorAll('[data-journey-index]').forEach(btn => {
         btn.addEventListener('click', () => {
             const idx = parseInt(btn.dataset.journeyIndex, 10);

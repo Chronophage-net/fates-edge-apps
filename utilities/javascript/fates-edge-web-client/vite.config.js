@@ -3,7 +3,7 @@ import { resolve } from 'path';
 import fs from 'fs';
 
 export default defineConfig({
-    base: './',
+    base: '/',
     server: {
         port: 5173,
         open: true,
