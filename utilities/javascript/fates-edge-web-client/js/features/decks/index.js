@@ -3,11 +3,8 @@
  * Decks feature - Deck of Consequences and Crown Spread
  * Supports single draw, multiple draw, and Crown Spread (4+1 wildcard).
  * Loads region data dynamically from /data/regions/.
- * Supports WebSocket sync for multiplayer draws.
+ * Region discovery is done without a manifest.json – we test known slugs.
  * Uses deterministic RNG for static/demo deployments.
- *
- * Region descriptions are parsed from LaTeX-like markup into clean HTML
- * using regionDescriptionParser.
  *
  * Data structure:
  *   {
@@ -31,6 +28,12 @@
  *     tags: ["TAG1", "TAG2"],
  *     metadata: { ... }
  *   }
+ *
+ * RANK TIERS (for timer segments):
+ *   - 2–5: Minor → 4 segments
+ *   - 6–9: Medium → 6 segments
+ *   - 10–K: Major → 8 segments
+ *   - A: Ace → 10 segments
  */
 
 import { shuffleArray } from '../../core/utils.js';
@@ -44,7 +47,6 @@ import { parseRegionDescription } from './region-parser.js';
 // ============================================================
 
 const REGION_DIR = './data/regions';
-const MANIFEST_PATH = './data/regions/manifest.json';
 
 const SUITS = ['hearts', 'spades', 'clubs', 'diamonds'];
 const RANKS = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
@@ -55,6 +57,31 @@ const RANK_NAMES = {
     'A': 'Ace', '2': 'Two', '3': 'Three', '4': 'Four', '5': 'Five',
     '6': 'Six', '7': 'Seven', '8': 'Eight', '9': 'Nine', '10': 'Ten',
     'J': 'Jack', 'Q': 'Queen', 'K': 'King'
+};
+
+// Suit archetypes for fallback descriptions
+const SUIT_ARCHETYPES = {
+    hearts: { label: 'Actor', desc: 'a person, faction, or relationship that drives the scene' },
+    spades: { label: 'Location', desc: 'a place, terrain, or environmental feature' },
+    clubs: { label: 'Complication', desc: 'an obstacle, danger, or twist' },
+    diamonds: { label: 'Reward/Leverage', desc: 'a resource, opportunity, or material gain' }
+};
+
+// Rank tier mapping for timer segments and fallback detail
+const RANK_TIERS = {
+    '2': { tier: 'Minor', segments: 4 },
+    '3': { tier: 'Minor', segments: 4 },
+    '4': { tier: 'Minor', segments: 4 },
+    '5': { tier: 'Minor', segments: 4 },
+    '6': { tier: 'Medium', segments: 6 },
+    '7': { tier: 'Medium', segments: 6 },
+    '8': { tier: 'Medium', segments: 6 },
+    '9': { tier: 'Medium', segments: 6 },
+    '10': { tier: 'Major', segments: 8 },
+    'J': { tier: 'Major', segments: 8 },
+    'Q': { tier: 'Major', segments: 8 },
+    'K': { tier: 'Major', segments: 8 },
+    'A': { tier: 'Ace', segments: 10 }
 };
 
 const POKER_RANK = { 'A': 14, 'K': 13, 'Q': 12, 'J': 11, '10': 10, '9': 9, '8': 8, '7': 7, '6': 6, '5': 5, '4': 4, '3': 3, '2': 2 };
@@ -300,30 +327,42 @@ function isJokerCard(card) {
 }
 
 // ============================================================
+// RANK MAPPING (numeric ranks → card ranks)
+// ============================================================
+
+function mapNumericRank(rank) {
+    const num = parseInt(rank, 10);
+    if (isNaN(num)) return String(rank);
+    if (num >= 2 && num <= 10) return String(num);
+    if (num === 11) return 'J';
+    if (num === 12) return 'Q';
+    if (num === 13) return 'K';
+    if (num === 14) return 'A';
+    return String(num);
+}
+
+// ============================================================
 // TAG EXTRACTION HELPERS
 // ============================================================
 
 function extractTags(text) {
     if (!text || typeof text !== 'string') return [];
     const tags = [];
-    // Match hashtags: #TAG, #TAG_NAME
     const hashMatches = text.match(/#([A-Za-z0-9_]+)/g);
     if (hashMatches) {
         tags.push(...hashMatches.map(t => t.slice(1).toUpperCase()));
     }
-    // Match all-caps words (length >= 3)
     const capMatches = text.match(/\b([A-Z]{3,})\b/g);
     if (capMatches) {
         tags.push(...capMatches);
     }
-    // Match bracketed tags: [TAG], [TAG_NAME]
     const bracketMatches = text.match(/\[([A-Za-z0-9_]+)\]/g);
     if (bracketMatches) {
         tags.push(...bracketMatches.map(t => t.slice(1, -1).toUpperCase()));
     }
-    // Remove duplicates
     return [...new Set(tags)];
 }
+
 // ============================================================
 // STATE
 // ============================================================
@@ -342,6 +381,116 @@ let regionChangeCallbacks = [];
 cardOffset = getDeckRandomInt(0, 1000);
 
 // ============================================================
+// REGION DISCOVERY (manifest-free)
+// ============================================================
+
+const KNOWN_REGION_SLUGS = [
+    'acasia', 'aelaerem', 'aeler', 'aelinnel', 'ecktoria',
+    'kahfagia', 'midh_ahkaz', 'mistlands', 'silkstrand',
+    'the_wilds', 'thepyrgos', 'ubral', 'valewood',
+    'vhasia', 'viterra', 'ykrul', 'zakov', 'dungeons'
+];
+
+const FALLBACK_REGIONS = ['Acasia', 'Ecktoria', 'Vhasia', 'Viterra', 'Ykrul', 'Silkstrand'];
+
+async function discoverRegions() {
+    try {
+        const cached = localStorage.getItem('fates-edge-region-cache');
+        if (cached) {
+            const { names, timestamp } = JSON.parse(cached);
+            if (Date.now() - timestamp < 3600000) {
+                console.log(`[Decks] Using cached region list (${names.length} regions)`);
+                return names;
+            }
+        }
+    } catch (_) {}
+
+    console.log('[Decks] Discovering available regions...');
+    const found = [];
+
+    await Promise.all(KNOWN_REGION_SLUGS.map(async (slug) => {
+        try {
+            const res = await fetch(`${REGION_DIR}/${slug}.json`, { method: 'HEAD' });
+            if (res.ok) {
+                const name = slug.replace(/-/g, ' ').replace(/_/g, ' ')
+                    .replace(/\b\w/g, c => c.toUpperCase());
+                found.push(name);
+            }
+        } catch (_) { /* ignore */ }
+    }));
+
+    found.sort();
+
+    try {
+        localStorage.setItem('fates-edge-region-cache', JSON.stringify({
+            names: found,
+            timestamp: Date.now()
+        }));
+    } catch (_) {}
+
+    console.log(`[Decks] Discovered ${found.length} regions:`, found);
+    return found;
+}
+
+async function initializeRegions() {
+    const discovered = await discoverRegions();
+    if (discovered.length > 0) {
+        regionNames = discovered;
+    } else {
+        console.warn('[Decks] No region files found. Using fallback default regions.');
+        regionNames = FALLBACK_REGIONS;
+        showToast('⚠️ No region files found. Using default fallback regions.', 'warning');
+    }
+}
+
+// ============================================================
+// REGION DATA CACHE
+// ============================================================
+
+const regionDataCache = new Map();
+
+function createFallbackData(regionName) {
+    return {
+        name: regionName,
+        description: `${regionName} – A region of Fate's Edge. (Using fallback data)`,
+        hearts: { "A": "A matter of loyalty or love arises." },
+        spades: { "A": "A conflict or struggle emerges." },
+        clubs: { "A": "A physical challenge or obstacle appears." },
+        diamonds: { "A": "A resource, treasure, or opportunity is found." }
+    };
+}
+
+// ============================================================
+// FETCH REGION DATA (with caching)
+// ============================================================
+
+async function fetchRegionData(regionName) {
+    if (regionDataCache.has(regionName)) {
+        console.log(`[Decks] Using cached data for ${regionName}`);
+        return regionDataCache.get(regionName);
+    }
+
+    const slug = getRegionSlug(regionName);
+    const path = `${REGION_DIR}/${slug}.json`;
+
+    try {
+        const res = await fetch(path);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const raw = await res.json();
+        const data = transformRegionData(raw);
+        regionDataCache.set(regionName, data);
+        console.log(`[Decks] Loaded region data for ${regionName}`);
+        return data;
+    } catch (e) {
+        console.warn(`[Decks] Could not load ${regionName}, using fallback.`, e);
+        const fallback = createFallbackData(regionName);
+        regionDataCache.set(regionName, fallback);
+        showToast(`⚠️ Could not load region "${regionName}". Using fallback.`, 'warning');
+        return fallback;
+    }
+}
+
+// ============================================================
 // HELPERS
 // ============================================================
 
@@ -349,19 +498,13 @@ function getRegionSlug(name) {
     return name.toLowerCase().replace(/ /g, '-').replace(/[^a-z0-9-]/g, '');
 }
 
-/**
- * Transform the new region JSON structure into the old suit-based structure.
- * New structure has arrays of objects under places, people_and_factions, etc.
- */
 function transformRegionData(raw) {
     if (!raw) return null;
 
-    // If already in the old format (suit arrays as objects keyed by rank), return as-is
     if (raw.hearts && raw.spades && raw.clubs && raw.diamonds && typeof raw.hearts === 'object') {
         return raw;
     }
 
-    // Build transformed object
     const transformed = {
         name: raw.title || raw.id || 'Unknown',
         description: '',
@@ -373,7 +516,6 @@ function transformRegionData(raw) {
         metadata: { source_file: raw.id || 'unknown' }
     };
 
-    // Build description from overview
     if (raw.overview) {
         let desc = '';
         if (raw.overview.tagline) desc += `<p><em>${raw.overview.tagline}</em></p>`;
@@ -386,12 +528,10 @@ function transformRegionData(raw) {
             if (raw.overview.lore.rule_that_kills) desc += `<p><strong>Rule that kills:</strong> ${raw.overview.lore.rule_that_kills}</p>`;
         }
         transformed.description = desc;
-        // Also extract tags from overview
         const text = JSON.stringify(raw.overview);
         transformed.tags = extractTags(text);
     }
 
-    // Map suit to array key
     const suitMap = {
         spades: 'places',
         hearts: 'people_and_factions',
@@ -404,8 +544,10 @@ function transformRegionData(raw) {
         const items = raw[key];
         if (!items || !Array.isArray(items)) continue;
         for (const card of items) {
-            const rank = String(card.rank || '');
-            if (!rank) continue;
+            const rawRank = String(card.rank || '');
+            if (!rawRank) continue;
+            const rankKey = mapNumericRank(rawRank);
+
             let meaning = `${card.title || 'Untitled'}: ${card.description || ''}`;
             if (card.flavor) meaning += ` <em>${card.flavor}</em>`;
             if (card.mechanical_hook) meaning += ` [Mechanic: ${card.mechanical_hook}]`;
@@ -414,12 +556,11 @@ function transformRegionData(raw) {
             if (card.debt) meaning += ` [Debt: ${card.debt}]`;
             if (card.price) meaning += ` [Price: ${card.price}]`;
             if (card.curse_cost) meaning += ` [Cost: ${card.curse_cost}]`;
-            transformed[suit][rank] = meaning;
-            // Collect tags from the card object (from subtitles, tags, etc.)
+            transformed[suit][rankKey] = meaning;
+
             const tags = [];
             if (card.subtitle) tags.push(card.subtitle);
             if (card.tags && Array.isArray(card.tags)) tags.push(...card.tags);
-            // Also extract tags from text
             const cardText = JSON.stringify(card);
             const cardTags = extractTags(cardText);
             tags.push(...cardTags);
@@ -430,7 +571,6 @@ function transformRegionData(raw) {
         }
     }
 
-    // Also extract tags from extra fields like ninth_taboo, lore_echoes, etc.
     const extraFields = ['ninth_taboo', 'lore_echoes', 'superstitions', 'additional_features'];
     for (const field of extraFields) {
         if (raw[field]) {
@@ -440,10 +580,8 @@ function transformRegionData(raw) {
         }
     }
 
-    // Deduplicate tags
     transformed.tags = [...new Set(transformed.tags)].filter(t => t && t.length > 0);
 
-    // Add metadata
     transformed.metadata = {
         source_file: raw.id || 'unknown',
         version: raw.version || '1.0.0',
@@ -453,13 +591,30 @@ function transformRegionData(raw) {
     return transformed;
 }
 
+// ============================================================
+// CARD MEANING LOOKUP (with rich fallback)
+// ============================================================
+
 function getCardMeaningFromRegion(suit, rank, regionData) {
     const suitKey = suit;
     const obj = regionData[suitKey];
+    const rankName = RANK_NAMES[rank] || rank;
+    const suitName = SUIT_NAMES[suit] || suit;
+    const archetype = SUIT_ARCHETYPES[suit] || { label: 'Element', desc: 'a force' };
+    const tierInfo = RANK_TIERS[rank] || { tier: 'Minor', segments: 4 };
+
     if (!obj || !obj[rank]) {
-        return `A complication of ${suit} arises.`;
+        // Rich fallback based on suit and rank tier
+        const tier = tierInfo.tier;
+        const segments = tierInfo.segments;
+        return `${rankName} of ${suitName} (${archetype.label} – ${tier}): A ${archetype.label.toLowerCase()} arises. ${archetype.desc}. This card suggests a ${tier.toLowerCase()} influence (${segments}-segment clock if this is the highest card).`;
     }
-    return obj[rank];
+
+    // If we have a specific meaning, prepend a short context
+    const specific = obj[rank];
+    const tier = tierInfo.tier;
+    const segments = tierInfo.segments;
+    return `${rankName} of ${suitName} (${archetype.label} – ${tier}): ${specific} (${segments} segments if highest).`;
 }
 
 function getWildcardMeaning(card, regionData) {
@@ -681,12 +836,10 @@ function synthesiseCrownSpread(mainCards, wildcard, regionData) {
     if (highest && !isJokerCard(highest)) {
         const rankVal = POKER_RANK[highest.rank] || 0;
         let segments = 4;
-        if (rankVal >= 14) segments = 10;
-        else if (rankVal >= 13) segments = 8;
-        else if (rankVal >= 11) segments = 8;
-        else if (rankVal >= 10) segments = 6;
-        else if (rankVal >= 7) segments = 6;
-        else segments = 4;
+        if (rankVal === 14) segments = 10;      // Ace
+        else if (rankVal >= 10) segments = 8;   // 10,J,Q,K
+        else if (rankVal >= 6) segments = 6;    // 6-9
+        else segments = 4;                      // 2-5
         timer = segments;
         timerCard = `${highest.rankName} of ${highest.suitName}`;
     } else if (highest) {
@@ -717,201 +870,6 @@ function synthesiseCrownSpread(mainCards, wildcard, regionData) {
         positions: positionCards, wildcard: wildcardMeaning,
         horizontalLayout, verticalLayout
     };
-}
-
-// ============================================================
-// MANIFEST LOADING
-// ============================================================
-
-const FALLBACK_REGIONS = ['Acasia', 'Ecktoria', 'Vhasia', 'Viterra', 'Ykrul', 'Silkstrand'];
-
-function capitalize(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
-
-/**
- * Load the region manifest from /data/regions/manifest.json.
- * If missing, discover region files and create the manifest.
- * If no files exist, create a default manifest and warn.
- */
-async function loadManifest() {
-    let manifestLoaded = false;
-    try {
-        const res = await fetch(MANIFEST_PATH);
-        if (res.ok) {
-            const data = await res.json();
-            if (Array.isArray(data) && data.length > 0) {
-                regionNames = data.map(item => typeof item === 'string' ? item : item.name || item);
-                console.log(`[Decks] Loaded ${regionNames.length} regions from manifest.json`);
-                manifestLoaded = true;
-            }
-        }
-    } catch (e) {
-        console.warn('[Decks] Could not load manifest, will attempt discovery.', e);
-    }
-
-    if (!manifestLoaded) {
-        console.warn('[Decks] Manifest not found or empty. Discovering regions...');
-        const discovered = await discoverRegions();
-        if (discovered.length > 0) {
-            regionNames = discovered;
-            await saveManifest(discovered);
-            console.log(`[Decks] Discovered ${regionNames.length} regions, manifest created.`);
-        } else {
-            // No region files found: create defaults and warn
-            regionNames = FALLBACK_REGIONS;
-            await saveManifest(regionNames);
-            console.warn('[Decks] No region files found. Using fallback default regions.');
-            showToast('⚠️ No region files found. Using default fallback regions.', 'warning');
-        }
-    }
-
-    // Optionally check for new regions (background scan)
-    checkAndUpdateManifest(regionNames).catch(() => {});
-}
-
-/**
- * Discover region files by scanning the REGION_DIR for .json files
- * (ignoring manifest.json and other non-region files).
- */
-async function discoverRegions() {
-    const discovered = [];
-    try {
-        // Attempt to fetch directory listing (requires server support)
-        const dirRes = await fetch(REGION_DIR + '/');
-        if (dirRes.ok) {
-            const html = await dirRes.text();
-            const matches = html.match(/href="([^"]+\.json)"/gi);
-            if (matches) {
-                matches.forEach(m => {
-                    const match = m.match(/href="([^"]+)"/i);
-                    if (match && !match[1].includes('manifest')) {
-                        let slug = match[1].replace(/\.json$/, '');
-                        slug = slug.split('/').pop();
-                        const name = slug.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
-                        discovered.push(name);
-                    }
-                });
-            }
-        }
-    } catch (e) {
-        // Directory listing not available – fallback to trying known slugs
-    }
-
-    // If directory listing fails, try known region slugs
-    if (discovered.length === 0) {
-        const knownSlugs = [
-            'acasia', 'aelaerem', 'aeler', 'aelinnel', 'ecktoria',
-            'kahfagia', 'midh_ahkaz', 'mistlands', 'silkstrand',
-            'the_wilds', 'thepyrgos', 'ubral', 'valewood',
-            'vhasia', 'viterra', 'ykrul', 'zakov', 'dungeons'
-        ];
-        for (const slug of knownSlugs) {
-            try {
-                const res = await fetch(`${REGION_DIR}/${slug}.json`);
-                if (res.ok) {
-                    const name = slug.replace(/-/g, ' ').replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
-                    discovered.push(name);
-                }
-            } catch (e) { /* ignore */ }
-        }
-    }
-
-    // Deduplicate and filter out manifest
-    return [...new Set(discovered)].filter(name => name.toLowerCase() !== 'manifest');
-}
-
-/**
- * Save the manifest to /data/regions/manifest.json.
- * Falls back to localStorage if write endpoint unavailable.
- */
-async function saveManifest(names) {
-    try {
-        const res = await fetch(MANIFEST_PATH, {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(names)
-        });
-        if (res.ok) {
-            console.log(`[Decks] Manifest saved to ${MANIFEST_PATH}`);
-            return;
-        }
-    } catch (e) {
-        console.warn('[Decks] Could not write manifest via PUT, falling back to localStorage.', e);
-    }
-
-    // Fallback: store in localStorage
-    try {
-        localStorage.setItem('fates-edge-region-manifest', JSON.stringify(names));
-        console.log('[Decks] Manifest cached in localStorage (no write endpoint available)');
-    } catch (e2) {
-        console.warn('[Decks] Could not save manifest to localStorage either.', e2);
-    }
-}
-
-/**
- * Periodically check for new region files and update the manifest.
- * Runs at most once per hour (throttled).
- */
-async function checkAndUpdateManifest(existingRegions) {
-    try {
-        const cachedCheck = localStorage.getItem('fates-edge-manifest-checked');
-        const now = Date.now();
-        if (cachedCheck && (now - parseInt(cachedCheck)) < 3600000) return;
-        localStorage.setItem('fates-edge-manifest-checked', String(now));
-
-        const discovered = await discoverRegions();
-        const newRegions = discovered.filter(r => !existingRegions.includes(r));
-        if (newRegions.length > 0) {
-            regionNames = [...new Set([...existingRegions, ...newRegions])];
-            await saveManifest(regionNames);
-            console.log(`[Decks] Found ${newRegions.length} new regions, manifest updated:`, newRegions);
-            // Show toast about new regions
-            showToast(`📂 Discovered ${newRegions.length} new region(s). Refresh to see them.`, 'info');
-        }
-    } catch (e) {
-        console.warn('[Decks] Background manifest check failed.', e);
-    }
-}
-
-// ============================================================
-// FETCH REGION DATA
-// ============================================================
-
-async function fetchRegionData(regionName) {
-    const slug = getRegionSlug(regionName);
-    const path = `${REGION_DIR}/${slug}.json`;
-
-    let data = null;
-    try {
-        const res = await fetch(path);
-        if (res.ok) {
-            const raw = await res.json();
-            data = transformRegionData(raw);
-            console.log(`[Decks] Loaded region data for ${regionName} from ${path}`);
-        } else {
-            console.warn(`[Decks] Region file not found: ${path}`);
-            showToast(`⚠️ Region "${regionName}" file not found. Using fallback data.`, 'warning');
-        }
-    } catch (e) {
-        console.warn(`[Decks] Error fetching region data for ${regionName}:`, e);
-        showToast(`⚠️ Could not load region "${regionName}". Using fallback.`, 'warning');
-    }
-
-    if (data && data.spades && data.hearts && data.clubs && data.diamonds) {
-        regionData = data;
-        return data;
-    }
-
-    // Fallback data
-    const fallbackData = {
-        name: regionName,
-        description: `${regionName} - A region of Fate's Edge. (Using fallback data)`,
-        hearts: { "A": "A matter of loyalty or love arises." },
-        spades: { "A": "A conflict or struggle emerges." },
-        clubs: { "A": "A physical challenge or obstacle appears." },
-        diamonds: { "A": "A resource, treasure, or opportunity is found." }
-    };
-    regionData = fallbackData;
-    return fallbackData;
 }
 
 // ============================================================
@@ -952,7 +910,18 @@ async function handleRegionChange() {
 
 export async function render(el) {
     container = el;
-    await loadManifest();
+
+    container.innerHTML = `
+        <div class="decks-header">
+            <h1 class="page-title">🃏 Deck of Consequences</h1>
+            <p class="page-sub">Loading regions...</p>
+        </div>
+        <div style="display:flex;justify-content:center;padding:2rem;">
+            <span style="color:var(--text2);">📂 Discovering available regions…</span>
+        </div>
+    `;
+
+    await initializeRegions();
 
     let regionOptions = regionNames.map(n => `<option value="${n}">${n}</option>`).join('');
     if (regionNames.length === 0) {
@@ -960,6 +929,7 @@ export async function render(el) {
     }
 
     const isDeterministic = !!_deckSeedState.seed;
+    const regionCount = regionNames.length;
 
     container.innerHTML = `
         <div class="decks-header">
@@ -967,7 +937,6 @@ export async function render(el) {
             <p class="page-sub">Transform Story Beats (SB) into thematic complications. Choose a region and draw type.</p>
         </div>
 
-        <!-- Seed Status -->
         <div class="panel" style="padding:0.3rem 0.8rem;margin-bottom:0.5rem;background:var(--bg3);border-left:3px solid ${isDeterministic ? 'var(--gold)' : 'var(--text3)'};">
             <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.3rem;">
                 <span style="font-size:0.8rem;color:var(--text2);">
@@ -982,14 +951,16 @@ export async function render(el) {
         </div>
 
         <div class="panel">
-            <div class="field" style="max-width:300px;">
-                <label>Region</label>
+            <div class="field" style="max-width:300px;display:flex;align-items:center;gap:0.5rem;">
+                <label style="margin:0;">Region</label>
                 <select id="deck-region-select">
                     <option value="">— Select Region —</option>
                     ${regionOptions}
                 </select>
-                ${regionNames.length === 0 ? `<div style="color:var(--warn);font-size:0.8rem;margin-top:0.3rem;">⚠️ No region files found. Using fallback defaults.</div>` : ''}
+                <button class="btn btn-xs btn-ghost" id="deck-refresh-regions" title="Re-scan for region files">🔄</button>
+                <span style="font-size:0.7rem;color:var(--text3);white-space:nowrap;">(${regionCount} regions)</span>
             </div>
+            ${regionNames.length === 0 ? `<div style="color:var(--warn);font-size:0.8rem;margin-top:0.3rem;">⚠️ No region files found. Using fallback defaults.</div>` : ''}
             <div id="region-description" style="margin-top:0.8rem;background:var(--bg2);padding:0.8rem 1rem;border-radius:var(--radius);border-left:4px solid var(--gold);color:var(--text2);font-size:1rem;line-height:1.6;max-height:60vh;overflow-y:auto;">
                 Select a region to display its description.
             </div>
@@ -1078,8 +1049,41 @@ export async function render(el) {
         });
     }
 
+    const refreshBtn = document.getElementById('deck-refresh-regions');
+    if (refreshBtn) {
+        refreshBtn.addEventListener('click', async function() {
+            localStorage.removeItem('fates-edge-region-cache');
+            regionDataCache.clear();
+            await initializeRegions();
+            const select = document.getElementById('deck-region-select');
+            if (select) {
+                const currentVal = select.value;
+                select.innerHTML = '<option value="">— Select Region —</option>';
+                regionNames.forEach(name => {
+                    const opt = document.createElement('option');
+                    opt.value = name;
+                    opt.textContent = name;
+                    select.appendChild(opt);
+                });
+                if (currentVal && regionNames.includes(currentVal)) {
+                    select.value = currentVal;
+                } else if (regionNames.length > 0) {
+                    select.value = regionNames[0];
+                }
+                await handleRegionChange();
+                const countSpan = document.querySelector('#deck-region-select + span');
+                if (countSpan) countSpan.textContent = `(${regionNames.length} regions)`;
+                showToast('🗺️ Region list refreshed.', 'success');
+            }
+        });
+    }
+
     isInitialized = true;
 }
+
+// ============================================================
+// DECK BUILDING & DRAWING
+// ============================================================
 
 function buildDeck() {
     deck = [];
@@ -1422,8 +1426,9 @@ export function onDeactivate() {
 }
 
 export async function refresh() {
-    console.log('[Decks] Refreshing');
-    await loadManifest();
+    localStorage.removeItem('fates-edge-region-cache');
+    regionDataCache.clear();
+    await initializeRegions();
     const select = document.getElementById('deck-region-select');
     if (select) {
         const currentValue = select.value;
@@ -1440,6 +1445,8 @@ export async function refresh() {
             select.value = regionNames[0];
         }
         await handleRegionChange();
+        const countSpan = document.querySelector('#deck-region-select + span');
+        if (countSpan) countSpan.textContent = `(${regionNames.length} regions)`;
     }
 }
 
@@ -1451,6 +1458,7 @@ export function destroy() {
     selectedRegion = null;
     isInitialized = false;
     regionChangeCallbacks = [];
+    regionDataCache.clear();
 }
 
 export function attachEvents() {
@@ -1621,7 +1629,12 @@ export async function setSelectedRegion(regionName) {
 }
 export function getRegionData() { return regionData; }
 export function getCardMeaning(suit, rank) {
-    if (!regionData) return `A complication of ${suit} arises.`;
+    if (!regionData) {
+        const archetype = SUIT_ARCHETYPES[suit] || { label: 'Element', desc: 'a force' };
+        const rankName = RANK_NAMES[rank] || rank;
+        const tierInfo = RANK_TIERS[rank] || { tier: 'Minor', segments: 4 };
+        return `${rankName} of ${suit} (${archetype.label}): A ${archetype.label.toLowerCase()} arises. ${archetype.desc}. ${tierInfo.tier} influence.`;
+    }
     return getCardMeaningFromRegion(suit, rank, regionData);
 }
 export function registerRegionChange(callback) {
@@ -1775,7 +1788,6 @@ export default {
     onDeactivate,
     refresh,
     destroy,
-    loadManifest,
     fetchRegionData,
     buildDeck,
     openCrownSpread,

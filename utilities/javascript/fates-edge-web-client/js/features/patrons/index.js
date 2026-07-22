@@ -1,19 +1,13 @@
 // features/patrons/index.js
 /**
  * Patrons feature - Display and manage Patrons (Cosmic, Terrestrial, and Trusts)
- * 
+ *
  * Data paths:
  * - Cosmic patron data: /data/patrons/{id}.json
- * - Cosmic manifest: /data/patrons/manifest.json
  * - Terrestrial patron data: /data/terrestrial/{id}.json (fallback: /data/factions/{id}.json)
- * - Terrestrial manifest: /data/terrestrial/manifest.json (fallback: /data/factions/manifest.json)
  * - Religions: /data/religions/{id}.json
- * - Religion manifest: /data/religions/manifest.json
- * 
- * Patron data structure supports nested rites with descriptions,
- * corruption tables, lore, cults, gifts, and more.
- * 
- * Terrestrial patrons are factions with additional patron-specific fields.
+ *
+ * All data is discovered without a manifest.json – we test known slugs.
  */
 
 import { getState, saveState } from '../../core/state.js';
@@ -25,64 +19,40 @@ import { escHtml } from '../../core/utils.js';
 // ============================================================
 
 const COSMIC_DATA_PATH = './data/patrons/';
-const COSMIC_MANIFEST_PATH = './data/patrons/manifest.json';
-
 const TERRESTRIAL_DATA_PATH = './data/terrestrial/';
-const TERRESTRIAL_MANIFEST_PATH = './data/terrestrial/manifest.json';
 const TERRESTRIAL_FALLBACK_DATA_PATH = './data/factions/';
-const TERRESTRIAL_FALLBACK_MANIFEST_PATH = './data/factions/manifest.json';
-
 const RELIGION_DATA_PATH = './data/religions/';
-const RELIGION_MANIFEST_PATHS = [
-    './data/religions/manifest.json',
-    './data/docs/religions-manifest.json'
+
+// Known slugs for each category – extend as needed
+const KNOWN_COSMIC_SLUGS = [
+    'aveh_the_rider_behind_the_storm', 'carrion_king', 'gaila_the_laughing_light',
+    'grimmir_the_old_man_of_the_forest', 'ibeji_the_twin_stones', 'ikasha_she_who_sleeps',
+    'inaea_angel_of_the_spider', 'isoka_angel_of_serpents', 'khemesh_the_abyssal_maw',
+    'kuva_the_sky_that_takes_many_names', 'livaea_the_crimson_courtier', 'lucky_jack_the_lord_of_thieves',
+    'lunara_the_silver_quiet', 'mab_queen_of_courts', 'maelstraeus_the_infernal_bargainer',
+    'malachai_the_cruel_messenger', 'morag_the_hag_weaver_of_hidden_costs', 'moriraath_the_destroyer',
+    'mykkiel_arbiter_of_the_covenant', 'nidhoggr_the_worldworm', 'nimorith_the_gray_benefactor',
+    'oath_of_flame__light', 'oath_of_flame_light', 'oath_of_mercy_and_grace',
+    'oya_the_wind_of_the_sahel', 'palinode_queen_of_encores', 'rayn_mistress_of_the_sea',
+    'solara_the_still_mirror', 'the_breath_of_the_first_forge_the_spark_in_the_makers_hand',
+    'the_carrion_king_lord_of_decay_and_renewal', 'the_clockwork_monad_the_iterative_forge',
+    'the_confessor_beneath_the_bell', 'the_gallows_bell', 'the_inquisitor_prime_the_iron_hand_of_purity',
+    'the_ninth_beyond_comprehension', 'the_pale_shepherd_guide_of_transitions',
+    'the_sacred_geometry_architect_of_perfect_forms', 'the_unbroken_way_the_way_of_balance',
+    'thrysos_king_of_revels', 'varnek_karn_the_deaths_negotiator', 'venara_the_unbroken_thread',
+    'vorthak_the_hunger_unbound', 'xhakthul_the_thunderspeaker', 'zephyria_the_first_bloom'
 ];
 
-const KNOWN_COSMIC_PATRON_SLUGS = [
-    'aveh_the_rider_behind_the_storm',
-    'carrion_king',
-    'gaila_the_laughing_light',
-    'grimmir_the_old_man_of_the_forest',
-    'ibeji_the_twin_stones',
-    'ikasha_she_who_sleeps',
-    'inaea_angel_of_the_spider',
-    'isoka_angel_of_serpents',
-    'khemesh_the_abyssal_maw',
-    'kuva_the_sky_that_takes_many_names',
-    'livaea_the_crimson_courtier',
-    'lucky_jack_the_lord_of_thieves',
-    'lunara_the_silver_quiet',
-    'mab_queen_of_courts',
-    'maelstraeus_the_infernal_bargainer',
-    'malachai_the_cruel_messenger',
-    'morag_the_hag_weaver_of_hidden_costs',
-    'moriraath_the_destroyer',
-    'mykkiel_arbiter_of_the_covenant',
-    'nidhoggr_the_worldworm',
-    'nimorith_the_gray_benefactor',
-    'oath_of_flame__light',
-    'oath_of_flame_light',
-    'oath_of_mercy_and_grace',
-    'oya_the_wind_of_the_sahel',
-    'palinode_queen_of_encores',
-    'rayn_mistress_of_the_sea',
-    'solara_the_still_mirror',
-    'the_breath_of_the_first_forge_the_spark_in_the_makers_hand',
-    'the_carrion_king_lord_of_decay_and_renewal',
-    'the_clockwork_monad_the_iterative_forge',
-    'the_confessor_beneath_the_bell',
-    'the_gallows_bell',
-    'the_inquisitor_prime_the_iron_hand_of_purity',
-    'the_ninth_beyond_comprehension',
-    'the_pale_shepherd_guide_of_transitions',
-    'the_sacred_geometry_architect_of_perfect_forms',
-    'the_unbroken_way_the_way_of_balance',
-    'thrysos_king_of_revels',
-    'varnek_karn_the_deaths_negotiator',
-    'venara_the_unbroken_thread',
-    'vorthak_the_hunger_unbound',
-    'xhakthul_the_thunderspeaker',
-    'zephyria_the_first_bloom'
+// Known terrestrial/faction slugs (you can expand this)
+const KNOWN_TERRESTRIAL_SLUGS = [
+    'velvet-court', 'house-contarini', 'the-iron-covenant', 'silver-fang-tribe',
+    'the-whispering-net', 'ashen-syndicate', 'crimson-rose'
+];
+
+// Known religion slugs
+const KNOWN_RELIGION_SLUGS = [
+    'everflame', 'the-celestial-spire', 'church-of-the-red-stone',
+    'order-of-the-void', 'temple-of-the-wandering-star'
 ];
 
 // ============================================================
@@ -90,8 +60,6 @@ const KNOWN_COSMIC_PATRON_SLUGS = [
 // ============================================================
 
 const DEFAULT_COSMIC_PATRONS = [
-    // Add your default cosmic patrons here. For brevity, I'll include one example.
-    // In your actual file, you can copy the full list from your previous version.
     {
         id: 'the-traveler',
         name: 'The Traveler',
@@ -114,7 +82,6 @@ const DEFAULT_COSMIC_PATRONS = [
         rites: [],
         source: 'default'
     }
-    // Add all other default cosmic patrons here
 ];
 
 const DEFAULT_TERRESTRIAL_PATRONS = [
@@ -195,7 +162,6 @@ const DEFAULT_RELIGIONS = [
 // HELPERS
 // ============================================================
 
-// Safely convert any value to a string for display
 function safeString(val) {
     if (val === undefined || val === null) return '';
     if (typeof val === 'string') return val;
@@ -211,42 +177,27 @@ function safeString(val) {
     return String(val);
 }
 
-// Extract a plain text description from a patron object
 function getPatronDescription(patron) {
     if (!patron) return 'No description available.';
-    
-    // If there's a direct description string, use it
     if (typeof patron.description === 'string') return patron.description;
-    
-    // If description is an object (like in the JSON)
     if (patron.description && typeof patron.description === 'object') {
-        // If it has a description field, use that
         if (patron.description.description) return patron.description.description;
-        // If it has a lore field, use that
         if (patron.description.lore) return patron.description.lore;
-        // If it has a quote, use that
         if (patron.description.quote) return patron.description.quote;
-        // If it has a text field, use that
         if (patron.description.text) return patron.description.text;
-        // If it has followers, combine with others
         let parts = [];
         if (patron.description.followers) parts.push(patron.description.followers);
         if (patron.description.apocalyptic_aspect) parts.push(patron.description.apocalyptic_aspect);
         if (parts.length > 0) return parts.join('\n\n');
     }
-    
-    // If there's a lore field at top level
     if (patron.lore && typeof patron.lore === 'object') {
         if (patron.lore.description) return patron.lore.description;
         if (patron.lore.lore) return patron.lore.lore;
     }
     if (typeof patron.lore === 'string') return patron.lore;
-    
-    // Fallback: try to get any string from the object
     return safeString(patron.description) || 'No description available.';
 }
 
-// Get a plain text summary for the tile
 function getPatronSummary(patron) {
     if (!patron) return '';
     if (patron.subtitle && typeof patron.subtitle === 'string') return patron.subtitle;
@@ -261,17 +212,12 @@ function getPatronSummary(patron) {
     return '';
 }
 
-// Normalize a patron object to have consistent fields
 function normalizePatron(p) {
     if (!p) return p;
     const result = { ...p };
-    // If there's a title but no name, use title as name
     if (!result.name && result.title) result.name = result.title;
-    // If there's a subtitle but no domain, use subtitle as domain
     if (!result.domain && result.subtitle) result.domain = result.subtitle;
-    // If description is an object, extract it
     if (result.description && typeof result.description === 'object') {
-        // If there's a lore.description, use that as the main description
         if (result.description.description) {
             result._rawDescription = result.description;
             result.description = result.description.description;
@@ -281,6 +227,90 @@ function normalizePatron(p) {
         }
     }
     return result;
+}
+
+// Format text: escape HTML but preserve line breaks
+function formatText(text) {
+    if (!text) return '';
+    return escHtml(text).replace(/\n/g, '<br>');
+}
+
+// ============================================================
+// DISCOVERY (manifest‑free)
+// ============================================================
+
+const CACHE_KEY = 'fates-edge-patrons-cache';
+const CACHE_TTL = 3600000; // 1 hour
+
+async function discoverPatrons(type) {
+    // type: 'cosmic', 'terrestrial', 'religion'
+    let slugs = [];
+    let dataPath = '';
+    let fallbackPath = null;
+
+    switch (type) {
+        case 'cosmic':
+            slugs = KNOWN_COSMIC_SLUGS;
+            dataPath = COSMIC_DATA_PATH;
+            break;
+        case 'terrestrial':
+            slugs = KNOWN_TERRESTRIAL_SLUGS;
+            dataPath = TERRESTRIAL_DATA_PATH;
+            fallbackPath = TERRESTRIAL_FALLBACK_DATA_PATH;
+            break;
+        case 'religion':
+            slugs = KNOWN_RELIGION_SLUGS;
+            dataPath = RELIGION_DATA_PATH;
+            break;
+        default:
+            return [];
+    }
+
+    // Check cache
+    try {
+        const cached = localStorage.getItem(CACHE_KEY);
+        if (cached) {
+            const data = JSON.parse(cached);
+            if (data[type] && Date.now() - data.timestamp < CACHE_TTL) {
+                console.log(`[Patrons] Using cached ${type} list (${data[type].length} items)`);
+                return data[type];
+            }
+        }
+    } catch (_) {}
+
+    console.log(`[Patrons] Discovering ${type} patrons...`);
+    const found = [];
+
+    // Test primary path
+    await Promise.all(slugs.map(async (slug) => {
+        try {
+            const res = await fetch(`${dataPath}${slug}.json`, { method: 'HEAD' });
+            if (res.ok) {
+                found.push(slug);
+                return;
+            }
+        } catch (_) {}
+        // If primary fails and we have a fallback, try that
+        if (fallbackPath) {
+            try {
+                const res = await fetch(`${fallbackPath}${slug}.json`, { method: 'HEAD' });
+                if (res.ok) {
+                    found.push(slug);
+                }
+            } catch (_) {}
+        }
+    }));
+
+    // Update cache
+    try {
+        const cacheData = JSON.parse(localStorage.getItem(CACHE_KEY) || '{}');
+        cacheData[type] = found;
+        cacheData.timestamp = Date.now();
+        localStorage.setItem(CACHE_KEY, JSON.stringify(cacheData));
+    } catch (_) {}
+
+    console.log(`[Patrons] Found ${found.length} ${type} patrons`);
+    return found;
 }
 
 // ============================================================
@@ -302,7 +332,7 @@ let state = {
     dataLoaded: false,
     usingFallback: false,
     obligation: {},
-    expandedRites: new Set(),
+    expandedRites: new Set(),       // stores rite IDs for persistence
     expandedSections: new Set()
 };
 
@@ -333,129 +363,74 @@ async function loadRemotePatrons() {
     state.isLoading = true;
 
     try {
-        // Load religions
-        await loadReligions();
+        // Discover slugs for each category
+        const cosmicSlugs = await discoverPatrons('cosmic');
+        const terrestrialSlugs = await discoverPatrons('terrestrial');
+        const religionSlugs = await discoverPatrons('religion');
 
-        // --- Load Cosmic Patrons ---
-        let cosmicManifest = null;
-        try {
-            const res = await fetch(COSMIC_MANIFEST_PATH);
-            if (res.ok) {
-                const data = await res.json();
-                if (Array.isArray(data) && data.length > 0) cosmicManifest = data;
-            }
-        } catch (e) { /* ignore */ }
-
+        // Fetch cosmic patrons
         let cosmicPatrons = [];
-        if (cosmicManifest) {
-            for (const entry of cosmicManifest) {
-                let patronId = typeof entry === 'string' ? entry : (entry.id || entry.slug || entry.name);
-                if (!patronId) continue;
-                patronId = String(patronId).toLowerCase().replace(/[^a-z0-9_-]/g, '');
-                try {
-                    const res = await fetch(`${COSMIC_DATA_PATH}${patronId}.json`);
-                    if (res.ok) {
-                        const data = await res.json();
-                        if (!data.id) data.id = patronId;
-                        cosmicPatrons.push(normalizePatron(data));
-                    }
-                } catch (e) { /* ignore */ }
-            }
-        }
-
-        if (cosmicPatrons.length === 0) {
-            // Discovery fallback
-            for (const slug of KNOWN_COSMIC_PATRON_SLUGS) {
-                try {
-                    const res = await fetch(`${COSMIC_DATA_PATH}${slug}.json`);
-                    if (res.ok) {
-                        const data = await res.json();
-                        if (!data.id) data.id = slug;
-                        cosmicPatrons.push(normalizePatron(data));
-                    }
-                } catch (e) { /* ignore */ }
-            }
-        }
-
-        if (cosmicPatrons.length > 0) {
-            state.cosmicPatrons = cosmicPatrons;
-            state.dataLoaded = true;
-            state.usingFallback = false;
-            // Save manifest for future
+        for (const slug of cosmicSlugs) {
             try {
-                await fetch(COSMIC_MANIFEST_PATH, {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(cosmicPatrons.map(p => p.id || p.name))
-                });
-            } catch (e) { /* ignore */ }
-        }
-
-        // --- Load Terrestrial Patrons ---
-        let terrestrialManifest = null;
-        let terrestrialDataPath = TERRESTRIAL_DATA_PATH;
-        try {
-            const res = await fetch(TERRESTRIAL_MANIFEST_PATH);
-            if (res.ok) {
-                const data = await res.json();
-                if (Array.isArray(data) && data.length > 0) {
-                    terrestrialManifest = data;
-                }
-            }
-        } catch (e) {
-            // fallback to factions
-            try {
-                const res = await fetch(TERRESTRIAL_FALLBACK_MANIFEST_PATH);
+                const res = await fetch(`${COSMIC_DATA_PATH}${slug}.json`);
                 if (res.ok) {
                     const data = await res.json();
-                    if (Array.isArray(data) && data.length > 0) {
-                        terrestrialManifest = data;
-                        terrestrialDataPath = TERRESTRIAL_FALLBACK_DATA_PATH;
-                    }
+                    if (!data.id) data.id = slug;
+                    cosmicPatrons.push(normalizePatron(data));
                 }
-            } catch (e2) { /* ignore */ }
+            } catch (e) { /* ignore */ }
         }
+        if (cosmicPatrons.length === 0) {
+            cosmicPatrons = DEFAULT_COSMIC_PATRONS.map(normalizePatron);
+            state.usingFallback = true;
+            showToast('⚠️ No cosmic patron files found. Using defaults.', 'warning');
+        }
+        state.cosmicPatrons = cosmicPatrons;
 
+        // Fetch terrestrial patrons
         let terrestrialPatrons = [];
-        if (terrestrialManifest) {
-            for (const entry of terrestrialManifest) {
-                let factionId = typeof entry === 'string' ? entry : (entry.id || entry.slug || entry.name);
-                if (!factionId) continue;
-                factionId = String(factionId).toLowerCase().replace(/[^a-z0-9_-]/g, '');
-                try {
-                    const res = await fetch(`${terrestrialDataPath}${factionId}.json`);
-                    if (res.ok) {
-                        const data = await res.json();
-                        if (!data.id) data.id = factionId;
-                        // If it has patron-like fields, store it; otherwise mark as generic faction
-                        if (data.assetSlots !== undefined || data.maxAssetTier !== undefined || data.leverage) {
-                            terrestrialPatrons.push(normalizePatron(data));
-                        } else {
-                            data._type = 'faction';
-                            terrestrialPatrons.push(normalizePatron(data));
-                        }
-                    }
-                } catch (e) { /* ignore */ }
-            }
+        for (const slug of terrestrialSlugs) {
+            try {
+                // Try primary path
+                let res = await fetch(`${TERRESTRIAL_DATA_PATH}${slug}.json`);
+                if (!res.ok) {
+                    // Try fallback
+                    res = await fetch(`${TERRESTRIAL_FALLBACK_DATA_PATH}${slug}.json`);
+                }
+                if (res.ok) {
+                    const data = await res.json();
+                    if (!data.id) data.id = slug;
+                    terrestrialPatrons.push(normalizePatron(data));
+                }
+            } catch (e) { /* ignore */ }
         }
-
         if (terrestrialPatrons.length === 0) {
-            // Use defaults
             terrestrialPatrons = DEFAULT_TERRESTRIAL_PATRONS.map(normalizePatron);
             state.usingFallback = true;
             showToast('⚠️ No terrestrial patron files found. Using defaults.', 'warning');
         }
         state.terrestrialPatrons = terrestrialPatrons;
 
-        // --- Auto-populate any empty categories with defaults ---
-        if (state.cosmicPatrons.length === 0) {
-            state.cosmicPatrons = DEFAULT_COSMIC_PATRONS.map(normalizePatron);
+        // Fetch religions
+        let religions = [];
+        for (const slug of religionSlugs) {
+            try {
+                const res = await fetch(`${RELIGION_DATA_PATH}${slug}.json`);
+                if (res.ok) {
+                    const data = await res.json();
+                    if (!data.id) data.id = slug;
+                    religions.push(data);
+                }
+            } catch (e) { /* ignore */ }
+        }
+        if (religions.length === 0) {
+            religions = DEFAULT_RELIGIONS;
             state.usingFallback = true;
-            showToast('⚠️ No cosmic patron files found. Using defaults.', 'warning');
+            showToast('⚠️ No religion files found. Using defaults.', 'warning');
         }
-        if (state.religions.length === 0) {
-            state.religions = [...DEFAULT_RELIGIONS];
-        }
+        state.religions = religions;
+
+        // Trusts – they are usually created by users, so only use defaults if empty
         if (state.trusts.length === 0) {
             state.trusts = [...DEFAULT_TRUSTS];
         }
@@ -470,49 +445,6 @@ async function loadRemotePatrons() {
     } finally {
         state.isLoading = false;
     }
-}
-
-async function loadReligions() {
-    let religions = [];
-    let manifestData = null;
-    for (const path of RELIGION_MANIFEST_PATHS) {
-        try {
-            const res = await fetch(path);
-            if (res.ok) {
-                const data = await res.json();
-                if (Array.isArray(data)) {
-                    manifestData = data;
-                    break;
-                } else if (data && data.religions && Array.isArray(data.religions)) {
-                    manifestData = data.religions;
-                    break;
-                }
-            }
-        } catch (e) { /* ignore */ }
-    }
-
-    if (manifestData && manifestData.length > 0) {
-        for (const entry of manifestData) {
-            let id = typeof entry === 'string' ? entry : (entry.id || entry.slug);
-            if (!id) continue;
-            id = id.toLowerCase().replace(/[^a-z0-9_-]/g, '');
-            try {
-                const res = await fetch(`${RELIGION_DATA_PATH}${id}.json`);
-                if (res.ok) {
-                    const data = await res.json();
-                    if (!data.id) data.id = id;
-                    religions.push(data);
-                }
-            } catch (e) { /* ignore */ }
-        }
-    }
-
-    if (religions.length === 0) {
-        religions = DEFAULT_RELIGIONS;
-    }
-
-    state.religions = religions;
-    console.log(`📚 Loaded ${state.religions.length} religions`);
 }
 
 function loadDefaultPatrons() {
@@ -617,7 +549,7 @@ function renderView(view) {
 }
 
 // ============================================================
-// RENDER: COSMIC PATRONS (two-row scrollable grid, names visible)
+// RENDER: COSMIC PATRONS
 // ============================================================
 
 function renderCosmicPatrons() {
@@ -779,7 +711,7 @@ function renderTrusts() {
 }
 
 // ============================================================
-// PATRON DETAIL
+// PATRON DETAIL (Main view) – no toggle, full description
 // ============================================================
 
 function renderPatronDetail(patronId) {
@@ -789,28 +721,47 @@ function renderPatronDetail(patronId) {
         return;
     }
 
-    // Update the description area
     const descArea = document.getElementById('cosmic-description-area');
-    if (descArea) {
-        const desc = getPatronDescription(patron);
-        const name = safeString(patron.name || patron.title || 'Unnamed');
-        const summary = getPatronSummary(patron);
-        descArea.innerHTML = `
-            <div style="display:flex;align-items:center;gap:0.5rem;flex-wrap:wrap;">
-                <span style="font-size:1.5rem;">${safeString(patron.icon || '🌟')}</span>
-                <span style="font-weight:600;font-size:1.1rem;">${escHtml(name)}</span>
-                <span style="color:var(--text3);font-size:0.85rem;">${escHtml(summary)}</span>
-                <span style="color:var(--text3);font-size:0.75rem;margin-left:auto;">Obligation: ${getPatronObligation('default-character', patron.id)}</span>
-                <button class="btn btn-xs btn-primary" onclick="window.addPatronObligation('default-character', '${patron.id}', 1)">➕</button>
-                <button class="btn btn-xs btn-secondary" onclick="window.clearPatronObligation('default-character', '${patron.id}', 1)">➖</button>
-                <button class="btn btn-xs btn-ghost" onclick="window.openPatronDetailModal('${patron.id}')">📖 Full Details</button>
-            </div>
-            <div style="margin:0.3rem 0 0 0;color:var(--text2);font-size:0.9rem;line-height:1.5;max-height:120px;overflow-y:auto;">
-                ${escHtml(desc)}
-            </div>
-        `;
-    }
+    if (!descArea) return;
+
+    const desc = getPatronDescription(patron);
+    const name = safeString(patron.name || patron.title || 'Unnamed');
+    const summary = getPatronSummary(patron);
+
+    descArea.innerHTML = `
+        <div style="display:flex;align-items:center;gap:0.5rem;flex-wrap:wrap;">
+            <span style="font-size:1.5rem;">${safeString(patron.icon || '🌟')}</span>
+            <span style="font-weight:600;font-size:1.1rem;">${escHtml(name)}</span>
+            <span style="color:var(--text3);font-size:0.85rem;">${escHtml(summary)}</span>
+            <span style="color:var(--text3);font-size:0.75rem;margin-left:auto;">Obligation: ${getPatronObligation('default-character', patron.id)}</span>
+            <button class="btn btn-xs btn-primary" onclick="window.addPatronObligation('default-character', '${patron.id}', 1)">➕</button>
+            <button class="btn btn-xs btn-secondary" onclick="window.clearPatronObligation('default-character', '${patron.id}', 1)">➖</button>
+            <button class="btn btn-xs btn-ghost" onclick="window.openPatronDetailModal('${patron.id}')">📖 Full Details</button>
+        </div>
+        <div style="margin:0.3rem 0 0 0;color:var(--text2);font-size:0.9rem;line-height:1.5;overflow-y:auto;">
+            ${formatText(desc)}
+        </div>
+    `;
 }
+
+// ============================================================
+// HELPER: Check if a rite has any detail fields worth expanding
+// ============================================================
+
+function riteHasDetails(r) {
+    if (!r) return false;
+    // The primary descriptive text may be in description OR effect
+    const hasMainText = safeString(r.description || r.effect || '').length > 0;
+    const hasMeta = r.tier || r.xp || r.action || r.range || r.resist ||
+        r.materials || r.cost || r.duration || r.invoke || r.requires ||
+        r.push_it || r.timer ||
+        (r.tags && r.tags.length > 0);
+    return hasMainText || hasMeta;
+}
+
+// ============================================================
+// MODAL: FULL DETAIL (Cosmic Patron)
+// ============================================================
 
 window.openPatronDetailModal = function(patronId) {
     const patron = state.cosmicPatrons.find(p => p.id === patronId);
@@ -828,52 +779,65 @@ window.openPatronDetailModal = function(patronId) {
     const icon = safeString(patron.icon || '🌟');
     const domain = safeString(patron.domain || patron.subtitle || 'Unknown Domain');
     const religion = safeString(patron.religion || '');
+    const currentObligation = getPatronObligation('default-character', patron.id);
 
-    // Build rites HTML
+    // --- FIX: Build rites HTML with working expand/collapse ---
+    // The key bug was: hasDesc checked r.description, but rite data uses r.effect.
+    // Now we use riteHasDetails() which checks both + all meta fields.
     let ritesHtml = '';
     if (patron.rites && patron.rites.length > 0) {
         const hasDetailedRites = typeof patron.rites[0] === 'object';
         if (hasDetailedRites) {
             ritesHtml = `
-                <div class="patron-detail-section">
-                    <h3>🔮 Rites (${patron.rites.length})</h3>
-                    <div class="rites-list">
+                <div class="patron-detail-section" style="background:var(--bg2);border-radius:var(--radius);padding:0.8rem;margin-bottom:0.8rem;border-left:4px solid var(--gold);">
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin:0 0 0.5rem 0;flex-wrap:wrap;gap:0.3rem;">
+                        <h3 style="margin:0;color:var(--gold);">🔮 Rites (${patron.rites.length})</h3>
+                        <div style="display:flex;gap:0.3rem;">
+                            <button class="btn btn-xs btn-secondary" onclick="window.expandAllRites()">📖 Expand All</button>
+                            <button class="btn btn-xs btn-secondary" onclick="window.collapseAllRites()">📕 Collapse All</button>
+                        </div>
+                    </div>
+                    <div class="rites-list" style="display:flex;flex-direction:column;gap:0.5rem;">
                         ${patron.rites.map((r, idx) => {
-                            const riteId = `${patron.id}-${idx}`;
+                            const riteId = `${patron.id}-rite-${idx}`;
                             const isExpanded = state.expandedRites.has(riteId);
-                            const hasDesc = r.description && safeString(r.description).length > 0;
+                            const hasDetails = riteHasDetails(r);
+                            const riteName = safeString(r.name);
+                            const riteTier = safeString(r.tier || '');
+                            // Use effect as the primary descriptive text (fallback to description)
+                            const riteMainText = safeString(r.description || r.effect || '');
+
                             let detailsHtml = '';
-                            if (hasDesc) {
+                            if (hasDetails) {
                                 detailsHtml = `
-                                    <div class="rite-details ${isExpanded ? 'expanded' : 'collapsed'}" 
-                                         id="rite-details-${riteId}" 
-                                         style="${isExpanded ? '' : 'display:none;'}">
-                                        <div class="rite-description">${escHtml(safeString(r.description))}</div>
-                                        ${r.tier ? `<div class="rite-meta"><strong>Tier:</strong> ${escHtml(safeString(r.tier))}</div>` : ''}
-                                        ${r.xp ? `<div class="rite-meta"><strong>XP:</strong> ${escHtml(safeString(r.xp))}</div>` : ''}
-                                        ${r.action ? `<div class="rite-meta"><strong>Action:</strong> ${escHtml(safeString(r.action))}</div>` : ''}
-                                        ${r.range ? `<div class="rite-meta"><strong>Range:</strong> ${escHtml(safeString(r.range))}</div>` : ''}
-                                        ${r.resist ? `<div class="rite-meta"><strong>Resist:</strong> ${escHtml(safeString(r.resist))}</div>` : ''}
-                                        ${r.materials ? `<div class="rite-meta"><strong>Materials:</strong> ${escHtml(safeString(r.materials))}</div>` : ''}
-                                        ${r.cost ? `<div class="rite-meta"><strong>Cost:</strong> ${escHtml(safeString(r.cost))}</div>` : ''}
-                                        ${r.duration ? `<div class="rite-meta"><strong>Duration:</strong> ${escHtml(safeString(r.duration))}</div>` : ''}
-                                        ${r.invoke ? `<div class="rite-meta"><strong>Invoke:</strong> ${escHtml(safeString(r.invoke))}</div>` : ''}
-                                        ${r.requires ? `<div class="rite-meta"><strong>Requires:</strong> ${escHtml(safeString(r.requires))}</div>` : ''}
-                                        ${r.effect ? `<div class="rite-meta"><strong>Effect:</strong> ${escHtml(safeString(r.effect))}</div>` : ''}
-                                        ${r.push_it ? `<div class="rite-meta"><strong>Push It:</strong> ${escHtml(safeString(r.push_it))}</div>` : ''}
-                                        ${r.timer ? `<div class="rite-meta"><strong>Timer:</strong> ${escHtml(safeString(r.timer))}</div>` : ''}
-                                        ${r.tags && r.tags.length > 0 ? `<div class="rite-tags">${r.tags.map(t => `<span class="badge badge-tag">${escHtml(safeString(t))}</span>`).join('')}</div>` : ''}
+                                    <div class="rite-details" style="margin-top:0.4rem;padding:0.5rem 0.8rem;background:var(--bg3);border-radius:var(--radius);${isExpanded ? '' : 'display:none;'}">
+                                        ${riteMainText ? `<div class="rite-description" style="margin-bottom:0.4rem;line-height:1.5;">${formatText(riteMainText)}</div>` : ''}
+                                        ${r.push_it ? `<div class="rite-meta" style="font-size:0.85rem;color:var(--text2);margin-bottom:0.3rem;"><strong>⚡ Push It:</strong> ${formatText(safeString(r.push_it))}</div>` : ''}
+                                        ${r.tier ? `<div class="rite-meta" style="font-size:0.85rem;color:var(--text2);"><strong>Tier:</strong> ${escHtml(safeString(r.tier))}</div>` : ''}
+                                        ${r.xp ? `<div class="rite-meta" style="font-size:0.85rem;color:var(--text2);"><strong>XP:</strong> ${escHtml(safeString(r.xp))}</div>` : ''}
+                                        ${r.action ? `<div class="rite-meta" style="font-size:0.85rem;color:var(--text2);"><strong>Action:</strong> ${escHtml(safeString(r.action))}</div>` : ''}
+                                        ${r.range ? `<div class="rite-meta" style="font-size:0.85rem;color:var(--text2);"><strong>Range:</strong> ${escHtml(safeString(r.range))}</div>` : ''}
+                                        ${r.resist ? `<div class="rite-meta" style="font-size:0.85rem;color:var(--text2);"><strong>Resist:</strong> ${escHtml(safeString(r.resist))}</div>` : ''}
+                                        ${r.materials ? `<div class="rite-meta" style="font-size:0.85rem;color:var(--text2);"><strong>Materials:</strong> ${formatText(safeString(r.materials))}</div>` : ''}
+                                        ${r.cost ? `<div class="rite-meta" style="font-size:0.85rem;color:var(--text2);"><strong>Cost:</strong> ${formatText(safeString(r.cost))}</div>` : ''}
+                                        ${r.duration ? `<div class="rite-meta" style="font-size:0.85rem;color:var(--text2);"><strong>Duration:</strong> ${escHtml(safeString(r.duration))}</div>` : ''}
+                                        ${r.invoke ? `<div class="rite-meta" style="font-size:0.85rem;color:var(--text2);"><strong>Invoke:</strong> ${escHtml(safeString(r.invoke))}</div>` : ''}
+                                        ${r.requires ? `<div class="rite-meta" style="font-size:0.85rem;color:var(--text2);"><strong>Requires:</strong> ${formatText(safeString(r.requires))}</div>` : ''}
+                                        ${r.timer ? `<div class="rite-meta" style="font-size:0.85rem;color:var(--text2);"><strong>Timer:</strong> ${escHtml(safeString(r.timer))}</div>` : ''}
+                                        ${r.tags && r.tags.length > 0 ? `<div class="rite-tags" style="display:flex;gap:0.3rem;flex-wrap:wrap;margin-top:0.3rem;">${r.tags.map(t => `<span class="badge badge-tag" style="background:var(--bg2);padding:0.1rem 0.4rem;border-radius:8px;font-size:0.7rem;color:var(--text3);">${escHtml(safeString(t))}</span>`).join('')}</div>` : ''}
                                     </div>
                                 `;
                             }
-                            const riteName = safeString(r.name);
-                            const riteTier = safeString(r.tier || '');
                             return `
-                                <div class="rite-item ${hasDesc ? 'rite-expandable' : ''}" data-rite-id="${riteId}">
-                                    <div class="rite-header" onclick="${hasDesc ? `window.toggleRite('${riteId}')` : ''}">
-                                        <span class="rite-name">${escHtml(riteName)}</span>
-                                        ${riteTier ? `<span class="rite-tier">${escHtml(riteTier)}</span>` : ''}
-                                        ${hasDesc ? `<span class="rite-expand-icon">${isExpanded ? '▾' : '▸'}</span>` : ''}
+                                <div class="rite-item ${hasDetails ? 'rite-expandable' : ''}" data-rite-id="${escHtml(riteId)}" style="background:var(--bg3);border-radius:var(--radius);padding:0.4rem 0.8rem;border-left:3px solid ${riteTier ? 'var(--gold)' : 'var(--border)'};">
+                                    <div class="rite-header" ${hasDetails ? `onclick="window.toggleRite(this)"` : ''} style="display:flex;justify-content:space-between;align-items:center;cursor:${hasDetails ? 'pointer' : 'default'};">
+                                        <span class="rite-name" style="font-weight:600;">${escHtml(riteName)}</span>
+                                        <span style="display:flex;align-items:center;gap:0.5rem;">
+                                            ${riteTier ? `<span class="rite-tier" style="font-size:0.75rem;color:var(--text3);">${escHtml(riteTier)}</span>` : ''}
+                                            ${r.xp ? `<span style="font-size:0.7rem;color:var(--text3);">${escHtml(safeString(r.xp))} XP</span>` : ''}
+                                            ${r.action ? `<span style="font-size:0.7rem;color:var(--text3);">${escHtml(safeString(r.action))}</span>` : ''}
+                                            ${hasDetails ? `<span class="rite-expand-icon" style="font-size:0.8rem;color:var(--text3);">${isExpanded ? '▾' : '▸'}</span>` : ''}
+                                        </span>
                                     </div>
                                     ${detailsHtml}
                                 </div>
@@ -883,10 +847,11 @@ window.openPatronDetailModal = function(patronId) {
                 </div>
             `;
         } else {
+            // Simple list of rites
             ritesHtml = `
-                <div class="patron-detail-section">
-                    <h3>🔮 Rites (${patron.rites.length})</h3>
-                    <ul>
+                <div class="patron-detail-section" style="background:var(--bg2);border-radius:var(--radius);padding:0.8rem;margin-bottom:0.8rem;border-left:4px solid var(--gold);">
+                    <h3 style="margin:0 0 0.5rem 0;color:var(--gold);">🔮 Rites (${patron.rites.length})</h3>
+                    <ul style="margin:0;padding-left:1.2rem;list-style-type:disc;">
                         ${patron.rites.map(r => `<li>${escHtml(safeString(r))}</li>`).join('')}
                     </ul>
                 </div>
@@ -894,39 +859,196 @@ window.openPatronDetailModal = function(patronId) {
         }
     }
 
-    const currentObligation = getPatronObligation('default-character', patron.id);
-
-    // Build the modal content
+    // Build the modal content with improved styling
     modal.innerHTML = `
-        <div class="modal-content patron-detail" style="width: 90%; max-width: 1200px; max-height: 90vh; overflow-y: auto;">
-            <button class="modal-close" onclick="window.closePatronModal()">✕</button>
-            <div class="patron-detail-header">
+        <div class="modal-content patron-detail" style="width: 90%; max-width: 1200px; max-height: 90vh; overflow-y: auto; background:var(--bg1); padding:1.5rem; border-radius:var(--radius);">
+            <button class="modal-close" onclick="window.closePatronModal()" style="float:right;background:none;border:none;font-size:1.5rem;cursor:pointer;color:var(--text3);">✕</button>
+            <div class="patron-detail-header" style="display:flex;align-items:center;gap:1rem;margin-bottom:1rem;border-bottom:1px solid var(--border);padding-bottom:0.5rem;">
                 <div class="patron-detail-icon" style="font-size:3rem;">${escHtml(icon)}</div>
-                <div>
-                    <h2>${escHtml(name)}</h2>
-                    <div class="patron-detail-domain">${escHtml(domain)}</div>
-                    ${religion ? `<span class="badge badge-religion" style="background:var(--gold);color:var(--bg);">⛪ ${escHtml(religion)}</span>` : ''}
-                    ${patron.source === 'default' ? '<span class="badge badge-remote" style="font-size:0.7rem;">📦 Default Data</span>' : ''}
-                    <div style="margin-top:0.3rem;font-size:0.9rem;">
-                        Obligation: <strong>${currentObligation}</strong>
+                <div style="flex:1;">
+                    <h2 style="margin:0;color:var(--gold);">${escHtml(name)}</h2>
+                    <div class="patron-detail-domain" style="color:var(--text2);font-size:1.1rem;">${escHtml(domain)}</div>
+                    <div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-top:0.3rem;">
+                        ${religion ? `<span class="badge badge-religion" style="background:var(--gold);color:var(--bg);padding:0.1rem 0.5rem;border-radius:12px;font-size:0.8rem;">⛪ ${escHtml(religion)}</span>` : ''}
+                        ${patron.source === 'default' ? '<span class="badge badge-remote" style="background:var(--bg3);color:var(--text3);padding:0.1rem 0.5rem;border-radius:12px;font-size:0.7rem;">📦 Default Data</span>' : ''}
+                    </div>
+                    <div style="margin-top:0.5rem;font-size:0.9rem;display:flex;gap:0.5rem;align-items:center;">
+                        <span>Obligation: <strong>${currentObligation}</strong></span>
                         <button class="btn btn-xs btn-primary" onclick="window.addPatronObligation('default-character', '${patron.id}', 1)">➕</button>
                         <button class="btn btn-xs btn-secondary" onclick="window.clearPatronObligation('default-character', '${patron.id}', 1)">➖</button>
                     </div>
                 </div>
             </div>
-            <div class="patron-detail-body">
-                ${desc ? `<div class="patron-detail-section"><h3>📖 Description</h3><p>${escHtml(desc)}</p></div>` : ''}
-                ${patron.lore && typeof patron.lore === 'object' ? `<div class="patron-detail-section"><h3>📚 Lore</h3><p style="white-space:pre-wrap;">${escHtml(safeString(patron.lore.description || patron.lore))}</p></div>` : ''}
-                ${patron.domain_focus ? `<div class="patron-detail-section"><h3>🎯 Domain Focus</h3><ul>${patron.domain_focus.map(d => `<li>${escHtml(safeString(d))}</li>`).join('')}</ul></div>` : ''}
-                ${patron.patrons_gift ? `<div class="patron-detail-section"><h3>🎁 Patron's Gift</h3><p><strong>${escHtml(safeString(patron.patrons_gift.name || 'Gift'))}</strong></p><p>${escHtml(safeString(patron.patrons_gift.description))}</p>${patron.patrons_gift.effect ? `<p><strong>Effect:</strong> ${escHtml(safeString(patron.patrons_gift.effect))}</p>` : ''}${patron.patrons_gift.cost ? `<p class="text-muted">Cost: ${escHtml(safeString(patron.patrons_gift.cost))}</p>` : ''}</div>` : ''}
+
+            <div class="patron-detail-body" style="display:flex;flex-direction:column;gap:0.8rem;">
+                ${desc ? `
+                    <div class="patron-detail-section" style="background:var(--bg2);border-radius:var(--radius);padding:0.8rem;border-left:4px solid var(--gold);">
+                        <h3 style="margin:0 0 0.3rem 0;color:var(--gold);">📖 Description</h3>
+                        <p style="margin:0;white-space:pre-wrap;">${formatText(desc)}</p>
+                    </div>
+                ` : ''}
+
+                ${patron.lore && typeof patron.lore === 'object' ? `
+                    <div class="patron-detail-section" style="background:var(--bg2);border-radius:var(--radius);padding:0.8rem;border-left:4px solid var(--gold);">
+                        <h3 style="margin:0 0 0.3rem 0;color:var(--gold);">📚 Lore</h3>
+                        <p style="margin:0;white-space:pre-wrap;">${formatText(safeString(patron.lore.description || patron.lore))}</p>
+                    </div>
+                ` : ''}
+
+                ${patron.domain_focus ? `
+                    <div class="patron-detail-section" style="background:var(--bg2);border-radius:var(--radius);padding:0.8rem;border-left:4px solid var(--gold);">
+                        <h3 style="margin:0 0 0.3rem 0;color:var(--gold);">🎯 Domain Focus</h3>
+                        <ul style="margin:0;padding-left:1.2rem;list-style-type:disc;">
+                            ${patron.domain_focus.map(d => `<li>${escHtml(safeString(d))}</li>`).join('')}
+                        </ul>
+                    </div>
+                ` : ''}
+
+                ${patron.runekeeper_options ? `
+                    <div class="patron-detail-section" style="background:var(--bg2);border-radius:var(--radius);padding:0.8rem;border-left:4px solid var(--gold);">
+                        <h3 style="margin:0 0 0.3rem 0;color:var(--gold);">📜 Runekeeper Options</h3>
+                        ${patron.runekeeper_options.thiasos ? `
+                            <div style="margin-bottom:0.5rem;">
+                                <strong>Thiasos (Familiar):</strong>
+                                <p style="margin:0.2rem 0;">${formatText(safeString(patron.runekeeper_options.thiasos.description))}</p>
+                                ${patron.runekeeper_options.thiasos.care ? `<p style="margin:0.2rem 0;font-size:0.85rem;color:var(--text3);"><strong>Care:</strong> ${formatText(safeString(patron.runekeeper_options.thiasos.care))}</p>` : ''}
+                            </div>
+                        ` : ''}
+                        ${patron.runekeeper_options.codex ? `
+                            <div>
+                                <strong>Codex:</strong>
+                                <p style="margin:0.2rem 0;">${formatText(safeString(patron.runekeeper_options.codex.description))}</p>
+                                ${patron.runekeeper_options.codex.upkeep ? `<p style="margin:0.2rem 0;font-size:0.85rem;color:var(--text3);"><strong>Upkeep:</strong> ${formatText(safeString(patron.runekeeper_options.codex.upkeep))}</p>` : ''}
+                            </div>
+                        ` : ''}
+                    </div>
+                ` : ''}
+
+                ${patron.patrons_gift ? `
+                    <div class="patron-detail-section" style="background:var(--bg2);border-radius:var(--radius);padding:0.8rem;border-left:4px solid var(--gold);">
+                        <h3 style="margin:0 0 0.3rem 0;color:var(--gold);">🎁 Patron's Gift</h3>
+                        <p style="margin:0;"><strong>${escHtml(safeString(patron.patrons_gift.name || 'Gift'))}</strong></p>
+                        <p style="margin:0.3rem 0 0 0;">${formatText(safeString(patron.patrons_gift.description))}</p>
+                        ${patron.patrons_gift.effect ? `<p style="margin:0.3rem 0 0 0;"><strong>Effect:</strong> ${formatText(safeString(patron.patrons_gift.effect))}</p>` : ''}
+                        ${patron.patrons_gift.cost ? `<p style="margin:0.3rem 0 0 0;color:var(--text3);">Cost: ${formatText(safeString(patron.patrons_gift.cost))}</p>` : ''}
+                    </div>
+                ` : ''}
+
                 ${ritesHtml}
-                ${patron.corruption ? `<div class="patron-detail-section"><h3>⚠️ Corruption</h3><table style="width:100%;border-collapse:collapse;font-size:0.9rem;"><thead><tr><th>Tier</th><th>Benefit</th><th>Cost / Quirk</th></tr></thead><tbody>${patron.corruption.map(c => `<tr><td>${escHtml(safeString(c.tier))}</td><td>${escHtml(safeString(c.benefit))}</td><td>${escHtml(safeString(c.cost))}</td></tr>`).join('')}</tbody></table></div>` : ''}
-                ${patron.cantors_and_cults ? `<div class="patron-detail-section"><h3>🎶 Cantors & Cults</h3>${patron.cantors_and_cults.cantors ? `<p><strong>Cantors:</strong> ${escHtml(safeString(patron.cantors_and_cults.cantors.description || patron.cantors_and_cults.cantors))}</p>` : ''}${patron.cantors_and_cults.cult ? `<p><strong>Cult:</strong> ${escHtml(safeString(patron.cantors_and_cults.cult.description || patron.cantors_and_cults.cult))}</p>` : ''}</div>` : ''}
-                ${patron.witchcraft ? `<div class="patron-detail-section"><h3>🧹 Witchcraft</h3>${patron.witchcraft.description ? `<p>${escHtml(safeString(patron.witchcraft.description))}</p>` : ''}${patron.witchcraft.tools ? `<p><strong>Tool:</strong> ${escHtml(safeString(patron.witchcraft.tools.name || ''))} — ${escHtml(safeString(patron.witchcraft.tools.description || ''))}</p>` : ''}${patron.witchcraft.hedge_gifts ? `<div><strong>Hedge Gifts:</strong></div><ul>${patron.witchcraft.hedge_gifts.map(g => `<li><strong>${escHtml(safeString(g.name))}</strong> (${escHtml(safeString(g.xp))} XP): ${escHtml(safeString(g.description))}</li>`).join('')}</ul>` : ''}</div>` : ''}
-                ${patron.playstyle_notes ? `<div class="patron-detail-section"><h3>🎮 Playstyle Notes</h3>${patron.playstyle_notes.description ? `<p>${escHtml(safeString(patron.playstyle_notes.description))}</p>` : ''}${patron.playstyle_notes.emphasizes ? `<div><strong>Emphasizes:</strong></div><ul>${patron.playstyle_notes.emphasizes.map(e => `<li>${escHtml(safeString(e))}</li>`).join('')}</ul>` : ''}</div>` : ''}
-                ${patron.quotes ? `<div class="patron-detail-section"><h3>💬 Quotes</h3>${patron.quotes.map(q => `<blockquote style="margin:0.5rem 0;padding:0.5rem 1rem;background:var(--bg3);border-left:4px solid var(--gold);"><em>${escHtml(safeString(q.text))}</em> — ${escHtml(safeString(q.speaker))}</blockquote>`).join('')}</div>` : ''}
+
+                ${patron.corruption ? `
+                    <div class="patron-detail-section" style="background:var(--bg2);border-radius:var(--radius);padding:0.8rem;border-left:4px solid var(--red);">
+                        <h3 style="margin:0 0 0.3rem 0;color:var(--red);">⚠️ Corruption</h3>
+                        <table style="width:100%;border-collapse:collapse;font-size:0.9rem;">
+                            <thead><tr style="border-bottom:1px solid var(--border);"><th style="text-align:left;padding:0.2rem 0.5rem;">Tier</th><th style="text-align:left;padding:0.2rem 0.5rem;">Benefit</th><th style="text-align:left;padding:0.2rem 0.5rem;">Cost / Quirk</th></tr></thead>
+                            <tbody>${patron.corruption.map(c => `<tr style="border-bottom:1px solid var(--border);"><td style="padding:0.2rem 0.5rem;">${escHtml(safeString(c.tier))}</td><td style="padding:0.2rem 0.5rem;">${escHtml(safeString(c.benefit))}</td><td style="padding:0.2rem 0.5rem;">${escHtml(safeString(c.cost))}</td></tr>`).join('')}</tbody>
+                        </table>
+                    </div>
+                ` : ''}
+
+                ${patron.monastic_tradition ? `
+                    <div class="patron-detail-section" style="background:var(--bg2);border-radius:var(--radius);padding:0.8rem;border-left:4px solid var(--gold);">
+                        <h3 style="margin:0 0 0.3rem 0;color:var(--gold);">⛩️ Monastic Tradition: ${escHtml(safeString(patron.monastic_tradition.name))}</h3>
+                        ${patron.monastic_tradition.quote ? `<blockquote style="margin:0.3rem 0;padding:0.5rem 1rem;background:var(--bg3);border-radius:var(--radius);border-left:4px solid var(--gold);"><em>${formatText(safeString(patron.monastic_tradition.quote))}</em></blockquote>` : ''}
+                        ${patron.monastic_tradition.prerequisites ? `<p style="margin:0.3rem 0;"><strong>Prerequisites:</strong> ${escHtml(safeString(patron.monastic_tradition.prerequisites))}</p>` : ''}
+                        ${patron.monastic_tradition.debt_resistant_frame ? `<p style="margin:0.3rem 0;"><strong>Debt-Resistant Frame:</strong> ${formatText(safeString(patron.monastic_tradition.debt_resistant_frame))}</p>` : ''}
+                        ${patron.monastic_tradition.techniques ? `
+                            <div style="margin-top:0.5rem;"><strong>Techniques:</strong></div>
+                            <div style="display:flex;flex-direction:column;gap:0.3rem;margin-top:0.3rem;">
+                                ${patron.monastic_tradition.techniques.map((tech, idx) => {
+                                    const techId = `${patron.id}-tech-${idx}`;
+                                    const techExpanded = state.expandedRites.has(techId);
+                                    const techHasDetails = tech.effect || tech.cost || tech.requirement;
+                                    return `
+                                        <div class="rite-item ${techHasDetails ? 'rite-expandable' : ''}" data-rite-id="${escHtml(techId)}" style="background:var(--bg3);border-radius:var(--radius);padding:0.4rem 0.8rem;border-left:3px solid var(--border);">
+                                            <div class="rite-header" ${techHasDetails ? `onclick="window.toggleRite(this)"` : ''} style="display:flex;justify-content:space-between;align-items:center;cursor:${techHasDetails ? 'pointer' : 'default'};">
+                                                <span style="font-weight:600;">${escHtml(safeString(tech.name))}</span>
+                                                <span style="display:flex;align-items:center;gap:0.5rem;">
+                                                    ${tech.tier ? `<span style="font-size:0.75rem;color:var(--text3);">${escHtml(safeString(tech.tier))}</span>` : ''}
+                                                    ${tech.xp ? `<span style="font-size:0.7rem;color:var(--text3);">${escHtml(safeString(tech.xp))} XP</span>` : ''}
+                                                    ${techHasDetails ? `<span class="rite-expand-icon" style="font-size:0.8rem;color:var(--text3);">${techExpanded ? '▾' : '▸'}</span>` : ''}
+                                                </span>
+                                            </div>
+                                            ${techHasDetails ? `
+                                                <div class="rite-details" style="margin-top:0.4rem;padding:0.5rem 0.8rem;background:var(--bg2);border-radius:var(--radius);${techExpanded ? '' : 'display:none;'}">
+                                                    ${tech.effect ? `<div style="margin-bottom:0.3rem;line-height:1.5;">${formatText(safeString(tech.effect))}</div>` : ''}
+                                                    ${tech.cost ? `<div style="font-size:0.85rem;color:var(--text2);"><strong>Cost:</strong> ${escHtml(safeString(tech.cost))}</div>` : ''}
+                                                    ${tech.requirement ? `<div style="font-size:0.85rem;color:var(--text2);"><strong>Requirement:</strong> ${escHtml(safeString(tech.requirement))}</div>` : ''}
+                                                </div>
+                                            ` : ''}
+                                        </div>
+                                    `;
+                                }).join('')}
+                            </div>
+                        ` : ''}
+                        ${patron.monastic_tradition.master_technique ? `
+                            <div style="margin-top:0.5rem;">
+                                <strong>Master Technique: ${escHtml(safeString(patron.monastic_tradition.master_technique.name))}</strong>
+                                <p style="margin:0.2rem 0;">${formatText(safeString(patron.monastic_tradition.master_technique.description))}</p>
+                                ${patron.monastic_tradition.master_technique.xp ? `<p style="font-size:0.85rem;color:var(--text3);">XP: ${escHtml(safeString(patron.monastic_tradition.master_technique.xp))}</p>` : ''}
+                            </div>
+                        ` : ''}
+                    </div>
+                ` : ''}
+
+                ${patron.cantors_and_cults ? `
+                    <div class="patron-detail-section" style="background:var(--bg2);border-radius:var(--radius);padding:0.8rem;border-left:4px solid var(--gold);">
+                        <h3 style="margin:0 0 0.3rem 0;color:var(--gold);">🎶 Cantors & Cults</h3>
+                        ${patron.cantors_and_cults.cantors ? `<p style="margin:0.3rem 0;"><strong>Cantors:</strong> ${formatText(safeString(patron.cantors_and_cults.cantors.description || patron.cantors_and_cults.cantors))}</p>` : ''}
+                        ${patron.cantors_and_cults.cult ? `<p style="margin:0.3rem 0;"><strong>Cult:</strong> ${formatText(safeString(patron.cantors_and_cults.cult.description || patron.cantors_and_cults.cult))}</p>` : ''}
+                    </div>
+                ` : ''}
+
+                ${patron.witchcraft ? `
+                    <div class="patron-detail-section" style="background:var(--bg2);border-radius:var(--radius);padding:0.8rem;border-left:4px solid var(--gold);">
+                        <h3 style="margin:0 0 0.3rem 0;color:var(--gold);">🧹 Witchcraft</h3>
+                        ${patron.witchcraft.description ? `<p style="margin:0.3rem 0;">${formatText(safeString(patron.witchcraft.description))}</p>` : ''}
+                        ${patron.witchcraft.tools ? `<p style="margin:0.3rem 0;"><strong>Tool:</strong> ${formatText(safeString(patron.witchcraft.tools.name || ''))} — ${formatText(safeString(patron.witchcraft.tools.description || ''))}</p>` : ''}
+                        ${patron.witchcraft.hedge_gifts ? `
+                            <div><strong>Hedge Gifts:</strong></div>
+                            <ul style="margin:0.3rem 0 0 0;padding-left:1.2rem;list-style-type:disc;">
+                                ${patron.witchcraft.hedge_gifts.map(g => `<li><strong>${escHtml(safeString(g.name))}</strong> (${escHtml(safeString(g.xp))} XP): ${formatText(safeString(g.description))}</li>`).join('')}
+                            </ul>
+                        ` : ''}
+                    </div>
+                ` : ''}
+
+                ${patron.playstyle_notes ? `
+                    <div class="patron-detail-section" style="background:var(--bg2);border-radius:var(--radius);padding:0.8rem;border-left:4px solid var(--gold);">
+                        <h3 style="margin:0 0 0.3rem 0;color:var(--gold);">🎮 Playstyle Notes</h3>
+                        ${patron.playstyle_notes.description ? `<p style="margin:0.3rem 0;">${formatText(safeString(patron.playstyle_notes.description))}</p>` : ''}
+                        ${patron.playstyle_notes.emphasizes ? `
+                            <div><strong>Emphasizes:</strong></div>
+                            <ul style="margin:0.3rem 0 0 0;padding-left:1.2rem;list-style-type:disc;">
+                                ${patron.playstyle_notes.emphasizes.map(e => `<li>${escHtml(safeString(e))}</li>`).join('')}
+                            </ul>
+                        ` : ''}
+                    </div>
+                ` : ''}
+
+                ${patron.sample_adventure ? `
+                    <div class="patron-detail-section" style="background:var(--bg2);border-radius:var(--radius);padding:0.8rem;border-left:4px solid var(--gold);">
+                        <h3 style="margin:0 0 0.3rem 0;color:var(--gold);">🎲 Sample Adventure</h3>
+                        <p style="margin:0.3rem 0;"><strong>${escHtml(safeString(patron.sample_adventure.title))}</strong></p>
+                        <p style="margin:0.2rem 0;">${formatText(safeString(patron.sample_adventure.description))}</p>
+                        ${patron.sample_adventure.quote ? `<blockquote style="margin:0.3rem 0;padding:0.5rem 1rem;background:var(--bg3);border-radius:var(--radius);border-left:4px solid var(--gold);"><em>${formatText(safeString(patron.sample_adventure.quote))}</em></blockquote>` : ''}
+                    </div>
+                ` : ''}
+
+                ${patron.quotes ? `
+                    <div class="patron-detail-section" style="background:var(--bg2);border-radius:var(--radius);padding:0.8rem;border-left:4px solid var(--gold);">
+                        <h3 style="margin:0 0 0.3rem 0;color:var(--gold);">💬 Quotes</h3>
+                        ${patron.quotes.map(q => `
+                            <blockquote style="margin:0.5rem 0;padding:0.5rem 1rem;background:var(--bg3);border-radius:var(--radius);border-left:4px solid var(--gold);">
+                                <em>${formatText(safeString(q.text))}</em>
+                                <footer style="margin-top:0.2rem;color:var(--text3);font-size:0.85rem;">— ${escHtml(safeString(q.speaker))}</footer>
+                            </blockquote>
+                        `).join('')}
+                    </div>
+                ` : ''}
             </div>
-            <div class="patron-detail-actions">
+
+            <div class="patron-detail-actions" style="display:flex;gap:0.5rem;margin-top:1rem;border-top:1px solid var(--border);padding-top:0.5rem;">
                 <button class="btn btn-sm" onclick="window.editPatron('${patron.id}')">✏️ Edit</button>
                 <button class="btn btn-sm btn-danger" onclick="window.deletePatron('${patron.id}')">🗑️ Delete</button>
                 <button class="btn btn-sm btn-secondary" onclick="window.closePatronModal()">Close</button>
@@ -934,13 +1056,81 @@ window.openPatronDetailModal = function(patronId) {
         </div>
     `;
 
-    modal.addEventListener('click', (e) => {
-        if (e.target === modal) closePatronModal();
+    // FIX: use onclick assignment instead of addEventListener to avoid listener accumulation
+    modal.onclick = (e) => {
+        if (e.target === modal) window.closePatronModal();
+    };
+};
+
+// ============================================================
+// RITE TOGGLE – using "this" for reliable DOM traversal
+// ============================================================
+
+window.toggleRite = function(headerElement) {
+    // Find the parent rite-item
+    const item = headerElement.closest('.rite-item');
+    if (!item) {
+        console.warn('[Patrons] Could not find .rite-item for toggle');
+        return;
+    }
+    // Find the details div inside this item
+    const details = item.querySelector('.rite-details');
+    if (!details) {
+        console.warn('[Patrons] No .rite-details found in .rite-item');
+        return;
+    }
+    // Toggle display
+    const isExpanded = details.style.display !== 'none';
+    details.style.display = isExpanded ? 'none' : 'block';
+    // Update expand icon
+    const icon = item.querySelector('.rite-expand-icon');
+    if (icon) {
+        icon.textContent = isExpanded ? '▸' : '▾';
+    }
+    // Update persisted state via data-rite-id
+    const riteId = item.dataset.riteId;
+    if (riteId) {
+        if (isExpanded) state.expandedRites.delete(riteId);
+        else state.expandedRites.add(riteId);
+    }
+};
+
+// ============================================================
+// EXPAND ALL / COLLAPSE ALL RITES
+// ============================================================
+
+window.expandAllRites = function() {
+    const modal = document.getElementById('patron-modal');
+    if (!modal) return;
+    modal.querySelectorAll('.rite-item.rite-expandable').forEach(item => {
+        const details = item.querySelector('.rite-details');
+        if (details) {
+            details.style.display = 'block';
+            const icon = item.querySelector('.rite-expand-icon');
+            if (icon) icon.textContent = '▾';
+            const riteId = item.dataset.riteId;
+            if (riteId) state.expandedRites.add(riteId);
+        }
+    });
+};
+
+window.collapseAllRites = function() {
+    const modal = document.getElementById('patron-modal');
+    if (!modal) return;
+    modal.querySelectorAll('.rite-item.rite-expandable').forEach(item => {
+        const details = item.querySelector('.rite-details');
+        if (details) {
+            details.style.display = 'none';
+            const icon = item.querySelector('.rite-expand-icon');
+            if (icon) icon.textContent = '▸';
+            const riteId = item.dataset.riteId;
+            if (riteId) state.expandedRites.delete(riteId);
+        }
     });
 };
 
 // ============================================================
-// TERRESTRIAL PATRON DETAIL
+// TERRESTRIAL PATRON DETAIL (Main view & Modal)
 // ============================================================
 
 window.viewTerrestrial = function(id) {
@@ -962,8 +1152,8 @@ window.viewTerrestrial = function(id) {
                 <span style="color:var(--text3);font-size:0.85rem;">${escHtml(summary)}</span>
                 <button class="btn btn-xs btn-ghost" onclick="window.openTerrestrialDetailModal('${patron.id}')" style="margin-left:auto;">📖 Full Details</button>
             </div>
-            <div style="margin:0.3rem 0 0 0;color:var(--text2);font-size:0.9rem;line-height:1.5;max-height:120px;overflow-y:auto;">
-                ${escHtml(desc)}
+            <div style="margin:0.3rem 0 0 0;color:var(--text2);font-size:0.9rem;line-height:1.5;overflow-y:auto;">
+                ${formatText(desc)}
             </div>
         `;
     }
@@ -980,7 +1170,6 @@ window.openTerrestrialDetailModal = function(id) {
     modal.style.display = 'block';
 
     const name = safeString(patron.name || patron.title || 'Unnamed');
-    const summary = getPatronSummary(patron);
     const desc = getPatronDescription(patron);
     const icon = safeString(patron.icon || '🏛️');
     const type = safeString(patron.type || patron.agenda || 'Terrestrial Patron');
@@ -994,62 +1183,107 @@ window.openTerrestrialDetailModal = function(id) {
     const obligationCapacity = safeString(patron.obligationCapacity || 'Spirit+Presence');
 
     modal.innerHTML = `
-        <div class="modal-content patron-detail" style="width: 90%; max-width: 800px; max-height: 90vh; overflow-y: auto;">
-            <button class="modal-close" onclick="window.closePatronModal()">✕</button>
-            <div class="patron-detail-header">
+        <div class="modal-content patron-detail" style="width: 90%; max-width: 800px; max-height: 90vh; overflow-y: auto; background:var(--bg1); padding:1.5rem; border-radius:var(--radius);">
+            <button class="modal-close" onclick="window.closePatronModal()" style="float:right;background:none;border:none;font-size:1.5rem;cursor:pointer;color:var(--text3);">✕</button>
+            <div class="patron-detail-header" style="display:flex;align-items:center;gap:1rem;margin-bottom:1rem;border-bottom:1px solid var(--border);padding-bottom:0.5rem;">
                 <div style="font-size:3rem;">${escHtml(icon)}</div>
                 <div>
-                    <h2>${escHtml(name)}</h2>
-                    <div style="color:var(--text3);">${escHtml(type)}</div>
+                    <h2 style="margin:0;color:var(--gold);">${escHtml(name)}</h2>
+                    <div style="color:var(--text2);">${escHtml(type)}</div>
                     <div style="color:var(--text3);">Tier ${escHtml(tier)}</div>
                 </div>
             </div>
-            <div class="patron-detail-body">
-                ${desc ? `<div class="patron-detail-section"><h3>📖 Description</h3><p>${escHtml(desc)}</p></div>` : ''}
-                ${location ? `<div class="patron-detail-section"><h3>📍 Location</h3><p>${escHtml(location)}</p></div>` : ''}
-                ${leverage ? `<div class="patron-detail-section"><h3>💰 Leverage</h3><p>${escHtml(leverage)}</p></div>` : ''}
-                ${debtTrigger ? `<div class="patron-detail-section"><h3>⚡ Debt Trigger</h3><p>${escHtml(debtTrigger)}</p></div>` : ''}
-                ${quirk ? `<div class="patron-detail-section"><h3>🌀 Quirk</h3><p>${escHtml(quirk)}</p></div>` : ''}
-                <div class="patron-detail-section"><h3>📊 Stats</h3>
-                    <ul>
+
+            <div class="patron-detail-body" style="display:flex;flex-direction:column;gap:0.8rem;">
+                ${desc ? `
+                    <div class="patron-detail-section" style="background:var(--bg2);border-radius:var(--radius);padding:0.8rem;border-left:4px solid var(--blue);">
+                        <h3 style="margin:0 0 0.3rem 0;color:var(--blue);">📖 Description</h3>
+                        <p style="margin:0;white-space:pre-wrap;">${formatText(desc)}</p>
+                    </div>
+                ` : ''}
+
+                ${location ? `
+                    <div class="patron-detail-section" style="background:var(--bg2);border-radius:var(--radius);padding:0.8rem;border-left:4px solid var(--blue);">
+                        <h3 style="margin:0 0 0.3rem 0;color:var(--blue);">📍 Location</h3>
+                        <p style="margin:0;">${escHtml(location)}</p>
+                    </div>
+                ` : ''}
+
+                ${leverage ? `
+                    <div class="patron-detail-section" style="background:var(--bg2);border-radius:var(--radius);padding:0.8rem;border-left:4px solid var(--blue);">
+                        <h3 style="margin:0 0 0.3rem 0;color:var(--blue);">💰 Leverage</h3>
+                        <p style="margin:0;">${escHtml(leverage)}</p>
+                    </div>
+                ` : ''}
+
+                ${debtTrigger ? `
+                    <div class="patron-detail-section" style="background:var(--bg2);border-radius:var(--radius);padding:0.8rem;border-left:4px solid var(--blue);">
+                        <h3 style="margin:0 0 0.3rem 0;color:var(--blue);">⚡ Debt Trigger</h3>
+                        <p style="margin:0;">${escHtml(debtTrigger)}</p>
+                    </div>
+                ` : ''}
+
+                ${quirk ? `
+                    <div class="patron-detail-section" style="background:var(--bg2);border-radius:var(--radius);padding:0.8rem;border-left:4px solid var(--blue);">
+                        <h3 style="margin:0 0 0.3rem 0;color:var(--blue);">🌀 Quirk</h3>
+                        <p style="margin:0;">${escHtml(quirk)}</p>
+                    </div>
+                ` : ''}
+
+                <div class="patron-detail-section" style="background:var(--bg2);border-radius:var(--radius);padding:0.8rem;border-left:4px solid var(--blue);">
+                    <h3 style="margin:0 0 0.3rem 0;color:var(--blue);">📊 Stats</h3>
+                    <ul style="margin:0;padding-left:1.2rem;list-style-type:disc;">
                         <li>Asset Slots: ${escHtml(assetSlots)}</li>
                         <li>Max Asset Tier: ${escHtml(maxAssetTier)}</li>
                         <li>Obligation Capacity: ${escHtml(obligationCapacity)}</li>
                     </ul>
                 </div>
-                ${patron.agendaTimer ? `<div class="patron-detail-section"><h3>⏱️ Agenda Timer</h3><div>${safeString(patron.agendaTimer.current || 0)}/${safeString(patron.agendaTimer.segments || 6)}</div><div class="timer-bar"><div class="timer-bar-fill" style="width:${((patron.agendaTimer?.current||0)/(patron.agendaTimer?.segments||6))*100}%;"></div></div></div>` : ''}
-                ${patron.keyNPCs ? `<div class="patron-detail-section"><h3>👤 Key NPCs</h3><ul>${patron.keyNPCs.map(n => `<li>${escHtml(safeString(n))}</li>`).join('')}</ul></div>` : ''}
-                ${patron.hooks ? `<div class="patron-detail-section"><h3>🔗 Hooks</h3><ul>${patron.hooks.map(h => `<li>${escHtml(safeString(h))}</li>`).join('')}</ul></div>` : ''}
+
+                ${patron.agendaTimer ? `
+                    <div class="patron-detail-section" style="background:var(--bg2);border-radius:var(--radius);padding:0.8rem;border-left:4px solid var(--blue);">
+                        <h3 style="margin:0 0 0.3rem 0;color:var(--blue);">⏱️ Agenda Timer</h3>
+                        <div style="margin:0.3rem 0;">${safeString(patron.agendaTimer.current || 0)}/${safeString(patron.agendaTimer.segments || 6)}</div>
+                        <div class="timer-bar" style="width:100%;height:6px;background:var(--bg3);border-radius:3px;overflow:hidden;">
+                            <div class="timer-bar-fill" style="height:100%;width:${((patron.agendaTimer?.current||0)/(patron.agendaTimer?.segments||6))*100}%;background:var(--gold);"></div>
+                        </div>
+                    </div>
+                ` : ''}
+
+                ${patron.keyNPCs ? `
+                    <div class="patron-detail-section" style="background:var(--bg2);border-radius:var(--radius);padding:0.8rem;border-left:4px solid var(--blue);">
+                        <h3 style="margin:0 0 0.3rem 0;color:var(--blue);">👤 Key NPCs</h3>
+                        <ul style="margin:0;padding-left:1.2rem;list-style-type:disc;">
+                            ${patron.keyNPCs.map(n => `<li>${escHtml(safeString(n))}</li>`).join('')}
+                        </ul>
+                    </div>
+                ` : ''}
+
+                ${patron.hooks ? `
+                    <div class="patron-detail-section" style="background:var(--bg2);border-radius:var(--radius);padding:0.8rem;border-left:4px solid var(--blue);">
+                        <h3 style="margin:0 0 0.3rem 0;color:var(--blue);">🔗 Hooks</h3>
+                        <ul style="margin:0;padding-left:1.2rem;list-style-type:disc;">
+                            ${patron.hooks.map(h => `<li>${escHtml(safeString(h))}</li>`).join('')}
+                        </ul>
+                    </div>
+                ` : ''}
             </div>
-            <div class="patron-detail-actions">
+
+            <div class="patron-detail-actions" style="display:flex;gap:0.5rem;margin-top:1rem;border-top:1px solid var(--border);padding-top:0.5rem;">
                 <button class="btn btn-sm" onclick="window.editTerrestrial('${patron.id}')">✏️ Edit</button>
                 <button class="btn btn-sm btn-danger" onclick="window.deleteTerrestrial('${patron.id}')">🗑️ Delete</button>
                 <button class="btn btn-sm btn-secondary" onclick="window.closePatronModal()">Close</button>
             </div>
         </div>
     `;
+
+    // FIX: use onclick assignment instead of addEventListener to avoid listener accumulation
+    modal.onclick = (e) => {
+        if (e.target === modal) window.closePatronModal();
+    };
 };
 
 // ============================================================
-// RITE TOGGLE
-// ============================================================
-
-window.toggleRite = function(riteId) {
-    const details = document.getElementById(`rite-details-${riteId}`);
-    if (!details) return;
-    const isExpanded = details.style.display !== 'none';
-    details.style.display = isExpanded ? 'none' : 'block';
-    const item = details.closest('.rite-item');
-    if (item) {
-        const icon = item.querySelector('.rite-expand-icon');
-        if (icon) icon.textContent = isExpanded ? '▸' : '▾';
-    }
-    if (isExpanded) state.expandedRites.delete(riteId);
-    else state.expandedRites.add(riteId);
-};
-
-// ============================================================
-// MODAL CONTROLS
+// MODAL CONTROLS & VIEW HANDLERS
 // ============================================================
 
 window.closePatronModal = function() {
@@ -1060,16 +1294,67 @@ window.closeAssetModal = function() {
     document.getElementById('asset-modal').style.display = 'none';
 };
 
+// The main view handler – updates description and, if modal is open, refreshes modal
 window.viewPatron = function(id) {
     renderPatronDetail(id);
+    // If the modal is open, update its content with the new patron
+    const modal = document.getElementById('patron-modal');
+    if (modal && modal.style.display !== 'none') {
+        window.openPatronDetailModal(id);
+    }
 };
 
 window.viewReligion = function(id) {
-    renderReligionDetail(id);
+    // For now, just open a simple modal or use the terrestrial modal
+    const religion = state.religions.find(r => r.id === id);
+    if (!religion) {
+        showToast('Religion not found', 'error');
+        return;
+    }
+    const modal = document.getElementById('patron-modal');
+    modal.style.display = 'block';
+    modal.innerHTML = `
+        <div class="modal-content" style="width:90%;max-width:600px;max-height:90vh;overflow-y:auto;background:var(--bg1);padding:1.5rem;border-radius:var(--radius);">
+            <button class="modal-close" onclick="window.closePatronModal()" style="float:right;background:none;border:none;font-size:1.5rem;cursor:pointer;color:var(--text3);">✕</button>
+            <h2 style="color:var(--gold);">${escHtml(religion.name)}</h2>
+            <div style="font-size:1.5rem;">${safeString(religion.icon || '⛪')}</div>
+            ${religion.description ? `<p>${formatText(religion.description)}</p>` : ''}
+            ${religion.lore ? `<p><strong>Lore:</strong> ${formatText(religion.lore)}</p>` : ''}
+            ${religion.doctrines ? `<div><strong>Doctrines:</strong><ul>${religion.doctrines.map(d => `<li>${escHtml(d)}</li>`).join('')}</ul></div>` : ''}
+            ${religion.practices ? `<div><strong>Practices:</strong><ul>${religion.practices.map(p => `<li>${escHtml(p)}</li>`).join('')}</ul></div>` : ''}
+            ${religion.orders ? `<div><strong>Orders:</strong><ul>${religion.orders.map(o => `<li>${escHtml(o.name)} (${escHtml(o.role)})</li>`).join('')}</ul></div>` : ''}
+            <button class="btn btn-sm btn-secondary" onclick="window.closePatronModal()" style="margin-top:0.5rem;">Close</button>
+        </div>
+    `;
+    modal.onclick = (e) => {
+        if (e.target === modal) window.closePatronModal();
+    };
 };
 
 window.viewTrust = function(id) {
-    renderTrustDetail(id);
+    const trust = state.trusts.find(t => t.id === id);
+    if (!trust) {
+        showToast('Trust not found', 'error');
+        return;
+    }
+    const modal = document.getElementById('patron-modal');
+    modal.style.display = 'block';
+    modal.innerHTML = `
+        <div class="modal-content" style="width:90%;max-width:600px;max-height:90vh;overflow-y:auto;background:var(--bg1);padding:1.5rem;border-radius:var(--radius);">
+            <button class="modal-close" onclick="window.closePatronModal()" style="float:right;background:none;border:none;font-size:1.5rem;cursor:pointer;color:var(--text3);">✕</button>
+            <h2 style="color:var(--gold);">${escHtml(trust.name)}</h2>
+            <div style="font-size:1.5rem;">${safeString(trust.icon || '🤝')}</div>
+            <div>Tier ${escHtml(trust.tier || 'I')}</div>
+            ${trust.description ? `<p>${formatText(trust.description)}</p>` : ''}
+            <div><strong>Obligation:</strong> ${trust.obligation || 0}/${trust.capacity || 4}</div>
+            <div><strong>Assets:</strong> ${trust.assets?.length || 0}</div>
+            <div><strong>Followers:</strong> ${trust.followers?.length || 0}</div>
+            <button class="btn btn-sm btn-secondary" onclick="window.closePatronModal()" style="margin-top:0.5rem;">Close</button>
+        </div>
+    `;
+    modal.onclick = (e) => {
+        if (e.target === modal) window.closePatronModal();
+    };
 };
 
 window.loadDefaultPatrons = function() {
@@ -1084,7 +1369,6 @@ window.loadDefaultPatrons = function() {
 
 window.addPatronObligation = function(characterId, patronId, amount = 1) {
     addPatronObligation(characterId, patronId, amount);
-    // Re-render description area
     const patron = state.cosmicPatrons.find(p => p.id === patronId);
     if (patron) renderPatronDetail(patronId);
     showToast(`Added ${amount} Obligation to ${patronId}`, 'success');
@@ -1098,7 +1382,7 @@ window.clearPatronObligation = function(characterId, patronId, amount = 1) {
 };
 
 // ============================================================
-// CRUD OPERATIONS - COSMIC PATRONS
+// CRUD OPERATIONS (cosmic, terrestrial, religions, trusts)
 // ============================================================
 
 window.addCosmicPatron = function() {
@@ -1130,7 +1414,7 @@ window.editPatron = function(id) {
     const name = prompt('Enter patron name:', patron.name || patron.title);
     if (!name) return;
     patron.name = name;
-    patron.title = name; // keep both for compatibility
+    patron.title = name;
     patron.domain = prompt('Enter patron domain:', patron.domain || patron.subtitle) || patron.domain;
     patron.icon = prompt('Enter patron icon:', patron.icon) || patron.icon;
     patron.description = prompt('Enter description:', patron.description) || patron.description;
@@ -1139,7 +1423,7 @@ window.editPatron = function(id) {
     patron.source = 'local';
     savePatronData();
     refreshView();
-    closePatronModal();
+    window.closePatronModal();
     showToast(`Updated patron: ${name}`, 'success');
 };
 
@@ -1150,13 +1434,9 @@ window.deletePatron = function(id) {
     state.cosmicPatrons = state.cosmicPatrons.filter(p => p.id !== id);
     savePatronData();
     refreshView();
-    closePatronModal();
+    window.closePatronModal();
     showToast(`Deleted patron: ${patron.name || patron.title}`, 'info');
 };
-
-// ============================================================
-// CRUD OPERATIONS - TERRESTRIAL PATRONS
-// ============================================================
 
 window.addTerrestrialPatron = function() {
     const name = prompt('Enter terrestrial patron name:');
@@ -1202,7 +1482,7 @@ window.editTerrestrial = function(id) {
     patron.source = 'local';
     savePatronData();
     refreshView();
-    closePatronModal();
+    window.closePatronModal();
     showToast(`Updated terrestrial patron: ${name}`, 'success');
 };
 
@@ -1213,13 +1493,9 @@ window.deleteTerrestrial = function(id) {
     state.terrestrialPatrons = state.terrestrialPatrons.filter(p => p.id !== id);
     savePatronData();
     refreshView();
-    closePatronModal();
+    window.closePatronModal();
     showToast(`Deleted terrestrial patron: ${patron.name || patron.title}`, 'info');
 };
-
-// ============================================================
-// CRUD OPERATIONS - RELIGIONS
-// ============================================================
 
 window.addReligion = function() {
     const name = prompt('Enter religion name:');
@@ -1256,7 +1532,7 @@ window.editReligion = function(id) {
     religion.source = 'local';
     savePatronData();
     refreshView();
-    closePatronModal();
+    window.closePatronModal();
     showToast(`Updated religion: ${name}`, 'success');
 };
 
@@ -1267,13 +1543,9 @@ window.deleteReligion = function(id) {
     state.religions = state.religions.filter(r => r.id !== id);
     savePatronData();
     refreshView();
-    closePatronModal();
+    window.closePatronModal();
     showToast(`Deleted religion: ${religion.name}`, 'info');
 };
-
-// ============================================================
-// CRUD OPERATIONS - TRUSTS
-// ============================================================
 
 window.addTrust = function() {
     const name = prompt('Enter trust name:');
@@ -1313,7 +1585,7 @@ window.editTrust = function(id) {
     trust.source = 'local';
     savePatronData();
     refreshView();
-    closePatronModal();
+    window.closePatronModal();
     showToast(`Updated trust: ${name}`, 'success');
 };
 
@@ -1324,7 +1596,7 @@ window.deleteTrust = function(id) {
     state.trusts = state.trusts.filter(t => t.id !== id);
     savePatronData();
     refreshView();
-    closePatronModal();
+    window.closePatronModal();
     showToast(`Deleted trust: ${trust.name}`, 'info');
 };
 
@@ -1341,6 +1613,8 @@ function refreshView() {
 }
 
 window.refreshPatrons = function() {
+    // Clear cache and reload
+    localStorage.removeItem(CACHE_KEY);
     loadPatronData();
     refreshView();
     showToast('Patrons refreshed', 'success');
@@ -1382,6 +1656,7 @@ export function onDeactivate() {
 }
 
 export function refresh() {
+    localStorage.removeItem(CACHE_KEY);
     loadPatronData();
     refreshView();
 }

@@ -1,15 +1,103 @@
-/**
- * Character editor modal
- * FIXED: Modal properly destroys itself on save
- * FIXED: Complete cleanup of DOM elements and event listeners
- * FIXED: Overlay listener cleanup
- * FIXED: Prevent duplicate listeners
- */
-
 import { getState, addCharacter, getCharacter, updateCharacter } from '../../core/state.js';
 import { generateId, escHtml, safeParseInt, clamp } from '../../core/utils.js';
-import { ALL_SKILLS, defaultSkills } from '../../core/dice.js';
 import { showToast } from '../../components/Toast.js';
+
+// ============================================================
+// GAME DATA CONSTANTS (from Player's Guide)
+// ============================================================
+
+const ALL_SKILLS = [
+    'Melee', 'Ranged', 'Unarmed', 'Athletics',
+    'Stealth', 'Endurance', 'Craft', 'Sway',
+    'Deception', 'Subterfuge', 'Performance', 'Insight',
+    'Lore', 'Investigation', 'Medicine', 'Arcana'
+];
+
+const HERITAGES = [
+    { id: 'human', label: 'Human — The Adaptable', note: 'No attribute adjustments. Endless Reach talent (free)' },
+    { id: 'aelaerem', label: 'Aelaerem (Halfling) — Hearth & Hollow', note: 'Wits+1, Presence+1, Body-1. Small Folk traits' },
+    { id: 'aelinnel', label: 'Aelinnel (Gnome) — Stone, Bough, Bright Things', note: 'Wits+1, Spirit+1, Body-1. Small Folk traits' },
+    { id: 'aeler', label: 'Aeler (Dwarf) — Crowns & Under-Vaults', note: 'Body+1, Spirit+1, Presence-1. Stone-sense' },
+    { id: 'lethai-al', label: 'Lethai-al (Wood Elf) — Root, River, Roof-Tree', note: 'Body+1, Wits+1, Presence-1' },
+    { id: 'lethai-thora', label: 'Lethai-thora (High Elf) — Mind\'s Eye & Civic Measure', note: 'Wits+1, Spirit+1, Body-1' },
+    { id: 'lethai-ar', label: 'Lethai-ar (Dark Elf) — The Oathbound', note: 'Wits+1, Presence+1, Spirit-1' },
+    { id: 'ykrul', label: 'Ykrul (Orc) — Wolf Standards, Winter Camps', note: 'Body+1, Spirit+1, Presence-1' },
+    { id: 'narethi', label: 'Narethi — The Unburied of the Deep Desert', note: 'Wits+1, Spirit+1, Body-1. Resonance Leash' },
+    { id: 'mixed', label: 'Mixed Heritage — Half-Elves, Half-Ykrul, Half-Others', note: 'Choose one +1 and one -1 from parent cultures' }
+];
+
+const PATRONS = [
+    { id: '', label: 'None' },
+    { id: 'traveler', label: 'The Traveler — Ways & Journeys' },
+    { id: 'oath-flame', label: 'Oath of Flame & Light — Dawn & Vows' },
+    { id: 'inaea', label: 'Inaea (Angel of the Spider) — Webs & Patient Predation' },
+    { id: 'witness', label: 'The Witness — Truth & Revelation' },
+    { id: 'carrion-king', label: 'The Carrion King — Lord of Decay and Renewal' },
+    { id: 'ikasha', label: 'Ikasha (She Who Sleeps) — Latent Potential & Shadow' },
+    { id: 'grimmir', label: 'Grimmir, the Old Man of the Forest — Primal Mystery & Seasonal Sacrifice' },
+    { id: 'palinode', label: 'Palinode, Queen of Encores — Performance & Rapture' }
+];
+
+const ARMOR_TYPES = [
+    { id: 'none', label: 'No Armor', xpCost: 0, conversion: 'Harm passes directly', penalty: 'None' },
+    { id: 'light', label: 'Light Armor', xpCost: 4, conversion: '1→1 (min 1 Fatigue/hit)', penalty: 'None' },
+    { id: 'medium', label: 'Medium Armor', xpCost: 8, conversion: '2→1 (min 1 Fatigue/hit)', penalty: '-1d physical skills' },
+    { id: 'heavy', label: 'Heavy Armor', xpCost: 12, conversion: '3→2 (min 1 Fatigue/hit)', penalty: '-2d physical, no sprint in rough' },
+    { id: 'superior', label: 'Superior Armor', xpCost: 16, conversion: '4→3 (min 1 Fatigue/hit)', penalty: 'Special' },
+    { id: 'mythic', label: 'Mythic Armor', xpCost: 20, conversion: '5→4 (min 1 Fatigue/hit)', penalty: 'Special' }
+];
+
+const WEAPON_CLASSES = [
+    { id: 'light', label: 'Light Weapon (4 XP)', close: '+2d', near: '+1d', notes: 'Fast, concealable' },
+    { id: 'medium', label: 'Medium Weapon (8 XP)', close: '+1d', near: '+2d', notes: 'Balanced, battlefield standard' },
+    { id: 'heavy', label: 'Heavy Weapon (12 XP)', close: '-1d', near: '+3d', notes: 'Punishing, slow' }
+];
+
+const WEAPON_TAGS = [
+    'Reach', 'Close', 'Accurate', 'Brutal', 'Hook',
+    'Concealable', 'Quickdraw', 'Two-Handed', 'Off-Hand'
+];
+
+const SHIELD_TYPES = [
+    { id: 'none', label: 'No Shield', xpCost: 0 },
+    { id: 'buckler', label: 'Buckler (4 XP)', xpCost: 4 },
+    { id: 'heater', label: 'Heater (8 XP)', xpCost: 8 },
+    { id: 'pavise', label: 'Pavise (12 XP)', xpCost: 12 }
+];
+
+const TIER_THRESHOLDS = [
+    { min: 0, max: 40, tier: 'I', name: 'Novice' },
+    { min: 41, max: 90, tier: 'II', name: 'Seasoned' },
+    { min: 91, max: 150, tier: 'III', name: 'Veteran' },
+    { min: 151, max: 220, tier: 'IV', name: 'Paragon' },
+    { min: 221, max: Infinity, tier: 'V', name: 'Mythic' }
+];
+
+const REGIONS = [
+    'Acasia', 'Aelaerem', 'Aeler', 'Aelinnel', 'Black Banners', 'Ecktoria',
+    'Linn', 'Mistlands', 'Silkstrand', 'Theona', 'Thepyrgos', 'Ubral',
+    'Valewood', 'Vhasia', 'Viterra', 'Ykrul', 'Zakov', 'Vilikari',
+    'Kahfagia', 'Fhara', 'Pereshi', 'Kuvani', 'Tulkani', 'Ashaan',
+    'Sekogo', 'Taharka', 'Sidhi', 'Ngomebe', 'Dhahara', 'Oshiira'
+];
+
+const MAGIC_PATHS = [
+    { id: 'none', label: 'No Magic Path', talents: [] },
+    { id: 'free-caster', label: 'Free Caster (Spellcraft, 6 XP)', talents: ['Spellcraft'] },
+    { id: 'runekeeper', label: 'Runekeeper (Familiar 2 XP + Codex 4 XP)', talents: ['Familiar', 'Codex'] },
+    { id: 'invoker', label: 'Invoker (Patron\'s Symbol, 4 XP/Patron)', talents: ['Patron\'s Symbol'] },
+    { id: 'cantor', label: 'Cantor (Cantor\'s Path, 8 XP)', talents: ['Cantor\'s Path'] },
+    { id: 'summoner', label: 'Summoner (Pact-Whisperer 2 XP + Lesser Pactwright 2 XP)', talents: ['Pact-Whisperer', 'Lesser Pactwright'] },
+    { id: 'witch', label: 'Witchcraft (Craft of the Hedge, 4 XP)', talents: ['Craft of the Hedge'] },
+    { id: 'familiar-only', label: 'Familiar Only (Familiar, 2 XP)', talents: ['Familiar'] },
+    { id: 'hedge-gifts', label: 'Hedge Gifts Only (Craft of the Hedge, 4 XP)', talents: ['Craft of the Hedge'] }
+];
+
+function defaultSkills() {
+    const skills = {};
+    ALL_SKILLS.forEach(s => skills[s.toLowerCase()] = 0);
+    return skills;
+}
 
 // ============================================================
 // STATE
@@ -34,25 +122,22 @@ const editorState = {
 function initEditor() {
     if (editorState.initialized) return;
     
-    // Use event delegation
     document.addEventListener('click', (e) => {
         const target = e.target;
         
-        // Handle add buttons
         if (target.matches('[data-editor-add]')) {
             const type = target.dataset.editorAdd;
             addCEDynamic(type);
             e.preventDefault();
         }
         
-        // Handle remove buttons
         if (target.matches('.editor-remove-btn')) {
             const row = target.closest('.dynamic-row');
             if (row) row.remove();
+            recalculateXpBudget();
             e.preventDefault();
         }
         
-        // Handle wiki add
         if (target.matches('[data-editor-wiki-add]')) {
             const type = target.dataset.editorWikiAdd;
             const select = document.getElementById(`ce-${type}-wiki`);
@@ -72,12 +157,9 @@ function initEditor() {
 // ============================================================
 
 export function openEditor(id) {
-    // Close any existing editor first
     closeEditor();
-    
     initEditor();
     
-    // Create fresh modal
     const modal = createModal();
     document.body.appendChild(modal);
     
@@ -112,25 +194,22 @@ export function openEditor(id) {
     modal.style.display = 'flex';
     document.body.classList.add('modal-open');
     
-    // Attach event listeners after rendering
     attachEditorEvents();
+    recalculateXpBudget();
 }
 
 export function closeEditor() {
-    // Remove modal from DOM completely
     const modal = document.getElementById('charModal');
     if (modal) {
-        // Remove overlay listener
         if (editorState.overlayListener) {
             modal.removeEventListener('click', editorState.overlayListener);
             editorState.overlayListener = null;
         }
-        modal.remove(); // This removes it from the DOM entirely
+        modal.remove();
     }
     
     document.body.classList.remove('modal-open');
     
-    // Clean up all event listeners
     if (editorState.escListener) {
         document.removeEventListener('keydown', editorState.escListener);
         editorState.escListener = null;
@@ -138,18 +217,12 @@ export function closeEditor() {
     
     if (editorState.saveListener) {
         const saveBtn = document.getElementById('ce-save-btn');
-        if (saveBtn) {
-            saveBtn.removeEventListener('click', editorState.saveListener);
-        }
+        if (saveBtn) saveBtn.removeEventListener('click', editorState.saveListener);
         editorState.saveListener = null;
     }
     
-    // Clean up cancel listeners
     editorState.cancelListeners.forEach(listener => {
-        const btn = listener.btn;
-        if (btn) {
-            btn.removeEventListener('click', listener.handler);
-        }
+        if (listener.btn) listener.btn.removeEventListener('click', listener.handler);
     });
     editorState.cancelListeners = [];
     
@@ -185,7 +258,7 @@ function createModal() {
         <div class="modal-content" style="
             background: var(--bg2);
             border-radius: var(--radius);
-            max-width: 900px;
+            max-width: 950px;
             width: 100%;
             max-height: 90vh;
             overflow-y: auto;
@@ -212,13 +285,25 @@ function createNewCharacter() {
     return {
         id: generateId(),
         name: '',
-        heritage: '',
+        heritage: 'human',
+        heritageNote: '',
         background: '',
+        backgroundTags: [],
+        backgroundContact: '',
+        backgroundBoon: '',
+        backgroundObligation: '',
+        region: '',
+        culturalAffinity: '',
         patron: '',
+        magicPath: 'none',
         tier: 'I',
-        xp: 32,
-        body: 3,
-        wits: 2,
+        totalXp: 32,
+        startingXp: 32,
+        xpFromBonds: 0,
+        xpFromComplications: 0,
+        xpSpent: 0,
+        body: 1,
+        wits: 1,
         spirit: 1,
         presence: 1,
         skills: defaultSkills(),
@@ -227,11 +312,95 @@ function createNewCharacter() {
         equipment: [],
         bonds: [],
         complications: [],
+        strings: [],
+        debtTimers: [],
         harm: 0,
         fatigue: 0,
+        fatigueMax: 1,
         boons: 0,
-        vtt: false
+        obligation: 0,
+        obligationCapacity: 2,
+        corruption: 0,
+        corruptionMax: 1,
+        leash: 0,
+        leashCapacity: 0,
+        mentalStrain: 0,
+        mentalStrainMax: 0,
+        vtt: false,
+        armorType: 'none',
+        shieldType: 'none',
+        weaponClass: 'light',
+        weaponTags: [],
+        armorConversion: '',
+        meleeMods: '',
+        rangedMods: ''
     };
+}
+
+function getTierFromXp(xp) {
+    for (const t of TIER_THRESHOLDS) {
+        if (xp >= t.min && xp <= t.max) {
+            return { tier: t.tier, name: t.name };
+        }
+    }
+    return { tier: 'V', name: 'Mythic' };
+}
+
+function calculateAttributeCost(currentRating, targetRating) {
+    let cost = 0;
+    for (let i = currentRating + 1; i <= targetRating; i++) {
+        cost += i * 3;
+    }
+    return cost;
+}
+
+function calculateSkillCost(currentLevel, targetLevel) {
+    let cost = 0;
+    for (let i = currentLevel + 1; i <= targetLevel; i++) {
+        cost += i * 2;
+    }
+    return cost;
+}
+
+function calculateTotalXpSpent(c) {
+    let spent = 0;
+    
+    // Attributes (base 1, each step costs new_rating × 3)
+    spent += calculateAttributeCost(1, c.body || 1);
+    spent += calculateAttributeCost(1, c.wits || 1);
+    spent += calculateAttributeCost(1, c.spirit || 1);
+    spent += calculateAttributeCost(1, c.presence || 1);
+    
+    // Skills (base 0, each step costs new_level × 2)
+    if (c.skills) {
+        ALL_SKILLS.forEach(s => {
+            const level = c.skills[s.toLowerCase()] || 0;
+            spent += calculateSkillCost(0, level);
+        });
+    }
+    
+    // Talents
+    if (c.talents) {
+        c.talents.forEach(t => {
+            spent += safeParseInt(t.cost, 0);
+        });
+    }
+    
+    // Assets
+    if (c.assets) {
+        c.assets.forEach(a => {
+            spent += safeParseInt(a.cost, 0);
+        });
+    }
+    
+    // Equipment (weapons, armor, shields)
+    if (c.equipment) {
+        c.equipment.forEach(e => {
+            spent += safeParseInt(e.cost, 0);
+        });
+    }
+    
+    return spent;
 }
 
 // ============================================================
@@ -239,10 +408,8 @@ function createNewCharacter() {
 // ============================================================
 
 function attachEditorEvents() {
-    // Save button - store listener for cleanup
     const saveBtn = document.getElementById('ce-save-btn');
     if (saveBtn) {
-        // Remove any existing listeners
         if (editorState.saveListener) {
             saveBtn.removeEventListener('click', editorState.saveListener);
         }
@@ -250,7 +417,6 @@ function attachEditorEvents() {
         saveBtn.addEventListener('click', editorState.saveListener);
     }
     
-    // Cancel/Close buttons - store listeners for cleanup
     const closeBtns = ['ce-cancel-btn', 'charModalClose'];
     for (const id of closeBtns) {
         const btn = document.getElementById(id);
@@ -261,7 +427,6 @@ function attachEditorEvents() {
         }
     }
     
-    // Close on overlay click - remove existing first
     const modal = document.getElementById('charModal');
     if (modal) {
         if (editorState.overlayListener) {
@@ -269,25 +434,295 @@ function attachEditorEvents() {
             editorState.overlayListener = null;
         }
         const handler = (e) => {
-            if (e.target === modal) {
-                closeEditor();
-            }
+            if (e.target === modal) closeEditor();
         };
         modal.addEventListener('click', handler);
         editorState.overlayListener = handler;
     }
     
-    // Keyboard shortcut
     if (editorState.escListener) {
         document.removeEventListener('keydown', editorState.escListener);
     }
     editorState.escListener = (e) => {
         if (!editorState.isOpen) return;
-        if (e.key === 'Escape') {
-            closeEditor();
-        }
+        if (e.key === 'Escape') closeEditor();
     };
     document.addEventListener('keydown', editorState.escListener);
+    
+    // Attribute change listeners for derived stats
+    ['body', 'wits', 'spirit', 'presence'].forEach(attr => {
+        const input = document.getElementById(`ce-${attr}`);
+        if (input) {
+            input.addEventListener('change', updateDerivedStats);
+            input.addEventListener('input', updateDerivedStats);
+        }
+    });
+    
+    // Heritage change listener
+    const heritageSelect = document.getElementById('ce-heritage');
+    if (heritageSelect) {
+        heritageSelect.addEventListener('change', updateHeritageNote);
+    }
+    
+    // XP input listener
+    const xpInput = document.getElementById('ce-total-xp');
+    if (xpInput) {
+        xpInput.addEventListener('input', updateTierDisplay);
+        xpInput.addEventListener('change', updateTierDisplay);
+    }
+    
+    // Armor type change
+    const armorSelect = document.getElementById('ce-armor-type');
+    if (armorSelect) {
+        armorSelect.addEventListener('change', updateArmorConversion);
+    }
+    
+    // Shield type change
+    const shieldSelect = document.getElementById('ce-shield-type');
+    if (shieldSelect) {
+        shieldSelect.addEventListener('change', recalculateXpBudget);
+    }
+    
+    // Weapon class change
+    const weaponSelect = document.getElementById('ce-weapon-class');
+    if (weaponSelect) {
+        weaponSelect.addEventListener('change', updateWeaponMods);
+    }
+    
+    // Magic path change
+    const magicPathSelect = document.getElementById('ce-magic-path');
+    if (magicPathSelect) {
+        magicPathSelect.addEventListener('change', updateMagicPathDisplay);
+    }
+    
+    // Skill inputs - validate against attribute cap
+    ALL_SKILLS.forEach(s => {
+        const key = s.toLowerCase();
+        const input = document.getElementById(`ce-sk-${key}`);
+        if (input) {
+            input.addEventListener('change', () => validateSkillCap(key, s));
+            input.addEventListener('input', () => recalculateXpBudget());
+        }
+    });
+}
+
+function updateDerivedStats() {
+    const body = safeParseInt(document.getElementById('ce-body')?.value, 1);
+    const spirit = safeParseInt(document.getElementById('ce-spirit')?.value, 1);
+    const presence = safeParseInt(document.getElementById('ce-presence')?.value, 1);
+    
+    // Fatigue max = Body
+    const fatigueMaxEl = document.getElementById('ce-fatigue-max');
+    if (fatigueMaxEl) fatigueMaxEl.textContent = body;
+    
+    const fatigueInput = document.getElementById('ce-fatigue');
+    if (fatigueInput) fatigueInput.max = body;
+    
+    // Obligation capacity = Spirit + Presence
+    const obligCapEl = document.getElementById('ce-obligation-capacity');
+    if (obligCapEl) obligCapEl.textContent = spirit + presence;
+    
+    const obligInput = document.getElementById('ce-obligation');
+    if (obligInput) {
+        obligInput.max = (spirit + presence) * 2;
+    }
+    
+    // Corruption timer max = Spirit (for Cantors)
+    const corruptMaxEl = document.getElementById('ce-corruption-max');
+    if (corruptMaxEl) corruptMaxEl.textContent = spirit;
+    
+    const corruptInput = document.getElementById('ce-corruption');
+    if (corruptInput) corruptInput.max = spirit;
+    
+    // Mental Strain max = Spirit (for Psionics)
+    const strainMaxEl = document.getElementById('ce-mental-strain-max');
+    if (strainMaxEl) strainMaxEl.textContent = spirit;
+    
+    recalculateXpBudget();
+}
+
+function updateTierDisplay() {
+    const xp = safeParseInt(document.getElementById('ce-total-xp')?.value, 0);
+    const { tier, name } = getTierFromXp(xp);
+    const tierEl = document.getElementById('ce-tier-display');
+    if (tierEl) tierEl.textContent = `Tier ${tier}: ${name}`;
+    recalculateXpBudget();
+}
+
+function updateHeritageNote() {
+    const heritageId = document.getElementById('ce-heritage')?.value;
+    const heritage = HERITAGES.find(h => h.id === heritageId);
+    const noteEl = document.getElementById('ce-heritage-note');
+    if (noteEl && heritage) {
+        noteEl.textContent = heritage.note;
+        noteEl.style.display = heritage.note ? 'block' : 'none';
+    }
+}
+
+function updateArmorConversion() {
+    const armorId = document.getElementById('ce-armor-type')?.value;
+    const armor = ARMOR_TYPES.find(a => a.id === armorId);
+    const convEl = document.getElementById('ce-armor-conversion');
+    if (convEl && armor) {
+        convEl.textContent = armor.conversion;
+    }
+    recalculateXpBudget();
+}
+
+function updateWeaponMods() {
+    const weaponId = document.getElementById('ce-weapon-class')?.value;
+    const weapon = WEAPON_CLASSES.find(w => w.id === weaponId);
+    const modsEl = document.getElementById('ce-weapon-mods');
+    if (modsEl && weapon) {
+        modsEl.textContent = `Close: ${weapon.close} | Near: ${weapon.near} | ${weapon.notes}`;
+    }
+    recalculateXpBudget();
+}
+
+function updateMagicPathDisplay() {
+    const pathId = document.getElementById('ce-magic-path')?.value;
+    const path = MAGIC_PATHS.find(p => p.id === pathId);
+    const infoEl = document.getElementById('ce-magic-path-info');
+    if (infoEl && path) {
+        infoEl.textContent = path.talents.length > 0 
+            ? `Required talents: ${path.talents.join(', ')}` 
+            : 'No magic path selected';
+    }
+    
+    // Show/hide magic-specific trackers
+    const corruptSection = document.getElementById('ce-corruption-section');
+    if (corruptSection) {
+        corruptSection.style.display = pathId === 'cantor' ? 'flex' : 'none';
+    }
+    
+    const leashSection = document.getElementById('ce-leash-section');
+    if (leashSection) {
+        leashSection.style.display = pathId === 'summoner' ? 'flex' : 'none';
+    }
+    
+    recalculateXpBudget();
+}
+
+function validateSkillCap(skillKey, skillName) {
+    // Skill rating cannot exceed relevant Attribute
+    // This is a guideline; the GM may override
+    const input = document.getElementById(`ce-sk-${skillKey}`);
+    if (!input) return;
+    
+    const level = safeParseInt(input.value, 0);
+    if (level > 5) {
+        input.value = 5;
+        showToast(`${skillName} cannot exceed 5.`, 'warning');
+    }
+    
+    recalculateXpBudget();
+}
+
+function recalculateXpBudget() {
+    const body = safeParseInt(document.getElementById('ce-body')?.value, 1);
+    const wits = safeParseInt(document.getElementById('ce-wits')?.value, 1);
+    const spirit = safeParseInt(document.getElementById('ce-spirit')?.value, 1);
+    const presence = safeParseInt(document.getElementById('ce-presence')?.value, 1);
+    
+    let spent = 0;
+    
+    // Attribute costs: each step costs new_rating × 3
+    spent += calculateAttributeCost(1, body);
+    spent += calculateAttributeCost(1, wits);
+    spent += calculateAttributeCost(1, spirit);
+    spent += calculateAttributeCost(1, presence);
+    
+    // Skill costs: each step costs new_level × 2
+    ALL_SKILLS.forEach(s => {
+        const key = s.toLowerCase();
+        const level = safeParseInt(document.getElementById(`ce-sk-${key}`)?.value, 0);
+        spent += calculateSkillCost(0, level);
+    });
+    
+    // Talent costs
+    document.querySelectorAll('.ce-talent-row').forEach(row => {
+        const costInput = row.querySelector('.ce-talent-cost');
+        spent += safeParseInt(costInput?.value, 0);
+    });
+    
+    // Asset costs
+    document.querySelectorAll('.ce-asset-row').forEach(row => {
+        const costInput = row.querySelector('.ce-asset-cost');
+        spent += safeParseInt(costInput?.value, 0);
+    });
+    
+    // Equipment costs
+    document.querySelectorAll('.ce-equipment-row').forEach(row => {
+        const costInput = row.querySelector('.ce-equipment-cost');
+        spent += safeParseInt(costInput?.value, 0);
+    });
+    
+    // Armor cost
+    const armorId = document.getElementById('ce-armor-type')?.value;
+    const armor = ARMOR_TYPES.find(a => a.id === armorId);
+    if (armor) spent += armor.xpCost;
+    
+    // Shield cost
+    const shieldId = document.getElementById('ce-shield-type')?.value;
+    const shield = SHIELD_TYPES.find(s => s.id === shieldId);
+    if (shield) spent += shield.xpCost;
+    
+    // Weapon cost
+    const weaponId = document.getElementById('ce-weapon-class')?.value;
+    const weapon = WEAPON_CLASSES.find(w => w.id === weaponId);
+    if (weapon) {
+        const weaponXp = { light: 4, medium: 8, heavy: 12 };
+        spent += weaponXp[weaponId] || 0;
+    }
+    
+    // Bond XP (each bond gives +2 XP, max 2 at creation)
+    let bondCount = 0;
+    document.querySelectorAll('.ce-bond-row').forEach(row => {
+        const nameInput = row.querySelector('.ce-bond-name');
+        const startCheck = row.querySelector('.ce-bond-start');
+        if (nameInput?.value.trim() && startCheck?.checked) {
+            bondCount++;
+        }
+    });
+    bondCount = Math.min(bondCount, 2);
+    const xpFromBonds = bondCount * 2;
+    
+    // Complication XP (each complication gives +2 XP, max 2 at creation)
+    let compCount = 0;
+    document.querySelectorAll('.ce-complication-row').forEach(row => {
+        const nameInput = row.querySelector('.ce-complication-name');
+        const startCheck = row.querySelector('.ce-complication-start');
+        if (nameInput?.value.trim() && startCheck?.checked) {
+            compCount++;
+        }
+    });
+    compCount = Math.min(compCount, 2);
+    const xpFromComplications = compCount * 2;
+    
+    // Starting XP = 32 + bonds + complications (max 36)
+    const startingXp = 32 + xpFromBonds + xpFromComplications;
+    const maxStartingXp = 36;
+    const effectiveStartingXp = Math.min(startingXp, maxStartingXp);
+    
+    // For new characters: check if spent > effectiveStartingXp
+    const totalXpInput = document.getElementById('ce-total-xp');
+    const totalXp = safeParseInt(totalXpInput?.value, 32);
+    
+    // Update the budget display
+    const budgetEl = document.getElementById('ce-xp-budget');
+    if (budgetEl) {
+        const remaining = totalXp - spent;
+        const isOver = remaining < 0;
+        budgetEl.innerHTML = `
+            <div style="padding:0.5rem 0.8rem;border-radius:var(--radius);background:${isOver ? 'rgba(255,50,50,0.15)' : 'rgba(50,255,50,0.1)'};border:1px solid ${isOver ? 'var(--red)' : 'var(--green)'};">
+                <strong>XP Budget:</strong> ${totalXp} total - ${spent} spent = 
+                <span style="color:${isOver ? 'var(--red)' : 'var(--green)'};font-weight:bold;">
+                    ${remaining > 0 ? remaining + ' remaining' : remaining === 0 ? 'exactly spent' : Math.abs(remaining) + ' over budget!'}
+                </span>
+                ${editorState.isNew ? `<br><small>Bonds: +${xpFromBonds} XP | Complications: +${xpFromComplications} XP | Max starting: ${maxStartingXp} XP</small>` : ''}
+            </div>
+        `;
+    }
 }
 
 // ============================================================
@@ -295,13 +730,50 @@ function attachEditorEvents() {
 // ============================================================
 
 function buildEditorHTML(c) {
+    const heritageOptions = HERITAGES.map(h => 
+        `<option value="${h.id}" ${c.heritage === h.id ? 'selected' : ''}>${escHtml(h.label)}</option>`
+    ).join('');
+    
+    const patronOptions = PATRONS.map(p => 
+        `<option value="${p.id}" ${c.patron === p.id ? 'selected' : ''}>${escHtml(p.label)}</option>`
+    ).join('');
+    
+    const armorOptions = ARMOR_TYPES.map(a => 
+        `<option value="${a.id}" ${c.armorType === a.id ? 'selected' : ''}>${escHtml(a.label)}${a.xpCost > 0 ? ` (${a.xpCost} XP)` : ''}</option>`
+    ).join('');
+    
+    const shieldOptions = SHIELD_TYPES.map(s => 
+        `<option value="${s.id}" ${c.shieldType === s.id ? 'selected' : ''}>${escHtml(s.label)}${s.xpCost > 0 ? ` (${s.xpCost} XP)` : ''}</option>`
+    ).join('');
+    
+    const weaponOptions = WEAPON_CLASSES.map(w => 
+        `<option value="${w.id}" ${c.weaponClass === w.id ? 'selected' : ''}>${escHtml(w.label)}</option>`
+    ).join('');
+    
+    const weaponTagCheckboxes = WEAPON_TAGS.map(tag => 
+        `<label class="inline-check" style="font-size:0.8rem;">
+            <input type="checkbox" class="ce-weapon-tag" value="${tag}" ${c.weaponTags?.includes(tag) ? 'checked' : ''} />
+            ${tag}
+        </label>`
+    ).join('');
+    
+    const regionOptions = ['<option value="">Select region…</option>'].concat(
+        REGIONS.map(r => `<option value="${r}" ${c.region === r ? 'selected' : ''}>${escHtml(r)}</option>`)
+    ).join('');
+    
+    const magicPathOptions = MAGIC_PATHS.map(p => 
+        `<option value="${p.id}" ${c.magicPath === p.id ? 'selected' : ''}>${escHtml(p.label)}</option>`
+    ).join('');
+    
+    const { tier, name: tierName } = getTierFromXp(c.totalXp || 32);
+    
     const skillInputs = ALL_SKILLS.map(s => {
         const key = s.toLowerCase();
         const val = c.skills?.[key] ?? 0;
         return `
             <div class="skill-item">
-                <label>${s}</label>
-                <input type="number" id="ce-sk-${key}" value="${val}" min="0" max="5" />
+                <label title="${escHtml(s)}">${escHtml(s)}</label>
+                <input type="number" id="ce-sk-${key}" value="${val}" min="0" max="5" data-skill="${key}" />
             </div>
         `;
     }).join('');
@@ -314,62 +786,206 @@ function buildEditorHTML(c) {
     
     return `
         <div class="editor-form">
+            <!-- XP Budget Display -->
+            <div id="ce-xp-budget" style="margin-bottom:1rem;"></div>
+            
+            <!-- Step 1: Identity & Concept -->
+            <h3 style="margin:0.8rem 0 0.4rem;color:var(--gold);">Step 1 — Identity & Concept</h3>
             <div class="form-row">
                 <div class="field"><label>Name *</label><input id="ce-name" value="${escHtml(c.name)}" /></div>
-                <div class="field"><label>Heritage</label><input id="ce-heritage" value="${escHtml(c.heritage || '')}" /></div>
+                <div class="field">
+                    <label>Heritage</label>
+                    <select id="ce-heritage">${heritageOptions}</select>
+                    <div id="ce-heritage-note" style="font-size:0.75rem;color:var(--text2);margin-top:0.2rem;display:none;">${escHtml(HERITAGES.find(h => h.id === c.heritage)?.note || '')}</div>
+                </div>
             </div>
             <div class="form-row">
-                <div class="field"><label>Background</label><input id="ce-background" value="${escHtml(c.background || '')}" /></div>
-                <div class="field"><label>Patron</label><input id="ce-patron" value="${escHtml(c.patron || '')}" /></div>
+                <div class="field">
+                    <label>Region of Origin</label>
+                    <select id="ce-region">${regionOptions}</select>
+                </div>
+                <div class="field">
+                    <label>Cultural Affinity</label>
+                    <input id="ce-cultural-affinity" value="${escHtml(c.culturalAffinity || '')}" placeholder="Once-per-session cultural benefit" />
+                </div>
+            </div>
+            
+            <!-- Step 2: Background -->
+            <h3 style="margin:0.8rem 0 0.4rem;color:var(--gold);">Step 2 — Background</h3>
+            <div class="form-row">
+                <div class="field"><label>Background Name</label><input id="ce-background" value="${escHtml(c.background || '')}" placeholder="e.g., Marcher Veteran, Merchant Factor" /></div>
             </div>
             <div class="form-row">
-                <div class="field"><label>Tier</label><input id="ce-tier" value="${escHtml(c.tier || 'I')}" /></div>
-                <div class="field"><label>Starting XP</label><input type="number" id="ce-xp" value="${c.xp || 32}" min="0" max="36" /></div>
-                <div class="field" style="display:flex;align-items:end;">
+                <div class="field"><label>Background Tags (Access)</label><input id="ce-background-tags" value="${escHtml(c.backgroundTags?.join(', ') || '')}" placeholder="e.g., Veteran-of-the-Marches, Muster Papers" /></div>
+            </div>
+            <div class="form-row">
+                <div class="field"><label>Signature Contact</label><input id="ce-background-contact" value="${escHtml(c.backgroundContact || '')}" placeholder="Named NPC (Cap 1 follower, +1d assist once/scene)" /></div>
+            </div>
+            <div class="form-row">
+                <div class="field"><label>Background Boon</label><input id="ce-background-boon" value="${escHtml(c.backgroundBoon || '')}" placeholder="Once/session: +1d or DV-1 for background-related task" /></div>
+            </div>
+            <div class="form-row">
+                <div class="field"><label>Obligation Timer [4] Seed</label><input id="ce-background-obligation" value="${escHtml(c.backgroundObligation || '')}" placeholder="Starting complication: what debt or duty follows you?" /></div>
+            </div>
+            
+            <!-- Step 3: Attributes -->
+            <h3 style="margin:0.8rem 0 0.4rem;color:var(--gold);">Step 3 — Attributes (1–5)</h3>
+            <div style="font-size:0.8rem;color:var(--text2);margin-bottom:0.4rem;">
+                Cost: each step = new rating × 3 XP. Base 1 each.
+                (1→2=6, 2→3=9, 3→4=12, 4→5=15)
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.4rem;">
+                <div class="stat-item"><label>Body</label><input type="number" id="ce-body" value="${c.body || 1}" min="1" max="5" /></div>
+                <div class="stat-item"><label>Wits</label><input type="number" id="ce-wits" value="${c.wits || 1}" min="1" max="5" /></div>
+                <div class="stat-item"><label>Spirit</label><input type="number" id="ce-spirit" value="${c.spirit || 1}" min="1" max="5" /></div>
+                <div class="stat-item"><label>Presence</label><input type="number" id="ce-presence" value="${c.presence || 1}" min="1" max="5" /></div>
+            </div>
+            
+            <!-- Step 4: Skills -->
+            <h3 style="margin:0.8rem 0 0.4rem;color:var(--gold);">Step 4 — Skills (0–5)</h3>
+            <div style="font-size:0.8rem;color:var(--text2);margin-bottom:0.4rem;">
+                Cost: each step = new level × 2 XP. Skill cannot exceed relevant Attribute.
+                (0→1=2, 1→2=4, 2→3=6, 3→4=8, 4→5=10)
+            </div>
+            <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:0.3rem;font-size:0.85rem;">${skillInputs}</div>
+            
+            <!-- Step 5: Magic Path & Patron -->
+            <h3 style="margin:0.8rem 0 0.4rem;color:var(--gold);">Step 5 — Magic Path & Patron (Optional)</h3>
+            <div class="form-row">
+                <div class="field">
+                    <label>Magic Path</label>
+                    <select id="ce-magic-path">${magicPathOptions}</select>
+                    <div id="ce-magic-path-info" style="font-size:0.75rem;color:var(--text2);margin-top:0.2rem;"></div>
+                </div>
+                <div class="field">
+                    <label>Patron</label>
+                    <select id="ce-patron">${patronOptions}</select>
+                </div>
+            </div>
+            
+            <!-- Step 6: Combat Loadout -->
+            <h3 style="margin:0.8rem 0 0.4rem;color:var(--gold);">Step 6 — Combat Loadout</h3>
+            <div class="form-row">
+                <div class="field">
+                    <label>Armor Type</label>
+                    <select id="ce-armor-type">${armorOptions}</select>
+                    <div id="ce-armor-conversion" style="font-size:0.75rem;color:var(--text2);margin-top:0.2rem;">${escHtml(ARMOR_TYPES.find(a => a.id === c.armorType)?.conversion || '')}</div>
+                </div>
+                <div class="field">
+                    <label>Shield</label>
+                    <select id="ce-shield-type">${shieldOptions}</select>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="field">
+                    <label>Weapon Class</label>
+                    <select id="ce-weapon-class">${weaponOptions}</select>
+                    <div id="ce-weapon-mods" style="font-size:0.75rem;color:var(--text2);margin-top:0.2rem;">${escHtml(WEAPON_CLASSES.find(w => w.id === c.weaponClass)?.notes || '')}</div>
+                </div>
+            </div>
+            <div class="form-row" style="flex-wrap:wrap;gap:0.3rem;">
+                <label style="font-size:0.85rem;margin-right:0.5rem;">Weapon Tags (Optional, +4 XP each, max 2):</label>
+                ${weaponTagCheckboxes}
+            </div>
+            
+            <!-- Step 7: Talents -->
+            <h3 style="margin:0.8rem 0 0.4rem;color:var(--gold);">Step 7 — Talents</h3>
+            <div style="font-size:0.8rem;color:var(--text2);margin-bottom:0.4rem;">
+                Minor: 2–3 XP | Major: 4–6 XP | Prestige: 7–10 XP | Epic: 11+ XP
+            </div>
+            ${wikiPickerHTML('talent', 'talents')}
+            <div class="dynamic-list" id="ce-talent-list">${talentRows}</div>
+            
+            <!-- Step 8: Assets -->
+            <h3 style="margin:0.8rem 0 0.4rem;color:var(--gold);">Step 8 — Assets</h3>
+            <div style="font-size:0.8rem;color:var(--text2);margin-bottom:0.4rem;">
+                Minor: 4 XP | Standard: 8 XP | Major: 12 XP
+            </div>
+            ${wikiPickerHTML('asset', 'assets')}
+            <div class="dynamic-list" id="ce-asset-list">${assetRows}</div>
+            
+            <!-- Step 9: Equipment -->
+            <h3 style="margin:0.8rem 0 0.4rem;color:var(--gold);">Step 9 — Additional Equipment</h3>
+            ${wikiPickerHTML('equipment', 'equipment')}
+            <div class="dynamic-list" id="ce-equipment-list">${equipRows}</div>
+            
+            <!-- Step 10: Bonds & Complications -->
+            <h3 style="margin:0.8rem 0 0.4rem;color:var(--gold);">Step 10 — Bonds & Complications</h3>
+            <div style="font-size:0.8rem;color:var(--text2);margin-bottom:0.4rem;">
+                Up to 2 Bonds (+2 XP each) and 2 Complications (+2 XP each). Max starting XP: 36.
+                Each unresolved Complication adds +1 banked SB to early scenes.
+            </div>
+            
+            <h4 style="margin:0.4rem 0;font-size:0.9rem;">Bonds (max 2 for +XP)</h4>
+            <button class="btn btn-sm" data-editor-add="bond">+ Add Bond</button>
+            <div class="dynamic-list" id="ce-bond-list">${bondRows}</div>
+            
+            <h4 style="margin:0.4rem 0;font-size:0.9rem;">Complications (max 2 for +XP)</h4>
+            <button class="btn btn-sm" data-editor-add="complication">+ Add Complication</button>
+            <div class="dynamic-list" id="ce-complication-list">${compRows}</div>
+            
+            <!-- Step 11: Status & Resources -->
+            <h3 style="margin:0.8rem 0 0.4rem;color:var(--gold);">Step 11 — Status & Resources</h3>
+            <div class="form-row">
+                <div class="field small"><label>Total XP</label><input type="number" id="ce-total-xp" value="${c.totalXp || 32}" min="0" /></div>
+                <div class="field small">
+                    <label>Tier</label>
+                    <div id="ce-tier-display" style="padding:0.3rem 0;font-weight:bold;color:var(--gold);">Tier ${tier}: ${tierName}</div>
+                </div>
+                <div class="field small">
                     <label class="inline-check"><input type="checkbox" id="ce-vtt" ${c.vtt ? 'checked' : ''} /> Push to VTT</label>
                 </div>
             </div>
             
-            <h3 style="margin:0.8rem 0 0.4rem;">Attributes</h3>
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.4rem;">
-                <div class="stat-item"><label>Body</label><input type="number" id="ce-body" value="${c.body}" min="1" max="5" /></div>
-                <div class="stat-item"><label>Wits</label><input type="number" id="ce-wits" value="${c.wits}" min="1" max="5" /></div>
-                <div class="stat-item"><label>Spirit</label><input type="number" id="ce-spirit" value="${c.spirit}" min="1" max="5" /></div>
-                <div class="stat-item"><label>Presence</label><input type="number" id="ce-presence" value="${c.presence}" min="1" max="5" /></div>
-            </div>
-            
-            <h3 style="margin:0.8rem 0 0.4rem;">Status</h3>
+            <h4 style="margin:0.4rem 0;font-size:0.85rem;">Damage Tracks</h4>
             <div class="form-row">
-                <div class="field small"><label>Harm</label><input type="number" id="ce-harm" value="${c.harm || 0}" min="0" max="3" /></div>
-                <div class="field small"><label>Fatigue</label><input type="number" id="ce-fatigue" value="${c.fatigue || 0}" min="0" /></div>
-                <div class="field small"><label>Boons</label><input type="number" id="ce-boons" value="${c.boons || 0}" min="0" max="5" /></div>
+                <div class="field small">
+                    <label>Harm (0–3)</label>
+                    <input type="number" id="ce-harm" value="${c.harm || 0}" min="0" max="3" />
+                    <small style="color:var(--text2);">0=OK, 1=–1d, 2=–2d, 3=incapacitated</small>
+                </div>
+                <div class="field small">
+                    <label>Fatigue (max <span id="ce-fatigue-max">${c.body || 1}</span>)</label>
+                    <input type="number" id="ce-fatigue" value="${c.fatigue || 0}" min="0" max="${c.body || 1}" />
+                    <small style="color:var(--text2);">Each worsens Position; full → Harm+1, clear</small>
+                </div>
+                <div class="field small">
+                    <label>Boons (max 5)</label>
+                    <input type="number" id="ce-boons" value="${c.boons || 0}" min="0" max="5" />
+                    <small style="color:var(--text2);">Spend: re-roll, Position, Asset, 2→1 XP</small>
+                </div>
             </div>
             
-            <h3 style="margin:0.8rem 0 0.4rem;">Talents</h3>
-            ${wikiPickerHTML('talent', 'talents')}
-            <div class="dynamic-list" id="ce-talent-list">${talentRows}</div>
+            <h4 style="margin:0.4rem 0;font-size:0.85rem;">Obligation & Corruption</h4>
+            <div class="form-row">
+                <div class="field small">
+                    <label>Obligation (cap: <span id="ce-obligation-capacity">${(c.spirit || 1) + (c.presence || 1)}</span>)</label>
+                    <input type="number" id="ce-obligation" value="${c.obligation || 0}" min="0" />
+                    <small style="color:var(--text2);">Over cap: 1 Fatigue/segment. Double: Patron intrusion</small>
+                </div>
+                <div class="field small" id="ce-corruption-section" style="display:${c.magicPath === 'cantor' ? 'flex' : 'none'};">
+                    <label>Corruption (max <span id="ce-corruption-max">${c.spirit || 1}</span>)</label>
+                    <input type="number" id="ce-corruption" value="${c.corruption || 0}" min="0" max="${c.spirit || 1}" />
+                    <small style="color:var(--text2);">Fill: bloom (benefit + drawback), reset to Tier</small>
+                </div>
+                <div class="field small" id="ce-leash-section" style="display:${c.magicPath === 'summoner' ? 'flex' : 'none'};">
+                    <label>Leash (cap: Cap + Spirit)</label>
+                    <input type="number" id="ce-leash" value="${c.leash || 0}" min="0" />
+                    <small style="color:var(--text2);">Fill: spirit acts & departs</small>
+                </div>
+            </div>
             
-            <h3 style="margin:0.8rem 0 0.4rem;">Assets</h3>
-            ${wikiPickerHTML('asset', 'assets')}
-            <div class="dynamic-list" id="ce-asset-list">${assetRows}</div>
+            <div class="form-row">
+                <div class="field small">
+                    <label>Mental Strain (max <span id="ce-mental-strain-max">${c.spirit || 1}</span>)</label>
+                    <input type="number" id="ce-mental-strain" value="${c.mentalStrain || 0}" min="0" max="${c.spirit || 1}" />
+                    <small style="color:var(--text2);">For Psionics (optional). Overflow → Fatigue/Harm</small>
+                </div>
+            </div>
             
-            <h3 style="margin:0.8rem 0 0.4rem;">Equipment</h3>
-            ${wikiPickerHTML('equipment', 'equipment')}
-            <div class="dynamic-list" id="ce-equipment-list">${equipRows}</div>
-            
-            <h3 style="margin:0.8rem 0 0.4rem;">Bonds</h3>
-            <button class="btn btn-sm" data-editor-add="bond">+ Add Bond</button>
-            <div class="dynamic-list" id="ce-bond-list">${bondRows}</div>
-            
-            <h3 style="margin:0.8rem 0 0.4rem;">Complications</h3>
-            <button class="btn btn-sm" data-editor-add="complication">+ Add Complication</button>
-            <div class="dynamic-list" id="ce-complication-list">${compRows}</div>
-            
-            <h3 style="margin:0.8rem 0 0.4rem;">Skills</h3>
-            <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:0.3rem;font-size:0.85rem;">${skillInputs}</div>
-            
+            <!-- Save/Cancel -->
             <div class="flex mt-1" style="gap:0.5rem;">
-                <button class="btn btn-gold" id="ce-save-btn">💾 Save</button>
+                <button class="btn btn-gold" id="ce-save-btn">💾 Save Character</button>
                 <button class="btn" id="ce-cancel-btn">Cancel</button>
             </div>
         </div>
@@ -381,13 +997,13 @@ function buildEditorHTML(c) {
 // ============================================================
 
 function dynamicRowHTML(type, idx, item = {}) {
-    if (type === 'bond' || type === 'complication') {
+    if (type === 'bond') {
         return `
-            <div class="dynamic-row ce-${type}-row" data-index="${idx}">
-                <input type="text" class="ce-${type}-name" placeholder="${type === 'bond' ? 'Bond name' : 'Complication name'}" value="${escHtml(item.name || '')}" />
-                <input type="text" class="ce-${type}-desc" placeholder="Description" value="${escHtml(item.desc || '')}" style="flex:2;" />
-                <label class="inline-check">
-                    <input type="checkbox" class="ce-${type}-start" ${item.start !== false ? 'checked' : ''} /> 
+            <div class="dynamic-row ce-bond-row" data-index="${idx}">
+                <input type="text" class="ce-bond-name" placeholder="Bond name (with PC or NPC)" value="${escHtml(item.name || '')}" style="flex:1;" />
+                <input type="text" class="ce-bond-desc" placeholder="Description" value="${escHtml(item.desc || '')}" style="flex:2;" />
+                <label class="inline-check" title="Check for +2 XP at character creation (max 2)">
+                    <input type="checkbox" class="ce-bond-start" ${item.start !== false ? 'checked' : ''} /> 
                     +2 XP
                 </label>
                 <button class="btn btn-xs editor-remove-btn">✕</button>
@@ -395,10 +1011,27 @@ function dynamicRowHTML(type, idx, item = {}) {
         `;
     }
     
+    if (type === 'complication') {
+        return `
+            <div class="dynamic-row ce-complication-row" data-index="${idx}">
+                <input type="text" class="ce-complication-name" placeholder="Complication name" value="${escHtml(item.name || '')}" style="flex:1;" />
+                <input type="text" class="ce-complication-desc" placeholder="Description" value="${escHtml(item.desc || '')}" style="flex:2;" />
+                <label class="inline-check" title="Check for +2 XP at character creation (max 2). Adds +1 banked SB to early scenes.">
+                    <input type="checkbox" class="ce-complication-start" ${item.start !== false ? 'checked' : ''} /> 
+                    +2 XP
+                </label>
+                <button class="btn btn-xs editor-remove-btn">✕</button>
+            </div>
+        `;
+    }
+    
+    // Talent, Asset, Equipment rows
+    const placeholder = type === 'talent' ? 'Talent name' : type === 'asset' ? 'Asset name' : 'Equipment name';
     return `
         <div class="dynamic-row ce-${type}-row" data-index="${idx}">
-            <input type="text" class="ce-${type}-name" placeholder="Name" value="${escHtml(item.name || '')}" style="flex:2;" />
-            <input type="number" class="ce-${type}-cost" placeholder="XP" value="${item.cost || 0}" min="0" style="width:70px;" />
+            <input type="text" class="ce-${type}-name" placeholder="${placeholder}" value="${escHtml(item.name || '')}" style="flex:2;" />
+            <input type="number" class="ce-${type}-cost" placeholder="XP" value="${item.cost || 0}" min="0" style="width:70px;" title="XP cost" />
+            ${type === 'asset' ? '<select class="ce-asset-tier" style="width:100px;"><option value="minor">Minor</option><option value="standard">Standard</option><option value="major">Major</option></select>' : ''}
             <button class="btn btn-xs editor-remove-btn">✕</button>
         </div>
     `;
@@ -456,7 +1089,6 @@ export function saveEditor() {
         return;
     }
     
-    // Get the existing character by ID
     let c = getCharacter(editorState.currentId);
     if (!c) {
         showToast('Character not found', 'error');
@@ -464,31 +1096,62 @@ export function saveEditor() {
     }
     
     try {
-        // Basic fields
+        // Identity
         c.name = name.trim();
-        c.heritage = v('#ce-heritage');
-        c.background = v('#ce-background');
-        c.patron = v('#ce-patron');
-        c.tier = v('#ce-tier') || 'I';
-        c.xp = clamp(n('#ce-xp'), 0, 36);
+        c.heritage = v('#ce-heritage') || 'human';
+        c.region = v('#ce-region');
+        c.culturalAffinity = v('#ce-cultural-affinity');
         
-        // Attributes
+        // Background
+        c.background = v('#ce-background');
+        c.backgroundTags = v('#ce-background-tags') ? v('#ce-background-tags').split(',').map(t => t.trim()).filter(Boolean) : [];
+        c.backgroundContact = v('#ce-background-contact');
+        c.backgroundBoon = v('#ce-background-boon');
+        c.backgroundObligation = v('#ce-background-obligation');
+        
+        // Attributes (1-5)
         c.body = clamp(n('#ce-body'), 1, 5);
         c.wits = clamp(n('#ce-wits'), 1, 5);
         c.spirit = clamp(n('#ce-spirit'), 1, 5);
         c.presence = clamp(n('#ce-presence'), 1, 5);
         
-        // Status
-        c.harm = clamp(n('#ce-harm'), 0, 3);
-        c.fatigue = Math.max(0, n('#ce-fatigue'));
-        c.boons = clamp(n('#ce-boons'), 0, 5);
-        c.vtt = document.getElementById('ce-vtt')?.checked || false;
+        // Derived stats
+        c.fatigueMax = c.body;
+        c.obligationCapacity = c.spirit + c.presence;
+        c.corruptionMax = c.spirit;
+        c.mentalStrainMax = c.spirit;
         
-        // Skills
+        // Skills (0-5)
         if (!c.skills) c.skills = defaultSkills();
         ALL_SKILLS.forEach(s => {
             c.skills[s.toLowerCase()] = clamp(n('#ce-sk-' + s.toLowerCase()), 0, 5);
         });
+        
+        // Magic & Patron
+        c.magicPath = v('#ce-magic-path') || 'none';
+        c.patron = v('#ce-patron');
+        
+        // Combat loadout
+        c.armorType = v('#ce-armor-type') || 'none';
+        c.shieldType = v('#ce-shield-type') || 'none';
+        c.weaponClass = v('#ce-weapon-class') || 'light';
+        c.weaponTags = Array.from(document.querySelectorAll('.ce-weapon-tag:checked')).map(cb => cb.value);
+        c.armorConversion = ARMOR_TYPES.find(a => a.id === c.armorType)?.conversion || '';
+        
+        // Status
+        c.totalXp = Math.max(0, n('#ce-total-xp'));
+        const { tier, name: tierName } = getTierFromXp(c.totalXp);
+        c.tier = tier;
+        c.tierName = tierName;
+        
+        c.harm = clamp(n('#ce-harm'), 0, 3);
+        c.fatigue = clamp(n('#ce-fatigue'), 0, c.fatigueMax);
+        c.boons = clamp(n('#ce-boons'), 0, 5);
+        c.obligation = Math.max(0, n('#ce-obligation'));
+        c.corruption = clamp(n('#ce-corruption'), 0, c.corruptionMax);
+        c.leash = Math.max(0, n('#ce-leash'));
+        c.mentalStrain = clamp(n('#ce-mental-strain'), 0, c.mentalStrainMax);
+        c.vtt = document.getElementById('ce-vtt')?.checked || false;
         
         // Dynamic lists
         c.talents = readDynamicList('talent');
@@ -497,20 +1160,54 @@ export function saveEditor() {
         c.bonds = readDynamicList('bond');
         c.complications = readDynamicList('complication');
         
+        // Validate bonds/complications for new characters
+        if (editorState.isNew) {
+            const startBonds = c.bonds.filter(b => b.start).length;
+            const startComps = c.complications.filter(x => x.start).length;
+            
+            if (startBonds > 2) {
+                showToast(`Only 2 Bonds can grant +XP at creation. ${startBonds} marked. Only first 2 will count.`, 'warning');
+            }
+            if (startComps > 2) {
+                showToast(`Only 2 Complications can grant +XP at creation. ${startComps} marked. Only first 2 will count.`, 'warning');
+            }
+            
+            // Calculate XP
+            c.xpFromBonds = Math.min(startBonds, 2) * 2;
+            c.xpFromComplications = Math.min(startComps, 2) * 2;
+            c.startingXp = 32 + c.xpFromBonds + c.xpFromComplications;
+            
+            if (c.startingXp > 36) {
+                c.startingXp = 36;
+                showToast('Starting XP capped at 36.', 'warning');
+            }
+            
+            // Check if overspent
+            const spent = calculateTotalXpSpent(c);
+            c.xpSpent = spent;
+            
+            if (spent > c.startingXp) {
+                const over = spent - c.startingXp;
+                const proceed = confirm(
+                    `This character is ${over} XP over budget (${spent} spent, ${c.startingXp} available).\n\n` +
+                    `Do you want to save anyway? (GM may allow this.)`
+                );
+                if (!proceed) return;
+            }
+        }
+        
         // Save
         updateCharacter(editorState.currentId, c);
         
-        // Close the modal FIRST (this removes it from DOM)
         closeEditor();
         
-        // Then refresh the characters list
         import('./index.js').then(module => {
             if (module.renderCharList) {
                 module.renderCharList();
             }
         });
         
-        showToast(`Character "${c.name}" saved successfully.`, 'success');
+        showToast(`Character "${c.name}" saved successfully. (Tier ${c.tier}: ${c.tierName})`, 'success');
         
     } catch (error) {
         console.error('[Editor] Error saving character:', error);
@@ -527,10 +1224,10 @@ function readDynamicList(type) {
     const rows = document.querySelectorAll('.ce-' + type + '-row');
     
     for (const row of rows) {
-        if (type === 'bond' || type === 'complication') {
-            const nameInput = row.querySelector('.ce-' + type + '-name');
-            const descInput = row.querySelector('.ce-' + type + '-desc');
-            const startCheck = row.querySelector('.ce-' + type + '-start');
+        if (type === 'bond') {
+            const nameInput = row.querySelector('.ce-bond-name');
+            const descInput = row.querySelector('.ce-bond-desc');
+            const startCheck = row.querySelector('.ce-bond-start');
             
             const name = nameInput ? nameInput.value.trim() : '';
             if (!name) continue;
@@ -539,6 +1236,32 @@ function readDynamicList(type) {
                 name,
                 desc: descInput ? descInput.value.trim() : '',
                 start: startCheck ? startCheck.checked : false
+            });
+        } else if (type === 'complication') {
+            const nameInput = row.querySelector('.ce-complication-name');
+            const descInput = row.querySelector('.ce-complication-desc');
+            const startCheck = row.querySelector('.ce-complication-start');
+            
+            const name = nameInput ? nameInput.value.trim() : '';
+            if (!name) continue;
+            
+            items.push({
+                name,
+                desc: descInput ? descInput.value.trim() : '',
+                start: startCheck ? startCheck.checked : false
+            });
+        } else if (type === 'asset') {
+            const nameInput = row.querySelector('.ce-asset-name');
+            const costInput = row.querySelector('.ce-asset-cost');
+            const tierSelect = row.querySelector('.ce-asset-tier');
+            
+            const name = nameInput ? nameInput.value.trim() : '';
+            if (!name) continue;
+            
+            items.push({
+                name,
+                cost: costInput ? safeParseInt(costInput.value, 0) : 0,
+                tier: tierSelect ? tierSelect.value : 'minor'
             });
         } else {
             const nameInput = row.querySelector('.ce-' + type + '-name');
@@ -574,11 +1297,12 @@ export function addCEDynamic(type) {
     const row = div.firstElementChild;
     container.appendChild(row);
     
-    // Focus the first input
     const firstInput = row.querySelector('input[type="text"]');
     if (firstInput) {
         setTimeout(() => firstInput.focus(), 50);
     }
+    
+    recalculateXpBudget();
 }
 
 export function addCEDynamicFromWiki(type, entryId) {
@@ -601,6 +1325,7 @@ export function addCEDynamicFromWiki(type, entryId) {
     container.appendChild(div.firstElementChild);
     
     showToast(`Added "${entry.title}" from wiki.`, 'success');
+    recalculateXpBudget();
 }
 
 // ============================================================
@@ -608,13 +1333,11 @@ export function addCEDynamicFromWiki(type, entryId) {
 // ============================================================
 
 function setupEditorEvents() {
-    // Keyboard shortcuts
     document.addEventListener('keydown', (e) => {
         if (!editorState.isOpen) return;
         if (e.key === 'Escape') {
             closeEditor();
         } else if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
-            // Ctrl+Enter or Cmd+Enter to save
             e.preventDefault();
             const saveBtn = document.getElementById('ce-save-btn');
             if (saveBtn) saveBtn.click();

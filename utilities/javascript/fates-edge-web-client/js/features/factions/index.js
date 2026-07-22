@@ -2,11 +2,10 @@
 /**
  * Factions & Assets Feature
  * Combines faction management with assets, followers, and trusts
- * 
- * Data paths:
- * - Faction data: /factions/{id}.json
- * - Faction manifest: /factions/manifest.json
- * - Fallback: /data/factions/
+ *
+ * Data path:
+ * - Faction data: ./data/factions/{id}.json
+ * - All data is discovered without a manifest.json – we test known slugs.
  */
 
 import { getState, saveState } from '../../core/state.js';
@@ -17,20 +16,22 @@ import { escHtml } from '../../core/utils.js';
 // CONSTANTS
 // ============================================================
 
-const FACTION_DATA_PATH = '/factions/';
-const FACTION_MANIFEST_PATH = '/factions/manifest.json';
+const FACTION_DATA_PATH = './data/factions/';
 
-const FALLBACK_DATA_PATH = './data/factions/';
-const FALLBACK_MANIFEST_PATH = './data/factions/manifest.json';
-
-// Known faction slugs for discovery fallback
+// Known faction slugs – extend as needed
 const KNOWN_FACTION_SLUGS = [
     'velvet-court',
     'iron-league',
     'gray-ash',
     'ecktorian-censorate',
     'bloody-fist',
-    'house-contarini'
+    'house-contarini',
+    'the-silver-fang',
+    'crimson-rose-syndicate',
+    'order-of-the-iron-covenant',
+    'whispering-net',
+    'ashen-syndicate',
+    'the-velvet-coin'
 ];
 
 const FACTION_STANDINGS = {
@@ -61,6 +62,58 @@ const FOLLOWER_STATES = {
         down: { label: 'Down', color: '#c45a5a', icon: '❌' }
     }
 };
+
+// ============================================================
+// DISCOVERY CACHE
+// ============================================================
+
+const CACHE_KEY = 'fates-edge-factions-cache';
+const CACHE_TTL = 3600000; // 1 hour
+
+/**
+ * Discover available faction files by testing each known slug.
+ * Results are cached in localStorage for 1 hour.
+ */
+async function discoverFactions() {
+    // Check cache first
+    try {
+        const cached = localStorage.getItem(CACHE_KEY);
+        if (cached) {
+            const data = JSON.parse(cached);
+            if (Date.now() - data.timestamp < CACHE_TTL) {
+                console.log(`[Factions] Using cached list (${data.slugs.length} factions)`);
+                return data.slugs;
+            }
+        }
+    } catch (_) {}
+
+    console.log('[Factions] Discovering available factions...');
+    const found = [];
+
+    // Test each slug with HEAD request
+    await Promise.all(KNOWN_FACTION_SLUGS.map(async (slug) => {
+        try {
+            const res = await fetch(`${FACTION_DATA_PATH}${slug}.json`, { method: 'HEAD' });
+            if (res.ok) {
+                found.push(slug);
+            }
+        } catch (_) { /* ignore */ }
+    }));
+
+    // Sort for consistency
+    found.sort();
+
+    // Cache the result
+    try {
+        localStorage.setItem(CACHE_KEY, JSON.stringify({
+            slugs: found,
+            timestamp: Date.now()
+        }));
+    } catch (_) {}
+
+    console.log(`[Factions] Found ${found.length} factions`);
+    return found;
+}
 
 // ============================================================
 // DEFAULT DATA
@@ -275,7 +328,7 @@ export function loadFactionData() {
         state.assets = saved.factions.assets || [];
         state.followers = saved.factions.followers || [];
         state.trusts = saved.factions.trusts || [];
-        
+
         if (state.factions.length > 0 || state.assets.length > 0) {
             console.log(`📦 Loaded from state: ${state.factions.length} factions, ${state.assets.length} assets, ${state.followers.length} followers, ${state.trusts.length} trusts`);
             state.dataLoaded = true;
@@ -283,87 +336,59 @@ export function loadFactionData() {
             return;
         }
     }
-    
+
     loadRemoteFactions();
 }
 
 async function loadRemoteFactions() {
     if (state.isLoading) return;
     state.isLoading = true;
-    
+
     try {
-        console.log('📥 Loading faction data from remote...');
-        
-        let manifestRes = await fetch(FACTION_MANIFEST_PATH);
-        let dataPath = FACTION_DATA_PATH;
-        let manifestFound = false;
-        
-        if (!manifestRes.ok) {
-            console.log('📥 Primary manifest not found, trying fallback...');
-            manifestRes = await fetch(FALLBACK_MANIFEST_PATH);
-            if (manifestRes.ok) {
-                dataPath = FALLBACK_DATA_PATH;
-                console.log('📥 Using fallback data path:', dataPath);
-                manifestFound = true;
-            }
-        } else {
-            manifestFound = true;
-        }
-        
+        // Discover available faction slugs
+        const slugs = await discoverFactions();
+
         let factions = [];
-        
-        if (manifestFound && manifestRes.ok) {
-            const manifest = await manifestRes.json();
-            if (Array.isArray(manifest) && manifest.length > 0) {
-                for (const factionId of manifest) {
-                    try {
-                        const res = await fetch(`${dataPath}${factionId}.json`);
-                        if (res.ok) {
-                            const data = await res.json();
-                            if (!data.id) data.id = factionId;
-                            factions.push(data);
-                            console.log(`✅ Loaded faction: ${data.name || factionId}`);
-                        } else {
-                            console.warn(`⚠️ Could not load faction: ${factionId} (HTTP ${res.status})`);
-                        }
-                    } catch (e) {
-                        console.warn(`⚠️ Error loading faction ${factionId}:`, e);
+
+        if (slugs.length > 0) {
+            for (const slug of slugs) {
+                try {
+                    const res = await fetch(`${FACTION_DATA_PATH}${slug}.json`);
+                    if (res.ok) {
+                        const data = await res.json();
+                        if (!data.id) data.id = slug;
+                        factions.push(data);
+                        console.log(`✅ Loaded faction: ${data.name || slug}`);
+                    } else {
+                        console.warn(`⚠️ Could not load faction: ${slug} (HTTP ${res.status})`);
                     }
+                } catch (e) {
+                    console.warn(`⚠️ Error loading faction ${slug}:`, e);
                 }
             }
         }
-        
-        // If manifest missing or empty, try discovery
+
+        // If no factions loaded, use defaults
         if (factions.length === 0) {
-            console.warn('📥 No manifest or no factions loaded. Attempting discovery...');
-            const discovered = await discoverFactions(dataPath);
-            if (discovered.length > 0) {
-                factions = discovered;
-                console.log(`✅ Discovered ${factions.length} factions`);
-                await saveFactionManifest(factions.map(f => f.id || f.name), dataPath);
-            }
-        }
-        
-        // If still no factions, use defaults and generate manifest
-        if (factions.length === 0) {
-            console.warn('📥 No factions discovered. Using defaults and generating manifest.');
+            console.warn('📥 No factions discovered. Using defaults.');
             state.usingFallback = true;
             loadDefaultFactions();
-            const defaultIds = state.factions.map(f => f.id || f.name);
-            await saveFactionManifest(defaultIds, dataPath);
             showToast('⚠️ No faction files found. Using default factions.', 'warning');
         } else {
             state.factions = factions;
             state.dataLoaded = true;
             state.usingFallback = false;
         }
-        
+
         // Save to global state
         const saved = getState();
         if (!saved.factions) saved.factions = {};
         saved.factions.factions = state.factions;
+        saved.factions.assets = state.assets;
+        saved.factions.followers = state.followers;
+        saved.factions.trusts = state.trusts;
         saveState();
-        
+
     } catch (error) {
         console.warn('Failed to load remote factions:', error);
         state.usingFallback = true;
@@ -371,76 +396,6 @@ async function loadRemoteFactions() {
         showToast('⚠️ Error loading factions. Using defaults.', 'error');
     } finally {
         state.isLoading = false;
-    }
-}
-
-async function discoverFactions(dataPath) {
-    const discovered = [];
-    
-    // Try directory listing
-    try {
-        const dirRes = await fetch(dataPath);
-        if (dirRes.ok) {
-            const html = await dirRes.text();
-            const matches = html.match(/href="([^"]+\.json)"/gi);
-            if (matches) {
-                for (const m of matches) {
-                    const match = m.match(/href="([^"]+)"/i);
-                    if (match && !match[1].includes('manifest')) {
-                        let slug = match[1].replace(/\.json$/, '');
-                        slug = slug.split('/').pop();
-                        try {
-                            const res = await fetch(`${dataPath}${slug}.json`);
-                            if (res.ok) {
-                                const data = await res.json();
-                                if (!data.id) data.id = slug;
-                                discovered.push(data);
-                            }
-                        } catch (e) { /* ignore */ }
-                    }
-                }
-            }
-        }
-    } catch (e) { /* ignore */ }
-    
-    // Fallback to known slugs
-    if (discovered.length === 0) {
-        for (const slug of KNOWN_FACTION_SLUGS) {
-            try {
-                const res = await fetch(`${dataPath}${slug}.json`);
-                if (res.ok) {
-                    const data = await res.json();
-                    if (!data.id) data.id = slug;
-                    discovered.push(data);
-                }
-            } catch (e) { /* ignore */ }
-        }
-    }
-    
-    return discovered;
-}
-
-async function saveFactionManifest(names, dataPath) {
-    const manifestPath = dataPath === FACTION_DATA_PATH ? FACTION_MANIFEST_PATH : FALLBACK_MANIFEST_PATH;
-    try {
-        const res = await fetch(manifestPath, {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(names)
-        });
-        if (res.ok) {
-            console.log(`✅ Faction manifest saved to ${manifestPath}`);
-            return;
-        }
-    } catch (e) {
-        console.warn('Could not save manifest via PUT, falling back to localStorage.', e);
-    }
-    
-    try {
-        localStorage.setItem('fates-edge-faction-manifest', JSON.stringify(names));
-        console.log('Faction manifest cached in localStorage');
-    } catch (e2) {
-        console.warn('Could not save manifest to localStorage.', e2);
     }
 }
 
@@ -479,7 +434,7 @@ export function render(el) {
             <header class="factions-header">
                 <h1 class="factions-title">🏛️ Factions & Assets</h1>
                 <p class="factions-subtitle">Manage factions, assets, followers, and trusts.</p>
-                ${!state.dataLoaded ? '<p class="text-muted" style="font-size:0.85rem;">⏳ Loading faction data...</p>' : 
+                ${!state.dataLoaded ? '<p class="text-muted" style="font-size:0.85rem;">⏳ Loading faction data...</p>' :
                   `<p class="text-muted" style="font-size:0.85rem;">📚 ${state.factions.length} factions, ${state.assets.length} assets, ${state.followers.length} followers</p>`}
                 ${usingFallback ? `<div style="color:var(--warn);font-size:0.85rem;margin-top:0.3rem;">⚠️ No faction files found – using fallback defaults.</div>` : ''}
             </header>
@@ -513,7 +468,7 @@ function renderView(view) {
             </div>
         `;
     }
-    
+
     switch(view) {
         case 'factions': return renderFactions();
         case 'assets': return renderAssets();
@@ -1065,7 +1020,11 @@ window.viewFaction = function(id) { renderFactionDetail(id); };
 window.viewAsset = function(id) { renderAssetDetail(id); };
 window.viewFollower = function(id) { renderFollowerDetail(id); };
 window.viewTrust = function(id) { renderTrustDetail(id); };
-window.loadDefaultFactions = function() { loadDefaultFactions(); refreshView(); showToast('Loaded default factions', 'success'); };
+window.loadDefaultFactions = function() {
+    loadDefaultFactions();
+    refreshView();
+    showToast('Loaded default factions', 'success');
+};
 
 // ============================================================
 // CRUD OPERATIONS - FACTIONS
@@ -1333,8 +1292,8 @@ window.deleteFollower = function(id) {
 window.changeFollowerState = function(id, type) {
     const follower = state.followers.find(f => f.id === id);
     if (!follower) return;
-    const states = type === 'loyalty' 
-        ? ['faithful', 'strained', 'broken'] 
+    const states = type === 'loyalty'
+        ? ['faithful', 'strained', 'broken']
         : ['ready', 'hurt', 'down'];
     const current = follower[type] || states[0];
     const idx = states.indexOf(current);
@@ -1477,6 +1436,8 @@ function refreshView() {
 }
 
 window.refreshFactions = function() {
+    // Clear cache and reload
+    localStorage.removeItem(CACHE_KEY);
     loadFactionData();
     refreshView();
     showToast('Factions refreshed', 'success');
@@ -1518,6 +1479,7 @@ export function onDeactivate() {
 }
 
 export function refresh() {
+    localStorage.removeItem(CACHE_KEY);
     loadFactionData();
     refreshView();
 }
