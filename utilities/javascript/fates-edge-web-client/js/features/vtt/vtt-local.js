@@ -494,9 +494,17 @@ export function render(el) {
           <div style="display:flex;justify-content:space-between;align-items:center;">
             <h3 style="margin:0;font-size:1.2rem;">👥 Party</h3>
             <button class="btn btn-sm btn-ghost" id="vtt-refresh-btn" title="Refresh" style="font-size:0.9rem;">↻</button>
-          </div>
-          <div id="vttCharGrid" style="margin-top:0.5rem;overflow-x:auto;"></div>
-        </div>
+                </div>
+            <div>
+                    <div id="vttCharGrid" style="
+                        margin-top:0.5rem;
+                        max-height:220px;          /* roughly 4 rows */
+                        overflow-y:auto;
+                        padding-right:4px;         /* avoid scrollbar overlap */
+                        scrollbar-width: thin;     /* optional: Firefox */
+                    ">        
+                    </div>
+              </div>
 
         <!-- Quick Roller + Common Rolls -->
         <div class="vtt-panel" style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:0.8rem;">

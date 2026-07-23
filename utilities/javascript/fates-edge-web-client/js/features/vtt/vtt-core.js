@@ -1,8 +1,7 @@
 /**
  * VTT Core – reactive rendering functions
- * Each renderer subscribes to the store and updates its DOM element automatically.
  * Updated for:
- * - JRPG-style horizontal character roster (scrollable)
+ * - Vertical JRPG-style roster (scrollable list)
  * - Single-click selection with highlighting
  * - Auto-populate Quick Roller from selected character
  * - Common rolls with auto-population
@@ -24,7 +23,6 @@ export const VTT_CONFIG = {
     presenceUpdateInterval: 5000,
 };
 
-// Sender types (for display)
 export const SENDER_TYPES = {
     SYSTEM: 'System',
     ROLL: 'Roll',
@@ -33,7 +31,6 @@ export const SENDER_TYPES = {
     DECK: 'Deck',
 };
 
-// [VTT SELECTION] Common rolls mapping: { displayName: { attr, skill } }
 export const COMMON_ROLLS = {
     Stealth: { attr: 'body', skill: 'stealth' },
     Investigate: { attr: 'mind', skill: 'investigate' },
@@ -77,10 +74,8 @@ let selectedCharUnsubscribe = null;
 export function renderChat() {
     if (!currentContainer) return;
     const chatContainer = currentContainer.querySelector('#chatMessages');
-    const chatInputRow = currentContainer.querySelector('.chat-input-row');
     if (!chatContainer) return;
 
-    // ---- Render selected character display above chat input ----
     const selectedDisplay = currentContainer.querySelector('#selected-character-display');
     if (selectedDisplay) {
         if (selectedCharUnsubscribe) selectedCharUnsubscribe();
@@ -98,7 +93,6 @@ export function renderChat() {
                         <button class="btn btn-xs btn-ghost" id="clear-selected-char" title="Deselect" style="padding:0 0.3rem;">✕</button>
                     </div>
                 `;
-                // Attach deselect handler
                 const clearBtn = selectedDisplay.querySelector('#clear-selected-char');
                 if (clearBtn) {
                     clearBtn.addEventListener('click', (e) => {
@@ -107,14 +101,11 @@ export function renderChat() {
                     });
                 }
             } else {
-                selectedDisplay.innerHTML = `
-                    <span style="color:var(--text3);font-size:0.9rem;">No character selected</span>
-                `;
+                selectedDisplay.innerHTML = `<span style="color:var(--text3);font-size:0.9rem;">No character selected</span>`;
             }
         });
     }
 
-    // ---- Chat messages ----
     if (chatUnsubscribe) chatUnsubscribe();
     chatUnsubscribe = vttStore.subscribe('chatMessages', (messages) => {
         const allMessages = messages || [];
@@ -268,7 +259,7 @@ function renderDeckDetails(deckData) {
 }
 
 // ============================================================
-// Party Status – Horizontal, JRPG-style roster with avatars
+// Party Status – Vertical JRPG-style roster (scrollable list)
 // ============================================================
 let charUnsubscribe = null;
 
@@ -287,8 +278,7 @@ export function renderVTTChars() {
             return;
         }
 
-        // Horizontal scrollable container (flex row)
-        let html = `<div style="display:flex;gap:0.8rem;overflow-x:auto;padding:0.2rem 0.2rem;flex-wrap:nowrap;">`;
+        let html = `<div style="display:flex;flex-direction:column;gap:0.4rem;">`;
         for (const char of vttChars) {
             const name = char.name || 'Unnamed';
             const harm = char.harm || 0;
@@ -297,38 +287,35 @@ export function renderVTTChars() {
             const tier = char.tier || 1;
             const isSelected = char.id === selectedId;
 
-            // Avatar (small)
             const avatarHtml = char.avatar
-                ? `<img src="${char.avatar}" alt="${escHtml(name)}" style="width:40px;height:40px;border-radius:50%;object-fit:cover;border:2px solid ${isSelected ? 'var(--gold)' : 'var(--border)'};flex-shrink:0;" />`
-                : `<span style="font-size:1.8rem;flex-shrink:0;">🧑</span>`;
+                ? `<img src="${char.avatar}" alt="${escHtml(name)}" style="width:36px;height:36px;border-radius:50%;object-fit:cover;border:2px solid ${isSelected ? 'var(--gold)' : 'var(--border)'};flex-shrink:0;" />`
+                : `<span style="font-size:1.6rem;flex-shrink:0;">🧑</span>`;
 
             html += `
                 <div class="vtt-char-card" data-char-id="${char.id}" style="
-                    flex:0 0 auto;
-                    min-width:160px;
+                    display:flex;
+                    align-items:center;
+                    gap:0.8rem;
                     background:var(--bg3);
                     border-radius:var(--radius);
-                    padding:0.4rem 0.6rem;
+                    padding:0.4rem 0.8rem;
                     border:2px solid ${isSelected ? 'var(--gold)' : 'var(--border)'};
                     box-shadow: ${isSelected ? '0 0 12px rgba(212,175,55,0.4)' : 'none'};
                     transition:all 0.2s;
                     cursor:pointer;
-                    display:flex;
-                    align-items:center;
-                    gap:0.6rem;
                 ">
                     ${avatarHtml}
                     <div style="display:flex;flex-direction:column;justify-content:center;flex:1;min-width:0;">
-                        <div style="font-weight:700;font-size:1rem;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
-                            ${escHtml(name)}
-                            <span style="font-size:0.6rem;color:var(--text3);background:var(--bg4);padding:0.05rem 0.4rem;border-radius:10px;margin-left:0.3rem;">T${tier}</span>
+                        <div style="display:flex;align-items:center;gap:0.4rem;flex-wrap:wrap;">
+                            <span style="font-weight:700;font-size:1rem;">${escHtml(name)}</span>
+                            <span style="font-size:0.65rem;color:var(--text3);background:var(--bg4);padding:0.05rem 0.5rem;border-radius:12px;">T${tier}</span>
+                            ${isSelected ? `<span style="font-size:0.65rem;color:var(--gold);font-weight:600;">👑 Selected</span>` : ''}
                         </div>
-                        <div style="display:flex;gap:0.6rem;font-size:0.85rem;color:var(--text2);margin-top:0.1rem;">
-                            <span>❤️${harm}</span>
-                            <span>⚡${fatigue}</span>
-                            <span>🎲${boons}</span>
+                        <div style="display:flex;gap:0.8rem;font-size:0.85rem;color:var(--text2);margin-top:0.1rem;">
+                            <span>❤️ ${harm}</span>
+                            <span>⚡ ${fatigue}</span>
+                            <span>🎲 ${boons}</span>
                         </div>
-                        ${isSelected ? `<span style="font-size:0.65rem;color:var(--gold);">👑 Selected</span>` : ''}
                     </div>
                 </div>
             `;
@@ -336,12 +323,10 @@ export function renderVTTChars() {
         html += `</div>`;
         setHtml(grid, html);
 
-        // Attach click handlers to select character
         grid.querySelectorAll('.vtt-char-card').forEach(card => {
             card.addEventListener('click', (e) => {
                 const id = card.dataset.charId;
                 if (id) {
-                    // Select the character – this will trigger all subscriptions
                     vttStore.selectCharacter(id);
                 }
             });
@@ -360,9 +345,7 @@ function populateRollerFromSelected(char) {
     const skillSelect = q('#vtt-skill');
     const boonsInput = q('#vtt-boons');
     if (attrSelect) {
-        // Use body attribute as default (fallback to 3)
         const body = char.attributes?.body ?? 3;
-        // Set the select value if it exists
         if ([1,2,3,4,5].includes(body)) {
             attrSelect.value = body;
         } else {
@@ -370,7 +353,6 @@ function populateRollerFromSelected(char) {
         }
     }
     if (skillSelect) {
-        // Set skill to 0 by default (user can adjust)
         skillSelect.value = 0;
     }
     if (boonsInput) {
@@ -389,7 +371,7 @@ export function initRollerAutoPopulate() {
 }
 
 // ============================================================
-// Common Rolls Renderer – populates quick roller with selected char's stats
+// Common Rolls Renderer
 // ============================================================
 let commonRollsUnsubscribe = null;
 
@@ -398,7 +380,6 @@ export function renderCommonRolls() {
     const container = currentContainer.querySelector('#vtt-common-rolls');
     if (!container) return;
 
-    // Ensure auto-populate is active
     initRollerAutoPopulate();
 
     if (commonRollsUnsubscribe) commonRollsUnsubscribe();
@@ -426,28 +407,23 @@ export function renderCommonRolls() {
         html += `</div>`;
         setHtml(container, html);
 
-        // Attach click handlers to populate the roller
         container.querySelectorAll('.common-roll-btn').forEach(btn => {
             btn.addEventListener('click', () => {
                 const attr = parseInt(btn.dataset.attr, 10) || 3;
                 const skill = parseInt(btn.dataset.skill, 10) || 0;
                 const label = btn.dataset.label;
-                // Set the quick roller fields
                 const attrSelect = q('#vtt-attr');
                 const skillSelect = q('#vtt-skill');
                 if (attrSelect) attrSelect.value = attr;
                 if (skillSelect) skillSelect.value = skill;
-                // Optionally set boons from selected char
                 const boonsInput = q('#vtt-boons');
                 if (boonsInput && char) {
                     boonsInput.value = char.boons || 0;
                 }
-                // Show feedback
                 const output = q('#vtt-roll-output');
                 if (output) {
                     output.innerHTML = `<span style="color:var(--text2);">⚡ ${label} prepared (Attr ${attr} + Skill ${skill})</span>`;
                 }
-                // Scroll to roller
                 const rollerPanel = q('.vtt-panel:has(#vtt-roll-output)');
                 if (rollerPanel) rollerPanel.scrollIntoView({ behavior: 'smooth', block: 'center' });
             });
@@ -456,7 +432,7 @@ export function renderCommonRolls() {
 }
 
 // ============================================================
-// Timers (reactive) – increased font size
+// Timers (reactive)
 // ============================================================
 let timerUnsubscribe = null;
 
@@ -495,7 +471,7 @@ export function renderVTTTimers() {
 }
 
 // ============================================================
-// Presence (reactive with WebSocket integration) – larger fonts
+// Presence (reactive with WebSocket integration)
 // ============================================================
 let presenceUnsubscribe = null;
 
@@ -540,7 +516,7 @@ export function renderLocalPresence() {
 }
 
 // ============================================================
-// Voice Clients (reactive) – larger fonts
+// Voice Clients (reactive)
 // ============================================================
 let voiceUnsubscribe = null;
 
@@ -597,7 +573,6 @@ export function renderVoiceClients() {
         }
         setHtml(listEl, html);
 
-        // Attach click events for call buttons (dispatched as custom event)
         listEl.querySelectorAll('.voice-call-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 e.stopPropagation();
@@ -627,12 +602,11 @@ export function updateMessageCount() {
 }
 
 // ============================================================
-// Chat Recipient Select (manual update – could be made reactive)
+// Chat Recipient Select
 // ============================================================
 export function populateChatRecipients() {
     const recipientSelect = q('#chatRecipient');
     if (!recipientSelect) return;
-    // We'll just populate it once; it can be updated when characters change if needed
     setHtml(recipientSelect, '');
     const options = [{ value: 'all', label: 'All' }, { value: 'gm', label: 'GM' }];
     const chars = vttStore.state.characters || [];
@@ -672,5 +646,4 @@ export function playNotificationSound() {
 // RE-EXPORT for convenience
 // ============================================================
 
-// Re-export these so they can be imported from vtt-core
 export { getOutcomeColor, getOutcomeLabel, getOutcomeClass } from '../../core/dice.js';

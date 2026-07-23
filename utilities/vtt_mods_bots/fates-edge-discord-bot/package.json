@@ -19,10 +19,6 @@
   "devDependencies": {
     "nodemon": "^3.0.1"
   },
-<<<<<<< HEAD
-  "_license": "Fate's Edge Proprietary Content – © 2024 Nicholas A. Gasper. All rights reserved."
-=======
   "_license": "Fate's Edge Proprietary Content – © 2024 Nicholas A. Gasper. All rights reserved.",
   "author": "Nicholas A. Gasper"
->>>>>>> 7a9b39e (Squashed commits)
 }

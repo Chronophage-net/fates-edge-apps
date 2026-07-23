@@ -30,7 +30,6 @@ export const DEFAULT_SKILLS = {
   intimidation: 0,
   performance: 0,
   sleightOfHand: 0,
-  stealth: 0,
 };
 
 // ============================================================
@@ -189,8 +188,6 @@ function ensureCharacterDefaults(char) {
 
 /**
  * Merge remote state with local state, detecting conflicts
- * @param {object} remoteState - State from server
- * @param {object} version - Version vector
  */
 export function mergeState(remoteState, version) {
     const conflicts = [];
@@ -201,7 +198,6 @@ export function mergeState(remoteState, version) {
         remoteState.characters.forEach(remoteChar => {
             const localChar = state.characters.find(c => c.id === remoteChar.id);
             if (localChar) {
-                // Check if local version is newer
                 if ((localChar._syncVersion || 0) > (remoteChar._syncVersion || 0)) {
                     conflicts.push({
                         type: 'character',
@@ -211,14 +207,12 @@ export function mergeState(remoteState, version) {
                         resolution: 'pending'
                     });
                 } else {
-                    // Remote is newer or same version – ensure defaults then replace
                     const mergedChar = { ...localChar, ...remoteChar };
                     ensureCharacterDefaults(mergedChar);
                     const idx = state.characters.indexOf(localChar);
                     state.characters[idx] = mergedChar;
                 }
             } else {
-                // New character from remote – ensure defaults
                 ensureCharacterDefaults(remoteChar);
                 state.characters.push(remoteChar);
             }
@@ -266,18 +260,16 @@ export function mergeState(remoteState, version) {
                 state.chatMessages.push(msg);
             }
         });
-        // Keep chat history under limit
         if (state.chatMessages.length > 200) {
             state.chatMessages = state.chatMessages.slice(-200);
         }
     }
 
-    // 5. Merge campaign state (NEW)
+    // 5. Merge campaign state
     if (remoteState.campaign && remoteState.campaign.state) {
         const remoteCampaignState = remoteState.campaign.state;
         const localCampaignState = state.campaign ? state.campaign.state : {};
         
-        // Merge sessionLog (append-only, deduplicate by timestamp)
         if (remoteCampaignState.sessionLog && Array.isArray(remoteCampaignState.sessionLog)) {
             const localLog = localCampaignState.sessionLog || [];
             const localTimestamps = new Set(localLog.map(e => e.timestamp));
@@ -286,7 +278,6 @@ export function mergeState(remoteState, version) {
                     localLog.push(entry);
                 }
             });
-            // Sort by timestamp and limit
             localLog.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
             if (localLog.length > 500) {
                 localCampaignState.sessionLog = localLog.slice(-500);
@@ -295,7 +286,6 @@ export function mergeState(remoteState, version) {
             }
         }
         
-        // Merge sceneTags (deduplicate)
         if (remoteCampaignState.sceneTags && Array.isArray(remoteCampaignState.sceneTags)) {
             const localTags = localCampaignState.sceneTags || [];
             const tagSet = new Set(localTags);
@@ -303,7 +293,6 @@ export function mergeState(remoteState, version) {
             localCampaignState.sceneTags = Array.from(tagSet);
         }
         
-        // Merge vttEvents (append-only, deduplicate by id)
         if (remoteCampaignState.vttEvents && Array.isArray(remoteCampaignState.vttEvents)) {
             const localEvents = localCampaignState.vttEvents || [];
             const localIds = new Set(localEvents.map(e => e.id));
@@ -312,7 +301,6 @@ export function mergeState(remoteState, version) {
                     localEvents.push(event);
                 }
             });
-            // Limit to 200 events
             if (localEvents.length > 200) {
                 localCampaignState.vttEvents = localEvents.slice(-200);
             } else {
@@ -320,7 +308,6 @@ export function mergeState(remoteState, version) {
             }
         }
         
-        // Merge activeThreats (append-only, deduplicate by id)
         if (remoteCampaignState.activeThreats && Array.isArray(remoteCampaignState.activeThreats)) {
             const localThreats = localCampaignState.activeThreats || [];
             const localIds = new Set(localThreats.map(t => t.id));
@@ -332,7 +319,6 @@ export function mergeState(remoteState, version) {
             localCampaignState.activeThreats = localThreats;
         }
         
-        // Merge opportunities (append-only, deduplicate by id)
         if (remoteCampaignState.opportunities && Array.isArray(remoteCampaignState.opportunities)) {
             const localOpps = localCampaignState.opportunities || [];
             const localIds = new Set(localOpps.map(o => o.id));
@@ -344,7 +330,6 @@ export function mergeState(remoteState, version) {
             localCampaignState.opportunities = localOpps;
         }
         
-        // Merge campaignTimers (by id, remote wins on conflict)
         if (remoteCampaignState.campaignTimers && Array.isArray(remoteCampaignState.campaignTimers)) {
             const localTimers = localCampaignState.campaignTimers || [];
             const remoteMap = new Map(remoteCampaignState.campaignTimers.map(t => [t.id, t]));
@@ -357,19 +342,14 @@ export function mergeState(remoteState, version) {
             localCampaignState.campaignTimers = merged;
         }
         
-        // Merge notes (remote overwrites if newer, or just concatenate)
         if (remoteCampaignState.notes && localCampaignState.notes !== remoteCampaignState.notes) {
-            // For notes, we'll let the remote version win (or we could concatenate)
-            // Using remote wins for simplicity
             localCampaignState.notes = remoteCampaignState.notes + (localCampaignState.notes ? '\n\n--- Remote Sync ---\n' + localCampaignState.notes : '');
         }
         
-        // Update the main campaign state
         if (!state.campaign) state.campaign = { ...DEFAULT_STATE.campaign };
         state.campaign.state = localCampaignState;
     }
 
-    // 6. Handle conflicts (show to user for resolution)
     if (conflicts.length > 0) {
         pendingConflicts = [...pendingConflicts, ...conflicts];
         document.dispatchEvent(new CustomEvent('syncConflict', {
@@ -377,7 +357,6 @@ export function mergeState(remoteState, version) {
         }));
     }
 
-    // 7. Update version
     state._version = version;
     state._lastSync = Date.now();
     saveState();
@@ -393,15 +372,12 @@ export function resolveConflict(conflictId, choice) {
 
     switch (choice) {
         case 'local':
-            // Keep local version, do nothing to state
             break;
         case 'remote':
-            // Use remote version
             const idx = state.characters.indexOf(conflict.local);
             if (idx !== -1) state.characters[idx] = conflict.remote;
             break;
         case 'merge':
-            // Deep merge
             const merged = { ...conflict.local, ...conflict.remote };
             merged._syncVersion = Math.max(
                 conflict.local._syncVersion || 0,
@@ -412,7 +388,6 @@ export function resolveConflict(conflictId, choice) {
             break;
     }
 
-    // Remove resolved conflict
     pendingConflicts = pendingConflicts.filter(c => c.id !== conflictId);
     saveState();
 }
@@ -495,7 +470,6 @@ export function addSessionLogEntry(message, type = 'info') {
         type: type
     };
     campaignState.sessionLog.push(entry);
-    // Keep log manageable
     if (campaignState.sessionLog.length > 500) {
         campaignState.sessionLog = campaignState.sessionLog.slice(-500);
     }
@@ -552,7 +526,7 @@ export function clearSceneTags() {
 }
 
 // ============================================================
-// VTT EVENT OPERATIONS (NEW)
+// VTT EVENT OPERATIONS
 // ============================================================
 
 export function addVTTEvent(event) {
@@ -567,7 +541,6 @@ export function addVTTEvent(event) {
         event.timestamp = new Date().toISOString();
     }
     campaignState.vttEvents.push(event);
-    // Keep event history manageable
     if (campaignState.vttEvents.length > 200) {
         campaignState.vttEvents = campaignState.vttEvents.slice(-200);
     }
@@ -592,7 +565,6 @@ export function clearVTTEvents() {
 // ============================================================
 
 export function getCharacters() {
-    // Ensure all characters have defaults
     if (state.characters) {
         state.characters = state.characters.map(c => ensureCharacterDefaults(c));
     }
@@ -612,9 +584,7 @@ export function addCharacter(character) {
     if (!character.createdAt) {
         character.createdAt = new Date().toISOString();
     }
-    // Ensure defaults
     ensureCharacterDefaults(character);
-    // Set sync version
     character._syncVersion = Date.now();
     state.characters = [...(state.characters || []), character];
     saveState();
@@ -633,7 +603,6 @@ export function updateCharacter(id, updates) {
         updatedAt: new Date().toISOString(),
         _syncVersion: Date.now()
     };
-    // Ensure defaults
     ensureCharacterDefaults(updated);
     state.characters = [...characters.slice(0, index), updated, ...characters.slice(index + 1)];
     saveState();
@@ -646,14 +615,12 @@ export function deleteCharacter(id) {
     return true;
 }
 
-// [VTT SELECTION] Helper to get character attribute
 export function getCharacterAttribute(charId, attrName) {
     const char = getCharacter(charId);
     if (!char) return null;
     return char.attributes?.[attrName] ?? null;
 }
 
-// [VTT SELECTION] Helper to get character skill
 export function getCharacterSkill(charId, skillName) {
     const char = getCharacter(charId);
     if (!char) return null;
