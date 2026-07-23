@@ -1,11 +1,8 @@
 // features/factions/index.js
 /**
  * Factions & Assets Feature
- * Combines faction management with assets, followers, and trusts
- *
- * Data path:
- * - Faction data: ./data/factions/{id}.json
- * - All data is discovered without a manifest.json – we test known slugs.
+ * Combines faction management with assets, followers, and trusts.
+ * Data path resolved dynamically.
  */
 
 import { getState, saveState } from '../../core/state.js';
@@ -13,12 +10,44 @@ import { showToast } from '../../components/Toast.js';
 import { escHtml } from '../../core/utils.js';
 
 // ============================================================
+// PATH RESOLUTION – tries multiple base paths
+// ============================================================
+
+let _dataBasePath = null;
+
+async function resolveDataBasePath() {
+    if (_dataBasePath !== null) return _dataBasePath;
+
+    const candidates = [
+        './data/',
+        '/data/',
+        '../data/',
+        './static/data/',
+        '/static/data/',
+        '../static/data/'
+    ];
+
+    for (const base of candidates) {
+        try {
+            const testUrl = `${base}factions/README.md`;
+            const res = await fetch(testUrl, { method: 'HEAD' });
+            if (res.ok) {
+                _dataBasePath = base;
+                console.log(`[Factions] Data base path resolved: ${base}`);
+                return base;
+            }
+        } catch (_) { /* ignore */ }
+    }
+
+    _dataBasePath = './data/';
+    console.warn('[Factions] Could not resolve data base path, using default:', _dataBasePath);
+    return _dataBasePath;
+}
+
+// ============================================================
 // CONSTANTS
 // ============================================================
 
-const FACTION_DATA_PATH = './data/factions/';
-
-// Known faction slugs – extend as needed
 const KNOWN_FACTION_SLUGS = [
     'velvet-court',
     'iron-league',
@@ -68,14 +97,9 @@ const FOLLOWER_STATES = {
 // ============================================================
 
 const CACHE_KEY = 'fates-edge-factions-cache';
-const CACHE_TTL = 3600000; // 1 hour
+const CACHE_TTL = 3600000;
 
-/**
- * Discover available faction files by testing each known slug.
- * Results are cached in localStorage for 1 hour.
- */
 async function discoverFactions() {
-    // Check cache first
     try {
         const cached = localStorage.getItem(CACHE_KEY);
         if (cached) {
@@ -89,21 +113,18 @@ async function discoverFactions() {
 
     console.log('[Factions] Discovering available factions...');
     const found = [];
+    const basePath = await resolveDataBasePath();
 
-    // Test each slug with HEAD request
     await Promise.all(KNOWN_FACTION_SLUGS.map(async (slug) => {
         try {
-            const res = await fetch(`${FACTION_DATA_PATH}${slug}.json`, { method: 'HEAD' });
+            const res = await fetch(`${basePath}factions/${slug}.json`, { method: 'HEAD' });
             if (res.ok) {
                 found.push(slug);
             }
         } catch (_) { /* ignore */ }
     }));
 
-    // Sort for consistency
     found.sort();
-
-    // Cache the result
     try {
         localStorage.setItem(CACHE_KEY, JSON.stringify({
             slugs: found,
@@ -345,15 +366,15 @@ async function loadRemoteFactions() {
     state.isLoading = true;
 
     try {
-        // Discover available faction slugs
         const slugs = await discoverFactions();
+        const basePath = await resolveDataBasePath();
 
         let factions = [];
 
         if (slugs.length > 0) {
             for (const slug of slugs) {
                 try {
-                    const res = await fetch(`${FACTION_DATA_PATH}${slug}.json`);
+                    const res = await fetch(`${basePath}factions/${slug}.json`);
                     if (res.ok) {
                         const data = await res.json();
                         if (!data.id) data.id = slug;
@@ -368,7 +389,6 @@ async function loadRemoteFactions() {
             }
         }
 
-        // If no factions loaded, use defaults
         if (factions.length === 0) {
             console.warn('📥 No factions discovered. Using defaults.');
             state.usingFallback = true;
@@ -380,7 +400,6 @@ async function loadRemoteFactions() {
             state.usingFallback = false;
         }
 
-        // Save to global state
         const saved = getState();
         if (!saved.factions) saved.factions = {};
         saved.factions.factions = state.factions;
@@ -1436,7 +1455,6 @@ function refreshView() {
 }
 
 window.refreshFactions = function() {
-    // Clear cache and reload
     localStorage.removeItem(CACHE_KEY);
     loadFactionData();
     refreshView();
