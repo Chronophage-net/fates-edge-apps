@@ -1,6 +1,10 @@
 /**
  * State management for Fate's Edge Toolkit
- * v3.1 - With VTT Selection & Character Attributes/Skills
+ * v3.2 – With full Spellcraft & Magic support
+ * - Extended character schema for all magical paths
+ * - Tracks: Obligation, Corruption, Leash, Mental Strain, Shadow, Shame, Identity Strain
+ * - Spellbook, bound spirits, repertoire, symbols
+ * - Helper functions for magic-related data
  */
 
 import { generateId, getBaseUrl as utilsGetBaseUrl, getStorage, setStorage, removeStorage } from './utils.js';
@@ -30,6 +34,18 @@ export const DEFAULT_SKILLS = {
   performance: 0,
   sleightOfHand: 0,
 };
+
+// Magic paths
+export const MAGIC_PATHS = [
+  'none',
+  'runekeeper',
+  'invoker',
+  'cantor',
+  'witch',
+  'psion',
+  'summoner',
+  'free-caster'
+];
 
 // ============================================================
 // STATE
@@ -153,9 +169,18 @@ export function clearState() {
     return state;
 }
 
-// [VTT SELECTION] Ensure character has attributes & skills
+// ============================================================
+// CHARACTER DEFAULTS (extended for Spellcraft)
+// ============================================================
+
+/**
+ * Ensure a character object has all required fields.
+ * Now includes magic tracks, spellbook, bound spirits, etc.
+ */
 export function ensureCharacterDefaults(char) {
     if (!char) return null;
+
+    // ---- Attributes ----
     if (!char.attributes || typeof char.attributes !== 'object') {
         char.attributes = { ...DEFAULT_ATTRIBUTES };
     } else {
@@ -165,6 +190,8 @@ export function ensureCharacterDefaults(char) {
             }
         }
     }
+
+    // ---- Skills ----
     if (!char.skills || typeof char.skills !== 'object') {
         char.skills = { ...DEFAULT_SKILLS };
     } else {
@@ -174,8 +201,48 @@ export function ensureCharacterDefaults(char) {
             }
         }
     }
+
+    // ---- Magic Path & Patron ----
+    if (char.magicPath === undefined) char.magicPath = 'none';
+    if (char.patron === undefined) char.patron = null;
+
+    // ---- Tracks ----
+    // Obligation (Runekeeper / Invoker)
+    if (char.obligation === undefined) char.obligation = 0;
+    // Corruption (Cantor)
+    if (char.corruption === undefined) char.corruption = 0;
+    if (char.corruptionMax === undefined) {
+        // default to spirit, but we'll recompute on the fly if needed
+        char.corruptionMax = char.attributes?.spirit || 3;
+    }
+    // Leash (Summoner)
+    if (char.leash === undefined) char.leash = 0;
+    if (char.leashMax === undefined) char.leashMax = 4;
+    // Mental Strain (Psion)
+    if (char.mentalStrain === undefined) char.mentalStrain = 0;
+    if (char.mentalStrainMax === undefined) {
+        char.mentalStrainMax = char.attributes?.spirit || 3;
+    }
+    // Witch tracks
+    if (char.shadow === undefined) char.shadow = 0;
+    if (char.shame === undefined) char.shame = 0;
+    if (char.identityStrain === undefined) char.identityStrain = 0;
+
+    // ---- Spellbook ----
+    if (char.spellbook === undefined) char.spellbook = [];
+    // ---- Bound Spirits ----
+    if (char.boundSpirits === undefined) char.boundSpirits = [];
+    // ---- Repertoire (Cantor songs) ----
+    if (char.repertoire === undefined) char.repertoire = [];
+    // ---- Symbols (Invoker) ----
+    if (char.symbols === undefined) char.symbols = [];
+
     return char;
 }
+
+// ============================================================
+// MERGE (with defaults)
+// ============================================================
 
 export function mergeState(remoteState, version) {
     const conflicts = [];
@@ -206,6 +273,7 @@ export function mergeState(remoteState, version) {
         });
     }
 
+    // Other merges (timers, wiki, chat, campaign) unchanged...
     if (remoteState.timers) {
         state.timers = state.timers || [];
         remoteState.timers.forEach(remoteTimer => {
@@ -544,7 +612,7 @@ export function clearVTTEvents() {
 }
 
 // ============================================================
-// CHARACTER OPERATIONS
+// CHARACTER OPERATIONS (extended)
 // ============================================================
 
 export function getCharacters() {
@@ -598,6 +666,7 @@ export function deleteCharacter(id) {
     return true;
 }
 
+// ---- Attribute & Skill helpers ----
 export function getCharacterAttribute(charId, attrName) {
     const char = getCharacter(charId);
     if (!char) return null;
@@ -610,8 +679,134 @@ export function getCharacterSkill(charId, skillName) {
     return char.skills?.[skillName] ?? null;
 }
 
+// ---- Magic helpers (new) ----
+export function getCharacterMagicPath(charId) {
+    const char = getCharacter(charId);
+    return char ? char.magicPath || 'none' : 'none';
+}
+
+export function getCharacterPatron(charId) {
+    const char = getCharacter(charId);
+    return char ? char.patron || null : null;
+}
+
+export function getCharacterTrack(charId, trackName) {
+    const char = getCharacter(charId);
+    if (!char) return null;
+    const validTracks = ['obligation', 'corruption', 'corruptionMax', 'leash', 'leashMax',
+                         'mentalStrain', 'mentalStrainMax', 'shadow', 'shame', 'identityStrain'];
+    if (validTracks.includes(trackName)) {
+        return char[trackName] ?? 0;
+    }
+    return null;
+}
+
+export function updateCharacterTrack(charId, trackName, value) {
+    const char = getCharacter(charId);
+    if (!char) return null;
+    const validTracks = ['obligation', 'corruption', 'corruptionMax', 'leash', 'leashMax',
+                         'mentalStrain', 'mentalStrainMax', 'shadow', 'shame', 'identityStrain'];
+    if (!validTracks.includes(trackName)) return null;
+    const updates = { [trackName]: Math.max(0, value) };
+    return updateCharacter(charId, updates);
+}
+
+// Spellbook helpers
+export function getCharacterSpellbook(charId) {
+    const char = getCharacter(charId);
+    return char ? char.spellbook || [] : [];
+}
+
+export function addSpellToCharacter(charId, spell) {
+    const char = getCharacter(charId);
+    if (!char) return null;
+    if (!spell.id) spell.id = generateId('spell_');
+    if (!char.spellbook) char.spellbook = [];
+    char.spellbook.push(spell);
+    return updateCharacter(charId, { spellbook: char.spellbook });
+}
+
+export function removeSpellFromCharacter(charId, spellId) {
+    const char = getCharacter(charId);
+    if (!char) return null;
+    if (!char.spellbook) return null;
+    char.spellbook = char.spellbook.filter(s => s.id !== spellId);
+    return updateCharacter(charId, { spellbook: char.spellbook });
+}
+
+// Bound spirits helpers
+export function getCharacterSpirits(charId) {
+    const char = getCharacter(charId);
+    return char ? char.boundSpirits || [] : [];
+}
+
+export function addSpiritToCharacter(charId, spirit) {
+    const char = getCharacter(charId);
+    if (!char) return null;
+    if (!spirit.id) spirit.id = generateId('spirit_');
+    if (!char.boundSpirits) char.boundSpirits = [];
+    char.boundSpirits.push(spirit);
+    return updateCharacter(charId, { boundSpirits: char.boundSpirits });
+}
+
+export function removeSpiritFromCharacter(charId, spiritId) {
+    const char = getCharacter(charId);
+    if (!char) return null;
+    if (!char.boundSpirits) return null;
+    char.boundSpirits = char.boundSpirits.filter(s => s.id !== spiritId);
+    return updateCharacter(charId, { boundSpirits: char.boundSpirits });
+}
+
+// Repertoire helpers (Cantor)
+export function getCharacterRepertoire(charId) {
+    const char = getCharacter(charId);
+    return char ? char.repertoire || [] : [];
+}
+
+export function addSongToRepertoire(charId, songName) {
+    const char = getCharacter(charId);
+    if (!char) return null;
+    if (!char.repertoire) char.repertoire = [];
+    if (!char.repertoire.includes(songName)) {
+        char.repertoire.push(songName);
+        return updateCharacter(charId, { repertoire: char.repertoire });
+    }
+    return char;
+}
+
+export function removeSongFromRepertoire(charId, songName) {
+    const char = getCharacter(charId);
+    if (!char) return null;
+    if (!char.repertoire) return null;
+    char.repertoire = char.repertoire.filter(s => s !== songName);
+    return updateCharacter(charId, { repertoire: char.repertoire });
+}
+
+// Symbols helpers (Invoker)
+export function getCharacterSymbols(charId) {
+    const char = getCharacter(charId);
+    return char ? char.symbols || [] : [];
+}
+
+export function addSymbolToCharacter(charId, symbol) {
+    const char = getCharacter(charId);
+    if (!char) return null;
+    if (!symbol.id) symbol.id = generateId('sym_');
+    if (!char.symbols) char.symbols = [];
+    char.symbols.push(symbol);
+    return updateCharacter(charId, { symbols: char.symbols });
+}
+
+export function removeSymbolFromCharacter(charId, symbolId) {
+    const char = getCharacter(charId);
+    if (!char) return null;
+    if (!char.symbols) return null;
+    char.symbols = char.symbols.filter(s => s.id !== symbolId);
+    return updateCharacter(charId, { symbols: char.symbols });
+}
+
 // ============================================================
-// NPC OPERATIONS
+// NPC OPERATIONS (unchanged)
 // ============================================================
 
 export function addNPC(npc) {
@@ -658,7 +853,7 @@ export function getCharacterNPCs(characterId) {
 }
 
 // ============================================================
-// CAMPAIGN OPERATIONS
+// CAMPAIGN OPERATIONS (unchanged)
 // ============================================================
 
 export function getCampaigns() {
@@ -700,7 +895,7 @@ export function deleteCampaign(id) {
 }
 
 // ============================================================
-// TIMER OPERATIONS
+// TIMER OPERATIONS (unchanged)
 // ============================================================
 
 export function getTimers() {
@@ -742,7 +937,7 @@ export function deleteTimer(id) {
 }
 
 // ============================================================
-// ENCOUNTER OPERATIONS
+// ENCOUNTER OPERATIONS (unchanged)
 // ============================================================
 
 export function getEncounters() {
@@ -784,7 +979,7 @@ export function deleteEncounter(id) {
 }
 
 // ============================================================
-// WIKI OPERATIONS
+// WIKI OPERATIONS (unchanged)
 // ============================================================
 
 export function getWikiEntries() {
@@ -827,7 +1022,7 @@ export function deleteWikiEntry(id) {
 }
 
 // ============================================================
-// ARCHIVE OPERATIONS
+// ARCHIVE OPERATIONS (unchanged)
 // ============================================================
 
 export function getArchives() {
@@ -869,7 +1064,7 @@ export function deleteArchive(id) {
 }
 
 // ============================================================
-// DICE OPERATIONS
+// DICE OPERATIONS (unchanged)
 // ============================================================
 
 export function getDiceHistory() {
@@ -903,7 +1098,7 @@ export function clearRollHistory() {
 }
 
 // ============================================================
-// CHAT OPERATIONS
+// CHAT OPERATIONS (unchanged)
 // ============================================================
 
 export function addChatMessage(message) {
@@ -932,7 +1127,7 @@ export function clearChatHistory() {
 }
 
 // ============================================================
-// DATA IMPORT/EXPORT
+// DATA IMPORT/EXPORT (unchanged)
 // ============================================================
 
 export function importData(data) {
@@ -1032,7 +1227,23 @@ export default {
     deleteCharacter,
     getCharacterAttribute,
     getCharacterSkill,
-    ensureCharacterDefaults,   // <-- ADDED
+    getCharacterMagicPath,
+    getCharacterPatron,
+    getCharacterTrack,
+    updateCharacterTrack,
+    getCharacterSpellbook,
+    addSpellToCharacter,
+    removeSpellFromCharacter,
+    getCharacterSpirits,
+    addSpiritToCharacter,
+    removeSpiritFromCharacter,
+    getCharacterRepertoire,
+    addSongToRepertoire,
+    removeSongFromRepertoire,
+    getCharacterSymbols,
+    addSymbolToCharacter,
+    removeSymbolFromCharacter,
+    ensureCharacterDefaults,
     addNPC,
     getNPCs,
     getNPC,

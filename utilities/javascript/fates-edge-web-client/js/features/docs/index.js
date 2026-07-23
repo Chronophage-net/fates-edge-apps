@@ -1,4 +1,4 @@
-// feature/docs/index.js - Document Library with /data/docs/ manifest discovery
+// feature/docs/index.js - Document Library with manifest‑free discovery (like patrons & decks)
 
 import { escHtml } from '../../core/utils.js';
 import { showToast } from '../../components/Toast.js';
@@ -13,19 +13,16 @@ let isDarkMode = false;
 
 const DOCS_BASE_PATH = './data/docs/';
 
-// Manifest paths to try in order
-const MANIFEST_PATHS = [
-    './data/docs/manifest.json',
-    './data/docs/manifest-core.json',
-    './data/docs/manifest-full.json'
-];
-
-// Known HTML files in /data/docs/ (from the tree)
+// Known HTML files in /data/docs/ – extend this list as new documents are added
 const KNOWN_DOC_FILES = [
     'Fates_-_Edge_-_-Essentials.html',
     'Fates_-_Edge_-_-Game_-_Master_-_Screen.html',
-    'Fates_-_Edge_-_-Systems_-_Reference_-_Document..html'
+    'Fates_-_Edge_-_-Systems_-_Reference_-_Document..html',
+    // Add any new .html files here (without the path)
 ];
+
+const CACHE_KEY = 'fates-edge-docs-cache';
+const CACHE_TTL = 3600000; // 1 hour
 
 // ============================================================
 // RENDER
@@ -136,6 +133,7 @@ function attachDocEvents() {
     
     if (refreshBtn) {
         refreshBtn.addEventListener('click', function() {
+            localStorage.removeItem(CACHE_KEY);
             loadDocList();
             showToast('🔄 Refreshed document list', 'info');
         });
@@ -143,7 +141,7 @@ function attachDocEvents() {
 }
 
 // ============================================================
-// LOAD DOCUMENT LIST - Smart manifest discovery
+// LOAD DOCUMENT LIST – Manifest‑free discovery (like patrons)
 // ============================================================
 
 export function loadDocList() {
@@ -152,130 +150,92 @@ export function loadDocList() {
 
     container.innerHTML = '<div class="empty-state" style="color:var(--text2);text-align:center;padding:2rem;font-style:italic;min-width:100%;">📄 Loading documents…</div>';
 
-    // Try manifest locations (primary: /data/docs/manifest.json)
-    let currentIndex = 0;
-    
-    function tryNextManifest() {
-        if (currentIndex >= MANIFEST_PATHS.length) {
-            // No manifest found — try to discover files
-            console.warn('📭 No manifest found, attempting discovery...');
-            discoverDocFiles();
-            return;
+    // Check cache first
+    try {
+        const cached = localStorage.getItem(CACHE_KEY);
+        if (cached) {
+            const data = JSON.parse(cached);
+            if (data.docs && Date.now() - data.timestamp < CACHE_TTL) {
+                console.log(`📄 Using cached doc list (${data.docs.length} items)`);
+                allDocs = data.docs;
+                populateCategoryFilter(allDocs);
+                applyDocsFilter();
+                updateDocStats(allDocs.length);
+                return;
+            }
         }
-        
-        const url = MANIFEST_PATHS[currentIndex];
-        console.log(`📄 Fetching manifest: ${url}`);
-        
-        fetch(url)
-            .then(res => {
-                if (!res.ok) throw new Error(`HTTP ${res.status}`);
-                return res.json();
-            })
-            .then(data => {
-                // Extract documents from various manifest formats
-                let documents = [];
-                
-                if (data.documents && Array.isArray(data.documents)) {
-                    documents = data.documents;
-                } else if (Array.isArray(data)) {
-                    documents = data;
-                } else if (typeof data === 'object') {
-                    // Try to find any array property
-                    for (const key of Object.keys(data)) {
-                        if (Array.isArray(data[key]) && data[key].length > 0) {
-                            documents = data[key];
-                            break;
-                        }
-                    }
-                }
-                
-                if (!documents || documents.length === 0) {
-                    console.log(`📭 No documents in ${url}, trying next...`);
-                    currentIndex++;
-                    tryNextManifest();
-                    return;
-                }
-                
-                console.log(`✅ Loaded ${documents.length} documents from ${url}`);
-                processManifest(documents);
-            })
-            .catch(err => {
-                console.warn(`⚠️ Failed to load ${url}:`, err.message);
-                currentIndex++;
-                tryNextManifest();
-            });
-    }
-    
-    function discoverDocFiles() {
-        // Attempt to fetch directory listing (if enabled)
-        fetch(DOCS_BASE_PATH)
-            .then(res => {
-                if (res.ok) {
-                    return res.text();
-                }
-                throw new Error('Directory listing not available');
-            })
-            .then(html => {
-                // Parse directory listing for .html files
-                const files = [];
+    } catch (_) {}
+
+    // Discover by testing known files with HEAD requests
+    discoverDocs();
+}
+
+async function discoverDocs() {
+    const container = document.getElementById('doc-list');
+    const foundDocs = [];
+
+    // Test each known file with a HEAD request
+    const testPromises = KNOWN_DOC_FILES.map(async (file) => {
+        const path = DOCS_BASE_PATH + file;
+        try {
+            const res = await fetch(path, { method: 'HEAD' });
+            if (res.ok && file !== 'index.html') {
+                return { file, path, exists: true };
+            }
+        } catch (_) {}
+        return null;
+    });
+
+    const results = await Promise.all(testPromises);
+    const existingFiles = results.filter(r => r && r.exists);
+
+    if (existingFiles.length > 0) {
+        console.log(`📄 Found ${existingFiles.length} docs via HEAD:`, existingFiles.map(f => f.file));
+        for (const f of existingFiles) {
+            const doc = createDocFromFile(f.file, f.path);
+            foundDocs.push(doc);
+        }
+    } else {
+        // Fallback: try directory listing (if enabled)
+        console.warn('📭 No docs found via HEAD, attempting directory listing...');
+        try {
+            const res = await fetch(DOCS_BASE_PATH);
+            if (res.ok) {
+                const html = await res.text();
                 const regex = /href="([^"]+\.html)"/gi;
                 let match;
+                const files = [];
                 while ((match = regex.exec(html)) !== null) {
                     const file = match[1];
-                    // Exclude index.html if present
                     if (file !== 'index.html') {
                         files.push(file);
                     }
                 }
                 if (files.length > 0) {
-                    console.log(`📄 Discovered ${files.length} HTML files:`, files);
-                    buildManifestFromFiles(files);
-                } else {
-                    // Fallback to known files
-                    buildManifestFromFiles(KNOWN_DOC_FILES);
+                    console.log(`📄 Discovered ${files.length} HTML files from directory listing:`, files);
+                    for (const file of files) {
+                        const path = DOCS_BASE_PATH + file;
+                        // Verify it actually exists (optional)
+                        try {
+                            const check = await fetch(path, { method: 'HEAD' });
+                            if (check.ok) {
+                                const doc = createDocFromFile(file, path);
+                                foundDocs.push(doc);
+                            }
+                        } catch (_) {}
+                    }
                 }
-            })
-            .catch(() => {
-                // Fallback to known files
-                console.warn('Could not fetch directory listing, using known files');
-                buildManifestFromFiles(KNOWN_DOC_FILES);
-            });
+            }
+        } catch (_) {}
     }
-    
-    function buildManifestFromFiles(files) {
-        const docs = files.map(file => {
-            const title = file
-                .replace('.html', '')
-                .replace(/_/g, ' ')
-                .replace(/-\s*/g, ' ')
-                .trim();
-            // Determine category from filename
-            let category = 'other';
-            if (file.toLowerCase().includes('srd')) category = 'srd';
-            else if (file.toLowerCase().includes('core')) category = 'core';
-            else if (file.toLowerCase().includes('essentials')) category = 'essentials';
-            else if (file.toLowerCase().includes('gm')) category = 'gm';
-            else if (file.toLowerCase().includes('player')) category = 'player';
-            else if (file.toLowerCase().includes('reference')) category = 'reference';
-            return {
-                id: file,
-                path: DOCS_BASE_PATH + file,
-                title: title,
-                file: file,
-                category: category,
-                categoryLabel: formatCategoryLabel(category),
-                categoryClass: getCategoryBadgeClass(category),
-                core: category === 'core' || category === 'essentials',
-                active: true,
-                has_sections: false,
-                section_count: 0,
-                sections: [],
-                author: null
-            };
-        });
-        
-        if (docs.length === 0) {
-            // If still no docs, show empty state
+
+    // If still nothing, fallback to a default set (but avoid index.html)
+    if (foundDocs.length === 0) {
+        console.warn('📭 No documents found. Using hardcoded fallback (excluding index.html).');
+        const fallbackFiles = KNOWN_DOC_FILES.filter(f => f !== 'index.html');
+        if (fallbackFiles.length === 0) {
+            // If even the known list is empty, show an empty state
+            allDocs = [];
             container.innerHTML = `
                 <div class="empty-state" style="color:var(--text2);text-align:center;padding:2rem;font-style:italic;min-width:100%;">
                     <div style="font-size:2rem;margin-bottom:0.5rem;">📭</div>
@@ -290,88 +250,74 @@ export function loadDocList() {
             updateDocStats(0);
             return;
         }
-        
-        processManifest(docs);
-    }
-    
-    function processManifest(manifest) {
-        // Normalize each document — ensure path uses /data/docs/ prefix
-        allDocs = manifest.map(doc => {
-            let path = doc.path || doc.file || '';
-            let file = doc.file || path.split('/').pop() || doc.id || '';
-            
-            // Normalize path: prefix with /data/docs/ if not already
-            if (path && !path.startsWith(DOCS_BASE_PATH) && !path.startsWith('#') && !path.startsWith('http')) {
-                const cleanPath = path.startsWith('/') ? path.substring(1) : path;
-                path = DOCS_BASE_PATH + cleanPath;
-            } else if (path && path.startsWith('/') && !path.startsWith(DOCS_BASE_PATH)) {
-                const cleanPath = path.substring(1);
-                path = DOCS_BASE_PATH + cleanPath;
-            }
-            
-            // If no valid path, construct from file or id
-            if (!path || path === '' || path === '#') {
-                let fileName = file;
-                if (fileName && fileName !== '') {
-                    if (!fileName.endsWith('.html')) {
-                        fileName = fileName + '.html';
-                    }
-                } else if (doc.id) {
-                    fileName = doc.id.endsWith('.html') ? doc.id : doc.id + '.html';
-                } else if (doc.title) {
-                    fileName = doc.title.replace(/\s+/g, '_').toLowerCase() + '.html';
-                } else {
-                    fileName = 'unknown.html';
-                }
-                path = DOCS_BASE_PATH + fileName;
-            }
-            
-            // Ensure path starts with /
-            if (!path.startsWith('/')) {
-                path = '/' + path;
-            }
-            
-            return {
-                id: doc.id || doc.file || path,
-                path: path,
-                title: doc.title || file.replace('.html', '').replace(/_/g, ' ') || 'Untitled',
-                category: doc.category || 'other',
-                categoryLabel: doc.categoryLabel || formatCategoryLabel(doc.category || 'other'),
-                categoryClass: doc.categoryClass || getCategoryBadgeClass(doc.category || 'other'),
-                core: doc.core || false,
-                active: doc.active !== undefined ? doc.active : true,
-                file: file || path.split('/').pop(),
-                author: doc.author || null,
-                has_sections: doc.has_sections || false,
-                section_count: doc.section_count || 0,
-                sections: doc.sections || []
-            };
-        });
-
-        // Only keep active docs
-        allDocs = allDocs.filter(d => d.active !== false);
-
-        console.log(`📚 ${allDocs.length} active documents:`, allDocs.map(d => d.title));
-
-        if (allDocs.length === 0) {
-            container.innerHTML = `
-                <div class="empty-state" style="color:var(--text2);text-align:center;padding:2rem;font-style:italic;min-width:100%;">
-                    <div style="font-size:2rem;margin-bottom:0.5rem;">📭</div>
-                    <p>No documents available.</p>
-                    <p class="text-muted" style="font-size:0.85rem;">The manifest is empty or no documents are active.</p>
-                </div>
-            `;
-            updateDocStats(0);
-            return;
+        for (const file of fallbackFiles) {
+            const path = DOCS_BASE_PATH + file;
+            const doc = createDocFromFile(file, path);
+            foundDocs.push(doc);
         }
-
-        populateCategoryFilter(allDocs);
-        applyDocsFilter();
-        showToast(`📚 Loaded ${allDocs.length} documents.`, 'success');
     }
-    
-    // Start the process
-    tryNextManifest();
+
+    // Deduplicate by path (just in case)
+    const seen = new Set();
+    allDocs = foundDocs.filter(d => {
+        if (seen.has(d.path)) return false;
+        seen.add(d.path);
+        return true;
+    });
+
+    // Cache the result
+    try {
+        localStorage.setItem(CACHE_KEY, JSON.stringify({
+            docs: allDocs,
+            timestamp: Date.now()
+        }));
+    } catch (_) {}
+
+    console.log(`📚 Loaded ${allDocs.length} documents.`);
+    populateCategoryFilter(allDocs);
+    applyDocsFilter();
+    showToast(`📚 Loaded ${allDocs.length} documents.`, 'success');
+}
+
+function createDocFromFile(file, path) {
+    const title = file
+        .replace('.html', '')
+        .replace(/_/g, ' ')
+        .replace(/-\s*/g, ' ')
+        .trim();
+    // Determine category from filename
+    let category = 'other';
+    const lower = file.toLowerCase();
+    if (lower.includes('srd')) category = 'srd';
+    else if (lower.includes('core')) category = 'core';
+    else if (lower.includes('essentials')) category = 'essentials';
+    else if (lower.includes('gm')) category = 'gm';
+    else if (lower.includes('player')) category = 'player';
+    else if (lower.includes('reference')) category = 'reference';
+    else if (lower.includes('adventure')) category = 'adventure';
+    else if (lower.includes('travel')) category = 'travel';
+    else if (lower.includes('expansion')) category = 'expansion';
+    else if (lower.includes('resource')) category = 'resource';
+    else if (lower.includes('lore')) category = 'lore';
+    else if (lower.includes('magic')) category = 'magic';
+    else if (lower.includes('character')) category = 'character';
+    else if (lower.includes('bestiary')) category = 'bestiary';
+
+    return {
+        id: file,
+        path: path,
+        title: title,
+        file: file,
+        category: category,
+        categoryLabel: formatCategoryLabel(category),
+        categoryClass: getCategoryBadgeClass(category),
+        core: category === 'core' || category === 'essentials',
+        active: true,
+        has_sections: false,
+        section_count: 0,
+        sections: [],
+        author: null
+    };
 }
 
 // ============================================================
@@ -523,7 +469,7 @@ function updateDocStats(count) {
 }
 
 // ============================================================
-// LOAD DOCUMENT - Fetches from /data/docs/ with prefix
+// LOAD DOCUMENT – Fetches from /data/docs/ with prefix
 // ============================================================
 
 export function loadDocument(docPath, preserveTheme = false) {
@@ -556,6 +502,10 @@ export function loadDocument(docPath, preserveTheme = false) {
             return res.text();
         })
         .then(html => {
+            // Check if the fetched document is actually index.html (should not happen)
+            if (fetchPath.includes('index.html')) {
+                throw new Error('Index page loaded – document not found.');
+            }
             const doc = allDocs.find(d => d.path === docPath || d.path === fetchPath);
             
             if (doc && doc.has_sections && doc.sections && doc.sections.length > 0) {
@@ -737,6 +687,7 @@ export function onDeactivate() {
 }
 
 export function refresh() {
+    localStorage.removeItem(CACHE_KEY);
     loadDocList();
 }
 

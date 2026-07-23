@@ -12,6 +12,7 @@
  * - State sync
  * - Room management
  * - Media recording broadcasts
+ * - Whiteboard sync (whiteboard-update, sync-request)
  */
 
 import { getState, importData, saveState, updateState } from './state.js';
@@ -94,13 +95,17 @@ const eventHandlers = {
     // Media events
     'media_recording': [],
 
-    // NEW: GM and VTT events
+    // GM and VTT events
     'module-list': [],
     'region-updated': [],
     'presence': [],
     'gm_vote_request': [],
     'gm_role_update': [],
-    'server_announcement': []
+    'server_announcement': [],
+
+    // Whiteboard sync events
+    'whiteboard-update': [],
+    'sync-request': []
 };
 
 // ============================================================
@@ -433,31 +438,26 @@ function handleWebSocketMessage(data) {
             break;
 
         // ============================================================
-        // NEW: GM and VTT events
+        // GM and VTT events
         // ============================================================
         case 'module-list':
             triggerEvent('module-list', data);
-            // Optionally, you can update a module store here
             break;
 
         case 'region-updated':
             triggerEvent('region-updated', data);
-            // You might want to refresh region data in the decks module
             break;
 
         case 'presence':
             triggerEvent('presence', data);
-            // Update online users list
             break;
 
         case 'gm_vote_request':
             triggerEvent('gm_vote_request', data);
-            // Show a vote request UI
             break;
 
         case 'gm_role_update':
             triggerEvent('gm_role_update', data);
-            // Update GM role assignment
             break;
 
         case 'server_announcement':
@@ -465,6 +465,17 @@ function handleWebSocketMessage(data) {
             if (data.message) {
                 showToast(data.message, 'info');
             }
+            break;
+
+        // ============================================================
+        // WHITEBOARD SYNC EVENTS
+        // ============================================================
+        case 'whiteboard-update':
+            triggerEvent('whiteboard-update', data);
+            break;
+
+        case 'sync-request':
+            triggerEvent('sync-request', data);
             break;
             
         case 'error':
@@ -853,7 +864,7 @@ function setupSocketIOListeners() {
     });
 
     // ============================================================
-    // NEW: GM and VTT events (Socket.io)
+    // GM and VTT events (Socket.io)
     // ============================================================
     socket.on('module-list', (data) => {
         triggerEvent('module-list', data);
@@ -880,6 +891,17 @@ function setupSocketIOListeners() {
         if (data.message) {
             showToast(data.message, 'info');
         }
+    });
+
+    // ============================================================
+    // WHITEBOARD SYNC EVENTS (Socket.io)
+    // ============================================================
+    socket.on('whiteboard-update', (data) => {
+        triggerEvent('whiteboard-update', data);
+    });
+
+    socket.on('sync-request', (data) => {
+        triggerEvent('sync-request', data);
     });
     
     // Other events

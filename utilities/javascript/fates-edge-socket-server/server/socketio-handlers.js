@@ -1,6 +1,6 @@
 /**
  * Fate's Edge - Socket.io Handlers
- * v3 – Uniform behaviour with plain WebSocket, added password, region, and flexible fields.
+ * v3 – Uniform behaviour with plain WebSocket, full whiteboard sync
  */
 
 const room = require('./room.js');
@@ -122,7 +122,7 @@ function setupSocketIO(io) {
                 deckRemaining: currentRoom.deck.length,
                 deckHistory: currentRoom.deckHistory.slice(-20),
                 totalClients: currentRoom.clients.size,
-                whiteboard: currentRoom.whiteboard
+                whiteboard: currentRoom.whiteboard || {}
             });
 
             // Broadcast with sender exclusion
@@ -282,7 +282,6 @@ function setupSocketIO(io) {
             if (!r) return socket.emit('error', { message: 'Room not found' });
             const region = data?.region;
             if (!region) return socket.emit('error', { message: 'Region name required' });
-            // Store in room's data (if you track it)
             if (!r.data) r.data = {};
             r.data.region = region;
             r.lastActivity = Date.now();
@@ -368,19 +367,15 @@ function setupSocketIO(io) {
             if (typeof callback === 'function') callback({ modules, count: modules.length, timestamp: Date.now() });
         });
 
-        // ─── Whiteboard ─────────────────────────────────────────────
+        // ─── WHITEBOARD: store full object ──────────────────────────
         socket.on('whiteboard-update', (data) => {
             if (!socket.room) return socket.emit('error', { message: 'Not in a room' });
             const r = room.rooms.get(socket.room);
             if (!r) return socket.emit('error', { message: 'Room not found' });
+            // Accept either { whiteboard: ... } or { state: ... } or the object itself
             let newWhiteboard = data.whiteboard || data.state || data;
-            r.whiteboard = {
-                drawings: newWhiteboard.drawings || [],
-                notes: newWhiteboard.notes || [],
-                images: newWhiteboard.images || [],
-                settings: { ...r.whiteboard.settings, ...(newWhiteboard.settings || {}) },
-                gridCombat: { ...r.whiteboard.gridCombat, ...(newWhiteboard.gridCombat || {}) }
-            };
+            // Replace the server's whiteboard with the incoming one (full structure)
+            r.whiteboard = newWhiteboard;
             r.lastActivity = Date.now();
             room.broadcastToRoom(socket.room, 'whiteboard-update', {
                 whiteboard: r.whiteboard,
@@ -397,8 +392,8 @@ function setupSocketIO(io) {
             if (!r) return socket.emit('error', { message: 'Room not found' });
             // Send presence update (like /who)
             socket.emit('presence', { clients: room.getClientsList(r) });
-            // Also send whiteboard state
-            socket.emit('sync-state', { state: r.whiteboard, timestamp: Date.now() });
+            // Also send full whiteboard state
+            socket.emit('sync-state', { state: r.whiteboard || {}, timestamp: Date.now() });
         });
 
         socket.on('sync-state', (data) => {

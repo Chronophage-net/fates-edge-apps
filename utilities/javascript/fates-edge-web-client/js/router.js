@@ -1,6 +1,6 @@
 /**
  * Application router – handles navigation and delegates module management to moduleLoader.
- * v3.2 – Integrated with module-loader.js, includes dashboard route.
+ * v3.3 – Added spellcraft route, extended for magic module.
  */
 
 import { showToast } from './components/Toast.js';
@@ -22,7 +22,7 @@ export const ROUTE_REDIRECTS = {
 // Map of route names to module import paths (relative to js/)
 const ROUTE_IMPORTS = {
     home:        () => import('./features/home/index.js'),
-    dashboard:   () => import('./features/dashboard/index.js'),  // <-- added
+    dashboard:   () => import('./features/dashboard/index.js'),
     characters:  () => import('./features/characters/index.js'),
     dice:        () => import('./features/dice/index.js'),
     decks:       () => import('./features/decks/index.js'),
@@ -39,6 +39,8 @@ const ROUTE_IMPORTS = {
     wiki:        () => import('./features/wiki/index.js'),
     vtt:         () => import('./features/vtt/index.js'),
     'gm-tools':  () => import('./features/gm-tools/index.js'),
+    // 👇 NEW – Spellcraft & Magic module
+    spellcraft:  () => import('./features/spellcraft/index.js'),
 };
 
 // ============================================================

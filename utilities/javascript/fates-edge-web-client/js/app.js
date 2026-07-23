@@ -1,6 +1,7 @@
 /**
  * Fate's Edge Toolkit – Main Application Entry Point
  * v3.1 – Unified router integration, cleaned up.
+ * Added Spellcraft module to preload list.
  */
 
 import { initMediaModule } from './core/media.js';
@@ -113,7 +114,7 @@ async function init() {
             initializeRouter();
         }
 
-        // 6. Preload common modules in background
+        // 6. Preload common modules in background (including Spellcraft)
         preloadCommonModules();
 
         // 7. Sync event listeners
@@ -737,7 +738,8 @@ function showConflictModal(conflicts) {
 
 function preloadCommonModules() {
     // Preload often-used modules to speed up navigation
-    const common = ['home', 'characters', 'dice'];
+    // Added 'spellcraft' to the list
+    const common = ['home', 'characters', 'dice', 'spellcraft'];
     common.forEach(tab => {
         preloadModule(tab).catch(() => {});
     });
