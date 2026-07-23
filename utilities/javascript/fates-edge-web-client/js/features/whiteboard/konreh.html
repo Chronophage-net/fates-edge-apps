@@ -29,7 +29,6 @@
     <p>Apex, Sanctum, and Reforge</p>
     <button id="play-btn">▶ Play</button>
   </div>
-
 <script>
 // ============================================================
 //  KON'REH ENGINE — implementation of the official LaTeX rulebook
@@ -727,6 +726,19 @@ const SCHOOLS = {
 
 const PIECE_VALUE = { red: 100, orange: 180, green: 140, blue: 300 };
 
+// School-flavored piece titles, drawn directly from the Concordance's
+// "Quick reference: piece titles per school" table. Purely cosmetic — used
+// by the UI in move logs and descriptions for whichever side a School is
+// controlling; gameplay never depends on these.
+const PIECE_TITLES = {
+  ykrul:      { blue: 'Warlord',      orange: 'Shaman',      red: 'Picket',       green: 'Raider' },
+  vilikari:   { blue: 'Boss',         orange: 'Barker',      red: 'Stall',        green: 'Runner' },
+  thepyrgosi: { blue: 'Arbiter',      orange: 'Corollary',   red: 'Lemma',        green: 'Q.E.D.' },
+  aeler:      { blue: 'Auditor',      orange: 'Factor',      red: 'Roadwright',   green: 'Courier' },
+  lethai:     { blue: 'Quiet Stroke', orange: 'Waiting Lid', red: "Alder's Knot", green: "Sparrow's Flight" },
+  vhasian:    { blue: 'Champion',     orange: 'Herald',      red: 'Retainer',     green: 'Duelist' },
+};
+
 // Move generation identical to engine.getValidMoves, but turn-agnostic —
 // used so the evaluator can measure BOTH sides' mobility/threats at a
 // given node regardless of whose turn it technically is.
@@ -895,14 +907,15 @@ function chooseAiReforgeChoice(engine, schoolId, depth = 2) {
 const TYPE_LABEL = { blue: 'B', orange: 'O', red: 'R', green: 'G' };
 const TYPE_NAME = { blue: 'Blue', orange: 'Orange', red: 'Red', green: 'Green' };
 
-function describeMove(game, piece, move) {
+function describeMove(game, piece, move, titleFn) {
+  const nameOf = (t) => (titleFn ? titleFn(t) : TYPE_NAME[t.type]);
   if (move.special === 'S:D') {
     const t = game.pieces.find(p => p.id === move.targetId);
-    return `Displacement — capture ${t ? TYPE_NAME[t.type] : 'piece'} at (${move.x},${move.y})`;
+    return `Displacement — capture ${t ? nameOf(t) : 'piece'} at (${move.x},${move.y})`;
   }
   if (move.special === 'S:H') {
     const t = game.pieces.find(p => p.id === move.targetId);
-    return `Hop-capture — jump ${t ? TYPE_NAME[t.type] : 'piece'} at (${t ? t.x : '?'},${t ? t.y : '?'}), land (${move.x},${move.y})`;
+    return `Hop-capture — jump ${t ? nameOf(t) : 'piece'} at (${t ? t.x : '?'},${t ? t.y : '?'}), land (${move.x},${move.y})`;
   }
   if (move.capture) return `Slide & capture at (${move.x},${move.y})`;
   return `Slide to (${move.x},${move.y})`;
@@ -916,10 +929,79 @@ function moveKind(move) {
 }
 
 // ============================================================
+//  COACH HINTS (approximate SSI / XS, live)
+// ============================================================
+// These are simplified, single-ply approximations of the Concordance's
+// own named heuristics — not the full multi-ply lookahead a strong human
+// player would do. They're meant as a live, honest nudge in the stat
+// panel, not a rigorous solver.
+
+function computeExitCertainty(game, blue) {
+  if (!blue || blue.rooted) return 0;
+  const moves = game.getValidMoves(blue.id);
+  return moves.filter(m => !game.isCross(m.x, m.y)).length;
+}
+
+function computeSeedSafety(game, blue) {
+  const enemyPlayer = blue.player === 1 ? 2 : 1;
+  const enemyBlue = game.getBlue(enemyPlayer);
+  if (!enemyBlue) return 2; // enemy Blue is off the board (mid-Reforge) — safe
+  const specialsLeft = 2 - enemyBlue.specialsUsed.length;
+  const dist = Math.abs(enemyBlue.x - blue.x) + Math.abs(enemyBlue.y - blue.y);
+  if (specialsLeft > 0 && dist <= 6) return 0;
+  if (specialsLeft > 0 || dist <= 8) return 1;
+  return 2;
+}
+
+const HINT_QUALIFIER = { 0: 'risky', 1: 'playable', 2: 'safe' };
+
+// ============================================================
+//  NETWORK STATE (SERIALIZE / LOAD) — used by connected mode
+// ============================================================
+// Plain-data snapshot of everything a KonrehEngine needs to resume from,
+// safe to JSON.stringify (the only non-JSON-safe field, doubleMoveUsed,
+// is a Set — converted to/from a plain array here).
+
+function serializeGameState(game) {
+  return {
+    board: game.board,
+    pieces: game.pieces,
+    turn: game.turn,
+    winner: game.winner,
+    winReason: game.winReason,
+    openingDoubleMoveDone: game.openingDoubleMoveDone,
+    firstMoveDone: game.firstMoveDone,
+    doubleMoveUsed: [...game.doubleMoveUsed],
+    reforgeCountdown: game.reforgeCountdown,
+    blueAlive: game.blueAlive,
+    greenCount: game.greenCount,
+    pendingReforge: game.pendingReforge,
+  };
+}
+
+function loadGameStateInto(game, state) {
+  game.board = state.board.map(row => row.slice());
+  game.pieces = state.pieces.map(p => ({ ...p, specialsUsed: [...p.specialsUsed] }));
+  game.turn = state.turn;
+  game.winner = state.winner;
+  game.winReason = state.winReason;
+  game.openingDoubleMoveDone = state.openingDoubleMoveDone;
+  game.firstMoveDone = state.firstMoveDone;
+  game.doubleMoveUsed = new Set(state.doubleMoveUsed);
+  game.reforgeCountdown = { ...state.reforgeCountdown };
+  game.blueAlive = { ...state.blueAlive };
+  game.greenCount = state.greenCount;
+  game.moveHistory = [];
+  game.pendingReforge = state.pendingReforge
+    ? { player: state.pendingReforge.player, options: state.pendingReforge.options.map(o => ({ ...o })) }
+    : null;
+}
+
+// ============================================================
 //  MODAL UI
 // ============================================================
 
-function openKonrehModal() {
+function openKonrehModal(netConfig = null) {
   const existing = document.getElementById('konreh-modal');
   if (existing) existing.remove();
 
@@ -1137,6 +1219,17 @@ function openKonrehModal() {
   let aiConfig = null;      // { schoolId, player } while playing vs computer, else null
   let aiThinking = false;   // guards against overlapping AI turns
 
+  const isNetworked = !!netConfig;
+  const localPlayer = netConfig ? netConfig.localPlayer : null; // 1, 2, or null (spectator)
+  let localSeq = 0; // count of actions applied so far — read by kon-reh-connected.js
+
+  function pieceTitle(piece) {
+    if (aiConfig && aiConfig.player === piece.player && PIECE_TITLES[aiConfig.schoolId]) {
+      return PIECE_TITLES[aiConfig.schoolId][piece.type];
+    }
+    return TYPE_NAME[piece.type];
+  }
+
   function log(html) {
     const line = document.createElement('div');
     line.innerHTML = html;
@@ -1336,6 +1429,17 @@ function openKonrehModal() {
       if (activeBlue) {
         addStat('Cross Stay', `${activeBlue.crossStays} / 3${activeBlue.crossExclusion ? ` (excl ${activeBlue.crossExclusion})` : ''}`);
         addStat('Specials Used', activeBlue.specialsUsed.length ? activeBlue.specialsUsed.join(', ') : 'none');
+
+        const nearCross = game.isCross(activeBlue.x, activeBlue.y) ||
+          game.getValidMoves(activeBlue.id).some(m => game.isCross(m.x, m.y));
+        if (nearCross) {
+          const xs = computeExitCertainty(game, activeBlue);
+          addStat('Exit Certainty (XS)', `${xs} — ${HINT_QUALIFIER[Math.min(xs, 2)]}`);
+        }
+        if (game.isSanctum(activeBlue.x, activeBlue.y)) {
+          const ssi = computeSeedSafety(game, activeBlue);
+          addStat('Seed Safety (SSI)', `${ssi} — ${HINT_QUALIFIER[ssi]}`);
+        }
       }
       if (!game.blueAlive[1]) addStat('P1 Reforge', `${game.reforgeCountdown[1]} turns left`);
       if (!game.blueAlive[2]) addStat('P2 Reforge', `${game.reforgeCountdown[2]} turns left`);
@@ -1345,9 +1449,13 @@ function openKonrehModal() {
     if (game.pendingReforge) {
       choicePanel.style.display = 'block';
       const isAiReforge = aiConfig && game.pendingReforge.player === aiConfig.player;
+      const isRemoteReforge = isNetworked && game.pendingReforge.player !== localPlayer;
       if (isAiReforge) {
         choicePanel.innerHTML = `<div style="color:var(--gold); font-weight:700; text-align:center;">
             ${SCHOOLS[aiConfig.schoolId].name} is choosing where Blue returns…</div>`;
+      } else if (isRemoteReforge) {
+        choicePanel.innerHTML = `<div style="color:var(--gold); font-weight:700; text-align:center;">
+            Player ${game.pendingReforge.player} is choosing where Blue returns…</div>`;
       } else {
         choicePanel.innerHTML = `<div style="color:var(--gold); font-weight:700; margin-bottom:8px; text-align:center;">
             Player ${game.pendingReforge.player}: choose where Blue returns</div>`;
@@ -1361,6 +1469,8 @@ function openKonrehModal() {
             log(`<span class="p${player}">P${player}</span> Reforge → <b>${opt.label}</b>`);
             selectedPiece = null; validMoves = [];
             choicePanel.style.display = 'none';
+            localSeq++;
+            if (isNetworked && netConfig.onLocalReforge) netConfig.onLocalReforge(opt.key, localSeq);
             render();
             maybeTriggerAiMove();
           };
@@ -1380,7 +1490,7 @@ function openKonrehModal() {
       for (const mv of pendingChoice.moves) {
         const btn = document.createElement('button');
         btn.className = 'kr-btn choice-btn kr-choice';
-        btn.textContent = describeMove(game, selectedPiece, mv);
+        btn.textContent = describeMove(game, selectedPiece, mv, pieceTitle);
         btn.onclick = () => { executeMove(mv); };
         choicePanel.appendChild(btn);
       }
@@ -1392,7 +1502,8 @@ function openKonrehModal() {
     }
   }
 
-  function executeMove(move, movingPiece) {
+  function executeMove(move, movingPiece, moveOpts = {}) {
+    const { isRemote = false } = moveOpts;
     const piece = movingPiece || selectedPiece;
     const player = piece.player;
     const greenBefore = game.greenCount;
@@ -1402,7 +1513,8 @@ function openKonrehModal() {
 
     const isAiMove = aiConfig && aiConfig.player === player;
     const schoolTag = isAiMove ? ` <span class="kr-badge">${SCHOOLS[aiConfig.schoolId].name}</span>` : '';
-    let entry = `<span class="p${player}">P${player} ${TYPE_LABEL[piece.type]}</span>${schoolTag} ${describeMove(game, piece, move)}`;
+    const moverName = isAiMove ? pieceTitle(piece) : TYPE_LABEL[piece.type];
+    let entry = `<span class="p${player}">P${player} ${moverName}</span>${schoolTag} ${describeMove(game, piece, move, pieceTitle)}`;
     if (game.greenCount > greenBefore) entry += ' <span class="kr-badge">Seed</span>';
     if (blueAliveBefore[player === 1 ? 2 : 1] && !game.blueAlive[player === 1 ? 2 : 1]) {
       entry += ' <span class="kr-badge">Blue captured!</span>';
@@ -1411,13 +1523,16 @@ function openKonrehModal() {
     log(entry);
 
     selectedPiece = null; validMoves = []; pendingChoice = null;
+    localSeq++;
+    if (isNetworked && !isRemote && netConfig.onLocalMove) netConfig.onLocalMove(piece.id, move, localSeq);
     render();
-    maybeTriggerAiMove();
+    if (!isRemote) maybeTriggerAiMove();
   }
 
   canvas.addEventListener('click', (e) => {
     if (game.winner || game.pendingReforge) return;
     if (aiConfig && game.turn === aiConfig.player) return; // not the human's turn
+    if (isNetworked && game.turn !== localPlayer) return;  // not this client's turn
     const rect = canvas.getBoundingClientRect();
     const scaleFactor = canvas.width / rect.width;
     const { x, y } = screenToGrid((e.clientX - rect.left) * scaleFactor, (e.clientY - rect.top) * scaleFactor);
@@ -1476,10 +1591,74 @@ function openKonrehModal() {
   });
 
   resetBtn.addEventListener('click', () => {
+    if (isNetworked) {
+      game = new KonrehEngine();
+      selectedPiece = null; validMoves = []; pendingChoice = null; localSeq = 0;
+      logDiv.innerHTML = '';
+      log(`<i>New game started — you are Player ${localPlayer}.</i>`);
+      if (netConfig.onLocalNewGame) netConfig.onLocalNewGame();
+      render();
+      return;
+    }
     boardContainer.style.display = 'none';
     setupScreen.style.display = 'flex';
     schoolPanel.style.display = 'none';
   });
+
+  if (isNetworked) {
+    setupScreen.style.display = 'none';
+    boardContainer.style.display = 'flex';
+    if (netConfig.initialState) {
+      loadGameStateInto(game, netConfig.initialState);
+      localSeq = netConfig.initialSeq || 0;
+      log(`<i>Connected — synced to the current game. You are Player ${localPlayer}.</i>`);
+    } else {
+      log(`<i>Connected — new game started. You are Player ${localPlayer}.</i>`);
+    }
+    render();
+
+    return {
+      // Called by kon-reh-connected.js when a move arrives from the peer.
+      applyRemoteMove(pieceId, move) {
+        const piece = game.pieces.find(p => p.id === pieceId);
+        if (!piece || !piece.isAlive) return false;
+        executeMove(move, piece, { isRemote: true });
+        return true;
+      },
+      // Called by kon-reh-connected.js when a Reforge choice arrives from the peer.
+      applyRemoteReforge(optionKey) {
+        if (!game.pendingReforge) return false;
+        const opt = game.pendingReforge.options.find(o => o.key === optionKey);
+        if (!opt) return false;
+        const player = game.pendingReforge.player;
+        game.resolveReforge(optionKey);
+        log(`<span class="p${player}">P${player}</span> Reforge → <b>${opt.label}</b>`);
+        localSeq++;
+        render();
+        return true;
+      },
+      // Called by kon-reh-connected.js when a 'new-game' signal arrives from the peer.
+      applyRemoteNewGame() {
+        game = new KonrehEngine();
+        selectedPiece = null; validMoves = []; pendingChoice = null; localSeq = 0;
+        logDiv.innerHTML = '';
+        log(`<i>Opponent started a new game. You are Player ${localPlayer}.</i>`);
+        render();
+      },
+      getState() { return serializeGameState(game); },
+      // `seq` MUST accompany any state snapshot — loading state without also
+      // resetting localSeq to match is exactly the bug that let seq numbers
+      // silently diverge between peers after a resync.
+      loadState(state, seq) {
+        loadGameStateInto(game, state);
+        localSeq = typeof seq === 'number' ? seq : localSeq;
+        selectedPiece = null; validMoves = []; pendingChoice = null;
+        render();
+      },
+      getSeq() { return localSeq; },
+      destroy() { modal.remove(); },
+    };
+  }
 }
 
 // ============================================================

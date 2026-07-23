@@ -116,7 +116,7 @@ When your Blue is captured:
 
 ## 🤖 Playing vs. the Computer (Schools)
 
-The board now offers a **vs Computer** mode alongside hot‑seat two‑player. Pick one of six Schools for the computer to play as — the rules never change between them, only how the computer *weighs* a position:
+The board offers a **vs Computer** mode alongside hot‑seat two‑player. Pick one of six Schools for the computer to play as — the rules never change between them, only how the computer *weighs* a position:
 
 | School | Doctrine |
 |---|---|
@@ -128,6 +128,38 @@ The board now offers a **vs Computer** mode alongside hot‑seat two‑player. P
 | **Vhasian** | Honor as bait — polish the helm in public, strike in private. |
 
 Under the hood, each School runs the same look‑ahead search but scores positions differently — e.g. Ykrul values mobility and avoids the Cross; Vilikari rewards forcing threats and Cross activity; Thepyrgosi guards its own Blue above almost everything else. Pick "Two Players" to skip this and play locally against another person as before.
+
+**School flavor.** Whichever side a School controls has its pieces named per the Concordance's own titles instead of generic Blue/Orange/Red/Green in the move log — e.g. Ykrul calls them Warlord/Shaman/Picket/Raider, Vilikari calls them Boss/Barker/Stall/Runner, and so on for all six. Purely cosmetic; the on‑board glyphs stay B/O/R/G for clarity.
+
+**Live coach hints.** When the active Blue is in or entering the Cross, a rough **Exit Certainty (XS)** reading appears in the stat panel; when it's sitting on a Sanctum, a rough **Seed Safety (SSI)** reading appears too. Both are simplified, single‑ply approximations of the named heuristics above — a nudge, not a solver — and apply in every mode, not just vs Computer.
+
+---
+
+## 🌐 Connected Mode (`kon-reh-connected.js`)
+
+A separate module for playing a real game between two separate clients — e.g. two people in the same VTT/chat session — over **any transport your application already has**. This module never opens a connection itself; it just needs two things from you:
+
+```js
+import { openKonrehModalConnected } from './kon-reh-connected.js';
+
+const connection = openKonrehModalConnected(myTransport, {
+  localPlayer: 1,      // which seat THIS client controls: 1, 2, or omit/null to spectate
+  startFresh: true,     // true: start a brand-new game now
+                         // false: ask the peer for its current state and join in progress
+});
+
+// wire messages from your existing socket into it:
+mySocket.on('konreh', (msg) => connection.receive(msg));
+
+// tear down when done:
+connection.destroy();
+```
+
+`myTransport` needs exactly one method: **`transport.send(message)`** — a plain JS object; serialize and route it however your socket layer already works (`socket.emit(...)`, `ws.send(JSON.stringify(...))`, your VTT's own event bus, etc). Everything else — whose turn it is, applying moves, Reforge choices, and catching a client up after a dropped message — is handled internally on top of the same engine used for local and vs‑Computer play.
+
+**Resync.** If your transport reports a reconnect (or you just suspect a message went missing), call `connection.requestSync()` to have the peer resend its full current state rather than guessing. The module also detects an unexpected gap automatically whenever a *later* message does arrive, and requests a resync on its own in that case — `requestSync()` covers the case where nothing further arrives to trigger that automatically.
+
+Verified with two independent browser clients relayed through a mock server: fresh start, mid‑game join, bidirectional move relay (including the opening double‑move), and drop‑then‑resync recovery all stay in sync with zero divergence.
 
 ---
 
@@ -169,4 +201,5 @@ Use markers or dice to track the following for each Blue:
 ## 📁 Files
 
 - **`konreh.html`** – standalone build; open it directly in any browser, no server or install needed.
-- **`kon-reh.js`** – the same engine as a drop-in ES module (exports `openKonrehModal()`), for embedding in a larger app.
+- **`kon-reh.js`** – the same engine as a drop-in ES module (exports `KonrehEngine`, `SCHOOLS`, `openKonrehModal()`, and friends), for embedding in a larger app.
+- **`kon-reh-connected.js`** – optional add-on module (exports `openKonrehModalConnected()`) for real-time play between two clients over a transport you already have. Imports from `./kon-reh.js`, so keep the two files together. Not needed for local or vs‑Computer play.
