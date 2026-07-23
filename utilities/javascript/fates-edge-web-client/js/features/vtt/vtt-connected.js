@@ -1,14 +1,9 @@
 /**
  * VTT Connected Mode – WebSocket sync, real‑time collaboration
  * Uses reactive store for all UI updates.
- * Updated for v1.2.0 with Deck and Module support
- * Now uses the unified WebSocket module
  * 
- * Added GM election/promotion features (2026-07-16)
- * ✅ Whiteboard button added to header.
- * ✅ Auto‑push characters to server on handshake.
- * ✅ Voice chat integration.
- * ✅ Dynamic API endpoint derivation from WebSocket URL.
+ * v2 – JRPG-style horizontal character cards, character selection,
+ *       common rolls, larger fonts, avatar support.
  */
 
 import { vttStore } from '../../core/vtt-store.js';
@@ -25,7 +20,7 @@ import {
     offEvent,
     getRoomCode,
     getSocketId,
-    getApiBaseUrl,          // ← dynamically derived from WebSocket connection
+    getApiBaseUrl,
     drawCards,
     shuffleDeck,
     drawCrownSpread,
@@ -52,7 +47,8 @@ import {
     populateChatRecipients,
     playNotificationSound,
     VTT_CONFIG,
-    getOutcomeColor
+    getOutcomeColor,
+    renderCommonRolls,        // [VTT SELECTION] New common rolls renderer
 } from './vtt-core.js';
 import {
     initVoice,
@@ -99,6 +95,20 @@ let clientsMap = new Map(); // id -> { id, name, role }
 
 // Character push guard
 let charactersPushed = false;
+
+// ============================================================
+// HELPERS – Get sender from selected character
+// ============================================================
+
+function getSenderName() {
+    const selected = vttStore.getSelectedCharacter();
+    if (selected && selected.name) return selected.name;
+    // Fallback: first active character
+    const chars = vttStore.state.characters || [];
+    const active = chars.find(c => c.active !== false);
+    if (active && active.name) return active.name;
+    return 'Player';
+}
 
 // ============================================================
 // MESSAGE SENDING (with WebSocket sync)
@@ -413,7 +423,7 @@ async function handleModuleCleanup(moduleId) {
 }
 
 // ============================================================
-// ROLL (with WebSocket broadcast)
+// ROLL (with WebSocket broadcast) – uses selected character
 // ============================================================
 
 function rollConnected(postToChat = true) {
@@ -438,7 +448,7 @@ function rollConnected(postToChat = true) {
 
     if (out) {
         let html = `
-            <span class="outcome-tag ${result.outcomeClass}" style="display:inline-block;padding:0.15rem 0.8rem;border-radius:20px;font-weight:600;font-size:0.8rem;margin-right:0.4rem;background:${getOutcomeColor(result.outcome)};">
+            <span class="outcome-tag ${result.outcomeClass}" style="display:inline-block;padding:0.15rem 0.8rem;border-radius:20px;font-weight:600;font-size:0.9rem;margin-right:0.4rem;background:${getOutcomeColor(result.outcome)};">
                 ${result.outcome}
             </span>
         `;
@@ -447,20 +457,17 @@ function rollConnected(postToChat = true) {
             if (die === 10) { bgColor = 'var(--green)'; textColor = 'white'; label = '10'; }
             else if (die >= 6) { bgColor = 'var(--green)'; textColor = 'white'; }
             else if (die === 1) { bgColor = 'var(--red)'; textColor = 'white'; label = '1⚠️'; }
-            return `<span style="display:inline-block;padding:0.1rem 0.4rem;margin:0.1rem;border-radius:4px;background:${bgColor};color:${textColor};">${label}</span>`;
+            return `<span style="display:inline-block;padding:0.1rem 0.5rem;margin:0.1rem;border-radius:6px;background:${bgColor};color:${textColor};font-size:0.9rem;">${label}</span>`;
         }).join(' ');
-        html += `<div style="margin:0.3rem 0;">${diceHtml}</div>`;
-        html += `<div style="font-size:0.75rem;color:var(--text2);">Successes: <strong style="color:var(--green);">${result.successes}</strong> | Story Beats: <strong style="color:var(--red);">${result.storyBeats}</strong>${result.reRolls > 0 ? `| Re-rolls: ${result.reRolls}` : ''}</div>`;
+        html += `<div style="margin:0.4rem 0;">${diceHtml}</div>`;
+        html += `<div style="font-size:0.9rem;color:var(--text2);">Successes: <strong style="color:var(--green);">${result.successes}</strong> | Story Beats: <strong style="color:var(--red);">${result.storyBeats}</strong>${result.reRolls > 0 ? `| Re-rolls: ${result.reRolls}` : ''}</div>`;
         out.innerHTML = html;
     }
 
     const postCheckbox = q('#vtt-post-chat');
     const shouldPost = postToChat && postCheckbox?.checked;
     if (shouldPost) {
-        const state = getState();
-        const characters = state.characters || [];
-        const activeChar = characters.find(c => c.active !== false) || characters[0];
-        const sender = activeChar?.name || 'GM';
+        const sender = getSenderName();
 
         let msg = `[${result.outcome}] ${attr}+${skill} vs DV${dv} (${pos}) → `;
         msg += result.dice.join(' ');
@@ -470,7 +477,7 @@ function rollConnected(postToChat = true) {
         }
         msg += ` — ${result.resultText}`;
 
-        sendMessage(msg, 'Roll', 'all', {
+        sendMessage(msg, sender, 'all', {
             rollData: {
                 outcome: result.outcome,
                 outcomeClass: result.outcomeClass,
@@ -496,16 +503,13 @@ function rollConnected(postToChat = true) {
 }
 
 // ============================================================
-// SLASH COMMANDS (with WebSocket awareness)
+// SLASH COMMANDS – uses selected character
 // ============================================================
 
 function handleSlash(text) {
     const parts = text.slice(1).trim().split(/\s+/);
     const cmd = parts[0].toLowerCase();
-    const state = getState();
-    const characters = state.characters || [];
-    const activeChar = characters.find(c => c.active !== false) || characters[0];
-    const sender = activeChar?.name || 'GM';
+    const sender = getSenderName();
 
     switch (cmd) {
         case 'roll': {
@@ -518,7 +522,7 @@ function handleSlash(text) {
             const result = performRoll(attr, skill, dv, pos, boons);
             if (!result) { showToast('Pool must be at least 1 die.', 'error'); return; }
             const msg = `[${result.outcome}] ${attr}+${skill} vs DV${dv} (${pos}) → ${result.dice.join(' ')} (S:${result.successes} SB:${result.storyBeats})${note ? ' — ' + note : ''}`;
-            sendMessage(msg, 'Roll', 'all', {
+            sendMessage(msg, sender, 'all', {
                 rollData: {
                     outcome: result.outcome,
                     outcomeClass: result.outcomeClass,
@@ -633,7 +637,7 @@ function handleSlash(text) {
             break;
         }
         case 'status': {
-            const chars = state.characters.filter(c => c.vtt);
+            const chars = getState().characters.filter(c => c.vtt);
             const isConnected = isConnectedToServer();
             const room = getRoomCode() || 'none';
             const mode = isConnected ? '🌐 Connected' : '📡 Local';
@@ -660,6 +664,7 @@ function handleSlash(text) {
 
 // ============================================================
 // CHARACTER PUSH TO SERVER (with dynamic API endpoint)
+// Now includes attributes and skills
 // ============================================================
 
 async function pushCharactersToServer() {
@@ -692,7 +697,7 @@ async function pushCharactersToServer() {
     const updates = {};
     characters.forEach(c => {
         if (c.name) {
-            updates[c.name] = {
+            const entry = {
                 harm: c.harm || 0,
                 fatigue: c.fatigue || 0,
                 obligation: c.obligation || 0,
@@ -700,6 +705,11 @@ async function pushCharactersToServer() {
                 leash: c.leash || 0,
                 corruption: c.corruption || 0
             };
+            // Include attributes and skills if available
+            if (c.attributes) entry.attributes = c.attributes;
+            if (c.skills) entry.skills = c.skills;
+            if (c.avatar) entry.avatar = c.avatar;
+            updates[c.name] = entry;
         }
     });
 
@@ -711,7 +721,6 @@ async function pushCharactersToServer() {
     // ---- Build endpoint ----
     let apiBase = getApiBaseUrl();
     if (apiBase && typeof apiBase === 'string') {
-        // CRITICAL: strip any query string (e.g., ?room=...) and trailing slash
         apiBase = apiBase.split('?')[0].replace(/\/+$/, '');
         if (apiBase === '') apiBase = null;
     }
@@ -724,7 +733,7 @@ async function pushCharactersToServer() {
         endpoint = `${origin}/api/rooms/${roomCode}/characters/update`;
     }
 
-    console.log('[VTT] Pushing characters to endpoint:', endpoint); // for debugging
+    console.log('[VTT] Pushing characters to endpoint:', endpoint);
 
     try {
         const response = await fetch(endpoint, {
@@ -1171,7 +1180,7 @@ function callVoiceClient(clientId) {
 }
 
 // ============================================================
-// EVENT HANDLING
+// EVENT HANDLING – uses selected character
 // ============================================================
 
 function handleSendMessage() {
@@ -1185,10 +1194,7 @@ function handleSendMessage() {
         input.value = '';
         return;
     }
-    const state = getState();
-    const characters = state.characters || [];
-    const activeChar = characters.find(c => c.active !== false) || characters[0];
-    const sender = activeChar?.name || 'Player';
+    const sender = getSenderName();
     sendMessage(text, sender, recipient.value);
     input.value = '';
     input.focus();
@@ -1338,48 +1344,59 @@ export function render(el) {
     const voiceClients = getActiveVoiceClients();
     const deckCount = deckState.remaining || 0;
 
+    // Build voice clients HTML (larger fonts)
+    const voiceClientsHtml = voiceClients.map(id => {
+        const client = getVoiceClient(id);
+        const isSpeaking = client?.speaking ? 'var(--gold)' : 'var(--bg3)';
+        const name = client?.name || 'Player';
+        return `<span class="voice-client-badge" style="display:inline-flex;align-items:center;gap:0.4rem;padding:0.2rem 0.8rem;border-radius:20px;background:var(--bg4);font-size:0.85rem;border:1px solid var(--border);">
+            <span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:${isSpeaking};transition:background 0.3s;"></span>
+            ${escHtml(name)}
+        </span>`;
+    }).join('');
+
     el.innerHTML = `
-        <div class="vtt-header" style="margin-bottom:1rem;">
-            <h1 class="page-title" style="display:flex;align-items:center;gap:0.5rem;">
+        <div class="vtt-header" style="margin-bottom:1.2rem;">
+            <h1 class="page-title" style="display:flex;align-items:center;gap:0.6rem;font-size:1.8rem;">
                 💬 VTT – Live Table
-                <span class="mode-indicator" style="font-size:0.7rem;font-weight:400;background:var(--bg3);padding:0.15rem 0.8rem;border-radius:20px;color:var(--green);">${isConnected ? '🌐 Connected' : '📡 Local'}</span>
-                <span class="mode-indicator" style="font-size:0.6rem;font-weight:400;background:var(--bg3);padding:0.1rem 0.6rem;border-radius:12px;color:var(--text3);">${mode}</span>
-                <button class="btn btn-sm" onclick="window.location.hash='whiteboard'" title="Open Whiteboard">✏️ Whiteboard</button>
+                <span class="mode-indicator" style="font-size:0.8rem;font-weight:400;background:var(--bg3);padding:0.2rem 0.8rem;border-radius:20px;color:${isConnected ? 'var(--green)' : 'var(--red)'};">${isConnected ? '🌐 Connected' : '📡 Local'}</span>
+                <span class="mode-indicator" style="font-size:0.7rem;font-weight:400;background:var(--bg3);padding:0.1rem 0.6rem;border-radius:12px;color:var(--text3);">${mode}</span>
+                <button class="btn btn-sm" onclick="window.location.hash='whiteboard'" title="Open Whiteboard" style="font-size:0.9rem;">✏️ Whiteboard</button>
             </h1>
-            <p class="page-sub" style="margin:0.2rem 0 0;">Chat, party status, quick die roller, deck, and scene timers all in one view.</p>
+            <p class="page-sub" style="margin:0.2rem 0 0;font-size:1.1rem;">Chat, party status, quick die roller, deck, and scene timers all in one view.</p>
         </div>
 
         <!-- Connection & Voice Status Panel -->
         <div class="panel" style="padding:0.5rem 1rem;margin-bottom:1rem;">
             <div class="flex-between" style="flex-wrap:wrap;gap:0.5rem;">
                 <div class="flex" style="gap:0.5rem;flex-wrap:wrap;align-items:center;">
-                    <span class="connection-status" style="display:inline-block;width:10px;height:10px;border-radius:50%;background:${isConnected ? 'var(--green)' : 'var(--red)'};"></span>
-                    <span class="text-muted small">${isConnected ? '🟢 Connected' : '🔴 Disconnected'}</span>
-                    ${roomCode ? `<span class="text-muted small">🔑 Room: <strong>${roomCode}</strong></span>` : ''}
-                    ${socketId ? `<span class="text-muted small">👤 ${socketId.slice(0, 8)}</span>` : ''}
-                    <span class="text-muted small">📍 ${defaultRegion}</span>
-                    <span class="text-muted small">🃏 <span id="vtt-deck-count-header">${deckCount}</span></span>
+                    <span class="connection-status" style="display:inline-block;width:12px;height:12px;border-radius:50%;background:${isConnected ? 'var(--green)' : 'var(--red)'};"></span>
+                    <span class="text-muted" style="font-size:1rem;">${isConnected ? '🟢 Connected' : '🔴 Disconnected'}</span>
+                    ${roomCode ? `<span class="text-muted" style="font-size:1rem;">🔑 Room: <strong>${roomCode}</strong></span>` : ''}
+                    ${socketId ? `<span class="text-muted" style="font-size:1rem;">👤 ${socketId.slice(0, 8)}</span>` : ''}
+                    <span class="text-muted" style="font-size:1rem;">📍 ${defaultRegion}</span>
+                    <span class="text-muted" style="font-size:1rem;">🃏 <span id="vtt-deck-count-header">${deckCount}</span></span>
                 </div>
                 <div class="flex" style="gap:0.4rem;flex-wrap:wrap;align-items:center;">
-                    <button class="btn btn-sm ${voiceInitialized ? 'btn-primary' : ''}" id="vtt-voice-toggle">${voiceInitialized ? '🎤 Voice On' : '🎤 Voice Off'}</button>
-                    ${voiceInitialized ? `<button class="btn btn-sm ${voiceStatus?.muted ? 'btn-danger' : 'btn-green'}" id="vtt-mute-toggle">${voiceStatus?.muted ? '🔇 Muted' : '🎙️ Live'}</button>` : ''}
-                    <span class="text-muted small" id="voice-clients-count">${voiceClients.length} voice users</span>
+                    <button class="btn btn-sm ${voiceInitialized ? 'btn-primary' : ''}" id="vtt-voice-toggle" style="font-size:0.9rem;">${voiceInitialized ? '🎤 Voice On' : '🎤 Voice Off'}</button>
+                    ${voiceInitialized ? `<button class="btn btn-sm ${voiceStatus?.muted ? 'btn-danger' : 'btn-green'}" id="vtt-mute-toggle" style="font-size:0.9rem;">${voiceStatus?.muted ? '🔇 Muted' : '🎙️ Live'}</button>` : ''}
+                    <span class="text-muted" id="voice-clients-count" style="font-size:0.9rem;">${voiceClients.length} voice users</span>
                 </div>
             </div>
             <div style="margin-top:0.4rem;display:flex;align-items:center;gap:0.5rem;">
-                <span style="font-size:0.7rem;color:var(--text3);">🎤</span>
-                <div style="flex:1;height:4px;background:var(--bg4);border-radius:2px;overflow:hidden;">
-                    <div id="voice-activity-bar" style="width:0%;height:100%;background:var(--bg4);border-radius:2px;transition:width 0.1s;"></div>
+                <span style="font-size:0.9rem;color:var(--text3);">🎤</span>
+                <div style="flex:1;height:6px;background:var(--bg4);border-radius:3px;overflow:hidden;">
+                    <div id="voice-activity-bar" style="width:0%;height:100%;background:var(--bg4);border-radius:3px;transition:width 0.1s;"></div>
                 </div>
-                <span style="font-size:0.6rem;color:var(--text3);" id="voice-activity-label">idle</span>
+                <span style="font-size:0.8rem;color:var(--text3);" id="voice-activity-label">idle</span>
             </div>
-            <div id="voice-clients-list" style="display:flex;flex-wrap:wrap;gap:0.4rem;margin-top:0.4rem;padding-top:0.4rem;border-top:1px solid var(--border);">
-                ${voiceClients.length === 0 ? '<span style="color:var(--text3);font-size:0.75rem;">No other voice clients.</span>' : ''}
+            <div id="voice-clients-list" style="display:flex;flex-wrap:wrap;gap:0.5rem;margin-top:0.5rem;padding-top:0.5rem;border-top:1px solid var(--border);">
+                ${voiceClients.length === 0 ? '<span style="color:var(--text3);font-size:0.9rem;">No other voice clients.</span>' : voiceClientsHtml}
             </div>
-            <div style="margin-top:0.4rem;padding-top:0.4rem;border-top:1px solid var(--border);">
+            <div style="margin-top:0.5rem;padding-top:0.5rem;border-top:1px solid var(--border);">
                 <div class="flex-between">
-                    <span class="text-muted small">👥 Party Members</span>
-                    <span class="text-muted small" id="vtt-mode-badge" style="background:var(--bg3);padding:0.1rem 0.6rem;border-radius:12px;font-size:0.7rem;">${isConnected ? '🌐 Online' : '📡 Local'}</span>
+                    <span class="text-muted" style="font-size:1rem;">👥 Party Members</span>
+                    <span class="text-muted" id="vtt-mode-badge" style="background:var(--bg3);padding:0.1rem 0.6rem;border-radius:12px;font-size:0.9rem;">${isConnected ? '🌐 Online' : '📡 Local'}</span>
                 </div>
                 <div id="presence-list" style="margin-top:0.2rem;"></div>
             </div>
@@ -1389,105 +1406,143 @@ export function render(el) {
         <div class="panel" style="padding:0.5rem 1rem;margin-bottom:1rem;border:1px solid var(--border);border-radius:var(--radius);">
             <div class="flex-between" style="flex-wrap:wrap;gap:0.5rem;">
                 <div>
-                    <span class="text-muted small">👑 Game Master</span>
-                    <span id="gm-display" style="font-weight:600;margin-left:0.5rem;">
+                    <span class="text-muted" style="font-size:1rem;">👑 Game Master</span>
+                    <span id="gm-display" style="font-weight:600;margin-left:0.5rem;font-size:1rem;">
                         ${gmState.currentGmName || 'None'}
                     </span>
-                    <span id="gm-role-badge" style="font-size:0.7rem;background:var(--bg3);padding:0.1rem 0.6rem;border-radius:12px;margin-left:0.5rem;">
+                    <span id="gm-role-badge" style="font-size:0.8rem;background:var(--bg3);padding:0.1rem 0.6rem;border-radius:12px;margin-left:0.5rem;">
                         ${gmState.myRole === 'gm' ? 'You are GM' : 'Player'}
                     </span>
                 </div>
                 <div id="gm-actions" style="display:flex;gap:0.4rem;">
                     ${gmState.myRole === 'gm' ? `
-                        <button class="btn btn-sm btn-danger" id="vtt-gm-resign">Resign GM</button>
+                        <button class="btn btn-sm btn-danger" id="vtt-gm-resign" style="font-size:0.9rem;">Resign GM</button>
                     ` : `
-                        <button class="btn btn-sm btn-gold" id="vtt-gm-request">Request GM</button>
+                        <button class="btn btn-sm btn-gold" id="vtt-gm-request" style="font-size:0.9rem;">Request GM</button>
                     `}
                 </div>
             </div>
             <div id="gm-requests" style="margin-top:0.4rem;display:none;border-top:1px solid var(--border);padding-top:0.4rem;">
-                <span class="text-muted small">Pending requests:</span>
+                <span class="text-muted" style="font-size:0.9rem;">Pending requests:</span>
                 <div id="gm-requests-list"></div>
             </div>
         </div>
 
         <!-- Main VTT layout -->
         <div class="vtt-container" style="display:grid;grid-template-columns:2fr 1fr;gap:1.2rem;">
-            <div class="chat-box" style="background:var(--bg3);border-radius:var(--radius);padding:0.6rem;display:flex;flex-direction:column;min-height:450px;">
-                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.4rem;">
-                    <h3 style="margin:0;">💬 Chat</h3>
-                    <div style="display:flex;gap:0.3rem;align-items:center;font-size:0.7rem;">
+            <!-- Chat Column -->
+            <div class="chat-box" style="background:var(--bg3);border-radius:var(--radius);padding:0.8rem;display:flex;flex-direction:column;min-height:500px;">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.5rem;">
+                    <h3 style="margin:0;font-size:1.4rem;">💬 Chat</h3>
+                    <div style="display:flex;gap:0.3rem;align-items:center;font-size:0.9rem;">
                         <span class="text-muted" id="message-count">0 messages</span>
-                        <button class="btn btn-sm btn-ghost" id="vtt-clear-chat" title="Clear chat">🗑️</button>
+                        <button class="btn btn-sm btn-ghost" id="vtt-clear-chat" title="Clear chat" style="font-size:0.9rem;">🗑️</button>
                     </div>
                 </div>
-                <div class="chat-messages" id="chatMessages" style="flex:1;overflow-y:auto;padding:0.4rem;background:var(--bg2);border-radius:var(--radius);margin-bottom:0.4rem;font-size:0.9rem;display:flex;flex-direction:column;max-height:400px;min-height:200px;"></div>
+                <div class="chat-messages" id="chatMessages" style="flex:1;overflow-y:auto;padding:0.5rem;background:var(--bg2);border-radius:var(--radius);margin-bottom:0.5rem;font-size:1rem;display:flex;flex-direction:column;max-height:450px;min-height:250px;"></div>
+                <!-- Selected character display (rendered by renderChat) -->
+                <div id="selected-character-display" style="margin-bottom:0.4rem;padding:0.2rem 0.4rem;background:var(--bg4);border-radius:var(--radius);min-height:2.5rem;"></div>
                 <div class="chat-input-row" style="display:flex;gap:0.4rem;">
-                    <input type="text" id="chatInput" placeholder="Type… (/roll, /timer, /deck, /help)" style="flex:1;" />
-                    <select id="chatRecipient" style="flex:0 0 120px;">
+                    <input type="text" id="chatInput" placeholder="Type… (/roll, /timer, /deck, /help)" style="flex:1;font-size:1rem;padding:0.4rem;" />
+                    <select id="chatRecipient" style="flex:0 0 120px;font-size:1rem;">
                         <option value="all">All</option>
                     </select>
-                    <button class="btn btn-gold" id="chat-send-btn">Send</button>
+                    <button class="btn btn-gold" id="chat-send-btn" style="font-size:1rem;">Send</button>
                 </div>
-                <div class="flex mt-1" style="flex-wrap:wrap;gap:0.5rem;font-size:0.8rem;">
+                <div class="flex mt-1" style="flex-wrap:wrap;gap:0.5rem;font-size:0.9rem;">
                     <label class="inline-check"><input type="checkbox" id="vtt-post-chat" checked /> Post rolls to chat</label>
                     <label class="inline-check"><input type="checkbox" id="vtt-auto-scroll" checked /> Auto-scroll</label>
                 </div>
             </div>
+
+            <!-- Sidebar -->
             <div class="vtt-sidebar" style="display:flex;flex-direction:column;gap:1.2rem;">
-                <div class="vtt-panel" style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:1rem;">
+                <!-- Party Status (horizontal, clickable cards) -->
+                <div class="vtt-panel" style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:0.8rem;">
                     <div style="display:flex;justify-content:space-between;align-items:center;">
-                        <h3 style="margin:0;">👥 Party Status</h3>
-                        <button class="btn btn-sm btn-ghost" id="vtt-refresh-btn" title="Refresh">↻</button>
+                        <h3 style="margin:0;font-size:1.2rem;">👥 Party</h3>
+                        <button class="btn btn-sm btn-ghost" id="vtt-refresh-btn" title="Refresh" style="font-size:0.9rem;">↻</button>
                     </div>
-                    <div class="character-status-grid" id="vttCharGrid" style="display:grid;grid-template-columns:1fr 1fr;gap:0.6rem;margin-top:0.5rem;"></div>
+                    <div id="vttCharGrid" style="margin-top:0.5rem;overflow-x:auto;"></div>
                 </div>
-                <div class="vtt-panel" style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:1rem;">
-                    <h3 style="margin-top:0;">🎲 Quick Roller</h3>
-                    <div class="vtt-dice-row" style="display:flex;flex-wrap:wrap;gap:0.4rem;">
-                        <div class="field" style="flex:1;min-width:60px;"><label>Attr</label><select id="vtt-attr"><option value="1">1</option><option value="2">2</option><option value="3" selected>3</option><option value="4">4</option><option value="5">5</option></select></div>
-                        <div class="field" style="flex:1;min-width:60px;"><label>Skill</label><select id="vtt-skill"><option value="0">0</option><option value="1">1</option><option value="2" selected>2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option></select></div>
-                        <div class="field" style="flex:0 0 70px;"><label>DV</label><select id="vtt-dv"><option value="2">2</option><option value="3" selected>3</option><option value="4">4</option><option value="5">5+</option></select></div>
-                        <div class="field" style="flex:0 0 80px;"><label>Pos</label><select id="vtt-pos"><option value="dominant">Dom</option><option value="controlled" selected>Ctrl</option><option value="desperate">Desp</option></select></div>
-                        <div class="field" style="flex:0 0 60px;"><label>Boons</label><input type="number" id="vtt-boons" value="0" min="0" max="5" /></div>
+
+                <!-- Quick Roller + Common Rolls -->
+                <div class="vtt-panel" style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:0.8rem;">
+                    <h3 style="margin-top:0;font-size:1.2rem;">🎲 Quick Roller</h3>
+                    <div class="vtt-dice-row" style="display:flex;flex-wrap:wrap;gap:0.5rem;align-items:end;">
+                        <div class="field" style="flex:1;min-width:70px;">
+                            <label style="font-size:0.9rem;">Attr</label>
+                            <select id="vtt-attr" style="font-size:1rem;padding:0.2rem;">
+                                <option value="1">1</option><option value="2">2</option><option value="3" selected>3</option><option value="4">4</option><option value="5">5</option>
+                            </select>
+                        </div>
+                        <div class="field" style="flex:1;min-width:70px;">
+                            <label style="font-size:0.9rem;">Skill</label>
+                            <select id="vtt-skill" style="font-size:1rem;padding:0.2rem;">
+                                <option value="0">0</option><option value="1">1</option><option value="2" selected>2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option>
+                            </select>
+                        </div>
+                        <div class="field" style="flex:0 0 80px;">
+                            <label style="font-size:0.9rem;">DV</label>
+                            <select id="vtt-dv" style="font-size:1rem;padding:0.2rem;">
+                                <option value="2">2</option><option value="3" selected>3</option><option value="4">4</option><option value="5">5+</option>
+                            </select>
+                        </div>
+                        <div class="field" style="flex:0 0 90px;">
+                            <label style="font-size:0.9rem;">Pos</label>
+                            <select id="vtt-pos" style="font-size:1rem;padding:0.2rem;">
+                                <option value="dominant">Dom</option><option value="controlled" selected>Ctrl</option><option value="desperate">Desp</option>
+                            </select>
+                        </div>
+                        <div class="field" style="flex:0 0 70px;">
+                            <label style="font-size:0.9rem;">Boons</label>
+                            <input type="number" id="vtt-boons" value="0" min="0" max="5" style="font-size:1rem;padding:0.2rem;width:60px;" />
+                        </div>
                     </div>
+                    <!-- Common Rolls -->
+                    <div id="vtt-common-rolls" style="margin-top:0.4rem;min-height:2.5rem;"></div>
                     <div class="flex" style="gap:0.4rem;margin-top:0.4rem;">
-                        <button class="btn btn-gold btn-sm" id="vtt-roll-post-btn">Roll &amp; Post</button>
-                        <button class="btn btn-sm" id="vtt-roll-only-btn">Roll Only</button>
+                        <button class="btn btn-gold btn-sm" id="vtt-roll-post-btn" style="font-size:0.95rem;">Roll &amp; Post</button>
+                        <button class="btn btn-sm" id="vtt-roll-only-btn" style="font-size:0.95rem;">Roll Only</button>
                     </div>
-                    <div id="vtt-roll-output" class="mt-1" style="font-size:0.85rem;min-height:2rem;"></div>
+                    <div id="vtt-roll-output" class="mt-1" style="font-size:1rem;min-height:3rem;padding:0.2rem 0;"></div>
                 </div>
+
                 <!-- Deck Panel -->
-                <div class="vtt-panel" style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:1rem;">
-                    <h3 style="margin-top:0;">🃏 Deck</h3>
-                    <div style="display:flex;flex-wrap:wrap;gap:0.3rem;">
-                        <button class="btn btn-sm btn-gold" id="vtt-deck-draw-1">Draw 1</button>
-                        <button class="btn btn-sm btn-gold" id="vtt-deck-draw-2">Draw 2</button>
-                        <button class="btn btn-sm btn-gold" id="vtt-deck-draw-3">Draw 3</button>
-                        <button class="btn btn-sm btn-primary" id="vtt-deck-crown">👑 Crown</button>
-                        <button class="btn btn-sm" id="vtt-deck-shuffle">🔀</button>
-                        <button class="btn btn-sm btn-ghost" id="vtt-deck-history">📜</button>
-                        <button class="btn btn-sm btn-ghost" id="vtt-modules-list">📦</button>
+                <div class="vtt-panel" style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:0.8rem;">
+                    <h3 style="margin-top:0;font-size:1.2rem;">🃏 Deck</h3>
+                    <div style="display:flex;flex-wrap:wrap;gap:0.4rem;">
+                        <button class="btn btn-sm btn-gold" id="vtt-deck-draw-1" style="font-size:0.9rem;">Draw 1</button>
+                        <button class="btn btn-sm btn-gold" id="vtt-deck-draw-2" style="font-size:0.9rem;">Draw 2</button>
+                        <button class="btn btn-sm btn-gold" id="vtt-deck-draw-3" style="font-size:0.9rem;">Draw 3</button>
+                        <button class="btn btn-sm btn-primary" id="vtt-deck-crown" style="font-size:0.9rem;">👑 Crown</button>
+                        <button class="btn btn-sm" id="vtt-deck-shuffle" style="font-size:0.9rem;">🔀</button>
+                        <button class="btn btn-sm btn-ghost" id="vtt-deck-history" style="font-size:0.9rem;">📜</button>
+                        <button class="btn btn-sm btn-ghost" id="vtt-modules-list" style="font-size:0.9rem;">📦</button>
                     </div>
-                    <div style="margin-top:0.3rem;font-size:0.7rem;color:var(--text3);">
+                    <div style="margin-top:0.3rem;font-size:0.85rem;color:var(--text3);">
                         Region: <strong id="vtt-region-display">${defaultRegion}</strong>
                         <span style="margin-left:0.5rem;">Cards: <strong id="vtt-deck-count">${deckCount}</strong></span>
                     </div>
                 </div>
-                <div class="vtt-panel" style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:1rem;">
-                    <h3 style="margin-top:0;">⏱️ Scene Timers</h3>
+
+                <!-- Timers -->
+                <div class="vtt-panel" style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:0.8rem;">
+                    <h3 style="margin-top:0;font-size:1.2rem;">⏱️ Scene Timers</h3>
                     <div id="vttTimerList"></div>
                     <div style="display:flex;gap:0.4rem;margin-top:0.5rem;">
-                        <button class="btn btn-sm" id="vtt-add-timer">+ Add Timer</button>
-                        <button class="btn btn-sm" id="vtt-scene-end">🌅 Scene End</button>
+                        <button class="btn btn-sm" id="vtt-add-timer" style="font-size:0.9rem;">+ Add Timer</button>
+                        <button class="btn btn-sm" id="vtt-scene-end" style="font-size:0.9rem;">🌅 Scene End</button>
                     </div>
                 </div>
             </div>
         </div>
     `;
 
-    renderChat();
-    renderVTTChars();
+    // Initialize reactive renderers
+    renderChat();           // Also renders selected-character-display
+    renderVTTChars();       // Horizontal, clickable cards
+    renderCommonRolls();    // Common rolls buttons (uses selected character)
     renderVTTTimers();
     renderLocalPresence();
     renderVoiceClients();
@@ -1524,7 +1579,7 @@ export function render(el) {
         if (headerCountEl) headerCountEl.textContent = String(deckState.remaining || 0);
     }, 5000);
 
-    console.log('[VTT Connected] Rendered with reactive store + deck/module/GM support');
+    console.log('[VTT Connected] Rendered with reactive store + deck/module/GM support (JRPG style)');
     // Expose to console for debugging
     window.getState = getState;
     window.vttStore = vttStore;
@@ -1585,7 +1640,7 @@ export default {
         const display = q('#vtt-region-display');
         if (display) display.textContent = region;
     },
-    pushCharactersToServer, // exposed for manual trigger if needed
+    pushCharactersToServer,
     // Voice functions (exposed for integration)
     initVoice,
     toggleMute,

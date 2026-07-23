@@ -1,7 +1,13 @@
 /**
  * VTT Core – reactive rendering functions
  * Each renderer subscribes to the store and updates its DOM element automatically.
- * Updated for unified WebSocket module with deck and module support.
+ * Updated for:
+ * - JRPG-style horizontal character roster (scrollable)
+ * - Single-click selection with highlighting
+ * - Auto-populate Quick Roller from selected character
+ * - Common rolls with auto-population
+ * - Larger, more readable UI
+ * - Avatar support
  */
 
 import { vttStore } from '../../core/vtt-store.js';
@@ -27,6 +33,22 @@ export const SENDER_TYPES = {
     DECK: 'Deck',
 };
 
+// [VTT SELECTION] Common rolls mapping: { displayName: { attr, skill } }
+export const COMMON_ROLLS = {
+    Stealth: { attr: 'body', skill: 'stealth' },
+    Investigate: { attr: 'mind', skill: 'investigate' },
+    Perception: { attr: 'mind', skill: 'perception' },
+    Athletics: { attr: 'body', skill: 'athletics' },
+    Acrobatics: { attr: 'body', skill: 'acrobatics' },
+    Persuasion: { attr: 'soul', skill: 'persuasion' },
+    Deception: { attr: 'soul', skill: 'deception' },
+    Insight: { attr: 'mind', skill: 'insight' },
+    Survival: { attr: 'body', skill: 'survival' },
+    Medicine: { attr: 'mind', skill: 'medicine' },
+    Arcana: { attr: 'mind', skill: 'arcana' },
+    Intimidation: { attr: 'soul', skill: 'intimidation' },
+};
+
 // ============================================================
 // Container & query helpers
 // ============================================================
@@ -47,15 +69,52 @@ export function qa(selector) {
 }
 
 // ============================================================
-// Chat renderer (reactive)
+// Chat renderer (reactive) – with selected character display
 // ============================================================
 let chatUnsubscribe = null;
+let selectedCharUnsubscribe = null;
 
 export function renderChat() {
     if (!currentContainer) return;
     const chatContainer = currentContainer.querySelector('#chatMessages');
+    const chatInputRow = currentContainer.querySelector('.chat-input-row');
     if (!chatContainer) return;
 
+    // ---- Render selected character display above chat input ----
+    const selectedDisplay = currentContainer.querySelector('#selected-character-display');
+    if (selectedDisplay) {
+        if (selectedCharUnsubscribe) selectedCharUnsubscribe();
+        selectedCharUnsubscribe = vttStore.subscribe('selectedCharacterId', (id) => {
+            const char = id ? vttStore.getSelectedCharacter() : null;
+            if (char) {
+                const avatarHtml = char.avatar
+                    ? `<img src="${char.avatar}" alt="${escHtml(char.name)}" style="width:32px;height:32px;border-radius:50%;object-fit:cover;border:2px solid var(--gold);" />`
+                    : `<span style="font-size:1.8rem;">🧑</span>`;
+                selectedDisplay.innerHTML = `
+                    <div style="display:flex;align-items:center;gap:0.5rem;background:var(--bg3);padding:0.2rem 0.8rem;border-radius:20px;border:2px solid var(--gold);">
+                        ${avatarHtml}
+                        <span style="font-weight:700;font-size:1rem;">${escHtml(char.name)}</span>
+                        <span style="font-size:0.7rem;color:var(--text2);">(selected)</span>
+                        <button class="btn btn-xs btn-ghost" id="clear-selected-char" title="Deselect" style="padding:0 0.3rem;">✕</button>
+                    </div>
+                `;
+                // Attach deselect handler
+                const clearBtn = selectedDisplay.querySelector('#clear-selected-char');
+                if (clearBtn) {
+                    clearBtn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        vttStore.selectCharacter(null);
+                    });
+                }
+            } else {
+                selectedDisplay.innerHTML = `
+                    <span style="color:var(--text3);font-size:0.9rem;">No character selected</span>
+                `;
+            }
+        });
+    }
+
+    // ---- Chat messages ----
     if (chatUnsubscribe) chatUnsubscribe();
     chatUnsubscribe = vttStore.subscribe('chatMessages', (messages) => {
         const allMessages = messages || [];
@@ -66,13 +125,13 @@ export function renderChat() {
         if (!Array.isArray(allMessages) || allMessages.length === 0) {
             setHtml(chatContainer, `
                 <div class="empty-chat-state" style="padding:2rem 1rem;text-align:center;color:var(--text3);">
-                    <div style="font-size:2rem;margin-bottom:0.5rem;">💬</div>
-                    <div style="font-size:0.85rem;">No messages yet</div>
-                    <div style="font-size:0.75rem;margin-top:0.3rem;">
+                    <div style="font-size:2.5rem;margin-bottom:0.5rem;">💬</div>
+                    <div style="font-size:1.1rem;">No messages yet</div>
+                    <div style="font-size:0.9rem;margin-top:0.3rem;">
                         ${isConnected ? `🌐 Connected to server${roomCode ? ` (${roomCode})` : ''}` : '📡 Messages stay local'}
                         <span style="color:var(--text4);margin-left:0.3rem;">via ${mode}</span>
                     </div>
-                    <div style="font-size:0.7rem;margin-top:0.5rem;color:var(--text4);">
+                    <div style="font-size:0.8rem;margin-top:0.5rem;color:var(--text4);">
                         Type /help for commands
                     </div>
                 </div>
@@ -107,11 +166,11 @@ export function renderChat() {
 
             let modeBadge = '';
             if (isLocal && !isConnected) {
-                modeBadge = ` <span class="mode-badge local" style="font-size:0.55rem;color:var(--text3);background:var(--bg4);padding:0.05rem 0.4rem;border-radius:10px;margin-left:0.3rem;border:1px solid var(--border);">📡 local</span>`;
+                modeBadge = ` <span class="mode-badge local" style="font-size:0.65rem;color:var(--text3);background:var(--bg4);padding:0.05rem 0.5rem;border-radius:10px;margin-left:0.3rem;border:1px solid var(--border);">📡 local</span>`;
             } else if (isLocal && isConnected) {
-                modeBadge = ` <span class="mode-badge local-ws" style="font-size:0.55rem;color:var(--gold);background:var(--bg4);padding:0.05rem 0.4rem;border-radius:10px;margin-left:0.3rem;border:1px solid var(--gold);">📡 local</span>`;
+                modeBadge = ` <span class="mode-badge local-ws" style="font-size:0.65rem;color:var(--gold);background:var(--bg4);padding:0.05rem 0.5rem;border-radius:10px;margin-left:0.3rem;border:1px solid var(--gold);">📡 local</span>`;
             } else if (!isLocal && isConnected) {
-                modeBadge = ` <span class="mode-badge synced" style="font-size:0.55rem;color:var(--green);background:var(--bg4);padding:0.05rem 0.4rem;border-radius:10px;margin-left:0.3rem;border:1px solid var(--green);">🌐 synced</span>`;
+                modeBadge = ` <span class="mode-badge synced" style="font-size:0.65rem;color:var(--green);background:var(--bg4);padding:0.05rem 0.5rem;border-radius:10px;margin-left:0.3rem;border:1px solid var(--green);">🌐 synced</span>`;
             }
 
             let statusIcon = '✓';
@@ -136,12 +195,13 @@ export function renderChat() {
             }
 
             html += `
-                <div class="chat-message" data-msg-id="${msg.id || ''}" style="padding:0.3rem 0.5rem;border-bottom:1px solid var(--border);font-size:0.85rem;transition:background 0.2s;">
-                    <div style="display:flex;align-items:center;gap:0.3rem;flex-wrap:wrap;">
-                        <span style="color:var(--text2);font-size:0.7rem;">${escHtml(time)}</span>
-                        <strong style="color:${senderColor};">${escHtml(sender)}${recipient}:</strong>
-                        <span style="word-break:break-word;">${whisper}${sender === 'GM' ? text : escHtml(String(text))}</span>                        ${modeBadge}
-                        <span class="msg-status" style="font-size:0.6rem;color:${statusColor};margin-left:auto;" title="${statusTitle}">${statusIcon}</span>
+                <div class="chat-message" data-msg-id="${msg.id || ''}" style="padding:0.4rem 0.6rem;border-bottom:1px solid var(--border);font-size:1rem;transition:background 0.2s;">
+                    <div style="display:flex;align-items:center;gap:0.4rem;flex-wrap:wrap;">
+                        <span style="color:var(--text2);font-size:0.8rem;">${escHtml(time)}</span>
+                        <strong style="color:${senderColor};font-size:1rem;">${escHtml(sender)}${recipient}:</strong>
+                        <span style="word-break:break-word;font-size:1rem;">${whisper}${sender === 'GM' ? text : escHtml(String(text))}</span>
+                        ${modeBadge}
+                        <span class="msg-status" style="font-size:0.7rem;color:${statusColor};margin-left:auto;" title="${statusTitle}">${statusIcon}</span>
                     </div>
                     ${msg.rollData ? renderRollDetails(msg.rollData) : ''}
                     ${msg.deckData ? renderDeckDetails(msg.deckData) : ''}
@@ -174,7 +234,7 @@ function renderRollDetails(rollData) {
             textColor = 'white';
             label = '1⚠️';
         }
-        return `<span style="display:inline-block;padding:0.05rem 0.3rem;margin:0.05rem;border-radius:3px;background:${bgColor};color:${textColor};font-size:0.7rem;">${label}</span>`;
+        return `<span style="display:inline-block;padding:0.05rem 0.4rem;margin:0.05rem;border-radius:4px;background:${bgColor};color:${textColor};font-size:0.8rem;">${label}</span>`;
     }).join(' ');
     
     const outcomeColor = getOutcomeColor(rollData.outcome || '');
@@ -182,9 +242,9 @@ function renderRollDetails(rollData) {
     const outcomeClass = getOutcomeClass(rollData.outcome || '');
     
     return `
-        <div style="margin-top:0.2rem;padding:0.2rem 0.4rem;background:var(--bg2);border-radius:4px;font-size:0.7rem;">
-            <div style="display:flex;flex-wrap:wrap;gap:0.3rem;align-items:center;">
-                <span class="outcome-tag ${outcomeClass}" style="padding:0.05rem 0.6rem;border-radius:12px;font-weight:600;background:${outcomeColor};color:white;">${outcomeLabel}</span>
+        <div style="margin-top:0.3rem;padding:0.3rem 0.5rem;background:var(--bg2);border-radius:6px;font-size:0.85rem;">
+            <div style="display:flex;flex-wrap:wrap;gap:0.4rem;align-items:center;">
+                <span class="outcome-tag ${outcomeClass}" style="padding:0.1rem 0.8rem;border-radius:20px;font-weight:700;background:${outcomeColor};color:white;font-size:0.9rem;">${outcomeLabel}</span>
                 <span>🎲 ${diceHtml}</span>
                 <span style="color:var(--text3);">S:${rollData.successes || 0} SB:${rollData.storyBeats || 0}</span>
             </div>
@@ -200,7 +260,7 @@ function renderDeckDetails(deckData) {
     ).join(', ');
     
     return `
-        <div style="margin-top:0.2rem;padding:0.2rem 0.4rem;background:var(--bg2);border-radius:4px;font-size:0.7rem;color:var(--text3);">
+        <div style="margin-top:0.3rem;padding:0.3rem 0.5rem;background:var(--bg2);border-radius:6px;font-size:0.85rem;color:var(--text3);">
             <span>🃏 ${cardNames}</span>
             ${deckData.remaining !== undefined ? `<span style="margin-left:0.5rem;">Remaining: ${deckData.remaining}</span>` : ''}
         </div>
@@ -208,7 +268,7 @@ function renderDeckDetails(deckData) {
 }
 
 // ============================================================
-// Party Status Grid (reactive)
+// Party Status – Horizontal, JRPG-style roster with avatars
 // ============================================================
 let charUnsubscribe = null;
 
@@ -220,39 +280,183 @@ export function renderVTTChars() {
     if (charUnsubscribe) charUnsubscribe();
     charUnsubscribe = vttStore.subscribe('characters', (chars) => {
         const vttChars = chars.filter(c => c.vtt !== false);
+        const selectedId = vttStore.getSelectedCharacterId();
+
         if (vttChars.length === 0) {
-            setHtml(grid, `<div class="empty-state" style="grid-column:1/-1;text-align:center;padding:1rem;color:var(--text3);font-size:0.85rem;">👤 No VTT characters</div>`);
+            setHtml(grid, `<div style="text-align:center;padding:1.5rem;color:var(--text3);font-size:1.1rem;">👤 No VTT characters</div>`);
             return;
         }
-        let html = '';
+
+        // Horizontal scrollable container (flex row)
+        let html = `<div style="display:flex;gap:0.8rem;overflow-x:auto;padding:0.2rem 0.2rem;flex-wrap:nowrap;">`;
         for (const char of vttChars) {
             const name = char.name || 'Unnamed';
             const harm = char.harm || 0;
             const fatigue = char.fatigue || 0;
             const boons = char.boons || 0;
             const tier = char.tier || 1;
-            const isActive = char.active !== false;
+            const isSelected = char.id === selectedId;
+
+            // Avatar (small)
+            const avatarHtml = char.avatar
+                ? `<img src="${char.avatar}" alt="${escHtml(name)}" style="width:40px;height:40px;border-radius:50%;object-fit:cover;border:2px solid ${isSelected ? 'var(--gold)' : 'var(--border)'};flex-shrink:0;" />`
+                : `<span style="font-size:1.8rem;flex-shrink:0;">🧑</span>`;
+
             html += `
-                <div class="vtt-char-card" style="background:var(--bg3);border-radius:var(--radius);padding:0.4rem 0.6rem;border-left:3px solid ${isActive ? 'var(--gold)' : 'var(--text3)'};transition:all 0.2s;${isActive ? '' : 'opacity:0.6;'}">
-                    <div style="font-weight:600;font-size:0.9rem;display:flex;align-items:center;gap:0.3rem;">
-                        ${isActive ? '🟢' : '⏸️'}
-                        ${escHtml(name)}
-                        <span style="font-size:0.6rem;color:var(--text3);background:var(--bg4);padding:0.05rem 0.4rem;border-radius:10px;">T${tier}</span>
-                    </div>
-                    <div style="display:flex;gap:0.8rem;font-size:0.7rem;color:var(--text2);margin-top:0.15rem;">
-                        <span>❤️ ${harm}</span>
-                        <span>⚡ ${fatigue}</span>
-                        <span>🎲 ${boons}</span>
+                <div class="vtt-char-card" data-char-id="${char.id}" style="
+                    flex:0 0 auto;
+                    min-width:160px;
+                    background:var(--bg3);
+                    border-radius:var(--radius);
+                    padding:0.4rem 0.6rem;
+                    border:2px solid ${isSelected ? 'var(--gold)' : 'var(--border)'};
+                    box-shadow: ${isSelected ? '0 0 12px rgba(212,175,55,0.4)' : 'none'};
+                    transition:all 0.2s;
+                    cursor:pointer;
+                    display:flex;
+                    align-items:center;
+                    gap:0.6rem;
+                ">
+                    ${avatarHtml}
+                    <div style="display:flex;flex-direction:column;justify-content:center;flex:1;min-width:0;">
+                        <div style="font-weight:700;font-size:1rem;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+                            ${escHtml(name)}
+                            <span style="font-size:0.6rem;color:var(--text3);background:var(--bg4);padding:0.05rem 0.4rem;border-radius:10px;margin-left:0.3rem;">T${tier}</span>
+                        </div>
+                        <div style="display:flex;gap:0.6rem;font-size:0.85rem;color:var(--text2);margin-top:0.1rem;">
+                            <span>❤️${harm}</span>
+                            <span>⚡${fatigue}</span>
+                            <span>🎲${boons}</span>
+                        </div>
+                        ${isSelected ? `<span style="font-size:0.65rem;color:var(--gold);">👑 Selected</span>` : ''}
                     </div>
                 </div>
             `;
         }
+        html += `</div>`;
         setHtml(grid, html);
+
+        // Attach click handlers to select character
+        grid.querySelectorAll('.vtt-char-card').forEach(card => {
+            card.addEventListener('click', (e) => {
+                const id = card.dataset.charId;
+                if (id) {
+                    // Select the character – this will trigger all subscriptions
+                    vttStore.selectCharacter(id);
+                }
+            });
+        });
     });
 }
 
 // ============================================================
-// Timers (reactive)
+// Auto-populate Quick Roller from selected character
+// ============================================================
+let rollerPopulateUnsubscribe = null;
+
+function populateRollerFromSelected(char) {
+    if (!char) return;
+    const attrSelect = q('#vtt-attr');
+    const skillSelect = q('#vtt-skill');
+    const boonsInput = q('#vtt-boons');
+    if (attrSelect) {
+        // Use body attribute as default (fallback to 3)
+        const body = char.attributes?.body ?? 3;
+        // Set the select value if it exists
+        if ([1,2,3,4,5].includes(body)) {
+            attrSelect.value = body;
+        } else {
+            attrSelect.value = 3;
+        }
+    }
+    if (skillSelect) {
+        // Set skill to 0 by default (user can adjust)
+        skillSelect.value = 0;
+    }
+    if (boonsInput) {
+        boonsInput.value = char.boons ?? 0;
+    }
+}
+
+export function initRollerAutoPopulate() {
+    if (rollerPopulateUnsubscribe) return;
+    rollerPopulateUnsubscribe = vttStore.subscribe('selectedCharacterId', (id) => {
+        const char = id ? vttStore.getSelectedCharacter() : null;
+        if (char) {
+            populateRollerFromSelected(char);
+        }
+    });
+}
+
+// ============================================================
+// Common Rolls Renderer – populates quick roller with selected char's stats
+// ============================================================
+let commonRollsUnsubscribe = null;
+
+export function renderCommonRolls() {
+    if (!currentContainer) return;
+    const container = currentContainer.querySelector('#vtt-common-rolls');
+    if (!container) return;
+
+    // Ensure auto-populate is active
+    initRollerAutoPopulate();
+
+    if (commonRollsUnsubscribe) commonRollsUnsubscribe();
+    commonRollsUnsubscribe = vttStore.subscribe('selectedCharacterId', (id) => {
+        const char = id ? vttStore.getSelectedCharacter() : null;
+        if (!char) {
+            setHtml(container, `<span style="color:var(--text3);font-size:0.9rem;">Select a character to use common rolls.</span>`);
+            return;
+        }
+
+        let html = `<div style="display:flex;flex-wrap:wrap;gap:0.4rem;margin-top:0.4rem;">`;
+        for (const [label, config] of Object.entries(COMMON_ROLLS)) {
+            const attrVal = char.attributes?.[config.attr] ?? 3;
+            const skillVal = char.skills?.[config.skill] ?? 0;
+            html += `
+                <button class="btn btn-sm btn-secondary common-roll-btn" 
+                        data-attr="${attrVal}" 
+                        data-skill="${skillVal}"
+                        data-label="${label}"
+                        style="font-size:0.8rem;padding:0.1rem 0.6rem;">
+                    ${label} (${attrVal}+${skillVal})
+                </button>
+            `;
+        }
+        html += `</div>`;
+        setHtml(container, html);
+
+        // Attach click handlers to populate the roller
+        container.querySelectorAll('.common-roll-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const attr = parseInt(btn.dataset.attr, 10) || 3;
+                const skill = parseInt(btn.dataset.skill, 10) || 0;
+                const label = btn.dataset.label;
+                // Set the quick roller fields
+                const attrSelect = q('#vtt-attr');
+                const skillSelect = q('#vtt-skill');
+                if (attrSelect) attrSelect.value = attr;
+                if (skillSelect) skillSelect.value = skill;
+                // Optionally set boons from selected char
+                const boonsInput = q('#vtt-boons');
+                if (boonsInput && char) {
+                    boonsInput.value = char.boons || 0;
+                }
+                // Show feedback
+                const output = q('#vtt-roll-output');
+                if (output) {
+                    output.innerHTML = `<span style="color:var(--text2);">⚡ ${label} prepared (Attr ${attr} + Skill ${skill})</span>`;
+                }
+                // Scroll to roller
+                const rollerPanel = q('.vtt-panel:has(#vtt-roll-output)');
+                if (rollerPanel) rollerPanel.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            });
+        });
+    });
+}
+
+// ============================================================
+// Timers (reactive) – increased font size
 // ============================================================
 let timerUnsubscribe = null;
 
@@ -264,7 +468,7 @@ export function renderVTTTimers() {
     if (timerUnsubscribe) timerUnsubscribe();
     timerUnsubscribe = vttStore.subscribe('timers', (timers) => {
         if (!timers || timers.length === 0) {
-            setHtml(list, `<div class="empty-state" style="text-align:center;padding:0.5rem;color:var(--text3);font-size:0.8rem;">⏱️ No active timers</div>`);
+            setHtml(list, `<div class="empty-state" style="text-align:center;padding:0.8rem;color:var(--text3);font-size:0.9rem;">⏱️ No active timers</div>`);
             return;
         }
         let html = '';
@@ -275,13 +479,13 @@ export function renderVTTTimers() {
             const progress = segments > 0 ? Math.min((current / segments) * 100, 100) : 0;
             const isComplete = progress >= 100;
             html += `
-                <div class="vtt-timer" style="margin-bottom:0.3rem;background:var(--bg3);border-radius:4px;padding:0.3rem 0.5rem;${isComplete ? 'border:1px solid var(--red);' : ''}">
-                    <div style="display:flex;justify-content:space-between;font-size:0.8rem;">
-                        <span>${escHtml(name)}</span>
+                <div class="vtt-timer" style="margin-bottom:0.4rem;background:var(--bg3);border-radius:6px;padding:0.4rem 0.6rem;${isComplete ? 'border:1px solid var(--red);' : ''}">
+                    <div style="display:flex;justify-content:space-between;font-size:0.9rem;">
+                        <span style="font-weight:600;">${escHtml(name)}</span>
                         <span>${current}/${segments} ${isComplete ? '✅' : ''}</span>
                     </div>
-                    <div style="width:100%;height:4px;background:var(--bg4);border-radius:2px;margin-top:2px;overflow:hidden;">
-                        <div style="width:${progress}%;height:100%;background:${isComplete ? 'var(--red)' : 'var(--gold)'};border-radius:2px;transition:width 0.3s;"></div>
+                    <div style="width:100%;height:6px;background:var(--bg4);border-radius:3px;margin-top:4px;overflow:hidden;">
+                        <div style="width:${progress}%;height:100%;background:${isComplete ? 'var(--red)' : 'var(--gold)'};border-radius:3px;transition:width 0.3s;"></div>
                     </div>
                 </div>
             `;
@@ -291,7 +495,7 @@ export function renderVTTTimers() {
 }
 
 // ============================================================
-// Presence (reactive with WebSocket integration)
+// Presence (reactive with WebSocket integration) – larger fonts
 // ============================================================
 let presenceUnsubscribe = null;
 
@@ -308,7 +512,7 @@ export function renderLocalPresence() {
         
         if (!presence || presence.length === 0) {
             setHtml(presenceList, `
-                <div style="color:var(--text3);padding:0.3rem 0;font-size:0.8rem;">
+                <div style="color:var(--text3);padding:0.4rem 0;font-size:0.9rem;">
                     ${isConnected ? '🌐 Connected, no other players' : '📡 Local mode'}
                     ${roomCode ? ` (${roomCode})` : ''}
                 </div>
@@ -323,11 +527,11 @@ export function renderLocalPresence() {
                 ? p.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(p.name)}&size=32&background=2c3e50&color=fff`
                 : '';
             html += `
-                <div class="presence-item" style="display:flex;align-items:center;gap:0.5rem;padding:0.2rem 0;border-bottom:1px solid var(--border);${isSelf ? 'background:var(--bg4);border-radius:4px;padding:0.2rem 0.4rem;' : ''}">
-                    ${showAvatars ? `<img src="${avatarUrl}" alt="${p.name}" style="width:28px;height:28px;border-radius:50%;object-fit:cover;" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2232%22 height=%2232%22 viewBox=%220 0 32 32%22%3E%3Crect fill=%22%232c3e50%22 width=%2232%22 height=%2232%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22 dy=%22.35em%22 fill=%22%23fff%22 font-family=%22Arial%22 font-size=%2214%22%3E${encodeURIComponent(p.name.charAt(0))}%3C/text%3E%3C/svg%3E'" />` : ''}
-                    <span style="font-weight:${isSelf ? '600' : '400'};">${escHtml(p.name)}${isSelf ? ' (you)' : ''}</span>
-                    <span style="font-size:0.7rem;color:var(--text2);background:var(--bg4);padding:0.05rem 0.4rem;border-radius:12px;">${p.tier ? `Tier ${p.tier}` : 'Player'}</span>
-                    <span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${p.online !== false ? 'var(--green)' : 'var(--text3)'};margin-left:auto;" title="${p.online !== false ? 'Online' : 'Offline'}"></span>
+                <div class="presence-item" style="display:flex;align-items:center;gap:0.6rem;padding:0.3rem 0;border-bottom:1px solid var(--border);${isSelf ? 'background:var(--bg4);border-radius:6px;padding:0.3rem 0.6rem;' : ''}">
+                    ${showAvatars ? `<img src="${avatarUrl}" alt="${p.name}" style="width:32px;height:32px;border-radius:50%;object-fit:cover;" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2232%22 height=%2232%22 viewBox=%220 0 32 32%22%3E%3Crect fill=%22%232c3e50%22 width=%2232%22 height=%2232%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22 dy=%22.35em%22 fill=%22%23fff%22 font-family=%22Arial%22 font-size=%2214%22%3E${encodeURIComponent(p.name.charAt(0))}%3C/text%3E%3C/svg%3E'" />` : ''}
+                    <span style="font-weight:${isSelf ? '600' : '400'};font-size:0.95rem;">${escHtml(p.name)}${isSelf ? ' (you)' : ''}</span>
+                    <span style="font-size:0.8rem;color:var(--text2);background:var(--bg4);padding:0.05rem 0.5rem;border-radius:12px;">${p.tier ? `Tier ${p.tier}` : 'Player'}</span>
+                    <span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:${p.online !== false ? 'var(--green)' : 'var(--text3)'};margin-left:auto;" title="${p.online !== false ? 'Online' : 'Offline'}"></span>
                 </div>
             `;
         }
@@ -336,7 +540,7 @@ export function renderLocalPresence() {
 }
 
 // ============================================================
-// Voice Clients (reactive)
+// Voice Clients (reactive) – larger fonts
 // ============================================================
 let voiceUnsubscribe = null;
 
@@ -350,7 +554,7 @@ export function renderVoiceClients() {
     voiceUnsubscribe = vttStore.subscribe('voiceClients', (clients) => {
         countEl.textContent = `${clients.length} voice user${clients.length !== 1 ? 's' : ''}`;
         if (!clients || clients.length === 0) {
-            setHtml(listEl, `<span style="color:var(--text3);font-size:0.75rem;">No other voice clients.</span>`);
+            setHtml(listEl, `<span style="color:var(--text3);font-size:0.85rem;">No other voice clients.</span>`);
             return;
         }
         let html = '';
@@ -378,15 +582,15 @@ export function renderVoiceClients() {
                     break;
             }
             if (state !== 'connected' && state !== 'connecting') {
-                callButton = `<button class="btn btn-sm btn-primary voice-call-btn" data-client-id="${client.id}" style="font-size:0.6rem;padding:0.1rem 0.5rem;">📞 Call</button>`;
+                callButton = `<button class="btn btn-sm btn-primary voice-call-btn" data-client-id="${client.id}" style="font-size:0.7rem;padding:0.1rem 0.6rem;">📞 Call</button>`;
             } else if (state === 'connected') {
-                callButton = `<span style="font-size:0.6rem;color:var(--green);">● Live</span>`;
+                callButton = `<span style="font-size:0.7rem;color:var(--green);">● Live</span>`;
             }
             html += `
-                <span class="voice-client-badge" style="display:inline-flex;align-items:center;gap:0.4rem;padding:0.2rem 0.6rem;border-radius:12px;background:var(--bg4);font-size:0.7rem;border:1px solid var(--border);">
-                    <span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${isSpeaking};transition:background 0.3s;" title="${isSpeaking === 'var(--gold)' ? 'Speaking' : 'Silent'}"></span>
-                    <span>${escHtml(client.name)}</span>
-                    <span style="font-size:0.6rem;color:${statusColor};">${statusLabel}</span>
+                <span class="voice-client-badge" style="display:inline-flex;align-items:center;gap:0.4rem;padding:0.3rem 0.8rem;border-radius:20px;background:var(--bg4);font-size:0.85rem;border:1px solid var(--border);">
+                    <span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:${isSpeaking};transition:background 0.3s;" title="${isSpeaking === 'var(--gold)' ? 'Speaking' : 'Silent'}"></span>
+                    <span style="font-weight:500;">${escHtml(client.name)}</span>
+                    <span style="font-size:0.7rem;color:${statusColor};">${statusLabel}</span>
                     ${callButton}
                 </span>
             `;

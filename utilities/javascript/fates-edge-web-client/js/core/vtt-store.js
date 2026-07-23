@@ -1,6 +1,8 @@
 /**
  * Reactive store for VTT state.
  * All state mutations go through this store, and UI components subscribe to slices.
+ * 
+ * v2 – Added character selection and avatar support.
  */
 
 class VTTStore {
@@ -12,6 +14,7 @@ class VTTStore {
       voiceClients: [],        // { id, name, speaking, connectionState }
       presence: [],            // derived from characters + connection
       connectionStatus: 'local', // 'local' | 'connected'
+      selectedCharacterId: null, // [VTT SELECTION] ID of the currently selected character
     };
     this.subscribers = new Map(); // key -> Set of callbacks
     this._nextId = 1;
@@ -87,6 +90,43 @@ class VTTStore {
     this._updatePresence();
   }
 
+  // ----- [VTT SELECTION] Character selection -----
+
+  /**
+   * Select a character by ID.
+   * @param {string|null} id - character ID, or null to deselect
+   */
+  selectCharacter(id) {
+    const chars = this.state.characters || [];
+    if (id !== null && !chars.some(c => c.id === id)) {
+      console.warn('[VTTStore] Character not found:', id);
+      return;
+    }
+    this.setState({ selectedCharacterId: id });
+    // Dispatch a custom event for other parts of the UI to react
+    const selectedChar = id ? chars.find(c => c.id === id) : null;
+    document.dispatchEvent(new CustomEvent('characterSelected', {
+      detail: { character: selectedChar, id }
+    }));
+  }
+
+  /**
+   * Get the currently selected character object, or null if none.
+   */
+  getSelectedCharacter() {
+    const id = this.state.selectedCharacterId;
+    if (!id) return null;
+    const chars = this.state.characters || [];
+    return chars.find(c => c.id === id) || null;
+  }
+
+  /**
+   * Get the selected character ID, or null.
+   */
+  getSelectedCharacterId() {
+    return this.state.selectedCharacterId;
+  }
+
   // Internal: derive presence from characters + connection status
   _updatePresence() {
     const chars = this.state.characters || [];
@@ -97,7 +137,8 @@ class VTTStore {
         id: c.id || c.name,
         name: c.name || 'Unnamed',
         online: connected,
-        tier: c.tier || 'Player'
+        tier: c.tier || 'Player',
+        avatar: c.avatar || null, // [VTT SELECTION] Include avatar
       }));
     this.setState({ presence });
   }

@@ -1,6 +1,6 @@
 {
   "name": "kon-reh",
-  "version": "4.1.2",
+  "version": "4.1.2a",
   "description": "Fate's Edge Toolkit",
   "scripts": {
     "test": "vitest run --passWithNoTests",
@@ -14,5 +14,10 @@
     "vitest": "^1.0.0",
     "eslint": "^8.0.0"
   },
+<<<<<<< HEAD
   "_license": "Fate's Edge Proprietary Content – © 2024 Nicholas A. Gasper. All rights reserved."
+=======
+  "_license": "Fate's Edge Proprietary Content – © 2024 Nicholas A. Gasper. All rights reserved.",
+  "author": "Nicholas A. Gasper"
+>>>>>>> 7a9b39e (Squashed commits)
 }

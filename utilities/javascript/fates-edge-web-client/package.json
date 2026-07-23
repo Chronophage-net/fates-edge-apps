@@ -1,6 +1,6 @@
 {
   "name": "fates-edge-web-client",
-  "version": "4.0.0",
+  "version": "4.1.2a",
   "description": "Fate's Edge Toolkit Web Client",
   "scripts": {
     "dev": "vite",
@@ -16,5 +16,10 @@
   "devDependencies": {
     "vite": "^5.0.0"
   },
+<<<<<<< HEAD
   "_license": "Fate's Edge Proprietary Content – © 2024 Nicholas A. Gasper. All rights reserved."
+=======
+  "_license": "Fate's Edge Proprietary Content – © 2024 Nicholas A. Gasper. All rights reserved.",
+  "author": "Nicholas A. Gasper"
+>>>>>>> 7a9b39e (Squashed commits)
 }

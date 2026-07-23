@@ -1,6 +1,6 @@
 {
   "name": "fates-edge-socket-server",
-  "version": "4.1.2",
+  "version": "4.1.2a",
   "description": "Fate's Edge WebSocket + HTTP server with campaign storage, deck, and character management",
   "main": "server.js",
   "type": "commonjs",
@@ -27,5 +27,10 @@
   "engines": {
     "node": ">=18.0.0"
   },
+<<<<<<< HEAD
   "_license": "Fate's Edge Proprietary Content – © 2024 Nicholas A. Gasper. All rights reserved."
+=======
+  "_license": "Fate's Edge Proprietary Content – © 2024 Nicholas A. Gasper. All rights reserved.",
+  "author": "Nicholas A. Gasper"
+>>>>>>> 7a9b39e (Squashed commits)
 }

@@ -1,9 +1,37 @@
 /**
  * State management for Fate's Edge Toolkit
- * v3.0 - With Real-Time Sync Merging
+ * v3.1 - With VTT Selection & Character Attributes/Skills
  */
 
 import { generateId, getBaseUrl as utilsGetBaseUrl, getStorage, setStorage, removeStorage } from './utils.js';
+
+// ============================================================
+// CONSTANTS
+// ============================================================
+
+// [VTT SELECTION] Default attributes & skills for characters
+export const DEFAULT_ATTRIBUTES = { body: 3, mind: 3, soul: 3 };
+
+export const DEFAULT_SKILLS = {
+  stealth: 0,
+  investigate: 0,
+  perception: 0,
+  athletics: 0,
+  acrobatics: 0,
+  persuasion: 0,
+  deception: 0,
+  insight: 0,
+  survival: 0,
+  medicine: 0,
+  arcana: 0,
+  history: 0,
+  religion: 0,
+  nature: 0,
+  intimidation: 0,
+  performance: 0,
+  sleightOfHand: 0,
+  stealth: 0,
+};
 
 // ============================================================
 // STATE
@@ -132,6 +160,33 @@ export function clearState() {
     return state;
 }
 
+// [VTT SELECTION] Ensure character has attributes & skills
+function ensureCharacterDefaults(char) {
+    if (!char) return null;
+    // Attributes
+    if (!char.attributes || typeof char.attributes !== 'object') {
+        char.attributes = { ...DEFAULT_ATTRIBUTES };
+    } else {
+        // Ensure all default attributes exist
+        for (const [key, val] of Object.entries(DEFAULT_ATTRIBUTES)) {
+            if (char.attributes[key] === undefined) {
+                char.attributes[key] = val;
+            }
+        }
+    }
+    // Skills
+    if (!char.skills || typeof char.skills !== 'object') {
+        char.skills = { ...DEFAULT_SKILLS };
+    } else {
+        for (const [key, val] of Object.entries(DEFAULT_SKILLS)) {
+            if (char.skills[key] === undefined) {
+                char.skills[key] = val;
+            }
+        }
+    }
+    return char;
+}
+
 /**
  * Merge remote state with local state, detecting conflicts
  * @param {object} remoteState - State from server
@@ -156,12 +211,15 @@ export function mergeState(remoteState, version) {
                         resolution: 'pending'
                     });
                 } else {
-                    // Remote is newer or same version
+                    // Remote is newer or same version – ensure defaults then replace
+                    const mergedChar = { ...localChar, ...remoteChar };
+                    ensureCharacterDefaults(mergedChar);
                     const idx = state.characters.indexOf(localChar);
-                    state.characters[idx] = remoteChar;
+                    state.characters[idx] = mergedChar;
                 }
             } else {
-                // New character from remote
+                // New character from remote – ensure defaults
+                ensureCharacterDefaults(remoteChar);
                 state.characters.push(remoteChar);
             }
         });
@@ -534,12 +592,17 @@ export function clearVTTEvents() {
 // ============================================================
 
 export function getCharacters() {
+    // Ensure all characters have defaults
+    if (state.characters) {
+        state.characters = state.characters.map(c => ensureCharacterDefaults(c));
+    }
     return state.characters || [];
 }
 
 export function getCharacter(id) {
     const characters = state.characters || [];
-    return characters.find(c => c.id === id) || null;
+    const char = characters.find(c => c.id === id) || null;
+    return char ? ensureCharacterDefaults(char) : null;
 }
 
 export function addCharacter(character) {
@@ -549,6 +612,9 @@ export function addCharacter(character) {
     if (!character.createdAt) {
         character.createdAt = new Date().toISOString();
     }
+    // Ensure defaults
+    ensureCharacterDefaults(character);
+    // Set sync version
     character._syncVersion = Date.now();
     state.characters = [...(state.characters || []), character];
     saveState();
@@ -560,12 +626,15 @@ export function updateCharacter(id, updates) {
     const index = characters.findIndex(c => c.id === id);
     if (index === -1) return null;
     
+    const existing = characters[index];
     const updated = { 
-        ...characters[index], 
+        ...existing, 
         ...updates, 
         updatedAt: new Date().toISOString(),
         _syncVersion: Date.now()
     };
+    // Ensure defaults
+    ensureCharacterDefaults(updated);
     state.characters = [...characters.slice(0, index), updated, ...characters.slice(index + 1)];
     saveState();
     return updated;
@@ -575,6 +644,20 @@ export function deleteCharacter(id) {
     state.characters = (state.characters || []).filter(c => c.id !== id);
     saveState();
     return true;
+}
+
+// [VTT SELECTION] Helper to get character attribute
+export function getCharacterAttribute(charId, attrName) {
+    const char = getCharacter(charId);
+    if (!char) return null;
+    return char.attributes?.[attrName] ?? null;
+}
+
+// [VTT SELECTION] Helper to get character skill
+export function getCharacterSkill(charId, skillName) {
+    const char = getCharacter(charId);
+    if (!char) return null;
+    return char.skills?.[skillName] ?? null;
 }
 
 // ============================================================
@@ -999,6 +1082,8 @@ export default {
     addCharacter,
     updateCharacter,
     deleteCharacter,
+    getCharacterAttribute,
+    getCharacterSkill,
     addNPC,
     getNPCs,
     getNPC,
