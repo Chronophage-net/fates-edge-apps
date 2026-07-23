@@ -1,3 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kon'reh — Apex, Sanctum, and Reforge</title>
+<style>
+  html, body {
+    margin: 0; height: 100%;
+    background: radial-gradient(circle at 50% 20%, #1c1d2a 0%, #0a0a0e 70%);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    color: #e8e6df;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .landing { text-align: center; }
+  .landing h1 { color: #d4af37; font-size: 32px; margin-bottom: 4px; letter-spacing: 0.02em; }
+  .landing p { color: #9a9aa8; margin-top: 0; }
+  .landing button {
+    margin-top: 24px; background: #d4af37; color: #1a1400; border: none;
+    padding: 12px 28px; border-radius: 8px; font-size: 15px; font-weight: 700;
+    cursor: pointer; letter-spacing: 0.02em;
+  }
+  .landing button:hover { background: #e6c250; }
+</style>
+</head>
+<body>
+  <div class="landing">
+    <h1>Kon'reh</h1>
+    <p>Apex, Sanctum, and Reforge</p>
+    <button id="play-btn">▶ Play</button>
+  </div>
+
+<script>
 // ============================================================
 //  KON'REH ENGINE — implementation of the official LaTeX rulebook
 //  ("Corpus Canré Scholiatum" / Kon'reh Core Rules §1–9)
@@ -27,12 +60,12 @@
 // This file has ZERO DOM dependencies so it can be unit tested with
 // plain Node, then reused verbatim inside the browser UI module.
 
-export const DIRS = [[1, 0], [-1, 0], [0, 1], [0, -1]];
+const DIRS = [[1, 0], [-1, 0], [0, 1], [0, -1]];
 
-export const ONWARD_DIST = { red: 2, orange: 3, green: 4, blue: 5 };
-export const HOMEWARD_DIST = { red: 1, orange: 2, green: 3, blue: 4 };
+const ONWARD_DIST = { red: 2, orange: 3, green: 4, blue: 5 };
+const HOMEWARD_DIST = { red: 1, orange: 2, green: 3, blue: 4 };
 
-export class KonrehEngine {
+class KonrehEngine {
   constructor() { this.reset(); }
 
   reset() {
@@ -657,9 +690,9 @@ export class KonrehEngine {
 // This file has zero DOM dependencies (pure logic over KonrehEngine),
 // so it can be unit tested the same way as engine.mjs.
 
-export const DIRS4 = [[1, 0], [-1, 0], [0, 1], [0, -1]];
+const DIRS4 = [[1, 0], [-1, 0], [0, 1], [0, -1]];
 
-export const SCHOOLS = {
+const SCHOOLS = {
   ykrul: {
     name: 'Ykrul',
     tagline: 'Control before contact — count exits, not victims.',
@@ -815,7 +848,7 @@ function search(engine, depth, alpha, beta, weights, me) {
 // Picks a move for `player`, styled by `schoolId`. Returns null if the
 // player genuinely has no legal move anywhere (shouldn't normally be
 // called in that case — the engine itself declares a draw first).
-export function chooseAiMove(engine, player, schoolId, depth = 3) {
+function chooseAiMove(engine, player, schoolId, depth = 3) {
   const school = SCHOOLS[schoolId] || SCHOOLS.ykrul;
   const weights = school.weights;
   const moves = candidateMoves(engine, player);
@@ -838,7 +871,7 @@ export function chooseAiMove(engine, player, schoolId, depth = 3) {
 }
 
 // Picks a Reforge placement for the pending player, styled by schoolId.
-export function chooseAiReforgeChoice(engine, schoolId, depth = 2) {
+function chooseAiReforgeChoice(engine, schoolId, depth = 2) {
   if (!engine.pendingReforge) return null;
   const school = SCHOOLS[schoolId] || SCHOOLS.ykrul;
   const weights = school.weights;
@@ -886,7 +919,7 @@ function moveKind(move) {
 //  MODAL UI
 // ============================================================
 
-export function openKonrehModal() {
+function openKonrehModal() {
   const existing = document.getElementById('konreh-modal');
   if (existing) existing.remove();
 
@@ -1478,3 +1511,11 @@ function getRulesText() {
     <p style="color:var(--muted); font-size:11px;">Click a piece, then a highlighted square. Squares with several legal moves show a number — click it to choose.</p>
   `;
 }
+
+</script>
+  <script>
+    document.getElementById('play-btn').addEventListener('click', openKonrehModal);
+    openKonrehModal();
+  </script>
+</body>
+</html>
