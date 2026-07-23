@@ -501,16 +501,52 @@ export function render(el) {
             </div>
             
             <!-- ============================================================
-                 ABOUT
+                 ABOUT (UPDATED)
                  ============================================================ -->
             <div class="panel settings-panel">
                 <div class="panel-header">
-                    <h3>ℹ️ About</h3>
+                    <h3>ℹ️ About Fate's Edge</h3>
                 </div>
-                <p class="text-muted">Fate's Edge Toolkit v4.0 — Modular Edition with WebSocket & Voice<br />All data stays in your browser.</p>
-                <p class="text-muted small mt-1">© ${new Date().getFullYear()} Nicholas A. Gasper. All Rights Reserved.</p>
-                <p class="text-muted small">The SRD and Essentials are CC BY-NC-SA 4.0. Code is MIT.</p>
+                <div style="display:flex; gap:1rem; align-items:flex-start; margin-bottom:1rem;">
+                    <span style="font-size:2.5rem;">🐉</span>
+                    <div>
+                        <p style="margin:0 0 0.5rem; color:var(--text);">
+                            <strong>Fate's Edge</strong> is an open-source, narrative-first Virtual Tabletop. 
+                            It runs entirely in your browser; all data stays local.
+                        </p>
+                        <p style="margin:0; color:var(--text2); font-size:0.9rem;">
+                            <strong>Toolkit v4.0</strong> — Modular Edition · WebSocket & Voice Support
+                        </p>
+                    </div>
+                </div>
+                <hr style="border-color:var(--border); margin:1rem 0;" />
+                <div>
+                    <h4 style="margin:0 0 0.5rem; color:var(--gold);">
+                        🛠️ Creator: Nicholas A. Gasper 
+                        <span style="font-weight:400; color:var(--text2);">(Chronophage)</span>
+                    </h4>
+                    <p style="margin:0 0 0.5rem; color:var(--text); font-size:0.95rem;">
+                        I've been rolling dice since I was twelve — over three decades of tabletop stories.
+                        I live in the Twin Cities, Minnesota, and I'm a friendly, if slightly shy, 
+                        sysadmin/DevOps consultant with 20+ years in FreeBSD / Linux.
+                    </p>
+                    <p style="margin:0 0 0.8rem; color:var(--text); font-size:0.95rem;">
+                        I designed <em>Fate's Edge</em> and built this Virtual Tabletop as my first large 
+                        software project — an open‑source companion that puts the narrative first.
+                    </p>
+                    <blockquote style="margin:0.8rem 0; padding:0.8rem 1rem; background:rgba(201,168,76,0.05); border-left:3px solid var(--gold); border-radius:4px; font-style:italic; color:var(--text2); font-size:0.9rem;">
+                        <p style="margin:0;">
+                            “Keep It Stupid — minimal but not fragile. Work from user needs, 
+                            set a feature limit, build in layers. I'm not a developer by trade, 
+                            but that pattern has served me for decades.”
+                        </p>
+                    </blockquote>
+                    <p style="margin:0.5rem 0 0; color:var(--text3); font-size:0.85rem;">
+                        ☕ Fueled by coffee · 🧠 Neurodivergent & proud · 🌱 Community grows from within and without
+                    </p>
+                </div>
             </div>
+            <!-- END ABOUT SECTION -->
         </div>
     `;
     

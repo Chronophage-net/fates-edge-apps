@@ -73,6 +73,13 @@ const TIER_THRESHOLDS = [
     { min: 221, max: Infinity, tier: 'V', name: 'Mythic' }
 ];
 
+const TALENT_TIERS = [
+    { id: 'minor', label: 'Minor', xpRange: '2–3 XP', min: 2, max: 3 },
+    { id: 'major', label: 'Major', xpRange: '4–6 XP', min: 4, max: 6 },
+    { id: 'prestige', label: 'Prestige', xpRange: '7–10 XP', min: 7, max: 10 },
+    { id: 'epic', label: 'Epic', xpRange: '11+ XP', min: 11, max: 999 }
+];
+
 const REGIONS = [
     'Acasia', 'Aelaerem', 'Aeler', 'Aelinnel', 'Black Banners', 'Ecktoria',
     'Linn', 'Mistlands', 'Silkstrand', 'Theona', 'Thepyrgos', 'Ubral',
@@ -122,6 +129,7 @@ const editorState = {
 function initEditor() {
     if (editorState.initialized) return;
     
+    // Global click delegation for dynamic buttons and catalog adds
     document.addEventListener('click', (e) => {
         const target = e.target;
         
@@ -145,6 +153,20 @@ function initEditor() {
                 addCEDynamicFromWiki(type, select.value);
                 select.value = '';
             }
+            e.preventDefault();
+        }
+
+        // Catalog talent add button
+        if (target.matches('.ce-catalog-add-btn')) {
+            const name = target.dataset.name;
+            const cost = parseInt(target.dataset.cost, 10);
+            addTalentFromCatalog(name, cost);
+            e.preventDefault();
+        }
+
+        // Custom talent add button
+        if (target.matches('#ce-add-custom-talent')) {
+            addCEDynamic('talent');   // adds editable row
             e.preventDefault();
         }
     });
@@ -196,6 +218,7 @@ export function openEditor(id) {
     
     attachEditorEvents();
     recalculateXpBudget();
+    renderTalentCatalog();   // ← populate catalog
 }
 
 export function closeEditor() {
@@ -365,13 +388,11 @@ function calculateSkillCost(currentLevel, targetLevel) {
 function calculateTotalXpSpent(c) {
     let spent = 0;
     
-    // Attributes (base 1, each step costs new_rating × 3)
     spent += calculateAttributeCost(1, c.body || 1);
     spent += calculateAttributeCost(1, c.wits || 1);
     spent += calculateAttributeCost(1, c.spirit || 1);
     spent += calculateAttributeCost(1, c.presence || 1);
     
-    // Skills (base 0, each step costs new_level × 2)
     if (c.skills) {
         ALL_SKILLS.forEach(s => {
             const level = c.skills[s.toLowerCase()] || 0;
@@ -379,28 +400,97 @@ function calculateTotalXpSpent(c) {
         });
     }
     
-    // Talents
     if (c.talents) {
-        c.talents.forEach(t => {
-            spent += safeParseInt(t.cost, 0);
-        });
+        c.talents.forEach(t => spent += safeParseInt(t.cost, 0));
     }
     
-    // Assets
     if (c.assets) {
-        c.assets.forEach(a => {
-            spent += safeParseInt(a.cost, 0);
-        });
+        c.assets.forEach(a => spent += safeParseInt(a.cost, 0));
     }
     
-    // Equipment (weapons, armor, shields)
     if (c.equipment) {
-        c.equipment.forEach(e => {
-            spent += safeParseInt(e.cost, 0);
-        });
+        c.equipment.forEach(e => spent += safeParseInt(e.cost, 0));
     }
     
     return spent;
+}
+
+// ============================================================
+// TALENT CATALOG (TIER-GATED)
+// ============================================================
+
+function getAvailableTalentsForTier(totalXp) {
+    const appState = getState();
+    const localTalents = appState.talents || [];
+    const wikiEntries = appState.wikiEntries || [];
+    const wikiTalents = wikiEntries.filter(e => e.category === 'talents' || e.category === 'talent');
+
+    const allTalents = [
+        ...localTalents.map(t => ({ ...t, source: 'local' })),
+        ...wikiTalents.map(t => ({ ...t, name: t.title, description: t.body || t.description, source: 'wiki' }))
+    ];
+
+    const { tier } = getTierFromXp(totalXp);
+    let allowedTiers = [];
+    if (tier === 'I') allowedTiers = ['minor'];
+    else if (tier === 'II') allowedTiers = ['minor', 'major'];
+    else allowedTiers = ['minor', 'major', 'prestige', 'epic'];
+
+    return allTalents.filter(t => {
+        const cost = safeParseInt(t.cost, 0);
+        for (const tierObj of TALENT_TIERS) {
+            if (cost >= tierObj.min && cost <= tierObj.max && allowedTiers.includes(tierObj.id))
+                return true;
+        }
+        return false;
+    });
+}
+
+function renderTalentCatalog() {
+    const catalogEl = document.getElementById('ce-talent-catalog');
+    if (!catalogEl) return;
+    const totalXp = safeParseInt(document.getElementById('ce-total-xp')?.value, 32);
+    const available = getAvailableTalentsForTier(totalXp);
+
+    if (available.length === 0) {
+        catalogEl.innerHTML = '<div style="padding:0.5rem;color:var(--text3);font-size:0.85rem;">No talents available for your current tier.</div>';
+        return;
+    }
+
+    catalogEl.innerHTML = available.map(t => {
+        const cost = safeParseInt(t.cost, 0);
+        const tierObj = TALENT_TIERS.find(ti => cost >= ti.min && cost <= ti.max);
+        const tierLabel = tierObj ? tierObj.label : '?';
+        return `
+            <div class="talent-catalog-item" style="display:flex;align-items:center;padding:0.3rem 0.5rem;font-size:0.8rem;border-bottom:1px solid var(--border);">
+                <div class="talent-info" style="flex:1;">
+                    <span style="font-weight:500;">${escHtml(t.name)}</span>
+                    <span style="color:var(--gold); margin-left:0.3rem;">${cost} XP</span>
+                    <span style="color:var(--text3); font-size:0.75rem; margin-left:0.3rem;">(${tierLabel})</span>
+                    ${t.description ? `<div style="color:var(--text2); font-size:0.7rem;">${escHtml(t.description)}</div>` : ''}
+                </div>
+                <button class="btn btn-xs btn-primary ce-catalog-add-btn" data-name="${escHtml(t.name)}" data-cost="${cost}">Add</button>
+            </div>
+        `;
+    }).join('');
+}
+
+function addTalentFromCatalog(name, cost) {
+    const listEl = document.getElementById('ce-talent-list');
+    if (!listEl) return;
+
+    // Create read-only row
+    const row = document.createElement('div');
+    row.className = 'dynamic-row ce-talent-row';
+    row.innerHTML = `
+        <span class="ce-talent-name" style="flex:2; padding:0.2rem;">${escHtml(name)}</span>
+        <span class="ce-talent-cost" style="width:70px; text-align:center;">${cost}</span>
+        <button class="btn btn-xs editor-remove-btn">✕</button>
+    `;
+    listEl.appendChild(row);
+
+    recalculateXpBudget();
+    showToast(`Added talent "${name}" (${cost} XP)`, 'success');
 }
 
 // ============================================================
@@ -458,44 +548,43 @@ function attachEditorEvents() {
         }
     });
     
-    // Heritage change listener
     const heritageSelect = document.getElementById('ce-heritage');
     if (heritageSelect) {
         heritageSelect.addEventListener('change', updateHeritageNote);
     }
     
-    // XP input listener
     const xpInput = document.getElementById('ce-total-xp');
     if (xpInput) {
-        xpInput.addEventListener('input', updateTierDisplay);
-        xpInput.addEventListener('change', updateTierDisplay);
+        xpInput.addEventListener('input', () => {
+            updateTierDisplay();
+            renderTalentCatalog();   // re-render when XP changes
+        });
+        xpInput.addEventListener('change', () => {
+            updateTierDisplay();
+            renderTalentCatalog();
+        });
     }
     
-    // Armor type change
     const armorSelect = document.getElementById('ce-armor-type');
     if (armorSelect) {
         armorSelect.addEventListener('change', updateArmorConversion);
     }
     
-    // Shield type change
     const shieldSelect = document.getElementById('ce-shield-type');
     if (shieldSelect) {
         shieldSelect.addEventListener('change', recalculateXpBudget);
     }
     
-    // Weapon class change
     const weaponSelect = document.getElementById('ce-weapon-class');
     if (weaponSelect) {
         weaponSelect.addEventListener('change', updateWeaponMods);
     }
     
-    // Magic path change
     const magicPathSelect = document.getElementById('ce-magic-path');
     if (magicPathSelect) {
         magicPathSelect.addEventListener('change', updateMagicPathDisplay);
     }
     
-    // Skill inputs - validate against attribute cap
     ALL_SKILLS.forEach(s => {
         const key = s.toLowerCase();
         const input = document.getElementById(`ce-sk-${key}`);
@@ -511,14 +600,12 @@ function updateDerivedStats() {
     const spirit = safeParseInt(document.getElementById('ce-spirit')?.value, 1);
     const presence = safeParseInt(document.getElementById('ce-presence')?.value, 1);
     
-    // Fatigue max = Body
     const fatigueMaxEl = document.getElementById('ce-fatigue-max');
     if (fatigueMaxEl) fatigueMaxEl.textContent = body;
     
     const fatigueInput = document.getElementById('ce-fatigue');
     if (fatigueInput) fatigueInput.max = body;
     
-    // Obligation capacity = Spirit + Presence
     const obligCapEl = document.getElementById('ce-obligation-capacity');
     if (obligCapEl) obligCapEl.textContent = spirit + presence;
     
@@ -527,14 +614,12 @@ function updateDerivedStats() {
         obligInput.max = (spirit + presence) * 2;
     }
     
-    // Corruption timer max = Spirit (for Cantors)
     const corruptMaxEl = document.getElementById('ce-corruption-max');
     if (corruptMaxEl) corruptMaxEl.textContent = spirit;
     
     const corruptInput = document.getElementById('ce-corruption');
     if (corruptInput) corruptInput.max = spirit;
     
-    // Mental Strain max = Spirit (for Psionics)
     const strainMaxEl = document.getElementById('ce-mental-strain-max');
     if (strainMaxEl) strainMaxEl.textContent = spirit;
     
@@ -589,7 +674,6 @@ function updateMagicPathDisplay() {
             : 'No magic path selected';
     }
     
-    // Show/hide magic-specific trackers
     const corruptSection = document.getElementById('ce-corruption-section');
     if (corruptSection) {
         corruptSection.style.display = pathId === 'cantor' ? 'flex' : 'none';
@@ -604,19 +688,19 @@ function updateMagicPathDisplay() {
 }
 
 function validateSkillCap(skillKey, skillName) {
-    // Skill rating cannot exceed relevant Attribute
-    // This is a guideline; the GM may override
     const input = document.getElementById(`ce-sk-${skillKey}`);
     if (!input) return;
-    
     const level = safeParseInt(input.value, 0);
     if (level > 5) {
         input.value = 5;
         showToast(`${skillName} cannot exceed 5.`, 'warning');
     }
-    
     recalculateXpBudget();
 }
+
+// ============================================================
+// XP BUDGET CALCULATION (handles both input and span costs)
+// ============================================================
 
 function recalculateXpBudget() {
     const body = safeParseInt(document.getElementById('ce-body')?.value, 1);
@@ -626,23 +710,27 @@ function recalculateXpBudget() {
     
     let spent = 0;
     
-    // Attribute costs: each step costs new_rating × 3
     spent += calculateAttributeCost(1, body);
     spent += calculateAttributeCost(1, wits);
     spent += calculateAttributeCost(1, spirit);
     spent += calculateAttributeCost(1, presence);
     
-    // Skill costs: each step costs new_level × 2
     ALL_SKILLS.forEach(s => {
         const key = s.toLowerCase();
         const level = safeParseInt(document.getElementById(`ce-sk-${key}`)?.value, 0);
         spent += calculateSkillCost(0, level);
     });
     
-    // Talent costs
+    // Talent costs (handle both read‑only spans and input fields)
     document.querySelectorAll('.ce-talent-row').forEach(row => {
-        const costInput = row.querySelector('.ce-talent-cost');
-        spent += safeParseInt(costInput?.value, 0);
+        const costEl = row.querySelector('.ce-talent-cost');
+        if (costEl) {
+            if (costEl.tagName === 'INPUT') {
+                spent += safeParseInt(costEl.value, 0);
+            } else {
+                spent += safeParseInt(costEl.textContent, 0);
+            }
+        }
     });
     
     // Asset costs
@@ -675,40 +763,28 @@ function recalculateXpBudget() {
         spent += weaponXp[weaponId] || 0;
     }
     
-    // Bond XP (each bond gives +2 XP, max 2 at creation)
+    // Bond XP
     let bondCount = 0;
     document.querySelectorAll('.ce-bond-row').forEach(row => {
         const nameInput = row.querySelector('.ce-bond-name');
         const startCheck = row.querySelector('.ce-bond-start');
-        if (nameInput?.value.trim() && startCheck?.checked) {
-            bondCount++;
-        }
+        if (nameInput?.value.trim() && startCheck?.checked) bondCount++;
     });
     bondCount = Math.min(bondCount, 2);
     const xpFromBonds = bondCount * 2;
     
-    // Complication XP (each complication gives +2 XP, max 2 at creation)
+    // Complication XP
     let compCount = 0;
     document.querySelectorAll('.ce-complication-row').forEach(row => {
         const nameInput = row.querySelector('.ce-complication-name');
         const startCheck = row.querySelector('.ce-complication-start');
-        if (nameInput?.value.trim() && startCheck?.checked) {
-            compCount++;
-        }
+        if (nameInput?.value.trim() && startCheck?.checked) compCount++;
     });
     compCount = Math.min(compCount, 2);
     const xpFromComplications = compCount * 2;
     
-    // Starting XP = 32 + bonds + complications (max 36)
-    const startingXp = 32 + xpFromBonds + xpFromComplications;
-    const maxStartingXp = 36;
-    const effectiveStartingXp = Math.min(startingXp, maxStartingXp);
+    const totalXp = safeParseInt(document.getElementById('ce-total-xp')?.value, 32);
     
-    // For new characters: check if spent > effectiveStartingXp
-    const totalXpInput = document.getElementById('ce-total-xp');
-    const totalXp = safeParseInt(totalXpInput?.value, 32);
-    
-    // Update the budget display
     const budgetEl = document.getElementById('ce-xp-budget');
     if (budgetEl) {
         const remaining = totalXp - spent;
@@ -719,7 +795,7 @@ function recalculateXpBudget() {
                 <span style="color:${isOver ? 'var(--red)' : 'var(--green)'};font-weight:bold;">
                     ${remaining > 0 ? remaining + ' remaining' : remaining === 0 ? 'exactly spent' : Math.abs(remaining) + ' over budget!'}
                 </span>
-                ${editorState.isNew ? `<br><small>Bonds: +${xpFromBonds} XP | Complications: +${xpFromComplications} XP | Max starting: ${maxStartingXp} XP</small>` : ''}
+                ${editorState.isNew ? `<br><small>Bonds: +${xpFromBonds} XP | Complications: +${xpFromComplications} XP | Max starting: 36 XP</small>` : ''}
             </div>
         `;
     }
@@ -888,15 +964,24 @@ function buildEditorHTML(c) {
                 ${weaponTagCheckboxes}
             </div>
             
-            <!-- Step 7: Talents -->
+            <!-- Step 7: Talents (new catalog) -->
             <h3 style="margin:0.8rem 0 0.4rem;color:var(--gold);">Step 7 — Talents</h3>
             <div style="font-size:0.8rem;color:var(--text2);margin-bottom:0.4rem;">
                 Minor: 2–3 XP | Major: 4–6 XP | Prestige: 7–10 XP | Epic: 11+ XP
             </div>
-            ${wikiPickerHTML('talent', 'talents')}
+            
+            <!-- Catalog list -->
+            <div id="ce-talent-catalog" style="max-height:220px;overflow-y:auto;border:1px solid var(--border);border-radius:6px;background:var(--bg2);margin-bottom:0.5rem;">
+                <!-- populated by renderTalentCatalog() -->
+            </div>
+            
+            <div style="margin-bottom:0.3rem;">
+                <button class="btn btn-sm btn-primary" id="ce-add-custom-talent">✏️ Add Custom Talent</button>
+            </div>
+            
             <div class="dynamic-list" id="ce-talent-list">${talentRows}</div>
             
-            <!-- Step 8: Assets -->
+            <!-- Step 8: Assets (unchanged) -->
             <h3 style="margin:0.8rem 0 0.4rem;color:var(--gold);">Step 8 — Assets</h3>
             <div style="font-size:0.8rem;color:var(--text2);margin-bottom:0.4rem;">
                 Minor: 4 XP | Standard: 8 XP | Major: 12 XP
@@ -904,7 +989,7 @@ function buildEditorHTML(c) {
             ${wikiPickerHTML('asset', 'assets')}
             <div class="dynamic-list" id="ce-asset-list">${assetRows}</div>
             
-            <!-- Step 9: Equipment -->
+            <!-- Step 9: Equipment (unchanged) -->
             <h3 style="margin:0.8rem 0 0.4rem;color:var(--gold);">Step 9 — Additional Equipment</h3>
             ${wikiPickerHTML('equipment', 'equipment')}
             <div class="dynamic-list" id="ce-equipment-list">${equipRows}</div>
@@ -1025,7 +1110,7 @@ function dynamicRowHTML(type, idx, item = {}) {
         `;
     }
     
-    // Talent, Asset, Equipment rows
+    // Talent, Asset, Equipment rows (custom, editable)
     const placeholder = type === 'talent' ? 'Talent name' : type === 'asset' ? 'Asset name' : 'Equipment name';
     return `
         <div class="dynamic-row ce-${type}-row" data-index="${idx}">
@@ -1038,7 +1123,7 @@ function dynamicRowHTML(type, idx, item = {}) {
 }
 
 // ============================================================
-// WIKI PICKER
+// WIKI PICKER (still used for assets & equipment)
 // ============================================================
 
 function wikiPickerHTML(type, cat) {
@@ -1076,7 +1161,6 @@ export function saveEditor() {
     const v = s => g(s)?.value || '';
     const n = s => safeParseInt(g(s)?.value);
     
-    // Validate name
     const name = v('#ce-name');
     if (!name || !name.trim()) {
         showToast('Character name is required.', 'error');
@@ -1096,49 +1180,41 @@ export function saveEditor() {
     }
     
     try {
-        // Identity
         c.name = name.trim();
         c.heritage = v('#ce-heritage') || 'human';
         c.region = v('#ce-region');
         c.culturalAffinity = v('#ce-cultural-affinity');
         
-        // Background
         c.background = v('#ce-background');
         c.backgroundTags = v('#ce-background-tags') ? v('#ce-background-tags').split(',').map(t => t.trim()).filter(Boolean) : [];
         c.backgroundContact = v('#ce-background-contact');
         c.backgroundBoon = v('#ce-background-boon');
         c.backgroundObligation = v('#ce-background-obligation');
         
-        // Attributes (1-5)
         c.body = clamp(n('#ce-body'), 1, 5);
         c.wits = clamp(n('#ce-wits'), 1, 5);
         c.spirit = clamp(n('#ce-spirit'), 1, 5);
         c.presence = clamp(n('#ce-presence'), 1, 5);
         
-        // Derived stats
         c.fatigueMax = c.body;
         c.obligationCapacity = c.spirit + c.presence;
         c.corruptionMax = c.spirit;
         c.mentalStrainMax = c.spirit;
         
-        // Skills (0-5)
         if (!c.skills) c.skills = defaultSkills();
         ALL_SKILLS.forEach(s => {
             c.skills[s.toLowerCase()] = clamp(n('#ce-sk-' + s.toLowerCase()), 0, 5);
         });
         
-        // Magic & Patron
         c.magicPath = v('#ce-magic-path') || 'none';
         c.patron = v('#ce-patron');
         
-        // Combat loadout
         c.armorType = v('#ce-armor-type') || 'none';
         c.shieldType = v('#ce-shield-type') || 'none';
         c.weaponClass = v('#ce-weapon-class') || 'light';
         c.weaponTags = Array.from(document.querySelectorAll('.ce-weapon-tag:checked')).map(cb => cb.value);
         c.armorConversion = ARMOR_TYPES.find(a => a.id === c.armorType)?.conversion || '';
         
-        // Status
         c.totalXp = Math.max(0, n('#ce-total-xp'));
         const { tier, name: tierName } = getTierFromXp(c.totalXp);
         c.tier = tier;
@@ -1153,7 +1229,7 @@ export function saveEditor() {
         c.mentalStrain = clamp(n('#ce-mental-strain'), 0, c.mentalStrainMax);
         c.vtt = document.getElementById('ce-vtt')?.checked || false;
         
-        // Dynamic lists
+        // Dynamic lists (now handles both read-only spans and inputs)
         c.talents = readDynamicList('talent');
         c.assets = readDynamicList('asset');
         c.equipment = readDynamicList('equipment');
@@ -1172,7 +1248,6 @@ export function saveEditor() {
                 showToast(`Only 2 Complications can grant +XP at creation. ${startComps} marked. Only first 2 will count.`, 'warning');
             }
             
-            // Calculate XP
             c.xpFromBonds = Math.min(startBonds, 2) * 2;
             c.xpFromComplications = Math.min(startComps, 2) * 2;
             c.startingXp = 32 + c.xpFromBonds + c.xpFromComplications;
@@ -1182,7 +1257,6 @@ export function saveEditor() {
                 showToast('Starting XP capped at 36.', 'warning');
             }
             
-            // Check if overspent
             const spent = calculateTotalXpSpent(c);
             c.xpSpent = spent;
             
@@ -1196,7 +1270,6 @@ export function saveEditor() {
             }
         }
         
-        // Save
         updateCharacter(editorState.currentId, c);
         
         closeEditor();
@@ -1216,7 +1289,7 @@ export function saveEditor() {
 }
 
 // ============================================================
-// READ DYNAMIC LISTS
+// READ DYNAMIC LISTS (supports both input & span content)
 // ============================================================
 
 function readDynamicList(type) {
@@ -1228,51 +1301,43 @@ function readDynamicList(type) {
             const nameInput = row.querySelector('.ce-bond-name');
             const descInput = row.querySelector('.ce-bond-desc');
             const startCheck = row.querySelector('.ce-bond-start');
-            
-            const name = nameInput ? nameInput.value.trim() : '';
+            const name = nameInput ? (nameInput.tagName === 'INPUT' ? nameInput.value.trim() : nameInput.textContent.trim()) : '';
             if (!name) continue;
-            
             items.push({
                 name,
-                desc: descInput ? descInput.value.trim() : '',
+                desc: descInput ? (descInput.tagName === 'INPUT' ? descInput.value.trim() : descInput.textContent.trim()) : '',
                 start: startCheck ? startCheck.checked : false
             });
         } else if (type === 'complication') {
             const nameInput = row.querySelector('.ce-complication-name');
             const descInput = row.querySelector('.ce-complication-desc');
             const startCheck = row.querySelector('.ce-complication-start');
-            
-            const name = nameInput ? nameInput.value.trim() : '';
+            const name = nameInput ? (nameInput.tagName === 'INPUT' ? nameInput.value.trim() : nameInput.textContent.trim()) : '';
             if (!name) continue;
-            
             items.push({
                 name,
-                desc: descInput ? descInput.value.trim() : '',
+                desc: descInput ? (descInput.tagName === 'INPUT' ? descInput.value.trim() : descInput.textContent.trim()) : '',
                 start: startCheck ? startCheck.checked : false
             });
         } else if (type === 'asset') {
-            const nameInput = row.querySelector('.ce-asset-name');
-            const costInput = row.querySelector('.ce-asset-cost');
+            const nameEl = row.querySelector('.ce-asset-name');
+            const costEl = row.querySelector('.ce-asset-cost');
             const tierSelect = row.querySelector('.ce-asset-tier');
-            
-            const name = nameInput ? nameInput.value.trim() : '';
+            const name = nameEl ? (nameEl.tagName === 'INPUT' ? nameEl.value.trim() : nameEl.textContent.trim()) : '';
             if (!name) continue;
-            
             items.push({
                 name,
-                cost: costInput ? safeParseInt(costInput.value, 0) : 0,
+                cost: costEl ? (costEl.tagName === 'INPUT' ? safeParseInt(costEl.value, 0) : safeParseInt(costEl.textContent, 0)) : 0,
                 tier: tierSelect ? tierSelect.value : 'minor'
             });
         } else {
-            const nameInput = row.querySelector('.ce-' + type + '-name');
-            const costInput = row.querySelector('.ce-' + type + '-cost');
-            
-            const name = nameInput ? nameInput.value.trim() : '';
+            const nameEl = row.querySelector('.ce-' + type + '-name');
+            const costEl = row.querySelector('.ce-' + type + '-cost');
+            const name = nameEl ? (nameEl.tagName === 'INPUT' ? nameEl.value.trim() : nameEl.textContent.trim()) : '';
             if (!name) continue;
-            
             items.push({
                 name,
-                cost: costInput ? safeParseInt(costInput.value, 0) : 0
+                cost: costEl ? (costEl.tagName === 'INPUT' ? safeParseInt(costEl.value, 0) : safeParseInt(costEl.textContent, 0)) : 0
             });
         }
     }
@@ -1286,10 +1351,7 @@ function readDynamicList(type) {
 
 export function addCEDynamic(type) {
     const container = document.getElementById('ce-' + type + '-list');
-    if (!container) {
-        console.warn(`[Editor] Container not found: ce-${type}-list`);
-        return;
-    }
+    if (!container) return;
     
     const idx = container.children.length;
     const div = document.createElement('div');
