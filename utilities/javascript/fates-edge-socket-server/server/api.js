@@ -1,6 +1,6 @@
 /**
  * Fate's Edge - Express API Routes
- * v7 – asynchronous file I/O + pluggable storage module
+ * v8 – Full character storage (room.characters) + WebSocket parity
  */
 
 const express = require('express');
@@ -22,12 +22,9 @@ function authenticate(req, res, next) {
 // ─── Pluggable storage ──────────────────────────────────────────────
 let storage = null;
 try {
-    // If you create a storage.js module exporting { saveCampaign, loadCampaign, ... }
-    // it will be used instead of the file system.
     storage = require('./storage.js');
     console.log('📦 Using custom storage module for campaigns.');
 } catch (e) {
-    // Fallback to file system (asynchronous)
     storage = {
         async saveCampaign(roomCode, campaignCode, data) {
             const campaignsDir = path.join(__dirname, 'campaigns');
@@ -35,7 +32,6 @@ try {
             const fileName = `${roomCode}-${campaignCode}.json`;
             const filePath = path.join(campaignsDir, fileName);
             await fsPromises.writeFile(filePath, JSON.stringify(data, null, 2));
-            // Consolidate: keep only last 2
             const files = await getCampaignFilesAsync(roomCode, campaignsDir);
             const MAX_CAMPAIGNS = 2;
             if (files.length > MAX_CAMPAIGNS) {
@@ -65,7 +61,7 @@ async function getCampaignFilesAsync(roomCode, campaignsDir) {
         const stat = await fsPromises.stat(fullPath);
         return { name: f, path: fullPath, mtime: stat.mtime };
     }));
-    return stats.sort((a, b) => b.mtime - a.mtime); // newest first
+    return stats.sort((a, b) => b.mtime - a.mtime);
 }
 
 function createApiRouter(appConfig) {
@@ -305,7 +301,7 @@ function createApiRouter(appConfig) {
         }
     });
 
-    // ─── Modules (unchanged) ──────────────────────────────────────
+    // ─── Modules ──────────────────────────────────────────────────────
     router.get('/api/modules', authenticate, (req, res) => {
         const modules = [];
         const modulesPath = path.join(__dirname, 'modules');
@@ -409,6 +405,107 @@ function createApiRouter(appConfig) {
         }
     });
 
+    // ─── FULL CHARACTER STORAGE ──────────────────────────────────────
+
+    // Helper to ensure room.characters exists (object keyed by character name)
+    function ensureCharacters(r) {
+        if (!r.characters) r.characters = {};
+        return r.characters;
+    }
+
+    // ─── Get all characters in a room ────────────────────────────
+    router.get('/api/rooms/:code/characters', authenticate, (req, res) => {
+        try {
+            const r = room.getRoom(req.params.code);
+            const chars = ensureCharacters(r);
+            const result = Object.values(chars);
+            res.json({ characters: result, count: result.length });
+        } catch (err) {
+            res.status(404).json({ error: err.message });
+        }
+    });
+
+    // ─── Get a single character ──────────────────────────────────
+    router.get('/api/rooms/:code/characters/:name', authenticate, (req, res) => {
+        try {
+            const r = room.getRoom(req.params.code);
+            const chars = ensureCharacters(r);
+            const name = req.params.name;
+            if (!chars[name]) {
+                return res.status(404).json({ error: 'Character not found' });
+            }
+            res.json(chars[name]);
+        } catch (err) {
+            res.status(404).json({ error: err.message });
+        }
+    });
+
+    // ─── Bulk update characters (full objects) ──────────────────
+    router.post('/api/rooms/:code/characters/update', authenticate, (req, res) => {
+        try {
+            const r = room.getRoom(req.params.code);
+            const chars = ensureCharacters(r);
+            const { updates } = req.body;
+            if (!updates || typeof updates !== 'object') {
+                return res.status(400).json({ error: 'Missing updates object' });
+            }
+
+            const results = {};
+            for (const [name, data] of Object.entries(updates)) {
+                if (!chars[name]) chars[name] = { name };
+                // Deep merge all top-level fields
+                for (const [key, value] of Object.entries(data)) {
+                    if (key === 'name') continue;
+                    chars[name][key] = value;
+                }
+                results[name] = chars[name];
+            }
+
+            r.lastActivity = Date.now();
+
+            // Broadcast the update to all WebSocket clients in the room
+            const charArray = Object.values(chars);
+            room.broadcastToRoom(r.code, 'state-updated', {
+                characters: charArray,
+                timestamp: Date.now()
+            });
+
+            res.json({ success: true, results });
+        } catch (err) {
+            res.status(500).json({ error: err.message });
+        }
+    });
+
+    // ─── Legacy numeric field endpoints (backward‑compatible) ────
+    // These read/write to the full character objects
+    const CHAR_FIELDS = ['harm', 'fatigue', 'obligation', 'boons', 'leash', 'corruption'];
+
+    CHAR_FIELDS.forEach(field => {
+        router.post(`/api/rooms/:code/characters/:name/${field}`, authenticate, (req, res) => {
+            try {
+                const r = room.getRoom(req.params.code);
+                const chars = ensureCharacters(r);
+                const name = req.params.name;
+                if (!chars[name]) chars[name] = { name };
+                const delta = typeof req.body.delta === 'number' ? req.body.delta : 0;
+                const current = chars[name][field] || 0;
+                chars[name][field] = Math.max(0, current + delta);
+                r.lastActivity = Date.now();
+
+                // Broadcast the individual update
+                room.broadcastToRoom(r.code, 'character-update', {
+                    name,
+                    field,
+                    value: chars[name][field]
+                });
+
+                res.json({ success: true, name, field, value: chars[name][field] });
+            } catch (err) {
+                res.status(500).json({ error: err.message });
+            }
+        });
+    });
+
     // ─── Character roster export (global) ──────────────────────────
     router.get('/api/characters/export', authenticate, (req, res) => {
         try {
@@ -421,13 +518,9 @@ function createApiRouter(appConfig) {
                     name: r.name || code,
                     characters: {}
                 };
-                if (r.characterState) {
-                    for (const [name, stats] of Object.entries(r.characterState)) {
-                        const entry = { name };
-                        CHAR_FIELDS.forEach(f => {
-                            entry[f] = stats[f] ?? 0;
-                        });
-                        roomData.characters[name] = entry;
+                if (r.characters) {
+                    for (const [name, data] of Object.entries(r.characters)) {
+                        roomData.characters[name] = data;
                     }
                 }
                 result.rooms[code] = roomData;
@@ -438,117 +531,12 @@ function createApiRouter(appConfig) {
         }
     });
 
-    // ─── Character‑state endpoints ──────────────────────────────
-    function ensureCharState(r) {
-        if (!r.characterState) r.characterState = {};
-    }
-
-    const CHAR_FIELDS = ['harm', 'fatigue', 'obligation', 'boons', 'leash', 'corruption'];
-
-    CHAR_FIELDS.forEach(field => {
-        router.post(`/api/rooms/:code/characters/:name/${field}`, authenticate, (req, res) => {
-            try {
-                const r = room.getRoom(req.params.code);
-                if (!r) return res.status(404).json({ error: 'Room not found' });
-                ensureCharState(r);
-                const name = req.params.name;
-                if (!r.characterState[name]) {
-                    r.characterState[name] = {};
-                    CHAR_FIELDS.forEach(f => { r.characterState[name][f] = 0; });
-                }
-                const delta = typeof req.body.delta === 'number' ? req.body.delta : 0;
-                const current = r.characterState[name][field] || 0;
-                r.characterState[name][field] = Math.max(0, current + delta);
-                r.lastActivity = Date.now();
-
-                room.broadcastToRoom(r.code, 'character-update', {
-                    name,
-                    field,
-                    value: r.characterState[name][field]
-                });
-
-                res.json({ success: true, name, field, value: r.characterState[name][field] });
-            } catch (err) {
-                res.status(500).json({ error: err.message });
-            }
-        });
-    });
-
-    router.get('/api/rooms/:code/characters/:name', authenticate, (req, res) => {
-        try {
-            const r = room.getRoom(req.params.code);
-            if (!r) return res.status(404).json({ error: 'Room not found' });
-            const state = r.characterState ? r.characterState[req.params.name] : null;
-            if (!state) return res.status(404).json({ error: 'Character not found' });
-            const result = { name: req.params.name };
-            CHAR_FIELDS.forEach(f => {
-                result[f] = state[f] ?? 0;
-            });
-            res.json(result);
-        } catch (err) {
-            res.status(500).json({ error: err.message });
-        }
-    });
-
-    router.get('/api/rooms/:code/characters', authenticate, (req, res) => {
-        try {
-            const r = room.getRoom(req.params.code);
-            if (!r) return res.status(404).json({ error: 'Room not found' });
-            ensureCharState(r);
-            const result = {};
-            for (const [name, stats] of Object.entries(r.characterState)) {
-                const entry = { name };
-                CHAR_FIELDS.forEach(f => {
-                    entry[f] = stats[f] ?? 0;
-                });
-                result[name] = entry;
-            }
-            res.json({ characters: result, count: Object.keys(result).length });
-        } catch (err) {
-            res.status(500).json({ error: err.message });
-        }
-    });
-
-    router.post('/api/rooms/:code/characters/update', authenticate, (req, res) => {
-        try {
-            const r = room.getRoom(req.params.code);
-            if (!r) return res.status(404).json({ error: 'Room not found' });
-            ensureCharState(r);
-            const { updates } = req.body;
-            if (!updates || typeof updates !== 'object') {
-                return res.status(400).json({ error: 'Missing updates object' });
-            }
-            const results = {};
-            for (const [name, fields] of Object.entries(updates)) {
-                if (!r.characterState[name]) {
-                    r.characterState[name] = {};
-                    CHAR_FIELDS.forEach(f => { r.characterState[name][f] = 0; });
-                }
-                const entry = r.characterState[name];
-                for (const [field, value] of Object.entries(fields)) {
-                    if (!CHAR_FIELDS.includes(field)) continue;
-                    entry[field] = Math.max(0, value);
-                }
-                results[name] = entry;
-            }
-            r.lastActivity = Date.now();
-            room.broadcastToRoom(r.code, 'character-update-bulk', { updates: results, timestamp: Date.now() });
-            res.json({ success: true, results });
-        } catch (err) {
-            res.status(500).json({ error: err.message });
-        }
-    });
-
-    // ─── Campaign sharing (now asynchronous) ──────────────────────
-    // The storage module is used if available; otherwise filesystem.
-
+    // ─── Campaign sharing ────────────────────────────────────────────
     router.post('/api/rooms/:code/campaigns', authenticate, async (req, res) => {
         try {
             const roomCode = req.params.code.toUpperCase();
             room.getRoom(roomCode); // verify room exists
 
-            // If the client provides an existing campaign code, we could overwrite it,
-            // but here we always generate a new code (as before).
             const random = Math.random().toString(36).substring(2, 8);
             const campaignCode = random;
 
@@ -580,7 +568,7 @@ function createApiRouter(appConfig) {
     router.get('/api/data/docs', (req, res) => {
         res.json({
             title: "Fate's Edge API Documentation",
-            version: "7.0.0",
+            version: "8.0.0",
             endpoints: {
                 health: { get: `GET ${config.healthEndpoint} - Server health check with stats` },
                 rooms: { get: 'GET /api/rooms - List all rooms with stats' },
@@ -604,10 +592,11 @@ function createApiRouter(appConfig) {
                     cleanup: 'POST /api/modules/:id/cleanup - Clean up module from clients'
                 },
                 characters: {
-                    get: 'GET /api/rooms/:code/characters/:name - Get character stats',
-                    list: 'GET /api/rooms/:code/characters - List all characters in a room',
-                    update: 'POST /api/rooms/:code/characters/update - Bulk update multiple characters',
-                    export: 'GET /api/characters/export - Export all character rosters across all rooms',
+                    get: 'GET /api/rooms/:code/characters/:name - Get full character object',
+                    list: 'GET /api/rooms/:code/characters - List all full character objects in a room',
+                    update: 'POST /api/rooms/:code/characters/update - Bulk update full character objects',
+                    export: 'GET /api/characters/export - Export all characters across all rooms',
+                    // Legacy numeric field endpoints (still work)
                     fields: {
                         harm: 'POST /api/rooms/:code/characters/:name/harm - Adjust harm',
                         fatigue: 'POST /api/rooms/:code/characters/:name/fatigue - Adjust fatigue',

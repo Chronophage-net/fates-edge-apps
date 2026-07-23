@@ -1,10 +1,11 @@
 /**
  * Fate's Edge - Plain WebSocket Handlers
- * v3 – Full feature parity with Socket.io:
+ * v4 – Full feature parity with Socket.io:
  *   - ping/pong heartbeat
  *   - full whiteboard sync (sheets + activeSheetId)
  *   - set-region command
  *   - room password support (handshake)
+ *   - full character storage (r.characters)
  */
 
 const WebSocket = require('ws');
@@ -70,7 +71,7 @@ function setupWSS(wss) {
             }
         }, 30000); // 30 seconds
 
-        // Send connected message
+        // ─── Send connected message ──────────────────────────────────
         ws.send(JSON.stringify({
             type: 'connected',
             clientId,
@@ -81,13 +82,15 @@ function setupWSS(wss) {
             serverVersion: '1.0.0'
         }));
 
-        // Send room state (includes full whiteboard + region if set)
+        // ─── Send room state (includes whiteboard, region, characters) ──
+        const charArray = currentRoom.characters ? Object.values(currentRoom.characters) : [];
         const roomStatePayload = {
             type: 'room-state',
             room: roomKey,
             deckRemaining: currentRoom.deck?.length || 0,
             historyCount: currentRoom.deckHistory?.length || 0,
             whiteboard: currentRoom.whiteboard || {},
+            characters: charArray,
             timestamp: Date.now()
         };
         if (currentRoom.data?.region) {
@@ -150,10 +153,9 @@ function setupWSS(wss) {
                         break;
 
                     case 'state-updated':
-                        room.broadcastToRoom(roomKey, 'state-updated', data, ws.clientId);
+                        handleStateUpdated(ws, currentRoom, data);
                         break;
 
-                    // ─── NEW: Region (parity with Socket.io) ──────────
                     case 'set-region':
                         handleSetRegion(ws, currentRoom, data);
                         break;
@@ -245,7 +247,7 @@ function setupWSS(wss) {
 // ─── Handler implementations ──────────────────────────────────────────
 
 function handleHandshake(ws, roomState, data) {
-    // ─── Password check (parity with Socket.io join-room) ──────────
+    // Password check (parity with Socket.io join-room)
     if (roomState.password && roomState.password !== data.password) {
         ws.send(JSON.stringify({ type: 'error', message: 'Incorrect room password.' }));
         ws.close(4003, 'Incorrect password');
@@ -273,6 +275,31 @@ function handleHandshake(ws, roomState, data) {
         clients: clientsList
     }, ws.clientId);
 }
+
+// ─── CHARACTER SYNC: store full characters ──────────────────────────
+function handleStateUpdated(ws, roomState, data) {
+    // If the update contains a characters array, store it in roomState.characters
+    if (data.state && data.state.characters && Array.isArray(data.state.characters)) {
+        const chars = {};
+        data.state.characters.forEach(c => {
+            if (c.name) chars[c.name] = c;
+        });
+        roomState.characters = chars;
+    } else if (data.characters && Array.isArray(data.characters)) {
+        // Also support direct characters field
+        const chars = {};
+        data.characters.forEach(c => {
+            if (c.name) chars[c.name] = c;
+        });
+        roomState.characters = chars;
+    }
+
+    roomState.lastActivity = Date.now();
+    // Broadcast to all clients in the room (including sender)
+    room.broadcastToRoom(roomState.code, 'state-updated', data, ws.clientId);
+}
+
+// ─── DECK HANDLERS ──────────────────────────────────────────────────
 
 async function handleDeckDraw(ws, roomState, data) {
     try {
@@ -394,15 +421,26 @@ function handleWhiteboardUpdate(ws, roomState, data) {
     }, ws.clientId);
 }
 
+// ─── SYNC REQUEST: send whiteboard + characters ──────────────────
+
 function handleSyncRequest(ws, roomState) {
+    // Send whiteboard state
     ws.send(JSON.stringify({
         type: 'sync-state',
         state: roomState.whiteboard || {},
         timestamp: Date.now()
     }));
+    // Also send characters if present
+    if (roomState.characters) {
+        ws.send(JSON.stringify({
+            type: 'state-updated',
+            characters: Object.values(roomState.characters),
+            timestamp: Date.now()
+        }));
+    }
 }
 
-// ─── NEW: Region handler (parity with Socket.io) ──────────────────
+// ─── REGION HANDLER ────────────────────────────────────────────────
 
 function handleSetRegion(ws, roomState, data) {
     const region = data?.region;

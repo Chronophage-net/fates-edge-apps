@@ -1,8 +1,14 @@
 #!/usr/bin/env node
 
 /**
- * Fate's Edge Terminal Client v2.2.0 – WebSocket + Dynamic Banners
- * Connects to ws://<host>:<port>?room=<ROOM_CODE>
+ * Fate's Edge Terminal Client v2.3.0 – Full WebSocket + REST API integration
+ * Supports all server features:
+ *   - Chat, dice rolls, deck, GM election, modules, region
+ *   - Character management (list, view, update stats)
+ *   - Whiteboard sync (draw, notes, images)
+ *   - Grid combat (tokens, zones, combat toggle)
+ *   - Admin commands (kick, ban, unban)
+ *   - Dynamic ANSI banners
  */
 
 const WebSocket = require('ws');
@@ -12,10 +18,10 @@ const path = require('path');
 
 // ─── Configuration ──────────────────────────────────────────────
 const CONFIG = {
-    defaultServerUrl: 'ws://localhost:3000',
+    defaultServerUrl: 'ws://localhost:10000',
     defaultRoom: 'ABC123',
     defaultName: 'Terminal Player',
-    defaultPassword: 'password123',
+    defaultPassword: '',
     reconnectDelay: 3000,
     maxReconnectAttempts: 5
 };
@@ -50,12 +56,11 @@ const colors = {
     white: "\x1b[37m"
 };
 
-// ─── Banners ─────────────────────────────────────────────────────
+// ─── Banners (unchanged) ────────────────────────────────────────
 const BANNER_CACHE_FILE = path.join(__dirname, 'banner_cache.json');
 const MAX_CACHE_SIZE = 20;
 const MIN_CACHE_SIZE = 5;
 
-// Default banner – a classic ANSI dragon
 const DEFAULT_BANNER = `
 ${colors.magenta}╔══════════════════════════════════════════════════════════╗
 ║                                                          ║
@@ -77,11 +82,10 @@ _#/|##########/\\#(   (_)   )#/\\##########|\\#_
                   (  | |
                  ___)(___)
 ${colors.reset}
-${colors.yellow}        ⚔️  Edge CLI v2.2.0 – Where fate meets stone  ⚔️${colors.reset}
+${colors.yellow}        ⚔️  Edge CLI v2.3.0 – Where fate meets stone  ⚔️${colors.reset}
 ${colors.magenta}╚══════════════════════════════════════════════════════════╝${colors.reset}
 `;
 
-// Remote banner sources (working .ans files from ansi.hrtk.in mirror)
 const REMOTE_BANNER_URLS = [
     'https://ansi.hrtk.in/ungenannt_motherofsorrows.ans',
     'https://ansi.hrtk.in/us-die2.ans',
@@ -95,7 +99,6 @@ const REMOTE_BANNER_URLS = [
     'https://ansi.hrtk.in/gr-zeit.ans'
 ];
 
-// Cache
 let bannerCache = [];
 
 function loadBannerCache() {
@@ -172,7 +175,6 @@ function getRandomBanner() {
     return bannerCache[Math.floor(Math.random() * bannerCache.length)];
 }
 
-// Load cache on startup
 loadBannerCache();
 setTimeout(() => {
     ensureBannerCache().catch(() => {});
@@ -194,6 +196,7 @@ let pendingRequests = [];
 let myRole = 'player';
 let deckRemaining = 0;
 let defaultRegion = 'Acasia';
+let characters = {}; // keyed by character name
 
 // ─── Readline ──────────────────────────────────────────────────
 const rl = readline.createInterface({
@@ -273,15 +276,38 @@ function printClientList() {
     rl.prompt(true);
 }
 
+function printCharacterList() {
+    const names = Object.keys(characters);
+    if (names.length === 0) {
+        printSystemMessage('No characters found in room state.');
+        return;
+    }
+    process.stdout.write('\r\x1b[K');
+    console.log(`${colors.cyan}👤 Characters (${names.length}):${colors.reset}`);
+    names.forEach(name => {
+        const c = characters[name];
+        const hp = c.harm !== undefined ? `❤️${c.harm}` : '';
+        const fatigue = c.fatigue ? `⚡${c.fatigue}` : '';
+        const boons = c.boons ? `🎲${c.boons}` : '';
+        const avatar = c.avatar ? '🖼️' : '';
+        console.log(`  ${avatar} ${colors.bold}${name}${colors.reset} ${hp} ${fatigue} ${boons}`);
+        if (c.attributes) {
+            const attrStr = Object.entries(c.attributes).map(([k,v]) => `${k}:${v}`).join(' ');
+            console.log(`    ${colors.dim}${attrStr}${colors.reset}`);
+        }
+    });
+    rl.prompt(true);
+}
+
 function printHelp() {
     process.stdout.write('\r\x1b[K');
     console.log(`
 ${colors.magenta}╔══════════════════════════════════════════════════════════════╗
-║  Edge CLI v2.2.0 - Commands                                    ║
+║  Edge CLI v2.3.0 - Commands                                    ║
 ╚══════════════════════════════════════════════════════════════╝${colors.reset}
 
 ${colors.yellow}Connection:${colors.reset}
-  /connect [url] [room]      Connect (e.g., /connect ws://localhost:3000 AIGM)
+  /connect [url] [room]      Connect (e.g., /connect ws://localhost:10000 AIGM)
   /disconnect                 Disconnect
   /status                     Show status
 
@@ -295,6 +321,25 @@ ${colors.yellow}Deck:${colors.reset}
   /crown [region]             Crown Spread
   /shuffle                    Shuffle deck
   /deck-status                Remaining cards
+
+${colors.yellow}Characters (NEW):${colors.reset}
+  /chars list                 List characters in room
+  /chars view <name>          View character details
+  /chars update <name> <field> <value>  Update a character stat
+  /chars sync                 Force sync characters from server
+
+${colors.yellow}Grid Combat (NEW):${colors.reset}
+  /grid on                    Enable grid combat
+  /grid off                   Disable grid combat
+  /grid status                Show grid combat status
+  /token add <name> [x] [y] [color]  Add token
+  /token list                 List tokens
+  /token remove <id>          Remove token
+  /token move <id> <x> <y>    Move token
+
+${colors.yellow}Whiteboard (NEW):${colors.reset}
+  /wb status                  Show whiteboard summary
+  /wb sync                    Force sync whiteboard from server
 
 ${colors.yellow}GM Management:${colors.reset}
   /gm request                 Request GM
@@ -327,7 +372,7 @@ ${colors.yellow}Admin (API Key Active):${colors.reset}
     rl.prompt(true);
 }
 
-// ─── REST API (admin) ──────────────────────────────────────────
+// ─── REST API (admin + characters + grid) ──────────────────────
 async function makeApiRequest(endpoint, method = 'GET', data = null) {
     const url = `${apiBaseUrl}${endpoint}`;
     const options = {
@@ -409,6 +454,139 @@ async function handleAdminCommand(args) {
     }
 }
 
+// ─── Character API commands ─────────────────────────────────────
+async function listCharacters() {
+    if (!roomCode) { printSystemMessage('Not connected to a room.', colors.red); return; }
+    try {
+        const result = await makeApiRequest(`/rooms/${roomCode}/characters`);
+        characters = {};
+        (result.characters || []).forEach(c => { if (c.name) characters[c.name] = c; });
+        printCharacterList();
+    } catch (err) {
+        printSystemMessage(`Failed to list characters: ${err.message}`, colors.red);
+    }
+}
+
+async function viewCharacter(name) {
+    if (!roomCode) { printSystemMessage('Not connected to a room.', colors.red); return; }
+    try {
+        const result = await makeApiRequest(`/rooms/${roomCode}/characters/${encodeURIComponent(name)}`);
+        console.log(`${colors.cyan}Character: ${colors.bold}${result.name}${colors.reset}`);
+        Object.keys(result).forEach(key => {
+            if (key === 'name') return;
+            console.log(`  ${key}: ${typeof result[key] === 'object' ? JSON.stringify(result[key]) : result[key]}`);
+        });
+        rl.prompt(true);
+    } catch (err) {
+        printSystemMessage(`Failed to view character: ${err.message}`, colors.red);
+    }
+}
+
+async function updateCharacter(name, field, value) {
+    if (!roomCode) { printSystemMessage('Not connected to a room.', colors.red); return; }
+    const updates = {};
+    updates[field] = value;
+    try {
+        await makeApiRequest(`/rooms/${roomCode}/characters/update`, 'POST', { updates: { [name]: updates } });
+        printSystemMessage(`✅ Updated ${name}.${field} = ${value}`);
+    } catch (err) {
+        printSystemMessage(`Failed to update character: ${err.message}`, colors.red);
+    }
+}
+
+// ─── Grid Combat API ────────────────────────────────────────────
+async function toggleGrid(enabled) {
+    if (!roomCode) { printSystemMessage('Not connected to a room.', colors.red); return; }
+    try {
+        await makeApiRequest(`/rooms/${roomCode}/grid-combat`, 'POST', { enabled });
+        printSystemMessage(`Grid combat ${enabled ? 'enabled' : 'disabled'}.`);
+    } catch (err) {
+        printSystemMessage(`Failed to toggle grid: ${err.message}`, colors.red);
+    }
+}
+
+async function addToken(name, x, y, color = '#d4af37') {
+    if (!roomCode) { printSystemMessage('Not connected to a room.', colors.red); return; }
+    const data = { name, x: x || 0, y: y || 0, color };
+    try {
+        const result = await makeApiRequest(`/rooms/${roomCode}/tokens`, 'POST', data);
+        printSystemMessage(`✅ Token added: ${name} (ID: ${result.id})`);
+    } catch (err) {
+        printSystemMessage(`Failed to add token: ${err.message}`, colors.red);
+    }
+}
+
+async function listTokens() {
+    if (!roomCode) { printSystemMessage('Not connected to a room.', colors.red); return; }
+    try {
+        const result = await makeApiRequest(`/rooms/${roomCode}/tokens`);
+        const tokens = result.tokens || [];
+        if (tokens.length === 0) {
+            printSystemMessage('No tokens in room.');
+        } else {
+            console.log(`${colors.cyan}Tokens (${tokens.length}):${colors.reset}`);
+            tokens.forEach(t => {
+                console.log(`  ${t.id}: ${t.name} (${t.x},${t.y}) [${t.color}]`);
+            });
+            rl.prompt(true);
+        }
+    } catch (err) {
+        printSystemMessage(`Failed to list tokens: ${err.message}`, colors.red);
+    }
+}
+
+async function removeToken(id) {
+    if (!roomCode) { printSystemMessage('Not connected to a room.', colors.red); return; }
+    try {
+        await makeApiRequest(`/rooms/${roomCode}/tokens/${id}`, 'DELETE');
+        printSystemMessage(`✅ Token ${id} removed.`);
+    } catch (err) {
+        printSystemMessage(`Failed to remove token: ${err.message}`, colors.red);
+    }
+}
+
+async function moveToken(id, x, y) {
+    if (!roomCode) { printSystemMessage('Not connected to a room.', colors.red); return; }
+    try {
+        await makeApiRequest(`/rooms/${roomCode}/tokens/${id}/move`, 'POST', { x, y });
+        printSystemMessage(`✅ Token ${id} moved to (${x},${y}).`);
+    } catch (err) {
+        printSystemMessage(`Failed to move token: ${err.message}`, colors.red);
+    }
+}
+
+// ─── Whiteboard API ─────────────────────────────────────────────
+async function getWhiteboardStatus() {
+    if (!roomCode) { printSystemMessage('Not connected to a room.', colors.red); return; }
+    try {
+        const wb = await makeApiRequest(`/rooms/${roomCode}/whiteboard`);
+        console.log(`${colors.cyan}Whiteboard state:${colors.reset}`);
+        console.log(`  Drawings: ${wb.drawings?.length || 0}`);
+        console.log(`  Notes: ${wb.notes?.length || 0}`);
+        console.log(`  Images: ${wb.images?.length || 0}`);
+        if (wb.gridCombat) {
+            const gc = wb.gridCombat;
+            console.log(`  Grid Combat: ${gc.enabled ? 'enabled' : 'disabled'}`);
+            console.log(`  Tokens: ${gc.tokens?.length || 0}`);
+            console.log(`  Grid Type: ${gc.gridType || 'square'}`);
+        }
+        rl.prompt(true);
+    } catch (err) {
+        printSystemMessage(`Failed to get whiteboard: ${err.message}`, colors.red);
+    }
+}
+
+async function syncWhiteboard() {
+    if (!roomCode) { printSystemMessage('Not connected to a room.', colors.red); return; }
+    try {
+        const wb = await makeApiRequest(`/rooms/${roomCode}/whiteboard`);
+        // In a real client, we could display or store it; here we just confirm
+        printSystemMessage(`Whiteboard synced (${wb.drawings?.length || 0} drawings, ${wb.notes?.length || 0} notes, ${wb.images?.length || 0} images).`);
+    } catch (err) {
+        printSystemMessage(`Failed to sync whiteboard: ${err.message}`, colors.red);
+    }
+}
+
 // ─── WebSocket connection ───────────────────────────────────────
 function connectToServer(url = serverUrl, room = roomCode) {
     if (connected) { printSystemMessage('Already connected.'); return; }
@@ -433,7 +611,7 @@ function connectToServer(url = serverUrl, room = roomCode) {
                 password: password,
                 clientName: clientName,
                 role: 'player',
-                version: '2.2.0'
+                version: '2.3.0'
             }));
         });
 
@@ -470,6 +648,7 @@ function disconnect() {
     gmId = null;
     pendingRequests = [];
     myRole = 'player';
+    characters = {};
     printSystemMessage('Disconnected.');
     rl.prompt(true);
 }
@@ -608,11 +787,39 @@ function handleMessage(msg) {
             if (msg.clients) updateClients(msg.clients);
             if (msg.deckRemaining !== undefined) deckRemaining = msg.deckRemaining;
             if (msg.data?.region) defaultRegion = msg.data.region;
+            if (msg.characters && Array.isArray(msg.characters)) {
+                characters = {};
+                msg.characters.forEach(c => { if (c.name) characters[c.name] = c; });
+            }
             printSystemMessage(`Room state received. ${Object.keys(clients).length} clients online.`);
             break;
 
         case 'state-updated':
-            printSystemMessage(`State updated by ${msg.updatedBy || 'Unknown'}`);
+            if (msg.characters && Array.isArray(msg.characters)) {
+                characters = {};
+                msg.characters.forEach(c => { if (c.name) characters[c.name] = c; });
+                printSystemMessage(`Characters updated (${Object.keys(characters).length} total).`);
+            } else {
+                printSystemMessage(`State updated by ${msg.updatedBy || 'Unknown'}`);
+            }
+            break;
+
+        case 'character-update':
+            if (msg.name) {
+                if (!characters[msg.name]) characters[msg.name] = { name: msg.name };
+                characters[msg.name][msg.field] = msg.value;
+                printSystemMessage(`⚡ ${msg.name}.${msg.field} = ${msg.value}`);
+            }
+            break;
+
+        case 'character-update-bulk':
+            if (msg.updates) {
+                Object.entries(msg.updates).forEach(([name, data]) => {
+                    if (!characters[name]) characters[name] = { name };
+                    Object.assign(characters[name], data);
+                });
+                printSystemMessage(`📋 Bulk character update (${Object.keys(msg.updates).length} characters).`);
+            }
             break;
 
         case 'error':
@@ -735,6 +942,7 @@ rl.on('line', (input) => {
                     printSystemMessage(`GM: ${gm ? gm.name : 'None'}`);
                     printSystemMessage(`Your role: ${myRole}`);
                     printSystemMessage(`Clients: ${Object.keys(clients).length}`);
+                    printSystemMessage(`Characters: ${Object.keys(characters).length}`);
                     if (ADMIN_MODE) printSystemMessage(`Admin mode: ✅`, colors.green);
                 }
                 break;
@@ -830,6 +1038,105 @@ rl.on('line', (input) => {
                         printSystemMessage(`🧹 Cleanup requested for ${modArg}`);
                         break;
                     default: printSystemMessage('Module commands: list, push <id>, cleanup <id>');
+                }
+                break;
+            }
+
+            // ─── NEW: Character commands ──────────────────────────
+            case 'chars': {
+                const charCmd = args[0]?.toLowerCase() || '';
+                const charArg1 = args[1];
+                const charArg2 = args[2];
+                const charArg3 = args[3];
+                switch (charCmd) {
+                    case 'list':
+                        if (!connected) { printSystemMessage('Not connected.'); break; }
+                        listCharacters();
+                        break;
+                    case 'view':
+                        if (!charArg1) { printSystemMessage('Usage: /chars view <name>'); break; }
+                        viewCharacter(charArg1);
+                        break;
+                    case 'update':
+                        if (!charArg1 || !charArg2 || charArg3 === undefined) {
+                            printSystemMessage('Usage: /chars update <name> <field> <value>');
+                            break;
+                        }
+                        updateCharacter(charArg1, charArg2, charArg3);
+                        break;
+                    case 'sync':
+                        if (!connected) { printSystemMessage('Not connected.'); break; }
+                        sendMessage('sync-request', { entity: 'characters' });
+                        printSystemMessage('Character sync requested.');
+                        break;
+                    default:
+                        printSystemMessage('Character commands: list, view <name>, update <name> <field> <value>, sync');
+                }
+                break;
+            }
+
+            // ─── NEW: Grid Combat ────────────────────────────────
+            case 'grid': {
+                const gridCmd = args[0]?.toLowerCase();
+                switch (gridCmd) {
+                    case 'on':
+                        toggleGrid(true);
+                        break;
+                    case 'off':
+                        toggleGrid(false);
+                        break;
+                    case 'status':
+                        if (!connected) { printSystemMessage('Not connected.'); break; }
+                        sendMessage('sync-request', { entity: 'grid' });
+                        printSystemMessage('Grid status requested.');
+                        break;
+                    default:
+                        printSystemMessage('Grid commands: on, off, status');
+                }
+                break;
+            }
+
+            case 'token': {
+                const tokenCmd = args[0]?.toLowerCase();
+                const tokenArgs = args.slice(1);
+                switch (tokenCmd) {
+                    case 'add':
+                        if (tokenArgs.length < 1) { printSystemMessage('Usage: /token add <name> [x] [y] [color]'); break; }
+                        const name = tokenArgs[0];
+                        const x = parseInt(tokenArgs[1]) || 0;
+                        const y = parseInt(tokenArgs[2]) || 0;
+                        const color = tokenArgs[3] || '#d4af37';
+                        addToken(name, x, y, color);
+                        break;
+                    case 'list':
+                        listTokens();
+                        break;
+                    case 'remove':
+                        if (!tokenArgs[0]) { printSystemMessage('Usage: /token remove <id>'); break; }
+                        removeToken(tokenArgs[0]);
+                        break;
+                    case 'move':
+                        if (tokenArgs.length < 3) { printSystemMessage('Usage: /token move <id> <x> <y>'); break; }
+                        moveToken(tokenArgs[0], parseInt(tokenArgs[1]), parseInt(tokenArgs[2]));
+                        break;
+                    default:
+                        printSystemMessage('Token commands: add, list, remove, move');
+                }
+                break;
+            }
+
+            // ─── NEW: Whiteboard ──────────────────────────────────
+            case 'wb': {
+                const wbCmd = args[0]?.toLowerCase();
+                switch (wbCmd) {
+                    case 'status':
+                        getWhiteboardStatus();
+                        break;
+                    case 'sync':
+                        syncWhiteboard();
+                        break;
+                    default:
+                        printSystemMessage('Whiteboard commands: status, sync');
                 }
                 break;
             }

@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 /**
  * Fate's Edge - Modular WebSocket Server
- * Supports Socket.io, plain WebSocket, GM election, ban/kick.
+ * Supports Socket.io, plain WebSocket, GM election, ban/kick,
+ * full character sync, and campaign storage.
  */
 
 try { require('dotenv').config(); } catch (e) {}
@@ -22,10 +23,24 @@ const ioHandlers = require('./socketio-handlers.js');
 // ---------- Express ----------
 const app = express();
 app.use(cors({ origin: config.corsOrigin }));
-// Increase payload limit for campaign state (which can be large)
+
+// Increase payload limit for campaign state and character updates (can be large)
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+
+// Mount API routes (health, rooms, deck, modules, characters, campaigns)
 app.use(api.createApiRouter(config));
+
+// Root route – simple status (optional)
+app.get('/', (req, res) => {
+    res.json({
+        name: "Fate's Edge WebSocket Server",
+        version: "1.0.0",
+        status: "running",
+        rooms: room.rooms.size,
+        timestamp: Date.now()
+    });
+});
 
 // ---------- HTTP server ----------
 const server = http.createServer(app);
@@ -35,7 +50,7 @@ const io = socketIo(server, {
     cors: { origin: config.corsOrigin, methods: ["GET", "POST"], credentials: true },
     transports: ['websocket', 'polling']
 });
-room.setIo(io);
+room.setIo(io);                // enable room.broadcastToRoom for Socket.io
 ioHandlers.setupSocketIO(io);
 
 // ---------- Plain WebSocket ----------
@@ -56,7 +71,10 @@ function gracefulShutdown(signal) {
     console.log(`\n🛑 Shutting down Fate's Edge server...`);
 
     server.close((err) => {
-        if (err) { logger.error('Error closing HTTP server', { error: err.message }); process.exit(1); }
+        if (err) {
+            logger.error('Error closing HTTP server', { error: err.message });
+            process.exit(1);
+        }
         logger.info('HTTP server closed.');
         io.close(() => {
             logger.info('Socket.io server closed.');
@@ -67,7 +85,12 @@ function gracefulShutdown(signal) {
             });
         });
     });
-    setTimeout(() => { logger.error('Forced shutdown after timeout.'); process.exit(1); }, 10000).unref();
+
+    // Force shutdown after 10 seconds
+    setTimeout(() => {
+        logger.error('Forced shutdown after timeout.');
+        process.exit(1);
+    }, 10000).unref();
 }
 process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
 process.on('SIGINT', () => gracefulShutdown('SIGINT'));
@@ -85,7 +108,7 @@ function startServer(port, retriesLeft) {
             if (retriesLeft > 0) {
                 logger.warn(`Port ${port} is in use. Trying next port (${port + 1})...`);
                 currentPort = port + 1;
-                server.close();
+                server.close();  // close the server to free the port
                 startServer(currentPort, retriesLeft - 1);
             } else {
                 logger.error(`Port ${port} is in use and no retries left. Exiting.`);
@@ -105,7 +128,8 @@ function startServer(port, retriesLeft) {
         console.log(`🚀 Server running on ${config.host}:${port}`);
         console.log(`📊 Health: http://localhost:${port}${config.healthEndpoint}`);
         console.log(`📚 API Docs: http://localhost:${port}/api/data/docs`);
-        console.log(`🔌 WebSocket (plain): ws://localhost:${port}?room=ROOM_CODE or /campaign/ROOM_CODE`);
+        console.log(`🔌 WebSocket (plain): ws://localhost:${port}?room=ROOM_CODE`);
+        console.log(`   (also supports /campaign/ROOM_CODE path)`);
         console.log(`🔌 WebSocket (Socket.io): http://localhost:${port}`);
         console.log(`📋 Rooms: ${room.rooms.size}`);
         console.log(`📊 Log Level: ${config.logLevel}`);

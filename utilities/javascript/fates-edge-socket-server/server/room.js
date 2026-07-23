@@ -1,5 +1,6 @@
 /**
- * Fate's Edge - Room & Client Management + Ban/Kick
+ * Fate's Edge - Room & Client Management + Ban/Kick + Character Storage
+ * v2 – Full character storage (r.characters) for WebSocket sync
  */
 
 const WebSocket = require('ws');
@@ -30,6 +31,7 @@ function getRoomStats(roomCode) {
         clients: room.clients.size,
         deckRemaining: room.deck?.length || 0,
         historyCount: room.deckHistory?.length || 0,
+        characterCount: room.characters ? Object.keys(room.characters).length : 0,
         lastActivity: room.lastActivity,
         created: room.created
     };
@@ -49,6 +51,37 @@ function getClientsList(room) {
         role: c.role,
         email: c.email || ''
     }));
+}
+
+// ---------- Character Helpers ----------
+function getCharacters(room) {
+    return room.characters ? Object.values(room.characters) : [];
+}
+
+function getCharacter(room, name) {
+    return room.characters && room.characters[name] ? room.characters[name] : null;
+}
+
+function setCharacters(room, charactersArray) {
+    if (!Array.isArray(charactersArray)) return;
+    const chars = {};
+    charactersArray.forEach(c => {
+        if (c.name) chars[c.name] = c;
+    });
+    room.characters = chars;
+    room.lastActivity = Date.now();
+}
+
+function updateCharacter(room, name, data) {
+    if (!room.characters) room.characters = {};
+    if (!room.characters[name]) room.characters[name] = { name };
+    // Merge all top-level fields
+    for (const [key, value] of Object.entries(data)) {
+        if (key === 'name') continue;
+        room.characters[name][key] = value;
+    }
+    room.lastActivity = Date.now();
+    return room.characters[name];
 }
 
 // ---------- Ban/Kick ----------
@@ -164,7 +197,7 @@ function setIo(ioInstance) { io = ioInstance; }
  * @param {string} roomCode - Room identifier
  * @param {string} event - Event name
  * @param {object} data - Event payload
- * @param {string|null} senderId - Optional client ID to exclude from plain WebSocket broadcast (self‑echo prevention)
+ * @param {string|null} senderId - Optional client ID to exclude from plain WebSocket broadcast
  */
 function broadcastToRoom(roomCode, event, data, senderId = null) {
     const roomKey = roomCode.toUpperCase();
@@ -186,7 +219,7 @@ function broadcastToRoom(roomCode, event, data, senderId = null) {
     const message = JSON.stringify({ type: event, ...payload });
     for (const [, client] of room.clients) {
         if (client.type === 'ws' && client.ws && client.ws.readyState === WebSocket.OPEN) {
-            if (senderId && client.id === senderId) continue; // skip sender
+            if (senderId && client.id === senderId) continue;
             client.ws.send(message);
         }
     }
@@ -208,7 +241,10 @@ function createRoom(roomCode) {
         lastActivity: Date.now(),
         created: Date.now(),
         whiteboard: createDefaultWhiteboard(),
-        banned: new Set()
+        characters: {},          // <-- Full character storage (keyed by name)
+        banned: new Set(),
+        password: null,          // Optional room password
+        data: {}                 // Generic data store (region, etc.)
     };
     rooms.set(roomKey, room);
     return room;
@@ -245,6 +281,10 @@ module.exports = {
     getRoomStats,
     getExistingGm,
     getClientsList,
+    getCharacters,
+    getCharacter,
+    setCharacters,
+    updateCharacter,
     kickClient,
     banClient,
     unbanClient,

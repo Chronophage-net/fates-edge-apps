@@ -1,6 +1,7 @@
 /**
  * Fate's Edge - Socket.io Handlers
- * v3 – Uniform behaviour with plain WebSocket, full whiteboard sync
+ * v4 – Uniform behaviour with plain WebSocket, full whiteboard sync,
+ *       and full character storage (r.characters)
  */
 
 const room = require('./room.js');
@@ -114,7 +115,9 @@ function setupSocketIO(io) {
                 activeClients: clientsList
             });
 
-            // Also keep room-joined for backwards compatibility
+            // ─── Include characters in room-joined ──────────────────
+            const charArray = currentRoom.characters ? Object.values(currentRoom.characters) : [];
+
             socket.emit('room-joined', {
                 room: roomKey,
                 clients: clientsList,
@@ -122,7 +125,8 @@ function setupSocketIO(io) {
                 deckRemaining: currentRoom.deck.length,
                 deckHistory: currentRoom.deckHistory.slice(-20),
                 totalClients: currentRoom.clients.size,
-                whiteboard: currentRoom.whiteboard || {}
+                whiteboard: currentRoom.whiteboard || {},
+                characters: charArray  // <-- send full characters
             });
 
             // Broadcast with sender exclusion
@@ -372,9 +376,7 @@ function setupSocketIO(io) {
             if (!socket.room) return socket.emit('error', { message: 'Not in a room' });
             const r = room.rooms.get(socket.room);
             if (!r) return socket.emit('error', { message: 'Room not found' });
-            // Accept either { whiteboard: ... } or { state: ... } or the object itself
             let newWhiteboard = data.whiteboard || data.state || data;
-            // Replace the server's whiteboard with the incoming one (full structure)
             r.whiteboard = newWhiteboard;
             r.lastActivity = Date.now();
             room.broadcastToRoom(socket.room, 'whiteboard-update', {
@@ -385,15 +387,49 @@ function setupSocketIO(io) {
             }, socket.id);
         });
 
+        // ─── CHARACTER SYNC: store full characters ──────────────────
+        socket.on('state-updated', (data) => {
+            if (!socket.room) return socket.emit('error', { message: 'Not in a room' });
+            const r = room.rooms.get(socket.room);
+            if (!r) return socket.emit('error', { message: 'Room not found' });
+
+            // If the update contains a characters array, store it in r.characters
+            if (data.state && data.state.characters && Array.isArray(data.state.characters)) {
+                const chars = {};
+                data.state.characters.forEach(c => {
+                    if (c.name) chars[c.name] = c;
+                });
+                r.characters = chars;
+            } else if (data.characters && Array.isArray(data.characters)) {
+                // Also support direct characters field
+                const chars = {};
+                data.characters.forEach(c => {
+                    if (c.name) chars[c.name] = c;
+                });
+                r.characters = chars;
+            }
+
+            r.lastActivity = Date.now();
+            // Broadcast to all clients in the room (including sender)
+            room.broadcastToRoom(socket.room, 'state-updated', data, socket.id);
+        });
+
         // ─── Sync requests ──────────────────────────────────────────
         socket.on('sync-request', (data) => {
             if (!socket.room) return socket.emit('error', { message: 'Not in a room' });
             const r = room.rooms.get(socket.room);
             if (!r) return socket.emit('error', { message: 'Room not found' });
-            // Send presence update (like /who)
+            // Send presence update
             socket.emit('presence', { clients: room.getClientsList(r) });
-            // Also send full whiteboard state
+            // Send whiteboard state
             socket.emit('sync-state', { state: r.whiteboard || {}, timestamp: Date.now() });
+            // Also send characters if present
+            if (r.characters) {
+                socket.emit('state-updated', {
+                    characters: Object.values(r.characters),
+                    timestamp: Date.now()
+                });
+            }
         });
 
         socket.on('sync-state', (data) => {
