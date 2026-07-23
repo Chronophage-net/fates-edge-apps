@@ -7,7 +7,6 @@
   "key_demographic": "Humans",
   "capital": "Ecktoria (The City)",
   "manifest_path": "/data/docs/manifest.json",
-
   "overview": {
     "tagline": "The flame remembers. The marble cracks. The law forgets — but the statues watch.",
     "genre": "Imperial decay, bureaucratic horror, memory as weight, Renaissance decadence — a city walled off from its own rot, where the wealthy dance while the poor cough ash.",
@@ -26,7 +25,6 @@
       "south": "The Amaranthine Sea — The old imperial navy rots in harbor; Zakov pirates and Thepyrgos chain-towers contest the straits. The flame of the Everflame does not burn on salt water."
     }
   },
-
   "quotes": [
     {
       "speaker": "Grand Magistrate (Elite)",
@@ -37,7 +35,6 @@
       "text": "I've seen the city burn three times. The marble remembers the heat. The flame remembers the lies. The rich have stopped looking at the flames. They only look at each other — and at the cracks in their own mirrors. The fire isn't burning anymore, friend. It's **smiling**."
     }
   ],
-
   "everflame_faith": {
     "description": "The state religion of Ecktoria is a syncretic faith that venerates the Eternal Flame as the divine principle, but its power flows through three great Orders, each devoted to a different Patron. The Basilica of the Unquenched Flame is the heart of the city: a cavernous space of gold mosaics, weeping saints, and the perpetual smell of beeswax and myrrh. Mass is held at dawn and dusk, the congregation coughing through the ash that falls from the censers. The priests sell indulgences in the side chapels — a silver coin for the remission of a small sin, a gold coin for a large one, a horse for a murder. The choir sings in Utaran, a language most parishioners no longer understand, but the melody is beautiful enough to make them weep — and to make the statues turn their heads.",
     "orders": [
@@ -59,31 +56,38 @@
     ],
     "flame_power": "The Everflame is both beautiful and ugly. Its gold leaf covers the same marble where petitioners once scratched their names. Its hymns are sung by choirboys whose families sold them for a loaf of bread. Its relics — a nail from the True Cross, a tear of Saint Lucia — draw pilgrims from across the empire, but the priests charge admission, and the poor sleep on the steps. The flame itself is a wonder: a pillar of blue-white fire that never gutters, tended by the High Priest alone. It is said to show the truth to any who stare into it long enough — and to show the same truth to the Vigil, who watch from the shadows. The truth is always the same: **you have forgotten something**."
   },
-
   "faction_spectrum": [
     {
       "name": "Old Blood",
       "type": "Patrician Traditionalists",
       "description": "The ancient senatorial families who remember when Ecktoria ruled the world. They worship precedent, hoard marble, and see mercenaries as necessary filth. Their power is in law, lineage, and the silent networks of the Censor's Hall.",
-      "timers": ["Patrician Patience [4]", "Blood Price [6]"],
+      "timers": [
+        "Patrician Patience [4]",
+        "Blood Price [6]"
+      ],
       "patron_whispers": "Livaea — they marry for influence, betray for pleasure, and mistake cruelty for wit. They mistake silence for consent."
     },
     {
       "name": "Black Purse",
       "type": "Mercenary & Trade Leagues",
       "description": "The new power: condotta brokers, coin-house factors, and mercenary captains who have bought what birth could not give. They care about supply lines, not bloodlines. Their loyalty is to the next contract, and their god is the tally — but the tally has no god.",
-      "timers": ["Contract Spiral [4]", "Payday Fever [6]"],
+      "timers": [
+        "Contract Spiral [4]",
+        "Payday Fever [6]"
+      ],
       "patron_whispers": "Maelstraeus — they measure profit in margins, margins in suffering, and suffering in silver. They do not measure the weight of marble."
     },
     {
       "name": "The Everflame",
       "type": "Church & Inquisition",
       "description": "The priests, inquisitors, and relic-keepers who claim that the Eternal Flame is the only true sovereign. They offer legitimacy to whoever pays the tithe — and withdraw it from whoever forgets. Their power is in pulpits, processions, and the fear of excommunication.",
-      "timers": ["Heresy Index [4]", "Sanctuary Violation [6]"],
+      "timers": [
+        "Heresy Index [4]",
+        "Sanctuary Violation [6]"
+      ],
       "patron_whispers": "Neither — the Everflame remembers, but the Vigil has learned to filter its truths. The flame's truth is ash; the Vigil's truth is silence."
     }
   ],
-
   "the_vigil": {
     "description": "The Vigil is not one order but three, each claiming the mantle of the old imperial secret police. They do not cooperate. They do not war. They **audit** each other. They also audit the dead.",
     "factions": [
@@ -91,24 +95,32 @@
         "name": "The Censer-Knights",
         "type": "Orthodox, Everflame",
         "description": "Hunters of untutored magic. They carry brass censers that smoke with bitter herbs and bells that ring once for a warning, thrice for a raid. They answer to the Synod and the High Priest, but their true loyalty is to the **precedent** — the law that magic must be licensed, indexed, and taxed. A Censer-Knight raid is heralded by a single, low bell. They are the most feared and the most public. They are also the most forgetful.",
-        "timers": ["Candle-Smoke Sweep [4]", "Heretic Index [6]"]
+        "timers": [
+          "Candle-Smoke Sweep [4]",
+          "Heretic Index [6]"
+        ]
       },
       {
         "name": "The Unburnt",
         "type": "Patrician",
         "description": "Bodyguards and spies of the Amber Palace. They wear red sashes and carry no visible weapons. Their job is to ensure that no whisper of rebellion, no bread riot, no unpaid toll ever reaches a patrician's ear. They are experts at **redaction** — not killing witnesses, but making them forget. They have forgotten their own names.",
-        "timers": ["Palace Secrets [4]", "Redacted Memory [6]"]
+        "timers": [
+          "Palace Secrets [4]",
+          "Redacted Memory [6]"
+        ]
       },
       {
         "name": "The Red Vigil",
         "type": "Maelstraeus's Own",
         "description": "Collectors and enforcers. They serve no noble, no church, no magistrate — only the record. They audit the wealthy for the wealthy, finding hidden obligations, unpaid tithes, and compound tolls that have grown teeth. A Red Vigil agent never demands coin. They demand **names**. They also demand silence — the silence of the forgotten.",
-        "timers": ["Toll Due [4]", "Roll of Names [6]"]
+        "timers": [
+          "Toll Due [4]",
+          "Roll of Names [6]"
+        ]
       }
     ],
     "meeting": "The Vigil's three commanders meet once a month in the hypogeum of the Arena, under the gaze of statues that weep marble tears. No record is kept of these meetings. No one admits they happen. The common folk say that if you see a Vigil agent, it is already too late — but they cannot agree on **which** Vigil. The statues know. The statues do not tell."
   },
-
   "npcs": [
     {
       "name": "Valerius",
@@ -159,14 +171,40 @@
       "quirk": "She has not left the Amber Palace in seven years. She does not know the price of bread. She dreams of bread."
     }
   ],
-
   "names": {
-    "first_male": ["Valerius", "Jackson", "Lucius", "Tiberius", "Gaius", "Decimus"],
-    "first_female": ["Flavia", "Cassia", "Aelia", "Cornelia", "Livia", "Valeria"],
-    "surnames": ["de Urbe", "Aquilinus", "Honoratus", "Lateranus", "Silvanus", "Portinari"],
-    "epithets": ["the Iron", "the Coin-Wise", "Flame-Touched", "the Unburned", "Bread-Counter", "Ash-Finger"]
+    "first_male": [
+      "Valerius",
+      "Jackson",
+      "Lucius",
+      "Tiberius",
+      "Gaius",
+      "Decimus"
+    ],
+    "first_female": [
+      "Flavia",
+      "Cassia",
+      "Aelia",
+      "Cornelia",
+      "Livia",
+      "Valeria"
+    ],
+    "surnames": [
+      "de Urbe",
+      "Aquilinus",
+      "Honoratus",
+      "Lateranus",
+      "Silvanus",
+      "Portinari"
+    ],
+    "epithets": [
+      "the Iron",
+      "the Coin-Wise",
+      "Flame-Touched",
+      "the Unburned",
+      "Bread-Counter",
+      "Ash-Finger"
+    ]
   },
-
   "places": [
     {
       "rank": 2,
@@ -214,7 +252,6 @@
       "mechanical_hook": ""
     }
   ],
-
   "people_and_factions": [
     {
       "rank": 2,
@@ -247,7 +284,6 @@
       "what_they_ask": ""
     }
   ],
-
   "complications": [
     {
       "rank": 2,
@@ -268,7 +304,6 @@
       "mechanical_hook": ""
     }
   ],
-
   "rewards": [
     {
       "rank": 2,
@@ -289,13 +324,11 @@
       "curse_cost": ""
     }
   ],
-
   "quick_use_notes": {
     "draw_rules": "Draw until you have all four suits: Spade = place, Heart = actor, Club = pressure, Diamond = leverage. Highest rank sets the main Timer (2–5 → 4, 6–10 → 6, J/Q/K → 8, A → 10).",
     "diamonds": "Diamonds are codified outcomes (papers/favor/precedence) that change position rather than call for a roll.",
     "ace_rule": "If any A appears, echo **marble and fire** motifs — statues that turn their heads, flames that burn blue, law that remembers every name — and also echo the **Vigil's presence**: a cough in the crowd, a seal on a document you did not stamp, a mirror that shows a different face. The different face is always older. It is always watching."
   },
-
   "additional_features": {
     "imperial_ruins": "Every district bears half-collapsed arcades, serving as markets, courts, or shelters for mercenary companies. The Vigil knows every hidden passage.",
     "competing_factions": "Dukes, guilds, and priests stage processions that collide at bridges and squares, each claiming legitimacy. The Vigil collects bets on the outcome.",
@@ -304,7 +337,6 @@
     "black_banner_contracts": "Foreign mercenaries fill the gaps left by a shrinking citizen levy, their loyalty secured only by steady coin. The Vigil audits their pay.",
     "amber_palace_quarantine": "The patricians have not left the palace in a decade. No one is certain if they are prisoners or patrons. The Vigil maintains the perimeter — and delivers the wine."
   },
-
   "local_patrons": [
     {
       "name": "St. Marcellus of the Gilded Scale",
@@ -341,7 +373,6 @@
       "description": "A secret society of patricians who worship pleasure as the only truth. Their rites are said to last nine days. No one has ever left a rite unchanged. The Vigil watches their parties — and reports to the Unburnt."
     }
   ],
-
   "lore_echoes": [
     {
       "title": "The Bitter Root",
@@ -364,7 +395,6 @@
       "description": "In any Ecktorian court, the ninth citation of precedent voids all previous. The wise stop at eight and settle. Those who cite the ninth hear a faint laughter from the marble walls — and their cases are never heard again. The Vigil cites the ninth often. The laughter does not bother them."
     }
   ],
-
   "superstitions": [
     {
       "name": "Bread to the Flame",
@@ -387,7 +417,6 @@
       "cost": "Burn for +1 die once"
     }
   ],
-
   "sb_spend_table": {
     "minor_complications": [
       "**Exposure:** Your actions draw unwanted attention from **city guards or rival factions**.",
@@ -424,7 +453,6 @@
       "**Ecktoria (The Vigil):** A seal appears on your documents that you did not stamp. A cough from the crowd sounds like your name. Your reflection in a polished shield has a red sash."
     ]
   },
-
   "extensions": {
     "cross_region_hooks": [
       "**Aeler True Masons bid** to shore a failing aqueduct; accepting stabilizes **Aftershock** but grants them soft leverage in the ward. The Vigil audits the contract.",
@@ -462,7 +490,6 @@
       "3_plus_sb": "**Patron Bargain**: accept a visible mark (ribbon, laurel brand) to halve consequences; start a **Patron Weight [6]**."
     }
   },
-
   "hidden_orders": [
     "**The Ash Senate** — a roll of 'extinguished' patrician lines still voting by proxy through funerary guilds. The Vigil has the key.",
     "**Surveyors of the Ninth Mile** — decumanus-masters who can **move** boundaries with ritual math; a lost rod sets precedent across the city. The Vigil owns the rod.",
@@ -477,7 +504,6 @@
     "**The Ember Vault** — a sealed reliquary under the Arena; victors' sweat was bottled for augury. The Vigil broke the seal.",
     "**Triumphal Maskers** — procession costumers who encode heretical theses into robe pleats and torch patterns. The Vigil decodes the theses — and sometimes agrees."
   ],
-
   "cults_and_rites": [
     {
       "name": "Children of the Phoenix",
@@ -520,7 +546,6 @@
       "description": "Saint of necessary arson: sanctify a fire to purge a tag (Plague/Corruption); City Heat +2."
     }
   ],
-
   "religious_schisms": {
     "schisms": [
       "**Orthodox Basilica vs. Ember Reformers:** Is miracle **counted** by law or **kindled** by need?",
@@ -537,59 +562,101 @@
       }
     }
   },
-
   "ecktoria_marble_and_fire": {
     "starting_location": "The Coin-House floor, marble cracked with soot lines, where votive candles burn beside melted icons.",
     "quote": "In Ecktoria, even faith must balance its ledgers, and the gods audit in ash.",
     "regional_motifs": "Coin-oaths, basilica relics, marble acoustics, augury smoke, Vigil seals.",
-    "whispers_to_offer": ["Bid against the city", "Pocket the relic shard", "Name an innocent debtor", "The Vigil's informer sits in the corner"],
+    "whispers_to_offer": [
+      "Bid against the city",
+      "Pocket the relic shard",
+      "Name an innocent debtor",
+      "The Vigil's informer sits in the corner"
+    ],
     "external_timers": {
       "threat": "Procession of Ash [6]",
       "community": "Credit Panic [4]",
       "anchor": "Basilica Choir [4]",
       "vigil": "Red List [6]"
     },
-    "complications": ["Smoke speaks truths; coins stick to skin; a reliquary runs hot; a seal appears on your documents that you did not stamp"],
-    "anchors_at_risk": ["A choir novice", "A patron account", "A Vigil informer who owes you a favor"],
+    "complications": [
+      "Smoke speaks truths; coins stick to skin; a reliquary runs hot; a seal appears on your documents that you did not stamp"
+    ],
+    "anchors_at_risk": [
+      "A choir novice",
+      "A patron account",
+      "A Vigil informer who owes you a favor"
+    ],
     "escalation_beat": "The Basilica tolls a note only one PC hears. The Vigil hears it too.",
     "relief": "Return the shard; pay a city-toll in blood or Boons; route the procession elsewhere; give the Vigil a name."
   },
-
   "boss_seeds": [
     {
       "name": "The Ember Prefect",
       "type": "Schismatic Inquisitor",
-      "phases": ["[8] Citation", "Censure", "Auto-da-fé", "Purge"],
+      "phases": [
+        "[8] Citation",
+        "Censure",
+        "Auto-da-fé",
+        "Purge"
+      ],
       "lair": "Everflame Cloister",
-      "counters": ["relic provenance", "crowd-favor", "rival sermon"],
+      "counters": [
+        "relic provenance",
+        "crowd-favor",
+        "rival sermon"
+      ],
       "vigil_twist": "The Prefect was once a Vigil informer. The Vigil knows where he hides."
     },
     {
       "name": "The Surveyor-Primus",
       "type": "Geomantic Usurper",
-      "phases": ["[6] Re-plat", "Dispossess", "Erase"],
+      "phases": [
+        "[6] Re-plat",
+        "Dispossess",
+        "Erase"
+      ],
       "lair": "Mile-Zero",
-      "counters": ["Aeler measure-rods", "witness line", "broken rod"],
+      "counters": [
+        "Aeler measure-rods",
+        "witness line",
+        "broken rod"
+      ],
       "vigil_twist": "The Primus has a Red Vigil agent as a protégé."
     },
     {
       "name": "Phoenix of the Arena",
       "type": "Miracle or Hoax",
-      "phases": ["[10] Hype", "Immolation", "'Rebirth'", "Riot"],
+      "phases": [
+        "[10] Hype",
+        "Immolation",
+        "'Rebirth'",
+        "Riot"
+      ],
       "lair": "Imperial Arena",
-      "counters": ["doused ash", "Mask of the Thirteenth", "Everflame test"],
+      "counters": [
+        "doused ash",
+        "Mask of the Thirteenth",
+        "Everflame test"
+      ],
       "vigil_twist": "The Phoenix is a Vigil experiment. The Unburnt want to contain it. The Red Vigil wants to sell tickets."
     },
     {
       "name": "The Velvet Mask",
       "type": "Livaea's Cult",
-      "phases": ["[8] Invitation", "Masque", "Price of Pleasure"],
+      "phases": [
+        "[8] Invitation",
+        "Masque",
+        "Price of Pleasure"
+      ],
       "lair": "The Amber Palace",
-      "counters": ["an unbroken oath", "a mirror with no reflection", "a name spoken without desire"],
+      "counters": [
+        "an unbroken oath",
+        "a mirror with no reflection",
+        "a name spoken without desire"
+      ],
       "vigil_twist": "The Vigil's Unburnt faction attends every masque. They are not there to stop it."
     }
   ],
-
   "forbidden_leverage": [
     {
       "rank": 14,
@@ -624,13 +691,11 @@
       "curse_cost": ""
     }
   ],
-
   "cross_contamination": [
     "**Aeler True Masons:** backing an iconoclast audit grants shoring crews; bell-codes now gate temple entries. The Vigil has the bell-codes.",
     "**Aelinnel Thorn Courts:** hawthorn chaplains host 'mirror sermons'; a basilica gains **Sanctuary** while a rival becomes **Anathema**. The Vigil watches both.",
     "**Black Banners:** war-chaplains monetize indulgences; clearing **Payday** risks +1 **Heresy Index**. The Vigil takes a cut."
   ],
-
   "patronage_and_power": {
     "description": "Ecktoria's decline is not collapse, but transformation. Wealth bleeds into patronage webs: a senator's indulgence, a censor's indulgence, a noble's purse. The city's great houses keep mercenary captains on retainer, while priests sell ritual processions as public theater and private favor. And everywhere, the Vigil watches — not to stop the rot, but to take notes. Yet beneath the decay, two demons whisper. **Maelstraeus** teaches that every contract is a weapon, every obligation a leash. **Livaea** teaches that every desire is a chain, every pleasure a payment. The patricians who once ruled the world now rule only the Amber Palace, and the Amber Palace is a gilded cage. They do not see the bread riots. They do not hear the Vigil's footsteps. They dance. They drink. They forget that the flame remembers everything.",
     "gm_advice": {
@@ -640,9 +705,7 @@
       "vigil_timer": "Introduce the **Vigil's Faction Timer [6]** to track which Vigil faction (Censer-Knights, Unburnt, Red Vigil) has the most leverage over the party. When it fills, that faction makes a demand."
     }
   },
-
   "final_gm_mantra": "Patronage in Ecktoria is not mere background — it is the engine of politics, coin, and survival. And beneath it all, Maelstraeus and Livaea are writing a contract. The city is the collateral. The poor are the interest. The patricians are the signature — and they signed in blood long ago.",
-
   "index": [
     "Ecktoria",
     "Marble and Fire generator",
@@ -684,5 +747,6 @@
     "Red Vigil",
     "Maelstraeus (demon)",
     "Livaea (demon)"
-  ]
+  ],
+  "_license": "Fate's Edge Proprietary Content – © 2024 Nicholas A. Gasper. All rights reserved."
 }

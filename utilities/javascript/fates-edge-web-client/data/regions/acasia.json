@@ -6,7 +6,6 @@
   "label": "chap:acasia",
   "key_demographic": "Human",
   "manifest_path": "/data/docs/manifest.json",
-  
   "overview": {
     "tagline": "The Empire conquered it first. The Empire left it last. Now neither remembers why.",
     "genre": "Low-fantasy wasteland, mercenary realism, cursed borderlands",
@@ -25,7 +24,6 @@
       "east": "Vhasian ambition rises and falls with the chaos within. Acasians learn to fear the 'High Season' of the Sun Court — a season of chevauchée and burning barns."
     }
   },
-
   "regional_diagnostic": {
     "current_hook": "The Empire conquered it first. The Empire left it last. Now neither remembers why.",
     "core_conflict": "Players are caught between the **Margravine's** iron law, the **Lame King's** desperate legitimacy, and the **Curse** that devours broken promises.",
@@ -53,7 +51,6 @@
       }
     ]
   },
-
   "quotes": [
     {
       "speaker": "Margravine of the Broken March (Elite)",
@@ -64,7 +61,6 @@
       "text": "Don't cross the Pale Causeway at dusk, especially not if you've got a silver tooth. The bridge'll remember it, and next time you pass, it'll want more than just your footfall. In Acasia, every road has a memory. The question is who pays the toll. The Empire forgot. That's why it fell."
     }
   ],
-
   "curse_timer": {
     "name": "Curse Awakening",
     "max_segments": 10,
@@ -80,19 +76,48 @@
       "10": "The Curse manifests as a physical threat — a bridge eats a village, a road swallows a patrol, or the ghost of the last emperor rides"
     },
     "stirrs_table": [
-      {"roll": 1, "complication": "A milestone points the wrong way. Navigation DV +2 for the scene."},
-      {"roll": 2, "complication": "A bridge you crossed earlier now loops back to where you started. Lose 1 segment of progress."},
-      {"roll": 3, "complication": "A toll collector's ghost demands payment in a currency that no longer exists. Pay 1 Boon or mark 1 Fatigue."},
-      {"roll": 4, "complication": "A child with no shadow offers directions. If you follow, you arrive at your destination — but you forget why you came."},
-      {"roll": 5, "complication": "The Margravine's seal cracks. One of your Diamonds (writ, charter, token) becomes a forgery until you re-witness it."},
-      {"roll": 6, "complication": "The Hollow's breath freezes the ford. Crossing requires a Desperate roll; on a Miss, you lose 1 Supply (drowned)."},
-      {"roll": 7, "complication": "A ghostly legionary patrol marches past at midnight. If you watch them, you gain +1 die on the next roll against imperial constructs. If you speak to them, they demand a password that died with the empire."},
-      {"roll": 8, "complication": "The bridge you are standing on remembers a name you have never spoken. It whispers it in your ear. Tick Curse Awakening +1; you may also learn a secret about the bridge's history."},
-      {"roll": 9, "complication": "A tax collector's ghost appears with a ledger. It demands payment on a debt that is older than your grandfather. Pay 1 Boon or lose a memory."},
-      {"roll": 10, "complication": "The crossroads shift. Three roads become one; the path you choose leads to a place you have already been. Lose 1 segment of progress and roll again."}
+      {
+        "roll": 1,
+        "complication": "A milestone points the wrong way. Navigation DV +2 for the scene."
+      },
+      {
+        "roll": 2,
+        "complication": "A bridge you crossed earlier now loops back to where you started. Lose 1 segment of progress."
+      },
+      {
+        "roll": 3,
+        "complication": "A toll collector's ghost demands payment in a currency that no longer exists. Pay 1 Boon or mark 1 Fatigue."
+      },
+      {
+        "roll": 4,
+        "complication": "A child with no shadow offers directions. If you follow, you arrive at your destination — but you forget why you came."
+      },
+      {
+        "roll": 5,
+        "complication": "The Margravine's seal cracks. One of your Diamonds (writ, charter, token) becomes a forgery until you re-witness it."
+      },
+      {
+        "roll": 6,
+        "complication": "The Hollow's breath freezes the ford. Crossing requires a Desperate roll; on a Miss, you lose 1 Supply (drowned)."
+      },
+      {
+        "roll": 7,
+        "complication": "A ghostly legionary patrol marches past at midnight. If you watch them, you gain +1 die on the next roll against imperial constructs. If you speak to them, they demand a password that died with the empire."
+      },
+      {
+        "roll": 8,
+        "complication": "The bridge you are standing on remembers a name you have never spoken. It whispers it in your ear. Tick Curse Awakening +1; you may also learn a secret about the bridge's history."
+      },
+      {
+        "roll": 9,
+        "complication": "A tax collector's ghost appears with a ledger. It demands payment on a debt that is older than your grandfather. Pay 1 Boon or lose a memory."
+      },
+      {
+        "roll": 10,
+        "complication": "The crossroads shift. Three roads become one; the path you choose leads to a place you have already been. Lose 1 segment of progress and roll again."
+      }
     ]
   },
-
   "npcs": [
     {
       "name": "Zara 'the Ledger'",
@@ -131,14 +156,40 @@
       "quirk": "She visits villages that no longer exist. The map shows them anyway. She carries a sealed chest of the last governor's papers."
     }
   ],
-
   "names": {
-    "first_male": ["Alboin", "Authari", "Liutprand", "Desiderius", "Ratchis", "Aistulf"],
-    "first_female": ["Theodelinda", "Rosamund", "Gundiberga", "Anspranda", "Veleda", "Gisela"],
-    "surnames": ["da Ponte", "del Ferro", "di Rocca", "Longobardus", "Saxo", "Capoferro"],
-    "epithets": ["the Stiff", "the Toll-Fist", "Bridge-Born", "Blackwood", "the Unremembered", "Ash-Finger"]
+    "first_male": [
+      "Alboin",
+      "Authari",
+      "Liutprand",
+      "Desiderius",
+      "Ratchis",
+      "Aistulf"
+    ],
+    "first_female": [
+      "Theodelinda",
+      "Rosamund",
+      "Gundiberga",
+      "Anspranda",
+      "Veleda",
+      "Gisela"
+    ],
+    "surnames": [
+      "da Ponte",
+      "del Ferro",
+      "di Rocca",
+      "Longobardus",
+      "Saxo",
+      "Capoferro"
+    ],
+    "epithets": [
+      "the Stiff",
+      "the Toll-Fist",
+      "Bridge-Born",
+      "Blackwood",
+      "the Unremembered",
+      "Ash-Finger"
+    ]
   },
-
   "places": [
     {
       "rank": 2,
@@ -258,7 +309,6 @@
       "mechanical_hook": "Crossing the Causeway at dusk forces a Resolve test (DV 4). On failure, you gain the Condition **Debtor to the Dead** (any spirit can demand one service from you). On a critical failure, the Curse Awakening timer ticks +2 immediately."
     }
   ],
-
   "people_and_factions": [
     {
       "rank": 2,
@@ -391,7 +441,6 @@
       "price": "A name you have never spoken. She will write it in her ledger. The Curse will remember it forever."
     }
   ],
-
   "complications": [
     {
       "rank": 2,
@@ -511,7 +560,6 @@
       "mechanical_hook": "Roll on the **Curse Stirrs** table (see Regional Mood section). The party cannot leave until they pay a toll — a story, a memory, or a name."
     }
   ],
-
   "rewards": [
     {
       "rank": 2,
@@ -631,21 +679,18 @@
       "curse_cost": "Using the rite clears all **Curse Awakening** segments for one night. The next morning, the Curse returns with double the segments. You cannot use the rite again in the same province."
     }
   ],
-
   "quick_use_notes": {
     "draw_rules": "Draw until you have all four suits: Spade = place, Heart = actor, Club = pressure, Diamond = leverage. Highest rank sets the main Timer (2–5 → 4, 6–10 → 6, J/Q/K → 8, A → 10).",
     "diamonds": "Diamonds are codified outcomes (papers/claims/safe-conducts) that change position rather than call for a roll.",
     "ace_rule": "If any A appears, echo plague and curse motifs—crossroads that turn back on themselves, bells tolling for no funeral, banners blackened by mildew, the ghost of the empire in every milestone.",
     "curse_tracking": "Track the **Curse Awakening [10]** timer as a campaign-wide pressure. Use the **Curse Stirrs** table when it reaches 8."
   },
-
   "additional_features": {
     "feud_as_currency": "Any insult, accident, or rumor can birth a feud; the GM may replace an SB result with a feud-token tied to a petty lord or house. Feud-tokens act as reusable complications: once per scene, the GM can spend a feud-token to have a rival appear, a bridge close, or a village refuse aid.",
     "rot_and_tithe": "Each market or harvest scene carries a risk of rot—add a pressure if food or coin are exchanged without a blessing or a seal. A failed roll may double the tithe or spoil stored supplies.",
     "curse_remembers": "When roads or negotiations stall, the GM may quietly repeat imagery—crossroads, whispers, mildew—to remind players that Acasia itself resists resolution. If the party ignores three such omens, the **Curse Stirrs** complication triggers automatically.",
     "empire_ghost": "Any ancient imperial structure (milestone, bridge, fortress) may still be haunted by the echo of its original purpose. A character who makes an offering (a coin, a salute, a whispered oath) may gain +1 die on a single roll within sight of that structure. The offering must be sincere. The empire does not accept bribes. It accepts memory."
   },
-
   "lore_echoes": [
     {
       "title": "The Bitter Root",
@@ -668,7 +713,6 @@
       "description": "In any Acasian scene, the ninth toll paid at a bridge is never the last. The wise pay eight and barter for the ninth. The ninth toll is collected by a child with no name. The child is the Curse's enforcer."
     }
   ],
-
   "superstitions": [
     {
       "name": "Bread to the Milestone",
@@ -686,9 +730,7 @@
       "cost": "Burn for +1 die once"
     }
   ],
-
   "decline_and_patronage": "Patronage here is as brittle as candle wax. The Rothari Clan holds their marches by fear and iron law—patronage from them is real, but cruel, demanding service in blood or levy. Elsewhere, noble names are little more than titles printed on parchment and sold like promises. The Margravine keeps a tally of feuds, binding bloodlines to her feast days, while mercenary captains trade loyalty for coin, switching colors with each bell. To seek a patron in Acasia is to choose which hunger you will feed: the Rothari's iron teeth, a Free Company's purse, or the hollow blessing of a saint who may never have lived. Yet even false crowns cast shadows long enough to shelter those desperate enough to kneel. The empire is dead. Its weight is not. And the Curse is patient.",
-
   "sb_spend_table": {
     "minor_complications": [
       "**Exposure:** Your actions draw unwanted attention from **tithe-collectors or petty lords**.",
@@ -725,45 +767,94 @@
       "**Acasia (Empire's Ghost):** A phantom legionary marches past, an imperial seal glows on a broken stone, a tax collector's ghost demands arrears."
     ]
   },
-
   "boss_archetypes": [
     {
       "name": "The False King",
-      "tags": ["Feud", "Authority"],
+      "tags": [
+        "Feud",
+        "Authority"
+      ],
       "description": "A petty lord or pretender who crowns themselves on the ruins of empire.",
-      "phases": ["Levy Demanded", "Feud Declared", "Hasty Coronation"],
-      "cracks": ["a **Blood-Peace Charter** suspends his authority", "a **Marriage Proxy** binds him to a rival"]
+      "phases": [
+        "Levy Demanded",
+        "Feud Declared",
+        "Hasty Coronation"
+      ],
+      "cracks": [
+        "a **Blood-Peace Charter** suspends his authority",
+        "a **Marriage Proxy** binds him to a rival"
+      ]
     },
     {
       "name": "The Witch of the Blackwoods",
-      "tags": ["Witchcraft", "Curse"],
+      "tags": [
+        "Witchcraft",
+        "Curse"
+      ],
       "description": "A hedge-witch, matriarch, or revenant who manipulates feuds and curses.",
-      "phases": ["Tithe of Fear", "Curse of the Crossroads", "Hollow Wedding"],
-      "cracks": ["a **Curse-Redemption Rite** breaks her hold", "a **Mine-Share** gives the commune courage to defy her"]
+      "phases": [
+        "Tithe of Fear",
+        "Curse of the Crossroads",
+        "Hollow Wedding"
+      ],
+      "cracks": [
+        "a **Curse-Redemption Rite** breaks her hold",
+        "a **Mine-Share** gives the commune courage to defy her"
+      ]
     },
     {
       "name": "The Tithe Collector",
-      "tags": ["Greed", "Extortion"],
+      "tags": [
+        "Greed",
+        "Extortion"
+      ],
       "description": "A bureaucrat-priest with writs, escorts, and the ability to summon feuds or famine with a single decree.",
-      "phases": ["Audit of Souls", "Seizure of Grain", "The Reckoning"],
-      "cracks": ["a **Toll-Exemption Plaque** voids his claim", "a **Wine-Right** buys off his debtors"]
+      "phases": [
+        "Audit of Souls",
+        "Seizure of Grain",
+        "The Reckoning"
+      ],
+      "cracks": [
+        "a **Toll-Exemption Plaque** voids his claim",
+        "a **Wine-Right** buys off his debtors"
+      ]
     },
     {
       "name": "The Rotting Child",
-      "tags": ["Mystery", "Curse"],
+      "tags": [
+        "Mystery",
+        "Curse"
+      ],
       "description": "A folkloric horror tied to Acasia's plague of false crossroads.",
-      "phases": ["Laughter in the Fog", "The Bridge That Loops", "The Feast of Ends"],
-      "cracks": ["a **Tithe-Remission Writ** fed to the fog", "a **Monastery Letter** read aloud at the crossroads"]
+      "phases": [
+        "Laughter in the Fog",
+        "The Bridge That Loops",
+        "The Feast of Ends"
+      ],
+      "cracks": [
+        "a **Tithe-Remission Writ** fed to the fog",
+        "a **Monastery Letter** read aloud at the crossroads"
+      ]
     },
     {
       "name": "The Imperial Ghost",
-      "tags": ["Undead", "Precedent"],
+      "tags": [
+        "Undead",
+        "Precedent"
+      ],
       "description": "The shade of the last imperial governor, still trying to collect the taxes.",
-      "phases": ["Audit of the Damned", "Summon the Debtors", "The Emperor's Peace"],
-      "cracks": ["produce the original imperial charter (in the Sealed Dowry Chest)", "pay a wergild in the empire's own debased coinage", "convince the ghost that the empire is truly dead"]
+      "phases": [
+        "Audit of the Damned",
+        "Summon the Debtors",
+        "The Emperor's Peace"
+      ],
+      "cracks": [
+        "produce the original imperial charter (in the Sealed Dowry Chest)",
+        "pay a wergild in the empire's own debased coinage",
+        "convince the ghost that the empire is truly dead"
+      ]
     }
   ],
-
   "encounter_seeds": [
     {
       "title": "The Dowry That Walked",
@@ -778,7 +869,6 @@
       "description": "The Causeway is repeating. Every crossing brings the party back to the same inn. The innkeeper is missing a finger. She says she gave it to the bridge. The bridge wants more. The bridge remembers the empire's last toll."
     }
   ],
-
   "index": [
     "Acasia",
     "Theme generator",
@@ -798,5 +888,6 @@
     "Hedge-witches",
     "Blood feuds",
     "The Ninth in Acasia"
-  ]
+  ],
+  "_license": "Fate's Edge Proprietary Content – © 2024 Nicholas A. Gasper. All rights reserved."
 }

@@ -6,7 +6,6 @@
   "label": "chap:valewood",
   "key_demographic": "Lethai-al",
   "manifest_path": "/data/docs/manifest.json",
-
   "overview": {
     "tagline": "The forest remembers. Speak truth, step lightly, and never eat the fruit of a tree with a face.",
     "genre": "Dark forest, fey remnant, imperial echo, folk horror.",
@@ -24,7 +23,6 @@
       "south": "Aelinnel / Aelaerem — The fae courts and the gnomes share a border of thorn and courtesy; the Green Gate is a two-way door. The Hazel Queen and the Stone Prince exchange warnings, not gifts."
     }
   },
-
   "quotes": [
     {
       "speaker": "Hazel Queen (Elite)",
@@ -35,12 +33,10 @@
       "text": "The woods here got a mind of their own — they'll lead you where you need to go if you ask right, but they'll just as soon lose you if you're carrying ill intent. Best know which is which before you wander off the path."
     }
   ],
-
   "ninth_taboo": {
     "title": "The Ninth Taboo Manifestation",
     "description": "In the Valewood, the ninth leaf to fall from any tree points to a hidden threshold. The wise catch it or pretend not to see. Those who follow the leaf's direction find a place that was not there a moment ago, and something old waits inside. The threshold may lead to a sealed laboratory, a fae court, or a clearing where the air smells of jasmine and grave-soil. It is always warm."
   },
-
   "npcs": [
     {
       "name": "Queen Amalthea",
@@ -85,14 +81,40 @@
       "quirk": "She appears as a shimmer of heat, speaking in equations that no longer add up."
     }
   ],
-
   "names": {
-    "first_male": ["Caelith", "Eryndor", "Jacob", "Oren", "Riven", "Thorn"],
-    "first_female": ["Amalthea", "Sila", "Liriel", "Vesper", "Fenn", "Myrin"],
-    "surnames": ["Thornweave", "Starfoot", "Hawthorn", "Silverbough", "Mossglen", "Gloaming"],
-    "epithets": ["the Green", "Oath-Woven", "the Unseen", "Hollow-Tongue", "the Last", "Ash-Finger"]
+    "first_male": [
+      "Caelith",
+      "Eryndor",
+      "Jacob",
+      "Oren",
+      "Riven",
+      "Thorn"
+    ],
+    "first_female": [
+      "Amalthea",
+      "Sila",
+      "Liriel",
+      "Vesper",
+      "Fenn",
+      "Myrin"
+    ],
+    "surnames": [
+      "Thornweave",
+      "Starfoot",
+      "Hawthorn",
+      "Silverbough",
+      "Mossglen",
+      "Gloaming"
+    ],
+    "epithets": [
+      "the Green",
+      "Oath-Woven",
+      "the Unseen",
+      "Hollow-Tongue",
+      "the Last",
+      "Ash-Finger"
+    ]
   },
-
   "places": [
     {
       "rank": 2,
@@ -212,7 +234,6 @@
       "mechanical_hook": "Navigating the spire is a puzzle; each floor requires a different skill test (GM chooses). Reaching the center grants a Valeheart Clause."
     }
   ],
-
   "people_and_factions": [
     {
       "rank": 2,
@@ -345,7 +366,6 @@
       "what_they_ask": "A name. She will write it in her equation, and the vats will recognize you as the key."
     }
   ],
-
   "complications": [
     {
       "rank": 2,
@@ -465,7 +485,6 @@
       "mechanical_hook": "Trigger the Genesis Vat Leak timer; imperial shades and vat horrors emerge. The party must flee or face a Boss Seed encounter."
     }
   ],
-
   "rewards": [
     {
       "rank": 2,
@@ -585,14 +604,12 @@
       "cost": "The exception lasts only one scene; after that, the forest may claim a piece of you (1 Corruption or a memory)."
     }
   ],
-
   "quick_use_notes": {
     "draw_rules": "Draw until you have all four suits: Spade = place, Heart = actor, Club = pressure, Diamond = leverage. Highest rank sets the main Timer (2–5 → 4, 6–10 → 6, J/Q/K → 8, A → 10).",
     "diamonds": "Diamonds are codified outcomes (charms/keys/passes) that change position rather than call for a roll.",
     "empire_echo": "When a J/Q/K is the highest rank in your seed, add one visible relic-logic (floating stairs, singing locks, patrol shades).",
     "ace_rule": "If any A appears, echo leaf and light motifs—paths that remember, leaves that whisper, light that moves like water."
   },
-
   "additional_features": [
     {
       "name": "Forest Claims",
@@ -647,7 +664,6 @@
       "description": "Earn Hazel Favor (by keeping promises) or Alder Favor (by collecting debts). Spend 3 favor to call a minor boon (safe passage, a single truthful answer from a fae)."
     }
   ],
-
   "artifacts": [
     {
       "name": "Leaf of the First Tree",
@@ -662,7 +678,6 @@
       "description": "Shows not your reflection but the unfinished beast-kin you would have become. Use to intimidate fae (+1 die) but mark 1 Corruption."
     }
   ],
-
   "lore_echoes": [
     {
       "title": "The Genesis Vats (The Clockwork Monad)",
@@ -689,7 +704,6 @@
       "description": "In any Valewood scene, the ninth leaf to fall from a tree will land pointing to a hidden threshold. The wise catch it—or pretend they didn't see. Those who follow the leaf's direction find a place that was not there a moment ago, and something old waits inside. The threshold may lead to a sealed laboratory, a fae court, or a clearing where the air smells of jasmine. It is always warm."
     }
   ],
-
   "superstitions": [
     {
       "name": "Bread to the Roots",
@@ -712,7 +726,6 @@
       "cost": "Burn for +1 die once"
     }
   ],
-
   "sb_spend_table": {
     "minor_complications": [
       "**Exposure:** Your actions draw attention from fae courtiers or beast-kin sentinels.",
@@ -743,37 +756,64 @@
       "**Narrative Pivot:** The story reframes—the sealed door was a trap, the beast-kin are not the enemy, the soft place is already here."
     ]
   },
-
   "pursuit_ladder": [
     "**Advance/Withdraw (Wits + Lore):** On a hit, shift one band. On a strong hit, also impose *Leaf Blind* (pursuers lose scent).",
     "**Cut the Star-Road (Presence + Lore):** On a hit, freeze range for one exchange; if a way-cord is in your possession, +1 die.",
     "**Weather the Glamour (Endurance + Spirit):** On a hit in *Sweet Wind* or *Name-Theft*, you pick who keeps their bearings; on a miss, the GM does."
   ],
-
   "boss_archetypes": [
     {
       "name": "The Unsealed",
-      "tags": ["Genesis Vat Horror"],
+      "tags": [
+        "Genesis Vat Horror"
+      ],
       "description": "A vat-born horror that escaped the sealed laboratories.",
-      "phases": ["Leak", "Gestation", "Unmaking"],
-      "cracks": ["seal the vat with a shardwright's favor", "offer a memory to the Genesis Keeper", "collapse the Amber Ziggurat's keystone"]
+      "phases": [
+        "Leak",
+        "Gestation",
+        "Unmaking"
+      ],
+      "cracks": [
+        "seal the vat with a shardwright's favor",
+        "offer a memory to the Genesis Keeper",
+        "collapse the Amber Ziggurat's keystone"
+      ]
     },
     {
       "name": "The Thorn-King",
-      "tags": ["Fae Usurper"],
+      "tags": [
+        "Fae Usurper"
+      ],
       "description": "A fae who seeks to claim the Alder King's throne by corrupting the forest's law.",
-      "phases": ["Courtesy", "Claim", "Crown"],
-      "cracks": ["refuse three gifts", "name his true origin (a failed beast-kin)", "burn the ninth grove"]
+      "phases": [
+        "Courtesy",
+        "Claim",
+        "Crown"
+      ],
+      "cracks": [
+        "refuse three gifts",
+        "name his true origin (a failed beast-kin)",
+        "burn the ninth grove"
+      ]
     },
     {
       "name": "The Echo-Emperor",
-      "tags": ["Imperial Shade"],
+      "tags": [
+        "Imperial Shade"
+      ],
       "description": "The ghost of a Lethai emperor who refuses to accept the empire's fall.",
-      "phases": ["March", "Patrol", "Reckoning"],
-      "cracks": ["perform the unfinished legionary oath", "return a lost standard", "remind him of the empire's fall"]
+      "phases": [
+        "March",
+        "Patrol",
+        "Reckoning"
+      ],
+      "cracks": [
+        "perform the unfinished legionary oath",
+        "return a lost standard",
+        "remind him of the empire's fall"
+      ]
     }
   ],
-
   "faction_entanglements": [
     "**Hazel Court:** Keep promises and honor hospitality; break them and the court will name you oath-breaker.",
     "**Alder Court:** Collect debts and enforce old laws; refuse and the forest's thorns will grow around you.",
@@ -781,14 +821,12 @@
     "**Gray Pilgrims:** Seek the old way-cords and the wisdom of the paths; disrespect them and the forest will lose you.",
     "**Genesis Vats:** The deeper you go, the more the vats hum. The hum is a promise of perfection. The promise is a lie."
   ],
-
   "cross_regional_ties": [
     "**Aelinnel (Gnomes):** The Green Gate is a two-way door; the fae courts exchange warnings, not gifts.",
     "**Aelaerem (Halflings):** The Hollow's attention is a shared dread; the Hazel Queen does not speak of what lies beyond the ninth leaf.",
     "**Mistlands (Direwood):** The forest's breath crosses the water; the bell-lines are the only thing keeping it at bay.",
     "**Acasia (Broken Marches):** The Curse does not cross the Valewood's edge; the star-roads remember what the empire forgot."
   ],
-
   "patronage_and_power": {
     "description": "In the Valewood, power flows through ancient magic, forgotten oaths, and the delicate balance between guest and host. The Lethai-ar maintain influence through their knowledge of paths and ruins, while the fae courts wield power through hospitality and geas. Beast-kin serve as guardians of the deeper mysteries, and the echoes of the empire still patrol their eternal rounds, enforcing laws written in starlight and stone. But beneath it all, the sealed doors wait. The fae courts are not the masters of the forest — they are its children, born from the soft place that pressed through when the empire's experiments tore the fabric. The Lethai-thora who survived burned their records and sealed their guilt in vaults of amber and iron. The beast-kin carry the memory in their bones. The monsters are the ones who remember too clearly.",
     "for_the_gm": [
@@ -798,7 +836,6 @@
       "Introduce the Genesis Vats Aftermath as a recurring tension. The deeper the party goes, the more they risk waking something that should sleep."
     ]
   },
-
   "index": [
     "Valewood",
     "Empire Under Leaves generator",
@@ -835,5 +872,6 @@
     "Forest Mood",
     "Star-Road Discovery",
     "Local Patrons!Valewood"
-  ]
+  ],
+  "_license": "Fate's Edge Proprietary Content – © 2024 Nicholas A. Gasper. All rights reserved."
 }

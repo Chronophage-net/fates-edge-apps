@@ -1,117 +1,695 @@
-[
-  {"name": "Keen Senses", "die_adjustment": 1, "condition": "Perception checks", "cost": 2},
-  {"name": "Silver Tongue", "die_adjustment": 1, "condition": "Persuasion attempts", "cost": 2},
-  {"name": "Second Wind", "die_adjustment": 0, "condition": "Once per scene, clear 1 Fatigue", "cost": 2},
-  {"name": "Combat Reflexes", "die_adjustment": 1, "condition": "Defense when surprised or flanked", "cost": 2},
-  {"name": "Precise Strike", "die_adjustment": 0, "condition": "Once per scene, ignore armor", "cost": 2},
-  {"name": "Trackless Step", "die_adjustment": 0, "condition": "Once per scene, leave no trail", "cost": 2},
-  {"name": "Urban Navigation", "die_adjustment": 1, "condition": "Never get lost in cities", "cost": 2},
-  {"name": "Wilderness Lore", "die_adjustment": 1, "condition": "Find food/water in hospitable biomes", "cost": 2},
-  {"name": "Read Emotions", "die_adjustment": 0, "condition": "Once per scene, detect surface emotions", "cost": 2},
-  {"name": "Iron Patience", "die_adjustment": 1, "condition": "Resist Conditions when Defending", "cost": 2},
-  {"name": "Stand Firm", "die_adjustment": 0, "condition": "Downgrade Harm by 1 on Defend Miss", "cost": 2},
-  {"name": "Counterpoise", "die_adjustment": 0, "condition": "Move after Defend Partial", "cost": 2},
-  {"name": "Smooth Talker", "die_adjustment": 1, "condition": "First impression social rolls", "cost": 2},
-  {"name": "Ear to the Ground", "die_adjustment": 0, "condition": "Once per session, ask a rumor question", "cost": 2},
-  {"name": "Friendly Face", "die_adjustment": 1, "condition": "Social roll after socializing", "cost": 2},
-  {"name": "Negotiation Stance", "die_adjustment": 0, "condition": "Improve Position in negotiations", "cost": 2},
-  {"name": "Projecting Voice", "die_adjustment": 1, "condition": "Performance to crowds", "cost": 2},
-  {"name": "Field Dressing", "die_adjustment": 0, "condition": "Stabilize a dying ally", "cost": 2},
-  {"name": "Keen Tracker", "die_adjustment": 1, "condition": "Track or follow trails", "cost": 2},
-  {"name": "Master Tinker", "die_adjustment": 1, "condition": "Craft repairs and modifications", "cost": 2},
-  {"name": "Light Fingers", "die_adjustment": 0, "condition": "Steal small objects, Position +1", "cost": 2},
-  {"name": "The Unlocked Window", "die_adjustment": 0, "condition": "Ignore one security obstacle per session", "cost": 2},
-  {"name": "Silk Palms", "die_adjustment": 0, "condition": "Gain temporary String with bribe", "cost": 2},
-  {"name": "Disciplined Body", "die_adjustment": 1, "condition": "Unarmed attacks", "cost": 3},
-  {"name": "Open Hand Technique", "die_adjustment": 0, "condition": "Unarmed attack effect (prone/push/disarm)", "cost": 2},
-  {"name": "Iron Skin", "die_adjustment": 0, "condition": "Convert first Harm to Fatigue", "cost": 2},
-  {"name": "Defensive Survival", "die_adjustment": 1, "condition": "Melee defense, convert Harm to Fatigue", "cost": 3},
-  {"name": "Weapon Training", "die_adjustment": 1, "condition": "Chosen weapon category", "cost": 3},
-  {"name": "Mounted Archery", "die_adjustment": 0, "condition": "Ignore ranged penalty while mounted", "cost": 2},
-  {"name": "The Miss That Feeds", "die_adjustment": 0, "condition": "Gain +1 Position when enemy misses", "cost": 2},
-  {"name": "Glancing Failure", "die_adjustment": 0, "condition": "Improve Position when enemy Partial hits", "cost": 3},
-  {"name": "Spellcraft", "die_adjustment": 0, "condition": "Access to freeform spellcasting", "cost": 6},
-  {"name": "Codex", "die_adjustment": 0, "condition": "Access to Patron Rites (Runekeeper)", "cost": 4},
-  {"name": "Patron's Symbol", "die_adjustment": 0, "condition": "Access to Invoker Rites", "cost": 4},
-  {"name": "Weapon Mastery", "die_adjustment": 2, "condition": "Chosen weapon type", "cost": 5},
-  {"name": "Command Presence", "die_adjustment": 1, "condition": "Leadership and intimidation", "cost": 4},
-  {"name": "Network Weaver", "die_adjustment": 0, "condition": "Gain contact in each new settlement", "cost": 4},
-  {"name": "Tactical Movement", "die_adjustment": 0, "condition": "Move within engagement zone as Move", "cost": 4},
-  {"name": "Conditioning", "die_adjustment": 1, "condition": "Body +1 for Fatigue track", "cost": 4},
-  {"name": "Spell Shaping", "die_adjustment": 0, "condition": "Modify range/scale/target of spell", "cost": 4},
-  {"name": "Elemental Focus", "die_adjustment": 1, "condition": "Chosen element spells", "cost": 4},
-  {"name": "Ritual Mastery", "die_adjustment": 0, "condition": "Reduce Backlash severity once per scene", "cost": 4},
-  {"name": "Efficient Invocation", "die_adjustment": 0, "condition": "Reduce ritual casting time", "cost": 4},
-  {"name": "Trusted Reputation", "die_adjustment": 0, "condition": "Call in minor favor from a faction", "cost": 4},
-  {"name": "Information Broker", "die_adjustment": 0, "condition": "Ask two questions when gathering info", "cost": 4},
-  {"name": "Unshakeable Composure", "die_adjustment": 1, "condition": "Resist social pressure and Conditions", "cost": 4},
-  {"name": "Triage", "die_adjustment": 0, "condition": "Heal Fatigue and reduce Harm penalties", "cost": 4},
-  {"name": "Camouflage", "die_adjustment": 2, "condition": "Stealth in natural terrain", "cost": 4},
-  {"name": "Master Artificer", "die_adjustment": 1, "condition": "Craft and upgrade items", "cost": 5},
-  {"name": "Captivating Performance", "die_adjustment": 0, "condition": "Inspire allies, resist fear", "cost": 4},
-  {"name": "Voice of Reason", "die_adjustment": 0, "condition": "De-escalate with Performance", "cost": 4},
-  {"name": "Harmonious Aid", "die_adjustment": 0, "condition": "Grant +2 die on Assist", "cost": 4},
-  {"name": "Well-Timed Encore", "die_adjustment": 0, "condition": "Extend Performance effect", "cost": 5},
-  {"name": "Efficient Recruiter", "die_adjustment": 0, "condition": "Reduce follower cost", "cost": 4},
-  {"name": "Asset Crafter", "die_adjustment": 0, "condition": "Reduce Asset cost and time", "cost": 4},
-  {"name": "Loyalty Bond", "die_adjustment": 0, "condition": "Follower Loyalty improved", "cost": 5},
-  {"name": "Delegated Upkeep", "die_adjustment": 0, "condition": "Follower manages Assets", "cost": 5},
-  {"name": "Rapid Construction", "die_adjustment": 0, "condition": "Reduce Asset building time", "cost": 4},
-  {"name": "Always Another Exit", "die_adjustment": 0, "condition": "Escape route prepared", "cost": 4},
-  {"name": "The Forger's Eye", "die_adjustment": 0, "condition": "Forge documents", "cost": 4},
-  {"name": "Crowd Veil", "die_adjustment": 0, "condition": "Vanish in crowds", "cost": 4},
-  {"name": "The Velvet Glove", "die_adjustment": 0, "condition": "Call in favor from minor NPC", "cost": 5},
-  {"name": "Master of Misdirection", "die_adjustment": 0, "condition": "Redirect suspicion", "cost": 5},
-  {"name": "Controlled Burn", "die_adjustment": 0, "condition": "Gain Boon on Free Casting 1", "cost": 4},
-  {"name": "Weave Resilience", "die_adjustment": 0, "condition": "Reduce Free Casting Backlash", "cost": 4},
-  {"name": "Elemental Attunement", "die_adjustment": 1, "condition": "Chosen element spells", "cost": 5},
-  {"name": "Backlash Siphon", "die_adjustment": 0, "condition": "Negate Backlash with Obligation", "cost": 6},
-  {"name": "Flurry Strike", "die_adjustment": 0, "condition": "Two attacks as one action", "cost": 6},
-  {"name": "Duelist's Edge", "die_adjustment": 1, "condition": "Single opponent melee", "cost": 6},
-  {"name": "Battlefield Mastery", "die_adjustment": 0, "condition": "Bonus vs. multiple opponents", "cost": 6},
-  {"name": "Backstab", "die_adjustment": 0, "condition": "Extra Harm from stealth", "cost": 6},
-  {"name": "Elusive Dodge", "die_adjustment": 0, "condition": "Free Defend reaction", "cost": 6},
-  {"name": "Berserker Rage", "die_adjustment": 2, "condition": "Melee damage, ignore penalties", "cost": 6},
-  {"name": "Cavalier", "die_adjustment": 2, "condition": "Mounted combat", "cost": 4},
-  {"name": "Subtle Casting", "die_adjustment": 0, "condition": "Hide magical casting", "cost": 6},
-  {"name": "Effortless Charge", "die_adjustment": 0, "condition": "Ignore Fatigue on Charge", "cost": 4},
-  {"name": "Effortless Skirmish", "die_adjustment": 0, "condition": "Ignore Fatigue on Skirmish", "cost": 4},
-  {"name": "Relentless", "die_adjustment": 0, "condition": "Charge/Skirmish over difficult terrain", "cost": 6},
-  {"name": "Stubborn Pursuer", "die_adjustment": 0, "condition": "Follow Disengage", "cost": 6},
-  {"name": "Horse Archer's Art", "die_adjustment": 2, "condition": "Mounted archery", "cost": 5},
-  {"name": "Stalwart's Ledger", "die_adjustment": 0, "condition": "Reposition on enemy Miss", "cost": 4},
-  {"name": "Called Shot", "die_adjustment": 0, "condition": "Called Shot effects", "cost": 6},
-  {"name": "Riposte Instinct", "die_adjustment": 0, "condition": "Free attack on Defend Success", "cost": 4},
-  {"name": "Adaptive Guard", "die_adjustment": 0, "condition": "Choose defense pool after Position", "cost": 4},
-  {"name": "Wardbreaker Reflex", "die_adjustment": 0, "condition": "Reroll failed defense vs. spells", "cost": 4},
-  {"name": "Iron Fist Technique", "die_adjustment": 1, "condition": "Unarmed attacks, supernatural", "cost": 6},
-  {"name": "Flowing Spirit Technique", "die_adjustment": 0, "condition": "Convert Harm to Fatigue", "cost": 6},
-  {"name": "Perfect Timing Technique", "die_adjustment": 0, "condition": "Improve Position, reaction bonus", "cost": 6},
-  {"name": "Whirlwind Kick", "die_adjustment": 0, "condition": "Area unarmed attack", "cost": 5},
-  {"name": "Meditative Focus", "die_adjustment": 0, "condition": "Clear Fatigue and Condition", "cost": 4},
-  {"name": "Deflect Projectiles", "die_adjustment": 0, "condition": "Deflect ranged physical attacks", "cost": 5},
-  {"name": "Arcane Dominance", "die_adjustment": 0, "condition": "Overpower weaker magic", "cost": 8},
-  {"name": "Forbidden Knowledge", "die_adjustment": 0, "condition": "Access forbidden summon", "cost": 8},
-  {"name": "Crack Specialist", "die_adjustment": 0, "condition": "Reduce Crack the Seal cost", "cost": 8},
-  {"name": "Dual Covenant", "die_adjustment": 0, "condition": "Maintain two summoned spirits", "cost": 8},
-  {"name": "Triad Bond", "die_adjustment": 0, "condition": "Maintain three summoned spirits", "cost": 10},
-  {"name": "Shrike Parry", "die_adjustment": 0, "condition": "Counter-attack on Defend", "cost": 8},
-  {"name": "Mystic Bulwark", "die_adjustment": 0, "condition": "Shield ally with Defend", "cost": 8},
-  {"name": "High Stance Duelist", "die_adjustment": 0, "condition": "Improved Defend, riposte", "cost": 8},
-  {"name": "Hollow-Touched", "die_adjustment": 0, "condition": "Convert Harm to Fatigue (Aelaerem)", "cost": 8},
-  {"name": "Stone-Bound Interdictor", "die_adjustment": 0, "condition": "Convert Harm to Fatigue (Aelinnel)", "cost": 8},
-  {"name": "Large Soul", "die_adjustment": 0, "condition": "Use Heavy Armor/Weapons", "cost": 8},
-  {"name": "Ghost Heist", "die_adjustment": 0, "condition": "Commit untraceable crime", "cost": 7},
-  {"name": "Spymaster", "die_adjustment": 0, "condition": "Permanent informant network", "cost": 8},
-  {"name": "Master Cantor", "die_adjustment": 0, "condition": "Legendary performances", "cost": 10},
-  {"name": "Shadow Song", "die_adjustment": 0, "condition": "Ikasha's Whisper", "cost": 7},
-  {"name": "Velvet Hook", "die_adjustment": 0, "condition": "Livaea's Whisper", "cost": 7},
-  {"name": "Desperate Cadence", "die_adjustment": 0, "condition": "Malachai's False Note", "cost": 7},
-  {"name": "Untouchable Form", "die_adjustment": 1, "condition": "Unarmed, convert Harm, immune grapple", "cost": 10},
-  {"name": "Inevitable Strike", "die_adjustment": 2, "condition": "Unarmed, ignore armor, counterattack", "cost": 10},
-  {"name": "Way of the Empty Mind", "die_adjustment": 0, "condition": "Immune fear, resist mind control", "cost": 9},
-  {"name": "Spell Echo", "die_adjustment": 0, "condition": "Reroll Free Casting 1", "cost": 8},
-  {"name": "Resonance Anchor", "die_adjustment": 0, "condition": "Bank SB from Free Casting", "cost": 9},
-  {"name": "Battlefield Terror", "die_adjustment": 0, "condition": "Enemies in Close suffer -1 die", "cost": 10},
-  {"name": "Shadow Dance", "die_adjustment": 0, "condition": "Re-enter stealth after hit", "cost": 10}
-]
+{
+  "_license": "Fate's Edge Proprietary Content – © 2024 Nicholas A. Gasper. All rights reserved.",
+  "data": [
+    {
+      "name": "Keen Senses",
+      "die_adjustment": 1,
+      "condition": "Perception checks",
+      "cost": 2
+    },
+    {
+      "name": "Silver Tongue",
+      "die_adjustment": 1,
+      "condition": "Persuasion attempts",
+      "cost": 2
+    },
+    {
+      "name": "Second Wind",
+      "die_adjustment": 0,
+      "condition": "Once per scene, clear 1 Fatigue",
+      "cost": 2
+    },
+    {
+      "name": "Combat Reflexes",
+      "die_adjustment": 1,
+      "condition": "Defense when surprised or flanked",
+      "cost": 2
+    },
+    {
+      "name": "Precise Strike",
+      "die_adjustment": 0,
+      "condition": "Once per scene, ignore armor",
+      "cost": 2
+    },
+    {
+      "name": "Trackless Step",
+      "die_adjustment": 0,
+      "condition": "Once per scene, leave no trail",
+      "cost": 2
+    },
+    {
+      "name": "Urban Navigation",
+      "die_adjustment": 1,
+      "condition": "Never get lost in cities",
+      "cost": 2
+    },
+    {
+      "name": "Wilderness Lore",
+      "die_adjustment": 1,
+      "condition": "Find food/water in hospitable biomes",
+      "cost": 2
+    },
+    {
+      "name": "Read Emotions",
+      "die_adjustment": 0,
+      "condition": "Once per scene, detect surface emotions",
+      "cost": 2
+    },
+    {
+      "name": "Iron Patience",
+      "die_adjustment": 1,
+      "condition": "Resist Conditions when Defending",
+      "cost": 2
+    },
+    {
+      "name": "Stand Firm",
+      "die_adjustment": 0,
+      "condition": "Downgrade Harm by 1 on Defend Miss",
+      "cost": 2
+    },
+    {
+      "name": "Counterpoise",
+      "die_adjustment": 0,
+      "condition": "Move after Defend Partial",
+      "cost": 2
+    },
+    {
+      "name": "Smooth Talker",
+      "die_adjustment": 1,
+      "condition": "First impression social rolls",
+      "cost": 2
+    },
+    {
+      "name": "Ear to the Ground",
+      "die_adjustment": 0,
+      "condition": "Once per session, ask a rumor question",
+      "cost": 2
+    },
+    {
+      "name": "Friendly Face",
+      "die_adjustment": 1,
+      "condition": "Social roll after socializing",
+      "cost": 2
+    },
+    {
+      "name": "Negotiation Stance",
+      "die_adjustment": 0,
+      "condition": "Improve Position in negotiations",
+      "cost": 2
+    },
+    {
+      "name": "Projecting Voice",
+      "die_adjustment": 1,
+      "condition": "Performance to crowds",
+      "cost": 2
+    },
+    {
+      "name": "Field Dressing",
+      "die_adjustment": 0,
+      "condition": "Stabilize a dying ally",
+      "cost": 2
+    },
+    {
+      "name": "Keen Tracker",
+      "die_adjustment": 1,
+      "condition": "Track or follow trails",
+      "cost": 2
+    },
+    {
+      "name": "Master Tinker",
+      "die_adjustment": 1,
+      "condition": "Craft repairs and modifications",
+      "cost": 2
+    },
+    {
+      "name": "Light Fingers",
+      "die_adjustment": 0,
+      "condition": "Steal small objects, Position +1",
+      "cost": 2
+    },
+    {
+      "name": "The Unlocked Window",
+      "die_adjustment": 0,
+      "condition": "Ignore one security obstacle per session",
+      "cost": 2
+    },
+    {
+      "name": "Silk Palms",
+      "die_adjustment": 0,
+      "condition": "Gain temporary String with bribe",
+      "cost": 2
+    },
+    {
+      "name": "Disciplined Body",
+      "die_adjustment": 1,
+      "condition": "Unarmed attacks",
+      "cost": 3
+    },
+    {
+      "name": "Open Hand Technique",
+      "die_adjustment": 0,
+      "condition": "Unarmed attack effect (prone/push/disarm)",
+      "cost": 2
+    },
+    {
+      "name": "Iron Skin",
+      "die_adjustment": 0,
+      "condition": "Convert first Harm to Fatigue",
+      "cost": 2
+    },
+    {
+      "name": "Defensive Survival",
+      "die_adjustment": 1,
+      "condition": "Melee defense, convert Harm to Fatigue",
+      "cost": 3
+    },
+    {
+      "name": "Weapon Training",
+      "die_adjustment": 1,
+      "condition": "Chosen weapon category",
+      "cost": 3
+    },
+    {
+      "name": "Mounted Archery",
+      "die_adjustment": 0,
+      "condition": "Ignore ranged penalty while mounted",
+      "cost": 2
+    },
+    {
+      "name": "The Miss That Feeds",
+      "die_adjustment": 0,
+      "condition": "Gain +1 Position when enemy misses",
+      "cost": 2
+    },
+    {
+      "name": "Glancing Failure",
+      "die_adjustment": 0,
+      "condition": "Improve Position when enemy Partial hits",
+      "cost": 3
+    },
+    {
+      "name": "Spellcraft",
+      "die_adjustment": 0,
+      "condition": "Access to freeform spellcasting",
+      "cost": 6
+    },
+    {
+      "name": "Codex",
+      "die_adjustment": 0,
+      "condition": "Access to Patron Rites (Runekeeper)",
+      "cost": 4
+    },
+    {
+      "name": "Patron's Symbol",
+      "die_adjustment": 0,
+      "condition": "Access to Invoker Rites",
+      "cost": 4
+    },
+    {
+      "name": "Weapon Mastery",
+      "die_adjustment": 2,
+      "condition": "Chosen weapon type",
+      "cost": 5
+    },
+    {
+      "name": "Command Presence",
+      "die_adjustment": 1,
+      "condition": "Leadership and intimidation",
+      "cost": 4
+    },
+    {
+      "name": "Network Weaver",
+      "die_adjustment": 0,
+      "condition": "Gain contact in each new settlement",
+      "cost": 4
+    },
+    {
+      "name": "Tactical Movement",
+      "die_adjustment": 0,
+      "condition": "Move within engagement zone as Move",
+      "cost": 4
+    },
+    {
+      "name": "Conditioning",
+      "die_adjustment": 1,
+      "condition": "Body +1 for Fatigue track",
+      "cost": 4
+    },
+    {
+      "name": "Spell Shaping",
+      "die_adjustment": 0,
+      "condition": "Modify range/scale/target of spell",
+      "cost": 4
+    },
+    {
+      "name": "Elemental Focus",
+      "die_adjustment": 1,
+      "condition": "Chosen element spells",
+      "cost": 4
+    },
+    {
+      "name": "Ritual Mastery",
+      "die_adjustment": 0,
+      "condition": "Reduce Backlash severity once per scene",
+      "cost": 4
+    },
+    {
+      "name": "Efficient Invocation",
+      "die_adjustment": 0,
+      "condition": "Reduce ritual casting time",
+      "cost": 4
+    },
+    {
+      "name": "Trusted Reputation",
+      "die_adjustment": 0,
+      "condition": "Call in minor favor from a faction",
+      "cost": 4
+    },
+    {
+      "name": "Information Broker",
+      "die_adjustment": 0,
+      "condition": "Ask two questions when gathering info",
+      "cost": 4
+    },
+    {
+      "name": "Unshakeable Composure",
+      "die_adjustment": 1,
+      "condition": "Resist social pressure and Conditions",
+      "cost": 4
+    },
+    {
+      "name": "Triage",
+      "die_adjustment": 0,
+      "condition": "Heal Fatigue and reduce Harm penalties",
+      "cost": 4
+    },
+    {
+      "name": "Camouflage",
+      "die_adjustment": 2,
+      "condition": "Stealth in natural terrain",
+      "cost": 4
+    },
+    {
+      "name": "Master Artificer",
+      "die_adjustment": 1,
+      "condition": "Craft and upgrade items",
+      "cost": 5
+    },
+    {
+      "name": "Captivating Performance",
+      "die_adjustment": 0,
+      "condition": "Inspire allies, resist fear",
+      "cost": 4
+    },
+    {
+      "name": "Voice of Reason",
+      "die_adjustment": 0,
+      "condition": "De-escalate with Performance",
+      "cost": 4
+    },
+    {
+      "name": "Harmonious Aid",
+      "die_adjustment": 0,
+      "condition": "Grant +2 die on Assist",
+      "cost": 4
+    },
+    {
+      "name": "Well-Timed Encore",
+      "die_adjustment": 0,
+      "condition": "Extend Performance effect",
+      "cost": 5
+    },
+    {
+      "name": "Efficient Recruiter",
+      "die_adjustment": 0,
+      "condition": "Reduce follower cost",
+      "cost": 4
+    },
+    {
+      "name": "Asset Crafter",
+      "die_adjustment": 0,
+      "condition": "Reduce Asset cost and time",
+      "cost": 4
+    },
+    {
+      "name": "Loyalty Bond",
+      "die_adjustment": 0,
+      "condition": "Follower Loyalty improved",
+      "cost": 5
+    },
+    {
+      "name": "Delegated Upkeep",
+      "die_adjustment": 0,
+      "condition": "Follower manages Assets",
+      "cost": 5
+    },
+    {
+      "name": "Rapid Construction",
+      "die_adjustment": 0,
+      "condition": "Reduce Asset building time",
+      "cost": 4
+    },
+    {
+      "name": "Always Another Exit",
+      "die_adjustment": 0,
+      "condition": "Escape route prepared",
+      "cost": 4
+    },
+    {
+      "name": "The Forger's Eye",
+      "die_adjustment": 0,
+      "condition": "Forge documents",
+      "cost": 4
+    },
+    {
+      "name": "Crowd Veil",
+      "die_adjustment": 0,
+      "condition": "Vanish in crowds",
+      "cost": 4
+    },
+    {
+      "name": "The Velvet Glove",
+      "die_adjustment": 0,
+      "condition": "Call in favor from minor NPC",
+      "cost": 5
+    },
+    {
+      "name": "Master of Misdirection",
+      "die_adjustment": 0,
+      "condition": "Redirect suspicion",
+      "cost": 5
+    },
+    {
+      "name": "Controlled Burn",
+      "die_adjustment": 0,
+      "condition": "Gain Boon on Free Casting 1",
+      "cost": 4
+    },
+    {
+      "name": "Weave Resilience",
+      "die_adjustment": 0,
+      "condition": "Reduce Free Casting Backlash",
+      "cost": 4
+    },
+    {
+      "name": "Elemental Attunement",
+      "die_adjustment": 1,
+      "condition": "Chosen element spells",
+      "cost": 5
+    },
+    {
+      "name": "Backlash Siphon",
+      "die_adjustment": 0,
+      "condition": "Negate Backlash with Obligation",
+      "cost": 6
+    },
+    {
+      "name": "Flurry Strike",
+      "die_adjustment": 0,
+      "condition": "Two attacks as one action",
+      "cost": 6
+    },
+    {
+      "name": "Duelist's Edge",
+      "die_adjustment": 1,
+      "condition": "Single opponent melee",
+      "cost": 6
+    },
+    {
+      "name": "Battlefield Mastery",
+      "die_adjustment": 0,
+      "condition": "Bonus vs. multiple opponents",
+      "cost": 6
+    },
+    {
+      "name": "Backstab",
+      "die_adjustment": 0,
+      "condition": "Extra Harm from stealth",
+      "cost": 6
+    },
+    {
+      "name": "Elusive Dodge",
+      "die_adjustment": 0,
+      "condition": "Free Defend reaction",
+      "cost": 6
+    },
+    {
+      "name": "Berserker Rage",
+      "die_adjustment": 2,
+      "condition": "Melee damage, ignore penalties",
+      "cost": 6
+    },
+    {
+      "name": "Cavalier",
+      "die_adjustment": 2,
+      "condition": "Mounted combat",
+      "cost": 4
+    },
+    {
+      "name": "Subtle Casting",
+      "die_adjustment": 0,
+      "condition": "Hide magical casting",
+      "cost": 6
+    },
+    {
+      "name": "Effortless Charge",
+      "die_adjustment": 0,
+      "condition": "Ignore Fatigue on Charge",
+      "cost": 4
+    },
+    {
+      "name": "Effortless Skirmish",
+      "die_adjustment": 0,
+      "condition": "Ignore Fatigue on Skirmish",
+      "cost": 4
+    },
+    {
+      "name": "Relentless",
+      "die_adjustment": 0,
+      "condition": "Charge/Skirmish over difficult terrain",
+      "cost": 6
+    },
+    {
+      "name": "Stubborn Pursuer",
+      "die_adjustment": 0,
+      "condition": "Follow Disengage",
+      "cost": 6
+    },
+    {
+      "name": "Horse Archer's Art",
+      "die_adjustment": 2,
+      "condition": "Mounted archery",
+      "cost": 5
+    },
+    {
+      "name": "Stalwart's Ledger",
+      "die_adjustment": 0,
+      "condition": "Reposition on enemy Miss",
+      "cost": 4
+    },
+    {
+      "name": "Called Shot",
+      "die_adjustment": 0,
+      "condition": "Called Shot effects",
+      "cost": 6
+    },
+    {
+      "name": "Riposte Instinct",
+      "die_adjustment": 0,
+      "condition": "Free attack on Defend Success",
+      "cost": 4
+    },
+    {
+      "name": "Adaptive Guard",
+      "die_adjustment": 0,
+      "condition": "Choose defense pool after Position",
+      "cost": 4
+    },
+    {
+      "name": "Wardbreaker Reflex",
+      "die_adjustment": 0,
+      "condition": "Reroll failed defense vs. spells",
+      "cost": 4
+    },
+    {
+      "name": "Iron Fist Technique",
+      "die_adjustment": 1,
+      "condition": "Unarmed attacks, supernatural",
+      "cost": 6
+    },
+    {
+      "name": "Flowing Spirit Technique",
+      "die_adjustment": 0,
+      "condition": "Convert Harm to Fatigue",
+      "cost": 6
+    },
+    {
+      "name": "Perfect Timing Technique",
+      "die_adjustment": 0,
+      "condition": "Improve Position, reaction bonus",
+      "cost": 6
+    },
+    {
+      "name": "Whirlwind Kick",
+      "die_adjustment": 0,
+      "condition": "Area unarmed attack",
+      "cost": 5
+    },
+    {
+      "name": "Meditative Focus",
+      "die_adjustment": 0,
+      "condition": "Clear Fatigue and Condition",
+      "cost": 4
+    },
+    {
+      "name": "Deflect Projectiles",
+      "die_adjustment": 0,
+      "condition": "Deflect ranged physical attacks",
+      "cost": 5
+    },
+    {
+      "name": "Arcane Dominance",
+      "die_adjustment": 0,
+      "condition": "Overpower weaker magic",
+      "cost": 8
+    },
+    {
+      "name": "Forbidden Knowledge",
+      "die_adjustment": 0,
+      "condition": "Access forbidden summon",
+      "cost": 8
+    },
+    {
+      "name": "Crack Specialist",
+      "die_adjustment": 0,
+      "condition": "Reduce Crack the Seal cost",
+      "cost": 8
+    },
+    {
+      "name": "Dual Covenant",
+      "die_adjustment": 0,
+      "condition": "Maintain two summoned spirits",
+      "cost": 8
+    },
+    {
+      "name": "Triad Bond",
+      "die_adjustment": 0,
+      "condition": "Maintain three summoned spirits",
+      "cost": 10
+    },
+    {
+      "name": "Shrike Parry",
+      "die_adjustment": 0,
+      "condition": "Counter-attack on Defend",
+      "cost": 8
+    },
+    {
+      "name": "Mystic Bulwark",
+      "die_adjustment": 0,
+      "condition": "Shield ally with Defend",
+      "cost": 8
+    },
+    {
+      "name": "High Stance Duelist",
+      "die_adjustment": 0,
+      "condition": "Improved Defend, riposte",
+      "cost": 8
+    },
+    {
+      "name": "Hollow-Touched",
+      "die_adjustment": 0,
+      "condition": "Convert Harm to Fatigue (Aelaerem)",
+      "cost": 8
+    },
+    {
+      "name": "Stone-Bound Interdictor",
+      "die_adjustment": 0,
+      "condition": "Convert Harm to Fatigue (Aelinnel)",
+      "cost": 8
+    },
+    {
+      "name": "Large Soul",
+      "die_adjustment": 0,
+      "condition": "Use Heavy Armor/Weapons",
+      "cost": 8
+    },
+    {
+      "name": "Ghost Heist",
+      "die_adjustment": 0,
+      "condition": "Commit untraceable crime",
+      "cost": 7
+    },
+    {
+      "name": "Spymaster",
+      "die_adjustment": 0,
+      "condition": "Permanent informant network",
+      "cost": 8
+    },
+    {
+      "name": "Master Cantor",
+      "die_adjustment": 0,
+      "condition": "Legendary performances",
+      "cost": 10
+    },
+    {
+      "name": "Shadow Song",
+      "die_adjustment": 0,
+      "condition": "Ikasha's Whisper",
+      "cost": 7
+    },
+    {
+      "name": "Velvet Hook",
+      "die_adjustment": 0,
+      "condition": "Livaea's Whisper",
+      "cost": 7
+    },
+    {
+      "name": "Desperate Cadence",
+      "die_adjustment": 0,
+      "condition": "Malachai's False Note",
+      "cost": 7
+    },
+    {
+      "name": "Untouchable Form",
+      "die_adjustment": 1,
+      "condition": "Unarmed, convert Harm, immune grapple",
+      "cost": 10
+    },
+    {
+      "name": "Inevitable Strike",
+      "die_adjustment": 2,
+      "condition": "Unarmed, ignore armor, counterattack",
+      "cost": 10
+    },
+    {
+      "name": "Way of the Empty Mind",
+      "die_adjustment": 0,
+      "condition": "Immune fear, resist mind control",
+      "cost": 9
+    },
+    {
+      "name": "Spell Echo",
+      "die_adjustment": 0,
+      "condition": "Reroll Free Casting 1",
+      "cost": 8
+    },
+    {
+      "name": "Resonance Anchor",
+      "die_adjustment": 0,
+      "condition": "Bank SB from Free Casting",
+      "cost": 9
+    },
+    {
+      "name": "Battlefield Terror",
+      "die_adjustment": 0,
+      "condition": "Enemies in Close suffer -1 die",
+      "cost": 10
+    },
+    {
+      "name": "Shadow Dance",
+      "die_adjustment": 0,
+      "condition": "Re-enter stealth after hit",
+      "cost": 10
+    }
+  ]
+}

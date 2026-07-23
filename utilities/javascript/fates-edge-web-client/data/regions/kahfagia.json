@@ -7,7 +7,6 @@
   "key_demographic": "Humans",
   "capital": "Kassamira",
   "manifest_path": "/data/docs/manifest.json",
-
   "overview": {
     "tagline": "Every mirror is a blade, every beacon a promise. The sea obeys when we move the lights — but the spiders weave in the mirror-towers.",
     "genre": "Creole thalassocracy, signal-and-lane politics, eldritch tide, secret infiltration.",
@@ -25,7 +24,6 @@
       "west": "The Western Reach — Rumors of islands that do not appear on charts, and of a fleet that sailed west and never returned."
     }
   },
-
   "quotes": [
     {
       "speaker": "Admiral of Lantern-Law (Elite)",
@@ -36,9 +34,7 @@
       "text": "The pilots see farther than kings. A gesture in lantern-code can open ports, or close them. Keep your lamps trimmed and your signals clear. And if a gray-robed stranger offers to adjust your mirror for free — say no. The Lethai-ar have long memories, and longer webs."
     }
   ],
-
   "regional_mood": "Power is visible here — literally. Every night, a thousand lamps burn along the channels, each a statement of control. To dim a light is to cede ground. To move a beacon is to declare war. Commodores sit in their mirror-towers, watching reflections, while tide-timers tick down to the next auction, the next inspection, the next quiet burial of a reputation. But beneath the visible power, another war is fought in whispers. The Lethai-ar agents of Inaea have spent a generation infiltrating the oligarchic families. A young heir who suddenly displays uncanny negotiating skill may not be talented — they may be **woven**. A Mirror-Keeper whose beacons never fail may be receiving guidance from a source that does not appear on any chart. The Spider's web is patient. It does not break the thalassocracy; it **guides** it.",
-
   "oligarchic_houses": {
     "description": "The true rulers of Kahfagia are not the Admiralty alone, but the **Shadow Council** of seven oligarchic families. Each controls a monopoly (spice, salt, silk, timber, pitch, shipbuilding, or intelligence). Each maintains its own private navy and network of spies. Each vies for the empty seat left by the family that the Lethai-ar have already **woven** into silence.",
     "houses": [
@@ -84,7 +80,6 @@
       }
     ]
   },
-
   "silk_vigil": {
     "description": "Agents of Inaea, the Spider's children have spent a generation worming into Kahfagia's elite. They do not steal or sabotage — they **guide**. A decision that benefits House Carrasco is subtly nudged toward the Lethai-ar's long-term goal: a unified thalassocracy that answers not to the Admiralty, but to the Web.",
     "signs_of_infiltration": [
@@ -114,7 +109,6 @@
     ],
     "mechanical_hook": "Once per session, a PC may roll Wits + Lore (DV 4) to notice a silken thread in an official's collar or a spider's brand on a dockhand's wrist. On success, they identify a Lethai-ar agent. On failure, the agent becomes aware of their scrutiny — and the Web tightens."
   },
-
   "npcs": [
     {
       "name": "Admiral Zafira",
@@ -159,14 +153,40 @@
       "quirk": "No one knows her face. She plays only in mirror-lit rooms, and her music leaves threads of silk in the listeners' hair."
     }
   ],
-
   "names": {
-    "first_male": ["Safir", "Idris", "Farid", "Jabir", "Rodrigo", "Tarik"],
-    "first_female": ["Zafira", "Ximena", "Layla", "Aisha", "Salma", "Nura"],
-    "surnames": ["al-Kassam", "del Puerto", "de la Vela", "Carrasco", "Mirat", "Henares"],
-    "epithets": ["the Lantern", "Tide-Keeper", "the Unlit", "Mirror-Eye", "Bell-Born", "Ash-Sails"]
+    "first_male": [
+      "Safir",
+      "Idris",
+      "Farid",
+      "Jabir",
+      "Rodrigo",
+      "Tarik"
+    ],
+    "first_female": [
+      "Zafira",
+      "Ximena",
+      "Layla",
+      "Aisha",
+      "Salma",
+      "Nura"
+    ],
+    "surnames": [
+      "al-Kassam",
+      "del Puerto",
+      "de la Vela",
+      "Carrasco",
+      "Mirat",
+      "Henares"
+    ],
+    "epithets": [
+      "the Lantern",
+      "Tide-Keeper",
+      "the Unlit",
+      "Mirror-Eye",
+      "Bell-Born",
+      "Ash-Sails"
+    ]
   },
-
   "places": [
     {
       "rank": 2,
@@ -286,7 +306,6 @@
       "mechanical_hook": ""
     }
   ],
-
   "people_and_factions": [
     {
       "rank": 2,
@@ -419,7 +438,6 @@
       "what_they_ask": ""
     }
   ],
-
   "complications": [
     {
       "rank": 2,
@@ -548,7 +566,6 @@
       "mechanical_hook": ""
     }
   ],
-
   "rewards": [
     {
       "rank": 2,
@@ -668,13 +685,11 @@
       "curse_cost": ""
     }
   ],
-
   "quick_use_notes": {
     "draw_rules": "Draw until you have all four suits: Spade = place, Heart = actor, Club = pressure, Diamond = leverage. Highest rank sets the main Timer (2–5 → 4, 6–10 → 6, J/Q/K → 8, A → 10).",
     "diamonds": "Diamonds are codified outcomes (papers/rights/priority) that change position rather than call for a roll.",
     "ace_rule": "If any A appears, echo **sea & signal** motifs — beacons that migrate, tides that remember, law that flows like water. If a King or Ace of Spades appears, also echo **web motifs** — silk threads on a bollard, a reflection that holds too long, the faint smell of spiced tea (the Lethai-ar are near)."
   },
-
   "additional_features": {
     "pilots_mirror": "Kahfagia's strength is not its fleet but its monopoly on light and lane. To post a beacon is to redraw the map. Any character with a Mirror Warrant may permanently move a beacon or buoy (GM sets a 4-segment timer). For the duration of that timer, all navigation rolls on that lane are at +1 Position for the party and –1 Position for rivals.",
     "lantern_law_privilege": "While flying an Admiralty flag or carrying a valid Lantern License, your ship may pass through chain-booms and customs points at +1 Position. The first time in a session you invoke this privilege, the GM gains 1 SB (the Admiralty is watching).",
@@ -689,7 +704,6 @@
       "the_unlit": "Ikasha. The ninth lamp that is never lit; the safe harbor that exists only in rumor."
     }
   },
-
   "lore_echoes": [
     {
       "title": "Saint Alvaro of the Lantern",
@@ -724,7 +738,6 @@
       ]
     }
   ],
-
   "superstitions": [
     {
       "name": "Bread to the Wake",
@@ -747,7 +760,6 @@
       "cost": "Burn for +1 die once"
     }
   ],
-
   "sb_spend_table": {
     "minor_complications": [
       "A lantern flickers; a signal is misread. Minor navigation error."
@@ -762,7 +774,6 @@
       "The Web tightens (Timer ticks); The Admiralty revokes a license; A storm breaks without warning."
     ]
   },
-
   "western_reach_rumors": [
     "A harbor where bells toll under water; cargo **must** be named aloud.",
     "A spice that stops bleeding — until moonrise.",
@@ -777,39 +788,59 @@
     "A spice ship that carries no cargo — only a single mirror, and the face of the merchant who sold it.",
     "A harbor where the tide is measured not in feet, but in secrets."
   ],
-
   "pursuit_ladder": {
     "advance_withdraw": "Advance/Withdraw (Sail + Wits): On a hit, shift one band. On a strong hit, also impose **Wake Surge**.",
     "cut_the_lane": "Cut the Lane (Pilot + Tactics): On a hit, freeze range for one exchange; if a beacon is under your color, +1 die.",
     "weather_the_squall": "Weather the Squall (Endurance + Sail): On a hit in **Black Squall**, you pick who drifts; on a miss, the Keeper does."
   },
-
   "boss_seeds": [
     {
       "name": "The Mirror-Keeper of Kassamira",
       "type": "Signal Tyrant",
-      "phases": ["Audit", "Blacklist", "Light Embargo"],
-      "cracks": ["rival beacon logs", "Tide Court precedent", "stolen codebook"]
+      "phases": [
+        "Audit",
+        "Blacklist",
+        "Light Embargo"
+      ],
+      "cracks": [
+        "rival beacon logs",
+        "Tide Court precedent",
+        "stolen codebook"
+      ]
     },
     {
       "name": "Corsair-Chaplain of the Pointe",
       "type": "Relic Raider",
-      "phases": ["Charm", "Board", "Bell-Wake"],
-      "cracks": ["sanctified boom", "cofradía oath", "drowned-saint tithe"]
+      "phases": [
+        "Charm",
+        "Board",
+        "Bell-Wake"
+      ],
+      "cracks": [
+        "sanctified boom",
+        "cofradía oath",
+        "drowned-saint tithe"
+      ]
     },
     {
       "name": "The Veiled Harpist",
       "type": "Spider's Daughter",
-      "phases": ["Whisper", "Weave", "Harvest"],
-      "cracks": ["speak a true name of a Lethai-ar agent", "cut a strand of the Web with silver", "remind an oligarch of a promise older than the Spider's memory"]
+      "phases": [
+        "Whisper",
+        "Weave",
+        "Harvest"
+      ],
+      "cracks": [
+        "speak a true name of a Lethai-ar agent",
+        "cut a strand of the Web with silver",
+        "remind an oligarch of a promise older than the Spider's memory"
+      ]
     }
   ],
-
   "patronage_and_power": {
     "description": "In Kahfagia, power flows through control of the sea lanes themselves — and through the silken threads that bind the oligarchs to the Spider's will. The maritime oligarchs have built their empire not through conquest of territory but through mastery of navigation and the quiet manipulation of loyalty. Every beacon, every channel marker, every mirror-light is both a navigational aid and a legal instrument. But behind every mirror, a gray-robed woman watches. And she is very, very patient.",
     "gm_advice": "Kahfagian patronage revolves around access — to channels, to cargo, to legal protection. Rewards often take the form of pilotage tokens, safe-conducts, or salvage rights. But the secret war of the Lethai-ar adds a new layer: players may be hired to expose an agent, to protect an oligarch from being 'woven,' or even to ally with the Spider's children for a share of the Harvest. Use the **Web's Patience** timer to track the infiltration; let players decide whether to slow it, accelerate it, or ride it to power."
   },
-
   "amaria": {
     "name": "Amaria — The Iron Shore",
     "description": "A small peninsula squeezed between Kahfagia's Akilan holdings and the Vilikari border, Amaria is a land of iron mines, coastal fog, and hybrid law. Ecktoria once claimed it; now it pays tribute to both Kahfagia and the Vilikari to stay independent. Its people speak a creole of Kahfagian maritime slang and Vilikari bureaucratic precision, and its courts rule by a blend of Admiralty tariff law and Vermilion Corps writ-law.",
@@ -968,7 +999,6 @@
       }
     ]
   },
-
   "index": [
     "Kahfagia",
     "Pilot's Mirror generator",
@@ -999,5 +1029,6 @@
     "The Spider's Daughter",
     "Silk Vigil",
     "Western Reach Rumors"
-  ]
+  ],
+  "_license": "Fate's Edge Proprietary Content – © 2024 Nicholas A. Gasper. All rights reserved."
 }

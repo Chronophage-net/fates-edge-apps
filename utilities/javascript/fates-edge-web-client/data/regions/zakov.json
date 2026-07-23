@@ -7,7 +7,6 @@
   "key_demographic": "Humans",
   "capital": "Zakov (the city has no other name)",
   "manifest_path": "/data/docs/manifest.json",
-
   "overview": {
     "tagline": "The tide keeps a better tally than any scribe. The reef remembers every secret.",
     "genre": "Lovecraftian dread meets pirate swagger; eldritch tide-horror, maritime noir, pressure as a living force.",
@@ -25,7 +24,6 @@
       "east": "Aelinnel — The gnomish tide-traders bring copper and counting-songs; the Reaping does not trust the fae. The gnomish courts have a standing offer on Astroegro artifacts."
     }
   },
-
   "quotes": [
     {
       "speaker": "Salt Prince (Elite)",
@@ -36,12 +34,10 @@
       "text": "The sewers and the sea both carry what folks want to forget, but they also remember everything. Best keep your business above water and your enemies guessing which dock you'll use next. The Salt Prince's crown floats, the Reaping grows in the dark, and the tide pulls for anyone with a sharp knife and a sharper tongue. Lately, the Gray Lady has been asking questions. She's not from here. She's from somewhere colder. And she's not the only one."
     }
   ],
-
   "ninth_taboo": {
     "title": "The Ninth Taboo Manifestation",
     "description": "In any Zakov scene, the ninth ship to enter the harbor in a tide will be claimed by the reef. The wise wait for the tenth — or pay a name to the Kraken's Tongue. The reef is not a reef. It is a crystalline mouth. It has been feeding for centuries. It is still hungry. The Salt-Bitten are building it a new mouth."
   },
-
   "reaping_timer": {
     "name": "Reaping's Corrosion",
     "max_segments": 8,
@@ -64,7 +60,6 @@
       "Deliver an Astroegro artifact to the Ordo Artificum for 'containment' — though this rarely ends well for the artifact."
     ]
   },
-
   "npcs": [
     {
       "name": "Salt Prince Lev",
@@ -121,14 +116,40 @@
       "quirk": "Her left arm is prosthetic, made from salvaged Astroegro alloy. It never tarnishes. It hums at low tide. She has been in Zakov for twelve years. She does not remember what she was before. She does not want to."
     }
   ],
-
   "names": {
-    "first_male": ["Lev", "Dmytro", "Sarkis", "Kostya", "Ruslan", "Taras"],
-    "first_female": ["Mila", "Olena", "Anush", "Zoya", "Nadia", "Halyna"],
-    "surnames": ["Voloshyn", "Bondarenko", "Torosyan", "Morozov", "Kravchenko", "Shevchenko"],
-    "epithets": ["the Gray", "Tide-Foot", "the Unpaid", "Bell-Sworn", "Ash-Prow", "the Silent"]
+    "first_male": [
+      "Lev",
+      "Dmytro",
+      "Sarkis",
+      "Kostya",
+      "Ruslan",
+      "Taras"
+    ],
+    "first_female": [
+      "Mila",
+      "Olena",
+      "Anush",
+      "Zoya",
+      "Nadia",
+      "Halyna"
+    ],
+    "surnames": [
+      "Voloshyn",
+      "Bondarenko",
+      "Torosyan",
+      "Morozov",
+      "Kravchenko",
+      "Shevchenko"
+    ],
+    "epithets": [
+      "the Gray",
+      "Tide-Foot",
+      "the Unpaid",
+      "Bell-Sworn",
+      "Ash-Prow",
+      "the Silent"
+    ]
   },
-
   "places": [
     {
       "rank": 2,
@@ -248,7 +269,6 @@
       "mechanical_hook": "Passing reveals a vision of the Reaping's source; ticks Reaping's Corrosion by +2."
     }
   ],
-
   "people_and_factions": [
     {
       "rank": 2,
@@ -381,7 +401,6 @@
       "what_they_ask": "A sailor's name — he will add it to his crew."
     }
   ],
-
   "complications": [
     {
       "rank": 2,
@@ -501,7 +520,6 @@
       "mechanical_hook": "Entering the flooded area ticks Reaping's Corrosion by +2; a successful Endurance (DV 5) may avoid the worst."
     }
   ],
-
   "rewards": [
     {
       "rank": 2,
@@ -621,13 +639,11 @@
       "cost": "Using the mark ticks Reaping's Corrosion by +3; the Reaping will demand a name within one session."
     }
   ],
-
   "quick_use_notes": {
     "draw_rules": "Draw until you have all four suits: Spade = place, Heart = actor, Club = pressure, Diamond = leverage. Highest rank sets the main Timer (2–5 → 4, 6–10 → 6, J/Q/K → 8, A → 10).",
     "diamonds": "Diamonds are codified outcomes (passes/contracts/goods) that change position rather than call for a roll.",
     "ace_rule": "If any A appears, echo salt and serpent motifs — tides that remember, reefs that shift, the deep that listens, crystal that grows in the dark. If the A is a Heart, a Naval Intelligence agent appears. If the A is a Spade, a new artifact vault is discovered. If the A is a Club, the Reaping's influence spreads. If the A is a Diamond, an Oligarch factor offers a deal."
   },
-
   "additional_features": [
     {
       "name": "Tide Timer",
@@ -658,7 +674,6 @@
       "description": "The Reckoner — Maelstraeus. Interest on every contract; the coin that always comes back. The Salt-Bitten Angel — Malachai. A silver coin that tastes of brine; a blessing that drowns. The Kraken's Father — Khemesh. The pressure beneath the keel; the weight the sea collects. The Tide Father — The Traveler. The current that carries you home — or to the reef. The Crystal Matrix — The Ninth. The Reaping's true nature; silence that has taken form. The Gray Lady's Lantern — The Witness (syncretic). The truth that Naval Intelligence records; the secret that cannot be hidden."
     }
   ],
-
   "lore_echoes": [
     {
       "title": "The Bitter Root",
@@ -685,7 +700,6 @@
       "description": "In any Zakov scene, the ninth ship to enter the harbor in a tide will be claimed by the reef. The wise wait for the tenth — or pay a name to the Kraken's Tongue. The reef is not a reef. It is a crystalline mouth. It has been feeding for centuries. It is still hungry. The Salt-Bitten are building it a new mouth."
     }
   ],
-
   "superstitions": [
     {
       "name": "Bread to the Tide",
@@ -713,7 +727,6 @@
       "cost": "Burn for +1 die once"
     }
   ],
-
   "sb_spend_table": {
     "minor_complications": [
       "**Exposure:** Your actions draw unwanted attention from syndicate enforcers, dock guards, Adjutant agents, or Oligarch factors.",
@@ -752,7 +765,6 @@
       "**Zakov (Kahfagian Presence):** A Naval Intelligence surveillance team is spotted, an Oligarch factor makes a counter-offer, the Gray Lady's cutter changes position, the Ordo Artificum archives a new artifact."
     ]
   },
-
   "patronage_and_power": {
     "description": "In Zakov, power flows through the control of smuggling routes, the management of syndicate weights, and the ability to navigate the complex web of pirate politics. The Salt Prince maintains nominal authority, but real power lies with those who control the tides, the reefs, and the flow of information through the city's taverns and black markets. The true authorities are those who can provide safe passage, protect cargoes, and mediate between competing syndicates. The Kahfagians change everything. Above the syndicate politics, a quieter war is fought. Naval Intelligence wants to contain the Reaping and recover the artifacts. The Oligarchs want to control the artifacts and profit from the chaos. The Ordo Artificum serves both — and neither. Patron Alaric funds the artifact hunt. Commodore Voss commands the Adjutant agents. The Gray Lady's cutter is a permanent fixture in the smuggler's gate. Players who engage with the Kahfagian factions will find themselves caught between two imperial powers that do not trust each other and do not care about Zakov's survival. The Reaping changes everything else. Whoever controls the crystalline shard — or understands its nature — holds a weapon that could unmake the city or save it. The Salt Prince keeps the Reaping's location secret, but the Syndicates whisper that he is no longer its master. The Reaping has begun to act on its own. It reaches through the tide, through the dreams of the drowned, through the taste of brine in a smuggler's coin. Zakov is not ruled by the Prince. It is ruled by a hunger that has been patient for centuries. The Astroegro sealed it. The first Salt Prince bargained with it. Now the seal cracks, and the crystal grows. The Kahfagians know this. They are trying to stop it. They are also trying to exploit it.",
     "for_the_gm": [
@@ -762,7 +774,6 @@
       "Track Reaping's Corrosion, Naval Intelligence Influence, and Oligarch Standing as campaign timers. Their advance is the city's slow death. The players can delay it, redirect it, or even embrace it — but they cannot ignore it. The Reaping is patient. The Gray Lady is watching. Patron Alaric is counting."
     ]
   },
-
   "faction_entanglements": [
     "**Salt Prince's Court:** Pay the levy and keep your head down; defy him and become a target for the Syndicates.",
     "**Pirate Queen's Shallows:** Gain her favor through charm and daring; earn her enmity and the Shallows become a trap.",
@@ -771,14 +782,12 @@
     "**Salt-Bitten Cult:** They offer power and protection from the Reaping — but at the cost of your soul.",
     "**Ordo Artificum:** They offer knowledge and artifact access — but their true purpose is to feed the Reaping, not contain it."
   ],
-
   "cross_regional_ties": [
     "**Thepyrgos:** Chain-towers and Synod seal police the straits; a Zakov corsair is a pirate, a Thepyrgos privateer is a legal pirate.",
     "**Valewood (Thin Coast):** Star-road shards and mist drift down the coast; the Gray Lady's agents watch the woods. The Reaping's influence does not cross the treeline.",
     "**Theona:** The Green Host does not ride the waves, but the Ninth Taboo is whispered in the coves. Zakov smugglers know which coves avoid the Host's riders.",
     "**Aelinnel:** Gnomish tide-traders bring copper and counting-songs; the Reaping does not trust the fae. The gnomish courts have a standing offer on Astroegro artifacts."
   ],
-
   "index": [
     "Zakov",
     "Salt and Serpent generator",
@@ -823,5 +832,6 @@
     "Artifact Registry",
     "Adjuvant agents",
     "Patronage!Zakov"
-  ]
+  ],
+  "_license": "Fate's Edge Proprietary Content – © 2024 Nicholas A. Gasper. All rights reserved."
 }

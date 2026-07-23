@@ -4,21 +4,28 @@
   "title": "Xhak'Thul, the Thunder-Speaker",
   "subtitle": "Storm, Shock & Awe",
   "version": "1.0.0",
-  "tags": ["storm", "thunder", "lightning", "primal", "fear", "chaos", "shaman", "berserker", "immediate"],
-
+  "tags": [
+    "storm",
+    "thunder",
+    "lightning",
+    "primal",
+    "fear",
+    "chaos",
+    "shaman",
+    "berserker",
+    "immediate"
+  ],
   "lore": {
     "description": "Before words, there was thunder. Before scripture, lightning carved its commandments into the bones of the world. Xhak'Thul is the Voice That Splits Mountains, the Drum That Shakes Foundations, a power born from the first storm that ever raged across the primal earth. His faithful are whirlwinds of action — they do not study; they dance, they shout, they move with the sky's fury. His gifts are not gentle miracles but raw terror, awe, and vitality ripped from nature's heart.",
     "followers": "Among the peoples of Fate's Edge, Xhak'Thul is the patron of the pre-literate, the neolithic, those who have not yet built walls against the wild. In the deep Vhasian highlands, he is the Storm-Father, invoked by herders who watch lightning split the sky. In Ykrul, he is the Thunder-Hoof, the sound of a thousand horses stampeding. In Linn, he is the Raging Tide, the storm that comes without warning. His followers are not scholars; they are dancers, drummers, shamans, and warriors who feel the storm in their bones before they hear it in the sky. He favors those who act without hesitation, who embrace chaos, and who understand that the loudest voice is often the truest.",
     "quote": "Feel the drum in your bones before you hear it in the sky. When the storm speaks, you will already be dancing to its rhythm."
   },
-
   "domain_focus": [
     "Primal Power: storm, thunder, lightning, earthquake, wildfire",
     "Shock and Awe: overwhelming sensory impact, terror as a weapon",
     "Fear-Eater: absorbing panic to fuel strength",
     "Immediate Magic: no rituals, no books — only emotion, movement, and the moment"
   ],
-
   "runekeeper_options": {
     "thiasos": {
       "description": "A Runekeeper sworn to Xhak'Thul does not bind a quiet familiar. Their Thiasos is a small beast or mythological creature that embodies the storm's wild heart: an electric blue salamander that crackles when touched, a tiny hawk whose feathers hum with static, a mouse that drums its tail in thunderstorms, or a small snake that vibrates like a plucked string before lightning strikes.",
@@ -29,14 +36,12 @@
       "upkeep": "Because the storm resists stillness, the Codex requires upkeep: the Runekeeper must spend an hour each week beating a rhythm into it (or exposing it to loud percussion), or the Rites stored there become sluggish (treat as Compromised until re-awakened)."
     }
   },
-
   "patrons_gift": {
     "name": "Xhak'Thul's Blessing",
     "description": "Once per scene as an action, a Runekeeper of Xhak'Thul may touch a held item (weapon, shield, or drum) and whisper a thunder-name.",
     "effect": "For the rest of the scene, the item grants +1 die to Intimidation or Command rolls, and the first time each scene the bearer would be surprised or lose initiative, they may act as if they were not surprised (the storm warns them).",
     "cost": "After the scene, the user marks +1 Obligation to Xhak'Thul."
   },
-
   "rites": [
     {
       "name": "Rite of the Thunderous Presence",
@@ -45,7 +50,12 @@
       "action": "Scene",
       "range": "Near",
       "resist": "No",
-      "tags": ["FEAR", "COMMAND", "AREA", "PRESSURE"],
+      "tags": [
+        "FEAR",
+        "COMMAND",
+        "AREA",
+        "PRESSURE"
+      ],
       "materials": "A drum made from storm-felled wood or any suitable improvised percussion.",
       "effect": "Your presence becomes overwhelming. All NPCs within Near range must test Resolve (DV 2) or suffer –1 die to social actions due to awe or terror for the scene. Allies gain +1 die to Intimidation or Command actions.",
       "push_it": "Extend the effect to Far range, but you mark 1 Fatigue and mark 1 SB (Hearts) as your presence becomes difficult to control. Cost: Mark +1 Obligation (total +2) or Mark +1 Fatigue.",
@@ -61,7 +71,11 @@
       "action": "Scene",
       "range": "Self",
       "resist": "No",
-      "tags": ["SPEED", "FEAR", "BOOST"],
+      "tags": [
+        "SPEED",
+        "FEAR",
+        "BOOST"
+      ],
       "materials": "Earth from a lightning strike site, worn boot leather.",
       "effect": "You move with the storm's speed. Gain +2 dice to Athletics or Stealth rolls. The first attack you make this scene gains +1 Effect.",
       "push_it": "Gain +3 dice and move as a blur, becoming difficult to track or clearly remember; mark 1 SB (Diamonds). Cost: Mark +1 Obligation (total +2) or Mark +1 Fatigue.",
@@ -77,7 +91,12 @@
       "action": "Scene",
       "range": "Zone",
       "resist": "No",
-      "tags": ["AREA", "FORCE", "FEAR", "WEATHER"],
+      "tags": [
+        "AREA",
+        "FORCE",
+        "FEAR",
+        "WEATHER"
+      ],
       "materials": "A shard of meteoric iron or metal touched by a severe storm.",
       "effect": "You call a localized, supernatural storm in a Zone. Choose one effect: Lightning Strike: Single target, Harm 2. Wind Blast: Knockback, dispersing arrows or scattering foes. Hail Barrage: Harm 1 (AREA). All enemies in the Zone suffer –1 die to actions from chaos and distraction.",
       "push_it": "Double the chosen effect's scale or potency (e.g., Harm 3, large knockback), but the effect also applies to allies in the Zone; mark 2 SB (Clubs). Cost: Mark +1 Obligation (total +3) or Mark +1 Fatigue.",
@@ -93,7 +112,12 @@
       "action": "Scene",
       "range": "Self",
       "resist": "No",
-      "tags": ["FEAR", "HEAL", "COMMAND", "BOOST"],
+      "tags": [
+        "FEAR",
+        "HEAL",
+        "COMMAND",
+        "BOOST"
+      ],
       "materials": "Soil or dust from a place of great terror (battlefield, prison, ruins).",
       "effect": "You feed on the fear around you. For each Frightened target in the scene, gain +1 die on your next action (max +3). If you successfully Intimidate a target during this scene, you heal 1 Fatigue.",
       "push_it": "Absorb all palpable fear in the scene, gaining a flat +3 dice bonus to your next action, but mark 1 permanent Scar related to fear. Mark 1 SB (Hearts). Cost: Mark +1 Obligation (total +2) or Mark +1 Fatigue.",
@@ -109,7 +133,13 @@
       "action": "Extended",
       "range": "Zone",
       "resist": "No",
-      "tags": ["AREA", "FEAR", "COMMAND", "TRANSFORM", "WEATHER"],
+      "tags": [
+        "AREA",
+        "FEAR",
+        "COMMAND",
+        "TRANSFORM",
+        "WEATHER"
+      ],
       "materials": "A drum fashioned from lightning-struck wood, with a hide from a beast killed by natural force.",
       "effect": "You become an incarnation of the storm for one scene: Gain +2 dice to rolls based on strength, speed, and intimidation. Your anger echoes as thunder; attacks against you may be answered by lightning (GM decides, usually 1 SB and Harm 1 to the attacker). Enemies must test Resolve at –2 dice to resist Fear effects you create. Start a 6-segment Natural Disasters timer; when it fills, the storm's wrath manifests as a random environmental hazard (landslide, lightning strike, flash flood).",
       "push_it": "The transformation lingers after the scene, and your emotional state causes minor environmental effects (windows rattle, small fires flicker). Mark 2 SB (Diamonds) and advance the timer by 2 segments. Cost: Mark +1 Obligation (total +4) or Mark +1 Fatigue.",
@@ -119,7 +149,6 @@
       "duration": "Scene."
     }
   ],
-
   "cantors_and_cults": {
     "cantors": {
       "name": "The Cantor's Song",
@@ -130,7 +159,6 @@
       "description": "Xhak'Thul's cults gather in clearings, on hilltops, or in caves that echo with thunder. The First Drum is a fellowship of dancers, shamans, and warriors who believe that civilization is a cage and that the storm is the only honest law. A ritual of the Cult involves each member drumming on a skin drum (never bought, always made from an animal they killed themselves) until the first person collapses from exhaustion. The collapsed dancer is declared 'storm-taken' and must lead the next ritual. Their creed is not written — it is beaten into the earth: 'The sky does not ask permission. Neither do we.' Outsiders are welcome to dance, but they must bring a drum they made with their own hands."
     }
   },
-
   "witchcraft": {
     "description": "A witch who walks with Xhak'Thul is a storm-caller or drum-maker — a shaman who crafts the tools of primal power: a drum that can be heard for a mile, a spear of lightning-struck wood that never misses its target, or a charm of meteoric iron that calls a storm when struck. Their magic is immediate, visceral, and never subtle. In Ykrul, a bone-carver might shape a whistle that mimics the sound of a thunderclap, terrifying horses. In the deep Vhasian highlands, a shaman might paint their drum with the blood of a goat struck by lightning, binding the storm's spirit to the skin.",
     "tools": {
@@ -147,7 +175,6 @@
       }
     ]
   },
-
   "corruption": [
     {
       "tier": 1,
@@ -180,7 +207,6 @@
       "cost": "Storm's Prison: Mark +3 Obligation. You can no longer remain indoors for more than an hour without suffering 1 Fatigue; the sky demands your presence."
     }
   ],
-
   "playstyle_notes": {
     "description": "Xhak'Thul is the patron of shamans, berserkers, and anyone who acts first and thinks never. His magic is immediate, loud, and unsubtle — the thunderclap, the lightning strike, the roar that silences a crowd. He rewards boldness, spontaneity, and the willingness to break things. His followers are not subtle, but they are terrifying. Ideal for players who enjoy direct solutions, primal power, and characters who would rather break a door than pick a lock.",
     "emphasizes": [
@@ -191,7 +217,6 @@
       "Pre-Literate Wisdom: the oldest magic, written in bone and drum"
     ]
   },
-
   "monastic_tradition": {
     "name": "Storm Fist (Xhak'Thul)",
     "quote": "The storm does not ask. It speaks. You are its echo.",
@@ -253,10 +278,10 @@
       "description": "Once per session, become the calm center of a supernatural storm for one scene. Allies within Near ignore fear and weather penalties. You gain +2 dice to physical and intimidation rolls, and any enemy that attacks you suffers a lightning counter (Harm 1, ignores armor). After the scene, you collapse with Fatigue 3. Gain a permanent Debt Scar — a lightning-bolt pattern on your chest — but you may ignore one forced Obligation or debt call (the creditor sees only static)."
     }
   },
-
   "sample_adventure": {
     "title": "The Drum That Would Not Stop",
     "description": "A village in the highlands has been plagued by a storm that will not end. For three weeks, the rain has fallen, the thunder has rolled, and the lightning has struck the same hilltop every night. The villagers believe they have angered Xhak'Thul. In truth, a shaman of the First Drum has become storm-taken — she cannot stop drumming, and the storm is her heartbeat. The party must find her, calm her, and break the rhythm before the storm drowns the valley or the lightning finds the village. But she does not want to be saved. She has felt the thunder in her bones, and she will not give it up.",
     "quote": "The storm does not ask permission. It speaks. And when it speaks, the only answer is to dance — or to be struck down. Some dancers never stop. And some storms never end."
-  }
+  },
+  "_license": "Fate's Edge Proprietary Content – © 2024 Nicholas A. Gasper. All rights reserved."
 }

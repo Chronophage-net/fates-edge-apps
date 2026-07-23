@@ -6,7 +6,6 @@
   "label": "chap:midh-ahkaz",
   "key_demographic": "Ykrul and Humans",
   "manifest_path": "/data/docs/manifest.json",
-
   "overview": {
     "tagline": "Coin talks. Grass walks. Blood settles the rest.",
     "genre": "Frontier grit, steppe noir, law of the rope and the blade, creeping cult horror.",
@@ -23,7 +22,6 @@
       "southeast": "Acasia — The Broken Marches' mercenaries and refugees seek shelter at the caravanserai; the Curse does not cross the gate's shadow. The Violet Gate is a sieve, not a wall."
     }
   },
-
   "quotes": [
     {
       "speaker": "Khatun of the Ring (Elite)",
@@ -34,19 +32,44 @@
       "text": "Ecktoria calls it uncivilized. We call it unbeatable. No writs, no seals, no questions. Coin talks. The rest walks. And if a snake offers you a sip from its cup, walk faster. The Shedder's smile has too many teeth."
     }
   ],
-
   "almanac": [
-    { "question": "What do people eat for breakfast?", "answer": "Curd cheese and flatbread — the cheese is from the Ykrul herds, the bread is baked in dung-fire embers. It tastes of smoke and the open sky. The poor dip it in salt; the rich dip it in honey stolen from a border hive." },
-    { "question": "What does a child learn before they can walk?", "answer": "To count horses. Midh Ahkaz children learn the eight gaits of a healthy mount: walk, trot, canter, gallop, pace, amble, rack, and the ninth — the death-sprint that only a stolen horse knows. The ninth gait is never taught; it is discovered when the rider's life depends on it." },
-    { "question": "What is the first thing you notice about a stranger?", "answer": "Their braids. Ykrul warriors braid their hair with clan colors; Vilikari traders wear oiled braids with silver beads. A stranger whose braids are loose has just fought. A stranger whose braids are cut has lost a blood-price. A stranger with no braids is either a slave or a ghost. Neither stays long." },
-    { "question": "What is the most common crime?", "answer": "Grass-right forgery — but forgery is not a crime, it is a negotiation. The Oasis Compact issues branded sticks for grazing rights. A clever carver can duplicate the brand. The penalty is exile into the tall grass at dusk. The grass does not have a court of appeals." },
-    { "question": "What does no one talk about but everyone knows?", "answer": "The Khatun is not the only ruler. The Serpent Cult's high priestess, the Shedder, knows the price of every sin. Her followers gather in the sunken pit behind the Dust Market, and the venom they drink either kills or transforms. The three powers — the Khatun, the Dust Market auctioneer, and the Iron Well keeper — meet once a season. No one records what they say. The grass records it." },
-    { "question": "Where do people go when they die?", "answer": "To the grass. Bodies are carried beyond the caravan rings and left for the wolves and the wind. The grass grows tall and green where a body falls. A patch of deep violet is a sign that the dead were not properly mourned. The locals avoid those patches." },
-    { "question": "How do you apologize for a serious wrong?", "answer": "You offer a blood-price in silver, weighed on the Bronze Court's scales. If the scale tips in your favor, you are forgiven. If it tips against you, you owe a horse. If the scale balances, you owe a story — and the story must be true, and the true story must make the wronged party weep. If it does not, you owe a finger." },
-    { "question": "What is the most important festival?", "answer": "The Grass Moon (autumn equinox). Violet seed-heads glow under moonlight. The tribes ride in a great circle, singing the names of the dead. At midnight, the Khatun pours a cup of water onto the earth. If the water sinks, the winter will be mild. If it pools, the winter will be hungry. If it steams, the Hollow is walking. The festival ends at dawn. No one sleeps." },
-    { "question": "What is the secret that could destroy a powerful person?", "answer": "The Oasis Compact's original seal was not lost. It was stolen by a Vilikari factor who wanted to control water rights. The factor is still alive, living in the Foreign Quarter under a false name. The seal is hidden in a hollow horse skull buried under the Grass Ring. The skull belonged to the Khatun's favorite stallion. The stallion did not die of old age. And beneath the Iron Well, the First Shedder waits—a serpent that has not eaten in three hundred years, feeding on the cult's offerings." }
+    {
+      "question": "What do people eat for breakfast?",
+      "answer": "Curd cheese and flatbread — the cheese is from the Ykrul herds, the bread is baked in dung-fire embers. It tastes of smoke and the open sky. The poor dip it in salt; the rich dip it in honey stolen from a border hive."
+    },
+    {
+      "question": "What does a child learn before they can walk?",
+      "answer": "To count horses. Midh Ahkaz children learn the eight gaits of a healthy mount: walk, trot, canter, gallop, pace, amble, rack, and the ninth — the death-sprint that only a stolen horse knows. The ninth gait is never taught; it is discovered when the rider's life depends on it."
+    },
+    {
+      "question": "What is the first thing you notice about a stranger?",
+      "answer": "Their braids. Ykrul warriors braid their hair with clan colors; Vilikari traders wear oiled braids with silver beads. A stranger whose braids are loose has just fought. A stranger whose braids are cut has lost a blood-price. A stranger with no braids is either a slave or a ghost. Neither stays long."
+    },
+    {
+      "question": "What is the most common crime?",
+      "answer": "Grass-right forgery — but forgery is not a crime, it is a negotiation. The Oasis Compact issues branded sticks for grazing rights. A clever carver can duplicate the brand. The penalty is exile into the tall grass at dusk. The grass does not have a court of appeals."
+    },
+    {
+      "question": "What does no one talk about but everyone knows?",
+      "answer": "The Khatun is not the only ruler. The Serpent Cult's high priestess, the Shedder, knows the price of every sin. Her followers gather in the sunken pit behind the Dust Market, and the venom they drink either kills or transforms. The three powers — the Khatun, the Dust Market auctioneer, and the Iron Well keeper — meet once a season. No one records what they say. The grass records it."
+    },
+    {
+      "question": "Where do people go when they die?",
+      "answer": "To the grass. Bodies are carried beyond the caravan rings and left for the wolves and the wind. The grass grows tall and green where a body falls. A patch of deep violet is a sign that the dead were not properly mourned. The locals avoid those patches."
+    },
+    {
+      "question": "How do you apologize for a serious wrong?",
+      "answer": "You offer a blood-price in silver, weighed on the Bronze Court's scales. If the scale tips in your favor, you are forgiven. If it tips against you, you owe a horse. If the scale balances, you owe a story — and the story must be true, and the true story must make the wronged party weep. If it does not, you owe a finger."
+    },
+    {
+      "question": "What is the most important festival?",
+      "answer": "The Grass Moon (autumn equinox). Violet seed-heads glow under moonlight. The tribes ride in a great circle, singing the names of the dead. At midnight, the Khatun pours a cup of water onto the earth. If the water sinks, the winter will be mild. If it pools, the winter will be hungry. If it steams, the Hollow is walking. The festival ends at dawn. No one sleeps."
+    },
+    {
+      "question": "What is the secret that could destroy a powerful person?",
+      "answer": "The Oasis Compact's original seal was not lost. It was stolen by a Vilikari factor who wanted to control water rights. The factor is still alive, living in the Foreign Quarter under a false name. The seal is hidden in a hollow horse skull buried under the Grass Ring. The skull belonged to the Khatun's favorite stallion. The stallion did not die of old age. And beneath the Iron Well, the First Shedder waits—a serpent that has not eaten in three hundred years, feeding on the cult's offerings."
+    }
   ],
-
   "npcs": [
     {
       "name": "Khatun of the Ring",
@@ -79,14 +102,40 @@
       "quirk": "Mute, scarred. A drink from the well costs a memory; a death costs a fortune."
     }
   ],
-
   "names": {
-    "first_male": ["Orun", "Tokan", "Korvash", "Dmytro", "Sarkis", "Kostya"],
-    "first_female": ["Yara", "Szik", "Olena", "Anush", "Zoya", "Nadia"],
-    "surnames": ["Gray Ash", "Iron-Blooded", "Swift", "Voloshyn", "Bondarenko", "Torosyan"],
-    "epithets": ["the Disgraced", "the Iron-Blooded", "the Swift", "the Gray", "Tide-Foot", "the Unpaid"]
+    "first_male": [
+      "Orun",
+      "Tokan",
+      "Korvash",
+      "Dmytro",
+      "Sarkis",
+      "Kostya"
+    ],
+    "first_female": [
+      "Yara",
+      "Szik",
+      "Olena",
+      "Anush",
+      "Zoya",
+      "Nadia"
+    ],
+    "surnames": [
+      "Gray Ash",
+      "Iron-Blooded",
+      "Swift",
+      "Voloshyn",
+      "Bondarenko",
+      "Torosyan"
+    ],
+    "epithets": [
+      "the Disgraced",
+      "the Iron-Blooded",
+      "the Swift",
+      "the Gray",
+      "Tide-Foot",
+      "the Unpaid"
+    ]
   },
-
   "places": [
     {
       "rank": 2,
@@ -215,7 +264,6 @@
       "mechanical_hook": "Entering the pit invites a Serpent's Favor test (Spirit+Resolve DV 5). On failure, gain 1 Corruption; on success, you may partake of the Cup (see Serpent's Favor)."
     }
   ],
-
   "people_and_factions": [
     {
       "rank": 2,
@@ -358,7 +406,6 @@
       "what_they_ask": "Your allegiance; refusal marks you as an enemy."
     }
   ],
-
   "complications": [
     {
       "rank": 2,
@@ -487,7 +534,6 @@
       "mechanical_hook": "You must offer something (a memory, a Boon, or a secret) or face a viper attack (Harm 1). Refusal ticks Serpent's Favor."
     }
   ],
-
   "rewards": [
     {
       "rank": 2,
@@ -615,14 +661,12 @@
       "cost": "The mark allows the cult to track you; you may be called upon for a favor at any time. Refusal costs 1 Corruption."
     }
   ],
-
   "quick_use_notes": {
     "draw_rules": "Draw until you have all four suits. Highest rank sets main Timer (2–5 → 4, 6–10 → 6, J/Q/K → 8, A → 10).",
     "diamonds": "Diamonds are narrative permits (grazing rights, oaths, witnesses) that shift Position.",
     "ace_rule": "If any A appears, echo grass and wind motifs — shifting alliances, old claims that ride with the seasons, the sky as witness, a body that vanishes into the tall grass by morning. The violet seed-heads of the steppe are a recurring omen: when they glow under moonlight, a spirit walks; when they shed, a caravan will be late — or never arrive.",
     "serpent_rule": "If a Serpent (S) entry appears, introduce a cult encounter, an omen of shedding, or a venomous complication."
   },
-
   "additional_features": [
     {
       "name": "Kon'reh Arbitration",
@@ -665,7 +709,6 @@
       "description": "When entering a cult stronghold, roll 1d6 for chamber nature: 1. The Shedding Floor (pit of serpents); 2. Altar of Names; 3. Whispering Gallery; 4. Hatching Chamber; 5. Vault of Skins; 6. First Shedder's Chamber."
     }
   ],
-
   "lore_echoes": [
     {
       "title": "The Bitter Root",
@@ -692,7 +735,6 @@
       "description": "In any Midh Ahkaz scene, the ninth horse table in the Violet Bazaar sells nothing but bad advice. Spend a Boon to reroll a failed negotiation — but the advice may haunt you. The table is always empty except at midnight. At midnight, a hooded figure sits there. No one knows who."
     }
   ],
-
   "superstitions": [
     {
       "name": "Hoofprint Pour",
@@ -715,7 +757,6 @@
       "cost": "Burn for +1 die once"
     }
   ],
-
   "sb_spend_table": {
     "minor_complications": [
       "**Exposure:** Your actions draw attention from Steppe Rangers or Bronze Court clerks.",
@@ -752,44 +793,82 @@
       "**Midh Ahkaz (Serpent Cult):** A shed snakeskin is found in your tent; a cup of warm milk appears on your saddle; a whisper from the dark says, 'The Shedder invites you to dine.'"
     ]
   },
-
   "pursuit_ladder": [
     "**Advance/Withdraw (Wits + Ride):** On a hit, shift one band. On a strong hit, also impose *Dust Cloud*.",
     "**Cut the Herd (Presence + Sway):** On a hit, freeze range for one exchange; if a Grass Right is in your possession, +1 die.",
     "**Weather the Stampede (Endurance + Survival):** On a hit in *Horse Sickness*, you pick which mount survives; on a miss, the GM does."
   ],
-
   "boss_archetypes": [
     {
       "name": "The Hollow Scale",
-      "tags": ["cursed scale bound to the Oasis"],
+      "tags": [
+        "cursed scale bound to the Oasis"
+      ],
       "description": "A corrupted entity that twists water rights and oaths.",
-      "phases": ["Fair Measure", "Thirst Unearned", "Naming the Bound"],
-      "cracks": ["burn a false token in the Oasis well", "satisfy a seven-clan water claim", "let a Sky-Speaker rebless the scale"]
+      "phases": [
+        "Fair Measure",
+        "Thirst Unearned",
+        "Naming the Bound"
+      ],
+      "cracks": [
+        "burn a false token in the Oasis well",
+        "satisfy a seven-clan water claim",
+        "let a Sky-Speaker rebless the scale"
+      ]
     },
     {
       "name": "Grass Reaver",
-      "tags": ["vengeful horse-lord", "half-legend"],
+      "tags": [
+        "vengeful horse-lord",
+        "half-legend"
+      ],
       "description": "A ghostly rider who hunts oath-breakers across the steppe.",
-      "phases": ["Hoof Drum", "Ghost Herd", "Blood-Claim Ride"],
-      "cracks": ["confess a broken oath at his cairn", "return a stolen foal", "outrun him on a borrowed horse"]
+      "phases": [
+        "Hoof Drum",
+        "Ghost Herd",
+        "Blood-Claim Ride"
+      ],
+      "cracks": [
+        "confess a broken oath at his cairn",
+        "return a stolen foal",
+        "outrun him on a borrowed horse"
+      ]
     },
     {
       "name": "The Hollow Merchant",
-      "tags": ["greedy soul who sold his reflection"],
+      "tags": [
+        "greedy soul who sold his reflection"
+      ],
       "description": "A trader who deals in cursed coin and forgotten debts.",
-      "phases": ["Roll of the Lost", "Chain of Measures", "Break the Seal"],
-      "cracks": ["settle a forgotten claim", "break his bond before witnesses", "let the Iron Well drink his name"]
+      "phases": [
+        "Roll of the Lost",
+        "Chain of Measures",
+        "Break the Seal"
+      ],
+      "cracks": [
+        "settle a forgotten claim",
+        "break his bond before witnesses",
+        "let the Iron Well drink his name"
+      ]
     },
     {
       "name": "The Shedder",
-      "tags": ["Serpent Cult Ascendant"],
+      "tags": [
+        "Serpent Cult Ascendant"
+      ],
       "description": "Isoka's high priestess, offering transformation through poison.",
-      "phases": ["Invitation", "The Cup", "Transformation"],
-      "cracks": ["refuse the cup three times", "show her a scale from the First Shedder", "cut her braid — she will shed her skin and flee, but she will remember your face"]
+      "phases": [
+        "Invitation",
+        "The Cup",
+        "Transformation"
+      ],
+      "cracks": [
+        "refuse the cup three times",
+        "show her a scale from the First Shedder",
+        "cut her braid — she will shed her skin and flee, but she will remember your face"
+      ]
     }
   ],
-
   "encounter_seeds": [
     {
       "title": "The Hollow Bride's Invitation",
@@ -804,7 +883,6 @@
       "description": "The winter church's bees have stopped producing honey. They are producing wax effigies of the PCs. The beekeeper wants to know why."
     }
   ],
-
   "faction_entanglements": [
     "**Khatun's Riders:** Honor the old oaths and pay tribute; anger them and they will seize your horses.",
     "**Vilikari Factors:** Trade flows through them; cross them and prices double for a season.",
@@ -812,14 +890,12 @@
     "**Bronze Court:** The clerks weigh everything; a false testimony will be weighed against you.",
     "**Serpent Cult:** They offer power but demand loyalty; refusal marks you as prey."
   ],
-
   "cross_regional_ties": [
     "**Ecktoria:** The Empire's reach ends at the Violet Gate; smugglers and spies cross both ways.",
     "**Ykrul:** The Khatun's clans trade horses and stories with the northern riders.",
     "**Acasia:** Refugees and mercenaries pass through, fleeing the Curse; the gate holds back the worst.",
     "**The Dolmis Sea:** Rare goods arrive via the coast; the Shedder's cult has agents in port towns."
   ],
-
   "index": [
     "Midh Ahkaz",
     "Violet Gate generator",
@@ -847,5 +923,6 @@
     "Census Raid",
     "Cup of Renewal",
     "Serpent's Favor"
-  ]
+  ],
+  "_license": "Fate's Edge Proprietary Content – © 2024 Nicholas A. Gasper. All rights reserved."
 }

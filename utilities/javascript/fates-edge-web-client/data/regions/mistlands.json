@@ -7,7 +7,6 @@
   "key_demographic": "Humans and Dwarves",
   "capital": "Payden's Port",
   "manifest_path": "/data/docs/manifest.json",
-
   "overview": {
     "tagline": "The mist collects names, and the bells count every breath.",
     "genre": "Folk horror, coastal gothic, bell-warding",
@@ -25,7 +24,6 @@
       "west": "The mist rolls in from the heart of the wood, carrying whispers, wraiths, and death."
     }
   },
-
   "quotes": [
     {
       "speaker": "Legate Halvar (Elite)",
@@ -36,7 +34,6 @@
       "text": "You think the salt is for warding? No. The salt is for remembering. Every grain is a name we have not forgotten, a breath we have not lost. The Direwood takes the unmourned. We salt the mourned. It's the only difference between a ghost and a memory."
     }
   ],
-
   "npcs": [
     {
       "name": "Legate Halvar",
@@ -75,14 +72,40 @@
       "quirk": "His left hand is always gloved; underneath, the names are carved into his palm."
     }
   ],
-
   "names": {
-    "first_male": ["Halvar", "Lucas", "Voss", "Torben", "Stian", "Vidar"],
-    "first_female": ["Anja", "Darya", "Pia", "Lise", "Ragna", "Signe"],
-    "surnames": ["Foss", "Mork", "Saltvedt", "Kyst", "Dyrep", "Tangen"],
-    "epithets": ["the Bell-Sworn", "Fog-Born", "the Unnamed", "Breath-Thief", "Ward-Keeper", "Ash-Finger"]
+    "first_male": [
+      "Halvar",
+      "Lucas",
+      "Voss",
+      "Torben",
+      "Stian",
+      "Vidar"
+    ],
+    "first_female": [
+      "Anja",
+      "Darya",
+      "Pia",
+      "Lise",
+      "Ragna",
+      "Signe"
+    ],
+    "surnames": [
+      "Foss",
+      "Mork",
+      "Saltvedt",
+      "Kyst",
+      "Dyrep",
+      "Tangen"
+    ],
+    "epithets": [
+      "the Bell-Sworn",
+      "Fog-Born",
+      "the Unnamed",
+      "Breath-Thief",
+      "Ward-Keeper",
+      "Ash-Finger"
+    ]
   },
-
   "places": [
     {
       "rank": 2,
@@ -202,7 +225,6 @@
       "mechanical_hook": "The gate is a threshold; crossing it invites the Direwood's attention. A Bell-Key or a Salt Oath may be required to pass safely."
     }
   ],
-
   "people_and_factions": [
     {
       "rank": 2,
@@ -335,7 +357,6 @@
       "what_they_ask": "A breath held in silence; she will take it as payment."
     }
   ],
-
   "complications": [
     {
       "rank": 2,
@@ -455,7 +476,6 @@
       "mechanical_hook": "All rolls against spirits are at -1 die. A Salt Oath can temporarily ward them off."
     }
   ],
-
   "rewards": [
     {
       "rank": 2,
@@ -575,13 +595,11 @@
       "cost": "The indulgence is a single bell-note; if the jar breaks, the ward fails."
     }
   ],
-
   "quick_use_notes": {
     "draw_rules": "Draw until you have all four suits: Spade = place, Heart = actor, Club = pressure, Diamond = leverage. Highest rank sets the main Timer (2–5 → 4, 6–10 → 6, J/Q/K → 8, A → 10).",
     "diamonds": "Diamonds are codified outcomes (passes/seals/tokens) that change position rather than call for a roll.",
     "ace_rule": "If any A appears, echo breath and boundary — bells answering across water, salt that won't dry, voices returning late."
   },
-
   "additional_features": [
     {
       "name": "Breath-Toll",
@@ -604,7 +622,6 @@
       "description": "The Bell-Keeper — The Sealed Gate. A bell that never rings, yet holds the threshold closed. The Salted One — Oath of Mercy and Grace. A prayer that preserves body and soul, but remembers the name of everyone it saves. The Mist-Father — Khemesh. The pressure beneath the fog; the hunger that waits in still air. The Lantern Bearer — The Traveler. The light that guides lost ships — and lost souls."
     }
   ],
-
   "lore_echoes": [
     {
       "title": "Saint Lucas of the Iron Bell (The Sealed Gate)",
@@ -631,7 +648,6 @@
       "description": "Looming over Payden's Port, this ancient workshop of bell-automata and ward-forges is sealed by the Protectorate — but smugglers and treasure-hunters still enter. Locals whisper that the lowest catacombs connect to the Ways Between. The Aeler have tried to collapse the upper levels three times; each time, the rubble was found cleared by morning, with no tracks in the fog."
     }
   ],
-
   "superstitions": [
     {
       "name": "Bread to the Fog",
@@ -649,7 +665,6 @@
       "cost": "Burn for +1 die once"
     }
   ],
-
   "sb_spend_table": {
     "minor_complications": [
       "**Exposure:** Your actions draw unwanted attention from **wardens or fog-knights**.",
@@ -685,37 +700,64 @@
       "**Mistlands (Direwood Threat):** Trees whisper your name, roots shift position, forest breath grows stronger."
     ]
   },
-
   "pursuit_ladder": [
     "**Advance/Withdraw (Wits + Navigation):** On a hit, shift one band. On a strong hit, also impose *Fog Bank*.",
     "**Silence the Bell (Presence + Stealth):** On a hit, freeze range for one exchange; if a ward-salt pouch is in your possession, +1 die.",
     "**Weather the Tide (Endurance + Survival):** On a hit in *Tide-Mist*, you pick who keeps their bearings; on a miss, the GM does."
   ],
-
   "boss_archetypes": [
     {
       "name": "The Ninth Bell Ringer",
-      "tags": ["Direwood herald"],
+      "tags": [
+        "Direwood herald"
+      ],
       "description": "A spectral figure who rings the forbidden ninth bell, opening gates to the Direwood.",
-      "phases": ["Lost Names", "Broken Lines", "Open Gate"],
-      "cracks": ["restore a ringbook", "trade a breath", "rehang a forbidden bell with copper nails"]
+      "phases": [
+        "Lost Names",
+        "Broken Lines",
+        "Open Gate"
+      ],
+      "cracks": [
+        "restore a ringbook",
+        "trade a breath",
+        "rehang a forbidden bell with copper nails"
+      ]
     },
     {
       "name": "Queen of Counting Lights",
-      "tags": ["fae arbiter"],
+      "tags": [
+        "fae arbiter"
+      ],
       "description": "A fae entity who counts names and breaths, and demands payment in forgotten things.",
-      "phases": ["Courtesies", "Geas-Market", "Counting of Leaves"],
-      "cracks": ["return stolen way-marks", "speak said and meant", "gild the iron"]
+      "phases": [
+        "Courtesies",
+        "Geas-Market",
+        "Counting of Leaves"
+      ],
+      "cracks": [
+        "return stolen way-marks",
+        "speak said and meant",
+        "gild the iron"
+      ]
     },
     {
       "name": "Reed-Wolf Captain",
-      "tags": ["Linn raider"],
+      "tags": [
+        "Linn raider"
+      ],
       "description": "A ruthless Linn raider who plunders the fens during tide-mists.",
-      "phases": ["Smoke Signals", "Night Oars", "Thing Verdict"],
-      "cracks": ["name a feud-token", "win a skald-duel", "force harbour-truce under bell and banner"]
+      "phases": [
+        "Smoke Signals",
+        "Night Oars",
+        "Thing Verdict"
+      ],
+      "cracks": [
+        "name a feud-token",
+        "win a skald-duel",
+        "force harbour-truce under bell and banner"
+      ]
     }
   ],
-
   "encounter_seeds": [
     {
       "title": "The Drowned Rat's Guest",
@@ -730,7 +772,6 @@
       "description": "The gate is weeping black sap. The wardens say the Direwood is hungry. They need a volunteer to carry a bell to the forest's edge and ring it until the sap stops. The volunteer may not return."
     }
   ],
-
   "faction_entanglements": [
     "**Aeler Protectorate:** They enforce standardized bell-codes and salt-tithes; anger them and you face fines, arrest, or exile to the Direwood.",
     "**Bell-Wardens:** They keep the old ways; cross them and your name will be omitted from the ward-records, leaving you vulnerable to the mist.",
@@ -738,14 +779,12 @@
     "**Direwood Refugees:** They carry the forest's secrets; earn their trust and learn the true name of the mist — or betray them and awaken the forest's wrath.",
     "**Linn Raiders:** They come for the salt and the bells; pay them tribute or fight them off. They respect strength and cruelty, not mercy."
   ],
-
   "cross_regional_ties": [
     "**Aeler:** The Protectorate supplies the Mistlands with iron, engineers, and missionaries; they seek to standardize the bell-lines and bring the region under imperial law.",
     "**Ykrul:** The Violet Steppe's riders avoid the Mistlands; the fog and bells are a better border than any wall. Those who wander in rarely find their way out.",
     "**Linns:** Longship raids prey on the coast; the Linns trade iron for salt when they are not raiding. Their skalds tell stories of the Mistlands as a haunted shore.",
     "**Direwood:** The forest breathes; its breath is the mist. The Weeping Gate holds it back — but the gate is old, and the forest is patient."
   ],
-
   "black_barrow_keep": {
     "title": "Black Barrow Keep — The Ruin Above Payden's Port",
     "description": "Looming over the eastern edge of Payden's Port, Black Barrow Keep is a jagged wound in the skyline. Its basalt walls weep salt, and its broken towers lean into the fog like old men listening for a bell that never rings. The Aelinnel built it in a forgotten age—not as a fortress, but as a workshop. Here, they forged bell-automata, copper sentinels, and the first ward-lines that still keep the Direwood at bay. When the Mistlands became a Protectorate, the Aelinnel sealed the deep forges and retreated. The locals say the keep is haunted. The truth is worse: it is not haunted—it is occupied.",
@@ -847,7 +886,6 @@
       }
     ]
   },
-
   "index": [
     "Mistlands",
     "Bells, Salt, and Breath generator",
@@ -884,5 +922,6 @@
     "Gray Hospice of the Unnamed",
     "Bell-Ringer's Covenant",
     "Local Patrons!Mistlands"
-  ]
+  ],
+  "_license": "Fate's Edge Proprietary Content – © 2024 Nicholas A. Gasper. All rights reserved."
 }

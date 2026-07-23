@@ -22,8 +22,7 @@ __pycache__/
 *.pyo
 *.pyd
 .Python
-env/
-venv/
+env/ venv/
 .venv/
 pip-log.txt
 pip-delete-this-directory.txt
@@ -67,3 +66,8 @@ ttrpg/utilities/javascript/fates-edge-desktop-client/out/
 
 # Discord bot
 ttrpg/utilities/fates-edge-discord-bot/node_modules/
+
+#misc
+
+output.txt
+*.tmp

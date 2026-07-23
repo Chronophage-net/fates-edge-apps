@@ -6,7 +6,6 @@
   "label": "chap:wilderness",
   "key_demographic": "Various",
   "manifest_path": "/data/docs/manifest.json",
-
   "overview": {
     "tagline": "The land walks when you don't watch it, and the roads remember who bled on them.",
     "genre": "Hexcrawl wanderlust, ruin-haunted silence, weather as character.",
@@ -21,7 +20,6 @@
       "all": "The wilds connect all regions. Roads lead to the Violet Steppe, the Aelerian mountains, the Mistlands, and the Amaranthine coast. The land is the common thread between all settled lands."
     }
   },
-
   "quotes": [
     {
       "speaker": "Claimant Chief (Elite)",
@@ -32,7 +30,6 @@
       "text": "The wilds don't need your roads or your rules — they got their own ways of keeping score. Follow the cairns if you want to live, and always leave something behind to thank the land for letting you pass. Every hill hides a secret, and every hollow breathes."
     }
   ],
-
   "wilds_timer": {
     "name": "The Wilds Timer",
     "max_segments": 6,
@@ -48,23 +45,60 @@
     },
     "ninth_taboo": "In any Wilds scene, the ninth cairn you pass in a day will be warm to the touch. Leave an offering—a pinch of salt, a copper coin, a single word spoken to the wind—or the path will forget you. Those who forget to pay find that the next crossing leads back to the same cairn, and the cairn has grown a new stone. The stone has their name on it."
   },
-
   "travel_system": {
-    "priorities": ["Speed", "Stealth", "Safety", "Survey"],
+    "priorities": [
+      "Speed",
+      "Stealth",
+      "Safety",
+      "Survey"
+    ],
     "weather_whims": [
-      {"roll": 1, "name": "Glass-clear", "effect": "long sight, easy navigation. +1 to Survey actions."},
-      {"roll": 2, "name": "Low fog", "effect": "stealth advantage, speed suffers. +1 to Stealth, -1 to Speed."},
-      {"roll": 3, "name": "Trickle rain", "effect": "tracks wash, cold bites. First navigation or tracking roll at -1 die."},
-      {"roll": 4, "name": "Dry cold / heat", "effect": "resources drain faster. Mark +1 supply strain at end of leg."},
-      {"roll": 5, "name": "Shifting wind", "effect": "smoke and scent lie. Reroll one die on a weather-related check, but the GM may bank 1 SB."},
-      {"roll": 6, "name": "Omen sky", "effect": "the land is listening. The GM may ask one player to answer a single question about the party's future."}
+      {
+        "roll": 1,
+        "name": "Glass-clear",
+        "effect": "long sight, easy navigation. +1 to Survey actions."
+      },
+      {
+        "roll": 2,
+        "name": "Low fog",
+        "effect": "stealth advantage, speed suffers. +1 to Stealth, -1 to Speed."
+      },
+      {
+        "roll": 3,
+        "name": "Trickle rain",
+        "effect": "tracks wash, cold bites. First navigation or tracking roll at -1 die."
+      },
+      {
+        "roll": 4,
+        "name": "Dry cold / heat",
+        "effect": "resources drain faster. Mark +1 supply strain at end of leg."
+      },
+      {
+        "roll": 5,
+        "name": "Shifting wind",
+        "effect": "smoke and scent lie. Reroll one die on a weather-related check, but the GM may bank 1 SB."
+      },
+      {
+        "roll": 6,
+        "name": "Omen sky",
+        "effect": "the land is listening. The GM may ask one player to answer a single question about the party's future."
+      }
     ],
     "making_camp": {
-      "boons": ["heal a piece of gear", "clear 1 Fatigue", "scout tomorrow's weather", "share a story with a road spirit (gain a Truce Cord)"],
-      "risks": ["thin shelter (next weather hits harder)", "smoky fire (attracts prowlers)", "exposed approach (ambush more likely)", "hungry neighbors (locals or beasts appear)"]
+      "boons": [
+        "heal a piece of gear",
+        "clear 1 Fatigue",
+        "scout tomorrow's weather",
+        "share a story with a road spirit (gain a Truce Cord)"
+      ],
+      "risks": [
+        "thin shelter (next weather hits harder)",
+        "smoky fire (attracts prowlers)",
+        "exposed approach (ambush more likely)",
+        "hungry neighbors (locals or beasts appear)"
+      ]
     }
   },
-
   "places": [
     {
       "rank": 2,
@@ -171,7 +205,6 @@
       "mechanical_hook": "Following the dead's path leads to a thin place (see Ways Between). The footprints are fresh — someone walked this way recently. They did not come back. If you take the third path, roll Spirit+Resolve (DV 4). On failure, tick the Wilds Timer +2 and gain the Marked by the Dead condition."
     }
   ],
-
   "people_and_factions": [
     {
       "rank": 2,
@@ -291,7 +324,6 @@
       "what_they_ask": "The memory must be something you cherish. They will not take it by force. They will ask. If you refuse, they will not speak again. If you offer a false memory, the land will know — tick the Wilds Timer +2."
     }
   ],
-
   "additional_denizens": [
     {
       "rank": 15,
@@ -411,7 +443,6 @@
       "what_they_ask": "They point in a direction. If you follow, you find a thin place (see Ways Between). If you ignore, the Hollow will walk in that direction at midnight — and you will be in its path. If you speak to them, they will answer in a voice that is not their own — the voice of someone you have wronged."
     }
   ],
-
   "complications": [
     {
       "rank": 2,
@@ -518,7 +549,6 @@
       "mechanical_hook": "The catastrophe advances each round. The party must find shelter (Survival test DV 5) or take Harm 2. The land's name is a warning. If you speak the name aloud, the catastrophe will pause for one round — but the land will remember your voice."
     }
   ],
-
   "expanded_travel_hazards": [
     {
       "rank": 15,
@@ -575,7 +605,6 @@
       "mechanical_hook": "The gatekeeper is testing the party. If they pay the toll, they pass. If they negotiate, they may pass for less. If they refuse, the gate will close — and the land will remember their name."
     }
   ],
-
   "rewards": [
     {
       "rank": 2,
@@ -682,56 +711,140 @@
       "cost": "The exception lasts one scene. The land will forget it as soon as you use it — but you will remember it every night for a year. The exception is a secret — if you tell anyone, the land will remember and take it back. If you use it wisely, the land may offer you another."
     }
   ],
-
   "wilds_manifestation_table": [
-    {"roll": 1, "manifestation": "**Cairn-Wight** — A stone guardian rises from a nearby cairn. It demands witness: the party must speak a truth about their journey. If they refuse, it attacks (Cap 3, Harm 4). If they speak truthfully, it grants them a Cache Token (see Diamonds)."},
-    {"roll": 2, "manifestation": "**Weather Omen** — A storm follows the party for the rest of the leg. All travel rolls are Desperate. The storm has a name — it's the land's voice. If the party speaks the name, the storm will pause for one scene."},
-    {"roll": 3, "manifestation": "**Path Shift** — The route ahead is no longer on any map. The party must navigate by instinct (Wits+Lore DV 5) or become lost (lose 2 segments of progress). The new path leads to a place that was never meant to be found."},
-    {"roll": 4, "manifestation": "**Ghost Procession** — The land's memory walks. A spectral column crosses the party's path. They must wait (lose 1 segment) or try to cross through (Spirit+Resolve DV 4, or take Harm 1). The ghosts are counting — they count in eights. If you take the ninth step, they will follow you."},
-    {"roll": 5, "manifestation": "**The Land Speaks** — The party hears a voice from the ground itself. It asks one question: 'What do you owe?' Answering costs a memory; silence costs a name. The voice is the land's — it has been waiting to speak to you."},
-    {"roll": 6, "manifestation": "**The Ninth Step** — The party finds themselves at the same crossing they passed yesterday. The Wilds Timer resets to 0. The land has decided to give them another chance — or another test. The crossing has changed — there is a new cairn. It has your name on it."}
+    {
+      "roll": 1,
+      "manifestation": "**Cairn-Wight** — A stone guardian rises from a nearby cairn. It demands witness: the party must speak a truth about their journey. If they refuse, it attacks (Cap 3, Harm 4). If they speak truthfully, it grants them a Cache Token (see Diamonds)."
+    },
+    {
+      "roll": 2,
+      "manifestation": "**Weather Omen** — A storm follows the party for the rest of the leg. All travel rolls are Desperate. The storm has a name — it's the land's voice. If the party speaks the name, the storm will pause for one scene."
+    },
+    {
+      "roll": 3,
+      "manifestation": "**Path Shift** — The route ahead is no longer on any map. The party must navigate by instinct (Wits+Lore DV 5) or become lost (lose 2 segments of progress). The new path leads to a place that was never meant to be found."
+    },
+    {
+      "roll": 4,
+      "manifestation": "**Ghost Procession** — The land's memory walks. A spectral column crosses the party's path. They must wait (lose 1 segment) or try to cross through (Spirit+Resolve DV 4, or take Harm 1). The ghosts are counting — they count in eights. If you take the ninth step, they will follow you."
+    },
+    {
+      "roll": 5,
+      "manifestation": "**The Land Speaks** — The party hears a voice from the ground itself. It asks one question: 'What do you owe?' Answering costs a memory; silence costs a name. The voice is the land's — it has been waiting to speak to you."
+    },
+    {
+      "roll": 6,
+      "manifestation": "**The Ninth Step** — The party finds themselves at the same crossing they passed yesterday. The Wilds Timer resets to 0. The land has decided to give them another chance — or another test. The crossing has changed — there is a new cairn. It has your name on it."
+    }
   ],
-
   "quick_use_notes": {
     "draw_rules": "Draw until you have all four suits: Spade = place, Heart = actor, Club = pressure, Diamond = leverage. Highest rank sets the main Timer (2–5 → 4, 6–10 → 6, J/Q/K → 8, A → 10).",
     "diamonds": "Diamonds are codified outcomes (cache/pass/favor) that change position rather than call for a roll.",
     "ace_rule": "If any A appears, add a lingering omen of the land (a smell on the wind, a sound that carries too far, tracks that shift) that you can echo in later scenes.",
     "timer_visibility": "The Wilds Timer should be visible to players — the land's attention is a pressure they can feel."
   },
-
   "weather_omens": [
-    {"roll": 1, "meaning": "Three crows fly west—the next storm will carry voices from the past."},
-    {"roll": 2, "meaning": "Moonring broken at midnight—the weather will shift twice before dawn."},
-    {"roll": 3, "meaning": "Wind carries iron scent on clear air—storm approaches from the direction of old battlefields."},
-    {"roll": 4, "meaning": "Stars vanish in pattern—the land is holding its breath; the next step decides fate."},
-    {"roll": 5, "meaning": "Sun dogs flank the rising sun—blessing on journeys begun before noon."},
-    {"roll": 6, "meaning": "Fog forms perfect circles—what is lost will return, but changed."},
-    {"roll": 7, "meaning": "Lightning strikes twice in same spot—the Hollow marks this place for attention."},
-    {"roll": 8, "meaning": "Rain falls upward for three breaths—a reversal is coming; prepare to give what you take."},
-    {"roll": 9, "meaning": "Wind dies completely at noon—the land sleeps; move swiftly or become part of its dream."},
-    {"roll": 10, "meaning": "Aurora pulses with your heartbeat—the sky knows your name and your burden."}
+    {
+      "roll": 1,
+      "meaning": "Three crows fly west—the next storm will carry voices from the past."
+    },
+    {
+      "roll": 2,
+      "meaning": "Moonring broken at midnight—the weather will shift twice before dawn."
+    },
+    {
+      "roll": 3,
+      "meaning": "Wind carries iron scent on clear air—storm approaches from the direction of old battlefields."
+    },
+    {
+      "roll": 4,
+      "meaning": "Stars vanish in pattern—the land is holding its breath; the next step decides fate."
+    },
+    {
+      "roll": 5,
+      "meaning": "Sun dogs flank the rising sun—blessing on journeys begun before noon."
+    },
+    {
+      "roll": 6,
+      "meaning": "Fog forms perfect circles—what is lost will return, but changed."
+    },
+    {
+      "roll": 7,
+      "meaning": "Lightning strikes twice in same spot—the Hollow marks this place for attention."
+    },
+    {
+      "roll": 8,
+      "meaning": "Rain falls upward for three breaths—a reversal is coming; prepare to give what you take."
+    },
+    {
+      "roll": 9,
+      "meaning": "Wind dies completely at noon—the land sleeps; move swiftly or become part of its dream."
+    },
+    {
+      "roll": 10,
+      "meaning": "Aurora pulses with your heartbeat—the sky knows your name and your burden."
+    }
   ],
-
   "ruin_findings": [
-    {"roll": 1, "discovery": "A mosaic floor depicting a migration no map remembers—follow the tiles to find a hidden valley."},
-    {"roll": 2, "discovery": "Wind whistles through broken arches in a tune that feels like home—hum it to gain +1 Effect on the next social roll."},
-    {"roll": 3, "discovery": "Stone faces weep clear liquid that tastes of the first rain of spring—drink to clear 1 Fatigue."},
-    {"roll": 4, "discovery": "A single tile is warm to the touch—press it to reveal a compartment holding a perfectly preserved seed."},
-    {"roll": 5, "discovery": "Shadows move opposite the light—stand in their intersection to become invisible for one exchange."},
-    {"roll": 6, "discovery": "Carvings show hands exchanging not goods but breaths—press your palm to the wall to share a memory."},
-    {"roll": 7, "discovery": "The air hums at a frequency that makes teeth ache—sing against it to gain +1 die on the next magical roll."},
-    {"roll": 8, "discovery": "A doorway frame is grown over with living stone—walk through it to leave one burden behind."}
+    {
+      "roll": 1,
+      "discovery": "A mosaic floor depicting a migration no map remembers—follow the tiles to find a hidden valley."
+    },
+    {
+      "roll": 2,
+      "discovery": "Wind whistles through broken arches in a tune that feels like home—hum it to gain +1 Effect on the next social roll."
+    },
+    {
+      "roll": 3,
+      "discovery": "Stone faces weep clear liquid that tastes of the first rain of spring—drink to clear 1 Fatigue."
+    },
+    {
+      "roll": 4,
+      "discovery": "A single tile is warm to the touch—press it to reveal a compartment holding a perfectly preserved seed."
+    },
+    {
+      "roll": 5,
+      "discovery": "Shadows move opposite the light—stand in their intersection to become invisible for one exchange."
+    },
+    {
+      "roll": 6,
+      "discovery": "Carvings show hands exchanging not goods but breaths—press your palm to the wall to share a memory."
+    },
+    {
+      "roll": 7,
+      "discovery": "The air hums at a frequency that makes teeth ache—sing against it to gain +1 die on the next magical roll."
+    },
+    {
+      "roll": 8,
+      "discovery": "A doorway frame is grown over with living stone—walk through it to leave one burden behind."
+    }
   ],
-
   "trail_signs": [
-    {"roll": 1, "meaning": "Pebbles point not to the path but to a patch of edible mushrooms—the land offers sustenance if you look aside."},
-    {"roll": 2, "meaning": "Grass grows in perfect spirals around a stone—walk the spiral three times to find your bearings if lost."},
-    {"roll": 3, "meaning": "A single feather lies across the trail—it belongs to a bird that nests only in places of perfect safety."},
-    {"roll": 4, "meaning": "Moss grows thickest on the north face of rocks—but here it thrives on the south; the land is confused or changed."},
-    {"roll": 5, "meaning": "Twigs are arranged in a pattern that matches your boot tread—something has been watching your steps."},
-    {"roll": 6, "meaning": "Water in a puddle holds a perfect reflection... of a place you've never been."}
+    {
+      "roll": 1,
+      "meaning": "Pebbles point not to the path but to a patch of edible mushrooms—the land offers sustenance if you look aside."
+    },
+    {
+      "roll": 2,
+      "meaning": "Grass grows in perfect spirals around a stone—walk the spiral three times to find your bearings if lost."
+    },
+    {
+      "roll": 3,
+      "meaning": "A single feather lies across the trail—it belongs to a bird that nests only in places of perfect safety."
+    },
+    {
+      "roll": 4,
+      "meaning": "Moss grows thickest on the north face of rocks—but here it thrives on the south; the land is confused or changed."
+    },
+    {
+      "roll": 5,
+      "meaning": "Twigs are arranged in a pattern that matches your boot tread—something has been watching your steps."
+    },
+    {
+      "roll": 6,
+      "meaning": "Water in a puddle holds a perfect reflection... of a place you've never been."
+    }
   ],
-
   "lore_echoes": [
     {
       "title": "The Bitter Root",
@@ -750,7 +863,6 @@
       "description": "Wilds psions are called 'Stone-Listeners.' They hear the memory of old trails. Claimant chiefs pay well for their services—and dispose of those who hear too much. The stones speak in eights. The ninth word is always a name."
     }
   ],
-
   "superstitions": [
     {
       "name": "Bread to the Cairn",
@@ -768,7 +880,6 @@
       "cost": "Burn for +1 die once"
     }
   ],
-
   "sb_spend_table": {
     "minor_complications": [
       "**Exposure:** Your actions draw unwanted attention from **wardens or local hunters**.",
@@ -805,7 +916,6 @@
       "**Wilds (The Ninth):** The ninth step leads to a thin place. The ninth cairn is warm. The ninth offering is always accepted."
     ]
   },
-
   "terrain_stock": [
     "Fresh ash on an old fire ring; prints circle *around* it.",
     "Boundary totems toppled but re-stack themselves if watched politely.",
@@ -828,7 +938,6 @@
     "Soot writing on cliff: 'Storm at Second Bell.' It's right.",
     "Hollow tree full of carved names; the newest is yours."
   ],
-
   "lair_seeds": [
     "**Fen Clockworks** — Bog-gears turn under peat; each tooth a drowned oath.",
     "**Dry River Gallery** — Petroglyphs re-arrange at dusk; wrong reading summons bramble knights.",
@@ -843,7 +952,6 @@
     "**Stormbone Spire** — Vertebrae tower; earth-sharks circle beneath like sharks in sand.",
     "**Amber Orchard** — Trees fossilised mid-sway; trapped thunderflies grant Weather Window when freed."
   ],
-
   "wilderness_bestiary": [
     {
       "name": "Earth-Sharks",
@@ -918,7 +1026,6 @@
       "hook": "present a hedge-blessing; they escort instead of impale. They count in thorns — the ninth is always sharp."
     }
   ],
-
   "strange_finds": [
     "**Route-stones** that warm near true north.",
     "**Weather-bell clapper** that tolls only for lightning.",
@@ -931,21 +1038,70 @@
     "**Bone flute** that calls earth-sharks to circle elsewhere.",
     "**Lantern-eye husk**; squeeze for daylight the length of a camp prayer."
   ],
-
   "omens_and_signs": {
-    "sky_signs": ["sun-dog", "mare's tails", "anvil cloud faces the wrong way", "silent birds", "far thunder without storm", "moon with halo", "ash scent on clear air", "stars 'shiver'"],
-    "ground_signs": ["cairn with new pebble", "boot prints that end at rock", "butchered game left neat", "snapped twig at head height", "ash under wet moss", "ward-knot cut", "trail beads on shrub", "a single coin on a stone"]
+    "sky_signs": [
+      "sun-dog",
+      "mare's tails",
+      "anvil cloud faces the wrong way",
+      "silent birds",
+      "far thunder without storm",
+      "moon with halo",
+      "ash scent on clear air",
+      "stars 'shiver'"
+    ],
+    "ground_signs": [
+      "cairn with new pebble",
+      "boot prints that end at rock",
+      "butchered game left neat",
+      "snapped twig at head height",
+      "ash under wet moss",
+      "ward-knot cut",
+      "trail beads on shrub",
+      "a single coin on a stone"
+    ]
   },
-
   "fast_reskin_palette": {
-    "forest": {"swap": {"dunes": "deadfall", "spindrift": "canopy flare", "prowlers": "boar/wolves"}, "water": "spring/stream"},
-    "desert": {"swap": {"bog": "salt pan", "fog": "dust"}, "shelter": "overhang/wadi", "water": "seep/fog net"},
-    "tundra/ice": {"swap": {"dune shift": "ice heave", "fire": "spindrift", "boats": "sleds"}, "prowlers": "bears/wolves"},
-    "coast/isles": {"crossings": "reef shelves", "prowlers": "seals/raiders", "alarms": "harbor booms", "fuel": "driftwood"},
-    "swamp/fen": {"crossings": "corduroy/log causeways", "bad ground": "peat crust", "prowlers": "gators/leeches"},
-    "highlands": {"crossings": "cols and scree traverses", "alarms": "beacon chains", "prowlers": "cats/eagles"}
+    "forest": {
+      "swap": {
+        "dunes": "deadfall",
+        "spindrift": "canopy flare",
+        "prowlers": "boar/wolves"
+      },
+      "water": "spring/stream"
+    },
+    "desert": {
+      "swap": {
+        "bog": "salt pan",
+        "fog": "dust"
+      },
+      "shelter": "overhang/wadi",
+      "water": "seep/fog net"
+    },
+    "tundra/ice": {
+      "swap": {
+        "dune shift": "ice heave",
+        "fire": "spindrift",
+        "boats": "sleds"
+      },
+      "prowlers": "bears/wolves"
+    },
+    "coast/isles": {
+      "crossings": "reef shelves",
+      "prowlers": "seals/raiders",
+      "alarms": "harbor booms",
+      "fuel": "driftwood"
+    },
+    "swamp/fen": {
+      "crossings": "corduroy/log causeways",
+      "bad ground": "peat crust",
+      "prowlers": "gators/leeches"
+    },
+    "highlands": {
+      "crossings": "cols and scree traverses",
+      "alarms": "beacon chains",
+      "prowlers": "cats/eagles"
+    }
   },
-
   "index": [
     "Wilderness",
     "Roads, Ruins, and Weather generator",
@@ -979,5 +1135,6 @@
     "Ninth Night",
     "Well-Spirit Honored",
     "Toll Shift"
-  ]
+  ],
+  "_license": "Fate's Edge Proprietary Content – © 2024 Nicholas A. Gasper. All rights reserved."
 }

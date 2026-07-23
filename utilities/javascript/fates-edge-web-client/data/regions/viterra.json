@@ -7,7 +7,6 @@
   "key_demographic": "Lethai-al",
   "capital": "Valora",
   "manifest_path": "/data/docs/manifest.json",
-
   "overview": {
     "tagline": "Every hedge is a boundary. Every boundary is a claim. Every claim is a blade.",
     "genre": "Post-imperial consolidation, legal warfare as blood sport, border adventurism, fragile crown haunted by fratricide.",
@@ -26,7 +25,6 @@
       "theona": "Eastern Viterran earls clamor to dominate the isles; the Abbess plays a dangerous game."
     }
   },
-
   "quotes": [
     {
       "speaker": "Queen Veralyn Everblood (Elite)",
@@ -37,12 +35,10 @@
       "text": "Barons to the west with blood on their hands, Earls to the east shapenin' their knives... Witches to the south and Dukes everywhere, laws everywhere. I keep my nose down, count my sheep, pay my tax, and obey my lord. That's enough for me."
     }
   ],
-
   "ninth_taboo": {
     "title": "The Ninth Taboo Manifestation",
     "description": "In any Viterran court, the ninth citation of precedent voids all previous citations. The wise stop at eight and settle out of court. Those who cite the ninth are said to hear faint laughter from the marble walls—and their cases are never heard again. Some say the laughter is Baldwyn Brightstide's, still judging from the shadow of the throne. The ninth witness called to a hedge-moot is always a ghost. The wise stop at eight. Those who call a ninth find that the ghost speaks the truth—but the truth is always the worst possible version, and the living witnesses remember it as their own. The hedges themselves are full of these truths."
   },
-
   "npcs": [
     {
       "name": "Queen Veralyn Everblood",
@@ -93,14 +89,40 @@
       "quirk": "Carries a shard of Lence's cathedral glass in his pommel; whispers to it before every moot. Secretly funded the fanatics who killed King Wyllmot."
     }
   ],
-
   "names": {
-    "first_male": ["Baldwyn", "Cuthbert", "Roran", "Morcar", "Leofric", "Ghiro"],
-    "first_female": ["Veralyn", "Elodie", "Oria", "Aelfwyn", "Celandine", "Svanhild"],
-    "surnames": ["Everblood", "Fenwood", "of the Scar", "de la Marche", "l'Argent", "Riven"],
-    "epithets": ["the Law-Giver", "the Unbuckled", "Bell-Sworn", "the Hedge-Wise", "the Silent", "Ash-Banner"]
+    "first_male": [
+      "Baldwyn",
+      "Cuthbert",
+      "Roran",
+      "Morcar",
+      "Leofric",
+      "Ghiro"
+    ],
+    "first_female": [
+      "Veralyn",
+      "Elodie",
+      "Oria",
+      "Aelfwyn",
+      "Celandine",
+      "Svanhild"
+    ],
+    "surnames": [
+      "Everblood",
+      "Fenwood",
+      "of the Scar",
+      "de la Marche",
+      "l'Argent",
+      "Riven"
+    ],
+    "epithets": [
+      "the Law-Giver",
+      "the Unbuckled",
+      "Bell-Sworn",
+      "the Hedge-Wise",
+      "the Silent",
+      "Ash-Banner"
+    ]
   },
-
   "player_hooks": {
     "description": "The Hedge-Law Realm is about legal warfare, border disputes, and royal legitimacy. A party in Viterra will most often:",
     "activities": [
@@ -115,7 +137,6 @@
       "The Queen's crown has no jewels—only seals from conquered claims. She will not surrender her Vhasian title."
     ]
   },
-
   "places": [
     {
       "rank": 2,
@@ -235,7 +256,6 @@
       "mechanical_hook": "A successful Wits+Lore (DV 4) can expose a forged seal; failure may start a Border Snarl."
     }
   ],
-
   "people_and_factions": [
     {
       "rank": 2,
@@ -368,7 +388,6 @@
       "what_they_ask": "A case worth winning—and a client who will not betray him."
     }
   ],
-
   "complications": [
     {
       "rank": 2,
@@ -488,7 +507,6 @@
       "mechanical_hook": "The party must accept or find a champion; a legal duel follows the Legal Duel Protocol. Victory grants a Duel Sanction."
     }
   ],
-
   "rewards": [
     {
       "rank": 2,
@@ -608,13 +626,11 @@
       "cost": "The duel is binding; losing may cost your life or legal standing."
     }
   ],
-
   "quick_use_notes": {
     "draw_rules": "Draw until you have all four suits: Spade = place, Heart = actor, Club = pressure, Diamond = leverage. Highest rank sets the main Timer (2–5 → 4, 6–10 → 6, J/Q/K → 8, A → 10).",
     "diamonds": "Diamonds are codified outcomes (writs, charters, priority) that change position rather than call for a roll.",
     "ace_rule": "If any Ace appears, echo hedge-law motifs—boundaries blur like old scars, charters contradict like guilty consciences, precedent splinters like shaky oaths, and the careful web of legal authority shows its living cracks. Legal warfare escalates to physical conflict not as failure, but as the only language left when words run dry."
   },
-
   "additional_features": [
     {
       "name": "Hedge-Law Momentum",
@@ -661,7 +677,6 @@
       "description": "Border-Lace [4]: Tracks competing legal claims. Ticks when a second valid writ is presented, a player steps up Position using Hedge-Law Momentum, or a Vhasian authority disputes a crown document. At 4: dispute escalates to riot, duel, or jurisdictional void. Succession's Shadow [6]: Tracks erosion of Queen Veralyn's legitimacy. Ticks when a document bearing Baldwyn's seal surfaces, a northern earl or eastern baron defies the crown, a legal duel is lost by the Queen's champion, or the GM spends 2 SB to introduce a related complication. At 3: Viterran officials suffer -1 die to social rolls. At 6: a serious claimant emerges. Queen's Peace [Front]: Once per session, if the party resolves a cross-border dispute in the Queen's favor without bloodshed, advance this front. If they escalate violence or validate a Vhasian claim, tick Succession's Shadow instead."
     }
   ],
-
   "lore_echoes": [
     {
       "title": "The Hedge-Seal (The Dike Covenant)",
@@ -680,7 +695,6 @@
       "description": "Along the Dolmis shore, a syncretic cult tends to the drowned. They build cairns of salt stone and leave no offerings—only the names of the lost, carved into driftwood. Temple of Light missions sent to suppress them have been found adrift with no crew and a single name carved into the mast: Oblivion."
     }
   ],
-
   "superstitions": [
     {
       "name": "Bread to the Hedge",
@@ -703,7 +717,6 @@
       "cost": "Burn for +1 die once"
     }
   ],
-
   "sb_spend_table": {
     "minor_complications": [
       "**Exposure:** Crown officials or rival advocates take notice.",
@@ -740,38 +753,76 @@
       "**Succession's Whisper (2 SB, Viterra only):** A document or rumor tied to Baldwyn Brightstide's death surfaces. The GM must answer one yes/no question about royal legitimacy or introduce a related complication. Earl Morcar's involvement may also be hinted."
     ]
   },
-
   "boss_archetypes": [
     {
       "name": "The Violet Clerk",
-      "tags": ["Master of Counter-Seals"],
+      "tags": [
+        "Master of Counter-Seals"
+      ],
       "description": "A legal expert who masters the art of counter-seals and forged precedents.",
-      "phases": ["Produce Earlier Patent", "Split the Writ", "Seal Fast"],
-      "cracks": ["A Queen's Audience overrules his seal", "a Duel Sanction forces personal combat", "a Map Correction voids his boundary claim"]
+      "phases": [
+        "Produce Earlier Patent",
+        "Split the Writ",
+        "Seal Fast"
+      ],
+      "cracks": [
+        "A Queen's Audience overrules his seal",
+        "a Duel Sanction forces personal combat",
+        "a Map Correction voids his boundary claim"
+      ]
     },
     {
       "name": "The Thorn Captain",
-      "tags": ["Queen's Quiet Hand"],
+      "tags": [
+        "Queen's Quiet Hand"
+      ],
       "description": "The Queen's enforcer, using legal means to crush opposition.",
-      "phases": ["Queenspeace Zone", "Duel Warrant", "Swap the Field"],
-      "cracks": ["A Map Correction reveals a loophole", "a Dike Allotment lets you claim the field as 'flood zone'", "a Border Routier testifies to the Queen's favor"]
+      "phases": [
+        "Queenspeace Zone",
+        "Duel Warrant",
+        "Swap the Field"
+      ],
+      "cracks": [
+        "A Map Correction reveals a loophole",
+        "a Dike Allotment lets you claim the field as 'flood zone'",
+        "a Border Routier testifies to the Queen's favor"
+      ]
     },
     {
       "name": "The Saffron Abbess",
-      "tags": ["Keeper of Bell-Law"],
+      "tags": [
+        "Keeper of Bell-Law"
+      ],
       "description": "A religious figure who uses bell-law and ritual to control disputes.",
-      "phases": ["Wrong Hour", "Bless or Damn", "Mixed Tribunal"],
-      "cracks": ["A Queen's Justiciar invokes crown supremacy", "a Border Routier bribes her bell-ringer", "a Thing Ruling from Theona forces her to recuse"]
+      "phases": [
+        "Wrong Hour",
+        "Bless or Damn",
+        "Mixed Tribunal"
+      ],
+      "cracks": [
+        "A Queen's Justiciar invokes crown supremacy",
+        "a Border Routier bribes her bell-ringer",
+        "a Thing Ruling from Theona forces her to recuse"
+      ]
     },
     {
       "name": "The Brightstide Claimant",
-      "tags": ["Pretender"],
+      "tags": [
+        "Pretender"
+      ],
       "description": "A claimant to the throne using forged documents and northern support.",
-      "phases": ["Produce the Lost Charter", "Rally the Northern Earls", "March on Valora"],
-      "cracks": ["Find proof the charter is a forgery", "convince Earl Morcar to stand with the Queen (or expose his role in Wyllmot's death)", "survive a legal duel with the claimant's champion"]
+      "phases": [
+        "Produce the Lost Charter",
+        "Rally the Northern Earls",
+        "March on Valora"
+      ],
+      "cracks": [
+        "Find proof the charter is a forgery",
+        "convince Earl Morcar to stand with the Queen (or expose his role in Wyllmot's death)",
+        "survive a legal duel with the claimant's champion"
+      ]
     }
   ],
-
   "faction_entanglements": [
     "**Queen's Household:** Uphold the Queen's peace and enforce her writs; cross her and you'll face her justiciars.",
     "**Crown Council:** Navigate the politics of dukes, guilds, and abbots; a misstep may lose you a charter or a life.",
@@ -779,14 +830,12 @@
     "**Vhasian Claimants:** They cross the Belworth with writs and swords; proving a charter's superiority is a duel of both ink and iron.",
     "**Border Routiers:** They serve the highest bidder; a Ducal Warrant may secure their aid—or their enmity."
   ],
-
   "cross_regional_ties": [
     "**Ubral (Stone & Oath):** A Ducal Warrant acts as a Guest-Token once at a clan hearth. Starts a Feud Rekindled tick if you collect tolls twice in a tenday.",
     "**Thepyrgos (Synod Law):** A Queen's Audience can suspend a synod interdict. Starts Whispered Precedent in Thepyrgos.",
     "**Vhasia (Fractured Sun):** A Duel Sanction is recognized on the Pont-du-Tithe. A rival abbey can turn it into Parlement Divided on a Club draw. The Queen's own Vhasian title (Duchess of Aberiel) may be used as leverage—or as a weapon against her.",
     "**Theona (No Ninth):** Ferry Priority overrides a local taboo once. If the Ninth custom is in play, the writ 'forgets' one clause on use (GM banks 1 SB)."
   ],
-
   "conspiracy_flourishes": [
     "**Hedge-Moots at Dusk:** Parish elders 'trim hedges' while trading sealed whispers.",
     "**Cipher Roses:** Folded writs stamped with thorn-petals; one petal missing marks a false clause.",
@@ -797,7 +846,6 @@
     "**Bell Penance:** A single off-hour peal grants amnesty to those who confess a clause before the twelfth echo.",
     "**The Brightstide Prayer:** Whispering the dead king's name before a legal proceeding is said to turn the judge's heart—or curse the speaker. Some say Earl Morcar still whispers it each night."
   ],
-
   "patronage_and_power": {
     "description": "In Viterra, power flows through the careful application of law—but beneath every charter runs the threat of steel. The Warrior Queen maintains authority through a combination of military might and legal precision, but the throne is fragile. The old duchies and local officials wield influence through knowledge of hedge-law and ancient custom. The true power lies not in the documents alone, but in the will to enforce them when the parchment fails.",
     "for_the_gm": [
@@ -808,7 +856,6 @@
       "Introduce the Succession's Shadow as a recurring complication: old loyalties, forged documents, the ghost of Baldwyn Brightstide, and the secret funding of King Wyllmot's murder can upend any legal certainty."
     ]
   },
-
   "index": [
     "Viterra",
     "Hedge-Law Realm generator",
@@ -845,5 +892,6 @@
     "Succession's Shadow timer",
     "Queen's Peace front",
     "Queen's Dial"
-  ]
+  ],
+  "_license": "Fate's Edge Proprietary Content – © 2024 Nicholas A. Gasper. All rights reserved."
 }

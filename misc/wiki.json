@@ -1,212 +1,371 @@
-[
-  {
-    "id": 1,
-    "title": "SRD - Core Mechanic",
-    "category": "rules",
-    "body": "The core resolution loop of Fate's Edge: 1) Declare intent and approach. 2) GM sets Position and Difficulty (DV). 3) Roll Attribute + Skill (d10s). 4) Count successes (6-9 = 1 success, 10 = 2 successes). 5) Apply Outcome Matrix.",
-    "tags": ["srd", "core", "mechanic", "rules"]
-  },
-  {
-    "id": 2,
-    "title": "SRD - Outcome Matrix",
-    "category": "rules",
-    "body": "Clean Success: Successes ≥ DV, no 1s. Success & Cost: Successes ≥ DV with 1s. Partial: 0 < Successes < DV. Miss: Successes = 0.",
-    "tags": ["srd", "outcome", "rules"]
-  },
-  {
-    "id": 3,
-    "title": "SRD - Position & Effect",
-    "category": "rules",
-    "body": "Position (Risk): Dominant (re-roll failures), Controlled (normal), Desperate (re-roll successes). Effect (Reward): Limited, Standard, Great.",
-    "tags": ["srd", "position", "effect", "rules"]
-  },
-  {
-    "id": 4,
-    "title": "SRD - Boons",
-    "category": "rules",
-    "body": "Player resource earned on Partial (1) or Miss (2). Max 5 held; trim to 2 at scene end. Spend 1 to: re-roll a die, activate an Asset, or improve Position.",
-    "tags": ["srd", "boons", "resource", "rules"]
-  },
-  {
-    "id": 5,
-    "title": "SRD - Story Beats",
-    "category": "rules",
-    "body": "GM resource gained from player rolls of 1. Spend SB to introduce complications: 1 = minor pressure, 2 = moderate setback, 3 = serious trouble, 4+ = major turn.",
-    "tags": ["srd", "story-beats", "gm", "rules"]
-  },
-  {
-    "id": 6,
-    "title": "SRD - Fatigue & Harm",
-    "category": "rules",
-    "body": "Fatigue track = Body. Each point worsens Position. Harm levels: 1 (-1 die on related actions), 2 (-1 die on most actions), 3 (incapacitated). Armor converts Harm to Fatigue.",
-    "tags": ["srd", "fatigue", "harm", "health", "rules"]
-  },
-  {
-    "id": 7,
-    "title": "SRD - Attributes",
-    "category": "rules",
-    "body": "Four attributes rated 1-5: Body (strength, endurance), Wits (perception, speed), Spirit (willpower, focus), Presence (charisma, command).",
-    "tags": ["srd", "attributes", "character", "rules"]
-  },
-  {
-    "id": 8,
-    "title": "SRD - Skills",
-    "category": "rules",
-    "body": "Skills represent specialized training: Melee, Ranged, Athletics, Stealth, Endurance, Craft, Survival, Sway, Command, Deception, Performance, Insight, Lore, Investigation, Medicine, Arcana, Ritual.",
-    "tags": ["srd", "skills", "character", "rules"]
-  },
-  {
-    "id": 9,
-    "title": "SRD - Armor Conversion",
-    "category": "rules",
-    "body": "Light: Harm 1 → Fatigue 1, Harm 2 → Harm 1 + Fatigue 1, Harm 3 → Harm 2 + Fatigue 1. Medium: Harm 1 → Fatigue 1, Harm 2 → Fatigue 1, Harm 3 → Harm 2 + Fatigue 1. Heavy: Harm 1 → Fatigue 1, Harm 2 → Fatigue 1, Harm 3 → Fatigue 2.",
-    "tags": ["srd", "armor", "combat", "rules"]
-  },
-  {
-    "id": 10,
-    "title": "SRD - Action Economy",
-    "category": "rules",
-    "body": "Each turn: 1 Action + 1 Move. Move shifts one range band. Actions: Attack, Disengage, Dash, Charge (full turn + Fatigue), Skirmish (full turn + Fatigue), Observe, Setup, Assist, Protect, Interact, Defend.",
-    "tags": ["srd", "actions", "combat", "rules"]
-  },
-  {
-    "id": 11,
-    "title": "The Hollow",
-    "category": "lore",
-    "body": "The Hollow is not a god. It is the interest on every broken promise ever made in Acasia. It does not hate. It remembers. The wise stop at eight — eight breaths, eight bells, eight cups. The ninth is the Hollow's share.",
-    "tags": ["lore", "acasia", "hollow", "curse", "blood-and-silk"]
-  },
-  {
-    "id": 12,
-    "title": "The Ninth Taboo",
-    "category": "lore",
-    "body": "There is a law older than kings: count eight, not nine. The ninth is never taken. The ninth is the Hollow's share. This appears everywhere: in Vhasia, the ninth citation voids all previous; in Aeler, counting to nine in the deep invites the pressure that thinks.",
-    "tags": ["lore", "acasia", "ninth", "taboo", "blood-and-silk"]
-  },
-  {
-    "id": 13,
-    "title": "Acasia - The Broken Marches",
-    "category": "lore",
-    "body": "Acasia is a place where the Empire's last breath still hangs in the mist. The locals speak of the Curse in whispers — not a monster, but a slow rot of broken promises and unpaid tolls. A bridge that loops back. A milestone that points north at dawn and south by dusk.",
-    "tags": ["lore", "acasia", "region", "blood-and-silk"]
-  },
-  {
-    "id": 14,
-    "title": "Millhaven",
-    "category": "lore",
-    "body": "A small farming village in the Acasian marches. The village sits in a valley where the old Imperial road forks. The locals say the fork is where the Curse began. A generation ago, a wandering knight named Sir Corin took shelter here and left a silver coin in every threshold.",
-    "tags": ["lore", "acasia", "millhaven", "location", "blood-and-silk"]
-  },
-  {
-    "id": 15,
-    "title": "The Silk Coin",
-    "category": "lore",
-    "body": "A modest guild of thieves, fences, and smugglers who kept their word. Their motto: 'The coin that never spends is the one you don't remember taking.' They fell to the Velvet Court, but their legacy lives on in the exiles who escaped through the burning guildhouse.",
-    "tags": ["lore", "silk-coin", "guild", "blood-and-silk"]
-  },
-  {
-    "id": 16,
-    "title": "The Velvet Court",
-    "category": "lore",
-    "body": "A ruthless syndicate that destroyed the Silk Coin. Led by Madam Serafine, who speaks through intermediaries, her face hidden by a velvet veil. Their power is tied to the Gilded Pillow, a Livaean brothel where secrets are extracted and compulsion is woven.",
-    "tags": ["lore", "velvet-court", "faction", "blood-and-silk"]
-  },
-  {
-    "id": 17,
-    "title": "The Valvano Ford",
-    "category": "lore",
-    "body": "A contested crossing where Ykrul herders, Aeler toll-keepers, and Vilikari merchants stare at one another across a span of gray stone. A silence furlong seals the east bank. A keystone clause locks the bridge. A Black Banner mercenary counts coin while three factions refuse to move.",
-    "tags": ["lore", "valvano-ford", "location", "beyond-millhaven"]
-  },
-  {
-    "id": 18,
-    "title": "The Bronze Gate",
-    "category": "lore",
-    "body": "The only pass through the mountains for three weeks' march. Built upon a Ykrul burial ground, the gate is etched with the names of every legionary who died defending it. The Ykrul call it the Weeping Gate; they say the ghosts scratch the stones at night.",
-    "tags": ["lore", "bronze-gate", "location", "the-brass-gate"]
-  },
-  {
-    "id": 19,
-    "title": "The Iron Seal of Varus",
-    "category": "lore",
-    "body": "A cursed relic of the Ninth Hispania Legion, betrayed by its own commander. The seal binds oaths with a wasting curse; any who swears on it and lies sickens and dies. It is said to absorb the dying breath of the betrayed legionaries.",
-    "tags": ["lore", "seal", "curse", "the-brass-gate"]
-  },
-  {
-    "id": 20,
-    "title": "Khatun Sarnai",
-    "category": "lore",
-    "body": "Proud, grieving chieftain of the Gray Ash Ykrul. Her nephew was killed by a Vilikari caravan. She will not trust Ecktorians, but she respects those who keep their word. Her daughter Yelü is the child of a legionary who defected.",
-    "tags": ["lore", "ykrul", "npc", "beyond-millhaven", "the-brass-gate"]
-  },
-  {
-    "id": 21,
-    "title": "Prefect Gaius Marcellus",
-    "category": "lore",
-    "body": "A wiry, scarred veteran who commands the garrison at Castra Ferrum. He speaks in clipped phrases and never repeats himself. He genuinely believes the Iron Seal will bring peace. His younger brother died in a Ykrul raid — a wound he has never spoken of.",
-    "tags": ["lore", "npc", "the-brass-gate", "ecktorian"]
-  },
-  {
-    "id": 22,
-    "title": "Old Kes",
-    "category": "lore",
-    "body": "The fence who taught the Silk Coin their trade. He was the first to fall, turned by a Livaean oath that made his blood like honey and his heart like lead. He betrayed them with a kiss. He loved the Silk Coin. He loved his daughter more.",
-    "tags": ["lore", "npc", "silk-coin", "velvet-war"]
-  },
-  {
-    "id": 23,
-    "title": "The Traveler",
-    "category": "lore",
-    "body": "The patron of ways, journeys, and thresholds — the presence that watches from every crossroads and listens at every waymark. Among the Fhara caravans and Kuvani traders along the Way of Silk, the Traveler is honored with small offerings before any significant trek.",
-    "tags": ["lore", "patron", "traveler", "magic"]
-  },
-  {
-    "id": 24,
-    "title": "Mareth",
-    "category": "lore",
-    "body": "A hooded scholar of Thepyrgos, now an exile walking the same broken roads as the party. A disgraced Runkeeper of the Traveler, expelled for unlocking forbidden way-routes. They do not teach high magic — only the low rites and foundational practices.",
-    "tags": ["lore", "npc", "traveler", "thepyrgos", "blood-and-silk", "beyond-millhaven"]
-  },
-  {
-    "id": 25,
-    "title": "Tema",
-    "category": "lore",
-    "body": "A Vilikari merchant who hires the party to escort grain seed to a famine-relief monastery. She is thinner now, her hands stained with grain dust. She has invested everything in the trade route; if the seal is not recovered, she will be ruined.",
-    "tags": ["lore", "npc", "beyond-millhaven", "vilikari"]
-  },
-  {
-    "id": 26,
-    "title": "Quick Lena",
-    "category": "lore",
-    "body": "A Sidhi rogue with mismatched eyes and a nervous laugh. She works for Rusk, not out of loyalty but desperation — she owes a debt to a Sidhi smuggler named Peyton. She has a soft spot for urchins and once left a stolen purse on a beggar's blanket.",
-    "tags": ["lore", "npc", "the-brass-gate", "sidhi"]
-  },
-  {
-    "id": 27,
-    "title": "Captain Rusk",
-    "category": "lore",
-    "body": "A former Ykrul hostage, now leading a Black Banner company. He owes no loyalty to any nation. He is haunted by a promise made to a dying legionary named Varus — the last survivor of the Ninth Hispania. He carries Varus's badge of rank: a bronze clasp shaped like a gate.",
-    "tags": ["lore", "npc", "the-brass-gate", "black-banner"]
-  },
-  {
-    "id": 28,
-    "title": "Censor Cassia",
-    "category": "lore",
-    "body": "A thin, aging woman with ink-stained fingers. Her left eye is a polished silver disc — a magical lens that reveals lies. She is Marcellus's political rival and is dying of a slow fever. Destroying the Iron Seal is her last act before retirement.",
-    "tags": ["lore", "npc", "the-brass-gate", "ecktorian"]
-  },
-  {
-    "id": 29,
-    "title": "The Way of Silk",
-    "category": "lore",
-    "body": "A trade route that connects the kingdoms of the Brass Coast to the eastern steppes. The Fhara caravans and Kuvani traders follow its paths, honoring the Traveler at every crossroads. Silk is the currency of this road, but secrets are the real cargo.",
-    "tags": ["lore", "trade", "way-of-silk", "region"]
-  },
-  {
-    "id": 30,
-    "title": "Thepyrgos",
-    "category": "lore",
-    "body": "The City of a Thousand Stairs, where every stair is a question and every answer is a proof. Home to the Synod of scholars and the Library of Keys. Bell-schedules govern the day, and the Unfinished Stair leads to a place that exists between memory and forgetting.",
-    "tags": ["lore", "thepyrgos", "city", "region"]
-  }
-]
+{
+  "_license": "Fate's Edge Proprietary Content – © 2024 Nicholas A. Gasper. All rights reserved.",
+  "data": [
+    {
+      "id": 1,
+      "title": "SRD - Core Mechanic",
+      "category": "rules",
+      "body": "The core resolution loop of Fate's Edge: 1) Declare intent and approach. 2) GM sets Position and Difficulty (DV). 3) Roll Attribute + Skill (d10s). 4) Count successes (6-9 = 1 success, 10 = 2 successes). 5) Apply Outcome Matrix.",
+      "tags": [
+        "srd",
+        "core",
+        "mechanic",
+        "rules"
+      ]
+    },
+    {
+      "id": 2,
+      "title": "SRD - Outcome Matrix",
+      "category": "rules",
+      "body": "Clean Success: Successes ≥ DV, no 1s. Success & Cost: Successes ≥ DV with 1s. Partial: 0 < Successes < DV. Miss: Successes = 0.",
+      "tags": [
+        "srd",
+        "outcome",
+        "rules"
+      ]
+    },
+    {
+      "id": 3,
+      "title": "SRD - Position & Effect",
+      "category": "rules",
+      "body": "Position (Risk): Dominant (re-roll failures), Controlled (normal), Desperate (re-roll successes). Effect (Reward): Limited, Standard, Great.",
+      "tags": [
+        "srd",
+        "position",
+        "effect",
+        "rules"
+      ]
+    },
+    {
+      "id": 4,
+      "title": "SRD - Boons",
+      "category": "rules",
+      "body": "Player resource earned on Partial (1) or Miss (2). Max 5 held; trim to 2 at scene end. Spend 1 to: re-roll a die, activate an Asset, or improve Position.",
+      "tags": [
+        "srd",
+        "boons",
+        "resource",
+        "rules"
+      ]
+    },
+    {
+      "id": 5,
+      "title": "SRD - Story Beats",
+      "category": "rules",
+      "body": "GM resource gained from player rolls of 1. Spend SB to introduce complications: 1 = minor pressure, 2 = moderate setback, 3 = serious trouble, 4+ = major turn.",
+      "tags": [
+        "srd",
+        "story-beats",
+        "gm",
+        "rules"
+      ]
+    },
+    {
+      "id": 6,
+      "title": "SRD - Fatigue & Harm",
+      "category": "rules",
+      "body": "Fatigue track = Body. Each point worsens Position. Harm levels: 1 (-1 die on related actions), 2 (-1 die on most actions), 3 (incapacitated). Armor converts Harm to Fatigue.",
+      "tags": [
+        "srd",
+        "fatigue",
+        "harm",
+        "health",
+        "rules"
+      ]
+    },
+    {
+      "id": 7,
+      "title": "SRD - Attributes",
+      "category": "rules",
+      "body": "Four attributes rated 1-5: Body (strength, endurance), Wits (perception, speed), Spirit (willpower, focus), Presence (charisma, command).",
+      "tags": [
+        "srd",
+        "attributes",
+        "character",
+        "rules"
+      ]
+    },
+    {
+      "id": 8,
+      "title": "SRD - Skills",
+      "category": "rules",
+      "body": "Skills represent specialized training: Melee, Ranged, Athletics, Stealth, Endurance, Craft, Survival, Sway, Command, Deception, Performance, Insight, Lore, Investigation, Medicine, Arcana, Ritual.",
+      "tags": [
+        "srd",
+        "skills",
+        "character",
+        "rules"
+      ]
+    },
+    {
+      "id": 9,
+      "title": "SRD - Armor Conversion",
+      "category": "rules",
+      "body": "Light: Harm 1 → Fatigue 1, Harm 2 → Harm 1 + Fatigue 1, Harm 3 → Harm 2 + Fatigue 1. Medium: Harm 1 → Fatigue 1, Harm 2 → Fatigue 1, Harm 3 → Harm 2 + Fatigue 1. Heavy: Harm 1 → Fatigue 1, Harm 2 → Fatigue 1, Harm 3 → Fatigue 2.",
+      "tags": [
+        "srd",
+        "armor",
+        "combat",
+        "rules"
+      ]
+    },
+    {
+      "id": 10,
+      "title": "SRD - Action Economy",
+      "category": "rules",
+      "body": "Each turn: 1 Action + 1 Move. Move shifts one range band. Actions: Attack, Disengage, Dash, Charge (full turn + Fatigue), Skirmish (full turn + Fatigue), Observe, Setup, Assist, Protect, Interact, Defend.",
+      "tags": [
+        "srd",
+        "actions",
+        "combat",
+        "rules"
+      ]
+    },
+    {
+      "id": 11,
+      "title": "The Hollow",
+      "category": "lore",
+      "body": "The Hollow is not a god. It is the interest on every broken promise ever made in Acasia. It does not hate. It remembers. The wise stop at eight — eight breaths, eight bells, eight cups. The ninth is the Hollow's share.",
+      "tags": [
+        "lore",
+        "acasia",
+        "hollow",
+        "curse",
+        "blood-and-silk"
+      ]
+    },
+    {
+      "id": 12,
+      "title": "The Ninth Taboo",
+      "category": "lore",
+      "body": "There is a law older than kings: count eight, not nine. The ninth is never taken. The ninth is the Hollow's share. This appears everywhere: in Vhasia, the ninth citation voids all previous; in Aeler, counting to nine in the deep invites the pressure that thinks.",
+      "tags": [
+        "lore",
+        "acasia",
+        "ninth",
+        "taboo",
+        "blood-and-silk"
+      ]
+    },
+    {
+      "id": 13,
+      "title": "Acasia - The Broken Marches",
+      "category": "lore",
+      "body": "Acasia is a place where the Empire's last breath still hangs in the mist. The locals speak of the Curse in whispers — not a monster, but a slow rot of broken promises and unpaid tolls. A bridge that loops back. A milestone that points north at dawn and south by dusk.",
+      "tags": [
+        "lore",
+        "acasia",
+        "region",
+        "blood-and-silk"
+      ]
+    },
+    {
+      "id": 14,
+      "title": "Millhaven",
+      "category": "lore",
+      "body": "A small farming village in the Acasian marches. The village sits in a valley where the old Imperial road forks. The locals say the fork is where the Curse began. A generation ago, a wandering knight named Sir Corin took shelter here and left a silver coin in every threshold.",
+      "tags": [
+        "lore",
+        "acasia",
+        "millhaven",
+        "location",
+        "blood-and-silk"
+      ]
+    },
+    {
+      "id": 15,
+      "title": "The Silk Coin",
+      "category": "lore",
+      "body": "A modest guild of thieves, fences, and smugglers who kept their word. Their motto: 'The coin that never spends is the one you don't remember taking.' They fell to the Velvet Court, but their legacy lives on in the exiles who escaped through the burning guildhouse.",
+      "tags": [
+        "lore",
+        "silk-coin",
+        "guild",
+        "blood-and-silk"
+      ]
+    },
+    {
+      "id": 16,
+      "title": "The Velvet Court",
+      "category": "lore",
+      "body": "A ruthless syndicate that destroyed the Silk Coin. Led by Madam Serafine, who speaks through intermediaries, her face hidden by a velvet veil. Their power is tied to the Gilded Pillow, a Livaean brothel where secrets are extracted and compulsion is woven.",
+      "tags": [
+        "lore",
+        "velvet-court",
+        "faction",
+        "blood-and-silk"
+      ]
+    },
+    {
+      "id": 17,
+      "title": "The Valvano Ford",
+      "category": "lore",
+      "body": "A contested crossing where Ykrul herders, Aeler toll-keepers, and Vilikari merchants stare at one another across a span of gray stone. A silence furlong seals the east bank. A keystone clause locks the bridge. A Black Banner mercenary counts coin while three factions refuse to move.",
+      "tags": [
+        "lore",
+        "valvano-ford",
+        "location",
+        "beyond-millhaven"
+      ]
+    },
+    {
+      "id": 18,
+      "title": "The Bronze Gate",
+      "category": "lore",
+      "body": "The only pass through the mountains for three weeks' march. Built upon a Ykrul burial ground, the gate is etched with the names of every legionary who died defending it. The Ykrul call it the Weeping Gate; they say the ghosts scratch the stones at night.",
+      "tags": [
+        "lore",
+        "bronze-gate",
+        "location",
+        "the-brass-gate"
+      ]
+    },
+    {
+      "id": 19,
+      "title": "The Iron Seal of Varus",
+      "category": "lore",
+      "body": "A cursed relic of the Ninth Hispania Legion, betrayed by its own commander. The seal binds oaths with a wasting curse; any who swears on it and lies sickens and dies. It is said to absorb the dying breath of the betrayed legionaries.",
+      "tags": [
+        "lore",
+        "seal",
+        "curse",
+        "the-brass-gate"
+      ]
+    },
+    {
+      "id": 20,
+      "title": "Khatun Sarnai",
+      "category": "lore",
+      "body": "Proud, grieving chieftain of the Gray Ash Ykrul. Her nephew was killed by a Vilikari caravan. She will not trust Ecktorians, but she respects those who keep their word. Her daughter Yelü is the child of a legionary who defected.",
+      "tags": [
+        "lore",
+        "ykrul",
+        "npc",
+        "beyond-millhaven",
+        "the-brass-gate"
+      ]
+    },
+    {
+      "id": 21,
+      "title": "Prefect Gaius Marcellus",
+      "category": "lore",
+      "body": "A wiry, scarred veteran who commands the garrison at Castra Ferrum. He speaks in clipped phrases and never repeats himself. He genuinely believes the Iron Seal will bring peace. His younger brother died in a Ykrul raid — a wound he has never spoken of.",
+      "tags": [
+        "lore",
+        "npc",
+        "the-brass-gate",
+        "ecktorian"
+      ]
+    },
+    {
+      "id": 22,
+      "title": "Old Kes",
+      "category": "lore",
+      "body": "The fence who taught the Silk Coin their trade. He was the first to fall, turned by a Livaean oath that made his blood like honey and his heart like lead. He betrayed them with a kiss. He loved the Silk Coin. He loved his daughter more.",
+      "tags": [
+        "lore",
+        "npc",
+        "silk-coin",
+        "velvet-war"
+      ]
+    },
+    {
+      "id": 23,
+      "title": "The Traveler",
+      "category": "lore",
+      "body": "The patron of ways, journeys, and thresholds — the presence that watches from every crossroads and listens at every waymark. Among the Fhara caravans and Kuvani traders along the Way of Silk, the Traveler is honored with small offerings before any significant trek.",
+      "tags": [
+        "lore",
+        "patron",
+        "traveler",
+        "magic"
+      ]
+    },
+    {
+      "id": 24,
+      "title": "Mareth",
+      "category": "lore",
+      "body": "A hooded scholar of Thepyrgos, now an exile walking the same broken roads as the party. A disgraced Runkeeper of the Traveler, expelled for unlocking forbidden way-routes. They do not teach high magic — only the low rites and foundational practices.",
+      "tags": [
+        "lore",
+        "npc",
+        "traveler",
+        "thepyrgos",
+        "blood-and-silk",
+        "beyond-millhaven"
+      ]
+    },
+    {
+      "id": 25,
+      "title": "Tema",
+      "category": "lore",
+      "body": "A Vilikari merchant who hires the party to escort grain seed to a famine-relief monastery. She is thinner now, her hands stained with grain dust. She has invested everything in the trade route; if the seal is not recovered, she will be ruined.",
+      "tags": [
+        "lore",
+        "npc",
+        "beyond-millhaven",
+        "vilikari"
+      ]
+    },
+    {
+      "id": 26,
+      "title": "Quick Lena",
+      "category": "lore",
+      "body": "A Sidhi rogue with mismatched eyes and a nervous laugh. She works for Rusk, not out of loyalty but desperation — she owes a debt to a Sidhi smuggler named Peyton. She has a soft spot for urchins and once left a stolen purse on a beggar's blanket.",
+      "tags": [
+        "lore",
+        "npc",
+        "the-brass-gate",
+        "sidhi"
+      ]
+    },
+    {
+      "id": 27,
+      "title": "Captain Rusk",
+      "category": "lore",
+      "body": "A former Ykrul hostage, now leading a Black Banner company. He owes no loyalty to any nation. He is haunted by a promise made to a dying legionary named Varus — the last survivor of the Ninth Hispania. He carries Varus's badge of rank: a bronze clasp shaped like a gate.",
+      "tags": [
+        "lore",
+        "npc",
+        "the-brass-gate",
+        "black-banner"
+      ]
+    },
+    {
+      "id": 28,
+      "title": "Censor Cassia",
+      "category": "lore",
+      "body": "A thin, aging woman with ink-stained fingers. Her left eye is a polished silver disc — a magical lens that reveals lies. She is Marcellus's political rival and is dying of a slow fever. Destroying the Iron Seal is her last act before retirement.",
+      "tags": [
+        "lore",
+        "npc",
+        "the-brass-gate",
+        "ecktorian"
+      ]
+    },
+    {
+      "id": 29,
+      "title": "The Way of Silk",
+      "category": "lore",
+      "body": "A trade route that connects the kingdoms of the Brass Coast to the eastern steppes. The Fhara caravans and Kuvani traders follow its paths, honoring the Traveler at every crossroads. Silk is the currency of this road, but secrets are the real cargo.",
+      "tags": [
+        "lore",
+        "trade",
+        "way-of-silk",
+        "region"
+      ]
+    },
+    {
+      "id": 30,
+      "title": "Thepyrgos",
+      "category": "lore",
+      "body": "The City of a Thousand Stairs, where every stair is a question and every answer is a proof. Home to the Synod of scholars and the Library of Keys. Bell-schedules govern the day, and the Unfinished Stair leads to a place that exists between memory and forgetting.",
+      "tags": [
+        "lore",
+        "thepyrgos",
+        "city",
+        "region"
+      ]
+    }
+  ]
+}

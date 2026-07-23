@@ -7,7 +7,6 @@
   "key_demographic": "Humans",
   "capital": "Thepyrgos",
   "manifest_path": "/data/docs/manifest.json",
-
   "overview": {
     "tagline": "Every stair is a question. Every answer is a proof. The Ninth and the Witness argue over whose record holds the truth.",
     "genre": "Scholarly vertical city, labyrinthine imperial bureaucracy, coastal peninsular folk horror, metaphysical war between memory and forgetting.",
@@ -25,7 +24,6 @@
       "west": "Kahfagia — Signal-codes and beacon treaties are exchanged; the Lantern-Law and the Synod maintain a watchful peace. Neither trusts the other's mirrors."
     }
   },
-
   "quotes": [
     {
       "speaker": "The Archon (Elite)",
@@ -36,13 +34,11 @@
       "text": "I know every step that creaks a warning and every landing that whispers gossip. The bells tell the city's mood better than any lord—three chimes means business, six means trouble, and nine means the hunters are coming. But on the ninth bell, the stairs themselves answer."
     }
   ],
-
   "geographic_integration": {
     "viterra": "Thepyrgos is separated from Viterra by the Black River and the Belmont Marshes. The marshy lowlands breed strange fogs and rarer creatures, and the border is porous—Viterran hedge-courts and Thepyrgos synods argue jurisdiction over every flooded farmstead.",
     "vhasia": "A short boat ride from Fairport (Viterra) across the Belworth estuary brings travelers to Marcott in Vhasia, making Thepyrgos a quiet but crucial link in the riverine trade between the fractured sun-kingdom and the imperial remnant.",
     "straits": "The city controls the Astroegro Straits—the narrow sea passage between the Dolmis and the Amaranthine—and maintains a few small colonies on the western coast of Hyaar, where olive oil and wine are exchanged for eastern silks and spices. Those colonies are run by exiled scholars and retired Chain-Lanterns, and they are said to be even more paranoid than the mother city."
   },
-
   "faction_timers": {
     "archons_balance": {
       "name": "Archon's Balance",
@@ -96,7 +92,6 @@
       }
     }
   },
-
   "faction_relationship_dial": {
     "name": "Witness ↔ Ninth",
     "description": "Track the party's perceived allegiance between the Witness (memory, record, preservation) and the Ninth (forgetting, erasure, revelation).",
@@ -122,7 +117,6 @@
       "center": "Perform a ritual that acknowledges both (center the dial, clear 1 segment from Unfinished Stair)"
     }
   },
-
   "npcs": [
     {
       "name": "Archon Konstantinos",
@@ -167,7 +161,6 @@
       "quirk": "She has not spoken aloud in twenty years. She writes on water. The water never freezes."
     }
   ],
-
   "archons_key": {
     "description": "The Archon wears a key around his neck. No one knows what it opens. The key is a stair.",
     "what_it_opens": "The Ninth Vault—the deepest of the Astroegro vaults, sealed by the first Archon. It contains the original Astroegro orrery, a working model of the cosmos that still ticks.",
@@ -186,20 +179,49 @@
       "The Ninth's Coterie offers to trade the information (cost: 1 Obligation to the Ninth)"
     ]
   },
-
   "lighthouse_patriarchs_mirror": {
     "description": "Once per session, a character who spends a scene in the Lighthouse-Patriarch's presence may ask the GM one question about a hidden door or stair, the location of an Astroegro vault entrance, or a weakness of the Chain-Lanterns or the Ninth's Coterie.",
     "cost": "The mirrors show the asker a face they have wronged. Mark 1 Fatigue (guilt).",
     "limit": "The Patriarch will not answer the same question twice. He does not need to speak—the mirrors show the answer. If the party asks a question the Patriarch cannot answer, the mirrors show a blank expanse of water."
   },
-
   "names": {
-    "first_male": ["Konstantinos", "Dimitris", "Kyrillos", "Nikolas", "Leonidas", "Stephanos", "Aerendil"],
-    "first_female": ["Eleni", "Zoe", "Sofia", "Anastasia", "Irini", "Fotini", "Lian"],
-    "surnames": ["Skalas", "Platanos", "Raptis", "Laskaris", "Makris", "Koutroulis", "Thoraen"],
-    "epithets": ["the Stair-Wise", "the Unseen", "Bell-Sworn", "the Accursed", "Ash-Finger", "the Silent", "Archivist"]
+    "first_male": [
+      "Konstantinos",
+      "Dimitris",
+      "Kyrillos",
+      "Nikolas",
+      "Leonidas",
+      "Stephanos",
+      "Aerendil"
+    ],
+    "first_female": [
+      "Eleni",
+      "Zoe",
+      "Sofia",
+      "Anastasia",
+      "Irini",
+      "Fotini",
+      "Lian"
+    ],
+    "surnames": [
+      "Skalas",
+      "Platanos",
+      "Raptis",
+      "Laskaris",
+      "Makris",
+      "Koutroulis",
+      "Thoraen"
+    ],
+    "epithets": [
+      "the Stair-Wise",
+      "the Unseen",
+      "Bell-Sworn",
+      "the Accursed",
+      "Ash-Finger",
+      "the Silent",
+      "Archivist"
+    ]
   },
-
   "places": [
     {
       "rank": 2,
@@ -319,7 +341,6 @@
       "mechanical_hook": "Climbing the stair requires a Resolve test (DV 5). On success, the party may ask one question of the Ninth. On failure, they lose 1 Fatigue and tick the Unfinished Stair Timer +2."
     }
   ],
-
   "people_and_factions": [
     {
       "rank": 2,
@@ -452,7 +473,6 @@
       "what_they_ask": "A story of a broken promise—he collects them."
     }
   ],
-
   "complications": [
     {
       "rank": 2,
@@ -572,7 +592,6 @@
       "mechanical_hook": "The party is drawn onto the stair. A Resolve test (DV 5) to resist; on failure, you must climb one step per scene. The Ninth will ask a question at the top."
     }
   ],
-
   "rewards": [
     {
       "rank": 2,
@@ -692,13 +711,11 @@
       "cost": "Using it may alert the Ninth's Coterie; they will know who opened the gate."
     }
   ],
-
   "quick_use_notes": {
     "draw_rules": "Draw until you have all four suits: Spade = place, Heart = actor, Club = pressure, Diamond = leverage. Highest rank sets the main Timer (2–5 → 4, 6–10 → 6, J/Q/K → 8, A → 10).",
     "diamonds": "Diamonds are codified outcomes (keys/rites/papers) that change position rather than call for a roll.",
     "ace_rule": "If any A appears, echo height and sound motifs—bells that carry, wind that remembers, stairs that echo with purpose."
   },
-
   "additional_features": [
     {
       "name": "Bell-Law",
@@ -733,7 +750,6 @@
       "description": "The Unwritten Citation — The Witness. A precedent that exists only in the margin.\nThe Bell-Founder — Mykkiel. The law that rings true, even when it hurts.\nThe Abyssal Pressure — Khemesh. The pressure beneath the city; the pressure that the deep remembers.\nThe Silent Stair — The Ninth. The step that is never counted, the threshold that opens only once."
     }
   ],
-
   "astroegro_vaults": {
     "description": "Beneath the city, nine vaults. The Synod knows of three and has sealed them with Witness-branded wax. The Ninth's Coterie has found a fourth. The other five are still buried.",
     "contents": [
@@ -803,7 +819,6 @@
       "**A Bond Broken:** You must sever a Bond—a relationship, a promise, a debt. The loss is permanent, though the wound may heal."
     ]
   },
-
   "province_generators": {
     "village_situation": [
       "**Quieted Village:** The Chain-Lanterns came last week. The gifted children are gone. The village is silent, and the elders will not speak to outsiders. A single child hides in the root cellar—too old to be taken, too young to understand why.",
@@ -838,7 +853,6 @@
       "**The Singing Stones:** A circle of stones that hum at dusk. They are an Anchor site—a thin place where the pressure below is close. The Hyro leave offerings here. A character who offers a memory may ask one question of the Hollow."
     ]
   },
-
   "lore_echoes": [
     {
       "title": "The Astroegro Remnant (Khemesh)",
@@ -869,7 +883,6 @@
       "description": "In any Thepyrgos scene, the ninth bell rung in an hour opens a threshold. The wise stop at eight and cover their ears. Those who ring the ninth are said to see a pale figure standing on the Beacon Crown's mirror tiles—waiting to receive a name."
     }
   ],
-
   "superstitions": [
     {
       "name": "Bread to the Stair",
@@ -892,7 +905,6 @@
       "cost": "Burn for +1 die once"
     }
   ],
-
   "sb_spend_table": {
     "minor_complications": [
       "**Exposure:** Your actions draw unwanted attention from **tower guards or guild masters**.",
@@ -929,37 +941,67 @@
       "**Thepyrgos (The Unfinished Stair):** A hidden stair appears behind the party. The Ninth is counting. The Witness is writing. The stairs have no end."
     ]
   },
-
   "pursuit_ladder": [
     "**Advance/Withdraw (Wits + Stealth):** On a hit, shift one band. On a strong hit, also impose *Fog Bank*.",
     "**Cut the Stair (Presence + Lore):** On a hit, freeze range for one exchange; if a stair token is in your possession, +1 die.",
     "**Weather the Quake (Body + Athletics):** On a hit in *Tremor*, you pick who keeps their footing; on a miss, the GM does."
   ],
-
   "boss_archetypes": [
     {
       "name": "The Bell-Exarch (Nine Bans)",
-      "tags": ["witch-hunter", "inquisition"],
+      "tags": [
+        "witch-hunter",
+        "inquisition"
+      ],
       "description": "A leader of the Chain-Lanterns who has declared nine bans on the city's arcane practices. Each ban is a bell-stroke that all must obey—or be hunted.",
-      "phases": ["Candle-Smoke Sweep", "Orchestrated Silence", "Synod Coup"],
-      "cracks": ["ring a forgotten bell", "expose a false bounty", "survive a night in the Beacon Crown"]
+      "phases": [
+        "Candle-Smoke Sweep",
+        "Orchestrated Silence",
+        "Synod Coup"
+      ],
+      "cracks": [
+        "ring a forgotten bell",
+        "expose a false bounty",
+        "survive a night in the Beacon Crown"
+      ]
     },
     {
       "name": "The Astroegro Engine (Pressure from Below)",
-      "tags": ["gear", "cosmic"],
+      "tags": [
+        "gear",
+        "cosmic"
+      ],
       "description": "A vast orrery of black glass and abyssal gear that ticks with the weight of a forgotten empire. It hungers for true names.",
-      "phases": ["Gears Turn", "Whispers Become Names", "Seiche"],
-      "cracks": ["abyssal glass shard", "survivor testimony", "the Lighthouse-Patriarch's mirror turning clear"]
+      "phases": [
+        "Gears Turn",
+        "Whispers Become Names",
+        "Seiche"
+      ],
+      "cracks": [
+        "abyssal glass shard",
+        "survivor testimony",
+        "the Lighthouse-Patriarch's mirror turning clear"
+      ]
     },
     {
       "name": "The Ninth's Advocate (Living Stair)",
-      "tags": ["forgetting", "threshold"],
+      "tags": [
+        "forgetting",
+        "threshold"
+      ],
       "description": "A figure who serves the Ninth, appearing as a stair that should not exist. They ask questions that cannot be answered and remember only what they choose.",
-      "phases": ["Count", "Omit", "Forget"],
-      "cracks": ["speak a true name that the Ninth does not know", "offer a memory the Witness has not recorded", "climb the Unfinished Stair and refuse to answer the Ninth's question"]
+      "phases": [
+        "Count",
+        "Omit",
+        "Forget"
+      ],
+      "cracks": [
+        "speak a true name that the Ninth does not know",
+        "offer a memory the Witness has not recorded",
+        "climb the Unfinished Stair and refuse to answer the Ninth's question"
+      ]
     }
   ],
-
   "magic_colleges": [
     {
       "name": "College of Ladders & Lines",
@@ -986,7 +1028,6 @@
       "description": "Ethics of death, memory rites; permitted remembrances—anything more is heresy."
     }
   ],
-
   "witch_hunter_province": {
     "hunter_hearts": [
       "**Commissary-Exarch** — Writs in triplicate; quotas in private.",
@@ -1008,7 +1049,6 @@
       "**Hidden Stair Token** — Through a maintenance run unseen; good for one group escape."
     ]
   },
-
   "detection_and_denial": {
     "scry_and_deny": [
       "**Mask the Trace:** dye, salt, bell-oil; pick *one* (each grants +1 die to one approach).",
@@ -1024,7 +1064,6 @@
       "6. **Quiet-Worker** (death-ethic): 6 notations; College of Quiet petitions for trial."
     ]
   },
-
   "scenario_starters": [
     {
       "title": "The Bright Child on the Exam Stair",
@@ -1051,7 +1090,6 @@
       "relief": "Climb the stair, speak the archivist's true name, and take the bell—but the stair adds a segment to the Unfinished Stair Timer. Or destroy the bell with a memory of the Astroegro's fall (lose a cherished memory permanently). Or give the bell to the Synod (gain a Synod Indulgence) or to the Ninth's Coterie (gain the Ninth's Annotation)."
     }
   ],
-
   "index": [
     "Thepyrgos",
     "City of Unfinished Proofs generator",
@@ -1093,5 +1131,6 @@
     "Ninth's Progress (timer)",
     "Witness's Vigil (timer)",
     "Faction Relationship Dial!Witness vs Ninth"
-  ]
+  ],
+  "_license": "Fate's Edge Proprietary Content – © 2024 Nicholas A. Gasper. All rights reserved."
 }

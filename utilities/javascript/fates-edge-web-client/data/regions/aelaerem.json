@@ -7,7 +7,6 @@
   "key_demographic": "Aelaerem (Halfling)",
   "capital": "Amedell",
   "manifest_path": "/data/docs/manifest.json",
-
   "overview": {
     "tagline": "The hollow counts your steps. The thread remembers your name.",
     "genre": "Pastoral folk horror, hearth magic, the weight of thresholds.",
@@ -25,7 +24,6 @@
       "southwest": "Theona (within the Dolmis) -- The Green Host's riders do not cross the water, but the Ninth Taboo echoes in the halfling tongue. The ninth cup is never poured on either shore."
     }
   },
-
   "quotes": [
     {
       "speaker": "Apple-Matron (Elite)",
@@ -36,7 +34,6 @@
       "text": "My geese know a stranger's step from a mile off, and they've never been wrong. If they start honking at noon, you best check your larder — someone's coming who wasn't invited. And when the Hollow walks, the only safe place is a lit hearth with the ninth cup unpoured."
     }
   ],
-
   "hollow_timer": {
     "name": "Hollow Attention",
     "max_segments": 8,
@@ -52,24 +49,58 @@
       "8": "The Hollow manifests. Roll on the **Hollow Walks** table. The party must offer a story, a memory, or a name to appease it."
     },
     "stirrs_table": [
-      {"roll": 1, "complication": "A pale figure stands at the edge of the circle. It asks for a name. Give a name (living or dead) and it leaves. Refuse, and it takes your shadow (—1 die on stealth for a week)."},
-      {"roll": 2, "complication": "The ninth cup pours itself. Whoever drinks from it forgets their greatest joy (lose 1 XP, refundable by a quest)."},
-      {"roll": 3, "complication": "A red thread appears tied around every PC's wrist. It tightens when you lie. Cutting it costs 1 Corruption."},
-      {"roll": 4, "complication": "The geese fall silent. The Hollow is inside the circle. It demands a story that ends with a death. If the story is true, it leaves. If false, it takes a memory."},
-      {"roll": 5, "complication": "The Moot Oak bleeds sap. The Hollow speaks through it: 'One of you carries a promise unpaid. Settle it now.' The one named must offer 1 Boon or 1 Supply. Refusal ticks the timer again immediately."},
-      {"roll": 6, "complication": "The empty chair is occupied by a figure in gray. It does not speak. It eats. If you serve it food, it leaves. If you ignore it, it eats your luck (all rolls are Desperate for the next scene)."}
+      {
+        "roll": 1,
+        "complication": "A pale figure stands at the edge of the circle. It asks for a name. Give a name (living or dead) and it leaves. Refuse, and it takes your shadow (—1 die on stealth for a week)."
+      },
+      {
+        "roll": 2,
+        "complication": "The ninth cup pours itself. Whoever drinks from it forgets their greatest joy (lose 1 XP, refundable by a quest)."
+      },
+      {
+        "roll": 3,
+        "complication": "A red thread appears tied around every PC's wrist. It tightens when you lie. Cutting it costs 1 Corruption."
+      },
+      {
+        "roll": 4,
+        "complication": "The geese fall silent. The Hollow is inside the circle. It demands a story that ends with a death. If the story is true, it leaves. If false, it takes a memory."
+      },
+      {
+        "roll": 5,
+        "complication": "The Moot Oak bleeds sap. The Hollow speaks through it: 'One of you carries a promise unpaid. Settle it now.' The one named must offer 1 Boon or 1 Supply. Refusal ticks the timer again immediately."
+      },
+      {
+        "roll": 6,
+        "complication": "The empty chair is occupied by a figure in gray. It does not speak. It eats. If you serve it food, it leaves. If you ignore it, it eats your luck (all rolls are Desperate for the next scene)."
+      }
     ]
   },
-
   "guest_right_violations": [
-    {"roll": 1, "consequence": "The host demands a price of 1 Supply (the cost of a broken loaf)."},
-    {"roll": 2, "consequence": "The village stones turn inward. You are not welcome anywhere for a week (—1 Position on all social rolls)."},
-    {"roll": 3, "consequence": "A red thread ties itself around your wrist. It tightens when you speak to an Aelaerem. Cut it with a silver knife (cost 1 Boon) or suffer —1 die on all interactions."},
-    {"roll": 4, "consequence": "The watch-geese chase you from the village. Gain a **Marked by Geese** condition (animals are hostile; +1 DV to all Beastcraft rolls)."},
-    {"roll": 5, "consequence": "The Hollow notices you. Tick **Hollow Attention +2**. The empty chair will be waiting at your next camp."},
-    {"roll": 6, "consequence": "The Apple-Matron herself banishes you. Start a **Gate of Thorns [4]** timer — when full, you cannot enter any Aelaerem village until you pay a blood-price."}
+    {
+      "roll": 1,
+      "consequence": "The host demands a price of 1 Supply (the cost of a broken loaf)."
+    },
+    {
+      "roll": 2,
+      "consequence": "The village stones turn inward. You are not welcome anywhere for a week (—1 Position on all social rolls)."
+    },
+    {
+      "roll": 3,
+      "consequence": "A red thread ties itself around your wrist. It tightens when you speak to an Aelaerem. Cut it with a silver knife (cost 1 Boon) or suffer —1 die on all interactions."
+    },
+    {
+      "roll": 4,
+      "consequence": "The watch-geese chase you from the village. Gain a **Marked by Geese** condition (animals are hostile; +1 DV to all Beastcraft rolls)."
+    },
+    {
+      "roll": 5,
+      "consequence": "The Hollow notices you. Tick **Hollow Attention +2**. The empty chair will be waiting at your next camp."
+    },
+    {
+      "roll": 6,
+      "consequence": "The Apple-Matron herself banishes you. Start a **Gate of Thorns [4]** timer — when full, you cannot enter any Aelaerem village until you pay a blood-price."
+    }
   ],
-
   "npcs": [
     {
       "name": "Oria 'Crimson Door'",
@@ -108,14 +139,40 @@
       "quirk": "The masks are not carved. They are grown."
     }
   ],
-
   "names": {
-    "first_male": ["Tolly", "Bram", "Corbin", "Willum", "Hodge", "Pippin"],
-    "first_female": ["Daisy", "Posy", "Marigold", "Hazel", "Fern", "Ivy"],
-    "surnames": ["Underhill", "Bywater", "Brookside", "Holloway", "Fielding", "Hayward"],
-    "epithets": ["the Red-Door", "the Goose-Wise", "Barrow-Born", "Hollow-Touched", "the Uninvited", "Ash-Finger"]
+    "first_male": [
+      "Tolly",
+      "Bram",
+      "Corbin",
+      "Willum",
+      "Hodge",
+      "Pippin"
+    ],
+    "first_female": [
+      "Daisy",
+      "Posy",
+      "Marigold",
+      "Hazel",
+      "Fern",
+      "Ivy"
+    ],
+    "surnames": [
+      "Underhill",
+      "Bywater",
+      "Brookside",
+      "Holloway",
+      "Fielding",
+      "Hayward"
+    ],
+    "epithets": [
+      "the Red-Door",
+      "the Goose-Wise",
+      "Barrow-Born",
+      "Hollow-Touched",
+      "the Uninvited",
+      "Ash-Finger"
+    ]
   },
-
   "places": [
     {
       "rank": 2,
@@ -235,7 +292,6 @@
       "mechanical_hook": "Entering the field forces a Resolve test (DV 4). On failure, you lose your appetite for a week (—1 die to all Endurance tests). The field can be fed a story or a memory to make it dormant for a year."
     }
   ],
-
   "people_and_factions": [
     {
       "rank": 2,
@@ -368,7 +424,6 @@
       "what_they_ask": "Nothing. He is not a patron. He is a deadline."
     }
   ],
-
   "complications": [
     {
       "rank": 2,
@@ -488,7 +543,6 @@
       "mechanical_hook": "The Hollow is crossing. Any character who steps on a barrow must test Resolve (DV 5) or be pulled underground. The party has one scene to rescue them before they become a Neighbor. Tick **Hollow Attention** to zero — the Hollow has fed."
     }
   ],
-
   "rewards": [
     {
       "rank": 2,
@@ -608,14 +662,12 @@
       "hollow_cost": "The Hollow will remember your face. After use, tick **Hollow Attention +0** (the timer does not advance, but the GM gains a permanent String on you). The clause can only be used once per character per campaign."
     }
   ],
-
   "quick_use_notes": {
     "draw_rules": "Draw until you have all four suits: Spade = place, Heart = actor, Club = pressure, Diamond = treasure. Highest rank sets the main Timer (2–5 → 4, 6–10 → 6, J/Q/K → 8, A → 10).",
     "diamonds": "Treasures (Diamonds) are codified outcomes (blessings/tokens/host-rights) that change position rather than call for a roll.",
     "ace_rule": "If any A appears, echo Hearth & Hollow motifs—quiet bells, red thread, watch-geese, footsteps under the soil—so the dread feels woven through the hedges.",
     "hollow_tracking": "Track the **Hollow Attention [8]** timer as a campaign-wide pressure. Use the **Hollow Walks** table when it reaches 8."
   },
-
   "additional_features": [
     {
       "name": "Bread & Lantern",
@@ -630,7 +682,6 @@
       "description": "A quiet pause at a stile, barrow, or hedge-tunnel yields a true omen—ask one short question about what the Hollow wants *here and now*; the answer arrives as a sign, a sound, or a small animal."
     }
   ],
-
   "lore_echoes": [
     {
       "title": "The Sealed Gate",
@@ -657,7 +708,6 @@
       "description": "On the ninth night of a feast, the empty chair is left for the Hollow. If a guest sits in it, the Hollow will take their place at the table. The feast will continue, but the guest will never be full again."
     }
   ],
-
   "superstitions": [
     {
       "name": "Bread to the Barrow",
@@ -675,9 +725,7 @@
       "cost": "Burn for +1 die once"
     }
   ],
-
   "hearth_magic": "The Aelaerem weave their power through careful observance and small courtesies. Their magic lies not in grand gestures but in the precise attention to thresholds, seasons, and the proper ordering of things. Red thread binds more than wounds—it ties names to places, promises to people, and the living to the Hollow that walks beneath their feet. To offend a hedge-witch is to invite the Neighbors' attention; to earn an elder's blessing is to walk with the earth's favor.",
-
   "sb_spend_table": {
     "minor_complications": [
       "**Exposure:** Your actions draw unwanted attention from **wardens or hedge-keepers**.",
@@ -713,38 +761,76 @@
       "**Aelaerem (Folk Customs):** You forget a crucial local taboo and offend the Neighbors; small things begin to go wrong—milk sours, knots loosen, a child points at the empty chair."
     ]
   },
-
   "boss_archetypes": [
     {
       "name": "The Scarecrow Regent",
-      "tags": ["Omen", "Threshold"],
+      "tags": [
+        "Omen",
+        "Threshold"
+      ],
       "description": "A hedge-raised guardian wearing twelve charms and one wrong knot.",
-      "phases": ["Stare of the Lane", "Scare the Crows", "Harvest of Faces"],
-      "cracks": ["a **Guest-Loaf** offered to its post", "a **Mummers' License** to wear a mask it cannot read"]
+      "phases": [
+        "Stare of the Lane",
+        "Scare the Crows",
+        "Harvest of Faces"
+      ],
+      "cracks": [
+        "a **Guest-Loaf** offered to its post",
+        "a **Mummers' License** to wear a mask it cannot read"
+      ]
     },
     {
       "name": "The Hollow Bride",
-      "tags": ["Otherworld", "Hospitality"],
+      "tags": [
+        "Otherworld",
+        "Hospitality"
+      ],
       "description": "A Neighbor wearing a borrowed name and wedding veil.",
-      "phases": ["Invitation Drifted", "Feast of Shadows", "Ninth Cup Poured"],
-      "cracks": ["a **Shepherd's Whistle** to call the dogs that guard the threshold", "a **Lantern-Writ** to see her true face"]
+      "phases": [
+        "Invitation Drifted",
+        "Feast of Shadows",
+        "Ninth Cup Poured"
+      ],
+      "cracks": [
+        "a **Shepherd's Whistle** to call the dogs that guard the threshold",
+        "a **Lantern-Writ** to see her true face"
+      ]
     },
     {
       "name": "Lantern Bailiff of the Moot",
-      "tags": ["Justice", "Order"],
+      "tags": [
+        "Justice",
+        "Order"
+      ],
       "description": "Enforcer of hedge-law with warrant-nails and bell-keys.",
-      "phases": ["Lantern Law", "Midnight Moot", "Binding Geas"],
-      "cracks": ["a **Cider-Mark** to buy a night's silence", "a **Moot Oak bench** to appeal his ruling"]
+      "phases": [
+        "Lantern Law",
+        "Midnight Moot",
+        "Binding Geas"
+      ],
+      "cracks": [
+        "a **Cider-Mark** to buy a night's silence",
+        "a **Moot Oak bench** to appeal his ruling"
+      ]
     },
     {
       "name": "Beekeeper of Winter Church",
-      "tags": ["Sacred", "Whisper"],
+      "tags": [
+        "Sacred",
+        "Whisper"
+      ],
       "description": "Keeper of cold honey and sleeping hymns.",
-      "phases": ["Swarm Omen", "Waxed Vow", "Memory Tithe"],
-      "cracks": ["a **Bee-Queen Share** to call her swarm to heel", "a **Lantern** lit from a winter church candle"]
+      "phases": [
+        "Swarm Omen",
+        "Waxed Vow",
+        "Memory Tithe"
+      ],
+      "cracks": [
+        "a **Bee-Queen Share** to call her swarm to heel",
+        "a **Lantern** lit from a winter church candle"
+      ]
     }
   ],
-
   "faction_entanglements": [
     "**Wold-Wardens:** Honor hedge-law (count stiles, turn stones inward) or suffer +1 SB on each night march; bringing steel disputes to the Moot Oak reduces the next travel DV by 1.",
     "**Mummers' Companies:** Travel under mask grants advantage crossing parochial borders; anger them (perform out of season) and village gates close at dusk (Position —).",
@@ -752,14 +838,12 @@
     "**Apple-Matron Circles:** Feast-days open barns and purses; snub an invitation and local prices double until amends are made.",
     "**Neighbors (quiet powers):** Leave butter at cup-marks to cancel the first supernatural SB this leg; break taboo and the Hollow stirs (add a **Hollow Attention** tick)."
   ],
-
   "cross_regional_ties": [
     "**Aeler Soft-Power:** Red-thread guest-right and courtesies are fashionable among Aeler houses; reputation for keeping hearth-law grants +1 die to parley with Aeler stewards and toll-clerks.",
     "**Kahfagian Sea-Lanes:** Beeswax, cider-brandy, and wool ride river-to-coast. Storm seasons push Kahfagian factors inland—good silver, stricter contracts.",
     "**Way of Silk Spurs:** Caravans detour across the downs for night-safe lanes under lantern law; counterfeit guest-loaf tokens discovered here echo as distrust along Silk waystations (Social DV +1 until cleared).",
     "**Valewood Fallout (North):** Moon-sap and dream pollen drift on certain winds: chalk mazes misalign, barrow-whispers grow bold. When **Valewood Weather** is in effect, the first night omen is always true (good or ill)."
   ],
-
   "encounter_seeds": [
     {
       "title": "The Hollow Bride's Invitation",
@@ -774,7 +858,6 @@
       "description": "The winter church's bees have stopped producing honey. They are producing wax effigies of the PCs. The beekeeper wants to know why."
     }
   ],
-
   "index": [
     "Aelaerem",
     "Hearth and Hollow generator",
@@ -800,5 +883,6 @@
     "Hollow Attention",
     "Guest-right violations",
     "Hollow Walks"
-  ]
+  ],
+  "_license": "Fate's Edge Proprietary Content – © 2024 Nicholas A. Gasper. All rights reserved."
 }

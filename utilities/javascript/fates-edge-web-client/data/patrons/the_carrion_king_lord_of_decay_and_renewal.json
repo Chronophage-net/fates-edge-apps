@@ -3,8 +3,16 @@
   "type": "patron",
   "title": "The Carrion King — Lord of Decay and Renewal",
   "version": "1.0.0",
-  "tags": ["decay", "renewal", "death", "cycle", "fungus", "undertaker", "rot", "ecology"],
-  
+  "tags": [
+    "decay",
+    "renewal",
+    "death",
+    "cycle",
+    "fungus",
+    "undertaker",
+    "rot",
+    "ecology"
+  ],
   "lore": {
     "description": "The Carrion King does not rule. He waits. He is the patience of the forest floor, the hunger of the root, the slow, inevitable turning of flesh to soil. He is not evil—he is necessary. Without decay, there is no growth. Without rot, no renewal. Without the carrion, no feast for the living.",
     "followers": "His followers are undertakers, plague doctors, mushroom farmers, and those who tend to the dying. They understand that death is not an ending but a transformation. The body returns to the earth; the earth feeds the root; the root feeds the tree; the tree shelters the living. The Carrion King is the hinge of this great cycle, and his servants are its keepers.",
@@ -19,14 +27,12 @@
       "text": "You fear the rot. I have made peace with it. The body feeds the root; the root feeds the leaf; the leaf feeds the deer; the deer feeds the wolf; the wolf feeds the earth. You are not an ending. You are a beginning."
     }
   },
-
   "domain_focus": [
     "Decay and Renewal: the cycle of death, rot, and new growth",
     "Carrion as Resource: using what others discard—bodies, waste, forgotten things",
     "The Patient Hunger: slow, inevitable consumption that nurtures rather than destroys",
     "Ecological Balance: understanding that death feeds life, and that preservation without decay is stagnation"
   ],
-
   "runekeeper_options": {
     "thiasos": {
       "description": "A Runekeeper sworn to the Carrion King does not bind a creature of bright sun or clean air. Their Thiasos is a small creature of the dark, damp places: a carrion beetle that clicks its mandibles in a language of decomposition, a pale fungus that pulses faintly when a death is near, a maggot that pupates into a fly only when its keeper is in danger, a mole that nests in graveyards and knows the taste of every soil, or a toad that hibernates in the hollow of a dead oak and croaks the names of the recently dead.",
@@ -37,14 +43,12 @@
       "upkeep": "Because decay resists being fixed in writing, the Codex requires upkeep: the Runekeeper must spend an hour each week burying it in fresh soil (or allowing it to rest on a corpse) to refresh its memory, or the Rites stored there become faint (treat as Compromised until re-interred)."
     }
   },
-
   "patrons_gift": {
     "name": "Carrion's Blessing",
     "description": "Once per scene as an action, a Runekeeper of the Carrion King may touch a held item (weapon, tool, or a piece of leather) and whisper a word of the grave.",
     "effect": "For the rest of the scene, the item grants +1 die to Medicine or Survival rolls involving decay, poison, or death, and the first time each scene the bearer would suffer a Condition from disease or poison, they may ignore it (the rot accepts them as kin).",
     "cost": "After the scene, the user marks +1 Obligation as the scent of turned earth clings to them."
   },
-
   "rites": [
     {
       "name": "Rite of the Rot's Touch",
@@ -53,7 +57,11 @@
       "action": "Instant",
       "range": "Touch",
       "resist": "No",
-      "tags": ["CONSUME", "DECAY", "DEBUFF"],
+      "tags": [
+        "CONSUME",
+        "DECAY",
+        "DEBUFF"
+      ],
       "materials": "A handful of soil from a grave, or a scrap of dead matter.",
       "effect": "Touch a small object (size of a lock or smaller) and cause it to decay. A rope snaps, a lock rusts, a leather strap weakens. The target must be mundane (not enchanted). The decay is immediate and permanent. On a miss, the object resists—the GM gains 1 SB as the decay spreads to your own gear.",
       "push_it": "The decay also weakens a metal weapon, imposing –1 die on its next attack. Mark +1 Fatigue.",
@@ -69,7 +77,11 @@
       "action": "Scene",
       "range": "Touch",
       "resist": "No",
-      "tags": ["HEAL", "REST", "BOOST"],
+      "tags": [
+        "HEAL",
+        "REST",
+        "BOOST"
+      ],
       "materials": "A handful of soil or moss, placed on the skin.",
       "effect": "You or a touched ally may rest for an hour as if they had rested a full day. They clear 2 Fatigue and remove one minor Condition (Fatigue, Shaken, or a minor poison). The rest is deep and dreamless; the sleeper wakes with dirt under their nails and a faint taste of earth.",
       "push_it": "The rest also removes one level of Harm (minimum 0). Mark +1 Obligation.",
@@ -85,7 +97,11 @@
       "action": "Scene",
       "range": "Near",
       "resist": "No",
-      "tags": ["SUMMON", "FEAR", "DEBUFF"],
+      "tags": [
+        "SUMMON",
+        "FEAR",
+        "DEBUFF"
+      ],
       "materials": "A piece of raw meat or a bone.",
       "effect": "You summon a swarm of carrion insects (flies, beetles, maggots) that cluster around one target within Near. The target suffers –1 die to all physical actions for the scene as the swarm distracts and disgusts. The swarm can be dispersed by fire, smoke, or a strong wind. On a miss, the swarm turns on you briefly—you suffer –1 die to your next action.",
       "push_it": "The swarm is aggressive and also imposes –1 die to the target's social rolls (others find them repulsive). Mark +1 Obligation.",
@@ -101,7 +117,11 @@
       "action": "Scene",
       "range": "Touch",
       "resist": "Yes",
-      "tags": ["READ", "DEATH", "TRUTH"],
+      "tags": [
+        "READ",
+        "DEATH",
+        "TRUTH"
+      ],
       "materials": "A bone or tooth from a corpse less than a year dead.",
       "effect": "You touch the bone and see the last moments of the person it belonged to. The GM must describe one significant event from the deceased's final day—a face, a word, a choice. If the bone belongs to a creature that died violently, you also learn the manner of their death. On a miss, the vision is garbled or false; the GM gains 1 SB.",
       "push_it": "You also learn the name of the person who killed them (if applicable). Mark +1 Fatigue.",
@@ -117,7 +137,11 @@
       "action": "Scene",
       "range": "Zone",
       "resist": "No",
-      "tags": ["VEIL", "AREA", "PROTECT"],
+      "tags": [
+        "VEIL",
+        "AREA",
+        "PROTECT"
+      ],
       "materials": "A handful of mushroom spores, blown into the air.",
       "effect": "You create a zone of thick, spore-laden air. The zone lasts for the scene. Any creature entering the zone must test Endurance (DV 3) or suffer –1 die to physical actions from coughing and irritation. The spores also mask scents; tracking through the zone suffers –1 die. On a miss, the spores settle on you instead—you suffer –1 die to your next action.",
       "push_it": "The spores also cause mild hallucinations; creatures in the zone suffer –1 die to Perception rolls. Mark +1 Obligation.",
@@ -134,7 +158,12 @@
       "action": "Extended",
       "range": "Zone",
       "resist": "No",
-      "tags": ["CONSUME", "HEAL", "AREA", "SACRIFICE"],
+      "tags": [
+        "CONSUME",
+        "HEAL",
+        "AREA",
+        "SACRIFICE"
+      ],
       "materials": "A body (freshly dead or long buried), a knife, and a clay vessel.",
       "effect": "You harvest the body's remaining vitality. All allies within Near gain +2 dice to their next action and clear 1 Fatigue as the energy of the dead flows through them. The body crumbles to dust afterward, its usefulness spent. On a miss, the ritual fails—the body remains, but the GM gains 2 SB as the dead are not yet willing to give.",
       "push_it": "The harvest also heals 1 Harm to all allies in the zone. Mark +1 Obligation.",
@@ -151,7 +180,12 @@
       "action": "Extended",
       "range": "Self",
       "resist": "No",
-      "tags": ["TRANSFORM", "BOOST", "DEBT", "SACRIFICE"],
+      "tags": [
+        "TRANSFORM",
+        "BOOST",
+        "DEBT",
+        "SACRIFICE"
+      ],
       "materials": "A circlet woven from the bones of a creature you killed yourself, worn for nine days.",
       "effect": "You become an avatar of the cycle of decay and renewal for one scene. You gain: +2 dice to all Medicine and Survival rolls involving death or decay; Immunity to poison and disease; The Carrion's Gaze: Once during the scene, you may force one target to test Spirit+Resolve (DV 4) or be paralysed by the vision of their own death. When the scene ends, you suffer Fatigue 2 as the transformation taxes your body. On a miss, the ritual fails, and you gain a permanent Condition (Rot-Touched: animals shy from you, and you cannot use healing magic on yourself).",
       "push_it": "The transformation lasts for the entire session instead of one scene. Mark +2 Obligation.",
@@ -161,7 +195,6 @@
       "duration": "Scene (or session, if pushed)."
     }
   ],
-
   "cantors_and_cults": {
     "cantors": {
       "name": "The Cantor's Song",
@@ -172,7 +205,6 @@
       "description": "The Carrion King's cults gather in places where decay is visible and accepted: charnel houses, mushroom caves, the compost heaps of great cities, and the root-cellars where bodies are prepared for burial. The Rot-Thread is a fellowship of undertakers, plague doctors, mushroom farmers, and those who have learned that death is not an ending. A ritual of the Cult involves each member bringing a piece of something dead—a bone, a fallen leaf, a scrap of hide—and placing it in a central pile. They then speak aloud what they hope will grow from that decay: a new craft, a new relationship, a new understanding. The pile is left to compost; the next meeting, they dig through the soil to see what has sprouted. Their creed is written in mushroom-ink on a single, ever-rotting leaf: 'The body feeds the root. The root feeds the leaf. The leaf feeds the deer. The deer feeds the wolf. The wolf feeds the earth. You are not an ending. You are a beginning.' Outsiders are welcome if they bring something dead and are willing to speak of what they hope will grow from it."
     }
   },
-
   "witchcraft": {
     "description": "A witch who walks with the Carrion King is a grave-wright or rot-smith—one who crafts the tools of the undertaker and the composter: a shovel that turns soil into a blessing, a needle that sews a shroud that becomes a winding-sheet for a new life, or a mortar that grinds bone into fertilizer. Their magic works through the materials of decay: a spore-dusted cloth that preserves a body for a season, a bone needle that stitches a wound without infection, or a clay pot that ferments a medicine from grave-soil. In Aeler, a True-Mason might carve a 'death keystone' into a crypt, but a witch of the Carrion King would instead plant a mushroom cap in the mortar, so the stone remembers the weight of the dead it holds.",
     "tools": {
@@ -189,7 +221,6 @@
       }
     ]
   },
-
   "corruption": [
     {
       "tier": 1,
@@ -222,7 +253,6 @@
       "cost": "The Root's Claim: Mark +3 Obligation. You can no longer enter a place that has not known death without suffering 1 Fatigue. Your eyes are the colour of turned soil, and mushrooms grow in your footsteps."
     }
   ],
-
   "playstyle_notes": {
     "description": "The Carrion King is the ideal patron for players who want to explore themes of death, decay, and renewal—not as horror, but as necessity. His followers are not necromancers who bind the dead to serve; they are undertakers who tend the dead so the living may thrive. The Rites reward patience, observation, and a willingness to work with what others discard. The cost is social isolation—death is a hard sell to the living. Intrusions often take the form of a corpse that refuses to yield its secret, a blight that must be understood before it can be cured, or a dying creature that needs a gentle hand rather than a healing spell. Ideal for druids of a darker bent, plague doctors, mushroom farmers, and any character who understands that the forest floor is not a graveyard but a garden.",
     "emphasizes": [
@@ -233,7 +263,6 @@
       "The Quiet Dignity of Death: tending the dying and the dead with respect"
     ]
   },
-
   "monastic_tradition": {
     "name": "Rot-Fist (The Carrion King)",
     "quote": "You fear the rot. I have made peace with it. The body feeds the root; the root feeds the leaf; the leaf feeds the deer; the deer feeds the wolf; the wolf feeds the earth. You are not an ending. You are a beginning.",
@@ -295,7 +324,6 @@
       "description": "Once per session, become the living embodiment of decay and renewal for one scene. You ignore all poison and disease, and any creature you touch (including a successful unarmed strike) must test Endurance (DV 4) or suffer 1 Fatigue as the energy of the grave flows through them. After the scene, you gain a permanent Debt Scar—a patch of skin that is always slightly cool to the touch, like grave-soil. You may ignore one obligation that would compel you to preserve what should decay—the Carrion King has already claimed it."
     }
   },
-
   "lore_echoes": [
     {
       "title": "The Mistslands (Fog and Decay)",
@@ -318,7 +346,6 @@
       "description": "In Zakov, the Carrion King is called the Salt-Hunger, the preservation that consumes moisture and leaves only husks. A pirate who prays to the Salt-Hunger before a voyage may find that their ship's timbers do not rot—but the crew will dream of drowning each night."
     }
   ],
-
   "sample_adventure": {
     "title": "The Compost King",
     "description": "A village on the edge of the Mistlands has stopped burying its dead. They leave them in the fields, hoping the fog will take them. But the fog does not take them. The bodies swell and burst, and a strange, pale fungus grows from their mouths. The villagers believe they have offended the Carrion King. In truth, a rival cult has poisoned the soil with a substance that prevents decay. The party must find the source of the poison, cleanse the soil, and restore the cycle of decay and renewal—or the village will rot from within.",
@@ -326,5 +353,6 @@
       "speaker": "Sister Mora, Fungal-warden of the Deepwood",
       "text": "The body that does not rot is a debt unpaid. The soil that does not feed is a wound unhealed. The Carrion King is patient, but even patience has its limits."
     }
-  }
+  },
+  "_license": "Fate's Edge Proprietary Content – © 2024 Nicholas A. Gasper. All rights reserved."
 }

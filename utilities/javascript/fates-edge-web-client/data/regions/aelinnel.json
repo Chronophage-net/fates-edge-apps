@@ -7,7 +7,6 @@
   "key_demographic": "Aelinnel (Gnomes)",
   "capital": "Keisanki",
   "manifest_path": "/data/docs/manifest.json",
-
   "overview": {
     "tagline": "Count the steps, weigh the words, and never trust a single telling.",
     "genre": "Dark faerie tale, moonlit groves, polite iron, and the uncanny weight of a promise unsaid.",
@@ -25,7 +24,6 @@
       "north": "The Valewood (deep) -- The empire's fallen towers are a source of treasure and terror; the star-roads are a shortcut that demands a toll in courtesy."
     }
   },
-
   "quotes": [
     {
       "speaker": "Lady of Thorns (Fae Sovereign)",
@@ -36,7 +34,6 @@
       "text": "Our kilns tell us more than your books ever could. When the smoke curls left, the tide's with you. When it splits in three, best stay by your own hearth till it burns straight again. And never trust a court that speaks in only one voice — the silence is always the second witness."
     }
   ],
-
   "npcs": [
     {
       "name": "Thorn",
@@ -75,14 +72,40 @@
       "quirk": "Her receipts are written on leaf-vein paper. They curl when the bargain is unbalanced — and also when it rains, which is often, which is why she keeps a stone in her pocket."
     }
   ],
-
   "names": {
-    "first_male": ["Caelum", "Riven", "Tallow", "Fennel", "Osprey", "Linden"],
-    "first_female": ["Eilidh", "Sable", "Merrow", "Briar", "Vesper", "Ash"],
-    "surnames": ["Thornweave", "Tidespeak", "Evenstep", "Hawthorn", "Silverbough", "Foxtail"],
-    "epithets": ["the Green-Wise", "Two-Tongue", "the Unseen Guest", "Barrow-Kept", "the Uncounted", "Ash-Finger"]
+    "first_male": [
+      "Caelum",
+      "Riven",
+      "Tallow",
+      "Fennel",
+      "Osprey",
+      "Linden"
+    ],
+    "first_female": [
+      "Eilidh",
+      "Sable",
+      "Merrow",
+      "Briar",
+      "Vesper",
+      "Ash"
+    ],
+    "surnames": [
+      "Thornweave",
+      "Tidespeak",
+      "Evenstep",
+      "Hawthorn",
+      "Silverbough",
+      "Foxtail"
+    ],
+    "epithets": [
+      "the Green-Wise",
+      "Two-Tongue",
+      "the Unseen Guest",
+      "Barrow-Kept",
+      "the Uncounted",
+      "Ash-Finger"
+    ]
   },
-
   "places": [
     {
       "rank": 2,
@@ -202,7 +225,6 @@
       "mechanical_hook": ""
     }
   ],
-
   "people_and_factions": [
     {
       "rank": 2,
@@ -335,7 +357,6 @@
       "what_they_ask": ""
     }
   ],
-
   "complications": [
     {
       "rank": 2,
@@ -455,7 +476,6 @@
       "mechanical_hook": ""
     }
   ],
-
   "rewards": [
     {
       "rank": 2,
@@ -575,14 +595,12 @@
       "curse_cost": ""
     }
   ],
-
   "quick_use_notes": {
     "draw_rules": "Draw until you have all four suits: **Spade** = place, **Heart** = actor, **Club** = pressure, **Diamond** = treasure. Highest rank sets the main Timer (2–5 → 4, 6–10 → 6, J/Q/K → 8, A → 10).",
     "diamonds": "Treasures (Diamonds) are codified outcomes (charms, passes, host-rights, exceptions) that change position rather than call for a roll.",
     "ace_rule": "If any **A** appears, echo threshold & fae motifs — gates that open at the wrong tide, paths that count your footsteps, gifts that ask for a name in return.",
     "obligation_tracking": "Track **Obligation to the Green Gate** as a persistent timer. Each crossing without proper payment ticks it toward a visit from the Huntsman."
   },
-
   "field_procedures": [
     {
       "name": "Two-Voice Talk",
@@ -597,7 +615,6 @@
       "description": "Producing copper/brass tools in a ritual space removes the first **Fae Offense** tag this scene; drawing iron instead escalates the next Complication by +1 Cap. The escalation is always polite. The result is never."
     }
   ],
-
   "lore_echoes": [
     {
       "title": "The Ninth Step",
@@ -620,7 +637,6 @@
       "description": "Never accept a gift without naming its price. The giver will name it for you — and their price is always one word more than you wanted to pay. The ninth word is the one that binds. If you speak the ninth word, you have accepted the price. The price is always a door. The door is always the Hollow."
     }
   ],
-
   "superstitions": [
     {
       "name": "Hazel to the Threshold",
@@ -638,7 +654,6 @@
       "cost": "Burn for +1 die once"
     }
   ],
-
   "patronage_and_power": {
     "description": "Among the Aelinnel, power flows through courtesy, oath, and the hidden geometry of the land. A Stone Prince's authority rests on indexed fae treaties; a Green Knight's on the trials he has witnessed. There is no single crown, only the shared understanding that a broken promise cuts deeper than a sword — and that a promise kept is a door that opens both ways.",
     "gm_advice": {
@@ -648,7 +663,6 @@
       "obligation_tracking": "Track **Obligation to the Green Gate** as a persistent timer. Each crossing without proper payment ticks it toward a visit from the Huntsman. The Huntsman is always polite. The Huntsman is always hungry."
     }
   },
-
   "sb_spend_table": {
     "minor_complications": [
       "**Exposure:** Your actions draw unwanted attention from **Thorn Court reeves or green-market brokers**.",
@@ -684,86 +698,139 @@
       "**Aelinnel (Oath & Iron):** An oath-bead chills in your pocket; iron is discovered in a grove; the Green Knight appears to demand a trial by path."
     ]
   },
-
   "boss_archetypes": {
     "court_and_courtesy": [
       {
         "name": "Lady of Thorns",
-        "tags": ["Etiquette Engine"],
+        "tags": [
+          "Etiquette Engine"
+        ],
         "description": "Punishes breaches with precise harms, rewards perfect courtesy with literal boons.",
         "win_condition": "Satisfying three courtesies in sequence (no iron, two-voice speech, return the waymark). The third courtesy is always a riddle. The riddle is always about a door.",
-        "phases": ["Courtesy Demanded", "Thorn Tax Levied", "Riddle of the Door"]
+        "phases": [
+          "Courtesy Demanded",
+          "Thorn Tax Levied",
+          "Riddle of the Door"
+        ]
       },
       {
         "name": "Green Knight",
-        "tags": ["Trial by Pattern"],
+        "tags": [
+          "Trial by Pattern"
+        ],
         "description": "Duel of paths and proofs, not blades.",
         "win_condition": "Presenting a higher-count route (Fibonacci, even-steps) or yielding a deserved apology at the right number. The right number is never nine. The right number is always eight — and a pause.",
-        "phases": ["Challenge Offered", "Path Test", "The Right Number"]
+        "phases": [
+          "Challenge Offered",
+          "Path Test",
+          "The Right Number"
+        ]
       }
     ],
     "threshold_and_hunt": [
       {
         "name": "Moonlit Ride (Wild Hunt)",
-        "tags": ["Hunt", "Judgment"],
+        "tags": [
+          "Hunt",
+          "Judgment"
+        ],
         "description": "Three phases: **Sounding** (horns), **Coursing** (paths shorten for the bold), **Closing the Ring**.",
         "win_condition": "Naming safe-clemency, joining the chase without taking a prey, or blowing the right counter-call (2–3–5). The counter-call must be a question. The question must be about the Hollow. The Hollow does not answer — but it listens.",
-        "phases": ["Sounding", "Coursing", "Closing the Ring"]
+        "phases": [
+          "Sounding",
+          "Coursing",
+          "Closing the Ring"
+        ]
       },
       {
         "name": "Green Gate",
-        "tags": ["Living Crossing"],
+        "tags": [
+          "Living Crossing"
+        ],
         "description": "Demands exact change in truths.",
         "win_condition": "Paying a memory that fits the posted proof; forcing passage triggers 'Roads Rewired.' The posted proof is always incomplete. The missing part is the ninth word.",
-        "phases": ["Gate Yawns", "Toll Demanded", "Roads Rewired"]
+        "phases": [
+          "Gate Yawns",
+          "Toll Demanded",
+          "Roads Rewired"
+        ]
       }
     ],
     "numbers_and_glamour": [
       {
         "name": "Glamour Fog",
-        "tags": ["Layered Illusion"],
+        "tags": [
+          "Layered Illusion"
+        ],
         "description": "Each layer dispelled by a correct count, courtesy, or copper rite.",
         "win_condition": "Completing the **Three Proofs**: count aloud, return a borrowed path token, trade a said/meant receipt. The third proof is always a promise. The promise is always to a shadow.",
-        "phases": ["Fog Gathers", "Layer by Layer", "The Third Proof"]
+        "phases": [
+          "Fog Gathers",
+          "Layer by Layer",
+          "The Third Proof"
+        ]
       },
       {
         "name": "Lost Day",
-        "tags": ["Time Miscount"],
+        "tags": [
+          "Time Miscount"
+        ],
         "description": "The sun miscounts hours.",
         "win_condition": "Reconciling two ledgers (what happened / what should have), then ringing a prime-number chime. The prime number is always 2, 3, 5, or 7 — never 9. 9 is not a number in Aelinnel. 9 is a **suggestion**.",
-        "phases": ["Dawn at Supper", "Reconcile the Ledgers", "Prime Chime"]
+        "phases": [
+          "Dawn at Supper",
+          "Reconcile the Ledgers",
+          "Prime Chime"
+        ]
       }
     ],
     "market_and_oath": [
       {
         "name": "Green-Market Broker",
-        "tags": ["Truth Arbitrage"],
+        "tags": [
+          "Truth Arbitrage"
+        ],
         "description": "Buys your meanings, sells your words.",
         "win_condition": "Catching them in a one-voice statement or producing an Oath-Bead that chills (misunderstood clause). The misunderstood clause is always the one you left unsaid. The broker knew you would.",
-        "phases": ["Bargain Offered", "Truth Exchanged", "The Unsaid Clause"]
+        "phases": [
+          "Bargain Offered",
+          "Truth Exchanged",
+          "The Unsaid Clause"
+        ]
       },
       {
         "name": "Oath-Carver Gone Wrong",
-        "tags": ["Quartz Tyrant"],
+        "tags": [
+          "Quartz Tyrant"
+        ],
         "description": "Binds towns with over-precise promises.",
         "win_condition": "Carving a **Release Unless** into communal quartz at cost of a public truth. The truth must be one you have never told. The quartz will remember it. The quartz will also share it — politely, and only with the Hollow.",
-        "phases": ["Quartz Bound", "Towns Enslaved", "Release Unless"]
+        "phases": [
+          "Quartz Bound",
+          "Towns Enslaved",
+          "Release Unless"
+        ]
       }
     ],
     "stone_and_memory": [
       {
         "name": "Stone-Wight Chorus",
-        "tags": ["Echo Jurors"],
+        "tags": [
+          "Echo Jurors"
+        ],
         "description": "Resent footsteps, adore proofs.",
         "win_condition": "Tapping the dolmen scale that matches the grievance and returning a taken token to the barrow. The token is always a memory. The memory is always someone else's. Return it carefully — the dead are particular about provenance.",
-        "phases": ["Footsteps Heard", "Grievance Filed", "Proof Demanded"]
+        "phases": [
+          "Footsteps Heard",
+          "Grievance Filed",
+          "Proof Demanded"
+        ]
       }
     ],
     "boss_mechanics": {
       "courtesy_currency": "In Aelinnel, social interactions operate on a hidden **Courtesy Counter**. Each polite gesture, correct honorific, or offered truth adds +1; each breach, slight, or falsehood subtracts. At 0, the GM gains an extra SB. At 5+, the party gains +1 die to their next social roll with fae courts."
     }
   },
-
   "index": [
     "Aelinnel",
     "Stone, Bough, and Bright Things generator",
@@ -791,5 +858,6 @@
     "Copper over iron",
     "The ninth step",
     "The Hollow"
-  ]
+  ],
+  "_license": "Fate's Edge Proprietary Content – © 2024 Nicholas A. Gasper. All rights reserved."
 }

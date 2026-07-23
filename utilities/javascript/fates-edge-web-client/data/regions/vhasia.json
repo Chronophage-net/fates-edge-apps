@@ -7,7 +7,6 @@
   "key_demographic": "Humans",
   "capital": "Lence",
   "manifest_path": "/data/docs/manifest.json",
-
   "overview": {
     "tagline": "The sun shattered at Lence. The pieces are still falling. Which shadow will catch you?",
     "genre": "Courtly intrigue, chevauchée warfare, fractured legitimacy, the tragedy of chivalry—a kingdom that cannot mourn because mourning would mean admitting the old world is dead. Beneath the gilt and the heraldry, chivalry is a thin veneer; the iron of siege and sack shows through at every edge.",
@@ -25,7 +24,6 @@
       "south": "Thepyrgos (via Viterra) — Synod law and the Chain-Lanterns rarely venture this far north, but their scholars collect Vhasian ballads. The ninth verse is always censored."
     }
   },
-
   "quotes": [
     {
       "speaker": "Cardinal-Regent of the Broken Sun (Elite)",
@@ -36,12 +34,10 @@
       "text": "I've served under three banners on this same road. The only constant is that someone always wants to collect tolls, oaths, the dead. The Fenwoods burned Lence ten years ago, marching from the Belworth like storm-clouds. Now every duke with a purse thinks he's king. The Queen-Mother weaves in the west, Valdais sharpens his lance in Adria, and the Two Crowns count their silver. Me? I just want to get home before the snows bury the graves. And if you hear a cantor singing the *Planctus Armatus*, stop and listen. That's the only honest history left—especially the verse about the queen who married twice, bore sons to both kings, and left the realm wondering which throne was hers by right, and which by rumor."
     }
   ],
-
   "ninth_taboo": {
     "title": "The Ninth Taboo Manifestation",
     "description": "In any Vhasian court, the ninth citation of precedent voids all previous. The wise stop at eight and settle. Those who cite the ninth are said to hear a faint laughter from the marble walls—and their cases are never heard again. The laughter is the dead king's. He was the ninth king of his line. He died at Lence. He is still laughing—because the ninth citation is the only one that names the Fenwoods as the true heirs. No one has ever cited it. No one dares. Also, the ninth cup poured at a feast is for the Hollow. The wise pour eight and leave the ninth empty. Those who pour the ninth see a pale figure standing at the high table—waiting to collect a weight. The figure is the dead king, checking his oath-stick."
   },
-
   "npcs": [
     {
       "name": "Elianor Everblood",
@@ -86,14 +82,44 @@
       "quirk": "He has never seen the sun. He knows three languages, the lineage of every noble house, and the taste of every poison. He does not know if he is a prince or a puppet. He dreams every night of a knight with an unbuckled gorget—and of a queen who wore two crowns, wondering which throne was truly hers."
     }
   ],
-
   "names": {
-    "first_male": ["Valdais", "Wymund", "Renaud", "Corin", "Touénot", "Alain", "Ghiro"],
-    "first_female": ["Elianor", "Baldvyn", "Isabeau", "Oria", "Mael", "Giselle", "Celandine"],
-    "surnames": ["de la Marche", "l'Ever", "de Lence", "d'Ethor", "du Pont", "de la Croix", "l'Argent"],
-    "epithets": ["the Iron", "the Unwed", "the Unbuckled", "Bell-Sworn", "the Silver", "Ash-Banner", "the Unpaid"]
+    "first_male": [
+      "Valdais",
+      "Wymund",
+      "Renaud",
+      "Corin",
+      "Touénot",
+      "Alain",
+      "Ghiro"
+    ],
+    "first_female": [
+      "Elianor",
+      "Baldvyn",
+      "Isabeau",
+      "Oria",
+      "Mael",
+      "Giselle",
+      "Celandine"
+    ],
+    "surnames": [
+      "de la Marche",
+      "l'Ever",
+      "de Lence",
+      "d'Ethor",
+      "du Pont",
+      "de la Croix",
+      "l'Argent"
+    ],
+    "epithets": [
+      "the Iron",
+      "the Unwed",
+      "the Unbuckled",
+      "Bell-Sworn",
+      "the Silver",
+      "Ash-Banner",
+      "the Unpaid"
+    ]
   },
-
   "places": [
     {
       "rank": 2,
@@ -213,7 +239,6 @@
       "mechanical_hook": "Travel on this road is swift but dangerous; raiders and patrols are common. A successful Wits+Scout (DV 4) may avoid ambush."
     }
   ],
-
   "people_and_factions": [
     {
       "rank": 2,
@@ -333,7 +358,6 @@
       "mechanical_hook": "Meeting him may reveal the truth of his legitimacy; protecting him is a major campaign goal."
     }
   ],
-
   "complications": [
     {
       "rank": 2,
@@ -462,7 +486,6 @@
       "mechanical_hook": "A major scare that can fracture morale; may be triggered by the GM when the party lingers near Lence."
     }
   ],
-
   "rewards": [
     {
       "rank": 2,
@@ -582,13 +605,11 @@
       "cost": "The pardon expires; after that, rebels are outlaws again."
     }
   ],
-
   "quick_use_notes": {
     "draw_rules": "Draw until you have all four suits: Spade = place, Heart = actor, Club = pressure, Diamond = leverage. Highest rank sets the main Timer (2–5 → 4, 6–10 → 6, J/Q/K → 8, A → 10).",
     "diamonds": "Diamonds are codified outcomes (charters/patents/rights) that change position rather than call for a roll.",
     "ace_rule": "If any A appears, echo fractured sun motifs—light that splinters, oaths that crack like glass, smoke that smells of Lence, and a child who may be a prince or a puppet. Also echo the weight of memory: a ghost knight, a mirror that shows the sack, a bell that rings for the dead."
   },
-
   "additional_features": [
     {
       "name": "Fractured Seals",
@@ -615,7 +636,6 @@
       "description": "Seint Michel, the Judge of the Scar (Mykkiel): The law that does not bend; the judge who cannot be bought. His shrines are at tourney fields and courtrooms. Knights swear oaths on his scale before the joust. Seint Isabeau, Who Slumbers Amongst the Lilies (Ikasha): The dream of setting aside the crown; the mercy of forgetting duty. Her groves demand that armour be unbuckled at the threshold. Seint Evroul of the Cairn (Mor'iraath): The oath that outlasts the oath-taker; the blood-price paid in stone. The barrow-kings demand tribute in stories, not gold. The Cantor's Road (The Traveler): The road that belongs to no lord; the path that finds its own way. Cantors are immune to chivalric protection—but subject to its violence."
     }
   ],
-
   "lore_echoes": [
     {
       "title": "Seint Michel, the Judge of the Scar (Mykkiel)",
@@ -638,7 +658,6 @@
       "description": "See the Ninth Taboo Manifestation box above."
     }
   ],
-
   "superstitions": [
     {
       "name": "Bread to the Sun",
@@ -665,7 +684,6 @@
       "flavor": "The candle should be made from the fat of a knight who died with his gorget buckled. There are many."
     }
   ],
-
   "sb_spend_table": {
     "minor_complications": [
       "**Exposure:** Rival officials or court guards take notice.",
@@ -706,58 +724,112 @@
       "**Lence's Shadow:** A ghost appears—a soldier, a child, a king. It asks a question. Answering costs a memory. Refusing costs a curse. The question is always: 'Why did you survive?'"
     ]
   },
-
   "pursuit_ladder": [
     "**Advance/Withdraw (Wits + Lore):** On a hit, shift one band. On a strong hit, also impose *Dust Cloud*.",
     "**Cut the Charter (Presence + Sway):** On a hit, freeze range for one exchange; if a Safe-Conduct is in your possession, +1 die.",
     "**Weather the Sack (Endurance + Spirit):** On a hit in *Lence's Echo*, you pick who keeps their memories; on a miss, the GM does."
   ],
-
   "boss_archetypes": [
     {
       "name": "The Red Marshal",
-      "tags": ["Exiled Sun Court hammer"],
+      "tags": [
+        "Exiled Sun Court hammer"
+      ],
       "description": "A commander who lost the Battle of Ashes and carries the guilt of Lence.",
-      "phases": ["Chevauchee Call", "Banner Turn", "Lists to War"],
-      "cracks": ["Letters Patent buys one round of obedience", "General Pardon lets a unit stand down"]
+      "phases": [
+        "Chevauchee Call",
+        "Banner Turn",
+        "Lists to War"
+      ],
+      "cracks": [
+        "Letters Patent buys one round of obedience",
+        "General Pardon lets a unit stand down"
+      ]
     },
     {
       "name": "Cardinal-Regent of the Broken Sun",
-      "tags": ["scarlet gloves"],
+      "tags": [
+        "scarlet gloves"
+      ],
       "description": "A church official who blessed the Fenwood banners before Lence.",
-      "phases": ["Interdict Blade", "Seal Both Ways", "Confessional Leak"],
-      "cracks": ["Queen's Audience cancels Interdict Blade once", "a Synod Indulgence treats a church check as controlled for one scene"]
+      "phases": [
+        "Interdict Blade",
+        "Seal Both Ways",
+        "Confessional Leak"
+      ],
+      "cracks": [
+        "Queen's Audience cancels Interdict Blade once",
+        "a Synod Indulgence treats a church check as controlled for one scene"
+      ]
     },
     {
       "name": "The Parlement Spider",
-      "tags": ["chief clerk", "quills like daggers"],
+      "tags": [
+        "chief clerk",
+        "quills like daggers"
+      ],
       "description": "A clerk who keeps the lists of nobles who betrayed the Sun Court.",
-      "phases": ["Motion to Delay", "Counter-Citation", "Filed at Dawn"],
-      "cracks": ["Sunburst Warrant opens a 'royal window'", "a Burgess Charter lets a town court overrule once locally"]
+      "phases": [
+        "Motion to Delay",
+        "Counter-Citation",
+        "Filed at Dawn"
+      ],
+      "cracks": [
+        "Sunburst Warrant opens a 'royal window'",
+        "a Burgess Charter lets a town court overrule once locally"
+      ]
     },
     {
       "name": "The Two Crowns",
-      "tags": ["rival dukes"],
+      "tags": [
+        "rival dukes"
+      ],
       "description": "Two claimants who rule in parallel, each incomplete.",
-      "phases": ["Contradictory Edicts", "Levy in Hours", "Coin Trial"],
-      "cracks": ["Sunburst Warrant – public mass unites them for one scene", "General Pardon calms levy unrest once"]
+      "phases": [
+        "Contradictory Edicts",
+        "Levy in Hours",
+        "Coin Trial"
+      ],
+      "cracks": [
+        "Sunburst Warrant – public mass unites them for one scene",
+        "General Pardon calms levy unrest once"
+      ]
     },
     {
       "name": "The Queen-Mother (Elianor Everblood)",
-      "tags": ["weaver of webs"],
+      "tags": [
+        "weaver of webs"
+      ],
       "description": "The dowager who holds the Dauphin and the secret of the succession.",
-      "phases": ["Weave the Web", "Unveil the Dauphin", "The Sun Rises Again"],
-      "cracks": ["produce proof of the Dauphin's illegitimacy", "convince Valdais to kneel", "find the old king's true heir"]
+      "phases": [
+        "Weave the Web",
+        "Unveil the Dauphin",
+        "The Sun Rises Again"
+      ],
+      "cracks": [
+        "produce proof of the Dauphin's illegitimacy",
+        "convince Valdais to kneel",
+        "find the old king's true heir"
+      ]
     },
     {
       "name": "The Cantor Alain (Iron Bard)",
-      "tags": ["bearer of the Cracked Ring"],
+      "tags": [
+        "bearer of the Cracked Ring"
+      ],
       "description": "A singer who carries the truth of Lence in his songs and his shadow.",
-      "phases": ["The Planctus", "The Witness", "The Silence"],
-      "cracks": ["unbuckle a gorget in his presence", "speak a true regret aloud", "sing the ninth verse—the one that names the Hollow"]
+      "phases": [
+        "The Planctus",
+        "The Witness",
+        "The Silence"
+      ],
+      "cracks": [
+        "unbuckle a gorget in his presence",
+        "speak a true regret aloud",
+        "sing the ninth verse—the one that names the Hollow"
+      ]
     }
   ],
-
   "campaign": {
     "vacant_throne_timer": {
       "name": "Vacant Throne",
@@ -790,12 +862,36 @@
       "determine_legitimacy": {
         "method": "At the start of the campaign, roll 1d6 on the table below to determine the Dauphin's true nature and the secret the Queen-Mother has been keeping.",
         "table": [
-          {"roll": 1, "legitimacy": "True Heir", "truth": "The Dauphin is exactly who the Queen-Mother claims: her grand-nephew, the last of the old Sun King's line. The blood is true. The problem is that Valdais's claim is also true, and the realm must choose."},
-          {"roll": 2, "legitimacy": "False Heir (Known)", "truth": "The Queen-Mother knows the Dauphin is a commoner—a Tulkani orphan with a convincing birthmark. She maintains the fiction because without a claimant, the realm falls to Valdais, whom she does not trust. The child does not know."},
-          {"roll": 3, "legitimacy": "False Heir (Unknown)", "truth": "The Dauphin is a changeling, placed in the cradle by agents of the Ninth to destabilize the succession. The Queen-Mother suspects but cannot prove it. She has dreamed of Sir Corin, who died saving a child at Lence—and the child in the dream has the Dauphin's face."},
-          {"roll": 4, "legitimacy": "Uncertain", "truth": "The Queen-Mother genuinely does not know. The child was brought to her by a dying servant who claimed he was the Dauphin. She has raised him as her own, hoping the doubt will never be tested. She has outlived three husbands and two sons. She cannot bear to lose a fourth."},
-          {"roll": 5, "legitimacy": "Double Claim", "truth": "There are two Dauphins. A second child, hidden in the Mistlands, also bears the birthmark and the blood-right. The Queen-Mother knows of this child but has not acknowledged them. The realm may split again."},
-          {"roll": 6, "legitimacy": "The Blood Remembers", "truth": "The Dauphin carries the blood of the old Sun King—but also the blood of a Fenwood. The sack of Lence was not just a conquest; it was a family feud. The child is the living proof of a union that should never have happened."}
+          {
+            "roll": 1,
+            "legitimacy": "True Heir",
+            "truth": "The Dauphin is exactly who the Queen-Mother claims: her grand-nephew, the last of the old Sun King's line. The blood is true. The problem is that Valdais's claim is also true, and the realm must choose."
+          },
+          {
+            "roll": 2,
+            "legitimacy": "False Heir (Known)",
+            "truth": "The Queen-Mother knows the Dauphin is a commoner—a Tulkani orphan with a convincing birthmark. She maintains the fiction because without a claimant, the realm falls to Valdais, whom she does not trust. The child does not know."
+          },
+          {
+            "roll": 3,
+            "legitimacy": "False Heir (Unknown)",
+            "truth": "The Dauphin is a changeling, placed in the cradle by agents of the Ninth to destabilize the succession. The Queen-Mother suspects but cannot prove it. She has dreamed of Sir Corin, who died saving a child at Lence—and the child in the dream has the Dauphin's face."
+          },
+          {
+            "roll": 4,
+            "legitimacy": "Uncertain",
+            "truth": "The Queen-Mother genuinely does not know. The child was brought to her by a dying servant who claimed he was the Dauphin. She has raised him as her own, hoping the doubt will never be tested. She has outlived three husbands and two sons. She cannot bear to lose a fourth."
+          },
+          {
+            "roll": 5,
+            "legitimacy": "Double Claim",
+            "truth": "There are two Dauphins. A second child, hidden in the Mistlands, also bears the birthmark and the blood-right. The Queen-Mother knows of this child but has not acknowledged them. The realm may split again."
+          },
+          {
+            "roll": 6,
+            "legitimacy": "The Blood Remembers",
+            "truth": "The Dauphin carries the blood of the old Sun King—but also the blood of a Fenwood. The sack of Lence was not just a conquest; it was a family feud. The child is the living proof of a union that should never have happened."
+          }
         ]
       },
       "phases": {
@@ -832,12 +928,36 @@
       "dauphin_fate_table": {
         "description": "When the succession is decided, roll or choose the Dauphin's fate based on the party's choices.",
         "outcomes": [
-          {"outcome": "Valdais Wins", "fate": "The Dauphin is exiled to the Mistlands (or killed).", "impact": "Vhasia unites under a strong western crown—but the Queen-Mother is dead or imprisoned. The memory of Lence fades, but the suspicion of illegitimacy remains."},
-          {"outcome": "Two Crowns Win", "fate": "The Dauphin becomes a puppet figurehead.", "impact": "Vhasia is ruled by a council of dukes. The realm stabilizes but remains divided. The Dauphin grows up in a gilded cage, learning to wait."},
-          {"outcome": "Queen-Mother Triumphs", "fate": "The Dauphin is crowned, with Elianor as regent.", "impact": "Vhasia returns to the old ways. The Queen-Mother dies within a year. The Dauphin's legitimacy is still questioned, but his reign begins."},
-          {"outcome": "Party Reveals Falsehood", "fate": "The Dauphin is revealed as a fraud.", "impact": "The realm descends into chaos. Valdais and the Two Crowns fight openly. The party may be hailed as heroes—or blamed for the war."},
-          {"outcome": "Party Protects the Secret", "fate": "The Dauphin rules, but the secret remains hidden.", "impact": "Vhasia is stable, but the hollow is watching. The party holds a weight they cannot share. The truth may surface at the worst possible moment."},
-          {"outcome": "The Ninth Intervenes", "fate": "The Dauphin's legitimacy is erased from all records. The Hollow forgets.", "impact": "The succession is voided. A new claimant must be found. The Ninth's Coterie gains influence. The party must decide whether to restore the records or let them lie."}
+          {
+            "outcome": "Valdais Wins",
+            "fate": "The Dauphin is exiled to the Mistlands (or killed).",
+            "impact": "Vhasia unites under a strong western crown—but the Queen-Mother is dead or imprisoned. The memory of Lence fades, but the suspicion of illegitimacy remains."
+          },
+          {
+            "outcome": "Two Crowns Win",
+            "fate": "The Dauphin becomes a puppet figurehead.",
+            "impact": "Vhasia is ruled by a council of dukes. The realm stabilizes but remains divided. The Dauphin grows up in a gilded cage, learning to wait."
+          },
+          {
+            "outcome": "Queen-Mother Triumphs",
+            "fate": "The Dauphin is crowned, with Elianor as regent.",
+            "impact": "Vhasia returns to the old ways. The Queen-Mother dies within a year. The Dauphin's legitimacy is still questioned, but his reign begins."
+          },
+          {
+            "outcome": "Party Reveals Falsehood",
+            "fate": "The Dauphin is revealed as a fraud.",
+            "impact": "The realm descends into chaos. Valdais and the Two Crowns fight openly. The party may be hailed as heroes—or blamed for the war."
+          },
+          {
+            "outcome": "Party Protects the Secret",
+            "fate": "The Dauphin rules, but the secret remains hidden.",
+            "impact": "Vhasia is stable, but the hollow is watching. The party holds a weight they cannot share. The truth may surface at the worst possible moment."
+          },
+          {
+            "outcome": "The Ninth Intervenes",
+            "fate": "The Dauphin's legitimacy is erased from all records. The Hollow forgets.",
+            "impact": "The succession is voided. A new claimant must be found. The Ninth's Coterie gains influence. The party must decide whether to restore the records or let them lie."
+          }
         ]
       },
       "gm_guidance": [
@@ -849,7 +969,6 @@
       ]
     }
   },
-
   "patronage_and_power": {
     "description": "In Vhasia, power flows through the remnants of imperial authority, fractured legitimacy, and the careful manipulation of memory and mercy. Former Utaran provincial structures still provide a framework for governance, but competing claimants to the Sun Court have created a complex web of overlapping jurisdictions and conflicting loyalties. The true power lies with those who can navigate this legal maze—and who understand that the only currency that matters is the memory of Lence. But beneath the charters and the writs runs a deeper current: the wound that will not close. The Fenwood sack was not just a military defeat; it was a wound to the soul of Vhasia, proof that chivalry was only ever a thin veneer. Every negotiation, every duel, every sealed document carries the weight of that loss. The Queen-Mother plays a long game, her Dauphin a card she may never play. Valdais wants the throne his father could not hold. The Two Crowns will accept any solution that leaves them richer. And the common folk—the farmers, the salt-panners, the road wardens—just want the raiding to stop. They will wait. They have waited ten years. They can wait longer.",
     "for_the_gm": [
@@ -860,7 +979,6 @@
       "Use the Armor Closes and Song Escapes timers as a visible campaign front. The party's actions—acts of mercy or cruelty—tick one or the other. When the Armor Closes, the cantons become fortresses; when the Song Escapes, a moment of genuine connection may change everything—or kill everyone."
     ]
   },
-
   "faction_entanglements": [
     "**Queen-Mother's Ethor:** Keep the Dauphin's secret and honor Elianor's web; cross her and her spies will dog you.",
     "**Valdais Longblood:** Support his claim with feats of arms and legal arguments; refuse and he may call his levies against you.",
@@ -868,14 +986,12 @@
     "**The Cantor's Witness:** Alain's truth-telling can be a shield or a sword; beware what the dead sing back.",
     "**The Order of the Gilded Scale:** They enforce the Chivalric Roll; a broken oath may be recorded forever."
   ],
-
   "cross_regional_ties": [
     "**Acasia (West):** Border raids across the Belworth define the seasons; the Curse of Acasia does not respect the river.",
     "**Viterra (East):** The Fenwood wound is still raw; Queen Veralyn's eyes watch the mountain passes.",
     "**Aeler / Ubral (North):** High passes funnel mercenaries and exiles into Vhasia's fractured politics.",
     "**Thepyrgos (South via Viterra):** Synod law and Chain-Lanterns collect Vhasian ballads—the ninth verse is always censored."
   ],
-
   "index": [
     "Vhasia",
     "Fractured Sun generator",
@@ -901,5 +1017,6 @@
     "Succession Crisis",
     "Dauphin of Vhasia",
     "Ninth Taboo"
-  ]
+  ],
+  "_license": "Fate's Edge Proprietary Content – © 2024 Nicholas A. Gasper. All rights reserved."
 }

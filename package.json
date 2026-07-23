@@ -13,5 +13,6 @@
   "devDependencies": {
     "vitest": "^1.0.0",
     "eslint": "^8.0.0"
-  }
+  },
+  "_license": "Fate's Edge Proprietary Content – © 2024 Nicholas A. Gasper. All rights reserved."
 }

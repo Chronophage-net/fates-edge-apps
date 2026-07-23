@@ -520,7 +520,7 @@ async function generateJourneyAsync(startRegion, destRegion, numLegs = 3) {
 export async function render(el) {
     container = el;
     
-    const regionNames = getRegionNames() || ['Acasia', 'Ecktoria', 'Vhasia', 'Viterra', 'Ykrul', 'Silkstrand'];
+    let regionNames = getRegionNames() || ['Acasia', 'Ecktoria', 'Vhasia', 'Viterra', 'Ykrul', 'Silkstrand'];
     if (regionNames.length === 0) {
         regionNames = ['Acasia'];
     }

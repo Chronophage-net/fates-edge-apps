@@ -7,7 +7,6 @@
   "key_demographic": "Humans",
   "capital": "Silkstrand",
   "manifest_path": "/data/docs/manifest.json",
-
   "overview": {
     "tagline": "Every bridge is a promise. Every canal carries a secret. But the true pacts are sealed in whispers, not wax.",
     "genre": "Mercantile intrigue, Renaissance urban drama",
@@ -25,7 +24,6 @@
       "south": "The Amaranthine Sea — The canals meet the salt water; the Zakov pirates and Kahfagian privateers are both customers and rivals. The tide brings cargo; the tide takes evidence."
     }
   },
-
   "quotes": [
     {
       "speaker": "The Matron (Elite)",
@@ -36,7 +34,6 @@
       "text": "I can cross this city faster than any grown-up, and I know which planks creak and which merchants lie. The bridges remember every step, and the canals carry more secrets than fish. The nobles think they rule, but the Ragman owns the stairs they climb. Stay off the water after midnight — the night-boats don't carry cargo, they carry whispers between patrons."
     }
   ],
-
   "npcs": [
     {
       "name": "Matrona Lucia",
@@ -75,14 +72,40 @@
       "quirk": "He wears a mask on feast days; no one has seen his face in seven years. The mask was a gift from the Contarini. He does not know what bond it placed upon him."
     }
   ],
-
   "names": {
-    "first_male": ["Lorenzo", "Niccolò", "Borso", "Marco", "Tommaso", "Andrea"],
-    "first_female": ["Lucia", "Xara", "Chiara", "Fiammetta", "Oria", "Zilia"],
-    "surnames": ["da Ponte", "Canaletti", "del Forno", "Riva", "Selci", "Molin"],
-    "epithets": ["the Bridge-Wise", "the Unseen", "Bobbin-Foot", "the Silent", "Red-Handed", "Ash-Thread"]
+    "first_male": [
+      "Lorenzo",
+      "Niccolò",
+      "Borso",
+      "Marco",
+      "Tommaso",
+      "Andrea"
+    ],
+    "first_female": [
+      "Lucia",
+      "Xara",
+      "Chiara",
+      "Fiammetta",
+      "Oria",
+      "Zilia"
+    ],
+    "surnames": [
+      "da Ponte",
+      "Canaletti",
+      "del Forno",
+      "Riva",
+      "Selci",
+      "Molin"
+    ],
+    "epithets": [
+      "the Bridge-Wise",
+      "the Unseen",
+      "Bobbin-Foot",
+      "the Silent",
+      "Red-Handed",
+      "Ash-Thread"
+    ]
   },
-
   "places": [
     {
       "rank": 2,
@@ -202,7 +225,6 @@
       "mechanical_hook": "A successful Wits+Lore test (DV 5) reveals its entrance. Inside, you may find a lost charter or a secret, but you risk being trapped (Resolve test DV 4 to escape)."
     }
   ],
-
   "people_and_factions": [
     {
       "rank": 2,
@@ -335,7 +357,6 @@
       "what_they_ask": "A thread from a patron's garment — she will read its fate."
     }
   ],
-
   "complications": [
     {
       "rank": 2,
@@ -455,7 +476,6 @@
       "mechanical_hook": "You are lost; a Resolve test (DV 5) to find your way, or offer a name to the water (gain a favor thread to the Ragman)."
     }
   ],
-
   "rewards": [
     {
       "rank": 2,
@@ -575,13 +595,11 @@
       "cost": "Using it binds you to the ghost's terms; if you break it, the ghost will haunt you (Harm 1 per violation)."
     }
   ],
-
   "quick_use_notes": {
     "draw_rules": "Draw until you have all four suits: Spade = place, Heart = actor, Club = pressure, Diamond = leverage. Highest rank sets the main Timer (2–5 → 4, 6–10 → 6, J/Q/K → 8, A → 10).",
     "diamonds": "Diamonds are codified outcomes (permits, passes, seals) that change position rather than call for a roll.",
     "ace_rule": "If any A appears, echo silk and water motifs — threads that bind, currents that remember, bargains that stain the hand. Also echo the ninth: a missing step, an unwritten charter, a silence where a name should be."
   },
-
   "additional_features": [
     {
       "name": "The Measure of a Favor (Patron–Client Bond)",
@@ -612,7 +630,6 @@
       "description": "The Saint of Accounts — The Witness. Every transaction is a prayer. Every signature is a confession.\nThe Unbroken Seal — Mykkiel. Charters are sacred. To break one is to break the city.\nThe Tide Father — Khemesh. The canal's hunger; the pull of a promise never kept.\nThe Lantern Bearer — The Traveler. The light that guides lost ships — and the lost.\nThe Ragman — The Ninth. The unspoken promise. The thread that is never cut."
     }
   ],
-
   "lore_echoes": [
     {
       "title": "Saint Lazarus of the Unwritten Accord (The Witness)",
@@ -635,7 +652,6 @@
       "description": "In any Silkstrand scene, the ninth bridge crossed in a day leads somewhere unexpected. The wise stop at eight and take a boat. Those who cross the ninth are said to hear a faint laugh from the water — and their pacts are never quite fulfilled. The ninth bridge is the Ragman's. He built it. He did not pay."
     }
   ],
-
   "superstitions": [
     {
       "name": "Bread to the Canal",
@@ -658,7 +674,6 @@
       "cost": "Burn for +1 die once"
     }
   ],
-
   "sb_spend_table": {
     "minor_complications": [
       "**Exposure:** Your actions draw unwanted attention from **city watch or rival merchants**.",
@@ -695,37 +710,67 @@
       "**Silkstrand (The Ninth):** A bridge appears where none was before. A charter's ninth clause writes itself. A thread tightens around your wrist. The Ragman is watching."
     ]
   },
-
   "pursuit_ladder": [
     "**Advance/Withdraw (Wits + Stealth):** On a hit, shift one band. On a strong hit, also impose *Fog Bank*.",
     "**Cut the Bridge (Presence + Sway):** On a hit, freeze range for one exchange; if a bridge token is in your possession, +1 die.",
     "**Weather the Flood (Endurance + Athletics):** On a hit in *Flood Siren*, you pick who keeps their footing; on a miss, the GM does."
   ],
-
   "boss_archetypes": [
     {
       "name": "The Ragman (Lord of Unspoken Pacts)",
-      "tags": ["shadow", "pact"],
+      "tags": [
+        "shadow",
+        "pact"
+      ],
       "description": "A figure who collects broken promises and forgotten bonds. He appears as a beggar, a merchant, or a child, but always with a knotted cord around his wrist.",
-      "phases": ["Polite Reception", "Forgotten Promise", "The Ninth Thread"],
-      "cracks": ["burn a favor thread in public", "settle a bond with a story, not silver", "cut the ninth thread — but it will grow back"]
+      "phases": [
+        "Polite Reception",
+        "Forgotten Promise",
+        "The Ninth Thread"
+      ],
+      "cracks": [
+        "burn a favor thread in public",
+        "settle a bond with a story, not silver",
+        "cut the ninth thread — but it will grow back"
+      ]
     },
     {
       "name": "Archivolt Agent (collector of 'missing entries')",
-      "tags": ["bureaucracy", "law"],
+      "tags": [
+        "bureaucracy",
+        "law"
+      ],
       "description": "A clerk who bends the records to serve patrons. They carry a quill that writes in invisible ink and a knife to cut inconvenient charters.",
-      "phases": ["Quiet Inserts", "Scroll Hunts", "Bridge Vetoes"],
-      "cracks": ["win a duel for precedent", "expose a hidden altar", "break his pen with the Matron's Seal"]
+      "phases": [
+        "Quiet Inserts",
+        "Scroll Hunts",
+        "Bridge Vetoes"
+      ],
+      "cracks": [
+        "win a duel for precedent",
+        "expose a hidden altar",
+        "break his pen with the Matron's Seal"
+      ]
     },
     {
       "name": "The Tide Father's Enforcer (a living pledge)",
-      "tags": ["water", "debt"],
+      "tags": [
+        "water",
+        "debt"
+      ],
       "description": "A grim figure who collects the Tide Father's due — sometimes in coin, sometimes in breath. They move silently on the canals and always find their mark.",
-      "phases": ["Grace Period", "Due Date", "Reclamation"],
-      "cracks": ["pay in stories", "find the original bound party", "renegotiate the bond under a neutral bridge — the ninth bridge, which does not exist"]
+      "phases": [
+        "Grace Period",
+        "Due Date",
+        "Reclamation"
+      ],
+      "cracks": [
+        "pay in stories",
+        "find the original bound party",
+        "renegotiate the bond under a neutral bridge — the ninth bridge, which does not exist"
+      ]
     }
   ],
-
   "encounter_seeds": [
     {
       "title": "The Forgotten Pledge",
@@ -740,7 +785,6 @@
       "description": "The Matron is dying. She summons you to her palazzo. She offers you a golden thread — the right to name her successor. But the other candidates have already begun to sharpen their knives, and the Ragman has taken an interest in the outcome."
     }
   ],
-
   "faction_entanglements": [
     "**Contarini:** Hold the sealed records; they can validate or void any charter. To earn their favor, bring them a secret from the Archivolt — or a rival's seal.",
     "**Morosini:** Merchant bankers; they hold the markers on half the Exchange. They value profit above all. A share in a cargo or a tip on a market corner will buy their ear.",
@@ -751,14 +795,12 @@
     "**The Silk Mother:** Runs the brothels and information network. Her weavers knot messages into silk. To gain her trust, bring her a secret that cannot be woven — or a thread from a patrician's garment.",
     "**The Bookman:** Fixes the Exchange books. He can make any loss look like profit. To bribe him, offer a percentage of the hidden gains — or a story of a deal gone sour, which he collects."
   ],
-
   "cross_regional_ties": [
     "**Ecktoria:** The Archivolt's clerks and the Amber Palace's factor are permanent fixtures on the Exchange. The Vigil's accountants keep a close eye on the silk trade, and they have a standing offer for information on any Acasian refugees.",
     "**Vhasia:** The Lame King's envoys and the Sun Court's diplomats frequent the Exchange. The dyewater runs red when the chevauchée burns, and the price of crimson silk spikes with each raid.",
     "**Acasia:** The Broken Marches bleed into the canals. The Curse's weight is felt in the dyewater, and the Ragman's bravos are the city's only shield against the Hollow's attention. Many a fugitive from the Marches finds a new identity in Silkstrand — for a price.",
     "**The Amaranthine Sea:** The canals meet the salt water at the Salt Gate. Zakov pirates and Kahfagian privateers are both customers and rivals. The tide brings cargo; the tide takes evidence. A night-boat captain who knows the sea's moods can avoid both customs and storms."
   ],
-
   "index": [
     "Silkstrand",
     "City of Bridges and Silk generator",
@@ -786,5 +828,6 @@
     "Dandolo",
     "Favor threads",
     "Patron-client relationships"
-  ]
+  ],
+  "_license": "Fate's Edge Proprietary Content – © 2024 Nicholas A. Gasper. All rights reserved."
 }

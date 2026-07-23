@@ -5,5 +5,6 @@
   "author": "Fate's Edge",
   "type": "module",
   "icon": "📦",
-  "route": "/example"
+  "route": "/example",
+  "_license": "Fate's Edge Proprietary Content – © 2024 Nicholas A. Gasper. All rights reserved."
 }

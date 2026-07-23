@@ -4,21 +4,27 @@
   "title": "The Sealed Gate",
   "subtitle": "Thresholds & Containment",
   "version": "1.0.0",
-  "tags": ["threshold", "containment", "ward", "banishment", "boundary", "exclusion", "permission", "sentinel"],
-
+  "tags": [
+    "threshold",
+    "containment",
+    "ward",
+    "banishment",
+    "boundary",
+    "exclusion",
+    "permission",
+    "sentinel"
+  ],
   "lore": {
     "description": "The Sealed Gate stands where realities meet, embodying the sacred power of thresholds, boundaries, and containment. Its followers are wardens, exorcists, and philosophers of separation who believe some things must be kept apart for the world to function. The Gate manifests as an impassive judge whose shifting sigils — binding runes, exclusion marks, or acceptance glyphs — determine what may cross.",
     "followers": "Among the peoples of Fate's Edge, the Sealed Gate is known as the patron of abjurists, exorcists, and sentinels. In Aeler, the Gate is called the Stone Seal, invoked by True-Masons who carve permanent wards into mountain passes. In Thepyrgos, the Gate is the Unbreakable Lock, whose sigils are painted on every archive door that holds forbidden texts. In the Mistlands, the Gate is the Bell-Line Keeper, the force that makes the bell-wards hold against the Direwood. Wherever something must be kept in or kept out, the Sealed Gate's servants are there — silent, patient, and absolute.",
     "quote": "You define what passes and what remains. Every boundary remembers your judgment."
   },
-
   "domain_focus": [
     "Thresholds: doors, portals, borders between realms",
     "Containment: wards, bindings, imprisonment of dangerous forces",
     "Exclusion: banishment, quarantine, protection through separation",
     "Permission: safe passage, authorized access, controlled crossing"
   ],
-
   "runekeeper_options": {
     "thiasos": {
       "description": "A Runekeeper sworn to the Sealed Gate does not bind a living creature — they bind a threshold given will. Their Thiasos is a small object imbued with boundary-sense: a bronze key that fits no lock yet trembles when a boundary is near, a brass bell that rings only when a ward is about to break, or a small iron gate that stands on the Runekeeper's desk and opens only when a lie is spoken.",
@@ -29,14 +35,12 @@
       "upkeep": "Because boundaries are physical, the Codex requires upkeep: the Runekeeper must spend an hour each week testing each seal (touching, ringing, or whispering to it), or the Rites stored there become uncertain (treat as Compromised until restored)."
     }
   },
-
   "patrons_gift": {
     "name": "Gate's Blessing",
     "description": "Once per scene as an action, a Runekeeper of the Sealed Gate may touch a held item (weapon, shield, or tool) and speak a word of exclusion.",
     "effect": "For the rest of the scene, the item grants +1 die to Defend or Resist rolls, and the first time each scene the bearer would be moved against their will (shoved, pulled, or teleported), they may ignore it.",
     "cost": "After the scene, the user marks +1 Obligation to the Sealed Gate."
   },
-
   "rites": [
     {
       "name": "Rite of the Sealed Threshold",
@@ -45,7 +49,10 @@
       "action": "Scene",
       "range": "Touch",
       "resist": "No",
-      "tags": ["WARD", "BIND"],
+      "tags": [
+        "WARD",
+        "BIND"
+      ],
       "materials": "Chalk, iron dust, or sanctified cord.",
       "effect": "Mark a doorway or passage as sealed. Unauthorized crossing tests Spirit+Resolve (DV 3) or suffers a Position penalty. Creates a 4-segment Ward Integrity timer.",
       "push_it": "The barrier becomes a visible shimmer, imposing –1 die on attempts to cross it. Cost: Mark +1 Obligation (total +2) or Mark +1 Fatigue.",
@@ -61,7 +68,10 @@
       "action": "Instant",
       "range": "Near",
       "resist": "No",
-      "tags": ["FORCE", "BANISH"],
+      "tags": [
+        "FORCE",
+        "BANISH"
+      ],
       "materials": "A gesture of denial or a barrier symbol.",
       "effect": "The target must test Body+Resolve (DV 3) or be pushed back from the threshold. On success, create a Rebuke Echo token granting +1 die to the next boundary defense.",
       "push_it": "The rebuke lingers — the target cannot cross this threshold for the rest of the scene. Cost: Mark +1 Obligation (total +2) or Mark +1 Fatigue.",
@@ -77,7 +87,11 @@
       "action": "Scene",
       "range": "Zone",
       "resist": "No",
-      "tags": ["WARD", "AREA", "BANISH"],
+      "tags": [
+        "WARD",
+        "AREA",
+        "BANISH"
+      ],
       "materials": "A salt ring, iron filings, or boundary stones.",
       "effect": "Create a protective circle. Supernatural beings test against the caster's Spirit+Arcana (DV 4) to cross. Mortals suffer –2 dice to force entry. Creates a 6-segment Circle Integrity timer.",
       "push_it": "The circle becomes a two-way barrier (no one can cross). Cost: Mark +1 Obligation (total +2) or Mark +1 Fatigue.",
@@ -93,7 +107,11 @@
       "action": "Scene",
       "range": "Zone",
       "resist": "No",
-      "tags": ["BOND", "COMMAND", "MOVEMENT"],
+      "tags": [
+        "BOND",
+        "COMMAND",
+        "MOVEMENT"
+      ],
       "materials": "Signed authorization or spoken permissions.",
       "effect": "Designate an authorized passage route. Allies gain Position +1 when using the route. Unauthorized intruders suffer –1 die to movement or stealth. Creates an 8-segment Writ Authority timer.",
       "push_it": "Extend authorization to additional allies; mark +1 Obligation. Cost: Mark +1 Obligation (total +2) or Mark +1 Fatigue.",
@@ -109,7 +127,11 @@
       "action": "Instant",
       "range": "Near",
       "resist": "No",
-      "tags": ["BANISH", "FORCE", "FEAR"],
+      "tags": [
+        "BANISH",
+        "FORCE",
+        "FEAR"
+      ],
       "materials": "A knotted cord sealed with a gate-sigil.",
       "effect": "The target supernatural entity tests against the caster's Spirit+Resolve (DV = entity Cap). On success, the entity is forced to immediately depart the scene. A failed attempt creates a 4-segment Banishment Backlash timer.",
       "push_it": "The banishment lasts until the next moon phase. Cost: Mark +1 Obligation (total +3) or Mark +1 Fatigue.",
@@ -125,7 +147,12 @@
       "action": "Extended",
       "range": "Zone",
       "resist": "No",
-      "tags": ["WARD", "AREA", "SANCTUARY", "FATE"],
+      "tags": [
+        "WARD",
+        "AREA",
+        "SANCTUARY",
+        "FATE"
+      ],
       "materials": "Relics from three traditions, boundary markers, a trespasser's acknowledgment.",
       "effect": "Consecrate an area against all unauthorized passage. The tests required scale with the intrusion attempt's severity. A 10-segment Sacred Boundary timer tracks the barrier's strength.",
       "push_it": "Make the barrier semi-permanent (lasts one season); start a Maintenance [6] timer. Cost: Mark +1 Obligation (total +3) or Mark +1 Fatigue.",
@@ -135,7 +162,6 @@
       "duration": "Session (Sacred Boundary timer: 10 segments)."
     }
   ],
-
   "cantors_and_cults": {
     "cantors": {
       "name": "The Cantor's Song",
@@ -146,7 +172,6 @@
       "description": "The Gate's cults meet in places where boundaries are most needed: at city gates, on bridges, in the guardrooms of tombs, and before the sealed doors of forgotten vaults. The Unbroken Seal is a fellowship of wardens, gate-keepers, exorcists, and sentinels who believe that a well-kept boundary is the foundation of civilization. A ritual of the Cult involves each member renewing a vow to guard a specific threshold — a door, a river, a mountain pass — and marking it with a fresh sigil. Their creed is carved into a single stone that is never moved: 'What is sealed stays sealed. What stays sealed protects the living.' Outsiders are welcome to witness the sealing, but they must leave a token of their own boundary — a key, a lock of hair, a written promise."
     }
   },
-
   "witchcraft": {
     "description": "A witch who walks with the Sealed Gate is a ward-keeper, an exorcist archivist, or a boundary-scholar — one who uses seals, litanies, and physical tokens to enforce separation. Their magic is not forged but written or sung: sealing wax mixed with iron filings, a bell that rings only when a threshold is violated, or a bound notebook of exclusion rites whose pages turn black when a spirit tries to cross. In Aeler, a True-Mason might carve a 'ward stone' into a lintel, but a hedge-witch of the Gate might daub a lignite sigil on a doorframe while reciting the Ninth Clause of Stillness. In Viterra, a village exorcist might carry a small iron seal to stamp the corners of a haunted room.",
     "tools": {
@@ -163,7 +188,6 @@
       }
     ]
   },
-
   "corruption": [
     {
       "tier": 1,
@@ -196,7 +220,6 @@
       "cost": "Ultimate Containment Risk: Mark +3 Obligation. You cannot leave the warded area until the scene ends, and you suffer 1 Fatigue."
     }
   ],
-
   "playstyle_notes": {
     "description": "The Sealed Gate patron excels in defensive, control-oriented play. Followers shape battlefields through strategic boundary placement and become invaluable when dealing with supernatural intrusions or securing locations. The corruption progression naturally leads characters toward becoming immovable guardians at the cost of flexibility and freedom. Ideal for abjurists, exorcists, sentinels, and any character whose duty is to keep things apart.",
     "emphasizes": [
@@ -207,7 +230,6 @@
       "Immovable Guardian: the follower becomes a wall given will"
     ]
   },
-
   "monastic_tradition": {
     "name": "Threshold Monk (Sealed Gate)",
     "quote": "You define what passes and what remains.",
@@ -269,10 +291,10 @@
       "description": "Once per session, become a living ward for one scene. Allies within Near gain +1 Armor; any creature attempting to pass a threshold you guard must test Spirit+Resolve (DV 5) or be turned back. After the scene, you gain a permanent Debt Scar (a door-shaped mark on your palm) — but you may ignore one debt or obligation that would force you to abandon your guard (the creditor finds themselves facing a wall where once there was a door)."
     }
   },
-
   "sample_adventure": {
     "title": "The Unsealed Vault",
     "description": "A vault beneath the Law Quarter of Valora has been breached. The seals were not broken from the outside — they were opened from within. Something that was imprisoned is now walking the city, wearing the face of the warden who sealed it. The party must track the escapee, learn what it truly is, and decide whether to seal it again or let it walk free. The Sealed Gate's servants are divided: some believe in redemption, others in containment. The decision will shape the city's future.",
     "quote": "Some doors are sealed for a reason. The Gate does not judge the prisoner — it only keeps the boundary. But when the boundary breaks, the Gate must decide: to seal again, or to let pass what should have stayed contained."
-  }
+  },
+  "_license": "Fate's Edge Proprietary Content – © 2024 Nicholas A. Gasper. All rights reserved."
 }

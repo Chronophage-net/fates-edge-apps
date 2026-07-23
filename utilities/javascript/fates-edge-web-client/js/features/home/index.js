@@ -115,6 +115,39 @@ function buildHTML() {
         </div>
       </div>
     </section>
+
+    <!-- SLIDE 5: ABOUT THE CREATOR (easy to remove) -->
+    <section class="home-slide home-about" id="slide-about" role="region" aria-label="About the Creator">
+      <div class="slide-content">
+        <div class="section-header">
+          <span class="section-number">04</span>
+          <h2>About the Creator</h2>
+          <p>Meet the person behind the dice.</p>
+        </div>
+        <div class="about-grid">
+          <div class="about-card">
+            <div class="about-icon">🐉</div>
+            <h3>Nicholas A. Gasper <span class="handle">(Chronophage)</span></h3>
+            <p class="about-role">Sysadmin · DevOps · FreeBSD / Linux — 20+ years</p>
+            <p class="about-bio">
+              I’ve been rolling dice since I was twelve — that’s over three decades of tabletop stories.
+              I live in the Twin Cities, Minnesota, and I’m friendly, if a bit shy.
+              This Virtual Tabletop is the first large piece of software I’ve built:
+              I designed <em>Fate’s Edge</em> and wanted an easy way to share it, so I created an open‑source companion that puts the narrative first.
+            </p>
+	    <p>
+	    You can contact me at: nick.gasper@gmail.com
+	    Buy me a coffee: chronphage@venmo
+	    I'm generally @chronophage everywhere, introduce yourself when you aore reaching out via social media.
+            <blockquote class="about-philosophy">
+              <p>“Keep It Stupid — minimal but not fragile. Work from user needs, set a feature limit, build in layers. I’m not a developer by trade, but that pattern has served me for decades.”</p>
+            </blockquote>
+            <p class="about-tagline">☕ Fueled by coffee · 🧠 Neurodivergent & proud · 🌱 Community grows from within and without</p>
+          </div>
+        </div>
+      </div>
+    </section>
+    <!-- END ABOUT SLIDE -->
   `;
 }
 
@@ -227,6 +260,7 @@ function injectStyles() {
     .home-slide:nth-child(2) { animation-delay: 0.2s; }
     .home-slide:nth-child(3) { animation-delay: 0.4s; }
     .home-slide:nth-child(4) { animation-delay: 0.6s; }
+    .home-slide:nth-child(5) { animation-delay: 0.8s; }
 
     @keyframes slideFadeIn {
       to { opacity: 1; transform: translateY(0); }
@@ -523,6 +557,74 @@ function injectStyles() {
       margin-top: 0.3rem;
     }
 
+    /* ===== ABOUT SLIDE ===== */
+    .home-about {
+      background: radial-gradient(ellipse at 70% 30%, rgba(201,168,76,0.04) 0%, transparent 60%);
+    }
+    .about-grid {
+      display: flex;
+      justify-content: center;
+      margin-top: 1.5rem;
+    }
+    .about-card {
+      max-width: 680px;
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 2rem 2.2rem;
+      text-align: center;
+      transition: box-shadow 0.3s ease;
+    }
+    .about-card:hover {
+      box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+      border-color: rgba(201,168,76,0.2);
+    }
+    .about-icon {
+      font-size: 3rem;
+      margin-bottom: 0.6rem;
+    }
+    .about-card h3 {
+      font-size: 1.4rem;
+      color: var(--gold);
+      margin-bottom: 0.2rem;
+    }
+    .handle {
+      font-size: 1rem;
+      font-weight: 400;
+      color: var(--text2);
+      margin-left: 0.3rem;
+    }
+    .about-role {
+      font-size: 0.8rem;
+      letter-spacing: 0.05em;
+      color: var(--text3);
+      text-transform: uppercase;
+      margin-bottom: 1rem;
+    }
+    .about-bio {
+      color: var(--text);
+      font-size: 0.95rem;
+      line-height: 1.6;
+      margin-bottom: 1.2rem;
+    }
+    .about-philosophy {
+      margin: 1rem 0;
+      padding: 1rem 1.5rem;
+      background: rgba(201,168,76,0.04);
+      border-radius: var(--radius);
+      border-left: 3px solid var(--gold);
+      font-style: italic;
+      color: var(--text2);
+      font-size: 0.9rem;
+      text-align: left;
+    }
+    .about-tagline {
+      font-size: 0.85rem;
+      color: var(--text3);
+      margin-top: 1.2rem;
+      line-height: 1.5;
+    }
+
     /* ===== RESPONSIVE ===== */
     @media (max-width: 768px) {
       .home-slide { padding: 3rem 1rem; min-height: auto; }
@@ -534,6 +636,14 @@ function injectStyles() {
       .table-wrap { font-size: 0.75rem; }
       .table-wrap th, .table-wrap td { padding: 0.4rem 0.6rem; }
       .scroll-indicator { display: none; }
+    }
+    @media (max-width: 600px) {
+      .about-card {
+        padding: 1.5rem 1.2rem;
+      }
+      .about-philosophy {
+        padding: 0.8rem;
+      }
     }
     @media (max-width: 480px) {
       .mechanics-grid { grid-template-columns: 1fr; }
