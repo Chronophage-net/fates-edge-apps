@@ -7,11 +7,11 @@
  */
 
 import { vttStore } from '../../core/vtt-store.js';
-import { getState, addChatMessage, clearChatHistory, getCharacter } from '../../core/state.js';
+import { getState, getCharacters, ensureCharacterDefaults, clearChatHistory } from '../../core/state.js';
 import { performRoll } from '../../core/dice.js';
 import { showToast } from '../../components/Toast.js';
 import { escHtml } from '../../core/utils.js';
-import { isConnectedToServer } from '../../core/websocket.js'; // needed for voice availability check
+import { isConnectedToServer } from '../../core/websocket.js';
 import {
   setContainer,
   q,
@@ -26,7 +26,7 @@ import {
   playNotificationSound,
   VTT_CONFIG,
   getOutcomeColor,
-  renderCommonRolls,        // [VTT SELECTION] New common rolls renderer
+  renderCommonRolls,
 } from './vtt-core.js';
 import { initVoice, toggleMute, getVoiceStatus, cleanupVoice, getActiveVoiceClients, getVoiceClient, onVoiceClientsChanged } from './voice.js';
 
@@ -209,7 +209,7 @@ function handleSlash(text) {
       break;
     }
     case 'status': {
-      const chars = getState().characters.filter(c => c.vtt);
+      const chars = getCharacters().filter(c => c.vtt);
       if (chars.length === 0) {
         sendMessage('📡 Local mode | No VTT characters.', 'System', 'all');
       } else {
@@ -334,12 +334,13 @@ function attachEvents() {
     switch (id) {
       case 'chat-send-btn': e.preventDefault(); handleSendMessage(); break;
       case 'vtt-clear-chat': clearChatHistory?.(); vttStore.clearChat(); showToast('Chat cleared.', 'success'); break;
-      case 'vtt-refresh-btn': 
-        const legacyState = getState();
-        vttStore.updateCharacters(legacyState.characters || []);
-        vttStore.updateTimers(legacyState.timers || []);
+      case 'vtt-refresh-btn': {
+        const chars = getCharacters();
+        vttStore.updateCharacters(chars);
+        vttStore.updateTimers(getState().timers || []);
         showToast('VTT refreshed.', 'info');
         break;
+      }
       case 'vtt-roll-post-btn': rollLocal(true); break;
       case 'vtt-roll-only-btn': rollLocal(false); break;
       case 'vtt-add-timer': {
@@ -369,7 +370,9 @@ function attachEvents() {
           c.boons = Math.min(c.boons || 0, 2);
           if (before > c.boons) trimmed += (before - c.boons);
         });
-        vttStore.updateCharacters(state.characters || []);
+        // Re‑normalize characters after modification
+        const chars = getCharacters();
+        vttStore.updateCharacters(chars);
         if (trimmed > 0) {
           showToast(`Scene ended: trimmed ${trimmed} excess Boons.`, 'success');
         } else {
@@ -415,7 +418,7 @@ export function render(el) {
   if (!el) return;
 
   const voiceClients = getActiveVoiceClients();
-  const voiceAvailable = isConnectedToServer(); // false in local mode
+  const voiceAvailable = isConnectedToServer();
 
   const voiceClientsHtml = voiceClients.map(id => {
     const client = getVoiceClient(id);
@@ -489,22 +492,20 @@ export function render(el) {
 
       <!-- Sidebar -->
       <div class="vtt-sidebar" style="display:flex;flex-direction:column;gap:1.2rem;">
-        <!-- Party Status (horizontal, clickable cards) -->
+        <!-- Party Status (vertical, scrollable) -->
         <div class="vtt-panel" style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:0.8rem;">
           <div style="display:flex;justify-content:space-between;align-items:center;">
             <h3 style="margin:0;font-size:1.2rem;">👥 Party</h3>
             <button class="btn btn-sm btn-ghost" id="vtt-refresh-btn" title="Refresh" style="font-size:0.9rem;">↻</button>
-                </div>
-            <div>
-                    <div id="vttCharGrid" style="
-                        margin-top:0.5rem;
-                        max-height:220px;          /* roughly 4 rows */
-                        overflow-y:auto;
-                        padding-right:4px;         /* avoid scrollbar overlap */
-                        scrollbar-width: thin;     /* optional: Firefox */
-                    ">        
-                    </div>
-              </div>
+          </div>
+          <div id="vttCharGrid" style="
+              margin-top:0.5rem;
+              max-height:220px;
+              overflow-y:auto;
+              padding-right:4px;
+              scrollbar-width:thin;
+          "></div>
+        </div>
 
         <!-- Quick Roller + Common Rolls -->
         <div class="vtt-panel" style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:0.8rem;">
@@ -562,14 +563,20 @@ export function render(el) {
   `;
 
   // Initialize reactive renderers
-  renderChat();           // Also renders selected-character-display
-  renderVTTChars();       // Horizontal, clickable cards
-  renderCommonRolls();    // Common rolls buttons (uses selected character)
+  renderChat();
+  renderVTTChars();
+  renderCommonRolls();
   renderVTTTimers();
   renderLocalPresence();
   renderVoiceClients();
   updateMessageCount();
   populateChatRecipients();
+
+  // Normalize and set initial characters
+  const chars = getCharacters();
+  vttStore.updateCharacters(chars);
+  vttStore.updateTimers(getState().timers || []);
+  vttStore.setConnectionStatus('local');
 
   // Register voice client callback to update the store
   if (voiceUnsubscribe) voiceUnsubscribe();
@@ -580,7 +587,7 @@ export function render(el) {
   // Attach DOM events
   attachEvents();
 
-  // Start presence update interval (local mode only – but we use store reactivity)
+  // Start presence update interval
   if (presenceInterval) clearInterval(presenceInterval);
   presenceInterval = setInterval(() => {
     if (isDestroyed || !container) {
@@ -588,9 +595,9 @@ export function render(el) {
       presenceInterval = null;
       return;
     }
-    const state = getState();
-    vttStore.updateCharacters(state.characters || []);
-    vttStore.updateTimers(state.timers || []);
+    const chars = getCharacters();
+    vttStore.updateCharacters(chars);
+    vttStore.updateTimers(getState().timers || []);
   }, VTT_CONFIG.presenceUpdateInterval);
 
   console.log('[VTT Local] Rendered with reactive store (JRPG style + selection)');

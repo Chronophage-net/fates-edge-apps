@@ -955,43 +955,47 @@ function setTalentFilter(filter) {
 }
 
 // ============================================================
-// EVENT LISTENERS
+// EVENT LISTENERS – now async for dynamic imports
 // ============================================================
 
-export function attachEvents() {
-    document.addEventListener('click', (e) => {
+export async function attachEvents() {
+    document.addEventListener('click', async (e) => {
         const target = e.target;
         
         // Wizard button
         if (target.id === 'wizardCharBtn' || target.closest('#wizardCharBtn')) {
             e.preventDefault();
-            import('./wizard.js')
-                .then(module => {
-                    if (module.openWizard) {
-                        module.openWizard();
-                    } else if (module.default && module.default.openWizard) {
-                        module.default.openWizard();
-                    } else {
-                        showToast('Wizard module has no openWizard export.', 'error');
-                    }
-                })
-                .catch(err => {
-                    showToast('Failed to load wizard: ' + (err.message || err), 'error');
-                });
+            try {
+                const module = await import('./wizard.js');
+                if (module.openWizard) {
+                    module.openWizard();
+                } else if (module.default && module.default.openWizard) {
+                    module.default.openWizard();
+                } else {
+                    showToast('Wizard module has no openWizard export.', 'error');
+                }
+            } catch (err) {
+                showToast('Failed to load wizard: ' + (err.message || err), 'error');
+            }
         }
         
-        // Blank editor button
+        // Blank editor button – now properly async
         if (target.id === 'openEditorBtn' || target.closest('#openEditorBtn')) {
             e.preventDefault();
-            import('./editor.js').then(module => {
+            try {
+                const module = await import('./editor.js');
                 if (module.openEditor) {
                     module.openEditor(null);
+                } else if (module.default && typeof module.default === 'function') {
+                    module.default(null);
                 } else {
-                    showToast('Editor module not available.', 'error');
+                    showToast('Editor module loaded but no openEditor export.', 'error');
+                    console.warn('[Characters] Available exports:', Object.keys(module));
                 }
-            }).catch(() => {
-                showToast('Failed to load editor.', 'error');
-            });
+            } catch (err) {
+                console.error('[Characters] Failed to load editor:', err);
+                showToast('Failed to load editor: ' + (err.message || 'unknown error'), 'error');
+            }
         }
         
         // Talents button

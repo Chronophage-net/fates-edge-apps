@@ -9,7 +9,6 @@ import { generateId, getBaseUrl as utilsGetBaseUrl, getStorage, setStorage, remo
 // CONSTANTS
 // ============================================================
 
-// [VTT SELECTION] Default attributes & skills for characters
 export const DEFAULT_ATTRIBUTES = { body: 3, mind: 3, soul: 3 };
 
 export const DEFAULT_SKILLS = {
@@ -81,8 +80,6 @@ const DEFAULT_STATE = {
 let state = { ...DEFAULT_STATE };
 let saveCallbacks = [];
 const STORAGE_KEY = 'fates-edge-state';
-
-// Track pending sync conflicts
 let pendingConflicts = [];
 
 // ============================================================
@@ -104,9 +101,6 @@ export function loadState() {
     return state;
 }
 
-/**
- * Deep merge helper for nested objects (supports multiple sources)
- */
 function deepMerge(target, ...sources) {
     if (!sources.length) return target;
     const [source, ...rest] = sources;
@@ -160,20 +154,17 @@ export function clearState() {
 }
 
 // [VTT SELECTION] Ensure character has attributes & skills
-function ensureCharacterDefaults(char) {
+export function ensureCharacterDefaults(char) {
     if (!char) return null;
-    // Attributes
     if (!char.attributes || typeof char.attributes !== 'object') {
         char.attributes = { ...DEFAULT_ATTRIBUTES };
     } else {
-        // Ensure all default attributes exist
         for (const [key, val] of Object.entries(DEFAULT_ATTRIBUTES)) {
             if (char.attributes[key] === undefined) {
                 char.attributes[key] = val;
             }
         }
     }
-    // Skills
     if (!char.skills || typeof char.skills !== 'object') {
         char.skills = { ...DEFAULT_SKILLS };
     } else {
@@ -186,13 +177,9 @@ function ensureCharacterDefaults(char) {
     return char;
 }
 
-/**
- * Merge remote state with local state, detecting conflicts
- */
 export function mergeState(remoteState, version) {
     const conflicts = [];
 
-    // 1. Merge characters
     if (remoteState.characters) {
         state.characters = state.characters || [];
         remoteState.characters.forEach(remoteChar => {
@@ -219,7 +206,6 @@ export function mergeState(remoteState, version) {
         });
     }
 
-    // 2. Merge timers
     if (remoteState.timers) {
         state.timers = state.timers || [];
         remoteState.timers.forEach(remoteTimer => {
@@ -235,7 +221,6 @@ export function mergeState(remoteState, version) {
         });
     }
 
-    // 3. Merge wiki entries
     if (remoteState.wikiEntries) {
         state.wikiEntries = state.wikiEntries || [];
         remoteState.wikiEntries.forEach(remoteEntry => {
@@ -251,7 +236,6 @@ export function mergeState(remoteState, version) {
         });
     }
 
-    // 4. Merge chat (append-only)
     if (remoteState.chatMessages) {
         state.chatMessages = state.chatMessages || [];
         const localIds = new Set(state.chatMessages.map(m => m.id));
@@ -265,7 +249,6 @@ export function mergeState(remoteState, version) {
         }
     }
 
-    // 5. Merge campaign state
     if (remoteState.campaign && remoteState.campaign.state) {
         const remoteCampaignState = remoteState.campaign.state;
         const localCampaignState = state.campaign ? state.campaign.state : {};
@@ -957,9 +940,7 @@ export function importData(data) {
         if (!data || typeof data !== 'object') {
             throw new Error('Invalid data format');
         }
-        
         const merged = deepMerge({ ...DEFAULT_STATE }, state, data);
-        
         state = merged;
         saveState();
         return { success: true };
@@ -1051,6 +1032,7 @@ export default {
     deleteCharacter,
     getCharacterAttribute,
     getCharacterSkill,
+    ensureCharacterDefaults,   // <-- ADDED
     addNPC,
     getNPCs,
     getNPC,

@@ -2,12 +2,12 @@
  * VTT Connected Mode – WebSocket sync, real‑time collaboration
  * Uses reactive store for all UI updates.
  * 
- * v2 – JRPG-style horizontal character cards, character selection,
+ * v2 – Vertical JRPG-style character roster, character selection,
  *       common rolls, larger fonts, avatar support.
  */
 
 import { vttStore } from '../../core/vtt-store.js';
-import { getState, clearChatHistory, getCharacter, addVTTEvent, addSessionLogEntry } from '../../core/state.js';
+import { getState, clearChatHistory, getCharacter, addVTTEvent, addSessionLogEntry, getCharacters, ensureCharacterDefaults } from '../../core/state.js';
 import { performRoll } from '../../core/dice.js';
 import { showToast } from '../../components/Toast.js';
 import { escHtml } from '../../core/utils.js';
@@ -48,7 +48,7 @@ import {
     playNotificationSound,
     VTT_CONFIG,
     getOutcomeColor,
-    renderCommonRolls,        // [VTT SELECTION] New common rolls renderer
+    renderCommonRolls,
 } from './vtt-core.js';
 import {
     initVoice,
@@ -637,7 +637,7 @@ function handleSlash(text) {
             break;
         }
         case 'status': {
-            const chars = getState().characters.filter(c => c.vtt);
+            const chars = getCharacters().filter(c => c.vtt);
             const isConnected = isConnectedToServer();
             const room = getRoomCode() || 'none';
             const mode = isConnected ? '🌐 Connected' : '📡 Local';
@@ -664,7 +664,7 @@ function handleSlash(text) {
 
 // ============================================================
 // CHARACTER PUSH TO SERVER (with dynamic API endpoint)
-// Now includes attributes and skills
+// Now includes attributes, skills, and avatar
 // ============================================================
 
 async function pushCharactersToServer() {
@@ -780,14 +780,16 @@ function setupWebSocketSync() {
         sendEvent({ type: 'state-updated', state: getState() });
     } catch (e) { /* ignore */ }
     
-    vttStore.updateCharacters(getState().characters || []);
+    const chars = getCharacters();
+    vttStore.updateCharacters(chars);
     vttStore.updateTimers(getState().timers || []);
 
-    // State updates
+    // State updates – ensure characters are normalized
     const stateHandler = (data) => {
         if (isDestroyed) return;
+        const chars = (data.characters || []).map(c => ensureCharacterDefaults(c));
         vttStore.setState({
-            characters: data.characters || [],
+            characters: chars,
             timers: data.timers || [],
         });
     };
@@ -797,7 +799,6 @@ function setupWebSocketSync() {
     // Chat messages
     const chatHandler = (data) => {
         if (isDestroyed) return;
-        // Extract the inner message if it's nested under `message` key
         const msg = data.message || data;
         vttStore.addChatMessage({
             ...msg,
@@ -828,7 +829,6 @@ function setupWebSocketSync() {
             offset: Date.now(),
             remaining: data.remaining || 0
         };
-        // Add deck draw to chat
         const cards = data.cards || [];
         const synthesis = data.synthesis || '';
         const region = data.region || defaultRegion;
@@ -957,7 +957,6 @@ function setupWebSocketSync() {
                 const myClient = clientsMap.get(myId);
                 if (gmState.myRole !== myClient.role) {
                     gmState.myRole = myClient.role;
-                    // Notify sidebar of role change
                     document.dispatchEvent(new CustomEvent('gmRoleUpdate', { detail: { role: myClient.role } }));
                 }
             }
@@ -1017,11 +1016,11 @@ function setupWebSocketSync() {
         try {
             sendEvent({ type: 'state-updated', state: state });
         } catch (e) { /* ignore */ }
-        vttStore.updateCharacters(state.characters || []);
+        const chars = getCharacters();
+        vttStore.updateCharacters(chars);
         vttStore.updateTimers(state.timers || []);
         vttStore.setConnectionStatus('connected');
         showToast('Reconnected to server!', 'success');
-        // Re-push characters after reconnect
         charactersPushed = false;
         pushCharactersToServer();
     };
@@ -1040,7 +1039,6 @@ function setupWebSocketSync() {
     // ─── AUTO-PUSH ON HANDSHAKE ────────────────────────────────────
     const handshakeHandler = (data) => {
         if (data.success && !charactersPushed) {
-            // Wait a moment for room to be fully established
             setTimeout(() => pushCharactersToServer(), 500);
         }
     };
@@ -1105,7 +1103,6 @@ function updateGMUI() {
 // ============================================================
 
 async function toggleVoice() {
-    // Initialize media module for session recording
     try {
         const state = getState();
         const userId = state.sessionId || 'vtt-' + Date.now().toString(36);
@@ -1215,9 +1212,9 @@ function attachEvents() {
             case 'chat-send-btn': e.preventDefault(); handleSendMessage(); break;
             case 'vtt-clear-chat': clearChatHistory?.(); vttStore.clearChat(); showToast('Chat cleared.', 'success'); break;
             case 'vtt-refresh-btn': {
-                const state = getState();
-                vttStore.updateCharacters(state.characters || []);
-                vttStore.updateTimers(state.timers || []);
+                const chars = getCharacters();
+                vttStore.updateCharacters(chars);
+                vttStore.updateTimers(getState().timers || []);
                 populateChatRecipients();
                 showToast('VTT refreshed.', 'info');
                 break;
@@ -1239,11 +1236,11 @@ function attachEvents() {
                 const state = getState();
                 (state.characters || []).forEach(c => {
                     if (c.boons > 2) {
-                        const trimmed = c.boons - 2;
                         c.boons = 2;
                     }
                 });
-                vttStore.updateCharacters(state.characters || []);
+                const chars = getCharacters();
+                vttStore.updateCharacters(chars);
                 try {
                     sendEvent({ type: 'state-updated', state: state });
                 } catch (e) { /* ignore */ }
@@ -1457,21 +1454,19 @@ export function render(el) {
 
             <!-- Sidebar -->
             <div class="vtt-sidebar" style="display:flex;flex-direction:column;gap:1.2rem;">
-                <!-- Party Status (horizontal, clickable cards) -->
+                <!-- Party Status (vertical, scrollable) -->
                 <div class="vtt-panel" style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:0.8rem;">
                     <div style="display:flex;justify-content:space-between;align-items:center;">
                         <h3 style="margin:0;font-size:1.2rem;">👥 Party</h3>
                         <button class="btn btn-sm btn-ghost" id="vtt-refresh-btn" title="Refresh" style="font-size:0.9rem;">↻</button>
                     </div>
-                <div>
                     <div id="vttCharGrid" style="
                         margin-top:0.5rem;
-                        max-height:220px;          /* roughly 4 rows */
+                        max-height:220px;
                         overflow-y:auto;
-                        padding-right:4px;         /* avoid scrollbar overlap */
-                        scrollbar-width: thin;     /* optional: Firefox */
-                    ">        
-                    </div>
+                        padding-right:4px;
+                        scrollbar-width:thin;
+                    "></div>
                 </div>
 
                 <!-- Quick Roller + Common Rolls -->
@@ -1548,15 +1543,19 @@ export function render(el) {
     `;
 
     // Initialize reactive renderers
-    renderChat();           // Also renders selected-character-display
-    renderVTTChars();       // Horizontal, clickable cards
-    renderCommonRolls();    // Common rolls buttons (uses selected character)
+    renderChat();
+    renderVTTChars();
+    renderCommonRolls();
     renderVTTTimers();
     renderLocalPresence();
     renderVoiceClients();
     updateMessageCount();
     populateChatRecipients();
 
+    // Normalize and set initial characters
+    const chars = getCharacters();
+    vttStore.updateCharacters(chars);
+    vttStore.updateTimers(getState().timers || []);
     vttStore.setConnectionStatus(isConnected ? 'connected' : 'local');
 
     if (voiceUnsubscribe) voiceUnsubscribe();
@@ -1575,9 +1574,9 @@ export function render(el) {
             presenceInterval = null;
             return;
         }
-        const state = getState();
-        vttStore.updateCharacters(state.characters || []);
-        vttStore.updateTimers(state.timers || []);
+        const chars = getCharacters();
+        vttStore.updateCharacters(chars);
+        vttStore.updateTimers(getState().timers || []);
     }, VTT_CONFIG.presenceUpdateInterval);
 
     setInterval(() => {
@@ -1588,7 +1587,6 @@ export function render(el) {
     }, 5000);
 
     console.log('[VTT Connected] Rendered with reactive store + deck/module/GM support (JRPG style)');
-    // Expose to console for debugging
     window.getState = getState;
     window.vttStore = vttStore;
     window.pushCharactersToServer = pushCharactersToServer;
@@ -1649,7 +1647,6 @@ export default {
         if (display) display.textContent = region;
     },
     pushCharactersToServer,
-    // Voice functions (exposed for integration)
     initVoice,
     toggleMute,
     getVoiceStatus,
