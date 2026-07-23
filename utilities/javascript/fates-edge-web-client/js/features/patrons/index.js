@@ -2,7 +2,12 @@
 /**
  * Patrons feature - Display and manage Patrons (Cosmic, Terrestrial, and Trusts)
  *
- * Data paths are resolved dynamically – we try multiple common base paths.
+ * Data paths:
+ * - Cosmic patron data: /data/patrons/{id}.json
+ * - Terrestrial patron data: /data/terrestrial/{id}.json (fallback: /data/factions/{id}.json)
+ * - Religions: /data/religions/{id}.json
+ *
+ * All data is discovered without a manifest.json – we test known slugs.
  */
 
 import { getState, saveState } from '../../core/state.js';
@@ -10,43 +15,13 @@ import { showToast } from '../../components/Toast.js';
 import { escHtml } from '../../core/utils.js';
 
 // ============================================================
-// PATH RESOLUTION – tries multiple base paths
-// ============================================================
-
-let _dataBasePath = null;
-
-async function resolveDataBasePath() {
-    if (_dataBasePath !== null) return _dataBasePath;
-
-    const candidates = [
-        './data/',
-        '/data/',
-        '../data/',
-        './static/data/',
-        '/static/data/',
-        '../static/data/'
-    ];
-
-    for (const base of candidates) {
-        try {
-            const testUrl = `${base}patrons/README.md`;
-            const res = await fetch(testUrl, { method: 'HEAD' });
-            if (res.ok) {
-                _dataBasePath = base;
-                console.log(`[Patrons] Data base path resolved: ${base}`);
-                return base;
-            }
-        } catch (_) { /* ignore */ }
-    }
-
-    _dataBasePath = './data/';
-    console.warn('[Patrons] Could not resolve data base path, using default:', _dataBasePath);
-    return _dataBasePath;
-}
-
-// ============================================================
 // CONSTANTS
 // ============================================================
+
+const COSMIC_DATA_PATH = './data/patrons/';
+const TERRESTRIAL_DATA_PATH = './data/terrestrial/';
+const TERRESTRIAL_FALLBACK_DATA_PATH = './data/factions/';
+const RELIGION_DATA_PATH = './data/religions/';
 
 // Known slugs for each category – extend as needed
 const KNOWN_COSMIC_SLUGS = [
@@ -68,11 +43,13 @@ const KNOWN_COSMIC_SLUGS = [
     'vorthak_the_hunger_unbound', 'xhakthul_the_thunderspeaker', 'zephyria_the_first_bloom'
 ];
 
+// Known terrestrial/faction slugs (you can expand this)
 const KNOWN_TERRESTRIAL_SLUGS = [
     'velvet-court', 'house-contarini', 'the-iron-covenant', 'silver-fang-tribe',
     'the-whispering-net', 'ashen-syndicate', 'crimson-rose'
 ];
 
+// Known religion slugs
 const KNOWN_RELIGION_SLUGS = [
     'everflame', 'the-celestial-spire', 'church-of-the-red-stone',
     'order-of-the-void', 'temple-of-the-wandering-star'
@@ -252,38 +229,38 @@ function normalizePatron(p) {
     return result;
 }
 
+// Format text: escape HTML but preserve line breaks
 function formatText(text) {
     if (!text) return '';
     return escHtml(text).replace(/\n/g, '<br>');
 }
 
 // ============================================================
-// DISCOVERY (manifest‑free) with flexible path
+// DISCOVERY (manifest‑free)
 // ============================================================
 
 const CACHE_KEY = 'fates-edge-patrons-cache';
 const CACHE_TTL = 3600000; // 1 hour
 
 async function discoverPatrons(type) {
+    // type: 'cosmic', 'terrestrial', 'religion'
     let slugs = [];
     let dataPath = '';
     let fallbackPath = null;
 
-    const basePath = await resolveDataBasePath();
-
     switch (type) {
         case 'cosmic':
             slugs = KNOWN_COSMIC_SLUGS;
-            dataPath = `${basePath}patrons/`;
+            dataPath = COSMIC_DATA_PATH;
             break;
         case 'terrestrial':
             slugs = KNOWN_TERRESTRIAL_SLUGS;
-            dataPath = `${basePath}terrestrial/`;
-            fallbackPath = `${basePath}factions/`;
+            dataPath = TERRESTRIAL_DATA_PATH;
+            fallbackPath = TERRESTRIAL_FALLBACK_DATA_PATH;
             break;
         case 'religion':
             slugs = KNOWN_RELIGION_SLUGS;
-            dataPath = `${basePath}religions/`;
+            dataPath = RELIGION_DATA_PATH;
             break;
         default:
             return [];
@@ -304,6 +281,7 @@ async function discoverPatrons(type) {
     console.log(`[Patrons] Discovering ${type} patrons...`);
     const found = [];
 
+    // Test primary path
     await Promise.all(slugs.map(async (slug) => {
         try {
             const res = await fetch(`${dataPath}${slug}.json`, { method: 'HEAD' });
@@ -312,6 +290,7 @@ async function discoverPatrons(type) {
                 return;
             }
         } catch (_) {}
+        // If primary fails and we have a fallback, try that
         if (fallbackPath) {
             try {
                 const res = await fetch(`${fallbackPath}${slug}.json`, { method: 'HEAD' });
@@ -322,6 +301,7 @@ async function discoverPatrons(type) {
         }
     }));
 
+    // Update cache
     try {
         const cacheData = JSON.parse(localStorage.getItem(CACHE_KEY) || '{}');
         cacheData[type] = found;
@@ -352,7 +332,7 @@ let state = {
     dataLoaded: false,
     usingFallback: false,
     obligation: {},
-    expandedRites: new Set(),
+    expandedRites: new Set(),       // stores rite IDs for persistence
     expandedSections: new Set()
 };
 
@@ -383,17 +363,16 @@ async function loadRemotePatrons() {
     state.isLoading = true;
 
     try {
+        // Discover slugs for each category
         const cosmicSlugs = await discoverPatrons('cosmic');
         const terrestrialSlugs = await discoverPatrons('terrestrial');
         const religionSlugs = await discoverPatrons('religion');
 
-        const basePath = await resolveDataBasePath();
-
-        // Fetch cosmic
+        // Fetch cosmic patrons
         let cosmicPatrons = [];
         for (const slug of cosmicSlugs) {
             try {
-                const res = await fetch(`${basePath}patrons/${slug}.json`);
+                const res = await fetch(`${COSMIC_DATA_PATH}${slug}.json`);
                 if (res.ok) {
                     const data = await res.json();
                     if (!data.id) data.id = slug;
@@ -408,13 +387,15 @@ async function loadRemotePatrons() {
         }
         state.cosmicPatrons = cosmicPatrons;
 
-        // Fetch terrestrial
+        // Fetch terrestrial patrons
         let terrestrialPatrons = [];
         for (const slug of terrestrialSlugs) {
             try {
-                let res = await fetch(`${basePath}terrestrial/${slug}.json`);
+                // Try primary path
+                let res = await fetch(`${TERRESTRIAL_DATA_PATH}${slug}.json`);
                 if (!res.ok) {
-                    res = await fetch(`${basePath}factions/${slug}.json`);
+                    // Try fallback
+                    res = await fetch(`${TERRESTRIAL_FALLBACK_DATA_PATH}${slug}.json`);
                 }
                 if (res.ok) {
                     const data = await res.json();
@@ -434,7 +415,7 @@ async function loadRemotePatrons() {
         let religions = [];
         for (const slug of religionSlugs) {
             try {
-                const res = await fetch(`${basePath}religions/${slug}.json`);
+                const res = await fetch(`${RELIGION_DATA_PATH}${slug}.json`);
                 if (res.ok) {
                     const data = await res.json();
                     if (!data.id) data.id = slug;
@@ -449,6 +430,7 @@ async function loadRemotePatrons() {
         }
         state.religions = religions;
 
+        // Trusts – they are usually created by users, so only use defaults if empty
         if (state.trusts.length === 0) {
             state.trusts = [...DEFAULT_TRUSTS];
         }
@@ -768,6 +750,7 @@ function renderPatronDetail(patronId) {
 
 function riteHasDetails(r) {
     if (!r) return false;
+    // The primary descriptive text may be in description OR effect
     const hasMainText = safeString(r.description || r.effect || '').length > 0;
     const hasMeta = r.tier || r.xp || r.action || r.range || r.resist ||
         r.materials || r.cost || r.duration || r.invoke || r.requires ||
@@ -798,6 +781,9 @@ window.openPatronDetailModal = function(patronId) {
     const religion = safeString(patron.religion || '');
     const currentObligation = getPatronObligation('default-character', patron.id);
 
+    // --- FIX: Build rites HTML with working expand/collapse ---
+    // The key bug was: hasDesc checked r.description, but rite data uses r.effect.
+    // Now we use riteHasDetails() which checks both + all meta fields.
     let ritesHtml = '';
     if (patron.rites && patron.rites.length > 0) {
         const hasDetailedRites = typeof patron.rites[0] === 'object';
@@ -818,6 +804,7 @@ window.openPatronDetailModal = function(patronId) {
                             const hasDetails = riteHasDetails(r);
                             const riteName = safeString(r.name);
                             const riteTier = safeString(r.tier || '');
+                            // Use effect as the primary descriptive text (fallback to description)
                             const riteMainText = safeString(r.description || r.effect || '');
 
                             let detailsHtml = '';
@@ -860,6 +847,7 @@ window.openPatronDetailModal = function(patronId) {
                 </div>
             `;
         } else {
+            // Simple list of rites
             ritesHtml = `
                 <div class="patron-detail-section" style="background:var(--bg2);border-radius:var(--radius);padding:0.8rem;margin-bottom:0.8rem;border-left:4px solid var(--gold);">
                     <h3 style="margin:0 0 0.5rem 0;color:var(--gold);">🔮 Rites (${patron.rites.length})</h3>
@@ -871,6 +859,7 @@ window.openPatronDetailModal = function(patronId) {
         }
     }
 
+    // Build the modal content with improved styling
     modal.innerHTML = `
         <div class="modal-content patron-detail" style="width: 90%; max-width: 1200px; max-height: 90vh; overflow-y: auto; background:var(--bg1); padding:1.5rem; border-radius:var(--radius);">
             <button class="modal-close" onclick="window.closePatronModal()" style="float:right;background:none;border:none;font-size:1.5rem;cursor:pointer;color:var(--text3);">✕</button>
@@ -1067,30 +1056,48 @@ window.openPatronDetailModal = function(patronId) {
         </div>
     `;
 
+    // FIX: use onclick assignment instead of addEventListener to avoid listener accumulation
     modal.onclick = (e) => {
         if (e.target === modal) window.closePatronModal();
     };
 };
 
 // ============================================================
-// RITE TOGGLE
+// RITE TOGGLE – using "this" for reliable DOM traversal
 // ============================================================
 
 window.toggleRite = function(headerElement) {
+    // Find the parent rite-item
     const item = headerElement.closest('.rite-item');
-    if (!item) return;
+    if (!item) {
+        console.warn('[Patrons] Could not find .rite-item for toggle');
+        return;
+    }
+    // Find the details div inside this item
     const details = item.querySelector('.rite-details');
-    if (!details) return;
+    if (!details) {
+        console.warn('[Patrons] No .rite-details found in .rite-item');
+        return;
+    }
+    // Toggle display
     const isExpanded = details.style.display !== 'none';
     details.style.display = isExpanded ? 'none' : 'block';
+    // Update expand icon
     const icon = item.querySelector('.rite-expand-icon');
-    if (icon) icon.textContent = isExpanded ? '▸' : '▾';
+    if (icon) {
+        icon.textContent = isExpanded ? '▸' : '▾';
+    }
+    // Update persisted state via data-rite-id
     const riteId = item.dataset.riteId;
     if (riteId) {
         if (isExpanded) state.expandedRites.delete(riteId);
         else state.expandedRites.add(riteId);
     }
 };
+
+// ============================================================
+// EXPAND ALL / COLLAPSE ALL RITES
+// ============================================================
 
 window.expandAllRites = function() {
     const modal = document.getElementById('patron-modal');
@@ -1123,7 +1130,7 @@ window.collapseAllRites = function() {
 };
 
 // ============================================================
-// TERRESTRIAL PATRON DETAIL
+// TERRESTRIAL PATRON DETAIL (Main view & Modal)
 // ============================================================
 
 window.viewTerrestrial = function(id) {
@@ -1269,6 +1276,7 @@ window.openTerrestrialDetailModal = function(id) {
         </div>
     `;
 
+    // FIX: use onclick assignment instead of addEventListener to avoid listener accumulation
     modal.onclick = (e) => {
         if (e.target === modal) window.closePatronModal();
     };
@@ -1286,8 +1294,10 @@ window.closeAssetModal = function() {
     document.getElementById('asset-modal').style.display = 'none';
 };
 
+// The main view handler – updates description and, if modal is open, refreshes modal
 window.viewPatron = function(id) {
     renderPatronDetail(id);
+    // If the modal is open, update its content with the new patron
     const modal = document.getElementById('patron-modal');
     if (modal && modal.style.display !== 'none') {
         window.openPatronDetailModal(id);
@@ -1295,6 +1305,7 @@ window.viewPatron = function(id) {
 };
 
 window.viewReligion = function(id) {
+    // For now, just open a simple modal or use the terrestrial modal
     const religion = state.religions.find(r => r.id === id);
     if (!religion) {
         showToast('Religion not found', 'error');
@@ -1371,7 +1382,7 @@ window.clearPatronObligation = function(characterId, patronId, amount = 1) {
 };
 
 // ============================================================
-// CRUD OPERATIONS
+// CRUD OPERATIONS (cosmic, terrestrial, religions, trusts)
 // ============================================================
 
 window.addCosmicPatron = function() {
@@ -1602,6 +1613,7 @@ function refreshView() {
 }
 
 window.refreshPatrons = function() {
+    // Clear cache and reload
     localStorage.removeItem(CACHE_KEY);
     loadPatronData();
     refreshView();
