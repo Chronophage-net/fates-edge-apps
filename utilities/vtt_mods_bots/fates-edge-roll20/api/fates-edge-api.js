@@ -1,30 +1,30 @@
 /**
- * Fate's Edge Roll20 API Module v1.3.0
+ * Fate's Edge Roll20 API Module v2.0.0
  * Connects Roll20 to the Fate's Edge WebSocket Server
  * 
  * Features:
  * - Real-time chat sync
  * - Dice roll sync
- * - Character sync (Harm, Fatigue, Boons, Tier)
+ * - Character sync (full attributes, skills, avatar)
  * - Timer sync
  * - Scene sync (via Roll20 page switching)
  * - Presence/voice indicators
  * - Auto-reconnect
- * - Player name mapping (Roll20 name → VTT name)
- * - Deck of Consequences sync
- * - Crown Spread support
- * - Module management
+ * - Deck of Consequences (draw, shuffle, crown spread)
  * - Region support
- * - GM election & promotion (new in v1.3.0)
+ * - Module management
+ * - GM election & promotion
+ * - Whiteboard summary (drawings, notes, images)
+ * - Grid combat status (tokens, zones)
  * 
  * Installation:
  * 1. In Roll20, go to Settings → API Scripts
  * 2. Paste this script
- * 3. Set the following environment variables in Roll20 API:
- *    - FATES_EDGE_SERVER_URL: ws://your-server:3000
+ * 3. Set environment variables in Roll20 API:
+ *    - FATES_EDGE_SERVER_URL: ws://your-server:10000
  *    - FATES_EDGE_ROOM_CODE: ABC123
  *    - FATES_EDGE_PLAYER_NAME: Optional (defaults to Roll20 display name)
- *    - FATES_EDGE_API_KEY: Your API key
+ *    - FATES_EDGE_API_KEY: Your API key (if required)
  *    - FATES_EDGE_AUTO_CONNECT: true/false
  *    - FATES_EDGE_DEFAULT_REGION: Acasia
  */
@@ -34,7 +34,7 @@
 // ============================================================
 
 const CONFIG = {
-    serverUrl: getConfigVar('FATES_EDGE_SERVER_URL', 'ws://localhost:3000'),
+    serverUrl: getConfigVar('FATES_EDGE_SERVER_URL', 'ws://localhost:10000'),
     roomCode: getConfigVar('FATES_EDGE_ROOM_CODE', ''),
     apiKey: getConfigVar('FATES_EDGE_API_KEY', ''),
     autoConnect: getConfigVar('FATES_EDGE_AUTO_CONNECT', 'true') === 'true',
@@ -45,7 +45,8 @@ const CONFIG = {
     syncScenes: getConfigVar('FATES_EDGE_SYNC_SCENES', 'true') === 'true',
     syncDeck: getConfigVar('FATES_EDGE_SYNC_DECK', 'true') === 'true',
     playerName: getConfigVar('FATES_EDGE_PLAYER_NAME', ''),
-    defaultRegion: getConfigVar('FATES_EDGE_DEFAULT_REGION', 'Acasia')
+    defaultRegion: getConfigVar('FATES_EDGE_DEFAULT_REGION', 'Acasia'),
+    password: getConfigVar('FATES_EDGE_ROOM_PASSWORD', '')  // optional room password
 };
 
 function getConfigVar(name, defaultValue) {
@@ -70,8 +71,8 @@ const MAX_RECONNECT_ATTEMPTS = 10;
 let heartbeatInterval = null;
 let clientId = null;
 
-// Track state
-const vttCharacters = new Map();
+// VTT state
+const vttCharacters = new Map();        // name -> full character object
 const vttTimers = [];
 const deckState = {
     cards: [],
@@ -81,6 +82,8 @@ const deckState = {
 };
 let currentRegion = CONFIG.defaultRegion;
 let loadedModules = [];
+let whiteboard = { drawings: [], notes: [], images: [] };
+let gridCombat = { enabled: false, tokens: [], gridType: 'square' };
 
 // GM State
 let clients = {};           // clientId -> { id, name, role, ... }
@@ -89,11 +92,11 @@ let pendingRequests = [];   // [ { requesterId, requesterName }, ... ]
 let myRole = 'player';      // role of this Roll20 client
 
 // ============================================================
-// Logging (Roll20-friendly)
+// Logging
 // ============================================================
 
 function log(message, level = 'info') {
-    const prefix = '⚔️ Fate\'s Edge v1.3.0:';
+    const prefix = '⚔️ Fate\'s Edge v2.0.0:';
     const timestamp = new Date().toISOString();
     switch (level) {
         case 'error':
@@ -137,7 +140,7 @@ function connect() {
     log(`Connecting to ${CONFIG.serverUrl} as ${getPlayerName()}...`);
 
     try {
-        const wsUrl = CONFIG.serverUrl;
+        const wsUrl = `${CONFIG.serverUrl}?room=${encodeURIComponent(CONFIG.roomCode)}`;
         ws = new WebSocket(wsUrl);
 
         ws.onopen = () => onOpen();
@@ -165,16 +168,13 @@ function disconnect() {
     if (ws) {
         try {
             ws.close(1000, 'Disconnected by user');
-        } catch (err) {
-            // Ignore
-        }
+        } catch (err) { /* ignore */ }
         ws = null;
     }
 
     connected = false;
     clientId = null;
     reconnectAttempts = 0;
-    // Reset GM state
     clients = {};
     gmId = null;
     pendingRequests = [];
@@ -213,24 +213,13 @@ function onOpen() {
     connected = true;
     reconnectAttempts = 0;
 
-    if (CONFIG.apiKey) {
-        sendMessage({
-            type: 'auth',
-            apiKey: CONFIG.apiKey
-        });
-    }
-
-    // Join room with extended client data
+    // Send handshake (plain WebSocket protocol)
+    const playerName = getPlayerName();
     sendMessage({
-        type: 'join-room',
-        roomCode: CONFIG.roomCode,
-        clientData: {
-            name: getPlayerName(),
-            role: 'GM',
-            platform: 'roll20',
-            version: '1.3.0',
-            region: currentRegion
-        }
+        type: 'handshake',
+        clientName: playerName,
+        role: 'gm',   // Roll20 is typically GM
+        password: CONFIG.password || ''
     });
 
     // Start heartbeat
@@ -244,7 +233,6 @@ function onOpen() {
     }, 30000);
 
     updateStatus('connected');
-    log(`Connected to room ${CONFIG.roomCode} (region: ${currentRegion})`);
 }
 
 function onMessage(event) {
@@ -260,12 +248,12 @@ function handleMessage(data) {
     logWS('📨', data);
 
     switch (data.type) {
-        case 'auth-success':
-            log('Authentication successful');
+        case 'connected':
+            // Server sends initial connected message; ignore
             break;
 
-        case 'auth-error':
-            log('Authentication failed: ' + (data.message || 'Invalid API key'), 'error');
+        case 'handshake_ack':
+            handleHandshakeAck(data);
             break;
 
         case 'room-state':
@@ -273,7 +261,11 @@ function handleMessage(data) {
             break;
 
         case 'state-updated':
-            handleStateUpdate(data);
+            handleStateUpdated(data);
+            break;
+
+        case 'sync-state':
+            handleSyncState(data);
             break;
 
         case 'chat-message':
@@ -284,28 +276,12 @@ function handleMessage(data) {
             handleRollResult(data);
             break;
 
-        case 'client-joined':
-            handleClientJoined(data);
+        case 'player-joined':
+            handlePlayerJoined(data);
             break;
 
-        case 'client-left':
-            handleClientLeft(data);
-            break;
-
-        case 'voice-status':
-            handleVoiceStatus(data);
-            break;
-
-        case 'vtt-state-updated':
-            handleVttStateUpdate(data);
-            break;
-
-        case 'vtt-characters-updated':
-            handleVttCharactersUpdate(data);
-            break;
-
-        case 'vtt-timers-updated':
-            handleVttTimersUpdate(data);
+        case 'player-left':
+            handlePlayerLeft(data);
             break;
 
         // Deck Events
@@ -315,6 +291,14 @@ function handleMessage(data) {
 
         case 'deck-shuffled':
             handleDeckShuffled(data);
+            break;
+
+        case 'deck-history':
+            handleDeckHistory(data);
+            break;
+
+        case 'deck-history-cleared':
+            handleDeckHistoryCleared(data);
             break;
 
         case 'crown-spread':
@@ -335,12 +319,24 @@ function handleMessage(data) {
             break;
 
         case 'region-updated':
-            handleRegionUpdate(data);
+            handleRegionUpdated(data);
             break;
 
-        // ============================================================
-        // GM EVENTS (new in v1.3.0)
-        // ============================================================
+        // Whiteboard
+        case 'whiteboard-update':
+            handleWhiteboardUpdate(data);
+            break;
+
+        // Character updates
+        case 'character-update':
+            handleCharacterUpdate(data);
+            break;
+
+        case 'character-update-bulk':
+            handleCharacterUpdateBulk(data);
+            break;
+
+        // GM Events
         case 'presence':
             handlePresence(data);
             break;
@@ -397,24 +393,14 @@ function onClose(event) {
 // Message Handlers
 // ============================================================
 
-function handleRoomState(data) {
-    log(`Room state received. Client ID: ${data.clientId}`);
+function handleHandshakeAck(data) {
     clientId = data.clientId;
+    myRole = data.clientRole || 'player';
+    log(`✅ Handshake successful. Client ID: ${clientId}, Role: ${myRole}`);
 
-    if (data.data && data.data.vtt) {
-        syncVttState(data.data.vtt);
-    }
-
-    if (data.data && data.data.deck) {
-        deckState.cards = data.data.deck.cards || [];
-        deckState.history = data.data.deck.history || [];
-        deckState.remaining = data.data.deck.cards?.length || 0;
-    }
-
-    // Update GM state if clients are provided
-    if (data.clients) {
-        updateClients(data.clients);
-        const names = data.clients.map(c => c.data?.name || 'Unknown').join(', ');
+    if (data.activeClients) {
+        updateClients(data.activeClients);
+        const names = data.activeClients.map(c => c.name).join(', ');
         log(`Clients in room: ${names}`);
     }
 
@@ -423,57 +409,95 @@ function handleRoomState(data) {
         type: 'set-region',
         region: currentRegion
     });
+
+    // Sync characters if any exist locally
+    if (CONFIG.syncCharacters) {
+        const chars = collectCharacters();
+        if (chars.length > 0) {
+            syncCharacters(chars);
+        }
+    }
 }
 
-function handleStateUpdate(data) {
+function handleRoomState(data) {
+    log('📦 Room state received');
+    if (data.characters) {
+        updateCharacters(data.characters);
+    }
+    if (data.whiteboard) {
+        whiteboard = data.whiteboard;
+        if (whiteboard.gridCombat) {
+            gridCombat = whiteboard.gridCombat;
+        }
+    }
+    if (data.deckRemaining !== undefined) {
+        deckState.remaining = data.deckRemaining;
+    }
+    if (data.region) {
+        currentRegion = data.region;
+    }
+    if (data.clients) {
+        updateClients(data.clients);
+    }
+    // Update UI
+    updateGMUI();
+}
+
+function handleStateUpdated(data) {
+    if (data.characters) {
+        updateCharacters(data.characters);
+    }
+    if (data.timers) {
+        updateTimers(data.timers);
+    }
     log('State updated');
-    if (data.state && data.state.vtt) {
-        syncVttState(data.state.vtt);
+}
+
+function handleSyncState(data) {
+    const state = data.state || {};
+    if (state.characters) {
+        updateCharacters(state.characters);
     }
-    if (data.state && data.state.deck) {
-        deckState.cards = data.state.deck.cards || [];
-        deckState.remaining = data.state.deck.cards?.length || 0;
+    if (state.whiteboard) {
+        whiteboard = state.whiteboard;
+        if (whiteboard.gridCombat) {
+            gridCombat = whiteboard.gridCombat;
+        }
     }
+    if (state.timers) {
+        updateTimers(state.timers);
+    }
+    log('Sync state received');
 }
 
 function handleChatMessage(data) {
     log(`💬 ${data.sender}: ${data.text}`);
-
     if (CONFIG.syncChat) {
-        const msg = `[Fate's Edge] ${data.sender}: ${data.text}`;
-        sendToChat(msg);
-
-        if (data.sender !== getPlayerName()) {
-            sendToChat(`⚠️ ${data.sender} says: ${data.text}`, 'gm');
-        }
+        sendToChat(`[Fate's Edge] ${data.sender}: ${data.text}`);
     }
 }
 
 function handleRollResult(data) {
     log(`🎲 ${data.sender} rolled: ${data.expr || 'Dice'}`);
-
     if (CONFIG.syncRolls) {
         let resultText = data.result;
         if (data.rolls && data.rolls.length > 0) {
             resultText = `${data.rolls.join(' + ')} = ${data.total}`;
         }
-
-        const msg = `🎲 ${data.sender} rolled:\n${data.expr || 'Dice Roll'}\n**Result:** ${resultText}`;
-        sendToChat(msg);
+        sendToChat(`🎲 ${data.sender} rolled **${data.expr}**: ${resultText}`);
     }
 }
 
-function handleClientJoined(data) {
-    const name = data.data?.name || 'Unknown';
-    log(`👤 ${name} joined the room`);
-    sendToChat(`👤 ${name} has joined the Fate's Edge session.`);
+function handlePlayerJoined(data) {
     if (data.clients) {
         updateClients(data.clients);
+        const name = data.clientName || 'Unknown';
+        log(`👤 ${name} joined`);
+        sendToChat(`👤 ${name} has joined the Fate's Edge session.`);
     }
 }
 
-function handleClientLeft(data) {
-    log(`👤 Client left: ${data}`);
+function handlePlayerLeft(data) {
     if (data.clientId) {
         delete clients[data.clientId];
         if (gmId === data.clientId) {
@@ -481,34 +505,13 @@ function handleClientLeft(data) {
             updateGmFromClients();
         }
     }
-    sendToChat(`👤 A client has left the Fate's Edge session.`);
+    if (data.clients) {
+        updateClients(data.clients);
+    }
+    const name = data.clientName || 'Unknown';
+    log(`👤 ${name} left`);
+    sendToChat(`👤 ${name} has left the Fate's Edge session.`);
     updateGMUI();
-}
-
-function handleVoiceStatus(data) {
-    log(`🎤 Voice status: ${data.name} ${data.enabled ? 'enabled' : 'disabled'}`);
-    updateVoiceUI(data);
-}
-
-function handleVttStateUpdate(data) {
-    log('VTT state update');
-    if (data.vtt) {
-        syncVttState(data.vtt);
-    }
-}
-
-function handleVttCharactersUpdate(data) {
-    log(`👥 Characters update: ${data.characters?.length || 0} characters`);
-    if (data.characters) {
-        syncCharacters(data.characters);
-    }
-}
-
-function handleVttTimersUpdate(data) {
-    log(`⏱️ Timers update: ${data.timers?.length || 0} timers`);
-    if (data.timers) {
-        syncTimers(data.timers);
-    }
 }
 
 // ============================================================
@@ -519,12 +522,10 @@ function handleDeckDrawn(data) {
     const cards = data.cards || [];
     const synthesis = data.synthesis || '';
     const region = data.region || currentRegion;
-    const count = cards.length;
+    deckState.cards = cards;
+    deckState.remaining = data.remaining || 0;
 
-    deckState.cards = deckState.cards || [];
-    deckState.remaining = data.remaining || (deckState.cards.length);
-
-    log(`🃏 ${count} card${count > 1 ? 's' : ''} drawn from ${region}`);
+    log(`🃏 ${cards.length} card(s) drawn from ${region}`);
 
     if (CONFIG.syncDeck) {
         const cardNames = cards.map(c => {
@@ -532,10 +533,10 @@ function handleDeckDrawn(data) {
             return `${c.rank_name || c.rank} of ${c.suit_name || c.suit}`;
         }).join(', ');
 
-        const msg = `🃏 **${count} card${count > 1 ? 's' : ''} drawn from ${region}**\n${cardNames}\n\n${synthesis}`;
+        let msg = `🃏 **${cards.length} card(s) drawn from ${region}**\n`;
+        msg += `${cardNames}\n\n`;
+        msg += synthesis;
         sendToChat(msg);
-
-        // Create a handout with the draw results
         createDeckHandout(`Deck Draw - ${region}`, msg);
     }
 }
@@ -544,39 +545,50 @@ function handleDeckShuffled(data) {
     deckState.cards = [];
     deckState.history = [];
     deckState.remaining = data.remaining || 54;
-
     log(`🔀 Deck shuffled (${deckState.remaining} cards remaining)`);
-
     if (CONFIG.syncDeck) {
         sendToChat(`🔀 The Deck of Consequences has been shuffled. ${deckState.remaining} cards remaining.`);
     }
 }
 
+function handleDeckHistory(data) {
+    const history = data.history || [];
+    deckState.history = history;
+    log(`📜 Deck history: ${history.length} entries`);
+}
+
+function handleDeckHistoryCleared(data) {
+    deckState.history = [];
+    log('🗑️ Deck history cleared');
+    if (CONFIG.syncDeck) {
+        sendToChat('🗑️ Deck history has been cleared.');
+    }
+}
+
 function handleCrownSpread(data) {
-    const result = data.result || {};
     const cards = data.cards || [];
+    const result = data.result || {};
     const region = data.region || currentRegion;
 
     log(`👑 Crown Spread from ${region}`);
 
     if (CONFIG.syncDeck) {
         let msg = `👑 **Crown Spread from ${region}**\n\n`;
-        msg += `🌱 **Root:** ${result.positions?.[0]?.meaning || '...'}\n`;
-        msg += `🏔️ **Crest:** ${result.positions?.[1]?.meaning || '...'}\n`;
-        msg += `👑 **Crown:** ${result.positions?.[2]?.meaning || '...'}\n`;
-        msg += `🤝 **Left Hand:** ${result.positions?.[3]?.meaning || '...'}\n`;
-        msg += `🌟 **Wildcard:** ${result.wildcard || '...'}`;
-
+        if (result.positions) {
+            result.positions.forEach(p => {
+                msg += `${p.icon} **${p.label}:** ${p.meaning}\n`;
+            });
+        }
+        if (result.wildcard) {
+            msg += `\n🌟 **Wildcard:** ${result.wildcard}`;
+        }
         sendToChat(msg);
-
-        // Create a handout with the Crown Spread
         createDeckHandout(`Crown Spread - ${region}`, msg);
     }
 }
 
 function createDeckHandout(title, content) {
     try {
-        // In Roll20, create a journal entry (handout)
         if (typeof Campaign !== 'undefined' && Campaign.createJournalEntry) {
             Campaign.createJournalEntry({
                 name: title,
@@ -598,7 +610,6 @@ function createDeckHandout(title, content) {
 function handleModuleList(data) {
     loadedModules = data.modules || [];
     log(`📦 ${loadedModules.length} modules loaded`);
-
     if (loadedModules.length > 0) {
         const names = loadedModules.map(m => m.name || m.id).join(', ');
         sendToChat(`📦 Modules loaded: ${names}`);
@@ -618,7 +629,7 @@ function handleModuleCleanup(data) {
     sendToChat(`🧹 Module cleanup requested: ${moduleId}`);
 }
 
-function handleRegionUpdate(data) {
+function handleRegionUpdated(data) {
     if (data.region) {
         currentRegion = data.region;
         log(`📍 Region updated to: ${currentRegion}`);
@@ -627,7 +638,171 @@ function handleRegionUpdate(data) {
 }
 
 // ============================================================
-// GM Handlers (new in v1.3.0)
+// Whiteboard & Grid Combat Handlers
+// ============================================================
+
+function handleWhiteboardUpdate(data) {
+    if (data.whiteboard) {
+        whiteboard = data.whiteboard;
+        if (whiteboard.gridCombat) {
+            gridCombat = whiteboard.gridCombat;
+        }
+        log(`📋 Whiteboard updated: ${whiteboard.drawings?.length || 0} drawings, ${whiteboard.notes?.length || 0} notes, ${whiteboard.images?.length || 0} images`);
+        if (gridCombat.enabled) {
+            log(`⚔️ Grid combat: ${gridCombat.gridType}, ${gridCombat.tokens?.length || 0} tokens`);
+        }
+    }
+}
+
+// ============================================================
+// Character Handlers
+// ============================================================
+
+function updateCharacters(charactersArray) {
+    vttCharacters.clear();
+    charactersArray.forEach(c => {
+        if (c.name) {
+            vttCharacters.set(c.name, c);
+        }
+    });
+    log(`👥 ${vttCharacters.size} characters synced`);
+
+    if (CONFIG.syncCharacters) {
+        syncToRoll20Characters();
+    }
+}
+
+function handleCharacterUpdate(data) {
+    if (data.name && data.field !== undefined) {
+        let char = vttCharacters.get(data.name);
+        if (!char) {
+            char = { name: data.name };
+            vttCharacters.set(data.name, char);
+        }
+        char[data.field] = data.value;
+        log(`⚡ ${data.name}.${data.field} = ${data.value}`);
+        if (CONFIG.syncCharacters) {
+            syncToRoll20Characters();
+        }
+    }
+}
+
+function handleCharacterUpdateBulk(data) {
+    if (data.updates) {
+        Object.entries(data.updates).forEach(([name, fields]) => {
+            let char = vttCharacters.get(name);
+            if (!char) {
+                char = { name };
+                vttCharacters.set(name, char);
+            }
+            Object.assign(char, fields);
+        });
+        log(`📋 Bulk update: ${Object.keys(data.updates).length} characters`);
+        if (CONFIG.syncCharacters) {
+            syncToRoll20Characters();
+        }
+    }
+}
+
+function syncToRoll20Characters() {
+    // Update Roll20 character sheets
+    if (typeof Campaign !== 'undefined' && Campaign.characters) {
+        Campaign.characters.forEach(roll20Char => {
+            const vttChar = vttCharacters.get(roll20Char.name);
+            if (vttChar) {
+                updateCharacterSheet(roll20Char, vttChar);
+            }
+        });
+    }
+
+    // Update journal entries
+    for (const [name, char] of vttCharacters) {
+        createOrUpdateJournalEntry(char);
+    }
+}
+
+function updateCharacterSheet(roll20Char, vttChar) {
+    const attributes = [
+        { name: 'harm', value: vttChar.harm || 0 },
+        { name: 'fatigue', value: vttChar.fatigue || 0 },
+        { name: 'boons', value: vttChar.boons || 0 },
+        { name: 'tier', value: vttChar.tier || 1 }
+    ];
+
+    if (roll20Char.set) {
+        attributes.forEach(attr => {
+            roll20Char.set(attr.name, attr.value);
+        });
+        log(`Updated character sheet: ${roll20Char.name}`);
+    }
+}
+
+function createOrUpdateJournalEntry(char) {
+    const name = char.name || 'Unnamed';
+    let content = `
+        <h2>${name}</h2>
+        <p><b>Harm:</b> ${char.harm || 0}</p>
+        <p><b>Fatigue:</b> ${char.fatigue || 0}</p>
+        <p><b>Boons:</b> ${char.boons || 0}</p>
+        ${char.tier ? `<p><b>Tier:</b> ${char.tier}</p>` : ''}
+    `;
+    if (char.attributes) {
+        content += `<p><b>Attributes:</b> ${Object.entries(char.attributes).map(([k,v]) => `${k}: ${v}`).join(', ')}</p>`;
+    }
+    if (char.skills) {
+        content += `<p><b>Skills:</b> ${Object.entries(char.skills).map(([k,v]) => `${k}: ${v}`).join(', ')}</p>`;
+    }
+    if (char.heritage) {
+        content += `<p><b>Heritage:</b> ${char.heritage}</p>`;
+    }
+    if (char.background) {
+        content += `<p><b>Background:</b> ${char.background}</p>`;
+    }
+    if (char.patron) {
+        content += `<p><b>Patron:</b> ${char.patron}</p>`;
+    }
+    content += `<hr><p><small>Synced from Fate's Edge VTT v2.0.0</small></p>`;
+
+    try {
+        if (typeof Campaign !== 'undefined' && Campaign.findJournalEntry) {
+            const existing = Campaign.findJournalEntry(name);
+            if (existing) {
+                existing.set('content', content);
+                log(`Updated journal entry: ${name}`);
+            } else if (Campaign.createJournalEntry) {
+                Campaign.createJournalEntry({
+                    name: name,
+                    content: content,
+                    gm: false,
+                    players: true
+                });
+                log(`Created journal entry: ${name}`);
+            }
+        }
+    } catch (err) {
+        log(`Failed to update journal: ${err.message}`, 'warn');
+    }
+}
+
+// ============================================================
+// Timer Handlers
+// ============================================================
+
+function updateTimers(timers) {
+    vttTimers.length = 0;
+    vttTimers.push(...timers);
+    if (CONFIG.syncTimers) {
+        timers.forEach(timer => {
+            const progress = ((timer.current || 0) / (timer.segments || 1) * 100);
+            const bar = '▰'.repeat(Math.floor(progress / 10)) + '▱'.repeat(10 - Math.floor(progress / 10));
+            const status = (timer.current || 0) >= (timer.segments || 1) ? '⚠️ COMPLETE' : '⏳ Active';
+            sendToChat(`⏱️ **${timer.name}** [${bar}] ${timer.current}/${timer.segments} - ${status}`);
+        });
+    }
+}
+
+// ============================================================
+// GM Handlers
 // ============================================================
 
 function handlePresence(data) {
@@ -639,13 +814,11 @@ function handlePresence(data) {
 
 function handleGmVoteRequest(data) {
     const { requesterId, requesterName, currentGmId, currentGmName } = data;
-    // Only show if we are the current GM
     if (myRole === 'gm' && clientId === currentGmId) {
         if (!pendingRequests.find(r => r.requesterId === requesterId)) {
             pendingRequests.push({ requesterId, requesterName });
         }
         updateGMUI();
-        // Notify in chat
         sendToChat(`👑 ${requesterName} requests to become GM. Use !fates-edge gm approve <name> or !fates-edge gm reject <name>`, 'gm');
     }
 }
@@ -701,135 +874,10 @@ function updateGmFromClients() {
 }
 
 function updateGMUI() {
-    // Store GM state in variables for macros
     if (typeof state !== 'undefined') {
         state.set('fatesEdgeGmId', gmId);
         state.set('fatesEdgeMyRole', myRole);
         state.set('fatesEdgePendingRequests', pendingRequests);
-    }
-}
-
-// ============================================================
-// Sync Functions
-// ============================================================
-
-function syncVttState(vttState) {
-    if (!vttState) return;
-
-    if (vttState.characters) {
-        syncCharacters(vttState.characters);
-    }
-
-    if (vttState.timers) {
-        syncTimers(vttState.timers);
-    }
-
-    if (vttState.scene && CONFIG.syncScenes) {
-        syncScene(vttState.scene);
-    }
-}
-
-function syncCharacters(characters) {
-    if (!CONFIG.syncCharacters) return;
-
-    vttCharacters.clear();
-    characters.forEach(char => {
-        vttCharacters.set(char.name || 'Unknown', char);
-    });
-
-    if (typeof Campaign !== 'undefined' && Campaign.characters) {
-        Campaign.characters.forEach(roll20Char => {
-            const vttChar = vttCharacters.get(roll20Char.name);
-            if (vttChar) {
-                updateCharacterSheet(roll20Char, vttChar);
-            }
-        });
-    }
-
-    characters.forEach(char => {
-        createOrUpdateJournalEntry(char);
-    });
-}
-
-function updateCharacterSheet(roll20Char, vttChar) {
-    const attributes = [
-        { name: 'harm', value: vttChar.harm || 0 },
-        { name: 'fatigue', value: vttChar.fatigue || 0 },
-        { name: 'boons', value: vttChar.boons || 0 },
-        { name: 'tier', value: vttChar.tier || 1 }
-    ];
-
-    if (roll20Char.set) {
-        attributes.forEach(attr => {
-            roll20Char.set(attr.name, attr.value);
-        });
-        log(`Updated character: ${roll20Char.name}`);
-    }
-}
-
-function createOrUpdateJournalEntry(char) {
-    const name = char.name || 'Unnamed';
-    const content = `
-        <h2>${name}</h2>
-        <p><b>Harm:</b> ${char.harm || 0}</p>
-        <p><b>Fatigue:</b> ${char.fatigue || 0}</p>
-        <p><b>Boons:</b> ${char.boons || 0}</p>
-        ${char.tier ? `<p><b>Tier:</b> ${char.tier}</p>` : ''}
-        ${char.description ? `<p><i>${char.description}</i></p>` : ''}
-        <hr>
-        <p><small>Synced from Fate's Edge VTT v1.3.0</small></p>
-    `;
-
-    try {
-        if (typeof Campaign !== 'undefined' && Campaign.findJournalEntry) {
-            const existing = Campaign.findJournalEntry(name);
-            if (existing) {
-                existing.set('content', content);
-                log(`Updated journal entry: ${name}`);
-            } else if (Campaign.createJournalEntry) {
-                Campaign.createJournalEntry({
-                    name: name,
-                    content: content,
-                    gm: false,
-                    players: true
-                });
-                log(`Created journal entry: ${name}`);
-            }
-        }
-    } catch (err) {
-        log(`Failed to update journal: ${err.message}`, 'warn');
-    }
-}
-
-function syncTimers(timers) {
-    if (!CONFIG.syncTimers) return;
-
-    vttTimers.length = 0;
-    vttTimers.push(...timers);
-
-    timers.forEach(timer => {
-        const progress = ((timer.current || 0) / (timer.segments || 1) * 100);
-        const bar = '▰'.repeat(Math.floor(progress / 10)) + '▱'.repeat(10 - Math.floor(progress / 10));
-        const status = (timer.current || 0) >= (timer.segments || 1) ? '⚠️ COMPLETE' : '⏳ Active';
-        sendToChat(`⏱️ **${timer.name}** [${bar}] ${timer.current}/${timer.segments} - ${status}`);
-    });
-}
-
-function syncScene(sceneData) {
-    if (!CONFIG.syncScenes) return;
-
-    if (sceneData.name) {
-        if (typeof Campaign !== 'undefined' && Campaign.setCurrentPage) {
-            const pages = Campaign.pages;
-            const match = pages.find(p => p.name === sceneData.name);
-            if (match) {
-                Campaign.setCurrentPage(match.id);
-                log(`Switched to page: ${sceneData.name}`);
-                sendToChat(`🎬 Switched to page: ${sceneData.name}`);
-            } else {
-                log(`Page not found: ${sceneData.name}`, 'warn');
-            }
-        }
     }
 }
 
@@ -843,10 +891,6 @@ function sendMessage(data) {
         return;
     }
 
-    if (CONFIG.apiKey && !data.apiKey) {
-        data.apiKey = CONFIG.apiKey;
-    }
-
     try {
         ws.send(JSON.stringify(data));
         logWS('📤', data);
@@ -857,7 +901,6 @@ function sendMessage(data) {
 
 function sendChatMessage(text) {
     if (!text) return;
-
     sendMessage({
         type: 'chat-message',
         text: text,
@@ -868,30 +911,14 @@ function sendChatMessage(text) {
 
 function sendRoll(expr, reason = null) {
     if (!expr) return;
-
-    try {
-        const roll = new Roll(expr);
-        const total = roll.total;
-        const rolls = roll.rolls;
-
-        sendMessage({
-            type: 'roll-dice',
-            expr: expr,
-            result: total,
-            rolls: rolls,
-            total: total,
-            reason: reason || 'Dice roll',
-            sender: getPlayerName(),
-            timestamp: Date.now()
-        });
-    } catch (err) {
-        log(`Failed to roll: ${err.message}`, 'error');
-    }
+    sendMessage({
+        type: 'roll-dice',
+        expr: expr,
+        sender: getPlayerName(),
+        reason: reason || 'Dice roll',
+        timestamp: Date.now()
+    });
 }
-
-// ============================================================
-// Deck Send Functions
-// ============================================================
 
 function sendDeckDraw(count = 1, region = null) {
     const regionName = region || currentRegion;
@@ -900,23 +927,20 @@ function sendDeckDraw(count = 1, region = null) {
         count: Math.min(count, 5),
         region: regionName
     });
-    log(`🃏 Drawing ${count} card${count > 1 ? 's' : ''} from ${regionName}`);
+    log(`🃏 Drawing ${count} card(s) from ${regionName}`);
 }
 
 function sendCrownSpread(region = null) {
     const regionName = region || currentRegion;
     sendMessage({
-        type: 'deck-draw',
-        count: 5,
+        type: 'crown-spread',
         region: regionName
     });
     log(`👑 Crown Spread from ${regionName}`);
 }
 
 function sendDeckShuffle() {
-    sendMessage({
-        type: 'deck-shuffle'
-    });
+    sendMessage({ type: 'deck-shuffle' });
     log('🔀 Deck shuffle requested');
 }
 
@@ -930,14 +954,23 @@ function sendRegionUpdate(region) {
 }
 
 function sendModuleList() {
-    sendMessage({
-        type: 'module-list'
-    });
+    sendMessage({ type: 'module-list' });
     log('📦 Module list requested');
 }
 
+function sendSyncRequest(entity = 'all') {
+    sendMessage({ type: 'sync-request', entity });
+}
+
+function syncCharacters(characters) {
+    sendMessage({
+        type: 'state-updated',
+        characters: characters
+    });
+}
+
 // ============================================================
-// GM Public Methods (new in v1.3.0)
+// GM Public Methods
 // ============================================================
 
 function requestGM() {
@@ -959,14 +992,12 @@ function approveGM(targetId) {
         return;
     }
     sendMessage({ type: 'approve_gm', targetId });
-    // Remove from pending list optimistically
     pendingRequests = pendingRequests.filter(r => r.requesterId !== targetId);
     updateGMUI();
     sendToChat(`✅ Approved GM for ${targetId}`);
 }
 
 function rejectGM(targetId) {
-    // Server doesn't have reject, but we remove from local list
     pendingRequests = pendingRequests.filter(r => r.requesterId !== targetId);
     updateGMUI();
     sendToChat(`❌ Rejected GM request from ${targetId}`);
@@ -1022,202 +1053,10 @@ function sendToChat(message, type = 'public') {
 }
 
 function updateStatus(status) {
-    const statusMsg = status === 'connected' 
-        ? '🟢 Connected to Fate\'s Edge v1.3.0' 
+    const statusMsg = status === 'connected'
+        ? '🟢 Connected to Fate\'s Edge v2.0.0'
         : '🔴 Disconnected from Fate\'s Edge';
     log(statusMsg);
-}
-
-function updateVoiceUI(data) {
-    const status = data.enabled ? '🎤 Voice On' : '🎤 Voice Off';
-    log(`Voice: ${data.name} - ${status}`);
-}
-
-// ============================================================
-// API Commands for Roll20 Macros (Updated)
-// ============================================================
-
-function registerCommands() {
-    on('ready', () => {
-        if (CONFIG.autoConnect) {
-            connect();
-        }
-
-        on('chat:message', (msg) => {
-            if (msg.type !== 'api') return;
-            const args = msg.content.split(' ');
-            const command = args[0];
-
-            if (command === '!fates-edge') {
-                const subcommand = args[1] || '';
-                const param = args.slice(2).join(' ');
-
-                switch (subcommand) {
-                    case 'connect':
-                        connect();
-                        sendToChat('Connecting to Fate\'s Edge...');
-                        break;
-
-                    case 'disconnect':
-                        disconnect();
-                        sendToChat('Disconnected from Fate\'s Edge.');
-                        break;
-
-                    case 'status':
-                        const status = connected ? '🟢 Connected' : '🔴 Disconnected';
-                        sendToChat(`Fate's Edge status: ${status}`);
-                        sendToChat(`Region: ${currentRegion}`);
-                        sendToChat(`Deck: ${deckState.remaining} cards remaining`);
-                        sendToChat(`Modules: ${loadedModules.length} loaded`);
-                        const gm = getCurrentGM();
-                        sendToChat(`GM: ${gm ? gm.name : 'None'}`);
-                        sendToChat(`Your role: ${myRole}`);
-                        break;
-
-                    case 'send':
-                        if (param) {
-                            sendChatMessage(param);
-                            sendToChat(`📤 Sent: ${param}`);
-                        }
-                        break;
-
-                    case 'roll':
-                        if (param) {
-                            const rollResult = parseDiceExpression(param);
-                            sendRoll(param);
-                            sendToChat(`🎲 Rolled: ${param} = ${rollResult.total}`);
-                        }
-                        break;
-
-                    // Deck Commands
-                    case 'draw':
-                        const count = parseInt(param) || 1;
-                        sendDeckDraw(Math.min(count, 5));
-                        sendToChat(`🃏 Drawing ${Math.min(count, 5)} cards...`);
-                        break;
-
-                    case 'crown':
-                        sendCrownSpread(param || currentRegion);
-                        sendToChat(`👑 Crown Spread from ${param || currentRegion}...`);
-                        break;
-
-                    case 'shuffle':
-                        sendDeckShuffle();
-                        sendToChat('🔀 Shuffling deck...');
-                        break;
-
-                    case 'region':
-                        if (param) {
-                            sendRegionUpdate(param);
-                            sendToChat(`📍 Region set to: ${param}`);
-                        } else {
-                            sendToChat(`📍 Current region: ${currentRegion}`);
-                        }
-                        break;
-
-                    case 'modules':
-                        if (param === 'list') {
-                            sendModuleList();
-                            sendToChat('📦 Requesting module list...');
-                        }
-                        break;
-
-                    case 'sync':
-                        if (param === 'characters') {
-                            const chars = collectCharacters();
-                            syncCharacters(chars);
-                            sendToChat(`📤 Synced ${chars.length} characters`);
-                        } else if (param === 'scene') {
-                            syncScene({ name: Campaign.currentPage.name });
-                            sendToChat(`🎬 Synced scene: ${Campaign.currentPage.name}`);
-                        }
-                        break;
-
-                    // ============================================================
-                    // GM Subcommands (new in v1.3.0)
-                    // ============================================================
-                    case 'gm':
-                        const gmSub = args[2] || '';
-                        const gmParam = args.slice(3).join(' ');
-
-                        if (gmSub === 'request') {
-                            requestGM();
-                        } else if (gmSub === 'approve') {
-                            if (!gmParam) {
-                                sendToChat('Usage: !fates-edge gm approve <playerId>');
-                                break;
-                            }
-                            // Find client by name or ID
-                            const target = Object.values(clients).find(c => 
-                                c.id === gmParam || c.name.toLowerCase() === gmParam.toLowerCase()
-                            );
-                            if (!target) {
-                                sendToChat(`❌ Player "${gmParam}" not found. Use !fates-edge gm list to see clients.`);
-                                break;
-                            }
-                            approveGM(target.id);
-                        } else if (gmSub === 'reject') {
-                            if (!gmParam) {
-                                sendToChat('Usage: !fates-edge gm reject <playerId>');
-                                break;
-                            }
-                            const target = Object.values(clients).find(c => 
-                                c.id === gmParam || c.name.toLowerCase() === gmParam.toLowerCase()
-                            );
-                            if (!target) {
-                                sendToChat(`❌ Player "${gmParam}" not found.`);
-                                break;
-                            }
-                            rejectGM(target.id);
-                        } else if (gmSub === 'status') {
-                            const gm = getCurrentGM();
-                            const gmName = gm ? gm.name : 'None';
-                            const pending = getPendingRequests();
-                            sendToChat(`👑 **GM Status**\nCurrent GM: ${gmName}\nPending requests: ${pending.length}`);
-                            if (pending.length > 0) {
-                                const list = pending.map(r => r.requesterName).join(', ');
-                                sendToChat(`Requests from: ${list}`);
-                            }
-                        } else if (gmSub === 'list') {
-                            const clientList = Object.values(clients).map(c => {
-                                const isGM = c.id === gmId ? '👑 ' : '';
-                                const isSelf = c.id === clientId ? ' (you)' : '';
-                                return `${isGM}${c.name}${isSelf} — ${c.role}`;
-                            }).join('\n');
-                            sendToChat(`👥 **Clients**\n${clientList}`);
-                        } else {
-                            sendToChat(`
-GM Commands:
-!fates-edge gm request        - Request to become GM
-!fates-edge gm approve <name> - Approve a pending GM request (GM only)
-!fates-edge gm reject <name>  - Reject a pending GM request (GM only)
-!fates-edge gm status         - Show current GM and pending requests
-!fates-edge gm list           - List all clients with roles
-`);
-                        }
-                        break;
-
-                    default:
-                        sendToChat(`
-Fate's Edge v1.3.0 Commands:
-!fates-edge connect - Connect to server
-!fates-edge disconnect - Disconnect
-!fates-edge status - Show status
-!fates-edge send <message> - Send chat
-!fates-edge roll <dice> - Roll dice
-!fates-edge draw [N] - Draw N cards (1-5)
-!fates-edge crown [region] - Crown Spread
-!fates-edge shuffle - Shuffle deck
-!fates-edge region [name] - Set/get region
-!fates-edge modules list - List modules
-!fates-edge sync characters - Sync characters
-!fates-edge sync scene - Sync current scene
-!fates-edge gm ... - GM management (see !fates-edge gm help)
-`);
-                }
-            }
-        });
-    });
 }
 
 function collectCharacters() {
@@ -1306,7 +1145,10 @@ try {
             try {
                 const page = Campaign.currentPage;
                 if (page && page.name) {
-                    syncScene({ name: page.name });
+                    sendMessage({
+                        type: 'sync-state',
+                        state: { scene: { name: page.name } }
+                    });
                 }
             } catch (err) {
                 log(`Failed to sync scene: ${err.message}`, 'error');
@@ -1319,13 +1161,213 @@ try {
 }
 
 // ============================================================
+// API Commands for Roll20 Macros
+// ============================================================
+
+function registerCommands() {
+    on('ready', () => {
+        if (CONFIG.autoConnect) {
+            connect();
+        }
+
+        on('chat:message', (msg) => {
+            if (msg.type !== 'api') return;
+            const args = msg.content.split(' ');
+            const command = args[0];
+
+            if (command === '!fates-edge') {
+                const subcommand = args[1] || '';
+                const param = args.slice(2).join(' ');
+
+                switch (subcommand) {
+                    case 'connect':
+                        connect();
+                        sendToChat('Connecting to Fate\'s Edge...');
+                        break;
+
+                    case 'disconnect':
+                        disconnect();
+                        sendToChat('Disconnected from Fate\'s Edge.');
+                        break;
+
+                    case 'status':
+                        const status = connected ? '🟢 Connected' : '🔴 Disconnected';
+                        sendToChat(`Fate's Edge status: ${status}`);
+                        sendToChat(`Region: ${currentRegion}`);
+                        sendToChat(`Deck: ${deckState.remaining} cards remaining`);
+                        sendToChat(`Modules: ${loadedModules.length} loaded`);
+                        sendToChat(`Characters: ${vttCharacters.size} synced`);
+                        sendToChat(`Whiteboard: ${whiteboard.drawings?.length || 0} drawings, ${whiteboard.notes?.length || 0} notes, ${whiteboard.images?.length || 0} images`);
+                        if (gridCombat.enabled) {
+                            sendToChat(`⚔️ Grid combat: ${gridCombat.gridType}, ${gridCombat.tokens?.length || 0} tokens`);
+                        }
+                        const gm = getCurrentGM();
+                        sendToChat(`GM: ${gm ? gm.name : 'None'}`);
+                        sendToChat(`Your role: ${myRole}`);
+                        break;
+
+                    case 'send':
+                        if (param) {
+                            sendChatMessage(param);
+                            sendToChat(`📤 Sent: ${param}`);
+                        }
+                        break;
+
+                    case 'roll':
+                        if (param) {
+                            const rollResult = parseDiceExpression(param);
+                            sendRoll(param);
+                            sendToChat(`🎲 Rolled: ${param} = ${rollResult.total}`);
+                        }
+                        break;
+
+                    // Deck Commands
+                    case 'draw':
+                        const count = parseInt(param) || 1;
+                        sendDeckDraw(Math.min(count, 5));
+                        sendToChat(`🃏 Drawing ${Math.min(count, 5)} cards...`);
+                        break;
+
+                    case 'crown':
+                        sendCrownSpread(param || currentRegion);
+                        sendToChat(`👑 Crown Spread from ${param || currentRegion}...`);
+                        break;
+
+                    case 'shuffle':
+                        sendDeckShuffle();
+                        sendToChat('🔀 Shuffling deck...');
+                        break;
+
+                    case 'region':
+                        if (param) {
+                            sendRegionUpdate(param);
+                            sendToChat(`📍 Region set to: ${param}`);
+                        } else {
+                            sendToChat(`📍 Current region: ${currentRegion}`);
+                        }
+                        break;
+
+                    case 'modules':
+                        if (param === 'list') {
+                            sendModuleList();
+                            sendToChat('📦 Requesting module list...');
+                        }
+                        break;
+
+                    case 'sync':
+                        if (param === 'characters') {
+                            const chars = collectCharacters();
+                            syncCharacters(chars);
+                            sendToChat(`📤 Synced ${chars.length} characters`);
+                        } else if (param === 'scene') {
+                            try {
+                                const page = Campaign.currentPage;
+                                if (page && page.name) {
+                                    sendMessage({
+                                        type: 'sync-state',
+                                        state: { scene: { name: page.name } }
+                                    });
+                                    sendToChat(`🎬 Synced scene: ${page.name}`);
+                                }
+                            } catch (err) {
+                                sendToChat(`Failed to sync scene: ${err.message}`);
+                            }
+                        } else {
+                            sendSyncRequest(param || 'all');
+                            sendToChat('🔄 Sync requested');
+                        }
+                        break;
+
+                    // GM Commands
+                    case 'gm':
+                        const gmSub = args[2] || '';
+                        const gmParam = args.slice(3).join(' ');
+
+                        if (gmSub === 'request') {
+                            requestGM();
+                        } else if (gmSub === 'approve') {
+                            if (!gmParam) {
+                                sendToChat('Usage: !fates-edge gm approve <playerId>');
+                                break;
+                            }
+                            const target = Object.values(clients).find(c =>
+                                c.id === gmParam || c.name.toLowerCase() === gmParam.toLowerCase()
+                            );
+                            if (!target) {
+                                sendToChat(`❌ Player "${gmParam}" not found. Use !fates-edge gm list to see clients.`);
+                                break;
+                            }
+                            approveGM(target.id);
+                        } else if (gmSub === 'reject') {
+                            if (!gmParam) {
+                                sendToChat('Usage: !fates-edge gm reject <playerId>');
+                                break;
+                            }
+                            const target = Object.values(clients).find(c =>
+                                c.id === gmParam || c.name.toLowerCase() === gmParam.toLowerCase()
+                            );
+                            if (!target) {
+                                sendToChat(`❌ Player "${gmParam}" not found.`);
+                                break;
+                            }
+                            rejectGM(target.id);
+                        } else if (gmSub === 'status') {
+                            const gm = getCurrentGM();
+                            const gmName = gm ? gm.name : 'None';
+                            const pending = getPendingRequests();
+                            sendToChat(`👑 **GM Status**\nCurrent GM: ${gmName}\nPending requests: ${pending.length}`);
+                            if (pending.length > 0) {
+                                const list = pending.map(r => r.requesterName).join(', ');
+                                sendToChat(`Requests from: ${list}`);
+                            }
+                        } else if (gmSub === 'list') {
+                            const clientList = Object.values(clients).map(c => {
+                                const isGM = c.id === gmId ? '👑 ' : '';
+                                const isSelf = c.id === clientId ? ' (you)' : '';
+                                return `${isGM}${c.name}${isSelf} — ${c.role}`;
+                            }).join('\n');
+                            sendToChat(`👥 **Clients**\n${clientList}`);
+                        } else {
+                            sendToChat(`
+GM Commands:
+!fates-edge gm request        - Request to become GM
+!fates-edge gm approve <name> - Approve a pending GM request (GM only)
+!fates-edge gm reject <name>  - Reject a pending GM request (GM only)
+!fates-edge gm status         - Show current GM and pending requests
+!fates-edge gm list           - List all clients with roles
+`);
+                        }
+                        break;
+
+                    default:
+                        sendToChat(`
+Fate's Edge v2.0.0 Commands:
+!fates-edge connect - Connect to server
+!fates-edge disconnect - Disconnect
+!fates-edge status - Show status
+!fates-edge send <message> - Send chat
+!fates-edge roll <dice> - Roll dice
+!fates-edge draw [N] - Draw N cards (1-5)
+!fates-edge crown [region] - Crown Spread
+!fates-edge shuffle - Shuffle deck
+!fates-edge region [name] - Set/get region
+!fates-edge modules list - List modules
+!fates-edge sync [characters|scene|all] - Sync state
+!fates-edge gm ... - GM management (see !fates-edge gm help)
+`);
+                }
+            }
+        });
+    });
+}
+
+// ============================================================
 // Initialize
 // ============================================================
 
-// Register commands
 registerCommands();
 
-log('Fate\'s Edge Roll20 API module v1.3.0 loaded');
+log('Fate\'s Edge Roll20 API module v2.0.0 loaded');
 log(`Server: ${CONFIG.serverUrl}`);
 log(`Room: ${CONFIG.roomCode}`);
 log(`Region: ${currentRegion}`);

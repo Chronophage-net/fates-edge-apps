@@ -1,6 +1,7 @@
 /**
  * WebSocket Client for Fate's Edge VTT Server
- * Extended with GM election/promotion support + Ban/Kick
+ * v3 – Full compatibility with plain WebSocket handshake,
+ * GM election, Ban/Kick, and all new events.
  */
 
 const WebSocket = require('ws');
@@ -21,12 +22,22 @@ class VTTClient extends EventEmitter {
         this.roomCode = config.roomCode;
         this.pendingMessages = [];
 
-        // GM state per room (only one room per client instance)
-        this.clients = new Map();        // clientId -> { id, name, role, ... }
-        this.gmId = null;               // clientId of current GM
-        this.pendingRequests = [];       // { requesterId, requesterName }
+        // GM state
+        this.clients = new Map();
+        this.gmId = null;
+        this.pendingRequests = [];
         this.myRole = 'player';
+
+        // Deck, modules, region, etc.
+        this.deck = { cards: [], history: [] };
+        this.modules = [];
+        this.defaultRegion = 'Acasia';
+        this.whiteboard = {};
+        this.characters = {};
+        this.gridCombat = {};
     }
+
+    // ─── Connection ──────────────────────────────────────────────
 
     connect(roomCode = this.roomCode) {
         if (this.connected) {
@@ -48,7 +59,7 @@ class VTTClient extends EventEmitter {
         logger.info(`🏠 Room: ${this.roomCode}`);
 
         try {
-            const wsUrl = this.config.serverUrl;
+            const wsUrl = `${this.config.serverUrl}?room=${encodeURIComponent(this.roomCode)}`;
             this.ws = new WebSocket(wsUrl);
 
             this.ws.on('open', () => this._onOpen());
@@ -69,20 +80,19 @@ class VTTClient extends EventEmitter {
         if (this.ws) {
             try {
                 this.ws.close(1000, 'Disconnected by user');
-            } catch (err) {
-                // Ignore
-            }
+            } catch (err) { /* ignore */ }
             this.ws = null;
         }
         this.connected = false;
         this.clientId = null;
         this.emit('disconnected');
-        // Reset GM state
         this.clients.clear();
         this.gmId = null;
         this.pendingRequests = [];
         this.myRole = 'player';
     }
+
+    // ─── Send messages ────────────────────────────────────────────
 
     send(type, data = {}) {
         const message = { type, ...data };
@@ -107,30 +117,21 @@ class VTTClient extends EventEmitter {
         }
     }
 
+    // ─── WebSocket event handlers ──────────────────────────────
+
     _onOpen() {
         logger.info('✅ WebSocket connected');
         this.connected = true;
         this.reconnectAttempts = 0;
         this.emit('connected');
 
-        // Send auth if API key provided
-        if (this.config.apiKey) {
-            this._sendMessage({
-                type: 'auth',
-                apiKey: this.config.apiKey
-            });
-        }
-
-        // Join room
+        // Send handshake (plain WebSocket protocol)
+        const playerName = this.config.botName || 'Discord Bot';
         this._sendMessage({
-            type: 'join-room',
-            roomCode: this.roomCode,
-            clientData: {
-                name: 'Discord Bot',
-                role: 'Bot',
-                platform: 'discord',
-                version: '1.0.0'
-            }
+            type: 'handshake',
+            clientName: playerName,
+            role: 'player',
+            password: this.config.password || ''
         });
 
         // Send any pending messages
@@ -157,33 +158,98 @@ class VTTClient extends EventEmitter {
         }
     }
 
+    _onError(error) {
+        logger.error(`❌ WebSocket error: ${error.message}`);
+        this.emit('error', error);
+    }
+
+    _onClose(code, reason) {
+        logger.info(`🔌 WebSocket closed (${code} - ${reason || 'No reason'})`);
+        this._cleanup();
+        this.connected = false;
+        this.clientId = null;
+        this.emit('disconnected');
+
+        if (code !== 1000) {
+            this._scheduleReconnect();
+        }
+    }
+
+    // ─── Message dispatcher ──────────────────────────────────────
+
     _handleMessage(message) {
         switch (message.type) {
-            case 'auth-success':
-                logger.info('✅ Authentication successful');
-                this.emit('auth-success');
+            case 'connected':
+                // Server sends connected message with clientId? Actually it sends separate.
+                // We'll capture clientId from handshake_ack.
                 break;
 
-            case 'auth-error':
-                logger.error(`❌ Authentication failed: ${message.message}`);
-                this.emit('auth-error', message.message);
-                break;
-
-            case 'room-state':
+            case 'handshake_ack':
                 this.clientId = message.clientId;
-                this.emit('room-state', message);
-                logger.info(`📦 Room state received. Client ID: ${this.clientId}`);
-                if (message.clients) {
-                    this._updateClients(message.clients);
-                    const names = message.clients.map(c => c.name || c.data?.name || 'Unknown').join(', ');
-                    logger.info(`👥 Clients in room: ${names}`);
+                this.myRole = message.clientRole || 'player';
+                logger.info(`✅ Handshake successful. Client ID: ${this.clientId}, Role: ${this.myRole}`);
+                this.emit('handshake_ack', message);
+                if (message.activeClients) {
+                    this._updateClients(message.activeClients);
                 }
                 break;
 
-            case 'state-updated':
-                this.emit('state-updated', message);
+            case 'room-state':
+                this.emit('room-state', message);
+                if (message.clients) this._updateClients(message.clients);
+                if (message.characters) {
+                    this.characters = {};
+                    message.characters.forEach(c => { if (c.name) this.characters[c.name] = c; });
+                }
+                if (message.deckRemaining !== undefined) {
+                    this.deck.cards = Array(message.deckRemaining).fill(null); // placeholder
+                }
+                if (message.whiteboard) {
+                    this.whiteboard = message.whiteboard;
+                    if (this.whiteboard.gridCombat) {
+                        this.gridCombat = this.whiteboard.gridCombat;
+                    }
+                }
+                if (message.region) this.defaultRegion = message.region;
+                this.emit('roomState', message);
                 break;
 
+            case 'presence':
+                if (message.clients) this._updateClients(message.clients);
+                this.emit('presence', message);
+                break;
+
+            case 'gm_vote_request':
+                if (!this.pendingRequests.find(r => r.requesterId === message.requesterId)) {
+                    this.pendingRequests.push({
+                        requesterId: message.requesterId,
+                        requesterName: message.requesterName
+                    });
+                }
+                this.emit('gmVoteRequest', message);
+                break;
+
+            case 'gm_role_update':
+                if (message.clientId === this.clientId) {
+                    this.myRole = message.role;
+                }
+                const client = this.clients.get(message.clientId);
+                if (client) client.role = message.role;
+                if (message.role === 'gm') this.gmId = message.clientId;
+                else if (this.gmId === message.clientId) this._updateGmFromClients();
+                this.emit('gmRoleUpdate', message);
+                break;
+
+            case 'server_announcement':
+                this.emit('serverAnnouncement', message);
+                break;
+
+            case 'kicked':
+                logger.warn(`🚫 Bot was kicked: ${message.reason || 'No reason'}`);
+                this.emit('kicked', message);
+                break;
+
+            // ─── Chat & Rolls ──────────────────────────────────────
             case 'chat-message':
                 this.emit('chat-message', message);
                 break;
@@ -192,98 +258,128 @@ class VTTClient extends EventEmitter {
                 this.emit('roll-result', message);
                 break;
 
-            case 'client-joined':
-                this.emit('client-joined', message);
-                const name = message.data?.name || 'Unknown';
-                logger.info(`👤 ${name} joined the room`);
-                // Update clients if the server provides the full list
-                if (message.clients) {
-                    this._updateClients(message.clients);
+            // ─── Deck ──────────────────────────────────────────────
+            case 'deck-drawn':
+                this.deck.cards = message.cards || [];
+                this.deck.remaining = message.remaining || 0;
+                this.emit('deckDrawn', message);
+                break;
+
+            case 'deck-shuffled':
+                this.deck.remaining = message.remaining || 54;
+                this.emit('deckShuffled', message);
+                break;
+
+            case 'deck-history':
+                this.deck.history = message.history || [];
+                this.emit('deckHistory', message);
+                break;
+
+            case 'deck-history-cleared':
+                this.deck.history = [];
+                this.emit('deckHistoryCleared', message);
+                break;
+
+            case 'crown-spread':
+                this.emit('crownSpread', message);
+                break;
+
+            // ─── Modules ────────────────────────────────────────────
+            case 'module-list':
+                this.modules = message.modules || [];
+                this.emit('moduleList', message);
+                break;
+
+            case 'module-push':
+                this.emit('modulePush', message);
+                break;
+
+            case 'module-cleanup':
+                this.emit('moduleCleanup', message);
+                break;
+
+            // ─── Region ─────────────────────────────────────────────
+            case 'region-updated':
+                if (message.region) {
+                    this.defaultRegion = message.region;
                 }
+                this.emit('regionUpdated', message);
                 break;
 
-            case 'client-left':
-                this.emit('client-left', message);
-                logger.info(`👤 Client left: ${message.clientId}`);
-                // Remove client from local state
-                this.clients.delete(message.clientId);
-                if (this.gmId === message.clientId) this.gmId = null;
-                // Possibly re-evaluate GM from remaining clients
-                this._updateGmFromClients();
+            // ─── Whiteboard ─────────────────────────────────────────
+            case 'whiteboard-update':
+                this.whiteboard = message.whiteboard || {};
+                if (this.whiteboard.gridCombat) {
+                    this.gridCombat = this.whiteboard.gridCombat;
+                }
+                this.emit('whiteboardUpdate', message);
                 break;
 
-            case 'vtt-state-updated':
-                this.emit('vtt-state-updated', message);
+            // ─── Sync ──────────────────────────────────────────────
+            case 'sync-state':
+                const state = message.state || {};
+                if (state.characters) {
+                    this.characters = {};
+                    state.characters.forEach(c => { if (c.name) this.characters[c.name] = c; });
+                }
+                if (state.whiteboard) {
+                    this.whiteboard = state.whiteboard;
+                    if (this.whiteboard.gridCombat) {
+                        this.gridCombat = this.whiteboard.gridCombat;
+                    }
+                }
+                this.emit('syncState', message);
                 break;
 
-            case 'vtt-characters-updated':
-                this.emit('vtt-characters-updated', message);
+            case 'state-updated':
+                if (message.characters) {
+                    this.characters = {};
+                    message.characters.forEach(c => { if (c.name) this.characters[c.name] = c; });
+                }
+                this.emit('stateUpdated', message);
                 break;
 
-            case 'vtt-timers-updated':
-                this.emit('vtt-timers-updated', message);
+            // ─── Character updates ──────────────────────────────────
+            case 'character-update':
+                if (message.name && message.field !== undefined) {
+                    if (!this.characters[message.name]) this.characters[message.name] = { name: message.name };
+                    this.characters[message.name][message.field] = message.value;
+                }
+                this.emit('characterUpdate', message);
+                break;
+
+            case 'character-update-bulk':
+                if (message.updates) {
+                    Object.entries(message.updates).forEach(([name, data]) => {
+                        if (!this.characters[name]) this.characters[name] = { name };
+                        Object.assign(this.characters[name], data);
+                    });
+                }
+                this.emit('characterUpdateBulk', message);
+                break;
+
+            // ─── Client events ─────────────────────────────────────
+            case 'player-joined':
+                if (message.clients) this._updateClients(message.clients);
+                this.emit('playerJoined', message);
+                break;
+
+            case 'player-left':
+                if (message.clientId) {
+                    this.clients.delete(message.clientId);
+                    if (this.gmId === message.clientId) this._updateGmFromClients();
+                }
+                if (message.clients) this._updateClients(message.clients);
+                this.emit('playerLeft', message);
                 break;
 
             case 'room-closed':
-                this.emit('room-closed', message);
-                logger.warn('⚠️ Room closed by server');
+                this.emit('roomClosed', message);
                 this.disconnect();
                 break;
 
-            // ============================================================
-            // GM ELECTION & PROMOTION EVENTS
-            // ============================================================
-            case 'presence':
-                if (message.clients) {
-                    this._updateClients(message.clients);
-                }
-                this.emit('presence', message);
-                break;
-
-            case 'gm_vote_request':
-                // Store pending request (if not already)
-                const { requesterId, requesterName, currentGmId, currentGmName } = message;
-                if (!this.pendingRequests.find(r => r.requesterId === requesterId)) {
-                    this.pendingRequests.push({ requesterId, requesterName });
-                }
-                this.emit('gmVoteRequest', message);
-                break;
-
-            case 'gm_role_update':
-                // Update our local role if we are the target
-                if (message.clientId === this.clientId) {
-                    this.myRole = message.role;
-                }
-                // Also update the client in our map
-                const client = this.clients.get(message.clientId);
-                if (client) {
-                    client.role = message.role;
-                }
-                // If it's the GM, update gmId
-                if (message.role === 'gm') {
-                    this.gmId = message.clientId;
-                } else if (this.gmId === message.clientId) {
-                    // If the GM was demoted, find new GM from remaining clients
-                    this._updateGmFromClients();
-                }
-                this.emit('gmRoleUpdate', message);
-                break;
-
-            case 'server_announcement':
-                this.emit('serverAnnouncement', message);
-                break;
-
-            // ============================================================
-            // BAN / KICK EVENTS
-            // ============================================================
-            case 'kicked':
-                logger.warn(`🚫 Bot was kicked: ${message.reason || 'No reason'}`);
-                this.emit('kicked', message);
-                // Optionally disconnect – the server will close the connection.
-                break;
-
             case 'pong':
-                // Heartbeat response - ignore
+                // Heartbeat response
                 break;
 
             default:
@@ -292,9 +388,7 @@ class VTTClient extends EventEmitter {
         }
     }
 
-    // ============================================================
-    // Internal helper methods
-    // ============================================================
+    // ─── Helpers ──────────────────────────────────────────────────
 
     _updateClients(clientsArray) {
         this.clients.clear();
@@ -307,42 +401,71 @@ class VTTClient extends EventEmitter {
             });
             if (c.role === 'gm') this.gmId = c.id;
         });
-        // If no GM found, set gmId to null
-        if (!clientsArray.some(c => c.role === 'gm')) {
-            this.gmId = null;
-        }
-        // Update myRole if my clientId is known
+        if (!clientsArray.some(c => c.role === 'gm')) this.gmId = null;
         if (this.clientId && this.clients.has(this.clientId)) {
             this.myRole = this.clients.get(this.clientId).role;
         }
     }
 
     _updateGmFromClients() {
-        let newGm = null;
         for (const [id, client] of this.clients) {
             if (client.role === 'gm') {
-                newGm = id;
-                break;
+                this.gmId = id;
+                return;
             }
         }
-        this.gmId = newGm;
+        this.gmId = null;
     }
 
-    // ============================================================
-    // Public API Methods – GM actions
-    // ============================================================
+    _cleanup() {
+        if (this.heartbeatInterval) {
+            clearInterval(this.heartbeatInterval);
+            this.heartbeatInterval = null;
+        }
+        if (this.reconnectTimer) {
+            clearTimeout(this.reconnectTimer);
+            this.reconnectTimer = null;
+        }
+    }
 
-    /**
-     * Request to become Game Master (send to server)
-     */
+    _scheduleReconnect() {
+        if (this.reconnectAttempts >= this.maxReconnectAttempts) {
+            logger.error('❌ Max reconnect attempts reached.');
+            this.emit('reconnectFailed');
+            return;
+        }
+        const delay = Math.min(1000 * Math.pow(2, this.reconnectAttempts), 30000);
+        this.reconnectAttempts++;
+        logger.info(`🔄 Reconnecting in ${delay}ms (attempt ${this.reconnectAttempts})`);
+        this.reconnectTimer = setTimeout(() => {
+            this.connect();
+        }, delay);
+    }
+
+    // ─── Public API ──────────────────────────────────────────────
+
+    getApiBaseUrl() {
+        const wsUrl = this.config.serverUrl;
+        const httpUrl = wsUrl.replace(/^ws/, 'http');
+        return httpUrl.replace(/\/$/, '') + '/api';
+    }
+
+    getCurrentGM() {
+        return this.gmId ? this.clients.get(this.gmId) : null;
+    }
+
+    getPendingGMRequests() {
+        return this.pendingRequests;
+    }
+
+    clearPendingGMRequests() {
+        this.pendingRequests = [];
+    }
+
     requestGM() {
         this.send('request_gm');
     }
 
-    /**
-     * Approve a GM request (only valid if current GM)
-     * @param {string} targetId - clientId of the requester
-     */
     approveGM(targetId) {
         if (!targetId) {
             logger.warn('approveGM called without targetId');
@@ -351,36 +474,8 @@ class VTTClient extends EventEmitter {
         this.send('approve_gm', { targetId });
     }
 
-    /**
-     * Get current GM client object, or null
-     */
-    getCurrentGM() {
-        return this.gmId ? this.clients.get(this.gmId) : null;
-    }
+    // ─── Ban / Kick ──────────────────────────────────────────────
 
-    /**
-     * Get list of pending GM requests
-     */
-    getPendingGMRequests() {
-        return this.pendingRequests;
-    }
-
-    /**
-     * Clear pending requests (e.g., after approval/rejection)
-     */
-    clearPendingGMRequests() {
-        this.pendingRequests = [];
-    }
-
-    // ============================================================
-    // NEW: Ban / Kick Methods
-    // ============================================================
-
-    /**
-     * Find a client ID by name (case‑insensitive)
-     * @param {string} name - player name
-     * @returns {string|null} clientId or null if not found
-     */
     getClientIdByName(name) {
         for (const [id, client] of this.clients) {
             if (client.name && client.name.toLowerCase() === name.toLowerCase()) {
@@ -390,42 +485,22 @@ class VTTClient extends EventEmitter {
         return null;
     }
 
-    /**
-     * Kick a client (requires GM role on the server)
-     * @param {string} targetId - client ID
-     * @param {string} [reason] - optional reason
-     */
-    kickClient(targetId, reason = 'Kicked by Discord admin') {
+    kickClient(targetId, reason = 'Kicked by admin') {
         this.send('kick_client', { targetId, reason });
     }
 
-    /**
-     * Ban a client (requires GM role on the server)
-     * @param {string} targetId - client ID
-     * @param {string} [reason] - optional reason
-     */
-    banClient(targetId, reason = 'Banned by Discord admin') {
+    banClient(targetId, reason = 'Banned by admin') {
         this.send('ban_client', { targetId, reason });
     }
 
-    /**
-     * Unban a client
-     * @param {string} targetId - client ID to unban
-     */
     unbanClient(targetId) {
         this.send('unban_client', { targetId });
     }
 
-    // ============================================================
-    // Existing public API methods
-    // ============================================================
+    // ─── Chat & Rolls ────────────────────────────────────────────
 
     sendChatMessage(text, sender = 'Discord Bot') {
-        this.send('chat-message', {
-            text,
-            sender,
-            timestamp: Date.now()
-        });
+        this.send('chat-message', { text, sender, timestamp: Date.now() });
     }
 
     sendRoll(expr, reason = null, sender = 'Discord Bot') {
@@ -442,17 +517,66 @@ class VTTClient extends EventEmitter {
         return result;
     }
 
-    syncCharacters(characters) {
-        this.send('vtt-characters-updated', { characters });
+    // ─── Deck ─────────────────────────────────────────────────────
+
+    drawCards(count = 1, region = null) {
+        this.send('deck-draw', { count, region: region || this.defaultRegion });
     }
 
-    syncTimers(timers) {
-        this.send('vtt-timers-updated', { timers });
+    shuffleDeck() {
+        this.send('deck-shuffle');
     }
+
+    crownSpread(region = null) {
+        this.send('crown-spread', { region: region || this.defaultRegion });
+    }
+
+    getDeckHistory(limit = 50) {
+        this.send('deck-history', { limit });
+    }
+
+    clearDeckHistory() {
+        this.send('deck-history-clear');
+    }
+
+    // ─── Modules ─────────────────────────────────────────────────
+
+    listModules() {
+        this.send('module-list');
+    }
+
+    pushModule(moduleId) {
+        this.send('module-push-request', { moduleId });
+    }
+
+    cleanupModule(moduleId) {
+        this.send('module-cleanup-request', { moduleId });
+    }
+
+    // ─── Region ──────────────────────────────────────────────────
+
+    setRegion(region) {
+        this.defaultRegion = region;
+        this.send('set-region', { region });
+    }
+
+    // ─── Sync ─────────────────────────────────────────────────────
 
     syncState(state) {
         this.send('sync-state', { state });
     }
+
+    syncCharacters(characters) {
+        this.send('state-updated', { characters });
+    }
+
+    // ─── Whiteboard ──────────────────────────────────────────────
+
+    getWhiteboard() {
+        this.send('sync-request', { entity: 'whiteboard' });
+    }
+
+    // ─── Dice parser ─────────────────────────────────────────────
 
     _parseDice(expr) {
         const parts = expr.match(/^(\d+)d(\d+)([+-]\d+)?$/i);
@@ -460,11 +584,9 @@ class VTTClient extends EventEmitter {
             const num = parseInt(expr) || 0;
             return { total: num, rolls: [num] };
         }
-
         const count = parseInt(parts[1]);
         const sides = parseInt(parts[2]);
         const modifier = parseInt(parts[3]) || 0;
-
         const rolls = [];
         let total = 0;
         for (let i = 0; i < count; i++) {
@@ -473,7 +595,6 @@ class VTTClient extends EventEmitter {
             total += roll;
         }
         total += modifier;
-
         return { total, rolls };
     }
 }

@@ -1,47 +1,89 @@
 <!drac2>
 import requests
 import json
+import os
 
-API_BASE = "https://your-fates-edge-server.com/api"
-API_KEY = "YOUR_API_KEY"
+# ============================================================
+# CONFIGURATION – Set these or use environment variables
+# ============================================================
+
+API_BASE = os.getenv("FATES_EDGE_API_BASE", "https://your-fates-edge-server.com/api")
+API_KEY = os.getenv("FATES_EDGE_API_KEY", "YOUR_API_KEY")
+# Room code can be overridden per server; we'll use a global for simplicity
+DEFAULT_ROOM = os.getenv("FATES_EDGE_ROOM", "YOUR_ROOM_CODE")
+
+# ============================================================
+# HELPERS
+# ============================================================
 
 def make_request(endpoint, method="GET", data=None):
     try:
         url = f"{API_BASE}{endpoint}"
-        headers = {"x-api-key": API_KEY}
+        headers = {"x-api-key": API_KEY, "Content-Type": "application/json"}
         if method == "GET":
             response = requests.get(url, headers=headers)
         else:
             response = requests.post(url, json=data, headers=headers)
+        response.raise_for_status()
         return response.json()
     except Exception as e:
         return {"error": str(e)}
 
 def get_room_code():
-    # In a real bot, this would be obtained from the active campaign/room mapping.
-    # For this example, we'll assume a fixed room code, replace with your logic.
-    return "YOUR_ROOM_CODE"
+    # In a real bot, you could store room per server using a dict or database.
+    # For now, we'll use a global constant.
+    return DEFAULT_ROOM
 
 def get_client_id_by_name(name):
     room_code = get_room_code()
     clients = make_request(f"/rooms/{room_code}/clients").get("clients", [])
     for c in clients:
-        if c["name"].lower() == name.lower():
+        if c.get("name", "").lower() == name.lower():
             return c["id"]
     return None
 
+def format_character(c):
+    name = c.get("name", "Unknown")
+    harm = c.get("harm", 0)
+    fatigue = c.get("fatigue", 0)
+    boons = c.get("boons", 0)
+    tier = c.get("tier", 1)
+    heritage = c.get("heritage", "")
+    background = c.get("background", "")
+    patron = c.get("patron", "")
+    attrs = c.get("attributes", {})
+    skills = c.get("skills", {})
+    output = f"**{name}**"
+    if heritage: output += f" ({heritage})"
+    output += f"\n  ❤️ {harm}  ⚡ {fatigue}  🪙 {boons}  Tier {tier}"
+    if attrs:
+        attr_str = ", ".join(f"{k}:{v}" for k,v in attrs.items())
+        output += f"\n  **Attributes:** {attr_str}"
+    if skills:
+        skill_str = ", ".join(f"{k}:{v}" for k,v in skills.items())
+        output += f"\n  **Skills:** {skill_str}"
+    if background: output += f"\n  **Background:** {background}"
+    if patron: output += f"\n  **Patron:** {patron}"
+    return output
+
+# ============================================================
+# COMMAND PARSING
+# ============================================================
+
 args = &ARGS&
 cmd = args[0].lower() if args else "help"
+room = get_room_code()
+
+# ============================================================
+# DECK COMMANDS
+# ============================================================
 
 if cmd == "draw":
     count = min(int(args[1]) if len(args) > 1 else 1, 5)
     region = args[2] if len(args) > 2 else "Acasia"
-    room_code = get_room_code()
-    result = make_request(f"/rooms/{room_code}/deck/draw", "POST", {"count": count, "region": region})
-    
+    result = make_request(f"/rooms/{room}/deck/draw", "POST", {"count": count, "region": region})
     if result.get("error"):
         return f"❌ {result['error']}"
-    
     cards = result.get("cards", [])
     synthesis = result.get("synthesis", "")
     card_list = "\n".join([f"• {c['rankName']} of {c['suitName']}" for c in cards])
@@ -49,44 +91,139 @@ if cmd == "draw":
 
 elif cmd == "crown":
     region = args[1] if len(args) > 1 else "Acasia"
-    room_code = get_room_code()
-    result = make_request(f"/rooms/{room_code}/deck/crown", "POST", {"region": region})
+    result = make_request(f"/rooms/{room}/deck/crown", "POST", {"region": region})
     if result.get("error"):
         return f"❌ {result['error']}"
-    
     positions = result.get("result", {}).get("positions", [])
     output = "👑 **Crown Spread**\n"
     for pos in positions:
         output += f"{pos['icon']} **{pos['label']}**: {pos['meaning']}\n"
     return output
 
+elif cmd == "shuffle":
+    result = make_request(f"/rooms/{room}/deck/shuffle", "POST")
+    if result.get("error"):
+        return f"❌ {result['error']}"
+    return "🔀 Deck shuffled."
+
+# ============================================================
+# CHARACTER COMMANDS
+# ============================================================
+
+elif cmd == "chars":
+    if len(args) < 2:
+        return "❌ Usage: `!fe chars list|view <name>|update <name> <field> <value>`"
+    sub = args[1].lower()
+    if sub == "list":
+        result = make_request(f"/rooms/{room}/characters")
+        if result.get("error"):
+            return f"❌ {result['error']}"
+        chars = result.get("characters", [])
+        if not chars:
+            return "📭 No characters in the room."
+        output = "👥 **Characters**\n"
+        for c in chars:
+            name = c.get("name", "Unknown")
+            harm = c.get("harm", 0)
+            fatigue = c.get("fatigue", 0)
+            boons = c.get("boons", 0)
+            output += f"  {name} (❤️{harm} ⚡{fatigue} 🪙{boons})\n"
+        return output
+    elif sub == "view":
+        if len(args) < 3:
+            return "❌ Usage: `!fe chars view <name>`"
+        name = " ".join(args[2:])
+        result = make_request(f"/rooms/{room}/characters/{name}")
+        if result.get("error"):
+            return f"❌ {result['error']}"
+        return format_character(result)
+    elif sub == "update":
+        if len(args) < 5:
+            return "❌ Usage: `!fe chars update <name> <field> <value>`"
+        name = args[2]
+        field = args[3]
+        value = " ".join(args[4:])  # allow spaces
+        # Convert numeric if possible
+        try:
+            value = int(value)
+        except:
+            try:
+                value = float(value)
+            except:
+                pass  # keep as string
+        updates = {field: value}
+        payload = {"updates": {name: updates}}
+        result = make_request(f"/rooms/{room}/characters/update", "POST", payload)
+        if result.get("error"):
+            return f"❌ {result['error']}"
+        return f"✅ **{name}** `{field}` updated to `{value}`."
+
+# ============================================================
+# GRID COMBAT & WHITEBOARD
+# ============================================================
+
+elif cmd == "grid":
+    # Show grid combat status (fetches whiteboard)
+    wb = make_request(f"/rooms/{room}/whiteboard")
+    if wb.get("error"):
+        return f"❌ {wb['error']}"
+    gc = wb.get("gridCombat", {})
+    enabled = gc.get("enabled", False)
+    grid_type = gc.get("gridType", "square")
+    cell_size = gc.get("cellSize", 40)
+    tokens = gc.get("tokens", [])
+    output = "⚔️ **Grid Combat Status**\n"
+    output += f"  Enabled: {'✅' if enabled else '❌'}\n"
+    if enabled:
+        output += f"  Grid Type: {grid_type}\n"
+        output += f"  Cell Size: {cell_size}\n"
+        output += f"  Tokens: {len(tokens)}\n"
+        if tokens:
+            output += "    " + ", ".join([f"{t.get('name', '?')} ({t.get('x',0)},{t.get('y',0)})" for t in tokens[:5]]) + ("..." if len(tokens)>5 else "")
+    return output
+
+elif cmd == "wb":
+    # Whiteboard summary
+    wb = make_request(f"/rooms/{room}/whiteboard")
+    if wb.get("error"):
+        return f"❌ {wb['error']}"
+    drawings = len(wb.get("drawings", []))
+    notes = len(wb.get("notes", []))
+    images = len(wb.get("images", []))
+    output = "📋 **Whiteboard Summary**\n"
+    output += f"  Drawings: {drawings}\n"
+    output += f"  Notes: {notes}\n"
+    output += f"  Images: {images}\n"
+    gc = wb.get("gridCombat", {})
+    if gc.get("enabled"):
+        output += f"  Grid Combat: Active ({gc.get('gridType','square')}, {len(gc.get('tokens',[]))} tokens)"
+    return output
+
+# ============================================================
+# GM & PLAYER MANAGEMENT
+# ============================================================
+
 elif cmd == "gm":
     if len(args) < 2:
-        return "❌ Usage: `!fe gm request|status|approve <player>`"
-    
-    subcmd = args[1].lower()
-    if subcmd == "request":
-        # GM request via API would need an endpoint (we didn't add one)
-        # Use existing WebSocket-based method? Not possible. We'll skip for now.
-        return "❌ GM request via REST API is not implemented. Use WebSocket bot."
-    elif subcmd == "status":
-        # We'd need a GM status endpoint, not yet. Use client list to find GM.
-        room_code = get_room_code()
-        clients = make_request(f"/rooms/{room_code}/clients").get("clients", [])
+        return "❌ Usage: `!fe gm status|request|approve <player>`"
+    sub = args[1].lower()
+    if sub == "status":
+        clients = make_request(f"/rooms/{room}/clients").get("clients", [])
         gm = next((c for c in clients if c.get("role") == "gm"), None)
         if gm:
-            return f"👑 **GM**: {gm['name']}\n👥 **Players**: {len(clients)-1}"
+            return f"👑 **GM**: {gm['name']}\n👥 **Players**: {len(clients)}"
         else:
             return "👑 No GM currently."
-    elif subcmd == "approve":
-        # Also not implemented via REST.
+    elif sub == "request":
+        # GM request via REST is not implemented; we could forward to WebSocket but not here.
+        return "❌ GM request via REST API is not implemented. Use WebSocket bot."
+    elif sub == "approve":
         return "❌ GM approve via REST API is not implemented."
     else:
         return "❌ Unknown GM subcommand."
 
 elif cmd == "players":
-    room_code = get_room_code()
-    clients = make_request(f"/rooms/{room_code}/clients").get("clients", [])
+    clients = make_request(f"/rooms/{room}/clients").get("clients", [])
     if not clients:
         return "📭 No players in the room."
     output = "👥 **Players in Room**\n"
@@ -99,14 +236,12 @@ elif cmd == "kick":
         return "❌ Usage: `!fe kick <player name or ID> [reason]`"
     target = args[1]
     reason = " ".join(args[2:]) if len(args) > 2 else "Kicked by Avrae admin"
-    room_code = get_room_code()
     client_id = target
-    # If not an ID-like string, resolve by name
     if not (target.startswith("ws-") or len(target) == 20):
         client_id = get_client_id_by_name(target)
         if not client_id:
             return f"❌ Player '{target}' not found."
-    result = make_request(f"/rooms/{room_code}/clients/{client_id}/kick", "POST", {"reason": reason})
+    result = make_request(f"/rooms/{room}/clients/{client_id}/kick", "POST", {"reason": reason})
     if result.get("error"):
         return f"❌ {result['error']}"
     return f"👢 Kicked {client_id} ({target})."
@@ -116,13 +251,12 @@ elif cmd == "ban":
         return "❌ Usage: `!fe ban <player name or ID> [reason]`"
     target = args[1]
     reason = " ".join(args[2:]) if len(args) > 2 else "Banned by Avrae admin"
-    room_code = get_room_code()
     client_id = target
     if not (target.startswith("ws-") or len(target) == 20):
         client_id = get_client_id_by_name(target)
         if not client_id:
             return f"❌ Player '{target}' not found."
-    result = make_request(f"/rooms/{room_code}/clients/{client_id}/ban", "POST", {"reason": reason})
+    result = make_request(f"/rooms/{room}/clients/{client_id}/ban", "POST", {"reason": reason})
     if result.get("error"):
         return f"❌ {result['error']}"
     return f"🚫 Banned {client_id} ({target})."
@@ -131,16 +265,25 @@ elif cmd == "unban":
     if len(args) < 2:
         return "❌ Usage: `!fe unban <client ID>`"
     target_id = args[1]
-    room_code = get_room_code()
-    result = make_request(f"/rooms/{room_code}/clients/{target_id}/unban", "POST")
+    result = make_request(f"/rooms/{room}/clients/{target_id}/unban", "POST")
     if result.get("error"):
         return f"❌ {result['error']}"
     return f"✅ Unbanned {target_id}."
 
+# ============================================================
+# HELP
+# ============================================================
+
 else:
-    return """**Fate's Edge VTT Commands**
+    return """**Fate's Edge VTT Commands** (v2.0)
 `!fe draw [count] [region]` - Draw cards (1-5)
 `!fe crown [region]` - Crown spread reading
+`!fe shuffle` - Shuffle the deck
+`!fe chars list` - List characters in room
+`!fe chars view <name>` - View character details
+`!fe chars update <name> <field> <value>` - Update a character stat
+`!fe grid` - Show grid combat status
+`!fe wb` - Show whiteboard summary
 `!fe gm status` - Show current GM
 `!fe players` - List players in the room
 `!fe kick <player> [reason]` - Kick a player

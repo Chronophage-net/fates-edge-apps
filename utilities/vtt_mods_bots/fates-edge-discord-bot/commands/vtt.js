@@ -1,6 +1,6 @@
 /**
- * VTT Commands - Connect, status, disconnect
- * Updated for v1.2.0 with deck, module, region, and GM support
+ * VTT Commands – Connect, status, disconnect, sync, grid, characters
+ * v2.0 – Full integration with server REST API and new features
  */
 
 const { SlashCommandBuilder, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
@@ -8,7 +8,7 @@ const { SlashCommandBuilder, EmbedBuilder, ActionRowBuilder, ButtonBuilder, Butt
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('vtt')
-        .setDescription('Manage VTT connection')
+        .setDescription('Manage VTT connection and view state')
         .addSubcommand(subcommand =>
             subcommand
                 .setName('connect')
@@ -32,12 +32,12 @@ module.exports = {
         .addSubcommand(subcommand =>
             subcommand
                 .setName('status')
-                .setDescription('Show VTT connection status')
+                .setDescription('Show VTT connection status with details')
         )
         .addSubcommand(subcommand =>
             subcommand
                 .setName('info')
-                .setDescription('Show room information')
+                .setDescription('Show room information (clients, deck, etc.)')
         )
         .addSubcommand(subcommand =>
             subcommand
@@ -54,7 +54,51 @@ module.exports = {
                 .setName('modules')
                 .setDescription('List loaded modules')
         )
-        // GM subcommand group
+        .addSubcommand(subcommand =>
+            subcommand
+                .setName('sync')
+                .setDescription('Request a full state sync from the server')
+        )
+        .addSubcommand(subcommand =>
+            subcommand
+                .setName('characters')
+                .setDescription('View characters in the room')
+                .addStringOption(option =>
+                    option.setName('action')
+                        .setDescription('Action to perform')
+                        .setRequired(true)
+                        .addChoices(
+                            { name: 'list', value: 'list' }
+                        )
+                )
+        )
+        .addSubcommand(subcommand =>
+            subcommand
+                .setName('grid')
+                .setDescription('View grid combat status')
+                .addStringOption(option =>
+                    option.setName('action')
+                        .setDescription('Action to perform')
+                        .setRequired(true)
+                        .addChoices(
+                            { name: 'status', value: 'status' }
+                        )
+                )
+        )
+        .addSubcommand(subcommand =>
+            subcommand
+                .setName('whiteboard')
+                .setDescription('View whiteboard summary')
+                .addStringOption(option =>
+                    option.setName('action')
+                        .setDescription('Action to perform')
+                        .setRequired(true)
+                        .addChoices(
+                            { name: 'status', value: 'status' }
+                        )
+                )
+        )
+        // GM subcommand group (unchanged)
         .addSubcommandGroup(subcommandGroup =>
             subcommandGroup
                 .setName('gm')
@@ -97,6 +141,7 @@ module.exports = {
             return;
         }
 
+        // Handle new subcommands
         switch (subcommand) {
             case 'connect':
                 await handleConnect(interaction, vtt);
@@ -121,12 +166,31 @@ module.exports = {
             case 'modules':
                 await handleModules(interaction, vtt);
                 break;
+
+            case 'sync':
+                await handleSync(interaction, vtt);
+                break;
+
+            case 'characters':
+                await handleCharacters(interaction, vtt);
+                break;
+
+            case 'grid':
+                await handleGrid(interaction, vtt);
+                break;
+
+            case 'whiteboard':
+                await handleWhiteboard(interaction, vtt);
+                break;
+
+            default:
+                await interaction.reply({ content: '❌ Unknown subcommand.', ephemeral: true });
         }
     }
 };
 
 // ============================================================
-// GM Subcommand Handlers
+// GM Subcommand Handlers (unchanged)
 // ============================================================
 
 async function handleGMSubcommand(interaction, vtt, subcommand) {
@@ -144,7 +208,6 @@ async function handleGMSubcommand(interaction, vtt, subcommand) {
 
         case 'approve': {
             const playerInput = interaction.options.getString('player');
-            // Find client by ID or name (case-insensitive)
             const clientEntry = Array.from(vtt.clients.entries()).find(([id, client]) => 
                 id === playerInput || client.name?.toLowerCase() === playerInput.toLowerCase() || client.data?.name?.toLowerCase() === playerInput.toLowerCase()
             );
@@ -152,14 +215,11 @@ async function handleGMSubcommand(interaction, vtt, subcommand) {
                 return interaction.editReply(`❌ Could not find player "${playerInput}" in the room. Use \`/vtt gm list\` to see available clients.`);
             }
             const [targetId, targetClient] = clientEntry;
-            // Check if the target has a pending request
             const pending = vtt.pendingRequests.find(r => r.requesterId === targetId);
             if (!pending) {
                 return interaction.editReply(`❌ ${targetClient.name || targetClient.data?.name || targetId} has not requested GM. They must use \`/vtt gm request\` first.`);
             }
-            // Send approval to server
             vtt.approveGM(targetId);
-            // Remove from pending list optimistically (server will also handle)
             vtt.pendingRequests = vtt.pendingRequests.filter(r => r.requesterId !== targetId);
             return interaction.editReply(`✅ Approved ${targetClient.name || targetClient.data?.name || targetId} as Game Master.`);
         }
@@ -206,7 +266,159 @@ async function handleGMSubcommand(interaction, vtt, subcommand) {
 }
 
 // ============================================================
-// Existing Handlers (unchanged, kept for completeness)
+// New Handlers
+// ============================================================
+
+async function handleSync(interaction, vtt) {
+    await interaction.deferReply({ ephemeral: true });
+
+    if (!vtt.connected) {
+        return interaction.editReply('❌ Not connected to VTT server.');
+    }
+
+    vtt.send('sync-request', {});
+    await interaction.editReply('✅ Sync request sent. The server will broadcast the latest state.');
+}
+
+async function handleCharacters(interaction, vtt) {
+    const action = interaction.options.getString('action');
+    await interaction.deferReply({ ephemeral: true });
+
+    if (!vtt.connected) {
+        return interaction.editReply('❌ Not connected to VTT server.');
+    }
+
+    if (action === 'list') {
+        // Use REST API or fallback to cache
+        const apiBase = vtt.getApiBaseUrl ? vtt.getApiBaseUrl() : `${vtt.config.serverUrl.replace('ws', 'http')}/api`;
+        const apiKey = process.env.API_KEY || vtt.config.apiKey || '';
+
+        try {
+            const url = `${apiBase}/rooms/${vtt.roomCode}/characters`;
+            const headers = { 'Content-Type': 'application/json' };
+            if (apiKey) headers['x-api-key'] = apiKey;
+            const res = await fetch(url, { headers });
+            if (!res.ok) {
+                const text = await res.text();
+                throw new Error(`HTTP ${res.status}: ${text}`);
+            }
+            const data = await res.json();
+            const chars = data.characters || [];
+            if (chars.length === 0) {
+                return interaction.editReply('📭 No characters found in this room.');
+            }
+            const embed = new EmbedBuilder()
+                .setColor(0xd4af37)
+                .setTitle(`👥 Characters (${chars.length})`)
+                .setDescription(chars.filter(c => c.active !== false).map(c => 
+                    `**${c.name}** — ❤️${c.harm || 0} ⚡${c.fatigue || 0} 🪙${c.boons || 0} Tier ${c.tier || 1}`
+                ).join('\n'))
+                .setTimestamp();
+            return interaction.editReply({ embeds: [embed] });
+        } catch (err) {
+            // Fallback to cached characters if available
+            if (vtt.characters && Object.keys(vtt.characters).length > 0) {
+                const chars = Object.values(vtt.characters);
+                const embed = new EmbedBuilder()
+                    .setColor(0xd4af37)
+                    .setTitle(`👥 Characters (cached, ${chars.length})`)
+                    .setDescription(chars.map(c => 
+                        `**${c.name}** — ❤️${c.harm || 0} ⚡${c.fatigue || 0} 🪙${c.boons || 0} Tier ${c.tier || 1}`
+                    ).join('\n'))
+                    .setFooter({ text: 'Using cached data – API may be unavailable.' })
+                    .setTimestamp();
+                return interaction.editReply({ embeds: [embed] });
+            }
+            return interaction.editReply(`❌ Failed to fetch characters: ${err.message}`);
+        }
+    }
+}
+
+async function handleGrid(interaction, vtt) {
+    const action = interaction.options.getString('action');
+    await interaction.deferReply({ ephemeral: true });
+
+    if (!vtt.connected) {
+        return interaction.editReply('❌ Not connected to VTT server.');
+    }
+
+    if (action === 'status') {
+        // Get grid state from whiteboard (or REST API)
+        const apiBase = vtt.getApiBaseUrl ? vtt.getApiBaseUrl() : `${vtt.config.serverUrl.replace('ws', 'http')}/api`;
+        const apiKey = process.env.API_KEY || vtt.config.apiKey || '';
+
+        try {
+            const url = `${apiBase}/rooms/${vtt.roomCode}/whiteboard`;
+            const headers = { 'Content-Type': 'application/json' };
+            if (apiKey) headers['x-api-key'] = apiKey;
+            const res = await fetch(url, { headers });
+            if (!res.ok) {
+                const text = await res.text();
+                throw new Error(`HTTP ${res.status}: ${text}`);
+            }
+            const data = await res.json();
+            const gc = data.gridCombat || {};
+            const embed = new EmbedBuilder()
+                .setColor(0xd4af37)
+                .setTitle('⚔️ Grid Combat Status')
+                .addFields(
+                    { name: 'Enabled', value: gc.enabled ? '✅' : '❌', inline: true },
+                    { name: 'Grid Type', value: gc.gridType || 'square', inline: true },
+                    { name: 'Cell Size', value: String(gc.cellSize || 40), inline: true },
+                    { name: 'Tokens', value: String(gc.tokens?.length || 0), inline: true },
+                    { name: 'Show Coordinates', value: gc.showCoordinates ? '✅' : '❌', inline: true },
+                    { name: 'Show Zones', value: gc.showZones ? '✅' : '❌', inline: true }
+                )
+                .setTimestamp();
+            return interaction.editReply({ embeds: [embed] });
+        } catch (err) {
+            return interaction.editReply(`❌ Failed to fetch grid status: ${err.message}`);
+        }
+    }
+}
+
+async function handleWhiteboard(interaction, vtt) {
+    const action = interaction.options.getString('action');
+    await interaction.deferReply({ ephemeral: true });
+
+    if (!vtt.connected) {
+        return interaction.editReply('❌ Not connected to VTT server.');
+    }
+
+    if (action === 'status') {
+        const apiBase = vtt.getApiBaseUrl ? vtt.getApiBaseUrl() : `${vtt.config.serverUrl.replace('ws', 'http')}/api`;
+        const apiKey = process.env.API_KEY || vtt.config.apiKey || '';
+
+        try {
+            const url = `${apiBase}/rooms/${vtt.roomCode}/whiteboard`;
+            const headers = { 'Content-Type': 'application/json' };
+            if (apiKey) headers['x-api-key'] = apiKey;
+            const res = await fetch(url, { headers });
+            if (!res.ok) {
+                const text = await res.text();
+                throw new Error(`HTTP ${res.status}: ${text}`);
+            }
+            const data = await res.json();
+            const embed = new EmbedBuilder()
+                .setColor(0xd4af37)
+                .setTitle('📋 Whiteboard Summary')
+                .addFields(
+                    { name: 'Drawings', value: String(data.drawings?.length || 0), inline: true },
+                    { name: 'Notes', value: String(data.notes?.length || 0), inline: true },
+                    { name: 'Images', value: String(data.images?.length || 0), inline: true },
+                    { name: 'Grid Combat', value: data.gridCombat?.enabled ? '✅ Enabled' : '❌ Disabled', inline: true },
+                    { name: 'Tokens', value: String(data.gridCombat?.tokens?.length || 0), inline: true }
+                )
+                .setTimestamp();
+            return interaction.editReply({ embeds: [embed] });
+        } catch (err) {
+            return interaction.editReply(`❌ Failed to fetch whiteboard status: ${err.message}`);
+        }
+    }
+}
+
+// ============================================================
+// Existing Handlers (updated status)
 // ============================================================
 
 async function handleConnect(interaction, vtt) {
@@ -228,6 +440,7 @@ async function handleConnect(interaction, vtt) {
         vtt.modules = [];
         vtt.defaultRegion = vtt.defaultRegion || 'Acasia';
         vtt.pendingMessages = [];
+        vtt.characters = {};
 
         vtt.connect(room || undefined);
 
@@ -277,6 +490,7 @@ async function handleDisconnect(interaction, vtt) {
         vtt.disconnect();
         vtt.deck = { cards: [], history: [], offset: 0 };
         vtt.modules = [];
+        vtt.characters = {};
         
         const embed = new EmbedBuilder()
             .setColor(0xf04747)
@@ -296,6 +510,9 @@ async function handleStatus(interaction, vtt) {
     const deckState = vtt.deck || { cards: [], history: [] };
     const modules = vtt.modules || [];
     const region = vtt.defaultRegion || 'Acasia';
+    const charCount = vtt.characters ? Object.keys(vtt.characters).length : 0;
+    const gridEnabled = vtt.gridCombat?.enabled || false;
+    const tokenCount = vtt.gridCombat?.tokens?.length || 0;
 
     const embed = new EmbedBuilder()
         .setTitle('📊 VTT Connection Status')
@@ -308,6 +525,9 @@ async function handleStatus(interaction, vtt) {
             { name: '🃏 Deck Cards', value: String(deckState.cards?.length || 0), inline: true },
             { name: '📜 Deck History', value: String(deckState.history?.length || 0), inline: true },
             { name: '📦 Modules Loaded', value: String(modules.length), inline: true },
+            { name: '👥 Characters', value: String(charCount), inline: true },
+            { name: '⚔️ Grid Combat', value: gridEnabled ? '✅ Enabled' : '❌ Disabled', inline: true },
+            { name: '🎯 Tokens', value: String(tokenCount), inline: true },
             { name: '🔄 Reconnect Attempts', value: String(vtt.reconnectAttempts || 0), inline: true },
             { name: '📨 Pending Messages', value: String(vtt.pendingMessages?.length || 0), inline: true }
         )
@@ -331,7 +551,7 @@ async function handleInfo(interaction, vtt) {
         return interaction.editReply('❌ Not connected to VTT server');
     }
 
-    vtt.send('get-clients', {});
+    vtt.send('sync-request', {});
 
     const timeout = setTimeout(() => {
         interaction.editReply('⏰ No response from VTT server');

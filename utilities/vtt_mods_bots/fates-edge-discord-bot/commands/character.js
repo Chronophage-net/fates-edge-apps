@@ -1,14 +1,14 @@
 /**
- * Character Sync Commands
- * Updated for v1.2.0 with deck and module support
+ * Character Sync Commands – v2.0
+ * Uses the server's REST API for full character management.
  */
 
-const { SlashCommandBuilder, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
+const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('vttchar')
-        .setDescription('Manage VTT characters')
+        .setDescription('Manage VTT characters (uses server API)')
         .addSubcommand(subcommand =>
             subcommand
                 .setName('list')
@@ -71,6 +71,11 @@ module.exports = {
                         .setDescription('Skills (e.g., "melee:2, stealth:1")')
                         .setRequired(false)
                 )
+                .addStringOption(option =>
+                    option.setName('attributes')
+                        .setDescription('Attributes (e.g., "body:3, mind:2")')
+                        .setRequired(false)
+                )
         )
         .addSubcommand(subcommand =>
             subcommand
@@ -83,7 +88,22 @@ module.exports = {
                 )
                 .addStringOption(option =>
                     option.setName('new_name')
-                        .setDescription('New character name')
+                        .setDescription('New character name (renames)')
+                        .setRequired(false)
+                )
+                .addStringOption(option =>
+                    option.setName('heritage')
+                        .setDescription('Character heritage')
+                        .setRequired(false)
+                )
+                .addStringOption(option =>
+                    option.setName('background')
+                        .setDescription('Character background')
+                        .setRequired(false)
+                )
+                .addStringOption(option =>
+                    option.setName('patron')
+                        .setDescription('Character patron')
                         .setRequired(false)
                 )
                 .addIntegerOption(option =>
@@ -118,7 +138,7 @@ module.exports = {
         .addSubcommand(subcommand =>
             subcommand
                 .setName('remove')
-                .setDescription('Remove a character from VTT')
+                .setDescription('Remove a character from VTT (soft delete)')
                 .addStringOption(option =>
                     option.setName('name')
                         .setDescription('Character name')
@@ -187,27 +207,49 @@ module.exports = {
                 return interaction.editReply('❌ Not connected to VTT server. Use `/vtt connect` first.');
             }
 
+            // Build API base and key
+            const apiBase = client.vtt.getApiBaseUrl ? client.vtt.getApiBaseUrl() : 
+                `${client.vtt.config.serverUrl.replace('ws', 'http')}/api`;
+            const apiKey = process.env.API_KEY || client.vtt.config.apiKey || '';
+
+            // Helper for API requests
+            const apiRequest = async (endpoint, method = 'GET', data = null) => {
+                const url = `${apiBase}${endpoint}`;
+                const headers = { 'Content-Type': 'application/json' };
+                if (apiKey) headers['x-api-key'] = apiKey;
+                const options = { method, headers };
+                if (data && method !== 'GET') options.body = JSON.stringify(data);
+                const res = await fetch(url, options);
+                if (!res.ok) {
+                    const text = await res.text();
+                    throw new Error(`HTTP ${res.status}: ${text}`);
+                }
+                return res.json();
+            };
+
+            const roomCode = client.vtt.roomCode;
+
             switch (subcommand) {
                 case 'list':
-                    await handleList(interaction, client);
+                    await handleList(interaction, apiRequest, roomCode);
                     break;
                 case 'add':
-                    await handleAdd(interaction, client);
+                    await handleAdd(interaction, apiRequest, roomCode);
                     break;
                 case 'update':
-                    await handleUpdate(interaction, client);
+                    await handleUpdate(interaction, apiRequest, roomCode);
                     break;
                 case 'remove':
-                    await handleRemove(interaction, client);
+                    await handleRemove(interaction, apiRequest, roomCode);
                     break;
                 case 'boons':
-                    await handleBoons(interaction, client);
+                    await handleBoons(interaction, apiRequest, roomCode);
                     break;
                 case 'fatigue':
-                    await handleFatigue(interaction, client);
+                    await handleFatigue(interaction, apiRequest, roomCode);
                     break;
                 case 'harm':
-                    await handleHarm(interaction, client);
+                    await handleHarm(interaction, apiRequest, roomCode);
                     break;
             }
         } catch (err) {
@@ -216,35 +258,36 @@ module.exports = {
     }
 };
 
-// In-memory character cache
-const characters = new Map();
+// ─── Handlers ──────────────────────────────────────────────
 
-async function handleList(interaction, client) {
-    // Request character list from VTT
-    client.vtt.send('get-characters', {});
-    
-    const charList = Array.from(characters.entries()).map(([name, data]) => ({
-        name,
-        ...data
-    }));
+async function handleList(interaction, apiRequest, roomCode) {
+    const result = await apiRequest(`/rooms/${roomCode}/characters`);
+    const characters = result.characters || [];
 
-    if (charList.length === 0) {
+    if (characters.length === 0) {
         return interaction.editReply('📭 No characters synced to VTT. Use `/vttchar add` to add one.');
+    }
+
+    // Filter out soft-deleted (active: false)
+    const active = characters.filter(c => c.active !== false);
+
+    if (active.length === 0) {
+        return interaction.editReply('📭 No active characters found (some may be soft-deleted).');
     }
 
     const embed = new EmbedBuilder()
         .setTitle('👥 VTT Characters')
         .setColor(0xd4af37)
-        .setDescription(charList.map(c => 
+        .setDescription(active.map(c => 
             `**${c.name}** ${c.heritage ? `(${c.heritage})` : ''}\n` +
             `   🪙 ${c.boons || 0} · ⚡ ${c.fatigue || 0} · ❤️ ${c.harm || 0} · Tier ${c.tier || 1}`
         ).join('\n'))
-        .setFooter({ text: `Total: ${charList.length} characters` });
+        .setFooter({ text: `Total: ${active.length} characters` });
 
     await interaction.editReply({ embeds: [embed] });
 }
 
-async function handleAdd(interaction, client) {
+async function handleAdd(interaction, apiRequest, roomCode) {
     const name = interaction.options.getString('name');
     const heritage = interaction.options.getString('heritage') || '';
     const background = interaction.options.getString('background') || '';
@@ -254,10 +297,7 @@ async function handleAdd(interaction, client) {
     const boons = interaction.options.getInteger('boons') || 0;
     const tier = interaction.options.getInteger('tier') || 1;
     const skillsStr = interaction.options.getString('skills') || '';
-
-    if (characters.has(name)) {
-        return interaction.editReply(`❌ Character "${name}" already exists. Use /vttchar update to modify.`);
-    }
+    const attrsStr = interaction.options.getString('attributes') || '';
 
     // Parse skills
     const skills = {};
@@ -266,6 +306,17 @@ async function handleAdd(interaction, client) {
             const [key, val] = s.trim().split(':');
             if (key && val) {
                 skills[key.toLowerCase()] = parseInt(val) || 0;
+            }
+        });
+    }
+
+    // Parse attributes
+    const attributes = {};
+    if (attrsStr) {
+        attrsStr.split(',').forEach(s => {
+            const [key, val] = s.trim().split(':');
+            if (key && val) {
+                attributes[key.toLowerCase()] = parseInt(val) || 0;
             }
         });
     }
@@ -279,12 +330,14 @@ async function handleAdd(interaction, client) {
         fatigue, 
         boons, 
         tier,
-        skills 
+        skills,
+        attributes,
+        active: true
     };
-    characters.set(name, charData);
 
-    // Sync to VTT
-    client.vtt.syncCharacters(Array.from(characters.values()).map((data, name) => ({ name, ...data })));
+    // Send update to server (will merge or create)
+    const updates = { [name]: charData };
+    await apiRequest(`/rooms/${roomCode}/characters/update`, 'POST', { updates });
 
     const embed = new EmbedBuilder()
         .setColor(0x43b581)
@@ -302,129 +355,160 @@ async function handleAdd(interaction, client) {
     if (Object.keys(skills).length > 0) {
         embed.addFields({ name: 'Skills', value: Object.entries(skills).map(([k, v]) => `${k}: ${v}`).join(', '), inline: false });
     }
+    if (Object.keys(attributes).length > 0) {
+        embed.addFields({ name: 'Attributes', value: Object.entries(attributes).map(([k, v]) => `${k}: ${v}`).join(', '), inline: false });
+    }
 
     await interaction.editReply({ embeds: [embed] });
 }
 
-async function handleUpdate(interaction, client) {
+async function handleUpdate(interaction, apiRequest, roomCode) {
     const name = interaction.options.getString('name');
     const newName = interaction.options.getString('new_name');
+    const heritage = interaction.options.getString('heritage');
+    const background = interaction.options.getString('background');
+    const patron = interaction.options.getString('patron');
     const harm = interaction.options.getInteger('harm');
     const fatigue = interaction.options.getInteger('fatigue');
     const boons = interaction.options.getInteger('boons');
     const tier = interaction.options.getInteger('tier');
 
-    if (!characters.has(name)) {
-        return interaction.editReply(`❌ Character "${name}" not found. Use /vttchar add to create it.`);
+    // First fetch current character to merge changes
+    let current;
+    try {
+        const result = await apiRequest(`/rooms/${roomCode}/characters/${encodeURIComponent(name)}`);
+        current = result;
+    } catch (e) {
+        return interaction.editReply(`❌ Character "${name}" not found.`);
     }
 
-    const char = characters.get(name);
-    if (newName) {
-        char.name = newName;
-        characters.delete(name);
-        characters.set(newName, char);
+    // Build updates
+    const updates = {};
+    if (newName && newName !== name) {
+        // Rename: we need to delete old and create new? 
+        // The server doesn't support rename natively. We'll have to create a new entry and soft-delete the old.
+        // We'll do: create new with all data, then set old active: false.
+        const newData = { ...current };
+        newData.name = newName;
+        // Ensure we don't carry over the old name as a field
+        delete newData.name;
+        // Also ensure we set active: true for new
+        newData.active = true;
+        // Prepare update for new name
+        updates[newName] = newData;
+        // Set old to inactive
+        updates[name] = { active: false };
+        await apiRequest(`/rooms/${roomCode}/characters/update`, 'POST', { updates });
+        return interaction.editReply(`✅ Character renamed from "${name}" to "${newName}" (old marked inactive).`);
     }
-    if (harm !== null) char.harm = harm;
-    if (fatigue !== null) char.fatigue = fatigue;
-    if (boons !== null) char.boons = boons;
-    if (tier !== null) char.tier = tier;
 
-    // Sync to VTT
-    client.vtt.syncCharacters(Array.from(characters.values()).map((data, name) => ({ name, ...data })));
+    // Build update object for the same name
+    const updateData = { active: true };
+    if (heritage !== null) updateData.heritage = heritage;
+    if (background !== null) updateData.background = background;
+    if (patron !== null) updateData.patron = patron;
+    if (harm !== null) updateData.harm = harm;
+    if (fatigue !== null) updateData.fatigue = fatigue;
+    if (boons !== null) updateData.boons = boons;
+    if (tier !== null) updateData.tier = tier;
+
+    if (Object.keys(updateData).length === 0) {
+        return interaction.editReply('No fields to update.');
+    }
+
+    updates[name] = updateData;
+    await apiRequest(`/rooms/${roomCode}/characters/update`, 'POST', { updates });
 
     const embed = new EmbedBuilder()
         .setColor(0x43b581)
         .setTitle(`✅ Character Updated: ${name}`)
         .addFields(
-            { name: 'Name', value: newName || name, inline: true },
-            { name: 'Harm', value: String(char.harm), inline: true },
-            { name: 'Fatigue', value: String(char.fatigue), inline: true },
-            { name: 'Boons', value: String(char.boons), inline: true },
-            { name: 'Tier', value: String(char.tier), inline: true }
+            { name: 'Harm', value: String(updateData.harm ?? current.harm ?? 0), inline: true },
+            { name: 'Fatigue', value: String(updateData.fatigue ?? current.fatigue ?? 0), inline: true },
+            { name: 'Boons', value: String(updateData.boons ?? current.boons ?? 0), inline: true },
+            { name: 'Tier', value: String(updateData.tier ?? current.tier ?? 1), inline: true }
         );
+
+    if (updateData.heritage !== undefined) embed.addFields({ name: 'Heritage', value: updateData.heritage, inline: true });
+    if (updateData.background !== undefined) embed.addFields({ name: 'Background', value: updateData.background, inline: true });
+    if (updateData.patron !== undefined) embed.addFields({ name: 'Patron', value: updateData.patron, inline: true });
 
     await interaction.editReply({ embeds: [embed] });
 }
 
-async function handleRemove(interaction, client) {
+async function handleRemove(interaction, apiRequest, roomCode) {
     const name = interaction.options.getString('name');
 
-    if (!characters.has(name)) {
-        return interaction.editReply(`❌ Character "${name}" not found.`);
-    }
+    // Soft delete: set active: false
+    const updates = { [name]: { active: false } };
+    await apiRequest(`/rooms/${roomCode}/characters/update`, 'POST', { updates });
 
-    characters.delete(name);
-
-    // Sync to VTT
-    client.vtt.syncCharacters(Array.from(characters.values()).map((data, name) => ({ name, ...data })));
-
-    await interaction.editReply(`✅ Removed character: ${name}`);
+    await interaction.editReply(`✅ Character "${name}" removed (soft-deleted).`);
 }
 
-async function handleBoons(interaction, client) {
+async function handleBoons(interaction, apiRequest, roomCode) {
     const name = interaction.options.getString('name');
     const amount = interaction.options.getInteger('amount');
 
-    if (!characters.has(name)) {
+    // Get current boons
+    let current;
+    try {
+        const result = await apiRequest(`/rooms/${roomCode}/characters/${encodeURIComponent(name)}`);
+        current = result;
+    } catch (e) {
         return interaction.editReply(`❌ Character "${name}" not found.`);
     }
 
-    const char = characters.get(name);
-    char.boons = Math.max(0, Math.min(5, (char.boons || 0) + amount));
-
-    // Sync to VTT
-    client.vtt.syncCharacters(Array.from(characters.values()).map((data, name) => ({ name, ...data })));
+    const newBoons = Math.max(0, Math.min(5, (current.boons || 0) + amount));
+    const updates = { [name]: { boons: newBoons } };
+    await apiRequest(`/rooms/${roomCode}/characters/update`, 'POST', { updates });
 
     const embed = new EmbedBuilder()
         .setColor(0x43b581)
         .setTitle(`🪙 Boons Updated: ${name}`)
-        .setDescription(`Boons: ${char.boons} (${amount >= 0 ? '+' : ''}${amount})`)
+        .setDescription(`Boons: ${newBoons} (${amount >= 0 ? '+' : ''}${amount})`)
         .setTimestamp();
 
     await interaction.editReply({ embeds: [embed] });
 }
 
-async function handleFatigue(interaction, client) {
+async function handleFatigue(interaction, apiRequest, roomCode) {
     const name = interaction.options.getString('name');
     const amount = interaction.options.getInteger('amount');
 
-    if (!characters.has(name)) {
+    // Get current fatigue
+    let current;
+    try {
+        const result = await apiRequest(`/rooms/${roomCode}/characters/${encodeURIComponent(name)}`);
+        current = result;
+    } catch (e) {
         return interaction.editReply(`❌ Character "${name}" not found.`);
     }
 
-    const char = characters.get(name);
-    char.fatigue = Math.max(0, Math.min(5, (char.fatigue || 0) + amount));
-
-    // Sync to VTT
-    client.vtt.syncCharacters(Array.from(characters.values()).map((data, name) => ({ name, ...data })));
+    const newFatigue = Math.max(0, Math.min(5, (current.fatigue || 0) + amount));
+    const updates = { [name]: { fatigue: newFatigue } };
+    await apiRequest(`/rooms/${roomCode}/characters/update`, 'POST', { updates });
 
     const embed = new EmbedBuilder()
         .setColor(0x43b581)
         .setTitle(`⚡ Fatigue Updated: ${name}`)
-        .setDescription(`Fatigue: ${char.fatigue} (${amount >= 0 ? '+' : ''}${amount})`)
+        .setDescription(`Fatigue: ${newFatigue} (${amount >= 0 ? '+' : ''}${amount})`)
         .setTimestamp();
 
     await interaction.editReply({ embeds: [embed] });
 }
 
-async function handleHarm(interaction, client) {
+async function handleHarm(interaction, apiRequest, roomCode) {
     const name = interaction.options.getString('name');
     const amount = interaction.options.getInteger('amount');
 
-    if (!characters.has(name)) {
-        return interaction.editReply(`❌ Character "${name}" not found.`);
-    }
-
-    const char = characters.get(name);
-    char.harm = Math.max(0, Math.min(3, amount));
-
-    // Sync to VTT
-    client.vtt.syncCharacters(Array.from(characters.values()).map((data, name) => ({ name, ...data })));
+    const updates = { [name]: { harm: amount } };
+    await apiRequest(`/rooms/${roomCode}/characters/update`, 'POST', { updates });
 
     const embed = new EmbedBuilder()
         .setColor(0x43b581)
         .setTitle(`❤️ Harm Updated: ${name}`)
-        .setDescription(`Harm: ${char.harm}`)
+        .setDescription(`Harm: ${amount}`)
         .setTimestamp();
 
     await interaction.editReply({ embeds: [embed] });

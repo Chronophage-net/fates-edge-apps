@@ -1,8 +1,8 @@
 /**
- * Chat Relay Commands
+ * Chat Relay Commands – Send messages to VTT chat with optional whispers and system messages
  */
 
-const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
+const { SlashCommandBuilder, EmbedBuilder, PermissionsBitField } = require('discord.js');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -17,11 +17,23 @@ module.exports = {
             option.setName('sender')
                 .setDescription('Sender name (defaults to Discord username)')
                 .setRequired(false)
+        )
+        .addStringOption(option =>
+            option.setName('whisper')
+                .setDescription('Target player name or ID for a whisper')
+                .setRequired(false)
+        )
+        .addBooleanOption(option =>
+            option.setName('system')
+                .setDescription('Send as system message (admin only)')
+                .setRequired(false)
         ),
 
     async execute(interaction, client) {
         const message = interaction.options.getString('message');
         const sender = interaction.options.getString('sender') || interaction.user.username;
+        const whisperTarget = interaction.options.getString('whisper') || null;
+        const system = interaction.options.getBoolean('system') || false;
 
         await interaction.deferReply({ ephemeral: true });
 
@@ -30,17 +42,37 @@ module.exports = {
                 return interaction.editReply('❌ Not connected to VTT server. Use `/vtt connect` first.');
             }
 
-            // Send to VTT
-            client.vtt.sendChatMessage(message, sender);
+            // Check system message permission
+            if (system) {
+                const isAdmin = interaction.member.permissions.has(PermissionsBitField.Flags.Administrator);
+                if (!isAdmin) {
+                    return interaction.editReply('❌ You need Administrator permission to send system messages.');
+                }
+            }
 
-            // Confirm
+            // Build the chat payload
+            const payload = {
+                type: 'chat-message',
+                text: message,
+                sender: system ? 'System' : sender,
+                recipient: whisperTarget || 'all',
+                whisper: !!whisperTarget,
+                timestamp: Date.now()
+            };
+
+            // Send via VTT client (uses WebSocket)
+            client.vtt.send('chat-message', payload);
+
+            // Build confirmation embed
             const embed = new EmbedBuilder()
-                .setColor(0x43b581)
-                .setTitle('📤 Message Sent to VTT')
+                .setColor(system ? 0xf1c40f : 0x43b581)
+                .setTitle(system ? '📢 System Message Sent' : '📤 Message Sent to VTT')
                 .addFields(
-                    { name: 'Sender', value: sender, inline: true },
+                    { name: 'Sender', value: system ? 'System' : sender, inline: true },
+                    { name: 'Recipient', value: whisperTarget || 'Everyone', inline: true },
                     { name: 'Message', value: message, inline: false }
                 )
+                .setFooter({ text: system ? 'System message' : 'Chat message' })
                 .setTimestamp();
 
             await interaction.editReply({ embeds: [embed] });
