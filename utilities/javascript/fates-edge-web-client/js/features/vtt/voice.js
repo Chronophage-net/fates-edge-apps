@@ -23,6 +23,26 @@ let _clientChangeCallback = null;
 let _lastClientInfo = new Map();
 let wsEventListeners = [];
 let speakingDetectors = new Map();
+let audioContexts = new Map(); // clientId -> AudioContext, so detectSpeaking()'s contexts can actually be closed
+
+/**
+ * Stop a client's speaking detector AND close its AudioContext.
+ * Every place that used to do speakingDetectors.delete(clientId) alone left
+ * the associated AudioContext running forever -- browsers cap the number of
+ * concurrently-open AudioContexts, so repeated voice connect/disconnect
+ * cycles would eventually start failing silently.
+ */
+function stopSpeakingDetector(clientId) {
+    if (speakingDetectors.has(clientId)) {
+        cancelAnimationFrame(speakingDetectors.get(clientId));
+        speakingDetectors.delete(clientId);
+    }
+    if (audioContexts.has(clientId)) {
+        const ctx = audioContexts.get(clientId);
+        try { ctx.close(); } catch (e) { /* ignore */ }
+        audioContexts.delete(clientId);
+    }
+}
 
 // ============================================================
 // CLIENT CHANGE NOTIFICATION
@@ -30,14 +50,14 @@ let speakingDetectors = new Map();
 
 function notifyClientsChanged() {
     if (!_clientChangeCallback) return;
-    
+
     const clientsInfo = Array.from(voiceClients.entries()).map(([id, client]) => ({
         id,
         name: client.name || 'Player',
         speaking: client.speaking || false,
         connectionState: client.connectionState || 'idle'
     }));
-    
+
     // Check if changed to avoid unnecessary updates
     let changed = false;
     if (clientsInfo.length !== _lastClientInfo.size) {
@@ -51,7 +71,7 @@ function notifyClientsChanged() {
             }
         }
     }
-    
+
     if (changed) {
         _lastClientInfo = new Map(clientsInfo.map(info => [info.id, info]));
         _clientChangeCallback(clientsInfo);
@@ -88,42 +108,42 @@ export async function initVoice() {
     if (isInitialized) {
         return true;
     }
-    
+
     if (!isConnectedToServer()) {
         showToast('Connect to a server first before starting voice.', 'error');
         return false;
     }
-    
+
     try {
         // Initialize media module for session recording
         await initializeMediaModule();
-        
+
         voiceChat = new VoiceChat();
         const success = await voiceChat.init();
         if (!success) {
             showToast('Failed to initialize voice chat.', 'error');
             return false;
         }
-        
+
         isInitialized = true;
-        
+
         // Set up WebSocket event handlers
         setupVoiceEvents();
-        
+
         // Notify room
-        sendEvent({ 
-            type: 'voice-status', 
+        sendEvent({
+            type: 'voice-status',
             enabled: true,
             name: localStorage.getItem('fates-edge-client-name') || 'Player'
         });
-        
+
         // Register activity listener (if available)
         if (voiceChat.onActivity) {
             activityCleanup = voiceChat.onActivity((activity) => {
                 // Activity can be used for UI if needed
             });
         }
-        
+
         showToast('🎤 Voice chat ready!', 'success');
         return true;
     } catch (err) {
@@ -143,28 +163,28 @@ export async function initVoice() {
 function setupVoiceEvents() {
     // Clean up any existing listeners
     cleanupVoiceEvents();
-    
+
     // WebRTC signaling - Offer
     const offerHandler = async (data) => {
         const { from, offer } = data;
         if (from === getSocketId()) return;
-        
+
         if (!isInitialized || !voiceChat) {
             showToast('Voice not initialized. Start voice first.', 'warning');
             return;
         }
-        
+
         try {
             // Ensure we have a client entry
             if (!voiceClients.has(from)) {
-                voiceClients.set(from, { 
+                voiceClients.set(from, {
                     name: data.name || 'Player',
                     speaking: false,
                     connectionState: 'connecting'
                 });
                 notifyClientsChanged();
             }
-            
+
             const pc = voiceChat.createPeerConnection(
                 from,
                 onRemoteTrack,
@@ -174,7 +194,7 @@ function setupVoiceEvents() {
             await pc.setRemoteDescription(new RTCSessionDescription(offer));
             const answer = await pc.createAnswer();
             await pc.setLocalDescription(answer);
-            
+
             sendEvent({
                 type: 'voice-answer',
                 from: getSocketId(),
@@ -187,14 +207,14 @@ function setupVoiceEvents() {
     };
     onWSEvent('voice-offer', offerHandler);
     wsEventListeners.push({ event: 'voice-offer', handler: offerHandler });
-    
+
     // WebRTC signaling - Answer
     const answerHandler = async (data) => {
         const { from, answer } = data;
         if (from === getSocketId()) return;
-        
+
         if (!isInitialized || !voiceChat) return;
-        
+
         try {
             const pc = voiceChat.getPeerConnection(from);
             if (pc) {
@@ -212,14 +232,14 @@ function setupVoiceEvents() {
     };
     onWSEvent('voice-answer', answerHandler);
     wsEventListeners.push({ event: 'voice-answer', handler: answerHandler });
-    
+
     // WebRTC signaling - ICE Candidate
     const iceHandler = async (data) => {
         const { from, candidate } = data;
         if (from === getSocketId()) return;
-        
+
         if (!isInitialized || !voiceChat) return;
-        
+
         try {
             const pc = voiceChat.getPeerConnection(from);
             if (pc) {
@@ -231,16 +251,16 @@ function setupVoiceEvents() {
     };
     onWSEvent('voice-ice-candidate', iceHandler);
     wsEventListeners.push({ event: 'voice-ice-candidate', handler: iceHandler });
-    
+
     // Voice status updates (remote client enables/disables voice)
     const statusHandler = (data) => {
         const { clientId, enabled, name } = data;
         if (!clientId || clientId === getSocketId()) return;
-        
+
         if (enabled) {
             // If we don't have this client yet, add with default name
             if (!voiceClients.has(clientId)) {
-                voiceClients.set(clientId, { 
+                voiceClients.set(clientId, {
                     name: name || 'Player',
                     speaking: false,
                     connectionState: 'idle'
@@ -258,24 +278,21 @@ function setupVoiceEvents() {
             if (voiceChat) {
                 voiceChat.cleanupPeerConnection(clientId);
             }
-            // Cleanup speaking detector
-            if (speakingDetectors.has(clientId)) {
-                cancelAnimationFrame(speakingDetectors.get(clientId));
-                speakingDetectors.delete(clientId);
-            }
+            // Cleanup speaking detector (and its AudioContext)
+            stopSpeakingDetector(clientId);
             notifyClientsChanged();
         }
     };
     onWSEvent('voice-status', statusHandler);
     wsEventListeners.push({ event: 'voice-status', handler: statusHandler });
-    
+
     // Client joined – check if they have voice enabled
     const joinedHandler = (data) => {
         // The client will send their own voice-status, so we wait for that
     };
     onWSEvent('client-joined', joinedHandler);
     wsEventListeners.push({ event: 'client-joined', handler: joinedHandler });
-    
+
     // Client left – cleanup voice for that client
     const leftHandler = (clientId) => {
         if (!clientId) return;
@@ -283,15 +300,12 @@ function setupVoiceEvents() {
         if (voiceChat) {
             voiceChat.cleanupPeerConnection(clientId);
         }
-        if (speakingDetectors.has(clientId)) {
-            cancelAnimationFrame(speakingDetectors.get(clientId));
-            speakingDetectors.delete(clientId);
-        }
+        stopSpeakingDetector(clientId);
         notifyClientsChanged();
     };
     onWSEvent('client-left', leftHandler);
     wsEventListeners.push({ event: 'client-left', handler: leftHandler });
-    
+
     // Disconnect – cleanup all voice
     const disconnectHandler = () => {
         cleanupVoice();
@@ -327,7 +341,7 @@ function onRemoteTrack(clientId, stream) {
         connectionState: 'connected'
     });
     notifyClientsChanged();
-    
+
     // Auto-play audio with volume control
     try {
         const audio = new Audio();
@@ -340,7 +354,7 @@ function onRemoteTrack(clientId, stream) {
     } catch (err) {
         console.warn('[Voice] Auto-play audio error:', err);
     }
-    
+
     // Detect speaking on remote stream
     detectSpeaking(clientId, stream);
 }
@@ -350,27 +364,25 @@ function onRemoteTrack(clientId, stream) {
  */
 function detectSpeaking(clientId, stream) {
     try {
-        // Clean up existing detector
-        if (speakingDetectors.has(clientId)) {
-            cancelAnimationFrame(speakingDetectors.get(clientId));
-            speakingDetectors.delete(clientId);
-        }
-        
+        // Clean up any existing detector (and its AudioContext) for this client
+        stopSpeakingDetector(clientId);
+
         const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        audioContexts.set(clientId, audioContext);
         const source = audioContext.createMediaStreamSource(stream);
         const analyser = audioContext.createAnalyser();
         analyser.fftSize = 256;
         analyser.smoothingTimeConstant = 0.8;
         source.connect(analyser);
-        
+
         const dataArray = new Uint8Array(analyser.frequencyBinCount);
         let lastSpeaking = false;
-        
+
         function checkSpeaking() {
             if (!voiceClients.has(clientId) || !stream.active) {
                 return;
             }
-            
+
             analyser.getByteFrequencyData(dataArray);
             let sum = 0;
             for (let i = 0; i < dataArray.length; i++) {
@@ -378,7 +390,7 @@ function detectSpeaking(clientId, stream) {
             }
             const avg = sum / (dataArray.length * 255);
             const isSpeaking = avg > 0.05;
-            
+
             const client = voiceClients.get(clientId);
             if (client) {
                 if (client.speaking !== isSpeaking) {
@@ -386,11 +398,11 @@ function detectSpeaking(clientId, stream) {
                     notifyClientsChanged();
                 }
             }
-            
+
             const frameId = requestAnimationFrame(checkSpeaking);
             speakingDetectors.set(clientId, frameId);
         }
-        
+
         const frameId = requestAnimationFrame(checkSpeaking);
         speakingDetectors.set(clientId, frameId);
     } catch (err) {
@@ -418,7 +430,7 @@ function onConnectionStateChange(clientId, state) {
     if (client) {
         client.connectionState = state;
         notifyClientsChanged();
-        
+
         if (state === 'failed' || state === 'disconnected') {
             // Clean up failed connection after a delay
             setTimeout(() => {
@@ -429,6 +441,7 @@ function onConnectionStateChange(clientId, state) {
                         if (voiceChat) {
                             voiceChat.cleanupPeerConnection(clientId);
                         }
+                        stopSpeakingDetector(clientId);
                         notifyClientsChanged();
                     }
                 }
@@ -449,23 +462,23 @@ export async function initiateVoiceCall(targetClientId) {
         showToast('Voice not initialized.', 'error');
         return false;
     }
-    
+
     if (!targetClientId || targetClientId === getSocketId()) {
         showToast('Invalid client.', 'error');
         return false;
     }
-    
+
     try {
         // Ensure we have a client entry
         if (!voiceClients.has(targetClientId)) {
-            voiceClients.set(targetClientId, { 
+            voiceClients.set(targetClientId, {
                 name: 'Player',
                 speaking: false,
                 connectionState: 'connecting'
             });
             notifyClientsChanged();
         }
-        
+
         const pc = voiceChat.createPeerConnection(
             targetClientId,
             onRemoteTrack,
@@ -474,7 +487,7 @@ export async function initiateVoiceCall(targetClientId) {
         );
         const offer = await pc.createOffer();
         await pc.setLocalDescription(offer);
-        
+
         sendEvent({
             type: 'voice-offer',
             from: getSocketId(),
@@ -482,7 +495,7 @@ export async function initiateVoiceCall(targetClientId) {
             offer: offer,
             name: localStorage.getItem('fates-edge-client-name') || 'Player'
         });
-        
+
         return true;
     } catch (err) {
         console.error('[Voice] Call init error:', err);
@@ -543,24 +556,19 @@ export function isVoiceInitialized() {
  * Cleanup voice
  */
 export function cleanupVoice() {
-    // Clean up speaking detectors
-    for (const [clientId, frameId] of speakingDetectors) {
-        cancelAnimationFrame(frameId);
+    // Clean up speaking detectors and their AudioContexts
+    for (const clientId of speakingDetectors.keys()) {
+        cancelAnimationFrame(speakingDetectors.get(clientId));
     }
     speakingDetectors.clear();
-    
-    // Clean up voice chat
-    if (voiceChat) {
-        voiceChat.cleanup();
-        voiceChat = null;
+    for (const ctx of audioContexts.values()) {
+        try { ctx.close(); } catch (e) { /* ignore */ }
     }
-    
-    if (activityCleanup) {
-        activityCleanup();
-        activityCleanup = null;
-    }
-    
-    // Clean up audio elements
+    audioContexts.clear();
+
+    // Clean up audio elements -- must happen BEFORE voiceChat is nulled below,
+    // otherwise this check is always false and the <audio> elements (and the
+    // remote streams they hold onto) are never actually released.
     if (voiceChat && voiceChat._audioElements) {
         for (const audio of voiceChat._audioElements.values()) {
             audio.srcObject = null;
@@ -568,22 +576,33 @@ export function cleanupVoice() {
         }
         voiceChat._audioElements.clear();
     }
-    
+
+    // Clean up voice chat
+    if (voiceChat) {
+        voiceChat.cleanup();
+        voiceChat = null;
+    }
+
+    if (activityCleanup) {
+        activityCleanup();
+        activityCleanup = null;
+    }
+
     voiceClients.clear();
     isInitialized = false;
     notifyClientsChanged();
-    
+
     // Clean up event listeners
     cleanupVoiceEvents();
-    
+
     // Notify room
     try {
-        sendEvent({ 
-            type: 'voice-status', 
+        sendEvent({
+            type: 'voice-status',
             enabled: false
         });
     } catch (e) { /* ignore */ }
-    
+
     showToast('Voice stopped.', 'info');
 }
 

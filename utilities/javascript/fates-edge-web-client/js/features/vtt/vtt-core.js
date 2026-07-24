@@ -190,7 +190,7 @@ export function renderChat() {
                     <div style="display:flex;align-items:center;gap:0.4rem;flex-wrap:wrap;">
                         <span style="color:var(--text2);font-size:0.8rem;">${escHtml(time)}</span>
                         <strong style="color:${senderColor};font-size:1rem;">${escHtml(sender)}${recipient}:</strong>
-                        <span style="word-break:break-word;font-size:1rem;">${whisper}${sender === 'GM' ? text : escHtml(String(text))}</span>
+                        <span style="word-break:break-word;font-size:1rem;">${whisper}${escHtml(String(text))}</span>
                         ${modeBadge}
                         <span class="msg-status" style="font-size:0.7rem;color:${statusColor};margin-left:auto;" title="${statusTitle}">${statusIcon}</span>
                     </div>
@@ -504,7 +504,7 @@ export function renderLocalPresence() {
                 : '';
             html += `
                 <div class="presence-item" style="display:flex;align-items:center;gap:0.6rem;padding:0.3rem 0;border-bottom:1px solid var(--border);${isSelf ? 'background:var(--bg4);border-radius:6px;padding:0.3rem 0.6rem;' : ''}">
-                    ${showAvatars ? `<img src="${avatarUrl}" alt="${p.name}" style="width:32px;height:32px;border-radius:50%;object-fit:cover;" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2232%22 height=%2232%22 viewBox=%220 0 32 32%22%3E%3Crect fill=%22%232c3e50%22 width=%2232%22 height=%2232%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22 dy=%22.35em%22 fill=%22%23fff%22 font-family=%22Arial%22 font-size=%2214%22%3E${encodeURIComponent(p.name.charAt(0))}%3C/text%3E%3C/svg%3E'" />` : ''}
+                    ${showAvatars ? `<img src="${avatarUrl}" alt="${escHtml(p.name)}" style="width:32px;height:32px;border-radius:50%;object-fit:cover;" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2232%22 height=%2232%22 viewBox=%220 0 32 32%22%3E%3Crect fill=%22%232c3e50%22 width=%2232%22 height=%2232%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22 dy=%22.35em%22 fill=%22%23fff%22 font-family=%22Arial%22 font-size=%2214%22%3E${encodeURIComponent(p.name.charAt(0))}%3C/text%3E%3C/svg%3E'" />` : ''}
                     <span style="font-weight:${isSelf ? '600' : '400'};font-size:0.95rem;">${escHtml(p.name)}${isSelf ? ' (you)' : ''}</span>
                     <span style="font-size:0.8rem;color:var(--text2);background:var(--bg4);padding:0.05rem 0.5rem;border-radius:12px;">${p.tier ? `Tier ${p.tier}` : 'Player'}</span>
                     <span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:${p.online !== false ? 'var(--green)' : 'var(--text3)'};margin-left:auto;" title="${p.online !== false ? 'Online' : 'Offline'}"></span>
@@ -627,9 +627,14 @@ export function populateChatRecipients() {
 // ============================================================
 // Notification sound (helper)
 // ============================================================
+let notificationAudioCtx = null;
+
 export function playNotificationSound() {
     try {
-        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        if (!notificationAudioCtx) {
+            notificationAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        const audioCtx = notificationAudioCtx;
         const oscillator = audioCtx.createOscillator();
         const gainNode = audioCtx.createGain();
         oscillator.connect(gainNode);
@@ -639,6 +644,9 @@ export function playNotificationSound() {
         gainNode.gain.value = 0.1;
         oscillator.start();
         oscillator.stop(audioCtx.currentTime + 0.1);
+        // The oscillator/gain nodes are cheap and garbage-collected once stopped;
+        // only the AudioContext itself needs to be long-lived, so it's reused
+        // above instead of creating (and never closing) a new one each time.
     } catch (e) { /* ignore */ }
 }
 

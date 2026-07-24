@@ -12,6 +12,7 @@ const WebSocket = require('ws');
 const room = require('./room.js');
 const deck = require('./deck.js');
 const logger = require('./logger.js').createLogger(process.env.LOG_LEVEL || 'INFO');
+const { buildSafeDict, clampCount } = require('./security.js');
 
 let socketStats = { wsConnections: 0, totalConnections: 0 };
 
@@ -28,9 +29,16 @@ function setupWSS(wss) {
         const roomKey = (roomCode || 'default').toUpperCase();
         const clientId = `ws-${Date.now()}-${Math.random().toString(36).substr(2, 6)}`;
 
-        let currentRoom = room.rooms.get(roomKey);
-        if (!currentRoom) {
-            currentRoom = room.createRoom(roomKey);
+        let currentRoom;
+        try {
+            currentRoom = room.rooms.get(roomKey) || room.createRoom(roomKey);
+        } catch (err) {
+            logger.warn('🚫 Rejected connection with invalid room code', { roomKey, error: err.message });
+            ws.send(JSON.stringify({ type: 'error', message: 'Invalid room code format.' }));
+            ws.close(4000, 'Invalid room code');
+            return;
+        }
+        if (!room.rooms.has(roomKey)) {
             logger.info('📋 Room created', { room: roomKey });
         }
 
@@ -280,18 +288,10 @@ function handleHandshake(ws, roomState, data) {
 function handleStateUpdated(ws, roomState, data) {
     // If the update contains a characters array, store it in roomState.characters
     if (data.state && data.state.characters && Array.isArray(data.state.characters)) {
-        const chars = {};
-        data.state.characters.forEach(c => {
-            if (c.name) chars[c.name] = c;
-        });
-        roomState.characters = chars;
+        roomState.characters = buildSafeDict(data.state.characters, c => c && c.name);
     } else if (data.characters && Array.isArray(data.characters)) {
         // Also support direct characters field
-        const chars = {};
-        data.characters.forEach(c => {
-            if (c.name) chars[c.name] = c;
-        });
-        roomState.characters = chars;
+        roomState.characters = buildSafeDict(data.characters, c => c && c.name);
     }
 
     roomState.lastActivity = Date.now();
@@ -303,7 +303,8 @@ function handleStateUpdated(ws, roomState, data) {
 
 async function handleDeckDraw(ws, roomState, data) {
     try {
-        const { count = 1, region = 'Acasia' } = data;
+        const { region = 'Acasia' } = data;
+        const count = clampCount(data.count);
         if (!roomState.deck || roomState.deck.length === 0) roomState.deck = deck.buildDeck();
         if (roomState.deck.length < count) roomState.deck = deck.buildDeck();
 

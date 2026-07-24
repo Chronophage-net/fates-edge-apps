@@ -9,6 +9,7 @@ const deck = require('./deck.js');
 const logger = require('./logger.js').createLogger(process.env.LOG_LEVEL || 'INFO');
 const fs = require('fs');
 const path = require('path');
+const { buildSafeDict, isSafeModuleId, clampCount } = require('./security.js');
 
 let socketStats = { socketIOConnections: 0, totalConnections: 0 };
 
@@ -162,7 +163,8 @@ function setupSocketIO(io) {
             const r = room.rooms.get(socket.room);
             if (!r) return socket.emit('error', { message: 'Room not found' });
             try {
-                const { count = 1, region = 'Acasia' } = data || {};
+                const { region = 'Acasia' } = data || {};
+                const count = clampCount(data?.count);
                 if (!r.deck || r.deck.length === 0) r.deck = deck.buildDeck();
                 if (r.deck.length < count) r.deck = deck.buildDeck();
 
@@ -296,6 +298,7 @@ function setupSocketIO(io) {
         socket.on('module-push-request', (data, callback) => {
             const { moduleId } = data || {};
             if (!moduleId) return callback?.({ error: 'Module ID required' });
+            if (!isSafeModuleId(moduleId)) return callback?.({ error: 'Invalid module id' });
             const modulesPath = path.join(__dirname, 'modules', moduleId);
             if (!fs.existsSync(modulesPath)) return callback?.({ error: 'Module not found' });
             const manifestPath = path.join(modulesPath, 'manifest.json');
@@ -395,18 +398,10 @@ function setupSocketIO(io) {
 
             // If the update contains a characters array, store it in r.characters
             if (data.state && data.state.characters && Array.isArray(data.state.characters)) {
-                const chars = {};
-                data.state.characters.forEach(c => {
-                    if (c.name) chars[c.name] = c;
-                });
-                r.characters = chars;
+                r.characters = buildSafeDict(data.state.characters, c => c && c.name);
             } else if (data.characters && Array.isArray(data.characters)) {
                 // Also support direct characters field
-                const chars = {};
-                data.characters.forEach(c => {
-                    if (c.name) chars[c.name] = c;
-                });
-                r.characters = chars;
+                r.characters = buildSafeDict(data.characters, c => c && c.name);
             }
 
             r.lastActivity = Date.now();

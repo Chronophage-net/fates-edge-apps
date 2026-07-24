@@ -59,7 +59,18 @@ class VTTStore {
 
   updateCharacters(chars) {
     this.setState({ characters: chars });
-    this._updatePresence();
+    // Only fall back to deriving "who's here" from the local character roster
+    // when there's no real connection -- once connected, the actual presence
+    // list (real clients, real online status) comes from the server via
+    // updatePresence() below, and must not be clobbered by this periodic call.
+    if (this.state.connectionStatus !== 'connected') {
+      this._updatePresence();
+    }
+  }
+
+  /** Set presence from real data (e.g. the websocket 'presence' event). */
+  updatePresence(list) {
+    this.setState({ presence: list || [] });
   }
 
   updateTimers(timers) {
@@ -72,7 +83,9 @@ class VTTStore {
 
   setConnectionStatus(status) {
     this.setState({ connectionStatus: status });
-    this._updatePresence();
+    if (status !== 'connected') {
+      this._updatePresence();
+    }
   }
 
   selectCharacter(id) {

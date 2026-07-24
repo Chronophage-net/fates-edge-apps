@@ -4,6 +4,7 @@
  */
 
 const WebSocket = require('ws');
+const { safeAssign, buildSafeDict, UNSAFE_KEYS } = require('./security.js');
 
 // ---------- State ----------
 const rooms = new Map();
@@ -64,22 +65,16 @@ function getCharacter(room, name) {
 
 function setCharacters(room, charactersArray) {
     if (!Array.isArray(charactersArray)) return;
-    const chars = {};
-    charactersArray.forEach(c => {
-        if (c.name) chars[c.name] = c;
-    });
-    room.characters = chars;
+    room.characters = buildSafeDict(charactersArray, c => c && c.name);
     room.lastActivity = Date.now();
 }
 
 function updateCharacter(room, name, data) {
-    if (!room.characters) room.characters = {};
+    if (!name || UNSAFE_KEYS.has(name)) return null;
+    if (!room.characters) room.characters = Object.create(null);
     if (!room.characters[name]) room.characters[name] = { name };
-    // Merge all top-level fields
-    for (const [key, value] of Object.entries(data)) {
-        if (key === 'name') continue;
-        room.characters[name][key] = value;
-    }
+    // Merge all top-level fields, skipping __proto__/constructor/prototype
+    safeAssign(room.characters[name], data);
     room.lastActivity = Date.now();
     return room.characters[name];
 }
@@ -227,6 +222,9 @@ function broadcastToRoom(roomCode, event, data, senderId = null) {
 
 // ---------- Room Creation ----------
 function createRoom(roomCode) {
+    if (!validateRoomCode(roomCode)) {
+        throw new Error('Invalid room code format');
+    }
     const roomKey = roomCode.toUpperCase();
     if (rooms.has(roomKey)) return rooms.get(roomKey);
 
@@ -241,13 +239,25 @@ function createRoom(roomCode) {
         lastActivity: Date.now(),
         created: Date.now(),
         whiteboard: createDefaultWhiteboard(),
-        characters: {},          // <-- Full character storage (keyed by name)
+        characters: Object.create(null),          // <-- Full character storage (keyed by name)
         banned: new Set(),
-        password: null,          // Optional room password
+        password: null,          // Optional room password (see setRoomPassword)
         data: {}                 // Generic data store (region, etc.)
     };
     rooms.set(roomKey, room);
     return room;
+}
+
+/**
+ * Set (or clear, with null/empty) a room's join password. The actual
+ * password CHECK already existed on both transports (join-room /
+ * handshake), but nothing ever called a "set" function -- so the
+ * feature was advertised in comments but was never actually reachable.
+ */
+function setRoomPassword(room, password) {
+    room.password = password ? String(password) : null;
+    room.lastActivity = Date.now();
+    return room.password !== null;
 }
 
 function createDefaultWhiteboard() {
@@ -294,5 +304,6 @@ module.exports = {
     setIo,
     broadcastToRoom,
     createRoom,
+    setRoomPassword,
     createDefaultWhiteboard,
 };

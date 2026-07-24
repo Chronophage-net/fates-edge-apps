@@ -68,10 +68,12 @@ let container = null;
 let voiceInitialized = false;
 let wsListeners = new Map();
 let eventListeners = [];
+let docEventListeners = []; // listeners attached to `document` rather than `container` -- must be removed from document, not container
 let isDestroyed = false;
 let reconnectTimer = null;
 let voiceUnsubscribe = null;
 let presenceInterval = null;
+let deckCountInterval = null;
 
 // Deck state
 let deckState = {
@@ -772,14 +774,11 @@ async function pushCharactersToServer() {
 function receiveCharacters(charArray) {
     if (!Array.isArray(charArray) || charArray.length === 0) {
         // If empty array, just clear the store
-        vttStore.setState({ characters: [] });
+        vttStore.updateCharacters([]);
         return;
     }
     const normalized = charArray.map(c => ensureCharacterDefaults(c));
-    vttStore.setState({
-        characters: normalized,
-        // preserve timers if we have them, but we'll re-fetch from state later
-    });
+    vttStore.updateCharacters(normalized);
     // Also update the character grid UI
     renderVTTChars();
     // Update the selected character display if needed
@@ -788,7 +787,7 @@ function receiveCharacters(charArray) {
         // If selected character no longer exists, clear selection
         const stillExists = normalized.some(c => c.name === selected.name);
         if (!stillExists) {
-            vttStore.setSelectedCharacter(null);
+            vttStore.selectCharacter(null);
         }
     }
     // Update chat recipients list (characters are in the store)
@@ -1041,6 +1040,17 @@ function setupWebSocketSync() {
                     document.dispatchEvent(new CustomEvent('gmRoleUpdate', { detail: { role: myClient.role } }));
                 }
             }
+            // Push the REAL presence list (actual clients, actual online status)
+            // into the store, so it isn't silently replaced by the
+            // character-roster-derived fallback that runs on every periodic
+            // updateCharacters() call while in local/disconnected mode.
+            vttStore.updatePresence(data.clients.map(c => ({
+                id: c.id,
+                name: c.name || 'Player',
+                online: true,
+                tier: c.role === 'gm' ? 'GM' : (c.tier || 'Player'),
+                avatar: c.avatar || null,
+            })));
             updateGMUI();
             renderLocalPresence();
         }
@@ -1285,6 +1295,11 @@ function attachEvents() {
     });
     eventListeners = [];
 
+    docEventListeners.forEach(({event, handler}) => {
+        document.removeEventListener(event, handler);
+    });
+    docEventListeners = [];
+
     const clickHandler = (e) => {
         const target = e.target.closest('button, .btn, [id]');
         if (!target) return;
@@ -1399,7 +1414,7 @@ function attachEvents() {
         }
     };
     document.addEventListener('voice-call-request', voiceCallHandler);
-    eventListeners.push({ event: 'voice-call-request', handler: voiceCallHandler });
+    docEventListeners.push({ event: 'voice-call-request', handler: voiceCallHandler });
 }
 
 // ============================================================
@@ -1660,7 +1675,13 @@ export function render(el) {
         vttStore.updateTimers(getState().timers || []);
     }, VTT_CONFIG.presenceUpdateInterval);
 
-    setInterval(() => {
+    if (deckCountInterval) clearInterval(deckCountInterval);
+    deckCountInterval = setInterval(() => {
+        if (isDestroyed) {
+            clearInterval(deckCountInterval);
+            deckCountInterval = null;
+            return;
+        }
         const countEl = q('#vtt-deck-count');
         if (countEl) countEl.textContent = String(deckState.remaining || 0);
         const headerCountEl = q('#vtt-deck-count-header');
@@ -1683,6 +1704,10 @@ export function destroy() {
         clearInterval(presenceInterval);
         presenceInterval = null;
     }
+    if (deckCountInterval) {
+        clearInterval(deckCountInterval);
+        deckCountInterval = null;
+    }
     if (container) {
         eventListeners.forEach(({event, handler}) => {
             container.removeEventListener(event, handler);
@@ -1692,6 +1717,10 @@ export function destroy() {
         setContainer(null);
         container = null;
     }
+    docEventListeners.forEach(({event, handler}) => {
+        document.removeEventListener(event, handler);
+    });
+    docEventListeners = [];
     cleanupWebSocketListeners();
     if (voiceUnsubscribe) {
         voiceUnsubscribe();

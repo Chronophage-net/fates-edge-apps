@@ -4,6 +4,7 @@
 
 const path = require('path');
 const fs = require('fs');
+const { sanitizeRegionName } = require('./security.js');
 
 const DECK_SUITS = ['hearts', 'spades', 'clubs', 'diamonds'];
 const DECK_RANKS = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
@@ -140,10 +141,11 @@ function synthesiseCrownSpread(mainCards, wildcard, regionData) {
     synthesis += `🤝 Left Hand: ${positionCards[3].meaning}\n\n`;
     synthesis += `🌟 Wildcard: ${wildcardMeaning}`;
 
-    const highestCard = positionCards.reduce((a, b) => {
-        const rankOrder = ['A', 'K', 'Q', 'J', '10', '9', '8', '7', '6', '5', '4', '3', '2'];
-        return rankOrder.indexOf(a.card.rank) < rankOrder.indexOf(b.card.rank) ? a : b;
-    });
+    const rankOrder = ['A', 'K', 'Q', 'J', '10', '9', '8', '7', '6', '5', '4', '3', '2'];
+    const rankedCards = positionCards.filter(pc => !pc.isJoker && rankOrder.includes(pc.card.rank));
+    const highestCard = rankedCards.length > 0
+        ? rankedCards.reduce((a, b) => rankOrder.indexOf(a.card.rank) < rankOrder.indexOf(b.card.rank) ? a : b)
+        : positionCards[0]; // defensive fallback (not reachable with a standard 2-joker deck, but harmless if a custom deck ever had more)
 
     return {
         synthesis,
@@ -157,47 +159,46 @@ function synthesiseCrownSpread(mainCards, wildcard, regionData) {
 }
 
 async function loadRegionData(regionName) {
-    if (regionDataCache.has(regionName)) {
-        return regionDataCache.get(regionName);
+    const safeRegion = sanitizeRegionName(regionName);
+    const cacheKey = (safeRegion || String(regionName || 'unknown')).toLowerCase();
+
+    if (regionDataCache.has(cacheKey)) {
+        return regionDataCache.get(cacheKey);
     }
 
-    try {
-        const regionPath = path.join(__dirname, 'data', 'regions', `${regionName.toLowerCase()}.json`);
-        if (fs.existsSync(regionPath)) {
-            const data = JSON.parse(fs.readFileSync(regionPath, 'utf-8'));
-            regionDataCache.set(regionName, data);
-            return data;
-        }
+    // If the region name didn't pass validation, don't touch the filesystem
+    // at all -- just fall through to the default data below, keyed under
+    // whatever the caller asked for so we don't re-validate every call.
+    if (safeRegion) {
+        try {
+            const regionPath = path.join(__dirname, 'data', 'regions', `${safeRegion.toLowerCase()}.json`);
+            if (fs.existsSync(regionPath)) {
+                const data = JSON.parse(fs.readFileSync(regionPath, 'utf-8'));
+                regionDataCache.set(cacheKey, data);
+                return data;
+            }
 
-        const miscPath = path.join(__dirname, 'misc', 'regions', `${regionName.toLowerCase()}.json`);
-        if (fs.existsSync(miscPath)) {
-            const data = JSON.parse(fs.readFileSync(miscPath, 'utf-8'));
-            regionDataCache.set(regionName, data);
-            return data;
+            const miscPath = path.join(__dirname, 'misc', 'regions', `${safeRegion.toLowerCase()}.json`);
+            if (fs.existsSync(miscPath)) {
+                const data = JSON.parse(fs.readFileSync(miscPath, 'utf-8'));
+                regionDataCache.set(cacheKey, data);
+                return data;
+            }
+        } catch (e) {
+            // fall through to default data below
         }
-
-        const defaultData = {
-            name: regionName,
-            description: `${regionName} - A region of Fate's Edge.`,
-            hearts: ["A matter of loyalty or love arises."],
-            spades: ["A conflict or struggle emerges."],
-            clubs: ["A physical challenge or obstacle appears."],
-            diamonds: ["A resource, treasure, or opportunity is found."]
-        };
-        regionDataCache.set(regionName, defaultData);
-        return defaultData;
-    } catch (e) {
-        const defaultData = {
-            name: regionName,
-            description: `${regionName} - A region of Fate's Edge.`,
-            hearts: ["A matter of loyalty or love arises."],
-            spades: ["A conflict or struggle emerges."],
-            clubs: ["A physical challenge or obstacle appears."],
-            diamonds: ["A resource, treasure, or opportunity is found."]
-        };
-        regionDataCache.set(regionName, defaultData);
-        return defaultData;
     }
+
+    const defaultData = {
+        name: regionName,
+        description: `${regionName} - A region of Fate's Edge.`,
+        hearts: ["A matter of loyalty or love arises."],
+        spades: ["A conflict or struggle emerges."],
+        clubs: ["A physical challenge or obstacle appears."],
+        diamonds: ["A resource, treasure, or opportunity is found."]
+    };
+    regionDataCache.set(cacheKey, defaultData);
+    return defaultData;
 }
 
 module.exports = {

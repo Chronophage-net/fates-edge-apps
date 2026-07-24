@@ -7,14 +7,30 @@ const express = require('express');
 const fs = require('fs');
 const fsPromises = fs.promises;
 const path = require('path');
+const crypto = require('crypto');
 const room = require('./room.js');
 const deck = require('./deck.js');
+const { safeAssign, buildSafeDict, isSafeModuleId, isSafeCampaignCode, clampCount, UNSAFE_KEYS } = require('./security.js');
 
 let config = {};
+
+function timingSafeEqual(a, b) {
+    const bufA = Buffer.from(String(a));
+    const bufB = Buffer.from(String(b));
+    if (bufA.length !== bufB.length) {
+        // Still run a comparison of equal length to avoid leaking length via timing
+        crypto.timingSafeEqual(bufA, bufA);
+        return false;
+    }
+    return crypto.timingSafeEqual(bufA, bufB);
+}
 
 function authenticate(req, res, next) {
     const apiKey = req.headers['x-api-key'] || req.query.apiKey;
     if (!apiKey) return res.status(401).json({ error: 'API key required' });
+    if (!config.apiKey || !timingSafeEqual(apiKey, config.apiKey)) {
+        return res.status(403).json({ error: 'Invalid API key' });
+    }
     req.apiKeyData = { name: 'System' };
     next();
 }
@@ -133,7 +149,8 @@ function createApiRouter(appConfig) {
     router.post('/api/rooms/:code/deck/draw', authenticate, async (req, res) => {
         try {
             const r = room.getRoom(req.params.code);
-            const { count = 1, region = 'Acasia' } = req.body;
+            const { region = 'Acasia' } = req.body;
+            const count = clampCount(req.body.count);
             if (!r.deck || r.deck.length === 0) r.deck = deck.buildDeck();
             if (r.deck.length < count) r.deck = deck.buildDeck();
 
@@ -335,6 +352,9 @@ function createApiRouter(appConfig) {
     router.post('/api/modules/:id/push', authenticate, (req, res) => {
         try {
             const moduleId = req.params.id;
+            if (!isSafeModuleId(moduleId)) {
+                return res.status(400).json({ error: 'Invalid module id' });
+            }
             const { roomCode } = req.body;
             const modulesPath = path.join(__dirname, 'modules', moduleId);
             if (!fs.existsSync(modulesPath)) return res.status(404).json({ error: 'Module not found' });
@@ -382,6 +402,9 @@ function createApiRouter(appConfig) {
     router.post('/api/modules/:id/cleanup', authenticate, (req, res) => {
         try {
             const moduleId = req.params.id;
+            if (!isSafeModuleId(moduleId)) {
+                return res.status(400).json({ error: 'Invalid module id' });
+            }
             const { roomCode } = req.body;
 
             if (roomCode) {
@@ -409,7 +432,7 @@ function createApiRouter(appConfig) {
 
     // Helper to ensure room.characters exists (object keyed by character name)
     function ensureCharacters(r) {
-        if (!r.characters) r.characters = {};
+        if (!r.characters) r.characters = Object.create(null);
         return r.characters;
     }
 
@@ -431,7 +454,7 @@ function createApiRouter(appConfig) {
             const r = room.getRoom(req.params.code);
             const chars = ensureCharacters(r);
             const name = req.params.name;
-            if (!chars[name]) {
+            if (!name || UNSAFE_KEYS.has(name) || !chars[name]) {
                 return res.status(404).json({ error: 'Character not found' });
             }
             res.json(chars[name]);
@@ -452,12 +475,10 @@ function createApiRouter(appConfig) {
 
             const results = {};
             for (const [name, data] of Object.entries(updates)) {
+                if (!name || UNSAFE_KEYS.has(name)) continue;
                 if (!chars[name]) chars[name] = { name };
-                // Deep merge all top-level fields
-                for (const [key, value] of Object.entries(data)) {
-                    if (key === 'name') continue;
-                    chars[name][key] = value;
-                }
+                // Deep merge all top-level fields, skipping __proto__/constructor/prototype
+                safeAssign(chars[name], data);
                 results[name] = chars[name];
             }
 
@@ -486,6 +507,9 @@ function createApiRouter(appConfig) {
                 const r = room.getRoom(req.params.code);
                 const chars = ensureCharacters(r);
                 const name = req.params.name;
+                if (!name || UNSAFE_KEYS.has(name)) {
+                    return res.status(400).json({ error: 'Invalid character name' });
+                }
                 if (!chars[name]) chars[name] = { name };
                 const delta = typeof req.body.delta === 'number' ? req.body.delta : 0;
                 const current = chars[name][field] || 0;
@@ -553,6 +577,9 @@ function createApiRouter(appConfig) {
             const roomCode = req.params.code.toUpperCase();
             room.getRoom(roomCode); // verify room exists
             const campaignCode = req.params.campaignCode;
+            if (!isSafeCampaignCode(campaignCode)) {
+                return res.status(400).json({ error: 'Invalid campaign code' });
+            }
 
             const data = await storage.loadCampaign(roomCode, campaignCode);
             res.json(data);

@@ -213,13 +213,14 @@ async function initMysql() {
     return {
         async save(roomCode, campaignCode, data) {
             const now = Date.now();
+            const json = JSON.stringify(data);
             await pool.query(
                 `INSERT INTO campaigns (room_code, campaign_code, data, created_at, updated_at)
                  VALUES (?, ?, ?, COALESCE((SELECT created_at FROM campaigns WHERE room_code = ? AND campaign_code = ?), ?), ?)
                  ON DUPLICATE KEY UPDATE
                      data = VALUES(data),
                      updated_at = VALUES(updated_at)`,
-                [roomCode, campaignCode, data, roomCode, campaignCode, now, now]
+                [roomCode, campaignCode, json, roomCode, campaignCode, now, now]
             );
             // Consolidate: keep only the latest maxCampaigns per room
             // Use a subquery to avoid DELETE with LIMIT in a subquery (works in MySQL)
@@ -245,7 +246,10 @@ async function initMysql() {
                 [roomCode, campaignCode]
             );
             if (rows.length === 0) throw new Error('Campaign not found');
-            return rows[0].data;
+            const raw = rows[0].data;
+            // mysql2 normally auto-parses a JSON-typed column back into an
+            // object, but don't assume that -- handle either shape safely.
+            return typeof raw === 'string' ? JSON.parse(raw) : raw;
         },
 
         close() {
