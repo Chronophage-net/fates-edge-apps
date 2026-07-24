@@ -1,14 +1,16 @@
 {
   "name": "fates-edge-web-client",
   "version": "4.1.2a",
+  "type": "module",
   "description": "Fate's Edge Toolkit Web Client",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "npm run build:manifests && vite build",
     "preview": "vite preview",
     "serve": "npx serve -s dist -l ${PORT:-10000}",
     "start": "npm run dev",
-    "seed": "node js/tools/generate-seed.js"
+    "seed": "node js/tools/generate-seed.js",
+    "build:manifests": "node js/tools/generate-manifests.js"
   },
   "dependencies": {
     "serve": "^14.2.0"

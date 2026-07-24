@@ -4,6 +4,8 @@
  * 
  * v2 – JRPG-style horizontal character cards, character selection,
  *       common rolls, larger fonts, avatar support.
+ * v3 – Restructured layout/visual pass: card-based sections, stat pills,
+ *      clearer typographic hierarchy. No IDs/classes/behavior removed.
  */
 
 import { vttStore } from '../../core/vtt-store.js';
@@ -105,21 +107,26 @@ function rollLocal(postToChat = true) {
     return;
   }
   if (out) {
-    let html = `
-      <span class="outcome-tag ${result.outcomeClass}" style="display:inline-block;padding:0.15rem 0.8rem;border-radius:20px;font-weight:600;font-size:0.9rem;margin-right:0.4rem;background:${getOutcomeColor(result.outcome)};">
-        ${result.outcome}
-      </span>
-    `;
     const diceHtml = result.dice.map(die => {
       let bgColor = 'var(--bg4)', textColor = 'var(--text)', label = die;
       if (die === 10) { bgColor = 'var(--green)'; textColor = 'white'; label = '10'; }
       else if (die >= 6) { bgColor = 'var(--green)'; textColor = 'white'; }
       else if (die === 1) { bgColor = 'var(--red)'; textColor = 'white'; label = '1⚠️'; }
-      return `<span style="display:inline-block;padding:0.1rem 0.5rem;margin:0.1rem;border-radius:6px;background:${bgColor};color:${textColor};font-size:0.9rem;">${label}</span>`;
-    }).join(' ');
-    html += `<div style="margin:0.4rem 0;">${diceHtml}</div>`;
-    html += `<div style="font-size:0.9rem;color:var(--text2);">Successes: <strong style="color:var(--green);">${result.successes}</strong> | Story Beats: <strong style="color:var(--red);">${result.storyBeats}</strong>${result.reRolls > 0 ? `| Re-rolls: ${result.reRolls}` : ''}</div>`;
-    out.innerHTML = html;
+      return `<span class="vtt-roll-die" style="background:${bgColor};color:${textColor};">${label}</span>`;
+    }).join('');
+    out.innerHTML = `
+      <div class="vtt-roll-result">
+        <span class="outcome-tag ${result.outcomeClass}" style="display:inline-block;padding:0.15rem 0.8rem;border-radius:20px;font-weight:600;font-size:0.9rem;margin-right:0.4rem;background:${getOutcomeColor(result.outcome)};">
+          ${result.outcome}
+        </span>
+        <div class="vtt-roll-dice">${diceHtml}</div>
+        <div class="vtt-roll-meta">
+          <span>Successes: <strong style="color:var(--green);">${result.successes}</strong></span>
+          <span>Story Beats: <strong style="color:var(--red);">${result.storyBeats}</strong></span>
+          ${result.reRolls > 0 ? `<span>Re-rolls: <strong>${result.reRolls}</strong></span>` : ''}
+        </div>
+      </div>
+    `;
   }
   const postCheckbox = q('#vtt-post-chat');
   const shouldPost = postToChat && postCheckbox?.checked;
@@ -431,75 +438,129 @@ export function render(el) {
   }).join('');
 
   el.innerHTML = `
+    <div class="vtt-live-table">
+    <style>
+        .vtt-live-table .vtt-card {
+            background: var(--bg2);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 0.9rem 1.1rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.10);
+        }
+        .vtt-live-table .vtt-card-header {
+            display: flex; align-items: center; justify-content: space-between;
+            gap: 0.5rem; margin-bottom: 0.6rem; flex-wrap: wrap;
+        }
+        .vtt-live-table .vtt-card-title {
+            display: flex; align-items: center; gap: 0.4rem;
+            font-size: 1.15rem; font-weight: 600; margin: 0; color: var(--text);
+        }
+        .vtt-live-table .vtt-stat-row { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; }
+        .vtt-live-table .vtt-stat-pill {
+            display: inline-flex; align-items: center; gap: 0.35rem;
+            background: var(--bg3); border: 1px solid var(--border);
+            padding: 0.25rem 0.75rem; border-radius: 999px; font-size: 0.85rem; color: var(--text2);
+        }
+        .vtt-live-table .vtt-stat-pill strong { color: var(--text); font-weight: 600; }
+        .vtt-live-table .vtt-divider { border-top: 1px solid var(--border); margin: 0.7rem 0; }
+        .vtt-live-table .vtt-section-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 1.2rem; align-items: start; }
+        .vtt-live-table .vtt-sidebar { display: flex; flex-direction: column; gap: 1.1rem; }
+        .vtt-live-table .vtt-btn-row { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+        .vtt-live-table .vtt-field label {
+            display: block; font-size: 0.78rem; color: var(--text3);
+            margin-bottom: 0.2rem; text-transform: uppercase; letter-spacing: 0.02em;
+        }
+        .vtt-live-table .vtt-roll-result {
+            background: var(--bg3); border: 1px solid var(--border);
+            border-radius: calc(var(--radius) - 2px); padding: 0.65rem 0.8rem;
+        }
+        .vtt-live-table .vtt-roll-dice { display: flex; flex-wrap: wrap; gap: 0.3rem; margin: 0.5rem 0; }
+        .vtt-live-table .vtt-roll-die {
+            display: inline-flex; align-items: center; justify-content: center;
+            min-width: 1.9rem; height: 1.9rem; border-radius: 6px; font-weight: 700; font-size: 0.9rem;
+        }
+        .vtt-live-table .vtt-roll-meta { display: flex; gap: 1rem; flex-wrap: wrap; font-size: 0.88rem; color: var(--text2); }
+        .vtt-live-table .vtt-hint { font-size: 0.82rem; color: var(--text3); margin-top: 0.5rem; }
+        .vtt-live-table .vtt-hint code { background: var(--bg4); padding: 0.05rem 0.35rem; border-radius: 4px; font-size: 0.78rem; }
+        @media (max-width: 900px) {
+            .vtt-live-table .vtt-section-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+
     <div class="vtt-header" style="margin-bottom:1.2rem;">
-      <h1 class="page-title" style="display:flex;align-items:center;gap:0.6rem;font-size:1.8rem;">
+      <h1 class="page-title" style="display:flex;align-items:center;gap:0.6rem;flex-wrap:wrap;font-size:1.8rem;">
         💬 VTT – Live Table
-        <span class="mode-indicator" style="font-size:0.8rem;font-weight:400;background:var(--bg3);padding:0.2rem 0.8rem;border-radius:20px;color:var(--gold);">📡 Local</span>
-        <button class="btn btn-sm" onclick="window.location.hash='whiteboard'" title="Open Whiteboard" style="font-size:0.9rem;">✏️ Whiteboard</button>
+        <span class="mode-indicator vtt-stat-pill" style="color:var(--gold);">📡 Local</span>
+        <button class="btn btn-sm" onclick="window.location.hash='whiteboard'" title="Open Whiteboard">✏️ Whiteboard</button>
       </h1>
-      <p class="page-sub" style="margin:0.2rem 0 0;font-size:1.1rem;">Chat, party status, quick die roller, and scene timers all in one view.</p>
+      <p class="page-sub" style="margin:0.25rem 0 0;font-size:1.05rem;color:var(--text3);">Chat, party status, quick die roller, and scene timers all in one view.</p>
     </div>
-    <div class="panel" style="padding:0.5rem 1rem;margin-bottom:1rem;">
-      <div class="flex-between" style="flex-wrap:wrap;gap:0.5rem;">
-        <div class="flex" style="gap:0.5rem;flex-wrap:wrap;align-items:center;">
-          <span style="display:inline-block;width:12px;height:12px;border-radius:50%;background:var(--gold);"></span>
-          <span class="text-muted" style="font-size:1rem;">📡 Local mode (no server)</span>
-        </div>
-        <div class="flex" style="gap:0.5rem;flex-wrap:wrap;align-items:center;">
+
+    <div class="panel vtt-card" style="margin-bottom:1.1rem;">
+      <div class="vtt-card-header">
+        <span class="vtt-card-title">🛰️ Table Status</span>
+        <span class="vtt-stat-pill">
+          <span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--gold);"></span>
+          📡 Local mode (no server)
+        </span>
+      </div>
+      <div class="vtt-stat-row" style="justify-content:space-between;">
+        <div class="vtt-btn-row" style="align-items:center;">
           <button class="btn btn-sm ${voiceInitialized ? 'btn-primary' : ''}" id="vtt-voice-toggle"
-            ${voiceAvailable ? '' : 'disabled'} title="${voiceAvailable ? 'Toggle voice chat' : 'Voice requires a server connection'}" style="font-size:0.9rem;">
+            ${voiceAvailable ? '' : 'disabled'} title="${voiceAvailable ? 'Toggle voice chat' : 'Voice requires a server connection'}">
             ${voiceAvailable ? (voiceInitialized ? '🎤 Voice On' : '🎤 Voice Off') : '🎤 Voice (unavailable)'}
           </button>
-          ${voiceInitialized ? `<button class="btn btn-sm ${getVoiceStatus()?.muted ? 'btn-danger' : 'btn-green'}" id="vtt-mute-toggle" style="font-size:0.9rem;">${getVoiceStatus()?.muted ? '🔇 Muted' : '🎙️ Live'}</button>` : ''}
-          <span class="text-muted" id="voice-clients-count" style="font-size:0.9rem;">${voiceClients.length} voice users</span>
+          ${voiceInitialized ? `<button class="btn btn-sm ${getVoiceStatus()?.muted ? 'btn-danger' : 'btn-green'}" id="vtt-mute-toggle">${getVoiceStatus()?.muted ? '🔇 Muted' : '🎙️ Live'}</button>` : ''}
+          <span class="vtt-stat-pill" id="voice-clients-count">${voiceClients.length} voice users</span>
         </div>
       </div>
       <div id="voice-clients-list" style="display:flex;flex-wrap:wrap;gap:0.5rem;margin-top:0.5rem;">${voiceClientsHtml}</div>
-      <div style="margin-top:0.5rem;padding-top:0.5rem;border-top:1px solid var(--border);">
-        <div class="flex-between">
-          <span class="text-muted" style="font-size:1rem;">👥 Party Members</span>
-          <span class="text-muted" id="vtt-mode-badge" style="background:var(--bg3);padding:0.1rem 0.6rem;border-radius:12px;font-size:0.8rem;">📡 Local</span>
-        </div>
-        <div id="presence-list" style="margin-top:0.2rem;"></div>
+
+      <div class="vtt-divider"></div>
+
+      <div class="vtt-card-header" style="margin-bottom:0.35rem;">
+        <span class="vtt-card-title" style="font-size:1rem;">👥 Party Members</span>
+        <span class="vtt-stat-pill" id="vtt-mode-badge">📡 Local</span>
       </div>
+      <div id="presence-list"></div>
     </div>
 
-    <div class="vtt-container" style="display:grid;grid-template-columns:2fr 1fr;gap:1.2rem;">
+    <div class="vtt-container vtt-section-grid">
       <!-- Chat Column -->
-      <div class="chat-box" style="background:var(--bg3);border-radius:var(--radius);padding:0.8rem;display:flex;flex-direction:column;min-height:500px;">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.5rem;">
-          <h3 style="margin:0;font-size:1.4rem;">💬 Chat</h3>
-          <div style="display:flex;gap:0.3rem;align-items:center;font-size:0.9rem;">
+      <div class="chat-box vtt-card" style="display:flex;flex-direction:column;min-height:500px;">
+        <div class="vtt-card-header">
+          <span class="vtt-card-title">💬 Chat</span>
+          <div class="vtt-btn-row" style="align-items:center;">
             <span class="text-muted" id="message-count">0 messages</span>
-            <button class="btn btn-sm btn-ghost" id="vtt-clear-chat" title="Clear chat" style="font-size:0.9rem;">🗑️</button>
+            <button class="btn btn-sm btn-ghost" id="vtt-clear-chat" title="Clear chat">🗑️</button>
           </div>
         </div>
-        <div class="chat-messages" id="chatMessages" style="flex:1;overflow-y:auto;padding:0.5rem;background:var(--bg2);border-radius:var(--radius);margin-bottom:0.5rem;font-size:1rem;display:flex;flex-direction:column;max-height:450px;min-height:250px;"></div>
+        <div class="chat-messages" id="chatMessages" style="flex:1;overflow-y:auto;padding:0.5rem;background:var(--bg3);border-radius:calc(var(--radius) - 2px);margin-bottom:0.5rem;font-size:1rem;display:flex;flex-direction:column;max-height:450px;min-height:250px;"></div>
         <!-- Selected character display (rendered by renderChat) -->
-        <div id="selected-character-display" style="margin-bottom:0.4rem;padding:0.2rem 0.4rem;background:var(--bg4);border-radius:var(--radius);min-height:2.5rem;"></div>
+        <div id="selected-character-display" style="margin-bottom:0.4rem;padding:0.2rem 0.4rem;background:var(--bg4);border-radius:calc(var(--radius) - 2px);min-height:2.5rem;"></div>
         <div class="chat-input-row" style="display:flex;gap:0.4rem;">
-          <input type="text" id="chatInput" placeholder="Type… (/roll, /timer, /help)" style="flex:1;font-size:1rem;padding:0.4rem;" />
+          <input type="text" id="chatInput" placeholder="Type… (/roll, /timer, /help)" style="flex:1;font-size:1rem;padding:0.5rem 0.6rem;" />
           <select id="chatRecipient" style="flex:0 0 120px;font-size:1rem;">
             <option value="all">All</option>
           </select>
-          <button class="btn btn-gold" id="chat-send-btn" style="font-size:1rem;">Send</button>
+          <button class="btn btn-gold" id="chat-send-btn">Send</button>
         </div>
-        <div class="flex mt-1" style="flex-wrap:wrap;gap:0.5rem;font-size:0.9rem;">
+        <div class="flex mt-1" style="flex-wrap:wrap;gap:0.9rem;font-size:0.9rem;align-items:center;">
           <label class="inline-check"><input type="checkbox" id="vtt-post-chat" checked /> Post rolls to chat</label>
           <label class="inline-check"><input type="checkbox" id="vtt-auto-scroll" checked /> Auto-scroll</label>
         </div>
+        <div class="vtt-hint">Try <code>/roll 3 2 3</code> or <code>/help</code> for the full command list.</div>
       </div>
 
       <!-- Sidebar -->
-      <div class="vtt-sidebar" style="display:flex;flex-direction:column;gap:1.2rem;">
+      <div class="vtt-sidebar">
         <!-- Party Status (vertical, scrollable) -->
-        <div class="vtt-panel" style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:0.8rem;">
-          <div style="display:flex;justify-content:space-between;align-items:center;">
-            <h3 style="margin:0;font-size:1.2rem;">👥 Party</h3>
-            <button class="btn btn-sm btn-ghost" id="vtt-refresh-btn" title="Refresh" style="font-size:0.9rem;">↻</button>
+        <div class="vtt-panel vtt-card">
+          <div class="vtt-card-header">
+            <span class="vtt-card-title" style="font-size:1.05rem;">👥 Party</span>
+            <button class="btn btn-sm btn-ghost" id="vtt-refresh-btn" title="Refresh">↻</button>
           </div>
           <div id="vttCharGrid" style="
-              margin-top:0.5rem;
               max-height:220px;
               overflow-y:auto;
               padding-right:4px;
@@ -508,57 +569,62 @@ export function render(el) {
         </div>
 
         <!-- Quick Roller + Common Rolls -->
-        <div class="vtt-panel" style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:0.8rem;">
-          <h3 style="margin-top:0;font-size:1.2rem;">🎲 Quick Roller</h3>
+        <div class="vtt-panel vtt-card">
+          <div class="vtt-card-header">
+            <span class="vtt-card-title" style="font-size:1.05rem;">🎲 Quick Roller</span>
+          </div>
           <div class="vtt-dice-row" style="display:flex;flex-wrap:wrap;gap:0.5rem;align-items:end;">
-            <div class="field" style="flex:1;min-width:70px;">
-              <label style="font-size:0.9rem;">Attr</label>
-              <select id="vtt-attr" style="font-size:1rem;padding:0.2rem;">
+            <div class="vtt-field" style="flex:1;min-width:70px;">
+              <label>Attr</label>
+              <select id="vtt-attr" style="font-size:1rem;padding:0.25rem;width:100%;">
                 <option value="1">1</option><option value="2">2</option><option value="3" selected>3</option><option value="4">4</option><option value="5">5</option>
               </select>
             </div>
-            <div class="field" style="flex:1;min-width:70px;">
-              <label style="font-size:0.9rem;">Skill</label>
-              <select id="vtt-skill" style="font-size:1rem;padding:0.2rem;">
+            <div class="vtt-field" style="flex:1;min-width:70px;">
+              <label>Skill</label>
+              <select id="vtt-skill" style="font-size:1rem;padding:0.25rem;width:100%;">
                 <option value="0">0</option><option value="1">1</option><option value="2" selected>2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option>
               </select>
             </div>
-            <div class="field" style="flex:0 0 80px;">
-              <label style="font-size:0.9rem;">DV</label>
-              <select id="vtt-dv" style="font-size:1rem;padding:0.2rem;">
+            <div class="vtt-field" style="flex:0 0 80px;">
+              <label>DV</label>
+              <select id="vtt-dv" style="font-size:1rem;padding:0.25rem;width:100%;">
                 <option value="2">2</option><option value="3" selected>3</option><option value="4">4</option><option value="5">5+</option>
               </select>
             </div>
-            <div class="field" style="flex:0 0 90px;">
-              <label style="font-size:0.9rem;">Pos</label>
-              <select id="vtt-pos" style="font-size:1rem;padding:0.2rem;">
+            <div class="vtt-field" style="flex:0 0 90px;">
+              <label>Pos</label>
+              <select id="vtt-pos" style="font-size:1rem;padding:0.25rem;width:100%;">
                 <option value="dominant">Dom</option><option value="controlled" selected>Ctrl</option><option value="desperate">Desp</option>
               </select>
             </div>
-            <div class="field" style="flex:0 0 70px;">
-              <label style="font-size:0.9rem;">Boons</label>
-              <input type="number" id="vtt-boons" value="0" min="0" max="5" style="font-size:1rem;padding:0.2rem;width:60px;" />
+            <div class="vtt-field" style="flex:0 0 70px;">
+              <label>Boons</label>
+              <input type="number" id="vtt-boons" value="0" min="0" max="5" style="font-size:1rem;padding:0.25rem;width:100%;" />
             </div>
           </div>
           <!-- Common Rolls -->
-          <div id="vtt-common-rolls" style="margin-top:0.4rem;min-height:2.5rem;"></div>
-          <div class="flex" style="gap:0.4rem;margin-top:0.4rem;">
-            <button class="btn btn-gold btn-sm" id="vtt-roll-post-btn" style="font-size:0.95rem;">Roll &amp; Post</button>
-            <button class="btn btn-sm" id="vtt-roll-only-btn" style="font-size:0.95rem;">Roll Only</button>
+          <div id="vtt-common-rolls" style="margin-top:0.5rem;min-height:2.5rem;"></div>
+          <div class="vtt-btn-row" style="margin-top:0.5rem;">
+            <button class="btn btn-gold btn-sm" id="vtt-roll-post-btn">Roll &amp; Post</button>
+            <button class="btn btn-sm" id="vtt-roll-only-btn">Roll Only</button>
           </div>
-          <div id="vtt-roll-output" class="mt-1" style="font-size:1rem;min-height:3rem;padding:0.2rem 0;"></div>
+          <div id="vtt-roll-output" class="mt-1" style="min-height:3rem;padding:0.2rem 0;"></div>
         </div>
 
         <!-- Timers -->
-        <div class="vtt-panel" style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:0.8rem;">
-          <h3 style="margin-top:0;font-size:1.2rem;">⏱️ Scene Timers</h3>
+        <div class="vtt-panel vtt-card">
+          <div class="vtt-card-header">
+            <span class="vtt-card-title" style="font-size:1.05rem;">⏱️ Scene Timers</span>
+          </div>
           <div id="vttTimerList"></div>
-          <div style="display:flex;gap:0.4rem;margin-top:0.5rem;">
-            <button class="btn btn-sm" id="vtt-add-timer" style="font-size:0.9rem;">+ Add Timer</button>
-            <button class="btn btn-sm" id="vtt-scene-end" style="font-size:0.9rem;">🌅 Scene End</button>
+          <div class="vtt-btn-row" style="margin-top:0.5rem;">
+            <button class="btn btn-sm" id="vtt-add-timer">+ Add Timer</button>
+            <button class="btn btn-sm" id="vtt-scene-end">🌅 Scene End</button>
           </div>
         </div>
       </div>
+    </div>
     </div>
   `;
 

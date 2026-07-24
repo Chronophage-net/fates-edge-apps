@@ -2,6 +2,8 @@ import { getState, addCharacter, getCharacter, updateCharacter, deleteCharacter 
 import { generateId, escHtml, safeParseInt, clamp } from '../../core/utils.js';
 import { showToast } from '../../components/Toast.js';
 
+console.log('[Editor] Module loaded');
+
 // ============================================================
 // GAME DATA CONSTANTS (from Player's Guide)
 // ============================================================
@@ -128,6 +130,7 @@ const editorState = {
 // ============================================================
 
 function initEditor() {
+    console.log('[Editor] initEditor called, initialized:', editorState.initialized);
     if (editorState.initialized) return;
     
     // Global click delegation for dynamic buttons and catalog adds
@@ -136,11 +139,13 @@ function initEditor() {
         
         if (target.matches('[data-editor-add]')) {
             const type = target.dataset.editorAdd;
+            console.log('[Editor] Click: data-editor-add:', type);
             addCEDynamic(type);
             e.preventDefault();
         }
         
         if (target.matches('.editor-remove-btn')) {
+            console.log('[Editor] Click: editor-remove-btn');
             const row = target.closest('.dynamic-row');
             if (row) row.remove();
             recalculateXpBudget();
@@ -150,6 +155,7 @@ function initEditor() {
         if (target.matches('[data-editor-wiki-add]')) {
             const type = target.dataset.editorWikiAdd;
             const select = document.getElementById(`ce-${type}-wiki`);
+            console.log('[Editor] Click: data-editor-wiki-add:', type, 'select value:', select?.value);
             if (select && select.value) {
                 addCEDynamicFromWiki(type, select.value);
                 select.value = '';
@@ -161,18 +167,21 @@ function initEditor() {
         if (target.matches('.ce-catalog-add-btn')) {
             const name = target.dataset.name;
             const cost = parseInt(target.dataset.cost, 10);
+            console.log('[Editor] Click: catalog add talent:', name, cost);
             addTalentFromCatalog(name, cost);
             e.preventDefault();
         }
 
         // Custom talent add button
         if (target.matches('#ce-add-custom-talent')) {
+            console.log('[Editor] Click: add custom talent');
             addCEDynamic('talent');   // adds editable row
             e.preventDefault();
         }
     });
     
     editorState.initialized = true;
+    console.log('[Editor] initEditor complete');
 }
 
 // ============================================================
@@ -180,24 +189,35 @@ function initEditor() {
 // ============================================================
 
 export function openEditor(id) {
+    console.log('[Editor] openEditor called with id:', id);
+
+    // Close any existing editor first
     closeEditor();
+
+    // Initialize global click delegation
     initEditor();
-    
+
+    // Create modal element
+    console.log('[Editor] Creating modal...');
     const modal = createModal();
     document.body.appendChild(modal);
-    
+    console.log('[Editor] Modal appended to body');
+
     const title = document.getElementById('char-modal-title');
     const content = document.getElementById('char-editor-content');
-    
+
     if (!modal || !title || !content) {
+        console.error('[Editor] Modal elements missing!', { modal, title, content });
         showToast('Editor modal not found. Please refresh.', 'error');
         return;
     }
-    
+
     let c;
     if (id) {
         c = getCharacter(id);
+        console.log('[Editor] Retrieved character by id:', id, c ? 'found' : 'not found');
         if (!c) {
+            console.error('[Editor] Character not found for id:', id);
             showToast('Character not found', 'error');
             return;
         }
@@ -206,26 +226,55 @@ export function openEditor(id) {
         title.textContent = 'Edit Character';
     } else {
         c = createNewCharacter();
-        addCharacter(c); // register immediately so getCharacter()/updateCharacter() calls during editing (and on Save) can find it
+        addCharacter(c);
+        console.log('[Editor] Created new character with id:', c.id);
         editorState.currentId = c.id;
         editorState.isNew = true;
         title.textContent = 'New Character';
     }
-    
+
     editorState.isOpen = true;
     editorState.saved = false;
     editorState.modalElement = modal;
-    content.innerHTML = buildEditorHTML(c);
+
+    console.log('[Editor] Building editor HTML for character:', c.id, c.name);
+
+    let html;
+    try {
+        html = buildEditorHTML(c);
+        console.log('[Editor] buildEditorHTML returned, type:', typeof html, 'length:', html ? html.length : 0);
+    } catch (err) {
+        console.error('[Editor] Error in buildEditorHTML:', err);
+        content.innerHTML = `<div style="padding:1rem;color:var(--red);">Error building editor: ${err.message}</div>`;
+        showToast('Error loading editor. See console.', 'error');
+        return;
+    }
+
+    try {
+        content.innerHTML = html;
+        console.log('[Editor] content.innerHTML set successfully');
+    } catch (err) {
+        console.error('[Editor] Error setting content.innerHTML:', err);
+        content.innerHTML = `<div style="padding:1rem;color:var(--red);">Error inserting editor content: ${err.message}</div>`;
+        showToast('Error loading editor. See console.', 'error');
+        return;
+    }
+
+    // Show the modal
     modal.style.display = 'flex';
     document.body.classList.add('modal-open');
-    
+    console.log('[Editor] Modal shown, body class added');
+
     attachEditorEvents();
     recalculateXpBudget();
-    renderTalentCatalog();   // ← populate catalog
+    renderTalentCatalog();
+    console.log('[Editor] openEditor complete');
 }
 
 export function closeEditor() {
+    console.log('[Editor] closeEditor called, isNew:', editorState.isNew, 'saved:', editorState.saved, 'currentId:', editorState.currentId);
     if (editorState.isNew && !editorState.saved && editorState.currentId) {
+        console.log('[Editor] Deleting unsaved new character:', editorState.currentId);
         deleteCharacter(editorState.currentId);
     }
 
@@ -236,6 +285,7 @@ export function closeEditor() {
             editorState.overlayListener = null;
         }
         modal.remove();
+        console.log('[Editor] Modal removed');
     }
     
     document.body.classList.remove('modal-open');
@@ -261,6 +311,7 @@ export function closeEditor() {
     editorState.isNew = false;
     editorState.saved = false;
     editorState.modalElement = null;
+    console.log('[Editor] Editor state reset');
 }
 
 // ============================================================
@@ -268,6 +319,7 @@ export function closeEditor() {
 // ============================================================
 
 function createModal() {
+    console.log('[Editor] createModal called');
     const modal = document.createElement('div');
     modal.id = 'charModal';
     modal.className = 'modal-overlay';
@@ -304,7 +356,7 @@ function createModal() {
             <div id="char-editor-content"></div>
         </div>
     `;
-    
+    console.log('[Editor] Modal element created');
     return modal;
 }
 
@@ -313,6 +365,7 @@ function createModal() {
 // ============================================================
 
 function createNewCharacter() {
+    console.log('[Editor] createNewCharacter called');
     return {
         id: generateId(),
         name: '',
@@ -428,6 +481,7 @@ function calculateTotalXpSpent(c) {
 // ============================================================
 
 function getAvailableTalentsForTier(totalXp) {
+    console.log('[Editor] getAvailableTalentsForTier totalXp:', totalXp);
     const appState = getState();
     const localTalents = appState.talents || [];
     const wikiEntries = appState.wikiEntries || [];
@@ -444,7 +498,7 @@ function getAvailableTalentsForTier(totalXp) {
     else if (tier === 'II') allowedTiers = ['minor', 'major'];
     else allowedTiers = ['minor', 'major', 'prestige', 'epic'];
 
-    return allTalents.filter(t => {
+    const filtered = allTalents.filter(t => {
         const cost = safeParseInt(t.cost, 0);
         for (const tierObj of TALENT_TIERS) {
             if (cost >= tierObj.min && cost <= tierObj.max && allowedTiers.includes(tierObj.id))
@@ -452,11 +506,17 @@ function getAvailableTalentsForTier(totalXp) {
         }
         return false;
     });
+    console.log('[Editor] Available talents for tier:', filtered.length);
+    return filtered;
 }
 
 function renderTalentCatalog() {
+    console.log('[Editor] renderTalentCatalog called');
     const catalogEl = document.getElementById('ce-talent-catalog');
-    if (!catalogEl) return;
+    if (!catalogEl) {
+        console.warn('[Editor] Catalog element not found');
+        return;
+    }
     const totalXp = safeParseInt(document.getElementById('ce-total-xp')?.value, 32);
     const available = getAvailableTalentsForTier(totalXp);
 
@@ -481,11 +541,16 @@ function renderTalentCatalog() {
             </div>
         `;
     }).join('');
+    console.log('[Editor] Catalog rendered with', available.length, 'items');
 }
 
 function addTalentFromCatalog(name, cost) {
+    console.log('[Editor] addTalentFromCatalog:', name, cost);
     const listEl = document.getElementById('ce-talent-list');
-    if (!listEl) return;
+    if (!listEl) {
+        console.warn('[Editor] Talent list element not found');
+        return;
+    }
 
     // Create read-only row
     const row = document.createElement('div');
@@ -499,6 +564,7 @@ function addTalentFromCatalog(name, cost) {
 
     recalculateXpBudget();
     showToast(`Added talent "${name}" (${cost} XP)`, 'success');
+    console.log('[Editor] Talent added from catalog');
 }
 
 // ============================================================
@@ -506,6 +572,7 @@ function addTalentFromCatalog(name, cost) {
 // ============================================================
 
 function attachEditorEvents() {
+    console.log('[Editor] attachEditorEvents called');
     const saveBtn = document.getElementById('ce-save-btn');
     if (saveBtn) {
         if (editorState.saveListener) {
@@ -513,6 +580,7 @@ function attachEditorEvents() {
         }
         editorState.saveListener = saveEditor;
         saveBtn.addEventListener('click', editorState.saveListener);
+        console.log('[Editor] Save listener attached');
     }
     
     const closeBtns = ['ce-cancel-btn', 'charModalClose'];
@@ -522,6 +590,7 @@ function attachEditorEvents() {
             const handler = closeEditor;
             btn.addEventListener('click', handler);
             editorState.cancelListeners.push({ btn, handler });
+            console.log('[Editor] Close listener attached to', id);
         }
     }
     
@@ -536,6 +605,7 @@ function attachEditorEvents() {
         };
         modal.addEventListener('click', handler);
         editorState.overlayListener = handler;
+        console.log('[Editor] Overlay click listener attached');
     }
     
     if (editorState.escListener) {
@@ -546,6 +616,7 @@ function attachEditorEvents() {
         if (e.key === 'Escape') closeEditor();
     };
     document.addEventListener('keydown', editorState.escListener);
+    console.log('[Editor] Escape listener attached');
     
     // Attribute change listeners for derived stats
     ['body', 'wits', 'spirit', 'presence'].forEach(attr => {
@@ -555,6 +626,7 @@ function attachEditorEvents() {
             input.addEventListener('input', updateDerivedStats);
         }
     });
+    console.log('[Editor] Attribute listeners attached');
     
     const heritageSelect = document.getElementById('ce-heritage');
     if (heritageSelect) {
@@ -571,6 +643,7 @@ function attachEditorEvents() {
             updateTierDisplay();
             renderTalentCatalog();
         });
+        console.log('[Editor] XP input listeners attached');
     }
     
     const armorSelect = document.getElementById('ce-armor-type');
@@ -601,6 +674,7 @@ function attachEditorEvents() {
             input.addEventListener('input', () => recalculateXpBudget());
         }
     });
+    console.log('[Editor] Skill listeners attached');
     
     document.querySelectorAll('.ce-weapon-tag').forEach(cb => {
         cb.addEventListener('change', () => {
@@ -612,6 +686,7 @@ function attachEditorEvents() {
             recalculateXpBudget();
         });
     });
+    console.log('[Editor] Weapon tag listeners attached');
 }
 
 function updateDerivedStats() {
@@ -722,6 +797,7 @@ function validateSkillCap(skillKey, skillName) {
 // ============================================================
 
 function recalculateXpBudget() {
+    console.log('[Editor] recalculateXpBudget called');
     const body = safeParseInt(document.getElementById('ce-body')?.value, 1);
     const wits = safeParseInt(document.getElementById('ce-wits')?.value, 1);
     const spirit = safeParseInt(document.getElementById('ce-spirit')?.value, 1);
@@ -831,6 +907,7 @@ function recalculateXpBudget() {
             </div>
         `;
     }
+    console.log('[Editor] XP budget recalculated: total=', totalXp, 'spent=', spent);
 }
 
 // ============================================================
@@ -838,6 +915,7 @@ function recalculateXpBudget() {
 // ============================================================
 
 function buildEditorHTML(c) {
+    console.log('[Editor] buildEditorHTML called for character:', c.id, c.name);
     const heritageOptions = HERITAGES.map(h => 
         `<option value="${h.id}" ${c.heritage === h.id ? 'selected' : ''}>${escHtml(h.label)}</option>`
     ).join('');
@@ -924,7 +1002,7 @@ function buildEditorHTML(c) {
                 <div class="field"><label>Background Name</label><input id="ce-background" value="${escHtml(c.background || '')}" placeholder="e.g., Marcher Veteran, Merchant Factor" /></div>
             </div>
             <div class="form-row">
-                <div class="field"><label>Background Tags (Access)</label><input id="ce-background-tags" value="${escHtml(c.backgroundTags?.join(', ') || '')}" placeholder="e.g., Veteran-of-the-Marches, Muster Papers" /></div>
+                <div class="field"><label>Background Tags (Access)</label><input id="ce-background-tags" value="${escHtml(Array.isArray(c.backgroundTags) ? c.backgroundTags.join(', ') : (c.backgroundTags || ''))}" placeholder="e.g., Veteran-of-the-Marches, Muster Papers" /></div>
             </div>
             <div class="form-row">
                 <div class="field"><label>Signature Contact</label><input id="ce-background-contact" value="${escHtml(c.backgroundContact || '')}" placeholder="Named NPC (Cap 1 follower, +1d assist once/scene)" /></div>
@@ -1193,12 +1271,14 @@ function wikiPickerHTML(type, cat) {
 // ============================================================
 
 export function saveEditor() {
+    console.log('[Editor] saveEditor called');
     const g = s => document.querySelector(s);
     const v = s => g(s)?.value || '';
     const n = s => safeParseInt(g(s)?.value);
     
     const name = v('#ce-name');
     if (!name || !name.trim()) {
+        console.warn('[Editor] Save aborted: name is required');
         showToast('Character name is required.', 'error');
         const nameInput = document.querySelector('#ce-name');
         if (nameInput) {
@@ -1211,9 +1291,11 @@ export function saveEditor() {
     
     let c = getCharacter(editorState.currentId);
     if (!c) {
+        console.error('[Editor] Character not found for id:', editorState.currentId);
         showToast('Character not found', 'error');
         return;
     }
+    console.log('[Editor] Saving character:', c.id, 'current name:', c.name);
     
     try {
         c.name = name.trim();
@@ -1271,6 +1353,7 @@ export function saveEditor() {
         c.equipment = readDynamicList('equipment');
         c.bonds = readDynamicList('bond');
         c.complications = readDynamicList('complication');
+        console.log('[Editor] Dynamic lists read: talents=', c.talents.length, 'assets=', c.assets.length, 'equipment=', c.equipment.length, 'bonds=', c.bonds.length, 'complications=', c.complications.length);
         
         // Validate bonds/complications for new characters
         if (editorState.isNew) {
@@ -1310,22 +1393,31 @@ export function saveEditor() {
                     `This character is ${over} XP over budget (${spent} spent, ${c.startingXp} available).\n\n` +
                     `Do you want to save anyway? (GM may allow this.)`
                 );
-                if (!proceed) return;
+                if (!proceed) {
+                    console.log('[Editor] Save cancelled by user due to over budget');
+                    return;
+                }
             }
         }
         
         updateCharacter(editorState.currentId, c);
+        console.log('[Editor] Character updated in state');
         
         editorState.saved = true;
         closeEditor();
+        console.log('[Editor] Editor closed after save');
         
         import('./index.js').then(module => {
             if (module.renderCharList) {
                 module.renderCharList();
+                console.log('[Editor] Character list re-rendered');
             }
+        }).catch(err => {
+            console.warn('[Editor] Failed to re-render character list:', err);
         });
         
         showToast(`Character "${c.name}" saved successfully. (Tier ${c.tier}: ${c.tierName})`, 'success');
+        console.log('[Editor] Save completed successfully');
         
     } catch (error) {
         console.error('[Editor] Error saving character:', error);
@@ -1338,8 +1430,10 @@ export function saveEditor() {
 // ============================================================
 
 function readDynamicList(type) {
+    console.log('[Editor] readDynamicList:', type);
     const items = [];
     const rows = document.querySelectorAll('.ce-' + type + '-row');
+    console.log(`[Editor] Found ${rows.length} rows for type ${type}`);
     
     for (const row of rows) {
         if (type === 'bond') {
@@ -1386,7 +1480,7 @@ function readDynamicList(type) {
             });
         }
     }
-    
+    console.log(`[Editor] readDynamicList ${type} returned ${items.length} items`);
     return items;
 }
 
@@ -1395,8 +1489,12 @@ function readDynamicList(type) {
 // ============================================================
 
 export function addCEDynamic(type) {
+    console.log('[Editor] addCEDynamic called for type:', type);
     const container = document.getElementById('ce-' + type + '-list');
-    if (!container) return;
+    if (!container) {
+        console.warn('[Editor] Container not found for:', type);
+        return;
+    }
     
     const idx = container.children.length;
     const div = document.createElement('div');
@@ -1410,20 +1508,26 @@ export function addCEDynamic(type) {
     }
     
     recalculateXpBudget();
+    console.log('[Editor] Dynamic row added for', type);
 }
 
 export function addCEDynamicFromWiki(type, entryId) {
+    console.log('[Editor] addCEDynamicFromWiki:', type, entryId);
     const state = getState();
     const wikiEntries = state.wikiEntries || [];
     const entry = wikiEntries.find(e => String(e.id) === String(entryId));
     
     if (!entry) {
+        console.warn('[Editor] Wiki entry not found:', entryId);
         showToast('Wiki entry not found.', 'error');
         return;
     }
     
     const container = document.getElementById('ce-' + type + '-list');
-    if (!container) return;
+    if (!container) {
+        console.warn('[Editor] Container not found for:', type);
+        return;
+    }
     
     const idx = container.children.length;
     const cost = entry.cost != null ? entry.cost : 0;
@@ -1433,6 +1537,7 @@ export function addCEDynamicFromWiki(type, entryId) {
     
     showToast(`Added "${entry.title}" from wiki.`, 'success');
     recalculateXpBudget();
+    console.log('[Editor] Added from wiki:', entry.title);
 }
 
 // ============================================================
@@ -1440,14 +1545,19 @@ export function addCEDynamicFromWiki(type, entryId) {
 // ============================================================
 
 function setupEditorEvents() {
+    console.log('[Editor] setupEditorEvents called');
     document.addEventListener('keydown', (e) => {
         if (!editorState.isOpen) return;
         if (e.key === 'Escape') {
+            console.log('[Editor] Escape key pressed, closing editor');
             closeEditor();
         } else if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
             e.preventDefault();
             const saveBtn = document.getElementById('ce-save-btn');
-            if (saveBtn) saveBtn.click();
+            if (saveBtn) {
+                console.log('[Editor] Ctrl+Enter pressed, triggering save');
+                saveBtn.click();
+            }
         }
     });
 }
@@ -1458,10 +1568,12 @@ function setupEditorEvents() {
 
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => {
+        console.log('[Editor] DOMContentLoaded, initializing');
         initEditor();
         setupEditorEvents();
     });
 } else {
+    console.log('[Editor] DOM already loaded, initializing');
     initEditor();
     setupEditorEvents();
 }
@@ -1477,6 +1589,7 @@ Object.assign(window, {
     closeEditor,
     openEditor
 });
+console.log('[Editor] Globals exposed');
 
 // ============================================================
 // EXPORTS

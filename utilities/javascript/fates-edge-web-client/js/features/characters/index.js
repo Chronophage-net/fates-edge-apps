@@ -965,7 +965,12 @@ export async function attachEvents() {
 
     document.addEventListener('click', async (e) => {
         const target = e.target;
-        
+
+        // IGNORE clicks that are handled by the character list (edit/delete/vtt/roll)
+        if (target.closest('[data-action]')) {
+            return;
+        }
+
         // Wizard button
         if (target.id === 'wizardCharBtn' || target.closest('#wizardCharBtn')) {
             e.preventDefault();
@@ -982,8 +987,8 @@ export async function attachEvents() {
                 showToast('Failed to load wizard: ' + (err.message || err), 'error');
             }
         }
-        
-        // Blank editor button – now properly async
+
+        // Blank editor button
         if (target.id === 'openEditorBtn' || target.closest('#openEditorBtn')) {
             e.preventDefault();
             try {
@@ -1001,7 +1006,7 @@ export async function attachEvents() {
                 showToast('Failed to load editor: ' + (err.message || 'unknown error'), 'error');
             }
         }
-        
+
         // Talents button
         if (target.id === 'openTalentsBtn' || target.closest('#openTalentsBtn')) {
             const panel = document.getElementById('talent-panel');
@@ -1011,37 +1016,25 @@ export async function attachEvents() {
             }
             e.preventDefault();
         }
-        
+
         // Talent toggle
         if (target.id === 'talent-toggle-btn' || target.closest('#talent-toggle-btn')) {
             toggleTalentPanel();
             e.preventDefault();
         }
-        
+
         // Add talent button
         if (target.id === 'talent-add-btn' || target.closest('#talent-add-btn')) {
             addCustomTalent();
             e.preventDefault();
         }
-        
+
         // Talent filter buttons
         if (target.classList?.contains('talent-filter-btn') || target.closest('.talent-filter-btn')) {
             const btn = target.closest('.talent-filter-btn');
             if (btn) {
                 setTalentFilter(btn.dataset.filter);
                 e.preventDefault();
-            }
-        }
-    });
-    
-    // Keyboard shortcut: Ctrl+Shift+T for talents
-    document.addEventListener('keydown', (e) => {
-        if (e.ctrlKey && e.shiftKey && e.key === 'T') {
-            e.preventDefault();
-            const panel = document.getElementById('talent-panel');
-            if (panel) {
-                panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                if (!talentPanelVisible) toggleTalentPanel();
             }
         }
     });

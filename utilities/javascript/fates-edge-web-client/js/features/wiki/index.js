@@ -103,17 +103,38 @@ export function loadRemoteWiki() {
             return res.json();
         })
         .then(data => {
-            if (!Array.isArray(data)) throw new Error('wiki.json must be an array');
-            const state = getState();
+            // --- FIX: handle various structures ---
+            let entries = [];
+            if (Array.isArray(data)) {
+                entries = data;
+            } else if (data && typeof data === 'object') {
+                // Try common keys: entries, items, data, wiki, etc.
+                for (const key of ['entries', 'items', 'data', 'wiki', 'docs']) {
+                    if (Array.isArray(data[key])) {
+                        entries = data[key];
+                        break;
+                    }
+                }
+                if (entries.length === 0) {
+                    // If still empty, treat the object itself as a single entry?
+                    // Or log a warning and use empty array.
+                    console.warn('Wiki data is an object but no array property found. Using empty array.');
+                }
+            }
 
+            if (!Array.isArray(entries) || entries.length === 0) {
+                throw new Error('wiki.json must contain an array (or an object with an "entries" array).');
+            }
+
+            const state = getState();
             if (!state.wikiEntries) state.wikiEntries = [];
             if (!state.hiddenRemoteIds) state.hiddenRemoteIds = [];
 
-            // Remove existing remote entries (to avoid duplicates)
+            // Remove existing remote entries
             state.wikiEntries = state.wikiEntries.filter(e => e.source !== 'remote');
 
             let added = 0;
-            data.forEach((entry, idx) => {
+            entries.forEach((entry, idx) => {
                 if (!entry || !entry.title) return;
                 const remoteId = 'remote-' + (entry.id || idx);
                 if (state.hiddenRemoteIds.includes(remoteId)) return;
@@ -140,13 +161,12 @@ export function loadRemoteWiki() {
             if (status) status.textContent = `✅ Loaded ${added} bundled entries.`;
             renderWiki();
             if (added > 0) showToast(`📥 Loaded ${added} bundled wiki entries.`, 'success');
-            return { added, total: data.length };
+            return { added, total: entries.length };
         })
         .catch(err => {
             console.warn('Remote wiki load failed:', err);
             const status = document.getElementById('wiki-status');
             if (status) status.textContent = `⚠️ Could not load bundled wiki (${err.message}). Using local entries only.`;
-            // Still render what we have
             renderWiki();
             return { added: 0, total: 0, error: err };
         });

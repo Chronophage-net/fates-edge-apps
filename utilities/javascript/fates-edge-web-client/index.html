@@ -3,158 +3,39 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="Fate's Edge Toolkit v4.0 - A modular TTRPG companion." />
+    <meta name="description" content="Fate's Edge Toolkit v4.1.2a - A modular TTRPG companion." />
+    <meta name="theme-color" content="#0f1117" />
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%E2%9A%94%EF%B8%8F%3C/text%3E%3C/svg%3E" />
     <title>Fate's Edge Toolkit v4.1.2a</title>
-    
+
     <!-- Preconnect for CDN performance -->
     <link rel="preconnect" href="https://cdnjs.cloudflare.com" />
     <link rel="preconnect" href="https://cdn.jsdelivr.net" />
-    
-    <!-- Stylesheets -->
-    <link rel="stylesheet" href="css/base.css" />
-    <link rel="stylesheet" href="css/components.css" />
-    <link rel="stylesheet" href="css/layout.css" />
-    <link rel="stylesheet" href="css/themes.css" />
-    
-    <!-- Improved sidebar styling -->
-    <style>
-        :root {
-            --sidebar-bg: linear-gradient(180deg, #1a1a2e 0%, #16213e 100%);
-            --sidebar-border: #2a2a4a;
-            --nav-item-hover-bg: rgba(212,175,55,0.12);
-            --nav-item-active-bg: rgba(212,175,55,0.22);
-            --nav-item-active-border: #d4af37;
-            --nav-text: #c8c8d0;
-            --nav-icon-color: #a0a0b0;
-        }
-        .sidebar {
-            background: var(--sidebar-bg);
-            border-right: 1px solid var(--sidebar-border);
-            display: flex;
-            flex-direction: column;
-            padding: 0;
-            transition: width 0.2s ease;
-        }
-        .sidebar-brand {
-            padding: 1.2rem 1rem 0.8rem;
-            border-bottom: 1px solid var(--sidebar-border);
-            display: flex;
-            align-items: center;
-            gap: 0.6rem;
-        }
-        .brand-icon {
-            font-size: 1.8rem;
-        }
-        .brand-name {
-            font-weight: 700;
-            font-size: 1.3rem;
-            color: var(--nav-text);
-        }
-        .brand-version {
-            display: block;
-            font-size: 0.7rem;
-            opacity: 0.6;
-            margin-top: 2px;
-        }
-        .sidebar-nav {
-            flex: 1;
-            overflow-y: auto;
-            padding: 0.5rem 0;
-        }
-        .nav-group {
-            margin-bottom: 1.2rem;
-        }
-        .nav-group-title {
-            display: block;
-            padding: 0.2rem 1.2rem;
-            font-size: 0.7rem;
-            text-transform: uppercase;
-            letter-spacing: 0.15em;
-            color: var(--nav-icon-color);
-            margin-bottom: 0.3rem;
-            opacity: 0.75;
-        }
-        .nav-item {
-            display: flex;
-            align-items: center;
-            gap: 0.7rem;
-            width: 100%;
-            padding: 0.55rem 1.2rem;
-            background: transparent;
-            border: none;
-            border-left: 3px solid transparent;
-            color: var(--nav-text);
-            font-size: 0.9rem;
-            cursor: pointer;
-            transition: all 0.15s ease;
-            text-align: left;
-        }
-        .nav-item:hover {
-            background: var(--nav-item-hover-bg);
-            border-left-color: var(--nav-item-active-border);
-        }
-        .nav-item.active {
-            background: var(--nav-item-active-bg);
-            border-left-color: var(--nav-item-active-border);
-            font-weight: 600;
-        }
-        .nav-item:disabled {
-            opacity: 0.4;
-            cursor: not-allowed;
-            background: transparent;
-            border-left-color: transparent;
-        }
-        .nav-item:disabled:hover {
-            background: transparent;
-        }
-        .nav-icon {
-            font-size: 1.2rem;
-            width: 1.6rem;
-            text-align: center;
-        }
-        .nav-label {
-            flex: 1;
-        }
-        .sidebar-footer {
-            padding: 0.5rem 1.2rem;
-            border-top: 1px solid var(--sidebar-border);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-        .footer-status {
-            display: flex;
-            align-items: center;
-            gap: 0.4rem;
-        }
-        .status-dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background: #4caf50;
-        }
-        .status-label {
-            font-size: 0.75rem;
-            color: var(--nav-text);
-        }
-        .footer-actions {
-            display: flex;
-            gap: 0.3rem;
-        }
-        .footer-btn {
-            background: rgba(255,255,255,0.05);
-            border: 1px solid var(--sidebar-border);
-            color: var(--nav-text);
-            padding: 0.25rem 0.45rem;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 0.8rem;
-            transition: background 0.15s;
-        }
-        .footer-btn:hover {
-            background: rgba(255,255,255,0.1);
-        }
-    </style>
+
+    <!--
+      Stylesheet: consolidated into one file (app.css) which includes
+      everything that used to live in base.css / components.css /
+      layout.css / themes.css — AND travel-planner.css, which was
+      never actually linked here before (it wasn't in this <head> at
+      all), so any .travel-card / .travel-modal / .timer-badge
+      styling was silently missing. If you'd rather keep the split
+      files, just re-add the four links in the same order as before
+      and drop this one; nothing else here depends on the filename.
+    -->
+    <link rel="stylesheet" href="css/app.css" />
+
+    <!--
+      NOTE: the page-specific inline sidebar <style> block that used
+      to live here has been removed. It duplicated rules already in
+      layout.css/base.css but with different hardcoded colors
+      (#d4af37 gold, #4caf50 green) instead of the theme's
+      var(--gold)/var(--accent-green) — so the sidebar's accent never
+      quite matched the rest of the app, and it also completely
+      ignored the light theme (html.light) since none of its colors
+      were theme variables. The sidebar/nav rules in app.css now cover
+      everything that block did, including the disabled-state style
+      for GM Tools, using the real theme tokens so both themes work.
+    -->
 
     <!-- Seed loading script -->
     <script>
@@ -212,7 +93,7 @@
                 <span class="brand-icon">⚔️</span>
                 <div class="brand-text">
                     <span class="brand-name">Fate's Edge</span>
-                    <span class="brand-version">v4.0</span>
+                    <span class="brand-version">v4.1.2a</span>
                 </div>
             </div>
             
@@ -222,67 +103,67 @@
                     <button class="nav-item active" data-tab="home" title="Home" role="tab" aria-selected="true">
                         <span class="nav-icon">📜</span> <span class="nav-label">Home</span>
                     </button>
-                    <button class="nav-item" data-tab="dashboard" title="Dashboard" role="tab">
+                    <button class="nav-item" data-tab="dashboard" title="Dashboard" role="tab" aria-selected="false">
                         <span class="nav-icon">📊</span> <span class="nav-label">Dashboard</span>
                     </button>
-                    <button class="nav-item" data-tab="characters" title="Characters" role="tab">
+                    <button class="nav-item" data-tab="characters" title="Characters" role="tab" aria-selected="false">
                         <span class="nav-icon">👤</span> <span class="nav-label">Characters</span>
                     </button>
-                    <button class="nav-item" data-tab="dice" title="Dice Roller" role="tab">
+                    <button class="nav-item" data-tab="dice" title="Dice Roller" role="tab" aria-selected="false">
                         <span class="nav-icon">🎲</span> <span class="nav-label">Dice</span>
                     </button>
                 </div>
 
                 <div class="nav-group">
                     <span class="nav-group-title">World</span>
-                    <button class="nav-item" data-tab="encounters" title="Encounters" role="tab">
+                    <button class="nav-item" data-tab="encounters" title="Encounters" role="tab" aria-selected="false">
                         <span class="nav-icon">⚔️</span> <span class="nav-label">Encounters</span>
                     </button>
-                    <button class="nav-item" data-tab="factions" title="Factions & Assets" role="tab">
+                    <button class="nav-item" data-tab="factions" title="Factions & Assets" role="tab" aria-selected="false">
                         <span class="nav-icon">🏛️</span> <span class="nav-label">Factions</span>
                     </button>
-                    <button class="nav-item" data-tab="wiki" title="Wiki" role="tab">
+                    <button class="nav-item" data-tab="wiki" title="Wiki" role="tab" aria-selected="false">
                         <span class="nav-icon">📖</span> <span class="nav-label">Wiki</span>
                     </button>
-                    <button class="nav-item" data-tab="patrons" title="Patrons" role="tab">
+                    <button class="nav-item" data-tab="patrons" title="Patrons" role="tab" aria-selected="false">
                         <span class="nav-icon">👁️</span> <span class="nav-label">Patrons</span>
                     </button>
                     <!-- NEW: Spellcraft tab -->
-                    <button class="nav-item" data-tab="spellcraft" title="Spellcraft & Magic" role="tab">
+                    <button class="nav-item" data-tab="spellcraft" title="Spellcraft & Magic" role="tab" aria-selected="false">
                         <span class="nav-icon">🧙</span> <span class="nav-label">Spellcraft</span>
                     </button>
                 </div>
 
                 <div class="nav-group">
                     <span class="nav-group-title">Table</span>
-                    <button class="nav-item" data-tab="vtt" title="Virtual Tabletop" role="tab">
+                    <button class="nav-item" data-tab="vtt" title="Virtual Tabletop" role="tab" aria-selected="false">
                         <span class="nav-icon">💬</span> <span class="nav-label">VTT</span>
                     </button>
                     <!-- GM Tools (formerly Scene Tools) – disabled when role is player -->
-                    <button class="nav-item" data-tab="gm-tools" title="GM Tools" role="tab" id="nav-gm-tools">
+                    <button class="nav-item" data-tab="gm-tools" title="GM Tools" role="tab" id="nav-gm-tools" aria-selected="false">
                         <span class="nav-icon">🎯</span> <span class="nav-label">GM Tools</span>
                     </button>
-                    <button class="nav-item" data-tab="timers" title="Timers" role="tab">
+                    <button class="nav-item" data-tab="timers" title="Timers" role="tab" aria-selected="false">
                         <span class="nav-icon">⏱️</span> <span class="nav-label">Timers</span>
                     </button>
-                    <button class="nav-item" data-tab="decks" title="Decks" role="tab">
+                    <button class="nav-item" data-tab="decks" title="Decks" role="tab" aria-selected="false">
                         <span class="nav-icon">🃏</span> <span class="nav-label">Decks</span>
                     </button>
                     <!-- Whiteboard -->
-                    <button class="nav-item" data-tab="whiteboard" title="Whiteboard" role="tab">
+                    <button class="nav-item" data-tab="whiteboard" title="Whiteboard" role="tab" aria-selected="false">
                         <span class="nav-icon">✏️</span> <span class="nav-label">Whiteboard</span>
                     </button>
                 </div>
 
                 <div class="nav-group">
                     <span class="nav-group-title">System</span>
-                    <button class="nav-item" data-tab="search" title="Search" role="tab">
+                    <button class="nav-item" data-tab="search" title="Search" role="tab" aria-selected="false">
                         <span class="nav-icon">🔍</span> <span class="nav-label">Search</span>
                     </button>
-                    <button class="nav-item" data-tab="docs" title="Documentation" role="tab">
+                    <button class="nav-item" data-tab="docs" title="Documentation" role="tab" aria-selected="false">
                         <span class="nav-icon">📄</span> <span class="nav-label">Docs</span>
                     </button>
-                    <button class="nav-item" data-tab="settings" title="Settings" role="tab">
+                    <button class="nav-item" data-tab="settings" title="Settings" role="tab" aria-selected="false">
                         <span class="nav-icon">⚙️</span> <span class="nav-label">Settings</span>
                     </button>
                 </div>
@@ -296,7 +177,7 @@
                 <div class="footer-actions">
                     <button class="footer-btn" id="exportBtn" title="Export JSON" aria-label="Export Data">⬇</button>
                     <button class="footer-btn" id="importBtn" title="Import JSON" aria-label="Import Data">⬆</button>
-                    <input type="file" id="importFile" accept=".json" style="display:none" />
+                    <input type="file" id="importFile" accept=".json" class="hidden" />
                     <button class="footer-btn" id="theme-toggle" title="Toggle theme" aria-label="Toggle Theme">🌙</button>
                 </div>
             </div>
