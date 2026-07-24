@@ -64,7 +64,7 @@ const MAGIC_PATHS = {
     'none': { label: 'None', icon: '' },
     'free-caster': { label: 'Free Caster', icon: '🔥' },
     'runekeeper': { label: 'Runekeeper', icon: '📖' },
-    'invoker': { label: 'Invoker', icon: ' sigil' },
+    'invoker': { label: 'Invoker', icon: '🔯' },
     'cantor': { label: 'Cantor', icon: '🎵' },
     'summoner': { label: 'Summoner', icon: '👁️' },
     'witch': { label: 'Witch', icon: '🌿' },
@@ -75,6 +75,7 @@ const MAGIC_PATHS = {
 let container = null;
 let talentPanelVisible = true;
 let activeTalentFilter = 'all';
+let globalEventsAttached = false; // guards against re-adding document-level listeners on every render()
 
 // ============================================================
 // HELPER FUNCTIONS
@@ -959,6 +960,9 @@ function setTalentFilter(filter) {
 // ============================================================
 
 export async function attachEvents() {
+    if (globalEventsAttached) return;
+    globalEventsAttached = true;
+
     document.addEventListener('click', async (e) => {
         const target = e.target;
         

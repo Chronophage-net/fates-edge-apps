@@ -54,7 +54,9 @@
 //   // later, to tear down:
 //   connection.destroy();
 
-import { openKonrehModal } from './kon-reh.js';
+// ─── Import from the *combined* engine file ──────────────────
+// Change this path to wherever you placed the combined file.
+import { openKonrehModal } from './kon-reh.js';   
 
 export const KONREH_CONNECTED_PROTOCOL_VERSION = 1;
 

@@ -212,11 +212,31 @@ export class KonrehEngine {
     const blue = this.getBlue(this.turn);
     if (blue && blue.rooted) blue.rooted = false;
 
-    // Stalemate safety net: if the side to move has no legal move anywhere,
-    // the game is declared a draw rather than soft-locking.
-    if (!this.pendingReforge && !this.hasAnyLegalMove(this.turn)) {
-      this.winner = 'draw';
-      this.winReason = `Player ${this.turn} has no legal move.`;
+    if (!this.pendingReforge) {
+      // A side with zero pieces left on the board (their Blue was just
+      // captured and it was their last piece) can never move and can
+      // never Reforge either — Reforge requires walking a living piece
+      // onto the enemy Home Apex. This is a decisive loss for them, NOT
+      // a stalemate draw. Without this check, hasAnyLegalMove() below
+      // trivially returns false for a side with no pieces, and the game
+      // would call that a draw — which in turn taught every AI School's
+      // search to actively AVOID capturing an opponent's last piece,
+      // since a draw (score 0) looked worse than just sitting on a
+      // material/mobility advantage forever.
+      const aliveCount = this.pieces.filter(p => p.isAlive && p.player === this.turn).length;
+      if (aliveCount === 0) {
+        this.winner = this.turn === 1 ? 2 : 1;
+        this.winReason = `Player ${this.turn} has no pieces remaining.`;
+        return;
+      }
+
+      // Stalemate safety net: if the side to move has pieces but genuinely
+      // no legal move anywhere, the game is declared a draw rather than
+      // soft-locking.
+      if (!this.hasAnyLegalMove(this.turn)) {
+        this.winner = 'draw';
+        this.winReason = `Player ${this.turn} has no legal move.`;
+      }
     }
   }
 
@@ -1059,6 +1079,48 @@ export function openKonrehModal(netConfig = null) {
   modeRow.appendChild(vsAiBtn);
   setupScreen.appendChild(modeRow);
 
+  // ---- Coach Mode panel: available in BOTH Two Players and vs Computer,
+  // since a human might want a School's-eye-view of the board either way.
+  // Independent from whichever School (if any) the computer opponent plays.
+  const coachPanel = document.createElement('div');
+  coachPanel.style.cssText = 'width:100%; max-width:460px; display:flex; flex-direction:column; gap:8px; align-items:center; padding: 4px 0;';
+  const coachToggleRow = document.createElement('div');
+  coachToggleRow.style.cssText = 'display:flex; align-items:center; gap:8px; font-size:12px; color:var(--muted);';
+  const coachCheck = document.createElement('input');
+  coachCheck.type = 'checkbox';
+  coachCheck.id = 'kr-coach-toggle';
+  const coachLabelEl = document.createElement('label');
+  coachLabelEl.htmlFor = 'kr-coach-toggle';
+  coachLabelEl.style.cursor = 'pointer';
+  coachLabelEl.textContent = '💡 Coach Mode — live move suggestions & teaching';
+  coachToggleRow.appendChild(coachCheck);
+  coachToggleRow.appendChild(coachLabelEl);
+  coachPanel.appendChild(coachToggleRow);
+
+  const coachSchoolRow = document.createElement('div');
+  coachSchoolRow.style.cssText = 'display:flex; align-items:center; gap:8px; font-size:12px; color:var(--muted);';
+  const coachSchoolLabel = document.createElement('span');
+  coachSchoolLabel.textContent = 'Coached by:';
+  const coachSchoolSelect = document.createElement('select');
+  coachSchoolSelect.id = 'kr-coach-school';
+  coachSchoolSelect.disabled = true;
+  coachSchoolSelect.style.cssText = 'background:#101119; color:var(--ink); border:1px solid var(--line); border-radius:6px; padding:5px 8px; font-size:12px;';
+  Object.entries(SCHOOLS).forEach(([id, school]) => {
+    const opt = document.createElement('option');
+    opt.value = id;
+    opt.textContent = `${school.name} — ${school.tagline}`;
+    coachSchoolSelect.appendChild(opt);
+  });
+  coachSchoolRow.appendChild(coachSchoolLabel);
+  coachSchoolRow.appendChild(coachSchoolSelect);
+  coachPanel.appendChild(coachSchoolRow);
+
+  coachCheck.addEventListener('change', () => {
+    coachSchoolSelect.disabled = !coachCheck.checked;
+  });
+
+  setupScreen.appendChild(coachPanel);
+
   const schoolPanel = document.createElement('div');
   schoolPanel.style.cssText = 'width:100%; max-width:460px; display:none; flex-direction:column; gap:12px; align-items:center;';
   setupScreen.appendChild(schoolPanel);
@@ -1076,6 +1138,7 @@ export function openKonrehModal(netConfig = null) {
   let chosenAiPlayer = 2;
   let aiDepth = 3; // NEW: default medium
   let coachMode = false; // NEW: coach mode toggle
+  let coachSchoolId = 'ykrul'; // NEW: which School's style is coaching the human
   const schoolCards = {};
   Object.entries(SCHOOLS).forEach(([id, school]) => {
     const card = document.createElement('button');
@@ -1102,19 +1165,6 @@ export function openKonrehModal(netConfig = null) {
     <label><input type="radio" name="kr-depth" value="4"> Hard</label>
   `;
   schoolPanel.appendChild(depthRow);
-
-  // ---- NEW: Coach Mode Toggle ----
-  const coachRow = document.createElement('div');
-  coachRow.style.cssText = 'display:flex; align-items:center; gap:8px; font-size:12px; color:var(--muted); width:100%; justify-content:center; padding:2px 0;';
-  const coachCheck = document.createElement('input');
-  coachCheck.type = 'checkbox';
-  coachCheck.id = 'kr-coach-toggle';
-  const coachLabel = document.createElement('label');
-  coachLabel.htmlFor = 'kr-coach-toggle';
-  coachLabel.textContent = '💡 Coach Mode (shows best move hints)';
-  coachRow.appendChild(coachCheck);
-  coachRow.appendChild(coachLabel);
-  schoolPanel.appendChild(coachRow);
 
   const sideRow = document.createElement('div');
   sideRow.style.cssText = 'display:flex; align-items:center; gap:8px; font-size:12px; color:var(--muted); flex-wrap:wrap; justify-content:center;';
@@ -1192,6 +1242,42 @@ export function openKonrehModal(netConfig = null) {
   logDiv.style.cssText = 'background:#101119; border:1px solid var(--line); border-radius:6px; padding:8px 10px; height:150px; overflow-y:auto;';
   sidebar.appendChild(logDiv);
 
+  const talkHeader = document.createElement('div');
+  talkHeader.style.cssText = 'display:flex; justify-content:space-between; align-items:center; cursor:pointer; user-select:none;';
+  talkHeader.innerHTML = `<span style="color:var(--gold); font-size:12px; font-weight:700; letter-spacing:0.04em; text-transform:uppercase;">Table Talk</span><span id="kr-talk-caret" style="color:var(--muted); font-size:11px;">▸ show</span>`;
+  sidebar.appendChild(talkHeader);
+
+  const talkBody = document.createElement('div');
+  talkBody.style.cssText = 'display:none; flex-direction:column; gap:6px;';
+  sidebar.appendChild(talkBody);
+
+  const talkLog = document.createElement('div');
+  talkLog.className = 'kr-log kr-scroll';
+  talkLog.style.cssText = 'background:#101119; border:1px solid var(--line); border-radius:6px; padding:8px 10px; height:90px; overflow-y:auto; font-size:11.5px;';
+  talkBody.appendChild(talkLog);
+
+  const talkInputRow = document.createElement('div');
+  talkInputRow.style.cssText = 'display:flex; gap:6px;';
+  const talkInput = document.createElement('input');
+  talkInput.type = 'text';
+  talkInput.placeholder = 'Say something…';
+  talkInput.maxLength = 140;
+  talkInput.style.cssText = 'flex:1; min-width:0; background:#101119; border:1px solid var(--line); border-radius:6px; padding:6px 8px; color:var(--ink); font-size:12px;';
+  const talkSendBtn = document.createElement('button');
+  talkSendBtn.className = 'kr-btn';
+  talkSendBtn.textContent = 'Send';
+  talkInputRow.appendChild(talkInput);
+  talkInputRow.appendChild(talkSendBtn);
+  talkBody.appendChild(talkInputRow);
+
+  let talkOpen = false;
+  const talkCaret = talkHeader.querySelector('#kr-talk-caret');
+  talkHeader.addEventListener('click', () => {
+    talkOpen = !talkOpen;
+    talkBody.style.display = talkOpen ? 'flex' : 'none';
+    talkCaret.textContent = talkOpen ? '▾ hide' : '▸ show';
+  });
+
   const rulesHeader = document.createElement('div');
   rulesHeader.textContent = 'Quick Rules';
   rulesHeader.style.cssText = 'color:var(--gold); font-size:12px; font-weight:700; letter-spacing:0.04em; text-transform:uppercase; margin-top:4px;';
@@ -1238,6 +1324,31 @@ export function openKonrehModal(netConfig = null) {
     logDiv.appendChild(line);
     logDiv.scrollTop = logDiv.scrollHeight;
   }
+
+  function escapeHtml(s) {
+    return s.replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  }
+
+  function talkLine(html) {
+    const line = document.createElement('div');
+    line.innerHTML = html;
+    talkLog.appendChild(line);
+    talkLog.scrollTop = talkLog.scrollHeight;
+  }
+
+  function sendTalk(text) {
+    text = (text || '').trim();
+    if (!text) return;
+    const who = isNetworked ? `Player ${localPlayer}` : 'You';
+    talkLine(`<span class="p${isNetworked ? localPlayer : game.turn}">${who}</span>: ${escapeHtml(text)}`);
+    talkInput.value = '';
+    if (isNetworked && netConfig.onLocalChat) netConfig.onLocalChat(text);
+  }
+
+  talkSendBtn.addEventListener('click', () => sendTalk(talkInput.value));
+  talkInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') sendTalk(talkInput.value);
+  });
 
   function beginGame() {
     game = new KonrehEngine();
@@ -1380,8 +1491,10 @@ export function openKonrehModal(netConfig = null) {
       return;
     }
 
-    // Quick search for the best move for the current player (depth 2 for speed)
-    const hint = chooseAiMove(game, game.turn, 'ykrul', 2);
+    // Quick search for the best move for the current player (depth 2 for speed),
+    // styled by whichever School the human picked as their coach.
+    const coachSchool = SCHOOLS[coachSchoolId] || SCHOOLS.ykrul;
+    const hint = chooseAiMove(game, game.turn, coachSchoolId, 2);
     if (!hint) {
       coachTipDiv.textContent = '🤔 No strong suggestions available.';
       return;
@@ -1408,15 +1521,21 @@ export function openKonrehModal(netConfig = null) {
 
     // Build explanation
     const piece = game.pieces.find(p => p.id === hint.pieceId);
-    let reason = `Coach suggests: ${TYPE_NAME[piece.type]} → (${x},${y})`;
+    let reason = `${coachSchool.name} suggests: ${TYPE_NAME[piece.type]} → (${x},${y})`;
     if (hint.move.capture) {
       const target = game.pieces.find(p => p.id === hint.move.targetId);
       if (target) reason += ` — captures ${TYPE_NAME[target.type]}!`;
     }
-    if (hint.move.special === 'S:D') reason += ` — uses Displacement.`;
-    if (hint.move.special === 'S:H') reason += ` — uses Hop.`;
-    if (piece.type === 'blue' && game.isCross(x, y)) reason += ` — moves into the Cross.`;
-    if (piece.type === 'blue' && game.isSanctum(x, y)) reason += ` — lands on a Sanctum (may Seed).`;
+    if (hint.move.special === 'S:D') reason += ` — Displacement (steps onto an adjacent enemy).`;
+    if (hint.move.special === 'S:H') reason += ` — Hop (jumps an adjacent enemy to the square beyond).`;
+    if (piece.type === 'blue' && game.isCross(x, y) && !game.isCross(piece.x, piece.y)) {
+      reason += ` — enters the Cross (up to 3 consecutive turns, then a 2-turn ban).`;
+    }
+    if (piece.type === 'blue' && game.isSanctum(x, y)) reason += ` — lands on a Sanctum (may Seed a Green).`;
+    if (piece.type !== 'blue') {
+      const onwardLane = (game.lanesFor(piece.player).onward).some(([dx, dy]) => x === piece.x + dx * ONWARD_DIST[piece.type] && y === piece.y + dy * ONWARD_DIST[piece.type]);
+      reason += onwardLane ? ` — full Onward distance (exact, no shorter stop allowed).` : ` — Homeward (chose to stop partway).`;
+    }
     coachTipDiv.textContent = `💡 ${reason}`;
   }
 
@@ -1582,6 +1701,10 @@ export function openKonrehModal(netConfig = null) {
     if (game.pendingReforge) entry += ' <span class="kr-badge">Banner planted</span>';
     log(entry);
 
+    if (isAiMove && (move.capture || move.special) && Math.random() < 0.35) {
+      talkLine(`<i style="color:var(--muted);">${SCHOOLS[aiConfig.schoolId].name}: "${SCHOOLS[aiConfig.schoolId].tagline}"</i>`);
+    }
+
     selectedPiece = null; validMoves = []; pendingChoice = null;
     localSeq++;
     if (isNetworked && !isRemote && netConfig.onLocalMove) netConfig.onLocalMove(piece.id, move, localSeq);
@@ -1636,8 +1759,14 @@ export function openKonrehModal(netConfig = null) {
     }
   });
 
+  function readCoachSettings() {
+    coachMode = coachCheck.checked;
+    coachSchoolId = coachSchoolSelect.value;
+  }
+
   twoPlayerBtn.addEventListener('click', () => {
     aiConfig = null;
+    readCoachSettings();
     beginGame();
   });
 
@@ -1649,7 +1778,7 @@ export function openKonrehModal(netConfig = null) {
   startBtn.addEventListener('click', () => {
     const depthRadios = document.querySelectorAll('input[name="kr-depth"]');
     for (const r of depthRadios) if (r.checked) aiDepth = parseInt(r.value, 10);
-    coachMode = document.getElementById('kr-coach-toggle').checked;
+    readCoachSettings();
     aiConfig = { schoolId: chosenSchool, player: chosenAiPlayer, depth: aiDepth };
     beginGame();
   });
@@ -1705,6 +1834,10 @@ export function openKonrehModal(netConfig = null) {
         logDiv.innerHTML = '';
         log(`<i>Opponent started a new game. You are Player ${localPlayer}.</i>`);
         render();
+      },
+      applyRemoteChat(text, fromPlayer) {
+        const p = fromPlayer || (localPlayer === 1 ? 2 : 1);
+        talkLine(`<span class="p${p}">Player ${p}</span>: ${escapeHtml(String(text || ''))}`);
       },
       getState() { return serializeGameState(game); },
       loadState(state, seq) {

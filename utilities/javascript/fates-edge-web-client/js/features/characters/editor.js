@@ -1,4 +1,4 @@
-import { getState, addCharacter, getCharacter, updateCharacter } from '../../core/state.js';
+import { getState, addCharacter, getCharacter, updateCharacter, deleteCharacter } from '../../core/state.js';
 import { generateId, escHtml, safeParseInt, clamp } from '../../core/utils.js';
 import { showToast } from '../../components/Toast.js';
 
@@ -114,6 +114,7 @@ const editorState = {
     currentId: null,
     isNew: false,
     isOpen: false,
+    saved: false,
     initialized: false,
     modalElement: null,
     escListener: null,
@@ -205,12 +206,14 @@ export function openEditor(id) {
         title.textContent = 'Edit Character';
     } else {
         c = createNewCharacter();
+        addCharacter(c); // register immediately so getCharacter()/updateCharacter() calls during editing (and on Save) can find it
         editorState.currentId = c.id;
         editorState.isNew = true;
         title.textContent = 'New Character';
     }
     
     editorState.isOpen = true;
+    editorState.saved = false;
     editorState.modalElement = modal;
     content.innerHTML = buildEditorHTML(c);
     modal.style.display = 'flex';
@@ -222,6 +225,10 @@ export function openEditor(id) {
 }
 
 export function closeEditor() {
+    if (editorState.isNew && !editorState.saved && editorState.currentId) {
+        deleteCharacter(editorState.currentId);
+    }
+
     const modal = document.getElementById('charModal');
     if (modal) {
         if (editorState.overlayListener) {
@@ -252,6 +259,7 @@ export function closeEditor() {
     editorState.isOpen = false;
     editorState.currentId = null;
     editorState.isNew = false;
+    editorState.saved = false;
     editorState.modalElement = null;
 }
 
@@ -593,6 +601,17 @@ function attachEditorEvents() {
             input.addEventListener('input', () => recalculateXpBudget());
         }
     });
+    
+    document.querySelectorAll('.ce-weapon-tag').forEach(cb => {
+        cb.addEventListener('change', () => {
+            const checked = document.querySelectorAll('.ce-weapon-tag:checked');
+            if (checked.length > 2) {
+                cb.checked = false;
+                showToast('Weapon Tags are capped at 2.', 'warning');
+            }
+            recalculateXpBudget();
+        });
+    });
 }
 
 function updateDerivedStats() {
@@ -763,6 +782,11 @@ function recalculateXpBudget() {
         spent += weaponXp[weaponId] || 0;
     }
     
+    // Weapon tags: +4 XP each, max 2 (the label promises this cost -- it must count)
+    const checkedTags = document.querySelectorAll('.ce-weapon-tag:checked');
+    const tagCount = Math.min(checkedTags.length, 2);
+    spent += tagCount * 4;
+    
     // Bond XP
     let bondCount = 0;
     document.querySelectorAll('.ce-bond-row').forEach(row => {
@@ -783,7 +807,15 @@ function recalculateXpBudget() {
     compCount = Math.min(compCount, 2);
     const xpFromComplications = compCount * 2;
     
-    const totalXp = safeParseInt(document.getElementById('ce-total-xp')?.value, 32);
+    // For a brand-new character, the Bonds/Complications bonus is part of
+    // the real starting total (see saveEditor) -- reflect that here too, so
+    // the live budget matches what will actually be saved, rather than only
+    // mentioning the bonus in a footnote while computing "remaining" from
+    // the raw, un-bonused field value.
+    const totalXpRaw = safeParseInt(document.getElementById('ce-total-xp')?.value, 32);
+    const totalXp = editorState.isNew
+        ? Math.min(32 + xpFromBonds + xpFromComplications, 36)
+        : totalXpRaw;
     
     const budgetEl = document.getElementById('ce-xp-budget');
     if (budgetEl) {
@@ -795,7 +827,7 @@ function recalculateXpBudget() {
                 <span style="color:${isOver ? 'var(--red)' : 'var(--green)'};font-weight:bold;">
                     ${remaining > 0 ? remaining + ' remaining' : remaining === 0 ? 'exactly spent' : Math.abs(remaining) + ' over budget!'}
                 </span>
-                ${editorState.isNew ? `<br><small>Bonds: +${xpFromBonds} XP | Complications: +${xpFromComplications} XP | Max starting: 36 XP</small>` : ''}
+                ${editorState.isNew ? `<br><small>Base 32 XP + Bonds: +${xpFromBonds} XP + Complications: +${xpFromComplications} XP (max starting: 36 XP) — already included above</small>` : ''}
             </div>
         `;
     }
@@ -1116,7 +1148,11 @@ function dynamicRowHTML(type, idx, item = {}) {
         <div class="dynamic-row ce-${type}-row" data-index="${idx}">
             <input type="text" class="ce-${type}-name" placeholder="${placeholder}" value="${escHtml(item.name || '')}" style="flex:2;" />
             <input type="number" class="ce-${type}-cost" placeholder="XP" value="${item.cost || 0}" min="0" style="width:70px;" title="XP cost" />
-            ${type === 'asset' ? '<select class="ce-asset-tier" style="width:100px;"><option value="minor">Minor</option><option value="standard">Standard</option><option value="major">Major</option></select>' : ''}
+            ${type === 'asset' ? `<select class="ce-asset-tier" style="width:100px;">
+                <option value="minor" ${(!item.tier || item.tier === 'minor') ? 'selected' : ''}>Minor</option>
+                <option value="standard" ${item.tier === 'standard' ? 'selected' : ''}>Standard</option>
+                <option value="major" ${item.tier === 'major' ? 'selected' : ''}>Major</option>
+            </select>` : ''}
             <button class="btn btn-xs editor-remove-btn">✕</button>
         </div>
     `;
@@ -1212,7 +1248,7 @@ export function saveEditor() {
         c.armorType = v('#ce-armor-type') || 'none';
         c.shieldType = v('#ce-shield-type') || 'none';
         c.weaponClass = v('#ce-weapon-class') || 'light';
-        c.weaponTags = Array.from(document.querySelectorAll('.ce-weapon-tag:checked')).map(cb => cb.value);
+        c.weaponTags = Array.from(document.querySelectorAll('.ce-weapon-tag:checked')).map(cb => cb.value).slice(0, 2);
         c.armorConversion = ARMOR_TYPES.find(a => a.id === c.armorType)?.conversion || '';
         
         c.totalXp = Math.max(0, n('#ce-total-xp'));
@@ -1257,6 +1293,14 @@ export function saveEditor() {
                 showToast('Starting XP capped at 36.', 'warning');
             }
             
+            // The bonus from Bonds/Complications is part of the character's
+            // actual starting XP total, not just an informational aside --
+            // apply it, and recompute Tier since totalXp just changed.
+            c.totalXp = c.startingXp;
+            const { tier: newTier, name: newTierName } = getTierFromXp(c.totalXp);
+            c.tier = newTier;
+            c.tierName = newTierName;
+            
             const spent = calculateTotalXpSpent(c);
             c.xpSpent = spent;
             
@@ -1272,6 +1316,7 @@ export function saveEditor() {
         
         updateCharacter(editorState.currentId, c);
         
+        editorState.saved = true;
         closeEditor();
         
         import('./index.js').then(module => {
