@@ -1,14 +1,15 @@
 #!/usr/bin/env node
 
 /**
- * Fate's Edge Terminal Client v2.3.0 – Full WebSocket + REST API integration
- * Supports all server features:
- *   - Chat, dice rolls, deck, GM election, modules, region
- *   - Character management (list, view, update stats)
- *   - Whiteboard sync (draw, notes, images)
- *   - Grid combat (tokens, zones, combat toggle)
- *   - Admin commands (kick, ban, unban)
- *   - Dynamic ANSI banners
+ * Fate's Edge Terminal Client v2.3.0 – WebSocket + Dynamic Banners
+ * Connects to ws://<host>:<port>?room=<ROOM_CODE>
+ *
+ * New in 2.3.0:
+ *  - Advantage/disadvantage rolls, crit/fumble flair, roll history (/history)
+ *  - Session stats (/stats), identity card (/whoami)
+ *  - Color themes (/theme), persisted alongside the banner cache
+ *  - /fortune, /time (with an in-world "Amber Reckoning" date), /ascii <text>
+ *  - A few extra surprises. Curiosity is rewarded.
  */
 
 const WebSocket = require('ws');
@@ -18,10 +19,11 @@ const path = require('path');
 
 // ─── Configuration ──────────────────────────────────────────────
 const CONFIG = {
-    defaultServerUrl: 'ws://localhost:10000',
+    version: '2.3.0',
+    defaultServerUrl: 'ws://localhost:3000',
     defaultRoom: 'ABC123',
     defaultName: 'Terminal Player',
-    defaultPassword: '',
+    defaultPassword: 'password123',
     reconnectDelay: 3000,
     maxReconnectAttempts: 5
 };
@@ -41,26 +43,57 @@ function getApiBaseUrl(serverUrl) {
 }
 let apiBaseUrl = getApiBaseUrl(CONFIG.defaultServerUrl);
 
-// ─── ANSI colors ─────────────────────────────────────────────────
-const colors = {
-    reset: "\x1b[0m",
-    bold: "\x1b[1m",
-    dim: "\x1b[2m",
-    red: "\x1b[31m",
-    green: "\x1b[32m",
-    yellow: "\x1b[33m",
-    blue: "\x1b[34m",
-    magenta: "\x1b[35m",
-    cyan: "\x1b[36m",
-    gray: "\x1b[90m",
-    white: "\x1b[37m"
+// ─── ANSI color themes ───────────────────────────────────────────
+const THEMES = {
+    default: {
+        reset: "\x1b[0m", bold: "\x1b[1m", dim: "\x1b[2m",
+        red: "\x1b[31m", green: "\x1b[32m", yellow: "\x1b[33m", blue: "\x1b[34m",
+        magenta: "\x1b[35m", cyan: "\x1b[36m", gray: "\x1b[90m", white: "\x1b[37m"
+    },
+    dracula: {
+        reset: "\x1b[0m", bold: "\x1b[1m", dim: "\x1b[2m",
+        red: "\x1b[38;5;203m", green: "\x1b[38;5;84m", yellow: "\x1b[38;5;228m", blue: "\x1b[38;5;117m",
+        magenta: "\x1b[38;5;141m", cyan: "\x1b[38;5;51m", gray: "\x1b[38;5;61m", white: "\x1b[38;5;231m"
+    },
+    forest: {
+        reset: "\x1b[0m", bold: "\x1b[1m", dim: "\x1b[2m",
+        red: "\x1b[38;5;130m", green: "\x1b[38;5;28m", yellow: "\x1b[38;5;178m", blue: "\x1b[38;5;24m",
+        magenta: "\x1b[38;5;95m", cyan: "\x1b[38;5;30m", gray: "\x1b[38;5;101m", white: "\x1b[38;5;230m"
+    },
+    amber: {
+        reset: "\x1b[0m", bold: "\x1b[1m", dim: "\x1b[2m",
+        red: "\x1b[38;5;166m", green: "\x1b[38;5;107m", yellow: "\x1b[38;5;214m", blue: "\x1b[38;5;67m",
+        magenta: "\x1b[38;5;172m", cyan: "\x1b[38;5;109m", gray: "\x1b[38;5;95m", white: "\x1b[38;5;223m"
+    }
 };
+// `colors` is reassigned (not just read) by /theme, so every function below
+// that references colors.xyz picks up the active theme automatically.
+let colors = THEMES.default;
 
-// ─── Banners (unchanged) ────────────────────────────────────────
+// ─── Local config (theme preference, etc.) ──────────────────────
+const USER_CONFIG_FILE = path.join(__dirname, 'edge_config.json');
+let userConfig = { theme: 'default' };
+
+function loadUserConfig() {
+    try {
+        const parsed = JSON.parse(fs.readFileSync(USER_CONFIG_FILE, 'utf8'));
+        if (parsed && typeof parsed === 'object') userConfig = { ...userConfig, ...parsed };
+    } catch (e) {}
+    if (THEMES[userConfig.theme]) colors = THEMES[userConfig.theme];
+}
+
+function saveUserConfig() {
+    try { fs.writeFileSync(USER_CONFIG_FILE, JSON.stringify(userConfig, null, 2), 'utf8'); } catch (e) {}
+}
+
+loadUserConfig();
+
+// ─── Banners ─────────────────────────────────────────────────────
 const BANNER_CACHE_FILE = path.join(__dirname, 'banner_cache.json');
 const MAX_CACHE_SIZE = 20;
 const MIN_CACHE_SIZE = 5;
 
+// Default banner – a classic ANSI dragon
 const DEFAULT_BANNER = `
 ${colors.magenta}╔══════════════════════════════════════════════════════════╗
 ║                                                          ║
@@ -82,10 +115,11 @@ _#/|##########/\\#(   (_)   )#/\\##########|\\#_
                   (  | |
                  ___)(___)
 ${colors.reset}
-${colors.yellow}        ⚔️  Edge CLI v2.3.0 – Where fate meets stone  ⚔️${colors.reset}
+${colors.yellow}        ⚔️  Edge CLI v${CONFIG.version} – Where fate meets stone  ⚔️${colors.reset}
 ${colors.magenta}╚══════════════════════════════════════════════════════════╝${colors.reset}
 `;
 
+// Remote banner sources (working .ans files from ansi.hrtk.in mirror)
 const REMOTE_BANNER_URLS = [
     'https://ansi.hrtk.in/ungenannt_motherofsorrows.ans',
     'https://ansi.hrtk.in/us-die2.ans',
@@ -99,6 +133,7 @@ const REMOTE_BANNER_URLS = [
     'https://ansi.hrtk.in/gr-zeit.ans'
 ];
 
+// Cache
 let bannerCache = [];
 
 function loadBannerCache() {
@@ -175,6 +210,7 @@ function getRandomBanner() {
     return bannerCache[Math.floor(Math.random() * bannerCache.length)];
 }
 
+// Load cache on startup
 loadBannerCache();
 setTimeout(() => {
     ensureBannerCache().catch(() => {});
@@ -196,7 +232,19 @@ let pendingRequests = [];
 let myRole = 'player';
 let deckRemaining = 0;
 let defaultRegion = 'Acasia';
-let characters = {}; // keyed by character name
+
+// Session stats + roll history (new in 2.3.0)
+let sessionStats = {
+    sessionStart: Date.now(),
+    rollsMade: 0,
+    diceTotal: 0,
+    crits: 0,
+    fumbles: 0,
+    messagesSent: 0,
+    cardsDrawn: 0
+};
+const MAX_ROLL_HISTORY = 20;
+let rollHistory = [];
 
 // ─── Readline ──────────────────────────────────────────────────
 const rl = readline.createInterface({
@@ -276,44 +324,22 @@ function printClientList() {
     rl.prompt(true);
 }
 
-function printCharacterList() {
-    const names = Object.keys(characters);
-    if (names.length === 0) {
-        printSystemMessage('No characters found in room state.');
-        return;
-    }
-    process.stdout.write('\r\x1b[K');
-    console.log(`${colors.cyan}👤 Characters (${names.length}):${colors.reset}`);
-    names.forEach(name => {
-        const c = characters[name];
-        const hp = c.harm !== undefined ? `❤️${c.harm}` : '';
-        const fatigue = c.fatigue ? `⚡${c.fatigue}` : '';
-        const boons = c.boons ? `🎲${c.boons}` : '';
-        const avatar = c.avatar ? '🖼️' : '';
-        console.log(`  ${avatar} ${colors.bold}${name}${colors.reset} ${hp} ${fatigue} ${boons}`);
-        if (c.attributes) {
-            const attrStr = Object.entries(c.attributes).map(([k,v]) => `${k}:${v}`).join(' ');
-            console.log(`    ${colors.dim}${attrStr}${colors.reset}`);
-        }
-    });
-    rl.prompt(true);
-}
-
 function printHelp() {
     process.stdout.write('\r\x1b[K');
     console.log(`
 ${colors.magenta}╔══════════════════════════════════════════════════════════════╗
-║  Edge CLI v2.3.0 - Commands                                    ║
+║  Edge CLI v${CONFIG.version} - Commands                                    ║
 ╚══════════════════════════════════════════════════════════════╝${colors.reset}
 
 ${colors.yellow}Connection:${colors.reset}
-  /connect [url] [room]      Connect (e.g., /connect ws://localhost:10000 AIGM)
+  /connect [url] [room]      Connect (e.g., /connect ws://localhost:3000 AIGM)
   /disconnect                 Disconnect
   /status                     Show status
 
 ${colors.yellow}Chat & Dice:${colors.reset}
   <message>                   Send chat
-  /roll <dice> [reason]       Roll dice (e.g., /roll 3d6+2 "Attack")
+  /roll <dice> [adv|dis] [reason]  Roll dice (e.g., /roll 1d20 adv "Attack")
+  /history                    Show your last 10 rolls
   /name <name>                Change your name
 
 ${colors.yellow}Deck:${colors.reset}
@@ -321,25 +347,6 @@ ${colors.yellow}Deck:${colors.reset}
   /crown [region]             Crown Spread
   /shuffle                    Shuffle deck
   /deck-status                Remaining cards
-
-${colors.yellow}Characters (NEW):${colors.reset}
-  /chars list                 List characters in room
-  /chars view <name>          View character details
-  /chars update <name> <field> <value>  Update a character stat
-  /chars sync                 Force sync characters from server
-
-${colors.yellow}Grid Combat (NEW):${colors.reset}
-  /grid on                    Enable grid combat
-  /grid off                   Disable grid combat
-  /grid status                Show grid combat status
-  /token add <name> [x] [y] [color]  Add token
-  /token list                 List tokens
-  /token remove <id>          Remove token
-  /token move <id> <x> <y>    Move token
-
-${colors.yellow}Whiteboard (NEW):${colors.reset}
-  /wb status                  Show whiteboard summary
-  /wb sync                    Force sync whiteboard from server
 
 ${colors.yellow}GM Management:${colors.reset}
   /gm request                 Request GM
@@ -356,11 +363,21 @@ ${colors.yellow}Modules:${colors.reset}
 ${colors.yellow}Region:${colors.reset}
   /region [name]              Set or show default region
 
-${colors.yellow}Other:${colors.reset}
-  /who                        Request presence update
-  /banner [reload|fetch]      Show a random banner; reload from cache, fetch new
-  /help                       This help
-  /quit / exit                Quit
+${colors.yellow}You:${colors.reset}
+  /whoami                      Show your identity card
+  /stats                       Show session stats
+  /theme [name]                Show/switch color theme (${Object.keys(THEMES).join(', ')})
+
+${colors.yellow}Extras:${colors.reset}
+  /time                        Real time + in-world Reckoning date
+  /fortune                     A short fortune
+  /ascii <text>                Render text as ASCII art
+  /matrix                      ...you'll see
+  /party                       🎉
+  /who                         Request presence update
+  /banner [reload|fetch]       Show a random banner; reload from cache, fetch new
+  /help                        This help
+  /quit / exit                 Quit
 ${ADMIN_MODE ? `
 ${colors.yellow}Admin (API Key Active):${colors.reset}
   /admin players              List clients
@@ -368,11 +385,169 @@ ${colors.yellow}Admin (API Key Active):${colors.reset}
   /admin ban <name|id> [reason]
   /admin unban <clientId>
 ` : ''}
+${colors.dim}(Some commands aren't listed here. Curiosity is rewarded.)${colors.reset}
 `);
     rl.prompt(true);
 }
 
-// ─── REST API (admin + characters + grid) ──────────────────────
+// ─── ASCII text art ──────────────────────────────────────────────
+const FONT = {
+    ' ': ["     ", "     ", "     ", "     ", "     "],
+    'A': [" ### ", "#   #", "#####", "#   #", "#   #"],
+    'B': ["#### ", "#   #", "#### ", "#   #", "#### "],
+    'C': [" ####", "#    ", "#    ", "#    ", " ####"],
+    'D': ["#### ", "#   #", "#   #", "#   #", "#### "],
+    'E': ["#####", "#    ", "#### ", "#    ", "#####"],
+    'F': ["#####", "#    ", "#### ", "#    ", "#    "],
+    'G': [" ####", "#    ", "#  ##", "#   #", " ####"],
+    'H': ["#   #", "#   #", "#####", "#   #", "#   #"],
+    'I': ["#####", "  #  ", "  #  ", "  #  ", "#####"],
+    'J': ["    #", "    #", "    #", "#   #", " ### "],
+    'K': ["#   #", "#  # ", "###  ", "#  # ", "#   #"],
+    'L': ["#    ", "#    ", "#    ", "#    ", "#####"],
+    'M': ["#   #", "## ##", "# # #", "#   #", "#   #"],
+    'N': ["#   #", "##  #", "# # #", "#  ##", "#   #"],
+    'O': [" ### ", "#   #", "#   #", "#   #", " ### "],
+    'P': ["#### ", "#   #", "#### ", "#    ", "#    "],
+    'Q': [" ### ", "#   #", "#   #", "#  # ", " ## #"],
+    'R': ["#### ", "#   #", "#### ", "#  # ", "#   #"],
+    'S': [" ####", "#    ", " ### ", "    #", "#### "],
+    'T': ["#####", "  #  ", "  #  ", "  #  ", "  #  "],
+    'U': ["#   #", "#   #", "#   #", "#   #", " ### "],
+    'V': ["#   #", "#   #", "#   #", " # # ", "  #  "],
+    'W': ["#   #", "#   #", "# # #", "## ##", "#   #"],
+    'X': ["#   #", " # # ", "  #  ", " # # ", "#   #"],
+    'Y': ["#   #", " # # ", "  #  ", "  #  ", "  #  "],
+    'Z': ["#####", "   # ", "  #  ", " #   ", "#####"],
+    '0': [" ### ", "#   #", "#   #", "#   #", " ### "],
+    '1': ["  #  ", " ##  ", "  #  ", "  #  ", "#####"],
+    '2': [" ### ", "#   #", "   # ", "  #  ", "#####"],
+    '3': ["#####", "   # ", "  ###", "    #", "#####"],
+    '4': ["#   #", "#   #", "#####", "    #", "    #"],
+    '5': ["#####", "#    ", "#### ", "    #", "#### "],
+    '6': [" ### ", "#    ", "#### ", "#   #", " ### "],
+    '7': ["#####", "    #", "   # ", "  #  ", "  #  "],
+    '8': [" ### ", "#   #", " ### ", "#   #", " ### "],
+    '9': [" ### ", "#   #", " ####", "    #", " ### "],
+    '!': ["  #  ", "  #  ", "  #  ", "     ", "  #  "],
+    '?': [" ### ", "#   #", "   # ", "     ", "  #  "],
+};
+
+function renderAsciiText(text) {
+    const rows = ['', '', '', '', ''];
+    for (const ch of text.toUpperCase()) {
+        const glyph = FONT[ch] || FONT[' '];
+        for (let i = 0; i < 5; i++) rows[i] += glyph[i] + ' ';
+    }
+    return rows.join('\n');
+}
+
+// ─── In-world date (Amber Reckoning) ─────────────────────────────
+const AMBER_EPOCH_OFFSET = -862; // ties "now" to a year consistent with the wider setting's lore
+const SEASON_NAMES = ['Kindling', 'Greening', 'Highsun', 'Ashing', 'Frostfall', 'Deepnight'];
+
+function getAmberReckoning(date = new Date()) {
+    const arYear = date.getFullYear() + AMBER_EPOCH_OFFSET;
+    const startOfYear = new Date(date.getFullYear(), 0, 1);
+    const dayOfYear = Math.floor((date - startOfYear) / 86400000);
+    const seasonIdx = Math.min(SEASON_NAMES.length - 1, Math.floor((dayOfYear / 366) * SEASON_NAMES.length));
+    return `${SEASON_NAMES[seasonIdx]}, Year ${arYear} A.R.`;
+}
+
+// ─── Fortunes ─────────────────────────────────────────────────────
+const FORTUNES = [
+    "Count exits, not victims.",
+    "The wise play for breaths, not squares.",
+    "A quiet move wins louder than a brilliant one.",
+    "Fortune favors the prepared roll.",
+    "Every road pays a toll, eventually.",
+    "Seed for tomorrow; map your escape today.",
+    "A locked door and a closed mind open the same way: not at all.",
+    "The GM's silence is rarely peaceful.",
+    "Some fates are rolled. Others are chosen.",
+    "In Acasia, even the winters keep a ledger.",
+    "Not all who wander the terminal are lost.",
+    "The dice remember nothing. The table remembers everything.",
+    "Ask for advantage. You might just get it.",
+    "A natural 1 builds more character than a natural 20.",
+    "42."
+];
+
+function getRandomFortune() {
+    return FORTUNES[Math.floor(Math.random() * FORTUNES.length)];
+}
+
+// ─── Matrix rain (purely cosmetic) ───────────────────────────────
+function playMatrixRain(durationMs = 2500) {
+    return new Promise(resolve => {
+        const cols = Math.min(process.stdout.columns || 80, 120);
+        const rows = Math.min(process.stdout.rows || 24, 30);
+        const chars = 'アイウエオカキクケコサシスセソ0123456789$#@%&';
+        const drops = new Array(cols).fill(0).map(() => Math.floor(Math.random() * rows));
+        let stopped = false;
+        process.stdout.write('\x1b[?25l');
+        const interval = setInterval(() => {
+            let out = '\x1b[H';
+            const grid = Array.from({ length: rows }, () => new Array(cols).fill(' '));
+            for (let c = 0; c < cols; c++) {
+                const r = drops[c];
+                if (r >= 0 && r < rows) grid[r][c] = chars[Math.floor(Math.random() * chars.length)];
+                drops[c] = (drops[c] + 1) % (rows + Math.floor(Math.random() * 10));
+            }
+            for (let r = 0; r < rows; r++) out += colors.green + grid[r].join('') + colors.reset + '\n';
+            process.stdout.write(out);
+        }, 90);
+        setTimeout(() => {
+            if (stopped) return;
+            stopped = true;
+            clearInterval(interval);
+            process.stdout.write('\x1b[?25h');
+            resolve();
+        }, durationMs);
+    });
+}
+
+async function playPartyMode() {
+    const rainbow = [colors.red, colors.yellow, colors.green, colors.cyan, colors.blue, colors.magenta];
+    for (let i = 0; i < 12; i++) {
+        process.stdout.write('\r\x1b[K' + rainbow[i % rainbow.length] + '🎉 PARTY MODE 🎉' + colors.reset);
+        await new Promise(r => setTimeout(r, 100));
+    }
+    process.stdout.write('\r\x1b[K');
+    rl.prompt(true);
+}
+
+const COFFEE_ART = `
+${colors.yellow}      ) ) )
+     ( ( (
+    .......
+    |     |]
+    \\     /
+     \`---'${colors.reset}
+${colors.dim}  Terminal fueled. Bug reports welcome, coffee mandatory.${colors.reset}
+`;
+
+function triggerKonami() {
+    console.log(`
+${colors.yellow}${colors.bold}⬆️⬆️⬇️⬇️⬅️➡️⬅️➡️🅱️🅰️${colors.reset}
+${colors.magenta}You feel a strange sense of ancient power...
+Nothing actually happens. This isn't that kind of game.${colors.reset}
+`);
+    rl.prompt(true);
+}
+
+// Chat-message easter eggs — checked before a plain message is sent as chat.
+// These work whether or not you're connected; if you ARE connected, your
+// message still goes out as normal chat too, with the joke shown locally.
+const CHAT_EASTER_EGGS = [
+    { pattern: /^sudo make me a sandwich$/i, respond: () => printSystemMessage(`${colors.green}Okay.${colors.reset} 🥪 (Root privileges are a hell of a drug.)`) },
+    { pattern: /^good bot$/i, respond: () => printSystemMessage('🤖 beep boop, thank you!', colors.cyan) },
+    { pattern: /^bad bot$/i, respond: () => printSystemMessage('🤖 ...I am but dice and readline.', colors.gray) },
+    { pattern: /^42$/, respond: () => printSystemMessage("Don't panic. 🐬", colors.yellow) },
+    { pattern: /^konami$/i, respond: () => triggerKonami() },
+];
+
+// ─── REST API (admin) ──────────────────────────────────────────
 async function makeApiRequest(endpoint, method = 'GET', data = null) {
     const url = `${apiBaseUrl}${endpoint}`;
     const options = {
@@ -454,139 +629,6 @@ async function handleAdminCommand(args) {
     }
 }
 
-// ─── Character API commands ─────────────────────────────────────
-async function listCharacters() {
-    if (!roomCode) { printSystemMessage('Not connected to a room.', colors.red); return; }
-    try {
-        const result = await makeApiRequest(`/rooms/${roomCode}/characters`);
-        characters = {};
-        (result.characters || []).forEach(c => { if (c.name) characters[c.name] = c; });
-        printCharacterList();
-    } catch (err) {
-        printSystemMessage(`Failed to list characters: ${err.message}`, colors.red);
-    }
-}
-
-async function viewCharacter(name) {
-    if (!roomCode) { printSystemMessage('Not connected to a room.', colors.red); return; }
-    try {
-        const result = await makeApiRequest(`/rooms/${roomCode}/characters/${encodeURIComponent(name)}`);
-        console.log(`${colors.cyan}Character: ${colors.bold}${result.name}${colors.reset}`);
-        Object.keys(result).forEach(key => {
-            if (key === 'name') return;
-            console.log(`  ${key}: ${typeof result[key] === 'object' ? JSON.stringify(result[key]) : result[key]}`);
-        });
-        rl.prompt(true);
-    } catch (err) {
-        printSystemMessage(`Failed to view character: ${err.message}`, colors.red);
-    }
-}
-
-async function updateCharacter(name, field, value) {
-    if (!roomCode) { printSystemMessage('Not connected to a room.', colors.red); return; }
-    const updates = {};
-    updates[field] = value;
-    try {
-        await makeApiRequest(`/rooms/${roomCode}/characters/update`, 'POST', { updates: { [name]: updates } });
-        printSystemMessage(`✅ Updated ${name}.${field} = ${value}`);
-    } catch (err) {
-        printSystemMessage(`Failed to update character: ${err.message}`, colors.red);
-    }
-}
-
-// ─── Grid Combat API ────────────────────────────────────────────
-async function toggleGrid(enabled) {
-    if (!roomCode) { printSystemMessage('Not connected to a room.', colors.red); return; }
-    try {
-        await makeApiRequest(`/rooms/${roomCode}/grid-combat`, 'POST', { enabled });
-        printSystemMessage(`Grid combat ${enabled ? 'enabled' : 'disabled'}.`);
-    } catch (err) {
-        printSystemMessage(`Failed to toggle grid: ${err.message}`, colors.red);
-    }
-}
-
-async function addToken(name, x, y, color = '#d4af37') {
-    if (!roomCode) { printSystemMessage('Not connected to a room.', colors.red); return; }
-    const data = { name, x: x || 0, y: y || 0, color };
-    try {
-        const result = await makeApiRequest(`/rooms/${roomCode}/tokens`, 'POST', data);
-        printSystemMessage(`✅ Token added: ${name} (ID: ${result.id})`);
-    } catch (err) {
-        printSystemMessage(`Failed to add token: ${err.message}`, colors.red);
-    }
-}
-
-async function listTokens() {
-    if (!roomCode) { printSystemMessage('Not connected to a room.', colors.red); return; }
-    try {
-        const result = await makeApiRequest(`/rooms/${roomCode}/tokens`);
-        const tokens = result.tokens || [];
-        if (tokens.length === 0) {
-            printSystemMessage('No tokens in room.');
-        } else {
-            console.log(`${colors.cyan}Tokens (${tokens.length}):${colors.reset}`);
-            tokens.forEach(t => {
-                console.log(`  ${t.id}: ${t.name} (${t.x},${t.y}) [${t.color}]`);
-            });
-            rl.prompt(true);
-        }
-    } catch (err) {
-        printSystemMessage(`Failed to list tokens: ${err.message}`, colors.red);
-    }
-}
-
-async function removeToken(id) {
-    if (!roomCode) { printSystemMessage('Not connected to a room.', colors.red); return; }
-    try {
-        await makeApiRequest(`/rooms/${roomCode}/tokens/${id}`, 'DELETE');
-        printSystemMessage(`✅ Token ${id} removed.`);
-    } catch (err) {
-        printSystemMessage(`Failed to remove token: ${err.message}`, colors.red);
-    }
-}
-
-async function moveToken(id, x, y) {
-    if (!roomCode) { printSystemMessage('Not connected to a room.', colors.red); return; }
-    try {
-        await makeApiRequest(`/rooms/${roomCode}/tokens/${id}/move`, 'POST', { x, y });
-        printSystemMessage(`✅ Token ${id} moved to (${x},${y}).`);
-    } catch (err) {
-        printSystemMessage(`Failed to move token: ${err.message}`, colors.red);
-    }
-}
-
-// ─── Whiteboard API ─────────────────────────────────────────────
-async function getWhiteboardStatus() {
-    if (!roomCode) { printSystemMessage('Not connected to a room.', colors.red); return; }
-    try {
-        const wb = await makeApiRequest(`/rooms/${roomCode}/whiteboard`);
-        console.log(`${colors.cyan}Whiteboard state:${colors.reset}`);
-        console.log(`  Drawings: ${wb.drawings?.length || 0}`);
-        console.log(`  Notes: ${wb.notes?.length || 0}`);
-        console.log(`  Images: ${wb.images?.length || 0}`);
-        if (wb.gridCombat) {
-            const gc = wb.gridCombat;
-            console.log(`  Grid Combat: ${gc.enabled ? 'enabled' : 'disabled'}`);
-            console.log(`  Tokens: ${gc.tokens?.length || 0}`);
-            console.log(`  Grid Type: ${gc.gridType || 'square'}`);
-        }
-        rl.prompt(true);
-    } catch (err) {
-        printSystemMessage(`Failed to get whiteboard: ${err.message}`, colors.red);
-    }
-}
-
-async function syncWhiteboard() {
-    if (!roomCode) { printSystemMessage('Not connected to a room.', colors.red); return; }
-    try {
-        const wb = await makeApiRequest(`/rooms/${roomCode}/whiteboard`);
-        // In a real client, we could display or store it; here we just confirm
-        printSystemMessage(`Whiteboard synced (${wb.drawings?.length || 0} drawings, ${wb.notes?.length || 0} notes, ${wb.images?.length || 0} images).`);
-    } catch (err) {
-        printSystemMessage(`Failed to sync whiteboard: ${err.message}`, colors.red);
-    }
-}
-
 // ─── WebSocket connection ───────────────────────────────────────
 function connectToServer(url = serverUrl, room = roomCode) {
     if (connected) { printSystemMessage('Already connected.'); return; }
@@ -604,6 +646,7 @@ function connectToServer(url = serverUrl, room = roomCode) {
         ws.on('open', () => {
             connected = true;
             reconnectAttempts = 0;
+            sessionStats.sessionStart = Date.now();
             printSystemMessage('Connected! Sending handshake...');
             ws.send(JSON.stringify({
                 type: 'handshake',
@@ -611,7 +654,7 @@ function connectToServer(url = serverUrl, room = roomCode) {
                 password: password,
                 clientName: clientName,
                 role: 'player',
-                version: '2.3.0'
+                version: CONFIG.version
             }));
         });
 
@@ -648,7 +691,6 @@ function disconnect() {
     gmId = null;
     pendingRequests = [];
     myRole = 'player';
-    characters = {};
     printSystemMessage('Disconnected.');
     rl.prompt(true);
 }
@@ -719,6 +761,7 @@ function handleMessage(msg) {
 
         case 'deck-drawn':
             deckRemaining = msg.remaining || 0;
+            sessionStats.cardsDrawn += (msg.cards || []).length;
             printDeckDraw((msg.cards || []).length, msg.region || defaultRegion, msg.cards || [], msg.synthesis || '');
             break;
 
@@ -787,39 +830,11 @@ function handleMessage(msg) {
             if (msg.clients) updateClients(msg.clients);
             if (msg.deckRemaining !== undefined) deckRemaining = msg.deckRemaining;
             if (msg.data?.region) defaultRegion = msg.data.region;
-            if (msg.characters && Array.isArray(msg.characters)) {
-                characters = {};
-                msg.characters.forEach(c => { if (c.name) characters[c.name] = c; });
-            }
             printSystemMessage(`Room state received. ${Object.keys(clients).length} clients online.`);
             break;
 
         case 'state-updated':
-            if (msg.characters && Array.isArray(msg.characters)) {
-                characters = {};
-                msg.characters.forEach(c => { if (c.name) characters[c.name] = c; });
-                printSystemMessage(`Characters updated (${Object.keys(characters).length} total).`);
-            } else {
-                printSystemMessage(`State updated by ${msg.updatedBy || 'Unknown'}`);
-            }
-            break;
-
-        case 'character-update':
-            if (msg.name) {
-                if (!characters[msg.name]) characters[msg.name] = { name: msg.name };
-                characters[msg.name][msg.field] = msg.value;
-                printSystemMessage(`⚡ ${msg.name}.${msg.field} = ${msg.value}`);
-            }
-            break;
-
-        case 'character-update-bulk':
-            if (msg.updates) {
-                Object.entries(msg.updates).forEach(([name, data]) => {
-                    if (!characters[name]) characters[name] = { name };
-                    Object.assign(characters[name], data);
-                });
-                printSystemMessage(`📋 Bulk character update (${Object.keys(msg.updates).length} characters).`);
-            }
+            printSystemMessage(`State updated by ${msg.updatedBy || 'Unknown'}`);
             break;
 
         case 'error':
@@ -886,7 +901,9 @@ function sendMessage(type, data = {}) {
 }
 
 // ─── Dice roller ──────────────────────────────────────────────────
-function rollDice(formula) {
+// Rolls a formula exactly once. Unchanged shape/behavior from before, just
+// factored out so advantage/disadvantage (below) can reuse it.
+function rollOnce(formula) {
     const parts = formula.match(/^(\d+)d(\d+)([+-]\d+)?$/i);
     if (!parts) {
         const num = parseInt(formula);
@@ -904,7 +921,21 @@ function rollDice(formula) {
         total += r;
     }
     total += mod;
-    return { formula, total, rolls };
+    return { formula, total, rolls, count, sides, mod };
+}
+
+// `rollDice(formula)` behaves exactly as it always did (mode defaults to
+// 'normal', same return shape). Passing 'adv' or 'dis' rolls the whole
+// expression twice and keeps the better/worse total, exposing the other
+// result as `alternateTotal`.
+function rollDice(formula, mode = 'normal') {
+    const first = rollOnce(formula);
+    if (first.error || mode === 'normal') return first;
+    const second = rollOnce(formula);
+    const [better, worse] = mode === 'adv'
+        ? (first.total >= second.total ? [first, second] : [second, first])
+        : (first.total <= second.total ? [first, second] : [second, first]);
+    return { ...better, alternateTotal: worse.total, mode };
 }
 
 // ─── Command processing ──────────────────────────────────────────
@@ -942,7 +973,6 @@ rl.on('line', (input) => {
                     printSystemMessage(`GM: ${gm ? gm.name : 'None'}`);
                     printSystemMessage(`Your role: ${myRole}`);
                     printSystemMessage(`Clients: ${Object.keys(clients).length}`);
-                    printSystemMessage(`Characters: ${Object.keys(characters).length}`);
                     if (ADMIN_MODE) printSystemMessage(`Admin mode: ✅`, colors.green);
                 }
                 break;
@@ -953,17 +983,60 @@ rl.on('line', (input) => {
                 break;
 
             case 'roll':
-            case 'r':
-                if (!argStr) { printSystemMessage('Usage: /roll <dice> [reason]'); break; }
-                const match = argStr.match(/^([^\s"]+(?:\s+[^\s"]+)*?)(?:\s+(.+))?$/);
-                let diceExpr = argStr, reason = '';
+            case 'r': {
+                if (!argStr) { printSystemMessage('Usage: /roll <dice> [adv|dis] [reason]'); break; }
+
+                let mode = 'normal';
+                const modeArgs = args.filter(a => {
+                    const lower = a.toLowerCase();
+                    if (lower === 'adv' || lower === 'advantage') { mode = 'adv'; return false; }
+                    if (lower === 'dis' || lower === 'disadvantage') { mode = 'dis'; return false; }
+                    return true;
+                });
+                const cleanedArgStr = modeArgs.join(' ');
+
+                const match = cleanedArgStr.match(/^([^\s"]+(?:\s+[^\s"]+)*?)(?:\s+(.+))?$/);
+                let diceExpr = cleanedArgStr, reason = '';
                 if (match) { diceExpr = match[1]; reason = match[2] || ''; }
-                const rollData = rollDice(diceExpr);
+
+                const rollData = rollDice(diceExpr, mode);
                 if (rollData.error) { printSystemMessage(rollData.error, colors.red); break; }
-                if (sendMessage('roll-dice', { roll: diceExpr, reason })) {
-                    printRollResult(clientName, diceExpr, rollData.total, rollData.rolls.join(', '));
+
+                const isD20 = rollData.count === 1 && rollData.sides === 20;
+                const natRoll = isD20 ? rollData.rolls[0] : null;
+                const isCrit = isD20 && natRoll === 20;
+                const isFumble = isD20 && natRoll === 1;
+
+                if (sendMessage('roll-dice', { roll: diceExpr, reason, mode })) {
+                    sessionStats.rollsMade++;
+                    sessionStats.diceTotal += rollData.total;
+                    if (isCrit) sessionStats.crits++;
+                    if (isFumble) sessionStats.fumbles++;
+                    rollHistory.push({ formula: diceExpr, total: rollData.total, crit: isCrit, fumble: isFumble, mode });
+                    if (rollHistory.length > MAX_ROLL_HISTORY) rollHistory.shift();
+
+                    let extra = '';
+                    if (mode !== 'normal') extra += ` [${mode === 'adv' ? 'ADV' : 'DIS'}, other roll: ${rollData.alternateTotal}]`;
+                    if (isCrit) extra += ` ${colors.green}${colors.bold}⭐ CRITICAL!${colors.reset}${colors.yellow}`;
+                    if (isFumble) extra += ` ${colors.red}💀 FUMBLE!${colors.reset}${colors.yellow}`;
+                    if (Math.random() < 0.02) extra += ` ${colors.magenta}✨ Fate intervenes...${colors.reset}${colors.yellow}`;
+                    printRollResult(clientName, diceExpr, rollData.total, rollData.rolls.join(', ') + extra);
                 }
                 break;
+            }
+
+            case 'history': {
+                if (!rollHistory.length) { printSystemMessage('No rolls yet this session.'); break; }
+                process.stdout.write('\r\x1b[K');
+                console.log(`${colors.yellow}🎲 Recent Rolls:${colors.reset}`);
+                rollHistory.slice(-10).reverse().forEach(r => {
+                    const tag = r.crit ? ` ${colors.green}⭐ CRIT${colors.reset}` : r.fumble ? ` ${colors.red}💀 FUMBLE${colors.reset}` : '';
+                    const modeTag = r.mode && r.mode !== 'normal' ? ` (${r.mode})` : '';
+                    console.log(`  ${r.formula}${modeTag} → ${colors.bold}${r.total}${colors.reset}${tag}`);
+                });
+                rl.prompt(true);
+                break;
+            }
 
             case 'draw':
                 const count = parseInt(args[0]) || 1;
@@ -1042,105 +1115,6 @@ rl.on('line', (input) => {
                 break;
             }
 
-            // ─── NEW: Character commands ──────────────────────────
-            case 'chars': {
-                const charCmd = args[0]?.toLowerCase() || '';
-                const charArg1 = args[1];
-                const charArg2 = args[2];
-                const charArg3 = args[3];
-                switch (charCmd) {
-                    case 'list':
-                        if (!connected) { printSystemMessage('Not connected.'); break; }
-                        listCharacters();
-                        break;
-                    case 'view':
-                        if (!charArg1) { printSystemMessage('Usage: /chars view <name>'); break; }
-                        viewCharacter(charArg1);
-                        break;
-                    case 'update':
-                        if (!charArg1 || !charArg2 || charArg3 === undefined) {
-                            printSystemMessage('Usage: /chars update <name> <field> <value>');
-                            break;
-                        }
-                        updateCharacter(charArg1, charArg2, charArg3);
-                        break;
-                    case 'sync':
-                        if (!connected) { printSystemMessage('Not connected.'); break; }
-                        sendMessage('sync-request', { entity: 'characters' });
-                        printSystemMessage('Character sync requested.');
-                        break;
-                    default:
-                        printSystemMessage('Character commands: list, view <name>, update <name> <field> <value>, sync');
-                }
-                break;
-            }
-
-            // ─── NEW: Grid Combat ────────────────────────────────
-            case 'grid': {
-                const gridCmd = args[0]?.toLowerCase();
-                switch (gridCmd) {
-                    case 'on':
-                        toggleGrid(true);
-                        break;
-                    case 'off':
-                        toggleGrid(false);
-                        break;
-                    case 'status':
-                        if (!connected) { printSystemMessage('Not connected.'); break; }
-                        sendMessage('sync-request', { entity: 'grid' });
-                        printSystemMessage('Grid status requested.');
-                        break;
-                    default:
-                        printSystemMessage('Grid commands: on, off, status');
-                }
-                break;
-            }
-
-            case 'token': {
-                const tokenCmd = args[0]?.toLowerCase();
-                const tokenArgs = args.slice(1);
-                switch (tokenCmd) {
-                    case 'add':
-                        if (tokenArgs.length < 1) { printSystemMessage('Usage: /token add <name> [x] [y] [color]'); break; }
-                        const name = tokenArgs[0];
-                        const x = parseInt(tokenArgs[1]) || 0;
-                        const y = parseInt(tokenArgs[2]) || 0;
-                        const color = tokenArgs[3] || '#d4af37';
-                        addToken(name, x, y, color);
-                        break;
-                    case 'list':
-                        listTokens();
-                        break;
-                    case 'remove':
-                        if (!tokenArgs[0]) { printSystemMessage('Usage: /token remove <id>'); break; }
-                        removeToken(tokenArgs[0]);
-                        break;
-                    case 'move':
-                        if (tokenArgs.length < 3) { printSystemMessage('Usage: /token move <id> <x> <y>'); break; }
-                        moveToken(tokenArgs[0], parseInt(tokenArgs[1]), parseInt(tokenArgs[2]));
-                        break;
-                    default:
-                        printSystemMessage('Token commands: add, list, remove, move');
-                }
-                break;
-            }
-
-            // ─── NEW: Whiteboard ──────────────────────────────────
-            case 'wb': {
-                const wbCmd = args[0]?.toLowerCase();
-                switch (wbCmd) {
-                    case 'status':
-                        getWhiteboardStatus();
-                        break;
-                    case 'sync':
-                        syncWhiteboard();
-                        break;
-                    default:
-                        printSystemMessage('Whiteboard commands: status, sync');
-                }
-                break;
-            }
-
             case 'admin':
                 handleAdminCommand(args);
                 break;
@@ -1176,6 +1150,102 @@ rl.on('line', (input) => {
                 else printSystemMessage('Not connected.');
                 break;
 
+            case 'whoami': {
+                process.stdout.write('\r\x1b[K');
+                console.log(`
+${colors.magenta}╔════════════════════════════════╗
+║  ${colors.yellow}Identity Card${colors.magenta}                   ║
+╠════════════════════════════════╣${colors.reset}
+  Name:    ${colors.cyan}${clientName}${colors.reset}
+  Role:    ${colors.cyan}${myRole}${colors.reset}
+  Region:  ${colors.cyan}${defaultRegion}${colors.reset}
+  Server:  ${colors.gray}${connected ? serverUrl : 'not connected'}${colors.reset}
+  Room:    ${colors.gray}${connected ? roomCode : '—'}${colors.reset}
+  Theme:   ${colors.gray}${userConfig.theme}${colors.reset}
+${colors.magenta}╚════════════════════════════════╝${colors.reset}
+`);
+                rl.prompt(true);
+                break;
+            }
+
+            case 'stats': {
+                const uptimeMin = Math.floor((Date.now() - sessionStats.sessionStart) / 60000);
+                process.stdout.write('\r\x1b[K');
+                console.log(`
+${colors.cyan}📊 Session Stats${colors.reset}
+  Uptime:         ${uptimeMin}m
+  Rolls made:     ${sessionStats.rollsMade}
+  Dice total:     ${sessionStats.diceTotal}
+  Crits (nat20):  ${sessionStats.crits}
+  Fumbles (nat1): ${sessionStats.fumbles}
+  Messages sent:  ${sessionStats.messagesSent}
+  Cards drawn:    ${sessionStats.cardsDrawn}
+`);
+                rl.prompt(true);
+                break;
+            }
+
+            case 'theme': {
+                const name = args[0]?.toLowerCase();
+                if (!name) {
+                    printSystemMessage(`Current theme: ${userConfig.theme}. Available: ${Object.keys(THEMES).join(', ')}`);
+                    break;
+                }
+                if (!THEMES[name]) {
+                    printSystemMessage(`Unknown theme "${name}". Available: ${Object.keys(THEMES).join(', ')}`, colors.red);
+                    break;
+                }
+                colors = THEMES[name];
+                userConfig.theme = name;
+                saveUserConfig();
+                rl.setPrompt(`${colors.gray}>${colors.reset} `);
+                printSystemMessage(`🎨 Theme switched to "${name}".`, colors.green);
+                break;
+            }
+
+            case 'time': {
+                const now = new Date();
+                printSystemMessage(`🕐 Real time: ${now.toLocaleString()}`);
+                printSystemMessage(`📜 Reckoning: ${getAmberReckoning(now)}`, colors.magenta);
+                break;
+            }
+
+            case 'fortune':
+                printSystemMessage(`🔮 ${getRandomFortune()}`, colors.magenta);
+                break;
+
+            case 'ascii': {
+                if (!argStr) { printSystemMessage('Usage: /ascii <text>'); break; }
+                const text = argStr.slice(0, 20);
+                process.stdout.write('\r\x1b[K');
+                console.log(colors.cyan + renderAsciiText(text) + colors.reset);
+                rl.prompt(true);
+                break;
+            }
+
+            case 'matrix':
+                playMatrixRain().then(() => rl.prompt(true));
+                break;
+
+            case 'party':
+                playPartyMode();
+                break;
+
+            case 'coffee':
+                console.log(COFFEE_ART);
+                rl.prompt(true);
+                break;
+
+            case 'about':
+                console.log(`
+${colors.magenta}Fate's Edge Terminal Client${colors.reset}
+${colors.dim}Built by someone who definitely tested this in production.${colors.reset}
+${colors.dim}Powered by dice, dread, and an unreasonable number of ANSI codes.${colors.reset}
+${colors.gray}Try typing things you shouldn't. You might find more than this.${colors.reset}
+`);
+                rl.prompt(true);
+                break;
+
             case 'help':
                 printHelp();
                 break;
@@ -1190,7 +1260,16 @@ rl.on('line', (input) => {
                 printSystemMessage(`Unknown command: /${cmd}. Type /help.`);
         }
     } else {
-        if (connected) {
+        const egg = CHAT_EASTER_EGGS.find(e => e.pattern.test(trimmed));
+        if (egg) {
+            if (connected) {
+                sessionStats.messagesSent++;
+                sendMessage('chat-message', { text: trimmed, sender: clientName });
+                printChatMessage(clientName, trimmed);
+            }
+            egg.respond();
+        } else if (connected) {
+            sessionStats.messagesSent++;
             sendMessage('chat-message', { text: trimmed, sender: clientName });
             printChatMessage(clientName, trimmed);
         } else {
@@ -1207,6 +1286,7 @@ console.log(`Set your name with ${colors.yellow}/name <Your Name>${colors.reset}
 console.log(`Connect with ${colors.yellow}/connect [url] [room]${colors.reset}`);
 if (ADMIN_MODE) console.log(`${colors.green}Admin mode enabled. Use /admin for player management.${colors.reset}`);
 else console.log(`${colors.dim}Tip: Set API_KEY env to enable admin commands.${colors.reset}`);
+console.log(`${colors.dim}💭 ${getRandomFortune()}${colors.reset}`);
 console.log('');
 
 rl.prompt();

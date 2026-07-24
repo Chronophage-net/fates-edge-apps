@@ -994,6 +994,7 @@ export function openKonrehModal(netConfig = null) {
     #konreh-modal .kr-log .p2 { color:#e18a95; }
     #konreh-modal .kr-scroll::-webkit-scrollbar { width:8px; }
     #konreh-modal .kr-scroll::-webkit-scrollbar-thumb { background:#3a3b4a; border-radius:4px; }
+    #konreh-modal .kr-coach-tip { background:#1a2a1a; border-left: 3px solid #4ecdc4; padding: 6px 10px; border-radius: 4px; font-size: 12px; color: #b8e6e0; margin-top: 6px; min-height: 28px; transition: all 0.15s; }
   `;
   document.head.appendChild(style);
 
@@ -1073,6 +1074,8 @@ export function openKonrehModal(netConfig = null) {
 
   let chosenSchool = 'ykrul';
   let chosenAiPlayer = 2;
+  let aiDepth = 3; // NEW: default medium
+  let coachMode = false; // NEW: coach mode toggle
   const schoolCards = {};
   Object.entries(SCHOOLS).forEach(([id, school]) => {
     const card = document.createElement('button');
@@ -1088,6 +1091,30 @@ export function openKonrehModal(netConfig = null) {
     schoolCards[id] = card;
   });
   schoolCards[chosenSchool].style.borderColor = 'var(--gold)';
+
+  // ---- NEW: Depth Selector ----
+  const depthRow = document.createElement('div');
+  depthRow.style.cssText = 'display:flex; gap:16px; align-items:center; font-size:12px; color:var(--muted); width:100%; justify-content:center; padding:4px 0;';
+  depthRow.innerHTML = `
+    <span style="font-weight:600;">Difficulty:</span>
+    <label><input type="radio" name="kr-depth" value="2"> Easy</label>
+    <label><input type="radio" name="kr-depth" value="3" checked> Medium</label>
+    <label><input type="radio" name="kr-depth" value="4"> Hard</label>
+  `;
+  schoolPanel.appendChild(depthRow);
+
+  // ---- NEW: Coach Mode Toggle ----
+  const coachRow = document.createElement('div');
+  coachRow.style.cssText = 'display:flex; align-items:center; gap:8px; font-size:12px; color:var(--muted); width:100%; justify-content:center; padding:2px 0;';
+  const coachCheck = document.createElement('input');
+  coachCheck.type = 'checkbox';
+  coachCheck.id = 'kr-coach-toggle';
+  const coachLabel = document.createElement('label');
+  coachLabel.htmlFor = 'kr-coach-toggle';
+  coachLabel.textContent = '💡 Coach Mode (shows best move hints)';
+  coachRow.appendChild(coachCheck);
+  coachRow.appendChild(coachLabel);
+  schoolPanel.appendChild(coachRow);
 
   const sideRow = document.createElement('div');
   sideRow.style.cssText = 'display:flex; align-items:center; gap:8px; font-size:12px; color:var(--muted); flex-wrap:wrap; justify-content:center;';
@@ -1125,6 +1152,13 @@ export function openKonrehModal(netConfig = null) {
   const statusDiv = document.createElement('div');
   statusDiv.style.cssText = 'margin-top: 12px; font-size: 13.5px; color: var(--ink); text-align: center; min-height: 22px; font-weight:600;';
   boardContainer.appendChild(statusDiv);
+
+  // ---- NEW: Coach Tip panel ----
+  const coachTipDiv = document.createElement('div');
+  coachTipDiv.className = 'kr-coach-tip';
+  coachTipDiv.textContent = '💡 Coach will suggest moves when it\'s your turn.';
+  coachTipDiv.style.display = 'none';
+  boardContainer.appendChild(coachTipDiv);
 
   const infoGrid = document.createElement('div');
   infoGrid.style.cssText = 'width:100%; display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:10px; font-size:12px;';
@@ -1183,13 +1217,13 @@ export function openKonrehModal(netConfig = null) {
   let game = new KonrehEngine();
   let selectedPiece = null;
   let validMoves = [];
-  let pendingChoice = null; // { x, y, moves: [...] } awaiting disambiguation
-  let aiConfig = null;      // { schoolId, player } while playing vs computer, else null
-  let aiThinking = false;   // guards against overlapping AI turns
+  let pendingChoice = null;
+  let aiConfig = null;      // { schoolId, player, depth }
+  let aiThinking = false;
 
   const isNetworked = !!netConfig;
-  const localPlayer = netConfig ? netConfig.localPlayer : null; // 1, 2, or null (spectator)
-  let localSeq = 0; // count of actions applied so far — read by kon-reh-connected.js
+  const localPlayer = netConfig ? netConfig.localPlayer : null;
+  let localSeq = 0;
 
   function pieceTitle(piece) {
     if (aiConfig && aiConfig.player === piece.player && PIECE_TITLES[aiConfig.schoolId]) {
@@ -1211,8 +1245,10 @@ export function openKonrehModal(netConfig = null) {
     logDiv.innerHTML = '';
     setupScreen.style.display = 'none';
     boardContainer.style.display = 'flex';
+    coachTipDiv.style.display = coachMode ? 'block' : 'none';
     if (aiConfig) {
-      log(`<i>Game started — vs computer (${SCHOOLS[aiConfig.schoolId].name}, playing Player ${aiConfig.player}).</i>`);
+      const depthLabel = aiConfig.depth === 2 ? 'Easy' : aiConfig.depth === 3 ? 'Medium' : 'Hard';
+      log(`<i>Game started — vs computer (${SCHOOLS[aiConfig.schoolId].name}, ${depthLabel}).</i>`);
     } else {
       log('<i>Game started — Player 1 to move.</i>');
     }
@@ -1220,9 +1256,7 @@ export function openKonrehModal(netConfig = null) {
     maybeTriggerAiMove();
   }
 
-  // If it's the AI-controlled side's turn (a normal move, or a pending
-  // Reforge placement), compute and play its move after a short delay so
-  // the turn transition reads naturally rather than snapping instantly.
+  // ---- UPDATED: uses global aiDepth ----
   function maybeTriggerAiMove() {
     if (!aiConfig || game.winner || aiThinking) return;
     const activePlayer = game.pendingReforge ? game.pendingReforge.player : game.turn;
@@ -1234,16 +1268,19 @@ export function openKonrehModal(netConfig = null) {
       if (game.winner) { aiThinking = false; render(); return; }
       if (game.pendingReforge) {
         const player = game.pendingReforge.player;
-        const opt = chooseAiReforgeChoice(game, aiConfig.schoolId, 2);
-        game.resolveReforge(opt.key);
-        log(`<span class="p${player}">P${player} (${SCHOOLS[aiConfig.schoolId].name})</span> Reforge → <b>${opt.label}</b>`);
+        const reforgeDepth = aiConfig.depth === 2 ? 1 : aiConfig.depth === 3 ? 2 : 3;
+        const opt = chooseAiReforgeChoice(game, aiConfig.schoolId, reforgeDepth);
+        if (opt) {
+          game.resolveReforge(opt.key);
+          log(`<span class="p${player}">P${player} (${SCHOOLS[aiConfig.schoolId].name})</span> Reforge → <b>${opt.label}</b>`);
+        }
         aiThinking = false;
         render();
         maybeTriggerAiMove();
         return;
       }
       const player = game.turn;
-      const cand = chooseAiMove(game, player, aiConfig.schoolId, 3);
+      const cand = chooseAiMove(game, player, aiConfig.schoolId, aiConfig.depth);
       aiThinking = false;
       if (!cand) { render(); return; }
       const piece = game.pieces.find(p => p.id === cand.pieceId);
@@ -1328,6 +1365,61 @@ export function openKonrehModal(netConfig = null) {
     }
   }
 
+  // ---- NEW: Coach Hint Renderer ----
+  function renderCoachHint() {
+    coachTipDiv.style.display = coachMode ? 'block' : 'none';
+    if (!coachMode) {
+      coachTipDiv.textContent = '💡 Coach will suggest moves when it\'s your turn.';
+      return;
+    }
+    // Only show coach if it's the local human's turn (or two-player local)
+    const isHumanTurn = !aiConfig || game.turn !== aiConfig.player;
+    const isLocalTurn = !isNetworked || game.turn === localPlayer;
+    if (game.winner || game.pendingReforge || aiThinking || !isHumanTurn || !isLocalTurn) {
+      coachTipDiv.textContent = '⏳ Waiting for your turn...';
+      return;
+    }
+
+    // Quick search for the best move for the current player (depth 2 for speed)
+    const hint = chooseAiMove(game, game.turn, 'ykrul', 2);
+    if (!hint) {
+      coachTipDiv.textContent = '🤔 No strong suggestions available.';
+      return;
+    }
+
+    // Draw overlay on the hint destination
+    const { x, y } = hint.move;
+    diamondPath(x, y);
+    ctx.save();
+    ctx.strokeStyle = '#4ecdc4';
+    ctx.lineWidth = 3;
+    ctx.setLineDash([4, 6]);
+    ctx.stroke();
+    ctx.restore();
+    // Draw a star / label
+    const { sx, sy } = gridToScreen(x, y);
+    ctx.save();
+    ctx.font = '18px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillStyle = '#4ecdc4';
+    ctx.fillText('✦', sx, sy - 16);
+    ctx.restore();
+
+    // Build explanation
+    const piece = game.pieces.find(p => p.id === hint.pieceId);
+    let reason = `Coach suggests: ${TYPE_NAME[piece.type]} → (${x},${y})`;
+    if (hint.move.capture) {
+      const target = game.pieces.find(p => p.id === hint.move.targetId);
+      if (target) reason += ` — captures ${TYPE_NAME[target.type]}!`;
+    }
+    if (hint.move.special === 'S:D') reason += ` — uses Displacement.`;
+    if (hint.move.special === 'S:H') reason += ` — uses Hop.`;
+    if (piece.type === 'blue' && game.isCross(x, y)) reason += ` — moves into the Cross.`;
+    if (piece.type === 'blue' && game.isSanctum(x, y)) reason += ` — lands on a Sanctum (may Seed).`;
+    coachTipDiv.textContent = `💡 ${reason}`;
+  }
+
   function render() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -1369,6 +1461,7 @@ export function openKonrehModal(netConfig = null) {
     for (const p of game.pieces) if (p.isAlive) drawPiece(p);
 
     renderStatus();
+    renderCoachHint(); // <- NEW: overlay + tip
   }
 
   function renderStatus() {
@@ -1450,7 +1543,6 @@ export function openKonrehModal(netConfig = null) {
       choicePanel.innerHTML = '';
     }
 
-    // Move disambiguation panel (reuses the same panel area)
     if (pendingChoice) {
       choicePanel.style.display = 'block';
       choicePanel.innerHTML = `<div style="color:var(--gold); font-weight:700; margin-bottom:8px; text-align:center;">
@@ -1499,8 +1591,8 @@ export function openKonrehModal(netConfig = null) {
 
   canvas.addEventListener('click', (e) => {
     if (game.winner || game.pendingReforge) return;
-    if (aiConfig && game.turn === aiConfig.player) return; // not the human's turn
-    if (isNetworked && game.turn !== localPlayer) return;  // not this client's turn
+    if (aiConfig && game.turn === aiConfig.player) return;
+    if (isNetworked && game.turn !== localPlayer) return;
     const rect = canvas.getBoundingClientRect();
     const scaleFactor = canvas.width / rect.width;
     const { x, y } = screenToGrid((e.clientX - rect.left) * scaleFactor, (e.clientY - rect.top) * scaleFactor);
@@ -1553,8 +1645,12 @@ export function openKonrehModal(netConfig = null) {
     schoolPanel.style.display = schoolPanel.style.display === 'none' ? 'flex' : 'none';
   });
 
+  // ---- UPDATED: Start button reads depth & coach ----
   startBtn.addEventListener('click', () => {
-    aiConfig = { schoolId: chosenSchool, player: chosenAiPlayer };
+    const depthRadios = document.querySelectorAll('input[name="kr-depth"]');
+    for (const r of depthRadios) if (r.checked) aiDepth = parseInt(r.value, 10);
+    coachMode = document.getElementById('kr-coach-toggle').checked;
+    aiConfig = { schoolId: chosenSchool, player: chosenAiPlayer, depth: aiDepth };
     beginGame();
   });
 
@@ -1586,14 +1682,12 @@ export function openKonrehModal(netConfig = null) {
     render();
 
     return {
-      // Called by kon-reh-connected.js when a move arrives from the peer.
       applyRemoteMove(pieceId, move) {
         const piece = game.pieces.find(p => p.id === pieceId);
         if (!piece || !piece.isAlive) return false;
         executeMove(move, piece, { isRemote: true });
         return true;
       },
-      // Called by kon-reh-connected.js when a Reforge choice arrives from the peer.
       applyRemoteReforge(optionKey) {
         if (!game.pendingReforge) return false;
         const opt = game.pendingReforge.options.find(o => o.key === optionKey);
@@ -1605,7 +1699,6 @@ export function openKonrehModal(netConfig = null) {
         render();
         return true;
       },
-      // Called by kon-reh-connected.js when a 'new-game' signal arrives from the peer.
       applyRemoteNewGame() {
         game = new KonrehEngine();
         selectedPiece = null; validMoves = []; pendingChoice = null; localSeq = 0;
@@ -1614,9 +1707,6 @@ export function openKonrehModal(netConfig = null) {
         render();
       },
       getState() { return serializeGameState(game); },
-      // `seq` MUST accompany any state snapshot — loading state without also
-      // resetting localSeq to match is exactly the bug that let seq numbers
-      // silently diverge between peers after a resync.
       loadState(state, seq) {
         loadGameStateInto(game, state);
         localSeq = typeof seq === 'number' ? seq : localSeq;

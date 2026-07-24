@@ -2,8 +2,7 @@
  * VTT Connected Mode – WebSocket sync, real‑time collaboration
  * Uses reactive store for all UI updates.
  * 
- * v2 – Vertical JRPG-style character roster, character selection,
- *       common rolls, larger fonts, avatar support.
+ * v3 – Full character sync from server (room-state, sync-state, state-updated)
  */
 
 import { vttStore } from '../../core/vtt-store.js';
@@ -767,6 +766,37 @@ async function pushCharactersToServer() {
 }
 
 // ============================================================
+// CHARACTER RECEIVE HELPERS
+// ============================================================
+
+function receiveCharacters(charArray) {
+    if (!Array.isArray(charArray) || charArray.length === 0) {
+        // If empty array, just clear the store
+        vttStore.setState({ characters: [] });
+        return;
+    }
+    const normalized = charArray.map(c => ensureCharacterDefaults(c));
+    vttStore.setState({
+        characters: normalized,
+        // preserve timers if we have them, but we'll re-fetch from state later
+    });
+    // Also update the character grid UI
+    renderVTTChars();
+    // Update the selected character display if needed
+    const selected = vttStore.getSelectedCharacter();
+    if (selected) {
+        // If selected character no longer exists, clear selection
+        const stillExists = normalized.some(c => c.name === selected.name);
+        if (!stillExists) {
+            vttStore.setSelectedCharacter(null);
+        }
+    }
+    // Update chat recipients list (characters are in the store)
+    populateChatRecipients();
+    console.log(`[VTT] Received ${normalized.length} characters from server.`);
+}
+
+// ============================================================
 // WEBSOCKET SYNC SETUP (using unified WebSocket module)
 // ============================================================
 
@@ -784,14 +814,65 @@ function setupWebSocketSync() {
     vttStore.updateCharacters(chars);
     vttStore.updateTimers(getState().timers || []);
 
-    // State updates – ensure characters are normalized
+    // ─── ROOM STATE (initial) ────────────────────────────────────
+    const roomStateHandler = (data) => {
+        if (isDestroyed) return;
+        // Process characters if present
+        if (data && data.characters && Array.isArray(data.characters)) {
+            receiveCharacters(data.characters);
+        }
+        // Process other room state (deck, whiteboard, etc.) if needed
+        if (data && data.deckRemaining !== undefined) {
+            deckState.remaining = data.deckRemaining;
+            updateDeckUI();
+        }
+        if (data && data.region) {
+            defaultRegion = data.region;
+            const regionDisplay = q('#vtt-region-display');
+            if (regionDisplay) regionDisplay.textContent = defaultRegion;
+        }
+        // Clients are handled by presence handler
+    };
+    onWSEvent('room-state', roomStateHandler);
+    wsListeners.set('room-state', roomStateHandler);
+
+    // ─── SYNC STATE (response to sync-request) ──────────────────
+    const syncStateHandler = (data) => {
+        if (isDestroyed) return;
+        // The server sends `state` (whiteboard) and sometimes `characters` separately?
+        // In our server, sync-state sends characters directly in the same payload.
+        // We'll check both `data.characters` and `data.state.characters` for flexibility.
+        let charArray = null;
+        if (data && data.characters && Array.isArray(data.characters)) {
+            charArray = data.characters;
+        } else if (data && data.state && data.state.characters && Array.isArray(data.state.characters)) {
+            charArray = data.state.characters;
+        }
+        if (charArray) {
+            receiveCharacters(charArray);
+        }
+        // Also handle whiteboard if needed
+        if (data && data.state && data.state.whiteboard) {
+            // whiteboard update would go here if needed
+        }
+        showToast('📋 Sync complete.', 'info');
+    };
+    onWSEvent('sync-state', syncStateHandler);
+    wsListeners.set('sync-state', syncStateHandler);
+
+    // ─── STATE UPDATED (incremental) ────────────────────────────
     const stateHandler = (data) => {
         if (isDestroyed) return;
-        const chars = (data.characters || []).map(c => ensureCharacterDefaults(c));
-        vttStore.setState({
-            characters: chars,
-            timers: data.timers || [],
-        });
+        // If the update contains characters, process them
+        if (data && data.characters && Array.isArray(data.characters)) {
+            receiveCharacters(data.characters);
+        } else if (data && data.state && data.state.characters && Array.isArray(data.state.characters)) {
+            receiveCharacters(data.state.characters);
+        }
+        // Also handle timers if present
+        if (data && data.timers) {
+            vttStore.updateTimers(data.timers);
+        }
     };
     onWSEvent('state-updated', stateHandler);
     wsListeners.set('state-updated', stateHandler);
@@ -1045,7 +1126,7 @@ function setupWebSocketSync() {
     onWSEvent('handshake_ack', handshakeHandler);
     wsListeners.set('handshake_ack', handshakeHandler);
 
-    console.log('[VTT Connected] WebSocket sync enabled with deck/module/GM support');
+    console.log('[VTT Connected] WebSocket sync enabled with full character support');
 }
 
 function cleanupWebSocketListeners() {
@@ -1552,7 +1633,7 @@ export function render(el) {
     updateMessageCount();
     populateChatRecipients();
 
-    // Normalize and set initial characters
+    // Normalize and set initial characters from local state (if any)
     const chars = getCharacters();
     vttStore.updateCharacters(chars);
     vttStore.updateTimers(getState().timers || []);
@@ -1586,7 +1667,7 @@ export function render(el) {
         if (headerCountEl) headerCountEl.textContent = String(deckState.remaining || 0);
     }, 5000);
 
-    console.log('[VTT Connected] Rendered with reactive store + deck/module/GM support (JRPG style)');
+    console.log('[VTT Connected] Rendered with reactive store + full character sync');
     window.getState = getState;
     window.vttStore = vttStore;
     window.pushCharactersToServer = pushCharactersToServer;
