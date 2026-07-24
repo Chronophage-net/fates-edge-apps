@@ -1455,261 +1455,205 @@ export function render(el) {
         </span>`;
     }).join('');
 
+    // In vtt-connected.js, inside the render() function, replace the innerHTML with:
+
     el.innerHTML = `
-        <div class="vtt-live-table">
-        <style>
-            .vtt-live-table .vtt-card {
-                background: var(--bg2);
-                border: 1px solid var(--border);
-                border-radius: var(--radius);
-                padding: 0.9rem 1.1rem;
-                box-shadow: 0 1px 3px rgba(0,0,0,0.10);
-            }
-            .vtt-live-table .vtt-card-header {
-                display: flex; align-items: center; justify-content: space-between;
-                gap: 0.5rem; margin-bottom: 0.6rem; flex-wrap: wrap;
-            }
-            .vtt-live-table .vtt-card-title {
-                display: flex; align-items: center; gap: 0.4rem;
-                font-size: 1.15rem; font-weight: 600; margin: 0; color: var(--text);
-            }
-            .vtt-live-table .vtt-stat-row { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; }
-            .vtt-live-table .vtt-stat-pill {
-                display: inline-flex; align-items: center; gap: 0.35rem;
-                background: var(--bg3); border: 1px solid var(--border);
-                padding: 0.25rem 0.75rem; border-radius: 999px; font-size: 0.85rem; color: var(--text2);
-            }
-            .vtt-live-table .vtt-stat-pill strong { color: var(--text); font-weight: 600; }
-            .vtt-live-table .vtt-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
-            .vtt-live-table .vtt-divider { border-top: 1px solid var(--border); margin: 0.7rem 0; }
-            .vtt-live-table .vtt-section-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 1.2rem; align-items: start; }
-            .vtt-live-table .vtt-sidebar { display: flex; flex-direction: column; gap: 1.1rem; }
-            .vtt-live-table .vtt-btn-row { display: flex; flex-wrap: wrap; gap: 0.4rem; }
-            .vtt-live-table .vtt-field label {
-                display: block; font-size: 0.78rem; color: var(--text3);
-                margin-bottom: 0.2rem; text-transform: uppercase; letter-spacing: 0.02em;
-            }
-            .vtt-live-table .vtt-roll-result {
-                background: var(--bg3); border: 1px solid var(--border);
-                border-radius: calc(var(--radius) - 2px); padding: 0.65rem 0.8rem;
-            }
-            .vtt-live-table .vtt-roll-dice { display: flex; flex-wrap: wrap; gap: 0.3rem; margin: 0.5rem 0; }
-            .vtt-live-table .vtt-roll-die {
-                display: inline-flex; align-items: center; justify-content: center;
-                min-width: 1.9rem; height: 1.9rem; border-radius: 6px; font-weight: 700; font-size: 0.9rem;
-            }
-            .vtt-live-table .vtt-roll-meta { display: flex; gap: 1rem; flex-wrap: wrap; font-size: 0.88rem; color: var(--text2); }
-            .vtt-live-table .vtt-hint { font-size: 0.82rem; color: var(--text3); margin-top: 0.5rem; }
-            .vtt-live-table .vtt-hint code { background: var(--bg4); padding: 0.05rem 0.35rem; border-radius: 4px; font-size: 0.78rem; }
-            .vtt-live-table .vtt-gm-request-row {
-                display: flex; align-items: center; justify-content: space-between;
-                padding: 0.4rem 0.5rem; border-bottom: 1px solid var(--border); gap: 0.5rem;
-            }
-            .vtt-live-table .vtt-gm-request-row:last-child { border-bottom: none; }
-            @media (max-width: 900px) {
-                .vtt-live-table .vtt-section-grid { grid-template-columns: 1fr; }
-            }
-        </style>
+    <div class="vtt-live-table">
 
-        <div class="vtt-header" style="margin-bottom:1.2rem;">
-            <h1 class="page-title" style="display:flex;align-items:center;gap:0.6rem;flex-wrap:wrap;font-size:1.8rem;">
-                💬 VTT – Live Table
-                <span class="mode-indicator vtt-stat-pill" style="color:${isConnected ? 'var(--green)' : 'var(--red)'};">${isConnected ? '🌐 Connected' : '📡 Local'}</span>
-                <span class="mode-indicator vtt-stat-pill" style="font-size:0.72rem;color:var(--text3);">${mode}</span>
-                <button class="btn btn-sm" onclick="window.location.hash='whiteboard'" title="Open Whiteboard">✏️ Whiteboard</button>
-            </h1>
-            <p class="page-sub" style="margin:0.25rem 0 0;font-size:1.05rem;color:var(--text3);">Chat, party status, quick die roller, deck, and scene timers all in one view.</p>
+        <!-- Header -->
+        <div class="vtt-header">
+        <h1 class="page-title">
+            💬 VTT – Live Table
+            <span class="mode-indicator vtt-stat-pill ${isConnected ? 'connected' : 'disconnected'}">
+            ${isConnected ? '🌐 Connected' : '📡 Local'}
+            </span>
+            <span class="vtt-stat-pill mode-label">${mode}</span>
+            <button class="btn btn-sm btn-ghost" onclick="window.location.hash='whiteboard'" title="Open Whiteboard">✏️ Whiteboard</button>
+        </h1>
+        <p class="page-sub">Chat, party status, quick die roller, deck, and scene timers all in one view.</p>
         </div>
 
-        <!-- Connection & Voice Status Panel -->
-        <div class="panel vtt-card" style="margin-bottom:1.1rem;">
-            <div class="vtt-card-header">
-                <span class="vtt-card-title">🛰️ Table Status</span>
-                <span class="vtt-stat-pill">
-                    <span class="vtt-dot connection-status" style="background:${isConnected ? 'var(--green)' : 'var(--red)'};"></span>
-                    ${isConnected ? '🟢 Connected' : '🔴 Disconnected'}
-                </span>
+        <!-- Table Status -->
+        <div class="panel vtt-card status-panel">
+        <div class="vtt-card-header">
+            <span class="vtt-card-title">🛰️ Table Status</span>
+            <span class="vtt-stat-pill">
+            <span class="vtt-dot connection-status" style="background:${isConnected ? 'var(--vtt-green)' : 'var(--vtt-red)'};"></span>
+            ${isConnected ? '🟢 Connected' : '🔴 Disconnected'}
+            </span>
+        </div>
+        <div class="vtt-stat-row">
+            ${roomCode ? `<span class="vtt-stat-pill">🔑 Room <strong>${roomCode}</strong></span>` : ''}
+            ${socketId ? `<span class="vtt-stat-pill">👤 <strong>${socketId.slice(0, 8)}</strong></span>` : ''}
+            <span class="vtt-stat-pill">📍 ${defaultRegion}</span>
+            <span class="vtt-stat-pill">🃏 <strong id="vtt-deck-count-header">${deckCount}</strong> cards</span>
+        </div>
+        <div class="vtt-divider"></div>
+        <!-- Voice controls (unchanged) -->
+        <div class="vtt-stat-row" style="justify-content:space-between;">
+            <div class="vtt-btn-row" style="align-items:center;">
+            <button class="btn btn-sm ${voiceInitialized ? 'btn-primary' : ''}" id="vtt-voice-toggle">${voiceInitialized ? '🎤 Voice On' : '🎤 Voice Off'}</button>
+            ${voiceInitialized ? `<button class="btn btn-sm ${voiceStatus?.muted ? 'btn-danger' : 'btn-green'}" id="vtt-mute-toggle">${voiceStatus?.muted ? '🔇 Muted' : '🎙️ Live'}</button>` : ''}
+            <span class="vtt-stat-pill" id="voice-clients-count">${voiceClients.length} voice users</span>
             </div>
-            <div class="vtt-stat-row">
-                ${roomCode ? `<span class="vtt-stat-pill">🔑 Room <strong>${roomCode}</strong></span>` : ''}
-                ${socketId ? `<span class="vtt-stat-pill">👤 <strong>${socketId.slice(0, 8)}</strong></span>` : ''}
-                <span class="vtt-stat-pill">📍 ${defaultRegion}</span>
-                <span class="vtt-stat-pill">🃏 <strong id="vtt-deck-count-header">${deckCount}</strong> cards</span>
+        </div>
+        <div style="margin-top:0.5rem;display:flex;align-items:center;gap:0.5rem;">
+            <span style="font-size:0.9rem;color:var(--vtt-text3);">🎤</span>
+            <div style="flex:1;height:6px;background:var(--vtt-surface2);border-radius:3px;overflow:hidden;">
+            <div id="voice-activity-bar" style="width:0%;height:100%;background:var(--vtt-gold);border-radius:3px;transition:width 0.1s;"></div>
             </div>
+            <span style="font-size:0.8rem;color:var(--vtt-text3);" id="voice-activity-label">idle</span>
+        </div>
+        <div id="voice-clients-list" style="display:flex;flex-wrap:wrap;gap:0.5rem;margin-top:0.5rem;">
+            ${voiceClients.length === 0 ? '<span style="color:var(--vtt-text3);font-size:0.9rem;">No other voice clients.</span>' : voiceClientsHtml}
+        </div>
+        <div class="vtt-divider"></div>
+        <div class="vtt-card-header" style="margin-bottom:0.35rem;">
+            <span class="vtt-card-title" style="font-size:1rem;">👥 Party Members</span>
+            <span class="vtt-stat-pill" id="vtt-mode-badge">${isConnected ? '🌐 Online' : '📡 Local'}</span>
+        </div>
+        <div id="presence-list"></div>
+        </div>
 
+        <!-- GM Management -->
+        <div class="panel vtt-card gm-panel">
+        <div class="vtt-card-header">
+            <span class="vtt-card-title">👑 Game Master
+            <span id="gm-display" style="font-weight:600;font-size:0.95rem;color:var(--vtt-text2);">${gmState.currentGmName || 'None'}</span>
+            <span id="gm-role-badge" class="vtt-stat-pill gm-badge">${gmState.myRole === 'gm' ? 'You are GM' : 'Player'}</span>
+            </span>
+            <span id="gm-actions" class="vtt-btn-row">
+            ${gmState.myRole === 'gm' ? `
+                <button class="btn btn-sm btn-danger" id="vtt-gm-resign">Resign GM</button>
+            ` : `
+                <button class="btn btn-sm btn-gold" id="vtt-gm-request">Request GM</button>
+            `}
+            </span>
+        </div>
+        <div id="gm-requests" style="display:none;">
             <div class="vtt-divider"></div>
-
-            <div class="vtt-stat-row" style="justify-content:space-between;">
-                <div class="vtt-btn-row" style="align-items:center;">
-                    <button class="btn btn-sm ${voiceInitialized ? 'btn-primary' : ''}" id="vtt-voice-toggle">${voiceInitialized ? '🎤 Voice On' : '🎤 Voice Off'}</button>
-                    ${voiceInitialized ? `<button class="btn btn-sm ${voiceStatus?.muted ? 'btn-danger' : 'btn-green'}" id="vtt-mute-toggle">${voiceStatus?.muted ? '🔇 Muted' : '🎙️ Live'}</button>` : ''}
-                    <span class="vtt-stat-pill" id="voice-clients-count">${voiceClients.length} voice users</span>
-                </div>
-            </div>
-            <div style="margin-top:0.5rem;display:flex;align-items:center;gap:0.5rem;">
-                <span style="font-size:0.9rem;color:var(--text3);">🎤</span>
-                <div style="flex:1;height:6px;background:var(--bg4);border-radius:3px;overflow:hidden;">
-                    <div id="voice-activity-bar" style="width:0%;height:100%;background:var(--bg4);border-radius:3px;transition:width 0.1s;"></div>
-                </div>
-                <span style="font-size:0.8rem;color:var(--text3);" id="voice-activity-label">idle</span>
-            </div>
-            <div id="voice-clients-list" style="display:flex;flex-wrap:wrap;gap:0.5rem;margin-top:0.5rem;">
-                ${voiceClients.length === 0 ? '<span style="color:var(--text3);font-size:0.9rem;">No other voice clients.</span>' : voiceClientsHtml}
-            </div>
-
-            <div class="vtt-divider"></div>
-
-            <div class="vtt-card-header" style="margin-bottom:0.35rem;">
-                <span class="vtt-card-title" style="font-size:1rem;">👥 Party Members</span>
-                <span class="vtt-stat-pill" id="vtt-mode-badge">${isConnected ? '🌐 Online' : '📡 Local'}</span>
-            </div>
-            <div id="presence-list"></div>
+            <span class="text-muted" style="font-size:0.85rem;">Pending requests:</span>
+            <div id="gm-requests-list"></div>
+        </div>
         </div>
 
-        <!-- GM Management Panel -->
-        <div class="panel vtt-card" style="margin-bottom:1.1rem;">
+        <!-- Main Grid -->
+        <div class="vtt-section-grid">
+        <!-- Chat Column -->
+        <div class="chat-box vtt-card" style="display:flex;flex-direction:column;min-height:500px;">
             <div class="vtt-card-header">
-                <span class="vtt-card-title">👑 Game Master
-                    <span id="gm-display" style="font-weight:600;font-size:0.95rem;color:var(--text2);">${gmState.currentGmName || 'None'}</span>
-                    <span id="gm-role-badge" class="vtt-stat-pill" style="font-size:0.78rem;">${gmState.myRole === 'gm' ? 'You are GM' : 'Player'}</span>
-                </span>
-                <span id="gm-actions" class="vtt-btn-row">
-                    ${gmState.myRole === 'gm' ? `
-                        <button class="btn btn-sm btn-danger" id="vtt-gm-resign">Resign GM</button>
-                    ` : `
-                        <button class="btn btn-sm btn-gold" id="vtt-gm-request">Request GM</button>
-                    `}
-                </span>
+            <span class="vtt-card-title">💬 Chat</span>
+            <div class="vtt-btn-row" style="align-items:center;">
+                <span class="text-muted" id="message-count">0 messages</span>
+                <button class="btn btn-sm btn-ghost" id="vtt-clear-chat" title="Clear chat">🗑️</button>
             </div>
-            <div id="gm-requests" style="display:none;">
-                <div class="vtt-divider"></div>
-                <span class="text-muted" style="font-size:0.85rem;">Pending requests:</span>
-                <div id="gm-requests-list"></div>
             </div>
+            <div class="chat-messages" id="chatMessages" style="flex:1;overflow-y:auto;padding:0.5rem;background:var(--vtt-surface2);border-radius:calc(var(--vtt-radius) - 2px);margin-bottom:0.5rem;font-size:1rem;display:flex;flex-direction:column;max-height:450px;min-height:250px;"></div>
+            <div id="selected-character-display" style="margin-bottom:0.4rem;padding:0.2rem 0.4rem;background:var(--vtt-surface2);border-radius:calc(var(--vtt-radius) - 2px);min-height:2.5rem;"></div>
+            <div class="chat-input-row" style="display:flex;gap:0.4rem;">
+            <input type="text" id="chatInput" placeholder="Type… (/roll, /timer, /deck, /help)" style="flex:1;font-size:1rem;padding:0.5rem 0.6rem;" />
+            <select id="chatRecipient" style="flex:0 0 120px;font-size:1rem;">
+                <option value="all">All</option>
+            </select>
+            <button class="btn btn-gold" id="chat-send-btn">Send</button>
+            </div>
+            <div class="flex mt-1" style="flex-wrap:wrap;gap:0.9rem;font-size:0.9rem;align-items:center;">
+            <label class="inline-check"><input type="checkbox" id="vtt-post-chat" checked /> Post rolls to chat</label>
+            <label class="inline-check"><input type="checkbox" id="vtt-auto-scroll" checked /> Auto-scroll</label>
+            </div>
+            <div class="vtt-hint">Try <code>/roll 3 2 3</code>, <code>/deck 1</code>, <code>/crown</code>, or <code>/help</code> for the full command list.</div>
         </div>
 
-        <!-- Main VTT layout -->
-        <div class="vtt-container vtt-section-grid">
-            <!-- Chat Column -->
-            <div class="chat-box vtt-card" style="display:flex;flex-direction:column;min-height:500px;">
+        <!-- Sidebar -->
+        <div class="vtt-sidebar">
+            <div class="vtt-sidebar-scroll">
+            <!-- Party Status -->
+            <div class="vtt-panel vtt-card">
                 <div class="vtt-card-header">
-                    <span class="vtt-card-title">💬 Chat</span>
-                    <div class="vtt-btn-row" style="align-items:center;">
-                        <span class="text-muted" id="message-count">0 messages</span>
-                        <button class="btn btn-sm btn-ghost" id="vtt-clear-chat" title="Clear chat">🗑️</button>
-                    </div>
+                <span class="vtt-card-title" style="font-size:1.05rem;">👥 Party</span>
+                <button class="btn btn-sm btn-ghost" id="vtt-refresh-btn" title="Refresh">↻</button>
                 </div>
-                <div class="chat-messages" id="chatMessages" style="flex:1;overflow-y:auto;padding:0.5rem;background:var(--bg3);border-radius:calc(var(--radius) - 2px);margin-bottom:0.5rem;font-size:1rem;display:flex;flex-direction:column;max-height:450px;min-height:250px;"></div>
-                <!-- Selected character display (rendered by renderChat) -->
-                <div id="selected-character-display" style="margin-bottom:0.4rem;padding:0.2rem 0.4rem;background:var(--bg4);border-radius:calc(var(--radius) - 2px);min-height:2.5rem;"></div>
-                <div class="chat-input-row" style="display:flex;gap:0.4rem;">
-                    <input type="text" id="chatInput" placeholder="Type… (/roll, /timer, /deck, /help)" style="flex:1;font-size:1rem;padding:0.5rem 0.6rem;" />
-                    <select id="chatRecipient" style="flex:0 0 120px;font-size:1rem;">
-                        <option value="all">All</option>
+                <div id="vttCharGrid" class="vtt-char-grid"></div>
+            </div>
+
+            <!-- Quick Roller -->
+            <div class="vtt-panel vtt-card">
+                <div class="vtt-card-header">
+                <span class="vtt-card-title" style="font-size:1.05rem;">🎲 Quick Roller</span>
+                </div>
+                <div class="vtt-dice-row">
+                <div class="vtt-field">
+                    <label>Attr</label>
+                    <select id="vtt-attr">
+                    <option value="1">1</option><option value="2">2</option><option value="3" selected>3</option><option value="4">4</option><option value="5">5</option>
                     </select>
-                    <button class="btn btn-gold" id="chat-send-btn">Send</button>
                 </div>
-                <div class="flex mt-1" style="flex-wrap:wrap;gap:0.9rem;font-size:0.9rem;align-items:center;">
-                    <label class="inline-check"><input type="checkbox" id="vtt-post-chat" checked /> Post rolls to chat</label>
-                    <label class="inline-check"><input type="checkbox" id="vtt-auto-scroll" checked /> Auto-scroll</label>
+                <div class="vtt-field">
+                    <label>Skill</label>
+                    <select id="vtt-skill">
+                    <option value="0">0</option><option value="1">1</option><option value="2" selected>2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option>
+                    </select>
                 </div>
-                <div class="vtt-hint">Try <code>/roll 3 2 3</code>, <code>/deck 1</code>, <code>/crown</code>, or <code>/help</code> for the full command list.</div>
+                <div class="vtt-field" style="flex:0 0 80px;">
+                    <label>DV</label>
+                    <select id="vtt-dv">
+                    <option value="2">2</option><option value="3" selected>3</option><option value="4">4</option><option value="5">5+</option>
+                    </select>
+                </div>
+                <div class="vtt-field" style="flex:0 0 90px;">
+                    <label>Pos</label>
+                    <select id="vtt-pos">
+                    <option value="dominant">Dom</option><option value="controlled" selected>Ctrl</option><option value="desperate">Desp</option>
+                    </select>
+                </div>
+                <div class="vtt-field" style="flex:0 0 70px;">
+                    <label>Boons</label>
+                    <input type="number" id="vtt-boons" value="0" min="0" max="5" />
+                </div>
+                </div>
+                <div id="vtt-common-rolls" style="margin-top:0.5rem;min-height:2.5rem;"></div>
+                <div class="vtt-btn-row" style="margin-top:0.5rem;">
+                <button class="btn btn-gold btn-sm" id="vtt-roll-post-btn">Roll &amp; Post</button>
+                <button class="btn btn-sm" id="vtt-roll-only-btn">Roll Only</button>
+                </div>
+                <div id="vtt-roll-output" class="mt-1" style="min-height:3rem;padding:0.2rem 0;"></div>
             </div>
 
-            <!-- Sidebar -->
-            <div class="vtt-sidebar">
-                <!-- Party Status (vertical, scrollable) -->
-                <div class="vtt-panel vtt-card">
-                    <div class="vtt-card-header">
-                        <span class="vtt-card-title" style="font-size:1.05rem;">👥 Party</span>
-                        <button class="btn btn-sm btn-ghost" id="vtt-refresh-btn" title="Refresh">↻</button>
-                    </div>
-                    <div id="vttCharGrid" style="
-                        max-height:220px;
-                        overflow-y:auto;
-                        padding-right:4px;
-                        scrollbar-width:thin;
-                    "></div>
+            <!-- Deck Panel -->
+            <div class="vtt-panel vtt-card">
+                <div class="vtt-card-header">
+                <span class="vtt-card-title" style="font-size:1.05rem;">🃏 Deck</span>
+                <span class="vtt-stat-pill">📍 <strong id="vtt-region-display">${defaultRegion}</strong></span>
                 </div>
+                <div class="vtt-btn-row">
+                <button class="btn btn-sm btn-gold" id="vtt-deck-draw-1">Draw 1</button>
+                <button class="btn btn-sm btn-gold" id="vtt-deck-draw-2">Draw 2</button>
+                <button class="btn btn-sm btn-gold" id="vtt-deck-draw-3">Draw 3</button>
+                <button class="btn btn-sm btn-primary" id="vtt-deck-crown">👑 Crown</button>
+                <button class="btn btn-sm" id="vtt-deck-shuffle">🔀</button>
+                <button class="btn btn-sm btn-ghost" id="vtt-deck-history">📜</button>
+                <button class="btn btn-sm btn-ghost" id="vtt-modules-list">📦</button>
+                </div>
+                <div class="vtt-hint">Cards remaining: <strong id="vtt-deck-count">${deckCount}</strong></div>
+            </div>
 
-                <!-- Quick Roller + Common Rolls -->
-                <div class="vtt-panel vtt-card">
-                    <div class="vtt-card-header">
-                        <span class="vtt-card-title" style="font-size:1.05rem;">🎲 Quick Roller</span>
-                    </div>
-                    <div class="vtt-dice-row" style="display:flex;flex-wrap:wrap;gap:0.5rem;align-items:end;">
-                        <div class="vtt-field" style="flex:1;min-width:70px;">
-                            <label>Attr</label>
-                            <select id="vtt-attr" style="font-size:1rem;padding:0.25rem;width:100%;">
-                                <option value="1">1</option><option value="2">2</option><option value="3" selected>3</option><option value="4">4</option><option value="5">5</option>
-                            </select>
-                        </div>
-                        <div class="vtt-field" style="flex:1;min-width:70px;">
-                            <label>Skill</label>
-                            <select id="vtt-skill" style="font-size:1rem;padding:0.25rem;width:100%;">
-                                <option value="0">0</option><option value="1">1</option><option value="2" selected>2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option>
-                            </select>
-                        </div>
-                        <div class="vtt-field" style="flex:0 0 80px;">
-                            <label>DV</label>
-                            <select id="vtt-dv" style="font-size:1rem;padding:0.25rem;width:100%;">
-                                <option value="2">2</option><option value="3" selected>3</option><option value="4">4</option><option value="5">5+</option>
-                            </select>
-                        </div>
-                        <div class="vtt-field" style="flex:0 0 90px;">
-                            <label>Pos</label>
-                            <select id="vtt-pos" style="font-size:1rem;padding:0.25rem;width:100%;">
-                                <option value="dominant">Dom</option><option value="controlled" selected>Ctrl</option><option value="desperate">Desp</option>
-                            </select>
-                        </div>
-                        <div class="vtt-field" style="flex:0 0 70px;">
-                            <label>Boons</label>
-                            <input type="number" id="vtt-boons" value="0" min="0" max="5" style="font-size:1rem;padding:0.25rem;width:100%;" />
-                        </div>
-                    </div>
-                    <!-- Common Rolls -->
-                    <div id="vtt-common-rolls" style="margin-top:0.5rem;min-height:2.5rem;"></div>
-                    <div class="vtt-btn-row" style="margin-top:0.5rem;">
-                        <button class="btn btn-gold btn-sm" id="vtt-roll-post-btn">Roll &amp; Post</button>
-                        <button class="btn btn-sm" id="vtt-roll-only-btn">Roll Only</button>
-                    </div>
-                    <div id="vtt-roll-output" class="mt-1" style="min-height:3rem;padding:0.2rem 0;"></div>
+            <!-- Timers -->
+            <div class="vtt-panel vtt-card">
+                <div class="vtt-card-header">
+                <span class="vtt-card-title" style="font-size:1.05rem;">⏱️ Scene Timers</span>
                 </div>
-
-                <!-- Deck Panel -->
-                <div class="vtt-panel vtt-card">
-                    <div class="vtt-card-header">
-                        <span class="vtt-card-title" style="font-size:1.05rem;">🃏 Deck</span>
-                        <span class="vtt-stat-pill">📍 <strong id="vtt-region-display">${defaultRegion}</strong></span>
-                    </div>
-                    <div class="vtt-btn-row">
-                        <button class="btn btn-sm btn-gold" id="vtt-deck-draw-1">Draw 1</button>
-                        <button class="btn btn-sm btn-gold" id="vtt-deck-draw-2">Draw 2</button>
-                        <button class="btn btn-sm btn-gold" id="vtt-deck-draw-3">Draw 3</button>
-                        <button class="btn btn-sm btn-primary" id="vtt-deck-crown">👑 Crown</button>
-                        <button class="btn btn-sm" id="vtt-deck-shuffle">🔀</button>
-                        <button class="btn btn-sm btn-ghost" id="vtt-deck-history">📜</button>
-                        <button class="btn btn-sm btn-ghost" id="vtt-modules-list">📦</button>
-                    </div>
-                    <div class="vtt-hint">Cards remaining: <strong id="vtt-deck-count">${deckCount}</strong></div>
+                <div id="vttTimerList"></div>
+                <div class="vtt-btn-row" style="margin-top:0.5rem;">
+                <button class="btn btn-sm" id="vtt-add-timer">+ Add Timer</button>
+                <button class="btn btn-sm" id="vtt-scene-end">🌅 Scene End</button>
                 </div>
-
-                <!-- Timers -->
-                <div class="vtt-panel vtt-card">
-                    <div class="vtt-card-header">
-                        <span class="vtt-card-title" style="font-size:1.05rem;">⏱️ Scene Timers</span>
-                    </div>
-                    <div id="vttTimerList"></div>
-                    <div class="vtt-btn-row" style="margin-top:0.5rem;">
-                        <button class="btn btn-sm" id="vtt-add-timer">+ Add Timer</button>
-                        <button class="btn btn-sm" id="vtt-scene-end">🌅 Scene End</button>
-                    </div>
-                </div>
+            </div>
             </div>
         </div>
         </div>
+    </div>
     `;
-
+    
     // Initialize reactive renderers
     renderChat();
     renderVTTChars();
