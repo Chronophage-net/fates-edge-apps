@@ -1,33 +1,44 @@
 /**
  * Bestiary – Creature reference with wiki integration
- * Uses manifest discovery (like patrons) with fallback to /data/bestiary.json
+ * Uses multi‑path discovery (like Search) with fallback to manifest + individual files
  */
 
 import { getState, saveState } from '../../core/state.js';
 import { escHtml } from '../../core/utils.js';
 import { showToast } from '../../components/Toast.js';
 import { logToSession, addVTTEvent } from '../gm-tools/index.js';
+// ─── Import shared discovery ─────────────────────────────────
+import { discoverBestiary } from '../../core/discovery.js';
 
 let container = null;
 let bestiaryData = [];
 let wikiData = {};
 
 // ============================================================
-// CONSTANTS
+// CONSTANTS – Multiple possible paths for bestiary.json
 // ============================================================
 
-const BESTIARY_DATA_PATH = './data/bestiary/';
-const CACHE_KEY = 'fates-edge-bestiary-cache';
-const CACHE_TTL = 3600000; // 1 hour
+const BESTIARY_PATHS = [
+    '/data/bestiary.json',
+    '/data/bestiary/bestiary.json',
+    'data/bestiary.json',
+    'data/bestiary/bestiary.json',
+    './data/bestiary.json',
+    './data/bestiary/bestiary.json'
+];
 
-// Fallback known slugs (used if manifest missing)
-const KNOWN_SLUGS = [
-    'goblin-scavenger', 'skeleton-knight', 'thorn-dryad',
-    'slavering-hound', 'cultist-fanatic', 'shadow-wraith'
+const BESTIARY_INDIVIDUAL_PATH = './data/bestiary/';
+const CACHE_KEY = 'fates-edge-bestiary-cache';
+
+// Hardcoded fallback entries (if everything else fails)
+const FALLBACK_ENTRIES = [
+    { id: 'goblin-scavenger', name: 'Goblin Scavenger', category: 'humanoid', tier: 1, description: 'A small, green-skinned creature with sharp teeth and a greedy glint.' },
+    { id: 'skeleton-knight', name: 'Skeleton Knight', category: 'undead', tier: 2, description: 'An animated suit of armor with hollow eye sockets glowing with pale blue light.' },
+    { id: 'thorn-dryad', name: 'Thorn Dryad', category: 'fey', tier: 3, description: 'A fey creature with bark-like skin and thorny vines for hair.' }
 ];
 
 // ============================================================
-// HELPERS (reused from patrons pattern)
+// HELPERS
 // ============================================================
 
 function safeString(val) {
@@ -94,126 +105,94 @@ function getCreatureDescription(entry) {
 }
 
 // ============================================================
-// DISCOVERY (manifest‑first, fallback to known slugs & bestiary.json)
+// DATA LOADING – Multi‑path discovery + shared discoverBestiary
 // ============================================================
 
-async function discoverBestiarySlugs() {
-    // Check cache
-    try {
-        const cached = localStorage.getItem(CACHE_KEY);
-        if (cached) {
-            const data = JSON.parse(cached);
-            if (data.slugs && Date.now() - data.timestamp < CACHE_TTL) {
-                console.log(`[Bestiary] Using cached slugs (${data.slugs.length} items)`);
-                return data.slugs;
-            }
-        }
-    } catch (_) {}
-
-    let slugs = [];
-
-    // 1. Try to fetch manifest.json
-    try {
-        const res = await fetch(BESTIARY_DATA_PATH + 'manifest.json');
-        if (res.ok) {
-            const manifest = await res.json();
-            if (Array.isArray(manifest)) {
-                slugs = manifest;
-                console.log(`[Bestiary] Loaded manifest (${slugs.length} items)`);
-            } else if (manifest.slugs && Array.isArray(manifest.slugs)) {
-                slugs = manifest.slugs;
-                console.log(`[Bestiary] Loaded manifest slugs (${slugs.length} items)`);
-            } else {
-                console.warn('[Bestiary] Manifest is not an array or missing "slugs".');
-            }
-        }
-    } catch (_) {}
-
-    // 2. If no manifest, fall back to known slugs
-    if (slugs.length === 0) {
-        slugs = KNOWN_SLUGS;
-        console.log(`[Bestiary] Using fallback known slugs (${slugs.length} items)`);
-    }
-
-    // 3. Test each slug with HEAD
-    const found = [];
-    await Promise.all(slugs.map(async (slug) => {
+async function loadBestiaryFromPaths() {
+    // Try each path in order
+    for (const path of BESTIARY_PATHS) {
         try {
-            const res = await fetch(`${BESTIARY_DATA_PATH}${slug}.json`, { method: 'HEAD' });
-            if (res.ok) {
-                found.push(slug);
+            const response = await fetch(path, { cache: 'no-cache' });
+            if (response.ok) {
+                const data = await response.json();
+                if (Array.isArray(data) && data.length > 0) {
+                    console.log(`[Bestiary] Loaded from ${path} (${data.length} entries)`);
+                    return data.filter(e => e && e.name).map(normalizeCreature);
+                }
             }
-        } catch (_) {}
-    }));
-
-    // 4. If no files found, try the single bestiary.json as fallback
-    if (found.length === 0) {
-        try {
-            const res = await fetch('/data/bestiary.json', { method: 'HEAD' });
-            if (res.ok) {
-                // Single file mode – we'll handle this separately in loadBestiaryData
-                console.log('[Bestiary] Found single bestiary.json, using that instead.');
-                // We'll store a special marker
-                found.push('_single_file_');
-            }
-        } catch (_) {}
+        } catch (_) { /* ignore */ }
     }
-
-    // Update cache
-    try {
-        const cacheData = { slugs: found, timestamp: Date.now() };
-        localStorage.setItem(CACHE_KEY, JSON.stringify(cacheData));
-    } catch (_) {}
-
-    console.log(`[Bestiary] Found ${found.length} creature files (or single file)`);
-    return found;
+    return null;
 }
 
-// ============================================================
-// DATA LOADING
-// ============================================================
+async function loadBestiaryFromIndividualFiles() {
+    // Use shared discovery to get slugs
+    const slugs = await discoverBestiary(BESTIARY_INDIVIDUAL_PATH);
+    if (slugs.length === 0) return null;
+
+    const creatures = [];
+    for (const slug of slugs) {
+        try {
+            const fileRes = await fetch(`${BESTIARY_INDIVIDUAL_PATH}${slug}.json`, { cache: 'no-cache' });
+            if (fileRes.ok) {
+                const data = await fileRes.json();
+                if (!data.id) data.id = slug;
+                creatures.push(normalizeCreature(data));
+            }
+        } catch (_) {}
+    }
+    if (creatures.length > 0) {
+        console.log(`[Bestiary] Loaded ${creatures.length} creatures from individual files via discovery`);
+        return creatures.sort(sortByName);
+    }
+    return null;
+}
+
+async function loadFallbackBestiary() {
+    console.log('[Bestiary] Using hardcoded fallback entries');
+    return FALLBACK_ENTRIES.map(normalizeCreature);
+}
 
 export async function loadBestiaryData() {
+    // Check sessionStorage cache first
     try {
-        const slugs = await discoverBestiarySlugs();
-
-        // If we have the single file marker, fetch the monolithic JSON
-        if (slugs.length === 1 && slugs[0] === '_single_file_') {
-            const response = await fetch('/data/bestiary.json');
-            if (!response.ok) throw new Error(`HTTP ${response.status}`);
-            const data = await response.json();
-            bestiaryData = Array.isArray(data) ? data.filter(e => e && e.name) : [];
-            bestiaryData.sort(sortByName);
-            console.log(`[Bestiary] Loaded ${bestiaryData.length} creatures from bestiary.json`);
-            return bestiaryData;
+        const cached = sessionStorage.getItem(CACHE_KEY);
+        if (cached) {
+            const data = JSON.parse(cached);
+            if (Array.isArray(data) && data.length > 0) {
+                bestiaryData = data;
+                console.log(`[Bestiary] Loaded ${data.length} entries from cache`);
+                return bestiaryData;
+            }
         }
+    } catch (_) {}
 
-        // Otherwise, fetch each individual file
-        const creatures = [];
-        for (const slug of slugs) {
-            try {
-                const res = await fetch(`${BESTIARY_DATA_PATH}${slug}.json`);
-                if (res.ok) {
-                    const data = await res.json();
-                    if (!data.id) data.id = slug;
-                    creatures.push(normalizeCreature(data));
-                }
-            } catch (e) { /* ignore */ }
-        }
-        bestiaryData = creatures.filter(e => e && e.name).sort(sortByName);
-        console.log(`[Bestiary] Loaded ${bestiaryData.length} creatures from individual files`);
+    // 1. Try multi‑path JSON
+    let data = await loadBestiaryFromPaths();
+    if (data) {
+        bestiaryData = data;
+        try { sessionStorage.setItem(CACHE_KEY, JSON.stringify(data)); } catch (_) {}
         return bestiaryData;
-    } catch (err) {
-        console.warn('Failed to load bestiary:', err);
-        showToast('Could not load bestiary data.', 'error');
-        bestiaryData = [];
-        return [];
     }
+
+    // 2. Try individual files via shared discovery
+    data = await loadBestiaryFromIndividualFiles();
+    if (data) {
+        bestiaryData = data;
+        try { sessionStorage.setItem(CACHE_KEY, JSON.stringify(data)); } catch (_) {}
+        return bestiaryData;
+    }
+
+    // 3. Fallback
+    data = await loadFallbackBestiary();
+    bestiaryData = data;
+    try { sessionStorage.setItem(CACHE_KEY, JSON.stringify(data)); } catch (_) {}
+    return bestiaryData;
 }
 
 export async function loadWikiData() {
     try {
-        const response = await fetch('/data/wiki.json');
+        const response = await fetch('/data/wiki.json', { cache: 'no-cache' });
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
         const data = await response.json();
         wikiData = data || {};
@@ -281,7 +260,7 @@ export async function render(el) {
 }
 
 // ============================================================
-// RENDER LIST (same as before, with safe handling)
+// RENDER LIST
 // ============================================================
 
 function renderBestiaryList(filter = '') {
@@ -436,7 +415,7 @@ function renderCategories() {
 }
 
 // ============================================================
-// DETAIL VIEW (modal) – same as before, simplified
+// DETAIL VIEW (modal)
 // ============================================================
 
 function showCreatureDetail(entry) {
@@ -509,7 +488,7 @@ window.openWiki = function(name) {
 };
 
 // ============================================================
-// ACTIONS (unchanged)
+// ACTIONS
 // ============================================================
 
 export function addCreatureAsAdversary(entry) {
@@ -599,7 +578,7 @@ function attachEvents() {
     const refresh = document.getElementById('bestiary-refresh');
     if (refresh) {
         refresh.addEventListener('click', async () => {
-            localStorage.removeItem(CACHE_KEY);
+            sessionStorage.removeItem(CACHE_KEY);
             await loadBestiaryData();
             await loadWikiData();
             renderBestiaryList(document.getElementById('bestiary-search')?.value || '');

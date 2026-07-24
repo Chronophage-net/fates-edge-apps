@@ -13,6 +13,8 @@
 import { getState, saveState } from '../../core/state.js';
 import { showToast } from '../../components/Toast.js';
 import { escHtml } from '../../core/utils.js';
+// ─── Import shared discovery ────────────────────────────────
+import { discoverPatrons } from '../../core/discovery.js';
 
 // ============================================================
 // CONSTANTS
@@ -22,36 +24,6 @@ const COSMIC_DATA_PATH = './data/patrons/';
 const TERRESTRIAL_DATA_PATH = './data/terrestrial/';
 const TERRESTRIAL_FALLBACK_DATA_PATH = './data/factions/';
 const RELIGION_DATA_PATH = './data/religions/';
-
-// Hardcoded fallback slugs (only used if manifest.json is missing)
-const KNOWN_COSMIC_SLUGS = [
-    'aveh_the_rider_behind_the_storm', 'carrion_king', 'gaila_the_laughing_light',
-    'grimmir_the_old_man_of_the_forest', 'ibeji_the_twin_stones', 'ikasha_she_who_sleeps',
-    'inaea_angel_of_the_spider', 'isoka_angel_of_serpents', 'khemesh_the_abyssal_maw',
-    'kuva_the_sky_that_takes_many_names', 'livaea_the_crimson_courtier', 'lucky_jack_the_lord_of_thieves',
-    'lunara_the_silver_quiet', 'mab_queen_of_courts', 'maelstraeus_the_infernal_bargainer',
-    'malachai_the_cruel_messenger', 'morag_the_hag_weaver_of_hidden_costs', 'moriraath_the_destroyer',
-    'mykkiel_arbiter_of_the_covenant', 'nidhoggr_the_worldworm', 'nimorith_the_gray_benefactor',
-    'oath_of_flame__light', 'oath_of_flame_light', 'oath_of_mercy_and_grace',
-    'oya_the_wind_of_the_sahel', 'palinode_queen_of_encores', 'rayn_mistress_of_the_sea',
-    'solara_the_still_mirror', 'the_breath_of_the_first_forge_the_spark_in_the_makers_hand',
-    'the_carrion_king_lord_of_decay_and_renewal', 'the_clockwork_monad_the_iterative_forge',
-    'the_confessor_beneath_the_bell', 'the_gallows_bell', 'the_inquisitor_prime_the_iron_hand_of_purity',
-    'the_ninth_beyond_comprehension', 'the_pale_shepherd_guide_of_transitions',
-    'the_sacred_geometry_architect_of_perfect_forms', 'the_unbroken_way_the_way_of_balance',
-    'thrysos_king_of_revels', 'varnek_karn_the_deaths_negotiator', 'venara_the_unbroken_thread',
-    'vorthak_the_hunger_unbound', 'xhakthul_the_thunderspeaker', 'zephyria_the_first_bloom'
-];
-
-const KNOWN_TERRESTRIAL_SLUGS = [
-    'velvet-court', 'house-contarini', 'the-iron-covenant', 'silver-fang-tribe',
-    'the-whispering-net', 'ashen-syndicate', 'crimson-rose'
-];
-
-const KNOWN_RELIGION_SLUGS = [
-    'everflame', 'the-celestial-spire', 'church-of-the-red-stone',
-    'order-of-the-void', 'temple-of-the-wandering-star'
-];
 
 // ============================================================
 // DEFAULT DATA (fallback)
@@ -232,115 +204,10 @@ function formatText(text) {
     return escHtml(text).replace(/\n/g, '<br>');
 }
 
-// --- NEW: sort helper ---
 function sortByName(a, b) {
     const nameA = (a.name || a.title || '').toLowerCase();
     const nameB = (b.name || b.title || '').toLowerCase();
     return nameA.localeCompare(nameB);
-}
-
-// ============================================================
-// DISCOVERY (manifest‑first, fallback to known slugs)
-// ============================================================
-
-const CACHE_KEY = 'fates-edge-patrons-cache';
-const CACHE_TTL = 3600000; // 1 hour
-
-async function discoverPatrons(type) {
-    let slugs = [];
-    let dataPath = '';
-    let fallbackPath = null;
-    let manifestPath = '';
-
-    switch (type) {
-        case 'cosmic':
-            dataPath = COSMIC_DATA_PATH;
-            manifestPath = dataPath + 'manifest.json';
-            break;
-        case 'terrestrial':
-            dataPath = TERRESTRIAL_DATA_PATH;
-            fallbackPath = TERRESTRIAL_FALLBACK_DATA_PATH;
-            manifestPath = dataPath + 'manifest.json';
-            break;
-        case 'religion':
-            dataPath = RELIGION_DATA_PATH;
-            manifestPath = dataPath + 'manifest.json';
-            break;
-        default:
-            return [];
-    }
-
-    // Check cache
-    try {
-        const cached = localStorage.getItem(CACHE_KEY);
-        if (cached) {
-            const data = JSON.parse(cached);
-            if (data[type] && Date.now() - data.timestamp < CACHE_TTL) {
-                console.log(`[Patrons] Using cached ${type} list (${data[type].length} items)`);
-                return data[type];
-            }
-        }
-    } catch (_) {}
-
-    console.log(`[Patrons] Discovering ${type} patrons...`);
-
-    // 1. Try to fetch manifest.json
-    try {
-        const res = await fetch(manifestPath);
-        if (res.ok) {
-            const manifest = await res.json();
-            if (Array.isArray(manifest)) {
-                slugs = manifest;
-                console.log(`[Patrons] Loaded manifest for ${type} (${slugs.length} items)`);
-            } else if (manifest.slugs && Array.isArray(manifest.slugs)) {
-                slugs = manifest.slugs;
-                console.log(`[Patrons] Loaded manifest slugs for ${type} (${slugs.length} items)`);
-            } else {
-                console.warn(`[Patrons] Manifest for ${type} is not an array or missing "slugs".`);
-            }
-        }
-    } catch (_) {}
-
-    // 2. If no manifest, fall back to known slugs
-    if (slugs.length === 0) {
-        if (type === 'cosmic') slugs = KNOWN_COSMIC_SLUGS;
-        else if (type === 'terrestrial') slugs = KNOWN_TERRESTRIAL_SLUGS;
-        else if (type === 'religion') slugs = KNOWN_RELIGION_SLUGS;
-        console.log(`[Patrons] Using fallback known slugs for ${type} (${slugs.length} items)`);
-    }
-
-    // 3. Test each slug with HEAD
-    const found = [];
-    await Promise.all(slugs.map(async (slug) => {
-        let ok = false;
-        try {
-            const res = await fetch(`${dataPath}${slug}.json`, { method: 'HEAD' });
-            if (res.ok) {
-                ok = true;
-                found.push(slug);
-                return;
-            }
-        } catch (_) {}
-        if (!ok && fallbackPath) {
-            try {
-                const res = await fetch(`${fallbackPath}${slug}.json`, { method: 'HEAD' });
-                if (res.ok) {
-                    found.push(slug);
-                }
-            } catch (_) {}
-        }
-    }));
-
-    // Update cache
-    try {
-        const cacheData = JSON.parse(localStorage.getItem(CACHE_KEY) || '{}');
-        cacheData[type] = found;
-        cacheData.timestamp = Date.now();
-        localStorage.setItem(CACHE_KEY, JSON.stringify(cacheData));
-    } catch (_) {}
-
-    console.log(`[Patrons] Found ${found.length} ${type} patrons (out of ${slugs.length} tested)`);
-    return found;
 }
 
 // ============================================================
@@ -393,9 +260,10 @@ async function loadRemotePatrons() {
     state.isLoading = true;
 
     try {
-        const cosmicSlugs = await discoverPatrons('cosmic');
-        const terrestrialSlugs = await discoverPatrons('terrestrial');
-        const religionSlugs = await discoverPatrons('religion');
+        // ─── Use shared discovery ──────────────────────────────
+        const cosmicSlugs = await discoverPatrons('cosmic', COSMIC_DATA_PATH);
+        const terrestrialSlugs = await discoverPatrons('terrestrial', TERRESTRIAL_DATA_PATH, TERRESTRIAL_FALLBACK_DATA_PATH);
+        const religionSlugs = await discoverPatrons('religion', RELIGION_DATA_PATH);
 
         // Fetch cosmic
         let cosmicPatrons = [];
@@ -857,7 +725,6 @@ window.openPatronDetailModal = function(patronId) {
     const religion = safeString(patron.religion || '');
     const currentObligation = getPatronObligation('default-character', patron.id);
 
-    // Build rites HTML (with expandable details)
     let ritesHtml = '';
     if (patron.rites && patron.rites.length > 0) {
         const hasDetailedRites = typeof patron.rites[0] === 'object';
@@ -920,7 +787,6 @@ window.openPatronDetailModal = function(patronId) {
                 </div>
             `;
         } else {
-            // Simple list
             ritesHtml = `
                 <div class="patron-detail-section" style="background:var(--bg2);border-radius:var(--radius);padding:0.8rem;margin-bottom:0.8rem;border-left:4px solid var(--gold);">
                     <h3 style="margin:0 0 0.5rem 0;color:var(--gold);">🔮 Rites (${patron.rites.length})</h3>
@@ -1607,12 +1473,14 @@ window.deleteTrust = function(id) {
 };
 
 // ============================================================
-// REFRESH (fixed to clear state & cache)
+// REFRESH (clears discovery cache)
 // ============================================================
 
 window.refreshPatrons = function() {
-    // 1. Clear the in‑memory cache
-    localStorage.removeItem(CACHE_KEY);
+    // 1. Clear the discovery module's caches
+    localStorage.removeItem('fates-edge-patrons-cache-cosmic');
+    localStorage.removeItem('fates-edge-patrons-cache-terrestrial');
+    localStorage.removeItem('fates-edge-patrons-cache-religion');
 
     // 2. Remove patron data from global state (preserve obligation)
     const saved = getState();
@@ -1621,7 +1489,6 @@ window.refreshPatrons = function() {
         delete saved.patrons.terrestrial;
         delete saved.patrons.trusts;
         delete saved.patrons.religions;
-        // Keep obligations: saved.patrons.obligation = saved.patrons.obligation || {};
         saveState();
     }
 
@@ -1633,8 +1500,8 @@ window.refreshPatrons = function() {
     state.dataLoaded = false;
     state.usingFallback = false;
 
-    // 4. Reload from remote (manifests + files)
-    loadPatronData(true);  // force reload
+    // 4. Reload from remote
+    loadPatronData(true);
 
     // 5. Update the view
     refreshView();
@@ -1695,7 +1562,9 @@ export function onDeactivate() {
 }
 
 export function refresh() {
-    localStorage.removeItem(CACHE_KEY);
+    localStorage.removeItem('fates-edge-patrons-cache-cosmic');
+    localStorage.removeItem('fates-edge-patrons-cache-terrestrial');
+    localStorage.removeItem('fates-edge-patrons-cache-religion');
     loadPatronData(true);
     refreshView();
 }

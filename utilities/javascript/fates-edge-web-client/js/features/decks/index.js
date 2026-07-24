@@ -41,6 +41,8 @@ import { showToast } from '../../components/Toast.js';
 import { getState, addTimer } from '../../core/state.js';
 import { logRecordingEvent } from '../../core/media.js';
 import { parseRegionDescription } from './region-parser.js';
+// ─── Use shared discovery ────────────────────────────────────
+import { initializeRegions, discoverRegions } from '../../core/discovery.js';
 
 // ============================================================
 // CONSTANTS
@@ -379,69 +381,6 @@ let isSyncing = false;
 let regionChangeCallbacks = [];
 
 cardOffset = getDeckRandomInt(0, 1000);
-
-// ============================================================
-// REGION DISCOVERY (manifest-free)
-// ============================================================
-
-const KNOWN_REGION_SLUGS = [
-    'acasia', 'aelaerem', 'aeler', 'aelinnel', 'ecktoria',
-    'kahfagia', 'midh_ahkaz', 'mistlands', 'silkstrand',
-    'the_wilds', 'thepyrgos', 'ubral', 'valewood',
-    'vhasia', 'viterra', 'ykrul', 'zakov', 'dungeons'
-];
-
-const FALLBACK_REGIONS = ['Acasia', 'Ecktoria', 'Vhasia', 'Viterra', 'Ykrul', 'Silkstrand'];
-
-async function discoverRegions() {
-    try {
-        const cached = localStorage.getItem('fates-edge-region-cache');
-        if (cached) {
-            const { names, timestamp } = JSON.parse(cached);
-            if (Date.now() - timestamp < 3600000) {
-                console.log(`[Decks] Using cached region list (${names.length} regions)`);
-                return names;
-            }
-        }
-    } catch (_) {}
-
-    console.log('[Decks] Discovering available regions...');
-    const found = [];
-
-    await Promise.all(KNOWN_REGION_SLUGS.map(async (slug) => {
-        try {
-            const res = await fetch(`${REGION_DIR}/${slug}.json`, { method: 'HEAD' });
-            if (res.ok) {
-                const name = slug.replace(/-/g, ' ').replace(/_/g, ' ')
-                    .replace(/\b\w/g, c => c.toUpperCase());
-                found.push(name);
-            }
-        } catch (_) { /* ignore */ }
-    }));
-
-    found.sort();
-
-    try {
-        localStorage.setItem('fates-edge-region-cache', JSON.stringify({
-            names: found,
-            timestamp: Date.now()
-        }));
-    } catch (_) {}
-
-    console.log(`[Decks] Discovered ${found.length} regions:`, found);
-    return found;
-}
-
-async function initializeRegions() {
-    const discovered = await discoverRegions();
-    if (discovered.length > 0) {
-        regionNames = discovered;
-    } else {
-        console.warn('[Decks] No region files found. Using fallback default regions.');
-        regionNames = FALLBACK_REGIONS;
-        showToast('⚠️ No region files found. Using default fallback regions.', 'warning');
-    }
-}
 
 // ============================================================
 // REGION DATA CACHE
@@ -921,7 +860,8 @@ export async function render(el) {
         </div>
     `;
 
-    await initializeRegions();
+    // ─── Use shared initialization ────────────────────────────
+    regionNames = await initializeRegions(REGION_DIR);
 
     let regionOptions = regionNames.map(n => `<option value="${n}">${n}</option>`).join('');
     if (regionNames.length === 0) {
@@ -1054,7 +994,7 @@ export async function render(el) {
         refreshBtn.addEventListener('click', async function() {
             localStorage.removeItem('fates-edge-region-cache');
             regionDataCache.clear();
-            await initializeRegions();
+            regionNames = await initializeRegions(REGION_DIR);
             const select = document.getElementById('deck-region-select');
             if (select) {
                 const currentVal = select.value;
@@ -1428,7 +1368,7 @@ export function onDeactivate() {
 export async function refresh() {
     localStorage.removeItem('fates-edge-region-cache');
     regionDataCache.clear();
-    await initializeRegions();
+    regionNames = await initializeRegions(REGION_DIR);
     const select = document.getElementById('deck-region-select');
     if (select) {
         const currentValue = select.value;
