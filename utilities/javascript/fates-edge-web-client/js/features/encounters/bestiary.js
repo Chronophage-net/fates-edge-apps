@@ -56,9 +56,43 @@ function safeString(val) {
     return String(val);
 }
 
+// ─── NEW: flatten wrapped { "Creature Name": {...fields} } entries ───
+// The Fates' Edge bestiary.json stores each creature as a single-key
+// object where the key IS the creature's name, e.g.:
+//   { "Echo (Class I Spirit)": { page, summary, locations, lore, connections } }
+// This unwraps that shape into a flat object with a real "name" field,
+// while leaving already-flat entries ({ name: "...", ... }) untouched.
+function flattenWrappedEntry(raw) {
+    if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return raw;
+
+    // Already flat — has its own "name" field, nothing to do
+    if (raw.name) return raw;
+
+    const keys = Object.keys(raw);
+    if (keys.length === 1 && raw[keys[0]] && typeof raw[keys[0]] === 'object') {
+        const name = keys[0];
+        const inner = raw[keys[0]];
+        return {
+            name,
+            description: inner.summary || inner.lore || inner.description || '',
+            summary: inner.summary || '',
+            lore: inner.lore || '',
+            locations: inner.locations || [],
+            connections: inner.connections || [],
+            page: inner.page || '',
+            // preserve any other fields the entry might carry
+            ...inner
+        };
+    }
+
+    // Not a recognizable wrapped shape — return as-is
+    return raw;
+}
+
 function normalizeCreature(c) {
     if (!c) return c;
-    const result = { ...c };
+    let result = flattenWrappedEntry(c);
+    result = { ...result };
     if (!result.name && result.title) result.name = result.title;
     if (result.description && typeof result.description === 'object') {
         if (result.description.description) {
@@ -85,7 +119,7 @@ function formatText(text) {
 
 function getCreatureDescription(entry) {
     if (!entry) return 'No description available.';
-    if (typeof entry.description === 'string') return entry.description;
+    if (typeof entry.description === 'string' && entry.description) return entry.description;
     if (entry.description && typeof entry.description === 'object') {
         if (entry.description.description) return entry.description.description;
         if (entry.description.lore) return entry.description.lore;
@@ -96,6 +130,7 @@ function getCreatureDescription(entry) {
         if (entry.description.apocalyptic_aspect) parts.push(entry.description.apocalyptic_aspect);
         if (parts.length > 0) return parts.join('\n\n');
     }
+    if (entry.summary) return entry.summary;
     if (entry.lore && typeof entry.lore === 'object') {
         if (entry.lore.description) return entry.lore.description;
         if (entry.lore.lore) return entry.lore.lore;
@@ -116,8 +151,12 @@ async function loadBestiaryFromPaths() {
             if (response.ok) {
                 const data = await response.json();
                 if (Array.isArray(data) && data.length > 0) {
-                    console.log(`[Bestiary] Loaded from ${path} (${data.length} entries)`);
-                    return data.filter(e => e && e.name).map(normalizeCreature);
+                    const flattened = data.map(flattenWrappedEntry).filter(e => e && e.name);
+                    if (flattened.length > 0) {
+                        console.log(`[Bestiary] Loaded from ${path} (${flattened.length} entries)`);
+                        return flattened.map(normalizeCreature);
+                    }
+                    console.warn(`[Bestiary] ${path} returned ${data.length} entries but none had a resolvable name after flattening.`);
                 }
             }
         } catch (_) { /* ignore */ }
@@ -136,8 +175,9 @@ async function loadBestiaryFromIndividualFiles() {
             const fileRes = await fetch(`${BESTIARY_INDIVIDUAL_PATH}${slug}.json`, { cache: 'no-cache' });
             if (fileRes.ok) {
                 const data = await fileRes.json();
-                if (!data.id) data.id = slug;
-                creatures.push(normalizeCreature(data));
+                const flat = flattenWrappedEntry(data);
+                if (!flat.id) flat.id = slug;
+                creatures.push(normalizeCreature(flat));
             }
         } catch (_) {}
     }
@@ -270,7 +310,7 @@ function renderBestiaryList(filter = '') {
     const searchTerm = filter.toLowerCase().trim();
     const filteredData = bestiaryData.filter(entry => {
         const name = (entry.name || '').toLowerCase();
-        const desc = (entry.description || '').toLowerCase();
+        const desc = (getCreatureDescription(entry) || '').toLowerCase();
         const category = (entry.category || '').toLowerCase();
         return name.includes(searchTerm) || desc.includes(searchTerm) || category.includes(searchTerm);
     });
@@ -288,11 +328,11 @@ function renderBestiaryList(filter = '') {
     listEl.innerHTML = filteredData.map(entry => {
         const name = entry.name || 'Unnamed';
         const safeName = name.replace(/["']/g, '');
-        const categoryBadge = entry.category 
-            ? `<span class="badge badge-${getCategoryBadgeColor(entry.category)}" style="font-size:0.65rem;">${escHtml(entry.category)}</span>` 
+        const categoryBadge = entry.category
+            ? `<span class="badge badge-${getCategoryBadgeColor(entry.category)}" style="font-size:0.65rem;">${escHtml(entry.category)}</span>`
             : '';
         const tier = entry.tier ? `TL ${entry.tier}` : '';
-        const description = entry.description || '';
+        const description = getCreatureDescription(entry);
 
         return `
             <div class="bestiary-entry" data-id="${entry.id || safeName}" style="
@@ -432,6 +472,18 @@ function showCreatureDetail(entry) {
         statsHtml += '</div>';
     }
 
+    // Extra lore fields present in the flattened wiki-style entries
+    // (locations / connections) — shown only when available.
+    let extraHtml = '';
+    if (Array.isArray(entry.locations) && entry.locations.length > 0) {
+        extraHtml += `<div style="margin-top:0.5rem;"><strong>Locations:</strong> ${entry.locations.map(l => escHtml(l)).join(', ')}</div>`;
+    }
+    if (Array.isArray(entry.connections) && entry.connections.length > 0) {
+        extraHtml += `<div style="margin-top:0.3rem;"><strong>Connections:</strong> ${entry.connections.map(c => escHtml(c)).join(', ')}</div>`;
+    }
+
+    const description = getCreatureDescription(entry);
+
     const overlay = document.createElement('div');
     overlay.style.cssText = `
         position:fixed;inset:0;background:rgba(0,0,0,0.7);backdrop-filter:blur(4px);
@@ -457,8 +509,9 @@ function showCreatureDetail(entry) {
                 ${entry.tier ? `<span style="font-size:0.7rem;color:var(--text2);background:var(--bg2);padding:0.05rem 0.5rem;border-radius:12px;">TL ${entry.tier}</span>` : ''}
             </h2>
             ${entry.category ? `<span class="badge badge-${getCategoryBadgeColor(entry.category)}" style="margin-bottom:0.5rem;">${escHtml(entry.category)}</span>` : ''}
-            ${entry.description ? `<div style="margin:0.5rem 0;line-height:1.5;">${escHtml(entry.description)}</div>` : ''}
+            ${description ? `<div style="margin:0.5rem 0;line-height:1.5;">${escHtml(description)}</div>` : ''}
             ${statsHtml}
+            ${extraHtml}
             ${wikiLink}
             <div style="margin-top:1rem;display:flex;gap:0.5rem;flex-wrap:wrap;">
                 <button class="btn btn-sm btn-gold add-adversary-from-detail" data-name="${escHtml(name)}">⚔️ Add as Adversary</button>
@@ -496,6 +549,7 @@ export function addCreatureAsAdversary(entry) {
         showToast('Invalid creature data.', 'error');
         return;
     }
+    const description = getCreatureDescription(entry);
     const state = getState();
     if (!state.encounters) state.encounters = [];
     let targetEncounter = state.encounters.find(e => e.status === 'active') || state.encounters[0];
@@ -503,7 +557,7 @@ export function addCreatureAsAdversary(entry) {
         const newEnc = {
             id: 'enc-' + Date.now() + '-' + Math.random().toString(36).substr(2, 4),
             title: `Encounter with ${entry.name}`,
-            body: entry.description || '',
+            body: description || '',
             difficulty: entry.tier || 2,
             location: '',
             status: 'draft',
@@ -517,7 +571,7 @@ export function addCreatureAsAdversary(entry) {
     if (!exists) {
         targetEncounter.adversaries.push({
             name: entry.name,
-            body: entry.description || '',
+            body: description || '',
             tier: entry.tier || 2,
             stats: entry.stats || {}
         });
@@ -537,18 +591,19 @@ function addCreatureToEncounter(entry) {
         showToast('Invalid creature data.', 'error');
         return;
     }
+    const description = getCreatureDescription(entry);
     const state = getState();
     if (!state.encounters) state.encounters = [];
     const newEnc = {
         id: 'enc-' + Date.now() + '-' + Math.random().toString(36).substr(2, 4),
         title: `${entry.name} Encounter`,
-        body: entry.description || '',
+        body: description || '',
         difficulty: entry.tier || 2,
         location: '',
         status: 'draft',
         adversaries: [{
             name: entry.name,
-            body: entry.description || '',
+            body: description || '',
             tier: entry.tier || 2,
             stats: entry.stats || {}
         }],
