@@ -661,6 +661,7 @@ export class KonrehEngine {
     return text;
   }
 }
+
 // ============================================================
 //  KON'REH AI — "Schools" opponent
 // ============================================================
@@ -679,36 +680,42 @@ export class KonrehEngine {
 
 export const DIRS4 = [[1, 0], [-1, 0], [0, 1], [0, -1]];
 
+// ---- School definitions with their weight vectors ----
+// All Schools now have `reforge: 4.0` to make them urgently race to
+// save their Blue. Previously some had values as low as 2.0, which
+// made them indifferent to losing their Blue until the very last
+// moment. The higher weight ensures they will start moving toward the
+// enemy Home Apex immediately upon Blue's death.
 export const SCHOOLS = {
   ykrul: {
     name: 'Ykrul',
     tagline: 'Control before contact — count exits, not victims.',
-    weights: { material: 0.8, mobility: 2.0, aggression: 0.5, blueSafety: 1.5, cross: -1.5, cap: 0.5, reforge: 2.0, rooted: 1.0 },
+    weights: { material: 0.8, mobility: 2.0, aggression: 0.5, blueSafety: 1.5, cross: -1.5, cap: 0.5, reforge: 4.0, rooted: 1.0 },
   },
   vilikari: {
     name: 'Vilikari',
     tagline: 'Tempo theft and misdirection — sell them the hour you stole.',
-    weights: { material: 0.8, mobility: 1.0, aggression: 2.0, blueSafety: 0.8, cross: 1.2, cap: 0.6, reforge: 2.5, rooted: 0.6 },
+    weights: { material: 0.8, mobility: 1.0, aggression: 2.0, blueSafety: 0.8, cross: 1.2, cap: 0.6, reforge: 4.0, rooted: 0.6 },
   },
   thepyrgosi: {
     name: 'Thepyrgosi',
     tagline: 'Proof and parity — refuse noise, prove inevitability.',
-    weights: { material: 1.0, mobility: 1.5, aggression: 0.3, blueSafety: 2.0, cross: -0.8, cap: 0.7, reforge: 3.0, rooted: 1.5 },
+    weights: { material: 1.0, mobility: 1.5, aggression: 0.3, blueSafety: 2.0, cross: -0.8, cap: 0.7, reforge: 4.0, rooted: 1.5 },
   },
   aeler: {
     name: 'Aeler',
     tagline: 'Ledger and toll — every square pays, or closes.',
-    weights: { material: 1.2, mobility: 0.8, aggression: 0.7, blueSafety: 1.0, cross: -0.3, cap: 2.0, reforge: 2.0, rooted: 0.8 },
+    weights: { material: 1.2, mobility: 0.8, aggression: 0.7, blueSafety: 1.0, cross: -0.3, cap: 2.0, reforge: 4.0, rooted: 0.8 },
   },
   lethai: {
     name: 'Lethai',
     tagline: 'Single-Stroke — win by inevitability, not attrition.',
-    weights: { material: 0.5, mobility: 1.8, aggression: 0.2, blueSafety: 1.8, cross: -1.0, cap: 0.4, reforge: 3.0, rooted: 1.2 },
+    weights: { material: 0.5, mobility: 1.8, aggression: 0.2, blueSafety: 1.8, cross: -1.0, cap: 0.4, reforge: 4.0, rooted: 1.2 },
   },
   vhasian: {
     name: 'Vhasian',
     tagline: 'Honor as bait — polish the helm in public, strike in private.',
-    weights: { material: 0.7, mobility: 0.8, aggression: 1.6, blueSafety: 0.7, cross: 1.5, cap: 0.6, reforge: 2.0, rooted: 0.5 },
+    weights: { material: 0.7, mobility: 0.8, aggression: 1.6, blueSafety: 0.7, cross: 1.5, cap: 0.6, reforge: 4.0, rooted: 0.5 },
   },
 };
 
@@ -745,6 +752,10 @@ function pseudoMoves(engine, piece) {
   return engine.getPieceMoves(piece);
 }
 
+// ---- Evaluation function – now with stronger Reforge incentives ----
+// Added a massive bonus (1000) if the side in Reforge already has a
+// piece on the enemy Home Apex, making the AI realise it can plant
+// immediately and will prioritise moves that put a piece there.
 function evaluate(engine, weights, me) {
   if (engine.winner === me) return 1_000_000;
   if (engine.winner === 'draw') return 0;
@@ -820,7 +831,7 @@ function evaluate(engine, weights, me) {
       // Bonus: (max possible distance = 14) - current distance, scaled by 20
       score += (14 - bestDist) * 20;
       // Extra large bonus if already on the Apex (ready to plant)
-      if (bestDist === 0) score += 500;
+      if (bestDist === 0) score += 1000;
     }
   }
 
@@ -1012,13 +1023,14 @@ function loadGameStateInto(game, state) {
 }
 
 // ============================================================
-//  MODAL UI
+//  MODAL UI (with Coach glow and destination highlight)
 // ============================================================
 
 export function openKonrehModal(netConfig = null) {
   const existing = document.getElementById('konreh-modal');
   if (existing) existing.remove();
 
+  // ---- Injected styles ----
   const style = document.createElement('style');
   style.id = 'konreh-style';
   style.textContent = `
@@ -1044,6 +1056,7 @@ export function openKonrehModal(netConfig = null) {
   `;
   document.head.appendChild(style);
 
+  // ---- Modal container ----
   const modal = document.createElement('div');
   modal.id = 'konreh-modal';
   modal.style.cssText = `
@@ -1063,6 +1076,7 @@ export function openKonrehModal(netConfig = null) {
   const gameArea = document.createElement('div');
   gameArea.style.cssText = 'flex: 1 1 480px; display: flex; flex-direction: column; align-items: center; min-width: 340px;';
 
+  // Title row with close button
   const titleRow = document.createElement('div');
   titleRow.style.cssText = 'width:100%; display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;';
   const title = document.createElement('h2');
@@ -1085,6 +1099,7 @@ export function openKonrehModal(netConfig = null) {
   titleRow.appendChild(closeBtnTop);
   gameArea.appendChild(titleRow);
 
+  // ---- Setup screen (choose mode) ----
   const setupScreen = document.createElement('div');
   setupScreen.style.cssText = 'width:100%; display:flex; flex-direction:column; align-items:center; gap:14px; padding: 18px 0 8px;';
 
@@ -1105,9 +1120,7 @@ export function openKonrehModal(netConfig = null) {
   modeRow.appendChild(vsAiBtn);
   setupScreen.appendChild(modeRow);
 
-  // ---- Coach Mode panel: available in BOTH Two Players and vs Computer,
-  // since a human might want a School's-eye-view of the board either way.
-  // Independent from whichever School (if any) the computer opponent plays.
+  // ---- Coach Mode panel (always visible) ----
   const coachPanel = document.createElement('div');
   coachPanel.style.cssText = 'width:100%; max-width:460px; display:flex; flex-direction:column; gap:8px; align-items:center; padding: 4px 0;';
   const coachToggleRow = document.createElement('div');
@@ -1147,6 +1160,7 @@ export function openKonrehModal(netConfig = null) {
 
   setupScreen.appendChild(coachPanel);
 
+  // ---- School selection panel (hidden until vs AI clicked) ----
   const schoolPanel = document.createElement('div');
   schoolPanel.style.cssText = 'width:100%; max-width:460px; display:none; flex-direction:column; gap:12px; align-items:center;';
   setupScreen.appendChild(schoolPanel);
@@ -1162,9 +1176,9 @@ export function openKonrehModal(netConfig = null) {
 
   let chosenSchool = 'ykrul';
   let chosenAiPlayer = 2;
-  let aiDepth = 3; // NEW: default medium
-  let coachMode = false; // NEW: coach mode toggle
-  let coachSchoolId = 'ykrul'; // NEW: which School's style is coaching the human
+  let aiDepth = 3; // default medium
+  let coachMode = false;
+  let coachSchoolId = 'ykrul';
   const schoolCards = {};
   Object.entries(SCHOOLS).forEach(([id, school]) => {
     const card = document.createElement('button');
@@ -1181,7 +1195,7 @@ export function openKonrehModal(netConfig = null) {
   });
   schoolCards[chosenSchool].style.borderColor = 'var(--gold)';
 
-  // ---- NEW: Depth Selector ----
+  // Depth selector
   const depthRow = document.createElement('div');
   depthRow.style.cssText = 'display:flex; gap:16px; align-items:center; font-size:12px; color:var(--muted); width:100%; justify-content:center; padding:4px 0;';
   depthRow.innerHTML = `
@@ -1192,6 +1206,7 @@ export function openKonrehModal(netConfig = null) {
   `;
   schoolPanel.appendChild(depthRow);
 
+  // Side selection for AI
   const sideRow = document.createElement('div');
   sideRow.style.cssText = 'display:flex; align-items:center; gap:8px; font-size:12px; color:var(--muted); flex-wrap:wrap; justify-content:center;';
   const sideLabel = document.createElement('span');
@@ -1217,6 +1232,7 @@ export function openKonrehModal(netConfig = null) {
 
   gameArea.appendChild(setupScreen);
 
+  // ---- Board container (hidden until game starts) ----
   const boardContainer = document.createElement('div');
   boardContainer.style.cssText = 'width:100%; display:none; flex-direction:column; align-items:center;';
 
@@ -1229,21 +1245,24 @@ export function openKonrehModal(netConfig = null) {
   statusDiv.style.cssText = 'margin-top: 12px; font-size: 13.5px; color: var(--ink); text-align: center; min-height: 22px; font-weight:600;';
   boardContainer.appendChild(statusDiv);
 
-  // ---- NEW: Coach Tip panel ----
+  // Coach tip div – shows the suggestion and also the selected piece coordinates
   const coachTipDiv = document.createElement('div');
   coachTipDiv.className = 'kr-coach-tip';
   coachTipDiv.textContent = '💡 Coach will suggest moves when it\'s your turn.';
   coachTipDiv.style.display = 'none';
   boardContainer.appendChild(coachTipDiv);
 
+  // Info grid for stats
   const infoGrid = document.createElement('div');
   infoGrid.style.cssText = 'width:100%; display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:10px; font-size:12px;';
   boardContainer.appendChild(infoGrid);
 
+  // Choice panel (for multiple moves on same square)
   const choicePanel = document.createElement('div');
   choicePanel.style.cssText = 'width:100%; margin-top:10px; display:none;';
   boardContainer.appendChild(choicePanel);
 
+  // Controls row
   const controlsRow = document.createElement('div');
   controlsRow.style.cssText = 'width:100%; display:flex; gap:8px; margin-top:14px; justify-content:center;';
   const resetBtn = document.createElement('button');
@@ -1320,7 +1339,7 @@ export function openKonrehModal(netConfig = null) {
   modal.appendChild(content);
   document.body.appendChild(modal);
 
-  // --- Game Engine & UI state ---
+  // ---- Game Engine & UI state ----
   const ctx = canvas.getContext('2d');
   const scale = 29;
   const cx = canvas.width / 2;
@@ -1333,10 +1352,14 @@ export function openKonrehModal(netConfig = null) {
   let aiConfig = null;      // { schoolId, player, depth }
   let aiThinking = false;
 
+  // For coach glow: we need to know which piece the coach suggested
+  let coachSuggestedPiece = null; // will be set in renderCoachHint()
+
   const isNetworked = !!netConfig;
   const localPlayer = netConfig ? netConfig.localPlayer : null;
   let localSeq = 0;
 
+  // ---- Helper functions ----
   function pieceTitle(piece) {
     if (aiConfig && aiConfig.player === piece.player && PIECE_TITLES[aiConfig.schoolId]) {
       return PIECE_TITLES[aiConfig.schoolId][piece.type];
@@ -1393,7 +1416,6 @@ export function openKonrehModal(netConfig = null) {
     maybeTriggerAiMove();
   }
 
-  // ---- UPDATED: uses global aiDepth ----
   function maybeTriggerAiMove() {
     if (!aiConfig || game.winner || aiThinking) return;
     const activePlayer = game.pendingReforge ? game.pendingReforge.player : game.turn;
@@ -1425,6 +1447,7 @@ export function openKonrehModal(netConfig = null) {
     }, 450);
   }
 
+  // ---- Coordinate conversions ----
   function gridToScreen(x, y) {
     return { sx: cx + (x - y) * scale, sy: cy + (x + y - 7) * scale };
   }
@@ -1433,6 +1456,7 @@ export function openKonrehModal(netConfig = null) {
     return { x: Math.round((dx + dy + 7) / 2), y: Math.round((dy - dx + 7) / 2) };
   }
 
+  // ---- Drawing helpers ----
   function diamondPath(x, y) {
     const { sx, sy } = gridToScreen(x, y);
     ctx.beginPath();
@@ -1502,9 +1526,39 @@ export function openKonrehModal(netConfig = null) {
     }
   }
 
-  // ---- NEW: Coach Hint Renderer ----
+  // ---- NEW: Draw a glowing halo around the coach‑suggested piece ----
+  function drawCoachGlow(piece) {
+    if (!piece) return;
+    const { sx, sy } = gridToScreen(piece.x, piece.y);
+    const time = Date.now() / 500; // pulse every 0.5s
+    const pulse = 0.7 + 0.3 * Math.sin(time);
+    ctx.save();
+    // Outer glow with shadow blur
+    ctx.shadowColor = '#ffd700';
+    ctx.shadowBlur = 30 * pulse;
+    ctx.beginPath();
+    ctx.arc(sx, sy, scale * 0.9, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(255, 215, 0, ${0.2 * pulse})`;
+    ctx.fill();
+    ctx.strokeStyle = `rgba(255, 215, 0, ${0.8 * pulse})`;
+    ctx.lineWidth = 3;
+    ctx.stroke();
+    // Inner ring to make it pop
+    ctx.shadowBlur = 0;
+    ctx.beginPath();
+    ctx.arc(sx, sy, scale * 0.7, 0, Math.PI * 2);
+    ctx.strokeStyle = `rgba(255, 215, 0, ${0.4 * pulse})`;
+    ctx.lineWidth = 2;
+    ctx.setLineDash([3, 4]);
+    ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.restore();
+  }
+
+  // ---- Coach hint renderer (enhanced with source piece coordinates and destination highlight) ----
   function renderCoachHint() {
     coachTipDiv.style.display = coachMode ? 'block' : 'none';
+    coachSuggestedPiece = null; // reset
     if (!coachMode) {
       coachTipDiv.textContent = '💡 Coach will suggest moves when it\'s your turn.';
       return;
@@ -1517,16 +1571,20 @@ export function openKonrehModal(netConfig = null) {
       return;
     }
 
-    // Quick search for the best move for the current player (depth 2 for speed),
+    // Quick search for the best move for the current player (depth 3 for better planning),
     // styled by whichever School the human picked as their coach.
     const coachSchool = SCHOOLS[coachSchoolId] || SCHOOLS.ykrul;
-    const hint = chooseAiMove(game, game.turn, coachSchoolId, 2);
+    const hint = chooseAiMove(game, game.turn, coachSchoolId, 3);
     if (!hint) {
       coachTipDiv.textContent = '🤔 No strong suggestions available.';
       return;
     }
 
-    // Draw overlay on the hint destination
+    // Store the suggested piece for glowing
+    const piece = game.pieces.find(p => p.id === hint.pieceId);
+    if (piece) coachSuggestedPiece = piece;
+
+    // ---- Draw destination highlight (cyan dashed diamond + star) ----
     const { x, y } = hint.move;
     diamondPath(x, y);
     ctx.save();
@@ -1535,7 +1593,7 @@ export function openKonrehModal(netConfig = null) {
     ctx.setLineDash([4, 6]);
     ctx.stroke();
     ctx.restore();
-    // Draw a star / label
+    // Draw a star on the destination
     const { sx, sy } = gridToScreen(x, y);
     ctx.save();
     ctx.font = '18px sans-serif';
@@ -1545,9 +1603,8 @@ export function openKonrehModal(netConfig = null) {
     ctx.fillText('✦', sx, sy - 16);
     ctx.restore();
 
-    // Build explanation
-    const piece = game.pieces.find(p => p.id === hint.pieceId);
-    let reason = `${coachSchool.name} suggests: ${TYPE_NAME[piece.type]} → (${x},${y})`;
+    // Build explanation, including source piece coordinates
+    let reason = `${coachSchool.name} suggests: ${TYPE_NAME[piece.type]} at (${piece.x},${piece.y}) → (${x},${y})`;
     if (hint.move.capture) {
       const target = game.pieces.find(p => p.id === hint.move.targetId);
       if (target) reason += ` — captures ${TYPE_NAME[target.type]}!`;
@@ -1555,7 +1612,7 @@ export function openKonrehModal(netConfig = null) {
     if (hint.move.special === 'S:D') reason += ` — Displacement (steps onto an adjacent enemy).`;
     if (hint.move.special === 'S:H') reason += ` — Hop (jumps an adjacent enemy to the square beyond).`;
     if (piece.type === 'blue' && game.isCross(x, y) && !game.isCross(piece.x, piece.y)) {
-      reason += ` — enters the Cross (up to 3 consecutive turns, then a 2-turn ban).`;
+      reason += ` — enters the Cross (up to 3 consecutive turns, then a 2‑turn ban).`;
     }
     if (piece.type === 'blue' && game.isSanctum(x, y)) reason += ` — lands on a Sanctum (may Seed a Green).`;
     if (piece.type !== 'blue') {
@@ -1565,9 +1622,11 @@ export function openKonrehModal(netConfig = null) {
     coachTipDiv.textContent = `💡 ${reason}`;
   }
 
+  // ---- Main render function ----
   function render() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
+    // Draw board
     for (let y = 0; y < 8; y++) {
       for (let x = 0; x < 8; x++) {
         let fill = ((x + y) % 2 === 0) ? '#1c1d28' : '#181923';
@@ -1583,6 +1642,7 @@ export function openKonrehModal(netConfig = null) {
     drawLabel(0, 7, 'S');
     drawLabel(7, 0, 'S');
 
+    // Highlight valid moves for selected piece
     if (selectedPiece) {
       const byKind = { slide: 'rgba(90,200,120,0.28)', capture: 'rgba(217,74,74,0.35)',
                        'special-d': 'rgba(180,110,230,0.35)', 'special-h': 'rgba(120,150,240,0.35)' };
@@ -1603,18 +1663,36 @@ export function openKonrehModal(netConfig = null) {
       ctx.strokeStyle = '#fff'; ctx.lineWidth = 2.5; ctx.stroke();
     }
 
+    // Draw pieces
     for (const p of game.pieces) if (p.isAlive) drawPiece(p);
 
+    // ---- Draw coach glow if active ----
+    if (coachMode && coachSuggestedPiece) {
+      drawCoachGlow(coachSuggestedPiece);
+    }
+
+    // ---- Render status (which calls renderCoachHint to draw destination and set tip) ----
     renderStatus();
-    renderCoachHint(); // <- NEW: overlay + tip
+    // renderCoachHint is called inside renderStatus, which draws the destination and sets coachSuggestedPiece
+    // We need to call renderCoachHint after draw pieces and before status? Actually it's called from renderStatus, which is after glow.
+    // That's fine; the destination highlight will be drawn after pieces.
+
+    // Update status with selected piece coords (if any)
+    if (selectedPiece) {
+      statusDiv.textContent += `  |  Selected: (${selectedPiece.x}, ${selectedPiece.y})`;
+    }
   }
 
+  // ---- Status rendering (calls renderCoachHint) ----
   function renderStatus() {
     let statusText = game.getStatus();
     if (aiConfig && !game.winner && !game.pendingReforge && game.turn === aiConfig.player) {
       statusText = statusText.replace(`Player ${game.turn}'s Turn`, `Player ${game.turn}'s Turn (${SCHOOLS[aiConfig.schoolId].name})`);
     }
     statusDiv.textContent = statusText;
+
+    // Coach hint overlay and tip – this will also set coachSuggestedPiece and draw destination
+    renderCoachHint();
 
     infoGrid.innerHTML = '';
     const addStat = (label, value, cls) => {
@@ -1707,6 +1785,7 @@ export function openKonrehModal(netConfig = null) {
     }
   }
 
+  // ---- Execute a move ----
   function executeMove(move, movingPiece, moveOpts = {}) {
     const { isRemote = false } = moveOpts;
     const piece = movingPiece || selectedPiece;
@@ -1738,6 +1817,7 @@ export function openKonrehModal(netConfig = null) {
     if (!isRemote) maybeTriggerAiMove();
   }
 
+  // ---- Canvas click handler ----
   canvas.addEventListener('click', (e) => {
     if (game.winner || game.pendingReforge) return;
     if (aiConfig && game.turn === aiConfig.player) return;
@@ -1785,6 +1865,7 @@ export function openKonrehModal(netConfig = null) {
     }
   });
 
+  // ---- UI event handlers ----
   function readCoachSettings() {
     coachMode = coachCheck.checked;
     coachSchoolId = coachSchoolSelect.value;
@@ -1800,7 +1881,6 @@ export function openKonrehModal(netConfig = null) {
     schoolPanel.style.display = schoolPanel.style.display === 'none' ? 'flex' : 'none';
   });
 
-  // ---- UPDATED: Start button reads depth & coach ----
   startBtn.addEventListener('click', () => {
     const depthRadios = document.querySelectorAll('input[name="kr-depth"]');
     for (const r of depthRadios) if (r.checked) aiDepth = parseInt(r.value, 10);
@@ -1824,6 +1904,7 @@ export function openKonrehModal(netConfig = null) {
     schoolPanel.style.display = 'none';
   });
 
+  // ---- Networked mode initialisation ----
   if (isNetworked) {
     setupScreen.style.display = 'none';
     boardContainer.style.display = 'flex';
