@@ -12,30 +12,7 @@
     <link rel="preconnect" href="https://cdnjs.cloudflare.com" />
     <link rel="preconnect" href="https://cdn.jsdelivr.net" />
 
-    <!--
-      Stylesheet: consolidated into one file (app.css) which includes
-      everything that used to live in base.css / components.css /
-      layout.css / themes.css — AND travel-planner.css, which was
-      never actually linked here before (it wasn't in this <head> at
-      all), so any .travel-card / .travel-modal / .timer-badge
-      styling was silently missing. If you'd rather keep the split
-      files, just re-add the four links in the same order as before
-      and drop this one; nothing else here depends on the filename.
-    -->
     <link rel="stylesheet" href="css/app.css" />
-
-    <!--
-      NOTE: the page-specific inline sidebar <style> block that used
-      to live here has been removed. It duplicated rules already in
-      layout.css/base.css but with different hardcoded colors
-      (#d4af37 gold, #4caf50 green) instead of the theme's
-      var(--gold)/var(--accent-green) — so the sidebar's accent never
-      quite matched the rest of the app, and it also completely
-      ignored the light theme (html.light) since none of its colors
-      were theme variables. The sidebar/nav rules in app.css now cover
-      everything that block did, including the disabled-state style
-      for GM Tools, using the real theme tokens so both themes work.
-    -->
 
     <!-- Seed loading script -->
     <script>
@@ -128,7 +105,7 @@
                     <button class="nav-item" data-tab="patrons" title="Patrons" role="tab" aria-selected="false">
                         <span class="nav-icon">👁️</span> <span class="nav-label">Patrons</span>
                     </button>
-                    <!-- NEW: Spellcraft tab -->
+                    <!-- Spellcraft -->
                     <button class="nav-item" data-tab="spellcraft" title="Spellcraft & Magic" role="tab" aria-selected="false">
                         <span class="nav-icon">🧙</span> <span class="nav-label">Spellcraft</span>
                     </button>
@@ -139,7 +116,6 @@
                     <button class="nav-item" data-tab="vtt" title="Virtual Tabletop" role="tab" aria-selected="false">
                         <span class="nav-icon">💬</span> <span class="nav-label">VTT</span>
                     </button>
-                    <!-- GM Tools (formerly Scene Tools) – disabled when role is player -->
                     <button class="nav-item" data-tab="gm-tools" title="GM Tools" role="tab" id="nav-gm-tools" aria-selected="false">
                         <span class="nav-icon">🎯</span> <span class="nav-label">GM Tools</span>
                     </button>
@@ -149,9 +125,12 @@
                     <button class="nav-item" data-tab="decks" title="Decks" role="tab" aria-selected="false">
                         <span class="nav-icon">🃏</span> <span class="nav-label">Decks</span>
                     </button>
-                    <!-- Whiteboard -->
                     <button class="nav-item" data-tab="whiteboard" title="Whiteboard" role="tab" aria-selected="false">
                         <span class="nav-icon">✏️</span> <span class="nav-label">Whiteboard</span>
+                    </button>
+                    <!-- 👇 NEW: kon'reh strategy game -->
+                    <button class="nav-item" data-tab="kon-reh" title="Kon'reh Strategy Game" role="tab" aria-selected="false">
+                        <span class="nav-icon">⚪</span> <span class="nav-label">kon'reh</span>
                     </button>
                 </div>
 
@@ -196,7 +175,6 @@
             <div id="tab-factions" class="tab-content" role="tabpanel"></div>
             <div id="tab-wiki" class="tab-content" role="tabpanel"></div>
             <div id="tab-patrons" class="tab-content" role="tabpanel"></div>
-            <!-- NEW: Spellcraft content container -->
             <div id="tab-spellcraft" class="tab-content" role="tabpanel"></div>
             
             <!-- Table tabs -->
@@ -205,6 +183,8 @@
             <div id="tab-timers" class="tab-content" role="tabpanel"></div>
             <div id="tab-decks" class="tab-content" role="tabpanel"></div>
             <div id="tab-whiteboard" class="tab-content" role="tabpanel"></div>
+            <!-- 👇 NEW: kon'reh content container -->
+            <div id="tab-kon-reh" class="tab-content" role="tabpanel"></div>
             
             <!-- System tabs -->
             <div id="tab-search" class="tab-content" role="tabpanel"></div>
@@ -310,7 +290,6 @@
 
     <!-- ===== ROLE-BASED FEATURE TOGGLING ===== -->
     <script>
-        // Global function to enable/disable GM Tools sidebar button
         window.setGmToolsDisabled = function(disabled) {
             const btn = document.getElementById('nav-gm-tools');
             if (btn) {
@@ -319,13 +298,11 @@
             }
         };
 
-        // Listen for role updates from VTT module (gmRoleUpdate custom event)
         document.addEventListener('gmRoleUpdate', (e) => {
             const role = e.detail?.role;
             window.setGmToolsDisabled(role !== 'gm');
         });
 
-        // Presence update fallback (if role is transmitted via presence event)
         document.addEventListener('presenceUpdate', (e) => {
             const myId = window.__vttClientId || (window.vttState && window.vttState.socketId);
             if (!myId || !e.detail || !e.detail.clients) return;
@@ -335,7 +312,6 @@
             }
         });
 
-        // The VTT module will set this when connected
         window.__vttClientId = null;
     </script>
 

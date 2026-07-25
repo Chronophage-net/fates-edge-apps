@@ -1907,3 +1907,66 @@ function getRulesText() {
     <p style="color:var(--muted); font-size:11px;">Click a piece, then a highlighted square. Squares with several legal moves show a number — click it to choose.</p>
   `;
 }
+
+// ============================================================
+//  ROUTER INTEGRATION – default export
+// ============================================================
+
+let currentModal = null;          // DOM element of the modal
+let currentModalAPI = null;       // API object returned by openKonrehModal
+
+function closeModal() {
+  if (currentModal) {
+    currentModal.remove();
+    currentModal = null;
+    currentModalAPI = null;
+  }
+  // Also ensure any leftover modal is gone
+  const existing = document.getElementById('konreh-modal');
+  if (existing) existing.remove();
+}
+
+export default {
+  /**
+   * Called by the router when the user navigates to #kon-reh.
+   * Opens the modal (or re‑opens if closed).
+   */
+  render(container) {
+    // Ignore container – the game is a full‑screen overlay.
+    // But we do need to clean up any previous modal.
+    closeModal();
+
+    // Open the modal (no network config = local play)
+    const api = openKonrehModal(null);
+    currentModalAPI = api;
+
+    // The modal is created asynchronously; grab its element after a tick.
+    setTimeout(() => {
+      const el = document.getElementById('konreh-modal');
+      if (el) currentModal = el;
+    }, 50);
+  },
+
+  /**
+   * Called when the route becomes active – ensure the modal is open.
+   */
+  onActivate() {
+    if (!currentModal || !document.getElementById('konreh-modal')) {
+      this.render();
+    }
+  },
+
+  /**
+   * Called when the route is deactivated – close the modal.
+   */
+  onDeactivate() {
+    closeModal();
+  },
+
+  /**
+   * Refresh – just re‑render.
+   */
+  refresh() {
+    this.render();
+  }
+};

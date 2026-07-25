@@ -202,4 +202,4 @@ Use markers or dice to track the following for each Blue:
 
 - **`konreh.html`** – standalone build; open it directly in any browser, no server or install needed.
 - **`kon-reh.js`** – the same engine as a drop-in ES module (exports `KonrehEngine`, `SCHOOLS`, `openKonrehModal()`, and friends), for embedding in a larger app.
-- **`kon-reh-connected.js`** – optional add-on module (exports `openKonrehModalConnected()`) for real-time play between two clients over a transport you already have. Imports from `./kon-reh.js`, so keep the two files together. Not needed for local or vs‑Computer play.
+- **`kon-reh-connected.js`** – optional add-on module (exports `openKonrehModalConnected()`) for real-time play between two clients over a transport you already have. Imports from `../kon-reh/index.js`, so keep the two files together. Not needed for local or vs‑Computer play.

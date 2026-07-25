@@ -1,6 +1,6 @@
 /**
  * Application router – handles navigation and delegates module management to moduleLoader.
- * v3.3 – Added spellcraft route, extended for magic module.
+ * v3.4 – Added kon‑reh route as a standalone feature.
  */
 
 import { showToast } from './components/Toast.js';
@@ -39,8 +39,9 @@ const ROUTE_IMPORTS = {
     wiki:        () => import('./features/wiki/index.js'),
     vtt:         () => import('./features/vtt/index.js'),
     'gm-tools':  () => import('./features/gm-tools/index.js'),
-    // 👇 NEW – Spellcraft & Magic module
     spellcraft:  () => import('./features/spellcraft/index.js'),
+    // 👇 NEW – Kon‑Reh (standalone feature)
+    'kon-reh':   () => import('./features/kon-reh/index.js'),
 };
 
 // ============================================================

@@ -49,7 +49,7 @@
 //   // later, to tear down:
 //   connection.destroy();
 
-import { openKonrehModal } from '../kon-reh/index.js';
+import { openKonrehModal } from './index.js';
 
 export const KONREH_CONNECTED_PROTOCOL_VERSION = 1;
 
