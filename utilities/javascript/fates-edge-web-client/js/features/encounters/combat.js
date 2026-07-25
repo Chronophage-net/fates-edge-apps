@@ -4,15 +4,13 @@
  * ✅ Keyboard shortcuts: Space = next turn, R = reset timer
  * ✅ Cleaner UI with better feedback
  * ✅ Import from Bestiary via searchable modal
- * ✅ Range tracking (Close/Near/Far/Absent) per PC/Adversary pair
- * ✅ External API: setTrackerRangeByName(nameA, nameB, bandKey)
- * ✅ Whiteboard integration: getLiveCombatants(), isTrackerOpen()
  */
 
 import { getState, saveState } from '../../core/state.js';
 import { showToast } from '../../components/Toast.js';
 import { escHtml } from '../../core/utils.js';
-import { loadBestiaryData, getCreatureDescription } from './bestiary.js';
+import { loadBestiaryData, getCreatureDescription } from './bestiary.js'; // 👈 Integration import
+import { isConnectedToServer, sendEvent } from '../../core/websocket.js'; // 👈 NEW: combat-status broadcast to VTT
 
 let modal = null;
 let currentEncounterId = null;
@@ -25,12 +23,13 @@ let timerName = 'Combat Timer';
 let isTimerRunning = false;
 let timerInterval = null;
 let combatLog = [];
-let keyHandler = null;
+let keyHandler = null;  // Store for cleanup
 
-// Range tracking
-let rangeMap = {};
-let rangeGridOpen = false;
+// 👇 NEW: Range tracking (relative, narrative distance per PC/Adversary pair)
+let rangeMap = {};          // { "pairKey": "close" | "near" | "far" | "absent" }
+let rangeGridOpen = false;  // whether the full range-grid panel is expanded
 
+// Order matters: index is used to cycle forward/back through bands.
 const RANGE_BANDS = [
     { key: 'close',  label: 'Close',  short: 'C', color: 'var(--red)',    desc: "Arm's length, grappling distance." },
     { key: 'near',   label: 'Near',   short: 'N', color: 'var(--gold)',   desc: 'Same room or immediate area.' },
@@ -43,6 +42,7 @@ const DEFAULT_RANGE = 'near';
 // RANGE TRACKING HELPERS
 // ============================================================
 
+// Pair key is order-independent so range(A,B) === range(B,A)
 function rangePairKey(idA, idB) {
     return [idA, idB].sort().join('::');
 }
@@ -54,7 +54,6 @@ function getRangeBand(idA, idB) {
 
 function setRangeBand(idA, idB, bandKey) {
     if (idA === idB) return;
-    if (!RANGE_BANDS.some(b => b.key === bandKey)) return;
     rangeMap[rangePairKey(idA, idB)] = bandKey;
 }
 
@@ -69,6 +68,11 @@ function getRangeBandInfo(bandKey) {
     return RANGE_BANDS.find(b => b.key === bandKey) || RANGE_BANDS[1];
 }
 
+// When a new combatant joins, default its range to every existing
+// combatant of the opposite type (player <-> adversary) to "Near".
+// Same-type pairs (player-player, adversary-adversary) aren't tracked –
+// range bands in Fate's Edge matter for who's threatening whom, not
+// for allies standing near each other.
 function initRangeForNewCombatant(newCombatant) {
     combatants.forEach(other => {
         if (other.id === newCombatant.id) return;
@@ -78,6 +82,8 @@ function initRangeForNewCombatant(newCombatant) {
     });
 }
 
+// Rebuild the default cross-type pairings for the whole current
+// combatants list (used right after openTracker populates it).
 function initRangeForAllCombatants() {
     for (let i = 0; i < combatants.length; i++) {
         for (let j = i + 1; j < combatants.length; j++) {
@@ -95,61 +101,82 @@ function clearRangeForCombatant(id) {
     });
 }
 
-// ============================================================
-// EXTERNAL API
-// ============================================================
+// Builds the full PC × Adversary range matrix panel.
+function buildRangeGridHtml() {
+    const players = combatants.filter(c => c.type === 'player');
+    const adversaries = combatants.filter(c => c.type === 'adversary');
 
-/**
- * Set the range band between two named combatants.
- * @param {string} nameA - Name of first combatant (case‑insensitive)
- * @param {string} nameB - Name of second combatant (case‑insensitive)
- * @param {string} bandKey - One of 'close', 'near', 'far', 'absent'
- * @returns {boolean} true if successful, false otherwise
- */
-export function setTrackerRangeByName(nameA, nameB, bandKey) {
-    if (!bandKey || !RANGE_BANDS.some(b => b.key === bandKey)) {
-        console.warn(`[Combat Tracker] Invalid band key: "${bandKey}"`);
-        return false;
+    let bodyHtml;
+    if (players.length === 0 || adversaries.length === 0) {
+        bodyHtml = `
+            <div style="color:var(--text3);padding:1rem;text-align:center;font-size:0.85rem;">
+                Add at least one 👤 Player and one 👾 Adversary to track ranges between them.
+            </div>`;
+    } else {
+        const headerCells = adversaries.map(a => `
+            <th style="padding:0.4rem 0.5rem;font-size:0.75rem;color:var(--text2);font-weight:600;white-space:nowrap;">
+                ${escHtml(a.name)}
+            </th>`).join('');
+
+        const rows = players.map(p => {
+            const cells = adversaries.map(a => {
+                const band = getRangeBand(p.id, a.id);
+                const info = getRangeBandInfo(band);
+                return `
+                    <td style="padding:0.3rem 0.4rem;text-align:center;">
+                        <button class="range-cell" data-a="${p.id}" data-b="${a.id}"
+                            title="${escHtml(p.name)} ↔ ${escHtml(a.name)}: ${info.label} — ${info.desc} (click to cycle)"
+                            style="
+                                min-width:64px; font-size:0.75rem; font-weight:700; color:white;
+                                background:${info.color}; border:none; border-radius:8px;
+                                padding:0.3rem 0.5rem; cursor:pointer; transition:transform 0.15s ease;
+                            ">${info.label}</button>
+                    </td>`;
+            }).join('');
+            return `
+                <tr>
+                    <th style="padding:0.4rem 0.6rem;text-align:right;font-size:0.8rem;color:var(--text);white-space:nowrap;">
+                        ${escHtml(p.name)}
+                    </th>
+                    ${cells}
+                </tr>`;
+        }).join('');
+
+        bodyHtml = `
+            <div style="overflow-x:auto;">
+                <table style="border-collapse:collapse;width:100%;">
+                    <thead>
+                        <tr>
+                            <th></th>
+                            ${headerCells}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${rows}
+                    </tbody>
+                </table>
+            </div>`;
     }
 
-    const a = combatants.find(c => c.name.toLowerCase() === nameA.toLowerCase());
-    const b = combatants.find(c => c.name.toLowerCase() === nameB.toLowerCase());
+    const legend = RANGE_BANDS.map(b => `
+        <span style="display:inline-flex;align-items:center;gap:0.3rem;font-size:0.7rem;color:var(--text2);margin-right:0.9rem;">
+            <span style="width:10px;height:10px;border-radius:3px;background:${b.color};display:inline-block;"></span>
+            <strong style="color:var(--text);">${b.label}</strong> — ${b.desc}
+        </span>`).join('');
 
-    if (!a || !b) {
-        console.warn(`[Combat Tracker] One or both combatants not found: "${nameA}", "${nameB}"`);
-        return false;
-    }
-
-    if (a.type === b.type) {
-        console.warn(`[Combat Tracker] Range only tracked between PC and Adversary (same type: ${a.type})`);
-        return false;
-    }
-
-    setRangeBand(a.id, b.id, bandKey);
-    // If the tracker is open, refresh the view
-    if (modal && modal.parentNode) {
-        renderTracker();
-    }
-    return true;
-}
-
-// ============================================================
-// WHITEBOARD INTEGRATION
-// ============================================================
-
-/**
- * Returns the current list of combatants (live data).
- * Useful for whiteboard or other modules that need to display tokens.
- */
-export function getLiveCombatants() {
-    return combatants;
-}
-
-/**
- * Returns whether the combat tracker modal is currently open.
- */
-export function isTrackerOpen() {
-    return modal !== null;
+    return `
+        <div style="
+            background: var(--bg3); border-radius: 12px; padding: 0.9rem 1rem;
+            margin-bottom: 1.25rem; border: 1px solid var(--border);
+        ">
+            <div style="font-size:0.7rem;color:var(--text3);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:0.6rem;">
+                📏 Range Grid — click any cell to cycle Close → Near → Far → Absent
+            </div>
+            ${bodyHtml}
+            <div style="margin-top:0.7rem;padding-top:0.6rem;border-top:1px solid var(--border);">
+                ${legend}
+            </div>
+        </div>`;
 }
 
 // ============================================================
@@ -248,6 +275,8 @@ export function openTracker(encounterId) {
     isTimerRunning = false;
     combatLog = [];
 
+    // 👇 NEW: fresh range map for this combat, defaulted to Near for
+    // every PC/Adversary pair (players are added separately via "+ Player").
     rangeMap = {};
     rangeGridOpen = false;
     initRangeForAllCombatants();
@@ -261,15 +290,62 @@ export function openTracker(encounterId) {
 }
 
 // ============================================================
+// VTT COMBAT STATUS BROADCAST (NEW)
+// ============================================================
+
+/**
+ * Pushes a lightweight, player-safe snapshot of combat state over the
+ * WebSocket so the VTT's "Live Table" view can show round/turn/timer
+ * info without giving players GM-only access to the Tracker itself.
+ *
+ * Deliberately excludes per-combatant harm values and other tactical
+ * secrets — only round number, whose turn it is, and the shared combat
+ * timer (which is meant to be player-visible tension, like a countdown
+ * clock) go out. Piggybacks on renderTracker(), which already runs
+ * after every state-changing action, so no extra call sites are needed
+ * for the common cases (damage, heal, next turn, timer tick, etc.).
+ */
+function broadcastCombatStatus() {
+    if (!isConnectedToServer()) return;
+    if (!combatants.length) return;
+
+    const active = combatants[activeIndex] || null;
+    const encounter = (getState().encounters || []).find(e => String(e.id) === String(currentEncounterId));
+
+    try {
+        sendEvent({
+            type: 'combat-status-update',
+            combat: {
+                encounterId: currentEncounterId,
+                encounterTitle: encounter ? encounter.title : null,
+                round,
+                activeName: active ? active.name : null,
+                activeType: active ? active.type : null,
+                timerName,
+                timerSegments,
+                timerMax,
+                activeCount: combatants.filter(c => c.status === 'active').length,
+                defeatedCount: combatants.filter(c => c.status === 'defeated').length,
+            }
+        });
+    } catch (e) { /* ignore */ }
+}
+
+// ============================================================
 // RENDER TRACKER
 // ============================================================
 
 function renderTracker() {
-    // Remove existing modal to prevent stacking
+    // 👇 FIX: renderTracker() is called on every action (damage, heal, sort,
+    // timer tick, and now every range click) to refresh the view. It was
+    // never removing the previous modal node first, so each action silently
+    // stacked a brand-new full-screen modal on top of the last one. Clean up
+    // any existing modal before building the new one.
     if (modal && modal.parentNode) {
         modal.parentNode.removeChild(modal);
     }
 
+    // Build modal
     modal = document.createElement('div');
     modal.style.cssText = `
         position: fixed; top: 0; left: 0; width: 100%; height: 100%;
@@ -278,6 +354,7 @@ function renderTracker() {
         animation: fadeIn 0.3s ease;
     `;
     
+    // 👇 NEW: reference combatant for the "range to active" chip on each row
     const focusCombatant = combatants[activeIndex] || null;
 
     const combatantsHtml = combatants.map((c, i) => {
@@ -286,6 +363,8 @@ function renderTracker() {
         const harmPercent = (c.harm / c.maxHarm) * 100;
         const hasLinks = c.linkedFaction || c.linkedPatron || c.linkedFollower || c.linkedAsset || c.linkedRival;
 
+        // 👇 NEW: range chip showing this combatant's distance to the
+        // currently-focused combatant (only meaningful across player/adversary lines)
         let rangeChip = '';
         if (focusCombatant && focusCombatant.id !== c.id && focusCombatant.type !== c.type) {
             const band = getRangeBand(c.id, focusCombatant.id);
@@ -548,6 +627,7 @@ function renderTracker() {
                                 style="padding: 0.4rem 0.75rem; font-size: 0.85rem; transition: all 0.2s ease;">
                             🏛️ Import
                         </button>
+                        <!-- 👇 NEW: Import from Bestiary -->
                         <button class="btn btn-sm btn-ghost" id="combat-import-bestiary" 
                                 style="padding: 0.4rem 0.75rem; font-size: 0.85rem; transition: all 0.2s ease;">
                             📖 Bestiary
@@ -556,6 +636,7 @@ function renderTracker() {
                                 style="padding: 0.4rem 0.75rem; font-size: 0.85rem; transition: all 0.2s ease;">
                             🔄 Sort
                         </button>
+                        <!-- 👇 NEW: Toggle full Range Grid -->
                         <button class="btn btn-sm ${rangeGridOpen ? 'btn-gold' : 'btn-ghost'}" id="combat-toggle-ranges" 
                                 style="padding: 0.4rem 0.75rem; font-size: 0.85rem; transition: all 0.2s ease;"
                                 title="Show/hide the full PC × Adversary range grid">
@@ -568,7 +649,7 @@ function renderTracker() {
                 </div>
             </div>
 
-            <!-- Range Grid panel -->
+            <!-- 👇 NEW: Range Grid panel -->
             ${rangeGridOpen ? buildRangeGridHtml() : ''}
             
             <!-- Combat Log -->
@@ -724,8 +805,9 @@ function renderTracker() {
     modal.querySelector('#combat-add-combatant')?.addEventListener('click', addCombatant);
     modal.querySelector('#combat-add-player')?.addEventListener('click', addPlayer);
     modal.querySelector('#combat-import-factions')?.addEventListener('click', importFromFactions);
-    modal.querySelector('#combat-import-bestiary')?.addEventListener('click', importFromBestiary);
+    modal.querySelector('#combat-import-bestiary')?.addEventListener('click', importFromBestiary); // 👈 NEW
     modal.querySelector('#combat-sort')?.addEventListener('click', sortCombatants);
+    // 👇 NEW: Range grid toggle + interactive range chips/cells
     modal.querySelector('#combat-toggle-ranges')?.addEventListener('click', () => {
         rangeGridOpen = !rangeGridOpen;
         renderTracker();
@@ -823,87 +905,10 @@ function renderTracker() {
         }
     };
     document.addEventListener('keydown', keyHandler);
-}
 
-// ============================================================
-// RANGE GRID HTML BUILDER
-// ============================================================
-
-function buildRangeGridHtml() {
-    const players = combatants.filter(c => c.type === 'player');
-    const adversaries = combatants.filter(c => c.type === 'adversary');
-
-    let bodyHtml;
-    if (players.length === 0 || adversaries.length === 0) {
-        bodyHtml = `
-            <div style="color:var(--text3);padding:1rem;text-align:center;font-size:0.85rem;">
-                Add at least one 👤 Player and one 👾 Adversary to track ranges between them.
-            </div>`;
-    } else {
-        const headerCells = adversaries.map(a => `
-            <th style="padding:0.4rem 0.5rem;font-size:0.75rem;color:var(--text2);font-weight:600;white-space:nowrap;">
-                ${escHtml(a.name)}
-            </th>`).join('');
-
-        const rows = players.map(p => {
-            const cells = adversaries.map(a => {
-                const band = getRangeBand(p.id, a.id);
-                const info = getRangeBandInfo(band);
-                return `
-                    <td style="padding:0.3rem 0.4rem;text-align:center;">
-                        <button class="range-cell" data-a="${p.id}" data-b="${a.id}"
-                            title="${escHtml(p.name)} ↔ ${escHtml(a.name)}: ${info.label} — ${info.desc} (click to cycle)"
-                            style="
-                                min-width:64px; font-size:0.75rem; font-weight:700; color:white;
-                                background:${info.color}; border:none; border-radius:8px;
-                                padding:0.3rem 0.5rem; cursor:pointer; transition:transform 0.15s ease;
-                            ">${info.label}</button>
-                    </td>`;
-            }).join('');
-            return `
-                <tr>
-                    <th style="padding:0.4rem 0.6rem;text-align:right;font-size:0.8rem;color:var(--text);white-space:nowrap;">
-                        ${escHtml(p.name)}
-                    </th>
-                    ${cells}
-                </tr>`;
-        }).join('');
-
-        bodyHtml = `
-            <div style="overflow-x:auto;">
-                <table style="border-collapse:collapse;width:100%;">
-                    <thead>
-                        <tr>
-                            <th></th>
-                            ${headerCells}
-                        </tr>
-                    </thead>
-                    <tbody>
-                        ${rows}
-                    </tbody>
-                </table>
-            </div>`;
-    }
-
-    const legend = RANGE_BANDS.map(b => `
-        <span style="display:inline-flex;align-items:center;gap:0.3rem;font-size:0.7rem;color:var(--text2);margin-right:0.9rem;">
-            <span style="width:10px;height:10px;border-radius:3px;background:${b.color};display:inline-block;"></span>
-            <strong style="color:var(--text);">${b.label}</strong> — ${b.desc}
-        </span>`).join('');
-
-    return `
-        <div style="
-            background: var(--bg3); border-radius: 12px; padding: 0.9rem 1rem;
-            margin-bottom: 1.25rem; border: 1px solid var(--border);
-        ">
-            <div style="font-size:0.7rem;color:var(--text3);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:0.6rem;">
-                📏 Range Grid — click any cell to cycle Close → Near → Far → Absent
-            </div>
-            ${bodyHtml}
-            <div style="margin-top:0.7rem;padding-top:0.6rem;border-top:1px solid var(--border);">
-                ${legend}
-            </div>
-        </div>`;
+    // 👇 NEW: keep the VTT's live combat-status pill in sync with every
+    // tracker refresh (damage, heal, next turn, timer tick, etc.)
+    broadcastCombatStatus();
 }
 
 // ============================================================
@@ -923,6 +928,14 @@ function closeTracker() {
         modal.parentNode.removeChild(modal);
     }
     modal = null;
+
+    // 👇 NEW: tell the VTT the encounter is no longer active so the
+    // combat-status pill disappears instead of showing stale round/turn
+    // info after the GM closes the tracker.
+    if (isConnectedToServer()) {
+        try { sendEvent({ type: 'combat-status-update', combat: null }); } catch (e) { /* ignore */ }
+    }
+
     currentEncounterId = null;
 }
 
@@ -962,7 +975,7 @@ function addCombatant() {
         linkedRival: getLinkedRival(name)
     };
     combatants.push(newAdversary);
-    initRangeForNewCombatant(newAdversary);
+    initRangeForNewCombatant(newAdversary); // 👈 NEW: default range to existing players
     sortCombatants();
     addLog('info', `Added adversary: ${name}`);
     renderTracker();
@@ -991,7 +1004,7 @@ function addPlayer() {
         linkedRival: null
     };
     combatants.push(newPlayer);
-    initRangeForNewCombatant(newPlayer);
+    initRangeForNewCombatant(newPlayer); // 👈 NEW: default range to existing adversaries
     sortCombatants();
     addLog('info', `Added player: ${name}`);
     renderTracker();
@@ -1034,13 +1047,14 @@ function importFromFactions() {
         linkedRival: null
     };
     combatants.push(newFactionCombatant);
-    initRangeForNewCombatant(newFactionCombatant);
+    initRangeForNewCombatant(newFactionCombatant); // 👈 NEW: default range to existing players
     sortCombatants();
     addLog('info', `Imported faction: ${faction.name}`);
     renderTracker();
     showToast(`🏛️ Imported ${faction.name} as combatant`, 'success');
 }
 
+// 👇 NEW: Import from Bestiary
 async function importFromBestiary() {
     const creatures = await loadBestiaryData();
     if (!creatures || creatures.length === 0) {
@@ -1048,6 +1062,7 @@ async function importFromBestiary() {
         return;
     }
 
+    // Create a modal for searching
     const searchModal = document.createElement('div');
     searchModal.style.cssText = `
         position: fixed; inset: 0; background: rgba(0,0,0,0.7);
@@ -1095,6 +1110,7 @@ async function importFromBestiary() {
                 const name = item.dataset.name;
                 const entry = creatures.find(e => e.name === name);
                 if (entry) {
+                    // Add to current encounter's adversaries
                     const state = getState();
                     const encounter = state.encounters?.find(e => String(e.id) === String(currentEncounterId));
                     if (!encounter) {
@@ -1113,6 +1129,12 @@ async function importFromBestiary() {
                         });
                         saveState();
                         showToast(`⚔️ Added "${name}" to combat.`, 'success');
+                        // 👇 FIX: previously this rebuilt `combatants` from
+                        // encounter.adversaries alone, which silently deleted
+                        // every player combatant and reset harm/status for
+                        // every adversary already in the fight. Just add the
+                        // one new combatant instead, and give it a default
+                        // range to everyone already present.
                         const newCombatant = {
                             id: 'combat-' + Date.now() + '-' + Math.random().toString(36).substr(2, 4),
                             name: entry.name || 'Adversary',
@@ -1249,7 +1271,7 @@ function removeCombatant(idx) {
             const name = combatants[idx].name;
             const removedId = combatants[idx].id;
             combatants.splice(idx, 1);
-            clearRangeForCombatant(removedId);
+            clearRangeForCombatant(removedId); // 👈 NEW: drop stale range entries
             if (activeIndex >= combatants.length) activeIndex = Math.max(0, combatants.length - 1);
             addLog('info', `Removed ${name}`);
             renderTracker();
@@ -1259,18 +1281,47 @@ function removeCombatant(idx) {
 }
 
 // ============================================================
+// EXTERNAL API (for cross-feature integration — e.g. the Whiteboard's
+// optional Grid Combat mode syncing token distance into narrative range)
+// ============================================================
+
+// True if the tracker modal is currently open, showing this specific encounter.
+export function isTrackerOpen(encounterId) {
+    return !!modal && String(currentEncounterId) === String(encounterId);
+}
+
+// Read-only snapshot of the live combatants (id/name/type/status/harm).
+// Lets other features (e.g. the Whiteboard) pull in who's actually in the
+// fight right now — including ad-hoc players added via "+ Player", which
+// aren't persisted anywhere else — without touching the Tracker's own
+// bookkeeping.
+export function getLiveCombatants() {
+    return combatants.map(c => ({
+        id: c.id, name: c.name, type: c.type, status: c.status,
+        harm: c.harm, maxHarm: c.maxHarm
+    }));
+}
+
+// Sets the narrative range band between two combatants, matched by name
+// (case-insensitive) against whichever combatants are currently loaded in
+// this tracker session. Returns true if both names were found and the
+// range was set. No-op (returns false) if the tracker isn't open, or
+// either name isn't currently in the fight — there's nothing to attach
+// a range to yet. Re-renders the tracker if it's visibly open, so a
+// Range Grid / chip left on screen updates live as tokens move.
+export function setTrackerRangeByName(nameA, nameB, bandKey) {
+    if (!modal) return false;
+    const a = combatants.find(c => (c.name || '').toLowerCase() === (nameA || '').toLowerCase());
+    const b = combatants.find(c => (c.name || '').toLowerCase() === (nameB || '').toLowerCase());
+    if (!a || !b) return false;
+    setRangeBand(a.id, b.id, bandKey);
+    renderTracker();
+    return true;
+}
+
+// ============================================================
 // EXPORTS
 // ============================================================
 
-// All named exports are provided by their function declarations above:
-//   - openTracker
-//   - setTrackerRangeByName
-//   - getLiveCombatants
-//   - isTrackerOpen
-// Default export for convenience.
-export default { 
-    openTracker, 
-    setTrackerRangeByName, 
-    getLiveCombatants, 
-    isTrackerOpen 
-};
+// Default export as before
+export default { openTracker };

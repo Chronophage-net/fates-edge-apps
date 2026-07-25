@@ -19,7 +19,16 @@ let voiceChat = null;
 let voiceClients = new Map(); // clientId -> { name, stream, speaking, connectionState }
 let isInitialized = false;
 let activityCleanup = null;
-let _clientChangeCallback = null;
+// 👇 FIX: was a single overwritable slot (`_clientChangeCallback`). Any
+// second caller of onVoiceClientsChanged() (e.g. a feature other than the
+// main VTT module wanting to react to who's speaking) would silently
+// replace the first subscriber instead of adding a second one. It also
+// never returned anything, so `voiceUnsubscribe = onVoiceClientsChanged(...)`
+// always set `voiceUnsubscribe` to undefined -- the `if (voiceUnsubscribe)
+// voiceUnsubscribe()` cleanup calls in vtt-connected.js/vtt-local.js were
+// dead code that never actually unsubscribed anything. Now a proper set of
+// subscribers, each with a real unsubscribe function.
+let clientChangeCallbacks = new Set();
 let _lastClientInfo = new Map();
 let wsEventListeners = [];
 let speakingDetectors = new Map();
@@ -49,7 +58,7 @@ function stopSpeakingDetector(clientId) {
 // ============================================================
 
 function notifyClientsChanged() {
-    if (!_clientChangeCallback) return;
+    if (clientChangeCallbacks.size === 0) return;
 
     const clientsInfo = Array.from(voiceClients.entries()).map(([id, client]) => ({
         id,
@@ -74,12 +83,17 @@ function notifyClientsChanged() {
 
     if (changed) {
         _lastClientInfo = new Map(clientsInfo.map(info => [info.id, info]));
-        _clientChangeCallback(clientsInfo);
+        clientChangeCallbacks.forEach(cb => {
+            try { cb(clientsInfo); } catch (e) { console.warn('[Voice] Subscriber error:', e); }
+        });
     }
 }
 
+// 👇 FIX: supports multiple independent subscribers and returns a working
+// unsubscribe function (see note above `clientChangeCallbacks`).
 export function onVoiceClientsChanged(callback) {
-    _clientChangeCallback = callback;
+    clientChangeCallbacks.add(callback);
+    return () => clientChangeCallbacks.delete(callback);
 }
 
 // ============================================================

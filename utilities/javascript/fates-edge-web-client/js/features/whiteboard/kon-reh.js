@@ -683,32 +683,32 @@ export const SCHOOLS = {
   ykrul: {
     name: 'Ykrul',
     tagline: 'Control before contact — count exits, not victims.',
-    weights: { material: 0.8, mobility: 2.0, aggression: 0.5, blueSafety: 1.5, cross: -1.5, cap: 0.5, reforge: 1.2, rooted: 1.0 },
+    weights: { material: 0.8, mobility: 2.0, aggression: 0.5, blueSafety: 1.5, cross: -1.5, cap: 0.5, reforge: 2.0, rooted: 1.0 },
   },
   vilikari: {
     name: 'Vilikari',
     tagline: 'Tempo theft and misdirection — sell them the hour you stole.',
-    weights: { material: 0.8, mobility: 1.0, aggression: 2.0, blueSafety: 0.8, cross: 1.2, cap: 0.6, reforge: 1.0, rooted: 0.6 },
+    weights: { material: 0.8, mobility: 1.0, aggression: 2.0, blueSafety: 0.8, cross: 1.2, cap: 0.6, reforge: 2.5, rooted: 0.6 },
   },
   thepyrgosi: {
     name: 'Thepyrgosi',
     tagline: 'Proof and parity — refuse noise, prove inevitability.',
-    weights: { material: 1.0, mobility: 1.5, aggression: 0.3, blueSafety: 2.0, cross: -0.8, cap: 0.7, reforge: 1.5, rooted: 1.5 },
+    weights: { material: 1.0, mobility: 1.5, aggression: 0.3, blueSafety: 2.0, cross: -0.8, cap: 0.7, reforge: 3.0, rooted: 1.5 },
   },
   aeler: {
     name: 'Aeler',
     tagline: 'Ledger and toll — every square pays, or closes.',
-    weights: { material: 1.2, mobility: 0.8, aggression: 0.7, blueSafety: 1.0, cross: -0.3, cap: 2.0, reforge: 1.0, rooted: 0.8 },
+    weights: { material: 1.2, mobility: 0.8, aggression: 0.7, blueSafety: 1.0, cross: -0.3, cap: 2.0, reforge: 2.0, rooted: 0.8 },
   },
   lethai: {
     name: 'Lethai',
     tagline: 'Single-Stroke — win by inevitability, not attrition.',
-    weights: { material: 0.5, mobility: 1.8, aggression: 0.2, blueSafety: 1.8, cross: -1.0, cap: 0.4, reforge: 2.0, rooted: 1.2 },
+    weights: { material: 0.5, mobility: 1.8, aggression: 0.2, blueSafety: 1.8, cross: -1.0, cap: 0.4, reforge: 3.0, rooted: 1.2 },
   },
   vhasian: {
     name: 'Vhasian',
     tagline: 'Honor as bait — polish the helm in public, strike in private.',
-    weights: { material: 0.7, mobility: 0.8, aggression: 1.6, blueSafety: 0.7, cross: 1.5, cap: 0.6, reforge: 0.9, rooted: 0.5 },
+    weights: { material: 0.7, mobility: 0.8, aggression: 1.6, blueSafety: 0.7, cross: 1.5, cap: 0.6, reforge: 2.0, rooted: 0.5 },
   },
 };
 
@@ -795,8 +795,34 @@ function evaluate(engine, weights, me) {
   const oppGreens = engine.pieces.filter(p => p.isAlive && p.player === opp && p.type === 'green').length;
   score += weights.cap * 30 * (myGreens - oppGreens);
 
-  if (!engine.blueAlive[me]) score -= weights.reforge * (6 - engine.reforgeCountdown[me]) * 40;
-  if (!engine.blueAlive[opp]) score += weights.reforge * (6 - engine.reforgeCountdown[opp]) * 40;
+  // --- Reforge urgency: quadratic penalty for the player whose Blue is dead ---
+  if (!engine.blueAlive[me]) {
+    const urgency = 6 - engine.reforgeCountdown[me]; // 1 at start, 5 at last turn
+    // Quadratic: as turns dwindle, the penalty grows sharply
+    score -= weights.reforge * urgency * urgency * 30;
+  }
+  if (!engine.blueAlive[opp]) {
+    const urgency = 6 - engine.reforgeCountdown[opp];
+    score += weights.reforge * urgency * urgency * 30;
+  }
+
+  // --- Proximity bonus for the player in Reforge: encourage moving toward the enemy Home Apex ---
+  if (!engine.blueAlive[me]) {
+    const enemyHome = engine.enemyHomeApexOf(me);
+    let bestDist = Infinity;
+    for (const p of engine.pieces) {
+      if (p.isAlive && p.player === me) {
+        const d = Math.abs(p.x - enemyHome.x) + Math.abs(p.y - enemyHome.y);
+        if (d < bestDist) bestDist = d;
+      }
+    }
+    if (bestDist !== Infinity) {
+      // Bonus: (max possible distance = 14) - current distance, scaled by 20
+      score += (14 - bestDist) * 20;
+      // Extra large bonus if already on the Apex (ready to plant)
+      if (bestDist === 0) score += 500;
+    }
+  }
 
   return score;
 }

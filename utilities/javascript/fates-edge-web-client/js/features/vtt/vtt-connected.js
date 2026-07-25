@@ -99,6 +99,10 @@ let clientsMap = new Map(); // id -> { id, name, role }
 // Character push guard
 let charactersPushed = false;
 
+// 👇 NEW: live combat status pushed from the Encounter Tracker (combat.js),
+// so players can see round/turn/timer without needing GM-only access.
+let combatStatus = null;
+
 // ============================================================
 // HELPERS – Get sender from selected character
 // ============================================================
@@ -803,6 +807,32 @@ function receiveCharacters(charArray) {
 }
 
 // ============================================================
+// COMBAT STATUS (from Encounter Tracker) – 👇 NEW
+// ============================================================
+
+// Renders the live "⚔️ Combat" pill in the Table Status panel from
+// whatever the Encounter Tracker last broadcast (see combat.js's
+// broadcastCombatStatus()). Deliberately shows only round/turn/timer —
+// not individual harm values — so the GM's tactical bookkeeping stays
+// private while players still get useful at-a-glance pacing info.
+function updateCombatStatusUI() {
+    const el = q('#vtt-combat-status');
+    if (!el) return;
+    if (!combatStatus) {
+        el.style.display = 'none';
+        el.innerHTML = '';
+        return;
+    }
+    const c = combatStatus;
+    const turnText = c.activeName ? `${escHtml(c.activeName)}'s turn` : 'awaiting turn order';
+    const timerText = c.timerMax > 0
+        ? ` · ⏱️ ${escHtml(c.timerName || 'Timer')} ${c.timerSegments}/${c.timerMax}`
+        : '';
+    el.style.display = 'inline-flex';
+    el.innerHTML = `⚔️ Round ${c.round} — ${turnText}${timerText}`;
+}
+
+// ============================================================
 // WEBSOCKET SYNC SETUP (using unified WebSocket module)
 // ============================================================
 
@@ -1020,6 +1050,17 @@ function setupWebSocketSync() {
     };
     onWSEvent('region-updated', regionUpdateHandler);
     wsListeners.set('region-updated', regionUpdateHandler);
+
+    // ─── COMBAT STATUS (from Encounter Tracker) ────────────────── 👇 NEW
+    const combatStatusHandler = (data) => {
+        if (isDestroyed) return;
+        // combat.js broadcasts `{ combat: {...} }` while active, and
+        // `{ combat: null }` once the GM closes the tracker.
+        combatStatus = (data && data.combat) || null;
+        updateCombatStatusUI();
+    };
+    onWSEvent('combat-status-update', combatStatusHandler);
+    wsListeners.set('combat-status-update', combatStatusHandler);
 
     // ============================================================
     // GM ELECTION & PROMOTION EVENTS
@@ -1487,6 +1528,8 @@ export function render(el) {
             ${socketId ? `<span class="vtt-stat-pill">👤 <strong>${socketId.slice(0, 8)}</strong></span>` : ''}
             <span class="vtt-stat-pill">📍 ${defaultRegion}</span>
             <span class="vtt-stat-pill">🃏 <strong id="vtt-deck-count-header">${deckCount}</strong> cards</span>
+            <!-- 👇 NEW: live combat status, pushed from the Encounter Tracker. Hidden until a broadcast arrives. -->
+            <span class="vtt-stat-pill" id="vtt-combat-status" style="display:none;background:var(--bg4);border:1px solid var(--red);"></span>
         </div>
         <div class="vtt-divider"></div>
         <!-- Voice controls (unchanged) -->
@@ -1663,6 +1706,7 @@ export function render(el) {
     renderVoiceClients();
     updateMessageCount();
     populateChatRecipients();
+    updateCombatStatusUI(); // 👈 NEW: reflect whatever combat status is already known (e.g. after a tab switch back)
 
     // Normalize and set initial characters from local state (if any)
     const chars = getCharacters();
