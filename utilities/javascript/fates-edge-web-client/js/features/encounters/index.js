@@ -2,15 +2,20 @@
  * Encounters feature - Manage combat and social encounters
  * Includes quick reference from The Witnessed Prey
  * ✅ Integrated with Bestiary (panel below encounter list, left column)
+ * ✅ One‑click "Open Tracker" from bestiary entries
  */
 
 import { getState, saveState } from '../../core/state.js';
 import { escHtml } from '../../core/utils.js';
 import { showToast } from '../../components/Toast.js';
 import { logToSession, addVTTEvent } from '../gm-tools/index.js';
-// Adjust the path to match your actual bestiary location
-// Example: if bestiary.js is in js/features/bestiary/bestiary.js
-import { loadBestiaryData, loadWikiData, addCreatureAsAdversary } from './bestiary.js';
+import { 
+    loadBestiaryData, 
+    loadWikiData, 
+    addCreatureAsAdversary,
+    getCreatureDescription   // 👈 new import for proper description handling
+} from './bestiary.js';
+import { openTracker } from './combat.js'; // 👈 named export
 
 let container = null;
 let bestiaryData = [];
@@ -18,15 +23,24 @@ let filteredBestiary = [];
 
 // Quick reference data (unchanged)
 const QUICK_ADVERSARIES = [
-    // ... (same as before)
+    { name: 'Goblin Scavenger', body: 'Small, green, greedy. TL1. Harm 3.' },
+    { name: 'Skeleton Knight', body: 'Animated armour, rusty blade. TL2. Harm 4.' },
+    { name: 'Thorn Dryad', body: 'Fey with bark skin and thorny vines. TL3. Harm 5.' },
+    { name: 'Cultist Emissary', body: 'Robed zealot, whispers of doom. TL2. Harm 3.' },
+    { name: 'Rust Wyrm', body: 'Mechanical beast, dripping corrosion. TL4. Harm 6.' }
 ];
 
 const ADVERSARY_MOVES = [
-    // ... (same as before)
+    { cost: 1, name: 'Flurry', effect: '+2 damage, +1 harm to self' },
+    { cost: 2, name: 'Grapple', effect: 'Target is held; must break free' },
+    { cost: 3, name: 'Sunder', effect: 'Destroy one piece of armour or shield' },
+    { cost: 4, name: 'Enrage', effect: '+1 to all actions, but vulnerable' }
 ];
 
 const QUICK_TIMERS = [
-    // ... (same as before)
+    { name: 'Ticking Clock', effect: '6 segments – after each round, advance one' },
+    { name: 'Ritual Progress', effect: '5 segments – at completion, summon boss' },
+    { name: 'Environmental Hazard', effect: '8 segments – area becomes unstable' }
 ];
 
 // ============================================================
@@ -266,7 +280,7 @@ function renderBestiary() {
     // Filter and also filter out entries without a name
     filteredBestiary = bestiaryData.filter(entry => {
         const name = (entry.name || '').toLowerCase();
-        const desc = (entry.description || '').toLowerCase();
+        const desc = (getCreatureDescription(entry) || '').toLowerCase();
         const category = (entry.category || '').toLowerCase();
         return (name || desc || category).includes(searchTerm);
     });
@@ -290,12 +304,11 @@ function renderBestiary() {
     }
 
     listEl.innerHTML = filteredBestiary.map(entry => {
-        // Safely extract fields with defaults
         const name = entry.name || 'Unnamed';
         const safeName = name.replace(/["']/g, '');
         const tier = entry.tier ? `TL${entry.tier}` : '';
         const category = entry.category || '';
-        const description = entry.description || '';
+        const description = getCreatureDescription(entry); // 👈 use the helper
 
         return `
             <div class="bestiary-entry" data-name="${escHtml(safeName)}" style="
@@ -315,22 +328,45 @@ function renderBestiary() {
                 ${tier ? `<span style="font-size:0.65rem;color:var(--text2);background:var(--bg2);padding:0.05rem 0.3rem;border-radius:12px;">${tier}</span>` : ''}
                 <span style="font-size:0.75rem;color:var(--text2);flex:1;min-width:100px;">${description ? escHtml(description.slice(0, 80)) + (description.length > 80 ? '…' : '') : ''}</span>
                 <button class="btn btn-xs btn-gold bestiary-add-adversary" data-name="${escHtml(safeName)}" title="Add to current encounter">+ Add</button>
+                <button class="btn btn-xs btn-primary bestiary-open-tracker" data-name="${escHtml(safeName)}" title="Open Combat Tracker">🎯</button>
             </div>
         `;
     }).join('');
 
-    // Attach add buttons – use the bestiaryData array for lookup (case‑insensitive)
+    // Attach add buttons
     listEl.querySelectorAll('.bestiary-add-adversary').forEach(btn => {
         btn.addEventListener('click', (e) => {
             e.stopPropagation();
             const name = btn.dataset.name;
-            // Find by case‑insensitive match
             const entry = bestiaryData.find(e => (e.name || '').toLowerCase() === name.toLowerCase());
             if (entry) {
                 addCreatureAsAdversary(entry);
                 showToast(`⚔️ Added "${entry.name}" to encounter.`, 'success');
             } else {
                 showToast(`❌ Creature "${name}" not found in bestiary.`, 'error');
+            }
+        });
+    });
+
+    // 👇 NEW: Open Tracker directly
+    listEl.querySelectorAll('.bestiary-open-tracker').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const name = btn.dataset.name;
+            const entry = bestiaryData.find(e => (e.name || '').toLowerCase() === name.toLowerCase());
+            if (entry) {
+                // Use the same logic as addCreatureAsAdversary to ensure it's in an encounter
+                addCreatureAsAdversary(entry);
+                // Now find the encounter we just added to (or the active one)
+                const state = getState();
+                const encounter = state.encounters.find(e => e.status === 'active') || state.encounters[state.encounters.length - 1];
+                if (encounter) {
+                    openTracker(encounter.id);
+                } else {
+                    showToast('Could not find encounter to open tracker.', 'error');
+                }
+            } else {
+                showToast(`❌ Creature "${name}" not found.`, 'error');
             }
         });
     });
@@ -342,7 +378,8 @@ function renderBestiary() {
             const name = row.dataset.name;
             const entry = bestiaryData.find(e => (e.name || '').toLowerCase() === name.toLowerCase());
             if (entry) {
-                showToast(`${entry.name}: ${entry.description || 'No description.'}`, 'info');
+                const desc = getCreatureDescription(entry);
+                showToast(`${entry.name}: ${desc || 'No description.'}`, 'info');
             }
         });
     });

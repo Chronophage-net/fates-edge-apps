@@ -46,6 +46,10 @@ import {
     getConnectionMode
 } from '../../core/websocket.js';
 import { openKonrehModal } from './kon-reh.js';
+// 👇 NEW: Combat Tracker integration. Path assumes the tracker lives at
+// features/encounters/combat.js (same depth as this file, per its own
+// '../../core/state.js' imports) — adjust if your project layout differs.
+import { getLiveCombatants, isTrackerOpen, setTrackerRangeByName } from '../encounters/combat.js';
 
 // ============================================================
 // CONSTANTS
@@ -163,7 +167,8 @@ function createDefaultGridCombat() {
         cellSize: 40,
         showCoordinates: true,
         showZones: false,
-        tokens: []
+        tokens: [],
+        linkedEncounterId: null // 👈 NEW: which Encounter's combatants this board is synced to, if any
     };
 }
 
@@ -819,6 +824,146 @@ function updateConnectionStatusUI(connected) {
 }
 
 // ============================================================
+// TRACKER INTEGRATION (grid distance <-> narrative range bands)
+// ============================================================
+
+// Straight-line cell distance, same convention the Ruler tool already used
+// (pixel distance / cellSize, rounded) — kept identical so the Ruler and the
+// auto range-sync always agree on "how far apart" two things are. This is
+// exact for a square grid and an approximation for hex/isometric (same
+// simplification the Ruler already made).
+function gridCellDistance(a, b, cellSize) {
+    const dx = a.x - b.x, dy = a.y - b.y;
+    return Math.round(Math.sqrt(dx * dx + dy * dy) / cellSize);
+}
+
+// Per the Advanced Tactics and Grid Combat module: Close = adjacent,
+// Near = up to 6 cells (~30ft), Far = 7-12 cells (~35-60ft), Absent = beyond.
+function cellDistanceToRangeBand(cells) {
+    if (cells <= 1) return 'close';
+    if (cells <= 6) return 'near';
+    if (cells <= 12) return 'far';
+    return 'absent';
+}
+
+// Called after a linked token finishes moving. Recomputes grid distance to
+// every opposing-faction linked token and pushes the matching range band
+// into the Combat Tracker (matched by name). Silently does nothing for any
+// pair where the Tracker isn't currently open — see setTrackerRangeByName.
+function syncRangeFromGrid(movedToken) {
+    if (!movedToken || !movedToken.combatantName) return;
+    const cellSize = state.gridCombat.cellSize || 40;
+    const others = (state.gridCombat.tokens || []).filter(t =>
+        t.id !== movedToken.id && t.combatantName && t.faction !== movedToken.faction
+    );
+    if (others.length === 0) return;
+    let synced = 0;
+    others.forEach(other => {
+        const cells = gridCellDistance(movedToken, other, cellSize);
+        const band = cellDistanceToRangeBand(cells);
+        if (setTrackerRangeByName(movedToken.combatantName, other.combatantName, band)) synced++;
+    });
+    if (synced > 0) updateTrackerLinkStatusUI();
+}
+
+// Pulls combatants from an Encounter into this sheet's grid as tokens. If
+// the Tracker is currently open for that encounter, pulls its live list
+// (players included, current harm/status and all); otherwise falls back to
+// the encounter's saved adversary list (no players — those only exist
+// while the Tracker session is open).
+function importFromTracker() {
+    if (!gridCombatActive) {
+        showToast('Enable Grid Combat mode first.', 'warning');
+        return;
+    }
+    if (konrehActive) {
+        showToast("Disable Kon'reh mode to import Tracker combatants.", 'error');
+        return;
+    }
+    if (isLayerLocked('tokens')) {
+        showToast('Tokens & Grid layer is locked', 'warning');
+        return;
+    }
+
+    const encounters = (getState().encounters || []);
+    if (encounters.length === 0) {
+        showToast('No encounters found — create one in Encounters first.', 'warning');
+        return;
+    }
+
+    const options = encounters.map((e, i) =>
+        `${i + 1}. ${e.title}${isTrackerOpen(e.id) ? ' (tracker open)' : ''}`
+    ).join('\n');
+    const choice = prompt(`Import combatants from which encounter?\n${options}\n\nEnter number:`);
+    if (!choice) return;
+    const idx = parseInt(choice) - 1;
+    if (isNaN(idx) || idx < 0 || idx >= encounters.length) {
+        showToast('Invalid selection', 'error');
+        return;
+    }
+    const encounter = encounters[idx];
+
+    let source;
+    if (isTrackerOpen(encounter.id)) {
+        source = getLiveCombatants().map(c => ({ name: c.name, type: c.type }));
+    } else {
+        source = (encounter.adversaries || []).map(a => ({ name: a.name, type: 'adversary' }));
+        if (source.length === 0) {
+            showToast("That encounter has no adversaries, and its Tracker isn't open.", 'warning');
+            return;
+        }
+        showToast("Tracker isn't open for this encounter — importing adversaries only (no players).", 'info');
+    }
+
+    const cellSize = state.gridCombat.cellSize || 40;
+    const existingNames = new Set(state.gridCombat.tokens.map(t => (t.combatantName || '').toLowerCase()));
+    let added = 0;
+    source.forEach((c, i) => {
+        if (!c.name || existingNames.has(c.name.toLowerCase())) return; // already on the board
+        const col = i % 6, row = Math.floor(i / 6);
+        state.gridCombat.tokens.push({
+            id: 'token-' + Date.now() + '-' + Math.random().toString(36).slice(2, 6),
+            label: c.name,
+            faction: c.type === 'player' ? 'ally' : 'enemy',
+            body: 3,
+            x: col * cellSize,
+            y: row * cellSize + cellSize * 2,
+            color: c.type === 'player' ? '#5a8ab5' : '#c45a5a',
+            harm: 0,
+            fatigue: 0,
+            tags: [],
+            layerId: 'tokens',
+            combatantName: c.name,
+            combatantType: c.type
+        });
+        added++;
+    });
+
+    if (added === 0) {
+        showToast('All combatants from that encounter are already on the board.', 'info');
+        return;
+    }
+
+    state.gridCombat.linkedEncounterId = encounter.id;
+    saveWhiteboardData();
+    restoreDrawings();
+    renderGridCombat();
+    updateTrackerLinkStatusUI();
+    showToast(`🔗 Imported ${added} combatant${added === 1 ? '' : 's'} from "${encounter.title}"`, 'success');
+}
+
+// Small status label next to the toolbar showing which encounter (if any)
+// this sheet's tokens are linked to.
+function updateTrackerLinkStatusUI() {
+    const el = document.getElementById('whiteboard-tracker-link-status');
+    if (!el) return;
+    const encId = state.gridCombat?.linkedEncounterId;
+    if (!encId) { el.textContent = ''; return; }
+    const enc = (getState().encounters || []).find(e => String(e.id) === String(encId));
+    el.textContent = enc ? `🔗 Linked: ${enc.title}` : '';
+}
+
+// ============================================================
 // GRID COMBAT FUNCTIONS
 // ============================================================
 
@@ -829,6 +974,7 @@ function toggleGridCombat() {
     
     const btn = document.getElementById('whiteboard-grid-combat');
     const addTokenBtn = document.getElementById('whiteboard-add-token');
+    const importTrackerBtn = document.getElementById('whiteboard-import-tracker');
     
     if (btn) {
         btn.textContent = gridCombatActive ? '⚔️ Combat ON' : '⚔️ Combat OFF';
@@ -836,6 +982,9 @@ function toggleGridCombat() {
     }
     if (addTokenBtn) {
         addTokenBtn.style.display = gridCombatActive && !konrehActive ? 'inline-block' : 'none';
+    }
+    if (importTrackerBtn) {
+        importTrackerBtn.style.display = gridCombatActive && !konrehActive ? 'inline-block' : 'none';
     }
     
     if (!gridCombatActive && konrehActive) {
@@ -1134,6 +1283,10 @@ function toggleKonreh() {
         if (btn) btn.className = 'btn btn-sm btn-secondary';
         const addTokenBtn = document.getElementById('whiteboard-add-token');
         if (addTokenBtn) addTokenBtn.style.display = 'inline-block';
+        const importTrackerBtn = document.getElementById('whiteboard-import-tracker');
+        if (importTrackerBtn) importTrackerBtn.style.display = 'inline-block';
+        const gridTypeSel = document.getElementById('whiteboard-grid-type');
+        if (gridTypeSel) gridTypeSel.style.display = '';
         return;
     }
 
@@ -1147,6 +1300,10 @@ function toggleKonreh() {
     
     const addTokenBtn = document.getElementById('whiteboard-add-token');
     if (addTokenBtn) addTokenBtn.style.display = 'none';
+    const importTrackerBtn = document.getElementById('whiteboard-import-tracker');
+    if (importTrackerBtn) importTrackerBtn.style.display = 'none';
+    const gridTypeSel = document.getElementById('whiteboard-grid-type');
+    if (gridTypeSel) gridTypeSel.style.display = 'none';
     
     state.gridCombat.tokens = [];
     const cellSize = state.gridCombat.cellSize;
@@ -1244,8 +1401,16 @@ export function render(el) {
                     <button class="btn btn-sm ${gridCombatActive ? 'btn-danger' : 'btn-secondary'}" id="whiteboard-grid-combat">
                         ${gridCombatActive ? '⚔️ Combat ON' : '⚔️ Combat OFF'}
                     </button>
+                    <select id="whiteboard-grid-type" title="Grid type for Combat Mode (Advanced Tactics module: Square or Hex)"
+                            style="${konrehActive ? 'display:none;' : ''}font-size:0.8rem;padding:0.25rem 0.3rem;background:var(--bg2);color:var(--text);border:1px solid var(--border);border-radius:4px;">
+                        <option value="square" ${state.gridCombat.gridType === 'square' ? 'selected' : ''}>◻️ Square</option>
+                        <option value="hex" ${state.gridCombat.gridType === 'hex' ? 'selected' : ''}>⬡ Hex</option>
+                        <option value="isometric" ${state.gridCombat.gridType === 'isometric' ? 'selected' : ''}>◇ Isometric</option>
+                    </select>
                     <button class="btn btn-sm btn-secondary" id="whiteboard-add-token" style="${gridCombatActive && !konrehActive ? '' : 'display:none;'}">🎯 Add Token</button>
+                    <button class="btn btn-sm btn-secondary" id="whiteboard-import-tracker" title="Import combatants from the Encounter Tracker" style="${gridCombatActive && !konrehActive ? '' : 'display:none;'}">🔗 Import Tracker</button>
                     <button class="btn btn-sm ${konrehActive ? 'btn-gold' : 'btn-secondary'}" id="whiteboard-konreh">🌀 Kon'reh</button>
+                    <span id="whiteboard-tracker-link-status" class="text-muted text-sm"></span>
                 </div>
                 <div class="flex gap-1 flex-center">
                     <button class="btn btn-sm btn-secondary" id="whiteboard-toggle-layers" title="Layers">🗂️ Layers</button>
@@ -1449,10 +1614,21 @@ function startDrawing(e) {
     const y = (e.clientY || e.touches?.[0]?.clientY || 0) - rect.top;
     const pos = snapToGrid(x, y);
 
-    if (currentTool === 'select' && gridCombatActive) {
+    // 👇 FIX: this used to require `currentTool === 'select'`, but the
+    // default tool is 'pen' — so clicking a token right after placing it
+    // (before ever switching to the 👆 Select tool) just drew a pen stroke
+    // instead of grabbing the token, which is what "can't drag tokens" was.
+    // Grabbing a token now works with whatever tool happens to be active,
+    // as long as the click actually lands on the token; clicks elsewhere
+    // still fall through to that tool's normal behavior.
+    if (gridCombatActive) {
         const cellSize = state.gridCombat.cellSize || 40;
-        const clickedToken = state.gridCombat.tokens.find(t => 
-            Math.abs(t.x - pos.x) < cellSize && Math.abs(t.y - pos.y) < cellSize
+        // Hit-test against the token's actual cell (t.x/t.y is its
+        // top-left corner) rather than a region straddling that corner,
+        // so clicks register precisely on the visible token.
+        const clickedToken = state.gridCombat.tokens.find(t =>
+            pos.x >= t.x && pos.x <= t.x + cellSize &&
+            pos.y >= t.y && pos.y <= t.y + cellSize
         );
         if (clickedToken) {
             if (isLayerLocked(clickedToken.layerId || 'tokens')) {
@@ -1536,11 +1712,8 @@ function draw(e) {
         restoreDrawings();
         renderGridCombat();
         
-        const dx = rulerEnd.x - rulerStart.x;
-        const dy = rulerEnd.y - rulerStart.y;
-        const distPixels = Math.sqrt(dx*dx + dy*dy);
         const cellSize = state.gridCombat.cellSize || 40;
-        const cells = Math.round(distPixels / cellSize);
+        const cells = gridCellDistance(rulerStart, rulerEnd, cellSize);
         const feet = cells * 5;
         
         ctx.save();
@@ -1644,9 +1817,7 @@ function endDrawing(e) {
                 return;
             }
             
-            const dx = draggedToken.x - tokenStartPos.x;
-            const dy = draggedToken.y - tokenStartPos.y;
-            const cellsMoved = Math.round(Math.sqrt(dx*dx + dy*dy) / cellSize);
+            const cellsMoved = gridCellDistance(draggedToken, tokenStartPos, cellSize);
             
             if (cellsMoved > 0) {
                 logRecordingEvent('token_move', `${draggedToken.label} moved ${cellsMoved} cells (${cellsMoved * 5} ft).`);
@@ -1660,6 +1831,10 @@ function endDrawing(e) {
                 }
                 saveWhiteboardData();
             }
+            // 👇 NEW: push grid-derived range bands into the Combat Tracker
+            // for any opposing linked token, regardless of how far it moved
+            // (even a small shuffle can cross a Close/Near boundary).
+            syncRangeFromGrid(draggedToken);
         }
         isDraggingToken = false;
         draggedToken = null;
@@ -1669,10 +1844,8 @@ function endDrawing(e) {
     }
 
     if (currentTool === 'ruler' && rulerStart && rulerEnd) {
-        const dx = rulerEnd.x - rulerStart.x;
-        const dy = rulerEnd.y - rulerStart.y;
         const cellSize = state.gridCombat.cellSize || 40;
-        const cells = Math.round(Math.sqrt(dx*dx + dy*dy) / cellSize);
+        const cells = gridCellDistance(rulerStart, rulerEnd, cellSize);
         logRecordingEvent('measurement', `GM measured ${cells} cells (${cells * 5} ft).`);
         isDrawing = false;
         rulerStart = null;
@@ -1712,8 +1885,16 @@ function endDrawing(e) {
 
 function restoreDrawings() {
     if (!ctx) return;
+    updateTrackerLinkStatusUI(); // 👈 NEW: keep the link label current for whichever sheet is active
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    if (state.settings.showGrid !== false) drawGrid();
+    // 👇 FIX: previously this drew the plain reference grid (always
+    // state.settings.gridType, which the Combat Mode grid-type selector
+    // never touched) UNCONDITIONALLY, then renderGridCombat() drew a second,
+    // separate grid on top using gridCombat.gridType. Selecting "Hex" only
+    // ever changed the second, fainter overlay — the square reference grid
+    // underneath never went away, so it still looked square. When Combat
+    // Mode owns the grid, let it be the only grid drawn.
+    if (state.settings.showGrid !== false && !gridCombatActive) drawGrid();
 
     for (const layer of layersInDrawOrder()) {
         if (!isLayerVisibleNow(layer)) continue;
@@ -1755,6 +1936,16 @@ export function attachEvents() {
     
     document.getElementById('whiteboard-grid-combat')?.addEventListener('click', toggleGridCombat);
     document.getElementById('whiteboard-add-token')?.addEventListener('click', addGridToken);
+    // 👇 NEW: grid type toggle + tracker import
+    document.getElementById('whiteboard-grid-type')?.addEventListener('change', (e) => {
+        state.gridCombat.gridType = e.target.value;
+        state.settings.gridType = e.target.value; // 👈 keep the background grid in sync too
+        saveWhiteboardData();
+        restoreDrawings();
+        renderGridCombat();
+        showToast(`Grid type set to ${e.target.value}`, 'info');
+    });
+    document.getElementById('whiteboard-import-tracker')?.addEventListener('click', importFromTracker);
     document.getElementById('whiteboard-konreh')?.addEventListener('click', toggleKonreh);
     document.getElementById('whiteboard-konreh')?.addEventListener('click', () => {
         openKonrehModal();

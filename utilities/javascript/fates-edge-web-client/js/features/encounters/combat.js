@@ -1,13 +1,15 @@
 /**
  * Combat Tracker - Advanced initiative and timer tracking
- * Integrated with Factions, Rivals, Followers, Assets, and Patrons
+ * Integrated with Factions, Rivals, Followers, Assets, Patrons, and Bestiary
  * ✅ Keyboard shortcuts: Space = next turn, R = reset timer
  * ✅ Cleaner UI with better feedback
+ * ✅ Import from Bestiary via searchable modal
  */
 
-import { getState } from '../../core/state.js';
+import { getState, saveState } from '../../core/state.js';
 import { showToast } from '../../components/Toast.js';
 import { escHtml } from '../../core/utils.js';
+import { loadBestiaryData, getCreatureDescription } from './bestiary.js'; // 👈 Integration import
 
 let modal = null;
 let currentEncounterId = null;
@@ -21,6 +23,160 @@ let isTimerRunning = false;
 let timerInterval = null;
 let combatLog = [];
 let keyHandler = null;  // Store for cleanup
+
+// 👇 NEW: Range tracking (relative, narrative distance per PC/Adversary pair)
+let rangeMap = {};          // { "pairKey": "close" | "near" | "far" | "absent" }
+let rangeGridOpen = false;  // whether the full range-grid panel is expanded
+
+// Order matters: index is used to cycle forward/back through bands.
+const RANGE_BANDS = [
+    { key: 'close',  label: 'Close',  short: 'C', color: 'var(--red)',    desc: "Arm's length, grappling distance." },
+    { key: 'near',   label: 'Near',   short: 'N', color: 'var(--gold)',   desc: 'Same room or immediate area.' },
+    { key: 'far',    label: 'Far',    short: 'F', color: 'var(--blue)',   desc: 'Visible but not immediately reachable.' },
+    { key: 'absent', label: 'Absent', short: 'A', color: 'var(--text3)',  desc: 'Off-screen; requires a scene change.' }
+];
+const DEFAULT_RANGE = 'near';
+
+// ============================================================
+// RANGE TRACKING HELPERS
+// ============================================================
+
+// Pair key is order-independent so range(A,B) === range(B,A)
+function rangePairKey(idA, idB) {
+    return [idA, idB].sort().join('::');
+}
+
+function getRangeBand(idA, idB) {
+    if (idA === idB) return null;
+    return rangeMap[rangePairKey(idA, idB)] || DEFAULT_RANGE;
+}
+
+function setRangeBand(idA, idB, bandKey) {
+    if (idA === idB) return;
+    rangeMap[rangePairKey(idA, idB)] = bandKey;
+}
+
+function cycleRangeBand(idA, idB) {
+    const current = getRangeBand(idA, idB);
+    const idx = RANGE_BANDS.findIndex(b => b.key === current);
+    const next = RANGE_BANDS[(idx + 1) % RANGE_BANDS.length];
+    setRangeBand(idA, idB, next.key);
+}
+
+function getRangeBandInfo(bandKey) {
+    return RANGE_BANDS.find(b => b.key === bandKey) || RANGE_BANDS[1];
+}
+
+// When a new combatant joins, default its range to every existing
+// combatant of the opposite type (player <-> adversary) to "Near".
+// Same-type pairs (player-player, adversary-adversary) aren't tracked –
+// range bands in Fate's Edge matter for who's threatening whom, not
+// for allies standing near each other.
+function initRangeForNewCombatant(newCombatant) {
+    combatants.forEach(other => {
+        if (other.id === newCombatant.id) return;
+        if (other.type === newCombatant.type) return;
+        const key = rangePairKey(newCombatant.id, other.id);
+        if (!(key in rangeMap)) rangeMap[key] = DEFAULT_RANGE;
+    });
+}
+
+// Rebuild the default cross-type pairings for the whole current
+// combatants list (used right after openTracker populates it).
+function initRangeForAllCombatants() {
+    for (let i = 0; i < combatants.length; i++) {
+        for (let j = i + 1; j < combatants.length; j++) {
+            const a = combatants[i], b = combatants[j];
+            if (a.type === b.type) continue;
+            const key = rangePairKey(a.id, b.id);
+            if (!(key in rangeMap)) rangeMap[key] = DEFAULT_RANGE;
+        }
+    }
+}
+
+function clearRangeForCombatant(id) {
+    Object.keys(rangeMap).forEach(key => {
+        if (key.split('::').includes(id)) delete rangeMap[key];
+    });
+}
+
+// Builds the full PC × Adversary range matrix panel.
+function buildRangeGridHtml() {
+    const players = combatants.filter(c => c.type === 'player');
+    const adversaries = combatants.filter(c => c.type === 'adversary');
+
+    let bodyHtml;
+    if (players.length === 0 || adversaries.length === 0) {
+        bodyHtml = `
+            <div style="color:var(--text3);padding:1rem;text-align:center;font-size:0.85rem;">
+                Add at least one 👤 Player and one 👾 Adversary to track ranges between them.
+            </div>`;
+    } else {
+        const headerCells = adversaries.map(a => `
+            <th style="padding:0.4rem 0.5rem;font-size:0.75rem;color:var(--text2);font-weight:600;white-space:nowrap;">
+                ${escHtml(a.name)}
+            </th>`).join('');
+
+        const rows = players.map(p => {
+            const cells = adversaries.map(a => {
+                const band = getRangeBand(p.id, a.id);
+                const info = getRangeBandInfo(band);
+                return `
+                    <td style="padding:0.3rem 0.4rem;text-align:center;">
+                        <button class="range-cell" data-a="${p.id}" data-b="${a.id}"
+                            title="${escHtml(p.name)} ↔ ${escHtml(a.name)}: ${info.label} — ${info.desc} (click to cycle)"
+                            style="
+                                min-width:64px; font-size:0.75rem; font-weight:700; color:white;
+                                background:${info.color}; border:none; border-radius:8px;
+                                padding:0.3rem 0.5rem; cursor:pointer; transition:transform 0.15s ease;
+                            ">${info.label}</button>
+                    </td>`;
+            }).join('');
+            return `
+                <tr>
+                    <th style="padding:0.4rem 0.6rem;text-align:right;font-size:0.8rem;color:var(--text);white-space:nowrap;">
+                        ${escHtml(p.name)}
+                    </th>
+                    ${cells}
+                </tr>`;
+        }).join('');
+
+        bodyHtml = `
+            <div style="overflow-x:auto;">
+                <table style="border-collapse:collapse;width:100%;">
+                    <thead>
+                        <tr>
+                            <th></th>
+                            ${headerCells}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${rows}
+                    </tbody>
+                </table>
+            </div>`;
+    }
+
+    const legend = RANGE_BANDS.map(b => `
+        <span style="display:inline-flex;align-items:center;gap:0.3rem;font-size:0.7rem;color:var(--text2);margin-right:0.9rem;">
+            <span style="width:10px;height:10px;border-radius:3px;background:${b.color};display:inline-block;"></span>
+            <strong style="color:var(--text);">${b.label}</strong> — ${b.desc}
+        </span>`).join('');
+
+    return `
+        <div style="
+            background: var(--bg3); border-radius: 12px; padding: 0.9rem 1rem;
+            margin-bottom: 1.25rem; border: 1px solid var(--border);
+        ">
+            <div style="font-size:0.7rem;color:var(--text3);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:0.6rem;">
+                📏 Range Grid — click any cell to cycle Close → Near → Far → Absent
+            </div>
+            ${bodyHtml}
+            <div style="margin-top:0.7rem;padding-top:0.6rem;border-top:1px solid var(--border);">
+                ${legend}
+            </div>
+        </div>`;
+}
 
 // ============================================================
 // INTEGRATION HELPERS
@@ -117,6 +273,12 @@ export function openTracker(encounterId) {
     timerName = 'Combat Timer';
     isTimerRunning = false;
     combatLog = [];
+
+    // 👇 NEW: fresh range map for this combat, defaulted to Near for
+    // every PC/Adversary pair (players are added separately via "+ Player").
+    rangeMap = {};
+    rangeGridOpen = false;
+    initRangeForAllCombatants();
     
     if (timerInterval) {
         clearInterval(timerInterval);
@@ -131,6 +293,15 @@ export function openTracker(encounterId) {
 // ============================================================
 
 function renderTracker() {
+    // 👇 FIX: renderTracker() is called on every action (damage, heal, sort,
+    // timer tick, and now every range click) to refresh the view. It was
+    // never removing the previous modal node first, so each action silently
+    // stacked a brand-new full-screen modal on top of the last one. Clean up
+    // any existing modal before building the new one.
+    if (modal && modal.parentNode) {
+        modal.parentNode.removeChild(modal);
+    }
+
     // Build modal
     modal = document.createElement('div');
     modal.style.cssText = `
@@ -140,12 +311,30 @@ function renderTracker() {
         animation: fadeIn 0.3s ease;
     `;
     
+    // 👇 NEW: reference combatant for the "range to active" chip on each row
+    const focusCombatant = combatants[activeIndex] || null;
+
     const combatantsHtml = combatants.map((c, i) => {
         const isActive = i === activeIndex && c.status === 'active';
         const isDefeated = c.status === 'defeated';
         const harmPercent = (c.harm / c.maxHarm) * 100;
         const hasLinks = c.linkedFaction || c.linkedPatron || c.linkedFollower || c.linkedAsset || c.linkedRival;
-        
+
+        // 👇 NEW: range chip showing this combatant's distance to the
+        // currently-focused combatant (only meaningful across player/adversary lines)
+        let rangeChip = '';
+        if (focusCombatant && focusCombatant.id !== c.id && focusCombatant.type !== c.type) {
+            const band = getRangeBand(c.id, focusCombatant.id);
+            const info = getRangeBandInfo(band);
+            rangeChip = `<span class="range-chip" data-a="${c.id}" data-b="${focusCombatant.id}"
+                title="Range to ${escHtml(focusCombatant.name)}: ${info.label} — ${info.desc} (click to cycle)"
+                style="
+                    font-size:0.65rem; font-weight:700; color:white; background:${info.color};
+                    padding:0.05rem 0.4rem; border-radius:10px; cursor:pointer; flex-shrink:0;
+                    letter-spacing:0.02em;
+                ">📏 ${info.label}</span>`;
+        }
+
         let linkBadges = '';
         if (c.linkedFaction) linkBadges += `<span class="badge faction-badge" style="background:${c.linkedFaction.color || 'var(--gold)'};">🏛️</span>`;
         if (c.linkedPatron) linkBadges += `<span class="badge patron-badge" style="background:var(--purple);">🌟</span>`;
@@ -191,6 +380,7 @@ function renderTracker() {
                         ">${escHtml(c.name)}</span>
                         <div style="display: flex; align-items: center; gap: 0.3rem; flex-shrink: 0;">
                             ${linkBadges}
+                            ${rangeChip}
                             <span style="font-size: 0.7rem; color: var(--text3);">Init ${c.initiative}</span>
                         </div>
                     </div>
@@ -394,9 +584,20 @@ function renderTracker() {
                                 style="padding: 0.4rem 0.75rem; font-size: 0.85rem; transition: all 0.2s ease;">
                             🏛️ Import
                         </button>
+                        <!-- 👇 NEW: Import from Bestiary -->
+                        <button class="btn btn-sm btn-ghost" id="combat-import-bestiary" 
+                                style="padding: 0.4rem 0.75rem; font-size: 0.85rem; transition: all 0.2s ease;">
+                            📖 Bestiary
+                        </button>
                         <button class="btn btn-sm btn-ghost" id="combat-sort" 
                                 style="padding: 0.4rem 0.75rem; font-size: 0.85rem; transition: all 0.2s ease;">
                             🔄 Sort
+                        </button>
+                        <!-- 👇 NEW: Toggle full Range Grid -->
+                        <button class="btn btn-sm ${rangeGridOpen ? 'btn-gold' : 'btn-ghost'}" id="combat-toggle-ranges" 
+                                style="padding: 0.4rem 0.75rem; font-size: 0.85rem; transition: all 0.2s ease;"
+                                title="Show/hide the full PC × Adversary range grid">
+                            📏 Ranges
                         </button>
                     </div>
                 </div>
@@ -404,6 +605,9 @@ function renderTracker() {
                     ${combatantsHtml || '<div style="color:var(--text3);padding:2rem;text-align:center;">No combatants. Add some to begin!</div>'}
                 </div>
             </div>
+
+            <!-- 👇 NEW: Range Grid panel -->
+            ${rangeGridOpen ? buildRangeGridHtml() : ''}
             
             <!-- Combat Log -->
             ${combatLog.length > 0 ? `
@@ -558,7 +762,27 @@ function renderTracker() {
     modal.querySelector('#combat-add-combatant')?.addEventListener('click', addCombatant);
     modal.querySelector('#combat-add-player')?.addEventListener('click', addPlayer);
     modal.querySelector('#combat-import-factions')?.addEventListener('click', importFromFactions);
+    modal.querySelector('#combat-import-bestiary')?.addEventListener('click', importFromBestiary); // 👈 NEW
     modal.querySelector('#combat-sort')?.addEventListener('click', sortCombatants);
+    // 👇 NEW: Range grid toggle + interactive range chips/cells
+    modal.querySelector('#combat-toggle-ranges')?.addEventListener('click', () => {
+        rangeGridOpen = !rangeGridOpen;
+        renderTracker();
+    });
+    modal.querySelectorAll('.range-chip').forEach(chip => {
+        chip.addEventListener('click', (e) => {
+            e.stopPropagation();
+            cycleRangeBand(chip.dataset.a, chip.dataset.b);
+            renderTracker();
+        });
+    });
+    modal.querySelectorAll('.range-cell').forEach(cell => {
+        cell.addEventListener('click', (e) => {
+            e.stopPropagation();
+            cycleRangeBand(cell.dataset.a, cell.dataset.b);
+            renderTracker();
+        });
+    });
     modal.querySelector('#combat-next')?.addEventListener('click', nextCombatant);
     modal.querySelector('#combat-end-round')?.addEventListener('click', endRound);
     modal.querySelector('#combat-clear-log')?.addEventListener('click', () => {
@@ -626,13 +850,11 @@ function renderTracker() {
             keyHandler = null;
             return;
         }
-        // Space to advance turn (only if not typing in input/textarea/select)
         if (e.key === ' ' && !e.target.matches('input, textarea, select')) {
             e.preventDefault();
             const nextBtn = modal.querySelector('#combat-next');
             if (nextBtn) nextBtn.click();
         }
-        // R to reset timer
         if (e.key === 'r' && !e.target.matches('input, textarea, select')) {
             e.preventDefault();
             const resetBtn = modal.querySelector('#combat-timer-reset');
@@ -682,7 +904,7 @@ function addCombatant() {
     const initiative = parseInt(prompt('Enter initiative (1-20):', Math.floor(Math.random() * 20) + 1) || '10');
     const harm = parseInt(prompt('Max Harm (1-10):', '3') || '3');
     
-    combatants.push({
+    const newAdversary = {
         id: 'combat-' + Date.now() + '-' + Math.random().toString(36).substr(2, 4),
         name: name,
         initiative: Math.min(Math.max(initiative, 1), 20),
@@ -696,7 +918,9 @@ function addCombatant() {
         linkedFollower: getLinkedFollower(name),
         linkedAsset: getLinkedAsset(name),
         linkedRival: getLinkedRival(name)
-    });
+    };
+    combatants.push(newAdversary);
+    initRangeForNewCombatant(newAdversary); // 👈 NEW: default range to existing players
     sortCombatants();
     addLog('info', `Added adversary: ${name}`);
     renderTracker();
@@ -709,7 +933,7 @@ function addPlayer() {
     const initiative = parseInt(prompt('Enter initiative (1-20):', Math.floor(Math.random() * 20) + 1) || '10');
     const harm = parseInt(prompt('Max Harm (1-10):', '4') || '4');
     
-    combatants.push({
+    const newPlayer = {
         id: 'combat-' + Date.now() + '-' + Math.random().toString(36).substr(2, 4),
         name: `🧙 ${name}`,
         initiative: Math.min(Math.max(initiative, 1), 20),
@@ -723,7 +947,9 @@ function addPlayer() {
         linkedFollower: null,
         linkedAsset: null,
         linkedRival: null
-    });
+    };
+    combatants.push(newPlayer);
+    initRangeForNewCombatant(newPlayer); // 👈 NEW: default range to existing adversaries
     sortCombatants();
     addLog('info', `Added player: ${name}`);
     renderTracker();
@@ -750,7 +976,7 @@ function importFromFactions() {
         return;
     }
     const faction = factions[idx];
-    combatants.push({
+    const newFactionCombatant = {
         id: 'combat-' + Date.now() + '-' + Math.random().toString(36).substr(2, 4),
         name: faction.name,
         initiative: Math.floor(Math.random() * 20) + 5 + (faction.standing || 0),
@@ -764,11 +990,130 @@ function importFromFactions() {
         linkedFollower: null,
         linkedAsset: null,
         linkedRival: null
-    });
+    };
+    combatants.push(newFactionCombatant);
+    initRangeForNewCombatant(newFactionCombatant); // 👈 NEW: default range to existing players
     sortCombatants();
     addLog('info', `Imported faction: ${faction.name}`);
     renderTracker();
     showToast(`🏛️ Imported ${faction.name} as combatant`, 'success');
+}
+
+// 👇 NEW: Import from Bestiary
+async function importFromBestiary() {
+    const creatures = await loadBestiaryData();
+    if (!creatures || creatures.length === 0) {
+        showToast('Bestiary not loaded yet.', 'error');
+        return;
+    }
+
+    // Create a modal for searching
+    const searchModal = document.createElement('div');
+    searchModal.style.cssText = `
+        position: fixed; inset: 0; background: rgba(0,0,0,0.7);
+        display: flex; align-items: center; justify-content: center;
+        z-index: 2000; backdrop-filter: blur(8px);
+    `;
+    searchModal.innerHTML = `
+        <div style="background: var(--bg-panel); padding: 1.5rem; border-radius: 12px;
+                    max-width: 500px; width: 100%; max-height: 80vh; overflow-y: auto;">
+            <h3 style="margin-top:0;">📖 Import from Bestiary</h3>
+            <input type="text" id="bestiary-import-search" placeholder="Search creatures..." 
+                   style="width:100%; padding:0.4rem; margin-bottom:0.5rem;">
+            <div id="bestiary-import-list" style="max-height:300px; overflow-y:auto;"></div>
+            <button id="bestiary-import-close" class="btn btn-sm btn-ghost" 
+                    style="margin-top:0.5rem;">Cancel</button>
+        </div>
+    `;
+    document.body.appendChild(searchModal);
+
+    const searchInput = searchModal.querySelector('#bestiary-import-search');
+    const listContainer = searchModal.querySelector('#bestiary-import-list');
+    const closeBtn = searchModal.querySelector('#bestiary-import-close');
+
+    function renderList(filter = '') {
+        const term = filter.toLowerCase().trim();
+        const filtered = creatures.filter(c => 
+            (c.name || '').toLowerCase().includes(term) ||
+            (getCreatureDescription(c) || '').toLowerCase().includes(term)
+        );
+        if (filtered.length === 0) {
+            listContainer.innerHTML = '<div style="color:var(--text3);padding:1rem;">No creatures found.</div>';
+            return;
+        }
+        listContainer.innerHTML = filtered.map(c => `
+            <div class="bestiary-import-item" data-name="${escHtml(c.name)}" 
+                 style="padding:0.4rem; border-bottom:1px solid var(--border); cursor:pointer;
+                        display:flex; justify-content:space-between; align-items:center;">
+                <span>${escHtml(c.name)}</span>
+                <span style="font-size:0.7rem;color:var(--text3);">${c.category || ''}</span>
+            </div>
+        `).join('');
+
+        listContainer.querySelectorAll('.bestiary-import-item').forEach(item => {
+            item.addEventListener('click', () => {
+                const name = item.dataset.name;
+                const entry = creatures.find(e => e.name === name);
+                if (entry) {
+                    // Add to current encounter's adversaries
+                    const state = getState();
+                    const encounter = state.encounters?.find(e => String(e.id) === String(currentEncounterId));
+                    if (!encounter) {
+                        showToast('No encounter found.', 'error');
+                        searchModal.remove();
+                        return;
+                    }
+                    if (!encounter.adversaries) encounter.adversaries = [];
+                    const exists = encounter.adversaries.some(a => a.name.toLowerCase() === name.toLowerCase());
+                    if (!exists) {
+                        encounter.adversaries.push({
+                            name: entry.name,
+                            body: getCreatureDescription(entry) || '',
+                            tier: entry.tier || 2,
+                            stats: entry.stats || {}
+                        });
+                        saveState();
+                        showToast(`⚔️ Added "${name}" to combat.`, 'success');
+                        // 👇 FIX: previously this rebuilt `combatants` from
+                        // encounter.adversaries alone, which silently deleted
+                        // every player combatant and reset harm/status for
+                        // every adversary already in the fight. Just add the
+                        // one new combatant instead, and give it a default
+                        // range to everyone already present.
+                        const newCombatant = {
+                            id: 'combat-' + Date.now() + '-' + Math.random().toString(36).substr(2, 4),
+                            name: entry.name || 'Adversary',
+                            initiative: Math.floor(Math.random() * 20) + 1,
+                            harm: 0,
+                            maxHarm: entry.harm || 3,
+                            status: 'active',
+                            notes: getCreatureDescription(entry) || '',
+                            type: 'adversary',
+                            linkedFaction: getLinkedFaction(entry.name),
+                            linkedPatron: getLinkedPatron(entry.name),
+                            linkedFollower: getLinkedFollower(entry.name),
+                            linkedAsset: getLinkedAsset(entry.name),
+                            linkedRival: getLinkedRival(entry.name)
+                        };
+                        combatants.push(newCombatant);
+                        initRangeForNewCombatant(newCombatant);
+                        sortCombatants();
+                        renderTracker();
+                        searchModal.remove();
+                    } else {
+                        showToast(`"${name}" already in this encounter.`, 'info');
+                        searchModal.remove();
+                    }
+                }
+            });
+        });
+    }
+
+    searchInput.addEventListener('input', (e) => renderList(e.target.value));
+    closeBtn.addEventListener('click', () => searchModal.remove());
+    searchModal.addEventListener('click', (e) => { if (e.target === searchModal) searchModal.remove(); });
+
+    renderList('');
 }
 
 function sortCombatants() {
@@ -869,7 +1214,9 @@ function removeCombatant(idx) {
     if (idx >= 0 && idx < combatants.length) {
         if (confirm(`Remove ${combatants[idx].name}?`)) {
             const name = combatants[idx].name;
+            const removedId = combatants[idx].id;
             combatants.splice(idx, 1);
+            clearRangeForCombatant(removedId); // 👈 NEW: drop stale range entries
             if (activeIndex >= combatants.length) activeIndex = Math.max(0, combatants.length - 1);
             addLog('info', `Removed ${name}`);
             renderTracker();
@@ -882,4 +1229,5 @@ function removeCombatant(idx) {
 // EXPORTS
 // ============================================================
 
+// Default export as before
 export default { openTracker };

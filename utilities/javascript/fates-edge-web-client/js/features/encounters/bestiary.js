@@ -1,14 +1,15 @@
 /**
  * Bestiary – Creature reference with wiki integration
  * Uses multi‑path discovery (like Search) with fallback to manifest + individual files
+ * Integrated with Combat Tracker: one-click to open tracker with creature added
  */
 
 import { getState, saveState } from '../../core/state.js';
 import { escHtml } from '../../core/utils.js';
 import { showToast } from '../../components/Toast.js';
 import { logToSession, addVTTEvent } from '../gm-tools/index.js';
-// ─── Import shared discovery ─────────────────────────────────
 import { discoverBestiary } from '../../core/discovery.js';
+import { openTracker } from './combat.js'; // 👈 Integration import
 
 let container = null;
 let bestiaryData = [];
@@ -56,18 +57,10 @@ function safeString(val) {
     return String(val);
 }
 
-// ─── NEW: flatten wrapped { "Creature Name": {...fields} } entries ───
-// The Fates' Edge bestiary.json stores each creature as a single-key
-// object where the key IS the creature's name, e.g.:
-//   { "Echo (Class I Spirit)": { page, summary, locations, lore, connections } }
-// This unwraps that shape into a flat object with a real "name" field,
-// while leaving already-flat entries ({ name: "...", ... }) untouched.
+// ─── flatten wrapped { "Creature Name": {...fields} } entries ───
 function flattenWrappedEntry(raw) {
     if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return raw;
-
-    // Already flat — has its own "name" field, nothing to do
     if (raw.name) return raw;
-
     const keys = Object.keys(raw);
     if (keys.length === 1 && raw[keys[0]] && typeof raw[keys[0]] === 'object') {
         const name = keys[0];
@@ -80,12 +73,9 @@ function flattenWrappedEntry(raw) {
             locations: inner.locations || [],
             connections: inner.connections || [],
             page: inner.page || '',
-            // preserve any other fields the entry might carry
             ...inner
         };
     }
-
-    // Not a recognizable wrapped shape — return as-is
     return raw;
 }
 
@@ -117,7 +107,8 @@ function formatText(text) {
     return escHtml(text).replace(/\n/g, '<br>');
 }
 
-function getCreatureDescription(entry) {
+// 👇 EXPORTED for use by combat
+export function getCreatureDescription(entry) {
     if (!entry) return 'No description available.';
     if (typeof entry.description === 'string' && entry.description) return entry.description;
     if (entry.description && typeof entry.description === 'object') {
@@ -144,7 +135,6 @@ function getCreatureDescription(entry) {
 // ============================================================
 
 async function loadBestiaryFromPaths() {
-    // Try each path in order
     for (const path of BESTIARY_PATHS) {
         try {
             const response = await fetch(path, { cache: 'no-cache' });
@@ -165,10 +155,8 @@ async function loadBestiaryFromPaths() {
 }
 
 async function loadBestiaryFromIndividualFiles() {
-    // Use shared discovery to get slugs
     const slugs = await discoverBestiary(BESTIARY_INDIVIDUAL_PATH);
     if (slugs.length === 0) return null;
-
     const creatures = [];
     for (const slug of slugs) {
         try {
@@ -194,7 +182,6 @@ async function loadFallbackBestiary() {
 }
 
 export async function loadBestiaryData() {
-    // Check sessionStorage cache first
     try {
         const cached = sessionStorage.getItem(CACHE_KEY);
         if (cached) {
@@ -207,7 +194,6 @@ export async function loadBestiaryData() {
         }
     } catch (_) {}
 
-    // 1. Try multi‑path JSON
     let data = await loadBestiaryFromPaths();
     if (data) {
         bestiaryData = data;
@@ -215,7 +201,6 @@ export async function loadBestiaryData() {
         return bestiaryData;
     }
 
-    // 2. Try individual files via shared discovery
     data = await loadBestiaryFromIndividualFiles();
     if (data) {
         bestiaryData = data;
@@ -223,7 +208,6 @@ export async function loadBestiaryData() {
         return bestiaryData;
     }
 
-    // 3. Fallback
     data = await loadFallbackBestiary();
     bestiaryData = data;
     try { sessionStorage.setItem(CACHE_KEY, JSON.stringify(data)); } catch (_) {}
@@ -361,6 +345,8 @@ function renderBestiaryList(filter = '') {
                 <div style="display:flex;gap:0.3rem;flex-wrap:wrap;">
                     <button class="btn btn-xs btn-primary bestiary-detail" data-name="${escHtml(safeName)}" title="Details">📄</button>
                     <button class="btn btn-xs btn-gold bestiary-add-adversary" data-name="${escHtml(safeName)}" title="Add as Adversary">⚔️</button>
+                    <!-- 👇 NEW: Open Combat Tracker button -->
+                    <button class="btn btn-xs btn-gold bestiary-open-tracker" data-name="${escHtml(safeName)}" title="Open Combat Tracker">🎯</button>
                 </div>
             </div>
         `;
@@ -382,6 +368,17 @@ function renderBestiaryList(filter = '') {
             const name = btn.dataset.name;
             const entry = bestiaryData.find(e => (e.name || '').toLowerCase() === name.toLowerCase());
             if (entry) addCreatureAsAdversary(entry);
+            else showToast(`Creature "${name}" not found.`, 'error');
+        });
+    });
+
+    // 👇 NEW: Open Tracker from list
+    listEl.querySelectorAll('.bestiary-open-tracker').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const name = btn.dataset.name;
+            const entry = bestiaryData.find(e => (e.name || '').toLowerCase() === name.toLowerCase());
+            if (entry) openTrackerForCreature(entry);
             else showToast(`Creature "${name}" not found.`, 'error');
         });
     });
@@ -472,8 +469,6 @@ function showCreatureDetail(entry) {
         statsHtml += '</div>';
     }
 
-    // Extra lore fields present in the flattened wiki-style entries
-    // (locations / connections) — shown only when available.
     let extraHtml = '';
     if (Array.isArray(entry.locations) && entry.locations.length > 0) {
         extraHtml += `<div style="margin-top:0.5rem;"><strong>Locations:</strong> ${entry.locations.map(l => escHtml(l)).join(', ')}</div>`;
@@ -516,6 +511,8 @@ function showCreatureDetail(entry) {
             <div style="margin-top:1rem;display:flex;gap:0.5rem;flex-wrap:wrap;">
                 <button class="btn btn-sm btn-gold add-adversary-from-detail" data-name="${escHtml(name)}">⚔️ Add as Adversary</button>
                 <button class="btn btn-sm btn-primary add-encounter-from-detail" data-name="${escHtml(name)}">📋 Add to Encounter</button>
+                <!-- 👇 NEW: Open Tracker from detail -->
+                <button class="btn btn-sm btn-gold open-tracker-from-detail" data-name="${escHtml(name)}">🎯 Open Tracker</button>
             </div>
         </div>
     `;
@@ -531,6 +528,12 @@ function showCreatureDetail(entry) {
 
     overlay.querySelector('.add-encounter-from-detail').addEventListener('click', () => {
         addCreatureToEncounter(entry);
+        overlay.remove();
+    });
+
+    // 👇 NEW: Open Tracker from detail
+    overlay.querySelector('.open-tracker-from-detail').addEventListener('click', () => {
+        openTrackerForCreature(entry);
         overlay.remove();
     });
 }
@@ -618,6 +621,20 @@ function addCreatureToEncounter(entry) {
     } catch (e) { /* ignore */ }
 }
 
+// 👇 NEW: Function to add creature and open tracker
+function openTrackerForCreature(entry) {
+    // First ensure it's added as adversary (creates/uses encounter)
+    addCreatureAsAdversary(entry);
+    // Now find the encounter we just added to (or the active one)
+    const state = getState();
+    const encounter = state.encounters.find(e => e.status === 'active') || state.encounters[state.encounters.length - 1];
+    if (encounter) {
+        openTracker(encounter.id);
+    } else {
+        showToast('Could not find encounter to open tracker.', 'error');
+    }
+}
+
 // ============================================================
 // EVENTS
 // ============================================================
@@ -688,5 +705,6 @@ export default {
     attachEvents,
     loadBestiaryData,
     loadWikiData,
-    addCreatureAsAdversary
+    addCreatureAsAdversary,
+    getCreatureDescription // export for other modules
 };

@@ -325,11 +325,33 @@ jobs:
         working-directory: utilities/javascript/fates-edge-desktop-client
         shell: bash
         run: |
-          if [ ! -d "dist" ] || [ -z "$(ls -A dist)" ]; then
-            echo "❌ Desktop build failed – dist directory is empty"
+          echo "--- dist/ contents ---"
+          find dist -maxdepth 2 2>/dev/null || echo "(no dist/ directory)"
+
+          # Check for the actual installer artifact expected on this
+          # platform, not just "dist/ has something in it". A partial
+          # or misconfigured electron-builder run can leave dist/
+          # non-empty (unpacked app, config yaml, etc.) without ever
+          # producing a real installer, and that must fail loudly.
+          case "${{ matrix.platform }}" in
+            mac)   PATTERNS="dist/*.dmg dist/*.zip" ;;
+            win)   PATTERNS="dist/*.exe" ;;
+            linux) PATTERNS="dist/*.AppImage dist/*.deb dist/*.rpm" ;;
+          esac
+
+          FOUND=""
+          for p in $PATTERNS; do
+            compgen -G "$p" > /dev/null 2>&1 && FOUND="yes"
+          done
+
+          if [ -z "$FOUND" ]; then
+            echo "❌ electron-builder produced no installer for '${{ matrix.platform }}' (expected one of: $PATTERNS)"
+            echo "dist/ may exist but doesn't contain the expected output."
+            echo "Check the build:${{ matrix.platform }} script and the electron-builder 'build' target config in package.json."
             exit 1
           fi
-          echo "✅ dist contents:"
+
+          echo "✅ Found installer(s) for ${{ matrix.platform }}:"
           ls -la dist/
 
       - name: Upload Desktop artifact
@@ -343,14 +365,21 @@ jobs:
             utilities/javascript/fates-edge-desktop-client/dist/*.AppImage
             utilities/javascript/fates-edge-desktop-client/dist/*.deb
             utilities/javascript/fates-edge-desktop-client/dist/*.rpm
-          if-no-files-found: warn
+          if-no-files-found: error
 
   # ─── Create Release ──────────────────────────────────────────────
   create-release:
     name: Create Release
     runs-on: ubuntu-latest
     needs: [build-components, build-desktop]
-    if: needs.build-components.result == 'success' && needs.build-desktop.result == 'success'
+    # Desktop builds run as a matrix across three OSes; one flaky/broken
+    # platform (e.g. an unsigned Windows build) shouldn't block the
+    # release for everything else. We still wait for build-desktop to
+    # finish (needs: above), but no longer hard-require every leg of
+    # it to succeed. Failed platforms will just be missing their
+    # installer from the release assets, and will show as a red X
+    # in the Actions run so it's not silently lost.
+    if: ${{ !cancelled() && needs.build-components.result == 'success' }}
     steps:
       - name: Download all artifacts
         uses: actions/download-artifact@v4
@@ -470,4 +499,4 @@ jobs:
     with:
       version: ${{ needs.build-components.outputs.release_tag }}
       push: true
-    secrets: inherit
+    secrets: inherit 
