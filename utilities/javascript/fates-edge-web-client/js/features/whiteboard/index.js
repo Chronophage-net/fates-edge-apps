@@ -1,7 +1,7 @@
 // features/whiteboard/index.js
 /**
  * Whiteboard - Campaign Whiteboard with drawing, notes, and image support
- * 
+ *
  * Features:
  * - Freehand drawing with color/size/opacity controls, plus line, rectangle,
  *   circle/ellipse, arrow, ruler, and text-note tools
@@ -18,6 +18,10 @@
  *   flat payload shape and the new multi-sheet shape, for compatibility
  *   with any peer still on the previous version)
  * - Grid combat mode with tactical overlays (ZoC, Flanking, Drag & Drop)
+ * - Fog of War: manual reveal/hide, token vision, line-of-sight raycasting,
+ *   dynamic light sources with adjustable color/radius, darkness slider,
+ *   and LoS walls — gated so GMs control fog and players see only what's
+ *   revealed (active when connected to VTT without the GM role)
  * - Kon'reh Board Game integration
  * - Records movements to media manifest for VOD creators
  *
@@ -32,23 +36,23 @@
  *   other module reads those directly instead of `whiteboard.sheets`.
  * - The WebSocket payload includes both the legacy flat mirror and the new
  *   `sheets` structure; incoming messages are accepted in either shape.
+ * - Fog of War data lives inside `gridCombat.fogOfWar` and syncs via the
+ *   existing WebSocket pipeline — no new event types needed.
+ * - `normalizeSheet()` backfills `fogOfWar` and `token.vision` on old saves.
  */
 
 import { getState, saveState } from '../../core/state.js';
 import { showToast } from '../../components/Toast.js';
 import { escHtml } from '../../core/utils.js';
-import { logRecordingEvent } from '../../core/media.js'; 
-import { 
-    isConnectedToServer, 
-    onWSEvent, 
-    offWSEvent, 
+import { logRecordingEvent } from '../../core/media.js';
+import {
+    isConnectedToServer,
+    onWSEvent,
+    offWSEvent,
     sendMessage as sendWSMessage,
     getConnectionMode
 } from '../../core/websocket.js';
 import { openKonrehModal } from './kon-reh.js';
-// 👇 NEW: Combat Tracker integration. Path assumes the tracker lives at
-// features/encounters/combat.js (same depth as this file, per its own
-// '../../core/state.js' imports) — adjust if your project layout differs.
 import { getLiveCombatants, isTrackerOpen, setTrackerRangeByName } from '../encounters/combat.js';
 
 // ============================================================
@@ -67,10 +71,6 @@ const GRID_COLORS = {
     ISOMETRIC: 'rgba(212, 175, 55, 0.08)'
 };
 
-// Default layer stack for every sheet, bottom to top. `isGM` layers are
-// hidden whenever "Player View" is toggled on. `id` values for these five
-// are fixed so tokens/drawings/etc. created before this feature existed can
-// be assigned a sensible default layer during migration.
 const DEFAULT_LAYER_DEFS = [
     { id: 'background', name: 'Background',      isGM: false },
     { id: 'drawing',     name: 'Drawing',         isGM: false },
@@ -80,6 +80,11 @@ const DEFAULT_LAYER_DEFS = [
 ];
 
 const MAX_UNDO_HISTORY = 50;
+
+// ── NEW: Fog tool identifiers (used in the toolbar's data-tool buttons) ──
+const FOG_TOOLS = new Set(['fog-reveal', 'fog-hide', 'fog-wall', 'fog-light']);
+
+const SHAPE_TOOLS = new Set(['line', 'rectangle', 'circle', 'arrow']);
 
 // ============================================================
 // STATE
@@ -96,11 +101,6 @@ let currentOpacity = 1;
 let lastX = 0;
 let lastY = 0;
 
-// `state.sheets` is the source of truth; `state.drawings` / `.notes` /
-// `.images` / `.gridCombat` / `.settings` / `.layers` are convenience
-// references that always point at the ACTIVE sheet's data (kept in sync
-// via `syncActiveSheetRefs()`), so all the existing logic in this file that
-// reads/writes those fields keeps working completely unchanged.
 let state = {
     sheets: [],
     activeSheetId: null,
@@ -115,8 +115,6 @@ let state = {
 let activeLayerId = 'drawing';
 let playerViewActive = false;
 
-// Per-sheet undo/redo history, keyed by sheet id. Kept out of `state` (and
-// therefore never persisted) since undo history shouldn't survive a reload.
 const undoHistory = new Map();
 
 let activeNoteId = null;
@@ -132,13 +130,23 @@ let tokenStartPos = null;
 let rulerStart = null;
 let rulerEnd = null;
 
-// Dragging for notes/images (new) — separate from token dragging above.
 let isDraggingObject = false;
 let draggedObject = null;
-let draggedObjectType = null; // 'note' | 'image'
+let draggedObjectType = null;
 
 let konrehGame = null;
 let konrehActive = false;
+
+// ── NEW: VTT role tracking for fog gating ──
+// Set by listening for the `gmRoleUpdate` custom event dispatched by
+// vtt-connected.js.  Values: 'gm' | 'player' | null (not connected).
+let vttRole = null;
+
+// ── NEW: Fog interaction state ──
+let fogWallStart = null;       // {x,y} when drawing a LoS wall segment
+let isDraggingLight = false;   // dragging a light source with the Select tool
+let draggedLight = null;       // reference to the light source being dragged
+let gmRoleHandler = null;      // stored for cleanup in destroy()
 
 // ============================================================
 // SHEETS
@@ -160,6 +168,18 @@ function createDefaultLayers() {
     }));
 }
 
+// ── NEW: Default fog-of-war configuration ──
+function createDefaultFogOfWar() {
+    return {
+        enabled: false,        // master toggle
+        mode: 'manual',        // 'manual' | 'token-vision' | 'line-of-sight'
+        revealed: [],          // array of {x, y, w, h} cell rects
+        darkness: 0.85,        // 0 = fully lit, 1 = pitch black
+        lightSources: [],      // array of {x, y, radius, color, intensity}
+        walls: [],             // array of {x1, y1, x2, y2} for LoS blocking
+    };
+}
+
 function createDefaultGridCombat() {
     return {
         enabled: false,
@@ -168,7 +188,8 @@ function createDefaultGridCombat() {
         showCoordinates: true,
         showZones: false,
         tokens: [],
-        linkedEncounterId: null // 👈 NEW: which Encounter's combatants this board is synced to, if any
+        linkedEncounterId: null,
+        fogOfWar: createDefaultFogOfWar(), // ── NEW ──
     };
 }
 
@@ -195,8 +216,6 @@ function createDefaultSheet(name) {
     };
 }
 
-// Fills in anything missing on a sheet loaded from storage (old saves, or a
-// partially-formed sheet) so nothing crashes and nothing silently vanishes.
 function normalizeSheet(raw) {
     const sheet = {
         id: raw.id || makeId('sheet'),
@@ -210,12 +229,26 @@ function normalizeSheet(raw) {
     };
     if (!Array.isArray(sheet.gridCombat.tokens)) sheet.gridCombat.tokens = [];
 
-    // Backfill layerId on anything created before layers existed, so old
-    // content stays visible under the new default layers.
+    // ── NEW: Backfill fogOfWar (old saves predate this field) ──
+    if (!sheet.gridCombat.fogOfWar) {
+        sheet.gridCombat.fogOfWar = createDefaultFogOfWar();
+    } else {
+        // Merge partial fog data with defaults so missing sub-fields are filled
+        sheet.gridCombat.fogOfWar = {
+            ...createDefaultFogOfWar(),
+            ...sheet.gridCombat.fogOfWar
+        };
+    }
+
+    // Backfill layerId on anything created before layers existed
     for (const d of sheet.drawings) if (!d.layerId) d.layerId = 'drawing';
     for (const n of sheet.notes) if (!n.layerId) n.layerId = 'notes';
     for (const im of sheet.images) if (!im.layerId) im.layerId = 'background';
-    for (const t of sheet.gridCombat.tokens) if (!t.layerId) t.layerId = 'tokens';
+    for (const t of sheet.gridCombat.tokens) {
+        if (!t.layerId) t.layerId = 'tokens';
+        // ── NEW: Backfill vision on old tokens ──
+        if (t.vision === undefined) t.vision = 0;
+    }
 
     return sheet;
 }
@@ -229,7 +262,6 @@ function getActiveSheet() {
     return sheet;
 }
 
-// Point the convenience top-level refs at the active sheet's own data.
 function syncActiveSheetRefs() {
     const sheet = getActiveSheet();
     if (!sheet) return;
@@ -253,8 +285,8 @@ function getUndoHistory(sheetId) {
 function switchToSheet(sheetId) {
     if (sheetId === state.activeSheetId) return;
     if (!state.sheets.some(s => s.id === sheetId)) return;
-    saveWhiteboardData(); // flush edits on the sheet we're leaving
-    if (konrehActive) toggleKonreh(); // don't carry a live Kon'reh session across sheets
+    saveWhiteboardData();
+    if (konrehActive) toggleKonreh();
     state.activeSheetId = sheetId;
     syncActiveSheetRefs();
     initCanvas();
@@ -263,6 +295,7 @@ function switchToSheet(sheetId) {
     renderSheetTabs();
     renderLayersPanel();
     updateStats();
+    renderVttCombatToolbar(); // ── NEW: update fog controls for this sheet ──
     saveWhiteboardData();
 }
 
@@ -321,6 +354,7 @@ export function deleteSheet(sheetId) {
         renderOverlay();
         renderLayersPanel();
         updateStats();
+        renderVttCombatToolbar(); // ── NEW ──
     }
     saveWhiteboardData();
     renderSheetTabs();
@@ -350,7 +384,7 @@ function renderSheetTabs() {
 
     bar.querySelectorAll('.wb-sheet-tab').forEach(tab => {
         tab.addEventListener('click', (e) => {
-            if (e.target.closest('button')) return; // let the ✏️/⧉/✕ buttons handle themselves
+            if (e.target.closest('button')) return;
             switchToSheet(tab.dataset.sheetId);
         });
     });
@@ -457,7 +491,7 @@ function moveLayer(layerId, direction) {
 function renderLayersPanel() {
     const panel = document.getElementById('whiteboard-layers-panel');
     if (!panel) return;
-    const ordered = [...layersInDrawOrder()].reverse(); // show topmost layer first, like most layer UIs
+    const ordered = [...layersInDrawOrder()].reverse();
 
     panel.innerHTML = `
         <div class="flex-between mb-1">
@@ -599,7 +633,6 @@ function loadWhiteboardData() {
             ? wb.activeSheetId
             : state.sheets[0].id;
     } else if (wb && (wb.drawings || wb.notes || wb.images || wb.settings || wb.gridCombat)) {
-        // Legacy flat format from before Sheets/Layers existed.
         const migrated = normalizeSheet({
             name: 'Sheet 1',
             drawings: wb.drawings || [],
@@ -620,12 +653,6 @@ function loadWhiteboardData() {
     syncActiveSheetRefs();
 
     if (migrationOccurred) {
-        // Write the migrated shape back to local storage right away, so a
-        // user who only ever VIEWS the whiteboard (never draws anything)
-        // still ends up on the new format rather than re-migrating forever
-        // from stale flat data. Deliberately skips broadcastWhiteboardUpdate
-        // — this is a local one-time format upgrade, not a user edit, and
-        // shouldn't compete with a concurrent peer's state on load.
         const s = getState();
         if (!s.whiteboard) s.whiteboard = {};
         s.whiteboard.sheets = state.sheets;
@@ -645,9 +672,6 @@ function loadWhiteboardData() {
 function saveWhiteboardData() {
     const sheet = getActiveSheet();
     if (sheet) {
-        // Propagate the convenience refs back in case any call site reassigned
-        // them (e.g. `state.notes = state.notes.filter(...)`) rather than
-        // mutating in place.
         sheet.drawings = state.drawings;
         sheet.notes = state.notes;
         sheet.images = state.images;
@@ -660,8 +684,6 @@ function saveWhiteboardData() {
     if (!saved.whiteboard) saved.whiteboard = {};
     saved.whiteboard.sheets = state.sheets;
     saved.whiteboard.activeSheetId = state.activeSheetId;
-    // Legacy mirror: anything reading the old flat shape directly still
-    // sees sensible (active-sheet) data.
     if (sheet) {
         saved.whiteboard.drawings = sheet.drawings;
         saved.whiteboard.notes = sheet.notes;
@@ -681,20 +703,18 @@ function saveWhiteboardData() {
 
 function setupWebSocketSync() {
     cleanupWebSocketListeners();
-    
+
     const connected = isConnectedToServer();
-    
+
     if (!connected) {
         isOfflineMode = true;
         updateConnectionStatusUI(false);
         return;
     }
-    
+
     isOfflineMode = false;
     updateConnectionStatusUI(true);
 
-    // Accepts either the new multi-sheet shape or the legacy flat shape
-    // (from a peer that hasn't updated yet), and applies it consistently.
     function applyIncomingWhiteboard(incoming) {
         if (!incoming) return;
         if (Array.isArray(incoming.sheets) && incoming.sheets.length > 0) {
@@ -704,7 +724,6 @@ function setupWebSocketSync() {
                 : state.sheets[0].id;
             syncActiveSheetRefs();
         } else {
-            // Legacy flat update — apply it to the currently active sheet.
             if (incoming.drawings) state.drawings = incoming.drawings;
             if (incoming.notes) state.notes = incoming.notes;
             if (incoming.images) state.images = incoming.images;
@@ -712,17 +731,17 @@ function setupWebSocketSync() {
             if (incoming.gridCombat) state.gridCombat = { ...state.gridCombat, ...incoming.gridCombat };
         }
     }
-    
+
     const updateHandler = (data) => {
         if (isSyncing || !data || !data.whiteboard) return;
         applyIncomingWhiteboard(data.whiteboard);
         saveWhiteboardData();
         refreshUI();
     };
-    
+
     onWSEvent('whiteboard-update', updateHandler);
     wsListeners.set('whiteboard-update', updateHandler);
-    
+
     const roomStateHandler = (data) => {
         if (data && data.whiteboard) {
             isSyncing = true;
@@ -732,7 +751,7 @@ function setupWebSocketSync() {
             isSyncing = false;
         }
     };
-    
+
     onWSEvent('room-state', roomStateHandler);
     wsListeners.set('room-state', roomStateHandler);
 
@@ -742,7 +761,7 @@ function setupWebSocketSync() {
         saveWhiteboardData();
         refreshUI();
     };
-    
+
     onWSEvent('sync-state', syncStateHandler);
     wsListeners.set('sync-state', syncStateHandler);
 }
@@ -761,11 +780,8 @@ function broadcastWhiteboardUpdate() {
         sendMessage({
             type: 'whiteboard-update',
             whiteboard: {
-                // New shape (source of truth going forward):
                 sheets: state.sheets,
                 activeSheetId: state.activeSheetId,
-                // Legacy flat mirror (active sheet), for any peer still on
-                // the previous version:
                 drawings: sheet ? sheet.drawings : [],
                 notes: sheet ? sheet.notes : [],
                 images: sheet ? sheet.images : [],
@@ -795,6 +811,7 @@ function refreshUI() {
         restoreDrawings();
         renderOverlay();
         updateStats();
+        renderVttCombatToolbar(); // ── NEW ──
         if (gridCombatActive) renderGridCombat();
     }
 }
@@ -810,7 +827,7 @@ function updateConnectionStatusUI(connected) {
     const statusBadge = document.querySelector('.status-badge');
     const statusText = document.querySelector('.status-text');
     const overlay = document.getElementById('whiteboard-offline-overlay');
-    
+
     if (statusBadge) {
         statusBadge.textContent = connected ? '🟢 Live' : '📡 Local';
         statusBadge.className = `status-badge ${connected ? 'connected' : 'local'}`;
@@ -824,21 +841,47 @@ function updateConnectionStatusUI(connected) {
 }
 
 // ============================================================
-// TRACKER INTEGRATION (grid distance <-> narrative range bands)
+// VTT ROLE GATING (NEW)
 // ============================================================
 
-// Straight-line cell distance, same convention the Ruler tool already used
-// (pixel distance / cellSize, rounded) — kept identical so the Ruler and the
-// auto range-sync always agree on "how far apart" two things are. This is
-// exact for a square grid and an approximation for hex/isometric (same
-// simplification the Ruler already made).
+/**
+ * Returns true when the client is connected to a VTT server and the
+ * user does NOT have the GM role — i.e. the "player" perspective.
+ * Fog of War is rendered at full darkness for this user.
+ */
+function isVttPlayer() {
+    return isConnectedToServer() && vttRole === 'player';
+}
+
+/**
+ * Returns true when the client is connected to a VTT server and the
+ * user HAS the GM role.
+ */
+function isVttGm() {
+    return isConnectedToServer() && vttRole === 'gm';
+}
+
+/**
+ * Returns true when the user should be allowed to EDIT fog data
+ * (toggle, paint reveals, add lights, draw walls, etc.).
+ *
+ *   Connected + GM      → can control fog
+ *   Connected + Player   → cannot control fog (sees it only)
+ *   Not connected (local)→ can control fog (single-user mode)
+ */
+function canControlFog() {
+    return !isConnectedToServer() || isVttGm();
+}
+
+// ============================================================
+// TRACKER INTEGRATION
+// ============================================================
+
 function gridCellDistance(a, b, cellSize) {
     const dx = a.x - b.x, dy = a.y - b.y;
     return Math.round(Math.sqrt(dx * dx + dy * dy) / cellSize);
 }
 
-// Per the Advanced Tactics and Grid Combat module: Close = adjacent,
-// Near = up to 6 cells (~30ft), Far = 7-12 cells (~35-60ft), Absent = beyond.
 function cellDistanceToRangeBand(cells) {
     if (cells <= 1) return 'close';
     if (cells <= 6) return 'near';
@@ -846,10 +889,6 @@ function cellDistanceToRangeBand(cells) {
     return 'absent';
 }
 
-// Called after a linked token finishes moving. Recomputes grid distance to
-// every opposing-faction linked token and pushes the matching range band
-// into the Combat Tracker (matched by name). Silently does nothing for any
-// pair where the Tracker isn't currently open — see setTrackerRangeByName.
 function syncRangeFromGrid(movedToken) {
     if (!movedToken || !movedToken.combatantName) return;
     const cellSize = state.gridCombat.cellSize || 40;
@@ -866,11 +905,6 @@ function syncRangeFromGrid(movedToken) {
     if (synced > 0) updateTrackerLinkStatusUI();
 }
 
-// Pulls combatants from an Encounter into this sheet's grid as tokens. If
-// the Tracker is currently open for that encounter, pulls its live list
-// (players included, current harm/status and all); otherwise falls back to
-// the encounter's saved adversary list (no players — those only exist
-// while the Tracker session is open).
 function importFromTracker() {
     if (!gridCombatActive) {
         showToast('Enable Grid Combat mode first.', 'warning');
@@ -919,7 +953,7 @@ function importFromTracker() {
     const existingNames = new Set(state.gridCombat.tokens.map(t => (t.combatantName || '').toLowerCase()));
     let added = 0;
     source.forEach((c, i) => {
-        if (!c.name || existingNames.has(c.name.toLowerCase())) return; // already on the board
+        if (!c.name || existingNames.has(c.name.toLowerCase())) return;
         const col = i % 6, row = Math.floor(i / 6);
         state.gridCombat.tokens.push({
             id: 'token-' + Date.now() + '-' + Math.random().toString(36).slice(2, 6),
@@ -934,7 +968,8 @@ function importFromTracker() {
             tags: [],
             layerId: 'tokens',
             combatantName: c.name,
-            combatantType: c.type
+            combatantType: c.type,
+            vision: c.type === 'player' ? 3 : 0 // ── NEW: players see by default ──
         });
         added++;
     });
@@ -952,8 +987,6 @@ function importFromTracker() {
     showToast(`🔗 Imported ${added} combatant${added === 1 ? '' : 's'} from "${encounter.title}"`, 'success');
 }
 
-// Small status label next to the toolbar showing which encounter (if any)
-// this sheet's tokens are linked to.
 function updateTrackerLinkStatusUI() {
     const el = document.getElementById('whiteboard-tracker-link-status');
     if (!el) return;
@@ -964,6 +997,322 @@ function updateTrackerLinkStatusUI() {
 }
 
 // ============================================================
+// FOG OF WAR — RAYCASTING & LINE OF SIGHT (NEW)
+// ============================================================
+
+/**
+ * Ray-segment intersection test.
+ *
+ * Ray:   P = (rx, ry) + t * (rdx, rdy),  t >= 0
+ * Segment: Q = (x1, y1) + s * (x2-x1, y2-y1),  0 <= s <= 1
+ *
+ * Returns the distance `t` along the ray at the intersection point,
+ * or `null` if there is no intersection.
+ */
+function raySegmentIntersect(rx, ry, rdx, rdy, x1, y1, x2, y2) {
+    const sdx = x2 - x1;
+    const sdy = y2 - y1;
+    const denom = rdx * sdy - rdy * sdx;
+    if (Math.abs(denom) < 1e-9) return null; // parallel — no intersection
+
+    const t = ((x1 - rx) * sdy - (y1 - ry) * sdx) / denom;
+    const s = ((x1 - rx) * rdy - (y1 - ry) * rdx) / denom;
+
+    if (t < 0 || s < 0 || s > 1) return null;
+    return t; // distance from ray origin to hit point
+}
+
+/**
+ * Casts `numRays` rays from (cx, cy) outward, stopping each at the
+ * nearest wall intersection (or `maxRange` if unobstructed).  Returns
+ * an array of {x, y} hit points forming a visibility polygon.
+ */
+function computeLineOfSight(cx, cy, maxRange, walls) {
+    const numRays = 72;
+    const points = [];
+
+    for (let i = 0; i < numRays; i++) {
+        const angle = (i / numRays) * Math.PI * 2;
+        const dx = Math.cos(angle);
+        const dy = Math.sin(angle);
+
+        let hitDist = maxRange;
+        for (const wall of walls) {
+            const dist = raySegmentIntersect(
+                cx, cy, dx, dy,
+                wall.x1, wall.y1, wall.x2, wall.y2
+            );
+            if (dist !== null && dist < hitDist) {
+                hitDist = dist;
+            }
+        }
+
+        points.push({
+            x: cx + dx * hitDist,
+            y: cy + dy * hitDist,
+        });
+    }
+    return points;
+}
+
+// ============================================================
+// FOG OF WAR — RENDERING (NEW)
+// ============================================================
+
+/**
+ * Draws the fog-of-war overlay on the canvas.  This is called at the
+ * end of `renderGridCombat()` so it paints on top of everything else
+ * (grid, tokens, drawings, zones of control).
+ *
+ * Rendering logic:
+ *
+ *   Player perspective (VTT-connected non-GM, or GM in Player View):
+ *     - Full darkness overlay at `fog.darkness` opacity
+ *     - "destination-out" cuts holes for revealed rects, light sources,
+ *       and (if mode is token-vision/line-of-sight) allied token vision
+ *     - "screen" composite adds warm/colored light tints additively
+ *
+ *   GM perspective (VTT-connected GM, or local mode):
+ *     - Lighter dim overlay (35% of darkness) so the GM can still see
+ *       the full map but knows where fog is applied
+ *     - Same hole-cutting so revealed/lit areas are clearly visible
+ *     - Wall segments and light-source markers drawn as reference
+ */
+function drawFogOfWar(cellSize) {
+    if (!ctx) return;
+    const fog = state.gridCombat.fogOfWar;
+    if (!fog || !fog.enabled) return;
+
+    // Determine perspective: players see full fog; GMs (and local users)
+    // see a dimmed preview unless Player View is toggled on.
+    const isPlayerPerspective = isVttPlayer() || (playerViewActive && canControlFog());
+
+    // ── STEP 1: Draw the fog overlay ──
+    ctx.save();
+
+    if (isPlayerPerspective) {
+        ctx.fillStyle = `rgba(5, 5, 12, ${fog.darkness})`;
+    } else {
+        // GM preview: lighter so the map is still visible underneath
+        ctx.fillStyle = `rgba(5, 5, 12, ${fog.darkness * 0.35})`;
+    }
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    // Cut holes for everything that reveals the map
+    ctx.globalCompositeOperation = 'destination-out';
+
+    // Manually revealed cell rects
+    for (const r of (fog.revealed || [])) {
+        ctx.fillStyle = 'rgba(0,0,0,1)';
+        ctx.fillRect(r.x, r.y, r.w, r.h);
+    }
+
+    // Light source radii with soft falloff
+    for (const light of (fog.lightSources || [])) {
+        const grad = ctx.createRadialGradient(
+            light.x, light.y, 0,
+            light.x, light.y, Math.max(light.radius, 1)
+        );
+        const alpha = light.intensity ?? 1;
+        grad.addColorStop(0, `rgba(0,0,0,${alpha})`);
+        grad.addColorStop(0.6, `rgba(0,0,0,${alpha * 0.5})`);
+        grad.addColorStop(1, 'rgba(0,0,0,0)');
+        ctx.fillStyle = grad;
+        ctx.beginPath();
+        ctx.arc(light.x, light.y, Math.max(light.radius, 1), 0, Math.PI * 2);
+        ctx.fill();
+    }
+
+    // Token vision / line-of-sight reveals
+    if (fog.mode === 'token-vision' || fog.mode === 'line-of-sight') {
+        const tokens = state.gridCombat.tokens || [];
+        for (const t of tokens) {
+            // Only allied/player tokens emit vision
+            if (t.faction !== 'ally' && t.faction !== 'player') continue;
+            const visionCells = t.vision > 0 ? t.vision : 3; // default 3 cells
+            const visionRadius = cellSize * visionCells;
+            const cx = t.x + cellSize / 2;
+            const cy = t.y + cellSize / 2;
+
+            if (fog.mode === 'line-of-sight' && (fog.walls || []).length > 0) {
+                // Raycast against walls to build a visibility polygon
+                const poly = computeLineOfSight(cx, cy, visionRadius, fog.walls || []);
+                if (poly.length > 0) {
+                    // Fill the polygon to cut through the fog
+                    const grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, visionRadius);
+                    grad.addColorStop(0, 'rgba(0,0,0,0.9)');
+                    grad.addColorStop(0.8, 'rgba(0,0,0,0.4)');
+                    grad.addColorStop(1, 'rgba(0,0,0,0)');
+                    ctx.fillStyle = grad;
+                    ctx.beginPath();
+                    ctx.moveTo(poly[0].x, poly[0].y);
+                    for (let i = 1; i < poly.length; i++) {
+                        ctx.lineTo(poly[i].x, poly[i].y);
+                    }
+                    ctx.closePath();
+                    ctx.fill();
+                }
+            } else {
+                // Simple radial vision (no walls or mode is token-vision)
+                const grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, visionRadius);
+                grad.addColorStop(0, 'rgba(0,0,0,0.9)');
+                grad.addColorStop(0.8, 'rgba(0,0,0,0.4)');
+                grad.addColorStop(1, 'rgba(0,0,0,0)');
+                ctx.fillStyle = grad;
+                ctx.beginPath();
+                ctx.arc(cx, cy, visionRadius, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+    }
+
+    ctx.restore();
+
+    // ── STEP 2: Additive light tint (warm glow on lit areas) ──
+    ctx.save();
+    ctx.globalCompositeOperation = 'screen';
+    for (const light of (fog.lightSources || [])) {
+        const grad = ctx.createRadialGradient(
+            light.x, light.y, 0,
+            light.x, light.y, Math.max(light.radius, 1)
+        );
+        grad.addColorStop(0, light.color || 'rgba(255, 220, 150, 0.25)');
+        grad.addColorStop(1, 'rgba(0,0,0,0)');
+        ctx.fillStyle = grad;
+        ctx.beginPath();
+        ctx.arc(light.x, light.y, Math.max(light.radius, 1), 0, Math.PI * 2);
+        ctx.fill();
+    }
+    ctx.restore();
+
+    // ── STEP 3: GM-only reference markers (walls, light positions) ──
+    if (canControlFog() && !isPlayerPerspective) {
+        // Draw LoS wall segments
+        ctx.save();
+        ctx.strokeStyle = 'rgba(196, 90, 90, 0.8)';
+        ctx.lineWidth = 2;
+        ctx.setLineDash([8, 4]);
+        for (const wall of (fog.walls || [])) {
+            ctx.beginPath();
+            ctx.moveTo(wall.x1, wall.y1);
+            ctx.lineTo(wall.x2, wall.y2);
+            ctx.stroke();
+        }
+        ctx.setLineDash([]);
+        ctx.restore();
+
+        // Draw light source markers (dot + radius circle)
+        ctx.save();
+        for (const light of (fog.lightSources || [])) {
+            // Faint radius circle
+            ctx.beginPath();
+            ctx.arc(light.x, light.y, Math.max(light.radius, 1), 0, Math.PI * 2);
+            ctx.strokeStyle = 'rgba(255, 220, 100, 0.15)';
+            ctx.lineWidth = 1;
+            ctx.setLineDash([4, 4]);
+            ctx.stroke();
+            ctx.setLineDash([]);
+
+            // Bright center dot
+            ctx.beginPath();
+            ctx.arc(light.x, light.y, 6, 0, Math.PI * 2);
+            ctx.fillStyle = 'rgba(255, 220, 100, 0.9)';
+            ctx.fill();
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.6)';
+            ctx.lineWidth = 1;
+            ctx.stroke();
+        }
+        ctx.restore();
+    } else if (isPlayerPerspective) {
+        // For players: small dim dots at light sources
+        ctx.save();
+        for (const light of (fog.lightSources || [])) {
+            ctx.beginPath();
+            ctx.arc(light.x, light.y, 3, 0, Math.PI * 2);
+            ctx.fillStyle = 'rgba(255, 220, 100, 0.4)';
+            ctx.fill();
+        }
+        ctx.restore();
+    }
+}
+
+/**
+ * Paints (reveals or hides) a single grid cell in the fog data.
+ * Called continuously during drag with the fog-reveal / fog-hide tools.
+ * Does NOT save/broadcast — the caller does that on mouseup.
+ */
+function paintFogCell(pos, cellSize, reveal) {
+    const fog = state.gridCombat.fogOfWar;
+    if (!fog) return;
+    const cx = Math.floor(pos.x / cellSize) * cellSize;
+    const cy = Math.floor(pos.y / cellSize) * cellSize;
+
+    if (reveal) {
+        const exists = (fog.revealed || []).some(r =>
+            r.x === cx && r.y === cy && r.w === cellSize && r.h === cellSize
+        );
+        if (!exists) {
+            fog.revealed.push({ x: cx, y: cy, w: cellSize, h: cellSize });
+        }
+    } else {
+        fog.revealed = (fog.revealed || []).filter(r =>
+            !(r.x === cx && r.y === cy)
+        );
+    }
+    // Re-render without saving (save happens on mouseup)
+    restoreDrawings();
+    renderGridCombat();
+}
+
+// ============================================================
+// VTT COMBAT TOOLBAR VISIBILITY (NEW)
+// ============================================================
+
+/**
+ * Shows or hides the fog controls based on:
+ *   - Combat mode is active
+ *   - Not in Kon'reh mode (Kon'reh has its own board)
+ *   - User is GM or in local mode (players can't control fog)
+ *   - Fog is enabled (for the sub-controls)
+ */
+function renderVttCombatToolbar() {
+    const fog = state.gridCombat?.fogOfWar;
+    const showFog = gridCombatActive && !konrehActive && canControlFog();
+
+    const fogToggle = document.getElementById('whiteboard-fog-toggle');
+    const fogControls = document.getElementById('whiteboard-fog-controls');
+    const fogLegend = document.getElementById('fog-legend');
+
+    if (fogToggle) {
+        fogToggle.style.display = showFog ? 'inline-block' : 'none';
+        if (fog?.enabled) {
+            fogToggle.textContent = '🌫️ Fog ON';
+            fogToggle.className = 'btn btn-sm btn-danger';
+        } else {
+            fogToggle.textContent = '🌫️ Fog OFF';
+            fogToggle.className = 'btn btn-sm btn-secondary';
+        }
+    }
+
+    if (fogControls) {
+        fogControls.style.display = (showFog && fog?.enabled) ? 'flex' : 'none';
+    }
+
+    if (fogLegend) {
+        fogLegend.style.display = (gridCombatActive && fog?.enabled) ? 'block' : 'none';
+    }
+
+    // Reset tool to pen if fog was just disabled while a fog tool was active
+    if (!fog?.enabled && FOG_TOOLS.has(currentTool)) {
+        currentTool = 'pen';
+        document.querySelectorAll('.btn[data-tool]').forEach(b => b.className = 'btn btn-sm btn-secondary');
+        const penBtn = document.querySelector('.btn[data-tool="pen"]');
+        if (penBtn) penBtn.className = 'btn btn-sm btn-gold';
+        if (canvas) canvas.style.cursor = 'crosshair';
+    }
+}
+
+// ============================================================
 // GRID COMBAT FUNCTIONS
 // ============================================================
 
@@ -971,11 +1320,11 @@ function toggleGridCombat() {
     gridCombatActive = !gridCombatActive;
     state.gridCombat.enabled = gridCombatActive;
     saveWhiteboardData();
-    
+
     const btn = document.getElementById('whiteboard-grid-combat');
     const addTokenBtn = document.getElementById('whiteboard-add-token');
     const importTrackerBtn = document.getElementById('whiteboard-import-tracker');
-    
+
     if (btn) {
         btn.textContent = gridCombatActive ? '⚔️ Combat ON' : '⚔️ Combat OFF';
         btn.className = gridCombatActive ? 'btn btn-sm btn-danger' : 'btn btn-sm btn-secondary';
@@ -986,55 +1335,57 @@ function toggleGridCombat() {
     if (importTrackerBtn) {
         importTrackerBtn.style.display = gridCombatActive && !konrehActive ? 'inline-block' : 'none';
     }
-    
+
     if (!gridCombatActive && konrehActive) {
-        toggleKonreh(); // Turn off Kon'reh if grid combat is disabled
+        toggleKonreh();
     }
-    
+
     showToast(gridCombatActive ? '⚔️ Grid Combat Mode enabled' : 'Grid Combat disabled', gridCombatActive ? 'success' : 'info');
     restoreDrawings();
     renderGridCombat();
+    renderVttCombatToolbar(); // ── NEW ──
 }
 
 function renderGridCombat() {
     if (!ctx || !gridCombatActive) return;
-    
+
     const gc = state.gridCombat;
     const cellSize = gc.cellSize || 40;
     const tokensLayer = getLayer('tokens');
-    
+
     ctx.save();
     ctx.globalAlpha = 0.3;
-    
+
     if (gc.gridType === 'hex') drawHexGrid(cellSize);
     else if (gc.gridType === 'isometric') drawIsometricGrid(cellSize);
     else drawSquareGrid(cellSize);
-    
+
     ctx.restore();
-    
-    if (gc.showCoordinates && !konrehActive) drawCoordinates(cellSize, gc.gridType); // Hide standard coords in Kon'reh to avoid clutter
+
+    if (gc.showCoordinates && !konrehActive) drawCoordinates(cellSize, gc.gridType);
     if (gc.showZones) drawZonesOfControl(cellSize, gc.gridType);
-    
+
     if (!tokensLayer || isLayerVisibleNow(tokensLayer)) {
         ctx.save();
         ctx.globalAlpha = tokensLayer ? tokensLayer.opacity : 1;
         drawTokens(cellSize, gc.gridType);
         ctx.restore();
     }
-    
+
     if (konrehActive) drawKonrehBoardOverlay(cellSize);
+
+    // ── NEW: Fog of War overlay (drawn last, on top of everything) ──
+    if (!konrehActive) drawFogOfWar(cellSize);
 }
 
 function drawKonrehBoardOverlay(cellSize) {
     if (!ctx) return;
     ctx.save();
-    
-    // Highlight the 8x8 board bounds
+
     ctx.strokeStyle = 'rgba(212, 175, 55, 0.8)';
     ctx.lineWidth = 2;
     ctx.strokeRect(0, 0, cellSize * 8, cellSize * 8);
-    
-    // Highlight Apexes and Sanctums
+
     const drawApexMarker = (x, y, label, color) => {
         ctx.fillStyle = color;
         ctx.fillRect(x * cellSize, y * cellSize, cellSize, cellSize);
@@ -1044,17 +1395,16 @@ function drawKonrehBoardOverlay(cellSize) {
         ctx.textBaseline = 'middle';
         ctx.fillText(label, x * cellSize + cellSize/2, y * cellSize + cellSize/2);
     };
-    
-    drawApexMarker(0, 0, 'H1', '#4a90d9'); // P1 Home
-    drawApexMarker(7, 7, 'H2', '#d94a4a'); // P2 Home
-    drawApexMarker(0, 7, 'S', '#d4af37');  // Sanctum
-    drawApexMarker(7, 0, 'S', '#d4af37');  // Sanctum
-    
-    // Highlight the Cross (Central Four)
+
+    drawApexMarker(0, 0, 'H1', '#4a90d9');
+    drawApexMarker(7, 7, 'H2', '#d94a4a');
+    drawApexMarker(0, 7, 'S', '#d4af37');
+    drawApexMarker(7, 0, 'S', '#d4af37');
+
     ctx.strokeStyle = 'rgba(107, 170, 122, 0.8)';
     ctx.lineWidth = 2;
     ctx.strokeRect(3 * cellSize, 3 * cellSize, cellSize * 2, cellSize * 2);
-    
+
     ctx.restore();
 }
 
@@ -1134,25 +1484,25 @@ function drawCoordinates(cellSize, gridType) {
 function checkTacticalStatus(token) {
     const cellSize = state.gridCombat.cellSize || 40;
     const enemies = state.gridCombat.tokens.filter(t => t.faction !== token.faction && t.id !== token.id);
-    
+
     const oppositePositions = [
         { dx: -cellSize, dy: 0, oppDx: cellSize, oppDy: 0 },
         { dx: 0, dy: -cellSize, oppDx: 0, oppDy: cellSize }
     ];
-    
+
     let isFlanked = false;
     for (const pos of oppositePositions) {
         const e1 = enemies.find(e => Math.abs(e.x - (token.x + pos.dx)) < 5 && Math.abs(e.y - (token.y + pos.dy)) < 5);
         const e2 = enemies.find(e => Math.abs(e.x - (token.x + pos.oppDx)) < 5 && Math.abs(e.y - (token.y + pos.oppDy)) < 5);
         if (e1 && e2) { isFlanked = true; break; }
     }
-    
+
     const inEnemyZoC = enemies.some(e => {
         const dx = Math.abs(e.x - token.x);
         const dy = Math.abs(e.y - token.y);
         return (dx <= cellSize && dy <= cellSize);
     });
-    
+
     return { isFlanked, inEnemyZoC };
 }
 
@@ -1178,35 +1528,53 @@ function drawTokens(cellSize, gridType) {
     for (const token of tokens) {
         const tacStatus = checkTacticalStatus(token);
         ctx.save();
-        
+
         if (tacStatus.isFlanked && !konrehActive) {
-            ctx.strokeStyle = '#e8c84a'; 
+            ctx.strokeStyle = '#e8c84a';
             ctx.lineWidth = 3;
             ctx.setLineDash([6, 6]);
             ctx.strokeRect(token.x - 3, token.y - 3, cellSize + 6, cellSize + 6);
             ctx.setLineDash([]);
         }
-        
+
         ctx.fillStyle = token.color || '#d4af37';
         ctx.shadowColor = 'rgba(0,0,0,0.6)';
         ctx.shadowBlur = 8;
-        
+
         ctx.beginPath();
         ctx.arc(token.x + cellSize/2, token.y + cellSize/2, cellSize * 0.4, 0, Math.PI * 2);
         ctx.fill();
-        
+
         ctx.shadowBlur = 0;
         ctx.fillStyle = 'white';
         ctx.font = 'bold 12px sans-serif';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
         ctx.fillText(token.label?.substring(0, 3) || '?', token.x + cellSize/2, token.y + cellSize/2);
-        
+
         if (token.harm > 0) {
             ctx.fillStyle = '#d97a7a';
             ctx.font = '9px sans-serif';
             ctx.fillText(`❤${token.harm}`, token.x + cellSize/2, token.y + cellSize + 8);
         }
+
+        // ── NEW: Vision radius indicator (faint circle for tokens with vision) ──
+        if (token.vision > 0 && !konrehActive) {
+            const fog = state.gridCombat.fogOfWar;
+            if (fog?.enabled && (fog.mode === 'token-vision' || fog.mode === 'line-of-sight')) {
+                ctx.strokeStyle = 'rgba(107, 170, 122, 0.2)';
+                ctx.lineWidth = 1;
+                ctx.setLineDash([3, 3]);
+                ctx.beginPath();
+                ctx.arc(
+                    token.x + cellSize/2, token.y + cellSize/2,
+                    cellSize * token.vision, 0, Math.PI * 2
+                );
+                ctx.stroke();
+                ctx.setLineDash([]);
+            }
+        }
+
         ctx.restore();
     }
 }
@@ -1220,22 +1588,26 @@ function addGridToken() {
         showToast('Tokens & Grid layer is locked', 'warning');
         return;
     }
-    
+
     const name = prompt('Token label:', 'Guard');
     if (!name) return;
     const faction = prompt('Faction (ally or enemy):', 'enemy')?.toLowerCase() || 'enemy';
     const bodyStr = prompt('Body Attribute (for movement):', '3');
     const body = parseInt(bodyStr) || 3;
-    
+    // ── NEW: Vision radius prompt ──
+    const visionStr = prompt('Vision radius in cells (0 = no vision, 3 = default for allies):',
+        faction === 'ally' ? '3' : '0');
+    const vision = parseInt(visionStr) || 0;
+
     const containerEl = document.getElementById('whiteboard-canvas-container');
     const rect = containerEl.getBoundingClientRect();
     const cellSize = state.gridCombat.cellSize || 40;
-    
+
     const x = Math.floor((rect.width / 2 - cellSize/2) / cellSize) * cellSize;
     const y = Math.floor((rect.height / 2 - cellSize/2) / cellSize) * cellSize;
-    
+
     const colors = faction === 'ally' ? ['#5a8ab5', '#6baa7a', '#7aa8d0'] : ['#c45a5a', '#d48a5a', '#d97a7a'];
-    
+
     if (!state.gridCombat.tokens) state.gridCombat.tokens = [];
     state.gridCombat.tokens.push({
         id: 'token-' + Date.now(),
@@ -1248,9 +1620,10 @@ function addGridToken() {
         harm: 0,
         fatigue: 0,
         tags: [],
-        layerId: 'tokens'
+        layerId: 'tokens',
+        vision: vision // ── NEW ──
     });
-    
+
     saveWhiteboardData();
     renderGridCombat();
     logRecordingEvent('token_add', `${name} (${faction}) added to the board.`);
@@ -1272,7 +1645,7 @@ function clearGridTokens() {
 
 function toggleKonreh() {
     if (!gridCombatActive) {
-        toggleGridCombat(); 
+        toggleGridCombat();
     }
 
     if (konrehActive) {
@@ -1287,24 +1660,25 @@ function toggleKonreh() {
         if (importTrackerBtn) importTrackerBtn.style.display = 'inline-block';
         const gridTypeSel = document.getElementById('whiteboard-grid-type');
         if (gridTypeSel) gridTypeSel.style.display = '';
+        renderVttCombatToolbar(); // ── NEW ──
         return;
     }
 
     konrehGame = new KonrehGame();
     konrehActive = true;
-    state.gridCombat.cellSize = 64; 
+    state.gridCombat.cellSize = 64;
     state.gridCombat.gridType = 'square';
-    
+
     const btn = document.getElementById('whiteboard-konreh');
     if (btn) btn.className = 'btn btn-sm btn-gold';
-    
+
     const addTokenBtn = document.getElementById('whiteboard-add-token');
     if (addTokenBtn) addTokenBtn.style.display = 'none';
     const importTrackerBtn = document.getElementById('whiteboard-import-tracker');
     if (importTrackerBtn) importTrackerBtn.style.display = 'none';
     const gridTypeSel = document.getElementById('whiteboard-grid-type');
     if (gridTypeSel) gridTypeSel.style.display = 'none';
-    
+
     state.gridCombat.tokens = [];
     const cellSize = state.gridCombat.cellSize;
     for (const id in konrehGame.pieces) {
@@ -1315,7 +1689,7 @@ function toggleKonreh() {
             if (p.type === 'red') color = '#d94a4a';
             if (p.type === 'orange') color = '#d9a54a';
             if (p.type === 'green') color = '#4ad97a';
-            
+
             state.gridCombat.tokens.push({
                 id: p.id,
                 label: p.type.charAt(0).toUpperCase(),
@@ -1326,13 +1700,15 @@ function toggleKonreh() {
                 harm: 0,
                 fatigue: 0,
                 tags: [],
-                layerId: 'tokens'
+                layerId: 'tokens',
+                vision: 0
             });
         }
     }
     saveWhiteboardData();
     restoreDrawings();
     renderGridCombat();
+    renderVttCombatToolbar(); // ── NEW ──
     showToast("🌀 Kon'reh Mode enabled! Drag pieces to play.", 'success');
 }
 
@@ -1416,6 +1792,24 @@ export function render(el) {
                     <button class="btn btn-sm btn-secondary" id="whiteboard-toggle-layers" title="Layers">🗂️ Layers</button>
                     <button class="btn btn-sm btn-secondary" id="whiteboard-player-view" title="Preview as a player (hides GM layers)">👁️ Player View</button>
                 </div>
+                <!-- ── NEW: Fog of War controls (GM / local only) ── -->
+                <button class="btn btn-sm btn-secondary" id="whiteboard-fog-toggle" style="display:none;" title="Toggle Fog of War">🌫️ Fog OFF</button>
+                <div class="flex gap-1 flex-center" id="whiteboard-fog-controls" style="display:none; flex-wrap:wrap;">
+                    <select id="whiteboard-fog-mode" title="Fog mode"
+                            style="font-size:0.8rem;padding:0.25rem 0.3rem;background:var(--bg2);color:var(--text);border:1px solid var(--border);border-radius:4px;">
+                        <option value="manual">🖌️ Manual</option>
+                        <option value="token-vision">👁️ Token Vision</option>
+                        <option value="line-of-sight">📡 Line of Sight</option>
+                    </select>
+                    <button class="btn btn-sm btn-secondary" data-tool="fog-reveal" title="Paint revealed areas">✨ Reveal</button>
+                    <button class="btn btn-sm btn-secondary" data-tool="fog-hide" title="Hide areas">🌑 Hide</button>
+                    <button class="btn btn-sm btn-secondary" data-tool="fog-wall" title="Draw LoS wall">🧱 Wall</button>
+                    <button class="btn btn-sm btn-secondary" data-tool="fog-light" title="Place light source">💡 Light</button>
+                    <button class="btn btn-sm btn-ghost" id="whiteboard-fog-clear" title="Clear all fog data">Clear Fog</button>
+                    <label class="text-muted text-sm flex gap-1 flex-center" title="Darkness level (0=lit, 1=pitch black)">
+                        Dark <input type="range" id="whiteboard-fog-darkness" min="0" max="1" step="0.05" value="${state.gridCombat.fogOfWar?.darkness ?? 0.85}" style="width:50px;"/>
+                    </label>
+                </div>
             </div>
 
             <!-- Layers panel (collapsible) -->
@@ -1449,6 +1843,8 @@ export function render(el) {
             <div id="grid-combat-legend" style="position:absolute;bottom:10px;right:10px;background:rgba(10,10,15,0.8);padding:0.3rem 0.6rem;border-radius:var(--radius-sm);font-size:0.65rem;color:var(--text3);display:${gridCombatActive ? 'block' : 'none'};border:1px solid var(--border);pointer-events:none;z-index:20;">
                 <div><span style="color:var(--red);">⬤</span> Enemy ZoC | <span style="color:var(--blue);">⬤</span> Ally ZoC</div>
                 <div><span style="color:var(--gold);">▭</span> Flanked (Dominant)</div>
+                <!-- ── NEW: Fog legend ── -->
+                <div id="fog-legend" style="display:none;"><span style="color:rgba(255,220,100,0.8);">💡</span> Light | <span style="color:rgba(196,90,90,0.8);">🧱</span> LoS Wall</div>
             </div>
 
         </div>
@@ -1462,7 +1858,8 @@ export function render(el) {
     updateConnectionStatusUI(isConnected);
     renderSheetTabs();
     renderLayersPanel();
-    
+    renderVttCombatToolbar(); // ── NEW ──
+
     if (gridCombatActive) renderGridCombat();
 }
 
@@ -1559,8 +1956,6 @@ function snapToGrid(x, y) {
     return { x: Math.round(x / gridSize) * gridSize, y: Math.round(y / gridSize) * gridSize };
 }
 
-const SHAPE_TOOLS = new Set(['line', 'rectangle', 'circle', 'arrow']);
-
 // ============================================================
 // OVERLAY RENDERING
 // ============================================================
@@ -1614,18 +2009,75 @@ function startDrawing(e) {
     const y = (e.clientY || e.touches?.[0]?.clientY || 0) - rect.top;
     const pos = snapToGrid(x, y);
 
-    // 👇 FIX: this used to require `currentTool === 'select'`, but the
-    // default tool is 'pen' — so clicking a token right after placing it
-    // (before ever switching to the 👆 Select tool) just drew a pen stroke
-    // instead of grabbing the token, which is what "can't drag tokens" was.
-    // Grabbing a token now works with whatever tool happens to be active,
-    // as long as the click actually lands on the token; clicks elsewhere
-    // still fall through to that tool's normal behavior.
+    // ── NEW: Grid combat fog/light interactions ──
     if (gridCombatActive) {
         const cellSize = state.gridCombat.cellSize || 40;
-        // Hit-test against the token's actual cell (t.x/t.y is its
-        // top-left corner) rather than a region straddling that corner,
-        // so clicks register precisely on the visible token.
+        const fog = state.gridCombat.fogOfWar;
+
+        // Light source hit-test (select tool + fog enabled + GM/local)
+        if (currentTool === 'select' && fog?.enabled && canControlFog()) {
+            const clickedLight = (fog.lightSources || []).find(ls => {
+                const dx = pos.x - ls.x, dy = pos.y - ls.y;
+                return Math.sqrt(dx * dx + dy * dy) < 20;
+            });
+            if (clickedLight) {
+                // Shift+click deletes the light source
+                if (e.shiftKey) {
+                    fog.lightSources = fog.lightSources.filter(ls => ls !== clickedLight);
+                    saveWhiteboardData();
+                    restoreDrawings();
+                    renderGridCombat();
+                    showToast('💡 Light source removed', 'info');
+                    return;
+                }
+                // Otherwise start dragging
+                isDraggingLight = true;
+                draggedLight = clickedLight;
+                canvas.style.cursor = 'grabbing';
+                return;
+            }
+        }
+
+        // Fog tools (fog-reveal, fog-hide, fog-wall, fog-light)
+        if (FOG_TOOLS.has(currentTool)) {
+            if (!canControlFog()) {
+                showToast('Only GM can edit fog of war', 'warning');
+                return;
+            }
+            if (!fog) return;
+
+            if (currentTool === 'fog-light') {
+                // Place a new light source at the click position
+                fog.lightSources.push({
+                    x: pos.x,
+                    y: pos.y,
+                    radius: cellSize * 4,
+                    color: 'rgba(255, 220, 150, 0.25)',
+                    intensity: 1,
+                });
+                saveWhiteboardData();
+                restoreDrawings();
+                renderGridCombat();
+                showToast('💡 Light source placed (dbl-click to edit, Shift+click to delete)', 'success');
+                return;
+            }
+
+            if (currentTool === 'fog-wall') {
+                // Start a wall segment (two-point line, like the line tool)
+                isDrawing = true;
+                fogWallStart = { x: pos.x, y: pos.y };
+                return;
+            }
+
+            if (currentTool === 'fog-reveal' || currentTool === 'fog-hide') {
+                // Start painting cells (like the pen tool but on fog data)
+                isDrawing = true;
+                paintFogCell(pos, cellSize, currentTool === 'fog-reveal');
+                return;
+            }
+        }
+
+        // Existing token hit-test
         const clickedToken = state.gridCombat.tokens.find(t =>
             pos.x >= t.x && pos.x <= t.x + cellSize &&
             pos.y >= t.y && pos.y <= t.y + cellSize
@@ -1659,7 +2111,7 @@ function startDrawing(e) {
 
     isDrawing = true;
     lastX = pos.x; lastY = pos.y;
-    
+
     if (currentTool === 'pen' || currentTool === 'eraser') {
         pushUndoSnapshot();
         const drawing = {
@@ -1683,11 +2135,20 @@ function startDrawing(e) {
 }
 
 function draw(e) {
-    if (!isDrawing && !isDraggingToken) return;
+    if (!isDrawing && !isDraggingToken && !isDraggingLight) return;
     const rect = canvas.getBoundingClientRect();
     const x = (e.clientX || e.touches?.[0]?.clientX || 0) - rect.left;
     const y = (e.clientY || e.touches?.[0]?.clientY || 0) - rect.top;
     const pos = snapToGrid(x, y);
+
+    // ── NEW: Light source dragging ──
+    if (isDraggingLight && draggedLight) {
+        draggedLight.x = pos.x;
+        draggedLight.y = pos.y;
+        restoreDrawings();
+        renderGridCombat();
+        return;
+    }
 
     if (isDraggingToken && draggedToken) {
         const cellSize = state.gridCombat.cellSize || 40;
@@ -1711,13 +2172,13 @@ function draw(e) {
         rulerEnd = pos;
         restoreDrawings();
         renderGridCombat();
-        
+
         const cellSize = state.gridCombat.cellSize || 40;
         const cells = gridCellDistance(rulerStart, rulerEnd, cellSize);
         const feet = cells * 5;
-        
+
         ctx.save();
-        ctx.strokeStyle = '#6baa7a'; 
+        ctx.strokeStyle = '#6baa7a';
         ctx.lineWidth = 2;
         ctx.setLineDash([6, 6]);
         ctx.beginPath();
@@ -1725,7 +2186,7 @@ function draw(e) {
         ctx.lineTo(rulerEnd.x, rulerEnd.y);
         ctx.stroke();
         ctx.setLineDash([]);
-        
+
         ctx.fillStyle = 'rgba(10,10,15,0.9)';
         ctx.fillRect(rulerEnd.x + 10, rulerEnd.y - 20, 80, 22);
         ctx.fillStyle = '#fff';
@@ -1735,7 +2196,31 @@ function draw(e) {
         ctx.restore();
         return;
     }
-    
+
+    // ── NEW: Fog wall preview (while dragging) ──
+    if (currentTool === 'fog-wall' && isDrawing && fogWallStart) {
+        restoreDrawings();
+        renderGridCombat();
+        // Draw wall preview line
+        ctx.save();
+        ctx.strokeStyle = 'rgba(196, 90, 90, 0.8)';
+        ctx.lineWidth = 3;
+        ctx.setLineDash([6, 4]);
+        ctx.beginPath();
+        ctx.moveTo(fogWallStart.x, fogWallStart.y);
+        ctx.lineTo(pos.x, pos.y);
+        ctx.stroke();
+        ctx.restore();
+        return;
+    }
+
+    // ── NEW: Fog reveal/hide continuous painting ──
+    if ((currentTool === 'fog-reveal' || currentTool === 'fog-hide') && isDrawing) {
+        const cellSize = state.gridCombat.cellSize || 40;
+        paintFogCell(pos, cellSize, currentTool === 'fog-reveal');
+        return;
+    }
+
     if (currentTool === 'pen' || currentTool === 'eraser') {
         const drawing = state.drawings[state.drawings.length - 1];
         if (drawing) {
@@ -1770,26 +2255,35 @@ function draw(e) {
 }
 
 function endDrawing(e) {
+    // ── NEW: Finalize light source dragging ──
+    if (isDraggingLight) {
+        isDraggingLight = false;
+        draggedLight = null;
+        canvas.style.cursor = 'grab';
+        saveWhiteboardData();
+        return;
+    }
+
     if (isDraggingToken) {
         if (draggedToken && tokenStartPos) {
             const cellSize = state.gridCombat.cellSize || 40;
-            
+
             if (konrehActive && konrehGame) {
                 const fromX = Math.floor(tokenStartPos.x / cellSize);
                 const fromY = Math.floor(tokenStartPos.y / cellSize);
                 const toX = Math.floor(draggedToken.x / cellSize);
                 const toY = Math.floor(draggedToken.y / cellSize);
-                
+
                 const validMoves = konrehGame.getValidMoves(draggedToken.id);
                 const validMove = validMoves.find(m => m.x === toX && m.y === toY);
-                
+
                 if (validMove) {
                     konrehGame.makeMove(draggedToken.id, validMove);
-                    
+
                     if (validMove.capture) {
                         state.gridCombat.tokens = state.gridCombat.tokens.filter(t => t.id !== validMove.targetId);
                     }
-                    
+
                     if (validMove.slideEnd) {
                         draggedToken.x = validMove.slideEnd.x * cellSize;
                         draggedToken.y = validMove.slideEnd.y * cellSize;
@@ -1797,7 +2291,7 @@ function endDrawing(e) {
                         draggedToken.x = toX * cellSize;
                         draggedToken.y = toY * cellSize;
                     }
-                    
+
                     logRecordingEvent('konreh_move', `Moved ${draggedToken.label} to (${toX}, ${toY}).`);
                     showToast(`Valid Kon'reh Move`, 'success');
                 } else {
@@ -1805,20 +2299,20 @@ function endDrawing(e) {
                     draggedToken.y = tokenStartPos.y;
                     showToast("Invalid Kon'reh move!", 'error');
                 }
-                
+
                 saveWhiteboardData();
                 restoreDrawings();
                 renderGridCombat();
-                
+
                 isDraggingToken = false;
                 draggedToken = null;
                 tokenStartPos = null;
                 canvas.style.cursor = 'grab';
                 return;
             }
-            
+
             const cellsMoved = gridCellDistance(draggedToken, tokenStartPos, cellSize);
-            
+
             if (cellsMoved > 0) {
                 logRecordingEvent('token_move', `${draggedToken.label} moved ${cellsMoved} cells (${cellsMoved * 5} ft).`);
                 const tacStatus = checkTacticalStatus(draggedToken);
@@ -1831,9 +2325,6 @@ function endDrawing(e) {
                 }
                 saveWhiteboardData();
             }
-            // 👇 NEW: push grid-derived range bands into the Combat Tracker
-            // for any opposing linked token, regardless of how far it moved
-            // (even a small shuffle can cross a Close/Near boundary).
             syncRangeFromGrid(draggedToken);
         }
         isDraggingToken = false;
@@ -1855,9 +2346,42 @@ function endDrawing(e) {
         return;
     }
 
+    // ── NEW: Finalize fog wall placement ──
+    if (currentTool === 'fog-wall' && isDrawing && fogWallStart) {
+        const rect = canvas.getBoundingClientRect();
+        const x = (e.clientX || e.changedTouches?.[0]?.clientX || 0) - rect.left;
+        const y = (e.clientY || e.changedTouches?.[0]?.clientY || 0) - rect.top;
+        const pos = snapToGrid(x, y);
+
+        const dist = Math.sqrt(
+            (pos.x - fogWallStart.x) ** 2 + (pos.y - fogWallStart.y) ** 2
+        );
+        if (dist >= 5) {
+            state.gridCombat.fogOfWar.walls.push({
+                x1: fogWallStart.x, y1: fogWallStart.y,
+                x2: pos.x, y2: pos.y
+            });
+            saveWhiteboardData();
+            showToast('🧱 LoS wall added', 'success');
+        }
+
+        isDrawing = false;
+        fogWallStart = null;
+        restoreDrawings();
+        renderGridCombat();
+        return;
+    }
+
+    // ── NEW: Finalize fog reveal/hide painting (save once on mouseup) ──
+    if ((currentTool === 'fog-reveal' || currentTool === 'fog-hide') && isDrawing) {
+        isDrawing = false;
+        saveWhiteboardData();
+        return;
+    }
+
     if (!isDrawing) return;
     isDrawing = false;
-    
+
     if (SHAPE_TOOLS.has(currentTool)) {
         const rect = canvas.getBoundingClientRect();
         const x = (e.clientX || e.changedTouches?.[0]?.clientX || 0) - rect.left;
@@ -1885,15 +2409,8 @@ function endDrawing(e) {
 
 function restoreDrawings() {
     if (!ctx) return;
-    updateTrackerLinkStatusUI(); // 👈 NEW: keep the link label current for whichever sheet is active
+    updateTrackerLinkStatusUI();
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    // 👇 FIX: previously this drew the plain reference grid (always
-    // state.settings.gridType, which the Combat Mode grid-type selector
-    // never touched) UNCONDITIONALLY, then renderGridCombat() drew a second,
-    // separate grid on top using gridCombat.gridType. Selecting "Hex" only
-    // ever changed the second, fainter overlay — the square reference grid
-    // underneath never went away, so it still looked square. When Combat
-    // Mode owns the grid, let it be the only grid drawn.
     if (state.settings.showGrid !== false && !gridCombatActive) drawGrid();
 
     for (const layer of layersInDrawOrder()) {
@@ -1933,13 +2450,12 @@ export function attachEvents() {
         state.settings.gridSnap = e.target.checked;
         saveWhiteboardData();
     });
-    
+
     document.getElementById('whiteboard-grid-combat')?.addEventListener('click', toggleGridCombat);
     document.getElementById('whiteboard-add-token')?.addEventListener('click', addGridToken);
-    // 👇 NEW: grid type toggle + tracker import
     document.getElementById('whiteboard-grid-type')?.addEventListener('change', (e) => {
         state.gridCombat.gridType = e.target.value;
-        state.settings.gridType = e.target.value; // 👈 keep the background grid in sync too
+        state.settings.gridType = e.target.value;
         saveWhiteboardData();
         restoreDrawings();
         renderGridCombat();
@@ -1960,6 +2476,115 @@ export function attachEvents() {
     document.getElementById('whiteboard-redo')?.addEventListener('click', redo);
     document.getElementById('whiteboard-toggle-layers')?.addEventListener('click', toggleLayersPanel);
     document.getElementById('whiteboard-player-view')?.addEventListener('click', togglePlayerView);
+
+    // ── NEW: Fog of War event listeners ──
+    document.getElementById('whiteboard-fog-toggle')?.addEventListener('click', () => {
+        const fog = state.gridCombat.fogOfWar;
+        if (!fog) return;
+        fog.enabled = !fog.enabled;
+        saveWhiteboardData();
+        renderVttCombatToolbar();
+        restoreDrawings();
+        renderGridCombat();
+        showToast(fog.enabled ? '🌫️ Fog of War enabled' : '🌫️ Fog of War disabled', fog.enabled ? 'success' : 'info');
+    });
+
+    document.getElementById('whiteboard-fog-mode')?.addEventListener('change', (e) => {
+        if (!state.gridCombat.fogOfWar) return;
+        state.gridCombat.fogOfWar.mode = e.target.value;
+        saveWhiteboardData();
+        restoreDrawings();
+        renderGridCombat();
+        showToast(`Fog mode: ${e.target.value}`, 'info');
+    });
+
+    document.getElementById('whiteboard-fog-darkness')?.addEventListener('input', (e) => {
+        if (!state.gridCombat.fogOfWar) return;
+        state.gridCombat.fogOfWar.darkness = parseFloat(e.target.value);
+        // Don't save on every slider tick — save on change
+    });
+    document.getElementById('whiteboard-fog-darkness')?.addEventListener('change', (e) => {
+        if (!state.gridCombat.fogOfWar) return;
+        state.gridCombat.fogOfWar.darkness = parseFloat(e.target.value);
+        saveWhiteboardData();
+    });
+
+    document.getElementById('whiteboard-fog-clear')?.addEventListener('click', () => {
+        const fog = state.gridCombat.fogOfWar;
+        if (!fog) return;
+        if (!confirm('Clear all fog data (revealed areas, light sources, and walls)?')) return;
+        fog.revealed = [];
+        fog.lightSources = [];
+        fog.walls = [];
+        saveWhiteboardData();
+        restoreDrawings();
+        renderGridCombat();
+        showToast('🌫️ Fog data cleared', 'info');
+    });
+
+    // ── NEW: Listen for VTT GM role updates (for fog gating) ──
+    gmRoleHandler = (e) => {
+        vttRole = e.detail?.role || null;
+        if (gridCombatActive) {
+            renderVttCombatToolbar();
+            restoreDrawings();
+            renderGridCombat();
+        }
+    };
+    document.addEventListener('gmRoleUpdate', gmRoleHandler);
+
+    // ── NEW: Double-click on light source to edit properties ──
+    if (canvas) {
+        canvas.addEventListener('dblclick', (e) => {
+            if (!gridCombatActive || currentTool !== 'select') return;
+            if (!canControlFog()) return;
+            const fog = state.gridCombat.fogOfWar;
+            if (!fog?.enabled) return;
+
+            const rect = canvas.getBoundingClientRect();
+            const x = (e.clientX || 0) - rect.left;
+            const y = (e.clientY || 0) - rect.top;
+
+            const clickedLight = (fog.lightSources || []).find(ls => {
+                const dx = x - ls.x, dy = y - ls.y;
+                return Math.sqrt(dx * dx + dy * dy) < 20;
+            });
+            if (!clickedLight) return;
+
+            const cellSize = state.gridCombat.cellSize || 40;
+            const radiusStr = prompt('Light radius (in cells):', String(Math.round(clickedLight.radius / cellSize)));
+            if (radiusStr !== null) {
+                const cells = parseInt(radiusStr);
+                if (!isNaN(cells) && cells > 0) clickedLight.radius = cells * cellSize;
+            }
+
+            const colorOptions = [
+                'rgba(255, 220, 150, 0.25)',  // Warm (torch)
+                'rgba(150, 200, 255, 0.25)',  // Cool (magic)
+                'rgba(150, 255, 150, 0.25)',  // Green (witchlight)
+                'rgba(255, 100, 100, 0.25)',  // Red (alarm)
+                'rgba(255, 255, 255, 0.20)',  // White (daylight)
+            ];
+            const colorChoice = prompt(
+                'Light color:\n1. Warm (torch)\n2. Cool (magic)\n3. Green (witchlight)\n4. Red (alarm)\n5. White (daylight)\n\nEnter 1-5:',
+                '1'
+            );
+            if (colorChoice) {
+                const idx = Math.max(0, Math.min(4, parseInt(colorChoice) - 1));
+                if (!isNaN(idx)) clickedLight.color = colorOptions[idx];
+            }
+
+            const intensityStr = prompt('Intensity (0.1 to 1.0):', String(clickedLight.intensity ?? 1));
+            if (intensityStr !== null) {
+                const val = parseFloat(intensityStr);
+                if (!isNaN(val)) clickedLight.intensity = Math.max(0.1, Math.min(1, val));
+            }
+
+            saveWhiteboardData();
+            restoreDrawings();
+            renderGridCombat();
+        });
+    }
 
     if (canvas) {
         canvas.addEventListener('mousedown', startDrawing);
@@ -2007,7 +2632,6 @@ export function attachEvents() {
         saveWhiteboardData(); renderOverlay(); updateStats();
     };
 
-    // New: dragging for notes/images (tokens already have their own drag path).
     window.__wbStartDragNote = (id, event) => {
         if (currentTool !== 'select') return;
         const note = state.notes.find(n => n.id === id);
@@ -2060,7 +2684,7 @@ export function attachEvents() {
         document.addEventListener('mousemove', onMove);
         document.addEventListener('mouseup', onUp);
     };
-    
+
     document.addEventListener('connection-change', (e) => {
         const connected = e.detail?.connected || false;
         isOfflineMode = !connected;
@@ -2071,6 +2695,7 @@ export function attachEvents() {
         } else {
             showToast('📡 Whiteboard in local mode', 'info');
         }
+        renderVttCombatToolbar(); // ── NEW: update fog controls on connection change ──
     });
 }
 
@@ -2143,11 +2768,18 @@ export function clearWhiteboardAll() {
     state.notes = [];
     state.images = [];
     state.gridCombat.tokens = [];
+    // ── NEW: Clear fog data too ──
+    if (state.gridCombat.fogOfWar) {
+        state.gridCombat.fogOfWar.revealed = [];
+        state.gridCombat.fogOfWar.lightSources = [];
+        state.gridCombat.fogOfWar.walls = [];
+    }
     if (konrehActive) toggleKonreh();
     saveWhiteboardData();
     restoreDrawings();
     renderOverlay();
     updateStats();
+    renderVttCombatToolbar(); // ── NEW ──
     showToast('🗑️ Whiteboard cleared', 'info');
 }
 
@@ -2157,7 +2789,7 @@ export function exportWhiteboard() {
     tempCanvas.width = canvas.width;
     tempCanvas.height = canvas.height;
     const tempCtx = tempCanvas.getContext('2d');
-    tempCtx.fillStyle = '#12121a'; 
+    tempCtx.fillStyle = '#12121a';
     tempCtx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
     tempCtx.drawImage(canvas, 0, 0);
 
@@ -2176,13 +2808,21 @@ export function onActivate() {
     loadWhiteboardData();
     setupWebSocketSync();
     if (container) {
-        setTimeout(() => { initCanvas(); restoreDrawings(); renderOverlay(); updateStats(); renderSheetTabs(); renderLayersPanel(); }, 100);
+        setTimeout(() => {
+            initCanvas(); restoreDrawings(); renderOverlay(); updateStats();
+            renderSheetTabs(); renderLayersPanel(); renderVttCombatToolbar();
+        }, 100);
     }
 }
 
 export function onDeactivate() {
     saveWhiteboardData();
     cleanupWebSocketListeners();
+    // ── NEW: Remove gmRoleUpdate listener ──
+    if (gmRoleHandler) {
+        document.removeEventListener('gmRoleUpdate', gmRoleHandler);
+        gmRoleHandler = null;
+    }
 }
 
 export function refresh() {
@@ -2194,12 +2834,18 @@ export function refresh() {
     setupWebSocketSync();
     renderSheetTabs();
     renderLayersPanel();
+    renderVttCombatToolbar(); // ── NEW ──
 }
 
 export function destroy() {
     container = null;
     saveWhiteboardData();
     cleanupWebSocketListeners();
+    // ── NEW: Remove gmRoleUpdate listener ──
+    if (gmRoleHandler) {
+        document.removeEventListener('gmRoleUpdate', gmRoleHandler);
+        gmRoleHandler = null;
+    }
 }
 
 export default {
