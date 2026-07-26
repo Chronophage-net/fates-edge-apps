@@ -666,14 +666,35 @@ export class KonrehEngine {
 //  KON'REH AI — "Schools" opponent
 // ============================================================
 //
-// Implements a shallow alpha-beta search whose leaf evaluation is
+// Implements alpha-beta search with iterative deepening, move ordering,
+// and a quiescence extension on captures, whose leaf evaluation is
 // weighted differently per "School," so that each School plays with a
 // genuinely different style rather than just a different name. The
 // core rules never change — only how a School *values* a position:
 // how much it cares about material, mobility/denial, forcing threats,
-// its own Blue's safety, Central Four presence, the Green cap, and
-// Reforge urgency. This mirrors the Concordance's own framing of
-// Schools as doctrines, not rule variants.
+// its own Blue's safety, Central Four presence and control, piece
+// advancement, and Reforge urgency. This mirrors the Concordance's own
+// framing of Schools as doctrines, not rule variants.
+//
+// STRATEGY UPGRADES over the previous version:
+//   1. Move ordering (captures/specials/advances scored and searched
+//      first) so alpha-beta prunes far more of the tree.
+//   2. Iterative deepening: search depth 1, 2, 3... up to the target
+//      depth, re-using the previous iteration's best move as the first
+//      move tried (principal-variation ordering) at the next depth.
+//   3. Quiescence search: when the main search bottoms out, capturing
+//      sequences are extended a few more plies so a piece that looks
+//      "free" only because the horizon cut the search early is still
+//      seen to be lost. This fixes the classic horizon-effect blunder
+//      where the AI walks a piece into a capture it "didn't see."
+//   4. Richer evaluation: threats are weighted by the VALUE of the
+//      piece threatened (not just counted), a Blue under attack from
+//      multiple pieces at once is treated as more dangerous than one
+//      attacker, non-Blue pieces are rewarded for controlling/occupying
+//      the Cross and its border, and pieces are rewarded for advancing
+//      down the board toward the enemy Home Apex (rather than the AI
+//      being indifferent between a piece sitting at home and one
+//      pressing forward).
 //
 // This file has zero DOM dependencies (pure logic over KonrehEngine),
 // so it can be unit tested the same way as engine.mjs.
@@ -681,41 +702,45 @@ export class KonrehEngine {
 export const DIRS4 = [[1, 0], [-1, 0], [0, 1], [0, -1]];
 
 // ---- School definitions with their weight vectors ----
-// All Schools now have `reforge: 4.0` to make them urgently race to
-// save their Blue. Previously some had values as low as 2.0, which
-// made them indifferent to losing their Blue until the very last
-// moment. The higher weight ensures they will start moving toward the
-// enemy Home Apex immediately upon Blue's death.
+// All Schools have `reforge: 4.0` so they urgently race to save their
+// Blue the moment it dies, rather than drifting toward the enemy Home
+// Apex only once the countdown is nearly out.
+//
+// Two new weights have been added to every School:
+//   control  — how much the School values occupying/bordering the Cross
+//              with non-Blue pieces (denying the center to the enemy)
+//   advance  — how much the School values pushing pieces forward along
+//              the board rather than leaving them undeveloped at home
 export const SCHOOLS = {
   ykrul: {
     name: 'Ykrul',
     tagline: 'Control before contact — count exits, not victims.',
-    weights: { material: 0.8, mobility: 2.0, aggression: 0.5, blueSafety: 1.5, cross: -1.5, cap: 0.5, reforge: 4.0, rooted: 1.0 },
+    weights: { material: 0.8, mobility: 2.0, aggression: 0.5, blueSafety: 1.5, cross: -1.5, cap: 0.5, reforge: 4.0, rooted: 1.0, control: 1.5, advance: 0.6 },
   },
   vilikari: {
     name: 'Vilikari',
     tagline: 'Tempo theft and misdirection — sell them the hour you stole.',
-    weights: { material: 0.8, mobility: 1.0, aggression: 2.0, blueSafety: 0.8, cross: 1.2, cap: 0.6, reforge: 4.0, rooted: 0.6 },
+    weights: { material: 0.8, mobility: 1.0, aggression: 2.0, blueSafety: 0.8, cross: 1.2, cap: 0.6, reforge: 4.0, rooted: 0.6, control: 0.6, advance: 1.2 },
   },
   thepyrgosi: {
     name: 'Thepyrgosi',
     tagline: 'Proof and parity — refuse noise, prove inevitability.',
-    weights: { material: 1.0, mobility: 1.5, aggression: 0.3, blueSafety: 2.0, cross: -0.8, cap: 0.7, reforge: 4.0, rooted: 1.5 },
+    weights: { material: 1.0, mobility: 1.5, aggression: 0.3, blueSafety: 2.0, cross: -0.8, cap: 0.7, reforge: 4.0, rooted: 1.5, control: 0.8, advance: 0.5 },
   },
   aeler: {
     name: 'Aeler',
     tagline: 'Ledger and toll — every square pays, or closes.',
-    weights: { material: 1.2, mobility: 0.8, aggression: 0.7, blueSafety: 1.0, cross: -0.3, cap: 2.0, reforge: 4.0, rooted: 0.8 },
+    weights: { material: 1.2, mobility: 0.8, aggression: 0.7, blueSafety: 1.0, cross: -0.3, cap: 2.0, reforge: 4.0, rooted: 0.8, control: 1.0, advance: 0.7 },
   },
   lethai: {
     name: 'Lethai',
     tagline: 'Single-Stroke — win by inevitability, not attrition.',
-    weights: { material: 0.5, mobility: 1.8, aggression: 0.2, blueSafety: 1.8, cross: -1.0, cap: 0.4, reforge: 4.0, rooted: 1.2 },
+    weights: { material: 0.5, mobility: 1.8, aggression: 0.2, blueSafety: 1.8, cross: -1.0, cap: 0.4, reforge: 4.0, rooted: 1.2, control: 0.7, advance: 1.0 },
   },
   vhasian: {
     name: 'Vhasian',
     tagline: 'Honor as bait — polish the helm in public, strike in private.',
-    weights: { material: 0.7, mobility: 0.8, aggression: 1.6, blueSafety: 0.7, cross: 1.5, cap: 0.6, reforge: 4.0, rooted: 0.5 },
+    weights: { material: 0.7, mobility: 0.8, aggression: 1.6, blueSafety: 0.7, cross: 1.5, cap: 0.6, reforge: 4.0, rooted: 0.5, control: 0.5, advance: 1.3 },
   },
 };
 
@@ -752,10 +777,36 @@ function pseudoMoves(engine, piece) {
   return engine.getPieceMoves(piece);
 }
 
-// ---- Evaluation function – now with stronger Reforge incentives ----
-// Added a massive bonus (1000) if the side in Reforge already has a
-// piece on the enemy Home Apex, making the AI realise it can plant
-// immediately and will prioritise moves that put a piece there.
+// How far a piece has progressed from its own Home Apex toward the
+// enemy Home Apex, as a 0..1 fraction of the total board diagonal (14
+// squares). 0 = still at home, 1 = sitting on the enemy Apex. Used to
+// reward development/advancement instead of the AI being indifferent
+// between a piece that never left home and one pressing the attack.
+function pieceProgress(engine, p) {
+  const home = engine.homeApexOf(p.player);
+  const enemyHome = engine.enemyHomeApexOf(p.player);
+  const total = Math.abs(enemyHome.x - home.x) + Math.abs(enemyHome.y - home.y); // 14
+  const remaining = Math.abs(p.x - enemyHome.x) + Math.abs(p.y - enemyHome.y);
+  return total > 0 ? Math.max(0, Math.min(1, (total - remaining) / total)) : 0;
+}
+
+// Whether a square is inside the Cross or orthogonally borders it —
+// used for the new "control" evaluation term, which rewards non-Blue
+// pieces for contesting the center rather than only Blue caring about it.
+function isNearCross(engine, x, y) {
+  if (engine.isCross(x, y)) return true;
+  for (const [dx, dy] of DIRS4) {
+    if (engine.isCross(x + dx, y + dy)) return true;
+  }
+  return false;
+}
+
+// ---- Evaluation function ----
+// Material, mobility, threat-value-weighted aggression, multi-attacker
+// Blue danger, Cross control, piece advancement, Cross/Rooted status for
+// Blue specifically, Green cap parity, and a steep Reforge-urgency term
+// (including a large bonus for already standing on the enemy Apex,
+// ready to plant immediately).
 function evaluate(engine, weights, me) {
   if (engine.winner === me) return 1_000_000;
   if (engine.winner === 'draw') return 0;
@@ -765,8 +816,9 @@ function evaluate(engine, weights, me) {
   let score = 0;
 
   let myMobility = 0, oppMobility = 0;
-  let myThreats = 0, oppThreats = 0;
-  let myBlueThreatened = false, oppBlueThreatened = false;
+  let myThreatValue = 0, oppThreatValue = 0;
+  let myBlueAttackers = 0, oppBlueAttackers = 0;
+  let myCrossControl = 0, oppCrossControl = 0;
   const myBlue = engine.getBlue(me);
   const oppBlue = engine.getBlue(opp);
 
@@ -775,23 +827,40 @@ function evaluate(engine, weights, me) {
     const val = PIECE_VALUE[p.type] * weights.material;
     score += p.player === me ? val : -val;
 
+    if (isNearCross(engine, p.x, p.y)) {
+      if (p.player === me) myCrossControl++; else oppCrossControl++;
+    }
+
+    if (p.type !== 'blue') {
+      const progress = pieceProgress(engine, p) * 25;
+      score += p.player === me ? weights.advance * progress : -weights.advance * progress;
+    }
+
     const moves = pseudoMoves(engine, p);
     const mobility = moves.length;
-    const captures = moves.filter(m => m.capture).length;
-    if (p.player === me) { myMobility += mobility; myThreats += captures; }
-    else { oppMobility += mobility; oppThreats += captures; }
+    if (p.player === me) myMobility += mobility; else oppMobility += mobility;
 
     for (const m of moves) {
       if (!m.capture) continue;
-      if (p.player === opp && myBlue && m.targetId === myBlue.id) myBlueThreatened = true;
-      if (p.player === me && oppBlue && m.targetId === oppBlue.id) oppBlueThreatened = true;
+      const target = engine.pieces.find(pp => pp.id === m.targetId);
+      const targetValue = target ? PIECE_VALUE[target.type] : 0;
+      if (p.player === me) myThreatValue += targetValue; else oppThreatValue += targetValue;
+
+      if (p.player === opp && myBlue && m.targetId === myBlue.id) myBlueAttackers++;
+      if (p.player === me && oppBlue && m.targetId === oppBlue.id) oppBlueAttackers++;
     }
   }
 
   score += weights.mobility * (myMobility - oppMobility);
-  score += weights.aggression * (myThreats - oppThreats);
-  if (myBlueThreatened) score -= weights.blueSafety * 250;
-  if (oppBlueThreatened) score += weights.blueSafety * 250;
+  // Threats are now weighted by the value of what's threatened, not just
+  // counted — a School that "sees" it can win a Blue for a Red values
+  // that far more than winning a Red for a Red.
+  score += weights.aggression * (myThreatValue - oppThreatValue) / 40;
+
+  // A doubly (or triply) attacked Blue is meaningfully more dangerous
+  // than a singly attacked one — extra attackers mean fewer safe replies.
+  if (myBlueAttackers > 0) score -= weights.blueSafety * 250 * myBlueAttackers;
+  if (oppBlueAttackers > 0) score += weights.blueSafety * 250 * oppBlueAttackers;
 
   if (myBlue) {
     if (engine.isCross(myBlue.x, myBlue.y)) score += weights.cross * (40 - myBlue.crossStays * 10);
@@ -801,6 +870,10 @@ function evaluate(engine, weights, me) {
     if (engine.isCross(oppBlue.x, oppBlue.y)) score -= weights.cross * (40 - oppBlue.crossStays * 10);
     if (oppBlue.rooted) score += weights.rooted * 60;
   }
+
+  // Central control: non-Blue presence in/around the Cross, contesting
+  // the board's most valuable real estate rather than leaving it open.
+  score += weights.control * 15 * (myCrossControl - oppCrossControl);
 
   const myGreens = engine.pieces.filter(p => p.isAlive && p.player === me && p.type === 'green').length;
   const oppGreens = engine.pieces.filter(p => p.isAlive && p.player === opp && p.type === 'green').length;
@@ -847,8 +920,81 @@ function candidateMoves(engine, player) {
   return out;
 }
 
+// Cheap static score used purely to ORDER moves before searching them,
+// so alpha-beta sees the strongest-looking moves first and prunes far
+// more of the tree. This is not the real evaluation — it never touches
+// the engine state — just a fast heuristic guess (MVV-LVA-flavored: a
+// big capture by a small piece ranks above a small capture by a big one).
+function moveOrderScore(engine, cand) {
+  const piece = engine.pieces.find(p => p.id === cand.pieceId);
+  if (!piece) return 0;
+  let s = 0;
+  if (cand.move.capture) {
+    const target = engine.pieces.find(p => p.id === cand.move.targetId);
+    const targetVal = target ? PIECE_VALUE[target.type] : 0;
+    const moverVal = PIECE_VALUE[piece.type];
+    s += 1000 + targetVal * 2 - moverVal / 10;
+  }
+  if (cand.move.special) s += 50;
+  const enemyHome = engine.enemyHomeApexOf(piece.player);
+  const dPrev = Math.abs(piece.x - enemyHome.x) + Math.abs(piece.y - enemyHome.y);
+  const dNew = Math.abs(cand.move.x - enemyHome.x) + Math.abs(cand.move.y - enemyHome.y);
+  s += (dPrev - dNew); // small nudge toward moves that advance
+  return s;
+}
+
+function orderedCandidateMoves(engine, player) {
+  const moves = candidateMoves(engine, player);
+  moves.sort((a, b) => moveOrderScore(engine, b) - moveOrderScore(engine, a));
+  return moves;
+}
+
+const QUIESCENCE_DEPTH = 3;
+
+// Quiescence search: once the main search bottoms out, keep extending
+// through CAPTURES ONLY for a few more plies before trusting the static
+// evaluation. This is the standard fix for the "horizon effect," where a
+// fixed-depth search stops looking exactly one ply before a piece it
+// just moved gets recaptured, making a bad trade look free. Non-capture
+// moves are never extended here — only forcing sequences.
+function quiescence(engine, alpha, beta, weights, me, qDepth) {
+  const standPat = evaluate(engine, weights, me);
+  if (engine.winner || qDepth <= 0 || engine.pendingReforge) return standPat;
+
+  const maximizing = engine.turn === me;
+  if (maximizing) {
+    if (standPat >= beta) return standPat;
+    alpha = Math.max(alpha, standPat);
+  } else {
+    if (standPat <= alpha) return standPat;
+    beta = Math.min(beta, standPat);
+  }
+
+  const player = engine.turn;
+  const captureMoves = candidateMoves(engine, player).filter(c => c.move.capture);
+  if (captureMoves.length === 0) return standPat;
+  captureMoves.sort((a, b) => moveOrderScore(engine, b) - moveOrderScore(engine, a));
+
+  let best = standPat;
+  for (const cand of captureMoves) {
+    const clone = engine.clone();
+    clone.makeMove(cand.pieceId, cand.move);
+    const val = quiescence(clone, alpha, beta, weights, me, qDepth - 1);
+    if (maximizing) {
+      best = Math.max(best, val);
+      alpha = Math.max(alpha, best);
+    } else {
+      best = Math.min(best, val);
+      beta = Math.min(beta, best);
+    }
+    if (beta <= alpha) break;
+  }
+  return best;
+}
+
 function search(engine, depth, alpha, beta, weights, me) {
-  if (depth <= 0 || engine.winner) return evaluate(engine, weights, me);
+  if (engine.winner) return evaluate(engine, weights, me);
+  if (depth <= 0) return quiescence(engine, alpha, beta, weights, me, QUIESCENCE_DEPTH);
 
   if (engine.pendingReforge) {
     const player = engine.pendingReforge.player;
@@ -867,7 +1013,7 @@ function search(engine, depth, alpha, beta, weights, me) {
 
   const player = engine.turn;
   const maximizing = player === me;
-  const moves = candidateMoves(engine, player);
+  const moves = orderedCandidateMoves(engine, player);
   if (moves.length === 0) return evaluate(engine, weights, me);
 
   let best = maximizing ? -Infinity : Infinity;
@@ -882,28 +1028,57 @@ function search(engine, depth, alpha, beta, weights, me) {
   return best;
 }
 
-// Picks a move for `player`, styled by `schoolId`. Returns null if the
-// player genuinely has no legal move anywhere (shouldn't normally be
-// called in that case — the engine itself declares a draw first).
+// Picks a move for `player`, styled by `schoolId`. Uses iterative
+// deepening: it searches depth 1, then 2, ... up to the requested depth,
+// each time trying the previous iteration's best move first. This gives
+// alpha-beta a strong first guess to prune against at every depth, so
+// the search explores its time budget far more efficiently than a single
+// fixed-depth pass with arbitrary move order. Returns null if the player
+// genuinely has no legal move anywhere (shouldn't normally be called in
+// that case — the engine itself declares a draw first).
 export function chooseAiMove(engine, player, schoolId, depth = 3) {
   const school = SCHOOLS[schoolId] || SCHOOLS.ykrul;
   const weights = school.weights;
-  const moves = candidateMoves(engine, player);
+  let moves = orderedCandidateMoves(engine, player);
   if (moves.length === 0) return null;
+  if (moves.length === 1) return moves[0];
 
-  let bestScore = -Infinity;
-  let bestMoves = [];
-  for (const cand of moves) {
-    const clone = engine.clone();
-    clone.makeMove(cand.pieceId, cand.move);
-    const score = search(clone, depth - 1, -Infinity, Infinity, weights, player);
-    if (score > bestScore + 1e-6) {
-      bestScore = score;
-      bestMoves = [cand];
-    } else if (Math.abs(score - bestScore) <= 1e-6) {
-      bestMoves.push(cand);
+  let bestMoves = [moves[0]];
+  let pv = null;
+
+  for (let d = 1; d <= depth; d++) {
+    if (pv) {
+      const idx = moves.findIndex(c => c.pieceId === pv.pieceId && c.move.x === pv.move.x && c.move.y === pv.move.y && c.move.special === pv.move.special);
+      if (idx > 0) {
+        const [found] = moves.splice(idx, 1);
+        moves.unshift(found);
+      }
+    }
+
+    let alpha = -Infinity;
+    const beta = Infinity;
+    let bestScore = -Infinity;
+    let iterBestMoves = [];
+
+    for (const cand of moves) {
+      const clone = engine.clone();
+      clone.makeMove(cand.pieceId, cand.move);
+      const score = search(clone, d - 1, alpha, beta, weights, player);
+      if (score > bestScore + 1e-6) {
+        bestScore = score;
+        iterBestMoves = [cand];
+      } else if (Math.abs(score - bestScore) <= 1e-6) {
+        iterBestMoves.push(cand);
+      }
+      alpha = Math.max(alpha, bestScore);
+    }
+
+    if (iterBestMoves.length > 0) {
+      bestMoves = iterBestMoves;
+      pv = bestMoves[0];
     }
   }
+
   return bestMoves[Math.floor(Math.random() * bestMoves.length)];
 }
 
@@ -1203,6 +1378,7 @@ export function openKonrehModal(netConfig = null) {
     <label><input type="radio" name="kr-depth" value="2"> Easy</label>
     <label><input type="radio" name="kr-depth" value="3" checked> Medium</label>
     <label><input type="radio" name="kr-depth" value="4"> Hard</label>
+    <label><input type="radio" name="kr-depth" value="5"> Expert</label>
   `;
   schoolPanel.appendChild(depthRow);
 
@@ -1407,7 +1583,7 @@ export function openKonrehModal(netConfig = null) {
     boardContainer.style.display = 'flex';
     coachTipDiv.style.display = coachMode ? 'block' : 'none';
     if (aiConfig) {
-      const depthLabel = aiConfig.depth === 2 ? 'Easy' : aiConfig.depth === 3 ? 'Medium' : 'Hard';
+      const depthLabel = aiConfig.depth === 2 ? 'Easy' : aiConfig.depth === 3 ? 'Medium' : aiConfig.depth === 4 ? 'Hard' : 'Expert';
       log(`<i>Game started — vs computer (${SCHOOLS[aiConfig.schoolId].name}, ${depthLabel}).</i>`);
     } else {
       log('<i>Game started — Player 1 to move.</i>');
@@ -1427,7 +1603,7 @@ export function openKonrehModal(netConfig = null) {
       if (game.winner) { aiThinking = false; render(); return; }
       if (game.pendingReforge) {
         const player = game.pendingReforge.player;
-        const reforgeDepth = aiConfig.depth === 2 ? 1 : aiConfig.depth === 3 ? 2 : 3;
+        const reforgeDepth = aiConfig.depth <= 2 ? 1 : aiConfig.depth === 3 ? 2 : aiConfig.depth === 4 ? 3 : 4;
         const opt = chooseAiReforgeChoice(game, aiConfig.schoolId, reforgeDepth);
         if (opt) {
           game.resolveReforge(opt.key);

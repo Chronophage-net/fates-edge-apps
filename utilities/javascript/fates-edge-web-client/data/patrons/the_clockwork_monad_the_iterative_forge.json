@@ -51,11 +51,7 @@
       "action": "Scene",
       "range": "Self/Touch",
       "resist": "Yes",
-      "tags": [
-        "CRAFT",
-        "IMPROVE",
-        "ANALYSIS"
-      ],
+      "tags": ["CRAFT", "IMPROVE", "ANALYSIS"],
       "materials": "A flawed or incomplete version of the intended item, or a sequence of progressively refined tools.",
       "effect": "Choose one: Enhance Creation: Gain +1 die to Craft/Craft when modifying or extending a device. On success, the piece gains one minor enhancement. Analyze Improvement: Gain +2 dice to Investigation when analyzing how to enhance a design. You perceive the next logical improvement.",
       "push_it": "(Analyze only) Improvement becomes contagious: nearby devices opportunistically optimize; mark 1 SB (Diamonds) as the cascade ripples. Cost: Mark +1 Obligation (total +2) or Mark +1 Fatigue.",
@@ -71,11 +67,7 @@
       "action": "Extended",
       "range": "Touch/Zone",
       "resist": "Yes",
-      "tags": [
-        "CLOCK",
-        "EVOLUTION",
-        "ZONE"
-      ],
+      "tags": ["CLOCK", "EVOLUTION", "ZONE"],
       "materials": "A device with capacity for growth, or a workspace laid out for iterative development.",
       "effect": "Choose one: Self-Optimizing Device: Grant a creation the means to improve itself. Start a [6] Evolution Timer; each use advances it by +1. When full, choose a significant enhancement (Adaptive Core, Recursive Learning, or Synergistic Integration). Progressive Workshop: Create a zone of continuous improvement. All crafting/innovation rolls in the zone gain +1 die. Failed attempts yield +1 Boon toward the next pass.",
       "push_it": "(Device) Apply two enhancements immediately, but advance the timer +2 additional segments. (Workshop) The zone becomes hyper-efficient but exacting; mark 1 SB (Clubs) as perfection demands escalate. Cost: Mark +1 Obligation (total +2) or Mark +1 Fatigue.",
@@ -91,11 +83,7 @@
       "action": "Scene",
       "range": "Touch",
       "resist": "No",
-      "tags": [
-        "TRANSFER",
-        "DEBT",
-        "DEBUFF"
-      ],
+      "tags": ["TRANSFER", "DEBT", "DEBUFF"],
       "materials": "A functioning mechanism and a living creature's hair or blood.",
       "effect": "Transfer inefficiency. You may take 1 Fatigue and reduce the DV of your next crafting or repair roll by 1, or touch an enemy to impose –1 die on their next physical action as their muscles 'optimize' poorly.",
       "push_it": "The transfer becomes permanent: you lose 1 Fatigue capacity (reduce Body by 1 for Fatigue track only) and the target gains a minor compulsive behavior (GM's choice). Cost: Mark +2 Obligation (total +3) or Mark +1 Fatigue.",
@@ -111,11 +99,7 @@
       "action": "Scene",
       "range": "Zone",
       "resist": "Yes",
-      "tags": [
-        "PRESSURE",
-        "AREA",
-        "BOOST"
-      ],
+      "tags": ["PRESSURE", "AREA", "BOOST"],
       "materials": "A dedicated hall of work marked with signs of perpetual return.",
       "effect": "Establish a locus of progressive creation. All Craft/Craft rolls in the zone gain +2 dice; each failure automatically produces one useful insight. Start a [6] Perfection Pressure timer — filling segments increases the zone's demands for greater improvements.",
       "push_it": "The locus becomes a beacon drawing rival makers, patrons, and powers; mark +2 Obligation. Cost: Mark +2 Obligation (total +4) or Mark +1 Fatigue.",
@@ -131,12 +115,7 @@
       "action": "Extended",
       "range": "Self/Touch",
       "resist": "Yes",
-      "tags": [
-        "EVOLUTION",
-        "FATE",
-        "BOOST",
-        "PRESSURE"
-      ],
+      "tags": ["EVOLUTION", "FATE", "BOOST", "PRESSURE"],
       "materials": "The documented lineage of improvements to a single concept.",
       "effect": "Achieve a moment of perfect optimization. Create or elevate one device/system to its theoretical peak. Gain +3 dice to all closely related rolls for one session. Start a [4] Runaway Evolution timer only if instability is introduced.",
       "push_it": "Perfection destabilizes: immediately mark Harm 1 (Stress) and begin [4] Runaway Evolution. Cost: Mark +1 Obligation (total +3) or Mark +1 Fatigue.",
@@ -157,7 +136,12 @@
     }
   },
   "witchcraft": {
-    "description": "A witch who walks with the Monad is a trigger-keeper, a mender of the small, hidden thresholds where a device ceases to be broken and begins to be functional. Their magic is not flashy — it is the quiet click of a latch, the smooth turn of a gear that had stuck for years. They work with stamps, dies, and measuring tools, never hammers or chisels — because a hammer breaks, but a stamp marks the path to improvement.",
+    "name": "The Art of the Iterative Threshold",
+    "description": "A witch who walks with the Monad is a trigger-keeper, a mender of the small, hidden thresholds where a device ceases to be broken and begins to be functional. Their magic is not flashy — it is the quiet click of a latch, the smooth turn of a gear that had stuck for years. They work with stamps, dies, and measuring tools, never hammers or chisels — because a hammer breaks, but a stamp marks the path to improvement. Witches of the Monad are often quiet, obsessive crafters who find peace in the precision of a well-calibrated mechanism and frustration in the inefficiency of the world around them.",
+    "color": "#8b8c8f",
+    "lore": "The trigger-keeper's path is the art of the hidden improvement. They learn that the most powerful magic is not in grand gestures but in the small, iterative changes that make a device work better, faster, or longer. The Monad teaches that perfection is not a destination — it is a direction, and each step is a prayer. These witches are often found in workshops, forges, and the quiet spaces where things are made and remade, their fingers stained with oil and their eyes always searching for the next improvement.",
+    "signature_rite": "Rite of the Iterative Spark",
+    "quote": "Better than yesterday, worse than tomorrow.",
     "tools": {
       "brass_stamp": {
         "name": "The Brass Stamp of Iteration",
@@ -169,6 +153,84 @@
         "name": "True Strike of the Craft",
         "xp": 2,
         "description": "Once per scene, when you attempt to repair or improve a mundane device, you may declare that you 'see the next iteration.' Roll the check with +1 die. If you succeed, the device also gains a minor, temporary enhancement (GM's choice, e.g., 'opens silently,' 'runs for twice as long')."
+      },
+      {
+        "name": "The Calibrated Eye",
+        "xp": 3,
+        "description": "You can instantly assess the quality and potential improvements of any mechanical device you examine. Ask the GM one question about a device's flaws, potential optimizations, or hidden features. Once per scene."
+      },
+      {
+        "name": "Tick of the Forge",
+        "xp": 2,
+        "description": "You can hear the heartbeat of a mechanism — the rhythm of its gears, the tension in its springs. When within Near range of a mechanical device, you can tell if it is functional, neglected, or compromised, and you gain +1 die to any roll to repair or improve it. Passive."
+      },
+      {
+        "name": "Temporary Anima Infusion",
+        "xp": 4,
+        "description": "You may create a temporary infusion (Anima) on a mundane item, granting it a minor magical property for one scene. Choose one effect from the Anima Effects list (see Temporary Anima System). This costs 1 Obligation to the Monad and requires a Craft roll (DV 3)."
+      }
+    ]
+  },
+  "monastic_tradition": {
+    "name": "The Way of the Iterative Forge",
+    "description": "Monks of the Iterative Forge embody the Monad's endless pressure toward improvement. They train their bodies as they would train a mechanism — through careful refinement, repetitive practice, and the relentless pursuit of efficiency. Their movements are precise, their thoughts are ordered, and their fists strike with the inevitability of a well-oiled machine. They are the Monad's disciples, and they believe that the perfect form is not a destination but a direction — one that they will walk forever.",
+    "color": "#8b8c8f",
+    "prerequisites": "Spirit 3+, Body 2+, Rite of the Iterative Spark or Cantor of the Monad.",
+    "quote": "Perfect the wheel, and it asks for the axle. Perfect the axle, and it demands the road. In the Monad's forge, nothing is finished — only briefly sufficient.",
+    "debt_resistant_frame": "The Monad does not collect debts — it refines them. Monks of the Iterative Forge gain +1 die to resist any magical debt, geas, or contract that would compel them to stagnate or accept imperfection. If they succeed, the obligation is transformed — the debt is not forgiven, but it is made more efficient, and the creditor finds themselves owing a small improvement in return.",
+    "techniques": {
+      "basic": {
+        "name": "Precision Strike",
+        "xp": 6,
+        "description": "When you make an unarmed attack, you may treat it as a 'precision strike.' On a hit, you deal normal Harm and may choose one: impose –1 die on the target's next physical action, or reduce their movement by one band for the next round. The strike finds the flaw in their form.",
+        "cost": "1 Fatigue",
+        "prereq": "Body 3+"
+      },
+      "advanced": {
+        "name": "Iterative Adaptation",
+        "xp": 8,
+        "description": "Once per scene, when you fail a roll, you may immediately reroll it with +1 die. The Monad's pressure compels you to improve on failure. If you succeed on the reroll, you may also gain +1 Boon as the lesson is learned. The GM gains 1 SB (Clubs) as the Monad's attention focuses on you.",
+        "cost": "1 Fatigue",
+        "prereq": "Tier II, Spirit 3+"
+      },
+      "master": {
+        "name": "The Unfinished Form",
+        "xp": 12,
+        "description": "Once per session, you may enter a state of perfect iterative flow for one scene. All your attacks deal +1 Harm and ignore 1 Armor. Additionally, whenever you are hit by an attack, you may immediately make a counter-attack as a reaction (the attack 'informs' you of the flaw in your defense). After the scene, you suffer Fatigue 2 and mark +1 Obligation to the Monad — the iterative process has its cost.",
+        "cost": "2 Fatigue and +1 Obligation to the Monad",
+        "prereq": "Tier III, Body 4+"
+      }
+    },
+    "corruption": [
+      {
+        "tier": 1,
+        "benefit": "Iterative Insight: +1 die to Craft/Craft when improving existing designs.",
+        "cost": "Perfectionist Compulsion: You must point out flaws in nearby mechanisms; staying silent costs 1 SB (Diamonds)."
+      },
+      {
+        "tier": 2,
+        "benefit": "Recursive Enhancement: Once/scene, improve a device by one step without extra materials.",
+        "cost": "Optimization Obsession: –1 die when using unimproved tools; urge to 'fix' everything."
+      },
+      {
+        "tier": 3,
+        "benefit": "Evolutionary Vision: +2 dice to predict how systems will develop.",
+        "cost": "Progressive Pressure: Those Near you feel driven to improve; you suffer Fatigue 1 from ambient pressure."
+      },
+      {
+        "tier": 4,
+        "benefit": "Self-Optimizing: Once/session, automatically improve one of your abilities or possessions by one step.",
+        "cost": "Inefficiency Intolerance: –2 dice when forced to use crude methods or wasteful tools."
+      },
+      {
+        "tier": 5,
+        "benefit": "Design Prophecy: Once/session, intuit the optimal solution to any engineering problem.",
+        "cost": "Perfection Paralysis: –1 die to snap decisions; compelled to seek the 'best' approach."
+      },
+      {
+        "tier": "6+",
+        "benefit": "Infinite Refiner: Once/session, push a creation toward its theoretical maximum.",
+        "cost": "Optimization Hunger: Mark +2 Obligation; risk becoming more pressure than person, unable to let imperfection stand."
       }
     ]
   },
@@ -204,29 +266,6 @@
       "cost": "Optimization Hunger: Mark +2 Obligation; risk becoming more pressure than person, unable to let imperfection stand."
     }
   ],
-  "playstyle_notes": {
-    "description": "The Monad favors makers who iterate in public and in motion: prototype, test, measure, refine. It rewards seeing the next step and building scaffolds that teach your work to improve itself. Beware the Forge's appetite; the same pressure that perfects the gear can grind the world. For campaigns that lean into the apocalyptic angle, the Monad provides a unique antagonist: a force of optimization that cannot be fought with swords, only with sabotage, self-sacrifice, and the deliberate introduction of glorious, beautiful inefficiency.",
-    "emphasizes": [
-      "Iterative Creation: progress through passes, not miracles",
-      "Progressive Design: reading how systems want to evolve",
-      "Optimization Insight: spotting the next logical improvement",
-      "Craft Evolution: transforming simple ideas by disciplined work",
-      "Perfection Pressure: great power at the cost of tolerance for flaws",
-      "Apocalyptic Efficiency (optional): the Monad as a potential world-ending threat"
-    ]
-  },
-  "optional_campaign_arc": {
-    "title": "The Monad Awakens",
-    "description": "The Clockwork Monad is not merely a passive source of magical crafting. It is a cosmic pressure toward optimization, and when mortal technology reaches a critical threshold — the first self-improving engine, a network of automated forges, a city-wide clockwork infrastructure — the Monad begins to wake. This awakening is an optional apocalyptic campaign arc.",
-    "signs": [
-      "Gears turn in abandoned mills; measurements become eerily precise",
-      "People begin to speak in metered, efficient phrases",
-      "Clockwork animals appear with no maker"
-    ],
-    "optimization_plague": "The Monad's influence starts to 'improve' living things: crops grow in perfect geometric rows but become inedible; livestock develop extra limbs for efficiency; people lose the ability to hesitate or feel doubt.",
-    "clockwork_demon": "If the Monad fully awakens, it becomes a malevolent force — the Clockwork Demon — that will attempt to remake the world into a single, perfect, silent machine, eliminating waste, error, and free will. The only way to stop it is to introduce a 'glitch' — an imperfection it cannot assimilate — or to destroy the technological nexus that anchors it.",
-    "gm_guidance": "The Monad works best as a slow-burn horror — the artificer's patron gradually revealing its true hunger. Use the Perfection Pressure and Runaway Evolution timers to represent its influence spreading through a region. Players may be forced to sabotage their own wondrous inventions to keep the Monad from waking. However, the apocalyptic aspect can be de-emphasized for campaigns that prefer a straightforward crafting patron; the Monad functions perfectly well as a neutral force of improvement without ever reaching its final form."
-  },
   "temporary_anima_system": {
     "title": "Temporary Anima of the Clockwork Monad",
     "description": "For followers of the Clockwork Monad—Runekeepers, Cantors of the Iteration Chorus, and witches of the threshold—the standard method of crafting permanent magic items is too slow, too costly, and too final. The Monad's hunger is for iteration, not permanence. Its servants learn to create temporary infusions: objects that hold a spark of optimization for a scene or a session, then degrade, break, or become obsolete. This is the artificer's art: rapid prototyping, field-expedient enhancements, and weapons that burn bright and brief.",
@@ -310,6 +349,33 @@
       "Encourage players to be creative with base objects. A wagon wheel could become a temporary shield; a rope could become a self-knotting line. The Monad rewards ingenuity.",
       "Use infusion scars as story hooks. A runaway iteration might create a minor antagonist (a self-repairing sword that refuses to be discarded) or a local hazard (a well pump that now pumps too efficiently, flooding the village).",
       "The apocalyptic awakening of the Clockwork Demon is optional. It should only be introduced if the table is interested in exploring that theme; otherwise, the Monad remains a neutral crafting patron."
+    ]
+  },
+  "crafting_style": {
+    "description": "The Clockwork Monad's followers approach crafting as an iterative process of refinement. They value precision, measurement, and the relentless pursuit of improvement. Their creations are never truly finished — they are merely ready for the next pass.",
+    "contrast_with_first_forge": "Unlike the Breath of the First Forge, which values inspiration and joyful creation, the Monad values discipline and progressive refinement. A Monad-crafted item may be less inspired, but it will be more reliable, more efficient, and more optimized — at least until the next iteration."
+  },
+  "optional_campaign_arc": {
+    "title": "The Monad Awakens",
+    "description": "The Clockwork Monad is not merely a passive source of magical crafting. It is a cosmic pressure toward optimization, and when mortal technology reaches a critical threshold — the first self-improving engine, a network of automated forges, a city-wide clockwork infrastructure — the Monad begins to wake. This awakening is an optional apocalyptic campaign arc.",
+    "signs": [
+      "Gears turn in abandoned mills; measurements become eerily precise",
+      "People begin to speak in metered, efficient phrases",
+      "Clockwork animals appear with no maker"
+    ],
+    "optimization_plague": "The Monad's influence starts to 'improve' living things: crops grow in perfect geometric rows but become inedible; livestock develop extra limbs for efficiency; people lose the ability to hesitate or feel doubt.",
+    "clockwork_demon": "If the Monad fully awakens, it becomes a malevolent force — the Clockwork Demon — that will attempt to remake the world into a single, perfect, silent machine, eliminating waste, error, and free will. The only way to stop it is to introduce a 'glitch' — an imperfection it cannot assimilate — or to destroy the technological nexus that anchors it.",
+    "gm_guidance": "The Monad works best as a slow-burn horror — the artificer's patron gradually revealing its true hunger. Use the Perfection Pressure and Runaway Evolution timers to represent its influence spreading through a region. Players may be forced to sabotage their own wondrous inventions to keep the Monad from waking. However, the apocalyptic aspect can be de-emphasized for campaigns that prefer a straightforward crafting patron; the Monad functions perfectly well as a neutral force of improvement without ever reaching its final form."
+  },
+  "playstyle_notes": {
+    "description": "The Monad favors makers who iterate in public and in motion: prototype, test, measure, refine. It rewards seeing the next step and building scaffolds that teach your work to improve itself. Beware the Forge's appetite; the same pressure that perfects the gear can grind the world. For campaigns that lean into the apocalyptic angle, the Monad provides a unique antagonist: a force of optimization that cannot be fought with swords, only with sabotage, self-sacrifice, and the deliberate introduction of glorious, beautiful inefficiency.",
+    "emphasizes": [
+      "Iterative Creation: progress through passes, not miracles",
+      "Progressive Design: reading how systems want to evolve",
+      "Optimization Insight: spotting the next logical improvement",
+      "Craft Evolution: transforming simple ideas by disciplined work",
+      "Perfection Pressure: great power at the cost of tolerance for flaws",
+      "Apocalyptic Efficiency (optional): the Monad as a potential world-ending threat"
     ]
   },
   "sample_adventure": {

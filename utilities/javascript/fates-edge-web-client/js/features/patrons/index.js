@@ -8,6 +8,24 @@
  *
  * All data is discovered via a manifest.json file that is generated automatically.
  * If manifest is missing, falls back to hardcoded known slugs.
+ *
+ * Patron JSON Structure (v2):
+ *   - id, type, title, subtitle, version, tags
+ *   - lore: { description, followers, names_across_regions, quote, signs, quotes }
+ *   - domain_focus: string[]
+ *   - runekeeper_options: { thiasos: { description, care }, codex: { description, upkeep } }
+ *   - patrons_gift: { name, description, effect, cost }
+ *   - rites: [{ name, tier, xp, action, range, resist, tags, materials, effect, push_it, cost, requires, invoke, duration, timer, integrity_timer }]
+ *   - cantors_and_cults: { cantors: { name, description }, cult: { name, description } }
+ *   - witchcraft: { name, description, color, lore, signature_rite, quote, tools: { ... }, hedge_gifts: [{ name, xp, description }] }
+ *   - monastic_tradition: { name, description, color, quote, prerequisites, debt_resistant_frame, techniques: { basic, advanced, master }, corruption: [] }
+ *   - corruption: [{ tier, benefit, cost }]
+ *   - playstyle_notes: { description, emphasizes: [] }
+ *   - sample_adventure: { title, description, quote }
+ *   - optional_campaign_arc: { title, description, signs, optimization_plague, clockwork_demon, gm_guidance }
+ *   - temporary_anima_system: { title, description, core_principles, creation_procedure, effects, scars, clearing_obligation, artificer_talents, gm_guidance }
+ *   - rivalries: [{ patron, description }]
+ *   - _license: string
  */
 
 import { getState, saveState } from '../../core/state.js';
@@ -142,6 +160,9 @@ function safeString(val) {
         if (val.label) return safeString(val.label);
         if (val.description) return safeString(val.description);
         if (val.lore) return safeString(val.lore);
+        if (val.effect) return safeString(val.effect);
+        if (val.text) return safeString(val.text);
+        if (val.quote) return safeString(val.quote);
         try { return JSON.stringify(val); } catch (e) { return '[object]'; }
     }
     return String(val);
@@ -149,23 +170,23 @@ function safeString(val) {
 
 function getPatronDescription(patron) {
     if (!patron) return 'No description available.';
+
+    // Try the lore.description field first (new format)
+    if (patron.lore?.description) return patron.lore.description;
+
+    // Fallback to old format
     if (typeof patron.description === 'string') return patron.description;
-    if (patron.description && typeof patron.description === 'object') {
-        if (patron.description.description) return patron.description.description;
-        if (patron.description.lore) return patron.description.lore;
-        if (patron.description.quote) return patron.description.quote;
-        if (patron.description.text) return patron.description.text;
-        let parts = [];
-        if (patron.description.followers) parts.push(patron.description.followers);
-        if (patron.description.apocalyptic_aspect) parts.push(patron.description.apocalyptic_aspect);
-        if (parts.length > 0) return parts.join('\n\n');
-    }
-    if (patron.lore && typeof patron.lore === 'object') {
-        if (patron.lore.description) return patron.lore.description;
-        if (patron.lore.lore) return patron.lore.lore;
-    }
+    if (patron.description?.description) return patron.description.description;
+    if (patron.description?.lore) return patron.description.lore;
+
+    // Last resort
     if (typeof patron.lore === 'string') return patron.lore;
     return safeString(patron.description) || 'No description available.';
+}
+
+function getPatronLore(patron) {
+    if (!patron?.lore) return null;
+    return patron.lore;
 }
 
 function getPatronSummary(patron) {
@@ -174,12 +195,21 @@ function getPatronSummary(patron) {
     if (patron.domain && typeof patron.domain === 'string') return patron.domain;
     if (patron.type && typeof patron.type === 'string') return patron.type;
     if (patron.agenda && typeof patron.agenda === 'string') return patron.agenda;
-    if (patron.description) {
-        const desc = getPatronDescription(patron);
-        const firstSentence = desc.split('.')[0] || desc;
-        return firstSentence.substring(0, 80) + (firstSentence.length > 80 ? '...' : '');
-    }
-    return '';
+    const desc = getPatronDescription(patron);
+    const firstSentence = desc.split('.')[0] || desc;
+    return firstSentence.substring(0, 80) + (firstSentence.length > 80 ? '...' : '');
+}
+
+function getPatronIcon(patron) {
+    if (patron?.icon) return patron.icon;
+    return '🌟';
+}
+
+function getPatronColor(patron) {
+    if (patron?.color) return patron.color;
+    if (patron?.witchcraft?.color) return patron.witchcraft.color;
+    if (patron?.monastic_tradition?.color) return patron.monastic_tradition.color;
+    return 'var(--gold)';
 }
 
 function normalizePatron(p) {
@@ -191,10 +221,16 @@ function normalizePatron(p) {
         if (result.description.description) {
             result._rawDescription = result.description;
             result.description = result.description.description;
-        } else if (result.lore && result.lore.description) {
-            result._rawDescription = result.description;
-            result.description = result.lore.description;
         }
+    }
+    // Ensure rites are objects
+    if (result.rites && Array.isArray(result.rites)) {
+        result.rites = result.rites.map(r => {
+            if (typeof r === 'string') {
+                return { name: r, tier: 'Basic', xp: 4, effect: r };
+            }
+            return r;
+        });
     }
     return result;
 }
@@ -208,6 +244,19 @@ function sortByName(a, b) {
     const nameA = (a.name || a.title || '').toLowerCase();
     const nameB = (b.name || b.title || '').toLowerCase();
     return nameA.localeCompare(nameB);
+}
+
+function getTierColor(tier) {
+    const colors = {
+        'Cantrip': 'var(--text3)',
+        'Basic': '#6baa7a',
+        'Low': '#6baa7a',
+        'Standard': '#d4af37',
+        'Advanced': '#c47a7a',
+        'Master': '#b84a8a',
+        'Epic': '#d94a4a'
+    };
+    return colors[tier] || 'var(--text2)';
 }
 
 // ============================================================
@@ -260,7 +309,6 @@ async function loadRemotePatrons() {
     state.isLoading = true;
 
     try {
-        // ─── Use shared discovery ──────────────────────────────
         const cosmicSlugs = await discoverPatrons('cosmic', COSMIC_DATA_PATH);
         const terrestrialSlugs = await discoverPatrons('terrestrial', TERRESTRIAL_DATA_PATH, TERRESTRIAL_FALLBACK_DATA_PATH);
         const religionSlugs = await discoverPatrons('religion', RELIGION_DATA_PATH);
@@ -325,7 +373,6 @@ async function loadRemotePatrons() {
         }
         state.religions = religions.sort(sortByName);
 
-        // Trusts – keep existing or use defaults
         if (state.trusts.length === 0) {
             state.trusts = DEFAULT_TRUSTS.sort(sortByName);
         } else {
@@ -444,7 +491,7 @@ function renderView(view) {
 }
 
 // ============================================================
-// RENDER: COSMIC PATRONS (sorted)
+// RENDER: COSMIC PATRONS
 // ============================================================
 
 function renderCosmicPatrons() {
@@ -468,9 +515,11 @@ function renderCosmicPatrons() {
                     const obl = obligationMap[p.id] || 0;
                     const name = safeString(p.name || p.title || 'Unnamed');
                     const summary = getPatronSummary(p);
+                    const icon = getPatronIcon(p);
+                    const color = getPatronColor(p);
                     return `
-                        <div class="patron-tile" onclick="window.viewPatron('${p.id}')" style="background:var(--bg3);border-radius:var(--radius);padding:0.3rem 0.5rem;cursor:pointer;display:flex;flex-direction:column;align-items:center;text-align:center;border-left:3px solid ${p.color || 'var(--gold)'};transition:all 0.2s;">
-                            <div style="font-size:1.5rem;">${safeString(p.icon || '🌟')}</div>
+                        <div class="patron-tile" onclick="window.viewPatron('${p.id}')" style="background:var(--bg3);border-radius:var(--radius);padding:0.3rem 0.5rem;cursor:pointer;display:flex;flex-direction:column;align-items:center;text-align:center;border-left:3px solid ${color};transition:all 0.2s;">
+                            <div style="font-size:1.5rem;">${safeString(icon)}</div>
                             <div style="font-size:0.75rem;font-weight:600;color:var(--text);">${escHtml(name)}</div>
                             <div style="font-size:0.6rem;color:var(--text3);">${escHtml(summary)}</div>
                             <div style="font-size:0.55rem;color:var(--text2);margin-top:0.1rem;">Oblig: ${obl}</div>
@@ -493,7 +542,7 @@ function renderCosmicPatrons() {
 }
 
 // ============================================================
-// RENDER: TERRESTRIAL PATRONS (sorted)
+// RENDER: TERRESTRIAL PATRONS
 // ============================================================
 
 function renderTerrestrialPatrons() {
@@ -514,9 +563,11 @@ function renderTerrestrialPatrons() {
                 ${state.terrestrialPatrons.map(p => {
                     const name = safeString(p.name || p.title || 'Unnamed');
                     const summary = getPatronSummary(p);
+                    const icon = getPatronIcon(p) || '🏛️';
+                    const color = p.color || '#2980b9';
                     return `
-                        <div class="patron-tile" onclick="window.viewTerrestrial('${p.id}')" style="background:var(--bg3);border-radius:var(--radius);padding:0.3rem 0.5rem;cursor:pointer;display:flex;flex-direction:column;align-items:center;text-align:center;border-left:3px solid ${p.color || '#2980b9'};transition:all 0.2s;">
-                            <div style="font-size:1.5rem;">${safeString(p.icon || '🏛️')}</div>
+                        <div class="patron-tile" onclick="window.viewTerrestrial('${p.id}')" style="background:var(--bg3);border-radius:var(--radius);padding:0.3rem 0.5rem;cursor:pointer;display:flex;flex-direction:column;align-items:center;text-align:center;border-left:3px solid ${color};transition:all 0.2s;">
+                            <div style="font-size:1.5rem;">${safeString(icon)}</div>
                             <div style="font-size:0.75rem;font-weight:600;color:var(--text);">${escHtml(name)}</div>
                             <div style="font-size:0.6rem;color:var(--text3);">${escHtml(summary)}</div>
                             <div style="font-size:0.55rem;color:var(--text2);">Tier ${safeString(p.tier || 'I')}</div>
@@ -538,7 +589,7 @@ function renderTerrestrialPatrons() {
 }
 
 // ============================================================
-// RENDER: RELIGIONS (sorted)
+// RENDER: RELIGIONS
 // ============================================================
 
 function renderReligions() {
@@ -557,9 +608,10 @@ function renderReligions() {
             ${state.religions.map(r => {
                 const name = safeString(r.name || r.title || 'Unnamed');
                 const orders = r.orders ? r.orders.length : 0;
+                const icon = r.icon || '⛪';
                 return `
                     <div class="religion-card" onclick="window.viewReligion('${r.id}')" style="background:var(--bg3);border-radius:var(--radius);padding:0.5rem;cursor:pointer;border-left:3px solid var(--gold);">
-                        <div style="font-size:1.5rem;">${safeString(r.icon || '⛪')}</div>
+                        <div style="font-size:1.5rem;">${safeString(icon)}</div>
                         <div style="font-weight:600;">${escHtml(name)}</div>
                         <div style="font-size:0.7rem;color:var(--text3);">${orders} Orders</div>
                     </div>
@@ -574,7 +626,7 @@ function renderReligions() {
 }
 
 // ============================================================
-// RENDER: TRUSTS (sorted)
+// RENDER: TRUSTS
 // ============================================================
 
 function renderTrusts() {
@@ -593,9 +645,10 @@ function renderTrusts() {
             ${state.trusts.map(t => {
                 const name = safeString(t.name || t.title || 'Unnamed');
                 const tier = safeString(t.tier || 'I');
+                const icon = t.icon || '🤝';
                 return `
                     <div class="trust-card" onclick="window.viewTrust('${t.id}')" style="background:var(--bg3);border-radius:var(--radius);padding:0.5rem;cursor:pointer;border-left:3px solid var(--gold);">
-                        <div style="font-size:1.5rem;">${safeString(t.icon || '🤝')}</div>
+                        <div style="font-size:1.5rem;">${safeString(icon)}</div>
                         <div style="font-weight:600;">${escHtml(name)}</div>
                         <div style="font-size:0.7rem;color:var(--text3);">Tier ${escHtml(tier)}</div>
                     </div>
@@ -626,10 +679,12 @@ function renderPatronDetail(patronId) {
     const desc = getPatronDescription(patron);
     const name = safeString(patron.name || patron.title || 'Unnamed');
     const summary = getPatronSummary(patron);
+    const icon = getPatronIcon(patron);
+    const color = getPatronColor(patron);
 
     descArea.innerHTML = `
         <div style="display:flex;align-items:center;gap:0.5rem;flex-wrap:wrap;">
-            <span style="font-size:1.5rem;">${safeString(patron.icon || '🌟')}</span>
+            <span style="font-size:1.5rem;">${safeString(icon)}</span>
             <span style="font-weight:600;font-size:1.1rem;">${escHtml(name)}</span>
             <span style="color:var(--text3);font-size:0.85rem;">${escHtml(summary)}</span>
             <span style="color:var(--text3);font-size:0.75rem;margin-left:auto;">Obligation: ${getPatronObligation('default-character', patron.id)}</span>
@@ -649,10 +704,10 @@ function renderPatronDetail(patronId) {
 
 function riteHasDetails(r) {
     if (!r) return false;
-    const hasMainText = safeString(r.description || r.effect || '').length > 0;
+    const hasMainText = safeString(r.effect || r.description || '').length > 0;
     const hasMeta = r.tier || r.xp || r.action || r.range || r.resist ||
         r.materials || r.cost || r.duration || r.invoke || r.requires ||
-        r.push_it || r.timer ||
+        r.push_it || r.timer || r.integrity_timer ||
         (r.tags && r.tags.length > 0);
     return hasMainText || hasMeta;
 }
@@ -704,7 +759,7 @@ window.collapseAllRites = function() {
 };
 
 // ============================================================
-// MODALS (Cosmic, Terrestrial, Religions, Trusts)
+// PATRON DETAIL MODAL (FULL)
 // ============================================================
 
 window.openPatronDetailModal = function(patronId) {
@@ -720,94 +775,29 @@ window.openPatronDetailModal = function(patronId) {
     const name = safeString(patron.name || patron.title || 'Unnamed');
     const summary = getPatronSummary(patron);
     const desc = getPatronDescription(patron);
-    const icon = safeString(patron.icon || '🌟');
+    const icon = getPatronIcon(patron);
+    const color = getPatronColor(patron);
     const domain = safeString(patron.domain || patron.subtitle || 'Unknown Domain');
     const religion = safeString(patron.religion || '');
     const currentObligation = getPatronObligation('default-character', patron.id);
+    const lore = getPatronLore(patron);
 
-    let ritesHtml = '';
-    if (patron.rites && patron.rites.length > 0) {
-        const hasDetailedRites = typeof patron.rites[0] === 'object';
-        if (hasDetailedRites) {
-            ritesHtml = `
-                <div class="patron-detail-section" style="background:var(--bg2);border-radius:var(--radius);padding:0.8rem;margin-bottom:0.8rem;border-left:4px solid var(--gold);">
-                    <div style="display:flex;justify-content:space-between;align-items:center;margin:0 0 0.5rem 0;flex-wrap:wrap;gap:0.3rem;">
-                        <h3 style="margin:0;color:var(--gold);">🔮 Rites (${patron.rites.length})</h3>
-                        <div style="display:flex;gap:0.3rem;">
-                            <button class="btn btn-xs btn-secondary" onclick="window.expandAllRites()">📖 Expand All</button>
-                            <button class="btn btn-xs btn-secondary" onclick="window.collapseAllRites()">📕 Collapse All</button>
-                        </div>
-                    </div>
-                    <div class="rites-list" style="display:flex;flex-direction:column;gap:0.5rem;">
-                        ${patron.rites.map((r, idx) => {
-                            const riteId = `${patron.id}-rite-${idx}`;
-                            const isExpanded = state.expandedRites.has(riteId);
-                            const hasDetails = riteHasDetails(r);
-                            const riteName = safeString(r.name);
-                            const riteTier = safeString(r.tier || '');
-                            const riteMainText = safeString(r.description || r.effect || '');
-
-                            let detailsHtml = '';
-                            if (hasDetails) {
-                                detailsHtml = `
-                                    <div class="rite-details" style="margin-top:0.4rem;padding:0.5rem 0.8rem;background:var(--bg3);border-radius:var(--radius);${isExpanded ? '' : 'display:none;'}">
-                                        ${riteMainText ? `<div class="rite-description" style="margin-bottom:0.4rem;line-height:1.5;">${formatText(riteMainText)}</div>` : ''}
-                                        ${r.push_it ? `<div class="rite-meta" style="font-size:0.85rem;color:var(--text2);margin-bottom:0.3rem;"><strong>⚡ Push It:</strong> ${formatText(safeString(r.push_it))}</div>` : ''}
-                                        ${r.tier ? `<div class="rite-meta" style="font-size:0.85rem;color:var(--text2);"><strong>Tier:</strong> ${escHtml(safeString(r.tier))}</div>` : ''}
-                                        ${r.xp ? `<div class="rite-meta" style="font-size:0.85rem;color:var(--text2);"><strong>XP:</strong> ${escHtml(safeString(r.xp))}</div>` : ''}
-                                        ${r.action ? `<div class="rite-meta" style="font-size:0.85rem;color:var(--text2);"><strong>Action:</strong> ${escHtml(safeString(r.action))}</div>` : ''}
-                                        ${r.range ? `<div class="rite-meta" style="font-size:0.85rem;color:var(--text2);"><strong>Range:</strong> ${escHtml(safeString(r.range))}</div>` : ''}
-                                        ${r.resist ? `<div class="rite-meta" style="font-size:0.85rem;color:var(--text2);"><strong>Resist:</strong> ${escHtml(safeString(r.resist))}</div>` : ''}
-                                        ${r.materials ? `<div class="rite-meta" style="font-size:0.85rem;color:var(--text2);"><strong>Materials:</strong> ${formatText(safeString(r.materials))}</div>` : ''}
-                                        ${r.cost ? `<div class="rite-meta" style="font-size:0.85rem;color:var(--text2);"><strong>Cost:</strong> ${formatText(safeString(r.cost))}</div>` : ''}
-                                        ${r.duration ? `<div class="rite-meta" style="font-size:0.85rem;color:var(--text2);"><strong>Duration:</strong> ${escHtml(safeString(r.duration))}</div>` : ''}
-                                        ${r.invoke ? `<div class="rite-meta" style="font-size:0.85rem;color:var(--text2);"><strong>Invoke:</strong> ${escHtml(safeString(r.invoke))}</div>` : ''}
-                                        ${r.requires ? `<div class="rite-meta" style="font-size:0.85rem;color:var(--text2);"><strong>Requires:</strong> ${formatText(safeString(r.requires))}</div>` : ''}
-                                        ${r.timer ? `<div class="rite-meta" style="font-size:0.85rem;color:var(--text2);"><strong>Timer:</strong> ${escHtml(safeString(r.timer))}</div>` : ''}
-                                        ${r.tags && r.tags.length > 0 ? `<div class="rite-tags" style="display:flex;gap:0.3rem;flex-wrap:wrap;margin-top:0.3rem;">${r.tags.map(t => `<span class="badge badge-tag" style="background:var(--bg2);padding:0.1rem 0.4rem;border-radius:8px;font-size:0.7rem;color:var(--text3);">${escHtml(safeString(t))}</span>`).join('')}</div>` : ''}
-                                    </div>
-                                `;
-                            }
-                            return `
-                                <div class="rite-item ${hasDetails ? 'rite-expandable' : ''}" data-rite-id="${escHtml(riteId)}" style="background:var(--bg3);border-radius:var(--radius);padding:0.4rem 0.8rem;border-left:3px solid ${riteTier ? 'var(--gold)' : 'var(--border)'};">
-                                    <div class="rite-header" ${hasDetails ? `onclick="window.toggleRite(this)"` : ''} style="display:flex;justify-content:space-between;align-items:center;cursor:${hasDetails ? 'pointer' : 'default'};">
-                                        <span class="rite-name" style="font-weight:600;">${escHtml(riteName)}</span>
-                                        <span style="display:flex;align-items:center;gap:0.5rem;">
-                                            ${riteTier ? `<span class="rite-tier" style="font-size:0.75rem;color:var(--text3);">${escHtml(riteTier)}</span>` : ''}
-                                            ${r.xp ? `<span style="font-size:0.7rem;color:var(--text3);">${escHtml(safeString(r.xp))} XP</span>` : ''}
-                                            ${r.action ? `<span style="font-size:0.7rem;color:var(--text3);">${escHtml(safeString(r.action))}</span>` : ''}
-                                            ${hasDetails ? `<span class="rite-expand-icon" style="font-size:0.8rem;color:var(--text3);">${isExpanded ? '▾' : '▸'}</span>` : ''}
-                                        </span>
-                                    </div>
-                                    ${detailsHtml}
-                                </div>
-                            `;
-                        }).join('')}
-                    </div>
-                </div>
-            `;
-        } else {
-            ritesHtml = `
-                <div class="patron-detail-section" style="background:var(--bg2);border-radius:var(--radius);padding:0.8rem;margin-bottom:0.8rem;border-left:4px solid var(--gold);">
-                    <h3 style="margin:0 0 0.5rem 0;color:var(--gold);">🔮 Rites (${patron.rites.length})</h3>
-                    <ul style="margin:0;padding-left:1.2rem;list-style-type:disc;">
-                        ${patron.rites.map(r => `<li>${escHtml(safeString(r))}</li>`).join('')}
-                    </ul>
-                </div>
-            `;
-        }
-    }
+    // Build sections HTML
+    const sectionsHtml = buildPatronSections(patron);
 
     modal.innerHTML = `
         <div class="modal-content patron-detail" style="width: 90%; max-width: 1200px; max-height: 90vh; overflow-y: auto; background:var(--bg1); padding:1.5rem; border-radius:var(--radius);">
             <button class="modal-close" onclick="window.closePatronModal()" style="float:right;background:none;border:none;font-size:1.5rem;cursor:pointer;color:var(--text3);">✕</button>
+
+            <!-- Header -->
             <div class="patron-detail-header" style="display:flex;align-items:center;gap:1rem;margin-bottom:1rem;border-bottom:1px solid var(--border);padding-bottom:0.5rem;">
                 <div class="patron-detail-icon" style="font-size:3rem;">${escHtml(icon)}</div>
                 <div style="flex:1;">
-                    <h2 style="margin:0;color:var(--gold);">${escHtml(name)}</h2>
+                    <h2 style="margin:0;color:${color};">${escHtml(name)}</h2>
                     <div class="patron-detail-domain" style="color:var(--text2);font-size:1.1rem;">${escHtml(domain)}</div>
                     <div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-top:0.3rem;">
-                        ${religion ? `<span class="badge badge-religion" style="background:var(--gold);color:var(--bg);padding:0.1rem 0.5rem;border-radius:12px;font-size:0.8rem;">⛪ ${escHtml(religion)}</span>` : ''}
+                        ${religion ? `<span class="badge badge-religion" style="background:${color};color:var(--bg);padding:0.1rem 0.5rem;border-radius:12px;font-size:0.8rem;">⛪ ${escHtml(religion)}</span>` : ''}
+                        ${patron.tags && patron.tags.length > 0 ? patron.tags.slice(0, 5).map(t => `<span class="badge" style="background:var(--bg3);color:var(--text3);padding:0.05rem 0.4rem;border-radius:8px;font-size:0.65rem;">${escHtml(t)}</span>`).join('') : ''}
                         ${patron.source === 'default' ? '<span class="badge badge-remote" style="background:var(--bg3);color:var(--text3);padding:0.1rem 0.5rem;border-radius:12px;font-size:0.7rem;">📦 Default Data</span>' : ''}
                     </div>
                     <div style="margin-top:0.5rem;font-size:0.9rem;display:flex;gap:0.5rem;align-items:center;">
@@ -818,174 +808,12 @@ window.openPatronDetailModal = function(patronId) {
                 </div>
             </div>
 
+            <!-- Body -->
             <div class="patron-detail-body" style="display:flex;flex-direction:column;gap:0.8rem;">
-                ${desc ? `
-                    <div class="patron-detail-section" style="background:var(--bg2);border-radius:var(--radius);padding:0.8rem;border-left:4px solid var(--gold);">
-                        <h3 style="margin:0 0 0.3rem 0;color:var(--gold);">📖 Description</h3>
-                        <p style="margin:0;white-space:pre-wrap;">${formatText(desc)}</p>
-                    </div>
-                ` : ''}
-
-                ${patron.lore && typeof patron.lore === 'object' ? `
-                    <div class="patron-detail-section" style="background:var(--bg2);border-radius:var(--radius);padding:0.8rem;border-left:4px solid var(--gold);">
-                        <h3 style="margin:0 0 0.3rem 0;color:var(--gold);">📚 Lore</h3>
-                        <p style="margin:0;white-space:pre-wrap;">${formatText(safeString(patron.lore.description || patron.lore))}</p>
-                    </div>
-                ` : ''}
-
-                ${ritesHtml}
-
-                ${patron.domain_focus ? `
-                    <div class="patron-detail-section" style="background:var(--bg2);border-radius:var(--radius);padding:0.8rem;border-left:4px solid var(--gold);">
-                        <h3 style="margin:0 0 0.3rem 0;color:var(--gold);">🎯 Domain Focus</h3>
-                        <ul style="margin:0;padding-left:1.2rem;list-style-type:disc;">
-                            ${patron.domain_focus.map(d => `<li>${escHtml(safeString(d))}</li>`).join('')}
-                        </ul>
-                    </div>
-                ` : ''}
-
-                ${patron.runekeeper_options ? `
-                    <div class="patron-detail-section" style="background:var(--bg2);border-radius:var(--radius);padding:0.8rem;border-left:4px solid var(--gold);">
-                        <h3 style="margin:0 0 0.3rem 0;color:var(--gold);">📜 Runekeeper Options</h3>
-                        ${patron.runekeeper_options.thiasos ? `
-                            <div style="margin-bottom:0.5rem;">
-                                <strong>Thiasos (Familiar):</strong>
-                                <p style="margin:0.2rem 0;">${formatText(safeString(patron.runekeeper_options.thiasos.description))}</p>
-                                ${patron.runekeeper_options.thiasos.care ? `<p style="margin:0.2rem 0;font-size:0.85rem;color:var(--text3);"><strong>Care:</strong> ${formatText(safeString(patron.runekeeper_options.thiasos.care))}</p>` : ''}
-                            </div>
-                        ` : ''}
-                        ${patron.runekeeper_options.codex ? `
-                            <div>
-                                <strong>Codex:</strong>
-                                <p style="margin:0.2rem 0;">${formatText(safeString(patron.runekeeper_options.codex.description))}</p>
-                                ${patron.runekeeper_options.codex.upkeep ? `<p style="margin:0.2rem 0;font-size:0.85rem;color:var(--text3);"><strong>Upkeep:</strong> ${formatText(safeString(patron.runekeeper_options.codex.upkeep))}</p>` : ''}
-                            </div>
-                        ` : ''}
-                    </div>
-                ` : ''}
-
-                ${patron.patrons_gift ? `
-                    <div class="patron-detail-section" style="background:var(--bg2);border-radius:var(--radius);padding:0.8rem;border-left:4px solid var(--gold);">
-                        <h3 style="margin:0 0 0.3rem 0;color:var(--gold);">🎁 Patron's Gift</h3>
-                        <p style="margin:0;"><strong>${escHtml(safeString(patron.patrons_gift.name || 'Gift'))}</strong></p>
-                        <p style="margin:0.3rem 0 0 0;">${formatText(safeString(patron.patrons_gift.description))}</p>
-                        ${patron.patrons_gift.effect ? `<p style="margin:0.3rem 0 0 0;"><strong>Effect:</strong> ${formatText(safeString(patron.patrons_gift.effect))}</p>` : ''}
-                        ${patron.patrons_gift.cost ? `<p style="margin:0.3rem 0 0 0;color:var(--text3);">Cost: ${formatText(safeString(patron.patrons_gift.cost))}</p>` : ''}
-                    </div>
-                ` : ''}
-
-                ${patron.corruption ? `
-                    <div class="patron-detail-section" style="background:var(--bg2);border-radius:var(--radius);padding:0.8rem;border-left:4px solid var(--red);">
-                        <h3 style="margin:0 0 0.3rem 0;color:var(--red);">⚠️ Corruption</h3>
-                        <table style="width:100%;border-collapse:collapse;font-size:0.9rem;">
-                            <thead><tr style="border-bottom:1px solid var(--border);"><th style="text-align:left;padding:0.2rem 0.5rem;">Tier</th><th style="text-align:left;padding:0.2rem 0.5rem;">Benefit</th><th style="text-align:left;padding:0.2rem 0.5rem;">Cost / Quirk</th></tr></thead>
-                            <tbody>${patron.corruption.map(c => `<tr style="border-bottom:1px solid var(--border);"><td style="padding:0.2rem 0.5rem;">${escHtml(safeString(c.tier))}</td><td style="padding:0.2rem 0.5rem;">${escHtml(safeString(c.benefit))}</td><td style="padding:0.2rem 0.5rem;">${escHtml(safeString(c.cost))}</td></tr>`).join('')}</tbody>
-                        </table>
-                    </div>
-                ` : ''}
-
-                ${patron.monastic_tradition ? `
-                    <div class="patron-detail-section" style="background:var(--bg2);border-radius:var(--radius);padding:0.8rem;border-left:4px solid var(--gold);">
-                        <h3 style="margin:0 0 0.3rem 0;color:var(--gold);">⛩️ Monastic Tradition: ${escHtml(safeString(patron.monastic_tradition.name))}</h3>
-                        ${patron.monastic_tradition.quote ? `<blockquote style="margin:0.3rem 0;padding:0.5rem 1rem;background:var(--bg3);border-radius:var(--radius);border-left:4px solid var(--gold);"><em>${formatText(safeString(patron.monastic_tradition.quote))}</em></blockquote>` : ''}
-                        ${patron.monastic_tradition.prerequisites ? `<p style="margin:0.3rem 0;"><strong>Prerequisites:</strong> ${escHtml(safeString(patron.monastic_tradition.prerequisites))}</p>` : ''}
-                        ${patron.monastic_tradition.debt_resistant_frame ? `<p style="margin:0.3rem 0;"><strong>Debt-Resistant Frame:</strong> ${formatText(safeString(patron.monastic_tradition.debt_resistant_frame))}</p>` : ''}
-                        ${patron.monastic_tradition.techniques ? `
-                            <div style="margin-top:0.5rem;"><strong>Techniques:</strong></div>
-                            <div style="display:flex;flex-direction:column;gap:0.3rem;margin-top:0.3rem;">
-                                ${patron.monastic_tradition.techniques.map((tech, idx) => {
-                                    const techId = `${patron.id}-tech-${idx}`;
-                                    const techExpanded = state.expandedRites.has(techId);
-                                    const techHasDetails = tech.effect || tech.cost || tech.requirement;
-                                    return `
-                                        <div class="rite-item ${techHasDetails ? 'rite-expandable' : ''}" data-rite-id="${escHtml(techId)}" style="background:var(--bg3);border-radius:var(--radius);padding:0.4rem 0.8rem;border-left:3px solid var(--border);">
-                                            <div class="rite-header" ${techHasDetails ? `onclick="window.toggleRite(this)"` : ''} style="display:flex;justify-content:space-between;align-items:center;cursor:${techHasDetails ? 'pointer' : 'default'};">
-                                                <span style="font-weight:600;">${escHtml(safeString(tech.name))}</span>
-                                                <span style="display:flex;align-items:center;gap:0.5rem;">
-                                                    ${tech.tier ? `<span style="font-size:0.75rem;color:var(--text3);">${escHtml(safeString(tech.tier))}</span>` : ''}
-                                                    ${tech.xp ? `<span style="font-size:0.7rem;color:var(--text3);">${escHtml(safeString(tech.xp))} XP</span>` : ''}
-                                                    ${techHasDetails ? `<span class="rite-expand-icon" style="font-size:0.8rem;color:var(--text3);">${techExpanded ? '▾' : '▸'}</span>` : ''}
-                                                </span>
-                                            </div>
-                                            ${techHasDetails ? `
-                                                <div class="rite-details" style="margin-top:0.4rem;padding:0.5rem 0.8rem;background:var(--bg2);border-radius:var(--radius);${techExpanded ? '' : 'display:none;'}">
-                                                    ${tech.effect ? `<div style="margin-bottom:0.3rem;line-height:1.5;">${formatText(safeString(tech.effect))}</div>` : ''}
-                                                    ${tech.cost ? `<div style="font-size:0.85rem;color:var(--text2);"><strong>Cost:</strong> ${escHtml(safeString(tech.cost))}</div>` : ''}
-                                                    ${tech.requirement ? `<div style="font-size:0.85rem;color:var(--text2);"><strong>Requirement:</strong> ${escHtml(safeString(tech.requirement))}</div>` : ''}
-                                                </div>
-                                            ` : ''}
-                                        </div>
-                                    `;
-                                }).join('')}
-                            </div>
-                        ` : ''}
-                        ${patron.monastic_tradition.master_technique ? `
-                            <div style="margin-top:0.5rem;">
-                                <strong>Master Technique: ${escHtml(safeString(patron.monastic_tradition.master_technique.name))}</strong>
-                                <p style="margin:0.2rem 0;">${formatText(safeString(patron.monastic_tradition.master_technique.description))}</p>
-                                ${patron.monastic_tradition.master_technique.xp ? `<p style="font-size:0.85rem;color:var(--text3);">XP: ${escHtml(safeString(patron.monastic_tradition.master_technique.xp))}</p>` : ''}
-                            </div>
-                        ` : ''}
-                    </div>
-                ` : ''}
-
-                ${patron.cantors_and_cults ? `
-                    <div class="patron-detail-section" style="background:var(--bg2);border-radius:var(--radius);padding:0.8rem;border-left:4px solid var(--gold);">
-                        <h3 style="margin:0 0 0.3rem 0;color:var(--gold);">🎶 Cantors & Cults</h3>
-                        ${patron.cantors_and_cults.cantors ? `<p style="margin:0.3rem 0;"><strong>Cantors:</strong> ${formatText(safeString(patron.cantors_and_cults.cantors.description || patron.cantors_and_cults.cantors))}</p>` : ''}
-                        ${patron.cantors_and_cults.cult ? `<p style="margin:0.3rem 0;"><strong>Cult:</strong> ${formatText(safeString(patron.cantors_and_cults.cult.description || patron.cantors_and_cults.cult))}</p>` : ''}
-                    </div>
-                ` : ''}
-
-                ${patron.witchcraft ? `
-                    <div class="patron-detail-section" style="background:var(--bg2);border-radius:var(--radius);padding:0.8rem;border-left:4px solid var(--gold);">
-                        <h3 style="margin:0 0 0.3rem 0;color:var(--gold);">🧹 Witchcraft</h3>
-                        ${patron.witchcraft.description ? `<p style="margin:0.3rem 0;">${formatText(safeString(patron.witchcraft.description))}</p>` : ''}
-                        ${patron.witchcraft.tools ? `<p style="margin:0.3rem 0;"><strong>Tool:</strong> ${formatText(safeString(patron.witchcraft.tools.name || ''))} — ${formatText(safeString(patron.witchcraft.tools.description || ''))}</p>` : ''}
-                        ${patron.witchcraft.hedge_gifts ? `
-                            <div><strong>Hedge Gifts:</strong></div>
-                            <ul style="margin:0.3rem 0 0 0;padding-left:1.2rem;list-style-type:disc;">
-                                ${patron.witchcraft.hedge_gifts.map(g => `<li><strong>${escHtml(safeString(g.name))}</strong> (${escHtml(safeString(g.xp))} XP): ${formatText(safeString(g.description))}</li>`).join('')}
-                            </ul>
-                        ` : ''}
-                    </div>
-                ` : ''}
-
-                ${patron.playstyle_notes ? `
-                    <div class="patron-detail-section" style="background:var(--bg2);border-radius:var(--radius);padding:0.8rem;border-left:4px solid var(--gold);">
-                        <h3 style="margin:0 0 0.3rem 0;color:var(--gold);">🎮 Playstyle Notes</h3>
-                        ${patron.playstyle_notes.description ? `<p style="margin:0.3rem 0;">${formatText(safeString(patron.playstyle_notes.description))}</p>` : ''}
-                        ${patron.playstyle_notes.emphasizes ? `
-                            <div><strong>Emphasizes:</strong></div>
-                            <ul style="margin:0.3rem 0 0 0;padding-left:1.2rem;list-style-type:disc;">
-                                ${patron.playstyle_notes.emphasizes.map(e => `<li>${escHtml(safeString(e))}</li>`).join('')}
-                            </ul>
-                        ` : ''}
-                    </div>
-                ` : ''}
-
-                ${patron.sample_adventure ? `
-                    <div class="patron-detail-section" style="background:var(--bg2);border-radius:var(--radius);padding:0.8rem;border-left:4px solid var(--gold);">
-                        <h3 style="margin:0 0 0.3rem 0;color:var(--gold);">🎲 Sample Adventure</h3>
-                        <p style="margin:0.3rem 0;"><strong>${escHtml(safeString(patron.sample_adventure.title))}</strong></p>
-                        <p style="margin:0.2rem 0;">${formatText(safeString(patron.sample_adventure.description))}</p>
-                        ${patron.sample_adventure.quote ? `<blockquote style="margin:0.3rem 0;padding:0.5rem 1rem;background:var(--bg3);border-radius:var(--radius);border-left:4px solid var(--gold);"><em>${formatText(safeString(patron.sample_adventure.quote))}</em></blockquote>` : ''}
-                    </div>
-                ` : ''}
-
-                ${patron.quotes ? `
-                    <div class="patron-detail-section" style="background:var(--bg2);border-radius:var(--radius);padding:0.8rem;border-left:4px solid var(--gold);">
-                        <h3 style="margin:0 0 0.3rem 0;color:var(--gold);">💬 Quotes</h3>
-                        ${patron.quotes.map(q => `
-                            <blockquote style="margin:0.5rem 0;padding:0.5rem 1rem;background:var(--bg3);border-radius:var(--radius);border-left:4px solid var(--gold);">
-                                <em>${formatText(safeString(q.text))}</em>
-                                <footer style="margin-top:0.2rem;color:var(--text3);font-size:0.85rem;">— ${escHtml(safeString(q.speaker))}</footer>
-                            </blockquote>
-                        `).join('')}
-                    </div>
-                ` : ''}
+                ${sectionsHtml}
             </div>
 
+            <!-- Actions -->
             <div class="patron-detail-actions" style="display:flex;gap:0.5rem;margin-top:1rem;border-top:1px solid var(--border);padding-top:0.5rem;">
                 <button class="btn btn-sm" onclick="window.editPatron('${patron.id}')">✏️ Edit</button>
                 <button class="btn btn-sm btn-danger" onclick="window.deletePatron('${patron.id}')">🗑️ Delete</button>
@@ -1000,7 +828,375 @@ window.openPatronDetailModal = function(patronId) {
 };
 
 // ============================================================
-// TERRESTRIAL PATRON DETAIL (Main view & Modal)
+// BUILD PATRON SECTIONS
+// ============================================================
+
+function buildPatronSections(patron) {
+    let html = '';
+
+    // ─── Lore ──────────────────────────────────────────────────
+    if (patron.lore) {
+        const lore = patron.lore;
+        html += `
+            <div class="patron-detail-section" style="background:var(--bg2);border-radius:var(--radius);padding:0.8rem;border-left:4px solid var(--gold);">
+                <h3 style="margin:0 0 0.3rem 0;color:var(--gold);">📚 Lore</h3>
+                ${lore.description ? `<p style="margin:0.3rem 0;white-space:pre-wrap;">${formatText(lore.description)}</p>` : ''}
+                ${lore.followers ? `<p style="margin:0.3rem 0;white-space:pre-wrap;"><strong>Followers:</strong> ${formatText(lore.followers)}</p>` : ''}
+                ${lore.quote ? `<blockquote style="margin:0.3rem 0;padding:0.5rem 1rem;background:var(--bg3);border-radius:var(--radius);border-left:4px solid var(--gold);"><em>${formatText(lore.quote)}</em></blockquote>` : ''}
+                ${lore.names_across_regions ? `
+                    <div style="margin:0.3rem 0;"><strong>Names Across Regions:</strong></div>
+                    ${Object.entries(lore.names_across_regions).map(([region, name]) =>
+                        `<div style="font-size:0.85rem;color:var(--text2);padding:0.1rem 0;">• <strong>${escHtml(region)}:</strong> ${formatText(name)}</div>`
+                    ).join('')}
+                ` : ''}
+                ${lore.signs && lore.signs.length > 0 ? `
+                    <div style="margin:0.3rem 0;"><strong>Signs:</strong></div>
+                    <ul style="margin:0;padding-left:1.2rem;list-style-type:disc;">
+                        ${lore.signs.map(s => `<li>${formatText(s)}</li>`).join('')}
+                    </ul>
+                ` : ''}
+                ${lore.quotes && lore.quotes.length > 0 ? `
+                    <div style="margin:0.3rem 0;"><strong>Quotes:</strong></div>
+                    ${lore.quotes.map(q => `<blockquote style="margin:0.3rem 0;padding:0.3rem 0.8rem;background:var(--bg3);border-radius:var(--radius);border-left:3px solid var(--gold);font-size:0.85rem;">${formatText(q)}</blockquote>`).join('')}
+                ` : ''}
+            </div>
+        `;
+    }
+
+    // ─── Domain Focus ──────────────────────────────────────────
+    if (patron.domain_focus && patron.domain_focus.length > 0) {
+        html += `
+            <div class="patron-detail-section" style="background:var(--bg2);border-radius:var(--radius);padding:0.8rem;border-left:4px solid var(--gold);">
+                <h3 style="margin:0 0 0.3rem 0;color:var(--gold);">🎯 Domain Focus</h3>
+                <ul style="margin:0;padding-left:1.2rem;list-style-type:disc;">
+                    ${patron.domain_focus.map(d => `<li>${escHtml(safeString(d))}</li>`).join('')}
+                </ul>
+            </div>
+        `;
+    }
+
+    // ─── Patron's Gift ─────────────────────────────────────────
+    if (patron.patrons_gift) {
+        const gift = patron.patrons_gift;
+        html += `
+            <div class="patron-detail-section" style="background:var(--bg2);border-radius:var(--radius);padding:0.8rem;border-left:4px solid var(--gold);">
+                <h3 style="margin:0 0 0.3rem 0;color:var(--gold);">🎁 Patron's Gift</h3>
+                ${gift.name ? `<p style="margin:0.2rem 0;"><strong>${escHtml(gift.name)}</strong></p>` : ''}
+                ${gift.description ? `<p style="margin:0.2rem 0;">${formatText(gift.description)}</p>` : ''}
+                ${gift.effect ? `<p style="margin:0.2rem 0;"><strong>Effect:</strong> ${formatText(gift.effect)}</p>` : ''}
+                ${gift.cost ? `<p style="margin:0.2rem 0;color:var(--text3);">Cost: ${formatText(gift.cost)}</p>` : ''}
+            </div>
+        `;
+    }
+
+    // ─── Rites ─────────────────────────────────────────────────
+    if (patron.rites && patron.rites.length > 0) {
+        const hasDetailedRites = typeof patron.rites[0] === 'object' && patron.rites[0].effect !== undefined;
+        if (hasDetailedRites) {
+            html += `
+                <div class="patron-detail-section" style="background:var(--bg2);border-radius:var(--radius);padding:0.8rem;border-left:4px solid var(--gold);">
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin:0 0 0.5rem 0;flex-wrap:wrap;gap:0.3rem;">
+                        <h3 style="margin:0;color:var(--gold);">🔮 Rites (${patron.rites.length})</h3>
+                        <div style="display:flex;gap:0.3rem;">
+                            <button class="btn btn-xs btn-secondary" onclick="window.expandAllRites()">📖 Expand All</button>
+                            <button class="btn btn-xs btn-secondary" onclick="window.collapseAllRites()">📕 Collapse All</button>
+                        </div>
+                    </div>
+                    <div class="rites-list" style="display:flex;flex-direction:column;gap:0.5rem;">
+                        ${patron.rites.map((r, idx) => {
+                            const riteId = `${patron.id}-rite-${idx}`;
+                            const isExpanded = state.expandedRites.has(riteId);
+                            const hasDetails = riteHasDetails(r);
+                            const riteName = safeString(r.name);
+                            const riteTier = safeString(r.tier || '');
+                            const riteMainText = safeString(r.effect || r.description || '');
+                            const tierColor = getTierColor(riteTier);
+
+                            let detailsHtml = '';
+                            if (hasDetails) {
+                                detailsHtml = `
+                                    <div class="rite-details" style="margin-top:0.4rem;padding:0.5rem 0.8rem;background:var(--bg3);border-radius:var(--radius);${isExpanded ? '' : 'display:none;'}">
+                                        ${riteMainText ? `<div class="rite-description" style="margin-bottom:0.4rem;line-height:1.5;">${formatText(riteMainText)}</div>` : ''}
+                                        ${r.materials ? `<div class="rite-meta" style="font-size:0.85rem;color:var(--text2);margin-bottom:0.15rem;"><strong>📦 Materials:</strong> ${formatText(safeString(r.materials))}</div>` : ''}
+                                        ${r.push_it ? `<div class="rite-meta" style="font-size:0.85rem;color:var(--text2);margin-bottom:0.15rem;"><strong>⚡ Push It:</strong> ${formatText(safeString(r.push_it))}</div>` : ''}
+                                        <div style="display:flex;flex-wrap:wrap;gap:0.3rem 0.8rem;font-size:0.75rem;color:var(--text3);margin-top:0.15rem;">
+                                            ${r.tier ? `<span><strong>Tier:</strong> ${escHtml(safeString(r.tier))}</span>` : ''}
+                                            ${r.xp ? `<span><strong>XP:</strong> ${escHtml(safeString(r.xp))}</span>` : ''}
+                                            ${r.action ? `<span><strong>Action:</strong> ${escHtml(safeString(r.action))}</span>` : ''}
+                                            ${r.range ? `<span><strong>Range:</strong> ${escHtml(safeString(r.range))}</span>` : ''}
+                                            ${r.resist ? `<span><strong>Resist:</strong> ${escHtml(safeString(r.resist))}</span>` : ''}
+                                            ${r.duration ? `<span><strong>Duration:</strong> ${escHtml(safeString(r.duration))}</span>` : ''}
+                                            ${r.invoke ? `<span><strong>Invoke:</strong> ${escHtml(safeString(r.invoke))}</span>` : ''}
+                                            ${r.requires ? `<span><strong>Requires:</strong> ${formatText(safeString(r.requires))}</span>` : ''}
+                                            ${r.cost ? `<span><strong>Cost:</strong> ${formatText(safeString(r.cost))}</span>` : ''}
+                                            ${r.timer ? `<span><strong>Timer:</strong> ${escHtml(safeString(r.timer))}</span>` : ''}
+                                            ${r.integrity_timer ? `<span><strong>Integrity Timer:</strong> ${escHtml(safeString(r.integrity_timer))}</span>` : ''}
+                                        </div>
+                                        ${r.tags && r.tags.length > 0 ? `
+                                            <div class="rite-tags" style="display:flex;gap:0.2rem;flex-wrap:wrap;margin-top:0.2rem;">
+                                                ${r.tags.map(t => `<span class="badge badge-tag" style="background:var(--bg2);padding:0.05rem 0.4rem;border-radius:8px;font-size:0.65rem;color:var(--text3);border:1px solid var(--border);">${escHtml(safeString(t))}</span>`).join('')}
+                                            </div>
+                                        ` : ''}
+                                    </div>
+                                `;
+                            }
+                            return `
+                                <div class="rite-item ${hasDetails ? 'rite-expandable' : ''}" data-rite-id="${escHtml(riteId)}" style="background:var(--bg3);border-radius:var(--radius);padding:0.4rem 0.8rem;border-left:3px solid ${tierColor};">
+                                    <div class="rite-header" ${hasDetails ? `onclick="window.toggleRite(this)"` : ''} style="display:flex;justify-content:space-between;align-items:center;cursor:${hasDetails ? 'pointer' : 'default'};">
+                                        <span class="rite-name" style="font-weight:600;">${escHtml(riteName)}</span>
+                                        <span style="display:flex;align-items:center;gap:0.5rem;">
+                                            ${riteTier ? `<span class="rite-tier" style="font-size:0.75rem;color:${tierColor};font-weight:600;">${escHtml(riteTier)}</span>` : ''}
+                                            ${r.xp ? `<span style="font-size:0.7rem;color:var(--text3);">${escHtml(safeString(r.xp))} XP</span>` : ''}
+                                            ${hasDetails ? `<span class="rite-expand-icon" style="font-size:0.8rem;color:var(--text3);">${isExpanded ? '▾' : '▸'}</span>` : ''}
+                                        </span>
+                                    </div>
+                                    ${detailsHtml}
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>
+                </div>
+            `;
+        } else {
+            html += `
+                <div class="patron-detail-section" style="background:var(--bg2);border-radius:var(--radius);padding:0.8rem;border-left:4px solid var(--gold);">
+                    <h3 style="margin:0 0 0.5rem 0;color:var(--gold);">🔮 Rites (${patron.rites.length})</h3>
+                    <ul style="margin:0;padding-left:1.2rem;list-style-type:disc;">
+                        ${patron.rites.map(r => `<li>${escHtml(safeString(r))}</li>`).join('')}
+                    </ul>
+                </div>
+            `;
+        }
+    }
+
+    // ─── Runekeeper Options ────────────────────────────────────
+    if (patron.runekeeper_options) {
+        const rko = patron.runekeeper_options;
+        html += `
+            <div class="patron-detail-section" style="background:var(--bg2);border-radius:var(--radius);padding:0.8rem;border-left:4px solid var(--gold);">
+                <h3 style="margin:0 0 0.3rem 0;color:var(--gold);">📜 Runekeeper Options</h3>
+                ${rko.thiasos ? `
+                    <div style="margin-bottom:0.5rem;">
+                        <strong>🐾 Thiasos (Familiar):</strong>
+                        <p style="margin:0.2rem 0;">${formatText(safeString(rko.thiasos.description))}</p>
+                        ${rko.thiasos.care ? `<p style="margin:0.2rem 0;font-size:0.85rem;color:var(--text3);"><strong>Care:</strong> ${formatText(safeString(rko.thiasos.care))}</p>` : ''}
+                    </div>
+                ` : ''}
+                ${rko.codex ? `
+                    <div>
+                        <strong>📖 Codex:</strong>
+                        <p style="margin:0.2rem 0;">${formatText(safeString(rko.codex.description))}</p>
+                        ${rko.codex.upkeep ? `<p style="margin:0.2rem 0;font-size:0.85rem;color:var(--text3);"><strong>Upkeep:</strong> ${formatText(safeString(rko.codex.upkeep))}</p>` : ''}
+                    </div>
+                ` : ''}
+            </div>
+        `;
+    }
+
+    // ─── Corruption ────────────────────────────────────────────
+    if (patron.corruption && patron.corruption.length > 0) {
+        html += `
+            <div class="patron-detail-section" style="background:var(--bg2);border-radius:var(--radius);padding:0.8rem;border-left:4px solid var(--red);">
+                <h3 style="margin:0 0 0.3rem 0;color:var(--red);">⚠️ Corruption</h3>
+                <table style="width:100%;border-collapse:collapse;font-size:0.85rem;">
+                    <thead><tr style="border-bottom:2px solid var(--border);"><th style="text-align:left;padding:0.2rem 0.4rem;">Tier</th><th style="text-align:left;padding:0.2rem 0.4rem;">Benefit</th><th style="text-align:left;padding:0.2rem 0.4rem;">Cost / Quirk</th></tr></thead>
+                    <tbody>${patron.corruption.map(c => `<tr style="border-bottom:1px solid var(--border);"><td style="padding:0.2rem 0.4rem;font-weight:600;">${escHtml(safeString(c.tier))}</td><td style="padding:0.2rem 0.4rem;color:var(--gold);">${escHtml(safeString(c.benefit))}</td><td style="padding:0.2rem 0.4rem;color:var(--red);">${escHtml(safeString(c.cost))}</td></tr>`).join('')}</tbody>
+                </table>
+            </div>
+        `;
+    }
+
+    // ─── Witchcraft ────────────────────────────────────────────
+    if (patron.witchcraft) {
+        const wc = patron.witchcraft;
+        const wcColor = wc.color || '#27ae60';
+        html += `
+            <div class="patron-detail-section" style="background:var(--bg2);border-radius:var(--radius);padding:0.8rem;border-left:4px solid ${wcColor};">
+                <h3 style="margin:0 0 0.3rem 0;color:${wcColor};">🧹 ${wc.name || 'Witchcraft'}</h3>
+                ${wc.description ? `<p style="margin:0.2rem 0;">${formatText(wc.description)}</p>` : ''}
+                ${wc.lore ? `<p style="margin:0.2rem 0;font-size:0.85rem;color:var(--text2);">${formatText(wc.lore)}</p>` : ''}
+                ${wc.signature_rite ? `<p style="margin:0.2rem 0;"><strong>Signature Rite:</strong> ${escHtml(wc.signature_rite)}</p>` : ''}
+                ${wc.quote ? `<blockquote style="margin:0.2rem 0;padding:0.3rem 0.8rem;background:var(--bg3);border-radius:var(--radius);border-left:3px solid ${wcColor};font-size:0.85rem;">${formatText(wc.quote)}</blockquote>` : ''}
+                ${wc.tools ? `
+                    <div style="margin:0.3rem 0;"><strong>🛠️ Tools:</strong></div>
+                    ${Object.entries(wc.tools).map(([key, tool]) => `
+                        <div style="margin:0.1rem 0;padding:0.2rem 0.5rem;background:var(--bg3);border-radius:var(--radius);">
+                            <strong>${escHtml(tool.name || key)}</strong>
+                            <p style="margin:0.1rem 0;font-size:0.85rem;color:var(--text2);">${formatText(tool.description)}</p>
+                        </div>
+                    `).join('')}
+                ` : ''}
+                ${wc.hedge_gifts && wc.hedge_gifts.length > 0 ? `
+                    <div style="margin:0.3rem 0;"><strong>🌿 Hedge Gifts:</strong></div>
+                    <ul style="margin:0;padding-left:1.2rem;list-style-type:disc;">
+                        ${wc.hedge_gifts.map(g => `<li><strong>${escHtml(safeString(g.name))}</strong> (${escHtml(safeString(g.xp))} XP): ${formatText(safeString(g.description))}</li>`).join('')}
+                    </ul>
+                ` : ''}
+            </div>
+        `;
+    }
+
+    // ─── Monastic Tradition ────────────────────────────────────
+    if (patron.monastic_tradition) {
+        const mt = patron.monastic_tradition;
+        const mtColor = mt.color || '#f39c12';
+        html += `
+            <div class="patron-detail-section" style="background:var(--bg2);border-radius:var(--radius);padding:0.8rem;border-left:4px solid ${mtColor};">
+                <h3 style="margin:0 0 0.3rem 0;color:${mtColor};">⛩️ ${mt.name || 'Monastic Tradition'}</h3>
+                ${mt.description ? `<p style="margin:0.2rem 0;">${formatText(mt.description)}</p>` : ''}
+                ${mt.quote ? `<blockquote style="margin:0.2rem 0;padding:0.3rem 0.8rem;background:var(--bg3);border-radius:var(--radius);border-left:3px solid ${mtColor};font-size:0.85rem;">${formatText(mt.quote)}</blockquote>` : ''}
+                ${mt.prerequisites ? `<p style="margin:0.2rem 0;"><strong>Prerequisites:</strong> ${escHtml(mt.prerequisites)}</p>` : ''}
+                ${mt.debt_resistant_frame ? `<p style="margin:0.2rem 0;color:var(--text2);">${formatText(mt.debt_resistant_frame)}</p>` : ''}
+                ${mt.techniques ? `
+                    <div style="margin:0.3rem 0;"><strong>Techniques:</strong></div>
+                    ${['basic', 'advanced', 'master'].filter(l => mt.techniques[l]).map(level => {
+                        const tech = mt.techniques[level];
+                        const levelLabel = level.charAt(0).toUpperCase() + level.slice(1);
+                        return `
+                            <div style="margin:0.1rem 0;padding:0.2rem 0.5rem;background:var(--bg3);border-radius:var(--radius);border-left:2px solid ${mtColor};">
+                                <strong>${levelLabel}: ${escHtml(tech.name)}</strong>
+                                ${tech.xp ? `<span style="font-size:0.7rem;color:var(--text3);">(${tech.xp} XP)</span>` : ''}
+                                <p style="margin:0.1rem 0;font-size:0.85rem;color:var(--text2);">${formatText(tech.description)}</p>
+                                ${tech.cost ? `<p style="margin:0.1rem 0;font-size:0.75rem;color:var(--text3);"><strong>Cost:</strong> ${formatText(tech.cost)}</p>` : ''}
+                                ${tech.prereq ? `<p style="margin:0.1rem 0;font-size:0.75rem;color:var(--text3);"><strong>Requirement:</strong> ${escHtml(tech.prereq)}</p>` : ''}
+                            </div>
+                        `;
+                    }).join('')}
+                ` : ''}
+                ${mt.master_technique ? `
+                    <div style="margin:0.3rem 0;padding:0.2rem 0.5rem;background:var(--bg3);border-radius:var(--radius);border-left:3px solid var(--gold);">
+                        <strong>🏆 Master Technique: ${escHtml(mt.master_technique.name)}</strong>
+                        ${mt.master_technique.xp ? `<span style="font-size:0.7rem;color:var(--text3);">(${mt.master_technique.xp} XP)</span>` : ''}
+                        <p style="margin:0.1rem 0;font-size:0.85rem;color:var(--text2);">${formatText(mt.master_technique.description)}</p>
+                        ${mt.master_technique.cost ? `<p style="margin:0.1rem 0;font-size:0.75rem;color:var(--text3);"><strong>Cost:</strong> ${formatText(mt.master_technique.cost)}</p>` : ''}
+                    </div>
+                ` : ''}
+                ${mt.corruption && mt.corruption.length > 0 ? `
+                    <div style="margin:0.3rem 0;"><strong>⚠️ Tradition Corruption:</strong></div>
+                    <table style="width:100%;border-collapse:collapse;font-size:0.75rem;">
+                        <thead><tr style="border-bottom:1px solid var(--border);"><th style="text-align:left;padding:0.1rem 0.3rem;">Tier</th><th style="text-align:left;padding:0.1rem 0.3rem;">Benefit</th><th style="text-align:left;padding:0.1rem 0.3rem;">Cost</th></tr></thead>
+                        <tbody>${mt.corruption.map(c => `<tr style="border-bottom:1px solid var(--border);"><td style="padding:0.1rem 0.3rem;">${escHtml(safeString(c.tier))}</td><td style="padding:0.1rem 0.3rem;color:var(--gold);">${escHtml(safeString(c.benefit))}</td><td style="padding:0.1rem 0.3rem;color:var(--red);">${escHtml(safeString(c.cost))}</td></tr>`).join('')}</tbody>
+                    </table>
+                ` : ''}
+            </div>
+        `;
+    }
+
+    // ─── Cantors & Cults ──────────────────────────────────────
+    if (patron.cantors_and_cults) {
+        const cc = patron.cantors_and_cults;
+        html += `
+            <div class="patron-detail-section" style="background:var(--bg2);border-radius:var(--radius);padding:0.8rem;border-left:4px solid var(--gold);">
+                <h3 style="margin:0 0 0.3rem 0;color:var(--gold);">🎶 Cantors & Cults</h3>
+                ${cc.cantors ? `
+                    <div style="margin:0.2rem 0;">
+                        <strong>🎵 ${cc.cantors.name || 'Cantors'}:</strong>
+                        <p style="margin:0.1rem 0;">${formatText(safeString(cc.cantors.description))}</p>
+                    </div>
+                ` : ''}
+                ${cc.cult ? `
+                    <div style="margin:0.2rem 0;">
+                        <strong>🏛️ ${cc.cult.name || 'Cult'}:</strong>
+                        <p style="margin:0.1rem 0;">${formatText(safeString(cc.cult.description))}</p>
+                    </div>
+                ` : ''}
+            </div>
+        `;
+    }
+
+    // ─── Rivalries ─────────────────────────────────────────────
+    if (patron.rivalries && patron.rivalries.length > 0) {
+        html += `
+            <div class="patron-detail-section" style="background:var(--bg2);border-radius:var(--radius);padding:0.8rem;border-left:4px solid var(--orange);">
+                <h3 style="margin:0 0 0.3rem 0;color:var(--orange);">⚔️ Rivalries</h3>
+                ${patron.rivalries.map(r => `
+                    <div style="margin:0.1rem 0;padding:0.2rem 0.5rem;background:var(--bg3);border-radius:var(--radius);">
+                        <strong>${escHtml(safeString(r.patron))}</strong>
+                        <p style="margin:0.1rem 0;font-size:0.85rem;color:var(--text2);">${formatText(r.description)}</p>
+                    </div>
+                `).join('')}
+            </div>
+        `;
+    }
+
+    // ─── Playstyle Notes ──────────────────────────────────────
+    if (patron.playstyle_notes) {
+        const pn = patron.playstyle_notes;
+        html += `
+            <div class="patron-detail-section" style="background:var(--bg2);border-radius:var(--radius);padding:0.8rem;border-left:4px solid var(--gold);">
+                <h3 style="margin:0 0 0.3rem 0;color:var(--gold);">🎮 Playstyle Notes</h3>
+                ${pn.description ? `<p style="margin:0.2rem 0;">${formatText(pn.description)}</p>` : ''}
+                ${pn.emphasizes && pn.emphasizes.length > 0 ? `
+                    <div style="margin:0.2rem 0;"><strong>Emphasizes:</strong></div>
+                    <ul style="margin:0;padding-left:1.2rem;list-style-type:disc;">
+                        ${pn.emphasizes.map(e => `<li>${formatText(e)}</li>`).join('')}
+                    </ul>
+                ` : ''}
+            </div>
+        `;
+    }
+
+    // ─── Sample Adventure ─────────────────────────────────────
+    if (patron.sample_adventure) {
+        const sa = patron.sample_adventure;
+        html += `
+            <div class="patron-detail-section" style="background:var(--bg2);border-radius:var(--radius);padding:0.8rem;border-left:4px solid var(--gold);">
+                <h3 style="margin:0 0 0.3rem 0;color:var(--gold);">🎲 Sample Adventure</h3>
+                ${sa.title ? `<p style="margin:0.2rem 0;"><strong>${escHtml(sa.title)}</strong></p>` : ''}
+                ${sa.description ? `<p style="margin:0.2rem 0;">${formatText(sa.description)}</p>` : ''}
+                ${sa.quote ? `<blockquote style="margin:0.2rem 0;padding:0.3rem 0.8rem;background:var(--bg3);border-radius:var(--radius);border-left:3px solid var(--gold);font-size:0.85rem;">${formatText(sa.quote)}</blockquote>` : ''}
+            </div>
+        `;
+    }
+
+    // ─── Optional Campaign Arc ────────────────────────────────
+    if (patron.optional_campaign_arc) {
+        const oca = patron.optional_campaign_arc;
+        html += `
+            <div class="patron-detail-section" style="background:var(--bg2);border-radius:var(--radius);padding:0.8rem;border-left:4px solid var(--purple);">
+                <h3 style="margin:0 0 0.3rem 0;color:var(--purple);">🌅 Optional Campaign Arc</h3>
+                ${oca.title ? `<p style="margin:0.2rem 0;"><strong>${escHtml(oca.title)}</strong></p>` : ''}
+                ${oca.description ? `<p style="margin:0.2rem 0;">${formatText(oca.description)}</p>` : ''}
+                ${oca.signs && oca.signs.length > 0 ? `
+                    <div style="margin:0.2rem 0;"><strong>Signs:</strong></div>
+                    <ul style="margin:0;padding-left:1.2rem;list-style-type:disc;">
+                        ${oca.signs.map(s => `<li>${formatText(s)}</li>`).join('')}
+                    </ul>
+                ` : ''}
+                ${oca.gm_guidance ? `<p style="margin:0.2rem 0;font-size:0.85rem;color:var(--text2);"><strong>GM Guidance:</strong> ${formatText(oca.gm_guidance)}</p>` : ''}
+            </div>
+        `;
+    }
+
+    // ─── Temporary Anima System ───────────────────────────────
+    if (patron.temporary_anima_system) {
+        const tas = patron.temporary_anima_system;
+        html += `
+            <div class="patron-detail-section" style="background:var(--bg2);border-radius:var(--radius);padding:0.8rem;border-left:4px solid var(--blue);">
+                <h3 style="margin:0 0 0.3rem 0;color:var(--blue);">⚡ Temporary Anima System</h3>
+                ${tas.title ? `<p style="margin:0.2rem 0;"><strong>${escHtml(tas.title)}</strong></p>` : ''}
+                ${tas.description ? `<p style="margin:0.2rem 0;">${formatText(tas.description)}</p>` : ''}
+                ${tas.core_principles && tas.core_principles.length > 0 ? `
+                    <div style="margin:0.2rem 0;"><strong>Core Principles:</strong></div>
+                    <ul style="margin:0;padding-left:1.2rem;list-style-type:disc;">
+                        ${tas.core_principles.map(p => `<li>${formatText(p)}</li>`).join('')}
+                    </ul>
+                ` : ''}
+                ${tas.effects && tas.effects.length > 0 ? `
+                    <div style="margin:0.2rem 0;"><strong>Effects:</strong></div>
+                    <ul style="margin:0;padding-left:1.2rem;list-style-type:disc;">
+                        ${tas.effects.map(e => `<li><strong>${escHtml(e.name)}</strong>: ${formatText(e.effect)}</li>`).join('')}
+                    </ul>
+                ` : ''}
+            </div>
+        `;
+    }
+
+    return html;
+}
+
+// ============================================================
+// TERRESTRIAL PATRON DETAIL
 // ============================================================
 
 window.viewTerrestrial = function(id) {
@@ -1015,9 +1211,10 @@ window.viewTerrestrial = function(id) {
         const desc = getPatronDescription(patron);
         const name = safeString(patron.name || patron.title || 'Unnamed');
         const summary = getPatronSummary(patron);
+        const icon = getPatronIcon(patron) || '🏛️';
         descArea.innerHTML = `
             <div style="display:flex;align-items:center;gap:0.5rem;flex-wrap:wrap;">
-                <span style="font-size:1.5rem;">${safeString(patron.icon || '🏛️')}</span>
+                <span style="font-size:1.5rem;">${safeString(icon)}</span>
                 <span style="font-weight:600;font-size:1.1rem;">${escHtml(name)}</span>
                 <span style="color:var(--text3);font-size:0.85rem;">${escHtml(summary)}</span>
                 <button class="btn btn-xs btn-ghost" onclick="window.openTerrestrialDetailModal('${patron.id}')" style="margin-left:auto;">📖 Full Details</button>
@@ -1041,16 +1238,9 @@ window.openTerrestrialDetailModal = function(id) {
 
     const name = safeString(patron.name || patron.title || 'Unnamed');
     const desc = getPatronDescription(patron);
-    const icon = safeString(patron.icon || '🏛️');
+    const icon = getPatronIcon(patron) || '🏛️';
     const type = safeString(patron.type || patron.agenda || 'Terrestrial Patron');
     const tier = safeString(patron.tier || 'I');
-    const location = safeString(patron.location || '');
-    const leverage = safeString(patron.leverage || '');
-    const debtTrigger = safeString(patron.debtTrigger || '');
-    const quirk = safeString(patron.quirk || '');
-    const assetSlots = safeString(patron.assetSlots || 0);
-    const maxAssetTier = safeString(patron.maxAssetTier || 'Minor');
-    const obligationCapacity = safeString(patron.obligationCapacity || 'Spirit+Presence');
 
     modal.innerHTML = `
         <div class="modal-content patron-detail" style="width: 90%; max-width: 800px; max-height: 90vh; overflow-y: auto; background:var(--bg1); padding:1.5rem; border-radius:var(--radius);">
@@ -1071,44 +1261,38 @@ window.openTerrestrialDetailModal = function(id) {
                         <p style="margin:0;white-space:pre-wrap;">${formatText(desc)}</p>
                     </div>
                 ` : ''}
-
-                ${location ? `
+                ${patron.location ? `
                     <div class="patron-detail-section" style="background:var(--bg2);border-radius:var(--radius);padding:0.8rem;border-left:4px solid var(--blue);">
                         <h3 style="margin:0 0 0.3rem 0;color:var(--blue);">📍 Location</h3>
-                        <p style="margin:0;">${escHtml(location)}</p>
+                        <p style="margin:0;">${escHtml(patron.location)}</p>
                     </div>
                 ` : ''}
-
-                ${leverage ? `
+                ${patron.leverage ? `
                     <div class="patron-detail-section" style="background:var(--bg2);border-radius:var(--radius);padding:0.8rem;border-left:4px solid var(--blue);">
                         <h3 style="margin:0 0 0.3rem 0;color:var(--blue);">💰 Leverage</h3>
-                        <p style="margin:0;">${escHtml(leverage)}</p>
+                        <p style="margin:0;">${escHtml(patron.leverage)}</p>
                     </div>
                 ` : ''}
-
-                ${debtTrigger ? `
+                ${patron.debtTrigger ? `
                     <div class="patron-detail-section" style="background:var(--bg2);border-radius:var(--radius);padding:0.8rem;border-left:4px solid var(--blue);">
                         <h3 style="margin:0 0 0.3rem 0;color:var(--blue);">⚡ Debt Trigger</h3>
-                        <p style="margin:0;">${escHtml(debtTrigger)}</p>
+                        <p style="margin:0;">${escHtml(patron.debtTrigger)}</p>
                     </div>
                 ` : ''}
-
-                ${quirk ? `
+                ${patron.quirk ? `
                     <div class="patron-detail-section" style="background:var(--bg2);border-radius:var(--radius);padding:0.8rem;border-left:4px solid var(--blue);">
                         <h3 style="margin:0 0 0.3rem 0;color:var(--blue);">🌀 Quirk</h3>
-                        <p style="margin:0;">${escHtml(quirk)}</p>
+                        <p style="margin:0;">${escHtml(patron.quirk)}</p>
                     </div>
                 ` : ''}
-
                 <div class="patron-detail-section" style="background:var(--bg2);border-radius:var(--radius);padding:0.8rem;border-left:4px solid var(--blue);">
                     <h3 style="margin:0 0 0.3rem 0;color:var(--blue);">📊 Stats</h3>
                     <ul style="margin:0;padding-left:1.2rem;list-style-type:disc;">
-                        <li>Asset Slots: ${escHtml(assetSlots)}</li>
-                        <li>Max Asset Tier: ${escHtml(maxAssetTier)}</li>
-                        <li>Obligation Capacity: ${escHtml(obligationCapacity)}</li>
+                        <li>Asset Slots: ${escHtml(patron.assetSlots || 0)}</li>
+                        <li>Max Asset Tier: ${escHtml(patron.maxAssetTier || 'Minor')}</li>
+                        <li>Obligation Capacity: ${escHtml(patron.obligationCapacity || 'Spirit+Presence')}</li>
                     </ul>
                 </div>
-
                 ${patron.agendaTimer ? `
                     <div class="patron-detail-section" style="background:var(--bg2);border-radius:var(--radius);padding:0.8rem;border-left:4px solid var(--blue);">
                         <h3 style="margin:0 0 0.3rem 0;color:var(--blue);">⏱️ Agenda Timer</h3>
@@ -1118,8 +1302,7 @@ window.openTerrestrialDetailModal = function(id) {
                         </div>
                     </div>
                 ` : ''}
-
-                ${patron.keyNPCs ? `
+                ${patron.keyNPCs && patron.keyNPCs.length > 0 ? `
                     <div class="patron-detail-section" style="background:var(--bg2);border-radius:var(--radius);padding:0.8rem;border-left:4px solid var(--blue);">
                         <h3 style="margin:0 0 0.3rem 0;color:var(--blue);">👤 Key NPCs</h3>
                         <ul style="margin:0;padding-left:1.2rem;list-style-type:disc;">
@@ -1127,8 +1310,7 @@ window.openTerrestrialDetailModal = function(id) {
                         </ul>
                     </div>
                 ` : ''}
-
-                ${patron.hooks ? `
+                ${patron.hooks && patron.hooks.length > 0 ? `
                     <div class="patron-detail-section" style="background:var(--bg2);border-radius:var(--radius);padding:0.8rem;border-left:4px solid var(--blue);">
                         <h3 style="margin:0 0 0.3rem 0;color:var(--blue);">🔗 Hooks</h3>
                         <ul style="margin:0;padding-left:1.2rem;list-style-type:disc;">
@@ -1150,6 +1332,10 @@ window.openTerrestrialDetailModal = function(id) {
         if (e.target === modal) window.closePatronModal();
     };
 };
+
+// ============================================================
+// RELIGION & TRUST MODALS
+// ============================================================
 
 window.viewReligion = function(id) {
     const religion = state.religions.find(r => r.id === id);
@@ -1204,7 +1390,7 @@ window.viewTrust = function(id) {
 };
 
 // ============================================================
-// MODAL CONTROLS & VIEW HANDLERS
+// MODAL CONTROLS
 // ============================================================
 
 window.closePatronModal = function() {
@@ -1242,7 +1428,7 @@ window.clearPatronObligation = function(characterId, patronId, amount = 1) {
 };
 
 // ============================================================
-// CRUD OPERATIONS (cosmic, terrestrial, religions, trusts)
+// CRUD OPERATIONS
 // ============================================================
 
 window.addCosmicPatron = function() {
@@ -1473,16 +1659,14 @@ window.deleteTrust = function(id) {
 };
 
 // ============================================================
-// REFRESH (clears discovery cache)
+// REFRESH
 // ============================================================
 
 window.refreshPatrons = function() {
-    // 1. Clear the discovery module's caches
     localStorage.removeItem('fates-edge-patrons-cache-cosmic');
     localStorage.removeItem('fates-edge-patrons-cache-terrestrial');
     localStorage.removeItem('fates-edge-patrons-cache-religion');
 
-    // 2. Remove patron data from global state (preserve obligation)
     const saved = getState();
     if (saved.patrons) {
         delete saved.patrons.cosmic;
@@ -1492,7 +1676,6 @@ window.refreshPatrons = function() {
         saveState();
     }
 
-    // 3. Reset in‑memory state
     state.cosmicPatrons = [];
     state.terrestrialPatrons = [];
     state.trusts = [];
@@ -1500,10 +1683,7 @@ window.refreshPatrons = function() {
     state.dataLoaded = false;
     state.usingFallback = false;
 
-    // 4. Reload from remote
     loadPatronData(true);
-
-    // 5. Update the view
     refreshView();
     showToast('🔄 Patrons refreshed from disk', 'success');
 };

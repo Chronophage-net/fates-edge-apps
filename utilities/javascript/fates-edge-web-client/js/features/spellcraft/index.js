@@ -1,12 +1,15 @@
 /**
  * Spellcraft & Magic – Unified interface for all magical traditions
- * 
- * Displays:
- * - Character's magic path, patron, tracks
- * - Patron-specific Rites / Songs / Arts / Spirits
- * - Spellbook (custom spells)
- * - TAGS Calculator for Free Casters
- * - Trackers (Obligation, Corruption, Leash, Mental Strain, etc.)
+ *
+ * "The coin that never spends is the one you don't remember taking."
+ * – Serafine of the Velvet Touch
+ *
+ * Features:
+ * - Character tracks (Obligation, Corruption, Leash, Mental Strain, Shadow/Shame/Identity)
+ * - Path-specific components: Rites, Spellbook, Crafting, Calculator, Summoning, Monks, Cantor
+ * - Crafting (Hedge Gifts, Quick Workings, Rituals) is available to ALL characters
+ * - TAGS Calculator for Free Casters (and as a learning tool for others)
+ * - Unified character selection via VTT
  */
 
 import { vttStore } from '../../core/vtt-store.js';
@@ -14,126 +17,183 @@ import { getState, getCharacter, updateCharacter, addCharacter, saveState } from
 import { showToast } from '../../components/Toast.js';
 import { escHtml, generateId, safeParseInt } from '../../core/utils.js';
 
-// Import sub‑components
+// ─── Import sub‑components ──────────────────────────────────
 import { renderRites } from './components/rites.js';
 import { renderSpellbook } from './components/spellbook.js';
 import { renderCalculator } from './components/calculator.js';
 import { renderTrackers } from './components/trackers.js';
 import { renderSummoning } from './components/summoning.js';
+import { renderWitchcraft } from './components/witchcraft.js';
+import { renderMonks } from './components/monks.js';
+import { renderCantor } from './components/cantor.js';
 
 // ============================================================
-// DATA – Patrons and their Rites (extracted from grimoire)
+// CONSTANTS – Path metadata for the UI
 // ============================================================
-const PATRON_DATA = {
-  'Grimmir': {
-    name: 'Grimmir',
-    domain: 'Wild',
-    rites: [
-      { name: 'The Speaking Seed', cost: 4, effect: 'Commune with local plant life.', type: 'Low' },
-      { name: 'The Thornveil', cost: 7, effect: 'Raise a living barrier.', type: 'Standard' },
-      { name: 'The World\'s Wound', cost: 13, obligation: 7, effect: 'Heal a blighted place.', type: 'Advanced' }
-    ],
-    corruptionTable: [
-      { tier: 1, benefit: '+1 die to Nature rolls', cost: 'Hair grows moss' },
-      { tier: 2, benefit: 'Speak with beasts', cost: 'Eat only raw food' }
-    ]
-  },
-  'Mykkiel': {
-    name: 'Mykkiel',
-    domain: 'Covenant',
-    rites: [
-      { name: 'Rite of Hallowed Ground', cost: 5, effect: 'Create sacred space.', type: 'Low' },
-      { name: 'The Covenant Seal', cost: 9, effect: 'Bind a covenant with penalties.', type: 'Standard' },
-      { name: 'Divine Judgment', cost: 13, obligation: 7, effect: 'Pronounce judgment on a breaker.', type: 'Advanced' }
-    ]
-  },
-  // ... add others from grimoire (Morag, Inaea, Isoka, etc.)
+
+const PATH_META = {
+    'none': {
+        label: 'Mundane',
+        icon: '👤',
+        color: 'var(--text3)',
+        description: 'No magical path chosen. Crafting (Hedge Gifts, rituals) is still available.'
+    },
+    'free-caster': {
+        label: 'Free Caster',
+        icon: '🔮',
+        color: '#8e44ad',
+        description: 'Weave the raw Weave using TAGS. No patron required – only will and grammar.'
+    },
+    'runekeeper': {
+        label: 'Runekeeper',
+        icon: '📜',
+        color: '#d4af37',
+        description: 'Bound to a single Patron. Your Codex and Thiasos are the instruments of your covenant.'
+    },
+    'invoker': {
+        label: 'Invoker',
+        icon: '🎴',
+        color: '#e67e22',
+        description: 'Carry Symbols from multiple Patrons. Power is borrowed, interest is steep.'
+    },
+    'cantor': {
+        label: 'Cantor',
+        icon: '🎵',
+        color: '#6b4c9a',
+        description: 'Your voice is the instrument. Sing the old songs, and the Weave answers – at a cost.'
+    },
+    'witch': {
+        label: 'Witch',
+        icon: '🧹',
+        color: '#27ae60',
+        description: 'Threshold magic, hedge gifts, and the quiet work of names. The hedge keeps the wolves at bay.'
+    },
+    'psion': {
+        label: 'Psion',
+        icon: '🧠',
+        color: '#2980b9',
+        description: 'The mind is the only focus. Mental Strain is the price of bending reality with will alone.'
+    },
+    'summoner': {
+        label: 'Summoner',
+        icon: '👁️',
+        color: '#c0392b',
+        description: 'Bind spirits with the Leash. Negotiate, command, and hope the price is worth the service.'
+    },
+    'monk': {
+        label: 'Monk',
+        icon: '🧘',
+        color: '#f39c12',
+        description: 'The body is a temple. The breath is a weapon. Stillness is the greatest disguise.'
+    }
 };
 
-// TAGS reference (from grimoire)
-const TAGS_REFERENCE = {
-  'Burning': { category: 'Elemental', mod: 1 },
-  'Freezing': { category: 'Elemental', mod: 1 },
-  'Storm': { category: 'Elemental', mod: 1 },
-  'Stone': { category: 'Elemental', mod: 1 },
-  'Wave': { category: 'Elemental', mod: 1 },
-  'Wind': { category: 'Elemental', mod: 1 },
-  'Force': { category: 'Force', mod: 1 },
-  'Area': { category: 'Force', mod: 1 },
-  'Strike': { category: 'Force', mod: 1 },
-  'Wall': { category: 'Force', mod: 1 },
-  'Bind': { category: 'Force', mod: 1 },
-  'Dispel': { category: 'Force', mod: 1 },
-  'Veil': { category: 'Mind/Illusion', mod: 1 },
-  'Scry': { category: 'Mind/Illusion', mod: 1 },
-  'Memory': { category: 'Mind/Illusion', mod: 1 },
-  'Command': { category: 'Mind/Illusion', mod: 1 },
-  'Fear': { category: 'Mind/Illusion', mod: 1 },
-  'HEAL': { category: 'Life/Body', mod: 1 },
-  'Purify': { category: 'Life/Body', mod: 1 },
-  'Strengthen': { category: 'Life/Body', mod: 1 },
-  'Waken': { category: 'Life/Body', mod: 1 },
-  'Beast': { category: 'Life/Body', mod: 1 },
-  'Leap': { category: 'Space/Motion', mod: 2 },
-  'Fold': { category: 'Space/Motion', mod: 2 },
-  'Gate': { category: 'Space/Motion', mod: 2 },
-  'Gravity': { category: 'Space/Motion', mod: 2 },
-  'Create': { category: 'Creation', mod: 2 },
-  'Summon': { category: 'Creation', mod: 2 },
-  'Transmute': { category: 'Creation', mod: 2 },
-  'Animate': { category: 'Creation', mod: 2 },
-  'Sense': { category: 'Utility', mod: 1 },
-  'Reveal': { category: 'Utility', mod: 1 },
-  'Light': { category: 'Utility', mod: 1 },
-  'Shadow': { category: 'Utility', mod: 1 },
-  'Silence': { category: 'Utility', mod: 1 },
-  'Protect': { category: 'Utility', mod: 1 },
-  'Counter': { category: 'Reaction', mod: 1 },
-  'Reflect': { category: 'Reaction', mod: 2 },
-  'Store': { category: 'Utility', mod: 2 },
-  'Curse': { category: 'Affliction', mod: 2 },
-  'Bless': { category: 'Affliction', mod: 1 },
-};
+// ============================================================
+// STYLES (injected once)
+// ============================================================
+
+const STYLE_ID = 'spellcraft-styles';
+
+function ensureStyles() {
+    if (document.getElementById(STYLE_ID)) return;
+    const style = document.createElement('style');
+    style.id = STYLE_ID;
+    style.textContent = `
+        .spellcraft-tab {
+            position: relative;
+            transition: color 0.15s ease, background 0.15s ease, border-color 0.15s ease;
+            background: transparent;
+            border-color: transparent;
+            color: var(--text3);
+        }
+        .spellcraft-tab:hover {
+            color: var(--text);
+            background: var(--bg3);
+        }
+        .spellcraft-tab.active {
+            background: var(--gold);
+            border-color: var(--gold);
+            color: #1a1400;
+            font-weight: 600;
+        }
+        .spellcraft-content-inner {
+            animation: spellcraft-fade-in 0.15s ease;
+        }
+        @keyframes spellcraft-fade-in {
+            from { opacity: 0; transform: translateY(2px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .spellcraft-loading {
+            padding: 2rem;
+            text-align: center;
+            color: var(--text3);
+            font-size: 0.85rem;
+        }
+        .spellcraft-path-desc {
+            color: var(--text3);
+            font-size: 0.7rem;
+            max-width: 320px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .spellcraft-patron-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.2rem;
+            font-size: 0.75rem;
+            padding: 0.05rem 0.5rem;
+            border-radius: 10px;
+            background: var(--bg3);
+            border: 1px solid var(--border);
+            color: var(--gold);
+        }
+    `;
+    document.head.appendChild(style);
+}
 
 // ============================================================
 // STATE
 // ============================================================
+
 let container = null;
-let selectedCharId = null;
 let eventListeners = [];
+let activeTab = 'crafting';
+let renderToken = 0; // guards against a slow async tab render landing after a newer one started
 
 // ============================================================
 // HELPERS (exported for sub‑components)
 // ============================================================
 
 export function getCharacterData() {
-  const id = vttStore.getSelectedCharacterId();
-  if (!id) {
-    showToast('Select a character first.', 'error');
-    return null;
-  }
-  const char = getCharacter(id);
-  if (!char) {
-    showToast('Character not found.', 'error');
-    return null;
-  }
-  return char;
+    const id = vttStore.getSelectedCharacterId();
+    if (!id) {
+        showToast('Select a character first.', 'error');
+        return null;
+    }
+    const char = getCharacter(id);
+    if (!char) {
+        showToast('Character not found.', 'error');
+        return null;
+    }
+    return char;
 }
 
 function saveCharacter(updates) {
-  const id = vttStore.getSelectedCharacterId();
-  if (!id) return false;
-  const result = updateCharacter(id, updates);
-  if (result) {
-    renderAll();
-    return true;
-  }
-  return false;
+    const id = vttStore.getSelectedCharacterId();
+    if (!id) return false;
+    const result = updateCharacter(id, updates);
+    if (result) {
+        renderAll();
+        return true;
+    }
+    return false;
 }
 
 export function getPatronRites(patronName) {
-  const patron = PATRON_DATA[patronName];
-  return patron ? patron.rites : [];
+    // Handled by the rites component's data-driven lookup. Kept as a
+    // pass-through for backward compatibility with anything still importing it.
+    return [];
 }
 
 // ============================================================
@@ -141,114 +201,280 @@ export function getPatronRites(patronName) {
 // ============================================================
 
 export function render(el) {
-  container = el;
-  if (!container) return;
+    container = el;
+    if (!container) return;
 
-  // Ensure we have a character selected
-  const char = getCharacterData();
-  if (!char) {
+    ensureStyles();
+
+    const char = getCharacterData();
+    if (!char) {
+        container.innerHTML = `
+            <div class="spellcraft-empty" style="padding:2rem;text-align:center;color:var(--text3);background:var(--bg2);border-radius:var(--radius);border:1px dashed var(--border);">
+                <div style="font-size:3rem;">🧙</div>
+                <h2 style="margin:0.5rem 0;">Select a Character</h2>
+                <p style="margin:0 0 0.5rem;">Go to the VTT and click a character card to view their magical abilities.</p>
+                <button class="btn btn-gold" id="go-to-vtt-btn">🎯 Go to VTT</button>
+            </div>
+        `;
+        attachEvents();
+        return;
+    }
+
+    const path = char.magicPath || 'none';
+    const pathMeta = PATH_META[path] || PATH_META['none'];
+    const patron = char.patron || null;
+    const name = char.name || 'Unnamed Character';
+
+    const tabs = getAvailableTabs(char);
+    if (!tabs.some(t => t.id === activeTab)) {
+        activeTab = 'crafting';
+    }
+
     container.innerHTML = `
-      <div class="panel" style="padding:2rem;text-align:center;color:var(--text3);">
-        <div style="font-size:3rem;">🧙</div>
-        <h2>Select a Character</h2>
-        <p>Go to the VTT and click a character card to view their magical abilities.</p>
-        <button class="btn btn-gold" id="go-to-vtt-btn">Go to VTT</button>
-      </div>
+        <div class="spellcraft-container" style="display:flex;flex-direction:column;gap:0.8rem;">
+
+            <!-- ─── Header ─────────────────────────────────────── -->
+            <header class="spellcraft-header" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.5rem;border-bottom:2px solid var(--border);padding-bottom:0.5rem;">
+                <div style="display:flex;align-items:center;gap:0.5rem;flex-wrap:wrap;">
+                    <span style="font-size:1.8rem;">${escHtml(pathMeta.icon)}</span>
+                    <div>
+                        <h1 class="page-title" style="margin:0;font-size:1.2rem;">${escHtml(name)}</h1>
+                        <div style="display:flex;align-items:center;gap:0.4rem;flex-wrap:wrap;font-size:0.8rem;color:var(--text2);">
+                            <span style="font-weight:600;color:${pathMeta.color};">${escHtml(pathMeta.label)}</span>
+                            ${patron ? `<span class="spellcraft-patron-pill">🔮 ${escHtml(patron)}</span>` : ''}
+                            <span class="spellcraft-path-desc" title="${escHtml(pathMeta.description)}">${escHtml(pathMeta.description)}</span>
+                        </div>
+                    </div>
+                </div>
+                <div style="display:flex;gap:0.3rem;flex-wrap:wrap;">
+                    <button class="btn btn-sm btn-ghost" id="spellcraft-refresh" title="Refresh">↻</button>
+                    <button class="btn btn-sm btn-secondary" id="spellcraft-change-path" title="Change magic path">⚙️ Path</button>
+                </div>
+            </header>
+
+            <!-- ─── Tracks ─────────────────────────────────────── -->
+            <div id="trackers-container" class="panel" style="padding:0.3rem 0.5rem;background:var(--bg2);border-radius:var(--radius);"></div>
+
+            <!-- ─── Tabs ────────────────────────────────────────── -->
+            <div class="spellcraft-tabs" style="display:flex;gap:0.2rem;border-bottom:1px solid var(--border);padding-bottom:0.1rem;flex-wrap:wrap;">
+                ${renderTabButtons(tabs)}
+            </div>
+
+            <!-- ─── Tab Content ────────────────────────────────── -->
+            <div id="spellcraft-content" class="spellcraft-content" style="min-height:300px;">
+                <div class="spellcraft-loading">Loading…</div>
+            </div>
+
+            <!-- ─── Footer / Quick Reference ────────────────────── -->
+            <div class="spellcraft-footer" style="display:grid;grid-template-columns:2fr 1fr;gap:0.5rem;border-top:1px solid var(--border);padding-top:0.5rem;font-size:0.7rem;color:var(--text3);">
+                <div style="display:flex;gap:0.5rem;flex-wrap:wrap;">
+                    <span>📖 <strong>Path:</strong> ${escHtml(pathMeta.label)}</span>
+                    ${patron ? `<span>🔮 <strong>Patron:</strong> ${escHtml(patron)}</span>` : ''}
+                    <span>📊 <strong>Tracks:</strong> ${escHtml(getTrackSummary(char))}</span>
+                </div>
+                <div style="text-align:right;font-style:italic;">
+                    "The Weave remembers." – Lysandra
+                </div>
+            </div>
+
+        </div>
     `;
+
+    renderAll();
     attachEvents();
-    return;
-  }
+}
 
-  // Build the UI based on magic path
-  const path = char.magicPath || 'none';
-  const patron = char.patron || null;
-  const isFreeCaster = path === 'free-caster';
-  const hasPatron = patron && PATRON_DATA[patron];
+// ============================================================
+// TAB SYSTEM
+// ============================================================
 
-  container.innerHTML = `
-    <div class="spellcraft-header">
-      <div class="flex-between" style="flex-wrap:wrap;gap:0.5rem;">
-        <div>
-          <h1 class="page-title" style="margin:0;">🧙 Spellcraft</h1>
-          <p class="page-sub" style="margin:0.2rem 0 0;">
-            ${escHtml(char.name)} – ${path ? path.toUpperCase() : 'No Magic Path'}
-            ${patron ? `· Patron: ${escHtml(patron)}` : ''}
-          </p>
-        </div>
-        <div style="display:flex;gap:0.4rem;">
-          <button class="btn btn-sm btn-ghost" id="spellcraft-refresh" title="Refresh">↻</button>
-          <button class="btn btn-sm" id="spellcraft-change-path">⚙️ Change Path</button>
-        </div>
-      </div>
-    </div>
+function renderTabButtons(tabs) {
+    return tabs.map(tab => `
+        <button class="spellcraft-tab btn btn-sm${activeTab === tab.id ? ' active' : ''}" data-tab="${tab.id}">
+            ${tab.icon} ${tab.label}
+        </button>
+    `).join('');
+}
 
-    <!-- Tracks -->
-    <div id="trackers-container" class="panel" style="margin-bottom:1rem;"></div>
+function getAvailableTabs(char) {
+    const path = char.magicPath || 'none';
+    const tabs = [];
 
-    <!-- Main Grid -->
-    <div style="display:grid;grid-template-columns:2fr 1fr;gap:1.2rem;">
-      <!-- Left Column: Spellbook / Rites / Calculator -->
-      <div style="display:flex;flex-direction:column;gap:1rem;">
-        <!-- Rites / Songs / Arts (depending on path) -->
-        <div id="rites-container" class="panel"></div>
+    // ─── Always show Crafting (Hedge Gifts, Quick Workings, Rituals) ───
+    tabs.push({ id: 'crafting', label: 'Crafting', icon: '🌿' });
 
-        <!-- Spellbook (custom spells) -->
-        <div id="spellbook-container" class="panel"></div>
+    // ─── Always show Spellbook ──────────────────────────────────
+    tabs.push({ id: 'spellbook', label: 'Spellbook', icon: '📚' });
 
-        <!-- TAGS Calculator (for Free Casters only) -->
-        ${isFreeCaster ? `<div id="calculator-container" class="panel"></div>` : ''}
+    // ─── Path-specific tabs ─────────────────────────────────────
+    if (path === 'free-caster') {
+        tabs.push({ id: 'calculator', label: 'Calculator', icon: '🔮' });
+    }
 
-        <!-- Summoning (for Summoners) -->
-        ${path === 'summoner' ? `<div id="summoning-container" class="panel"></div>` : ''}
-      </div>
+    // Runekeeper and Invoker share the Rites tab
+    if (path === 'runekeeper' || path === 'invoker') {
+        tabs.push({ id: 'rites', label: 'Rites', icon: '📜' });
+    }
 
-      <!-- Right Column: Info / Quick Reference -->
-      <div style="display:flex;flex-direction:column;gap:1rem;">
-        <div class="panel" style="background:var(--bg2);">
-          <h3 style="margin-top:0;">📖 Quick Reference</h3>
-          <div id="quick-ref" style="font-size:0.9rem;color:var(--text2);">
-            <p>Select a character to view their magical abilities.</p>
-            <p><strong>Path:</strong> ${escHtml(path)}</p>
-            ${patron ? `<p><strong>Patron:</strong> ${escHtml(patron)}</p>` : ''}
-          </div>
-        </div>
-        <div class="panel" style="background:var(--bg2);">
-          <h3 style="margin-top:0;">⚡ TAGS Reference</h3>
-          <div id="tags-reference" style="max-height:300px;overflow-y:auto;font-size:0.8rem;">
-            ${Object.entries(TAGS_REFERENCE).map(([tag, info]) =>
-              `<span class="tag-badge" style="display:inline-block;padding:0.05rem 0.4rem;margin:0.1rem;border-radius:3px;background:var(--bg4);border:1px solid var(--border);">${tag} (${info.mod})</span>`
-            ).join(' ')}
-          </div>
-        </div>
-      </div>
-    </div>
-  `;
+    // Cantor gets its own dedicated tab with corruption and songs
+    if (path === 'cantor') {
+        tabs.push({ id: 'cantor', label: 'Cantor', icon: '🎵' });
+    }
 
-  // Render sub-components
-  renderAll();
-  attachEvents();
+    if (path === 'summoner') {
+        tabs.push({ id: 'summoning', label: 'Summoning', icon: '👁️' });
+    }
+
+    // Monk is not a path gate on its own — it's available the moment a
+    // character has committed to the monastic path (magicPath === 'monk'),
+    // OR has already chosen a tradition. Either signal is enough to surface
+    // the tab; the monks component itself gates further on learned talents.
+    if (path === 'monk' || char.monasticTradition) {
+        tabs.push({ id: 'monks', label: 'Monks', icon: '🧘' });
+    }
+
+    return tabs;
+}
+
+// Renders the active tab's content directly into the LIVE #spellcraft-content
+// element (never a detached scratch node), and properly awaits async
+// components (Calculator, Cantor, Summoning) before anything else touches
+// the DOM. A render token guards against a slow render finishing after the
+// user has already switched tabs or characters.
+async function renderActiveTabContent() {
+    const contentEl = document.getElementById('spellcraft-content');
+    if (!contentEl) return;
+    const char = getCharacterData();
+    if (!char) return;
+
+    const myToken = ++renderToken;
+    contentEl.innerHTML = `<div class="spellcraft-loading">Loading…</div>`;
+
+    const wrapper = document.createElement('div');
+    wrapper.className = 'spellcraft-content-inner';
+
+    try {
+        switch (activeTab) {
+            case 'crafting':
+                renderWitchcraft(wrapper);
+                break;
+            case 'spellbook':
+                renderSpellbook(wrapper);
+                break;
+            case 'calculator':
+                await renderCalculator(wrapper);
+                break;
+            case 'rites':
+                renderRites(wrapper);
+                break;
+            case 'cantor':
+                await renderCantor(wrapper);
+                break;
+            case 'summoning':
+                await renderSummoning(wrapper);
+                break;
+            case 'monks':
+                renderMonks(wrapper);
+                break;
+            default:
+                wrapper.innerHTML = `<p style="color:var(--text3);">Select a tab to view its content.</p>`;
+        }
+    } catch (err) {
+        console.error(`Spellcraft: error rendering tab "${activeTab}":`, err);
+        wrapper.innerHTML = `<p style="color:var(--red);">Failed to load this tab. Check the console for details.</p>`;
+    }
+
+    // If the user switched tabs/characters while we were awaiting, drop
+    // this result on the floor instead of overwriting whatever's current.
+    if (myToken !== renderToken) return;
+
+    contentEl.innerHTML = '';
+    contentEl.appendChild(wrapper);
 }
 
 function renderAll() {
-  // Render trackers
-  const trackersEl = document.getElementById('trackers-container');
-  if (trackersEl) renderTrackers(trackersEl);
+    const char = getCharacterData();
+    if (!char) return;
 
-  // Render rites / songs / arts
-  const ritesEl = document.getElementById('rites-container');
-  if (ritesEl) renderRites(ritesEl);
+    // Render trackers
+    const trackersEl = document.getElementById('trackers-container');
+    if (trackersEl) renderTrackers(trackersEl);
 
-  // Render spellbook
-  const spellbookEl = document.getElementById('spellbook-container');
-  if (spellbookEl) renderSpellbook(spellbookEl);
+    // Rebuild the tab bar (in case path/tradition changed which tabs show)
+    const tabs = getAvailableTabs(char);
+    if (!tabs.some(t => t.id === activeTab)) {
+        activeTab = 'crafting';
+    }
+    const tabsContainer = document.querySelector('.spellcraft-tabs');
+    if (tabsContainer) {
+        tabsContainer.innerHTML = renderTabButtons(tabs);
+    }
 
-  // Render calculator (if free caster)
-  const calcEl = document.getElementById('calculator-container');
-  if (calcEl) renderCalculator(calcEl);
+    // Render the active tab's content (async-safe, into the live element)
+    renderActiveTabContent();
+}
 
-  // Render summoning (if summoner)
-  const summonEl = document.getElementById('summoning-container');
-  if (summonEl) renderSummoning(summonEl);
+function switchTab(tabId) {
+    if (tabId === activeTab) return;
+    activeTab = tabId;
+
+    const tabsContainer = document.querySelector('.spellcraft-tabs');
+    if (tabsContainer) {
+        tabsContainer.querySelectorAll('.spellcraft-tab').forEach(b => {
+            b.classList.toggle('active', b.dataset.tab === activeTab);
+        });
+    }
+
+    renderActiveTabContent();
+}
+
+// ============================================================
+// TRACK SUMMARY
+// ============================================================
+
+function getTrackSummary(char) {
+    const path = char.magicPath || 'none';
+    const parts = [];
+
+    if (path === 'runekeeper' || path === 'invoker') {
+        const obligation = char.obligation || 0;
+        const maxObligation = (char.spirit || 1) + (char.presence || 1);
+        parts.push(`Obligation ${obligation}/${maxObligation}`);
+    }
+
+    if (path === 'cantor') {
+        const corruption = char.corruption || 0;
+        const maxCorruption = char.corruptionMax || (char.spirit || 1);
+        parts.push(`Corruption ${corruption}/${maxCorruption}`);
+    }
+
+    if (path === 'summoner') {
+        const leash = char.leash || 0;
+        const maxLeash = char.leashMax || 4;
+        const spirits = (char.boundSpirits || []).length;
+        parts.push(`Leash ${leash}/${maxLeash} · ${spirits} spirits`);
+    }
+
+    if (path === 'psion') {
+        const strain = char.mentalStrain || 0;
+        const maxStrain = char.mentalStrainMax || (char.spirit || 1);
+        parts.push(`Mental Strain ${strain}/${maxStrain}`);
+    }
+
+    if (path === 'witch') {
+        const shadow = char.witch?.prices?.shadow || 0;
+        const shame = char.witch?.prices?.shame || 0;
+        const idStrain = char.witch?.prices?.identityStrain || 0;
+        parts.push(`Shadow ${shadow} · Shame ${shame} · Identity ${idStrain}`);
+    }
+
+    if (path === 'monk' || char.monasticTradition) {
+        const breath = char.breathState || 'entering';
+        const tier = char.monkCorruptionTier || 0;
+        parts.push(`Breath: ${breath} · Corruption Tier ${tier}`);
+    }
+
+    return parts.join(' · ') || 'No active tracks';
 }
 
 // ============================================================
@@ -256,41 +482,47 @@ function renderAll() {
 // ============================================================
 
 function attachEvents() {
-  // Remove old listeners
-  eventListeners.forEach(({event, handler}) => {
-    container.removeEventListener(event, handler);
-  });
-  eventListeners = [];
+    // Remove old listeners
+    eventListeners.forEach(({ event, handler }) => {
+        if (container) container.removeEventListener(event, handler);
+    });
+    eventListeners = [];
 
-  const clickHandler = (e) => {
-    const target = e.target.closest('button, [id]');
-    if (!target) return;
-    const id = target.id;
+    const clickHandler = (e) => {
+        const tabBtn = e.target.closest('.spellcraft-tab');
+        if (tabBtn) {
+            switchTab(tabBtn.dataset.tab);
+            return;
+        }
 
-    switch (id) {
-      case 'go-to-vtt-btn':
-        window.location.hash = 'vtt';
-        break;
-      case 'spellcraft-refresh':
-        renderAll();
-        showToast('Refreshed', 'info');
-        break;
-      case 'spellcraft-change-path':
-        changeMagicPath();
-        break;
-      // Add more actions here (add spell, delete spell, etc.)
+        const target = e.target.closest('button, [id]');
+        if (!target) return;
+
+        switch (target.id) {
+            case 'go-to-vtt-btn':
+                window.location.hash = 'vtt';
+                break;
+            case 'spellcraft-refresh':
+                renderAll();
+                showToast('🔄 Refreshed', 'info');
+                break;
+            case 'spellcraft-change-path':
+                changeMagicPath();
+                break;
+        }
+    };
+
+    if (container) {
+        container.addEventListener('click', clickHandler);
+        eventListeners.push({ event: 'click', handler: clickHandler });
     }
-  };
 
-  container.addEventListener('click', clickHandler);
-  eventListeners.push({ event: 'click', handler: clickHandler });
-
-  // Listen for character selection changes (from VTT)
-  const selectionHandler = () => {
-    render(container);
-  };
-  document.addEventListener('characterSelected', selectionHandler);
-  eventListeners.push({ event: 'characterSelected', handler: selectionHandler });
+    // Listen for character selection changes (from VTT)
+    const selectionHandler = () => {
+        if (container) render(container);
+    };
+    document.addEventListener('characterSelected', selectionHandler);
+    eventListeners.push({ event: 'characterSelected', handler: selectionHandler });
 }
 
 // ============================================================
@@ -298,18 +530,37 @@ function attachEvents() {
 // ============================================================
 
 function changeMagicPath() {
-  const char = getCharacterData();
-  if (!char) return;
+    const char = getCharacterData();
+    if (!char) return;
 
-  const paths = ['none', 'runekeeper', 'invoker', 'cantor', 'witch', 'psion', 'summoner', 'free-caster'];
-  const current = char.magicPath || 'none';
-  const idx = paths.indexOf(current);
-  const next = paths[(idx + 1) % paths.length];
-  const result = updateCharacter(char.id, { magicPath: next });
-  if (result) {
-    showToast(`Magic path changed to ${next}`, 'success');
-    renderAll();
-  }
+    const paths = ['none', 'free-caster', 'runekeeper', 'invoker', 'cantor', 'witch', 'psion', 'summoner', 'monk'];
+    const current = char.magicPath || 'none';
+    const options = paths.map(p => {
+        const meta = PATH_META[p];
+        return `${p === current ? '▶ ' : '  '} ${p}: ${meta.label} – ${meta.description}`;
+    }).join('\n');
+
+    const choice = prompt(
+        `Change magic path for ${char.name}:\n\n${options}\n\nEnter the new path (e.g., "witch" or "none"):`,
+        current
+    );
+
+    if (!choice || choice === current) return;
+
+    const trimmed = choice.trim().toLowerCase();
+    if (!paths.includes(trimmed)) {
+        showToast(`Invalid path. Choose from: ${paths.join(', ')}`, 'error');
+        return;
+    }
+
+    const result = updateCharacter(char.id, { magicPath: trimmed });
+    if (result) {
+        activeTab = 'crafting';
+        showToast(`⚙️ Magic path changed to ${PATH_META[trimmed].label}`, 'success');
+        render(container);
+    } else {
+        showToast('Failed to update character.', 'error');
+    }
 }
 
 // ============================================================
@@ -317,25 +568,25 @@ function changeMagicPath() {
 // ============================================================
 
 export function destroy() {
-  if (container) {
-    eventListeners.forEach(({event, handler}) => {
-      container.removeEventListener(event, handler);
-    });
-    eventListeners = [];
-    container.innerHTML = '';
-    container = null;
-  }
+    if (container) {
+        eventListeners.forEach(({ event, handler }) => {
+            container.removeEventListener(event, handler);
+        });
+        eventListeners = [];
+        container.innerHTML = '';
+        container = null;
+    }
 }
 
 // ============================================================
-// EXPORTS (for sub‑components)
+// EXPORTS
 // ============================================================
 
 export { saveCharacter };
 
 export default {
-  render,
-  destroy,
+    render,
+    destroy,
 };
 
 export { render as renderSpellcraft, destroy as destroySpellcraft };

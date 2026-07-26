@@ -58,11 +58,7 @@
       "action": "Scene",
       "range": "Near",
       "resist": "No",
-      "tags": [
-        "FEAR",
-        "COMMAND",
-        "RADIANT"
-      ],
+      "tags": ["FEAR", "COMMAND", "RADIANT"],
       "materials": "A lit taper or a bell.",
       "effect": "Begin a hymn or chant. Allies in Near gain +2 dice to resist Fear this scene. On a 10, they may ignore Fear entirely for one round.",
       "push_it": "Allies who benefit also clear 1 Fatigue or 1 Complication point; you gain 1 Fatigue at the scene's end. Cost: Mark +1 Obligation (total +2) or Mark +1 Fatigue.",
@@ -78,11 +74,7 @@
       "action": "Instant",
       "range": "Self",
       "resist": "No",
-      "tags": [
-        "PERFORMANCE",
-        "BOOST",
-        "BURDEN"
-      ],
+      "tags": ["PERFORMANCE", "BOOST", "BURDEN"],
       "materials": "A note held until your voice frays.",
       "effect": "For one scene you cannot produce an imperfect sound: all Performance rolls +2 dice. All other rolls –1 die from intrusive perfection.",
       "push_it": "Extend to one ally; both mark 1 SB (Diamonds). Cost: Mark +1 Obligation (total +2) or Mark +1 Fatigue.",
@@ -98,11 +90,7 @@
       "action": "Scene",
       "range": "Near",
       "resist": "Yes",
-      "tags": [
-        "COMMAND",
-        "READ",
-        "FEAR"
-      ],
+      "tags": ["COMMAND", "READ", "FEAR"],
       "materials": "A melody braided from the listener's secret want.",
       "effect": "Presence + Command vs. Resolve (DV 3). Success: target joins in. Partial: they resist but suffer –1 die to social rolls this scene. Failure: they follow entranced.",
       "push_it": "Affects all in Near; start Compelled Audience [6] timer. Cost: Mark +1 Obligation (total +2) or Mark +1 Fatigue.",
@@ -118,11 +106,7 @@
       "action": "Scene",
       "range": "Self",
       "resist": "No",
-      "tags": [
-        "BIND",
-        "FOCUS",
-        "BOOST"
-      ],
+      "tags": ["BIND", "FOCUS", "BOOST"],
       "materials": "Your hair woven into your instrument or tool.",
       "effect": "Enter ruthless focus: creative rolls +2 dice; ignore first 2 Fatigue from exertion. You are [BIND] to the piece until completion or ruin.",
       "push_it": "One ally is also bound; both mark 1 SB (Diamonds). Cost: Mark +1 Obligation (total +2) or Mark +1 Fatigue.",
@@ -138,12 +122,7 @@
       "action": "Extended",
       "range": "Zone",
       "resist": "No",
-      "tags": [
-        "WARD",
-        "AREA",
-        "BOOST",
-        "SACRIFICE"
-      ],
+      "tags": ["WARD", "AREA", "BOOST", "SACRIFICE"],
       "materials": "A stage kissed with the blood of sworn singers.",
       "effect": "Hallow a venue. All performances +2 dice, +1 Effect. The space is [WARD]ed: any disruption spawns 2 SB. The ward collapses if the performance ends.",
       "push_it": "The stage sustains itself but drains life; start Performance Hunger [8] timer. Cost: Mark +1 Obligation (total +3) or Mark +1 Fatigue.",
@@ -159,12 +138,7 @@
       "action": "Extended",
       "range": "Touch",
       "resist": "No",
-      "tags": [
-        "TRANSFORM",
-        "FATE",
-        "SACRIFICE",
-        "BOOST"
-      ],
+      "tags": ["TRANSFORM", "FATE", "SACRIFICE", "BOOST"],
       "materials": "Your greatest work and regret, destroyed together.",
       "effect": "Birth a transcendent masterpiece: +2 dice to creative rolls this session; immune to social manipulation. But all lesser works falter (mundane actions not directly related to the masterpiece suffer –1 die).",
       "push_it": "The piece wakes and demands; mark Harm 1 (Stress); start Demanding Creation [6] timer. Cost: Mark +1 Obligation (total +3) or Mark +1 Fatigue.",
@@ -185,7 +159,12 @@
     }
   },
   "witchcraft": {
+    "name": "The Art of Unfinished Song",
     "description": "A witch who walks with Palinode is an instrument-smith or stage-weaver — one who crafts the physical vessels of rapture: a violin that plays notes the player has not yet learned, a mask that shows the audience what they most desire to see, or a stage that remembers every performance and adds its echo to the next. Their tools are never hammers; they work with tuning forks, silk cords, and scraps of unfinished sheet music. In Aeler, a True-Mason might carve an acoustic keystone, but a hedge-witch of Palinode might tune a theater's resonance by humming a specific interval into its cornerstone until the stone hums back.",
+    "color": "#b84a8a",
+    "lore": "The stage-weaver's path is the art of the unfinished. They learn that the most powerful performance is the one that leaves the audience wanting more — the breath held, the note unresolved, the story that never quite ends. Palinode teaches that art is not a destination but a promise, and that the truest magic is the longing that lingers after the curtain falls.",
+    "signature_rite": "Rite of the Hooked Chorus",
+    "quote": "The art that is never finished is the art that never dies.",
     "tools": {
       "conductors_baton": {
         "name": "The Conductor's Baton of Unfinished Phrases",
@@ -197,6 +176,84 @@
         "name": "Encore's Whisper",
         "xp": 4,
         "description": "Once per scene, the witch may snap their fingers and whisper a single word ('again,' 'more,' 'stay'). For the next minute, any willing performer (including the witch) may reroll one failed Performance or Sway roll, as the audience's desire for more bends reality slightly. The reroll is made at –1 die, and the audience will demand an encore at the end — the witch must perform again (or provide a suitable distraction) or mark 1 Fatigue."
+      },
+      {
+        "name": "Tune the Stage",
+        "xp": 3,
+        "description": "By humming a specific interval into a room's walls or floor, the witch may improve the acoustics of a space. For the next hour, any Performance or social roll made in the space gains +1 die. The effect lasts until the witch leaves the room. Once per scene."
+      },
+      {
+        "name": "Read the Crowd",
+        "xp": 2,
+        "description": "When performing before an audience of at least three people, the witch may ask the GM one question about the audience's mood, desire, or hidden agenda. The GM must answer truthfully, though cryptically. Once per scene."
+      },
+      {
+        "name": "Phantom Instrument",
+        "xp": 3,
+        "description": "The witch may briefly summon a ghostly instrument (a lute, a drum, a violin) that plays itself for one scene. The instrument cannot be physically interacted with, but it provides +1 die to Performance rolls and can serve as a distraction or accompaniment. Once per session."
+      }
+    ]
+  },
+  "monastic_tradition": {
+    "name": "The Way of the Unfinished Note",
+    "description": "Monks of the Unfinished Note live by the principle that perfection is the enemy of art. They train their bodies to be instruments of expression, their silence to be a performance, and their presence to be a stage. They move through the world as unfinished symphonies — always becoming, never complete. In theaters and monasteries alike, they teach that the search for the perfect note is the note itself, and that to be truly free is to embrace the encore that never ends.",
+    "color": "#b84a8a",
+    "prerequisites": "Presence 3+, Spirit 2+, Rite of the Single True Note or Cantor of Palinode.",
+    "quote": "The art that is never finished is the art that never dies.",
+    "debt_resistant_frame": "The unfinished cannot be bound. Monks of the Unfinished Note gain +1 die to resist any magical debt, geas, or contract that would force them to complete a work before it is ready or to perform a lie. If they succeed, the creditor finds only an empty stage — the monk has already moved to the next act.",
+    "techniques": {
+      "basic": {
+        "name": "Captivating Presence",
+        "xp": 6,
+        "description": "When you engage in a Performance or Sway roll, you may treat the first failure as a Partial Success instead (the audience is intrigued, not disappointed). Once per scene.",
+        "cost": "1 Fatigue",
+        "prereq": "Presence 3+"
+      },
+      "advanced": {
+        "name": "Echo of the Encore",
+        "xp": 8,
+        "description": "When you successfully complete a Performance roll, the audience's desire for more lingers. For the rest of the scene, any ally who follows your lead in a social setting gains +1 die to their Sway or Performance rolls. The encore echoes through them.",
+        "cost": "Passive",
+        "prereq": "Tier II, Performance 3+"
+      },
+      "master": {
+        "name": "The Crownpiece",
+        "xp": 12,
+        "description": "Once per session, you may perform a transcendent work of art — a song, a dance, a speech — that leaves all who witness it changed. For one scene, all allies within Near range gain +2 dice to all social and creative rolls, and any enemy who witnessed the performance must test Resolve (DV 4) or be captivated (suffer –1 die to all actions). After the performance, you suffer 2 Fatigue and mark +1 Obligation to Palinode.",
+        "cost": "2 Fatigue and +1 Obligation to Palinode",
+        "prereq": "Tier III, Presence 4+"
+      }
+    },
+    "corruption": [
+      {
+        "tier": 1,
+        "benefit": "Perfect Pitch: +1 die to Performance.",
+        "cost": "Restless Ear: Distracted by any flaw; –1 die to non-performance focus."
+      },
+      {
+        "tier": 2,
+        "benefit": "Rapturous Presence: Once/scene, grant allies +1 die to social rolls.",
+        "cost": "Craves Applause: Suffer 1 Fatigue if ignored or without an audience."
+      },
+      {
+        "tier": 3,
+        "benefit": "Inspired Creation: +2 dice to one artistic act per scene.",
+        "cost": "Haunted by Drafts: Must obsessively rework; delays other actions."
+      },
+      {
+        "tier": 4,
+        "benefit": "Mesmerizing Performance: Once/session, captivate a crowd (Resolve DV 4 to resist).",
+        "cost": "Lost in the Moment: –1 die to awareness while performing."
+      },
+      {
+        "tier": 5,
+        "benefit": "Artistic Vision: Foresee the perfect form of a work; +2 dice to create it.",
+        "cost": "Consumed Spark: Must pursue inspiration immediately, no matter the cost."
+      },
+      {
+        "tier": "6+",
+        "benefit": "Queen of Encores: Once/session, create a legendary performance; all present +3 dice to social rolls.",
+        "cost": "Eternal Encore: Mark +3 Obligation; the performance demands endless repetition until sated. Voice of Palinode: Permanent condition—your words carry her power. Anyone who hears you speak must test Resolve (DV 3) to interrupt you or ignore a reasonable request. However, you cannot whisper; your quietest voice is still audible at Near range."
       }
     ]
   },
