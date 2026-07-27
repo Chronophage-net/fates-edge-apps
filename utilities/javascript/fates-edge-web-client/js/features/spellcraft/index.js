@@ -11,6 +11,20 @@
  * - TAGS Calculator for Free Casters (and as a learning tool for others)
  * - Unified character selection via VTT
  * - Default "Path Finder" view helps players choose their magical tradition
+ *
+ * FIX (this pass): the 'rites' branch of renderActiveTabContent() called
+ * `renderRites(wrapper)` with only the container element. rites.js's real
+ * signature is `renderRites(el, patronIds, characterId, options = {})` —
+ * every call was leaving patronIds and characterId as `undefined`. Inside
+ * rites.js, `state.characters.find(c => c.id === characterId)` with
+ * characterId undefined never matches a real character (ids are
+ * generateId(8) strings), so `char` came back undefined, `char?.patron`
+ * was never read, and the panel always fell through to "No patron
+ * selected" — regardless of what was actually set on the character. The
+ * character object (`char`) was already sitting in scope two lines above
+ * the switch statement; it just never got passed down. Fixed below, and
+ * the call is now awaited (renderRites is async) to match the pattern
+ * already used for calculator/cantor/summoning.
  */
 
 import { vttStore } from '../../core/vtt-store.js';
@@ -364,6 +378,23 @@ export function getPatronRites(patronName) {
     return [];
 }
 
+// ─── Helper: derive the patron id list to hand to renderRites ─────────
+// Runekeepers carry a single patron on char.patron. Invokers carry an
+// array of Symbols on char.symbols; each Symbol entry may itself be a
+// plain patron-id string, or an object referencing the patron via
+// `patronId` (from addSymbolToCharacter's shape in core/state.js) or
+// `patron`. We try all three so this keeps working regardless of which
+// shape ends up being used when Symbols are created.
+function getPatronIdsForRites(char) {
+    if (!char) return [];
+    if (char.magicPath === 'invoker') {
+        return (char.symbols || [])
+            .map(s => (typeof s === 'string' ? s : s?.patronId || s?.patron || s?.id))
+            .filter(Boolean);
+    }
+    return char.patron ? [char.patron] : [];
+}
+
 // ============================================================
 // RENDER – Main
 // ============================================================
@@ -677,9 +708,9 @@ function getAvailableTabs(char) {
 
 // Renders the active tab's content directly into the LIVE #spellcraft-content
 // element (never a detached scratch node), and properly awaits async
-// components (Calculator, Cantor, Summoning) before anything else touches
-// the DOM. A render token guards against a slow render finishing after the
-// user has already switched tabs or characters.
+// components (Calculator, Cantor, Summoning, Rites) before anything else
+// touches the DOM. A render token guards against a slow render finishing
+// after the user has already switched tabs or characters.
 async function renderActiveTabContent() {
     const contentEl = document.getElementById('spellcraft-content');
     if (!contentEl) return;
@@ -703,9 +734,19 @@ async function renderActiveTabContent() {
             case 'calculator':
                 await renderCalculator(wrapper);
                 break;
-            case 'rites':
-                renderRites(wrapper);
+            case 'rites': {
+                // FIX: this used to be a bare `renderRites(wrapper)` with no
+                // patronIds/characterId/options — see the file-level note
+                // at the top of this file for exactly why that produced
+                // "No patron selected" unconditionally. char is already in
+                // scope here; we just have to actually pass it through.
+                const patronIds = getPatronIdsForRites(char);
+                await renderRites(wrapper, patronIds, char.id, {
+                    path: char.magicPath === 'invoker' ? 'invoker' : 'runekeeper',
+                    characterName: char.name
+                });
                 break;
+            }
             case 'cantor':
                 await renderCantor(wrapper);
                 break;

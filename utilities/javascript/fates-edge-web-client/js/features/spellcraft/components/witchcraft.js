@@ -312,6 +312,41 @@ function getTierFromXp(xp) {
     return 'V';
 }
 
+// ─── Magic Paths Reference ─────────────────────────────────────
+// Shown as a resource when no character is selected at all, so the panel
+// is useful before a character exists. Kept in sync manually with the
+// richer MAGIC_PATHS object in features/characters/index.js — this is a
+// small, self-contained copy rather than a cross-feature import, so a
+// wrong relative path can never break this panel.
+const MAGIC_PATH_REFERENCE = [
+    { icon: '🔥', label: 'Free Caster', blurb: 'Raw TAGS grammar, no patron — pure will and improvisation.' },
+    { icon: '📖', label: 'Runekeeper', blurb: 'Bound to one patron via Thiasos or Codex; steady Rites.' },
+    { icon: '🔯', label: 'Invoker', blurb: 'Carries Symbols from multiple patrons; risks Cross-Resonance.' },
+    { icon: '🎵', label: 'Cantor', blurb: "Sings a patron's Rites as Songs; Corruption blooms with Pushing." },
+    { icon: '👁️', label: 'Summoner', blurb: 'Binds spirits from the Bestiary; manages the Leash.' },
+    { icon: '🌿', label: 'Witch', blurb: 'Hedge magic at Thresholds, paid in Shadow, Shame, Identity Strain.' },
+    { icon: '🧠', label: 'Psion', blurb: 'Mind-born power fueled by Mental Strain.' },
+    { icon: '🧘', label: 'Monk', blurb: 'Patron-optional path of Breath States and monastic Techniques.' },
+    { icon: '🦅', label: 'Familiar Only', blurb: 'A bonded companion without a full magic path.' },
+    { icon: '🍃', label: 'Hedge Gifts', blurb: 'Small universal gifts available to any character.' }
+];
+
+function renderMagicPathReferenceHtml(highlightLabel) {
+    return `
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:0.4rem;text-align:left;margin-top:0.8rem;">
+            ${MAGIC_PATH_REFERENCE.map(p => `
+                <div style="padding:0.4rem 0.5rem;border-radius:var(--radius);background:var(--bg2);border:1px solid ${p.label === highlightLabel ? 'var(--gold)' : 'var(--border)'};">
+                    <div style="display:flex;align-items:center;gap:0.3rem;">
+                        <span style="font-size:1.1rem;">${p.icon}</span>
+                        <strong style="font-size:0.82rem;${p.label === highlightLabel ? 'color:var(--gold);' : ''}">${p.label}</strong>
+                    </div>
+                    <div style="font-size:0.68rem;color:var(--text3);margin-top:0.15rem;line-height:1.3;">${p.blurb}</div>
+                </div>
+            `).join('')}
+        </div>
+    `;
+}
+
 // ============================================================
 // WITCHCRAFT STATE (per character)
 // ============================================================
@@ -362,6 +397,8 @@ export function renderWitchcraft(el) {
             <div class="panel" style="padding:1rem;text-align:center;color:var(--text3);">
                 <div style="font-size:2rem;">🧹</div>
                 <p>Select a character to view their hedge magic.</p>
+                <div style="margin-top:0.5rem;font-weight:600;color:var(--gold);">📚 Magic Paths Reference</div>
+                ${renderMagicPathReferenceHtml('Witch')}
             </div>
         `;
         return;

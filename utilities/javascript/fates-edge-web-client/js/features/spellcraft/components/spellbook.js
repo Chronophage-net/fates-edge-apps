@@ -274,11 +274,37 @@ function getSignatureBonus(spell) {
     return 1;
 }
 
+// ─── Mount element lookup ───────────────────────────────────────
+// FIX: every CRUD handler below used to refresh via
+// getSpellbookMountEl() — but nothing in this
+// file (or, as far as we can tell, the caller that mounts it) ever gives
+// any element that id. The rendered root only ever carries the *class*
+// "spellbook-container" (see the `<div class="spellbook-container">` in
+// renderSpellbook below), set as the innerHTML of whatever parent element
+// was passed into renderSpellbook(el) in the first place. So that lookup
+// always returned null, and el.innerHTML = html inside renderSpellbook
+// threw "Cannot set properties of null" the moment any Add/Edit/Copy/
+// Delete/Template/etc. button tried to refresh the view.
+// This mirrors the safer pattern cantor.js/witchcraft.js already use:
+// find the live ".xxx-container" div and refresh its parent, with a
+// fallback to the shared "spellcraft-content" mount point.
+function getSpellbookMountEl() {
+    return document.querySelector('.spellbook-container')?.parentElement
+        || document.getElementById('spellcraft-content');
+}
+
 // ============================================================
 // MAIN RENDER
 // ============================================================
 
 export function renderSpellbook(el) {
+    // FIX: guard against a null/missing container — see getSpellbookMountEl()
+    // note above. Previously this function assumed `el` always existed and
+    // crashed with "Cannot set properties of null" the instant it didn't.
+    if (!el) {
+        console.warn('[Spellbook] renderSpellbook called with no container element — skipping.');
+        return;
+    }
     const char = getCharacterData();
     if (!char) {
         el.innerHTML = `
@@ -646,7 +672,7 @@ window.spellbookAddSpell = function() {
     char.spellbook.push(newSpell);
     saveCharacter({ spellbook: char.spellbook });
     showToast(`✨ "${name}" added to spellbook (DV ${dv}).`, 'success');
-    renderSpellbook(document.getElementById('spellbook-container'));
+    renderSpellbook(getSpellbookMountEl());
 };
 
 // ─── From Tags (Free Caster) ──────────────────────────────────
@@ -692,7 +718,7 @@ window.spellbookFromTags = function() {
     char.spellbook.push(newSpell);
     saveCharacter({ spellbook: char.spellbook });
     showToast(`🔮 "${name}" created from tags (DV ${dv}).`, 'success');
-    renderSpellbook(document.getElementById('spellbook-container'));
+    renderSpellbook(getSpellbookMountEl());
 };
 
 // ─── Templates ─────────────────────────────────────────────────
@@ -738,7 +764,7 @@ window.spellbookTemplates = function() {
     char.spellbook.push(newSpell);
     saveCharacter({ spellbook: char.spellbook });
     showToast(`📋 Template "${template.name}" added to spellbook.`, 'success');
-    renderSpellbook(document.getElementById('spellbook-container'));
+    renderSpellbook(getSpellbookMountEl());
 };
 
 // ─── Copy Spell ─────────────────────────────────────────────────
@@ -768,7 +794,7 @@ window.spellbookCopySpell = function(id) {
     char.spellbook.push(newSpell);
     saveCharacter({ spellbook: char.spellbook });
     showToast(`📋 "${spell.name}" copied.`, 'success');
-    renderSpellbook(document.getElementById('spellbook-container'));
+    renderSpellbook(getSpellbookMountEl());
 };
 
 // ─── Edit ──────────────────────────────────────────────────────
@@ -808,7 +834,7 @@ window.spellbookEdit = function(id) {
 
     saveCharacter({ spellbook: char.spellbook });
     showToast('Spell updated.', 'success');
-    renderSpellbook(document.getElementById('spellbook-container'));
+    renderSpellbook(getSpellbookMountEl());
 };
 
 // ─── Delete ────────────────────────────────────────────────────
@@ -822,7 +848,7 @@ window.spellbookDelete = function(id) {
     char.spellbook = char.spellbook.filter(s => s.id !== id);
     saveCharacter({ spellbook: char.spellbook });
     showToast(`Deleted "${spell.name}"`, 'info');
-    renderSpellbook(document.getElementById('spellbook-container'));
+    renderSpellbook(getSpellbookMountEl());
 };
 
 // ─── Clear All ─────────────────────────────────────────────────
@@ -838,7 +864,7 @@ window.spellbookClearAll = function() {
     char.spellbook = [];
     saveCharacter({ spellbook: char.spellbook });
     showToast('Spellbook cleared.', 'info');
-    renderSpellbook(document.getElementById('spellbook-container'));
+    renderSpellbook(getSpellbookMountEl());
 };
 
 // ─── Toggle Signature ─────────────────────────────────────────
@@ -852,7 +878,7 @@ window.spellbookToggleSignature = function(id) {
     spell.updatedAt = Date.now();
     saveCharacter({ spellbook: char.spellbook });
     showToast(spell.signature ? `⭐ "${spell.name}" is now signature (+1 die).` : `"${spell.name}" is no longer signature.`, 'info');
-    renderSpellbook(document.getElementById('spellbook-container'));
+    renderSpellbook(getSpellbookMountEl());
 };
 
 // ─── Clear Filters ─────────────────────────────────────────────
@@ -861,7 +887,7 @@ window.spellbookClearFilters = function() {
     localStorage.removeItem('fates-edge-spellbook-filter-tag');
     localStorage.removeItem('fates-edge-spellbook-filter-signature');
     localStorage.removeItem('fates-edge-spellbook-filter-text');
-    const el = document.getElementById('spellbook-container');
+    const el = getSpellbookMountEl();
     if (el) renderSpellbook(el);
 };
 
@@ -1001,7 +1027,7 @@ window.spellbookUse = function(id) {
 
     // Refresh the spellbook to update usage stats
     setTimeout(() => {
-        const el = document.getElementById('spellbook-container');
+        const el = getSpellbookMountEl();
         if (el) renderSpellbook(el);
     }, 100);
 };
@@ -1059,7 +1085,7 @@ window.spellbookImport = function() {
                 });
                 saveCharacter({ spellbook: char.spellbook });
                 showToast(`📥 Imported ${added} spells.`, 'success');
-                renderSpellbook(document.getElementById('spellbook-container'));
+                renderSpellbook(getSpellbookMountEl());
             } catch (err) {
                 showToast('Failed to parse spellbook JSON.', 'error');
             }

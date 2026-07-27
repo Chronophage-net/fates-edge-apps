@@ -10,6 +10,23 @@
  * - Talent filtering by category
  * - Path‑specific character summary (Invoker symbols, Cantor corruption, Witch prices, etc.)
  * - FIX: Runekeepers without a patron now derive it from Thiasos/Codex selection
+ * - FIX (this pass): derivePatronFromRunekeeperItems referenced two undefined
+ *   bare identifiers (`thiasos`, `codex` instead of `char.thiasos`/`char.codex`)
+ *   ahead of an unconditional `return null;`, so the function threw a
+ *   ReferenceError on every real invocation and the correct implementation
+ *   below it was unreachable dead code. Because renderCharList() runs this
+ *   over every character with .map(), ANY Runekeeper anywhere in the party
+ *   missing a patron would throw uncaught, aborting renderCharList() and
+ *   therefore everything sequenced after it in render() (party overview,
+ *   talent list, event attachment) — which is consistent with rites/other
+ *   panels silently showing stale "no patron" state even for an unrelated,
+ *   fully-configured character. See the fixed function and the new
+ *   try/catch in ensureRunekeeperPatron()/createCharacterSummary() below.
+ * - ADDED: MAGIC_PATHS now carries a short `blurb` for each path, and
+ *   renderMagicPathsReference()/getMagicPathsReferenceHtml() are exported
+ *   so other panels can show a "here's what each path does" resource when
+ *   no character (or no matching character) is selected, instead of just
+ *   a bare "select a character" message.
  */
 
 import { generateId, escHtml, safeParseInt, clamp } from '../../core/utils.js';
@@ -62,18 +79,21 @@ const TIER_INFO = [
     { min: 221, max: Infinity, tier: 'V', name: 'Mythic', color: '#9c27b0' }
 ];
 
+// Each path now carries a short `blurb` in addition to label/icon, so this
+// single object can double as the data source for the "no character
+// selected" reference resource (see renderMagicPathsReference below).
 const MAGIC_PATHS = {
-    'none': { label: 'None', icon: '' },
-    'free-caster': { label: 'Free Caster', icon: '🔥' },
-    'runekeeper': { label: 'Runekeeper', icon: '📖' },
-    'invoker': { label: 'Invoker', icon: '🔯' },
-    'cantor': { label: 'Cantor', icon: '🎵' },
-    'summoner': { label: 'Summoner', icon: '👁️' },
-    'witch': { label: 'Witch', icon: '🌿' },
-    'psion': { label: 'Psion', icon: '🧠' },
-    'monk': { label: 'Monk', icon: '🧘' },
-    'familiar-only': { label: 'Familiar Only', icon: '🦅' },
-    'hedge-gifts': { label: 'Hedge Gifts', icon: '🍃' }
+    'none': { label: 'None', icon: '', blurb: 'No magic path chosen yet.' },
+    'free-caster': { label: 'Free Caster', icon: '🔥', blurb: 'Weaves raw TAGS grammar with no patron — pure will and improvisation. Higher risk, no strings attached.' },
+    'runekeeper': { label: 'Runekeeper', icon: '📖', blurb: 'Bound to a single patron through a Thiasos (familiar) or Codex. Steady, reliable Rites and a clear Obligation track.' },
+    'invoker': { label: 'Invoker', icon: '🔯', blurb: 'Carries Symbols from multiple patrons at once. Versatile, but rival patrons can cause Cross-Resonance.' },
+    'cantor': { label: 'Cantor', icon: '🎵', blurb: "Sings a patron's Rites as Songs. Pushing a Song advances Corruption toward the Bloom." },
+    'summoner': { label: 'Summoner', icon: '👁️', blurb: 'Binds spirits from the Bestiary and manages the Leash before a spirit breaks free.' },
+    'witch': { label: 'Witch', icon: '🌿', blurb: 'Hedge magic worked at Thresholds through Quick Workings and full Rituals, paid in Shadow, Shame, and Identity Strain.' },
+    'psion': { label: 'Psion', icon: '🧠', blurb: 'Mind-born power fueled by Mental Strain instead of a patron, tags, or corruption.' },
+    'monk': { label: 'Monk', icon: '🧘', blurb: 'A patron-optional path of Breath States, Meditation, and monastic Techniques (Foundation → Working → Signature → Quiet).' },
+    'familiar-only': { label: 'Familiar Only', icon: '🦅', blurb: 'A bonded animal companion without taking on a full magic path.' },
+    'hedge-gifts': { label: 'Hedge Gifts', icon: '🍃', blurb: 'Small universal Hedge Gifts available to any character — no magic path required.' }
 };
 
 // ─── Patron-to-Thiasos/Codex mapping ──────────────────────────
@@ -193,20 +213,23 @@ const PATRON_TECHNIQUE_MAP = {
 
 export function derivePatronFromRunekeeperItems(char) {
     if (!char) return null;
-     if (thiasos && THIASOS_PATRON_MAP[thiasos]) return THIASOS_PATRON_MAP[thiasos];
-    if (codex && CODEX_PATRON_MAP[codex]) return CODEX_PATRON_MAP[codex];
-    return null;
+
+    // FIX: this used to reference bare `thiasos`/`codex` (undefined
+    // identifiers, not `char.thiasos`/`char.codex`) followed by an
+    // unconditional `return null;` — meaning every real call threw a
+    // ReferenceError before the correct logic below could ever run.
+    // The two checks below are the only implementation now.
 
     // Check Thiasos
     if (char.thiasos && THIASOS_PATRON_MAP[char.thiasos]) {
         return THIASOS_PATRON_MAP[char.thiasos];
     }
-    
+
     // Check Codex
     if (char.codex && CODEX_PATRON_MAP[char.codex]) {
         return CODEX_PATRON_MAP[char.codex];
     }
-    
+
     return null;
 }
 
@@ -216,9 +239,19 @@ function ensureRunekeeperPatron(char) {
     if (!char) return char;
     if (char.magicPath !== 'runekeeper') return char;
     if (char.patron) return char;
-    
-    // Try to derive from Thiasos/Codex
-    const derived = derivePatronFromRunekeeperItems(char);
+
+    // FIX: derivePatronFromRunekeeperItems is now safe, but we still guard
+    // this call with try/catch — one malformed/unexpected character (e.g.
+    // a corrupted save, or a future bug in the map lookups) should never
+    // be able to abort renderCharList()'s .map() and take the rest of the
+    // Characters tab render down with it again.
+    let derived = null;
+    try {
+        derived = derivePatronFromRunekeeperItems(char);
+    } catch (err) {
+        console.warn('[Characters] derivePatronFromRunekeeperItems failed for', char?.id, err);
+    }
+
     if (derived) {
         char.patron = derived;
         // Also set the patron techniques if available
@@ -238,6 +271,48 @@ function ensureRunekeeperPatron(char) {
 }
 
 // ============================================================
+// MAGIC PATHS REFERENCE (for "no character selected" resource views)
+// ============================================================
+
+/**
+ * Builds the inner HTML for a compact grid of every magic path with its
+ * icon and blurb. Exported so other feature modules (spellcraft panels,
+ * etc.) can drop this in as a fallback resource instead of a bare
+ * "select a character" message. `highlightId` optionally highlights one
+ * path (e.g. the path a given panel is about).
+ */
+export function getMagicPathsReferenceHtml(highlightId = null) {
+    const paths = Object.entries(MAGIC_PATHS).filter(([id]) => id !== 'none');
+    return `
+        <div class="magic-paths-reference" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:0.4rem;text-align:left;">
+            ${paths.map(([id, info]) => `
+                <div style="padding:0.4rem 0.5rem;border-radius:var(--radius);background:var(--bg2);border:1px solid ${id === highlightId ? 'var(--gold)' : 'var(--border)'};">
+                    <div style="display:flex;align-items:center;gap:0.3rem;">
+                        <span style="font-size:1.1rem;">${info.icon}</span>
+                        <strong style="font-size:0.85rem;${id === highlightId ? 'color:var(--gold);' : ''}">${escHtml(info.label)}</strong>
+                    </div>
+                    <div style="font-size:0.7rem;color:var(--text3);margin-top:0.15rem;line-height:1.3;">${escHtml(info.blurb)}</div>
+                </div>
+            `).join('')}
+        </div>
+    `;
+}
+
+/**
+ * Renders the magic paths reference directly into an element — a
+ * convenience wrapper around getMagicPathsReferenceHtml for callers that
+ * just want to hand it a container.
+ */
+export function renderMagicPathsReference(el, options = {}) {
+    if (!el) return;
+    const { title = '📚 Magic Paths Reference', highlightId = null } = options;
+    el.innerHTML = `
+        ${title ? `<div style="font-weight:600;color:var(--gold);margin-bottom:0.4rem;">${escHtml(title)}</div>` : ''}
+        ${getMagicPathsReferenceHtml(highlightId)}
+    `;
+}
+
+// ============================================================
 // RENDER
 // ============================================================
 
@@ -253,7 +328,7 @@ export function render(el) {
             <div class="flex-between" style="flex-wrap:wrap;gap:0.5rem;">
                 <div>
                     <h1 class="page-title" style="margin:0;">👤 Characters</h1>
-                    <p class="page-sub" style="margin:0.2rem 0 0;">Create and manage your party. Starting XP: 32 (max 36 with Bonds & Complications).</p>
+                    <p class="page-sub" style="margin:0.2rem 0 0;">Create and manage your party. Starting XP: 32 (max 36 with bonds/complications).</p>
                 </div>
                 <div class="flex" style="gap:0.4rem;flex-wrap:wrap;">
                     <button class="btn btn-gold" id="wizardCharBtn">+ New Character (Wizard)</button>
@@ -381,6 +456,10 @@ export function renderCharList() {
     let characters = state.characters || [];
     
     // ─── Ensure all Runekeepers have a patron ──────────────────
+    // FIX: ensureRunekeeperPatron() now catches its own errors internally,
+    // so a single bad character can no longer throw out of this .map()
+    // and abort the rest of render() (party overview / talent list /
+    // event attachment used to never run when that happened).
     characters = characters.map(c => ensureRunekeeperPatron(c));
     state.characters = characters;
     
@@ -411,6 +490,9 @@ export function renderCharList() {
                 <div style="font-size:0.8rem;margin-top:0.3rem;">
                     Click "New Character (Wizard)" for guided creation, or "Blank Editor" for the full editor.<br>
                     Starting XP: 32 (max 36 with up to 2 Bonds and 2 Complications).
+                </div>
+                <div style="margin-top:1rem;text-align:left;">
+                    ${getMagicPathsReferenceHtml()}
                 </div>
             </div>
         `;
@@ -513,7 +595,12 @@ function createCharacterSummary(char) {
     if (char.magicPath === 'runekeeper') {
         // Ensure patron is set
         if (!char.patron) {
-            const derived = derivePatronFromRunekeeperItems(char);
+            let derived = null;
+            try {
+                derived = derivePatronFromRunekeeperItems(char);
+            } catch (err) {
+                console.warn('[Characters] derivePatronFromRunekeeperItems failed for', char?.id, err);
+            }
             if (derived) {
                 char.patron = derived;
                 // Update in state
@@ -1267,5 +1354,9 @@ export default {
     renderCharList,
     renderTalentList,
     renderPartyOverview,
-    attachEvents
+    attachEvents,
+    derivePatronFromRunekeeperItems,
+    getMagicPathsReferenceHtml,
+    renderMagicPathsReference,
+    MAGIC_PATHS
 };
