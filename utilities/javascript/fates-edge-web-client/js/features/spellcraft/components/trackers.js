@@ -44,13 +44,16 @@ export function renderTrackers(el) {
     const presence = char.presence || 1;
     const wits = char.wits || 1;
 
-    // Core tracks
+    // Core tracks – using correct limits per Player's Guide
     const fatigue = char.fatigue || 0;
+    const fatigueMax = body; // Fatigue track = Body (not Body*3)
     const harm = char.harm || 0;
-    const xp = char.xp || 0;
+    const harmMax = 3;       // Harm is 0–3
+    const totalXp = char.totalXp || 0;
 
     // Path-specific
     const obligation = char.obligation || 0;
+    const obligationMax = (spirit + presence) || 1;
     const corruption = char.corruption || 0;
     const corruptionMax = char.corruptionMax || spirit;
     const leash = char.leash || 0;
@@ -58,10 +61,11 @@ export function renderTrackers(el) {
     const mentalStrain = char.mentalStrain || 0;
     const mentalStrainMax = char.mentalStrainMax || spirit;
 
-    // Witch prices
-    const shadow = char.witch?.prices?.shadow ?? 0;
-    const shame = char.witch?.prices?.shame ?? 0;
-    const identityStrain = char.witch?.prices?.identityStrain ?? 0;
+    // Witch prices – now top‑level fields (not nested under witch)
+    const shadow = char.shadow ?? 0;
+    const shame = char.shame ?? 0;
+    const identityStrain = char.identityStrain ?? 0;
+    const promiseTimers = char.promiseTimers?.length || 0;
 
     // Monk
     const breathState = char.breathState || 'entering';
@@ -72,16 +76,12 @@ export function renderTrackers(el) {
     // Summoner
     const boundSpirits = char.boundSpirits?.length || 0;
 
-    // Witch timers (count)
-    const promiseTimers = char.witch?.promiseTimers?.length || 0;
-
     let html = `
         <div class="trackers-grid" style="display:flex;flex-wrap:wrap;gap:0.4rem 0.8rem;padding:0.2rem 0;">
     `;
 
     // ─── Core: Fatigue ──────────────────────────────────────
-    const fatigueMax = body * 3;
-    const fatiguePct = Math.min(100, (fatigue / fatigueMax) * 100);
+    const fatiguePct = fatigueMax > 0 ? Math.min(100, (fatigue / fatigueMax) * 100) : 0;
     html += `
         <div class="tracker-item" style="flex:1;min-width:80px;max-width:140px;">
             <div style="display:flex;justify-content:space-between;font-size:0.75rem;">
@@ -94,9 +94,8 @@ export function renderTrackers(el) {
         </div>
     `;
 
-    // ─── Core: Harm ─────────────────────────────────────────
-    const harmMax = body * 2;
-    const harmPct = Math.min(100, (harm / harmMax) * 100);
+    // ─── Core: Harm ──────────────────────────────────────────
+    const harmPct = (harm / harmMax) * 100;
     html += `
         <div class="tracker-item" style="flex:1;min-width:80px;max-width:140px;">
             <div style="display:flex;justify-content:space-between;font-size:0.75rem;">
@@ -109,25 +108,24 @@ export function renderTrackers(el) {
         </div>
     `;
 
-    // ─── Core: XP ───────────────────────────────────────────
+    // ─── Core: XP ────────────────────────────────────────────
     html += `
         <div class="tracker-item" style="flex:0 0 auto;padding:0 0.2rem;">
             <div style="display:flex;justify-content:space-between;font-size:0.75rem;">
                 <span>⭐ XP</span>
-                <span>${xp}</span>
+                <span>${totalXp}</span>
             </div>
         </div>
     `;
 
     // ─── Path: Obligation (Runekeeper/Invoker) ─────────────
     if (path === 'runekeeper' || path === 'invoker') {
-        const maxObligation = (spirit + presence) || 1;
-        const pct = Math.min(100, (obligation / maxObligation) * 100);
+        const pct = obligationMax > 0 ? Math.min(100, (obligation / obligationMax) * 100) : 0;
         html += `
             <div class="tracker-item" style="flex:1;min-width:80px;max-width:140px;">
                 <div style="display:flex;justify-content:space-between;font-size:0.75rem;">
                     <span>⛓️ Obligation</span>
-                    <span>${obligation}/${maxObligation}</span>
+                    <span>${obligation}/${obligationMax}</span>
                 </div>
                 <div style="width:100%;height:5px;background:var(--bg4);border-radius:3px;overflow:hidden;">
                     <div style="width:${pct}%;height:100%;background:${pct > 80 ? 'var(--red)' : pct > 60 ? 'var(--orange)' : 'var(--gold)'};border-radius:3px;"></div>
@@ -138,7 +136,7 @@ export function renderTrackers(el) {
 
     // ─── Path: Corruption (Cantor) ──────────────────────────
     if (path === 'cantor') {
-        const pct = Math.min(100, (corruption / corruptionMax) * 100);
+        const pct = corruptionMax > 0 ? Math.min(100, (corruption / corruptionMax) * 100) : 0;
         html += `
             <div class="tracker-item" style="flex:1;min-width:80px;max-width:140px;">
                 <div style="display:flex;justify-content:space-between;font-size:0.75rem;">
@@ -154,7 +152,7 @@ export function renderTrackers(el) {
 
     // ─── Path: Leash (Summoner) ─────────────────────────────
     if (path === 'summoner') {
-        const pct = Math.min(100, (leash / leashMax) * 100);
+        const pct = leashMax > 0 ? Math.min(100, (leash / leashMax) * 100) : 0;
         html += `
             <div class="tracker-item" style="flex:1;min-width:80px;max-width:140px;">
                 <div style="display:flex;justify-content:space-between;font-size:0.75rem;">
@@ -171,7 +169,7 @@ export function renderTrackers(el) {
 
     // ─── Path: Mental Strain (Psion) ────────────────────────
     if (path === 'psion') {
-        const pct = Math.min(100, (mentalStrain / mentalStrainMax) * 100);
+        const pct = mentalStrainMax > 0 ? Math.min(100, (mentalStrain / mentalStrainMax) * 100) : 0;
         html += `
             <div class="tracker-item" style="flex:1;min-width:80px;max-width:140px;">
                 <div style="display:flex;justify-content:space-between;font-size:0.75rem;">
@@ -287,12 +285,6 @@ export function renderTrackers(el) {
                 </div>
             `;
         }
-    }
-
-    // ─── Generic: If path is 'none' or free-caster, show minimal ──
-    if (path === 'none' || path === 'free-caster') {
-        // Optionally show nothing extra
-        // Already have core tracks
     }
 
     html += `</div>`;

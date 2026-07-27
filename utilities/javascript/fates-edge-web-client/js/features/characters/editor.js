@@ -28,6 +28,7 @@ const HERITAGES = [
     { id: 'mixed', label: 'Mixed Heritage — Half-Elves, Half-Ykrul, Half-Others', note: 'Choose one +1 and one -1 from parent cultures' }
 ];
 
+// Expanded patron list for Invoker symbols (same as before, but we also want to allow free text)
 const PATRONS = [
     { id: '', label: 'None' },
     { id: 'traveler', label: 'The Traveler — Ways & Journeys' },
@@ -37,7 +38,21 @@ const PATRONS = [
     { id: 'carrion-king', label: 'The Carrion King — Lord of Decay and Renewal' },
     { id: 'ikasha', label: 'Ikasha (She Who Sleeps) — Latent Potential & Shadow' },
     { id: 'grimmir', label: 'Grimmir, the Old Man of the Forest — Primal Mystery & Seasonal Sacrifice' },
-    { id: 'palinode', label: 'Palinode, Queen of Encores — Performance & Rapture' }
+    { id: 'palinode', label: 'Palinode, Queen of Encores — Performance & Rapture' },
+    { id: 'mykkiel', label: 'Mykkiel — Arbiter of the Covenant' },
+    { id: 'inquisitor-prime', label: 'Inquisitor Prime — Purity & Domination' },
+    { id: 'morag', label: 'Morag the Hag — Weaver of Hidden Costs' },
+    { id: 'malachai', label: 'Malachai — The Cruel Messenger' },
+    { id: 'isoka', label: 'Isoka — Angel of Serpents' },
+    { id: 'varnek-karn', label: 'Varnek Karn — The Death\'s Negotiator' },
+    { id: 'raeyn', label: 'Raéyn — Mistress of the Sea' },
+    { id: 'khemesh', label: 'Khemesh — The Abyssal Maw' },
+    { id: 'ninth', label: 'The Ninth — Beyond Comprehension' },
+    { id: 'aveh', label: 'Aveh — The Rider Behind the Storm' },
+    { id: 'livaea', label: 'Livaea — The Crimson Courtier' },
+    { id: 'mab', label: 'Mab — Queen of Courts' },
+    { id: 'maelstraeus', label: 'Maelstraeus — The Infernal Bargainer' },
+    { id: 'thrysos', label: 'Thrysos — King of Revels' }
 ];
 
 const ARMOR_TYPES = [
@@ -96,8 +111,10 @@ const MAGIC_PATHS = [
     { id: 'runekeeper', label: 'Runekeeper (Familiar 2 XP + Codex 4 XP)', talents: ['Familiar', 'Codex'] },
     { id: 'invoker', label: 'Invoker (Patron\'s Symbol, 4 XP/Patron)', talents: ['Patron\'s Symbol'] },
     { id: 'cantor', label: 'Cantor (Cantor\'s Path, 8 XP)', talents: ['Cantor\'s Path'] },
+    { id: 'witch', label: 'Witch (Craft of the Hedge, 4 XP)', talents: ['Craft of the Hedge'] },
+    { id: 'psion', label: 'Psion (Psionic Training, 6 XP)', talents: ['Psionic Training'] },
     { id: 'summoner', label: 'Summoner (Pact-Whisperer 2 XP + Lesser Pactwright 2 XP)', talents: ['Pact-Whisperer', 'Lesser Pactwright'] },
-    { id: 'witch', label: 'Witchcraft (Craft of the Hedge, 4 XP)', talents: ['Craft of the Hedge'] },
+    { id: 'monk', label: 'Monk (Monastic Training, 4 XP)', talents: ['Monastic Training'] },
     { id: 'familiar-only', label: 'Familiar Only (Familiar, 2 XP)', talents: ['Familiar'] },
     { id: 'hedge-gifts', label: 'Hedge Gifts Only (Craft of the Hedge, 4 XP)', talents: ['Craft of the Hedge'] }
 ];
@@ -175,7 +192,7 @@ function initEditor() {
         // Custom talent add button
         if (target.matches('#ce-add-custom-talent')) {
             console.log('[Editor] Click: add custom talent');
-            addCEDynamic('talent');   // adds editable row
+            addCEDynamic('talent');
             e.preventDefault();
         }
     });
@@ -268,6 +285,7 @@ export function openEditor(id) {
     attachEditorEvents();
     recalculateXpBudget();
     renderTalentCatalog();
+    updateMagicPathDisplay(); // ensure conditional sections show/hide based on current path
     console.log('[Editor] openEditor complete');
 }
 
@@ -406,8 +424,11 @@ function createNewCharacter() {
         obligationCapacity: 2,
         corruption: 0,
         corruptionMax: 1,
+        corruptionTier: 0,       // for Cantor
+        spellbook: [],
+        boundSpirits: [],
         leash: 0,
-        leashCapacity: 0,
+        leashCapacity: 4,
         mentalStrain: 0,
         mentalStrainMax: 0,
         vtt: false,
@@ -417,7 +438,23 @@ function createNewCharacter() {
         weaponTags: [],
         armorConversion: '',
         meleeMods: '',
-        rangedMods: ''
+        rangedMods: '',
+        // Path-specific fields
+        symbols: [],               // Invoker: list of patron IDs
+        symbolStates: {},          // Invoker: map patronId -> 'active'|'compromised'
+        rites: [],                 // Runekeeper: list of rite IDs or names
+        repertoire: [],            // Cantor: list of song/rite IDs or names
+        hedgeGifts: [],            // Witch: list of gift names or objects
+        shadow: 0,                 // Witch
+        shame: 0,                  // Witch
+        identityStrain: 0,         // Witch
+        promiseTimers: [],         // Witch: array of {name, segments}
+        psionicArts: [],           // Psion: list of art names
+        boundSpirits: [],          // Summoner: array of {name, cap, nature, services}
+        monasticTradition: '',     // Monk
+        breathState: 'entering',   // Monk: 'entering'|'still'|'exiting'
+        monkCorruptionTier: 0,     // Monk
+        knownTags: []              // Free Caster: list of tag names
     };
 }
 
@@ -768,14 +805,54 @@ function updateMagicPathDisplay() {
             : 'No magic path selected';
     }
     
-    const corruptSection = document.getElementById('ce-corruption-section');
-    if (corruptSection) {
-        corruptSection.style.display = pathId === 'cantor' ? 'flex' : 'none';
+    // Show/hide path-specific sections
+    // Invoker: symbols
+    const symbolSection = document.getElementById('ce-invoker-section');
+    if (symbolSection) {
+        symbolSection.style.display = pathId === 'invoker' ? 'block' : 'none';
     }
-    
+    // Runekeeper: rites
+    const ritesSection = document.getElementById('ce-runekeeper-section');
+    if (ritesSection) {
+        ritesSection.style.display = pathId === 'runekeeper' ? 'block' : 'none';
+    }
+    // Cantor: repertoire, corruption (already shown)
+    const corruptionSection = document.getElementById('ce-corruption-section');
+    if (corruptionSection) {
+        corruptionSection.style.display = pathId === 'cantor' ? 'flex' : 'none';
+    }
+    const repertoireSection = document.getElementById('ce-cantor-section');
+    if (repertoireSection) {
+        repertoireSection.style.display = pathId === 'cantor' ? 'block' : 'none';
+    }
+    // Witch: shadow, shame, identity, hedgeGifts, promiseTimers
+    const witchSection = document.getElementById('ce-witch-section');
+    if (witchSection) {
+        witchSection.style.display = pathId === 'witch' ? 'block' : 'none';
+    }
+    // Psion: psionicArts
+    const psionSection = document.getElementById('ce-psion-section');
+    if (psionSection) {
+        psionSection.style.display = pathId === 'psion' ? 'block' : 'none';
+    }
+    // Summoner: leash (already shown), boundSpirits
     const leashSection = document.getElementById('ce-leash-section');
     if (leashSection) {
         leashSection.style.display = pathId === 'summoner' ? 'flex' : 'none';
+    }
+    const summonerSection = document.getElementById('ce-summoner-section');
+    if (summonerSection) {
+        summonerSection.style.display = pathId === 'summoner' ? 'block' : 'none';
+    }
+    // Monk: monasticTradition, breathState, monkCorruptionTier
+    const monkSection = document.getElementById('ce-monk-section');
+    if (monkSection) {
+        monkSection.style.display = pathId === 'monk' ? 'block' : 'none';
+    }
+    // Free Caster: knownTags
+    const freeCasterSection = document.getElementById('ce-free-caster-section');
+    if (freeCasterSection) {
+        freeCasterSection.style.display = pathId === 'free-caster' ? 'block' : 'none';
     }
     
     recalculateXpBudget();
@@ -858,7 +935,7 @@ function recalculateXpBudget() {
         spent += weaponXp[weaponId] || 0;
     }
     
-    // Weapon tags: +4 XP each, max 2 (the label promises this cost -- it must count)
+    // Weapon tags: +4 XP each, max 2
     const checkedTags = document.querySelectorAll('.ce-weapon-tag:checked');
     const tagCount = Math.min(checkedTags.length, 2);
     spent += tagCount * 4;
@@ -883,11 +960,6 @@ function recalculateXpBudget() {
     compCount = Math.min(compCount, 2);
     const xpFromComplications = compCount * 2;
     
-    // For a brand-new character, the Bonds/Complications bonus is part of
-    // the real starting total (see saveEditor) -- reflect that here too, so
-    // the live budget matches what will actually be saved, rather than only
-    // mentioning the bonus in a footnote while computing "remaining" from
-    // the raw, un-bonused field value.
     const totalXpRaw = safeParseInt(document.getElementById('ce-total-xp')?.value, 32);
     const totalXp = editorState.isNew
         ? Math.min(32 + xpFromBonds + xpFromComplications, 36)
@@ -964,11 +1036,23 @@ function buildEditorHTML(c) {
         `;
     }).join('');
     
+    // Dynamic rows for all lists
     const talentRows = (c.talents || []).map((t, i) => dynamicRowHTML('talent', i, t)).join('');
     const assetRows = (c.assets || []).map((a, i) => dynamicRowHTML('asset', i, a)).join('');
     const equipRows = (c.equipment || []).map((e, i) => dynamicRowHTML('equipment', i, e)).join('');
     const bondRows = (c.bonds || []).map((b, i) => dynamicRowHTML('bond', i, b)).join('');
     const compRows = (c.complications || []).map((x, i) => dynamicRowHTML('complication', i, x)).join('');
+    const symbolRows = (c.symbols || []).map((s, i) => {
+        const state = c.symbolStates?.[s] || 'active';
+        return dynamicRowHTML('symbol', i, { patron: s, state });
+    }).join('');
+    const riteRows = (c.rites || []).map((r, i) => dynamicRowHTML('rite', i, { name: r })).join('');
+    const repertoireRows = (c.repertoire || []).map((r, i) => dynamicRowHTML('repertoire', i, { name: r })).join('');
+    const hedgeGiftRows = (c.hedgeGifts || []).map((g, i) => dynamicRowHTML('hedge-gift', i, { name: g })).join('');
+    const promiseTimerRows = (c.promiseTimers || []).map((p, i) => dynamicRowHTML('promise-timer', i, p)).join('');
+    const psionicArtRows = (c.psionicArts || []).map((a, i) => dynamicRowHTML('psionic-art', i, { name: a })).join('');
+    const boundSpiritRows = (c.boundSpirits || []).map((sp, i) => dynamicRowHTML('bound-spirit', i, sp)).join('');
+    const knownTagRows = (c.knownTags || []).map((t, i) => dynamicRowHTML('known-tag', i, { name: t })).join('');
     
     return `
         <div class="editor-form">
@@ -1049,6 +1133,97 @@ function buildEditorHTML(c) {
                 </div>
             </div>
             
+            <!-- Path-specific sections -->
+            <!-- Invoker -->
+            <div id="ce-invoker-section" style="display:${c.magicPath === 'invoker' ? 'block' : 'none'}; margin-top:0.5rem;">
+                <h4 style="margin:0.4rem 0;font-size:0.9rem;">Invoker: Symbols</h4>
+                <div style="font-size:0.8rem;color:var(--text2);margin-bottom:0.3rem;">Each Symbol costs 4 XP. Max 4 without penalty.</div>
+                <button class="btn btn-sm" data-editor-add="symbol">+ Add Symbol</button>
+                <div class="dynamic-list" id="ce-symbol-list">${symbolRows}</div>
+            </div>
+            
+            <!-- Runekeeper -->
+            <div id="ce-runekeeper-section" style="display:${c.magicPath === 'runekeeper' ? 'block' : 'none'}; margin-top:0.5rem;">
+                <h4 style="margin:0.4rem 0;font-size:0.9rem;">Runekeeper: Rites</h4>
+                <div style="font-size:0.8rem;color:var(--text2);margin-bottom:0.3rem;">Rites known (names or IDs, one per line).</div>
+                <button class="btn btn-sm" data-editor-add="rite">+ Add Rite</button>
+                <div class="dynamic-list" id="ce-rite-list">${riteRows}</div>
+            </div>
+            
+            <!-- Cantor -->
+            <div id="ce-cantor-section" style="display:${c.magicPath === 'cantor' ? 'block' : 'none'}; margin-top:0.5rem;">
+                <h4 style="margin:0.4rem 0;font-size:0.9rem;">Cantor: Repertoire</h4>
+                <div style="font-size:0.8rem;color:var(--text2);margin-bottom:0.3rem;">Songs / Rites known (names or IDs).</div>
+                <button class="btn btn-sm" data-editor-add="repertoire">+ Add Song</button>
+                <div class="dynamic-list" id="ce-repertoire-list">${repertoireRows}</div>
+                <div class="form-row" style="margin-top:0.3rem;">
+                    <div class="field small">
+                        <label>Corruption Tier (number of blooms)</label>
+                        <input type="number" id="ce-corruption-tier" value="${c.corruptionTier || 0}" min="0" />
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Witch -->
+            <div id="ce-witch-section" style="display:${c.magicPath === 'witch' ? 'block' : 'none'}; margin-top:0.5rem;">
+                <h4 style="margin:0.4rem 0;font-size:0.9rem;">Witch: Prices & Gifts</h4>
+                <div class="form-row" style="flex-wrap:wrap;gap:0.3rem;">
+                    <div class="field small"><label>Shadow</label><input type="number" id="ce-shadow" value="${c.shadow || 0}" min="0" /></div>
+                    <div class="field small"><label>Shame</label><input type="number" id="ce-shame" value="${c.shame || 0}" min="0" /></div>
+                    <div class="field small"><label>Identity Strain</label><input type="number" id="ce-identity-strain" value="${c.identityStrain || 0}" min="0" /></div>
+                </div>
+                <div style="font-size:0.8rem;color:var(--text2);margin-top:0.3rem;">Hedge Gifts (one per line)</div>
+                <button class="btn btn-sm" data-editor-add="hedge-gift">+ Add Hedge Gift</button>
+                <div class="dynamic-list" id="ce-hedge-gift-list">${hedgeGiftRows}</div>
+                <div style="font-size:0.8rem;color:var(--text2);margin-top:0.3rem;">Promise Timers (name and segments)</div>
+                <button class="btn btn-sm" data-editor-add="promise-timer">+ Add Promise Timer</button>
+                <div class="dynamic-list" id="ce-promise-timer-list">${promiseTimerRows}</div>
+            </div>
+            
+            <!-- Psion -->
+            <div id="ce-psion-section" style="display:${c.magicPath === 'psion' ? 'block' : 'none'}; margin-top:0.5rem;">
+                <h4 style="margin:0.4rem 0;font-size:0.9rem;">Psion: Psionic Arts</h4>
+                <div style="font-size:0.8rem;color:var(--text2);margin-bottom:0.3rem;">List of Arts (e.g., Telekinesis, Telepathy).</div>
+                <button class="btn btn-sm" data-editor-add="psionic-art">+ Add Art</button>
+                <div class="dynamic-list" id="ce-psionic-art-list">${psionicArtRows}</div>
+            </div>
+            
+            <!-- Summoner -->
+            <div id="ce-summoner-section" style="display:${c.magicPath === 'summoner' ? 'block' : 'none'}; margin-top:0.5rem;">
+                <h4 style="margin:0.4rem 0;font-size:0.9rem;">Summoner: Bound Spirits</h4>
+                <div style="font-size:0.8rem;color:var(--text2);margin-bottom:0.3rem;">Each spirit: name, cap, nature, services.</div>
+                <button class="btn btn-sm" data-editor-add="bound-spirit">+ Add Spirit</button>
+                <div class="dynamic-list" id="ce-bound-spirit-list">${boundSpiritRows}</div>
+            </div>
+            
+            <!-- Monk -->
+            <div id="ce-monk-section" style="display:${c.magicPath === 'monk' ? 'block' : 'none'}; margin-top:0.5rem;">
+                <h4 style="margin:0.4rem 0;font-size:0.9rem;">Monk: Monastic Path</h4>
+                <div class="form-row">
+                    <div class="field"><label>Monastic Tradition</label><input id="ce-monastic-tradition" value="${escHtml(c.monasticTradition || '')}" placeholder="e.g., Order of the Unstruck Bell" /></div>
+                    <div class="field small">
+                        <label>Breath State</label>
+                        <select id="ce-breath-state">
+                            <option value="entering" ${c.breathState === 'entering' ? 'selected' : ''}>Entering</option>
+                            <option value="still" ${c.breathState === 'still' ? 'selected' : ''}>Still</option>
+                            <option value="exiting" ${c.breathState === 'exiting' ? 'selected' : ''}>Exiting</option>
+                        </select>
+                    </div>
+                    <div class="field small">
+                        <label>Corruption Tier</label>
+                        <input type="number" id="ce-monk-corruption-tier" value="${c.monkCorruptionTier || 0}" min="0" />
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Free Caster -->
+            <div id="ce-free-caster-section" style="display:${c.magicPath === 'free-caster' ? 'block' : 'none'}; margin-top:0.5rem;">
+                <h4 style="margin:0.4rem 0;font-size:0.9rem;">Free Caster: Known Tags</h4>
+                <div style="font-size:0.8rem;color:var(--text2);margin-bottom:0.3rem;">Tags known (e.g., Burning, Force, Heal).</div>
+                <button class="btn btn-sm" data-editor-add="known-tag">+ Add Tag</button>
+                <div class="dynamic-list" id="ce-known-tag-list">${knownTagRows}</div>
+            </div>
+            
             <!-- Step 6: Combat Loadout -->
             <h3 style="margin:0.8rem 0 0.4rem;color:var(--gold);">Step 6 — Combat Loadout</h3>
             <div class="form-row">
@@ -1091,7 +1266,7 @@ function buildEditorHTML(c) {
             
             <div class="dynamic-list" id="ce-talent-list">${talentRows}</div>
             
-            <!-- Step 8: Assets (unchanged) -->
+            <!-- Step 8: Assets -->
             <h3 style="margin:0.8rem 0 0.4rem;color:var(--gold);">Step 8 — Assets</h3>
             <div style="font-size:0.8rem;color:var(--text2);margin-bottom:0.4rem;">
                 Minor: 4 XP | Standard: 8 XP | Major: 12 XP
@@ -1099,7 +1274,7 @@ function buildEditorHTML(c) {
             ${wikiPickerHTML('asset', 'assets')}
             <div class="dynamic-list" id="ce-asset-list">${assetRows}</div>
             
-            <!-- Step 9: Equipment (unchanged) -->
+            <!-- Step 9: Equipment -->
             <h3 style="margin:0.8rem 0 0.4rem;color:var(--gold);">Step 9 — Additional Equipment</h3>
             ${wikiPickerHTML('equipment', 'equipment')}
             <div class="dynamic-list" id="ce-equipment-list">${equipRows}</div>
@@ -1192,6 +1367,7 @@ function buildEditorHTML(c) {
 // ============================================================
 
 function dynamicRowHTML(type, idx, item = {}) {
+    // Bond row
     if (type === 'bond') {
         return `
             <div class="dynamic-row ce-bond-row" data-index="${idx}">
@@ -1206,6 +1382,7 @@ function dynamicRowHTML(type, idx, item = {}) {
         `;
     }
     
+    // Complication row
     if (type === 'complication') {
         return `
             <div class="dynamic-row ce-complication-row" data-index="${idx}">
@@ -1220,7 +1397,62 @@ function dynamicRowHTML(type, idx, item = {}) {
         `;
     }
     
-    // Talent, Asset, Equipment rows (custom, editable)
+    // Symbol row (Invoker)
+    if (type === 'symbol') {
+        const patronOptions = PATRONS.map(p => 
+            `<option value="${p.id}" ${item.patron === p.id ? 'selected' : ''}>${escHtml(p.label)}</option>`
+        ).join('');
+        return `
+            <div class="dynamic-row ce-symbol-row" data-index="${idx}">
+                <select class="ce-symbol-patron" style="flex:2;">${patronOptions}</select>
+                <select class="ce-symbol-state" style="width:100px;">
+                    <option value="active" ${item.state === 'active' ? 'selected' : ''}>Active</option>
+                    <option value="compromised" ${item.state === 'compromised' ? 'selected' : ''}>Compromised</option>
+                </select>
+                <button class="btn btn-xs editor-remove-btn">✕</button>
+            </div>
+        `;
+    }
+    
+    // Rite, Repertoire, Hedge Gift, Psionic Art, Known Tag (simple name)
+    if (['rite', 'repertoire', 'hedge-gift', 'psionic-art', 'known-tag'].includes(type)) {
+        const label = type === 'rite' ? 'Rite' :
+                     type === 'repertoire' ? 'Song/ Rite' :
+                     type === 'hedge-gift' ? 'Gift' :
+                     type === 'psionic-art' ? 'Art' : 'Tag';
+        return `
+            <div class="dynamic-row ce-${type}-row" data-index="${idx}">
+                <input type="text" class="ce-${type}-name" placeholder="${label} name" value="${escHtml(item.name || '')}" style="flex:1;" />
+                <button class="btn btn-xs editor-remove-btn">✕</button>
+            </div>
+        `;
+    }
+    
+    // Promise Timer
+    if (type === 'promise-timer') {
+        return `
+            <div class="dynamic-row ce-promise-timer-row" data-index="${idx}">
+                <input type="text" class="ce-promise-timer-name" placeholder="Timer name" value="${escHtml(item.name || '')}" style="flex:1;" />
+                <input type="number" class="ce-promise-timer-segments" placeholder="Segments" value="${item.segments || 4}" min="1" style="width:70px;" />
+                <button class="btn btn-xs editor-remove-btn">✕</button>
+            </div>
+        `;
+    }
+    
+    // Bound Spirit
+    if (type === 'bound-spirit') {
+        return `
+            <div class="dynamic-row ce-bound-spirit-row" data-index="${idx}">
+                <input type="text" class="ce-bound-spirit-name" placeholder="Spirit name" value="${escHtml(item.name || '')}" style="flex:1;" />
+                <input type="number" class="ce-bound-spirit-cap" placeholder="Cap" value="${item.cap || 1}" min="1" style="width:60px;" />
+                <input type="text" class="ce-bound-spirit-nature" placeholder="Nature" value="${escHtml(item.nature || '')}" style="flex:1;" />
+                <input type="text" class="ce-bound-spirit-services" placeholder="Services" value="${escHtml(item.services || '')}" style="flex:1;" />
+                <button class="btn btn-xs editor-remove-btn">✕</button>
+            </div>
+        `;
+    }
+    
+    // Default: talent, asset, equipment
     const placeholder = type === 'talent' ? 'Talent name' : type === 'asset' ? 'Asset name' : 'Equipment name';
     return `
         <div class="dynamic-row ce-${type}-row" data-index="${idx}">
@@ -1343,11 +1575,40 @@ export function saveEditor() {
         c.boons = clamp(n('#ce-boons'), 0, 5);
         c.obligation = Math.max(0, n('#ce-obligation'));
         c.corruption = clamp(n('#ce-corruption'), 0, c.corruptionMax);
+        c.corruptionTier = Math.max(0, n('#ce-corruption-tier'));
         c.leash = Math.max(0, n('#ce-leash'));
         c.mentalStrain = clamp(n('#ce-mental-strain'), 0, c.mentalStrainMax);
         c.vtt = document.getElementById('ce-vtt')?.checked || false;
         
-        // Dynamic lists (now handles both read-only spans and inputs)
+        // Path-specific fields
+        c.symbols = readDynamicList('symbol').map(row => row.patron).filter(Boolean);
+        c.symbolStates = {};
+        readDynamicList('symbol').forEach(row => {
+            if (row.patron) c.symbolStates[row.patron] = row.state || 'active';
+        });
+        c.rites = readDynamicList('rite').map(row => row.name).filter(Boolean);
+        c.repertoire = readDynamicList('repertoire').map(row => row.name).filter(Boolean);
+        c.hedgeGifts = readDynamicList('hedge-gift').map(row => row.name).filter(Boolean);
+        c.shadow = Math.max(0, n('#ce-shadow'));
+        c.shame = Math.max(0, n('#ce-shame'));
+        c.identityStrain = Math.max(0, n('#ce-identity-strain'));
+        c.promiseTimers = readDynamicList('promise-timer').map(row => ({
+            name: row.name,
+            segments: row.segments || 4
+        })).filter(p => p.name);
+        c.psionicArts = readDynamicList('psionic-art').map(row => row.name).filter(Boolean);
+        c.boundSpirits = readDynamicList('bound-spirit').map(row => ({
+            name: row.name,
+            cap: row.cap || 1,
+            nature: row.nature || '',
+            services: row.services || ''
+        })).filter(s => s.name);
+        c.monasticTradition = v('#ce-monastic-tradition');
+        c.breathState = v('#ce-breath-state') || 'entering';
+        c.monkCorruptionTier = Math.max(0, n('#ce-monk-corruption-tier'));
+        c.knownTags = readDynamicList('known-tag').map(row => row.name).filter(Boolean);
+        
+        // Dynamic lists: talents, assets, equipment, bonds, complications (already handled by readDynamicList)
         c.talents = readDynamicList('talent');
         c.assets = readDynamicList('asset');
         c.equipment = readDynamicList('equipment');
@@ -1376,9 +1637,6 @@ export function saveEditor() {
                 showToast('Starting XP capped at 36.', 'warning');
             }
             
-            // The bonus from Bonds/Complications is part of the character's
-            // actual starting XP total, not just an informational aside --
-            // apply it, and recompute Tier since totalXp just changed.
             c.totalXp = c.startingXp;
             const { tier: newTier, name: newTierName } = getTierFromXp(c.totalXp);
             c.tier = newTier;
@@ -1426,7 +1684,7 @@ export function saveEditor() {
 }
 
 // ============================================================
-// READ DYNAMIC LISTS (supports both input & span content)
+// READ DYNAMIC LISTS (supports all custom types)
 // ============================================================
 
 function readDynamicList(type) {
@@ -1436,48 +1694,90 @@ function readDynamicList(type) {
     console.log(`[Editor] Found ${rows.length} rows for type ${type}`);
     
     for (const row of rows) {
+        // Bond
         if (type === 'bond') {
             const nameInput = row.querySelector('.ce-bond-name');
             const descInput = row.querySelector('.ce-bond-desc');
             const startCheck = row.querySelector('.ce-bond-start');
-            const name = nameInput ? (nameInput.tagName === 'INPUT' ? nameInput.value.trim() : nameInput.textContent.trim()) : '';
+            const name = nameInput ? nameInput.value.trim() : '';
             if (!name) continue;
             items.push({
                 name,
-                desc: descInput ? (descInput.tagName === 'INPUT' ? descInput.value.trim() : descInput.textContent.trim()) : '',
+                desc: descInput ? descInput.value.trim() : '',
                 start: startCheck ? startCheck.checked : false
             });
-        } else if (type === 'complication') {
+        }
+        // Complication
+        else if (type === 'complication') {
             const nameInput = row.querySelector('.ce-complication-name');
             const descInput = row.querySelector('.ce-complication-desc');
             const startCheck = row.querySelector('.ce-complication-start');
-            const name = nameInput ? (nameInput.tagName === 'INPUT' ? nameInput.value.trim() : nameInput.textContent.trim()) : '';
+            const name = nameInput ? nameInput.value.trim() : '';
             if (!name) continue;
             items.push({
                 name,
-                desc: descInput ? (descInput.tagName === 'INPUT' ? descInput.value.trim() : descInput.textContent.trim()) : '',
+                desc: descInput ? descInput.value.trim() : '',
                 start: startCheck ? startCheck.checked : false
             });
-        } else if (type === 'asset') {
-            const nameEl = row.querySelector('.ce-asset-name');
-            const costEl = row.querySelector('.ce-asset-cost');
-            const tierSelect = row.querySelector('.ce-asset-tier');
-            const name = nameEl ? (nameEl.tagName === 'INPUT' ? nameEl.value.trim() : nameEl.textContent.trim()) : '';
+        }
+        // Symbol
+        else if (type === 'symbol') {
+            const patronSelect = row.querySelector('.ce-symbol-patron');
+            const stateSelect = row.querySelector('.ce-symbol-state');
+            const patron = patronSelect ? patronSelect.value : '';
+            if (!patron) continue;
+            items.push({
+                patron,
+                state: stateSelect ? stateSelect.value : 'active'
+            });
+        }
+        // Promise Timer
+        else if (type === 'promise-timer') {
+            const nameInput = row.querySelector('.ce-promise-timer-name');
+            const segInput = row.querySelector('.ce-promise-timer-segments');
+            const name = nameInput ? nameInput.value.trim() : '';
             if (!name) continue;
             items.push({
                 name,
-                cost: costEl ? (costEl.tagName === 'INPUT' ? safeParseInt(costEl.value, 0) : safeParseInt(costEl.textContent, 0)) : 0,
-                tier: tierSelect ? tierSelect.value : 'minor'
+                segments: segInput ? safeParseInt(segInput.value, 4) : 4
             });
-        } else {
+        }
+        // Bound Spirit
+        else if (type === 'bound-spirit') {
+            const nameInput = row.querySelector('.ce-bound-spirit-name');
+            const capInput = row.querySelector('.ce-bound-spirit-cap');
+            const natureInput = row.querySelector('.ce-bound-spirit-nature');
+            const servicesInput = row.querySelector('.ce-bound-spirit-services');
+            const name = nameInput ? nameInput.value.trim() : '';
+            if (!name) continue;
+            items.push({
+                name,
+                cap: capInput ? safeParseInt(capInput.value, 1) : 1,
+                nature: natureInput ? natureInput.value.trim() : '',
+                services: servicesInput ? servicesInput.value.trim() : ''
+            });
+        }
+        // Simple name-list types (rite, repertoire, hedge-gift, psionic-art, known-tag)
+        else if (['rite', 'repertoire', 'hedge-gift', 'psionic-art', 'known-tag'].includes(type)) {
+            const nameInput = row.querySelector('.ce-' + type + '-name');
+            const name = nameInput ? nameInput.value.trim() : '';
+            if (!name) continue;
+            items.push({ name });
+        }
+        // Asset, Equipment, Talent (with cost)
+        else if (['asset', 'equipment', 'talent'].includes(type)) {
             const nameEl = row.querySelector('.ce-' + type + '-name');
             const costEl = row.querySelector('.ce-' + type + '-cost');
-            const name = nameEl ? (nameEl.tagName === 'INPUT' ? nameEl.value.trim() : nameEl.textContent.trim()) : '';
+            const name = nameEl ? nameEl.value.trim() : '';
             if (!name) continue;
-            items.push({
-                name,
-                cost: costEl ? (costEl.tagName === 'INPUT' ? safeParseInt(costEl.value, 0) : safeParseInt(costEl.textContent, 0)) : 0
-            });
+            const cost = costEl ? safeParseInt(costEl.value, 0) : 0;
+            const item = { name, cost };
+            // For assets, also read tier
+            if (type === 'asset') {
+                const tierSelect = row.querySelector('.ce-asset-tier');
+                if (tierSelect) item.tier = tierSelect.value;
+            }
+            items.push(item);
         }
     }
     console.log(`[Editor] readDynamicList ${type} returned ${items.length} items`);

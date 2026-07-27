@@ -8,6 +8,7 @@
  * - Talent fields include tier, prerequisites, activation type
  * - Starting XP guidance (32 base, max 36 with bonds/complications)
  * - Talent filtering by category
+ * - Path‑specific character summary (Invoker symbols, Cantor corruption, Witch prices, etc.)
  */
 
 import { generateId, escHtml, safeParseInt, clamp } from '../../core/utils.js';
@@ -68,6 +69,8 @@ const MAGIC_PATHS = {
     'cantor': { label: 'Cantor', icon: '🎵' },
     'summoner': { label: 'Summoner', icon: '👁️' },
     'witch': { label: 'Witch', icon: '🌿' },
+    'psion': { label: 'Psion', icon: '🧠' },
+    'monk': { label: 'Monk', icon: '🧘' },
     'familiar-only': { label: 'Familiar Only', icon: '🦅' },
     'hedge-gifts': { label: 'Hedge Gifts', icon: '🍃' }
 };
@@ -181,6 +184,17 @@ function getObligationInfo(char) {
     const doubleCapacity = current > capacity * 2;
     
     return { capacity, current, overCapacity, doubleCapacity };
+}
+
+// Helper to get a human-readable Cantor corruption tier label
+function getCantorCorruptionTier(corruption, maxCorruption) {
+    if (corruption === 0) return 'Clear';
+    const ratio = corruption / maxCorruption;
+    if (ratio < 0.25) return 'Faint';
+    if (ratio < 0.5) return 'Growing';
+    if (ratio < 0.75) return 'Pressing';
+    if (ratio < 1) return 'Near Bloom';
+    return 'Bloom';
 }
 
 // ============================================================
@@ -395,64 +409,85 @@ function createCharacterSummary(char) {
     const magicPath = MAGIC_PATHS[char.magicPath || 'none'] || MAGIC_PATHS['none'];
     const xpSpent = calculateXpSpent(char);
     const xpTotal = char.totalXp || 32;
-    
-    // Status indicators
-    const harmColor = harm === 0 ? 'var(--green)' : harm === 1 ? 'var(--gold)' : harm === 2 ? 'var(--orange)' : 'var(--red)';
-    const fatiguePct = Math.min(100, (fatigue / fatigueMax) * 100);
-    const obligColor = obligInfo.doubleCapacity ? 'var(--red)' : obligInfo.overCapacity ? 'var(--orange)' : 'var(--text2)';
-    
+    const role = determineRole(char);
+    const roleIcon = PARTY_ROLES.find(r => r.id === role)?.icon || '👤';
+
+    // Build path-specific stats string
+    let pathStats = '';
+
+    // Invoker: show symbols
+    if (char.magicPath === 'invoker' && char.symbols?.length) {
+        pathStats += ` | 🔯 ${char.symbols.map(s => escHtml(s)).join(', ')}`;
+    }
+
+    // Cantor: corruption + tier (optional)
+    if (char.magicPath === 'cantor') {
+        const corr = char.corruption || 0;
+        const maxCorr = char.corruptionMax || char.spirit || 1;
+        const tierLabel = getCantorCorruptionTier(corr, maxCorr);
+        pathStats += ` | 🎵 ${corr}/${maxCorr} (${tierLabel})`;
+    }
+
+    // Witch: shadow·shame·identity
+    if (char.magicPath === 'witch') {
+        const s = char.shadow || 0, sh = char.shame || 0, id = char.identityStrain || 0;
+        pathStats += ` | 🌑 ${s}·${sh}·${id}`;
+    }
+
+    // Psion: mental strain
+    if (char.magicPath === 'psion') {
+        const strain = char.mentalStrain || 0;
+        const maxStrain = char.mentalStrainMax || char.spirit || 1;
+        pathStats += ` | 🧠 ${strain}/${maxStrain}`;
+    }
+
+    // Summoner: bound spirits (leash already shown separately)
+    if (char.magicPath === 'summoner') {
+        const count = (char.boundSpirits || []).length;
+        if (count > 0) pathStats += ` | 👁️ ${count} spirits`;
+    }
+
+    // Monk: breath state + corruption tier
+    if (char.magicPath === 'monk' || char.monasticTradition) {
+        const breath = char.breathState || 'entering';
+        const tierNum = char.monkCorruptionTier || 0;
+        pathStats += ` | 🧘 ${breath} (T${tierNum})`;
+    }
+
+    // Free Caster: tag count
+    if (char.magicPath === 'free-caster') {
+        const tags = (char.knownTags || []).length;
+        if (tags > 0) pathStats += ` | 🔮 ${tags} tags`;
+    }
+
+    // Runekeeper: show number of rites (optional)
+    if (char.magicPath === 'runekeeper' && char.rites?.length) {
+        pathStats += ` | 📜 ${char.rites.length} rites`;
+    }
+
+    // Build the HTML
     const div = document.createElement('div');
     div.className = 'char-summary';
     div.style.cssText = 'padding:0.4rem 0.6rem;font-size:0.75rem;border-top:1px solid var(--border);display:flex;flex-wrap:wrap;gap:0.5rem;align-items:center;background:var(--bg1);';
-    
+
+    const harmColor = harm === 0 ? 'var(--green)' : harm === 1 ? 'var(--gold)' : harm === 2 ? 'var(--orange)' : 'var(--red)';
+    const obligColor = obligInfo.doubleCapacity ? 'var(--red)' : obligInfo.overCapacity ? 'var(--orange)' : 'var(--text2)';
+    const fatigueColor = fatigue >= fatigueMax ? 'var(--red)' : fatigue > 0 ? 'var(--orange)' : 'var(--text2)';
+
     div.innerHTML = `
-        <!-- Tier badge -->
-        <span style="background:${tier.color};color:#000;padding:0.1rem 0.4rem;border-radius:3px;font-weight:600;font-size:0.7rem;" title="Tier based on ${xpTotal} XP">
-            T${tier.tier} ${tier.name}
-        </span>
-        
-        <!-- XP -->
-        <span style="color:var(--text3);" title="Total XP / XP spent">
-            ${xpTotal} XP ${xpSpent !== xpTotal ? `(${xpSpent} spent)` : ''}
-        </span>
-        
-        <!-- Attributes -->
-        <span style="color:var(--text2);" title="Body / Wits / Spirit / Presence">
-            <strong>B</strong>${char.body || 1} <strong>W</strong>${char.wits || 1} <strong>S</strong>${char.spirit || 1} <strong>P</strong>${char.presence || 1}
-        </span>
-        
-        <!-- Magic path -->
+        <span style="background:rgba(255,255,255,0.05);padding:0.1rem 0.4rem;border-radius:3px;font-size:0.7rem;" title="Party role">${roleIcon} ${role}</span>
+        <span style="background:${tier.color};color:#000;padding:0.1rem 0.4rem;border-radius:3px;font-weight:600;font-size:0.7rem;" title="Tier based on ${xpTotal} XP">T${tier.tier} ${tier.name}</span>
+        <span style="color:var(--text3);" title="Total XP / XP spent">${xpTotal} XP ${xpSpent !== xpTotal ? `(${xpSpent} spent)` : ''}</span>
+        <span style="color:var(--text2);" title="Body / Wits / Spirit / Presence"><strong>B</strong>${char.body||1} <strong>W</strong>${char.wits||1} <strong>S</strong>${char.spirit||1} <strong>P</strong>${char.presence||1}</span>
         ${magicPath.icon ? `<span title="${magicPath.label}">${magicPath.icon} ${magicPath.label}</span>` : ''}
-        
-        <!-- Patron -->
         ${char.patron ? `<span style="color:var(--text3);" title="Patron">🔮 ${escHtml(char.patron)}</span>` : ''}
-        
-        <!-- Harm -->
-        <span style="color:${harmColor};font-weight:${harm > 0 ? '600' : '400'};" title="Harm level (0-3)">
-            ${harm === 0 ? '✓' : '💔'} Harm ${harm}/3
-        </span>
-        
-        <!-- Fatigue -->
-        <span style="color:${fatigue >= fatigueMax ? 'var(--red)' : fatigue > 0 ? 'var(--orange)' : 'var(--text2)'};" title="Fatigue (max = Body = ${fatigueMax}). Full → Harm+1, clear">
-            😓 ${fatigue}/${fatigueMax}
-        </span>
-        
-        <!-- Boons -->
+        ${pathStats}
+        <span style="color:${harmColor};font-weight:${harm>0?'600':'400'};" title="Harm level (0-3)">${harm===0?'✓':'💔'} Harm ${harm}/3</span>
+        <span style="color:${fatigueColor};" title="Fatigue (max = Body = ${fatigueMax}). Full → Harm+1, clear">😓 ${fatigue}/${fatigueMax}</span>
         ${boons > 0 ? `<span style="color:var(--gold);" title="Boons (max 5). Spend: re-roll, Position, Asset, 2→1 XP">⭐ ${boons}/5</span>` : ''}
-        
-        <!-- Obligation -->
         ${obligInfo.current > 0 ? `<span style="color:${obligColor};" title="Obligation (capacity = Spirit + Presence). Over cap: 1 Fatigue/segment. Double: Patron intrusion">⛓️ ${obligInfo.current}/${obligInfo.capacity}</span>` : ''}
-        
-        <!-- Corruption (Cantors) -->
-        ${char.magicPath === 'cantor' && (char.corruption || 0) > 0 ? `<span style="color:var(--purple);" title="Corruption timer (size = Spirit). Fill: bloom, reset to Tier">🎵 ${(char.corruption || 0)}/${char.corruptionMax || char.spirit || 1}</span>` : ''}
-        
-        <!-- Leash (Summoners) -->
-        ${char.magicPath === 'summoner' && (char.leash || 0) > 0 ? `<span style="color:var(--red);" title="Leash (cap = Cap + Spirit). Fill: spirit acts & departs">👁️ ${char.leash || 0}</span>` : ''}
-        
-        <!-- VTT -->
         ${char.vtt ? `<span style="color:var(--green);" title="Pushed to VTT">📡</span>` : ''}
     `;
-    
     return div;
 }
 

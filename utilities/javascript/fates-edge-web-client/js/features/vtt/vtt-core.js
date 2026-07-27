@@ -7,6 +7,7 @@
  * - Common rolls with auto-population
  * - Larger, more readable UI
  * - Avatar support
+ * - Fixed attribute/skill lookup to match character data model
  */
 
 import { vttStore } from '../../core/vtt-store.js';
@@ -31,19 +32,20 @@ export const SENDER_TYPES = {
     DECK: 'Deck',
 };
 
+// Updated common rolls to match character skill names (lowercase, full names)
 export const COMMON_ROLLS = {
     Stealth: { attr: 'body', skill: 'stealth' },
-    Investigate: { attr: 'mind', skill: 'investigate' },
-    Perception: { attr: 'mind', skill: 'perception' },
+    Investigate: { attr: 'wits', skill: 'investigation' },
+    Perception: { attr: 'wits', skill: 'insight' },          // using insight for perception
     Athletics: { attr: 'body', skill: 'athletics' },
-    Acrobatics: { attr: 'body', skill: 'acrobatics' },
-    Persuasion: { attr: 'soul', skill: 'persuasion' },
-    Deception: { attr: 'soul', skill: 'deception' },
-    Insight: { attr: 'mind', skill: 'insight' },
-    Survival: { attr: 'body', skill: 'survival' },
-    Medicine: { attr: 'mind', skill: 'medicine' },
-    Arcana: { attr: 'mind', skill: 'arcana' },
-    Intimidation: { attr: 'soul', skill: 'intimidation' },
+    Acrobatics: { attr: 'body', skill: 'athletics' },
+    Persuasion: { attr: 'presence', skill: 'sway' },
+    Deception: { attr: 'presence', skill: 'deception' },
+    Insight: { attr: 'spirit', skill: 'insight' },
+    Survival: { attr: 'body', skill: 'endurance' },          // using endurance for survival
+    Medicine: { attr: 'wits', skill: 'medicine' },
+    Arcana: { attr: 'spirit', skill: 'arcana' },
+    Intimidation: { attr: 'presence', skill: 'sway' },       // using sway for intimidation
 };
 
 // ============================================================
@@ -339,20 +341,24 @@ export function renderVTTChars() {
 // ============================================================
 let rollerPopulateUnsubscribe = null;
 
+/**
+ * Populate the roller inputs with the selected character's stats.
+ * Attributes are stored directly on the character (e.g., char.body, char.wits).
+ * Skills are stored in char.skills (e.g., char.skills.melee).
+ */
 function populateRollerFromSelected(char) {
     if (!char) return;
     const attrSelect = q('#vtt-attr');
     const skillSelect = q('#vtt-skill');
     const boonsInput = q('#vtt-boons');
     if (attrSelect) {
-        const body = char.attributes?.body ?? 3;
-        if ([1,2,3,4,5].includes(body)) {
-            attrSelect.value = body;
-        } else {
-            attrSelect.value = 3;
-        }
+        // Use char.body as the default attribute; but we could also use the highest attribute
+        // For simplicity, we set to body (primary for many actions)
+        attrSelect.value = char.body ?? 3;
     }
     if (skillSelect) {
+        // We can't auto-set a skill because there's no single "main" skill.
+        // The common rolls will set specific skills; we'll keep it as 0 here.
         skillSelect.value = 0;
     }
     if (boonsInput) {
@@ -392,7 +398,8 @@ export function renderCommonRolls() {
 
         let html = `<div style="display:flex;flex-wrap:wrap;gap:0.4rem;margin-top:0.4rem;">`;
         for (const [label, config] of Object.entries(COMMON_ROLLS)) {
-            const attrVal = char.attributes?.[config.attr] ?? 3;
+            // Use the character's actual attributes and skills
+            const attrVal = char[config.attr] ?? 3;
             const skillVal = char.skills?.[config.skill] ?? 0;
             html += `
                 <button class="btn btn-sm btn-secondary common-roll-btn" 
@@ -644,9 +651,6 @@ export function playNotificationSound() {
         gainNode.gain.value = 0.1;
         oscillator.start();
         oscillator.stop(audioCtx.currentTime + 0.1);
-        // The oscillator/gain nodes are cheap and garbage-collected once stopped;
-        // only the AudioContext itself needs to be long-lived, so it's reused
-        // above instead of creating (and never closing) a new one each time.
     } catch (e) { /* ignore */ }
 }
 

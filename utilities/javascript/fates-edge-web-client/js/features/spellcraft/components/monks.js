@@ -18,7 +18,7 @@
 import { getCharacterData, saveCharacter } from '../index.js';
 import { escHtml, generateId, safeParseInt } from '../../../core/utils.js';
 import { showToast } from '../../../components/Toast.js';
-import { getState } from '../../../core/state.js';
+import { getState, saveState } from '../../../core/state.js';
 
 // ============================================================
 // HELPERS
@@ -44,6 +44,73 @@ function formatText(text) {
     return escHtml(text).replace(/\n/g, '<br>');
 }
 
+/**
+ * Load patron data from state or fetch from /data/patrons/{patronId}.json
+ * Caches the result in state.patrons (by category) and in a local cache.
+ */
+const patronCache = new Map();
+
+async function loadPatronData(patronId) {
+    if (!patronId) return null;
+
+    // Check local cache first
+    if (patronCache.has(patronId)) {
+        return patronCache.get(patronId);
+    }
+
+    const state = getState();
+
+    // Check if already loaded in state.patrons (cosmic/terrestrial/religions)
+    let found = null;
+    if (state.patrons) {
+        if (state.patrons.cosmic) {
+            found = state.patrons.cosmic.find(p => p.id === patronId);
+        }
+        if (!found && state.patrons.terrestrial) {
+            found = state.patrons.terrestrial.find(p => p.id === patronId);
+        }
+        if (!found && state.patrons.religions) {
+            for (const religion of state.patrons.religions) {
+                if (religion.orders) {
+                    found = religion.orders.find(o => o.id === patronId);
+                    if (found) break;
+                }
+            }
+        }
+    }
+
+    if (found) {
+        patronCache.set(patronId, found);
+        return found;
+    }
+
+    // Not in state – try to fetch from /data/patrons/{patronId}.json
+    try {
+        const response = await fetch(`./data/patrons/${patronId}.json`);
+        if (response.ok) {
+            const data = await response.json();
+            // Store in state for future use (add to appropriate category)
+            if (!state.patrons) state.patrons = {};
+            if (!state.patrons.cosmic) state.patrons.cosmic = [];
+            // Avoid duplicates
+            if (!state.patrons.cosmic.find(p => p.id === patronId)) {
+                state.patrons.cosmic.push(data);
+            }
+            patronCache.set(patronId, data);
+            saveState(); // persist so future loads don't refetch
+            return data;
+        } else {
+            console.warn(`Patron data not found: ${patronId}`);
+            patronCache.set(patronId, null); // cache miss
+            return null;
+        }
+    } catch (e) {
+        console.warn(`Failed to fetch patron data for ${patronId}:`, e);
+        patronCache.set(patronId, null);
+        return null;
+    }
+}
+
 // ============================================================
 // BREATH STATES (hardcoded – they're universal, not patron-specific)
 // ============================================================
@@ -66,41 +133,20 @@ const BREATH_LABELS = {
 // MONASTIC TRADITION LOOKUP
 // ============================================================
 
-function findPatronTradition(patronId) {
-    const state = getState();
-
-    if (state.patrons?.cosmic) {
-        const patron = state.patrons.cosmic.find(p => p.id === patronId);
-        if (patron && patron.monastic_tradition) {
-            return { patron, tradition: patron.monastic_tradition };
-        }
+async function findPatronTradition(patronId) {
+    const patronData = await loadPatronData(patronId);
+    if (patronData && patronData.monastic_tradition) {
+        return { patron: patronData, tradition: patronData.monastic_tradition };
     }
-
-    if (state.patrons?.terrestrial) {
-        const patron = state.patrons.terrestrial.find(p => p.id === patronId);
-        if (patron && patron.monastic_tradition) {
-            return { patron, tradition: patron.monastic_tradition };
-        }
-    }
-
-    if (state.patrons?.religions) {
-        for (const religion of state.patrons.religions) {
-            if (religion.orders) {
-                const order = religion.orders.find(o => o.id === patronId);
-                if (order && order.monastic_tradition) {
-                    return { patron: order, tradition: order.monastic_tradition };
-                }
-            }
-        }
-    }
-
     return null;
 }
 
-function getAllMonasticTraditions() {
+async function getAllMonasticTraditions() {
     const state = getState();
     const results = [];
 
+    // First, ensure all patrons that might have traditions are loaded
+    // We'll need to scan data/patrons directory – but for now, we'll use what's in state
     if (state.patrons?.cosmic) {
         for (const patron of state.patrons.cosmic) {
             if (patron.monastic_tradition) {
@@ -154,9 +200,6 @@ function getAllMonasticTraditions() {
 // ============================================================
 // TALENTS (hardcoded – universal to all monks)
 // ============================================================
-// Category order defines the prerequisite chain: you can't buy into a later
-// category until you've bought at least one talent from the category before
-// it. This is the "keys off monk talents" gate the whole module now respects.
 
 const TALENT_CATEGORY_ORDER = ['foundation', 'working', 'signature', 'quiet'];
 
@@ -306,11 +349,11 @@ function getMonasticTradition(char) {
     return char.monasticTradition || null;
 }
 
-function getMonasticTraditionData(char) {
+async function getMonasticTraditionData(char) {
     const traditionId = getMonasticTradition(char);
     if (!traditionId) return null;
 
-    const result = findPatronTradition(traditionId);
+    const result = await findPatronTradition(traditionId);
     if (!result) return null;
 
     return {
@@ -336,11 +379,9 @@ function hasTechnique(char, traditionId, level) {
     return techs[traditionId]?.includes(level) || false;
 }
 
-// Corruption tier is now driven by total investment in the path (talents +
+// Corruption tier is driven by total investment in the path (talents +
 // techniques learned), scaled against however many corruption tiers the
-// chosen tradition actually defines — not hardcoded to a max of 3. A
-// tradition with 6 tiers (like Inaea's Silk-Spinner) can now actually be
-// reached instead of capping out at tier 3 forever.
+// chosen tradition actually defines — not hardcoded to a max of 3.
 function computeCorruptionTier(char, traditionData) {
     if (!traditionData) return 0;
     const entries = traditionData.tradition.corruption || [];
@@ -362,9 +403,16 @@ export function performMeditation(char, targetDV = 3) {
     const results = [];
     let sbCount = 0;
 
-    const wits = char.wits || 1;
-    const medicine = char.skills?.medicine || 0;
-    const bodyPool = wits + medicine;
+    // Use character's actual skills from the data model
+    // Skills: body, wits, spirit, presence
+    // For meditation, we use:
+    // - Settle the Body: Body + Athletics (or just Body + Endurance)
+    // - Settle the Breath: Spirit + Insight (for inner awareness)
+    // - The Still Point: Spirit + Resolve (using Presence as a stand-in for resolve)
+
+    const body = char.body || 1;
+    const athletics = char.skills?.athletics || 0;
+    const bodyPool = body + athletics;
     const bodyRoll = rollDice(bodyPool);
     const bodySuccess = bodyRoll >= 2;
     results.push({
@@ -376,8 +424,8 @@ export function performMeditation(char, targetDV = 3) {
     if (!bodySuccess) sbCount += 1;
 
     const spirit = char.spirit || 1;
-    const meditation = char.skills?.meditation || 0;
-    const breathPool = spirit + meditation;
+    const insight = char.skills?.insight || 0;
+    const breathPool = spirit + insight;
     const breathRoll = rollDice(breathPool);
     const breathSuccess = breathRoll >= 3;
     results.push({
@@ -388,8 +436,10 @@ export function performMeditation(char, targetDV = 3) {
     });
     if (!breathSuccess) sbCount += 1;
 
-    const resolve = char.skills?.resolve || 0;
-    const stillPool = spirit + resolve;
+    const presence = char.presence || 1;
+    const sway = char.skills?.sway || 0;
+    // Use Presence + Sway as a stand-in for resolve/meditation
+    const stillPool = spirit + presence + Math.floor((insight + sway) / 2);
     const stillRoll = rollDice(stillPool);
     const stillSuccess = stillRoll >= targetDV;
     let partial = false;
@@ -412,8 +462,9 @@ export function performMeditation(char, targetDV = 3) {
     let benefits = [];
     if (achieved && !drained) {
         benefits.push('Clear 1 Fatigue');
-        if (char.conditions?.includes('Fear') || char.conditions?.includes('Shaken') || char.conditions?.includes('Guilty')) {
-            benefits.push('May test Spirit+Resolve (DV 3) to remove one minor Condition');
+        const conditions = char.conditions || [];
+        if (conditions.some(c => ['Fear', 'Shaken', 'Guilty'].includes(c))) {
+            benefits.push('May remove one minor Condition (Fear, Shaken, Guilty)');
         }
         benefits.push('Gain +1 die to next Wits-based roll (Clarity Meditation)');
     } else if (achieved && drained) {
@@ -440,7 +491,7 @@ function rollDice(pool) {
 // MAIN RENDER
 // ============================================================
 
-export function renderMonks(el) {
+export async function renderMonks(el) {
     container = el;
     const char = getCharacterData();
 
@@ -455,28 +506,25 @@ export function renderMonks(el) {
     }
 
     // ---- GATE: nothing below renders until the character has actually
-    // learned a monk talent. This replaces the old behavior where the full
-    // panel (breath state, tradition picker, meditation, techniques) showed
-    // for every character regardless of investment. ----
+    // learned a monk talent. ----
     if (!isMonkInitiate(char)) {
         renderOnboarding(el, char);
         return;
     }
 
     const traditionId = getMonasticTradition(char);
-    const traditionData = traditionId ? getMonasticTraditionData(char) : null;
+    const traditionData = traditionId ? await getMonasticTraditionData(char) : null;
     const breathState = getBreathState(char);
     const breathScars = getBreathScars(char);
 
     // Recompute + persist corruption tier from actual investment every render
-    // so it never silently drifts out of sync with talents/techniques owned.
     const corruptionTier = computeCorruptionTier(char, traditionData);
     if (traditionData && corruptionTier !== (char.monkCorruptionTier || 0)) {
         char.monkCorruptionTier = corruptionTier;
         saveCharacter({ monkCorruptionTier: corruptionTier });
     }
 
-    const allTraditions = getAllMonasticTraditions();
+    const allTraditions = await getAllMonasticTraditions();
 
     el.innerHTML = `
         <div class="monks-container" style="display:flex;flex-direction:column;gap:0.8rem;">
@@ -554,7 +602,11 @@ export function renderMonks(el) {
 // ============================================================
 
 function renderOnboarding(el, char) {
-    const xp = char.xp || 0;
+    // Use totalXp or xp field (the character model has totalXp)
+    const xp = char.totalXp || 0;
+    const spent = char.xpSpent || 0;
+    const available = xp - spent;
+
     el.innerHTML = `
         <div class="monks-container" style="display:flex;flex-direction:column;gap:0.6rem;">
             <div class="monks-header" style="display:flex;align-items:center;gap:0.4rem;border-bottom:1px solid var(--border);padding-bottom:0.3rem;">
@@ -565,7 +617,7 @@ function renderOnboarding(el, char) {
                 <div style="font-size:1.8rem;">🥋</div>
                 <p style="color:var(--text2);">You have not yet begun the Way.</p>
                 <p style="font-size:0.85rem;">Learning any Foundation talent below opens the monastic path: breath states, meditation, and — once you choose a tradition tied to a patron — techniques and corruption.</p>
-                <p style="font-size:0.75rem;">Your XP: <strong style="color:var(--gold);">${xp}</strong></p>
+                <p style="font-size:0.75rem;">Available XP: <strong style="color:var(--gold);">${available}</strong> (${spent} spent of ${xp})</p>
             </div>
             <div class="monks-foundation-picker" style="background:var(--bg2);border-radius:var(--radius);padding:0.3rem 0.5rem;">
                 <div style="font-size:0.85rem;font-weight:600;color:var(--gold);margin-bottom:0.2rem;">Foundation Talents (2 XP)</div>
@@ -708,11 +760,11 @@ function renderCorruption(traditionData, tier) {
 // GLOBAL FUNCTIONS (onclick handlers)
 // ============================================================
 
-window.monkChooseTradition = function() {
+window.monkChooseTradition = async function() {
     const char = getCharacterData();
     if (!char) return;
 
-    const allTraditions = getAllMonasticTraditions();
+    const allTraditions = await getAllMonasticTraditions();
 
     if (allTraditions.length === 0) {
         showToast('No monastic traditions found. Check your patron JSON files.', 'error');
@@ -859,9 +911,13 @@ window.monkBuyTalent = function(talentId) {
         return;
     }
 
-    const currentXP = char.xp || 0;
-    if (currentXP < talent.xp) {
-        showToast(`Not enough XP. Need ${talent.xp}, have ${currentXP}.`, 'error');
+    // Use available XP (total - spent)
+    const totalXp = char.totalXp || 0;
+    const spent = char.xpSpent || 0;
+    const available = totalXp - spent;
+
+    if (available < talent.xp) {
+        showToast(`Not enough XP. Need ${talent.xp}, have ${available} available.`, 'error');
         return;
     }
 
@@ -871,9 +927,13 @@ window.monkBuyTalent = function(talentId) {
 
     if (!char.monkTalents) char.monkTalents = [];
     char.monkTalents.push(talentId);
-    char.xp = currentXP - talent.xp;
+    char.xpSpent = (char.xpSpent || 0) + talent.xp;
 
-    saveCharacter({ monkTalents: char.monkTalents, xp: char.xp });
+    // Recalculate corruption tier after learning
+    const traditionData = getMonasticTraditionData(char); // but this is async... we'll handle after save
+
+    // We'll save now, and the render will recalc corruption
+    saveCharacter({ monkTalents: char.monkTalents, xpSpent: char.xpSpent });
 
     if (!wasInitiate) {
         showToast(`🥋 You have begun the Way. Learned "${talent.name}"`, 'success');
@@ -921,7 +981,7 @@ window.monkLearnTalent = function(category) {
     window.monkBuyTalent(choice);
 };
 
-window.monkBuyTechnique = function(traditionId, level) {
+window.monkBuyTechnique = async function(traditionId, level) {
     const char = getCharacterData();
     if (!char) return;
 
@@ -930,7 +990,7 @@ window.monkBuyTechnique = function(traditionId, level) {
         return;
     }
 
-    const traditionData = findPatronTradition(traditionId);
+    const traditionData = await findPatronTradition(traditionId);
     if (!traditionData) return showToast('Tradition not found.', 'error');
 
     const tech = traditionData.tradition.techniques?.[level];
@@ -951,9 +1011,12 @@ window.monkBuyTechnique = function(traditionId, level) {
     }
 
     const xpCost = tech.xp || (level === 'basic' ? 6 : level === 'advanced' ? 8 : 12);
-    const currentXP = char.xp || 0;
-    if (currentXP < xpCost) {
-        showToast(`Not enough XP. Need ${xpCost}, have ${currentXP}.`, 'error');
+    const totalXp = char.totalXp || 0;
+    const spent = char.xpSpent || 0;
+    const available = totalXp - spent;
+
+    if (available < xpCost) {
+        showToast(`Not enough XP. Need ${xpCost}, have ${available} available.`, 'error');
         return;
     }
 
@@ -962,18 +1025,27 @@ window.monkBuyTechnique = function(traditionId, level) {
     if (!char.monkTechniques) char.monkTechniques = {};
     if (!char.monkTechniques[traditionId]) char.monkTechniques[traditionId] = [];
     char.monkTechniques[traditionId].push(level);
-    char.xp = currentXP - xpCost;
+    char.xpSpent = (char.xpSpent || 0) + xpCost;
 
-    saveCharacter({ monkTechniques: char.monkTechniques, xp: char.xp });
+    // Recalculate corruption tier
+    const traditionDataFull = await getMonasticTraditionData(char);
+    const newTier = computeCorruptionTier(char, traditionDataFull);
+    char.monkCorruptionTier = newTier;
+
+    saveCharacter({
+        monkTechniques: char.monkTechniques,
+        xpSpent: char.xpSpent,
+        monkCorruptionTier: char.monkCorruptionTier
+    });
     showToast(`✅ Learned "${tech.name}"`, 'success');
     renderMonks(container);
 };
 
-window.monkLearnTechnique = function(traditionId) {
+window.monkLearnTechnique = async function(traditionId) {
     const char = getCharacterData();
     if (!char) return;
 
-    const traditionData = findPatronTradition(traditionId);
+    const traditionData = await findPatronTradition(traditionId);
     if (!traditionData) return showToast('Tradition not found.', 'error');
 
     const levels = ['basic', 'advanced', 'master'];

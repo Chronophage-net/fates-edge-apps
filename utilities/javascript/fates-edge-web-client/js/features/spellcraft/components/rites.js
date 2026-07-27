@@ -5,11 +5,19 @@
  * obligation tracking, and integration with the character's magic path.
  * 
  * Data source: /data/patrons/<patron-id>.json (loaded by patrons feature)
+ * Uses the patrons module for data loading and management.
  */
 
 import { getState } from '../../../core/state.js';
 import { showToast } from '../../../components/Toast.js';
 import { escHtml } from '../../../core/utils.js';
+import patrons from '../../patrons/index.js';
+const { 
+    loadPatronData, 
+    getPatronObligation, 
+    setPatronObligation,
+    savePatronData 
+} = patrons;
 
 // ============================================================
 // HELPERS
@@ -72,19 +80,65 @@ function getTierBadge(tier) {
     return labels[tier] || '📜';
 }
 
+/**
+ * Find a patron in the state by ID, checking both cosmic and terrestrial patrons.
+ * Uses the patrons module's data.
+ */
+function findPatronData(state, patronId) {
+    if (!patronId) return null;
+    
+    // Check cosmic patrons
+    if (state.patrons?.cosmic) {
+        const found = state.patrons.cosmic.find(p => p.id === patronId);
+        if (found) return found;
+    }
+    
+    // Check terrestrial patrons
+    if (state.patrons?.terrestrial) {
+        const found = state.patrons.terrestrial.find(p => p.id === patronId);
+        if (found) return found;
+    }
+    
+    // Check religions (for patron orders)
+    if (state.patrons?.religions) {
+        for (const religion of state.patrons.religions) {
+            if (religion.orders) {
+                const found = religion.orders.find(o => o.id === patronId);
+                if (found) {
+                    return {
+                        ...found,
+                        _religion: religion.name,
+                        _religionIcon: religion.icon
+                    };
+                }
+            }
+        }
+    }
+    
+    return null;
+}
+
 // ============================================================
 // MAIN RENDER
 // ============================================================
 
-export function renderRites(el, patronId, characterId = 'default-character') {
+export async function renderRites(el, patronIds, characterId) {
     if (!el) return;
 
-    // If no patronId provided, try to get it from the character
-    if (!patronId) {
+    // Ensure patron data is loaded
+    await loadPatronData();
+
+    // Normalize to array
+    const ids = Array.isArray(patronIds) ? patronIds : (patronIds ? [patronIds] : []);
+    
+    if (ids.length === 0) {
+        // Try to get from character data
         const state = getState();
-        const char = state.characters?.[characterId];
-        patronId = char?.patron;
-        if (!patronId) {
+        const char = state.characters?.find(c => c.id === characterId) || state.characters?.[characterId];
+        if (char?.patron) {
+            ids.push(char.patron);
+        }
+        if (ids.length === 0) {
             el.innerHTML = `
                 <div class="panel" style="padding:0.5rem;text-align:center;color:var(--text3);">
                     <div style="font-size:1.5rem;">🔮</div>
@@ -96,99 +150,43 @@ export function renderRites(el, patronId, characterId = 'default-character') {
         }
     }
 
-    // Look up the patron in the global patron state
     const state = getState();
-    const patronData = findPatronData(state, patronId);
+    const patronDataList = [];
+    const notFound = [];
+    
+    for (const id of ids) {
+        if (!id) continue;
+        const data = findPatronData(state, id);
+        if (data) {
+            patronDataList.push(data);
+        } else {
+            notFound.push(id);
+        }
+    }
 
-    if (!patronData) {
+    if (patronDataList.length === 0) {
         el.innerHTML = `
             <div class="panel" style="padding:0.5rem;text-align:center;color:var(--text3);">
                 <div style="font-size:1.5rem;">🔮</div>
-                <p>Patron "<strong>${escHtml(patronId)}</strong>" not found.</p>
-                <p style="font-size:0.85rem;">Make sure the patron's JSON file is loaded.</p>
+                <p>No patron data found for: <strong>${escHtml(notFound.join(', '))}</strong></p>
+                <p style="font-size:0.85rem;">Make sure the patron's JSON file is in <code>/data/patrons/</code></p>
             </div>
         `;
         return;
     }
 
-    const rites = patronData.rites || [];
-    const name = safeString(patronData.name || patronData.title || patronId);
-    const icon = safeString(patronData.icon || '🔮');
-    const domain = safeString(patronData.domain || patronData.subtitle || '');
+    // Get character for obligation tracking
+    const char = state.characters?.find(c => c.id === characterId) || state.characters?.[characterId];
+    const charName = char?.name || 'Character';
 
-    if (rites.length === 0) {
-        el.innerHTML = `
-            <div class="panel" style="padding:0.5rem;text-align:center;color:var(--text3);">
-                <div style="font-size:1.5rem;">${escHtml(icon)}</div>
-                <p><strong>${escHtml(name)}</strong> has no rites listed.</p>
-                <p style="font-size:0.85rem;">Check the patron's JSON file at <code>/data/patrons/${patronId}.json</code></p>
-            </div>
-        `;
-        return;
+    // Build HTML
+    let html = `<div class="rites-multi-container" style="display:flex;flex-direction:column;gap:0.8rem;">`;
+
+    for (const patronData of patronDataList) {
+        html += renderSinglePatronRites(patronData, characterId, charName, ids);
     }
 
-    const sortedRites = [...rites].sort(sortRites);
-
-    // Group by tier
-    const grouped = {};
-    sortedRites.forEach(rite => {
-        const tier = rite.tier || 'Basic';
-        if (!grouped[tier]) grouped[tier] = [];
-        grouped[tier].push(rite);
-    });
-
-    const obligation = getPatronObligation(state, characterId, patronId);
-
-    let html = `
-        <div class="rites-container" style="display:flex;flex-direction:column;gap:0.5rem;">
-            <!-- Header -->
-            <div class="rites-header" style="display:flex;align-items:center;gap:0.5rem;flex-wrap:wrap;border-bottom:1px solid var(--border);padding-bottom:0.3rem;">
-                <span style="font-size:1.5rem;">${escHtml(icon)}</span>
-                <span style="font-weight:600;font-size:1.05rem;color:var(--gold);">${escHtml(name)}</span>
-                ${domain ? `<span style="font-size:0.8rem;color:var(--text3);">— ${escHtml(domain)}</span>` : ''}
-                <span style="font-size:0.7rem;color:var(--text3);margin-left:auto;">${rites.length} rites · Obligation: ${obligation}</span>
-            </div>
-
-            <!-- Obligation Controls -->
-            <div class="rites-obligation" style="display:flex;gap:0.3rem;align-items:center;font-size:0.8rem;">
-                <span style="color:var(--text3);">⛓️ Obligation:</span>
-                <span style="font-weight:600;">${obligation}</span>
-                <button class="btn btn-xs btn-primary" onclick="window.addRiteObligation('${patronId}', 1)">+1</button>
-                <button class="btn btn-xs btn-secondary" onclick="window.addRiteObligation('${patronId}', -1)">−1</button>
-                <button class="btn btn-xs btn-ghost" onclick="window.clearRiteObligation('${patronId}')" style="color:var(--red);">✕ Clear</button>
-            </div>
-
-            <!-- Rites list -->
-            <div class="rites-list" style="display:flex;flex-direction:column;gap:0.4rem;max-height:400px;overflow-y:auto;padding:0.1rem;">
-    `;
-
-    // Render grouped rites
-    const tierOrder = ['Cantrip', 'Basic', 'Low', 'Standard', 'Advanced', 'Master', 'Epic'];
-    tierOrder.forEach(tier => {
-        if (!grouped[tier]) return;
-        const ritesInTier = grouped[tier];
-        const color = getTierColor(tier);
-        const badge = getTierBadge(tier);
-
-        html += `
-            <div class="rite-tier-group" style="margin-top:0.2rem;">
-                <div style="display:flex;align-items:center;gap:0.3rem;font-size:0.75rem;color:${color};font-weight:600;border-bottom:1px solid var(--border);padding-bottom:0.1rem;margin-bottom:0.2rem;">
-                    ${badge} ${tier} (${ritesInTier.length})
-                </div>
-        `;
-
-        ritesInTier.forEach((rite, idx) => {
-            html += renderRiteItem(rite, patronId, idx);
-        });
-
-        html += `</div>`;
-    });
-
-    html += `
-            </div>
-        </div>
-    `;
-
+    html += `</div>`;
     el.innerHTML = html;
 
     // Attach toggle events for expandable rites
@@ -226,6 +224,95 @@ export function renderRites(el, patronId, characterId = 'default-character') {
 }
 
 // ============================================================
+// RENDER A SINGLE PATRON'S RITES
+// ============================================================
+
+function renderSinglePatronRites(patronData, characterId, charName, allPatronIds) {
+    const patronId = patronData.id;
+    const rites = patronData.rites || [];
+    const name = safeString(patronData.name || patronData.title || patronId);
+    const icon = safeString(patronData.icon || '🔮');
+    const domain = safeString(patronData.domain || patronData.subtitle || '');
+
+    if (rites.length === 0) {
+        return `
+            <div class="rites-patron-block" style="border-left:3px solid var(--border);padding-left:0.5rem;background:var(--bg2);border-radius:var(--radius);padding:0.5rem;">
+                <div style="display:flex;align-items:center;gap:0.5rem;">
+                    <span style="font-size:1.2rem;">${escHtml(icon)}</span>
+                    <span style="font-weight:600;color:var(--gold);">${escHtml(name)}</span>
+                    <span style="font-size:0.7rem;color:var(--text3);">— no rites listed</span>
+                </div>
+            </div>
+        `;
+    }
+
+    const sortedRites = [...rites].sort(sortRites);
+
+    // Group by tier
+    const grouped = {};
+    sortedRites.forEach(rite => {
+        const tier = rite.tier || 'Basic';
+        if (!grouped[tier]) grouped[tier] = [];
+        grouped[tier].push(rite);
+    });
+
+    const obligation = getPatronObligation(characterId, patronId);
+    const isMultiPatron = allPatronIds && allPatronIds.length > 1;
+
+    let html = `
+        <div class="rites-patron-block" style="border-left:3px solid var(--gold);padding-left:0.5rem;background:var(--bg2);border-radius:var(--radius);padding:0.3rem 0.5rem;">
+            <!-- Header -->
+            <div class="rites-header" style="display:flex;align-items:center;gap:0.5rem;flex-wrap:wrap;border-bottom:1px solid var(--border);padding-bottom:0.2rem;margin-bottom:0.2rem;">
+                <span style="font-size:1.2rem;">${escHtml(icon)}</span>
+                <span style="font-weight:600;font-size:1rem;color:var(--gold);">${escHtml(name)}</span>
+                ${domain ? `<span style="font-size:0.7rem;color:var(--text3);">— ${escHtml(domain)}</span>` : ''}
+                <span style="font-size:0.65rem;color:var(--text3);margin-left:auto;">${rites.length} rites · Obligation: ${obligation}</span>
+            </div>
+
+            <!-- Obligation Controls -->
+            <div class="rites-obligation" style="display:flex;gap:0.2rem;align-items:center;font-size:0.75rem;margin-bottom:0.2rem;">
+                <span style="color:var(--text3);">⛓️ Obligation:</span>
+                <span style="font-weight:600;font-size:0.85rem;">${obligation}</span>
+                <button class="btn btn-xs btn-primary" onclick="window.addRiteObligation('${patronId}', 1, '${characterId}')">+1</button>
+                <button class="btn btn-xs btn-secondary" onclick="window.addRiteObligation('${patronId}', -1, '${characterId}')">−1</button>
+                <button class="btn btn-xs btn-ghost" onclick="window.clearRiteObligation('${patronId}', '${characterId}')" style="color:var(--red);">✕ Clear</button>
+                ${isMultiPatron ? `<span style="font-size:0.55rem;color:var(--text3);margin-left:0.3rem;">(Carrying multiple Symbols)</span>` : ''}
+            </div>
+
+            <!-- Rites list -->
+            <div class="rites-list" style="display:flex;flex-direction:column;gap:0.3rem;max-height:300px;overflow-y:auto;padding:0.1rem;">
+    `;
+
+    const tierOrder = ['Cantrip', 'Basic', 'Low', 'Standard', 'Advanced', 'Master', 'Epic'];
+    tierOrder.forEach(tier => {
+        if (!grouped[tier]) return;
+        const ritesInTier = grouped[tier];
+        const color = getTierColor(tier);
+        const badge = getTierBadge(tier);
+
+        html += `
+            <div class="rite-tier-group" style="margin-top:0.1rem;">
+                <div style="display:flex;align-items:center;gap:0.3rem;font-size:0.7rem;color:${color};font-weight:600;border-bottom:1px solid var(--border);padding-bottom:0.05rem;margin-bottom:0.1rem;">
+                    ${badge} ${tier} (${ritesInTier.length})
+                </div>
+        `;
+
+        ritesInTier.forEach((rite, idx) => {
+            html += renderRiteItem(rite, patronId, idx);
+        });
+
+        html += `</div>`;
+    });
+
+    html += `
+            </div>
+        </div>
+    `;
+
+    return html;
+}
+
+// ============================================================
 // RENDER A SINGLE RITE
 // ============================================================
 
@@ -250,17 +337,17 @@ function renderRiteItem(rite, patronId, idx) {
     const hasDetails = !!(effect || pushIt || materials || cost || requires || invoke || duration || timer || tags.length > 0);
     const color = getTierColor(tier);
 
-    // Check if we should expand by default (if it's the first rite or has no details)
-    const expanded = idx === 0 && hasDetails ? true : false;
+    // First rite in each patron block expands by default
+    const expanded = idx === 0 && hasDetails;
 
     let detailsHtml = '';
     if (hasDetails) {
         detailsHtml = `
-            <div class="rite-details" style="margin-top:0.4rem;padding:0.4rem 0.6rem;background:var(--bg2);border-radius:var(--radius);${expanded ? '' : 'display:none;'}">
-                ${effect ? `<div class="rite-description" style="margin-bottom:0.3rem;line-height:1.5;font-size:0.9rem;">${formatText(effect)}</div>` : ''}
-                ${materials ? `<div class="rite-meta" style="font-size:0.8rem;color:var(--text2);margin-bottom:0.15rem;"><strong>📦 Materials:</strong> ${formatText(materials)}</div>` : ''}
-                ${pushIt ? `<div class="rite-meta" style="font-size:0.8rem;color:var(--text2);margin-bottom:0.15rem;"><strong>⚡ Push It:</strong> ${formatText(pushIt)}</div>` : ''}
-                <div style="display:flex;flex-wrap:wrap;gap:0.3rem 0.8rem;font-size:0.75rem;color:var(--text3);margin-top:0.15rem;">
+            <div class="rite-details" style="margin-top:0.3rem;padding:0.3rem 0.5rem;background:var(--bg2);border-radius:var(--radius);${expanded ? '' : 'display:none;'}">
+                ${effect ? `<div class="rite-description" style="margin-bottom:0.2rem;line-height:1.4;font-size:0.85rem;">${formatText(effect)}</div>` : ''}
+                ${materials ? `<div class="rite-meta" style="font-size:0.75rem;color:var(--text2);margin-bottom:0.1rem;"><strong>📦 Materials:</strong> ${formatText(materials)}</div>` : ''}
+                ${pushIt ? `<div class="rite-meta" style="font-size:0.75rem;color:var(--text2);margin-bottom:0.1rem;"><strong>⚡ Push It:</strong> ${formatText(pushIt)}</div>` : ''}
+                <div style="display:flex;flex-wrap:wrap;gap:0.2rem 0.6rem;font-size:0.7rem;color:var(--text3);margin-top:0.1rem;">
                     ${action ? `<span><strong>Action:</strong> ${escHtml(action)}</span>` : ''}
                     ${range ? `<span><strong>Range:</strong> ${escHtml(range)}</span>` : ''}
                     ${resist ? `<span><strong>Resist:</strong> ${escHtml(resist)}</span>` : ''}
@@ -271,8 +358,8 @@ function renderRiteItem(rite, patronId, idx) {
                     ${timer ? `<span><strong>Timer:</strong> ${escHtml(timer)}</span>` : ''}
                 </div>
                 ${tags.length > 0 ? `
-                    <div class="rite-tags" style="display:flex;gap:0.2rem;flex-wrap:wrap;margin-top:0.2rem;">
-                        ${tags.map(t => `<span class="tag-badge" style="display:inline-block;padding:0.05rem 0.4rem;border-radius:8px;background:var(--bg3);border:1px solid var(--border);font-size:0.65rem;color:var(--text3);">${escHtml(safeString(t))}</span>`).join('')}
+                    <div class="rite-tags" style="display:flex;gap:0.15rem;flex-wrap:wrap;margin-top:0.1rem;">
+                        ${tags.map(t => `<span class="tag-badge" style="display:inline-block;padding:0.05rem 0.3rem;border-radius:6px;background:var(--bg3);border:1px solid var(--border);font-size:0.6rem;color:var(--text3);">${escHtml(safeString(t))}</span>`).join('')}
                     </div>
                 ` : ''}
             </div>
@@ -280,15 +367,15 @@ function renderRiteItem(rite, patronId, idx) {
     }
 
     return `
-        <div class="rite-item ${hasDetails ? 'rite-expandable' : ''}" data-rite-id="${escHtml(riteId)}" style="background:var(--bg3);border-radius:var(--radius);padding:0.3rem 0.6rem;border-left:3px solid ${color};">
+        <div class="rite-item ${hasDetails ? 'rite-expandable' : ''}" data-rite-id="${escHtml(riteId)}" style="background:var(--bg3);border-radius:var(--radius);padding:0.2rem 0.5rem;border-left:2px solid ${color};margin-bottom:0.1rem;">
             <div class="rite-header" style="display:flex;justify-content:space-between;align-items:center;cursor:${hasDetails ? 'pointer' : 'default'};">
                 <div style="display:flex;align-items:center;gap:0.3rem;flex-wrap:wrap;">
-                    <span class="rite-name" style="font-weight:600;font-size:0.9rem;">${escHtml(name)}</span>
-                    ${xp ? `<span style="font-size:0.7rem;color:var(--text3);">${escHtml(xp)} XP</span>` : ''}
+                    <span class="rite-name" style="font-weight:600;font-size:0.85rem;">${escHtml(name)}</span>
+                    ${xp ? `<span style="font-size:0.65rem;color:var(--text3);">${escHtml(xp)} XP</span>` : ''}
                 </div>
-                <div style="display:flex;align-items:center;gap:0.3rem;">
-                    ${tier ? `<span style="font-size:0.6rem;color:${color};font-weight:600;">${escHtml(tier)}</span>` : ''}
-                    ${hasDetails ? `<span class="rite-expand-icon" style="font-size:0.7rem;color:var(--text3);">${expanded ? '▾' : '▸'}</span>` : ''}
+                <div style="display:flex;align-items:center;gap:0.2rem;">
+                    ${tier ? `<span style="font-size:0.55rem;color:${color};font-weight:600;">${escHtml(tier)}</span>` : ''}
+                    ${hasDetails ? `<span class="rite-expand-icon" style="font-size:0.65rem;color:var(--text3);">${expanded ? '▾' : '▸'}</span>` : ''}
                 </div>
             </div>
             ${detailsHtml}
@@ -297,84 +384,36 @@ function renderRiteItem(rite, patronId, idx) {
 }
 
 // ============================================================
-// PATRON DATA LOOKUP
+// OBLIGATION MANAGEMENT (using patrons module)
 // ============================================================
 
-function findPatronData(state, patronId) {
-    // Check cosmic patrons
-    if (state.patrons?.cosmic) {
-        const found = state.patrons.cosmic.find(p => p.id === patronId);
-        if (found) return found;
-    }
-
-    // Check terrestrial patrons
-    if (state.patrons?.terrestrial) {
-        const found = state.patrons.terrestrial.find(p => p.id === patronId);
-        if (found) return found;
-    }
-
-    // Check religions (for patron orders)
-    if (state.patrons?.religions) {
-        for (const religion of state.patrons.religions) {
-            if (religion.orders) {
-                const found = religion.orders.find(o => o.id === patronId);
-                if (found) {
-                    // Return a merged object with religion context
-                    return {
-                        ...found,
-                        _religion: religion.name,
-                        _religionIcon: religion.icon
-                    };
-                }
-            }
-        }
-    }
-
-    return null;
-}
-
-// ============================================================
-// OBLIGATION MANAGEMENT
-// ============================================================
-
-function getPatronObligation(state, characterId, patronId) {
-    if (!state.patrons?.obligation) return 0;
-    if (!state.patrons.obligation[characterId]) return 0;
-    return state.patrons.obligation[characterId][patronId] || 0;
-}
-
-function setPatronObligation(state, characterId, patronId, value) {
-    if (!state.patrons) state.patrons = {};
-    if (!state.patrons.obligation) state.patrons.obligation = {};
-    if (!state.patrons.obligation[characterId]) state.patrons.obligation[characterId] = {};
-    state.patrons.obligation[characterId][patronId] = Math.max(0, value);
-}
-
-// ============================================================
-// GLOBAL FUNCTIONS (for onclick handlers)
-// ============================================================
-
-window.addRiteObligation = function(patronId, amount = 1) {
+window.addRiteObligation = function(patronId, amount = 1, characterId = 'default-character') {
     const state = getState();
-    const characterId = 'default-character';
-    const current = getPatronObligation(state, characterId, patronId);
-    setPatronObligation(state, characterId, patronId, current + amount);
-    // Save state
-    import('../../../core/state.js').then(({ saveState }) => saveState());
+    const current = getPatronObligation(characterId, patronId);
+    setPatronObligation(characterId, patronId, Math.max(0, current + amount));
+    savePatronData();
     showToast(`Obligation ${amount > 0 ? '+' : ''}${amount} for ${patronId}`, amount > 0 ? 'success' : 'info');
+    
     // Refresh the rites view
-    const container = document.getElementById('rites-container');
-    if (container) renderRites(container, patronId, characterId);
+    const container = document.getElementById('spellcraft-content');
+    if (container) {
+        import('../index.js').then(module => {
+            if (module.renderActiveTabContent) module.renderActiveTabContent();
+        });
+    }
 };
 
-window.clearRiteObligation = function(patronId) {
-    const state = getState();
-    const characterId = 'default-character';
-    setPatronObligation(state, characterId, patronId, 0);
-    import('../../../core/state.js').then(({ saveState }) => saveState());
+window.clearRiteObligation = function(patronId, characterId = 'default-character') {
+    setPatronObligation(characterId, patronId, 0);
+    savePatronData();
     showToast(`Obligation cleared for ${patronId}`, 'info');
-    const container = document.getElementById('rites-container');
-    if (container) renderRites(container, patronId, characterId);
+    
+    const container = document.getElementById('spellcraft-content');
+    if (container) {
+        import('../index.js').then(module => {
+            if (module.renderActiveTabContent) module.renderActiveTabContent();
+        });
+    }
 };
 
 // ============================================================

@@ -4,6 +4,7 @@
  * - Talent catalog from index.js / state.talents + wiki entries
  * - Filtered by tier (Minor for T1, Minor+Major for T2, all for T3+)
  * - Click‑to‑add from catalog, still allows manual custom talents
+ * - Data model now includes all path-specific fields (symbols, rites, etc.)
  */
 
 import { generateId, escHtml, safeParseInt, clamp } from '../../core/utils.js';
@@ -407,13 +408,33 @@ export function openWizard() {
             obligationCapacity: 2,
             corruption: 0,
             corruptionMax: 1,
+            corruptionTier: 0,
+            boundSpirits: [],
+            leashCapacity: 4,
             leash: 0,
             mentalStrain: 0,
+            mentalStrainMax: 1,
             armorType: 'none',
             shieldType: 'none',
             weaponClass: 'light',
             armorConversion: 'Harm passes directly',
             vtt: true,
+            // Path-specific fields (empty defaults)
+            symbols: [],
+            symbolStates: {},
+            rites: [],
+            repertoire: [],
+            hedgeGifts: [],
+            shadow: 0,
+            shame: 0,
+            identityStrain: 0,
+            promiseTimers: [],
+            psionicArts: [],
+            boundSpirits: [],
+            monasticTradition: '',
+            breathState: 'entering',
+            monkCorruptionTier: 0,
+            knownTags: [],
             _stepDataCollected: {},
         };
         state.step = 0;
@@ -520,6 +541,7 @@ function collectAttributes(d) {
     d.fatigueMax = d.body;
     d.obligationCapacity = d.spirit + d.presence;
     d.corruptionMax = d.spirit;
+    d.mentalStrainMax = d.spirit;
     d._stepDataCollected[1] = true;
     return true;
 }
@@ -1063,7 +1085,7 @@ export function addCustomTalentRow() {
     if (nameInput) setTimeout(() => nameInput.focus(), 50);
 }
 
-// ─── Step 3 Renderer (updated) ──────────────────────────────────
+// ─── Step 3 Renderer ──────────────────────────────────────────────
 
 function renderStep3TalentsAndLoadout(d) {
     const xpBudget = renderXpBudget(d);
@@ -1093,10 +1115,8 @@ function renderStep3TalentsAndLoadout(d) {
     
     // Talent rows (now with catalog rows rendered from data, custom rows will be added later)
     const talentRows = (d.talents || []).map((t, i) => {
-        // Determine if it came from catalog (we'll assume any row not from catalog is custom editable)
-        // For simplicity, we render all as editable for now; catalog rows are handled separately.
-        // But since we now store talents as name+obj, we can display read-only if we know it's from catalog.
-        // We'll just render them as read-only spans for consistency (they won't be editable unless we add a custom button).
+        // For wizard, we render all talents as read-only spans (catalog) or editable? 
+        // We'll render them as read-only for simplicity; custom rows can be added via "Add Custom Talent"
         return `
             <div class="dynamic-row wz-talent-row">
                 <span class="wz-talent-name" style="flex:2; padding:0.2rem;">${escHtml(t.name)}</span>
@@ -1119,6 +1139,7 @@ function renderStep3TalentsAndLoadout(d) {
             <div class="info-box" style="font-size:0.75rem;">
                 You don't need magic to be effective. A Body 3 + Melee 2 warrior rolls 5 dice with no talents.
                 If you want magic, choose a path. Each path has different costs and risks.
+                For advanced options (Invoker symbols, Cantor repertoire, etc.), use the full editor after creation.
             </div>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;">
                 <div>
@@ -1282,12 +1303,13 @@ function renderStep4BondsAndSummary(d) {
             <div class="info-box" style="margin-top:0.5rem;font-size:0.8rem;">
                 <strong>Starting Gear (free):</strong> ${STARTING_GEAR.join(', ')}.
                 <br><strong>Remember:</strong> Spend all starting XP — you cannot bank it.
+                <br><strong>Advanced fields</strong> (Symbols, Rites, Repertoire, Hedge Gifts, etc.) can be added later in the editor.
             </div>
         </div>
     `;
 }
 
-// ─── Live Update Functions (unchanged, except added updateXpBudgetFromDOM) ──
+// ─── Live Update Functions ──────────────────────────────────────────
 
 function attachAttributeListeners() {
     ['body', 'wits', 'spirit', 'presence'].forEach(attr => {

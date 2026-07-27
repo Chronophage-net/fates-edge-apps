@@ -12,13 +12,14 @@
  * - Save to spellbook
  * - Spell history
  * - Quick reference for all tags
+ * - Roll test with core dice module
  */
 
-import { getCharacterData } from '../index.js';
+import { getCharacterData, saveCharacter } from '../index.js';
 import { showToast } from '../../../components/Toast.js';
 import { escHtml, generateId } from '../../../core/utils.js';
-import { updateCharacter } from '../../../core/state.js';
 import { getState } from '../../../core/state.js';
+import { performRoll } from '../../../core/dice.js';
 
 // ============================================================
 // STATE
@@ -27,6 +28,7 @@ import { getState } from '../../../core/state.js';
 let tagDefinitions = null;
 let spellHistory = [];
 let activeTags = [];
+let calculatorContainer = null;
 
 // ============================================================
 // WIKI LOADER
@@ -39,14 +41,11 @@ async function loadWikiTags() {
         const response = await fetch('./data/wiki.json');
         if (response.ok) {
             const data = await response.json();
-            // Extract magic tags from wiki entries
             const tags = new Map();
             
-            // Look for entries with magic tags
             if (data.data && Array.isArray(data.data)) {
                 for (const entry of data.data) {
                     if (entry.tags && entry.tags.includes('magic')) {
-                        // Try to parse tag info from the entry
                         const tagName = entry.title?.toUpperCase();
                         if (tagName && entry.cost !== undefined) {
                             tags.set(tagName, {
@@ -60,7 +59,6 @@ async function loadWikiTags() {
                 }
             }
             
-            // If we found tags, merge with our hardcoded reference
             if (tags.size > 0) {
                 tagDefinitions = tags;
                 return tagDefinitions;
@@ -70,7 +68,6 @@ async function loadWikiTags() {
         console.warn('Could not load wiki.json, using hardcoded tags.');
     }
     
-    // Fallback: build from hardcoded reference
     tagDefinitions = buildTagDefinitions();
     return tagDefinitions;
 }
@@ -160,6 +157,7 @@ const CATEGORY_ICONS = {
 // ============================================================
 
 async function renderCalculator(el) {
+    calculatorContainer = el;
     const char = getCharacterData();
     if (!char || char.magicPath !== 'free-caster') {
         el.innerHTML = `
@@ -177,7 +175,7 @@ async function renderCalculator(el) {
 
     // Load spell history from character
     if (char.spellbook) {
-        spellHistory = char.spellbook.filter(s => s.source === 'custom' || s.source === 'calculator');
+        spellHistory = char.spellbook.filter(s => s.source === 'custom' || s.source === 'calculator' || s.source === 'tags-calculator');
     }
 
     el.innerHTML = `
@@ -224,6 +222,7 @@ async function renderCalculator(el) {
             <!-- Actions -->
             <div style="display:flex;gap:0.3rem;flex-wrap:wrap;padding:0.2rem 0;">
                 <button class="btn btn-sm btn-gold" id="save-spell-btn">💾 Save as Spell</button>
+                <button class="btn btn-sm btn-secondary" id="roll-test-btn">🎲 Test Cast</button>
                 <button class="btn btn-sm btn-secondary" id="clear-tags-btn">🧹 Clear Tags</button>
                 <button class="btn btn-sm btn-ghost" onclick="window.calculatorShowHistory()">📜 History</button>
             </div>
@@ -298,6 +297,7 @@ function attachEvents(el) {
     const addBtn = el.querySelector('#add-tag-btn');
     const clearBtn = el.querySelector('#clear-tags-btn');
     const saveBtn = el.querySelector('#save-spell-btn');
+    const rollBtn = el.querySelector('#roll-test-btn');
     const suggestions = el.querySelector('#tag-suggestions');
 
     // Add tag on Enter or button click
@@ -355,6 +355,7 @@ function attachEvents(el) {
 
     if (clearBtn) clearBtn.addEventListener('click', window.calculatorClear);
     if (saveBtn) saveBtn.addEventListener('click', window.calculatorSaveSpell);
+    if (rollBtn) rollBtn.addEventListener('click', window.calculatorTestCast);
 
     // Click outside to close suggestions
     document.addEventListener('click', (e) => {
@@ -396,8 +397,7 @@ window.calculatorClear = function() {
 
 window.calculatorRefresh = function() {
     activeTags = [];
-    const el = document.querySelector('.calculator-container');
-    if (el) renderCalculator(el.parentElement);
+    if (calculatorContainer) renderCalculator(calculatorContainer);
     showToast('🔄 Calculator refreshed.', 'info');
 };
 
@@ -410,7 +410,7 @@ window.calculatorSaveSpell = function() {
     const char = getCharacterData();
     if (!char) return;
 
-    const name = prompt('Spell name:', 'Weave Craft');
+    const name = prompt('Spell name:', activeTags.join(' '));
     if (!name) return;
     const description = prompt('Effect description:', '') || '';
 
@@ -428,22 +428,101 @@ window.calculatorSaveSpell = function() {
         id: generateId('spell_'),
         name: name.trim(),
         description: description.trim(),
-        tags: activeTags,
+        tags: activeTags.slice(),
         dv: dv,
         cost: {},
         source: 'calculator',
-        createdAt: Date.now()
+        createdAt: Date.now(),
+        updatedAt: Date.now()
     };
 
     if (!char.spellbook) char.spellbook = [];
     char.spellbook.push(newSpell);
-    updateCharacter(char.id, { spellbook: char.spellbook });
+    saveCharacter({ spellbook: char.spellbook });
     showToast(`✨ "${name}" saved to spellbook.`, 'success');
     
     // Add to history
     spellHistory.push(newSpell);
     activeTags = [];
     updateResult();
+};
+
+window.calculatorTestCast = function() {
+    if (activeTags.length === 0) {
+        showToast('Add some tags first.', 'error');
+        return;
+    }
+
+    const char = getCharacterData();
+    if (!char) return;
+
+    // Compute DV
+    let dv = 1 + activeTags.length;
+    let totalMod = 0;
+    for (const tag of activeTags) {
+        if (tagDefinitions && tagDefinitions.has(tag)) {
+            totalMod += tagDefinitions.get(tag).mod || 1;
+        }
+    }
+    dv += totalMod;
+
+    // Dice pool: Wits + Arcana
+    const wits = char.wits || 1;
+    const arcana = char.skills?.arcana || 0;
+    const pool = wits + arcana;
+
+    if (pool < 1) {
+        showToast('Dice pool must be at least 1 die. Increase your Wits or Arcana.', 'error');
+        return;
+    }
+
+    // Roll using core dice module
+    const result = performRoll(pool, dv);
+
+    // Determine outcome
+    let outcomeLabel, backlashSeverity;
+    if (result.successes >= dv && result.storyBeats === 0) {
+        outcomeLabel = 'Clean Success';
+        backlashSeverity = 'None';
+    } else if (result.successes >= dv && result.storyBeats > 0) {
+        outcomeLabel = 'Success with SB';
+        backlashSeverity = 'Minor';
+    } else if (result.successes > 0 && result.successes < dv) {
+        outcomeLabel = 'Partial Success';
+        backlashSeverity = 'Moderate';
+    } else {
+        outcomeLabel = 'Miss';
+        backlashSeverity = 'Major';
+    }
+
+    let backlashDesc = '';
+    if (backlashSeverity === 'Minor') {
+        backlashDesc = 'Fatigue +1 or -1 die on next roll (GM choice).';
+    } else if (backlashSeverity === 'Moderate') {
+        backlashDesc = 'Harm 1 (stress) or a minor Condition.';
+    } else if (backlashSeverity === 'Major') {
+        backlashDesc = 'Harm 2, permanent Scar, or reality fracture (GM choice).';
+    } else {
+        backlashDesc = 'No backlash.';
+    }
+
+    const spellName = activeTags.join(' ');
+
+    // Show result in a modal
+    const html = `
+        <div style="display:flex;flex-direction:column;gap:0.3rem;">
+            <div><strong>${escHtml(spellName)}</strong> (DV ${dv})</div>
+            <div>Pool: ${pool}d (Wits ${wits} + Arcana ${arcana})</div>
+            <div>Roll: ${result.dice.join(', ')} → ${result.successes} successes</div>
+            ${result.storyBeats > 0 ? `<div style="color:var(--text3);">${result.storyBeats} Story Beats generated</div>` : ''}
+            <div><strong>Outcome:</strong> ${outcomeLabel}</div>
+            ${backlashSeverity !== 'None' ? `<div style="color:var(--red);">⚡ Backlash: ${backlashSeverity} — ${backlashDesc}</div>` : '<div style="color:var(--green);">✅ No backlash.</div>'}
+            ${result.criticalEffect ? `<div style="color:var(--gold);">✨ Critical: ${result.criticalEffect}</div>` : ''}
+            <div style="font-size:0.8rem;color:var(--text2);">"The Weave's receipt is your teacher." – Lysandra</div>
+        </div>
+    `;
+
+    showToastWithHTML(html, result.successes >= dv ? 'success' : 'warning');
 };
 
 window.calculatorShowHistory = function() {
@@ -558,26 +637,45 @@ function updateResult() {
 // ============================================================
 
 function showToastWithHTML(html, type = 'info') {
+    // Use the same helper from spellbook if available, or fallback
+    if (typeof window.spellbookShowToastWithHTML === 'function') {
+        window.spellbookShowToastWithHTML(html, type);
+        return;
+    }
+
+    // Fallback implementation
     const modal = document.createElement('div');
     modal.style.cssText = `
         position: fixed; top: 0; left: 0; width: 100%; height: 100%;
         background: rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center;
         z-index: 9999;
+        animation: toastFadeIn 0.2s ease;
     `;
     const inner = document.createElement('div');
     inner.style.cssText = `
         background: var(--bg1); padding: 1.5rem; border-radius: var(--radius);
-        max-width: 400px; width: 90%; border: 1px solid var(--border);
+        max-width: 450px; width: 90%; border: 1px solid var(--border);
         box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+        max-height: 80vh; overflow-y: auto;
     `;
     inner.innerHTML = html + `<br><button class="btn btn-xs btn-secondary" onclick="this.closest('div').parentElement.remove()">Close</button>`;
     modal.appendChild(inner);
     document.body.appendChild(modal);
-    setTimeout(() => { if (modal.parentNode) modal.remove(); }, 8000);
+
+    if (!document.getElementById('toast-animation-style')) {
+        const style = document.createElement('style');
+        style.id = 'toast-animation-style';
+        style.textContent = `
+            @keyframes toastFadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+        `;
+        document.head.appendChild(style);
+    }
+
+    setTimeout(() => { if (modal.parentNode) modal.remove(); }, 10000);
 }
 
 // ============================================================
 // EXPORT
 // ============================================================
 
-export { renderCalculator, loadWikiTags };
+export { renderCalculator, loadWikiTags }; 

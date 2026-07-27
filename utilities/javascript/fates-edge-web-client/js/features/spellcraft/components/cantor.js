@@ -16,7 +16,7 @@
 
 import { getCharacterData, saveCharacter } from '../index.js';
 import { escHtml } from '../../../core/utils.js';
-import { getState } from '../../../core/state.js';
+import { getState, saveState } from '../../../core/state.js';
 import { showToast } from '../../../components/Toast.js';
 import { renderRites } from './rites.js';
 
@@ -47,24 +47,71 @@ function formatText(text) {
     return escHtml(text).replace(/\n/g, '<br>');
 }
 
-function findPatronData(state, patronId) {
-    if (state.patrons?.cosmic) {
-        const found = state.patrons.cosmic.find(p => p.id === patronId);
-        if (found) return found;
+/**
+ * Load patron data from state or fetch from /data/patrons/{patronId}.json
+ * Caches the result in state.patrons (by category) and in a local cache.
+ */
+const patronCache = new Map();
+
+async function loadPatronData(patronId) {
+    if (!patronId) return null;
+
+    // Check local cache first
+    if (patronCache.has(patronId)) {
+        return patronCache.get(patronId);
     }
-    if (state.patrons?.terrestrial) {
-        const found = state.patrons.terrestrial.find(p => p.id === patronId);
-        if (found) return found;
-    }
-    if (state.patrons?.religions) {
-        for (const religion of state.patrons.religions) {
-            if (religion.orders) {
-                const found = religion.orders.find(o => o.id === patronId);
-                if (found) return found;
+
+    const state = getState();
+
+    // Check if already loaded in state.patrons (cosmic/terrestrial/religions)
+    let found = null;
+    if (state.patrons) {
+        if (state.patrons.cosmic) {
+            found = state.patrons.cosmic.find(p => p.id === patronId);
+        }
+        if (!found && state.patrons.terrestrial) {
+            found = state.patrons.terrestrial.find(p => p.id === patronId);
+        }
+        if (!found && state.patrons.religions) {
+            for (const religion of state.patrons.religions) {
+                if (religion.orders) {
+                    found = religion.orders.find(o => o.id === patronId);
+                    if (found) break;
+                }
             }
         }
     }
-    return null;
+
+    if (found) {
+        patronCache.set(patronId, found);
+        return found;
+    }
+
+    // Not in state – try to fetch from /data/patrons/{patronId}.json
+    try {
+        const response = await fetch(`./data/patrons/${patronId}.json`);
+        if (response.ok) {
+            const data = await response.json();
+            // Store in state for future use (add to appropriate category)
+            if (!state.patrons) state.patrons = {};
+            if (!state.patrons.cosmic) state.patrons.cosmic = [];
+            // Avoid duplicates
+            if (!state.patrons.cosmic.find(p => p.id === patronId)) {
+                state.patrons.cosmic.push(data);
+            }
+            patronCache.set(patronId, data);
+            saveState(); // persist so future loads don't refetch
+            return data;
+        } else {
+            console.warn(`Patron data not found: ${patronId}`);
+            patronCache.set(patronId, null); // cache miss
+            return null;
+        }
+    } catch (e) {
+        console.warn(`Failed to fetch patron data for ${patronId}:`, e);
+        patronCache.set(patronId, null);
+        return null;
+    }
 }
 
 function rollDice(pool) {
@@ -193,14 +240,14 @@ export async function renderCantor(el) {
         return;
     }
 
-    const state = getState();
-    const patronData = findPatronData(state, patronId);
+    // Load patron data from state or fetch
+    const patronData = await loadPatronData(patronId);
     if (!patronData) {
         el.innerHTML = `
             <div class="panel" style="padding:1rem;text-align:center;color:var(--text3);">
                 <div style="font-size:2rem;">🎵</div>
                 <p>Patron "<strong>${escHtml(patronId)}</strong>" not found.</p>
-                <p style="font-size:0.85rem;">Make sure the patron's JSON file is loaded.</p>
+                <p style="font-size:0.85rem;">Make sure the patron's JSON file is loaded in <code>/data/patrons/${patronId}.json</code>.</p>
             </div>
         `;
         return;
@@ -423,11 +470,14 @@ window.cantorPushRite = function(patronId, riteIndex, riteName) {
     const char = getCharacterData();
     if (!char) return;
 
-    // Get the rite from patron data
+    // Get the rite from patron data (using the same loadPatronData, but it's async)
+    // We'll use the cached version from the already loaded patron data.
+    // Since this is called from a click, we can rely on the patron data being in cache.
     const state = getState();
-    const patronData = findPatronData(state, patronId);
+    const patronData = state.patrons?.cosmic?.find(p => p.id === patronId) ||
+                       state.patrons?.terrestrial?.find(p => p.id === patronId);
     if (!patronData) {
-        showToast('Patron not found.', 'error');
+        showToast('Patron not found. Please refresh.', 'error');
         return;
     }
 
@@ -442,11 +492,8 @@ window.cantorPushRite = function(patronId, riteIndex, riteName) {
     // - Advance Corruption Timer by 1
     // - Optionally, apply the Push effect immediately
 
-    // Check if the character has the Cantor's Path talent (we'll assume yes if they're a Cantor)
-    // Push It: The song resolves immediately (in fiction, it's instant)
-
     const fatigue = char.fatigue || 0;
-    const fatigueMax = (char.body || 1) * 3;
+    const fatigueMax = (char.body || 1) * 3; // or just char.body?
 
     if (fatigue >= fatigueMax) {
         showToast('Cannot Push — Fatigue track is full!', 'error');

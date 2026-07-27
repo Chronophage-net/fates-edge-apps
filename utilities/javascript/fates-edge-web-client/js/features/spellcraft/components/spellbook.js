@@ -4,11 +4,15 @@
  * A grimoire of TAGS combinations, signature spells, and the Weave's receipts.
  * "Record your spells. The Weave respects repetition."
  * – Lysandra of the Amber Gate
+ *
+ * Available to all characters, but most useful for Free Casters.
+ * Spellcasting uses Wits + Arcana (or Spirit + Arcana for intuitive casters).
  */
 
 import { getCharacterData, saveCharacter } from '../index.js';
 import { escHtml, generateId, safeParseInt } from '../../../core/utils.js';
 import { showToast } from '../../../components/Toast.js';
+import { performRoll } from '../../../core/dice.js';
 
 // ============================================================
 // HELPERS
@@ -64,13 +68,18 @@ export function renderSpellbook(el) {
     }
 
     // Ensure spellbook exists
-    if (!char.spellbook) char.spellbook = [];
+    if (!char.spellbook) {
+        char.spellbook = [];
+        saveCharacter({ spellbook: char.spellbook });
+    }
 
     const spells = char.spellbook;
     const sortBy = localStorage.getItem('fates-edge-spellbook-sort') || 'name';
     const sorted = sortSpells(spells, sortBy);
 
     const signatureCount = spells.filter(s => s.signature).length;
+    const magicPath = char.magicPath || 'none';
+    const isFreeCaster = magicPath === 'free-caster';
 
     let html = `
         <div class="spellbook-container" style="display:flex;flex-direction:column;gap:0.5rem;">
@@ -80,9 +89,11 @@ export function renderSpellbook(el) {
                     <span style="font-size:1.2rem;">📚</span>
                     <span style="font-weight:600;font-size:1.05rem;color:var(--gold);">Spellbook</span>
                     <span style="font-size:0.7rem;color:var(--text3);">${spells.length} spells ${signatureCount > 0 ? `· ⭐ ${signatureCount} signature` : ''}</span>
+                    ${isFreeCaster ? `<span style="font-size:0.6rem;color:var(--text2);background:var(--bg3);padding:0.05rem 0.5rem;border-radius:10px;">Free Caster</span>` : ''}
                 </div>
                 <div style="display:flex;gap:0.3rem;flex-wrap:wrap;">
                     <button class="btn btn-sm btn-primary" onclick="window.spellbookAddSpell()">➕ Add</button>
+                    ${isFreeCaster ? `<button class="btn btn-sm btn-secondary" onclick="window.spellbookFromTags()">🔮 From Tags</button>` : ''}
                     <button class="btn btn-sm btn-secondary" onclick="window.spellbookImport()">📥 Import</button>
                     <button class="btn btn-sm btn-secondary" onclick="window.spellbookExport()">📤 Export</button>
                     <button class="btn btn-sm btn-ghost" onclick="window.spellbookClearAll()" style="color:var(--red);">🗑️</button>
@@ -114,7 +125,7 @@ export function renderSpellbook(el) {
             <div class="spellbook-empty" style="text-align:center;color:var(--text3);padding:1rem 0;">
                 <div style="font-size:2rem;">📖</div>
                 <p>No spells yet.</p>
-                <p style="font-size:0.85rem;">Create your first spell using the TAGS calculator or the Add button.</p>
+                <p style="font-size:0.85rem;">Create your first spell using the Add button${isFreeCaster ? ' or the "From Tags" button' : ''}.</p>
                 <p style="font-size:0.75rem;color:var(--text2);">"The Weave does not reward empty pages." – Lysandra</p>
             </div>
         `;
@@ -158,7 +169,6 @@ function renderSpellItem(spell, index) {
     // Build tag badges
     const tagBadges = tags.map(tag => {
         const color = TAG_COLORS[tag] || 'var(--text3)';
-        const mod = window.TAGS_REFERENCE?.[tag]?.mod ?? (tag.length > 4 ? 2 : 1); // fallback heuristic
         return `<span class="tag-badge" style="display:inline-block;padding:0.05rem 0.4rem;margin:0.05rem;border-radius:8px;background:${color}22;border:1px solid ${color};font-size:0.65rem;color:${color};">${escHtml(tag)}</span>`;
     }).join(' ');
 
@@ -247,9 +257,49 @@ window.spellbookAddSpell = function() {
         newSpell.cost.obligation = costObligation;
     }
 
+    if (!char.spellbook) char.spellbook = [];
     char.spellbook.push(newSpell);
     saveCharacter({ spellbook: char.spellbook });
     showToast(`Spell "${name}" added to spellbook.`, 'success');
+    renderSpellbook(document.getElementById('spellbook-container'));
+};
+
+/**
+ * Create a spell from TAGS calculator data (for Free Casters)
+ * This can be called from the calculator tab to save a spell.
+ */
+window.spellbookFromTags = function() {
+    const char = getCharacterData();
+    if (!char) return;
+
+    // Try to get data from the calculator tab
+    const tagsInput = prompt('Enter TAGS (space-separated, e.g., Burning Strike Area):');
+    if (!tagsInput) return;
+    const tags = tagsInput.trim().split(/\s+/).map(t => t.toUpperCase());
+
+    const dv = 1 + tags.length; // Base DV = 1 + number of tags
+    const name = prompt('Spell name:', tags.join(' ') || 'New Spell');
+    if (!name) return;
+    const description = prompt('Description / Effect:') || '';
+
+    const newSpell = {
+        id: generateId('spell_'),
+        name: name.trim(),
+        description: description.trim(),
+        tags: tags,
+        dv: dv,
+        cost: {},
+        signature: false,
+        usage: 0,
+        createdAt: Date.now(),
+        updatedAt: Date.now(),
+        source: 'tags-calculator'
+    };
+
+    if (!char.spellbook) char.spellbook = [];
+    char.spellbook.push(newSpell);
+    saveCharacter({ spellbook: char.spellbook });
+    showToast(`Spell "${name}" created from tags (DV ${dv}).`, 'success');
     renderSpellbook(document.getElementById('spellbook-container'));
 };
 
@@ -339,35 +389,44 @@ window.spellbookUse = function(id) {
     if (!spell) return showToast('Spell not found.', 'error');
 
     // Determine dice pool: Wits + Arcana (or Spirit + Arcana if the player prefers)
-    // We'll use Wits as default (precision) but allow choice
+    // We'll use Wits + Arcana as default
     const wits = char.wits || 1;
     const spirit = char.spirit || 1;
     const arcana = char.skills?.arcana || 0;
-    const pool = wits + arcana; // could also be spirit
+    
+    // Ask the user which attribute to use
+    const useSpirit = confirm('Use Spirit + Arcana instead of Wits + Arcana? (Click No for Wits)');
+    const attr = useSpirit ? spirit : wits;
+    const attrName = useSpirit ? 'Spirit' : 'Wits';
+    const pool = attr + arcana;
 
     const dv = spell.dv || 1;
 
-    // Roll dice
-    const successes = rollDice(pool);
-    const ones = countOnes(pool); // we don't have individual dice, so simulate
+    if (pool < 1) {
+        showToast('Dice pool must be at least 1 die. Increase your Wits/Spirit or Arcana.', 'error');
+        return;
+    }
+
+    // Perform the roll using the core dice module
+    const result = performRoll(pool, dv);
 
     // Determine outcome
-    let outcome, sbCount, backlashSeverity;
-    if (successes >= dv && ones === 0) {
-        outcome = 'Clean Success';
-        sbCount = 0;
+    let outcome, outcomeLabel, backlashSeverity;
+    if (result.successes >= dv && result.storyBeats === 0) {
+        outcome = 'clean';
+        outcomeLabel = 'Clean Success';
         backlashSeverity = 'None';
-    } else if (successes >= dv && ones > 0) {
-        outcome = 'Success with SB';
-        sbCount = ones;
+    } else if (result.successes >= dv && result.storyBeats > 0) {
+        outcome = 'success_sb';
+        outcomeLabel = 'Success with SB';
         backlashSeverity = 'Minor';
-    } else if (successes > 0 && successes < dv) {
-        outcome = 'Partial Success';
-        sbCount = ones;
+    } else if (result.successes > 0 && result.successes < dv) {
+        outcome = 'partial';
+        outcomeLabel = 'Partial Success';
         backlashSeverity = 'Moderate';
     } else {
-        outcome = 'Miss';
-        sbCount = ones;
+        outcome = 'miss';
+        outcomeLabel = 'Miss';
         backlashSeverity = 'Major';
     }
 
@@ -376,21 +435,34 @@ window.spellbookUse = function(id) {
     spell.updatedAt = Date.now();
     saveCharacter({ spellbook: char.spellbook });
 
-    // Build result message
+    // Build result message with Backlash description
+    let backlashDesc = '';
+    if (backlashSeverity === 'Minor') {
+        backlashDesc = 'Fatigue +1 or -1 die on next roll (GM choice).';
+    } else if (backlashSeverity === 'Moderate') {
+        backlashDesc = 'Harm 1 (stress) or a minor Condition (Blinded, Silenced, etc.).';
+    } else if (backlashSeverity === 'Major') {
+        backlashDesc = 'Harm 2, permanent Scar, or reality fracture (GM choice).';
+    } else {
+        backlashDesc = 'No backlash.';
+    }
+
     const msg = `
         <div style="display:flex;flex-direction:column;gap:0.3rem;">
             <div><strong>${escHtml(spell.name)}</strong> (DV ${dv})</div>
-            <div>Pool: ${pool}d (Wits ${wits} + Arcana ${arcana})</div>
-            <div>Rolled: ${successes} successes, ${ones} ones</div>
-            <div><strong>Outcome:</strong> ${outcome}</div>
-            ${backlashSeverity !== 'None' ? `<div style="color:var(--red);">Backlash: ${backlashSeverity}</div>` : '<div style="color:var(--green);">No backlash.</div>'}
-            ${sbCount > 0 ? `<div style="color:var(--text3);">GM gains ${sbCount} Story Beat${sbCount > 1 ? 's' : ''}.</div>` : ''}
+            <div>Pool: ${pool}d (${attrName} ${attr} + Arcana ${arcana})</div>
+            <div>Roll: ${result.dice.join(', ')} → ${result.successes} successes</div>
+            ${result.storyBeats > 0 ? `<div style="color:var(--text3);">${result.storyBeats} Story Beats generated</div>` : ''}
+            <div><strong>Outcome:</strong> ${outcomeLabel}</div>
+            ${backlashSeverity !== 'None' ? `<div style="color:var(--red);">⚡ Backlash: ${backlashSeverity} — ${backlashDesc}</div>` : '<div style="color:var(--green);">✅ No backlash.</div>'}
+            ${result.criticalEffect ? `<div style="color:var(--gold);">✨ Critical: ${result.criticalEffect}</div>` : ''}
             <div style="font-size:0.8rem;color:var(--text2);">"The Weave's receipt is your teacher." – Lysandra</div>
+            <div style="font-size:0.7rem;color:var(--text3);">${outcome === 'partial' ? '+1 Boon gained' : outcome === 'miss' ? '+2 Boons gained' : ''}</div>
         </div>
     `;
 
     // Show a modal with the result
-    showToastWithHTML(msg, outcome === 'Clean Success' ? 'success' : outcome === 'Miss' ? 'error' : 'info');
+    showToastWithHTML(msg, outcome === 'clean' ? 'success' : outcome === 'miss' ? 'error' : 'info');
 };
 
 // ============================================================
@@ -434,12 +506,9 @@ window.spellbookImport = function() {
                 const char = getCharacterData();
                 if (!char) return;
                 if (!char.spellbook) char.spellbook = [];
-                // Merge or replace? We'll append with new IDs to avoid collisions.
                 let added = 0;
                 imported.forEach(spell => {
-                    // Basic validation
                     if (!spell.name) return;
-                    // Generate new ID to avoid clashes
                     spell.id = generateId('spell_');
                     spell.source = 'imported';
                     spell.createdAt = Date.now();
@@ -460,51 +529,45 @@ window.spellbookImport = function() {
 };
 
 // ============================================================
-// DICE HELPERS (simulated)
-// ============================================================
-
-function rollDice(pool) {
-    let successes = 0;
-    for (let i = 0; i < pool; i++) {
-        const roll = Math.floor(Math.random() * 10) + 1;
-        if (roll >= 6) successes++;
-        if (roll === 10) successes++; // 10s count twice
-    }
-    return successes;
-}
-
-function countOnes(pool) {
-    let ones = 0;
-    for (let i = 0; i < pool; i++) {
-        if (Math.floor(Math.random() * 10) + 1 === 1) ones++;
-    }
-    return ones;
-}
-
-// ============================================================
 // TOAST WITH HTML (custom)
 // ============================================================
 
 function showToastWithHTML(html, type = 'info') {
-    // Use existing toast system if it supports HTML
-    // Fallback: create a temporary modal
+    // Remove any existing custom toast
+    const existing = document.querySelector('.custom-toast-modal');
+    if (existing) existing.remove();
+
     const modal = document.createElement('div');
+    modal.className = 'custom-toast-modal';
     modal.style.cssText = `
         position: fixed; top: 0; left: 0; width: 100%; height: 100%;
         background: rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center;
         z-index: 9999;
+        animation: toastFadeIn 0.2s ease;
     `;
     const inner = document.createElement('div');
     inner.style.cssText = `
         background: var(--bg1); padding: 1.5rem; border-radius: var(--radius);
-        max-width: 400px; width: 90%; border: 1px solid var(--border);
+        max-width: 450px; width: 90%; border: 1px solid var(--border);
         box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+        max-height: 80vh; overflow-y: auto;
     `;
-    inner.innerHTML = html + `<br><button class="btn btn-sm btn-secondary" onclick="this.closest('div').parentElement.remove()">Close</button>`;
+    inner.innerHTML = html + `<br><button class="btn btn-sm btn-secondary" onclick="this.closest('.custom-toast-modal').remove()">Close</button>`;
     modal.appendChild(inner);
     document.body.appendChild(modal);
-    // Auto-close after 8 seconds
-    setTimeout(() => { if (modal.parentNode) modal.remove(); }, 8000);
+
+    // Inject animation if not present
+    if (!document.getElementById('toast-animation-style')) {
+        const style = document.createElement('style');
+        style.id = 'toast-animation-style';
+        style.textContent = `
+            @keyframes toastFadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+        `;
+        document.head.appendChild(style);
+    }
+
+    // Auto-close after 10 seconds
+    setTimeout(() => { if (modal.parentNode) modal.remove(); }, 10000);
 }
 
 // ============================================================
