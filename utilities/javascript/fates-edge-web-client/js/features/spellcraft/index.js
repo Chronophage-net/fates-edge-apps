@@ -329,6 +329,25 @@ function ensureStyles() {
             color: var(--text2);
             font-size: 0.85rem;
         }
+
+        /* ─── Path Info Cards (non-interactive reference, shown when no
+               character is selected) — same look as path-finder-card but
+               no hover/pointer affordance, since there's nothing to click. */
+        .path-info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 0.6rem;
+        }
+        .path-info-card {
+            background: var(--bg2);
+            border-radius: var(--radius);
+            padding: 0.6rem 0.8rem;
+            border: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            gap: 0.2rem;
+            text-align: left;
+        }
     `;
     document.head.appendChild(style);
 }
@@ -347,15 +366,16 @@ let isPathFinder = false; // true when showing the default path selection view
 // HELPERS (exported for sub‑components)
 // ============================================================
 
-export function getCharacterData() {
+export function getCharacterData(options = {}) {
+    const { silent = false } = options;
     const id = vttStore.getSelectedCharacterId();
     if (!id) {
-        showToast('Select a character first.', 'error');
+        if (!silent) showToast('Select a character first.', 'error');
         return null;
     }
     const char = getCharacter(id);
     if (!char) {
-        showToast('Character not found.', 'error');
+        if (!silent) showToast('Character not found.', 'error');
         return null;
     }
     return char;
@@ -396,6 +416,83 @@ function getPatronIdsForRites(char) {
 }
 
 // ============================================================
+// RENDER – No Character Selected (dropdown selector + magic path reference)
+// ============================================================
+
+function renderNoCharacterView() {
+    const characters = getState().characters || [];
+
+    return `
+        <div class="spellcraft-empty" style="padding:1.5rem 1.5rem 2rem;text-align:center;color:var(--text3);background:var(--bg2);border-radius:var(--radius);border:1px dashed var(--border);">
+            <div style="font-size:3rem;">🧙</div>
+            <h2 style="margin:0.5rem 0;color:var(--text);">Select a Character</h2>
+            <p style="margin:0 0 0.8rem;">Pick a character below, or go to the VTT and click a character card.</p>
+
+            <div style="display:flex;gap:0.4rem;justify-content:center;align-items:center;flex-wrap:wrap;margin-bottom:1rem;">
+                ${characters.length > 0 ? `
+                    <select id="spellcraft-char-select" style="background:var(--bg3);color:var(--text);border:1px solid var(--border);border-radius:var(--radius);padding:0.35rem 0.6rem;font-size:0.85rem;min-width:220px;">
+                        <option value="">— Choose a character —</option>
+                        ${characters.map(c => {
+                            const pathLabel = c.magicPath && c.magicPath !== 'none'
+                                ? (PATH_META[c.magicPath]?.label || c.magicPath)
+                                : null;
+                            return `<option value="${escHtml(c.id)}">${escHtml(c.name || 'Unnamed')}${pathLabel ? ` — ${escHtml(pathLabel)}` : ''}</option>`;
+                        }).join('')}
+                    </select>
+                ` : `
+                    <p style="font-size:0.85rem;color:var(--text3);margin:0;">No characters yet — create one on the Characters tab first.</p>
+                `}
+                <button class="btn btn-gold" id="go-to-vtt-btn">🎯 Go to VTT</button>
+            </div>
+
+            <div style="text-align:left;max-width:960px;margin:0 auto;">
+                <div style="font-weight:600;color:var(--gold);margin-bottom:0.5rem;text-align:center;">📚 Magic Paths at a Glance</div>
+                <div class="path-info-grid">
+                    ${Object.entries(PATH_META)
+                        .filter(([id]) => id !== 'none')
+                        .map(([id, meta]) => `
+                            <div class="path-info-card">
+                                <div style="display:flex;align-items:center;gap:0.3rem;">
+                                    <span class="path-icon">${escHtml(meta.icon)}</span>
+                                    <span class="path-label" style="color:${meta.color};">${escHtml(meta.label)}</span>
+                                </div>
+                                <div class="path-brief">${escHtml(meta.description)}</div>
+                                ${meta.archetypes ? `
+                                    <div class="path-archetypes">
+                                        ${meta.archetypes.map(a => `<span>${escHtml(a)}</span>`).join('')}
+                                    </div>
+                                ` : ''}
+                            </div>
+                        `).join('')}
+                </div>
+                <div style="margin-top:0.6rem;font-size:0.75rem;color:var(--text3);text-align:center;">
+                    Crafting (Hedge Gifts, Quick Workings, Rituals) and the Spellbook are available to every character, regardless of path.
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+function attachNoCharacterEvents() {
+    const select = document.getElementById('spellcraft-char-select');
+    if (select) {
+        select.addEventListener('change', () => {
+            const id = select.value;
+            if (!id) return;
+            // The VTT store keeps its own copy of the character list for
+            // selection purposes, and only lets you select an id it already
+            // knows about. If the VTT tab hasn't been visited yet this
+            // session, that list can still be empty/stale — so sync it from
+            // the real app state first, then select. selectCharacter()
+            // dispatches 'characterSelected', which attachEvents() below
+            // already listens for and re-renders this view from.
+            vttStore.updateCharacters(getState().characters || []);
+            vttStore.selectCharacter(id);
+        });
+    }
+}
+
+// ============================================================
 // RENDER – Main
 // ============================================================
 
@@ -405,17 +502,14 @@ export function render(el) {
 
     ensureStyles();
 
-    const char = getCharacterData();
+    // silent: true — this is just a state check to decide which view to
+    // show, not a user action, so it shouldn't pop an error toast on
+    // every ordinary load/refresh of this tab.
+    const char = getCharacterData({ silent: true });
     if (!char) {
-        container.innerHTML = `
-            <div class="spellcraft-empty" style="padding:2rem;text-align:center;color:var(--text3);background:var(--bg2);border-radius:var(--radius);border:1px dashed var(--border);">
-                <div style="font-size:3rem;">🧙</div>
-                <h2 style="margin:0.5rem 0;">Select a Character</h2>
-                <p style="margin:0 0 0.5rem;">Go to the VTT and click a character card to view their magical abilities.</p>
-                <button class="btn btn-gold" id="go-to-vtt-btn">🎯 Go to VTT</button>
-            </div>
-        `;
+        container.innerHTML = renderNoCharacterView();
         attachEvents();
+        attachNoCharacterEvents();
         return;
     }
 
@@ -885,9 +979,17 @@ function getTrackSummary(char) {
 // ============================================================
 
 function attachEvents() {
-    // Remove old listeners
-    eventListeners.forEach(({ event, handler }) => {
-        if (container) container.removeEventListener(event, handler);
+    // FIX: this used to only ever call container.removeEventListener(...)
+    // during cleanup, but the 'characterSelected' listener below is bound
+    // to `document`, not `container` — so it was never actually removed,
+    // and every render() call (now more frequent thanks to the new
+    // character dropdown) stacked another live 'characterSelected'
+    // listener onto document permanently. Each stacked listener calls
+    // render(container) again, so after a few renders a single selection
+    // change would re-render the tab multiple times over. Track the real
+    // target per listener and remove from that target specifically.
+    eventListeners.forEach(({ target, event, handler }) => {
+        (target || container)?.removeEventListener(event, handler);
     });
     eventListeners = [];
 
@@ -917,15 +1019,16 @@ function attachEvents() {
 
     if (container) {
         container.addEventListener('click', clickHandler);
-        eventListeners.push({ event: 'click', handler: clickHandler });
+        eventListeners.push({ target: container, event: 'click', handler: clickHandler });
     }
 
-    // Listen for character selection changes (from VTT)
+    // Listen for character selection changes (from VTT, or from the new
+    // dropdown in the no-character view)
     const selectionHandler = () => {
         if (container) render(container);
     };
     document.addEventListener('characterSelected', selectionHandler);
-    eventListeners.push({ event: 'characterSelected', handler: selectionHandler });
+    eventListeners.push({ target: document, event: 'characterSelected', handler: selectionHandler });
 }
 
 // ============================================================
