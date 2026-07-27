@@ -9,6 +9,7 @@
  * - Starting XP guidance (32 base, max 36 with bonds/complications)
  * - Talent filtering by category
  * - Path‑specific character summary (Invoker symbols, Cantor corruption, Witch prices, etc.)
+ * - FIX: Runekeepers without a patron now derive it from Thiasos/Codex selection
  */
 
 import { generateId, escHtml, safeParseInt, clamp } from '../../core/utils.js';
@@ -17,7 +18,7 @@ import { getCharacter,
 	updateCharacter,
 	deleteCharacter, 
 	getState, 
-	saveState } from '../../core/state.js'
+	saveState } from '../../core/state.js';
 import { createCharacterCard } from '../../components/CharacterCard.js';
 import { showToast } from '../../components/Toast.js';
 
@@ -75,131 +76,175 @@ const MAGIC_PATHS = {
     'hedge-gifts': { label: 'Hedge Gifts', icon: '🍃' }
 };
 
-let container = null;
-let talentPanelVisible = true;
-let activeTalentFilter = 'all';
-let globalEventsAttached = false; // guards against re-adding document-level listeners on every render()
+// ─── Patron-to-Thiasos/Codex mapping ──────────────────────────
+// This maps Thiasos and Codex names to their patron.
+// In a real implementation, this would come from the patron data.
+// For now, we use a reasonable mapping based on the examples in the grimoire.
+const THIASOS_PATRON_MAP = {
+    // Runekeeper examples from the grimoire
+    'white-hound': 'mykkiel',
+    'ferret': 'inquisitor-prime',
+    'bronze-hawk': 'inquisitor-prime',
+    'mechanical-bird': 'inquisitor-prime',
+    'garden-spider': 'inaea',
+    'silk-moth': 'inaea',
+    'gray-mouse': 'inaea',
+    'fire-salamander': 'oath-of-flame-light',
+    'phoenix-fledgling': 'oath-of-flame-light',
+    'brass-beetle': 'sacred-geometry',
+    'konreh-pieces': 'sacred-geometry',
+    'bell-frog': 'gallows-bell',
+    'gray-mouse-courthouse': 'gallows-bell',
+    'lead-seal': 'varnek-karn',
+    'knucklebone': 'varnek-karn',
+    'confessor-mouse': 'confessor-beneath-the-bell',
+    'bell-cricket': 'confessor-beneath-the-bell',
+    'letter-mouse': 'silent-choir',
+    'forgetfulness-moth': 'silent-choir',
+    'raven': 'the-witness',
+    'silverfish': 'the-witness',
+    'bronze-key': 'sealed-gate',
+    'bell-ward': 'sealed-gate',
+};
 
-// ============================================================
-// HELPER FUNCTIONS
-// ============================================================
+const CODEX_PATRON_MAP = {
+    'iron-bound-ledger': 'inquisitor-prime',
+    'slate-tablet': 'inquisitor-prime',
+    'frame-loom': 'inaea',
+    'knotted-cords': 'inaea',
+    'brass-scroll': 'oath-of-flame-light',
+    'sun-stone': 'oath-of-flame-light',
+    'brass-stencils': 'sacred-geometry',
+    'slate-proofs': 'sacred-geometry',
+    'court-ledger': 'gallows-bell',
+    'bronze-bells': 'gallows-bell',
+    'slate-carvings': 'varnek-karn',
+    'burial-tablets': 'varnek-karn',
+    'bell-ringers-log': 'confessor-beneath-the-bell',
+    'leather-strap': 'confessor-beneath-the-bell',
+    'locked-journal': 'silent-choir',
+    'wax-tablets': 'silent-choir',
+    'loose-leaf-pages': 'the-witness',
+    'chalkboard': 'the-witness',
+    'leather-strap-seals': 'sealed-gate',
+    'iron-rings': 'sealed-gate',
+};
 
-function getTierFromXp(xp) {
-    for (const t of TIER_INFO) {
-        if (xp >= t.min && xp <= t.max) return t;
+// ─── Patron-to-Technique mapping ──────────────────────────────
+const PATRON_TECHNIQUE_MAP = {
+    'mykkiel': {
+        basic: 'Sworn Defender',
+        advanced: 'Unyielding Vow',
+        master: 'The Unbroken Covenant'
+    },
+    'inquisitor-prime': {
+        basic: 'Hunter\'s Instinct',
+        advanced: 'Cold Clarity',
+        master: 'Absolute Judgment'
+    },
+    'inaea': {
+        basic: 'Thread-Knot Strike',
+        advanced: 'Strand of Inevitability',
+        master: 'Weaver\'s Dominion'
+    },
+    'oath-of-flame-light': {
+        basic: 'Oathbound Strength',
+        advanced: 'Unwavering Resolve',
+        master: 'Avatar of the Oath'
+    },
+    'sacred-geometry': {
+        basic: 'Golden Ratio Strike',
+        advanced: 'Pattern\'s Heart',
+        master: 'Architect of Reality'
+    },
+    'gallows-bell': {
+        basic: 'Judge\'s Intuition',
+        advanced: 'Scales of Balance',
+        master: 'Final Arbiter'
+    },
+    'varnek-karn': {
+        basic: 'Ancestor\'s Knuckle',
+        advanced: 'Final Testament',
+        master: 'Death\'s Confidant'
+    },
+    'confessor-beneath-the-bell': {
+        basic: 'Stitched Silence',
+        advanced: 'Sin-Eater\'s Resilience',
+        master: 'The Unburdened Bell'
+    },
+    'silent-choir': {
+        basic: 'Silencing Palm',
+        advanced: 'Burden Bearer',
+        master: 'The Unburdened Confessor'
+    },
+    'the-witness': {
+        basic: 'Lingering Trace',
+        advanced: 'Shared Burden',
+        master: 'Absolute Witness'
+    },
+    'sealed-gate': {
+        basic: 'Iron Rebuke',
+        advanced: 'Circle of Denial',
+        master: 'Threshold Incarnate'
+    },
+};
+
+// ─── Helper: Derive patron from Thiasos/Codex ──────────────────
+
+export function derivePatronFromRunekeeperItems(char) {
+    if (!char) return null;
+     if (thiasos && THIASOS_PATRON_MAP[thiasos]) return THIASOS_PATRON_MAP[thiasos];
+    if (codex && CODEX_PATRON_MAP[codex]) return CODEX_PATRON_MAP[codex];
+    return null;
+
+    // Check Thiasos
+    if (char.thiasos && THIASOS_PATRON_MAP[char.thiasos]) {
+        return THIASOS_PATRON_MAP[char.thiasos];
     }
-    return TIER_INFO[TIER_INFO.length - 1];
-}
-
-function getTalentTier(cost) {
-    const xp = safeParseInt(cost, 0);
-    for (const t of TALENT_TIERS) {
-        if (xp >= t.min && xp <= t.max) return t;
+    
+    // Check Codex
+    if (char.codex && CODEX_PATRON_MAP[char.codex]) {
+        return CODEX_PATRON_MAP[char.codex];
     }
-    return TALENT_TIERS[0];
+    
+    return null;
 }
 
-function determineRole(char) {
-    const body = char.body || 1;
-    const wits = char.wits || 1;
-    const spirit = char.spirit || 1;
-    const presence = char.presence || 1;
-    const skills = char.skills || {};
-    
-    const maxAttr = Math.max(body, wits, spirit, presence);
-    
-    // Check for support indicators
-    if ((spirit >= 3 || wits >= 3) && (skills.medicine || 0) >= 2) return 'support';
-    
-    // Check for controller indicators
-    if ((spirit >= 3 || presence >= 3) && ((skills.sway || 0) >= 2 || (skills.deception || 0) >= 1)) return 'controller';
-    
-    // Check for utility indicators
-    if ((wits >= 3 || spirit >= 3) && ((skills.lore || 0) >= 2 || (skills.investigation || 0) >= 1)) return 'utility';
-    
-    // Check for tank (high body + melee + endurance)
-    if (body >= 3 && (skills.melee || 0) >= 2 && (skills.endurance || 0) >= 1) return 'tank';
-    
-    // Check for striker (high body or wits + combat skills)
-    if ((body >= 3 || wits >= 3) && ((skills.melee || 0) >= 2 || (skills.ranged || 0) >= 2)) return 'striker';
-    
-    // Fallback: highest attribute
-    if (maxAttr === body) return 'tank';
-    if (maxAttr === wits) return 'utility';
-    if (maxAttr === spirit) return 'support';
-    if (maxAttr === presence) return 'controller';
-    
-    return 'utility';
-}
+// ─── Ensure Runekeeper has patron ──────────────────────────────
 
-function calculateXpSpent(char) {
-    let spent = 0;
+function ensureRunekeeperPatron(char) {
+    if (!char) return char;
+    if (char.magicPath !== 'runekeeper') return char;
+    if (char.patron) return char;
     
-    // Attributes: each step from base 1 costs new_rating × 3
-    for (const attr of ['body', 'wits', 'spirit', 'presence']) {
-        const rating = char[attr] || 1;
-        for (let i = 2; i <= rating; i++) {
-            spent += i * 3;
+    // Try to derive from Thiasos/Codex
+    const derived = derivePatronFromRunekeeperItems(char);
+    if (derived) {
+        char.patron = derived;
+        // Also set the patron techniques if available
+        if (PATRON_TECHNIQUE_MAP[derived] && !char.monkTechniques) {
+            char.monkTechniques = {};
+        }
+        // Update in state
+        const state = getState();
+        const idx = (state.characters || []).findIndex(c => c.id === char.id);
+        if (idx >= 0) {
+            state.characters[idx].patron = derived;
+            saveState();
         }
     }
     
-    // Skills: each step from base 0 costs new_level × 2
-    if (char.skills) {
-        for (const skill of ALL_SKILLS) {
-            const level = char.skills[skill.toLowerCase()] || 0;
-            for (let i = 1; i <= level; i++) {
-                spent += i * 2;
-            }
-        }
-    }
-    
-    // Talents
-    if (char.talents) {
-        char.talents.forEach(t => {
-            spent += safeParseInt(t.cost, 0);
-        });
-    }
-    
-    // Assets
-    if (char.assets) {
-        char.assets.forEach(a => {
-            spent += safeParseInt(a.cost, 0);
-        });
-    }
-    
-    // Equipment
-    if (char.equipment) {
-        char.equipment.forEach(e => {
-            spent += safeParseInt(e.cost, 0);
-        });
-    }
-    
-    return spent;
-}
-
-function getObligationInfo(char) {
-    const capacity = (char.spirit || 1) + (char.presence || 1);
-    const current = char.obligation || 0;
-    const overCapacity = current > capacity;
-    const doubleCapacity = current > capacity * 2;
-    
-    return { capacity, current, overCapacity, doubleCapacity };
-}
-
-// Helper to get a human-readable Cantor corruption tier label
-function getCantorCorruptionTier(corruption, maxCorruption) {
-    if (corruption === 0) return 'Clear';
-    const ratio = corruption / maxCorruption;
-    if (ratio < 0.25) return 'Faint';
-    if (ratio < 0.5) return 'Growing';
-    if (ratio < 0.75) return 'Pressing';
-    if (ratio < 1) return 'Near Bloom';
-    return 'Bloom';
+    return char;
 }
 
 // ============================================================
 // RENDER
 // ============================================================
+
+let container = null;
+let talentPanelVisible = true;
+let activeTalentFilter = 'all';
+let globalEventsAttached = false;
 
 export function render(el) {
     container = el;
@@ -333,7 +378,11 @@ export function renderCharList() {
     if (!list) return;
     
     const state = getState();
-    const characters = state.characters || [];
+    let characters = state.characters || [];
+    
+    // ─── Ensure all Runekeepers have a patron ──────────────────
+    characters = characters.map(c => ensureRunekeeperPatron(c));
+    state.characters = characters;
     
     // Update count
     const countEl = document.getElementById('char-count');
@@ -460,9 +509,26 @@ function createCharacterSummary(char) {
         if (tags > 0) pathStats += ` | 🔮 ${tags} tags`;
     }
 
-    // Runekeeper: show number of rites (optional)
-    if (char.magicPath === 'runekeeper' && char.rites?.length) {
-        pathStats += ` | 📜 ${char.rites.length} rites`;
+    // Runekeeper: show Thiasos, Codex, and Patron (with auto-derive if missing)
+    if (char.magicPath === 'runekeeper') {
+        // Ensure patron is set
+        if (!char.patron) {
+            const derived = derivePatronFromRunekeeperItems(char);
+            if (derived) {
+                char.patron = derived;
+                // Update in state
+                const state = getState();
+                const idx = (state.characters || []).findIndex(c => c.id === char.id);
+                if (idx >= 0) {
+                    state.characters[idx].patron = derived;
+                    saveState();
+                }
+            }
+        }
+        if (char.thiasos) pathStats += ` | 🐾 ${escHtml(char.thiasos)}`;
+        if (char.codex) pathStats += ` | 📖 ${escHtml(char.codex)}`;
+        if (char.patron) pathStats += ` | 🔮 ${escHtml(char.patron)}`;
+        if (char.rites?.length) pathStats += ` | 📜 ${char.rites.length} rites`;
     }
 
     // Build the HTML
@@ -480,7 +546,6 @@ function createCharacterSummary(char) {
         <span style="color:var(--text3);" title="Total XP / XP spent">${xpTotal} XP ${xpSpent !== xpTotal ? `(${xpSpent} spent)` : ''}</span>
         <span style="color:var(--text2);" title="Body / Wits / Spirit / Presence"><strong>B</strong>${char.body||1} <strong>W</strong>${char.wits||1} <strong>S</strong>${char.spirit||1} <strong>P</strong>${char.presence||1}</span>
         ${magicPath.icon ? `<span title="${magicPath.label}">${magicPath.icon} ${magicPath.label}</span>` : ''}
-        ${char.patron ? `<span style="color:var(--text3);" title="Patron">🔮 ${escHtml(char.patron)}</span>` : ''}
         ${pathStats}
         <span style="color:${harmColor};font-weight:${harm>0?'600':'400'};" title="Harm level (0-3)">${harm===0?'✓':'💔'} Harm ${harm}/3</span>
         <span style="color:${fatigueColor};" title="Fatigue (max = Body = ${fatigueMax}). Full → Harm+1, clear">😓 ${fatigue}/${fatigueMax}</span>
@@ -1076,6 +1141,106 @@ export async function attachEvents() {
 }
 
 // ============================================================
+// HELPERS (unchanged from original)
+// ============================================================
+
+function getTierFromXp(xp) {
+    for (const t of TIER_INFO) {
+        if (xp >= t.min && xp <= t.max) return t;
+    }
+    return TIER_INFO[TIER_INFO.length - 1];
+}
+
+function getTalentTier(cost) {
+    const xp = safeParseInt(cost, 0);
+    for (const t of TALENT_TIERS) {
+        if (xp >= t.min && xp <= t.max) return t;
+    }
+    return TALENT_TIERS[0];
+}
+
+function determineRole(char) {
+    const body = char.body || 1;
+    const wits = char.wits || 1;
+    const spirit = char.spirit || 1;
+    const presence = char.presence || 1;
+    const skills = char.skills || {};
+    
+    const maxAttr = Math.max(body, wits, spirit, presence);
+    
+    if ((spirit >= 3 || wits >= 3) && (skills.medicine || 0) >= 2) return 'support';
+    if ((spirit >= 3 || presence >= 3) && ((skills.sway || 0) >= 2 || (skills.deception || 0) >= 1)) return 'controller';
+    if ((wits >= 3 || spirit >= 3) && ((skills.lore || 0) >= 2 || (skills.investigation || 0) >= 1)) return 'utility';
+    if (body >= 3 && (skills.melee || 0) >= 2 && (skills.endurance || 0) >= 1) return 'tank';
+    if ((body >= 3 || wits >= 3) && ((skills.melee || 0) >= 2 || (skills.ranged || 0) >= 2)) return 'striker';
+    
+    if (maxAttr === body) return 'tank';
+    if (maxAttr === wits) return 'utility';
+    if (maxAttr === spirit) return 'support';
+    if (maxAttr === presence) return 'controller';
+    
+    return 'utility';
+}
+
+function calculateXpSpent(char) {
+    let spent = 0;
+    
+    for (const attr of ['body', 'wits', 'spirit', 'presence']) {
+        const rating = char[attr] || 1;
+        for (let i = 2; i <= rating; i++) {
+            spent += i * 3;
+        }
+    }
+    
+    if (char.skills) {
+        for (const skill of ALL_SKILLS) {
+            const level = char.skills[skill.toLowerCase()] || 0;
+            for (let i = 1; i <= level; i++) {
+                spent += i * 2;
+            }
+        }
+    }
+    
+    if (char.talents) {
+        char.talents.forEach(t => {
+            spent += safeParseInt(t.cost, 0);
+        });
+    }
+    
+    if (char.assets) {
+        char.assets.forEach(a => {
+            spent += safeParseInt(a.cost, 0);
+        });
+    }
+    
+    if (char.equipment) {
+        char.equipment.forEach(e => {
+            spent += safeParseInt(e.cost, 0);
+        });
+    }
+    
+    return spent;
+}
+
+function getObligationInfo(char) {
+    const capacity = (char.spirit || 1) + (char.presence || 1);
+    const current = char.obligation || 0;
+    const overCapacity = current > capacity;
+    const doubleCapacity = current > capacity * 2;
+    
+    return { capacity, current, overCapacity, doubleCapacity };
+}
+
+function getCantorCorruptionTier(corruption, maxCorruption) {
+    if (corruption === 0) return 'Clear';
+    const ratio = corruption / maxCorruption;
+    if (ratio < 0.25) return 'Faint';
+    if (ratio < 0.5) return 'Growing';
+    if (ratio < 0.75) return 'Pressing';
+    if (ratio < 1) return 'Near Bloom';
+    return 'Bloom';
+}
+// ============================================================
 // INITIALIZATION & DESTROY
 // ============================================================
 
@@ -1086,6 +1251,8 @@ export function init(el) {
 export function destroy() {
     container = null;
 }
+
+
 
 // ============================================================
 // EXPORTS

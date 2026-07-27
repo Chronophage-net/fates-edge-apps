@@ -25,28 +25,27 @@
  *   - optional_campaign_arc: { title, description, signs, optimization_plague, clockwork_demon, gm_guidance }
  *   - temporary_anima_system: { title, description, core_principles, creation_procedure, effects, scars, clearing_obligation, artificer_talents, gm_guidance }
  *   - rivalries: [{ patron, description }]
- *   - _license: string
- */
-
+ *   - _license: string */
+ 
 import { getState, saveState } from '../../core/state.js';
 import { showToast } from '../../components/Toast.js';
 import { escHtml } from '../../core/utils.js';
-// ─── Import shared discovery ────────────────────────────────
+// ─── Import shared discovery ────────────────────────────
 import { discoverPatrons } from '../../core/discovery.js';
-
+ 
 // ============================================================
 // CONSTANTS
 // ============================================================
-
+ 
 const COSMIC_DATA_PATH = './data/patrons/';
 const TERRESTRIAL_DATA_PATH = './data/terrestrial/';
 const TERRESTRIAL_FALLBACK_DATA_PATH = './data/factions/';
 const RELIGION_DATA_PATH = './data/religions/';
-
+ 
 // ============================================================
 // DEFAULT DATA (fallback)
 // ============================================================
-
+ 
 const DEFAULT_COSMIC_PATRONS = [
     {
         id: 'the-traveler',
@@ -71,7 +70,7 @@ const DEFAULT_COSMIC_PATRONS = [
         source: 'default'
     }
 ];
-
+ 
 const DEFAULT_TERRESTRIAL_PATRONS = [
     {
         id: 'velvet-court',
@@ -112,7 +111,7 @@ const DEFAULT_TERRESTRIAL_PATRONS = [
         source: 'default'
     }
 ];
-
+ 
 const DEFAULT_TRUSTS = [
     {
         id: 'velvet-coin-trust',
@@ -129,7 +128,7 @@ const DEFAULT_TRUSTS = [
         source: 'default'
     }
 ];
-
+ 
 const DEFAULT_RELIGIONS = [
     {
         id: 'everflame',
@@ -145,11 +144,11 @@ const DEFAULT_RELIGIONS = [
         source: 'default'
     }
 ];
-
+ 
 // ============================================================
 // HELPERS
 // ============================================================
-
+ 
 function safeString(val) {
     if (val === undefined || val === null) return '';
     if (typeof val === 'string') return val;
@@ -167,28 +166,28 @@ function safeString(val) {
     }
     return String(val);
 }
-
+ 
 function getPatronDescription(patron) {
     if (!patron) return 'No description available.';
-
+ 
     // Try the lore.description field first (new format)
     if (patron.lore?.description) return patron.lore.description;
-
+ 
     // Fallback to old format
     if (typeof patron.description === 'string') return patron.description;
     if (patron.description?.description) return patron.description.description;
     if (patron.description?.lore) return patron.description.lore;
-
+ 
     // Last resort
     if (typeof patron.lore === 'string') return patron.lore;
     return safeString(patron.description) || 'No description available.';
 }
-
+ 
 function getPatronLore(patron) {
     if (!patron?.lore) return null;
     return patron.lore;
 }
-
+ 
 function getPatronSummary(patron) {
     if (!patron) return '';
     if (patron.subtitle && typeof patron.subtitle === 'string') return patron.subtitle;
@@ -199,19 +198,19 @@ function getPatronSummary(patron) {
     const firstSentence = desc.split('.')[0] || desc;
     return firstSentence.substring(0, 80) + (firstSentence.length > 80 ? '...' : '');
 }
-
+ 
 function getPatronIcon(patron) {
     if (patron?.icon) return patron.icon;
     return '🌟';
 }
-
+ 
 function getPatronColor(patron) {
     if (patron?.color) return patron.color;
     if (patron?.witchcraft?.color) return patron.witchcraft.color;
     if (patron?.monastic_tradition?.color) return patron.monastic_tradition.color;
     return 'var(--gold)';
 }
-
+ 
 function normalizePatron(p) {
     if (!p) return p;
     const result = { ...p };
@@ -234,18 +233,18 @@ function normalizePatron(p) {
     }
     return result;
 }
-
+ 
 function formatText(text) {
     if (!text) return '';
     return escHtml(text).replace(/\n/g, '<br>');
 }
-
+ 
 function sortByName(a, b) {
     const nameA = (a.name || a.title || '').toLowerCase();
     const nameB = (b.name || b.title || '').toLowerCase();
     return nameA.localeCompare(nameB);
 }
-
+ 
 function getTierColor(tier) {
     const colors = {
         'Cantrip': 'var(--text3)',
@@ -258,11 +257,11 @@ function getTierColor(tier) {
     };
     return colors[tier] || 'var(--text2)';
 }
-
+ 
 // ============================================================
 // STATE
 // ============================================================
-
+ 
 let container = null;
 const state = {
     cosmicPatrons: [],
@@ -281,12 +280,12 @@ const state = {
     expandedRites: new Set(),
     expandedSections: new Set()
 };
-
+ 
 // ============================================================
 // LOAD DATA
 // ============================================================
-
-export function loadPatronData(force = false) {
+ 
+export async function loadPatronData(force = false) {
     const saved = getState();
     if (!force && saved.patrons) {
         if (saved.patrons.cosmic?.length || saved.patrons.terrestrial?.length) {
@@ -301,18 +300,18 @@ export function loadPatronData(force = false) {
             return;
         }
     }
-    loadRemotePatrons();
+    await loadRemotePatrons();
 }
-
+ 
 async function loadRemotePatrons() {
     if (state.isLoading) return;
     state.isLoading = true;
-
+ 
     try {
         const cosmicSlugs = await discoverPatrons('cosmic', COSMIC_DATA_PATH);
         const terrestrialSlugs = await discoverPatrons('terrestrial', TERRESTRIAL_DATA_PATH, TERRESTRIAL_FALLBACK_DATA_PATH);
         const religionSlugs = await discoverPatrons('religion', RELIGION_DATA_PATH);
-
+ 
         // Fetch cosmic
         let cosmicPatrons = [];
         for (const slug of cosmicSlugs) {
@@ -321,6 +320,9 @@ async function loadRemotePatrons() {
                 if (res.ok) {
                     const data = await res.json();
                     if (!data.id) data.id = slug;
+                    // Normalize ID: replace underscores with hyphens to match expected format (e.g., defaults)
+                    const normalizedId = data.id.replace(/_/g, '-');
+                    data.id = normalizedId;
                     cosmicPatrons.push(normalizePatron(data));
                 }
             } catch (e) { /* ignore */ }
@@ -331,7 +333,7 @@ async function loadRemotePatrons() {
             showToast('⚠️ No cosmic patron files found. Using defaults.', 'warning');
         }
         state.cosmicPatrons = cosmicPatrons.sort(sortByName);
-
+ 
         // Fetch terrestrial
         let terrestrialPatrons = [];
         for (const slug of terrestrialSlugs) {
@@ -343,6 +345,9 @@ async function loadRemotePatrons() {
                 if (res.ok) {
                     const data = await res.json();
                     if (!data.id) data.id = slug;
+                    // Normalize ID: replace underscores with hyphens to match expected format (e.g., defaults)
+                    const normalizedId = data.id.replace(/_/g, '-');
+                    data.id = normalizedId;
                     terrestrialPatrons.push(normalizePatron(data));
                 }
             } catch (e) { /* ignore */ }
@@ -353,7 +358,7 @@ async function loadRemotePatrons() {
             showToast('⚠️ No terrestrial patron files found. Using defaults.', 'warning');
         }
         state.terrestrialPatrons = terrestrialPatrons.sort(sortByName);
-
+ 
         // Fetch religions
         let religions = [];
         for (const slug of religionSlugs) {
@@ -362,6 +367,9 @@ async function loadRemotePatrons() {
                 if (res.ok) {
                     const data = await res.json();
                     if (!data.id) data.id = slug;
+                    // Normalize ID: replace underscores with hyphens to match expected format (e.g., defaults)
+                    const normalizedId = data.id.replace(/_/g, '-');
+                    data.id = normalizedId;
                     religions.push(data);
                 }
             } catch (e) { /* ignore */ }
@@ -372,16 +380,16 @@ async function loadRemotePatrons() {
             showToast('⚠️ No religion files found. Using defaults.', 'warning');
         }
         state.religions = religions.sort(sortByName);
-
+ 
         if (state.trusts.length === 0) {
             state.trusts = DEFAULT_TRUSTS.sort(sortByName);
         } else {
             state.trusts.sort(sortByName);
         }
-
+ 
         state.dataLoaded = true;
         savePatronData();
-
+ 
     } catch (error) {
         console.warn('Failed to load remote patrons:', error);
         loadDefaultPatrons();
@@ -390,7 +398,7 @@ async function loadRemotePatrons() {
         state.isLoading = false;
     }
 }
-
+ 
 function loadDefaultPatrons() {
     state.cosmicPatrons = DEFAULT_COSMIC_PATRONS.map(normalizePatron).sort(sortByName);
     state.terrestrialPatrons = DEFAULT_TERRESTRIAL_PATRONS.map(normalizePatron).sort(sortByName);
@@ -400,7 +408,7 @@ function loadDefaultPatrons() {
     state.usingFallback = true;
     console.log(`📦 Using defaults: ${state.cosmicPatrons.length} cosmic, ${state.terrestrialPatrons.length} terrestrial, ${state.religions.length} religions`);
 }
-
+ 
 function savePatronData() {
     const saved = getState();
     if (!saved.patrons) saved.patrons = {};
@@ -411,42 +419,42 @@ function savePatronData() {
     saved.patrons.obligation = state.obligation;
     saveState();
 }
-
+ 
 // ============================================================
 // OBLIGATION MANAGEMENT
 // ============================================================
-
+ 
 export function getPatronObligation(characterId, patronId) {
     if (!state.obligation[characterId]) return 0;
     return state.obligation[characterId][patronId] || 0;
 }
-
+ 
 export function setPatronObligation(characterId, patronId, value) {
     if (!state.obligation[characterId]) state.obligation[characterId] = {};
     state.obligation[characterId][patronId] = Math.max(0, value);
     savePatronData();
 }
-
+ 
 export function addPatronObligation(characterId, patronId, amount = 1) {
     const current = getPatronObligation(characterId, patronId);
     setPatronObligation(characterId, patronId, current + amount);
 }
-
+ 
 export function clearPatronObligation(characterId, patronId, amount = 1) {
     const current = getPatronObligation(characterId, patronId);
     setPatronObligation(characterId, patronId, current - amount);
 }
-
+ 
 // ============================================================
 // RENDER
 // ============================================================
-
+ 
 export function render(el) {
     container = el;
     loadPatronData();
-
+ 
     const usingFallback = state.usingFallback;
-
+ 
     container.innerHTML = `
         <div class="patrons-modern-layout">
             <header class="patrons-header" style="margin-bottom:0.5rem;">
@@ -455,32 +463,32 @@ export function render(el) {
                 ${!state.dataLoaded ? '<p class="text-muted" style="font-size:0.85rem;">⏳ Loading data...</p>' : `<p class="text-muted" style="font-size:0.85rem;">📚 ${state.cosmicPatrons.length} cosmic, ${state.terrestrialPatrons.length} terrestrial, ${state.religions.length} religions</p>`}
                 ${usingFallback ? `<div style="color:var(--warn);font-size:0.85rem;margin-top:0.3rem;">⚠️ Using fallback defaults for some data.</div>` : ''}
             </header>
-
+ 
             <div class="patrons-tabs" style="display:flex;gap:0.3rem;margin-bottom:0.5rem;flex-wrap:wrap;">
                 <button class="patrons-tab active" data-view="cosmic">🌟 Cosmic</button>
                 <button class="patrons-tab" data-view="terrestrial">🏛️ Terrestrial</button>
                 <button class="patrons-tab" data-view="trusts">🤝 Trusts</button>
                 <button class="patrons-tab" data-view="religions">⛪ Religions</button>
             </div>
-
+ 
             <div id="patrons-view-container" class="patrons-view-container">
                 ${renderView('cosmic')}
             </div>
-
+ 
             <div id="patron-modal" class="patron-modal" style="display:none;"></div>
             <div id="asset-modal" class="patron-modal" style="display:none;"></div>
         </div>
     `;
-
+ 
     attachEvents();
 }
-
+ 
 function renderView(view) {
     state.viewMode = view;
     if (!state.dataLoaded) {
         return `<div class="patrons-empty"><div style="font-size:3rem;">⏳</div><div>Loading...</div></div>`;
     }
-
+ 
     switch(view) {
         case 'cosmic': return renderCosmicPatrons();
         case 'terrestrial': return renderTerrestrialPatrons();
@@ -489,11 +497,11 @@ function renderView(view) {
         default: return renderCosmicPatrons();
     }
 }
-
+ 
 // ============================================================
 // RENDER: COSMIC PATRONS
 // ============================================================
-
+ 
 function renderCosmicPatrons() {
     if (state.cosmicPatrons.length === 0) {
         return `
@@ -504,10 +512,10 @@ function renderCosmicPatrons() {
             </div>
         `;
     }
-
+ 
     const characterId = 'default-character';
     const obligationMap = state.obligation[characterId] || {};
-
+ 
     return `
         <div style="display:flex;flex-direction:column;gap:0.8rem;">
             <div class="patrons-scroll-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:0.5rem;max-height:220px;overflow-y:auto;padding:0.2rem;border:1px solid var(--border);border-radius:var(--radius);background:var(--bg2);">
@@ -527,11 +535,11 @@ function renderCosmicPatrons() {
                     `;
                 }).join('')}
             </div>
-
+ 
             <div id="cosmic-description-area" style="background:var(--bg2);border-radius:var(--radius);padding:0.8rem;border-left:4px solid var(--gold);min-height:80px;">
                 <p style="color:var(--text2);font-style:italic;margin:0;">Select a patron above to see their description and details.</p>
             </div>
-
+ 
             <div class="patrons-actions" style="display:flex;gap:0.3rem;flex-wrap:wrap;">
                 <button class="btn btn-primary btn-sm" onclick="window.addCosmicPatron()">➕ Add Cosmic</button>
                 <button class="btn btn-secondary btn-sm" onclick="window.refreshPatrons()">🔄 Refresh</button>
@@ -540,11 +548,11 @@ function renderCosmicPatrons() {
         </div>
     `;
 }
-
+ 
 // ============================================================
 // RENDER: TERRESTRIAL PATRONS
 // ============================================================
-
+ 
 function renderTerrestrialPatrons() {
     if (state.terrestrialPatrons.length === 0) {
         return `
@@ -556,7 +564,7 @@ function renderTerrestrialPatrons() {
             </div>
         `;
     }
-
+ 
     return `
         <div style="display:flex;flex-direction:column;gap:0.8rem;">
             <div class="patrons-scroll-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:0.5rem;max-height:220px;overflow-y:auto;padding:0.2rem;border:1px solid var(--border);border-radius:var(--radius);background:var(--bg2);">
@@ -575,11 +583,11 @@ function renderTerrestrialPatrons() {
                     `;
                 }).join('')}
             </div>
-
+ 
             <div id="terrestrial-description-area" style="background:var(--bg2);border-radius:var(--radius);padding:0.8rem;border-left:4px solid var(--blue);min-height:80px;">
                 <p style="color:var(--text2);font-style:italic;margin:0;">Select a terrestrial patron to see details.</p>
             </div>
-
+ 
             <div class="patrons-actions" style="display:flex;gap:0.3rem;flex-wrap:wrap;">
                 <button class="btn btn-primary btn-sm" onclick="window.addTerrestrialPatron()">➕ Add Terrestrial</button>
                 <button class="btn btn-secondary btn-sm" onclick="window.refreshPatrons()">🔄 Refresh</button>
@@ -587,11 +595,11 @@ function renderTerrestrialPatrons() {
         </div>
     `;
 }
-
+ 
 // ============================================================
 // RENDER: RELIGIONS
 // ============================================================
-
+ 
 function renderReligions() {
     if (state.religions.length === 0) {
         return `
@@ -602,7 +610,7 @@ function renderReligions() {
             </div>
         `;
     }
-
+ 
     return `
         <div class="religions-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:0.5rem;">
             ${state.religions.map(r => {
@@ -624,11 +632,11 @@ function renderReligions() {
         </div>
     `;
 }
-
+ 
 // ============================================================
 // RENDER: TRUSTS
 // ============================================================
-
+ 
 function renderTrusts() {
     if (state.trusts.length === 0) {
         return `
@@ -639,7 +647,7 @@ function renderTrusts() {
             </div>
         `;
     }
-
+ 
     return `
         <div class="trusts-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:0.5rem;">
             ${state.trusts.map(t => {
@@ -661,27 +669,27 @@ function renderTrusts() {
         </div>
     `;
 }
-
+ 
 // ============================================================
 // PATRON DETAIL (Cosmic)
 // ============================================================
-
+ 
 function renderPatronDetail(patronId) {
     const patron = state.cosmicPatrons.find(p => p.id === patronId);
     if (!patron) {
         showToast('Patron not found', 'error');
         return;
     }
-
+ 
     const descArea = document.getElementById('cosmic-description-area');
     if (!descArea) return;
-
+ 
     const desc = getPatronDescription(patron);
     const name = safeString(patron.name || patron.title || 'Unnamed');
     const summary = getPatronSummary(patron);
     const icon = getPatronIcon(patron);
     const color = getPatronColor(patron);
-
+ 
     descArea.innerHTML = `
         <div style="display:flex;align-items:center;gap:0.5rem;flex-wrap:wrap;">
             <span style="font-size:1.5rem;">${safeString(icon)}</span>
@@ -697,11 +705,11 @@ function renderPatronDetail(patronId) {
         </div>
     `;
 }
-
+ 
 // ============================================================
 // RITE HELPERS & TOGGLE
 // ============================================================
-
+ 
 function riteHasDetails(r) {
     if (!r) return false;
     const hasMainText = safeString(r.effect || r.description || '').length > 0;
@@ -711,7 +719,7 @@ function riteHasDetails(r) {
         (r.tags && r.tags.length > 0);
     return hasMainText || hasMeta;
 }
-
+ 
 window.toggleRite = function(headerElement) {
     const item = headerElement.closest('.rite-item');
     if (!item) return;
@@ -727,7 +735,7 @@ window.toggleRite = function(headerElement) {
         else state.expandedRites.add(riteId);
     }
 };
-
+ 
 window.expandAllRites = function() {
     const modal = document.getElementById('patron-modal');
     if (!modal) return;
@@ -742,7 +750,7 @@ window.expandAllRites = function() {
         }
     });
 };
-
+ 
 window.collapseAllRites = function() {
     const modal = document.getElementById('patron-modal');
     if (!modal) return;
@@ -757,21 +765,21 @@ window.collapseAllRites = function() {
         }
     });
 };
-
+ 
 // ============================================================
 // PATRON DETAIL MODAL (FULL)
 // ============================================================
-
+ 
 window.openPatronDetailModal = function(patronId) {
     const patron = state.cosmicPatrons.find(p => p.id === patronId);
     if (!patron) {
         showToast('Patron not found', 'error');
         return;
     }
-
+ 
     const modal = document.getElementById('patron-modal');
     modal.style.display = 'block';
-
+ 
     const name = safeString(patron.name || patron.title || 'Unnamed');
     const summary = getPatronSummary(patron);
     const desc = getPatronDescription(patron);
@@ -781,14 +789,14 @@ window.openPatronDetailModal = function(patronId) {
     const religion = safeString(patron.religion || '');
     const currentObligation = getPatronObligation('default-character', patron.id);
     const lore = getPatronLore(patron);
-
+ 
     // Build sections HTML
     const sectionsHtml = buildPatronSections(patron);
-
+ 
     modal.innerHTML = `
         <div class="modal-content patron-detail" style="width: 90%; max-width: 1200px; max-height: 90vh; overflow-y: auto; background:var(--bg1); padding:1.5rem; border-radius:var(--radius);">
             <button class="modal-close" onclick="window.closePatronModal()" style="float:right;background:none;border:none;font-size:1.5rem;cursor:pointer;color:var(--text3);">✕</button>
-
+ 
             <!-- Header -->
             <div class="patron-detail-header" style="display:flex;align-items:center;gap:1rem;margin-bottom:1rem;border-bottom:1px solid var(--border);padding-bottom:0.5rem;">
                 <div class="patron-detail-icon" style="font-size:3rem;">${escHtml(icon)}</div>
@@ -807,12 +815,12 @@ window.openPatronDetailModal = function(patronId) {
                     </div>
                 </div>
             </div>
-
+ 
             <!-- Body -->
             <div class="patron-detail-body" style="display:flex;flex-direction:column;gap:0.8rem;">
                 ${sectionsHtml}
             </div>
-
+ 
             <!-- Actions -->
             <div class="patron-detail-actions" style="display:flex;gap:0.5rem;margin-top:1rem;border-top:1px solid var(--border);padding-top:0.5rem;">
                 <button class="btn btn-sm" onclick="window.editPatron('${patron.id}')">✏️ Edit</button>
@@ -821,19 +829,19 @@ window.openPatronDetailModal = function(patronId) {
             </div>
         </div>
     `;
-
+ 
     modal.onclick = (e) => {
         if (e.target === modal) window.closePatronModal();
     };
 };
-
+ 
 // ============================================================
 // BUILD PATRON SECTIONS
 // ============================================================
-
+ 
 function buildPatronSections(patron) {
     let html = '';
-
+ 
     // ─── Lore ──────────────────────────────────────────────────
     if (patron.lore) {
         const lore = patron.lore;
@@ -862,7 +870,7 @@ function buildPatronSections(patron) {
             </div>
         `;
     }
-
+ 
     // ─── Domain Focus ──────────────────────────────────────────
     if (patron.domain_focus && patron.domain_focus.length > 0) {
         html += `
@@ -874,7 +882,7 @@ function buildPatronSections(patron) {
             </div>
         `;
     }
-
+ 
     // ─── Patron's Gift ─────────────────────────────────────────
     if (patron.patrons_gift) {
         const gift = patron.patrons_gift;
@@ -888,7 +896,7 @@ function buildPatronSections(patron) {
             </div>
         `;
     }
-
+ 
     // ─── Rites ─────────────────────────────────────────────────
     if (patron.rites && patron.rites.length > 0) {
         const hasDetailedRites = typeof patron.rites[0] === 'object' && patron.rites[0].effect !== undefined;
@@ -911,7 +919,7 @@ function buildPatronSections(patron) {
                             const riteTier = safeString(r.tier || '');
                             const riteMainText = safeString(r.effect || r.description || '');
                             const tierColor = getTierColor(riteTier);
-
+ 
                             let detailsHtml = '';
                             if (hasDetails) {
                                 detailsHtml = `
@@ -925,7 +933,6 @@ function buildPatronSections(patron) {
                                             ${r.action ? `<span><strong>Action:</strong> ${escHtml(safeString(r.action))}</span>` : ''}
                                             ${r.range ? `<span><strong>Range:</strong> ${escHtml(safeString(r.range))}</span>` : ''}
                                             ${r.resist ? `<span><strong>Resist:</strong> ${escHtml(safeString(r.resist))}</span>` : ''}
-                                            ${r.duration ? `<span><strong>Duration:</strong> ${escHtml(safeString(r.duration))}</span>` : ''}
                                             ${r.invoke ? `<span><strong>Invoke:</strong> ${escHtml(safeString(r.invoke))}</span>` : ''}
                                             ${r.requires ? `<span><strong>Requires:</strong> ${formatText(safeString(r.requires))}</span>` : ''}
                                             ${r.cost ? `<span><strong>Cost:</strong> ${formatText(safeString(r.cost))}</span>` : ''}
@@ -968,7 +975,7 @@ function buildPatronSections(patron) {
             `;
         }
     }
-
+ 
     // ─── Runekeeper Options ────────────────────────────────────
     if (patron.runekeeper_options) {
         const rko = patron.runekeeper_options;
@@ -992,7 +999,7 @@ function buildPatronSections(patron) {
             </div>
         `;
     }
-
+ 
     // ─── Corruption ────────────────────────────────────────────
     if (patron.corruption && patron.corruption.length > 0) {
         html += `
@@ -1005,7 +1012,7 @@ function buildPatronSections(patron) {
             </div>
         `;
     }
-
+ 
     // ─── Witchcraft ────────────────────────────────────────────
     if (patron.witchcraft) {
         const wc = patron.witchcraft;
@@ -1035,7 +1042,7 @@ function buildPatronSections(patron) {
             </div>
         `;
     }
-
+ 
     // ─── Monastic Tradition ────────────────────────────────────
     if (patron.monastic_tradition) {
         const mt = patron.monastic_tradition;
@@ -1081,7 +1088,7 @@ function buildPatronSections(patron) {
             </div>
         `;
     }
-
+ 
     // ─── Cantors & Cults ──────────────────────────────────────
     if (patron.cantors_and_cults) {
         const cc = patron.cantors_and_cults;
@@ -1103,7 +1110,7 @@ function buildPatronSections(patron) {
             </div>
         `;
     }
-
+ 
     // ─── Rivalries ─────────────────────────────────────────────
     if (patron.rivalries && patron.rivalries.length > 0) {
         html += `
@@ -1118,7 +1125,7 @@ function buildPatronSections(patron) {
             </div>
         `;
     }
-
+ 
     // ─── Playstyle Notes ──────────────────────────────────────
     if (patron.playstyle_notes) {
         const pn = patron.playstyle_notes;
@@ -1135,7 +1142,7 @@ function buildPatronSections(patron) {
             </div>
         `;
     }
-
+ 
     // ─── Sample Adventure ─────────────────────────────────────
     if (patron.sample_adventure) {
         const sa = patron.sample_adventure;
@@ -1148,7 +1155,7 @@ function buildPatronSections(patron) {
             </div>
         `;
     }
-
+ 
     // ─── Optional Campaign Arc ────────────────────────────────
     if (patron.optional_campaign_arc) {
         const oca = patron.optional_campaign_arc;
@@ -1167,7 +1174,7 @@ function buildPatronSections(patron) {
             </div>
         `;
     }
-
+ 
     // ─── Temporary Anima System ───────────────────────────────
     if (patron.temporary_anima_system) {
         const tas = patron.temporary_anima_system;
@@ -1191,21 +1198,21 @@ function buildPatronSections(patron) {
             </div>
         `;
     }
-
+ 
     return html;
 }
-
+ 
 // ============================================================
 // TERRESTRIAL PATRON DETAIL
 // ============================================================
-
+ 
 window.viewTerrestrial = function(id) {
     const patron = state.terrestrialPatrons.find(p => p.id === id);
     if (!patron) {
         showToast('Terrestrial patron not found', 'error');
         return;
     }
-
+ 
     const descArea = document.getElementById('terrestrial-description-area');
     if (descArea) {
         const desc = getPatronDescription(patron);
@@ -1225,23 +1232,23 @@ window.viewTerrestrial = function(id) {
         `;
     }
 };
-
+ 
 window.openTerrestrialDetailModal = function(id) {
     const patron = state.terrestrialPatrons.find(p => p.id === id);
     if (!patron) {
         showToast('Terrestrial patron not found', 'error');
         return;
     }
-
+ 
     const modal = document.getElementById('patron-modal');
     modal.style.display = 'block';
-
+ 
     const name = safeString(patron.name || patron.title || 'Unnamed');
     const desc = getPatronDescription(patron);
     const icon = getPatronIcon(patron) || '🏛️';
     const type = safeString(patron.type || patron.agenda || 'Terrestrial Patron');
     const tier = safeString(patron.tier || 'I');
-
+ 
     modal.innerHTML = `
         <div class="modal-content patron-detail" style="width: 90%; max-width: 800px; max-height: 90vh; overflow-y: auto; background:var(--bg1); padding:1.5rem; border-radius:var(--radius);">
             <button class="modal-close" onclick="window.closePatronModal()" style="float:right;background:none;border:none;font-size:1.5rem;cursor:pointer;color:var(--text3);">✕</button>
@@ -1253,7 +1260,7 @@ window.openTerrestrialDetailModal = function(id) {
                     <div style="color:var(--text3);">Tier ${escHtml(tier)}</div>
                 </div>
             </div>
-
+ 
             <div class="patron-detail-body" style="display:flex;flex-direction:column;gap:0.8rem;">
                 ${desc ? `
                     <div class="patron-detail-section" style="background:var(--bg2);border-radius:var(--radius);padding:0.8rem;border-left:4px solid var(--blue);">
@@ -1319,7 +1326,7 @@ window.openTerrestrialDetailModal = function(id) {
                     </div>
                 ` : ''}
             </div>
-
+ 
             <div class="patron-detail-actions" style="display:flex;gap:0.5rem;margin-top:1rem;border-top:1px solid var(--border);padding-top:0.5rem;">
                 <button class="btn btn-sm" onclick="window.editTerrestrial('${patron.id}')">✏️ Edit</button>
                 <button class="btn btn-sm btn-danger" onclick="window.deleteTerrestrial('${patron.id}')">🗑️ Delete</button>
@@ -1327,16 +1334,16 @@ window.openTerrestrialDetailModal = function(id) {
             </div>
         </div>
     `;
-
+ 
     modal.onclick = (e) => {
         if (e.target === modal) window.closePatronModal();
     };
 };
-
+ 
 // ============================================================
 // RELIGION & TRUST MODALS
 // ============================================================
-
+ 
 window.viewReligion = function(id) {
     const religion = state.religions.find(r => r.id === id);
     if (!religion) {
@@ -1362,7 +1369,7 @@ window.viewReligion = function(id) {
         if (e.target === modal) window.closePatronModal();
     };
 };
-
+ 
 window.viewTrust = function(id) {
     const trust = state.trusts.find(t => t.id === id);
     if (!trust) {
@@ -1388,19 +1395,19 @@ window.viewTrust = function(id) {
         if (e.target === modal) window.closePatronModal();
     };
 };
-
+ 
 // ============================================================
 // MODAL CONTROLS
 // ============================================================
-
+ 
 window.closePatronModal = function() {
     document.getElementById('patron-modal').style.display = 'none';
 };
-
+ 
 window.closeAssetModal = function() {
     document.getElementById('asset-modal').style.display = 'none';
 };
-
+ 
 window.viewPatron = function(id) {
     renderPatronDetail(id);
     const modal = document.getElementById('patron-modal');
@@ -1408,35 +1415,35 @@ window.viewPatron = function(id) {
         window.openPatronDetailModal(id);
     }
 };
-
+ 
 // ============================================================
 // OBLIGATION WINDOW FUNCTIONS
 // ============================================================
-
+ 
 window.addPatronObligation = function(characterId, patronId, amount = 1) {
     addPatronObligation(characterId, patronId, amount);
     const patron = state.cosmicPatrons.find(p => p.id === patronId);
     if (patron) renderPatronDetail(patronId);
     showToast(`Added ${amount} Obligation to ${patronId}`, 'success');
 };
-
+ 
 window.clearPatronObligation = function(characterId, patronId, amount = 1) {
     clearPatronObligation(characterId, patronId, amount);
     const patron = state.cosmicPatrons.find(p => p.id === patronId);
     if (patron) renderPatronDetail(patronId);
     showToast(`Cleared ${amount} Obligation from ${patronId}`, 'info');
 };
-
+ 
 // ============================================================
 // CRUD OPERATIONS
 // ============================================================
-
+ 
 window.addCosmicPatron = function() {
     const name = prompt('Enter patron name:');
     if (!name) return;
     const domain = prompt('Enter patron domain:') || 'Unknown';
     const icon = prompt('Enter patron icon (emoji):') || '🌟';
-
+ 
     state.cosmicPatrons.push(normalizePatron({
         id: 'patron-' + Date.now(),
         name,
@@ -1454,7 +1461,7 @@ window.addCosmicPatron = function() {
     refreshView();
     showToast(`Added patron: ${name}`, 'success');
 };
-
+ 
 window.editPatron = function(id) {
     const patron = state.cosmicPatrons.find(p => p.id === id);
     if (!patron) return;
@@ -1474,7 +1481,7 @@ window.editPatron = function(id) {
     window.closePatronModal();
     showToast(`Updated patron: ${name}`, 'success');
 };
-
+ 
 window.deletePatron = function(id) {
     const patron = state.cosmicPatrons.find(p => p.id === id);
     if (!patron) return;
@@ -1486,11 +1493,11 @@ window.deletePatron = function(id) {
     window.closePatronModal();
     showToast(`Deleted patron: ${patron.name || patron.title}`, 'info');
 };
-
+ 
 window.addTerrestrialPatron = function() {
     const name = prompt('Enter terrestrial patron name:');
     if (!name) return;
-
+ 
     state.terrestrialPatrons.push(normalizePatron({
         id: 'terr-' + Date.now(),
         name,
@@ -1511,7 +1518,7 @@ window.addTerrestrialPatron = function() {
     refreshView();
     showToast(`Added terrestrial patron: ${name}`, 'success');
 };
-
+ 
 window.editTerrestrial = function(id) {
     const patron = state.terrestrialPatrons.find(p => p.id === id);
     if (!patron) return;
@@ -1525,7 +1532,7 @@ window.editTerrestrial = function(id) {
     patron.location = prompt('Enter location:', patron.location) || patron.location;
     patron.leverage = prompt('Enter leverage:', patron.leverage) || patron.leverage;
     patron.debtTrigger = prompt('Enter debt trigger:', patron.debtTrigger) || patron.debtTrigger;
-    patron.quirk = prompt('Enter quirk:', patron.quirk) || patron.quirk;
+    patron.quirk = prompt('Enter quirk:') || patron.quirk;
     patron.assetSlots = parseInt(prompt('Enter asset slots:', patron.assetSlots) || '2');
     patron.maxAssetTier = prompt('Enter max asset tier:', patron.maxAssetTier) || patron.maxAssetTier;
     patron.obligationCapacity = prompt('Enter obligation capacity:', patron.obligationCapacity) || patron.obligationCapacity;
@@ -1536,7 +1543,7 @@ window.editTerrestrial = function(id) {
     window.closePatronModal();
     showToast(`Updated terrestrial patron: ${name}`, 'success');
 };
-
+ 
 window.deleteTerrestrial = function(id) {
     const patron = state.terrestrialPatrons.find(p => p.id === id);
     if (!patron) return;
@@ -1548,12 +1555,12 @@ window.deleteTerrestrial = function(id) {
     window.closePatronModal();
     showToast(`Deleted terrestrial patron: ${patron.name || patron.title}`, 'info');
 };
-
+ 
 window.addReligion = function() {
     const name = prompt('Enter religion name:');
     if (!name) return;
     const icon = prompt('Enter icon (emoji):') || '⛪';
-
+ 
     state.religions.push({
         id: 'religion-' + Date.now(),
         name,
@@ -1570,7 +1577,7 @@ window.addReligion = function() {
     refreshView();
     showToast(`Added religion: ${name}`, 'success');
 };
-
+ 
 window.editReligion = function(id) {
     const religion = state.religions.find(r => r.id === id);
     if (!religion) return;
@@ -1589,7 +1596,7 @@ window.editReligion = function(id) {
     window.closePatronModal();
     showToast(`Updated religion: ${name}`, 'success');
 };
-
+ 
 window.deleteReligion = function(id) {
     const religion = state.religions.find(r => r.id === id);
     if (!religion) return;
@@ -1601,11 +1608,11 @@ window.deleteReligion = function(id) {
     window.closePatronModal();
     showToast(`Deleted religion: ${religion.name}`, 'info');
 };
-
+ 
 window.addTrust = function() {
     const name = prompt('Enter trust name:');
     if (!name) return;
-
+ 
     state.trusts.push({
         id: 'trust-' + Date.now(),
         name,
@@ -1625,7 +1632,7 @@ window.addTrust = function() {
     refreshView();
     showToast(`Created trust: ${name}`, 'success');
 };
-
+ 
 window.editTrust = function(id) {
     const trust = state.trusts.find(t => t.id === id);
     if (!trust) return;
@@ -1645,7 +1652,7 @@ window.editTrust = function(id) {
     window.closePatronModal();
     showToast(`Updated trust: ${name}`, 'success');
 };
-
+ 
 window.deleteTrust = function(id) {
     const trust = state.trusts.find(t => t.id === id);
     if (!trust) return;
@@ -1657,47 +1664,51 @@ window.deleteTrust = function(id) {
     window.closePatronModal();
     showToast(`Deleted trust: ${trust.name}`, 'info');
 };
-
+ 
 // ============================================================
 // REFRESH
 // ============================================================
-
+ 
 window.refreshPatrons = function() {
     localStorage.removeItem('fates-edge-patrons-cache-cosmic');
     localStorage.removeItem('fates-edge-patrons-cache-terrestrial');
     localStorage.removeItem('fates-edge-patrons-cache-religion');
-
+ 
     const saved = getState();
     if (saved.patrons) {
         delete saved.patrons.cosmic;
         delete saved.patrons.terrestrial;
-        delete saved.patrons.trusts;
         delete saved.patrons.religions;
+        // NOTE: trusts are player-created and never fetched remotely, so
+        // they must never be cleared here — doing so used to silently
+        // delete every Trust the party had built the moment "Refresh" was
+        // clicked (loadRemotePatrons repopulates an empty trusts array with
+        // DEFAULT_TRUSTS). We deliberately leave saved.patrons.trusts alone.
         saveState();
     }
-
+ 
     state.cosmicPatrons = [];
     state.terrestrialPatrons = [];
-    state.trusts = [];
+    // state.trusts is intentionally left untouched (see note above).
     state.religions = [];
     state.dataLoaded = false;
     state.usingFallback = false;
-
+ 
     loadPatronData(true);
     refreshView();
     showToast('🔄 Patrons refreshed from disk', 'success');
 };
-
+ 
 window.loadDefaultPatrons = function() {
     loadDefaultPatrons();
     refreshView();
     showToast('Loaded default patrons', 'success');
 };
-
+ 
 // ============================================================
 // VIEW MANAGEMENT
 // ============================================================
-
+ 
 function refreshView() {
     const container = document.getElementById('patrons-view-container');
     if (container) {
@@ -1705,11 +1716,11 @@ function refreshView() {
     }
     attachEvents();
 }
-
+ 
 // ============================================================
 // EVENT LISTENERS
 // ============================================================
-
+ 
 export function attachEvents() {
     document.querySelectorAll('.patrons-tab').forEach(tab => {
         tab.addEventListener('click', () => {
@@ -1724,11 +1735,11 @@ export function attachEvents() {
         });
     });
 }
-
+ 
 // ============================================================
 // LIFECYCLE METHODS
 // ============================================================
-
+ 
 export function onActivate() {
     console.log('[Patrons] Activated');
     if (!state.dataLoaded) {
@@ -1736,11 +1747,11 @@ export function onActivate() {
     }
     refreshView();
 }
-
+ 
 export function onDeactivate() {
     console.log('[Patrons] Deactivated');
 }
-
+ 
 export function refresh() {
     localStorage.removeItem('fates-edge-patrons-cache-cosmic');
     localStorage.removeItem('fates-edge-patrons-cache-terrestrial');
@@ -1748,15 +1759,15 @@ export function refresh() {
     loadPatronData(true);
     refreshView();
 }
-
+ 
 export function destroy() {
     container = null;
 }
-
+ 
 // ============================================================
 // EXPORTS
 // ============================================================
-
+ 
 export default {
     render,
     destroy,

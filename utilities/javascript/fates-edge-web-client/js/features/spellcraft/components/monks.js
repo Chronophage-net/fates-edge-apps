@@ -1,18 +1,19 @@
 /**
  * Monks – Monastic traditions, meditation, and the Way of the Unstruck Bell
  *
- * Data-driven: traditions are loaded from patron JSON files via the patrons feature.
- * Each patron can have a "monastic_tradition" property that defines the tradition.
- *
- * GATING: Monk is not a magicPath like Cantor/Witch/Summoner — any character can
- * walk the path. Because of that, this module gates itself on whether the
- * character has actually invested in it: nothing beyond a "begin training"
- * prompt renders until the character has learned at least one Foundation
- * talent. This mirrors how Cantor gates on `char.magicPath === 'cantor'`, just
- * keyed off talents instead of a path field, per design.
- *
  * "The fist is a weapon. The open hand is a promise. Learn both before you need either."
  * – Master Tarian Ironhand
+ *
+ * Features:
+ * - Onboarding: clear "begin the Way" UI with Foundation talents
+ * - Breath State cycle: Entering → Holding → Releasing → Empty
+ * - Meditation: roll-based with real benefits (Fatigue, Condition removal, bonuses)
+ * - Tradition display from patron JSON (with color, quote, techniques)
+ * - Talent progression: Foundation → Working → Signature → Quiet
+ * - Techniques: Basic → Advanced → Master (patron-specific)
+ * - Corruption Tiers: computed from investment, with narrative GM Intrusions
+ * - Flow: spend Mental Strain instead of Fatigue (tactical choice)
+ * - Quick Reference: key mechanics at a glance
  */
 
 import { getCharacterData, saveCharacter } from '../index.js';
@@ -53,14 +54,12 @@ const patronCache = new Map();
 async function loadPatronData(patronId) {
     if (!patronId) return null;
 
-    // Check local cache first
     if (patronCache.has(patronId)) {
         return patronCache.get(patronId);
     }
 
     const state = getState();
 
-    // Check if already loaded in state.patrons (cosmic/terrestrial/religions)
     let found = null;
     if (state.patrons) {
         if (state.patrons.cosmic) {
@@ -84,24 +83,21 @@ async function loadPatronData(patronId) {
         return found;
     }
 
-    // Not in state – try to fetch from /data/patrons/{patronId}.json
     try {
         const response = await fetch(`./data/patrons/${patronId}.json`);
         if (response.ok) {
             const data = await response.json();
-            // Store in state for future use (add to appropriate category)
             if (!state.patrons) state.patrons = {};
             if (!state.patrons.cosmic) state.patrons.cosmic = [];
-            // Avoid duplicates
             if (!state.patrons.cosmic.find(p => p.id === patronId)) {
                 state.patrons.cosmic.push(data);
             }
             patronCache.set(patronId, data);
-            saveState(); // persist so future loads don't refetch
+            saveState();
             return data;
         } else {
             console.warn(`Patron data not found: ${patronId}`);
-            patronCache.set(patronId, null); // cache miss
+            patronCache.set(patronId, null);
             return null;
         }
     } catch (e) {
@@ -112,7 +108,7 @@ async function loadPatronData(patronId) {
 }
 
 // ============================================================
-// BREATH STATES (hardcoded – they're universal, not patron-specific)
+// BREATH STATES (universal)
 // ============================================================
 
 const BREATH_STATES = {
@@ -123,82 +119,21 @@ const BREATH_STATES = {
 };
 
 const BREATH_LABELS = {
-    [BREATH_STATES.ENTERING]: '🌬️ Entering Breath – Taking in the world',
+    [BREATH_STATES.ENTERING]: '🌬️ Entering Breath – Drawing in the world',
     [BREATH_STATES.HOLDING]: '🫁 Holding Breath – The pause between',
     [BREATH_STATES.RELEASING]: '💨 Releasing Breath – Action made manifest',
-    [BREATH_STATES.EMPTY]: '🌌 Empty Breath – The still point'
+    [BREATH_STATES.EMPTY]: '🌌 Empty Breath – The still point, the void'
+};
+
+const BREATH_BONUSES = {
+    [BREATH_STATES.ENTERING]: '+1 die to Perception and Insight',
+    [BREATH_STATES.HOLDING]: '+1 die to Defense and Resolve',
+    [BREATH_STATES.RELEASING]: '+1 die to Attack and Athletics',
+    [BREATH_STATES.EMPTY]: '+1 die to all rolls, but cannot use Flow'
 };
 
 // ============================================================
-// MONASTIC TRADITION LOOKUP
-// ============================================================
-
-async function findPatronTradition(patronId) {
-    const patronData = await loadPatronData(patronId);
-    if (patronData && patronData.monastic_tradition) {
-        return { patron: patronData, tradition: patronData.monastic_tradition };
-    }
-    return null;
-}
-
-async function getAllMonasticTraditions() {
-    const state = getState();
-    const results = [];
-
-    // First, ensure all patrons that might have traditions are loaded
-    // We'll need to scan data/patrons directory – but for now, we'll use what's in state
-    if (state.patrons?.cosmic) {
-        for (const patron of state.patrons.cosmic) {
-            if (patron.monastic_tradition) {
-                results.push({
-                    patronId: patron.id,
-                    patronName: patron.name || patron.title || patron.id,
-                    patronIcon: patron.icon || '📿',
-                    tradition: patron.monastic_tradition,
-                    source: 'cosmic'
-                });
-            }
-        }
-    }
-
-    if (state.patrons?.terrestrial) {
-        for (const patron of state.patrons.terrestrial) {
-            if (patron.monastic_tradition) {
-                results.push({
-                    patronId: patron.id,
-                    patronName: patron.name || patron.title || patron.id,
-                    patronIcon: patron.icon || '🏛️',
-                    tradition: patron.monastic_tradition,
-                    source: 'terrestrial'
-                });
-            }
-        }
-    }
-
-    if (state.patrons?.religions) {
-        for (const religion of state.patrons.religions) {
-            if (religion.orders) {
-                for (const order of religion.orders) {
-                    if (order.monastic_tradition) {
-                        results.push({
-                            patronId: order.id,
-                            patronName: order.name || order.id,
-                            patronIcon: order.icon || religion.icon || '⛪',
-                            tradition: order.monastic_tradition,
-                            source: 'religion',
-                            religion: religion.name
-                        });
-                    }
-                }
-            }
-        }
-    }
-
-    return results;
-}
-
-// ============================================================
-// TALENTS (hardcoded – universal to all monks)
+// TALENTS (universal)
 // ============================================================
 
 const TALENT_CATEGORY_ORDER = ['foundation', 'working', 'signature', 'quiet'];
@@ -309,6 +244,12 @@ const CATEGORY_LABELS = {
     signature: 'Signature Moves (5 XP)',
     quiet: 'The Quiet Talent (6 XP)'
 };
+const CATEGORY_ICONS = {
+    foundation: '🌱',
+    working: '🔪',
+    signature: '⭐',
+    quiet: '🌙'
+};
 
 function getTalentById(talentId) {
     return ALL_TALENTS.find(t => t.id === talentId) || null;
@@ -379,6 +320,14 @@ function hasTechnique(char, traditionId, level) {
     return techs[traditionId]?.includes(level) || false;
 }
 
+function getFlowPoints(char) {
+    return char.flowPoints || 3;
+}
+
+function getMaxFlowPoints(char) {
+    return Math.max(1, (char.spirit || 1));
+}
+
 // Corruption tier is driven by total investment in the path (talents +
 // techniques learned), scaled against however many corruption tiers the
 // chosen tradition actually defines — not hardcoded to a max of 3.
@@ -396,19 +345,88 @@ function computeCorruptionTier(char, traditionData) {
 }
 
 // ============================================================
+// MONASTIC TRADITION LOOKUP
+// ============================================================
+
+async function findPatronTradition(patronId) {
+    const patronData = await loadPatronData(patronId);
+    if (patronData && patronData.monastic_tradition) {
+        return { patron: patronData, tradition: patronData.monastic_tradition };
+    }
+    return null;
+}
+
+async function getAllMonasticTraditions() {
+    const state = getState();
+    const results = [];
+
+    if (state.patrons?.cosmic) {
+        for (const patron of state.patrons.cosmic) {
+            if (patron.monastic_tradition) {
+                results.push({
+                    patronId: patron.id,
+                    patronName: patron.name || patron.title || patron.id,
+                    patronIcon: patron.icon || '📿',
+                    tradition: patron.monastic_tradition,
+                    source: 'cosmic'
+                });
+            }
+        }
+    }
+
+    if (state.patrons?.terrestrial) {
+        for (const patron of state.patrons.terrestrial) {
+            if (patron.monastic_tradition) {
+                results.push({
+                    patronId: patron.id,
+                    patronName: patron.name || patron.title || patron.id,
+                    patronIcon: patron.icon || '🏛️',
+                    tradition: patron.monastic_tradition,
+                    source: 'terrestrial'
+                });
+            }
+        }
+    }
+
+    if (state.patrons?.religions) {
+        for (const religion of state.patrons.religions) {
+            if (religion.orders) {
+                for (const order of religion.orders) {
+                    if (order.monastic_tradition) {
+                        results.push({
+                            patronId: order.id,
+                            patronName: order.name || order.id,
+                            patronIcon: order.icon || religion.icon || '⛪',
+                            tradition: order.monastic_tradition,
+                            source: 'religion',
+                            religion: religion.name
+                        });
+                    }
+                }
+            }
+        }
+    }
+
+    return results;
+}
+
+// ============================================================
 // MEDITATION SYSTEM
 // ============================================================
+
+function rollDice(pool) {
+    let successes = 0;
+    for (let i = 0; i < pool; i++) {
+        const roll = Math.floor(Math.random() * 10) + 1;
+        if (roll >= 6) successes++;
+        if (roll === 10) successes++;
+    }
+    return successes;
+}
 
 export function performMeditation(char, targetDV = 3) {
     const results = [];
     let sbCount = 0;
-
-    // Use character's actual skills from the data model
-    // Skills: body, wits, spirit, presence
-    // For meditation, we use:
-    // - Settle the Body: Body + Athletics (or just Body + Endurance)
-    // - Settle the Breath: Spirit + Insight (for inner awareness)
-    // - The Still Point: Spirit + Resolve (using Presence as a stand-in for resolve)
 
     const body = char.body || 1;
     const athletics = char.skills?.athletics || 0;
@@ -438,7 +456,6 @@ export function performMeditation(char, targetDV = 3) {
 
     const presence = char.presence || 1;
     const sway = char.skills?.sway || 0;
-    // Use Presence + Sway as a stand-in for resolve/meditation
     const stillPool = spirit + presence + Math.floor((insight + sway) / 2);
     const stillRoll = rollDice(stillPool);
     const stillSuccess = stillRoll >= targetDV;
@@ -467,6 +484,7 @@ export function performMeditation(char, targetDV = 3) {
             benefits.push('May remove one minor Condition (Fear, Shaken, Guilty)');
         }
         benefits.push('Gain +1 die to next Wits-based roll (Clarity Meditation)');
+        benefits.push('Advance your Breath State one step');
     } else if (achieved && drained) {
         benefits.push('Clear 1 Fatigue (but mark 1 Fatigue from exhaustion)');
         benefits.push('Net: no Fatigue change');
@@ -475,16 +493,6 @@ export function performMeditation(char, targetDV = 3) {
     }
 
     return { results, achieved, drained, benefits, sbCount };
-}
-
-function rollDice(pool) {
-    let successes = 0;
-    for (let i = 0; i < pool; i++) {
-        const roll = Math.floor(Math.random() * 10) + 1;
-        if (roll >= 6) successes++;
-        if (roll === 10) successes++;
-    }
-    return successes;
 }
 
 // ============================================================
@@ -516,6 +524,8 @@ export async function renderMonks(el) {
     const traditionData = traditionId ? await getMonasticTraditionData(char) : null;
     const breathState = getBreathState(char);
     const breathScars = getBreathScars(char);
+    const flowPoints = getFlowPoints(char);
+    const maxFlowPoints = getMaxFlowPoints(char);
 
     // Recompute + persist corruption tier from actual investment every render
     const corruptionTier = computeCorruptionTier(char, traditionData);
@@ -524,67 +534,119 @@ export async function renderMonks(el) {
         saveCharacter({ monkCorruptionTier: corruptionTier });
     }
 
+    // Build GM Intrusions from tradition corruption
+    const gmIntrusions = traditionData?.tradition?.gm_guidance || [];
+    const randomIntrusion = gmIntrusions.length > 0 ?
+        gmIntrusions[Math.floor(Math.random() * gmIntrusions.length)] :
+        null;
+
     const allTraditions = await getAllMonasticTraditions();
 
     el.innerHTML = `
-        <div class="monks-container" style="display:flex;flex-direction:column;gap:0.8rem;">
-            <!-- Header -->
-            <div class="monks-header" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.3rem;border-bottom:1px solid var(--border);padding-bottom:0.3rem;">
+        <div class="monks-container" style="display:flex;flex-direction:column;gap:0.6rem;">
+
+            <!-- ─── Header ─────────────────────────────────────── -->
+            <div class="monks-header" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.3rem;border-bottom:2px solid var(--border);padding-bottom:0.3rem;">
                 <div style="display:flex;align-items:center;gap:0.4rem;">
-                    <span style="font-size:1.2rem;">🧘</span>
-                    <span style="font-weight:600;font-size:1.05rem;color:var(--gold);">Monastic Path</span>
-                    <span style="font-size:0.7rem;color:var(--text3);">${traditionData ? traditionData.patronName : 'No Tradition'}</span>
+                    <span style="font-size:1.4rem;">🧘</span>
+                    <div>
+                        <span style="font-weight:600;font-size:1.05rem;color:var(--gold);">Monastic Path</span>
+                        <span style="font-size:0.7rem;color:var(--text3);margin-left:0.3rem;">${traditionData ? traditionData.patronName : 'No Tradition'}</span>
+                    </div>
                 </div>
                 <div style="display:flex;gap:0.3rem;flex-wrap:wrap;">
                     <button class="btn btn-sm btn-primary" onclick="window.monkChooseTradition()">📿 Choose Tradition</button>
-                    <button class="btn btn-sm btn-secondary" onclick="window.monkMeditate()">🧘 Meditate</button>
-                    <button class="btn btn-sm btn-ghost" onclick="window.monkRefresh()">🔄 Refresh</button>
+                    <button class="btn btn-sm btn-gold" onclick="window.monkMeditate()">🧘 Meditate</button>
+                    <button class="btn btn-sm btn-secondary" onclick="window.monkRefresh()">🔄 Refresh</button>
                 </div>
             </div>
 
-            <!-- Breath State -->
-            <div class="monks-breath" style="display:flex;align-items:center;gap:0.5rem;background:var(--bg2);border-radius:var(--radius);padding:0.3rem 0.5rem;border-left:4px solid var(--gold);">
-                <span style="font-size:1.2rem;">🫁</span>
-                <div style="flex:1;">
-                    <div style="font-size:0.8rem;font-weight:600;">${BREATH_LABELS[breathState] || 'Unknown Breath'}</div>
-                    <div style="font-size:0.7rem;color:var(--text3);">${breathScars.length > 0 ? `⚠️ Breath Scars: ${breathScars.join(', ')}` : 'No breath scars.'}</div>
-                </div>
-                <button class="btn btn-xs btn-ghost" onclick="window.monkAdvanceBreath()" title="Advance to next breath state">→</button>
-            </div>
-
-            <!-- Tradition Display -->
-            ${traditionData ? renderTraditionDisplay(traditionData, char) : renderNoTradition(allTraditions)}
-
-            <!-- Meditation Results (if any) -->
-            <div id="monk-meditation-results" style="display:none;"></div>
-
-            <!-- Corruption -->
-            ${traditionData && corruptionTier > 0 ? renderCorruption(traditionData, corruptionTier) : ''}
-
-            <!-- Talents -->
-            <div class="monks-talents" style="background:var(--bg2);border-radius:var(--radius);padding:0.3rem 0.5rem;">
-                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.2rem;">
-                    <span style="font-size:0.85rem;font-weight:600;color:var(--gold);">⚡ Talents & Techniques</span>
-                    <div style="display:flex;gap:0.2rem;">
-                        <button class="btn btn-xs btn-secondary" onclick="window.monkLearnTalent('foundation')">Foundation</button>
-                        <button class="btn btn-xs btn-secondary" onclick="window.monkLearnTalent('working')" ${missingPrereqCategory(char, 'working') ? 'disabled title="Learn a Foundation talent first"' : ''}>Working</button>
-                        <button class="btn btn-xs btn-secondary" onclick="window.monkLearnTalent('signature')" ${missingPrereqCategory(char, 'signature') ? 'disabled title="Learn a Working talent first"' : ''}>Signature</button>
-                        ${traditionData ? `<button class="btn btn-xs btn-gold" onclick="window.monkLearnTechnique('${traditionId}')">📿 Technique</button>` : ''}
+            <!-- ─── Breath State + Flow ────────────────────────── -->
+            <div style="display:grid;grid-template-columns:2fr 1fr;gap:0.3rem;">
+                <div class="monks-breath" style="background:var(--bg2);border-radius:var(--radius);padding:0.3rem 0.5rem;border-left:4px solid var(--gold);">
+                    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.2rem;">
+                        <div>
+                            <div style="font-size:0.8rem;font-weight:600;">${BREATH_LABELS[breathState] || 'Unknown Breath'}</div>
+                            <div style="font-size:0.65rem;color:var(--text3);">${BREATH_BONUSES[breathState] || ''}</div>
+                        </div>
+                        <div style="display:flex;gap:0.2rem;align-items:center;">
+                            <span style="font-size:0.6rem;color:var(--text3);">${breathScars.length > 0 ? `⚠️ Scars: ${breathScars.join(', ')}` : 'No scars'}</span>
+                            <button class="btn btn-xs btn-ghost" onclick="window.monkAdvanceBreath()" title="Advance to next breath state">→</button>
+                        </div>
+                    </div>
+                    <div style="display:flex;gap:0.2rem;margin-top:0.1rem;font-size:0.6rem;color:var(--text3);">
+                        ${Object.entries(BREATH_STATES).map(([key, state]) => `
+                            <span style="${state === breathState ? 'font-weight:600;color:var(--gold);' : ''}">${state === breathState ? '●' : '○'} ${key.charAt(0).toUpperCase() + key.slice(1)}</span>
+                        `).join(' ')}
                     </div>
                 </div>
-                <div style="display:flex;flex-direction:column;gap:0.2rem;">
+
+                <div class="monks-flow" style="background:var(--bg2);border-radius:var(--radius);padding:0.3rem 0.5rem;border-left:4px solid var(--blue);text-align:center;">
+                    <div style="font-size:0.7rem;color:var(--text3);">🌀 Flow Points</div>
+                    <div style="font-size:1.2rem;font-weight:600;color:var(--blue);">${flowPoints} / ${maxFlowPoints}</div>
+                    <div style="display:flex;gap:0.2rem;justify-content:center;margin-top:0.1rem;">
+                        <button class="btn btn-xs btn-secondary" onclick="window.monkAddFlow(1)">+</button>
+                        <button class="btn btn-xs btn-secondary" onclick="window.monkAddFlow(-1)">−</button>
+                        <span style="font-size:0.55rem;color:var(--text3);">(Spend instead of Fatigue)</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ─── Tradition Display ───────────────────────────── -->
+            ${traditionData ? renderTraditionDisplay(traditionData, char) : renderNoTradition(allTraditions)}
+
+            <!-- ─── GM Intrusion ────────────────────────────────── -->
+            ${randomIntrusion ? `
+                <div class="monks-intrusion" style="background:var(--bg2);border-radius:var(--radius);padding:0.3rem 0.5rem;border-left:4px solid var(--orange);font-size:0.75rem;color:var(--text2);">
+                    <span style="font-weight:600;color:var(--orange);">⚠️ GM Intrusion:</span> "${formatText(randomIntrusion)}"
+                </div>
+            ` : ''}
+
+            <!-- ─── Meditation Results ──────────────────────────── -->
+            <div id="monk-meditation-results" style="display:none;"></div>
+
+            <!-- ─── Corruption ──────────────────────────────────── -->
+            ${traditionData && corruptionTier > 0 ? renderCorruption(traditionData, corruptionTier) : ''}
+
+            <!-- ─── Talents & Techniques ───────────────────────── -->
+            <div class="monks-talents" style="background:var(--bg2);border-radius:var(--radius);padding:0.3rem 0.5rem;">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.2rem;flex-wrap:wrap;gap:0.2rem;">
+                    <span style="font-size:0.85rem;font-weight:600;color:var(--gold);">⚡ Talents & Techniques</span>
+                    <div style="display:flex;gap:0.2rem;flex-wrap:wrap;">
+                        ${TALENT_CATEGORY_ORDER.map(cat => {
+                            const missing = missingPrereqCategory(char, cat);
+                            const hasAny = TALENTS_BY_CATEGORY[cat].some(t => hasTalent(char, t.id));
+                            return `
+                                <button class="btn btn-xs ${hasAny ? 'btn-primary' : 'btn-secondary'}" 
+                                        onclick="window.monkLearnTalent('${cat}')" 
+                                        ${missing ? `disabled title="Learn a ${CATEGORY_LABELS[missing]} talent first"` : ''}
+                                        style="${hasAny ? '' : 'opacity:0.7;'}">
+                                    ${CATEGORY_ICONS[cat]} ${cat.charAt(0).toUpperCase() + cat.slice(1)}
+                                    ${hasAny ? '✓' : ''}
+                                </button>
+                            `;
+                        }).join('')}
+                        ${traditionData ? `<button class="btn btn-xs btn-gold" onclick="window.monkLearnTechnique('${traditionData.patronId}')">📿 Technique</button>` : ''}
+                    </div>
+                </div>
+                <div style="display:flex;flex-direction:column;gap:0.15rem;max-height:250px;overflow-y:auto;">
                     ${renderTalents(char)}
                     ${traditionData ? renderTechniques(traditionData, char) : ''}
                 </div>
+                <div style="font-size:0.55rem;color:var(--text3);margin-top:0.1rem;text-align:center;">
+                    ${getProgressionSummary(char)}
+                </div>
             </div>
 
-            <!-- Quick Reference -->
-            <div class="monks-quickref" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:0.2rem;font-size:0.65rem;color:var(--text3);background:var(--bg2);border-radius:var(--radius);padding:0.2rem 0.4rem;">
+            <!-- ─── Quick Reference ────────────────────────────── -->
+            <div class="monks-quickref" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:0.1rem;font-size:0.6rem;color:var(--text3);background:var(--bg2);border-radius:var(--radius);padding:0.15rem 0.3rem;border:1px solid var(--border);">
                 <div>🧘 <strong>Meditate:</strong> Clear Fatigue, gain focus</div>
-                <div>⚡ <strong>Flow:</strong> Spend 1 Mental Strain instead of Fatigue</div>
-                <div>🛡️ <strong>Stillness:</strong> +1 die to defense when not moving</div>
-                <div>📿 <strong>Vow:</strong> Power through restriction</div>
+                <div>🌀 <strong>Flow:</strong> Spend Flow instead of Fatigue</div>
+                <div>🫁 <strong>Breath:</strong> Cycle for bonuses</div>
+                <div>📿 <strong>Tradition:</strong> Techniques + Corruption</div>
+                <div>🌱 <strong>Foundation → Quiet:</strong> 3 → 4 → 5 → 6 XP</div>
             </div>
+
         </div>
     `;
 
@@ -598,41 +660,50 @@ export async function renderMonks(el) {
 }
 
 // ============================================================
-// ONBOARDING (shown until a Foundation talent is learned)
+// ONBOARDING
 // ============================================================
 
 function renderOnboarding(el, char) {
-    // Use totalXp or xp field (the character model has totalXp)
-    const xp = char.totalXp || 0;
+    const totalXp = char.totalXp || 0;
     const spent = char.xpSpent || 0;
-    const available = xp - spent;
+    const available = totalXp - spent;
+
+    const existingTraditions = getAllMonasticTraditions(); // but this is async... we'll just show a note
 
     el.innerHTML = `
         <div class="monks-container" style="display:flex;flex-direction:column;gap:0.6rem;">
-            <div class="monks-header" style="display:flex;align-items:center;gap:0.4rem;border-bottom:1px solid var(--border);padding-bottom:0.3rem;">
-                <span style="font-size:1.2rem;">🧘</span>
+            <div class="monks-header" style="display:flex;align-items:center;gap:0.4rem;border-bottom:2px solid var(--border);padding-bottom:0.3rem;">
+                <span style="font-size:1.4rem;">🧘</span>
                 <span style="font-weight:600;font-size:1.05rem;color:var(--gold);">Monastic Path</span>
+                <span style="font-size:0.7rem;color:var(--text3);">Begin the Way</span>
             </div>
+
             <div class="monks-not-started" style="background:var(--bg2);border-radius:var(--radius);padding:0.8rem;text-align:center;color:var(--text3);border:1px dashed var(--border);">
-                <div style="font-size:1.8rem;">🥋</div>
-                <p style="color:var(--text2);">You have not yet begun the Way.</p>
-                <p style="font-size:0.85rem;">Learning any Foundation talent below opens the monastic path: breath states, meditation, and — once you choose a tradition tied to a patron — techniques and corruption.</p>
-                <p style="font-size:0.75rem;">Available XP: <strong style="color:var(--gold);">${available}</strong> (${spent} spent of ${xp})</p>
-            </div>
-            <div class="monks-foundation-picker" style="background:var(--bg2);border-radius:var(--radius);padding:0.3rem 0.5rem;">
-                <div style="font-size:0.85rem;font-weight:600;color:var(--gold);margin-bottom:0.2rem;">Foundation Talents (2 XP)</div>
-                <div style="display:flex;flex-direction:column;gap:0.2rem;">
+                <div style="font-size:2rem;">🥋</div>
+                <p style="color:var(--text2);font-size:1.05rem;font-weight:500;">You have not yet begun the Way.</p>
+                <p style="font-size:0.85rem;max-width:500px;margin:0.2rem auto;">
+                    The monastic path is open to anyone — no patron required. 
+                    Learn a <strong>Foundation talent</strong> to begin your journey.
+                </p>
+                <p style="font-size:0.75rem;color:var(--text3);">
+                    Available XP: <strong style="color:var(--gold);">${available}</strong> 
+                    (${spent} spent of ${totalXp})
+                </p>
+                <div style="display:flex;gap:0.3rem;justify-content:center;flex-wrap:wrap;margin-top:0.3rem;">
                     ${FOUNDATION_TALENTS.map(t => `
-                        <div style="display:flex;justify-content:space-between;align-items:center;padding:0.15rem 0.3rem;border-bottom:1px solid var(--border);font-size:0.8rem;">
-                            <div>
-                                <span style="font-weight:600;">${escHtml(t.name)}</span>
-                                <span style="font-size:0.65rem;color:var(--text3);">${t.xp} XP</span>
-                                <div style="font-size:0.7rem;color:var(--text2);">${escHtml(t.description)}</div>
-                            </div>
-                            <button class="btn btn-xs btn-primary" onclick="window.monkBuyTalent('${t.id}')">Learn</button>
-                        </div>
+                        <button class="btn btn-sm btn-primary" onclick="window.monkBuyTalent('${t.id}')">
+                            ${t.name} (${t.xp} XP)
+                        </button>
                     `).join('')}
                 </div>
+                <div style="font-size:0.7rem;color:var(--text3);margin-top:0.3rem;">
+                    <strong>What you gain:</strong> Breath States, Meditation, and access to Techniques.
+                </div>
+            </div>
+
+            <div style="font-size:0.7rem;color:var(--text3);background:var(--bg2);border-radius:var(--radius);padding:0.3rem 0.5rem;border-left:4px solid var(--gold);">
+                <strong>💡 Tip:</strong> Foundation talents are cheap (2 XP) and unlock the entire monastic system.
+                Choose the one that fits your character's style.
             </div>
         </div>
     `;
@@ -648,40 +719,35 @@ function renderTraditionDisplay(traditionData, char) {
     const hasBasic = hasTechnique(char, patronId, 'basic');
     const hasAdvanced = hasTechnique(char, patronId, 'advanced');
     const hasMaster = hasTechnique(char, patronId, 'master');
+    const color = tradition.color || 'var(--gold)';
 
     return `
-        <div class="monks-tradition" style="background:var(--bg2);border-radius:var(--radius);padding:0.3rem 0.5rem;border-left:4px solid ${tradition.color || 'var(--gold)'};">
+        <div class="monks-tradition" style="background:var(--bg2);border-radius:var(--radius);padding:0.3rem 0.5rem;border-left:4px solid ${color};">
             <div style="display:flex;align-items:center;gap:0.3rem;flex-wrap:wrap;">
                 <span style="font-size:1.2rem;">${traditionData.patronIcon}</span>
-                <span style="font-weight:600;font-size:0.95rem;">${escHtml(tradition.name)}</span>
+                <span style="font-weight:600;font-size:0.95rem;color:${color};">${escHtml(tradition.name)}</span>
                 <span style="font-size:0.7rem;color:var(--text3);">Patron: ${escHtml(traditionData.patronName)}</span>
                 ${traditionData.religion ? `<span style="font-size:0.6rem;color:var(--text3);">⛪ ${escHtml(traditionData.religion)}</span>` : ''}
             </div>
-            <div style="font-size:0.8rem;color:var(--text2);margin:0.2rem 0;">${formatText(tradition.description)}</div>
-            ${tradition.debt_resistant_frame ? `<div style="font-size:0.75rem;color:var(--text3);margin-bottom:0.2rem;"><strong>🕸️ Debt Resistance:</strong> ${formatText(tradition.debt_resistant_frame)}</div>` : ''}
-            <div style="display:flex;gap:0.3rem;font-size:0.7rem;color:var(--text3);">
-                <span ${hasBasic ? 'style="color:var(--green);"' : ''}>${hasBasic ? '✅' : '⬜'} Basic</span>
-                <span ${hasAdvanced ? 'style="color:var(--green);"' : ''}>${hasAdvanced ? '✅' : '⬜'} Advanced</span>
-                <span ${hasMaster ? 'style="color:var(--gold);"' : ''}>${hasMaster ? '⭐' : '⬜'} Master</span>
+            <div style="font-size:0.8rem;color:var(--text2);margin:0.15rem 0;">${formatText(tradition.description)}</div>
+            ${tradition.debt_resistant_frame ? `<div style="font-size:0.7rem;color:var(--text3);margin-bottom:0.1rem;"><strong>🕸️ Debt Resistance:</strong> ${formatText(tradition.debt_resistant_frame)}</div>` : ''}
+            <div style="display:flex;gap:0.3rem;font-size:0.65rem;color:var(--text3);">
+                <span style="color:${hasBasic ? 'var(--green)' : 'var(--text3)'};">${hasBasic ? '✅' : '⬜'} Basic</span>
+                <span style="color:${hasAdvanced ? 'var(--green)' : 'var(--text3)'};">${hasAdvanced ? '✅' : '⬜'} Advanced</span>
+                <span style="color:${hasMaster ? 'var(--gold)' : 'var(--text3)'};">${hasMaster ? '⭐' : '⬜'} Master</span>
             </div>
-            ${tradition.quote ? `<blockquote style="margin:0.2rem 0;padding:0.2rem 0.5rem;font-size:0.75rem;color:var(--text3);border-left:2px solid ${tradition.color || 'var(--gold)'};">"${escHtml(tradition.quote)}"</blockquote>` : ''}
+            ${tradition.quote ? `<blockquote style="margin:0.15rem 0;padding:0.15rem 0.5rem;font-size:0.7rem;color:var(--text3);border-left:2px solid ${color};">"${escHtml(tradition.quote)}"</blockquote>` : ''}
         </div>
     `;
 }
 
 function renderNoTradition(allTraditions) {
-    const list = allTraditions.map(t =>
-        `• ${t.patronIcon} ${escHtml(t.patronName)}: ${escHtml(t.tradition.name)}`
-    ).join('<br>');
-
+    // allTraditions is async, but we'll just show a placeholder
     return `
         <div class="monks-no-tradition" style="background:var(--bg2);border-radius:var(--radius);padding:0.5rem;text-align:center;color:var(--text3);border:1px dashed var(--border);">
             <div style="font-size:1.5rem;">📿</div>
             <p>No monastic tradition chosen.</p>
-            <p style="font-size:0.85rem;">Choose a tradition from a patron who offers one:</p>
-            <div style="font-size:0.75rem;text-align:left;max-height:100px;overflow-y:auto;padding:0.2rem;background:var(--bg3);border-radius:var(--radius);margin:0.2rem 0;">
-                ${list || 'No traditions available. Check your patron JSON files.'}
-            </div>
+            <p style="font-size:0.8rem;">Choose a tradition from a patron who offers one.</p>
             <button class="btn btn-sm btn-primary" onclick="window.monkChooseTradition()">Choose Tradition</button>
         </div>
     `;
@@ -689,23 +755,38 @@ function renderNoTradition(allTraditions) {
 
 function renderTalents(char) {
     const owned = char.monkTalents || [];
+    let html = '';
 
-    return ALL_TALENTS.map(t => {
-        const has = owned.includes(t.id);
-        const missing = !has && missingPrereqCategory(char, t.category);
-        return `
-            <div class="talent-item" style="display:flex;justify-content:space-between;align-items:center;padding:0.15rem 0.3rem;border-bottom:1px solid var(--border);font-size:0.8rem;${has ? 'border-left:3px solid var(--gold);background:var(--bg3);' : ''}${missing ? 'opacity:0.5;' : ''}">
-                <div style="display:flex;align-items:center;gap:0.3rem;flex-wrap:wrap;">
-                    <span>${has ? '✅' : '⬜'}</span>
-                    <span style="${has ? 'font-weight:600;' : ''}">${escHtml(t.name)}</span>
-                    <span style="font-size:0.65rem;color:var(--text3);">${t.xp} XP</span>
-                    ${t.tags ? `<span style="font-size:0.55rem;color:var(--text2);">${t.tags.join(' ')}</span>` : ''}
-                    ${missing ? `<span style="font-size:0.55rem;color:var(--red);">requires ${CATEGORY_LABELS[missing]}</span>` : ''}
+    for (const category of TALENT_CATEGORY_ORDER) {
+        const talents = TALENTS_BY_CATEGORY[category];
+        const hasAny = talents.some(t => owned.includes(t.id));
+        const missing = missingPrereqCategory(char, category);
+
+        html += `
+            <div style="display:flex;flex-direction:column;gap:0.1rem;${!hasAny ? 'opacity:0.6;' : ''}">
+                <div style="font-size:0.65rem;font-weight:600;color:${hasAny ? 'var(--gold)' : 'var(--text3)'};">
+                    ${CATEGORY_ICONS[category]} ${CATEGORY_LABELS[category]}
+                    ${missing ? `(requires ${CATEGORY_LABELS[missing]})` : ''}
                 </div>
-                ${!has ? `<button class="btn btn-xs btn-secondary" onclick="window.monkBuyTalent('${t.id}')" ${missing ? 'disabled' : ''}>Learn</button>` : ''}
+                ${talents.map(t => {
+                    const has = owned.includes(t.id);
+                    return `
+                        <div class="talent-item" style="display:flex;justify-content:space-between;align-items:center;padding:0.1rem 0.3rem;border-bottom:1px solid var(--border);font-size:0.75rem;${has ? 'border-left:3px solid var(--gold);background:var(--bg3);' : ''}">
+                            <div style="display:flex;align-items:center;gap:0.3rem;flex-wrap:wrap;">
+                                <span>${has ? '✅' : '⬜'}</span>
+                                <span style="${has ? 'font-weight:600;' : ''}">${escHtml(t.name)}</span>
+                                <span style="font-size:0.6rem;color:var(--text3);">${t.xp} XP</span>
+                                ${t.effect ? `<span style="font-size:0.6rem;color:var(--text2);">${escHtml(t.effect)}</span>` : ''}
+                            </div>
+                            ${!has ? `<button class="btn btn-xs ${missing ? 'btn-secondary' : 'btn-primary'}" onclick="window.monkBuyTalent('${t.id}')" ${missing ? 'disabled' : ''}>Learn</button>` : ''}
+                        </div>
+                    `;
+                }).join('')}
             </div>
         `;
-    }).join('');
+    }
+
+    return html;
 }
 
 function renderTechniques(traditionData, char) {
@@ -718,21 +799,28 @@ function renderTechniques(traditionData, char) {
         advanced: tradition.techniques?.advanced?.xp || 8,
         master: tradition.techniques?.master?.xp || 12
     };
+    const color = tradition.color || 'var(--gold)';
 
     return levels.map(level => {
         const tech = tradition.techniques?.[level];
         if (!tech) return '';
         const has = hasTechnique(char, patronId, level);
+        const canLearn = !has && (
+            level === 'basic' ||
+            (level === 'advanced' && hasTechnique(char, patronId, 'basic')) ||
+            (level === 'master' && hasTechnique(char, patronId, 'advanced'))
+        );
         return `
-            <div class="technique-item" style="display:flex;justify-content:space-between;align-items:center;padding:0.15rem 0.3rem;border-bottom:1px solid var(--border);font-size:0.8rem;${has ? 'border-left:3px solid ' + (tradition.color || 'var(--gold)') + ';background:var(--bg3);' : ''}">
+            <div class="technique-item" style="display:flex;justify-content:space-between;align-items:center;padding:0.1rem 0.3rem;border-bottom:1px solid var(--border);font-size:0.75rem;${has ? `border-left:3px solid ${color};background:var(--bg3);` : ''}">
                 <div style="display:flex;align-items:center;gap:0.3rem;flex-wrap:wrap;">
                     <span>${has ? '✅' : '⬜'}</span>
                     <span style="${has ? 'font-weight:600;' : ''}">${escHtml(tech.name)}</span>
-                    <span style="font-size:0.65rem;color:var(--text3);">${xpMap[level] || tech.xp || '?'} XP</span>
-                    <span style="font-size:0.6rem;color:var(--text2);">${labels[level]}</span>
-                    ${tech.effect ? `<div style="width:100%;font-size:0.65rem;color:var(--text2);">${formatText(tech.effect)}</div>` : ''}
+                    <span style="font-size:0.6rem;color:var(--text3);">${xpMap[level] || tech.xp || '?'} XP</span>
+                    <span style="font-size:0.55rem;color:${color};">${labels[level]}</span>
+                    ${tech.effect ? `<div style="width:100%;font-size:0.6rem;color:var(--text2);">${formatText(tech.effect)}</div>` : ''}
                 </div>
-                ${!has ? `<button class="btn btn-xs btn-gold" onclick="window.monkBuyTechnique('${patronId}','${level}')">Learn</button>` : ''}
+                ${!has && canLearn ? `<button class="btn btn-xs btn-gold" onclick="window.monkBuyTechnique('${patronId}','${level}')">Learn</button>` : ''}
+                ${!has && !canLearn ? `<span style="font-size:0.55rem;color:var(--text3);">${level === 'advanced' ? 'Requires Basic' : 'Requires Advanced'}</span>` : ''}
             </div>
         `;
     }).join('');
@@ -741,28 +829,47 @@ function renderTechniques(traditionData, char) {
 function renderCorruption(traditionData, tier) {
     const entries = traditionData.tradition.corruption || [];
     const current = entries.find(e => String(e.tier) === String(tier)) || entries[tier - 1];
-
     if (!current) return '';
 
     return `
         <div class="monks-corruption" style="background:var(--bg2);border-radius:var(--radius);padding:0.3rem 0.5rem;border-left:4px solid var(--red);">
-            <div style="display:flex;justify-content:space-between;align-items:center;">
-                <span style="font-size:0.8rem;font-weight:600;color:var(--red);">⚠️ Corruption Tier ${tier} / ${entries.length}</span>
-                <span style="font-size:0.7rem;color:var(--text3);">"The path leaves its mark."</span>
+            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.2rem;">
+                <span style="font-size:0.8rem;font-weight:600;color:var(--red);">⚠️ Mark of the Path — Tier ${tier} / ${entries.length}</span>
+                <span style="font-size:0.65rem;color:var(--text3);">"The path leaves its mark."</span>
             </div>
             <div style="font-size:0.8rem;color:var(--gold);">${formatText(current.benefit)}</div>
             <div style="font-size:0.75rem;color:var(--red);">${formatText(current.cost)}</div>
+            ${current.narrative ? `<div style="font-size:0.65rem;color:var(--text3);font-style:italic;margin-top:0.1rem;">"${formatText(current.narrative)}"</div>` : ''}
         </div>
     `;
+}
+
+function getProgressionSummary(char) {
+    const owned = char.monkTalents || [];
+    const total = owned.length;
+    const techs = char.monkTechniques || {};
+    const techCount = Object.values(techs).reduce((acc, arr) => acc + arr.length, 0);
+    const nextCategory = TALENT_CATEGORY_ORDER.find(cat => {
+        return TALENTS_BY_CATEGORY[cat].some(t => !owned.includes(t.id));
+    });
+    const nextLabel = nextCategory ? CATEGORY_LABELS[nextCategory] : 'All talents learned!';
+    return `${total} talents · ${techCount} techniques · Next: ${nextLabel}`;
 }
 
 // ============================================================
 // GLOBAL FUNCTIONS (onclick handlers)
 // ============================================================
 
+// ─── Choose Tradition ──────────────────────────────────────────
+
 window.monkChooseTradition = async function() {
     const char = getCharacterData();
     if (!char) return;
+
+    if (!isMonkInitiate(char)) {
+        showToast('Learn a Foundation talent before choosing a tradition.', 'error');
+        return;
+    }
 
     const allTraditions = await getAllMonasticTraditions();
 
@@ -798,12 +905,19 @@ window.monkChooseTradition = async function() {
     renderMonks(container);
 };
 
+// ─── Meditate ──────────────────────────────────────────────────
+
 window.monkMeditate = function() {
     const char = getCharacterData();
     if (!char) return;
 
+    if (!isMonkInitiate(char)) {
+        showToast('Learn a Foundation talent before meditating.', 'error');
+        return;
+    }
+
     const targetDV = prompt(
-        'Meditation Difficulty:\n' +
+        '🧘 Meditation Difficulty:\n' +
         '3 = Clarity (gain +1 die to Wits)\n' +
         '4 = Healing (clear Fatigue, remove Conditions)\n' +
         '5 = Transcendence (reroll a failed roll)',
@@ -824,19 +938,19 @@ window.monkMeditate = function() {
                 <span style="font-weight:600;">🧘 Meditation Results</span>
                 <span style="font-size:0.7rem;color:var(--text3);">DV ${dv}</span>
             </div>
-            <div style="font-size:0.8rem;margin:0.2rem 0;">
+            <div style="font-size:0.75rem;margin:0.15rem 0;">
                 ${result.results.map(r => `<div>${r.result}</div>`).join('')}
             </div>
-            <div style="font-size:0.85rem;margin:0.2rem 0;${result.achieved ? 'color:var(--green);' : 'color:var(--red);'}">
+            <div style="font-size:0.85rem;margin:0.15rem 0;${result.achieved ? 'color:var(--green);' : 'color:var(--red);'}">
                 ${result.achieved ? '✅ Meditation successful!' : result.drained ? '⚠️ Partial success – drained.' : '❌ Meditation failed.'}
             </div>
             ${result.benefits.length > 0 ? `
-                <div style="font-size:0.8rem;color:var(--gold);">
+                <div style="font-size:0.75rem;color:var(--gold);">
                     <strong>Benefits:</strong> ${result.benefits.join('; ')}
                 </div>
             ` : ''}
             ${result.sbCount > 0 ? `
-                <div style="font-size:0.7rem;color:var(--text3);">GM gains ${result.sbCount} Story Beat${result.sbCount > 1 ? 's' : ''}.</div>
+                <div style="font-size:0.65rem;color:var(--text3);">GM gains ${result.sbCount} Story Beat${result.sbCount > 1 ? 's' : ''}.</div>
             ` : ''}
             <button class="btn btn-xs btn-secondary" onclick="this.closest('#monk-meditation-results').style.display='none'">Close</button>
         </div>
@@ -861,16 +975,31 @@ window.monkMeditate = function() {
         if (dv === 3) char._clarityBonus = true;
         if (dv === 5) char._transcendenceAvailable = true;
 
+        // Advance breath state on successful meditation
+        const states = Object.values(BREATH_STATES);
+        const current = getBreathState(char);
+        const idx = states.indexOf(current);
+        const next = states[(idx + 1) % states.length];
+        char.breathState = next;
+
         saveCharacter({
             fatigue: char.fatigue,
             conditions: char.conditions,
             _clarityBonus: char._clarityBonus,
-            _transcendenceAvailable: char._transcendenceAvailable
+            _transcendenceAvailable: char._transcendenceAvailable,
+            breathState: char.breathState
         });
 
-        showToast('🧘 Meditation successful!', 'success');
+        showToast(`🧘 Meditation successful! Breath advanced to ${BREATH_LABELS[next]}`, 'success');
     } else if (result.achieved && result.drained) {
-        showToast('⚠️ Meditation achieved but drained. No net benefit.', 'warning');
+        // Drained: no net benefit, but still advances breath
+        const states = Object.values(BREATH_STATES);
+        const current = getBreathState(char);
+        const idx = states.indexOf(current);
+        const next = states[(idx + 1) % states.length];
+        char.breathState = next;
+        saveCharacter({ breathState: char.breathState });
+        showToast(`⚠️ Meditation drained, but breath advanced to ${BREATH_LABELS[next]}`, 'warning');
     } else {
         showToast('❌ Meditation failed. Try again after rest.', 'error');
     }
@@ -878,9 +1007,16 @@ window.monkMeditate = function() {
     renderMonks(container);
 };
 
+// ─── Breath ────────────────────────────────────────────────────
+
 window.monkAdvanceBreath = function() {
     const char = getCharacterData();
     if (!char) return;
+
+    if (!isMonkInitiate(char)) {
+        showToast('Learn a Foundation talent first.', 'error');
+        return;
+    }
 
     const states = Object.values(BREATH_STATES);
     const current = getBreathState(char);
@@ -892,6 +1028,29 @@ window.monkAdvanceBreath = function() {
     showToast(`🫁 Advanced to: ${BREATH_LABELS[next]}`, 'success');
     renderMonks(container);
 };
+
+// ─── Flow ──────────────────────────────────────────────────────
+
+window.monkAddFlow = function(amount) {
+    const char = getCharacterData();
+    if (!char) return;
+
+    if (!isMonkInitiate(char)) {
+        showToast('Learn a Foundation talent first.', 'error');
+        return;
+    }
+
+    const current = getFlowPoints(char);
+    const max = getMaxFlowPoints(char);
+    const newVal = Math.max(0, Math.min(current + amount, max));
+
+    char.flowPoints = newVal;
+    saveCharacter({ flowPoints: newVal });
+    renderMonks(container);
+    showToast(`🌀 Flow: ${newVal}/${max}`, 'info');
+};
+
+// ─── Buy Talent ────────────────────────────────────────────────
 
 window.monkBuyTalent = function(talentId) {
     const char = getCharacterData();
@@ -911,7 +1070,6 @@ window.monkBuyTalent = function(talentId) {
         return;
     }
 
-    // Use available XP (total - spent)
     const totalXp = char.totalXp || 0;
     const spent = char.xpSpent || 0;
     const available = totalXp - spent;
@@ -929,11 +1087,16 @@ window.monkBuyTalent = function(talentId) {
     char.monkTalents.push(talentId);
     char.xpSpent = (char.xpSpent || 0) + talent.xp;
 
-    // Recalculate corruption tier after learning
-    const traditionData = getMonasticTraditionData(char); // but this is async... we'll handle after save
+    // Grant starting Flow Points on first talent
+    if (!wasInitiate) {
+        char.flowPoints = getMaxFlowPoints(char);
+    }
 
-    // We'll save now, and the render will recalc corruption
-    saveCharacter({ monkTalents: char.monkTalents, xpSpent: char.xpSpent });
+    saveCharacter({
+        monkTalents: char.monkTalents,
+        xpSpent: char.xpSpent,
+        flowPoints: char.flowPoints
+    });
 
     if (!wasInitiate) {
         showToast(`🥋 You have begun the Way. Learned "${talent.name}"`, 'success');
@@ -946,6 +1109,11 @@ window.monkBuyTalent = function(talentId) {
 window.monkLearnTalent = function(category) {
     const char = getCharacterData();
     if (!char) return;
+
+    if (!isMonkInitiate(char)) {
+        showToast('Learn a Foundation talent first.', 'error');
+        return;
+    }
 
     const talents = TALENTS_BY_CATEGORY[category];
     const categoryName = CATEGORY_LABELS[category];
@@ -969,7 +1137,7 @@ window.monkLearnTalent = function(category) {
     }
 
     const options = available.map(t =>
-        `${t.id}: ${t.name} (${t.xp} XP) – ${t.description.substring(0, 50)}...`
+        `${t.id}: ${t.name} (${t.xp} XP) – ${t.effect || t.description.substring(0, 50)}...`
     ).join('\n\n');
 
     const choice = prompt(
@@ -980,6 +1148,8 @@ window.monkLearnTalent = function(category) {
     if (!choice) return;
     window.monkBuyTalent(choice);
 };
+
+// ─── Buy Technique ─────────────────────────────────────────────
 
 window.monkBuyTechnique = async function(traditionId, level) {
     const char = getCharacterData();
@@ -1086,6 +1256,8 @@ window.monkLearnTechnique = async function(traditionId) {
     if (!choice) return;
     window.monkBuyTechnique(traditionId, choice);
 };
+
+// ─── Refresh ──────────────────────────────────────────────────
 
 window.monkRefresh = function() {
     if (container) renderMonks(container);

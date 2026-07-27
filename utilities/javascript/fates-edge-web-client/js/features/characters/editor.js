@@ -1,6 +1,16 @@
+/**
+ * Editor – Full character editor with dynamic patron loading
+ * 
+ * UPDATED: Patrons are now loaded dynamically from the patrons feature's state.
+ * No hardcoded patron list – uses the same data as the Patrons tab.
+ * 
+ * Also includes Thiasos/Codex fields for Runekeepers with auto-patron derivation.
+ */
+
 import { getState, addCharacter, getCharacter, updateCharacter, deleteCharacter } from '../../core/state.js';
 import { generateId, escHtml, safeParseInt, clamp } from '../../core/utils.js';
 import { showToast } from '../../components/Toast.js';
+import { loadPatronData } from '../patrons/index.js';
 
 console.log('[Editor] Module loaded');
 
@@ -28,32 +38,7 @@ const HERITAGES = [
     { id: 'mixed', label: 'Mixed Heritage — Half-Elves, Half-Ykrul, Half-Others', note: 'Choose one +1 and one -1 from parent cultures' }
 ];
 
-// Expanded patron list for Invoker symbols (same as before, but we also want to allow free text)
-const PATRONS = [
-    { id: '', label: 'None' },
-    { id: 'traveler', label: 'The Traveler — Ways & Journeys' },
-    { id: 'oath-flame', label: 'Oath of Flame & Light — Dawn & Vows' },
-    { id: 'inaea', label: 'Inaea (Angel of the Spider) — Webs & Patient Predation' },
-    { id: 'witness', label: 'The Witness — Truth & Revelation' },
-    { id: 'carrion-king', label: 'The Carrion King — Lord of Decay and Renewal' },
-    { id: 'ikasha', label: 'Ikasha (She Who Sleeps) — Latent Potential & Shadow' },
-    { id: 'grimmir', label: 'Grimmir, the Old Man of the Forest — Primal Mystery & Seasonal Sacrifice' },
-    { id: 'palinode', label: 'Palinode, Queen of Encores — Performance & Rapture' },
-    { id: 'mykkiel', label: 'Mykkiel — Arbiter of the Covenant' },
-    { id: 'inquisitor-prime', label: 'Inquisitor Prime — Purity & Domination' },
-    { id: 'morag', label: 'Morag the Hag — Weaver of Hidden Costs' },
-    { id: 'malachai', label: 'Malachai — The Cruel Messenger' },
-    { id: 'isoka', label: 'Isoka — Angel of Serpents' },
-    { id: 'varnek-karn', label: 'Varnek Karn — The Death\'s Negotiator' },
-    { id: 'raeyn', label: 'Raéyn — Mistress of the Sea' },
-    { id: 'khemesh', label: 'Khemesh — The Abyssal Maw' },
-    { id: 'ninth', label: 'The Ninth — Beyond Comprehension' },
-    { id: 'aveh', label: 'Aveh — The Rider Behind the Storm' },
-    { id: 'livaea', label: 'Livaea — The Crimson Courtier' },
-    { id: 'mab', label: 'Mab — Queen of Courts' },
-    { id: 'maelstraeus', label: 'Maelstraeus — The Infernal Bargainer' },
-    { id: 'thrysos', label: 'Thrysos — King of Revels' }
-];
+// ─── No hardcoded PATRONS! We load them dynamically from the patrons feature ───
 
 const ARMOR_TYPES = [
     { id: 'none', label: 'No Armor', xpCost: 0, conversion: 'Harm passes directly', penalty: 'None' },
@@ -125,6 +110,99 @@ function defaultSkills() {
     return skills;
 }
 
+// ─── Thiasos/Codex → Patron mapping ──────────────────────────────
+// Used for auto-deriving patron when a Runekeeper has Thiasos/Codex but no patron.
+// This should ideally come from the patron data, but we keep a reasonable mapping
+// as a fallback based on the examples in the grimoire.
+
+const THIASOS_PATRON_MAP = {
+    'white-hound': 'mykkiel',
+    'ferret': 'inquisitor-prime',
+    'bronze-hawk': 'inquisitor-prime',
+    'mechanical-bird': 'inquisitor-prime',
+    'garden-spider': 'inaea',
+    'silk-moth': 'inaea',
+    'gray-mouse': 'inaea',
+    'fire-salamander': 'oath-of-flame-light',
+    'phoenix-fledgling': 'oath-of-flame-light',
+    'brass-beetle': 'sacred-geometry',
+    'konreh-pieces': 'sacred-geometry',
+    'bell-frog': 'gallows-bell',
+    'gray-mouse-courthouse': 'gallows-bell',
+    'lead-seal': 'varnek-karn',
+    'knucklebone': 'varnek-karn',
+    'confessor-mouse': 'confessor-beneath-the-bell',
+    'bell-cricket': 'confessor-beneath-the-bell',
+    'letter-mouse': 'silent-choir',
+    'forgetfulness-moth': 'silent-choir',
+    'raven': 'the-witness',
+    'silverfish': 'the-witness',
+    'bronze-key': 'sealed-gate',
+    'bell-ward': 'sealed-gate',
+};
+
+const CODEX_PATRON_MAP = {
+    'iron-bound-ledger': 'inquisitor-prime',
+    'slate-tablet': 'inquisitor-prime',
+    'frame-loom': 'inaea',
+    'knotted-cords': 'inaea',
+    'brass-scroll': 'oath-of-flame-light',
+    'sun-stone': 'oath-of-flame-light',
+    'brass-stencils': 'sacred-geometry',
+    'slate-proofs': 'sacred-geometry',
+    'court-ledger': 'gallows-bell',
+    'bronze-bells': 'gallows-bell',
+    'slate-carvings': 'varnek-karn',
+    'burial-tablets': 'varnek-karn',
+    'bell-ringers-log': 'confessor-beneath-the-bell',
+    'leather-strap': 'confessor-beneath-the-bell',
+    'locked-journal': 'silent-choir',
+    'wax-tablets': 'silent-choir',
+    'loose-leaf-pages': 'the-witness',
+    'chalkboard': 'the-witness',
+    'leather-strap-seals': 'sealed-gate',
+    'iron-rings': 'sealed-gate',
+};
+
+function derivePatronFromRunekeeperItems({ thiasos, codex }) {
+    if (thiasos && THIASOS_PATRON_MAP[thiasos]) return THIASOS_PATRON_MAP[thiasos];
+    if (codex && CODEX_PATRON_MAP[codex]) return CODEX_PATRON_MAP[codex];
+    return null;
+}
+
+// ─── Dynamic patron loader ────────────────────────────────────────
+
+let patronOptionsCache = null;
+
+function getPatronOptions() {
+    if (patronOptionsCache) return patronOptionsCache;
+    
+    const appState = getState();
+    const cosmicPatrons = appState.patrons?.cosmic || [];
+    
+    if (cosmicPatrons.length === 0) {
+        patronOptionsCache = [{ id: '', label: 'None — No Patron' }];
+        return patronOptionsCache;
+    }
+    
+    const options = cosmicPatrons.map(p => ({
+        id: p.id,
+        label: `${p.name || p.title || p.id} — ${p.subtitle || p.domain || 'Cosmic Patron'}`
+    }));
+    options.sort((a, b) => a.label.localeCompare(b.label));
+    options.unshift({ id: '', label: 'None — No Patron' });
+    
+    patronOptionsCache = options;
+    return patronOptionsCache;
+}
+
+function buildPatronOptionsHTML(selectedId) {
+    const options = getPatronOptions();
+    return options.map(p => 
+        `<option value="${p.id}" ${selectedId === p.id ? 'selected' : ''}>${escHtml(p.label)}</option>`
+    ).join('');
+}
+
 // ============================================================
 // STATE
 // ============================================================
@@ -150,7 +228,6 @@ function initEditor() {
     console.log('[Editor] initEditor called, initialized:', editorState.initialized);
     if (editorState.initialized) return;
     
-    // Global click delegation for dynamic buttons and catalog adds
     document.addEventListener('click', (e) => {
         const target = e.target;
         
@@ -180,7 +257,6 @@ function initEditor() {
             e.preventDefault();
         }
 
-        // Catalog talent add button
         if (target.matches('.ce-catalog-add-btn')) {
             const name = target.dataset.name;
             const cost = parseInt(target.dataset.cost, 10);
@@ -189,7 +265,6 @@ function initEditor() {
             e.preventDefault();
         }
 
-        // Custom talent add button
         if (target.matches('#ce-add-custom-talent')) {
             console.log('[Editor] Click: add custom talent');
             addCEDynamic('talent');
@@ -205,16 +280,20 @@ function initEditor() {
 // PUBLIC API
 // ============================================================
 
-export function openEditor(id) {
+export async function openEditor(id) {
     console.log('[Editor] openEditor called with id:', id);
 
-    // Close any existing editor first
     closeEditor();
 
-    // Initialize global click delegation
+    try {
+        await loadPatronData();
+        console.log('[Editor] Patron data loaded');
+    } catch (err) {
+        console.warn('[Editor] Failed to load patron data, using fallback:', err);
+    }
+
     initEditor();
 
-    // Create modal element
     console.log('[Editor] Creating modal...');
     const modal = createModal();
     document.body.appendChild(modal);
@@ -277,7 +356,6 @@ export function openEditor(id) {
         return;
     }
 
-    // Show the modal
     modal.style.display = 'flex';
     document.body.classList.add('modal-open');
     console.log('[Editor] Modal shown, body class added');
@@ -285,7 +363,7 @@ export function openEditor(id) {
     attachEditorEvents();
     recalculateXpBudget();
     renderTalentCatalog();
-    updateMagicPathDisplay(); // ensure conditional sections show/hide based on current path
+    updateMagicPathDisplay();
     console.log('[Editor] openEditor complete');
 }
 
@@ -424,7 +502,7 @@ function createNewCharacter() {
         obligationCapacity: 2,
         corruption: 0,
         corruptionMax: 1,
-        corruptionTier: 0,       // for Cantor
+        corruptionTier: 0,
         spellbook: [],
         boundSpirits: [],
         leash: 0,
@@ -439,22 +517,23 @@ function createNewCharacter() {
         armorConversion: '',
         meleeMods: '',
         rangedMods: '',
-        // Path-specific fields
-        symbols: [],               // Invoker: list of patron IDs
-        symbolStates: {},          // Invoker: map patronId -> 'active'|'compromised'
-        rites: [],                 // Runekeeper: list of rite IDs or names
-        repertoire: [],            // Cantor: list of song/rite IDs or names
-        hedgeGifts: [],            // Witch: list of gift names or objects
-        shadow: 0,                 // Witch
-        shame: 0,                  // Witch
-        identityStrain: 0,         // Witch
-        promiseTimers: [],         // Witch: array of {name, segments}
-        psionicArts: [],           // Psion: list of art names
-        boundSpirits: [],          // Summoner: array of {name, cap, nature, services}
-        monasticTradition: '',     // Monk
-        breathState: 'entering',   // Monk: 'entering'|'still'|'exiting'
-        monkCorruptionTier: 0,     // Monk
-        knownTags: []              // Free Caster: list of tag names
+        symbols: [],
+        symbolStates: {},
+        rites: [],
+        thiasos: '',
+        codex: '',
+        repertoire: [],
+        hedgeGifts: [],
+        shadow: 0,
+        shame: 0,
+        identityStrain: 0,
+        promiseTimers: [],
+        psionicArts: [],
+        boundSpirits: [],
+        monasticTradition: '',
+        breathState: 'entering',
+        monkCorruptionTier: 0,
+        knownTags: []
     };
 }
 
@@ -514,7 +593,7 @@ function calculateTotalXpSpent(c) {
 }
 
 // ============================================================
-// TALENT CATALOG (TIER-GATED)
+// TALENT CATALOG
 // ============================================================
 
 function getAvailableTalentsForTier(totalXp) {
@@ -589,7 +668,6 @@ function addTalentFromCatalog(name, cost) {
         return;
     }
 
-    // Create read-only row
     const row = document.createElement('div');
     row.className = 'dynamic-row ce-talent-row';
     row.innerHTML = `
@@ -655,7 +733,6 @@ function attachEditorEvents() {
     document.addEventListener('keydown', editorState.escListener);
     console.log('[Editor] Escape listener attached');
     
-    // Attribute change listeners for derived stats
     ['body', 'wits', 'spirit', 'presence'].forEach(attr => {
         const input = document.getElementById(`ce-${attr}`);
         if (input) {
@@ -674,7 +751,7 @@ function attachEditorEvents() {
     if (xpInput) {
         xpInput.addEventListener('input', () => {
             updateTierDisplay();
-            renderTalentCatalog();   // re-render when XP changes
+            renderTalentCatalog();
         });
         xpInput.addEventListener('change', () => {
             updateTierDisplay();
@@ -805,18 +882,14 @@ function updateMagicPathDisplay() {
             : 'No magic path selected';
     }
     
-    // Show/hide path-specific sections
-    // Invoker: symbols
     const symbolSection = document.getElementById('ce-invoker-section');
     if (symbolSection) {
         symbolSection.style.display = pathId === 'invoker' ? 'block' : 'none';
     }
-    // Runekeeper: rites
     const ritesSection = document.getElementById('ce-runekeeper-section');
     if (ritesSection) {
         ritesSection.style.display = pathId === 'runekeeper' ? 'block' : 'none';
     }
-    // Cantor: repertoire, corruption (already shown)
     const corruptionSection = document.getElementById('ce-corruption-section');
     if (corruptionSection) {
         corruptionSection.style.display = pathId === 'cantor' ? 'flex' : 'none';
@@ -825,17 +898,14 @@ function updateMagicPathDisplay() {
     if (repertoireSection) {
         repertoireSection.style.display = pathId === 'cantor' ? 'block' : 'none';
     }
-    // Witch: shadow, shame, identity, hedgeGifts, promiseTimers
     const witchSection = document.getElementById('ce-witch-section');
     if (witchSection) {
         witchSection.style.display = pathId === 'witch' ? 'block' : 'none';
     }
-    // Psion: psionicArts
     const psionSection = document.getElementById('ce-psion-section');
     if (psionSection) {
         psionSection.style.display = pathId === 'psion' ? 'block' : 'none';
     }
-    // Summoner: leash (already shown), boundSpirits
     const leashSection = document.getElementById('ce-leash-section');
     if (leashSection) {
         leashSection.style.display = pathId === 'summoner' ? 'flex' : 'none';
@@ -844,12 +914,10 @@ function updateMagicPathDisplay() {
     if (summonerSection) {
         summonerSection.style.display = pathId === 'summoner' ? 'block' : 'none';
     }
-    // Monk: monasticTradition, breathState, monkCorruptionTier
     const monkSection = document.getElementById('ce-monk-section');
     if (monkSection) {
         monkSection.style.display = pathId === 'monk' ? 'block' : 'none';
     }
-    // Free Caster: knownTags
     const freeCasterSection = document.getElementById('ce-free-caster-section');
     if (freeCasterSection) {
         freeCasterSection.style.display = pathId === 'free-caster' ? 'block' : 'none';
@@ -870,7 +938,7 @@ function validateSkillCap(skillKey, skillName) {
 }
 
 // ============================================================
-// XP BUDGET CALCULATION (handles both input and span costs)
+// XP BUDGET CALCULATION
 // ============================================================
 
 function recalculateXpBudget() {
@@ -893,7 +961,6 @@ function recalculateXpBudget() {
         spent += calculateSkillCost(0, level);
     });
     
-    // Talent costs (handle both read‑only spans and input fields)
     document.querySelectorAll('.ce-talent-row').forEach(row => {
         const costEl = row.querySelector('.ce-talent-cost');
         if (costEl) {
@@ -905,29 +972,24 @@ function recalculateXpBudget() {
         }
     });
     
-    // Asset costs
     document.querySelectorAll('.ce-asset-row').forEach(row => {
         const costInput = row.querySelector('.ce-asset-cost');
         spent += safeParseInt(costInput?.value, 0);
     });
     
-    // Equipment costs
     document.querySelectorAll('.ce-equipment-row').forEach(row => {
         const costInput = row.querySelector('.ce-equipment-cost');
         spent += safeParseInt(costInput?.value, 0);
     });
     
-    // Armor cost
     const armorId = document.getElementById('ce-armor-type')?.value;
     const armor = ARMOR_TYPES.find(a => a.id === armorId);
     if (armor) spent += armor.xpCost;
     
-    // Shield cost
     const shieldId = document.getElementById('ce-shield-type')?.value;
     const shield = SHIELD_TYPES.find(s => s.id === shieldId);
     if (shield) spent += shield.xpCost;
     
-    // Weapon cost
     const weaponId = document.getElementById('ce-weapon-class')?.value;
     const weapon = WEAPON_CLASSES.find(w => w.id === weaponId);
     if (weapon) {
@@ -935,12 +997,10 @@ function recalculateXpBudget() {
         spent += weaponXp[weaponId] || 0;
     }
     
-    // Weapon tags: +4 XP each, max 2
     const checkedTags = document.querySelectorAll('.ce-weapon-tag:checked');
     const tagCount = Math.min(checkedTags.length, 2);
     spent += tagCount * 4;
     
-    // Bond XP
     let bondCount = 0;
     document.querySelectorAll('.ce-bond-row').forEach(row => {
         const nameInput = row.querySelector('.ce-bond-name');
@@ -950,7 +1010,6 @@ function recalculateXpBudget() {
     bondCount = Math.min(bondCount, 2);
     const xpFromBonds = bondCount * 2;
     
-    // Complication XP
     let compCount = 0;
     document.querySelectorAll('.ce-complication-row').forEach(row => {
         const nameInput = row.querySelector('.ce-complication-name');
@@ -992,9 +1051,7 @@ function buildEditorHTML(c) {
         `<option value="${h.id}" ${c.heritage === h.id ? 'selected' : ''}>${escHtml(h.label)}</option>`
     ).join('');
     
-    const patronOptions = PATRONS.map(p => 
-        `<option value="${p.id}" ${c.patron === p.id ? 'selected' : ''}>${escHtml(p.label)}</option>`
-    ).join('');
+    const patronOptions = buildPatronOptionsHTML(c.patron || '');
     
     const armorOptions = ARMOR_TYPES.map(a => 
         `<option value="${a.id}" ${c.armorType === a.id ? 'selected' : ''}>${escHtml(a.label)}${a.xpCost > 0 ? ` (${a.xpCost} XP)` : ''}</option>`
@@ -1036,7 +1093,6 @@ function buildEditorHTML(c) {
         `;
     }).join('');
     
-    // Dynamic rows for all lists
     const talentRows = (c.talents || []).map((t, i) => dynamicRowHTML('talent', i, t)).join('');
     const assetRows = (c.assets || []).map((a, i) => dynamicRowHTML('asset', i, a)).join('');
     const equipRows = (c.equipment || []).map((e, i) => dynamicRowHTML('equipment', i, e)).join('');
@@ -1054,12 +1110,22 @@ function buildEditorHTML(c) {
     const boundSpiritRows = (c.boundSpirits || []).map((sp, i) => dynamicRowHTML('bound-spirit', i, sp)).join('');
     const knownTagRows = (c.knownTags || []).map((t, i) => dynamicRowHTML('known-tag', i, { name: t })).join('');
     
+    const thiasos = c.thiasos || '';
+    const codex = c.codex || '';
+    
+    const isRunekeeper = c.magicPath === 'runekeeper';
+    const isInvoker = c.magicPath === 'invoker';
+    const isCantor = c.magicPath === 'cantor';
+    const isWitch = c.magicPath === 'witch';
+    const isPsion = c.magicPath === 'psion';
+    const isSummoner = c.magicPath === 'summoner';
+    const isMonk = c.magicPath === 'monk';
+    const isFreeCaster = c.magicPath === 'free-caster';
+    
     return `
         <div class="editor-form">
-            <!-- XP Budget Display -->
             <div id="ce-xp-budget" style="margin-bottom:1rem;"></div>
             
-            <!-- Step 1: Identity & Concept -->
             <h3 style="margin:0.8rem 0 0.4rem;color:var(--gold);">Step 1 — Identity & Concept</h3>
             <div class="form-row">
                 <div class="field"><label>Name *</label><input id="ce-name" value="${escHtml(c.name)}" /></div>
@@ -1080,7 +1146,6 @@ function buildEditorHTML(c) {
                 </div>
             </div>
             
-            <!-- Step 2: Background -->
             <h3 style="margin:0.8rem 0 0.4rem;color:var(--gold);">Step 2 — Background</h3>
             <div class="form-row">
                 <div class="field"><label>Background Name</label><input id="ce-background" value="${escHtml(c.background || '')}" placeholder="e.g., Marcher Veteran, Merchant Factor" /></div>
@@ -1098,7 +1163,6 @@ function buildEditorHTML(c) {
                 <div class="field"><label>Obligation Timer [4] Seed</label><input id="ce-background-obligation" value="${escHtml(c.backgroundObligation || '')}" placeholder="Starting complication: what debt or duty follows you?" /></div>
             </div>
             
-            <!-- Step 3: Attributes -->
             <h3 style="margin:0.8rem 0 0.4rem;color:var(--gold);">Step 3 — Attributes (1–5)</h3>
             <div style="font-size:0.8rem;color:var(--text2);margin-bottom:0.4rem;">
                 Cost: each step = new rating × 3 XP. Base 1 each.
@@ -1111,7 +1175,6 @@ function buildEditorHTML(c) {
                 <div class="stat-item"><label>Presence</label><input type="number" id="ce-presence" value="${c.presence || 1}" min="1" max="5" /></div>
             </div>
             
-            <!-- Step 4: Skills -->
             <h3 style="margin:0.8rem 0 0.4rem;color:var(--gold);">Step 4 — Skills (0–5)</h3>
             <div style="font-size:0.8rem;color:var(--text2);margin-bottom:0.4rem;">
                 Cost: each step = new level × 2 XP. Skill cannot exceed relevant Attribute.
@@ -1119,7 +1182,6 @@ function buildEditorHTML(c) {
             </div>
             <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:0.3rem;font-size:0.85rem;">${skillInputs}</div>
             
-            <!-- Step 5: Magic Path & Patron -->
             <h3 style="margin:0.8rem 0 0.4rem;color:var(--gold);">Step 5 — Magic Path & Patron (Optional)</h3>
             <div class="form-row">
                 <div class="field">
@@ -1130,28 +1192,38 @@ function buildEditorHTML(c) {
                 <div class="field">
                     <label>Patron</label>
                     <select id="ce-patron">${patronOptions}</select>
+                    <div style="font-size:0.65rem;color:var(--text3);margin-top:0.1rem;">Patrons loaded from /data/patrons/</div>
                 </div>
             </div>
             
-            <!-- Path-specific sections -->
-            <!-- Invoker -->
-            <div id="ce-invoker-section" style="display:${c.magicPath === 'invoker' ? 'block' : 'none'}; margin-top:0.5rem;">
+            <div id="ce-invoker-section" style="display:${isInvoker ? 'block' : 'none'}; margin-top:0.5rem;">
                 <h4 style="margin:0.4rem 0;font-size:0.9rem;">Invoker: Symbols</h4>
                 <div style="font-size:0.8rem;color:var(--text2);margin-bottom:0.3rem;">Each Symbol costs 4 XP. Max 4 without penalty.</div>
                 <button class="btn btn-sm" data-editor-add="symbol">+ Add Symbol</button>
                 <div class="dynamic-list" id="ce-symbol-list">${symbolRows}</div>
             </div>
             
-            <!-- Runekeeper -->
-            <div id="ce-runekeeper-section" style="display:${c.magicPath === 'runekeeper' ? 'block' : 'none'}; margin-top:0.5rem;">
-                <h4 style="margin:0.4rem 0;font-size:0.9rem;">Runekeeper: Rites</h4>
+            <div id="ce-runekeeper-section" style="display:${isRunekeeper ? 'block' : 'none'}; margin-top:0.5rem;">
+                <h4 style="margin:0.4rem 0;font-size:0.9rem;">Runekeeper: Thiasos, Codex & Rites</h4>
+                <div class="form-row">
+                    <div class="field">
+                        <label>Thiasos (Familiar)</label>
+                        <input id="ce-thiasos" value="${escHtml(thiasos)}" placeholder="e.g., white-hound, garden-spider" />
+                        <span style="font-size:0.65rem;color:var(--text3);">The patron's attention given form.</span>
+                    </div>
+                    <div class="field">
+                        <label>Codex</label>
+                        <input id="ce-codex" value="${escHtml(codex)}" placeholder="e.g., iron-bound-ledger, frame-loom" />
+                        <span style="font-size:0.65rem;color:var(--text3);">The covenant made visible.</span>
+                    </div>
+                </div>
                 <div style="font-size:0.8rem;color:var(--text2);margin-bottom:0.3rem;">Rites known (names or IDs, one per line).</div>
                 <button class="btn btn-sm" data-editor-add="rite">+ Add Rite</button>
                 <div class="dynamic-list" id="ce-rite-list">${riteRows}</div>
+                ${thiasos || codex ? `<div style="font-size:0.65rem;color:var(--gold);margin-top:0.2rem;">💡 Patron will be auto-set from Thiasos/Codex if not selected.</div>` : ''}
             </div>
             
-            <!-- Cantor -->
-            <div id="ce-cantor-section" style="display:${c.magicPath === 'cantor' ? 'block' : 'none'}; margin-top:0.5rem;">
+            <div id="ce-cantor-section" style="display:${isCantor ? 'block' : 'none'}; margin-top:0.5rem;">
                 <h4 style="margin:0.4rem 0;font-size:0.9rem;">Cantor: Repertoire</h4>
                 <div style="font-size:0.8rem;color:var(--text2);margin-bottom:0.3rem;">Songs / Rites known (names or IDs).</div>
                 <button class="btn btn-sm" data-editor-add="repertoire">+ Add Song</button>
@@ -1164,8 +1236,7 @@ function buildEditorHTML(c) {
                 </div>
             </div>
             
-            <!-- Witch -->
-            <div id="ce-witch-section" style="display:${c.magicPath === 'witch' ? 'block' : 'none'}; margin-top:0.5rem;">
+            <div id="ce-witch-section" style="display:${isWitch ? 'block' : 'none'}; margin-top:0.5rem;">
                 <h4 style="margin:0.4rem 0;font-size:0.9rem;">Witch: Prices & Gifts</h4>
                 <div class="form-row" style="flex-wrap:wrap;gap:0.3rem;">
                     <div class="field small"><label>Shadow</label><input type="number" id="ce-shadow" value="${c.shadow || 0}" min="0" /></div>
@@ -1180,24 +1251,21 @@ function buildEditorHTML(c) {
                 <div class="dynamic-list" id="ce-promise-timer-list">${promiseTimerRows}</div>
             </div>
             
-            <!-- Psion -->
-            <div id="ce-psion-section" style="display:${c.magicPath === 'psion' ? 'block' : 'none'}; margin-top:0.5rem;">
+            <div id="ce-psion-section" style="display:${isPsion ? 'block' : 'none'}; margin-top:0.5rem;">
                 <h4 style="margin:0.4rem 0;font-size:0.9rem;">Psion: Psionic Arts</h4>
                 <div style="font-size:0.8rem;color:var(--text2);margin-bottom:0.3rem;">List of Arts (e.g., Telekinesis, Telepathy).</div>
                 <button class="btn btn-sm" data-editor-add="psionic-art">+ Add Art</button>
                 <div class="dynamic-list" id="ce-psionic-art-list">${psionicArtRows}</div>
             </div>
             
-            <!-- Summoner -->
-            <div id="ce-summoner-section" style="display:${c.magicPath === 'summoner' ? 'block' : 'none'}; margin-top:0.5rem;">
+            <div id="ce-summoner-section" style="display:${isSummoner ? 'block' : 'none'}; margin-top:0.5rem;">
                 <h4 style="margin:0.4rem 0;font-size:0.9rem;">Summoner: Bound Spirits</h4>
                 <div style="font-size:0.8rem;color:var(--text2);margin-bottom:0.3rem;">Each spirit: name, cap, nature, services.</div>
                 <button class="btn btn-sm" data-editor-add="bound-spirit">+ Add Spirit</button>
                 <div class="dynamic-list" id="ce-bound-spirit-list">${boundSpiritRows}</div>
             </div>
             
-            <!-- Monk -->
-            <div id="ce-monk-section" style="display:${c.magicPath === 'monk' ? 'block' : 'none'}; margin-top:0.5rem;">
+            <div id="ce-monk-section" style="display:${isMonk ? 'block' : 'none'}; margin-top:0.5rem;">
                 <h4 style="margin:0.4rem 0;font-size:0.9rem;">Monk: Monastic Path</h4>
                 <div class="form-row">
                     <div class="field"><label>Monastic Tradition</label><input id="ce-monastic-tradition" value="${escHtml(c.monasticTradition || '')}" placeholder="e.g., Order of the Unstruck Bell" /></div>
@@ -1216,15 +1284,13 @@ function buildEditorHTML(c) {
                 </div>
             </div>
             
-            <!-- Free Caster -->
-            <div id="ce-free-caster-section" style="display:${c.magicPath === 'free-caster' ? 'block' : 'none'}; margin-top:0.5rem;">
+            <div id="ce-free-caster-section" style="display:${isFreeCaster ? 'block' : 'none'}; margin-top:0.5rem;">
                 <h4 style="margin:0.4rem 0;font-size:0.9rem;">Free Caster: Known Tags</h4>
                 <div style="font-size:0.8rem;color:var(--text2);margin-bottom:0.3rem;">Tags known (e.g., Burning, Force, Heal).</div>
                 <button class="btn btn-sm" data-editor-add="known-tag">+ Add Tag</button>
                 <div class="dynamic-list" id="ce-known-tag-list">${knownTagRows}</div>
             </div>
             
-            <!-- Step 6: Combat Loadout -->
             <h3 style="margin:0.8rem 0 0.4rem;color:var(--gold);">Step 6 — Combat Loadout</h3>
             <div class="form-row">
                 <div class="field">
@@ -1249,16 +1315,12 @@ function buildEditorHTML(c) {
                 ${weaponTagCheckboxes}
             </div>
             
-            <!-- Step 7: Talents (new catalog) -->
             <h3 style="margin:0.8rem 0 0.4rem;color:var(--gold);">Step 7 — Talents</h3>
             <div style="font-size:0.8rem;color:var(--text2);margin-bottom:0.4rem;">
                 Minor: 2–3 XP | Major: 4–6 XP | Prestige: 7–10 XP | Epic: 11+ XP
             </div>
             
-            <!-- Catalog list -->
-            <div id="ce-talent-catalog" style="max-height:220px;overflow-y:auto;border:1px solid var(--border);border-radius:6px;background:var(--bg2);margin-bottom:0.5rem;">
-                <!-- populated by renderTalentCatalog() -->
-            </div>
+            <div id="ce-talent-catalog" style="max-height:220px;overflow-y:auto;border:1px solid var(--border);border-radius:6px;background:var(--bg2);margin-bottom:0.5rem;"></div>
             
             <div style="margin-bottom:0.3rem;">
                 <button class="btn btn-sm btn-primary" id="ce-add-custom-talent">✏️ Add Custom Talent</button>
@@ -1266,7 +1328,6 @@ function buildEditorHTML(c) {
             
             <div class="dynamic-list" id="ce-talent-list">${talentRows}</div>
             
-            <!-- Step 8: Assets -->
             <h3 style="margin:0.8rem 0 0.4rem;color:var(--gold);">Step 8 — Assets</h3>
             <div style="font-size:0.8rem;color:var(--text2);margin-bottom:0.4rem;">
                 Minor: 4 XP | Standard: 8 XP | Major: 12 XP
@@ -1274,12 +1335,10 @@ function buildEditorHTML(c) {
             ${wikiPickerHTML('asset', 'assets')}
             <div class="dynamic-list" id="ce-asset-list">${assetRows}</div>
             
-            <!-- Step 9: Equipment -->
             <h3 style="margin:0.8rem 0 0.4rem;color:var(--gold);">Step 9 — Additional Equipment</h3>
             ${wikiPickerHTML('equipment', 'equipment')}
             <div class="dynamic-list" id="ce-equipment-list">${equipRows}</div>
             
-            <!-- Step 10: Bonds & Complications -->
             <h3 style="margin:0.8rem 0 0.4rem;color:var(--gold);">Step 10 — Bonds & Complications</h3>
             <div style="font-size:0.8rem;color:var(--text2);margin-bottom:0.4rem;">
                 Up to 2 Bonds (+2 XP each) and 2 Complications (+2 XP each). Max starting XP: 36.
@@ -1294,7 +1353,6 @@ function buildEditorHTML(c) {
             <button class="btn btn-sm" data-editor-add="complication">+ Add Complication</button>
             <div class="dynamic-list" id="ce-complication-list">${compRows}</div>
             
-            <!-- Step 11: Status & Resources -->
             <h3 style="margin:0.8rem 0 0.4rem;color:var(--gold);">Step 11 — Status & Resources</h3>
             <div class="form-row">
                 <div class="field small"><label>Total XP</label><input type="number" id="ce-total-xp" value="${c.totalXp || 32}" min="0" /></div>
@@ -1333,12 +1391,12 @@ function buildEditorHTML(c) {
                     <input type="number" id="ce-obligation" value="${c.obligation || 0}" min="0" />
                     <small style="color:var(--text2);">Over cap: 1 Fatigue/segment. Double: Patron intrusion</small>
                 </div>
-                <div class="field small" id="ce-corruption-section" style="display:${c.magicPath === 'cantor' ? 'flex' : 'none'};">
+                <div class="field small" id="ce-corruption-section" style="display:${isCantor ? 'flex' : 'none'};">
                     <label>Corruption (max <span id="ce-corruption-max">${c.spirit || 1}</span>)</label>
                     <input type="number" id="ce-corruption" value="${c.corruption || 0}" min="0" max="${c.spirit || 1}" />
                     <small style="color:var(--text2);">Fill: bloom (benefit + drawback), reset to Tier</small>
                 </div>
-                <div class="field small" id="ce-leash-section" style="display:${c.magicPath === 'summoner' ? 'flex' : 'none'};">
+                <div class="field small" id="ce-leash-section" style="display:${isSummoner ? 'flex' : 'none'};">
                     <label>Leash (cap: Cap + Spirit)</label>
                     <input type="number" id="ce-leash" value="${c.leash || 0}" min="0" />
                     <small style="color:var(--text2);">Fill: spirit acts & departs</small>
@@ -1353,7 +1411,6 @@ function buildEditorHTML(c) {
                 </div>
             </div>
             
-            <!-- Save/Cancel -->
             <div class="flex mt-1" style="gap:0.5rem;">
                 <button class="btn btn-gold" id="ce-save-btn">💾 Save Character</button>
                 <button class="btn" id="ce-cancel-btn">Cancel</button>
@@ -1367,7 +1424,6 @@ function buildEditorHTML(c) {
 // ============================================================
 
 function dynamicRowHTML(type, idx, item = {}) {
-    // Bond row
     if (type === 'bond') {
         return `
             <div class="dynamic-row ce-bond-row" data-index="${idx}">
@@ -1382,7 +1438,6 @@ function dynamicRowHTML(type, idx, item = {}) {
         `;
     }
     
-    // Complication row
     if (type === 'complication') {
         return `
             <div class="dynamic-row ce-complication-row" data-index="${idx}">
@@ -1397,11 +1452,8 @@ function dynamicRowHTML(type, idx, item = {}) {
         `;
     }
     
-    // Symbol row (Invoker)
     if (type === 'symbol') {
-        const patronOptions = PATRONS.map(p => 
-            `<option value="${p.id}" ${item.patron === p.id ? 'selected' : ''}>${escHtml(p.label)}</option>`
-        ).join('');
+        const patronOptions = buildPatronOptionsHTML(item.patron || '');
         return `
             <div class="dynamic-row ce-symbol-row" data-index="${idx}">
                 <select class="ce-symbol-patron" style="flex:2;">${patronOptions}</select>
@@ -1414,7 +1466,6 @@ function dynamicRowHTML(type, idx, item = {}) {
         `;
     }
     
-    // Rite, Repertoire, Hedge Gift, Psionic Art, Known Tag (simple name)
     if (['rite', 'repertoire', 'hedge-gift', 'psionic-art', 'known-tag'].includes(type)) {
         const label = type === 'rite' ? 'Rite' :
                      type === 'repertoire' ? 'Song/ Rite' :
@@ -1428,7 +1479,6 @@ function dynamicRowHTML(type, idx, item = {}) {
         `;
     }
     
-    // Promise Timer
     if (type === 'promise-timer') {
         return `
             <div class="dynamic-row ce-promise-timer-row" data-index="${idx}">
@@ -1439,7 +1489,6 @@ function dynamicRowHTML(type, idx, item = {}) {
         `;
     }
     
-    // Bound Spirit
     if (type === 'bound-spirit') {
         return `
             <div class="dynamic-row ce-bound-spirit-row" data-index="${idx}">
@@ -1452,7 +1501,6 @@ function dynamicRowHTML(type, idx, item = {}) {
         `;
     }
     
-    // Default: talent, asset, equipment
     const placeholder = type === 'talent' ? 'Talent name' : type === 'asset' ? 'Asset name' : 'Equipment name';
     return `
         <div class="dynamic-row ce-${type}-row" data-index="${idx}">
@@ -1469,7 +1517,7 @@ function dynamicRowHTML(type, idx, item = {}) {
 }
 
 // ============================================================
-// WIKI PICKER (still used for assets & equipment)
+// WIKI PICKER
 // ============================================================
 
 function wikiPickerHTML(type, cat) {
@@ -1559,6 +1607,24 @@ export function saveEditor() {
         c.magicPath = v('#ce-magic-path') || 'none';
         c.patron = v('#ce-patron');
         
+        c.thiasos = v('#ce-thiasos').trim();
+        c.codex = v('#ce-codex').trim();
+        
+        if (c.magicPath === 'runekeeper' && !c.patron) {
+            const derived = derivePatronFromRunekeeperItems({ 
+                thiasos: c.thiasos, 
+                codex: c.codex 
+            });
+            if (derived) {
+                c.patron = derived;
+                const patronSelect = document.getElementById('ce-patron');
+                if (patronSelect) patronSelect.value = derived;
+                showToast(`🔮 Patron auto-set to ${derived} from Thiasos/Codex.`, 'info');
+            } else if (c.thiasos || c.codex) {
+                showToast('⚠️ Thiasos/Codex selected but patron could not be auto-detected. Please select a patron.', 'warning');
+            }
+        }
+        
         c.armorType = v('#ce-armor-type') || 'none';
         c.shieldType = v('#ce-shield-type') || 'none';
         c.weaponClass = v('#ce-weapon-class') || 'light';
@@ -1580,7 +1646,6 @@ export function saveEditor() {
         c.mentalStrain = clamp(n('#ce-mental-strain'), 0, c.mentalStrainMax);
         c.vtt = document.getElementById('ce-vtt')?.checked || false;
         
-        // Path-specific fields
         c.symbols = readDynamicList('symbol').map(row => row.patron).filter(Boolean);
         c.symbolStates = {};
         readDynamicList('symbol').forEach(row => {
@@ -1608,7 +1673,6 @@ export function saveEditor() {
         c.monkCorruptionTier = Math.max(0, n('#ce-monk-corruption-tier'));
         c.knownTags = readDynamicList('known-tag').map(row => row.name).filter(Boolean);
         
-        // Dynamic lists: talents, assets, equipment, bonds, complications (already handled by readDynamicList)
         c.talents = readDynamicList('talent');
         c.assets = readDynamicList('asset');
         c.equipment = readDynamicList('equipment');
@@ -1616,7 +1680,6 @@ export function saveEditor() {
         c.complications = readDynamicList('complication');
         console.log('[Editor] Dynamic lists read: talents=', c.talents.length, 'assets=', c.assets.length, 'equipment=', c.equipment.length, 'bonds=', c.bonds.length, 'complications=', c.complications.length);
         
-        // Validate bonds/complications for new characters
         if (editorState.isNew) {
             const startBonds = c.bonds.filter(b => b.start).length;
             const startComps = c.complications.filter(x => x.start).length;
@@ -1684,7 +1747,7 @@ export function saveEditor() {
 }
 
 // ============================================================
-// READ DYNAMIC LISTS (supports all custom types)
+// READ DYNAMIC LISTS
 // ============================================================
 
 function readDynamicList(type) {
@@ -1694,7 +1757,6 @@ function readDynamicList(type) {
     console.log(`[Editor] Found ${rows.length} rows for type ${type}`);
     
     for (const row of rows) {
-        // Bond
         if (type === 'bond') {
             const nameInput = row.querySelector('.ce-bond-name');
             const descInput = row.querySelector('.ce-bond-desc');
@@ -1707,7 +1769,6 @@ function readDynamicList(type) {
                 start: startCheck ? startCheck.checked : false
             });
         }
-        // Complication
         else if (type === 'complication') {
             const nameInput = row.querySelector('.ce-complication-name');
             const descInput = row.querySelector('.ce-complication-desc');
@@ -1720,7 +1781,6 @@ function readDynamicList(type) {
                 start: startCheck ? startCheck.checked : false
             });
         }
-        // Symbol
         else if (type === 'symbol') {
             const patronSelect = row.querySelector('.ce-symbol-patron');
             const stateSelect = row.querySelector('.ce-symbol-state');
@@ -1731,7 +1791,6 @@ function readDynamicList(type) {
                 state: stateSelect ? stateSelect.value : 'active'
             });
         }
-        // Promise Timer
         else if (type === 'promise-timer') {
             const nameInput = row.querySelector('.ce-promise-timer-name');
             const segInput = row.querySelector('.ce-promise-timer-segments');
@@ -1742,7 +1801,6 @@ function readDynamicList(type) {
                 segments: segInput ? safeParseInt(segInput.value, 4) : 4
             });
         }
-        // Bound Spirit
         else if (type === 'bound-spirit') {
             const nameInput = row.querySelector('.ce-bound-spirit-name');
             const capInput = row.querySelector('.ce-bound-spirit-cap');
@@ -1757,14 +1815,12 @@ function readDynamicList(type) {
                 services: servicesInput ? servicesInput.value.trim() : ''
             });
         }
-        // Simple name-list types (rite, repertoire, hedge-gift, psionic-art, known-tag)
         else if (['rite', 'repertoire', 'hedge-gift', 'psionic-art', 'known-tag'].includes(type)) {
             const nameInput = row.querySelector('.ce-' + type + '-name');
             const name = nameInput ? nameInput.value.trim() : '';
             if (!name) continue;
             items.push({ name });
         }
-        // Asset, Equipment, Talent (with cost)
         else if (['asset', 'equipment', 'talent'].includes(type)) {
             const nameEl = row.querySelector('.ce-' + type + '-name');
             const costEl = row.querySelector('.ce-' + type + '-cost');
@@ -1772,7 +1828,6 @@ function readDynamicList(type) {
             if (!name) continue;
             const cost = costEl ? safeParseInt(costEl.value, 0) : 0;
             const item = { name, cost };
-            // For assets, also read tier
             if (type === 'asset') {
                 const tierSelect = row.querySelector('.ce-asset-tier');
                 if (tierSelect) item.tier = tierSelect.value;

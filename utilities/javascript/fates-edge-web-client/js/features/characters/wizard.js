@@ -5,11 +5,14 @@
  * - Filtered by tier (Minor for T1, Minor+Major for T2, all for T3+)
  * - Click‑to‑add from catalog, still allows manual custom talents
  * - Data model now includes all path-specific fields (symbols, rites, etc.)
+ * - Patrons are loaded dynamically from /data/patrons/ via the patrons module
+ * - Thiasos/Codex fields for Runekeepers with auto-patron derivation
  */
 
 import { generateId, escHtml, safeParseInt, clamp } from '../../core/utils.js';
-import { addCharacter, getState } from '../../core/state.js';
+import { getState, addCharacter } from '../../core/state.js';
 import { showToast } from '../../components/Toast.js';
+import { loadPatronData } from '../patrons/index.js';
 
 // ─── Game Data Constants (from Player's Guide) ─────────────────────
 
@@ -41,29 +44,7 @@ const HERITAGES = [
     { id: 'mixed', label: 'Mixed Heritage — Half-Elves, Half-Ykrul, Half-Others', adj: 'Choose one +1 and one −1', note: 'Pick two skill bonuses from parent cultures. Access both talent lists.' }
 ];
 
-const PATRONS = [
-    { id: '', label: 'None — No Patron' },
-    { id: 'traveler', label: 'The Traveler — Ways & Journeys', theme: 'Roads, wayfinding, safe passage' },
-    { id: 'oath-flame', label: 'Oath of Flame & Light — Dawn & Vows', theme: 'Vows, radiance, smiting' },
-    { id: 'inaea', label: 'Inaea (Angel of the Spider) — Webs & Patient Predation', theme: 'Mercy, community, threads that bind' },
-    { id: 'witness', label: 'The Witness — Truth & Revelation', theme: 'Truth, memory, uncomfortable revelations' },
-    { id: 'carrion-king', label: 'The Carrion King — Lord of Decay and Renewal', theme: 'Decay, renewal, wisdom of endings' },
-    { id: 'ikasha', label: 'Ikasha (She Who Sleeps) — Latent Potential & Shadow', theme: 'Shadow, secrets, latent potential' },
-    { id: 'grimmir', label: 'Grimmir, the Old Man of the Forest — Primal Mystery', theme: 'Seasons, sacrifice, old pact of field and forest' },
-    { id: 'palinode', label: 'Palinode, Queen of Encores — Performance & Rapture', theme: 'Performance, rapture, the unfinished song' }
-];
-
-const MAGIC_PATHS = [
-    { id: 'none', label: 'No Magic Path', cost: 0, note: 'Attributes and Skills are enough to be effective.' },
-    { id: 'hedge-gifts', label: 'Hedge Gifts (Craft of the Hedge, 4 XP)', cost: 4, note: '2 no-roll magical abilities. No resource tracking. Retrain later.' },
-    { id: 'familiar-only', label: 'Familiar Only (Familiar, 2 XP)', cost: 2, note: 'Companion + Patron\'s Gift. Obligation per use. Buy Codex later for full Runekeeper.' },
-    { id: 'runekeeper', label: 'Runekeeper (Familiar 2 XP + Codex 4 XP)', cost: 6, note: 'Structured rites from a Patron. Obligation cost per rite. Reliable but accrues debt.' },
-    { id: 'free-caster', label: 'Free Caster (Spellcraft, 6 XP)', cost: 6, note: 'Improvised magic via TAGS. Flexible but risky. Backlash on failure.' },
-    { id: 'invoker', label: 'Invoker (Patron\'s Symbol, 4 XP/Patron)', cost: 4, note: 'Ritual magic via symbols. Slow but flexible. Crack the Seal for emergencies.' },
-    { id: 'cantor', label: 'Cantor (Cantor\'s Path, 8 XP)', cost: 8, note: 'Songs that mimic Low Rites. Accessible but corrupting. Requires Lore 1+, Performance 2+, Presence 2+.' },
-    { id: 'summoner', label: 'Summoner (Pact-Whisperer 2 XP + Lesser Pactwright 2 XP)', cost: 4, note: 'Bind and command spirits. Powerful but requires Leash management.' },
-    { id: 'witch', label: 'Witchcraft (Craft of the Hedge, 4 XP)', cost: 4, note: 'Threshold magic. Hedge Gifts + Quick Workings + Full Rituals. Identity Strain track.' }
-];
+// ─── No hardcoded PATRONS! We load them dynamically from the patrons feature ───
 
 const ARMOR_TYPES = [
     { id: 'none', label: 'No Armor', xpCost: 0, conversion: 'Harm passes directly' },
@@ -117,6 +98,18 @@ const STARTING_GEAR = [
     'Any tools required for your skills (lockpicks, healer\'s kit, writing materials)'
 ];
 
+const MAGIC_PATHS = [
+    { id: 'none', label: 'No Magic Path', cost: 0, note: 'Attributes and Skills are enough to be effective.' },
+    { id: 'hedge-gifts', label: 'Hedge Gifts (Craft of the Hedge, 4 XP)', cost: 4, note: '2 no-roll magical abilities. No resource tracking. Retrain later.' },
+    { id: 'familiar-only', label: 'Familiar Only (Familiar, 2 XP)', cost: 2, note: 'Companion + Patron\'s Gift. Obligation per use. Buy Codex later for full Runekeeper.' },
+    { id: 'runekeeper', label: 'Runekeeper (Familiar 2 XP + Codex 4 XP)', cost: 6, note: 'Structured rites from a Patron. Obligation cost per rite. Reliable but accrues debt.' },
+    { id: 'free-caster', label: 'Free Caster (Spellcraft, 6 XP)', cost: 6, note: 'Improvised magic via TAGS. Flexible but risky. Backlash on failure.' },
+    { id: 'invoker', label: 'Invoker (Patron\'s Symbol, 4 XP/Patron)', cost: 4, note: 'Ritual magic via symbols. Slow but flexible. Crack the Seal for emergencies.' },
+    { id: 'cantor', label: 'Cantor (Cantor\'s Path, 8 XP)', cost: 8, note: 'Songs that mimic Low Rites. Accessible but corrupting. Requires Lore 1+, Performance 2+, Presence 2+.' },
+    { id: 'summoner', label: 'Summoner (Pact-Whisperer 2 XP + Lesser Pactwright 2 XP)', cost: 4, note: 'Bind and command spirits. Powerful but requires Leash management.' },
+    { id: 'witch', label: 'Witchcraft (Craft of the Hedge, 4 XP)', cost: 4, note: 'Threshold magic. Hedge Gifts + Quick Workings + Full Rituals. Identity Strain track.' }
+];
+
 function defaultSkills() {
     const skills = {};
     ALL_SKILLS.forEach(s => skills[s.toLowerCase()] = 0);
@@ -128,6 +121,97 @@ function getTierFromXp(xp) {
         if (xp >= t.min && xp <= t.max) return t;
     }
     return TIER_THRESHOLDS[TIER_THRESHOLDS.length - 1];
+}
+
+// ─── Thiasos/Codex → Patron mapping ──────────────────────────────
+// Used for auto-deriving patron when a Runekeeper has Thiasos/Codex but no patron.
+
+const THIASOS_PATRON_MAP = {
+    'white-hound': 'mykkiel',
+    'ferret': 'inquisitor-prime',
+    'bronze-hawk': 'inquisitor-prime',
+    'mechanical-bird': 'inquisitor-prime',
+    'garden-spider': 'inaea',
+    'silk-moth': 'inaea',
+    'gray-mouse': 'inaea',
+    'fire-salamander': 'oath-of-flame-light',
+    'phoenix-fledgling': 'oath-of-flame-light',
+    'brass-beetle': 'sacred-geometry',
+    'konreh-pieces': 'sacred-geometry',
+    'bell-frog': 'gallows-bell',
+    'gray-mouse-courthouse': 'gallows-bell',
+    'lead-seal': 'varnek-karn',
+    'knucklebone': 'varnek-karn',
+    'confessor-mouse': 'confessor-beneath-the-bell',
+    'bell-cricket': 'confessor-beneath-the-bell',
+    'letter-mouse': 'silent-choir',
+    'forgetfulness-moth': 'silent-choir',
+    'raven': 'the-witness',
+    'silverfish': 'the-witness',
+    'bronze-key': 'sealed-gate',
+    'bell-ward': 'sealed-gate',
+};
+
+const CODEX_PATRON_MAP = {
+    'iron-bound-ledger': 'inquisitor-prime',
+    'slate-tablet': 'inquisitor-prime',
+    'frame-loom': 'inaea',
+    'knotted-cords': 'inaea',
+    'brass-scroll': 'oath-of-flame-light',
+    'sun-stone': 'oath-of-flame-light',
+    'brass-stencils': 'sacred-geometry',
+    'slate-proofs': 'sacred-geometry',
+    'court-ledger': 'gallows-bell',
+    'bronze-bells': 'gallows-bell',
+    'slate-carvings': 'varnek-karn',
+    'burial-tablets': 'varnek-karn',
+    'bell-ringers-log': 'confessor-beneath-the-bell',
+    'leather-strap': 'confessor-beneath-the-bell',
+    'locked-journal': 'silent-choir',
+    'wax-tablets': 'silent-choir',
+    'loose-leaf-pages': 'the-witness',
+    'chalkboard': 'the-witness',
+    'leather-strap-seals': 'sealed-gate',
+    'iron-rings': 'sealed-gate',
+};
+
+function derivePatronFromRunekeeperItems({ thiasos, codex }) {
+    if (thiasos && THIASOS_PATRON_MAP[thiasos]) return THIASOS_PATRON_MAP[thiasos];
+    if (codex && CODEX_PATRON_MAP[codex]) return CODEX_PATRON_MAP[codex];
+    return null;
+}
+
+// ─── Dynamic patron loader ────────────────────────────────────────
+
+let patronOptionsCache = null;
+
+function getPatronOptions() {
+    if (patronOptionsCache) return patronOptionsCache;
+    
+    const appState = getState();
+    const cosmicPatrons = appState.patrons?.cosmic || [];
+    
+    if (cosmicPatrons.length === 0) {
+        patronOptionsCache = [{ id: '', label: 'None — No Patron' }];
+        return patronOptionsCache;
+    }
+    
+    const options = cosmicPatrons.map(p => ({
+        id: p.id,
+        label: `${p.name || p.title || p.id} — ${p.subtitle || p.domain || 'Cosmic Patron'}`
+    }));
+    options.sort((a, b) => a.label.localeCompare(b.label));
+    options.unshift({ id: '', label: 'None — No Patron' });
+    
+    patronOptionsCache = options;
+    return patronOptionsCache;
+}
+
+function buildPatronOptionsHTML(selectedId) {
+    const options = getPatronOptions();
+    return options.map(p => 
+        `<option value="${p.id}" ${selectedId === p.id ? 'selected' : ''}>${escHtml(p.label)}</option>`
+    ).join('');
 }
 
 // ─── XP Calculation Helpers ────────────────────────────────────────
@@ -158,16 +242,12 @@ function calculateTotalXpSpent(d) {
     if (d.talents) d.talents.forEach(t => spent += safeParseInt(t.cost, 0));
     if (d.assets) d.assets.forEach(a => spent += safeParseInt(a.cost, 0));
     if (d.equipment) d.equipment.forEach(e => spent += safeParseInt(e.cost, 0));
-    // Magic path cost
     const path = MAGIC_PATHS.find(p => p.id === (d.magicPath || 'none'));
     if (path) spent += path.cost;
-    // Armor
     const armor = ARMOR_TYPES.find(a => a.id === (d.armorType || 'none'));
     if (armor) spent += armor.xpCost;
-    // Shield
     const shield = SHIELD_TYPES.find(s => s.id === (d.shieldType || 'none'));
     if (shield) spent += shield.xpCost;
-    // Weapon (basic light weapon is free)
     const weapon = WEAPON_CLASSES.find(w => w.id === (d.weaponClass || 'light'));
     if (weapon && d.weaponClass !== 'light') spent += weapon.xpCost;
     return spent;
@@ -292,7 +372,6 @@ function injectModalStyles() {
             border-radius: 4px;
             border-left: 2px solid var(--gold, #c9a84c);
         }
-        /* Talent catalog within wizard */
         .talent-catalog {
             max-height: 200px;
             overflow-y: auto;
@@ -366,8 +445,16 @@ function addListener(el, event, fn) {
 
 // ─── Public API ─────────────────────────────────────────────────────
 
-export function openWizard() {
+export async function openWizard() {
     try {
+        // Ensure patron data is loaded
+        try {
+            await loadPatronData();
+            console.log('[Wizard] Patron data loaded');
+        } catch (err) {
+            console.warn('[Wizard] Failed to load patron data, using fallback:', err);
+        }
+
         const modal = ensureModal();
         state.modal = modal;
 
@@ -419,10 +506,11 @@ export function openWizard() {
             weaponClass: 'light',
             armorConversion: 'Harm passes directly',
             vtt: true,
-            // Path-specific fields (empty defaults)
             symbols: [],
             symbolStates: {},
             rites: [],
+            thiasos: '',
+            codex: '',
             repertoire: [],
             hedgeGifts: [],
             shadow: 0,
@@ -558,13 +646,35 @@ function collectSkills(d) {
 }
 
 function collectTalentsAndLoadout(d) {
-    d.talents = readTalentListFromDOM();   // now reads both catalog & custom rows
+    d.talents = readTalentListFromDOM();
     d.assets = readDynamicList('wz-asset');
     d.equipment = readDynamicList('wz-equip');
     d.magicPath = getVal('#wz-magic-path') || 'none';
     const path = MAGIC_PATHS.find(p => p.id === d.magicPath);
     d.magicPathNote = path?.note || '';
     d.patron = getVal('#wz-patron');
+    
+    // ─── Read Thiasos/Codex (Runekeeper) ──────────────────────────
+    d.thiasos = getVal('#wz-thiasos').trim();
+    d.codex = getVal('#wz-codex').trim();
+    
+    // ─── Auto-derive patron if Runekeeper and patron missing ──────
+    if (d.magicPath === 'runekeeper' && !d.patron) {
+        const derived = derivePatronFromRunekeeperItems({ 
+            thiasos: d.thiasos, 
+            codex: d.codex 
+        });
+        if (derived) {
+            d.patron = derived;
+            // Update the dropdown to reflect the derived patron
+            const patronSelect = document.querySelector('#wz-patron');
+            if (patronSelect) patronSelect.value = derived;
+            showToast(`🔮 Patron auto-set to ${derived} from Thiasos/Codex.`, 'info');
+        } else if (d.thiasos || d.codex) {
+            showToast('⚠️ Thiasos/Codex selected but patron could not be auto-detected. Please select a patron.', 'warning');
+        }
+    }
+    
     d.armorType = getVal('#wz-armor-type') || 'none';
     d.shieldType = getVal('#wz-shield-type') || 'none';
     d.weaponClass = getVal('#wz-weapon-class') || 'light';
@@ -579,12 +689,10 @@ function collectBondsAndFinish(d) {
     d.complications = readCompList();
     d._stepDataCollected[4] = true;
     
-    // Calculate starting XP
     const bondCount = Math.min(d.bonds.filter(b => b.start).length, 2);
     const compCount = Math.min(d.complications.filter(c => c.start).length, 2);
     d.startingXp = Math.min(32 + bondCount * 2 + compCount * 2, 36);
     
-    // Calculate XP spent
     const spent = calculateTotalXpSpent(d);
     
     if (spent > d.startingXp) {
@@ -618,9 +726,6 @@ function readDynamicList(prefix) {
     return items;
 }
 
-/**
- * Reads the talent list from the DOM, handling both catalog (read-only) and custom rows.
- */
 function readTalentListFromDOM() {
     const items = [];
     document.querySelectorAll('.wz-talent-row').forEach(row => {
@@ -684,30 +789,25 @@ function finishWizard() {
         return;
     }
 
-    // Final XP calculation
     const bondCount = Math.min((d.bonds || []).filter(b => b.start).length, 2);
     const compCount = Math.min((d.complications || []).filter(c => c.start).length, 2);
     d.startingXp = Math.min(32 + bondCount * 2 + compCount * 2, 36);
     d.totalXp = d.startingXp;
     
-    // Auto-calculate tier
     const tierInfo = getTierFromXp(d.totalXp);
     d.tier = tierInfo.tier;
     d.tierName = tierInfo.name;
 
-    // Derived stats
     d.fatigueMax = d.body;
     d.obligationCapacity = d.spirit + d.presence;
     d.corruptionMax = d.spirit;
     d.mentalStrainMax = d.spirit;
     
-    // XP spent tracking
     d.xpSpent = calculateTotalXpSpent(d);
 
     const pushCheck = document.getElementById('wz-push-vtt');
     if (pushCheck) d.vtt = pushCheck.checked;
 
-    // Warn if overspent but allow save
     if (d.xpSpent > d.startingXp) {
         const proceed = confirm(
             `This character is ${d.xpSpent - d.startingXp} XP over budget.\n` +
@@ -774,10 +874,9 @@ function renderStep() {
     }
     stepsEl.innerHTML = html;
 
-    // Post-render hooks
     if (state.step === 1) attachAttributeListeners();
     if (state.step === 2) attachSkillListeners();
-    if (state.step === 3) renderTalentCatalog();   // render catalog after DOM exists
+    if (state.step === 3) renderTalentCatalog();
     if (state.step === 4) updateSummaryDisplay();
 
     const firstInput = stepsEl.querySelector('input, select, textarea');
@@ -981,10 +1080,6 @@ function renderStep2Skills(d) {
 
 // ─── Talent Catalog Helpers ──────────────────────────────────────
 
-/**
- * Returns combined list of talents from state (local + wiki) that
- * are valid for the current character tier.
- */
 function getAvailableTalentsForTier(d) {
     const appState = getState();
     const localTalents = appState.talents || [];
@@ -997,12 +1092,12 @@ function getAvailableTalentsForTier(d) {
     ];
 
     const spent = calculateTotalXpSpent(d);
-    const tier = getTierFromXp(spent).tier;   // 'I', 'II', etc.
+    const tier = getTierFromXp(spent).tier;
 
     let allowedTiers = [];
     if (tier === 'I') allowedTiers = ['minor'];
     else if (tier === 'II') allowedTiers = ['minor', 'major'];
-    else allowedTiers = ['minor', 'major', 'prestige', 'epic'];   // III+
+    else allowedTiers = ['minor', 'major', 'prestige', 'epic'];
 
     return allTalents.filter(t => {
         const cost = safeParseInt(t.cost, 0);
@@ -1042,9 +1137,6 @@ function renderTalentCatalog() {
     }).join('');
 }
 
-/**
- * Adds a talent (from catalog) as a read-only row to the character's talent list.
- */
 export function addTalentFromCatalog(name, cost) {
     const listEl = document.getElementById('wz-talent-list');
     if (!listEl || !state.data) return;
@@ -1058,7 +1150,6 @@ export function addTalentFromCatalog(name, cost) {
     `;
     listEl.appendChild(row);
 
-    // Update data and budget
     if (state.data.talents) {
         state.data.talents.push({ name, cost });
     }
@@ -1066,9 +1157,6 @@ export function addTalentFromCatalog(name, cost) {
     if (state.step === 4) setTimeout(updateSummaryDisplay, 50);
 }
 
-/**
- * Add a custom (editable) talent row.
- */
 export function addCustomTalentRow() {
     const listEl = document.getElementById('wz-talent-list');
     if (!listEl) return;
@@ -1094,9 +1182,8 @@ function renderStep3TalentsAndLoadout(d) {
         `<option value="${p.id}" ${d.magicPath === p.id ? 'selected' : ''}>${escHtml(p.label)}</option>`
     ).join('');
     
-    const patronOptions = PATRONS.map(p => 
-        `<option value="${p.id}" ${d.patron === p.id ? 'selected' : ''}>${escHtml(p.label)}</option>`
-    ).join('');
+    // ─── Dynamic patron options ──────────────────────────────────
+    const patronOptions = buildPatronOptionsHTML(d.patron || '');
     
     const armorOptions = ARMOR_TYPES.map(a => 
         `<option value="${a.id}" ${d.armorType === a.id ? 'selected' : ''}>${escHtml(a.label)}</option>`
@@ -1113,28 +1200,27 @@ function renderStep3TalentsAndLoadout(d) {
     const path = MAGIC_PATHS.find(p => p.id === d.magicPath);
     const weapon = WEAPON_CLASSES.find(w => w.id === d.weaponClass);
     
-    // Talent rows (now with catalog rows rendered from data, custom rows will be added later)
-    const talentRows = (d.talents || []).map((t, i) => {
-        // For wizard, we render all talents as read-only spans (catalog) or editable? 
-        // We'll render them as read-only for simplicity; custom rows can be added via "Add Custom Talent"
-        return `
-            <div class="dynamic-row wz-talent-row">
-                <span class="wz-talent-name" style="flex:2; padding:0.2rem;">${escHtml(t.name)}</span>
-                <span class="wz-talent-cost" style="width:60px; text-align:center;">${t.cost}</span>
-                <button class="wizard-remove-btn">✕</button>
-            </div>
-        `;
-    }).join('');
+    const talentRows = (d.talents || []).map((t, i) => `
+        <div class="dynamic-row wz-talent-row">
+            <span class="wz-talent-name" style="flex:2; padding:0.2rem;">${escHtml(t.name)}</span>
+            <span class="wz-talent-cost" style="width:60px; text-align:center;">${t.cost}</span>
+            <button class="wizard-remove-btn">✕</button>
+        </div>
+    `).join('');
     
     const assetRows = (d.assets || []).map((a, i) => dynamicRowHtml('wz-asset', i, a.name, a.cost)).join('');
     const equipRows = (d.equipment || []).map((e, i) => dynamicRowHtml('wz-equip', i, e.name, e.cost)).join('');
+    
+    // Thiasos/Codex values
+    const thiasos = d.thiasos || '';
+    const codex = d.codex || '';
+    const isRunekeeper = d.magicPath === 'runekeeper';
     
     return `
         <div>
             <h3 style="margin-top:0;">🧩 Step 4 — Talents, Magic & Loadout</h3>
             ${xpBudget}
             
-            <!-- Magic Path -->
             <h4 style="margin:0.5rem 0 0.2rem;">🔮 Magic Path (Optional)</h4>
             <div class="info-box" style="font-size:0.75rem;">
                 You don't need magic to be effective. A Body 3 + Melee 2 warrior rolls 5 dice with no talents.
@@ -1150,11 +1236,27 @@ function renderStep3TalentsAndLoadout(d) {
                 <div>
                     <label>Patron</label>
                     <select id="wz-patron">${patronOptions}</select>
-                    <div class="field-hint" style="margin-top:0.2rem;">${escHtml(PATRONS.find(p => p.id === d.patron)?.theme || '')}</div>
+                    <div class="field-hint" style="margin-top:0.2rem;">Patrons loaded from /data/patrons/</div>
                 </div>
             </div>
             
-            <!-- Combat Loadout -->
+            <!-- ─── Runekeeper: Thiasos/Codex ────────────────────── -->
+            <div id="wz-runekeeper-fields" style="display:${isRunekeeper ? 'block' : 'none'}; margin-top:0.3rem;">
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;">
+                    <div>
+                        <label>Thiasos (Familiar)</label>
+                        <input id="wz-thiasos" value="${escHtml(thiasos)}" placeholder="e.g., white-hound, garden-spider" />
+                        <span style="font-size:0.65rem;color:var(--text3);">The patron's attention given form.</span>
+                    </div>
+                    <div>
+                        <label>Codex</label>
+                        <input id="wz-codex" value="${escHtml(codex)}" placeholder="e.g., iron-bound-ledger, frame-loom" />
+                        <span style="font-size:0.65rem;color:var(--text3);">The covenant made visible.</span>
+                    </div>
+                </div>
+                ${thiasos || codex ? `<div style="font-size:0.65rem;color:var(--gold);margin-top:0.2rem;">💡 Patron will be auto-set from Thiasos/Codex if not selected.</div>` : ''}
+            </div>
+            
             <h4 style="margin:0.8rem 0 0.2rem;">⚔️ Combat Loadout</h4>
             <div class="info-box" style="font-size:0.75rem;">
                 Starting gear (free): One set of clothing, a Light weapon, Light armor (if needed), 
@@ -1178,7 +1280,6 @@ function renderStep3TalentsAndLoadout(d) {
                 </div>
             </div>
             
-            <!-- Talents -->
             <h4 style="margin:0.8rem 0 0.2rem;">🧠 Talents</h4>
             <div class="info-box" style="font-size:0.75rem;">
                 Minor (2–3 XP): Small situational bonus | Major (4–6 XP): Strong upgrade | 
@@ -1186,21 +1287,14 @@ function renderStep3TalentsAndLoadout(d) {
                 Start with 0–3 talents. Many concepts work perfectly with zero talents.
             </div>
             
-            <!-- Catalog selection -->
-            <div id="wz-talent-catalog" class="talent-catalog">
-                <!-- populated by renderTalentCatalog() -->
-            </div>
+            <div id="wz-talent-catalog" class="talent-catalog"></div>
             
-            <!-- Current talent list -->
-            <div id="wz-talent-list">
-                ${talentRows}
-            </div>
+            <div id="wz-talent-list">${talentRows}</div>
             
             <div style="display:flex; gap:0.4rem;">
                 <button class="btn btn-sm btn-secondary" id="wz-add-custom-talent">✏️ Add Custom Talent</button>
             </div>
             
-            <!-- Assets -->
             <h4 style="margin:0.8rem 0 0.2rem;">🏰 Assets (Optional)</h4>
             <div class="info-box" style="font-size:0.75rem;">
                 Minor Asset (4 XP): Safehouse, workshop, contact network | 
@@ -1210,7 +1304,6 @@ function renderStep3TalentsAndLoadout(d) {
             <div id="wz-asset-list">${assetRows}</div>
             <button class="btn btn-sm btn-secondary" data-wizard-add="wz-asset">+ Add Asset</button>
             
-            <!-- Equipment -->
             <h4 style="margin:0.8rem 0 0.2rem;">🎒 Additional Equipment</h4>
             <div id="wz-equip-list">${equipRows}</div>
             <button class="btn btn-sm btn-secondary" data-wizard-add="wz-equip">+ Add Equipment</button>
@@ -1222,7 +1315,6 @@ function renderStep4BondsAndSummary(d) {
     const bondRows = (d.bonds || []).map((b, i) => bondRowHtml(i, b)).join('');
     const compRows = (d.complications || []).map((c, i) => compRowHtml(i, c)).join('');
     
-    // Pre-calculate for summary
     const bondCount = Math.min((d.bonds || []).filter(b => b.start).length, 2);
     const compCount = Math.min((d.complications || []).filter(c => c.start).length, 2);
     const startingXp = Math.min(32 + bondCount * 2 + compCount * 2, 36);
@@ -1231,14 +1323,12 @@ function renderStep4BondsAndSummary(d) {
     
     const tier = getTierFromXp(startingXp);
     
-    // Count skills with ranks
     const skilledCount = ALL_SKILLS.filter(s => (d.skills?.[s.toLowerCase()] || 0) > 0).length;
     
     return `
         <div>
             <h3 style="margin-top:0;">📋 Step 5 — Bonds, Complications & Summary</h3>
             
-            <!-- Bonds -->
             <h4 style="margin:0.3rem 0 0.2rem;">🤝 Bonds</h4>
             <div class="info-box" style="font-size:0.75rem;">
                 Establish up to 2 bonds with other characters. Each bond grants <strong>+2 XP</strong> at creation (max +4 from bonds).
@@ -1248,7 +1338,6 @@ function renderStep4BondsAndSummary(d) {
             <div id="wz-bond-list">${bondRows}</div>
             <button class="btn btn-sm btn-secondary" data-wizard-add="wz-bond">+ Add Bond</button>
             
-            <!-- Complications -->
             <h4 style="margin:0.8rem 0 0.2rem;">⚠️ Complications</h4>
             <div class="info-box" style="font-size:0.75rem;">
                 Take up to 2 complications (e.g., a feud, a cursed item, a debt). Each grants <strong>+2 XP</strong> at creation (max +4 from complications).
@@ -1258,7 +1347,6 @@ function renderStep4BondsAndSummary(d) {
             <div id="wz-comp-list">${compRows}</div>
             <button class="btn btn-sm btn-secondary" data-wizard-add="wz-comp">+ Add Complication</button>
             
-            <!-- Summary -->
             <h4 style="margin:1rem 0 0.3rem;">📊 Character Summary</h4>
             <div style="background:var(--bg2);padding:1rem;border-radius:var(--radius);">
                 <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:0.5rem;">
@@ -1279,13 +1367,15 @@ function renderStep4BondsAndSummary(d) {
                     <div><span class="text-muted">Attributes:</span> B${d.body} W${d.wits} S${d.spirit} P${d.presence}</div>
                     <div><span class="text-muted">Skills with ranks:</span> ${skilledCount}/16</div>
                     <div><span class="text-muted">Magic Path:</span> ${escHtml(MAGIC_PATHS.find(p => p.id === d.magicPath)?.label.split('(')[0] || 'None')}</div>
-                    <div><span class="text-muted">Patron:</span> ${escHtml(PATRONS.find(p => p.id === d.patron)?.label.split('—')[0] || 'None')}</div>
+                    <div><span class="text-muted">Patron:</span> ${escHtml(getPatronLabel(d.patron) || 'None')}</div>
                     <div><span class="text-muted">Talents:</span> ${(d.talents || []).length}</div>
                     <div><span class="text-muted">Assets:</span> ${(d.assets || []).length}</div>
                     <div><span class="text-muted">Bonds:</span> ${(d.bonds || []).length} (${bondCount} for +XP)</div>
                     <div><span class="text-muted">Complications:</span> ${(d.complications || []).length} (${compCount} for +XP)</div>
                     <div><span class="text-muted">Armor:</span> ${escHtml(ARMOR_TYPES.find(a => a.id === d.armorType)?.label.split('(')[0] || 'None')}</div>
                     <div><span class="text-muted">Weapon:</span> ${escHtml(WEAPON_CLASSES.find(w => w.id === d.weaponClass)?.label.split('(')[0] || 'Light')}</div>
+                    ${d.thiasos ? `<div><span class="text-muted">Thiasos:</span> ${escHtml(d.thiasos)}</div>` : ''}
+                    ${d.codex ? `<div><span class="text-muted">Codex:</span> ${escHtml(d.codex)}</div>` : ''}
                 </div>
                 <hr style="border-color:var(--border);margin:0.6rem 0;" />
                 <div class="xp-budget-bar ${remaining < 0 ? 'xp-budget-over' : 'xp-budget-ok'}" id="wz-summary-xp-bar">
@@ -1307,6 +1397,15 @@ function renderStep4BondsAndSummary(d) {
             </div>
         </div>
     `;
+}
+
+// ─── Helper: Get patron label from ID ────────────────────────────
+
+function getPatronLabel(patronId) {
+    if (!patronId) return null;
+    const options = getPatronOptions();
+    const found = options.find(p => p.id === patronId);
+    return found ? found.label : patronId;
 }
 
 // ─── Live Update Functions ──────────────────────────────────────────
@@ -1371,9 +1470,7 @@ function updateSkillCost(skillKey) {
 function updateXpBudgetFromDOM() {
     if (!state.data) return;
     const d = state.data;
-    // Re-read talents from DOM (handles read-only spans)
     d.talents = readTalentListFromDOM();
-    // All other data remains as stored.
     const budgetEl = document.querySelector('.xp-budget-bar');
     if (budgetEl) {
         const spent = calculateTotalXpSpent(d);
@@ -1519,7 +1616,6 @@ function attachEvents() {
     };
     addListener(document, 'keydown', keyHandler);
 
-    // Delegated click for dynamic add/remove and live updates
     const clickHandler = (e) => {
         const target = e.target;
 
@@ -1532,21 +1628,18 @@ function attachEvents() {
         if (target.matches('.wizard-remove-btn')) {
             const row = target.closest('.dynamic-row');
             if (row) row.remove();
-            // Update data from DOM
             if (state.data) state.data.talents = readTalentListFromDOM();
             updateXpBudgetFromDOM();
             if (state.step === 4) setTimeout(updateSummaryDisplay, 50);
             e.preventDefault();
         }
 
-        // Checkbox change updates summary
         if (target.matches('.wz-bond-start, .wz-comp-start')) {
             if (state.isOpen && state.step === 4) {
                 setTimeout(updateSummaryDisplay, 50);
             }
         }
 
-        // Heritage change updates note
         if (target.matches('#wz-heritage')) {
             const heritage = HERITAGES.find(h => h.id === target.value);
             const noteEl = document.getElementById('wz-heritage-note');
@@ -1555,16 +1648,19 @@ function attachEvents() {
             }
         }
 
-        // Magic path change updates note
         if (target.matches('#wz-magic-path')) {
             const path = MAGIC_PATHS.find(p => p.id === target.value);
             const noteEl = document.getElementById('wz-magic-path-note');
             if (noteEl && path) {
                 noteEl.textContent = path.note;
             }
+            // Show/hide Runekeeper fields
+            const runekeeperFields = document.getElementById('wz-runekeeper-fields');
+            if (runekeeperFields) {
+                runekeeperFields.style.display = target.value === 'runekeeper' ? 'block' : 'none';
+            }
         }
 
-        // Armor change updates info
         if (target.matches('#wz-armor-type')) {
             const armor = ARMOR_TYPES.find(a => a.id === target.value);
             const infoEl = document.getElementById('wz-armor-info');
@@ -1573,7 +1669,6 @@ function attachEvents() {
             }
         }
 
-        // Weapon change updates info
         if (target.matches('#wz-weapon-class')) {
             const weapon = WEAPON_CLASSES.find(w => w.id === target.value);
             const infoEl = document.getElementById('wz-weapon-info');
@@ -1582,7 +1677,6 @@ function attachEvents() {
             }
         }
 
-        // Catalog add button
         if (target.matches('.catalog-add-btn')) {
             const name = target.dataset.name;
             const cost = parseInt(target.dataset.cost, 10);
@@ -1590,7 +1684,6 @@ function attachEvents() {
             e.preventDefault();
         }
 
-        // Custom talent add button
         if (target.matches('#wz-add-custom-talent')) {
             addCustomTalentRow();
             e.preventDefault();
@@ -1598,18 +1691,15 @@ function attachEvents() {
     };
     addListener(document, 'click', clickHandler);
     
-    // Input event for live XP updates on step 4
     const inputHandler = (e) => {
         if (!state.isOpen) return;
         if (state.step === 4 && e.target.matches('.wz-bond-name, .wz-bond-desc, .wz-comp-name, .wz-comp-desc, .wz-talent-name, .wz-talent-cost')) {
-            // Talent cost inputs (for custom rows)
             if (e.target.matches('.wz-talent-cost')) {
                 state.data.talents = readTalentListFromDOM();
             }
             setTimeout(updateSummaryDisplay, 50);
             updateXpBudgetFromDOM();
         }
-        // For talent catalog, nothing needed as add removes from catalog.
     };
     addListener(document, 'input', inputHandler);
 }

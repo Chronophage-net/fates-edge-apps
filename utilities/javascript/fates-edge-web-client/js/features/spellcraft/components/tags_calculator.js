@@ -33,6 +33,15 @@ let spellHistory = [];
 let activeTags = [];
 let calculatorContainer = null;
 
+// FIX: attachEvents() used to call document.addEventListener('click', ...)
+// on every single render (refresh, template pick, tag add/remove all
+// re-render the calculator). Each call stacked a brand-new listener on
+// `document` that never got removed, so after using the calculator for a
+// while dozens of duplicate handlers would fire on every click anywhere on
+// the page. We keep a single reference here and always remove it before
+// re-adding so there is ever only one bound at a time.
+let outsideClickHandler = null;
+
 // ============================================================
 // WIKI LOADER
 // ============================================================
@@ -160,8 +169,6 @@ const CATEGORY_ORDER = ['Elemental', 'Force', 'Mind/Illusion', 'Life/Body', 'Spa
 
 // ─── Spell Templates ──────────────────────────────────────────
 
-// ─── Spell Templates ──────────────────────────────────────────
-
 const SPELL_TEMPLATES = [
     { name: '🔥 Firebolt', tags: ['Burning', 'Strike'], description: 'A bolt of flame strikes a single target.' },
     { name: '❄️ Frost Grasp', tags: ['Freezing', 'Bind'], description: 'Ice encases a target, holding them in place.' },
@@ -179,7 +186,6 @@ const SPELL_TEMPLATES = [
     { name: '✨ Momentary Forge', tags: ['Create', 'Transmute', 'Animate'], description: 'Shape raw matter ' +
         'into a temporary tool or weapon.' }
 ];
-
 
 // ─── Tag Combination Hints ────────────────────────────────────
 
@@ -838,12 +844,20 @@ function attachEvents(el) {
     if (rollBtn) rollBtn.addEventListener('click', window.calculatorTestCast);
     if (gambleBtn) gambleBtn.addEventListener('click', window.calculatorGamble);
 
-    // Click outside to close suggestions
-    document.addEventListener('click', (e) => {
+    // FIX: previously this added a brand-new document-level click listener
+    // every time attachEvents() ran (i.e. every render), and old ones were
+    // never removed. Over a session this silently stacked up dozens of
+    // duplicate handlers. Now we remove any handler we previously attached
+    // before binding a fresh one, so there is always exactly one.
+    if (outsideClickHandler) {
+        document.removeEventListener('click', outsideClickHandler);
+    }
+    outsideClickHandler = (e) => {
         if (suggestions && !suggestions.contains(e.target) && e.target !== input) {
             suggestions.style.display = 'none';
         }
-    });
+    };
+    document.addEventListener('click', outsideClickHandler);
 }
 
 // ============================================================
