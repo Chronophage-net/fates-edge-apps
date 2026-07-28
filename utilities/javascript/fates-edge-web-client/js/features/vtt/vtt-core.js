@@ -8,6 +8,11 @@
  * - Larger, more readable UI
  * - Avatar support
  * - Fixed attribute/skill lookup to match character data model
+ * - Rich chat message rendering: Deck/Crown Spread synthesis text
+ *   posted to chat (which carries the same embedded <em> tags and
+ *   [Bracket] annotations as region card data) now renders as
+ *   structured HTML instead of one escaped run-on line, matching the
+ *   treatment already applied to Adventure Manager descriptions.
  */
 
 import { vttStore } from '../../core/vtt-store.js';
@@ -65,6 +70,134 @@ export function q(selector) {
 export function qa(selector) {
     if (!currentContainer) return [];
     return currentContainer.querySelectorAll(selector);
+}
+
+// ============================================================
+// RICH CHAT TEXT RENDERING (plain text → nice HTML, composed from
+// sub-components at display time — same approach as Adventure
+// Manager's description renderer, for the same underlying reason:
+// Deck draws / Crown Spreads post their synthesis text straight to
+// chat, complete with inline <em> flavor tags and [Bracket: ...]
+// annotations from the region card data. Escaping that wholesale
+// turns it into a wall of "&lt;em&gt;" and literal brackets.
+// ============================================================
+
+const RICH_TEXT_ALLOWED_TAGS = ['em', 'strong', 'i', 'b'];
+
+// Escapes everything EXCEPT the small whitelist of inline tags already
+// used in region/card flavor text, so a stray "<script>" still gets
+// neutered but an authored "<em>...</em>" renders as emphasis instead
+// of literal "&lt;em&gt;" text.
+function escapeKeepingAllowedTags(text) {
+    const stashed = [];
+    const tagPattern = new RegExp(`</?(?:${RICH_TEXT_ALLOWED_TAGS.join('|')})>`, 'gi');
+    const withPlaceholders = String(text).replace(tagPattern, (match) => {
+        stashed.push(match);
+        return `\u0000${stashed.length - 1}\u0000`;
+    });
+    let escaped = escHtml(withPlaceholders);
+    escaped = escaped.replace(/\u0000(\d+)\u0000/g, (_, i) => stashed[Number(i)]);
+    return escaped;
+}
+
+// "[Label: detail text]" → a small styled callout chip, instead of
+// literal square brackets sitting in the middle of a chat line.
+function renderChatBracketAnnotations(html) {
+    return html.replace(/\[([A-Za-z][A-Za-z ]{0,20}):\s*([^\]]+)\]/g, (match, label, detail) => `
+        <span style="display:inline-block;margin:0.1rem 0.15rem 0.1rem 0;padding:0.05rem 0.45rem;background:var(--bg4);border-radius:10px;border-left:2px solid var(--gold);font-size:0.85em;">
+            <strong style="color:var(--gold);">${label}:</strong> ${detail}
+        </span>
+    `);
+}
+
+// "**bold**" (used by Ace Effect text) → real <strong>.
+function renderChatMarkdownBold(html) {
+    return html.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+}
+
+// Crown Spread / deck synthesis text always uses these emoji markers.
+const CHAT_POSITION_MARKERS = ['🌱', '🏔️', '👑', '🤝', '🌟', '⏱️', '♠️'];
+
+function looksLikeCrownSpreadText(text) {
+    return CHAT_POSITION_MARKERS.filter(m => text.includes(m)).length >= 3;
+}
+
+// Splits Crown Spread synthesis text into one compact styled block per
+// position/wildcard/timer/ace-effect segment.
+function renderCrownSpreadChatHtml(text) {
+    const splitPattern = /(?=(?:🌱|🏔️|👑|🤝|🌟|⏱️|♠️))/g;
+    const rawSegments = text.split(splitPattern).map(s => s.trim()).filter(Boolean);
+
+    return rawSegments.map(seg => {
+        const marker = CHAT_POSITION_MARKERS.find(m => seg.startsWith(m));
+        const rest = marker ? seg.slice(marker.length).trim() : seg;
+        const colonIdx = rest.indexOf(':');
+        // Only treat a colon within the first ~25 chars as a "Label:" —
+        // further out (or inside "**Ace Effect:**"-style markdown) it's
+        // just punctuation inside the body text.
+        let label = '';
+        let body = rest;
+        if (colonIdx > -1 && colonIdx <= 25) {
+            label = rest.slice(0, colonIdx).replace(/\*\*/g, '').trim();
+            body = rest.slice(colonIdx + 1).replace(/^\*\*\s*/, '').trim();
+        }
+        const withChips = renderChatBracketAnnotations(renderChatMarkdownBold(escapeKeepingAllowedTags(body)));
+        const isHighlight = marker === '🌟' || marker === '⏱️' || marker === '♠️';
+
+        return `
+            <div style="padding:0.3rem 0.5rem;margin:0.2rem 0;border-radius:6px;background:${isHighlight ? 'var(--bg4)' : 'var(--bg2)'};border-left:2px solid ${isHighlight ? 'var(--gold)' : 'var(--border)'};">
+                ${label ? `<div style="font-weight:600;color:var(--gold);font-size:0.8rem;">${marker || ''} ${escHtml(label)}</div>` : ''}
+                <div style="font-size:0.85rem;line-height:1.4;">${withChips}</div>
+            </div>
+        `;
+    }).join('');
+}
+
+// Clean, tag/bracket/marker-free text for the collapsed preview line.
+function chatPlainPreview(text, maxLen = 160) {
+    let plain = String(text)
+        .replace(/<\/?[^>]+>/g, '')
+        .replace(/\[[^\]]+\]/g, '')
+        .replace(/\*\*/g, '')
+        .replace(/[🌱🏔️👑🤝🌟⏱️♠️]/g, '')
+        .replace(/\s+/g, ' ')
+        .trim();
+    if (plain.length > maxLen) plain = plain.slice(0, maxLen).trim() + '…';
+    return plain;
+}
+
+let richChatMsgCounter = 0;
+
+/**
+ * Renders a chat message's text nicely. Crown Spread / deck synthesis
+ * text (detected by its emoji position markers) gets the structured
+ * block treatment; anything else gets newline-aware paragraphing plus
+ * the same [Bracket]/**bold** treatment, so ordinary player chat still
+ * reads naturally (and looks identical to before for a normal one-line
+ * message). Long messages get a "Show full reading" toggle so the
+ * chat feed doesn't get overwhelmed by one giant Crown Spread post.
+ */
+function renderChatMessageText(rawText) {
+    const text = String(rawText || '');
+    if (!text) return '';
+
+    const isCrown = looksLikeCrownSpreadText(text);
+    const formatted = isCrown
+        ? renderCrownSpreadChatHtml(text)
+        : renderChatBracketAnnotations(renderChatMarkdownBold(escapeKeepingAllowedTags(text)))
+            .split(/\n\s*\n/)
+            .map(p => `<div style="margin:0.15rem 0;">${p.trim()}</div>`)
+            .join('');
+
+    if (text.length > 220) {
+        const toggleId = `chat-msg-full-${++richChatMsgCounter}`;
+        return `
+            <span class="chat-msg-preview">${escHtml(chatPlainPreview(text))}</span>
+            <button class="btn btn-xs btn-ghost chat-msg-expand-btn" data-target="${toggleId}" style="font-size:0.7rem;padding:0.05rem 0.4rem;margin-left:0.3rem;">Show full reading</button>
+            <div id="${toggleId}" class="chat-msg-full" style="display:none;margin-top:0.3rem;">${formatted}</div>
+        `;
+    }
+    return formatted;
 }
 
 // ============================================================
@@ -192,7 +325,7 @@ export function renderChat() {
                     <div style="display:flex;align-items:center;gap:0.4rem;flex-wrap:wrap;">
                         <span style="color:var(--text2);font-size:0.8rem;">${escHtml(time)}</span>
                         <strong style="color:${senderColor};font-size:1rem;">${escHtml(sender)}${recipient}:</strong>
-                        <span style="word-break:break-word;font-size:1rem;">${whisper}${escHtml(String(text))}</span>
+                        <div style="word-break:break-word;font-size:1rem;flex:1 1 auto;min-width:0;">${whisper}${renderChatMessageText(text)}</div>
                         ${modeBadge}
                         <span class="msg-status" style="font-size:0.7rem;color:${statusColor};margin-left:auto;" title="${statusTitle}">${statusIcon}</span>
                     </div>
@@ -203,6 +336,22 @@ export function renderChat() {
         }
 
         setHtml(chatContainer, html);
+
+        // Wire up "Show full reading" toggles for long/Crown-Spread messages.
+        chatContainer.querySelectorAll('.chat-msg-expand-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const target = chatContainer.querySelector(`#${btn.dataset.target}`);
+                const preview = btn.previousElementSibling;
+                if (!target) return;
+                const showing = target.style.display !== 'none';
+                target.style.display = showing ? 'none' : 'block';
+                if (preview && preview.classList.contains('chat-msg-preview')) {
+                    preview.style.display = showing ? 'inline' : 'none';
+                }
+                btn.textContent = showing ? 'Show full reading' : 'Show less';
+            });
+        });
+
         if (VTT_CONFIG.chatAutoScroll) {
             chatContainer.scrollTop = chatContainer.scrollHeight;
         }

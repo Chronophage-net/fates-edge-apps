@@ -1325,6 +1325,15 @@ function clearDeckHistory() {
     }
 }
 
+// 👇 NEW: expose the local deck-draw history (newest last, matching
+// how it's built above). Used by Adventure Manager's Crown Spread
+// import so it can find a real recent draw — including Crown Spreads
+// (type: 'Crown Spread') — instead of guessing at some other log/chat
+// system that this module never actually writes to.
+export function getDeckHistory() {
+    return deckHistory.slice();
+}
+
 export function resetDeck() {
     cardOffset = getDeckRandomInt(0, 1000);
     buildDeck();
@@ -1740,5 +1749,6 @@ export default {
     registerRegionChange,
     onRegionChange,
     quickDraw,
-    quickCrownSpread
+    quickCrownSpread,
+    getDeckHistory
 };

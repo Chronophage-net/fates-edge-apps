@@ -14,6 +14,21 @@
  * - Tag Injector (scene tags affecting Position/DV)
  * - Ace Effects Integration (special effects on Ace draws)
  * - 🎥 Session Recap & Save (voice recording, VTT events, export)
+ *
+ * ── NEW: Adventure Manager cross-links ───────────────────────────────
+ * - Scene view now surfaces whatever adventure is currently `status:
+ *   'active'` (title/act/scene), with Complete Scene / Start Encounter
+ *   buttons right there — no more tab-switching to see where you are.
+ * - Quick Generate NPCs/Locations/Rumors can be saved straight into the
+ *   active adventure with one click, instead of being throwaway flavor.
+ * - A Crown Spread drawn here can be turned into a full adventure
+ *   template on the spot (reuses Adventure Manager's own parser via a
+ *   dynamic import — no logic duplicated).
+ * - Encounters started from an adventure scene now show which
+ *   adventure/scene they came from in the Active Encounters list.
+ * All cross-feature calls use dynamic import() (not a static import),
+ * since Adventure Manager already imports logToSession/addVTTEvent from
+ * *this* file — a static import the other way would be circular.
  */
 
 import { getState, addArchive, clearRollHistory, clearChatHistory, saveState } from '../../core/state.js';
@@ -67,6 +82,14 @@ let campaignState = {
     sceneTags: [],
     vttEvents: []
 };
+
+// 👇 NEW: last Quick Generate result, so "Save to Adventure" has
+// something concrete to persist (rather than re-parsing rendered HTML).
+let lastQuickGenResult = null; // { type: 'npc'|'location'|'rumor', data }
+
+// 👇 NEW: last Crown Spread drawn from this tab, so "Build Adventure
+// from this Reading" doesn't need to re-draw or guess at Decks' history.
+let lastCrownSpreadReading = null; // { synthesis, cardNames, region }
 
 
 // ============================================================
@@ -148,6 +171,61 @@ function addVTTEvent(type, data = {}) {
     state.campaign.state.vttEvents.push(event);
     saveState();
     return event;
+}
+
+// ============================================================
+// 👇 NEW: ADVENTURE MANAGER CROSS-LINKS
+// ============================================================
+
+// "The" active adventure, for cross-linking purposes, is whichever one
+// has status 'active' — NOT Adventure Manager's own activeAdventureId
+// (that just tracks whichever adventure is currently open in ITS UI,
+// which may be none if that tab hasn't been visited this session).
+// Reading state.adventures directly here is safe and read-only; no
+// import of Adventure Manager needed just to look at data it already
+// persists to shared state.
+function getRunningAdventure() {
+    const state = getState();
+    return (state.adventures || []).find(a => a.status === 'active') || null;
+}
+
+function renderCurrentAdventurePanel() {
+    const adventure = getRunningAdventure();
+    if (!adventure) {
+        return `
+            <div class="panel">
+                <h3 class="panel-title">📖 Current Adventure</h3>
+                <p class="text-muted mt-1">No adventure is currently active. Start one from Adventure Manager.</p>
+                <button class="btn btn-sm btn-secondary mt-1" onclick="window.openAdventureManager()">📖 Open Adventure Manager</button>
+            </div>
+        `;
+    }
+
+    const act = adventure.acts?.[adventure.currentAct];
+    const scene = act?.scenes?.[adventure.currentScene];
+    const sceneCount = adventure.acts?.reduce((acc, a) => acc + (a.scenes?.length || 0), 0) || 0;
+    const completedScenes = adventure.acts?.reduce((acc, a) => acc + (a.scenes?.filter(s => s.completed).length || 0), 0) || 0;
+
+    return `
+        <div class="panel" style="border-left: 4px solid var(--gold);">
+            <div class="flex-between">
+                <h3 class="panel-title">📖 ${escHtml(adventure.title)}</h3>
+                <span class="text-xs text-muted">${completedScenes}/${sceneCount} scenes</span>
+            </div>
+            ${act && scene ? `
+                <div class="text-sm mt-1"><span class="text-muted">Act:</span> ${escHtml(act.title)}</div>
+                <div class="text-sm"><span class="text-muted">Scene:</span> ${escHtml(scene.title)}</div>
+                <div class="flex gap-1 mt-2 flex-wrap">
+                    <button class="btn btn-sm btn-danger" onclick="window.gmStartSceneEncounter()">⚔️ ${scene.encounterId ? 'Resume' : 'Start'} Encounter</button>
+                    ${!scene.completed ? `<button class="btn btn-sm btn-primary" onclick="window.gmCompleteScene()">✓ Complete Scene</button>` : `<span class="badge badge-gold">✅ Scene Complete</span>`}
+                    <button class="btn btn-sm btn-secondary" onclick="window.openAdventureManager()">📖 Full Details</button>
+                </div>
+            ` : `
+                <p class="text-muted mt-1">This adventure has no scenes defined yet.</p>
+                <button class="btn btn-sm btn-secondary mt-1" onclick="window.openAdventureManager()">📖 Open Adventure Manager</button>
+            `}
+        </div>
+    `;
 }
 
 // ============================================================
@@ -277,6 +355,14 @@ async function generateQuickNPC() {
         const motivation = cards[0] ? getCardMeaningFromRegion(cards[0].suit, cards[0].rank, data) : 'A matter of loyalty arises.';
         const complication = cards[1] ? getCardMeaningFromRegion(cards[1].suit, cards[1].rank, data) : 'No complication.';
         const names = generateRandomName(region);
+        lastQuickGenResult = {
+            type: 'npc',
+            data: {
+                name: `${names.name} ${names.surname}`,
+                role: names.epithet,
+                motivation: `${motivation} Complication: ${complication}`
+            }
+        };
         displayQuickGenResult(renderNPC({ ...names, motivation, complication }));
         logToSession(`👤 Generated NPC: ${names.name} "${names.epithet}"`, 'success');
     } catch (err) {
@@ -296,6 +382,13 @@ async function generateQuickLocation() {
         const place = cards[0] ? getCardMeaningFromRegion(cards[0].suit, cards[0].rank, data) : 'A place of significance.';
         const leverage = cards[1] ? getCardMeaningFromRegion(cards[1].suit, cards[1].rank, data) : 'A hidden opportunity.';
         const name = place.length > 30 ? place.substring(0, 30) + '...' : place;
+        lastQuickGenResult = {
+            type: 'location',
+            data: {
+                name,
+                description: `${place} Leverage: ${leverage}`
+            }
+        };
         displayQuickGenResult(renderLocation({ name, place, leverage, region }));
         logToSession(`📍 Generated Location: ${name}`, 'success');
     } catch (err) {
@@ -313,6 +406,10 @@ async function generateQuickRumor() {
         if (!result) return;
         const card = result.cards[0];
         const meaning = card ? getCardMeaningFromRegion(card.suit, card.rank, data) : 'A rumor is circulating.';
+        lastQuickGenResult = {
+            type: 'rumor',
+            data: { text: meaning, region }
+        };
         displayQuickGenResult(renderRumor({ text: meaning, region }));
         logToSession(`📜 Generated Rumor: ${meaning.substring(0, 50)}...`, 'info');
     } catch (err) {
@@ -327,6 +424,7 @@ function renderNPC(npc) {
             <em class="text-muted">“${npc.epithet}”</em>
             <div class="text-sm mt-1"><span class="text-muted">🎯 Motivation:</span> ${npc.motivation}</div>
             <div class="text-sm"><span class="text-muted">⚡ Complication:</span> ${npc.complication}</div>
+            <button class="btn btn-xs btn-primary mt-1" style="align-self:flex-start;" onclick="window.gmSaveQuickGenToAdventure()">📌 Save to Adventure</button>
         </div>
     `;
 }
@@ -338,6 +436,7 @@ function renderLocation(loc) {
             <div class="text-sm text-muted">Region: ${loc.region}</div>
             <div class="text-sm mt-1"><span class="text-muted">Place:</span> ${loc.place}</div>
             <div class="text-sm"><span class="text-muted">Leverage:</span> ${loc.leverage}</div>
+            <button class="btn btn-xs btn-primary mt-1" style="align-self:flex-start;" onclick="window.gmSaveQuickGenToAdventure()">📌 Save to Adventure</button>
         </div>
     `;
 }
@@ -347,6 +446,7 @@ function renderRumor(rumor) {
         <div class="flex flex-col gap-1">
             <div class="text-sm italic">“${rumor.text}”</div>
             <div class="text-xs text-muted">Region: ${rumor.region}</div>
+            <button class="btn btn-xs btn-primary mt-1" style="align-self:flex-start;" onclick="window.gmSaveQuickGenToAdventure()">📌 Save to Adventure Notes</button>
         </div>
     `;
 }
@@ -424,6 +524,8 @@ function renderSceneView() {
 
     return `
         <div class="flex flex-col gap-2">
+            ${renderCurrentAdventurePanel()}
+
             <div class="panel">
                 <h3 class="panel-title">⚡ Quick Actions</h3>
                 <div class="grid-2 mt-1">
@@ -503,6 +605,7 @@ function renderSceneView() {
                         ${activeEncounters.map(e => `
                             <div class="flex gap-1 flex-center">
                                 <span class="flex-1 text-sm">${escHtml(e.name)}</span>
+                                ${e.fromAdventureTitle ? `<span class="badge badge-purple" title="From scene: ${escHtml(e.fromSceneTitle || '')}">📖 ${escHtml(e.fromAdventureTitle)}</span>` : ''}
                                 <span class="badge badge-red">${e.status || 'active'}</span>
                                 <button class="btn btn-xs btn-primary" onclick="window.openEncounterTracker('${e.id}')">⚔️ Track</button>
                             </div>
@@ -945,6 +1048,96 @@ window.loadTravelPlanner = function() { loadTravelPlannerModule(document.getElem
 window.loadKanban = function() { loadKanbanModule(document.getElementById('gm-view-container')); };
 window.loadWhiteboard = function() { loadWhiteboardModule(document.getElementById('gm-view-container')); };
 
+// 👇 NEW: jump to the Adventure Manager tab — same hash-navigation
+// pattern already used elsewhere in this app (e.g. "Open Whiteboard"
+// from the VTT).
+window.openAdventureManager = function() {
+    window.location.hash = 'adventure-manager';
+};
+
+// 👇 NEW: Complete the current scene of whichever adventure is
+// status:'active', straight from the Scene tab. Delegates to Adventure
+// Manager's own completeScene() (dynamic import — see file header for
+// why this can't be a static import) so logging/broadcast/persistence
+// all happen through the one real implementation.
+window.gmCompleteScene = async function() {
+    const adventure = getRunningAdventure();
+    if (!adventure) return;
+    try {
+        const advModule = await import('../adventure-manager/index.js');
+        const result = advModule.completeScene(adventure.id, adventure.currentAct, adventure.currentScene);
+        if (result) showToast('✅ Scene completed!', 'success');
+        refreshView();
+    } catch (e) {
+        console.error('[GM Tools] Could not complete scene:', e);
+        showToast('Adventure Manager not available.', 'error');
+    }
+};
+
+// 👇 NEW: start/resume the Combat Tracker for the current scene of
+// whichever adventure is active, via Adventure Manager's own bridge.
+window.gmStartSceneEncounter = async function() {
+    const adventure = getRunningAdventure();
+    if (!adventure) return;
+    try {
+        const advModule = await import('../adventure-manager/index.js');
+        await advModule.startSceneEncounter(adventure.id, adventure.currentAct, adventure.currentScene);
+    } catch (e) {
+        console.error('[GM Tools] Could not start scene encounter:', e);
+        showToast('Adventure Manager not available.', 'error');
+    }
+};
+
+// 👇 NEW: persist a Quick Generate result into whichever adventure is
+// currently active, instead of it staying throwaway flavor text.
+window.gmSaveQuickGenToAdventure = async function() {
+    if (!lastQuickGenResult) return;
+    const adventure = getRunningAdventure();
+    if (!adventure) {
+        showToast('No active adventure to save to — start one in Adventure Manager first.', 'warning');
+        return;
+    }
+    try {
+        const advModule = await import('../adventure-manager/index.js');
+        const { type, data } = lastQuickGenResult;
+        if (type === 'npc') {
+            const npcs = [...(adventure.npcs || []), { id: 'npc_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6), ...data }];
+            advModule.updateAdventure(adventure.id, { npcs });
+            showToast(`👤 Saved "${data.name}" to "${adventure.title}"`, 'success');
+        } else if (type === 'location') {
+            const locations = [...(adventure.locations || []), { id: 'loc_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6), ...data }];
+            advModule.updateAdventure(adventure.id, { locations });
+            showToast(`📍 Saved "${data.name}" to "${adventure.title}"`, 'success');
+        } else if (type === 'rumor') {
+            const notes = `${adventure.notes || ''}\n\nRumor (${data.region}): ${data.text}`.trim();
+            advModule.updateAdventure(adventure.id, { notes });
+            showToast(`📜 Saved rumor to "${adventure.title}" notes`, 'success');
+        }
+    } catch (e) {
+        console.error('[GM Tools] Could not save quick-gen result to adventure:', e);
+        showToast('Adventure Manager not available.', 'error');
+    }
+};
+
+// 👇 NEW: turn a Crown Spread just drawn here into a full adventure
+// template, reusing Adventure Manager's own parser/builder so the exact
+// same logic (per-position scenes, NPC/Location extraction, timer from
+// the highest card) runs regardless of which tab the reading started in.
+window.gmBuildAdventureFromCrownSpread = async function() {
+    if (!lastCrownSpreadReading) return;
+    try {
+        const advModule = await import('../adventure-manager/index.js');
+        const adventure = advModule.createAdventureFromCrownSpreadReading(lastCrownSpreadReading);
+        if (adventure) {
+            showToast(`👑 Built "${adventure.title}" — opening Adventure Manager…`, 'success');
+            window.location.hash = 'adventure-manager';
+        }
+    } catch (e) {
+        console.error('[GM Tools] Could not build adventure from reading:', e);
+        showToast('Adventure Manager not available.', 'error');
+    }
+};
+
 window.openCombatTracker = function() {
     import('../encounters/combat.js').then(module => {
         if (module.default?.openTracker) module.default.openTracker(null);
@@ -1159,6 +1352,14 @@ window.quickCrownSpreadFromScene = async function() {
     try {
         const result = await quickCrownSpread();
         if (result) {
+            // 👇 NEW: stash the reading so "Build Adventure from this
+            // Reading" doesn't need to re-draw or dig through history.
+            lastCrownSpreadReading = {
+                synthesis: result.result.synthesis,
+                cardNames: result.cardNames,
+                region: getSelectedRegion() || 'Acasia'
+            };
+
             const resultEl = document.getElementById('consequence-result');
             if (resultEl) {
                 resultEl.innerHTML = `
@@ -1179,6 +1380,11 @@ window.quickCrownSpreadFromScene = async function() {
                         const isJoker = card.isJoker || false;
                         return `<div class="panel flex-center flex-col" style="min-width:60px; background:var(--bg3); border: 2px solid ${card.color || 'var(--gold)'};"><div class="text-xs text-muted">${positions[i]}</div><div style="font-size:1.5rem;">${isJoker ? '🃏' : (card.symbol || '♦')}</div><div class="text-xs text-muted">${isJoker ? 'Joker' : card.rankName}</div></div>`;
                     }).join('') + `<div class="panel flex-center flex-col" style="min-width:60px; background:var(--bg4); border: 2px solid var(--gold); box-shadow: 0 0 15px var(--gold-glow);"><div class="text-xs text-gold">🌟 Wild</div><div style="font-size:1.5rem;">🃏</div><div class="text-xs text-gold">Twist</div></div>`;
+                }
+                // 👇 NEW: one-click path from "just drew this" to "now it's an adventure"
+                const interpEl = document.getElementById('crown-spread-interpretation');
+                if (interpEl) {
+                    interpEl.innerHTML = `<button class="btn btn-sm btn-gold" onclick="window.gmBuildAdventureFromCrownSpread()">📖 Build Adventure from this Reading</button>`;
                 }
             }
         }
@@ -1393,4 +1599,3 @@ export default {
     getSceneTags,
     getTagEffects
 };
-
