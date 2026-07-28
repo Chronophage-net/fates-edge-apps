@@ -8,6 +8,7 @@
  * - Witch: Promise Timers (condensed)
  * - Summoner: Bound Spirits count, Leash ticks
  * - Psion: Mental Strain, max
+ * - Cantor: Corruption + Bloom Count (NEW)
  *
  * "The ledger always balances. The question is what you're willing to pay."
  * – The Gray Wanderer
@@ -66,6 +67,9 @@ export function renderTrackers(el) {
     const shame = char.shame ?? 0;
     const identityStrain = char.identityStrain ?? 0;
     const promiseTimers = char.promiseTimers?.length || 0;
+
+    // ─── Cantor: Bloom Count ──────────────────────────────────
+    const bloomCount = char.bloomCount || 0;
 
     // Monk
     const breathState = char.breathState || 'entering';
@@ -148,6 +152,30 @@ export function renderTrackers(el) {
                 </div>
             </div>
         `;
+
+        // ─── Cantor: Bloom Count ────────────────────────────
+        // Show bloom count as a small pill next to corruption
+        if (bloomCount > 0) {
+            const fugalLabel = bloomCount >= 7 ? ' ✨Fugal' : '';
+            html += `
+                <div class="tracker-item" style="flex:0 0 auto;padding:0 0.2rem;">
+                    <div style="display:flex;justify-content:space-between;font-size:0.75rem;align-items:center;gap:0.2rem;">
+                        <span>🌸 Blooms</span>
+                        <span style="font-weight:600;color:${bloomCount >= 7 ? 'var(--gold)' : 'var(--text2)'};">${bloomCount}${fugalLabel}</span>
+                    </div>
+                </div>
+            `;
+        } else {
+            // Show a subtle "0" to indicate tracking is active
+            html += `
+                <div class="tracker-item" style="flex:0 0 auto;padding:0 0.2rem;">
+                    <div style="display:flex;justify-content:space-between;font-size:0.75rem;align-items:center;gap:0.2rem;">
+                        <span>🌸 Blooms</span>
+                        <span style="color:var(--text3);">0</span>
+                    </div>
+                </div>
+            `;
+        }
     }
 
     // ─── Path: Leash (Summoner) ─────────────────────────────

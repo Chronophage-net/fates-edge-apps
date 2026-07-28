@@ -27,6 +27,7 @@
  *   so other panels can show a "here's what each path does" resource when
  *   no character (or no matching character) is selected, instead of just
  *   a bare "select a character" message.
+ * - REVISED: Added Bound Patron, bloomCount, resonantRites display for Cantors.
  */
 
 import { generateId, escHtml, safeParseInt, clamp } from '../../core/utils.js';
@@ -551,12 +552,20 @@ function createCharacterSummary(char) {
         pathStats += ` | 🔯 ${char.symbols.map(s => escHtml(s)).join(', ')}`;
     }
 
-    // Cantor: corruption + tier (optional)
+    // ─── Cantor: corruption, bound patron, bloom ──────────────────
     if (char.magicPath === 'cantor') {
         const corr = char.corruption || 0;
         const maxCorr = char.corruptionMax || char.spirit || 1;
         const tierLabel = getCantorCorruptionTier(corr, maxCorr);
+        const blooms = char.bloomCount || 0;
+        const bound = char.boundPatron ? `bound to ${escHtml(char.boundPatron)}` : 'unbound';
+        const resonantCount = (char.resonantRites || []).length;
         pathStats += ` | 🎵 ${corr}/${maxCorr} (${tierLabel})`;
+        pathStats += ` | 🌸 ${blooms} blooms`;
+        pathStats += ` | ${bound}`;
+        if (resonantCount > 0) {
+            pathStats += ` | 🔮 ${resonantCount} resonant`;
+        }
     }
 
     // Witch: shadow·shame·identity

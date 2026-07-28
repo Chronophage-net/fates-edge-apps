@@ -5,6 +5,8 @@
  * No hardcoded patron list – uses the same data as the Patrons tab.
  * 
  * Also includes Thiasos/Codex fields for Runekeepers with auto-patron derivation.
+ * 
+ * REVISED: Added Bound Patron, bloomCount, resonantRites for Cantors.
  */
 
 import { getState, addCharacter, getCharacter, updateCharacter, deleteCharacter } from '../../core/state.js';
@@ -533,7 +535,12 @@ function createNewCharacter() {
         monasticTradition: '',
         breathState: 'entering',
         monkCorruptionTier: 0,
-        knownTags: []
+        knownTags: [],
+        // ─── NEW Cantor fields ───────────────────────────────────
+        boundPatron: '',
+        boundPatronBonus: 1,
+        bloomCount: 0,
+        resonantRites: []
     };
 }
 
@@ -1052,6 +1059,7 @@ function buildEditorHTML(c) {
     ).join('');
     
     const patronOptions = buildPatronOptionsHTML(c.patron || '');
+    const boundPatronOptions = buildPatronOptionsHTML(c.boundPatron || '');
     
     const armorOptions = ARMOR_TYPES.map(a => 
         `<option value="${a.id}" ${c.armorType === a.id ? 'selected' : ''}>${escHtml(a.label)}${a.xpCost > 0 ? ` (${a.xpCost} XP)` : ''}</option>`
@@ -1112,6 +1120,10 @@ function buildEditorHTML(c) {
     
     const thiasos = c.thiasos || '';
     const codex = c.codex || '';
+    const boundPatron = c.boundPatron || '';
+    const boundPatronBonus = c.boundPatronBonus ?? 1;
+    const bloomCount = c.bloomCount || 0;
+    const resonantRites = (c.resonantRites || []).join(', ');
     
     const isRunekeeper = c.magicPath === 'runekeeper';
     const isInvoker = c.magicPath === 'invoker';
@@ -1223,11 +1235,41 @@ function buildEditorHTML(c) {
                 ${thiasos || codex ? `<div style="font-size:0.65rem;color:var(--gold);margin-top:0.2rem;">💡 Patron will be auto-set from Thiasos/Codex if not selected.</div>` : ''}
             </div>
             
+            <!-- ─── Cantor Section ─────────────────────────────────────────── -->
             <div id="ce-cantor-section" style="display:${isCantor ? 'block' : 'none'}; margin-top:0.5rem;">
-                <h4 style="margin:0.4rem 0;font-size:0.9rem;">Cantor: Repertoire</h4>
+                <h4 style="margin:0.4rem 0;font-size:0.9rem;">Cantor: Voice & Corruption</h4>
                 <div style="font-size:0.8rem;color:var(--text2);margin-bottom:0.3rem;">Songs / Rites known (names or IDs).</div>
                 <button class="btn btn-sm" data-editor-add="repertoire">+ Add Song</button>
                 <div class="dynamic-list" id="ce-repertoire-list">${repertoireRows}</div>
+                
+                <!-- ─── NEW: Bound Patron fields ────────────────────────── -->
+                <div style="margin-top:0.5rem;border-top:1px solid var(--border);padding-top:0.4rem;">
+                    <h5 style="margin:0 0 0.2rem;font-size:0.85rem;">🎯 Bound Patron (talent)</h5>
+                    <div class="form-row">
+                        <div class="field">
+                            <label>Bound Patron</label>
+                            <select id="ce-bound-patron">${boundPatronOptions}</select>
+                            <span style="font-size:0.65rem;color:var(--text3);">Set when Bound Patron talent is learned</span>
+                        </div>
+                        <div class="field small">
+                            <label>Position Bonus</label>
+                            <input type="number" id="ce-bound-patron-bonus" value="${boundPatronBonus}" min="0" max="3" />
+                            <span style="font-size:0.65rem;color:var(--text3);">+1 die when singing bound patron's rites</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- ─── Bloom tracking ────────────────────────────────────── -->
+                <div class="form-row" style="margin-top:0.3rem;">
+                    <div class="field small">
+                        <label>Bloom Count (Fugal Self at 7+)</label>
+                        <input type="number" id="ce-bloom-count" value="${bloomCount}" min="0" />
+                    </div>
+                    <div class="field small">
+                        <label>Resonant Rites (comma-separated)</label>
+                        <input id="ce-resonant-rites" value="${escHtml(resonantRites)}" placeholder="e.g., Cradle Song, Golden Tongue" />
+                    </div>
+                </div>
                 <div class="form-row" style="margin-top:0.3rem;">
                     <div class="field small">
                         <label>Corruption Tier (number of blooms)</label>
@@ -1610,6 +1652,15 @@ export function saveEditor() {
         c.thiasos = v('#ce-thiasos').trim();
         c.codex = v('#ce-codex').trim();
         
+        // ─── New Cantor fields ──────────────────────────────────────
+        c.boundPatron = v('#ce-bound-patron');
+        c.boundPatronBonus = clamp(n('#ce-bound-patron-bonus'), 0, 3);
+        c.bloomCount = Math.max(0, n('#ce-bloom-count'));
+        c.resonantRites = v('#ce-resonant-rites')
+            ? v('#ce-resonant-rites').split(',').map(s => s.trim()).filter(Boolean)
+            : [];
+        
+        // ─── Auto-derive patron for Runekeeper ──────────────────────
         if (c.magicPath === 'runekeeper' && !c.patron) {
             const derived = derivePatronFromRunekeeperItems({ 
                 thiasos: c.thiasos, 

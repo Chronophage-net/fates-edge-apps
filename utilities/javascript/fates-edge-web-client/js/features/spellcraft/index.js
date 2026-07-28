@@ -6,7 +6,7 @@
  *
  * Features:
  * - Character tracks (Obligation, Corruption, Leash, Mental Strain, Shadow/Shame/Identity)
- * - Path-specific components: Rites, Spellbook, Crafting, Calculator, Summoning, Monks, Cantor
+ * - Path-specific components: Rites, Spellbook, Crafting, Calculator, Summoning, Monks, Cantor, Psionics
  * - Crafting (Hedge Gifts, Quick Workings, Rituals) is available to ALL characters
  * - TAGS Calculator for Free Casters (and as a learning tool for others)
  * - Unified character selection via VTT
@@ -25,6 +25,8 @@
  * the switch statement; it just never got passed down. Fixed below, and
  * the call is now awaited (renderRites is async) to match the pattern
  * already used for calculator/cantor/summoning.
+ *
+ * NEW: Added Psionics tab for psion characters.
  */
 
 import { vttStore } from '../../core/vtt-store.js';
@@ -41,6 +43,8 @@ import { renderSummoning } from './components/summoning.js';
 import { renderWitchcraft } from './components/witchcraft.js';
 import { renderMonks } from './components/monks.js';
 import { renderCantor } from './components/cantor.js';
+// ─── NEW: Psionics component ──────────────────────────────
+import { renderPsion } from './components/psionics.js';
 
 // ============================================================
 // CONSTANTS – Path metadata for the UI
@@ -780,6 +784,11 @@ function getAvailableTabs(char) {
         tabs.push({ id: 'cantor', label: 'Cantor', icon: '🎵' });
     }
 
+    // ─── NEW: Psionics tab ──────────────────────────────────────
+    if (path === 'psion') {
+        tabs.push({ id: 'psionics', label: 'Psionics', icon: '🧠' });
+    }
+
     if (path === 'summoner') {
         tabs.push({ id: 'summoning', label: 'Summoning', icon: '👁️' });
     }
@@ -843,6 +852,10 @@ async function renderActiveTabContent() {
             }
             case 'cantor':
                 await renderCantor(wrapper);
+                break;
+            // ─── NEW: Psionics tab ──────────────────────────────────
+            case 'psionics':
+                await renderPsion(wrapper);
                 break;
             case 'summoning':
                 await renderSummoning(wrapper);

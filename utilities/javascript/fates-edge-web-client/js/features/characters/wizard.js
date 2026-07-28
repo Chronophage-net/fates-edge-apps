@@ -7,6 +7,7 @@
  * - Data model now includes all path-specific fields (symbols, rites, etc.)
  * - Patrons are loaded dynamically from /data/patrons/ via the patrons module
  * - Thiasos/Codex fields for Runekeepers with auto-patron derivation
+ * - REVISED: Added Bound Patron, bloomCount, resonantRites for Cantors.
  */
 
 import { generateId, escHtml, safeParseInt, clamp } from '../../core/utils.js';
@@ -390,6 +391,13 @@ function injectModalStyles() {
         .talent-catalog-item:last-child { border-bottom: none; }
         .talent-catalog-item .talent-info { flex: 1; }
         .talent-catalog-item .btn-xs { margin-left: 0.3rem; }
+        /* Cantor fields style */
+        .cantor-fields {
+            border-top: 1px solid var(--border, #444);
+            margin-top: 0.5rem;
+            padding-top: 0.4rem;
+        }
+        .cantor-fields h5 { margin: 0 0 0.2rem; font-size: 0.85rem; }
     `;
     document.head.appendChild(style);
 }
@@ -523,6 +531,11 @@ export async function openWizard() {
             breathState: 'entering',
             monkCorruptionTier: 0,
             knownTags: [],
+            // ─── NEW Cantor fields ───────────────────────────────────
+            boundPatron: '',
+            boundPatronBonus: 1,
+            bloomCount: 0,
+            resonantRites: [],
             _stepDataCollected: {},
         };
         state.step = 0;
@@ -674,6 +687,15 @@ function collectTalentsAndLoadout(d) {
             showToast('⚠️ Thiasos/Codex selected but patron could not be auto-detected. Please select a patron.', 'warning');
         }
     }
+    
+    // ─── Read Cantor fields ──────────────────────────────────────────
+    d.boundPatron = getVal('#wz-bound-patron');
+    d.boundPatronBonus = clamp(getNum('#wz-bound-patron-bonus'), 0, 3);
+    d.bloomCount = Math.max(0, getNum('#wz-bloom-count'));
+    const resonantRitesRaw = getVal('#wz-resonant-rites');
+    d.resonantRites = resonantRitesRaw 
+        ? resonantRitesRaw.split(',').map(s => s.trim()).filter(Boolean)
+        : [];
     
     d.armorType = getVal('#wz-armor-type') || 'none';
     d.shieldType = getVal('#wz-shield-type') || 'none';
@@ -1184,6 +1206,7 @@ function renderStep3TalentsAndLoadout(d) {
     
     // ─── Dynamic patron options ──────────────────────────────────
     const patronOptions = buildPatronOptionsHTML(d.patron || '');
+    const boundPatronOptions = buildPatronOptionsHTML(d.boundPatron || '');
     
     const armorOptions = ARMOR_TYPES.map(a => 
         `<option value="${a.id}" ${d.armorType === a.id ? 'selected' : ''}>${escHtml(a.label)}</option>`
@@ -1215,6 +1238,11 @@ function renderStep3TalentsAndLoadout(d) {
     const thiasos = d.thiasos || '';
     const codex = d.codex || '';
     const isRunekeeper = d.magicPath === 'runekeeper';
+    const isCantor = d.magicPath === 'cantor';
+    const boundPatron = d.boundPatron || '';
+    const boundPatronBonus = d.boundPatronBonus ?? 1;
+    const bloomCount = d.bloomCount || 0;
+    const resonantRites = (d.resonantRites || []).join(', ');
     
     return `
         <div>
@@ -1255,6 +1283,35 @@ function renderStep3TalentsAndLoadout(d) {
                     </div>
                 </div>
                 ${thiasos || codex ? `<div style="font-size:0.65rem;color:var(--gold);margin-top:0.2rem;">💡 Patron will be auto-set from Thiasos/Codex if not selected.</div>` : ''}
+            </div>
+            
+            <!-- ─── Cantor: Bound Patron & Bloom ─────────────────── -->
+            <div id="wz-cantor-fields" style="display:${isCantor ? 'block' : 'none'}; margin-top:0.3rem;">
+                <div class="cantor-fields">
+                    <h5>🎵 Bound Patron (talent)</h5>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;">
+                        <div>
+                            <label>Bound Patron</label>
+                            <select id="wz-bound-patron">${boundPatronOptions}</select>
+                            <span style="font-size:0.65rem;color:var(--text3);">Set when Bound Patron talent is learned</span>
+                        </div>
+                        <div>
+                            <label>Position Bonus</label>
+                            <input type="number" id="wz-bound-patron-bonus" value="${boundPatronBonus}" min="0" max="3" />
+                            <span style="font-size:0.65rem;color:var(--text3);">+1 die when singing bound patron's rites</span>
+                        </div>
+                    </div>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;margin-top:0.3rem;">
+                        <div>
+                            <label>Bloom Count (Fugal Self at 7+)</label>
+                            <input type="number" id="wz-bloom-count" value="${bloomCount}" min="0" />
+                        </div>
+                        <div>
+                            <label>Resonant Rites (comma-separated)</label>
+                            <input id="wz-resonant-rites" value="${escHtml(resonantRites)}" placeholder="e.g., Cradle Song, Golden Tongue" />
+                        </div>
+                    </div>
+                </div>
             </div>
             
             <h4 style="margin:0.8rem 0 0.2rem;">⚔️ Combat Loadout</h4>
@@ -1376,6 +1433,11 @@ function renderStep4BondsAndSummary(d) {
                     <div><span class="text-muted">Weapon:</span> ${escHtml(WEAPON_CLASSES.find(w => w.id === d.weaponClass)?.label.split('(')[0] || 'Light')}</div>
                     ${d.thiasos ? `<div><span class="text-muted">Thiasos:</span> ${escHtml(d.thiasos)}</div>` : ''}
                     ${d.codex ? `<div><span class="text-muted">Codex:</span> ${escHtml(d.codex)}</div>` : ''}
+                    ${d.magicPath === 'cantor' ? `
+                        <div><span class="text-muted">Bound Patron:</span> ${escHtml(getPatronLabel(d.boundPatron) || 'None')}</div>
+                        <div><span class="text-muted">Bloom Count:</span> ${d.bloomCount || 0}</div>
+                        <div><span class="text-muted">Resonant Rites:</span> ${(d.resonantRites || []).length}</div>
+                    ` : ''}
                 </div>
                 <hr style="border-color:var(--border);margin:0.6rem 0;" />
                 <div class="xp-budget-bar ${remaining < 0 ? 'xp-budget-over' : 'xp-budget-ok'}" id="wz-summary-xp-bar">
@@ -1654,10 +1716,15 @@ function attachEvents() {
             if (noteEl && path) {
                 noteEl.textContent = path.note;
             }
-            // Show/hide Runekeeper fields
+            // ─── Show/hide Runekeeper fields ────────────────────────────
             const runekeeperFields = document.getElementById('wz-runekeeper-fields');
             if (runekeeperFields) {
                 runekeeperFields.style.display = target.value === 'runekeeper' ? 'block' : 'none';
+            }
+            // ─── Show/hide Cantor fields ────────────────────────────────
+            const cantorFields = document.getElementById('wz-cantor-fields');
+            if (cantorFields) {
+                cantorFields.style.display = target.value === 'cantor' ? 'block' : 'none';
             }
         }
 
