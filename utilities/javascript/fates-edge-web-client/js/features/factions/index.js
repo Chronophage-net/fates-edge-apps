@@ -287,7 +287,7 @@ const DEFAULT_FOLLOWERS = [
 const DEFAULT_TRUSTS = [
     {
         id: 'velvet-coin-trust',
-        name: 'The Velvet Coin',
+        name: 'The Silk Coin',
         icon: '🪙',
         tier: 'I',
         description: 'A thieves\' guild operating in the shadows of Silkstrand. Founded by exiles from the Silk Coin, now a legitimate (and illegitimate) organization with hands in smuggling, information, and the occasional heist.',

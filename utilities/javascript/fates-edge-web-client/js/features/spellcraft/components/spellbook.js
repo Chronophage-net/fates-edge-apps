@@ -18,7 +18,8 @@
  * - Spell research: learn new spells during downtime
  * - Casting with full dice roll, story beats, and backlash handling
  *
- * Available to all characters, but Free Casters get the most out of it.
+ * Available to all characters for collection and study.
+ * CASTING requires the Free Caster magic path.
  */
 
 import { getCharacterData, saveCharacter } from '../index.js';
@@ -450,7 +451,7 @@ export function renderSpellbook(el) {
             <!-- ─── Footer ──────────────────────────────────────── -->
             <div class="spellbook-footer" style="display:flex;justify-content:space-between;font-size:0.6rem;color:var(--text3);border-top:1px solid var(--border);padding-top:0.2rem;">
                 <span>${sorted.length} of ${spells.length} spells shown</span>
-                <span>${isFreeCaster ? '🔮 Free Caster' : '📜 Standard'}</span>
+                <span>${isFreeCaster ? '🔮 Free Caster — Can cast' : '📜 Study Only — Need Free Caster to cast'}</span>
             </div>
         </div>
     `;
@@ -892,12 +893,38 @@ window.spellbookClearFilters = function() {
 };
 
 // ============================================================
-// USE SPELL – Cast and Track
+// USE SPELL – Cast and Track (Free Caster only)
 // ============================================================
 
 window.spellbookUse = function(id) {
     const char = getCharacterData();
     if (!char) return;
+
+    // ─── CRITICAL: Only Free Casters can cast spells ────────────
+    const magicPath = char.magicPath || 'none';
+    if (magicPath !== 'free-caster') {
+        showToastWithHTML(`
+            <div style="display:flex;flex-direction:column;gap:0.3rem;">
+                <div style="font-weight:600;font-size:1rem;color:var(--orange);">🔮 Free Caster Required</div>
+                <p style="font-size:0.85rem;color:var(--text2);">
+                    Only <strong>Free Casters</strong> can cast spells from their grimoire.
+                </p>
+                <p style="font-size:0.75rem;color:var(--text3);font-style:italic;">
+                    "The Weave answers those who speak its raw grammar." – Lysandra
+                </p>
+                <p style="font-size:0.75rem;color:var(--text3);">
+                    Your current path is <strong>${PATH_META[magicPath]?.label || magicPath}</strong>.
+                    ${magicPath === 'none' ? 'Choose the Free Caster path to cast spells.' : 'Free Casters are the only ones who can improvise spellcasting.'}
+                </p>
+                <div style="display:flex;gap:0.3rem;flex-wrap:wrap;">
+                    <button class="btn btn-sm btn-primary" onclick="this.closest('.custom-toast-modal').remove(); window.location.hash='spellcraft';">📖 Go to Spellcraft</button>
+                    <button class="btn btn-sm btn-secondary" onclick="this.closest('.custom-toast-modal').remove();">Close</button>
+                </div>
+            </div>
+        `, 'warning');
+        return;
+    }
+
     const spell = char.spellbook.find(s => s.id === id);
     if (!spell) return showToast('Spell not found.', 'error');
 
@@ -1133,6 +1160,23 @@ function showToastWithHTML(html, type = 'info') {
 
     setTimeout(() => { if (modal.parentNode) modal.remove(); }, 12000);
 }
+
+// ============================================================
+// PATH META (for Free Caster check display)
+// ============================================================
+
+// ─── Minimal PATH_META for the Free Caster check ────────────────
+const PATH_META = {
+    'free-caster': { label: 'Free Caster' },
+    'runekeeper': { label: 'Runekeeper' },
+    'invoker': { label: 'Invoker' },
+    'cantor': { label: 'Cantor' },
+    'witch': { label: 'Witch' },
+    'psion': { label: 'Psion' },
+    'summoner': { label: 'Summoner' },
+    'monk': { label: 'Monk' },
+    'none': { label: 'No Path' }
+};
 
 // ============================================================
 // EXPORT

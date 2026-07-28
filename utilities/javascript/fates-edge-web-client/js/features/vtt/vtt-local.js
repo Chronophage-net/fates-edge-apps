@@ -6,6 +6,13 @@
  *       common rolls, larger fonts, avatar support.
  * v3 – Restructured layout/visual pass: card-based sections, stat pills,
  *      clearer typographic hierarchy. No IDs/classes/behavior removed.
+ * v4 – Added the Combat Actions panel (contextual melee/ranged/tactics/
+ *      talent buttons driven by the selected character's sheet). See
+ *      combat-actions.js. #vtt-attr / #vtt-skill switched from <select>
+ *      to <input type="number"> so weapon/talent bonuses that push a
+ *      pool above the old 5-option dropdown range still work — every
+ *      other reference to these fields (rollLocal, renderCommonRolls,
+ *      etc.) reads `.value` the same way, so nothing else changes.
  */
 
 import { vttStore } from '../../core/vtt-store.js';
@@ -31,6 +38,7 @@ import {
   renderCommonRolls,
 } from './vtt-core.js';
 import { initVoice, toggleMute, getVoiceStatus, cleanupVoice, getActiveVoiceClients, getVoiceClient, onVoiceClientsChanged } from './voice.js';
+import { renderCombatActions, resetCombatScene } from './combat-actions.js'; // 👈 NEW
 
 // ============================================================
 // STATE
@@ -81,6 +89,20 @@ export function sendMessage(text, sender, recipient = 'all', metadata = {}) {
   const msg = createLocalMessage(text, sender, recipient, metadata);
   vttStore.addChatMessage(msg);
   return msg;
+}
+
+// ============================================================
+// 👇 NEW: forward a roll summary into the GM's Combat Tracker log, if
+// it's open. Silently no-ops otherwise — the roll still posts to chat
+// as normal either way, this is just a convenience for the GM so they
+// don't have to cross-reference chat separately.
+// ============================================================
+
+async function logToGMTracker(sender, message) {
+  try {
+    const combat = await import('../encounters/combat.js');
+    combat.logExternalAction?.(sender, message, 'roll');
+  } catch (e) { /* combat module not available — ignore */ }
 }
 
 // ============================================================
@@ -147,6 +169,7 @@ function rollLocal(postToChat = true) {
         reRolls: result.reRolls
       }
     });
+    logToGMTracker(sender, msg); // 👈 NEW
   }
 }
 
@@ -180,6 +203,7 @@ function handleSlash(text) {
           storyBeats: result.storyBeats
         }
       });
+      logToGMTracker(sender, msg); // 👈 NEW
       break;
     }
     case 'timer': {
@@ -380,6 +404,7 @@ function attachEvents() {
         // Re‑normalize characters after modification
         const chars = getCharacters();
         vttStore.updateCharacters(chars);
+        resetCombatScene(); // 👈 NEW: also refresh once-per-scene combat talents
         if (trimmed > 0) {
           showToast(`Scene ended: trimmed ${trimmed} excess Boons.`, 'success');
         } else {
@@ -515,6 +540,14 @@ el.innerHTML = `
             <div id="vttCharGrid" class="vtt-char-grid"></div>
           </div>
 
+          <!-- 👇 NEW: Combat Actions -->
+          <div class="vtt-panel vtt-card">
+            <div class="vtt-card-header">
+              <span class="vtt-card-title" style="font-size:1.05rem;">⚔️ Combat Actions</span>
+            </div>
+            <div id="vtt-combat-actions" style="min-height:2.5rem;"></div>
+          </div>
+
           <!-- Quick Roller -->
           <div class="vtt-panel vtt-card">
             <div class="vtt-card-header">
@@ -523,15 +556,11 @@ el.innerHTML = `
             <div class="vtt-dice-row">
               <div class="vtt-field">
                 <label>Attr</label>
-                <select id="vtt-attr">
-                  <option value="1">1</option><option value="2">2</option><option value="3" selected>3</option><option value="4">4</option><option value="5">5</option>
-                </select>
+                <input type="number" id="vtt-attr" value="3" min="1" max="8" style="width:100%;" />
               </div>
               <div class="vtt-field">
                 <label>Skill</label>
-                <select id="vtt-skill">
-                  <option value="0">0</option><option value="1">1</option><option value="2" selected>2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option>
-                </select>
+                <input type="number" id="vtt-skill" value="2" min="0" max="12" style="width:100%;" />
               </div>
               <div class="vtt-field" style="flex:0 0 80px;">
                 <label>DV</label>
@@ -579,6 +608,7 @@ el.innerHTML = `
   renderChat();
   renderVTTChars();
   renderCommonRolls();
+  renderCombatActions(); // 👈 NEW
   renderVTTTimers();
   renderLocalPresence();
   renderVoiceClients();

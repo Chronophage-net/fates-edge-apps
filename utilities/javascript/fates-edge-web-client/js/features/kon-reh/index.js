@@ -1270,7 +1270,7 @@ export function openKonrehModal(netConfig = null) {
   closeBtnTop.className = 'kr-btn';
   closeBtnTop.textContent = '✕';
   closeBtnTop.title = 'Close';
-  closeBtnTop.onclick = () => modal.remove();
+  closeBtnTop.onclick = () => { stopCoachAnimation(); modal.remove(); };
   titleRow.appendChild(closeBtnTop);
   gameArea.appendChild(titleRow);
 
@@ -1528,8 +1528,13 @@ export function openKonrehModal(netConfig = null) {
   let aiConfig = null;      // { schoolId, player, depth }
   let aiThinking = false;
 
-  // For coach glow: we need to know which piece the coach suggested
-  let coachSuggestedPiece = null; // will be set in renderCoachHint()
+  // Coach: a cached { piece, move } suggestion, keyed off the current
+  // game state so we only re-run the search when something actually
+  // changed, plus a rAF handle so the on-screen arrow can pulse smoothly
+  // without re-searching every frame.
+  let coachHint = null;
+  let coachHintKey = null;
+  let coachAnimHandle = null;
 
   const isNetworked = !!netConfig;
   const localPlayer = netConfig ? netConfig.localPlayer : null;
@@ -1578,6 +1583,7 @@ export function openKonrehModal(netConfig = null) {
   function beginGame() {
     game = new KonrehEngine();
     selectedPiece = null; validMoves = []; pendingChoice = null; aiThinking = false;
+    coachHint = null; coachHintKey = null;
     logDiv.innerHTML = '';
     setupScreen.style.display = 'none';
     boardContainer.style.display = 'flex';
@@ -1702,107 +1708,153 @@ export function openKonrehModal(netConfig = null) {
     }
   }
 
-  // ---- NEW: Draw a glowing halo around the coach‑suggested piece ----
-  function drawCoachGlow(piece) {
-    if (!piece) return;
-    const { sx, sy } = gridToScreen(piece.x, piece.y);
-    const time = Date.now() / 500; // pulse every 0.5s
-    const pulse = 0.7 + 0.3 * Math.sin(time);
+  // ---- Small rounded label pill used by the coach overlay (e.g. "MOVE THIS", "TO HERE") ----
+  function drawPillLabel(sx, sy, text, color) {
     ctx.save();
-    // Outer glow with shadow blur
-    ctx.shadowColor = '#ffd700';
-    ctx.shadowBlur = 30 * pulse;
+    ctx.font = 'bold 10px sans-serif';
+    const paddingX = 6;
+    const textWidth = ctx.measureText(text).width;
+    const w = textWidth + paddingX * 2, h = 15;
+    const rx = sx - w / 2, ry = Math.max(2, sy) - h / 2, r = 6;
+    ctx.fillStyle = 'rgba(10,11,16,0.9)';
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 1;
     ctx.beginPath();
-    ctx.arc(sx, sy, scale * 0.9, 0, Math.PI * 2);
-    ctx.fillStyle = `rgba(255, 215, 0, ${0.2 * pulse})`;
+    ctx.moveTo(rx + r, ry);
+    ctx.arcTo(rx + w, ry, rx + w, ry + h, r);
+    ctx.arcTo(rx + w, ry + h, rx, ry + h, r);
+    ctx.arcTo(rx, ry + h, rx, ry, r);
+    ctx.arcTo(rx, ry, rx + w, ry, r);
+    ctx.closePath();
     ctx.fill();
-    ctx.strokeStyle = `rgba(255, 215, 0, ${0.8 * pulse})`;
-    ctx.lineWidth = 3;
     ctx.stroke();
-    // Inner ring to make it pop
-    ctx.shadowBlur = 0;
-    ctx.beginPath();
-    ctx.arc(sx, sy, scale * 0.7, 0, Math.PI * 2);
-    ctx.strokeStyle = `rgba(255, 215, 0, ${0.4 * pulse})`;
-    ctx.lineWidth = 2;
-    ctx.setLineDash([3, 4]);
-    ctx.stroke();
-    ctx.setLineDash([]);
+    ctx.fillStyle = color;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(text, sx, ry + h / 2 + 1);
     ctx.restore();
   }
 
-  // ---- Coach hint renderer (enhanced with source piece coordinates and destination highlight) ----
-  function renderCoachHint() {
-    coachTipDiv.style.display = coachMode ? 'block' : 'none';
-    coachSuggestedPiece = null; // reset
-    if (!coachMode) {
-      coachTipDiv.textContent = '💡 Coach will suggest moves when it\'s your turn.';
-      return;
-    }
-    // Only show coach if it's the local human's turn (or two-player local)
+  // ---- Coach overlay: one unambiguous "move THIS piece to HERE" visual —
+  // a pulsing ring + tag on the source piece, a pulsing target + tag on
+  // the destination square, and an arrow connecting the two so there's
+  // never any doubt about which piece goes where. ----
+  function drawCoachOverlay(hint, pulsePhase) {
+    const { piece, move } = hint;
+    const p = 0.7 + 0.3 * Math.sin(pulsePhase); // 0.4..1.0 pulse factor
+    const from = gridToScreen(piece.x, piece.y);
+    const to = gridToScreen(move.x, move.y);
+
+    ctx.save();
+
+    const dist = Math.hypot(to.sx - from.sx, to.sy - from.sy) || 1;
+    const angle = Math.atan2(to.sy - from.sy, to.sx - from.sx);
+    const trimStart = Math.min(scale * 0.85, dist * 0.3);
+    const trimEnd = Math.min(scale * 1.05, dist * 0.3);
+    const x1 = from.sx + Math.cos(angle) * trimStart, y1 = from.sy + Math.sin(angle) * trimStart;
+    const x2 = to.sx - Math.cos(angle) * trimEnd, y2 = to.sy - Math.sin(angle) * trimEnd;
+
+    // Connecting arrow shaft
+    ctx.strokeStyle = `rgba(255,215,0,${0.5 + 0.35 * p})`;
+    ctx.lineWidth = 3;
+    ctx.lineCap = 'round';
+    ctx.setLineDash([2, 7]);
+    ctx.beginPath();
+    ctx.moveTo(x1, y1);
+    ctx.lineTo(x2, y2);
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    // Arrowhead
+    const headLen = Math.min(11 + 3 * p, dist * 0.22);
+    ctx.fillStyle = `rgba(255,215,0,${0.55 + 0.4 * p})`;
+    ctx.beginPath();
+    ctx.moveTo(x2 + Math.cos(angle) * 5, y2 + Math.sin(angle) * 5);
+    ctx.lineTo(x2 - headLen * Math.cos(angle - Math.PI / 6), y2 - headLen * Math.sin(angle - Math.PI / 6));
+    ctx.lineTo(x2 - headLen * Math.cos(angle + Math.PI / 6), y2 - headLen * Math.sin(angle + Math.PI / 6));
+    ctx.closePath();
+    ctx.fill();
+
+    // Source marker: pulsing gold ring around the piece to move
+    ctx.shadowColor = '#ffd700';
+    ctx.shadowBlur = 20 * p;
+    ctx.beginPath();
+    ctx.arc(from.sx, from.sy, scale * 0.88, 0, Math.PI * 2);
+    ctx.strokeStyle = `rgba(255,215,0,${0.85 * p + 0.15})`;
+    ctx.lineWidth = 3.5;
+    ctx.stroke();
+    ctx.shadowBlur = 0;
+    drawPillLabel(from.sx, from.sy - scale - 13, 'MOVE THIS', '#ffd700');
+
+    // Destination marker: pulsing cyan target on the landing square
+    ctx.shadowColor = '#4ecdc4';
+    ctx.shadowBlur = 20 * p;
+    diamondPath(move.x, move.y);
+    ctx.strokeStyle = `rgba(78,205,196,${0.85 * p + 0.15})`;
+    ctx.lineWidth = 3.5;
+    ctx.setLineDash([4, 5]);
+    ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.shadowBlur = 0;
+    ctx.beginPath();
+    ctx.arc(to.sx, to.sy, 5, 0, Math.PI * 2);
+    ctx.fillStyle = '#4ecdc4';
+    ctx.fill();
+    drawPillLabel(to.sx, to.sy - scale - 13, 'TO HERE', '#4ecdc4');
+
+    ctx.restore();
+  }
+
+  // ---- Coach hint: recompute only when the game state actually changed
+  // (turn, move count, or coached school), never on every animation frame ----
+  function updateCoachHint() {
+    if (!coachMode) { coachHint = null; coachHintKey = null; return; }
     const isHumanTurn = !aiConfig || game.turn !== aiConfig.player;
     const isLocalTurn = !isNetworked || game.turn === localPlayer;
     if (game.winner || game.pendingReforge || aiThinking || !isHumanTurn || !isLocalTurn) {
-      coachTipDiv.textContent = '⏳ Waiting for your turn...';
+      coachHint = null; coachHintKey = null;
       return;
     }
-
-    // Quick search for the best move for the current player (depth 3 for better planning),
-    // styled by whichever School the human picked as their coach.
-    const coachSchool = SCHOOLS[coachSchoolId] || SCHOOLS.ykrul;
-    const hint = chooseAiMove(game, game.turn, coachSchoolId, 3);
-    if (!hint) {
-      coachTipDiv.textContent = '🤔 No strong suggestions available.';
-      return;
-    }
-
-    // Store the suggested piece for glowing
-    const piece = game.pieces.find(p => p.id === hint.pieceId);
-    if (piece) coachSuggestedPiece = piece;
-
-    // ---- Draw destination highlight (cyan dashed diamond + star) ----
-    const { x, y } = hint.move;
-    diamondPath(x, y);
-    ctx.save();
-    ctx.strokeStyle = '#4ecdc4';
-    ctx.lineWidth = 3;
-    ctx.setLineDash([4, 6]);
-    ctx.stroke();
-    ctx.restore();
-    // Draw a star on the destination
-    const { sx, sy } = gridToScreen(x, y);
-    ctx.save();
-    ctx.font = '18px sans-serif';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillStyle = '#4ecdc4';
-    ctx.fillText('✦', sx, sy - 16);
-    ctx.restore();
-
-    // Build explanation, including source piece coordinates
-    let reason = `${coachSchool.name} suggests: ${TYPE_NAME[piece.type]} at (${piece.x},${piece.y}) → (${x},${y})`;
-    if (hint.move.capture) {
-      const target = game.pieces.find(p => p.id === hint.move.targetId);
-      if (target) reason += ` — captures ${TYPE_NAME[target.type]}!`;
-    }
-    if (hint.move.special === 'S:D') reason += ` — Displacement (steps onto an adjacent enemy).`;
-    if (hint.move.special === 'S:H') reason += ` — Hop (jumps an adjacent enemy to the square beyond).`;
-    if (piece.type === 'blue' && game.isCross(x, y) && !game.isCross(piece.x, piece.y)) {
-      reason += ` — enters the Cross (up to 3 consecutive turns, then a 2‑turn ban).`;
-    }
-    if (piece.type === 'blue' && game.isSanctum(x, y)) reason += ` — lands on a Sanctum (may Seed a Green).`;
-    if (piece.type !== 'blue') {
-      const onwardLane = (game.lanesFor(piece.player).onward).some(([dx, dy]) => x === piece.x + dx * ONWARD_DIST[piece.type] && y === piece.y + dy * ONWARD_DIST[piece.type]);
-      reason += onwardLane ? ` — full Onward distance (exact, no shorter stop allowed).` : ` — Homeward (chose to stop partway).`;
-    }
-    coachTipDiv.textContent = `💡 ${reason}`;
+    const key = `${game.moveHistory.length}:${game.turn}:${coachSchoolId}`;
+    if (key === coachHintKey && coachHint) return; // cached suggestion is still valid
+    coachHintKey = key;
+    const result = chooseAiMove(game, game.turn, coachSchoolId, 3);
+    if (!result) { coachHint = null; return; }
+    const piece = game.pieces.find(p => p.id === result.pieceId);
+    coachHint = piece ? { piece, move: result.move } : null;
   }
 
-  // ---- Main render function ----
-  function render() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+  function coachTipText() {
+    if (!coachMode) return '💡 Coach will suggest moves when it\'s your turn.';
+    const isHumanTurn = !aiConfig || game.turn !== aiConfig.player;
+    const isLocalTurn = !isNetworked || game.turn === localPlayer;
+    if (game.winner || game.pendingReforge || aiThinking || !isHumanTurn || !isLocalTurn) {
+      return '⏳ Waiting for your turn...';
+    }
+    if (!coachHint) return '🤔 No strong suggestions available.';
+    const { piece, move } = coachHint;
+    const coachSchool = SCHOOLS[coachSchoolId] || SCHOOLS.ykrul;
+    let reason = `${coachSchool.name}: move the ${TYPE_NAME[piece.type]} at (${piece.x},${piece.y}) to (${move.x},${move.y})`;
+    if (move.capture) {
+      const target = game.pieces.find(p => p.id === move.targetId);
+      if (target) reason += ` — captures ${TYPE_NAME[target.type]}!`;
+    }
+    if (move.special === 'S:D') reason += ` — Displacement (steps onto an adjacent enemy).`;
+    if (move.special === 'S:H') reason += ` — Hop (jumps an adjacent enemy to the square beyond).`;
+    if (piece.type === 'blue' && game.isCross(move.x, move.y) && !game.isCross(piece.x, piece.y)) {
+      reason += ` — enters the Cross (up to 3 consecutive turns, then a 2‑turn ban).`;
+    }
+    if (piece.type === 'blue' && game.isSanctum(move.x, move.y)) reason += ` — lands on a Sanctum (may Seed a Green).`;
+    if (piece.type !== 'blue') {
+      const onwardLane = (game.lanesFor(piece.player).onward).some(([dx, dy]) => move.x === piece.x + dx * ONWARD_DIST[piece.type] && move.y === piece.y + dy * ONWARD_DIST[piece.type]);
+      reason += onwardLane ? ` — full Onward distance (exact, no shorter stop allowed).` : ` — Homeward (chose to stop partway).`;
+    }
+    return `💡 ${reason}`;
+  }
 
-    // Draw board
+  // ---- Board drawing split into small pieces so the coach animation loop
+  // can redraw just the canvas (fast) without touching DOM stats/log ----
+  function drawBoardCells() {
     for (let y = 0; y < 8; y++) {
       for (let x = 0; x < 8; x++) {
         let fill = ((x + y) % 2 === 0) ? '#1c1d28' : '#181923';
@@ -1812,46 +1864,78 @@ export function openKonrehModal(netConfig = null) {
         drawCell(x, y, fill);
       }
     }
-
     drawLabel(0, 0, 'P1');
     drawLabel(7, 7, 'P2');
     drawLabel(0, 7, 'S');
     drawLabel(7, 0, 'S');
+  }
 
-    // Highlight valid moves for selected piece
-    if (selectedPiece) {
-      const byKind = { slide: 'rgba(90,200,120,0.28)', capture: 'rgba(217,74,74,0.35)',
-                       'special-d': 'rgba(180,110,230,0.35)', 'special-h': 'rgba(120,150,240,0.35)' };
-      const grouped = {};
-      for (const m of validMoves) {
-        const key = `${m.x},${m.y}`;
-        grouped[key] = grouped[key] || [];
-        grouped[key].push(m);
-      }
-      for (const key in grouped) {
-        const list = grouped[key];
-        const [mx, my] = key.split(',').map(Number);
-        const kind = moveKind(list[0]);
-        drawHighlight(mx, my, byKind[kind] || 'rgba(255,255,255,0.2)', list.length > 1);
-        if (list.length > 1) drawLabel(mx, my, `${list.length}`, '#fff');
-      }
-      diamondPath(selectedPiece.x, selectedPiece.y);
-      ctx.strokeStyle = '#fff'; ctx.lineWidth = 2.5; ctx.stroke();
+  function drawSelectionHighlights() {
+    if (!selectedPiece) return;
+    const byKind = { slide: 'rgba(90,200,120,0.28)', capture: 'rgba(217,74,74,0.35)',
+                     'special-d': 'rgba(180,110,230,0.35)', 'special-h': 'rgba(120,150,240,0.35)' };
+    const grouped = {};
+    for (const m of validMoves) {
+      const key = `${m.x},${m.y}`;
+      grouped[key] = grouped[key] || [];
+      grouped[key].push(m);
     }
+    for (const key in grouped) {
+      const list = grouped[key];
+      const [mx, my] = key.split(',').map(Number);
+      const kind = moveKind(list[0]);
+      drawHighlight(mx, my, byKind[kind] || 'rgba(255,255,255,0.2)', list.length > 1);
+      if (list.length > 1) drawLabel(mx, my, `${list.length}`, '#fff');
+    }
+    diamondPath(selectedPiece.x, selectedPiece.y);
+    ctx.strokeStyle = '#fff'; ctx.lineWidth = 2.5; ctx.stroke();
+  }
 
-    // Draw pieces
+  function drawAllPieces() {
     for (const p of game.pieces) if (p.isAlive) drawPiece(p);
+  }
 
-    // ---- Draw coach glow if active ----
-    if (coachMode && coachSuggestedPiece) {
-      drawCoachGlow(coachSuggestedPiece);
+  function coachPulsePhase() { return Date.now() / 450; }
+
+  function drawBoardOnly() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    drawBoardCells();
+    drawSelectionHighlights();
+    drawAllPieces();
+    if (coachMode && coachHint) drawCoachOverlay(coachHint, coachPulsePhase());
+  }
+
+  // ---- Keeps the coach arrow gently pulsing via requestAnimationFrame,
+  // WITHOUT re-running the AI search every frame (that only happens in
+  // updateCoachHint, which is cached). Starts/stops itself as needed. ----
+  function syncCoachAnimation() {
+    const shouldAnimate = coachMode && !!coachHint && !game.winner;
+    if (shouldAnimate && coachAnimHandle == null) {
+      const tick = () => {
+        if (!coachMode || !coachHint || game.winner) { coachAnimHandle = null; return; }
+        drawBoardOnly();
+        coachAnimHandle = requestAnimationFrame(tick);
+      };
+      coachAnimHandle = requestAnimationFrame(tick);
+    } else if (!shouldAnimate && coachAnimHandle != null) {
+      cancelAnimationFrame(coachAnimHandle);
+      coachAnimHandle = null;
     }
+  }
 
-    // ---- Render status (which calls renderCoachHint to draw destination and set tip) ----
+  function stopCoachAnimation() {
+    if (coachAnimHandle != null) {
+      cancelAnimationFrame(coachAnimHandle);
+      coachAnimHandle = null;
+    }
+  }
+
+  // ---- Main render function ----
+  function render() {
+    updateCoachHint();
+    drawBoardOnly();
     renderStatus();
-    // renderCoachHint is called inside renderStatus, which draws the destination and sets coachSuggestedPiece
-    // We need to call renderCoachHint after draw pieces and before status? Actually it's called from renderStatus, which is after glow.
-    // That's fine; the destination highlight will be drawn after pieces.
+    syncCoachAnimation();
 
     // Update status with selected piece coords (if any)
     if (selectedPiece) {
@@ -1859,7 +1943,7 @@ export function openKonrehModal(netConfig = null) {
     }
   }
 
-  // ---- Status rendering (calls renderCoachHint) ----
+  // ---- Status rendering (DOM only — drawing happens in drawBoardOnly) ----
   function renderStatus() {
     let statusText = game.getStatus();
     if (aiConfig && !game.winner && !game.pendingReforge && game.turn === aiConfig.player) {
@@ -1867,8 +1951,8 @@ export function openKonrehModal(netConfig = null) {
     }
     statusDiv.textContent = statusText;
 
-    // Coach hint overlay and tip – this will also set coachSuggestedPiece and draw destination
-    renderCoachHint();
+    coachTipDiv.style.display = coachMode ? 'block' : 'none';
+    coachTipDiv.textContent = coachTipText();
 
     infoGrid.innerHTML = '';
     const addStat = (label, value, cls) => {
@@ -2066,9 +2150,11 @@ export function openKonrehModal(netConfig = null) {
   });
 
   resetBtn.addEventListener('click', () => {
+    stopCoachAnimation();
     if (isNetworked) {
       game = new KonrehEngine();
       selectedPiece = null; validMoves = []; pendingChoice = null; localSeq = 0;
+      coachHint = null; coachHintKey = null;
       logDiv.innerHTML = '';
       log(`<i>New game started — you are Player ${localPlayer}.</i>`);
       if (netConfig.onLocalNewGame) netConfig.onLocalNewGame();
@@ -2114,6 +2200,7 @@ export function openKonrehModal(netConfig = null) {
       applyRemoteNewGame() {
         game = new KonrehEngine();
         selectedPiece = null; validMoves = []; pendingChoice = null; localSeq = 0;
+        coachHint = null; coachHintKey = null;
         logDiv.innerHTML = '';
         log(`<i>Opponent started a new game. You are Player ${localPlayer}.</i>`);
         render();
@@ -2130,7 +2217,7 @@ export function openKonrehModal(netConfig = null) {
         render();
       },
       getSeq() { return localSeq; },
-      destroy() { modal.remove(); },
+      destroy() { stopCoachAnimation(); modal.remove(); },
     };
   }
 }

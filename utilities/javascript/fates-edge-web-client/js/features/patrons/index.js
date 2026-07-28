@@ -115,7 +115,7 @@ const DEFAULT_TERRESTRIAL_PATRONS = [
 const DEFAULT_TRUSTS = [
     {
         id: 'velvet-coin-trust',
-        name: 'The Velvet Coin',
+        name: 'The Silk Coin',
         icon: '🪙',
         tier: 'I',
         description: 'A thieves\' guild operating in the shadows of Silkstrand.',

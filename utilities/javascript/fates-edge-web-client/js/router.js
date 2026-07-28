@@ -16,6 +16,7 @@ export const ROUTE_REDIRECTS = {
     'builder': 'characters',
     'regional': 'decks',
     'roller': 'dice',
+    'adventures': 'adventure-manager',
     'scene-tools': 'gm-tools',   // old name → new
 };
 
@@ -40,8 +41,8 @@ const ROUTE_IMPORTS = {
     vtt:         () => import('./features/vtt/index.js'),
     'gm-tools':  () => import('./features/gm-tools/index.js'),
     spellcraft:  () => import('./features/spellcraft/index.js'),
-    // 👇 NEW – Kon‑Reh (standalone feature)
     'kon-reh':   () => import('./features/kon-reh/index.js'),
+    'adventure-manager':         () => import('./features/adventure-manager/index.js'),
 };
 
 // ============================================================

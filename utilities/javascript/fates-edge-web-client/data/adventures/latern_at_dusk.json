@@ -1,0 +1,205 @@
+{
+  "id": "lantern_at_dusk",
+  "title": "The Lantern at Dusk",
+  "description": "A terrible blight is spreading from the old barrow in the hills — the same barrow where a cursed lantern was buried centuries ago. The lantern must be brought to a stone circle in the valley to break the curse. But the barrow is not empty.",
+  "tier": "I",
+  "tierRange": "I",
+  "author": "Nicholas A. Gasper",
+  "sessions": "1–2",
+  "themes": ["Curse", "Barrow", "Spirits", "Exploration", "Rival"],
+  "status": "planned",
+  "currentAct": 0,
+  "currentScene": 0,
+  "startedAt": null,
+  "completedAt": null,
+  "notes": "This adventure is designed as a one-shot or introductory session. It showcases the core mechanics: Position, DV, Outcome Matrix, Timers, Boons, and Story Beats. The timers create rising tension, and the rival (Lena) adds a human element to the supernatural threat.",
+  "acts": [
+    {
+      "id": "act-one",
+      "title": "The Lantern at Dusk",
+      "description": "A complete one-shot adventure. Enter the barrow, face the Duskwights, confront Quick Lena, escape the collapse, and break the curse.",
+      "scenes": [
+        {
+          "id": "scene-entry",
+          "title": "Scene 1 — The Entry",
+          "description": "The barrow entrance is a narrow stone passage. A faint green glow pulses from deeper inside. A cave-in blocks the way.",
+          "completed": false,
+          "timers": [
+            {
+              "name": "Barrow Collapse",
+              "segments": 6,
+              "current": 0,
+              "description": "Ticks on failure inside. At 6, the entrance seals."
+            }
+          ],
+          "encounters": [
+            {
+              "name": "Clearing the Rubble",
+              "dv": 3,
+              "position": "Controlled",
+              "outcomes": {
+                "clean": "You clear the rubble and enter the barrow.",
+                "partial": "You get through but disturb rubble — tick Barrow Collapse +1.",
+                "miss": "You are pinned by a rock — mark Harm 1 and tick Collapse +1."
+              }
+            }
+          ]
+        },
+        {
+          "id": "scene-spirit",
+          "title": "Scene 2 — The Spirit Corridor",
+          "description": "The passage widens into a hall where three Duskwights drift. They do not attack unless provoked, but they will not let anyone pass without an offering.",
+          "completed": false,
+          "timers": [
+            {
+              "name": "Barrow Collapse",
+              "segments": 6,
+              "current": 0,
+              "description": "Ticks on failure inside."
+            }
+          ],
+          "encounters": [
+            {
+              "name": "Offer a Memory or a Secret",
+              "dv": 3,
+              "position": "Controlled",
+              "outcomes": {
+                "clean": "They bow and let you pass.",
+                "partial": "They take your offering but also steal a random piece of equipment.",
+                "miss": "They attack as a single mob (Cap 2, Harm 1 each, 2 Fatigue each on hit)."
+              }
+            }
+          ]
+        },
+        {
+          "id": "scene-lantern",
+          "title": "Scene 3 — The Lantern Chamber",
+          "description": "The lantern sits on a stone altar. Quick Lena is there, trying to pry it loose.",
+          "completed": false,
+          "timers": [
+            {
+              "name": "Barrow Collapse",
+              "segments": 6,
+              "current": 0,
+              "description": "Ticks on failure inside."
+            },
+            {
+              "name": "Lena's Agenda",
+              "segments": 4,
+              "current": 0,
+              "description": "Ticks each scene inside. At 4, Lena takes the lantern first."
+            }
+          ],
+          "encounters": [
+            {
+              "name": "Confront Lena",
+              "dv": 3,
+              "position": "Controlled",
+              "outcomes": {
+                "clean": "She leaves peacefully, but warns that 'others will come for it.'",
+                "partial": "She agrees to split any reward but demands a favor later (start a Debt Timer [4]).",
+                "miss": "She triggers a trap — a stone door starts closing (tick Collapse +2)."
+              }
+            }
+          ]
+        },
+        {
+          "id": "scene-escape",
+          "title": "Scene 4 — Escape",
+          "description": "After you take the lantern, the barrow begins to collapse in earnest. The party needs 3 successes before 2 failures to escape.",
+          "completed": false,
+          "timers": [
+            {
+              "name": "Barrow Collapse",
+              "segments": 6,
+              "current": 0,
+              "description": "Ticks on failure. At 6, entrance seals."
+            }
+          ],
+          "encounters": [
+            {
+              "name": "Escape the Barrow",
+              "dv": 3,
+              "position": "Desperate",
+              "outcomes": {
+                "clean": "Each success counts toward the 3 needed; no extra tick.",
+                "partial": "Tick Collapse +1; gain a Boon.",
+                "miss": "Tick Collapse +1. If Collapse reaches 6, entrance seals — find another way."
+              }
+            }
+          ]
+        },
+        {
+          "id": "scene-resolution",
+          "title": "Resolution — Breaking the Curse",
+          "description": "Return the lantern to the stone circle. Breaking the curse requires a simple ritual.",
+          "completed": false,
+          "timers": [],
+          "encounters": [
+            {
+              "name": "Ritual of Breaking",
+              "dv": 2,
+              "position": "Controlled",
+              "outcomes": {
+                "clean": "The blight lifts. Elder Sarai rewards each PC with a String — 'The village owes you.'",
+                "partial": "The curse lifts, but the lantern cannot be destroyed — it will attract another danger soon.",
+                "miss": "The curse is only pushed back one year. A dark spirit escapes and will become a recurring enemy."
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "npcs": [
+    {
+      "id": "npc-sarai",
+      "name": "Elder Sarai",
+      "role": "Village elder of Duskwood",
+      "motivation": "Save her village from the blight."
+    },
+    {
+      "id": "npc-lena",
+      "name": "Quick Lena",
+      "role": "Rival treasure hunter",
+      "motivation": "Get the lantern for herself."
+    },
+    {
+      "id": "npc-duskwights",
+      "name": "Duskwights",
+      "role": "Restless spirits (3)",
+      "motivation": "Guard the barrow."
+    }
+  ],
+  "locations": [
+    {
+      "id": "loc-barrow",
+      "name": "The Old Barrow",
+      "description": "A moss-covered stone mound on a hill overlooking Duskwood.",
+      "tags": ["barrow", "ruin", "threshold"]
+    },
+    {
+      "id": "loc-stone-circle",
+      "name": "The Stone Circle",
+      "description": "A ring of standing stones in the valley below the barrow.",
+      "tags": ["circle", "ritual", "threshold"]
+    }
+  ],
+  "factions": [],
+  "campaignTimers": [
+    {
+      "name": "Barrow Collapse",
+      "segments": 6,
+      "current": 0,
+      "description": "Ticks when the party fails a roll inside. At 6, the entrance seals."
+    },
+    {
+      "name": "Lena's Agenda",
+      "segments": 4,
+      "current": 0,
+      "description": "Ticks at the end of each scene inside the barrow. When it fills, Lena has already taken the lantern."
+    }
+  ],
+  "createdAt": "2026-07-28T00:00:00.000Z",
+  "updatedAt": "2026-07-28T00:00:00.000Z"
+}

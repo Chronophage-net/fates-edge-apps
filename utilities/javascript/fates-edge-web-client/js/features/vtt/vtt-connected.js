@@ -5,6 +5,13 @@
  * v3 – Full character sync from server (room-state, sync-state, state-updated)
  * v4 – Restructured layout/visual pass: card-based sections, stat pills,
  *      clearer typographic hierarchy. No IDs/classes/behavior removed.
+ * v5 – Added the Combat Actions panel (contextual melee/ranged/tactics/
+ *      talent buttons driven by the selected character's sheet). See
+ *      combat-actions.js. #vtt-attr / #vtt-skill switched from <select>
+ *      to <input type="number"> so weapon/talent bonuses that push a
+ *      pool above the old 5-option dropdown range still work — every
+ *      other reference to these fields (rollConnected, renderCommonRolls,
+ *      etc.) reads `.value` the same way, so nothing else changes.
  */
 
 import { vttStore } from '../../core/vtt-store.js';
@@ -61,6 +68,7 @@ import {
     initiateVoiceCall,
     onVoiceClientsChanged
 } from './voice.js';
+import { renderCombatActions, resetCombatScene } from './combat-actions.js'; // 👈 NEW
 
 // ============================================================
 // STATE
@@ -102,6 +110,11 @@ let charactersPushed = false;
 // 👇 NEW: live combat status pushed from the Encounter Tracker (combat.js),
 // so players can see round/turn/timer without needing GM-only access.
 let combatStatus = null;
+
+// 👇 NEW: live "where are we" status pushed from the Adventures module
+// (adventure-manager/index.js's broadcastSceneStatus()), so players see the
+// current act/scene without needing GM access to the Adventures tab.
+let sceneStatus = null;
 
 // ============================================================
 // HELPERS – Get sender from selected character
@@ -430,6 +443,20 @@ async function handleModuleCleanup(moduleId) {
 }
 
 // ============================================================
+// 👇 NEW: forward a roll summary into the GM's Combat Tracker log, if
+// it's open. Silently no-ops otherwise — the roll still posts to chat
+// as normal either way, this is just a convenience for the GM so they
+// don't have to cross-reference chat separately.
+// ============================================================
+
+async function logToGMTracker(sender, message) {
+    try {
+        const combat = await import('../encounters/combat.js');
+        combat.logExternalAction?.(sender, message, 'roll');
+    } catch (e) { /* combat module not available — ignore */ }
+}
+
+// ============================================================
 // ROLL (with WebSocket broadcast) – uses selected character
 // ============================================================
 
@@ -511,6 +538,8 @@ function rollConnected(postToChat = true) {
                 });
             } catch (e) { /* ignore */ }
         }
+
+        logToGMTracker(sender, msg); // 👈 NEW
     }
 }
 
@@ -546,6 +575,7 @@ function handleSlash(text) {
                     reRolledDice: result.reRolledDice
                 }
             });
+            logToGMTracker(sender, msg); // 👈 NEW
             break;
         }
         case 'timer': {
@@ -832,6 +862,25 @@ function updateCombatStatusUI() {
     el.innerHTML = `⚔️ Round ${c.round} — ${turnText}${timerText}`;
 }
 
+// 👇 NEW: renders the "where are we" pill from whatever the Adventures
+// module last broadcast (see adventure-manager/index.js's broadcastSceneStatus()).
+// Deliberately just adventure/act/scene titles — no GM notes, no NPC
+// info — the same "player-safe" scope as the combat status pill above.
+function updateSceneStatusUI() {
+    const el = q('#vtt-scene-status');
+    if (!el) return;
+    if (!sceneStatus) {
+        el.style.display = 'none';
+        el.innerHTML = '';
+        return;
+    }
+    const s = sceneStatus;
+    const parts = [s.actTitle, s.sceneTitle].filter(Boolean).map(escHtml);
+    const label = parts.length ? parts.join(' — ') : escHtml(s.adventureTitle || 'Adventure in progress');
+    el.style.display = 'inline-flex';
+    el.innerHTML = `🎭 ${label}`;
+}
+
 // ============================================================
 // WEBSOCKET SYNC SETUP (using unified WebSocket module)
 // ============================================================
@@ -1061,6 +1110,17 @@ function setupWebSocketSync() {
     };
     onWSEvent('combat-status-update', combatStatusHandler);
     wsListeners.set('combat-status-update', combatStatusHandler);
+
+    // ─── SCENE STATUS (from Adventures module) ─────────────────── 👇 NEW
+    const sceneStatusHandler = (data) => {
+        if (isDestroyed) return;
+        // adventure-manager/index.js broadcasts `{ scene: {...} }` on start/
+        // scene-complete/act-complete, and `{ scene: null }` on reset.
+        sceneStatus = (data && data.scene) || null;
+        updateSceneStatusUI();
+    };
+    onWSEvent('scene-status-update', sceneStatusHandler);
+    wsListeners.set('scene-status-update', sceneStatusHandler);
 
     // ============================================================
     // GM ELECTION & PROMOTION EVENTS
@@ -1385,6 +1445,7 @@ function attachEvents() {
                 });
                 const chars = getCharacters();
                 vttStore.updateCharacters(chars);
+                resetCombatScene(); // 👈 NEW: also refresh once-per-scene combat talents
                 try {
                     sendEvent({ type: 'state-updated', state: state });
                 } catch (e) { /* ignore */ }
@@ -1530,6 +1591,8 @@ export function render(el) {
             <span class="vtt-stat-pill">🃏 <strong id="vtt-deck-count-header">${deckCount}</strong> cards</span>
             <!-- 👇 NEW: live combat status, pushed from the Encounter Tracker. Hidden until a broadcast arrives. -->
             <span class="vtt-stat-pill" id="vtt-combat-status" style="display:none;background:var(--bg4);border:1px solid var(--red);"></span>
+            <!-- 👇 NEW: live "where are we" status, pushed from the Adventures module. Hidden until a broadcast arrives. -->
+            <span class="vtt-stat-pill" id="vtt-scene-status" style="display:none;background:var(--bg4);border:1px solid var(--gold);"></span>
         </div>
         <div class="vtt-divider"></div>
         <!-- Voice controls (unchanged) -->
@@ -1619,6 +1682,14 @@ export function render(el) {
                 <div id="vttCharGrid" class="vtt-char-grid"></div>
             </div>
 
+            <!-- 👇 NEW: Combat Actions -->
+            <div class="vtt-panel vtt-card">
+                <div class="vtt-card-header">
+                <span class="vtt-card-title" style="font-size:1.05rem;">⚔️ Combat Actions</span>
+                </div>
+                <div id="vtt-combat-actions" style="min-height:2.5rem;"></div>
+            </div>
+
             <!-- Quick Roller -->
             <div class="vtt-panel vtt-card">
                 <div class="vtt-card-header">
@@ -1627,15 +1698,11 @@ export function render(el) {
                 <div class="vtt-dice-row">
                 <div class="vtt-field">
                     <label>Attr</label>
-                    <select id="vtt-attr">
-                    <option value="1">1</option><option value="2">2</option><option value="3" selected>3</option><option value="4">4</option><option value="5">5</option>
-                    </select>
+                    <input type="number" id="vtt-attr" value="3" min="1" max="8" style="width:100%;" />
                 </div>
                 <div class="vtt-field">
                     <label>Skill</label>
-                    <select id="vtt-skill">
-                    <option value="0">0</option><option value="1">1</option><option value="2" selected>2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option>
-                    </select>
+                    <input type="number" id="vtt-skill" value="2" min="0" max="12" style="width:100%;" />
                 </div>
                 <div class="vtt-field" style="flex:0 0 80px;">
                     <label>DV</label>
@@ -1701,12 +1768,14 @@ export function render(el) {
     renderChat();
     renderVTTChars();
     renderCommonRolls();
+    renderCombatActions(); // 👈 NEW
     renderVTTTimers();
     renderLocalPresence();
     renderVoiceClients();
     updateMessageCount();
     populateChatRecipients();
     updateCombatStatusUI(); // 👈 NEW: reflect whatever combat status is already known (e.g. after a tab switch back)
+    updateSceneStatusUI(); // 👈 NEW: same, for the Adventures "where are we" pill
 
     // Normalize and set initial characters from local state (if any)
     const chars = getCharacters();

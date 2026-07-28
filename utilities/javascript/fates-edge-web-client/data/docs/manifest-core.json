@@ -5,7 +5,7 @@
     {
       "id": "srd",
       "title": "Fate's Edge Systems Reference Document",
-      "file": " Fates_-_Edge_-_-Systems_-_Reference_-_Document..html",
+      "file": "Fates_-_Edge_-_-Systems_-_Reference_-_Document.html",
       "path": "/data/docs/",
       "category": "srd",
       "categoryLabel": "System Reference Document",
@@ -16,7 +16,7 @@
       "id": "essentials",
       "title": "Fate's Edge Essentials",
       "file": "Fates_-_Edge_-_-Essentials.html",
-      "path": "/data/docs/Fates_-_Edge_-_-Essentials.html",
+      "path": "/data/docs/",
       "category": "essentials",
       "categoryLabel": "Essentials",
       "core": true,
@@ -26,14 +26,34 @@
       "id": "essential_gm_screen",
       "title": "Fate's Edge Essential GM Screen",
       "file": "Fates_-_Edge_-_-Game_-_Master_-_Screen.html",
-      "path": "/data/docs/Fates_-_Edge_-_-Game_-_Master_-_Screen.html",
+      "path": "/data/docs/",
       "category": "essentials",
       "categoryLabel": "Essentials",
       "core": true,
       "active": true
+    },
+    {
+      "id": "running_via_web_client",
+      "title": "Fate's Edge Playing and Running via the Web Client",
+      "file": "Fates_-_Edge_-_-Playing-_-and-_-Running-_-Fate's-_-Edge.html",
+      "path": "/data/docs/",
+      "category": "essentials",
+      "categoryLabel": "Essentials",
+      "core": true,
+      "active": true
+    },
+    {
+      "id": "lantern_at_dusk",
+      "title": "The Lantern at Dusk — Starter Adventure",
+      "file": "Fates_-_Edge_-_-Lantern-_-at-_-Dusk.html",
+      "path": "/data/docs/adventures/",
+      "category": "adventures",
+      "categoryLabel": "Adventures",
+      "core": false,
+      "active": true
     }
   ],
-  "total_count": 3,
-  "active_count": 3,
+  "total_count": 5,
+  "active_count": 5,
   "_license": "Fate's Edge Proprietary Content – © 2024 Nicholas A. Gasper. All rights reserved."
 }
