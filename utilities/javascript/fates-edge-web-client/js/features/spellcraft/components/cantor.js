@@ -15,6 +15,8 @@
  * - Voice of the Cantor (wisdom and guidance)
  * - Bloom tracker – how many times you've bloomed
  * - Fugal Self progression (after 7 blooms)
+ * - Bound Patron talent: +1 position for bound patron, -1 for others, bound corruption
+ * - Unbound Cantors access all patrons' Low rites
  */
 
 import { getCharacterData, saveCharacter } from '../index.js';
@@ -22,6 +24,9 @@ import { escHtml } from '../../../core/utils.js';
 import { getState, saveState } from '../../../core/state.js';
 import { showToast } from '../../../components/Toast.js';
 import { performRoll } from '../../../core/dice.js';
+// ─── Import patrons module for data loading ────────────────
+import patrons from '../../patrons/index.js';
+const { loadPatronData, getPatronObligation, savePatronData } = patrons;
 
 // ============================================================
 // HELPERS
@@ -45,12 +50,78 @@ function safeString(val) {
     return String(val);
 }
 
-// ─── Magic Paths Reference ─────────────────────────────────────
-// Shown as a resource when no Cantor character is selected, so the panel
-// is useful even before a character exists. Kept in sync manually with
-// the richer MAGIC_PATHS object in features/characters/index.js — this is
-// a small, self-contained copy rather than a cross-feature import, so a
-// wrong relative path can never break this panel.
+function formatText(text) {
+    if (!text) return '';
+    return escHtml(text).replace(/\n/g, '<br>');
+}
+
+function getTierColor(tier) {
+    const colors = {
+        'Cantrip': 'var(--text3)',
+        'Basic': '#6baa7a',
+        'Low': '#6baa7a',
+        'Standard': '#d4af37',
+        'Advanced': '#c47a7a',
+        'Master': '#b84a8a',
+        'Epic': '#d94a4a'
+    };
+    return colors[tier] || 'var(--text2)';
+}
+
+// ─── Find a patron in state by ID (copied from rites module) ──
+function findPatronData(state, patronId) {
+    if (!patronId) return null;
+    
+    if (state.patrons?.cosmic) {
+        const found = state.patrons.cosmic.find(p => p.id === patronId);
+        if (found) return found;
+    }
+    
+    if (state.patrons?.terrestrial) {
+        const found = state.patrons.terrestrial.find(p => p.id === patronId);
+        if (found) return found;
+    }
+    
+    if (state.patrons?.religions) {
+        for (const religion of state.patrons.religions) {
+            if (religion.orders) {
+                const found = religion.orders.find(o => o.id === patronId);
+                if (found) {
+                    return {
+                        ...found,
+                        _religion: religion.name,
+                        _religionIcon: religion.icon
+                    };
+                }
+            }
+        }
+    }
+    
+    return null;
+}
+
+// ─── Get all patrons (cosmic, terrestrial, and religion orders) ──
+function getAllPatrons(state) {
+    const all = [];
+    if (state.patrons?.cosmic) all.push(...state.patrons.cosmic);
+    if (state.patrons?.terrestrial) all.push(...state.patrons.terrestrial);
+    if (state.patrons?.religions) {
+        for (const rel of state.patrons.religions) {
+            if (rel.orders) {
+                for (const order of rel.orders) {
+                    all.push({
+                        ...order,
+                        _religion: rel.name,
+                        _religionIcon: rel.icon
+                    });
+                }
+            }
+        }
+    }
+    return all;
+}
+
+// ─── Magic Paths Reference (kept for fallback) ──────────────
 const MAGIC_PATH_REFERENCE = [
     { icon: '🔥', label: 'Free Caster', blurb: 'Raw TAGS grammar, no patron — pure will and improvisation.' },
     { icon: '📖', label: 'Runekeeper', blurb: 'Bound to one patron via Thiasos or Codex; steady Rites.' },
@@ -80,75 +151,8 @@ function renderMagicPathReferenceHtml(highlightLabel) {
     `;
 }
 
-function formatText(text) {
-    if (!text) return '';
-    return escHtml(text).replace(/\n/g, '<br>');
-}
-
-/**
- * Load patron data from state or fetch from /data/patrons/{patronId}.json
- * Caches the result in state.patrons (by category) and in a local cache.
- */
-const patronCache = new Map();
-
-async function loadPatronData(patronId) {
-    if (!patronId) return null;
-
-    if (patronCache.has(patronId)) {
-        return patronCache.get(patronId);
-    }
-
-    const state = getState();
-
-    let found = null;
-    if (state.patrons) {
-        if (state.patrons.cosmic) {
-            found = state.patrons.cosmic.find(p => p.id === patronId);
-        }
-        if (!found && state.patrons.terrestrial) {
-            found = state.patrons.terrestrial.find(p => p.id === patronId);
-        }
-        if (!found && state.patrons.religions) {
-            for (const religion of state.patrons.religions) {
-                if (religion.orders) {
-                    found = religion.orders.find(o => o.id === patronId);
-                    if (found) break;
-                }
-            }
-        }
-    }
-
-    if (found) {
-        patronCache.set(patronId, found);
-        return found;
-    }
-
-    try {
-        const response = await fetch(`./data/patrons/${patronId}.json`);
-        if (response.ok) {
-            const data = await response.json();
-            if (!state.patrons) state.patrons = {};
-            if (!state.patrons.cosmic) state.patrons.cosmic = [];
-            if (!state.patrons.cosmic.find(p => p.id === patronId)) {
-                state.patrons.cosmic.push(data);
-            }
-            patronCache.set(patronId, data);
-            saveState();
-            return data;
-        } else {
-            console.warn(`Patron data not found: ${patronId}`);
-            patronCache.set(patronId, null);
-            return null;
-        }
-    } catch (e) {
-        console.warn(`Failed to fetch patron data for ${patronId}:`, e);
-        patronCache.set(patronId, null);
-        return null;
-    }
-}
-
 // ============================================================
-// TALENT LOADER (from wiki.json)
+// TALENT LOADER (from wiki.json, with Bound Patron added)
 // ============================================================
 
 async function loadCantorTalents() {
@@ -228,6 +232,15 @@ function getFallbackCantorTalents() {
             body: 'Learn Golden Tongue (Low: +2 dice to Sway for one social exchange, costs 1 Fatigue) and The Unrefusable Offer (Standard: sing a bargain, target must accept or suffer -2 dice until they do, costs 2 Obligation). Requires Patron: Livaea.',
             tags: ['talent', 'magic', 'cantor', 'prestige'],
             cost: 7
+        },
+        // ─── NEW: Bound Patron talent ────────────────────────────
+        {
+            id: 'bound-patron',
+            title: 'Bound Patron',
+            category: 'magic',
+            body: 'Choose one patron. You gain +1 position when singing that patron’s rites, but suffer -1 position when singing any other patron’s rites. Your Corruption is bound to that patron’s bloom table.',
+            tags: ['talent', 'cantor'],
+            cost: 5
         }
     ];
 }
@@ -253,32 +266,47 @@ export async function renderCantor(el) {
         return;
     }
 
-    const patronId = char.patron;
-    if (!patronId) {
-        el.innerHTML = `
-            <div class="panel" style="padding:1rem;text-align:center;color:var(--text3);">
-                <div style="font-size:2rem;">🎵</div>
-                <p>No patron selected. A Cantor must have a patron to sing their songs.</p>
-                <p style="font-size:0.85rem;">Assign a patron to this character to view their Cantor abilities.</p>
-            </div>
-        `;
-        return;
+    // Ensure patron data is loaded
+    await loadPatronData();
+    const state = getState();
+
+    // Determine bound patron (fallback to char.patron for backward compatibility)
+    const boundPatronId = char.boundPatron || char.patron || null;
+    const boundPatronData = boundPatronId ? findPatronData(state, boundPatronId) : null;
+    const isBound = !!boundPatronData;
+
+    // Collect rites
+    let rites = [];
+    if (isBound) {
+        // Bound: use that patron's rites (all tiers)
+        rites = (boundPatronData.rites || []).map(r => ({
+            ...r,
+            patronId: boundPatronId,
+            patronName: boundPatronData.name || boundPatronData.title,
+            patronIcon: boundPatronData.icon,
+            patronColor: boundPatronData.color || 'var(--gold)',
+        }));
+    } else {
+        // Unbound: collect all Low rites from all patrons
+        const allPatrons = getAllPatrons(state);
+        for (const p of allPatrons) {
+            if (p.rites && Array.isArray(p.rites)) {
+                const low = p.rites.filter(r => (r.tier || '').toLowerCase() === 'low');
+                for (const r of low) {
+                    rites.push({
+                        ...r,
+                        patronId: p.id,
+                        patronName: p.name || p.title,
+                        patronIcon: p.icon,
+                        patronColor: p.color || 'var(--gold)',
+                    });
+                }
+            }
+        }
     }
 
-    const patronData = await loadPatronData(patronId);
-    if (!patronData) {
-        el.innerHTML = `
-            <div class="panel" style="padding:1rem;text-align:center;color:var(--text3);">
-                <div style="font-size:2rem;">🎵</div>
-                <p>Patron "<strong>${escHtml(patronId)}</strong>" not found.</p>
-                <p style="font-size:0.85rem;">Make sure the patron's JSON file is loaded in <code>/data/patrons/${patronId}.json</code>.</p>
-            </div>
-        `;
-        return;
-    }
-
-    const rites = patronData.rites || [];
-    const corruption = patronData.corruption || [];
+    // Corruption data
+    const corruptionTable = isBound ? (boundPatronData.corruption || []) : [];
     const currentCorruption = char.corruption || 0;
     const corruptionMax = char.corruptionMax || char.spirit || 1;
     const corruptionPct = Math.min(100, (currentCorruption / corruptionMax) * 100);
@@ -288,7 +316,7 @@ export async function renderCantor(el) {
     const hasFugalSelf = bloomCount >= 7;
 
     // Unlocked corruption tier (each 2 corruption = 1 tier, min 1)
-    const unlockedTier = Math.min(corruption.length, Math.floor(currentCorruption / 2) + 1);
+    const unlockedTier = isBound ? Math.min(corruptionTable.length, Math.floor(currentCorruption / 2) + 1) : 0;
     const isCorruptionFull = currentCorruption >= corruptionMax;
 
     // Resonant Rites
@@ -301,7 +329,9 @@ export async function renderCantor(el) {
     const talents = await loadCantorTalents();
 
     // Build patron quote
-    const patronQuote = patronData.lore?.quotes?.[0] || patronData.lore?.quote || 'Sing, and the Weave answers.';
+    const patronQuote = isBound
+        ? (boundPatronData.lore?.quotes?.[0] || boundPatronData.lore?.quote || 'Sing, and the Weave answers.')
+        : 'The Weave speaks through all voices.';
 
     let html = `
         <div class="cantor-container" style="display:flex;flex-direction:column;gap:0.6rem;">
@@ -312,7 +342,8 @@ export async function renderCantor(el) {
                     <span style="font-size:1.4rem;">🎵</span>
                     <div>
                         <span style="font-weight:600;font-size:1.05rem;color:var(--gold);">Cantor</span>
-                        <span style="font-size:0.75rem;color:var(--text3);margin-left:0.3rem;">of ${escHtml(patronData.name || patronId)}</span>
+                        ${isBound ? `<span style="font-size:0.75rem;color:var(--text3);margin-left:0.3rem;">of ${escHtml(boundPatronData.name || boundPatronId)}</span>` : `<span style="font-size:0.75rem;color:var(--text3);margin-left:0.3rem;">of the Weave (unbound)</span>`}
+                        ${isBound ? `<span style="font-size:0.65rem;color:var(--text2);margin-left:0.2rem;">🎯 +1/-1 position</span>` : ''}
                     </div>
                 </div>
                 <div style="display:flex;gap:0.3rem;flex-wrap:wrap;">
@@ -321,22 +352,22 @@ export async function renderCantor(el) {
             </div>
 
             <!-- ─── Corruption Track ───────────────────────────── -->
-            <div class="cantor-corruption-track" style="background:var(--bg2);border-radius:var(--radius);padding:0.4rem 0.6rem;border-left:4px solid var(--purple);">
+            <div class="cantor-corruption-track" style="background:var(--bg2);border-radius:var(--radius);padding:0.4rem 0.6rem;border-left:4px solid ${isBound ? 'var(--purple)' : 'var(--text3)'};">
                 <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.2rem;">
                     <div style="display:flex;align-items:center;gap:0.4rem;flex-wrap:wrap;">
-                        <span style="font-size:0.85rem;font-weight:600;color:var(--purple);">🎵 Corruption</span>
+                        <span style="font-size:0.85rem;font-weight:600;color:${isBound ? 'var(--purple)' : 'var(--text3)'};">🎵 Corruption</span>
                         <span style="font-size:0.8rem;font-weight:600;">${currentCorruption}/${corruptionMax}</span>
-                        ${isCorruptionFull ? `<span style="font-size:0.7rem;color:var(--red);font-weight:600;">⚠️ FULL – BLOOM NEAR</span>` : ''}
+                        ${isCorruptionFull ? `<span style="font-size:0.7rem;color:var(--red);font-weight:600;">⚠️ FULL – ${isBound ? 'BLOOM NEAR' : 'CORRUPTION PEAKED'}</span>` : ''}
                     </div>
                     <div style="display:flex;gap:0.2rem;align-items:center;">
-                        <span style="font-size:0.65rem;color:var(--text3);">Tier ${unlockedTier}/${corruption.length}</span>
+                        ${isBound ? `<span style="font-size:0.65rem;color:var(--text3);">Tier ${unlockedTier}/${corruptionTable.length}</span>` : `<span style="font-size:0.65rem;color:var(--text3);">Unfocused</span>`}
                         <button class="btn btn-xs btn-secondary" onclick="window.cantorAdvanceCorruption(1)" title="Advance corruption">+</button>
                         <button class="btn btn-xs btn-secondary" onclick="window.cantorAdvanceCorruption(-1)" title="Reduce corruption">−</button>
                         <button class="btn btn-xs btn-ghost" onclick="window.cantorSimulatePush()" style="color:var(--gold);font-size:0.6rem;" title="Simulate what happens when you Push a Song">⚡ Simulate Push</button>
                     </div>
                 </div>
                 <div style="width:100%;height:8px;background:var(--bg4);border-radius:4px;overflow:hidden;margin-top:0.2rem;">
-                    <div style="width:${corruptionPct}%;height:100%;background:${corruptionPct > 80 ? 'var(--red)' : 'var(--purple)'};border-radius:4px;transition:width 0.3s ease;"></div>
+                    <div style="width:${corruptionPct}%;height:100%;background:${corruptionPct > 80 ? 'var(--red)' : (isBound ? 'var(--purple)' : 'var(--text3)')};border-radius:4px;transition:width 0.3s ease;"></div>
                 </div>
                 <div style="display:flex;justify-content:space-between;font-size:0.6rem;color:var(--text3);margin-top:0.1rem;">
                     <span>${bloomCount} blooms</span>
@@ -345,15 +376,15 @@ export async function renderCantor(el) {
                 </div>
             </div>
 
-            <!-- ─── Corruption Table ───────────────────────────── -->
-            ${corruption.length > 0 ? `
+            <!-- ─── Corruption Table (only if bound) ──────────── -->
+            ${isBound && corruptionTable.length > 0 ? `
                 <div class="cantor-corruption-table" style="background:var(--bg2);border-radius:var(--radius);padding:0.3rem 0.5rem;border-left:4px solid var(--purple);">
                     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.2rem;">
                         <span style="font-size:0.8rem;font-weight:600;color:var(--purple);">⚠️ The Bloom: Corruption Tiers</span>
-                        <span style="font-size:0.65rem;color:var(--text3);">Unlocked: ${unlockedTier} / ${corruption.length}</span>
+                        <span style="font-size:0.65rem;color:var(--text3);">Unlocked: ${unlockedTier} / ${corruptionTable.length}</span>
                     </div>
                     <div style="display:flex;flex-direction:column;gap:0.15rem;max-height:220px;overflow-y:auto;font-size:0.75rem;">
-                        ${corruption.map((c, idx) => {
+                        ${corruptionTable.map((c, idx) => {
                             const tier = c.tier || (idx + 1);
                             const isUnlocked = (idx + 1) <= unlockedTier;
                             const benefit = safeString(c.benefit);
@@ -375,13 +406,17 @@ export async function renderCantor(el) {
                         </div>
                     ` : ''}
                 </div>
-            ` : ''}
+            ` : (isBound ? '' : `
+                <div class="cantor-corruption-unbound" style="background:var(--bg2);border-radius:var(--radius);padding:0.3rem 0.5rem;border-left:4px solid var(--text3);font-size:0.75rem;color:var(--text3);">
+                    🌿 Unbound – your corruption is not tied to any patron’s bloom. No tiers or benefits.
+                </div>
+            `)}
 
             <!-- ─── Songs / Rites ──────────────────────────────── -->
             <div class="cantor-songs" style="background:var(--bg2);border-radius:var(--radius);padding:0.3rem 0.5rem;border-left:4px solid var(--gold);">
                 <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.2rem;flex-wrap:wrap;gap:0.2rem;">
                     <span style="font-size:0.85rem;font-weight:600;color:var(--gold);">🎶 Songs (Rites)</span>
-                    <span style="font-size:0.6rem;color:var(--text3);">${rites.length} songs</span>
+                    <span style="font-size:0.6rem;color:var(--text3);">${rites.length} songs${isBound ? '' : ' (Low rites only)'}</span>
                     <div style="display:flex;gap:0.2rem;">
                         <button class="btn btn-xs btn-secondary" onclick="window.cantorMarkResonant()">🔮 Resonant Rite</button>
                         <button class="btn btn-xs btn-ghost" onclick="window.cantorResetCorruption()" style="color:var(--red);">✕ Reset</button>
@@ -403,7 +438,7 @@ export async function renderCantor(el) {
                     </div>
                     <div style="font-size:0.6rem;color:var(--text3);margin-top:0.1rem;">
                         Resonant Rites advance your Corruption Timer. Each Resonant Rite = +1 Corruption.
-                        ${bloomCount > 0 ? `You have bloomed ${bloomCount} time${bloomCount > 1 ? 's' : ''}.` : ''}
+                        ${isBound ? (bloomCount > 0 ? `You have bloomed ${bloomCount} time${bloomCount > 1 ? 's' : ''}.` : '') : 'No bloom without a bound patron.'}
                     </div>
                 </div>
             ` : ''}
@@ -421,11 +456,15 @@ export async function renderCantor(el) {
                         const cost = t.cost || '?';
                         const tags = (t.tags || []).join(', ');
                         const isLearned = learnedTalents.includes(t.id || name);
+                        // Special handling for Bound Patron
+                        const isBoundPatron = (t.id === 'bound-patron');
+                        const isBound = !!char.boundPatron;
                         return `
                             <div style="display:flex;justify-content:space-between;align-items:center;padding:0.15rem 0.3rem;border-bottom:1px solid var(--border);${isLearned ? 'background:var(--bg3);border-left:3px solid var(--gold);' : ''}">
                                 <div style="flex:1;min-width:0;">
                                     <span style="font-weight:${isLearned ? '600' : '400'};color:${isLearned ? 'var(--gold)' : 'var(--text)'};">${escHtml(name)}</span>
                                     ${isLearned ? `<span style="font-size:0.55rem;color:var(--gold);margin-left:0.2rem;">✓ Learned</span>` : ''}
+                                    ${isBoundPatron && isBound ? `<span style="font-size:0.55rem;color:var(--text2);margin-left:0.2rem;">(Bound to ${escHtml(char.boundPatron)})</span>` : ''}
                                     <div style="font-size:0.65rem;color:var(--text2);">${formatText(description)}</div>
                                 </div>
                                 <div style="display:flex;align-items:center;gap:0.2rem;flex-shrink:0;margin-left:0.3rem;">
@@ -446,11 +485,11 @@ export async function renderCantor(el) {
                 <div style="display:flex;flex-direction:column;gap:0.1rem;">
                     <div style="font-size:0.7rem;color:var(--text3);font-style:italic;">
                         "${formatText(patronQuote)}"
-                        <span style="display:block;text-align:right;font-size:0.6rem;color:var(--text2);">— ${escHtml(patronData.name || patronId)}</span>
+                        <span style="display:block;text-align:right;font-size:0.6rem;color:var(--text2);">— ${isBound ? (boundPatronData.name || boundPatronId) : 'The Weave'}</span>
                     </div>
                     <div style="display:flex;gap:0.5rem;flex-wrap:wrap;font-size:0.6rem;color:var(--text3);border-top:1px solid var(--border);padding-top:0.15rem;">
                         <span>💡 <strong>Push It:</strong> Resolve a song instantly, but mark Fatigue + Corruption</span>
-                        <span>🌸 <strong>Bloom:</strong> When Corruption is full, perform a Resonant Rite to transform</span>
+                        ${isBound ? `<span>🌸 <strong>Bloom:</strong> When Corruption is full, perform a Resonant Rite to transform</span>` : `<span>🌿 <strong>Unbound:</strong> No bloom – corruption is unfocused</span>`}
                         <span>🎵 <strong>Voice:</strong> Your larynx is older than any tree</span>
                     </div>
                 </div>
@@ -464,7 +503,7 @@ export async function renderCantor(el) {
     // Render the rites with Push It support
     const ritesContainer = document.getElementById('cantor-rites-container');
     if (ritesContainer) {
-        renderCantorRites(ritesContainer, patronData, char);
+        renderCantorRites(ritesContainer, rites, char);
     }
 }
 
@@ -472,12 +511,9 @@ export async function renderCantor(el) {
 // CANTOR RITES RENDER (with Push It)
 // ============================================================
 
-function renderCantorRites(container, patronData, char) {
-    const rites = patronData.rites || [];
-    const patronName = patronData.name || patronData.title || 'Unknown Patron';
-
+function renderCantorRites(container, rites, char) {
     if (rites.length === 0) {
-        container.innerHTML = `<div style="font-size:0.8rem;color:var(--text3);text-align:center;">No songs found for ${escHtml(patronName)}.</div>`;
+        container.innerHTML = `<div style="font-size:0.8rem;color:var(--text3);text-align:center;">${char.boundPatron ? 'No songs found for this patron.' : 'No Low rites found across all patrons.'}</div>`;
         return;
     }
 
@@ -507,6 +543,10 @@ function renderCantorRites(container, patronData, char) {
         };
         const color = colorMap[tier] || 'var(--text2)';
 
+        // Show patron info if unbound (patronId may be present)
+        const patronName = rite.patronName ? safeString(rite.patronName) : null;
+        const patronIcon = rite.patronIcon ? safeString(rite.patronIcon) : null;
+
         // Check if this rite has been marked as Resonant
         const resonantRites = char.resonantRites || [];
         const isResonant = resonantRites.includes(name);
@@ -515,7 +555,9 @@ function renderCantorRites(container, patronData, char) {
             <div class="rite-item" style="background:var(--bg3);border-radius:var(--radius);padding:0.3rem 0.5rem;border-left:3px solid ${color};${isResonant ? 'border-right:3px solid var(--gold);' : ''}">
                 <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.2rem;">
                     <div style="display:flex;align-items:center;gap:0.3rem;flex-wrap:wrap;">
+                        ${patronIcon ? `<span style="font-size:1rem;">${patronIcon}</span>` : ''}
                         <span style="font-weight:600;font-size:0.85rem;">${escHtml(name)}</span>
+                        ${patronName ? `<span style="font-size:0.6rem;color:var(--text3);">(${escHtml(patronName)})</span>` : ''}
                         <span style="font-size:0.6rem;color:${color};">${escHtml(tier)}</span>
                         ${xp ? `<span style="font-size:0.6rem;color:var(--text3);">${xp} XP</span>` : ''}
                         ${isResonant ? `<span style="font-size:0.55rem;color:var(--gold);">🔮 Resonant</span>` : ''}
@@ -523,7 +565,7 @@ function renderCantorRites(container, patronData, char) {
                     <div style="display:flex;gap:0.2rem;flex-wrap:wrap;">
                         ${cost ? `<span style="font-size:0.6rem;color:var(--text3);">${escHtml(cost)}</span>` : ''}
                         ${hasPush ? `
-                            <button class="btn btn-xs btn-primary" onclick="window.cantorPushRite('${patronData.id}', ${idx}, '${escHtml(name)}')" title="Push It: Resolve instantly, mark Fatigue + Corruption">
+                            <button class="btn btn-xs btn-primary" onclick="window.cantorPushRite('${escHtml(rite.patronId || '')}', ${idx}, '${escHtml(name)}')" title="Push It: Resolve instantly, mark Fatigue + Corruption">
                                 ⚡ Push
                             </button>
                         ` : ''}
@@ -554,27 +596,30 @@ window.cantorPushRite = function(patronId, riteIndex, riteName) {
     const char = getCharacterData();
     if (!char) return;
 
-    // Get patron data from cache or state
+    // Get patron data from state (using helper)
     const state = getState();
-    const patronData = state.patrons?.cosmic?.find(p => p.id === patronId) ||
-                       state.patrons?.terrestrial?.find(p => p.id === patronId);
-    if (!patronData) {
-        showToast('Patron not found. Please refresh.', 'error');
-        return;
-    }
+    const boundPatronId = char.boundPatron || char.patron || null;
+    const isBound = !!boundPatronId;
 
-    const rite = patronData.rites?.[riteIndex];
+    // Find the rite data
+    // We need to find the rite from the current list; we can pass the full rite object instead of patronId/riteIndex.
+    // However, we only have patronId and riteIndex from the button click. We need to retrieve the rite from the patron data.
+    // Since we have patronId, we can load that patron's data.
+    let rite = null;
+    if (patronId) {
+        const patronData = findPatronData(state, patronId);
+        if (patronData && patronData.rites && patronData.rites[riteIndex]) {
+            rite = patronData.rites[riteIndex];
+        }
+    }
     if (!rite) {
-        showToast('Rite not found.', 'error');
+        // Fallback: try to find by name? For safety, we'll show error.
+        showToast('Rite not found. Please refresh.', 'error');
         return;
     }
 
     // Check Fatigue
     const fatigue = char.fatigue || 0;
-    // FIX: the Fatigue track's actual size is Body (see trackers.js, which
-    // implements the corrected Player's Guide rule). This used to multiply
-    // by 3, which let Cantors Push far more times than the rules allow
-    // before the track reads as "full".
     const fatigueMax = (char.body || 1);
 
     if (fatigue >= fatigueMax) {
@@ -582,8 +627,23 @@ window.cantorPushRite = function(patronId, riteIndex, riteName) {
         return;
     }
 
-    // Simulate the Push effect
-    const pool = (char.spirit || 1) + (char.performance || 0);
+    // ─── Calculate pool with bonus/penalty ──────────────────────
+    let pool = (char.spirit || 1) + (char.performance || 0);
+
+    if (isBound) {
+        const ritePatronId = patronId;
+        if (ritePatronId === boundPatronId) {
+            // Bonus: +1 position (or defined bonus)
+            pool += (char.boundPatronBonus || 1);
+        } else {
+            // Penalty: -1 position
+            pool -= 1;
+        }
+    }
+    // Ensure pool >= 0
+    pool = Math.max(pool, 0);
+
+    // Roll
     const dv = rite.dv || 3;
     const rollResult = performRoll(pool, dv);
 
@@ -607,6 +667,15 @@ window.cantorPushRite = function(patronId, riteIndex, riteName) {
 
     const pushEffect = rite.push_it || 'The song resolves instantly.';
 
+    let bonusInfo = '';
+    if (isBound) {
+        if (patronId === boundPatronId) {
+            bonusInfo = '🎯 +1 position (Bound Patron)';
+        } else {
+            bonusInfo = '⚠️ -1 position (not your Bound Patron)';
+        }
+    }
+
     showToastWithHTML(`
         <div style="display:flex;flex-direction:column;gap:0.3rem;">
             <div style="display:flex;justify-content:space-between;align-items:center;">
@@ -616,13 +685,14 @@ window.cantorPushRite = function(patronId, riteIndex, riteName) {
             <div style="font-size:0.9rem;font-weight:500;">"${escHtml(riteName)}"</div>
             <div style="font-size:0.75rem;color:var(--text2);">${detail}</div>
             <div style="font-size:0.7rem;color:var(--text3);">${formatText(pushEffect)}</div>
+            ${bonusInfo ? `<div style="font-size:0.7rem;color:var(--text2);">${bonusInfo}</div>` : ''}
             <div style="border-top:1px solid var(--border);padding-top:0.2rem;font-size:0.75rem;">
                 <span style="color:var(--orange);">💪 Fatigue +1</span>
                 <span style="color:var(--purple);margin-left:0.5rem;">🎵 Corruption +1</span>
                 <span style="color:var(--text3);margin-left:0.5rem;">(${char.fatigue}/${fatigueMax} Fatigue · ${char.corruption}/${char.corruptionMax || char.spirit || 1} Corruption)</span>
             </div>
-            ${char.corruption >= (char.corruptionMax || char.spirit || 1) ? '<div style="color:var(--red);font-weight:600;font-size:0.8rem;">🌸 The bloom is near! Perform a Resonant Rite to transform.</div>' : ''}
-            <button class="btn btn-xs btn-secondary" onclick="this.closest(\'div\').parentElement.remove()">Close</button>
+            ${char.corruption >= (char.corruptionMax || char.spirit || 1) ? `<div style="color:var(--red);font-weight:600;font-size:0.8rem;">${char.boundPatron ? '🌸 The bloom is near! Perform a Resonant Rite to transform.' : '🌿 Corruption peaked – but without a bound patron, there is no bloom.'}</div>` : ''}
+            <button class="btn btn-xs btn-secondary" onclick="this.closest('div').parentElement.remove()">Close</button>
         </div>
     `, success ? 'success' : 'warning');
 
@@ -635,39 +705,65 @@ window.cantorSimulatePush = function() {
     const char = getCharacterData();
     if (!char) return;
 
-    const pool = (char.spirit || 1) + (char.performance || 0);
-    const dv = 4; // Average DV
+    const isBound = !!(char.boundPatron || char.patron);
 
-    const results = [];
-    for (let i = 0; i < 5; i++) {
-        const roll = performRoll(pool, dv);
-        results.push({
-            successes: roll.successes,
-            sb: roll.storyBeats || 0,
-            success: roll.successes >= dv
+    // Base pool
+    let basePool = (char.spirit || 1) + (char.performance || 0);
+    // For simulation, we assume two scenarios: with bonus and with penalty (if bound)
+    // We'll simulate both: singing bound patron's rite (with bonus) and singing a different patron's rite (with penalty).
+    // If unbound, just use base pool.
+
+    const pools = [];
+    if (isBound) {
+        pools.push({
+            label: 'Bound Patron Rite',
+            pool: basePool + (char.boundPatronBonus || 1),
+            bonus: true
+        });
+        pools.push({
+            label: 'Other Patron Rite',
+            pool: basePool - 1,
+            bonus: false
+        });
+    } else {
+        pools.push({
+            label: 'Any Rite',
+            pool: basePool,
+            bonus: null
         });
     }
 
-    const successCount = results.filter(r => r.success).length;
-    const avgSuccesses = results.reduce((acc, r) => acc + r.successes, 0) / results.length;
+    const resultsHtml = pools.map(p => {
+        const results = [];
+        for (let i = 0; i < 5; i++) {
+            const roll = performRoll(p.pool, 4); // average DV 4
+            results.push({
+                successes: roll.successes,
+                sb: roll.storyBeats || 0,
+                success: roll.successes >= 4
+            });
+        }
+        const successCount = results.filter(r => r.success).length;
+        const avgSuccesses = results.reduce((acc, r) => acc + r.successes, 0) / results.length;
+        return `
+            <div style="background:var(--bg3);border-radius:var(--radius);padding:0.2rem 0.5rem;margin-top:0.2rem;">
+                <div style="font-weight:600;font-size:0.8rem;${p.bonus === true ? 'color:var(--gold);' : p.bonus === false ? 'color:var(--red);' : ''}">${p.label}</div>
+                <div style="font-size:0.75rem;">Pool: ${p.pool}d</div>
+                <div style="font-size:0.75rem;">${results.map(r => r.success ? '✅' : '❌').join(' ')}</div>
+                <div style="font-size:0.7rem;color:var(--text3);">${successCount}/5 succeed · Avg: ${avgSuccesses.toFixed(1)} successes</div>
+            </div>
+        `;
+    }).join('');
 
     const html = `
         <div style="display:flex;flex-direction:column;gap:0.3rem;">
             <div style="font-weight:600;font-size:1rem;color:var(--gold);">⚡ Push Simulation</div>
-            <div style="font-size:0.8rem;color:var(--text2);">Pool: ${pool}d (Spirit ${char.spirit || 1} + Performance ${char.performance || 0})</div>
-            <div style="display:flex;gap:0.5rem;font-size:0.8rem;">
-                <span>🎲 ${results.map(r => r.success ? '✅' : '❌').join(' ')}</span>
-                <span style="color:var(--text3);">${successCount}/5 succeed</span>
-                <span style="color:var(--text3);">Avg: ${avgSuccesses.toFixed(1)} successes</span>
-            </div>
+            <div style="font-size:0.8rem;color:var(--text2);">Base pool: ${basePool}d (Spirit ${char.spirit || 1} + Performance ${char.performance || 0})</div>
+            ${resultsHtml}
             <div style="border-top:1px solid var(--border);padding-top:0.2rem;font-size:0.75rem;color:var(--text3);">
                 <strong>On a Push:</strong> Fatigue +1, Corruption +1.
-                ${avgSuccesses >= 3 ? '✨ Good odds!' : avgSuccesses >= 2 ? '⚠️ Risky.' : '💀 Very risky!'}
             </div>
-            <div style="font-size:0.65rem;color:var(--text3);font-style:italic;">
-                ${avgSuccesses >= 3 ? '"The Weave welcomes the bold."' : '"The Weave respects caution."'}
-            </div>
-            <button class="btn btn-xs btn-secondary" onclick="this.closest(\'div\').parentElement.remove()">Close</button>
+            <button class="btn btn-xs btn-secondary" onclick="this.closest('div').parentElement.remove()">Close</button>
         </div>
     `;
 
@@ -688,7 +784,8 @@ window.cantorToggleResonantRite = function(riteName) {
         saveCharacter({ resonantRites: char.resonantRites });
         showToast(`"${riteName}" unmarked as Resonant.`, 'info');
     } else {
-        // Check if corruption is full – if so, this triggers the bloom
+        // Check if bound
+        const isBound = !!(char.boundPatron || char.patron);
         const corruption = char.corruption || 0;
         const corruptionMax = char.corruptionMax || char.spirit || 1;
         const isFull = corruption >= corruptionMax;
@@ -699,58 +796,70 @@ window.cantorToggleResonantRite = function(riteName) {
         saveCharacter({ resonantRites: char.resonantRites, corruption: char.corruption });
 
         if (isFull || char.corruption >= corruptionMax) {
-            // Bloom!
-            const bloomCount = (char.bloomCount || 0) + 1;
-            char.bloomCount = bloomCount;
-            saveCharacter({ bloomCount: char.bloomCount });
+            if (isBound) {
+                // Bloom!
+                const bloomCount = (char.bloomCount || 0) + 1;
+                char.bloomCount = bloomCount;
+                saveCharacter({ bloomCount: char.bloomCount });
 
-            // FIX: this used to fall back to a hardcoded "6" tiers whenever
-            // char._corruptionTableLength wasn't set — and nothing in the
-            // codebase ever sets that property, so the fallback always
-            // fired. The Bloom toast could report a tier number higher
-            // than the patron's actual corruption table (e.g. "Tier 4/6"
-            // for a patron that only defines 3 tiers). We now look up the
-            // real patron and use the length of its own corruption array,
-            // exactly like the main render does.
-            let corruptionTableLength = 6;
-            if (char.patron) {
+                // Determine corruption table length from bound patron
                 const state = getState();
-                const patronData =
-                    state.patrons?.cosmic?.find(p => p.id === char.patron) ||
-                    state.patrons?.terrestrial?.find(p => p.id === char.patron);
+                const boundPatronId = char.boundPatron || char.patron;
+                const patronData = boundPatronId ? findPatronData(state, boundPatronId) : null;
+                let corruptionTableLength = 0;
                 if (patronData?.corruption?.length) {
                     corruptionTableLength = patronData.corruption.length;
                 }
-            }
-            const unlockedTier = Math.min(
-                (char.corruption || 0) > 0 ? Math.floor(char.corruption / 2) + 1 : 1,
-                corruptionTableLength
-            );
+                const unlockedTier = Math.min(
+                    (char.corruption || 0) > 0 ? Math.floor(char.corruption / 2) + 1 : 1,
+                    corruptionTableLength || 1
+                );
 
-            showToastWithHTML(`
-                <div style="display:flex;flex-direction:column;gap:0.3rem;">
-                    <div style="font-size:1.2rem;text-align:center;">🌸🌿🌸</div>
-                    <div style="font-weight:600;font-size:1.1rem;color:var(--gold);text-align:center;">THE BLOOM</div>
-                    <div style="font-size:0.9rem;color:var(--text2);text-align:center;">
-                        "${escHtml(riteName)}" resonates through you.<br>
-                        You have bloomed <strong>${bloomCount}</strong> time${bloomCount > 1 ? 's' : ''}.
+                showToastWithHTML(`
+                    <div style="display:flex;flex-direction:column;gap:0.3rem;">
+                        <div style="font-size:1.2rem;text-align:center;">🌸🌿🌸</div>
+                        <div style="font-weight:600;font-size:1.1rem;color:var(--gold);text-align:center;">THE BLOOM</div>
+                        <div style="font-size:0.9rem;color:var(--text2);text-align:center;">
+                            "${escHtml(riteName)}" resonates through you.<br>
+                            You have bloomed <strong>${bloomCount}</strong> time${bloomCount > 1 ? 's' : ''}.
+                        </div>
+                        <div style="border-top:1px solid var(--border);padding-top:0.2rem;font-size:0.8rem;color:var(--text3);">
+                            Corruption: ${char.corruption}/${corruptionMax} · Tier ${unlockedTier}/${corruptionTableLength || '?'}
+                            ${bloomCount >= 7 ? '<br>✨ <strong>Fugal Self achieved!</strong> +1 die to all Performance rolls.' : ''}
+                        </div>
+                        <div style="font-size:0.65rem;color:var(--text3);font-style:italic;text-align:center;">
+                            "The bloom is not an ending. It is a beginning."
+                        </div>
+                        <button class="btn btn-xs btn-secondary" onclick="this.closest('div').parentElement.remove()">Close</button>
                     </div>
-                    <div style="border-top:1px solid var(--border);padding-top:0.2rem;font-size:0.8rem;color:var(--text3);">
-                        Corruption: ${char.corruption}/${corruptionMax} · Tier ${unlockedTier}/${corruptionTableLength}
-                        ${bloomCount >= 7 ? '<br>✨ <strong>Fugal Self achieved!</strong> +1 die to all Performance rolls.' : ''}
+                `, 'success');
+            } else {
+                // Unbound: no bloom, just message
+                showToastWithHTML(`
+                    <div style="display:flex;flex-direction:column;gap:0.3rem;">
+                        <div style="font-size:1.2rem;text-align:center;">🌿</div>
+                        <div style="font-weight:600;font-size:1rem;color:var(--text3);text-align:center;">Corruption Peaked</div>
+                        <div style="font-size:0.9rem;color:var(--text2);text-align:center;">
+                            Your corruption is full, but without a bound patron, there is no bloom.
+                            You remain unbound.
+                        </div>
+                        <button class="btn btn-xs btn-secondary" onclick="this.closest('div').parentElement.remove()">Close</button>
                     </div>
-                    <div style="font-size:0.65rem;color:var(--text3);font-style:italic;text-align:center;">
-                        "The bloom is not an ending. It is a beginning."
-                    </div>
-                    <button class="btn btn-xs btn-secondary" onclick="this.closest(\'div\').parentElement.remove()">Close</button>
-                </div>
-            `, 'success');
+                `, 'warning');
+            }
         } else {
             showToast(`🔮 "${riteName}" marked as Resonant! Corruption +1.`, 'info');
         }
     }
 
     window.cantorRefresh();
+};
+
+// ─── Mark Resonant (helper) ──────────────────────────────────
+
+window.cantorMarkResonant = function() {
+    // This opens a prompt or just toggles? We'll keep the existing toggle per rite.
+    showToast('Click the 🔮 button on a rite to mark it as Resonant.', 'info');
 };
 
 // ─── Advance Corruption ───────────────────────────────────────
@@ -767,7 +876,11 @@ window.cantorAdvanceCorruption = function(amount = 1) {
     window.cantorRefresh();
 
     if (char.corruption >= corruptionMax) {
-        showToast('🌸 Corruption is full! Perform a Resonant Rite to bloom.', 'warning');
+        if (char.boundPatron || char.patron) {
+            showToast('🌸 Corruption is full! Perform a Resonant Rite to bloom.', 'warning');
+        } else {
+            showToast('🌿 Corruption is full – but you are unbound. No bloom.', 'warning');
+        }
     } else {
         showToast(`Corruption: ${char.corruption}/${corruptionMax}`, 'info');
     }
@@ -798,11 +911,74 @@ window.cantorToggleTalent = function(talentId) {
 
     const index = char.learnedTalents.indexOf(talentId);
     if (index >= 0) {
+        // Unlearn
+        if (talentId === 'bound-patron') {
+            // Clear bound patron
+            char.boundPatron = null;
+            // Optionally reset corruption? Not required.
+            saveCharacter({ boundPatron: null });
+        }
         char.learnedTalents.splice(index, 1);
         showToast(`Unlearned: ${talentId}`, 'info');
     } else {
-        char.learnedTalents.push(talentId);
-        showToast(`Learned: ${talentId} ✨`, 'success');
+        // Learn
+        if (talentId === 'bound-patron') {
+            // Prompt for patron selection
+            const state = getState();
+            const allPatrons = getAllPatrons(state);
+            if (allPatrons.length === 0) {
+                showToast('No patrons available. Please load patron data first.', 'error');
+                return;
+            }
+            // Build a modal with a select dropdown
+            const modalHtml = `
+                <div style="display:flex;flex-direction:column;gap:0.5rem;">
+                    <p style="font-weight:600;">Choose a patron to bind to:</p>
+                    <select id="bound-patron-select" style="padding:0.3rem;border-radius:var(--radius);background:var(--bg2);color:var(--text);border:1px solid var(--border);">
+                        ${allPatrons.map(p => `<option value="${p.id}">${p.icon || '🔮'} ${p.name || p.title}</option>`).join('')}
+                    </select>
+                    <div style="display:flex;gap:0.5rem;">
+                        <button class="btn btn-primary" id="bound-patron-confirm">Bind</button>
+                        <button class="btn btn-secondary" id="bound-patron-cancel">Cancel</button>
+                    </div>
+                </div>
+            `;
+            showToastWithHTML(modalHtml, 'info');
+            // Attach events after modal is rendered
+            setTimeout(() => {
+                const confirmBtn = document.getElementById('bound-patron-confirm');
+                const cancelBtn = document.getElementById('bound-patron-cancel');
+                const select = document.getElementById('bound-patron-select');
+                if (confirmBtn) {
+                    confirmBtn.addEventListener('click', () => {
+                        const selected = select.value;
+                        if (selected) {
+                            char.boundPatron = selected;
+                            char.boundPatronBonus = 1; // default bonus
+                            if (!char.learnedTalents.includes(talentId)) {
+                                char.learnedTalents.push(talentId);
+                            }
+                            saveCharacter({ boundPatron: selected, boundPatronBonus: 1, learnedTalents: char.learnedTalents });
+                            showToast(`Bound to ${selected}`, 'success');
+                            window.cantorRefresh();
+                            // Close the toast
+                            const toast = document.querySelector('.toast-container')?.lastElementChild;
+                            if (toast) toast.remove();
+                        }
+                    });
+                }
+                if (cancelBtn) {
+                    cancelBtn.addEventListener('click', () => {
+                        const toast = document.querySelector('.toast-container')?.lastElementChild;
+                        if (toast) toast.remove();
+                    });
+                }
+            }, 100);
+            return; // Don't proceed with normal learning; it's handled above.
+        } else {
+            char.learnedTalents.push(talentId);
+            showToast(`Learned: ${talentId} ✨`, 'success');
+        }
     }
 
     saveCharacter({ learnedTalents: char.learnedTalents });
