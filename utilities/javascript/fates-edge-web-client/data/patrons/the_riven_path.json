@@ -55,7 +55,7 @@
   "rites": [
     {
       "name": "Rite of Feasting on Fear",
-      "tier": "Basic",
+      "tier": "Low",
       "xp": 4,
       "action": "Instant",
       "range": "Self",
@@ -71,7 +71,7 @@
     },
     {
       "name": "Rite of the Crushing Grip",
-      "tier": "Basic",
+      "tier": "Low",
       "xp": 5,
       "action": "Instant",
       "range": "Near",
@@ -87,7 +87,7 @@
     },
     {
       "name": "Rite of the Cracking Lightning",
-      "tier": "Advanced",
+      "tier": "Standard",
       "xp": 9,
       "action": "Instant",
       "range": "Close",
@@ -103,7 +103,7 @@
     },
     {
       "name": "Rite of the Battle Rage",
-      "tier": "Advanced",
+      "tier": "Standard",
       "xp": 8,
       "action": "Scene",
       "range": "Self",
@@ -119,7 +119,7 @@
     },
     {
       "name": "Rite of the Crushing Dark",
-      "tier": "Master",
+      "tier": "High",
       "xp": 13,
       "action": "Instant",
       "range": "Zone",
@@ -135,7 +135,7 @@
     },
     {
       "name": "Rite of the Riven Fury",
-      "tier": "Master",
+      "tier": "High",
       "xp": 13,
       "action": "Scene",
       "range": "Self",

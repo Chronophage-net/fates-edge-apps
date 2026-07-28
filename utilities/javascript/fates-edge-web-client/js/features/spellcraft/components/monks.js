@@ -14,6 +14,10 @@
  * - Corruption Tiers: computed from investment, with narrative GM Intrusions
  * - Flow: spend Mental Strain instead of Fatigue (tactical choice)
  * - Quick Reference: key mechanics at a glance
+ *
+ * All selection modals (tradition, meditation DV, talent, technique) have been
+ * replaced with inline dropdowns. Text-entry prompts (name, description, etc.)
+ * remain as simple prompt() calls.
  */
 
 import { getCharacterData, saveCharacter } from '../index.js';
@@ -542,6 +546,54 @@ export async function renderMonks(el) {
 
     const allTraditions = await getAllMonasticTraditions();
 
+    // Build dropdown options for traditions
+    const traditionOptionsHtml = allTraditions.map(t =>
+        `<option value="${t.patronId}" ${t.patronId === traditionId ? 'selected' : ''}>${t.patronIcon} ${t.patronName} – ${t.tradition.name}</option>`
+    ).join('');
+
+    // Meditation DV options
+    const dvOptionsHtml = `
+        <option value="3">Clarity (DV 3)</option>
+        <option value="4">Healing (DV 4)</option>
+        <option value="5">Transcendence (DV 5)</option>
+    `;
+
+    // Build talent dropdown (all unlearned talents that are learnable)
+    const ownedTalents = char.monkTalents || [];
+    const learnableTalents = ALL_TALENTS.filter(t => {
+        if (ownedTalents.includes(t.id)) return false;
+        const missing = missingPrereqCategory(char, t.category);
+        return missing === null;
+    });
+    const talentOptionsHtml = learnableTalents.map(t =>
+        `<option value="${t.id}">${t.name} (${t.xp} XP) — ${t.effect || t.description.substring(0, 40)}...</option>`
+    ).join('');
+
+    // Build technique dropdown for the current tradition
+    let techniqueOptionsHtml = '';
+    if (traditionData) {
+        const tradition = traditionData.tradition;
+        const levels = ['basic', 'advanced', 'master'];
+        const labels = { basic: 'Basic', advanced: 'Advanced', master: 'Master' };
+        const xpMap = {
+            basic: tradition.techniques?.basic?.xp || 6,
+            advanced: tradition.techniques?.advanced?.xp || 8,
+            master: tradition.techniques?.master?.xp || 12
+        };
+        const learnableLevels = levels.filter(l => {
+            if (hasTechnique(char, traditionData.patronId, l)) return false;
+            if (l === 'advanced' && !hasTechnique(char, traditionData.patronId, 'basic')) return false;
+            if (l === 'master' && !hasTechnique(char, traditionData.patronId, 'advanced')) return false;
+            return true;
+        });
+        techniqueOptionsHtml = learnableLevels.map(l =>
+            `<option value="${l}">${labels[l]} — ${tradition.techniques[l]?.name || l} (${xpMap[l]} XP)</option>`
+        ).join('');
+        if (!techniqueOptionsHtml) {
+            techniqueOptionsHtml = `<option value="">All techniques learned!</option>`;
+        }
+    }
+
     el.innerHTML = `
         <div class="monks-container" style="display:flex;flex-direction:column;gap:0.6rem;">
 
@@ -554,9 +606,12 @@ export async function renderMonks(el) {
                         <span style="font-size:0.7rem;color:var(--text3);margin-left:0.3rem;">${traditionData ? traditionData.patronName : 'No Tradition'}</span>
                     </div>
                 </div>
-                <div style="display:flex;gap:0.3rem;flex-wrap:wrap;">
-                    <button class="btn btn-sm btn-primary" onclick="window.monkChooseTradition()">📿 Choose Tradition</button>
-                    <button class="btn btn-sm btn-gold" onclick="window.monkMeditate()">🧘 Meditate</button>
+                <div style="display:flex;gap:0.3rem;flex-wrap:wrap;align-items:center;">
+                    <select id="monk-meditation-dv-select" style="font-size:0.65rem;background:var(--bg3);border:1px solid var(--border);border-radius:4px;padding:0.1rem 0.3rem;">
+                        ${dvOptionsHtml}
+                    </select>
+                    <button class="btn btn-sm btn-gold" onclick="window.monkMeditateFromSelect()">🧘 Meditate</button>
+                    <button class="btn btn-sm btn-primary" onclick="window.monkChooseTradition()">📿 Tradition</button>
                     <button class="btn btn-sm btn-secondary" onclick="window.monkRefresh()">🔄 Refresh</button>
                 </div>
             </div>
@@ -595,6 +650,17 @@ export async function renderMonks(el) {
             <!-- ─── Tradition Display ───────────────────────────── -->
             ${traditionData ? renderTraditionDisplay(traditionData, char) : renderNoTradition(allTraditions)}
 
+            <!-- ─── Tradition Selector (dropdown) ──────────────── -->
+            <div style="display:flex;gap:0.3rem;align-items:center;background:var(--bg2);border-radius:var(--radius);padding:0.2rem 0.5rem;border:1px solid var(--border);flex-wrap:wrap;">
+                <span style="font-size:0.7rem;color:var(--text3);">📿 Set Tradition:</span>
+                <select id="monk-tradition-select" style="flex:1;min-width:150px;background:var(--bg3);border:1px solid var(--border);border-radius:4px;padding:0.1rem 0.3rem;font-size:0.7rem;">
+                    <option value="">— Choose a tradition —</option>
+                    ${traditionOptionsHtml}
+                </select>
+                <button class="btn btn-xs btn-primary" onclick="window.monkSetTraditionFromSelect()">Set</button>
+                ${traditionData ? `<button class="btn btn-xs btn-ghost" onclick="window.monkClearTradition()" style="color:var(--red);">✕ Clear</button>` : ''}
+            </div>
+
             <!-- ─── GM Intrusion ────────────────────────────────── -->
             ${randomIntrusion ? `
                 <div class="monks-intrusion" style="background:var(--bg2);border-radius:var(--radius);padding:0.3rem 0.5rem;border-left:4px solid var(--orange);font-size:0.75rem;color:var(--text2);">
@@ -612,21 +678,21 @@ export async function renderMonks(el) {
             <div class="monks-talents" style="background:var(--bg2);border-radius:var(--radius);padding:0.3rem 0.5rem;">
                 <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.2rem;flex-wrap:wrap;gap:0.2rem;">
                     <span style="font-size:0.85rem;font-weight:600;color:var(--gold);">⚡ Talents & Techniques</span>
-                    <div style="display:flex;gap:0.2rem;flex-wrap:wrap;">
-                        ${TALENT_CATEGORY_ORDER.map(cat => {
-                            const missing = missingPrereqCategory(char, cat);
-                            const hasAny = TALENTS_BY_CATEGORY[cat].some(t => hasTalent(char, t.id));
-                            return `
-                                <button class="btn btn-xs ${hasAny ? 'btn-primary' : 'btn-secondary'}" 
-                                        onclick="window.monkLearnTalent('${cat}')" 
-                                        ${missing ? `disabled title="Learn a ${CATEGORY_LABELS[missing]} talent first"` : ''}
-                                        style="${hasAny ? '' : 'opacity:0.7;'}">
-                                    ${CATEGORY_ICONS[cat]} ${cat.charAt(0).toUpperCase() + cat.slice(1)}
-                                    ${hasAny ? '✓' : ''}
-                                </button>
-                            `;
-                        }).join('')}
-                        ${traditionData ? `<button class="btn btn-xs btn-gold" onclick="window.monkLearnTechnique('${traditionData.patronId}')">📿 Technique</button>` : ''}
+                    <div style="display:flex;gap:0.2rem;flex-wrap:wrap;align-items:center;">
+                        ${learnableTalents.length > 0 ? `
+                            <select id="monk-talent-select" style="font-size:0.6rem;background:var(--bg3);border:1px solid var(--border);border-radius:4px;padding:0.05rem 0.2rem;max-width:200px;">
+                                ${talentOptionsHtml}
+                            </select>
+                            <button class="btn btn-xs btn-primary" onclick="window.monkLearnTalentFromSelect()">Learn</button>
+                        ` : `
+                            <span style="font-size:0.6rem;color:var(--text3);">All talents learned!</span>
+                        `}
+                        ${traditionData && techniqueOptionsHtml ? `
+                            <select id="monk-technique-select" style="font-size:0.6rem;background:var(--bg3);border:1px solid var(--border);border-radius:4px;padding:0.05rem 0.2rem;max-width:180px;">
+                                ${techniqueOptionsHtml}
+                            </select>
+                            <button class="btn btn-xs btn-gold" onclick="window.monkLearnTechniqueFromSelect('${traditionData.patronId}')">Learn Tech</button>
+                        ` : ''}
                     </div>
                 </div>
                 <div style="display:flex;flex-direction:column;gap:0.15rem;max-height:250px;overflow-y:auto;">
@@ -657,6 +723,8 @@ export async function renderMonks(el) {
         resultsDiv.innerHTML = meditationResult;
         sessionStorage.removeItem('fates-edge-meditation-result');
     }
+
+    // Attach any extra events (none needed for this file)
 }
 
 // ============================================================
@@ -667,8 +735,6 @@ function renderOnboarding(el, char) {
     const totalXp = char.totalXp || 0;
     const spent = char.xpSpent || 0;
     const available = totalXp - spent;
-
-    const existingTraditions = getAllMonasticTraditions(); // but this is async... we'll just show a note
 
     el.innerHTML = `
         <div class="monks-container" style="display:flex;flex-direction:column;gap:0.6rem;">
@@ -742,13 +808,11 @@ function renderTraditionDisplay(traditionData, char) {
 }
 
 function renderNoTradition(allTraditions) {
-    // allTraditions is async, but we'll just show a placeholder
     return `
         <div class="monks-no-tradition" style="background:var(--bg2);border-radius:var(--radius);padding:0.5rem;text-align:center;color:var(--text3);border:1px dashed var(--border);">
             <div style="font-size:1.5rem;">📿</div>
             <p>No monastic tradition chosen.</p>
-            <p style="font-size:0.8rem;">Choose a tradition from a patron who offers one.</p>
-            <button class="btn btn-sm btn-primary" onclick="window.monkChooseTradition()">Choose Tradition</button>
+            <p style="font-size:0.8rem;">Choose a tradition from the dropdown above.</p>
         </div>
     `;
 }
@@ -857,12 +921,12 @@ function getProgressionSummary(char) {
 }
 
 // ============================================================
-// GLOBAL FUNCTIONS (onclick handlers)
+// GLOBAL FUNCTIONS (onclick handlers) – with dropdown replacements
 // ============================================================
 
-// ─── Choose Tradition ──────────────────────────────────────────
+// ─── Set Tradition from dropdown ──────────────────────────────
 
-window.monkChooseTradition = async function() {
+window.monkSetTraditionFromSelect = function() {
     const char = getCharacterData();
     if (!char) return;
 
@@ -871,43 +935,53 @@ window.monkChooseTradition = async function() {
         return;
     }
 
-    const allTraditions = await getAllMonasticTraditions();
-
-    if (allTraditions.length === 0) {
-        showToast('No monastic traditions found. Check your patron JSON files.', 'error');
+    const select = document.getElementById('monk-tradition-select');
+    if (!select) return;
+    const patronId = select.value;
+    if (!patronId) {
+        showToast('Please select a tradition.', 'error');
         return;
     }
 
-    const options = allTraditions.map((t, i) =>
-        `${i + 1}. ${t.patronIcon} ${t.patronName}: ${t.tradition.name}`
-    ).join('\n');
-
-    const choice = prompt(
-        `Choose a monastic tradition:\n\n${options}\n\nEnter the number of your choice:`,
-        '1'
-    );
-
-    if (!choice) return;
-    const idx = parseInt(choice) - 1;
-    if (isNaN(idx) || idx < 0 || idx >= allTraditions.length) {
-        showToast('Invalid selection.', 'error');
-        return;
-    }
-
-    const selected = allTraditions[idx];
-    char.monasticTradition = selected.patronId;
+    char.monasticTradition = patronId;
     if (!char.monkTechniques) char.monkTechniques = {};
     saveCharacter({
-        monasticTradition: selected.patronId,
+        monasticTradition: patronId,
         monkTechniques: char.monkTechniques
     });
-    showToast(`📿 Chosen tradition: ${selected.tradition.name} (${selected.patronName})`, 'success');
+    showToast(`📿 Chosen tradition.`, 'success');
     renderMonks(container);
 };
 
-// ─── Meditate ──────────────────────────────────────────────────
+// ─── Clear Tradition ──────────────────────────────────────────
 
-window.monkMeditate = function() {
+window.monkClearTradition = function() {
+    const char = getCharacterData();
+    if (!char) return;
+    if (!confirm('Clear your monastic tradition? This will remove all techniques.')) return;
+    char.monasticTradition = null;
+    char.monkTechniques = {};
+    saveCharacter({ monasticTradition: null, monkTechniques: {} });
+    showToast('Tradition cleared.', 'info');
+    renderMonks(container);
+};
+
+// ─── Legacy Choose Tradition (redirects to dropdown) ──────────
+
+window.monkChooseTradition = function() {
+    const select = document.getElementById('monk-tradition-select');
+    if (select) {
+        // If there's already a selection, scroll to it and highlight.
+        select.focus();
+        showToast('Select a tradition from the dropdown above.', 'info');
+    } else {
+        showToast('Please refresh the panel to use the dropdown.', 'info');
+    }
+};
+
+// ─── Meditate from dropdown ───────────────────────────────────
+
+window.monkMeditateFromSelect = function() {
     const char = getCharacterData();
     if (!char) return;
 
@@ -916,17 +990,11 @@ window.monkMeditate = function() {
         return;
     }
 
-    const targetDV = prompt(
-        '🧘 Meditation Difficulty:\n' +
-        '3 = Clarity (gain +1 die to Wits)\n' +
-        '4 = Healing (clear Fatigue, remove Conditions)\n' +
-        '5 = Transcendence (reroll a failed roll)',
-        '3'
-    );
-
-    const dv = safeParseInt(targetDV, 3);
-    if (dv < 3 || dv > 5) {
-        showToast('Enter a value between 3 and 5.', 'error');
+    const select = document.getElementById('monk-meditation-dv-select');
+    if (!select) return;
+    const dv = parseInt(select.value);
+    if (isNaN(dv) || dv < 3 || dv > 5) {
+        showToast('Invalid DV. Choose 3, 4, or 5.', 'error');
         return;
     }
 
@@ -1007,6 +1075,17 @@ window.monkMeditate = function() {
     renderMonks(container);
 };
 
+// ─── Legacy Meditate (redirects to dropdown) ─────────────────
+
+window.monkMeditate = function() {
+    const select = document.getElementById('monk-meditation-dv-select');
+    if (select) {
+        window.monkMeditateFromSelect();
+    } else {
+        showToast('Please refresh the panel to use the dropdown.', 'info');
+    }
+};
+
 // ─── Breath ────────────────────────────────────────────────────
 
 window.monkAdvanceBreath = function() {
@@ -1050,7 +1129,39 @@ window.monkAddFlow = function(amount) {
     showToast(`🌀 Flow: ${newVal}/${max}`, 'info');
 };
 
-// ─── Buy Talent ────────────────────────────────────────────────
+// ─── Learn Talent from dropdown ───────────────────────────────
+
+window.monkLearnTalentFromSelect = function() {
+    const char = getCharacterData();
+    if (!char) return;
+
+    const select = document.getElementById('monk-talent-select');
+    if (!select) return;
+    const talentId = select.value;
+    if (!talentId) {
+        showToast('No learnable talents available.', 'info');
+        return;
+    }
+    window.monkBuyTalent(talentId);
+};
+
+// ─── Learn Technique from dropdown ────────────────────────────
+
+window.monkLearnTechniqueFromSelect = function(traditionId) {
+    const char = getCharacterData();
+    if (!char) return;
+
+    const select = document.getElementById('monk-technique-select');
+    if (!select) return;
+    const level = select.value;
+    if (!level) {
+        showToast('No learnable techniques available.', 'info');
+        return;
+    }
+    window.monkBuyTechnique(traditionId, level);
+};
+
+// ─── Buy Talent (unchanged – uses confirm for confirmation) ───
 
 window.monkBuyTalent = function(talentId) {
     const char = getCharacterData();
@@ -1106,50 +1217,21 @@ window.monkBuyTalent = function(talentId) {
     renderMonks(container);
 };
 
+// ─── Legacy Learn Talent (redirects to dropdown) ──────────────
+
 window.monkLearnTalent = function(category) {
-    const char = getCharacterData();
-    if (!char) return;
-
-    if (!isMonkInitiate(char)) {
-        showToast('Learn a Foundation talent first.', 'error');
-        return;
+    // This used to show a prompt with a list. Now we use the dropdown.
+    const select = document.getElementById('monk-talent-select');
+    if (select) {
+        // Try to filter the dropdown to just this category? We'll just focus it.
+        select.focus();
+        showToast('Select a talent from the dropdown above.', 'info');
+    } else {
+        showToast('Please refresh the panel to use the dropdown.', 'info');
     }
-
-    const talents = TALENTS_BY_CATEGORY[category];
-    const categoryName = CATEGORY_LABELS[category];
-    if (!talents) {
-        showToast('Unknown category.', 'error');
-        return;
-    }
-
-    const missing = missingPrereqCategory(char, category);
-    if (missing) {
-        showToast(`Learn a ${CATEGORY_LABELS[missing]} talent first.`, 'error');
-        return;
-    }
-
-    const owned = char.monkTalents || [];
-    const available = talents.filter(t => !owned.includes(t.id));
-
-    if (available.length === 0) {
-        showToast(`No unlearned talents in ${categoryName}.`, 'info');
-        return;
-    }
-
-    const options = available.map(t =>
-        `${t.id}: ${t.name} (${t.xp} XP) – ${t.effect || t.description.substring(0, 50)}...`
-    ).join('\n\n');
-
-    const choice = prompt(
-        `Learn a ${categoryName} talent:\n\n${options}\n\nEnter talent ID:`,
-        available[0]?.id
-    );
-
-    if (!choice) return;
-    window.monkBuyTalent(choice);
 };
 
-// ─── Buy Technique ─────────────────────────────────────────────
+// ─── Buy Technique (unchanged – uses confirm) ────────────────
 
 window.monkBuyTechnique = async function(traditionId, level) {
     const char = getCharacterData();
@@ -1211,50 +1293,16 @@ window.monkBuyTechnique = async function(traditionId, level) {
     renderMonks(container);
 };
 
-window.monkLearnTechnique = async function(traditionId) {
-    const char = getCharacterData();
-    if (!char) return;
+// ─── Legacy Learn Technique (redirects to dropdown) ───────────
 
-    const traditionData = await findPatronTradition(traditionId);
-    if (!traditionData) return showToast('Tradition not found.', 'error');
-
-    const levels = ['basic', 'advanced', 'master'];
-    const labels = { basic: 'Basic', advanced: 'Advanced', master: 'Master' };
-    const xpMap = {
-        basic: traditionData.tradition.techniques?.basic?.xp || 6,
-        advanced: traditionData.tradition.techniques?.advanced?.xp || 8,
-        master: traditionData.tradition.techniques?.master?.xp || 12
-    };
-
-    const available = levels.filter(l => !hasTechnique(char, traditionId, l));
-
-    if (available.length === 0) {
-        showToast('All techniques learned!', 'info');
-        return;
+window.monkLearnTechnique = function(traditionId) {
+    const select = document.getElementById('monk-technique-select');
+    if (select) {
+        select.focus();
+        showToast('Select a technique from the dropdown above.', 'info');
+    } else {
+        showToast('Please refresh the panel to use the dropdown.', 'info');
     }
-
-    const canLearn = available.filter(l => {
-        if (l === 'advanced' && !hasTechnique(char, traditionId, 'basic')) return false;
-        if (l === 'master' && !hasTechnique(char, traditionId, 'advanced')) return false;
-        return true;
-    });
-
-    if (canLearn.length === 0) {
-        showToast('Must learn Basic technique first.', 'error');
-        return;
-    }
-
-    const options = canLearn.map(l =>
-        `${l}: ${traditionData.tradition.techniques[l].name} (${labels[l]}, ${xpMap[l]} XP)`
-    ).join('\n');
-
-    const choice = prompt(
-        `Learn a technique:\n\n${options}\n\nEnter level (basic/advanced/master):`,
-        canLearn[0]
-    );
-
-    if (!choice) return;
-    window.monkBuyTechnique(traditionId, choice);
 };
 
 // ─── Refresh ──────────────────────────────────────────────────

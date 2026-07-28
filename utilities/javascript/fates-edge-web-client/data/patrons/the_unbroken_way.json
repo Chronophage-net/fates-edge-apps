@@ -55,7 +55,7 @@
   "rites": [
     {
       "name": "Rite of the Sensing Current",
-      "tier": "Basic",
+      "tier": "Low",
       "xp": 4,
       "action": "Scene",
       "range": "Self",
@@ -71,7 +71,7 @@
     },
     {
       "name": "Rite of the Gentle Push",
-      "tier": "Basic",
+      "tier": "Low",
       "xp": 5,
       "action": "Instant",
       "range": "Near",
@@ -87,7 +87,7 @@
     },
     {
       "name": "Rite of the Quiet Suggestion",
-      "tier": "Advanced",
+      "tier": "Standard",
       "xp": 8,
       "action": "Instant",
       "range": "Near",
@@ -103,7 +103,7 @@
     },
     {
       "name": "Rite of the Flowing Parry",
-      "tier": "Advanced",
+      "tier": "Standard",
       "xp": 7,
       "action": "Scene",
       "range": "Self",
@@ -119,7 +119,7 @@
     },
     {
       "name": "Rite of the Flowing Blade",
-      "tier": "Advanced",
+      "tier": "Standard",
       "xp": 9,
       "action": "Instant",
       "range": "Self",
@@ -135,7 +135,7 @@
     },
     {
       "name": "Rite of the Still Mind",
-      "tier": "Master",
+      "tier": "High",
       "xp": 12,
       "action": "Scene",
       "range": "Zone",

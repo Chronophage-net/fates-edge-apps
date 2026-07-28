@@ -46,7 +46,7 @@
   "rites": [
     {
       "name": "Rite of the Iterative Spark",
-      "tier": "Basic",
+      "tier": "Low",
       "xp": 5,
       "action": "Scene",
       "range": "Self/Touch",
@@ -62,7 +62,7 @@
     },
     {
       "name": "Rite of the Adaptive Mechanism",
-      "tier": "Advanced",
+      "tier": "Standard",
       "xp": 8,
       "action": "Extended",
       "range": "Touch/Zone",
@@ -78,7 +78,7 @@
     },
     {
       "name": "Rite of Efficiency's Toll",
-      "tier": "Advanced",
+      "tier": "Standard",
       "xp": 9,
       "action": "Scene",
       "range": "Touch",
@@ -94,7 +94,7 @@
     },
     {
       "name": "Rite of the Optimization Cascade",
-      "tier": "Advanced",
+      "tier": "Standard",
       "xp": 7,
       "action": "Scene",
       "range": "Zone",
@@ -110,7 +110,7 @@
     },
     {
       "name": "Rite of the Ultimate Iteration",
-      "tier": "Master",
+      "tier": "High",
       "xp": 14,
       "action": "Extended",
       "range": "Self/Touch",

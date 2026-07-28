@@ -45,7 +45,7 @@
   "rites": [
     {
       "name": "Rite of the Thunderous Presence",
-      "tier": "Basic",
+      "tier": "Low",
       "xp": 4,
       "action": "Scene",
       "range": "Near",
@@ -61,7 +61,7 @@
     },
     {
       "name": "Rite of the Storm's Step",
-      "tier": "Basic",
+      "tier": "Low",
       "xp": 5,
       "action": "Scene",
       "range": "Self",
@@ -77,7 +77,7 @@
     },
     {
       "name": "Rite of the Shattered Sky",
-      "tier": "Advanced",
+      "tier": "Standard",
       "xp": 8,
       "action": "Scene",
       "range": "Zone",
@@ -93,7 +93,7 @@
     },
     {
       "name": "Rite of the Fear-Eater",
-      "tier": "Advanced",
+      "tier": "Standard",
       "xp": 9,
       "action": "Scene",
       "range": "Self",
@@ -109,7 +109,7 @@
     },
     {
       "name": "Rite of the World's Drum",
-      "tier": "Master",
+      "tier": "High",
       "xp": 14,
       "action": "Extended",
       "range": "Zone",

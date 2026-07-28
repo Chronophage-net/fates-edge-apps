@@ -49,7 +49,7 @@
   "rites": [
     {
       "name": "Rite of the Crushing Whisper",
-      "tier": "Basic",
+      "tier": "Low",
       "xp": 5,
       "action": "Scene",
       "range": "Near",
@@ -65,7 +65,7 @@
     },
     {
       "name": "Rite of the Abyssal Grasp",
-      "tier": "Advanced",
+      "tier": "Standard",
       "xp": 7,
       "action": "Scene",
       "range": "Near",
@@ -81,7 +81,7 @@
     },
     {
       "name": "Rite of the Alien Gaze",
-      "tier": "Advanced",
+      "tier": "Standard",
       "xp": 9,
       "action": "Scene",
       "range": "Self",
@@ -97,7 +97,7 @@
     },
     {
       "name": "Rite of the Sundering Deep",
-      "tier": "Master",
+      "tier": "High",
       "xp": 14,
       "action": "Scene",
       "range": "Zone",

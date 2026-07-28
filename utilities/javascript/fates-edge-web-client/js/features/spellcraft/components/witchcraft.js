@@ -432,6 +432,17 @@ export function renderWitchcraft(el) {
     const crafted = getCraftedItems(char);
     const allPatrons = getAllWitchcraftPatrons();
 
+    // Build list of available gifts for dropdown (universal + patron)
+    const patronGifts = witchcraftData?.witchcraft?.hedge_gifts || [];
+    const availableGifts = [...UNIVERSAL_HEDGE_GIFTS, ...patronGifts];
+    // Remove duplicates (by id)
+    const seen = new Set();
+    const uniqueGifts = availableGifts.filter(g => {
+        if (seen.has(g.id)) return false;
+        seen.add(g.id);
+        return true;
+    });
+
     const identityThreshold = prices.identityStrain >= 3;
 
     // Determine which sections to show
@@ -492,15 +503,18 @@ export function renderWitchcraft(el) {
             <div class="witchcraft-gifts" style="background:var(--bg2);border-radius:var(--radius);padding:0.3rem 0.5rem;border:1px solid var(--border);">
                 <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.2rem;">
                     <span style="font-size:0.85rem;font-weight:600;color:var(--gold);">🌿 Hedge Gifts</span>
-                    <div style="display:flex;gap:0.2rem;">
+                    <div style="display:flex;gap:0.2rem;align-items:center;">
                         <span style="font-size:0.6rem;color:var(--text3);">${gifts.length} learned</span>
-                        <button class="btn btn-xs btn-secondary" onclick="window.witchAddGift()">+ Add</button>
+                        <select id="witch-gift-select" style="font-size:0.6rem;background:var(--bg3);border:1px solid var(--border);border-radius:4px;padding:0.05rem 0.3rem;max-width:140px;">
+                            ${uniqueGifts.map(g => `<option value="${g.id}">${g.name}</option>`).join('')}
+                        </select>
+                        <button class="btn btn-xs btn-secondary" onclick="window.witchAddGiftFromSelect()">+ Add</button>
                     </div>
                 </div>
                 <div style="display:flex;flex-direction:column;gap:0.15rem;max-height:200px;overflow-y:auto;">
                     ${gifts.length === 0 ? `
                         <div style="font-size:0.75rem;color:var(--text3);text-align:center;padding:0.5rem 0;">
-                            No hedge gifts learned. Click "Add" to learn one.
+                            No hedge gifts learned. Select a gift from the dropdown and click "Add".
                         </div>
                     ` : gifts.map(g => renderGiftItem(g, char)).join('')}
                 </div>
@@ -576,6 +590,8 @@ export function renderWitchcraft(el) {
 
         </div>
     `;
+
+    // After rendering, attach any extra event listeners (none needed for this file)
 }
 
 // ============================================================
@@ -697,8 +713,73 @@ function renderRitualItem(ritual, char) {
 }
 
 // ============================================================
-// QUICK WORKING
+// GLOBAL FUNCTIONS (exposed to HTML onclick)
 // ============================================================
+
+// ─── Hedge Gifts ──────────────────────────────────────────────
+
+window.witchAddGiftFromSelect = function() {
+    const char = getCharacterData();
+    if (!char) return;
+
+    // Check if they have Craft of the Hedge
+    const hasCraft = (char.talents || []).some(t =>
+        t.name === 'Craft of the Hedge' || t.id === 'craft-of-the-hedge'
+    );
+    if (!hasCraft && char.magicPath !== 'witch') {
+        showToast('Learn the "Craft of the Hedge" talent first.', 'error');
+        return;
+    }
+
+    const select = document.getElementById('witch-gift-select');
+    if (!select) return;
+    const giftId = select.value;
+    const patronData = char.patron ? findPatronWitchcraft(char.patron) : null;
+    const patronGifts = patronData?.witchcraft?.hedge_gifts || [];
+    const available = [...UNIVERSAL_HEDGE_GIFTS, ...patronGifts];
+    const selected = available.find(g => g.id === giftId);
+    if (!selected) {
+        showToast('Gift not found.', 'error');
+        return;
+    }
+
+    const gifts = getHedgeGifts(char);
+    if (gifts.some(g => g.name === selected.name)) {
+        showToast('Already learned this gift.', 'warning');
+        return;
+    }
+
+    gifts.push({ ...selected, id: generateId('gift_') });
+    // Save the whole witch object to avoid clobbering siblings
+    saveCharacter({ witch: char.witch });
+    showToast(`🌿 Learned "${selected.name}"`, 'success');
+    window.witchRefresh();
+};
+
+// The old `window.witchAddGift` is kept for backward compatibility but now
+// redirects to the select-based version.
+window.witchAddGift = function() {
+    // If the select exists, use it; otherwise, show a message.
+    const select = document.getElementById('witch-gift-select');
+    if (select) {
+        window.witchAddGiftFromSelect();
+    } else {
+        showToast('Please refresh the panel to see the gift selection dropdown.', 'info');
+    }
+};
+
+window.witchRemoveGift = function(giftId) {
+    const char = getCharacterData();
+    if (!char) return;
+    let gifts = getHedgeGifts(char);
+    gifts = gifts.filter(g => g.id !== giftId && g.name !== giftId);
+    char.witch.hedgeGifts = gifts;
+    saveCharacter({ witch: char.witch });
+    showToast('Removed gift.', 'info');
+    window.witchRefresh();
+};
+
+// ─── Quick Work ───────────────────────────────────────────────
 
 window.witchQuickWork = function() {
     const char = getCharacterData();
@@ -768,9 +849,6 @@ window.witchQuickWork = function() {
             priceApplied = true;
         }
         if (priceApplied) {
-            // FIX: save the whole char.witch object, not just { prices },
-            // so hedgeGifts/promiseTimers/rituals/crafted aren't wiped.
-            // See the file-level bugfix note at the top of this file.
             saveCharacter({ witch: char.witch });
             if (prices.identityStrain >= 3) {
                 showToast('🌀 Identity Strain threshold reached! Risk losing something of yourself.', 'error');
@@ -810,9 +888,7 @@ window.witchQuickWork = function() {
     window.witchRefresh();
 };
 
-// ============================================================
-// FULL RITUAL (Witches only)
-// ============================================================
+// ─── Full Ritual ──────────────────────────────────────────────
 
 window.witchFullRitual = function() {
     const char = getCharacterData();
@@ -866,7 +942,6 @@ window.witchFullRitual = function() {
     // Apply Identity Strain
     const prices = getPriceTracks(char);
     prices.identityStrain += 1;
-    // FIX: was saveCharacter({ witch: { prices } }) — see bugfix note above.
     saveCharacter({ witch: char.witch });
     if (prices.identityStrain >= 3) {
         showToast('🌀 Identity Strain threshold reached! Risk losing something of yourself.', 'error');
@@ -892,7 +967,6 @@ window.witchFullRitual = function() {
         result: success ? 'Success' : outcome,
         date: new Date().toLocaleDateString()
     });
-    // FIX: was saveCharacter({ witch: { rituals } }) — see bugfix note above.
     saveCharacter({ witch: char.witch });
 
     const outcomeColor = success ? 'var(--green)' : outcome === '⚠️ Partial Success' ? 'var(--orange)' : 'var(--red)';
@@ -920,9 +994,7 @@ window.witchFullRitual = function() {
     window.witchRefresh();
 };
 
-// ============================================================
-// CRAFTING
-// ============================================================
+// ─── Crafting ──────────────────────────────────────────────────
 
 window.witchCraftItem = function() {
     const char = getCharacterData();
@@ -998,7 +1070,6 @@ window.witchCraftItem = function() {
             icon: recipe.icon || '🔧',
             createdAt: Date.now()
         });
-        // FIX: was saveCharacter({ witch: { crafted } }) — see bugfix note above.
         saveCharacter({ witch: char.witch });
         showToast(`🔧 Crafted "${recipe.name}"!`, 'success');
     } else {
@@ -1037,7 +1108,6 @@ window.witchUseCraftedItem = function(itemId) {
     if (item.uses <= 0) {
         window.witchRemoveCraftedItem(itemId);
     } else {
-        // FIX: was saveCharacter({ witch: { crafted } }) — see bugfix note above.
         saveCharacter({ witch: char.witch });
         window.witchRefresh();
     }
@@ -1049,71 +1119,12 @@ window.witchRemoveCraftedItem = function(itemId) {
     let crafted = getCraftedItems(char);
     crafted = crafted.filter(c => c.id !== itemId);
     char.witch.crafted = crafted;
-    // FIX: was saveCharacter({ witch: { crafted } }) — see bugfix note above.
     saveCharacter({ witch: char.witch });
     showToast('Item removed.', 'info');
     window.witchRefresh();
 };
 
-// ============================================================
-// HEDGE GIFTS
-// ============================================================
-
-window.witchAddGift = function() {
-    const char = getCharacterData();
-    if (!char) return;
-
-    // Check if they have Craft of the Hedge
-    const hasCraft = (char.talents || []).some(t =>
-        t.name === 'Craft of the Hedge' || t.id === 'craft-of-the-hedge'
-    );
-    if (!hasCraft && char.magicPath !== 'witch') {
-        showToast('Learn the "Craft of the Hedge" talent first.', 'error');
-        return;
-    }
-
-    const patronData = char.patron ? findPatronWitchcraft(char.patron) : null;
-    const patronGifts = patronData?.witchcraft?.hedge_gifts || [];
-    const available = [...UNIVERSAL_HEDGE_GIFTS, ...patronGifts];
-    const list = available.map((g, i) => `${i+1}. ${g.name} – ${g.effect} (${g.limit || 'No limit'})`).join('\n');
-
-    const choice = prompt(`🌿 Available hedge gifts:\n\n${list}\n\nEnter the number:`, '1');
-    if (!choice) return;
-    const idx = parseInt(choice) - 1;
-    if (isNaN(idx) || idx < 0 || idx >= available.length) {
-        showToast('Invalid selection.', 'error');
-        return;
-    }
-
-    const selected = available[idx];
-    const gifts = getHedgeGifts(char);
-    if (gifts.some(g => g.name === selected.name)) {
-        showToast('Already learned this gift.', 'warning');
-        return;
-    }
-
-    gifts.push({ ...selected, id: generateId('gift_') });
-    // FIX: was saveCharacter({ witch: { hedgeGifts: gifts } }) — see bugfix note above.
-    saveCharacter({ witch: char.witch });
-    showToast(`🌿 Learned "${selected.name}"`, 'success');
-    window.witchRefresh();
-};
-
-window.witchRemoveGift = function(giftId) {
-    const char = getCharacterData();
-    if (!char) return;
-    let gifts = getHedgeGifts(char);
-    gifts = gifts.filter(g => g.id !== giftId && g.name !== giftId);
-    char.witch.hedgeGifts = gifts;
-    // FIX: was saveCharacter({ witch: { hedgeGifts: gifts } }) — see bugfix note above.
-    saveCharacter({ witch: char.witch });
-    showToast('Removed gift.', 'info');
-    window.witchRefresh();
-};
-
-// ============================================================
-// PROMISE TIMERS
-// ============================================================
+// ─── Promise Timers ────────────────────────────────────────────
 
 window.witchAddTimer = function() {
     const char = getCharacterData();
@@ -1133,7 +1144,6 @@ window.witchAddTimer = function() {
         description,
         createdAt: Date.now()
     });
-    // FIX: was saveCharacter({ witch: { promiseTimers: timers } }) — see bugfix note above.
     saveCharacter({ witch: char.witch });
     showToast(`⏳ Promise "${name}" created.`, 'success');
     window.witchRefresh();
@@ -1150,7 +1160,6 @@ window.witchTickTimer = function(timerId) {
     if (timer.current >= timer.segments) {
         showToast(`⏳ "${timer.name}" is full! The price comes due.`, 'warning');
     }
-    // FIX: was saveCharacter({ witch: { promiseTimers: timers } }) — see bugfix note above.
     saveCharacter({ witch: char.witch });
     window.witchRefresh();
 };
@@ -1161,15 +1170,12 @@ window.witchRemoveTimer = function(timerId) {
     let timers = getPromiseTimers(char);
     timers = timers.filter(t => t.id !== timerId);
     char.witch.promiseTimers = timers;
-    // FIX: was saveCharacter({ witch: { promiseTimers: timers } }) — see bugfix note above.
     saveCharacter({ witch: char.witch });
     showToast('Timer removed.', 'info');
     window.witchRefresh();
 };
 
-// ============================================================
-// PRICE MANAGEMENT
-// ============================================================
+// ─── Price Management ─────────────────────────────────────────
 
 window.witchClearPrices = function() {
     const char = getCharacterData();
@@ -1179,15 +1185,15 @@ window.witchClearPrices = function() {
     prices.shadow = 0;
     prices.shame = 0;
     prices.identityStrain = 0;
-    // FIX: was saveCharacter({ witch: { prices } }) — see bugfix note above.
     saveCharacter({ witch: char.witch });
     showToast('Prices cleared.', 'info');
     window.witchRefresh();
 };
 
-// ============================================================
-// WEAVER SELECTION
-// ============================================================
+// ─── Weaver Selection ─────────────────────────────────────────
+
+// Note: weaver selection still uses a prompt because it involves choosing a patron
+// from a list, but we could later add a dropdown. For now we keep the prompt.
 
 window.witchChooseWeaver = function() {
     const char = getCharacterData();
@@ -1218,9 +1224,7 @@ window.witchChooseWeaver = function() {
     window.witchRefresh();
 };
 
-// ============================================================
-// REFRESH
-// ============================================================
+// ─── Refresh ──────────────────────────────────────────────────
 
 window.witchRefresh = function() {
     const container = document.querySelector('.witchcraft-container');
@@ -1238,7 +1242,7 @@ window.witchRefresh = function() {
 };
 
 // ============================================================
-// TOAST WITH HTML
+// TOAST WITH HTML (shared)
 // ============================================================
 
 function showToastWithHTML(html, type = 'info') {
@@ -1277,7 +1281,7 @@ function showToastWithHTML(html, type = 'info') {
 }
 
 // ============================================================
-// EXPORT
+// EXPORT – keep single default export
 // ============================================================
 
 export default { renderWitchcraft };

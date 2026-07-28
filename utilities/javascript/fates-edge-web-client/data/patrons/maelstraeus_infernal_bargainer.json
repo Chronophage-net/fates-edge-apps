@@ -55,7 +55,7 @@
   "rites": [
     {
       "name": "Rite of Uneven Scales",
-      "tier": "Basic",
+      "tier": "Low",
       "xp": 5,
       "action": "Scene",
       "range": "Near",
@@ -71,7 +71,7 @@
     },
     {
       "name": "Rite of the Merchant's Gaze",
-      "tier": "Basic",
+      "tier": "Low",
       "xp": 5,
       "action": "Scene",
       "range": "Self",
@@ -87,7 +87,7 @@
     },
     {
       "name": "Rite of the Weighted Contract",
-      "tier": "Advanced",
+      "tier": "Standard",
       "xp": 8,
       "action": "Scene",
       "range": "Near/Touch",
@@ -103,7 +103,7 @@
     },
     {
       "name": "Rite of the Infernal Bazaar",
-      "tier": "Master",
+      "tier": "High",
       "xp": 13,
       "action": "Scene",
       "range": "Zone",
@@ -119,7 +119,7 @@
     },
     {
       "name": "Rite of the Cosmic Ledger",
-      "tier": "Master",
+      "tier": "High",
       "xp": 14,
       "action": "Extended",
       "range": "Self",

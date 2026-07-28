@@ -50,7 +50,7 @@
   "rites": [
     {
       "name": "Rite of Road-Sense",
-      "tier": "Basic",
+      "tier": "Low",
       "xp": 4,
       "action": "Scene",
       "range": "Self",
@@ -66,7 +66,7 @@
     },
     {
       "name": "Rite of the Traveler's Boon",
-      "tier": "Basic",
+      "tier": "Low",
       "xp": 5,
       "action": "Scene",
       "range": "Self/Ally",
@@ -82,7 +82,7 @@
     },
     {
       "name": "Rite of the Waymark",
-      "tier": "Advanced",
+      "tier": "Standard",
       "xp": 8,
       "action": "Scene",
       "range": "Near",
@@ -98,7 +98,7 @@
     },
     {
       "name": "Rite of the Bridge Between",
-      "tier": "Advanced",
+      "tier": "Standard",
       "xp": 7,
       "action": "Instant",
       "range": "Near",
@@ -114,7 +114,7 @@
     },
     {
       "name": "Rite of the Crown of Crossings",
-      "tier": "Master",
+      "tier": "High",
       "xp": 13,
       "action": "Scene",
       "range": "Zone",
@@ -130,7 +130,7 @@
     },
     {
       "name": "Rite of the Wayfarer's Covenant",
-      "tier": "Master",
+      "tier": "High",
       "xp": 14,
       "action": "Extended",
       "range": "Near",

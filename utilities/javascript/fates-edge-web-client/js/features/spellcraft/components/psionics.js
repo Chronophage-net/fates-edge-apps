@@ -14,7 +14,10 @@
  * - Story Beat generation from Mental Strain
  * - Silent Orders as talents (Unstruck Bell, Empty Circle, Shared Breath)
  * - Learn/Unlearn Arts as talents
- * - Use Art modal with DV, target, and modifiers
+ * - Use Art modal replaced with inline controls (dropdown + target input)
+ *
+ * All selection modals have been replaced with inline dropdowns.
+ * Text-entry prompts (name, description) remain as simple prompt() calls.
  */
 
 import { getCharacterData, saveCharacter } from '../index.js';
@@ -35,7 +38,7 @@ const ARTS = {
         alternateAttribute: 'wits',
         description: 'Move objects with the mind. Lift, push, pull, or manipulate.',
         baseDv: 2,
-        strainCost: 1, // per scene, or per use? We'll handle per use based on effect
+        strainCost: 1,
         effectExamples: [
             'Light object (cup, tool): DV 2, Strain 1',
             'Medium object (furniture, person): DV 4, Strain 2',
@@ -111,7 +114,7 @@ const ARTS = {
         alternateAttribute: 'wits',
         description: 'Project your consciousness outside your body. Travel as a shade.',
         baseDv: 3,
-        strainCost: 1, // per scene
+        strainCost: 1,
         effectExamples: [
             'Near range (within sight): DV 3, Strain 1 per scene',
             'Distant (beyond sight): DV 5, Strain 2 per scene',
@@ -120,7 +123,7 @@ const ARTS = {
         sbModifiers: {
             near: 1,
             distant: 2,
-            extended: 1 // per extra scene
+            extended: 1
         }
     },
     psychicAssault: {
@@ -375,7 +378,6 @@ function getLearnedArts(char) {
 }
 
 function getSilentOrder(char) {
-    // Returns the order id if learned (first one found)
     const learned = char.learnedTalents || [];
     for (const order of SILENT_ORDERS) {
         if (learned.includes(order.id)) {
@@ -474,8 +476,16 @@ export async function renderPsion(el) {
                 <div id="psion-arts-container" style="display:flex;flex-direction:column;gap:0.3rem;">
                     ${Object.entries(ARTS).map(([artId, art]) => {
                         const isLearned = learnedArts.includes(artId);
+                        // Build effect example dropdown
+                        const effectOptionsHtml = art.effectExamples.map((ex, i) => {
+                            const dvMatch = ex.match(/DV (\d+)/);
+                            const dv = dvMatch ? parseInt(dvMatch[1]) : 2;
+                            const strainMatch = ex.match(/Strain (\d+)/);
+                            const strain = strainMatch ? parseInt(strainMatch[1]) : 1;
+                            return `<option value="${i}" data-dv="${dv}" data-strain="${strain}">${escHtml(ex)}</option>`;
+                        }).join('');
                         return `
-                            <div class="psion-art-item" style="background:var(--bg3);border-radius:var(--radius);padding:0.2rem 0.5rem;border-left:3px solid ${isLearned ? 'var(--blue)' : 'var(--text3)'};${isLearned ? '' : 'opacity:0.5;'}">
+                            <div class="psion-art-item" data-art-id="${artId}" style="background:var(--bg3);border-radius:var(--radius);padding:0.2rem 0.5rem;border-left:3px solid ${isLearned ? 'var(--blue)' : 'var(--text3)'};${isLearned ? '' : 'opacity:0.5;'}">
                                 <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.2rem;">
                                     <div style="display:flex;align-items:center;gap:0.3rem;flex-wrap:wrap;">
                                         <span style="font-weight:600;font-size:0.85rem;">${escHtml(art.label)}</span>
@@ -484,7 +494,7 @@ export async function renderPsion(el) {
                                     </div>
                                     <div style="display:flex;gap:0.2rem;flex-wrap:wrap;">
                                         ${isLearned ? `
-                                            <button class="btn btn-xs btn-primary" onclick="window.psionUseArt('${artId}')" title="Use this Art">⚡ Use</button>
+                                            <button class="btn btn-xs btn-secondary" onclick="window.psionUseArt('${artId}')" title="Use this Art (inline controls below)">⚡ Use</button>
                                         ` : ''}
                                         <button class="btn btn-xs ${isLearned ? 'btn-secondary' : 'btn-primary'}" onclick="window.psionToggleArt('${artId}')" style="font-size:0.55rem;padding:0.05rem 0.3rem;">
                                             ${isLearned ? '✕ Unlearn' : '✓ Learn'}
@@ -495,6 +505,15 @@ export async function renderPsion(el) {
                                 <div style="font-size:0.65rem;color:var(--text3);margin-top:0.05rem;display:flex;flex-wrap:wrap;gap:0.2rem 0.5rem;">
                                     ${art.effectExamples.map(e => `<span>${escHtml(e)}</span>`).join(' · ')}
                                 </div>
+                                ${isLearned ? `
+                                    <div class="psion-inline-controls" style="margin-top:0.2rem;display:flex;gap:0.3rem;align-items:center;flex-wrap:wrap;background:var(--bg2);padding:0.2rem 0.3rem;border-radius:var(--radius);border:1px solid var(--border);">
+                                        <select class="psion-effect-select" style="font-size:0.7rem;background:var(--bg3);border:1px solid var(--border);border-radius:4px;padding:0.1rem 0.3rem;">
+                                            ${effectOptionsHtml}
+                                        </select>
+                                        <input type="text" class="psion-target-input" placeholder="Target" style="font-size:0.7rem;width:100px;background:var(--bg3);border:1px solid var(--border);border-radius:4px;padding:0.1rem 0.3rem;">
+                                        <button class="btn btn-xs btn-primary" onclick="window.psionPerformArtFromInline('${artId}', this)">⚡ Use</button>
+                                    </div>
+                                ` : ''}
                             </div>
                         `;
                     }).join('')}
@@ -557,10 +576,10 @@ export async function renderPsion(el) {
 }
 
 // ============================================================
-// USE ART MODAL
+// INLINE ART PERFORMANCE (replaces modal)
 // ============================================================
 
-window.psionUseArt = function(artId) {
+window.psionPerformArtFromInline = function(artId, buttonElement) {
     const char = getCharacterData();
     if (!char) return;
 
@@ -582,71 +601,32 @@ window.psionUseArt = function(artId) {
         return;
     }
 
-    // Build modal for selecting effect level, target, modifiers
-    const modalHtml = `
-        <div style="display:flex;flex-direction:column;gap:0.5rem;">
-            <h3 style="margin:0;color:var(--blue);">⚡ ${escHtml(art.label)}</h3>
-            <p style="font-size:0.8rem;color:var(--text2);">${escHtml(art.description)}</p>
-            <div>
-                <label style="font-size:0.75rem;font-weight:600;">Effect Level / Scope</label>
-                <select id="psion-effect-level" style="width:100%;padding:0.3rem;border-radius:var(--radius);background:var(--bg2);color:var(--text);border:1px solid var(--border);">
-                    ${art.effectExamples.map((ex, i) => {
-                        // Parse DV from example (e.g., "DV 2")
-                        const dvMatch = ex.match(/DV (\d+)/);
-                        const dv = dvMatch ? parseInt(dvMatch[1]) : 2;
-                        const strainMatch = ex.match(/Strain (\d+)/);
-                        const strain = strainMatch ? parseInt(strainMatch[1]) : 1;
-                        return `<option value="${i}" data-dv="${dv}" data-strain="${strain}">${escHtml(ex)}</option>`;
-                    }).join('')}
-                </select>
-            </div>
-            <div>
-                <label style="font-size:0.75rem;font-weight:600;">Target / Modifiers (optional)</label>
-                <input type="text" id="psion-target" placeholder="e.g., the guard, the door, myself" style="width:100%;padding:0.3rem;border-radius:var(--radius);background:var(--bg2);color:var(--text);border:1px solid var(--border);">
-            </div>
-            <div style="display:flex;gap:0.5rem;">
-                <button class="btn btn-primary" id="psion-use-confirm">⚡ Use Art</button>
-                <button class="btn btn-secondary" id="psion-use-cancel">Cancel</button>
-            </div>
-        </div>
-    `;
+    // Find the parent art item and get the select and input
+    const artItem = buttonElement.closest('.psion-art-item');
+    if (!artItem) {
+        showToast('Could not find art controls.', 'error');
+        return;
+    }
 
-    showToastWithHTML(modalHtml, 'info');
+    const select = artItem.querySelector('.psion-effect-select');
+    const targetInput = artItem.querySelector('.psion-target-input');
+    if (!select) {
+        showToast('Effect selection not found.', 'error');
+        return;
+    }
 
-    // Attach events after modal render
-    setTimeout(() => {
-        const confirmBtn = document.getElementById('psion-use-confirm');
-        const cancelBtn = document.getElementById('psion-use-cancel');
-        const levelSelect = document.getElementById('psion-effect-level');
-        const targetInput = document.getElementById('psion-target');
+    const selectedIndex = parseInt(select.value);
+    const option = select.options[selectedIndex];
+    const dv = parseInt(option.dataset.dv) || 2;
+    const strainCost = parseInt(option.dataset.strain) || 1;
+    const target = targetInput ? targetInput.value.trim() || 'a target' : 'a target';
 
-        if (confirmBtn) {
-            confirmBtn.addEventListener('click', () => {
-                const selectedIndex = parseInt(levelSelect.value);
-                const option = levelSelect.options[selectedIndex];
-                const dv = parseInt(option.dataset.dv) || 2;
-                const strainCost = parseInt(option.dataset.strain) || 1;
-                const target = targetInput.value.trim() || 'a target';
-
-                // Perform the psionic action
-                performPsionicAction(char, artId, dv, strainCost, target);
-
-                // Close the toast
-                const toast = document.querySelector('.toast-container')?.lastElementChild;
-                if (toast) toast.remove();
-            });
-        }
-        if (cancelBtn) {
-            cancelBtn.addEventListener('click', () => {
-                const toast = document.querySelector('.toast-container')?.lastElementChild;
-                if (toast) toast.remove();
-            });
-        }
-    }, 100);
+    // Perform the psionic action
+    performPsionicAction(char, artId, dv, strainCost, target);
 };
 
 // ============================================================
-// PERFORM PSIONIC ACTION
+// PERFORM PSIONIC ACTION (core logic, extracted from modal)
 // ============================================================
 
 function performPsionicAction(char, artId, dv, strainCost, target) {
@@ -666,16 +646,13 @@ function performPsionicAction(char, artId, dv, strainCost, target) {
     if (mentalStrain + strainCost > mentalStrainMax) {
         // Overflow: cannot pay strain, must convert to Fatigue or Harm
         const overflow = (mentalStrain + strainCost) - mentalStrainMax;
-        // For simplicity, offer to convert to Fatigue (2 per point) or Harm (1 per point)
         const fatigueCost = overflow * 2;
         const harmCost = overflow;
-        // We'll ask the user to confirm
         const confirmMsg = `Mental Strain would overflow by ${overflow} points. You can either:\n- Pay ${fatigueCost} Fatigue (standard conversion)\n- Pay ${harmCost} Harm (Stress)\n\nChoose "OK" to pay Fatigue, "Cancel" to pay Harm.`;
         if (!confirm(confirmMsg)) {
             // Pay Harm
             const newHarm = (char.harm || 0) + harmCost;
             char.harm = newHarm;
-            // Set mental strain to max
             char.mentalStrain = mentalStrainMax;
             showToast(`Overflow converted to Harm ${harmCost}. Mental Strain set to max.`, 'error');
         } else {
@@ -685,7 +662,6 @@ function performPsionicAction(char, artId, dv, strainCost, target) {
             char.mentalStrain = mentalStrainMax;
             showToast(`Overflow converted to Fatigue ${fatigueCost}. Mental Strain set to max.`, 'warning');
         }
-        // Save and refresh
         saveCharacter({ mentalStrain: char.mentalStrain, harm: char.harm, fatigue: char.fatigue });
         window.psionRefresh();
         return;
@@ -707,9 +683,6 @@ function performPsionicAction(char, artId, dv, strainCost, target) {
     let outcomeColor = success ? 'var(--gold)' : 'var(--red)';
     let detail = success ? `The ${art.label} resolves with ${rollResult.successes} successes.` : `The ${art.label} falters with ${rollResult.successes}/${dv} successes.`;
     if (sb > 0) detail += ` ${sb} Story Beats generated.`;
-
-    // Apply any special effects based on success (narrative)
-    // We'll just show the result
 
     showToastWithHTML(`
         <div style="display:flex;flex-direction:column;gap:0.3rem;">
@@ -733,6 +706,28 @@ function performPsionicAction(char, artId, dv, strainCost, target) {
     saveCharacter({ mentalStrain: char.mentalStrain });
     window.psionRefresh();
 }
+
+// ============================================================
+// LEGACY USE ART (redirects to inline controls)
+// ============================================================
+
+window.psionUseArt = function(artId) {
+    // Instead of showing a modal, we'll scroll to the art item and highlight the inline controls.
+    const artItem = document.querySelector(`.psion-art-item[data-art-id="${artId}"]`);
+    if (artItem) {
+        artItem.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        // Flash the inline controls
+        const controls = artItem.querySelector('.psion-inline-controls');
+        if (controls) {
+            controls.style.transition = 'background 0.3s';
+            controls.style.background = 'var(--gold)';
+            setTimeout(() => { controls.style.background = ''; }, 600);
+        }
+        showToast('Use the dropdown and target field below the art description.', 'info');
+    } else {
+        showToast('Art not found. Please refresh.', 'error');
+    }
+};
 
 // ============================================================
 // TOGGLE ART
@@ -776,25 +771,20 @@ window.psionToggleTalent = function(talentId) {
     const index = char.learnedTalents.indexOf(talentId);
     if (index >= 0) {
         // Unlearn
-        // If it's an order, remove its effects
         if (SILENT_ORDERS.some(o => o.id === talentId)) {
-            // Clear any order-specific flags? Not needed, but we might want to remove the order from char.
-            // We'll just treat it as a talent removal.
+            // Clear any order-specific flags? Not needed.
         }
         char.learnedTalents.splice(index, 1);
         showToast(`Unlearned: ${talentId}`, 'info');
     } else {
         // Learn
-        char.learnedTalents.push(talentId);
-        // If it's the Craft of the Psion, grant Psionics skill 1 if not already
         if (talentId === 'craft-of-the-psion') {
             if (!char.psionics || char.psionics < 1) {
                 char.psionics = 1;
                 showToast('Craft of the Psion learned! Psionics skill set to 1.', 'success');
             }
         }
-        // If it's an order, we might want to set a flag
-        // No additional action needed.
+        char.learnedTalents.push(talentId);
         showToast(`Learned: ${talentId} ✨`, 'success');
     }
 

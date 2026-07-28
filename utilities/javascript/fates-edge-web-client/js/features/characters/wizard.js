@@ -8,6 +8,7 @@
  * - Patrons are loaded dynamically from /data/patrons/ via the patrons module
  * - Thiasos/Codex fields for Runekeepers with auto-patron derivation
  * - REVISED: Added Bound Patron, bloomCount, resonantRites for Cantors.
+ * - FIX: Auto‑add magic‑access talents to learnedTalents based on magicPath.
  */
 
 import { generateId, escHtml, safeParseInt, clamp } from '../../core/utils.js';
@@ -526,7 +527,6 @@ export async function openWizard() {
             identityStrain: 0,
             promiseTimers: [],
             psionicArts: [],
-            boundSpirits: [],
             monasticTradition: '',
             breathState: 'entering',
             monkCorruptionTier: 0,
@@ -536,6 +536,8 @@ export async function openWizard() {
             boundPatronBonus: 1,
             bloomCount: 0,
             resonantRites: [],
+            // ─── FIX: learnedTalents for magic-access detection ──
+            learnedTalents: [],
             _stepDataCollected: {},
         };
         state.step = 0;
@@ -826,6 +828,24 @@ function finishWizard() {
     d.mentalStrainMax = d.spirit;
     
     d.xpSpent = calculateTotalXpSpent(d);
+
+    // ─── FIX: Auto‑add magic‑access talents to learnedTalents ──
+    const pathTalents = {
+        'runekeeper': ['familiar', 'codex'],
+        'familiar-only': ['familiar'],
+        'cantor': ['cantors-path'],
+        'summoner': ['pact-whisperer', 'lesser-pactwright'],
+        'free-caster': ['spellcraft'],
+        'witch': ['craft-of-the-hedge'],
+        'hedge-gifts': ['craft-of-the-hedge'],
+        'invoker': [], // no talent needed; symbols are separate
+    };
+    if (d.magicPath && pathTalents[d.magicPath]) {
+        if (!d.learnedTalents) d.learnedTalents = [];
+        pathTalents[d.magicPath].forEach(t => {
+            if (!d.learnedTalents.includes(t)) d.learnedTalents.push(t);
+        });
+    }
 
     const pushCheck = document.getElementById('wz-push-vtt');
     if (pushCheck) d.vtt = pushCheck.checked;

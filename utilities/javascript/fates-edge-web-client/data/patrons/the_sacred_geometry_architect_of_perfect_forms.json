@@ -52,7 +52,7 @@
   "rites": [
     {
       "name": "Rite of the Harmonic Alignment",
-      "tier": "Basic",
+      "tier": "Low",
       "xp": 4,
       "action": "Scene",
       "range": "Self",
@@ -68,7 +68,7 @@
     },
     {
       "name": "Rite of the Perfect Structure",
-      "tier": "Basic",
+      "tier": "Low",
       "xp": 5,
       "action": "Scene",
       "range": "Touch",
@@ -84,7 +84,7 @@
     },
     {
       "name": "Rite of the Resonant Field",
-      "tier": "Advanced",
+      "tier": "Standard",
       "xp": 8,
       "action": "Scene",
       "range": "Zone",
@@ -100,7 +100,7 @@
     },
     {
       "name": "Rite of the Pattern's Heart",
-      "tier": "Advanced",
+      "tier": "Standard",
       "xp": 7,
       "action": "Scene",
       "range": "Self",
@@ -116,7 +116,7 @@
     },
     {
       "name": "Rite of the Immutable Design",
-      "tier": "Master",
+      "tier": "High",
       "xp": 13,
       "action": "Extended",
       "range": "Zone",
@@ -132,7 +132,7 @@
     },
     {
       "name": "Rite of the Architect's Vision",
-      "tier": "Master",
+      "tier": "High",
       "xp": 14,
       "action": "Extended",
       "range": "Self",

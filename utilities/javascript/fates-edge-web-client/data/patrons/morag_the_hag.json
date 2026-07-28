@@ -55,7 +55,7 @@
   "rites": [
     {
       "name": "Rite of the Unfinished Promise",
-      "tier": "Basic",
+      "tier": "Low",
       "xp": 4,
       "action": "Scene",
       "range": "Near/Touch",
@@ -71,7 +71,7 @@
     },
     {
       "name": "Rite of the Speaking Knot",
-      "tier": "Advanced",
+      "tier": "Standard",
       "xp": 8,
       "action": "Scene",
       "range": "Near",
@@ -87,7 +87,7 @@
     },
     {
       "name": "Rite of the Threefold Exchange",
-      "tier": "Advanced",
+      "tier": "Standard",
       "xp": 7,
       "action": "Scene",
       "range": "Near",
@@ -103,7 +103,7 @@
     },
     {
       "name": "Rite of the Cauldron's Secret",
-      "tier": "Master",
+      "tier": "High",
       "xp": 12,
       "action": "Extended",
       "range": "Zone",
@@ -119,7 +119,7 @@
     },
     {
       "name": "Rite of the Crossroads Court",
-      "tier": "Master",
+      "tier": "High",
       "xp": 14,
       "action": "Extended",
       "range": "Zone",

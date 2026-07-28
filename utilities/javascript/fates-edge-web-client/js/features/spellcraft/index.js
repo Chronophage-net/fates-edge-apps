@@ -11,22 +11,7 @@
  * - TAGS Calculator for Free Casters (and as a learning tool for others)
  * - Unified character selection via VTT
  * - Default "Path Finder" view helps players choose their magical tradition
- *
- * FIX (this pass): the 'rites' branch of renderActiveTabContent() called
- * `renderRites(wrapper)` with only the container element. rites.js's real
- * signature is `renderRites(el, patronIds, characterId, options = {})` —
- * every call was leaving patronIds and characterId as `undefined`. Inside
- * rites.js, `state.characters.find(c => c.id === characterId)` with
- * characterId undefined never matches a real character (ids are
- * generateId(8) strings), so `char` came back undefined, `char?.patron`
- * was never read, and the panel always fell through to "No patron
- * selected" — regardless of what was actually set on the character. The
- * character object (`char`) was already sitting in scope two lines above
- * the switch statement; it just never got passed down. Fixed below, and
- * the call is now awaited (renderRites is async) to match the pattern
- * already used for calculator/cantor/summoning.
- *
- * NEW: Added Psionics tab for psion characters.
+ * - Path selection is now an inline dropdown in the header (no modal)
  */
 
 import { vttStore } from '../../core/vtt-store.js';
@@ -43,7 +28,6 @@ import { renderSummoning } from './components/summoning.js';
 import { renderWitchcraft } from './components/witchcraft.js';
 import { renderMonks } from './components/monks.js';
 import { renderCantor } from './components/cantor.js';
-// ─── NEW: Psionics component ──────────────────────────────
 import { renderPsion } from './components/psionics.js';
 
 // ============================================================
@@ -334,9 +318,7 @@ function ensureStyles() {
             font-size: 0.85rem;
         }
 
-        /* ─── Path Info Cards (non-interactive reference, shown when no
-               character is selected) — same look as path-finder-card but
-               no hover/pointer affordance, since there's nothing to click. */
+        /* ─── Path Info Cards (non-interactive reference) ────── */
         .path-info-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
@@ -351,6 +333,25 @@ function ensureStyles() {
             flex-direction: column;
             gap: 0.2rem;
             text-align: left;
+        }
+
+        /* ─── Path dropdown styling ───────────────────────────── */
+        .spellcraft-path-select {
+            background: var(--bg3);
+            color: var(--text);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            padding: 0.15rem 0.4rem;
+            font-size: 0.75rem;
+            min-width: 140px;
+            cursor: pointer;
+        }
+        .spellcraft-path-select:hover {
+            border-color: var(--gold);
+        }
+        .spellcraft-path-select option {
+            background: var(--bg1);
+            color: var(--text);
         }
     `;
     document.head.appendChild(style);
@@ -397,18 +398,10 @@ function saveCharacter(updates) {
 }
 
 export function getPatronRites(patronName) {
-    // Handled by the rites component's data-driven lookup. Kept as a
-    // pass-through for backward compatibility with anything still importing it.
     return [];
 }
 
 // ─── Helper: derive the patron id list to hand to renderRites ─────────
-// Runekeepers carry a single patron on char.patron. Invokers carry an
-// array of Symbols on char.symbols; each Symbol entry may itself be a
-// plain patron-id string, or an object referencing the patron via
-// `patronId` (from addSymbolToCharacter's shape in core/state.js) or
-// `patron`. We try all three so this keeps working regardless of which
-// shape ends up being used when Symbols are created.
 function getPatronIdsForRites(char) {
     if (!char) return [];
     if (char.magicPath === 'invoker') {
@@ -417,6 +410,17 @@ function getPatronIdsForRites(char) {
             .filter(Boolean);
     }
     return char.patron ? [char.patron] : [];
+}
+
+// ─── Build path dropdown options ──────────────────────────────
+
+function buildPathSelectOptions(currentPath) {
+    return Object.entries(PATH_META)
+        .map(([id, meta]) => {
+            const selected = id === currentPath ? 'selected' : '';
+            return `<option value="${id}" ${selected}>${meta.icon} ${meta.label}</option>`;
+        })
+        .join('');
 }
 
 // ============================================================
@@ -483,13 +487,6 @@ function attachNoCharacterEvents() {
         select.addEventListener('change', () => {
             const id = select.value;
             if (!id) return;
-            // The VTT store keeps its own copy of the character list for
-            // selection purposes, and only lets you select an id it already
-            // knows about. If the VTT tab hasn't been visited yet this
-            // session, that list can still be empty/stale — so sync it from
-            // the real app state first, then select. selectCharacter()
-            // dispatches 'characterSelected', which attachEvents() below
-            // already listens for and re-renders this view from.
             vttStore.updateCharacters(getState().characters || []);
             vttStore.selectCharacter(id);
         });
@@ -506,9 +503,6 @@ export function render(el) {
 
     ensureStyles();
 
-    // silent: true — this is just a state check to decide which view to
-    // show, not a user action, so it shouldn't pop an error toast on
-    // every ordinary load/refresh of this tab.
     const char = getCharacterData({ silent: true });
     if (!char) {
         container.innerHTML = renderNoCharacterView();
@@ -525,7 +519,7 @@ export function render(el) {
     // If no path is selected, show the Path Finder view
     if (path === 'none') {
         isPathFinder = true;
-        activeTab = 'crafting'; // Keep crafting accessible
+        activeTab = 'crafting';
         renderPathFinder(char, name, pathMeta, patron);
         attachEvents();
         return;
@@ -536,6 +530,9 @@ export function render(el) {
     if (!tabs.some(t => t.id === activeTab)) {
         activeTab = 'crafting';
     }
+
+    // Build path dropdown
+    const pathOptionsHtml = buildPathSelectOptions(path);
 
     container.innerHTML = `
         <div class="spellcraft-container" style="display:flex;flex-direction:column;gap:0.8rem;">
@@ -553,9 +550,12 @@ export function render(el) {
                         </div>
                     </div>
                 </div>
-                <div style="display:flex;gap:0.3rem;flex-wrap:wrap;">
+                <div style="display:flex;gap:0.3rem;flex-wrap:wrap;align-items:center;">
+                    <select id="spellcraft-path-select" class="spellcraft-path-select" title="Change magic path">
+                        ${pathOptionsHtml}
+                    </select>
+                    <button class="btn btn-sm btn-secondary" id="spellcraft-set-path" title="Set magic path">Set Path</button>
                     <button class="btn btn-sm btn-ghost" id="spellcraft-refresh" title="Refresh">↻</button>
-                    <button class="btn btn-sm btn-secondary" id="spellcraft-change-path" title="Change magic path">⚙️ Path</button>
                 </div>
             </header>
 
@@ -596,7 +596,9 @@ export function render(el) {
 // ============================================================
 
 function renderPathFinder(char, name, pathMeta, patron) {
-    // Show the path finder view – a clean overview that helps players choose
+    // Build path dropdown (for header when path finder is active)
+    const pathOptionsHtml = buildPathSelectOptions('none');
+
     container.innerHTML = `
         <div class="spellcraft-container" style="display:flex;flex-direction:column;gap:0.8rem;">
 
@@ -613,7 +615,11 @@ function renderPathFinder(char, name, pathMeta, patron) {
                         </div>
                     </div>
                 </div>
-                <div style="display:flex;gap:0.3rem;flex-wrap:wrap;">
+                <div style="display:flex;gap:0.3rem;flex-wrap:wrap;align-items:center;">
+                    <select id="spellcraft-path-select" class="spellcraft-path-select" title="Change magic path">
+                        ${pathOptionsHtml}
+                    </select>
+                    <button class="btn btn-sm btn-secondary" id="spellcraft-set-path" title="Set magic path">Set Path</button>
                     <button class="btn btn-sm btn-ghost" id="spellcraft-refresh" title="Refresh">↻</button>
                 </div>
             </header>
@@ -717,7 +723,6 @@ function renderPathFinder(char, name, pathMeta, patron) {
     // Clicking the card itself also selects the path
     container.querySelectorAll('.path-finder-card').forEach(card => {
         card.addEventListener('click', (e) => {
-            // Don't trigger if the click was on the button (it already handles it)
             if (e.target.closest('.path-choose-btn')) return;
             const pathId = card.dataset.path;
             if (pathId) selectPathForCharacter(pathId);
@@ -737,7 +742,6 @@ function selectPathForCharacter(pathId) {
     const result = updateCharacter(char.id, { magicPath: pathId });
     if (result) {
         showToast(`✨ Path changed to ${PATH_META[pathId]?.label || pathId}`, 'success');
-        // Re-render the full view with the new path
         render(container);
     } else {
         showToast('Failed to change path.', 'error');
@@ -760,31 +764,23 @@ function getAvailableTabs(char) {
     const path = char.magicPath || 'none';
     const tabs = [];
 
-    // ─── Always show Crafting (Hedge Gifts, Quick Workings, Rituals) ───
     tabs.push({ id: 'crafting', label: 'Crafting', icon: '🌿' });
-
-    // ─── Always show Spellbook ──────────────────────────────────
     tabs.push({ id: 'spellbook', label: 'Spellbook', icon: '📚' });
 
-    // ─── If no path, that's it (Path Finder handles the rest) ──
     if (path === 'none') return tabs;
 
-    // ─── Path-specific tabs ─────────────────────────────────────
     if (path === 'free-caster') {
         tabs.push({ id: 'calculator', label: 'Calculator', icon: '🔮' });
     }
 
-    // Runekeeper and Invoker share the Rites tab
     if (path === 'runekeeper' || path === 'invoker') {
         tabs.push({ id: 'rites', label: 'Rites', icon: '📜' });
     }
 
-    // Cantor gets its own dedicated tab with corruption and songs
     if (path === 'cantor') {
         tabs.push({ id: 'cantor', label: 'Cantor', icon: '🎵' });
     }
 
-    // ─── NEW: Psionics tab ──────────────────────────────────────
     if (path === 'psion') {
         tabs.push({ id: 'psionics', label: 'Psionics', icon: '🧠' });
     }
@@ -793,15 +789,10 @@ function getAvailableTabs(char) {
         tabs.push({ id: 'summoning', label: 'Summoning', icon: '👁️' });
     }
 
-    // Monk is not a path gate on its own — it's available the moment a
-    // character has committed to the monastic path (magicPath === 'monk'),
-    // OR has already chosen a tradition. Either signal is enough to surface
-    // the tab; the monks component itself gates further on learned talents.
     if (path === 'monk' || char.monasticTradition) {
         tabs.push({ id: 'monks', label: 'Monks', icon: '🧘' });
     }
 
-    // Witchcraft tab for witches (shows their full tradition content)
     if (path === 'witch') {
         tabs.push({ id: 'witchcraft', label: 'Witchcraft', icon: '🧹' });
     }
@@ -809,11 +800,6 @@ function getAvailableTabs(char) {
     return tabs;
 }
 
-// Renders the active tab's content directly into the LIVE #spellcraft-content
-// element (never a detached scratch node), and properly awaits async
-// components (Calculator, Cantor, Summoning, Rites) before anything else
-// touches the DOM. A render token guards against a slow render finishing
-// after the user has already switched tabs or characters.
 async function renderActiveTabContent() {
     const contentEl = document.getElementById('spellcraft-content');
     if (!contentEl) return;
@@ -838,11 +824,6 @@ async function renderActiveTabContent() {
                 await renderCalculator(wrapper);
                 break;
             case 'rites': {
-                // FIX: this used to be a bare `renderRites(wrapper)` with no
-                // patronIds/characterId/options — see the file-level note
-                // at the top of this file for exactly why that produced
-                // "No patron selected" unconditionally. char is already in
-                // scope here; we just have to actually pass it through.
                 const patronIds = getPatronIdsForRites(char);
                 await renderRites(wrapper, patronIds, char.id, {
                     path: char.magicPath === 'invoker' ? 'invoker' : 'runekeeper',
@@ -853,7 +834,6 @@ async function renderActiveTabContent() {
             case 'cantor':
                 await renderCantor(wrapper);
                 break;
-            // ─── NEW: Psionics tab ──────────────────────────────────
             case 'psionics':
                 await renderPsion(wrapper);
                 break;
@@ -874,8 +854,6 @@ async function renderActiveTabContent() {
         wrapper.innerHTML = `<p style="color:var(--red);">Failed to load this tab. Check the console for details.</p>`;
     }
 
-    // If the user switched tabs/characters while we were awaiting, drop
-    // this result on the floor instead of overwriting whatever's current.
     if (myToken !== renderToken) return;
 
     contentEl.innerHTML = '';
@@ -886,13 +864,11 @@ function renderAll() {
     const char = getCharacterData();
     if (!char) return;
 
-    // If we're in path finder mode, tracks are minimal
     if (isPathFinder) {
         const trackersEl = document.getElementById('trackers-container');
         if (trackersEl) {
             trackersEl.innerHTML = `<div style="font-size:0.7rem;color:var(--text3);">No active tracks. Choose a path to begin.</div>`;
         }
-        // Rebuild tabs
         const tabs = getAvailableTabs(char);
         const tabsContainer = document.querySelector('.spellcraft-tabs');
         if (tabsContainer) {
@@ -902,11 +878,9 @@ function renderAll() {
         return;
     }
 
-    // Render trackers
     const trackersEl = document.getElementById('trackers-container');
     if (trackersEl) renderTrackers(trackersEl);
 
-    // Rebuild the tab bar (in case path/tradition changed which tabs show)
     const tabs = getAvailableTabs(char);
     if (!tabs.some(t => t.id === activeTab)) {
         activeTab = 'crafting';
@@ -916,7 +890,6 @@ function renderAll() {
         tabsContainer.innerHTML = renderTabButtons(tabs);
     }
 
-    // Render the active tab's content (async-safe, into the live element)
     renderActiveTabContent();
 }
 
@@ -992,15 +965,6 @@ function getTrackSummary(char) {
 // ============================================================
 
 function attachEvents() {
-    // FIX: this used to only ever call container.removeEventListener(...)
-    // during cleanup, but the 'characterSelected' listener below is bound
-    // to `document`, not `container` — so it was never actually removed,
-    // and every render() call (now more frequent thanks to the new
-    // character dropdown) stacked another live 'characterSelected'
-    // listener onto document permanently. Each stacked listener calls
-    // render(container) again, so after a few renders a single selection
-    // change would re-render the tab multiple times over. Track the real
-    // target per listener and remove from that target specifically.
     eventListeners.forEach(({ target, event, handler }) => {
         (target || container)?.removeEventListener(event, handler);
     });
@@ -1024,8 +988,8 @@ function attachEvents() {
                 renderAll();
                 showToast('🔄 Refreshed', 'info');
                 break;
-            case 'spellcraft-change-path':
-                changeMagicPath();
+            case 'spellcraft-set-path':
+                setPathFromSelect();
                 break;
         }
     };
@@ -1035,8 +999,22 @@ function attachEvents() {
         eventListeners.push({ target: container, event: 'click', handler: clickHandler });
     }
 
-    // Listen for character selection changes (from VTT, or from the new
-    // dropdown in the no-character view)
+    // Handle path selection from dropdown (via the Set Path button)
+    const setPathBtn = document.getElementById('spellcraft-set-path');
+    if (setPathBtn) {
+        // The click handler above already handles this via the container click,
+        // but we also need to handle Enter key on the dropdown.
+        const pathSelect = document.getElementById('spellcraft-path-select');
+        if (pathSelect) {
+            pathSelect.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    setPathFromSelect();
+                }
+            });
+        }
+    }
+
+    // Listen for character selection changes
     const selectionHandler = () => {
         if (container) render(container);
     };
@@ -1048,37 +1026,38 @@ function attachEvents() {
 // ACTIONS
 // ============================================================
 
-function changeMagicPath() {
+function setPathFromSelect() {
+    const select = document.getElementById('spellcraft-path-select');
+    if (!select) return;
+    const pathId = select.value;
+    if (!pathId) return;
+
     const char = getCharacterData();
     if (!char) return;
 
-    const paths = ['none', 'free-caster', 'runekeeper', 'invoker', 'cantor', 'witch', 'psion', 'summoner', 'monk'];
-    const current = char.magicPath || 'none';
-    const options = paths.map(p => {
-        const meta = PATH_META[p];
-        return `${p === current ? '▶ ' : '  '} ${p}: ${meta.label} – ${meta.description}`;
-    }).join('\n');
-
-    const choice = prompt(
-        `Change magic path for ${char.name}:\n\n${options}\n\nEnter the new path (e.g., "witch" or "none"):`,
-        current
-    );
-
-    if (!choice || choice === current) return;
-
-    const trimmed = choice.trim().toLowerCase();
-    if (!paths.includes(trimmed)) {
-        showToast(`Invalid path. Choose from: ${paths.join(', ')}`, 'error');
+    if (pathId === char.magicPath) {
+        showToast(`Already on the ${PATH_META[pathId]?.label || pathId} path.`, 'info');
         return;
     }
 
-    const result = updateCharacter(char.id, { magicPath: trimmed });
+    const result = updateCharacter(char.id, { magicPath: pathId });
     if (result) {
         activeTab = 'crafting';
-        showToast(`⚙️ Magic path changed to ${PATH_META[trimmed].label}`, 'success');
+        showToast(`⚙️ Magic path changed to ${PATH_META[pathId]?.label || pathId}`, 'success');
         render(container);
     } else {
         showToast('Failed to update character.', 'error');
+    }
+}
+
+// Legacy function – kept for backward compatibility, redirects to dropdown
+function changeMagicPath() {
+    const select = document.getElementById('spellcraft-path-select');
+    if (select) {
+        select.focus();
+        showToast('Select a path from the dropdown and click "Set Path".', 'info');
+    } else {
+        showToast('Please refresh the panel to use the dropdown.', 'info');
     }
 }
 

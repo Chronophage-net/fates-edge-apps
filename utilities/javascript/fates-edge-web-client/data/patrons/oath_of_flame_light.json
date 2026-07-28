@@ -53,7 +53,7 @@
   "rites": [
     {
       "name": "Rite of Kindle Vow",
-      "tier": "Basic",
+      "tier": "Low",
       "xp": 4,
       "action": "Action",
       "range": "Self/Ally",
@@ -69,7 +69,7 @@
     },
     {
       "name": "Rite of Lay on Hands",
-      "tier": "Basic",
+      "tier": "Low",
       "xp": 5,
       "action": "Instant",
       "range": "Touch",
@@ -85,7 +85,7 @@
     },
     {
       "name": "Rite of Sunlit Parley",
-      "tier": "Advanced",
+      "tier": "Standard",
       "xp": 8,
       "action": "Scene",
       "range": "Zone",
@@ -101,7 +101,7 @@
     },
     {
       "name": "Rite of Radiant Smite",
-      "tier": "Advanced",
+      "tier": "Standard",
       "xp": 9,
       "action": "Action",
       "range": "Self",
@@ -117,7 +117,7 @@
     },
     {
       "name": "Rite of Purge the Shadow",
-      "tier": "Advanced",
+      "tier": "Standard",
       "xp": 10,
       "action": "Instant",
       "range": "Near",
@@ -133,7 +133,7 @@
     },
     {
       "name": "Rite of Covenant Blaze",
-      "tier": "Master",
+      "tier": "High",
       "xp": 13,
       "action": "Scene",
       "range": "Zone",

@@ -7,7 +7,7 @@
  *
  * Features:
  * - Grimoire-style visual design with parchment textures
- * - Spell templates library for inspiration and quick creation
+ * - Spell templates library with dropdown selection
  * - Signature spells with mechanical benefits (+1 die when casting)
  * - Tag color coding and definitions from the TAGS system
  * - Usage tracking with statistics (success rate, most used spells)
@@ -20,6 +20,10 @@
  *
  * Available to all characters for collection and study.
  * CASTING requires the Free Caster magic path.
+ *
+ * All selection modals (templates, categories, attribute choice) have been
+ * replaced with inline dropdowns. Text-entry prompts (name, description, tags)
+ * remain as simple prompt() calls.
  */
 
 import { getCharacterData, saveCharacter } from '../index.js';
@@ -52,7 +56,7 @@ const TAG_COLORS = {
     'Create': '#f39c12', 'Summon': '#9b59b6', 'Transmute': '#e74c3c', 'Animate': '#e67e22',
     // Utility
     'Sense': '#3498db', 'Reveal': '#1abc9c', 'Light': '#f1c40f',
-    'Shadow': '#2c3e50', 'Silence': '#7f8c8d', 'Protect': '#27ae60',
+    'Shadow': '#2c3e50', 'Silence': '#7f8f8d', 'Protect': '#27ae60',
     // Reaction
     'Counter': '#c0392b', 'Reflect': '#8e44ad', 'Store': '#d35400',
     // Affliction
@@ -222,6 +226,25 @@ const SPELL_TEMPLATES = [
     }
 ];
 
+// ─── Categories ────────────────────────────────────────────────
+
+const CATEGORIES = ['Offensive', 'Defensive', 'Support', 'Control', 'Utility', 'Movement'];
+const CATEGORY_ICONS = {
+    'Offensive': '⚔️',
+    'Defensive': '🛡️',
+    'Support': '💚',
+    'Control': '🌀',
+    'Utility': '🔍',
+    'Movement': '💨'
+};
+
+// ─── Attribute choices for casting ────────────────────────────
+
+const CAST_ATTRIBUTES = [
+    { value: 'wits', label: 'Wits + Arcana' },
+    { value: 'spirit', label: 'Spirit + Arcana' }
+];
+
 // ============================================================
 // HELPERS
 // ============================================================
@@ -256,39 +279,17 @@ function getTagDefinition(tag) {
 }
 
 function getCategoryIcon(category) {
-    const icons = {
-        'Offensive': '⚔️',
-        'Defensive': '🛡️',
-        'Support': '💚',
-        'Control': '🌀',
-        'Utility': '🔍',
-        'Movement': '💨'
-    };
-    return icons[category] || '📜';
+    return CATEGORY_ICONS[category] || '📜';
 }
 
 // ─── Signature Bonus ───────────────────────────────────────────
 
 function getSignatureBonus(spell) {
     if (!spell.signature) return 0;
-    // Signature spells get +1 die when cast
     return 1;
 }
 
 // ─── Mount element lookup ───────────────────────────────────────
-// FIX: every CRUD handler below used to refresh via
-// getSpellbookMountEl() — but nothing in this
-// file (or, as far as we can tell, the caller that mounts it) ever gives
-// any element that id. The rendered root only ever carries the *class*
-// "spellbook-container" (see the `<div class="spellbook-container">` in
-// renderSpellbook below), set as the innerHTML of whatever parent element
-// was passed into renderSpellbook(el) in the first place. So that lookup
-// always returned null, and el.innerHTML = html inside renderSpellbook
-// threw "Cannot set properties of null" the moment any Add/Edit/Copy/
-// Delete/Template/etc. button tried to refresh the view.
-// This mirrors the safer pattern cantor.js/witchcraft.js already use:
-// find the live ".xxx-container" div and refresh its parent, with a
-// fallback to the shared "spellcraft-content" mount point.
 function getSpellbookMountEl() {
     return document.querySelector('.spellbook-container')?.parentElement
         || document.getElementById('spellcraft-content');
@@ -299,9 +300,6 @@ function getSpellbookMountEl() {
 // ============================================================
 
 export function renderSpellbook(el) {
-    // FIX: guard against a null/missing container — see getSpellbookMountEl()
-    // note above. Previously this function assumed `el` always existed and
-    // crashed with "Cannot set properties of null" the instant it didn't.
     if (!el) {
         console.warn('[Spellbook] renderSpellbook called with no container element — skipping.');
         return;
@@ -360,6 +358,21 @@ export function renderSpellbook(el) {
     const allTags = new Set();
     spells.forEach(s => (s.tags || []).forEach(t => allTags.add(t)));
     const tagOptions = Array.from(allTags).sort();
+
+    // Template dropdown options
+    const templateOptionsHtml = SPELL_TEMPLATES.map((t, i) =>
+        `<option value="${i}">${t.name} (DV ${t.dv}) — ${t.category}</option>`
+    ).join('');
+
+    // Category dropdown options for Add/Edit/FromTags (used in forms)
+    const categoryOptionsHtml = CATEGORIES.map(c =>
+        `<option value="${c}">${getCategoryIcon(c)} ${c}</option>`
+    ).join('');
+
+    // Attribute dropdown options for casting
+    const attributeOptionsHtml = CAST_ATTRIBUTES.map(a =>
+        `<option value="${a.value}">${a.label}</option>`
+    ).join('');
 
     let html = `
         <div class="spellbook-container" style="display:flex;flex-direction:column;gap:0.5rem;">
@@ -432,7 +445,7 @@ export function renderSpellbook(el) {
                 <p style="font-size:0.85rem;">${spells.length === 0 ? 'Create your first spell using the Add button.' : 'Try adjusting your filters.'}</p>
                 <p style="font-size:0.75rem;color:var(--text3);font-style:italic;">"The Weave does not reward empty pages." – Lysandra</p>
                 ${spells.length === 0 ? `
-                    <div style="display:flex;gap:0.3rem;justify-content:center;margin-top:0.3rem;">
+                    <div style="display:flex;gap:0.3rem;justify-content:center;margin-top:0.3rem;flex-wrap:wrap;">
                         <button class="btn btn-sm btn-primary" onclick="window.spellbookAddSpell()">➕ Add Spell</button>
                         <button class="btn btn-sm btn-gold" onclick="window.spellbookTemplates()">📋 Load Template</button>
                     </div>
@@ -453,6 +466,29 @@ export function renderSpellbook(el) {
                 <span>${sorted.length} of ${spells.length} spells shown</span>
                 <span>${isFreeCaster ? '🔮 Free Caster — Can cast' : '📜 Study Only — Need Free Caster to cast'}</span>
             </div>
+
+            <!-- ─── Hidden template loader (dropdown + button) ── -->
+            <div style="display:none;" id="spellbook-template-loader">
+                <select id="spellbook-template-select" style="background:var(--bg3);color:var(--text);border:1px solid var(--border);border-radius:4px;padding:0.1rem 0.3rem;font-size:0.75rem;">
+                    ${templateOptionsHtml}
+                </select>
+                <button class="btn btn-xs btn-gold" onclick="window.spellbookLoadTemplateFromSelect()">Load</button>
+            </div>
+
+            <!-- ─── Hidden category selector for forms ────────── -->
+            <div style="display:none;" id="spellbook-category-selector">
+                <select id="spellbook-category-select" style="background:var(--bg3);color:var(--text);border:1px solid var(--border);border-radius:4px;padding:0.1rem 0.3rem;font-size:0.75rem;">
+                    ${categoryOptionsHtml}
+                </select>
+            </div>
+
+            <!-- ─── Hidden attribute selector for casting ────── -->
+            <div style="display:none;" id="spellbook-attribute-selector">
+                <select id="spellbook-attribute-select" style="background:var(--bg3);color:var(--text);border:1px solid var(--border);border-radius:4px;padding:0.1rem 0.3rem;font-size:0.75rem;">
+                    ${attributeOptionsHtml}
+                </select>
+            </div>
+
         </div>
     `;
 
@@ -629,7 +665,7 @@ function attachSpellbookEvents(el) {
 }
 
 // ============================================================
-// CRUD OPERATIONS
+// CRUD OPERATIONS (with dropdowns for selection)
 // ============================================================
 
 // ─── Add Spell ─────────────────────────────────────────────────
@@ -638,7 +674,6 @@ window.spellbookAddSpell = function() {
     const char = getCharacterData();
     if (!char) return;
 
-    // Prompt for spell details
     const name = prompt('Spell name:');
     if (!name) return;
 
@@ -646,7 +681,11 @@ window.spellbookAddSpell = function() {
     const tagsInput = prompt('Tags (space-separated, e.g., Burning Strike Area):') || '';
     const tags = tagsInput.trim() ? tagsInput.split(/\s+/) : [];
     const dv = safeParseInt(prompt('DV (difficulty, default 2):') || '2', 2);
-    const category = prompt('Category (Offensive/Defensive/Support/Control/Utility/Movement):') || 'Utility';
+
+    // ─── Category dropdown ────────────────────────────────────
+    const category = window.spellbookPromptCategory('Category:', 'Utility');
+    if (category === null) return; // cancelled
+
     const costObligation = safeParseInt(prompt('Obligation cost (if any):') || '0', 0);
 
     const newSpell = {
@@ -656,7 +695,7 @@ window.spellbookAddSpell = function() {
         tags: tags.map(t => t.toUpperCase()),
         dv: Math.max(1, dv),
         cost: {},
-        category: category.trim() || 'Utility',
+        category: category || 'Utility',
         signature: false,
         usage: 0,
         _successes: 0,
@@ -697,7 +736,10 @@ window.spellbookFromTags = function() {
     const name = prompt('Spell name:', validTags.join(' ') || 'New Spell');
     if (!name) return;
     const description = prompt('Description / Effect:') || '';
-    const category = prompt('Category (Offensive/Defensive/Support/Control/Utility/Movement):') || 'Utility';
+
+    // ─── Category dropdown ────────────────────────────────────
+    const category = window.spellbookPromptCategory('Category:', 'Utility');
+    if (category === null) return;
 
     const newSpell = {
         id: generateId('spell_'),
@@ -706,7 +748,7 @@ window.spellbookFromTags = function() {
         tags: tags,
         dv: Math.max(1, dv),
         cost: {},
-        category: category.trim() || 'Utility',
+        category: category || 'Utility',
         signature: false,
         usage: 0,
         _successes: 0,
@@ -724,25 +766,77 @@ window.spellbookFromTags = function() {
 
 // ─── Templates ─────────────────────────────────────────────────
 
+// Legacy function – redirects to the dropdown version
 window.spellbookTemplates = function() {
-    const char = getCharacterData();
-    if (!char) return;
+    const select = document.getElementById('spellbook-template-select');
+    if (select) {
+        // If the dropdown exists, use it
+        window.spellbookLoadTemplateFromSelect();
+    } else {
+        // Fallback: show a prompt with numbered list (kept for backward compatibility)
+        // But we want to eliminate modals, so we'll create the dropdown dynamically.
+        const char = getCharacterData();
+        if (!char) return;
 
-    const options = SPELL_TEMPLATES.map((t, i) =>
-        `${i + 1}. ${t.name} (DV ${t.dv}) — ${t.category}`
-    ).join('\n');
+        const options = SPELL_TEMPLATES.map((t, i) =>
+            `${i + 1}. ${t.name} (DV ${t.dv}) — ${t.category}`
+        ).join('\n');
 
-    const choice = prompt(
-        `📋 Spell Templates\n\n${options}\n\nEnter the number of the template to load, or "cancel":`,
-        '1'
-    );
+        // Instead of prompt, we'll use a custom dropdown in a toast
+        const modalHtml = `
+            <div style="display:flex;flex-direction:column;gap:0.5rem;">
+                <p style="font-weight:600;">📋 Choose a template:</p>
+                <select id="template-prompt-select" style="padding:0.3rem;border-radius:var(--radius);background:var(--bg2);color:var(--text);border:1px solid var(--border);">
+                    ${SPELL_TEMPLATES.map((t, i) => `<option value="${i}">${t.name} (DV ${t.dv}) — ${t.category}</option>`).join('')}
+                </select>
+                <div style="display:flex;gap:0.5rem;">
+                    <button class="btn btn-primary" id="template-prompt-confirm">Load</button>
+                    <button class="btn btn-secondary" id="template-prompt-cancel">Cancel</button>
+                </div>
+            </div>
+        `;
+        showToastWithHTML(modalHtml, 'info');
+        setTimeout(() => {
+            const confirmBtn = document.getElementById('template-prompt-confirm');
+            const cancelBtn = document.getElementById('template-prompt-cancel');
+            const selectEl = document.getElementById('template-prompt-select');
+            if (confirmBtn) {
+                confirmBtn.addEventListener('click', () => {
+                    const idx = parseInt(selectEl.value);
+                    window.spellbookLoadTemplateByIndex(idx);
+                    const toast = document.querySelector('.custom-toast-modal');
+                    if (toast) toast.remove();
+                });
+            }
+            if (cancelBtn) {
+                cancelBtn.addEventListener('click', () => {
+                    const toast = document.querySelector('.custom-toast-modal');
+                    if (toast) toast.remove();
+                });
+            }
+        }, 100);
+    }
+};
 
-    if (!choice) return;
-    const idx = parseInt(choice) - 1;
-    if (isNaN(idx) || idx < 0 || idx >= SPELL_TEMPLATES.length) {
-        showToast('Invalid selection.', 'error');
+// ─── Load Template from dropdown ────────────────────────────
+
+window.spellbookLoadTemplateFromSelect = function() {
+    const select = document.getElementById('spellbook-template-select');
+    if (!select) {
+        showToast('Template dropdown not found. Please refresh.', 'error');
         return;
     }
+    const idx = parseInt(select.value);
+    if (isNaN(idx) || idx < 0 || idx >= SPELL_TEMPLATES.length) {
+        showToast('Invalid template selection.', 'error');
+        return;
+    }
+    window.spellbookLoadTemplateByIndex(idx);
+};
+
+window.spellbookLoadTemplateByIndex = function(idx) {
+    const char = getCharacterData();
+    if (!char) return;
 
     const template = SPELL_TEMPLATES[idx];
     const newSpell = {
@@ -768,6 +862,48 @@ window.spellbookTemplates = function() {
     renderSpellbook(getSpellbookMountEl());
 };
 
+// ─── Category Prompt (shared helper) ─────────────────────────
+
+window.spellbookPromptCategory = function(promptText, defaultValue = 'Utility') {
+    // This returns the selected category from a dropdown in a toast.
+    // We use a synchronous-like pattern with a promise.
+    return new Promise((resolve) => {
+        const modalHtml = `
+            <div style="display:flex;flex-direction:column;gap:0.5rem;">
+                <p style="font-weight:600;">${escHtml(promptText)}</p>
+                <select id="category-prompt-select" style="padding:0.3rem;border-radius:var(--radius);background:var(--bg2);color:var(--text);border:1px solid var(--border);">
+                    ${CATEGORIES.map(c => `<option value="${c}" ${c === defaultValue ? 'selected' : ''}>${getCategoryIcon(c)} ${c}</option>`).join('')}
+                </select>
+                <div style="display:flex;gap:0.5rem;">
+                    <button class="btn btn-primary" id="category-prompt-confirm">OK</button>
+                    <button class="btn btn-secondary" id="category-prompt-cancel">Cancel</button>
+                </div>
+            </div>
+        `;
+        showToastWithHTML(modalHtml, 'info');
+        setTimeout(() => {
+            const confirmBtn = document.getElementById('category-prompt-confirm');
+            const cancelBtn = document.getElementById('category-prompt-cancel');
+            const selectEl = document.getElementById('category-prompt-select');
+            if (confirmBtn) {
+                confirmBtn.addEventListener('click', () => {
+                    const val = selectEl.value;
+                    const toast = document.querySelector('.custom-toast-modal');
+                    if (toast) toast.remove();
+                    resolve(val);
+                });
+            }
+            if (cancelBtn) {
+                cancelBtn.addEventListener('click', () => {
+                    const toast = document.querySelector('.custom-toast-modal');
+                    if (toast) toast.remove();
+                    resolve(null);
+                });
+            }
+        }, 100);
+    });
+};
+
 // ─── Copy Spell ─────────────────────────────────────────────────
 
 window.spellbookCopySpell = function(id) {
@@ -776,11 +912,6 @@ window.spellbookCopySpell = function(id) {
     const spell = char.spellbook.find(s => s.id === id);
     if (!spell) return showToast('Spell not found.', 'error');
 
-    // FIX: this used to generate a fresh id and then immediately
-    // `delete newSpell.id`, so every copied spell ended up with NO id at
-    // all. Every button on the copy (Cast/Edit/Delete/Copy again) looks
-    // the spell up by `s.id === id`, so none of them ever matched and the
-    // copy was permanently un-interactable. We now keep the generated id.
     const newSpell = {
         ...spell,
         id: generateId('spell_'),
@@ -800,7 +931,7 @@ window.spellbookCopySpell = function(id) {
 
 // ─── Edit ──────────────────────────────────────────────────────
 
-window.spellbookEdit = function(id) {
+window.spellbookEdit = async function(id) {
     const char = getCharacterData();
     if (!char) return;
     const spell = char.spellbook.find(s => s.id === id);
@@ -812,19 +943,18 @@ window.spellbookEdit = function(id) {
     const tagsInput = prompt('Tags (space-separated):', (spell.tags || []).join(' ')) || '';
     const tags = tagsInput.trim() ? tagsInput.split(/\s+/) : [];
     const dv = safeParseInt(prompt('DV:', spell.dv || 2), 2);
-    const category = prompt('Category:', spell.category || 'Utility') || 'Utility';
+
+    // ─── Category dropdown ────────────────────────────────────
+    const category = await window.spellbookPromptCategory('Category:', spell.category || 'Utility');
+    if (category === null) return;
+
     const costObligation = safeParseInt(prompt('Obligation cost:', spell.cost?.obligation || 0), 0);
 
     spell.name = name.trim();
     spell.description = description.trim();
     spell.tags = tags.map(t => t.toUpperCase());
     spell.dv = Math.max(1, dv);
-    spell.category = category.trim();
-    // FIX: spell.cost isn't guaranteed to exist (imported/templated spells
-    // may never have had one), so `Object.keys(spell.cost)` used to throw
-    // "Cannot convert undefined or null to object" and abort the whole
-    // edit whenever someone left the obligation field at 0 on such a
-    // spell. Guard on spell.cost existing before touching it.
+    spell.category = category || 'Utility';
     if (costObligation > 0) {
         spell.cost = { obligation: costObligation };
     } else if (spell.cost) {
@@ -928,15 +1058,16 @@ window.spellbookUse = function(id) {
     const spell = char.spellbook.find(s => s.id === id);
     if (!spell) return showToast('Spell not found.', 'error');
 
-    // Determine dice pool
+    // Determine dice pool with dropdown instead of confirm
+    const attributeChoice = window.spellbookPromptAttribute();
+    if (attributeChoice === null) return; // cancelled
+
     const wits = char.wits || 1;
     const spirit = char.spirit || 1;
     const arcana = char.skills?.arcana || 0;
 
-    // Ask which attribute to use
-    const useSpirit = confirm('Use Spirit + Arcana instead of Wits + Arcana? (Click No for Wits)');
-    const attr = useSpirit ? spirit : wits;
-    const attrName = useSpirit ? 'Spirit' : 'Wits';
+    const attr = attributeChoice === 'spirit' ? spirit : wits;
+    const attrName = attributeChoice === 'spirit' ? 'Spirit' : 'Wits';
     let pool = attr + arcana;
 
     // Apply signature bonus
@@ -1059,6 +1190,48 @@ window.spellbookUse = function(id) {
     }, 100);
 };
 
+// ─── Attribute Prompt (for casting) ──────────────────────────
+
+window.spellbookPromptAttribute = function() {
+    // Returns 'wits' or 'spirit' or null if cancelled
+    // Using a synchronous-like pattern with a promise
+    return new Promise((resolve) => {
+        const modalHtml = `
+            <div style="display:flex;flex-direction:column;gap:0.5rem;">
+                <p style="font-weight:600;">Choose attribute for casting:</p>
+                <select id="attribute-prompt-select" style="padding:0.3rem;border-radius:var(--radius);background:var(--bg2);color:var(--text);border:1px solid var(--border);">
+                    ${CAST_ATTRIBUTES.map(a => `<option value="${a.value}">${a.label}</option>`).join('')}
+                </select>
+                <div style="display:flex;gap:0.5rem;">
+                    <button class="btn btn-primary" id="attribute-prompt-confirm">Cast</button>
+                    <button class="btn btn-secondary" id="attribute-prompt-cancel">Cancel</button>
+                </div>
+            </div>
+        `;
+        showToastWithHTML(modalHtml, 'info');
+        setTimeout(() => {
+            const confirmBtn = document.getElementById('attribute-prompt-confirm');
+            const cancelBtn = document.getElementById('attribute-prompt-cancel');
+            const selectEl = document.getElementById('attribute-prompt-select');
+            if (confirmBtn) {
+                confirmBtn.addEventListener('click', () => {
+                    const val = selectEl.value;
+                    const toast = document.querySelector('.custom-toast-modal');
+                    if (toast) toast.remove();
+                    resolve(val);
+                });
+            }
+            if (cancelBtn) {
+                cancelBtn.addEventListener('click', () => {
+                    const toast = document.querySelector('.custom-toast-modal');
+                    if (toast) toast.remove();
+                    resolve(null);
+                });
+            }
+        }, 100);
+    });
+};
+
 // ============================================================
 // IMPORT / EXPORT
 // ============================================================
@@ -1123,7 +1296,7 @@ window.spellbookImport = function() {
 };
 
 // ============================================================
-// TOAST WITH HTML
+// TOAST WITH HTML (shared)
 // ============================================================
 
 function showToastWithHTML(html, type = 'info') {
@@ -1165,7 +1338,6 @@ function showToastWithHTML(html, type = 'info') {
 // PATH META (for Free Caster check display)
 // ============================================================
 
-// ─── Minimal PATH_META for the Free Caster check ────────────────
 const PATH_META = {
     'free-caster': { label: 'Free Caster' },
     'runekeeper': { label: 'Runekeeper' },

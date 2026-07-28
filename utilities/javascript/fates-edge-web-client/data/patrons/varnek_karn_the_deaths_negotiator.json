@@ -51,7 +51,7 @@
   "rites": [
     {
       "name": "Rite of the Crossing Fee",
-      "tier": "Basic",
+      "tier": "Low",
       "xp": 4,
       "action": "Scene",
       "range": "Near",
@@ -67,7 +67,7 @@
     },
     {
       "name": "Rite of the Ancestral Consultation",
-      "tier": "Basic",
+      "tier": "Low",
       "xp": 5,
       "action": "Scene",
       "range": "Self",
@@ -83,7 +83,7 @@
     },
     {
       "name": "Rite of the Mediated Pact",
-      "tier": "Advanced",
+      "tier": "Standard",
       "xp": 8,
       "action": "Scene",
       "range": "Near",
@@ -99,7 +99,7 @@
     },
     {
       "name": "Rite of the Unquiet Host",
-      "tier": "Advanced",
+      "tier": "Standard",
       "xp": 10,
       "action": "Scene",
       "range": "Zone",
@@ -115,7 +115,7 @@
     },
     {
       "name": "Rite of the Final Testament",
-      "tier": "Master",
+      "tier": "High",
       "xp": 13,
       "action": "Extended",
       "range": "Touch",
@@ -131,7 +131,7 @@
     },
     {
       "name": "Rite of the Eternal Archive",
-      "tier": "Master",
+      "tier": "High",
       "xp": 14,
       "action": "Extended",
       "range": "Zone",

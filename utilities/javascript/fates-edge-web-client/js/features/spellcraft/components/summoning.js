@@ -16,6 +16,8 @@
  * - Custom spirit binding for unique entities
  * - Release with consequences (narrative prompt)
  * - Quick reference for summoning mechanics
+ *
+ * All selection modals (choose cost, offer) have been replaced with inline dropdowns.
  */
 
 import { getCharacterData, saveCharacter } from '../index.js';
@@ -97,6 +99,14 @@ const LEASH_BY_CLASS = Object.fromEntries(
     Object.entries(CLASS_META).map(([key, meta]) => [key, meta.leash])
 );
 
+// ─── Cost options for binding ──────────────────────────────
+
+const BIND_COST_OPTIONS = [
+    { value: 'boon', label: '1 Boon' },
+    { value: 'fatigue', label: '1 Fatigue' },
+    { value: 'memory', label: 'Memory' }
+];
+
 // ============================================================
 // HELPERS
 // ============================================================
@@ -140,9 +150,7 @@ function getLeashMax(spirit) {
 
 function getSpiritIcon(spirit) {
     const name = (spirit.name || '').toLowerCase();
-    // Custom icons
     if (spirit.icon) return spirit.icon;
-    // Auto-detect
     if (name.includes('wolf') || name.includes('hound')) return '🐺';
     if (name.includes('raven') || name.includes('crow')) return '🐦‍⬛';
     if (name.includes('serpent') || name.includes('snake') || name.includes('worm')) return '🐍';
@@ -445,6 +453,11 @@ export async function renderSummoning(el) {
     // Get global mood
     const mood = getMood(leash, leashMax);
 
+    // Bind cost options for dropdowns
+    const costOptionsHtml = BIND_COST_OPTIONS.map(opt =>
+        `<option value="${opt.value}">${opt.label}</option>`
+    ).join('');
+
     let html = `
         <div class="summoning-container" style="display:flex;flex-direction:column;gap:0.5rem;">
 
@@ -457,8 +470,11 @@ export async function renderSummoning(el) {
                         <span style="font-size:0.7rem;color:var(--text3);margin-left:0.3rem;">${spirits.length} bound</span>
                     </div>
                 </div>
-                <div style="display:flex;gap:0.3rem;flex-wrap:wrap;">
-                    <button class="btn btn-sm btn-gold" onclick="window.summonerBindRitual()">🔮 Bind Spirit</button>
+                <div style="display:flex;gap:0.3rem;flex-wrap:wrap;align-items:center;">
+                    <select id="summoner-bind-cost-select" style="font-size:0.65rem;background:var(--bg3);border:1px solid var(--border);border-radius:4px;padding:0.1rem 0.3rem;">
+                        ${costOptionsHtml}
+                    </select>
+                    <button class="btn btn-sm btn-gold" onclick="window.summonerBindRitualFromSelect()">🔮 Bind Spirit</button>
                     <button class="btn btn-sm btn-secondary" onclick="window.summonerRefresh()">🔄 Refresh</button>
                 </div>
             </div>
@@ -471,10 +487,13 @@ export async function renderSummoning(el) {
                         <span style="color:${mood.color};font-weight:600;">${mood.label}</span>
                         <span style="color:var(--text3);">🔗 ${leash}/${leashMax}</span>
                     </div>
-                    <div style="display:flex;gap:0.2rem;">
+                    <div style="display:flex;gap:0.2rem;align-items:center;">
                         <button class="btn btn-xs btn-secondary" onclick="window.summonerTickLeash(1)">+1</button>
                         <button class="btn btn-xs btn-secondary" onclick="window.summonerTickLeash(-1)">−1</button>
-                        <button class="btn btn-xs btn-ghost" onclick="window.summonerNegotiateLeash()" style="color:var(--gold);font-size:0.6rem;">🤝 Negotiate</button>
+                        <select id="summoner-negotiate-offer-select" style="font-size:0.6rem;background:var(--bg3);border:1px solid var(--border);border-radius:4px;padding:0.05rem 0.2rem;">
+                            ${costOptionsHtml}
+                        </select>
+                        <button class="btn btn-xs btn-gold" onclick="window.summonerNegotiateFromSelect()" style="font-size:0.6rem;">🤝 Negotiate</button>
                         <button class="btn btn-xs btn-ghost" onclick="window.summonerClearLeash()" style="color:var(--red);">✕</button>
                     </div>
                 </div>
@@ -555,7 +574,7 @@ export async function renderSummoning(el) {
 }
 
 // ============================================================
-// RENDER BESTIARY ENTRY
+// RENDER BESTIARY ENTRY (with dropdown for cost)
 // ============================================================
 
 function renderBestiaryEntry(spirit, char) {
@@ -571,6 +590,11 @@ function renderBestiaryEntry(spirit, char) {
 
     // Check if already bound
     const isBound = (char.boundSpirits || []).some(s => s.bestiaryId === id);
+
+    // Cost dropdown
+    const costOptions = BIND_COST_OPTIONS.map(opt =>
+        `<option value="${opt.value}">${opt.label}</option>`
+    ).join('');
 
     return `
         <div class="bestiary-entry" style="display:flex;align-items:center;gap:0.3rem;padding:0.15rem 0.3rem;border-bottom:1px solid var(--border);border-left:3px solid ${meta.color};background:var(--bg3);border-radius:3px;">
@@ -588,8 +612,11 @@ function renderBestiaryEntry(spirit, char) {
                     ${nature ? ` · ${getNatureIcon(nature)} ${escHtml(nature)}` : ''}
                 </div>
             </div>
-            <div style="display:flex;gap:0.2rem;flex-shrink:0;">
-                <button class="btn btn-xs ${isBound ? 'btn-secondary' : 'btn-gold'}" onclick="window.summonerBindFromBestiary('${escHtml(id)}')" ${isBound ? 'disabled' : ''}>
+            <div style="display:flex;gap:0.2rem;flex-shrink:0;align-items:center;">
+                <select class="bind-cost-select" style="font-size:0.55rem;background:var(--bg3);border:1px solid var(--border);border-radius:4px;padding:0.05rem 0.2rem;">
+                    ${costOptions}
+                </select>
+                <button class="btn btn-xs ${isBound ? 'btn-secondary' : 'btn-gold'} bind-btn" data-bestiary-id="${escHtml(id)}" ${isBound ? 'disabled' : ''}>
                     ${isBound ? '🔗 Bound' : '🔗 Bind'}
                 </button>
                 <button class="btn btn-xs btn-ghost" onclick="window.summonerViewSpirit('${escHtml(id)}')" title="View details" style="font-size:0.6rem;">📖</button>
@@ -599,7 +626,7 @@ function renderBestiaryEntry(spirit, char) {
 }
 
 // ============================================================
-// RENDER BOUND SPIRIT
+// RENDER BOUND SPIRIT (unchanged)
 // ============================================================
 
 function renderBoundSpirit(spirit, char) {
@@ -678,15 +705,26 @@ function attachSummoningEvents(el) {
             renderSummoning(el);
         });
     }
+
+    // Bind buttons: use the cost from the sibling select
+    el.querySelectorAll('.bind-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const bestiaryId = btn.dataset.bestiaryId;
+            const entry = btn.closest('.bestiary-entry');
+            const costSelect = entry.querySelector('.bind-cost-select');
+            const cost = costSelect ? costSelect.value : 'boon';
+            window.summonerBindFromBestiaryWithCost(bestiaryId, cost);
+        });
+    });
 }
 
 // ============================================================
-// GLOBAL FUNCTIONS
+// GLOBAL FUNCTIONS (exposed to onclick)
 // ============================================================
 
-// ─── Bind from Bestiary ──────────────────────────────────────
+// ─── Bind from Bestiary with cost (dropdown) ──────────────────
 
-window.summonerBindFromBestiary = async function(bestiaryId) {
+window.summonerBindFromBestiaryWithCost = async function(bestiaryId, cost) {
     const char = getCharacterData();
     if (!char) return;
 
@@ -706,31 +744,21 @@ window.summonerBindFromBestiary = async function(bestiaryId) {
         return;
     }
 
-    // Show the binding ritual
-    const cost = prompt(
-        `🔮 Binding Ritual: "${name}" (${meta.label})\n\n` +
-        `Services: ${(spiritData.services || []).join(', ')}\n` +
-        `Price: ${spiritData.price || 'Unknown'}\n\n` +
-        `Pay with: "boon" (1 Boon), "fatigue" (1 Fatigue), or "memory" (a memory of your choice)`,
-        'boon'
-    );
-    if (!cost) return;
-
-    const costLower = cost.toLowerCase();
-    if (!['boon', 'fatigue', 'memory'].includes(costLower)) {
-        showToast('Invalid cost. Enter "boon", "fatigue", or "memory".', 'error');
+    // Validate cost
+    if (!['boon', 'fatigue', 'memory'].includes(cost)) {
+        showToast('Invalid cost. Choose boon, fatigue, or memory.', 'error');
         return;
     }
 
     // Deduct cost
-    if (costLower === 'boon') {
+    if (cost === 'boon') {
         const boons = char.boons || 0;
         if (boons < 1) {
             showToast('Not enough Boons! You need 1 Boon.', 'error');
             return;
         }
         char.boons = boons - 1;
-    } else if (costLower === 'fatigue') {
+    } else if (cost === 'fatigue') {
         const fatigue = char.fatigue || 0;
         const maxFatigue = char.body || 1;
         if (fatigue >= maxFatigue) {
@@ -761,16 +789,20 @@ window.summonerBindFromBestiary = async function(bestiaryId) {
     char.boundSpirits.push(newSpirit);
     saveCharacter({ boundSpirits: char.boundSpirits, boons: char.boons, fatigue: char.fatigue });
 
-    showToast(`🔮 Bound "${name}"! The leash is set. (Paid with ${costLower})`, 'success');
+    showToast(`🔮 Bound "${name}"! The leash is set. (Paid with ${cost})`, 'success');
     renderSummoning(document.getElementById('summoning-container'));
 };
 
-// ─── Ritual Binding ──────────────────────────────────────────
+// ─── Ritual Binding with cost dropdown ──────────────────────
 
-window.summonerBindRitual = function() {
+window.summonerBindRitualFromSelect = function() {
     const char = getCharacterData();
     if (!char) return;
 
+    const costSelect = document.getElementById('summoner-bind-cost-select');
+    const cost = costSelect ? costSelect.value : 'boon';
+
+    // All other details still use prompts (name, nature, services, price, class)
     const name = prompt('🔮 Spirit name:');
     if (!name) return;
 
@@ -782,18 +814,16 @@ window.summonerBindRitual = function() {
     const cls = classInput.toUpperCase();
     const meta = CLASS_META[cls] || CLASS_META['II'];
 
-    const cost = prompt(
-        `Pay with: "boon" (1 Boon), "fatigue" (1 Fatigue), or "memory"`,
-        'boon'
-    );
-    if (!cost) return;
-    const costLower = cost.toLowerCase();
+    if (!['boon', 'fatigue', 'memory'].includes(cost)) {
+        showToast('Invalid cost. Choose boon, fatigue, or memory.', 'error');
+        return;
+    }
 
-    if (costLower === 'boon') {
+    if (cost === 'boon') {
         const boons = char.boons || 0;
         if (boons < 1) { showToast('Not enough Boons!', 'error'); return; }
         char.boons = boons - 1;
-    } else if (costLower === 'fatigue') {
+    } else if (cost === 'fatigue') {
         const fatigue = char.fatigue || 0;
         const maxFatigue = char.body || 1;
         if (fatigue >= maxFatigue) { showToast('Fatigue track full!', 'error'); return; }
@@ -841,30 +871,26 @@ window.summonerTickLeash = function(amount = 1) {
     renderSummoning(document.getElementById('summoning-container'));
 };
 
-window.summonerNegotiateLeash = function() {
+window.summonerNegotiateFromSelect = function() {
     const char = getCharacterData();
     if (!char) return;
 
-    const offer = prompt(
-        '🤝 Negotiate with the spirit.\n\n' +
-        'Offer: "boon" (pay 1 Boon), "fatigue" (take 1 Fatigue), or "memory" (offer a memory)\n' +
-        'This will reduce the leash tension by half.'
-    );
-    if (!offer) return;
+    const select = document.getElementById('summoner-negotiate-offer-select');
+    if (!select) return;
+    const offer = select.value;
 
-    const offerLower = offer.toLowerCase();
-    if (!['boon', 'fatigue', 'memory'].includes(offerLower)) {
-        showToast('Invalid offer. Enter "boon", "fatigue", or "memory".', 'error');
+    if (!['boon', 'fatigue', 'memory'].includes(offer)) {
+        showToast('Invalid offer. Choose boon, fatigue, or memory.', 'error');
         return;
     }
 
     let accepted = false;
-    if (offerLower === 'boon') {
+    if (offer === 'boon') {
         const boons = char.boons || 0;
         if (boons < 1) { showToast('Not enough Boons!', 'error'); return; }
         char.boons = boons - 1;
         accepted = true;
-    } else if (offerLower === 'fatigue') {
+    } else if (offer === 'fatigue') {
         const fatigue = char.fatigue || 0;
         const maxFatigue = char.body || 1;
         if (fatigue >= maxFatigue) { showToast('Fatigue track full!', 'error'); return; }
@@ -1070,6 +1096,42 @@ window.summonerRefresh = function() {
     const el = document.getElementById('summoning-container');
     if (el) renderSummoning(el);
     showToast('🔄 Summoning refreshed.', 'info');
+};
+
+// ─── Backward Compatibility (redirect old functions) ──────
+
+// Keep the old function names but redirect to the new ones with a default cost
+window.summonerBindFromBestiary = async function(bestiaryId) {
+    // Default to 'boon' but warn the user
+    showToast('Please use the dropdown to select a cost.', 'info');
+    // We could also fallback to prompt, but we want to eliminate modals.
+    // Instead, we'll just show a message.
+    // Better: we can automatically use 'boon' but that's not ideal.
+    // We'll remove this function and rely on the new button.
+    // But to avoid breakage, we'll redirect to the new function with 'boon'.
+    await window.summonerBindFromBestiaryWithCost(bestiaryId, 'boon');
+};
+
+// Legacy function for ritual binding without dropdown – we keep it but it uses prompt,
+// which we are deprecating. We'll redirect to the new function with a default cost.
+window.summonerBindRitual = function() {
+    // Use the dropdown if present, else fallback to prompt.
+    const select = document.getElementById('summoner-bind-cost-select');
+    if (select) {
+        window.summonerBindRitualFromSelect();
+    } else {
+        showToast('Please refresh the panel to use the dropdown.', 'info');
+    }
+};
+
+// Legacy negotiate – redirect to new function
+window.summonerNegotiateLeash = function() {
+    const select = document.getElementById('summoner-negotiate-offer-select');
+    if (select) {
+        window.summonerNegotiateFromSelect();
+    } else {
+        showToast('Please refresh the panel to use the dropdown.', 'info');
+    }
 };
 
 // ============================================================

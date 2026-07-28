@@ -44,7 +44,7 @@
   "rites": [
     {
       "name": "Rite of the Lucky Coin",
-      "tier": "Basic",
+      "tier": "Low",
       "xp": 4,
       "action": "Instant",
       "range": "Self",
@@ -60,7 +60,7 @@
     },
     {
       "name": "Rite of the Clever Hand",
-      "tier": "Basic",
+      "tier": "Low",
       "xp": 5,
       "action": "Scene",
       "range": "Self",
@@ -76,7 +76,7 @@
     },
     {
       "name": "Rite of the Quick Exit",
-      "tier": "Basic",
+      "tier": "Low",
       "xp": 4,
       "action": "Instant",
       "range": "Self",
@@ -92,7 +92,7 @@
     },
     {
       "name": "Rite of the Plan That Never Fails",
-      "tier": "Advanced",
+      "tier": "Standard",
       "xp": 8,
       "action": "Scene",
       "range": "Zone",
@@ -108,7 +108,7 @@
     },
     {
       "name": "Rite of the Crowd's Distraction",
-      "tier": "Advanced",
+      "tier": "Standard",
       "xp": 7,
       "action": "Scene",
       "range": "Near",
@@ -124,7 +124,7 @@
     },
     {
       "name": "Rite of the Unseen Hand",
-      "tier": "Advanced",
+      "tier": "Standard",
       "xp": 9,
       "action": "Instant",
       "range": "Touch",
@@ -140,7 +140,7 @@
     },
     {
       "name": "Rite of the Magpie's Hoard",
-      "tier": "Master",
+      "tier": "High",
       "xp": 13,
       "action": "Scene",
       "range": "Self",
@@ -156,7 +156,7 @@
     },
     {
       "name": "Rite of the Unpayable Debt",
-      "tier": "Master",
+      "tier": "High",
       "xp": 14,
       "action": "Scene",
       "range": "Near",

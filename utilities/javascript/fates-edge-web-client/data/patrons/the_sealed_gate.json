@@ -46,7 +46,7 @@
   "rites": [
     {
       "name": "Rite of the Sealed Threshold",
-      "tier": "Basic",
+      "tier": "Low",
       "xp": 4,
       "action": "Scene",
       "range": "Touch",
@@ -62,7 +62,7 @@
     },
     {
       "name": "Rite of the Key's Rebuke",
-      "tier": "Basic",
+      "tier": "Low",
       "xp": 5,
       "action": "Instant",
       "range": "Near",
@@ -78,7 +78,7 @@
     },
     {
       "name": "Rite of the Circle of Denial",
-      "tier": "Advanced",
+      "tier": "Standard",
       "xp": 8,
       "action": "Scene",
       "range": "Zone",
@@ -94,7 +94,7 @@
     },
     {
       "name": "Rite of the Writ of Passage",
-      "tier": "Advanced",
+      "tier": "Standard",
       "xp": 7,
       "action": "Scene",
       "range": "Zone",
@@ -110,7 +110,7 @@
     },
     {
       "name": "Rite of the Banishment Knot",
-      "tier": "Master",
+      "tier": "High",
       "xp": 13,
       "action": "Instant",
       "range": "Near",
@@ -126,7 +126,7 @@
     },
     {
       "name": "Rite of the Consecrated Barrier",
-      "tier": "Master",
+      "tier": "High",
       "xp": 14,
       "action": "Extended",
       "range": "Zone",

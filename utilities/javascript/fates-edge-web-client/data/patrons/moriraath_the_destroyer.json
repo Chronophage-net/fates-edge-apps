@@ -55,7 +55,7 @@
   "rites": [
     {
       "name": "Rite of the Perfect Ending",
-      "tier": "Basic",
+      "tier": "Low",
       "xp": 4,
       "action": "Instant",
       "range": "Touch",
@@ -71,7 +71,7 @@
     },
     {
       "name": "Rite of the Unmaking Gaze",
-      "tier": "Basic",
+      "tier": "Low",
       "xp": 5,
       "action": "Scene",
       "range": "Self",
@@ -87,7 +87,7 @@
     },
     {
       "name": "Rite of the Cleansing Flame",
-      "tier": "Advanced",
+      "tier": "Standard",
       "xp": 8,
       "action": "Scene",
       "range": "Zone",
@@ -103,7 +103,7 @@
     },
     {
       "name": "Rite of the Absolute Negation",
-      "tier": "Advanced",
+      "tier": "Standard",
       "xp": 9,
       "action": "Instant",
       "range": "Near",
@@ -119,7 +119,7 @@
     },
     {
       "name": "Rite of the Unraveling Inferno",
-      "tier": "Master",
+      "tier": "High",
       "xp": 13,
       "action": "Scene",
       "range": "Touch",
@@ -135,7 +135,7 @@
     },
     {
       "name": "Rite of the Final Pyre",
-      "tier": "Master",
+      "tier": "High",
       "xp": 14,
       "action": "Extended",
       "range": "Zone",

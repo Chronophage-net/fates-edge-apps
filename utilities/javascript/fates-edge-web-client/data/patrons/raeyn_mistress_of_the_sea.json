@@ -55,7 +55,7 @@
   "rites": [
     {
       "name": "Rite of the Wave_Tide",
-      "tier": "Basic",
+      "tier": "Low",
       "xp": 5,
       "action": "Scene",
       "range": "Self",
@@ -71,7 +71,7 @@
     },
     {
       "name": "Rite of the Changing Tide",
-      "tier": "Advanced",
+      "tier": "Standard",
       "xp": 8,
       "action": "Scene",
       "range": "Zone",
@@ -87,7 +87,7 @@
     },
     {
       "name": "Rite of the Wave_Road Consecration",
-      "tier": "Advanced",
+      "tier": "Standard",
       "xp": 7,
       "action": "Scene",
       "range": "Route",
@@ -103,7 +103,7 @@
     },
     {
       "name": "Rite of the Storm_Queen's Hand",
-      "tier": "Master",
+      "tier": "High",
       "xp": 13,
       "action": "Scene",
       "range": "Zone",
@@ -119,7 +119,7 @@
     },
     {
       "name": "Rite of the Mother's Wrath",
-      "tier": "Master",
+      "tier": "High",
       "xp": 14,
       "action": "Extended",
       "range": "Zone",

@@ -59,7 +59,7 @@
   "rites": [
     {
       "name": "Rite of the Overflowing Cup",
-      "tier": "Basic",
+      "tier": "Low",
       "xp": 4,
       "action": "Scene",
       "range": "Near",
@@ -75,7 +75,7 @@
     },
     {
       "name": "Rite of the Horned Dance",
-      "tier": "Basic",
+      "tier": "Low",
       "xp": 5,
       "action": "Scene",
       "range": "Self",
@@ -91,7 +91,7 @@
     },
     {
       "name": "Rite of the Breaking Mask",
-      "tier": "Advanced",
+      "tier": "Standard",
       "xp": 7,
       "action": "Instant",
       "range": "Near",
@@ -107,7 +107,7 @@
     },
     {
       "name": "Rite of the Wild Procession",
-      "tier": "Advanced",
+      "tier": "Standard",
       "xp": 9,
       "action": "Scene",
       "range": "Zone",
@@ -123,7 +123,7 @@
     },
     {
       "name": "Rite of the Endless Feast",
-      "tier": "Master",
+      "tier": "High",
       "xp": 14,
       "action": "Scene",
       "range": "Zone",
@@ -139,7 +139,7 @@
     },
     {
       "name": "Rite of the Reveler's Apotheosis",
-      "tier": "Master",
+      "tier": "High",
       "xp": 15,
       "action": "Extended",
       "range": "Touch",

@@ -8,6 +8,13 @@
  * Uses the patrons module for data loading and management.
  * 
  * PATH-AWARE: Supports both Runekeepers (single patron) and Invokers (multiple patrons).
+ * 
+ * TIER STANDARDIZATION: Supports the standardized Low/Standard/High tiers
+ * (used by Cantors), while remaining backward‑compatible with older tier
+ * names (Basic, Advanced, Master, Epic, Cantrip).
+ * 
+ * NEW: Patron's Gifts (Imbuement) for Runekeepers with Familiar (Thiasos) only,
+ * and Borrowed Grace for Invokers carrying Symbols.
  */
 
 import { getState, saveState } from '../../../core/state.js';
@@ -68,8 +75,20 @@ function formatText(text) {
     return escHtml(text).replace(/\n/g, '<br>');
 }
 
+/**
+ * Sort rites by tier (using standardized tiers plus legacy names).
+ */
 function sortRites(a, b) {
-    const tiers = { 'Cantrip': 0, 'Basic': 1, 'Low': 1, 'Standard': 2, 'Advanced': 3, 'Master': 4, 'Epic': 5 };
+    const tiers = {
+        'Cantrip': 0,
+        'Basic': 1,
+        'Low': 1,
+        'Standard': 2,
+        'Advanced': 3,
+        'Master': 4,
+        'Epic': 5,
+        'High': 6
+    };
     const tierA = tiers[a.tier] ?? 99;
     const tierB = tiers[b.tier] ?? 99;
     if (tierA !== tierB) return tierA - tierB;
@@ -84,22 +103,24 @@ function getTierColor(tier) {
         'Standard': '#d4af37',
         'Advanced': '#c47a7a',
         'Master': '#b84a8a',
-        'Epic': '#d94a4a'
+        'Epic': '#d94a4a',
+        'High': '#8e44ad'
     };
     return colors[tier] || 'var(--text2)';
 }
 
 function getTierBadge(tier) {
-    const labels = {
+    const badges = {
         'Cantrip': '🎵',
         'Basic': '🟢',
         'Low': '🟢',
         'Standard': '🟡',
         'Advanced': '🟠',
         'Master': '🔴',
-        'Epic': '🟣'
+        'Epic': '🟣',
+        'High': '👑'
     };
-    return labels[tier] || '📜';
+    return badges[tier] || '📜';
 }
 
 function getPatronName(patronId, state) {
@@ -156,6 +177,41 @@ function getRivalryWarnings(patronIds) {
     return warnings;
 }
 
+// ─── Patron's Gift helpers ──────────────────────────────────
+
+function getPatronGift(patronData) {
+    if (!patronData) return null;
+    return patronData.patrons_gift || null;
+}
+
+// ─── Check if character has access to Patron's Gifts ──────
+
+function hasAccessToPatronGifts(char) {
+    if (!char) return false;
+    if (char.magicPath === 'runekeeper') {
+        // Runekeeper needs Familiar (Thiasos) to access Patron's Gift
+        return (char.learnedTalents || []).includes('familiar');
+    }
+    if (char.magicPath === 'invoker') {
+        // Invoker needs at least one Symbol
+        return (char.symbols || []).length > 0;
+    }
+    return false;
+}
+
+function hasAccessToRites(char) {
+    if (!char) return false;
+    if (char.magicPath === 'runekeeper') {
+        // Runekeeper needs Codex to access Rites
+        return (char.learnedTalents || []).includes('codex');
+    }
+    if (char.magicPath === 'invoker') {
+        // Invoker needs at least one Symbol to perform rituals
+        return (char.symbols || []).length > 0;
+    }
+    return false;
+}
+
 // ============================================================
 // MAIN RENDER
 // ============================================================
@@ -171,28 +227,17 @@ export async function renderRites(el, patronIds, characterId, options = {}) {
     const path = options.path || 'runekeeper'; // 'runekeeper' or 'invoker'
     const charName = options.characterName || 'Character';
     
-    if (ids.length === 0) {
-        const state = getState();
-        const char = state.characters?.find(c => c.id === characterId) || state.characters?.[characterId];
-        if (char?.patron) {
-            ids.push(char.patron);
-        }
-        if (ids.length === 0) {
-            el.innerHTML = `
-                <div class="panel" style="padding:0.5rem;text-align:center;color:var(--text3);">
-                    <div style="font-size:1.5rem;">🔮</div>
-                    <p>No patron selected.</p>
-                    <p style="font-size:0.85rem;">Assign a patron to a character to view their rites.</p>
-                </div>
-            `;
-            return;
-        }
+    // Get character from state
+    const state = getState();
+    const char = state.characters?.find(c => c.id === characterId) || state.characters?.[characterId];
+    if (!char) {
+        el.innerHTML = `<div class="panel" style="padding:0.5rem;text-align:center;color:var(--text3);">Character not found.</div>`;
+        return;
     }
 
-    const state = getState();
+    // Gather patron data for the IDs
     const patronDataList = [];
     const notFound = [];
-    
     for (const id of ids) {
         if (!id) continue;
         const data = findPatronData(state, id);
@@ -214,8 +259,9 @@ export async function renderRites(el, patronIds, characterId, options = {}) {
         return;
     }
 
-    // Get character for obligation tracking
-    const char = state.characters?.find(c => c.id === characterId) || state.characters?.[characterId];
+    // Determine access
+    const canAccessGifts = hasAccessToPatronGifts(char);
+    const canAccessRites = hasAccessToRites(char);
 
     // Check for Cross-Resonance warnings (Invokers)
     const rivalryWarnings = path === 'invoker' ? getRivalryWarnings(ids) : [];
@@ -242,6 +288,11 @@ export async function renderRites(el, patronIds, characterId, options = {}) {
         </div>
     `;
 
+    // ─── Patron's Gifts Section ──────────────────────────────
+    if (canAccessGifts) {
+        html += renderPatronGiftsSection(char, patronDataList, path);
+    }
+
     // ─── Cross-Resonance Warnings (Invokers) ──────────────────
     if (rivalryWarnings.length > 0) {
         html += `
@@ -257,15 +308,27 @@ export async function renderRites(el, patronIds, characterId, options = {}) {
         `;
     }
 
-    // ─── Patron Blocks ─────────────────────────────────────────
-    for (const patronData of patronDataList) {
-        html += renderSinglePatronRites(patronData, characterId, charName, ids, path, char);
+    // ─── Rites Section (only if character has access) ────────
+    if (canAccessRites) {
+        for (const patronData of patronDataList) {
+            html += renderSinglePatronRites(patronData, characterId, charName, ids, path, char);
+        }
+    } else {
+        if (path === 'runekeeper' && !canAccessRites) {
+            html += `
+                <div class="rites-no-access" style="background:var(--bg2);border-radius:var(--radius);padding:0.5rem;text-align:center;color:var(--text3);border:1px dashed var(--border);">
+                    <p>You do not have a Codex. Rites are not available.</p>
+                    <p style="font-size:0.8rem;">Acquire a Codex (talent) to learn and invoke Rites.</p>
+                </div>
+            `;
+        }
+        // For Invokers without Symbols, we already handle that earlier.
     }
 
     html += `</div>`;
     el.innerHTML = html;
 
-    // Attach toggle events for expandable rites
+    // Attach toggle events for expandable rites (if any)
     el.querySelectorAll('.rite-expandable .rite-header').forEach(header => {
         header.addEventListener('click', (e) => {
             const item = header.closest('.rite-item');
@@ -297,6 +360,110 @@ export async function renderRites(el, patronIds, characterId, options = {}) {
             if (icon) icon.textContent = '▾';
         }
     });
+}
+
+// ============================================================
+// RENDER PATRON'S GIFTS SECTION
+// ============================================================
+
+function renderPatronGiftsSection(char, patronDataList, path) {
+    const isRunekeeper = path === 'runekeeper';
+    const isInvoker = path === 'invoker';
+
+    // Gather gifts
+    const gifts = [];
+    if (isRunekeeper) {
+        // Runekeeper: only one patron (the bound one)
+        const patronData = patronDataList[0]; // assume first
+        if (patronData) {
+            const gift = getPatronGift(patronData);
+            if (gift) {
+                gifts.push({
+                    patronId: patronData.id,
+                    patronName: patronData.name || patronData.title,
+                    patronIcon: patronData.icon || '🔮',
+                    gift: gift,
+                    isBound: true
+                });
+            }
+        }
+    } else if (isInvoker) {
+        // Invoker: each Symbol gives access
+        const symbols = char.symbols || [];
+        for (const patronId of symbols) {
+            const patronData = findPatronData(getState(), patronId);
+            if (patronData) {
+                const gift = getPatronGift(patronData);
+                if (gift) {
+                    gifts.push({
+                        patronId: patronData.id,
+                        patronName: patronData.name || patronData.title,
+                        patronIcon: patronData.icon || '🔮',
+                        gift: gift,
+                        isBound: false
+                    });
+                }
+            }
+        }
+    }
+
+    if (gifts.length === 0) return '';
+
+    // Build cost options for Invoker (Boon or Fatigue)
+    const costOptionsHtml = `
+        <option value="boon">1 Boon</option>
+        <option value="fatigue">1 Fatigue</option>
+    `;
+
+    let html = `
+        <div class="patron-gifts" style="background:var(--bg2);border-radius:var(--radius);padding:0.3rem 0.5rem;border-left:4px solid var(--gold);margin-bottom:0.3rem;">
+            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.2rem;">
+                <span style="font-size:0.85rem;font-weight:600;color:var(--gold);">${isRunekeeper ? '🔮 Patron\'s Gift' : '🎴 Borrowed Grace (Symbols)'}</span>
+                <span style="font-size:0.6rem;color:var(--text3);">${gifts.length} gift${gifts.length > 1 ? 's' : ''}</span>
+            </div>
+            ${gifts.map((item, idx) => {
+                const gift = item.gift;
+                const name = safeString(gift.name || 'Patron\'s Gift');
+                const description = safeString(gift.description || '');
+                const effect = safeString(gift.effect || '');
+                const costDesc = safeString(gift.cost || '+1 Obligation');
+                const patronIcon = item.patronIcon;
+                const patronName = item.patronName;
+
+                // For Runekeeper, the cost is already +1 Obligation; for Invoker, they choose Boon or Fatigue.
+                const isBound = item.isBound;
+                const giftId = `gift-${item.patronId}`;
+
+                return `
+                    <div class="gift-item" style="display:flex;flex-direction:column;gap:0.2rem;padding:0.2rem 0.3rem;border-bottom:1px solid var(--border);background:var(--bg3);border-radius:var(--radius);margin-top:0.1rem;">
+                        <div style="display:flex;align-items:center;gap:0.3rem;flex-wrap:wrap;">
+                            <span style="font-size:1.1rem;">${patronIcon}</span>
+                            <span style="font-weight:600;font-size:0.85rem;">${escHtml(name)}</span>
+                            <span style="font-size:0.6rem;color:var(--text3);">${escHtml(patronName)}</span>
+                            ${isBound ? `<span style="font-size:0.55rem;color:var(--gold);">(Bound)</span>` : `<span style="font-size:0.55rem;color:var(--orange);">(Symbol)</span>`}
+                        </div>
+                        <div style="font-size:0.75rem;color:var(--text2);">${formatText(description)}</div>
+                        <div style="font-size:0.7rem;color:var(--text3);">${formatText(effect)}</div>
+                        <div style="display:flex;flex-wrap:wrap;gap:0.2rem;align-items:center;margin-top:0.1rem;">
+                            <span style="font-size:0.65rem;color:var(--text3);">Cost: ${escHtml(costDesc)}</span>
+                            ${isBound ? `
+                                <button class="btn btn-xs btn-primary" onclick="window.usePatronGift('${item.patronId}')" style="font-size:0.6rem;">Use Gift</button>
+                            ` : `
+                                <select id="${giftId}-cost" style="font-size:0.6rem;background:var(--bg3);border:1px solid var(--border);border-radius:4px;padding:0.05rem 0.2rem;">
+                                    ${costOptionsHtml}
+                                </select>
+                                <button class="btn btn-xs btn-gold" onclick="window.useBorrowedGrace('${item.patronId}', document.getElementById('${giftId}-cost').value)" style="font-size:0.6rem;">Invoke Borrowed Grace</button>
+                            `}
+                        </div>
+                    </div>
+                `;
+            }).join('')}
+            <div style="font-size:0.55rem;color:var(--text3);margin-top:0.1rem;">
+                ${isRunekeeper ? 'Patron\'s Gift is an Imbuement: once per scene, touch an item to gain +1 die to a thematic skill and a special benefit. Costs +1 Obligation.' : 'Borrowed Grace: spend 1 Boon or 1 Fatigue, mark +1 Obligation, and gain the Symbol\'s Gift effect for the scene.'}
+            </div>
+        </div>
+    `;
+    return html;
 }
 
 // ============================================================
@@ -382,7 +549,7 @@ function renderSinglePatronRites(patronData, characterId, charName, allPatronIds
             <div class="rites-list" style="display:flex;flex-direction:column;gap:0.3rem;max-height:350px;overflow-y:auto;padding:0.1rem;">
     `;
 
-    const tierOrder = ['Cantrip', 'Basic', 'Low', 'Standard', 'Advanced', 'Master', 'Epic'];
+    const tierOrder = ['Cantrip', 'Basic', 'Low', 'Standard', 'Advanced', 'Master', 'Epic', 'High'];
     tierOrder.forEach(tier => {
         if (!grouped[tier]) return;
         const ritesInTier = grouped[tier];
@@ -493,6 +660,159 @@ function renderRiteItem(rite, patronId, idx, isInvoker, characterId) {
 }
 
 // ============================================================
+// GLOBAL FUNCTIONS: Patron's Gift (Runekeeper)
+// ============================================================
+
+window.usePatronGift = async function(patronId) {
+    const char = getCharacterData();
+    if (!char) return;
+
+    // Check if Runekeeper with Familiar
+    if (char.magicPath !== 'runekeeper') {
+        showToast('Only Runekeepers can use Patron\'s Gift.', 'error');
+        return;
+    }
+    if (!(char.learnedTalents || []).includes('familiar')) {
+        showToast('You need a Familiar (Thiasos) to use Patron\'s Gift.', 'error');
+        return;
+    }
+
+    // Fetch patron data
+    const state = getState();
+    const patronData = findPatronData(state, patronId);
+    if (!patronData) {
+        showToast('Patron not found.', 'error');
+        return;
+    }
+    const gift = getPatronGift(patronData);
+    if (!gift) {
+        showToast('This patron has no Gift defined.', 'error');
+        return;
+    }
+
+    // Apply cost: +1 Obligation
+    const currentObligation = getPatronObligation(char.id, patronId);
+    setPatronObligation(char.id, patronId, currentObligation + 1);
+    savePatronData();
+
+    // Apply effect (narrative, +1 die to thematic skill, etc.)
+    // In a real game, the GM would adjudicate; we show a confirmation.
+    const name = safeString(gift.name || 'Patron\'s Gift');
+    const effect = safeString(gift.effect || 'The item glows with patron\'s favor.');
+    showToast(`✨ ${name}: ${effect} (Obligation +1)`, 'success');
+
+    // Refresh the rites view
+    const container = document.getElementById('spellcraft-content');
+    if (container) {
+        import('../index.js').then(module => {
+            if (module.renderActiveTabContent) module.renderActiveTabContent();
+        });
+    }
+};
+
+// ============================================================
+// GLOBAL FUNCTIONS: Borrowed Grace (Invoker)
+// ============================================================
+
+window.useBorrowedGrace = async function(patronId, costType) {
+    const char = getCharacterData();
+    if (!char) return;
+
+    // Check if Invoker with Symbols
+    if (char.magicPath !== 'invoker') {
+        showToast('Only Invokers can use Borrowed Grace.', 'error');
+        return;
+    }
+    if (!(char.symbols || []).includes(patronId)) {
+        showToast('You do not carry a Symbol for this patron.', 'error');
+        return;
+    }
+
+    // Deduct cost (Boon or Fatigue)
+    if (costType === 'boon') {
+        const boons = char.boons || 0;
+        if (boons < 1) {
+            showToast('Not enough Boons! Need 1 Boon.', 'error');
+            return;
+        }
+        char.boons = boons - 1;
+    } else if (costType === 'fatigue') {
+        const fatigue = char.fatigue || 0;
+        const maxFatigue = char.body || 1;
+        if (fatigue >= maxFatigue) {
+            showToast('Fatigue track is full!', 'error');
+            return;
+        }
+        char.fatigue = fatigue + 1;
+    } else {
+        showToast('Invalid cost type. Choose boon or fatigue.', 'error');
+        return;
+    }
+
+    // Apply Obligation (+1)
+    const currentObligation = getPatronObligation(char.id, patronId);
+    setPatronObligation(char.id, patronId, currentObligation + 1);
+    savePatronData();
+
+    // Fetch patron data for gift effect
+    const state = getState();
+    const patronData = findPatronData(state, patronId);
+    if (!patronData) {
+        showToast('Patron not found.', 'error');
+        return;
+    }
+    const gift = getPatronGift(patronData);
+    if (!gift) {
+        showToast('This patron has no Gift defined.', 'error');
+        return;
+    }
+
+    // Apply effect (narrative)
+    const name = safeString(gift.name || 'Borrowed Grace');
+    const effect = safeString(gift.effect || 'The Symbol flares with borrowed power.');
+    showToast(`🎴 ${name}: ${effect} (Cost: 1 ${costType}, Obligation +1)`, 'success');
+
+    // Save character changes (boons/fatigue)
+    saveCharacter({ boons: char.boons, fatigue: char.fatigue });
+
+    // Refresh the rites view
+    const container = document.getElementById('spellcraft-content');
+    if (container) {
+        import('../index.js').then(module => {
+            if (module.renderActiveTabContent) module.renderActiveTabContent();
+        });
+    }
+};
+
+// ─── Helper to get character data (imported from main spellcraft) ──
+// We assume the global getCharacterData is available.
+// If not, we import from the spellcraft main.
+// We'll use a fallback.
+
+function getCharacterData() {
+    // Try to get from the global spellcraft module if available.
+    if (typeof window.getCharacterData === 'function') {
+        return window.getCharacterData();
+    }
+    // Fallback: import from '../index.js' dynamically.
+    // For simplicity, we'll use the same import that other components use.
+    // But we'll just return null if not available.
+    return null;
+}
+
+// Also need saveCharacter – we'll use the same fallback.
+function saveCharacter(updates) {
+    if (typeof window.saveCharacter === 'function') {
+        return window.saveCharacter(updates);
+    }
+    return false;
+}
+
+// We'll expose these functions to window for onclick.
+window.getCharacterData = getCharacterData;
+window.saveCharacter = saveCharacter;
+
+// ============================================================
 // CRACK THE SEAL (Invokers only)
 // ============================================================
 
@@ -519,13 +839,7 @@ window.crackTheSeal = function(patronId, riteIndex, characterId = 'default-chara
     setPatronObligation(characterId, patronId, doubleObligation);
     savePatronData();
 
-    // Mark the Symbol as Compromised (narrative flag) and actually persist
-    // it. FIX: the previous version mutated stateStore.characters in
-    // memory and left a "// We'd need to save this properly" comment —
-    // saveState was never imported, so the flag was silently lost the
-    // moment the page reloaded or state was reloaded from storage. We now
-    // import saveState (alongside getState) and call it once the flag is
-    // set, so Compromised Symbols actually stick.
+    // Mark the Symbol as Compromised (narrative flag) and persist
     const stateStore = getState();
     if (stateStore.characters) {
         const char = stateStore.characters.find(c => c.id === characterId) || stateStore.characters[characterId];

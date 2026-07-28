@@ -54,7 +54,7 @@
   "rites": [
     {
       "name": "Hearth-Thread Knot",
-      "tier": "Basic",
+      "tier": "Low",
       "xp": 5,
       "action": "Scene",
       "range": "Near",
@@ -70,7 +70,7 @@
     },
     {
       "name": "Snaring Filament",
-      "tier": "Basic",
+      "tier": "Low",
       "xp": 5,
       "action": "Scene",
       "range": "Zone",
@@ -86,7 +86,7 @@
     },
     {
       "name": "Strand of Inevitability",
-      "tier": "Advanced",
+      "tier": "Standard",
       "xp": 8,
       "action": "Scene",
       "range": "Near",
@@ -102,7 +102,7 @@
     },
     {
       "name": "Weaver's Glance",
-      "tier": "Advanced",
+      "tier": "Standard",
       "xp": 7,
       "action": "Instant",
       "range": "Self",
@@ -118,7 +118,7 @@
     },
     {
       "name": "Spinner's Debt",
-      "tier": "Advanced",
+      "tier": "Standard",
       "xp": 9,
       "action": "Scene",
       "range": "Near",
@@ -134,7 +134,7 @@
     },
     {
       "name": "Binding Knot",
-      "tier": "Master",
+      "tier": "High",
       "xp": 11,
       "action": "Scene",
       "range": "Near",
@@ -150,7 +150,7 @@
     },
     {
       "name": "Merciful Severing",
-      "tier": "Master",
+      "tier": "High",
       "xp": 13,
       "action": "Scene",
       "range": "Touch",
@@ -166,7 +166,7 @@
     },
     {
       "name": "Web of Slumber",
-      "tier": "Master",
+      "tier": "High",
       "xp": 12,
       "action": "Extended",
       "range": "Zone",
