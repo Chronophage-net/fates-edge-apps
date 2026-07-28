@@ -430,6 +430,77 @@ async function fetchRegionData(regionName) {
 }
 
 // ============================================================
+// RICH TEXT RENDERING (plain text → nice HTML, composed from
+// sub-components at display time — same approach used in Adventure
+// Manager and the VTT chat, and for the same reason: card flavor text
+// carries inline <em> tags and [Bracket: ...] annotations baked into
+// the region JSON, and region overview fields (tagline, mood, lore...)
+// are plain prose that should be escaped, not trusted as raw HTML.
+// Kept as a local, self-contained copy rather than importing from
+// another feature, matching how this pattern is duplicated elsewhere
+// in the codebase (e.g. combat.js's own ADVERSARY_MOVES).
+// ============================================================
+
+const RICH_TEXT_ALLOWED_TAGS = ['em', 'strong', 'i', 'b'];
+
+function escHtmlLocal(text) {
+    return String(text)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+}
+
+// Escapes everything EXCEPT the small whitelist of inline tags already
+// used in card flavor text, so a stray "<" in plain prose still gets
+// neutered but an authored "<em>...</em>" renders as emphasis instead
+// of literal "&lt;em&gt;" text.
+function escapeKeepingAllowedTags(text) {
+    const stashed = [];
+    const tagPattern = new RegExp(`</?(?:${RICH_TEXT_ALLOWED_TAGS.join('|')})>`, 'gi');
+    const withPlaceholders = String(text).replace(tagPattern, (match) => {
+        stashed.push(match);
+        return `\u0000${stashed.length - 1}\u0000`;
+    });
+    let escaped = escHtmlLocal(withPlaceholders);
+    escaped = escaped.replace(/\u0000(\d+)\u0000/g, (_, i) => stashed[Number(i)]);
+    return escaped;
+}
+
+// "[Label: detail]" → a small styled chip, instead of literal square
+// brackets sitting in the middle of a sentence.
+function renderBracketChips(html) {
+    return html.replace(/\[([A-Za-z][A-Za-z ]{0,20}):\s*([^\]]+)\]/g, (match, label, detail) => `
+        <span style="display:inline-block;margin:0.15rem 0.25rem 0.15rem 0;padding:0.05rem 0.5rem;background:var(--bg4);border-radius:10px;border-left:2px solid var(--gold);font-size:0.85em;">
+            <strong style="color:var(--gold);">${label}:</strong> ${detail}
+        </span>
+    `);
+}
+
+// "**bold**" (used by Ace Effect text) → real <strong>.
+function renderMarkdownBold(html) {
+    return html.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+}
+
+// Formats a single card-meaning string (region flavor + inline <em> +
+// [Bracket] annotations) into nicely structured HTML.
+function renderCardText(text) {
+    if (!text) return '';
+    return renderBracketChips(renderMarkdownBold(escapeKeepingAllowedTags(text)));
+}
+
+// Formats a full synthesis string — one or more \n\n-separated entries
+// (a multi-card draw, or a Crown Spread's Root/Crest/Crown/Left/
+// Wildcard/Timer/Ace-Effect segments) — as separate styled paragraphs
+// instead of one dense blob that only visually breaks on raw newlines.
+function renderSynthesisHtml(text) {
+    if (!text) return '';
+    const paragraphs = String(text).split(/\n\s*\n/).map(p => p.trim()).filter(Boolean);
+    return paragraphs.map(p => `<p style="margin:0.4rem 0;line-height:1.5;">${renderCardText(p)}</p>`).join('');
+}
+
+// ============================================================
 // HELPERS
 // ============================================================
 
@@ -457,14 +528,14 @@ function transformRegionData(raw) {
 
     if (raw.overview) {
         let desc = '';
-        if (raw.overview.tagline) desc += `<p><em>${raw.overview.tagline}</em></p>`;
-        if (raw.overview.genre) desc += `<p><strong>Genre:</strong> ${raw.overview.genre}</p>`;
-        if (raw.overview.mood) desc += `<p><strong>Mood:</strong> ${raw.overview.mood}</p>`;
-        if (raw.overview.starting_location) desc += `<p><strong>Starting Location:</strong> ${raw.overview.starting_location}</p>`;
+        if (raw.overview.tagline) desc += `<p><em>${escHtmlLocal(raw.overview.tagline)}</em></p>`;
+        if (raw.overview.genre) desc += `<p><strong>Genre:</strong> ${escHtmlLocal(raw.overview.genre)}</p>`;
+        if (raw.overview.mood) desc += `<p><strong>Mood:</strong> ${escHtmlLocal(raw.overview.mood)}</p>`;
+        if (raw.overview.starting_location) desc += `<p><strong>Starting Location:</strong> ${escHtmlLocal(raw.overview.starting_location)}</p>`;
         if (raw.overview.lore) {
-            if (raw.overview.lore.history) desc += `<p>${raw.overview.lore.history}</p>`;
-            if (raw.overview.lore.first_notice) desc += `<p><strong>What you notice first:</strong> ${raw.overview.lore.first_notice}</p>`;
-            if (raw.overview.lore.rule_that_kills) desc += `<p><strong>Rule that kills:</strong> ${raw.overview.lore.rule_that_kills}</p>`;
+            if (raw.overview.lore.history) desc += `<p>${escHtmlLocal(raw.overview.lore.history)}</p>`;
+            if (raw.overview.lore.first_notice) desc += `<p><strong>What you notice first:</strong> ${escHtmlLocal(raw.overview.lore.first_notice)}</p>`;
+            if (raw.overview.lore.rule_that_kills) desc += `<p><strong>Rule that kills:</strong> ${escHtmlLocal(raw.overview.lore.rule_that_kills)}</p>`;
         }
         transformed.description = desc;
         const text = JSON.stringify(raw.overview);
@@ -729,7 +800,7 @@ function synthesiseCrownSpread(mainCards, wildcard, regionData) {
             </div>
             <div style="display:flex;flex-direction:column;justify-content:center;">
                 <div style="font-size:0.8rem;color:var(--text2);font-weight:600;">${p.position.label}</div>
-                <div style="font-size:0.85rem;color:var(--text);line-height:1.4;white-space:pre-wrap;">${p.regionMeaning || p.description}</div>
+                <div style="font-size:0.85rem;color:var(--text);line-height:1.4;">${renderCardText(p.regionMeaning || p.description)}</div>
             </div>
         </div>
     `).join('');
@@ -743,7 +814,7 @@ function synthesiseCrownSpread(mainCards, wildcard, regionData) {
             </div>
             <div style="display:flex;flex-direction:column;justify-content:center;">
                 <div style="font-size:0.8rem;color:var(--gold);font-weight:600;">Wildcard Twist</div>
-                <div style="font-size:0.85rem;color:var(--text);line-height:1.4;">${wildcardMeaning}</div>
+                <div style="font-size:0.85rem;color:var(--text);line-height:1.4;">${renderCardText(wildcardMeaning)}</div>
             </div>
         </div>
     `;
@@ -1165,7 +1236,7 @@ export async function drawConsequence() {
 
     const synthesisEl = document.getElementById('consequence-synthesis');
     if (synthesisEl) {
-        synthesisEl.innerHTML = `<strong>Consequence:</strong>\n${synthesis}`;
+        synthesisEl.innerHTML = `<strong>Consequence:</strong>${renderSynthesisHtml(synthesis)}`;
     }
 
     const detailsEl = document.getElementById('crown-spread-details');
@@ -1505,7 +1576,7 @@ export function openCrownSpread() {
                                 <strong style="color:${p.isJoker ? 'var(--gold)' : p.color};">${p.position.label}</strong>
                                 <span style="color:var(--text3);font-size:0.8rem;">${p.rankName} of ${p.suitName}</span>
                             </div>
-                            <div style="color:var(--text2);font-size:0.9rem;margin-left:1.5rem;">${p.regionMeaning || p.description}</div>
+                            <div style="color:var(--text2);font-size:0.9rem;margin-left:1.5rem;">${renderCardText(p.regionMeaning || p.description)}</div>
                         </div>
                     `).join('')}
                     <div>
@@ -1513,7 +1584,7 @@ export function openCrownSpread() {
                             <span style="color:var(--gold);">🌟</span>
                             <strong style="color:var(--gold);">Wildcard Twist</strong>
                         </div>
-                        <div style="color:var(--text2);font-size:0.9rem;margin-left:1.5rem;">${result.wildcard}</div>
+                        <div style="color:var(--text2);font-size:0.9rem;margin-left:1.5rem;">${renderCardText(result.wildcard)}</div>
                     </div>
                 </div>
 
