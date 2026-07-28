@@ -1,17 +1,7 @@
 {
   "version": "1.0",
-  "generated": "2026-07-28T17:44:42.405Z",
+  "generated": "2026-07-28T17:57:06.126Z",
   "documents": [
-    {
-      "id": "essentials",
-      "title": "Essentials",
-      "file": "Fates_-_Edge_-_-Essentials.html",
-      "path": "/data/docs/",
-      "category": "core",
-      "categoryLabel": "📘 Core",
-      "core": true,
-      "active": true
-    },
     {
       "id": "systems_reference_document",
       "title": "Systems   Reference   Document",
@@ -43,10 +33,20 @@
       "active": true
     },
     {
+      "id": "essentials",
+      "title": "Essentials",
+      "file": "Fates_-_Edge_-_-Essentials.html",
+      "path": "/data/docs/",
+      "category": "resources",
+      "categoryLabel": "📚 Resources",
+      "core": false,
+      "active": true
+    },
+    {
       "id": "game_master_screen",
       "title": "Game   Master   Screen",
       "file": "Fates_-_Edge_-_-Game_-_Master_-_Screen.html",
-      "path": "/data/docs/",
+      "path": "/data/docs/resources/",
       "category": "resources",
       "categoryLabel": "📚 Resources",
       "core": false,
@@ -66,9 +66,9 @@
       "id": "playing_and_running_fate_s_edge",
       "title": "Playing   And   Running   Fate'S   Edge",
       "file": "Fates_-_Edge_-_-Playing-_-and-_-Running-_-Fate's-_-Edge.html",
-      "path": "/data/docs/",
-      "category": "other",
-      "categoryLabel": "📄 Other",
+      "path": "/data/docs/resources/",
+      "category": "resources",
+      "categoryLabel": "📚 Resources",
       "core": false,
       "active": true
     },

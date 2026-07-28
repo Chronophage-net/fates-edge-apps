@@ -13,22 +13,28 @@ const DATA_DIRS = [
   { dir: 'data/adventures', type: 'simple' },
   { dir: 'data/factions', type: 'simple' },
   { dir: 'data/regions', type: 'simple' },
-  { dir: 'data/docs', type: 'docs' },      // Rich manifest for docs
+  { dir: 'data/docs', type: 'docs' },
 ];
 
 const EXCLUDED_FILES = new Set(['manifest.json', 'manifest-core.json', 'manifest-core.json.tmp']);
 
+// ─── Category mapping: subdir → category info ────────────────────
+const CATEGORY_MAP = {
+  'core': { id: 'core', label: '📘 Core', path: '/data/docs/core/' },
+  'resources': { id: 'resources', label: '📚 Resources', path: '/data/docs/resources/' },
+  'adventures': { id: 'adventures', label: '🗡️ Adventures', path: '/data/docs/adventures/' },
+  'expansions': { id: 'expansions', label: '📦 Expansions', path: '/data/docs/expansions/' },
+  'travel': { id: 'travel', label: '🗺️ Travel', path: '/data/docs/travel/' },
+  'design': { id: 'design', label: '🎨 Design', path: '/data/docs/design/' },
+  'konreh': { id: 'konreh', label: '♟️ Kon\'reh', path: '/data/docs/konreh/' },
+  'uploaded': { id: 'uploaded', label: '📤 Uploaded', path: '/data/docs/uploaded/' },
+};
+
+const SUBDIRS = Object.keys(CATEGORY_MAP);
+
 // ─── Helpers ──────────────────────────────────────────────────────
 function getFileSlug(filename) {
   return filename.replace(/\.json$/, '').replace(/\.html$/, '');
-}
-
-function getDocType(file) {
-  const adventurePatterns = ['Saga', 'Dreams', 'Serpent', 'Blood', 'Carnival', 'Adventure', 'Coil', 'Lantern'];
-  if (adventurePatterns.some(p => file.includes(p))) return 'adventures';
-  if (file.includes('Screen') || file.includes('GM')) return 'resources';
-  if (file.includes('Reference') || file.includes('SRD') || file.includes('Essentials') || file.includes('Essential')) return 'core';
-  return 'other';
 }
 
 function getDocTitle(file) {
@@ -57,69 +63,94 @@ function ensureDirectory(dirPath) {
   return fullPath;
 }
 
-// ─── Generate Docs Manifest (rich format) ──────────────────────
+// ─── Generate Docs Manifest ──────────────────────────────────────
 function generateDocsManifest(docsPath) {
   const fullPath = ensureDirectory(docsPath);
   const documents = [];
 
-  // Scan for HTML files in docs root
-  let files = [];
+  let rootFiles = [];
   try {
-    files = fs.readdirSync(fullPath);
+    rootFiles = fs.readdirSync(fullPath);
   } catch (_) { return null; }
 
-  // Also scan subdirectories
-  const subdirs = ['core', 'resources', 'adventures', 'expansions', 'travel', 'design', 'konreh', 'uploaded'];
-  for (const subdir of subdirs) {
+  // ─── Scan subdirectories ──────────────────────────────────────────
+  for (const subdir of SUBDIRS) {
     const subPath = path.join(fullPath, subdir);
-    if (fs.existsSync(subPath)) {
-      const subFiles = fs.readdirSync(subPath);
-      for (const file of subFiles) {
-        if (file.endsWith('.html') && !EXCLUDED_FILES.has(file)) {
-          const title = getDocTitle(file);
-          const type = getDocType(file);
-          const id = generateId(title);
-          documents.push({
-            id: id,
-            title: title,
-            file: file,
-            path: `/data/docs/${subdir}/`,
-            category: type,
-            categoryLabel: type === 'adventures' ? '🗡️ Adventures' :
-                           type === 'resources' ? '📚 Resources' :
-                           type === 'core' ? '📘 Core' : '📄 Other',
-            core: type === 'core',
-            active: true
-          });
-        }
-      }
-    }
-  }
+    if (!fs.existsSync(subPath)) continue;
 
-  // Scan root for HTML files
-  for (const file of files) {
-    if (file.endsWith('.html') && !EXCLUDED_FILES.has(file)) {
+    const category = CATEGORY_MAP[subdir];
+    const files = fs.readdirSync(subPath);
+
+    for (const file of files) {
+      if (!file.endsWith('.html')) continue;
+      if (EXCLUDED_FILES.has(file)) continue;
+
       const title = getDocTitle(file);
-      const type = getDocType(file);
       const id = generateId(title);
-      if (!documents.some(d => d.file === file)) {
-        documents.push({
-          id: id,
-          title: title,
-          file: file,
-          path: '/data/docs/',
-          category: type,
-          categoryLabel: type === 'adventures' ? '🗡️ Adventures' :
-                         type === 'resources' ? '📚 Resources' :
-                         type === 'core' ? '📘 Core' : '📄 Other',
-          core: type === 'core',
-          active: true
-        });
-      }
+      const isCore = subdir === 'core';
+
+      documents.push({
+        id: id,
+        title: title,
+        file: file,
+        path: category.path,
+        category: category.id,
+        categoryLabel: category.label,
+        core: isCore,
+        active: true
+      });
     }
   }
 
-  // Sort: core first, then alphabetically
+  // ─── Scan root directory ──────────────────────────────────────────
+  // Only process files that aren't in a subdirectory
+  for (const file of rootFiles) {
+    if (!file.endsWith('.html')) continue;
+    if (EXCLUDED_FILES.has(file)) continue;
+
+    // Check if this file is already in a subdirectory (shouldn't happen)
+    const alreadyIndexed = documents.some(d => d.file === file);
+    if (alreadyIndexed) continue;
+
+    const title = getDocTitle(file);
+    const id = generateId(title);
+
+    // Root files: try to infer category from filename, default to 'other'
+    let category = 'other';
+    let label = '📄 Other';
+    let path = '/data/docs/';
+    let core = false;
+
+    // Simple filename-based inference for root files
+    const lower = file.toLowerCase();
+    if (lower.includes('srd') || lower.includes('reference')) {
+      category = 'core';
+      label = '📘 Core';
+      path = '/data/docs/';
+      core = true;
+    } else if (lower.includes('screen') || lower.includes('gm') || lower.includes('essential')) {
+      category = 'resources';
+      label = '📚 Resources';
+      path = '/data/docs/';
+    } else if (lower.includes('saga') || lower.includes('dreams') || lower.includes('serpent') || lower.includes('adventure')) {
+      category = 'adventures';
+      label = '🗡️ Adventures';
+      path = '/data/docs/';
+    }
+
+    documents.push({
+      id: id,
+      title: title,
+      file: file,
+      path: path,
+      category: category,
+      categoryLabel: label,
+      core: core,
+      active: true
+    });
+  }
+
+  // ─── Sort: core first, then by title ─────────────────────────────
   documents.sort((a, b) => {
     if (a.core && !b.core) return -1;
     if (!a.core && b.core) return 1;
@@ -193,7 +224,6 @@ for (const entry of DATA_DIRS) {
       console.error(`❌ Failed to write manifest to ${dir}:`, err.message);
     }
   } else {
-    // Write empty manifest if directory exists but has no content
     const manifestPath = path.join(fullPath, 'manifest.json');
     try {
       fs.writeFileSync(manifestPath, JSON.stringify([], null, 2));

@@ -12,12 +12,12 @@
   "currentScene": 0,
   "startedAt": null,
   "completedAt": null,
-  "notes": "This adventure is designed as a one-shot or introductory session. It showcases the core mechanics: Position, DV, Outcome Matrix, Timers, Boons, and Story Beats. The timers create rising tension, and the rival (Lena) adds a human element to the supernatural threat.",
+  "notes": "A one-shot introductory adventure showcasing core mechanics.",
   "acts": [
     {
       "id": "act-one",
       "title": "The Lantern at Dusk",
-      "description": "A complete one-shot adventure. Enter the barrow, face the Duskwights, confront Quick Lena, escape the collapse, and break the curse.",
+      "description": "Enter the barrow, face the Duskwights, confront Quick Lena, escape the collapse, and break the curse.",
       "scenes": [
         {
           "id": "scene-entry",
@@ -25,12 +25,7 @@
           "description": "The barrow entrance is a narrow stone passage. A faint green glow pulses from deeper inside. A cave-in blocks the way.",
           "completed": false,
           "timers": [
-            {
-              "name": "Barrow Collapse",
-              "segments": 6,
-              "current": 0,
-              "description": "Ticks on failure inside. At 6, the entrance seals."
-            }
+            { "name": "Barrow Collapse", "segments": 6, "current": 0, "description": "Ticks on failure inside. At 6, the entrance seals." }
           ],
           "encounters": [
             {
@@ -38,7 +33,7 @@
               "dv": 3,
               "position": "Controlled",
               "outcomes": {
-                "clean": "You clear the rubble and enter the barrow.",
+                "clean": "You clear the rubble and enter.",
                 "partial": "You get through but disturb rubble — tick Barrow Collapse +1.",
                 "miss": "You are pinned by a rock — mark Harm 1 and tick Collapse +1."
               }
@@ -51,12 +46,7 @@
           "description": "The passage widens into a hall where three Duskwights drift. They do not attack unless provoked, but they will not let anyone pass without an offering.",
           "completed": false,
           "timers": [
-            {
-              "name": "Barrow Collapse",
-              "segments": 6,
-              "current": 0,
-              "description": "Ticks on failure inside."
-            }
+            { "name": "Barrow Collapse", "segments": 6, "current": 0, "description": "Ticks on failure inside." }
           ],
           "encounters": [
             {
@@ -77,18 +67,8 @@
           "description": "The lantern sits on a stone altar. Quick Lena is there, trying to pry it loose.",
           "completed": false,
           "timers": [
-            {
-              "name": "Barrow Collapse",
-              "segments": 6,
-              "current": 0,
-              "description": "Ticks on failure inside."
-            },
-            {
-              "name": "Lena's Agenda",
-              "segments": 4,
-              "current": 0,
-              "description": "Ticks each scene inside. At 4, Lena takes the lantern first."
-            }
+            { "name": "Barrow Collapse", "segments": 6, "current": 0, "description": "Ticks on failure inside." },
+            { "name": "Lena's Agenda", "segments": 4, "current": 0, "description": "Ticks each scene inside. At 4, Lena takes the lantern first." }
           ],
           "encounters": [
             {
@@ -109,12 +89,7 @@
           "description": "After you take the lantern, the barrow begins to collapse in earnest. The party needs 3 successes before 2 failures to escape.",
           "completed": false,
           "timers": [
-            {
-              "name": "Barrow Collapse",
-              "segments": 6,
-              "current": 0,
-              "description": "Ticks on failure. At 6, entrance seals."
-            }
+            { "name": "Barrow Collapse", "segments": 6, "current": 0, "description": "Ticks on failure. At 6, entrance seals." }
           ],
           "encounters": [
             {
@@ -152,53 +127,18 @@
     }
   ],
   "npcs": [
-    {
-      "id": "npc-sarai",
-      "name": "Elder Sarai",
-      "role": "Village elder of Duskwood",
-      "motivation": "Save her village from the blight."
-    },
-    {
-      "id": "npc-lena",
-      "name": "Quick Lena",
-      "role": "Rival treasure hunter",
-      "motivation": "Get the lantern for herself."
-    },
-    {
-      "id": "npc-duskwights",
-      "name": "Duskwights",
-      "role": "Restless spirits (3)",
-      "motivation": "Guard the barrow."
-    }
+    { "id": "npc-sarai", "name": "Elder Sarai", "role": "Village elder of Duskwood", "motivation": "Save her village from the blight." },
+    { "id": "npc-lena", "name": "Quick Lena", "role": "Rival treasure hunter", "motivation": "Get the lantern for herself." },
+    { "id": "npc-duskwights", "name": "Duskwights", "role": "Restless spirits (3)", "motivation": "Guard the barrow." }
   ],
   "locations": [
-    {
-      "id": "loc-barrow",
-      "name": "The Old Barrow",
-      "description": "A moss-covered stone mound on a hill overlooking Duskwood.",
-      "tags": ["barrow", "ruin", "threshold"]
-    },
-    {
-      "id": "loc-stone-circle",
-      "name": "The Stone Circle",
-      "description": "A ring of standing stones in the valley below the barrow.",
-      "tags": ["circle", "ritual", "threshold"]
-    }
+    { "id": "loc-barrow", "name": "The Old Barrow", "description": "A moss-covered stone mound on a hill overlooking Duskwood." },
+    { "id": "loc-stone-circle", "name": "The Stone Circle", "description": "A ring of standing stones in the valley below the barrow." }
   ],
   "factions": [],
   "campaignTimers": [
-    {
-      "name": "Barrow Collapse",
-      "segments": 6,
-      "current": 0,
-      "description": "Ticks when the party fails a roll inside. At 6, the entrance seals."
-    },
-    {
-      "name": "Lena's Agenda",
-      "segments": 4,
-      "current": 0,
-      "description": "Ticks at the end of each scene inside the barrow. When it fills, Lena has already taken the lantern."
-    }
+    { "name": "Barrow Collapse", "segments": 6, "current": 0, "description": "Ticks when the party fails a roll inside. At 6, the entrance seals." },
+    { "name": "Lena's Agenda", "segments": 4, "current": 0, "description": "Ticks at the end of each scene inside the barrow. When it fills, Lena has already taken the lantern." }
   ],
   "createdAt": "2026-07-28T00:00:00.000Z",
   "updatedAt": "2026-07-28T00:00:00.000Z"
