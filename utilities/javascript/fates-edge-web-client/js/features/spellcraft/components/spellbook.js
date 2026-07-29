@@ -24,12 +24,59 @@
  * All selection modals (templates, categories, attribute choice) have been
  * replaced with inline dropdowns. Text-entry prompts (name, description, tags)
  * remain as simple prompt() calls.
+ *
+ * ────────────────────────────────────────────────────────────────────────
+ * BUGFIX NOTE: window.spellbookPromptCategory() and
+ * window.spellbookPromptAttribute() are both written to return a Promise
+ * (they show a toast with a dropdown + Confirm/Cancel and resolve() when
+ * the player answers). spellbookEdit() correctly `await`s them. But
+ * spellbookAddSpell(), spellbookFromTags(), and spellbookUse() were NOT
+ * declared `async` and never awaited these calls — so `category` /
+ * `attributeChoice` held the pending Promise object itself, not the
+ * eventual answer:
+ *   - New spells from Add/From Tags got `category` set to a Promise
+ *     object rather than a real category string (the `=== null` cancel
+ *     check could also never fire, since a Promise is never `null`).
+ *   - Casting a spell via spellbookUse() ran the roll IMMEDIATELY using
+ *     the un-resolved Promise, before the attribute-choice dropdown the
+ *     player was looking at had even been answered — `attributeChoice ===
+ *     'spirit'` was always false, so casting silently always used Wits no
+ *     matter what the player picked, and the Cancel path never worked.
+ * Fixed by making these three functions `async` and awaiting the prompts,
+ * matching the pattern spellbookEdit() already used correctly.
+ * ────────────────────────────────────────────────────────────────────────
+ *
+ * ────────────────────────────────────────────────────────────────────────
+ * NEW: The Grimoire is now a magic-path-aware collection, not just a spell
+ * list. Above the Free Caster spellbook, it shows whichever of these apply
+ * to the current character (each section is omitted entirely if it
+ * doesn't apply, so a pure Free Caster sees no change at all):
+ *
+ * - Rites Known (Runekeeper/Invoker) — reads char.rites (plain rite-name
+ *   strings) and cross-references patron data for tier/effect. Read-only
+ *   here; learning new Rites still happens in the Rites panel, which is
+ *   the single source of truth for that XP spend.
+ * - Repertoire / Songs (Cantor) — same pattern against char.repertoire.
+ * - Spirit Relationships (Summoner) — this one didn't exist anywhere in
+ *   the app before. Player's Guide §4.2.5 (True Name Keeper, 15 XP):
+ *   "Call any previously encountered spirit by true name; reduce Leash
+ *   Capacity by 2." That implies a persistent record of specific spirits
+ *   you've met — a name, a true name, a nature, a disposition — not just
+ *   the generic archetype-and-Cap system already tracked during a scene
+ *   (char.boundSpirits, managed in the Summoning panel). This file adds a
+ *   full CRUD directory for that (char.spiritRelationships), gated behind
+ *   having actually learned True Name Keeper — without it, RAW gives you
+ *   no way to re-summon a *specific* spirit at all, so the directory
+ *   would have no mechanical purpose yet.
+ * ────────────────────────────────────────────────────────────────────────
  */
 
 import { getCharacterData, saveCharacter } from '../index.js';
 import { escHtml, generateId, safeParseInt } from '../../../core/utils.js';
 import { showToast } from '../../../components/Toast.js';
 import { performRoll } from '../../../core/dice.js';
+import { getState } from '../../../core/state.js';
+import patronsModule from '../../patrons/index.js';
 
 // ============================================================
 // CONSTANTS
@@ -296,10 +343,217 @@ function getSpellbookMountEl() {
 }
 
 // ============================================================
+// GRIMOIRE COLLECTION — Rites / Repertoire / Spirit Relationships
+// ============================================================
+// See file header note for the rules basis of each section.
+
+function findPatronDataForLookup(state, patronId) {
+    if (!patronId) return null;
+    if (state.patrons?.cosmic) {
+        const found = state.patrons.cosmic.find(p => p.id === patronId);
+        if (found) return found;
+    }
+    if (state.patrons?.terrestrial) {
+        const found = state.patrons.terrestrial.find(p => p.id === patronId);
+        if (found) return found;
+    }
+    if (state.patrons?.religions) {
+        for (const religion of state.patrons.religions) {
+            if (religion.orders) {
+                const found = religion.orders.find(o => o.id === patronId);
+                if (found) return { ...found, _religion: religion.name };
+            }
+        }
+    }
+    return null;
+}
+
+function getAllPatronsForLookup(state) {
+    const all = [];
+    if (state.patrons?.cosmic) all.push(...state.patrons.cosmic);
+    if (state.patrons?.terrestrial) all.push(...state.patrons.terrestrial);
+    if (state.patrons?.religions) {
+        for (const rel of state.patrons.religions) {
+            if (rel.orders) all.push(...rel.orders);
+        }
+    }
+    return all;
+}
+
+/**
+ * Find full rite/song details by name across whichever patrons the
+ * character actually has access to (bound patron for Runekeeper/Cantor,
+ * carried Symbols for Invoker, or all patrons for an Unbound Cantor).
+ * Falls back to searching every loaded patron if none of those narrow it
+ * down, so a known name never just silently disappears.
+ */
+function findKnownRiteDetails(state, char, riteName) {
+    const candidatePatronIds = [];
+    if (char.patron) candidatePatronIds.push(char.patron);
+    if (char.boundPatron) candidatePatronIds.push(char.boundPatron);
+    if (Array.isArray(char.symbols)) candidatePatronIds.push(...char.symbols);
+
+    for (const pid of candidatePatronIds) {
+        const patron = findPatronDataForLookup(state, pid);
+        const rite = patron?.rites?.find(r => r.name === riteName);
+        if (rite) return { ...rite, patronName: patron.name || patron.title, patronIcon: patron.icon };
+    }
+
+    // Fallback: search everything loaded (covers Unbound Cantors, or a
+    // rite learned before a patron change).
+    for (const patron of getAllPatronsForLookup(state)) {
+        const rite = patron.rites?.find(r => r.name === riteName);
+        if (rite) return { ...rite, patronName: patron.name || patron.title, patronIcon: patron.icon };
+    }
+    return null;
+}
+
+function renderRitesKnownSection(char, state) {
+    const known = char.rites || [];
+    if (known.length === 0) return '';
+
+    const items = known.map(name => findKnownRiteDetails(state, char, name) || { name, tier: '', effect: '' });
+
+    return `
+        <div class="grimoire-collection-section" style="background:var(--bg2);border-radius:var(--radius);padding:0.3rem 0.5rem;border-left:4px solid var(--gold);">
+            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.2rem;">
+                <span style="font-weight:600;color:var(--gold);">📜 Rites Known</span>
+                <span style="font-size:0.6rem;color:var(--text3);">${items.length} learned · manage new Rites in the Rites panel</span>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:0.15rem;margin-top:0.2rem;max-height:160px;overflow-y:auto;">
+                ${items.map(r => `
+                    <div style="padding:0.15rem 0.3rem;border-bottom:1px solid var(--border);font-size:0.75rem;">
+                        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.2rem;">
+                            <span style="font-weight:500;">${escHtml(r.name)}</span>
+                            <span style="display:flex;gap:0.3rem;align-items:center;">
+                                ${r.patronName ? `<span style="color:var(--text3);font-size:0.6rem;">${escHtml(r.patronName)}</span>` : ''}
+                                ${r.tier ? `<span style="color:var(--text3);font-size:0.6rem;">${escHtml(r.tier)}</span>` : ''}
+                            </span>
+                        </div>
+                        ${r.effect ? `<div style="color:var(--text2);font-size:0.7rem;margin-top:0.1rem;">${escHtml(r.effect)}</div>` : ''}
+                    </div>
+                `).join('')}
+            </div>
+        </div>
+    `;
+}
+
+function renderRepertoireSection(char, state) {
+    const known = char.repertoire || [];
+    if (known.length === 0) return '';
+
+    const items = known.map(name => findKnownRiteDetails(state, char, name) || { name, tier: '', effect: '' });
+
+    return `
+        <div class="grimoire-collection-section" style="background:var(--bg2);border-radius:var(--radius);padding:0.3rem 0.5rem;border-left:4px solid var(--gold);">
+            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.2rem;">
+                <span style="font-weight:600;color:var(--gold);">🎶 Repertoire (Songs)</span>
+                <span style="font-size:0.6rem;color:var(--text3);">${items.length} learned · manage new Songs in the Cantor panel</span>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:0.15rem;margin-top:0.2rem;max-height:160px;overflow-y:auto;">
+                ${items.map(r => `
+                    <div style="padding:0.15rem 0.3rem;border-bottom:1px solid var(--border);font-size:0.75rem;">
+                        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.2rem;">
+                            <span style="font-weight:500;">${escHtml(r.name)}</span>
+                            <span style="display:flex;gap:0.3rem;align-items:center;">
+                                ${r.patronName ? `<span style="color:var(--text3);font-size:0.6rem;">${escHtml(r.patronName)}</span>` : ''}
+                                ${r.tier ? `<span style="color:var(--text3);font-size:0.6rem;">${escHtml(r.tier)}</span>` : ''}
+                            </span>
+                        </div>
+                        ${r.effect ? `<div style="color:var(--text2);font-size:0.7rem;margin-top:0.1rem;">${escHtml(r.effect)}</div>` : ''}
+                    </div>
+                `).join('')}
+            </div>
+        </div>
+    `;
+}
+
+const SPIRIT_DISPOSITIONS = ['Favorable', 'Neutral', 'Wary', 'Hostile'];
+
+function renderSpiritRelationshipsSection(char) {
+    const hasTrueNameKeeper = (char.learnedTalents || []).includes('true-name-keeper');
+    const bound = char.boundSpirits || [];
+    const relationships = char.spiritRelationships || [];
+
+    return `
+        <div class="grimoire-collection-section" style="background:var(--bg2);border-radius:var(--radius);padding:0.3rem 0.5rem;border-left:4px solid #8e44ad;">
+            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.2rem;">
+                <span style="font-weight:600;color:#8e44ad;">👁️ Spirit Relationships</span>
+                ${hasTrueNameKeeper
+                    ? `<button class="btn btn-xs btn-primary" onclick="window.grimoireAddSpiritRelationship()">+ Record Spirit</button>`
+                    : `<span style="font-size:0.6rem;color:var(--text3);">Unlocks with True Name Keeper (15 XP)</span>`}
+            </div>
+
+            ${bound.length > 0 ? `
+                <div style="margin-top:0.25rem;">
+                    <div style="font-size:0.6rem;color:var(--text3);font-weight:600;">Currently Bound (this scene)</div>
+                    ${bound.map(s => `
+                        <div style="display:flex;justify-content:space-between;font-size:0.75rem;padding:0.1rem 0.3rem;border-bottom:1px solid var(--border);">
+                            <span>${escHtml(s.name)} <span style="color:var(--text3);font-size:0.6rem;">Cap ${s.cap || 1}</span></span>
+                            <span style="color:var(--text3);font-size:0.6rem;">${escHtml(s.nature || '')}</span>
+                        </div>
+                    `).join('')}
+                    <div style="font-size:0.55rem;color:var(--text3);margin-top:0.1rem;">Manage active bindings and the Leash in the Summoning panel.</div>
+                </div>
+            ` : ''}
+
+            ${hasTrueNameKeeper ? `
+                <div style="margin-top:0.3rem;">
+                    <div style="font-size:0.6rem;color:var(--text3);font-weight:600;">Known by True Name</div>
+                    ${relationships.length === 0 ? `
+                        <div style="font-size:0.7rem;color:var(--text3);padding:0.3rem 0;">No spirits recorded yet. Once you've encountered one worth remembering, record it here.</div>
+                    ` : relationships.map(r => `
+                        <div style="padding:0.25rem 0.3rem;border-bottom:1px solid var(--border);font-size:0.75rem;">
+                            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.3rem;">
+                                <span style="font-weight:600;">${escHtml(r.name)}</span>
+                                ${r.trueName ? `<span style="color:var(--gold);font-size:0.65rem;font-style:italic;">"${escHtml(r.trueName)}"</span>` : ''}
+                                <select onchange="window.grimoireSetSpiritDisposition('${r.id}', this.value)" style="font-size:0.6rem;background:var(--bg3);border:1px solid var(--border);border-radius:4px;">
+                                    ${SPIRIT_DISPOSITIONS.map(d => `<option value="${d}" ${r.disposition === d ? 'selected' : ''}>${d}</option>`).join('')}
+                                </select>
+                            </div>
+                            ${r.nature ? `<div style="color:var(--text2);font-size:0.7rem;margin-top:0.1rem;">${escHtml(r.nature)}</div>` : ''}
+                            ${r.notes ? `<div style="color:var(--text3);font-size:0.65rem;font-style:italic;">${escHtml(r.notes)}</div>` : ''}
+                            <div style="font-size:0.6rem;color:var(--text3);">Called ${r.timesBound || 0} time${(r.timesBound || 0) === 1 ? '' : 's'}</div>
+                            <div style="display:flex;gap:0.2rem;margin-top:0.15rem;">
+                                <button class="btn btn-xs btn-gold" onclick="window.grimoireRecallSpirit('${r.id}')" title="Call by true name — Leash Capacity −2 for this binding, per True Name Keeper">👁️ Call by True Name</button>
+                                <button class="btn btn-xs btn-ghost" onclick="window.grimoireEditSpiritRelationship('${r.id}')" title="Edit">✏️</button>
+                                <button class="btn btn-xs btn-ghost" onclick="window.grimoireDeleteSpiritRelationship('${r.id}')" style="color:var(--red);" title="Remove">✕</button>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            ` : `
+                <div style="font-size:0.65rem;color:var(--text3);margin-top:0.3rem;">
+                    Learn True Name Keeper (15 XP) to call any previously encountered spirit by true name (Leash Capacity −2) — this is where you'd track those relationships once you have.
+                </div>
+            `}
+        </div>
+    `;
+}
+
+function renderGrimoireCollection(char, state) {
+    const hasRites = (char.rites || []).length > 0 || char.magicPath === 'runekeeper' || char.magicPath === 'invoker';
+    const hasSongs = (char.repertoire || []).length > 0 || char.magicPath === 'cantor';
+    const hasSpiritStuff = (char.boundSpirits || []).length > 0
+        || (char.spiritRelationships || []).length > 0
+        || char.magicPath === 'summoner'
+        || (char.learnedTalents || []).includes('true-name-keeper');
+
+    if (!hasRites && !hasSongs && !hasSpiritStuff) return '';
+
+    let html = `<div class="grimoire-collection" style="display:flex;flex-direction:column;gap:0.4rem;margin-bottom:0.2rem;">`;
+    if (hasRites) html += renderRitesKnownSection(char, state);
+    if (hasSongs) html += renderRepertoireSection(char, state);
+    if (hasSpiritStuff) html += renderSpiritRelationshipsSection(char);
+    html += `</div>`;
+    return html;
+}
+
+// ============================================================
 // MAIN RENDER
 // ============================================================
 
-export function renderSpellbook(el) {
+export async function renderSpellbook(el) {
     if (!el) {
         console.warn('[Spellbook] renderSpellbook called with no container element — skipping.');
         return;
@@ -314,6 +568,15 @@ export function renderSpellbook(el) {
         `;
         return;
     }
+
+    // Load patron data so the Rites Known / Repertoire sections can
+    // cross-reference tier/effect details, same loader everyone else uses.
+    try {
+        await patronsModule.loadPatronData();
+    } catch (err) {
+        console.warn('[Spellbook] Failed to load patron data for Grimoire Collection:', err);
+    }
+    const appState = getState();
 
     // Ensure spellbook exists
     if (!char.spellbook) {
@@ -397,6 +660,9 @@ export function renderSpellbook(el) {
                     <button class="btn btn-sm btn-ghost" onclick="window.spellbookClearAll()" style="color:var(--red);" title="Clear all spells">🗑️</button>
                 </div>
             </div>
+
+            <!-- ─── Grimoire Collection (Rites/Repertoire/Spirits) ─ -->
+            ${renderGrimoireCollection(char, appState)}
 
             <!-- ─── Stats Bar ───────────────────────────────────── -->
             <div class="spellbook-stats" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:0.2rem;background:var(--bg2);border-radius:var(--radius);padding:0.2rem 0.5rem;border:1px solid var(--border);font-size:0.7rem;color:var(--text2);">
@@ -669,8 +935,10 @@ function attachSpellbookEvents(el) {
 // ============================================================
 
 // ─── Add Spell ─────────────────────────────────────────────────
+// FIX: was a plain (non-async) function that never awaited
+// spellbookPromptCategory()'s Promise — see file header note.
 
-window.spellbookAddSpell = function() {
+window.spellbookAddSpell = async function() {
     const char = getCharacterData();
     if (!char) return;
 
@@ -683,7 +951,7 @@ window.spellbookAddSpell = function() {
     const dv = safeParseInt(prompt('DV (difficulty, default 2):') || '2', 2);
 
     // ─── Category dropdown ────────────────────────────────────
-    const category = window.spellbookPromptCategory('Category:', 'Utility');
+    const category = await window.spellbookPromptCategory('Category:', 'Utility');
     if (category === null) return; // cancelled
 
     const costObligation = safeParseInt(prompt('Obligation cost (if any):') || '0', 0);
@@ -716,8 +984,9 @@ window.spellbookAddSpell = function() {
 };
 
 // ─── From Tags (Free Caster) ──────────────────────────────────
+// FIX: same missing-await bug as spellbookAddSpell — see file header note.
 
-window.spellbookFromTags = function() {
+window.spellbookFromTags = async function() {
     const char = getCharacterData();
     if (!char) return;
 
@@ -738,7 +1007,7 @@ window.spellbookFromTags = function() {
     const description = prompt('Description / Effect:') || '';
 
     // ─── Category dropdown ────────────────────────────────────
-    const category = window.spellbookPromptCategory('Category:', 'Utility');
+    const category = await window.spellbookPromptCategory('Category:', 'Utility');
     if (category === null) return;
 
     const newSpell = {
@@ -1025,8 +1294,13 @@ window.spellbookClearFilters = function() {
 // ============================================================
 // USE SPELL – Cast and Track (Free Caster only)
 // ============================================================
+// FIX: was a plain (non-async) function that never awaited
+// spellbookPromptAttribute()'s Promise, so the roll fired immediately with
+// an unresolved Promise as `attributeChoice` — casting always silently
+// used Wits, and the Cancel button never actually cancelled anything. See
+// file header note.
 
-window.spellbookUse = function(id) {
+window.spellbookUse = async function(id) {
     const char = getCharacterData();
     if (!char) return;
 
@@ -1059,7 +1333,7 @@ window.spellbookUse = function(id) {
     if (!spell) return showToast('Spell not found.', 'error');
 
     // Determine dice pool with dropdown instead of confirm
-    const attributeChoice = window.spellbookPromptAttribute();
+    const attributeChoice = await window.spellbookPromptAttribute();
     if (attributeChoice === null) return; // cancelled
 
     const wits = char.wits || 1;
@@ -1230,6 +1504,116 @@ window.spellbookPromptAttribute = function() {
             }
         }, 100);
     });
+};
+
+// ============================================================
+// SPIRIT RELATIONSHIPS (Summoner — True Name Keeper, 15 XP)
+// ============================================================
+// See file header note. Gated on having actually learned the talent,
+// since RAW gives no mechanical way to re-summon a *specific* spirit
+// without it — recording one here without the talent would just be a
+// list with nothing to do.
+
+window.grimoireAddSpiritRelationship = function() {
+    const char = getCharacterData();
+    if (!char) return;
+
+    if (!(char.learnedTalents || []).includes('true-name-keeper')) {
+        showToast('Requires the True Name Keeper talent (15 XP).', 'error');
+        return;
+    }
+
+    const name = prompt('Spirit name/archetype (e.g., "Ashen Hollow-Wight"):');
+    if (!name || !name.trim()) return;
+    const trueName = prompt('True Name (the word that binds it):') || '';
+    const nature = prompt('Nature (its temperament, domain, what it wants):') || '';
+
+    if (!char.spiritRelationships) char.spiritRelationships = [];
+    char.spiritRelationships.push({
+        id: generateId('spirit_'),
+        name: name.trim(),
+        trueName: trueName.trim(),
+        nature: nature.trim(),
+        disposition: 'Neutral',
+        notes: '',
+        timesBound: 0,
+        lastBound: null,
+        createdAt: Date.now()
+    });
+    saveCharacter({ spiritRelationships: char.spiritRelationships });
+    showToast(`📖 "${name.trim()}" recorded in your Spirit Relationships.`, 'success');
+    renderSpellbook(getSpellbookMountEl());
+};
+
+window.grimoireEditSpiritRelationship = function(id) {
+    const char = getCharacterData();
+    if (!char) return;
+    const rel = (char.spiritRelationships || []).find(r => r.id === id);
+    if (!rel) {
+        showToast('Spirit not found.', 'error');
+        return;
+    }
+
+    const name = prompt('Spirit name/archetype:', rel.name);
+    if (name === null) return;
+    const trueName = prompt('True Name:', rel.trueName || '');
+    const nature = prompt('Nature:', rel.nature || '');
+    const notes = prompt('Notes (history, debts, warnings):', rel.notes || '');
+
+    rel.name = (name || rel.name).trim();
+    rel.trueName = (trueName || '').trim();
+    rel.nature = (nature || '').trim();
+    rel.notes = (notes || '').trim();
+
+    saveCharacter({ spiritRelationships: char.spiritRelationships });
+    showToast(`Updated "${rel.name}".`, 'success');
+    renderSpellbook(getSpellbookMountEl());
+};
+
+window.grimoireSetSpiritDisposition = function(id, disposition) {
+    const char = getCharacterData();
+    if (!char) return;
+    const rel = (char.spiritRelationships || []).find(r => r.id === id);
+    if (!rel) return;
+    rel.disposition = disposition;
+    saveCharacter({ spiritRelationships: char.spiritRelationships });
+    showToast(`"${rel.name}" is now ${disposition}.`, 'info');
+};
+
+window.grimoireRecallSpirit = function(id) {
+    const char = getCharacterData();
+    if (!char) return;
+
+    if (!(char.learnedTalents || []).includes('true-name-keeper')) {
+        showToast('Requires the True Name Keeper talent.', 'error');
+        return;
+    }
+
+    const rel = (char.spiritRelationships || []).find(r => r.id === id);
+    if (!rel) {
+        showToast('Spirit not found.', 'error');
+        return;
+    }
+
+    if (!confirm(`Call "${rel.name}" by its true name?\n\nPer True Name Keeper: Leash Capacity is reduced by 2 for this binding.`)) return;
+
+    rel.timesBound = (rel.timesBound || 0) + 1;
+    rel.lastBound = Date.now();
+    saveCharacter({ spiritRelationships: char.spiritRelationships });
+    showToast(`👁️ "${rel.name}" answers your call. (Leash Capacity −2 for this binding.) Set up the actual binding in the Summoning panel.`, 'success');
+    renderSpellbook(getSpellbookMountEl());
+};
+
+window.grimoireDeleteSpiritRelationship = function(id) {
+    const char = getCharacterData();
+    if (!char) return;
+    const rel = (char.spiritRelationships || []).find(r => r.id === id);
+    if (!rel) return;
+    if (!confirm(`Remove "${rel.name}" from your Spirit Relationships? This can't be undone.`)) return;
+    char.spiritRelationships = (char.spiritRelationships || []).filter(r => r.id !== id);
+    saveCharacter({ spiritRelationships: char.spiritRelationships });
+    showToast('Removed.', 'info');
+    renderSpellbook(getSpellbookMountEl());
 };
 
 // ============================================================

@@ -11,6 +11,153 @@
     "beyond-millhaven",
     "the-brass-gate"
   ],
+  "bestiary": [
+    {
+      "id": "garrick-ursillo",
+      "name": "Garrick Ursillo",
+      "tl": 3,
+      "class": "III",
+      "category": "humanoid",
+      "description": "A cruel bandit leader with a personal code of honour. He is a veteran fighter with scars that tell stories of countless battles. His sword is well-maintained and deadly, and his eyes burn with the fury of a man who has lost everything.",
+      "stats": { "Body": 4, "Melee": 4, "Spirit": 3, "Command": 2, "hp": 40 },
+      "sb_spends": [
+        { "cost": 1, "name": "Intimidating Presence", "effect": "Opponents start Desperate (generates 1 SB)." },
+        { "cost": 2, "name": "Tactical Awareness", "effect": "Redirect an attack to a minion (once per round)." },
+        { "cost": 2, "name": "Berserker Rage", "effect": "When wounded to Harm 2, gains +1 die to all attacks but loses defensive options." }
+      ],
+      "lore": "A faded brand on his forearm marks him as a deserter from the Vhasian army – a secret he kills to protect."
+    },
+    {
+      "id": "ursillo-bandit",
+      "name": "Ursillo Bandit",
+      "tl": 2,
+      "class": "II",
+      "category": "humanoid",
+      "description": "A common thug in Garrick's gang. They fight with crude weapons and intimidation.",
+      "stats": { "Body": 2, "Melee": 2, "Athletics": 1, "hp": 20 },
+      "sb_spends": [
+        { "cost": 1, "name": "Rough Tackle", "effect": "Knock a target Prone." }
+      ]
+    },
+    {
+      "id": "voss-aeler",
+      "name": "Factor Voss",
+      "tl": 2,
+      "class": "II",
+      "category": "humanoid",
+      "description": "A mid-level Aeler bureaucrat under audit. He is desperate to show revenue and save face.",
+      "stats": { "Wits": 3, "Lore": 2, "Command": 2, "hp": 15 },
+      "sb_spends": []
+    },
+    {
+      "id": "captain-rusk",
+      "name": "Captain Rusk",
+      "tl": 3,
+      "class": "III",
+      "category": "humanoid",
+      "description": "A pragmatic Black Banner mercenary captain who sells steel to whoever can pay. He is haunted by a promise made to a dying legionary.",
+      "stats": { "Body": 3, "Melee": 3, "Command": 2, "hp": 35 },
+      "sb_spends": [
+        { "cost": 1, "name": "Weathered Soldier", "effect": "Ignore one point of Fatigue for the scene." },
+        { "cost": 2, "name": "Call in Favours", "effect": "Summon a squad of mercenaries (Cap 2) to assist." }
+      ],
+      "lore": "He carries Varus's badge of rank and owes a debt to a smuggler named Peyton."
+    },
+    {
+      "id": "khatun-sarnai",
+      "name": "Khatun Sarnai",
+      "tl": 3,
+      "class": "III",
+      "category": "humanoid",
+      "description": "The proud and grieving chieftain of the Ykrul Gray Ash clan. She respects those who keep their word.",
+      "stats": { "Body": 3, "Melee": 3, "Command": 2, "hp": 30 },
+      "sb_spends": [
+        { "cost": 1, "name": "Hunting Cry", "effect": "Allies gain +1 die on their next attack." },
+        { "cost": 2, "name": "Steppe Tactics", "effect": "The party gains Dominant Position for the next exchange." }
+      ],
+      "secret": "Her daughter Yelü is the child of a legionary who defected."
+    },
+    {
+      "id": "quick-lena",
+      "name": "Quick Lena",
+      "tl": 2,
+      "class": "II",
+      "category": "humanoid",
+      "description": "A Sidhi rogue with mismatched eyes and a nervous laugh. She works for Rusk, not out of loyalty but desperation.",
+      "stats": { "Wits": 3, "Stealth": 3, "Subterfuge": 2, "hp": 18 },
+      "sb_spends": [
+        { "cost": 1, "name": "Light Fingers", "effect": "Steal a weapon mid‑combat (Wits+Subterfuge vs target's Wits+Notice)." },
+        { "cost": 2, "name": "Always Another Exit", "effect": "Escape a scene without a roll (once per session)." }
+      ],
+      "secret": "She was an apprentice of the Silk Coin who ran when the Velvet Court came."
+    },
+    {
+      "id": "prefect-marcellus",
+      "name": "Prefect Gaius Marcellus",
+      "tl": 4,
+      "class": "IV",
+      "category": "humanoid",
+      "description": "Commander of Castra Ferrum, a wiry, scarred veteran with a voice like a parade ground. He genuinely believes the seal will bring peace – and consolidate his power.",
+      "stats": { "Body": 3, "Command": 3, "Spirit": 3, "hp": 45 },
+      "sb_spends": [
+        { "cost": 1, "name": "Legionary Discipline", "effect": "Allies gain +1 die to resist Fear." },
+        { "cost": 3, "name": "Invoke the Curse", "effect": "Target must test Resolve or gain Varus's Whispers ( –1 die to resist persuasion)." }
+      ],
+      "secret": "He leads a cult of oathbreakers who worship Varus's ghost. His younger brother died in a Ykrul raid."
+    },
+    {
+      "id": "censor-cassia",
+      "name": "Censor Cassia",
+      "tl": 3,
+      "class": "III",
+      "category": "humanoid",
+      "description": "A thin, aging woman with ink‑stained fingers. Her left eye is a polished silver disc – a magical lens that reveals lies.",
+      "stats": { "Wits": 4, "Lore": 3, "Arcana": 2, "hp": 20 },
+      "sb_spends": [
+        { "cost": 1, "name": "Silver Eye", "effect": "Automatically detect Deception of DV 4 or less." },
+        { "cost": 2, "name": "Archive Secrets", "effect": "Gain +2 dice on Lore rolls for the rest of the scene." }
+      ],
+      "secret": "She is dying of a slow fever; destroying the seal is her last act."
+    },
+    {
+      "id": "varus-ghost",
+      "name": "Ghost of the Ninth Legion's Commander",
+      "tl": 5,
+      "class": "V",
+      "category": "undead",
+      "description": "The betrayed commander of the Ninth Hispania Legion, now a vengeful spirit bound to the Iron Seal.",
+      "stats": { "Spirit": 4, "Resolve": 4, "hp": 50 },
+      "sb_spends": [
+        { "cost": 2, "name": "Cry of Betrayal", "effect": "All in Near range must test Spirit or be Shaken ( –1 die)." },
+        { "cost": 3, "name": "The Ninth Clause", "effect": "If the ghost speaks his own name, the curse ends." }
+      ]
+    },
+    {
+      "id": "silken-blade",
+      "name": "The Silken Blade",
+      "tl": 4,
+      "class": "IV",
+      "category": "humanoid",
+      "description": "A masked enforcer of the Velvet Court, armed with a poisoned stiletto. She is the Court's most deadly assassin.",
+      "stats": { "Body": 3, "Melee": 4, "Stealth": 4, "hp": 30 },
+      "sb_spends": [
+        { "cost": 1, "name": "Poisoned Blade", "effect": "Target tests Resolve or gains 1 Fatigue." },
+        { "cost": 2, "name": "Shadow Meld", "effect": "Become invisible until you attack." }
+      ]
+    },
+    {
+      "id": "black-banner-squad",
+      "name": "Black Banner Mercenary Squad",
+      "tl": 2,
+      "class": "II",
+      "category": "humanoid",
+      "description": "A squad of professional sellswords. They fight as a unit.",
+      "stats": { "Body": 3, "Melee": 2, "Athletics": 2, "hp": 25 },
+      "sb_spends": [
+        { "cost": 1, "name": "Coordinated Strike", "effect": "Gain +1 die on all attacks for the round." }
+      ]
+    }
+  ],
   "acts": [
     {
       "id": "act-prequel",
@@ -92,9 +239,10 @@
           ],
           "encounters": [
             {
-              "name": "Confronting Garrick",
-              "dv": 4,
+              "creatureId": "garrick-ursillo",
+              "quantity": 1,
               "position": "Controlled",
+              "dv": 4,
               "outcomes": {
                 "clean": "Garrick is impressed by your defiance. He leaves - for now. Gain a String: Garrick's Respect.",
                 "partial": "Garrick reduces his demand but takes a hostage. Tick Village Safety +1.",
@@ -133,9 +281,10 @@
           ],
           "encounters": [
             {
-              "name": "The Battle of Millhaven",
-              "dv": 4,
+              "creatureId": "garrick-ursillo",
+              "quantity": 1,
               "position": "Desperate",
+              "dv": 4,
               "outcomes": {
                 "clean": "The village stands. Garrick is defeated. Each PC gains 2 Boons and the Village Trust minor asset.",
                 "partial": "The village holds, but Garrick escapes. He will return.",
@@ -219,9 +368,10 @@
           ],
           "encounters": [
             {
-              "name": "Khatun Sarnai - The Ykrul",
-              "dv": 4,
+              "creatureId": "khatun-sarnai",
+              "quantity": 1,
               "position": "Controlled",
+              "dv": 4,
               "outcomes": {
                 "clean": "Sarnai respects your directness. She offers a Ykrul Guide as an asset.",
                 "partial": "Sarnai agrees to talk, but her terms are stiff.",
@@ -229,9 +379,10 @@
               }
             },
             {
-              "name": "Factor Voss - The Aeler",
-              "dv": 4,
+              "creatureId": "voss-aeler",
+              "quantity": 1,
               "position": "Controlled",
+              "dv": 4,
               "outcomes": {
                 "clean": "Voss reveals his audit anxiety. You have leverage.",
                 "partial": "Voss is evasive. You learn something, but not everything.",
@@ -239,9 +390,10 @@
               }
             },
             {
-              "name": "Captain Rusk - The Black Banner",
-              "dv": 3,
+              "creatureId": "captain-rusk",
+              "quantity": 1,
               "position": "Controlled",
+              "dv": 3,
               "outcomes": {
                 "clean": "Rusk names his price. You can pay it or negotiate.",
                 "partial": "Rusk gives you a deadline. Tick Ford Standoff +1 if you miss it.",
@@ -319,9 +471,10 @@
           ],
           "encounters": [
             {
-              "name": "Prefect Marcellus - The Tribunal",
-              "dv": 4,
+              "creatureId": "prefect-marcellus",
+              "quantity": 1,
               "position": "Controlled",
+              "dv": 4,
               "outcomes": {
                 "clean": "Marcellus offers you a job. Accepting starts his Debt Timer.",
                 "partial": "Marcellus is interested, but suspicious.",
@@ -329,9 +482,10 @@
               }
             },
             {
-              "name": "Censor Cassia - The Archive",
-              "dv": 4,
+              "creatureId": "censor-cassia",
+              "quantity": 1,
               "position": "Controlled",
+              "dv": 4,
               "outcomes": {
                 "clean": "Cassia offers a counter-job. She wants Marcellus exposed.",
                 "partial": "Cassia gives you a lead, but demands a favor.",
@@ -339,9 +493,10 @@
               }
             },
             {
-              "name": "Khatun Sarnai - The Ykrul Camp",
-              "dv": 4,
+              "creatureId": "khatun-sarnai",
+              "quantity": 1,
               "position": "Controlled",
+              "dv": 4,
               "outcomes": {
                 "clean": "Sarnai remembers you from the ford. She offers a Ykrul Guide.",
                 "partial": "Sarnai agrees to talk, but her daughter Yelü challenges you to a horse race.",
@@ -381,9 +536,10 @@
               }
             },
             {
-              "name": "Chamber Three - The Reliquary",
-              "dv": 5,
+              "creatureId": "quick-lena",
+              "quantity": 1,
               "position": "Desperate",
+              "dv": 5,
               "outcomes": {
                 "clean": "You reach the seal first. Quick Lena is still trying to crack the lock.",
                 "partial": "You arrive at the same time as Lena. A tense standoff ensues.",
@@ -400,9 +556,10 @@
           "timers": [],
           "encounters": [
             {
-              "name": "Breaking the Curse - Return to the Ykrul",
-              "dv": 4,
+              "creatureId": "khatun-sarnai",
+              "quantity": 1,
               "position": "Controlled",
+              "dv": 4,
               "outcomes": {
                 "clean": "Sarnai buries the seal under a cairn. The curse ends. Sarnai opens the trade route. Gain Sarnai's Oath.",
                 "partial": "The ritual is incomplete. The curse lingers, but weaker.",
@@ -410,7 +567,7 @@
               }
             },
             {
-              "name": "Breaking the Curse - Destroy with Fire",
+              "name": "Destroy with Fire",
               "dv": 6,
               "position": "Desperate",
               "outcomes": {
@@ -420,9 +577,10 @@
               }
             },
             {
-              "name": "Breaking the Curse - Bind with a New Oath",
-              "dv": 5,
+              "creatureId": "prefect-marcellus",
+              "quantity": 1,
               "position": "Controlled",
+              "dv": 5,
               "outcomes": {
                 "clean": "A treaty is sworn between Marcellus, Sarnai, and Tema. The curse transforms into a blessing. Gain Strings with all three factions.",
                 "partial": "A partial treaty is sworn. The curse is weakened, but not gone.",
@@ -430,9 +588,10 @@
               }
             },
             {
-              "name": "Secret Fourth Way - The Ninth Clause",
-              "dv": 5,
+              "creatureId": "varus-ghost",
+              "quantity": 1,
               "position": "Dominant",
+              "dv": 5,
               "outcomes": {
                 "clean": "You summon the ghost of the Ninth Legion's commander. He speaks his own name, ending the curse forever. Gain a Legendary String: The Ninth Legion's Gratitude.",
                 "partial": "The ghost appears but requires a sacrifice.",
@@ -474,14 +633,6 @@
       "secret": "He knows the old Imperial bridge was the site of a broken promise. He still leaves milk on the bridge steps every full moon."
     },
     {
-      "id": "npc-garrick-ursillo",
-      "name": "Garrick Ursillo",
-      "role": "Bandit Leader",
-      "motivation": "Power, control, and revenge",
-      "stats": "Body 4, Melee 4, Spirit 3, Command 2",
-      "secret": "A faded brand on his forearm marks him as a deserter from the Vhasian army - a secret he kills to protect."
-    },
-    {
       "id": "npc-mira-baker",
       "name": "Mira the Baker",
       "role": "Village Representative",
@@ -512,66 +663,11 @@
       "stats": "Body 2, Presence 3, Command 2, Commerce 2"
     },
     {
-      "id": "npc-khatun-sarnai",
-      "name": "Khatun Sarnai",
-      "role": "Ykrul Chieftain of the Gray Ash Clan",
-      "motivation": "Protect her people, restore clan honor, reopen trade",
-      "stats": "Body 3, Melee 3, Command 2",
-      "secret": "Her daughter Yelü is the child of a legionary who defected."
-    },
-    {
       "id": "npc-yelu",
       "name": "Yelü",
       "role": "Sarnai's Daughter",
       "motivation": "Prove herself worthy of leadership",
       "stats": "Body 3, Melee 2, Ride 3"
-    },
-    {
-      "id": "npc-factor-voss",
-      "name": "Factor Voss",
-      "role": "Aeler Guild Factor",
-      "motivation": "Show revenue and save face in an audit",
-      "stats": "Wits 3, Lore 2, Command 2"
-    },
-    {
-      "id": "npc-captain-rusk",
-      "name": "Captain Rusk",
-      "role": "Black Banner Mercenary Captain",
-      "motivation": "Get paid, get out",
-      "stats": "Body 3, Melee 3, Command 2",
-      "secret": "He carries Varus's badge of rank and owes a debt to a smuggler named Peyton."
-    },
-    {
-      "id": "npc-quick-lena",
-      "name": "Quick Lena",
-      "role": "Sidhi Rogue and Thief",
-      "motivation": "Survive, clear her debts",
-      "stats": "Wits 3, Stealth 3, Subterfuge 2",
-      "secret": "She was an apprentice of the Silk Coin who ran when the Velvet Court came."
-    },
-    {
-      "id": "npc-prefect-marcellus",
-      "name": "Prefect Gaius Marcellus",
-      "role": "Commander of Castra Ferrum",
-      "motivation": "Enforce order, control the seal, consolidate power",
-      "stats": "Body 3, Command 3, Spirit 3",
-      "secret": "He leads a cult of oathbreakers who worship Varus's ghost. His younger brother died in a Ykrul raid."
-    },
-    {
-      "id": "npc-censor-cassia",
-      "name": "Censor Cassia",
-      "role": "Political Rival of Marcellus",
-      "motivation": "Destroy the seal, expose Marcellus",
-      "stats": "Wits 4, Lore 3, Arcana 2",
-      "secret": "Her left eye is a polished silver disc - a magical lens that reveals lies. She is dying of a slow fever."
-    },
-    {
-      "id": "npc-mareth",
-      "name": "Mareth",
-      "role": "Exiled Scholar of Thepyrgos",
-      "motivation": "Guide the exiles, atone for past mistakes",
-      "stats": "Wits 4, Lore 4, Arcana 3",
-      "secret": "They were a Runekeeper of the Traveler, expelled for unlocking forbidden way-routes."
     },
     {
       "id": "npc-old-kes",
@@ -580,6 +676,14 @@
       "motivation": "Keep the Silk Coin's principles alive",
       "stats": "Presence 3, Sway 3, Lore 2",
       "secret": "He taught the exiles to keep their word even when it cost everything."
+    },
+    {
+      "id": "npc-mareth",
+      "name": "Mareth",
+      "role": "Exiled Scholar of Thepyrgos",
+      "motivation": "Guide the exiles, atone for past mistakes",
+      "stats": "Wits 4, Lore 4, Arcana 3",
+      "secret": "They were a Runekeeper of the Traveler, expelled for unlocking forbidden way-routes."
     }
   ],
   "locations": [

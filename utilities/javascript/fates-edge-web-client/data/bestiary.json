@@ -5,7 +5,13 @@
       "summary": "A psychic recording of a traumatic death, repeating endlessly. Cannot be negotiated with.",
       "locations": ["Sites of violent death", "Aeler mining tunnels", "Haunted battlefields"],
       "lore": "Not truly a spirit, but an imprint. Requires a witness to speak the truth of the event to fade.",
-      "connections": ["The Witness"]
+      "connections": ["The Witness"],
+      "tl": 1,
+      "class": "I",
+      "sb_spends": [
+        { "cost": 1, "name": "[HAUNT] Replay the death", "effect": "The Echo projects its death into a PC's mind; they mark 1 Fatigue unless they speak a truth aloud." },
+        { "cost": 1, "name": "[TIMER] Strengthen the imprint", "effect": "Start a 4-segment 'Imprint Deepens' timer. When full, a second Echo spawns from the same site." }
+      ]
     }
   },
   {
@@ -14,16 +20,29 @@
       "summary": "A spirit bound to an object, location, or person by unresolved emotion. Possesses will and memory.",
       "locations": ["Vilikari hearths", "Aeler watchtowers", "Places of betrayal"],
       "lore": "Can be negotiated with to fulfill unfinished business.",
-      "connections": ["The Hearth-Bound", "The Duty-Bound", "The Wronged"]
+      "connections": ["The Hearth-Bound", "The Duty-Bound", "The Wronged"],
+      "tl": 2,
+      "class": "II",
+      "sb_spends": [
+        { "cost": 1, "name": "[BARGAIN] Offer a fragment of memory", "effect": "The Anchor offers a useful memory if a PC swears to fulfill its unfinished business." },
+        { "cost": 2, "name": "[HAUNT] Ride the bound object", "effect": "The Anchor possesses its anchor-object; anyone touching it sees the Anchor's death and is Slowed." }
+      ]
     }
   },
   {
-    "Poltergeist (Class IV Spirit)": {
+    "Poltergeist (Class III Spirit)": {
       "page": "Poltergeist",
       "summary": "A corrupted Anchor, driven by rage or hunger. A wound that has learned to strike back.",
       "locations": ["Plague houses", "Sites of unresolved grief", "The Plague House of Port Shed"],
       "lore": "Progresses through stages from The Knock to The Mask (possession).",
-      "connections": ["The Sentinel"]
+      "connections": ["The Sentinel"],
+      "tl": 3,
+      "class": "III",
+      "sb_spends": [
+        { "cost": 1, "name": "[ENVIRONMENT] Throw the room", "effect": "Furniture, debris, or tools fly at the party; one PC is knocked Prone." },
+        { "cost": 2, "name": "[HAUNT] Manifest the scream", "effect": "The Poltergeist becomes visible; all PCs in Near range mark 1 Fatigue from its shriek." },
+        { "cost": 3, "name": "[POSSESSION] The Mask forms", "effect": "The Poltergeist rides a host for one exchange, turning their body against the party." }
+      ]
     }
   },
   {
@@ -32,7 +51,14 @@
       "summary": "An Anchor that has begun consuming life force to sustain itself. Retains intelligence.",
       "locations": ["Crypts", "Battlefields", "The sewers of Port Shed"],
       "lore": "Can be negotiated with if fed; fire and silver are key weaknesses.",
-      "connections": ["Malachai", "The Well of Ichor"]
+      "connections": ["Malachai", "The Well of Ichor"],
+      "tl": 3,
+      "class": "III",
+      "sb_spends": [
+        { "cost": 1, "name": "[BARGAIN] Hunger speaks", "effect": "The Ghoul pauses, offering information in exchange for a morsel of flesh or a recent memory." },
+        { "cost": 2, "name": "[REINFORCEMENT] Call another starved mouth", "effect": "Its hunger-song draws a second Starved Anchor from a dark corner." },
+        { "cost": 2, "name": "[BLOOD] Latching bite", "effect": "The Ghoul fastens onto a PC; the PC marks Harm 1 and the Ghoul heals." }
+      ]
     }
   },
   {
@@ -41,7 +67,14 @@
       "summary": "A lycanthrope that transforms into a massive seal or walrus. Solitary and melancholic.",
       "locations": ["Linn coastline", "Northern seas"],
       "lore": "Transforms during the first winter storm after a kill. Vulnerable to silver.",
-      "connections": ["Malachai"]
+      "connections": ["Malachai"],
+      "tl": 3,
+      "class": "III",
+      "sb_spends": [
+        { "cost": 1, "name": "[ENVIRONMENT] Drag into the surf", "effect": "The Sea-Wolf hauls a PC into freezing water; they are Slowed until warmed." },
+        { "cost": 2, "name": "[REINFORCEMENT] Storm-sibling", "effect": "The storm's voice calls a second Sea-Wolf from the breakers." },
+        { "cost": 2, "name": "[TIMER] Drowning tide", "effect": "Start a 4-segment 'Tide Rises' timer. When full, the surf sweeps the lowest ground clear." }
+      ]
     }
   },
   {
@@ -50,7 +83,14 @@
       "summary": "A hawk-headed hunter that transforms during the day to hunt oath-breakers.",
       "locations": ["Ykrul steppes"],
       "lore": "Triggered by the sight of blood on fresh snow. Hunts for justice, not flesh.",
-      "connections": ["Malachai"]
+      "connections": ["Malachai"],
+      "tl": 3,
+      "class": "III",
+      "sb_spends": [
+        { "cost": 1, "name": "[SOCIAL] Circle the oath-breaker", "effect": "The Sky-Hound circles a PC it judges guilty; other PCs must choose to intervene or condemn." },
+        { "cost": 2, "name": "[TIMER] Mark of judgment", "effect": "Start a 4-segment 'Judgment' timer. At 4, the Sky-Hound strikes the marked PC." },
+        { "cost": 1, "name": "[ENVIRONMENT] Screaming snow", "effect": "Its cry kicks up blinding snow; vision in Near is reduced to one exchange." }
+      ]
     }
   },
   {
@@ -59,7 +99,14 @@
       "summary": "Transforms into a tree, immobile but all-seeing. Guardians, not predators.",
       "locations": ["The Valewood", "Ancient groves"],
       "lore": "Triggered by a witnessed promise of hospitality.",
-      "connections": ["Malachai", "The Green Court"]
+      "connections": ["Malachai", "The Green Court"],
+      "tl": 2,
+      "class": "II",
+      "sb_spends": [
+        { "cost": 1, "name": "[BARGAIN] Demand hospitality", "effect": "It will not allow passage until a PC swears a promise of hospitality." },
+        { "cost": 2, "name": "[ENVIRONMENT] Roots seize the path", "effect": "Roots erupt across the ground; movement in the area becomes Desperate." },
+        { "cost": 2, "name": "[FEY] Witness a broken promise", "effect": "If a PC breaks a promise in its grove, it transforms into a Thorn Dryad's vassal and attacks." }
+      ]
     }
   },
   {
@@ -68,97 +115,176 @@
       "summary": "Massive, slow lycanthrope that transforms only underground. Nearly invulnerable.",
       "locations": ["Aeler mines", "Deep under-vaults"],
       "lore": "Cannot transform in sunlight. Silver weapon to the heart or brain.",
-      "connections": ["Malachai"]
+      "connections": ["Malachai"],
+      "tl": 4,
+      "class": "IV",
+      "sb_spends": [
+        { "cost": 2, "name": "[ENVIRONMENT] Cavern-shaking slam", "effect": "It slams the stone; start a 4-segment 'Collapse' timer. At 4, rocks fall in the chamber." },
+        { "cost": 1, "name": "[ENVIRONMENT] Stone dust cloud", "effect": "It kicks up thick stone-dust; all attacks in Near are Desperate until cleared." },
+        { "cost": 3, "name": "[REINFORCEMENT] Pressure-crack ally", "effect": "The tremor cracks a wall and a Vein-Serpent spills out to aid it." }
+      ]
     }
   },
   {
-    "Baron Quentin Asselin (Vampire)": {
+    "Baron Quentin Asselin (True Vampire)": {
       "page": "Baron_Quentin_Asselin",
       "summary": "The first vampire and one of the Thirteen. Disillusioned and melancholic.",
       "locations": ["A secluded estate in a remote valley"],
       "lore": "Converts guests or drives them mad. Never accept his wine.",
-      "connections": ["Malachai", "The Thirteen First Vampires"]
+      "connections": ["Malachai", "The Thirteen First Vampires"],
+      "tl": 7,
+      "class": "VI",
+      "sb_spends": [
+        { "cost": 1, "name": "[BLOOD] Lock eyes", "effect": "The Baron catches a PC's gaze; they must test Spirit + Resolve or offer a wrist." },
+        { "cost": 2, "name": "[BARGAIN] Offer the wine", "effect": "He offers a drink. Refusing worsens all party Position by one step for this scene." },
+        { "cost": 2, "name": "[REINFORCEMENT] Call the household", "effect": "A lesser vampire or two enthralled servants arrive from the wine cellar." },
+        { "cost": 3, "name": "[HAUNT] Mist and memory", "effect": "He dissolves into mist and reforms behind a PC, whispering their greatest failure." }
+      ]
     }
   },
   {
-    "Sister Maris (Vampire)": {
+    "Sister Maris (True Vampire)": {
       "page": "Sister_Maris",
       "summary": "One of the Thirteen. Runs a children's hospice where the children never leave.",
-      "locations": ["Eastern swamps"],
+      "locations": ["Eastern swamps of Thepyrgos"],
       "lore": "The Everflame has tried to destroy her hospice four times, but the children defend her.",
-      "connections": ["Malachai", "The Thirteen First Vampires"]
+      "connections": ["Malachai", "The Thirteen First Vampires"],
+      "tl": 7,
+      "class": "VI",
+      "sb_spends": [
+        { "cost": 1, "name": "[SOCIAL] The children sing", "effect": "The children form a protective ring; harming Sister Maris requires harming them first." },
+        { "cost": 2, "name": "[BARGAIN] Mother's mercy", "effect": "She offers to heal a PC's Harm if they swear never to harm her." },
+        { "cost": 2, "name": "[REINFORCEMENT] Wake the hospice", "effect": "More children rise from their beds, moving with wrong, shared grace." },
+        { "cost": 3, "name": "[HAUNT] Lullaby of forgetting", "effect": "She sings; PCs in Near must test Spirit or lose a Boon and forget why they came." }
+      ]
     }
   },
   {
-    "The Sparrow (Vampire)": {
+    "The Sparrow (True Vampire)": {
       "page": "The_Sparrow",
       "summary": "One of the Thirteen. Kills only the wicked, or so he claims.",
       "locations": ["No fixed domain"],
       "lore": "Cannot look at mirrors. Has saved Saikou Ira's life twice.",
-      "connections": ["Malachai", "The Thirteen First Vampires"]
+      "connections": ["Malachai", "The Thirteen First Vampires"],
+      "tl": 6,
+      "class": "VI",
+      "sb_spends": [
+        { "cost": 1, "name": "[SOCIAL] Name the wicked", "effect": "He declares one PC 'wicked'; the others must justify them or he attacks that PC." },
+        { "cost": 2, "name": "[BARGAIN] A life for a secret", "effect": "He offers to spare a target if the party gives up a secret that will ruin someone." },
+        { "cost": 2, "name": "[ENVIRONMENT] Shatter every mirror", "effect": "He breaks reflective surfaces in Near; no one can use them against him." },
+        { "cost": 3, "name": "[HAUNT] Step from shadow", "effect": "He appears in a PC's shadow and strikes before they can act." }
+      ]
     }
   },
   {
-    "Linn Draugr (Vampire)": {
+    "Linn Draugr (Lesser Vampire)": {
       "page": "Linn_Draugr",
       "summary": "Vampires that breathe underwater, trapped by sea-salt circles.",
       "locations": ["Linn coastline", "Shipwrecks"],
       "lore": "A lesser bloodline of the Thirteen.",
-      "connections": ["Malachai"]
+      "connections": ["Malachai"],
+      "tl": 3,
+      "class": "III",
+      "sb_spends": [
+        { "cost": 1, "name": "[BLOOD] Feed on the drowned", "effect": "It drags a nearby corpse underwater and feeds, healing itself." },
+        { "cost": 1, "name": "[ENVIRONMENT] Salt wash", "effect": "It splashes salt water, eroding a protective circle or weakening a barrier." },
+        { "cost": 1, "name": "[REINFORCEMENT] Call from the wreck", "effect": "Its cry rouses another Draugr tangled in the kelp." }
+      ]
     }
   },
   {
-    "Aeler Stone-Sleepers (Vampire)": {
+    "Aeler Stone-Sleepers (Lesser Vampire)": {
       "page": "Aeler_Stone-Sleepers",
       "summary": "Vampires that drink breath, awakened by bronze bells at dawn.",
       "locations": ["Aeler deep mines"],
       "lore": "A lesser bloodline.",
-      "connections": ["Malachai"]
+      "connections": ["Malachai"],
+      "tl": 3,
+      "class": "III",
+      "sb_spends": [
+        { "cost": 1, "name": "[BLOOD] Steal a breath", "effect": "It sips the air from a PC's lungs; they mark 1 Fatigue." },
+        { "cost": 1, "name": "[ENVIRONMENT] Extinguish light", "effect": "It snuffs the nearest flame or lantern, claiming the darkness." },
+        { "cost": 1, "name": "[REINFORCEMENT] The bronze bell rings", "effect": "A distant bell tolls and another Stone-Sleeper opens its eyes." }
+      ]
     }
   },
   {
-    "Ykrul Bone-Eaters (Vampire)": {
+    "Ykrul Bone-Eaters (Lesser Vampire)": {
       "page": "Ykrul_Bone-Eaters",
       "summary": "Vampires that turn to dust when killed but rise if their name is spoken.",
       "locations": ["Ykrul steppes"],
       "lore": "Erase the name to destroy them permanently.",
-      "connections": ["Malachai"]
+      "connections": ["Malachai"],
+      "tl": 3,
+      "class": "III",
+      "sb_spends": [
+        { "cost": 1, "name": "[HAUNT] Speak the name", "effect": "A PC or NPC accidentally speaks its name; it reforms from dust." },
+        { "cost": 1, "name": "[BLOOD] Crunch marrow", "effect": "It devours a bone it carries, healing and gaining one die next exchange." },
+        { "cost": 2, "name": "[SOCIAL] Name-stealing curse", "effect": "It bites a PC and learns their true name; the PC's Position worsens until they reclaim it." }
+      ]
     }
   },
   {
-    "Vhasian Candle-Wights (Vampire)": {
+    "Vhasian Candle-Wights (Lesser Vampire)": {
       "page": "Vhasian_Candle-Wights",
       "summary": "Vampires that extinguish flames through windows. A lit candle at the threshold bars them.",
       "locations": ["Vhasia"],
       "lore": "A lesser bloodline.",
-      "connections": ["Malachai"]
+      "connections": ["Malachai"],
+      "tl": 3,
+      "class": "III",
+      "sb_spends": [
+        { "cost": 1, "name": "[ENVIRONMENT] Blow out the light", "effect": "It extinguishes one light source in Near or Far range." },
+        { "cost": 1, "name": "[HAUNT] Tap at the glass", "effect": "It appears at a window; PCs inside must test Spirit or lose a Boon." },
+        { "cost": 2, "name": "[TIMER] Candle wanes", "effect": "Start a 4-segment 'Threshold Light' timer. At 4, the last protective candle goes out." }
+      ]
     }
   },
   {
-    "Lethai-ar Silk-Drinkers (Vampire)": {
+    "Lethai-ar Silk-Drinkers (Lesser Vampire)": {
       "page": "Lethai-ar_Silk-Drinkers",
       "summary": "Vampires that feed on desire. Vulnerable to vows witnessed by a third party.",
       "locations": ["Lethai-ar territories", "The Court Painter of Mbaro's domain"],
       "lore": "A lesser bloodline.",
-      "connections": ["Malachai"]
+      "connections": ["Malachai"],
+      "tl": 3,
+      "class": "III",
+      "sb_spends": [
+        { "cost": 1, "name": "[BARGAIN] Offered wish", "effect": "It whispers a PC's desire and offers it if they break a vow." },
+        { "cost": 2, "name": "[SOCIAL] Unwanted truth", "effect": "It drinks a secret and speaks it aloud, turning allies against each other." },
+        { "cost": 2, "name": "[TIMER] Hunger blooms", "effect": "Start a 4-segment 'Longing' timer. At 4, a PC is compelled to approach it." }
+      ]
     }
   },
   {
     "The Oath-Keeper (Possessor Variant)": {
       "page": "Oath-Keeper_Possessor",
-      "summary": "A spirit of unpaid obligation that wears the face of the person you failed.",
-      "locations": ["Anywhere a debt is owed"],
+      "summary": "A spirit of broken oaths that wears the face of the person you failed.",
+      "locations": ["Anywhere an oath was broken"],
       "lore": "Manifests from your own memory. It accuses, does not attack. Can possess a host.",
-      "connections": ["The Hollow", "Daughters of the Unbroken Cord"]
+      "connections": ["The Hollow", "Daughters of the Unbroken Cord"],
+      "tl": 3,
+      "class": "III",
+      "sb_spends": [
+        { "cost": 1, "name": "[SOCIAL] Name the broken oath", "effect": "It speaks the oath aloud; the accused PC's Position worsens until they answer." },
+        { "cost": 2, "name": "[POSSESSION] Wear the host", "effect": "It enters a host's shadow; the PC speaks truths they wanted hidden." },
+        { "cost": 3, "name": "[SOCIAL] Public reckoning", "effect": "It forces a confrontation; all present must choose a side, splitting the party." }
+      ]
     }
   },
   {
-    "The Counting Wraith": {
-      "page": "Counting_Wraith",
-      "summary": "A ghost of an error that appears when someone miscounts nine steps, cups, or breaths.",
-      "locations": ["Thresholds", "Stairways", "Counting-houses"],
-      "lore": "Can only be resolved by a correct count. Takes memories as payment for errors.",
-      "connections": ["The Hollow"]
+    "The Misstep": {
+      "page": "The_Misstep",
+      "summary": "A ghost that rises where a threshold is crossed wrongly—nine steps taken where eight were asked, a door opened out of turn.",
+      "locations": ["Thresholds", "Stairways", "Forgotten doorways"],
+      "lore": "Can only be resolved by walking the threshold as it should be walked. It claims a memory from those who cross out of turn.",
+      "connections": ["The Hollow"],
+      "tl": 2,
+      "class": "II",
+      "sb_spends": [
+        { "cost": 1, "name": "[TIMER] Threshold unravels", "effect": "Tick 'Threshold Unraveling' +1. At 4, the doorway leads somewhere else entirely." },
+        { "cost": 2, "name": "[MEMORY] Claim a step", "effect": "The Misstep takes a memory; a PC forgets why they entered this room." }
+      ]
     }
   },
   {
@@ -167,7 +293,13 @@
       "summary": "A ghost bound by a secret promise of silence, unable to speak its unfinished business.",
       "locations": ["Where secrets were made", "Rooms with hidden doors"],
       "lore": "Can only be resolved by someone speaking the secret aloud in the presence of a witness.",
-      "connections": ["The Hollow", "Daughters of the Unbroken Cord"]
+      "connections": ["The Hollow", "Daughters of the Unbroken Cord"],
+      "tl": 2,
+      "class": "II",
+      "sb_spends": [
+        { "cost": 1, "name": "[SOCIAL] Press the secret", "effect": "It pushes a secret into a PC's mind; they must share it or mark 1 Fatigue." },
+        { "cost": 2, "name": "[BARGAIN] Speak for me", "effect": "It offers to reveal a hidden door if a PC swears to carry its message to the living." }
+      ]
     }
   },
   {
@@ -176,7 +308,13 @@
       "summary": "A threshold entity that appears as a gray door where no door stood before.",
       "locations": ["Thresholds", "The space between places"],
       "lore": "Opens to a room with two mirrors. Choosing one transforms the character.",
-      "connections": ["The Witness", "Aveh", "The Hollow"]
+      "connections": ["The Witness", "Aveh", "The Hollow"],
+      "tl": 2,
+      "class": "II",
+      "sb_spends": [
+        { "cost": 1, "name": "[ENVIRONMENT] A second door", "effect": "A second gray door appears; choosing wrongly transforms a random trait." },
+        { "cost": 2, "name": "[TIMER] Doors begin to fade", "effect": "Start a 4-segment 'Door Closes' timer. At 4, both doors vanish and the party is stranded." }
+      ]
     }
   },
   {
@@ -185,7 +323,15 @@
       "summary": "A mythic creature dwelling in the deepest galleries beneath Khaz-Vurim.",
       "locations": ["Khaz-Vurim deep galleries", "The Heart of the Ninth Gallery"],
       "lore": "A wyrm, child of Nidhoggr. It invites intruders to count their breaths, then consumes them.",
-      "connections": ["Nidhoggr", "The Aeler"]
+      "connections": ["Nidhoggr", "The Aeler"],
+      "tl": 7,
+      "class": "VII",
+      "sb_spends": [
+        { "cost": 1, "name": "[PRESSURE] Count your breaths", "effect": "The Drake counts aloud; all PCs in Near must hold their breath or mark 1 Fatigue." },
+        { "cost": 2, "name": "[TIMER] Crush of the deep", "effect": "Start a 6-segment 'Gallery Collapse' timer. At 6, the stone closes like a fist." },
+        { "cost": 3, "name": "[REINFORCEMENT] Pressure-spawn", "effect": "A fissure opens and Nidhoggr's Brood spills through to flank the party." },
+        { "cost": 2, "name": "[ENVIRONMENT] Exhale stale air", "effect": "The Drake exhales pressure; all ranged attacks in Near become Desperate." }
+      ]
     }
   },
   {
@@ -194,7 +340,13 @@
       "summary": "A demon of small bargains, offering power through contracts witnessed by no one.",
       "locations": ["Crossroads", "Thresholds", "The space between deals"],
       "lore": "A contract sealed without a third party is a hole shaped like your own hand.",
-      "connections": ["The Abyss"]
+      "connections": ["The Abyss"],
+      "tl": 1,
+      "class": "I",
+      "sb_spends": [
+        { "cost": 1, "name": "[BARGAIN] Whisper a contract", "effect": "It offers a small power for a tiny, unwitnessed promise." },
+        { "cost": 1, "name": "[SOCIAL] Find a witness", "effect": "It points out that a PC's deal lacks a witness; the PC loses a Boon until they find one." }
+      ]
     }
   },
   {
@@ -203,7 +355,14 @@
       "summary": "A demon summoned by violence or mass death. It does not speak; it erases.",
       "locations": ["Battlefields", "Sites of massacre"],
       "lore": "Banishment requires overwhelming witness—three or more souls refusing to look away.",
-      "connections": ["The Abyss"]
+      "connections": ["The Abyss"],
+      "tl": 4,
+      "class": "IV",
+      "sb_spends": [
+        { "cost": 1, "name": "[ENVIRONMENT] Erase the ground", "effect": "Its passage scorches earth; movement in Near becomes Desperate." },
+        { "cost": 2, "name": "[REINFORCEMENT] Birth from slaughter", "effect": "The blood of the wounded births a second, lesser Ravager." },
+        { "cost": 2, "name": "[HAUNT] Refuse to witness", "effect": "It forces a PC to avert their eyes; that PC cannot assist others this exchange." }
+      ]
     }
   },
   {
@@ -212,7 +371,14 @@
       "summary": "A demon that possesses a host, slowly eroding their identity.",
       "locations": ["Ecktoria", "Where a soul has said 'yes' to something they should have refused"],
       "lore": "Exorcism requires a witness from the host's faith and the demon's true name.",
-      "connections": ["The Abyss"]
+      "connections": ["The Abyss"],
+      "tl": 4,
+      "class": "IV",
+      "sb_spends": [
+        { "cost": 1, "name": "[BARGAIN] Offer to leave", "effect": "It whispers that it will depart the host if the party sacrifices someone else's name." },
+        { "cost": 2, "name": "[POSSESSION] Leap to a new host", "effect": "It abandons the current host and seizes a nearby NPC or PC." },
+        { "cost": 2, "name": "[TIMER] Erode the self", "effect": "Start a 4-segment 'Identity Fades' timer. At 4, the host forgets their own name." }
+      ]
     }
   },
   {
@@ -221,7 +387,14 @@
       "summary": "A demon that embodies an emotion: fear, grief, or ambition, starving the body.",
       "locations": ["Inside a host's psyche"],
       "lore": "Countered by rigorous emotional discipline and sensory deprivation.",
-      "connections": ["The Abyss"]
+      "connections": ["The Abyss"],
+      "tl": 4,
+      "class": "IV",
+      "sb_spends": [
+        { "cost": 1, "name": "[HAUNT] Amplify the feeling", "effect": "It feasts on a PC's dominant emotion; that PC acts at Desperate Position." },
+        { "cost": 2, "name": "[BARGAIN] Take the pain", "effect": "It offers to remove the emotion forever in exchange for a treasured memory." },
+        { "cost": 2, "name": "[TIMER] Starve the body", "effect": "Start a 4-segment 'Hollow' timer. At 4, the host collapses from starvation of will." }
+      ]
     }
   },
   {
@@ -229,8 +402,15 @@
       "page": "Trow",
       "summary": "Enigmatic fey who keep to thresholds and almost-there spaces. Bound by courtesy.",
       "locations": ["Thresholds", "Crossroads", "The space between departure and arrival"],
-      "lore": "Hint at an unnamed patron like the Gray Benefactor. Payment must be in honest memory.",
-      "connections": ["The Gray Benefactor", "The Under-Guest"]
+      "lore": "Hint at an unnamed patron like the Gray Benefactor. They accept an honest memory as their due.",
+      "connections": ["The Gray Benefactor", "The Under-Guest"],
+      "tl": 2,
+      "class": "II",
+      "sb_spends": [
+        { "cost": 1, "name": "[BARGAIN] Name the toll", "effect": "It names a true memory as the price for safe passage." },
+        { "cost": 2, "name": "[FEY] Threshold law", "effect": "It invokes threshold law; crossing without permission marks 1 Fatigue." },
+        { "cost": 1, "name": "[SOCIAL] Test courtesy", "effect": "It provokes the rudest PC; an insult turns it hostile." }
+      ]
     }
   },
   {
@@ -239,7 +419,14 @@
       "summary": "The forest's awareness of intruders, manifesting as silence and watching.",
       "locations": ["The Valewood", "Thin places"],
       "lore": "Manifest as an Oath-Keeper when a taboo is broken.",
-      "connections": ["The Hollow"]
+      "connections": ["The Hollow"],
+      "tl": 2,
+      "class": "II",
+      "sb_spends": [
+        { "cost": 1, "name": "[ENVIRONMENT] Forest falls silent", "effect": "All sound dies; the Neighbors become Dominant, the party Desperate." },
+        { "cost": 2, "name": "[FEY] Invoke a taboo", "effect": "A PC breaks an unspoken rule; start a 4-segment 'Broken Promise' timer." },
+        { "cost": 1, "name": "[HAUNT] Eyes in the bark", "effect": "Eyes open in every tree; a PC cannot rest or recover while watched." }
+      ]
     }
   },
   {
@@ -248,7 +435,14 @@
       "summary": "A fae courtier wearing leaves and law, bound by the Green Court's rules.",
       "locations": ["The Green Court", "Where the Hazel Queen's influence holds"],
       "lore": "Cannot lie but may omit. Any gift accepted creates a debt.",
-      "connections": ["The Green Court", "The Hazel Queen"]
+      "connections": ["The Green Court", "The Hazel Queen"],
+      "tl": 3,
+      "class": "III",
+      "sb_spends": [
+        { "cost": 1, "name": "[FEY] The gift", "effect": "It offers a small gift; accepting binds a minor geas until repaid." },
+        { "cost": 2, "name": "[SOCIAL] Riddle of leaves", "effect": "It demands a riddle-answer; a wrong answer costs the party a Boon." },
+        { "cost": 2, "name": "[BARGAIN] Courtly alliance", "effect": "It offers Green Court support in exchange for a future favor." }
+      ]
     }
   },
   {
@@ -257,7 +451,14 @@
       "summary": "Sovereign of a hawthorn court. She never lies; she simply doesn't need to.",
       "locations": ["The Hawthorn Court", "The Valewood"],
       "lore": "Cannot be fought or bargained with on unequal terms. Offer a gift of equal value.",
-      "connections": ["The Green Court"]
+      "connections": ["The Green Court"],
+      "tl": 5,
+      "class": "V",
+      "sb_spends": [
+        { "cost": 2, "name": "[FEY] Briar maze", "effect": "Hawthorn erupts from the ground, forming a maze of thorns." },
+        { "cost": 3, "name": "[BARGAIN] Name her price", "effect": "She names an equal gift she desires; refusal turns the court hostile." },
+        { "cost": 2, "name": "[REINFORCEMENT] Honor guard", "effect": "Thorn Dryads arrive as her honor guard, blocking retreat." }
+      ]
     }
   },
   {
@@ -266,7 +467,14 @@
       "summary": "A giant of living rock, found in mountain passes and under-vaults.",
       "locations": ["Ubral", "Aeler deep under-vaults"],
       "lore": "Pacified by a correct count of eight. Count to nine, and it will become hostile.",
-      "connections": ["The Tall Folk"]
+      "connections": ["The Tall Folk"],
+      "tl": 4,
+      "class": "IV",
+      "sb_spends": [
+        { "cost": 2, "name": "[ENVIRONMENT] Hurl a boulder", "effect": "It throws stone; the terrain becomes difficult and a PC is knocked Prone." },
+        { "cost": 2, "name": "[TIMER] Avalanche", "effect": "Start a 4-segment 'Avalanche' timer. At 4, rockslides sweep the pass." },
+        { "cost": 1, "name": "[SOCIAL] Demand the count", "effect": "It bellows for a count; the wrong number enrages it." }
+      ]
     }
   },
   {
@@ -275,7 +483,14 @@
       "summary": "A giant wrapped in permafrost, appearing during the deepest winters.",
       "locations": ["Himadri", "Northern Reaches"],
       "lore": "Driven back by a true fire, a hearth-fire that has burned for nine generations.",
-      "connections": ["The Tall Folk"]
+      "connections": ["The Tall Folk"],
+      "tl": 4,
+      "class": "IV",
+      "sb_spends": [
+        { "cost": 2, "name": "[ICE] Freeze the ground", "effect": "Its breath ices the earth; movement is halved in Near." },
+        { "cost": 2, "name": "[TIMER] Blizzard", "effect": "Start a 4-segment 'Blizzard' timer. At 4, visibility drops to zero and cold deals Fatigue." },
+        { "cost": 1, "name": "[SOCIAL] Demand tribute", "effect": "It demands fire or food; refusal provokes a charge." }
+      ]
     }
   },
   {
@@ -284,16 +499,30 @@
       "summary": "A giant that appears in thin places and dreams, asking questions.",
       "locations": ["The Valewood", "Ways Between"],
       "lore": "Banished by answering its question truthfully or by refusing to answer at all.",
-      "connections": ["The Tall Folk", "The Hollow"]
+      "connections": ["The Tall Folk", "The Hollow"],
+      "tl": 3,
+      "class": "III",
+      "sb_spends": [
+        { "cost": 1, "name": "[SOCIAL] Ask the question", "effect": "It asks a riddle-question; a wrong answer marks 1 Fatigue." },
+        { "cost": 2, "name": "[DREAM] Pull into sleep", "effect": "A PC who answers falsely falls asleep for one exchange." },
+        { "cost": 1, "name": "[BARGAIN] Offer passage", "effect": "It offers safe passage if the party tells it a dream they never shared." }
+      ]
     }
   },
   {
-    "Debt-Ogre": {
-      "page": "Debt-Ogre",
+    "Promise-Eater Ogre": {
+      "page": "Promise_Eater_Ogre",
       "summary": "An ogre drawn to broken promises, taking the memory of the broken promise.",
       "locations": ["Acasia", "Ubral"],
       "lore": "Can be satisfied by speaking the broken promise aloud, even if you don't remember it.",
-      "connections": ["The Tall Folk", "The Hollow"]
+      "connections": ["The Tall Folk", "The Hollow"],
+      "tl": 2,
+      "class": "II",
+      "sb_spends": [
+        { "cost": 1, "name": "[BARGAIN] Speak the promise", "effect": "It demands the broken promise be spoken; silence worsens Position." },
+        { "cost": 2, "name": "[MEMORY] Devour the vow", "effect": "It eats the promise; all witnesses forget it was ever made." },
+        { "cost": 1, "name": "[SOCIAL] Name the debtor", "effect": "It points at a PC and names them debtor; others must vouch for them." }
+      ]
     }
   },
   {
@@ -302,7 +531,14 @@
       "summary": "A huge, bloated ogre drawn to battlefields, scavenging the dead and living.",
       "locations": ["Black Banners", "Zakov"],
       "lore": "Driven off by fire or a more appealing offering.",
-      "connections": ["The Tall Folk", "The Hollow"]
+      "connections": ["The Tall Folk", "The Hollow"],
+      "tl": 3,
+      "class": "III",
+      "sb_spends": [
+        { "cost": 1, "name": "[BLOOD] Gorge on a corpse", "effect": "It devours a body, healing itself." },
+        { "cost": 2, "name": "[ENVIRONMENT] Upend cover", "effect": "It overturns a cart, wall, or barricade, exposing the party." },
+        { "cost": 1, "name": "[BARGAIN] Offer a bigger meal", "effect": "It can be distracted by a larger or fresher offering." }
+      ]
     }
   },
   {
@@ -311,7 +547,14 @@
       "summary": "An ogre covered in rocky hide, guarding places where the earth has been wounded.",
       "locations": ["Aeler", "Ubral"],
       "lore": "Pacified by repairing the wound to the land.",
-      "connections": ["The Tall Folk", "The Hollow"]
+      "connections": ["The Tall Folk", "The Hollow"],
+      "tl": 3,
+      "class": "III",
+      "sb_spends": [
+        { "cost": 2, "name": "[ENVIRONMENT] Seal the passage", "effect": "It slams stone, sealing a doorway or tunnel." },
+        { "cost": 2, "name": "[TIMER] Wound spreads", "effect": "Start a 4-segment 'Earth Bleeds' timer. At 4, the ground becomes unstable." },
+        { "cost": 1, "name": "[BARGAIN] Mend the wound", "effect": "It pauses if a PC begins repairing the wounded earth." }
+      ]
     }
   },
   {
@@ -320,7 +563,14 @@
       "summary": "A vast oni sleeping beneath a caldera, dreaming of waking.",
       "locations": ["Nihori", "Western ash wastes"],
       "lore": "Sealed by performing the old rites: a pilgrimage, a true name spoken at midnight.",
-      "connections": ["The Oni-Eyed daimyo", "The Tall Folk"]
+      "connections": ["The Oni-Eyed daimyo", "The Tall Folk"],
+      "tl": 6,
+      "class": "VI",
+      "sb_spends": [
+        { "cost": 3, "name": "[ENVIRONMENT] The caldera stirs", "effect": "Start a 6-segment 'Eruption' timer. At 6, ash and lava flood the area." },
+        { "cost": 2, "name": "[DREAM] Dream-spawn", "effect": "The Oni dreams an Oni-spawn into being beside the party." },
+        { "cost": 2, "name": "[TIMER] The old seal weakens", "effect": "The binding rites falter; the Oni gains +1 die." }
+      ]
     }
   },
   {
@@ -329,7 +579,14 @@
       "summary": "A clever oni dwelling in deep pools, offering bargains to the lost and desperate.",
       "locations": ["Ayokha", "Great rivers"],
       "lore": "Driven off by a true name.",
-      "connections": ["The Tall Folk"]
+      "connections": ["The Tall Folk"],
+      "tl": 3,
+      "class": "III",
+      "sb_spends": [
+        { "cost": 1, "name": "[BARGAIN] Offer what was lost", "effect": "It offers to return something a PC lost—for a future favor." },
+        { "cost": 2, "name": "[TIDE] River rises", "effect": "Start a 4-segment 'Drowning Current' timer. At 4, the bank overflows." },
+        { "cost": 1, "name": "[SOCIAL] Name the desperate", "effect": "It names a PC's secret desperation; that PC loses a Boon." }
+      ]
     }
   },
   {
@@ -338,7 +595,14 @@
       "summary": "An oni that appears in dreams, offering bargains and taking memories.",
       "locations": ["Ways Between", "Dreams"],
       "lore": "Banished by speaking a truth never told or by waking.",
-      "connections": ["The Tall Folk", "The Hollow"]
+      "connections": ["The Tall Folk", "The Hollow"],
+      "tl": 3,
+      "class": "III",
+      "sb_spends": [
+        { "cost": 2, "name": "[DREAM] Shared nightmare", "effect": "It pulls a PC into a shared nightmare; they act at Desperate until woken." },
+        { "cost": 2, "name": "[BARGAIN] Rewrite the memory", "effect": "It offers to erase a bad memory in exchange for a good one." },
+        { "cost": 1, "name": "[HAUNT] Whisper while waking", "effect": "Its voice lingers after waking; a PC speaks a truth they meant to keep." }
+      ]
     }
   },
   {
@@ -347,7 +611,13 @@
       "summary": "Common pests in the Crown Spread, known for their greed and cowardice.",
       "locations": ["The Mudflats", "Old Dwarven Road"],
       "lore": "Hunger's fingers. Can be bribed, threatened, or tricked.",
-      "connections": ["The Hunger Beneath"]
+      "connections": ["The Hunger Beneath"],
+      "tl": 1,
+      "class": "I",
+      "sb_spends": [
+        { "cost": 1, "name": "[REINFORCEMENT] More pests", "effect": "Its shrieks summon 1d6 more scavengers." },
+        { "cost": 1, "name": "[TRAP] Crude snare", "effect": "A hidden trip-wire or pit trap springs." }
+      ]
     }
   },
   {
@@ -356,7 +626,13 @@
       "summary": "Pale, blind, and skittering goblins adapted to the darkness of the deep ways.",
       "locations": ["Aeler Underways"],
       "lore": "Navigate by echolocation. Weak to bright light.",
-      "connections": ["The Hunger Beneath"]
+      "connections": ["The Hunger Beneath"],
+      "tl": 1,
+      "class": "I",
+      "sb_spends": [
+        { "cost": 1, "name": "[REINFORCEMENT] Echolocation call", "effect": "Its clicking calls more tunnel-goblins from the dark." },
+        { "cost": 1, "name": "[ENVIRONMENT] Snuff the light", "effect": "It swarms a light source, risking breakage." }
+      ]
     }
   },
   {
@@ -365,7 +641,14 @@
       "summary": "Goblins touched by the fires of Zahk'Kozahn, carrying the heat of Malachai's forge.",
       "locations": ["Zahk'Kozahn Fringes"],
       "lore": "Explode in a burst of ash and heat when killed. Weak to water.",
-      "connections": ["The Hunger Beneath", "Malachai"]
+      "connections": ["The Hunger Beneath", "Malachai"],
+      "tl": 2,
+      "class": "II",
+      "sb_spends": [
+        { "cost": 1, "name": "[FIRE] Ember burst", "effect": "A dying Ember-Goblin explodes, dealing Fatigue to all in Close." },
+        { "cost": 2, "name": "[ENVIRONMENT] Ignite the debris", "effect": "They set flammable material alight; the area becomes hazardous." },
+        { "cost": 1, "name": "[REINFORCEMENT] Forge-kin arrive", "effect": "The heat calls more Ember-Goblins from the cracks." }
+      ]
     }
   },
   {
@@ -374,7 +657,13 @@
       "summary": "Webbed-fingered goblins that patrol the tide-lines, scavenging what the sea brings.",
       "locations": ["Linn Coast"],
       "lore": "Amphibious and opportunistic.",
-      "connections": ["The Hunger Beneath"]
+      "connections": ["The Hunger Beneath"],
+      "tl": 1,
+      "class": "I",
+      "sb_spends": [
+        { "cost": 1, "name": "[REINFORCEMENT] Tide brings more", "effect": "A wave deposits more Sea-Goblins on the shore." },
+        { "cost": 1, "name": "[TIDE] Drag to water", "effect": "They grab at ankles, trying to pull a PC into the surf." }
+      ]
     }
   },
   {
@@ -383,34 +672,60 @@
       "summary": "Dust-gray goblins living in the high passes, their eyes reflecting constellations.",
       "locations": ["High Passes"],
       "lore": "Star-touched, leaving behind a glowing crystal shard when killed.",
-      "connections": ["The Hunger Beneath"]
+      "connections": ["The Hunger Beneath"],
+      "tl": 2,
+      "class": "II",
+      "sb_spends": [
+        { "cost": 1, "name": "[ENVIRONMENT] Crystal lure", "effect": "A dead Star-Goblin's crystal glows, drawing predators." },
+        { "cost": 1, "name": "[HAUNT] Starlight blindness", "effect": "Their eyes flare; a PC is blinded for one exchange." }
+      ]
     }
   },
   {
     "Hobgoblin": {
       "page": "Hobgoblin",
-      "summary": "Taller, disciplined goblinoids acting as the Hunger's enforcers.",
-      "locations": ["Broken Marches", "Where order has broken down"],
+      "summary": "Taller, disciplined goblinoids acting as the Hunger's enforcers and sell-swords.",
+      "locations": ["Broken Marches", "Black Banners camps", "Where order has broken down"],
       "lore": "Hunger's fist. Respect strength and order. Can be reasoned with from a position of strength.",
-      "connections": ["The Hunger Beneath"]
+      "connections": ["The Hunger Beneath", "The Black Banners"],
+      "tl": 2,
+      "class": "II",
+      "sb_spends": [
+        { "cost": 2, "name": "[REINFORCEMENT] Call the squad", "effect": "It blows a horn and 1d4 hobgoblins arrive." },
+        { "cost": 1, "name": "[TACTICS] Flank and pin", "effect": "It orders goblins into flanking positions; the party's Position worsens." },
+        { "cost": 1, "name": "[BARGAIN] Offer terms", "effect": "It will parley if the party shows clear dominance." }
+      ]
     }
   },
   {
-    "Bugbear": {
-      "page": "Bugbear",
+    "Mirk-Stalker": {
+      "page": "Mirk_Stalker",
       "summary": "Large, silent hunters of the goblinoid kind, patient and relentless.",
       "locations": ["Wilderness", "Where something has been lost"],
       "lore": "Hunger's stalker. Cannot be bargained with; can only be distracted or out-hunted.",
-      "connections": ["The Hunger Beneath"]
+      "connections": ["The Hunger Beneath"],
+      "tl": 3,
+      "class": "III",
+      "sb_spends": [
+        { "cost": 1, "name": "[AMBUSH] Fade into shadow", "effect": "It vanishes and reappears behind a vulnerable PC." },
+        { "cost": 2, "name": "[REINFORCEMENT] Howl for kin", "effect": "Its hunting call brings a second Mirk-Stalker." },
+        { "cost": 1, "name": "[ENVIRONMENT] Mark the prey", "effect": "It wounds a PC without killing, marking them as quarry." }
+      ]
     }
   },
   {
-    "Warg": {
-      "page": "Warg",
+    "Fray-Hound": {
+      "page": "Fray_Hound",
       "summary": "Lean, wolf-like predators that patrol boundary edges, drawn to frayed balance.",
       "locations": ["Boundary edges", "Where balance has frayed"],
       "lore": "Hunger's reminder. Respond to imbalance, not aggression.",
-      "connections": ["The Hunger Beneath"]
+      "connections": ["The Hunger Beneath"],
+      "tl": 2,
+      "class": "II",
+      "sb_spends": [
+        { "cost": 1, "name": "[ENVIRONMENT] Sense imbalance", "effect": "It targets the most wounded or unbalanced PC." },
+        { "cost": 1, "name": "[REINFORCEMENT] Pack boundary", "effect": "More Fray-Hounds arrive at the edge of the boundary." }
+      ]
     }
   },
   {
@@ -419,7 +734,13 @@
       "summary": "A burrowing predator with a dorsal ridge like a plowshare.",
       "locations": ["Steppe", "Tundra"],
       "lore": "Something older that learned hunger from the sea and brought it to land.",
-      "connections": ["The Wilds"]
+      "connections": ["The Wilds"],
+      "tl": 3,
+      "class": "III",
+      "sb_spends": [
+        { "cost": 2, "name": "[ENVIRONMENT] Sinkhole", "effect": "Its passage opens a sinkhole; start a 4-segment 'Ground Collapse' timer." },
+        { "cost": 1, "name": "[AMBUSH] Breach", "effect": "It erupts from beneath a PC, knocking them Prone." }
+      ]
     }
   },
   {
@@ -428,7 +749,13 @@
       "summary": "A wind-packed silhouette that rises from dunes, a memory given weight by thirst.",
       "locations": ["Deserts", "Dunes"],
       "lore": "Cannot cross running water. Spill water on its shadow to dissolve it.",
-      "connections": ["The Wilds"]
+      "connections": ["The Wilds"],
+      "tl": 2,
+      "class": "II",
+      "sb_spends": [
+        { "cost": 1, "name": "[ENVIRONMENT] Dust storm", "effect": "It whips sand, reducing visibility to Near only." },
+        { "cost": 2, "name": "[HAUNT] Thirst memory", "effect": "It shares its thirst; all PCs in Near mark 1 Fatigue." }
+      ]
     }
   },
   {
@@ -437,7 +764,13 @@
       "summary": "A carrion bird with rune-etched pinions, feeding on the dying.",
       "locations": ["Steppe", "Battlefields"],
       "lore": "Can see the weight of unfulfilled promises. Accepts name-stakes as barter.",
-      "connections": ["The Wilds"]
+      "connections": ["The Wilds"],
+      "tl": 2,
+      "class": "II",
+      "sb_spends": [
+        { "cost": 1, "name": "[OMEN] Circle the doomed", "effect": "It circles a PC, marking them as the next to fall." },
+        { "cost": 1, "name": "[BARGAIN] Accept a name-stake", "effect": "It will carry a message if given a piece of a name." }
+      ]
     }
   },
   {
@@ -446,7 +779,13 @@
       "summary": "A pale eel in dry salt pans with a voice like a flute. Its scream is a question.",
       "locations": ["Dry salt pans"],
       "lore": "Asks 'What is your name?' Answering truthfully grants a boon; lying advances its patience.",
-      "connections": ["The Wilds"]
+      "connections": ["The Wilds"],
+      "tl": 2,
+      "class": "II",
+      "sb_spends": [
+        { "cost": 1, "name": "[SOCIAL] Ask the name", "effect": "It asks a PC's name. Lying costs a Boon; truth grants a Boon." },
+        { "cost": 2, "name": "[TIMER] Patience ends", "effect": "Start a 4-segment 'Final Question' timer. At 4, it screams and deals Harm." }
+      ]
     }
   },
   {
@@ -455,7 +794,13 @@
       "summary": "A shadow-striped cat that steps between gusts of wind.",
       "locations": ["Forests", "Jungles"],
       "lore": "Cannot phase through mirrored water. A silver mirror fascinates it.",
-      "connections": ["The Wilds"]
+      "connections": ["The Wilds"],
+      "tl": 3,
+      "class": "III",
+      "sb_spends": [
+        { "cost": 2, "name": "[AMBUSH] Phase through guard", "effect": "It steps through a PC's defense and attacks from inside their guard." },
+        { "cost": 1, "name": "[ENVIRONMENT] Wind-stride", "effect": "It rides a gust, moving to Far in one exchange." }
+      ]
     }
   },
   {
@@ -464,7 +809,13 @@
       "summary": "A moss-matted ursine with rock-teeth, carrying the memory of a lost forest.",
       "locations": ["Ancient forests"],
       "lore": "Smoke of juniper calms it; salt enrages it. Burn the moss to kill it.",
-      "connections": ["The Wilds"]
+      "connections": ["The Wilds"],
+      "tl": 3,
+      "class": "III",
+      "sb_spends": [
+        { "cost": 2, "name": "[ENVIRONMENT] Spore cloud", "effect": "It shakes its moss, releasing spores; all in Near cough and take -1 die." },
+        { "cost": 1, "name": "[HAUNT] Memory of the lost wood", "effect": "A PC sees the forest it remembers and is Distracted." }
+      ]
     }
   },
   {
@@ -473,7 +824,13 @@
       "summary": "An empty helm grown through with thorn, a hedge that learned to walk.",
       "locations": ["Forests", "Hedges"],
       "lore": "Cannot cross a line of salt. Accepts a hedge-blessing as safe passage.",
-      "connections": ["The Wilds"]
+      "connections": ["The Wilds"],
+      "tl": 2,
+      "class": "II",
+      "sb_spends": [
+        { "cost": 1, "name": "[ENVIRONMENT] Thorn barrier", "effect": "It grows thorns across a threshold, blocking passage." },
+        { "cost": 2, "name": "[FEY] Demand the blessing", "effect": "It will not let anyone pass without a hedge-blessing or a line of salt." }
+      ]
     }
   },
   {
@@ -482,7 +839,13 @@
       "summary": "A kelp-maned constrictor nesting in pilings, a rope that forgot it was tied.",
       "locations": ["Coasts", "Pilings"],
       "lore": "Beat a drum in a rhythm it doesn't recognize to confuse it.",
-      "connections": ["The Wilds"]
+      "connections": ["The Wilds"],
+      "tl": 2,
+      "class": "II",
+      "sb_spends": [
+        { "cost": 2, "name": "[TIDE] Coil the support", "effect": "It wraps a piling or mast; start a 4-segment 'Collapse' timer." },
+        { "cost": 1, "name": "[ENVIRONMENT] Kelp tangle", "effect": "It drags kelp across the deck, making movement Desperate." }
+      ]
     }
   },
   {
@@ -491,7 +854,13 @@
       "summary": "An eel that burrows through barrow loam and tastes names.",
       "locations": ["Graves", "Barrows"],
       "lore": "A question that learned to wiggle. Feed it a false name to confuse it.",
-      "connections": ["The Wilds"]
+      "connections": ["The Wilds"],
+      "tl": 2,
+      "class": "II",
+      "sb_spends": [
+        { "cost": 1, "name": "[HAUNT] Taste the name", "effect": "It whispers a PC's name to the dead; the PC feels cold fingers on their grave." },
+        { "cost": 1, "name": "[BARGAIN] Offer a false name", "effect": "A PC can feed it a false name to confuse it, but the dead remember lies." }
+      ]
     }
   },
   {
@@ -500,7 +869,13 @@
       "summary": "A serpent of polished copper and malachite, swimming through stone.",
       "locations": ["Aeler Underways"],
       "lore": "The mountain's blood given form. Can be negotiated with to maintain the stone.",
-      "connections": ["The Wilds", "The Aeler"]
+      "connections": ["The Wilds", "The Aeler"],
+      "tl": 2,
+      "class": "II",
+      "sb_spends": [
+        { "cost": 2, "name": "[ENVIRONMENT] Stone flows", "effect": "It causes stone to flow like water, sealing a path." },
+        { "cost": 1, "name": "[BARGAIN] Maintain the mountain", "effect": "It pauses if a PC offers to repair the stone it guards." }
+      ]
     }
   },
   {
@@ -509,7 +884,13 @@
       "summary": "A rib-thin sky serpent that rides storm fronts.",
       "locations": ["Mountains", "Skies"],
       "lore": "Whistle back the storm to calm it. Ground it with a copper-weighted net.",
-      "connections": ["The Wilds"]
+      "connections": ["The Wilds"],
+      "tl": 3,
+      "class": "III",
+      "sb_spends": [
+        { "cost": 1, "name": "[ENVIRONMENT] Gust strike", "effect": "It kicks up a gust, knocking a PC prone." },
+        { "cost": 2, "name": "[TIMER] Storm front", "effect": "Start a 4-segment 'Storm Worsens' timer. At 4, lightning strikes." }
+      ]
     }
   },
   {
@@ -518,7 +899,13 @@
       "summary": "A swarm of iron-scaled moths that taste memory and rust metal.",
       "locations": ["Dungeons", "Ruins"],
       "lore": "Attracted to old keys. Repelled by a copper bell.",
-      "connections": ["Dungeon Living Infrastructure"]
+      "connections": ["Dungeon Living Infrastructure"],
+      "tl": 2,
+      "class": "II",
+      "sb_spends": [
+        { "cost": 1, "name": "[ENVIRONMENT] Swarm the light", "effect": "They swarm a lantern, dimming it." },
+        { "cost": 1, "name": "[HAUNT] Nibble a memory", "effect": "They taste a recent memory; a PC forgets one minor detail." }
+      ]
     }
   },
   {
@@ -527,7 +914,13 @@
       "summary": "A floating orb of watchlight, jealous of secrets.",
       "locations": ["Dungeons", "Ruins"],
       "lore": "The dungeon's attention made visible. Offer a whispered truth to pacify it.",
-      "connections": ["Dungeon Living Infrastructure"]
+      "connections": ["Dungeon Living Infrastructure"],
+      "tl": 2,
+      "class": "II",
+      "sb_spends": [
+        { "cost": 1, "name": "[SOCIAL] Demand a secret", "effect": "It bobs before a PC; refusal causes it to alert dungeon denizens." },
+        { "cost": 1, "name": "[REINFORCEMENT] Light calls watchers", "effect": "Its glow attracts other dungeon creatures." }
+      ]
     }
   },
   {
@@ -536,7 +929,13 @@
       "summary": "Ancient guardians of forgotten tombs, often found in barrows.",
       "locations": ["Barrows", "Forgotten tombs"],
       "lore": "Believed to be the remains of a fallen order of paladins.",
-      "connections": ["The Unquiet Dead"]
+      "connections": ["The Unquiet Dead"],
+      "tl": 2,
+      "class": "II",
+      "sb_spends": [
+        { "cost": 2, "name": "[REINFORCEMENT] Rouse the dead", "effect": "Its clatter awakens 1d4 additional skeletons." },
+        { "cost": 1, "name": "[HAUNT] Speak the old oath", "effect": "It speaks an old oath; a PC must answer truthfully or its blade finds them." }
+      ]
     }
   },
   {
@@ -545,7 +944,14 @@
       "summary": "Fey guardians that are fiercely protective of old forests.",
       "locations": ["Old forests", "The Valewood"],
       "lore": "Connected to the Green Court and the Queen of Thorns.",
-      "connections": ["The Green Court", "The Queen of Thorns"]
+      "connections": ["The Green Court", "The Queen of Thorns"],
+      "tl": 3,
+      "class": "III",
+      "sb_spends": [
+        { "cost": 1, "name": "[ENVIRONMENT] Thorn eruption", "effect": "Thorns erupt from the ground in Near range." },
+        { "cost": 2, "name": "[REINFORCEMENT] The forest answers", "effect": "A Bramble Knight or Treant stirs to aid her." },
+        { "cost": 1, "name": "[FEY] Name the intruder", "effect": "She marks a PC as a trespasser; the forest turns hostile to them." }
+      ]
     }
   },
   {
@@ -554,7 +960,13 @@
       "summary": "Used by the Salt Prince's huntsmen to track fugitives.",
       "locations": ["Zakov", "The Salt Prince's domain"],
       "lore": "Relentless trackers.",
-      "connections": ["The Salt Prince"]
+      "connections": ["The Salt Prince"],
+      "tl": 2,
+      "class": "II",
+      "sb_spends": [
+        { "cost": 1, "name": "[REINFORCEMENT] Bay for the pack", "effect": "It bays; more hounds converge on its position." },
+        { "cost": 1, "name": "[BLOOD] Mark the quarry", "effect": "Its bite marks a PC; all hounds gain Dominant Position against that PC." }
+      ]
     }
   },
   {
@@ -563,7 +975,13 @@
       "summary": "Devotees of the Drowned God, eager to die for their faith.",
       "locations": ["Coastal temples", "Zakov"],
       "lore": "Eager to die for their faith.",
-      "connections": ["The Drowned God"]
+      "connections": ["The Drowned God"],
+      "tl": 1,
+      "class": "I",
+      "sb_spends": [
+        { "cost": 2, "name": "[REINFORCEMENT] Martyr's call", "effect": "A dying cultist completes a ritual, summoning a Drowned One." },
+        { "cost": 2, "name": "[TIMER] Ritual advances", "effect": "Start a 4-segment 'Drowned Rite' timer. At 4, the god's attention turns here." }
+      ]
     }
   },
   {
@@ -572,7 +990,1661 @@
       "summary": "Souls twisted by despair, lingering in the place of their death.",
       "locations": ["Shadow-haunted ruins", "Places of despair"],
       "lore": "Souls twisted by despair.",
-      "connections": ["The Unquiet Dead"]
+      "connections": ["The Unquiet Dead"],
+      "tl": 2,
+      "class": "II",
+      "sb_spends": [
+        { "cost": 2, "name": "[HAUNT] Wrap despair", "effect": "It cloaks a PC in despair; that PC acts at Desperate Position." },
+        { "cost": 1, "name": "[ENVIRONMENT] Shadows deepen", "effect": "The area dims; mundane light sources flicker." }
+      ]
+    }
+  },
+  {
+    "Basilisk (Stone Serpent)": {
+      "page": "Basilisk",
+      "summary": "A serpent with a gaze that turns flesh to stone. Found in deep ruins and forgotten temples.",
+      "locations": ["Aeler under-vaults", "Valewood ruins", "Thepyrgos catacombs"],
+      "lore": "The first basilisks were bred by the Astroegro as guardians. Their gaze is a curse that can be reflected by polished metal.",
+      "connections": ["Astroegro Remnant", "The Stone Courts"],
+      "tl": 4,
+      "class": "IV",
+      "sb_spends": [
+        { "cost": 1, "name": "[STONE] Gaze lingers", "effect": "A PC who meets its eyes feels their limbs grow heavy; they are Slowed." },
+        { "cost": 2, "name": "[TIMER] Petrification", "effect": "Start a 4-segment 'Turn to Stone' timer on a gazed PC. At 4, they are petrified." },
+        { "cost": 2, "name": "[ENVIRONMENT] Scatter reflectors", "effect": "It knocks over polished objects, making its gaze harder to avoid." }
+      ]
+    }
+  },
+  {
+    "Chimera (Three-Fold Beast)": {
+      "page": "Chimera",
+      "summary": "A monstrous amalgam of lion, goat, and serpent. Roams the wild places between kingdoms.",
+      "locations": ["The Wilds", "Valewood borders", "Theona highlands"],
+      "lore": "Created by a Lethai-thora flesh-shaper who sought to perfect the hunting beast. The original escaped and bred true in the wild.",
+      "connections": ["Genesis Vats", "The Savage Heart"],
+      "tl": 5,
+      "class": "V",
+      "sb_spends": [
+        { "cost": 2, "name": "[REINFORCEMENT] The goat calls", "effect": "The goat-head's bleat summons a second chimera." },
+        { "cost": 2, "name": "[FIRE] Venomous flame", "effect": "The serpent head breathes flame and venom in a cone." },
+        { "cost": 2, "name": "[TIMER] Territory marked", "effect": "Start a 4-segment 'Pack Arrives' timer. At 4, more chimeras contest the ground." }
+      ]
+    }
+  },
+  {
+    "Cyclops (One-Eyed Giant)": {
+      "page": "Cyclops",
+      "summary": "A one-eyed giant of prodigious strength and simple appetites. Found in mountain caves and coastal cliffs.",
+      "locations": ["Himadri foothills", "Ubral passes", "Nihori sea cliffs"],
+      "lore": "Distant cousins to the Stone Giants, the cyclopes were once servants of the volcano gods. They forge crude weapons from raw ore and eat whatever they can catch.",
+      "connections": ["The Tall Folk", "Volcano Shrines"],
+      "tl": 4,
+      "class": "IV",
+      "sb_spends": [
+        { "cost": 2, "name": "[ENVIRONMENT] Hurl stone", "effect": "It throws a boulder, blocking a route and knocking a PC Prone." },
+        { "cost": 1, "name": "[SOCIAL] Demand tribute", "effect": "It demands food or shiny things; refusal enrages it." },
+        { "cost": 2, "name": "[TIMER] Forge a weapon", "effect": "Start a 4-segment 'Crude Forge' timer. At 4, its weapon gains +1 die." }
+      ]
+    }
+  },
+  {
+    "Djinn (Desert Spirit)": {
+      "page": "Djinn",
+      "summary": "A spirit of smokeless fire, bound to ancient lamps or hidden oases. Proud and capricious.",
+      "locations": ["Fhara deserts", "Ashaani ruins", "Kuvani steppe"],
+      "lore": "Older than the empires, the djinn were trapped by the first desert kings. They grant power to those who can earn their respect—or trick them into service.",
+      "connections": ["The Veiled Throne", "The Oasis Courts", "The Way of Silk"],
+      "tl": 4,
+      "class": "IV",
+      "sb_spends": [
+        { "cost": 1, "name": "[BARGAIN] Offer a wish", "effect": "It grants a small wish with a hidden, ironic price." },
+        { "cost": 2, "name": "[ENVIRONMENT] Sandstorm", "effect": "It whips the desert wind into a blinding storm." },
+        { "cost": 2, "name": "[SOCIAL] Test of pride", "effect": "It poses a riddle of pride; a wrong answer costs a Boon." }
+      ]
+    }
+  },
+  {
+    "Dragon (High Wyrm)": {
+      "page": "Dragon",
+      "summary": "The eldest of the wyrms, wise and terrible. Only a handful remain in the world's deepest places.",
+      "locations": ["Himadri peaks", "Valewood depths", "Aeler under-vaults"],
+      "lore": "The dragons were ancient when the first elves carved their star-roads. They sleep in forgotten halls, dreaming of the age before mortal memory.",
+      "connections": ["The Deep Drake", "Nidhoggr", "The First City"],
+      "tl": 8,
+      "class": "VIII",
+      "sb_spends": [
+        { "cost": 2, "name": "[TIMER] Dragon's Ire", "effect": "Start a 6-segment 'True Breath' timer. At 6, the Dragon uses its legendary breath." },
+        { "cost": 3, "name": "[ENVIRONMENT] Lair reshapes", "effect": "The Dragon's roar shifts stone; pillars fall and the hoard slides, changing the battlefield." },
+        { "cost": 2, "name": "[BARGAIN] Offer a covenant", "effect": "It offers a pact: service in exchange for a single priceless gift." },
+        { "cost": 3, "name": "[REINFORCEMENT] Call the brood", "effect": "Its roar summons drake-kin to defend the lair." }
+      ]
+    }
+  },
+  {
+    "Gargoyle (Stone Watcher)": {
+      "page": "Gargoyle",
+      "summary": "A living statue that guards rooftops and ruins. Motionless by day, predatory by night.",
+      "locations": ["Thepyrgos towers", "Ecktoria temples", "Aeler vault-mouths"],
+      "lore": "Forged from living stone by the Aeler, the gargoyles were intended as guardians. Many have forgotten their purpose and now hunt for sport.",
+      "connections": ["The Sealed Gate", "Dungeon Living Infrastructure"],
+      "tl": 2,
+      "class": "II",
+      "sb_spends": [
+        { "cost": 1, "name": "[ENVIRONMENT] Merge with stone", "effect": "It sinks into a wall or floor and disappears until it ambushes." },
+        { "cost": 2, "name": "[TIMER] Sunrise approaches", "effect": "Start a 4-segment 'Sunrise' timer. At 4, it becomes invulnerable stone." },
+        { "cost": 1, "name": "[AMBUSH] Drop from above", "effect": "It falls from a ledge onto a PC, knocking them Prone." }
+      ]
+    }
+  },
+  {
+    "Gorgon (Fury of the Pale Shore)": {
+      "page": "Gorgon",
+      "summary": "A serpent-haired woman whose gaze brings death. Haunts the coastlines and salt-caves of the Amaranthine.",
+      "locations": ["Brass Coast sea caves", "Zakov salt-flats", "Kahfagia reefs"],
+      "lore": "The gorgons were once Sidhi priestesses who swore vengeance on the Ashaani slavers. Their curse was twisted by the Veiled Sisters, turning their fury into a petrifying gaze.",
+      "connections": ["The Sidhi", "Ashaan", "The Veil"],
+      "tl": 4,
+      "class": "IV",
+      "sb_spends": [
+        { "cost": 1, "name": "[STONE] Petrify an object", "effect": "Her gaze turns a nearby object to stone, creating cover or destroying gear." },
+        { "cost": 2, "name": "[STONE] Limb stiffens", "effect": "A PC's arm or leg begins to harden; they take -1 die until cured." },
+        { "cost": 2, "name": "[ENVIRONMENT] Salt mist", "effect": "She exhales salt mist, blinding all in Near range." }
+      ]
+    }
+  },
+  {
+    "Griffon (Sky Hunter)": {
+      "page": "Griffon",
+      "summary": "A noble beast with the body of a lion and the wings of an eagle. Hunts the high peaks and open skies.",
+      "locations": ["Aelerian peaks", "Ykrul steppe", "Himadri passes"],
+      "lore": "The griffons were once ridden by the Storm Kings of Ykrul. They remember the old alliances and sometimes offer their backs to those who speak the ancient tongue.",
+      "connections": ["The Sky Father", "The Wilds"],
+      "tl": 3,
+      "class": "III",
+      "sb_spends": [
+        { "cost": 1, "name": "[ENVIRONMENT] Carry skyward", "effect": "It grapples a PC and lifts them into the air." },
+        { "cost": 2, "name": "[SOCIAL] Test of worth", "effect": "It challenges a PC to speak the ancient tongue; failure means aerial combat." }
+      ]
+    }
+  },
+  {
+    "Harpy (Wind-Wraith)": {
+      "page": "Harpy",
+      "summary": "A creature with the body of a bird and the face of a woman. Lures travelers to their doom.",
+      "locations": ["Linn sea cliffs", "Mistlands bell-towers", "Valewood edge"],
+      "lore": "The harpies are said to be the ghosts of Linn women who drowned at sea. They sing to sailors, promising rescue, before leading them to the rocks.",
+      "connections": ["The Storm Father", "The Drowned"],
+      "tl": 3,
+      "class": "III",
+      "sb_spends": [
+        { "cost": 1, "name": "[SONG] Lure toward rocks", "effect": "A PC must test Spirit or move toward the nearest danger." },
+        { "cost": 2, "name": "[REINFORCEMENT] Join the chorus", "effect": "More harpies arrive and their song becomes harder to resist." },
+        { "cost": 2, "name": "[ENVIRONMENT] Sea-mist", "effect": "Mist thickens; navigation and ranged attacks become Desperate." }
+      ]
+    }
+  },
+  {
+    "Hydra (Many-Headed Serpent)": {
+      "page": "Hydra",
+      "summary": "A serpent with multiple heads, each regrowing when cut. Dwells in the black lakes and deep fens.",
+      "locations": ["Acasian bogs", "Mistlands fens", "Valewood lakes"],
+      "lore": "Born from the blood of a dying dragon, the hydra is a curse upon the land. Fire and acid are the only sure ways to prevent its heads from regrowing.",
+      "connections": ["The Wilds", "The Bitter Root"],
+      "tl": 5,
+      "class": "V",
+      "sb_spends": [
+        { "cost": 2, "name": "[TIMER] Heads regrow", "effect": "Start a 4-segment 'Regrow' timer. At 4, a severed head returns or a new one sprouts." },
+        { "cost": 1, "name": "[BLOOD] Acidic blood", "effect": "Its blood splashes a PC, dealing Fatigue and corroding armor." },
+        { "cost": 2, "name": "[REINFORCEMENT] Spawn from blood", "effect": "A pool of hydra blood births 1d3 hydra-spawn." }
+      ]
+    }
+  },
+  {
+    "Kraken (Tide-Terror)": {
+      "page": "Kraken",
+      "summary": "A monstrous cephalopod that drags ships to the deep. Sleeper of the Amaranthine depths.",
+      "locations": ["Amaranthine Sea", "Dolmis Trench", "Aberderrin Deep"],
+      "lore": "The kraken is older than the sea-faring nations. It sleeps for centuries, dreaming of the sunken cities of the Astroegro. When it wakes, the tides shift and the dead remember.",
+      "connections": ["Khemesh", "The Astroegro"],
+      "tl": 7,
+      "class": "VII",
+      "sb_spends": [
+        { "cost": 2, "name": "[TIDE] Tentacles around the hull", "effect": "Start a 6-segment 'Capsize' timer. At 6, the ship is pulled under." },
+        { "cost": 3, "name": "[ENVIRONMENT] Whirlpool", "effect": "The Kraken spins, creating a whirlpool that traps small boats." },
+        { "cost": 2, "name": "[REINFORCEMENT] Deep-spawn answer", "effect": "It calls sea-devils or reef serpents to swarm the decks." }
+      ]
+    }
+  },
+  {
+    "Lamia (Serpent-Born Enchantress)": {
+      "page": "Lamia",
+      "summary": "A creature with the body of a serpent and the torso of a woman. Preys upon the lonely and the lost.",
+      "locations": ["Fhara oases", "Sekogo groves", "Ashaani deserts"],
+      "lore": "The lamiae were once priestesses of a forgotten moon goddess. Their transformation was a blessing that became a curse; they now consume the warmth of travelers to maintain their beauty.",
+      "connections": ["The Veiled Throne", "The Oasis Courts"],
+      "tl": 3,
+      "class": "III",
+      "sb_spends": [
+        { "cost": 1, "name": "[BARGAIN] Offer warmth", "effect": "She offers comfort and healing in exchange for a secret." },
+        { "cost": 2, "name": "[SONG] Lure closer", "effect": "A PC must test Spirit or move into Close range with her." },
+        { "cost": 2, "name": "[TIMER] Enchantment deepens", "effect": "Start a 4-segment 'Charm' timer. At 4, a PC is charmed and will defend her." }
+      ]
+    }
+  },
+  {
+    "Manticore (Scourge of the Steppe)": {
+      "page": "Manticore",
+      "summary": "A beast with the body of a lion, the wings of a bat, and the tail of a scorpion. Hunts the dry lands.",
+      "locations": ["Ykrul steppe", "Kuvani grasslands", "Fhara desert edge"],
+      "lore": "The manticore was created by a Sky-Speaker who sought to punish a greedy Khagan. It now hunts across the steppe, its venomous tail a reminder of the cost of excess.",
+      "connections": ["The Sky Father", "The Wilds"],
+      "tl": 3,
+      "class": "III",
+      "sb_spends": [
+        { "cost": 1, "name": "[ENVIRONMENT] Tail spikes", "effect": "It launches venomous tail spikes, pinning a PC in place." },
+        { "cost": 2, "name": "[REINFORCEMENT] Blood calls blood", "effect": "The scent of blood draws a second manticore." },
+        { "cost": 2, "name": "[TIMER] Venom spreads", "effect": "Start a 4-segment 'Venom' timer on a stung PC. At 4, they mark Harm 2." }
+      ]
+    }
+  },
+  {
+    "Mermaid (Tide-Sister)": {
+      "page": "Mermaid",
+      "summary": "A creature of the sea with the upper body of a woman and the tail of a fish. Singers of the deep.",
+      "locations": ["Linn coasts", "Kahfagia reefs", "Brass Coast shallows"],
+      "lore": "The mermaids are the daughters of the Tide Father. They sing to sailors, not to lure them to death, but to share the secrets of the deep. Some say they carry the memories of drowned captains.",
+      "connections": ["The Tide Father", "The Amaranthine"],
+      "tl": 2,
+      "class": "II",
+      "sb_spends": [
+        { "cost": 1, "name": "[SONG] Share a secret", "effect": "They sing a useful secret, offering a Boon for a price." },
+        { "cost": 2, "name": "[BARGAIN] Rescue for a memory", "effect": "They offer to save a drowning PC in exchange for a memory." },
+        { "cost": 2, "name": "[TIDE] Call a current", "effect": "They summon a current that moves the party or their boat." }
+      ]
+    }
+  },
+  {
+    "Minotaur (Labyrinth-Kin)": {
+      "page": "Minotaur",
+      "summary": "A creature with the body of a man and the head of a bull. Dwells in mazes and under-mountains.",
+      "locations": ["Aeler under-vaults", "Thepyrgos catacombs", "Ubral barrows"],
+      "lore": "The minotaurs were bred by the Astroegro to guard their deepest vaults. They remember the old dungeons and pace the corridors of forgotten empires.",
+      "connections": ["Astroegro Remnant", "Dungeon Living Infrastructure"],
+      "tl": 3,
+      "class": "III",
+      "sb_spends": [
+        { "cost": 2, "name": "[ENVIRONMENT] Charge the wall", "effect": "It smashes a wall; start a 4-segment 'Maze Shifts' timer." },
+        { "cost": 1, "name": "[TIMER] Labyrinth rearranges", "effect": "Tick 'Maze Shifts' +1; at 4, the passages rearrange and a PC is separated." },
+        { "cost": 2, "name": "[HAUNT] Remember the old path", "effect": "It bellows in the old tongue; a PC sees the labyrinth as it once was and is Distracted." }
+      ]
+    }
+  },
+  {
+    "Pegasus (Sky-Steed)": {
+      "page": "Pegasus",
+      "summary": "A winged horse of pure white, born from the blood of a dying star. Carries the worthy across the sky.",
+      "locations": ["Himadri peaks", "Ykrul steppe", "Aelerian heights"],
+      "lore": "The pegasus was the mount of the first Sky-Speaker. It appears to those who are lost and in need, offering a ride to safety—or to destiny.",
+      "connections": ["The Sky Father", "The Traveler"],
+      "tl": 3,
+      "class": "III",
+      "sb_spends": [
+        { "cost": 1, "name": "[SOCIAL] Judge the worthy", "effect": "It judges a PC's heart; the wicked cannot approach." },
+        { "cost": 1, "name": "[ENVIRONMENT] Wing-beat dust", "effect": "It kicks up a blinding cloud of dust." },
+        { "cost": 2, "name": "[BARGAIN] Carry for a promise", "effect": "It offers a ride to safety in exchange for a promise kept." }
+      ]
+    }
+  },
+  {
+    "Phoenix (Fire-Born)": {
+      "page": "Phoenix",
+      "summary": "A bird of flame that dies and is reborn from its own ashes. A symbol of renewal and endurance.",
+      "locations": ["Volcano shrines", "Everflame temples", "Nihori calderas"],
+      "lore": "The phoenix is said to be the first creature the Everflame created. It nestles in volcanoes, and its tears are said to heal any wound—or to ignite the spark of new life.",
+      "connections": ["The Everflame", "The Oath of Flame and Light"],
+      "tl": 6,
+      "class": "VI",
+      "sb_spends": [
+        { "cost": 2, "name": "[FIRE] Tears of flame", "effect": "Its tears heal an enemy or ignite the battlefield." },
+        { "cost": 2, "name": "[TIMER] Rebirth", "effect": "Start a 4-segment 'Rebirth' timer. At 4, it immolates and returns fully healed." },
+        { "cost": 3, "name": "[ENVIRONMENT] Inferno", "effect": "The area becomes an inferno; all in Near take Fatigue." }
+      ]
+    }
+  },
+  {
+    "Roc (Sky-Titan)": {
+      "page": "Roc",
+      "summary": "A colossal bird of prey that carries off elephants and dragons. Nests on the highest peaks.",
+      "locations": ["Himadri peaks", "Pereshi highlands", "Aelerian summits"],
+      "lore": "The roc is the oldest of the flying beasts. It remembers when the mountains were young and the seas were not yet salt. Its feathers are prized by kings, and its eggs are worth a kingdom.",
+      "connections": ["The Traveler", "The Wilds"],
+      "tl": 6,
+      "class": "VI",
+      "sb_spends": [
+        { "cost": 2, "name": "[ENVIRONMENT] Drop or snatch", "effect": "It drops a boulder or snatches a PC into the air." },
+        { "cost": 1, "name": "[WIND] Wing-blast", "effect": "Its wingbeats knock prone all in Near." },
+        { "cost": 2, "name": "[REINFORCEMENT] Call its mate", "effect": "It screams; a second Roc arrives in 1d4 exchanges." }
+      ]
+    }
+  },
+  {
+    "Sphinx (Riddle-Keeper)": {
+      "page": "Sphinx",
+      "summary": "A creature with the body of a lion and the head of a woman. Guards ancient secrets with riddles.",
+      "locations": ["Pereshi archives", "Valewood ruins", "Ashaani temples"],
+      "lore": "The sphinx was created by the Lethai-thora to guard their most dangerous knowledge. It does not attack—it asks. The answer is always a choice. The choice is always final.",
+      "connections": ["The Witness", "The Lethai-thora"],
+      "tl": 4,
+      "class": "IV",
+      "sb_spends": [
+        { "cost": 2, "name": "[SOCIAL] Pose the riddle", "effect": "It asks a riddle; wrong answer costs a Boon or advances a timer." },
+        { "cost": 2, "name": "[BARGAIN] Knowledge for a secret", "effect": "It offers dangerous knowledge in exchange for a PC's secret." },
+        { "cost": 2, "name": "[TIMER] Time to answer", "effect": "Start a 4-segment 'Riddle Timer'. At 4, the Sphinx attacks." }
+      ]
+    }
+  },
+  {
+    "Troll (Boulder-Born)": {
+      "page": "Troll",
+      "summary": "A large, brutish creature of stone and flesh. Regenerates from almost any wound. Dwells in bridges and under-roads.",
+      "locations": ["Ubral passes", "Aeler underways", "Linn fjords"],
+      "lore": "The trolls were once Aeler builders who angered the mountain. They were cursed to become part of the stone they loved. Now they guard the places they once built.",
+      "connections": ["The Tall Folk", "The Aeler"],
+      "tl": 3,
+      "class": "III",
+      "sb_spends": [
+        { "cost": 2, "name": "[TIMER] Regeneration", "effect": "Start a 4-segment 'Regrow' timer. At 4, the Troll heals all Harm." },
+        { "cost": 1, "name": "[ENVIRONMENT] Tear up the bridge", "effect": "It rips up part of a bridge or path, isolating a PC." },
+        { "cost": 1, "name": "[BARGAIN] Pay the toll", "effect": "It demands a toll; refusal means combat." }
+      ]
+    }
+  },
+  {
+    "Unicorn (Silent Horn)": {
+      "page": "Unicorn",
+      "summary": "A horse with a single spiraling horn. A creature of purity and grace, shy of the wicked.",
+      "locations": ["Valewood glades", "Aelaerem downs", "Theona moors"],
+      "lore": "The unicorn is a creature of the Wilds that only appears to those of pure heart. Its horn is said to cure any poison, but it will only give it willingly—it cannot be taken by force.",
+      "connections": ["The Wilds", "The Green Court"],
+      "tl": 3,
+      "class": "III",
+      "sb_spends": [
+        { "cost": 1, "name": "[SOCIAL] Judge purity", "effect": "It turns from the wicked; an impure PC cannot approach." },
+        { "cost": 2, "name": "[BARGAIN] Cure for a pure act", "effect": "It offers its horn's cure if a PC performs a selfless act." },
+        { "cost": 1, "name": "[ENVIRONMENT] Vanish into mist", "effect": "It fades into mist and reappears elsewhere." }
+      ]
+    }
+  },
+  {
+    "Werewolf (Moon-Hunter)": {
+      "page": "Werewolf",
+      "summary": "A human who transforms into a wolf under the full moon. Cursed by their own rage.",
+      "locations": ["Ykrul steppe", "Valewood edge", "Acasian forests"],
+      "lore": "The werewolves were once a tribe of hunters who angered the Wolf Spirit. Their curse is passed through blood; they cannot control their transformation, and they fear silver and the touch of holy ground.",
+      "connections": ["The Wilds", "The Savage Heart"],
+      "tl": 3,
+      "class": "III",
+      "sb_spends": [
+        { "cost": 2, "name": "[REINFORCEMENT] Pack howls", "effect": "The pack answers; 1d3 more werewolves arrive." },
+        { "cost": 2, "name": "[TIMER] Moon rises", "effect": "Start a 4-segment 'Moonrise' timer. At 4, all werewolves gain +1 die." },
+        { "cost": 1, "name": "[BLOOD] Infecting bite", "effect": "A bite starts a 4-segment 'Curse' timer. At 4, the PC is cursed." }
+      ]
+    }
+  },
+  {
+    "Wyvern (Rust-Wing)": {
+      "page": "Wyvern",
+      "summary": "A dragon-kin with two legs and a venomous tail. Smaller than a true dragon, but no less deadly.",
+      "locations": ["Aelerian crags", "Valewood spires", "Himadri passes"],
+      "lore": "The wyverns are the remnants of the True Dragons' brood, scattered when the first wyrms fell. They nest on high peaks and guard old hoards with fiery jealousy.",
+      "connections": ["The Wilds", "The Tall Folk"],
+      "tl": 3,
+      "class": "III",
+      "sb_spends": [
+        { "cost": 1, "name": "[ENVIRONMENT] Dive-bomb", "effect": "It stoops from above, knocking a PC prone." },
+        { "cost": 2, "name": "[REINFORCEMENT] Screech for kin", "effect": "Its cry brings a second wyvern to the fight." },
+        { "cost": 2, "name": "[TIMER] Retreat to hoard", "effect": "It flees to its hoard to heal; start a 4-segment 'Hoard Defense' timer." }
+      ]
+    }
+  },
+  {
+    "Kitsune (Nine-Tailed Fox)": {
+      "page": "Kitsune",
+      "summary": "A cunning fox spirit with the power of illusion and transformation. Found in the eastern realms.",
+      "locations": ["Sihai shrines", "Nihori temples", "Ayokha riverbanks"],
+      "lore": "The kitsune serve as messengers between the mortal world and the Celestial Bureaucracy. Each tail is a century of wisdom; the greatest have nine tails and speak with the authority of the gods.",
+      "connections": ["Inaea", "The Celestial Bureaucracy", "The Lethai-thora"],
+      "tl": 3,
+      "class": "III",
+      "sb_spends": [
+        { "cost": 1, "name": "[BARGAIN] Trick for truth", "effect": "It offers a useful trick in exchange for a truth." },
+        { "cost": 2, "name": "[ILLUSION] Mirror images", "effect": "It creates illusory duplicates; attacks against it become Desperate." },
+        { "cost": 2, "name": "[SOCIAL] Wear a loved face", "effect": "It assumes the face of someone a PC trusts." }
+      ]
+    }
+  },
+  {
+    "Naga (Serpent Sovereign)": {
+      "page": "Naga",
+      "summary": "A serpent-like being of divine ancestry, dwelling in rivers and deep pools. Judges of the waters.",
+      "locations": ["Ayokha rivers", "Sekogo groves", "Dhaharan estuaries"],
+      "lore": "The naga are the children of Benzaiten, the river of words. They judge oaths sworn over water and punish those who pollute the streams. Their gaze is said to reveal all lies.",
+      "connections": ["Benzaiten", "The Lethai-ar", "The Ukwe"],
+      "tl": 3,
+      "class": "III",
+      "sb_spends": [
+        { "cost": 1, "name": "[SOCIAL] Judge the oath", "effect": "It tests a spoken oath; false oaths cost the liar a Boon." },
+        { "cost": 2, "name": "[TIDE] Flood the chamber", "effect": "It raises water, flooding the area and forcing movement." },
+        { "cost": 2, "name": "[TIMER] River rises", "effect": "Start a 4-segment 'River Rises' timer. At 4, the water reaches the neck." }
+      ]
+    }
+  },
+  {
+    "Salamander (Fire-Born Spirit)": {
+      "page": "Salamander",
+      "summary": "A spirit of living flame, found in volcanoes and deep forges. Dwells in the hottest places.",
+      "locations": ["Aeler deep forges", "Nihori calderas", "Himadri vents"],
+      "lore": "The salamanders are the first children of the Everflame. They speak in embers and move through ash like water. Forge-masters seek them out for the heat of their presence.",
+      "connections": ["The Everflame", "The Oath of Flame and Light"],
+      "tl": 2,
+      "class": "II",
+      "sb_spends": [
+        { "cost": 1, "name": "[FIRE] Ignite the floor", "effect": "It sets a flammable surface alight." },
+        { "cost": 2, "name": "[ENVIRONMENT] Melt stone", "effect": "It melts stone underfoot, creating hazardous lava pools." }
+      ]
+    }
+  },
+  {
+    "Siren (Song of the Deep)": {
+      "page": "Siren",
+      "summary": "A creature of the sea whose voice enchants sailors to steer toward disaster.",
+      "locations": ["Linn coasts", "Kahfagia reefs", "Zakov shallows"],
+      "lore": "The sirens were once musicians of the deep court, bound to serve the Tide Father. Their songs are not malicious; they simply want company in the cold depths.",
+      "connections": ["The Tide Father", "The Amaranthine"],
+      "tl": 2,
+      "class": "II",
+      "sb_spends": [
+        { "cost": 1, "name": "[SONG] Compel toward the deep", "effect": "A PC must test Spirit or move toward the water." },
+        { "cost": 2, "name": "[REINFORCEMENT] The deep answers", "effect": "Sea-devils or drowned sailors surface to join her." },
+        { "cost": 2, "name": "[BARGAIN] A voice for rescue", "effect": "She offers to save a PC from drowning in exchange for their voice." }
+      ]
+    }
+  },
+  {
+    "Sprite (Glimmer-Folk)": {
+      "page": "Sprite",
+      "summary": "A tiny fey creature of light and mischief. Flitters through glades and shadows.",
+      "locations": ["Valewood glades", "Aelaerem downs", "Aelinnel groves"],
+      "lore": "The sprites are the laughter of the first green things. They bear no malice, but they carry no loyalty—they serve only the moment's whim.",
+      "connections": ["The Green Court", "The Wilds"],
+      "tl": 1,
+      "class": "I",
+      "sb_spends": [
+        { "cost": 1, "name": "[FEY] Steal a shine", "effect": "They steal a small shiny object or a piece of jewelry." },
+        { "cost": 1, "name": "[ILLUSION] Distracting lights", "effect": "They create distracting lights; a PC's next roll becomes Desperate." }
+      ]
+    }
+  },
+  {
+    "Succubus (Dream-Thief)": {
+      "page": "Succubus",
+      "summary": "A demon of desire that appears in dreams and offers pleasure in exchange for memories.",
+      "locations": ["Ecktoria", "Ashaan", "Zakov"],
+      "lore": "The succubi are the whispers of the Abyss, feeding on the warmth of mortal dreams. They drain their victims slowly, leaving them hollow and yearning.",
+      "connections": ["The Abyss", "Livaea"],
+      "tl": 3,
+      "class": "III",
+      "sb_spends": [
+        { "cost": 1, "name": "[DREAM] Whisper in sleep", "effect": "A sleeping PC hears her offer and must test Spirit or lose a Boon." },
+        { "cost": 2, "name": "[BARGAIN] Memory for pleasure", "effect": "She offers to remove a painful memory in exchange for a treasured one." },
+        { "cost": 2, "name": "[TIMER] Hollow out", "effect": "Start a 4-segment 'Hollow' timer. At 4, a PC loses a memory permanently." }
+      ]
+    }
+  },
+  {
+    "Tengu (Mountain Hawk)": {
+      "page": "Tengu",
+      "summary": "A proud, winged creature of the high passes. Master of the sword and the riddle.",
+      "locations": ["Nihori mountains", "Sihai peaks", "Pereshi highlands"],
+      "lore": "The tengu are the guardians of the mountain shrines. They challenge travelers to duels of wit and steel, and they teach the most worthy the secrets of the old ways.",
+      "connections": ["The Traveler", "The Wilds"],
+      "tl": 3,
+      "class": "III",
+      "sb_spends": [
+        { "cost": 2, "name": "[SOCIAL] Duel of wits", "effect": "It challenges a PC to a riddle or blade duel; refusal shames the party." },
+        { "cost": 1, "name": "[REINFORCEMENT] Wind-crows", "effect": "It summons a flock of wind-crows to harass the party." }
+      ]
+    }
+  },
+  {
+    "Tree-Keeper": {
+      "page": "Tree_Keeper",
+      "summary": "An ancient tree that has awakened to consciousness. Walks the forest and judges intruders.",
+      "locations": ["Valewood", "Sekogo groves", "Aelaerem hollows"],
+      "lore": "The tree-keepers are the guardians of the green places. They remember the first forests and judge all who walk beneath their branches. They do not offer second chances.",
+      "connections": ["The Green Court", "The Ukwe"],
+      "tl": 5,
+      "class": "V",
+      "sb_spends": [
+        { "cost": 2, "name": "[ENVIRONMENT] Roots seize the ground", "effect": "Roots erupt across the battlefield, trapping all in Near." },
+        { "cost": 2, "name": "[TIMER] Forest awakens", "effect": "Start a 6-segment 'Forest Awakens' timer. At 6, the whole forest turns hostile." },
+        { "cost": 2, "name": "[BARGAIN] Promise to protect", "effect": "It pauses if a PC swears a binding oath to protect the green." }
+      ]
+    }
+  },
+  {
+    "Vampire (Night-Lord)": {
+      "page": "Vampire",
+      "summary": "An undead creature of the night, sustained by the life-force of the living. Cunning, patient, and ancient.",
+      "locations": ["Ecktoria", "Vhasia", "Zakov", "Ashaan"],
+      "lore": "The vampires are the remnant of a bloodline that refused to fade. They remember the old empire and wait for its return—or they build their own, one mortal at a time.",
+      "connections": ["Malachai", "The Thirteen", "The Hollow"],
+      "tl": 5,
+      "class": "V",
+      "sb_spends": [
+        { "cost": 1, "name": "[BLOOD] Dominate the will", "effect": "A PC must test Spirit or obey a single command." },
+        { "cost": 2, "name": "[REINFORCEMENT] Summon spawn", "effect": "Lesser vampires or enthralled mortals arrive to serve." },
+        { "cost": 2, "name": "[BARGAIN] Offer immortality", "effect": "It offers the Embrace in exchange for betrayal of an ally." },
+        { "cost": 2, "name": "[TIMER] Blood frenzy", "effect": "Start a 4-segment 'Frenzy' timer. At 4, it attacks wildly with +2 dice." }
+      ]
+    }
+  },
+  {
+    "Wight (Frost-Bound)": {
+      "page": "Wight",
+      "summary": "An undead creature of the frozen places, animated by ancient rage and forgotten hunger.",
+      "locations": ["Himadri peaks", "Linn fjords", "Aeler deep-vaults"],
+      "lore": "The wights are the frozen dead of the northern passes, risen to guard the secrets of the ice. They do not negotiate—they only remember the cold.",
+      "connections": ["The Unquiet Dead", "The Hollow"],
+      "tl": 3,
+      "class": "III",
+      "sb_spends": [
+        { "cost": 1, "name": "[ICE] Drain warmth", "effect": "Its touch drains warmth; a PC marks 1 Fatigue." },
+        { "cost": 2, "name": "[REINFORCEMENT] Ice rises", "effect": "The frozen dead around it rise as lesser wights." },
+        { "cost": 2, "name": "[TIMER] Endless cold", "effect": "Start a 4-segment 'Deep Freeze' timer. At 4, all in Near take Harm from cold." }
+      ]
+    }
+  },
+  {
+    "Will-o'-Wisp (Fool's Light)": {
+      "page": "Will-o'-Wisp",
+      "summary": "A glowing orb of false light that lures travelers into bogs and pitfalls.",
+      "locations": ["Mistlands fens", "Acasian bogs", "Theona moors"],
+      "lore": "The will-o'-wisps are the spirits of those who drowned in the bogs. They lead others to join them, not out of malice, but out of loneliness.",
+      "connections": ["The Hollow", "The Wilds"],
+      "tl": 2,
+      "class": "II",
+      "sb_spends": [
+        { "cost": 1, "name": "[HAUNT] Show false path", "effect": "It floats toward a pit or deep water; a PC must test Wits or follow." },
+        { "cost": 1, "name": "[BARGAIN] Lead for a memory", "effect": "It offers to lead the way safely in exchange for a happy memory." },
+        { "cost": 1, "name": "[TIMER] Bog claims", "effect": "Start a 4-segment 'Sinking' timer. At 4, a stuck PC is fully submerged." }
+      ]
+    }
+  },
+  {
+    "Yeti (Snow-Stalker)": {
+      "page": "Yeti",
+      "summary": "A great ape-like creature of snow and ice, dwelling in the highest peaks. Rarely seen, never forgotten.",
+      "locations": ["Himadri peaks", "Aelerian summits", "Pereshi highlands"],
+      "lore": "The yeti is a spirit of the mountain cold, older than the clans that revere it. Its howl is said to herald the arrival of the winter storms.",
+      "connections": ["The Tall Folk", "The Wilds"],
+      "tl": 3,
+      "class": "III",
+      "sb_spends": [
+        { "cost": 2, "name": "[ICE] Trigger avalanche", "effect": "Its howl triggers an avalanche; start a 4-segment 'Avalanche' timer." },
+        { "cost": 1, "name": "[REINFORCEMENT] Second howl", "effect": "Its call brings a second yeti from the whiteout." },
+        { "cost": 1, "name": "[AMBUSH] Vanish into snow", "effect": "It disappears into the snow and ambushes next exchange." }
+      ]
+    }
+  },
+  {
+    "Zombie (Unquiet Corpse)": {
+      "page": "Zombie",
+      "summary": "A reanimated corpse, mindless and ravenous. Drives before it the scent of death.",
+      "locations": ["Ashaan", "Zakov", "Acasia", "Vhasia"],
+      "lore": "The zombies are the broken shells of the dead, animated by necromantic impulses or the lingering residue of the Veil. They are little more than hunger and confusion.",
+      "connections": ["The Unquiet Dead", "The Veil"],
+      "tl": 1,
+      "class": "I",
+      "sb_spends": [
+        { "cost": 1, "name": "[REINFORCEMENT] More dead rise", "effect": "Nearby corpses shamble to join the horde." },
+        { "cost": 1, "name": "[TIMER] Horde grows", "effect": "Start a 4-segment 'Horde' timer. At 4, the mob becomes overwhelming." }
+      ]
+    }
+  },
+  {
+    "Banshee (Scream of the Sidhe)": {
+      "page": "Banshee",
+      "summary": "A wailing spirit that heralds the death of a clan's chieftain. Her cry is a memory of the old court.",
+      "locations": ["Theona", "Ubral", "Aelaerem downs"],
+      "lore": "The banshee serves the Green Court, singing the names of the soon-to-be-dead. Those who hear her and survive are marked for a meeting with the Hollow.",
+      "connections": ["The Green Court", "The Hollow"],
+      "tl": 3,
+      "class": "III",
+      "sb_spends": [
+        { "cost": 2, "name": "[SONG] Wail of death", "effect": "All in Near must test Spirit or mark 1 Fatigue." },
+        { "cost": 2, "name": "[TIMER] Death knell", "effect": "Start a 4-segment 'Death Knell' timer. At 4, a named PC is marked for death." },
+        { "cost": 1, "name": "[HAUNT] Name the next", "effect": "She names the next PC likely to die; that PC loses a Boon." }
+      ]
+    }
+  },
+  {
+    "Tunnel-Grub": {
+      "page": "Tunnel_Grub",
+      "summary": "A segmented, many-legged horror that dwells in the deep places, paralyzing prey with a touch.",
+      "locations": ["Aeler underways", "Dungeon depths", "Mistlands sinkholes"],
+      "lore": "The tunnel-grubs were once carrion-feeders in the Astroegro vaults. The Deep Drake's pressure has twisted them, giving them a hunger for warm flesh.",
+      "connections": ["Dungeon Living Infrastructure", "The Pressure Below"],
+      "tl": 2,
+      "class": "II",
+      "sb_spends": [
+        { "cost": 1, "name": "[VENOM] Paralytic mucus", "effect": "Its touch leaves paralytic mucus; a PC is Slowed." },
+        { "cost": 1, "name": "[REINFORCEMENT] Grubs from cracks", "effect": "More grubs pour from wall cracks." }
+      ]
+    }
+  },
+  {
+    "Strangle-Kin": {
+      "page": "Strangle_Kin",
+      "summary": "A small, rubbery creature with prehensile limbs that lurk in ceilings and drop onto unsuspecting prey.",
+      "locations": ["Dungeon ceilings", "Aeler old galleries", "Thepyrgos cisterns"],
+      "lore": "The strangle-kin are the descendants of failed binding experiments. They cling to stone and shadow, their grip colder than the grave.",
+      "connections": ["Dungeon Living Infrastructure", "The Unsealed"],
+      "tl": 1,
+      "class": "I",
+      "sb_spends": [
+        { "cost": 1, "name": "[AMBUSH] Drop from above", "effect": "It drops onto a PC and begins strangling." },
+        { "cost": 1, "name": "[TIMER] Suffocate", "effect": "Start a 4-segment 'Suffocation' timer on a grabbed PC." }
+      ]
+    }
+  },
+  {
+    "Cockatrice (Stone-Fowl)": {
+      "page": "Cockatrice",
+      "summary": "A reptilian bird whose bite causes flesh to turn to stone. Roosts in ruins and rocky outcrops.",
+      "locations": ["Vilikari hedges", "Acasian ruins", "Theona cliffs"],
+      "lore": "The cockatrice is said to be hatched from a serpent's egg, incubated by a rooster. It does not hunt—it waits for the unwary to wander too close.",
+      "connections": ["The Wilds", "The Bitter Root"],
+      "tl": 2,
+      "class": "II",
+      "sb_spends": [
+        { "cost": 1, "name": "[STONE] Petrifying bite", "effect": "A bite begins petrification; start a 4-segment 'Stone' timer." },
+        { "cost": 1, "name": "[ENVIRONMENT] Flutter into the group", "effect": "It flutters into the midst of the party, forcing gaze checks." }
+      ]
+    }
+  },
+  {
+    "Dire Wolf (Great Wolf)": {
+      "page": "Dire_Wolf",
+      "summary": "A massive, intelligent wolf that hunts in packs. Revered by the Ykrul and feared by the lowlands.",
+      "locations": ["Ykrul steppe", "Valewood edge", "Ubral highlands"],
+      "lore": "The dire wolves are the descendants of the Wolf Spirit's first children. They are not beasts—they are hunters with a sense of honor that demands respect.",
+      "connections": ["The Wolf Spirit", "The Wilds"],
+      "tl": 2,
+      "class": "II",
+      "sb_spends": [
+        { "cost": 1, "name": "[TACTICS] Surround the prey", "effect": "The pack flanks the party, worsening Position." },
+        { "cost": 1, "name": "[TACTICS] Harry the weakest", "effect": "They focus on the most wounded PC, ignoring others." }
+      ]
+    }
+  },
+  {
+    "Shade-Strider": {
+      "page": "Shade_Strider",
+      "summary": "A six-limbed panther wrapped in ghost-limbs of shadow-stuff. Its form shifts, making its true position impossible to fix.",
+      "locations": ["Valewood deeps", "Aelinnel groves", "Ways Between edges"],
+      "lore": "The shade-striders are the result of Lethai-thora experiments that blended shadow-stuff with predatory flesh. They never quite belong to this world.",
+      "connections": ["Genesis Vats", "The Ninth"],
+      "tl": 3,
+      "class": "III",
+      "sb_spends": [
+        { "cost": 1, "name": "[ILLUSION] Two places at once", "effect": "It seems to be in two places; attacks become Desperate." },
+        { "cost": 2, "name": "[AMBUSH] Strike from shadow", "effect": "It vanishes and strikes from a PC's shadow." }
+      ]
+    }
+  },
+  {
+    "Doppelganger (Face-Thief)": {
+      "page": "Doppelganger",
+      "summary": "A creature that wears the faces of the living. It does not kill—it replaces.",
+      "locations": ["Silkstrand", "Ecktoria", "Vhasia courts"],
+      "lore": "The doppelgangers are the spies of the Veiled Sisters, sent to infiltrate and destabilize. They are not assassins—they are collectors of secrets.",
+      "connections": ["Ashaan", "The Veil"],
+      "tl": 2,
+      "class": "II",
+      "sb_spends": [
+        { "cost": 2, "name": "[SOCIAL] Replace an ally", "effect": "It slips away and returns wearing an NPC's face." },
+        { "cost": 1, "name": "[ILLUSION] Borrowed face", "effect": "It briefly wears a PC's face, sowing confusion." }
+      ]
+    }
+  },
+  {
+    "Mind-Reaver": {
+      "page": "Mind_Reaver",
+      "summary": "A creature of nightmare that feeds on the thoughts of the living. Hails from the deepest places of the world.",
+      "locations": ["Dungeon depths", "Ways Between", "Sealed vaults"],
+      "lore": "The mind-reavers are the remnants of a civilisation that predates the Astroegro. They do not speak aloud—they project their will. They do not attack with claws—they consume the self.",
+      "connections": ["The Ninth", "The Unsealed"],
+      "tl": 4,
+      "class": "IV",
+      "sb_spends": [
+        { "cost": 2, "name": "[HAUNT] Psychic lance", "effect": "It projects pain; a PC loses a Boon and marks Fatigue." },
+        { "cost": 2, "name": "[BARGAIN] Spare the mind", "effect": "It offers to leave a PC's mind intact for a secret." },
+        { "cost": 2, "name": "[TIMER] Mind fracture", "effect": "Start a 4-segment 'Fracture' timer. At 4, a PC gains a permanent quirk." }
+      ]
+    }
+  },
+  {
+    "Frost Wyrm (Ice-Breath)": {
+      "page": "Frost_Wyrm",
+      "summary": "A dragon-kin that breathes ice and sleeps in permafrost. Slower than its cousins, but no less deadly.",
+      "locations": ["Himadri peaks", "Linn fjords", "Aeler deep-vaults"],
+      "lore": "The frost wyrms are the guardians of the north. They remember the Winter Kings and demand tribute from all who cross their territory.",
+      "connections": ["The Tall Folk", "The Wilds"],
+      "tl": 4,
+      "class": "IV",
+      "sb_spends": [
+        { "cost": 2, "name": "[ICE] Seal the door", "effect": "Its breath freezes a doorway or exit shut." },
+        { "cost": 2, "name": "[TIMER] Blizzard breath", "effect": "Start a 4-segment 'Blizzard Breath' timer. At 4, it unleashes a freezing cone." }
+      ]
+    }
+  },
+  {
+    "Sludge-Thing": {
+      "page": "Sludge_Thing",
+      "summary": "A transparent, cube-shaped ooze that glides through dungeons, digesting everything in its path.",
+      "locations": ["Dungeon corridors", "Aeler sealed chambers", "Thepyrgos cisterns"],
+      "lore": "The sludge-things are a byproduct of alchemical experiments gone wrong. They are mindless, relentless, and patient.",
+      "connections": ["Dungeon Living Infrastructure", "The Alchemical Age"],
+      "tl": 2,
+      "class": "II",
+      "sb_spends": [
+        { "cost": 1, "name": "[ENVIRONMENT] Block the corridor", "effect": "It expands to fill a corridor, blocking movement." },
+        { "cost": 1, "name": "[TIMER] Digest gear", "effect": "Start a 4-segment 'Digestion' timer on gear it has engulfed." }
+      ]
+    }
+  },
+  {
+    "Giant (Tall Folk)": {
+      "page": "Giant",
+      "summary": "Beings of immense stature, the giants remember the old world and the treaties that bound them to the earth.",
+      "locations": ["Himadri foothills", "Aelerian passes", "Ubral highlands"],
+      "lore": "The giants were once the rulers of the mountains, before the Aeler came. They keep the old oaths, but they do not forget the loss of their kingdom.",
+      "connections": ["The Tall Folk", "The Aeler"],
+      "tl": 4,
+      "class": "IV",
+      "sb_spends": [
+        { "cost": 2, "name": "[ENVIRONMENT] Kick a boulder", "effect": "It kicks a boulder into the party's path." },
+        { "cost": 1, "name": "[SOCIAL] Recall the old oaths", "effect": "It demands the party acknowledge an old treaty." }
+      ]
+    }
+  },
+  {
+    "Giant Spider (Weaver-Kin)": {
+      "page": "Giant_Spider",
+      "summary": "A massive arachnid with a web that can entangle a horse. Dwells in shadowed places.",
+      "locations": ["Valewood", "Dungeons", "Aelinnel groves"],
+      "lore": "The giant spiders are the children of the Spider Queen. They weave not just webs, but memories and warnings.",
+      "connections": ["Inaea", "The Wilds"],
+      "tl": 2,
+      "class": "II",
+      "sb_spends": [
+        { "cost": 1, "name": "[ENVIRONMENT] Web the exit", "effect": "It webs a doorway, sealing it." },
+        { "cost": 1, "name": "[REINFORCEMENT] Spiderlings", "effect": "A swarm of spiderlings descends." }
+      ]
+    }
+  },
+  {
+    "False Chest": {
+      "page": "False_Chest",
+      "summary": "A creature that mimics the shape of treasure chests, doors, and furniture. Patient. Hungry.",
+      "locations": ["Dungeons", "Ruined keeps", "Abandoned warehouses"],
+      "lore": "The false chests are a mutation from the Astroegro era, designed to guard vaults. They are patient—they have been waiting for centuries.",
+      "connections": ["Dungeon Living Infrastructure", "Astroegro Remnant"],
+      "tl": 2,
+      "class": "II",
+      "sb_spends": [
+        { "cost": 1, "name": "[AMBUSH] Snap shut", "effect": "It snaps shut on a PC's arm or head." },
+        { "cost": 1, "name": "[TIMER] Digest", "effect": "Start a 4-segment 'Digestion' timer on engulfed prey." }
+      ]
+    }
+  },
+  {
+    "Stitched Horror": {
+      "page": "Stitched_Horror",
+      "summary": "A construct of sewn flesh and stolen sinew, animated by a spark of something forbidden.",
+      "locations": ["Ashaan laboratories", "Genesis Vats", "Dungeon depths"],
+      "lore": "The stitched horrors are the legacy of the Lethai-thora's experiments. They do not serve—they are the leftover parts of a greater ambition.",
+      "connections": ["Genesis Vats", "The Unsealed"],
+      "tl": 3,
+      "class": "III",
+      "sb_spends": [
+        { "cost": 1, "name": "[HAUNT] Many voices", "effect": "It screams with the voices of its parts; PCs in Near mark Fatigue." },
+        { "cost": 2, "name": "[REINFORCEMENT] Assemble more", "effect": "Scattered body parts knit into a second horror." }
+      ]
+    }
+  },
+  {
+    "Mummy (Veil-Wrapped)": {
+      "page": "Mummy",
+      "summary": "A preserved corpse, animated by the remnants of its binding magic. Guards the tombs of ancient kings.",
+      "locations": ["Ashaan tombs", "Pereshi archives", "Dhaharan barrows"],
+      "lore": "The mummies are the wardens of the old kingdoms. They do not attack those who show proper respect—but their patience has limits.",
+      "connections": ["The Veil", "The Unquiet Dead"],
+      "tl": 3,
+      "class": "III",
+      "sb_spends": [
+        { "cost": 1, "name": "[CURSE] Cursed touch", "effect": "Its touch places a curse on a PC." },
+        { "cost": 2, "name": "[TIMER] Curse spreads", "effect": "Start a 4-segment 'Curse' timer. At 4, the curse affects all nearby." },
+        { "cost": 2, "name": "[REINFORCEMENT] Awaken guardians", "effect": "It awakens more mummies from their sarcophagi." }
+      ]
+    }
+  },
+  {
+    "Hollow-Steed": {
+      "page": "Hollow_Steed",
+      "summary": "A spectral horse of smoke and ember, ridden by those who have made a pact with the Hollow.",
+      "locations": ["Ways Between", "Valewood edge", "Dungeon depths"],
+      "lore": "The hollow-steed is a creature of the Hollow's own making. It offers speed and power to those who are willing to pay the toll—a memory, a name, a breath.",
+      "connections": ["The Hollow", "The Wilds"],
+      "tl": 3,
+      "class": "III",
+      "sb_spends": [
+        { "cost": 1, "name": "[DREAM] Carry into the Ways", "effect": "It charges through a PC, carrying them a step into the Ways Between." },
+        { "cost": 2, "name": "[BARGAIN] Speed for memory", "effect": "It offers escape-speed in exchange for a memory." }
+      ]
+    }
+  },
+  {
+    "Ogre (Hill-Eater)": {
+      "page": "Ogre",
+      "summary": "A large, brutish creature that feeds on the livestock and the lost. Dwells in caves and ruins.",
+      "locations": ["Ubral hills", "Acasian ruins", "Black Banners camps"],
+      "lore": "The ogres are the distant cousins of the giants, but they lack the old wisdom. They eat what they can catch and break what they cannot.",
+      "connections": ["The Tall Folk", "The Wilds"],
+      "tl": 2,
+      "class": "II",
+      "sb_spends": [
+        { "cost": 1, "name": "[SOCIAL] Demand food", "effect": "It demands the party hand over rations or a captive." },
+        { "cost": 1, "name": "[ENVIRONMENT] Smash cover", "effect": "It smashes a wall or tree the party is using for cover." }
+      ]
+    }
+  },
+  {
+    "Filth-Feeder": {
+      "page": "Filth_Feeder",
+      "summary": "A grotesque, tentacled creature that dwells in filth and sewage. Larger and hungrier than it appears.",
+      "locations": ["Dungeon sewers", "Aeler waste-ways", "Zakov under-city"],
+      "lore": "The filth-feeders are the cleaners of the deep places. They are not evil—they simply eat what others leave behind.",
+      "connections": ["Dungeon Living Infrastructure"],
+      "tl": 2,
+      "class": "II",
+      "sb_spends": [
+        { "cost": 1, "name": "[ENVIRONMENT] Filth spray", "effect": "It sprays sewage, making the area hazardous." },
+        { "cost": 1, "name": "[TIMER] Block the drain", "effect": "Start a 4-segment 'Flood' timer. At 4, the area floods with filth." }
+      ]
+    }
+  },
+  {
+    "Thornfeather": {
+      "page": "Thornfeather",
+      "summary": "A creature of feather and fur, with the body of a bear and the head of an owl. Found in ancient forests.",
+      "locations": ["Valewood", "Aelaerem downs", "Theona moors"],
+      "lore": "The thornfeather is a creature of the old magic, born from a Lethai-thora experiment that was never undone. It hunts with silent patience.",
+      "connections": ["Genesis Vats", "The Wilds"],
+      "tl": 3,
+      "class": "III",
+      "sb_spends": [
+        { "cost": 1, "name": "[AMBUSH] Drop from the tree", "effect": "It drops silently from above onto a PC." },
+        { "cost": 1, "name": "[ENVIRONMENT] Deafening screech", "effect": "Its owl-head screech deafens all in Near for one exchange." }
+      ]
+    }
+  },
+  {
+    "Fire-Spine": {
+      "page": "Fire_Spine",
+      "summary": "A massive, insectoid creature with a blazing-hot spine. Burrows through ice and stone alike.",
+      "locations": ["Himadri peaks", "Aeler deeps", "Linn glaciers"],
+      "lore": "The fire-spine is a creature of the deep cold, its heat a defiance of its frozen home. It hunts with patience and fury.",
+      "connections": ["The Tall Folk", "The Wilds"],
+      "tl": 4,
+      "class": "IV",
+      "sb_spends": [
+        { "cost": 2, "name": "[FIRE] Ignite a PC", "effect": "Its blazing spine sets a PC's gear alight." },
+        { "cost": 2, "name": "[ENVIRONMENT] Melt the ice", "effect": "It melts ice underfoot, creating treacherous water." }
+      ]
+    }
+  },
+  {
+    "Stone-Tongue": {
+      "page": "Stone_Tongue",
+      "summary": "A stalactite-shaped creature with long, sticky tendrils that drag prey into its mouth.",
+      "locations": ["Dungeon ceilings", "Aeler vaults", "Thepyrgos catacombs"],
+      "lore": "The stone-tongues are the oldest inhabitants of the deep places. They do not move—they wait. They have been waiting since the first stone was laid.",
+      "connections": ["Dungeon Living Infrastructure"],
+      "tl": 3,
+      "class": "III",
+      "sb_spends": [
+        { "cost": 1, "name": "[AMBUSH] Drop from ceiling", "effect": "It drops onto a PC and wraps its tendrils around them." },
+        { "cost": 1, "name": "[TIMER] Drag upward", "effect": "Start a 4-segment 'Consumed' timer on a grabbed PC." }
+      ]
+    }
+  },
+  {
+    "Sea-Devil": {
+      "page": "Sea_Devil",
+      "summary": "A fish-like humanoid that hunts the coastal waters. Savage, territorial, and never alone.",
+      "locations": ["Linn coasts", "Zakov shallows", "Kahfagia reefs"],
+      "lore": "The sea-devils are the children of the deep trenches. They do not trade—they take. They do not negotiate—they feed.",
+      "connections": ["The Tide Father", "The Amaranthine"],
+      "tl": 2,
+      "class": "II",
+      "sb_spends": [
+        { "cost": 1, "name": "[TIDE] School flanks", "effect": "A school of sea-devils flanks the party from the water." },
+        { "cost": 2, "name": "[REINFORCEMENT] Deep one rises", "effect": "A larger deep one surfaces to lead them." }
+      ]
+    }
+  },
+  {
+    "Sea Serpent (Tide-Wyrm)": {
+      "page": "Sea_Serpent",
+      "summary": "A serpent of the deep waters, long as a ship and quick as a thought. Dwells in the open sea.",
+      "locations": ["Amaranthine Sea", "Aberderrin Deep", "Dolmis Trench"],
+      "lore": "The sea serpents are the dragons of the deeps. They are not evil—they are indifferent to the concerns of the land.",
+      "connections": ["The Tide Father", "The Wilds"],
+      "tl": 3,
+      "class": "III",
+      "sb_spends": [
+        { "cost": 2, "name": "[TIDE] Coil the vessel", "effect": "It wraps the ship or boat; start a 4-segment 'Crush Hull' timer." },
+        { "cost": 2, "name": "[ENVIRONMENT] Dive and capsize", "effect": "It dives, rocking and potentially capsizing a small boat." }
+      ]
+    }
+  },
+  {
+    "Shadow (Blight of the Unseen)": {
+      "page": "Shadow",
+      "summary": "A creature made of darkness, born from a death that was never witnessed. Hungers for warmth.",
+      "locations": ["Ashaan", "Zakov", "Dungeon depths"],
+      "lore": "The shadows are the remnants of the Veil, fragments of a binding that failed. They do not strike—they drain.",
+      "connections": ["The Veil", "The Unquiet Dead"],
+      "tl": 2,
+      "class": "II",
+      "sb_spends": [
+        { "cost": 1, "name": "[HAUNT] Attach to a shadow", "effect": "It attaches to a PC's shadow, draining warmth each exchange." },
+        { "cost": 2, "name": "[TIMER] Shadow consumes", "effect": "Start a 4-segment 'Consumed' timer. At 4, the host PC is incapacitated." }
+      ]
+    }
+  },
+  {
+    "Bog-Kin": {
+      "page": "Bog_Kin",
+      "summary": "A creature of living vegetation and swamp matter, animated by old magic. Dwells in the deep fens.",
+      "locations": ["Acasian bogs", "Mistlands fens", "Theona moors"],
+      "lore": "The bog-kin are the swamp's immune system. They do not attack without reason, but their patience is not infinite.",
+      "connections": ["The Wilds", "The Bitter Root"],
+      "tl": 3,
+      "class": "III",
+      "sb_spends": [
+        { "cost": 1, "name": "[ENVIRONMENT] Muck in the eyes", "effect": "It throws muck, blinding a PC." },
+        { "cost": 2, "name": "[TIMER] Bog swallows", "effect": "Start a 4-segment 'Sinking' timer. At 4, a PC is trapped in the bog." }
+      ]
+    }
+  },
+  {
+    "Skeleton (Bone-Walker)": {
+      "page": "Skeleton",
+      "summary": "A reanimated skeleton, driven by old magic or the lingering will of its former self.",
+      "locations": ["Barrows", "Ashaan tombs", "Dungeon depths"],
+      "lore": "The skeletons are the remnants of the unburied. They do not speak—they march. They do not rest—they wait.",
+      "connections": ["The Unquiet Dead"],
+      "tl": 1,
+      "class": "I",
+      "sb_spends": [
+        { "cost": 1, "name": "[REINFORCEMENT] More bones rise", "effect": "Nearby bones assemble into more skeletons." },
+        { "cost": 1, "name": "[HAUNT] Speak from beyond", "effect": "It speaks a single warning that reveals a danger." }
+      ]
+    }
+  },
+  {
+    "Cave-Breaker": {
+      "page": "Cave_Breaker",
+      "summary": "A creature of immense strength and strange power, with the ability to burrow and confuse.",
+      "locations": ["Aeler deeps", "Dungeon depths", "Thepyrgos catacombs"],
+      "lore": "The cave-breakers are the remnants of a forgotten age, their minds as alien as their forms. They are not enemies—they are obstacles.",
+      "connections": ["Dungeon Living Infrastructure", "The Unsealed"],
+      "tl": 3,
+      "class": "III",
+      "sb_spends": [
+        { "cost": 2, "name": "[ENVIRONMENT] Collapse passage", "effect": "It collapses a tunnel or doorway, trapping someone." },
+        { "cost": 2, "name": "[TIMER] Cave-in", "effect": "Start a 4-segment 'Cave In' timer. At 4, the ceiling falls." }
+      ]
+    }
+  },
+  {
+    "Gem-Eater": {
+      "page": "Gem_Eater",
+      "summary": "A three-legged, three-armed creature that burrows through stone, seeking precious gems.",
+      "locations": ["Aeler deeps", "Dungeon depths", "Himadri passes"],
+      "lore": "The gem-eaters are the miners of the deep places. They do not attack without provocation—they are simply hungry, and the deep earth is their pantry.",
+      "connections": ["Dungeon Living Infrastructure"],
+      "tl": 2,
+      "class": "II",
+      "sb_spends": [
+        { "cost": 1, "name": "[BARGAIN] Tunnel for gems", "effect": "It will tunnel a path if offered gems." },
+        { "cost": 1, "name": "[ENVIRONMENT] Undermine footing", "effect": "It burrows under a PC, causing the floor to give way." }
+      ]
+    }
+  },
+  {
+    "Web-Spawn": {
+      "page": "Web_Spawn",
+      "summary": "A fusion of Aelinnel and spider, born from a failed bargain with the green courts.",
+      "locations": ["Valewood deeps", "Aelinnel dark groves", "The Ways Between"],
+      "lore": "The web-spawn were once Aelinnel who sought power from the Spider Queen. Their transformation was a punishment for their ambition—they are now hunters of the deep places.",
+      "connections": ["Inaea", "The Valewood"],
+      "tl": 3,
+      "class": "III",
+      "sb_spends": [
+        { "cost": 1, "name": "[ENVIRONMENT] Web the exits", "effect": "It sprays webbing, sealing exits." },
+        { "cost": 1, "name": "[REINFORCEMENT] Spiders descend", "effect": "A swarm of spiders descends to assist." }
+      ]
+    }
+  },
+  {
+    "Land-Shark": {
+      "page": "Land_Shark",
+      "summary": "A massive, armored burrower that hunts through earth and stone. Leaves nothing but cracks and screams.",
+      "locations": ["Aeler deeps", "Ngomebe plains", "Ubral highlands"],
+      "lore": "The land-shark is the earth's rage given form. It does not hunt for food—it hunts for the pleasure of breaking rock.",
+      "connections": ["The Wilds", "The Pressure Below"],
+      "tl": 4,
+      "class": "IV",
+      "sb_spends": [
+        { "cost": 2, "name": "[ENVIRONMENT] Open sinkhole", "effect": "Its passage opens a sinkhole under a PC." },
+        { "cost": 2, "name": "[TIMER] Ground collapse", "effect": "Start a 4-segment 'Collapse' timer. At 4, the area caves in." }
+      ]
+    }
+  },
+  {
+    "Nidhoggr's Brood (Corpse-Tearer Kin)": {
+      "page": "Nidhoggr_Brood",
+      "summary": "The spawn of the corpse-tearer, each a nightmarish amalgam of wyrm and shadow.",
+      "locations": ["Aeler deep-vaults", "Dungeon depths", "Valewood under-root"],
+      "lore": "Nidhoggr's children are not born—they are carved from the mountain's memory. They hunger for the warmth of the world above.",
+      "connections": ["Nidhoggr", "The Pressure Below"],
+      "tl": 6,
+      "class": "VI",
+      "sb_spends": [
+        { "cost": 2, "name": "[PRESSURE] Crush of Nidhoggr", "effect": "The pressure of the deep intensifies; all in Near mark Fatigue." },
+        { "cost": 3, "name": "[REINFORCEMENT] The mountain remembers", "effect": "More Brood carve themselves from the stone walls." },
+        { "cost": 2, "name": "[TIMER] Corpse-tearer's approach", "effect": "Start a 6-segment 'Nidhoggr Wakes' timer. At 6, the father stirs." }
+      ]
+    }
+  },
+  {
+    "The Ravenous (Ghoul King's Brood)": {
+      "page": "The_Ravenous",
+      "summary": "The spawn of the Ghoul King—savage, intelligent, and always hunting.",
+      "locations": ["Zakov crypts", "Ashaan catacombs", "Acasian barrows"],
+      "lore": "The Ravenous are the Ghoul King's own. They do not eat for hunger—they eat for the memory of warmth.",
+      "connections": ["Malachai", "The Unquiet Dead"],
+      "tl": 5,
+      "class": "V",
+      "sb_spends": [
+        { "cost": 1, "name": "[BLOOD] Devour warmth", "effect": "A Ravenous feeds on a corpse, healing and gaining +1 die." },
+        { "cost": 2, "name": "[REINFORCEMENT] The King sends more", "effect": "More Ravenous pour from the dark." },
+        { "cost": 2, "name": "[TIMER] Hunger spreads", "effect": "Start a 4-segment 'Ghoul King's Hunger' timer. At 4, all dead in the area rise." }
+      ]
+    }
+  },
+  {
+    "Lusca (Tide-Devil)": {
+      "page": "Lusca",
+      "summary": "A many-tentacled horror of the deep, larger and more cunning than any kraken-spawn.",
+      "locations": ["Amaranthine Trench", "Dolmis Deep", "Aberderrin Abyss"],
+      "lore": "The lusca is the kraken's older, crueler sibling. It does not sleep—it waits, coiled in the darkness, its many eyes fixed on the surface.",
+      "connections": ["Khemesh", "The Tide Father"],
+      "tl": 7,
+      "class": "VII",
+      "sb_spends": [
+        { "cost": 2, "name": "[TIDE] Tentacles everywhere", "effect": "Tentacles seize the ship; start a 6-segment 'Drag Under' timer." },
+        { "cost": 3, "name": "[ENVIRONMENT] Whirlpool", "effect": "The Lusca creates a massive whirlpool, trapping all vessels." },
+        { "cost": 3, "name": "[REINFORCEMENT] Eyes of the deep", "effect": "It calls abyssal spawn to swarm the decks." }
+      ]
+    }
+  },
+  {
+    "Stone Giant King (Throne-Breaker)": {
+      "page": "Stone_Giant_King",
+      "summary": "The ruler of the stone giants, ancient and terrible. His voice is the sound of grinding mountains.",
+      "locations": ["Aeler deep-vaults", "Himadri peaks", "Ubral highlands"],
+      "lore": "The Stone Giant King sits on a throne carved from the mountain's heart. He does not rule—he simply is, and the mountain obeys.",
+      "connections": ["The Tall Folk", "The Aeler"],
+      "tl": 7,
+      "class": "VII",
+      "sb_spends": [
+        { "cost": 3, "name": "[ENVIRONMENT] The mountain obeys", "effect": "He commands stone; pillars fall and the ground splits." },
+        { "cost": 2, "name": "[SOCIAL] Demand the old tribute", "effect": "He demands the party pay the mountain's ancient tithe." },
+        { "cost": 3, "name": "[REINFORCEMENT] Stone giants rise", "effect": "Stone giants break from the walls to serve him." }
+      ]
+    }
+  },
+  {
+    "Frost Giant Jarl (Winter's Voice)": {
+      "page": "Frost_Giant_Jarl",
+      "summary": "The chieftain of the frost giants, who speaks with the voice of the winter storms.",
+      "locations": ["Himadri peaks", "Linn glaciers", "Northern Reaches"],
+      "lore": "The Frost Giant Jarl does not negotiate—he commands. His word is the blizzard, and his silence is the frozen earth.",
+      "connections": ["The Tall Folk", "The Sky Father"],
+      "tl": 7,
+      "class": "VII",
+      "sb_spends": [
+        { "cost": 3, "name": "[ICE] Voice of winter", "effect": "He speaks a word of frost; all in Near take Harm from cold." },
+        { "cost": 2, "name": "[TIMER] Blizzard gathers", "effect": "Start a 6-segment 'Whiteout' timer. At 6, the storm isolates each PC." },
+        { "cost": 3, "name": "[REINFORCEMENT] Frost giants answer", "effect": "His command calls frost giants from the whiteout." }
+      ]
+    }
+  },
+  {
+    "Shadow Wyrm (Darkness Given Form)": {
+      "page": "Shadow_Wyrm",
+      "summary": "A dragon of shadow and silence, born from the Ninth's first mistake.",
+      "locations": ["Ways Between", "Dungeon depths", "Valewood under-root"],
+      "lore": "The Shadow Wyrm does not breathe fire—it breathes forgetting. Those who face it may not remember why they came.",
+      "connections": ["The Ninth", "The Hollow"],
+      "tl": 7,
+      "class": "VII",
+      "sb_spends": [
+        { "cost": 2, "name": "[SHADOW] Breath of forgetting", "effect": "It exhales shadow; all in Near must test Spirit or forget their current goal." },
+        { "cost": 3, "name": "[TIMER] Shadow consumes the story", "effect": "Start a 6-segment 'Forgetting' timer. At 6, the party forgets why they entered the dungeon." },
+        { "cost": 2, "name": "[HAUNT] Whisper from shadow", "effect": "It whispers a PC's forgotten sin, causing them to hesitate." }
+      ]
+    }
+  },
+  {
+    "The Hollow King (Lord of the Forgotten)": {
+      "page": "Hollow_King",
+      "summary": "The ruler of the Hollow itself—a king of shadows and promises that were never kept.",
+      "locations": ["The Ways Between", "The Ninth Gate", "The Heart of the Hollow"],
+      "lore": "The Hollow King is the echo of a monarch who broke a promise to the world. He does not rule—he waits, and his patience is a weight that bends the world.",
+      "connections": ["The Ninth", "The Hollow"],
+      "tl": 8,
+      "class": "VIII",
+      "sb_spends": [
+        { "cost": 2, "name": "[HAUNT] Name the unkept promise", "effect": "He names a promise a PC broke; they act at Desperate until they acknowledge it." },
+        { "cost": 3, "name": "[BARGAIN] Offer to unmake a debt", "effect": "He offers to erase one of the party's debts in exchange for a name." },
+        { "cost": 3, "name": "[TIMER] The Hollow closes", "effect": "Start a 6-segment 'Hollow Collapse' timer. At 6, the Ways Between swallow the party." },
+        { "cost": 3, "name": "[REINFORCEMENT] Forgotten subjects", "effect": "He summons shades of those who broke promises to him." }
+      ]
+    }
+  },
+  {
+    "Cinder-Wyrm (Dragon's Lair)": {
+      "page": "Cinder_Wyrm",
+      "summary": "A young dragon-kin that nests in volcanic ash and feeds on ember-rich ore. Possesses a cunning intelligence and a territorial fury.",
+      "locations": ["Volcanic calderas", "Aeler deep forges", "Nihori ash wastes"],
+      "lore": "The cinder-wyrms are the children of Azghal the Doomfire, born from the molten gates of his Red Vault. They serve as his eyes and his enforcers, and they remember every face that has ever offered tribute to their sire.",
+      "connections": ["Azghal the Doomfire", "The Red Vault", "The Everflame"],
+      "tl": 3,
+      "class": "III",
+      "sb_spends": [
+        { "cost": 1, "name": "[FIRE] Scatter embers", "effect": "It shakes ash and embers, igniting flammable surfaces." },
+        { "cost": 2, "name": "[TIMER] Forge heat builds", "effect": "Start a 4-segment 'Furnace' timer. At 4, the chamber becomes unbearably hot." },
+        { "cost": 2, "name": "[BARGAIN] Demand tribute", "effect": "It pauses to accept tribute; refusal enrages it." }
+      ]
+    }
+  },
+  {
+    "Hoard-Wyrd (Dragon's Lair)": {
+      "page": "Hoard_Wyrd",
+      "summary": "A ghost bonded to a specific treasure. It permits those who swear an oath to borrow its relic—but it always remembers the terms.",
+      "locations": ["Dragon hoards", "Sunken vaults", "Forgotten crypts"],
+      "lore": "A wyrd does not guard the hoard; it is the hoard's memory made manifest. It does not sleep. It does not forget. It counts the days since the treasure was taken, and it will ask for its return—or for the story of its journey.",
+      "connections": ["The Witness", "The Unquiet Dead", "Dungeon Living Infrastructure"],
+      "tl": 2,
+      "class": "II",
+      "sb_spends": [
+        { "cost": 1, "name": "[BARGAIN] State the terms", "effect": "It names the oath required to borrow the relic." },
+        { "cost": 2, "name": "[TIMER] Debt comes due", "effect": "Start a 4-segment 'Debt' timer. At 4, the borrower must return the relic or face a geas." },
+        { "cost": 1, "name": "[HAUNT] Remind of the oath", "effect": "It whispers the terms to a PC, causing them to lose a Boon if they have broken them." }
+      ]
+    }
+  },
+  {
+    "Sky-Needle Wyvern (Dragon's Lair)": {
+      "page": "Sky_Needle_Wyvern",
+      "summary": "A wyvern that nests on the highest peaks, hunting updrafts and snatching prey from sheer cliffs.",
+      "locations": ["Himadri peaks", "Sky Needles", "Aelerian summits"],
+      "lore": "The wyverns of the Sky Needles are the children of Tyrgoth the Thunder-Eater. They challenge travelers who climb too high—not to kill, but to test their worth. Those who pass may claim a feather.",
+      "connections": ["Tyrgoth the Thunder-Eater", "The Ykrul", "The Sky Father"],
+      "tl": 3,
+      "class": "III",
+      "sb_spends": [
+        { "cost": 1, "name": "[ENVIRONMENT] Snatch and drop", "effect": "It grabs a PC and drops them toward the cliff." },
+        { "cost": 2, "name": "[SOCIAL] Test of worth", "effect": "It challenges a PC to stand firm against the wind; failure means being knocked Prone." },
+        { "cost": 2, "name": "[TIMER] Tyrgoth watches", "effect": "Start a 4-segment 'Thunder-Eater's Eye' timer. At 4, Tyrgoth notices the climbers." }
+      ]
+    }
+  },
+  {
+    "Frostling Wyrm (Dragon's Lair)": {
+      "page": "Frostling_Wyrm",
+      "summary": "A small but cunning wyrm that breathes rime and seals doors with ice-ribbing. Dwells in glacier cathedrals.",
+      "locations": ["Glacier Cathedral", "Linn fjords", "Himadri passes"],
+      "lore": "The frostling wyrm is the child of Vyrmja the Winter Coil. It does not attack with rage—it hunts with patience, freezing the ground beneath its prey and waiting for the cold to do its work.",
+      "connections": ["Vyrmja the Winter Coil", "The Linn", "The Tall Folk"],
+      "tl": 3,
+      "class": "III",
+      "sb_spends": [
+        { "cost": 2, "name": "[ICE] Seal the door", "effect": "It ices over an exit, sealing it shut." },
+        { "cost": 2, "name": "[TIMER] Cold takes hold", "effect": "Start a 4-segment 'Deep Freeze' timer. At 4, all in Near take Harm from cold." },
+        { "cost": 1, "name": "[ENVIRONMENT] Ice underfoot", "effect": "It freezes the ground; movement becomes Desperate." }
+      ]
+    }
+  },
+  {
+    "Lampwyrm Archivist (Dragon's Lair)": {
+      "page": "Lampwyrm_Archivist",
+      "summary": "A drake that hoards knowledge, not gold. It illuminates lies and hums lullabies of forgotten history.",
+      "locations": ["Thepyrgos archives", "Pereshi libraries", "Valewood ruins"],
+      "lore": "The lampwyrm was once a servant of the Lethai-thora, tasked with guarding forbidden knowledge. It still remembers the old protocols—and it still enforces them.",
+      "connections": ["The Lethai-thora", "The Witness", "The Forgotten Prince"],
+      "tl": 2,
+      "class": "II",
+      "sb_spends": [
+        { "cost": 1, "name": "[SOCIAL] Illuminate a lie", "effect": "Its light reveals a lie a PC has told." },
+        { "cost": 2, "name": "[BARGAIN] Knowledge for silence", "effect": "It offers a forbidden fact if the party swears never to speak it." },
+        { "cost": 2, "name": "[TIMER] Protocols engage", "effect": "Start a 4-segment 'Archive Seals' timer. At 4, the archive locks down." }
+      ]
+    }
+  },
+  {
+    "The Worn (Malachai)": {
+      "page": "The_Worn",
+      "summary": "A hollowed shell of a former mortal who accepted Malachai's curse and succumbed completely. Still speaks, still begs—but the hunger is all that remains.",
+      "locations": ["Zahk'Kozahn", "Zakov under-city", "Ashaan ruins"],
+      "lore": "The Worn were once vampires, werewolves, slashers, or memory-eaters who gave in to their appetites. They are drawn back to the cursed city, where they wander the salt flats and whisper the names of those who still have hope—and who still have time.",
+      "connections": ["Malachai", "The Chained Angel", "The Well of Ichor"],
+      "tl": 2,
+      "class": "II",
+      "sb_spends": [
+        { "cost": 1, "name": "[BARGAIN] Beg for release", "effect": "It begs a PC to end it; hesitation costs a Boon." },
+        { "cost": 1, "name": "[HAUNT] Whisper a name", "effect": "It whispers the name of someone the PC loves who is in danger." },
+        { "cost": 1, "name": "[CURSE] Spread the hunger", "effect": "Its touch reminds a PC of their own appetites; they mark Fatigue." }
+      ]
+    }
+  },
+  {
+    "The Slasher (Unkillable Killer)": {
+      "page": "The_Slasher",
+      "summary": "An immortal killer who cannot die, driven by a hunger for violence that grows with each life taken.",
+      "locations": ["Black Banners camps", "Acasian ruins", "Zakov underbelly"],
+      "lore": "The slasher was once a soldier who begged Malachai for vengeance. She answered—but the price was eternal, and the hunger can never be fed. Their face appears in every mirror, watching.",
+      "connections": ["Malachai", "The Chained Angel", "The Hunger Beneath"],
+      "tl": 5,
+      "class": "V",
+      "sb_spends": [
+        { "cost": 2, "name": "[TIMER] Stalk in the mirror", "effect": "Start a 4-segment 'Stalk' timer. At 4, the Slasher appears in a reflection and strikes." },
+        { "cost": 1, "name": "[HAUNT] Face in the glass", "effect": "A PC sees the Slasher's face in every reflective surface." },
+        { "cost": 2, "name": "[REINFORCEMENT] Trail of bodies", "effect": "It leaves corpses that rise as The Worn to harry the party." }
+      ]
+    }
+  },
+  {
+    "Memory Eater (Psychic Vampire)": {
+      "page": "Memory_Eater",
+      "summary": "A creature that feeds on fresh memories, stealing the past to fuel its own endless hunger.",
+      "locations": ["Thepyrgos university", "Vilikari archives", "Lethai-thora archives"],
+      "lore": "The memory eaters were once scholars, spies, or lovers who wanted to preserve what they could not keep. Now they consume the past of others, leaving only hollow gaps where love and fear once lived.",
+      "connections": ["Malachai", "The Witness", "The Lethai-thora"],
+      "tl": 4,
+      "class": "IV",
+      "sb_spends": [
+        { "cost": 1, "name": "[MEMORY] Steal a recent memory", "effect": "It consumes a recent memory from a PC." },
+        { "cost": 2, "name": "[BARGAIN] Return for a deeper memory", "effect": "It offers to return the stolen memory for an older, dearer one." },
+        { "cost": 2, "name": "[TIMER] Hollow gaps spread", "effect": "Start a 4-segment 'Hollowing' timer. At 4, a PC forgets a bond or talent." }
+      ]
+    }
+  },
+  {
+    "The Changeling (Faceless)": {
+      "page": "The_Changeling",
+      "summary": "A creature that can change appearance at will, but in doing so forgets who it was originally.",
+      "locations": ["Acasia", "Zakov", "Valewood"],
+      "lore": "The changeling was once a person who wanted to escape their past. Malachai offered them a new face—and then another, and another, until the original was lost entirely.",
+      "connections": ["Malachai", "The Valewood", "The Hollow"],
+      "tl": 3,
+      "class": "III",
+      "sb_spends": [
+        { "cost": 1, "name": "[ILLUSION] New face", "effect": "It assumes a new appearance mid-combat, confusing targeting." },
+        { "cost": 2, "name": "[SOCIAL] Wear a PC's face", "effect": "It takes a PC's face, sowing distrust among allies." },
+        { "cost": 2, "name": "[BARGAIN] Offer escape from self", "effect": "It offers a PC a new identity in exchange for their old name." }
+      ]
+    }
+  },
+  {
+    "The Plague Bearer (Contagion)": {
+      "page": "The_Plague_Bearer",
+      "summary": "A healer who took a plague into themselves, now a walking blight. They are immune to disease—but they carry every disease they have touched.",
+      "locations": ["Ecktoria", "Mistlands", "Sekogo"],
+      "lore": "The plague bearer wanted to save their people. Malachai gave them the power to absorb any sickness—but the sickness lives inside them still, and it will not be denied forever.",
+      "connections": ["Malachai", "The Bitter Root", "The Everflame"],
+      "tl": 4,
+      "class": "IV",
+      "sb_spends": [
+        { "cost": 2, "name": "[CURSE] Infection spreads", "effect": "A PC is exposed; start a 4-segment 'Infection' timer." },
+        { "cost": 2, "name": "[TIMER] Outbreak", "effect": "Start a 6-segment 'Outbreak' timer. At 6, the disease becomes contagious in the region." },
+        { "cost": 1, "name": "[BARGAIN] Absorb another's sickness", "effect": "It offers to take a PC's disease, but must give one back." }
+      ]
+    }
+  },
+  {
+    "Lamp-Eater (Moira's Journals)": {
+      "page": "Lamp_Eater",
+      "summary": "A large, nocturnal omnivore that follows bioluminescent fungi and sources of light. Confused, not aggressive—but dangerous when frustrated.",
+      "locations": ["Valewood deeps", "Hollow Wood", "Aelinnel ruins"],
+      "lore": "The lamp-eater feeds on glow-fungus, but it has learned that travelers carry light—and sometimes, that light is edible. It follows lanterns, hoping to feast. When it cannot, it grows angry.",
+      "connections": ["The Wilds", "The Hollow Wood", "The Aelinnel"],
+      "tl": 2,
+      "class": "II",
+      "sb_spends": [
+        { "cost": 1, "name": "[ENVIRONMENT] Eat the light", "effect": "It devours a light source, plunging the area into darkness." },
+        { "cost": 1, "name": "[BARGAIN] Offer glow-fungus", "effect": "Offering glow-fungus distracts it." },
+        { "cost": 1, "name": "[TIMER] Frustration builds", "effect": "Start a 4-segment 'Frustrated' timer. At 4, it rampages." }
+      ]
+    }
+  },
+  {
+    "Hedge-Crawler (Moira's Journals)": {
+      "page": "Hedge_Crawler",
+      "summary": "A many-legged insect that nests in old oaks. It emerges at dusk, forming slow-moving columns that stain anything they touch.",
+      "locations": ["Hollow Wood", "Valewood edge", "Aelaerem downs"],
+      "lore": "The hedge-crawler is not dangerous, but it is persistent. Its oil stains skin for days and attracts scavengers. The Aelaerem say it was once a border-marking spirit that forgot its purpose.",
+      "connections": ["The Aelaerem", "The Valewood", "The Hollow"],
+      "tl": 1,
+      "class": "I",
+      "sb_spends": [
+        { "cost": 1, "name": "[ENVIRONMENT] Oil stain", "effect": "Its oil marks a PC, attracting predators." },
+        { "cost": 1, "name": "[TIMER] Column grows", "effect": "Start a 4-segment 'Swarm' timer. At 4, the column becomes difficult terrain." }
+      ]
+    }
+  },
+  {
+    "Pressure Eel (Moira's Journals)": {
+      "page": "Pressure_Eel",
+      "summary": "A translucent creature that slides through cracks in stone, triggering old mechanisms with its passage.",
+      "locations": ["Aeler under-vaults", "Thepyrgos catacombs", "Dungeon depths"],
+      "lore": "The pressure eel is a remnant of the Astroegro's living infrastructure. It does not attack—it simply moves, and in moving, it wakes what should sleep.",
+      "connections": ["Dungeon Living Infrastructure", "Astroegro Remnant", "The Pressure Below"],
+      "tl": 2,
+      "class": "II",
+      "sb_spends": [
+        { "cost": 1, "name": "[ENVIRONMENT] Trigger a mechanism", "effect": "Its passage activates a trap or opens a sealed door." },
+        { "cost": 2, "name": "[TIMER] Wake the dungeon", "effect": "Start a 4-segment 'Dungeon Wakes' timer. At 4, dormant defenses activate." }
+      ]
+    }
+  },
+  {
+    "Thread-Bird (Fairy Warbler)": {
+      "page": "Thread_Bird",
+      "summary": "A finch-sized bird with red thread-like markings. It follows travelers and mimics human speech patterns.",
+      "locations": ["Hollow Wood", "Valewood glades", "Aelinnel groves"],
+      "lore": "The thread-birds are said to carry messages between the living and the Neighbors. They do not speak with intent—they mimic what they hear, and their warnings are echoes, not advice.",
+      "connections": ["The Neighbors", "The Valewood", "The Aelinnel"],
+      "tl": 1,
+      "class": "I",
+      "sb_spends": [
+        { "cost": 1, "name": "[FEY] Mimic a secret", "effect": "It mimics something private a PC once said, revealing it to others." },
+        { "cost": 1, "name": "[REINFORCEMENT] Neighbors listen", "effect": "Its chirping alerts the Neighbors to the party's presence." }
+      ]
+    }
+  },
+  {
+    "Dream-Eater (Narethi)": {
+      "page": "Dream_Eater",
+      "summary": "A jackal-like spirit with too many eyes, born from the Unburied's hunger. It does not kill—it collects memories.",
+      "locations": ["Deep Desert", "Sunken Courts", "Narethi salt flats"],
+      "lore": "The dream-eater is not a predator in the ordinary sense. It takes what the Unburied has demanded: a name, a face, a moment of warmth. Those who lose to it remember the fact of their loss, but not the feeling.",
+      "connections": ["The Narethi", "The Unburied", "The Hollow"],
+      "tl": 3,
+      "class": "III",
+      "sb_spends": [
+        { "cost": 1, "name": "[DREAM] Take a dream", "effect": "It consumes a dream from a sleeping PC." },
+        { "cost": 1, "name": "[MEMORY] Claim a face", "effect": "It steals the memory of a face; a PC cannot recall someone they love." },
+        { "cost": 2, "name": "[BARGAIN] Trade memory for memory", "effect": "It offers to return a taken memory for one the PC has not yet lost." }
+      ]
+    }
+  },
+  {
+    "Watcher (Narethi)": {
+      "page": "Watcher",
+      "summary": "A priest-archivist who maintains the Bone Archive and tends the Unburied's sleep. Their face is hidden behind a salt-cured mask.",
+      "locations": ["Sunken Courts", "Bone Archive", "Narethi settlements"],
+      "lore": "The Watchers are the memory of the Narethi people. They tattoo the names of the dead onto their own skin, and they speak only when the ancestors demand it.",
+      "connections": ["The Narethi", "The Unburied", "The Bone Archive"],
+      "tl": 2,
+      "class": "II",
+      "sb_spends": [
+        { "cost": 1, "name": "[SOCIAL] Record your words", "effect": "The Watcher writes down a PC's words; they are now part of the Archive." },
+        { "cost": 2, "name": "[BARGAIN] Archive access", "effect": "It offers access to forbidden records in exchange for a name." },
+        { "cost": 2, "name": "[TIMER] The ancestors stir", "effect": "Start a 4-segment 'Ancestral Voice' timer. At 4, the dead demand answers." }
+      ]
+    }
+  },
+  {
+    "Unbound Exile (Narethi)": {
+      "page": "Unbound_Exile",
+      "summary": "A Narethi who chose the Riven Path over Stillness, now wandering the desert and selling psionic services to survive.",
+      "locations": ["Caravan routes", "Black Banners camps", "Sidhi ports"],
+      "lore": "The Unbound are exiles not because they are dangerous, but because they are honest. They admit that the Unburied's dream is not a curse—it is an inheritance, and they will claim it.",
+      "connections": ["The Narethi", "The Riven Path", "The Unburied"],
+      "tl": 3,
+      "class": "III",
+      "sb_spends": [
+        { "cost": 1, "name": "[BARGAIN] Psionic service", "effect": "It offers a psychic service for a favor or secret." },
+        { "cost": 1, "name": "[SOCIAL] Uncomfortable truth", "effect": "It speaks a truth the party does not want to hear." },
+        { "cost": 2, "name": "[TIMER] Riven path opens", "effect": "Start a 4-segment 'Riven Path' timer. At 4, it demonstrates the Unburied's power." }
+      ]
+    }
+  },
+  {
+    "Bone-Scribe (Narethi)": {
+      "page": "Bone_Scribe",
+      "summary": "An archivist who records the names of the dead on bone with needles dipped in their own blood.",
+      "locations": ["Bone Archive", "Sunken Courts", "Cairn Council chambers"],
+      "lore": "A Bone-Scribe does not speak. Their voice is the scratch of needle on bone, and their memory is the Archive itself. They recall every name that has ever been recorded—and they do not forgive.",
+      "connections": ["The Narethi", "The Bone Archive", "The Ancestral Vote"],
+      "tl": 2,
+      "class": "II",
+      "sb_spends": [
+        { "cost": 2, "name": "[SOCIAL] Inscribe a name", "effect": "It begins writing a PC's name in bone; the PC is bound to a promise." },
+        { "cost": 2, "name": "[BARGAIN] Erase a name", "effect": "It offers to erase a name from the Archive for a terrible price." },
+        { "cost": 1, "name": "[HAUNT] Scratch of needle", "effect": "The sound of its needle unsettles all in Near; they lose a Boon." }
+      ]
+    }
+  },
+  {
+    "Ghost Herd (Kuvani/Narethi)": {
+      "page": "Ghost_Herd",
+      "summary": "A herd of spectral horses that rides the salt pan on moonless nights, seeking a battle that will never come.",
+      "locations": ["Kuvani salt pans", "Narethi desert edge", "Ykrul steppe"],
+      "lore": "The ghost herd is said to be the souls of warriors who died without honor. They ride forever—and sometimes, when the Hollow is close, they ride through the waking world.",
+      "connections": ["The Kuvani", "The Narethi", "The Hollow"],
+      "tl": 3,
+      "class": "III",
+      "sb_spends": [
+        { "cost": 2, "name": "[HAUNT] Ride through", "effect": "The herd charges through the party; all must test Spirit or panic." },
+        { "cost": 2, "name": "[TIMER] Endless ride", "effect": "Start a 4-segment 'Ride' timer. At 4, a PC is swept up and carried into the Hollow." },
+        { "cost": 1, "name": "[SOCIAL] Test of honor", "effect": "They challenge a PC to name an honorable deed; failure draws their wrath." }
+      ]
+    }
+  },
+  {
+    "The Unburied (Narethi Myth)": {
+      "page": "The_Unburied",
+      "summary": "The mummified First One sealed beneath the Sunken Courts. It does not speak—it dreams, and its dreams leak into the world.",
+      "locations": ["Sunken Courts", "The Heart of the Deep Desert"],
+      "lore": "The Unburied was once a sorcerer-king who reached into a well of power and pulled something back. It did not die—it transformed into a dream made flesh, and that dream is the Narethi's curse and their inheritance.",
+      "connections": ["The Narethi", "The Hollow", "The Great Silence"],
+      "tl": 8,
+      "class": "VIII",
+      "sb_spends": [
+        { "cost": 3, "name": "[DREAM] Dream leaks", "effect": "Its dream spills into reality; all PCs see visions of their failures." },
+        { "cost": 3, "name": "[TIMER] Awakening", "effect": "Start an 8-segment 'Awakening' timer. At 8, the Unburied fully wakes." },
+        { "cost": 3, "name": "[REINFORCEMENT] Dreams made flesh", "effect": "Its dream births nightmare creatures to defend it." }
+      ]
+    }
+  },
+  {
+    "The Covenant Child": {
+      "page": "The_Covenant_Child",
+      "summary": "A child with silver wire eyes, sent to enforce broken covenants. It does not speak—it waits, and its patience is absolute.",
+      "locations": ["Where oaths were broken", "Hospices", "Gambling dens", "Midnight docks"],
+      "lore": "The Covenant Child serves both Malachai and the Daughters of the Unbroken Cord. It does not care which master it answers to—it only cares that the promise is kept.",
+      "connections": ["Malachai", "The Daughters of the Unbroken Cord", "The Hollow"],
+      "tl": 2,
+      "class": "II",
+      "sb_spends": [
+        { "cost": 2, "name": "[BARGAIN] Name the price", "effect": "It holds out its hand, demanding the price of the broken covenant." },
+        { "cost": 2, "name": "[TIMER] Debt comes due", "effect": "Start a 4-segment 'Debt' timer. At 4, the breaker suffers a geas." },
+        { "cost": 1, "name": "[SOCIAL] Others must choose", "effect": "It looks at the party; they must decide whether to pay the debt or abandon the breaker." }
+      ]
+    }
+  },
+  {
+    "Herald Gargoyle (Dragon's Lair)": {
+      "page": "Herald_Gargoyle",
+      "summary": "A living statue that enforces the dragon's etiquette, demanding a tithe before allowing passage.",
+      "locations": ["Dragon lairs", "Aeler vault-mouths", "Thepyrgos towers"],
+      "lore": "The herald gargoyle was carved by the Aeler, but its soul was shaped by the dragon it serves. It does not attack—it judges. And its judgment is always final.",
+      "connections": ["The Aeler", "Dungeon Living Infrastructure", "The Sealed Gate"],
+      "tl": 2,
+      "class": "II",
+      "sb_spends": [
+        { "cost": 1, "name": "[SOCIAL] Demand the tithe", "effect": "It refuses passage until a suitable tribute is offered." },
+        { "cost": 2, "name": "[ENVIRONMENT] Seal the way", "effect": "It seals the passage until etiquette is satisfied." },
+        { "cost": 1, "name": "[BARGAIN] Judge the offering", "effect": "It judges the quality of a tribute; a poor offering angers the dragon." }
+      ]
+    }
+  },
+  {
+    "Fossil Juror (Dragon's Lair)": {
+      "page": "Fossil_Juror",
+      "summary": "A sentient skeleton bound to judge intruders. It does not attack—it asks a riddle. Answer wrong, and you owe a geas.",
+      "locations": ["Dragon lairs", "Fossil courts", "Aeler under-vaults"],
+      "lore": "The fossil juror was once a magistrate in a kingdom that fell to dust. Its judgment still holds, and its geasa are still binding.",
+      "connections": ["The Witness", "The Unquiet Dead", "The Aeler"],
+      "tl": 2,
+      "class": "II",
+      "sb_spends": [
+        { "cost": 2, "name": "[SOCIAL] Pose judgment", "effect": "It asks a riddle; wrong answer binds the PC to a geas." },
+        { "cost": 2, "name": "[TIMER] Judgment timer", "effect": "Start a 4-segment 'Judgment' timer. At 4, it attacks the guilty." },
+        { "cost": 1, "name": "[BARGAIN] Offer a verdict", "effect": "It allows a PC to condemn another to avoid the geas." }
+      ]
+    }
+  },
+  {
+    "Ember Imp (Dragon's Lair)": {
+      "page": "Ember_Imp",
+      "summary": "A small, sharp-toothed creature that trades heat for secrets. It will light your lamp for a memory—and steal something when you aren't looking.",
+      "locations": ["Volcanic lairs", "Deep forges", "Nihori ash wastes"],
+      "lore": "The ember imp is a fragment of Azghal's Doomfire, given a shape and a hunger. It does not serve the dragon—it serves the heat, and it will barter with anyone who carries a spark.",
+      "connections": ["Azghal the Doomfire", "The Everflame", "The Abyss"],
+      "tl": 1,
+      "class": "I",
+      "sb_spends": [
+        { "cost": 1, "name": "[FIRE] Steal a spark", "effect": "It steals heat from a fire or lantern, extinguishing it." },
+        { "cost": 1, "name": "[BARGAIN] Trade heat for secret", "effect": "It offers to light a way in exchange for a secret." },
+        { "cost": 1, "name": "[HAUNT] Pick a pocket", "effect": "It filches a small, flammable item." }
+      ]
+    }
+  },
+  {
+    "Mirewing Basilisk-Drake (Dragon's Lair)": {
+      "page": "Mirewing_Basilisk_Drake",
+      "summary": "A venomous drake with a gaze that roots its prey in place. Haunts swampy zones and deep fens.",
+      "locations": ["Acasian bogs", "Mistlands fens", "Sekogo groves"],
+      "lore": "The mirewing is a cousin to the true basilisk, but its gaze does not petrify—it binds. Those who meet its eyes feel the weight of the bog pulling them down.",
+      "connections": ["Dungeon Living Infrastructure", "The Wilds", "The Bitter Root"],
+      "tl": 3,
+      "class": "III",
+      "sb_spends": [
+        { "cost": 1, "name": "[STONE] Binding gaze", "effect": "Its gaze roots a PC in place." },
+        { "cost": 2, "name": "[ENVIRONMENT] Bog claims the still", "effect": "A rooted PC begins to sink; start a 4-segment 'Sinking' timer." },
+        { "cost": 1, "name": "[TIMER] Gaze holds", "effect": "Tick 'Binding' +1. At 4, the PC is fully immobilized." }
+      ]
+    }
+  },
+  {
+    "Barrow Serpent (Dragon's Lair)": {
+      "page": "Barrow_Serpent",
+      "summary": "A serpent that dwells in burial mounds, feeding on the cold memory of the dead.",
+      "locations": ["Ubral barrows", "Aelaerem hollows", "Linn cairns"],
+      "lore": "The barrow serpent is a guardian of the dead, but it does not protect the living. It waits for warmth to enter the cold, and it coils around the careless.",
+      "connections": ["The Unquiet Dead", "The Wilds", "The Aelaerem"],
+      "tl": 3,
+      "class": "III",
+      "sb_spends": [
+        { "cost": 1, "name": "[HAUNT] Taste the warmth", "effect": "It senses living warmth and targets the healthiest PC." },
+        { "cost": 2, "name": "[TIMER] Barrow seals", "effect": "Start a 4-segment 'Barrow Seals' timer. At 4, the exit closes." },
+        { "cost": 2, "name": "[REINFORCEMENT] Dead stir", "effect": "The dead it guards rise to aid it." }
+      ]
+    }
+  },
+  {
+    "Sky Serpent (Dragon's Lair)": {
+      "page": "Sky_Serpent",
+      "summary": "A long, ribbon-like drake that nests in the highest peaks and hunts updrafts.",
+      "locations": ["Sky Needles", "Himadri passes", "Aelerian summits"],
+      "lore": "The sky serpent is the wind given form. It does not breathe fire—it breathes stillness, and those who catch its gaze find themselves falling.",
+      "connections": ["Tyrgoth the Thunder-Eater", "The Sky Father", "The Wilds"],
+      "tl": 3,
+      "class": "III",
+      "sb_spends": [
+        { "cost": 1, "name": "[WIND] Breath of stillness", "effect": "It breathes stillness; a PC loses their footing and falls." },
+        { "cost": 2, "name": "[ENVIRONMENT] Ride the updraft", "effect": "It rides an updraft out of reach, forcing ranged combat." },
+        { "cost": 2, "name": "[TIMER] The sky turns", "effect": "Start a 4-segment 'Sky Falls' timer. At 4, a PC is dropped from a great height." }
+      ]
+    }
+  },
+  {
+    "River Wight (Dragon's Lair)": {
+      "page": "River_Wight",
+      "summary": "A drowned spirit bound to a river, guarding a dragon's hoard or a sunken treasure.",
+      "locations": ["River Gorge", "Crimson Valley", "Ayokha rivers"],
+      "lore": "The river wight was once a guardian who drowned in the service of its wyrm. It cannot leave the water, but it can drown those who enter without permission.",
+      "connections": ["Dungeon Living Infrastructure", "The Tide Father", "The Lethai-ar"],
+      "tl": 3,
+      "class": "III",
+      "sb_spends": [
+        { "cost": 2, "name": "[TIDE] Drown the intruder", "effect": "It drags a PC underwater; start a 4-segment 'Drowning' timer." },
+        { "cost": 2, "name": "[TIMER] River rises", "effect": "Start a 4-segment 'Flood' timer. At 4, the river claims the shore." },
+        { "cost": 1, "name": "[BARGAIN] Ask permission", "effect": "It demands a tribute to allow passage across the water." }
+      ]
+    }
+  },
+  {
+    "Hell Hound (Ember-Wolf)": {
+      "page": "Hell_Hound",
+      "summary": "A wolf of living fire, bound to the will of the Abyss. Hunts the lost and the damned.",
+      "locations": ["Ashaan ruins", "Zakov deeps", "Dungeon depths"],
+      "lore": "The hell hounds are the emissaries of the Abyss. They do not eat—they burn. They are not loyal—they are commanded.",
+      "connections": ["The Abyss", "The Unsealed"],
+      "tl": 3,
+      "class": "III",
+      "sb_spends": [
+        { "cost": 1, "name": "[FIRE] Mark with flame", "effect": "Its bite sets a PC's gear smoldering." },
+        { "cost": 2, "name": "[REINFORCEMENT] Pack of embers", "effect": "More Hell Hounds arrive from a fissure of flame." },
+        { "cost": 2, "name": "[TIMER] Hunt escalates", "effect": "Start a 4-segment 'Hunt' timer. At 4, they ignore all others and focus on a marked PC." }
+      ]
+    }
+  },
+  {
+    "Stone-Eater": {
+      "page": "Stone_Eater",
+      "summary": "A massive burrowing worm that tunnels through stone and earth. Its passage leaves no trace but the silence.",
+      "locations": ["Aeler deeps", "Himadri passes", "Dungeon depths"],
+      "lore": "The stone-eaters are the children of Nidhoggr, the corpse-tearer. They eat what the mountain leaves behind.",
+      "connections": ["Nidhoggr", "The Pressure Below"],
+      "tl": 4,
+      "class": "IV",
+      "sb_spends": [
+        { "cost": 2, "name": "[ENVIRONMENT] Tunnel collapse", "effect": "Its passage collapses a tunnel behind or ahead of the party." },
+        { "cost": 2, "name": "[TIMER] Swallow the path", "effect": "Start a 4-segment 'Devoured Path' timer. At 4, the only route is gone." },
+        { "cost": 1, "name": "[PRESSURE] Silence before the worm", "effect": "All sound dies; the next attack is Dominant for the Stone-Eater." }
+      ]
+    }
+  },
+  {
+    "Rakshasa (Masked Demon)": {
+      "page": "Rakshasa",
+      "summary": "A demon of deception and pleasure, wearing the guise of nobility. Dwells in the courts of the powerful.",
+      "locations": ["Ecktoria", "Silkstrand", "Sihai courts"],
+      "lore": "The rakshasa are the demons of desire, feeding on the greed of the powerful. They are not summoned—they arrive, and they always have an invitation.",
+      "connections": ["The Abyss", "Livaea"],
+      "tl": 4,
+      "class": "IV",
+      "sb_spends": [
+        { "cost": 1, "name": "[SOCIAL] Twist the invitation", "effect": "It reveals the party was invited into a trap." },
+        { "cost": 2, "name": "[BARGAIN] Offer corrupt power", "effect": "It offers a noble PC influence in exchange for a soul-debt." },
+        { "cost": 2, "name": "[ILLUSION] Mask drops", "effect": "It briefly reveals its true form, terrifying all in Near." }
+      ]
+    }
+  },
+  {
+    "Serpent-Folk": {
+      "page": "Serpent_Folk",
+      "summary": "A race of serpent-like beings, descended from the union of human and serpent spirit. Cold, calculating, and patient.",
+      "locations": ["Sekogo groves", "Ashaani deserts", "Fhara oases"],
+      "lore": "The serpent-folk are the children of the Serpent Queen. They remember the old empire and wait for its return—or they build their own, one convert at a time.",
+      "connections": ["The Veiled Throne", "Isoka"],
+      "tl": 3,
+      "class": "III",
+      "sb_spends": [
+        { "cost": 1, "name": "[SOCIAL] Offer conversion", "effect": "They offer a PC power if they swear to the Serpent Queen." },
+        { "cost": 2, "name": "[TIMER] Venom takes hold", "effect": "Start a 4-segment 'Venom' timer. At 4, a bitten PC is dominated." },
+        { "cost": 2, "name": "[REINFORCEMENT] Call the brood", "effect": "They summon more serpent-folk from hidden burrows." }
+      ]
     }
   }
 ]

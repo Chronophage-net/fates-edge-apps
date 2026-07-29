@@ -320,99 +320,120 @@ export async function loadPatronData(force = false) {
     await loadRemotePatrons();
 }
  
+// FIX: concurrent callers used to just check `state.isLoading` and bail
+// out immediately if a load was already in flight — which meant the
+// SECOND caller in the same tick (e.g. Cantor rendering right after the
+// Patrons tab, or two panels both calling loadPatronData() on app start)
+// would resolve its own await instantly, read getState() before the FIRST
+// caller's fetch had actually finished, and render with empty/stale
+// patron data. This is why Cantor (and potentially any other panel) could
+// need a manual "Refresh" click on first load — by the time you clicked
+// Refresh, the original fetch had long since finished, so the retry just
+// worked. Concurrent callers now share and await the same promise instead
+// of silently no-op'ing.
+let loadingPromise = null;
+
 async function loadRemotePatrons() {
-    if (state.isLoading) return;
+    if (loadingPromise) return loadingPromise;
+
     state.isLoading = true;
+    loadingPromise = (async () => {
+        try {
+            const cosmicSlugs = await discoverPatrons('cosmic', COSMIC_DATA_PATH);
+            const terrestrialSlugs = await discoverPatrons('terrestrial', TERRESTRIAL_DATA_PATH, TERRESTRIAL_FALLBACK_DATA_PATH);
+            const religionSlugs = await discoverPatrons('religion', RELIGION_DATA_PATH);
  
+            // Fetch cosmic
+            let cosmicPatrons = [];
+            for (const slug of cosmicSlugs) {
+                try {
+                    const res = await fetch(`${COSMIC_DATA_PATH}${slug}.json`);
+                    if (res.ok) {
+                        const data = await res.json();
+                        if (!data.id) data.id = slug;
+                        // Normalize ID: replace underscores with hyphens to match expected format (e.g., defaults)
+                        const normalizedId = data.id.replace(/_/g, '-');
+                        data.id = normalizedId;
+                        cosmicPatrons.push(normalizePatron(data));
+                    }
+                } catch (e) { /* ignore */ }
+            }
+            if (cosmicPatrons.length === 0) {
+                cosmicPatrons = DEFAULT_COSMIC_PATRONS.map(normalizePatron);
+                state.usingFallback = true;
+                showToast('⚠️ No cosmic patron files found. Using defaults.', 'warning');
+            }
+            state.cosmicPatrons = cosmicPatrons.sort(sortByName);
+ 
+            // Fetch terrestrial
+            let terrestrialPatrons = [];
+            for (const slug of terrestrialSlugs) {
+                try {
+                    let res = await fetch(`${TERRESTRIAL_DATA_PATH}${slug}.json`);
+                    if (!res.ok) {
+                        res = await fetch(`${TERRESTRIAL_FALLBACK_DATA_PATH}${slug}.json`);
+                    }
+                    if (res.ok) {
+                        const data = await res.json();
+                        if (!data.id) data.id = slug;
+                        // Normalize ID: replace underscores with hyphens to match expected format (e.g., defaults)
+                        const normalizedId = data.id.replace(/_/g, '-');
+                        data.id = normalizedId;
+                        terrestrialPatrons.push(normalizePatron(data));
+                    }
+                } catch (e) { /* ignore */ }
+            }
+            if (terrestrialPatrons.length === 0) {
+                terrestrialPatrons = DEFAULT_TERRESTRIAL_PATRONS.map(normalizePatron);
+                state.usingFallback = true;
+                showToast('⚠️ No terrestrial patron files found. Using defaults.', 'warning');
+            }
+            state.terrestrialPatrons = terrestrialPatrons.sort(sortByName);
+ 
+            // Fetch religions
+            let religions = [];
+            for (const slug of religionSlugs) {
+                try {
+                    const res = await fetch(`${RELIGION_DATA_PATH}${slug}.json`);
+                    if (res.ok) {
+                        const data = await res.json();
+                        if (!data.id) data.id = slug;
+                        // Normalize ID: replace underscores with hyphens to match expected format (e.g., defaults)
+                        const normalizedId = data.id.replace(/_/g, '-');
+                        data.id = normalizedId;
+                        religions.push(data);
+                    }
+                } catch (e) { /* ignore */ }
+            }
+            if (religions.length === 0) {
+                religions = DEFAULT_RELIGIONS;
+                state.usingFallback = true;
+                showToast('⚠️ No religion files found. Using defaults.', 'warning');
+            }
+            state.religions = religions.sort(sortByName);
+ 
+            if (state.trusts.length === 0) {
+                state.trusts = DEFAULT_TRUSTS.sort(sortByName);
+            } else {
+                state.trusts.sort(sortByName);
+            }
+ 
+            state.dataLoaded = true;
+            savePatronData();
+ 
+        } catch (error) {
+            console.warn('Failed to load remote patrons:', error);
+            loadDefaultPatrons();
+            showToast('⚠️ Error loading patrons. Using defaults.', 'error');
+        } finally {
+            state.isLoading = false;
+        }
+    })();
+
     try {
-        const cosmicSlugs = await discoverPatrons('cosmic', COSMIC_DATA_PATH);
-        const terrestrialSlugs = await discoverPatrons('terrestrial', TERRESTRIAL_DATA_PATH, TERRESTRIAL_FALLBACK_DATA_PATH);
-        const religionSlugs = await discoverPatrons('religion', RELIGION_DATA_PATH);
- 
-        // Fetch cosmic
-        let cosmicPatrons = [];
-        for (const slug of cosmicSlugs) {
-            try {
-                const res = await fetch(`${COSMIC_DATA_PATH}${slug}.json`);
-                if (res.ok) {
-                    const data = await res.json();
-                    if (!data.id) data.id = slug;
-                    // Normalize ID: replace underscores with hyphens to match expected format (e.g., defaults)
-                    const normalizedId = data.id.replace(/_/g, '-');
-                    data.id = normalizedId;
-                    cosmicPatrons.push(normalizePatron(data));
-                }
-            } catch (e) { /* ignore */ }
-        }
-        if (cosmicPatrons.length === 0) {
-            cosmicPatrons = DEFAULT_COSMIC_PATRONS.map(normalizePatron);
-            state.usingFallback = true;
-            showToast('⚠️ No cosmic patron files found. Using defaults.', 'warning');
-        }
-        state.cosmicPatrons = cosmicPatrons.sort(sortByName);
- 
-        // Fetch terrestrial
-        let terrestrialPatrons = [];
-        for (const slug of terrestrialSlugs) {
-            try {
-                let res = await fetch(`${TERRESTRIAL_DATA_PATH}${slug}.json`);
-                if (!res.ok) {
-                    res = await fetch(`${TERRESTRIAL_FALLBACK_DATA_PATH}${slug}.json`);
-                }
-                if (res.ok) {
-                    const data = await res.json();
-                    if (!data.id) data.id = slug;
-                    // Normalize ID: replace underscores with hyphens to match expected format (e.g., defaults)
-                    const normalizedId = data.id.replace(/_/g, '-');
-                    data.id = normalizedId;
-                    terrestrialPatrons.push(normalizePatron(data));
-                }
-            } catch (e) { /* ignore */ }
-        }
-        if (terrestrialPatrons.length === 0) {
-            terrestrialPatrons = DEFAULT_TERRESTRIAL_PATRONS.map(normalizePatron);
-            state.usingFallback = true;
-            showToast('⚠️ No terrestrial patron files found. Using defaults.', 'warning');
-        }
-        state.terrestrialPatrons = terrestrialPatrons.sort(sortByName);
- 
-        // Fetch religions
-        let religions = [];
-        for (const slug of religionSlugs) {
-            try {
-                const res = await fetch(`${RELIGION_DATA_PATH}${slug}.json`);
-                if (res.ok) {
-                    const data = await res.json();
-                    if (!data.id) data.id = slug;
-                    // Normalize ID: replace underscores with hyphens to match expected format (e.g., defaults)
-                    const normalizedId = data.id.replace(/_/g, '-');
-                    data.id = normalizedId;
-                    religions.push(data);
-                }
-            } catch (e) { /* ignore */ }
-        }
-        if (religions.length === 0) {
-            religions = DEFAULT_RELIGIONS;
-            state.usingFallback = true;
-            showToast('⚠️ No religion files found. Using defaults.', 'warning');
-        }
-        state.religions = religions.sort(sortByName);
- 
-        if (state.trusts.length === 0) {
-            state.trusts = DEFAULT_TRUSTS.sort(sortByName);
-        } else {
-            state.trusts.sort(sortByName);
-        }
- 
-        state.dataLoaded = true;
-        savePatronData();
- 
-    } catch (error) {
-        console.warn('Failed to load remote patrons:', error);
-        loadDefaultPatrons();
-        showToast('⚠️ Error loading patrons. Using defaults.', 'error');
+        await loadingPromise;
     } finally {
-        state.isLoading = false;
+        loadingPromise = null;
     }
 }
  

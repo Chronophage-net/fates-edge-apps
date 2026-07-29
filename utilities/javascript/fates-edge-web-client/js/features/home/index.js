@@ -10,6 +10,7 @@ import { showToast } from '../../components/Toast.js';
 const SELECTORS = {
   CREATE_CHAR: '[data-action="create-char"]',
   RULES_LINK: '[data-action="rules-link"]',
+  TOOLKIT_LINK: '[data-action="toolkit-link"]',
 };
 
 // ─── State ─────────────────────────────────────────────────────────────
@@ -25,18 +26,19 @@ function buildHTML() {
     <!-- SLIDE 1: HERO -->
     <section class="home-slide home-hero" id="slide-hero" role="region" aria-label="Hero">
       <div class="slide-content">
-        <div class="hero-badge">⚔️ Narrative-First TTRPG</div>
+        <div class="hero-badge">⚔️ Narrative-First TTRPG + Digital Toolkit</div>
         <h1 class="hero-title"><span class="gold">Fate's</span> Edge</h1>
         <p class="hero-subtitle">
-          Fortune favors the bold, but the wise know when to fold.
-          <span class="hero-attribution">— Captain Livia Vex</span>
+          Roll dice. Build characters. Shape stories.
+          <span class="hero-attribution">— all in one open‑source companion</span>
         </p>
         <div class="hero-quote">
           <p>“Every choice carries weight. Every debt echoes forward. Every road remembers.”</p>
         </div>
         <div class="hero-actions">
-          <a href="#slide-rules" class="btn btn-gold" data-action="rules-link">⚡ View the Rules</a>
+          <a href="#slide-rules" class="btn btn-gold" data-action="rules-link">📖 View the Rules</a>
           <a href="#" class="btn btn-primary" data-action="create-char">🎭 Create a Character</a>
+          <a href="#slide-toolkit" class="btn btn-secondary" data-action="toolkit-link">🛠️ Explore the Toolkit</a>
         </div>
         <div class="hero-footer">
           <p>“The road remembers. Every broken wheel leaves a mark, every lit lamp bears witness. The only question is: what are you willing to owe?”</p>
@@ -96,18 +98,39 @@ function buildHTML() {
       </div>
     </section>
 
-    <!-- SLIDE 4: WHY FATE'S EDGE -->
-    <section class="home-slide home-why" id="slide-why" role="region" aria-label="Why Fate's Edge?">
+    <!-- SLIDE 4: DIGITAL TOOLKIT (NEW) -->
+    <section class="home-slide home-toolkit" id="slide-toolkit" role="region" aria-label="Digital Toolkit">
       <div class="slide-content">
         <div class="section-header">
           <span class="section-number">03</span>
-          <h2>Why Fate's Edge?</h2>
-          <p>Three principles that define the game.</p>
+          <h2>🛠️ Digital Toolkit</h2>
+          <p>Everything you need to run or play <em>Fate’s Edge</em> — right in your browser.</p>
+        </div>
+        <div class="toolkit-grid">
+          ${buildToolkitCard('🎲', 'Dice Roller', 'Roll d10s with position and difficulty modifiers. Auto‑calculates successes and Story Beats.')}
+          ${buildToolkitCard('👤', 'Character Sheets', 'Track attributes, skills, talents, bonds, and complications. Export to PDF for your table.')}
+          ${buildToolkitCard('⚔️', 'Encounter Tracker', 'Build scenes with NPCs, track initiative, and apply status effects on the fly.')}
+          ${buildToolkitCard('🏛️', 'Faction Manager', 'Define factions, track reputations, and see how the world reacts to your party’s choices.')}
+        </div>
+        <div class="toolkit-cta">
+          <p>All data stays in your browser — no sign‑up required. <strong>Open source</strong> and ready to use.</p>
+          <a href="#" class="btn btn-primary" data-action="create-char">🎭 Jump to the Character Editor</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 5: WHY FATE'S EDGE? (re‑focused) -->
+    <section class="home-slide home-why" id="slide-why" role="region" aria-label="Why Fate's Edge?">
+      <div class="slide-content">
+        <div class="section-header">
+          <span class="section-number">04</span>
+          <h2>Why This Game?</h2>
+          <p>Three core pillars that make <em>Fate’s Edge</em> stand out.</p>
         </div>
         <div class="why-grid">
-          ${buildWhyCard('📜', 'Narrative First', 'Mechanics serve the story, not the other way around. Every roll asks "what happens next?"')}
-          ${buildWhyCard('⚔️', 'Meaningful Risk', 'Safety is boring. Risk creates drama. Story Beats fuel an unpredictable, responsive narrative.')}
-          ${buildWhyCard('⚡', 'Scalable Complexity', 'Start simple, discover naturally. Same core rules handle intimate scenes and epic narratives.')}
+          ${buildWhyCard('📜', 'Narrative First', 'Every roll pushes the story forward. Successes and failures alike create new drama—never a dead end.')}
+          ${buildWhyCard('⚔️', 'Meaningful Risk', 'Position and Story Beats make each choice weighty. You’re not just rolling dice—you’re making a pact with fate.')}
+          ${buildWhyCard('⚡', 'Scalable Complexity', 'Start with just Attributes and Skills. Add Talents and Complications as you grow. The same core handles a tavern brawl or a kingdom‑saving heist.')}
         </div>
         <div class="why-footer">
           <p>“The road remembers. Every broken wheel leaves a mark, every lit lamp bears witness.”</p>
@@ -116,13 +139,13 @@ function buildHTML() {
       </div>
     </section>
 
-    <!-- SLIDE 5: ABOUT THE CREATOR (easy to remove) -->
+    <!-- SLIDE 6: ABOUT THE CREATOR (trimmed, more inviting) -->
     <section class="home-slide home-about" id="slide-about" role="region" aria-label="About the Creator">
       <div class="slide-content">
         <div class="section-header">
-          <span class="section-number">04</span>
+          <span class="section-number">05</span>
           <h2>About the Creator</h2>
-          <p>Meet the person behind the dice.</p>
+          <p>Built by a lifelong gamer, for everyone.</p>
         </div>
         <div class="about-grid">
           <div class="about-card">
@@ -130,24 +153,22 @@ function buildHTML() {
             <h3>Nicholas A. Gasper <span class="handle">(Chronophage)</span></h3>
             <p class="about-role">Sysadmin · DevOps · FreeBSD / Linux — 20+ years</p>
             <p class="about-bio">
-              I’ve been rolling dice since I was twelve — that’s over three decades of tabletop stories.
-              I live in the Twin Cities, Minnesota, and I’m friendly, if a bit shy.
-              This Virtual Tabletop is the first large piece of software I’ve built:
-              I designed <em>Fate’s Edge</em> and wanted an easy way to share it, so I created an open‑source companion that puts the narrative first.
+              Rolling dice since age twelve — three decades of tabletop stories. I live in the Twin Cities, Minnesota.
+              This is my first large software project: an open‑source companion designed to put the narrative first.
             </p>
-	    <p>
-	    You can contact me at: nick.gasper@gmail.com
-	    Buy me a coffee: chronphage@venmo
-	    I'm generally @chronophage everywhere, introduce yourself when you aore reaching out via social media.
             <blockquote class="about-philosophy">
-              <p>“Keep It Stupid — minimal but not fragile. Work from user needs, set a feature limit, build in layers. I’m not a developer by trade, but that pattern has served me for decades.”</p>
+              <p>“Keep It Stupid — minimal but not fragile. Build from user needs, set a feature limit, layer by layer.”</p>
             </blockquote>
-            <p class="about-tagline">☕ Fueled by coffee · 🧠 Neurodivergent & proud · 🌱 Community grows from within and without</p>
+            <p class="about-contact">
+              📧 <a href="mailto:nick.gasper@gmail.com">nick.gasper@gmail.com</a> · 
+              ☕ <a href="https://venmo.com/chronophage" target="_blank" rel="noopener noreferrer">Venmo: chronophage</a> · 
+              🐦 <a href="https://twitter.com/chronophage" target="_blank" rel="noopener noreferrer">@chronophage</a> (everywhere)
+            </p>
+            <p class="about-tagline">☕ Fueled by coffee · 🧠 Neurodivergent & proud · 🌱 Community grows from within</p>
           </div>
         </div>
       </div>
     </section>
-    <!-- END ABOUT SLIDE -->
   `;
 }
 
@@ -179,6 +200,17 @@ function buildWhyCard(icon, title, desc) {
   return `
     <div class="why-card">
       <span class="why-icon">${icon}</span>
+      <h3>${title}</h3>
+      <p>${desc}</p>
+    </div>
+  `;
+}
+
+/** Helper: toolkit card */
+function buildToolkitCard(icon, title, desc) {
+  return `
+    <div class="toolkit-card">
+      <span class="toolkit-icon">${icon}</span>
       <h3>${title}</h3>
       <p>${desc}</p>
     </div>
@@ -261,6 +293,7 @@ function injectStyles() {
     .home-slide:nth-child(3) { animation-delay: 0.4s; }
     .home-slide:nth-child(4) { animation-delay: 0.6s; }
     .home-slide:nth-child(5) { animation-delay: 0.8s; }
+    .home-slide:nth-child(6) { animation-delay: 1.0s; }
 
     @keyframes slideFadeIn {
       to { opacity: 1; transform: translateY(0); }
@@ -294,6 +327,51 @@ function injectStyles() {
       50% { transform: translateX(-50%) translateY(-8px); }
     }
     .scroll-arrow { font-size: 1.4rem; line-height: 1; }
+
+    /* ===== BUTTONS ===== */
+    .btn {
+      display: inline-block;
+      padding: 0.6rem 1.4rem;
+      border-radius: var(--radius);
+      font-weight: 600;
+      text-decoration: none;
+      transition: all 0.2s ease;
+      border: 1px solid transparent;
+      cursor: pointer;
+      font-size: 0.9rem;
+    }
+    .btn-primary {
+      background: var(--gold);
+      color: #0b0b0b;
+    }
+    .btn-primary:hover {
+      background: var(--gold-light);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 20px rgba(201,168,76,0.3);
+    }
+    .btn-gold {
+      background: transparent;
+      border-color: var(--gold);
+      color: var(--gold);
+    }
+    .btn-gold:hover {
+      background: rgba(201,168,76,0.1);
+      transform: translateY(-2px);
+    }
+    .btn-secondary {
+      background: var(--bg2);
+      border-color: var(--border);
+      color: var(--text);
+    }
+    .btn-secondary:hover {
+      background: var(--bg3);
+      border-color: var(--gold);
+      transform: translateY(-2px);
+    }
+    .btn-large {
+      padding: 0.8rem 2.5rem;
+      font-size: 1.05rem;
+    }
 
     /* ===== HERO SLIDE ===== */
     .home-hero {
@@ -516,7 +594,40 @@ function injectStyles() {
     .creation-example { font-size: 0.75rem; color: var(--text3); display: block; }
 
     .creation-actions { text-align: center; margin-top: 1.5rem; }
-    .btn-large { padding: 0.8rem 2.5rem; font-size: 1.05rem; }
+
+    /* ===== TOOLKIT SLIDE (NEW) ===== */
+    .toolkit-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1.2rem;
+      margin: 1.5rem 0;
+    }
+    .toolkit-card {
+      text-align: center;
+      padding: 1.5rem;
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      transition: all 0.3s ease;
+    }
+    .toolkit-card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(201,168,76,0.2);
+      box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+    }
+    .toolkit-icon { font-size: 2.5rem; display: block; margin-bottom: 0.6rem; }
+    .toolkit-card h3 { color: var(--gold); font-size: 1.1rem; margin-bottom: 0.4rem; }
+    .toolkit-card p { color: var(--text2); font-size: 0.9rem; line-height: 1.5; }
+
+    .toolkit-cta {
+      text-align: center;
+      margin-top: 1.5rem;
+      padding: 1.5rem;
+      background: rgba(201,168,76,0.04);
+      border-radius: var(--radius);
+      border: 1px solid rgba(201,168,76,0.08);
+    }
+    .toolkit-cta p { margin-bottom: 1rem; color: var(--text2); }
 
     /* ===== WHY SLIDE ===== */
     .why-grid {
@@ -618,6 +729,18 @@ function injectStyles() {
       font-size: 0.9rem;
       text-align: left;
     }
+    .about-contact {
+      margin: 1rem 0 0.5rem;
+      font-size: 0.9rem;
+      color: var(--text2);
+    }
+    .about-contact a {
+      color: var(--gold);
+      text-decoration: none;
+    }
+    .about-contact a:hover {
+      text-decoration: underline;
+    }
     .about-tagline {
       font-size: 0.85rem;
       color: var(--text3);
@@ -632,6 +755,7 @@ function injectStyles() {
       .hero-quote { padding: 1rem; margin: 1rem 0; }
       .mechanics-grid { grid-template-columns: 1fr 1fr; }
       .creation-grid { grid-template-columns: 1fr 1fr; }
+      .toolkit-grid { grid-template-columns: 1fr 1fr; }
       .why-grid { grid-template-columns: 1fr; }
       .table-wrap { font-size: 0.75rem; }
       .table-wrap th, .table-wrap td { padding: 0.4rem 0.6rem; }
@@ -648,6 +772,7 @@ function injectStyles() {
     @media (max-width: 480px) {
       .mechanics-grid { grid-template-columns: 1fr; }
       .creation-grid { grid-template-columns: 1fr; }
+      .toolkit-grid { grid-template-columns: 1fr; }
       .hero-title { font-size: 2.4rem; }
       .hero-actions { flex-direction: column; align-items: center; }
       .hero-actions .btn { width: 100%; max-width: 280px; }
@@ -672,9 +797,9 @@ function navigateToCharacters() {
     .catch(() => showToast('Character editor not available', 'error'));
 }
 
-/** Scroll to the rules section */
-function scrollToRules() {
-  const target = document.getElementById('slide-rules');
+/** Scroll to any slide by its ID */
+function scrollToSlide(id) {
+  const target = document.getElementById(id);
   if (target) {
     target.scrollIntoView({ behavior: 'smooth' });
   }
@@ -690,8 +815,11 @@ function handleContainerClick(e) {
     e.preventDefault();
     navigateToCharacters();
   } else if (action === 'rules-link') {
-    e.preventDefault();        // 🛑 Prevent router interception
-    scrollToRules();           // 👈 Smooth scroll to #slide-rules
+    e.preventDefault();
+    scrollToSlide('slide-rules');
+  } else if (action === 'toolkit-link') {
+    e.preventDefault();
+    scrollToSlide('slide-toolkit');
   }
 }
 

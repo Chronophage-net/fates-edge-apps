@@ -9,6 +9,24 @@
  * - Thiasos/Codex fields for Runekeepers with auto-patron derivation
  * - REVISED: Added Bound Patron, bloomCount, resonantRites for Cantors.
  * - FIX: Auto‑add magic‑access talents to learnedTalents based on magicPath.
+ *
+ * ────────────────────────────────────────────────────────────────────────
+ * BUGFIX PASS (this revision):
+ *
+ * 1. getAvailableTalentsForTier() filtered wiki entries with
+ *    `e.category === 'talents' || e.category === 'talent'`. Real wiki
+ *    entries (see cantor.js/psion.js's own fallback loaders) identify
+ *    themselves as talents via a `tags` array containing 'talent', not via
+ *    a `category` value of 'talents' — that field is used for the magic
+ *    path name instead (e.g. category: 'magic'). This filter never matched
+ *    a single wiki entry, so the Wizard's talent catalog only ever showed
+ *    manually-added local talents. Fixed to check `tags`.
+ *
+ * 2. getPatronOptions() cached its computed dropdown list in a module-level
+ *    variable that was never invalidated after the first build — same
+ *    class of bug as the earlier Cantor stale-cache issue. openWizard() now
+ *    resets it right after the shared patron loader runs.
+ * ────────────────────────────────────────────────────────────────────────
  */
 
 import { generateId, escHtml, safeParseInt, clamp } from '../../core/utils.js';
@@ -184,6 +202,10 @@ function derivePatronFromRunekeeperItems({ thiasos, codex }) {
 }
 
 // ─── Dynamic patron loader ────────────────────────────────────────
+//
+// FIX: patronOptionsCache used to be built once and never invalidated —
+// see header note #2. openWizard() now resets it right after the shared
+// patron loader runs.
 
 let patronOptionsCache = null;
 
@@ -459,6 +481,10 @@ export async function openWizard() {
         // Ensure patron data is loaded
         try {
             await loadPatronData();
+            // FIX (see header note #2): force this file's own dropdown-option
+            // cache to rebuild against whatever the shared loader just
+            // fetched, instead of silently reusing the first-ever list.
+            patronOptionsCache = null;
             console.log('[Wizard] Patron data loaded');
         } catch (err) {
             console.warn('[Wizard] Failed to load patron data, using fallback:', err);
@@ -1121,12 +1147,15 @@ function renderStep2Skills(d) {
 }
 
 // ─── Talent Catalog Helpers ──────────────────────────────────────
+//
+// FIX (see header note #1): filter by tags.includes('talent'), not a
+// category field that real wiki entries never use for this purpose.
 
 function getAvailableTalentsForTier(d) {
     const appState = getState();
     const localTalents = appState.talents || [];
     const wikiEntries = appState.wikiEntries || [];
-    const wikiTalents = wikiEntries.filter(e => e.category === 'talents' || e.category === 'talent');
+    const wikiTalents = wikiEntries.filter(e => e.tags && Array.isArray(e.tags) && e.tags.includes('talent'));
 
     const allTalents = [
         ...localTalents.map(t => ({ ...t, source: 'local' })),
@@ -1172,13 +1201,23 @@ function renderTalentCatalog() {
                     <span style="color:var(--gold); margin-left:0.3rem;">${cost} XP</span>
                     <span style="color:var(--text3); font-size:0.75rem; margin-left:0.3rem;">(${tierLabel})</span>
                     ${t.description ? `<div style="color:var(--text2); font-size:0.7rem;">${escHtml(t.description)}</div>` : ''}
+                    ${t.prerequisites ? `<div style="color:var(--text3); font-size:0.65rem;">Requires: ${escHtml(t.prerequisites)}</div>` : ''}
                 </div>
                 <button class="btn btn-xs btn-primary catalog-add-btn" data-name="${escHtml(t.name)}" data-cost="${cost}">Add</button>
             </div>
         `;
     }).join('');
-}
 
+    // Directly attach click listeners to each button
+    catalogContainer.querySelectorAll('.catalog-add-btn').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            const name = this.dataset.name;
+            const cost = parseInt(this.dataset.cost, 10);
+            addTalentFromCatalog(name, cost);
+        });
+    });
+}
 export function addTalentFromCatalog(name, cost) {
     const listEl = document.getElementById('wz-talent-list');
     if (!listEl || !state.data) return;

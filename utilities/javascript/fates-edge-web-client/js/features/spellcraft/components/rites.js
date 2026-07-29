@@ -15,11 +15,30 @@
  * 
  * NEW: Patron's Gifts (Imbuement) for Runekeepers with Familiar (Thiasos) only,
  * and Borrowed Grace for Invokers carrying Symbols.
+ *
+ * ────────────────────────────────────────────────────────────────────────
+ * RULES FIX (this pass) — Rites must be learned, not free access:
+ * Player's Guide §9.7 ("Step 5: Choose Your First Rites") has a Runekeeper
+ * buy two starting Low Rites individually with XP — every Rite in every
+ * patron's catalog throughout the book carries its own XP cost (e.g.
+ * "Road-Sense (Low, 4 XP)"), and "buy new Rites" is listed alongside
+ * raising Attributes/Skills as an ordinary XP expenditure during play.
+ * Crack the Seal (§4.2.3, Invoker) explicitly resolves "a KNOWN Rite" —
+ * implying an Invoker's usable Rites are a specific acquired subset too,
+ * not their whole patron's catalog. This file used to show every rite
+ * from every carried patron as immediately usable the moment you had a
+ * Symbol (Invoker) or Codex (Runekeeper). It now checks each Rite against
+ * `char.rites` (a plain array of learned Rite names — already present on
+ * the character schema in editor.js/wizard.js) and only allows Crack the
+ * Seal on Rites actually in that list. Unlearned Rites still display in
+ * full (so you can browse and decide what's worth learning) with a
+ * "📖 Learn (X XP)" button that spends the Rite's own listed `xp` cost.
+ * ────────────────────────────────────────────────────────────────────────
  */
 
 import { getState, saveState } from '../../../core/state.js';
 import { showToast } from '../../../components/Toast.js';
-import { escHtml } from '../../../core/utils.js';
+import { escHtml, safeParseInt } from '../../../core/utils.js';
 import patrons from '../../patrons/index.js';
 
 const { 
@@ -596,7 +615,7 @@ function renderSinglePatronRites(patronData, characterId, charName, allPatronIds
         `;
 
         ritesInTier.forEach((rite, idx) => {
-            html += renderRiteItem(rite, patronId, idx, isInvoker, characterId);
+            html += renderRiteItem(rite, patronId, idx, isInvoker, characterId, char);
         });
 
         html += `</div>`;
@@ -614,11 +633,12 @@ function renderSinglePatronRites(patronData, characterId, charName, allPatronIds
 // RENDER A SINGLE RITE
 // ============================================================
 
-function renderRiteItem(rite, patronId, idx, isInvoker, characterId) {
+function renderRiteItem(rite, patronId, idx, isInvoker, characterId, char) {
     const riteId = `${patronId}-rite-${idx}`;
     const name = safeString(rite.name);
     const tier = safeString(rite.tier || 'Basic');
     const xp = rite.xp || rite.cost;
+    const xpCost = safeParseInt(rite.xp, 0);
     const action = safeString(rite.action || '');
     const range = safeString(rite.range || '');
     const resist = safeString(rite.resist || '');
@@ -637,8 +657,15 @@ function renderRiteItem(rite, patronId, idx, isInvoker, characterId) {
 
     const expanded = idx === 0 && hasDetails;
 
-    // ─── Crack the Seal (Invokers only) ────────────────────────
-    const canCrackSeal = isInvoker;
+    // RULES FIX (see file header note): only Rites in char.rites are
+    // actually known — Crack the Seal ("resolve a KNOWN Rite") and any
+    // future invocation UI should gate on this, not just on having a
+    // Symbol/Codex at all.
+    const knownRites = (char && char.rites) || [];
+    const isKnown = knownRites.includes(name);
+
+    // ─── Crack the Seal (Invokers only, and only once the Rite is known) ──
+    const canCrackSeal = isInvoker && isKnown;
 
     // Preview the Crack the Seal cost inline so it's visible before clicking.
     const baseObligationCost = parseRiteBaseObligationCost(rite);
@@ -668,24 +695,31 @@ function renderRiteItem(rite, patronId, idx, isInvoker, characterId) {
                         ${tags.map(t => `<span class="tag-badge" style="display:inline-block;padding:0.05rem 0.3rem;border-radius:6px;background:var(--bg3);border:1px solid var(--border);font-size:0.6rem;color:var(--text3);">${escHtml(safeString(t))}</span>`).join('')}
                     </div>
                 ` : ''}
-                ${canCrackSeal ? `
-                    <div style="margin-top:0.2rem;display:flex;gap:0.2rem;align-items:center;">
+                <div style="margin-top:0.2rem;display:flex;gap:0.4rem;align-items:center;flex-wrap:wrap;">
+                    ${!isKnown ? `
+                        <button class="btn btn-xs btn-gold" onclick="window.learnRite('${patronId}', ${idx}, '${characterId}')" title="Add this Rite to your known Rites for ${xpCost} XP">
+                            📖 Learn (${xpCost} XP)
+                        </button>
+                    ` : canCrackSeal ? `
                         <button class="btn btn-xs btn-danger" onclick="window.crackTheSeal('${patronId}', ${idx}, '${characterId}')" title="Invoke instantly at double the rite's Obligation cost (min +2, or +3 for High Rites)">
                             💥 Crack the Seal
                         </button>
                         <span style="font-size:0.55rem;color:var(--text3);align-self:center;">+${crackCostPreview} Obligation · Instant · Symbol becomes Compromised</span>
-                    </div>
-                ` : ''}
+                    ` : ''}
+                </div>
             </div>
         `;
     }
 
     return `
-        <div class="rite-item ${hasDetails ? 'rite-expandable' : ''}" data-rite-id="${escHtml(riteId)}" style="background:var(--bg3);border-radius:var(--radius);padding:0.2rem 0.5rem;border-left:2px solid ${color};margin-bottom:0.1rem;">
+        <div class="rite-item ${hasDetails ? 'rite-expandable' : ''}" data-rite-id="${escHtml(riteId)}" style="background:var(--bg3);border-radius:var(--radius);padding:0.2rem 0.5rem;border-left:2px solid ${color};margin-bottom:0.1rem;${isKnown ? '' : 'opacity:0.75;'}">
             <div class="rite-header" style="display:flex;justify-content:space-between;align-items:center;cursor:${hasDetails ? 'pointer' : 'default'};">
                 <div style="display:flex;align-items:center;gap:0.3rem;flex-wrap:wrap;">
                     <span class="rite-name" style="font-weight:600;font-size:0.85rem;">${escHtml(name)}</span>
                     ${xp ? `<span style="font-size:0.65rem;color:var(--text3);">${escHtml(xp)} XP</span>` : ''}
+                    ${isKnown
+                        ? `<span style="font-size:0.55rem;color:var(--green);">✓ Known</span>`
+                        : `<span style="font-size:0.55rem;color:var(--text3);">📖 Not learned</span>`}
                 </div>
                 <div style="display:flex;align-items:center;gap:0.2rem;">
                     ${tier ? `<span style="font-size:0.55rem;color:${color};font-weight:600;">${escHtml(tier)}</span>` : ''}
@@ -907,6 +941,65 @@ window.saveCharacter = saveCharacter;
 // only ever charged 2). It now reads the rite's own listed cost and doubles
 // that, applying the correct minimum for its tier.
 
+// ─── Learn Rite (add to known Rites) ───────────────────────────
+//
+// RULES FIX (see file header note): Rites must be individually learned —
+// this spends the Rite's own listed XP cost and adds it to char.rites,
+// the same field name already present on the character schema (see
+// editor.js/wizard.js). Available to both Runekeepers and Invokers.
+
+window.learnRite = function(patronId, riteIndex, characterId = 'default-character') {
+    const state = getState();
+    const patronData = findPatronData(state, patronId);
+    if (!patronData) {
+        showToast('Patron not found.', 'error');
+        return;
+    }
+
+    const rite = patronData.rites?.[riteIndex];
+    if (!rite) {
+        showToast('Rite not found.', 'error');
+        return;
+    }
+
+    const char = state.characters?.find(c => c.id === characterId) || state.characters?.[characterId];
+    if (!char) {
+        showToast('Character not found.', 'error');
+        return;
+    }
+
+    const riteName = safeString(rite.name);
+    if (!char.rites) char.rites = [];
+    if (char.rites.includes(riteName)) {
+        showToast(`"${riteName}" is already known.`, 'info');
+        return;
+    }
+
+    const xpCost = safeParseInt(rite.xp, 0);
+    const totalXp = char.totalXp || 0;
+    const spent = char.xpSpent || 0;
+    const available = totalXp - spent;
+
+    if (xpCost > 0 && available < xpCost) {
+        showToast(`Not enough XP. Need ${xpCost}, have ${available} available.`, 'error');
+        return;
+    }
+
+    if (!confirm(`Learn "${riteName}" (${rite.tier || ''}) for ${xpCost} XP?`)) return;
+
+    char.rites.push(riteName);
+    char.xpSpent = spent + xpCost;
+    saveState();
+    showToast(`📖 Learned "${riteName}" (${xpCost} XP spent).`, 'success');
+
+    const container = document.getElementById('spellcraft-content');
+    if (container) {
+        import('../index.js').then(module => {
+            if (module.renderActiveTabContent) module.renderActiveTabContent();
+        });
+    }
+};
+
 window.crackTheSeal = function(patronId, riteIndex, characterId = 'default-character') {
     const state = getState();
     const patronData = findPatronData(state, patronId);
@@ -922,6 +1015,13 @@ window.crackTheSeal = function(patronId, riteIndex, characterId = 'default-chara
     }
 
     const riteName = safeString(rite.name);
+
+    // RULES FIX: Crack the Seal only works on "a known Rite" (§4.2.3).
+    const char = state.characters?.find(c => c.id === characterId) || state.characters?.[characterId];
+    if (!char || !(char.rites || []).includes(riteName)) {
+        showToast(`You haven't learned "${riteName}" yet — learn it first.`, 'error');
+        return;
+    }
     const tier = safeString(rite.tier || '');
     const isHighTier = tier.toLowerCase() === 'high';
     const baseCost = parseRiteBaseObligationCost(rite);

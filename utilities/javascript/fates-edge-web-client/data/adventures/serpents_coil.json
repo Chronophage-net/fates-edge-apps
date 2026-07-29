@@ -6,26 +6,105 @@
   "author": "Nicholas A. Gasper",
   "sessions": "3",
   "themes": ["Sword & Sorcery", "Cosmic Horror", "Rising Legend", "Serpent Cult", "Transformation"],
-  "specialMechanics": {
-    "serpentsFavor": {
-      "description": "A secret track the GM keeps for each character. Starts at 0. Increases when Isoka's influence touches them (via SB, certain successes, or artifact use). As Favor rises, the character experiences subtle luck—coincidences, good timing, strange intuitions. They think they're becoming a legendary hero. They are, but also they're becoming something else.",
-      "thresholds": {
-        "0-3": "Nothing yet.",
-        "4-7": "+1 die once per scene from 'instinct.'",
-        "8-12": "+1 die to all rolls involving 'serpent intuition.'",
-        "13+": "+2 dice, but civilized folk start giving you strange looks."
-      }
+  "bestiary": [
+    {
+      "id": "isokai-cultist",
+      "name": "Isokai Cultist",
+      "tl": 2,
+      "class": "II",
+      "category": "humanoid",
+      "description": "A fanatic who has already exchanged half their skin for scales. They fight with the desperate zeal of the newly converted—and the terrible hunger of something that was human yesterday.",
+      "stats": { "Body": 2, "Melee": 2, "Athletics": 1, "hp": 18 },
+      "sb_spends": [
+        { "cost": 1, "name": "Coil and Crush", "effect": "The cultist's serpentine limbs constrict a PC; they are Held until they break free with a Body+Athletics test (DV 4)." },
+        { "cost": 2, "name": "Fanatical Scream", "effect": "The cultist's shriek draws 1d4 more cultists from the shadows." }
+      ]
     },
-    "corruptionScore": {
-      "description": "Track separately from Favor. This is the actual transformation. Players see it. Starts at 0.",
-      "thresholds": {
-        "0-5": "None. Just a bit of dry skin.",
-        "6-10": "Gain Serpent's Senses (+1 die to Notice in dark/underground places).",
-        "11-15": "Gain Scaled Skin (+1 Armor). People start edging away from you.",
-        "16+": "Gain Cosmic Insight (once per session, ask a question about cosmic threats). You also hiss your 's's."
-      }
+    {
+      "id": "fang-bearer",
+      "name": "Fang Bearer",
+      "tl": 3,
+      "class": "III",
+      "category": "humanoid",
+      "description": "The cult's elite—warriors who have embraced the change more deeply. Their fangs drip venom, and their eyes are all black. They regenerate, which is annoying.",
+      "stats": { "Body": 3, "Melee": 3, "Athletics": 2, "hp": 28 },
+      "sb_spends": [
+        { "cost": 1, "name": "Venomous Bite", "effect": "A PC is poisoned; they mark 1 Fatigue and act at Desperate until they test Resolve (DV 4)." },
+        { "cost": 2, "name": "Unnatural Regeneration", "effect": "The Fang Bearer heals 2 Harm at the start of its turn." }
+      ]
+    },
+    {
+      "id": "serpent-spawn",
+      "name": "Serpent Spawn",
+      "tl": 3,
+      "class": "III",
+      "category": "monstrosity",
+      "description": "A nightmare made flesh—a grotesque fusion of human and serpent that barely remembers it was ever anything else. It climbs walls, hisses, and has no sense of humour.",
+      "stats": { "Body": 3, "Melee": 3, "Athletics": 3, "hp": 30 },
+      "sb_spends": [
+        { "cost": 1, "name": "Wall Crawl", "effect": "The Spawn climbs out of reach; ranged attacks become Desperate for one exchange." },
+        { "cost": 2, "name": "Constrict and Crush", "effect": "A PC is Grappled; they take 1 Harm automatically each round until they escape." },
+        { "cost": 2, "name": "Acid Spray", "effect": "The Spawn vomits acid; all in Near range mark 1 Fatigue." }
+      ]
+    },
+    {
+      "id": "thaliss-high-priest",
+      "name": "Thaliss, High Priest of the Serpent Cult",
+      "tl": 4,
+      "class": "IV",
+      "category": "humanoid",
+      "description": "The self‑proclaimed Voice of Isoka. He is a terrible orator who monologues at length. Let the heroes interrupt him. It's more fun that way.",
+      "stats": { "Spirit": 3, "Presence": 3, "Arcana": 3, "hp": 35 },
+      "sb_spends": [
+        { "cost": 2, "name": "Dramatic Monologue", "effect": "Thaliss launches into a speech; all PCs must test Resolve or lose a Boon to his rhetoric." },
+        { "cost": 1, "name": "Flog the Cult", "effect": "He sacrifices a cultist to fuel the ritual; Cult Ascendancy +1." },
+        { "cost": 3, "name": "Call the Serpent", "effect": "He summons a Serpent Spawn to defend him." }
+      ],
+      "lore": "He genuinely believes he is the chosen one. He is not. His cultists are just too afraid to tell him."
+    },
+    {
+      "id": "isoka-projection",
+      "name": "Isoka's Projection",
+      "tl": 6,
+      "class": "VI",
+      "category": "celestial",
+      "description": "A fraction of the Angel of Serpents—beautiful, terrible, and coiled like a building. Her voice is honey and razors, and she is not entirely sure this whole cult thing was her idea.",
+      "stats": { "Spirit": 6, "Presence": 5, "Arcana": 5, "hp": 50 },
+      "sb_spends": [
+        { "cost": 2, "name": "Gaze of the Serpent", "effect": "A PC must test Spirit+Resolve (DV 5) or be Paralyzed with awe for one exchange." },
+        { "cost": 3, "name": "Shed the Skin", "effect": "Isoka sheds her projection; all attacks miss this round." },
+        { "cost": 3, "name": "Offer the Bargain", "effect": "Isoka offers a PC a deal; if they accept, they gain 3 Serpent's Favor and 2 Corruption." }
+      ],
+      "lore": "She did not start the cult. She is curious to see what happens. The real question isn't whether the heroes will change—it's whether they'll notice, and whether they'll care."
+    },
+    {
+      "id": "palace-guard",
+      "name": "Palace Guard (Cult-Infected)",
+      "tl": 2,
+      "class": "II",
+      "category": "humanoid",
+      "description": "A former City Watchman, now serving the serpent cult. They move too fluidly—their joints bend wrong. Their eyes are all black.",
+      "stats": { "Body": 2, "Melee": 2, "Command": 1, "hp": 20 },
+      "sb_spends": [
+        { "cost": 1, "name": "Snake-Hiss Surprise", "effect": "The guard hisses as they strike; all PCs in Close range act at Desperate for the next exchange." },
+        { "cost": 2, "name": "Call the Watch", "effect": "The guard sounds an alarm; 1d4 more guards arrive in 2 rounds." }
+      ]
+    },
+    {
+      "id": "yara-cultist",
+      "name": "Yara (Cult-Bound)",
+      "tl": 2,
+      "class": "II",
+      "category": "humanoid",
+      "description": "Orun's daughter, now a willing cultist. She has vertical pupils, patches of iridescent scales, and a smile that's a bit too wide. She thinks becoming a snake-person is 'cool.' She hasn't thought it through.",
+      "stats": { "Wits": 1, "Spirit": 2, "Presence": 2, "hp": 16 },
+      "sb_spends": [
+        { "cost": 1, "name": "Snake Eyes", "effect": "Yara's gaze makes a PC hesitate; they lose their next action unless they test Resolve (DV 3)." },
+        { "cost": 2, "name": "Call the Mother", "effect": "Yara summons a Serpent Spawn to defend her." }
+      ],
+      "lore": "She genuinely believes the transformation is an honor. She needs a lecture about why this is a bad idea. With small words."
     }
-  },
+  ],
   "acts": [
     {
       "id": "act-1-simple-job",
@@ -116,9 +195,10 @@
           ],
           "encounters": [
             {
-              "name": "Palace Guards",
-              "dv": 4,
+              "creatureId": "palace-guard",
+              "quantity": 2,
               "position": "Desperate",
+              "dv": 4,
               "outcomes": {
                 "clean": "You fight through the guards and reach the inner chambers.",
                 "partial": "You fight through, but one guard escapes to raise the alarm. Tick Cult Ascendancy +1.",
@@ -138,9 +218,10 @@
           ],
           "encounters": [
             {
-              "name": "Ambush",
-              "dv": 5,
+              "creatureId": "serpent-spawn",
+              "quantity": 1,
               "position": "Desperate",
+              "dv": 5,
               "outcomes": {
                 "clean": "You defeat the spawn. Gain the Serpent's Fang dagger.",
                 "partial": "You defeat the spawn, but one of you is poisoned. Tick Cult Ascendancy +1.",
@@ -159,9 +240,10 @@
           ],
           "encounters": [
             {
-              "name": "The Revelation",
-              "dv": 4,
+              "creatureId": "yara-cultist",
+              "quantity": 1,
               "position": "Controlled",
+              "dv": 4,
               "outcomes": {
                 "clean": "You convince Yara to reconsider. She joins you.",
                 "partial": "Yara is uncertain. She will help, but she's not convinced.",
@@ -209,9 +291,10 @@
           ],
           "encounters": [
             {
-              "name": "The Offer",
-              "dv": 4,
+              "creatureId": "isoka-projection",
+              "quantity": 1,
               "position": "Controlled",
+              "dv": 4,
               "outcomes": {
                 "clean": "You resist Isoka's influence. Gain a Transformation Talent.",
                 "partial": "You resist, but Isoka takes a keen interest in you. Narrative effect.",

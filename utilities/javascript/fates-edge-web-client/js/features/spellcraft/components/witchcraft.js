@@ -41,12 +41,34 @@
  * Fix: always pass the whole, already-mutated char.witch object, so
  * nothing sibling gets clobbered regardless of merge depth.
  * ────────────────────────────────────────────────────────────────────────
+ *
+ * ────────────────────────────────────────────────────────────────────────
+ * CONSISTENCY PASS (patron loading + dice engine):
+ * This file's witchcraft lookups (findPatronWitchcraft / getAllWitchcraft-
+ * Patrons) read straight from `getState().patrons`, but this file never
+ * actually loaded that data itself — it silently relied on some OTHER
+ * panel (Patrons, Cantor, Rites) having been opened first to populate it.
+ * That meant opening Witchcraft as the very first thing in a session could
+ * show an empty weaver list for no visible reason. This file now calls the
+ * same shared `patrons/index.js` loader everyone else uses, at the top of
+ * `renderWitchcraft` and before `witchChooseWeaver` runs, so it always has
+ * current data regardless of what the player clicked first.
+ *
+ * Also replaced this file's private `rollDice()` (which tracked "ones" as
+ * a proxy for Story Beats) with the shared `performRoll()` from
+ * `core/dice.js`, whose `storyBeats` field is that same concept — this
+ * file no longer runs its own, independently-tuned dice math.
+ * ────────────────────────────────────────────────────────────────────────
  */
 
 import { getCharacterData, saveCharacter } from '../index.js';
 import { escHtml, generateId, safeParseInt } from '../../../core/utils.js';
 import { showToast } from '../../../components/Toast.js';
 import { getState } from '../../../core/state.js';
+import { performRoll } from '../../../core/dice.js';
+import patrons from '../../patrons/index.js';
+
+const { loadPatronData: ensurePatronDataLoaded } = patrons;
 
 // ============================================================
 // CONSTANTS – Universal Hedge Gifts (available to all)
@@ -292,18 +314,6 @@ function formatText(text) {
     return escHtml(text).replace(/\n/g, '<br>');
 }
 
-function rollDice(pool) {
-    let successes = 0;
-    let ones = 0;
-    for (let i = 0; i < pool; i++) {
-        const roll = Math.floor(Math.random() * 10) + 1;
-        if (roll >= 6) successes++;
-        if (roll === 10) successes++;
-        if (roll === 1) ones++;
-    }
-    return { successes, ones };
-}
-
 function getTierFromXp(xp) {
     if (xp < 40) return 'I';
     if (xp < 90) return 'II';
@@ -390,7 +400,7 @@ function getCraftedItems(char) {
 // MAIN RENDER – Path-aware
 // ============================================================
 
-export function renderWitchcraft(el) {
+export async function renderWitchcraft(el) {
     const char = getCharacterData();
     if (!char) {
         el.innerHTML = `
@@ -403,6 +413,11 @@ export function renderWitchcraft(el) {
         `;
         return;
     }
+
+    // Ensure patron data (and therefore witchcraft traditions) is loaded
+    // via the shared loader before we look anything up below — this used
+    // to assume some other panel had already populated state.patrons.
+    await ensurePatronDataLoaded();
 
     const isWitch = char.magicPath === 'witch';
     const hasHedgeGifts = (char.hedgeGifts || []).length > 0 || (char.witch?.hedgeGifts || []).length > 0;
@@ -466,7 +481,7 @@ export function renderWitchcraft(el) {
                     ${showFullWitch ? `<button class="btn btn-sm btn-secondary" onclick="window.witchFullRitual()">🕯️ Ritual</button>` : ''}
                     <button class="btn btn-sm btn-secondary" onclick="window.witchCraftItem()">🔧 Craft</button>
                     <button class="btn btn-sm btn-secondary" onclick="window.witchAddGift()">🌿 Gift</button>
-                    <button class="btn btn-sm btn-ghost" onclick="window.witchRefresh()">🔄</button>
+                    <button class="btn btn-sm btn-ghost" onclick="window.witchRefresh()" title="Reloads patron data from disk, bypassing any cached copy">🔄</button>
                 </div>
             </div>
 
@@ -805,31 +820,31 @@ window.witchQuickWork = function() {
     const pos = prompt('Position: Controlled (you have time) or Desperate (threatened)', 'Controlled');
     const isDesperate = pos.toLowerCase() === 'desperate';
 
-    // Step 5: Roll
+    // Step 5: Roll (shared dice engine — see file header note)
     const wits = char.wits || 1;
     const lore = char.skills?.lore || 0;
     const pool = wits + lore;
     const dv = isDesperate ? 4 : 3;
-    const result = rollDice(pool);
+    const result = performRoll(pool, dv);
 
     // Step 6: Determine Outcome and Price
     let outcome, priceType, sbCount = 0, boons = 0;
-    if (result.successes >= dv && result.ones === 0) {
+    if (result.successes >= dv && result.storyBeats === 0) {
         outcome = '✨ Clean Success';
         priceType = 'none';
-    } else if (result.successes >= dv && result.ones > 0) {
+    } else if (result.successes >= dv && result.storyBeats > 0) {
         outcome = '⚠️ Success with SB';
         priceType = 'shadow';
-        sbCount = result.ones;
+        sbCount = result.storyBeats;
     } else if (result.successes > 0 && result.successes < dv) {
         outcome = '⚠️ Partial Success';
         priceType = 'shame';
-        sbCount = result.ones;
+        sbCount = result.storyBeats;
         boons = 1;
     } else {
         outcome = '💀 Miss';
         priceType = 'identity';
-        sbCount = result.ones || 1;
+        sbCount = result.storyBeats || 1;
         boons = 2;
     }
 
@@ -875,7 +890,8 @@ window.witchQuickWork = function() {
                 <div><strong>Layer:</strong> ${escHtml(layer)} · <strong>Tag:</strong> ${escHtml(tag)}</div>
             </div>
             <div style="font-size:0.75rem;color:var(--text3);">Pool: ${pool}d · DV: ${dv} · Position: ${isDesperate ? 'Desperate' : 'Controlled'}</div>
-            <div style="font-size:0.8rem;">Rolled: <strong>${result.successes}</strong> successes, ${result.ones} ones</div>
+            <div style="font-size:0.7rem;color:var(--text3);">Roll: ${result.dice.join(', ')}</div>
+            <div style="font-size:0.8rem;">Rolled: <strong>${result.successes}</strong> successes</div>
             <div style="font-size:1rem;font-weight:600;color:${outcomeColor};">${outcome}</div>
             ${priceApplied ? `<div style="color:var(--red);font-size:0.8rem;">Price: ${priceType} (+1)</div>` : '<div style="color:var(--green);">No price.</div>'}
             ${sbCount > 0 ? `<div style="color:var(--text3);font-size:0.75rem;">📖 GM gains ${sbCount} SB</div>` : ''}
@@ -915,27 +931,27 @@ window.witchFullRitual = function() {
     const price = prompt('Step 4: Set the Price (memory, name, lock of hair, promise, blood):', 'Memory of a childhood home');
     if (!price) return;
 
-    // Step 5: Make the Exchange
+    // Step 5: Make the Exchange (shared dice engine — see file header note)
     const dv = safeParseInt(prompt('Step 5: Difficulty (DV 3-6):', '4'), 4);
     const spirit = char.spirit || 1;
     const lore = char.skills?.lore || 0;
     const pool = spirit + lore;
-    const result = rollDice(pool);
+    const result = performRoll(pool, dv);
 
     let outcome, success = false, boons = 0, sbCount = 0;
-    if (result.successes >= dv && result.ones === 0) {
+    if (result.successes >= dv && result.storyBeats === 0) {
         outcome = '✅ Success';
         success = true;
-    } else if (result.successes >= dv && result.ones > 0) {
+    } else if (result.successes >= dv && result.storyBeats > 0) {
         outcome = '⚠️ Success with Echo';
         success = true;
-        sbCount = result.ones;
+        sbCount = result.storyBeats;
     } else if (result.successes > 0 && result.successes < dv) {
         outcome = '⚠️ Partial Success';
         boons = 1;
     } else {
         outcome = '❌ Failure';
-        sbCount = result.ones || 1;
+        sbCount = result.storyBeats || 1;
         boons = 2;
     }
 
@@ -981,6 +997,7 @@ window.witchFullRitual = function() {
                 <div><strong>Price:</strong> ${escHtml(price)}</div>
             </div>
             <div style="font-size:0.75rem;color:var(--text3);">Pool: ${pool}d · DV: ${dv}</div>
+            <div style="font-size:0.7rem;color:var(--text3);">Roll: ${result.dice.join(', ')}</div>
             <div style="font-size:0.8rem;">Rolled: <strong>${result.successes}</strong> successes</div>
             <div style="font-size:1rem;font-weight:600;color:${outcomeColor};">${outcome}</div>
             <div style="color:var(--red);font-size:0.8rem;">🌀 Identity Strain +1</div>
@@ -1019,8 +1036,9 @@ window.witchCraftItem = function() {
                  recipe.skill === 'craft' ? 'wits' : 'spirit';
     const attrValue = char[attr] || 1;
     const pool = attrValue + skillLevel;
-    const result = rollDice(pool);
     const dv = recipe.dv;
+    // Shared dice engine — see file header note
+    const result = performRoll(pool, dv);
 
     let outcome, success = false, boons = 0, sbCount = 0;
     if (result.successes >= dv) {
@@ -1031,7 +1049,7 @@ window.witchCraftItem = function() {
         boons = 1;
     } else {
         outcome = '❌ Failure';
-        sbCount = result.ones || 1;
+        sbCount = result.storyBeats || 1;
         boons = 2;
     }
 
@@ -1081,6 +1099,7 @@ window.witchCraftItem = function() {
             <div style="font-weight:600;font-size:1rem;color:var(--gold);">🔧 Crafting: ${escHtml(recipe.name)}</div>
             <div style="font-size:0.8rem;color:var(--text2);">${escHtml(recipe.description)}</div>
             <div style="font-size:0.75rem;color:var(--text3);">Pool: ${pool}d · DV: ${dv}</div>
+            <div style="font-size:0.7rem;color:var(--text3);">Roll: ${result.dice.join(', ')}</div>
             <div style="font-size:0.8rem;">Rolled: <strong>${result.successes}</strong> successes</div>
             <div style="font-size:1rem;font-weight:600;color:${success ? 'var(--green)' : outcome === '⚠️ Partial' ? 'var(--orange)' : 'var(--red)'};">${outcome}</div>
             ${success || outcome === '⚠️ Partial' ? `<div style="color:var(--text3);font-size:0.75rem;">Cost: ${recipe.xpCost} XP</div>` : ''}
@@ -1195,9 +1214,14 @@ window.witchClearPrices = function() {
 // Note: weaver selection still uses a prompt because it involves choosing a patron
 // from a list, but we could later add a dropdown. For now we keep the prompt.
 
-window.witchChooseWeaver = function() {
+window.witchChooseWeaver = async function() {
     const char = getCharacterData();
     if (!char) return;
+
+    // Ensure patron data is loaded before scanning for weavers — this can
+    // be the very first action a player takes, before any render has
+    // populated state.patrons.
+    await ensurePatronDataLoaded();
 
     const allPatrons = getAllWitchcraftPatrons();
     if (allPatrons.length === 0) {
@@ -1225,20 +1249,31 @@ window.witchChooseWeaver = function() {
 };
 
 // ─── Refresh ──────────────────────────────────────────────────
+//
+// FIX (two issues): this used to (1) never force a real reload of patron
+// data from disk — inconsistent with cantor.js/rites.js/monks.js — and
+// (2) re-render straight into `.witchcraft-container` itself rather than
+// its parent mount element. Since renderWitchcraft's very first line of
+// output IS a fresh `<div class="witchcraft-container">`, passing the
+// existing `.witchcraft-container` node as `el` meant every refresh
+// nested a brand new copy of the container one level deeper inside the
+// previous one. Now it re-renders into the actual parent mount, matching
+// how every other panel's refresh works.
 
-window.witchRefresh = function() {
-    const container = document.querySelector('.witchcraft-container');
-    if (container) {
-        renderWitchcraft(container);
+window.witchRefresh = async function() {
+    showToast('🔄 Reloading patron data from disk…', 'info');
+    await ensurePatronDataLoaded(true);
+
+    const existing = document.querySelector('.witchcraft-container');
+    const mount = existing ? existing.parentElement : document.getElementById('spellcraft-content');
+    if (mount) {
+        await renderWitchcraft(mount);
     } else {
-        const el = document.getElementById('spellcraft-content');
-        if (el) {
-            import('../index.js').then(module => {
-                if (module.renderActiveTabContent) module.renderActiveTabContent();
-            });
-        }
+        import('../index.js').then(module => {
+            if (module.renderActiveTabContent) module.renderActiveTabContent();
+        });
     }
-    showToast('🔄 Hedge magic refreshed.', 'info');
+    showToast('✅ Hedge magic refreshed.', 'success');
 };
 
 // ============================================================

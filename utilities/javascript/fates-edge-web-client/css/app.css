@@ -1594,3 +1594,24 @@ select {
         order: -1; /* move quick refs above on small screens */
     }
 }
+/* Style the details/summary for expandable groups */
+.patron-group summary {
+    list-style: none; /* removes default triangle */
+    position: relative;
+    padding-left: 1.2rem;
+}
+.patron-group summary::-webkit-details-marker {
+    display: none;
+}
+.patron-group summary::before {
+    content: '▶';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    transition: transform 0.2s;
+    color: var(--gold);
+}
+.patron-group[open] summary::before {
+    content: '▼';
+}

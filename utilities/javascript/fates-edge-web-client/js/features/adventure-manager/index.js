@@ -10,6 +10,11 @@
  * - NPC, Location, and Faction management per adventure
  * - Export/Import adventure data
  * - Modal-based adventure library browser (replaces clunky prompt)
+ *
+ * NEW: Adventure-specific bestiary – each adventure can have its own
+ * creatures/NPCs/bosses that can be used as adversaries in scenes.
+ * Scenes' encounter entries can reference bestiary creatures by ID,
+ * or define inline adversaries.
  */
 
 import { getState, saveState } from '../../core/state.js';
@@ -17,6 +22,7 @@ import { showToast } from '../../components/Toast.js';
 import { escHtml, safeParseInt } from '../../core/utils.js';
 import { logToSession, addVTTEvent } from '../gm-tools/index.js';
 import { isConnectedToServer, sendEvent } from '../../core/websocket.js';
+import { loadBestiaryData, getCreatureDescription } from '../encounters/bestiary.js';
 
 // ============================================================
 // CONSTANTS
@@ -69,23 +75,11 @@ function broadcastSceneStatus(adventure) {
 }
 
 // ============================================================
-// RICH TEXT RENDERING (plain text → nice HTML, composed from sub-parts)
+// RICH TEXT RENDERING (plain text → nice HTML)
 // ============================================================
-// Adventure/act descriptions are stored as plain text — sometimes with
-// a handful of inline <em> tags baked in from region card flavor (Crown
-// Spread synthesis text is the main source of these). Storing pre-built
-// HTML in the adventure JSON is a maintenance nightmare, and running
-// everything through escHtml() mangles those inline tags into visible
-// "&lt;em&gt;". This renders the *plain text* nicely and builds the
-// actual HTML structure (headers, chips, paragraphs) here, at display
-// time, from known sub-components — not from markup baked into the data.
 
 const RICH_TEXT_ALLOWED_TAGS = ['em', 'strong', 'i', 'b'];
 
-// Escapes everything EXCEPT the small whitelist of inline tags already
-// used in region/card flavor text, so a stray "<script>" still gets
-// neutered but an authored "<em>...</em>" renders as emphasis instead
-// of literal "&lt;em&gt;" text.
 function escapeTextKeepingAllowedTags(text) {
     const stashed = [];
     const tagPattern = new RegExp(`</?(?:${RICH_TEXT_ALLOWED_TAGS.join('|')})>`, 'gi');
@@ -98,8 +92,6 @@ function escapeTextKeepingAllowedTags(text) {
     return escaped;
 }
 
-// "[Label: detail text]" → a small styled callout chip, instead of
-// showing up as literal square brackets in a wall of text.
 function renderBracketAnnotations(html) {
     return html.replace(/\[([A-Za-z][A-Za-z ]{0,20}):\s*([^\]]+)\]/g, (match, label, detail) => `
         <span style="display:inline-block;margin:0.15rem 0.2rem 0.15rem 0;padding:0.1rem 0.5rem;background:var(--bg4);border-radius:10px;border-left:3px solid var(--gold);font-size:0.8rem;">
@@ -108,22 +100,16 @@ function renderBracketAnnotations(html) {
     `);
 }
 
-// "**bold**" (used by Ace Effect text) → real <strong>.
 function renderMarkdownBold(html) {
     return html.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
 }
 
-// Crown Spread synthesis text (from decks/index.js) is always built
-// from these position/wildcard/timer/ace-effect emoji markers.
 const POSITION_MARKERS = ['🌱', '🏔️', '👑', '🤝', '🌟', '⏱️', '♠️'];
 
 function looksLikeCrownSpreadText(text) {
     return POSITION_MARKERS.filter(m => text.includes(m)).length >= 3;
 }
 
-// Splits Crown Spread synthesis text into one styled block per
-// position/wildcard/timer/ace-effect segment, with [Bracket] annotations
-// as chips and **bold** as real emphasis.
 function renderCrownSpreadHtml(text) {
     const splitPattern = /(?=(?:🌱|🏔️|👑|🤝|🌟|⏱️|♠️))/g;
     const rawSegments = text.split(splitPattern).map(s => s.trim()).filter(Boolean);
@@ -132,8 +118,6 @@ function renderCrownSpreadHtml(text) {
         const marker = POSITION_MARKERS.find(m => seg.startsWith(m));
         const rest = marker ? seg.slice(marker.length).trim() : seg;
         const colonIdx = rest.indexOf(':');
-        // Only treat a colon within the first ~25 chars as a "Label:" —
-        // further out, it's just punctuation inside the body text.
         let label = '';
         let body = rest;
         if (colonIdx > -1 && colonIdx <= 25) {
@@ -159,14 +143,6 @@ function renderCrownSpreadHtml(text) {
     return `<div class="crown-spread-reading">${blocks.join('')}</div>`;
 }
 
-/**
- * Turns raw description text into safe, nicely structured HTML.
- * Crown Spread synthesis text gets the full position-by-position
- * treatment above; anything else just gets paragraph breaks plus the
- * same [Bracket]/**bold** treatment, so a long block of plain text
- * reads comfortably instead of as one dense run-on paragraph. Inline
- * <em>/<strong> already present in the source text survive intact.
- */
 function renderDescriptionHtml(text) {
     if (!text) return '';
     if (looksLikeCrownSpreadText(text)) {
@@ -180,9 +156,6 @@ function renderDescriptionHtml(text) {
     return paragraphs.map(p => `<p style="margin:0.3rem 0;line-height:1.5;">${p}</p>`).join('');
 }
 
-// Clean, short, tag-free preview for compact contexts (the adventure
-// list card) — strips tags/brackets/markdown/emoji markers rather than
-// showing a giant escaped wall of Crown Spread text in a summary line.
 function plainTextPreview(text, maxLen = 160) {
     if (!text) return '';
     let plain = String(text)
@@ -196,31 +169,10 @@ function plainTextPreview(text, maxLen = 160) {
     return plain;
 }
 
-// 👇 ROOT CAUSE FOUND: core/utils.js's generateId() takes a LENGTH
-// (a number), not a prefix. Every call in this file was doing
-// generateId('adv_') / generateId('scene_') / etc, expecting it to
-// return "adv_xxxxx" — but passing a string where a number is expected
-// coerces to NaN, and String.prototype.substr(start, NaN) returns an
-// empty string. So every id in every adventure/act/scene/npc/location
-// created here was silently "" — which is why a freshly created
-// adventure would show up in the list (it's still a real object in the
-// array) but could never be opened: activeAdventureId = "" is falsy,
-// so the `adventureViewMode === 'detail' && activeAdventureId` check in
-// renderView() always failed and silently fell back to the list view,
-// on every click, forever, surviving refreshes because the data really
-// was saved — just permanently unopenable. This is a self-contained
-// replacement that doesn't depend on generateId's actual behavior at
-// all, so it can't silently break the same way again.
 function makeId(prefix) {
     return `${prefix}${Date.now().toString(36)}${Math.random().toString(36).slice(2, 8)}`;
 }
 
-// Fixes up any adventure (freshly loaded from storage, imported from a
-// file, or pulled from the library) that has empty/missing ids on
-// itself or any of its acts/scenes/npcs/locations — whether from this
-// exact bug in an earlier version, or from hand-edited/external JSON.
-// Returns true if anything was actually repaired, so callers can decide
-// whether to re-save.
 function repairAdventureIds(adventure) {
     let repaired = false;
     if (!adventure.id) { adventure.id = makeId('adv_'); repaired = true; }
@@ -236,6 +188,10 @@ function repairAdventureIds(adventure) {
     (adventure.locations || []).forEach(loc => {
         if (!loc.id) { loc.id = makeId('loc_'); repaired = true; }
     });
+    // NEW: ensure bestiary entries have ids
+    (adventure.bestiary || []).forEach(creature => {
+        if (!creature.id) { creature.id = makeId('creature_'); repaired = true; }
+    });
     return repaired;
 }
 
@@ -247,13 +203,11 @@ function loadAdventuresFromState() {
     const state = getState();
     if (state.adventures) {
         adventures = state.adventures;
-        // Self-heal any adventure saved before makeId() existed — these
-        // are the ones stuck with empty ids (see the note above
-        // repairAdventureIds) and were previously unopenable no matter
-        // how many times you clicked or refreshed.
         let anyRepaired = false;
         adventures.forEach(a => {
             if (repairAdventureIds(a)) anyRepaired = true;
+            // Ensure bestiary array exists
+            if (!Array.isArray(a.bestiary)) a.bestiary = [];
         });
         if (anyRepaired) {
             console.warn('[Adventures] Repaired empty ids on one or more previously-saved adventures.');
@@ -267,11 +221,6 @@ function loadAdventuresFromState() {
 
 function saveAdventuresToState() {
     try {
-        // Validate serializability *before* handing off to the shared
-        // saveState() (whose own try/catch only logs a console.warn —
-        // easy to miss, and exactly the kind of "silent failure" that
-        // makes a newly created adventure vanish on the next reload
-        // without any visible sign anything went wrong).
         JSON.stringify(adventures);
         const state = getState();
         state.adventures = adventures;
@@ -290,7 +239,6 @@ async function loadAdventureFromFile(adventureId) {
         `.${ADVENTURES_DATA_PATH}${adventureId}.json`,
     ];
 
-    // If the slug looks like a misspelling of "lantern", try the corrected version
     if (adventureId === 'latern_at_dusk') {
         candidates.push(`${ADVENTURES_DATA_PATH}lantern_at_dusk.json`);
         candidates.push(`.${ADVENTURES_DATA_PATH}lantern_at_dusk.json`);
@@ -321,16 +269,14 @@ async function loadAdventureFromFile(adventureId) {
 
             if (!data.id) data.id = adventureId;
 
-            // Same normalization createAdventure() applies — a manifest
-            // JSON with e.g. non-array acts would otherwise load "fine"
-            // here and then throw the moment the list/detail view tried
-            // to render it.
+            // Normalise
             if (!Array.isArray(data.acts)) data.acts = [];
             data.acts = data.acts.map(act => ({ ...act, scenes: Array.isArray(act.scenes) ? act.scenes : [] }));
             if (!Array.isArray(data.npcs)) data.npcs = [];
             if (!Array.isArray(data.locations)) data.locations = [];
             if (!Array.isArray(data.campaignTimers)) data.campaignTimers = [];
-            repairAdventureIds(data); // fixes files exported before makeId() existed (empty ids throughout)
+            if (!Array.isArray(data.bestiary)) data.bestiary = [];
+            repairAdventureIds(data);
 
             const existing = adventures.find(a => a.id === data.id);
             if (existing) {
@@ -394,7 +340,6 @@ async function browseAdventureLibrary() {
         return;
     }
 
-    // ─── Create the modal ──────────────────────────────────────────
     const modal = document.createElement('div');
     modal.style.cssText = `
         position: fixed;
@@ -459,7 +404,6 @@ async function browseAdventureLibrary() {
     modal.appendChild(content);
     document.body.appendChild(modal);
 
-    // ─── Inject styles ──────────────────────────────────────────────
     if (!document.getElementById('adv-library-styles')) {
         const style = document.createElement('style');
         style.id = 'adv-library-styles';
@@ -477,7 +421,6 @@ async function browseAdventureLibrary() {
         document.head.appendChild(style);
     }
 
-    // ─── Event listeners ──────────────────────────────────────────
     const cancelBtn = content.querySelector('#adv-library-cancel');
     cancelBtn.addEventListener('click', () => modal.remove());
 
@@ -489,7 +432,6 @@ async function browseAdventureLibrary() {
     items.forEach(item => {
         item.addEventListener('click', async function() {
             const slug = this.dataset.slug;
-            // Disable further clicks while loading
             this.style.opacity = '0.5';
             this.style.cursor = 'wait';
             this.innerHTML = `<span>${escHtml(slug)}</span><span style="font-size:0.6rem;color:var(--gold);">⏳ Loading…</span>`;
@@ -526,10 +468,6 @@ function getActiveAdventure() {
 // ============================================================
 
 function createAdventure(data) {
-    // Defensively normalize acts/scenes — a non-array here (from hand-edited
-    // or externally-generated JSON) would otherwise throw deep inside the
-    // render code (act.scenes?.map(...) only guards against undefined, not
-    // against a wrong-typed truthy value), taking down the whole list.
     const acts = Array.isArray(data.acts) ? data.acts.map(act => ({
         ...act,
         scenes: Array.isArray(act.scenes) ? act.scenes : []
@@ -547,6 +485,7 @@ function createAdventure(data) {
         locations: Array.isArray(data.locations) ? data.locations : [],
         factions: Array.isArray(data.factions) ? data.factions : [],
         campaignTimers: Array.isArray(data.campaignTimers) ? data.campaignTimers : [],
+        bestiary: Array.isArray(data.bestiary) ? data.bestiary : [], // NEW
         notes: data.notes || '',
         currentAct: data.currentAct || 0,
         currentScene: data.currentScene || 0,
@@ -557,13 +496,8 @@ function createAdventure(data) {
         updatedAt: new Date().toISOString()
     };
 
-    // Final safety net regardless of what the caller passed in — this
-    // is the exact bug that made every Crown Spread import unopenable.
     repairAdventureIds(adventure);
 
-    // Surface a bad object immediately — silently pushing something that
-    // can't round-trip through JSON is exactly how an adventure ends up
-    // "there" in memory but gone after a refresh with no visible error.
     try {
         JSON.parse(JSON.stringify(adventure));
     } catch (e) {
@@ -709,7 +643,42 @@ function resetAdventure(id) {
 }
 
 // ============================================================
-// SCENE ↔ ENCOUNTER BRIDGE
+// HELPER: RESOLVE CREATURE FROM ADVENTURE BESTIARY OR GLOBAL
+// ============================================================
+
+async function resolveCreatureFromAdventure(adventure, ref) {
+    // ref can be an id or a name
+    if (!adventure) return null;
+    if (!adventure.bestiary) adventure.bestiary = [];
+
+    // Try by id first
+    let creature = adventure.bestiary.find(c => c.id === ref);
+    if (creature) return creature;
+
+    // Try by name
+    creature = adventure.bestiary.find(c => (c.name || '').toLowerCase() === ref.toLowerCase());
+    if (creature) return creature;
+
+    // Fallback to global bestiary
+    try {
+        const globalBestiary = await loadBestiaryData();
+        if (Array.isArray(globalBestiary)) {
+            let global = globalBestiary.find(c => c.id === ref);
+            if (!global) global = globalBestiary.find(c => (c.name || '').toLowerCase() === ref.toLowerCase());
+            if (global) {
+                // Clone it so we don't mutate global
+                return { ...global };
+            }
+        }
+    } catch (e) {
+        console.warn('[Adventures] Could not load global bestiary for fallback:', e);
+    }
+
+    return null;
+}
+
+// ============================================================
+// SCENE ↔ ENCOUNTER BRIDGE (UPDATED)
 // ============================================================
 
 async function startSceneEncounter(adventureId, actIndex, sceneIndex) {
@@ -732,16 +701,56 @@ async function startSceneEncounter(adventureId, actIndex, sceneIndex) {
         ? state.encounters.find(e => String(e.id) === String(scene.encounterId))
         : null;
 
-    if (!encounter) {
-        const adversaries = (scene.encounters || []).map(enc => ({
-            name: enc.name || 'Adversary',
-            body: [
-                enc.dv !== undefined && enc.dv !== null ? `DV ${enc.dv}` : '',
-                enc.position ? `Position: ${enc.position}` : '',
-                enc.outcomes ? `Outcomes: ${enc.outcomes}` : ''
-            ].filter(Boolean).join(' · ')
-        }));
+    // Build adversary list from scene.encounters
+    const adversaryPromises = (scene.encounters || []).map(async (entry) => {
+        // If entry has creatureId, resolve from bestiary
+        if (entry.creatureId) {
+            const creature = await resolveCreatureFromAdventure(adventure, entry.creatureId);
+            if (creature) {
+                // Build adversary from creature
+                const stats = creature.stats || {};
+                if (!stats.hp && creature.tl) stats.hp = creature.tl * 10 + 10;
+                if (!stats.hp) stats.hp = 20;
+                return {
+                    name: creature.name || 'Adversary',
+                    body: getCreatureDescription(creature) || '',
+                    tier: creature.tl || 2,
+                    tl: creature.tl,
+                    class: creature.class || '',
+                    category: creature.category || '',
+                    stats: stats,
+                    sb_spends: creature.sb_spends || [],
+                    // Preserve scene-specific overrides
+                    _sceneDv: entry.dv,
+                    _scenePosition: entry.position,
+                    _sceneOutcomes: entry.outcomes
+                };
+            } else {
+                showToast(`⚠️ Creature "${entry.creatureId}" not found in adventure bestiary or global.`, 'warning');
+                return null;
+            }
+        } else {
+            // Inline adversary definition (backwards compatible)
+            return {
+                name: entry.name || 'Adversary',
+                body: entry.body || '',
+                tier: entry.tl || entry.dv || 2,
+                tl: entry.tl,
+                class: entry.class || '',
+                category: entry.category || '',
+                stats: entry.stats || { hp: (entry.tl || 2) * 10 + 10 },
+                sb_spends: entry.sb_spends || [],
+                _sceneDv: entry.dv,
+                _scenePosition: entry.position,
+                _sceneOutcomes: entry.outcomes
+            };
+        }
+    });
 
+    const adversaryResults = await Promise.all(adversaryPromises);
+    const adversaries = adversaryResults.filter(a => a !== null);
+
+    if (!encounter) {
         encounter = {
             id: makeId('enc_'),
             title: `${scene.title} (${adventure.title})`,
@@ -751,9 +760,6 @@ async function startSceneEncounter(adventureId, actIndex, sceneIndex) {
             status: 'active',
             adversaries,
             created: Date.now(),
-            // 👇 NEW: origin tags — lets other views (e.g. GM Tools'
-            // Active Encounters list) show which adventure/scene this
-            // came from without having to cross-reference by title.
             fromAdventureId: adventure.id,
             fromAdventureTitle: adventure.title,
             fromSceneTitle: scene.title
@@ -767,6 +773,11 @@ async function startSceneEncounter(adventureId, actIndex, sceneIndex) {
         logAdventureEvent(`⚔️ Encounter "${encounter.title}" started from scene "${scene.title}"`, 'warning', 'encounter_created', {
             name: encounter.title, id: encounter.id, status: encounter.status, fromAdventure: adventure.id
         });
+    } else {
+        // Update existing encounter's adversaries if they've changed
+        // (optional: we could merge or replace)
+        encounter.adversaries = adversaries;
+        saveState();
     }
 
     try {
@@ -778,10 +789,6 @@ async function startSceneEncounter(adventureId, actIndex, sceneIndex) {
     }
 }
 
-// Matches the slug convention your own tools/generate-manifests.js
-// produces (lowercase, underscores) — so an exported file can be
-// dropped straight into /data/adventures/ and referenced by a manifest
-// entry without renaming anything.
 function slugify(text) {
     const slug = String(text || 'adventure')
         .toLowerCase()
@@ -834,17 +841,13 @@ async function importAdventureFromFile() {
                     return;
                 }
 
-                // Same normalization createAdventure() applies — this path
-                // used to push the raw parsed JSON straight in, bypassing
-                // those guards entirely, so a file with e.g. acts as a
-                // non-array would render fine here but throw deep inside
-                // the list/detail views the moment it tried to display.
                 if (!Array.isArray(data.acts)) data.acts = [];
                 data.acts = data.acts.map(act => ({ ...act, scenes: Array.isArray(act.scenes) ? act.scenes : [] }));
                 if (!Array.isArray(data.npcs)) data.npcs = [];
                 if (!Array.isArray(data.locations)) data.locations = [];
                 if (!Array.isArray(data.campaignTimers)) data.campaignTimers = [];
-                repairAdventureIds(data); // fixes files exported before makeId() existed (empty ids throughout)
+                if (!Array.isArray(data.bestiary)) data.bestiary = [];
+                repairAdventureIds(data);
 
                 try {
                     JSON.parse(JSON.stringify(data));
@@ -867,7 +870,7 @@ async function importAdventureFromFile() {
                 const saved = saveAdventuresToState();
                 if (saved) {
                     showToast(`📥 Imported "${data.title}"`, 'success');
-                } // saveAdventuresToState() already showed its own error toast otherwise
+                }
                 resolve(data);
             } catch (err) {
                 showToast('Failed to import adventure: ' + err.message, 'error');
@@ -879,16 +882,8 @@ async function importAdventureFromFile() {
 }
 
 // ============================================================
-// CROWN SPREAD → ADVENTURE TEMPLATE (parse + build)
+// CROWN SPREAD → ADVENTURE TEMPLATE
 // ============================================================
-// Crown Spread synthesis text has a fixed, deterministic structure:
-// Decks always draws Hearts→Spades→Clubs→Diamonds (drawOneOfEachSuit)
-// and always assigns them Root→Crest→Crown→Left-Hand (CROWN_POSITIONS),
-// in that order. So the suit archetypes are pinned to positions too:
-// Root is always the Hearts/Actor card, Crest always Spades/Location,
-// Crown always Clubs/Complication, Left Hand always Diamonds/Reward.
-// That reliability is what makes turning the reading into a proper
-// adventure skeleton possible instead of just archiving the text.
 
 const CROWN_TEMPLATE_MARKERS = [
     { marker: '🌱', label: 'Root', role: 'npc' },
@@ -898,10 +893,6 @@ const CROWN_TEMPLATE_MARKERS = [
 ];
 const CROWN_ALL_MARKERS = ['🌱', '🏔️', '👑', '🤝', '🌟', '⏱️', '♠️'];
 
-// "{Rank} of {Suit} ({Archetype} – {Tier}): {Card Title}: {flavor...}
-// (N segments if highest)." — pulls the card's own title (distinct from
-// its flavor paragraph) and its suggested timer size straight out of
-// that one string, without needing to reach into Decks' internals.
 function parseCrownCardSegment(body) {
     const segmentsMatch = body.match(/\((\d+)\s*segments if highest\)/i);
     const tierSegments = segmentsMatch ? parseInt(segmentsMatch[1], 10) : null;
@@ -918,13 +909,6 @@ function parseCrownCardSegment(body) {
     return { cardLabel, title, flavor, tierSegments };
 }
 
-/**
- * Parses a Crown Spread synthesis string (the exact text Decks builds
- * in synthesiseCrownSpread(), whether it came from a fresh draw or
- * Decks' own history) into: one entry per Root/Crest/Crown/Left-Hand
- * position, the Wildcard twist, any Ace Effect, and the suggested
- * Adventure Clock timer (segments + which card triggered it).
- */
 function parseCrownSpreadSynthesis(text) {
     const splitPattern = /(?=(?:🌱|🏔️|👑|🤝|🌟|⏱️|♠️))/g;
     const rawSegments = String(text || '').split(splitPattern).map(s => s.trim()).filter(Boolean);
@@ -959,15 +943,6 @@ function parseCrownSpreadSynthesis(text) {
     return { positions, wildcardText, aceEffectText, timerSegments, timerCardLabel };
 }
 
-/**
- * Builds a full adventure skeleton from a parsed Crown Spread: one
- * scene per position, an NPC pulled from Root (always Hearts/Actor),
- * a Location pulled from Crest (always Spades/Location), the Wildcard
- * twist folded into the Crown scene (the confrontation is where a
- * twist lands hardest), an Adventure Clock timer sized from the
- * highest non-wildcard card, and any Ace Effect tucked into GM-facing
- * notes as a diagetic aside rather than dropped into scene text.
- */
 function buildAdventureFromCrownSpread({ parsed, title, tier, region, cardNames }) {
     const findByRole = (role) => parsed.positions.find(p => p.role === role);
     const root = findByRole('npc');
@@ -1028,29 +1003,11 @@ function buildAdventureFromCrownSpread({ parsed, title, tier, region, cardNames 
         npcs,
         locations,
         campaignTimers,
+        bestiary: [], // empty; GM can add later
         notes: notesParts.join('\n\n'),
         status: 'planned'
     };
 }
-
-// ============================================================
-// CROWN SPREAD IMPORT
-// ============================================================
-// Reads Decks' own local deckHistory (via its getDeckHistory() export)
-// for the most recent real Crown Spread draw. If none exists yet, draws
-// one live via Decks' own quickCrownSpread(), reusing whatever region
-// Decks already has selected, or prompting for one from its actual
-// discovered region list if not (and saying so plainly if Decks hasn't
-// been opened yet this session, since region discovery only happens
-// when that tab renders).
-//
-// The reading then gets parsed into a real adventure skeleton (see
-// above) rather than archived as one flat description — so there's
-// something to actually run, not just a name and a wall of text. Since
-// this is a static-served app with no write endpoint for adventure
-// data, "saved to /data/adventures" is approximated as closely as a
-// browser can: it's persisted into app state (survives reloads) and
-// auto-exported as a ready-to-drop JSON file for that folder.
 
 async function importCrownSpreadAsAdventure() {
     let decks;
@@ -1066,7 +1023,6 @@ async function importCrownSpreadAsAdventure() {
     let synthesis = null;
     let region = decks.getSelectedRegion ? decks.getSelectedRegion() : null;
 
-    // 1) Prefer a Crown Spread Decks already drew and displayed this session.
     try {
         const history = decks.getDeckHistory ? decks.getDeckHistory() : [];
         const recent = [...history].reverse().find(e => e.type === 'Crown Spread');
@@ -1076,8 +1032,6 @@ async function importCrownSpreadAsAdventure() {
         }
     } catch (e) { /* ignore */ }
 
-    // 2) Nothing drawn yet — draw one now via the real quickCrownSpread(),
-    // picking a region first if Decks doesn't already have one selected.
     if (!synthesis) {
         if (!region) {
             const regions = decks.getRegionNames ? decks.getRegionNames() : [];
@@ -1098,7 +1052,7 @@ async function importCrownSpreadAsAdventure() {
 
         const drawResult = await decks.quickCrownSpread(region);
         if (isDestroyed) return null;
-        if (!drawResult) return null; // quickCrownSpread already toasts its own error (e.g. bad region)
+        if (!drawResult) return null;
         cardNames = drawResult.cardNames;
         synthesis = drawResult.result.synthesis;
     }
@@ -1106,14 +1060,6 @@ async function importCrownSpreadAsAdventure() {
     return createAdventureFromCrownSpreadReading({ synthesis, cardNames, region });
 }
 
-/**
- * Builds + saves + opens an adventure from an *already-drawn* Crown
- * Spread reading — the shared tail end of importCrownSpreadAsAdventure
- * above, pulled out so other features (e.g. GM Tools, which draws its
- * own Crown Spreads on the Consequences tab) can turn a reading they
- * already have into an adventure without re-drawing, re-checking
- * history, or duplicating the parsing/template logic.
- */
 function createAdventureFromCrownSpreadReading({ synthesis, cardNames, region, title, tier } = {}) {
     if (!synthesis) {
         showToast('No Crown Spread reading to build from.', 'error');
@@ -1127,9 +1073,6 @@ function createAdventureFromCrownSpreadReading({ synthesis, cardNames, region, t
     const templateData = parsed.positions.length > 0
         ? buildAdventureFromCrownSpread({ parsed, title: finalTitle, tier: finalTier, region, cardNames })
         : {
-            // Parsing found no recognizable positions (unexpected synthesis
-            // shape) — fall back to archiving the reading as a single scene
-            // rather than losing it.
             title: finalTitle,
             description: region ? `${synthesis}\n\n(Cards: ${cardNames} — Region: ${region})` : synthesis,
             tier: finalTier,
@@ -1149,18 +1092,15 @@ function createAdventureFromCrownSpreadReading({ synthesis, cardNames, region, t
                 }]
             }],
             campaignTimers: [{ name: 'Adventure Clock', segments: 8, current: 0, description: 'Overall adventure pace' }],
+            bestiary: [],
             status: 'planned'
         };
 
     const adventure = createAdventure(templateData);
-    if (!adventure) return null; // createAdventure already toasted the specific error
+    if (!adventure) return null;
 
-    // Best available equivalent of "save to /data/adventures" from a
-    // static-served client — auto-download a ready-to-drop JSON file.
     exportAdventure(adventure.id);
 
-    // Open it for editing immediately, so there's more than a name and
-    // truncated description to work from.
     activeAdventureId = adventure.id;
     adventureViewMode = 'detail';
     renderView();
@@ -1232,18 +1172,13 @@ function renderAdventureList() {
 
             <div class="panel" style="background:var(--bg2);border-left:4px solid var(--gold);font-size:0.75rem;color:var(--text3);">
                 <strong>💡 Adventure Format:</strong> Adventures are stored in <code>/data/adventures/</code> as JSON files.
-                Each adventure contains acts, scenes, timers, NPCs, locations, and factions.
+                Each adventure contains acts, scenes, timers, NPCs, locations, and a bestiary (creatures for encounters).
                 Crown Spread generation creates a structured adventure from a card draw.
             </div>
         </div>
     `;
 }
 
-// A single malformed adventure (bad JSON round-trip, unexpected shape
-// from a hand-edited or externally-generated file) previously took
-// down the ENTIRE list — .map() over all adventures throws on the
-// first bad one, so renderAdventureList() itself throws and the whole
-// tab goes blank. This isolates the failure to just that one card.
 function renderAdventureCardSafe(adventure) {
     try {
         return renderAdventureCard(adventure);
@@ -1408,6 +1343,22 @@ function buildAdventureDetailHtml(adventure) {
         </div>
     `).join('') || '<span class="text-muted text-sm">No locations.</span>';
 
+    // ---- NEW: Bestiary panel ----
+    const bestiaryHtml = (adventure.bestiary || []).map(creature => `
+        <div class="panel" style="background:var(--bg3);padding:0.2rem 0.4rem;margin:0.1rem 0;border-left:2px solid var(--red);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;">
+            <div>
+                <span style="font-weight:600;font-size:0.8rem;">${escHtml(creature.name)}</span>
+                ${creature.tl ? `<span style="font-size:0.6rem;color:var(--red);">TL${creature.tl}</span>` : ''}
+                ${creature.class ? `<span style="font-size:0.6rem;color:var(--accent);">${escHtml(creature.class)}</span>` : ''}
+                ${creature.category ? `<span style="font-size:0.6rem;color:var(--text3);">${escHtml(creature.category)}</span>` : ''}
+                ${creature.description ? `<div style="font-size:0.65rem;color:var(--text2);">${escHtml(creature.description.slice(0,60))}${creature.description.length>60?'…':''}</div>` : ''}
+            </div>
+            <div style="display:flex;gap:0.2rem;">
+                <button class="btn btn-xs btn-danger" onclick="window.adventureRemoveBestiaryCreature('${adventure.id}','${creature.id}')">✕</button>
+            </div>
+        </div>
+    `).join('') || '<span class="text-muted text-sm">No creatures in adventure bestiary. Add some to use in encounters.</span>';
+
     return `
         <div class="adventure-detail flex flex-col gap-2">
             <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.3rem;border-bottom:2px solid var(--border);padding-bottom:0.3rem;">
@@ -1463,6 +1414,12 @@ function buildAdventureDetailHtml(adventure) {
                     </div>
 
                     <div class="panel">
+                        <h4 style="margin:0;font-size:0.9rem;">🐉 Bestiary (Adventure Creatures)</h4>
+                        <div style="max-height:200px;overflow-y:auto;margin-bottom:0.3rem;">${bestiaryHtml}</div>
+                        <button class="btn btn-xs btn-secondary" onclick="window.adventureAddBestiaryCreature('${adventure.id}')">+ Add Creature</button>
+                    </div>
+
+                    <div class="panel">
                         <h4 style="margin:0;font-size:0.9rem;">📝 Notes</h4>
                         <textarea id="adv-notes" rows="3" style="width:100%;font-size:0.75rem;background:var(--bg3);color:var(--text);border:1px solid var(--border);border-radius:var(--radius);padding:0.3rem;">${escHtml(adventure.notes || '')}</textarea>
                         <button class="btn btn-xs btn-primary mt-1" onclick="window.adventureSaveNotes('${adventure.id}')">💾 Save Notes</button>
@@ -1473,10 +1430,6 @@ function buildAdventureDetailHtml(adventure) {
     `;
 }
 
-// A malformed adventure previously blanked this whole view with an
-// uncaught exception and no indication why. This isolates the failure
-// and gives the GM a way to inspect (export) or remove the bad entry
-// instead of being stuck.
 function renderAdventureDetail(adventureId) {
     const adventure = getAdventure(adventureId);
     if (!adventure) {
@@ -1559,6 +1512,13 @@ function renderCreateAdventure() {
                 <h4 style="margin:0;font-size:0.85rem;">⏱️ Campaign Timers</h4>
                 <div id="adv-create-timers-container"></div>
                 <button class="btn btn-xs btn-secondary mt-1" id="adv-add-timer-btn">+ Add Timer</button>
+            </div>
+
+            <div class="panel">
+                <h4 style="margin:0;font-size:0.85rem;">🐉 Bestiary (optional)</h4>
+                <p style="font-size:0.7rem;color:var(--text3);">Creatures you can reference in scene encounters.</p>
+                <div id="adv-create-bestiary-container"></div>
+                <button class="btn btn-xs btn-secondary mt-1" id="adv-add-bestiary-btn">+ Add Creature</button>
             </div>
 
             <div class="flex gap-1">
@@ -1725,6 +1685,29 @@ function attachCreateEvents() {
         });
     }
 
+    // ---- NEW: Bestiary creation ----
+    const addBestiaryBtn = document.getElementById('adv-add-bestiary-btn');
+    if (addBestiaryBtn) {
+        addBestiaryBtn.addEventListener('click', () => {
+            const container = document.getElementById('adv-create-bestiary-container');
+            if (!container) return;
+            const div = document.createElement('div');
+            div.className = 'adv-bestiary-row';
+            div.style.cssText = 'display:flex;gap:0.2rem;margin:0.1rem 0;align-items:center;flex-wrap:wrap;';
+            div.innerHTML = `
+                <input type="text" class="adv-bestiary-name" placeholder="Name" style="flex:1;min-width:80px;background:var(--bg2);color:var(--text);border:1px solid var(--border);border-radius:var(--radius);padding:0.15rem 0.3rem;font-size:0.75rem;" />
+                <input type="text" class="adv-bestiary-tl" placeholder="TL" value="2" style="width:40px;background:var(--bg2);color:var(--text);border:1px solid var(--border);border-radius:var(--radius);padding:0.15rem 0.3rem;font-size:0.7rem;" />
+                <input type="text" class="adv-bestiary-class" placeholder="Class" style="width:40px;background:var(--bg2);color:var(--text);border:1px solid var(--border);border-radius:var(--radius);padding:0.15rem 0.3rem;font-size:0.7rem;" />
+                <input type="text" class="adv-bestiary-desc" placeholder="Description" style="flex:1.5;min-width:100px;background:var(--bg2);color:var(--text);border:1px solid var(--border);border-radius:var(--radius);padding:0.15rem 0.3rem;font-size:0.7rem;" />
+                <button class="btn btn-xs btn-danger adv-remove-bestiary-btn">✕</button>
+            `;
+            container.appendChild(div);
+            div.querySelector('.adv-remove-bestiary-btn').addEventListener('click', () => {
+                div.remove();
+            });
+        });
+    }
+
     const saveBtn = document.getElementById('adv-create-save-btn');
     if (saveBtn) {
         saveBtn.addEventListener('click', () => {
@@ -1802,6 +1785,21 @@ function attachCreateEvents() {
                 }
             });
 
+            // ---- NEW: bestiary ----
+            const bestiary = [];
+            document.querySelectorAll('.adv-bestiary-row').forEach(row => {
+                const name = row.querySelector('.adv-bestiary-name')?.value.trim();
+                if (name) {
+                    bestiary.push({
+                        id: makeId('creature_'),
+                        name,
+                        tl: safeParseInt(row.querySelector('.adv-bestiary-tl')?.value, 2),
+                        class: row.querySelector('.adv-bestiary-class')?.value.trim() || '',
+                        description: row.querySelector('.adv-bestiary-desc')?.value.trim() || ''
+                    });
+                }
+            });
+
             if (acts.length === 0) {
                 showToast('Please add at least one act with scenes.', 'error');
                 return;
@@ -1818,6 +1816,7 @@ function attachCreateEvents() {
                 locations,
                 factions: [],
                 campaignTimers,
+                bestiary,
                 notes: '',
                 status: 'planned'
             });
@@ -1830,7 +1829,7 @@ function attachCreateEvents() {
 }
 
 // ============================================================
-// WINDOW EXPOSURES
+// WINDOW EXPOSURES (updated with bestiary functions)
 // ============================================================
 
 window.adventureBackToList = function() {
@@ -1914,6 +1913,47 @@ window.adventureSaveNotes = function(id) {
     }
 };
 
+// ---- NEW: Bestiary management ----
+window.adventureAddBestiaryCreature = function(adventureId) {
+    const adventure = getAdventure(adventureId);
+    if (!adventure) {
+        showToast('Adventure not found.', 'error');
+        return;
+    }
+    const name = prompt('Creature name:');
+    if (!name) return;
+    const tl = parseInt(prompt('TL (1-10):', '2'), 10) || 2;
+    const cls = prompt('Class (I-X):', 'I') || 'I';
+    const desc = prompt('Brief description:', '') || '';
+    const creature = {
+        id: makeId('creature_'),
+        name,
+        tl,
+        class: cls,
+        description: desc,
+        stats: { hp: tl * 10 + 10 },
+        sb_spends: []
+    };
+    if (!adventure.bestiary) adventure.bestiary = [];
+    adventure.bestiary.push(creature);
+    saveAdventuresToState();
+    renderView();
+    showToast(`🐉 Added "${name}" to bestiary.`, 'success');
+};
+
+window.adventureRemoveBestiaryCreature = function(adventureId, creatureId) {
+    const adventure = getAdventure(adventureId);
+    if (!adventure) return;
+    if (!adventure.bestiary) return;
+    const idx = adventure.bestiary.findIndex(c => c.id === creatureId);
+    if (idx === -1) return;
+    if (!confirm(`Remove "${adventure.bestiary[idx].name}" from bestiary?`)) return;
+    adventure.bestiary.splice(idx, 1);
+    saveAdventuresToState();
+    renderView();
+    showToast('Creature removed.', 'info');
+};
+
 // ============================================================
 // LIFECYCLE
 // ============================================================
@@ -1938,6 +1978,7 @@ function destroy() {
     container = null;
     saveAdventuresToState();
 }
+
 // ============================================================
 // EXPORTS
 // ============================================================

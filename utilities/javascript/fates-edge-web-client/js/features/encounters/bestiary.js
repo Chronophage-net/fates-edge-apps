@@ -2,6 +2,14 @@
  * Bestiary – Creature reference with wiki integration
  * Uses multi‑path discovery (like Search) with fallback to manifest + individual files
  * Integrated with Combat Tracker: one-click to open tracker with creature added
+ *
+ * Now supports:
+ * - tl 1–10, class I–X, nature, services, price, lore, signs, connections
+ * - Story Beat (SB) moves sub-panel with GM SB bank
+ * - Creature-specific sb_spends rendered in detail modal
+ * - Filtering by TL, class, nature, region
+ * - Detail modal shows all relevant fields
+ * - Combat Tracker integration uses tl for default difficulty/HP
  */
 
 import { getState, saveState } from '../../core/state.js';
@@ -14,6 +22,68 @@ import { openTracker } from './combat.js'; // 👈 Integration import
 let container = null;
 let bestiaryData = [];
 let wikiData = {};
+
+// ============================================================
+// STORY BEAT STATE (local, no dependency on combat)
+// ============================================================
+
+const SB_BANK_KEY = 'fates-edge-gm-sb-bank';
+let gmStoryBeats = 0;
+
+const DEFAULT_SB_MOVES = [
+    {
+        cost: 1,
+        name: 'Minor Complication',
+        effect: 'Tick a timer +1, leave a trace, make a noise, or introduce a small distraction.'
+    },
+    {
+        cost: 2,
+        name: 'Moderate Complication',
+        effect: 'Raise an alarm, worsen the party’s Position, introduce a lesser foe, or damage an asset.'
+    },
+    {
+        cost: 3,
+        name: 'Major Complication',
+        effect: 'Bring reinforcements, shift the scene, test a bond, or land a serious consequence.'
+    }
+];
+
+function loadStoryBeatsBank() {
+    try {
+        const stored = localStorage.getItem(SB_BANK_KEY);
+        gmStoryBeats = stored ? Math.max(0, parseInt(stored, 10)) : 0;
+    } catch (_) {
+        gmStoryBeats = 0;
+    }
+}
+
+function saveStoryBeatsBank() {
+    try {
+        localStorage.setItem(SB_BANK_KEY, String(gmStoryBeats));
+    } catch (_) {}
+}
+
+function adjustStoryBeats(delta) {
+    gmStoryBeats = Math.max(0, gmStoryBeats + delta);
+    saveStoryBeatsBank();
+    renderStoryBeatsPanel();
+}
+
+function spendStoryBeats(cost, label) {
+    if (gmStoryBeats < cost) {
+        showToast(`Need ${cost} SB; only ${gmStoryBeats} available.`, 'warning');
+        return false;
+    }
+    gmStoryBeats -= cost;
+    saveStoryBeatsBank();
+    renderStoryBeatsPanel();
+    try {
+        logToSession(`💥 SB spent (${cost}): ${label}`, 'danger');
+        addVTTEvent('sb_spent', { cost, label });
+    } catch (e) { /* ignore */ }
+    showToast(`Spent ${cost} SB — ${label}`, 'success');
+    return true;
+}
 
 // ============================================================
 // CONSTANTS – Multiple possible paths for bestiary.json
@@ -33,9 +103,9 @@ const CACHE_KEY = 'fates-edge-bestiary-cache';
 
 // Hardcoded fallback entries (if everything else fails)
 const FALLBACK_ENTRIES = [
-    { id: 'goblin-scavenger', name: 'Goblin Scavenger', category: 'humanoid', tier: 1, description: 'A small, green-skinned creature with sharp teeth and a greedy glint.' },
-    { id: 'skeleton-knight', name: 'Skeleton Knight', category: 'undead', tier: 2, description: 'An animated suit of armor with hollow eye sockets glowing with pale blue light.' },
-    { id: 'thorn-dryad', name: 'Thorn Dryad', category: 'fey', tier: 3, description: 'A fey creature with bark-like skin and thorny vines for hair.' }
+    { id: 'goblin-scavenger', name: 'Goblin Scavenger', category: 'humanoid', tl: 1, class: 'I', description: 'A small, green-skinned creature with sharp teeth and a greedy glint.' },
+    { id: 'skeleton-knight', name: 'Skeleton Knight', category: 'undead', tl: 2, class: 'II', description: 'An animated suit of armor with hollow eye sockets glowing with pale blue light.' },
+    { id: 'thorn-dryad', name: 'Thorn Dryad', category: 'fey', tl: 3, class: 'III', description: 'A fey creature with bark-like skin and thorny vines for hair.' }
 ];
 
 // ============================================================
@@ -67,12 +137,22 @@ function flattenWrappedEntry(raw) {
         const inner = raw[keys[0]];
         return {
             name,
+            // prefer summary or lore for description, but keep all fields
             description: inner.summary || inner.lore || inner.description || '',
             summary: inner.summary || '',
             lore: inner.lore || '',
             locations: inner.locations || [],
             connections: inner.connections || [],
             page: inner.page || '',
+            // new fields
+            tl: inner.tl,
+            class: inner.class,
+            nature: inner.nature,
+            services: inner.services || [],
+            price: inner.price,
+            signs: inner.signs || [],
+            sb_spends: inner.sb_spends || null,
+            // preserve any other fields
             ...inner
         };
     }
@@ -92,6 +172,10 @@ function normalizeCreature(c) {
             result._rawDescription = result.description;
             result.description = result.lore.description;
         }
+    }
+    // Ensure numeric tl
+    if (result.tl !== undefined && result.tl !== null) {
+        result.tl = parseInt(result.tl, 10);
     }
     return result;
 }
@@ -130,6 +214,30 @@ export function getCreatureDescription(entry) {
     return safeString(entry.description) || 'No description available.';
 }
 
+function formatSBMove(move) {
+    const cost = parseInt(move.cost, 10) || 1;
+    const name = move.name || 'Unnamed Move';
+    const effect = move.effect || move.description || '';
+    return `
+        <div class="sb-move" style="
+            background:var(--bg2);
+            border:1px solid var(--border);
+            border-radius:var(--radius-sm);
+            padding:0.4rem 0.6rem;
+            margin-bottom:0.3rem;
+            font-size:0.8rem;
+        ">
+            <div style="display:flex;justify-content:space-between;align-items:center;gap:0.4rem;">
+                <strong style="color:var(--danger);">${escHtml(name)}</strong>
+                <button class="btn btn-xs btn-danger sb-spend-btn" data-cost="${cost}" data-label="${escHtml(name)}" title="Spend ${cost} SB">
+                    ${cost} SB
+                </button>
+            </div>
+            <div style="color:var(--text2);margin-top:0.2rem;">${escHtml(effect)}</div>
+        </div>
+    `;
+}
+
 // ============================================================
 // DATA LOADING – Multi‑path discovery + shared discoverBestiary
 // ============================================================
@@ -137,7 +245,9 @@ export function getCreatureDescription(entry) {
 async function loadBestiaryFromPaths() {
     for (const path of BESTIARY_PATHS) {
         try {
-            const response = await fetch(path, { cache: 'no-cache' });
+            // Add cache-busting timestamp
+            const url = path + (path.includes('?') ? '&' : '?') + 't=' + Date.now();
+            const response = await fetch(url, { cache: 'no-cache' });
             if (response.ok) {
                 const data = await response.json();
                 if (Array.isArray(data) && data.length > 0) {
@@ -160,7 +270,7 @@ async function loadBestiaryFromIndividualFiles() {
     const creatures = [];
     for (const slug of slugs) {
         try {
-            const fileRes = await fetch(`${BESTIARY_INDIVIDUAL_PATH}${slug}.json`, { cache: 'no-cache' });
+            const fileRes = await fetch(`${BESTIARY_INDIVIDUAL_PATH}${slug}.json?t=${Date.now()}`, { cache: 'no-cache' });
             if (fileRes.ok) {
                 const data = await fileRes.json();
                 const flat = flattenWrappedEntry(data);
@@ -182,18 +292,20 @@ async function loadFallbackBestiary() {
 }
 
 export async function loadBestiaryData() {
+    // Try cache first (but only if not too old? we'll use it but still refresh)
     try {
         const cached = sessionStorage.getItem(CACHE_KEY);
         if (cached) {
             const data = JSON.parse(cached);
             if (Array.isArray(data) && data.length > 0) {
-                bestiaryData = data;
                 console.log(`[Bestiary] Loaded ${data.length} entries from cache`);
+                bestiaryData = data;
                 return bestiaryData;
             }
         }
     } catch (_) {}
 
+    // Fetch fresh
     let data = await loadBestiaryFromPaths();
     if (data) {
         bestiaryData = data;
@@ -216,7 +328,7 @@ export async function loadBestiaryData() {
 
 export async function loadWikiData() {
     try {
-        const response = await fetch('/data/wiki.json', { cache: 'no-cache' });
+        const response = await fetch('/data/wiki.json?t=' + Date.now(), { cache: 'no-cache' });
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
         const data = await response.json();
         wikiData = data || {};
@@ -239,13 +351,36 @@ export async function render(el) {
             <header style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.5rem;margin-bottom:1rem;">
                 <div>
                     <h1 class="page-title" style="margin:0;">📖 Bestiary</h1>
-                    <p class="page-sub" style="margin:0.2rem 0 0;">Creatures, monsters, and NPCs of the Crown Spread.</p>
+                    <p class="page-sub" style="margin:0.2rem 0 0;">Creatures, monsters, and spirits of the Crown Spread.</p>
                 </div>
-                <div style="display:flex;gap:0.5rem;align-items:center;">
-                    <input type="text" id="bestiary-search" placeholder="🔍 Search creatures…" style="font-size:0.9rem;padding:0.3rem 0.6rem;" />
+                <div style="display:flex;gap:0.5rem;align-items:center;flex-wrap:wrap;">
+                    <input type="text" id="bestiary-search" placeholder="🔍 Search…" style="font-size:0.9rem;padding:0.3rem 0.6rem;width:140px;" />
                     <button class="btn btn-sm btn-ghost" id="bestiary-refresh" title="Refresh data">↻</button>
                 </div>
             </header>
+
+            <!-- Filter Bar -->
+            <div style="display:flex;flex-wrap:wrap;gap:0.3rem;margin-bottom:0.8rem;align-items:center;background:var(--bg-panel);padding:0.4rem 0.6rem;border-radius:var(--radius-sm);border:1px solid var(--border);">
+                <span style="font-size:0.75rem;color:var(--text3);margin-right:0.2rem;">Filter:</span>
+                <select id="bestiary-filter-tl" style="font-size:0.75rem;padding:0.1rem 0.3rem;background:var(--bg3);border:1px solid var(--border);border-radius:4px;">
+                    <option value="all">All TL</option>
+                    ${[1,2,3,4,5,6,7,8,9,10].map(n => `<option value="${n}">TL ${n}</option>`).join('')}
+                </select>
+                <select id="bestiary-filter-class" style="font-size:0.75rem;padding:0.1rem 0.3rem;background:var(--bg3);border:1px solid var(--border);border-radius:4px;">
+                    <option value="all">All Classes</option>
+                    ${['I','II','III','IV','V','VI','VII','VIII','IX','X'].map(c => `<option value="${c}">Class ${c}</option>`).join('')}
+                </select>
+                <select id="bestiary-filter-nature" style="font-size:0.75rem;padding:0.1rem 0.3rem;background:var(--bg3);border:1px solid var(--border);border-radius:4px;max-width:120px;">
+                    <option value="all">All Natures</option>
+                    <!-- options will be populated from data -->
+                </select>
+                <select id="bestiary-filter-region" style="font-size:0.75rem;padding:0.1rem 0.3rem;background:var(--bg3);border:1px solid var(--border);border-radius:4px;max-width:120px;">
+                    <option value="all">All Regions</option>
+                    <!-- options will be populated from data -->
+                </select>
+                <button class="btn btn-xs btn-secondary" id="bestiary-clear-filters" style="font-size:0.7rem;">✕ Clear</button>
+            </div>
+
             <div style="display:grid;grid-template-columns:2fr 1fr;gap:1rem;">
                 <div class="bestiary-list" id="bestiary-list" style="background:var(--bg-panel);border:1px solid var(--border);border-radius:var(--radius);padding:0.5rem;max-height:70vh;overflow-y:auto;">
                     <div style="text-align:center;padding:2rem;color:var(--text3);">
@@ -258,6 +393,19 @@ export async function render(el) {
                         <h3 style="margin-top:0;">📋 Quick Categories</h3>
                         <div id="bestiary-categories" style="display:flex;flex-wrap:wrap;gap:0.3rem;"></div>
                     </div>
+                    <div class="panel" id="bestiary-sb-panel" style="background:var(--bg-panel);border:1px solid var(--border);border-radius:var(--radius);padding:0.8rem;">
+                        <h3 style="margin-top:0;">⚡ Story Beats</h3>
+                        <div style="display:flex;align-items:center;gap:0.4rem;margin-bottom:0.5rem;">
+                            <span style="font-size:0.8rem;color:var(--text2);">Bank:</span>
+                            <button class="btn btn-xs btn-ghost" id="sb-minus" style="font-weight:bold;">−</button>
+                            <input type="number" id="sb-bank-input" value="0" min="0" style="width:50px;font-size:0.85rem;text-align:center;background:var(--bg2);border:1px solid var(--border);border-radius:4px;padding:0.15rem;" />
+                            <button class="btn btn-xs btn-ghost" id="sb-plus" style="font-weight:bold;">+</button>
+                        </div>
+                        <div id="sb-moves-list" style="display:flex;flex-direction:column;gap:0.2rem;"></div>
+                        <div style="font-size:0.7rem;color:var(--text3);margin-top:0.4rem;">
+                            Spend SB on monster moves or default complications. Creature-specific moves appear in detail view.
+                        </div>
+                    </div>
                     <div class="panel" style="background:var(--bg-panel);border:1px solid var(--border);border-radius:var(--radius);padding:0.8rem;">
                         <h3 style="margin-top:0;">🔗 Wiki Cross‑Reference</h3>
                         <div id="bestiary-wiki-refs" style="font-size:0.85rem;color:var(--text2);">
@@ -265,7 +413,7 @@ export async function render(el) {
                         </div>
                     </div>
                     <div class="panel" style="background:var(--bg-panel);border:1px solid var(--border);border-radius:var(--radius);padding:0.8rem;">
-                        <h3 style="margin-top:0;">⚡ Quick Actions</h3>
+                        <h3 style="margin-top:0;">⚔️ Quick Actions</h3>
                         <div style="display:flex;flex-direction:column;gap:0.3rem;">
                             <button class="btn btn-sm btn-gold" id="bestiary-add-encounter">+ Add as Encounter</button>
                             <button class="btn btn-sm" id="bestiary-add-adversary">+ Add as Adversary</button>
@@ -276,34 +424,111 @@ export async function render(el) {
         </div>
     `;
 
+    loadStoryBeatsBank();
     await loadBestiaryData();
     await loadWikiData();
+    populateFilterOptions();
     renderBestiaryList();
     renderCategories();
+    renderStoryBeatsPanel();
     attachEvents();
 }
 
 // ============================================================
-// RENDER LIST
+// STORY BEAT PANEL
 // ============================================================
 
-function renderBestiaryList(filter = '') {
+function renderStoryBeatsPanel() {
+    const bankInput = document.getElementById('sb-bank-input');
+    if (bankInput) bankInput.value = gmStoryBeats;
+
+    const movesList = document.getElementById('sb-moves-list');
+    if (!movesList) return;
+
+    movesList.innerHTML = DEFAULT_SB_MOVES.map(formatSBMove).join('');
+
+    movesList.querySelectorAll('.sb-spend-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const cost = parseInt(btn.dataset.cost, 10);
+            const label = btn.dataset.label;
+            spendStoryBeats(cost, label);
+        });
+    });
+}
+
+// ============================================================
+// POPULATE FILTER DROPDOWNS
+// ============================================================
+
+function populateFilterOptions() {
+    const natures = [...new Set(bestiaryData.map(e => e.nature).filter(Boolean))];
+    const regions = [...new Set(bestiaryData.flatMap(e => e.connections || []).filter(Boolean))];
+
+    const natureSelect = document.getElementById('bestiary-filter-nature');
+    if (natureSelect) {
+        natureSelect.innerHTML = '<option value="all">All Natures</option>' +
+            natures.map(n => `<option value="${escHtml(n)}">${escHtml(n)}</option>`).join('');
+    }
+
+    const regionSelect = document.getElementById('bestiary-filter-region');
+    if (regionSelect) {
+        regionSelect.innerHTML = '<option value="all">All Regions</option>' +
+            regions.map(r => `<option value="${escHtml(r)}">${escHtml(r)}</option>`).join('');
+    }
+}
+
+// ============================================================
+// RENDER LIST with filters
+// ============================================================
+
+function renderBestiaryList() {
     const listEl = document.getElementById('bestiary-list');
     if (!listEl) return;
 
-    const searchTerm = filter.toLowerCase().trim();
+    // Get filter values
+    const searchTerm = (document.getElementById('bestiary-search')?.value || '').toLowerCase().trim();
+    const tlFilter = document.getElementById('bestiary-filter-tl')?.value || 'all';
+    const classFilter = document.getElementById('bestiary-filter-class')?.value || 'all';
+    const natureFilter = document.getElementById('bestiary-filter-nature')?.value || 'all';
+    const regionFilter = document.getElementById('bestiary-filter-region')?.value || 'all';
+
     const filteredData = bestiaryData.filter(entry => {
         const name = (entry.name || '').toLowerCase();
         const desc = (getCreatureDescription(entry) || '').toLowerCase();
         const category = (entry.category || '').toLowerCase();
-        return name.includes(searchTerm) || desc.includes(searchTerm) || category.includes(searchTerm);
+        const matchSearch = name.includes(searchTerm) || desc.includes(searchTerm) || category.includes(searchTerm);
+        if (!matchSearch) return false;
+
+        // TL
+        if (tlFilter !== 'all') {
+            const entryTl = entry.tl !== undefined ? parseInt(entry.tl, 10) : null;
+            if (entryTl !== parseInt(tlFilter, 10)) return false;
+        }
+
+        // Class
+        if (classFilter !== 'all') {
+            if ((entry.class || '').toUpperCase() !== classFilter) return false;
+        }
+
+        // Nature
+        if (natureFilter !== 'all') {
+            if ((entry.nature || '').toLowerCase() !== natureFilter.toLowerCase()) return false;
+        }
+
+        // Region
+        if (regionFilter !== 'all') {
+            const conns = (entry.connections || []).map(c => c.toLowerCase());
+            if (!conns.some(c => c.includes(regionFilter.toLowerCase()))) return false;
+        }
+
+        return true;
     });
 
     if (filteredData.length === 0) {
         listEl.innerHTML = `
             <div style="text-align:center;padding:2rem;color:var(--text3);">
                 <div style="font-size:2rem;margin-bottom:0.5rem;">🦴</div>
-                <div>${bestiaryData.length === 0 ? 'No bestiary data loaded.' : 'No creatures match your search.'}</div>
+                <div>${bestiaryData.length === 0 ? 'No bestiary data loaded.' : 'No creatures match your filters.'}</div>
             </div>
         `;
         return;
@@ -315,7 +540,8 @@ function renderBestiaryList(filter = '') {
         const categoryBadge = entry.category
             ? `<span class="badge badge-${getCategoryBadgeColor(entry.category)}" style="font-size:0.65rem;">${escHtml(entry.category)}</span>`
             : '';
-        const tier = entry.tier ? `TL ${entry.tier}` : '';
+        const tlDisplay = entry.tl ? `TL ${entry.tl}` : '';
+        const classDisplay = entry.class ? `Class ${entry.class}` : '';
         const description = getCreatureDescription(entry);
 
         return `
@@ -336,7 +562,9 @@ function renderBestiaryList(filter = '') {
                     <div style="font-weight:600;display:flex;align-items:center;gap:0.4rem;flex-wrap:wrap;">
                         ${escHtml(name)}
                         ${categoryBadge}
-                        ${tier ? `<span style="font-size:0.7rem;color:var(--text2);background:var(--bg2);padding:0.05rem 0.4rem;border-radius:12px;">${tier}</span>` : ''}
+                        ${tlDisplay ? `<span style="font-size:0.7rem;color:var(--text2);background:var(--bg2);padding:0.05rem 0.4rem;border-radius:12px;">${tlDisplay}</span>` : ''}
+                        ${classDisplay ? `<span style="font-size:0.7rem;color:var(--text2);background:var(--bg2);padding:0.05rem 0.4rem;border-radius:12px;">${classDisplay}</span>` : ''}
+                        ${entry.nature ? `<span style="font-size:0.65rem;color:var(--text3);">${escHtml(entry.nature)}</span>` : ''}
                     </div>
                     <div style="font-size:0.8rem;color:var(--text2);">
                         ${description ? escHtml(description.slice(0, 100)) + (description.length > 100 ? '…' : '') : ''}
@@ -345,7 +573,6 @@ function renderBestiaryList(filter = '') {
                 <div style="display:flex;gap:0.3rem;flex-wrap:wrap;">
                     <button class="btn btn-xs btn-primary bestiary-detail" data-name="${escHtml(safeName)}" title="Details">📄</button>
                     <button class="btn btn-xs btn-gold bestiary-add-adversary" data-name="${escHtml(safeName)}" title="Add as Adversary">⚔️</button>
-                    <!-- 👇 NEW: Open Combat Tracker button -->
                     <button class="btn btn-xs btn-gold bestiary-open-tracker" data-name="${escHtml(safeName)}" title="Open Combat Tracker">🎯</button>
                 </div>
             </div>
@@ -372,7 +599,6 @@ function renderBestiaryList(filter = '') {
         });
     });
 
-    // 👇 NEW: Open Tracker from list
     listEl.querySelectorAll('.bestiary-open-tracker').forEach(btn => {
         btn.addEventListener('click', (e) => {
             e.stopPropagation();
@@ -444,15 +670,15 @@ function renderCategories() {
             const cat = pill.dataset.category;
             const searchInput = document.getElementById('bestiary-search');
             if (searchInput) {
-                searchInput.value = `category:${cat}`;
-                renderBestiaryList(searchInput.value);
+                searchInput.value = cat;
+                renderBestiaryList();
             }
         });
     });
 }
 
 // ============================================================
-// DETAIL VIEW (modal)
+// DETAIL VIEW (modal) – now shows all new fields + SB moves
 // ============================================================
 
 function showCreatureDetail(entry) {
@@ -460,6 +686,7 @@ function showCreatureDetail(entry) {
     const wikiEntry = wikiData[name] || wikiData[name.toLowerCase()] || null;
     const wikiLink = wikiEntry ? `<div style="margin-top:0.5rem;"><strong>Wiki:</strong> <a href="#" onclick="window.openWiki('${encodeURIComponent(name)}')">${escHtml(name)}</a></div>` : '';
 
+    // Build sections
     let statsHtml = '';
     if (entry.stats && typeof entry.stats === 'object') {
         statsHtml = '<div style="display:grid;grid-template-columns:1fr 1fr;gap:0.3rem;font-size:0.85rem;">';
@@ -470,14 +697,41 @@ function showCreatureDetail(entry) {
     }
 
     let extraHtml = '';
-    if (Array.isArray(entry.locations) && entry.locations.length > 0) {
+    if (entry.locations && entry.locations.length > 0) {
         extraHtml += `<div style="margin-top:0.5rem;"><strong>Locations:</strong> ${entry.locations.map(l => escHtml(l)).join(', ')}</div>`;
     }
-    if (Array.isArray(entry.connections) && entry.connections.length > 0) {
+    if (entry.connections && entry.connections.length > 0) {
         extraHtml += `<div style="margin-top:0.3rem;"><strong>Connections:</strong> ${entry.connections.map(c => escHtml(c)).join(', ')}</div>`;
+    }
+    if (entry.signs && entry.signs.length > 0) {
+        extraHtml += `<div style="margin-top:0.3rem;"><strong>Signs:</strong> ${entry.signs.map(s => escHtml(s)).join(', ')}</div>`;
+    }
+
+    // Summoner-specific info
+    let summonerHtml = '';
+    if (entry.nature || entry.services || entry.price) {
+        summonerHtml = `<div style="margin-top:0.5rem;border-top:1px solid var(--border);padding-top:0.5rem;">
+            <h4 style="margin:0 0 0.3rem 0;color:var(--gold);">🔮 Summoner Notes</h4>`;
+        if (entry.nature) summonerHtml += `<div><strong>Nature:</strong> ${escHtml(entry.nature)}</div>`;
+        if (entry.services && entry.services.length > 0) {
+            summonerHtml += `<div><strong>Services:</strong> ${entry.services.map(s => escHtml(s)).join(', ')}</div>`;
+        }
+        if (entry.price) summonerHtml += `<div><strong>Price:</strong> ${escHtml(entry.price)}</div>`;
+        summonerHtml += `</div>`;
+    }
+
+    // Story Beat moves for this creature
+    let sbMovesHtml = '';
+    if (entry.sb_spends && Array.isArray(entry.sb_spends) && entry.sb_spends.length > 0) {
+        sbMovesHtml = entry.sb_spends.map(formatSBMove).join('');
+    } else {
+        sbMovesHtml = `<p style="font-size:0.8rem;color:var(--text3);margin:0 0 0.4rem 0;">
+            No specific Story Beat moves recorded yet. Use the default SB menu in the sidebar.
+        </p>` + DEFAULT_SB_MOVES.map(formatSBMove).join('');
     }
 
     const description = getCreatureDescription(entry);
+    const lore = entry.lore ? formatText(entry.lore) : '';
 
     const overlay = document.createElement('div');
     overlay.style.cssText = `
@@ -499,19 +753,25 @@ function showCreatureDetail(entry) {
             animation:scaleIn 0.2s ease-out;
         ">
             <button class="modal-close" style="position:absolute;top:0.5rem;right:0.5rem;background:transparent;border:none;font-size:1.5rem;cursor:pointer;color:var(--text2);">&times;</button>
-            <h2 style="margin-top:0;color:var(--gold);display:flex;gap:0.5rem;align-items:center;">
+            <h2 style="margin-top:0;color:var(--gold);display:flex;gap:0.5rem;align-items:center;flex-wrap:wrap;">
                 ${escHtml(name)}
-                ${entry.tier ? `<span style="font-size:0.7rem;color:var(--text2);background:var(--bg2);padding:0.05rem 0.5rem;border-radius:12px;">TL ${entry.tier}</span>` : ''}
+                ${entry.tl ? `<span style="font-size:0.7rem;color:var(--text2);background:var(--bg2);padding:0.05rem 0.5rem;border-radius:12px;">TL ${entry.tl}</span>` : ''}
+                ${entry.class ? `<span style="font-size:0.7rem;color:var(--text2);background:var(--bg2);padding:0.05rem 0.5rem;border-radius:12px;">Class ${entry.class}</span>` : ''}
             </h2>
             ${entry.category ? `<span class="badge badge-${getCategoryBadgeColor(entry.category)}" style="margin-bottom:0.5rem;">${escHtml(entry.category)}</span>` : ''}
             ${description ? `<div style="margin:0.5rem 0;line-height:1.5;">${escHtml(description)}</div>` : ''}
+            ${lore ? `<div style="margin:0.5rem 0;line-height:1.5;background:var(--bg2);padding:0.5rem;border-radius:var(--radius-sm);border-left:3px solid var(--gold);"><strong>Lore:</strong> ${lore}</div>` : ''}
             ${statsHtml}
             ${extraHtml}
+            ${summonerHtml}
             ${wikiLink}
+            <div style="margin-top:0.6rem;border-top:1px solid var(--border);padding-top:0.6rem;">
+                <h4 style="margin:0 0 0.4rem 0;color:var(--danger);">⚡ Story Beat Moves</h4>
+                ${sbMovesHtml}
+            </div>
             <div style="margin-top:1rem;display:flex;gap:0.5rem;flex-wrap:wrap;">
                 <button class="btn btn-sm btn-gold add-adversary-from-detail" data-name="${escHtml(name)}">⚔️ Add as Adversary</button>
                 <button class="btn btn-sm btn-primary add-encounter-from-detail" data-name="${escHtml(name)}">📋 Add to Encounter</button>
-                <!-- 👇 NEW: Open Tracker from detail -->
                 <button class="btn btn-sm btn-gold open-tracker-from-detail" data-name="${escHtml(name)}">🎯 Open Tracker</button>
             </div>
         </div>
@@ -531,10 +791,17 @@ function showCreatureDetail(entry) {
         overlay.remove();
     });
 
-    // 👇 NEW: Open Tracker from detail
     overlay.querySelector('.open-tracker-from-detail').addEventListener('click', () => {
         openTrackerForCreature(entry);
         overlay.remove();
+    });
+
+    overlay.querySelectorAll('.sb-spend-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const cost = parseInt(btn.dataset.cost, 10);
+            const label = btn.dataset.label;
+            spendStoryBeats(cost, `${name}: ${label}`);
+        });
     });
 }
 
@@ -561,7 +828,7 @@ export function addCreatureAsAdversary(entry) {
             id: 'enc-' + Date.now() + '-' + Math.random().toString(36).substr(2, 4),
             title: `Encounter with ${entry.name}`,
             body: description || '',
-            difficulty: entry.tier || 2,
+            difficulty: entry.tl || 2,
             location: '',
             status: 'draft',
             adversaries: [],
@@ -572,11 +839,24 @@ export function addCreatureAsAdversary(entry) {
     }
     const exists = targetEncounter.adversaries.some(a => a.name.toLowerCase() === entry.name.toLowerCase());
     if (!exists) {
+        // Create adversary with default stats if none provided
+        const stats = entry.stats ? { ...entry.stats } : {};
+        // If no stats, infer from TL: HP = TL * 10 + 10, other stats default
+        if (!stats.hp && entry.tl) {
+            stats.hp = entry.tl * 10 + 10;
+        }
+        if (!stats.hp) stats.hp = 20;
         targetEncounter.adversaries.push({
             name: entry.name,
             body: description || '',
-            tier: entry.tier || 2,
-            stats: entry.stats || {}
+            tier: entry.tl || 2,
+            stats: stats,
+            // Store other fields for reference
+            _original: {
+                tl: entry.tl,
+                class: entry.class,
+                nature: entry.nature
+            }
         });
         saveState();
         showToast(`⚔️ Added "${entry.name}" as adversary.`, 'success');
@@ -601,14 +881,14 @@ function addCreatureToEncounter(entry) {
         id: 'enc-' + Date.now() + '-' + Math.random().toString(36).substr(2, 4),
         title: `${entry.name} Encounter`,
         body: description || '',
-        difficulty: entry.tier || 2,
+        difficulty: entry.tl || 2,
         location: '',
         status: 'draft',
         adversaries: [{
             name: entry.name,
             body: description || '',
-            tier: entry.tier || 2,
-            stats: entry.stats || {}
+            tier: entry.tl || 2,
+            stats: entry.stats || { hp: (entry.tl || 2) * 10 + 10 }
         }],
         created: Date.now()
     };
@@ -621,11 +901,11 @@ function addCreatureToEncounter(entry) {
     } catch (e) { /* ignore */ }
 }
 
-// 👇 NEW: Function to add creature and open tracker
+// 👇 Function to add creature and open tracker
 function openTrackerForCreature(entry) {
-    // First ensure it's added as adversary (creates/uses encounter)
+    // Ensure added as adversary
     addCreatureAsAdversary(entry);
-    // Now find the encounter we just added to (or the active one)
+    // Find the encounter we just added to
     const state = getState();
     const encounter = state.encounters.find(e => e.status === 'active') || state.encounters[state.encounters.length - 1];
     if (encounter) {
@@ -642,10 +922,22 @@ function openTrackerForCreature(entry) {
 function attachEvents() {
     const search = document.getElementById('bestiary-search');
     if (search) {
-        search.addEventListener('input', (e) => {
-            renderBestiaryList(e.target.value);
-        });
+        search.addEventListener('input', () => renderBestiaryList());
     }
+
+    // Filter dropdowns
+    ['bestiary-filter-tl', 'bestiary-filter-class', 'bestiary-filter-nature', 'bestiary-filter-region'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.addEventListener('change', () => renderBestiaryList());
+    });
+
+    document.getElementById('bestiary-clear-filters')?.addEventListener('click', () => {
+        document.getElementById('bestiary-filter-tl').value = 'all';
+        document.getElementById('bestiary-filter-class').value = 'all';
+        document.getElementById('bestiary-filter-nature').value = 'all';
+        document.getElementById('bestiary-filter-region').value = 'all';
+        renderBestiaryList();
+    });
 
     const refresh = document.getElementById('bestiary-refresh');
     if (refresh) {
@@ -653,7 +945,8 @@ function attachEvents() {
             sessionStorage.removeItem(CACHE_KEY);
             await loadBestiaryData();
             await loadWikiData();
-            renderBestiaryList(document.getElementById('bestiary-search')?.value || '');
+            populateFilterOptions();
+            renderBestiaryList();
             renderCategories();
             showToast('Bestiary refreshed.', 'info');
         });
@@ -685,6 +978,26 @@ function attachEvents() {
             }
         });
     }
+
+    // Story Beat bank controls
+    const sbMinus = document.getElementById('sb-minus');
+    const sbPlus = document.getElementById('sb-plus');
+    const sbInput = document.getElementById('sb-bank-input');
+
+    if (sbMinus) {
+        sbMinus.addEventListener('click', () => adjustStoryBeats(-1));
+    }
+    if (sbPlus) {
+        sbPlus.addEventListener('click', () => adjustStoryBeats(1));
+    }
+    if (sbInput) {
+        sbInput.addEventListener('change', () => {
+            const val = parseInt(sbInput.value, 10);
+            gmStoryBeats = isNaN(val) ? 0 : Math.max(0, val);
+            saveStoryBeatsBank();
+            renderStoryBeatsPanel();
+        });
+    }
 }
 
 // ============================================================
@@ -699,6 +1012,15 @@ export function destroy() {
 // EXPORTS
 // ============================================================
 
+export {
+    gmStoryBeats,
+    adjustStoryBeats,
+    spendStoryBeats,
+    saveStoryBeatsBank,
+    loadStoryBeatsBank,
+    DEFAULT_SB_MOVES
+};
+
 export default {
     render,
     destroy,
@@ -706,5 +1028,5 @@ export default {
     loadBestiaryData,
     loadWikiData,
     addCreatureAsAdversary,
-    getCreatureDescription // export for other modules
+    getCreatureDescription
 };

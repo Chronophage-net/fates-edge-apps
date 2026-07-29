@@ -1,8 +1,10 @@
 /**
  * Encounters feature - Manage combat and social encounters
- * Includes quick reference from The Witnessed Prey
  * ✅ Integrated with Bestiary (panel below encounter list, left column)
- * ✅ One‑click "Open Tracker" from bestiary entries
+ * ✅ Reads TL 1-10, Class I-X, sb_spends
+ * ✅ Shared GM Story Beat bank with Bestiary
+ * ✅ One-click "Open Tracker" from bestiary entries
+ * ✅ Creature detail modal with SB spends
  */
 
 import { getState, saveState } from '../../core/state.js';
@@ -13,15 +15,62 @@ import {
     loadBestiaryData, 
     loadWikiData, 
     addCreatureAsAdversary,
-    getCreatureDescription   // 👈 new import for proper description handling
+    getCreatureDescription
 } from './bestiary.js';
-import { openTracker } from './combat.js'; // 👈 named export
+import { openTracker } from './combat.js';
 
 let container = null;
 let bestiaryData = [];
 let filteredBestiary = [];
 
-// Quick reference data (unchanged)
+// ============================================================
+// SHARED STORY BEAT BANK (same key as bestiary.js)
+// ============================================================
+
+const SB_BANK_KEY = 'fates-edge-gm-sb-bank';
+let gmStoryBeats = 0;
+
+function loadStoryBeatsBank() {
+    try {
+        const stored = localStorage.getItem(SB_BANK_KEY);
+        gmStoryBeats = stored ? Math.max(0, parseInt(stored, 10)) : 0;
+    } catch (_) {
+        gmStoryBeats = 0;
+    }
+}
+
+function saveStoryBeatsBank() {
+    try {
+        localStorage.setItem(SB_BANK_KEY, String(gmStoryBeats));
+    } catch (_) {}
+}
+
+function adjustStoryBeats(delta) {
+    gmStoryBeats = Math.max(0, gmStoryBeats + delta);
+    saveStoryBeatsBank();
+    renderSBBank();
+}
+
+function spendStoryBeats(cost, label) {
+    if (gmStoryBeats < cost) {
+        showToast(`Need ${cost} SB; only ${gmStoryBeats} available.`, 'warning');
+        return false;
+    }
+    gmStoryBeats -= cost;
+    saveStoryBeatsBank();
+    renderSBBank();
+    try {
+        logToSession(`💥 SB spent (${cost}): ${label}`, 'danger');
+        addVTTEvent('sb_spent', { cost, label });
+    } catch (e) { /* ignore */ }
+    showToast(`Spent ${cost} SB — ${label}`, 'success');
+    return true;
+}
+
+// ============================================================
+// QUICK REFERENCE DATA
+// ============================================================
+
 const QUICK_ADVERSARIES = [
     { name: 'Goblin Scavenger', body: 'Small, green, greedy. TL1. Harm 3.' },
     { name: 'Skeleton Knight', body: 'Animated armour, rusty blade. TL2. Harm 4.' },
@@ -53,16 +102,237 @@ export async function render(el) {
     // Load bestiary data
     try {
         bestiaryData = await loadBestiaryData();
-        await loadWikiData(); // optional
+        console.log(`[Encounters] Loaded ${bestiaryData.length} bestiary entries`);
+        await loadWikiData();
     } catch (e) {
         console.warn('Bestiary data not available:', e);
         bestiaryData = [];
     }
     filteredBestiary = bestiaryData;
+    loadStoryBeatsBank();
 
     container.innerHTML = `
+        <style>
+            .encounters-layout { padding: 1rem; }
+            .encounters-header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1rem; }
+            
+            /* Main grid: left column 2fr, right column 1fr */
+            .encounters-grid {
+                display: grid;
+                grid-template-columns: 2fr 1fr;
+                gap: 1.25rem;
+                align-items: start;
+                min-height: 70vh;
+            }
+            @media (max-width: 768px) {
+                .encounters-grid {
+                    grid-template-columns: 1fr;
+                    gap: 1rem;
+                }
+            }
+
+            /* Left column – stacked vertically */
+            .left-column {
+                display: flex;
+                flex-direction: column;
+                gap: 1rem;
+                height: 100%;
+            }
+            /* Saved Encounters takes auto height */
+            .saved-encounters {
+                flex-shrink: 0;
+            }
+            /* Bestiary panel takes remaining height */
+            .bestiary-panel-wrapper {
+                flex: 1;
+                display: flex;
+                flex-direction: column;
+                min-height: 300px; /* fallback */
+            }
+            .bestiary-panel-wrapper .panel {
+                flex: 1;
+                display: flex;
+                flex-direction: column;
+                overflow: hidden;
+            }
+            .bestiary-panel-wrapper .bestiary-list-container {
+                flex: 1;
+                overflow-y: auto;
+                padding-right: 0.25rem;
+            }
+
+            /* Right column – stacked panels */
+            .right-column {
+                display: flex;
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .panel {
+                background: var(--bg-panel);
+                border: 1px solid var(--border);
+                border-radius: var(--radius);
+                padding: 0.8rem;
+            }
+            .panel h4 {
+                margin: 0 0 0.3rem 0;
+                font-size: 1rem;
+            }
+
+            .encounter-item {
+                display: flex;
+                flex-wrap: wrap;
+                align-items: center;
+                justify-content: space-between;
+                padding: 0.6rem 0.9rem;
+                background: var(--bg3);
+                border-radius: var(--radius);
+                border: 1px solid var(--border);
+                margin-bottom: 0.45rem;
+                transition: border-color 0.2s, background 0.2s;
+            }
+            .encounter-item:hover {
+                border-color: var(--gold);
+                background: var(--bg2);
+            }
+            .encounter-item.active {
+                border-left: 4px solid var(--green);
+            }
+
+            .bestiary-filters {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 0.2rem;
+                margin-bottom: 0.4rem;
+                align-items: center;
+            }
+            .bestiary-list {
+                display: flex;
+                flex-direction: column;
+                gap: 0.35rem;
+                font-size: 0.8rem;
+            }
+            .bestiary-entry {
+                display: grid;
+                grid-template-columns: 1fr auto;
+                gap: 0.4rem;
+                align-items: center;
+                background: var(--bg3);
+                border: 1px solid var(--border);
+                border-radius: var(--radius-sm);
+                padding: 0.45rem 0.6rem;
+                transition: border-color 0.2s, background 0.2s;
+            }
+            .bestiary-entry:hover {
+                border-color: var(--gold);
+                background: var(--bg2);
+            }
+            .bestiary-entry .entry-main {
+                display: flex;
+                flex-wrap: wrap;
+                align-items: center;
+                gap: 0.35rem;
+                min-width: 0;
+            }
+            .bestiary-entry .entry-actions {
+                display: flex;
+                gap: 0.25rem;
+            }
+
+            .sb-bank-display {
+                display: flex;
+                align-items: center;
+                gap: 0.4rem;
+                margin-bottom: 0.3rem;
+            }
+            .sb-bank-display input {
+                width: 50px;
+                text-align: center;
+                font-size: 0.8rem;
+                background: var(--bg2);
+                border: 1px solid var(--border);
+                border-radius: 4px;
+                padding: 0.15rem;
+            }
+            .sb-move-card {
+                background: var(--bg2);
+                border: 1px solid var(--border);
+                border-radius: var(--radius-sm);
+                padding: 0.3rem 0.5rem;
+                margin-bottom: 0.3rem;
+                font-size: 0.75rem;
+            }
+            .sb-move-card .cost {
+                color: var(--danger);
+                font-weight: 700;
+            }
+            .creature-tag {
+                font-size: 0.65rem;
+                padding: 0.05rem 0.35rem;
+                border-radius: 12px;
+                background: var(--bg2);
+                color: var(--text2);
+                white-space: nowrap;
+            }
+            .tl-badge {
+                background: var(--danger-soft, var(--bg2));
+                color: var(--danger);
+            }
+            .class-badge {
+                background: var(--accent-soft, var(--bg2));
+                color: var(--accent);
+            }
+            .scale-table {
+                font-size: 0.7rem;
+                display: grid;
+                grid-template-columns: 0.6fr 1.4fr 0.8fr;
+                gap: 0.1rem 0.3rem;
+            }
+            .scale-table > div {
+                padding: 0.1rem 0.2rem;
+                border-bottom: 1px solid var(--border);
+            }
+
+            /* Quick adversary clickable */
+            .quick-adversary {
+                background: var(--bg3);
+                padding: 0.35rem 0.55rem;
+                border-radius: 4px;
+                margin-bottom: 0.3rem;
+                border-left: 3px solid var(--gold);
+                cursor: pointer;
+                transition: background 0.15s;
+            }
+            .quick-adversary:hover {
+                background: var(--bg2);
+            }
+
+            .btn { transition: all 0.2s ease; }
+            .btn:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
+            .btn:active { transform: scale(0.96); }
+
+            /* Scrollbars */
+            .bestiary-list-container::-webkit-scrollbar,
+            #encounter-list::-webkit-scrollbar,
+            .right-column .panel > div:last-child::-webkit-scrollbar {
+                width: 6px;
+            }
+            .bestiary-list-container::-webkit-scrollbar-track,
+            #encounter-list::-webkit-scrollbar-track,
+            .right-column .panel > div:last-child::-webkit-scrollbar-track {
+                background: var(--bg3);
+                border-radius: 3px;
+            }
+            .bestiary-list-container::-webkit-scrollbar-thumb,
+            #encounter-list::-webkit-scrollbar-thumb,
+            .right-column .panel > div:last-child::-webkit-scrollbar-thumb {
+                background: var(--border);
+                border-radius: 3px;
+            }
+        </style>
+
         <div class="encounters-layout">
-            <header class="encounters-header" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.5rem;margin-bottom:1rem;">
+            <header class="encounters-header">
                 <div>
                     <h1 class="page-title" style="margin:0;">⚔️ Encounters</h1>
                     <p class="page-sub" style="margin:0.2rem 0 0;">Build encounters, track combat, and reference adversaries.</p>
@@ -70,61 +340,81 @@ export async function render(el) {
                 <button class="btn btn-gold" id="add-encounter-btn">+ New Encounter</button>
             </header>
 
-            <!-- Main grid: left column (encounters + bestiary) | right column (quick refs) -->
-            <div class="encounters-grid" style="display:grid;grid-template-columns:2fr 1fr;gap:1.5rem;align-items:start;">
-                <!-- Left Column -->
-                <div class="encounters-left" style="display:flex;flex-direction:column;gap:1rem;">
+            <div class="encounters-grid">
+                <!-- LEFT COLUMN -->
+                <div class="left-column">
                     <!-- Saved Encounters -->
-                    <div class="panel">
-                        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.5rem;margin-bottom:0.5rem;">
-                            <h3 style="margin:0;">📋 Saved Encounters</h3>
-                            <div style="display:flex;gap:0.3rem;">
-                                <input type="text" id="encounter-search" placeholder="🔍 Search…" style="font-size:0.8rem;padding:0.2rem 0.5rem;" />
+                    <div class="saved-encounters panel">
+                        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.5rem; margin-bottom:0.8rem;">
+                            <div style="display:flex; align-items:center; gap:0.5rem; flex-wrap:wrap;">
+                                <h4 style="margin:0;">📋 Saved Encounters</h4>
+                                <input type="text" id="encounter-search" placeholder="🔍 Search…" style="font-size:0.8rem; padding:0.25rem 0.5rem; width:160px;" />
                             </div>
                         </div>
-                        <div id="encounter-list"></div>
+                        <div id="encounter-list" style="max-height:40vh; overflow-y:auto; padding-right:0.25rem;"></div>
                     </div>
 
-                    <!-- Bestiary (full width below encounters) -->
-                    <div class="panel bestiary-panel">
-                        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.5rem;margin-bottom:0.5rem;">
-                            <h3 style="margin:0;">📖 Bestiary</h3>
-                            <div style="display:flex;gap:0.3rem;">
-                                <input type="text" id="bestiary-search" placeholder="🔍 Search creatures…" style="font-size:0.8rem;padding:0.2rem 0.5rem;" />
-                                <button class="btn btn-sm btn-ghost" id="bestiary-refresh" title="Refresh data">↻</button>
+                    <!-- Bestiary Panel (large, takes remaining height) -->
+                    <div class="bestiary-panel-wrapper">
+                        <div class="panel">
+                            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.3rem; margin-bottom:0.5rem;">
+                                <h4 style="margin:0;">📖 Bestiary</h4>
+                                <div style="display:flex; gap:0.3rem; align-items:center;">
+                                    <input type="text" id="bestiary-search" placeholder="Search…" style="font-size:0.75rem; padding:0.15rem 0.4rem; width:100px;" />
+                                    <select id="bestiary-filter-tl" style="font-size:0.7rem; padding:0.1rem 0.2rem;">
+                                        <option value="all">TL</option>
+                                        ${[1,2,3,4,5,6,7,8,9,10].map(n => `<option value="${n}">${n}</option>`).join('')}
+                                    </select>
+                                    <button class="btn btn-sm btn-ghost" id="bestiary-refresh" style="font-size:0.7rem; padding:0.1rem 0.4rem;">↻</button>
+                                </div>
+                            </div>
+                            <div class="bestiary-filters">
+                                <span style="font-size:0.65rem; color:var(--text3);">Class:</span>
+                                <div id="bestiary-class-filters" style="display:flex; flex-wrap:wrap; gap:0.15rem;">
+                                    ${['I','II','III','IV','V','VI','VII','VIII','IX','X'].map(c => `
+                                        <button class="btn btn-xs class-filter-btn ${c === 'all' ? 'btn-primary' : 'btn-ghost'}" data-class="${c}" style="font-size:0.6rem; padding:0.05rem 0.3rem;">${c}</button>
+                                    `).join('')}
+                                </div>
+                            </div>
+                            <div class="bestiary-list-container">
+                                <div id="bestiary-list" class="bestiary-list"></div>
                             </div>
                         </div>
-                        <div id="bestiary-list" style="max-height:300px;overflow-y:auto;display:flex;flex-wrap:wrap;gap:0.3rem;padding:0.2rem 0;"></div>
                     </div>
                 </div>
 
-                <!-- Right Column: Quick Reference (unchanged) -->
-                <div class="encounters-sidebar" style="display:flex;flex-direction:column;gap:0.8rem;">
+                <!-- RIGHT COLUMN -->
+                <div class="right-column">
                     <!-- Quick Adversaries -->
                     <div class="panel">
-                        <h3 style="margin-top:0;">🃏 Quick Adversaries</h3>
-                        <div id="quick-adversaries" style="font-size:0.85rem;max-height:300px;overflow-y:auto;"></div>
+                        <h4>🃏 Quick Adversaries</h4>
+                        <div id="quick-adversaries" style="font-size:0.75rem; max-height:200px; overflow-y:auto; margin-top:0.3rem;"></div>
                     </div>
-                    <!-- Adversary Moves -->
+
+                    <!-- GM SB Bank -->
                     <div class="panel">
-                        <h3 style="margin-top:0;">🎯 Adversary Moves (SB Costs)</h3>
-                        <div id="adversary-moves" style="font-size:0.8rem;max-height:200px;overflow-y:auto;display:grid;grid-template-columns:1fr 1fr;gap:0.2rem 0.5rem;"></div>
+                        <h4>⚡ GM SB Bank</h4>
+                        <div class="sb-bank-display">
+                            <span style="font-size:0.8rem; color:var(--text2);">Bank:</span>
+                            <button class="btn btn-xs btn-ghost" id="sb-minus" style="font-weight:bold;">−</button>
+                            <input type="number" id="sb-bank-input" value="${gmStoryBeats}" min="0" />
+                            <button class="btn btn-xs btn-ghost" id="sb-plus" style="font-weight:bold;">+</button>
+                        </div>
+                        <div id="sb-default-moves" style="max-height:120px; overflow-y:auto; font-size:0.75rem; margin-top:0.3rem;"></div>
                     </div>
-                    <!-- Quick Timers -->
+
+                    <!-- Threat Scale -->
                     <div class="panel">
-                        <h3 style="margin-top:0;">⏱️ Quick Timers</h3>
-                        <div id="quick-timers" style="font-size:0.8rem;"></div>
-                    </div>
-                    <!-- Threat Level Scaling -->
-                    <div class="panel">
-                        <h3 style="margin-top:0;">📊 Threat Level Scaling</h3>
-                        <div style="font-size:0.75rem;display:grid;grid-template-columns:1fr 1fr 1fr;gap:0.1rem;">
-                            <div><strong>TL</strong></div><div><strong>Use</strong></div><div><strong>Bonus</strong></div>
-                            <div>0</div><div>Flavor</div><div>-1</div>
-                            <div>1</div><div>Minion</div><div>+0</div>
-                            <div>2</div><div>Elite</div><div>+1</div>
-                            <div>3</div><div>Mini-boss</div><div>+2</div>
-                            <div>4+</div><div>Major Boss</div><div>+3</div>
+                        <h4>📊 Threat Scale</h4>
+                        <div class="scale-table" style="margin-top:0.3rem;">
+                            <div><strong>TL</strong></div><div><strong>Role</strong></div><div><strong>HP</strong></div>
+                            <div>1</div><div>Fodder / pest</div><div>20</div>
+                            <div>2</div><div>Common threat</div><div>30</div>
+                            <div>3</div><div>Drop unarmored PC</div><div>40</div>
+                            <div>4</div><div>Elite / captain</div><div>50</div>
+                            <div>5–6</div><div>Miniboss / Boss</div><div>60–70</div>
+                            <div>7–8</div><div>Arch / named horror</div><div>80–90</div>
+                            <div>9–10</div><div>Cosmic / god-adjacent</div><div>100+</div>
                         </div>
                     </div>
                 </div>
@@ -135,19 +425,60 @@ export async function render(el) {
     renderQuickReference();
     renderEncounters();
     renderBestiary();
+    renderSBBank();
+    renderDefaultSBMoves();
     attachEvents();
 }
 
 // ============================================================
-// RENDER QUICK REFERENCE (unchanged)
+// STORY BEAT BANK RENDER
+// ============================================================
+
+function renderSBBank() {
+    const input = document.getElementById('sb-bank-input');
+    if (input) input.value = gmStoryBeats;
+}
+
+function renderDefaultSBMoves() {
+    const el = document.getElementById('sb-default-moves');
+    if (!el) return;
+    
+    const moves = [
+        { cost: 1, name: 'Minor complication', effect: 'Tick a timer, leave a trace, or make a noise.' },
+        { cost: 2, name: 'Moderate complication', effect: 'Alarm raised, lose Position, lesser foe appears.' },
+        { cost: 3, name: 'Major complication', effect: 'Reinforcements, scene shift, or break an asset.' }
+    ];
+    
+    el.innerHTML = moves.map(m => `
+        <div class="sb-move-card">
+            <div style="display:flex;justify-content:space-between;align-items:center;gap:0.4rem;">
+                <strong>${escHtml(m.name)}</strong>
+                <button class="btn btn-xs btn-danger sb-spend-btn" data-cost="${m.cost}" data-label="${escHtml(m.name)}" style="font-size:0.65rem;">
+                    ${m.cost} SB
+                </button>
+            </div>
+            <div style="color:var(--text2);margin-top:0.15rem;">${escHtml(m.effect)}</div>
+        </div>
+    `).join('');
+    
+    el.querySelectorAll('.sb-spend-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const cost = parseInt(btn.dataset.cost, 10);
+            const label = btn.dataset.label;
+            spendStoryBeats(cost, label);
+        });
+    });
+}
+
+// ============================================================
+// RENDER QUICK REFERENCE
 // ============================================================
 
 function renderQuickReference() {
-    // Adversaries
     const advEl = document.getElementById('quick-adversaries');
     if (advEl) {
         advEl.innerHTML = QUICK_ADVERSARIES.map(a => `
-            <div style="background:var(--bg3);padding:0.3rem 0.5rem;border-radius:4px;margin-bottom:0.3rem;border-left:3px solid var(--gold);cursor:pointer;" class="quick-adversary" data-name="${escHtml(a.name)}" data-body="${escHtml(a.body)}">
+            <div class="quick-adversary" data-name="${escHtml(a.name)}" data-body="${escHtml(a.body)}">
                 <div style="font-weight:600;font-size:0.85rem;">${escHtml(a.name)}</div>
                 <div style="font-size:0.75rem;color:var(--text2);">${escHtml(a.body)}</div>
             </div>
@@ -155,39 +486,14 @@ function renderQuickReference() {
         
         advEl.querySelectorAll('.quick-adversary').forEach(el => {
             el.addEventListener('click', () => {
-                const name = el.dataset.name;
-                const body = el.dataset.body;
-                createEncounterFromAdversary(name, body);
+                createEncounterFromAdversary(el.dataset.name, el.dataset.body);
             });
         });
-    }
-    
-    // Adversary Moves
-    const movesEl = document.getElementById('adversary-moves');
-    if (movesEl) {
-        movesEl.innerHTML = ADVERSARY_MOVES.map(m => `
-            <div style="padding:0.1rem 0.2rem;border-bottom:1px solid var(--border);">
-                <span style="font-weight:600;color:var(--gold);">${m.cost} SB</span>
-                <span style="color:var(--text);">${escHtml(m.name)}</span>
-                <span style="font-size:0.65rem;color:var(--text3);display:block;">${escHtml(m.effect)}</span>
-            </div>
-        `).join('');
-    }
-    
-    // Quick Timers
-    const timersEl = document.getElementById('quick-timers');
-    if (timersEl) {
-        timersEl.innerHTML = QUICK_TIMERS.map(t => `
-            <div style="padding:0.15rem 0;border-bottom:1px solid var(--border);">
-                <span style="font-weight:600;color:var(--accent);">${escHtml(t.name)}</span>
-                <span style="font-size:0.7rem;color:var(--text2);display:block;">${escHtml(t.effect)}</span>
-            </div>
-        `).join('');
     }
 }
 
 // ============================================================
-// RENDER ENCOUNTERS (unchanged)
+// RENDER ENCOUNTERS
 // ============================================================
 
 function renderEncounters() {
@@ -207,7 +513,7 @@ function renderEncounters() {
     
     if (filtered.length === 0) {
         el.innerHTML = `
-            <div style="text-align:center;padding:2rem;color:var(--text3);">
+            <div style="text-align:center;padding:1.5rem;color:var(--text3);">
                 <div style="font-size:2rem;margin-bottom:0.5rem;">⚔️</div>
                 <div>${encounters.length === 0 ? 'No encounters yet. Click "New Encounter" to start.' : 'No matches found.'}</div>
             </div>
@@ -216,18 +522,31 @@ function renderEncounters() {
     }
     
     el.innerHTML = filtered.map(e => {
-        const statusColor = e.status === 'active' ? 'var(--green)' : 'var(--text2)';
-        const difficultyStars = '⭐'.repeat(Math.min(e.difficulty || 3, 5)) + '☆'.repeat(Math.max(0, 5 - (e.difficulty || 3)));
+        const isActive = e.status === 'active';
+        const statusColor = isActive ? 'var(--green)' : 'var(--text2)';
+        const activeClass = isActive ? 'active' : '';
+        const tl = e.difficulty || 3;
+        const tlBadge = `<span class="creature-tag tl-badge" title="Difficulty / TL">TL ${tl}</span>`;
+        
         return `
-            <div class="encounter-item" style="display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;padding:0.6rem 1rem;background:var(--bg3);border-radius:var(--radius);border:1px solid var(--border);margin-bottom:0.4rem;transition:border-color 0.2s;">
+            <div class="encounter-item ${activeClass}" data-id="${e.id}">
                 <div class="info" style="flex:1;min-width:150px;cursor:pointer;" onclick="window.toggleEncounterBody('${e.id}')">
-                    <div class="name" style="font-weight:600;">${escHtml(e.title)}</div>
-                    <div class="meta" style="font-size:0.8rem;color:var(--text2);">
-                        ${difficultyStars} · ${e.location || 'No location'} · <span style="color:${statusColor}">${e.status || 'draft'}</span>
+                    <div class="name" style="font-weight:600;display:flex;align-items:center;gap:0.4rem;flex-wrap:wrap;">
+                        ${escHtml(e.title)}
+                        ${tlBadge}
+                        <span style="color:${statusColor};font-size:0.75rem;">${e.status || 'draft'}</span>
                     </div>
-                    <div id="enc-body-${e.id}" style="display:none;margin-top:0.3rem;padding:0.3rem 0.5rem;background:var(--bg2);border-radius:4px;font-size:0.8rem;color:var(--text);">
-                        ${e.body || 'No description.'}
-                        ${e.adversaries && e.adversaries.length > 0 ? `<div style="margin-top:0.2rem;font-weight:600;color:var(--gold);">Adversaries: ${e.adversaries.map(a => a.name).join(', ')}</div>` : ''}
+                    <div class="meta" style="font-size:0.8rem;color:var(--text2);">
+                        ${e.location || 'No location'} · ${e.adversaries?.length || 0} adversaries
+                    </div>
+                    <div id="enc-body-${e.id}" style="display:none;margin-top:0.4rem;padding:0.4rem 0.6rem;background:var(--bg2);border-radius:4px;font-size:0.8rem;color:var(--text);border-left:3px solid var(--gold);">
+                        ${escHtml(e.body || 'No description.')}
+                        ${e.adversaries && e.adversaries.length > 0 ? `
+                            <div style="margin-top:0.35rem;">
+                                <strong style="color:var(--gold);">Adversaries:</strong>
+                                ${e.adversaries.map(a => `<span class="creature-tag">${escHtml(a.name)}</span>`).join(' ')}
+                            </div>
+                        ` : ''}
                     </div>
                 </div>
                 <div class="actions" style="display:flex;gap:0.3rem;flex-wrap:wrap;">
@@ -239,7 +558,6 @@ function renderEncounters() {
         `;
     }).join('');
     
-    // Attach event listeners
     el.querySelectorAll('.encounter-edit-btn').forEach(btn => {
         btn.addEventListener('click', (e) => {
             e.stopPropagation();
@@ -260,14 +578,13 @@ function renderEncounters() {
     });
 }
 
-// Body toggle
 window.toggleEncounterBody = function(id) {
     const el = document.getElementById('enc-body-' + id);
     if (el) el.style.display = el.style.display === 'none' ? 'block' : 'none';
 };
 
 // ============================================================
-// RENDER BESTIARY PANEL (improved)
+// RENDER BESTIARY PANEL
 // ============================================================
 
 function renderBestiary() {
@@ -275,20 +592,27 @@ function renderBestiary() {
     if (!listEl) return;
 
     const searchInput = document.getElementById('bestiary-search');
+    const tlSelect = document.getElementById('bestiary-filter-tl');
     const searchTerm = searchInput ? searchInput.value.toLowerCase().trim() : '';
-    
-    // Filter and also filter out entries without a name
+    const tlFilter = tlSelect ? tlSelect.value : 'all';
+    const activeClassBtn = document.querySelector('.class-filter-btn.active-class');
+    const classFilter = activeClassBtn ? activeClassBtn.dataset.class : 'all';
+
     filteredBestiary = bestiaryData.filter(entry => {
         const name = (entry.name || '').toLowerCase();
         const desc = (getCreatureDescription(entry) || '').toLowerCase();
         const category = (entry.category || '').toLowerCase();
-        return (name || desc || category).includes(searchTerm);
+        const matchesSearch = name.includes(searchTerm) || desc.includes(searchTerm) || category.includes(searchTerm);
+        const matchesTL = tlFilter === 'all' || parseInt(entry.tl, 10) === parseInt(tlFilter, 10);
+        const matchesClass = classFilter === 'all' || (entry.class || '').toUpperCase() === classFilter;
+        return matchesSearch && matchesTL && matchesClass;
     });
 
     if (!bestiaryData || bestiaryData.length === 0) {
         listEl.innerHTML = `
-            <div style="text-align:center;padding:1rem;color:var(--text3);width:100%;">
-                📭 No bestiary data loaded. Check that /data/bestiary.json exists.
+            <div style="text-align:center;padding:1.5rem;color:var(--text3);">
+                <div style="font-size:1.5rem;margin-bottom:0.5rem;">📭</div>
+                <div>No bestiary data loaded.<br><small>Check that /data/bestiary.json exists.</small></div>
             </div>
         `;
         return;
@@ -296,8 +620,9 @@ function renderBestiary() {
 
     if (filteredBestiary.length === 0) {
         listEl.innerHTML = `
-            <div style="text-align:center;padding:1rem;color:var(--text3);width:100%;">
-                🔍 No creatures match your search.
+            <div style="text-align:center;padding:1.5rem;color:var(--text3);">
+                <div style="font-size:1.5rem;margin-bottom:0.5rem;">🔍</div>
+                <div>No creatures match your search or filters.</div>
             </div>
         `;
         return;
@@ -306,34 +631,38 @@ function renderBestiary() {
     listEl.innerHTML = filteredBestiary.map(entry => {
         const name = entry.name || 'Unnamed';
         const safeName = name.replace(/["']/g, '');
-        const tier = entry.tier ? `TL${entry.tier}` : '';
+        const tl = entry.tl !== undefined ? `TL ${entry.tl}` : '';
+        const cls = entry.class || '';
         const category = entry.category || '';
-        const description = getCreatureDescription(entry); // 👈 use the helper
+        const description = getCreatureDescription(entry);
 
         return `
-            <div class="bestiary-entry" data-name="${escHtml(safeName)}" style="
-                background:var(--bg3);
-                border:1px solid var(--border);
-                border-radius:var(--radius-sm);
-                padding:0.3rem 0.6rem;
-                display:flex;
-                align-items:center;
-                gap:0.4rem;
-                flex-wrap:wrap;
-                transition:border-color 0.2s;
-                cursor:default;
-            ">
-                <span style="font-weight:600;font-size:0.85rem;">${escHtml(name)}</span>
-                ${category ? `<span class="badge badge-${getCategoryBadgeColor(category)}" style="font-size:0.6rem;">${escHtml(category)}</span>` : ''}
-                ${tier ? `<span style="font-size:0.65rem;color:var(--text2);background:var(--bg2);padding:0.05rem 0.3rem;border-radius:12px;">${tier}</span>` : ''}
-                <span style="font-size:0.75rem;color:var(--text2);flex:1;min-width:100px;">${description ? escHtml(description.slice(0, 80)) + (description.length > 80 ? '…' : '') : ''}</span>
-                <button class="btn btn-xs btn-gold bestiary-add-adversary" data-name="${escHtml(safeName)}" title="Add to current encounter">+ Add</button>
-                <button class="btn btn-xs btn-primary bestiary-open-tracker" data-name="${escHtml(safeName)}" title="Open Combat Tracker">🎯</button>
+            <div class="bestiary-entry" data-name="${escHtml(safeName)}">
+                <div class="entry-main">
+                    <span style="font-weight:600;font-size:0.9rem;min-width:0;overflow:hidden;text-overflow:ellipsis;">${escHtml(name)}</span>
+                    ${category ? `<span class="badge badge-${getCategoryBadgeColor(category)}" style="font-size:0.6rem;">${escHtml(category)}</span>` : ''}
+                    ${tl ? `<span class="creature-tag tl-badge">${escHtml(tl)}</span>` : ''}
+                    ${cls ? `<span class="creature-tag class-badge">Class ${escHtml(cls)}</span>` : ''}
+                    <span style="font-size:0.75rem;color:var(--text2);flex:1 1 100%;min-width:0;overflow:hidden;text-overflow:ellipsis;">${description ? escHtml(description.slice(0, 90)) + (description.length > 90 ? '…' : '') : ''}</span>
+                </div>
+                <div class="entry-actions">
+                    <button class="btn btn-xs btn-primary bestiary-view-btn" data-name="${escHtml(safeName)}" title="Details">📄</button>
+                    <button class="btn btn-xs btn-gold bestiary-add-adversary" data-name="${escHtml(safeName)}" title="Add to current encounter">+ Add</button>
+                    <button class="btn btn-xs btn-green bestiary-open-tracker" data-name="${escHtml(safeName)}" title="Open Combat Tracker">🎯</button>
+                </div>
             </div>
         `;
     }).join('');
 
-    // Attach add buttons
+    listEl.querySelectorAll('.bestiary-view-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const name = btn.dataset.name;
+            const entry = bestiaryData.find(e => (e.name || '').toLowerCase() === name.toLowerCase());
+            if (entry) showCreatureDetail(entry);
+        });
+    });
+
     listEl.querySelectorAll('.bestiary-add-adversary').forEach(btn => {
         btn.addEventListener('click', (e) => {
             e.stopPropagation();
@@ -341,23 +670,20 @@ function renderBestiary() {
             const entry = bestiaryData.find(e => (e.name || '').toLowerCase() === name.toLowerCase());
             if (entry) {
                 addCreatureAsAdversary(entry);
-                showToast(`⚔️ Added "${entry.name}" to encounter.`, 'success');
+                renderEncounters();
             } else {
-                showToast(`❌ Creature "${name}" not found in bestiary.`, 'error');
+                showToast(`❌ Creature "${name}" not found.`, 'error');
             }
         });
     });
 
-    // 👇 NEW: Open Tracker directly
     listEl.querySelectorAll('.bestiary-open-tracker').forEach(btn => {
         btn.addEventListener('click', (e) => {
             e.stopPropagation();
             const name = btn.dataset.name;
             const entry = bestiaryData.find(e => (e.name || '').toLowerCase() === name.toLowerCase());
             if (entry) {
-                // Use the same logic as addCreatureAsAdversary to ensure it's in an encounter
                 addCreatureAsAdversary(entry);
-                // Now find the encounter we just added to (or the active one)
                 const state = getState();
                 const encounter = state.encounters.find(e => e.status === 'active') || state.encounters[state.encounters.length - 1];
                 if (encounter) {
@@ -370,22 +696,123 @@ function renderBestiary() {
             }
         });
     });
+}
 
-    // Click on entry to show a brief description (optional)
-    listEl.querySelectorAll('.bestiary-entry').forEach(row => {
-        row.addEventListener('click', (e) => {
-            if (e.target.closest('button')) return;
-            const name = row.dataset.name;
-            const entry = bestiaryData.find(e => (e.name || '').toLowerCase() === name.toLowerCase());
-            if (entry) {
-                const desc = getCreatureDescription(entry);
-                showToast(`${entry.name}: ${desc || 'No description.'}`, 'info');
+// ============================================================
+// CREATURE DETAIL MODAL (with SB spends)
+// ============================================================
+
+function showCreatureDetail(entry) {
+    const name = entry.name || 'Unnamed';
+    const description = getCreatureDescription(entry);
+    const lore = entry.lore ? formatText(entry.lore) : '';
+    const locations = Array.isArray(entry.locations) && entry.locations.length > 0
+        ? `<div style="margin-top:0.4rem;"><strong>Locations:</strong> ${entry.locations.map(l => escHtml(l)).join(', ')}</div>` : '';
+    const connections = Array.isArray(entry.connections) && entry.connections.length > 0
+        ? `<div style="margin-top:0.2rem;"><strong>Connections:</strong> ${entry.connections.map(c => escHtml(c)).join(', ')}</div>` : '';
+    const signs = Array.isArray(entry.signs) && entry.signs.length > 0
+        ? `<div style="margin-top:0.2rem;"><strong>Signs:</strong> ${entry.signs.map(s => escHtml(s)).join(', ')}</div>` : '';
+    
+    let sbHtml = '';
+    if (entry.sb_spends && Array.isArray(entry.sb_spends) && entry.sb_spends.length > 0) {
+        sbHtml = entry.sb_spends.map(m => `
+            <div class="sb-move-card">
+                <div style="display:flex;justify-content:space-between;align-items:center;gap:0.4rem;">
+                    <strong style="color:var(--danger);font-size:0.8rem;">${escHtml(m.name)}</strong>
+                    <button class="btn btn-xs btn-danger sb-spend-btn" data-cost="${parseInt(m.cost,10)||1}" data-label="${name}: ${escHtml(m.name)}" style="font-size:0.65rem;">
+                        ${parseInt(m.cost,10)||1} SB
+                    </button>
+                </div>
+                <div style="color:var(--text2);margin-top:0.2rem;">${escHtml(m.effect)}</div>
+            </div>
+        `).join('');
+    } else {
+        sbHtml = `<p style="font-size:0.8rem;color:var(--text3);margin:0 0 0.5rem 0;">No specific Story Beat moves recorded. Use the default SB moves in the sidebar.</p>`;
+    }
+
+    const overlay = document.createElement('div');
+    overlay.style.cssText = `
+        position:fixed;inset:0;background:rgba(0,0,0,0.7);backdrop-filter:blur(4px);
+        display:flex;justify-content:center;align-items:center;z-index:1000;
+        padding:1rem;
+    `;
+    overlay.innerHTML = `
+        <div style="
+            background:var(--bg-panel);
+            border:1px solid var(--border);
+            border-radius:var(--radius);
+            max-width:600px;
+            width:100%;
+            max-height:85vh;
+            overflow-y:auto;
+            padding:1.5rem 2rem;
+            position:relative;
+        ">
+            <button class="modal-close" style="position:absolute;top:0.5rem;right:0.7rem;background:transparent;border:none;font-size:1.5rem;cursor:pointer;color:var(--text2);">&times;</button>
+            <h2 style="margin-top:0;color:var(--gold);display:flex;gap:0.5rem;align-items:center;flex-wrap:wrap;">
+                ${escHtml(name)}
+                ${entry.tl !== undefined ? `<span class="creature-tag tl-badge">TL ${entry.tl}</span>` : ''}
+                ${entry.class ? `<span class="creature-tag class-badge">Class ${entry.class}</span>` : ''}
+                ${entry.category ? `<span class="badge badge-${getCategoryBadgeColor(entry.category)}">${escHtml(entry.category)}</span>` : ''}
+            </h2>
+            ${description ? `<div style="margin:0.5rem 0;line-height:1.5;color:var(--text);">${escHtml(description)}</div>` : ''}
+            ${lore ? `<div style="margin:0.5rem 0;line-height:1.5;background:var(--bg2);padding:0.5rem;border-radius:var(--radius-sm);border-left:3px solid var(--gold);"><strong>Lore:</strong> ${lore}</div>` : ''}
+            ${locations}
+            ${connections}
+            ${signs}
+            <div style="margin-top:0.8rem;border-top:1px solid var(--border);padding-top:0.6rem;">
+                <h4 style="margin:0 0 0.4rem 0;color:var(--danger);">⚡ Story Beat Moves</h4>
+                <div style="display:flex;flex-direction:column;gap:0.2rem;">
+                    ${sbHtml}
+                </div>
+            </div>
+            <div style="margin-top:1rem;display:flex;gap:0.5rem;flex-wrap:wrap;">
+                <button class="btn btn-sm btn-gold add-adversary-from-detail" data-name="${escHtml(name)}">⚔️ Add as Adversary</button>
+                <button class="btn btn-sm btn-green open-tracker-from-detail" data-name="${escHtml(name)}">🎯 Open Tracker</button>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(overlay);
+
+    overlay.querySelector('.modal-close').addEventListener('click', () => overlay.remove());
+    overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.remove(); });
+
+    overlay.querySelector('.add-adversary-from-detail').addEventListener('click', () => {
+        const entry = bestiaryData.find(e => (e.name || '').toLowerCase() === name.toLowerCase());
+        if (entry) {
+            addCreatureAsAdversary(entry);
+            renderEncounters();
+            overlay.remove();
+        }
+    });
+
+    overlay.querySelector('.open-tracker-from-detail').addEventListener('click', () => {
+        const entry = bestiaryData.find(e => (e.name || '').toLowerCase() === name.toLowerCase());
+        if (entry) {
+            addCreatureAsAdversary(entry);
+            const state = getState();
+            const encounter = state.encounters.find(e => e.status === 'active') || state.encounters[state.encounters.length - 1];
+            if (encounter) {
+                openTracker(encounter.id);
+                overlay.remove();
             }
+        }
+    });
+
+    overlay.querySelectorAll('.sb-spend-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const cost = parseInt(btn.dataset.cost, 10);
+            const label = btn.dataset.label;
+            spendStoryBeats(cost, label);
         });
     });
 }
 
-// Helper: category badge color (same as in bestiary.js)
+function formatText(text) {
+    if (!text) return '';
+    return escHtml(text).replace(/\n/g, '<br>');
+}
+
 function getCategoryBadgeColor(category) {
     const map = {
         'beast': 'green',
@@ -399,11 +826,11 @@ function getCategoryBadgeColor(category) {
         'celestial': 'gold',
         'abomination': 'purple'
     };
-    return map[category.toLowerCase()] || 'gold';
+    return map[(category || '').toLowerCase()] || 'gold';
 }
 
 // ============================================================
-// ENCOUNTER OPERATIONS (unchanged)
+// ENCOUNTER OPERATIONS
 // ============================================================
 
 function createEncounterFromAdversary(name, body) {
@@ -489,13 +916,29 @@ export function attachEvents() {
         search.addEventListener('input', renderEncounters);
     }
 
-    // Bestiary search
     const bestiarySearch = document.getElementById('bestiary-search');
     if (bestiarySearch) {
         bestiarySearch.addEventListener('input', renderBestiary);
     }
 
-    // Refresh bestiary
+    const tlSelect = document.getElementById('bestiary-filter-tl');
+    if (tlSelect) {
+        tlSelect.addEventListener('change', renderBestiary);
+    }
+
+    document.getElementById('bestiary-class-filters')?.addEventListener('click', (e) => {
+        if (e.target.closest('.class-filter-btn')) {
+            document.querySelectorAll('.class-filter-btn').forEach(b => {
+                b.classList.remove('btn-primary', 'active-class');
+                b.classList.add('btn-ghost');
+            });
+            const btn = e.target.closest('.class-filter-btn');
+            btn.classList.remove('btn-ghost');
+            btn.classList.add('btn-primary', 'active-class');
+            renderBestiary();
+        }
+    });
+
     const refreshBtn = document.getElementById('bestiary-refresh');
     if (refreshBtn) {
         refreshBtn.addEventListener('click', async () => {
@@ -507,6 +950,22 @@ export function attachEvents() {
             } catch (e) {
                 showToast('Failed to refresh bestiary.', 'error');
             }
+        });
+    }
+
+    // SB bank controls
+    const sbMinus = document.getElementById('sb-minus');
+    const sbPlus = document.getElementById('sb-plus');
+    const sbInput = document.getElementById('sb-bank-input');
+
+    if (sbMinus) sbMinus.addEventListener('click', () => adjustStoryBeats(-1));
+    if (sbPlus) sbPlus.addEventListener('click', () => adjustStoryBeats(1));
+    if (sbInput) {
+        sbInput.addEventListener('change', () => {
+            const val = parseInt(sbInput.value, 10);
+            gmStoryBeats = isNaN(val) ? 0 : Math.max(0, val);
+            saveStoryBeatsBank();
+            renderSBBank();
         });
     }
 }

@@ -18,12 +18,32 @@
  * All selection modals (tradition, meditation DV, talent, technique) have been
  * replaced with inline dropdowns. Text-entry prompts (name, description, etc.)
  * remain as simple prompt() calls.
+ *
+ * CONSISTENCY PASS: this file used to maintain its own standalone
+ * fetch+cache implementation for patron data (a `patronCache` Map and a
+ * local `loadPatronData(patronId)` that hit `/data/patrons/{id}.json`
+ * directly), completely separate from the shared loader in
+ * `patrons/index.js` that Cantor, Rites, and the Patrons tab all use.
+ * Monastic traditions live directly on the patron JSON objects
+ * (`patron.monastic_tradition` — see any patron file), so there was never
+ * a need for a second data path. The practical cost of the duplication:
+ * Monks got none of the schema-version cache-busting added to the shared
+ * loader, so it could keep showing a stale tradition after a patron JSON
+ * update long after every other panel had picked up the change. This file
+ * now goes through the same `patrons/index.js` loader as everyone else.
+ * Also replaced this file's private `rollDice()` with the shared
+ * `performRoll()` from `core/dice.js` — there is no longer a second,
+ * independently-tuned dice engine living in this file.
  */
 
 import { getCharacterData, saveCharacter } from '../index.js';
 import { escHtml, generateId, safeParseInt } from '../../../core/utils.js';
 import { showToast } from '../../../components/Toast.js';
 import { getState, saveState } from '../../../core/state.js';
+import { performRoll } from '../../../core/dice.js';
+import patrons from '../../patrons/index.js';
+
+const { loadPatronData: ensurePatronDataLoaded } = patrons;
 
 // ============================================================
 // HELPERS
@@ -50,65 +70,32 @@ function formatText(text) {
 }
 
 /**
- * Load patron data from state or fetch from /data/patrons/{patronId}.json
- * Caches the result in state.patrons (by category) and in a local cache.
+ * Find a patron already loaded into shared state (cosmic/terrestrial/
+ * religions) — the same lookup pattern used by cantor.js and rites.js, so
+ * all three magic-path panels agree on where a patron's data lives.
  */
-const patronCache = new Map();
-
-async function loadPatronData(patronId) {
+function findPatronData(state, patronId) {
     if (!patronId) return null;
 
-    if (patronCache.has(patronId)) {
-        return patronCache.get(patronId);
+    if (state.patrons?.cosmic) {
+        const found = state.patrons.cosmic.find(p => p.id === patronId);
+        if (found) return found;
     }
-
-    const state = getState();
-
-    let found = null;
-    if (state.patrons) {
-        if (state.patrons.cosmic) {
-            found = state.patrons.cosmic.find(p => p.id === patronId);
-        }
-        if (!found && state.patrons.terrestrial) {
-            found = state.patrons.terrestrial.find(p => p.id === patronId);
-        }
-        if (!found && state.patrons.religions) {
-            for (const religion of state.patrons.religions) {
-                if (religion.orders) {
-                    found = religion.orders.find(o => o.id === patronId);
-                    if (found) break;
+    if (state.patrons?.terrestrial) {
+        const found = state.patrons.terrestrial.find(p => p.id === patronId);
+        if (found) return found;
+    }
+    if (state.patrons?.religions) {
+        for (const religion of state.patrons.religions) {
+            if (religion.orders) {
+                const found = religion.orders.find(o => o.id === patronId);
+                if (found) {
+                    return { ...found, _religion: religion.name, _religionIcon: religion.icon };
                 }
             }
         }
     }
-
-    if (found) {
-        patronCache.set(patronId, found);
-        return found;
-    }
-
-    try {
-        const response = await fetch(`./data/patrons/${patronId}.json`);
-        if (response.ok) {
-            const data = await response.json();
-            if (!state.patrons) state.patrons = {};
-            if (!state.patrons.cosmic) state.patrons.cosmic = [];
-            if (!state.patrons.cosmic.find(p => p.id === patronId)) {
-                state.patrons.cosmic.push(data);
-            }
-            patronCache.set(patronId, data);
-            saveState();
-            return data;
-        } else {
-            console.warn(`Patron data not found: ${patronId}`);
-            patronCache.set(patronId, null);
-            return null;
-        }
-    } catch (e) {
-        console.warn(`Failed to fetch patron data for ${patronId}:`, e);
-        patronCache.set(patronId, null);
-        return null;
-    }
+    return null;
 }
 
 // ============================================================
@@ -306,7 +293,6 @@ async function getMonasticTraditionData(char) {
         patronName: result.patron.name || result.patron.title || result.patronId,
         patronIcon: result.patron.icon || '📿',
         tradition: result.tradition,
-        source: result.source,
         religion: result.religion
     };
 }
@@ -353,14 +339,22 @@ function computeCorruptionTier(char, traditionData) {
 // ============================================================
 
 async function findPatronTradition(patronId) {
-    const patronData = await loadPatronData(patronId);
+    if (!patronId) return null;
+    await ensurePatronDataLoaded();
+    const state = getState();
+    const patronData = findPatronData(state, patronId);
     if (patronData && patronData.monastic_tradition) {
-        return { patron: patronData, tradition: patronData.monastic_tradition };
+        return {
+            patron: patronData,
+            tradition: patronData.monastic_tradition,
+            religion: patronData._religion || null
+        };
     }
     return null;
 }
 
 async function getAllMonasticTraditions() {
+    await ensurePatronDataLoaded();
     const state = getState();
     const results = [];
 
@@ -418,16 +412,6 @@ async function getAllMonasticTraditions() {
 // MEDITATION SYSTEM
 // ============================================================
 
-function rollDice(pool) {
-    let successes = 0;
-    for (let i = 0; i < pool; i++) {
-        const roll = Math.floor(Math.random() * 10) + 1;
-        if (roll >= 6) successes++;
-        if (roll === 10) successes++;
-    }
-    return successes;
-}
-
 export function performMeditation(char, targetDV = 3) {
     const results = [];
     let sbCount = 0;
@@ -435,8 +419,8 @@ export function performMeditation(char, targetDV = 3) {
     const body = char.body || 1;
     const athletics = char.skills?.athletics || 0;
     const bodyPool = body + athletics;
-    const bodyRoll = rollDice(bodyPool);
-    const bodySuccess = bodyRoll >= 2;
+    const bodyResult = performRoll(bodyPool, 2);
+    const bodySuccess = bodyResult.successes >= 2;
     results.push({
         step: 'Settle the Body',
         pool: bodyPool,
@@ -448,8 +432,8 @@ export function performMeditation(char, targetDV = 3) {
     const spirit = char.spirit || 1;
     const insight = char.skills?.insight || 0;
     const breathPool = spirit + insight;
-    const breathRoll = rollDice(breathPool);
-    const breathSuccess = breathRoll >= 3;
+    const breathResult = performRoll(breathPool, 3);
+    const breathSuccess = breathResult.successes >= 3;
     results.push({
         step: 'Settle the Breath',
         pool: breathPool,
@@ -461,10 +445,10 @@ export function performMeditation(char, targetDV = 3) {
     const presence = char.presence || 1;
     const sway = char.skills?.sway || 0;
     const stillPool = spirit + presence + Math.floor((insight + sway) / 2);
-    const stillRoll = rollDice(stillPool);
-    const stillSuccess = stillRoll >= targetDV;
+    const stillResult = performRoll(stillPool, targetDV);
+    const stillSuccess = stillResult.successes >= targetDV;
     let partial = false;
-    if (stillRoll > 0 && stillRoll < targetDV) partial = true;
+    if (stillResult.successes > 0 && stillResult.successes < targetDV) partial = true;
     results.push({
         step: 'The Still Point',
         pool: stillPool,
@@ -523,6 +507,10 @@ export async function renderMonks(el) {
         renderOnboarding(el, char);
         return;
     }
+
+    // Ensure patron data (and therefore monastic traditions) is loaded via
+    // the shared loader before we look anything up below.
+    await ensurePatronDataLoaded();
 
     const traditionId = getMonasticTradition(char);
     const traditionData = traditionId ? await getMonasticTraditionData(char) : null;
@@ -612,7 +600,7 @@ export async function renderMonks(el) {
                     </select>
                     <button class="btn btn-sm btn-gold" onclick="window.monkMeditateFromSelect()">🧘 Meditate</button>
                     <button class="btn btn-sm btn-primary" onclick="window.monkChooseTradition()">📿 Tradition</button>
-                    <button class="btn btn-sm btn-secondary" onclick="window.monkRefresh()">🔄 Refresh</button>
+                    <button class="btn btn-sm btn-secondary" onclick="window.monkRefresh()" title="Reloads patron data from disk, bypassing any cached copy">🔄 Refresh</button>
                 </div>
             </div>
 
@@ -1306,10 +1294,16 @@ window.monkLearnTechnique = function(traditionId) {
 };
 
 // ─── Refresh ──────────────────────────────────────────────────
+//
+// FIX: this used to just re-render the panel from whatever patron data was
+// already in memory/localStorage, without ever forcing a fresh load — now
+// consistent with cantor.js/rites.js/witchcraft.js's refresh behavior.
 
-window.monkRefresh = function() {
-    if (container) renderMonks(container);
-    showToast('🔄 Monks refreshed.', 'info');
+window.monkRefresh = async function() {
+    showToast('🔄 Reloading patron data from disk…', 'info');
+    await ensurePatronDataLoaded(true);
+    if (container) await renderMonks(container);
+    showToast('✅ Monks refreshed.', 'success');
 };
 
 // ============================================================

@@ -18,10 +18,29 @@
  * - Bound Patron talent: +1 position for bound patron, -1 for others, bound corruption
  * - Unbound Cantors access all patrons' Low rites
  * - High Cantor talent grants access to Standard rites as well
+ *
+ * ────────────────────────────────────────────────────────────────────────
+ * RULES FIX (this pass) — Songs must be learned, not free access:
+ * Player's Guide §9.7 walks a Runekeeper through buying two starting Low
+ * Rites individually with XP ("Road-Sense (Low, 4 XP)"), and every Rite in
+ * every patron's catalog throughout the book carries its own XP cost.
+ * §3.3's player-managed-modules table lists "Repertoire" as a Cantor
+ * progression timer alongside Corruption — i.e. Cantors track a growing,
+ * individually-learned set of Songs, not blanket access to a patron's
+ * whole Low (or Low+Standard) catalog the moment they take Cantor's Path.
+ * This file used to show every Low/Standard rite from the bound (or all)
+ * patron(s) as immediately usable. It now checks each Song against
+ * `char.repertoire` (a plain array of learned Song names — the same field
+ * name already used elsewhere in the character schema) and only allows
+ * Push/Resonant marking on Songs actually in that list. Unknown Songs
+ * still display in full (so you can browse and decide what's worth
+ * learning) with a "📖 Learn (X XP)" button that spends the Song's own
+ * listed `xp` cost via the new cantorLearnSong().
+ * ────────────────────────────────────────────────────────────────────────
  */
 
 import { getCharacterData, saveCharacter } from '../index.js';
-import { escHtml } from '../../../core/utils.js';
+import { escHtml, safeParseInt } from '../../../core/utils.js';
 import { getState, saveState } from '../../../core/state.js';
 import { showToast } from '../../../components/Toast.js';
 import { performRoll } from '../../../core/dice.js';
@@ -591,18 +610,18 @@ export async function renderCantor(el) {
 
     el.innerHTML = html;
 
-    // Render the rites with Push It support
+    // Render the rites grouped by patron with expandable sections
     const ritesContainer = document.getElementById('cantor-rites-container');
     if (ritesContainer) {
-        renderCantorRites(ritesContainer, rites, char);
+        renderCantorRitesGrouped(ritesContainer, rites, char);
     }
 }
 
 // ============================================================
-// CANTOR RITES RENDER (with Push It)
+// CANTOR RITES RENDER (grouped by patron, expandable)
 // ============================================================
 
-function renderCantorRites(container, rites, char) {
+function renderCantorRitesGrouped(container, rites, char) {
     if (rites.length === 0) {
         container.innerHTML = `<div style="font-size:0.8rem;color:var(--text3);text-align:center;">${char.boundPatron ? 'No songs found for this patron.' : 'No available rites found across all patrons.'}</div>`;
         return;
@@ -611,41 +630,85 @@ function renderCantorRites(container, rites, char) {
     // Build cache for Push lookups
     window._cantorRiteCache = new Map();
 
+    // ── Group rites by patron ──
+    const groups = new Map();
+    rites.forEach(rite => {
+        const patronId = rite.patronId || 'unbound';
+        if (!groups.has(patronId)) {
+            groups.set(patronId, {
+                id: patronId,
+                name: rite.patronName || 'Unbound',
+                icon: rite.patronIcon || '🌌',
+                color: rite.patronColor || 'var(--text3)',
+                rites: []
+            });
+        }
+        groups.get(patronId).rites.push(rite);
+        // store in cache for Push
+        window._cantorRiteCache.set(rite.name, rite);
+    });
+
     let html = '';
-    rites.forEach((rite) => {
-        const name = safeString(rite.name);
-        const tier = safeString(rite.tier || 'Basic');
-        const xp = rite.xp || rite.cost;
-        const effect = safeString(rite.effect || rite.description);
-        const pushIt = safeString(rite.push_it);
-        const hasPush = pushIt && pushIt.length > 0;
-        const cost = safeString(rite.cost || '');
-
-        const color = getTierColor(tier);
-        const icon = getTierIcon(tier);
-
-        const patronName = rite.patronName ? safeString(rite.patronName) : null;
-        const patronIcon = rite.patronIcon ? safeString(rite.patronIcon) : null;
-
-        const resonantRites = char.resonantRites || [];
-        const isResonant = resonantRites.includes(name);
-
-        // Store in cache for Push
-        window._cantorRiteCache.set(name, rite);
+    for (const [patronId, group] of groups) {
+        const isUnbound = patronId === 'unbound';
+        const groupName = isUnbound ? '🌌 Unbound (all patrons)' : `${group.icon} ${group.name}`;
+        const riteCount = group.rites.length;
 
         html += `
-            <div class="rite-item" style="background:var(--bg3);border-radius:var(--radius);padding:0.3rem 0.5rem;border-left:3px solid ${color};${isResonant ? 'border-right:3px solid var(--gold);' : ''}">
-                <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.2rem;">
-                    <div style="display:flex;align-items:center;gap:0.3rem;flex-wrap:wrap;">
-                        ${patronIcon ? `<span style="font-size:1rem;">${patronIcon}</span>` : ''}
-                        <span style="font-weight:600;font-size:0.85rem;">${escHtml(name)}</span>
-                        ${patronName ? `<span style="font-size:0.6rem;color:var(--text3);">(${escHtml(patronName)})</span>` : ''}
-                        <span style="font-size:0.6rem;color:${color};font-weight:500;">${icon} ${escHtml(tier)}</span>
-                        ${xp ? `<span style="font-size:0.6rem;color:var(--text3);">${xp} XP</span>` : ''}
-                        ${isResonant ? `<span style="font-size:0.55rem;color:var(--gold);">🔮 Resonant</span>` : ''}
-                    </div>
-                    <div style="display:flex;gap:0.2rem;flex-wrap:wrap;">
-                        ${cost ? `<span style="font-size:0.6rem;color:var(--text3);">${escHtml(cost)}</span>` : ''}
+            <details class="patron-group" style="background:var(--bg3);border-radius:var(--radius);padding:0.2rem 0.4rem;border-left:4px solid ${group.color};">
+                <summary style="cursor:pointer;font-weight:600;font-size:0.85rem;color:var(--text);display:flex;justify-content:space-between;align-items:center;padding:0.2rem 0;">
+                    <span>${groupName}</span>
+                    <span style="font-size:0.7rem;color:var(--text3);font-weight:400;">${riteCount} rite${riteCount > 1 ? 's' : ''}</span>
+                </summary>
+                <div style="display:flex;flex-direction:column;gap:0.3rem;margin-top:0.3rem;padding-left:0.3rem;">
+                    ${group.rites.map(rite => renderRiteItem(rite, char)).join('')}
+                </div>
+            </details>
+        `;
+    }
+
+    container.innerHTML = html;
+}
+
+// ── Helper to render a single rite item ──
+function renderRiteItem(rite, char) {
+    const name = safeString(rite.name);
+    const tier = safeString(rite.tier || 'Basic');
+    const xp = rite.xp || rite.cost;
+    const xpCost = safeParseInt(rite.xp, 0);
+    const effect = safeString(rite.effect || rite.description);
+    const pushIt = safeString(rite.push_it);
+    const hasPush = pushIt && pushIt.length > 0;
+    const cost = safeString(rite.cost || '');
+    const color = getTierColor(tier);
+    const icon = getTierIcon(tier);
+    const patronName = rite.patronName ? safeString(rite.patronName) : null;
+    const patronIcon = rite.patronIcon ? safeString(rite.patronIcon) : null;
+    const resonantRites = char.resonantRites || [];
+    const isResonant = resonantRites.includes(name);
+
+    // RULES FIX (see file header note): only Songs in char.repertoire are
+    // actually known — Push and Resonant marking both require it.
+    const repertoire = char.repertoire || [];
+    const isKnown = repertoire.includes(name);
+
+    return `
+        <div class="rite-item" style="background:var(--bg2);border-radius:var(--radius);padding:0.3rem 0.5rem;border-left:3px solid ${color};${isResonant ? 'border-right:3px solid var(--gold);' : ''}${isKnown ? '' : 'opacity:0.75;'}">
+            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.2rem;">
+                <div style="display:flex;align-items:center;gap:0.3rem;flex-wrap:wrap;">
+                    ${patronIcon ? `<span style="font-size:1rem;">${patronIcon}</span>` : ''}
+                    <span style="font-weight:600;font-size:0.85rem;">${escHtml(name)}</span>
+                    ${patronName ? `<span style="font-size:0.6rem;color:var(--text3);">(${escHtml(patronName)})</span>` : ''}
+                    <span style="font-size:0.6rem;color:${color};font-weight:500;">${icon} ${escHtml(tier)}</span>
+                    ${xp ? `<span style="font-size:0.6rem;color:var(--text3);">${xp} XP</span>` : ''}
+                    ${isKnown
+                        ? `<span style="font-size:0.55rem;color:var(--green);">✓ In Repertoire</span>`
+                        : `<span style="font-size:0.55rem;color:var(--text3);">📖 Not yet learned</span>`}
+                    ${isResonant ? `<span style="font-size:0.55rem;color:var(--gold);">🔮 Resonant</span>` : ''}
+                </div>
+                <div style="display:flex;gap:0.2rem;flex-wrap:wrap;">
+                    ${cost ? `<span style="font-size:0.6rem;color:var(--text3);">${escHtml(cost)}</span>` : ''}
+                    ${isKnown ? `
                         ${hasPush ? `
                             <button class="btn btn-xs btn-primary push-btn" data-rite-name="${escHtml(name)}" onclick="window.cantorPushRite('${escHtml(name)}', this)" title="Push It: resolves instantly with no roll. Mark Fatigue + Corruption; the GM gains 1 SB.">
                                 ⚡ Push
@@ -657,15 +720,17 @@ function renderCantorRites(container, rites, char) {
                                 title="${isResonant ? 'Unmark as Resonant' : 'Mark as Resonant Rite (advances Corruption)'}">
                             ${isResonant ? '🔮✕' : '🔮'}
                         </button>
-                    </div>
+                    ` : `
+                        <button class="btn btn-xs btn-gold" onclick="window.cantorLearnSong('${escHtml(name)}', ${xpCost})" title="Add this Song to your Repertoire for ${xpCost} XP">
+                            📖 Learn (${xpCost} XP)
+                        </button>
+                    `}
                 </div>
-                ${effect ? `<div style="font-size:0.75rem;color:var(--text2);margin-top:0.1rem;line-height:1.3;">${formatText(effect)}</div>` : ''}
-                ${hasPush ? `<div style="font-size:0.65rem;color:var(--text3);margin-top:0.1rem;">⚡ Push: ${formatText(pushIt)}</div>` : ''}
             </div>
-        `;
-    });
-
-    container.innerHTML = html;
+            ${effect ? `<div style="font-size:0.75rem;color:var(--text2);margin-top:0.1rem;line-height:1.3;">${formatText(effect)}</div>` : ''}
+            ${hasPush && isKnown ? `<div style="font-size:0.65rem;color:var(--text3);margin-top:0.1rem;">⚡ Push: ${formatText(pushIt)}</div>` : ''}
+        </div>
+    `;
 }
 
 // ============================================================
@@ -683,6 +748,41 @@ function renderCantorRites(container, rites, char) {
 // longer fail here. There is no roll, so bound/unbound position modifiers
 // (which only ever applied to a roll) no longer apply to a Push.
 
+// ─── Learn Song (add to Repertoire) ────────────────────────────
+//
+// RULES FIX (see file header note): Songs must be individually learned —
+// this spends the Song's own listed XP cost and adds it to
+// char.repertoire, the same field name already present on the character
+// schema (see editor.js/wizard.js).
+
+window.cantorLearnSong = function(riteName, xpCost) {
+    const char = getCharacterData();
+    if (!char) return;
+
+    if (!char.repertoire) char.repertoire = [];
+    if (char.repertoire.includes(riteName)) {
+        showToast(`"${riteName}" is already in your Repertoire.`, 'info');
+        return;
+    }
+
+    const totalXp = char.totalXp || 0;
+    const spent = char.xpSpent || 0;
+    const available = totalXp - spent;
+
+    if (xpCost > 0 && available < xpCost) {
+        showToast(`Not enough XP. Need ${xpCost}, have ${available} available.`, 'error');
+        return;
+    }
+
+    if (!confirm(`Add "${riteName}" to your Repertoire for ${xpCost} XP?`)) return;
+
+    char.repertoire.push(riteName);
+    char.xpSpent = spent + xpCost;
+    saveCharacter({ repertoire: char.repertoire, xpSpent: char.xpSpent });
+    showToast(`🎶 "${riteName}" added to your Repertoire (${xpCost} XP spent).`, 'success');
+    window.cantorRefresh();
+};
+
 window.cantorPushRite = function(riteName, buttonElement) {
     const char = getCharacterData();
     if (!char) return;
@@ -690,6 +790,12 @@ window.cantorPushRite = function(riteName, buttonElement) {
     const rite = window._cantorRiteCache?.get(riteName);
     if (!rite) {
         showToast('Rite not found. Please refresh.', 'error');
+        return;
+    }
+
+    // RULES FIX: only Songs in the Repertoire can be sung at all.
+    if (!(char.repertoire || []).includes(riteName)) {
+        showToast(`You haven't learned "${riteName}" yet — add it to your Repertoire first.`, 'error');
         return;
     }
 

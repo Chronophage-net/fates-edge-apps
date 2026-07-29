@@ -6,16 +6,17 @@
  * – Borte, Wolf-Speaker of the Gray Fox Clan
  *
  * Features:
- * - Bestiary browser with spirits from /data/bestiary.json
+ * - Bestiary browser with spirits from /data/bestiary.json (TL 1–3 only)
  * - Ritual Binding with cost negotiation (Boon, Fatigue, or Memory)
  * - Spirit mood tracking (Calm → Restless → Strained → Rebellious)
  * - Command history per spirit
  * - Leash tension with visual feedback and critical warnings
  * - Spirit details modal with lore, signs, and regional connections
- * - Filter by class, nature, region, and search
+ * - Filter by class, nature, region, search, and TL (1–3 only)
  * - Custom spirit binding for unique entities
  * - Release with consequences (narrative prompt)
  * - Quick reference for summoning mechanics
+ * - TL 4+ creatures are completely hidden (not shown, not filterable)
  *
  * All selection modals (choose cost, offer) have been replaced with inline dropdowns.
  */
@@ -143,6 +144,16 @@ function getSpiritClass(spirit) {
     return 'II';
 }
 
+function getSpiritTL(spirit) {
+    // Use explicit tl field if present, else derive from class
+    if (spirit.tl !== undefined && spirit.tl !== null) {
+        return parseInt(spirit.tl, 10);
+    }
+    const cls = getSpiritClass(spirit);
+    const num = parseInt(cls, 10);
+    return isNaN(num) ? 2 : num;
+}
+
 function getLeashMax(spirit) {
     const cls = getSpiritClass(spirit);
     return LEASH_BY_CLASS[cls] || 4;
@@ -201,9 +212,30 @@ async function loadBestiary() {
         if (response.ok) {
             const data = await response.json();
             if (Array.isArray(data)) {
-                bestiaryCache = data;
+                // Transform each entry: { "Spirit Name": { ...details } } → { name, ...details }
+                bestiaryCache = data.map(entry => {
+                    const keys = Object.keys(entry);
+                    // Each entry should have exactly one key – the spirit name
+                    if (keys.length === 1) {
+                        const name = keys[0];
+                        const details = entry[name];
+                        return {
+                            id: name.toLowerCase().replace(/[^a-z0-9]/g, '-'), // generate an id
+                            name: name,
+                            ...details  // spreads summary, lore, connections, tl, etc.
+                        };
+                    } else {
+                        // Fallback – use the entry as is (might already be flat)
+                        return entry;
+                    }
+                });
             } else if (typeof data === 'object') {
-                bestiaryCache = Object.values(data);
+                // If the root is an object with name keys, convert it similarly
+                bestiaryCache = Object.entries(data).map(([name, details]) => ({
+                    id: name.toLowerCase().replace(/[^a-z0-9]/g, '-'),
+                    name: name,
+                    ...details
+                }));
             } else {
                 bestiaryCache = [];
             }
@@ -217,10 +249,10 @@ async function loadBestiary() {
     return bestiaryCache;
 }
 
-// ─── Built-in Spirits ────────────────────────────────────────
+// ─── Built-in Spirits (with computed TL from class, all TL ≤ 3) ──────────
 
 function getBuiltInSpirits() {
-    return [
+    const base = [
         {
             id: 'wolf-ancestor',
             name: 'Wolf-Ancestor',
@@ -378,6 +410,13 @@ function getBuiltInSpirits() {
             signs: ['A hoofprint that smokes', 'The smell of ozone', 'A horse that disappears over the horizon']
         }
     ];
+
+    // Add computed tl from class (all ≤ 3)
+    return base.map(s => {
+        const cls = s.class || 'II';
+        const tl = parseInt(cls, 10);
+        return { ...s, tl: isNaN(tl) ? 2 : tl };
+    });
 }
 
 // ============================================================
@@ -413,6 +452,12 @@ function filterByRegion(spirits, regionFilter) {
     return spirits.filter(s => (s.connections || []).some(c => c.toLowerCase().includes(regionFilter.toLowerCase())));
 }
 
+function filterByTL(spirits, tlFilter) {
+    if (!tlFilter || tlFilter === 'all') return spirits;
+    const tl = parseInt(tlFilter, 10);
+    return spirits.filter(s => getSpiritTL(s) === tl);
+}
+
 // ============================================================
 // MAIN RENDER
 // ============================================================
@@ -435,20 +480,28 @@ export async function renderSummoning(el) {
     const leashMax = char.leashMax || 4;
 
     // Load bestiary
-    const bestiary = await loadBestiary();
+    const fullBestiary = await loadBestiary();
+
+    // --- NEW: Filter out TL 4+ creatures entirely ---
+    const bestiary = fullBestiary.filter(s => (s.tl || 0) < 4);
+
     const searchQuery = sessionStorage.getItem('fates-edge-summoner-search') || '';
     const classFilter = sessionStorage.getItem('fates-edge-summoner-filter-class') || 'all';
     const natureFilter = sessionStorage.getItem('fates-edge-summoner-filter-nature') || 'all';
     const regionFilter = sessionStorage.getItem('fates-edge-summoner-filter-region') || 'all';
+    const tlFilter = sessionStorage.getItem('fates-edge-summoner-filter-tl') || 'all';
 
     let filtered = searchSpirits(searchQuery, bestiary);
     filtered = filterByClass(filtered, classFilter);
     filtered = filterByNature(filtered, natureFilter);
     filtered = filterByRegion(filtered, regionFilter);
+    filtered = filterByTL(filtered, tlFilter);
 
-    // Extract unique natures, regions for filters
+    // Extract unique natures, regions for filters (from the filtered bestiary, not full)
     const natures = ['all', ...new Set(bestiary.map(s => s.nature || 'Unknown').filter(Boolean))];
     const regions = ['all', ...new Set(bestiary.flatMap(s => s.connections || []).filter(Boolean))];
+    // TL options: only 1-3 (since we filtered out 4+)
+    const tlOptions = [1, 2, 3];
 
     // Get global mood
     const mood = getMood(leash, leashMax);
@@ -529,6 +582,10 @@ export async function renderSummoning(el) {
                         <select id="summoner-region-filter" style="background:var(--bg3);color:var(--text);border:1px solid var(--border);border-radius:4px;padding:0.1rem 0.3rem;max-width:100px;">
                             ${regions.map(r => `<option value="${escHtml(r)}" ${regionFilter === r ? 'selected' : ''}>${r === 'all' ? 'All Regions' : escHtml(r)}</option>`).join('')}
                         </select>
+                        <select id="summoner-tl-filter" style="background:var(--bg3);color:var(--text);border:1px solid var(--border);border-radius:4px;padding:0.1rem 0.3rem;max-width:80px;">
+                            <option value="all" ${tlFilter === 'all' ? 'selected' : ''}>All TL</option>
+                            ${tlOptions.map(tl => `<option value="${tl}" ${tlFilter === String(tl) ? 'selected' : ''}>TL ${tl}</option>`).join('')}
+                        </select>
                     </div>
                 </div>
                 <div class="bestiary-list" style="max-height:200px;overflow-y:auto;display:flex;flex-direction:column;gap:0.2rem;">
@@ -587,14 +644,31 @@ function renderBestiaryEntry(spirit, char) {
     const services = (spirit.services || []).slice(0, 3).join(', ');
     const price = safeString(spirit.price || 'Unknown');
     const nature = safeString(spirit.nature || 'Unknown');
+    const tl = getSpiritTL(spirit);
 
     // Check if already bound
     const isBound = (char.boundSpirits || []).some(s => s.bestiaryId === id);
+    // TL 4+ should not appear, but keep guard
+    const isTooPowerful = tl >= 4;
+    const canBind = !isBound && !isTooPowerful;
 
     // Cost dropdown
     const costOptions = BIND_COST_OPTIONS.map(opt =>
         `<option value="${opt.value}">${opt.label}</option>`
     ).join('');
+
+    let bindLabel = '🔗 Bind';
+    let bindDisabled = false;
+    let bindClass = 'btn-gold';
+    if (isBound) {
+        bindLabel = '🔗 Bound';
+        bindDisabled = true;
+        bindClass = 'btn-secondary';
+    } else if (isTooPowerful) {
+        bindLabel = '🚫 TL 4+';
+        bindDisabled = true;
+        bindClass = 'btn-secondary';
+    }
 
     return `
         <div class="bestiary-entry" style="display:flex;align-items:center;gap:0.3rem;padding:0.15rem 0.3rem;border-bottom:1px solid var(--border);border-left:3px solid ${meta.color};background:var(--bg3);border-radius:3px;">
@@ -604,6 +678,7 @@ function renderBestiaryEntry(spirit, char) {
                     <span style="font-weight:600;font-size:0.8rem;">${escHtml(name)}</span>
                     <span style="font-size:0.5rem;color:${meta.color};font-weight:600;padding:0.05rem 0.3rem;border-radius:6px;background:${meta.color}22;">${meta.icon} ${meta.label}</span>
                     <span style="font-size:0.5rem;color:var(--text3);">🔗 ${meta.leash}</span>
+                    <span style="font-size:0.5rem;color:var(--text3);">⚡ TL ${tl}</span>
                 </div>
                 ${summary ? `<div style="font-size:0.6rem;color:var(--text2);line-height:1.3;">${escHtml(summary)}</div>` : ''}
                 <div style="font-size:0.55rem;color:var(--text3);">
@@ -613,11 +688,13 @@ function renderBestiaryEntry(spirit, char) {
                 </div>
             </div>
             <div style="display:flex;gap:0.2rem;flex-shrink:0;align-items:center;">
-                <select class="bind-cost-select" style="font-size:0.55rem;background:var(--bg3);border:1px solid var(--border);border-radius:4px;padding:0.05rem 0.2rem;">
-                    ${costOptions}
-                </select>
-                <button class="btn btn-xs ${isBound ? 'btn-secondary' : 'btn-gold'} bind-btn" data-bestiary-id="${escHtml(id)}" ${isBound ? 'disabled' : ''}>
-                    ${isBound ? '🔗 Bound' : '🔗 Bind'}
+                ${!isBound && !isTooPowerful ? `
+                    <select class="bind-cost-select" style="font-size:0.55rem;background:var(--bg3);border:1px solid var(--border);border-radius:4px;padding:0.05rem 0.2rem;">
+                        ${costOptions}
+                    </select>
+                ` : ''}
+                <button class="btn btn-xs ${bindClass} bind-btn" data-bestiary-id="${escHtml(id)}" ${bindDisabled ? 'disabled' : ''}>
+                    ${bindLabel}
                 </button>
                 <button class="btn btn-xs btn-ghost" onclick="window.summonerViewSpirit('${escHtml(id)}')" title="View details" style="font-size:0.6rem;">📖</button>
             </div>
@@ -706,6 +783,14 @@ function attachSummoningEvents(el) {
         });
     }
 
+    const tlFilter = el.querySelector('#summoner-tl-filter');
+    if (tlFilter) {
+        tlFilter.addEventListener('change', (e) => {
+            sessionStorage.setItem('fates-edge-summoner-filter-tl', e.target.value);
+            renderSummoning(el);
+        });
+    }
+
     // Bind buttons: use the cost from the sibling select
     el.querySelectorAll('.bind-btn').forEach(btn => {
         btn.addEventListener('click', () => {
@@ -728,8 +813,9 @@ window.summonerBindFromBestiaryWithCost = async function(bestiaryId, cost) {
     const char = getCharacterData();
     if (!char) return;
 
-    const bestiary = await loadBestiary();
-    const spiritData = bestiary.find(s => (s.id || s.name) === bestiaryId);
+    // Use full bestiary to find the spirit (but we'll still enforce TL < 4)
+    const fullBestiary = await loadBestiary();
+    const spiritData = fullBestiary.find(s => (s.id || s.name) === bestiaryId);
     if (!spiritData) {
         showToast('Spirit not found in bestiary.', 'error');
         return;
@@ -738,6 +824,13 @@ window.summonerBindFromBestiaryWithCost = async function(bestiaryId, cost) {
     const name = spiritData.name || 'Unnamed Spirit';
     const cls = getSpiritClass(spiritData);
     const meta = CLASS_META[cls] || CLASS_META['II'];
+    const tl = getSpiritTL(spiritData);
+
+    // Prevent binding TL 4+ (safety guard)
+    if (tl >= 4) {
+        showToast(`"${name}" is TL ${tl} and cannot be bound.`, 'error');
+        return;
+    }
 
     if ((char.boundSpirits || []).some(s => s.bestiaryId === bestiaryId || s.name === name)) {
         showToast(`"${name}" is already bound.`, 'warning');
@@ -814,6 +907,7 @@ window.summonerBindRitualFromSelect = function() {
     const cls = classInput.toUpperCase();
     const meta = CLASS_META[cls] || CLASS_META['II'];
 
+    // Custom spirits are assumed to be bindable (no TL limit enforcement here)
     if (!['boon', 'fatigue', 'memory'].includes(cost)) {
         showToast('Invalid cost. Choose boon, fatigue, or memory.', 'error');
         return;
@@ -1012,8 +1106,9 @@ window.summonerReleaseAll = function() {
 // ─── View Spirit Details ────────────────────────────────────
 
 window.summonerViewSpirit = async function(bestiaryId) {
-    const bestiary = await loadBestiary();
-    const spirit = bestiary.find(s => (s.id || s.name) === bestiaryId);
+    // Use full bestiary to allow viewing TL 4+ (but not binding)
+    const fullBestiary = await loadBestiary();
+    const spirit = fullBestiary.find(s => (s.id || s.name) === bestiaryId);
     if (!spirit) {
         showToast('Spirit not found.', 'error');
         return;
@@ -1030,6 +1125,7 @@ window.summonerViewSpirit = async function(bestiaryId) {
     const nature = safeString(spirit.nature || 'Unknown');
     const connections = (spirit.connections || []).join(', ');
     const signs = (spirit.signs || []).join(', ');
+    const tl = getSpiritTL(spirit);
 
     showToastWithHTML(`
         <div style="display:flex;flex-direction:column;gap:0.3rem;">
@@ -1037,7 +1133,7 @@ window.summonerViewSpirit = async function(bestiaryId) {
                 <span style="font-size:2rem;">${escHtml(icon)}</span>
                 <div>
                     <div style="font-weight:600;font-size:1.1rem;">${escHtml(name)}</div>
-                    <div style="font-size:0.8rem;color:var(--text3);">${getNatureIcon(nature)} ${escHtml(nature)} · ${meta.icon} ${meta.label}</div>
+                    <div style="font-size:0.8rem;color:var(--text3);">${getNatureIcon(nature)} ${escHtml(nature)} · ${meta.icon} ${meta.label} · ⚡ TL ${tl}</div>
                     <div style="font-size:0.7rem;color:var(--text3);">🔗 Leash ${meta.leash}</div>
                 </div>
             </div>
@@ -1047,6 +1143,7 @@ window.summonerViewSpirit = async function(bestiaryId) {
             ${price ? `<div style="font-size:0.8rem;"><strong>💰 Price:</strong> ${escHtml(price)}</div>` : ''}
             ${signs ? `<div style="font-size:0.75rem;color:var(--text3);"><strong>👁️ Signs:</strong> ${escHtml(signs)}</div>` : ''}
             ${connections ? `<div style="font-size:0.7rem;color:var(--text3);"><strong>🌍 Connections:</strong> ${escHtml(connections)}</div>` : ''}
+            ${tl >= 4 ? `<div style="font-size:0.75rem;color:var(--red);">⚠️ This spirit is Threat Level ${tl} and cannot be bound.</div>` : ''}
             <div style="font-size:0.7rem;color:var(--text3);margin-top:0.2rem;border-top:1px solid var(--border);padding-top:0.2rem;">
                 "The spirit remembers every slight."
             </div>

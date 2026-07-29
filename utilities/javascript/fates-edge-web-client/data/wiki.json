@@ -3262,6 +3262,169 @@
     "body": "You are always treated as having Partial Cover against ranged attacks, even in the open (the Weave twists around you). When you take the Defend action against a ranged attack, improve Position by one step. Requires Elusive Dodge, Wits 3+.",
     "tags": ["talent", "combat", "defender"],
     "cost": 6
+  },
+  {   
+    "id": "light-fingers",
+    "title": "Light Fingers",
+    "category": "mundane",
+    "tags": [
+      "talent",
+      "thief",
+      "minor",
+      "foundation"
+    ],
+    "cost": 2,
+    "tier": "minor",
+    "activation": "active",
+    "prerequisites": "",
+    "body": "Active, once per scene. When you attempt to lift a small object (purse, key, letter, seal) from a person or desk, treat your first Stealth or Subterfuge roll as Position +1. No one notices until it is already in your sleeve.",
+    "quote": "No one notices until it is already in your sleeve.",
+    "source_book": "The Velvet Touch",
+    "source_section": "2.1 — 2 XP Talents: Foundations"
+  },
+  {
+    "id": "the-unlocked-window",
+    "title": "The Unlocked Window",
+    "category": "mundane",
+    "tags": [
+      "talent",
+      "thief",
+      "minor",
+      "foundation"
+    ],
+    "cost": 2,
+    "tier": "minor",
+    "activation": "passive",
+    "prerequisites": "",
+    "body": "Passive. When infiltrating a structure you have cased for at least an hour, ignore one security obstacle (locked door, patrolled corridor, guard dog) per session. Describe how you already prepared for it.",
+    "source_book": "The Velvet Touch",
+    "source_section": "2.1 — 2 XP Talents: Foundations"
+  },
+  {
+    "id": "silk-palms",
+    "title": "Silk Palms",
+    "category": "mundane",
+    "tags": [
+      "talent",
+      "thief",
+      "minor",
+      "foundation"
+    ],
+    "cost": 2,
+    "tier": "minor",
+    "activation": "active",
+    "prerequisites": "",
+    "body": "Active. When you bribe or gift a minor official, you gain a temporary String: Bought Silence. Once, you may activate this String to reduce DV by 1 on a Petition or Broker action involving that official. The String is consumed afterward.",
+    "source_book": "The Velvet Touch",
+    "source_section": "2.1 — 2 XP Talents: Foundations"
+  },
+  {
+    "id": "always-another-exit",
+    "title": "Always Another Exit",
+    "category": "mundane",
+    "tags": [
+      "talent",
+      "thief",
+      "major",
+      "working-knife"
+    ],
+    "cost": 4,
+    "tier": "major",
+    "activation": "active",
+    "prerequisites": "",
+    "body": "Active, once per session. When you are cornered or a heist goes wrong, you may declare that you prepared an escape route earlier. Describe it plausibly (rope out a window, a bribed guard, a secret door). The GM may impose a cost — a dropped item, a witness, a future debt — but you get out.",
+    "source_book": "The Velvet Touch",
+    "source_section": "2.2 — 4 XP Talents: The Working Knife"
+  },
+  {
+    "id": "the-forgers-eye",
+    "title": "The Forger's Eye",
+    "category": "mundane",
+    "tags": [
+      "talent",
+      "thief",
+      "major",
+      "working-knife"
+    ],
+    "cost": 4,
+    "tier": "major",
+    "activation": "active",
+    "prerequisites": "Craft 1+",
+    "body": "Active. You can copy any handwriting, seal, or signature with uncanny accuracy. When you attempt to forge a document, roll Wits + Craft (DV 3 for simple, 4–5 for complex). On a hit, create a Forged credential. On a partial, the forgery holds for one scene, after which it may be detected.",
+    "source_book": "The Velvet Touch",
+    "source_section": "2.2 — 4 XP Talents: The Working Knife"
+  },
+  {
+    "id": "crowd-veil",
+    "title": "Crowd Veil",
+    "category": "mundane",
+    "tags": [
+      "talent",
+      "thief",
+      "major",
+      "working-knife"
+    ],
+    "cost": 4,
+    "tier": "major",
+    "activation": "active",
+    "prerequisites": "Stealth 2+",
+    "body": "Active. You vanish into crowds. When in a populated area (market, festival, dock), you may roll Stealth vs. DV 3 to become Hidden in plain sight. Pursuers suffer −1 die to find you until you act conspicuously.",
+    "source_book": "The Velvet Touch",
+    "source_section": "2.2 — 4 XP Talents: The Working Knife"
+  },
+  {
+    "id": "the-velvet-glove",
+    "title": "The Velvet Glove",
+    "category": "mundane",
+    "tags": [
+      "talent",
+      "thief",
+      "major",
+      "signature"
+    ],
+    "cost": 5,
+    "tier": "major",
+    "activation": "active",
+    "prerequisites": "Presence 2+, Subterfuge 1+",
+    "body": "Active, once per session. You have cultivated a network of informants, fence contacts, and corrupted clerks. You may declare that a minor NPC (a servant, a dockworker, a scribe) owes you a favor. They provide a specific service: unlock a door, delay a patrol, deliver a message. The GM may dictate a cost — the NPC will later need help, or their favor expires after use.",
+    "source_book": "The Velvet Touch",
+    "source_section": "2.3 — 5 XP Talents: Signature Moves"
+  },
+  {
+    "id": "master-of-misdirection",
+    "title": "Master of Misdirection",
+    "category": "mundane",
+    "tags": [
+      "talent",
+      "thief",
+      "major",
+      "signature"
+    ],
+    "cost": 5,
+    "tier": "major",
+    "activation": "active",
+    "prerequisites": "Deception 2+",
+    "body": "Active. When you are discovered during a crime, you may spend 1 Boon to redirect suspicion to another person or faction. Roll Deception vs. DV 4. On a hit, the heat shifts; on a miss, you gain Exposure +1 and the target becomes hostile.",
+    "source_book": "The Velvet Touch",
+    "source_section": "2.3 — 5 XP Talents: Signature Moves"
+  },
+  {
+    "id": "ghost-heist",
+    "title": "Ghost Heist",
+    "category": "mundane",
+    "tags": [
+      "talent",
+      "thief",
+      "prestige"
+    ],
+    "cost": 7,
+    "tier": "prestige",
+    "activation": "active",
+    "prerequisites": "Tier II, Stealth 3+",
+    "body": "Active, once per arc. You may commit a crime that is never solved — not because you are perfect, but because the evidence points nowhere. After a successful heist, you may declare that no traceable evidence remains; the GM cannot use Social SB to retroactively implicate you from that scene. Cost: you must accept a permanent Reputation: Whispers tag — some will always suspect you, even without proof.",
+    "note": "Referenced as 'The Ghost Did It' in the Saboteur sample build (Ch. 3) but never written up under that name — this entry (Ghost Heist) is the only 7 XP prestige talent defined in the source text and is almost certainly the intended talent. Worth a naming pass in the sourcebook.",
+    "source_book": "The Velvet Touch",
+    "source_section": "2.4 — 7 XP Prestige Talent: The Quiet Catastrophe"
   }
   ]
 }

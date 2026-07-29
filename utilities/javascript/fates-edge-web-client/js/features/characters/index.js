@@ -10,7 +10,7 @@
  * - Talent filtering by category
  * - Path‑specific character summary (Invoker symbols, Cantor corruption, Witch prices, etc.)
  * - FIX: Runekeepers without a patron now derive it from Thiasos/Codex selection
- * - FIX (this pass): derivePatronFromRunekeeperItems referenced two undefined
+ * - FIX (earlier pass): derivePatronFromRunekeeperItems referenced two undefined
  *   bare identifiers (`thiasos`, `codex` instead of `char.thiasos`/`char.codex`)
  *   ahead of an unconditional `return null;`, so the function threw a
  *   ReferenceError on every real invocation and the correct implementation
@@ -28,6 +28,29 @@
  *   no character (or no matching character) is selected, instead of just
  *   a bare "select a character" message.
  * - REVISED: Added Bound Patron, bloomCount, resonantRites display for Cantors.
+ *
+ * ────────────────────────────────────────────────────────────────────────
+ * BUGFIX PASS (this revision) — "Talents doesn't work":
+ *
+ * 1. renderTalentList() filtered wiki entries with
+ *    `e.category === 'talents' || e.category === 'talent'`. Real wiki
+ *    entries (see cantor.js/psion.js's own fallback loaders) identify
+ *    themselves as talents via a `tags` array containing 'talent' — the
+ *    `category` field is used for the magic path name instead (e.g.
+ *    category: 'magic'). This filter matched ZERO wiki entries, ever, so
+ *    the standalone Talent Catalog panel could only ever show manually
+ *    added local talents. The same wrong filter was duplicated in
+ *    editor.js and wizard.js — fixed in all three.
+ *
+ * 2. cloneTalentFromWiki() hardcoded `activation: 'passive'` and never
+ *    copied `prerequisites` from the source wiki entry — cloning an
+ *    Active, prerequisite-gated talent (e.g. Ghost Heist, a new thief
+ *    talent — Active, once per arc, requires Tier II + Stealth 3+) would
+ *    silently turn it into a passive talent with no prerequisites shown.
+ *    Now carries over `activation`/`prerequisites`/`tier` from the wiki
+ *    entry when present, falling back to the previous defaults only when
+ *    the entry doesn't specify them.
+ * ────────────────────────────────────────────────────────────────────────
  */
 
 import { generateId, escHtml, safeParseInt, clamp } from '../../core/utils.js';
@@ -689,8 +712,9 @@ export function renderTalentList() {
     const state = getState();
     const localTalents = state.talents || [];
     const wikiEntries = state.wikiEntries || [];
-    const remoteTalents = wikiEntries.filter(e => 
-        e.category === 'talents' || e.category === 'talent'
+    // FIX (see header note #1): identify talents via tags, not category.
+    const remoteTalents = wikiEntries.filter(e =>
+        e.tags && Array.isArray(e.tags) && e.tags.includes('talent')
     );
     
     // Count by tier
@@ -809,6 +833,7 @@ export function renderTalentList() {
                         <span style="font-weight:500;color:var(--text2);white-space:nowrap;">${escHtml(t.title)}</span>
                         ${t.cost != null ? `<span style="color:${tier.color};font-weight:600;font-size:0.7rem;white-space:nowrap;">${t.cost}XP</span>` : ''}
                         ${t.body ? `<span style="color:var(--text3);font-size:0.75rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">— ${escHtml(t.body)}</span>` : ''}
+                        ${t.prerequisites ? `<span style="color:var(--text3);font-size:0.65rem;white-space:nowrap;">Req: ${escHtml(t.prerequisites)}</span>` : ''}
                     </div>
                     <button class="btn btn-xs btn-ghost talent-clone-btn" data-id="${escHtml(String(t.id))}" title="Clone to local" style="color:var(--green);">📋</button>
                 </div>
@@ -1041,12 +1066,17 @@ function deleteTalentHandler(id) {
     showToast('Talent deleted.', 'success');
 }
 
+// FIX (see header note #2): this used to hardcode `activation: 'passive'`
+// and never copy `prerequisites` from the source wiki entry, silently
+// dropping both whenever the cloned talent was actually Active and/or
+// prerequisite-gated. Now carries them over when the wiki entry provides
+// them (falls back to the previous defaults only if it doesn't).
 function cloneTalentFromWiki(remoteId) {
     const state = getState();
     const wikiEntries = state.wikiEntries || [];
-    const remote = wikiEntries.find(w => 
-        String(w.id) === String(remoteId) && 
-        (w.category === 'talents' || w.category === 'talent')
+    const remote = wikiEntries.find(w =>
+        String(w.id) === String(remoteId) &&
+        w.tags && Array.isArray(w.tags) && w.tags.includes('talent')
     );
     
     if (!remote) {
@@ -1072,10 +1102,11 @@ function cloneTalentFromWiki(remoteId) {
         name: remote.title,
         cost: cost,
         description: remote.body || remote.description || '',
+        prerequisites: remote.prerequisites || '',
         source: 'wiki-clone',
         clonedFrom: remote.id,
-        tier: tier.id,
-        activation: 'passive',
+        tier: remote.tier || tier.id,
+        activation: remote.activation || 'passive',
         createdAt: new Date().toISOString()
     };
     
