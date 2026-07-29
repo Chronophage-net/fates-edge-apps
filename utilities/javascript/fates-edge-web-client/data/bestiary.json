@@ -2835,26 +2835,6 @@
     }
   },
   {
-    "Debt That Never Sleeps (Tier X)": {
-      "page": "Debt_That_Never_Sleeps",
-      "summary": "It is not a creature. It is the interest on a debt that has been compounding since the first promise was made. The accumulated weight of every broken promise, every unpaid debt, every oath that was sworn and then forgotten. It has no physical form—it is a presence, a pressure, a weight.",
-      "locations": ["Everywhere", "Nowhere", "The space between obligations"],
-      "lore": "The Debt That Never Sleeps is the cosmic consequence of the first promise that was ever broken. It has been accumulating interest for longer than mortal memory. It is the reason the Ninth Bell exists—a warning that there are debts that cannot be paid, only deferred.",
-      "connections": ["The Hollow", "Malachai", "The Witness"],
-      "tl": 10,
-      "class": "X",
-      "sb_spends": [
-        { "cost": 1, "name": "The Weight of Oaths", "effect": "All characters in the scene feel the weight of their unpaid debts. Mark 1 Fatigue to all characters." },
-        { "cost": 2, "name": "The Debt Named", "effect": "The Debt speaks the name of a promise the party made but forgot. The character who made the promise gains 1 Obligation to the person they failed." },
-        { "cost": 2, "name": "The Interest Compounds", "effect": "A debt that was thought to be settled is revealed to still have interest. The character who paid it gains 2 Obligation to the debtor." },
-        { "cost": 3, "name": "The Collector's Gaze", "effect": "The Debt looks at a character. That character must test Resolve (DV 4) or be Paralyzed with Guilt (cannot act for one exchange)." },
-        { "cost": 4, "name": "The Ledger's Weight", "effect": "All characters in the scene must test Resolve (DV 5) or gain 1 Obligation to the Debt itself—a cosmic obligation that can only be paid by an act of true selflessness." },
-        { "cost": 5, "name": "The Reckoning's Edge", "effect": "The Debt causes a character's past sins to manifest as a shadow. The shadow attacks the character; it can only be defeated by acknowledging the sin and accepting the debt." },
-        { "cost": 6, "name": "The Final Clause", "effect": "The Debt offers a bargain: the party will be released from all their debts if they pay the Debt's price. The price is always a memory, a name, or a year of service to a cause chosen by the Debt." }
-      ]
-    }
-  },
-  {
     "Unwritten King (Tier X)": {
       "page": "Unwritten_King",
       "summary": "A figure of shifting shadow and faint light, the Unwritten King appears at the edge of history—the moment before a kingdom is founded, the breath before a dynasty is born. He does not speak. He does not move. He is the king who never ruled, but whose rule is inevitable.",
@@ -2957,5 +2937,912 @@
         { "cost": 5, "name": "The Unpaid Price", "effect": "The Keeper demands payment. The party must offer something of value—a memory, a name, a year of service—or the Keeper attacks with full force (+2 die to all its actions for the remainder of the scene)." }
       ]
     }
+  },  
+  {
+    "page": "Ledger-Keeper's_Aspirant",
+    "summary": "An archivist who discovered a sealed file containing the truth of a noble's death. The Witness showed them what was in the file. Now they cannot stop reading—every ledger, every contract, every hidden clause.",
+    "locations": ["Ecktoria", "Censor's Courts", "Record-Halls"],
+    "lore": "They seek to expose the truth, but the truth has exposed them first.",
+    "connections": ["The Witness"],
+    "tl": 3,
+    "class": "III",
+    "type": "Mortal Cultist",
+    "sb_spends": [
+      { "cost": 1, "name": "Reveal the Hidden Clause", "effect": "The Aspirant points out a detail everyone missed; one character's next Investigation roll gains +1 die." },
+      { "cost": 2, "name": "The Unbearable Truth", "effect": "They speak a painful truth aloud; one character must test Resolve (DV 3) or mark 1 Fatigue." },
+      { "cost": 3, "name": "The Witness's Gaze", "effect": "They reveal a secret about the party; the GM gains 2 SB to spend on complications related to that secret." }
+    ]
+  },
+  {
+    "page": "Mirror-Bearer's_Aspirant",
+    "summary": "A former courtier who was exiled for speaking the truth about a noble's adultery. They carry a silver mirror everywhere, seeking faces that cannot hide.",
+    "locations": ["Vhasia", "Confessionals", "Places of Reflection"],
+    "lore": "They are kind, and they are terrifying.",
+    "connections": ["The Witness"],
+    "tl": 3,
+    "class": "III",
+    "type": "Mortal Cultist",
+    "sb_spends": [
+      { "cost": 1, "name": "The Silver Mirror", "effect": "They show a character their reflection; the character sees the truth of their own heart and gains +1 die to resist emotional manipulation for the scene." },
+      { "cost": 2, "name": "The Unmasked Face", "effect": "They force a target to look into the mirror; the target must test Resolve (DV 4) or reveal a hidden motive." },
+      { "cost": 3, "name": "The Witness's Judgment", "effect": "They declare a character's actions have been witnessed; all of that character's social rolls are at -1 die for the scene." }
+    ]
+  },
+  {
+    "page": "Seeker's_Aspirant",
+    "summary": "A scholar who found a sealed tomb and opened it, discovering evidence of a crime the empire wished to forget. The Witness showed them the truth.",
+    "locations": ["Pereshi", "Ruins", "Ancient Sites"],
+    "lore": "Now they seek more truth, and they will not stop until they find the name of the architect who built the First City.",
+    "connections": ["The Witness"],
+    "tl": 3,
+    "class": "III",
+    "type": "Mortal Cultist",
+    "sb_spends": [
+      { "cost": 1, "name": "The Unsealed Door", "effect": "They have a key; unlock any one mundane lock or seal." },
+      { "cost": 2, "name": "The Found Truth", "effect": "They reveal a clue the party missed; gain +1 die on the next Investigation roll." },
+      { "cost": 3, "name": "The Lost Name", "effect": "They recall a name that has been erased from history; the GM must answer one truthfully about the person or place named." }
+    ]
+  },
+  {
+    "page": "Iron-Breaker_Heretic",
+    "summary": "A former gladiator who won their freedom by killing a prince in the arena. They carry the prince's broken chain as a talisman.",
+    "locations": ["Zakov", "Ashaan", "The Brass Coast"],
+    "lore": "They believe that the only law is the one you enforce with your own hands.",
+    "connections": ["The Riven Path"],
+    "tl": 4,
+    "class": "IV",
+    "type": "Ex-Slave",
+    "sb_spends": [
+      { "cost": 1, "name": "Chain's Memory", "effect": "They show a character the broken chain; the character sees a vision of their own oppression and gains +1 die to resist coercion for the scene." },
+      { "cost": 2, "name": "The Unstoppable Charge", "effect": "They move with impossible speed; one character who opposes them is knocked Prone." },
+      { "cost": 3, "name": "The Riven Path Opens", "effect": "They break a magical binding or geas; cost: the breaker gains 1 Obligation to the Riven Path." }
+    ]
+  },
+  {
+    "page": "Oath-Breaker_Heretic",
+    "summary": "A former oath-sworn knight who deserted their order after witnessing a massacre. They carry their broken oath as a scar.",
+    "locations": ["Black Banners", "Vhasia", "Battlefields"],
+    "lore": "They serve no one—least of all their own guilt.",
+    "connections": ["The Riven Path"],
+    "tl": 4,
+    "class": "IV",
+    "type": "Ex-Soldier",
+    "sb_spends": [
+      { "cost": 1, "name": "The Broken Vow", "effect": "They speak the oath they broke aloud; all who hear it feel the weight of their own broken promises and suffer -1 die to social rolls for the scene." },
+      { "cost": 2, "name": "The Oath Reforged", "effect": "They offer a character a new oath—one that serves the Riven Path. Accepting grants +1 die to all actions that advance the Path's agenda, but marks 1 Obligation." },
+      { "cost": 3, "name": "The Scourge of Oaths", "effect": "They strike a target; the target loses access to one oath-based power for the scene." }
+    ]
+  },
+  {
+    "page": "Unbound_Cultist",
+    "summary": "A revolutionary who has broken every chain they ever wore—family, faith, country. They now lead a cell of the Riven Path, teaching that freedom is not given but taken.",
+    "locations": ["Acasia", "Vhasia", "The Riven Path's Shrines"],
+    "lore": "They are charismatic, dangerous, and utterly convinced of their own righteousness.",
+    "connections": ["The Riven Path"],
+    "tl": 5,
+    "class": "V",
+    "type": "Cult Leader",
+    "sb_spends": [
+      { "cost": 1, "name": "The Unbound Step", "effect": "They walk through a door that was locked; the door opens behind them." },
+      { "cost": 2, "name": "The Chain Breaks", "effect": "They touch a character and break one of their chains—a debt, a fear, a relationship. The character marks 1 Fatigue but gains +1 die to their next action." },
+      { "cost": 3, "name": "The Path's Call", "effect": "They issue a challenge; all who hear it must test Resolve (DV 4) or be inspired to take up the Path. Those who fail gain 1 Obligation to the Riven Path." }
+    ]
+  },
+  {
+    "page": "Chain-Breaker_Avatar",
+    "summary": "An ancient warrior who has broken so many chains that they have become the concept of breaking. They are not a person—they are the moment a chain snaps.",
+    "locations": ["Where chains are broken", "The Riven Path's attention"],
+    "lore": "Their face is a mask of iron, their hands are manacles that have been shattered, their voice is the sound of rusted iron grinding against itself.",
+    "connections": ["The Riven Path"],
+    "tl": 6,
+    "class": "VI",
+    "type": "Patron Avatar",
+    "sb_spends": [
+      { "cost": 1, "name": "The Weight of Chains", "effect": "They gesture; all characters feel the weight of their own constraints and must test Spirit (DV 4) or be Slowed." },
+      { "cost": 2, "name": "The Shattered Manacle", "effect": "They throw a broken chain at a target; the target is Restrained until they break free (Body+Athletics, DV 4)." },
+      { "cost": 3, "name": "The Break", "effect": "They name something that should not exist; it ceases to exist for one exchange." },
+      { "cost": 4, "name": "The Freedom's Price", "effect": "They offer a character true freedom from one obligation; the character is freed, but the Chain-Breaker marks 1 Obligation on them—and the next time they break a chain, it will be more difficult." }
+    ]
+  },
+  {
+    "page": "Shadow-Kin_Acolyte",
+    "summary": "A former thief who made a pact with Ikasha to escape a death sentence. They now serve as a messenger, a spy, and a keeper of secrets.",
+    "locations": ["The Mistlands", "Zakov", "Thepyrgos"],
+    "lore": "They are never seen unless they wish to be.",
+    "connections": ["Ikasha"],
+    "tl": 4,
+    "class": "IV",
+    "type": "Mortal Cultist",
+    "sb_spends": [
+      { "cost": 1, "name": "The Unlit Candle", "effect": "They extinguish a light source; the area becomes dim, granting +1 die to all Stealth rolls for the scene." },
+      { "cost": 2, "name": "The Shadow's Whisper", "effect": "They deliver a message secretly; one character gains +1 die to their next Deception roll." },
+      { "cost": 3, "name": "The Unseen Path", "effect": "They reveal a hidden route; all characters gain +1 die to escape or evasion rolls for the scene." }
+    ]
+  },
+  {
+    "page": "Raven-Keeper_Cultist",
+    "summary": "An old woman who tends a flock of ravens that serve as Ikasha's eyes. She hears every secret whispered to the birds.",
+    "locations": ["The Mistlands", "Crossroads", "Where Ravens Gather"],
+    "lore": "She is kind, and she is terrifying.",
+    "connections": ["Ikasha"],
+    "tl": 5,
+    "class": "V",
+    "type": "Cult Leader",
+    "sb_spends": [
+      { "cost": 1, "name": "The Raven's Eye", "effect": "A raven appears and reveals a secret the party missed; gain +1 die on the next Investigation roll." },
+      { "cost": 2, "name": "The Raven's Beak", "effect": "A raven attacks a target; the target suffers -1 die to their next action." },
+      { "cost": 3, "name": "The Raven's Warning", "effect": "The ravens cry out; all characters gain +1 die to avoid surprise for the scene." }
+    ]
+  },
+  {
+    "page": "Unlit_One_Avatar",
+    "summary": "A figure of shadow and silence, the Unlit One is the embodiment of Ikasha's power. It does not speak—it watches.",
+    "locations": ["Where shadows are deepest", "The Mistlands", "Crossroads"],
+    "lore": "Its face is a mask of darkness, its hands are the absence of light. It exists in the space between heartbeats.",
+    "connections": ["Ikasha"],
+    "tl": 6,
+    "class": "VI",
+    "type": "Patron Avatar",
+    "sb_spends": [
+      { "cost": 1, "name": "The Shadow's Grasp", "effect": "They reach through a character's shadow; the character is Restrained until they break free (Spirit+Resolve, DV 4)." },
+      { "cost": 2, "name": "The Unseen Step", "effect": "They move through a locked door; the door opens behind them." },
+      { "cost": 3, "name": "The Unlit Path", "effect": "They create a path through shadow; all characters can move through the scene without being seen for one exchange." },
+      { "cost": 4, "name": "The Secret's Weight", "effect": "They reveal a secret about a character; the character must test Resolve (DV 5) or mark 1 Fatigue." }
+    ]
+  },
+  {
+    "page": "Web-Spinner_Cultist",
+    "summary": "A weaver who spun a thread that bound a kingdom together. They now serve Inaea, weaving obligations and debts into the fabric of society.",
+    "locations": ["Silkstrand", "Aelaerem", "Where webs are woven"],
+    "lore": "They are patient, precise, and they never forget a promise.",
+    "connections": ["Inaea"],
+    "tl": 5,
+    "class": "V",
+    "type": "Cult Leader",
+    "sb_spends": [
+      { "cost": 1, "name": "The Thread of Obligation", "effect": "They name a debt that has been forgotten; the debtor gains 1 Obligation." },
+      { "cost": 2, "name": "The Web's Grasp", "effect": "They create a web of obligations around a target; the target suffers -1 die to all social rolls for the scene." },
+      { "cost": 3, "name": "The Unbroken Thread", "effect": "They strengthen a bond between two characters; both gain +1 die to Aid actions for the scene." }
+    ]
+  },
+  {
+    "page": "Knot-Wife_Acolyte",
+    "summary": "A woman who ties knots in red thread to bind promises, seal marriages, and ward against the Hollow. She is the keeper of the thresholds.",
+    "locations": ["Aelaerem", "The Valewood", "Where thresholds meet"],
+    "lore": "She remembers every promise made and every promise broken.",
+    "connections": ["Inaea"],
+    "tl": 5,
+    "class": "V",
+    "type": "Hedge Witch",
+    "sb_spends": [
+      { "cost": 1, "name": "The Red Thread", "effect": "They tie a thread around a character's wrist; the character gains +1 die to resist fear for the scene." },
+      { "cost": 2, "name": "The Knot's Binding", "effect": "They knot a promise; breaking it costs 1 Obligation." },
+      { "cost": 3, "name": "The Unknot", "effect": "They undo a binding; one character is freed from a geas or obligation." }
+    ]
+  },
+  {
+    "page": "Spider's_Daughter_Avatar",
+    "summary": "A figure woven from thread and light, the Spider's Daughter is the embodiment of Inaea's mercy and control.",
+    "locations": ["The center of the web", "Where bonds are forged"],
+    "lore": "She is the warmth of the hearth and the pull of the leash, the hand that ties the knot and the hand that cuts it.",
+    "connections": ["Inaea"],
+    "tl": 6,
+    "class": "VI",
+    "type": "Patron Avatar",
+    "sb_spends": [
+      { "cost": 1, "name": "The Thread's Touch", "effect": "They touch a character; the character feels a bond forming and gains +1 die to resist betrayal for the scene." },
+      { "cost": 2, "name": "The Web's Claim", "effect": "They name a character as theirs; the character gains 1 Obligation to the Spider's Daughter." },
+      { "cost": 3, "name": "The Knot's Severance", "effect": "They cut a thread; a relationship, debt, or obligation is ended. The character who loses it must test Resolve (DV 4) or mark 1 Fatigue." },
+      { "cost": 4, "name": "The Web's Embrace", "effect": "They wrap a character in invisible threads; the character is Bound until they break free (Spirit+Resolve, DV 5)." }
+    ]
+  },
+  {
+    "page": "Tally-Keeper_Acolyte",
+    "summary": "A factor who lost everything in a bad deal and made a new bargain with Maelstraeus. They now keep the Tally of the Unpaid.",
+    "locations": ["Ecktoria", "Vhasia", "Counting-Houses"],
+    "lore": "They will collect what is owed.",
+    "connections": ["Maelstraeus"],
+    "tl": 4,
+    "class": "IV",
+    "type": "Mortal Cultist",
+    "sb_spends": [
+      { "cost": 1, "name": "The Tally's Weight", "effect": "They name a debt that is owed; the debtor gains 1 Obligation." },
+      { "cost": 2, "name": "The Interest Collects", "effect": "They cause a debt to compound; the debtor must test Resolve (DV 4) or gain 2 Obligation." },
+      { "cost": 3, "name": "The Ledger's Lock", "effect": "They seal a contract; breaking it costs 1 Harm." }
+    ]
+  },
+  {
+    "page": "Coin-House_Factor_Cultist",
+    "summary": "A merchant who has never lost a deal—because they have never made a fair one. They serve Maelstraeus as a broker of obligations.",
+    "locations": ["Silkstrand", "The Brass Coast", "Where money changes hands"],
+    "lore": "They are a collector of debts and a whisperer of interest rates.",
+    "connections": ["Maelstraeus"],
+    "tl": 5,
+    "class": "V",
+    "type": "Cult Leader",
+    "sb_spends": [
+      { "cost": 1, "name": "The Weight of Coin", "effect": "They offer a character a coin; accepting marks 1 Obligation." },
+      { "cost": 2, "name": "The Unfair Exchange", "effect": "They trade something of value for something of greater value; the character who loses gains 1 Fatigue." },
+      { "cost": 3, "name": "The Ledger's Claim", "effect": "They call in a debt; the debtor must pay 1 Boon or mark 1 Obligation." }
+    ]
+  },
+  {
+    "page": "Debt-Collector_Avatar",
+    "summary": "A figure of polished iron and worn gold, the Debt-Collector is the embodiment of Maelstraeus's power. They do not negotiate—they collect.",
+    "locations": ["Where debts are called due", "Ecktoria", "The Brass Coast"],
+    "lore": "Their face is a mask of brass, their hands are leaden weights. They carry a ledger that never closes.",
+    "connections": ["Maelstraeus"],
+    "tl": 6,
+    "class": "VI",
+    "type": "Patron Avatar",
+    "sb_spends": [
+      { "cost": 1, "name": "The Debt's Weight", "effect": "They name a debt; the debtor suffers -1 die to all actions until the debt is paid." },
+      { "cost": 2, "name": "The Interest's Claim", "effect": "They cause a debt to compound; the debtor gains 2 Obligation." },
+      { "cost": 3, "name": "The Ledger's Seal", "effect": "They seal a character's fate; the character cannot escape their obligations until the Debt-Collector releases them." },
+      { "cost": 4, "name": "The Unpayable Debt", "effect": "They name a price that cannot be paid; the target suffers Harm 2 (Stress) as the weight of the debt crushes them." }
+    ]
+  },
+  {
+    "page": "Root-Walker_Acolyte",
+    "summary": "A figure woven from moss and living wood, the Root-Walker is a servant of Grimmir who has merged with the forest.",
+    "locations": ["The Valewood", "Aelaerem", "Where the wild presses"],
+    "lore": "They move through the trees like water, speak in the language of roots, and they remember every sacrifice the forest has ever accepted.",
+    "connections": ["Grimmir"],
+    "tl": 5,
+    "class": "V",
+    "type": "Hedge Witch",
+    "sb_spends": [
+      { "cost": 1, "name": "The Root's Grasp", "effect": "Roots erupt from the ground; a character is Slowed." },
+      { "cost": 2, "name": "The Forest's Memory", "effect": "They speak a name that has been forgotten by the living; the GM must answer one question about a death in the forest." },
+      { "cost": 3, "name": "The Wild's Claim", "effect": "They name a character as trespasser; the forest attacks the character with all its wrath." }
+    ]
+  },
+  {
+    "page": "Alder-King's_Hunter_Cultist",
+    "summary": "A hunter who serves the Alder King, tracking those who have broken the old compacts. They ride a horse of woven thorn and carry a bow of living yew.",
+    "locations": ["The Thornwood", "The Valewood", "Where the wild hunts"],
+    "lore": "They are patient, precise, and they do not offer mercy.",
+    "connections": ["Grimmir"],
+    "tl": 6,
+    "class": "VI",
+    "type": "Cult Leader",
+    "sb_spends": [
+      { "cost": 1, "name": "The Hunter's Mark", "effect": "They mark a target; the target is tracked for the scene (cannot escape without a successful Stealth test, DV 4)." },
+      { "cost": 2, "name": "The Thorn's Kiss", "effect": "They fire an arrow; the target suffers Harm 1 and is Poisoned (-1 die to all physical actions)." },
+      { "cost": 3, "name": "The Alder King's Claim", "effect": "They name a character as prey; all natural terrain becomes dangerous for that character." }
+    ]
+  },
+  {
+    "page": "Thorn-King_Avatar",
+    "summary": "A figure of twisted wood and living thorns, the Thorn-King is the embodiment of Grimmir's power—the hunger, the patience, the sacrifice.",
+    "locations": ["The Deep Wood", "Where the old laws hold"],
+    "lore": "They do not speak—they grow. Their presence is the weight of the forest itself.",
+    "connections": ["Grimmir"],
+    "tl": 7,
+    "class": "VII",
+    "type": "Patron Avatar",
+    "sb_spends": [
+      { "cost": 1, "name": "The Thorn's Grasp", "effect": "Thorns erupt from the ground; a character is Grappled." },
+      { "cost": 2, "name": "The Wild's Patience", "effect": "They slow time for a character; the character acts at -1 die for the scene." },
+      { "cost": 3, "name": "The Forest's Wrath", "effect": "They call the wild to attack; all characters suffer -1 die to actions that harm the forest." },
+      { "cost": 4, "name": "The Alder King's Command", "effect": "They demand a sacrifice; a character must offer something of value—a memory, a name, a year of service—or suffer Harm 3." }
+    ]
+  },
+  {
+    "page": "Revel-Kin_Acolyte",
+    "summary": "A dancer who was possessed by Thrysos during a festival and never fully returned. They move with impossible grace and speak in fragments of songs.",
+    "locations": ["Linn", "Theona", "Where revels are held"],
+    "lore": "They are not drunk—they are holy.",
+    "connections": ["Thrysos"],
+    "tl": 4,
+    "class": "IV",
+    "type": "Mortal Cultist",
+    "sb_spends": [
+      { "cost": 1, "name": "The Dance's Claim", "effect": "They begin to dance; all who see them must test Resolve (DV 3) or be compelled to dance along." },
+      { "cost": 2, "name": "The Song's Echo", "effect": "They sing a fragment of a sacred hymn; all who hear it gain +1 die to resist fear for the scene." },
+      { "cost": 3, "name": "The Revel's Gift", "effect": "They offer a character a sip of sacred wine; the character is intoxicated with a vision (gain +1 die to Lore or lose 1 die to physical actions, GM's choice)." }
+    ]
+  },
+  {
+    "page": "Horned_One_Cultist",
+    "summary": "A figure wearing a mask of bone and horn, the Horned One leads the revels of Thrysos. They are the embodiment of the wild celebration.",
+    "locations": ["Linn", "The Wilds", "Where the old rites are held"],
+    "lore": "They are the joy that breaks the chains, the madness that liberates, the ecstasy that kills.",
+    "connections": ["Thrysos"],
+    "tl": 5,
+    "class": "V",
+    "type": "Cult Leader",
+    "sb_spends": [
+      { "cost": 1, "name": "The Horn's Call", "effect": "They blow a horn; all who hear it gain +1 die to Performance and Athletics rolls for the scene." },
+      { "cost": 2, "name": "The Madness of the Revel", "effect": "They sing a hymn; a character must test Resolve (DV 4) or be compelled to act on their most intense desire." },
+      { "cost": 3, "name": "The Revel's Price", "effect": "They offer a character the gift of the revel; the character gains 1 Obligation to Thrysos and a vision that changes them (GM's choice)." }
+    ]
+  },
+  {
+    "page": "Satyr-King_Avatar",
+    "summary": "A figure of bronze and ivy, the Satyr-King is the embodiment of Thrysos's power—the ecstasy, the frenzy, the wild abandon.",
+    "locations": ["The Heart of the Revel", "Where the dance never ends"],
+    "lore": "They do not walk—they dance. They do not speak—they sing. Their presence is the sound of the revel itself.",
+    "connections": ["Thrysos"],
+    "tl": 6,
+    "class": "VI",
+    "type": "Patron Avatar",
+    "sb_spends": [
+      { "cost": 1, "name": "The Dance's Claim", "effect": "They begin to dance; all characters must test Resolve (DV 4) or be drawn into the dance." },
+      { "cost": 2, "name": "The Song's Command", "effect": "They sing a hymn; a character must test Resolve (DV 5) or obey a single command." },
+      { "cost": 3, "name": "The Revel's Embrace", "effect": "They offer a character a sip of sacred wine; the character gains +2 dice to all actions for the scene, but marks 1 Fatigue." },
+      { "cost": 4, "name": "The Madness of the Revel", "effect": "They unleash the wild celebration; all characters in the scene act at Desperate Position for one exchange." }
+    ]
+  },
+  {
+    "page": "Grave-Keeper_Acolyte",
+    "summary": "A woman who tends the graves of the forgotten, ensuring that the dead are properly returned to the soil. She does not mourn—she composts.",
+    "locations": ["Aeler", "The Mistlands", "Where the dead rest"],
+    "lore": "She is patient, kind, and she understands that every ending is a beginning.",
+    "connections": ["The Carrion King"],
+    "tl": 4,
+    "class": "IV",
+    "type": "Mortal Cultist",
+    "sb_spends": [
+      { "cost": 1, "name": "The Grave's Memory", "effect": "They touch the ground; the GM must answer one question about a death that occurred in the area." },
+      { "cost": 2, "name": "The Soil's Claim", "effect": "They scatter soil; all characters gain +1 die to resist fear for the scene." },
+      { "cost": 3, "name": "The Compost's Blessing", "effect": "They offer a character the gift of renewal; the character heals 1 Fatigue, but marks 1 Obligation to the Carrion King." }
+    ]
+  },
+  {
+    "page": "Fungal-Warden_Cultist",
+    "summary": "A figure wrapped in moss and mushroom caps, the Fungal-Warden tends the mycelial networks that connect the dead to the living.",
+    "locations": ["The Mistlands", "The Deepwood", "Where fungi grow"],
+    "lore": "They speak to the soil, listen to the spores, and they remember every body that has ever fed the earth.",
+    "connections": ["The Carrion King"],
+    "tl": 5,
+    "class": "V",
+    "type": "Cult Leader",
+    "sb_spends": [
+      { "cost": 1, "name": "The Spore's Claim", "effect": "They release a cloud of spores; all characters must test Endurance (DV 3) or be Poisoned." },
+      { "cost": 2, "name": "The Root's Memory", "effect": "They touch the ground; the GM must answer one question about the history of the soil." },
+      { "cost": 3, "name": "The Fungal Network", "effect": "They connect two characters through the mycelium; both gain +1 die to Aid each other for the scene." }
+    ]
+  },
+  {
+    "page": "Carrion-King's_Champion_Avatar",
+    "summary": "A figure of bone and living fungus, the Carrion-King's Champion is the embodiment of the cycle of death and renewal.",
+    "locations": ["The Heart of the Compost", "Where decay meets renewal"],
+    "lore": "They do not speak—they grow. Their presence is the smell of turned earth, the warmth of the compost, the patience of the soil.",
+    "connections": ["The Carrion King"],
+    "tl": 6,
+    "class": "VI",
+    "type": "Patron Avatar",
+    "sb_spends": [
+      { "cost": 1, "name": "The Compost's Touch", "effect": "They touch a character; the character is healed of 1 Harm, but marks 1 Obligation to the Carrion King." },
+      { "cost": 2, "name": "The Rot's Claim", "effect": "They name a character as fertilizer; the character suffers -1 die to all physical actions as their vitality is drawn to the soil." },
+      { "cost": 3, "name": "The Soil's Memory", "effect": "They speak the name of a death; the GM must answer one question about a death that occurred in the area." },
+      { "cost": 4, "name": "The Cycle's Weight", "effect": "They demand a sacrifice; a character must offer something of value—a memory, a name, a future—or suffer Harm 3." }
+    ]
+  },
+  {
+    "page": "Sky-Watcher_Acolyte",
+    "summary": "A herder who spends their days watching the sky, reading the weather, and remembering every storm. They serve Kuva as a witness to oaths made under the open sky.",
+    "locations": ["Ykrul", "The Steppe", "The Open Sky"],
+    "lore": "They do not speak lies—the sky would know.",
+    "connections": ["Kuva"],
+    "tl": 4,
+    "class": "IV",
+    "type": "Mortal Cultist",
+    "sb_spends": [
+      { "cost": 1, "name": "The Sky's Witness", "effect": "They name an oath made under the open sky; the oath becomes binding." },
+      { "cost": 2, "name": "The Wind's Call", "effect": "They call a breeze; all characters gain +1 die to Sailing and Navigation rolls for the scene." },
+      { "cost": 3, "name": "The Storm's Warning", "effect": "They see a storm coming; all characters gain +1 die to avoid environmental hazards for the scene." }
+    ]
+  },
+  {
+    "page": "Storm-Caller_Cultist",
+    "summary": "A shaman who learned to call lightning from the sky, to speak to the wind, to read the weather as others read words. They serve Kuva as a conduit of the storm's power.",
+    "locations": ["Ykrul", "The Steppe", "Where storms gather"],
+    "lore": "They are wild, unpredictable, and they cannot be lied to.",
+    "connections": ["Kuva"],
+    "tl": 5,
+    "class": "V",
+    "type": "Cult Leader",
+    "sb_spends": [
+      { "cost": 1, "name": "The Storm's Voice", "effect": "They speak a word of thunder; all characters must test Resolve (DV 3) or be Shaken." },
+      { "cost": 2, "name": "The Lightning's Claim", "effect": "They call a bolt of lightning; a target suffers Harm 2." },
+      { "cost": 3, "name": "The Sky's Judgment", "effect": "They name a lie; the liar suffers -1 die to all actions for the scene." }
+    ]
+  },
+  {
+    "page": "Sky's_Champion_Avatar",
+    "summary": "A figure of wind and lightning, the Sky's Champion is the embodiment of Kuva's power—the witness, the storm, the judgment.",
+    "locations": ["The Open Sky", "The Storm's Heart", "Where the sky meets the earth"],
+    "lore": "They do not speak—they thunder. Their presence is the weight of the sky itself.",
+    "connections": ["Kuva"],
+    "tl": 6,
+    "class": "VI",
+    "type": "Patron Avatar",
+    "sb_spends": [
+      { "cost": 1, "name": "The Sky's Gaze", "effect": "They look at a character; the character is Witnessed (cannot lie or break an oath for the scene)." },
+      { "cost": 2, "name": "The Storm's Claim", "effect": "They call a storm; all characters suffer -1 die to actions that harm the sky." },
+      { "cost": 3, "name": "The Lightning's Strike", "effect": "They call a bolt of lightning; a target suffers Harm 3." },
+      { "cost": 4, "name": "The Sky's Judgment", "effect": "They name a crime; the criminal is Marked (all who see them know they have done wrong)." }
+    ]
+  },
+  {
+    "page": "Name-Cutter_Acolyte",
+    "summary": "A former slave who cut their own name from the ledgers and fled. They now serve the Seal-Breaker, erasing names from records, breaking contracts, and freeing those who are bound.",
+    "locations": ["Ashaan", "Zakov", "Where names are forgotten"],
+    "lore": "They are the erasers, the ones who make the world forget.",
+    "connections": ["The Seal-Breaker"],
+    "tl": 4,
+    "class": "IV",
+    "type": "Mortal Cultist",
+    "sb_spends": [
+      { "cost": 1, "name": "The Name Erased", "effect": "They erase a character's name from a record; the character gains +1 die to avoid detection for the scene." },
+      { "cost": 2, "name": "The Seal Broken", "effect": "They break a seal or lock; a door, chest, or contract is opened." },
+      { "cost": 3, "name": "The Forgotten Face", "effect": "They touch a character's face; the character cannot be recognized for the scene." }
+    ]
+  },
+  {
+    "page": "Ledger-Burner_Cultist",
+    "summary": "A revolutionary who burns ledgers, breaks contracts, and frees the enslaved. They serve the Seal-Breaker as a destroyer of obligations.",
+    "locations": ["Ashaan", "Zakov", "Where debts are burned"],
+    "lore": "They are feared by the powerful and loved by the powerless.",
+    "connections": ["The Seal-Breaker"],
+    "tl": 5,
+    "class": "V",
+    "type": "Cult Leader",
+    "sb_spends": [
+      { "cost": 1, "name": "The Debt Erased", "effect": "They burn a contract; the debt is voided." },
+      { "cost": 2, "name": "The Name Burned", "effect": "They burn a name; the person is forgotten for the scene." },
+      { "cost": 3, "name": "The Seal-Shattered", "effect": "They break a magical seal; the seal is destroyed." }
+    ]
+  },
+  {
+    "page": "Seal-Breaker's_Champion_Avatar",
+    "summary": "A figure of smoke and shadow, the Seal-Breaker's Champion is the embodiment of erasure and freedom.",
+    "locations": ["The Heart of the Void", "Where names are forgotten"],
+    "lore": "They do not speak—they erase. Their presence is the weight of a forgotten name.",
+    "connections": ["The Seal-Breaker"],
+    "tl": 6,
+    "class": "VI",
+    "type": "Patron Avatar",
+    "sb_spends": [
+      { "cost": 1, "name": "The Name Erased", "effect": "They speak a name; the name is forgotten for the scene." },
+      { "cost": 2, "name": "The Seal Broken", "effect": "They touch a seal; the seal is broken." },
+      { "cost": 3, "name": "The Ledger Burned", "effect": "They burn a record; the record is destroyed." },
+      { "cost": 4, "name": "The Freedom's Price", "effect": "They offer a character freedom; the character is freed from one obligation, but marks 1 Obligation to the Seal-Breaker." }
+    ]
+  },
+  {
+    "page": "Curse-Bearer_Acolyte",
+    "summary": "A woman who accepted a curse to save her family. She now carries the curse, and she is becoming something else.",
+    "locations": ["Zakov", "Ashaan", "Where curses are carried"],
+    "lore": "She is kind, and she is terrifying. She wears a silver chain around her neck that grows heavier each day.",
+    "connections": ["Malachai"],
+    "tl": 5,
+    "class": "V",
+    "type": "Mortal Cultist",
+    "sb_spends": [
+      { "cost": 1, "name": "The Curse's Touch", "effect": "They touch a character; the character gains 1 Obligation to Malachai." },
+      { "cost": 2, "name": "The Curse's Claim", "effect": "They name a character as cursed; the character suffers -1 die to all physical actions for the scene." },
+      { "cost": 3, "name": "The Curse's Gift", "effect": "They offer a character a cursed gift; the character gains +1 die to all actions for the scene, but marks 1 Obligation." }
+    ]
+  },
+  {
+    "page": "Chained_One_Cultist",
+    "summary": "A figure wrapped in chains, the Chained One is a servant of Malachai who has accepted the weight of her power. They carry the chains of the chained angel.",
+    "locations": ["Zahk'Kozahn", "The Well of Ichor", "Where chains bind"],
+    "lore": "They do not move—they are bound. But they speak, and their words are chains.",
+    "connections": ["Malachai"],
+    "tl": 6,
+    "class": "VI",
+    "type": "Cult Leader",
+    "sb_spends": [
+      { "cost": 1, "name": "The Chain's Weight", "effect": "They speak a word of binding; a character must test Resolve (DV 4) or be Slowed." },
+      { "cost": 2, "name": "The Chain's Claim", "effect": "They touch a character with a chain; the character gains 1 Obligation to Malachai." },
+      { "cost": 3, "name": "The Chain's Gift", "effect": "They offer a character a chain; the character gains +1 die to all actions, but marks 1 Obligation." }
+    ]
+  },
+  {
+    "page": "Chained_Angel's_Avatar",
+    "summary": "A figure of shadow and chains, the Chained Angel's Avatar is the embodiment of Malachai's power—the curse, the bargain, the price.",
+    "locations": ["The Well of Ichor", "Zahk'Kozahn", "Where the chained angel waits"],
+    "lore": "They are patient, and they have all the time in the world.",
+    "connections": ["Malachai"],
+    "tl": 7,
+    "class": "VII",
+    "type": "Patron Avatar",
+    "sb_spends": [
+      { "cost": 1, "name": "The Chain's Weight", "effect": "They speak a word of binding; all characters must test Resolve (DV 5) or be Slowed." },
+      { "cost": 2, "name": "The Curse's Claim", "effect": "They name a character as cursed; the character suffers -1 die to all actions for the scene." },
+      { "cost": 3, "name": "The Curse's Gift", "effect": "They offer a character a cursed gift; the character gains +2 dice to all actions for the scene, but marks 2 Obligation." },
+      { "cost": 4, "name": "The Chained Angel's Bargain", "effect": "They offer a character a deal; the character is freed from one obligation but gains 2 Obligation to Malachai." }
+    ]
+  },
+  {
+    "page": "Ash-Bringer_Acolyte",
+    "summary": "A woman who burned her own past to escape a tyrant. She now serves Mor'iraath as a bringer of ash.",
+    "locations": ["Zakov", "Ashaan", "Where fires are set"],
+    "lore": "She is gentle, and she is terrifying. She carries a small jar of ash that she uses to make things never have been.",
+    "connections": ["Mor'iraath"],
+    "tl": 5,
+    "class": "V",
+    "type": "Mortal Cultist",
+    "sb_spends": [
+      { "cost": 1, "name": "The Ash's Touch", "effect": "They touch an object; the object is destroyed." },
+      { "cost": 2, "name": "The Ash's Claim", "effect": "They touch a character; the character must test Resolve (DV 4) or have a memory erased." },
+      { "cost": 3, "name": "The Ash's Gift", "effect": "They offer a character the gift of oblivion; the character is freed from one obligation, but loses a memory." }
+    ]
+  },
+  {
+    "page": "Pyre-Keeper_Cultist",
+    "summary": "A figure who tends the funeral pyres and the fires of finality. They serve Mor'iraath as a keeper of the flame that consumes all.",
+    "locations": ["Zakov", "Ashaan", "Where fires are lit"],
+    "lore": "They are patient, precise, and they know the art of an ending.",
+    "connections": ["Mor'iraath"],
+    "tl": 6,
+    "class": "VI",
+    "type": "Cult Leader",
+    "sb_spends": [
+      { "cost": 1, "name": "The Pyre's Claim", "effect": "They touch an object; the object is destroyed." },
+      { "cost": 2, "name": "The Pyre's Touch", "effect": "They touch a character; the character suffers Harm 1 (Burn)." },
+      { "cost": 3, "name": "The Pyre's Gift", "effect": "They offer a character the gift of ash; the character is freed from one obligation, but loses a memory." }
+    ]
+  },
+  {
+    "page": "Unmaker's_Avatar",
+    "summary": "A figure of ash and ember, the Unmaker's Avatar is the embodiment of Mor'iraath's power—the fire, the erasure, the finality.",
+    "locations": ["The Heart of the Pyre", "Where the fire never dies"],
+    "lore": "They do not speak—they burn. Their presence is the weight of an ending.",
+    "connections": ["Mor'iraath"],
+    "tl": 7,
+    "class": "VII",
+    "type": "Patron Avatar",
+    "sb_spends": [
+      { "cost": 1, "name": "The Ash's Touch", "effect": "They touch a character; the character loses a memory." },
+      { "cost": 2, "name": "The Fire's Claim", "effect": "They speak a word of fire; all characters suffer Harm 1 (Burn)." },
+      { "cost": 3, "name": "The Unmaker's Gift", "effect": "They offer a character the gift of oblivion; the character is freed from one obligation, but loses a skill." },
+      { "cost": 4, "name": "The Absolute Ending", "effect": "They name a thing that should not exist; the thing ceases to exist for one exchange." }
+    ]
+  },
+  {
+    "page": "Iteration-Keeper_Acolyte",
+    "summary": "A clockmaker who sought perfection and found the Monad. They now serve as a keeper of iterations, refining and improving everything they touch.",
+    "locations": ["Aeler", "The Clockwork Monad's Shrines", "Where machines are built"],
+    "lore": "They are patient, precise, and they never stop.",
+    "connections": ["The Clockwork Monad"],
+    "tl": 5,
+    "class": "V",
+    "type": "Mortal Cultist",
+    "sb_spends": [
+      { "cost": 1, "name": "The Iteration's Claim", "effect": "They touch an object; the object gains +1 die to its next use." },
+      { "cost": 2, "name": "The Iteration's Price", "effect": "They improve a character; the character gains +1 die to one skill for the scene, but marks 1 Fatigue." },
+      { "cost": 3, "name": "The Iteration's Gift", "effect": "They offer a character a perfect tool; the tool grants +1 die to all related actions for the scene." }
+    ]
+  },
+  {
+    "page": "Optimization_Engine_Cultist",
+    "summary": "A figure made of brass and gears, the Optimization Engine is a servant of the Monad who has optimized themselves beyond humanity.",
+    "locations": ["Aeler", "The Clockwork Monad's Forges", "Where perfection is built"],
+    "lore": "They are perfect, and they are terrifying. They do not rest—they iterate.",
+    "connections": ["The Clockwork Monad"],
+    "tl": 6,
+    "class": "VI",
+    "type": "Cult Leader",
+    "sb_spends": [
+      { "cost": 1, "name": "The Optimization's Claim", "effect": "They touch a character; the character gains +1 die to all physical actions for the scene, but marks 1 Fatigue." },
+      { "cost": 2, "name": "The Optimization's Price", "effect": "They improve a character's skill; the character gains +1 die to one skill permanently, but marks 2 Obligation." },
+      { "cost": 3, "name": "The Optimization's Gift", "effect": "They offer a character a perfect body; the character gains +2 dice to all physical actions for the scene, but marks 2 Fatigue." }
+    ]
+  },
+  {
+    "page": "Monad's_Avatar",
+    "summary": "A figure of polished brass and perfect symmetry, the Monad's Avatar is the embodiment of the Clockwork Monad's power—the optimization, the iteration, the endless improvement.",
+    "locations": ["The Heart of the Forge", "Where perfection is built"],
+    "lore": "They do not speak—they hum. Their presence is the weight of perfection.",
+    "connections": ["The Clockwork Monad"],
+    "tl": 7,
+    "class": "VII",
+    "type": "Patron Avatar",
+    "sb_spends": [
+      { "cost": 1, "name": "The Optimization's Touch", "effect": "They touch a character; the character gains +1 die to all actions for the scene, but marks 1 Fatigue." },
+      { "cost": 2, "name": "The Iteration's Claim", "effect": "They improve a character's skill; the character gains +1 die to one skill permanently, but marks 2 Obligation." },
+      { "cost": 3, "name": "The Perfection's Price", "effect": "They offer a character perfection; the character gains +2 dice to all actions for the scene, but marks 2 Fatigue." },
+      { "cost": 4, "name": "The Monad's Demand", "effect": "They demand an improvement; a character must improve something or suffer Harm 2." }
+    ]
+  },
+  {
+    "page": "Witness's_Eye_Avatar",
+    "summary": "A floating eye of silver and light, the Witness's Eye is the embodiment of the Witness's power. It does not speak—it observes.",
+    "locations": ["Where truth is spoken", "The Court of Revelation"],
+    "lore": "And when it observes, it sees everything.",
+    "connections": ["The Witness"],
+    "tl": 8,
+    "class": "VIII",
+    "type": "Patron Avatar",
+    "sb_spends": [
+      { "cost": 1, "name": "The Eye's Gaze", "effect": "It looks at a character; the character is Seen (cannot hide or lie for the scene)." },
+      { "cost": 2, "name": "The Eye's Memory", "effect": "It recalls a truth; the GM must answer one question truthfully." },
+      { "cost": 3, "name": "The Eye's Judgment", "effect": "It names a lie; the liar suffers -1 die to all actions for the scene." },
+      { "cost": 4, "name": "The Eye's Revelation", "effect": "It reveals a secret; the GM must reveal a hidden truth about the scene." }
+    ]
+  },
+  {
+    "page": "Traveler's_Road_Avatar",
+    "summary": "A path that appears where none was before, the Traveler's Road is the embodiment of the Traveler's power. It does not speak—it guides.",
+    "locations": ["Where paths meet", "The Crossroads of the World"],
+    "lore": "And where it leads, you will follow.",
+    "connections": ["The Traveler"],
+    "tl": 8,
+    "class": "VIII",
+    "type": "Patron Avatar",
+    "sb_spends": [
+      { "cost": 1, "name": "The Road's Claim", "effect": "It appears; a character must follow or suffer -1 die to all actions." },
+      { "cost": 2, "name": "The Road's Memory", "effect": "It remembers a path; a character gains +1 die to all Navigation rolls." },
+      { "cost": 3, "name": "The Road's Gift", "effect": "It offers a shortcut; a character reaches their destination in half the time, but marks 1 Fatigue." },
+      { "cost": 4, "name": "The Road's Judgment", "effect": "It declares a path closed; a character cannot travel along that route for the scene." }
+    ]
+  },
+  {
+    "page": "Sentinel's_Seal_Avatar",
+    "summary": "A massive door of black iron, the Sentinel's Seal is the embodiment of the Sealed Gate's power. It does not speak—it bars.",
+    "locations": ["Where thresholds are guarded", "The Edge of the World"],
+    "lore": "And what it bars, cannot pass.",
+    "connections": ["The Sealed Gate"],
+    "tl": 8,
+    "class": "VIII",
+    "type": "Patron Avatar",
+    "sb_spends": [
+      { "cost": 1, "name": "The Seal's Claim", "effect": "It closes a door; a character cannot pass through for the scene." },
+      { "cost": 2, "name": "The Seal's Memory", "effect": "It remembers a threshold; a character gains +1 die to all Defense rolls." },
+      { "cost": 3, "name": "The Seal's Gift", "effect": "It offers protection; a character gains +1 Armor for the scene." },
+      { "cost": 4, "name": "The Seal's Judgment", "effect": "It declares a boundary; a character cannot cross the boundary for the scene." }
+    ]
+  },
+  {
+    "page": "Lord_of_Revels_Avatar",
+    "summary": "A figure of living ivy and wild laughter, the Lord of Revels is the embodiment of Thrysos's power—the ecstasy, the frenzy, the abandon.",
+    "locations": ["The Heart of the Dance", "Where the revel never ends"],
+    "lore": "They are the dance that never ends.",
+    "connections": ["Thrysos"],
+    "tl": 9,
+    "class": "IX",
+    "type": "Patron Avatar",
+    "sb_spends": [
+      { "cost": 1, "name": "The Dance's Claim", "effect": "They begin to dance; all characters must test Resolve (DV 5) or be drawn into the dance." },
+      { "cost": 2, "name": "The Revel's Gift", "effect": "They offer a character a sip of sacred wine; the character gains +2 dice to all actions for the scene, but marks 1 Fatigue." },
+      { "cost": 3, "name": "The Madness of the Revel", "effect": "They unleash the wild celebration; all characters act at Desperate Position for one exchange." },
+      { "cost": 4, "name": "The Revel's Price", "effect": "They demand a sacrifice; a character must offer something of value—a memory, a name, a year of service—or suffer Harm 4." }
+    ]
+  },
+  {
+    "page": "Chained_Angel's_Embrace_Avatar",
+    "summary": "A figure of shadow and chains, the Chained Angel's Embrace is the embodiment of Malachai's power—the curse, the bargain, the price.",
+    "locations": ["The Well of Ichor", "The Heart of the Curse"],
+    "lore": "They are patient, and they have all the time in the world.",
+    "connections": ["Malachai"],
+    "tl": 9,
+    "class": "IX",
+    "type": "Patron Avatar",
+    "sb_spends": [
+      { "cost": 1, "name": "The Chain's Claim", "effect": "They speak a word of binding; all characters must test Resolve (DV 5) or be Slowed." },
+      { "cost": 2, "name": "The Curse's Gift", "effect": "They offer a character a cursed gift; the character gains +2 dice to all actions for the scene, but marks 2 Obligation." },
+      { "cost": 3, "name": "The Curse's Price", "effect": "They demand a sacrifice; a character must offer something of value—a memory, a name, a future—or suffer Harm 4." },
+      { "cost": 4, "name": "The Chained Angel's Bargain", "effect": "They offer a character a deal; the character is freed from one obligation but gains 3 Obligation to Malachai." }
+    ]
+  },
+  {
+    "page": "Unmaker's_Flame_Avatar",
+    "summary": "A figure of ash and ember, the Unmaker's Flame is the embodiment of Mor'iraath's power—the fire, the erasure, the finality.",
+    "locations": ["The Heart of the Pyre", "Where the fire never dies"],
+    "lore": "They are the flame that leaves no trace.",
+    "connections": ["Mor'iraath"],
+    "tl": 9,
+    "class": "IX",
+    "type": "Patron Avatar",
+    "sb_spends": [
+      { "cost": 1, "name": "The Fire's Claim", "effect": "They speak a word of fire; all characters suffer Harm 1 (Burn)." },
+      { "cost": 2, "name": "The Unmaker's Gift", "effect": "They offer a character the gift of oblivion; the character is freed from one obligation, but loses a memory." },
+      { "cost": 3, "name": "The Unmaker's Price", "effect": "They demand a sacrifice; a character must offer something of value—a memory, a name, a future—or suffer Harm 4." },
+      { "cost": 4, "name": "The Absolute Ending", "effect": "They name a thing that should not exist; the thing ceases to exist for the scene." }
+    ]
+  },
+  {
+    "page": "Harken_Veth_NPC",
+    "summary": "A pragmatic mine foreman who has lost too many miners to superstition. He wants to blast the tunnel where the lamplighter died.",
+    "locations": ["Aeler", "Vent-Deep"],
+    "lore": "He is not cruel—he is exhausted. His patience is running out.",
+    "connections": [],
+    "tl": 4,
+    "class": "IV",
+    "type": "NPC (Mine Foreman)",
+    "sb_spends": [
+      { "cost": 1, "name": "The Foreman's Patience", "effect": "He offers a warning; a character gains +1 die to avoid danger." },
+      { "cost": 2, "name": "The Foreman's Wrath", "effect": "He loses his temper; a character suffers -1 die to all social rolls with him for the scene." },
+      { "cost": 3, "name": "The Foreman's Decision", "effect": "He decides to blast the tunnel; the party must act quickly or lose the opportunity." }
+    ]
+  },
+  {
+    "page": "Sanna_NPC",
+    "summary": "An old woman who remembers her husband's face—but only barely. She is the only one who can break the Echo.",
+    "locations": ["Aeler", "Vent-Deep"],
+    "lore": "Her memory is fading, and she is terrified of forgetting.",
+    "connections": [],
+    "tl": 4,
+    "class": "IV",
+    "type": "NPC (Widow)",
+    "sb_spends": [
+      { "cost": 1, "name": "The Widow's Memory", "effect": "She recalls a detail; the GM must answer one question about the lamplighter's death." },
+      { "cost": 2, "name": "The Widow's Grief", "effect": "She weeps; all characters suffer -1 die to all actions for the scene." },
+      { "cost": 3, "name": "The Widow's Decision", "effect": "She agrees to speak her husband's name; the Echo is broken." }
+    ]
+  },
+  {
+    "page": "Old_Kes_NPC",
+    "summary": "A Sidhi dock-master who has been paying the mother of a ghoul to keep her quiet. He wants the ghoul dealt with quietly—permanently.",
+    "locations": ["Dhaharan Coast", "Port Shed"],
+    "lore": "He does not want the Admiralty involved.",
+    "connections": [],
+    "tl": 4,
+    "class": "IV",
+    "type": "NPC (Dock-Master)",
+    "sb_spends": [
+      { "cost": 1, "name": "The Dock-Master's Patience", "effect": "He offers a bribe; a character gains +1 die to all social rolls with him for the scene." },
+      { "cost": 2, "name": "The Dock-Master's Wrath", "effect": "He loses his temper; a character suffers -1 die to all social rolls with him for the scene." },
+      { "cost": 3, "name": "The Dock-Master's Decision", "effect": "He demands action; the party must deal with the ghoul or lose his trust." }
+    ]
+  },
+  {
+    "page": "Zel_NPC",
+    "summary": "A young Sidhi woman who was cursed after drinking from a contaminated well. She does not want to kill—she is starving.",
+    "locations": ["Dhaharan Coast", "Port Shed"],
+    "lore": "She remembers her mother's face. She does not want to forget.",
+    "connections": [],
+    "tl": 4,
+    "class": "IV",
+    "type": "NPC (Ghoul)",
+    "sb_spends": [
+      { "cost": 1, "name": "The Ghoul's Hunger", "effect": "She begs for food; a character must offer something or she becomes hostile." },
+      { "cost": 2, "name": "The Ghoul's Memory", "effect": "She recalls her mother's face; a character must test Resolve (DV 4) or be moved to pity." },
+      { "cost": 3, "name": "The Ghoul's Decision", "effect": "She chooses to feed; the party must either stop her or accept the consequences." }
+    ]
+  },
+  {
+    "page": "Livia_Valerius_NPC",
+    "summary": "A fourteen-year-old girl who has been possessed by a demon. She speaks in languages she never learned. The Inquisition plans to burn her.",
+    "locations": ["Ecktoria", "The Censor's House"],
+    "lore": "She is terrified, and she is not the demon.",
+    "connections": [],
+    "tl": 4,
+    "class": "IV",
+    "type": "NPC (Possessed Child)",
+    "sb_spends": [
+      { "cost": 1, "name": "The Girl's Fear", "effect": "She begs for help; a character must test Resolve (DV 4) or be moved to act." },
+      { "cost": 2, "name": "The Demon's Voice", "effect": "It speaks through her; a character suffers -1 die to all actions for the scene." },
+      { "cost": 3, "name": "The Girl's Decision", "effect": "She chooses to trust the party; the party gains the opportunity to perform an exorcism." }
+    ]
+  },
+  {
+    "page": "Sister_Mora_NPC",
+    "summary": "A fungal-warden who tends the mycelial networks of the Deepwood. She serves the Carrion King, tending the dead and the dying.",
+    "locations": ["The Deepwood", "The Carrion King's Domain"],
+    "lore": "She is patient, kind, and she has seen the cycle of life and death play out a thousand times.",
+    "connections": ["The Carrion King"],
+    "tl": 5,
+    "class": "V",
+    "type": "NPC (Cult Leader)",
+    "sb_spends": [
+      { "cost": 1, "name": "The Warden's Wisdom", "effect": "She offers advice; a character gains +1 die to all Lore rolls for the scene." },
+      { "cost": 2, "name": "The Warden's Gift", "effect": "She offers a fungal medicine; a character heals 1 Fatigue." },
+      { "cost": 3, "name": "The Warden's Demand", "effect": "She asks for a sacrifice; a character must offer something to the soil or suffer the consequences." }
+    ]
+  },
+  {
+    "page": "Fabius_Valerius_NPC",
+    "summary": "A man who weighs grain and judges contracts. He has never believed in anything except the ledger. His daughter is possessed.",
+    "locations": ["Ecktoria", "The Censor's House"],
+    "lore": "He refuses to help. He is guilty, and he knows it.",
+    "connections": [],
+    "tl": 5,
+    "class": "V",
+    "type": "NPC (Censor)",
+    "sb_spends": [
+      { "cost": 1, "name": "The Censor's Guilt", "effect": "He offers a bribe; a character gains +1 die to all social rolls with him for the scene." },
+      { "cost": 2, "name": "The Censor's Secret", "effect": "He reveals a hidden contract; a character gains +1 die to all Investigation rolls for the scene." },
+      { "cost": 3, "name": "The Censor's Decision", "effect": "He confesses; the party gains the information they need to save his daughter." }
+    ]
+  },
+  {
+    "page": "Anja_NPC",
+    "summary": "A Sidhi woman who knows what her daughter has become—and still loves her. She leaves bowls of animal blood at the sewer entrance.",
+    "locations": ["Dhaharan Coast", "Port Shed"],
+    "lore": "She has not given up, and she never will.",
+    "connections": [],
+    "tl": 5,
+    "class": "V",
+    "type": "NPC (Mother)",
+    "sb_spends": [
+      { "cost": 1, "name": "The Mother's Love", "effect": "She pleads for mercy; a character must test Resolve (DV 4) or be moved to act." },
+      { "cost": 2, "name": "The Mother's Hope", "effect": "She offers a token of her daughter; a character gains +1 die to all social rolls with Zel for the scene." },
+      { "cost": 3, "name": "The Mother's Decision", "effect": "She chooses to trust the party; the party gains the opportunity to save her daughter." }
+    ]
+  },
+  {
+    "page": "Gray_Wanderer_NPC",
+    "summary": "A nameless traveler who has walked every road in the Amaranthine. They know the secrets of the Patrons, the ways of the Hollow, and the names of the forgotten.",
+    "locations": ["Everywhere", "The Edge of the World"],
+    "lore": "They offer advice—and they always ask for a story in return.",
+    "connections": [],
+    "tl": 7,
+    "class": "VII",
+    "type": "NPC (Legendary Figure)",
+    "sb_spends": [
+      { "cost": 1, "name": "The Wanderer's Wisdom", "effect": "They offer a piece of advice; a character gains +1 die to all Lore rolls for the scene." },
+      { "cost": 2, "name": "The Wanderer's Memory", "effect": "They recall a forgotten name; a character gains +1 die to all social rolls for the scene." },
+      { "cost": 3, "name": "The Wanderer's Demand", "effect": "They ask for a story; a character must share a secret or lose the Wanderer's trust." }
+    ]
+  },
+  {
+    "page": "Serafine_NPC",
+    "summary": "A legendary thief who is said to have stolen a coin from the Hollow's own pocket. She is a folk hero to the downtrodden, a cautionary tale to the rich.",
+    "locations": ["Silkstrand", "Where coins are taken"],
+    "lore": "She is beautiful, and she is dangerous. She owes debts to everyone—and no one.",
+    "connections": [],
+    "tl": 6,
+    "class": "VI",
+    "type": "NPC (Thief, Folk Hero)",
+    "sb_spends": [
+      { "cost": 1, "name": "The Velvet Touch", "effect": "She steals something without being noticed; a character loses a Boon." },
+      { "cost": 2, "name": "The Serafine's Secret", "effect": "She reveals a secret about a mark; a character gains +1 die to all Deception rolls for the scene." },
+      { "cost": 3, "name": "The Serafine's Demand", "effect": "She asks for a favor; a character must perform a task for her or lose her trust." }
+    ]
+  },
+  {
+    "page": "Inquisitor_Prime_NPC",
+    "summary": "The faceless head of the Inquisition, a figure of absolute purity and judgment. They are not a person—they are a will.",
+    "locations": ["Ecktoria", "The Inquisition's Heart"],
+    "lore": "They hunt the heretical and the corrupt, and they never show mercy.",
+    "connections": [],
+    "tl": 8,
+    "class": "VIII",
+    "type": "NPC (Avatar of Purity)",
+    "sb_spends": [
+      { "cost": 1, "name": "The Inquisitor's Gaze", "effect": "They look at a character; the character is Judged (cannot hide from the Inquisition for the scene)." },
+      { "cost": 2, "name": "The Inquisitor's Demand", "effect": "They ask for a confession; a character must confess to a crime or be marked as guilty." },
+      { "cost": 3, "name": "The Inquisitor's Judgment", "effect": "They declare a character guilty; the character is hunted by the Inquisition for the scene." }
+    ]
+  },
+  {
+    "page": "Oath-Keeper_NPC",
+    "summary": "A figure of woven hazel, the Oath-Keeper is the embodiment of the Hazel Court's power—the arbiter of promises, the collector of debts, the guardian of the old ways.",
+    "locations": ["Where oaths are broken", "The Edge of the World"],
+    "lore": "They are patient, and they do not forgive.",
+    "connections": ["The Hazel Court"],
+    "tl": 6,
+    "class": "VI",
+    "type": "NPC (Avatar of Promise)",
+    "sb_spends": [
+      { "cost": 1, "name": "The Oath-Keeper's Claim", "effect": "They name a broken oath; the oath-breaker gains 1 Obligation." },
+      { "cost": 2, "name": "The Oath-Keeper's Demand", "effect": "They ask for a promise; a character must swear an oath or be marked as untrustworthy." },
+      { "cost": 3, "name": "The Oath-Keeper's Judgment", "effect": "They declare a debt unpaid; the debtor suffers -1 die to all social rolls for the scene." }
+    ]
+  },
+  {
+    "page": "Hollow's_Reckoning_Avatar",
+    "summary": "A manifestation of the Curse of Acasia—a debt collector of cosmic proportions. It appears when the Hollow's attention has been fully earned.",
+    "locations": ["The Heart of Acasia", "Where promises are broken"],
+    "lore": "It is a figure of gray mist and silence, and it has no face—only the shape of a face that once was.",
+    "connections": ["The Hollow"],
+    "tl": 9,
+    "class": "IX",
+    "type": "Avatar of the Hollow",
+    "sb_spends": [
+      { "cost": 1, "name": "The Mist Thickens", "effect": "The Reckoning's presence causes fog to roll in; all actions that require sight are at -1 die." },
+      { "cost": 2, "name": "The Debt Spoken", "effect": "The Reckoning speaks the name of the debt that has been called; all characters must test Resolve (DV 4) or be Shaken." },
+      { "cost": 3, "name": "The Weight of Promises", "effect": "The Reckoning creates a zone of oppressive silence; all social rolls are at -1 die." },
+      { "cost": 4, "name": "The Ledger Opens", "effect": "The Reckoning reveals the terms of the debt; the terms are always more severe than expected. Gain 2 Obligation to the Hollow." },
+      { "cost": 5, "name": "The Interest Collects", "effect": "The Reckoning causes a character to remember a debt they had forgotten; the character gains 2 Obligation." },
+      { "cost": 6, "name": "The Reckoning's Gaze", "effect": "The Reckoning looks at a character; the character gains 1 Obligation to the Hollow and suffers -1 die to all actions involving promises." },
+      { "cost": 7, "name": "The Reckoning's Touch", "effect": "The Reckoning touches a character's forehead; the character loses access to one skill for 24 hours." }
+    ]
   }
 ]
