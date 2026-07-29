@@ -268,7 +268,34 @@ function getTierColor(tier) {
     };
     return colors[tier] || 'var(--text2)';
 }
- 
+
+// ============================================================
+// EASTER EGG: The Ninth
+// ============================================================
+
+// Track whether The Ninth has been revealed in this session
+let ninthRevealed = false;
+
+// Check if a patron is "The Ninth"
+function isTheNinth(patron) {
+    if (!patron) return false;
+    const id = patron.id || '';
+    const name = (patron.name || patron.title || '').toLowerCase();
+    return id === 'the-ninth' || name === 'the ninth' || name === 'ninth';
+}
+
+// Check if the search query triggers the easter egg
+function isNinthTrigger(query) {
+    if (!query) return false;
+    const q = query.toLowerCase().trim();
+    // The Ninth reveals itself to those who seek forbidden knowledge
+    const triggers = [
+        'ninth', 'the ninth', 'forbidden', 'hidden', 'secret',
+        'unspoken', 'void', 'infinite', 'overflow', 'knowledge',
+        'truth beyond', 'easter egg', 'beyond comprehension'
+    ];
+    return triggers.some(t => q.includes(t));
+}
 // ============================================================
 // STATE
 // ============================================================
