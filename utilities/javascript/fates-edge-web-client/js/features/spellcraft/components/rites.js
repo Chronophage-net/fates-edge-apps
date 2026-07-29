@@ -184,6 +184,24 @@ function getPatronGift(patronData) {
     return patronData.patrons_gift || null;
 }
 
+// ─── Rite Obligation cost parsing (for Crack the Seal) ──────
+//
+// RULES FIX (Player's Guide §4.2.3): "Crack the Seal — Resolve a known Rite
+// instantly as 1 action. Set the Symbol to Compromised and mark double the
+// Rite's base cost (minimum +2, or +3 for High Rites)."
+//
+// Rite JSON objects give their base Obligation cost as a string like
+// "Mark +1 Obligation." or "Mark +2 Obligation." — this pulls the numeric
+// value out of that string so Crack the Seal can double the RIGHT number
+// instead of a flat guess.
+
+function parseRiteBaseObligationCost(rite) {
+    const costStr = safeString(rite?.cost || '');
+    const match = costStr.match(/\+\s*(\d+)\s*Obligation/i);
+    if (match) return parseInt(match[1], 10);
+    return 1; // sensible default for rites that don't specify a numeric cost
+}
+
 // ─── Check if character has access to Patron's Gifts ──────
 
 function hasAccessToPatronGifts(char) {
@@ -282,15 +300,20 @@ export async function renderRites(el, patronIds, characterId, options = {}) {
                     ${path === 'invoker' ? `${ids.length} Symbols · ` : ''}Total Obligation: ${totalObligation}
                 </span>
             </div>
-            ${path === 'invoker' && ids.length > 4 ? `
-                <span style="font-size:0.65rem;color:var(--red);font-weight:600;">⚠️ ${ids.length} Symbols – beyond recommended limit!</span>
-            ` : ''}
+            <div style="display:flex;align-items:center;gap:0.4rem;">
+                ${path === 'invoker' && ids.length > 4 ? `
+                    <span style="font-size:0.65rem;color:var(--red);font-weight:600;">⚠️ ${ids.length} Symbols – beyond recommended limit!</span>
+                ` : ''}
+                ${path === 'invoker' ? `
+                    <button class="btn btn-xs btn-ghost" onclick="window.startNewScene('${characterId}')" title="Reset once-per-scene abilities like Borrowed Grace">🎬 New Scene</button>
+                ` : ''}
+            </div>
         </div>
     `;
 
     // ─── Patron's Gifts Section ──────────────────────────────
     if (canAccessGifts) {
-        html += renderPatronGiftsSection(char, patronDataList, path);
+        html += renderPatronGiftsSection(char, patronDataList, path, characterId);
     }
 
     // ─── Cross-Resonance Warnings (Invokers) ──────────────────
@@ -366,7 +389,7 @@ export async function renderRites(el, patronIds, characterId, options = {}) {
 // RENDER PATRON'S GIFTS SECTION
 // ============================================================
 
-function renderPatronGiftsSection(char, patronDataList, path) {
+function renderPatronGiftsSection(char, patronDataList, path, characterId = 'default-character') {
     const isRunekeeper = path === 'runekeeper';
     const isInvoker = path === 'invoker';
 
@@ -415,11 +438,16 @@ function renderPatronGiftsSection(char, patronDataList, path) {
         <option value="fatigue">1 Fatigue</option>
     `;
 
+    // RULES FIX (Player's Guide/Invoker Guide App. A.2): Borrowed Grace is
+    // usable once per scene, and works at -1 die if the Symbol invoked is
+    // Compromised (the state Crack the Seal itself puts a Symbol into).
+    const borrowedGraceUsed = !!(char.sceneFlags && char.sceneFlags.borrowedGrace);
+
     let html = `
         <div class="patron-gifts" style="background:var(--bg2);border-radius:var(--radius);padding:0.3rem 0.5rem;border-left:4px solid var(--gold);margin-bottom:0.3rem;">
             <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.2rem;">
                 <span style="font-size:0.85rem;font-weight:600;color:var(--gold);">${isRunekeeper ? '🔮 Patron\'s Gift' : '🎴 Borrowed Grace (Symbols)'}</span>
-                <span style="font-size:0.6rem;color:var(--text3);">${gifts.length} gift${gifts.length > 1 ? 's' : ''}</span>
+                <span style="font-size:0.6rem;color:var(--text3);">${gifts.length} gift${gifts.length > 1 ? 's' : ''}${isInvoker && borrowedGraceUsed ? ' · used this scene' : ''}</span>
             </div>
             ${gifts.map((item, idx) => {
                 const gift = item.gift;
@@ -433,6 +461,7 @@ function renderPatronGiftsSection(char, patronDataList, path) {
                 // For Runekeeper, the cost is already +1 Obligation; for Invoker, they choose Boon or Fatigue.
                 const isBound = item.isBound;
                 const giftId = `gift-${item.patronId}`;
+                const isCompromised = !isBound && (char.compromisedSymbols || []).includes(item.patronId);
 
                 return `
                     <div class="gift-item" style="display:flex;flex-direction:column;gap:0.2rem;padding:0.2rem 0.3rem;border-bottom:1px solid var(--border);background:var(--bg3);border-radius:var(--radius);margin-top:0.1rem;">
@@ -441,6 +470,7 @@ function renderPatronGiftsSection(char, patronDataList, path) {
                             <span style="font-weight:600;font-size:0.85rem;">${escHtml(name)}</span>
                             <span style="font-size:0.6rem;color:var(--text3);">${escHtml(patronName)}</span>
                             ${isBound ? `<span style="font-size:0.55rem;color:var(--gold);">(Bound)</span>` : `<span style="font-size:0.55rem;color:var(--orange);">(Symbol)</span>`}
+                            ${isCompromised ? `<span style="font-size:0.55rem;color:var(--red);">⚠️ Compromised: −1 die</span>` : ''}
                         </div>
                         <div style="font-size:0.75rem;color:var(--text2);">${formatText(description)}</div>
                         <div style="font-size:0.7rem;color:var(--text3);">${formatText(effect)}</div>
@@ -449,17 +479,19 @@ function renderPatronGiftsSection(char, patronDataList, path) {
                             ${isBound ? `
                                 <button class="btn btn-xs btn-primary" onclick="window.usePatronGift('${item.patronId}')" style="font-size:0.6rem;">Use Gift</button>
                             ` : `
-                                <select id="${giftId}-cost" style="font-size:0.6rem;background:var(--bg3);border:1px solid var(--border);border-radius:4px;padding:0.05rem 0.2rem;">
+                                <select id="${giftId}-cost" style="font-size:0.6rem;background:var(--bg3);border:1px solid var(--border);border-radius:4px;padding:0.05rem 0.2rem;" ${borrowedGraceUsed ? 'disabled' : ''}>
                                     ${costOptionsHtml}
                                 </select>
-                                <button class="btn btn-xs btn-gold" onclick="window.useBorrowedGrace('${item.patronId}', document.getElementById('${giftId}-cost').value)" style="font-size:0.6rem;">Invoke Borrowed Grace</button>
+                                <button class="btn btn-xs ${borrowedGraceUsed ? 'btn-secondary' : 'btn-gold'}" ${borrowedGraceUsed ? 'disabled' : ''} onclick="window.useBorrowedGrace('${item.patronId}', document.getElementById('${giftId}-cost').value, '${characterId}')" style="font-size:0.6rem;">
+                                    ${borrowedGraceUsed ? '✓ Used this scene' : 'Invoke Borrowed Grace'}
+                                </button>
                             `}
                         </div>
                     </div>
                 `;
             }).join('')}
             <div style="font-size:0.55rem;color:var(--text3);margin-top:0.1rem;">
-                ${isRunekeeper ? 'Patron\'s Gift is an Imbuement: once per scene, touch an item to gain +1 die to a thematic skill and a special benefit. Costs +1 Obligation.' : 'Borrowed Grace: spend 1 Boon or 1 Fatigue, mark +1 Obligation, and gain the Symbol\'s Gift effect for the scene.'}
+                ${isRunekeeper ? 'Patron\'s Gift is an Imbuement: once per scene, touch an item to gain +1 die to a thematic skill and a special benefit. Costs +1 Obligation.' : 'Borrowed Grace: once per scene, spend 1 Boon or 1 Fatigue, mark +1 Obligation, and gain the Symbol\'s Gift effect. Works at −1 die if the Symbol is Compromised. Use "🎬 New Scene" above to reset.'}
             </div>
         </div>
     `;
@@ -608,6 +640,12 @@ function renderRiteItem(rite, patronId, idx, isInvoker, characterId) {
     // ─── Crack the Seal (Invokers only) ────────────────────────
     const canCrackSeal = isInvoker;
 
+    // Preview the Crack the Seal cost inline so it's visible before clicking.
+    const baseObligationCost = parseRiteBaseObligationCost(rite);
+    const isHighTier = tier.toLowerCase() === 'high';
+    const crackMinimum = isHighTier ? 3 : 2;
+    const crackCostPreview = Math.max(baseObligationCost * 2, crackMinimum);
+
     let detailsHtml = '';
     if (hasDetails) {
         detailsHtml = `
@@ -631,11 +669,11 @@ function renderRiteItem(rite, patronId, idx, isInvoker, characterId) {
                     </div>
                 ` : ''}
                 ${canCrackSeal ? `
-                    <div style="margin-top:0.2rem;display:flex;gap:0.2rem;">
-                        <button class="btn btn-xs btn-danger" onclick="window.crackTheSeal('${patronId}', ${idx}, '${characterId}')" title="Invoke instantly at double Obligation cost">
+                    <div style="margin-top:0.2rem;display:flex;gap:0.2rem;align-items:center;">
+                        <button class="btn btn-xs btn-danger" onclick="window.crackTheSeal('${patronId}', ${idx}, '${characterId}')" title="Invoke instantly at double the rite's Obligation cost (min +2, or +3 for High Rites)">
                             💥 Crack the Seal
                         </button>
-                        <span style="font-size:0.55rem;color:var(--text3);align-self:center;">Double Obligation · Instant</span>
+                        <span style="font-size:0.55rem;color:var(--text3);align-self:center;">+${crackCostPreview} Obligation · Instant · Symbol becomes Compromised</span>
                     </div>
                 ` : ''}
             </div>
@@ -713,8 +751,19 @@ window.usePatronGift = async function(patronId) {
 // ============================================================
 // GLOBAL FUNCTIONS: Borrowed Grace (Invoker)
 // ============================================================
+//
+// RULES FIX (Player's Guide §4.2.3/§4.7.2, Invoker Guide App. A.2):
+// Borrowed Grace is usable ONCE PER SCENE, and if the Symbol invoked is
+// Compromised it works at -1 die. Neither of those was tracked before —
+// the ability could be spammed repeatedly, and a Compromised Symbol (the
+// very thing Crack the Seal produces) had no consequence at all.
+// "Scene" isn't otherwise tracked in this app, so this uses a simple
+// char.sceneFlags.borrowedGrace flag with a manual "New Scene" reset
+// button, matching the app's existing pattern of manually-logged state
+// (Resonant Rites, Corruption, etc.) rather than inventing an automatic
+// scene-detection system.
 
-window.useBorrowedGrace = async function(patronId, costType) {
+window.useBorrowedGrace = async function(patronId, costType, characterId = 'default-character') {
     const char = getCharacterData();
     if (!char) return;
 
@@ -727,6 +776,13 @@ window.useBorrowedGrace = async function(patronId, costType) {
         showToast('You do not carry a Symbol for this patron.', 'error');
         return;
     }
+
+    if (char.sceneFlags && char.sceneFlags.borrowedGrace) {
+        showToast('Borrowed Grace has already been used this scene. Start a New Scene to use it again.', 'error');
+        return;
+    }
+
+    const isCompromised = (char.compromisedSymbols || []).includes(patronId);
 
     // Deduct cost (Boon or Fatigue)
     if (costType === 'boon') {
@@ -754,6 +810,10 @@ window.useBorrowedGrace = async function(patronId, costType) {
     setPatronObligation(char.id, patronId, currentObligation + 1);
     savePatronData();
 
+    // Mark Borrowed Grace as used for this scene
+    if (!char.sceneFlags) char.sceneFlags = {};
+    char.sceneFlags.borrowedGrace = true;
+
     // Fetch patron data for gift effect
     const state = getState();
     const patronData = findPatronData(state, patronId);
@@ -770,12 +830,32 @@ window.useBorrowedGrace = async function(patronId, costType) {
     // Apply effect (narrative)
     const name = safeString(gift.name || 'Borrowed Grace');
     const effect = safeString(gift.effect || 'The Symbol flares with borrowed power.');
-    showToast(`🎴 ${name}: ${effect} (Cost: 1 ${costType}, Obligation +1)`, 'success');
+    const penaltyNote = isCompromised ? ' ⚠️ Symbol is Compromised — this applies at −1 die.' : '';
+    showToast(`🎴 ${name}: ${effect}${penaltyNote} (Cost: 1 ${costType}, Obligation +1)`, 'success');
 
-    // Save character changes (boons/fatigue)
-    saveCharacter({ boons: char.boons, fatigue: char.fatigue });
+    // Save character changes (boons/fatigue/scene flag)
+    saveCharacter({ boons: char.boons, fatigue: char.fatigue, sceneFlags: char.sceneFlags });
 
     // Refresh the rites view
+    const container = document.getElementById('spellcraft-content');
+    if (container) {
+        import('../index.js').then(module => {
+            if (module.renderActiveTabContent) module.renderActiveTabContent();
+        });
+    }
+};
+
+// ─── New Scene (resets once-per-scene abilities) ──────────────
+
+window.startNewScene = function(characterId = 'default-character') {
+    const state = getState();
+    const char = state.characters?.find(c => c.id === characterId) || state.characters?.[characterId];
+    if (!char) return;
+
+    char.sceneFlags = {};
+    saveState();
+    showToast('🎬 New scene — once-per-scene abilities (like Borrowed Grace) are available again.', 'info');
+
     const container = document.getElementById('spellcraft-content');
     if (container) {
         import('../index.js').then(module => {
@@ -815,6 +895,17 @@ window.saveCharacter = saveCharacter;
 // ============================================================
 // CRACK THE SEAL (Invokers only)
 // ============================================================
+//
+// RULES FIX (Player's Guide §4.2.3): "Crack the Seal — Resolve a known Rite
+// instantly as 1 action. Set the Symbol to Compromised and mark double the
+// Rite's base cost (minimum +2, or +3 for High Rites)."
+//
+// This used to add a flat +2 to the running Obligation total regardless of
+// which rite or its tier — coincidentally correct for Low/Standard rites
+// (whose base cost is usually 1, doubled = 2), but it silently undercharged
+// every High-tier rite (base cost 2, doubled = 4, floored at 3 — the code
+// only ever charged 2). It now reads the rite's own listed cost and doubles
+// that, applying the correct minimum for its tier.
 
 window.crackTheSeal = function(patronId, riteIndex, characterId = 'default-character') {
     const state = getState();
@@ -831,12 +922,18 @@ window.crackTheSeal = function(patronId, riteIndex, characterId = 'default-chara
     }
 
     const riteName = safeString(rite.name);
+    const tier = safeString(rite.tier || '');
+    const isHighTier = tier.toLowerCase() === 'high';
+    const baseCost = parseRiteBaseObligationCost(rite);
+    const minimum = isHighTier ? 3 : 2;
+    const crackCost = Math.max(baseCost * 2, minimum);
+
     const currentObligation = getPatronObligation(characterId, patronId);
-    const doubleObligation = currentObligation + 2;
+    const newObligation = currentObligation + crackCost;
 
-    if (!confirm(`💥 Crack the Seal: invoke "${riteName}" instantly?\n\nThis will add +2 Obligation (total: ${currentObligation} → ${doubleObligation}). The Symbol may become Compromised.`)) return;
+    if (!confirm(`💥 Crack the Seal: invoke "${riteName}" instantly?\n\nThis rite's base cost is ${baseCost} Obligation. Crack the Seal doubles it (minimum +${minimum}${isHighTier ? ' for High Rites' : ''}), costing +${crackCost} Obligation this time (total: ${currentObligation} → ${newObligation}). The Symbol becomes Compromised.`)) return;
 
-    setPatronObligation(characterId, patronId, doubleObligation);
+    setPatronObligation(characterId, patronId, newObligation);
     savePatronData();
 
     // Mark the Symbol as Compromised (narrative flag) and persist
@@ -852,7 +949,7 @@ window.crackTheSeal = function(patronId, riteIndex, characterId = 'default-chara
         }
     }
 
-    showToast(`💥 "${riteName}" invoked instantly! Obligation +2 (now ${doubleObligation}). Symbol may be Compromised.`, 'warning');
+    showToast(`💥 "${riteName}" invoked instantly! Obligation +${crackCost} (now ${newObligation}). Symbol is now Compromised (−1 die on Borrowed Grace until restored).`, 'warning');
 
     // Refresh the rites view
     const container = document.getElementById('spellcraft-content');

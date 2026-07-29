@@ -41,6 +41,15 @@ const COSMIC_DATA_PATH = './data/patrons/';
 const TERRESTRIAL_DATA_PATH = './data/terrestrial/';
 const TERRESTRIAL_FALLBACK_DATA_PATH = './data/factions/';
 const RELIGION_DATA_PATH = './data/religions/';
+
+// Bump this whenever the on-disk patron JSON schema changes in a way that
+// would make a previously-cached copy of `state.patrons` stale or wrong
+// (e.g. the rite tier vocabulary moving from Basic/Advanced/Master to
+// Low/Standard/High). Any cached blob written under an older version is
+// treated as invalid and force-reloaded from disk automatically, so this
+// class of "stale cache silently hides new data forever" bug can't recur
+// just because someone forgot to click Refresh.
+const PATRON_SCHEMA_VERSION = 2;
  
 // ============================================================
 // DEFAULT DATA (fallback)
@@ -253,7 +262,8 @@ function getTierColor(tier) {
         'Standard': '#d4af37',
         'Advanced': '#c47a7a',
         'Master': '#b84a8a',
-        'Epic': '#d94a4a'
+        'Epic': '#d94a4a',
+        'High': '#8e44ad'
     };
     return colors[tier] || 'var(--text2)';
 }
@@ -287,7 +297,9 @@ const state = {
  
 export async function loadPatronData(force = false) {
     const saved = getState();
-    if (!force && saved.patrons) {
+    const cacheMatchesCurrentSchema = saved.patrons?._schemaVersion === PATRON_SCHEMA_VERSION;
+
+    if (!force && saved.patrons && cacheMatchesCurrentSchema) {
         if (saved.patrons.cosmic?.length || saved.patrons.terrestrial?.length) {
             state.cosmicPatrons = (saved.patrons.cosmic || []).map(normalizePatron).sort(sortByName);
             state.terrestrialPatrons = (saved.patrons.terrestrial || []).map(normalizePatron).sort(sortByName);
@@ -300,6 +312,11 @@ export async function loadPatronData(force = false) {
             return;
         }
     }
+
+    if (saved.patrons && !cacheMatchesCurrentSchema) {
+        console.log(`📦 Cached patron data is schema v${saved.patrons._schemaVersion ?? 'unknown'}, current is v${PATRON_SCHEMA_VERSION} — reloading from disk.`);
+    }
+
     await loadRemotePatrons();
 }
  
@@ -417,6 +434,7 @@ function savePatronData() {
     saved.patrons.trusts = state.trusts;
     saved.patrons.religions = state.religions;
     saved.patrons.obligation = state.obligation;
+    saved.patrons._schemaVersion = PATRON_SCHEMA_VERSION;
     saveState();
 }
  
