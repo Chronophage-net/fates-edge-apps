@@ -3174,6 +3174,94 @@
       "body": "Attach hostile tag/timer to target. Dangerous tag.",
       "tags": ["tag", "magic", "affliction", "dangerous"],
       "mod": 2
-    }
+    },
+  {
+    "id": 419,
+    "title": "High Cantor",
+    "category": "talents",
+    "body": "Prerequisite: Cantor's Path, Tier III. Allows you to weave Standard Rites into instant, powerful Songs. Each such casting marks your Corruption Timer, but the effects are immediate. Cost: 18 XP.",
+    "tags": ["talent", "magic", "cantor", "prestige"],
+    "cost": 18
+  },
+  {
+    "id": 420,
+    "title": "Patron's Dedication",
+    "category": "talents",
+    "body": "Prerequisite: Cantor's Path. You bind your voice to a single Patron. Your Corruption timer is always keyed to that Patron—it never resets to a different Patron's table when you bloom. Singing a Song of any other Patron worsens your Position by one step. Cost: 4 XP.",
+    "tags": ["talent", "magic", "cantor"],
+    "cost": 4
+  },
+  {
+    "id": 421,
+    "title": "Resonant Performance",
+    "category": "talents",
+    "body": "Prerequisite: Cantor's Path. Gain +1 die when performing for an audience of 5 or more. Cost: 3 XP.",
+    "tags": ["talent", "magic", "cantor"],
+    "cost": 3
+  },
+  {
+    "id": 422,
+    "title": "Song Weaver",
+    "category": "talents",
+    "body": "Prerequisite: Cantor's Path. Combine two compatible Songs for +1 Effect. Two Songs are compatible if they share a thematic tag or are from the same Patron. Sing both as a single action; resolve the Performance roll once. Cost: 4 XP.",
+    "tags": ["talent", "magic", "cantor"],
+    "cost": 4
+  },
+  {
+    "id": 423,
+    "title": "Steady Voice",
+    "category": "talents",
+    "body": "Prerequisite: Cantor's Path. Passive. When you Push a Song, you may choose to mark 1 additional Fatigue instead of marking a Corruption segment (once per scene). You cannot use this talent if your Corruption timer is already full. This talent gives low-Spirit Cantors an emergency buffer at the cost of greater exhaustion. Cost: 2 XP.",
+    "tags": ["talent", "magic", "cantor"],
+    "cost": 2
+  },
+  {
+    "id": 424,
+    "title": "Embraced Corruption",
+    "category": "talents",
+    "body": "Prerequisite: Cantor's Path, Tier II+. You have learned to treat the bloom not as disease but as evolution. When you voluntarily fill your Corruption Timer through Resonant Rites (not by Pushing), you may choose your corruption trait rather than accepting a random result. You may Push Songs without marking Fatigue once per session. After seven blooms, gain the Fugal Self: +1 die to all Performance rolls, but each morning test Spirit+Resolve (DV 3) or your Corruption controls your body for the first scene. Cost: 12 XP.",
+    "tags": ["talent", "magic", "cantor", "prestige"],
+    "cost": 12
+  },
+  {
+    "id": 425,
+    "title": "Threshold Sense",
+    "category": "talents",
+    "body": "Prerequisite: Witchcraft (Craft of the Hedge). Gain +1 die to detect hidden thresholds, boundaries, or debts in any scene. This is a passive ability. Cost: 3 XP.",
+    "tags": ["talent", "witchcraft", "threshold"],
+    "cost": 3
+  },
+  {
+    "id": 426,
+    "title": "Promise Keeper",
+    "category": "talents",
+    "body": "Prerequisite: Witchcraft. When you bind a promise with a Hedge Gift or Quick Working, the Promise Timer starts at 6 segments instead of 4. You may also spend 1 Boon to clear one segment from any Promise Timer you have set. Cost: 5 XP.",
+    "tags": ["talent", "witchcraft", "promise"],
+    "cost": 5
+  },
+  {
+    "id": 427,
+    "title": "Weaver's Resolve",
+    "category": "talents",
+    "body": "Prerequisite: Witchcraft. When you would mark Identity Strain, you may instead mark 2 Fatigue (once per scene). The strain of touching your own identity is deferred to your body. Cost: 6 XP.",
+    "tags": ["talent", "witchcraft", "identity"],
+    "cost": 6
+  },
+  {
+    "id": 428,
+    "title": "Kinetic Momentum",
+    "category": "combat",
+    "body": "You can use the force of your attacks to propel yourself. When you make a successful melee attack, you may immediately move one range band (Close→Near or Near→Close) without provoking opportunity attacks. You may not use this talent more than once per round. Requires Melee 2+, Athletics 2+.",
+    "tags": ["talent", "combat", "movement"],
+    "cost": 4
+  },
+  {
+    "id": 429,
+    "title": "Uncanny Dodge",
+    "category": "combat",
+    "body": "You are always treated as having Partial Cover against ranged attacks, even in the open (the Weave twists around you). When you take the Defend action against a ranged attack, improve Position by one step. Requires Elusive Dodge, Wits 3+.",
+    "tags": ["talent", "combat", "defender"],
+    "cost": 6
+  }
   ]
 }

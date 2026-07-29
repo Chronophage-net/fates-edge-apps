@@ -49,40 +49,37 @@ let outsideClickHandler = null;
 async function loadWikiTags() {
     if (tagDefinitions) return tagDefinitions;
     
+    // Start with hardcoded tags as base
+    const merged = buildTagDefinitions();
+    
     try {
         const response = await fetch('./data/wiki.json');
         if (response.ok) {
             const data = await response.json();
-            const tags = new Map();
-            
-           if (data.data && Array.isArray(data.data)) {
-            for (const entry of data.data) {
-                // Only include entries that are actual tags (have a mod field)
-                if (entry.tags && entry.tags.includes('magic') && entry.mod !== undefined) {
-                    const tagName = entry.title?.toUpperCase();
-                    if (tagName) {
-                        tags.set(tagName, {
-                            name: tagName,
-                            mod: entry.mod,          // use mod, not cost
-                            category: entry.category || 'magic',
-                            description: entry.body || '',
-                            example: entry.example || ''
-                        });
+            if (data.data && Array.isArray(data.data)) {
+                for (const entry of data.data) {
+                    // Only include entries that are actual tags (have a mod field)
+                    if (entry.tags && entry.tags.includes('magic') && entry.mod !== undefined) {
+                        const tagName = entry.title?.toUpperCase();
+                        if (tagName) {
+                            // Overwrite or add from wiki
+                            merged.set(tagName, {
+                                name: tagName,
+                                mod: entry.mod,
+                                category: entry.category || 'magic',
+                                description: entry.body || '',
+                                example: entry.example || ''
+                            });
+                        }
                     }
                 }
-            }
-        }
-            
-            if (tags.size > 0) {
-                tagDefinitions = tags;
-                return tagDefinitions;
             }
         }
     } catch (e) {
         console.warn('Could not load wiki.json, using hardcoded tags.');
     }
     
-    tagDefinitions = buildTagDefinitions();
+    tagDefinitions = merged;
     return tagDefinitions;
 }
 
