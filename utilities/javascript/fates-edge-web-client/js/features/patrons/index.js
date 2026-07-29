@@ -32,6 +32,7 @@ import { showToast } from '../../components/Toast.js';
 import { escHtml } from '../../core/utils.js';
 // ─── Import shared discovery ────────────────────────────
 import { discoverPatrons } from '../../core/discovery.js';
+import { recommendPatrons } from './recommender.js';
  
 // ============================================================
 // CONSTANTS
@@ -288,7 +289,8 @@ const state = {
     usingFallback: false,
     obligation: {},
     expandedRites: new Set(),
-    expandedSections: new Set()
+    expandedSections: new Set(),
+    recommender: { query: '', results: null, active: false }
 };
  
 // ============================================================
@@ -554,21 +556,111 @@ function renderCosmicPatrons() {
  
     const characterId = 'default-character';
     const obligationMap = state.obligation[characterId] || {};
- 
+
+    // ─── Patron Recommender ────────────────────────────────────────
+    const rec = state.recommender;
+    const recommenderBox = `
+        <div class="patron-recommender" style="display:flex;gap:0.3rem;align-items:center;background:var(--bg2);border-radius:var(--radius);padding:0.3rem 0.5rem;border:1px solid var(--border);flex-wrap:wrap;">
+            <span style="font-size:0.75rem;color:var(--text3);white-space:nowrap;">🔮 Find your patron:</span>
+            <input type="text" id="patron-recommender-input" value="${escHtml(rec.query)}"
+                placeholder="e.g. 'a nature-loving druid' or 'stealthy rogue who steals secrets'"
+                onkeydown="if(event.key==='Enter') window.runPatronRecommender()"
+                style="flex:1;min-width:160px;background:var(--bg3);border:1px solid var(--border);border-radius:4px;padding:0.2rem 0.4rem;font-size:0.75rem;" />
+            <button class="btn btn-xs btn-primary" onclick="window.runPatronRecommender()">Search</button>
+            ${rec.active ? `<button class="btn btn-xs btn-ghost" onclick="window.clearPatronRecommender()" style="color:var(--text3);">✕ Clear</button>` : ''}
+        </div>
+    `;
+
+    // ─── EASTER EGG: The Ninth ──────────────────────────────────
+    // Check if the search query triggers the revelation
+    const query = rec.query || '';
+    const shouldRevealNinth = isNinthTrigger(query);
+
+    // If triggered, reveal The Ninth
+    if (shouldRevealNinth && !ninthRevealed) {
+        ninthRevealed = true;
+        // Optional: show a cryptic toast
+        setTimeout(() => {
+            showToast('🔮 You sense a presence beyond the eighth threshold...', 'info');
+        }, 300);
+    }
+
+    // Filter patrons for display
+    let displayPatrons = [...state.cosmicPatrons];
+
+    // Hide The Ninth unless it has been revealed
+    if (!ninthRevealed) {
+        displayPatrons = displayPatrons.filter(p => !isTheNinth(p));
+    }
+
+    // ─── Apply recommender filter ─────────────────────────────────
+    let gridPatrons = displayPatrons;
+    let matchInfoById = {};
+    let resultsNote = '';
+
+    if (rec.active && rec.results) {
+        // Filter recommender results to only include visible patrons
+        const visibleResults = rec.results.filter(r => !isTheNinth(r.patron) || ninthRevealed);
+        
+        if (visibleResults.length === 0 && rec.results.length > 0) {
+            // This handles the case where the only match was The Ninth
+            resultsNote = `<div style="font-size:0.75rem;color:var(--purple);padding:0.3rem;background:var(--bg3);border-radius:var(--radius);border-left:3px solid var(--purple);">
+                🔮 <em>"The Ninth is not found. It finds you."</em> — Try a different search, or seek what is hidden.
+                ${!ninthRevealed ? `<br><span style="font-size:0.65rem;color:var(--text3);">(Hint: seek <strong>forbidden knowledge</strong>)</span>` : ''}
+            </div>`;
+            gridPatrons = displayPatrons;
+        } else if (visibleResults.length === 0) {
+            resultsNote = `<div style="font-size:0.75rem;color:var(--text3);padding:0.3rem;">No visible patrons matched "${escHtml(rec.query)}" — showing the full list instead.</div>`;
+            gridPatrons = displayPatrons;
+        } else {
+            gridPatrons = visibleResults.map(r => r.patron);
+            visibleResults.forEach(r => {
+                matchInfoById[r.patron.id] = r.matchedTags.slice(0, 3).map(m => m.match);
+            });
+            // Check if The Ninth was hidden but would have matched
+            const hiddenNinthMatch = rec.results.some(r => isTheNinth(r.patron) && !ninthRevealed);
+            if (hiddenNinthMatch) {
+                resultsNote = `<div style="font-size:0.75rem;color:var(--purple);padding:0.2rem 0.3rem;font-style:italic;">
+                    🔮 ${visibleResults.length} match${visibleResults.length === 1 ? '' : 'es'} for "${escHtml(rec.query)}". 
+                    <span style="color:var(--text3);">Something stirs beyond the eighth threshold...</span>
+                </div>`;
+            } else {
+                resultsNote = `<div style="font-size:0.7rem;color:var(--gold);padding:0.2rem 0.3rem;">
+                    🔮 ${visibleResults.length} match${visibleResults.length === 1 ? '' : 'es'} for "${escHtml(rec.query)}", best first.
+                </div>`;
+            }
+        }
+    } else if (ninthRevealed) {
+        // Show a subtle indicator that The Ninth is present
+        resultsNote = `<div style="font-size:0.7rem;color:var(--purple);padding:0.2rem 0.3rem;font-style:italic;">
+            🌌 <em>The Ninth has revealed itself to you.</em>
+        </div>`;
+    }
+
+    // ─── Render the grid ──────────────────────────────────────────
     return `
-        <div style="display:flex;flex-direction:column;gap:0.8rem;">
+        <div style="display:flex;flex-direction:column;gap:0.5rem;">
+            ${recommenderBox}
+            ${resultsNote}
+
             <div class="patrons-scroll-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:0.5rem;max-height:220px;overflow-y:auto;padding:0.2rem;border:1px solid var(--border);border-radius:var(--radius);background:var(--bg2);">
-                ${state.cosmicPatrons.map(p => {
+                ${gridPatrons.map(p => {
                     const obl = obligationMap[p.id] || 0;
                     const name = safeString(p.name || p.title || 'Unnamed');
                     const summary = getPatronSummary(p);
                     const icon = getPatronIcon(p);
                     const color = getPatronColor(p);
+                    const matched = matchInfoById[p.id];
+                    const isNinth = isTheNinth(p);
+                    
                     return `
-                        <div class="patron-tile" onclick="window.viewPatron('${p.id}')" style="background:var(--bg3);border-radius:var(--radius);padding:0.3rem 0.5rem;cursor:pointer;display:flex;flex-direction:column;align-items:center;text-align:center;border-left:3px solid ${color};transition:all 0.2s;">
+                        <div class="patron-tile" onclick="window.viewPatron('${p.id}')" style="background:var(--bg3);border-radius:var(--radius);padding:0.3rem 0.5rem;cursor:pointer;display:flex;flex-direction:column;align-items:center;text-align:center;border-left:3px solid ${color};transition:all 0.2s;${matched ? 'border:1px solid var(--gold);' : ''}${isNinth ? 'border:1px solid var(--purple);position:relative;' : ''}">
+                            ${isNinth ? `<div style="position:absolute;top:-6px;right:-4px;font-size:0.7rem;color:var(--purple);">🔮</div>` : ''}
                             <div style="font-size:1.5rem;">${safeString(icon)}</div>
                             <div style="font-size:0.75rem;font-weight:600;color:var(--text);">${escHtml(name)}</div>
                             <div style="font-size:0.6rem;color:var(--text3);">${escHtml(summary)}</div>
+                            ${matched ? `<div style="font-size:0.55rem;color:var(--gold);margin-top:0.1rem;">🔮 ${matched.map(escHtml).join(', ')}</div>` : ''}
+                            ${isNinth ? `<div style="font-size:0.55rem;color:var(--purple);margin-top:0.05rem;">🌌 Beyond the Eighth</div>` : ''}
                             <div style="font-size:0.55rem;color:var(--text2);margin-top:0.1rem;">Oblig: ${obl}</div>
                         </div>
                     `;
@@ -1708,6 +1800,40 @@ window.deleteTrust = function(id) {
 // REFRESH
 // ============================================================
  
+// ============================================================
+// PATRON RECOMMENDER
+// ============================================================
+
+window.runPatronRecommender = function() {
+    const input = document.getElementById('patron-recommender-input');
+    if (!input) return;
+    const query = input.value.trim();
+    if (!query) {
+        showToast('Describe a character concept first — e.g. "a nature-loving druid".', 'info');
+        return;
+    }
+
+    const results = recommendPatrons(query, state.cosmicPatrons);
+    state.recommender.query = query;
+    state.recommender.results = results;
+    state.recommender.active = true;
+
+    if (results.length === 0) {
+        showToast(`No patrons matched "${query}". Showing the full list — try different words.`, 'info');
+    } else {
+        showToast(`🔮 Found ${results.length} match${results.length === 1 ? '' : 'es'}.`, 'success');
+    }
+
+    refreshView();
+};
+
+window.clearPatronRecommender = function() {
+    state.recommender.query = '';
+    state.recommender.results = null;
+    state.recommender.active = false;
+    refreshView();
+};
+
 window.refreshPatrons = function() {
     localStorage.removeItem('fates-edge-patrons-cache-cosmic');
     localStorage.removeItem('fates-edge-patrons-cache-terrestrial');
@@ -1732,6 +1858,11 @@ window.refreshPatrons = function() {
     state.religions = [];
     state.dataLoaded = false;
     state.usingFallback = false;
+    // Clear any recommender results too — they hold references to the
+    // patron objects we're about to throw away, and would otherwise show
+    // stale/duplicate tiles once fresh data loads.
+    state.recommender.results = null;
+    state.recommender.active = false;
  
     loadPatronData(true);
     refreshView();
@@ -1802,11 +1933,17 @@ export function refresh() {
 export function destroy() {
     container = null;
 }
- 
-// ============================================================
-// EXPORTS
-// ============================================================
- 
+
+export function revealNinth() {
+    ninthRevealed = true;
+    refreshView();
+    showToast('🔮 The Ninth has revealed itself to you.', 'info');
+}
+
+export function isNinthRevealed() {
+    return ninthRevealed;
+}
+
 export default {
     render,
     destroy,
@@ -1820,5 +1957,7 @@ export default {
     getPatronObligation,
     setPatronObligation,
     addPatronObligation,
-    clearPatronObligation
+    clearPatronObligation,
+    revealNinth,
+    isNinthRevealed
 };

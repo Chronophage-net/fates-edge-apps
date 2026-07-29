@@ -10,6 +10,24 @@
  *   - parseQuery(query): normalises and tokenises the input
  */
 
+// ─── Stopwords ────────────────────────────────────────────────────
+// BUGFIX: parseQuery() used to keep every token of length > 0, including
+// single letters like "i" and "a". Those then went into getArchetypeTags(),
+// whose `key.includes(token) || token.includes(key)` check has no length
+// floor — "a" or "i" fuzzy-matches nearly every archetype key (almost all
+// of them contain the letter 'a' or 'i' somewhere). Running the module's
+// own docstring example, "I want to be a Druid", through the original
+// code pulled in 123 unrelated tags (combat, healing, stealth, everything)
+// from "i"/"a"/"to"/"be"/"want" alone, completely burying the one real
+// signal ("druid"). Filtering stopwords and requiring length > 2 fixes
+// this at the source, so every downstream function benefits.
+const STOPWORDS = new Set([
+  'i', 'a', 'an', 'the', 'to', 'be', 'is', 'of', 'in', 'on', 'for', 'and',
+  'or', 'my', 'me', 'you', 'your', 'it', 'that', 'this', 'with', 'as',
+  'at', 'by', 'so', 'am', 'are', 'was', 'were', 'want', 'wanna', 'like',
+  'play', 'playing', 'character', 'build', 'looking', 'find', 'need',
+]);
+
 // ─── Archetype → Tag Mapping ─────────────────────────────────────
 // These are the "classic" TTRPG roles and concepts.
 // You can extend this list as needed – it's the only place that references external concepts.
@@ -97,7 +115,7 @@ export function parseQuery(query) {
     .toLowerCase()
     .replace(/[^a-z0-9\s]/g, ' ')   // remove punctuation
     .split(/\s+/)
-    .filter(word => word.length > 0);
+    .filter(word => word.length > 2 && !STOPWORDS.has(word));
 }
 
 /**
@@ -107,9 +125,17 @@ export function parseQuery(query) {
 export function getArchetypeTags(tokens) {
   const matched = new Set();
   for (const token of tokens) {
-    // Check if token (or a variant) exists as a key in the map
     for (const [key, tags] of Object.entries(ARCHETYPE_MAP)) {
-      if (key.includes(token) || token.includes(key)) {
+      // BUGFIX: this used to be `key.includes(token) || token.includes(key)`
+      // with no length floor, so any short token fuzzy-matched almost every
+      // key. Exact match is always fine; fuzzy containment now only counts
+      // when the shorter side is at least 4 characters, so "war" doesn't
+      // spuriously match "warlock" off a 3-letter fragment of an unrelated
+      // word, but "warlock"/"lock" or "healer"/"healers" still work.
+      const isMatch = token === key
+        || (token.length >= 4 && key.includes(token))
+        || (key.length >= 4 && token.includes(key));
+      if (isMatch) {
         for (const tag of tags) matched.add(tag);
       }
     }
@@ -150,29 +176,41 @@ function matchPatron(patron, searchTerms, options) {
     sources.push({ type: 'description', items: descWords });
   }
 
-  // Score each source
+  // Score each source.
+  // BUGFIX: the original had a third `else if (term.length > 2 &&
+  // item.length > 2 && (item.includes(term) || term.includes(item)))`
+  // branch that could never execute — the preceding `else if
+  // (item.includes(term) || term.includes(item))` already catches every
+  // case that condition checks for, so it was dead code. Replaced with a
+  // single partial-match branch that requires both sides to be at least
+  // 4 characters (consistent with getArchetypeTags' fix above), so short
+  // words can't rack up cheap partial-match points against everything.
+  // Also dedupes identical (source, term, matched-word) hits so the same
+  // word appearing twice in one list doesn't double-count.
+  const seenHits = new Set();
   for (const term of searchTerms) {
     for (const source of sources) {
       for (const item of source.items) {
-        // Exact match or contains?
+        if (!item) continue;
+        const hitKey = `${source.type}:${term}:${item}`;
+        if (seenHits.has(hitKey)) continue;
+
+        let weight = 0;
         if (item === term) {
-          score += 3;
-          matchedTags.push({ source: source.type, term, match: item });
-        } else if (item.includes(term) || term.includes(item)) {
-          score += 1.5;
-          matchedTags.push({ source: source.type, term, match: item });
+          weight = 3;
+        } else if (term.length >= 4 && item.length >= 4 && (item.includes(term) || term.includes(item))) {
+          weight = 1.5;
         }
-        // Also check if the term is a substring of the item or vice‑versa (partial)
-        else if (term.length > 2 && item.length > 2 &&
-                 (item.includes(term) || term.includes(item))) {
-          score += 0.5;
+
+        if (weight > 0) {
+          score += weight;
           matchedTags.push({ source: source.type, term, match: item });
+          seenHits.add(hitKey);
         }
       }
     }
   }
 
-  // Normalise score (optional) – but we keep raw.
-
   return { score, matchedTags };
 }
+
