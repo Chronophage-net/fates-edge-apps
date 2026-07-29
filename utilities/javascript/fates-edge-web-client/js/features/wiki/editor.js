@@ -1,16 +1,15 @@
 /**
  * Wiki Editor – Markdown editor for wiki entries
  * Provides a modal editor for creating and editing wiki entries.
- * FIXED: Removed unused sanitizeHtml import.
+ * Includes HTML sanitization to prevent XSS from markdown content.
  */
 
 import { getState, addWikiEntry, updateWikiEntry, saveState } from '../../core/state.js';
-import { escHtml } from '../../core/utils.js';  // only escHtml needed
+import { escHtml } from '../../core/utils.js';
 import { showToast } from '../../components/Toast.js';
 
 let modalOverlay = null;
 let currentEntryId = null;
-let editorInstance = null;
 
 // ============================================================
 // OPEN EDITOR
@@ -27,7 +26,6 @@ export function openEditor(id) {
     }
 
     if (!entry) {
-        // New entry
         isNew = true;
         entry = {
             id: 'local-' + Date.now() + '-' + Math.random().toString(36).substr(2, 6),
@@ -50,7 +48,6 @@ export function openEditor(id) {
 // ============================================================
 
 function createEditorModal(entry, isNew) {
-    // Remove any existing modal
     removeEditorModal();
 
     const overlay = document.createElement('div');
@@ -147,12 +144,10 @@ function createEditorModal(entry, isNew) {
     document.body.appendChild(overlay);
     modalOverlay = overlay;
 
-    // Store reference to entry for delete
     if (!isNew) {
         modal.dataset.entryId = entry.id;
     }
 
-    // Setup event listeners
     setupEditorEvents(entry, isNew);
 }
 
@@ -170,13 +165,11 @@ function setupEditorEvents(entry, isNew) {
     const bodyTextarea = document.getElementById('wiki-editor-body');
     const helpBtn = document.querySelector('.markdown-help-btn');
 
-    // Close handlers
     const closeModal = () => removeEditorModal();
 
     closeBtn.addEventListener('click', closeModal);
     cancelBtn.addEventListener('click', closeModal);
 
-    // Click outside to close
     modalOverlay.addEventListener('click', (e) => {
         if (e.target === modalOverlay) closeModal();
     });
@@ -191,19 +184,16 @@ function setupEditorEvents(entry, isNew) {
         }
     });
 
-    // Live preview update
     bodyTextarea.addEventListener('input', () => {
         if (previewToggle.checked) {
             renderPreview(bodyTextarea.value, previewDiv);
         }
     });
 
-    // Markdown help
     if (helpBtn) {
         helpBtn.addEventListener('click', showMarkdownHelp);
     }
 
-    // Delete
     if (deleteBtn) {
         deleteBtn.addEventListener('click', () => {
             const id = modalOverlay.querySelector('.modal')?.dataset?.entryId;
@@ -213,7 +203,6 @@ function setupEditorEvents(entry, isNew) {
                 saveState();
                 removeEditorModal();
                 showToast('🗑️ Entry deleted.', 'success');
-                // Re-render wiki
                 import('./index.js').then(module => {
                     if (module.renderWiki) module.renderWiki();
                 });
@@ -221,13 +210,11 @@ function setupEditorEvents(entry, isNew) {
         });
     }
 
-    // Submit
     form.addEventListener('submit', (e) => {
         e.preventDefault();
         saveEntry(isNew);
     });
 
-    // Keyboard shortcuts
     document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape') closeModal();
         if ((e.ctrlKey || e.metaKey) && e.key === 's') {
@@ -236,7 +223,6 @@ function setupEditorEvents(entry, isNew) {
         }
     });
 
-    // Focus title
     setTimeout(() => {
         const titleInput = document.getElementById('wiki-editor-title');
         if (titleInput) titleInput.focus();
@@ -265,7 +251,6 @@ function saveEntry(isNew) {
     const state = getState();
     const entries = state.wikiEntries || [];
 
-    // Check for duplicate title (only for new entries)
     if (isNew) {
         const exists = entries.some(e => e.title.toLowerCase() === title.toLowerCase());
         if (exists) {
@@ -306,14 +291,43 @@ function saveEntry(isNew) {
     saveState();
     removeEditorModal();
 
-    // Re-render wiki
     import('./index.js').then(module => {
         if (module.renderWiki) module.renderWiki();
     });
 }
 
 // ============================================================
-// RENDER PREVIEW
+// SANITIZE HTML (prevents XSS from markdown)
+// ============================================================
+
+function sanitizeHtml(html) {
+    if (!html) return '';
+    const temp = document.createElement('div');
+    temp.innerHTML = html;
+
+    // Remove all <script> tags
+    temp.querySelectorAll('script').forEach(el => el.remove());
+
+    // Remove all on* attributes and sanitize dangerous URIs
+    temp.querySelectorAll('*').forEach(el => {
+        for (const attr of el.attributes) {
+            if (attr.name.startsWith('on')) {
+                el.removeAttribute(attr.name);
+            }
+            if (attr.name === 'href' || attr.name === 'src') {
+                const val = attr.value.trim().toLowerCase();
+                if (val.startsWith('javascript:')) {
+                    el.removeAttribute(attr.name);
+                }
+            }
+        }
+    });
+
+    return temp.innerHTML;
+}
+
+// ============================================================
+// RENDER PREVIEW (with sanitization)
 // ============================================================
 
 function renderPreview(text, container) {
@@ -325,7 +339,8 @@ function renderPreview(text, container) {
             } else if (typeof window.marked === 'function') {
                 html = window.marked(text);
             }
-            container.innerHTML = html || '<em>Empty content</em>';
+            const safeHtml = html ? sanitizeHtml(html) : '';
+            container.innerHTML = safeHtml || '<em>Empty content</em>';
         } else {
             container.innerHTML = escHtml(text).replace(/\n/g, '<br>');
         }
