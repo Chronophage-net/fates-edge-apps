@@ -2646,5 +2646,316 @@
         { "cost": 2, "name": "[REINFORCEMENT] Call the brood", "effect": "They summon more serpent-folk from hidden burrows." }
       ]
     }
+  }, 
+  {
+    "Breath-Counting Ghost (Tier IV)": {
+      "page": "Breath-Counting_Ghost",
+      "summary": "It does not attack. It counts. And when it reaches nine, you will remember what you forgot. A translucent figure in tattered Ykrul riding leathers, counting the breaths of the living. It appears at thresholds—doorways, bridges, and the space between waking and sleeping.",
+      "locations": ["Thresholds", "Doorways", "Bridges", "Fords", "The space between waking and sleeping"],
+      "lore": "The ghost is the echo of someone who died counting. In the Ykrul tradition, a rider who dies on the steppe without settling their debts is doomed to count forever. The ghost does not want to harm you. It wants you to remember.",
+      "connections": ["The Hollow", "The Unquiet Dead", "Ykrul traditions"],
+      "tl": 4,
+      "class": "IV",
+      "sb_spends": [
+        { "cost": 1, "name": "Count of Eight", "effect": "The ghost counts your breaths aloud. For the rest of the scene, you suffer -1 die to all actions involving memory, promises, or navigation." },
+        { "cost": 2, "name": "The Ninth Breath", "effect": "The ghost reaches nine. You remember a debt you owe. Mark 1 Obligation to the person you failed. If you have no outstanding debts, gain the 'Haunted by Possibility' condition—you dream of promises you haven't made yet." },
+        { "cost": 3, "name": "The Ledger Opens", "effect": "The ghost reveals a fragment of the debt ledger of the region. You learn one true thing about a broken promise in this area—and one true thing about a promise that must be kept before the next full moon." }
+      ]
+    }
+  },
+  {
+    "Oath-Keeper's Thorn (Tier IV)": {
+      "page": "Oath-Keeper_Thorn",
+      "summary": "A slender figure in a mask of woven hazel twigs, the Oath-Keeper's Thorn is a messenger of the Hazel Court. It appears when an oath is broken, a promise is forgotten, or a bargain is unpaid. It offers a choice: fulfill the oath, or pay the price.",
+      "locations": ["The Hazel Court", "Where oaths are broken", "Hedges", "Crossroads"],
+      "lore": "The Hazel Queen does not forgive. She renegotiates. The Thorn is her reminder that every promise is a root, and roots can be pulled up, or they can be watered. The choice is yours.",
+      "connections": ["The Hazel Queen", "The Green Court", "The Lethai-al"],
+      "tl": 4,
+      "class": "IV",
+      "sb_spends": [
+        { "cost": 1, "name": "The Root Remembers", "effect": "The Thorn touches the ground; roots sprout from the soil, grasping at your ankles. You must test Resolve (DV 3) or be Rooted—unable to move until you fulfill or break the oath in question." },
+        { "cost": 2, "name": "The Bargain Recalled", "effect": "The Thorn speaks the exact words of the broken oath aloud. All who hear it are Bound Witnesses; they cannot speak of the oath without also speaking of its breach. This imposes -1 die to all social rolls involving the oath until it is resolved." },
+        { "cost": 3, "name": "The Hedge Grows", "effect": "The Thorn summons a barrier of thorny hazel between you and your objective. It requires a successful Body+Athletics test (DV 4) to pass through, and doing so causes 1 Fatigue." },
+        { "cost": 4, "name": "The Queen's Interest", "effect": "The Hazel Queen herself takes notice of the party. For the remainder of the session, all social rolls involving oaths, bargains, or hospitality are at -1 die. The Thorn gains +1 die to all actions against anyone who has broken an oath in its presence." }
+      ]
+    }
+  },
+  {
+    "The Worn Captain (Tier V)": {
+      "page": "Worn_Captain",
+      "summary": "A gaunt figure in the tattered remains of a Black Banner captain's coat, the Worn Captain leads a squad of equally hollowed soldiers. He does not speak—his throat was cut by the creditors who came to collect. He communicates through gestures, each one a command that his soldiers obey without question.",
+      "locations": ["Black Banner camps", "Battlefields", "Where debts are called due"],
+      "lore": "The Worn Captain is a cautionary tale told in Black Banner camps: 'A captain who cannot count his paychest is a captain who will count his own grave.' He made a deal with a broker in exchange for a season's worth of supplies. The broker was not a broker. The deal was not a deal. And the interest is still compounding.",
+      "connections": ["The Black Banners", "Malachai", "The Worn"],
+      "tl": 5,
+      "class": "V",
+      "sb_spends": [
+        { "cost": 1, "name": "The Ledger's Weight", "effect": "The Captain draws his sword and taps it three times on the ground. All who hear it must test Resolve (DV 3) or feel the weight of their own unpaid debts. For the rest of the scene, any failure on a roll involving a promise or obligation generates an additional SB." },
+        { "cost": 2, "name": "Form Up", "effect": "The Captain's soldiers form a shield wall. They cannot be bypassed without a successful Wits+Tactics test (DV 4); failure means you are forced to engage them directly." },
+        { "cost": 2, "name": "The Unpaid Price", "effect": "One of the soldiers lunges forward, its rusted blade aimed at the character with the highest outstanding debt. The attack cannot be parried; it must be dodged (Body+Athletics, DV 4). On a hit, deal Harm 2 and mark 1 Obligation to the soldier's patron." },
+        { "cost": 3, "name": "The Captain's Last Order", "effect": "The Captain points at a character. For the rest of the scene, that character hears a whisper in their ear: 'You will pay.' All of their social rolls are at -1 die, as the guilt of their debts distracts them." },
+        { "cost": 4, "name": "Debt Called In", "effect": "The Captain names a character's greatest failure aloud. All witnesses hear the accusation. The character must test Spirit+Resolve (DV 4) or gain the 'Shamed' condition (-1 die to all Presence-based rolls until they publicly atone)." }
+      ]
+    }
+  },
+  {
+    "The Misstep (Tier V)": {
+      "page": "The_Misstep",
+      "summary": "A shifting, uncertain shape that appears at the edge of perception—a stair that was not there, a door that should not open, a threshold that leads to the same room you just left. The Misstep is a reminder that some boundaries are not meant to be crossed.",
+      "locations": ["Thresholds", "Stairways", "Doorways", "The space between places"],
+      "lore": "In the Aelaerem tradition, the ninth step belongs to the Hollow. The Misstep is the Hollow's way of saying, 'You have mis-counted. Try again.' It is not a punishment. It is a correction.",
+      "connections": ["The Hollow", "The Witness", "Aelaerem traditions"],
+      "tl": 5,
+      "class": "V",
+      "sb_spends": [
+        { "cost": 1, "name": "The Threshold Shifts", "effect": "The Misstep rearranges the geometry of the current space. The party is separated by one room or corridor; you must spend an action to regroup." },
+        { "cost": 2, "name": "The Ninth Step Recalled", "effect": "The Misstep shows you the moment when you (or someone you know) took a step that should not have been taken. The vision is vivid; you must test Resolve (DV 3) or lose a Boon." },
+        { "cost": 2, "name": "The Door You Missed", "effect": "The Misstep reveals a door that was always there but never noticed. It leads to a location of the GM's choice—usually somewhere inconvenient, dangerous, or connected to an unresolved debt." },
+        { "cost": 3, "name": "The Path That Loops", "effect": "The party finds themselves walking in circles. For the next exchange, any action that requires navigation is at -1 die." },
+        { "cost": 4, "name": "The Hollow's Attention", "effect": "The Misstep's actions draw the Hollow's focus to the party. The Hollow's Attention timer advances by 2 segments. If there is no such timer, the GM gains 3 SB to spend on supernatural complications." }
+      ]
+    }
+  },
+  {
+    "The Deep Warden (Tier VI)": {
+      "page": "Deep_Warden",
+      "summary": "A towering figure of stone and rusted iron, the Deep Warden patrols the forgotten vaults beneath the Aelerian mountains. It was not created—it accumulated, layer by layer, from the sediment of broken oaths and forgotten contracts. It does not speak. It does not negotiate. It enforces.",
+      "locations": ["Aeler deep vaults", "Forgotten chambers", "Where contracts are broken"],
+      "lore": "The Deep Warden is not a servant of the Aeler. It is a consequence. When the Aeler built their vaults, they built them on the principle of 'enough.' But some debts are not paid. Some contracts are not fulfilled. The Deep Warden is the interest on those unpaid debts, made manifest.",
+      "connections": ["The Aeler", "The Stone Courts", "The Vault-Kingdom"],
+      "tl": 6,
+      "class": "VI",
+      "sb_spends": [
+        { "cost": 1, "name": "The Ledger's Gaze", "effect": "The Warden looks at a character. They feel their name being written onto the Warden's stone. For the rest of the scene, any action that involves breaking a promise or ignoring a contract is at -1 die." },
+        { "cost": 2, "name": "Stone Grasps", "effect": "The Warden raises its hand; stone and rusted iron erupt from the ground, grasping at the party. Each character must test Body+Athletics (DV 3) or be Grappled; escaping requires a successful Body+Melee test (DV 4) as an action." },
+        { "cost": 2, "name": "The Unpaid Clause", "effect": "The Warden cites a specific clause from a contract you have broken. You must test Resolve (DV 3) or mark 1 Obligation to the Aeler." },
+        { "cost": 3, "name": "The Vault's Memory", "effect": "The Warden summons the ghost of a previous oath-breaker—a former adventurer who failed to fulfil their contract. The ghost attacks the party for one exchange." },
+        { "cost": 4, "name": "The Interest Compounds", "effect": "The Warden reaches into its chest and pulls out a fist-sized stone. It places it on the ground. The stone grows, becoming a smaller copy of the Warden that attacks the party independently." },
+        { "cost": 5, "name": "The Contract's Final Clause", "effect": "The Warden demands a settlement. The party must offer something of value—a memory, a name, a year of service—or the Warden attacks with full force (+2 die to all its actions for the remainder of the scene)." }
+      ]
+    }
+  },
+  {
+    "Mist King's Herald (Tier VI)": {
+      "page": "Mist_Kings_Herald",
+      "summary": "A figure wrapped in fog, its face a mask of silvered mist, the Herald rides a horse made of fog and shadow. It appears when the Mistlands' bell-lines fail, riding from the Direwood to remind the living that some debts are older than the Mistlands themselves.",
+      "locations": ["The Mistlands", "The Direwood", "Where bell-lines fail"],
+      "lore": "The Mist King's Herald is the echo of the first warden—the one who forgot to count the ninth bell. It rides the border between the Mistlands and the Direwood, carrying messages between the dead and the living. Sometimes the messages are warnings. Sometimes they are demands.",
+      "connections": ["The Mist King", "The Direwood", "The Aeler"],
+      "tl": 6,
+      "class": "VI",
+      "sb_spends": [
+        { "cost": 1, "name": "The Fog Thickens", "effect": "The Herald's presence causes fog to roll in. All ranged attacks are at -1 die for the scene, and navigation tests are at -1 die." },
+        { "cost": 2, "name": "The King's Command", "effect": "The Herald speaks a single word in the language of the Direwood. All who hear it must test Resolve (DV 3) or be Shaken (-1 die to all actions for one exchange)." },
+        { "cost": 2, "name": "The Bell Toll", "effect": "The Herald raises its hand; a bell tolls in the distance. The bell-line at the nearest village begins to fray; if not repaired within the scene, the Fog Attention timer advances by 2." },
+        { "cost": 3, "name": "The Warden's Echo", "effect": "The Herald summons a wraith of a former warden—a figure in rusted Aeler armor that attacks the party. The wraith fights until destroyed or until the Herald is banished." },
+        { "cost": 4, "name": "The Mist King's Judgment", "effect": "The Herald names a character's greatest failure—the moment they most disappointed someone they loved. The character must test Spirit+Resolve (DV 4) or be Wracked with Guilt (-2 dice to all actions until they atone)." },
+        { "cost": 5, "name": "The Direwood Opens", "effect": "The Herald creates a temporary path to the Direwood. Any character who follows it must test Resolve (DV 5) or become Lost in the Direwood, separated from the party." }
+      ]
+    }
+  },
+  {
+    "Stone-Bound King (Tier VII)": {
+      "page": "Stone_Bound_King",
+      "summary": "A colossal figure carved from black granite, the Stone-Bound King sits on a throne of rubble in the deepest Aeler vaults. He was once a king who sought immortality. He found it—in the form of a mountain that would not let him go.",
+      "locations": ["Aeler deep vaults", "The heart of the mountain", "Forgotten thrones"],
+      "lore": "The Stone-Bound King was the last ruler of a kingdom that fell to the Aeler. He made a pact with the mountain: he would become stone, and in return, the mountain would protect his people. But the mountain did not distinguish between protection and imprisonment.",
+      "connections": ["The Aeler", "The Tall Folk", "The Stone Courts"],
+      "tl": 7,
+      "class": "VII",
+      "sb_spends": [
+        { "cost": 1, "name": "The Mountain's Weight", "effect": "The King's presence causes a tremor; all in the scene must test Body+Athletics (DV 3) or be Prone." },
+        { "cost": 2, "name": "Stone Speaks", "effect": "The King's voice echoes through the stone. You hear it in your bones. All Resolve-based tests are at -1 die for the scene." },
+        { "cost": 2, "name": "The King's Claim", "effect": "The King names a character as his heir. The character gains 1 Obligation to the King, and for the rest of the scene, all actions that involve claiming power or authority are at -1 die." },
+        { "cost": 3, "name": "The Vault's Guardian", "effect": "The King summons a Stone Giant from the walls of the chamber. The Giant attacks the party until destroyed." },
+        { "cost": 4, "name": "The Contract Recalled", "effect": "The King cites the exact terms of the pact he made with the mountain. You must test Lore (DV 5) to understand it; failure means you are Bound by the terms of a contract you did not knowingly sign." },
+        { "cost": 5, "name": "The Mountain's Embrace", "effect": "The walls of the chamber begin to close in. Characters must test Body+Athletics (DV 5) or be Crushed (Harm 3). This effect continues for one exchange; after that, the King's power wanes." },
+        { "cost": 6, "name": "The Unspoken Clause", "effect": "The King reveals a secret about the mountain that no one knows. The secret is true, and it is always a burden. The character who hears it gains 1 Obligation to the King." }
+      ]
+    }
+  },
+  {
+    "Chained Angel's Echo (Tier VIII)": {
+      "page": "Chained_Angels_Echo",
+      "summary": "A figure of shadow and chains, the Chained Angel's Echo appears in places where debts have been called in and payments have been refused. She does not speak—her chains do. Each rattle is a word, each clink a clause, each groan a consequence.",
+      "locations": ["Where debts are called due", "The Well of Ichor", "Zahk'Kozahn", "The spaces between contracts"],
+      "lore": "Malachai is the Chained Angel—a cosmic entity of obligation and consequence. The Echo is not Malachai herself, but a fragment of her will. It appears when debts have been called in and the debtor has refused. The Echo does not bargain. It collects.",
+      "connections": ["Malachai", "The Chained Angel", "The Daughters of the Unbroken Cord"],
+      "tl": 8,
+      "class": "VIII",
+      "sb_spends": [
+        { "cost": 1, "name": "The Chain's Weight", "effect": "The Echo rattles her chains. All in the scene must test Resolve (DV 3) or be Slowed (-1 die to all physical actions) for the scene." },
+        { "cost": 2, "name": "The Debt Named", "effect": "The Echo speaks the name of the debt you owe. You must test Spirit+Resolve (DV 4) or mark 1 Obligation immediately. If you have no outstanding debts, the Echo gains 1 SB for its next spend." },
+        { "cost": 2, "name": "The Price of Freedom", "effect": "The Echo offers a terrible bargain: it will release one character from their debts, but another character must take on their burden. The character who accepts the bargain gains 3 Obligation." },
+        { "cost": 3, "name": "The Chains Bind", "effect": "The Echo's chains reach out and wrap around a character. They are Grappled; escaping requires a successful Body+Melee test (DV 5) as an action." },
+        { "cost": 4, "name": "The Interest Compounds", "effect": "The Echo reveals that a debt you thought was settled is still accruing interest. You must test Resolve (DV 4) or gain 2 Obligation to the person you thought you had paid." },
+        { "cost": 5, "name": "The Echo of Malachai", "effect": "The Echo becomes momentarily indistinguishable from Malachai herself. All in the scene must test Spirit+Resolve (DV 5) or be Stunned (cannot act) for one exchange." },
+        { "cost": 6, "name": "The Final Settlement", "effect": "The Echo offers one final bargain: it will forgive all debts of the party if one character agrees to become its vessel—to carry its chains until the debt is paid. The character who accepts gains 4 Obligation and becomes a target for future debt-collectors." }
+      ]
+    }
+  },
+  {
+    "Hollow's Reckoning (Tier IX)": {
+      "page": "Hollows_Reckoning",
+      "summary": "A manifestation of the Curse of Acasia—a debt collector of cosmic proportions. It appears when the Hollow's attention has been fully earned, and it does not leave until the debt is paid. It is a figure of gray mist and silence, and it has no face—only the shape of a face that once was.",
+      "locations": ["Acasia", "Where promises are broken", "The Hollow", "The space between debts"],
+      "lore": "The Hollow's Reckoning is the final stage of the Curse of Acasia. It is the consequence of a promise that was never kept, a debt that was never paid. It does not negotiate. It does not bargain. It collects—and it collects in full.",
+      "connections": ["The Hollow", "Acasia", "The Curse"],
+      "tl": 9,
+      "class": "IX",
+      "sb_spends": [
+        { "cost": 1, "name": "The Mist Thickens", "effect": "The Reckoning's presence causes fog to roll in from nowhere. All actions that require sight are at -1 die for the scene." },
+        { "cost": 2, "name": "The Debt Spoken", "effect": "The Reckoning speaks the name of the debt that has been called. All in the scene must test Resolve (DV 3) or be Shaken (-1 die to all actions for one exchange)." },
+        { "cost": 2, "name": "The Weight of Promises", "effect": "The Reckoning creates a zone of oppressive silence. All social rolls in the scene are at -1 die, as the weight of unspoken promises presses down." },
+        { "cost": 3, "name": "The Ledger Opens", "effect": "The Reckoning reveals the terms of the debt that has been called. The terms are always more severe than expected. Gain 2 Obligation to the Hollow." },
+        { "cost": 4, "name": "The Interest Collects", "effect": "The Reckoning causes a character to remember a debt they had forgotten. The character must test Resolve (DV 5) or mark 2 Obligation to the person they owe." },
+        { "cost": 5, "name": "The Reckoning's Gaze", "effect": "The Reckoning looks at a character. That character gains 1 Obligation to the Hollow immediately, and for the rest of the scene, any action that involves making a promise is at -2 dice." },
+        { "cost": 6, "name": "The Reckoning's Touch", "effect": "The Reckoning touches a character's forehead. The character loses access to one skill for 24 hours. The skill returns when the debt is paid." }
+      ]
+    }
+  },
+  {
+    "Spear of the Forgotten Heroine (Tier IX)": {
+      "page": "Spear_Forgotten_Heroine",
+      "summary": "A gilded spear of unknown origin, planted in the Alder Throne by a Linn heroine whose name was erased from history. It is not a weapon in the traditional sense—it is a witness, a memory, and a promise. Warm to the touch, as if it has been held recently.",
+      "locations": ["The Alder Throne", "The Mistlands", "The Direwood"],
+      "lore": "The Spear was planted by a Linn heroine whose name was erased from history. She sealed the Mist King with the power of her true name, and then she went to the Alder Throne to plant the spear. She never returned. The spear holds her memory, her power, and her name—the name that can end the mist.",
+      "connections": ["The Mist King", "The Linn", "The Mistlands"],
+      "tl": 9,
+      "class": "IX",
+      "sb_spends": [
+        { "cost": 1, "name": "The Spear's Warmth", "effect": "The Spear glows faintly. All in the scene feel a sense of hope; gain +1 die to all Resolve-based rolls for the scene." },
+        { "cost": 2, "name": "The Heroine's Voice", "effect": "The Spear whispers a fragment of the heroine's name. You must test Lore (DV 4) to remember it; success grants +1 die to all actions involving the Mist King for the rest of the scene. Failure means you lose the fragment." },
+        { "cost": 2, "name": "The Gilded Light", "effect": "The Spear shines brightly, revealing hidden things. All investigations in the scene gain +1 die; illusions are automatically dispelled." },
+        { "cost": 3, "name": "The Spear's Edge", "effect": "The Spear attacks a target of the GM's choice. Deal Harm 3, ignoring 2 armor. This attack cannot be used again in the same scene." },
+        { "cost": 4, "name": "The Name Spoken", "effect": "A character speaks the heroine's name aloud. The Mist King's power wavers; all undead in the scene suffer -2 dice to all actions for the rest of the scene." },
+        { "cost": 5, "name": "The Erased Wound", "effect": "The Spear's wielder may temporarily erase one wound—an injury, a disease, a curse. The character heals 2 Harm immediately, but the wound returns when the Spear is put down." },
+        { "cost": 6, "name": "The Spear's Choice", "effect": "The Spear chooses a wielder. That character gains the power to end the Mist King's influence permanently—but they must take the Spear to the Alder Throne and speak the heroine's name there. The GM gains 4 SB to spend on complications along the way." }
+      ]
+    }
+  },
+  {
+    "Debt That Never Sleeps (Tier X)": {
+      "page": "Debt_That_Never_Sleeps",
+      "summary": "It is not a creature. It is the interest on a debt that has been compounding since the first promise was made. The accumulated weight of every broken promise, every unpaid debt, every oath that was sworn and then forgotten. It has no physical form—it is a presence, a pressure, a weight.",
+      "locations": ["Everywhere", "Nowhere", "The space between obligations"],
+      "lore": "The Debt That Never Sleeps is the cosmic consequence of the first promise that was ever broken. It has been accumulating interest for longer than mortal memory. It is the reason the Ninth Bell exists—a warning that there are debts that cannot be paid, only deferred.",
+      "connections": ["The Hollow", "Malachai", "The Witness"],
+      "tl": 10,
+      "class": "X",
+      "sb_spends": [
+        { "cost": 1, "name": "The Weight of Oaths", "effect": "All characters in the scene feel the weight of their unpaid debts. Mark 1 Fatigue to all characters." },
+        { "cost": 2, "name": "The Debt Named", "effect": "The Debt speaks the name of a promise the party made but forgot. The character who made the promise gains 1 Obligation to the person they failed." },
+        { "cost": 2, "name": "The Interest Compounds", "effect": "A debt that was thought to be settled is revealed to still have interest. The character who paid it gains 2 Obligation to the debtor." },
+        { "cost": 3, "name": "The Collector's Gaze", "effect": "The Debt looks at a character. That character must test Resolve (DV 4) or be Paralyzed with Guilt (cannot act for one exchange)." },
+        { "cost": 4, "name": "The Ledger's Weight", "effect": "All characters in the scene must test Resolve (DV 5) or gain 1 Obligation to the Debt itself—a cosmic obligation that can only be paid by an act of true selflessness." },
+        { "cost": 5, "name": "The Reckoning's Edge", "effect": "The Debt causes a character's past sins to manifest as a shadow. The shadow attacks the character; it can only be defeated by acknowledging the sin and accepting the debt." },
+        { "cost": 6, "name": "The Final Clause", "effect": "The Debt offers a bargain: the party will be released from all their debts if they pay the Debt's price. The price is always a memory, a name, or a year of service to a cause chosen by the Debt." }
+      ]
+    }
+  },
+  {
+    "Unwritten King (Tier X)": {
+      "page": "Unwritten_King",
+      "summary": "A figure of shifting shadow and faint light, the Unwritten King appears at the edge of history—the moment before a kingdom is founded, the breath before a dynasty is born. He does not speak. He does not move. He is the king who never ruled, but whose rule is inevitable.",
+      "locations": ["The edge of history", "The space between what was and what might have been", "The throne of possibility"],
+      "lore": "The Unwritten King is the king who was never crowned—the ruler who was meant to unite the realm but was never born. He exists in the space between what was and what might have been. He is the personification of potential, and he is waiting for someone to claim the throne.",
+      "connections": ["The Ninth", "The Hollow", "The Witness"],
+      "tl": 10,
+      "class": "X",
+      "sb_spends": [
+        { "cost": 1, "name": "The Crown's Weight", "effect": "The Unwritten King's presence causes all in the scene to feel the weight of expectation. Gain 1 Fatigue to all characters." },
+        { "cost": 2, "name": "The King's Gaze", "effect": "The Unwritten King looks at a character. They feel the weight of a kingdom on their shoulders; all social rolls are at -1 die for the scene." },
+        { "cost": 2, "name": "The Throne's Claim", "effect": "The Unwritten King declares a character to be the heir to the kingdom of possibility. The character gains 1 Obligation to the Unwritten King, and for the rest of the campaign, they will face challenges related to leadership and responsibility." },
+        { "cost": 3, "name": "The Unwritten Law", "effect": "The Unwritten King speaks a law that has never been spoken before. All in the scene must test Resolve (DV 4) or be Bound by the law (cannot act against it for the rest of the scene)." },
+        { "cost": 4, "name": "The Kingdom's Memory", "effect": "The Unwritten King summons a memory of a kingdom that never existed. All in the scene see it; they must test Resolve (DV 5) or be Distracted (-1 die to all actions) for one exchange." },
+        { "cost": 5, "name": "The Crown's Choice", "effect": "The Unwritten King offers a character the chance to become the king of possibility—to rule over what might have been. The character who accepts gains 3 Obligation to the Unwritten King and the power to reshape one reality (GM's discretion)." },
+        { "cost": 6, "name": "The Inevitable Rule", "effect": "The Unwritten King declares that the party's actions have already been written in the book of what might have been. The party must accept that their choices are not choices—they are consequences. All actions in the scene are at -1 die, as the weight of inevitability presses down." }
+      ]
+    }
+  },
+  {
+    "Bell-Warden's Shadow (Tier IV)": {
+      "page": "Bell-Warden_Shadow",
+      "summary": "Every bell-warden has a shadow. The shadow is the part of them that remembers the tolls they have rung. A shadow that follows a bell-warden wherever they go, the Bell-Warden's Shadow is the manifestation of the tolls the warden has rung—the deaths, the warnings, the sealed doors.",
+      "locations": ["The Mistlands", "Where bell-lines are rung", "The shadow of a bell-warden"],
+      "lore": "The Shadow is the part of the bell-warden that remembers the silence after a bell is rung. It watches, patient and cold, waiting for the bell-warden to make a mistake.",
+      "connections": ["The Mistlands", "Bell-wardens", "The Aeler"],
+      "tl": 4,
+      "class": "IV",
+      "sb_spends": [
+        { "cost": 1, "name": "The Unrung Bell", "effect": "The Shadow mimics the sound of a bell that was never rung. All in the scene must test Resolve (DV 3) or be Shaken (-1 die to all actions for one exchange)." },
+        { "cost": 2, "name": "The Toll Remembered", "effect": "The Shadow shows the bell-warden the face of a person they failed. The bell-warden gains 1 Obligation to the person's memory." },
+        { "cost": 3, "name": "The Shadow's Claim", "effect": "The Shadow reaches out and touches a character. That character gains the 'Haunted by the Bell' condition—they hear bells in their sleep and are awakened by imaginary rings." }
+      ]
+    }
+  },
+  {
+    "Salt-Eater (Tier V)": {
+      "page": "Salt-Eater",
+      "summary": "A creature made of crystallized salt and bone, the Salt-Eater feeds on the boundaries of the world. It appears at the edges of the Mistlands, where the wards are thin and the fog is hungry. It has no fixed shape—it is a shifting mass of salt crystals and bone fragments.",
+      "locations": ["The Mistlands", "Salt pans", "Where wards are thin"],
+      "lore": "The Salt-Eater is a rare and dangerous entity that eats salt, eats wards, and eats the memory of boundaries. It is not malicious; it is hungry.",
+      "connections": ["The Mistlands", "The Direwood", "The Aeler"],
+      "tl": 5,
+      "class": "V",
+      "sb_spends": [
+        { "cost": 1, "name": "The Salt Line Breaks", "effect": "The Salt-Eater eats a line of salt, breaking a ward. The GM gains 1 SB to spend on supernatural complications." },
+        { "cost": 2, "name": "The Crystallization", "effect": "The Salt-Eater sprays a cloud of salt crystals; all in Near range must test Body+Endurance (DV 4) or be Blinded for one exchange." },
+        { "cost": 3, "name": "The Memory Eaten", "effect": "The Salt-Eater touches a character and eats a memory—a minor one, like the name of a street or the face of a stranger. The character cannot recall the memory until they perform a ritual of restoration." }
+      ]
+    }
+  },
+  {
+    "Thornwood Rider (Tier VI)": {
+      "page": "Thornwood_Rider",
+      "summary": "A figure in rusted armor, mounted on a horse of woven thorn, the Thornwood Rider is a messenger of the Alder King. It appears when the Thornwood has been disturbed, and it does not leave until the wood is appeased.",
+      "locations": ["The Thornwood", "The Alder King's domain", "Where the wood has been disturbed"],
+      "lore": "The Alder King's riders are not kind. They are precise. The Rider's face is a mask of woven thorn, its eyes two points of pale light. Its horse has no hooves—it moves on roots that burrow into the soil.",
+      "connections": ["The Alder King", "The Thornwood", "The Green Court"],
+      "tl": 6,
+      "class": "VI",
+      "sb_spends": [
+        { "cost": 1, "name": "The Thorn's Grasp", "effect": "Roots erupt from the ground, grasping at a character. They must test Body+Athletics (DV 3) or be Grappled; escaping requires an action." },
+        { "cost": 2, "name": "The Alder King's Claim", "effect": "The Rider declares a character to be a trespasser. The character gains 1 Obligation to the Alder King, and for the rest of the scene, all actions in natural terrain are at -1 die." },
+        { "cost": 3, "name": "The Wood's Wrath", "effect": "The Rider summons a swarm of thorn-laden branches; all in Near range must test Resolve (DV 4) or take Harm 2." },
+        { "cost": 4, "name": "The Rider's Challenge", "effect": "The Rider challenges a character to a duel. Refusing causes the character to be Marked by the Alder King (all Fey in the region will recognise them as a coward)." }
+      ]
+    }
+  },
+  {
+    "Mirror-Wraith (Tier VII)": {
+      "page": "Mirror-Wraith",
+      "summary": "A figure that exists only in reflections, the Mirror-Wraith preys on those who spend too long looking at themselves. It does not attack—it waits. And when you look away, it moves. It is visible only in reflections—a figure that stands behind you in a mirror, but vanishes when you turn around.",
+      "locations": ["Reflections", "Mirrors", "Still water", "Polished surfaces"],
+      "lore": "The Mirror-Wraith lives in reflections. It waits for you to forget that mirrors show two sides. Its face is always slightly wrong, a distortion of your own features.",
+      "connections": ["The Hollow", "The Ninth", "Ikasha"],
+      "tl": 7,
+      "class": "VII",
+      "sb_spends": [
+        { "cost": 1, "name": "The Reflection Moves", "effect": "The Mirror-Wraith moves in a reflection, distracting a character. The character suffers -1 die to all actions for the exchange." },
+        { "cost": 2, "name": "The Mirror's Claim", "effect": "The Mirror-Wraith reaches through a reflection and touches a character. They gain the 'Haunted by Reflections' condition—they see their own face in every mirror, and it is always slightly wrong." },
+        { "cost": 3, "name": "The Reflected Self", "effect": "The Mirror-Wraith creates a duplicate of a character in a reflection. The duplicate attacks the character; it can only be defeated by destroying the mirror it is in." },
+        { "cost": 4, "name": "The Unseen Gaze", "effect": "The Mirror-Wraith follows a character for the rest of the scene. They feel watched; all social rolls are at -1 die." }
+      ]
+    }
+  },
+  {
+    "Iron Vow Keeper (Tier VIII)": {
+      "page": "Iron_Vow_Keeper",
+      "summary": "A figure of rusted iron and glowing runes, the Iron Vow Keeper is a construct of ancient Aeler design. It was built to enforce the contracts of the mountain, but it has been waiting for so long that it has forgotten the terms. It keeps the vows that were never kept.",
+      "locations": ["Aeler vaults", "Where contracts are kept", "The mountain's heart"],
+      "lore": "The Keeper has no face—only a smooth, polished surface. Its body is covered in runes that glow with a soft, red light. Its voice is the sound of a bell that has been struck and then held, the note lingering impossibly long.",
+      "connections": ["The Aeler", "The Stone Courts", "The Vault-Kingdom"],
+      "tl": 8,
+      "class": "VIII",
+      "sb_spends": [
+        { "cost": 1, "name": "The Vow Recalled", "effect": "The Keeper speaks a vow that has been broken. All who hear it must test Resolve (DV 3) or mark 1 Obligation to the Keeper." },
+        { "cost": 2, "name": "The Iron Grasp", "effect": "The Keeper's hand closes on a character. They must test Body+Melee (DV 4) or be Grappled; escaping requires a successful test." },
+        { "cost": 3, "name": "The Contract's Weight", "effect": "The Keeper reveals a clause in the original vow that has not been fulfilled. The character must test Lore (DV 5) to understand it; failure means they are Bound by the terms of a contract they cannot break." },
+        { "cost": 4, "name": "The Interest Collects", "effect": "The Keeper's presence causes all debts in the scene to become visible—everyone knows exactly what everyone else owes. All social rolls are at -1 die for the scene." },
+        { "cost": 5, "name": "The Unpaid Price", "effect": "The Keeper demands payment. The party must offer something of value—a memory, a name, a year of service—or the Keeper attacks with full force (+2 die to all its actions for the remainder of the scene)." }
+      ]
+    }
   }
 ]
