@@ -3425,6 +3425,298 @@
     "note": "Referenced as 'The Ghost Did It' in the Saboteur sample build (Ch. 3) but never written up under that name — this entry (Ghost Heist) is the only 7 XP prestige talent defined in the source text and is almost certainly the intended talent. Worth a naming pass in the sourcebook.",
     "source_book": "The Velvet Touch",
     "source_section": "2.4 — 7 XP Prestige Talent: The Quiet Catastrophe"
-  }
+  },
+  {
+  "id": 430,
+  "title": "Herbs",
+  "category": "ingredient",
+  "body": "A handful of common medicinal or culinary herbs. Foraged freely in most temperate biomes.",
+  "tags": ["common", "herb", "forage"],
+  "cost": 0,
+  "icon": "🌿"
+},
+{
+  "id": 431,
+  "title": "Clean cloth",
+  "category": "ingredient",
+  "body": "A strip of clean, dry linen or cotton. Essential for bandages, poultices, and wrapping.",
+  "tags": ["common", "fabric", "forage"],
+  "cost": 0,
+  "icon": "🧻"
+},
+{
+  "id": 432,
+  "title": "Rare herb",
+  "category": "ingredient",
+  "body": "A rare, potent herb found only in specific climates (e.g., ghost‑flower, star‑thistle).",
+  "tags": ["rare", "herb", "purchase"],
+  "cost": 1,
+  "icon": "🌱"
+},
+{
+  "id": 433,
+  "title": "Distilled water",
+  "category": "ingredient",
+  "body": "Pure, boiled, and condensed water. Used as a base for potions and tinctures.",
+  "tags": ["common", "liquid", "forage"],
+  "cost": 0,
+  "icon": "💧"
+},
+{
+  "id": 434,
+  "title": "Charcoal",
+  "category": "ingredient",
+  "body": "Burnt wood, finely powdered. Used for filtration, drawing out toxins, and as a component in powders.",
+  "tags": ["common", "mineral", "forage"],
+  "cost": 0,
+  "icon": "🪵"
+},
+{
+  "id": 435,
+  "title": "Valerian root",
+  "category": "ingredient",
+  "body": "A common sedative herb. Found in meadows and woodland edges.",
+  "tags": ["common", "herb", "forage"],
+  "cost": 0,
+  "icon": "🌰"
+},
+{
+  "id": 436,
+  "title": "Honey",
+  "category": "ingredient",
+  "body": "Natural sweetener with mild antibacterial properties. Often used to bind mixtures.",
+  "tags": ["common", "food", "forage"],
+  "cost": 0,
+  "icon": "🍯"
+},
+{
+  "id": 437,
+  "title": "Moonwater",
+  "category": "ingredient",
+  "body": "Water left under a full moon, charged with lunar essence. Rare and sought after for night rites.",
+  "tags": ["rare", "liquid", "purchase"],
+  "cost": 1,
+  "icon": "🌙"
+},
+{
+  "id": 438,
+  "title": "Salt",
+  "category": "ingredient",
+  "body": "Common table salt. A staple for preserving and for warding against spirits.",
+  "tags": ["common", "mineral", "forage"],
+  "cost": 0,
+  "icon": "🧂"
+},
+{
+  "id": 439,
+  "title": "Blessed ash",
+  "category": "ingredient",
+  "body": "Ash from a sacred fire, often mixed with incense. Used in wards and purifications.",
+  "tags": ["rare", "ash", "purchase"],
+  "cost": 1,
+  "icon": "🔥"
+},
+{
+  "id": 440,
+  "title": "Iron filings",
+  "category": "ingredient",
+  "body": "Fine shavings of iron. Used to bind spirits and strengthen wards.",
+  "tags": ["common", "mineral", "forage"],
+  "cost": 0,
+  "icon": "⚙️"
+},
+{
+  "id": 441,
+  "title": "Nightshade",
+  "category": "ingredient",
+  "body": "A poisonous plant with potent alkaloids. Must be carefully prepared to be safe.",
+  "tags": ["rare", "herb", "purchase"],
+  "cost": 1,
+  "icon": "☠️"
+},
+{
+  "id": 442,
+  "title": "Pure water",
+  "category": "ingredient",
+  "body": "Water from a pristine spring, free of impurities. Used as a base for alchemy.",
+  "tags": ["common", "liquid", "forage"],
+  "cost": 0,
+  "icon": "💧"
+},
+{
+  "id": 443,
+  "title": "Blood",
+  "category": "ingredient",
+  "body": "Fresh or preserved blood (usually your own, or from a willing donor). Essential for truth serums and oaths.",
+  "tags": ["common", "liquid", "forage"],
+  "cost": 0,
+  "icon": "🩸"
+},
+{
+  "id": 444,
+  "title": "Chamomile",
+  "category": "ingredient",
+  "body": "A mild, calming flower. Used in teas and sleep draughts.",
+  "tags": ["common", "herb", "forage"],
+  "cost": 0,
+  "icon": "🌼"
+},
+{
+  "id": 445,
+  "title": "Moonwort",
+  "category": "ingredient",
+  "body": "A fern that grows only under the light of the waning moon. Has subtle dream‑enhancing properties.",
+  "tags": ["rare", "herb", "purchase"],
+  "cost": 1,
+  "icon": "🌙"
+},
+{
+  "id": 446,
+  "title": "Sulphur",
+  "category": "ingredient",
+  "body": "Yellow mineral, highly flammable. Used in fire powders and elemental reactions.",
+  "tags": ["common", "mineral", "forage"],
+  "cost": 0,
+  "icon": "🟡"
+},
+{
+  "id": 447,
+  "title": "Saltpetre",
+  "category": "ingredient",
+  "body": "Potassium nitrate, a key component in gunpowder and fire powders.",
+  "tags": ["common", "mineral", "forage"],
+  "cost": 0,
+  "icon": "🧪"
+},
+{
+  "id": 448,
+  "title": "Olive oil",
+  "category": "ingredient",
+  "body": "Pressed olive oil, used as a base for unguents and anointing oils.",
+  "tags": ["common", "liquid", "forage"],
+  "cost": 0,
+  "icon": "🫒"
+},
+{
+  "id": 449,
+  "title": "Incense",
+  "category": "ingredient",
+  "body": "Resin or wood that burns with fragrant smoke. Used in rituals and consecrations.",
+  "tags": ["common", "herb", "forage"],
+  "cost": 0,
+  "icon": "🪔"
+},
+{
+  "id": 450,
+  "title": "Healing Poultice",
+  "category": "recipe",
+  "body": "A balm of herbs and salves that speeds recovery. Remove 1 Fatigue when applied during a short rest.",
+  "tags": ["recipe", "medicine", "minor"],
+  "ingredients": ["Herbs", "Clean cloth"],
+  "skill": "medicine",
+  "dv": 2,
+  "xpCost": 1,
+  "tier": "minor",
+  "effect": "Remove 1 Fatigue when applied during a short rest.",
+  "icon": "🩹"
+},
+{
+  "id": 451,
+  "title": "Antidote",
+  "category": "recipe",
+  "body": "A bitter draught that neutralises common poisons. Remove one Poisoned Condition.",
+  "tags": ["recipe", "medicine", "minor"],
+  "ingredients": ["Rare herb", "Distilled water", "Charcoal"],
+  "skill": "medicine",
+  "dv": 3,
+  "xpCost": 2,
+  "tier": "minor",
+  "effect": "Remove one Poisoned Condition.",
+  "icon": "🧪"
+},
+{
+  "id": 452,
+  "title": "Sleep Draught",
+  "category": "recipe",
+  "body": "A sweet syrup that induces deep, dreamless sleep. Target tests Spirit+Resolve (DV 3) or falls asleep for 1 hour.",
+  "tags": ["recipe", "craft", "minor"],
+  "ingredients": ["Valerian root", "Honey", "Moonwater"],
+  "skill": "craft",
+  "dv": 3,
+  "xpCost": 1,
+  "tier": "minor",
+  "effect": "Target tests Spirit+Resolve (DV 3) or falls asleep for 1 hour.",
+  "icon": "💤"
+},
+{
+  "id": 453,
+  "title": "Ward Salt",
+  "category": "recipe",
+  "body": "Salt blessed with protective herbs and iron filings. Line wards against spirits and undead (Spirit+Resolve DV 4 to cross).",
+  "tags": ["recipe", "lore", "minor"],
+  "ingredients": ["Salt", "Blessed ash", "Iron filings"],
+  "skill": "lore",
+  "dv": 3,
+  "xpCost": 2,
+  "tier": "minor",
+  "effect": "Line wards against spirits and undead (Spirit+Resolve DV 4 to cross).",
+  "icon": "🧂"
+},
+{
+  "id": 454,
+  "title": "Truth Serum",
+  "category": "recipe",
+  "body": "A clear liquid that loosens the tongue. Target tests Spirit+Resolve (DV 4) or speaks only truth for one exchange.",
+  "tags": ["recipe", "craft", "standard"],
+  "ingredients": ["Nightshade", "Pure water", "Blood"],
+  "skill": "craft",
+  "dv": 4,
+  "xpCost": 3,
+  "tier": "standard",
+  "effect": "Target tests Spirit+Resolve (DV 4) or speaks only truth for one exchange.",
+  "icon": "🔮"
+},
+{
+  "id": 455,
+  "title": "Moon Tea",
+  "category": "recipe",
+  "body": "A calming infusion that sharpens dreams and intuition. +1 die on next Wits or Spirit roll within 1 hour.",
+  "tags": ["recipe", "craft", "minor"],
+  "ingredients": ["Chamomile", "Moonwort", "Honey"],
+  "skill": "craft",
+  "dv": 2,
+  "xpCost": 1,
+  "tier": "minor",
+  "effect": "+1 die on next Wits or Spirit roll within 1 hour.",
+  "icon": "🌙"
+},
+{
+  "id": 456,
+  "title": "Fire Powder",
+  "category": "recipe",
+  "body": "A volatile powder that ignites on contact with air. Creates a small fire (Harm 2, Area) in Close range. One use.",
+  "tags": ["recipe", "craft", "standard"],
+  "ingredients": ["Sulphur", "Charcoal", "Saltpetre"],
+  "skill": "craft",
+  "dv": 4,
+  "xpCost": 3,
+  "tier": "standard",
+  "effect": "Creates a small fire (Harm 2, Area) in Close range. One use.",
+  "icon": "🔥"
+},
+{
+  "id": 457,
+  "title": "Blessed Oil",
+  "category": "recipe",
+  "body": "Oil consecrated to a Patron or Threshold. Anoints a weapon or threshold; counts as [WARD] or [BLESSED] for one scene.",
+  "tags": ["recipe", "lore", "standard"],
+  "ingredients": ["Olive oil", "Incense"],
+  "skill": "lore",
+  "dv": 3,
+  "xpCost": 2,
+  "tier": "standard",
+  "effect": "Anoints a weapon or threshold; counts as [WARD] or [BLESSED] for one scene.",
+  "icon": "🕯️"
+}
   ]
 }
