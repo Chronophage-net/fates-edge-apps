@@ -51,6 +51,9 @@
  *    entry when present, falling back to the previous defaults only when
  *    the entry doesn't specify them.
  * ────────────────────────────────────────────────────────────────────────
+ * NEW: "Clone All" button clones every remote talent from the wiki that
+ * hasn't already been cloned locally. Works with the fixed cloning logic.
+ * ────────────────────────────────────────────────────────────────────────
  */
 
 import { generateId, escHtml, safeParseInt, clamp } from '../../core/utils.js';
@@ -394,6 +397,7 @@ export function render(el) {
                 <div style="display:flex;gap:0.3rem;">
                     <button class="btn btn-sm btn-ghost" id="talent-toggle-btn" title="Toggle talent list visibility">−</button>
                     <button class="btn btn-sm btn-ghost" id="talent-add-btn" title="Add custom talent">+ Talent</button>
+                    <button class="btn btn-sm btn-ghost" id="talent-clone-all-btn" title="Clone all talents from the wiki that are not yet cloned" style="color:var(--gold);">📋 Clone All</button>
                 </div>
             </div>
             
@@ -1071,27 +1075,44 @@ function deleteTalentHandler(id) {
 // dropping both whenever the cloned talent was actually Active and/or
 // prerequisite-gated. Now carries them over when the wiki entry provides
 // them (falls back to the previous defaults only if it doesn't).
-function cloneTalentFromWiki(remoteId) {
+//
+// NEW: The function can accept either a remoteId (string) or a remote
+// talent object directly, for efficient bulk cloning.
+function cloneTalentFromWiki(remoteIdOrObject) {
     const state = getState();
     const wikiEntries = state.wikiEntries || [];
-    const remote = wikiEntries.find(w =>
-        String(w.id) === String(remoteId) &&
-        w.tags && Array.isArray(w.tags) && w.tags.includes('talent')
-    );
+    
+    let remote;
+    if (typeof remoteIdOrObject === 'string') {
+        remote = wikiEntries.find(w =>
+            String(w.id) === String(remoteIdOrObject) &&
+            w.tags && Array.isArray(w.tags) && w.tags.includes('talent')
+        );
+    } else {
+        // assume it's the remote talent object itself
+        remote = remoteIdOrObject;
+        // ensure it's a valid talent entry
+        if (!remote || !remote.tags || !remote.tags.includes('talent')) {
+            showToast('Invalid talent object.', 'error');
+            return false;
+        }
+    }
     
     if (!remote) {
         showToast('Wiki talent not found.', 'error');
-        return;
+        return false;
     }
     
     if (!state.talents) state.talents = [];
     
+    // Check if already cloned (by clonedFrom or by exact name match)
     const existing = state.talents.find(t => 
-        t.name === remote.title && t.source === 'wiki-clone'
+        t.clonedFrom === remote.id || 
+        (t.source === 'wiki-clone' && t.name === remote.title)
     );
     if (existing) {
-        showToast(`"${remote.title}" already cloned.`, 'warning');
-        return;
+        // Not an error; just skip silently for bulk operations.
+        return false;
     }
     
     const cost = safeParseInt(remote.cost, 0);
@@ -1113,32 +1134,50 @@ function cloneTalentFromWiki(remoteId) {
     state.talents.push(newTalent);
     saveState();
     renderTalentList();
-    showToast(`Cloned "${remote.title}" from wiki (${tier.label}, ${cost} XP).`, 'success');
+    return true;
 }
 
-function addCustomTalent() {
+// ─── NEW: Clone all remote talents that haven't been cloned yet ──
+
+function cloneAllTalentsFromWiki() {
     const state = getState();
-    if (!state.talents) state.talents = [];
+    const wikiEntries = state.wikiEntries || [];
+    const remoteTalents = wikiEntries.filter(e =>
+        e.tags && Array.isArray(e.tags) && e.tags.includes('talent')
+    );
     
-    const newTalent = {
-        id: generateId('talent_'),
-        name: 'New Talent',
-        cost: 2,
-        description: '',
-        prerequisites: '',
-        source: 'custom',
-        tier: 'minor',
-        activation: 'passive',
-        createdAt: new Date().toISOString()
-    };
+    if (remoteTalents.length === 0) {
+        showToast('No talents found in the wiki.', 'warning');
+        return;
+    }
     
-    state.talents.push(newTalent);
-    saveState();
-    renderTalentList();
+    // Get already cloned IDs
+    const existingClones = (state.talents || [])
+        .filter(t => t.source === 'wiki-clone' && t.clonedFrom)
+        .map(t => t.clonedFrom);
     
-    setTimeout(() => {
-        openTalentEditor(newTalent.id);
-    }, 100);
+    const toClone = remoteTalents.filter(t => !existingClones.includes(t.id));
+    
+    if (toClone.length === 0) {
+        showToast('All wiki talents are already cloned.', 'info');
+        return;
+    }
+    
+    let clonedCount = 0;
+    const totalToClone = toClone.length;
+    
+    // Clone each one
+    for (const talent of toClone) {
+        const success = cloneTalentFromWiki(talent);
+        if (success) clonedCount++;
+    }
+    
+    if (clonedCount > 0) {
+        showToast(`Cloned ${clonedCount}/${totalToClone} talents from wiki.`, 'success');
+        renderTalentList();
+    } else {
+        showToast('No new talents were cloned (maybe all are duplicates).', 'info');
+    }
 }
 
 // ============================================================
@@ -1253,6 +1292,12 @@ export async function attachEvents() {
         // Add talent button
         if (target.id === 'talent-add-btn' || target.closest('#talent-add-btn')) {
             addCustomTalent();
+            e.preventDefault();
+        }
+
+        // Clone All button
+        if (target.id === 'talent-clone-all-btn' || target.closest('#talent-clone-all-btn')) {
+            cloneAllTalentsFromWiki();
             e.preventDefault();
         }
 
