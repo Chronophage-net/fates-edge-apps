@@ -10,6 +10,8 @@
  * - Re-roll mechanics
  * - Boon integration
  * - Dice pool management
+ * 
+ * v3.3 – Exposes normalized outcome codes for VTT automation
  */
 
 // ============================================================
@@ -242,6 +244,49 @@ const defaultSkills = [
 ];
 
 // ============================================================
+// OUTCOME CONSTANTS (NEW for VTT automation)
+// ============================================================
+
+export const OUTCOME_CODES = {
+    CLEAN: 'clean',
+    SUCCESS_SB: 'success_sb',
+    PARTIAL: 'partial',
+    MISS: 'miss'
+};
+
+/**
+ * Get the machine‑friendly outcome code from successes, DV, and story beats.
+ * @param {number} successes - Number of successes rolled
+ * @param {number} dv - Difficulty Value
+ * @param {number} storyBeats - Number of 1s rolled (Story Beats)
+ * @returns {string} One of 'clean', 'success_sb', 'partial', 'miss'
+ */
+function getRollOutcomeCode(successes, dv, storyBeats = 0) {
+    if (successes >= dv) {
+        return storyBeats > 0 ? OUTCOME_CODES.SUCCESS_SB : OUTCOME_CODES.CLEAN;
+    } else if (successes > 0) {
+        return OUTCOME_CODES.PARTIAL;
+    } else {
+        return OUTCOME_CODES.MISS;
+    }
+}
+
+/**
+ * Get the human‑readable label for an outcome code.
+ * @param {string} code - Outcome code (from OUTCOME_CODES)
+ * @returns {string} Human‑readable label
+ */
+function getOutcomeLabelFromCode(code) {
+    const labels = {
+        [OUTCOME_CODES.CLEAN]: 'Clean Success',
+        [OUTCOME_CODES.SUCCESS_SB]: 'Success with SB',
+        [OUTCOME_CODES.PARTIAL]: 'Partial',
+        [OUTCOME_CODES.MISS]: 'Miss'
+    };
+    return labels[code] || 'Unknown';
+}
+
+// ============================================================
 // CORE DICE ROLLING
 // ============================================================
 
@@ -396,6 +441,7 @@ function performDicePoolRoll(pool, dv, options = {}) {
     
     // Determine outcome
     let outcome, outcomeClass, resultText;
+    const outcomeCode = getRollOutcomeCode(successes, dv, storyBeats);
     if (successes >= dv) {
         if (storyBeats > 0) {
             outcome = 'Success with SB';
@@ -428,6 +474,7 @@ function performDicePoolRoll(pool, dv, options = {}) {
         outcome,
         outcomeClass,
         resultText,
+        outcomeCode,                // NEW: machine‑friendly code
         reRolls: reRollCount,
         reRolledDice,
         deterministic: !!_seed,
@@ -511,6 +558,7 @@ function performRoll(attr, skill, dv, position = 'controlled', boons = 0, option
     // Determine outcome
     let outcome, outcomeClass, resultText;
     let storyBeatOutcome = '';
+    const outcomeCode = getRollOutcomeCode(successes, dv, storyBeats);
     if (successes >= dv) {
         if (storyBeats > 0) {
             outcome = 'Success with SB';
@@ -549,6 +597,7 @@ function performRoll(attr, skill, dv, position = 'controlled', boons = 0, option
         outcome,
         outcomeClass,
         resultText,
+        outcomeCode,                // NEW: machine‑friendly code
         storyBeatOutcome,
         reRolls,
         reRolledDice,
@@ -677,7 +726,11 @@ export {
     visualizeDice,
     diceToHtml,
     ALL_SKILLS,
-    defaultSkills
+    defaultSkills,
+    // NEW exports for outcome codes
+    //OUTCOME_CODES,
+    getRollOutcomeCode,
+    getOutcomeLabelFromCode
 };
 
 // Default export for the module loader
@@ -701,5 +754,8 @@ export default {
     visualizeDice,
     diceToHtml,
     ALL_SKILLS,
-    defaultSkills
+    defaultSkills,
+    OUTCOME_CODES,
+    getRollOutcomeCode,
+    getOutcomeLabelFromCode
 };

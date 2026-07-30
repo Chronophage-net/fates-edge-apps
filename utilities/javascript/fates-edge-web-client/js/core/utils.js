@@ -2,6 +2,7 @@
 /**
  * Core Utility Functions
  * Single source of truth for shared utilities
+ * v3.3 – Added renderDescriptionHtml, getTierFromXp, getTierColor, sanitizeHtml, deepMerge
  */
 
 // ============================================================
@@ -569,6 +570,27 @@ export function deepClone(obj) {
     return obj;
 }
 
+/**
+ * Deep merge two or more objects (non‑destructive)
+ * @param {...Object} sources - Objects to merge
+ * @returns {Object} Merged object
+ */
+export function deepMerge(...sources) {
+    const target = {};
+    for (const source of sources) {
+        if (!source || typeof source !== 'object') continue;
+        for (const key of Object.keys(source)) {
+            const val = source[key];
+            if (val && typeof val === 'object' && !Array.isArray(val)) {
+                target[key] = deepMerge(target[key] || {}, val);
+            } else {
+                target[key] = val;
+            }
+        }
+    }
+    return target;
+}
+
 // ============================================================
 // DATE UTILITIES
 // ============================================================
@@ -706,6 +728,150 @@ export function htmlToFragment(html) {
     const template = document.createElement('template');
     template.innerHTML = html.trim();
     return template.content;
+}
+
+// ============================================================
+// SECURITY & SANITIZATION (NEW)
+// ============================================================
+
+/**
+ * Sanitize HTML to prevent XSS attacks.
+ * Removes <script> tags and all on* event attributes.
+ * Optionally uses DOMPurify if available (window.DOMPurify).
+ *
+ * @param {string} html - Unsafe HTML string
+ * @returns {string} Safe HTML string
+ */
+export function sanitizeHtml(html) {
+    if (!html) return '';
+    if (typeof html !== 'string') return '';
+
+    // If DOMPurify is available (loaded as a global), use it
+    if (typeof window !== 'undefined' && window.DOMPurify) {
+        return window.DOMPurify.sanitize(html, {
+            USE_PROFILES: { html: true },
+            FORBID_TAGS: ['script', 'style', 'iframe', 'object', 'embed'],
+            FORBID_ATTR: ['onerror', 'onload', 'onclick', 'onmouseover', 'onfocus', 'onblur'],
+        });
+    }
+
+    // Fallback: manual sanitization
+    let safe = html;
+
+    // Remove <script> tags and their content
+    safe = safe.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '');
+
+    // Remove all on* attributes (case‑insensitive)
+    safe = safe.replace(/\s+on\w+\s*=\s*("[^"]*"|'[^']*'|[^>\s]+)/gi, '');
+
+    // Remove <iframe>, <object>, <embed> tags
+    safe = safe.replace(/<\/?(iframe|object|embed)\b[^>]*>/gi, '');
+
+    return safe;
+}
+
+/**
+ * Render a plain text description with simple markdown into safe HTML.
+ * Supports:
+ *   - **bold** → <strong>
+ *   - *italic* → <em>
+ *   - [text](url) → <a href="url" target="_blank">
+ *   - - item → <ul><li>
+ *   - 1. item → <ol><li>
+ *   - \n\n → <p> (double newline)
+ *   - \n → <br>
+ *
+ * @param {string} text - Plain text description
+ * @returns {string} Safe HTML string
+ */
+export function renderDescriptionHtml(text) {
+    if (!text) return '';
+    if (typeof text !== 'string') return '';
+
+    // Step 1: Escape HTML characters to prevent injection
+    let html = escHtml(text);
+
+    // Step 2: Convert markdown-like syntax
+    // Bold: **text** → <strong>text</strong>
+    html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+
+    // Italic: *text* → <em>text</em> (non-greedy, not inside bold)
+    html = html.replace(/\*(.+?)\*/g, '<em>$1</em>');
+
+    // Links: [text](url) → <a href="url" target="_blank">text</a>
+    html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, (match, linkText, url) => {
+        // Sanitize URL – only allow http/https and relative paths
+        const safeUrl = url.startsWith('http') || url.startsWith('/') ? url : '#';
+        return `<a href="${safeUrl}" target="_blank" rel="noopener noreferrer">${linkText}</a>`;
+    });
+
+    // Step 3: Convert lists
+    // Unordered lists: lines starting with "- " or "* "
+    html = html.replace(/^[\s]*[-*]\s+(.+)$/gm, (match, item) => {
+        return `<li>${item}</li>`;
+    });
+    // Wrap consecutive <li> in <ul>
+    html = html.replace(/(<li>.*?<\/li>\s*)+/g, (match) => {
+        return `<ul>${match.trim()}</ul>`;
+    });
+
+    // Ordered lists: lines starting with "1. " (any number)
+    html = html.replace(/^[\s]*\d+\.\s+(.+)$/gm, (match, item) => {
+        return `<li>${item}</li>`;
+    });
+    // Wrap consecutive <li> in <ol>
+    html = html.replace(/(<li>.*?<\/li>\s*)+/g, (match) => {
+        // But only if it wasn't already wrapped by the unordered rule
+        // We'll check if the match contains <ul>; if so, skip.
+        if (match.includes('<ul>')) return match;
+        return `<ol>${match.trim()}</ol>`;
+    });
+
+    // Step 4: Convert newlines
+    // Double newline → paragraph
+    html = html.replace(/\n\s*\n/g, '</p><p>');
+    // Single newline → <br>
+    html = html.replace(/\n/g, '<br>');
+
+    // Step 5: Wrap in <p> if not already wrapped
+    if (!html.startsWith('<p>')) {
+        html = `<p>${html}</p>`;
+    }
+
+    // Step 6: Final sanitization (extra safety)
+    return sanitizeHtml(html);
+}
+
+// ============================================================
+// TIER & XP UTILITIES (NEW)
+// ============================================================
+
+/**
+ * Get the tier (rank) based on total XP.
+ * @param {number} xp - Total experience points
+ * @returns {string} Tier name: 'bronze', 'silver', 'gold', 'platinum'
+ */
+export function getTierFromXp(xp) {
+    if (typeof xp !== 'number' || xp < 0) return 'bronze';
+    if (xp < 20) return 'bronze';
+    if (xp < 50) return 'silver';
+    if (xp < 100) return 'gold';
+    return 'platinum';
+}
+
+/**
+ * Get a CSS color (hex or class) for a given tier.
+ * @param {string} tier - Tier name (bronze/silver/gold/platinum)
+ * @returns {string} CSS color (e.g., '#cd7f32') or a CSS class name
+ */
+export function getTierColor(tier) {
+    const colors = {
+        bronze: '#cd7f32',
+        silver: '#c0c0c0',
+        gold: '#ffd700',
+        platinum: '#e5e4e2'
+    };
+    return colors[tier] || '#888';
 }
 
 // ============================================================
@@ -889,6 +1055,7 @@ const Utils = {
     omit,
     isEmpty,
     deepClone,
+    deepMerge,          // NEW
     
     // Date
     formatDate,
@@ -900,6 +1067,14 @@ const Utils = {
     setHtml,
     htmlToElement,
     htmlToFragment,
+    
+    // Security
+    sanitizeHtml,       // NEW
+    renderDescriptionHtml, // NEW
+    
+    // Tier
+    getTierFromXp,      // NEW
+    getTierColor,       // NEW
     
     // Storage
     getStorage,

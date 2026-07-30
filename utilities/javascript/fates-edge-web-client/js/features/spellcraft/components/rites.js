@@ -36,7 +36,7 @@
  * ────────────────────────────────────────────────────────────────────────
  */
 
-import { getState, saveState } from '../../../core/state.js';
+import { getState, saveState, getCharacter, updateCharacter } from '../../../core/state.js';
 import { showToast } from '../../../components/Toast.js';
 import { escHtml, safeParseInt } from '../../../core/utils.js';
 import patrons from '../../patrons/index.js';
@@ -496,7 +496,7 @@ function renderPatronGiftsSection(char, patronDataList, path, characterId = 'def
                         <div style="display:flex;flex-wrap:wrap;gap:0.2rem;align-items:center;margin-top:0.1rem;">
                             <span style="font-size:0.65rem;color:var(--text3);">Cost: ${escHtml(costDesc)}</span>
                             ${isBound ? `
-                                <button class="btn btn-xs btn-primary" onclick="window.usePatronGift('${item.patronId}')" style="font-size:0.6rem;">Use Gift</button>
+                                <button class="btn btn-xs btn-primary" onclick="window.usePatronGift('${item.patronId}', '${characterId}')" style="font-size:0.6rem;">Use Gift</button>
                             ` : `
                                 <select id="${giftId}-cost" style="font-size:0.6rem;background:var(--bg3);border:1px solid var(--border);border-radius:4px;padding:0.05rem 0.2rem;" ${borrowedGraceUsed ? 'disabled' : ''}>
                                     ${costOptionsHtml}
@@ -735,8 +735,12 @@ function renderRiteItem(rite, patronId, idx, isInvoker, characterId, char) {
 // GLOBAL FUNCTIONS: Patron's Gift (Runekeeper)
 // ============================================================
 
-window.usePatronGift = async function(patronId) {
-    const char = getCharacterData();
+window.usePatronGift = async function(patronId, characterId) {
+    const char = getCharacterData(characterId);
+    if (!char) {
+        showToast('Character not found.', 'error');
+        return;
+    }
     if (!char) return;
 
     // Check if Runekeeper with Familiar
@@ -798,7 +802,7 @@ window.usePatronGift = async function(patronId) {
 // scene-detection system.
 
 window.useBorrowedGrace = async function(patronId, costType, characterId = 'default-character') {
-    const char = getCharacterData();
+    const char = getCharacterData(characterId);
     if (!char) return;
 
     // Check if Invoker with Symbols
@@ -828,7 +832,7 @@ window.useBorrowedGrace = async function(patronId, costType, characterId = 'defa
         char.boons = boons - 1;
     } else if (costType === 'fatigue') {
         const fatigue = char.fatigue || 0;
-        const maxFatigue = char.body || 1;
+        const maxFatigue = char.attributes?.body || 1;
         if (fatigue >= maxFatigue) {
             showToast('Fatigue track is full!', 'error');
             return;
@@ -903,24 +907,22 @@ window.startNewScene = function(characterId = 'default-character') {
 // If not, we import from the spellcraft main.
 // We'll use a fallback.
 
-function getCharacterData() {
-    // Try to get from the global spellcraft module if available.
-    if (typeof window.getCharacterData === 'function') {
-        return window.getCharacterData();
-    }
-    // Fallback: import from '../index.js' dynamically.
-    // For simplicity, we'll use the same import that other components use.
-    // But we'll just return null if not available.
-    return null;
+// ─── Safe character access using state.js ──────────────────
+
+function getCharacterData(characterId) {
+    if (!characterId) return null;
+    return getCharacter(characterId);
 }
 
-// Also need saveCharacter – we'll use the same fallback.
-function saveCharacter(updates) {
-    if (typeof window.saveCharacter === 'function') {
-        return window.saveCharacter(updates);
-    }
-    return false;
+function saveCharacter(characterId, updates) {
+    if (!characterId) return false;
+    const result = updateCharacter(characterId, updates);
+    return !!result;
 }
+
+// Expose for onclick handlers (they pass characterId)
+window.getCharacterData = getCharacterData;
+window.saveCharacter = saveCharacter;
 
 // We'll expose these functions to window for onclick.
 window.getCharacterData = getCharacterData;

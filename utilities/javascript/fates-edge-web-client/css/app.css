@@ -1615,3 +1615,208 @@ select {
 .patron-group[open] summary::before {
     content: '▼';
 }
+/* ===== X-CARD (Safety Tool) ===== */
+.xcard-floating-btn {
+    position: fixed;
+    bottom: 1.5rem;
+    right: 1.5rem;
+    width: 3.5rem;
+    height: 3.5rem;
+    border-radius: 50%;
+    background: #e53e3e;
+    color: #fff;
+    font-size: 2rem;
+    border: 2px solid rgba(255,255,255,0.3);
+    box-shadow: 0 4px 12px rgba(229,62,62,0.4);
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+    user-select: none;
+}
+.xcard-floating-btn:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 20px rgba(229,62,62,0.6);
+}
+.xcard-floating-btn:active {
+    transform: scale(0.95);
+}
+
+.xcard-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    background: rgba(0,0,0,0.85);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: xcardFadeIn 0.3s ease;
+}
+
+.xcard-overlay.open {
+    display: flex !important;
+}
+
+@keyframes xcardFadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.xcard-content {
+    text-align: center;
+    color: #fff;
+    max-width: 500px;
+    padding: 2rem;
+}
+
+.xcard-icon {
+    font-size: 5rem;
+    display: block;
+    margin-bottom: 0.5rem;
+}
+
+.xcard-title {
+    font-size: 3rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    color: #e53e3e;
+    text-shadow: 0 0 20px rgba(229,62,62,0.3);
+    margin: 0.5rem 0;
+}
+
+.xcard-message {
+    font-size: 1.2rem;
+    margin: 1rem 0 2rem;
+    opacity: 0.9;
+}
+
+.xcard-resume-btn {
+    background: #e53e3e;
+    color: #fff;
+    border: none;
+    padding: 0.75rem 2.5rem;
+    font-size: 1.2rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.2s;
+    font-weight: 600;
+}
+
+.xcard-resume-btn:hover {
+    background: #c53030;
+    transform: scale(1.05);
+}
+
+.xcard-shortcut-hint {
+    margin-top: 1.5rem;
+    font-size: 0.8rem;
+    opacity: 0.6;
+}
+
+.xcard-shortcut-hint kbd {
+    background: rgba(255,255,255,0.15);
+    padding: 0.2rem 0.6rem;
+    border-radius: 4px;
+    font-family: inherit;
+    border: 1px solid rgba(255,255,255,0.2);
+}
+
+/* body class for additional blur if desired (toggled by app.js) */
+body.xcard-active .app-shell {
+    filter: blur(4px);
+    transition: filter 0.3s;
+}
+/* ─── WELCOME OVERLAY ────────────────────────────────────────────── */
+.welcome-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  background: rgba(0,0,0,0.85);
+  backdrop-filter: blur(12px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: welcomeFadeIn 0.4s ease;
+  padding: 1rem;
+}
+
+@keyframes welcomeFadeIn {
+  from { opacity: 0; transform: scale(0.96); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.welcome-card {
+  background: var(--bg1);
+  color: var(--text);
+  max-width: 640px;
+  width: 100%;
+  max-height: 90vh;
+  padding: 2rem;
+  border-radius: 16px;
+  border: 1px solid var(--border);
+  box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+  overflow-y: auto;
+  text-align: center;
+}
+
+.welcome-card h1 {
+  color: var(--gold);
+  margin: 0.2rem 0;
+}
+
+.welcome-card .welcome-docs {
+  background: var(--bg3);
+  padding: 1rem;
+  border-radius: 8px;
+  border-left: 4px solid var(--gold);
+  margin: 1.2rem 0;
+  text-align: left;
+}
+
+.welcome-card .welcome-docs ul {
+  margin: 0.5rem 0 0 1.2rem;
+  padding: 0;
+  color: var(--text2);
+}
+
+.welcome-card .welcome-docs a {
+  color: var(--gold);
+}
+
+.welcome-card .welcome-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin: 1.2rem 0;
+}
+
+.welcome-card .welcome-actions .btn {
+  width: 100%;
+}
+
+.welcome-card .welcome-dismiss {
+  color: var(--text3);
+  font-size: 0.85rem;
+  cursor: pointer;
+  background: none;
+  border: none;
+  text-decoration: underline;
+}
+
+.welcome-card .welcome-footer {
+  font-size: 0.75rem;
+  color: var(--text3);
+  margin: 0;
+}
+
+/* ─── RESPONSIVE TWEAKS ───────────────────────────────────────────── */
+@media (max-width: 600px) {
+  .welcome-card {
+    padding: 1.5rem;
+  }
+}

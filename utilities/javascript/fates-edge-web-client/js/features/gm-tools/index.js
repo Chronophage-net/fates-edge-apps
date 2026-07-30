@@ -14,6 +14,7 @@
  * - Tag Injector (scene tags affecting Position/DV)
  * - Ace Effects Integration (special effects on Ace draws)
  * - 🎥 Session Recap & Save (voice recording, VTT events, export)
+ * - 🔄 Automation: auto-tick timers on Partial/Miss, auto-increment SB Bank
  *
  * ── NEW: Adventure Manager cross-links ───────────────────────────────
  * - Scene view now surfaces whatever adventure is currently `status:
@@ -32,8 +33,10 @@
  */
 
 import { getState, addArchive, clearRollHistory, clearChatHistory, saveState } from '../../core/state.js';
+import { getGmState, updateGmState } from '../../core/state.js';
 import { clamp, escHtml } from '../../core/utils.js';
 import { showToast } from '../../components/Toast.js';
+import { isFeatureVisible, getFeatureAccess } from '../../core/feature-toggles.js';
 import { 
     getSelectedRegion, 
     getRegionNames, 
@@ -43,6 +46,7 @@ import {
     onRegionChange,
     getRegionData
 } from '../decks/index.js';
+import { isConnectedToServer } from '../../core/websocket.js';
 
 // Import media module
 import { 
@@ -90,31 +94,6 @@ let lastQuickGenResult = null; // { type: 'npc'|'location'|'rumor', data }
 // 👇 NEW: last Crown Spread drawn from this tab, so "Build Adventure
 // from this Reading" doesn't need to re-draw or guess at Decks' history.
 let lastCrownSpreadReading = null; // { synthesis, cardNames, region }
-
-
-// ============================================================
-// CHECK CONNECTED STATUS
-// ============================================================
-
-// Add this function to check room status via your sync manager
-function isViewOnlyMode() {
-    if (window.__syncManager && window.__syncManager.isConnected) {
-        try {
-            const status = window.__syncManager.getStatus();
-            const myRole = status.role; // 'gm' or 'player'
-            
-            // If I am a player, check if a GM is online
-            if (myRole === 'player') {
-                const clients = status.onlineClients || [];
-                const hasGM = clients.some(client => client.role === 'gm' && client.id !== status.clientId);
-                return hasGM;
-            }
-        } catch (e) {
-            console.warn('Could not get sync status for view-only check:', e);
-        }
-    }
-    return false;
-}
 
 // ============================================================
 // LOAD/SAVE
@@ -460,6 +439,98 @@ function displayQuickGenResult(html) {
 }
 
 // ============================================================
+// AUTOMATION: AUTO-TICK & SB BANK
+// ============================================================
+
+// Get the active adventure's timers (stored in state.timers and linked via timerIds)
+function getActiveAdventureTimers() {
+    const adventure = getRunningAdventure();
+    if (!adventure || !adventure.timerIds || adventure.timerIds.length === 0) return [];
+    const state = getState();
+    const timers = state.timers || [];
+    return timers.filter(t => adventure.timerIds.includes(t.id));
+}
+
+// Tick the timers of the active adventure by the given amount
+function tickActiveSceneTimer(adventureId, amount = 1) {
+    const adventure = getRunningAdventure();
+    if (!adventure) {
+        console.warn('[GM Tools] No active adventure to tick timers.');
+        return false;
+    }
+    if (adventure.id !== adventureId) {
+        // In case we get an adventureId from the event, but the active adventure may have changed
+        // We'll still use the active one, but log a warning.
+        console.warn('[GM Tools] Tick requested for adventure ' + adventureId + ' but active is ' + adventure.id);
+    }
+    const timers = getActiveAdventureTimers();
+    if (timers.length === 0) {
+        console.warn('[GM Tools] No timers linked to active adventure.');
+        return false;
+    }
+    let ticked = false;
+    timers.forEach(timer => {
+        const before = timer.current;
+        timer.current = Math.min(timer.current + amount, timer.segments);
+        if (timer.current !== before) {
+            ticked = true;
+            // Update the timer in state
+            const state = getState();
+            const idx = state.timers.findIndex(t => t.id === timer.id);
+            if (idx !== -1) state.timers[idx] = timer;
+            saveState();
+            // Check completion
+            if (timer.current >= timer.segments) {
+                showToast(`⏱️ Timer "${timer.name}" completed!`, 'warning');
+                logToSession(`⏱️ Timer "${timer.name}" completed!`, 'warning');
+                // Optionally, dispatch an event for the adventure manager to handle scene transitions
+                document.dispatchEvent(new CustomEvent('timer-completed', { detail: { timerId: timer.id, adventureId: adventure.id } }));
+            }
+        }
+    });
+    if (ticked) {
+        // Refresh the view to update progress bars
+        refreshView();
+        // Also show a toast for the tick
+        showToast(`⏱️ Timers ticked (${amount}) for "${adventure.title}"`, 'info');
+    }
+    return ticked;
+}
+
+// Handle "timer-tick-request" events
+function onTimerTickRequest(event) {
+    const gmState = getGmState();
+    if (!gmState.autoTickTimers) return; // Auto-tick disabled
+
+    const { adventureId, amount = 1 } = event.detail || {};
+    const activeAdventure = getRunningAdventure();
+    if (!activeAdventure) {
+        console.warn('[GM Tools] Timer tick requested but no active adventure.');
+        return;
+    }
+    // Use the provided adventureId or fallback to active adventure id
+    const targetId = adventureId || activeAdventure.id;
+    tickActiveSceneTimer(targetId, amount);
+}
+
+// Handle "sb-generated" events
+function onSbGenerated(event) {
+    const { count = 1 } = event.detail || {};
+    const gmState = getGmState();
+    const newTotal = (gmState.sbBank || 0) + count;
+    updateGmState({ sbBank: newTotal });
+    showToast(`🎲 Story Beat +${count} (Total: ${newTotal})`, 'info');
+    logToSession(`🎲 Story Beat +${count} (Bank: ${newTotal})`, 'success');
+}
+
+// Set up event listeners (call once)
+function initAutomationListeners() {
+    document.addEventListener('timer-tick-request', onTimerTickRequest);
+    document.addEventListener('sb-generated', onSbGenerated);
+    console.log('[GM Tools] Automation listeners initialized.');
+}
+
+// ============================================================
 // RENDER
 // ============================================================
 
@@ -471,11 +542,22 @@ function render(el) {
     const userId = state.sessionId || 'local-' + Date.now().toString(36);
     initMediaModule(userId);
 
+    // Init automation listeners (only once)
+    if (!window.__gmAutomationInitialized) {
+        initAutomationListeners();
+        window.__gmAutomationInitialized = true;
+    }
+
+    // ─── Use feature-toggles for view-only detection ──────────────
+    const { accessible, reason } = getFeatureAccess('gm-tools');
+    const isViewOnly = !accessible;
+
     container.innerHTML = `
         <div class="gm-tools-modern-layout flex flex-col gap-2">
             <header class="gm-tools-header">
                 <h1 class="page-title">⚙️ GM Tools</h1>
                 <p class="page-sub">Manage scenes, campaign tracking, whiteboard, Kanban board, and journey planning.</p>
+                ${isViewOnly ? `<div class="text-muted text-sm" style="color:var(--gold);">👁️ View-only mode: ${reason === 'gm-only' ? 'Only the GM can access these tools.' : 'You have hidden this feature from your sidebar.'}</div>` : ''}
             </header>
 
             <div class="flex gap-1 flex-center flex-wrap" style="border-bottom: 1px solid var(--border); padding-bottom: 0.5rem; margin-bottom: 0.5rem;">
@@ -499,6 +581,8 @@ function render(el) {
 
 function renderView(view) {
     activeTab = view;
+    // Reload data when switching views
+    loadCampaignData();
     switch(view) {
         case 'scene': return renderSceneView();
         case 'kanban': return renderKanbanView();
@@ -512,6 +596,79 @@ function renderView(view) {
 }
 
 // ============================================================
+// SAFETY TOOLS
+// ============================================================
+
+function getCampaignSafety() {
+    const state = getState();
+    if (!state.campaign) state.campaign = {};
+    if (!state.campaign.safety) state.campaign.safety = { lines: '', veils: '', sessionZero: {} };
+    return state.campaign.safety;
+}
+
+function saveCampaignSafety(updates) {
+    const state = getState();
+    if (!state.campaign) state.campaign = {};
+    if (!state.campaign.safety) state.campaign.safety = { lines: '', veils: '', sessionZero: {} };
+    Object.assign(state.campaign.safety, updates);
+    saveState();
+    refreshView();
+}
+
+function renderSafetyToolsPanel() {
+    const safety = getCampaignSafety();
+    return `
+        <div class="panel">
+            <h3 class="panel-title">🛡️ Safety Tools</h3>
+            <p class="text-muted text-sm">Set your group's safety boundaries. These will be shown when the X‑Card is called.</p>
+
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;margin-top:0.5rem;">
+                <div>
+                    <label style="font-size:0.8rem;font-weight:600;">Lines (never to appear)</label>
+                    <textarea id="safety-lines" rows="2" style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:0.3rem;font-size:0.8rem;">${escHtml(safety.lines || '')}</textarea>
+                    <span class="text-muted text-xs">Things that are absolutely off-limits.</span>
+                </div>
+                <div>
+                    <label style="font-size:0.8rem;font-weight:600;">Veils (fade to black)</label>
+                    <textarea id="safety-veils" rows="2" style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:0.3rem;font-size:0.8rem;">${escHtml(safety.veils || '')}</textarea>
+                    <span class="text-muted text-xs">Things that can happen off-screen.</span>
+                </div>
+            </div>
+
+            <button class="btn btn-sm btn-primary mt-1" id="safety-save-btn">💾 Save Safety Settings</button>
+
+            <details style="margin-top:0.5rem;">
+                <summary style="cursor:pointer;font-size:0.8rem;color:var(--text2);">📋 Session Zero Checklist</summary>
+                <div style="padding:0.5rem 0.3rem;font-size:0.8rem;">
+                    ${renderSessionZeroChecklist(safety.sessionZero || {})}
+                </div>
+            </details>
+        </div>
+    `;
+}
+
+function renderSessionZeroChecklist(sessionZero) {
+    const fields = [
+        { id: 'tone', label: 'Tone of the campaign', placeholder: 'e.g., heroic, grim, mysterious' },
+        { id: 'length', label: 'Campaign length', placeholder: 'e.g., one-shot, 6 sessions, ongoing' },
+        { id: 'characterHooks', label: 'Character hooks', placeholder: 'What themes are you excited to explore?' },
+    ];
+    return fields.map(f => `
+        <div style="margin-bottom:0.3rem;">
+            <label style="font-size:0.75rem;">${escHtml(f.label)}</label>
+            <input type="text" id="sz-${f.id}" value="${escHtml(sessionZero[f.id] || '')}" placeholder="${escHtml(f.placeholder)}" style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:0.2rem 0.4rem;font-size:0.8rem;" />
+        </div>
+    `).join('') + `
+        <div style="margin-bottom:0.3rem;">
+            <label class="inline-check" style="font-size:0.75rem;">
+                <input type="checkbox" id="sz-consent" ${sessionZero.consent ? 'checked' : ''} />
+                I have discussed consent with the group.
+            </label>
+        </div>
+        <button class="btn btn-xs btn-secondary" id="sz-save-btn">Save Session Zero</button>
+    `;
+}
+// ============================================================
 // SCENE VIEW
 // ============================================================
 
@@ -521,18 +678,33 @@ function renderSceneView() {
     const activeEncounters = state.encounters || [];
     const characters = state.characters || [];
     const tagEffects = getTagEffects();
+    const gmState = getGmState();
+    const autoTick = gmState.autoTickTimers || false;
+    const { accessible } = getFeatureAccess('gm-tools');
+    const isViewOnly = !accessible;
 
     return `
         <div class="flex flex-col gap-2">
             ${renderCurrentAdventurePanel()}
 
             <div class="panel">
+                <h3 class="panel-title">⚙️ GM Settings</h3>
+                <div class="flex gap-1 flex-center flex-wrap mt-1">
+                    <label class="inline-check" style="display:flex;align-items:center;gap:0.5rem;cursor:pointer;">
+                        <input type="checkbox" id="auto-tick-toggle" ${autoTick ? 'checked' : ''} ${isViewOnly ? 'disabled' : ''} />
+                        <span>Auto-tick active timers on Partial/Miss</span>
+                    </label>
+                    <span class="text-muted text-xs">(Story Beats auto‑increment the SB Bank)</span>
+                </div>
+            </div>
+            ${renderSafetyToolsPanel()}
+            <div class="panel">
                 <h3 class="panel-title">⚡ Quick Actions</h3>
                 <div class="grid-2 mt-1">
-                    <button class="btn btn-secondary" onclick="window.sceneEndTrimBoons()">✂️ Trim Boons</button>
-                    <button class="btn btn-secondary" onclick="window.resetAllTimers()">⏱️ Reset Timers</button>
-                    <button class="btn btn-secondary" onclick="window.newSession()">📦 New Session</button>
-                    <button class="btn btn-secondary" onclick="window.openCombatTracker()">⚔️ Combat Tracker</button>
+                    <button class="btn btn-secondary" onclick="window.sceneEndTrimBoons()" ${isViewOnly ? 'disabled' : ''}>✂️ Trim Boons</button>
+                    <button class="btn btn-secondary" onclick="window.resetAllTimers()" ${isViewOnly ? 'disabled' : ''}>⏱️ Reset Timers</button>
+                    <button class="btn btn-secondary" onclick="window.newSession()" ${isViewOnly ? 'disabled' : ''}>📦 New Session</button>
+                    <button class="btn btn-secondary" onclick="window.openCombatTracker()" ${isViewOnly ? 'disabled' : ''}>⚔️ Combat Tracker</button>
                     <button class="btn btn-secondary" onclick="window.openKanban()">📋 Kanban Board</button>
                     <button class="btn btn-secondary" onclick="window.openWhiteboard()">✏️ Whiteboard</button>
                     <button class="btn btn-secondary" onclick="window.openCrownSpread()">👑 Crown Spread</button>
@@ -543,9 +715,9 @@ function renderSceneView() {
             <div class="panel">
                 <h3 class="panel-title">⚡ Quick Generate</h3>
                 <div class="flex gap-1 flex-center flex-wrap mt-1">
-                    <button class="btn btn-sm btn-gold" id="gen-npc-btn">👤 NPC</button>
-                    <button class="btn btn-sm btn-gold" id="gen-location-btn">📍 Location</button>
-                    <button class="btn btn-sm btn-gold" id="gen-rumor-btn">📜 Rumor</button>
+                    <button class="btn btn-sm btn-gold" id="gen-npc-btn" ${isViewOnly ? 'disabled' : ''}>👤 NPC</button>
+                    <button class="btn btn-sm btn-gold" id="gen-location-btn" ${isViewOnly ? 'disabled' : ''}>📍 Location</button>
+                    <button class="btn btn-sm btn-gold" id="gen-rumor-btn" ${isViewOnly ? 'disabled' : ''}>📜 Rumor</button>
                     <span class="text-muted text-sm mx-auto">Uses current region's deck</span>
                 </div>
                 <div id="quick-gen-result" class="mt-1 panel" style="background:var(--bg3); border-left: 3px solid var(--border);">
@@ -556,9 +728,9 @@ function renderSceneView() {
             <div class="panel">
                 <h3 class="panel-title">🏷️ Scene Tags</h3>
                 <div class="flex gap-1 flex-center flex-wrap mt-1">
-                    <input type="text" id="scene-tag-input" placeholder="e.g., WARD, FIRE, DARK" class="flex-1" style="min-width: 120px;" />
-                    <button class="btn btn-sm btn-primary" id="scene-tag-add-btn">+ Add Tag</button>
-                    <button class="btn btn-sm btn-secondary" id="scene-tag-clear-btn">Clear All</button>
+                    <input type="text" id="scene-tag-input" placeholder="e.g., WARD, FIRE, DARK" class="flex-1" style="min-width: 120px;" ${isViewOnly ? 'disabled' : ''} />
+                    <button class="btn btn-sm btn-primary" id="scene-tag-add-btn" ${isViewOnly ? 'disabled' : ''}>+ Add Tag</button>
+                    <button class="btn btn-sm btn-secondary" id="scene-tag-clear-btn" ${isViewOnly ? 'disabled' : ''}>Clear All</button>
                 </div>
                 <div id="scene-tag-container" class="flex gap-1 flex-wrap mt-1">
                     ${tagEffects.activeTags.length === 0 ? '<span class="text-muted text-sm">No tags active.</span>' : ''}
@@ -577,7 +749,7 @@ function renderSceneView() {
             <div class="panel">
                 <div class="flex-between">
                     <h3 class="panel-title">⏱️ Active Timers</h3>
-                    <button class="btn btn-sm btn-primary" onclick="window.addTimerFromScene()">+ Add Timer</button>
+                    <button class="btn btn-sm btn-primary" onclick="window.addTimerFromScene()" ${isViewOnly ? 'disabled' : ''}>+ Add Timer</button>
                 </div>
                 ${activeTimers.length === 0 ? '<p class="text-muted mt-1">No active timers.</p>' : `
                     <div class="flex flex-col gap-1 mt-1">
@@ -588,7 +760,7 @@ function renderSceneView() {
                                     <div style="width:${(t.current / t.segments) * 100}%; height:100%; background:var(--gold);"></div>
                                 </div>
                                 <span class="text-xs text-muted">${t.current}/${t.segments}</span>
-                                <button class="btn btn-xs btn-ghost" onclick="window.tickTimer('${t.id}')">+1</button>
+                                <button class="btn btn-xs btn-ghost" onclick="window.tickTimer('${t.id}')" ${isViewOnly ? 'disabled' : ''}>+1</button>
                             </div>
                         `).join('')}
                     </div>
@@ -598,7 +770,7 @@ function renderSceneView() {
             <div class="panel">
                 <div class="flex-between">
                     <h3 class="panel-title">⚔️ Active Encounters</h3>
-                    <button class="btn btn-sm btn-primary" onclick="window.addEncounterFromScene()">+ Add Encounter</button>
+                    <button class="btn btn-sm btn-primary" onclick="window.addEncounterFromScene()" ${isViewOnly ? 'disabled' : ''}>+ Add Encounter</button>
                 </div>
                 ${activeEncounters.length === 0 ? '<p class="text-muted mt-1">No active encounters.</p>' : `
                     <div class="flex flex-col gap-1 mt-1">
@@ -607,7 +779,7 @@ function renderSceneView() {
                                 <span class="flex-1 text-sm">${escHtml(e.name)}</span>
                                 ${e.fromAdventureTitle ? `<span class="badge badge-purple" title="From scene: ${escHtml(e.fromSceneTitle || '')}">📖 ${escHtml(e.fromAdventureTitle)}</span>` : ''}
                                 <span class="badge badge-red">${e.status || 'active'}</span>
-                                <button class="btn btn-xs btn-primary" onclick="window.openEncounterTracker('${e.id}')">⚔️ Track</button>
+                                <button class="btn btn-xs btn-primary" onclick="window.openEncounterTracker('${e.id}')" ${isViewOnly ? 'disabled' : ''}>⚔️ Track</button>
                             </div>
                         `).join('')}
                     </div>
@@ -1041,12 +1213,41 @@ window.sceneEndTrimBoons = sceneEndTrimBoons;
 window.resetAllTimers = resetAllTimers;
 window.newSession = newSession;
 
-window.openKanban = function() { document.querySelector('.gm-tab[data-view="kanban"]')?.click(); };
-window.openWhiteboard = function() { document.querySelector('.gm-tab[data-view="whiteboard"]')?.click(); };
-window.openTravelPlanner = function() { document.querySelector('.gm-tab[data-view="travel"]')?.click(); };
-window.loadTravelPlanner = function() { loadTravelPlannerModule(document.getElementById('gm-view-container')); };
-window.loadKanban = function() { loadKanbanModule(document.getElementById('gm-view-container')); };
-window.loadWhiteboard = function() { loadWhiteboardModule(document.getElementById('gm-view-container')); };
+// ─── Robust tab loaders: directly load the module into the container ───
+window.openKanban = function() {
+    const containerEl = document.getElementById('gm-view-container');
+    if (!containerEl) return;
+    activeTab = 'kanban';
+    loadKanbanModule(containerEl).then(() => {
+        document.querySelectorAll('.gm-tab').forEach(t => t.classList.replace('btn-gold', 'btn-secondary'));
+        document.querySelector('.gm-tab[data-view="kanban"]')?.classList.replace('btn-secondary', 'btn-gold');
+    });
+};
+
+window.openWhiteboard = function() {
+    const containerEl = document.getElementById('gm-view-container');
+    if (!containerEl) return;
+    activeTab = 'whiteboard';
+    loadWhiteboardModule(containerEl).then(() => {
+        document.querySelectorAll('.gm-tab').forEach(t => t.classList.replace('btn-gold', 'btn-secondary'));
+        document.querySelector('.gm-tab[data-view="whiteboard"]')?.classList.replace('btn-secondary', 'btn-gold');
+    });
+};
+
+window.openTravelPlanner = function() {
+    const containerEl = document.getElementById('gm-view-container');
+    if (!containerEl) return;
+    activeTab = 'travel';
+    loadTravelPlannerModule(containerEl).then(() => {
+        document.querySelectorAll('.gm-tab').forEach(t => t.classList.replace('btn-gold', 'btn-secondary'));
+        document.querySelector('.gm-tab[data-view="travel"]')?.classList.replace('btn-secondary', 'btn-gold');
+    });
+};
+
+// Legacy loader functions (kept for backward compatibility)
+window.loadTravelPlanner = function() { window.openTravelPlanner(); };
+window.loadKanban = function() { window.openKanban(); };
+window.loadWhiteboard = function() { window.openWhiteboard(); };
 
 // 👇 NEW: jump to the Adventure Manager tab — same hash-navigation
 // pattern already used elsewhere in this app (e.g. "Open Whiteboard"
@@ -1065,6 +1266,8 @@ window.gmCompleteScene = async function() {
     if (!adventure) return;
     try {
         const advModule = await import('../adventure-manager/index.js');
+        // Ensure the adventure manager's cache is synced
+        advModule.loadAdventuresFromState();
         const result = advModule.completeScene(adventure.id, adventure.currentAct, adventure.currentScene);
         if (result) showToast('✅ Scene completed!', 'success');
         refreshView();
@@ -1081,6 +1284,7 @@ window.gmStartSceneEncounter = async function() {
     if (!adventure) return;
     try {
         const advModule = await import('../adventure-manager/index.js');
+        advModule.loadAdventuresFromState();
         await advModule.startSceneEncounter(adventure.id, adventure.currentAct, adventure.currentScene);
     } catch (e) {
         console.error('[GM Tools] Could not start scene encounter:', e);
@@ -1099,6 +1303,7 @@ window.gmSaveQuickGenToAdventure = async function() {
     }
     try {
         const advModule = await import('../adventure-manager/index.js');
+        advModule.loadAdventuresFromState();
         const { type, data } = lastQuickGenResult;
         if (type === 'npc') {
             const npcs = [...(adventure.npcs || []), { id: 'npc_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6), ...data }];
@@ -1448,6 +1653,8 @@ function refreshView() {
     const containerEl = document.getElementById('gm-view-container');
     if (!containerEl) return;
     
+    loadCampaignData();
+    
     if (activeTab === 'kanban') loadKanbanModule(containerEl);
     else if (activeTab === 'whiteboard') loadWhiteboardModule(containerEl);
     else if (activeTab === 'travel') loadTravelPlannerModule(containerEl);
@@ -1491,6 +1698,15 @@ function attachEvents() {
     document.getElementById('gen-rumor-btn')?.addEventListener('click', generateQuickRumor);
     document.getElementById('scene-tag-add-btn')?.addEventListener('click', window.addSceneTag);
     document.getElementById('scene-tag-clear-btn')?.addEventListener('click', window.clearSceneTags);
+
+    // 👇 NEW: auto-tick toggle
+    const autoTickToggle = document.getElementById('auto-tick-toggle');
+    if (autoTickToggle) {
+        autoTickToggle.addEventListener('change', (e) => {
+            updateGmState({ autoTickTimers: e.target.checked });
+            showToast(`Auto-tick ${e.target.checked ? 'enabled' : 'disabled'}.`, 'info');
+        });
+    }
     
     document.addEventListener('keydown', (e) => {
         if (e.key === 'Enter' && document.activeElement === document.getElementById('scene-tag-input')) {
@@ -1501,6 +1717,23 @@ function attachEvents() {
     document.addEventListener('click', (e) => {
         const target = e.target.closest('.gm-tag-remove');
         if (target) window.removeSceneTag(target.dataset.tag);
+    });
+
+    // Safety Tools
+    document.getElementById('safety-save-btn')?.addEventListener('click', () => {
+        const lines = document.getElementById('safety-lines')?.value || '';
+        const veils = document.getElementById('safety-veils')?.value || '';
+        saveCampaignSafety({ lines, veils });
+        showToast('Safety settings saved.', 'success');
+    });
+
+    document.getElementById('sz-save-btn')?.addEventListener('click', () => {
+        const tone = document.getElementById('sz-tone')?.value || '';
+        const length = document.getElementById('sz-length')?.value || '';
+        const characterHooks = document.getElementById('sz-characterHooks')?.value || '';
+        const consent = document.getElementById('sz-consent')?.checked || false;
+        saveCampaignSafety({ sessionZero: { tone, length, characterHooks, consent } });
+        showToast('Session Zero saved.', 'success');
     });
 }
 
@@ -1578,7 +1811,10 @@ export {
     getTagEffects,
     sceneEndTrimBoons,
     resetAllTimers,
-    newSession
+    newSession,
+    // 👇 NEW exports (optional)
+    tickActiveSceneTimer,
+    getActiveAdventureTimers
 };
 
 // ✅ Default export (re‑exporting the same)
@@ -1597,5 +1833,7 @@ export default {
     removeSceneTag,
     clearSceneTags,
     getSceneTags,
-    getTagEffects
+    getTagEffects,
+    tickActiveSceneTimer,
+    getActiveAdventureTimers
 };

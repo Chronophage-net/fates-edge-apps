@@ -1,9 +1,11 @@
 /**
  * Home feature module – Modern Reactive Landing Page
  * Provides a scrollable, single-page introduction to the game.
+ * Includes first‑start welcome overlay with Quick Start.
  */
 
 import { showToast } from '../../components/Toast.js';
+import { getState, saveState } from '../../core/state.js';
 
 // ─── Constants ──────────────────────────────────────────────────────────
 
@@ -11,12 +13,14 @@ const SELECTORS = {
   CREATE_CHAR: '[data-action="create-char"]',
   RULES_LINK: '[data-action="rules-link"]',
   TOOLKIT_LINK: '[data-action="toolkit-link"]',
+  QUICK_START: '[data-action="quick-start"]',
 };
 
 // ─── State ─────────────────────────────────────────────────────────────
 
 let container = null;
 let stylesInjected = false;
+let overlayShown = false; // prevent duplicate overlays
 
 // ─── Render Functions ──────────────────────────────────────────────────
 
@@ -39,6 +43,7 @@ function buildHTML() {
           <a href="#slide-rules" class="btn btn-gold" data-action="rules-link">📖 View the Rules</a>
           <a href="#" class="btn btn-primary" data-action="create-char">🎭 Create a Character</a>
           <a href="#slide-toolkit" class="btn btn-secondary" data-action="toolkit-link">🛠️ Explore the Toolkit</a>
+          <button class="btn btn-gold btn-large" data-action="quick-start" style="font-weight:700;border-width:2px;">🚀 Quick Start – The Lantern at Dusk</button>
         </div>
         <div class="hero-footer">
           <p>“The road remembers. Every broken wheel leaves a mark, every lit lamp bears witness. The only question is: what are you willing to owe?”</p>
@@ -748,6 +753,55 @@ function injectStyles() {
       line-height: 1.5;
     }
 
+    /* ===== WELCOME OVERLAY (added) ===== */
+    .welcome-overlay {
+      position: fixed; inset: 0; z-index: 99999;
+      background: rgba(0,0,0,0.85); backdrop-filter: blur(12px);
+      display: flex; align-items: center; justify-content: center;
+      animation: welcomeFadeIn 0.4s ease;
+      padding: 1rem;
+    }
+    @keyframes welcomeFadeIn {
+      from { opacity: 0; transform: scale(0.96); }
+      to { opacity: 1; transform: scale(1); }
+    }
+    .welcome-card {
+      background: var(--bg1); color: var(--text);
+      max-width: 640px; width: 100%; max-height: 90vh;
+      padding: 2rem; border-radius: 16px;
+      border: 1px solid var(--border);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+      overflow-y: auto;
+      text-align: center;
+    }
+    .welcome-card h1 {
+      color: var(--gold); margin: 0.2rem 0;
+    }
+    .welcome-card .welcome-docs {
+      background: var(--bg3); padding: 1rem; border-radius: 8px;
+      border-left: 4px solid var(--gold); margin: 1.2rem 0;
+      text-align: left;
+    }
+    .welcome-card .welcome-docs ul {
+      margin: 0.5rem 0 0 1.2rem; padding: 0; color: var(--text2);
+    }
+    .welcome-card .welcome-docs a {
+      color: var(--gold);
+    }
+    .welcome-card .welcome-actions {
+      display: flex; flex-direction: column; gap: 0.75rem; margin: 1.2rem 0;
+    }
+    .welcome-card .welcome-actions .btn {
+      width: 100%;
+    }
+    .welcome-card .welcome-dismiss {
+      color: var(--text3); font-size: 0.85rem; cursor: pointer;
+      background: none; border: none; text-decoration: underline;
+    }
+    .welcome-card .welcome-footer {
+      font-size: 0.75rem; color: var(--text3); margin: 0;
+    }
+
     /* ===== RESPONSIVE ===== */
     @media (max-width: 768px) {
       .home-slide { padding: 3rem 1rem; min-height: auto; }
@@ -762,12 +816,9 @@ function injectStyles() {
       .scroll-indicator { display: none; }
     }
     @media (max-width: 600px) {
-      .about-card {
-        padding: 1.5rem 1.2rem;
-      }
-      .about-philosophy {
-        padding: 0.8rem;
-      }
+      .about-card { padding: 1.5rem 1.2rem; }
+      .about-philosophy { padding: 0.8rem; }
+      .welcome-card { padding: 1.5rem; }
     }
     @media (max-width: 480px) {
       .mechanics-grid { grid-template-columns: 1fr; }
@@ -782,6 +833,183 @@ function injectStyles() {
   stylesInjected = true;
 }
 
+// ─── WELCOME OVERLAY ──────────────────────────────────────────────────
+
+function showWelcomeOverlay() {
+  if (overlayShown) return;
+  overlayShown = true;
+
+  // Build the overlay
+  const overlay = document.createElement('div');
+  overlay.className = 'welcome-overlay';
+  overlay.id = 'welcome-overlay';
+  overlay.innerHTML = `
+    <div class="welcome-card">
+      <span style="font-size:3rem;">⚔️</span>
+      <h1>Welcome to Fate's Edge</h1>
+      <p style="color:var(--text2);font-size:1.05rem;margin:0;">
+        Your complete toolkit for running and playing Fate's Edge.
+      </p>
+
+      <div class="welcome-docs">
+        <p style="margin:0;font-weight:500;">📖 Start here – essential documents:</p>
+        <ul>
+          <li><a href="/data/docs/resources/Fates_-_Edge_-_-Essentials.html" target="_blank">⚡ Essentials</a> – quick start rules</li>
+          <li><a href="/data/docs/resources/Fates_-_Edge_-_-Playing-_-and-_-Running-_-Fate's-_-Edge.html" target="_blank">📜 Playing &amp; Running Fate's Edge</a> – full guide</li>
+        </ul>
+      </div>
+
+      <div class="welcome-actions">
+        <button class="btn btn-gold btn-large" data-action="quick-start" style="font-weight:700;border-width:2px;">
+          🚀 Quick Start – The Lantern at Dusk
+        </button>
+        <button class="btn btn-secondary" data-action="dismiss-welcome">
+          Skip – I'll explore on my own
+        </button>
+      </div>
+      <p class="welcome-footer">You can re‑open this welcome tour anytime in Settings.</p>
+    </div>
+  `;
+
+  document.body.appendChild(overlay);
+
+  // Event listeners
+  const quickBtn = overlay.querySelector('[data-action="quick-start"]');
+  const dismissBtn = overlay.querySelector('[data-action="dismiss-welcome"]');
+
+  quickBtn?.addEventListener('click', () => {
+    overlay.remove();
+    overlayShown = false;
+    quickStart();
+  });
+
+  dismissBtn?.addEventListener('click', () => {
+    overlay.remove();
+    overlayShown = false;
+    markWelcomeSeen();
+  });
+
+  // Click outside to dismiss
+  overlay.addEventListener('click', (e) => {
+    if (e.target === overlay) {
+      overlay.remove();
+      overlayShown = false;
+      markWelcomeSeen();
+    }
+  });
+}
+
+function markWelcomeSeen() {
+  const state = getState();
+  if (!state.app) state.app = {};
+  state.app.welcomeSeen = true;
+  saveState();
+}
+
+function checkWelcomeOverlay() {
+  const state = getState();
+  const welcomeSeen = state.app?.welcomeSeen || false;
+  if (!welcomeSeen && !overlayShown) {
+    // Delay a bit so the home page renders first
+    setTimeout(showWelcomeOverlay, 400);
+  }
+}
+
+// ─── QUICK START LOGIC ───────────────────────────────────────────────
+
+// js/features/home/index.js
+
+async function quickStart() {
+    console.log('[QuickStart] Starting quick start...');
+    try {
+        const state = getState();
+
+        // 1. Import adventure manager early so we can sync its cache
+        const advModule = await import('../adventure-manager/index.js');
+
+        // 2. Ensure the adventure is loaded into state
+        let adventure = state.adventures?.find(a => a.id === 'lantern_at_dusk');
+        if (!adventure) {
+            console.log('[QuickStart] Adventure not in state, loading from file...');
+            const loaded = await advModule.loadAdventureFromFile('lantern_at_dusk');
+            if (!loaded) {
+                console.error('[QuickStart] loadAdventureFromFile failed.');
+                showToast('Could not load the starter adventure. Check that lantern_at_dusk.json exists in /data/adventures/.', 'error');
+                return;
+            }
+            // Re-fetch state after load
+            const newState = getState();
+            adventure = newState.adventures?.find(a => a.id === 'lantern_at_dusk');
+            if (!adventure) {
+                console.error('[QuickStart] Adventure still not found after loading.');
+                showToast('Starter adventure not found after loading.', 'error');
+                return;
+            }
+            console.log('[QuickStart] Adventure loaded successfully:', adventure.title);
+        } else {
+            console.log('[QuickStart] Adventure already in state.');
+        }
+
+        // ─── ROBUST FIX: Sync the adventure-manager's internal cache ────
+        advModule.loadAdventuresFromState();
+        console.log('[QuickStart] Adventure manager cache synced with state.');
+
+        // 3. Load pre‑generated characters if not present
+        if (!state.characters || state.characters.length === 0) {
+            console.log('[QuickStart] Loading pre-gens...');
+            try {
+                const response = await fetch('/data/pre-gens.json');
+                if (response.ok) {
+                    const chars = await response.json();
+                    if (Array.isArray(chars) && chars.length > 0) {
+                        let added = 0;
+                        chars.forEach(char => {
+                            const exists = state.characters.some(c => c.name === char.name);
+                            if (!exists) {
+                                if (!char.id) char.id = 'pregen-' + Date.now() + '-' + Math.random().toString(36).substr(2, 6);
+                                state.characters.push(char);
+                                added++;
+                            }
+                        });
+                        if (added > 0) {
+                            saveState();
+                            console.log(`[QuickStart] Added ${added} pre-gens.`);
+                            showToast(`📋 Loaded ${added} pre‑generated characters.`, 'success');
+                        }
+                    }
+                } else {
+                    console.warn('[QuickStart] Pre-gen fetch failed with status:', response.status);
+                    showToast('Could not load pre‑gens (HTTP ' + response.status + ').', 'warning');
+                }
+            } catch (e) {
+                console.warn('[QuickStart] Pre‑gen load error:', e);
+                // Non‑fatal
+            }
+        }
+
+        // 4. Start the adventure
+        console.log('[QuickStart] Calling startAdventure...');
+        const started = advModule.startAdventure('lantern_at_dusk');
+        console.log('[QuickStart] startAdventure returned:', started);
+        if (!started) {
+            console.error('[QuickStart] startAdventure failed.');
+            showToast('Failed to start adventure. Check console for errors.', 'error');
+            return;
+        }
+
+        // 5. Mark welcome as seen (if not already)
+        markWelcomeSeen();
+
+        // 6. Navigate to Adventure Manager
+        window.location.hash = 'adventure-manager';
+        showToast(`🚀 Launched "${adventure.title}" with pre‑gens!`, 'success');
+        console.log('[QuickStart] Quick start completed successfully.');
+
+    } catch (error) {
+        console.error('[QuickStart] Unhandled error:', error);
+        showToast('Quick Start failed: ' + (error.message || 'unknown error'), 'error');
+    }
+}
 // ─── Event Handling ──────────────────────────────────────────────────
 
 /** Navigate to the character tab */
@@ -820,6 +1048,23 @@ function handleContainerClick(e) {
   } else if (action === 'toolkit-link') {
     e.preventDefault();
     scrollToSlide('slide-toolkit');
+  } else if (action === 'quick-start') {
+    e.preventDefault();
+    // If the overlay is open, dismiss it first
+    const overlay = document.getElementById('welcome-overlay');
+    if (overlay) {
+      overlay.remove();
+      overlayShown = false;
+    }
+    quickStart();
+  } else if (action === 'dismiss-welcome') {
+    e.preventDefault();
+    const overlay = document.getElementById('welcome-overlay');
+    if (overlay) {
+      overlay.remove();
+      overlayShown = false;
+    }
+    markWelcomeSeen();
   }
 }
 
@@ -833,8 +1078,9 @@ export function render(el) {
   container = el;
   container.innerHTML = buildHTML();
   injectStyles();
-  // Attach event listeners after render
   attachEvents();
+  // Show welcome overlay if not seen
+  checkWelcomeOverlay();
 }
 
 /**

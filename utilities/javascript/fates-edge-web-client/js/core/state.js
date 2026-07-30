@@ -5,6 +5,10 @@
  * - Tracks: Obligation, Corruption, Leash, Mental Strain, Shadow, Shame, Identity Strain
  * - Spellbook, bound spirits, repertoire, symbols
  * - Helper functions for magic-related data
+ * 
+ * v3.3 – Safety Tools & GM Bank
+ * - Added campaign.safety (Lines, Veils, Session Zero)
+ * - Added gm.sbBank and gm.autoTickTimers
  */
 
 import { generateId, getBaseUrl as utilsGetBaseUrl, getStorage, setStorage, removeStorage } from './utils.js';
@@ -13,7 +17,7 @@ import { generateId, getBaseUrl as utilsGetBaseUrl, getStorage, setStorage, remo
 // CONSTANTS
 // ============================================================
 
-export const DEFAULT_ATTRIBUTES = { body: 3, mind: 3, soul: 3 };
+export const DEFAULT_ATTRIBUTES = { body: 1, wits: 1, spirit: 1, presence: 1 };
 
 export const DEFAULT_SKILLS = {
   stealth: 0,
@@ -89,7 +93,31 @@ const DEFAULT_STATE = {
             sessionLog: [],
             sceneTags: [],
             vttEvents: []
+        },
+        app: {
+            version: '0.8.0',
+            activeTab: 'home',
+            theme: 'dark',
+            notifications: [],
+            welcomeSeen: false,
+            magicTourSeen: false,
+        },        
+        safety: {
+            lines: '',
+            veils: '',
+            sessionZero: {
+                tone: '',
+                length: '',
+                characterHooks: '',
+                consent: false
+            }
         }
+
+    },
+    // ----- NEW: GM state (Story Beat bank, auto‑tick toggle) -----
+    gm: {
+        sbBank: 0,
+        autoTickTimers: false
     }
 };
 
@@ -236,7 +264,20 @@ export function ensureCharacterDefaults(char) {
     if (char.repertoire === undefined) char.repertoire = [];
     // ---- Symbols (Invoker) ----
     if (char.symbols === undefined) char.symbols = [];
-
+    // Migration: rename mind→wits, soul→spirit, add presence
+    if (char.attributes) {
+        if (char.attributes.mind !== undefined && char.attributes.wits === undefined) {
+            char.attributes.wits = char.attributes.mind;
+            delete char.attributes.mind;
+        }
+        if (char.attributes.soul !== undefined && char.attributes.spirit === undefined) {
+            char.attributes.spirit = char.attributes.soul;
+            delete char.attributes.soul;
+        }
+        if (char.attributes.presence === undefined) {
+            char.attributes.presence = 1;
+        }
+    }
     return char;
 }
 
@@ -399,6 +440,15 @@ export function mergeState(remoteState, version) {
         
         if (!state.campaign) state.campaign = { ...DEFAULT_STATE.campaign };
         state.campaign.state = localCampaignState;
+    }
+
+    // --- Merge safety and gm fields from remote ---
+    if (remoteState.campaign && remoteState.campaign.safety) {
+        if (!state.campaign) state.campaign = { ...DEFAULT_STATE.campaign };
+        state.campaign.safety = deepMerge(state.campaign.safety || {}, remoteState.campaign.safety);
+    }
+    if (remoteState.gm) {
+        state.gm = deepMerge(state.gm || {}, remoteState.gm);
     }
 
     if (conflicts.length > 0) {
@@ -574,6 +624,45 @@ export function clearSceneTags() {
     campaignState.sceneTags = [];
     saveState();
     return true;
+}
+
+// ============================================================
+// SAFETY TOOLS (NEW)
+// ============================================================
+
+export function getCampaignSafety() {
+    if (!state.campaign) {
+        state.campaign = { ...DEFAULT_STATE.campaign };
+    }
+    if (!state.campaign.safety) {
+        state.campaign.safety = { ...DEFAULT_STATE.campaign.safety };
+    }
+    return state.campaign.safety;
+}
+
+export function updateCampaignSafety(updates) {
+    const safety = getCampaignSafety();
+    Object.assign(safety, updates);
+    saveState();
+    return safety;
+}
+
+// ============================================================
+// GM STATE (NEW)
+// ============================================================
+
+export function getGmState() {
+    if (!state.gm) {
+        state.gm = { ...DEFAULT_STATE.gm };
+    }
+    return state.gm;
+}
+
+export function updateGmState(updates) {
+    const gm = getGmState();
+    Object.assign(gm, updates);
+    saveState();
+    return gm;
 }
 
 // ============================================================
@@ -1217,6 +1306,12 @@ export default {
     addSceneTag,
     removeSceneTag,
     clearSceneTags,
+    // ---- NEW exports ----
+    getCampaignSafety,
+    updateCampaignSafety,
+    getGmState,
+    updateGmState,
+    // ---- end new ----
     addVTTEvent,
     getVTTEvents,
     clearVTTEvents,

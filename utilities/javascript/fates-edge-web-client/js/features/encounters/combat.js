@@ -6,6 +6,7 @@
  * ✅ Keyboard shortcuts: Space = next turn, R = reset timer
  * ✅ Cleaner UI with creature-specific SB moves
  * ✅ Import from Bestiary via searchable modal
+ * ✅ Armor auto‑conversion (Essentials §2.4 & §A.7)
  */
 
 import { getState, saveState } from '../../core/state.js';
@@ -110,6 +111,35 @@ const RANGE_BANDS = [
     { key: 'absent', label: 'Absent', short: 'A', color: 'var(--text3)',  desc: 'Off-screen; requires a scene change.' }
 ];
 const DEFAULT_RANGE = 'near';
+
+// ============================================================
+// ARMOR CONVERSION (Essentials §2.4 & §A.7)
+// ============================================================
+
+/**
+ * Convert Harm to Fatigue based on armor type.
+ * @param {number} harm - Incoming harm (integer)
+ * @param {string} armorType - 'none', 'light', 'medium', 'heavy'
+ * @returns {{ harm: number, fatigue: number }} Remaining Harm and Fatigue applied
+ */
+function applyArmorConversion(harm, armorType) {
+    if (typeof harm !== 'number' || harm < 0) harm = 0;
+    const type = (armorType || 'none').toLowerCase();
+    switch (type) {
+        case 'light':
+            // 1→1 Fatigue (min 1/hit)
+            return { harm: Math.max(0, harm - 1), fatigue: Math.min(harm, 1) };
+        case 'medium':
+            // 2→1 Fatigue (min 1/hit)
+            return { harm: Math.max(0, harm - 2), fatigue: Math.min(Math.ceil(harm / 2), 1) };
+        case 'heavy':
+            // 3→2 Fatigue (min 1/hit)
+            return { harm: Math.max(0, harm - 3), fatigue: Math.min(Math.ceil(harm / 2), 2) };
+        case 'none':
+        default:
+            return { harm, fatigue: 0 };
+    }
+}
 
 // ============================================================
 // RANGE TRACKING HELPERS
@@ -319,6 +349,8 @@ export async function openTracker(encounterId) {
             name: a.name || 'Adversary',
             initiative: Math.floor(Math.random() * 20) + 1,
             harm: 0,
+            fatigue: 0,                         // NEW
+            armorType: a.armorType || 'none',   // NEW
             maxHarm: tlToMaxHarm(tl),
             status: 'active',
             notes: body || '',
@@ -405,6 +437,16 @@ function renderTracker() {
         const harmPercent = (c.harm / c.maxHarm) * 100;
         const hasLinks = c.linkedFaction || c.linkedPatron || c.linkedFollower || c.linkedAsset || c.linkedRival;
 
+        // ─── Armor & fatigue display ──────────────────────────────
+        let armorLabel = '';
+        if (c.armorType && c.armorType !== 'none') {
+            armorLabel = `<span style="font-size:0.6rem;background:rgba(100,180,255,0.15);color:var(--accent);padding:0.05rem 0.35rem;border-radius:10px;flex-shrink:0;">🛡️ ${escHtml(c.armorType)}</span>`;
+        }
+        let fatigueLabel = '';
+        if (c.fatigue > 0) {
+            fatigueLabel = `<span style="font-size:0.6rem;background:rgba(255,200,0,0.15);color:var(--gold);padding:0.05rem 0.35rem;border-radius:10px;flex-shrink:0;">💤 ${c.fatigue}</span>`;
+        }
+
         let rangeChip = '';
         if (focusCombatant && focusCombatant.id !== c.id && focusCombatant.type !== c.type) {
             const band = getRangeBand(c.id, focusCombatant.id);
@@ -462,6 +504,8 @@ function renderTracker() {
                             ${c.tl !== undefined ? `<span class="creature-tag" style="font-size:0.62rem;background:rgba(255,100,100,0.15);color:var(--red);padding:0.05rem 0.35rem;border-radius:10px;flex-shrink:0;">TL${c.tl}</span>` : ''}
                             ${c.class ? `<span class="creature-tag" style="font-size:0.62rem;background:rgba(100,180,255,0.15);color:var(--accent);padding:0.05rem 0.35rem;border-radius:10px;flex-shrink:0;">Class ${escHtml(c.class)}</span>` : ''}
                             ${c.category ? `<span class="badge badge-${getCategoryBadgeColor(c.category)}" style="font-size:0.55rem;flex-shrink:0;">${escHtml(c.category)}</span>` : ''}
+                            ${armorLabel}
+                            ${fatigueLabel}
                         </div>
                         <div style="display: flex; align-items: center; gap: 0.3rem; flex-shrink: 0;">
                             ${linkBadges}
@@ -845,12 +889,16 @@ function addCombatant() {
     if (!name) return;
     const initiative = parseInt(prompt('Enter initiative (1-20):', Math.floor(Math.random() * 20) + 1) || '10');
     const harm = parseInt(prompt('Max Harm (1-20):', '3') || '3');
+    const armorPrompt = prompt('Armor type: none, light, medium, heavy (default: none)', 'none') || 'none';
+    const armorType = ['none', 'light', 'medium', 'heavy'].includes(armorPrompt) ? armorPrompt : 'none';
 
     const newAdversary = {
         id: 'combat-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9),
         name,
         initiative: Math.min(Math.max(initiative, 1), 20),
         harm: 0,
+        fatigue: 0,
+        armorType: armorType,
         maxHarm: Math.min(Math.max(harm, 1), 20),
         status: 'active',
         notes: '',
@@ -874,12 +922,16 @@ function addPlayer() {
     if (!name) return;
     const initiative = parseInt(prompt('Enter initiative (1-20):', Math.floor(Math.random() * 20) + 1) || '10');
     const harm = parseInt(prompt('Max Harm (1-20):', '4') || '4');
+    const armorPrompt = prompt('Armor type: none, light, medium, heavy (default: none)', 'none') || 'none';
+    const armorType = ['none', 'light', 'medium', 'heavy'].includes(armorPrompt) ? armorPrompt : 'none';
 
     const newPlayer = {
         id: 'combat-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9),
         name: `👤 ${name}`,
         initiative: Math.min(Math.max(initiative, 1), 20),
         harm: 0,
+        fatigue: 0,
+        armorType: armorType,
         maxHarm: Math.min(Math.max(harm, 1), 20),
         status: 'active',
         notes: 'Player character',
@@ -918,6 +970,8 @@ function importFromFactions() {
         name: faction.name,
         initiative: Math.floor(Math.random() * 20) + 5 + (faction.standing || 0),
         harm: 0,
+        fatigue: 0,
+        armorType: 'none',
         maxHarm: 4 + Math.abs(faction.standing || 0),
         status: 'active',
         notes: `Faction: ${faction.agenda || 'No agenda'}`,
@@ -1007,7 +1061,8 @@ async function importFromBestiary() {
                             class: entry.class || '',
                             category: entry.category || '',
                             stats: entry.stats || {},
-                            sb_spends: entry.sb_spends || []
+                            sb_spends: entry.sb_spends || [],
+                            armorType: 'none'  // default armor
                         });
                         saveState();
                     }
@@ -1018,6 +1073,8 @@ async function importFromBestiary() {
                     name: entry.name || 'Adversary',
                     initiative: Math.floor(Math.random() * 20) + 1,
                     harm: 0,
+                    fatigue: 0,
+                    armorType: 'none',
                     maxHarm: tlToMaxHarm(entry.tl),
                     status: 'active',
                     notes: getCreatureDescription(entry) || '',
@@ -1099,18 +1156,39 @@ function endRound() {
     }
 }
 
+// ─── UPDATED damageCombatant with Armor Conversion ──────────────
+
 function damageCombatant(idx) {
     const amount = parseInt(prompt('Damage amount:', '1') || '1');
+    if (isNaN(amount) || amount < 1) {
+        showToast('Invalid damage amount.', 'error');
+        return;
+    }
     if (idx >= 0 && idx < combatants.length) {
         const c = combatants[idx];
-        c.harm = Math.min(c.harm + amount, c.maxHarm);
-        if (c.harm >= c.maxHarm && c.status !== 'defeated') {
-            c.status = 'defeated';
-            addLog('damage', `${c.name} is defeated!`);
-            showToast(`💀 ${c.name} is defeated!`, 'error');
+        // Apply armor conversion
+        const armorType = c.armorType || 'none';
+        const converted = applyArmorConversion(amount, armorType);
+        // Apply fatigue first (if any)
+        if (converted.fatigue > 0) {
+            c.fatigue = (c.fatigue || 0) + converted.fatigue;
+            addLog('damage', `${c.name} gains ${converted.fatigue} Fatigue from armor (${armorType})`);
+        }
+        // Apply remaining harm
+        if (converted.harm > 0) {
+            c.harm = Math.min(c.harm + converted.harm, c.maxHarm);
+            addLog('damage', `${c.name} takes ${converted.harm} harm (${c.harm}/${c.maxHarm})`);
+            if (c.harm >= c.maxHarm && c.status !== 'defeated') {
+                c.status = 'defeated';
+                addLog('damage', `${c.name} is defeated!`);
+                showToast(`💀 ${c.name} is defeated!`, 'error');
+            } else {
+                showToast(`💥 ${c.name} takes ${converted.harm} harm (${c.harm}/${c.maxHarm})`, 'warning');
+            }
+        } else if (converted.fatigue > 0) {
+            showToast(`🛡️ ${c.name} absorbs harm, gains ${converted.fatigue} Fatigue`, 'info');
         } else {
-            addLog('damage', `${c.name} takes ${amount} harm (${c.harm}/${c.maxHarm})`);
-            showToast(`💥 ${c.name} takes ${amount} harm`, 'warning');
+            showToast(`🛡️ ${c.name}'s armor completely absorbs the damage.`, 'info');
         }
         renderTracker();
     }
@@ -1178,7 +1256,7 @@ export function isTrackerOpen(encounterId) {
 export function getLiveCombatants() {
     return combatants.map(c => ({
         id: c.id, name: c.name, type: c.type, status: c.status,
-        harm: c.harm, maxHarm: c.maxHarm
+        harm: c.harm, maxHarm: c.maxHarm, fatigue: c.fatigue || 0, armorType: c.armorType || 'none'
     }));
 }
 

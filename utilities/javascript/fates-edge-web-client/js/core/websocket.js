@@ -113,7 +113,15 @@ const eventHandlers = {
 
     // Whiteboard sync events
     'whiteboard-update': [],
-    'sync-request': []
+    'sync-request': [],
+    'sync-state': [],
+    'combat-status-update': [],
+    'scene-status-update': [],
+    'character-select': [],
+    'adventure-timer': [],
+    'adventure-log': [],
+    'handshake_ack': [],
+    
 };
 
 // ============================================================
@@ -483,7 +491,33 @@ function handleWebSocketMessage(data) {
                 showToast(data.message, 'info');
             }
             break;
+        case 'sync-state':
+            triggerEvent('sync-state', data);
+            break;
 
+        case 'combat-status-update':
+            triggerEvent('combat-status-update', data);
+            break;
+
+        case 'scene-status-update':
+            triggerEvent('scene-status-update', data);
+            break;
+
+        case 'character-select':
+            triggerEvent('character-select', data);
+            break;
+
+        case 'adventure-timer':
+            triggerEvent('adventure-timer', data);
+            break;
+
+        case 'adventure-log':
+            triggerEvent('adventure-log', data);
+            break;
+
+        case 'handshake_ack':
+            triggerEvent('handshake_ack', data);
+            break;
         // ============================================================
         // WHITEBOARD SYNC EVENTS
         // ============================================================

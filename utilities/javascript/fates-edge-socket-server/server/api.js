@@ -1,6 +1,7 @@
 /**
  * Fate's Edge - Express API Routes
  * v8 – Full character storage (room.characters) + WebSocket parity
+ * v9 – Adventure Engine routes wired in (see server/adventure.js)
  */
 
 const express = require('express');
@@ -11,6 +12,7 @@ const crypto = require('crypto');
 const room = require('./room.js');
 const deck = require('./deck.js');
 const { safeAssign, buildSafeDict, isSafeModuleId, isSafeCampaignCode, clampCount, UNSAFE_KEYS } = require('./security.js');
+const adventure = require('./adventure.js');
 
 let config = {};
 
@@ -428,6 +430,141 @@ function createApiRouter(appConfig) {
         }
     });
 
+    // ─── Adventure Engine ───────────────────────────────────────────
+    // See server/adventure.js for the underlying state machine. These
+    // routes let a GM's own tooling -- or a fully automated/AI agent --
+    // drive an entire adventure through plain authenticated REST calls.
+    // They call the exact same functions the matching WS/Socket.io
+    // commands do, so everyone in the room sees the same updates via
+    // room.broadcastToRoom() regardless of which path drove the change.
+    // "Pushing" an adventure's source content to human clients still
+    // uses the /api/modules/:id/push route above, unchanged -- these
+    // routes are for the LIVE, authoritative state instead.
+
+    router.get('/api/rooms/:code/adventure', authenticate, (req, res) => {
+        try {
+            const r = room.getRoom(req.params.code);
+            res.json(adventure.getPublicState(r));
+        } catch (err) {
+            res.status(404).json({ error: err.message });
+        }
+    });
+
+    router.get('/api/rooms/:code/adventure/reference', authenticate, (req, res) => {
+        try {
+            const r = room.getRoom(req.params.code);
+            res.json(adventure.getReferenceData(r));
+        } catch (err) {
+            res.status(err.message.includes('No adventure') ? 400 : 404).json({ error: err.message });
+        }
+    });
+
+    router.post('/api/rooms/:code/adventure/load', authenticate, (req, res) => {
+        try {
+            const r = room.getRoom(req.params.code);
+            const { moduleId } = req.body;
+            if (!moduleId) return res.status(400).json({ error: 'moduleId is required' });
+            const state = adventure.loadAdventureModule(r, moduleId);
+            const roomCode = req.params.code.toUpperCase();
+            room.broadcastToRoom(roomCode, 'adventure-loaded', { source: 'api', ...state });
+            res.json({ success: true, code: roomCode, ...state });
+        } catch (err) {
+            const notFound = err.message.includes('not found') || err.message.includes("isn't an adventure");
+            res.status(notFound ? 404 : 400).json({ error: err.message });
+        }
+    });
+
+    router.post('/api/rooms/:code/adventure/reset', authenticate, (req, res) => {
+        try {
+            const r = room.getRoom(req.params.code);
+            const state = adventure.resetAdventure(r);
+            const roomCode = req.params.code.toUpperCase();
+            room.broadcastToRoom(roomCode, 'adventure-reset', { source: 'api', ...state });
+            res.json({ success: true, code: roomCode, ...state });
+        } catch (err) {
+            res.status(400).json({ error: err.message });
+        }
+    });
+
+    router.post('/api/rooms/:code/adventure/scene', authenticate, (req, res) => {
+        try {
+            const r = room.getRoom(req.params.code);
+            const { actIndex, sceneIndex } = req.body;
+            const target = {};
+            if (typeof actIndex === 'number') target.actIndex = actIndex;
+            if (typeof sceneIndex === 'number') target.sceneIndex = sceneIndex;
+            const state = adventure.advanceScene(r, target);
+            const roomCode = req.params.code.toUpperCase();
+            room.broadcastToRoom(roomCode, 'scene-changed', { source: 'api', ...state });
+            res.json({ success: true, code: roomCode, ...state });
+        } catch (err) {
+            res.status(400).json({ error: err.message });
+        }
+    });
+
+    // `ref` is looked up in the CURRENT scene by index (number) or by
+    // name/creatureId (string). `encounter`, if given, is used directly
+    // as a full ad-hoc encounter object instead ({ name/creatureId, dv,
+    // position, outcomes }), for an improvised fight with no pre-written
+    // encounter.
+    router.post('/api/rooms/:code/adventure/encounter/start', authenticate, (req, res) => {
+        try {
+            const r = room.getRoom(req.params.code);
+            const { ref, encounter } = req.body;
+            if (ref === undefined && !encounter) return res.status(400).json({ error: 'ref or encounter is required' });
+            const state = adventure.startEncounter(r, ref, encounter || null);
+            const roomCode = req.params.code.toUpperCase();
+            room.broadcastToRoom(roomCode, 'encounter-started', { source: 'api', ...state });
+            res.json({ success: true, code: roomCode, ...state });
+        } catch (err) {
+            res.status(400).json({ error: err.message });
+        }
+    });
+
+    router.post('/api/rooms/:code/adventure/encounter/resolve', authenticate, (req, res) => {
+        try {
+            const r = room.getRoom(req.params.code);
+            const { outcome, notes } = req.body;
+            const state = adventure.resolveEncounter(r, { outcome, notes });
+            const roomCode = req.params.code.toUpperCase();
+            room.broadcastToRoom(roomCode, 'encounter-resolved', { source: 'api', ...state });
+            res.json({ success: true, code: roomCode, ...state });
+        } catch (err) {
+            res.status(400).json({ error: err.message });
+        }
+    });
+
+    // Tick a timer -- either the CURRENT SCENE's own timers (default) or
+    // the module's campaignTimers[]. `ref` accepts a numeric index or a
+    // name string; directly supports outcome text like "Tick Village
+    // Safety +1" being turned into a real state change.
+    router.post('/api/rooms/:code/adventure/timer', authenticate, (req, res) => {
+        try {
+            const r = room.getRoom(req.params.code);
+            const { scope, ref, name, amount } = req.body;
+            if (ref === undefined && !name) return res.status(400).json({ error: 'ref (or name) is required' });
+            const state = adventure.tickTimer(r, { scope, ref, name, amount });
+            const roomCode = req.params.code.toUpperCase();
+            room.broadcastToRoom(roomCode, 'timer-ticked', { source: 'api', ...state });
+            res.json({ success: true, code: roomCode, ...state });
+        } catch (err) {
+            res.status(400).json({ error: err.message });
+        }
+    });
+
+    router.post('/api/rooms/:code/adventure/log', authenticate, (req, res) => {
+        try {
+            const r = room.getRoom(req.params.code);
+            const { text, author } = req.body;
+            const state = adventure.logBeat(r, { text, author });
+            const roomCode = req.params.code.toUpperCase();
+            room.broadcastToRoom(roomCode, 'adventure-log', { source: 'api', ...state });
+            res.json({ success: true, code: roomCode, ...state });
+        } catch (err) {
+            res.status(400).json({ error: err.message });
+        }
+    });
+
     // ─── FULL CHARACTER STORAGE ──────────────────────────────────────
 
     // Helper to ensure room.characters exists (object keyed by character name)
@@ -595,7 +732,7 @@ function createApiRouter(appConfig) {
     router.get('/api/data/docs', (req, res) => {
         res.json({
             title: "Fate's Edge API Documentation",
-            version: "8.0.0",
+            version: "9.0.0",
             endpoints: {
                 health: { get: `GET ${config.healthEndpoint} - Server health check with stats` },
                 rooms: { get: 'GET /api/rooms - List all rooms with stats' },
@@ -617,6 +754,17 @@ function createApiRouter(appConfig) {
                     list: 'GET /api/modules - List available modules',
                     push: 'POST /api/modules/:id/push - Push module to clients',
                     cleanup: 'POST /api/modules/:id/cleanup - Clean up module from clients'
+                },
+                adventure: {
+                    get: 'GET /api/rooms/:code/adventure - Get current adventure state (module, act, scene, active encounter, campaign timers, recent log)',
+                    reference: 'GET /api/rooms/:code/adventure/reference - Get bestiary/npcs/locations/factions/notes for the loaded adventure',
+                    load: 'POST /api/rooms/:code/adventure/load - Load an adventure module ({ moduleId }); modules need "type": "adventure" in manifest.json plus an adventure.json',
+                    reset: 'POST /api/rooms/:code/adventure/reset - Reset the loaded adventure back to planned (position, completed flags, timers)',
+                    scene: 'POST /api/rooms/:code/adventure/scene - Advance the adventure ({ actIndex?, sceneIndex? } both optional; omit both to advance sequentially)',
+                    encounterStart: "POST /api/rooms/:code/adventure/encounter/start - Start an encounter ({ ref } by index or name/creatureId in the current scene, OR { encounter } as a full ad-hoc object for an improvised fight)",
+                    encounterResolve: 'POST /api/rooms/:code/adventure/encounter/resolve - Resolve the active encounter ({ outcome: "clean"|"partial"|"miss", notes? })',
+                    timer: 'POST /api/rooms/:code/adventure/timer - Tick a timer ({ scope: "scene"|"campaign", ref (index or name), amount? } amount defaults to +1, can be negative)',
+                    log: 'POST /api/rooms/:code/adventure/log - Append a free-form narrative beat to the adventure log ({ text, author? })'
                 },
                 characters: {
                     get: 'GET /api/rooms/:code/characters/:name - Get full character object',

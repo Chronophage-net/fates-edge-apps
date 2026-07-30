@@ -43,7 +43,23 @@
  *    here or require the server model to change shape — worth a
  *    deliberate choice rather than picked silently. The log beat is a
  *    safe, information-only middle ground until that's decided.
+ *
+ * 4. Timer triggers: data-driven actions on timer completion.
+ *    - notify: show toast and log
+ *    - completeScene: mark a scene (by index within current act) completed
+ *    - advanceScene: move currentScene to a given index
+ *    - setEncounterPosition: change an encounter's position field
+ *    Extensible; see executeTimerTriggers().
+ *
+ * 5. Global timer sync: when an adventure starts, campaign timers are
+ *    mirrored into state.timers (with timerIds stored on the adventure)
+ *    so the GM Tools' auto-tick feature can tick them. Timers are kept
+ *    in sync on advanceTimer/reset.
+ *
  * ────────────────────────────────────────────────────────────────────────
+ * v3 – Role-based gating: non‑GM players can view adventures but cannot
+ *      create, edit, delete, import/export, start/reset, or control
+ *      timers/encounters/scenes.
  */
 
 import { getState, saveState } from '../../core/state.js';
@@ -52,6 +68,8 @@ import { escHtml, safeParseInt } from '../../core/utils.js';
 import { logToSession, addVTTEvent } from '../gm-tools/index.js';
 import { isConnectedToServer, sendEvent } from '../../core/websocket.js';
 import { loadBestiaryData, getCreatureDescription } from '../encounters/bestiary.js';
+// ─── Role check ──────────────────────────────────────────────
+import { getMyStoredRole } from '../../core/feature-toggles.js';
 
 // ============================================================
 // CONSTANTS
@@ -69,6 +87,13 @@ let adventures = [];
 let activeAdventureId = null;
 let adventureViewMode = 'list'; // 'list' | 'detail' | 'create'
 let isDestroyed = false;
+
+// ─── Helper to check if current user is GM ──────────────────────────
+
+function isGM() {
+    if (!isConnectedToServer()) return true; // solo/local – allow all
+    return getMyStoredRole() === 'gm';
+}
 
 // ============================================================
 // GM SESSION LOG + LIVE SCENE STATUS BROADCAST
@@ -103,19 +128,107 @@ function broadcastSceneStatus(adventure) {
     } catch (e) { /* ignore */ }
 }
 
-// NEW: mirrors broadcastSceneStatus()'s exact defensive style: silently a
-// no-op when not connected, and never throws into the caller. Sends the
-// same 'adventure-timer' shape server/adventure.js's tickTimer() expects
-// -- if a matching adventure was ALSO loaded server-side (via
-// POST /api/rooms/:code/adventure/load or the equivalent WS command),
-// this keeps both copies in sync exactly. If nothing is loaded
-// server-side, the server just replies with an error the client already
-// ignores here, same as broadcastSceneStatus() does for its own event.
 function broadcastTimerTick(timerName, scope, ref, amount) {
     if (!isConnectedToServer()) return;
     try {
         sendEvent({ type: 'adventure-timer', scope, ref, name: timerName, amount });
     } catch (e) { /* ignore */ }
+}
+
+// ============================================================
+// TIMER TRIGGER EXECUTION (NEW)
+// ============================================================
+
+function executeTimerTriggers(adventure, timer, scope, ref) {
+    if (!timer.triggers || !Array.isArray(timer.triggers)) return;
+    const triggers = timer.triggers;
+    const actIdx = ref.actIndex !== undefined ? ref.actIndex : null;
+    const sceneIdx = ref.sceneIndex !== undefined ? ref.sceneIndex : null;
+    const timerIdx = ref.timerIndex;
+
+    triggers.forEach(trigger => {
+        const { type } = trigger;
+        switch (type) {
+            case 'notify': {
+                const msg = trigger.message || `Timer "${timer.name}" completed.`;
+                showToast(msg, 'warning');
+                logAdventureEvent(`⏱️ ${msg}`, 'warning', 'timer_trigger_notify', {
+                    timerName: timer.name,
+                    adventureId: adventure.id,
+                    scope
+                });
+                break;
+            }
+            case 'completeScene': {
+                const sceneIndex = trigger.sceneIndex;
+                if (sceneIndex === undefined || sceneIndex === null) {
+                    console.warn('[Adventures] completeScene trigger missing sceneIndex');
+                    return;
+                }
+                const act = adventure.acts?.[adventure.currentAct];
+                if (!act) return;
+                const scene = act.scenes?.[sceneIndex];
+                if (!scene) return;
+                if (!scene.completed) {
+                    scene.completed = true;
+                    logAdventureEvent(`📜 Scene "${scene.title}" auto‑completed by timer "${timer.name}"`, 'info', 'scene_auto_completed', {
+                        adventureId: adventure.id,
+                        sceneIndex,
+                        sceneTitle: scene.title
+                    });
+                }
+                saveAdventuresToState();
+                break;
+            }
+            case 'advanceScene': {
+                const newSceneIdx = trigger.sceneIndex;
+                if (newSceneIdx === undefined || newSceneIdx === null) {
+                    console.warn('[Adventures] advanceScene trigger missing sceneIndex');
+                    return;
+                }
+                const act = adventure.acts?.[adventure.currentAct];
+                if (!act) return;
+                if (newSceneIdx < act.scenes.length) {
+                    adventure.currentScene = newSceneIdx;
+                    logAdventureEvent(`⏩ Advanced to scene "${act.scenes[newSceneIdx].title}" by timer "${timer.name}"`, 'info', 'scene_advanced', {
+                        adventureId: adventure.id,
+                        sceneIndex: newSceneIdx
+                    });
+                    broadcastSceneStatus(adventure);
+                    saveAdventuresToState();
+                } else {
+                    console.warn('[Adventures] advanceScene target index out of range');
+                }
+                break;
+            }
+            case 'setEncounterPosition': {
+                const sceneIndex = trigger.sceneIndex;
+                const encIdx = trigger.encounterIndex;
+                const newPos = trigger.position;
+                if (sceneIndex === undefined || encIdx === undefined || !newPos) {
+                    console.warn('[Adventures] setEncounterPosition missing required params');
+                    return;
+                }
+                const act = adventure.acts?.[adventure.currentAct];
+                if (!act) return;
+                const scene = act.scenes?.[sceneIndex];
+                if (!scene) return;
+                const encounter = scene.encounters?.[encIdx];
+                if (!encounter) return;
+                encounter.position = newPos;
+                logAdventureEvent(`⚔️ Encounter "${encounter.name}" position set to ${newPos} by timer "${timer.name}"`, 'info', 'encounter_position_changed', {
+                    adventureId: adventure.id,
+                    sceneIndex,
+                    encounterIndex: encIdx,
+                    position: newPos
+                });
+                saveAdventuresToState();
+                break;
+            }
+            default:
+                console.warn(`[Adventures] Unknown timer trigger type: ${type}`);
+        }
+    });
 }
 
 // ============================================================
@@ -232,10 +345,10 @@ function repairAdventureIds(adventure) {
     (adventure.locations || []).forEach(loc => {
         if (!loc.id) { loc.id = makeId('loc_'); repaired = true; }
     });
-    // NEW: ensure bestiary entries have ids
     (adventure.bestiary || []).forEach(creature => {
         if (!creature.id) { creature.id = makeId('creature_'); repaired = true; }
     });
+    if (!adventure.timerIds) { adventure.timerIds = []; repaired = true; }
     return repaired;
 }
 
@@ -250,7 +363,6 @@ function loadAdventuresFromState() {
         let anyRepaired = false;
         adventures.forEach(a => {
             if (repairAdventureIds(a)) anyRepaired = true;
-            // Ensure bestiary array exists
             if (!Array.isArray(a.bestiary)) a.bestiary = [];
         });
         if (anyRepaired) {
@@ -283,7 +395,7 @@ async function loadAdventureFromFile(adventureId) {
         `.${ADVENTURES_DATA_PATH}${adventureId}.json`,
     ];
 
-    if (adventureId === 'latern_at_dusk') {
+    if (adventureId === 'lantern_at_dusk') {
         candidates.push(`${ADVENTURES_DATA_PATH}lantern_at_dusk.json`);
         candidates.push(`.${ADVENTURES_DATA_PATH}lantern_at_dusk.json`);
     }
@@ -313,13 +425,13 @@ async function loadAdventureFromFile(adventureId) {
 
             if (!data.id) data.id = adventureId;
 
-            // Normalise
             if (!Array.isArray(data.acts)) data.acts = [];
             data.acts = data.acts.map(act => ({ ...act, scenes: Array.isArray(act.scenes) ? act.scenes : [] }));
             if (!Array.isArray(data.npcs)) data.npcs = [];
             if (!Array.isArray(data.locations)) data.locations = [];
             if (!Array.isArray(data.campaignTimers)) data.campaignTimers = [];
             if (!Array.isArray(data.bestiary)) data.bestiary = [];
+            if (!data.timerIds) data.timerIds = [];
             repairAdventureIds(data);
 
             const existing = adventures.find(a => a.id === data.id);
@@ -368,6 +480,11 @@ async function loadAdventureManifest() {
 // ─── MODAL-BASED ADVENTURE LIBRARY BROWSER ──────────────────────
 
 async function browseAdventureLibrary() {
+    if (!isGM()) {
+        showToast('Only the GM can browse the adventure library.', 'error');
+        return;
+    }
+
     const ids = await loadAdventureManifest();
     if (isDestroyed) return;
 
@@ -503,15 +620,20 @@ function getAdventure(id) {
 }
 
 function getActiveAdventure() {
+    if (adventures.length === 0) loadAdventuresFromState();
     if (!activeAdventureId) return null;
     return getAdventure(activeAdventureId);
 }
 
 // ============================================================
-// ADVENTURE CRUD
+// ADVENTURE CRUD (all guarded by isGM())
 // ============================================================
 
 function createAdventure(data) {
+    if (!isGM()) {
+        showToast('Only the GM can create adventures.', 'error');
+        return null;
+    }
     const acts = Array.isArray(data.acts) ? data.acts.map(act => ({
         ...act,
         scenes: Array.isArray(act.scenes) ? act.scenes : []
@@ -529,7 +651,8 @@ function createAdventure(data) {
         locations: Array.isArray(data.locations) ? data.locations : [],
         factions: Array.isArray(data.factions) ? data.factions : [],
         campaignTimers: Array.isArray(data.campaignTimers) ? data.campaignTimers : [],
-        bestiary: Array.isArray(data.bestiary) ? data.bestiary : [], // NEW
+        bestiary: Array.isArray(data.bestiary) ? data.bestiary : [],
+        timerIds: [],
         notes: data.notes || '',
         currentAct: data.currentAct || 0,
         currentScene: data.currentScene || 0,
@@ -556,6 +679,10 @@ function createAdventure(data) {
 }
 
 function updateAdventure(id, updates) {
+    if (!isGM()) {
+        showToast('Only the GM can update adventures.', 'error');
+        return null;
+    }
     const idx = adventures.findIndex(a => a.id === id);
     if (idx === -1) return null;
     adventures[idx] = { ...adventures[idx], ...updates, updatedAt: new Date().toISOString() };
@@ -564,6 +691,7 @@ function updateAdventure(id, updates) {
 }
 
 function deleteAdventure(id) {
+    if (!isGM()) return false;
     const idx = adventures.findIndex(a => a.id === id);
     if (idx === -1) return false;
     adventures.splice(idx, 1);
@@ -573,6 +701,10 @@ function deleteAdventure(id) {
 }
 
 function duplicateAdventure(id) {
+    if (!isGM()) {
+        showToast('Only the GM can duplicate adventures.', 'error');
+        return null;
+    }
     const original = getAdventure(id);
     if (!original) return null;
     const copy = JSON.parse(JSON.stringify(original));
@@ -583,16 +715,21 @@ function duplicateAdventure(id) {
     copy.completedAt = null;
     copy.createdAt = new Date().toISOString();
     copy.updatedAt = new Date().toISOString();
+    copy.timerIds = [];
     adventures.push(copy);
     saveAdventuresToState();
     return copy;
 }
 
 // ============================================================
-// ADVENTURE PROGRESSION
+// ADVENTURE PROGRESSION & TIMER INTEGRATION (all guarded)
 // ============================================================
 
 function startAdventure(id) {
+    if (!isGM()) {
+        showToast('Only the GM can start an adventure.', 'error');
+        return null;
+    }
     const adventure = getAdventure(id);
     if (!adventure) return null;
     adventure.status = 'active';
@@ -604,6 +741,50 @@ function startAdventure(id) {
     });
     adventure.campaignTimers.forEach(t => t.current = 0);
     saveAdventuresToState();
+
+    const state = getState();
+    if (!state.timers) state.timers = [];
+    const newTimerIds = [];
+    adventure.campaignTimers.forEach((timer, idx) => {
+        const existingGlobalId = adventure.timerIds?.[idx];
+        if (existingGlobalId) {
+            const globalTimer = state.timers.find(gt => gt.id === existingGlobalId);
+            if (globalTimer) {
+                globalTimer.current = timer.current;
+                globalTimer.segments = timer.segments;
+                globalTimer.name = timer.name;
+                globalTimer.description = timer.description || '';
+                newTimerIds.push(existingGlobalId);
+            } else {
+                const newId = makeId('timer_');
+                state.timers.push({
+                    id: newId,
+                    name: timer.name,
+                    segments: timer.segments,
+                    current: timer.current,
+                    description: timer.description || '',
+                    adventureId: adventure.id,
+                    timerIndex: idx
+                });
+                newTimerIds.push(newId);
+            }
+        } else {
+            const newId = makeId('timer_');
+            state.timers.push({
+                id: newId,
+                name: timer.name,
+                segments: timer.segments,
+                current: timer.current,
+                description: timer.description || '',
+                adventureId: adventure.id,
+                timerIndex: idx
+            });
+            newTimerIds.push(newId);
+        }
+    });
+    adventure.timerIds = newTimerIds;
+    saveState();
+
     activeAdventureId = id;
 
     logAdventureEvent(`🎭 Adventure started: ${adventure.title}`, 'warning', 'adventure_started', {
@@ -615,6 +796,11 @@ function startAdventure(id) {
 }
 
 function completeScene(adventureId, actIndex, sceneIndex) {
+    if (!isGM()) {
+        showToast('Only the GM can complete scenes.', 'error');
+        return null;
+    }
+    if (adventures.length === 0) loadAdventuresFromState();
     const adventure = getAdventure(adventureId);
     if (!adventure) return null;
     const act = adventure.acts[actIndex];
@@ -652,6 +838,10 @@ function completeScene(adventureId, actIndex, sceneIndex) {
 }
 
 function advanceTimer(adventureId, timerIndex, amount = 1) {
+    if (!isGM()) {
+        showToast('Only the GM can advance adventure timers.', 'error');
+        return null;
+    }
     const adventure = getAdventure(adventureId);
     if (!adventure) return null;
     const timer = adventure.campaignTimers[timerIndex];
@@ -659,25 +849,35 @@ function advanceTimer(adventureId, timerIndex, amount = 1) {
     const wasComplete = timer.current >= timer.segments;
     timer.current = Math.min(timer.current + amount, timer.segments);
     saveAdventuresToState();
+
+    const globalId = adventure.timerIds?.[timerIndex];
+    if (globalId) {
+        const state = getState();
+        const globalTimer = state.timers.find(t => t.id === globalId);
+        if (globalTimer) {
+            globalTimer.current = timer.current;
+            saveState();
+        }
+    }
+
     if (timer.current >= timer.segments && !wasComplete) {
         showToast(`⏱️ Adventure Timer "${timer.name}" completed!`, 'warning');
         logAdventureEvent(`⏱️ Adventure Timer "${timer.name}" completed (${adventure.title})`, 'warning', 'adventure_timer_completed', {
             adventureId: adventure.id, timerName: timer.name
         });
+        executeTimerTriggers(adventure, timer, 'campaign', { timerIndex });
+        saveAdventuresToState();
     }
+
     broadcastTimerTick(timer.name, 'campaign', timerIndex, amount);
     return adventure;
 }
 
-// NEW: scene-local timer ticking. Mirrors advanceTimer()'s shape and
-// behavior exactly, just scoped to one scene's own timers[] instead of
-// the adventure's campaignTimers[]. Only meaningful for the CURRENTLY
-// ACTIVE scene if you want this to stay in sync with a server-loaded
-// copy of the same adventure -- server/adventure.js's tickTimer() only
-// ever operates on whatever scene IT currently considers active, so the
-// UI only exposes the +1 button on the current scene's timers (see
-// buildAdventureDetailHtml below).
 function advanceSceneTimer(adventureId, actIndex, sceneIndex, timerIndex, amount = 1) {
+    if (!isGM()) {
+        showToast('Only the GM can advance scene timers.', 'error');
+        return null;
+    }
     const adventure = getAdventure(adventureId);
     if (!adventure) return null;
     const scene = adventure.acts?.[actIndex]?.scenes?.[sceneIndex];
@@ -692,12 +892,18 @@ function advanceSceneTimer(adventureId, actIndex, sceneIndex, timerIndex, amount
         logAdventureEvent(`⏱️ Scene Timer "${timer.name}" completed (${adventure.title} — ${scene.title})`, 'warning', 'adventure_scene_timer_completed', {
             adventureId: adventure.id, actIndex, sceneIndex, timerName: timer.name
         });
+        executeTimerTriggers(adventure, timer, 'scene', { actIndex, sceneIndex, timerIndex });
+        saveAdventuresToState();
     }
     broadcastTimerTick(timer.name, 'scene', timerIndex, amount);
     return adventure;
 }
 
 function resetAdventure(id) {
+    if (!isGM()) {
+        showToast('Only the GM can reset an adventure.', 'error');
+        return null;
+    }
     const adventure = getAdventure(id);
     if (!adventure) return null;
     adventure.status = 'planned';
@@ -710,6 +916,16 @@ function resetAdventure(id) {
     });
     adventure.campaignTimers.forEach(t => t.current = 0);
     saveAdventuresToState();
+
+    const state = getState();
+    if (state.timers && adventure.timerIds) {
+        adventure.timerIds.forEach(id => {
+            const gt = state.timers.find(t => t.id === id);
+            if (gt) gt.current = 0;
+        });
+        saveState();
+    }
+
     logAdventureEvent(`🔄 Adventure reset: ${adventure.title}`, 'info', 'adventure_reset', { id: adventure.id, title: adventure.title });
     broadcastSceneStatus(null);
     return adventure;
@@ -720,28 +936,21 @@ function resetAdventure(id) {
 // ============================================================
 
 async function resolveCreatureFromAdventure(adventure, ref) {
-    // ref can be an id or a name
     if (!adventure) return null;
     if (!adventure.bestiary) adventure.bestiary = [];
 
-    // Try by id first
     let creature = adventure.bestiary.find(c => c.id === ref);
     if (creature) return creature;
 
-    // Try by name
     creature = adventure.bestiary.find(c => (c.name || '').toLowerCase() === ref.toLowerCase());
     if (creature) return creature;
 
-    // Fallback to global bestiary
     try {
         const globalBestiary = await loadBestiaryData();
         if (Array.isArray(globalBestiary)) {
             let global = globalBestiary.find(c => c.id === ref);
             if (!global) global = globalBestiary.find(c => (c.name || '').toLowerCase() === ref.toLowerCase());
-            if (global) {
-                // Clone it so we don't mutate global
-                return { ...global };
-            }
+            if (global) return { ...global };
         }
     } catch (e) {
         console.warn('[Adventures] Could not load global bestiary for fallback:', e);
@@ -751,10 +960,14 @@ async function resolveCreatureFromAdventure(adventure, ref) {
 }
 
 // ============================================================
-// SCENE ↔ ENCOUNTER BRIDGE (UPDATED)
+// SCENE ↔ ENCOUNTER BRIDGE (UPDATED, guarded)
 // ============================================================
 
 async function startSceneEncounter(adventureId, actIndex, sceneIndex) {
+    if (!isGM()) {
+        showToast('Only the GM can start scene encounters.', 'error');
+        return;
+    }
     const adventure = getAdventure(adventureId);
     if (!adventure) {
         showToast('Adventure not found.', 'error');
@@ -774,13 +987,10 @@ async function startSceneEncounter(adventureId, actIndex, sceneIndex) {
         ? state.encounters.find(e => String(e.id) === String(scene.encounterId))
         : null;
 
-    // Build adversary list from scene.encounters
     const adversaryPromises = (scene.encounters || []).map(async (entry) => {
-        // If entry has creatureId, resolve from bestiary
         if (entry.creatureId) {
             const creature = await resolveCreatureFromAdventure(adventure, entry.creatureId);
             if (creature) {
-                // Build adversary from creature
                 const stats = creature.stats || {};
                 if (!stats.hp && creature.tl) stats.hp = creature.tl * 10 + 10;
                 if (!stats.hp) stats.hp = 20;
@@ -793,7 +1003,6 @@ async function startSceneEncounter(adventureId, actIndex, sceneIndex) {
                     category: creature.category || '',
                     stats: stats,
                     sb_spends: creature.sb_spends || [],
-                    // Preserve scene-specific overrides
                     _sceneDv: entry.dv,
                     _scenePosition: entry.position,
                     _sceneOutcomes: entry.outcomes
@@ -803,7 +1012,6 @@ async function startSceneEncounter(adventureId, actIndex, sceneIndex) {
                 return null;
             }
         } else {
-            // Inline adversary definition (backwards compatible)
             return {
                 name: entry.name || 'Adversary',
                 body: entry.body || '',
@@ -847,15 +1055,10 @@ async function startSceneEncounter(adventureId, actIndex, sceneIndex) {
             name: encounter.title, id: encounter.id, status: encounter.status, fromAdventure: adventure.id
         });
     } else {
-        // Update existing encounter's adversaries if they've changed
-        // (optional: we could merge or replace)
         encounter.adversaries = adversaries;
         saveState();
     }
 
-    // NEW: lightweight, information-only broadcast -- see file header
-    // note on why this doesn't call the server's 'adventure-encounter-start'
-    // command directly.
     if (isConnectedToServer()) {
         try {
             sendEvent({
@@ -885,8 +1088,12 @@ function slugify(text) {
 }
 
 function exportAdventure(id) {
+    if (!isGM()) {
+        showToast('Only the GM can export adventures.', 'error');
+        return;
+    }
     const adventure = getAdventure(id);
-    if (!adventure) return null;
+    if (!adventure) return;
     const data = JSON.stringify(adventure, null, 2);
     const blob = new Blob([data], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
@@ -899,6 +1106,10 @@ function exportAdventure(id) {
 }
 
 async function importAdventureFromFile() {
+    if (!isGM()) {
+        showToast('Only the GM can import adventures.', 'error');
+        return null;
+    }
     return new Promise((resolve) => {
         const input = document.createElement('input');
         input.type = 'file';
@@ -933,6 +1144,7 @@ async function importAdventureFromFile() {
                 if (!Array.isArray(data.locations)) data.locations = [];
                 if (!Array.isArray(data.campaignTimers)) data.campaignTimers = [];
                 if (!Array.isArray(data.bestiary)) data.bestiary = [];
+                if (!data.timerIds) data.timerIds = [];
                 repairAdventureIds(data);
 
                 try {
@@ -968,7 +1180,7 @@ async function importAdventureFromFile() {
 }
 
 // ============================================================
-// CROWN SPREAD → ADVENTURE TEMPLATE
+// CROWN SPREAD → ADVENTURE TEMPLATE (guarded)
 // ============================================================
 
 const CROWN_TEMPLATE_MARKERS = [
@@ -1089,13 +1301,17 @@ function buildAdventureFromCrownSpread({ parsed, title, tier, region, cardNames 
         npcs,
         locations,
         campaignTimers,
-        bestiary: [], // empty; GM can add later
+        bestiary: [],
         notes: notesParts.join('\n\n'),
         status: 'planned'
     };
 }
 
 async function importCrownSpreadAsAdventure() {
+    if (!isGM()) {
+        showToast('Only the GM can import Crown Spread as adventure.', 'error');
+        return null;
+    }
     let decks;
     try {
         decks = await import('../decks/index.js');
@@ -1147,6 +1363,10 @@ async function importCrownSpreadAsAdventure() {
 }
 
 function createAdventureFromCrownSpreadReading({ synthesis, cardNames, region, title, tier } = {}) {
+    if (!isGM()) {
+        showToast('Only the GM can create adventures from Crown Spread.', 'error');
+        return null;
+    }
     if (!synthesis) {
         showToast('No Crown Spread reading to build from.', 'error');
         return null;
@@ -1196,7 +1416,7 @@ function createAdventureFromCrownSpreadReading({ synthesis, cardNames, region, t
 }
 
 // ============================================================
-// RENDER
+// RENDER (with role‑based gating)
 // ============================================================
 
 function render(el) {
@@ -1212,6 +1432,12 @@ function renderView() {
     if (adventureViewMode === 'detail' && activeAdventureId) {
         container.innerHTML = renderAdventureDetail(activeAdventureId);
     } else if (adventureViewMode === 'create') {
+        if (!isGM()) {
+            showToast('Only the GM can create adventures.', 'error');
+            adventureViewMode = 'list';
+            renderView();
+            return;
+        }
         container.innerHTML = renderCreateAdventure();
         attachCreateEvents();
     } else {
@@ -1222,6 +1448,7 @@ function renderView() {
 
 function renderAdventureList() {
     const hasAdventures = adventures.length > 0;
+    const canEdit = isGM();
 
     return `
         <div class="adventures-modern-layout flex flex-col gap-2">
@@ -1231,27 +1458,35 @@ function renderAdventureList() {
             </header>
 
             <div class="flex gap-1 flex-center flex-wrap" style="border-bottom:1px solid var(--border);padding-bottom:0.5rem;">
-                <button class="btn btn-sm btn-gold" id="adv-browse-library-btn">📚 Browse Library</button>
-                <button class="btn btn-sm btn-secondary" id="adv-load-file-btn">📂 Load from File</button>
-                <button class="btn btn-sm btn-primary" id="adv-create-btn">✨ New Adventure</button>
-                <button class="btn btn-sm btn-secondary" id="adv-crown-gen-btn">👑 Import Crown Spread</button>
+                ${canEdit ? `
+                    <button class="btn btn-sm btn-gold" id="adv-browse-library-btn">📚 Browse Library</button>
+                    <button class="btn btn-sm btn-secondary" id="adv-load-file-btn">📂 Load from File</button>
+                    <button class="btn btn-sm btn-primary" id="adv-create-btn">✨ New Adventure</button>
+                    <button class="btn btn-sm btn-secondary" id="adv-crown-gen-btn">👑 Import Crown Spread</button>
+                ` : `
+                    <span style="font-size:0.75rem;color:var(--text3);">🔒 Read‑only – only the GM can manage adventures.</span>
+                `}
                 <button class="btn btn-sm btn-secondary" id="adv-refresh-btn">🔄 Refresh</button>
             </div>
 
             <div class="panel" style="min-height:300px;">
                 ${hasAdventures ? `
                     <div class="flex flex-col gap-1">
-                        ${adventures.map(a => renderAdventureCardSafe(a)).join('')}
+                        ${adventures.map(a => renderAdventureCardSafe(a, canEdit)).join('')}
                     </div>
                 ` : `
                     <div class="text-center" style="padding:2rem 0;">
                         <div style="font-size:3rem;">🎭</div>
                         <p class="text-muted">No adventures loaded yet.</p>
-                        <p class="text-sm text-muted">Click "Browse Library" to pick one from /data/adventures/, "Load from File" to import your own, or create a new one.</p>
-                        <div class="flex gap-1 flex-center mt-1">
-                            <button class="btn btn-sm btn-gold" id="adv-load-file-btn">📂 Load from File</button>
-                            <button class="btn btn-sm btn-secondary" id="adv-crown-gen-btn">👑 Import Crown Spread</button>
-                        </div>
+                        ${canEdit ? `
+                            <p class="text-sm text-muted">Click "Browse Library" to pick one from /data/adventures/, "Load from File" to import your own, or create a new one.</p>
+                            <div class="flex gap-1 flex-center mt-1">
+                                <button class="btn btn-sm btn-gold" id="adv-load-file-btn">📂 Load from File</button>
+                                <button class="btn btn-sm btn-secondary" id="adv-crown-gen-btn">👑 Import Crown Spread</button>
+                            </div>
+                        ` : `
+                            <p class="text-sm text-muted">No adventures available. Only the GM can add them.</p>
+                        `}
                     </div>
                 `}
             </div>
@@ -1265,25 +1500,26 @@ function renderAdventureList() {
     `;
 }
 
-function renderAdventureCardSafe(adventure) {
+function renderAdventureCardSafe(adventure, canEdit) {
     try {
-        return renderAdventureCard(adventure);
+        return renderAdventureCard(adventure, canEdit);
     } catch (e) {
         console.error('[Adventures] Failed to render adventure card:', adventure?.id, e);
+        const deleteBtn = canEdit ? `<button class="btn btn-xs btn-danger" onclick="window.adventureDelete('${adventure?.id}')">🗑️ Remove</button>` : '';
         return `
             <div class="panel" style="padding:0.6rem 0.8rem;border-left:4px solid var(--red);">
                 <div style="font-weight:600;color:var(--red);">⚠️ "${escHtml(adventure?.title || adventure?.id || 'Unknown adventure')}" failed to render</div>
                 <div style="font-size:0.75rem;color:var(--text3);margin:0.2rem 0;">${escHtml(e.message)} — see browser console for details.</div>
                 <div style="display:flex;gap:0.3rem;">
-                    <button class="btn btn-xs btn-secondary" onclick="window.adventureExport('${adventure?.id}')">📤 Export raw data</button>
-                    <button class="btn btn-xs btn-danger" onclick="window.adventureDelete('${adventure?.id}')">🗑️ Remove</button>
+                    ${canEdit ? `<button class="btn btn-xs btn-secondary" onclick="window.adventureExport('${adventure?.id}')">📤 Export raw data</button>` : ''}
+                    ${deleteBtn}
                 </div>
             </div>
         `;
     }
 }
 
-function renderAdventureCard(adventure) {
+function renderAdventureCard(adventure, canEdit) {
     const statusColors = {
         'planned': 'var(--text3)',
         'active': 'var(--gold)',
@@ -1309,6 +1545,8 @@ function renderAdventureCard(adventure) {
     const completedScenes = adventure.acts?.reduce((acc, act) => acc + (act.scenes?.filter(s => s.completed).length || 0), 0) || 0;
     const progress = sceneCount > 0 ? Math.round((completedScenes / sceneCount) * 100) : 0;
 
+    const deleteBtn = canEdit ? `<button class="btn btn-xs btn-ghost" onclick="event.stopPropagation();window.adventureDelete('${adventure.id}')" style="color:var(--red);">✕</button>` : '';
+
     return `
         <div class="panel" style="padding:0.6rem 0.8rem;border-left:4px solid ${statusColors[adventure.status] || 'var(--border)'};cursor:pointer;" data-adv-id="${adventure.id}" onclick="window.adventureOpenDetail('${adventure.id}')">
             <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.3rem;">
@@ -1320,7 +1558,7 @@ function renderAdventureCard(adventure) {
                 <div style="display:flex;align-items:center;gap:0.3rem;flex-wrap:wrap;">
                     <span style="font-size:0.65rem;color:var(--text3);">${actCount} acts · ${sceneCount} scenes</span>
                     <span style="font-size:0.65rem;color:var(--text3);">${progress}% done</span>
-                    <button class="btn btn-xs btn-ghost" onclick="event.stopPropagation();window.adventureDelete('${adventure.id}')" style="color:var(--red);">✕</button>
+                    ${deleteBtn}
                 </div>
             </div>
             ${adventure.description ? `<div style="font-size:0.75rem;color:var(--text2);margin-top:0.1rem;">${escHtml(plainTextPreview(adventure.description))}</div>` : ''}
@@ -1340,6 +1578,7 @@ function renderAdventureCard(adventure) {
 }
 
 function buildAdventureDetailHtml(adventure) {
+    const canEdit = isGM();
     const statusColors = {
         'planned': 'var(--text3)',
         'active': 'var(--gold)',
@@ -1366,6 +1605,7 @@ function buildAdventureDetailHtml(adventure) {
     const progress = sceneCount > 0 ? Math.round((completedScenes / sceneCount) * 100) : 0;
     const isActive = adventure.status === 'active';
 
+    // ─── Timers ────────────────────────────────────────────────────
     const timersHtml = adventure.campaignTimers?.map((t, idx) => `
         <div class="flex gap-1 flex-center" style="margin:0.1rem 0;">
             <span class="flex-1 text-sm">${escHtml(t.name)}</span>
@@ -1374,49 +1614,67 @@ function buildAdventureDetailHtml(adventure) {
                 <div style="width:${(t.current / t.segments) * 100}%;height:100%;background:${(t.current / t.segments) > 0.8 ? 'var(--red)' : 'var(--gold)'};"></div>
             </div>
             <span class="text-xs text-muted">${t.current}/${t.segments}</span>
-            <button class="btn btn-xs btn-primary" onclick="window.adventureAdvanceTimer('${adventure.id}', ${idx})">+1</button>
+            ${canEdit ? `<button class="btn btn-xs btn-primary" onclick="window.adventureAdvanceTimer('${adventure.id}', ${idx})">+1</button>` : ''}
         </div>
     `).join('') || '<span class="text-muted text-sm">No campaign timers.</span>';
 
-    const actsHtml = adventure.acts?.map((act, actIdx) => `
-        <div class="panel" style="background:var(--bg3);border-left:3px solid var(--gold);padding:0.3rem 0.5rem;margin:0.2rem 0;">
-            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;">
-                <span style="font-weight:600;font-size:0.85rem;">${escHtml(act.title)}</span>
-                <span style="font-size:0.65rem;color:var(--text3);">${act.scenes?.length || 0} scenes</span>
-            </div>
-            ${act.description ? `<div style="font-size:0.7rem;">${renderDescriptionHtml(act.description)}</div>` : ''}
-            <div style="margin-top:0.2rem;display:flex;flex-direction:column;gap:0.1rem;padding-left:0.3rem;">
-                ${act.scenes?.map((scene, sceneIdx) => {
-                    const isCurrent = actIdx === adventure.currentAct && sceneIdx === adventure.currentScene;
-                    const isCompleted = scene.completed;
-                    const descId = `scene-desc-${adventure.id}-${actIdx}-${sceneIdx}`;
-                    return `
-                        <div style="display:flex;flex-direction:column;padding:0.1rem 0.2rem;border-radius:4px;${isCurrent ? 'background:var(--bg4);border-left:3px solid var(--gold);' : ''}${isCompleted ? 'opacity:0.6;' : ''}">
-                            <div style="display:flex;justify-content:space-between;align-items:center;">
-                                <div style="display:flex;align-items:center;gap:0.3rem;">
-                                    <span style="font-size:0.8rem;">${isCompleted ? '✅' : isCurrent ? '▶️' : '⏹️'}</span>
-                                    <span style="font-size:0.75rem;${isCurrent ? 'font-weight:600;color:var(--gold);' : ''}">${escHtml(scene.title)}</span>
-                                    ${scene.description ? `<button class="btn btn-xs btn-ghost" onclick="window.adventureToggleSceneDesc('${descId}')" title="Show/hide scene description" style="padding:0 0.3rem;font-size:0.7rem;">📖</button>` : ''}
-                                </div>
-                                <div style="display:flex;gap:0.2rem;align-items:center;">
-                                    ${scene.timers?.map((t, timerIdx) => `
-                                        <span style="font-size:0.55rem;color:var(--text3);display:inline-flex;align-items:center;gap:0.15rem;">
-                                            ${escHtml(t.name)} ${t.current}/${t.segments}
-                                            ${isCurrent ? `<button class="btn btn-xs btn-ghost" style="padding:0 0.2rem;font-size:0.55rem;" onclick="window.adventureAdvanceSceneTimer('${adventure.id}', ${actIdx}, ${sceneIdx}, ${timerIdx})" title="Tick +1">+1</button>` : ''}
-                                        </span>
-                                    `).join('') || ''}
-                                    ${isCurrent ? `<button class="btn btn-xs btn-danger" onclick="window.adventureStartEncounter('${adventure.id}', ${actIdx}, ${sceneIdx})" title="${scene.encounterId ? 'Reopen the Combat Tracker for this scene' : 'Create an Encounter from this scene and open the Combat Tracker'}">⚔️ ${scene.encounterId ? 'Resume' : 'Start'} Encounter</button>` : ''}
-                                    ${!isCompleted && isCurrent ? `<button class="btn btn-xs btn-primary" onclick="window.adventureCompleteScene('${adventure.id}', ${actIdx}, ${sceneIdx})">✓ Complete</button>` : ''}
-                                </div>
-                            </div>
-                            ${scene.description ? `<div id="${descId}" style="display:none;margin:0.2rem 0 0.3rem 1.3rem;font-size:0.75rem;">${renderDescriptionHtml(scene.description)}</div>` : ''}
-                        </div>
-                    `;
-                }).join('')}
-            </div>
-        </div>
-    `).join('') || '<span class="text-muted text-sm">No acts defined.</span>';
+    // ─── Acts & Scenes ────────────────────────────────────────────
+    const actsHtml = adventure.acts?.map((act, actIdx) => {
+        const scenesHtml = act.scenes?.map((scene, sceneIdx) => {
+            const isCurrent = actIdx === adventure.currentAct && sceneIdx === adventure.currentScene;
+            const isCompleted = scene.completed;
+            const descId = `scene-desc-${adventure.id}-${actIdx}-${sceneIdx}`;
 
+            // Scene timer controls – only if current and editable
+            const timerControls = scene.timers?.map((t, timerIdx) => `
+                <span style="font-size:0.55rem;color:var(--text3);display:inline-flex;align-items:center;gap:0.15rem;">
+                    ${escHtml(t.name)} ${t.current}/${t.segments}
+                    ${isCurrent && canEdit ? `<button class="btn btn-xs btn-ghost" style="padding:0 0.2rem;font-size:0.55rem;" onclick="window.adventureAdvanceSceneTimer('${adventure.id}', ${actIdx}, ${sceneIdx}, ${timerIdx})" title="Tick +1">+1</button>` : ''}
+                </span>
+            `).join('') || '';
+
+            const startEncBtn = isCurrent && canEdit
+                ? `<button class="btn btn-xs btn-danger" onclick="window.adventureStartEncounter('${adventure.id}', ${actIdx}, ${sceneIdx})" title="${scene.encounterId ? 'Reopen the Combat Tracker for this scene' : 'Create an Encounter from this scene and open the Combat Tracker'}">⚔️ ${scene.encounterId ? 'Resume' : 'Start'} Encounter</button>`
+                : '';
+
+            const completeBtn = !isCompleted && isCurrent && canEdit
+                ? `<button class="btn btn-xs btn-primary" onclick="window.adventureCompleteScene('${adventure.id}', ${actIdx}, ${sceneIdx})">✓ Complete</button>`
+                : '';
+
+            return `
+                <div style="display:flex;flex-direction:column;padding:0.1rem 0.2rem;border-radius:4px;${isCurrent ? 'background:var(--bg4);border-left:3px solid var(--gold);' : ''}${isCompleted ? 'opacity:0.6;' : ''}">
+                    <div style="display:flex;justify-content:space-between;align-items:center;">
+                        <div style="display:flex;align-items:center;gap:0.3rem;">
+                            <span style="font-size:0.8rem;">${isCompleted ? '✅' : isCurrent ? '▶️' : '⏹️'}</span>
+                            <span style="font-size:0.75rem;${isCurrent ? 'font-weight:600;color:var(--gold);' : ''}">${escHtml(scene.title)}</span>
+                            ${scene.description ? `<button class="btn btn-xs btn-ghost" onclick="window.adventureToggleSceneDesc('${descId}')" title="Show/hide scene description" style="padding:0 0.3rem;font-size:0.7rem;">📖</button>` : ''}
+                        </div>
+                        <div style="display:flex;gap:0.2rem;align-items:center;">
+                            ${timerControls}
+                            ${startEncBtn}
+                            ${completeBtn}
+                        </div>
+                    </div>
+                    ${scene.description ? `<div id="${descId}" style="display:none;margin:0.2rem 0 0.3rem 1.3rem;font-size:0.75rem;">${renderDescriptionHtml(scene.description)}</div>` : ''}
+                </div>
+            `;
+        }).join('') || '<span class="text-muted text-sm">No scenes.</span>';
+
+        return `
+            <div class="panel" style="background:var(--bg3);border-left:3px solid var(--gold);padding:0.3rem 0.5rem;margin:0.2rem 0;">
+                <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;">
+                    <span style="font-weight:600;font-size:0.85rem;">${escHtml(act.title)}</span>
+                    <span style="font-size:0.65rem;color:var(--text3);">${act.scenes?.length || 0} scenes</span>
+                </div>
+                ${act.description ? `<div style="font-size:0.7rem;">${renderDescriptionHtml(act.description)}</div>` : ''}
+                <div style="margin-top:0.2rem;display:flex;flex-direction:column;gap:0.1rem;padding-left:0.3rem;">
+                    ${scenesHtml}
+                </div>
+            </div>
+        `;
+    }).join('') || '<span class="text-muted text-sm">No acts defined.</span>';
+
+    // ─── NPCs ─────────────────────────────────────────────────────
     const npcsHtml = adventure.npcs?.map(npc => `
         <div class="panel" style="background:var(--bg3);padding:0.2rem 0.4rem;margin:0.1rem 0;border-left:2px solid var(--gold);">
             <span style="font-weight:600;font-size:0.8rem;">${escHtml(npc.name)}</span>
@@ -1425,6 +1683,7 @@ function buildAdventureDetailHtml(adventure) {
         </div>
     `).join('') || '<span class="text-muted text-sm">No NPCs.</span>';
 
+    // ─── Locations ────────────────────────────────────────────────
     const locationsHtml = adventure.locations?.map(loc => `
         <div class="panel" style="background:var(--bg3);padding:0.2rem 0.4rem;margin:0.1rem 0;border-left:2px solid var(--blue);">
             <span style="font-weight:600;font-size:0.8rem;">📍 ${escHtml(loc.name)}</span>
@@ -1432,7 +1691,7 @@ function buildAdventureDetailHtml(adventure) {
         </div>
     `).join('') || '<span class="text-muted text-sm">No locations.</span>';
 
-    // ---- NEW: Bestiary panel ----
+    // ─── Bestiary ─────────────────────────────────────────────────
     const bestiaryHtml = (adventure.bestiary || []).map(creature => `
         <div class="panel" style="background:var(--bg3);padding:0.2rem 0.4rem;margin:0.1rem 0;border-left:2px solid var(--red);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;">
             <div>
@@ -1442,11 +1701,26 @@ function buildAdventureDetailHtml(adventure) {
                 ${creature.category ? `<span style="font-size:0.6rem;color:var(--text3);">${escHtml(creature.category)}</span>` : ''}
                 ${creature.description ? `<div style="font-size:0.65rem;color:var(--text2);">${escHtml(creature.description.slice(0,60))}${creature.description.length>60?'…':''}</div>` : ''}
             </div>
-            <div style="display:flex;gap:0.2rem;">
-                <button class="btn btn-xs btn-danger" onclick="window.adventureRemoveBestiaryCreature('${adventure.id}','${creature.id}')">✕</button>
-            </div>
+            ${canEdit ? `<button class="btn btn-xs btn-danger" onclick="window.adventureRemoveBestiaryCreature('${adventure.id}','${creature.id}')">✕</button>` : ''}
         </div>
     `).join('') || '<span class="text-muted text-sm">No creatures in adventure bestiary. Add some to use in encounters.</span>';
+
+    // ─── Notes ────────────────────────────────────────────────────
+    const notesEditor = canEdit
+        ? `<textarea id="adv-notes" rows="3" style="width:100%;font-size:0.75rem;background:var(--bg3);color:var(--text);border:1px solid var(--border);border-radius:var(--radius);padding:0.3rem;">${escHtml(adventure.notes || '')}</textarea>
+           <button class="btn btn-xs btn-primary mt-1" onclick="window.adventureSaveNotes('${adventure.id}')">💾 Save Notes</button>`
+        : `<div style="font-size:0.75rem;color:var(--text2);white-space:pre-wrap;">${escHtml(adventure.notes || '')}</div>`;
+
+    // ─── Action buttons ───────────────────────────────────────────
+    const actionButtons = canEdit ? `
+        ${!isActive && adventure.status !== 'completed' ? `<button class="btn btn-sm btn-gold" onclick="window.adventureStart('${adventure.id}')">▶️ Start</button>` : ''}
+        ${isActive ? `<button class="btn btn-sm btn-secondary" onclick="window.adventureReset('${adventure.id}')">🔄 Reset</button>` : ''}
+        <button class="btn btn-sm btn-secondary" onclick="window.adventureExport('${adventure.id}')">📤 Export</button>
+        <button class="btn btn-sm btn-secondary" onclick="window.adventureDuplicate('${adventure.id}')">📋 Duplicate</button>
+        <button class="btn btn-sm btn-danger" onclick="window.adventureDelete('${adventure.id}')">🗑️ Delete</button>
+    ` : `
+        <span style="font-size:0.75rem;color:var(--text3);">🔒 Read‑only – only the GM can manage this adventure.</span>
+    `;
 
     return `
         <div class="adventure-detail flex flex-col gap-2">
@@ -1458,11 +1732,7 @@ function buildAdventureDetailHtml(adventure) {
                     <span style="font-size:0.6rem;padding:0.05rem 0.4rem;border-radius:8px;background:${statusColors[adventure.status]}33;border:1px solid ${statusColors[adventure.status]};color:${statusColors[adventure.status]};">${statusLabels[adventure.status]}</span>
                 </div>
                 <div style="display:flex;gap:0.2rem;flex-wrap:wrap;">
-                    ${!isActive && adventure.status !== 'completed' ? `<button class="btn btn-sm btn-gold" onclick="window.adventureStart('${adventure.id}')">▶️ Start</button>` : ''}
-                    ${isActive ? `<button class="btn btn-sm btn-secondary" onclick="window.adventureReset('${adventure.id}')">🔄 Reset</button>` : ''}
-                    <button class="btn btn-sm btn-secondary" onclick="window.adventureExport('${adventure.id}')">📤 Export</button>
-                    <button class="btn btn-sm btn-secondary" onclick="window.adventureDuplicate('${adventure.id}')">📋 Duplicate</button>
-                    <button class="btn btn-sm btn-danger" onclick="window.adventureDelete('${adventure.id}')">🗑️ Delete</button>
+                    ${actionButtons}
                 </div>
             </div>
 
@@ -1505,13 +1775,12 @@ function buildAdventureDetailHtml(adventure) {
                     <div class="panel">
                         <h4 style="margin:0;font-size:0.9rem;">🐉 Bestiary (Adventure Creatures)</h4>
                         <div style="max-height:200px;overflow-y:auto;margin-bottom:0.3rem;">${bestiaryHtml}</div>
-                        <button class="btn btn-xs btn-secondary" onclick="window.adventureAddBestiaryCreature('${adventure.id}')">+ Add Creature</button>
+                        ${canEdit ? `<button class="btn btn-xs btn-secondary" onclick="window.adventureAddBestiaryCreature('${adventure.id}')">+ Add Creature</button>` : ''}
                     </div>
 
                     <div class="panel">
                         <h4 style="margin:0;font-size:0.9rem;">📝 Notes</h4>
-                        <textarea id="adv-notes" rows="3" style="width:100%;font-size:0.75rem;background:var(--bg3);color:var(--text);border:1px solid var(--border);border-radius:var(--radius);padding:0.3rem;">${escHtml(adventure.notes || '')}</textarea>
-                        <button class="btn btn-xs btn-primary mt-1" onclick="window.adventureSaveNotes('${adventure.id}')">💾 Save Notes</button>
+                        ${notesEditor}
                     </div>
                 </div>
             </div>
@@ -1528,6 +1797,7 @@ function renderAdventureDetail(adventureId) {
         return buildAdventureDetailHtml(adventure);
     } catch (e) {
         console.error('[Adventures] Failed to render adventure detail:', adventureId, e);
+        const canEdit = isGM();
         return `
             <div class="panel">
                 <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.5rem;">
@@ -1536,8 +1806,8 @@ function renderAdventureDetail(adventureId) {
                 <p style="color:var(--red);font-weight:600;">⚠️ This adventure failed to render: ${escHtml(e.message)}</p>
                 <p class="text-muted" style="font-size:0.75rem;">Check the browser console for the full error. The underlying data is still there — Export to inspect the raw JSON, or Delete to remove it.</p>
                 <div style="display:flex;gap:0.5rem;">
-                    <button class="btn btn-sm btn-secondary" onclick="window.adventureExport('${adventureId}')">📤 Export</button>
-                    <button class="btn btn-sm btn-danger" onclick="window.adventureDelete('${adventureId}')">🗑️ Delete</button>
+                    ${canEdit ? `<button class="btn btn-sm btn-secondary" onclick="window.adventureExport('${adventureId}')">📤 Export</button>` : ''}
+                    ${canEdit ? `<button class="btn btn-sm btn-danger" onclick="window.adventureDelete('${adventureId}')">🗑️ Delete</button>` : ''}
                 </div>
             </div>
         `;
@@ -1545,6 +1815,7 @@ function renderAdventureDetail(adventureId) {
 }
 
 function renderCreateAdventure() {
+    // This is only called when isGM() returns true (see renderView guard)
     return `
         <div class="adventure-create flex flex-col gap-2">
             <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.3rem;border-bottom:2px solid var(--border);padding-bottom:0.3rem;">
@@ -1619,17 +1890,18 @@ function renderCreateAdventure() {
 }
 
 // ============================================================
-// EVENT ATTACHMENT
+// EVENT ATTACHMENT (only for GM actions; refresh still works for everyone)
 // ============================================================
 
 function attachEvents() {
+    const canEdit = isGM();
     const browseBtn = document.getElementById('adv-browse-library-btn');
-    if (browseBtn) {
+    if (browseBtn && canEdit) {
         browseBtn.addEventListener('click', browseAdventureLibrary);
     }
 
     const loadBtn = document.getElementById('adv-load-file-btn');
-    if (loadBtn) {
+    if (loadBtn && canEdit) {
         loadBtn.addEventListener('click', async () => {
             await importAdventureFromFile();
             if (isDestroyed) return;
@@ -1638,7 +1910,7 @@ function attachEvents() {
     }
 
     const createBtn = document.getElementById('adv-create-btn');
-    if (createBtn) {
+    if (createBtn && canEdit) {
         createBtn.addEventListener('click', () => {
             adventureViewMode = 'create';
             renderView();
@@ -1646,7 +1918,7 @@ function attachEvents() {
     }
 
     const crownBtn = document.getElementById('adv-crown-gen-btn');
-    if (crownBtn) {
+    if (crownBtn && canEdit) {
         crownBtn.addEventListener('click', async () => {
             const result = await importCrownSpreadAsAdventure();
             if (isDestroyed) return;
@@ -1667,6 +1939,7 @@ function attachEvents() {
 }
 
 function attachCreateEvents() {
+    // All these buttons are only present when canEdit is true, so no extra guards needed
     const addActBtn = document.getElementById('adv-add-act-btn');
     if (addActBtn) {
         addActBtn.addEventListener('click', () => {
@@ -1774,7 +2047,6 @@ function attachCreateEvents() {
         });
     }
 
-    // ---- NEW: Bestiary creation ----
     const addBestiaryBtn = document.getElementById('adv-add-bestiary-btn');
     if (addBestiaryBtn) {
         addBestiaryBtn.addEventListener('click', () => {
@@ -1874,7 +2146,6 @@ function attachCreateEvents() {
                 }
             });
 
-            // ---- NEW: bestiary ----
             const bestiary = [];
             document.querySelectorAll('.adv-bestiary-row').forEach(row => {
                 const name = row.querySelector('.adv-bestiary-name')?.value.trim();
@@ -1918,7 +2189,7 @@ function attachCreateEvents() {
 }
 
 // ============================================================
-// WINDOW EXPOSURES (updated with bestiary functions)
+// WINDOW EXPOSURES (all functions now check isGM() internally)
 // ============================================================
 
 window.adventureBackToList = function() {
@@ -1933,6 +2204,10 @@ window.adventureOpenDetail = function(id) {
 };
 
 window.adventureDelete = function(id) {
+    if (!isGM()) {
+        showToast('Only the GM can delete adventures.', 'error');
+        return;
+    }
     const adventure = getAdventure(id);
     if (!adventure) return;
     if (!confirm(`Delete "${adventure.title}"?`)) return;
@@ -1950,6 +2225,10 @@ window.adventureStart = function(id) {
 };
 
 window.adventureReset = function(id) {
+    if (!isGM()) {
+        showToast('Only the GM can reset adventures.', 'error');
+        return;
+    }
     if (!confirm(`Reset "${getAdventure(id)?.title}" to planned?`)) return;
     const result = resetAdventure(id);
     if (result) {
@@ -1982,7 +2261,6 @@ window.adventureAdvanceTimer = function(id, idx) {
     }
 };
 
-// NEW: window exposure for scene-local timer ticking.
 window.adventureAdvanceSceneTimer = function(id, actIdx, sceneIdx, timerIdx, amount = 1) {
     const result = advanceSceneTimer(id, actIdx, sceneIdx, timerIdx, amount);
     if (result) renderView();
@@ -2001,6 +2279,10 @@ window.adventureDuplicate = function(id) {
 };
 
 window.adventureSaveNotes = function(id) {
+    if (!isGM()) {
+        showToast('Only the GM can save notes.', 'error');
+        return;
+    }
     const notes = document.getElementById('adv-notes')?.value;
     if (notes !== undefined) {
         updateAdventure(id, { notes });
@@ -2008,8 +2290,11 @@ window.adventureSaveNotes = function(id) {
     }
 };
 
-// ---- NEW: Bestiary management ----
 window.adventureAddBestiaryCreature = function(adventureId) {
+    if (!isGM()) {
+        showToast('Only the GM can add creatures.', 'error');
+        return;
+    }
     const adventure = getAdventure(adventureId);
     if (!adventure) {
         showToast('Adventure not found.', 'error');
@@ -2037,6 +2322,10 @@ window.adventureAddBestiaryCreature = function(adventureId) {
 };
 
 window.adventureRemoveBestiaryCreature = function(adventureId, creatureId) {
+    if (!isGM()) {
+        showToast('Only the GM can remove creatures.', 'error');
+        return;
+    }
     const adventure = getAdventure(adventureId);
     if (!adventure) return;
     if (!adventure.bestiary) return;

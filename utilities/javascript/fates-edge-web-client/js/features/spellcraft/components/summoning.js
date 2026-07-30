@@ -853,7 +853,7 @@ window.summonerBindFromBestiaryWithCost = async function(bestiaryId, cost) {
         char.boons = boons - 1;
     } else if (cost === 'fatigue') {
         const fatigue = char.fatigue || 0;
-        const maxFatigue = char.body || 1;
+        const maxFatigue = char.attributes?.body || 1;
         if (fatigue >= maxFatigue) {
             showToast('Fatigue track is full!', 'error');
             return;
@@ -919,7 +919,7 @@ window.summonerBindRitualFromSelect = function() {
         char.boons = boons - 1;
     } else if (cost === 'fatigue') {
         const fatigue = char.fatigue || 0;
-        const maxFatigue = char.body || 1;
+        const maxFatigue = char.attributes?.body || 1;
         if (fatigue >= maxFatigue) { showToast('Fatigue track full!', 'error'); return; }
         char.fatigue = fatigue + 1;
     }
@@ -986,7 +986,7 @@ window.summonerNegotiateFromSelect = function() {
         accepted = true;
     } else if (offer === 'fatigue') {
         const fatigue = char.fatigue || 0;
-        const maxFatigue = char.body || 1;
+        const maxFatigue = char.attributes?.body || 1;
         if (fatigue >= maxFatigue) { showToast('Fatigue track full!', 'error'); return; }
         char.fatigue = fatigue + 1;
         accepted = true;

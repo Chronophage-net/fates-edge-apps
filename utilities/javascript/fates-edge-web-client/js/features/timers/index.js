@@ -3,12 +3,16 @@
  * FIXED: Modal is always rebuilt from scratch before editing.
  * FIXED: Explicit fallbacks for missing elements.
  * FIXED: Debug logging to help trace issues.
+ * v2 – Role‑based gating: non‑GM cannot create, edit, or delete timers.
  */
 
 import { getState, addTimer, deleteTimer, updateTimer, saveState } from '../../core/state.js';
 import { createTimerWidget } from '../../components/TimerWidget.js';
 import { escHtml, safeParseInt, generateId } from '../../core/utils.js';
 import { showToast } from '../../components/Toast.js';
+// ─── Role check ──────────────────────────────────────────────
+import { getMyStoredRole } from '../../core/feature-toggles.js';
+import { isConnectedToServer } from '../../core/websocket.js';
 
 let container = null;
 let editingTimerId = null;
@@ -161,17 +165,25 @@ function closeModal() {
     editingTimerId = null;
 }
 
+// ─── Helper to check if current user is GM ──────────────────────────
+function isGM() {
+    if (!isConnectedToServer()) return true; // solo/local – allow all
+    return getMyStoredRole() === 'gm';
+}
+
 // ─── Render ────────────────────────────────────────────────────────────
 
 export function render(el) {
     container = el;
+    const canEdit = isGM();
+
     container.innerHTML = `
         <div class="flex-between" style="flex-wrap:wrap;gap:0.5rem;">
             <div>
                 <h1 class="page-title">⏱️ Timers</h1>
                 <p class="page-sub">Track scene pressure and faction clocks.</p>
             </div>
-            <button class="btn btn-gold" id="add-timer-btn">+ New Timer</button>
+            ${canEdit ? `<button class="btn btn-gold" id="add-timer-btn">+ New Timer</button>` : ''}
         </div>
         <div class="panel" id="timer-list-container">
             <div id="timer-list"></div>
@@ -187,13 +199,14 @@ function renderTimers() {
     if (!el) return;
     const state = getState();
     const timers = state.timers || [];
+    const canEdit = isGM();
 
     if (timers.length === 0) {
         el.innerHTML = `
             <div class="empty-state" style="text-align:center;padding:2rem;color:var(--text3);">
                 <div style="font-size:2rem;margin-bottom:0.5rem;">⏱️</div>
                 <div>No timers created.</div>
-                <div style="font-size:0.8rem;margin-top:0.3rem;">Click "New Timer" to start tracking scene pressure.</div>
+                ${canEdit ? `<div style="font-size:0.8rem;margin-top:0.3rem;">Click "New Timer" to start tracking scene pressure.</div>` : ''}
             </div>
         `;
         return;
@@ -214,8 +227,9 @@ function renderTimers() {
         const widget = createTimerWidget(timer, {
             onTick: () => tickTimer(timer.id),
             onReset: () => resetTimer(timer.id),
-            onDelete: () => deleteTimerHandler(timer.id),
-            onEdit: () => openTimerEditor(timer.id)
+            // Only provide edit/delete if GM
+            onEdit: canEdit ? () => openTimerEditor(timer.id) : null,
+            onDelete: canEdit ? () => deleteTimerHandler(timer.id) : null
         }, false);
         el.appendChild(widget);
     });
@@ -246,6 +260,10 @@ function resetTimer(id) {
 }
 
 function deleteTimerHandler(id) {
+    if (!isGM()) {
+        showToast('Only the GM can delete timers.', 'error');
+        return;
+    }
     if (!confirm('Delete this timer?')) return;
     deleteTimer(id);
     renderTimers();
@@ -255,6 +273,11 @@ function deleteTimerHandler(id) {
 // ─── Editor ────────────────────────────────────────────────────────────
 
 export function openTimerEditor(timerId = null) {
+    if (!isGM()) {
+        showToast('Only the GM can create or edit timers.', 'error');
+        return;
+    }
+
     console.log('[Timers] openTimerEditor called with id:', timerId);
 
     try {
@@ -339,6 +362,11 @@ export function openTimerEditor(timerId = null) {
 }
 
 function onSave() {
+    if (!isGM()) {
+        showToast('Only the GM can save timer changes.', 'error');
+        closeModal();
+        return;
+    }
     try {
         const nameInput = document.getElementById('te-name');
         const segmentsInput = document.getElementById('te-segments');

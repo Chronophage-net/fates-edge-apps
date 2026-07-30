@@ -338,7 +338,7 @@
             <div id="faction-editor-content"></div>
         </div>
     </div>
-
+    
     <div class="modal-overlay" id="licenseModal" role="dialog" aria-modal="true">
         <div class="modal">
             <button class="modal-close" id="licenseModalClose" aria-label="Close">&times;</button>
@@ -349,6 +349,24 @@
 
     <!-- ===== TOAST CONTAINER ===== -->
     <div id="toast-container" role="status" aria-live="polite"></div>
+
+    <!-- ===== X‑CARD FLOATING BUTTON & OVERLAY ===== -->
+    <!-- Floating button (bottom‑right) -->
+    <button id="xcard-toggle" class="xcard-floating-btn" title="X-Card (Ctrl+Shift+X)" aria-label="Toggle X-Card overlay">
+        🛑
+    </button>
+
+    <!-- X-Card overlay (full‑screen pause) -->
+    <div id="xcard-overlay" class="xcard-overlay" style="display:none;" role="dialog" aria-modal="true" aria-label="X-Card Pause">
+        <div class="xcard-content">
+            <div class="xcard-icon">🛑</div>
+            <h1 class="xcard-title">PAUSED</h1>
+            <p class="xcard-message" style="font-size:0.9rem;">X‑Card has been called. Pause the scene and check in with your group.</p>
+            <p style="font-size:0.8rem;color:var(--text3);margin-top:0.2rem;">The X‑Card is a safety tool: any player can call it at any time to stop a scene that is making them uncomfortable. No questions asked.</p>
+            <button class="xcard-resume-btn" id="xcard-resume">Resume Game</button>
+            <div class="xcard-shortcut-hint">Press <kbd>Ctrl+Shift+X</kbd> to close</div>
+        </div>
+    </div>
 
     <!-- Role-based feature access is now handled by js/core/feature-toggles.js
          (self-mirrors current role from 'gmRoleUpdate'/'presenceUpdate' —

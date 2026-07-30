@@ -1,4 +1,3 @@
-// features/decks/index.js
 /**
  * Decks feature - Deck of Consequences and Crown Spread
  * Supports single draw, multiple draw, and Crown Spread (4+1 wildcard).
@@ -43,6 +42,8 @@ import { logRecordingEvent } from '../../core/media.js';
 import { parseRegionDescription } from './region-parser.js';
 // ─── Use shared discovery ────────────────────────────────────
 import { initializeRegions, discoverRegions } from '../../core/discovery.js';
+// ─── Role-based access ──────────────────────────────────────
+import { getFeatureAccess } from '../../core/feature-toggles.js';
 
 // ============================================================
 // CONSTANTS
@@ -430,15 +431,7 @@ async function fetchRegionData(regionName) {
 }
 
 // ============================================================
-// RICH TEXT RENDERING (plain text → nice HTML, composed from
-// sub-components at display time — same approach used in Adventure
-// Manager and the VTT chat, and for the same reason: card flavor text
-// carries inline <em> tags and [Bracket: ...] annotations baked into
-// the region JSON, and region overview fields (tagline, mood, lore...)
-// are plain prose that should be escaped, not trusted as raw HTML.
-// Kept as a local, self-contained copy rather than importing from
-// another feature, matching how this pattern is duplicated elsewhere
-// in the codebase (e.g. combat.js's own ADVERSARY_MOVES).
+// RICH TEXT RENDERING
 // ============================================================
 
 const RICH_TEXT_ALLOWED_TAGS = ['em', 'strong', 'i', 'b'];
@@ -452,10 +445,6 @@ function escHtmlLocal(text) {
         .replace(/'/g, '&#39;');
 }
 
-// Escapes everything EXCEPT the small whitelist of inline tags already
-// used in card flavor text, so a stray "<" in plain prose still gets
-// neutered but an authored "<em>...</em>" renders as emphasis instead
-// of literal "&lt;em&gt;" text.
 function escapeKeepingAllowedTags(text) {
     const stashed = [];
     const tagPattern = new RegExp(`</?(?:${RICH_TEXT_ALLOWED_TAGS.join('|')})>`, 'gi');
@@ -468,8 +457,6 @@ function escapeKeepingAllowedTags(text) {
     return escaped;
 }
 
-// "[Label: detail]" → a small styled chip, instead of literal square
-// brackets sitting in the middle of a sentence.
 function renderBracketChips(html) {
     return html.replace(/\[([A-Za-z][A-Za-z ]{0,20}):\s*([^\]]+)\]/g, (match, label, detail) => `
         <span style="display:inline-block;margin:0.15rem 0.25rem 0.15rem 0;padding:0.05rem 0.5rem;background:var(--bg4);border-radius:10px;border-left:2px solid var(--gold);font-size:0.85em;">
@@ -478,22 +465,15 @@ function renderBracketChips(html) {
     `);
 }
 
-// "**bold**" (used by Ace Effect text) → real <strong>.
 function renderMarkdownBold(html) {
     return html.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
 }
 
-// Formats a single card-meaning string (region flavor + inline <em> +
-// [Bracket] annotations) into nicely structured HTML.
 function renderCardText(text) {
     if (!text) return '';
     return renderBracketChips(renderMarkdownBold(escapeKeepingAllowedTags(text)));
 }
 
-// Formats a full synthesis string — one or more \n\n-separated entries
-// (a multi-card draw, or a Crown Spread's Root/Crest/Crown/Left/
-// Wildcard/Timer/Ace-Effect segments) — as separate styled paragraphs
-// instead of one dense blob that only visually breaks on raw newlines.
 function renderSynthesisHtml(text) {
     if (!text) return '';
     const paragraphs = String(text).split(/\n\s*\n/).map(p => p.trim()).filter(Boolean);
@@ -614,13 +594,11 @@ function getCardMeaningFromRegion(suit, rank, regionData) {
     const tierInfo = RANK_TIERS[rank] || { tier: 'Minor', segments: 4 };
 
     if (!obj || !obj[rank]) {
-        // Rich fallback based on suit and rank tier
         const tier = tierInfo.tier;
         const segments = tierInfo.segments;
         return `${rankName} of ${suitName} (${archetype.label} – ${tier}): A ${archetype.label.toLowerCase()} arises. ${archetype.desc}. This card suggests a ${tier.toLowerCase()} influence (${segments}-segment clock if this is the highest card).`;
     }
 
-    // If we have a specific meaning, prepend a short context
     const specific = obj[rank];
     const tier = tierInfo.tier;
     const segments = tierInfo.segments;
@@ -915,7 +893,7 @@ async function handleRegionChange() {
 }
 
 // ============================================================
-// RENDER
+// RENDER (with role‑based access control)
 // ============================================================
 
 export async function render(el) {
@@ -942,6 +920,57 @@ export async function render(el) {
     const isDeterministic = !!_deckSeedState.seed;
     const regionCount = regionNames.length;
 
+    // ─── Check role permission ─────────────────────────────────
+    const { accessible } = getFeatureAccess('decks');
+
+    // Build the interactive controls only if accessible
+    let controlsHtml = '';
+    if (accessible) {
+        controlsHtml = `
+            <div class="panel">
+                <h3>Draw Type</h3>
+                <div class="deck-controls" style="display:flex;flex-wrap:wrap;gap:0.8rem;align-items:end;">
+                    <div class="field" style="flex:0 0 200px;">
+                        <label>Cost / Draw</label>
+                        <select id="deck-draw-type">
+                            <option value="1">1 SB (1 card)</option>
+                            <option value="2" selected>2 SB (2 cards)</option>
+                            <option value="3">3 SB (3 cards)</option>
+                            <option value="crown">👑 Crown Spread (4+1 wildcard)</option>
+                        </select>
+                    </div>
+                    <button class="btn btn-gold" id="deck-draw-btn">🃏 Draw</button>
+                    <button class="btn" id="deck-reshuffle-btn">↺ Reshuffle</button>
+                    <span class="text-muted" id="deck-cards-remaining">54 cards</span>
+                </div>
+                <div id="spread-type-indicator" style="margin-top:0.4rem;font-size:0.85rem;color:var(--text2);">
+                    <span id="spread-description">Single draw: one consequence</span>
+                </div>
+            </div>
+
+            <div class="panel" id="consequence-display">
+                <h3 id="consequence-title">Cards Drawn</h3>
+                <div id="crown-spread-cards" style="margin:0.8rem 0;display:none;"></div>
+                <div class="card-grid" id="drawn-cards" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:0.8rem;margin:0.8rem 0;"></div>
+                <div id="consequence-synthesis" class="consequence-synthesis" style="background:var(--bg3);border-left:4px solid var(--gold);padding:0.8rem 1rem;border-radius:var(--radius);margin-top:0.8rem;font-style:italic;white-space:pre-wrap;">
+                    Draw cards to see a complication.
+                </div>
+                <div id="crown-spread-details" style="margin-top:0.8rem;display:none;"></div>
+                <div id="timer-result" style="margin-top:0.8rem;display:none;background:var(--bg3);padding:0.5rem 1rem;border-radius:var(--radius);border-left:4px solid var(--accent);"></div>
+            </div>
+        `;
+    } else {
+        controlsHtml = `
+            <div class="panel" style="background:var(--bg2);border:2px dashed var(--border);text-align:center;padding:1.5rem;">
+                <div style="font-size:2rem;">🔒</div>
+                <h3 style="color:var(--text2);">Deck is GM‑only</h3>
+                <p style="color:var(--text3);">Only the Game Master can draw cards in a connected session.</p>
+                <p style="font-size:0.8rem;color:var(--text3);">You can still browse regions and view the history.</p>
+            </div>
+        `;
+    }
+
+    // Assemble the full UI
     container.innerHTML = `
         <div class="decks-header">
             <h1 class="page-title">🃏 Deck of Consequences</h1>
@@ -977,42 +1006,12 @@ export async function render(el) {
             </div>
         </div>
 
-        <div class="panel">
-            <h3>Draw Type</h3>
-            <div class="deck-controls" style="display:flex;flex-wrap:wrap;gap:0.8rem;align-items:end;">
-                <div class="field" style="flex:0 0 200px;">
-                    <label>Cost / Draw</label>
-                    <select id="deck-draw-type">
-                        <option value="1">1 SB (1 card)</option>
-                        <option value="2" selected>2 SB (2 cards)</option>
-                        <option value="3">3 SB (3 cards)</option>
-                        <option value="crown">👑 Crown Spread (4+1 wildcard)</option>
-                    </select>
-                </div>
-                <button class="btn btn-gold" id="deck-draw-btn">🃏 Draw</button>
-                <button class="btn" id="deck-reshuffle-btn">↺ Reshuffle</button>
-                <span class="text-muted" id="deck-cards-remaining">54 cards</span>
-            </div>
-            <div id="spread-type-indicator" style="margin-top:0.4rem;font-size:0.85rem;color:var(--text2);">
-                <span id="spread-description">Single draw: one consequence</span>
-            </div>
-        </div>
-
-        <div class="panel" id="consequence-display">
-            <h3 id="consequence-title">Cards Drawn</h3>
-            <div id="crown-spread-cards" style="margin:0.8rem 0;display:none;"></div>
-            <div class="card-grid" id="drawn-cards" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:0.8rem;margin:0.8rem 0;"></div>
-            <div id="consequence-synthesis" class="consequence-synthesis" style="background:var(--bg3);border-left:4px solid var(--gold);padding:0.8rem 1rem;border-radius:var(--radius);margin-top:0.8rem;font-style:italic;white-space:pre-wrap;">
-                Draw cards to see a complication.
-            </div>
-            <div id="crown-spread-details" style="margin-top:0.8rem;display:none;"></div>
-            <div id="timer-result" style="margin-top:0.8rem;display:none;background:var(--bg3);padding:0.5rem 1rem;border-radius:var(--radius);border-left:4px solid var(--accent);"></div>
-        </div>
+        ${controlsHtml}
 
         <div class="panel">
             <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;">
                 <h3 style="margin:0;">📜 History</h3>
-                <button class="btn btn-sm" id="deck-history-clear-btn">Clear History</button>
+                ${accessible ? `<button class="btn btn-sm" id="deck-history-clear-btn">Clear History</button>` : ''}
             </div>
             <div class="deck-history" id="deck-history" style="max-height:200px;overflow-y:auto;margin-top:0.5rem;"></div>
         </div>
@@ -1093,7 +1092,7 @@ export async function render(el) {
 }
 
 // ============================================================
-// DECK BUILDING & DRAWING
+// DECK BUILDING & DRAWING (unchanged)
 // ============================================================
 
 function buildDeck() {
@@ -1145,6 +1144,13 @@ function updateSpreadDescription() {
 let lastDrawResults = null;
 
 export async function drawConsequence() {
+    // Extra safety – this should not be called if UI is disabled, but keep it.
+    const { accessible } = getFeatureAccess('decks');
+    if (!accessible) {
+        showToast('Only the GM can draw cards.', 'error');
+        return;
+    }
+
     if (!selectedRegion) {
         showToast('Please select a region first.', 'error');
         return;
@@ -1396,16 +1402,18 @@ function clearDeckHistory() {
     }
 }
 
-// 👇 NEW: expose the local deck-draw history (newest last, matching
-// how it's built above). Used by Adventure Manager's Crown Spread
-// import so it can find a real recent draw — including Crown Spreads
-// (type: 'Crown Spread') — instead of guessing at some other log/chat
-// system that this module never actually writes to.
+// ─── Expose local deck-draw history (newest last) ──────────
 export function getDeckHistory() {
     return deckHistory.slice();
 }
 
 export function resetDeck() {
+    // Prevent non-GM from resetting
+    const { accessible } = getFeatureAccess('decks');
+    if (!accessible) {
+        showToast('Only the GM can reset the deck.', 'error');
+        return;
+    }
     cardOffset = getDeckRandomInt(0, 1000);
     buildDeck();
     const drawnCards = document.getElementById('drawn-cards');
@@ -1482,6 +1490,7 @@ export function destroy() {
 }
 
 export function attachEvents() {
+    // Only attach if the buttons exist (i.e., accessible)
     const drawBtn = document.getElementById('deck-draw-btn');
     if (drawBtn) {
         const newBtn = drawBtn.cloneNode(true);
@@ -1511,6 +1520,13 @@ export function attachEvents() {
 let crownSpreadModal = null;
 
 export function openCrownSpread() {
+    // Only GM can open Crown Spread
+    const { accessible } = getFeatureAccess('decks');
+    if (!accessible) {
+        showToast('Only the GM can open a Crown Spread.', 'error');
+        return;
+    }
+
     if (crownSpreadModal && crownSpreadModal.parentNode) {
         crownSpreadModal.remove();
         crownSpreadModal = null;
@@ -1680,6 +1696,13 @@ export async function onRegionChange(regionNameOrCallback, callback) {
 }
 
 export async function quickDraw(count = 1, regionName = null) {
+    // Quick draw is also GM‑only
+    const { accessible } = getFeatureAccess('decks');
+    if (!accessible) {
+        showToast('Only the GM can draw cards.', 'error');
+        return null;
+    }
+
     if (regionName) await setSelectedRegion(regionName);
     if (!selectedRegion) {
         showToast('Please select a region first.', 'error');
@@ -1730,6 +1753,13 @@ export async function quickDraw(count = 1, regionName = null) {
 }
 
 export async function quickCrownSpread(regionName = null) {
+    // GM‑only
+    const { accessible } = getFeatureAccess('decks');
+    if (!accessible) {
+        showToast('Only the GM can draw a Crown Spread.', 'error');
+        return null;
+    }
+
     if (regionName) await setSelectedRegion(regionName);
     if (!selectedRegion) {
         showToast('Please select a region first.', 'error');

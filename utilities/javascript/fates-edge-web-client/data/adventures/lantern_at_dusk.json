@@ -196,8 +196,40 @@
   ],
   "factions": [],
   "campaignTimers": [
-    { "name": "Barrow Collapse", "segments": 6, "current": 0, "description": "Ticks when the party fails a roll inside. At 6, the entrance seals." },
-    { "name": "Lena's Agenda", "segments": 4, "current": 0, "description": "Ticks at the end of each scene inside the barrow. When it fills, Lena has already taken the lantern." }
+    {
+      "name": "Barrow Collapse",
+      "segments": 6,
+      "current": 0,
+      "description": "Ticks when the party fails a roll inside. At 6, the entrance seals.",
+      "triggers": [
+        {
+          "type": "notify",
+          "message": "The entrance seals! Escape becomes a Desperate group action."
+        },
+        {
+          "type": "setEncounterPosition",
+          "sceneIndex": 3,
+          "encounterIndex": 0,
+          "position": "Desperate"
+        }
+      ]
+    },
+    {
+      "name": "Lena's Agenda",
+      "segments": 4,
+      "current": 0,
+      "description": "Ticks at the end of each scene inside the barrow. When it fills, Lena has already taken the lantern.",
+      "triggers": [
+        {
+          "type": "completeScene",
+          "sceneIndex": 2
+        },
+        {
+          "type": "advanceScene",
+          "sceneIndex": 3
+        }
+      ]
+    }
   ],
   "createdAt": "2026-07-28T00:00:00.000Z",
   "updatedAt": "2026-07-28T00:00:00.000Z"

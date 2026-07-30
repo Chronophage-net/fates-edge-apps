@@ -13,10 +13,15 @@
  *   [Bracket] annotations as region card data) now renders as
  *   structured HTML instead of one escaped run-on line, matching the
  *   treatment already applied to Adventure Manager descriptions.
+ *
+ * NEW: Roll event dispatching – when a roll with outcome "Partial" or
+ * "Miss" appears, dispatch `timer-tick-request`. When a roll has
+ * storyBeats > 0, dispatch `sb-generated`. Uses a processed-ids Set
+ * to avoid duplicate events on re-renders.
  */
 
 import { vttStore } from '../../core/vtt-store.js';
-import { escHtml, getStorage, setHtml, createElement } from '../../core/utils.js';
+import { escHtml, getStorage, setHtml, createElement, sanitizeHtml } from '../../core/utils.js';
 import { isConnectedToServer, getRoomCode, getSocketId, getConnectionMode } from '../../core/websocket.js';
 import { getOutcomeColor, getOutcomeLabel, getOutcomeClass } from '../../core/dice.js';
 
@@ -189,16 +194,36 @@ function renderChatMessageText(rawText) {
             .map(p => `<div style="margin:0.15rem 0;">${p.trim()}</div>`)
             .join('');
 
+    const safeFormatted = sanitizeHtml(formatted);
+
     if (text.length > 220) {
         const toggleId = `chat-msg-full-${++richChatMsgCounter}`;
         return `
             <span class="chat-msg-preview">${escHtml(chatPlainPreview(text))}</span>
             <button class="btn btn-xs btn-ghost chat-msg-expand-btn" data-target="${toggleId}" style="font-size:0.7rem;padding:0.05rem 0.4rem;margin-left:0.3rem;">Show full reading</button>
-            <div id="${toggleId}" class="chat-msg-full" style="display:none;margin-top:0.3rem;">${formatted}</div>
+            <div id="${toggleId}" class="chat-msg-full" style="display:none;margin-top:0.3rem;">${safeFormatted}</div>
         `;
     }
-    return formatted;
+    return safeFormatted;
 }
+
+// ============================================================
+// Roll event dispatching helpers (NEW)
+// ============================================================
+
+// Map outcome labels to machine‑friendly codes
+function getOutcomeCodeFromLabel(label) {
+    const map = {
+        'Clean Success': 'clean',
+        'Success with SB': 'success_sb',
+        'Partial': 'partial',
+        'Miss': 'miss'
+    };
+    return map[label] || 'unknown';
+}
+
+// Keep track of already‑processed roll messages to avoid duplicate events
+const processedRollIds = new Set();
 
 // ============================================================
 // Chat renderer (reactive) – with selected character display
@@ -248,6 +273,42 @@ export function renderChat() {
         const roomCode = isConnected ? getRoomCode() : null;
         const mode = getConnectionMode ? getConnectionMode() : 'websocket';
 
+        // --- Process new roll messages for event dispatching ---
+        for (const msg of allMessages) {
+            if (!msg || !msg.rollData || !msg.id) continue;
+            if (processedRollIds.has(msg.id)) continue;
+
+            const rollData = msg.rollData;
+            const outcomeCode = rollData.outcomeCode || getOutcomeCodeFromLabel(rollData.outcome);
+
+            // Auto‑tick timers on Partial or Miss
+            if (outcomeCode === 'partial' || outcomeCode === 'miss') {
+                document.dispatchEvent(new CustomEvent('timer-tick-request', {
+                    detail: {
+                        amount: 1,
+                        source: 'roll',
+                        rollData: rollData,
+                        messageId: msg.id
+                    }
+                }));
+            }
+
+            // SB generation on any roll with story beats
+            if (rollData.storyBeats && rollData.storyBeats > 0) {
+                document.dispatchEvent(new CustomEvent('sb-generated', {
+                    detail: {
+                        count: rollData.storyBeats,
+                        source: 'roll',
+                        rollData: rollData,
+                        messageId: msg.id
+                    }
+                }));
+            }
+
+            processedRollIds.add(msg.id);
+        }
+
+        // --- Render chat messages ---
         if (!Array.isArray(allMessages) || allMessages.length === 0) {
             setHtml(chatContainer, `
                 <div class="empty-chat-state" style="padding:2rem 1rem;text-align:center;color:var(--text3);">
@@ -636,39 +697,129 @@ export function renderLocalPresence() {
     const presenceList = currentContainer.querySelector('#presence-list');
     if (!presenceList) return;
 
-    if (presenceUnsubscribe) presenceUnsubscribe();
-    presenceUnsubscribe = vttStore.subscribe('presence', (presence) => {
+    // Track both presence and characters
+    let presenceUnsub = null;
+    let charUnsub = null;
+
+    function renderPresence() {
+        const presence = vttStore.state.presence || [];
+        const characters = vttStore.state.characters || [];
         const isConnected = isConnectedToServer();
         const roomCode = isConnected ? getRoomCode() : null;
         const socketId = isConnected ? getSocketId() : null;
-        
+        const showAvatars = getStorage('fates-edge-show-avatars', 'true') !== 'false';
+
         if (!presence || presence.length === 0) {
             setHtml(presenceList, `
-                <div style="color:var(--text3);padding:0.4rem 0;font-size:0.9rem;">
-                    ${isConnected ? '🌐 Connected, no other players' : '📡 Local mode'}
-                    ${roomCode ? ` (${roomCode})` : ''}
-                </div>
+                <details class="vtt-presence-details" style="margin-top:0.2rem;">
+                    <summary style="cursor:pointer;font-weight:600;color:var(--text2);font-size:0.9rem;">👥 Party Members</summary>
+                    <div style="color:var(--text3);padding:0.4rem 0;font-size:0.9rem;">
+                        ${isConnected ? '🌐 Connected, no other players' : '📡 Local mode'}
+                        ${roomCode ? ` (${roomCode})` : ''}
+                    </div>
+                </details>
             `);
             return;
         }
-        const showAvatars = getStorage('fates-edge-show-avatars', 'true') !== 'false';
-        let html = '';
+
+        const myId = socketId;
+        let membersHtml = '';
         for (const p of presence) {
-            const isSelf = p.id === socketId;
+            const isSelf = p.id === myId;
+            const isOnline = p.online !== false;
+            const playerName = p.name || 'Unknown';
+
+            const roleBadge = p.role === 'gm'
+                ? `<span style="font-size:0.55rem;background:var(--gold);color:#1a1400;padding:0.05rem 0.4rem;border-radius:8px;font-weight:600;">GM</span>`
+                : `<span style="font-size:0.55rem;background:var(--bg4);color:var(--text3);padding:0.05rem 0.4rem;border-radius:8px;">Player</span>`;
+
             const avatarUrl = showAvatars
-                ? p.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(p.name)}&size=32&background=2c3e50&color=fff`
+                ? p.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(playerName)}&size=32&background=2c3e50&color=fff`
                 : '';
-            html += `
-                <div class="presence-item" style="display:flex;align-items:center;gap:0.6rem;padding:0.3rem 0;border-bottom:1px solid var(--border);${isSelf ? 'background:var(--bg4);border-radius:6px;padding:0.3rem 0.6rem;' : ''}">
-                    ${showAvatars ? `<img src="${avatarUrl}" alt="${escHtml(p.name)}" style="width:32px;height:32px;border-radius:50%;object-fit:cover;" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2232%22 height=%2232%22 viewBox=%220 0 32 32%22%3E%3Crect fill=%22%232c3e50%22 width=%2232%22 height=%2232%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22 dy=%22.35em%22 fill=%22%23fff%22 font-family=%22Arial%22 font-size=%2214%22%3E${encodeURIComponent(p.name.charAt(0))}%3C/text%3E%3C/svg%3E'" />` : ''}
-                    <span style="font-weight:${isSelf ? '600' : '400'};font-size:0.95rem;">${escHtml(p.name)}${isSelf ? ' (you)' : ''}</span>
-                    <span style="font-size:0.8rem;color:var(--text2);background:var(--bg4);padding:0.05rem 0.5rem;border-radius:12px;">${p.tier ? `Tier ${p.tier}` : 'Player'}</span>
-                    <span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:${p.online !== false ? 'var(--green)' : 'var(--text3)'};margin-left:auto;" title="${p.online !== false ? 'Online' : 'Offline'}"></span>
+
+            let charDisplayHtml = '';
+            if (isSelf) {
+                const currentChar = p.selectedCharacter || '';
+                if (characters.length > 0) {
+                    charDisplayHtml = `
+                        <select class="vtt-char-select" data-client-id="${p.id}" style="font-size:0.75rem;padding:0.05rem 0.3rem;background:var(--bg3);border:1px solid var(--border);border-radius:4px;color:var(--text);max-width:120px;">
+                            <option value="">— Select —</option>
+                            ${characters.map(c => `<option value="${c.name}" ${c.name === currentChar ? 'selected' : ''}>${c.name}</option>`).join('')}
+                        </select>
+                    `;
+                } else {
+                    charDisplayHtml = `
+                        <span style="font-size:0.75rem;color:var(--text3);white-space:nowrap;">No characters</span>
+                        <button class="btn btn-xs btn-primary" onclick="window.location.hash='characters'" style="font-size:0.6rem;padding:0.05rem 0.4rem;white-space:nowrap;">+ Create</button>
+                    `;
+                }
+            } else {
+                charDisplayHtml = p.selectedCharacter
+                    ? `<span style="font-size:0.75rem;color:var(--text2);white-space:nowrap;">🎭 ${escHtml(p.selectedCharacter)}</span>`
+                    : `<span style="font-size:0.75rem;color:var(--text3);white-space:nowrap;">No character selected</span>`;
+            }
+
+            membersHtml += `
+                <div class="presence-item" style="display:flex;align-items:center;gap:0.6rem;padding:0.25rem 0;border-bottom:1px solid var(--border);${isSelf ? 'background:var(--bg4);border-radius:6px;padding:0.25rem 0.6rem;' : ''}">
+                    <span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:${isOnline ? 'var(--green)' : 'var(--text3)'};flex-shrink:0;" title="${isOnline ? 'Online' : 'Offline'}"></span>
+                    ${showAvatars ? `<img src="${avatarUrl}" alt="${escHtml(playerName)}" style="width:28px;height:28px;border-radius:50%;object-fit:cover;flex-shrink:0;" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2232%22 height=%2232%22 viewBox=%220 0 32 32%22%3E%3Crect fill=%22%232c3e50%22 width=%2232%22 height=%2232%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22 dy=%22.35em%22 fill=%22%23fff%22 font-family=%22Arial%22 font-size=%2214%22%3E${encodeURIComponent(playerName.charAt(0))}%3C/text%3E%3C/svg%3E'" />` : ''}
+                    <span style="font-weight:${isSelf ? '600' : '400'};font-size:0.9rem;white-space:nowrap;">${escHtml(playerName)}${isSelf ? ' (you)' : ''}</span>
+                    ${roleBadge}
+                    <span style="flex:1;text-align:right;display:flex;justify-content:flex-end;align-items:center;gap:0.4rem;font-size:0.85rem;">
+                        <span style="color:var(--text3);">Character:</span>
+                        ${charDisplayHtml}
+                    </span>
                 </div>
             `;
         }
+
+        const total = presence.length;
+        const html = `
+            <details class="vtt-presence-details" style="margin-top:0.2rem;" open>
+                <summary style="cursor:pointer;font-weight:600;color:var(--text2);font-size:0.9rem;display:flex;align-items:center;gap:0.5rem;">
+                    👥 Party Members
+                    <span style="font-size:0.65rem;font-weight:400;color:var(--text3);">(${total} online)</span>
+                </summary>
+                <div style="margin-top:0.4rem;">
+                    ${membersHtml}
+                </div>
+            </details>
+        `;
         setHtml(presenceList, html);
-    });
+
+        // Attach change event for dropdowns
+        presenceList.querySelectorAll('.vtt-char-select').forEach(select => {
+            select.removeEventListener('change', handleCharSelect);
+            select.addEventListener('change', handleCharSelect);
+        });
+    }
+
+    // Clean up old subscriptions
+    if (presenceUnsub) presenceUnsub();
+    if (charUnsub) charUnsub();
+
+    // Subscribe to both presence and characters
+    presenceUnsub = vttStore.subscribe('presence', renderPresence);
+    charUnsub = vttStore.subscribe('characters', renderPresence);
+
+    // Initial render
+    renderPresence();
+}
+
+// Separate handler for character selection
+function handleCharSelect(e) {
+    const select = e.target;
+    const clientId = select.dataset.clientId;
+    const selectedChar = select.value;
+    if (window.__vttConnected && window.__vttConnected.sendCharacterSelection) {
+        window.__vttConnected.sendCharacterSelection(selectedChar);
+    } else {
+        import('./vtt-connected.js').then(module => {
+            if (module.sendCharacterSelection) {
+                module.sendCharacterSelection(selectedChar);
+            }
+        });
+    }
 }
 
 // ============================================================

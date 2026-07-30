@@ -1,7 +1,6 @@
 /**
  * Fate's Edge - Socket.io Handlers
- * v4 – Uniform behaviour with plain WebSocket, full whiteboard sync,
- *       and full character storage (r.characters)
+ * v6 – Adventure Engine wired in (see server/adventure.js)
  */
 
 const room = require('./room.js');
@@ -10,6 +9,7 @@ const logger = require('./logger.js').createLogger(process.env.LOG_LEVEL || 'INF
 const fs = require('fs');
 const path = require('path');
 const { buildSafeDict, isSafeModuleId, clampCount } = require('./security.js');
+const adventure = require('./adventure.js');
 
 let socketStats = { socketIOConnections: 0, totalConnections: 0 };
 
@@ -292,6 +292,114 @@ function setupSocketIO(io) {
             r.data.region = region;
             r.lastActivity = Date.now();
             room.broadcastToRoom(socket.room, 'region-updated', { region, clientName: socket.clientData?.name || 'Player' }, socket.id);
+        });
+
+        // ─── Adventure Engine ────────────────────────────────────────
+        // See server/adventure.js. Mirrors the exact room-lookup pattern
+        // already used by set-region above (room.rooms.get(socket.room)).
+        socket.on('adventure-load', (data) => {
+            if (!socket.room) return socket.emit('error', { message: 'Not in a room' });
+            const r = room.rooms.get(socket.room);
+            if (!r) return socket.emit('error', { message: 'Room not found' });
+            try {
+                const state = adventure.loadAdventureModule(r, data?.moduleId);
+                room.broadcastToRoom(socket.room, 'adventure-loaded', state);
+            } catch (error) {
+                socket.emit('error', { message: error.message });
+            }
+        });
+
+        socket.on('adventure-reset', () => {
+            if (!socket.room) return socket.emit('error', { message: 'Not in a room' });
+            const r = room.rooms.get(socket.room);
+            if (!r) return socket.emit('error', { message: 'Room not found' });
+            try {
+                const state = adventure.resetAdventure(r);
+                room.broadcastToRoom(socket.room, 'adventure-reset', state);
+            } catch (error) {
+                socket.emit('error', { message: error.message });
+            }
+        });
+
+        socket.on('adventure-scene', (data) => {
+            if (!socket.room) return socket.emit('error', { message: 'Not in a room' });
+            const r = room.rooms.get(socket.room);
+            if (!r) return socket.emit('error', { message: 'Room not found' });
+            try {
+                const target = {};
+                if (typeof data?.actIndex === 'number') target.actIndex = data.actIndex;
+                if (typeof data?.sceneIndex === 'number') target.sceneIndex = data.sceneIndex;
+                const state = adventure.advanceScene(r, target);
+                room.broadcastToRoom(socket.room, 'scene-changed', state);
+            } catch (error) {
+                socket.emit('error', { message: error.message });
+            }
+        });
+
+        socket.on('adventure-encounter-start', (data) => {
+            if (!socket.room) return socket.emit('error', { message: 'Not in a room' });
+            const r = room.rooms.get(socket.room);
+            if (!r) return socket.emit('error', { message: 'Room not found' });
+            try {
+                const state = adventure.startEncounter(r, data?.ref, data?.encounter || null);
+                room.broadcastToRoom(socket.room, 'encounter-started', state);
+            } catch (error) {
+                socket.emit('error', { message: error.message });
+            }
+        });
+
+        socket.on('adventure-encounter-resolve', (data) => {
+            if (!socket.room) return socket.emit('error', { message: 'Not in a room' });
+            const r = room.rooms.get(socket.room);
+            if (!r) return socket.emit('error', { message: 'Room not found' });
+            try {
+                const state = adventure.resolveEncounter(r, { outcome: data?.outcome, notes: data?.notes });
+                room.broadcastToRoom(socket.room, 'encounter-resolved', state);
+            } catch (error) {
+                socket.emit('error', { message: error.message });
+            }
+        });
+
+        socket.on('adventure-timer', (data) => {
+            if (!socket.room) return socket.emit('error', { message: 'Not in a room' });
+            const r = room.rooms.get(socket.room);
+            if (!r) return socket.emit('error', { message: 'Room not found' });
+            try {
+                const state = adventure.tickTimer(r, { scope: data?.scope, ref: data?.ref, name: data?.name, amount: data?.amount });
+                room.broadcastToRoom(socket.room, 'timer-ticked', state);
+            } catch (error) {
+                socket.emit('error', { message: error.message });
+            }
+        });
+
+        socket.on('adventure-log', (data) => {
+            if (!socket.room) return socket.emit('error', { message: 'Not in a room' });
+            const r = room.rooms.get(socket.room);
+            if (!r) return socket.emit('error', { message: 'Room not found' });
+            try {
+                const state = adventure.logBeat(r, { text: data?.text, author: data?.author });
+                room.broadcastToRoom(socket.room, 'adventure-log', state);
+            } catch (error) {
+                socket.emit('error', { message: error.message });
+            }
+        });
+
+        socket.on('adventure-state', (callback) => {
+            if (!socket.room) { callback?.({ error: 'Not in a room' }); return; }
+            const r = room.rooms.get(socket.room);
+            if (!r) { callback?.({ error: 'Room not found' }); return; }
+            if (typeof callback === 'function') callback(adventure.getPublicState(r));
+        });
+
+        socket.on('adventure-reference', (callback) => {
+            if (!socket.room) { callback?.({ error: 'Not in a room' }); return; }
+            const r = room.rooms.get(socket.room);
+            if (!r) { callback?.({ error: 'Room not found' }); return; }
+            try {
+                if (typeof callback === 'function') callback(adventure.getReferenceData(r));
+            } catch (error) {
+                if (typeof callback === 'function') callback({ error: error.message });
+            }
         });
 
         // ─── Module management ──────────────────────────────────────

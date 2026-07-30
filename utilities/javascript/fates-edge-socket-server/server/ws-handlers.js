@@ -1,11 +1,7 @@
 /**
  * Fate's Edge - Plain WebSocket Handlers
- * v4 – Full feature parity with Socket.io:
- *   - ping/pong heartbeat
- *   - full whiteboard sync (sheets + activeSheetId)
- *   - set-region command
- *   - room password support (handshake)
- *   - full character storage (r.characters)
+ * v5 – Player name + selected character separation
+ * v6 – Adventure Engine wired in (see server/adventure.js)
  */
 
 const WebSocket = require('ws');
@@ -13,6 +9,7 @@ const room = require('./room.js');
 const deck = require('./deck.js');
 const logger = require('./logger.js').createLogger(process.env.LOG_LEVEL || 'INFO');
 const { buildSafeDict, clampCount } = require('./security.js');
+const adventure = require('./adventure.js');
 
 let socketStats = { wsConnections: 0, totalConnections: 0 };
 
@@ -52,7 +49,15 @@ function setupWSS(wss) {
 
         ws.clientId = clientId;
         ws.room = roomKey;
-        ws.clientData = { id: clientId, name: 'Player', role: 'player', email: '', type: 'ws', ws };
+        ws.clientData = { 
+            id: clientId, 
+            name: 'Player', 
+            role: 'player', 
+            email: '',
+            selectedCharacter: '',  // 👈 NEW
+            type: 'ws', 
+            ws 
+        };
         currentRoom.clients.set(clientId, ws.clientData);
         socketStats.wsConnections++;
         socketStats.totalConnections++;
@@ -77,7 +82,7 @@ function setupWSS(wss) {
             } else {
                 clearInterval(pingInterval);
             }
-        }, 30000); // 30 seconds
+        }, 30000);
 
         // ─── Send connected message ──────────────────────────────────
         ws.send(JSON.stringify({
@@ -189,6 +194,7 @@ function setupWSS(wss) {
                         }
                         break;
 
+                    // ─── Direct broadcast events ──────────────────────────
                     case 'media_recording':
                     case 'voice-offer':
                     case 'voice-answer':
@@ -197,13 +203,195 @@ function setupWSS(wss) {
                     case 'chat-message':
                     case 'roll-dice':
                     case 'roll-result':
-                    case 'event':
                     case 'operation':
                     case 'operation_ack':
-                    case 'presence':
                     case 'module-push':
                     case 'module-cleanup':
+                    case 'sync-state':
+                    case 'combat-status-update':
+                    case 'scene-status-update':
                         room.broadcastToRoom(roomKey, messageType, data, ws.clientId);
+                        break;
+
+                    // ─── Adventure Engine ──────────────────────────────────
+                    // See server/adventure.js. Each of these recomputes
+                    // authoritatively on the server (rather than just
+                    // relaying whatever a client/AI computed locally, which
+                    // is what 'adventure-timer'/'adventure-log' used to do
+                    // as bare passthrough cases above) and broadcasts the
+                    // canonical resulting state, so every connected
+                    // client/AI agent stays in sync regardless of who
+                    // drove the change.
+                    case 'adventure-load': {
+                        try {
+                            const state = adventure.loadAdventureModule(currentRoom, data.moduleId);
+                            room.broadcastToRoom(roomKey, 'adventure-loaded', state);
+                        } catch (err) {
+                            ws.send(JSON.stringify({ type: 'error', message: err.message }));
+                        }
+                        break;
+                    }
+
+                    case 'adventure-reset': {
+                        try {
+                            const state = adventure.resetAdventure(currentRoom);
+                            room.broadcastToRoom(roomKey, 'adventure-reset', state);
+                        } catch (err) {
+                            ws.send(JSON.stringify({ type: 'error', message: err.message }));
+                        }
+                        break;
+                    }
+
+                    case 'adventure-scene': {
+                        try {
+                            const target = {};
+                            if (typeof data.actIndex === 'number') target.actIndex = data.actIndex;
+                            if (typeof data.sceneIndex === 'number') target.sceneIndex = data.sceneIndex;
+                            const state = adventure.advanceScene(currentRoom, target);
+                            room.broadcastToRoom(roomKey, 'scene-changed', state);
+                        } catch (err) {
+                            ws.send(JSON.stringify({ type: 'error', message: err.message }));
+                        }
+                        break;
+                    }
+
+                    case 'adventure-encounter-start': {
+                        try {
+                            const state = adventure.startEncounter(currentRoom, data.ref, data.encounter || null);
+                            room.broadcastToRoom(roomKey, 'encounter-started', state);
+                        } catch (err) {
+                            ws.send(JSON.stringify({ type: 'error', message: err.message }));
+                        }
+                        break;
+                    }
+
+                    case 'adventure-encounter-resolve': {
+                        try {
+                            const state = adventure.resolveEncounter(currentRoom, { outcome: data.outcome, notes: data.notes });
+                            room.broadcastToRoom(roomKey, 'encounter-resolved', state);
+                        } catch (err) {
+                            ws.send(JSON.stringify({ type: 'error', message: err.message }));
+                        }
+                        break;
+                    }
+
+                    case 'adventure-timer': {
+                        try {
+                            const state = adventure.tickTimer(currentRoom, { scope: data.scope, ref: data.ref, name: data.name, amount: data.amount });
+                            room.broadcastToRoom(roomKey, 'timer-ticked', state);
+                        } catch (err) {
+                            ws.send(JSON.stringify({ type: 'error', message: err.message }));
+                        }
+                        break;
+                    }
+
+                    case 'adventure-log': {
+                        try {
+                            const state = adventure.logBeat(currentRoom, { text: data.text, author: data.author });
+                            room.broadcastToRoom(roomKey, 'adventure-log', state);
+                        } catch (err) {
+                            ws.send(JSON.stringify({ type: 'error', message: err.message }));
+                        }
+                        break;
+                    }
+
+                    case 'adventure-state-request': {
+                        ws.send(JSON.stringify({ type: 'adventure-state', ...adventure.getPublicState(currentRoom) }));
+                        break;
+                    }
+
+                    case 'adventure-reference-request': {
+                        try {
+                            ws.send(JSON.stringify({ type: 'adventure-reference', ...adventure.getReferenceData(currentRoom) }));
+                        } catch (err) {
+                            ws.send(JSON.stringify({ type: 'error', message: err.message }));
+                        }
+                        break;
+                    }
+
+                    // ─── Presence update ───────────────────────────────────
+                    case 'presence':
+                        if (data.name) {
+                            ws.clientData.name = data.name;
+                        }
+                        if (data.role) {
+                            ws.clientData.role = data.role;
+                        }
+                        // Preserve selectedCharacter
+                        const r = room.rooms.get(roomKey);
+                        if (r) {
+                            const clientEntry = r.clients.get(clientId);
+                            if (clientEntry) {
+                                clientEntry.name = ws.clientData.name;
+                                clientEntry.role = ws.clientData.role;
+                                // selectedCharacter stays as is
+                                r.clients.set(clientId, clientEntry);
+                            }
+                            room.broadcastToRoom(roomKey, 'presence', { clients: room.getClientsList(r) }, ws.clientId);
+                        } else {
+                            room.broadcastToRoom(roomKey, 'presence', data, ws.clientId);
+                        }
+                        break;
+
+                    // ─── Character selection ──────────────────────────────
+                    case 'character-select':
+                        if (data.clientId) {
+                            const r = room.rooms.get(roomKey);
+                            if (r) {
+                                const clientEntry = r.clients.get(data.clientId);
+                                if (clientEntry) {
+                                    clientEntry.selectedCharacter = data.character || '';
+                                    r.clients.set(data.clientId, clientEntry);
+                                    room.broadcastToRoom(roomKey, 'presence', { clients: room.getClientsList(r) }, ws.clientId);
+                                }
+                            }
+                        }
+                        // Also broadcast the raw event for any other listeners
+                        room.broadcastToRoom(roomKey, 'character-select', data, ws.clientId);
+                        break;
+
+                    // ─── Generic event with nested type ───────────────────
+                    case 'event':
+                        // Check for presence update (sent via sendEvent)
+                        if (data && data.type === 'presence') {
+                            if (data.name) {
+                                ws.clientData.name = data.name;
+                            }
+                            if (data.role) {
+                                ws.clientData.role = data.role;
+                            }
+                            const r2 = room.rooms.get(roomKey);
+                            if (r2) {
+                                const clientEntry2 = r2.clients.get(clientId);
+                                if (clientEntry2) {
+                                    clientEntry2.name = ws.clientData.name;
+                                    clientEntry2.role = ws.clientData.role;
+                                    r2.clients.set(clientId, clientEntry2);
+                                }
+                                room.broadcastToRoom(roomKey, 'presence', { clients: room.getClientsList(r2) }, ws.clientId);
+                            } else {
+                                room.broadcastToRoom(roomKey, 'event', data, ws.clientId);
+                            }
+                            break;
+                        }
+                        // Check for character selection (sent via sendEvent)
+                        if (data && data.type === 'character-select') {
+                            if (data.clientId) {
+                                const r2 = room.rooms.get(roomKey);
+                                if (r2) {
+                                    const clientEntry2 = r2.clients.get(data.clientId);
+                                    if (clientEntry2) {
+                                        clientEntry2.selectedCharacter = data.character || '';
+                                        r2.clients.set(data.clientId, clientEntry2);
+                                        room.broadcastToRoom(roomKey, 'presence', { clients: room.getClientsList(r2) }, ws.clientId);
+                                    }
+                                }
+                            }
+                            room.broadcastToRoom(roomKey, 'character-select', data, ws.clientId);
+                            break;
+                        }
+                        // Otherwise, broadcast generic event
+                        room.broadcastToRoom(roomKey, 'event', data, ws.clientId);
                         break;
 
                     default:
@@ -255,7 +443,7 @@ function setupWSS(wss) {
 // ─── Handler implementations ──────────────────────────────────────────
 
 function handleHandshake(ws, roomState, data) {
-    // Password check (parity with Socket.io join-room)
+    // Password check
     if (roomState.password && roomState.password !== data.password) {
         ws.send(JSON.stringify({ type: 'error', message: 'Incorrect room password.' }));
         ws.close(4003, 'Incorrect password');
@@ -271,6 +459,7 @@ function handleHandshake(ws, roomState, data) {
     ws.clientData.name = data.clientName || 'Player';
     ws.clientData.role = assignedRole;
     ws.clientData.email = data.clientEmail || '';
+    // selectedCharacter remains empty initially
     roomState.clients.set(ws.clientId, ws.clientData);
 
     const clientsList = room.getClientsList(roomState);
@@ -286,16 +475,22 @@ function handleHandshake(ws, roomState, data) {
 
 // ─── CHARACTER SYNC: store full characters ──────────────────────────
 function handleStateUpdated(ws, roomState, data) {
-    // If the update contains a characters array, store it in roomState.characters
     if (data.state && data.state.characters && Array.isArray(data.state.characters)) {
         roomState.characters = buildSafeDict(data.state.characters, c => c && c.name);
     } else if (data.characters && Array.isArray(data.characters)) {
-        // Also support direct characters field
         roomState.characters = buildSafeDict(data.characters, c => c && c.name);
+    } else if (data.updates && typeof data.updates === 'object') {
+        if (!roomState.characters) roomState.characters = {};
+        for (const [name, charData] of Object.entries(data.updates)) {
+            roomState.characters[name] = { 
+                ...roomState.characters[name], 
+                ...charData,
+                playerName: charData.playerName || roomState.characters[name]?.playerName || null
+            };
+        }
     }
 
     roomState.lastActivity = Date.now();
-    // Broadcast to all clients in the room (including sender)
     room.broadcastToRoom(roomState.code, 'state-updated', data, ws.clientId);
 }
 
@@ -409,7 +604,7 @@ function handleDeckHistoryClear(ws, roomState) {
     ws.send(JSON.stringify({ type: 'deck-history-cleared-success', timestamp: Date.now() }));
 }
 
-// ─── WHITEBOARD: store full object ────────────────────────────────
+// ─── WHITEBOARD ────────────────────────────────────────────────
 
 function handleWhiteboardUpdate(ws, roomState, data) {
     let newWhiteboard = data.whiteboard || data.state || data;
@@ -422,16 +617,14 @@ function handleWhiteboardUpdate(ws, roomState, data) {
     }, ws.clientId);
 }
 
-// ─── SYNC REQUEST: send whiteboard + characters ──────────────────
+// ─── SYNC REQUEST ──────────────────────────────────
 
 function handleSyncRequest(ws, roomState) {
-    // Send whiteboard state
     ws.send(JSON.stringify({
         type: 'sync-state',
         state: roomState.whiteboard || {},
         timestamp: Date.now()
     }));
-    // Also send characters if present
     if (roomState.characters) {
         ws.send(JSON.stringify({
             type: 'state-updated',

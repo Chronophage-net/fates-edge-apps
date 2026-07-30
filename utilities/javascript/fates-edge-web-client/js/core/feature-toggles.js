@@ -44,8 +44,13 @@ export const TOGGLEABLE_FEATURES = [
 // index.html (see that file's "ROLE-BASED FEATURE TOGGLING" block) so
 // there's one source of truth instead of the same rule living in two
 // places that could drift out of sync.
-export const ROLE_LOCKED_FEATURES = ['gm-tools'];
-
+// Features that are ALWAYS unavailable to a non-GM client, independent of
+// any toggle — this is a hard permission boundary, not a preference.
+export const ROLE_LOCKED_FEATURES = [
+    'gm-tools',
+    'decks',
+    'adventure-manager',   // 👈 NEW
+];
 function getDisabledSet() {
     try {
         const raw = localStorage.getItem(DISABLED_KEY);

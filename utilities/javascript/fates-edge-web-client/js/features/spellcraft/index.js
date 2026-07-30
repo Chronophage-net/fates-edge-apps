@@ -12,6 +12,7 @@
  * - Unified character selection via VTT
  * - Default "Path Finder" view helps players choose their magical tradition
  * - Path selection is now an inline dropdown in the header (no modal)
+ * - NEW: Magic Paths Tour – a full-screen slide-show introduction to each tradition
  */
 
 import { vttStore } from '../../core/vtt-store.js';
@@ -54,7 +55,11 @@ const PATH_META = {
             'I love the idea of raw, untamed magic',
             'I want to be self-reliant and answer to no Patron'
         ],
-        archetypes: ['Sorcerer', 'Wild Mage', 'Improviser']
+        archetypes: ['Sorcerer', 'Wild Mage', 'Improviser'],
+        tourDescription: `<p>Free Casters reach directly into the Weave, shaping reality through will, word, and gesture. No Patron, no Codex, no Symbol – just you and the raw stuff of creation.</p>
+<p>The power is intoxicating, but the Backlash is entirely your own. You pay in Fatigue, in scars, in moments of reality slipping sideways. The <strong>TAGS</strong> system is your grammar – verbs and nouns of the Weave that let you improvise anything from a spark to a gate.</p>
+<p>You are the uncontrolled, the unpredictable, the one who makes the Synod nervous. But you are also free – answerable to no covenant, bound by no oath. The Weave is patient, but it expects precision.</p>
+<p><em>"I do not borrow. I speak. And the Weave listens."</em></p>`
     },
     'runekeeper': {
         label: 'Runekeeper',
@@ -67,7 +72,11 @@ const PATH_META = {
             'I like the idea of being a paladin, druid, or artificer',
             'I want a deep, committed relationship with a single Patron'
         ],
-        archetypes: ['Paladin', 'Druid', 'Artificer', 'Inquisitor', 'Templar']
+        archetypes: ['Paladin', 'Druid', 'Artificer', 'Inquisitor', 'Templar'],
+        tourDescription: `<p>Runekeepers are the agents of the great powers – the ones who speak with authority because they have been granted it. You serve a single Patron, and in return you wield structured, reliable power that is the envy of less disciplined mages.</p>
+<p>Your <strong>Codex</strong> is not merely a book – it is a covenant made visible, a record of your service and your Patron's expectations. Your <strong>Thiasos</strong> is a fragment of the Patron's attention, a witness to your deeds.</p>
+<p>A Runekeeper of Mykkiel is a Paladin of law. A Runekeeper of Grimmir is a Druid of the wild. A Runekeeper of the Clockwork Monad is an Artificer of impossible geometries. The Patron supplies the theme; the Rites supply the mechanics.</p>
+<p><em>"I do not beg. I record. And in the recording, I become the hand that writes the law."</em></p>`
     },
     'invoker': {
         label: 'Invoker',
@@ -80,7 +89,11 @@ const PATH_META = {
             'I love risk/reward mechanics',
             'I want to be clever and find loopholes'
         ],
-        archetypes: ['Warlock', 'Gambler', 'Occultist', 'Hedge-Mage']
+        archetypes: ['Warlock', 'Gambler', 'Occultist', 'Hedge-Mage'],
+        tourDescription: `<p>Invokers are the gamblers of the magical world – the ones who carry <strong>Symbols</strong> from multiple Patrons, borrowing power without committing their soul to any one master. They are the ultimate pragmatists.</p>
+<p>Each Symbol is a contract made tangible: a ring, a seal, a blackened coin. The Invoker does not ask what a Patron wants; they determine what a Patron lacks. They trade in obligations, juggling debts with the precision of a merchant.</p>
+<p>When the knife is at the throat, the Invoker <strong>Cracks the Seal</strong> – invoking a Rite instantly, calling in the weight as an emergency loan. The price is never small, but the power is undeniable.</p>
+<p><em>"I do not kneel. I sign. I do not pray. I calculate."</em></p>`
     },
     'cantor': {
         label: 'Cantor',
@@ -93,7 +106,11 @@ const PATH_META = {
             'I enjoy tragic corruption arcs',
             'I want power that is literally part of my body'
         ],
-        archetypes: ['Bard', 'Siren', 'Storm-Singer', 'Prophet']
+        archetypes: ['Bard', 'Siren', 'Storm-Singer', 'Prophet'],
+        tourDescription: `<p>Cantors are the wild singers, the mad pipers, the hymn-leaders who become the altar. They do not swear to Patrons – they <strong>echo</strong> them. Their power is intimacy, unmediated and deeply dangerous.</p>
+<p>They require no focus but their own bodies. A Cantor without a voice can tap rhythm on their ribs. One without hands can whistle through their teeth. The body remembers the song even when the mind has forgotten it.</p>
+<p><strong>Corruption</strong> for a Cantor is not a debt – it is a transformation undergone. The voice develops harmonics that should not exist. The breath carries scents from places not on any map. Some grow feathers in their hair; others find their shadows lagging half a step behind.</p>
+<p><em>"You think you need a lute? My larynx is older than any tree. Hum, and the world will listen. Scream, and it might answer back."</em></p>`
     },
     'witch': {
         label: 'Witch',
@@ -106,7 +123,11 @@ const PATH_META = {
             'I enjoy folk horror and domestic magic',
             'I want to be underestimated and overlooked'
         ],
-        archetypes: ['Hedge-Witch', 'Hearth-Mother', 'Knot-Weaver', 'Threshold-Keeper']
+        archetypes: ['Hedge-Witch', 'Hearth-Mother', 'Knot-Weaver', 'Threshold-Keeper'],
+        tourDescription: `<p>Witches practice the systemic magic that maintains the world – the quiet, overlooked power that is at once invisible and essential. They are the ones who know that a threshold must be swept three times counter-timerwise to keep the Hollow from noticing it.</p>
+<p>Their magic is organic, grown from relationships with places and spirits that have no names in any grimoire. They work with the Ninth, with thresholds, with the accumulated weight of stories.</p>
+<p>Every culture has Witches, though they call them different things – Hedge-Mothers, Breath-Wardens, Map-Adjusters, Cistern-Keepers. They are the ones who remember that magic is not merely for throwing fireballs but for ensuring that the fire does not burn down the village.</p>
+<p><em>"The hedge is what keeps the wolves from the flock. I am the one who tends the hedge."</em></p>`
     },
     'psion': {
         label: 'Psion',
@@ -119,7 +140,11 @@ const PATH_META = {
             'I like mind games and subtlety',
             'I dislike carrying obvious magical gear'
         ],
-        archetypes: ['Mind-Mage', 'Telepath', 'Psychic', 'Monk']
+        archetypes: ['Mind-Mage', 'Telepath', 'Psychic', 'Monk'],
+        tourDescription: `<p>Psions are the isolated ones, the untrusted, the inward-turned. Where other paths borrow from outside powers, the Psion looks only to the self – the disciplined, trained, dangerous self. They carry no outward signs of their power.</p>
+<p>Their power is attrition. They pay not in Obligation but in themselves – every thought bent, every future glimpsed, every object moved by will alone leaves a hairline crack in the vessel. <strong>Mental Strain</strong> is the ledger of this cost.</p>
+<p>They are hunted by the Chain-Lanterns of Ecktoria, licensed by the Synod of Thepyrgos, sealed in vaults by the Aeler, and shunned by the hearth-keepers of Aelaerem. They carry no outward sign. They are accountable only to themselves – and to the Mind's Ledger, which never forgets a weight.</p>
+<p><em>"I carry no Symbol. I keep no Codex. My power has no scent, no sound, no outward sign. And that is why they fear me most of all."</em></p>`
     },
     'summoner': {
         label: 'Summoner',
@@ -132,7 +157,10 @@ const PATH_META = {
             'I enjoy contracts, diplomacy, and bargaining with monsters',
             'I want a "friend" that might eat me'
         ],
-        archetypes: ['Necromancer', 'Demonologist', 'Spirit-Binder', 'Shaman']
+        archetypes: ['Necromancer', 'Demonologist', 'Spirit-Binder', 'Shaman'],
+        tourDescription: `<p>Summoners are the diplomats of the damned and the blessed alike – the ones who open doors and hope to close them before something follows through. The dead who cling to memory are spirits. The fey who trade in stolen time are spirits. The angels that guard thresholds, and the demons that wait hungry at the edge of sin – they are all spirits, and they all speak the language of contract.</p>
+<p>The difference between a Summoner who treats with spirits as guests and one who treats them as slaves is the difference between a partnership that lasts decades and a rebellion that ends in blood. The <strong>Leash</strong> is the spiritual strain of keeping an Outsider in the world – a courtesy extended by the spirit while it finds your measure.</p>
+<p><em>"I do not command the dead. I ask. I pay the price. And sometimes, when the contract is fair, they answer."</em></p>`
     },
     'monk': {
         label: 'Monk',
@@ -145,7 +173,11 @@ const PATH_META = {
             'I enjoy martial arts and meditation',
             'I want to serve the balance itself'
         ],
-        archetypes: ['Martial Artist', 'Monk', 'Ascetic', 'Guardian']
+        archetypes: ['Martial Artist', 'Monk', 'Ascetic', 'Guardian'],
+        tourDescription: `<p>Monks of the Unbroken Way walk the path of discipline and balance. They do not bargain with Patrons – they master themselves. Their power is not in what they can do, but in what they can choose not to do.</p>
+<p>The body is a temple; the breath is a weapon; stillness is the greatest disguise. Monks channel power through breath, through the alignment of spirit and flesh, through the patient accumulation of inner strength. They are feared because they have no obvious weakness – only a discipline that seems to transcend the ordinary limits of mortality.</p>
+<p>They serve the balance itself, intervening only when the scales tip too far. They are the quiet guardians, the ones who stand at the edge of the storm and wait for the right moment to act.</p>
+<p><em>"I do not pray. I breathe. And in the breathing, the world listens."</em></p>`
     }
 };
 
@@ -353,6 +385,139 @@ function ensureStyles() {
             background: var(--bg1);
             color: var(--text);
         }
+
+        /* ─── Magic Paths Tour ─────────────────────────────────── */
+        .magic-tour-overlay {
+            position: fixed; inset: 0; z-index: 100000;
+            background: rgba(0,0,0,0.88); backdrop-filter: blur(12px);
+            display: flex; align-items: center; justify-content: center;
+            animation: magicTourFadeIn 0.4s ease;
+            padding: 1rem;
+        }
+        @keyframes magicTourFadeIn {
+            from { opacity: 0; transform: scale(0.96); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        .magic-tour-card {
+            background: var(--bg1); color: var(--text);
+            max-width: 740px; width: 100%; max-height: 90vh;
+            padding: 2rem; border-radius: 16px;
+            border: 1px solid var(--border);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+        }
+        .magic-tour-card .tour-header {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            flex-wrap: wrap;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 0.4rem;
+        }
+        .magic-tour-card .tour-header .tour-icon {
+            font-size: 2.4rem;
+        }
+        .magic-tour-card .tour-header .tour-title {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: var(--text);
+        }
+        .magic-tour-card .tour-header .tour-count {
+            margin-left: auto;
+            font-size: 0.8rem;
+            color: var(--text3);
+            background: var(--bg3);
+            padding: 0.1rem 0.6rem;
+            border-radius: 12px;
+        }
+        .magic-tour-card .tour-tagline {
+            font-size: 1rem;
+            color: var(--text2);
+            font-style: italic;
+            margin-top: -0.2rem;
+        }
+        .magic-tour-card .tour-description {
+            font-size: 0.95rem;
+            line-height: 1.7;
+            color: var(--text);
+            background: var(--bg2);
+            padding: 0.8rem 1rem;
+            border-radius: 8px;
+            border-left: 3px solid var(--gold);
+            max-height: 260px;
+            overflow-y: auto;
+        }
+        .magic-tour-card .tour-description p {
+            margin: 0.5rem 0;
+        }
+        .magic-tour-card .tour-description em {
+            color: var(--gold);
+        }
+        .magic-tour-card .tour-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.4rem;
+            align-items: center;
+            font-size: 0.8rem;
+        }
+        .magic-tour-card .tour-meta .tour-archetypes {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.3rem;
+        }
+        .magic-tour-card .tour-meta .tour-archetypes span {
+            background: var(--bg3);
+            padding: 0.05rem 0.5rem;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            font-size: 0.7rem;
+            color: var(--text2);
+        }
+        .magic-tour-card .tour-meta .tour-rec {
+            font-size: 0.75rem;
+            color: var(--text3);
+            font-style: italic;
+            margin-top: 0.1rem;
+            flex-basis: 100%;
+        }
+        .magic-tour-card .tour-nav {
+            display: flex;
+            gap: 0.6rem;
+            flex-wrap: wrap;
+            align-items: center;
+            border-top: 1px solid var(--border);
+            padding-top: 0.6rem;
+            margin-top: 0.2rem;
+        }
+        .magic-tour-card .tour-nav .btn {
+            padding: 0.4rem 1rem;
+            font-size: 0.85rem;
+        }
+        .magic-tour-card .tour-nav .tour-choose {
+            background: var(--gold);
+            color: #1a1400;
+            font-weight: 700;
+            border: none;
+            border-radius: var(--radius);
+            cursor: pointer;
+        }
+        .magic-tour-card .tour-nav .tour-choose:hover {
+            background: var(--gold-hover);
+        }
+        .magic-tour-card .tour-nav .tour-skip {
+            color: var(--text3);
+            background: transparent;
+            border: none;
+            font-size: 0.8rem;
+            cursor: pointer;
+            text-decoration: underline;
+        }
+        .magic-tour-card .tour-nav .tour-skip:hover {
+            color: var(--text);
+        }
     `;
     document.head.appendChild(style);
 }
@@ -364,8 +529,13 @@ function ensureStyles() {
 let container = null;
 let eventListeners = [];
 let activeTab = 'crafting';
-let renderToken = 0; // guards against a slow async tab render landing after a newer one started
-let isPathFinder = false; // true when showing the default path selection view
+let renderToken = 0;
+let isPathFinder = false;
+
+// ─── Tour state ──────────────────────────────────────────────
+let tourActive = false;
+let tourSlideIndex = 0;
+const TOUR_PATH_IDS = ['free-caster', 'runekeeper', 'invoker', 'cantor', 'witch', 'psion', 'summoner', 'monk'];
 
 // ============================================================
 // HELPERS (exported for sub‑components)
@@ -401,7 +571,6 @@ export function getPatronRites(patronName) {
     return [];
 }
 
-// ─── Helper: derive the patron id list to hand to renderRites ─────────
 function getPatronIdsForRites(char) {
     if (!char) return [];
     if (char.magicPath === 'invoker') {
@@ -411,8 +580,6 @@ function getPatronIdsForRites(char) {
     }
     return char.patron ? [char.patron] : [];
 }
-
-// ─── Build path dropdown options ──────────────────────────────
 
 function buildPathSelectOptions(currentPath) {
     return Object.entries(PATH_META)
@@ -424,7 +591,158 @@ function buildPathSelectOptions(currentPath) {
 }
 
 // ============================================================
-// RENDER – No Character Selected (dropdown selector + magic path reference)
+// MAGIC PATHS TOUR
+// ============================================================
+
+function getMagicTourSeen() {
+    const state = getState();
+    return state.app?.magicTourSeen || false;
+}
+
+function setMagicTourSeen(seen = true) {
+    const state = getState();
+    if (!state.app) state.app = {};
+    state.app.magicTourSeen = seen;
+    saveState();
+}
+
+export function showMagicTour() {
+    if (tourActive) return;
+    const char = getCharacterData({ silent: true });
+    if (!char) {
+        showToast('Select a character to explore magic paths.', 'info');
+        return;
+    }
+
+    tourActive = true;
+    tourSlideIndex = 0;
+    renderTourSlide(char);
+}
+
+function closeTour() {
+    tourActive = false;
+    const overlay = document.getElementById('magic-tour-overlay');
+    if (overlay) overlay.remove();
+    // Refocus on the main spellcraft container
+    if (container) render(container);
+}
+
+function renderTourSlide(char) {
+    let overlay = document.getElementById('magic-tour-overlay');
+    if (!overlay) {
+        overlay = document.createElement('div');
+        overlay.id = 'magic-tour-overlay';
+        overlay.className = 'magic-tour-overlay';
+        document.body.appendChild(overlay);
+    }
+
+    const pathId = TOUR_PATH_IDS[tourSlideIndex];
+    const meta = PATH_META[pathId];
+    if (!meta) {
+        closeTour();
+        return;
+    }
+
+    const total = TOUR_PATH_IDS.length;
+    const currentPath = char.magicPath || 'none';
+    const isActive = currentPath === pathId;
+
+    overlay.innerHTML = `
+        <div class="magic-tour-card">
+            <div class="tour-header">
+                <span class="tour-icon">${meta.icon}</span>
+                <span class="tour-title" style="color:${meta.color};">${meta.label}</span>
+                <span class="tour-count">${tourSlideIndex + 1} / ${total}</span>
+            </div>
+            <div class="tour-tagline">${meta.description}</div>
+            <div class="tour-description">${meta.tourDescription || meta.longDescription || meta.description}</div>
+            <div class="tour-meta">
+                ${meta.archetypes && meta.archetypes.length ? `
+                    <div class="tour-archetypes">
+                        <strong style="font-size:0.7rem;color:var(--text3);">Archetypes:</strong>
+                        ${meta.archetypes.map(a => `<span>${escHtml(a)}</span>`).join('')}
+                    </div>
+                ` : ''}
+                ${meta.recommendations && meta.recommendations.length ? `
+                    <div class="tour-rec">
+                        <strong>You might like this if:</strong>
+                        ${meta.recommendations.map(r => `<div style="padding-left:0.5rem;">• ${escHtml(r)}</div>`).join('')}
+                    </div>
+                ` : ''}
+            </div>
+            <div class="tour-nav">
+                <button class="btn btn-secondary" id="tour-prev" ${tourSlideIndex === 0 ? 'disabled' : ''}>← Previous</button>
+                <button class="btn tour-choose" id="tour-choose">✨ Choose This Path</button>
+                <button class="btn btn-secondary" id="tour-next">${tourSlideIndex === total - 1 ? 'Finish Tour →' : 'Next →'}</button>
+                <button class="tour-skip" id="tour-skip">Skip Tour</button>
+            </div>
+        </div>
+    `;
+
+    // Attach events
+    overlay.querySelector('#tour-prev')?.addEventListener('click', () => {
+        if (tourSlideIndex > 0) {
+            tourSlideIndex--;
+            renderTourSlide(char);
+        }
+    });
+
+    overlay.querySelector('#tour-next')?.addEventListener('click', () => {
+        if (tourSlideIndex < total - 1) {
+            tourSlideIndex++;
+            renderTourSlide(char);
+        } else {
+            // End of tour – mark seen and close
+            setMagicTourSeen(true);
+            closeTour();
+        }
+    });
+
+    overlay.querySelector('#tour-choose')?.addEventListener('click', () => {
+        if (pathId === currentPath) {
+            showToast(`Already on the ${meta.label} path.`, 'info');
+            setMagicTourSeen(true);
+            closeTour();
+            return;
+        }
+        const result = updateCharacter(char.id, { magicPath: pathId });
+        if (result) {
+            showToast(`✨ Chosen: ${meta.label}`, 'success');
+            setMagicTourSeen(true);
+            closeTour();
+            // Re-render the main view
+            if (container) render(container);
+        } else {
+            showToast('Failed to update character.', 'error');
+        }
+    });
+
+    overlay.querySelector('#tour-skip')?.addEventListener('click', () => {
+        setMagicTourSeen(true);
+        closeTour();
+    });
+
+    // Close on overlay background click
+    overlay.addEventListener('click', (e) => {
+        if (e.target === overlay) {
+            setMagicTourSeen(true);
+            closeTour();
+        }
+    });
+}
+
+function checkMagicTour() {
+    const char = getCharacterData({ silent: true });
+    if (!char) return;
+    // Only show if not seen and character has no path or is on 'none'
+    if (!getMagicTourSeen() && (char.magicPath === 'none' || !char.magicPath)) {
+        // Small delay to let the UI render first
+        setTimeout(() => showMagicTour(), 400);
+    }
+}
+
+// ============================================================
+// RENDER – No Character Selected
 // ============================================================
 
 function renderNoCharacterView() {
@@ -522,6 +840,8 @@ export function render(el) {
         activeTab = 'crafting';
         renderPathFinder(char, name, pathMeta, patron);
         attachEvents();
+        // Check if we should show the magic tour
+        checkMagicTour();
         return;
     }
 
@@ -531,7 +851,6 @@ export function render(el) {
         activeTab = 'crafting';
     }
 
-    // Build path dropdown
     const pathOptionsHtml = buildPathSelectOptions(path);
 
     container.innerHTML = `
@@ -556,6 +875,7 @@ export function render(el) {
                     </select>
                     <button class="btn btn-sm btn-secondary" id="spellcraft-set-path" title="Set magic path">Set Path</button>
                     <button class="btn btn-sm btn-ghost" id="spellcraft-refresh" title="Refresh">↻</button>
+                    <button class="btn btn-sm btn-secondary" id="show-magic-tour-btn" title="Magic Paths Tour">🎭 Tour</button>
                 </div>
             </header>
 
@@ -572,7 +892,7 @@ export function render(el) {
                 <div class="spellcraft-loading">Loading…</div>
             </div>
 
-            <!-- ─── Footer / Quick Reference ────────────────────── -->
+            <!-- ─── Footer ────────────────────────────────────── -->
             <div class="spellcraft-footer" style="display:grid;grid-template-columns:2fr 1fr;gap:0.5rem;border-top:1px solid var(--border);padding-top:0.5rem;font-size:0.7rem;color:var(--text3);">
                 <div style="display:flex;gap:0.5rem;flex-wrap:wrap;">
                     <span>📖 <strong>Path:</strong> ${escHtml(pathMeta.label)}</span>
@@ -596,7 +916,6 @@ export function render(el) {
 // ============================================================
 
 function renderPathFinder(char, name, pathMeta, patron) {
-    // Build path dropdown (for header when path finder is active)
     const pathOptionsHtml = buildPathSelectOptions('none');
 
     container.innerHTML = `
@@ -621,6 +940,7 @@ function renderPathFinder(char, name, pathMeta, patron) {
                     </select>
                     <button class="btn btn-sm btn-secondary" id="spellcraft-set-path" title="Set magic path">Set Path</button>
                     <button class="btn btn-sm btn-ghost" id="spellcraft-refresh" title="Refresh">↻</button>
+                    <button class="btn btn-sm btn-secondary" id="show-magic-tour-btn" title="Magic Paths Tour">🎭 Tour</button>
                 </div>
             </header>
 
@@ -671,12 +991,10 @@ function renderPathFinder(char, name, pathMeta, patron) {
                 </div>
 
                 <div style="padding:0.5rem;background:var(--bg2);border-radius:var(--radius);border-left:4px solid var(--gold);font-size:0.8rem;color:var(--text3);">
-                    <strong>💡 Not sure?</strong>
-                    Talk to your GM, or pick the path that sounds most fun.
-                    You can always change your path later (though your GM may want a story reason).
+                    <strong>💡 Not sure?</strong> Take the <button class="btn btn-sm btn-secondary" id="show-magic-tour-btn-inline" style="font-size:0.7rem;padding:0.05rem 0.5rem;">🎭 Magic Paths Tour</button> to explore each tradition in depth.
                 </div>
 
-                <!-- ─── Tracks (minimal, since no path) ──────────── -->
+                <!-- ─── Tracks (minimal) ──────────────────────────── -->
                 <div id="trackers-container" class="panel" style="padding:0.3rem 0.5rem;background:var(--bg2);border-radius:var(--radius);">
                     <div style="font-size:0.7rem;color:var(--text3);">No active tracks. Choose a path to begin.</div>
                 </div>
@@ -707,11 +1025,10 @@ function renderPathFinder(char, name, pathMeta, patron) {
         </div>
     `;
 
-    // Render the default tab content (crafting/spellbook)
     renderAll();
     attachEvents();
 
-    // Add special event listeners for path selection buttons
+    // Path selection from cards
     container.querySelectorAll('.path-choose-btn').forEach(btn => {
         btn.addEventListener('click', (e) => {
             e.stopPropagation();
@@ -720,7 +1037,6 @@ function renderPathFinder(char, name, pathMeta, patron) {
         });
     });
 
-    // Clicking the card itself also selects the path
     container.querySelectorAll('.path-finder-card').forEach(card => {
         card.addEventListener('click', (e) => {
             if (e.target.closest('.path-choose-btn')) return;
@@ -728,6 +1044,15 @@ function renderPathFinder(char, name, pathMeta, patron) {
             if (pathId) selectPathForCharacter(pathId);
         });
     });
+
+    // Inline tour button
+    const inlineTourBtn = container.querySelector('#show-magic-tour-btn-inline');
+    if (inlineTourBtn) {
+        inlineTourBtn.addEventListener('click', () => showMagicTour());
+    }
+
+    // Check if we should show the magic tour
+    checkMagicTour();
 }
 
 function selectPathForCharacter(pathId) {
@@ -742,6 +1067,7 @@ function selectPathForCharacter(pathId) {
     const result = updateCharacter(char.id, { magicPath: pathId });
     if (result) {
         showToast(`✨ Path changed to ${PATH_META[pathId]?.label || pathId}`, 'success');
+        setMagicTourSeen(true);
         render(container);
     } else {
         showToast('Failed to change path.', 'error');
@@ -991,6 +1317,9 @@ function attachEvents() {
             case 'spellcraft-set-path':
                 setPathFromSelect();
                 break;
+            case 'show-magic-tour-btn':
+                showMagicTour();
+                break;
         }
     };
 
@@ -1002,8 +1331,6 @@ function attachEvents() {
     // Handle path selection from dropdown (via the Set Path button)
     const setPathBtn = document.getElementById('spellcraft-set-path');
     if (setPathBtn) {
-        // The click handler above already handles this via the container click,
-        // but we also need to handle Enter key on the dropdown.
         const pathSelect = document.getElementById('spellcraft-path-select');
         if (pathSelect) {
             pathSelect.addEventListener('keydown', (e) => {
@@ -1043,6 +1370,7 @@ function setPathFromSelect() {
     const result = updateCharacter(char.id, { magicPath: pathId });
     if (result) {
         activeTab = 'crafting';
+        setMagicTourSeen(true);
         showToast(`⚙️ Magic path changed to ${PATH_META[pathId]?.label || pathId}`, 'success');
         render(container);
     } else {
@@ -1050,7 +1378,7 @@ function setPathFromSelect() {
     }
 }
 
-// Legacy function – kept for backward compatibility, redirects to dropdown
+// Legacy function – kept for backward compatibility
 function changeMagicPath() {
     const select = document.getElementById('spellcraft-path-select');
     if (select) {
@@ -1074,6 +1402,10 @@ export function destroy() {
         container.innerHTML = '';
         container = null;
     }
+    // Close tour if open
+    const overlay = document.getElementById('magic-tour-overlay');
+    if (overlay) overlay.remove();
+    tourActive = false;
 }
 
 // ============================================================

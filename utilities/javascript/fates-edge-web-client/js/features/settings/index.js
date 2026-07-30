@@ -1,3 +1,18 @@
+/**
+ * Settings Module – Data management, sync, preferences
+ * 
+ * Features:
+ * - Data export/import/clear
+ * - Password protection management
+ * - WebSocket configuration
+ * - Live campaign sync (WebSocket + HTTP)
+ * - Pack management
+ * - Session archives
+ * - Theme switching
+ * - License display
+ * - Tours & Onboarding (Welcome Tour + Magic Paths Tour)
+ */
+
 import { 
     getState as getAppState,
     getArchives, 
@@ -121,7 +136,6 @@ FATE'S EDGE — LICENSE SUMMARY
 // DEFAULT CONFIGURATION
 // ============================================================
 
-// Default WebSocket server URL - uses your Render.com deployment
 const DEFAULT_WS_URL = 'wss://fates-edge-socket-server.onrender.com';
 const DEFAULT_WS_ROOM = 'vtt-room';
 const DEFAULT_SERVER_URL = 'https://fates-edge-socket-server.onrender.com';
@@ -136,7 +150,6 @@ export function render(el) {
     const archives = getArchives();
     const settings = state.settings || {};
     
-    // Get stored settings with new defaults
     const serverUrl = localStorage.getItem('fates-edge-server-url') || DEFAULT_SERVER_URL;
     const userEmail = localStorage.getItem('fates-edge-user-email') || '';
     const userName = localStorage.getItem('fates-edge-client-name') || '';
@@ -146,12 +159,241 @@ export function render(el) {
     const wsConnected = isWSConnected ? isWSConnected() : false;
     const wsStatus = getWSStatus ? getWSStatus() : 'disconnected';
     
-    // Get installed packs
     const installedPacks = getInstalledPacks();
     const packDocuments = getDocuments();
     
     container.innerHTML = `
         <div class="settings-layout">
+            <style>
+                /* ─── Settings Panel Header Fix ───────────────────────────── */
+                .settings-header {
+                    background: var(--bg2);
+                    padding: 1rem 1.2rem;
+                    border-radius: var(--radius);
+                    border: 1px solid var(--border);
+                    margin-bottom: 1rem;
+                }
+                .settings-header .page-title {
+                    margin: 0;
+                    color: var(--gold);
+                }
+                .settings-header .page-sub {
+                    margin: 0.1rem 0 0;
+                    color: var(--text3);
+                    font-size: 0.9rem;
+                }
+                /* ─── Tours panel ─────────────────────────────────────────── */
+                .settings-tours .flex {
+                    gap: 0.5rem;
+                    flex-wrap: wrap;
+                }
+                /* ─── Stats bar ───────────────────────────────────────────── */
+                .settings-stats {
+                    display: grid;
+                    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+                    gap: 0.5rem;
+                    margin-bottom: 1rem;
+                }
+                .stat-item {
+                    background: var(--bg2);
+                    padding: 0.5rem 0.8rem;
+                    border-radius: var(--radius);
+                    border: 1px solid var(--border);
+                    text-align: center;
+                }
+                .stat-label {
+                    font-size: 0.65rem;
+                    color: var(--text3);
+                    text-transform: uppercase;
+                    letter-spacing: 0.05em;
+                    display: block;
+                }
+                .stat-value {
+                    font-size: 1.1rem;
+                    font-weight: 700;
+                    color: var(--text);
+                }
+                .stat-value.enabled { color: var(--green); }
+                .stat-value.disabled { color: var(--text3); }
+                /* ─── Sync status ──────────────────────────────────────────── */
+                .sync-status {
+                    padding: 0.3rem 0.6rem;
+                    border-radius: var(--radius);
+                    margin-top: 0.5rem;
+                    font-size: 0.9rem;
+                }
+                .sync-status.connected {
+                    background: rgba(76, 175, 80, 0.12);
+                    color: var(--green);
+                    border: 1px solid var(--green);
+                }
+                .sync-status.disconnected {
+                    background: rgba(244, 67, 54, 0.08);
+                    color: var(--red);
+                    border: 1px solid var(--red);
+                }
+                .sync-status.connecting {
+                    background: rgba(255, 193, 7, 0.12);
+                    color: var(--gold);
+                    border: 1px solid var(--gold);
+                }
+                .sync-status.error {
+                    background: rgba(244, 67, 54, 0.12);
+                    color: var(--red);
+                    border: 1px solid var(--red);
+                }
+                .status-badge {
+                    display: inline-block;
+                    padding: 0.1rem 0.6rem;
+                    border-radius: 12px;
+                    font-size: 0.75rem;
+                    font-weight: 600;
+                }
+                .status-badge.connected {
+                    background: rgba(76, 175, 80, 0.15);
+                    color: var(--green);
+                }
+                .status-badge.disconnected {
+                    background: rgba(244, 67, 54, 0.1);
+                    color: var(--red);
+                }
+                /* ─── Avatar preview ───────────────────────────────────────── */
+                .avatar-preview-container {
+                    display: flex;
+                    align-items: center;
+                    gap: 0.8rem;
+                    padding: 0.3rem 0.6rem;
+                    background: var(--bg3);
+                    border-radius: var(--radius);
+                    margin: 0.3rem 0;
+                }
+                .avatar-preview-container img {
+                    border-radius: 50%;
+                    border: 2px solid var(--border);
+                    width: 48px;
+                    height: 48px;
+                    object-fit: cover;
+                }
+                .avatar-name {
+                    font-weight: 600;
+                    color: var(--text);
+                }
+                .avatar-email {
+                    font-size: 0.8rem;
+                    color: var(--text3);
+                }
+                /* ─── Presence list ────────────────────────────────────────── */
+                .presence-list {
+                    max-height: 120px;
+                    overflow-y: auto;
+                    padding: 0.2rem 0.4rem;
+                    background: var(--bg3);
+                    border-radius: var(--radius);
+                }
+                .presence-item {
+                    display: flex;
+                    align-items: center;
+                    gap: 0.5rem;
+                    padding: 0.2rem 0.3rem;
+                    border-bottom: 1px solid var(--border);
+                }
+                .presence-item:last-child { border-bottom: none; }
+                .presence-item .avatar {
+                    width: 28px;
+                    height: 28px;
+                    border-radius: 50%;
+                    object-fit: cover;
+                }
+                .presence-item .name { flex: 1; font-weight: 500; font-size: 0.85rem; }
+                .presence-item .role { font-size: 0.65rem; color: var(--text3); }
+                .presence-item .status-dot {
+                    width: 8px;
+                    height: 8px;
+                    border-radius: 50%;
+                    display: inline-block;
+                }
+                .presence-item .status-dot.online { background: var(--green); }
+                .presence-item .status-dot.away { background: var(--gold); }
+                /* ─── Password status ──────────────────────────────────────── */
+                .password-status-badge {
+                    font-size: 0.7rem;
+                    padding: 0.1rem 0.6rem;
+                    border-radius: 12px;
+                    font-weight: 600;
+                }
+                .password-status-badge.enabled {
+                    background: rgba(76, 175, 80, 0.15);
+                    color: var(--green);
+                }
+                .password-status-badge.disabled {
+                    background: rgba(244, 67, 54, 0.1);
+                    color: var(--text3);
+                }
+                .password-settings-row {
+                    display: grid;
+                    grid-template-columns: 1fr 1fr 1fr;
+                    gap: 0.5rem;
+                    margin-bottom: 0.5rem;
+                }
+                @media (max-width: 700px) {
+                    .password-settings-row {
+                        grid-template-columns: 1fr;
+                    }
+                }
+                /* ─── Session archives ────────────────────────────────────── */
+                .session-archive-item {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    padding: 0.3rem 0.5rem;
+                    border-bottom: 1px solid var(--border);
+                }
+                .session-archive-item:last-child { border-bottom: none; }
+                .session-archive-item .name { font-weight: 500; }
+                .session-archive-item .meta { font-size: 0.7rem; color: var(--text3); }
+                /* ─── Pack list ───────────────────────────────────────────── */
+                .pack-item {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    padding: 0.3rem 0.5rem;
+                    border-bottom: 1px solid var(--border);
+                }
+                .pack-item:last-child { border-bottom: none; }
+                .pack-item .pack-name { font-weight: 500; }
+                .pack-item .pack-version { font-size: 0.65rem; color: var(--text2); background: var(--bg3); padding: 0.05rem 0.4rem; border-radius: 8px; }
+                .pack-item .pack-type { font-size: 0.6rem; color: var(--text3); text-transform: uppercase; }
+                .pack-item .pack-meta { font-size: 0.7rem; color: var(--text3); }
+                .pack-document-item {
+                    display: inline-block;
+                    padding: 0.1rem 0.5rem;
+                    margin: 0.1rem;
+                    background: var(--bg3);
+                    border-radius: 12px;
+                    font-size: 0.75rem;
+                }
+                .pack-document-item .doc-title { color: var(--text); }
+                .pack-document-item .doc-category { color: var(--text3); margin-left: 0.3rem; font-size: 0.65rem; }
+                .campaign-feedback {
+                    padding: 0.3rem 0.6rem;
+                    border-radius: var(--radius);
+                    font-size: 0.85rem;
+                    min-height: 1.5rem;
+                }
+                .campaign-feedback.success { color: var(--green); background: rgba(76,175,80,0.08); border: 1px solid var(--green); }
+                .campaign-feedback.error { color: var(--red); background: rgba(244,67,54,0.08); border: 1px solid var(--red); }
+                .license-box {
+                    background: var(--bg3);
+                    padding: 0.8rem 1rem;
+                    border-radius: var(--radius);
+                    font-size: 0.8rem;
+                    color: var(--text2);
+                    border: 1px solid var(--border);
+                }
+                .license-box p { margin: 0.3rem 0; }
+                .theme-btn.active { border-color: var(--gold); background: var(--bg4); }
+            </style>
+
             <header class="settings-header">
                 <h1 class="page-title">⚙️ Settings</h1>
                 <p class="page-sub">Manage your data, backups, and preferences.</p>
@@ -290,22 +532,6 @@ export function render(el) {
             </div>
             
             <!-- ============================================================
-                 DATA MANAGEMENT
-                 ============================================================ -->
-            <div class="panel settings-panel">
-                <div class="panel-header">
-                    <h3>💾 Data Management</h3>
-                </div>
-                <div class="flex">
-                    <button class="btn btn-primary" id="settings-export-btn">📥 Export All Data (JSON)</button>
-                    <button class="btn btn-secondary" id="settings-import-btn">📤 Import JSON</button>
-                    <input type="file" id="settings-import-file" accept=".json" style="display:none" />
-                    <button class="btn btn-danger" id="settings-clear-btn">🗑️ Clear All Data</button>
-                </div>
-                <p class="text-muted mt-1">Data is stored in your browser's local storage. Export regularly for backup.</p>
-            </div>
-            
-            <!-- ============================================================
                  LIVE CAMPAIGN (Sync)
                  ============================================================ -->
             <div class="panel settings-panel" id="sync-panel">
@@ -412,6 +638,23 @@ export function render(el) {
                     <button class="btn btn-danger" id="campaign-delete-btn">🗑️ Delete Campaign</button>
                 </div>
                 <div id="campaign-feedback" class="campaign-feedback mt-1"></div>
+            </div>
+            
+            <!-- ============================================================
+                 PREFERENCES – TOURS & ONBOARDING (NEW)
+                 ============================================================ -->
+            <div class="panel settings-panel settings-tours">
+                <div class="panel-header">
+                    <h3>🎭 Tours & Onboarding</h3>
+                </div>
+                <p class="text-muted small">Re‑open the introductory tours if you dismissed them earlier.</p>
+                <div class="flex">
+                    <button class="btn btn-sm btn-secondary" id="settings-show-welcome-tour">📜 Show Welcome Tour</button>
+                    <button class="btn btn-sm btn-secondary" id="settings-show-magic-tour">🧙 Show Magic Paths Tour</button>
+                </div>
+                <div class="text-muted small mt-1" style="font-size:0.7rem;">
+                    The Welcome Tour appears on the Home tab. The Magic Paths Tour appears in the Spellcraft tab.
+                </div>
             </div>
             
             <!-- ============================================================
@@ -553,10 +796,8 @@ export function render(el) {
     renderSessionArchives();
     attachEvents();
       
-    // Initialize sync UI
     setTimeout(initSyncUI, 100);
     
-    // Initialize pack manager
     try {
         initPackManager();
     } catch (e) {
@@ -686,7 +927,6 @@ function initSyncUI() {
         }
     }
     
-    // Try to load sync module
     import('../../core/sync/index.js')
         .then(module => {
             const { syncManager } = module;
@@ -723,7 +963,7 @@ function initSyncUI() {
 }
 
 // ============================================================
-// CONNECT TO SYNC SERVER (FIXED)
+// CONNECT TO SYNC SERVER
 // ============================================================
 
 async function connectToSyncServer() {
@@ -748,7 +988,6 @@ async function connectToSyncServer() {
     try {
         const { syncManager } = await import('../../core/sync/index.js');
 
-        // Store password for reconnection attempts if needed
         syncManager.lastPassword = password;
         localStorage.setItem('fates-edge-client-role', userRole);
 
@@ -759,7 +998,6 @@ async function connectToSyncServer() {
         });
 
         showToast('Connected to campaign!', 'success');
-        // Update UI status (the sync module will emit events)
     } catch (e) {
         if (statusEl) {
             statusEl.innerHTML = `❌ ${e.message}`;
@@ -1073,6 +1311,45 @@ export function attachEvents() {
                 el.addEventListener('blur', saveWSSettings);
             }
         }
+    });
+    
+    // ─── NEW: Tours & Onboarding ──────────────────────────────────────
+    document.getElementById('settings-show-welcome-tour')?.addEventListener('click', () => {
+        const state = getAppState();
+        if (!state.app) state.app = {};
+        state.app.welcomeSeen = false;
+        saveState();
+        window.location.hash = 'home';
+        setTimeout(() => {
+            const homeTab = document.querySelector('#tab-home');
+            if (homeTab) {
+                import('../home/index.js').then(module => {
+                    if (module.render) module.render(homeTab);
+                }).catch(() => {
+                    window.location.reload();
+                });
+            }
+        }, 200);
+        showToast('Welcome Tour re‑enabled – go to the Home tab.', 'success');
+    });
+
+    document.getElementById('settings-show-magic-tour')?.addEventListener('click', () => {
+        const state = getAppState();
+        if (!state.app) state.app = {};
+        state.app.magicTourSeen = false;
+        saveState();
+        window.location.hash = 'spellcraft';
+        setTimeout(() => {
+            const spellcraftTab = document.querySelector('#tab-spellcraft');
+            if (spellcraftTab) {
+                import('../spellcraft/index.js').then(module => {
+                    if (module.render) module.render(spellcraftTab);
+                }).catch(() => {
+                    window.location.reload();
+                });
+            }
+        }, 200);
+        showToast('Magic Paths Tour re‑enabled – go to the Spellcraft tab.', 'success');
     });
     
     setTimeout(updateWSStatusDisplay, 200);
