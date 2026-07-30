@@ -272,5 +272,5 @@ This project is licensed under the MIT License – see the [LICENSE](LICENSE) fi
 ---
 
 <p align="center">
-  <sub>Made with ❤️ by the Fate's Edge Team</sub>
+  <sub>Made with ❤️ by Nick Gasper</sub>
 </p>

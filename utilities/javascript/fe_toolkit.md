@@ -1,23 +1,24 @@
-# Fate's Edge Toolkit v2.1 — Design Document
+# Fate's Edge Toolkit v2.2 — Design Document
 
 ## 📋 Table of Contents
 1. [Overview](#overview)
 2. [Architecture](#architecture)
 3. [Core Components](#core-components)
 4. [Data Layer](#data-layer)
-5. [UI/UX Design](#uiux-design)
-6. [Features](#features)
-7. [Build & Deployment](#build--deployment)
-8. [Troubleshooting](#troubleshooting)
-9. [Security](#security)
-10. [Future Roadmap](#future-roadmap)
+5. [Server Integration](#server-integration)
+6. [UI/UX Design](#uiux-design)
+7. [Features](#features)
+8. [Build & Deployment](#build--deployment)
+9. [Troubleshooting](#troubleshooting)
+10. [Security](#security)
+11. [Future Roadmap](#future-roadmap)
 
 ---
 
 ## Overview
 
 ### Purpose
-The Fate's Edge Toolkit is a comprehensive, browser-based TTRPG companion application for the Fate's Edge narrative-first roleplaying game system. It provides GMs and players with a complete suite of tools for character management, dice rolling, encounter tracking, document browsing, and campaign management.
+The Fate's Edge Toolkit is a comprehensive, cross-platform TTRPG companion application for the Fate's Edge narrative-first roleplaying game system. It provides GMs and players with a complete suite of tools for character management, dice rolling, encounter tracking, adventure management, and campaign coordination across multiple environments: browser, Discord, Roll20, Foundry VTT, and terminal.
 
 ### Key Features
 - **Password-protected access** for playtesters
@@ -32,7 +33,8 @@ The Fate's Edge Toolkit is a comprehensive, browser-based TTRPG companion applic
 - **Deck of Consequences** for Story Beat complications
 - **Regional roller** for worldbuilding
 - **Campaign sharing** via server
-- **Search** with Fuse.js integration
+- **Adventure Engine** – load and run structured adventures
+- **Cross‑platform integration** – Discord, Roll20, Foundry VTT, terminal, Avrae
 
 ### Technology Stack
 - **Frontend**: Vanilla JavaScript, HTML5, CSS3
@@ -40,9 +42,10 @@ The Fate's Edge Toolkit is a comprehensive, browser-based TTRPG companion applic
   - jsPDF + jsPDF-AutoTable (PDF export)
   - Marked.js (Markdown rendering)
   - Fuse.js (Fuzzy search)
-- **Storage**: LocalStorage (client-side only)
+- **Backend (optional)**: Node.js + WebSocket server for real‑time VTT sync
+- **Storage**: LocalStorage (client-side only) + optional server‑side campaign persistence
 - **Build Tools**: Python, Pandoc, LaTeX
-- **Deployment**: GitHub Pages
+- **Deployment**: GitHub Pages, Docker (server)
 
 ---
 
@@ -51,45 +54,41 @@ The Fate's Edge Toolkit is a comprehensive, browser-based TTRPG companion applic
 ### High-Level Architecture
 
 ```
-┌─────────────────────────────────────────────────────────────┐
-│                        User Browser                        │
-├─────────────────────────────────────────────────────────────┤
-│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐    │
-│  │   Password   │  │   Main App   │  │   Document   │    │
-│  │    Gate      │  │   (SPA)      │  │   Viewer     │    │
-│  └──────────────┘  └──────────────┘  └──────────────┘    │
-│         │                 │                    │          │
-│         ▼                 ▼                    ▼          │
-│  ┌──────────────────────────────────────────────────┐    │
-│  │              Local Storage (Data Layer)           │    │
-│  │  • Characters  • Timers  • Wiki  • Encounters    │    │
-│  │  • Roll History • Chat History • NPCs            │    │
-│  └──────────────────────────────────────────────────┘    │
-└─────────────────────────────────────────────────────────┘
-                              │
-                              ▼
-┌─────────────────────────────────────────────────────────────┐
-│                     GitHub Pages (Hosting)                  │
-│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐    │
-│  │  index.html  │  │  build/html/ │  │  wiki.json   │    │
-│  │  (Main App)  │  │ (Documents)  │  │  (Bundled)   │    │
-│  └──────────────┘  └──────────────┘  └──────────────┘    │
-└─────────────────────────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────────────────────┐
+│                          User Platforms                                 │
+├─────────────┬─────────────┬─────────────┬─────────────┬───────────────┤
+│  Web Browser │  Discord   │   Roll20   │  Foundry    │   Terminal    │
+│  (Toolkit)   │  (Bot)     │  (API)     │  VTT        │   (CLI)       │
+└──────┬───────┴──────┬──────┴──────┬──────┴──────┬──────┴───────┬───────┘
+       │              │             │             │             │
+       ▼              ▼             ▼             ▼             ▼
+┌─────────────────────────────────────────────────────────────────────────┐
+│                    Fate's Edge WebSocket Server                        │
+│  ┌──────────────────────────────────────────────────────────────────┐  │
+│  │  Room Management  │  State Sync  │  Broadcast  │  REST API     │  │
+│  └──────────────────────────────────────────────────────────────────┘  │
+│  ┌──────────────────────────────────────────────────────────────────┐  │
+│  │  Adventure Engine (state machine)  │  Deck Engine  │  Timers    │  │
+│  └──────────────────────────────────────────────────────────────────┘  │
+└─────────────────────────────────────────────────────────────────────────┘
+                                     │
+                                     ▼
+┌─────────────────────────────────────────────────────────────────────────┐
+│                         Data Layer                                      │
+├─────────────────────────────────────────────────────────────────────────┤
+│  • Rooms (in-memory)    • Campaigns (JSON files)    • Modules (files)  │
+│  • Characters (per room) • Adventure state (room.data)                 │
+│  • Deck state            • Whiteboard data                             │
+└─────────────────────────────────────────────────────────────────────────┘
 ```
 
-### Data Flow Diagram
+### Data Flow
 
 ```
-User Action → JavaScript Handler → Data Update → Render Function → UI Update
-                    │
-                    ▼
-              LocalStorage (Persist)
-                    │
-                    ▼
-              Export/Import (JSON)
-                    │
-                    ▼
-              Campaign Server (Optional)
+User Action → Client → WebSocket/REST → Server → State Update → Broadcast → All Clients
+                                                             │
+                                                             ▼
+                                                       (Persist to disk)
 ```
 
 ---
@@ -360,6 +359,159 @@ REGIONS_DATA = {
 3. Randomly selects entry from matching deck
 4. Displays with suggested timer count
 
+### 9. Adventure Engine
+
+#### Purpose
+Provides a state machine for running structured adventure modules, with built‑in acts, scenes, encounters, timers, and narrative logging. The engine lives on the server, ensuring all clients stay in sync.
+
+#### Data Model
+```javascript
+// Adventure module schema (JSON file under data/adventures/<id>.json)
+{
+    id: string,
+    title: string,
+    description: string,
+    tier: string,
+    author: string,
+    acts: [{
+        id: string,
+        title: string,
+        description: string,
+        scenes: [{
+            id: string,
+            title: string,
+            description: string,
+            completed: boolean,
+            timers: [{ name, segments, current, description }],
+            encounters: [
+                { name, dv, position, outcomes: { clean, partial, miss } }
+                // OR
+                { creatureId, quantity, dv, position, outcomes: {...} }
+            ]
+        }]
+    }],
+    npcs: [{ id, name, role, motivation, stats }],
+    locations: [{ id, name, description, tags }],
+    factions: [{ id, name, goals, relationship }],
+    bestiary: [{ id, name, tl, class, stats, sb_spends }],
+    campaignTimers: [{ name, segments, current, description }],
+    notes: string,
+    // runtime state (stored separately in room.data.adventure)
+    currentAct: 0,
+    currentScene: 0,
+    startedAt: null,
+    completedAt: null,
+    status: 'planned'|'active'|'completed'
+}
+```
+
+#### API Endpoints
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/rooms/:code/adventure` | GET | Get current adventure state |
+| `/api/rooms/:code/adventure/reference` | GET | Get reference data (bestiary, NPCs, etc.) |
+| `/api/rooms/:code/adventure/load` | POST | Load a module from disk |
+| `/api/rooms/:code/adventure/load-custom` | POST | Load an in‑memory adventure (AI‑generated) |
+| `/api/rooms/:code/adventure/reset` | POST | Reset to initial state |
+| `/api/rooms/:code/adventure/scene` | POST | Advance to a specific scene (or sequential) |
+| `/api/rooms/:code/adventure/encounter/start` | POST | Start an encounter |
+| `/api/rooms/:code/adventure/encounter/resolve` | POST | Resolve active encounter |
+| `/api/rooms/:code/adventure/timer` | POST | Tick a timer (scene or campaign) |
+| `/api/rooms/:code/adventure/log` | POST | Append a narrative beat |
+
+#### WebSocket Events
+| Event | Direction | Payload |
+|-------|-----------|---------|
+| `adventure-load` | Client → Server | `{ moduleId }` |
+| `adventure-scene` | Client → Server | `{ actIndex?, sceneIndex? }` |
+| `adventure-encounter-start` | Client → Server | `{ ref }` |
+| `adventure-encounter-resolve` | Client → Server | `{ outcome, notes? }` |
+| `adventure-timer` | Client → Server | `{ ref, amount?, scope? }` |
+| `adventure-log` | Client → Server | `{ text, author? }` |
+| `adventure-loaded` | Server → Clients | Full state |
+| `scene-changed` | Server → Clients | Full state |
+| `encounter-started` | Server → Clients | Full state |
+| `encounter-resolved` | Server → Clients | Full state |
+| `timer-ticked` | Server → Clients | Full state + `tickedTimer` |
+| `adventure-log` | Server → Clients | Full state |
+
+---
+
+## Server Integration
+
+### Overview
+The Fate's Edge server (Node.js) acts as a central hub, synchronising state across all clients. It uses WebSockets for real‑time updates and REST for admin tasks and state queries. All client‑side applications connect to the same server, ensuring a unified experience.
+
+### Server Components
+- **Room Management**: Each campaign room has its own clients, deck, characters, whiteboard, and adventure state.
+- **Adventure Engine**: State machine for running adventures; lives entirely in memory, with room‑specific state persisted to the room object.
+- **Deck Engine**: Shuffles and draws cards; region‑specific card meanings.
+- **Authentication**: API key‑based access for REST endpoints.
+- **Broadcast**: Relays messages to all clients in a room.
+
+### Integration Points
+
+#### Discord Bot (discord.js)
+- **Commands**:
+  - General: `/vtt`, `/vttchar`, `/vtttimer`, `/vttdeck`, `/vttadmin`, `/vttchat`, `/dice`
+  - Adventure: `/vttadventure` (load, scene, encounter, timer, log, status, reference, reset)
+- **Features**:
+  - Real‑time chat relay
+  - Roll and deck commands
+  - Character management (via REST API)
+  - Timer management (local or synced)
+  - GM election and approval
+  - Adventure Engine control
+
+#### Roll20 API (javascript)
+- **Commands** (via `!fates-edge`):
+  - `connect`, `status`, `send`, `roll`, `draw`, `crown`, `shuffle`, `region`, `sync`
+  - GM commands: `gm request`, `gm approve`, `gm reject`, `gm status`, `gm list`
+  - Adventure commands: `adventure load`, `adventure scene`, `adventure encounter start/resolve`, `adventure timer`, `adventure log`, `adventure status`, `adventure reference`, `adventure reset`
+- **Features**:
+  - Synchronises chat, dice rolls, characters (via API), timers, and scenes (pages)
+  - WebSocket connection to the Fate’s Edge server
+  - Automatic reconnection
+  - Character sheet integration (harm, fatigue, boons, tier)
+  - Timer creation and ticking with visual progress bars
+  - Whiteboard and grid combat status summaries
+
+#### Foundry VTT (JavaScript module)
+- **Features**:
+  - Real‑time chat, dice, and scene sync
+  - Character sheet sync (harm, fatigue, boons, tier)
+  - Timer creation and ticking (with journal entries)
+  - Whiteboard and grid combat updates
+  - GM election and approval
+  - **Adventure Engine**: full support via WebSocket events and REST API
+  - Journal entries created for adventure state changes (loaded, scene changed, encounter started/resolved, timer ticked, log entries, reference data)
+- **User Interface**: Status indicator, deck counter, GM panel, character journal entries, adventure status panels (optional)
+
+#### Avrae (D&D Beyond)
+- **Commands** (via `!fe`):
+  - Deck commands: `draw`, `crown`, `shuffle`
+  - Character commands: `chars list`, `chars view`, `chars update`
+  - GM commands: `gm status`, `players`, `kick`, `ban`, `unban`
+  - Adventure commands: `adventure load`, `adventure scene`, `adventure encounter start/resolve`, `adventure timer`, `adventure log`, `adventure status`, `adventure reference`, `adventure reset`
+- **Features**:
+  - Uses REST API (no WebSocket)
+  - All commands return formatted messages to the chat
+  - Full adventure engine support
+
+#### Terminal Client (Node.js)
+- **Features**:
+  - Full WebSocket support
+  - ANSI colour themes (default, dracula, forest, amber)
+  - Rich command set including all VTT and adventure commands
+  - Dice rolling with advantage/disadvantage, critical/fumble detection, roll history
+  - Persistent banner cache (remote ANSI art fetch)
+  - ASCII art rendering, fortune, in‑world time, matrix rain, party mode
+  - Session statistics
+  - Whisper deduplication (last 10 clients)
+  - Aggressive sync (every 30s) for character and state updates
+  - Auto‑claim GM on vacancy (with delay and warning)
+  - Integration with adventure‑director.js for adventure selection and Crown‑Spread generation
+
 ---
 
 ## UI/UX Design
@@ -446,6 +598,38 @@ REGIONS_DATA = {
 - Consistent card sizes
 - No truncation issues
 - Mobile-optimized with smaller cards
+
+---
+
+## Features
+
+### Current Feature List
+| Feature | Status | Description |
+|---------|--------|-------------|
+| Password Gate | ✅ | SHA‑256 hashed password protection |
+| Character Manager | ✅ | Full CRUD with XP tracking |
+| Character Builder | ✅ | Template‑based with cost calculation |
+| Dice Roller | ✅ | Fate’s Edge resolution, position, boons |
+| VTT | ✅ | Chat, party status, quick roller, timers |
+| Timers | ✅ | Scene and campaign timers |
+| Encounter Tracker | ✅ | Combat log, initiative, status |
+| Document Library | ✅ | Horizontal grid with search/filter |
+| Wiki | ✅ | Markdown‑based with search |
+| Deck of Consequences | ✅ | Story Beat complication generator |
+| Regional Roller | ✅ | Worldbuilding elements per region |
+| Campaign Sharing | ✅ | Server‑side storage (optional) |
+| Search (Fuse.js) | ✅ | Fuzzy search across all content |
+| Theme (Dark/Light) | ✅ | Persistent user preference |
+| PDF Export | ✅ | Character sheets and documents |
+| **Adventure Engine** | ✅ | **Structured adventures (acts, scenes, encounters, timers)** |
+| **Discord Bot** | ✅ | **Full VTT and adventure control via Discord** |
+| **Roll20 API** | ✅ | **Full integration with Roll20** |
+| **Foundry VTT Module** | ✅ | **Full integration with Foundry VTT** |
+| **Avrae Module** | ✅ | **Adventure commands via Avrae** |
+| **Terminal Client** | ✅ | **Full CLI with adventure control and styling** |
+| **GM Election** | ✅ | **Vote‑based GM promotion** |
+| **Whisper Support** | ✅ | **Private messages to clients** |
+| **Auto‑Reconnect** | ✅ | **Resilient WebSocket connection** |
 
 ---
 
@@ -814,24 +998,25 @@ if (window.DEBUG) {
 
 ## Future Roadmap
 
-### v2.2 (Planned)
-- **Collaborative VTT**: Real-time updates via WebSocket
-- **Character Import/Export**: Standard format for sharing
-- **Advanced Search**: Content-aware search with relevance
-- **Mobile App**: PWA support
+### v2.2 (Current)
+- **Adventure Engine** – fully integrated across all platforms.
+- **Discord Bot** – all VTT and adventure commands.
+- **Roll20 API** – full VTT and adventure control.
+- **Foundry VTT Module** – full VTT and adventure integration.
+- **Avrae Module** – adventure commands.
+- **Terminal Client** – full CLI with adventure control and styling.
+
+### v2.3 (Planned)
+- **Advanced Scene Maps**: Interactive grid map with tokens, fog of war.
+- **Voice Chat**: WebRTC integration for VTT.
+- **Character Sharing**: Import/export characters between instances.
+- **Module Marketplace**: Browse and download community adventures.
 
 ### v3.0 (Long-term)
-- **Cloud Sync**: Cross-device data synchronization
-- **Campaign Management**: Full campaign structure
-- **Module Integration**: Pre-built adventures
-- **API**: External tool integration
-
-### Enhancement Ideas
-1. **Voice Chat**: WebRTC integration
-2. **Interactive Maps**: SVG-based maps with tokens
-3. **Automation**: Rules automation for common actions
-4. **Analytics**: Usage tracking (opt-in)
-5. **Community Content**: User-submitted modules
+- **Cloud Sync**: Cross‑device campaign sync with authentication.
+- **AI GM Assistant**: LLM‑driven NPCs, plot generation, dynamic encounters.
+- **Mobile App**: PWA with offline support.
+- **Full Multi‑User Collaboration**: Shared whiteboard, real‑time text editing.
 
 ---
 
@@ -896,5 +1081,5 @@ if (window.DEBUG) {
 
 ---
 
-*Document Version: 2.1.0*
-*Last Updated: June 2026*
+*Document Version: 2.2.0*  
+*Last Updated: July 2026*

@@ -456,5 +456,5 @@ Licensed under **CC BY-NC-SA 4.0**. See [LICENSE.srd](LICENSE.srd).
 ---
 
 <p align="center">
-  <sub>Made with ❤️ by the Fate's Edge Team</sub>
+  <sub>Made with ❤️ by Nick Gasper</sub>
 </p>

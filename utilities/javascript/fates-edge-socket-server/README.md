@@ -142,4 +142,4 @@ Environment variables (see `env-example.md` for the full list):
 ---
 
 **Enjoy your games!**
-— The Fate's Edge Team
+— Nick Gasper

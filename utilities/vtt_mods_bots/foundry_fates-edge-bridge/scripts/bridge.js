@@ -1,8 +1,8 @@
 /**
- * Fate's Edge Bridge v2.0.0 - Core WebSocket Connection
+ * Fate's Edge Bridge v2.1.0 - Core WebSocket Connection
  * Supports: Chat, Rolls, Deck, Crown Spread, Modules, Regions,
  *           GM Election/Promotion, Characters (full sync),
- *           Whiteboard, Grid Combat, and more.
+ *           Whiteboard, Grid Combat, and Adventure Engine.
  */
 
 export const FatesEdgeBridge = {
@@ -28,6 +28,19 @@ export const FatesEdgeBridge = {
     whiteboard: { drawings: [], notes: [], images: [] },
     gridCombat: { enabled: false, tokens: [], gridType: 'square' },
     
+    // Adventure Engine State
+    adventureState: {
+        moduleId: null,
+        title: null,
+        status: null,
+        currentAct: null,
+        currentScene: null,
+        activeEncounter: null,
+        campaignTimers: [],
+        log: [],
+        updatedAt: null
+    },
+    
     // GM State
     clients: new Map(),          // clientId -> { id, name, role, ... }
     gmId: null,                  // clientId of current GM
@@ -39,7 +52,6 @@ export const FatesEdgeBridge = {
     // ============================================================
     
     initialize() {
-        // Listen for settings changes
         Hooks.on('fates-edge-bridge-settings-changed', () => {
             if (this.connected) {
                 this.disconnect();
@@ -49,22 +61,19 @@ export const FatesEdgeBridge = {
             }
         });
         
-        // Register for chat message hooks
         Hooks.on('chatMessage', (message) => {
             this.hookChatMessage(message);
         });
         
-        // Register for dice roll hooks
         Hooks.on('diceRoll', (roll) => {
             this.hookDiceRoll(roll);
         });
         
-        // Register for scene change hooks
         Hooks.on('canvasReady', () => {
             this.hookSceneChange();
         });
         
-        console.log('⚔️ Fate\'s Edge Bridge v2.0.0 initialized');
+        console.log('⚔️ Fate\'s Edge Bridge v2.1.0 initialized');
     },
     
     // ============================================================
@@ -148,6 +157,17 @@ export const FatesEdgeBridge = {
         this.characters.clear();
         this.whiteboard = { drawings: [], notes: [], images: [] };
         this.gridCombat = { enabled: false, tokens: [], gridType: 'square' };
+        this.adventureState = {
+            moduleId: null,
+            title: null,
+            status: null,
+            currentAct: null,
+            currentScene: null,
+            activeEncounter: null,
+            campaignTimers: [],
+            log: [],
+            updatedAt: null
+        };
         
         console.log('🔌 Disconnected from Fate\'s Edge server');
         this._updateStatusUI('disconnected');
@@ -165,18 +185,16 @@ export const FatesEdgeBridge = {
         this.reconnectAttempts = 0;
         this._updateStatusUI('connected');
         
-        // Send handshake (plain WebSocket protocol)
         const message = {
             type: 'handshake',
             clientName: playerName,
             role: game.user.isGM ? 'gm' : 'player',
             password: password,
-            version: '2.0.0'
+            version: '2.1.0'
         };
         this.ws.send(JSON.stringify(message));
         console.log('📤 Handshake sent');
         
-        // Start heartbeat
         this.heartbeatInterval = setInterval(() => {
             if (this.connected && this.ws && this.ws.readyState === WebSocket.OPEN) {
                 this.ws.send(JSON.stringify({ type: 'ping' }));
@@ -272,6 +290,34 @@ export const FatesEdgeBridge = {
             case 'server_announcement':
                 this._handleServerAnnouncement(data);
                 break;
+            // Adventure Engine events
+            case 'adventure-loaded':
+                this._handleAdventureLoaded(data);
+                break;
+            case 'scene-changed':
+                this._handleSceneChanged(data);
+                break;
+            case 'encounter-started':
+                this._handleEncounterStarted(data);
+                break;
+            case 'encounter-resolved':
+                this._handleEncounterResolved(data);
+                break;
+            case 'timer-ticked':
+                this._handleTimerTicked(data);
+                break;
+            case 'adventure-log':
+                this._handleAdventureLog(data);
+                break;
+            case 'adventure-state':
+                this._handleAdventureState(data);
+                break;
+            case 'adventure-reference':
+                this._handleAdventureReference(data);
+                break;
+            case 'adventure-reset':
+                this._handleAdventureReset(data);
+                break;
             case 'room-closed':
                 ui.notifications.warn('⚠️ Fate\'s Edge: Room closed by server');
                 this.disconnect();
@@ -344,7 +390,6 @@ export const FatesEdgeBridge = {
             console.log(`👥 Clients in room: ${names}`);
         }
         
-        // Send region info
         this._sendRegionUpdate(this.defaultRegion);
         this._updateGmUI();
         this._updateDeckUI();
@@ -369,6 +414,10 @@ export const FatesEdgeBridge = {
         }
         if (data.clients) {
             this._updateClients(data.clients);
+        }
+        // Adventure state may be included
+        if (data.adventure) {
+            this.adventureState = { ...this.adventureState, ...data.adventure };
         }
         this._updateGmUI();
         this._updateDeckUI();
@@ -658,7 +707,6 @@ export const FatesEdgeBridge = {
     },
     
     _syncCharactersToJournal() {
-        // Update journal entries for all characters
         for (const [name, char] of this.characters) {
             this._createJournalEntry(`[Fate's Edge] ${name}`, this._formatCharacter(char));
         }
@@ -679,7 +727,7 @@ export const FatesEdgeBridge = {
         if (char.heritage) content += `<p><b>Heritage:</b> ${char.heritage}</p>`;
         if (char.background) content += `<p><b>Background:</b> ${char.background}</p>`;
         if (char.patron) content += `<p><b>Patron:</b> ${char.patron}</p>`;
-        content += `<hr><p><small>Synced from Fate's Edge VTT v2.0.0</small></p>`;
+        content += `<hr><p><small>Synced from Fate's Edge VTT v2.1.0</small></p>`;
         return content;
     },
     
@@ -700,7 +748,7 @@ export const FatesEdgeBridge = {
                 <div style="width:100%;height:10px;background:#333;border-radius:5px;overflow:hidden;border:1px solid #555;">
                     <div style="width:${Math.min(progress, 100)}%;height:100%;background:${color};border-radius:5px;transition:width 0.3s;"></div>
                 </div>
-                <hr><p><small>Synced from Fate's Edge VTT v2.0.0</small></p>
+                <hr><p><small>Synced from Fate's Edge VTT v2.1.0</small></p>
             `;
             this._createJournalEntry(`[Fate's Edge] Timer - ${timerName}`, content);
         });
@@ -792,157 +840,305 @@ export const FatesEdgeBridge = {
     // Send Functions
     // ============================================================
     
-    sendChatMessage(text, sender = null) {
+    _send(type, data = {}) {
         if (!this.connected || !this.ws) {
             ui.notifications.warn('⚠️ Fate\'s Edge: Not connected to server');
-            return;
+            return false;
         }
-        this.ws.send(JSON.stringify({
-            type: 'chat-message',
-            text: text,
-            sender: sender || game.user.name,
-            timestamp: Date.now()
-        }));
+        this.ws.send(JSON.stringify({ type, ...data }));
+        return true;
+    },
+    
+    sendChatMessage(text, sender = null) {
+        return this._send('chat-message', { text, sender: sender || game.user.name, timestamp: Date.now() });
     },
     
     sendRoll(expr, reason = null) {
-        if (!this.connected || !this.ws) {
-            ui.notifications.warn('⚠️ Fate\'s Edge: Not connected to server');
-            return;
-        }
-        this.ws.send(JSON.stringify({
-            type: 'roll-dice',
-            expr: expr,
-            reason: reason || 'Dice roll',
-            sender: game.user.name,
-            timestamp: Date.now()
-        }));
+        return this._send('roll-dice', { expr, reason: reason || 'Dice roll', sender: game.user.name, timestamp: Date.now() });
     },
     
     sendDeckDraw(count = 1, region = null) {
-        if (!this.connected || !this.ws) {
-            ui.notifications.warn('⚠️ Fate\'s Edge: Not connected to server');
-            return;
-        }
         const regionName = region || this.defaultRegion;
-        this.ws.send(JSON.stringify({
-            type: 'deck-draw',
-            count: Math.min(count, 5),
-            region: regionName
-        }));
-        console.log(`🃏 Drawing ${count} card(s) from ${regionName}`);
+        return this._send('deck-draw', { count: Math.min(count, 5), region: regionName });
     },
     
     sendCrownSpread(region = null) {
-        if (!this.connected || !this.ws) {
-            ui.notifications.warn('⚠️ Fate\'s Edge: Not connected to server');
-            return;
-        }
         const regionName = region || this.defaultRegion;
-        this.ws.send(JSON.stringify({
-            type: 'crown-spread',
-            region: regionName
-        }));
-        console.log(`👑 Crown Spread from ${regionName}`);
+        return this._send('crown-spread', { region: regionName });
     },
     
     sendDeckShuffle() {
-        if (!this.connected || !this.ws) {
-            ui.notifications.warn('⚠️ Fate\'s Edge: Not connected to server');
-            return;
-        }
-        this.ws.send(JSON.stringify({ type: 'deck-shuffle' }));
-        console.log('🔀 Deck shuffle requested');
+        return this._send('deck-shuffle', {});
     },
     
     sendRegionUpdate(region) {
         this.defaultRegion = region;
-        this._sendRegionUpdate(region);
-    },
-    
-    _sendRegionUpdate(region) {
-        if (!this.connected || !this.ws) return;
-        this.ws.send(JSON.stringify({
-            type: 'set-region',
-            region: region
-        }));
-        console.log(`📍 Region updated to: ${region}`);
+        return this._send('set-region', { region });
     },
     
     sendModuleList() {
-        if (!this.connected || !this.ws) {
-            ui.notifications.warn('⚠️ Fate\'s Edge: Not connected to server');
-            return;
-        }
-        this.ws.send(JSON.stringify({ type: 'module-list' }));
-        console.log('📦 Module list requested');
+        return this._send('module-list', {});
     },
     
     sendSyncRequest(entity = 'all') {
-        if (!this.connected || !this.ws) {
-            ui.notifications.warn('⚠️ Fate\'s Edge: Not connected to server');
-            return;
-        }
-        this.ws.send(JSON.stringify({ type: 'sync-request', entity }));
-        console.log('🔄 Sync requested');
+        return this._send('sync-request', { entity });
     },
     
     syncCharacters(characters) {
-        if (!this.connected || !this.ws) {
-            ui.notifications.warn('⚠️ Fate\'s Edge: Not connected to server');
-            return;
-        }
-        this.ws.send(JSON.stringify({
-            type: 'state-updated',
-            characters: characters
-        }));
+        return this._send('state-updated', { characters });
     },
     
-    // ============================================================
-    // GM Public Methods
-    // ============================================================
-    
     requestGM() {
-        if (!this.connected || !this.ws) {
-            ui.notifications.warn('⚠️ Fate\'s Edge: Not connected to server');
-            return;
-        }
-        this.ws.send(JSON.stringify({ type: 'request_gm' }));
-        console.log('👑 GM request sent');
-        ui.notifications.info('👑 GM request sent. Waiting for approval.');
+        return this._send('request_gm', {});
     },
     
     approveGM(targetId) {
-        if (!this.connected || !this.ws) {
-            ui.notifications.warn('⚠️ Fate\'s Edge: Not connected to server');
-            return;
-        }
-        if (!targetId) {
-            console.warn('approveGM called without targetId');
-            return;
-        }
         if (this.myRole !== 'gm') {
             ui.notifications.warn('⚠️ Only the current GM can approve.');
-            return;
+            return false;
         }
-        this.ws.send(JSON.stringify({ type: 'approve_gm', targetId }));
         this.pendingRequests = this.pendingRequests.filter(r => r.requesterId !== targetId);
         this._updateGmUI();
-        console.log(`👑 Approved GM for ${targetId}`);
-        ui.notifications.info(`✅ GM approved for ${targetId}`);
+        return this._send('approve_gm', { targetId });
     },
     
-    getCurrentGM() {
-        return this.gmId ? this.clients.get(this.gmId) : null;
+    // ─── Adventure Engine send methods ─────────────────────────
+    
+    sendAdventureLoad(moduleId) {
+        if (!moduleId) {
+            ui.notifications.warn('⚠️ Module ID required');
+            return false;
+        }
+        return this._send('adventure-load', { moduleId });
     },
     
-    getPendingGMRequests() {
-        return this.pendingRequests;
+    sendAdventureScene(actIndex = null, sceneIndex = null) {
+        const target = {};
+        if (actIndex !== null && !isNaN(actIndex)) target.actIndex = Number(actIndex);
+        if (sceneIndex !== null && !isNaN(sceneIndex)) target.sceneIndex = Number(sceneIndex);
+        return this._send('adventure-scene', target);
     },
     
-    clearPendingGMRequests() {
-        this.pendingRequests = [];
-        this._updateGmUI();
+    sendAdventureEncounterStart(ref) {
+        if (ref === undefined || ref === null) {
+            ui.notifications.warn('⚠️ Encounter reference required');
+            return false;
+        }
+        return this._send('adventure-encounter-start', { ref });
+    },
+    
+    sendAdventureEncounterResolve(outcome, notes = '') {
+        if (!['clean', 'partial', 'miss'].includes(outcome)) {
+            ui.notifications.warn('⚠️ Outcome must be clean, partial, or miss');
+            return false;
+        }
+        return this._send('adventure-encounter-resolve', { outcome, notes });
+    },
+    
+    sendAdventureTimer(name, amount = 1, scope = 'scene') {
+        if (!name) {
+            ui.notifications.warn('⚠️ Timer name required');
+            return false;
+        }
+        return this._send('adventure-timer', { ref: name, amount, scope });
+    },
+    
+    sendAdventureLog(text, author = null) {
+        if (!text) {
+            ui.notifications.warn('⚠️ Log text required');
+            return false;
+        }
+        return this._send('adventure-log', { text, author: author || game.user.name });
+    },
+    
+    sendAdventureStatus() {
+        return this._send('adventure-state-request', {});
+    },
+    
+    sendAdventureReference() {
+        return this._send('adventure-reference-request', {});
+    },
+    
+    sendAdventureReset() {
+        return this._send('adventure-reset', {});
+    },
+    
+    // ============================================================
+    // Adventure Engine Handlers (NEW)
+    // ============================================================
+    
+    _handleAdventureLoaded(data) {
+        this.adventureState = { ...this.adventureState, ...data };
+        console.log(`📖 Adventure loaded: ${data.title || data.moduleId}`);
+        const content = `
+            <h2>📖 Adventure Loaded</h2>
+            <p><b>Title:</b> ${data.title || data.moduleId}</p>
+            <p><b>Status:</b> ${data.status || 'active'}</p>
+            <p><b>Tier:</b> ${data.tier || '?'}</p>
+            ${data.currentAct ? `<p><b>Act:</b> ${data.currentAct.title}</p>` : ''}
+            ${data.currentScene ? `<p><b>Scene:</b> ${data.currentScene.title}</p>` : ''}
+            <hr><p><small>Synced from Fate's Edge VTT v2.1.0</small></p>
+        `;
+        this._createJournalEntry(`[Fate's Edge] Adventure: ${data.title || data.moduleId}`, content);
+        ui.notifications.info(`📖 Fate's Edge: Adventure "${data.title || data.moduleId}" loaded`);
+        Hooks.call('fates-edge-adventure-loaded', data);
+    },
+    
+    _handleSceneChanged(data) {
+        this.adventureState = { ...this.adventureState, ...data };
+        const act = data.currentAct?.title || 'Unknown';
+        const scene = data.currentScene?.title || 'Unknown';
+        console.log(`🎭 Scene changed: ${act} / ${scene}`);
+        const content = `
+            <h2>🎭 Scene Changed</h2>
+            <p><b>Act:</b> ${act}</p>
+            <p><b>Scene:</b> ${scene}</p>
+            ${data.currentScene?.description ? `<p><i>${data.currentScene.description}</i></p>` : ''}
+            <hr><p><small>Synced from Fate's Edge VTT v2.1.0</small></p>
+        `;
+        this._createJournalEntry(`[Fate's Edge] Scene: ${scene}`, content);
+        ui.notifications.info(`🎭 Fate's Edge: Scene changed to "${scene}"`);
+        Hooks.call('fates-edge-scene-changed', data);
+    },
+    
+    _handleEncounterStarted(data) {
+        this.adventureState = { ...this.adventureState, ...data };
+        const enc = data.activeEncounter || {};
+        const name = enc.name || enc.creatureId || 'Encounter';
+        const dv = enc.dv || '?';
+        const pos = enc.position || 'Controlled';
+        console.log(`⚔️ Encounter started: ${name}`);
+        const content = `
+            <h2>⚔️ Encounter Started</h2>
+            <p><b>Name:</b> ${name}</p>
+            <p><b>DV:</b> ${dv}</p>
+            <p><b>Position:</b> ${pos}</p>
+            ${enc.creature ? `<p><b>Creature:</b> ${enc.creature.name} (TL${enc.creature.tl})</p>` : ''}
+            <hr><p><small>Synced from Fate's Edge VTT v2.1.0</small></p>
+        `;
+        this._createJournalEntry(`[Fate's Edge] Encounter: ${name}`, content);
+        ui.notifications.warn(`⚔️ Fate's Edge: Encounter "${name}" started!`);
+        Hooks.call('fates-edge-encounter-started', data);
+    },
+    
+    _handleEncounterResolved(data) {
+        this.adventureState = { ...this.adventureState, ...data };
+        const resolution = data.lastResolution || {};
+        const encName = resolution.encounter || 'Encounter';
+        const outcome = resolution.outcome || '?';
+        const resultText = resolution.result || '';
+        console.log(`⚔️ Encounter resolved: ${encName} (${outcome})`);
+        const content = `
+            <h2>⚔️ Encounter Resolved</h2>
+            <p><b>Encounter:</b> ${encName}</p>
+            <p><b>Outcome:</b> ${outcome}</p>
+            ${resultText ? `<p><i>${resultText}</i></p>` : ''}
+            ${resolution.notes ? `<p><b>Notes:</b> ${resolution.notes}</p>` : ''}
+            <hr><p><small>Synced from Fate's Edge VTT v2.1.0</small></p>
+        `;
+        this._createJournalEntry(`[Fate's Edge] Encounter Resolved: ${encName}`, content);
+        ui.notifications.info(`⚔️ Fate's Edge: Encounter "${encName}" resolved as ${outcome}`);
+        Hooks.call('fates-edge-encounter-resolved', data);
+    },
+    
+    _handleTimerTicked(data) {
+        this.adventureState = { ...this.adventureState, ...data };
+        const timer = data.tickedTimer || {};
+        const name = timer.name || 'Timer';
+        const current = timer.current ?? 0;
+        const segments = timer.segments || 1;
+        const full = timer.full || false;
+        console.log(`⏱️ Timer ticked: ${name} ${current}/${segments}`);
+        const progress = Math.round((current / segments) * 100);
+        const color = full ? '#cc3333' : '#d4af37';
+        const content = `
+            <h2>⏱️ Timer Ticked: ${name}</h2>
+            <p><b>Progress:</b> ${current}/${segments}</p>
+            <div style="width:100%;height:10px;background:#333;border-radius:5px;overflow:hidden;border:1px solid #555;">
+                <div style="width:${Math.min(progress, 100)}%;height:100%;background:${color};border-radius:5px;transition:width 0.3s;"></div>
+            </div>
+            <p><b>Status:</b> ${full ? '⚠️ COMPLETE' : '⏳ Active'}</p>
+            <hr><p><small>Synced from Fate's Edge VTT v2.1.0</small></p>
+        `;
+        this._createJournalEntry(`[Fate's Edge] Timer: ${name}`, content);
+        if (full) ui.notifications.warn(`⚠️ Fate's Edge: Timer "${name}" is complete!`);
+        Hooks.call('fates-edge-timer-ticked', data);
+    },
+    
+    _handleAdventureLog(data) {
+        this.adventureState = { ...this.adventureState, ...data };
+        const log = data.log || [];
+        if (log.length) {
+            const last = log[log.length - 1];
+            console.log(`📝 Adventure log: ${last.message || last.text || last.type}`);
+            const content = `
+                <h2>📝 Adventure Log</h2>
+                <p><b>${last.author || 'GM'}:</b> ${last.message || last.text || last.type}</p>
+                <p><i>${new Date(last.timestamp).toLocaleString()}</i></p>
+                <hr><p><small>Synced from Fate's Edge VTT v2.1.0</small></p>
+            `;
+            this._createJournalEntry(`[Fate's Edge] Log Entry`, content);
+            Hooks.call('fates-edge-adventure-log', data);
+        }
+    },
+    
+    _handleAdventureState(data) {
+        this.adventureState = { ...this.adventureState, ...data };
+        console.log('📋 Adventure state received');
+        Hooks.call('fates-edge-adventure-state', data);
+    },
+    
+    _handleAdventureReference(data) {
+        console.log('📚 Adventure reference received');
+        let content = `<h2>📚 Adventure Reference: ${data.moduleId}</h2>`;
+        if (data.bestiary && data.bestiary.length) {
+            content += `<h3>🐉 Bestiary (${data.bestiary.length})</h3><ul>`;
+            data.bestiary.forEach(b => {
+                content += `<li><b>${b.name}</b> (TL${b.tl}) - ${b.class || b.category || ''}</li>`;
+            });
+            content += `</ul>`;
+        }
+        if (data.npcs && data.npcs.length) {
+            content += `<h3>👤 NPCs (${data.npcs.length})</h3><ul>`;
+            data.npcs.forEach(n => {
+                content += `<li><b>${n.name}</b> (${n.role || 'NPC'})${n.motivation ? ` - ${n.motivation}` : ''}</li>`;
+            });
+            content += `</ul>`;
+        }
+        if (data.locations && data.locations.length) {
+            content += `<h3>📍 Locations (${data.locations.length})</h3><ul>`;
+            data.locations.forEach(l => {
+                content += `<li><b>${l.name}</b>${l.description ? `: ${l.description}` : ''}</li>`;
+            });
+            content += `</ul>`;
+        }
+        if (data.factions && data.factions.length) {
+            content += `<h3>⚑ Factions (${data.factions.length})</h3><ul>`;
+            data.factions.forEach(f => {
+                content += `<li><b>${f.name}</b>${f.goals ? ` - ${f.goals}` : ''}</li>`;
+            });
+            content += `</ul>`;
+        }
+        if (data.notes) {
+            content += `<h3>📝 Notes</h3><p>${data.notes}</p>`;
+        }
+        content += `<hr><p><small>Synced from Fate's Edge VTT v2.1.0</small></p>`;
+        this._createJournalEntry(`[Fate's Edge] Reference: ${data.moduleId}`, content);
+        ui.notifications.info(`📚 Fate's Edge: Reference data for "${data.moduleId}" received`);
+        Hooks.call('fates-edge-adventure-reference', data);
+    },
+    
+    _handleAdventureReset(data) {
+        this.adventureState = { ...this.adventureState, ...data };
+        console.log('🔄 Adventure reset');
+        const content = `
+            <h2>🔄 Adventure Reset</h2>
+            <p>The adventure has been reset to its initial state.</p>
+            <hr><p><small>Synced from Fate's Edge VTT v2.1.0</small></p>
+        `;
+        this._createJournalEntry(`[Fate's Edge] Adventure Reset`, content);
+        ui.notifications.info('🔄 Fate\'s Edge: Adventure reset to start');
+        Hooks.call('fates-edge-adventure-reset', data);
     },
     
     // ============================================================
@@ -965,7 +1161,6 @@ export const FatesEdgeBridge = {
     },
     
     _parseDiceExpression(expr) {
-        // Support Fate/Fudge dice
         if (expr.toLowerCase().includes('df')) {
             const parts = expr.match(/^(\d*)dF([+-]\d+)?$/i);
             if (parts) {
@@ -1047,12 +1242,28 @@ export const FatesEdgeBridge = {
     },
     
     // ============================================================
+    // Public Accessors
+    // ============================================================
+    
+    getCurrentGM() {
+        return this.gmId ? this.clients.get(this.gmId) : null;
+    },
+    
+    getPendingGMRequests() {
+        return this.pendingRequests;
+    },
+    
+    clearPendingGMRequests() {
+        this.pendingRequests = [];
+        this._updateGmUI();
+    },
+    
+    // ============================================================
     // Foundry Hooks
     // ============================================================
     
     hookChatMessage(message) {
         if (!game.settings.get('fates-edge-bridge', 'syncChat')) return;
-        // Don't sync our own messages or system messages
         if (message.content && !message.content.includes('[Fate\'s Edge]') && !message.whisper) {
             this.sendChatMessage(message.content, message.user?.name || 'Unknown');
         }

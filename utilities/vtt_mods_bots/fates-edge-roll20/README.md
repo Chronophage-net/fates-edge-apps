@@ -269,4 +269,4 @@ Contributions are welcome! Please see our [Contributing Guidelines](https://gith
 
 ---
 
-Made with ❤️ by the Fate's Edge Team
+Made with ❤️ by Nick Gasper

@@ -1,6 +1,8 @@
 /**
- * Fate's Edge Roll20 API Module v2.0.0
+ * Fate's Edge Roll20 API Module v2.1.0
  * Connects Roll20 to the Fate's Edge WebSocket Server
+ * 
+ * New in 2.1.0: Adventure Engine support (load, scene, encounter, timer, log, status, reference, reset)
  * 
  * Features:
  * - Real-time chat sync
@@ -16,6 +18,7 @@
  * - GM election & promotion
  * - Whiteboard summary (drawings, notes, images)
  * - Grid combat status (tokens, zones)
+ * - Adventure Engine (load, scene, encounter, timer, log, status, reference, reset)
  * 
  * Installation:
  * 1. In Roll20, go to Settings → API Scripts
@@ -33,7 +36,7 @@
 // Configuration
 // ============================================================
 
-const CONFIG = {
+var CONFIG = {
     serverUrl: getConfigVar('FATES_EDGE_SERVER_URL', 'ws://localhost:10000'),
     roomCode: getConfigVar('FATES_EDGE_ROOM_CODE', ''),
     apiKey: getConfigVar('FATES_EDGE_API_KEY', ''),
@@ -63,58 +66,72 @@ function getConfigVar(name, defaultValue) {
 // State
 // ============================================================
 
-let ws = null;
-let connected = false;
-let reconnectTimer = null;
-let reconnectAttempts = 0;
-const MAX_RECONNECT_ATTEMPTS = 10;
-let heartbeatInterval = null;
-let clientId = null;
+var ws = null;
+var connected = false;
+var reconnectTimer = null;
+var reconnectAttempts = 0;
+var MAX_RECONNECT_ATTEMPTS = 10;
+var heartbeatInterval = null;
+var clientId = null;
 
 // VTT state
-const vttCharacters = new Map();        // name -> full character object
-const vttTimers = [];
-const deckState = {
+var vttCharacters = new Map();        // name -> full character object
+var vttTimers = [];
+var deckState = {
     cards: [],
     history: [],
     offset: 0,
     remaining: 54
 };
-let currentRegion = CONFIG.defaultRegion;
-let loadedModules = [];
-let whiteboard = { drawings: [], notes: [], images: [] };
-let gridCombat = { enabled: false, tokens: [], gridType: 'square' };
+var currentRegion = CONFIG.defaultRegion;
+var loadedModules = [];
+var whiteboard = { drawings: [], notes: [], images: [] };
+var gridCombat = { enabled: false, tokens: [], gridType: 'square' };
+
+// Adventure Engine state
+var adventureState = {
+    moduleId: null,
+    title: null,
+    status: null,
+    currentAct: null,
+    currentScene: null,
+    activeEncounter: null,
+    campaignTimers: [],
+    log: [],
+    updatedAt: null
+};
 
 // GM State
-let clients = {};           // clientId -> { id, name, role, ... }
-let gmId = null;            // clientId of current GM
-let pendingRequests = [];   // [ { requesterId, requesterName }, ... ]
-let myRole = 'player';      // role of this Roll20 client
+var clients = {};           // clientId -> { id, name, role, ... }
+var gmId = null;            // clientId of current GM
+var pendingRequests = [];   // [ { requesterId, requesterName }, ... ]
+var myRole = 'player';      // role of this Roll20 client
 
 // ============================================================
 // Logging
 // ============================================================
 
-function log(message, level = 'info') {
-    const prefix = '⚔️ Fate\'s Edge v2.0.0:';
-    const timestamp = new Date().toISOString();
+function log(message, level) {
+    level = level || 'info';
+    var prefix = '⚔️ Fate\'s Edge v2.1.0:';
+    var timestamp = new Date().toISOString();
     switch (level) {
         case 'error':
-            console.error(`${prefix} ${message}`);
+            console.error(prefix + ' ' + message);
             break;
         case 'warn':
-            console.warn(`${prefix} ${message}`);
+            console.warn(prefix + ' ' + message);
             break;
         case 'info':
         default:
-            console.log(`${prefix} ${message}`);
+            console.log(prefix + ' ' + message);
             break;
     }
 }
 
 function logWS(direction, data) {
     // Uncomment for verbose debugging
-    // console.log(`${direction} ${JSON.stringify(data)}`);
+    // console.log(direction + ' ' + JSON.stringify(data));
 }
 
 // ============================================================
@@ -137,19 +154,19 @@ function connect() {
         return;
     }
 
-    log(`Connecting to ${CONFIG.serverUrl} as ${getPlayerName()}...`);
+    log('Connecting to ' + CONFIG.serverUrl + ' as ' + getPlayerName() + '...');
 
     try {
-        const wsUrl = `${CONFIG.serverUrl}?room=${encodeURIComponent(CONFIG.roomCode)}`;
+        var wsUrl = CONFIG.serverUrl + '?room=' + encodeURIComponent(CONFIG.roomCode);
         ws = new WebSocket(wsUrl);
 
-        ws.onopen = () => onOpen();
-        ws.onmessage = (event) => onMessage(event);
-        ws.onerror = (error) => onError(error);
-        ws.onclose = (event) => onClose(event);
+        ws.onopen = onOpen;
+        ws.onmessage = onMessage;
+        ws.onerror = onError;
+        ws.onclose = onClose;
 
     } catch (err) {
-        log(`Connection error: ${err.message}`, 'error');
+        log('Connection error: ' + err.message, 'error');
         scheduleReconnect();
     }
 }
@@ -179,6 +196,17 @@ function disconnect() {
     gmId = null;
     pendingRequests = [];
     myRole = 'player';
+    adventureState = {
+        moduleId: null,
+        title: null,
+        status: null,
+        currentAct: null,
+        currentScene: null,
+        activeEncounter: null,
+        campaignTimers: [],
+        log: [],
+        updatedAt: null
+    };
     log('Disconnected');
     updateStatus('disconnected');
 }
@@ -189,15 +217,15 @@ function scheduleReconnect() {
         return;
     }
 
-    const delay = Math.min(1000 * Math.pow(1.5, reconnectAttempts), 30000);
+    var delay = Math.min(1000 * Math.pow(1.5, reconnectAttempts), 30000);
     reconnectAttempts++;
 
-    log(`Reconnecting in ${delay}ms (attempt ${reconnectAttempts}/${MAX_RECONNECT_ATTEMPTS})`);
+    log('Reconnecting in ' + delay + 'ms (attempt ' + reconnectAttempts + '/' + MAX_RECONNECT_ATTEMPTS + ')');
 
     if (reconnectTimer) {
         clearTimeout(reconnectTimer);
     }
-    reconnectTimer = setTimeout(() => {
+    reconnectTimer = setTimeout(function() {
         if (!connected) {
             connect();
         }
@@ -213,20 +241,18 @@ function onOpen() {
     connected = true;
     reconnectAttempts = 0;
 
-    // Send handshake (plain WebSocket protocol)
-    const playerName = getPlayerName();
+    var playerName = getPlayerName();
     sendMessage({
         type: 'handshake',
         clientName: playerName,
-        role: 'gm',   // Roll20 is typically GM
+        role: 'gm',
         password: CONFIG.password || ''
     });
 
-    // Start heartbeat
     if (heartbeatInterval) {
         clearInterval(heartbeatInterval);
     }
-    heartbeatInterval = setInterval(() => {
+    heartbeatInterval = setInterval(function() {
         if (connected && ws && ws.readyState === WebSocket.OPEN) {
             sendMessage({ type: 'ping' });
         }
@@ -237,10 +263,10 @@ function onOpen() {
 
 function onMessage(event) {
     try {
-        const data = JSON.parse(event.data);
+        var data = JSON.parse(event.data);
         handleMessage(data);
     } catch (err) {
-        log(`Failed to parse message: ${err.message}`, 'error');
+        log('Failed to parse message: ' + err.message, 'error');
     }
 }
 
@@ -249,7 +275,6 @@ function handleMessage(data) {
 
     switch (data.type) {
         case 'connected':
-            // Server sends initial connected message; ignore
             break;
 
         case 'handshake_ack':
@@ -353,6 +378,44 @@ function handleMessage(data) {
             handleServerAnnouncement(data);
             break;
 
+        // ─── Adventure Engine events ──────────────────────
+        case 'adventure-loaded':
+            handleAdventureLoaded(data);
+            break;
+
+        case 'scene-changed':
+            handleSceneChanged(data);
+            break;
+
+        case 'encounter-started':
+            handleEncounterStarted(data);
+            break;
+
+        case 'encounter-resolved':
+            handleEncounterResolved(data);
+            break;
+
+        case 'timer-ticked':
+            handleTimerTicked(data);
+            break;
+
+        case 'adventure-log':
+            handleAdventureLog(data);
+            break;
+
+        case 'adventure-state':
+            handleAdventureState(data);
+            break;
+
+        case 'adventure-reference':
+            handleAdventureReference(data);
+            break;
+
+        case 'adventure-reset':
+            handleAdventureReset(data);
+            break;
+        // ─── end new ────────────────────────────────────────
+
         case 'room-closed':
             log('Room closed by server', 'warn');
             disconnect();
@@ -363,17 +426,17 @@ function handleMessage(data) {
             break;
 
         default:
-            log(`Unhandled message type: ${data.type}`);
+            log('Unhandled message type: ' + data.type);
     }
 }
 
 function onError(error) {
-    log(`WebSocket error: ${error.message || 'Unknown error'}`, 'error');
+    log('WebSocket error: ' + (error.message || 'Unknown error'), 'error');
     scheduleReconnect();
 }
 
 function onClose(event) {
-    log(`WebSocket closed: ${event.code} - ${event.reason || 'No reason'}`);
+    log('WebSocket closed: ' + event.code + ' - ' + (event.reason || 'No reason'));
     connected = false;
     clientId = null;
 
@@ -396,23 +459,21 @@ function onClose(event) {
 function handleHandshakeAck(data) {
     clientId = data.clientId;
     myRole = data.clientRole || 'player';
-    log(`✅ Handshake successful. Client ID: ${clientId}, Role: ${myRole}`);
+    log('✅ Handshake successful. Client ID: ' + clientId + ', Role: ' + myRole);
 
     if (data.activeClients) {
         updateClients(data.activeClients);
-        const names = data.activeClients.map(c => c.name).join(', ');
-        log(`Clients in room: ${names}`);
+        var names = data.activeClients.map(function(c) { return c.name; }).join(', ');
+        log('Clients in room: ' + names);
     }
 
-    // Send region info
     sendMessage({
         type: 'set-region',
         region: currentRegion
     });
 
-    // Sync characters if any exist locally
     if (CONFIG.syncCharacters) {
-        const chars = collectCharacters();
+        var chars = collectCharacters();
         if (chars.length > 0) {
             syncCharacters(chars);
         }
@@ -439,7 +500,9 @@ function handleRoomState(data) {
     if (data.clients) {
         updateClients(data.clients);
     }
-    // Update UI
+    if (data.adventure) {
+        adventureState = mergeAdventureState(adventureState, data.adventure);
+    }
     updateGMUI();
 }
 
@@ -454,7 +517,7 @@ function handleStateUpdated(data) {
 }
 
 function handleSyncState(data) {
-    const state = data.state || {};
+    var state = data.state || {};
     if (state.characters) {
         updateCharacters(state.characters);
     }
@@ -471,29 +534,29 @@ function handleSyncState(data) {
 }
 
 function handleChatMessage(data) {
-    log(`💬 ${data.sender}: ${data.text}`);
+    log('💬 ' + data.sender + ': ' + data.text);
     if (CONFIG.syncChat) {
-        sendToChat(`[Fate's Edge] ${data.sender}: ${data.text}`);
+        sendToChat('[Fate\'s Edge] ' + data.sender + ': ' + data.text);
     }
 }
 
 function handleRollResult(data) {
-    log(`🎲 ${data.sender} rolled: ${data.expr || 'Dice'}`);
+    log('🎲 ' + data.sender + ' rolled: ' + (data.expr || 'Dice'));
     if (CONFIG.syncRolls) {
-        let resultText = data.result;
+        var resultText = data.result;
         if (data.rolls && data.rolls.length > 0) {
-            resultText = `${data.rolls.join(' + ')} = ${data.total}`;
+            resultText = data.rolls.join(' + ') + ' = ' + data.total;
         }
-        sendToChat(`🎲 ${data.sender} rolled **${data.expr}**: ${resultText}`);
+        sendToChat('🎲 ' + data.sender + ' rolled **' + data.expr + '**: ' + resultText);
     }
 }
 
 function handlePlayerJoined(data) {
     if (data.clients) {
         updateClients(data.clients);
-        const name = data.clientName || 'Unknown';
-        log(`👤 ${name} joined`);
-        sendToChat(`👤 ${name} has joined the Fate's Edge session.`);
+        var name = data.clientName || 'Unknown';
+        log('👤 ' + name + ' joined');
+        sendToChat('👤 ' + name + ' has joined the Fate\'s Edge session.');
     }
 }
 
@@ -508,10 +571,230 @@ function handlePlayerLeft(data) {
     if (data.clients) {
         updateClients(data.clients);
     }
-    const name = data.clientName || 'Unknown';
-    log(`👤 ${name} left`);
-    sendToChat(`👤 ${name} has left the Fate's Edge session.`);
+    var name = data.clientName || 'Unknown';
+    log('👤 ' + name + ' left');
+    sendToChat('👤 ' + name + ' has left the Fate\'s Edge session.');
     updateGMUI();
+}
+
+// ============================================================
+// Adventure Engine Handlers
+// ============================================================
+
+function mergeAdventureState(existing, incoming) {
+    var merged = {};
+    for (var key in existing) {
+        if (existing.hasOwnProperty(key)) {
+            merged[key] = existing[key];
+        }
+    }
+    for (var key in incoming) {
+        if (incoming.hasOwnProperty(key)) {
+            merged[key] = incoming[key];
+        }
+    }
+    return merged;
+}
+
+function handleAdventureLoaded(data) {
+    adventureState = mergeAdventureState(adventureState, data);
+    var title = data.title || data.moduleId || 'Unknown';
+    log('📖 Adventure loaded: ' + title);
+    var msg = '📖 **Adventure Loaded:** ' + title + '\n';
+    msg += 'Status: ' + (data.status || 'active') + '\n';
+    if (data.currentAct) {
+        msg += 'Act: ' + data.currentAct.title + '\n';
+    }
+    if (data.currentScene) {
+        msg += 'Scene: ' + data.currentScene.title + '\n';
+    }
+    sendToChat(msg);
+    // Create a handout/journal entry
+    createHandout('Adventure: ' + title, msg);
+}
+
+function handleSceneChanged(data) {
+    adventureState = mergeAdventureState(adventureState, data);
+    var act = data.currentAct ? data.currentAct.title : 'Unknown';
+    var scene = data.currentScene ? data.currentScene.title : 'Unknown';
+    log('🎭 Scene changed: ' + act + ' / ' + scene);
+    var msg = '🎭 **Scene Changed**\nAct: ' + act + '\nScene: ' + scene;
+    if (data.currentScene && data.currentScene.description) {
+        msg += '\n' + data.currentScene.description;
+    }
+    sendToChat(msg);
+    createHandout('Scene: ' + scene, msg);
+}
+
+function handleEncounterStarted(data) {
+    adventureState = mergeAdventureState(adventureState, data);
+    var enc = data.activeEncounter || {};
+    var name = enc.name || enc.creatureId || 'Encounter';
+    var dv = enc.dv || '?';
+    var pos = enc.position || 'Controlled';
+    log('⚔️ Encounter started: ' + name);
+    var msg = '⚔️ **Encounter Started:** ' + name + '\n';
+    msg += 'DV: ' + dv + '\n';
+    msg += 'Position: ' + pos;
+    if (enc.creature) {
+        msg += '\nCreature: ' + enc.creature.name + ' (TL' + enc.creature.tl + ')';
+    }
+    sendToChat(msg);
+    createHandout('Encounter: ' + name, msg);
+}
+
+function handleEncounterResolved(data) {
+    adventureState = mergeAdventureState(adventureState, data);
+    var resolution = data.lastResolution || {};
+    var encName = resolution.encounter || 'Encounter';
+    var outcome = resolution.outcome || '?';
+    var resultText = resolution.result || '';
+    log('⚔️ Encounter resolved: ' + encName + ' (' + outcome + ')');
+    var msg = '⚔️ **Encounter Resolved:** ' + encName + '\n';
+    msg += 'Outcome: ' + outcome + '\n';
+    if (resultText) {
+        msg += resultText + '\n';
+    }
+    if (resolution.notes) {
+        msg += 'Notes: ' + resolution.notes;
+    }
+    sendToChat(msg);
+    createHandout('Encounter Resolved: ' + encName, msg);
+}
+
+function handleTimerTicked(data) {
+    adventureState = mergeAdventureState(adventureState, data);
+    var timer = data.tickedTimer || {};
+    var name = timer.name || 'Timer';
+    var current = timer.current || 0;
+    var segments = timer.segments || 1;
+    var full = timer.full || false;
+    log('⏱️ Timer ticked: ' + name + ' ' + current + '/' + segments);
+    var bar = generateProgressBar(current, segments);
+    var msg = '⏱️ **Timer:** ' + name + '\n';
+    msg += '[' + bar + '] ' + current + '/' + segments + '\n';
+    msg += 'Status: ' + (full ? '⚠️ COMPLETE' : '⏳ Active');
+    sendToChat(msg);
+    if (full) {
+        sendToChat('⚠️ Timer "' + name + '" is complete!');
+    }
+    createHandout('Timer: ' + name, msg);
+}
+
+function handleAdventureLog(data) {
+    adventureState = mergeAdventureState(adventureState, data);
+    var logData = data.log || [];
+    if (logData.length > 0) {
+        var last = logData[logData.length - 1];
+        var author = last.author || 'GM';
+        var message = last.message || last.text || last.type;
+        log('📝 Adventure log: ' + message);
+        sendToChat('📝 **' + author + ':** ' + message);
+    }
+}
+
+function handleAdventureState(data) {
+    adventureState = mergeAdventureState(adventureState, data);
+    log('📋 Adventure state received');
+    var msg = '📋 **Adventure Status**\n';
+    msg += 'Title: ' + (adventureState.title || 'None') + '\n';
+    msg += 'Status: ' + (adventureState.status || 'unknown') + '\n';
+    if (adventureState.currentAct) {
+        msg += 'Act: ' + adventureState.currentAct.title + '\n';
+    }
+    if (adventureState.currentScene) {
+        msg += 'Scene: ' + adventureState.currentScene.title + '\n';
+    }
+    if (adventureState.activeEncounter) {
+        var enc = adventureState.activeEncounter;
+        var encName = enc.name || enc.creatureId || 'Encounter';
+        msg += 'Encounter: ' + encName + ' (DV ' + (enc.dv || '?') + ', ' + (enc.position || 'Controlled') + ')\n';
+    }
+    if (adventureState.campaignTimers && adventureState.campaignTimers.length > 0) {
+        var timerStr = adventureState.campaignTimers.map(function(t) {
+            return t.name + ': ' + (t.current || 0) + '/' + t.segments;
+        }).join(', ');
+        msg += 'Campaign Timers: ' + timerStr + '\n';
+    }
+    if (adventureState.log && adventureState.log.length > 0) {
+        var lastLog = adventureState.log[adventureState.log.length - 1];
+        msg += 'Last log: ' + (lastLog.message || lastLog.text || lastLog.type);
+    }
+    sendToChat(msg);
+}
+
+function handleAdventureReference(data) {
+    log('📚 Adventure reference received');
+    var msg = '📚 **Reference: ' + (data.moduleId || 'Unknown') + '**\n';
+    if (data.bestiary && data.bestiary.length > 0) {
+        msg += '🐉 Bestiary (' + data.bestiary.length + '):\n';
+        data.bestiary.slice(0, 5).forEach(function(b) {
+            msg += '  - ' + b.name + ' (TL' + b.tl + ')\n';
+        });
+        if (data.bestiary.length > 5) {
+            msg += '  ... and ' + (data.bestiary.length - 5) + ' more\n';
+        }
+    }
+    if (data.npcs && data.npcs.length > 0) {
+        msg += '👤 NPCs (' + data.npcs.length + '):\n';
+        data.npcs.slice(0, 5).forEach(function(n) {
+            msg += '  - ' + n.name + ' (' + (n.role || 'NPC') + ')\n';
+        });
+        if (data.npcs.length > 5) {
+            msg += '  ... and ' + (data.npcs.length - 5) + ' more\n';
+        }
+    }
+    if (data.locations && data.locations.length > 0) {
+        msg += '📍 Locations (' + data.locations.length + '):\n';
+        data.locations.slice(0, 5).forEach(function(l) {
+            msg += '  - ' + l.name + '\n';
+        });
+        if (data.locations.length > 5) {
+            msg += '  ... and ' + (data.locations.length - 5) + ' more\n';
+        }
+    }
+    if (data.factions && data.factions.length > 0) {
+        msg += '⚑ Factions (' + data.factions.length + '):\n';
+        data.factions.forEach(function(f) {
+            msg += '  - ' + f.name + '\n';
+        });
+    }
+    if (data.notes) {
+        msg += '📝 Notes: ' + data.notes + '\n';
+    }
+    sendToChat(msg);
+    createHandout('Reference: ' + data.moduleId, msg);
+}
+
+function handleAdventureReset(data) {
+    adventureState = mergeAdventureState(adventureState, data);
+    log('🔄 Adventure reset');
+    sendToChat('🔄 Adventure has been reset to its initial state.');
+}
+
+function generateProgressBar(current, max) {
+    var filled = Math.floor((current / max) * 10);
+    var bar = '';
+    for (var i = 0; i < 10; i++) {
+        bar += (i < filled) ? '▰' : '▱';
+    }
+    return bar;
+}
+
+function createHandout(title, content) {
+    try {
+        if (typeof Campaign !== 'undefined' && Campaign.createJournalEntry) {
+            Campaign.createJournalEntry({
+                name: title,
+                content: content.replace(/\n/g, '<br>'),
+                gm: false,
+                players: true
+            });
+            log('📄 Created handout: ' + title);
+        }
+    } catch (err) {
+        log('Failed to create handout: ' + err.message, 'warn');
+    }
 }
 
 // ============================================================
@@ -519,25 +802,25 @@ function handlePlayerLeft(data) {
 // ============================================================
 
 function handleDeckDrawn(data) {
-    const cards = data.cards || [];
-    const synthesis = data.synthesis || '';
-    const region = data.region || currentRegion;
+    var cards = data.cards || [];
+    var synthesis = data.synthesis || '';
+    var region = data.region || currentRegion;
     deckState.cards = cards;
     deckState.remaining = data.remaining || 0;
 
-    log(`🃏 ${cards.length} card(s) drawn from ${region}`);
+    log('🃏 ' + cards.length + ' card(s) drawn from ' + region);
 
     if (CONFIG.syncDeck) {
-        const cardNames = cards.map(c => {
+        var cardNames = cards.map(function(c) {
             if (c.is_joker) return '🃏 Joker';
-            return `${c.rank_name || c.rank} of ${c.suit_name || c.suit}`;
+            return (c.rank_name || c.rank) + ' of ' + (c.suit_name || c.suit);
         }).join(', ');
 
-        let msg = `🃏 **${cards.length} card(s) drawn from ${region}**\n`;
-        msg += `${cardNames}\n\n`;
+        var msg = '🃏 **' + cards.length + ' card(s) drawn from ' + region + '**\n';
+        msg += cardNames + '\n\n';
         msg += synthesis;
         sendToChat(msg);
-        createDeckHandout(`Deck Draw - ${region}`, msg);
+        createHandout('Deck Draw - ' + region, msg);
     }
 }
 
@@ -545,16 +828,16 @@ function handleDeckShuffled(data) {
     deckState.cards = [];
     deckState.history = [];
     deckState.remaining = data.remaining || 54;
-    log(`🔀 Deck shuffled (${deckState.remaining} cards remaining)`);
+    log('🔀 Deck shuffled (' + deckState.remaining + ' cards remaining)');
     if (CONFIG.syncDeck) {
-        sendToChat(`🔀 The Deck of Consequences has been shuffled. ${deckState.remaining} cards remaining.`);
+        sendToChat('🔀 The Deck of Consequences has been shuffled. ' + deckState.remaining + ' cards remaining.');
     }
 }
 
 function handleDeckHistory(data) {
-    const history = data.history || [];
+    var history = data.history || [];
     deckState.history = history;
-    log(`📜 Deck history: ${history.length} entries`);
+    log('📜 Deck history: ' + history.length + ' entries');
 }
 
 function handleDeckHistoryCleared(data) {
@@ -566,40 +849,24 @@ function handleDeckHistoryCleared(data) {
 }
 
 function handleCrownSpread(data) {
-    const cards = data.cards || [];
-    const result = data.result || {};
-    const region = data.region || currentRegion;
+    var cards = data.cards || [];
+    var result = data.result || {};
+    var region = data.region || currentRegion;
 
-    log(`👑 Crown Spread from ${region}`);
+    log('👑 Crown Spread from ' + region);
 
     if (CONFIG.syncDeck) {
-        let msg = `👑 **Crown Spread from ${region}**\n\n`;
+        var msg = '👑 **Crown Spread from ' + region + '**\n\n';
         if (result.positions) {
-            result.positions.forEach(p => {
-                msg += `${p.icon} **${p.label}:** ${p.meaning}\n`;
+            result.positions.forEach(function(p) {
+                msg += p.icon + ' **' + p.label + ':** ' + p.meaning + '\n';
             });
         }
         if (result.wildcard) {
-            msg += `\n🌟 **Wildcard:** ${result.wildcard}`;
+            msg += '\n🌟 **Wildcard:** ' + result.wildcard;
         }
         sendToChat(msg);
-        createDeckHandout(`Crown Spread - ${region}`, msg);
-    }
-}
-
-function createDeckHandout(title, content) {
-    try {
-        if (typeof Campaign !== 'undefined' && Campaign.createJournalEntry) {
-            Campaign.createJournalEntry({
-                name: title,
-                content: content.replace(/\n/g, '<br>'),
-                gm: false,
-                players: true
-            });
-            log(`📄 Created handout: ${title}`);
-        }
-    } catch (err) {
-        log(`Failed to create handout: ${err.message}`, 'warn');
+        createHandout('Crown Spread - ' + region, msg);
     }
 }
 
@@ -609,31 +876,31 @@ function createDeckHandout(title, content) {
 
 function handleModuleList(data) {
     loadedModules = data.modules || [];
-    log(`📦 ${loadedModules.length} modules loaded`);
+    log('📦 ' + loadedModules.length + ' modules loaded');
     if (loadedModules.length > 0) {
-        const names = loadedModules.map(m => m.name || m.id).join(', ');
-        sendToChat(`📦 Modules loaded: ${names}`);
+        var names = loadedModules.map(function(m) { return m.name || m.id; }).join(', ');
+        sendToChat('📦 Modules loaded: ' + names);
     }
 }
 
 function handleModulePush(data) {
-    const module = data.module || {};
-    const name = module.manifest?.name || module.id || 'Unknown';
-    log(`📦 Module pushed: ${name}`);
-    sendToChat(`📦 Module pushed: ${name}`);
+    var module = data.module || {};
+    var name = module.manifest ? module.manifest.name : (module.id || 'Unknown');
+    log('📦 Module pushed: ' + name);
+    sendToChat('📦 Module pushed: ' + name);
 }
 
 function handleModuleCleanup(data) {
-    const moduleId = data.moduleId || 'Unknown';
-    log(`🧹 Module cleanup: ${moduleId}`);
-    sendToChat(`🧹 Module cleanup requested: ${moduleId}`);
+    var moduleId = data.moduleId || 'Unknown';
+    log('🧹 Module cleanup: ' + moduleId);
+    sendToChat('🧹 Module cleanup requested: ' + moduleId);
 }
 
 function handleRegionUpdated(data) {
     if (data.region) {
         currentRegion = data.region;
-        log(`📍 Region updated to: ${currentRegion}`);
-        sendToChat(`📍 Region updated to: ${currentRegion}`);
+        log('📍 Region updated to: ' + currentRegion);
+        sendToChat('📍 Region updated to: ' + currentRegion);
     }
 }
 
@@ -647,9 +914,9 @@ function handleWhiteboardUpdate(data) {
         if (whiteboard.gridCombat) {
             gridCombat = whiteboard.gridCombat;
         }
-        log(`📋 Whiteboard updated: ${whiteboard.drawings?.length || 0} drawings, ${whiteboard.notes?.length || 0} notes, ${whiteboard.images?.length || 0} images`);
+        log('📋 Whiteboard updated: ' + (whiteboard.drawings ? whiteboard.drawings.length : 0) + ' drawings, ' + (whiteboard.notes ? whiteboard.notes.length : 0) + ' notes, ' + (whiteboard.images ? whiteboard.images.length : 0) + ' images');
         if (gridCombat.enabled) {
-            log(`⚔️ Grid combat: ${gridCombat.gridType}, ${gridCombat.tokens?.length || 0} tokens`);
+            log('⚔️ Grid combat: ' + gridCombat.gridType + ', ' + (gridCombat.tokens ? gridCombat.tokens.length : 0) + ' tokens');
         }
     }
 }
@@ -660,12 +927,12 @@ function handleWhiteboardUpdate(data) {
 
 function updateCharacters(charactersArray) {
     vttCharacters.clear();
-    charactersArray.forEach(c => {
+    charactersArray.forEach(function(c) {
         if (c.name) {
             vttCharacters.set(c.name, c);
         }
     });
-    log(`👥 ${vttCharacters.size} characters synced`);
+    log('👥 ' + vttCharacters.size + ' characters synced');
 
     if (CONFIG.syncCharacters) {
         syncToRoll20Characters();
@@ -674,13 +941,13 @@ function updateCharacters(charactersArray) {
 
 function handleCharacterUpdate(data) {
     if (data.name && data.field !== undefined) {
-        let char = vttCharacters.get(data.name);
+        var char = vttCharacters.get(data.name);
         if (!char) {
             char = { name: data.name };
             vttCharacters.set(data.name, char);
         }
         char[data.field] = data.value;
-        log(`⚡ ${data.name}.${data.field} = ${data.value}`);
+        log('⚡ ' + data.name + '.' + data.field + ' = ' + data.value);
         if (CONFIG.syncCharacters) {
             syncToRoll20Characters();
         }
@@ -689,15 +956,21 @@ function handleCharacterUpdate(data) {
 
 function handleCharacterUpdateBulk(data) {
     if (data.updates) {
-        Object.entries(data.updates).forEach(([name, fields]) => {
-            let char = vttCharacters.get(name);
+        var names = Object.keys(data.updates);
+        names.forEach(function(name) {
+            var fields = data.updates[name];
+            var char = vttCharacters.get(name);
             if (!char) {
-                char = { name };
+                char = { name: name };
                 vttCharacters.set(name, char);
             }
-            Object.assign(char, fields);
+            for (var key in fields) {
+                if (fields.hasOwnProperty(key)) {
+                    char[key] = fields[key];
+                }
+            }
         });
-        log(`📋 Bulk update: ${Object.keys(data.updates).length} characters`);
+        log('📋 Bulk update: ' + names.length + ' characters');
         if (CONFIG.syncCharacters) {
             syncToRoll20Characters();
         }
@@ -707,8 +980,8 @@ function handleCharacterUpdateBulk(data) {
 function syncToRoll20Characters() {
     // Update Roll20 character sheets
     if (typeof Campaign !== 'undefined' && Campaign.characters) {
-        Campaign.characters.forEach(roll20Char => {
-            const vttChar = vttCharacters.get(roll20Char.name);
+        Campaign.characters.forEach(function(roll20Char) {
+            var vttChar = vttCharacters.get(roll20Char.name);
             if (vttChar) {
                 updateCharacterSheet(roll20Char, vttChar);
             }
@@ -716,13 +989,13 @@ function syncToRoll20Characters() {
     }
 
     // Update journal entries
-    for (const [name, char] of vttCharacters) {
+    vttCharacters.forEach(function(char, name) {
         createOrUpdateJournalEntry(char);
-    }
+    });
 }
 
 function updateCharacterSheet(roll20Char, vttChar) {
-    const attributes = [
+    var attributes = [
         { name: 'harm', value: vttChar.harm || 0 },
         { name: 'fatigue', value: vttChar.fatigue || 0 },
         { name: 'boons', value: vttChar.boons || 0 },
@@ -730,45 +1003,62 @@ function updateCharacterSheet(roll20Char, vttChar) {
     ];
 
     if (roll20Char.set) {
-        attributes.forEach(attr => {
+        attributes.forEach(function(attr) {
             roll20Char.set(attr.name, attr.value);
         });
-        log(`Updated character sheet: ${roll20Char.name}`);
+        log('Updated character sheet: ' + roll20Char.name);
     }
 }
 
 function createOrUpdateJournalEntry(char) {
-    const name = char.name || 'Unnamed';
-    let content = `
-        <h2>${name}</h2>
-        <p><b>Harm:</b> ${char.harm || 0}</p>
-        <p><b>Fatigue:</b> ${char.fatigue || 0}</p>
-        <p><b>Boons:</b> ${char.boons || 0}</p>
-        ${char.tier ? `<p><b>Tier:</b> ${char.tier}</p>` : ''}
-    `;
+    var name = char.name || 'Unnamed';
+    var content = '';
+    content += '<h2>' + name + '</h2>';
+    content += '<p><b>Harm:</b> ' + (char.harm || 0) + '</p>';
+    content += '<p><b>Fatigue:</b> ' + (char.fatigue || 0) + '</p>';
+    content += '<p><b>Boons:</b> ' + (char.boons || 0) + '</p>';
+    if (char.tier) {
+        content += '<p><b>Tier:</b> ' + char.tier + '</p>';
+    }
     if (char.attributes) {
-        content += `<p><b>Attributes:</b> ${Object.entries(char.attributes).map(([k,v]) => `${k}: ${v}`).join(', ')}</p>`;
+        var attrStr = '';
+        for (var key in char.attributes) {
+            if (char.attributes.hasOwnProperty(key)) {
+                attrStr += key + ': ' + char.attributes[key] + ', ';
+            }
+        }
+        if (attrStr) {
+            content += '<p><b>Attributes:</b> ' + attrStr.slice(0, -2) + '</p>';
+        }
     }
     if (char.skills) {
-        content += `<p><b>Skills:</b> ${Object.entries(char.skills).map(([k,v]) => `${k}: ${v}`).join(', ')}</p>`;
+        var skillStr = '';
+        for (var key in char.skills) {
+            if (char.skills.hasOwnProperty(key)) {
+                skillStr += key + ': ' + char.skills[key] + ', ';
+            }
+        }
+        if (skillStr) {
+            content += '<p><b>Skills:</b> ' + skillStr.slice(0, -2) + '</p>';
+        }
     }
     if (char.heritage) {
-        content += `<p><b>Heritage:</b> ${char.heritage}</p>`;
+        content += '<p><b>Heritage:</b> ' + char.heritage + '</p>';
     }
     if (char.background) {
-        content += `<p><b>Background:</b> ${char.background}</p>`;
+        content += '<p><b>Background:</b> ' + char.background + '</p>';
     }
     if (char.patron) {
-        content += `<p><b>Patron:</b> ${char.patron}</p>`;
+        content += '<p><b>Patron:</b> ' + char.patron + '</p>';
     }
-    content += `<hr><p><small>Synced from Fate's Edge VTT v2.0.0</small></p>`;
+    content += '<hr><p><small>Synced from Fate\'s Edge VTT v2.1.0</small></p>';
 
     try {
         if (typeof Campaign !== 'undefined' && Campaign.findJournalEntry) {
-            const existing = Campaign.findJournalEntry(name);
+            var existing = Campaign.findJournalEntry(name);
             if (existing) {
                 existing.set('content', content);
-                log(`Updated journal entry: ${name}`);
+                log('Updated journal entry: ' + name);
             } else if (Campaign.createJournalEntry) {
                 Campaign.createJournalEntry({
                     name: name,
@@ -776,11 +1066,11 @@ function createOrUpdateJournalEntry(char) {
                     gm: false,
                     players: true
                 });
-                log(`Created journal entry: ${name}`);
+                log('Created journal entry: ' + name);
             }
         }
     } catch (err) {
-        log(`Failed to update journal: ${err.message}`, 'warn');
+        log('Failed to update journal: ' + err.message, 'warn');
     }
 }
 
@@ -790,13 +1080,15 @@ function createOrUpdateJournalEntry(char) {
 
 function updateTimers(timers) {
     vttTimers.length = 0;
-    vttTimers.push(...timers);
+    timers.forEach(function(timer) {
+        vttTimers.push(timer);
+    });
     if (CONFIG.syncTimers) {
-        timers.forEach(timer => {
-            const progress = ((timer.current || 0) / (timer.segments || 1) * 100);
-            const bar = '▰'.repeat(Math.floor(progress / 10)) + '▱'.repeat(10 - Math.floor(progress / 10));
-            const status = (timer.current || 0) >= (timer.segments || 1) ? '⚠️ COMPLETE' : '⏳ Active';
-            sendToChat(`⏱️ **${timer.name}** [${bar}] ${timer.current}/${timer.segments} - ${status}`);
+        timers.forEach(function(timer) {
+            var progress = ((timer.current || 0) / (timer.segments || 1) * 100);
+            var bar = generateProgressBar(timer.current || 0, timer.segments || 1);
+            var status = (timer.current || 0) >= (timer.segments || 1) ? '⚠️ COMPLETE' : '⏳ Active';
+            sendToChat('⏱️ **' + timer.name + '** [' + bar + '] ' + timer.current + '/' + timer.segments + ' - ' + status);
         });
     }
 }
@@ -813,18 +1105,21 @@ function handlePresence(data) {
 }
 
 function handleGmVoteRequest(data) {
-    const { requesterId, requesterName, currentGmId, currentGmName } = data;
+    var requesterId = data.requesterId;
+    var requesterName = data.requesterName;
+    var currentGmId = data.currentGmId;
     if (myRole === 'gm' && clientId === currentGmId) {
-        if (!pendingRequests.find(r => r.requesterId === requesterId)) {
-            pendingRequests.push({ requesterId, requesterName });
+        if (!pendingRequests.some(function(r) { return r.requesterId === requesterId; })) {
+            pendingRequests.push({ requesterId: requesterId, requesterName: requesterName });
         }
         updateGMUI();
-        sendToChat(`👑 ${requesterName} requests to become GM. Use !fates-edge gm approve <name> or !fates-edge gm reject <name>`, 'gm');
+        sendToChat('👑 ' + requesterName + ' requests to become GM. Use !fates-edge gm approve <name> or !fates-edge gm reject <name>', 'gm');
     }
 }
 
 function handleGmRoleUpdate(data) {
-    const { clientId: targetId, role } = data;
+    var targetId = data.clientId;
+    var role = data.role;
     if (targetId === clientId) {
         myRole = role;
     }
@@ -837,12 +1132,12 @@ function handleGmRoleUpdate(data) {
         updateGmFromClients();
     }
     updateGMUI();
-    const name = clients[targetId]?.name || targetId;
-    sendToChat(`👑 ${name} is now ${role.toUpperCase()}.`);
+    var name = clients[targetId] ? clients[targetId].name : targetId;
+    sendToChat('👑 ' + name + ' is now ' + role.toUpperCase() + '.');
 }
 
 function handleServerAnnouncement(data) {
-    sendToChat(`📢 ${data.message}`);
+    sendToChat('📢 ' + data.message);
 }
 
 // ============================================================
@@ -851,11 +1146,11 @@ function handleServerAnnouncement(data) {
 
 function updateClients(clientsArray) {
     clients = {};
-    clientsArray.forEach(c => {
+    clientsArray.forEach(function(c) {
         clients[c.id] = c;
         if (c.role === 'gm') gmId = c.id;
     });
-    if (!clientsArray.some(c => c.role === 'gm')) {
+    if (!clientsArray.some(function(c) { return c.role === 'gm'; })) {
         gmId = null;
     }
     if (clientId && clients[clientId]) {
@@ -864,8 +1159,8 @@ function updateClients(clientsArray) {
 }
 
 function updateGmFromClients() {
-    for (let id in clients) {
-        if (clients[id].role === 'gm') {
+    for (var id in clients) {
+        if (clients.hasOwnProperty(id) && clients[id].role === 'gm') {
             gmId = id;
             return;
         }
@@ -895,7 +1190,7 @@ function sendMessage(data) {
         ws.send(JSON.stringify(data));
         logWS('📤', data);
     } catch (err) {
-        log(`Failed to send message: ${err.message}`, 'error');
+        log('Failed to send message: ' + err.message, 'error');
     }
 }
 
@@ -909,7 +1204,8 @@ function sendChatMessage(text) {
     });
 }
 
-function sendRoll(expr, reason = null) {
+function sendRoll(expr, reason) {
+    reason = reason || null;
     if (!expr) return;
     sendMessage({
         type: 'roll-dice',
@@ -920,23 +1216,24 @@ function sendRoll(expr, reason = null) {
     });
 }
 
-function sendDeckDraw(count = 1, region = null) {
-    const regionName = region || currentRegion;
+function sendDeckDraw(count, region) {
+    count = count || 1;
+    region = region || currentRegion;
     sendMessage({
         type: 'deck-draw',
         count: Math.min(count, 5),
-        region: regionName
+        region: region
     });
-    log(`🃏 Drawing ${count} card(s) from ${regionName}`);
+    log('🃏 Drawing ' + count + ' card(s) from ' + region);
 }
 
-function sendCrownSpread(region = null) {
-    const regionName = region || currentRegion;
+function sendCrownSpread(region) {
+    region = region || currentRegion;
     sendMessage({
         type: 'crown-spread',
-        region: regionName
+        region: region
     });
-    log(`👑 Crown Spread from ${regionName}`);
+    log('👑 Crown Spread from ' + region);
 }
 
 function sendDeckShuffle() {
@@ -950,7 +1247,7 @@ function sendRegionUpdate(region) {
         type: 'set-region',
         region: region
     });
-    log(`📍 Region updated to: ${region}`);
+    log('📍 Region updated to: ' + region);
 }
 
 function sendModuleList() {
@@ -958,8 +1255,9 @@ function sendModuleList() {
     log('📦 Module list requested');
 }
 
-function sendSyncRequest(entity = 'all') {
-    sendMessage({ type: 'sync-request', entity });
+function sendSyncRequest(entity) {
+    entity = entity || 'all';
+    sendMessage({ type: 'sync-request', entity: entity });
 }
 
 function syncCharacters(characters) {
@@ -967,6 +1265,99 @@ function syncCharacters(characters) {
         type: 'state-updated',
         characters: characters
     });
+}
+
+// ============================================================
+// Adventure Engine Send Functions
+// ============================================================
+
+function sendAdventureLoad(moduleId) {
+    if (!moduleId) {
+        log('Module ID required', 'error');
+        return;
+    }
+    sendMessage({ type: 'adventure-load', moduleId: moduleId });
+    log('📖 Load adventure: ' + moduleId);
+    sendToChat('📖 Requested load of adventure: ' + moduleId);
+}
+
+function sendAdventureScene(actIndex, sceneIndex) {
+    var target = {};
+    if (actIndex !== undefined && actIndex !== null && !isNaN(actIndex)) {
+        target.actIndex = Number(actIndex);
+    }
+    if (sceneIndex !== undefined && sceneIndex !== null && !isNaN(sceneIndex)) {
+        target.sceneIndex = Number(sceneIndex);
+    }
+    sendMessage({ type: 'adventure-scene', target: target });
+    var msg = '🎭 Scene change requested';
+    if (target.actIndex !== undefined) msg += ' to act ' + target.actIndex;
+    if (target.sceneIndex !== undefined) msg += ', scene ' + target.sceneIndex;
+    if (!target.actIndex && !target.sceneIndex) msg += ' (sequential)';
+    log(msg);
+    sendToChat(msg);
+}
+
+function sendAdventureEncounterStart(ref) {
+    if (ref === undefined || ref === null) {
+        log('Encounter reference required', 'error');
+        return;
+    }
+    sendMessage({ type: 'adventure-encounter-start', ref: ref });
+    log('⚔️ Starting encounter: ' + ref);
+    sendToChat('⚔️ Starting encounter: ' + ref);
+}
+
+function sendAdventureEncounterResolve(outcome, notes) {
+    notes = notes || '';
+    if (!outcome || ['clean', 'partial', 'miss'].indexOf(outcome) === -1) {
+        log('Outcome must be clean, partial, or miss', 'error');
+        return;
+    }
+    sendMessage({ type: 'adventure-encounter-resolve', outcome: outcome, notes: notes });
+    log('⚔️ Resolving encounter as ' + outcome);
+    sendToChat('⚔️ Encounter resolved as ' + outcome);
+}
+
+function sendAdventureTimer(name, amount, scope) {
+    amount = amount || 1;
+    scope = scope || 'scene';
+    if (!name) {
+        log('Timer name required', 'error');
+        return;
+    }
+    sendMessage({ type: 'adventure-timer', ref: name, amount: amount, scope: scope });
+    log('⏱️ Ticking timer: ' + name + ' by ' + amount);
+    sendToChat('⏱️ Ticking timer "' + name + '" by ' + amount);
+}
+
+function sendAdventureLog(text, author) {
+    author = author || getPlayerName();
+    if (!text) {
+        log('Log text required', 'error');
+        return;
+    }
+    sendMessage({ type: 'adventure-log', text: text, author: author });
+    log('📝 Logging beat: ' + text);
+    sendToChat('📝 ' + author + ': ' + text);
+}
+
+function sendAdventureStatus() {
+    sendMessage({ type: 'adventure-state-request' });
+    log('📋 Requesting adventure status');
+    sendToChat('📋 Requesting adventure status...');
+}
+
+function sendAdventureReference() {
+    sendMessage({ type: 'adventure-reference-request' });
+    log('📚 Requesting adventure reference');
+    sendToChat('📚 Requesting adventure reference...');
+}
+
+function sendAdventureReset() {
+    sendMessage({ type: 'adventure-reset' });
+    log('🔄 Resetting adventure');
+    sendToChat('🔄 Resetting adventure...');
 }
 
 // ============================================================
@@ -991,16 +1382,16 @@ function approveGM(targetId) {
         log('Only current GM can approve', 'error');
         return;
     }
-    sendMessage({ type: 'approve_gm', targetId });
-    pendingRequests = pendingRequests.filter(r => r.requesterId !== targetId);
+    sendMessage({ type: 'approve_gm', targetId: targetId });
+    pendingRequests = pendingRequests.filter(function(r) { return r.requesterId !== targetId; });
     updateGMUI();
-    sendToChat(`✅ Approved GM for ${targetId}`);
+    sendToChat('✅ Approved GM for ' + targetId);
 }
 
 function rejectGM(targetId) {
-    pendingRequests = pendingRequests.filter(r => r.requesterId !== targetId);
+    pendingRequests = pendingRequests.filter(function(r) { return r.requesterId !== targetId; });
     updateGMUI();
-    sendToChat(`❌ Rejected GM request from ${targetId}`);
+    sendToChat('❌ Rejected GM request from ' + targetId);
 }
 
 function getCurrentGM() {
@@ -1029,7 +1420,7 @@ function getPlayerName() {
     }
     try {
         if (typeof User !== 'undefined' && User.getActivePlayer) {
-            const player = User.getActivePlayer();
+            var player = User.getActivePlayer();
             if (player && player.name) {
                 return player.name;
             }
@@ -1040,7 +1431,8 @@ function getPlayerName() {
     return 'Roll20 GM';
 }
 
-function sendToChat(message, type = 'public') {
+function sendToChat(message, type) {
+    type = type || 'public';
     if (typeof sendChat !== 'undefined') {
         if (type === 'gm') {
             sendChat('GM', message);
@@ -1048,22 +1440,22 @@ function sendToChat(message, type = 'public') {
             sendChat('Fate\'s Edge', message);
         }
     } else {
-        console.log(`[CHAT] ${message}`);
+        console.log('[CHAT] ' + message);
     }
 }
 
 function updateStatus(status) {
-    const statusMsg = status === 'connected'
-        ? '🟢 Connected to Fate\'s Edge v2.0.0'
+    var statusMsg = status === 'connected'
+        ? '🟢 Connected to Fate\'s Edge v2.1.0'
         : '🔴 Disconnected from Fate\'s Edge';
     log(statusMsg);
 }
 
 function collectCharacters() {
-    const characters = [];
+    var characters = [];
     try {
         if (typeof Campaign !== 'undefined' && Campaign.characters) {
-            Campaign.characters.forEach(char => {
+            Campaign.characters.forEach(function(char) {
                 characters.push({
                     name: char.name,
                     harm: char.get('harm') || 0,
@@ -1074,32 +1466,32 @@ function collectCharacters() {
             });
         }
     } catch (err) {
-        log(`Failed to collect characters: ${err.message}`, 'error');
+        log('Failed to collect characters: ' + err.message, 'error');
     }
     return characters;
 }
 
 function parseDiceExpression(expr) {
-    const parts = expr.match(/^(\d+)d(\d+)([+-]\d+)?$/i);
+    var parts = expr.match(/^(\d+)d(\d+)([+-]\d+)?$/i);
     if (!parts) {
-        const num = parseInt(expr) || 0;
+        var num = parseInt(expr) || 0;
         return { total: num, rolls: [num] };
     }
 
-    const count = parseInt(parts[1]);
-    const sides = parseInt(parts[2]);
-    const modifier = parseInt(parts[3]) || 0;
+    var count = parseInt(parts[1]);
+    var sides = parseInt(parts[2]);
+    var modifier = parseInt(parts[3]) || 0;
 
-    const rolls = [];
-    let total = 0;
-    for (let i = 0; i < count; i++) {
-        const roll = Math.floor(Math.random() * sides) + 1;
+    var rolls = [];
+    var total = 0;
+    for (var i = 0; i < count; i++) {
+        var roll = Math.floor(Math.random() * sides) + 1;
         rolls.push(roll);
         total += roll;
     }
     total += modifier;
 
-    return { total, rolls };
+    return { total: total, rolls: rolls };
 }
 
 // ============================================================
@@ -1108,12 +1500,12 @@ function parseDiceExpression(expr) {
 
 try {
     // Chat message hook
-    on('chat:message', (msg) => {
+    on('chat:message', function(msg) {
         if (msg.type !== 'general') return;
         if (!CONFIG.syncChat) return;
         if (msg.who === 'Fate\'s Edge') return;
 
-        let text = msg.content;
+        var text = msg.content;
         text = text.replace(/<[^>]+>/g, '');
         text = text.replace(/^Fate's Edge:\s*/, '');
         if (!text.trim()) return;
@@ -1122,17 +1514,17 @@ try {
     });
 
     // Dice roll hook
-    on('chat:message', (msg) => {
+    on('chat:message', function(msg) {
         if (msg.type !== 'rollresult') return;
         if (!CONFIG.syncRolls) return;
 
-        const content = msg.content;
-        const match = content.match(/<div[^>]*>(.*?)<\/div>/i);
+        var content = msg.content;
+        var match = content.match(/<div[^>]*>(.*?)<\/div>/i);
         if (match) {
-            const text = match[1].replace(/<[^>]+>/g, '').trim();
-            const rollMatch = text.match(/\[\[([^\]]+)\]\]/);
+            var text = match[1].replace(/<[^>]+>/g, '').trim();
+            var rollMatch = text.match(/\[\[([^\]]+)\]\]/);
             if (rollMatch) {
-                const expr = rollMatch[1];
+                var expr = rollMatch[1];
                 sendRoll(expr);
             }
         }
@@ -1140,10 +1532,10 @@ try {
 
     // Page change hook
     if (typeof on === 'function') {
-        on('change:campaign:currentpage', () => {
+        on('change:campaign:currentpage', function() {
             if (!CONFIG.syncScenes) return;
             try {
-                const page = Campaign.currentPage;
+                var page = Campaign.currentPage;
                 if (page && page.name) {
                     sendMessage({
                         type: 'sync-state',
@@ -1151,13 +1543,13 @@ try {
                     });
                 }
             } catch (err) {
-                log(`Failed to sync scene: ${err.message}`, 'error');
+                log('Failed to sync scene: ' + err.message, 'error');
             }
         });
     }
 
 } catch (err) {
-    log(`Failed to register hooks: ${err.message}`, 'error');
+    log('Failed to register hooks: ' + err.message, 'error');
 }
 
 // ============================================================
@@ -1165,19 +1557,19 @@ try {
 // ============================================================
 
 function registerCommands() {
-    on('ready', () => {
+    on('ready', function() {
         if (CONFIG.autoConnect) {
             connect();
         }
 
-        on('chat:message', (msg) => {
+        on('chat:message', function(msg) {
             if (msg.type !== 'api') return;
-            const args = msg.content.split(' ');
-            const command = args[0];
+            var args = msg.content.split(' ');
+            var command = args[0];
 
             if (command === '!fates-edge') {
-                const subcommand = args[1] || '';
-                const param = args.slice(2).join(' ');
+                var subcommand = args[1] || '';
+                var param = args.slice(2).join(' ');
 
                 switch (subcommand) {
                     case 'connect':
@@ -1191,46 +1583,56 @@ function registerCommands() {
                         break;
 
                     case 'status':
-                        const status = connected ? '🟢 Connected' : '🔴 Disconnected';
-                        sendToChat(`Fate's Edge status: ${status}`);
-                        sendToChat(`Region: ${currentRegion}`);
-                        sendToChat(`Deck: ${deckState.remaining} cards remaining`);
-                        sendToChat(`Modules: ${loadedModules.length} loaded`);
-                        sendToChat(`Characters: ${vttCharacters.size} synced`);
-                        sendToChat(`Whiteboard: ${whiteboard.drawings?.length || 0} drawings, ${whiteboard.notes?.length || 0} notes, ${whiteboard.images?.length || 0} images`);
+                        var statusMsg = connected ? '🟢 Connected' : '🔴 Disconnected';
+                        sendToChat('Fate\'s Edge status: ' + statusMsg);
+                        sendToChat('Region: ' + currentRegion);
+                        sendToChat('Deck: ' + deckState.remaining + ' cards remaining');
+                        sendToChat('Modules: ' + loadedModules.length + ' loaded');
+                        sendToChat('Characters: ' + vttCharacters.size + ' synced');
+                        sendToChat('Whiteboard: ' + (whiteboard.drawings ? whiteboard.drawings.length : 0) + ' drawings, ' + (whiteboard.notes ? whiteboard.notes.length : 0) + ' notes, ' + (whiteboard.images ? whiteboard.images.length : 0) + ' images');
                         if (gridCombat.enabled) {
-                            sendToChat(`⚔️ Grid combat: ${gridCombat.gridType}, ${gridCombat.tokens?.length || 0} tokens`);
+                            sendToChat('⚔️ Grid combat: ' + gridCombat.gridType + ', ' + (gridCombat.tokens ? gridCombat.tokens.length : 0) + ' tokens');
                         }
-                        const gm = getCurrentGM();
-                        sendToChat(`GM: ${gm ? gm.name : 'None'}`);
-                        sendToChat(`Your role: ${myRole}`);
+                        var gm = getCurrentGM();
+                        sendToChat('GM: ' + (gm ? gm.name : 'None'));
+                        sendToChat('Your role: ' + myRole);
+                        if (adventureState.title) {
+                            sendToChat('Adventure: ' + adventureState.title + ' (' + adventureState.status + ')');
+                            if (adventureState.currentScene) {
+                                sendToChat('  Scene: ' + adventureState.currentScene.title);
+                            }
+                            if (adventureState.activeEncounter) {
+                                var enc = adventureState.activeEncounter;
+                                sendToChat('  Encounter: ' + (enc.name || enc.creatureId || 'Active'));
+                            }
+                        }
                         break;
 
                     case 'send':
                         if (param) {
                             sendChatMessage(param);
-                            sendToChat(`📤 Sent: ${param}`);
+                            sendToChat('📤 Sent: ' + param);
                         }
                         break;
 
                     case 'roll':
                         if (param) {
-                            const rollResult = parseDiceExpression(param);
+                            var rollResult = parseDiceExpression(param);
                             sendRoll(param);
-                            sendToChat(`🎲 Rolled: ${param} = ${rollResult.total}`);
+                            sendToChat('🎲 Rolled: ' + param + ' = ' + rollResult.total);
                         }
                         break;
 
                     // Deck Commands
                     case 'draw':
-                        const count = parseInt(param) || 1;
+                        var count = parseInt(param) || 1;
                         sendDeckDraw(Math.min(count, 5));
-                        sendToChat(`🃏 Drawing ${Math.min(count, 5)} cards...`);
+                        sendToChat('🃏 Drawing ' + Math.min(count, 5) + ' cards...');
                         break;
 
                     case 'crown':
                         sendCrownSpread(param || currentRegion);
-                        sendToChat(`👑 Crown Spread from ${param || currentRegion}...`);
+                        sendToChat('👑 Crown Spread from ' + (param || currentRegion) + '...');
                         break;
 
                     case 'shuffle':
@@ -1241,9 +1643,9 @@ function registerCommands() {
                     case 'region':
                         if (param) {
                             sendRegionUpdate(param);
-                            sendToChat(`📍 Region set to: ${param}`);
+                            sendToChat('📍 Region set to: ' + param);
                         } else {
-                            sendToChat(`📍 Current region: ${currentRegion}`);
+                            sendToChat('📍 Current region: ' + currentRegion);
                         }
                         break;
 
@@ -1256,21 +1658,21 @@ function registerCommands() {
 
                     case 'sync':
                         if (param === 'characters') {
-                            const chars = collectCharacters();
+                            var chars = collectCharacters();
                             syncCharacters(chars);
-                            sendToChat(`📤 Synced ${chars.length} characters`);
+                            sendToChat('📤 Synced ' + chars.length + ' characters');
                         } else if (param === 'scene') {
                             try {
-                                const page = Campaign.currentPage;
+                                var page = Campaign.currentPage;
                                 if (page && page.name) {
                                     sendMessage({
                                         type: 'sync-state',
                                         state: { scene: { name: page.name } }
                                     });
-                                    sendToChat(`🎬 Synced scene: ${page.name}`);
+                                    sendToChat('🎬 Synced scene: ' + page.name);
                                 }
                             } catch (err) {
-                                sendToChat(`Failed to sync scene: ${err.message}`);
+                                sendToChat('Failed to sync scene: ' + err.message);
                             }
                         } else {
                             sendSyncRequest(param || 'all');
@@ -1280,8 +1682,8 @@ function registerCommands() {
 
                     // GM Commands
                     case 'gm':
-                        const gmSub = args[2] || '';
-                        const gmParam = args.slice(3).join(' ');
+                        var gmSub = args[2] || '';
+                        var gmParam = args.slice(3).join(' ');
 
                         if (gmSub === 'request') {
                             requestGM();
@@ -1290,11 +1692,18 @@ function registerCommands() {
                                 sendToChat('Usage: !fates-edge gm approve <playerId>');
                                 break;
                             }
-                            const target = Object.values(clients).find(c =>
-                                c.id === gmParam || c.name.toLowerCase() === gmParam.toLowerCase()
-                            );
+                            var target = null;
+                            for (var id in clients) {
+                                if (clients.hasOwnProperty(id)) {
+                                    var c = clients[id];
+                                    if (c.id === gmParam || c.name.toLowerCase() === gmParam.toLowerCase()) {
+                                        target = c;
+                                        break;
+                                    }
+                                }
+                            }
                             if (!target) {
-                                sendToChat(`❌ Player "${gmParam}" not found. Use !fates-edge gm list to see clients.`);
+                                sendToChat('❌ Player "' + gmParam + '" not found. Use !fates-edge gm list to see clients.');
                                 break;
                             }
                             approveGM(target.id);
@@ -1303,58 +1712,131 @@ function registerCommands() {
                                 sendToChat('Usage: !fates-edge gm reject <playerId>');
                                 break;
                             }
-                            const target = Object.values(clients).find(c =>
-                                c.id === gmParam || c.name.toLowerCase() === gmParam.toLowerCase()
-                            );
+                            var target = null;
+                            for (var id in clients) {
+                                if (clients.hasOwnProperty(id)) {
+                                    var c = clients[id];
+                                    if (c.id === gmParam || c.name.toLowerCase() === gmParam.toLowerCase()) {
+                                        target = c;
+                                        break;
+                                    }
+                                }
+                            }
                             if (!target) {
-                                sendToChat(`❌ Player "${gmParam}" not found.`);
+                                sendToChat('❌ Player "' + gmParam + '" not found.');
                                 break;
                             }
                             rejectGM(target.id);
                         } else if (gmSub === 'status') {
-                            const gm = getCurrentGM();
-                            const gmName = gm ? gm.name : 'None';
-                            const pending = getPendingRequests();
-                            sendToChat(`👑 **GM Status**\nCurrent GM: ${gmName}\nPending requests: ${pending.length}`);
+                            var gm = getCurrentGM();
+                            var gmName = gm ? gm.name : 'None';
+                            var pending = getPendingRequests();
+                            sendToChat('👑 **GM Status**\nCurrent GM: ' + gmName + '\nPending requests: ' + pending.length);
                             if (pending.length > 0) {
-                                const list = pending.map(r => r.requesterName).join(', ');
-                                sendToChat(`Requests from: ${list}`);
+                                var list = pending.map(function(r) { return r.requesterName; }).join(', ');
+                                sendToChat('Requests from: ' + list);
                             }
                         } else if (gmSub === 'list') {
-                            const clientList = Object.values(clients).map(c => {
-                                const isGM = c.id === gmId ? '👑 ' : '';
-                                const isSelf = c.id === clientId ? ' (you)' : '';
-                                return `${isGM}${c.name}${isSelf} — ${c.role}`;
-                            }).join('\n');
-                            sendToChat(`👥 **Clients**\n${clientList}`);
+                            var clientList = '';
+                            for (var id in clients) {
+                                if (clients.hasOwnProperty(id)) {
+                                    var c = clients[id];
+                                    var isGM = c.id === gmId ? '👑 ' : '';
+                                    var isSelf = c.id === clientId ? ' (you)' : '';
+                                    clientList += isGM + c.name + isSelf + ' — ' + c.role + '\n';
+                                }
+                            }
+                            sendToChat('👥 **Clients**\n' + clientList);
                         } else {
-                            sendToChat(`
-GM Commands:
-!fates-edge gm request        - Request to become GM
-!fates-edge gm approve <name> - Approve a pending GM request (GM only)
-!fates-edge gm reject <name>  - Reject a pending GM request (GM only)
-!fates-edge gm status         - Show current GM and pending requests
-!fates-edge gm list           - List all clients with roles
-`);
+                            sendToChat('GM Commands:\n!fates-edge gm request        - Request to become GM\n!fates-edge gm approve <name> - Approve a pending GM request (GM only)\n!fates-edge gm reject <name>  - Reject a pending GM request (GM only)\n!fates-edge gm status         - Show current GM and pending requests\n!fates-edge gm list           - List all clients with roles');
                         }
                         break;
 
+                    // ─── NEW: Adventure Engine Commands ──────────────────────
+
+                    case 'adventure':
+                        var advSub = args[2] || '';
+                        var advParams = args.slice(3);
+
+                        if (advSub === 'load') {
+                            if (!advParams[0]) {
+                                sendToChat('Usage: !fates-edge adventure load <moduleId>');
+                                break;
+                            }
+                            sendAdventureLoad(advParams[0]);
+                        } else if (advSub === 'scene') {
+                            var actIdx = advParams[0] !== undefined ? parseInt(advParams[0]) : undefined;
+                            var sceneIdx = advParams[1] !== undefined ? parseInt(advParams[1]) : undefined;
+                            sendAdventureScene(actIdx, sceneIdx);
+                        } else if (advSub === 'encounter') {
+                            var encSub = advParams[0] || '';
+                            var encRef = advParams[1] || '';
+                            if (encSub === 'start') {
+                                if (!encRef) {
+                                    sendToChat('Usage: !fates-edge adventure encounter start <ref>');
+                                    break;
+                                }
+                                sendAdventureEncounterStart(encRef);
+                            } else if (encSub === 'resolve') {
+                                var outcome = advParams[1] || '';
+                                var notes = advParams.slice(2).join(' ');
+                                if (!outcome || ['clean', 'partial', 'miss'].indexOf(outcome) === -1) {
+                                    sendToChat('Usage: !fates-edge adventure encounter resolve <clean|partial|miss> [notes]');
+                                    break;
+                                }
+                                sendAdventureEncounterResolve(outcome, notes);
+                            } else {
+                                sendToChat('Encounter subcommands: start <ref>, resolve <outcome> [notes]');
+                            }
+                        } else if (advSub === 'timer') {
+                            var timerName = advParams[0] || '';
+                            var timerAmount = advParams[1] !== undefined ? parseInt(advParams[1]) : 1;
+                            var timerScope = advParams[2] || 'scene';
+                            if (!timerName) {
+                                sendToChat('Usage: !fates-edge adventure timer <name> [amount] [scene|campaign]');
+                                break;
+                            }
+                            sendAdventureTimer(timerName, timerAmount, timerScope);
+                        } else if (advSub === 'log') {
+                            var logText = advParams.join(' ');
+                            if (!logText) {
+                                sendToChat('Usage: !fates-edge adventure log <text> [author]');
+                                break;
+                            }
+                            // Author is the last word if we want, but we'll let the user specify author as an optional param
+                            // For simplicity, we'll use the provided author if exactly one param after text? Hard to parse.
+                            // We'll default to the player name and let the user include author in the text if they want.
+                            sendAdventureLog(logText);
+                        } else if (advSub === 'status') {
+                            sendAdventureStatus();
+                        } else if (advSub === 'reference') {
+                            sendAdventureReference();
+                        } else if (advSub === 'reset') {
+                            sendAdventureReset();
+                        } else {
+                            sendToChat('Adventure Commands:\n!fates-edge adventure load <moduleId>\n!fates-edge adventure scene [actIndex] [sceneIndex]\n!fates-edge adventure encounter start <ref>\n!fates-edge adventure encounter resolve <clean|partial|miss> [notes]\n!fates-edge adventure timer <name> [amount] [scene|campaign]\n!fates-edge adventure log <text>\n!fates-edge adventure status\n!fates-edge adventure reference\n!fates-edge adventure reset');
+                        }
+                        break;
+
+                    // ─── end new ────────────────────────────────────────
+
                     default:
-                        sendToChat(`
-Fate's Edge v2.0.0 Commands:
-!fates-edge connect - Connect to server
-!fates-edge disconnect - Disconnect
-!fates-edge status - Show status
-!fates-edge send <message> - Send chat
-!fates-edge roll <dice> - Roll dice
-!fates-edge draw [N] - Draw N cards (1-5)
-!fates-edge crown [region] - Crown Spread
-!fates-edge shuffle - Shuffle deck
-!fates-edge region [name] - Set/get region
-!fates-edge modules list - List modules
-!fates-edge sync [characters|scene|all] - Sync state
-!fates-edge gm ... - GM management (see !fates-edge gm help)
-`);
+                        sendToChat([
+                            'Fate\'s Edge v2.1.0 Commands:',
+                            '!fates-edge connect                - Connect to server',
+                            '!fates-edge disconnect             - Disconnect',
+                            '!fates-edge status                 - Show status',
+                            '!fates-edge send <message>         - Send chat',
+                            '!fates-edge roll <dice>            - Roll dice',
+                            '!fates-edge draw [N]               - Draw N cards (1-5)',
+                            '!fates-edge crown [region]         - Crown Spread',
+                            '!fates-edge shuffle                - Shuffle deck',
+                            '!fates-edge region [name]          - Set/get region',
+                            '!fates-edge modules list           - List modules',
+                            '!fates-edge sync [characters|scene|all] - Sync state',
+                            '!fates-edge gm ...                 - GM management (see !fates-edge gm help)',
+                            '!fates-edge adventure ...          - Adventure Engine (see !fates-edge adventure help)'
+                        ].join('\n'));
                 }
             }
         });
@@ -1367,11 +1849,11 @@ Fate's Edge v2.0.0 Commands:
 
 registerCommands();
 
-log('Fate\'s Edge Roll20 API module v2.0.0 loaded');
-log(`Server: ${CONFIG.serverUrl}`);
-log(`Room: ${CONFIG.roomCode}`);
-log(`Region: ${currentRegion}`);
-log(`Auto-connect: ${CONFIG.autoConnect}`);
+log('Fate\'s Edge Roll20 API module v2.1.0 loaded');
+log('Server: ' + CONFIG.serverUrl);
+log('Room: ' + CONFIG.roomCode);
+log('Region: ' + currentRegion);
+log('Auto-connect: ' + CONFIG.autoConnect);
 
 if (CONFIG.autoConnect) {
     connect();

@@ -437,6 +437,6 @@ module.exports = {
 ---
 
 <p align="center">
-  <sub>Made with ❤️ by the Fate's Edge Team</sub>
+  <sub>Made with ❤️ by Nick Gasper</sub>
 </p>
 ```
