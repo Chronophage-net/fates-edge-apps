@@ -53,6 +53,14 @@ let reconnectAttempts = 0;
 let socketId = null;
 let connectionMode = 'websocket'; // 'socketio' or 'websocket'
 let reconnectTimer = null;
+let pingInterval = null;    // BUGFIX: moved here from inside ws.onopen — it
+                             // used to be declared with `let` inside that
+                             // closure, which meant the sibling ws.onclose
+                             // closure could never see it, throwing
+                             // "ReferenceError: pingInterval is not defined"
+                             // the moment a connection closed. Module-level
+                             // now, so onopen/onclose/connectWebSocket/
+                             // disconnectWebSocket all share the same one.
 let wsStatus = 'disconnected';
 let connectionPromise = null;
 let pendingCallbacks = new Map(); // For request/response patterns
@@ -203,9 +211,17 @@ export function connectWebSocket(room = null, url = null) {
     
     // Close existing connection
     if (ws) {
+        // BUGFIX: detach onclose before closing. The OLD connection's
+        // onclose closure has its own auto-reconnect logic (see below) —
+        // left attached, it could fire moments after this new connection
+        // attempt starts (racing with it), or double-clear/re-trigger
+        // state that this new attempt is already managing.
+        ws.onclose = null;
         ws.close();
         ws = null;
     }
+    clearInterval(pingInterval);
+    pingInterval = null;
     clearTimeout(reconnectTimer);
     
     const roomName = room || config.room;
@@ -243,10 +259,10 @@ export function connectWebSocket(room = null, url = null) {
             state.wsRoom = roomName;
             state.wsSocketId = socketId;
             updateState(state);
-            
-            let pingInterval = null;
 
-            // Start keep‑alive pings
+            // Start keep‑alive pings. pingInterval is module-level (see
+            // STATE block above) so ws.onclose/disconnectWebSocket() can
+            // see and clear the same one this sets.
             if (pingInterval) clearInterval(pingInterval);
             pingInterval = setInterval(() => {
                 if (ws && ws.readyState === WebSocket.OPEN) {
@@ -270,6 +286,7 @@ export function connectWebSocket(room = null, url = null) {
         
         ws.onclose = (event) => {
             clearInterval(pingInterval);
+            pingInterval = null;
             clearTimeout(timeoutId);
             console.log('🔌 WebSocket disconnected:', event.code, event.reason);
             wsStatus = 'disconnected';
@@ -535,14 +552,47 @@ export function sendWSMessage(data, callback = null) {
 }
 
 /**
- * Disconnect WebSocket
+ * Disconnect WebSocket (mode-aware — handles both plain WebSocket and Socket.io)
+ *
+ * BUGFIXES (this pass):
+ * 1. Never cleared pingInterval at all — every manual disconnect left a
+ *    ping timer running forever (harmless once ws is null since the guard
+ *    inside it just no-ops, but it never actually stops).
+ * 2. Only ever touched `ws`, never `socket` — every other shared function
+ *    in this file (sendMessage, syncState, etc.) branches on
+ *    connectionMode, but this one didn't. Calling it while connected via
+ *    Socket.io reset all local state to "disconnected" while the actual
+ *    Socket.io connection stayed alive underneath.
+ * 3. Closing `ws`/`socket` without detaching their close/disconnect
+ *    handlers first meant: (a) a duplicate 'disconnected' event fired
+ *    when the real close event arrived asynchronously afterward, and much
+ *    more importantly (b) for plain WS, onclose's own auto-reconnect logic
+ *    doesn't know "user clicked Disconnect" from "connection dropped" — it
+ *    would just reconnect anyway, silently undoing the user's action.
  */
 export function disconnectWebSocket() {
-    if (ws) {
+    clearInterval(pingInterval);
+    pingInterval = null;
+    clearTimeout(reconnectTimer);
+
+    if (connectionMode === 'socketio') {
+        if (socket) {
+            // Remove our own 'disconnect' listener first so this
+            // intentional disconnect doesn't also fire a second
+            // 'disconnected' event when Socket.io's async disconnect
+            // handler runs (it would otherwise still call triggerEvent
+            // itself, moments after we already do below).
+            socket.off('disconnect');
+            socket.disconnect();
+            socket = null;
+        }
+    } else if (ws) {
+        // See note above — detach before closing.
+        ws.onclose = null;
         ws.close();
         ws = null;
     }
-    clearTimeout(reconnectTimer);
+
     reconnectAttempts = 0;
     wsStatus = 'disconnected';
     isConnected = false;

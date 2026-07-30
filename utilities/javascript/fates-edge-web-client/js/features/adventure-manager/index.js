@@ -15,6 +15,35 @@
  * creatures/NPCs/bosses that can be used as adversaries in scenes.
  * Scenes' encounter entries can reference bestiary creatures by ID,
  * or define inline adversaries.
+ *
+ * ────────────────────────────────────────────────────────────────────────
+ * NEW (this pass) — server sync for timers, and a real gap fixed:
+ *
+ * 1. Scene-local timers (scene.timers[]) were displayed and could be
+ *    AUTHORED when creating an adventure, but nothing anywhere could
+ *    actually tick one during play — only campaign timers had that.
+ *    Added advanceSceneTimer() + window.adventureAdvanceSceneTimer(),
+ *    mirroring advanceTimer()'s campaign-timer version exactly.
+ *
+ * 2. Neither advanceTimer() nor the new advanceSceneTimer() broadcast
+ *    anything over the wire before now (only scene/act position did, via
+ *    the existing broadcastSceneStatus()). Added broadcastTimerTick(),
+ *    which sends the same 'adventure-timer' shape server/adventure.js's
+ *    tickTimer() expects — so a client-driven tick and a server/API/AI-
+ *    driven tick land on the same state whenever both sides have the
+ *    same adventure loaded, no translation needed.
+ *
+ * 3. startSceneEncounter() now also sends a lightweight 'adventure-log'
+ *    beat when connected, so other clients/an AI see that an encounter
+ *    began and who's in it. This deliberately does NOT call the server's
+ *    'adventure-encounter-start' command: that command models ONE
+ *    encounter at a time, while this function can merge SEVERAL
+ *    scene.encounters[] entries into one combined Combat Tracker session.
+ *    Forcing them to match would either lose the multi-adversary merging
+ *    here or require the server model to change shape — worth a
+ *    deliberate choice rather than picked silently. The log beat is a
+ *    safe, information-only middle ground until that's decided.
+ * ────────────────────────────────────────────────────────────────────────
  */
 
 import { getState, saveState } from '../../core/state.js';
@@ -71,6 +100,21 @@ function broadcastSceneStatus(adventure) {
                 status: adventure.status
             }
         });
+    } catch (e) { /* ignore */ }
+}
+
+// NEW: mirrors broadcastSceneStatus()'s exact defensive style: silently a
+// no-op when not connected, and never throws into the caller. Sends the
+// same 'adventure-timer' shape server/adventure.js's tickTimer() expects
+// -- if a matching adventure was ALSO loaded server-side (via
+// POST /api/rooms/:code/adventure/load or the equivalent WS command),
+// this keeps both copies in sync exactly. If nothing is loaded
+// server-side, the server just replies with an error the client already
+// ignores here, same as broadcastSceneStatus() does for its own event.
+function broadcastTimerTick(timerName, scope, ref, amount) {
+    if (!isConnectedToServer()) return;
+    try {
+        sendEvent({ type: 'adventure-timer', scope, ref, name: timerName, amount });
     } catch (e) { /* ignore */ }
 }
 
@@ -621,6 +665,35 @@ function advanceTimer(adventureId, timerIndex, amount = 1) {
             adventureId: adventure.id, timerName: timer.name
         });
     }
+    broadcastTimerTick(timer.name, 'campaign', timerIndex, amount);
+    return adventure;
+}
+
+// NEW: scene-local timer ticking. Mirrors advanceTimer()'s shape and
+// behavior exactly, just scoped to one scene's own timers[] instead of
+// the adventure's campaignTimers[]. Only meaningful for the CURRENTLY
+// ACTIVE scene if you want this to stay in sync with a server-loaded
+// copy of the same adventure -- server/adventure.js's tickTimer() only
+// ever operates on whatever scene IT currently considers active, so the
+// UI only exposes the +1 button on the current scene's timers (see
+// buildAdventureDetailHtml below).
+function advanceSceneTimer(adventureId, actIndex, sceneIndex, timerIndex, amount = 1) {
+    const adventure = getAdventure(adventureId);
+    if (!adventure) return null;
+    const scene = adventure.acts?.[actIndex]?.scenes?.[sceneIndex];
+    if (!scene || !Array.isArray(scene.timers)) return null;
+    const timer = scene.timers[timerIndex];
+    if (!timer) return null;
+    const wasComplete = timer.current >= timer.segments;
+    timer.current = Math.max(0, Math.min(timer.current + amount, timer.segments));
+    saveAdventuresToState();
+    if (timer.current >= timer.segments && !wasComplete) {
+        showToast(`⏱️ Scene Timer "${timer.name}" completed!`, 'warning');
+        logAdventureEvent(`⏱️ Scene Timer "${timer.name}" completed (${adventure.title} — ${scene.title})`, 'warning', 'adventure_scene_timer_completed', {
+            adventureId: adventure.id, actIndex, sceneIndex, timerName: timer.name
+        });
+    }
+    broadcastTimerTick(timer.name, 'scene', timerIndex, amount);
     return adventure;
 }
 
@@ -778,6 +851,19 @@ async function startSceneEncounter(adventureId, actIndex, sceneIndex) {
         // (optional: we could merge or replace)
         encounter.adversaries = adversaries;
         saveState();
+    }
+
+    // NEW: lightweight, information-only broadcast -- see file header
+    // note on why this doesn't call the server's 'adventure-encounter-start'
+    // command directly.
+    if (isConnectedToServer()) {
+        try {
+            sendEvent({
+                type: 'adventure-log',
+                text: `⚔️ Encounter started: ${scene.title} (${adventure.title}) — ${adversaries.map(a => a.name).join(', ') || 'no adversaries'}`,
+                author: 'GM'
+            });
+        } catch (e) { /* ignore */ }
     }
 
     try {
@@ -1313,8 +1399,11 @@ function buildAdventureDetailHtml(adventure) {
                                     ${scene.description ? `<button class="btn btn-xs btn-ghost" onclick="window.adventureToggleSceneDesc('${descId}')" title="Show/hide scene description" style="padding:0 0.3rem;font-size:0.7rem;">📖</button>` : ''}
                                 </div>
                                 <div style="display:flex;gap:0.2rem;align-items:center;">
-                                    ${scene.timers?.map(t => `
-                                        <span style="font-size:0.55rem;color:var(--text3);">${escHtml(t.name)} ${t.current}/${t.segments}</span>
+                                    ${scene.timers?.map((t, timerIdx) => `
+                                        <span style="font-size:0.55rem;color:var(--text3);display:inline-flex;align-items:center;gap:0.15rem;">
+                                            ${escHtml(t.name)} ${t.current}/${t.segments}
+                                            ${isCurrent ? `<button class="btn btn-xs btn-ghost" style="padding:0 0.2rem;font-size:0.55rem;" onclick="window.adventureAdvanceSceneTimer('${adventure.id}', ${actIdx}, ${sceneIdx}, ${timerIdx})" title="Tick +1">+1</button>` : ''}
+                                        </span>
                                     `).join('') || ''}
                                     ${isCurrent ? `<button class="btn btn-xs btn-danger" onclick="window.adventureStartEncounter('${adventure.id}', ${actIdx}, ${sceneIdx})" title="${scene.encounterId ? 'Reopen the Combat Tracker for this scene' : 'Create an Encounter from this scene and open the Combat Tracker'}">⚔️ ${scene.encounterId ? 'Resume' : 'Start'} Encounter</button>` : ''}
                                     ${!isCompleted && isCurrent ? `<button class="btn btn-xs btn-primary" onclick="window.adventureCompleteScene('${adventure.id}', ${actIdx}, ${sceneIdx})">✓ Complete</button>` : ''}
@@ -1893,6 +1982,12 @@ window.adventureAdvanceTimer = function(id, idx) {
     }
 };
 
+// NEW: window exposure for scene-local timer ticking.
+window.adventureAdvanceSceneTimer = function(id, actIdx, sceneIdx, timerIdx, amount = 1) {
+    const result = advanceSceneTimer(id, actIdx, sceneIdx, timerIdx, amount);
+    if (result) renderView();
+};
+
 window.adventureExport = function(id) {
     exportAdventure(id);
 };
@@ -2003,6 +2098,7 @@ export {
     startAdventure,
     completeScene,
     advanceTimer,
+    advanceSceneTimer,
     resetAdventure,
     exportAdventure,
     importAdventureFromFile,

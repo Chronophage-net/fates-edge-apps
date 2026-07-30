@@ -1,0 +1,75 @@
+═══════════════════════════════════════════════════════════════
+ws-handlers.js changes
+═══════════════════════════════════════════════════════════════
+
+1) Add near the top, alongside the other requires:
+
+    const adventure = require('./adventure.js');
+
+
+2) Add these new case branches inside the `switch (messageType) { ... }`
+   block, anywhere among the other cases -- e.g. right before the
+   existing passthrough list (`case 'media_recording': ... case
+   'module-cleanup': room.broadcastToRoom(...); break;`) and its
+   following `default:` case:
+
+                    case 'adventure-load': {
+                        try {
+                            const state = adventure.loadAdventureModule(currentRoom, data.moduleId);
+                            room.broadcastToRoom(roomKey, 'adventure-loaded', state);
+                        } catch (err) {
+                            ws.send(JSON.stringify({ type: 'error', message: err.message }));
+                        }
+                        break;
+                    }
+
+                    case 'adventure-scene': {
+                        try {
+                            const state = adventure.advanceScene(currentRoom, data.sceneId || null);
+                            room.broadcastToRoom(roomKey, 'scene-changed', state);
+                        } catch (err) {
+                            ws.send(JSON.stringify({ type: 'error', message: err.message }));
+                        }
+                        break;
+                    }
+
+                    case 'adventure-encounter-start': {
+                        try {
+                            const combatants = Array.isArray(data.combatants) ? data.combatants : null;
+                            const state = adventure.startEncounter(currentRoom, data.encounterId, combatants);
+                            room.broadcastToRoom(roomKey, 'encounter-started', state);
+                        } catch (err) {
+                            ws.send(JSON.stringify({ type: 'error', message: err.message }));
+                        }
+                        break;
+                    }
+
+                    case 'adventure-encounter-resolve': {
+                        try {
+                            const state = adventure.resolveEncounter(currentRoom, { outcome: data.outcome, notes: data.notes });
+                            room.broadcastToRoom(roomKey, 'encounter-resolved', state);
+                        } catch (err) {
+                            ws.send(JSON.stringify({ type: 'error', message: err.message }));
+                        }
+                        break;
+                    }
+
+                    case 'adventure-log': {
+                        try {
+                            const state = adventure.logBeat(currentRoom, { text: data.text, author: data.author });
+                            room.broadcastToRoom(roomKey, 'adventure-log', state);
+                        } catch (err) {
+                            ws.send(JSON.stringify({ type: 'error', message: err.message }));
+                        }
+                        break;
+                    }
+
+                    case 'adventure-state-request': {
+                        ws.send(JSON.stringify({ type: 'adventure-state', ...adventure.getPublicState(currentRoom) }));
+                        break;
+                    }
+
+Note: these all use `currentRoom` and `roomKey`, matching the exact
+variable names already in scope inside this switch (see the existing
+`case 'deck-draw': handleDeckDraw(ws, currentRoom, data); break;` right
+above them for the pattern this file already uses).

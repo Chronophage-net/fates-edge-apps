@@ -1,0 +1,50 @@
+{
+    "title": "The Salt Road Incident",
+    "acts": [
+        {
+            "id": "act-1",
+            "title": "Act I: Arrival",
+            "scenes": [
+                {
+                    "id": "scene-1-1",
+                    "title": "The Broken Caravan",
+                    "readAloud": "The wind off the salt flats carries a smell that shouldn't be there — burnt leather, and something sweeter underneath. Ahead, a merchant caravan lies scattered across the road, one wagon on its side, wheels still slowly turning.",
+                    "gmNotes": "The caravan was hit twenty minutes ago. Survivors are hiding in the rocks fifty yards off the road (Perception DV 3 to spot them). If the party investigates quietly, they can question a survivor before the bandits (still nearby, looting) notice them.",
+                    "encounters": [
+                        {
+                            "id": "enc-bandits",
+                            "name": "Bandit Ambush",
+                            "combatants": [
+                                { "name": "Bandit Leader", "hp": 12, "notes": "Wields a curved blade, will flee at half HP" },
+                                { "name": "Bandit", "hp": 6, "count": 3 }
+                            ]
+                        }
+                    ],
+                    "nextSceneId": "scene-1-2"
+                },
+                {
+                    "id": "scene-1-2",
+                    "title": "The Survivor's Account",
+                    "readAloud": "The caravan master, bloodied but alive, grips your arm. 'They knew our route. Someone sold us out. Please — my daughter was taken toward the Hollow Cisterns.'",
+                    "gmNotes": "This is the pivot scene. The party can pursue immediately (-> scene-2-1) or investigate who leaked the route first (a Lore/Subterfuge scene left to the GM/AI to run ad-hoc — log it as a beat rather than a scripted scene).",
+                    "encounters": [],
+                    "nextSceneId": "scene-2-1"
+                }
+            ]
+        },
+        {
+            "id": "act-2",
+            "title": "Act II: The Hollow Cisterns",
+            "scenes": [
+                {
+                    "id": "scene-2-1",
+                    "title": "Descent Into the Cisterns",
+                    "readAloud": "The old cisterns were sealed a generation ago. Now the seal is broken, and lantern-light flickers somewhere far below.",
+                    "gmNotes": "This is the adventure's climax. Whoever is holding the caravan master's daughter is a matter for the GM/AI to decide based on earlier play (the leaked-route thread from scene-1-2, if pursued). Start an ad-hoc encounter here with a synthetic encounterId and an explicit combatants list rather than a pre-scripted one, since the final fight should reflect what actually happened earlier at the table.",
+                    "encounters": [],
+                    "nextSceneId": null
+                }
+            ]
+        }
+    ]
+}

@@ -14,6 +14,38 @@
 
     <link rel="stylesheet" href="css/app.css" />
 
+    <!-- NEW: grayed-out styling for sidebar items the current client can't
+         access (GM-only features for a non-GM, or a GM's own hidden
+         toggle). See js/core/feature-toggles.js and js/app.js's
+         setupFeatureAccess() for the logic that applies this class.
+         Values match the existing .nav-item:disabled rule in app.css
+         (opacity 0.4, var(--text3)) for visual consistency — this is a
+         separate class rather than reusing :disabled because the item
+         must stay clickable (a truly disabled button can't fire a click
+         event, so there'd be no way to show a notification toast). -->
+    <style>
+        .sidebar-nav .nav-item.nav-item-locked {
+            opacity: 0.4;
+            color: var(--text3);
+            cursor: not-allowed;
+            background: transparent;
+            border-left-color: transparent;
+        }
+        .sidebar-nav .nav-item.nav-item-locked:hover {
+            background: transparent;
+            border-left-color: transparent;
+            transform: none;
+            color: var(--text3);
+        }
+        .sidebar-nav .nav-item.nav-item-locked .nav-icon {
+            filter: grayscale(1);
+        }
+        .sidebar-nav .nav-item.nav-item-locked .nav-label::after {
+            content: ' 🔒';
+            font-size: 0.75em;
+        }
+    </style>
+
     <!-- Seed loading script -->
     <script>
         (function() {
@@ -59,6 +91,33 @@
             <input type="password" class="gate-input" id="gateInput" placeholder="Enter password…" autocomplete="current-password" />
             <button class="gate-btn" id="gateBtn">Unlock</button>
             <div class="gate-foot">— playtester access only —</div>
+        </div>
+    </div>
+
+    <!-- ===== LOCAL LOCK OVERLAY =====
+         A manually-triggered, client-side-only screen lock — distinct
+         from the playtester password overlay above. See
+         js/core/local-lock.js for the full design rationale. Locking
+         doesn't disconnect or lose any state; it just blocks the screen
+         until the local lock password (or an emergency reset code from
+         data/lock-reset.json) is entered. Reuses the same .gate-* classes
+         as the password overlay above for visual consistency. -->
+    <div class="password-overlay" id="localLockOverlay" role="dialog" aria-modal="true" aria-label="Screen locked">
+        <div class="gate-box">
+            <div class="gate-icon">🔒</div>
+            <div class="gate-title">Screen Locked</div>
+            <div class="gate-sub">Enter your local lock password to continue.</div>
+            <div class="gate-error" id="localLockError"></div>
+            <input type="password" class="gate-input" id="localLockInput" placeholder="Enter password…" autocomplete="off" />
+            <button class="gate-btn" id="localLockBtn">Unlock</button>
+            <div class="gate-foot">
+                <a href="#" id="localLockForgotLink" style="color:inherit;text-decoration:underline;cursor:pointer;">Forgot password? Emergency reset</a>
+            </div>
+            <div id="localLockResetSection" style="display:none;margin-top:0.6rem;">
+                <div class="gate-sub" style="font-size:0.8rem;">Enter the emergency reset code (see data/lock-reset.json on the server).</div>
+                <input type="text" class="gate-input" id="localLockResetInput" placeholder="Reset code…" autocomplete="off" />
+                <button class="gate-btn" id="localLockResetBtn">Reset &amp; Unlock</button>
+            </div>
         </div>
     </div>
 
@@ -128,7 +187,7 @@
                     <button class="nav-item" data-tab="whiteboard" title="Whiteboard" role="tab" aria-selected="false">
                         <span class="nav-icon">✏️</span> <span class="nav-label">Whiteboard</span>
                     </button>
-                    <button class="nav-item" data-tab="adventure-manager" title="Adventure Manager" role="tab" aria-selected="false">
+                    <button class="nav-item" data-tab="adventure-manager" title="Adventure Manager" role="tab" id="nav-adventure-manager" aria-selected="false">
                         <span class="nav-icon">🤺</span> <span class="nav-label">Adventure Manager</span>
                     </button>
                     <button class="nav-item" data-tab="kon-reh" title="Kon'reh Strategy Game" role="tab" aria-selected="false">
@@ -160,6 +219,7 @@
                     <button class="footer-btn" id="importBtn" title="Import JSON" aria-label="Import Data">⬆</button>
                     <input type="file" id="importFile" accept=".json" class="hidden" />
                     <button class="footer-btn" id="theme-toggle" title="Toggle theme" aria-label="Toggle Theme">🌙</button>
+                    <button class="footer-btn" id="lockAppBtn" title="Lock screen" aria-label="Lock Screen">🔒</button>
                 </div>
             </div>
         </aside>
@@ -290,30 +350,18 @@
     <!-- ===== TOAST CONTAINER ===== -->
     <div id="toast-container" role="status" aria-live="polite"></div>
 
-    <!-- ===== ROLE-BASED FEATURE TOGGLING ===== -->
+    <!-- Role-based feature access is now handled by js/core/feature-toggles.js
+         (self-mirrors current role from 'gmRoleUpdate'/'presenceUpdate' —
+         see that file for why neither vtt-connected.js nor
+         core/sync/presence.js need to be edited or import it) and
+         js/app.js's setupFeatureAccess() (grays out locked sidebar items
+         and shows a toast on click, rather than disabling them outright —
+         a disabled button can't fire a click event, so it couldn't show a
+         notification). The logic that used to live here as an inline
+         <script> — gating only #nav-gm-tools via btn.disabled — has been
+         consolidated into those two files. window.__vttClientId is kept
+         here since feature-toggles.js's presenceUpdate listener reads it. -->
     <script>
-        window.setGmToolsDisabled = function(disabled) {
-            const btn = document.getElementById('nav-gm-tools');
-            if (btn) {
-                btn.disabled = disabled;
-                btn.title = disabled ? 'Disabled by Server Admin' : 'GM Tools';
-            }
-        };
-
-        document.addEventListener('gmRoleUpdate', (e) => {
-            const role = e.detail?.role;
-            window.setGmToolsDisabled(role !== 'gm');
-        });
-
-        document.addEventListener('presenceUpdate', (e) => {
-            const myId = window.__vttClientId || (window.vttState && window.vttState.socketId);
-            if (!myId || !e.detail || !e.detail.clients) return;
-            const me = e.detail.clients.find(c => c.id === myId);
-            if (me) {
-                window.setGmToolsDisabled(me.role !== 'gm');
-            }
-        });
-
         window.__vttClientId = null;
     </script>
 

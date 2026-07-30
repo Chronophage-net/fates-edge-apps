@@ -2,6 +2,14 @@
  * Fate's Edge Toolkit – Main Application Entry Point
  * v3.1 – Unified router integration, cleaned up.
  * Added Spellcraft module to preload list.
+ *
+ * ────────────────────────────────────────────────────────────────────────
+ * NEW: setupFeatureAccess() grays out sidebar items the current client
+ * can't access (GM-only features for a non-GM, or a GM's own hidden
+ * toggle) and shows a toast on click instead of hiding/disabling them.
+ * See core/feature-toggles.js for the full design rationale. This
+ * replaces logic that used to live in an inline <script> in index.html.
+ * ────────────────────────────────────────────────────────────────────────
  */
 
 import { initMediaModule } from './core/media.js';
@@ -13,6 +21,8 @@ import { showToast } from './components/Toast.js';
 import { syncManager } from './core/sync/index.js';
 import { getUserAvatar } from './core/gravatar.js';
 import { getStorage, setStorage } from './core/utils.js';
+import { getFeatureAccess, getFeatureLockMessage, watchFeatureVisibility } from './core/feature-toggles.js';
+import { lockApp, initLocalLock } from './core/local-lock.js';
 
 // ============================================================
 // TEST MODE HANDLING
@@ -97,6 +107,8 @@ async function init() {
         setupSyncUI();
         setupSettingsTabHook();
         setupNavigation();
+        setupFeatureAccess();
+        setupLocalLock();
         setupConflictModalListener();
 
         // 5. Password gate
@@ -253,19 +265,95 @@ async function handlePasswordSubmit(state) {
 // ============================================================
 
 function setupNavigation() {
-    // Sidebar clicks are already handled by router.js.
-    // This is kept for any extra redirection logic if needed.
-    document.querySelectorAll('.sidebar-nav .nav-item[data-tab]').forEach(btn => {
-        btn.addEventListener('click', () => {
-            const tab = btn.dataset.tab;
-            if (tab) {
-                const targetTab = ROUTE_REDIRECTS[tab] || tab;
-                if (targetTab !== tab) {
-                    btn.dataset.tab = targetTab; // update for next time
-                }
-                navigate(targetTab); // router will update hash
-            }
-        });
+    // BUGFIX: this used to attach its own click listener to
+    // '.sidebar-nav .nav-item[data-tab]', while router.js's initRouter()
+    // separately attaches one to '.sidebar-nav button[data-tab]'. Since
+    // every sidebar button here actually is a literal
+    // <button class="nav-item" data-tab="...">, both selectors match the
+    // SAME elements — meaning every sidebar click used to call navigate()
+    // twice (and, once the feature-access backstop below was added, would
+    // have shown its "not available" toast twice too). router.js's
+    // initRouter() is the authoritative click handler (it also manages the
+    // URL hash); this function is now a deliberate no-op, kept only so any
+    // external caller expecting setupNavigation() to exist doesn't break.
+}
+
+// ============================================================
+// FEATURE ACCESS (GM-only / GM-toggled sidebar items)
+// ============================================================
+//
+// NEW: replaces the old inline <script> in index.html. Grays out any
+// sidebar item this client currently can't access — either a hard role
+// restriction (e.g. GM Tools for a non-GM) or the GM's own opt-in toggle
+// (e.g. they've hidden Adventure Manager from themselves this session) —
+// and shows a toast explaining why on click.
+//
+// Deliberately does NOT set btn.disabled: a disabled button never fires a
+// click event at all, so there'd be no way to show a notification when
+// someone clicks it. This was the actual gap in the old inline script,
+// which could only offer a passive tooltip via the title attribute.
+
+function applyFeatureAccess() {
+    document.querySelectorAll('.sidebar-nav [data-tab]').forEach(btn => {
+        // FAILS OPEN: if getFeatureAccess() throws for any reason, treat
+        // the item as accessible rather than leaving it (or, worse, every
+        // subsequent item in this loop) in an unknown/locked state.
+        let accessible = true;
+        try {
+            accessible = getFeatureAccess(btn.dataset.tab).accessible;
+        } catch (err) {
+            console.warn('[App] getFeatureAccess failed, treating as accessible:', err);
+        }
+        btn.classList.toggle('nav-item-locked', !accessible);
+        btn.setAttribute('aria-disabled', String(!accessible));
+    });
+}
+
+function setupFeatureAccess() {
+    applyFeatureAccess();
+
+    // Re-apply whenever the GM flips a toggle, or GM status changes hands
+    // mid-session (watchFeatureVisibility listens for 'featureVisibilityChanged',
+    // 'gmRoleUpdate', and 'presenceUpdate' — see core/feature-toggles.js).
+    watchFeatureVisibility(applyFeatureAccess);
+
+    // Delegated click interceptor in the CAPTURE phase, so it runs before
+    // this file's own setupNavigation() listener (and router.js's) ever
+    // reach navigate(). Locked items stop here; unlocked items are
+    // untouched and fall through exactly as before.
+    //
+    // FAILS OPEN: wrapped in try/catch so that if getFeatureLockMessage()
+    // (or anything else in here) throws, the click is allowed to proceed
+    // normally rather than being silently swallowed — a broken lock-check
+    // should never be able to take down navigation entirely.
+    document.querySelector('.sidebar-nav')?.addEventListener('click', (e) => {
+        try {
+            const btn = e.target.closest('[data-tab].nav-item-locked');
+            if (!btn) return;
+            e.preventDefault();
+            e.stopImmediatePropagation();
+            showToast(getFeatureLockMessage(btn.dataset.tab) || 'This is currently unavailable.', 'info');
+        } catch (err) {
+            console.warn('[App] Feature-lock click handler failed, allowing navigation:', err);
+        }
+    }, true); // capture: true
+}
+
+// ============================================================
+// LOCAL LOCK (manual screen lock, separate from the playtester gate)
+// ============================================================
+//
+// See core/local-lock.js for the full design. initLocalLock() re-shows
+// the lock overlay immediately if the page was reloaded while locked, and
+// wires up the overlay's own password/reset-code inputs. The sidebar
+// button here just triggers lockApp() — everything else (prompting for a
+// password on first use, checking it, the emergency reset flow) lives in
+// that module.
+
+function setupLocalLock() {
+    initLocalLock();
+    document.getElementById('lockAppBtn')?.addEventListener('click', () => {
+        lockApp();
     });
 }
 

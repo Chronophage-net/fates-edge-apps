@@ -1,10 +1,19 @@
 /**
  * Application router – handles navigation and delegates module management to moduleLoader.
  * v3.4 – Added kon‑reh route as a standalone feature.
+ *
+ * ────────────────────────────────────────────────────────────────────────
+ * NEW: navigate() now has a feature-access backstop, so a typed #gm-tools
+ * (or #adventure-manager) hash can't bypass a grayed-out sidebar button.
+ * isFeatureVisible() is a safe no-op for any route that isn't role-locked
+ * or GM-toggled off, so this check runs unconditionally for every route —
+ * no allowlist needed here. See core/feature-toggles.js.
+ * ────────────────────────────────────────────────────────────────────────
  */
 
 import { showToast } from './components/Toast.js';
 import { moduleLoader } from './module-loader.js';
+import { isFeatureVisible, getFeatureLockMessage } from './core/feature-toggles.js';
 
 // ============================================================
 // CONSTANTS & CONFIGURATION
@@ -106,6 +115,16 @@ export async function navigate(tab, options = {}) {
             window.history.replaceState(null, '', `#${resolved}`);
         }
         return navigate(resolved, { ...options, _fromRedirect: true });
+    }
+
+    // NEW: feature-access backstop — see file header note.
+    if (!isFeatureVisible(resolved) && !options._fromRedirect) {
+        console.log(`🚫 Router: "${resolved}" is not currently accessible.`);
+        showToast(getFeatureLockMessage(resolved) || `"${resolved}" is not currently available.`, 'info');
+        if (resolved !== 'home') {
+            window.location.hash = 'home';
+            return navigate('home');
+        }
     }
 
     // Ensure routes are registered (lazy init)
