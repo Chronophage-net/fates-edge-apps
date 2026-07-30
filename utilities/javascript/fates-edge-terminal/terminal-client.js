@@ -1,15 +1,15 @@
 #!/usr/bin/env node
 
 /**
- * Fate's Edge Terminal Client v2.3.0 – WebSocket + Dynamic Banners
+ * Fate's Edge Terminal Client v2.4.0 – Adventure Engine + Full Feature Set
  * Connects to ws://<host>:<port>?room=<ROOM_CODE>
  *
- * New in 2.3.0:
- *  - Advantage/disadvantage rolls, crit/fumble flair, roll history (/history)
- *  - Session stats (/stats), identity card (/whoami)
- *  - Color themes (/theme), persisted alongside the banner cache
- *  - /fortune, /time (with an in-world "Amber Reckoning" date), /ascii <text>
- *  - A few extra surprises. Curiosity is rewarded.
+ * New in 2.4.0:
+ *  - Full Adventure Engine commands: load, scene, encounter, timer, log, status, reference
+ *  - Handles all adventure WS events with rich formatting
+ *  - Improved /status, /whoami with adventure state
+ *  - Auto‑refresh adventure status on relevant broadcasts
+ *  - /adventure help for command reference
  */
 
 const WebSocket = require('ws');
@@ -19,7 +19,7 @@ const path = require('path');
 
 // ─── Configuration ──────────────────────────────────────────────
 const CONFIG = {
-    version: '2.3.0',
+    version: '2.4.0',
     defaultServerUrl: 'ws://localhost:3000',
     defaultRoom: 'ABC123',
     defaultName: 'Terminal Player',
@@ -66,11 +66,9 @@ const THEMES = {
         magenta: "\x1b[38;5;172m", cyan: "\x1b[38;5;109m", gray: "\x1b[38;5;95m", white: "\x1b[38;5;223m"
     }
 };
-// `colors` is reassigned (not just read) by /theme, so every function below
-// that references colors.xyz picks up the active theme automatically.
 let colors = THEMES.default;
 
-// ─── Local config (theme preference, etc.) ──────────────────────
+// ─── Local config ──────────────────────────────────────────────
 const USER_CONFIG_FILE = path.join(__dirname, 'edge_config.json');
 let userConfig = { theme: 'default' };
 
@@ -88,12 +86,11 @@ function saveUserConfig() {
 
 loadUserConfig();
 
-// ─── Banners ─────────────────────────────────────────────────────
+// ─── Banners (unchanged) ──────────────────────────────────────
 const BANNER_CACHE_FILE = path.join(__dirname, 'banner_cache.json');
 const MAX_CACHE_SIZE = 20;
 const MIN_CACHE_SIZE = 5;
 
-// Default banner – a classic ANSI dragon
 const DEFAULT_BANNER = `
 ${colors.magenta}╔══════════════════════════════════════════════════════════╗
 ║                                                          ║
@@ -119,7 +116,6 @@ ${colors.yellow}        ⚔️  Edge CLI v${CONFIG.version} – Where fate meets
 ${colors.magenta}╚══════════════════════════════════════════════════════════╝${colors.reset}
 `;
 
-// Remote banner sources (working .ans files from ansi.hrtk.in mirror)
 const REMOTE_BANNER_URLS = [
     'https://ansi.hrtk.in/ungenannt_motherofsorrows.ans',
     'https://ansi.hrtk.in/us-die2.ans',
@@ -133,7 +129,6 @@ const REMOTE_BANNER_URLS = [
     'https://ansi.hrtk.in/gr-zeit.ans'
 ];
 
-// Cache
 let bannerCache = [];
 
 function loadBannerCache() {
@@ -210,7 +205,6 @@ function getRandomBanner() {
     return bannerCache[Math.floor(Math.random() * bannerCache.length)];
 }
 
-// Load cache on startup
 loadBannerCache();
 setTimeout(() => {
     ensureBannerCache().catch(() => {});
@@ -233,7 +227,20 @@ let myRole = 'player';
 let deckRemaining = 0;
 let defaultRegion = 'Acasia';
 
-// Session stats + roll history (new in 2.3.0)
+// Adventure state (populated from events)
+let adventureState = {
+    moduleId: null,
+    title: null,
+    status: null,
+    currentAct: null,
+    currentScene: null,
+    activeEncounter: null,
+    campaignTimers: [],
+    log: [],
+    updatedAt: null
+};
+
+// Session stats + roll history
 let sessionStats = {
     sessionStart: Date.now(),
     rollsMade: 0,
@@ -324,6 +331,93 @@ function printClientList() {
     rl.prompt(true);
 }
 
+// ─── Adventure helpers ──────────────────────────────────────────
+function printAdventureState(state) {
+    if (!state || !state.moduleId) {
+        printSystemMessage('No adventure loaded.', colors.dim);
+        return;
+    }
+    process.stdout.write('\r\x1b[K');
+    console.log(`${colors.magenta}📖 Adventure: ${colors.bold}${state.title || state.moduleId}${colors.reset}`);
+    console.log(`  Status: ${state.status || 'unknown'}`);
+    if (state.currentAct) {
+        console.log(`  Act: ${state.currentAct.title}`);
+        if (state.currentScene) {
+            console.log(`  Scene: ${state.currentScene.title}`);
+            if (state.currentScene.description) {
+                const desc = state.currentScene.description.length > 120
+                    ? state.currentScene.description.slice(0, 120) + '…'
+                    : state.currentScene.description;
+                console.log(`    ${desc}`);
+            }
+        }
+    }
+    if (state.activeEncounter) {
+        const enc = state.activeEncounter;
+        const name = enc.name || enc.creatureId || 'Encounter';
+        console.log(`  ⚔️ Active Encounter: ${name} (DV ${enc.dv || '?'}, ${enc.position || 'Controlled'})`);
+        if (enc.creature) {
+            console.log(`    Creature: ${enc.creature.name} (TL${enc.creature.tl})`);
+        }
+    }
+    if (state.campaignTimers && state.campaignTimers.length) {
+        console.log(`  ⏱️ Campaign Timers:`);
+        state.campaignTimers.forEach(t => {
+            const progress = t.current !== undefined ? `${t.current}/${t.segments}` : `${t.segments}`;
+            console.log(`    - ${t.name}: ${progress}`);
+        });
+    }
+    if (state.log && state.log.length) {
+        const last = state.log[state.log.length - 1];
+        console.log(`  📜 Last log: ${last.message || last.type}`);
+    }
+    if (state.updatedAt) {
+        console.log(`  🕐 Updated: ${new Date(state.updatedAt).toLocaleTimeString()}`);
+    }
+    rl.prompt(true);
+}
+
+function printAdventureReference(ref) {
+    if (!ref || !ref.moduleId) {
+        printSystemMessage('No adventure loaded or no reference data available.', colors.dim);
+        return;
+    }
+    process.stdout.write('\r\x1b[K');
+    console.log(`${colors.magenta}📚 Adventure Reference: ${ref.moduleId}${colors.reset}`);
+    if (ref.bestiary && ref.bestiary.length) {
+        console.log(`  🐉 Bestiary (${ref.bestiary.length}):`);
+        ref.bestiary.slice(0, 5).forEach(b => {
+            console.log(`    - ${b.name} (TL${b.tl}, ${b.class || b.category || ''})`);
+        });
+        if (ref.bestiary.length > 5) console.log(`      ... and ${ref.bestiary.length - 5} more`);
+    }
+    if (ref.npcs && ref.npcs.length) {
+        console.log(`  👤 NPCs (${ref.npcs.length}):`);
+        ref.npcs.slice(0, 5).forEach(n => {
+            console.log(`    - ${n.name} (${n.role || 'NPC'})`);
+        });
+        if (ref.npcs.length > 5) console.log(`      ... and ${ref.npcs.length - 5} more`);
+    }
+    if (ref.locations && ref.locations.length) {
+        console.log(`  📍 Locations (${ref.locations.length}):`);
+        ref.locations.slice(0, 5).forEach(l => {
+            console.log(`    - ${l.name}${l.description ? ': ' + l.description.slice(0, 60) + '…' : ''}`);
+        });
+        if (ref.locations.length > 5) console.log(`      ... and ${ref.locations.length - 5} more`);
+    }
+    if (ref.factions && ref.factions.length) {
+        console.log(`  ⚑ Factions (${ref.factions.length}):`);
+        ref.factions.forEach(f => {
+            console.log(`    - ${f.name} (${f.goals || ''})`);
+        });
+    }
+    if (ref.notes) {
+        console.log(`  📝 Notes: ${ref.notes.slice(0, 200)}${ref.notes.length > 200 ? '…' : ''}`);
+    }
+    rl.prompt(true);
+}
+
+// ─── Help command ──────────────────────────────────────────────
 function printHelp() {
     process.stdout.write('\r\x1b[K');
     console.log(`
@@ -347,6 +441,17 @@ ${colors.yellow}Deck:${colors.reset}
   /crown [region]             Crown Spread
   /shuffle                    Shuffle deck
   /deck-status                Remaining cards
+
+${colors.yellow}Adventure Engine:${colors.reset}
+  /adventure help             This adventure command help
+  /adventure status           Show current adventure state
+  /adventure load <moduleId>  Load an adventure module
+  /adventure scene [actIdx] [sceneIdx]  Advance to a specific scene (omit both to advance sequentially)
+  /adventure encounter start <ref>      Start an encounter by index or name/creatureId
+  /adventure encounter resolve <outcome>  Resolve active encounter (clean|partial|miss)
+  /adventure timer <name> [amount]      Tick a timer (default +1)
+  /adventure log <text>       Add a narrative beat to the log
+  /adventure reference         Show reference data (bestiary, NPCs, locations, factions)
 
 ${colors.yellow}GM Management:${colors.reset}
   /gm request                 Request GM
@@ -390,7 +495,24 @@ ${colors.dim}(Some commands aren't listed here. Curiosity is rewarded.)${colors.
     rl.prompt(true);
 }
 
-// ─── ASCII text art ──────────────────────────────────────────────
+function printAdventureHelp() {
+    process.stdout.write('\r\x1b[K');
+    console.log(`
+${colors.magenta}📖 Adventure Commands${colors.reset}
+  /adventure status            Show current adventure state
+  /adventure load <moduleId>   Load an adventure module by its ID (from /modules list)
+  /adventure scene [actIndex] [sceneIndex]  Advance to a specific scene (omit both to advance sequentially)
+  /adventure encounter start <ref>   Start an encounter in the current scene (ref = index or name/creatureId)
+  /adventure encounter resolve <outcome>  Resolve active encounter (clean|partial|miss)
+  /adventure timer <name> [amount]  Tick a timer by name (amount defaults to +1)
+  /adventure log <text>        Append a narrative beat to the adventure log
+  /adventure reference          Show reference data (bestiary, NPCs, locations, factions)
+${colors.dim}All adventure commands require a connection and GM role (or admin).${colors.reset}
+`);
+    rl.prompt(true);
+}
+
+// ─── ASCII art (unchanged) ─────────────────────────────────────
 const FONT = {
     ' ': ["     ", "     ", "     ", "     ", "     "],
     'A': [" ### ", "#   #", "#####", "#   #", "#   #"],
@@ -442,8 +564,8 @@ function renderAsciiText(text) {
     return rows.join('\n');
 }
 
-// ─── In-world date (Amber Reckoning) ─────────────────────────────
-const AMBER_EPOCH_OFFSET = -862; // ties "now" to a year consistent with the wider setting's lore
+// ─── Other extras (unchanged) ────────────────────────────────
+const AMBER_EPOCH_OFFSET = -862;
 const SEASON_NAMES = ['Kindling', 'Greening', 'Highsun', 'Ashing', 'Frostfall', 'Deepnight'];
 
 function getAmberReckoning(date = new Date()) {
@@ -454,7 +576,6 @@ function getAmberReckoning(date = new Date()) {
     return `${SEASON_NAMES[seasonIdx]}, Year ${arYear} A.R.`;
 }
 
-// ─── Fortunes ─────────────────────────────────────────────────────
 const FORTUNES = [
     "Count exits, not victims.",
     "The wise play for breaths, not squares.",
@@ -477,7 +598,6 @@ function getRandomFortune() {
     return FORTUNES[Math.floor(Math.random() * FORTUNES.length)];
 }
 
-// ─── Matrix rain (purely cosmetic) ───────────────────────────────
 function playMatrixRain(durationMs = 2500) {
     return new Promise(resolve => {
         const cols = Math.min(process.stdout.columns || 80, 120);
@@ -536,9 +656,6 @@ Nothing actually happens. This isn't that kind of game.${colors.reset}
     rl.prompt(true);
 }
 
-// Chat-message easter eggs — checked before a plain message is sent as chat.
-// These work whether or not you're connected; if you ARE connected, your
-// message still goes out as normal chat too, with the joke shown locally.
 const CHAT_EASTER_EGGS = [
     { pattern: /^sudo make me a sandwich$/i, respond: () => printSystemMessage(`${colors.green}Okay.${colors.reset} 🥪 (Root privileges are a hell of a drug.)`) },
     { pattern: /^good bot$/i, respond: () => printSystemMessage('🤖 beep boop, thank you!', colors.cyan) },
@@ -708,8 +825,549 @@ function scheduleReconnect() {
     }, delay);
 }
 
-// ─── Message handler ────────────────────────────────────────────
+function sendMessage(type, data = {}) {
+    if (!connected || !ws || ws.readyState !== WebSocket.OPEN) {
+        printSystemMessage('Not connected.', colors.red);
+        return false;
+    }
+    try {
+        ws.send(JSON.stringify({ type, ...data }));
+        return true;
+    } catch (e) {
+        printSystemMessage(`Send failed: ${e.message}`, colors.red);
+        return false;
+    }
+}
+
+// ─── Dice roller (unchanged) ──────────────────────────────────
+function rollOnce(formula) {
+    const parts = formula.match(/^(\d+)d(\d+)([+-]\d+)?$/i);
+    if (!parts) {
+        const num = parseInt(formula);
+        if (!isNaN(num)) return { formula, total: num, rolls: [num] };
+        return { formula, total: 0, rolls: [], error: 'Invalid dice expression' };
+    }
+    const count = parseInt(parts[1]);
+    const sides = parseInt(parts[2]);
+    const mod = parseInt(parts[3]) || 0;
+    const rolls = [];
+    let total = 0;
+    for (let i = 0; i < count; i++) {
+        const r = Math.floor(Math.random() * sides) + 1;
+        rolls.push(r);
+        total += r;
+    }
+    total += mod;
+    return { formula, total, rolls, count, sides, mod };
+}
+
+function rollDice(formula, mode = 'normal') {
+    const first = rollOnce(formula);
+    if (first.error || mode === 'normal') return first;
+    const second = rollOnce(formula);
+    const [better, worse] = mode === 'adv'
+        ? (first.total >= second.total ? [first, second] : [second, first])
+        : (first.total <= second.total ? [first, second] : [second, first]);
+    return { ...better, alternateTotal: worse.total, mode };
+}
+
+// ─── Command processing ──────────────────────────────────────────
+rl.on('line', (input) => {
+    const trimmed = input.trim();
+    if (!trimmed) { rl.prompt(); return; }
+
+    if (trimmed.startsWith('/')) {
+        const parts = trimmed.slice(1).split(/\s+/);
+        const cmd = parts[0].toLowerCase();
+        const args = parts.slice(1);
+        const argStr = args.join(' ');
+
+        switch (cmd) {
+            case 'connect':
+                if (connected) { printSystemMessage('Already connected.'); break; }
+                const newUrl = args[0] || CONFIG.defaultServerUrl;
+                const newRoom = args[1] || CONFIG.defaultRoom;
+                connectToServer(newUrl, newRoom);
+                break;
+
+            case 'disconnect':
+                disconnect();
+                break;
+
+            case 'status':
+                printSystemMessage(`Status: ${connected ? '🟢 Connected' : '🔴 Disconnected'}`);
+                if (connected) {
+                    printSystemMessage(`Server: ${serverUrl}`);
+                    printSystemMessage(`Room: ${roomCode}`);
+                    printSystemMessage(`Name: ${clientName}`);
+                    printSystemMessage(`Region: ${defaultRegion}`);
+                    printSystemMessage(`Deck: ${deckRemaining} cards`);
+                    const gm = getCurrentGM();
+                    printSystemMessage(`GM: ${gm ? gm.name : 'None'}`);
+                    printSystemMessage(`Your role: ${myRole}`);
+                    printSystemMessage(`Clients: ${Object.keys(clients).length}`);
+                    if (ADMIN_MODE) printSystemMessage(`Admin mode: ✅`, colors.green);
+                    // Adventure state
+                    if (adventureState.moduleId) {
+                        printSystemMessage(`Adventure: ${adventureState.title || adventureState.moduleId} (${adventureState.status || 'unknown'})`, colors.magenta);
+                    } else {
+                        printSystemMessage(`Adventure: none loaded`, colors.dim);
+                    }
+                }
+                break;
+
+            case 'name':
+                if (argStr) { clientName = argStr; printSystemMessage(`Name set to: ${clientName}`); }
+                else printSystemMessage(`Current name: ${clientName}`);
+                break;
+
+            // ─── Dice rolling ──────────────────────────────────
+            case 'roll':
+            case 'r': {
+                if (!argStr) { printSystemMessage('Usage: /roll <dice> [adv|dis] [reason]'); break; }
+
+                let mode = 'normal';
+                const modeArgs = args.filter(a => {
+                    const lower = a.toLowerCase();
+                    if (lower === 'adv' || lower === 'advantage') { mode = 'adv'; return false; }
+                    if (lower === 'dis' || lower === 'disadvantage') { mode = 'dis'; return false; }
+                    return true;
+                });
+                const cleanedArgStr = modeArgs.join(' ');
+
+                const match = cleanedArgStr.match(/^([^\s"]+(?:\s+[^\s"]+)*?)(?:\s+(.+))?$/);
+                let diceExpr = cleanedArgStr, reason = '';
+                if (match) { diceExpr = match[1]; reason = match[2] || ''; }
+
+                const rollData = rollDice(diceExpr, mode);
+                if (rollData.error) { printSystemMessage(rollData.error, colors.red); break; }
+
+                const isD20 = rollData.count === 1 && rollData.sides === 20;
+                const natRoll = isD20 ? rollData.rolls[0] : null;
+                const isCrit = isD20 && natRoll === 20;
+                const isFumble = isD20 && natRoll === 1;
+
+                if (sendMessage('roll-dice', { roll: diceExpr, reason, mode })) {
+                    sessionStats.rollsMade++;
+                    sessionStats.diceTotal += rollData.total;
+                    if (isCrit) sessionStats.crits++;
+                    if (isFumble) sessionStats.fumbles++;
+                    rollHistory.push({ formula: diceExpr, total: rollData.total, crit: isCrit, fumble: isFumble, mode });
+                    if (rollHistory.length > MAX_ROLL_HISTORY) rollHistory.shift();
+
+                    let extra = '';
+                    if (mode !== 'normal') extra += ` [${mode === 'adv' ? 'ADV' : 'DIS'}, other roll: ${rollData.alternateTotal}]`;
+                    if (isCrit) extra += ` ${colors.green}${colors.bold}⭐ CRITICAL!${colors.reset}${colors.yellow}`;
+                    if (isFumble) extra += ` ${colors.red}💀 FUMBLE!${colors.reset}${colors.yellow}`;
+                    if (Math.random() < 0.02) extra += ` ${colors.magenta}✨ Fate intervenes...${colors.reset}${colors.yellow}`;
+                    printRollResult(clientName, diceExpr, rollData.total, rollData.rolls.join(', ') + extra);
+                }
+                break;
+            }
+
+            case 'history': {
+                if (!rollHistory.length) { printSystemMessage('No rolls yet this session.'); break; }
+                process.stdout.write('\r\x1b[K');
+                console.log(`${colors.yellow}🎲 Recent Rolls:${colors.reset}`);
+                rollHistory.slice(-10).reverse().forEach(r => {
+                    const tag = r.crit ? ` ${colors.green}⭐ CRIT${colors.reset}` : r.fumble ? ` ${colors.red}💀 FUMBLE${colors.reset}` : '';
+                    const modeTag = r.mode && r.mode !== 'normal' ? ` (${r.mode})` : '';
+                    console.log(`  ${r.formula}${modeTag} → ${colors.bold}${r.total}${colors.reset}${tag}`);
+                });
+                rl.prompt(true);
+                break;
+            }
+
+            // ─── Deck ──────────────────────────────────────────
+            case 'draw':
+                const count = parseInt(args[0]) || 1;
+                const region = args[1] || defaultRegion;
+                if (count < 1 || count > 5) { printSystemMessage('Count must be 1-5.', colors.red); break; }
+                sendMessage('deck-draw', { count, region });
+                break;
+
+            case 'crown':
+                sendMessage('crown-spread', { region: args[0] || defaultRegion });
+                break;
+
+            case 'shuffle':
+                sendMessage('deck-shuffle', {});
+                break;
+
+            case 'deck-status':
+                printSystemMessage(`Deck remaining: ${deckRemaining} cards`);
+                break;
+
+            case 'region':
+                if (args[0]) { defaultRegion = args[0]; sendMessage('set-region', { region: defaultRegion }); printSystemMessage(`Region set to: ${defaultRegion}`); }
+                else printSystemMessage(`Current region: ${defaultRegion}`);
+                break;
+
+            // ─── Adventure Engine ──────────────────────────────
+            case 'adventure': {
+                const sub = args[0]?.toLowerCase() || '';
+                const subArgs = args.slice(1);
+                switch (sub) {
+                    case 'help':
+                        printAdventureHelp();
+                        break;
+                    case 'status':
+                        printAdventureState(adventureState);
+                        break;
+                    case 'load': {
+                        const moduleId = subArgs[0];
+                        if (!moduleId) { printSystemMessage('Usage: /adventure load <moduleId>', colors.red); break; }
+                        sendMessage('adventure-load', { moduleId });
+                        printSystemMessage(`📖 Requesting load of "${moduleId}"...`, colors.magenta);
+                        break;
+                    }
+                    case 'scene': {
+                        const actIdx = subArgs[0] !== undefined ? parseInt(subArgs[0]) : undefined;
+                        const sceneIdx = subArgs[1] !== undefined ? parseInt(subArgs[1]) : undefined;
+                        const target = {};
+                        if (actIdx !== undefined) target.actIndex = actIdx;
+                        if (sceneIdx !== undefined) target.sceneIndex = sceneIdx;
+                        sendMessage('adventure-scene', target);
+                        printSystemMessage(`🎭 Advancing scene...`, colors.magenta);
+                        break;
+                    }
+                    case 'encounter': {
+                        const encSub = subArgs[0]?.toLowerCase() || '';
+                        const encArgs = subArgs.slice(1);
+                        if (encSub === 'start') {
+                            const ref = encArgs[0];
+                            if (!ref) { printSystemMessage('Usage: /adventure encounter start <ref>', colors.red); break; }
+                            // If ref looks like a number, send as number; otherwise string
+                            const parsedRef = isNaN(ref) ? ref : parseInt(ref);
+                            sendMessage('adventure-encounter-start', { ref: parsedRef });
+                            printSystemMessage(`⚔️ Starting encounter "${ref}"...`, colors.yellow);
+                        } else if (encSub === 'resolve') {
+                            const outcome = encArgs[0];
+                            if (!outcome) { printSystemMessage('Usage: /adventure encounter resolve <outcome> (clean|partial|miss)', colors.red); break; }
+                            if (!['clean', 'partial', 'miss'].includes(outcome)) {
+                                printSystemMessage('Outcome must be clean, partial, or miss.', colors.red);
+                                break;
+                            }
+                            const notes = encArgs.slice(1).join(' ') || '';
+                            sendMessage('adventure-encounter-resolve', { outcome, notes });
+                            printSystemMessage(`⚔️ Resolving encounter as ${outcome}...`, colors.yellow);
+                        } else {
+                            printSystemMessage('Encounter subcommands: start, resolve');
+                        }
+                        break;
+                    }
+                    case 'timer': {
+                        const timerName = subArgs[0];
+                        const amount = subArgs[1] !== undefined ? parseInt(subArgs[1]) : 1;
+                        if (!timerName) { printSystemMessage('Usage: /adventure timer <name> [amount]', colors.red); break; }
+                        sendMessage('adventure-timer', { ref: timerName, amount });
+                        printSystemMessage(`⏱️ Ticking timer "${timerName}" by ${amount}...`, colors.cyan);
+                        break;
+                    }
+                    case 'log': {
+                        const text = subArgs.join(' ');
+                        if (!text) { printSystemMessage('Usage: /adventure log <text>', colors.red); break; }
+                        sendMessage('adventure-log', { text, author: clientName });
+                        printSystemMessage(`📝 Logging beat: "${text.slice(0, 60)}${text.length > 60 ? '…' : ''}"`, colors.gray);
+                        break;
+                    }
+                    case 'reference':
+                        sendMessage('adventure-reference-request', {});
+                        printSystemMessage('📚 Requesting reference data...', colors.magenta);
+                        break;
+                    default:
+                        printSystemMessage(`Unknown adventure command. Use /adventure help.`);
+                }
+                break;
+            }
+
+            // ─── GM ─────────────────────────────────────────────
+            case 'gm': {
+                const sub = args[0]?.toLowerCase() || '';
+                const gmArg = args.slice(1).join(' ');
+                switch (sub) {
+                    case 'request':
+                        sendMessage('request_gm', {});
+                        printSystemMessage('GM request sent.');
+                        break;
+                    case 'approve': {
+                        if (!gmArg) { printSystemMessage('Usage: /gm approve <id|name>'); break; }
+                        const target = findClient(gmArg);
+                        if (!target) { printSystemMessage(`Client "${gmArg}" not found.`, colors.red); break; }
+                        if (myRole !== 'gm') { printSystemMessage('Only current GM can approve.', colors.red); break; }
+                        sendMessage('approve_gm', { targetId: target.id });
+                        pendingRequests = pendingRequests.filter(r => r.requesterId !== target.id);
+                        printSystemMessage(`✅ Approved ${target.name} as GM.`);
+                        break;
+                    }
+                    case 'reject': {
+                        if (!gmArg) { printSystemMessage('Usage: /gm reject <id|name>'); break; }
+                        const target = findClient(gmArg);
+                        if (!target) { printSystemMessage(`Client "${gmArg}" not found.`, colors.red); break; }
+                        pendingRequests = pendingRequests.filter(r => r.requesterId !== target.id);
+                        printSystemMessage(`❌ Rejected ${target.name} as GM.`);
+                        break;
+                    }
+                    case 'status': printGMStatus(); break;
+                    case 'list': printClientList(); break;
+                    default: printSystemMessage(`Unknown GM command: ${sub}. Use request, approve, reject, status, list.`);
+                }
+                break;
+            }
+
+            // ─── Modules ────────────────────────────────────────
+            case 'modules': {
+                const modCmd = args[0]?.toLowerCase() || '';
+                const modArg = args.slice(1).join(' ');
+                switch (modCmd) {
+                    case 'list': sendMessage('module-list', {}); break;
+                    case 'push':
+                        if (!modArg) { printSystemMessage('Usage: /modules push <moduleId>'); break; }
+                        sendMessage('module-push', { moduleId: modArg });
+                        printSystemMessage(`📦 Push requested for ${modArg}`);
+                        break;
+                    case 'cleanup':
+                        if (!modArg) { printSystemMessage('Usage: /modules cleanup <moduleId>'); break; }
+                        sendMessage('module-cleanup', { moduleId: modArg });
+                        printSystemMessage(`🧹 Cleanup requested for ${modArg}`);
+                        break;
+                    default: printSystemMessage('Module commands: list, push <id>, cleanup <id>');
+                }
+                break;
+            }
+
+            case 'admin':
+                handleAdminCommand(args);
+                break;
+
+            // ─── Banner and fun ─────────────────────────────────
+            case 'banner': {
+                const sub = args[0]?.toLowerCase();
+                if (sub === 'reload') {
+                    loadBannerCache();
+                    printSystemMessage(`Banners reloaded from cache (${bannerCache.length} loaded)`, colors.green);
+                    rl.prompt(true);
+                } else if (sub === 'fetch') {
+                    printSystemMessage('Fetching a remote banner...', colors.dim);
+                    fetchRemoteBanner()
+                        .then(banner => {
+                            addToCache(banner);
+                            console.log(banner);
+                            printSystemMessage(`Added new banner to cache (now ${bannerCache.length} total)`, colors.green);
+                            rl.prompt(true);
+                        })
+                        .catch(err => {
+                            printSystemMessage(`Failed to fetch: ${err.message}`, colors.red);
+                            rl.prompt(true);
+                        });
+                } else {
+                    console.log(getRandomBanner());
+                    rl.prompt(true);
+                }
+                break;
+            }
+
+            case 'who':
+                if (connected) sendMessage('sync-request', { entity: 'presence' });
+                else printSystemMessage('Not connected.');
+                break;
+
+            case 'whoami': {
+                process.stdout.write('\r\x1b[K');
+                console.log(`
+${colors.magenta}╔════════════════════════════════╗
+║  ${colors.yellow}Identity Card${colors.magenta}                   ║
+╠════════════════════════════════╣${colors.reset}
+  Name:    ${colors.cyan}${clientName}${colors.reset}
+  Role:    ${colors.cyan}${myRole}${colors.reset}
+  Region:  ${colors.cyan}${defaultRegion}${colors.reset}
+  Server:  ${colors.gray}${connected ? serverUrl : 'not connected'}${colors.reset}
+  Room:    ${colors.gray}${connected ? roomCode : '—'}${colors.reset}
+  Theme:   ${colors.gray}${userConfig.theme}${colors.reset}
+${adventureState.moduleId ? `  Adventure: ${colors.green}${adventureState.title || adventureState.moduleId}${colors.reset}` : ''}
+${colors.magenta}╚════════════════════════════════╝${colors.reset}
+`);
+                rl.prompt(true);
+                break;
+            }
+
+            case 'stats': {
+                const uptimeMin = Math.floor((Date.now() - sessionStats.sessionStart) / 60000);
+                process.stdout.write('\r\x1b[K');
+                console.log(`
+${colors.cyan}📊 Session Stats${colors.reset}
+  Uptime:         ${uptimeMin}m
+  Rolls made:     ${sessionStats.rollsMade}
+  Dice total:     ${sessionStats.diceTotal}
+  Crits (nat20):  ${sessionStats.crits}
+  Fumbles (nat1): ${sessionStats.fumbles}
+  Messages sent:  ${sessionStats.messagesSent}
+  Cards drawn:    ${sessionStats.cardsDrawn}
+`);
+                rl.prompt(true);
+                break;
+            }
+
+            case 'theme': {
+                const name = args[0]?.toLowerCase();
+                if (!name) {
+                    printSystemMessage(`Current theme: ${userConfig.theme}. Available: ${Object.keys(THEMES).join(', ')}`);
+                    break;
+                }
+                if (!THEMES[name]) {
+                    printSystemMessage(`Unknown theme "${name}". Available: ${Object.keys(THEMES).join(', ')}`, colors.red);
+                    break;
+                }
+                colors = THEMES[name];
+                userConfig.theme = name;
+                saveUserConfig();
+                rl.setPrompt(`${colors.gray}>${colors.reset} `);
+                printSystemMessage(`🎨 Theme switched to "${name}".`, colors.green);
+                break;
+            }
+
+            case 'time': {
+                const now = new Date();
+                printSystemMessage(`🕐 Real time: ${now.toLocaleString()}`);
+                printSystemMessage(`📜 Reckoning: ${getAmberReckoning(now)}`, colors.magenta);
+                break;
+            }
+
+            case 'fortune':
+                printSystemMessage(`🔮 ${getRandomFortune()}`, colors.magenta);
+                break;
+
+            case 'ascii': {
+                if (!argStr) { printSystemMessage('Usage: /ascii <text>'); break; }
+                const text = argStr.slice(0, 20);
+                process.stdout.write('\r\x1b[K');
+                console.log(colors.cyan + renderAsciiText(text) + colors.reset);
+                rl.prompt(true);
+                break;
+            }
+
+            case 'matrix':
+                playMatrixRain().then(() => rl.prompt(true));
+                break;
+
+            case 'party':
+                playPartyMode();
+                break;
+
+            case 'coffee':
+                console.log(COFFEE_ART);
+                rl.prompt(true);
+                break;
+
+            case 'about':
+                console.log(`
+${colors.magenta}Fate's Edge Terminal Client${colors.reset}
+${colors.dim}Built by someone who definitely tested this in production.${colors.reset}
+${colors.dim}Powered by dice, dread, and an unreasonable number of ANSI codes.${colors.reset}
+${colors.gray}Try typing things you shouldn't. You might find more than this.${colors.reset}
+`);
+                rl.prompt(true);
+                break;
+
+            case 'help':
+                printHelp();
+                break;
+
+            case 'quit':
+            case 'exit':
+                if (ws) ws.close();
+                process.exit(0);
+                break;
+
+            default:
+                printSystemMessage(`Unknown command: /${cmd}. Type /help.`);
+        }
+    } else {
+        const egg = CHAT_EASTER_EGGS.find(e => e.pattern.test(trimmed));
+        if (egg) {
+            if (connected) {
+                sessionStats.messagesSent++;
+                sendMessage('chat-message', { text: trimmed, sender: clientName });
+                printChatMessage(clientName, trimmed);
+            }
+            egg.respond();
+        } else if (connected) {
+            sessionStats.messagesSent++;
+            sendMessage('chat-message', { text: trimmed, sender: clientName });
+            printChatMessage(clientName, trimmed);
+        } else {
+            printSystemMessage('Not connected.');
+        }
+    }
+    rl.prompt();
+});
+
+// ─── Message handler (updated for adventure events) ────────────
 function handleMessage(msg) {
+    // ─── Adventure Engine events ──────────────────────────────
+    if (msg.type === 'adventure-loaded') {
+        adventureState = { ...msg }; // overwrite with full state
+        printSystemMessage(`📖 Adventure loaded: ${msg.title || msg.moduleId}`, colors.magenta);
+        printAdventureState(adventureState);
+        return;
+    }
+    if (msg.type === 'scene-changed') {
+        adventureState = { ...adventureState, ...msg };
+        printSystemMessage(`🎭 Scene changed`, colors.magenta);
+        printAdventureState(adventureState);
+        return;
+    }
+    if (msg.type === 'encounter-started') {
+        adventureState = { ...adventureState, ...msg };
+        printSystemMessage(`⚔️ Encounter started: ${msg.activeEncounter?.name || 'Unknown'}`, colors.yellow);
+        printAdventureState(adventureState);
+        return;
+    }
+    if (msg.type === 'encounter-resolved') {
+        adventureState = { ...adventureState, ...msg };
+        const encName = msg.lastResolution?.encounter || 'Encounter';
+        const outcome = msg.lastResolution?.outcome || '?';
+        printSystemMessage(`⚔️ ${encName} resolved: ${outcome}`, colors.yellow);
+        printAdventureState(adventureState);
+        return;
+    }
+    if (msg.type === 'timer-ticked') {
+        adventureState = { ...adventureState, ...msg };
+        if (msg.tickedTimer) {
+            const t = msg.tickedTimer;
+            printSystemMessage(`⏱️ Timer "${t.name}" advanced: ${t.current}/${t.segments}${t.full ? ' (FULL)' : ''}`, colors.cyan);
+        } else {
+            printSystemMessage(`⏱️ Timer ticked.`, colors.cyan);
+        }
+        return;
+    }
+    if (msg.type === 'adventure-log') {
+        adventureState = { ...adventureState, ...msg };
+        if (msg.log && msg.log.length) {
+            const last = msg.log[msg.log.length - 1];
+            printSystemMessage(`📝 Log: ${last.message || last.text || last.type}`, colors.gray);
+        }
+        return;
+    }
+    if (msg.type === 'adventure-state') {
+        adventureState = { ...adventureState, ...msg };
+        printSystemMessage(`📋 Adventure state received.`, colors.magenta);
+        printAdventureState(adventureState);
+        return;
+    }
+    if (msg.type === 'adventure-reference') {
+        printSystemMessage(`📚 Reference data received.`, colors.magenta);
+        printAdventureReference(msg);
+        return;
+    }
+    if (msg.type === 'adventure-reset') {
+        adventureState = { ...adventureState, ...msg };
+        printSystemMessage(`🔄 Adventure reset.`, colors.magenta);
+        printAdventureState(adventureState);
+        return;
+    }
+
+    // ─── Existing events (unchanged) ──────────────────────────
     switch (msg.type) {
         case 'handshake_ack':
             printSystemMessage(`Handshake successful! You are ${clientName}.`);
@@ -830,6 +1488,9 @@ function handleMessage(msg) {
             if (msg.clients) updateClients(msg.clients);
             if (msg.deckRemaining !== undefined) deckRemaining = msg.deckRemaining;
             if (msg.data?.region) defaultRegion = msg.data.region;
+            if (msg.adventure) {
+                adventureState = { ...adventureState, ...msg.adventure };
+            }
             printSystemMessage(`Room state received. ${Object.keys(clients).length} clients online.`);
             break;
 
@@ -857,7 +1518,6 @@ function handleMessage(msg) {
     }
 }
 
-// ─── Helpers ──────────────────────────────────────────────────────
 function updateClients(clientsArray) {
     clients = {};
     clientsArray.forEach(c => {
@@ -885,399 +1545,6 @@ function findClient(idOrName) {
     }
     return null;
 }
-
-function sendMessage(type, data = {}) {
-    if (!connected || !ws || ws.readyState !== WebSocket.OPEN) {
-        printSystemMessage('Not connected.', colors.red);
-        return false;
-    }
-    try {
-        ws.send(JSON.stringify({ type, ...data }));
-        return true;
-    } catch (e) {
-        printSystemMessage(`Send failed: ${e.message}`, colors.red);
-        return false;
-    }
-}
-
-// ─── Dice roller ──────────────────────────────────────────────────
-// Rolls a formula exactly once. Unchanged shape/behavior from before, just
-// factored out so advantage/disadvantage (below) can reuse it.
-function rollOnce(formula) {
-    const parts = formula.match(/^(\d+)d(\d+)([+-]\d+)?$/i);
-    if (!parts) {
-        const num = parseInt(formula);
-        if (!isNaN(num)) return { formula, total: num, rolls: [num] };
-        return { formula, total: 0, rolls: [], error: 'Invalid dice expression' };
-    }
-    const count = parseInt(parts[1]);
-    const sides = parseInt(parts[2]);
-    const mod = parseInt(parts[3]) || 0;
-    const rolls = [];
-    let total = 0;
-    for (let i = 0; i < count; i++) {
-        const r = Math.floor(Math.random() * sides) + 1;
-        rolls.push(r);
-        total += r;
-    }
-    total += mod;
-    return { formula, total, rolls, count, sides, mod };
-}
-
-// `rollDice(formula)` behaves exactly as it always did (mode defaults to
-// 'normal', same return shape). Passing 'adv' or 'dis' rolls the whole
-// expression twice and keeps the better/worse total, exposing the other
-// result as `alternateTotal`.
-function rollDice(formula, mode = 'normal') {
-    const first = rollOnce(formula);
-    if (first.error || mode === 'normal') return first;
-    const second = rollOnce(formula);
-    const [better, worse] = mode === 'adv'
-        ? (first.total >= second.total ? [first, second] : [second, first])
-        : (first.total <= second.total ? [first, second] : [second, first]);
-    return { ...better, alternateTotal: worse.total, mode };
-}
-
-// ─── Command processing ──────────────────────────────────────────
-rl.on('line', (input) => {
-    const trimmed = input.trim();
-    if (!trimmed) { rl.prompt(); return; }
-
-    if (trimmed.startsWith('/')) {
-        const parts = trimmed.slice(1).split(/\s+/);
-        const cmd = parts[0].toLowerCase();
-        const args = parts.slice(1);
-        const argStr = args.join(' ');
-
-        switch (cmd) {
-            case 'connect':
-                if (connected) { printSystemMessage('Already connected.'); break; }
-                const newUrl = args[0] || CONFIG.defaultServerUrl;
-                const newRoom = args[1] || CONFIG.defaultRoom;
-                connectToServer(newUrl, newRoom);
-                break;
-
-            case 'disconnect':
-                disconnect();
-                break;
-
-            case 'status':
-                printSystemMessage(`Status: ${connected ? '🟢 Connected' : '🔴 Disconnected'}`);
-                if (connected) {
-                    printSystemMessage(`Server: ${serverUrl}`);
-                    printSystemMessage(`Room: ${roomCode}`);
-                    printSystemMessage(`Name: ${clientName}`);
-                    printSystemMessage(`Region: ${defaultRegion}`);
-                    printSystemMessage(`Deck: ${deckRemaining} cards`);
-                    const gm = getCurrentGM();
-                    printSystemMessage(`GM: ${gm ? gm.name : 'None'}`);
-                    printSystemMessage(`Your role: ${myRole}`);
-                    printSystemMessage(`Clients: ${Object.keys(clients).length}`);
-                    if (ADMIN_MODE) printSystemMessage(`Admin mode: ✅`, colors.green);
-                }
-                break;
-
-            case 'name':
-                if (argStr) { clientName = argStr; printSystemMessage(`Name set to: ${clientName}`); }
-                else printSystemMessage(`Current name: ${clientName}`);
-                break;
-
-            case 'roll':
-            case 'r': {
-                if (!argStr) { printSystemMessage('Usage: /roll <dice> [adv|dis] [reason]'); break; }
-
-                let mode = 'normal';
-                const modeArgs = args.filter(a => {
-                    const lower = a.toLowerCase();
-                    if (lower === 'adv' || lower === 'advantage') { mode = 'adv'; return false; }
-                    if (lower === 'dis' || lower === 'disadvantage') { mode = 'dis'; return false; }
-                    return true;
-                });
-                const cleanedArgStr = modeArgs.join(' ');
-
-                const match = cleanedArgStr.match(/^([^\s"]+(?:\s+[^\s"]+)*?)(?:\s+(.+))?$/);
-                let diceExpr = cleanedArgStr, reason = '';
-                if (match) { diceExpr = match[1]; reason = match[2] || ''; }
-
-                const rollData = rollDice(diceExpr, mode);
-                if (rollData.error) { printSystemMessage(rollData.error, colors.red); break; }
-
-                const isD20 = rollData.count === 1 && rollData.sides === 20;
-                const natRoll = isD20 ? rollData.rolls[0] : null;
-                const isCrit = isD20 && natRoll === 20;
-                const isFumble = isD20 && natRoll === 1;
-
-                if (sendMessage('roll-dice', { roll: diceExpr, reason, mode })) {
-                    sessionStats.rollsMade++;
-                    sessionStats.diceTotal += rollData.total;
-                    if (isCrit) sessionStats.crits++;
-                    if (isFumble) sessionStats.fumbles++;
-                    rollHistory.push({ formula: diceExpr, total: rollData.total, crit: isCrit, fumble: isFumble, mode });
-                    if (rollHistory.length > MAX_ROLL_HISTORY) rollHistory.shift();
-
-                    let extra = '';
-                    if (mode !== 'normal') extra += ` [${mode === 'adv' ? 'ADV' : 'DIS'}, other roll: ${rollData.alternateTotal}]`;
-                    if (isCrit) extra += ` ${colors.green}${colors.bold}⭐ CRITICAL!${colors.reset}${colors.yellow}`;
-                    if (isFumble) extra += ` ${colors.red}💀 FUMBLE!${colors.reset}${colors.yellow}`;
-                    if (Math.random() < 0.02) extra += ` ${colors.magenta}✨ Fate intervenes...${colors.reset}${colors.yellow}`;
-                    printRollResult(clientName, diceExpr, rollData.total, rollData.rolls.join(', ') + extra);
-                }
-                break;
-            }
-
-            case 'history': {
-                if (!rollHistory.length) { printSystemMessage('No rolls yet this session.'); break; }
-                process.stdout.write('\r\x1b[K');
-                console.log(`${colors.yellow}🎲 Recent Rolls:${colors.reset}`);
-                rollHistory.slice(-10).reverse().forEach(r => {
-                    const tag = r.crit ? ` ${colors.green}⭐ CRIT${colors.reset}` : r.fumble ? ` ${colors.red}💀 FUMBLE${colors.reset}` : '';
-                    const modeTag = r.mode && r.mode !== 'normal' ? ` (${r.mode})` : '';
-                    console.log(`  ${r.formula}${modeTag} → ${colors.bold}${r.total}${colors.reset}${tag}`);
-                });
-                rl.prompt(true);
-                break;
-            }
-
-            case 'draw':
-                const count = parseInt(args[0]) || 1;
-                const region = args[1] || defaultRegion;
-                if (count < 1 || count > 5) { printSystemMessage('Count must be 1-5.', colors.red); break; }
-                sendMessage('deck-draw', { count, region });
-                break;
-
-            case 'crown':
-                sendMessage('crown-spread', { region: args[0] || defaultRegion });
-                break;
-
-            case 'shuffle':
-                sendMessage('deck-shuffle', {});
-                break;
-
-            case 'deck-status':
-                printSystemMessage(`Deck remaining: ${deckRemaining} cards`);
-                break;
-
-            case 'region':
-                if (args[0]) { defaultRegion = args[0]; sendMessage('set-region', { region: defaultRegion }); printSystemMessage(`Region set to: ${defaultRegion}`); }
-                else printSystemMessage(`Current region: ${defaultRegion}`);
-                break;
-
-            case 'gm': {
-                const sub = args[0]?.toLowerCase() || '';
-                const gmArg = args.slice(1).join(' ');
-                switch (sub) {
-                    case 'request':
-                        sendMessage('request_gm', {});
-                        printSystemMessage('GM request sent.');
-                        break;
-                    case 'approve': {
-                        if (!gmArg) { printSystemMessage('Usage: /gm approve <id|name>'); break; }
-                        const target = findClient(gmArg);
-                        if (!target) { printSystemMessage(`Client "${gmArg}" not found.`, colors.red); break; }
-                        if (myRole !== 'gm') { printSystemMessage('Only current GM can approve.', colors.red); break; }
-                        sendMessage('approve_gm', { targetId: target.id });
-                        pendingRequests = pendingRequests.filter(r => r.requesterId !== target.id);
-                        printSystemMessage(`✅ Approved ${target.name} as GM.`);
-                        break;
-                    }
-                    case 'reject': {
-                        if (!gmArg) { printSystemMessage('Usage: /gm reject <id|name>'); break; }
-                        const target = findClient(gmArg);
-                        if (!target) { printSystemMessage(`Client "${gmArg}" not found.`, colors.red); break; }
-                        pendingRequests = pendingRequests.filter(r => r.requesterId !== target.id);
-                        printSystemMessage(`❌ Rejected ${target.name} as GM.`);
-                        break;
-                    }
-                    case 'status': printGMStatus(); break;
-                    case 'list': printClientList(); break;
-                    default: printSystemMessage(`Unknown GM command: ${sub}. Use request, approve, reject, status, list.`);
-                }
-                break;
-            }
-
-            case 'modules': {
-                const modCmd = args[0]?.toLowerCase() || '';
-                const modArg = args.slice(1).join(' ');
-                switch (modCmd) {
-                    case 'list': sendMessage('module-list', {}); break;
-                    case 'push':
-                        if (!modArg) { printSystemMessage('Usage: /modules push <moduleId>'); break; }
-                        sendMessage('module-push', { moduleId: modArg });
-                        printSystemMessage(`📦 Push requested for ${modArg}`);
-                        break;
-                    case 'cleanup':
-                        if (!modArg) { printSystemMessage('Usage: /modules cleanup <moduleId>'); break; }
-                        sendMessage('module-cleanup', { moduleId: modArg });
-                        printSystemMessage(`🧹 Cleanup requested for ${modArg}`);
-                        break;
-                    default: printSystemMessage('Module commands: list, push <id>, cleanup <id>');
-                }
-                break;
-            }
-
-            case 'admin':
-                handleAdminCommand(args);
-                break;
-
-            case 'banner': {
-                const sub = args[0]?.toLowerCase();
-                if (sub === 'reload') {
-                    loadBannerCache();
-                    printSystemMessage(`Banners reloaded from cache (${bannerCache.length} loaded)`, colors.green);
-                    rl.prompt(true);
-                } else if (sub === 'fetch') {
-                    printSystemMessage('Fetching a remote banner...', colors.dim);
-                    fetchRemoteBanner()
-                        .then(banner => {
-                            addToCache(banner);
-                            console.log(banner);
-                            printSystemMessage(`Added new banner to cache (now ${bannerCache.length} total)`, colors.green);
-                            rl.prompt(true);
-                        })
-                        .catch(err => {
-                            printSystemMessage(`Failed to fetch: ${err.message}`, colors.red);
-                            rl.prompt(true);
-                        });
-                } else {
-                    console.log(getRandomBanner());
-                    rl.prompt(true);
-                }
-                break;
-            }
-
-            case 'who':
-                if (connected) sendMessage('sync-request', { entity: 'presence' });
-                else printSystemMessage('Not connected.');
-                break;
-
-            case 'whoami': {
-                process.stdout.write('\r\x1b[K');
-                console.log(`
-${colors.magenta}╔════════════════════════════════╗
-║  ${colors.yellow}Identity Card${colors.magenta}                   ║
-╠════════════════════════════════╣${colors.reset}
-  Name:    ${colors.cyan}${clientName}${colors.reset}
-  Role:    ${colors.cyan}${myRole}${colors.reset}
-  Region:  ${colors.cyan}${defaultRegion}${colors.reset}
-  Server:  ${colors.gray}${connected ? serverUrl : 'not connected'}${colors.reset}
-  Room:    ${colors.gray}${connected ? roomCode : '—'}${colors.reset}
-  Theme:   ${colors.gray}${userConfig.theme}${colors.reset}
-${colors.magenta}╚════════════════════════════════╝${colors.reset}
-`);
-                rl.prompt(true);
-                break;
-            }
-
-            case 'stats': {
-                const uptimeMin = Math.floor((Date.now() - sessionStats.sessionStart) / 60000);
-                process.stdout.write('\r\x1b[K');
-                console.log(`
-${colors.cyan}📊 Session Stats${colors.reset}
-  Uptime:         ${uptimeMin}m
-  Rolls made:     ${sessionStats.rollsMade}
-  Dice total:     ${sessionStats.diceTotal}
-  Crits (nat20):  ${sessionStats.crits}
-  Fumbles (nat1): ${sessionStats.fumbles}
-  Messages sent:  ${sessionStats.messagesSent}
-  Cards drawn:    ${sessionStats.cardsDrawn}
-`);
-                rl.prompt(true);
-                break;
-            }
-
-            case 'theme': {
-                const name = args[0]?.toLowerCase();
-                if (!name) {
-                    printSystemMessage(`Current theme: ${userConfig.theme}. Available: ${Object.keys(THEMES).join(', ')}`);
-                    break;
-                }
-                if (!THEMES[name]) {
-                    printSystemMessage(`Unknown theme "${name}". Available: ${Object.keys(THEMES).join(', ')}`, colors.red);
-                    break;
-                }
-                colors = THEMES[name];
-                userConfig.theme = name;
-                saveUserConfig();
-                rl.setPrompt(`${colors.gray}>${colors.reset} `);
-                printSystemMessage(`🎨 Theme switched to "${name}".`, colors.green);
-                break;
-            }
-
-            case 'time': {
-                const now = new Date();
-                printSystemMessage(`🕐 Real time: ${now.toLocaleString()}`);
-                printSystemMessage(`📜 Reckoning: ${getAmberReckoning(now)}`, colors.magenta);
-                break;
-            }
-
-            case 'fortune':
-                printSystemMessage(`🔮 ${getRandomFortune()}`, colors.magenta);
-                break;
-
-            case 'ascii': {
-                if (!argStr) { printSystemMessage('Usage: /ascii <text>'); break; }
-                const text = argStr.slice(0, 20);
-                process.stdout.write('\r\x1b[K');
-                console.log(colors.cyan + renderAsciiText(text) + colors.reset);
-                rl.prompt(true);
-                break;
-            }
-
-            case 'matrix':
-                playMatrixRain().then(() => rl.prompt(true));
-                break;
-
-            case 'party':
-                playPartyMode();
-                break;
-
-            case 'coffee':
-                console.log(COFFEE_ART);
-                rl.prompt(true);
-                break;
-
-            case 'about':
-                console.log(`
-${colors.magenta}Fate's Edge Terminal Client${colors.reset}
-${colors.dim}Built by someone who definitely tested this in production.${colors.reset}
-${colors.dim}Powered by dice, dread, and an unreasonable number of ANSI codes.${colors.reset}
-${colors.gray}Try typing things you shouldn't. You might find more than this.${colors.reset}
-`);
-                rl.prompt(true);
-                break;
-
-            case 'help':
-                printHelp();
-                break;
-
-            case 'quit':
-            case 'exit':
-                if (ws) ws.close();
-                process.exit(0);
-                break;
-
-            default:
-                printSystemMessage(`Unknown command: /${cmd}. Type /help.`);
-        }
-    } else {
-        const egg = CHAT_EASTER_EGGS.find(e => e.pattern.test(trimmed));
-        if (egg) {
-            if (connected) {
-                sessionStats.messagesSent++;
-                sendMessage('chat-message', { text: trimmed, sender: clientName });
-                printChatMessage(clientName, trimmed);
-            }
-            egg.respond();
-        } else if (connected) {
-            sessionStats.messagesSent++;
-            sendMessage('chat-message', { text: trimmed, sender: clientName });
-            printChatMessage(clientName, trimmed);
-        } else {
-            printSystemMessage('Not connected.');
-        }
-    }
-    rl.prompt();
-});
 
 // ─── Welcome ──────────────────────────────────────────────────────
 console.log(getRandomBanner());

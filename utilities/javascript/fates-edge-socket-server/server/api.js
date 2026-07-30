@@ -2,6 +2,7 @@
  * Fate's Edge - Express API Routes
  * v8 – Full character storage (room.characters) + WebSocket parity
  * v9 – Adventure Engine routes wired in (see server/adventure.js)
+ * v10 – /api/modules now includes standalone adventure JSONs from data/adventures/
  */
 
 const express = require('express');
@@ -21,7 +22,6 @@ function timingSafeEqual(a, b) {
     const bufA = Buffer.from(String(a));
     const bufB = Buffer.from(String(b));
     if (bufA.length !== bufB.length) {
-        // Still run a comparison of equal length to avoid leaking length via timing
         crypto.timingSafeEqual(bufA, bufA);
         return false;
     }
@@ -324,6 +324,7 @@ function createApiRouter(appConfig) {
     // ─── Modules ──────────────────────────────────────────────────────
     router.get('/api/modules', authenticate, (req, res) => {
         const modules = [];
+        // 1. Scan server/modules/ (legacy module folders)
         const modulesPath = path.join(__dirname, 'modules');
         if (fs.existsSync(modulesPath)) {
             const items = fs.readdirSync(modulesPath);
@@ -349,6 +350,31 @@ function createApiRouter(appConfig) {
                 }
             }
         }
+
+        // 2. Scan data/adventures/ for standalone adventure JSON files
+        const adventuresDir = path.resolve(process.cwd(), 'data', 'adventures');
+        if (fs.existsSync(adventuresDir)) {
+            const files = fs.readdirSync(adventuresDir);
+            for (const file of files) {
+                if (file.endsWith('.json')) {
+                    const id = path.basename(file, '.json');
+                    try {
+                        const content = JSON.parse(fs.readFileSync(path.join(adventuresDir, file), 'utf-8'));
+                        modules.push({
+                            id: id,
+                            name: content.title || id,
+                            version: content.version || '1.0.0',
+                            description: content.description || '',
+                            author: content.author || '',
+                            type: 'adventure',
+                            icon: content.icon || '📖',
+                            route: null
+                        });
+                    } catch (e) { /* skip invalid JSON */ }
+                }
+            }
+        }
+
         res.json({ modules, count: modules.length, timestamp: Date.now() });
     });
 
@@ -837,7 +863,6 @@ function createApiRouter(appConfig) {
                     list: 'GET /api/rooms/:code/characters - List all full character objects in a room',
                     update: 'POST /api/rooms/:code/characters/update - Bulk update full character objects',
                     export: 'GET /api/characters/export - Export all characters across all rooms',
-                    // Legacy numeric field endpoints (still work)
                     fields: {
                         harm: 'POST /api/rooms/:code/characters/:name/harm - Adjust harm',
                         fatigue: 'POST /api/rooms/:code/characters/:name/fatigue - Adjust fatigue',

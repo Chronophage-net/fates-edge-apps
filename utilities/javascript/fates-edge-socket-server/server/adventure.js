@@ -202,6 +202,56 @@ function loadAdventureModule(room, moduleId) {
 }
 
 /**
+ * Load an adventure from a plain object (no file on disk). Used for
+ * AI‑generated adventures (e.g. Crown Spread output) or any custom
+ * content that shouldn't be saved as a permanent module. Deep‑clones
+ * the content, resets all timers and scene completed flags, and
+ * initialises the room's adventure state. `options.id` can be used
+ * to set the module id (defaults to 'custom').
+ */
+function loadAdventureContent(room, content, options = {}) {
+    if (!content || typeof content !== 'object') {
+        throw new Error('content object is required');
+    }
+    if (!content.title) {
+        throw new Error('content.title is required');
+    }
+    if (!Array.isArray(content.acts) || content.acts.length === 0) {
+        throw new Error('content.acts must be a non-empty array');
+    }
+
+    const moduleCopy = JSON.parse(JSON.stringify(content)); // deep clone
+    moduleCopy.id = options.id || moduleCopy.id || 'custom';
+
+    // Reset every scene's completed flag and every timer (scene + campaign)
+    for (const act of moduleCopy.acts || []) {
+        for (const scene of act.scenes || []) {
+            scene.completed = false;
+            for (const t of scene.timers || []) {
+                t.current = 0;
+            }
+        }
+    }
+    for (const t of moduleCopy.campaignTimers || []) {
+        t.current = 0;
+    }
+
+    const adventure = ensureAdventureState(room);
+    adventure.module = moduleCopy;
+    adventure.currentAct = 0;
+    adventure.currentScene = 0;
+    adventure.activeEncounterRef = null;
+    adventure.status = 'active';
+    adventure.startedAt = Date.now();
+    adventure.completedAt = null;
+    adventure.log = [];
+    appendLog(adventure, { type: 'loaded', message: `Loaded custom adventure "${moduleCopy.title}"` });
+    adventure.updatedAt = Date.now();
+    room.lastActivity = Date.now();
+
+    return getPublicState(room);
+}
+/**
  * Advance the adventure. With no target, moves sequentially: next scene
  * in the current act, or the next act's first scene, or marks the
  * adventure completed if this was the final scene of the final act.
@@ -508,6 +558,7 @@ function getReferenceData(room) {
 module.exports = {
     ensureAdventureState,
     loadAdventureModule,
+    loadAdventureContent,
     advanceScene,
     startEncounter,
     resolveEncounter,

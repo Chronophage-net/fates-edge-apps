@@ -9,7 +9,6 @@ import os
 
 API_BASE = os.getenv("FATES_EDGE_API_BASE", "https://your-fates-edge-server.com/api")
 API_KEY = os.getenv("FATES_EDGE_API_KEY", "YOUR_API_KEY")
-# Room code can be overridden per server; we'll use a global for simplicity
 DEFAULT_ROOM = os.getenv("FATES_EDGE_ROOM", "YOUR_ROOM_CODE")
 
 # ============================================================
@@ -30,8 +29,6 @@ def make_request(endpoint, method="GET", data=None):
         return {"error": str(e)}
 
 def get_room_code():
-    # In a real bot, you could store room per server using a dict or database.
-    # For now, we'll use a global constant.
     return DEFAULT_ROOM
 
 def get_client_id_by_name(name):
@@ -65,6 +62,13 @@ def format_character(c):
     if background: output += f"\n  **Background:** {background}"
     if patron: output += f"\n  **Patron:** {patron}"
     return output
+
+def parse_ref(ref_str):
+    # Try to parse as int, else keep as string
+    try:
+        return int(ref_str)
+    except ValueError:
+        return ref_str
 
 # ============================================================
 # COMMAND PARSING
@@ -143,14 +147,13 @@ elif cmd == "chars":
         name = args[2]
         field = args[3]
         value = " ".join(args[4:])  # allow spaces
-        # Convert numeric if possible
         try:
             value = int(value)
         except:
             try:
                 value = float(value)
             except:
-                pass  # keep as string
+                pass
         updates = {field: value}
         payload = {"updates": {name: updates}}
         result = make_request(f"/rooms/{room}/characters/update", "POST", payload)
@@ -163,7 +166,6 @@ elif cmd == "chars":
 # ============================================================
 
 elif cmd == "grid":
-    # Show grid combat status (fetches whiteboard)
     wb = make_request(f"/rooms/{room}/whiteboard")
     if wb.get("error"):
         return f"❌ {wb['error']}"
@@ -183,7 +185,6 @@ elif cmd == "grid":
     return output
 
 elif cmd == "wb":
-    # Whiteboard summary
     wb = make_request(f"/rooms/{room}/whiteboard")
     if wb.get("error"):
         return f"❌ {wb['error']}"
@@ -200,7 +201,7 @@ elif cmd == "wb":
     return output
 
 # ============================================================
-# GM & PLAYER MANAGEMENT
+# GM & PLAYER MANAGEMENT (unchanged)
 # ============================================================
 
 elif cmd == "gm":
@@ -215,7 +216,6 @@ elif cmd == "gm":
         else:
             return "👑 No GM currently."
     elif sub == "request":
-        # GM request via REST is not implemented; we could forward to WebSocket but not here.
         return "❌ GM request via REST API is not implemented. Use WebSocket bot."
     elif sub == "approve":
         return "❌ GM approve via REST API is not implemented."
@@ -271,11 +271,162 @@ elif cmd == "unban":
     return f"✅ Unbanned {target_id}."
 
 # ============================================================
+# ADVENTURE ENGINE COMMANDS (NEW)
+# ============================================================
+
+elif cmd == "adventure":
+    if len(args) < 2:
+        return "❌ Usage: `!fe adventure load|scene|encounter|timer|log|status|reference|reset`"
+    sub = args[1].lower()
+    sub_args = args[2:]
+
+    # --- LOAD ---
+    if sub == "load":
+        if not sub_args:
+            return "❌ Usage: `!fe adventure load <moduleId>`"
+        module_id = sub_args[0]
+        result = make_request(f"/rooms/{room}/adventure/load", "POST", {"moduleId": module_id})
+        if result.get("error"):
+            return f"❌ {result['error']}"
+        return f"📖 Loaded adventure **{module_id}**."
+
+    # --- SCENE ---
+    elif sub == "scene":
+        target = {}
+        if sub_args:
+            # try to parse actIndex, sceneIndex
+            if len(sub_args) >= 1 and sub_args[0].isdigit():
+                target["actIndex"] = int(sub_args[0])
+                if len(sub_args) >= 2 and sub_args[1].isdigit():
+                    target["sceneIndex"] = int(sub_args[1])
+        result = make_request(f"/rooms/{room}/adventure/scene", "POST", target)
+        if result.get("error"):
+            return f"❌ {result['error']}"
+        state = result
+        act_title = state.get("currentAct", {}).get("title", "Unknown")
+        scene_title = state.get("currentScene", {}).get("title", "Unknown")
+        return f"🎭 Advanced to scene **{scene_title}** in act **{act_title}**."
+
+    # --- ENCOUNTER ---
+    elif sub == "encounter":
+        if len(sub_args) < 2:
+            return "❌ Usage: `!fe adventure encounter start <ref>` or `resolve <outcome> [notes]`"
+        enc_sub = sub_args[0].lower()
+        enc_args = sub_args[1:]
+        if enc_sub == "start":
+            if not enc_args:
+                return "❌ Usage: `!fe adventure encounter start <ref>` (ref = index or name/creatureId)"
+            ref = parse_ref(enc_args[0])
+            result = make_request(f"/rooms/{room}/adventure/encounter/start", "POST", {"ref": ref})
+            if result.get("error"):
+                return f"❌ {result['error']}"
+            return f"⚔️ Encounter started: **{ref}**"
+        elif enc_sub == "resolve":
+            if not enc_args:
+                return "❌ Usage: `!fe adventure encounter resolve <outcome> [notes]` (outcome: clean|partial|miss)"
+            outcome = enc_args[0].lower()
+            if outcome not in ["clean", "partial", "miss"]:
+                return "❌ Outcome must be `clean`, `partial`, or `miss`"
+            notes = " ".join(enc_args[1:]) if len(enc_args) > 1 else ""
+            result = make_request(f"/rooms/{room}/adventure/encounter/resolve", "POST", {"outcome": outcome, "notes": notes})
+            if result.get("error"):
+                return f"❌ {result['error']}"
+            return f"⚔️ Encounter resolved as **{outcome}**."
+        else:
+            return "❌ Unknown encounter subcommand. Use `start` or `resolve`."
+
+    # --- TIMER ---
+    elif sub == "timer":
+        if len(sub_args) < 1:
+            return "❌ Usage: `!fe adventure timer <name> [amount] [scope]`"
+        name = sub_args[0]
+        amount = int(sub_args[1]) if len(sub_args) > 1 and sub_args[1].lstrip('-').isdigit() else 1
+        scope = sub_args[2] if len(sub_args) > 2 else "scene"
+        if scope not in ["scene", "campaign"]:
+            scope = "scene"
+        result = make_request(f"/rooms/{room}/adventure/timer", "POST", {"ref": name, "amount": amount, "scope": scope})
+        if result.get("error"):
+            return f"❌ {result['error']}"
+        return f"⏱️ Timer **{name}** ticked by {amount} ({scope} scope)."
+
+    # --- LOG ---
+    elif sub == "log":
+        if not sub_args:
+            return "❌ Usage: `!fe adventure log <text> [author]`"
+        text = sub_args[0]
+        author = sub_args[1] if len(sub_args) > 1 else "Avrae"
+        result = make_request(f"/rooms/{room}/adventure/log", "POST", {"text": text, "author": author})
+        if result.get("error"):
+            return f"❌ {result['error']}"
+        return f"📝 Logged beat: \"{text}\""
+
+    # --- STATUS ---
+    elif sub == "status":
+        result = make_request(f"/rooms/{room}/adventure")
+        if result.get("error"):
+            return f"❌ {result['error']}"
+        if not result.get("moduleId"):
+            return "📭 No adventure loaded in this room."
+        state = result
+        title = state.get("title", state.get("moduleId", "Unknown"))
+        status = state.get("status", "unknown")
+        act_title = state.get("currentAct", {}).get("title", "None")
+        scene_title = state.get("currentScene", {}).get("title", "None")
+        output = f"📖 **{title}**\n  Status: {status}\n  Act: {act_title}\n  Scene: {scene_title}"
+        if state.get("activeEncounter"):
+            enc = state["activeEncounter"]
+            enc_name = enc.get("name") or enc.get("creatureId") or "Encounter"
+            dv = enc.get("dv", "?")
+            pos = enc.get("position", "Controlled")
+            output += f"\n  ⚔️ Encounter: {enc_name} (DV {dv}, {pos})"
+        if state.get("campaignTimers"):
+            timers = ", ".join([f"{t['name']}: {t.get('current',0)}/{t['segments']}" for t in state["campaignTimers"]])
+            output += f"\n  ⏱️ Campaign Timers: {timers}"
+        if state.get("log") and len(state["log"]) > 0:
+            last = state["log"][-1]
+            output += f"\n  📜 Last log: {last.get('message') or last.get('type')}"
+        return output
+
+    # --- REFERENCE ---
+    elif sub == "reference":
+        result = make_request(f"/rooms/{room}/adventure/reference")
+        if result.get("error"):
+            return f"❌ {result['error']}"
+        if not result.get("moduleId"):
+            return "📭 No adventure loaded."
+        output = f"📚 **Reference for {result['moduleId']}**\n"
+        if result.get("bestiary"):
+            best = result["bestiary"][:5]
+            output += f"🐉 Bestiary ({len(result['bestiary'])}): " + ", ".join([f"{b['name']} (TL{b.get('tl','?')})" for b in best]) + ("..." if len(result['bestiary'])>5 else "") + "\n"
+        if result.get("npcs"):
+            npcs = result["npcs"][:5]
+            output += f"👤 NPCs ({len(result['npcs'])}): " + ", ".join([f"{n['name']} ({n.get('role','NPC')})" for n in npcs]) + ("..." if len(result['npcs'])>5 else "") + "\n"
+        if result.get("locations"):
+            locs = result["locations"][:5]
+            output += f"📍 Locations ({len(result['locations'])}): " + ", ".join([l['name'] for l in locs]) + ("..." if len(result['locations'])>5 else "") + "\n"
+        if result.get("factions"):
+            facs = result["factions"]
+            output += f"⚑ Factions ({len(facs)}): " + ", ".join([f['name'] for f in facs]) + "\n"
+        if result.get("notes"):
+            output += f"📝 Notes: {result['notes'][:200]}{'...' if len(result['notes'])>200 else ''}"
+        return output
+
+    # --- RESET ---
+    elif sub == "reset":
+        result = make_request(f"/rooms/{room}/adventure/reset", "POST")
+        if result.get("error"):
+            return f"❌ {result['error']}"
+        return "🔄 Adventure reset to initial state."
+
+    else:
+        return "❌ Unknown adventure subcommand. Use: load, scene, encounter, timer, log, status, reference, reset."
+
+# ============================================================
 # HELP
 # ============================================================
 
 else:
-    return """**Fate's Edge VTT Commands** (v2.0)
+    return """**Fate's Edge VTT Commands** (v2.1 – Adventure Engine)
 `!fe draw [count] [region]` - Draw cards (1-5)
 `!fe crown [region]` - Crown spread reading
 `!fe shuffle` - Shuffle the deck
@@ -285,10 +436,19 @@ else:
 `!fe grid` - Show grid combat status
 `!fe wb` - Show whiteboard summary
 `!fe gm status` - Show current GM
-`!fe players` - List players in the room
+`!fe players` - List players in room
 `!fe kick <player> [reason]` - Kick a player
 `!fe ban <player> [reason]` - Ban a player
-`!fe unban <clientId>` - Unban a client ID
+`!fe unban <clientId>` - Unban a client
+`!fe adventure load <moduleId>` - Load an adventure
+`!fe adventure scene [actIndex] [sceneIndex]` - Advance scene (omit both to go sequential)
+`!fe adventure encounter start <ref>` - Start an encounter (ref=index or name/creatureId)
+`!fe adventure encounter resolve <outcome> [notes]` - Resolve (clean|partial|miss)
+`!fe adventure timer <name> [amount] [scope]` - Tick timer (scope: scene|campaign)
+`!fe adventure log <text> [author]` - Append narrative beat
+`!fe adventure status` - Show current adventure state
+`!fe adventure reference` - Show reference data (bestiary, NPCs, locations, factions)
+`!fe adventure reset` - Reset adventure to start
 `!fe help` - This help
 """
 </drac2>

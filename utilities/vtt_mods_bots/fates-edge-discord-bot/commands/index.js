@@ -9,5 +9,6 @@ module.exports = {
     chat: require('./chat'),
     character: require('./character'),
     timer: require('./timer'),
+    adventure: require('./adventure.js'),
     admin: require('./admin')
 };
