@@ -343,7 +343,9 @@ function createApiRouter(appConfig) {
                                 author: manifest.author || '',
                                 type: manifest.type || 'module',
                                 icon: manifest.icon || '📦',
-                                route: manifest.route || null
+                                route: manifest.route || null,
+                                tier: content.tier || content.tierRange || '?'   // <── ADD THIS LINE
+
                             });
                         } catch (e) { /* ignore */ }
                     }

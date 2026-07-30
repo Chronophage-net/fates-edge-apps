@@ -69,7 +69,9 @@ const path = require('path');
 const fs = require('fs');
 const { isSafeModuleId } = require('./security.js');
 
-const MODULES_DIR = path.join(__dirname, 'modules');
+// ---- DATA DIRECTORY: adventures live under data/adventures/<id>.json ----
+const ADVENTURES_DIR = path.resolve(process.cwd(), 'data', 'adventures');
+
 const MAX_LOG_ENTRIES = 200;
 const VALID_OUTCOMES = ['clean', 'partial', 'miss'];
 
@@ -81,10 +83,6 @@ function ensureAdventureState(room) {
             module: null,          // deep-copied adventure content, mutated in place
             currentAct: 0,          // index into module.acts
             currentScene: 0,        // index into module.acts[currentAct].scenes
-            // Active encounter is tracked by REFERENCE rather than a copy,
-            // so ticking a scene timer etc. stays in sync with it:
-            //   { source: 'scene', index: N }   -- scene.encounters[N]
-            //   { source: 'adhoc', data: {...} } -- improvised, not in the module at all
             activeEncounterRef: null,
             status: 'planned',      // planned | active | completed
             startedAt: null,
@@ -142,11 +140,9 @@ function enrichEncounter(adventure, encounter) {
 }
 
 /**
- * Load an adventure module's content from modules/<id>/adventure.json
- * into the room, replacing any previously-loaded adventure. The
- * module's manifest.json (read separately by GET /api/modules) should
- * set "type": "adventure" to distinguish it from a plain content-push
- * module. Deep-clones the content so completed flags / timer ticks never
+ * Load an adventure module's content from data/adventures/<moduleId>.json
+ * into the room, replacing any previously-loaded adventure.
+ * Deep-clones the content so completed flags / timer ticks never
  * touch the file on disk, and always resets to a clean starting position
  * (act 0 / scene 0, every scene incomplete, every timer at 0) regardless
  * of whatever the source file's own currentAct/currentScene/timer values
@@ -155,24 +151,19 @@ function enrichEncounter(adventure, encounter) {
  */
 function loadAdventureModule(room, moduleId) {
     if (!isSafeModuleId(moduleId)) {
-        throw new Error('Invalid module id');
-    }
-    const moduleDir = path.join(MODULES_DIR, moduleId);
-    const manifestPath = path.join(moduleDir, 'manifest.json');
-    const adventurePath = path.join(moduleDir, 'adventure.json');
-
-    if (!fs.existsSync(manifestPath)) {
-        throw new Error(`Module "${moduleId}" not found (missing manifest.json)`);
-    }
-    if (!fs.existsSync(adventurePath)) {
-        throw new Error(`Module "${moduleId}" has no adventure.json -- it isn't an adventure module`);
+        throw new Error('Invalid adventure id');
     }
 
-    const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf-8'));
-    const content = JSON.parse(fs.readFileSync(adventurePath, 'utf-8'));
-    const moduleCopy = JSON.parse(JSON.stringify(content)); // deep clone -- see note above
+    const filePath = path.join(ADVENTURES_DIR, `${moduleId}.json`);
+    if (!fs.existsSync(filePath)) {
+        throw new Error(`Adventure "${moduleId}" not found (missing ${moduleId}.json)`);
+    }
+
+    const content = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
+    const moduleCopy = JSON.parse(JSON.stringify(content)); // deep clone
     moduleCopy.id = moduleCopy.id || moduleId;
 
+    // Reset all scene completed flags and timers
     for (const act of moduleCopy.acts || []) {
         for (const scene of act.scenes || []) {
             scene.completed = false;
@@ -223,7 +214,6 @@ function loadAdventureContent(room, content, options = {}) {
     const moduleCopy = JSON.parse(JSON.stringify(content)); // deep clone
     moduleCopy.id = options.id || moduleCopy.id || 'custom';
 
-    // Reset every scene's completed flag and every timer (scene + campaign)
     for (const act of moduleCopy.acts || []) {
         for (const scene of act.scenes || []) {
             scene.completed = false;
@@ -251,6 +241,7 @@ function loadAdventureContent(room, content, options = {}) {
 
     return getPublicState(room);
 }
+
 /**
  * Advance the adventure. With no target, moves sequentially: next scene
  * in the current act, or the next act's first scene, or marks the
