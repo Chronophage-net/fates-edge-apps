@@ -13,6 +13,7 @@ const room = require('./room.js');
 const deck = require('./deck.js');
 const { safeAssign, buildSafeDict, isSafeModuleId, isSafeCampaignCode, clampCount, UNSAFE_KEYS } = require('./security.js');
 const adventure = require('./adventure.js');
+const { deriveManifestFromContent } = require('./module-manifest-utils.js');
 
 let config = {};
 
@@ -351,6 +352,52 @@ function createApiRouter(appConfig) {
         res.json({ modules, count: modules.length, timestamp: Date.now() });
     });
 
+    // Permanently install an adventure module: writes manifest.json +
+    // adventure.json to server/modules/<id>/, so it shows up in the list
+    // above and can be loaded by anyone (bot or human GM) from then on --
+    // unlike POST /api/rooms/:code/adventure/load-custom, which only ever
+    // exists in that one room's memory. `manifest` is optional; if
+    // omitted, one is derived from content's own title/description/
+    // author/tier (see module-manifest-utils.js -- the same derivation
+    // the generate-manifest.js CLI script uses for files dropped in by
+    // hand, so the two paths can't disagree).
+    router.post('/api/modules', authenticate, async (req, res) => {
+        try {
+            const { id, content, manifest: manifestOverrides, overwrite } = req.body;
+
+            if (!id || !isSafeModuleId(id)) {
+                return res.status(400).json({ error: 'A valid id is required (letters, numbers, underscore, dash; 1-64 chars)' });
+            }
+            if (!content || typeof content !== 'object') {
+                return res.status(400).json({ error: 'content (the adventure object) is required' });
+            }
+            if (!content.title) {
+                return res.status(400).json({ error: 'content.title is required' });
+            }
+            if (!Array.isArray(content.acts) || content.acts.length === 0) {
+                return res.status(400).json({ error: 'content.acts must be a non-empty array' });
+            }
+
+            const moduleDir = path.join(__dirname, 'modules', id);
+            const manifestPath = path.join(moduleDir, 'manifest.json');
+            const adventurePath = path.join(moduleDir, 'adventure.json');
+
+            if (fs.existsSync(moduleDir) && !overwrite) {
+                return res.status(409).json({ error: `Module "${id}" already exists. Pass { overwrite: true } to replace it.` });
+            }
+
+            const manifest = deriveManifestFromContent(content, manifestOverrides || {});
+
+            await fsPromises.mkdir(moduleDir, { recursive: true });
+            await fsPromises.writeFile(manifestPath, JSON.stringify(manifest, null, 2));
+            await fsPromises.writeFile(adventurePath, JSON.stringify(content, null, 2));
+
+            res.json({ success: true, id, manifest, message: `Module "${id}" installed permanently.` });
+        } catch (err) {
+            res.status(500).json({ error: err.message });
+        }
+    });
+
     router.post('/api/modules/:id/push', authenticate, (req, res) => {
         try {
             const moduleId = req.params.id;
@@ -471,6 +518,23 @@ function createApiRouter(appConfig) {
         } catch (err) {
             const notFound = err.message.includes('not found') || err.message.includes("isn't an adventure");
             res.status(notFound ? 404 : 400).json({ error: err.message });
+        }
+    });
+
+    // Load an adventure that only exists in memory (e.g. an AI GM's
+    // Crown-Spread-generated adventure) -- no file on disk needed. `id`
+    // is optional, mainly useful for the caller's own bookkeeping/logging.
+    router.post('/api/rooms/:code/adventure/load-custom', authenticate, (req, res) => {
+        try {
+            const r = room.getRoom(req.params.code);
+            const { content, id } = req.body;
+            if (!content || typeof content !== 'object') return res.status(400).json({ error: 'content object is required' });
+            const state = adventure.loadAdventureContent(r, content, { id });
+            const roomCode = req.params.code.toUpperCase();
+            room.broadcastToRoom(roomCode, 'adventure-loaded', { source: 'api', ...state });
+            res.json({ success: true, code: roomCode, ...state });
+        } catch (err) {
+            res.status(400).json({ error: err.message });
         }
     });
 
@@ -752,6 +816,7 @@ function createApiRouter(appConfig) {
                 },
                 modules: {
                     list: 'GET /api/modules - List available modules',
+                    install: 'POST /api/modules - Permanently install an adventure module ({ id, content, manifest?, overwrite? }); manifest is derived from content if omitted',
                     push: 'POST /api/modules/:id/push - Push module to clients',
                     cleanup: 'POST /api/modules/:id/cleanup - Clean up module from clients'
                 },
@@ -759,6 +824,7 @@ function createApiRouter(appConfig) {
                     get: 'GET /api/rooms/:code/adventure - Get current adventure state (module, act, scene, active encounter, campaign timers, recent log)',
                     reference: 'GET /api/rooms/:code/adventure/reference - Get bestiary/npcs/locations/factions/notes for the loaded adventure',
                     load: 'POST /api/rooms/:code/adventure/load - Load an adventure module ({ moduleId }); modules need "type": "adventure" in manifest.json plus an adventure.json',
+                    loadCustom: 'POST /api/rooms/:code/adventure/load-custom - Load an in-memory adventure with no file on disk ({ content, id? }) -- for AI-GM-generated adventures',
                     reset: 'POST /api/rooms/:code/adventure/reset - Reset the loaded adventure back to planned (position, completed flags, timers)',
                     scene: 'POST /api/rooms/:code/adventure/scene - Advance the adventure ({ actIndex?, sceneIndex? } both optional; omit both to advance sequentially)',
                     encounterStart: "POST /api/rooms/:code/adventure/encounter/start - Start an encounter ({ ref } by index or name/creatureId in the current scene, OR { encounter } as a full ad-hoc object for an improvised fight)",
