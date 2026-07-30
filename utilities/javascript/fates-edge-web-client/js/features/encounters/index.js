@@ -421,14 +421,14 @@ export async function render(el) {
                     <div class="panel">
                         <h4>📊 Threat Scale</h4>
                         <div class="scale-table" style="margin-top:0.3rem;">
-                            <div><strong>TL</strong></div><div><strong>Role</strong></div><div><strong>HP</strong></div>
-                            <div>1</div><div>Fodder / pest</div><div>20</div>
-                            <div>2</div><div>Common threat</div><div>30</div>
-                            <div>3</div><div>Drop unarmored PC</div><div>40</div>
-                            <div>4</div><div>Elite / captain</div><div>50</div>
-                            <div>5–6</div><div>Miniboss / Boss</div><div>60–70</div>
-                            <div>7–8</div><div>Arch / named horror</div><div>80–90</div>
-                            <div>9–10</div><div>Cosmic / god-adjacent</div><div>100+</div>
+                            <div><strong>TL</strong></div><div><strong>Role</strong></div><div><strong>Harm Levels</strong></div>
+                            <div>1</div><div>Fodder / pest</div><div>2</div>
+                            <div>2</div><div>Common threat</div><div>3</div>
+                            <div>3</div><div>Drop unarmored PC</div><div>4</div>
+                            <div>4</div><div>Elite / captain</div><div>5</div>
+                            <div>5–6</div><div>Miniboss / Boss</div><div>6–7</div>
+                            <div>7–8</div><div>Arch / named horror</div><div>8–9</div>
+                            <div>9–10</div><div>Cosmic / god-adjacent</div><div>10+</div>
                         </div>
                     </div>
                 </div>
