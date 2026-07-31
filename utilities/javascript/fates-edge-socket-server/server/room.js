@@ -1,10 +1,25 @@
 /**
  * Fate's Edge - Room & Client Management + Ban/Kick + Character Storage
- * v2 – Full character storage (r.characters) for WebSocket sync
+ * v3 – Full character storage with default attributes/skills on creation
  */
 
 const WebSocket = require('ws');
 const { safeAssign, buildSafeDict, UNSAFE_KEYS } = require('./security.js');
+
+// ─── Shared default character constants ────────────────────────────
+// Matches the defaults in modules/characters.js so the server and bot
+// never disagree on what a "fresh" character looks like.
+const DEFAULT_ATTRIBUTES = { Body: 2, Wits: 2, Spirit: 2, Presence: 2 };
+
+const ALL_SKILLS = [
+  'Melee', 'Ranged', 'Unarmed',
+  'Athletics', 'Stealth', 'Endurance', 'Craft',
+  'Sway', 'Deception', 'Subterfuge', 'Performance', 'Insight',
+  'Lore', 'Investigation', 'Medicine',
+  'Arcana'
+];
+
+const DEFAULT_SKILLS = Object.fromEntries(ALL_SKILLS.map(s => [s, 0]));
 
 // ---------- State ----------
 const rooms = new Map();
@@ -55,28 +70,123 @@ function getClientsList(room) {
 }
 
 // ---------- Character Helpers ----------
+function normalizeCharKey(name) {
+    return typeof name === 'string' ? name.toLowerCase() : name;
+}
+
 function getCharacters(room) {
     return room.characters ? Object.values(room.characters) : [];
 }
 
 function getCharacter(room, name) {
-    return room.characters && room.characters[name] ? room.characters[name] : null;
+    const key = normalizeCharKey(name);
+    return room.characters && room.characters[key] ? room.characters[key] : null;
 }
 
 function setCharacters(room, charactersArray) {
     if (!Array.isArray(charactersArray)) return;
-    room.characters = buildSafeDict(charactersArray, c => c && c.name);
+    const dict = buildSafeDict(charactersArray, c => c && c.name);
+    const normalized = Object.create(null);
+    for (const [rawKey, value] of Object.entries(dict)) {
+        normalized[normalizeCharKey(rawKey)] = value;
+    }
+    room.characters = normalized;
     room.lastActivity = Date.now();
 }
 
+/**
+ * Create or update a character, ensuring attributes and skills are always
+ * present (with defaults) to avoid partial updates wiping out essential fields.
+ */
 function updateCharacter(room, name, data) {
     if (!name || UNSAFE_KEYS.has(name)) return null;
+    const key = normalizeCharKey(name);
+    if (UNSAFE_KEYS.has(key)) return null;
     if (!room.characters) room.characters = Object.create(null);
-    if (!room.characters[name]) room.characters[name] = { name };
-    // Merge all top-level fields, skipping __proto__/constructor/prototype
-    safeAssign(room.characters[name], data);
+
+    // Ensure the character record exists
+    if (!room.characters[key]) {
+        room.characters[key] = { name };
+    }
+    const char = room.characters[key];
+
+    // ─── FIX: initialise attributes and skills if missing ──────────
+    if (!char.attributes || typeof char.attributes !== 'object') {
+        char.attributes = { ...DEFAULT_ATTRIBUTES };
+    }
+    if (!char.skills || typeof char.skills !== 'object') {
+        char.skills = { ...DEFAULT_SKILLS };
+    }
+
+    // Merge incoming data (shallow merge for top-level fields)
+    safeAssign(char, data);
+
+    // Ensure the display name is preserved
+    if (data && data.name) {
+        char.name = data.name;
+    } else if (!char.name) {
+        char.name = name;
+    }
+
     room.lastActivity = Date.now();
-    return room.characters[name];
+    return char;
+}
+
+/**
+ * One-time cleanup for duplicate case‑fragmented character records.
+ * See the long comment in the original file for details.
+ */
+function mergeDuplicateCharacters(room) {
+    if (!room.characters) return { merged: 0, removedKeys: [] };
+
+    const groups = new Map(); // normalizedKey -> [rawKey, ...]
+    for (const rawKey of Object.keys(room.characters)) {
+        const norm = normalizeCharKey(rawKey);
+        if (!groups.has(norm)) groups.set(norm, []);
+        groups.get(norm).push(rawKey);
+    }
+
+    const NESTED_MERGE_FIELDS = ['attributes', 'skills'];
+    const ARRAY_FIELDS = ['talents', 'bonds', 'complications', 'assets', 'followers'];
+
+    let mergedCount = 0;
+    const removedKeys = [];
+
+    for (const [norm, rawKeys] of groups) {
+        if (rawKeys.length <= 1) continue;
+
+        let merged = {};
+        for (const rawKey of rawKeys) {
+            const rec = room.characters[rawKey];
+            if (!rec) continue;
+            for (const [field, value] of Object.entries(rec)) {
+                if (NESTED_MERGE_FIELDS.includes(field) && value && typeof value === 'object') {
+                    merged[field] = { ...(merged[field] || {}), ...value };
+                } else if (ARRAY_FIELDS.includes(field) && Array.isArray(value)) {
+                    if (!merged[field] || value.length > merged[field].length) {
+                        merged[field] = value;
+                    }
+                } else if (value !== undefined && value !== null && value !== '') {
+                    merged[field] = value;
+                } else if (merged[field] === undefined) {
+                    merged[field] = value;
+                }
+            }
+        }
+        merged.name = merged.name || norm;
+
+        for (const rawKey of rawKeys) {
+            if (rawKey !== norm) {
+                delete room.characters[rawKey];
+                removedKeys.push(rawKey);
+            }
+        }
+        room.characters[norm] = merged;
+        mergedCount++;
+    }
+
+    if (mergedCount > 0) room.lastActivity = Date.now();
+    return { merged: mergedCount, removedKeys };
 }
 
 // ---------- Ban/Kick ----------
@@ -183,34 +293,24 @@ function handleGmApproval(room, approverId, targetId) {
     }
 }
 
-// ---------- Broadcast (with sender exclusion) ----------
+// ---------- Broadcast ----------
 let io = null;
 function setIo(ioInstance) { io = ioInstance; }
 
-/**
- * Broadcast an event to all clients in a room.
- * @param {string} roomCode - Room identifier
- * @param {string} event - Event name
- * @param {object} data - Event payload
- * @param {string|null} senderId - Optional client ID to exclude from plain WebSocket broadcast
- */
 function broadcastToRoom(roomCode, event, data, senderId = null) {
     const roomKey = roomCode.toUpperCase();
     const room = rooms.get(roomKey);
     if (!room) return;
 
-    // Build payload with sender info if provided
     const payload = { ...data };
     if (senderId) {
         payload.clientId = senderId;
     }
 
-    // Socket.io broadcast (includes sender, but client can ignore via clientId check)
     if (io) {
         io.to(roomKey).emit(event, payload);
     }
 
-    // Plain WebSocket broadcast (skip sender)
     const message = JSON.stringify({ type: event, ...payload });
     for (const [, client] of room.clients) {
         if (client.type === 'ws' && client.ws && client.ws.readyState === WebSocket.OPEN) {
@@ -239,21 +339,15 @@ function createRoom(roomCode) {
         lastActivity: Date.now(),
         created: Date.now(),
         whiteboard: createDefaultWhiteboard(),
-        characters: Object.create(null),          // <-- Full character storage (keyed by name)
+        characters: Object.create(null),
         banned: new Set(),
-        password: null,          // Optional room password (see setRoomPassword)
-        data: {}                 // Generic data store (region, etc.)
+        password: null,
+        data: {}
     };
     rooms.set(roomKey, room);
     return room;
 }
 
-/**
- * Set (or clear, with null/empty) a room's join password. The actual
- * password CHECK already existed on both transports (join-room /
- * handshake), but nothing ever called a "set" function -- so the
- * feature was advertised in comments but was never actually reachable.
- */
 function setRoomPassword(room, password) {
     room.password = password ? String(password) : null;
     room.lastActivity = Date.now();
@@ -295,6 +389,8 @@ module.exports = {
     getCharacter,
     setCharacters,
     updateCharacter,
+    mergeDuplicateCharacters,
+    normalizeCharKey,
     kickClient,
     banClient,
     unbanClient,

@@ -3,6 +3,16 @@
  * v8 – Full character storage (room.characters) + WebSocket parity
  * v9 – Adventure Engine routes wired in (see server/adventure.js)
  * v10 – /api/modules now includes standalone adventure JSONs from data/adventures/
+ * v11 – FIXED: /api/modules legacy-module scan referenced an undefined
+ *       `content` variable (only ever defined in the second, unrelated
+ *       loop below) inside a try/catch that silently swallowed the
+ *       resulting ReferenceError. Every module directory under
+ *       server/modules/ therefore threw and was dropped from the list
+ *       on every single call, with zero visible error -- only
+ *       standalone data/adventures/*.json files ever made it into
+ *       /api/modules. Changed `content.tier` to `manifest.tier`, which
+ *       is what's actually in scope at that point. See the CHANGED
+ *       comment at the call site below.
  */
 
 const express = require('express');
@@ -166,7 +176,7 @@ function createApiRouter(appConfig) {
             const regionData = await deck.loadRegionData(region);
             const isCrown = count === 5;
             const synthesis = isCrown
-                ? deck.synthesiseCrownSpread(drawn.slice(0, 4), drawn[4], regionData)
+                ? deck.synthesiseCrownSpread(drawn.slice(0, 4), drawn[4], regionData, region)
                 : deck.synthesiseConsequence(drawn, regionData);
 
             const result = {
@@ -211,7 +221,7 @@ function createApiRouter(appConfig) {
             const wildcard = cards[4];
 
             const regionData = await deck.loadRegionData(region);
-            const result = deck.synthesiseCrownSpread(mainCards, wildcard, regionData);
+            const result = deck.synthesiseCrownSpread(mainCards, wildcard, regionData, region);
 
             r.deckHistory = r.deckHistory || [];
             r.deckHistory.push({
@@ -344,8 +354,15 @@ function createApiRouter(appConfig) {
                                 type: manifest.type || 'module',
                                 icon: manifest.icon || '📦',
                                 route: manifest.route || null,
-                                tier: content.tier || content.tierRange || '?'   // <── ADD THIS LINE
-
+                                // FIXED: was `content.tier || content.tierRange || '?'`.
+                                // `content` doesn't exist in this scope (it's only
+                                // defined in the standalone-adventure-JSON loop
+                                // below) -- that ReferenceError was thrown on every
+                                // iteration and silently swallowed by the catch
+                                // block below, so no module directory ever made it
+                                // into this list. `manifest` is what's actually in
+                                // scope here and is what tier data should come from.
+                                tier: manifest.tier || manifest.tierRange || '?'
                             });
                         } catch (e) { /* ignore */ }
                     }
@@ -552,14 +569,112 @@ function createApiRouter(appConfig) {
     // Load an adventure that only exists in memory (e.g. an AI GM's
     // Crown-Spread-generated adventure) -- no file on disk needed. `id`
     // is optional, mainly useful for the caller's own bookkeeping/logging.
+    // `dynamicGrowth` (bool) and `climaxAfterSessions` (number) opt this
+    // adventure into the growth system -- see server/adventure.js.
     router.post('/api/rooms/:code/adventure/load-custom', authenticate, (req, res) => {
         try {
             const r = room.getRoom(req.params.code);
-            const { content, id } = req.body;
+            const { content, id, dynamicGrowth, climaxAfterSessions } = req.body;
             if (!content || typeof content !== 'object') return res.status(400).json({ error: 'content object is required' });
-            const state = adventure.loadAdventureContent(r, content, { id });
+            const state = adventure.loadAdventureContent(r, content, { id, dynamicGrowth, climaxAfterSessions });
             const roomCode = req.params.code.toUpperCase();
             room.broadcastToRoom(roomCode, 'adventure-loaded', { source: 'api', ...state });
+            res.json({ success: true, code: roomCode, ...state });
+        } catch (err) {
+            res.status(400).json({ error: err.message });
+        }
+    });
+
+    // NEW: append a single scene to an existing act -- used by the
+    // bot-side dynamic-growth logic to extend a Crown-Spread-built
+    // adventure as it's played, BEFORE calling /adventure/scene (with no
+    // body) to advance into it via ordinary sequential advance.
+    router.post('/api/rooms/:code/adventure/scene/append', authenticate, (req, res) => {
+        try {
+            const r = room.getRoom(req.params.code);
+            const { actIndex, scene } = req.body;
+            if (typeof actIndex !== 'number' || !scene) {
+                return res.status(400).json({ error: 'actIndex (number) and scene object are required' });
+            }
+            const state = adventure.appendScene(r, actIndex, scene);
+            const roomCode = req.params.code.toUpperCase();
+            room.broadcastToRoom(roomCode, 'scene-appended', { source: 'api', ...state });
+            res.json({ success: true, code: roomCode, ...state });
+        } catch (err) {
+            res.status(400).json({ error: err.message });
+        }
+    });
+
+    // NEW: append a whole new act (e.g. a generated climax/conclusion).
+    router.post('/api/rooms/:code/adventure/act/append', authenticate, (req, res) => {
+        try {
+            const r = room.getRoom(req.params.code);
+            const { act } = req.body;
+            if (!act) return res.status(400).json({ error: 'act object is required' });
+            const state = adventure.appendAct(r, act);
+            const roomCode = req.params.code.toUpperCase();
+            room.broadcastToRoom(roomCode, 'act-appended', { source: 'api', ...state });
+            res.json({ success: true, code: roomCode, ...state });
+        } catch (err) {
+            res.status(400).json({ error: err.message });
+        }
+    });
+
+    // NEW: register an ad-hoc NPC into the currently loaded adventure's
+    // own npcs[] -- used by the [NPC CREATE ...] tag so an improvised
+    // character the AI invents mid-narration becomes a real, trackable
+    // NPC instead of disposable prose.
+    router.post('/api/rooms/:code/adventure/npc', authenticate, (req, res) => {
+        try {
+            const r = room.getRoom(req.params.code);
+            const { npc } = req.body;
+            if (!npc) return res.status(400).json({ error: 'npc object is required' });
+            const state = adventure.addNpc(r, npc);
+            const roomCode = req.params.code.toUpperCase();
+            room.broadcastToRoom(roomCode, 'npc-added', { source: 'api', ...state });
+            res.json({ success: true, code: roomCode, ...state });
+        } catch (err) {
+            res.status(400).json({ error: err.message });
+        }
+    });
+
+    // NEW: same as above, for the bestiary.
+    router.post('/api/rooms/:code/adventure/creature', authenticate, (req, res) => {
+        try {
+            const r = room.getRoom(req.params.code);
+            const { creature } = req.body;
+            if (!creature) return res.status(400).json({ error: 'creature object is required' });
+            const state = adventure.addCreature(r, creature);
+            const roomCode = req.params.code.toUpperCase();
+            room.broadcastToRoom(roomCode, 'creature-added', { source: 'api', ...state });
+            res.json({ success: true, code: roomCode, ...state });
+        } catch (err) {
+            res.status(400).json({ error: err.message });
+        }
+    });
+
+    // NEW: mark a real-world play session as ended -- increments the
+    // sessionsPlayed counter the bot-side director checks against
+    // climaxAfterSessions to decide when to generate a climax.
+    router.post('/api/rooms/:code/adventure/session/end', authenticate, (req, res) => {
+        try {
+            const r = room.getRoom(req.params.code);
+            const state = adventure.markSessionEnd(r);
+            const roomCode = req.params.code.toUpperCase();
+            room.broadcastToRoom(roomCode, 'session-ended', { source: 'api', ...state });
+            res.json({ success: true, code: roomCode, ...state });
+        } catch (err) {
+            res.status(400).json({ error: err.message });
+        }
+    });
+
+    // NEW: mark that the climax act has already been generated for this
+    // adventure, so growth logic doesn't generate a second one.
+    router.post('/api/rooms/:code/adventure/climax-triggered', authenticate, (req, res) => {
+        try {
+            const r = room.getRoom(req.params.code);
+            const state = adventure.markClimaxTriggered(r);
+            const roomCode = req.params.code.toUpperCase();
             res.json({ success: true, code: roomCode, ...state });
         } catch (err) {
             res.status(400).json({ error: err.message });
@@ -658,19 +773,22 @@ function createApiRouter(appConfig) {
     });
 
     // ─── FULL CHARACTER STORAGE ──────────────────────────────────────
-
-    // Helper to ensure room.characters exists (object keyed by character name)
-    function ensureCharacters(r) {
-        if (!r.characters) r.characters = Object.create(null);
-        return r.characters;
-    }
+    // FIXED: this whole section used to reimplement character storage
+    // inline (its own `ensureCharacters(r)` + direct `chars[name]`
+    // access) as a SEPARATE, case-sensitive code path from room.js's own
+    // getCharacter()/updateCharacter() helpers -- which room.js exported
+    // but nothing ever actually called. Two independent implementations
+    // of the same storage, neither normalizing case, is exactly how
+    // "Khor" and "khor" could silently become two different server-side
+    // characters. Now uses room.js's helpers directly (which normalize
+    // to lowercase internally -- see room.js's normalizeCharKey()),
+    // removing the duplication and the case bug in the same change.
 
     // ─── Get all characters in a room ────────────────────────────
     router.get('/api/rooms/:code/characters', authenticate, (req, res) => {
         try {
             const r = room.getRoom(req.params.code);
-            const chars = ensureCharacters(r);
-            const result = Object.values(chars);
+            const result = room.getCharacters(r);
             res.json({ characters: result, count: result.length });
         } catch (err) {
             res.status(404).json({ error: err.message });
@@ -681,12 +799,15 @@ function createApiRouter(appConfig) {
     router.get('/api/rooms/:code/characters/:name', authenticate, (req, res) => {
         try {
             const r = room.getRoom(req.params.code);
-            const chars = ensureCharacters(r);
             const name = req.params.name;
-            if (!name || UNSAFE_KEYS.has(name) || !chars[name]) {
+            if (!name || UNSAFE_KEYS.has(name)) {
                 return res.status(404).json({ error: 'Character not found' });
             }
-            res.json(chars[name]);
+            const char = room.getCharacter(r, name);
+            if (!char) {
+                return res.status(404).json({ error: 'Character not found' });
+            }
+            res.json(char);
         } catch (err) {
             res.status(404).json({ error: err.message });
         }
@@ -696,7 +817,6 @@ function createApiRouter(appConfig) {
     router.post('/api/rooms/:code/characters/update', authenticate, (req, res) => {
         try {
             const r = room.getRoom(req.params.code);
-            const chars = ensureCharacters(r);
             const { updates } = req.body;
             if (!updates || typeof updates !== 'object') {
                 return res.status(400).json({ error: 'Missing updates object' });
@@ -705,16 +825,16 @@ function createApiRouter(appConfig) {
             const results = {};
             for (const [name, data] of Object.entries(updates)) {
                 if (!name || UNSAFE_KEYS.has(name)) continue;
-                if (!chars[name]) chars[name] = { name };
-                // Deep merge all top-level fields, skipping __proto__/constructor/prototype
-                safeAssign(chars[name], data);
-                results[name] = chars[name];
+                // Preserve the display-case name the caller sent, in case
+                // `data` didn't already include its own `.name` field.
+                const merged = room.updateCharacter(r, name, { name, ...data });
+                if (merged) results[name] = merged;
             }
 
             r.lastActivity = Date.now();
 
             // Broadcast the update to all WebSocket clients in the room
-            const charArray = Object.values(chars);
+            const charArray = room.getCharacters(r);
             room.broadcastToRoom(r.code, 'state-updated', {
                 characters: charArray,
                 timestamp: Date.now()
@@ -734,29 +854,50 @@ function createApiRouter(appConfig) {
         router.post(`/api/rooms/:code/characters/:name/${field}`, authenticate, (req, res) => {
             try {
                 const r = room.getRoom(req.params.code);
-                const chars = ensureCharacters(r);
                 const name = req.params.name;
                 if (!name || UNSAFE_KEYS.has(name)) {
                     return res.status(400).json({ error: 'Invalid character name' });
                 }
-                if (!chars[name]) chars[name] = { name };
+                const existing = room.getCharacter(r, name);
                 const delta = typeof req.body.delta === 'number' ? req.body.delta : 0;
-                const current = chars[name][field] || 0;
-                chars[name][field] = Math.max(0, current + delta);
+                const current = (existing && existing[field]) || 0;
+                const newValue = Math.max(0, current + delta);
+                room.updateCharacter(r, name, { [field]: newValue });
                 r.lastActivity = Date.now();
 
                 // Broadcast the individual update
                 room.broadcastToRoom(r.code, 'character-update', {
                     name,
                     field,
-                    value: chars[name][field]
+                    value: newValue
                 });
 
-                res.json({ success: true, name, field, value: chars[name][field] });
+                res.json({ success: true, name, field, value: newValue });
             } catch (err) {
                 res.status(500).json({ error: err.message });
             }
         });
+    });
+
+    // ─── One-time cleanup: merge case-fragmented character records ──
+    // NEW: for rooms that already have duplicate records from before
+    // case-normalization existed (e.g. both "Khor" and "khor" as
+    // separate keys). See room.js's mergeDuplicateCharacters() for the
+    // merge heuristic and its limitations.
+    router.post('/api/rooms/:code/characters/cleanup', authenticate, (req, res) => {
+        try {
+            const r = room.getRoom(req.params.code);
+            const { merged, removedKeys } = room.mergeDuplicateCharacters(r);
+            if (merged > 0) {
+                room.broadcastToRoom(r.code, 'state-updated', {
+                    characters: room.getCharacters(r),
+                    timestamp: Date.now()
+                });
+            }
+            res.json({ success: true, merged, removedKeys });
+        } catch (err) {
+            res.status(500).json({ error: err.message });
+        }
     });
 
     // ─── Character roster export (global) ──────────────────────────
@@ -849,12 +990,18 @@ function createApiRouter(appConfig) {
                     cleanup: 'POST /api/modules/:id/cleanup - Clean up module from clients'
                 },
                 adventure: {
-                    get: 'GET /api/rooms/:code/adventure - Get current adventure state (module, act, scene, active encounter, campaign timers, recent log)',
+                    get: 'GET /api/rooms/:code/adventure - Get current adventure state (module, act, scene, active encounter, campaign timers, recent log, growth tracking)',
                     reference: 'GET /api/rooms/:code/adventure/reference - Get bestiary/npcs/locations/factions/notes for the loaded adventure',
                     load: 'POST /api/rooms/:code/adventure/load - Load an adventure module ({ moduleId }); modules need "type": "adventure" in manifest.json plus an adventure.json',
-                    loadCustom: 'POST /api/rooms/:code/adventure/load-custom - Load an in-memory adventure with no file on disk ({ content, id? }) -- for AI-GM-generated adventures',
-                    reset: 'POST /api/rooms/:code/adventure/reset - Reset the loaded adventure back to planned (position, completed flags, timers)',
+                    loadCustom: 'POST /api/rooms/:code/adventure/load-custom - Load an in-memory adventure with no file on disk ({ content, id?, dynamicGrowth?, climaxAfterSessions? }) -- for AI-GM-generated adventures',
+                    reset: 'POST /api/rooms/:code/adventure/reset - Reset the loaded adventure back to planned (position, completed flags, timers, session/climax tracking)',
                     scene: 'POST /api/rooms/:code/adventure/scene - Advance the adventure ({ actIndex?, sceneIndex? } both optional; omit both to advance sequentially)',
+                    sceneAppend: 'POST /api/rooms/:code/adventure/scene/append - Append a new scene to an existing act ({ actIndex, scene }) -- call /adventure/scene afterward to advance into it',
+                    actAppend: 'POST /api/rooms/:code/adventure/act/append - Append a whole new act ({ act: { title, description?, scenes: [...] } })',
+                    npcAdd: 'POST /api/rooms/:code/adventure/npc - Register an ad-hoc NPC into the loaded adventure ({ npc: { name, role?, motivation? } })',
+                    creatureAdd: 'POST /api/rooms/:code/adventure/creature - Register an ad-hoc creature into the bestiary ({ creature: { name, ... } })',
+                    sessionEnd: 'POST /api/rooms/:code/adventure/session/end - Mark a real-world play session as ended (increments sessionsPlayed)',
+                    climaxTriggered: 'POST /api/rooms/:code/adventure/climax-triggered - Mark that the climax act has already been generated for this adventure',
                     encounterStart: "POST /api/rooms/:code/adventure/encounter/start - Start an encounter ({ ref } by index or name/creatureId in the current scene, OR { encounter } as a full ad-hoc object for an improvised fight)",
                     encounterResolve: 'POST /api/rooms/:code/adventure/encounter/resolve - Resolve the active encounter ({ outcome: "clean"|"partial"|"miss", notes? })',
                     timer: 'POST /api/rooms/:code/adventure/timer - Tick a timer ({ scope: "scene"|"campaign", ref (index or name), amount? } amount defaults to +1, can be negative)',
@@ -865,6 +1012,7 @@ function createApiRouter(appConfig) {
                     list: 'GET /api/rooms/:code/characters - List all full character objects in a room',
                     update: 'POST /api/rooms/:code/characters/update - Bulk update full character objects',
                     export: 'GET /api/characters/export - Export all characters across all rooms',
+                    cleanup: 'POST /api/rooms/:code/characters/cleanup - One-time merge of case-fragmented duplicate character records (e.g. "Khor"/"khor") left over from before case-normalization',
                     fields: {
                         harm: 'POST /api/rooms/:code/characters/:name/harm - Adjust harm',
                         fatigue: 'POST /api/rooms/:code/characters/:name/fatigue - Adjust fatigue',

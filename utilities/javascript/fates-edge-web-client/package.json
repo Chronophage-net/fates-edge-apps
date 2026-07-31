@@ -13,11 +13,15 @@
     "build:manifests": "node js/tools/generate-manifests.js"
   },
   "dependencies": {
-    "serve": "^14.2.0"
+    "fs": "^0.0.1-security",
+    "serve": "^6.5.8"
   },
   "devDependencies": {
-    "vite": "^5.0.0"
+    "vite": "^8.2.0"
   },
   "_license": "Fate's Edge Proprietary Content – © 2024 Nicholas A. Gasper. All rights reserved.",
-  "author": "Nicholas A. Gasper"
+  "author": "Nicholas A. Gasper",
+  "allowScripts": {
+    "fsevents@2.3.3": true
+  }
 }

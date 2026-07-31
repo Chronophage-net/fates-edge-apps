@@ -7,6 +7,7 @@
  * ✅ Cleaner UI with creature-specific SB moves
  * ✅ Import from Bestiary via searchable modal
  * ✅ Armor auto‑conversion (Essentials §2.4 & §A.7)
+ * ✅ Weapon range rules: melee vs ranged vs Reach-tagged weapons
  */
 
 import { getState, saveState } from '../../core/state.js';
@@ -107,6 +108,7 @@ function tlToMaxHarm(tl) {
 const RANGE_BANDS = [
     { key: 'close',  label: 'Close',  short: 'C', color: 'var(--red)',    desc: "Arm's length, grappling distance." },
     { key: 'near',   label: 'Near',   short: 'N', color: 'var(--gold)',   desc: 'Same room or immediate area.' },
+    { key: 'reach',  label: 'Reach',  short: 'R', color: 'var(--orange)', desc: "Just past Near — the gap a Reach-tagged weapon (spear, polearm) can still close." },
     { key: 'far',    label: 'Far',    short: 'F', color: 'var(--blue)',   desc: 'Visible but not immediately reachable.' },
     { key: 'absent', label: 'Absent', short: 'A', color: 'var(--text3)',  desc: 'Off-screen; requires a scene change.' }
 ];
@@ -139,6 +141,62 @@ function applyArmorConversion(harm, armorType) {
         default:
             return { harm, fatigue: 0 };
     }
+}
+
+// ============================================================
+// WEAPON RANGE RULES
+// ============================================================
+//
+// House rule (Fate's Edge combat tracker): a combatant's currently-equipped
+// weapon determines which range bands it can actually threaten.
+//   - Melee (no Reach tag): Close, Near.
+//   - Melee with the Reach tag (spear, polearm, other reach weapons): Close,
+//     Near, and Reach — the extra band that lets a longer weapon close the
+//     last bit of distance a standard melee weapon can't.
+//   - Ranged: everything except Absent, but Close and Near carry a penalty
+//     (mirrors "Ranged attack while in Close range → Desperate", extended to
+//     Near as well) since you're too close to loose a clean shot.
+//
+// Combatants with no weaponType set (older saved encounters, imported
+// Factions/abstract entries, etc.) are left unflagged rather than guessed at.
+//
+// This is a GM-facing indicator, not a hard lock on the damage button — the
+// table still makes the final call — but it makes "wait, can that dagger even
+// reach them?" visible at a glance.
+
+function getWeaponRangeStatus(combatant, bandKey) {
+    const type = combatant.weaponType;
+    if (type === 'ranged') {
+        if (bandKey === 'absent') return 'blocked';
+        if (bandKey === 'close' || bandKey === 'near') return 'penalty';
+        return 'ok';
+    }
+    if (type === 'melee') {
+        if (bandKey === 'close' || bandKey === 'near') return 'ok';
+        if (bandKey === 'reach') return combatant.reach ? 'ok' : 'blocked';
+        return 'blocked'; // far, absent
+    }
+    return 'ok'; // unknown/untracked weapon type — don't flag anything
+}
+
+function weaponTypeLabel(combatant) {
+    const type = combatant.weaponType;
+    if (type === 'ranged') return '🏹 Ranged';
+    if (type === 'melee') return combatant.reach ? '⚔️ Melee (Reach)' : '⚔️ Melee';
+    return '❔ Weapon not set';
+}
+
+function weaponToggleGlyph(combatant) {
+    const type = combatant.weaponType;
+    if (type === 'ranged') return '🏹';
+    if (type === 'melee') return combatant.reach ? '⚔️+' : '⚔️';
+    return '❔';
+}
+
+function weaponRangeNote(status, combatant, bandLabel) {
+    if (status === 'blocked') return `${weaponTypeLabel(combatant)} can't attack at ${bandLabel} range`;
+    if (status === 'penalty') return `${weaponTypeLabel(combatant)} attacks at a penalty at ${bandLabel} range`;
+    return '';
 }
 
 // ============================================================
@@ -214,15 +272,26 @@ function buildRangeGridHtml() {
             const cells = adversaries.map(a => {
                 const band = getRangeBand(p.id, a.id);
                 const info = getRangeBandInfo(band);
+                const pStatus = getWeaponRangeStatus(p, band);
+                const aStatus = getWeaponRangeStatus(a, band);
+                const worst = (pStatus === 'blocked' || aStatus === 'blocked') ? 'blocked'
+                    : (pStatus === 'penalty' || aStatus === 'penalty') ? 'penalty' : 'ok';
+                const notes = [
+                    weaponRangeNote(pStatus, p, info.label),
+                    weaponRangeNote(aStatus, a, info.label)
+                ].filter(Boolean).join('; ');
+                const glyph = worst === 'blocked' ? '🚫 ' : worst === 'penalty' ? '⚠️ ' : '';
+                const border = worst === 'blocked' ? '2px dashed var(--red)'
+                    : worst === 'penalty' ? '2px dashed var(--orange)' : 'none';
                 return `
                     <td style="padding:0.3rem 0.4rem;text-align:center;">
                         <button class="range-cell" data-a="${attr(p.id)}" data-b="${attr(a.id)}"
-                            title="${escHtml(p.name)} ↔ ${escHtml(a.name)}: ${info.label} — ${info.desc} (click to cycle)"
+                            title="${escHtml(p.name)} ↔ ${escHtml(a.name)}: ${info.label} — ${info.desc} (click to cycle)${notes ? ` — ${escHtml(notes)}` : ''}"
                             style="
                                 min-width:64px; font-size:0.75rem; font-weight:700; color:white;
-                                background:${info.color}; border:none; border-radius:8px;
+                                background:${info.color}; border:${border}; border-radius:8px;
                                 padding:0.3rem 0.5rem; cursor:pointer; transition:transform 0.15s ease;
-                            ">${info.label}</button>
+                            ">${glyph}${info.label}</button>
                     </td>`;
             }).join('');
             return `
@@ -255,11 +324,15 @@ function buildRangeGridHtml() {
             margin-bottom: 1.25rem; border: 1px solid var(--border);
         ">
             <div style="font-size:0.7rem;color:var(--text3);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:0.6rem;">
-                📏 Range Grid — click any cell to cycle Close → Near → Far → Absent
+                📏 Range Grid — click any cell to cycle Close → Near → Reach → Far → Absent
             </div>
             ${bodyHtml}
             <div style="margin-top:0.7rem;padding-top:0.6rem;border-top:1px solid var(--border);">
                 ${legend}
+            </div>
+            <div style="margin-top:0.5rem;font-size:0.7rem;color:var(--text2);">
+                🚫 = a combatant's weapon can't act at that range · ⚠️ = attacks there at a penalty ·
+                click a combatant's ${escHtml('⚔️/🏹')} chip in the list to change their weapon.
             </div>
         </div>`;
 }
@@ -343,6 +416,8 @@ export async function openTracker(encounterId) {
         const sbSpends = a.sb_spends?.length ? a.sb_spends : (creature?.sb_spends || []);
         const body = a.body || (creature ? getCreatureDescription(creature) : '');
         const stats = a.stats || creature?.stats || {};
+        const weaponType = a.weaponType || creature?.weaponType || undefined;
+        const reach = (a.reach !== undefined) ? !!a.reach : (creature?.reach !== undefined ? !!creature.reach : false);
 
         return {
             id: 'combat-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9),
@@ -351,6 +426,8 @@ export async function openTracker(encounterId) {
             harm: 0,
             fatigue: 0,                         // NEW
             armorType: a.armorType || 'none',   // NEW
+            weaponType,                         // NEW: 'melee' | 'ranged' | undefined (untracked)
+            reach,                              // NEW: only meaningful when weaponType === 'melee'
             maxHarm: tlToMaxHarm(tl),
             status: 'active',
             notes: body || '',
@@ -447,15 +524,24 @@ function renderTracker() {
             fatigueLabel = `<span style="font-size:0.6rem;background:rgba(255,200,0,0.15);color:var(--gold);padding:0.05rem 0.35rem;border-radius:10px;flex-shrink:0;">💤 ${c.fatigue}</span>`;
         }
 
+        // ─── Weapon type toggle (melee / melee+reach / ranged) ────
+        const weaponLabel = `<button class="combat-weapon-toggle" data-index="${i}" title="${attr(weaponTypeLabel(c))} — click to change"
+            style="font-size:0.6rem;background:rgba(212,175,55,0.12);color:var(--text2);border:1px solid var(--border);padding:0.05rem 0.35rem;border-radius:10px;flex-shrink:0;cursor:pointer;">${weaponToggleGlyph(c)}</button>`;
+
         let rangeChip = '';
         if (focusCombatant && focusCombatant.id !== c.id && focusCombatant.type !== c.type) {
             const band = getRangeBand(c.id, focusCombatant.id);
             const info = getRangeBandInfo(band);
+            const status = getWeaponRangeStatus(c, band);
+            const note = weaponRangeNote(status, c, info.label);
+            const glyph = status === 'blocked' ? '🚫' : status === 'penalty' ? '⚠️' : '📏';
+            const outline = status === 'blocked' ? 'outline:2px solid var(--red);outline-offset:1px;'
+                : status === 'penalty' ? 'outline:2px solid var(--orange);outline-offset:1px;' : '';
             rangeChip = `<span class="range-chip" data-a="${attr(c.id)}" data-b="${attr(focusCombatant.id)}"
-                title="Range to ${escHtml(focusCombatant.name)}: ${info.label} — ${info.desc} (click to cycle)"
+                title="Range to ${escHtml(focusCombatant.name)}: ${info.label} — ${info.desc} (click to cycle)${note ? ` — ${escHtml(note)}` : ''}"
                 style="font-size:0.65rem; font-weight:700; color:white; background:${info.color};
-                       padding:0.05rem 0.4rem; border-radius:10px; cursor:pointer; flex-shrink:0;">
-                📏 ${info.label}
+                       padding:0.05rem 0.4rem; border-radius:10px; cursor:pointer; flex-shrink:0; ${outline}">
+                ${glyph} ${info.label}
             </span>`;
         }
 
@@ -506,6 +592,7 @@ function renderTracker() {
                             ${c.category ? `<span class="badge badge-${getCategoryBadgeColor(c.category)}" style="font-size:0.55rem;flex-shrink:0;">${escHtml(c.category)}</span>` : ''}
                             ${armorLabel}
                             ${fatigueLabel}
+                            ${weaponLabel}
                         </div>
                         <div style="display: flex; align-items: center; gap: 0.3rem; flex-shrink: 0;">
                             ${linkBadges}
@@ -827,6 +914,9 @@ function renderTracker() {
     modal.querySelectorAll('.combat-remove-btn').forEach(btn => {
         btn.addEventListener('click', (e) => { e.stopPropagation(); removeCombatant(parseInt(btn.dataset.index)); });
     });
+    modal.querySelectorAll('.combat-weapon-toggle').forEach(btn => {
+        btn.addEventListener('click', (e) => { e.stopPropagation(); cycleWeaponType(parseInt(btn.dataset.index)); });
+    });
 
     // Keyboard shortcuts
     if (keyHandler) {
@@ -884,6 +974,16 @@ function addLog(type, message) {
     if (combatLog.length > 50) combatLog.shift();
 }
 
+function promptWeaponType(defaultType) {
+    const typePrompt = (prompt('Weapon type: melee or ranged', defaultType || 'melee') || defaultType || 'melee').toLowerCase();
+    const weaponType = ['melee', 'ranged'].includes(typePrompt) ? typePrompt : 'melee';
+    let reach = false;
+    if (weaponType === 'melee') {
+        reach = confirm('Does this weapon have the Reach tag (spear, polearm, etc.)? It will be able to act at the Reach band as well as Close/Near.');
+    }
+    return { weaponType, reach };
+}
+
 function addCombatant() {
     const name = prompt('Enter adversary name:');
     if (!name) return;
@@ -891,6 +991,7 @@ function addCombatant() {
     const harm = parseInt(prompt('Max Harm (1-20):', '3') || '3');
     const armorPrompt = prompt('Armor type: none, light, medium, heavy (default: none)', 'none') || 'none';
     const armorType = ['none', 'light', 'medium', 'heavy'].includes(armorPrompt) ? armorPrompt : 'none';
+    const { weaponType, reach } = promptWeaponType('melee');
 
     const newAdversary = {
         id: 'combat-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9),
@@ -899,6 +1000,8 @@ function addCombatant() {
         harm: 0,
         fatigue: 0,
         armorType: armorType,
+        weaponType,
+        reach,
         maxHarm: Math.min(Math.max(harm, 1), 20),
         status: 'active',
         notes: '',
@@ -924,6 +1027,7 @@ function addPlayer() {
     const harm = parseInt(prompt('Max Harm (1-20):', '4') || '4');
     const armorPrompt = prompt('Armor type: none, light, medium, heavy (default: none)', 'none') || 'none';
     const armorType = ['none', 'light', 'medium', 'heavy'].includes(armorPrompt) ? armorPrompt : 'none';
+    const { weaponType, reach } = promptWeaponType('melee');
 
     const newPlayer = {
         id: 'combat-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9),
@@ -932,6 +1036,8 @@ function addPlayer() {
         harm: 0,
         fatigue: 0,
         armorType: armorType,
+        weaponType,
+        reach,
         maxHarm: Math.min(Math.max(harm, 1), 20),
         status: 'active',
         notes: 'Player character',
@@ -972,6 +1078,8 @@ function importFromFactions() {
         harm: 0,
         fatigue: 0,
         armorType: 'none',
+        // weaponType intentionally left unset — a Faction is an abstract force,
+        // not a single combatant with a weapon, so we don't flag range issues for it.
         maxHarm: 4 + Math.abs(faction.standing || 0),
         status: 'active',
         notes: `Faction: ${faction.agenda || 'No agenda'}`,
@@ -1062,7 +1170,9 @@ async function importFromBestiary() {
                             category: entry.category || '',
                             stats: entry.stats || {},
                             sb_spends: entry.sb_spends || [],
-                            armorType: 'none'  // default armor
+                            armorType: 'none',  // default armor
+                            weaponType: entry.weaponType || undefined,
+                            reach: entry.reach !== undefined ? !!entry.reach : undefined
                         });
                         saveState();
                     }
@@ -1075,6 +1185,10 @@ async function importFromBestiary() {
                     harm: 0,
                     fatigue: 0,
                     armorType: 'none',
+                    // Only set if the bestiary entry actually specifies it — otherwise
+                    // leave untracked rather than guessing melee/ranged for a monster.
+                    weaponType: entry.weaponType || undefined,
+                    reach: entry.reach !== undefined ? !!entry.reach : false,
                     maxHarm: tlToMaxHarm(entry.tl),
                     status: 'active',
                     notes: getCreatureDescription(entry) || '',
@@ -1219,6 +1333,26 @@ function toggleCombatant(idx) {
         showToast(`${c.name} ${c.status === 'active' ? 'activated' : 'deactivated'}`, 'info');
         renderTracker();
     }
+}
+
+// Cycle a combatant's weapon: unset/other → melee → melee+Reach → ranged → melee → ...
+function cycleWeaponType(idx) {
+    if (idx < 0 || idx >= combatants.length) return;
+    const c = combatants[idx];
+    if (c.weaponType !== 'melee' && c.weaponType !== 'ranged') {
+        c.weaponType = 'melee';
+        c.reach = false;
+    } else if (c.weaponType === 'melee' && !c.reach) {
+        c.reach = true;
+    } else if (c.weaponType === 'melee' && c.reach) {
+        c.weaponType = 'ranged';
+        c.reach = false;
+    } else {
+        c.weaponType = 'melee';
+        c.reach = false;
+    }
+    addLog('info', `${c.name} switched to ${weaponTypeLabel(c)}`);
+    renderTracker();
 }
 
 function removeCombatant(idx) {

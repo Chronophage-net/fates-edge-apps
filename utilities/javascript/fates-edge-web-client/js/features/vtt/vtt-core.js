@@ -58,6 +58,33 @@ export const COMMON_ROLLS = {
     Intimidation: { attr: 'presence', skill: 'sway' },       // using sway for intimidation
 };
 
+function trustedSanitize(html) {
+    // Use global DOMPurify if available
+    const purify = (typeof window !== 'undefined' && window.DOMPurify) ? window.DOMPurify : null;
+    if (purify && typeof purify.sanitize === 'function') {
+        return purify.sanitize(html, {
+            ALLOWED_TAGS: [
+                'div', 'span', 'p', 'br', 'b', 'i', 'strong', 'em', 'u',
+                'h1', 'h2', 'h3', 'h4', 'ul', 'ol', 'li', 'blockquote',
+                'pre', 'code', 'hr', 'a', 'img', 'table', 'thead', 'tbody',
+                'tr', 'th', 'td'
+            ],
+            ALLOWED_ATTR: [
+                'href', 'target', 'src', 'alt', 'title', 'class', 'id',
+                'style', 'data-*', 'width', 'height'
+            ],
+            ALLOW_DATA_ATTR: true,
+            ADD_ATTR: ['target'],
+            FORBID_TAGS: ['script', 'style', 'iframe', 'object', 'embed'],
+            FORBID_ATTR: ['onerror', 'onload', 'onclick', 'onmouseover'],
+        });
+    }
+    // --- Fallback: basic strip if DOMPurify isn't loaded ---
+    return String(html)
+        .replace(/<script[\s\S]*?>[\s\S]*?<\/script>/gi, '')
+        .replace(/\s+on\w+\s*=\s*["'][^"']*["']/gi, '')
+        .replace(/href\s*=\s*["']\s*javascript:/gi, 'href="#"');
+}
 // ============================================================
 // Container & query helpers
 // ============================================================
@@ -182,29 +209,37 @@ let richChatMsgCounter = 0;
  * message). Long messages get a "Show full reading" toggle so the
  * chat feed doesn't get overwhelmed by one giant Crown Spread post.
  */
-function renderChatMessageText(rawText) {
+function renderChatMessageText(rawText, sender = '') {
     const text = String(rawText || '');
     if (!text) return '';
 
-    const isCrown = looksLikeCrownSpreadText(text);
-    const formatted = isCrown
-        ? renderCrownSpreadChatHtml(text)
-        : renderChatBracketAnnotations(renderChatMarkdownBold(escapeKeepingAllowedTags(text)))
-            .split(/\n\s*\n/)
-            .map(p => `<div style="margin:0.15rem 0;">${p.trim()}</div>`)
-            .join('');
+    const isTrusted = (sender === 'GM' || sender === 'System');
 
-    const safeFormatted = sanitizeHtml(formatted);
-
-    if (text.length > 220) {
-        const toggleId = `chat-msg-full-${++richChatMsgCounter}`;
-        return `
-            <span class="chat-msg-preview">${escHtml(chatPlainPreview(text))}</span>
-            <button class="btn btn-xs btn-ghost chat-msg-expand-btn" data-target="${toggleId}" style="font-size:0.7rem;padding:0.05rem 0.4rem;margin-left:0.3rem;">Show full reading</button>
-            <div id="${toggleId}" class="chat-msg-full" style="display:none;margin-top:0.3rem;">${safeFormatted}</div>
-        `;
+    // --- Trusted senders: render HTML directly (sanitised) ---
+    if (isTrusted) {
+        // For long messages, add a toggle
+        if (text.length > 220) {
+            const toggleId = `chat-msg-full-${++richChatMsgCounter}`;
+            const sanitizedFull = trustedSanitize(text);
+            return `
+                <span class="chat-msg-preview">${escHtml(chatPlainPreview(text))}</span>
+                <button class="btn btn-xs btn-ghost chat-msg-expand-btn" data-target="${toggleId}" style="font-size:0.7rem;padding:0.05rem 0.4rem;margin-left:0.3rem;">Show full reading</button>
+                <div id="${toggleId}" class="chat-msg-full" style="display:none;margin-top:0.3rem;">${sanitizedFull}</div>
+            `;
+        }
+        // Short trusted message: just sanitise and return
+        return trustedSanitize(text);
     }
-    return safeFormatted;
+
+    // --- Untrusted senders (players, etc.): use the original escaping logic ---
+    const isCrown = looksLikeCrownSpreadText(text);
+    if (isCrown) {
+        return renderCrownSpreadChatHtml(text);
+    }
+    const formatted = renderChatBracketAnnotations(
+        renderChatMarkdownBold(escapeKeepingAllowedTags(text))
+    ).split(/\n\s*\n/).map(p => `<div style="margin:0.15rem 0;">${p.trim()}</div>`).join('');
+    return sanitizeHtml(formatted);
 }
 
 // ============================================================
@@ -386,7 +421,7 @@ export function renderChat() {
                     <div style="display:flex;align-items:center;gap:0.4rem;flex-wrap:wrap;">
                         <span style="color:var(--text2);font-size:0.8rem;">${escHtml(time)}</span>
                         <strong style="color:${senderColor};font-size:1rem;">${escHtml(sender)}${recipient}:</strong>
-                        <div style="word-break:break-word;font-size:1rem;flex:1 1 auto;min-width:0;">${whisper}${renderChatMessageText(text)}</div>
+                        <div style="word-break:break-word;font-size:1rem;flex:1 1 auto;min-width:0;">${whisper}${renderChatMessageText(text, sender)}</div>
                         ${modeBadge}
                         <span class="msg-status" style="font-size:0.7rem;color:${statusColor};margin-left:auto;" title="${statusTitle}">${statusIcon}</span>
                     </div>

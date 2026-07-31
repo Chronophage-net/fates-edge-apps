@@ -26,6 +26,12 @@
  *    variable that was never invalidated after the first build — same
  *    class of bug as the earlier Cantor stale-cache issue. openWizard() now
  *    resets it right after the shared patron loader runs.
+ *
+ * 3. Added missing data fields (strings, debtTimers, spellbook) so the
+ *    editor never encounters undefined properties on wizard-created chars.
+ *
+ * 4. Added Psion and Monk magic paths to the dropdown and their talent
+ *    mappings so learnedTalents is correctly populated.
  * ────────────────────────────────────────────────────────────────────────
  */
 
@@ -118,6 +124,7 @@ const STARTING_GEAR = [
     'Any tools required for your skills (lockpicks, healer\'s kit, writing materials)'
 ];
 
+// ─── MAGIC_PATHS: added Psion and Monk ─────────────────────────────
 const MAGIC_PATHS = [
     { id: 'none', label: 'No Magic Path', cost: 0, note: 'Attributes and Skills are enough to be effective.' },
     { id: 'hedge-gifts', label: 'Hedge Gifts (Craft of the Hedge, 4 XP)', cost: 4, note: '2 no-roll magical abilities. No resource tracking. Retrain later.' },
@@ -127,7 +134,10 @@ const MAGIC_PATHS = [
     { id: 'invoker', label: 'Invoker (Patron\'s Symbol, 4 XP/Patron)', cost: 4, note: 'Ritual magic via symbols. Slow but flexible. Crack the Seal for emergencies.' },
     { id: 'cantor', label: 'Cantor (Cantor\'s Path, 8 XP)', cost: 8, note: 'Songs that mimic Low Rites. Accessible but corrupting. Requires Lore 1+, Performance 2+, Presence 2+.' },
     { id: 'summoner', label: 'Summoner (Pact-Whisperer 2 XP + Lesser Pactwright 2 XP)', cost: 4, note: 'Bind and command spirits. Powerful but requires Leash management.' },
-    { id: 'witch', label: 'Witchcraft (Craft of the Hedge, 4 XP)', cost: 4, note: 'Threshold magic. Hedge Gifts + Quick Workings + Full Rituals. Identity Strain track.' }
+    { id: 'witch', label: 'Witchcraft (Craft of the Hedge, 4 XP)', cost: 4, note: 'Threshold magic. Hedge Gifts + Quick Workings + Full Rituals. Identity Strain track.' },
+    // ─── ADDED ──────────────────────────────────────────────────────
+    { id: 'psion', label: 'Psion (Psionic Training, 6 XP)', cost: 6, note: 'Mind-born power fueled by Mental Strain. No patron or tags – pure will.' },
+    { id: 'monk', label: 'Monk (Monastic Training, 4 XP)', cost: 4, note: 'Breath States, Meditation, and monastic Techniques. Patron-optional.' }
 ];
 
 function defaultSkills() {
@@ -144,7 +154,6 @@ function getTierFromXp(xp) {
 }
 
 // ─── Thiasos/Codex → Patron mapping ──────────────────────────────
-// Used for auto-deriving patron when a Runekeeper has Thiasos/Codex but no patron.
 
 const THIASOS_PATRON_MAP = {
     'white-hound': 'mykkiel',
@@ -202,10 +211,6 @@ function derivePatronFromRunekeeperItems({ thiasos, codex }) {
 }
 
 // ─── Dynamic patron loader ────────────────────────────────────────
-//
-// FIX: patronOptionsCache used to be built once and never invalidated —
-// see header note #2. openWizard() now resets it right after the shared
-// patron loader runs.
 
 let patronOptionsCache = null;
 
@@ -481,9 +486,7 @@ export async function openWizard() {
         // Ensure patron data is loaded
         try {
             await loadPatronData();
-            // FIX (see header note #2): force this file's own dropdown-option
-            // cache to rebuild against whatever the shared loader just
-            // fetched, instead of silently reusing the first-ever list.
+            // FIX: force this file's own dropdown-option cache to rebuild
             patronOptionsCache = null;
             console.log('[Wizard] Patron data loaded');
         } catch (err) {
@@ -493,6 +496,7 @@ export async function openWizard() {
         const modal = ensureModal();
         state.modal = modal;
 
+        // ─── FIX: Added missing fields (strings, debtTimers, spellbook) ──
         state.data = {
             id: generateId(),
             name: '',
@@ -557,13 +561,15 @@ export async function openWizard() {
             breathState: 'entering',
             monkCorruptionTier: 0,
             knownTags: [],
-            // ─── NEW Cantor fields ───────────────────────────────────
             boundPatron: '',
             boundPatronBonus: 1,
             bloomCount: 0,
             resonantRites: [],
-            // ─── FIX: learnedTalents for magic-access detection ──
             learnedTalents: [],
+            // ─── NEW: missing fields from editor's createNewCharacter ──
+            strings: [],
+            debtTimers: [],
+            spellbook: [],
             _stepDataCollected: {},
         };
         state.step = 0;
@@ -695,11 +701,9 @@ function collectTalentsAndLoadout(d) {
     d.magicPathNote = path?.note || '';
     d.patron = getVal('#wz-patron');
     
-    // ─── Read Thiasos/Codex (Runekeeper) ──────────────────────────
     d.thiasos = getVal('#wz-thiasos').trim();
     d.codex = getVal('#wz-codex').trim();
     
-    // ─── Auto-derive patron if Runekeeper and patron missing ──────
     if (d.magicPath === 'runekeeper' && !d.patron) {
         const derived = derivePatronFromRunekeeperItems({ 
             thiasos: d.thiasos, 
@@ -707,7 +711,6 @@ function collectTalentsAndLoadout(d) {
         });
         if (derived) {
             d.patron = derived;
-            // Update the dropdown to reflect the derived patron
             const patronSelect = document.querySelector('#wz-patron');
             if (patronSelect) patronSelect.value = derived;
             showToast(`🔮 Patron auto-set to ${derived} from Thiasos/Codex.`, 'info');
@@ -716,7 +719,6 @@ function collectTalentsAndLoadout(d) {
         }
     }
     
-    // ─── Read Cantor fields ──────────────────────────────────────────
     d.boundPatron = getVal('#wz-bound-patron');
     d.boundPatronBonus = clamp(getNum('#wz-bound-patron-bonus'), 0, 3);
     d.bloomCount = Math.max(0, getNum('#wz-bloom-count'));
@@ -855,7 +857,7 @@ function finishWizard() {
     
     d.xpSpent = calculateTotalXpSpent(d);
 
-    // ─── FIX: Auto‑add magic‑access talents to learnedTalents ──
+    // ─── FIX: Added psion and monk to the path-talents mapping ──
     const pathTalents = {
         'runekeeper': ['familiar', 'codex'],
         'familiar-only': ['familiar'],
@@ -865,6 +867,8 @@ function finishWizard() {
         'witch': ['craft-of-the-hedge'],
         'hedge-gifts': ['craft-of-the-hedge'],
         'invoker': [], // no talent needed; symbols are separate
+        'psion': ['psionic-training'],    // ADDED
+        'monk': ['monastic-training']     // ADDED
     };
     if (d.magicPath && pathTalents[d.magicPath]) {
         if (!d.learnedTalents) d.learnedTalents = [];
@@ -1147,9 +1151,6 @@ function renderStep2Skills(d) {
 }
 
 // ─── Talent Catalog Helpers ──────────────────────────────────────
-//
-// FIX (see header note #1): filter by tags.includes('talent'), not a
-// category field that real wiki entries never use for this purpose.
 
 function getAvailableTalentsForTier(d) {
     const appState = getState();
@@ -1263,7 +1264,6 @@ function renderStep3TalentsAndLoadout(d) {
         `<option value="${p.id}" ${d.magicPath === p.id ? 'selected' : ''}>${escHtml(p.label)}</option>`
     ).join('');
     
-    // ─── Dynamic patron options ──────────────────────────────────
     const patronOptions = buildPatronOptionsHTML(d.patron || '');
     const boundPatronOptions = buildPatronOptionsHTML(d.boundPatron || '');
     
@@ -1293,7 +1293,6 @@ function renderStep3TalentsAndLoadout(d) {
     const assetRows = (d.assets || []).map((a, i) => dynamicRowHtml('wz-asset', i, a.name, a.cost)).join('');
     const equipRows = (d.equipment || []).map((e, i) => dynamicRowHtml('wz-equip', i, e.name, e.cost)).join('');
     
-    // Thiasos/Codex values
     const thiasos = d.thiasos || '';
     const codex = d.codex || '';
     const isRunekeeper = d.magicPath === 'runekeeper';
@@ -1775,12 +1774,10 @@ function attachEvents() {
             if (noteEl && path) {
                 noteEl.textContent = path.note;
             }
-            // ─── Show/hide Runekeeper fields ────────────────────────────
             const runekeeperFields = document.getElementById('wz-runekeeper-fields');
             if (runekeeperFields) {
                 runekeeperFields.style.display = target.value === 'runekeeper' ? 'block' : 'none';
             }
-            // ─── Show/hide Cantor fields ────────────────────────────────
             const cantorFields = document.getElementById('wz-cantor-fields');
             if (cantorFields) {
                 cantorFields.style.display = target.value === 'cantor' ? 'block' : 'none';

@@ -14,35 +14,14 @@
  * access to Patron's Gift and Rites.
  *
  * ────────────────────────────────────────────────────────────────────────
- * BUGFIX PASS (this revision):
+ * ADDITIONAL BUGFIX PASS (this revision):
  *
- * 1. getAvailableTalentsForTier() filtered wiki entries with
- *    `e.category === 'talents' || e.category === 'talent'`. Every real wiki
- *    entry in this app (see cantor.js/psion.js's own fallback loaders) uses
- *    `category: 'magic'` (or similar path name) plus a `tags` array, and
- *    identifies itself as a talent via `tags.includes('talent')` — never
- *    via category. That means this filter matched ZERO wiki-sourced
- *    talents, ever. Since wiki talents are presumably the bulk of the
- *    catalog, the Talent Catalog would only ever show manually-added local
- *    talents — for most users, nothing at all. This is almost certainly
- *    the "Talents doesn't work" bug. Fixed to check `tags`.
- *
- * 2. buildEditorHTML()/validateSkillCap() referenced `SKILL_ATTRIBUTES`,
- *    which was never defined or imported in this file — it only exists in
- *    wizard.js's module scope. Referencing an undeclared identifier throws
- *    a ReferenceError even through optional chaining (`?.` only guards
- *    against null/undefined VALUES, not unbound NAMES). Since this happens
- *    while building the skills grid HTML — before that HTML is ever
- *    assigned into the modal — opening the editor could throw before the
- *    modal became visible at all, i.e. clicking "Edit" or "Blank Editor"
- *    silently did nothing. Added the missing constant (mirrors wizard.js).
- *
- * 3. getPatronOptions() cached its computed dropdown list in a module-level
- *    variable that was never invalidated — once built, the patron dropdown
- *    in this editor would never notice a Patrons-tab refresh for the rest
- *    of the session (same class of bug as the earlier Cantor stale-cache
- *    issue). Now cleared every time the editor opens, right after the
- *    shared patron loader runs.
+ * 1. buildEditorHTML now normalises backgroundTags: ensures it's an array
+ *    before calling .join().
+ * 2. readDynamicList now safely checks for missing inputs and uses
+ *    .textContent for non‑input elements (fixes talent name reading).
+ * 3. saveEditor normalises backgroundTags to an array before saving.
+ * 4. recalculateXpBudget now catches errors from readDynamicList.
  * ────────────────────────────────────────────────────────────────────────
  */
 
@@ -64,8 +43,6 @@ const ALL_SKILLS = [
     'Lore', 'Investigation', 'Medicine', 'Arcana'
 ];
 
-// FIX: this constant was referenced (buildEditorHTML, validateSkillCap)
-// but never defined anywhere in this file — see header note #2.
 const SKILL_ATTRIBUTES = {
     melee: 'body', ranged: 'wits', unarmed: 'body', athletics: 'body',
     stealth: 'wits', endurance: 'body', craft: 'wits', sway: 'presence',
@@ -158,7 +135,9 @@ const MAGIC_PATH_LEARNED_TALENTS = {
     'free-caster': ['spellcraft'],
     witch: ['craft-of-the-hedge'],
     'hedge-gifts': ['craft-of-the-hedge'],
-    invoker: [] // no talent needed; symbols are stored separately
+    invoker: [], // no talent needed; symbols are stored separately
+    psion: ['psionic-training'],
+    monk: ['monastic-training']
 };
 
 function defaultSkills() {
@@ -224,12 +203,6 @@ function derivePatronFromRunekeeperItems({ thiasos, codex }) {
 }
 
 // ─── Dynamic patron loader ────────────────────────────────────────
-//
-// FIX: patronOptionsCache used to be built once and never invalidated —
-// see header note #3. openEditor() now resets it right after the shared
-// patron loader runs, so a stale option list can't survive a Patrons
-// refresh for the rest of the session.
-
 let patronOptionsCache = null;
 
 function getPatronOptions() {
@@ -307,8 +280,6 @@ function initEditor() {
             }
             e.preventDefault();
         }
-
-        // Remove delegated handler for catalog add—we use direct listeners now
     });
     
     editorState.initialized = true;
@@ -372,10 +343,6 @@ function getTierFromXp(xp) {
 // TALENT CATALOG
 // ============================================================
 
-// FIX (see header note #1): wiki entries identify themselves as talents
-// via a `tags` array containing 'talent' (matching cantor.js/psion.js's
-// own loaders), never via a `category` field equal to 'talents'/'talent'.
-// The old filter here never matched a single wiki entry.
 function getAvailableTalentsForTier(totalXp) {
     const appState = getState();
     const localTalents = appState.talents || [];
@@ -432,7 +399,6 @@ function renderTalentCatalog() {
         `;
     }).join('');
 
-    // Directly attach click listeners to each button
     catalogEl.querySelectorAll('.ce-catalog-add-btn').forEach(btn => {
         btn.addEventListener('click', function(e) {
             e.preventDefault();
@@ -467,8 +433,8 @@ function addTalentFromCatalog(name, cost) {
 // ============================================================
 
 function dynamicRowHTML(type, idx, item = {}) {
-    const name = item.name || '';
-    const cost = item.cost || 0;
+    const name = item?.name ?? '';
+    const cost = item?.cost ?? 0;
     let html = '';
     switch(type) {
         case 'talent':
@@ -486,9 +452,9 @@ function dynamicRowHTML(type, idx, item = {}) {
             html = `
                 <div class="dynamic-row ce-bond-row" data-index="${idx}">
                     <input type="text" class="ce-bond-name" placeholder="Bond name" value="${escHtml(name)}" style="flex:1;" />
-                    <input type="text" class="ce-bond-desc" placeholder="Description" value="${escHtml(item.desc || '')}" style="flex:2;" />
+                    <input type="text" class="ce-bond-desc" placeholder="Description" value="${escHtml(item?.desc ?? '')}" style="flex:2;" />
                     <label style="font-size:0.8rem;display:flex;align-items:center;gap:0.2rem;">
-                        <input type="checkbox" class="ce-bond-start" ${item.start ? 'checked' : ''} /> +2 XP
+                        <input type="checkbox" class="ce-bond-start" ${item?.start ? 'checked' : ''} /> +2 XP
                     </label>
                     <button class="btn btn-xs editor-remove-btn">✕</button>
                 </div>
@@ -498,9 +464,9 @@ function dynamicRowHTML(type, idx, item = {}) {
             html = `
                 <div class="dynamic-row ce-complication-row" data-index="${idx}">
                     <input type="text" class="ce-complication-name" placeholder="Complication name" value="${escHtml(name)}" style="flex:1;" />
-                    <input type="text" class="ce-complication-desc" placeholder="Description" value="${escHtml(item.desc || '')}" style="flex:2;" />
+                    <input type="text" class="ce-complication-desc" placeholder="Description" value="${escHtml(item?.desc ?? '')}" style="flex:2;" />
                     <label style="font-size:0.8rem;display:flex;align-items:center;gap:0.2rem;">
-                        <input type="checkbox" class="ce-complication-start" ${item.start ? 'checked' : ''} /> +2 XP
+                        <input type="checkbox" class="ce-complication-start" ${item?.start ? 'checked' : ''} /> +2 XP
                     </label>
                     <button class="btn btn-xs editor-remove-btn">✕</button>
                 </div>
@@ -509,11 +475,11 @@ function dynamicRowHTML(type, idx, item = {}) {
         case 'symbol':
             html = `
                 <div class="dynamic-row ce-symbol-row" data-index="${idx}">
-                    <select class="ce-symbol-patron" style="flex:1;">${buildPatronOptionsHTML(item.patron || '')}</select>
+                    <select class="ce-symbol-patron" style="flex:1;">${buildPatronOptionsHTML(item?.patron || '')}</select>
                     <select class="ce-symbol-state" style="width:100px;">
-                        <option value="active" ${item.state === 'active' ? 'selected' : ''}>Active</option>
-                        <option value="compromised" ${item.state === 'compromised' ? 'selected' : ''}>Compromised</option>
-                        <option value="shattered" ${item.state === 'shattered' ? 'selected' : ''}>Shattered</option>
+                        <option value="active" ${item?.state === 'active' ? 'selected' : ''}>Active</option>
+                        <option value="compromised" ${item?.state === 'compromised' ? 'selected' : ''}>Compromised</option>
+                        <option value="shattered" ${item?.state === 'shattered' ? 'selected' : ''}>Shattered</option>
                     </select>
                     <button class="btn btn-xs editor-remove-btn">✕</button>
                 </div>
@@ -535,7 +501,7 @@ function dynamicRowHTML(type, idx, item = {}) {
             html = `
                 <div class="dynamic-row ce-promise-timer-row" data-index="${idx}">
                     <input type="text" class="ce-promise-timer-name" placeholder="Timer name" value="${escHtml(name)}" style="flex:1;" />
-                    <input type="number" class="ce-promise-timer-segments" placeholder="Segments" value="${item.segments || 4}" min="1" max="12" style="width:80px;" />
+                    <input type="number" class="ce-promise-timer-segments" placeholder="Segments" value="${item?.segments ?? 4}" min="1" max="12" style="width:80px;" />
                     <button class="btn btn-xs editor-remove-btn">✕</button>
                 </div>
             `;
@@ -544,9 +510,9 @@ function dynamicRowHTML(type, idx, item = {}) {
             html = `
                 <div class="dynamic-row ce-bound-spirit-row" data-index="${idx}">
                     <input type="text" class="ce-bound-spirit-name" placeholder="Spirit name" value="${escHtml(name)}" style="flex:1;" />
-                    <input type="number" class="ce-bound-spirit-cap" placeholder="Cap" value="${item.cap || 1}" min="1" max="5" style="width:60px;" />
-                    <input type="text" class="ce-bound-spirit-nature" placeholder="Nature" value="${escHtml(item.nature || '')}" style="flex:1;" />
-                    <input type="text" class="ce-bound-spirit-services" placeholder="Services" value="${escHtml(item.services || '')}" style="flex:1;" />
+                    <input type="number" class="ce-bound-spirit-cap" placeholder="Cap" value="${item?.cap ?? 1}" min="1" max="5" style="width:60px;" />
+                    <input type="text" class="ce-bound-spirit-nature" placeholder="Nature" value="${escHtml(item?.nature ?? '')}" style="flex:1;" />
+                    <input type="text" class="ce-bound-spirit-services" placeholder="Services" value="${escHtml(item?.services ?? '')}" style="flex:1;" />
                     <button class="btn btn-xs editor-remove-btn">✕</button>
                 </div>
             `;
@@ -563,7 +529,7 @@ function dynamicRowHTML(type, idx, item = {}) {
 }
 
 // ============================================================
-// READ DYNAMIC LISTS
+// READ DYNAMIC LISTS (with defensive checks)
 // ============================================================
 
 function readDynamicList(type) {
@@ -574,7 +540,8 @@ function readDynamicList(type) {
             const nameInput = row.querySelector('.ce-bond-name');
             const descInput = row.querySelector('.ce-bond-desc');
             const startCheck = row.querySelector('.ce-bond-start');
-            const name = nameInput ? nameInput.value.trim() : '';
+            if (!nameInput) continue;
+            const name = nameInput.value?.trim() || '';
             if (!name) continue;
             items.push({
                 name,
@@ -586,7 +553,8 @@ function readDynamicList(type) {
             const nameInput = row.querySelector('.ce-complication-name');
             const descInput = row.querySelector('.ce-complication-desc');
             const startCheck = row.querySelector('.ce-complication-start');
-            const name = nameInput ? nameInput.value.trim() : '';
+            if (!nameInput) continue;
+            const name = nameInput.value?.trim() || '';
             if (!name) continue;
             items.push({
                 name,
@@ -607,7 +575,8 @@ function readDynamicList(type) {
         else if (type === 'promise-timer') {
             const nameInput = row.querySelector('.ce-promise-timer-name');
             const segInput = row.querySelector('.ce-promise-timer-segments');
-            const name = nameInput ? nameInput.value.trim() : '';
+            if (!nameInput) continue;
+            const name = nameInput.value?.trim() || '';
             if (!name) continue;
             items.push({
                 name,
@@ -619,7 +588,8 @@ function readDynamicList(type) {
             const capInput = row.querySelector('.ce-bound-spirit-cap');
             const natureInput = row.querySelector('.ce-bound-spirit-nature');
             const servicesInput = row.querySelector('.ce-bound-spirit-services');
-            const name = nameInput ? nameInput.value.trim() : '';
+            if (!nameInput) continue;
+            const name = nameInput.value?.trim() || '';
             if (!name) continue;
             items.push({
                 name,
@@ -630,16 +600,24 @@ function readDynamicList(type) {
         }
         else if (['rite', 'repertoire', 'hedge-gift', 'psionic-art', 'known-tag'].includes(type)) {
             const nameInput = row.querySelector('.ce-' + type + '-name');
-            const name = nameInput ? nameInput.value.trim() : '';
+            if (!nameInput) continue;
+            const name = nameInput.value?.trim() || '';
             if (!name) continue;
             items.push({ name });
         }
         else if (['asset', 'equipment', 'talent'].includes(type)) {
             const nameEl = row.querySelector('.ce-' + type + '-name');
             const costEl = row.querySelector('.ce-' + type + '-cost');
-            const name = nameEl ? nameEl.value.trim() : '';
+            if (!nameEl) continue;
+            // nameEl may be an input or a span (for talents)
+            let name;
+            if (nameEl.tagName === 'INPUT') {
+                name = nameEl.value?.trim() || '';
+            } else {
+                name = nameEl.textContent?.trim() || '';
+            }
             if (!name) continue;
-            const cost = costEl ? safeParseInt(costEl.value, 0) : 0;
+            const cost = costEl ? safeParseInt(costEl.value || costEl.textContent, 0) : 0;
             const item = { name, cost };
             if (type === 'asset') {
                 const tierSelect = row.querySelector('.ce-asset-tier');
@@ -660,35 +638,39 @@ function recalculateXpBudget() {
     if (!totalXpInput) return;
     const totalXp = safeParseInt(totalXpInput.value, 32);
     
-    const tempChar = {
-        body: safeParseInt(document.getElementById('ce-body')?.value, 1),
-        wits: safeParseInt(document.getElementById('ce-wits')?.value, 1),
-        spirit: safeParseInt(document.getElementById('ce-spirit')?.value, 1),
-        presence: safeParseInt(document.getElementById('ce-presence')?.value, 1),
-        skills: {},
-        talents: readDynamicList('talent'),
-        assets: readDynamicList('asset'),
-        equipment: readDynamicList('equipment')
-    };
-    ALL_SKILLS.forEach(s => {
-        const key = s.toLowerCase();
-        const val = safeParseInt(document.getElementById(`ce-sk-${key}`)?.value, 0);
-        tempChar.skills[key] = val;
-    });
-    
-    const spent = calculateTotalXpSpent(tempChar);
-    const remaining = totalXp - spent;
-    const isOver = remaining < 0;
-    
-    const bar = document.querySelector('.ce-xp-bar');
-    if (bar) {
-        bar.className = `xp-budget-bar ${isOver ? 'xp-budget-over' : 'xp-budget-ok'}`;
-        bar.innerHTML = `
-            <strong>XP:</strong> ${totalXp} available − ${spent} spent = 
-            <span style="color:${isOver ? 'var(--red)' : 'var(--green)'};font-weight:bold;">
-                ${remaining > 0 ? remaining + ' remaining' : remaining === 0 ? 'exactly spent' : Math.abs(remaining) + ' OVER!'}
-            </span>
-        `;
+    try {
+        const tempChar = {
+            body: safeParseInt(document.getElementById('ce-body')?.value, 1),
+            wits: safeParseInt(document.getElementById('ce-wits')?.value, 1),
+            spirit: safeParseInt(document.getElementById('ce-spirit')?.value, 1),
+            presence: safeParseInt(document.getElementById('ce-presence')?.value, 1),
+            skills: {},
+            talents: readDynamicList('talent'),
+            assets: readDynamicList('asset'),
+            equipment: readDynamicList('equipment')
+        };
+        ALL_SKILLS.forEach(s => {
+            const key = s.toLowerCase();
+            const val = safeParseInt(document.getElementById(`ce-sk-${key}`)?.value, 0);
+            tempChar.skills[key] = val;
+        });
+        
+        const spent = calculateTotalXpSpent(tempChar);
+        const remaining = totalXp - spent;
+        const isOver = remaining < 0;
+        
+        const bar = document.querySelector('.ce-xp-bar');
+        if (bar) {
+            bar.className = `xp-budget-bar ${isOver ? 'xp-budget-over' : 'xp-budget-ok'}`;
+            bar.innerHTML = `
+                <strong>XP:</strong> ${totalXp} available − ${spent} spent = 
+                <span style="color:${isOver ? 'var(--red)' : 'var(--green)'};font-weight:bold;">
+                    ${remaining > 0 ? remaining + ' remaining' : remaining === 0 ? 'exactly spent' : Math.abs(remaining) + ' OVER!'}
+                </span>
+            `;
+        }
+    } catch (err) {
+        console.warn('[Editor] XP budget recalculation failed:', err);
     }
 }
 
@@ -953,10 +935,20 @@ function createModal() {
 }
 
 // ============================================================
-// BUILD EDITOR HTML
+// BUILD EDITOR HTML (with backgroundTags normalisation)
 // ============================================================
 
 function buildEditorHTML(c) {
+    // Ensure backgroundTags is an array
+    let backgroundTags = c.backgroundTags;
+    if (!Array.isArray(backgroundTags)) {
+        if (typeof backgroundTags === 'string') {
+            backgroundTags = backgroundTags.split(',').map(s => s.trim()).filter(Boolean);
+        } else {
+            backgroundTags = [];
+        }
+    }
+
     const heritageOptions = HERITAGES.map(h => 
         `<option value="${h.id}" ${c.heritage === h.id ? 'selected' : ''}>${escHtml(h.label)}</option>`
     ).join('');
@@ -1000,18 +992,24 @@ function buildEditorHTML(c) {
         `;
     }).join('');
 
-    const talentRows = (c.talents || []).map((t, i) => `
+    const validTalents = (c.talents || []).filter(t => t && typeof t === 'object' && t.name);
+    const validAssets = (c.assets || []).filter(a => a && typeof a === 'object' && a.name);
+    const validEquipment = (c.equipment || []).filter(e => e && typeof e === 'object' && e.name);
+    const validBonds = (c.bonds || []).filter(b => b && typeof b === 'object' && b.name);
+    const validComplications = (c.complications || []).filter(cp => cp && typeof cp === 'object' && cp.name);
+
+    const talentRows = validTalents.map((t, i) => `
         <div class="dynamic-row ce-talent-row">
             <span class="ce-talent-name" style="flex:2; padding:0.2rem;">${escHtml(t.name)}</span>
-            <span class="ce-talent-cost" style="width:70px; text-align:center;">${t.cost}</span>
+            <span class="ce-talent-cost" style="width:70px; text-align:center;">${t.cost ?? 0}</span>
             <button class="btn btn-xs editor-remove-btn">✕</button>
         </div>
     `).join('');
 
-    const assetRows = (c.assets || []).map((a, i) => dynamicRowHTML('asset', i, a)).join('');
-    const equipRows = (c.equipment || []).map((e, i) => dynamicRowHTML('equipment', i, e)).join('');
-    const bondRows = (c.bonds || []).map((b, i) => dynamicRowHTML('bond', i, b)).join('');
-    const compRows = (c.complications || []).map((cp, i) => dynamicRowHTML('complication', i, cp)).join('');
+    const assetRows = validAssets.map((a, i) => dynamicRowHTML('asset', i, a)).join('');
+    const equipRows = validEquipment.map((e, i) => dynamicRowHTML('equipment', i, e)).join('');
+    const bondRows = validBonds.map((b, i) => dynamicRowHTML('bond', i, b)).join('');
+    const compRows = validComplications.map((cp, i) => dynamicRowHTML('complication', i, cp)).join('');
 
     const isRunekeeper = c.magicPath === 'runekeeper';
     const isCantor = c.magicPath === 'cantor';
@@ -1053,7 +1051,7 @@ function buildEditorHTML(c) {
                 </div>
                 <div>
                     <label>Background Tags</label>
-                    <input id="ce-background-tags" value="${escHtml((c.backgroundTags || []).join(', '))}" placeholder="e.g., Veteran, Muster Papers" />
+                    <input id="ce-background-tags" value="${escHtml(backgroundTags.join(', '))}" placeholder="e.g., Veteran, Muster Papers" />
                 </div>
                 <div>
                     <label>Signature Contact</label>
@@ -1230,9 +1228,6 @@ export async function openEditor(id) {
 
     try {
         await loadPatronData();
-        // FIX (see header note #3): force this file's own dropdown-option
-        // cache to rebuild against whatever the shared loader just fetched,
-        // instead of silently reusing the first-ever computed list.
         patronOptionsCache = null;
         console.log('[Editor] Patron data loaded');
     } catch (err) {
@@ -1286,7 +1281,7 @@ export async function openEditor(id) {
     try {
         html = buildEditorHTML(c);
     } catch (err) {
-        console.error('[Editor] buildEditorHTML failed:', err);
+        console.error('[Editor] buildEditorHTML failed:', err, 'Character data:', c);
         showToast('Error building the character editor. Please refresh and try again.', 'error');
         modal.remove();
         return;
@@ -1342,7 +1337,7 @@ export function closeEditor() {
 }
 
 // ============================================================
-// SAVE EDITOR
+// SAVE EDITOR (with backgroundTags normalisation)
 // ============================================================
 
 export function saveEditor() {
@@ -1374,7 +1369,11 @@ export function saveEditor() {
         c.region = v('#ce-region');
         c.culturalAffinity = v('#ce-cultural-affinity');
         c.background = v('#ce-background');
-        c.backgroundTags = v('#ce-background-tags') ? v('#ce-background-tags').split(',').map(t => t.trim()).filter(Boolean) : [];
+        
+        // Normalise backgroundTags to array
+        const tagsRaw = v('#ce-background-tags');
+        c.backgroundTags = tagsRaw ? tagsRaw.split(',').map(t => t.trim()).filter(Boolean) : [];
+        
         c.backgroundContact = v('#ce-background-contact');
         c.backgroundBoon = v('#ce-background-boon');
         c.backgroundObligation = v('#ce-background-obligation');
@@ -1448,11 +1447,11 @@ export function saveEditor() {
         c.monkCorruptionTier = Math.max(0, n('#ce-monk-corruption-tier'));
         c.knownTags = readDynamicList('known-tag').map(row => row.name).filter(Boolean);
 
-        c.talents = readDynamicList('talent');
-        c.assets = readDynamicList('asset');
-        c.equipment = readDynamicList('equipment');
-        c.bonds = readDynamicList('bond');
-        c.complications = readDynamicList('complication');
+        c.talents = readDynamicList('talent').filter(t => t.name);
+        c.assets = readDynamicList('asset').filter(a => a.name);
+        c.equipment = readDynamicList('equipment').filter(e => e.name);
+        c.bonds = readDynamicList('bond').filter(b => b.name);
+        c.complications = readDynamicList('complication').filter(cp => cp.name);
 
         if (!c.learnedTalents) c.learnedTalents = [];
         if (c.learnedTalents.length === 0 && c.magicPath && c.magicPath !== 'none') {

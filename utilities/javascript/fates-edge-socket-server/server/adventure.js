@@ -8,6 +8,29 @@
  * the result via room.broadcastToRoom(), exactly like they already do
  * for deck draws.
  *
+ * v2 (this pass) -- DYNAMIC GROWTH SUPPORT:
+ *   Adds four new live-state fields alongside status/currentAct/etc.:
+ *     - dynamicGrowth: whether this adventure is allowed to generate new
+ *       content as it's played (true only for Crown-Spread-built
+ *       adventures, set at load time via loadAdventureContent's options;
+ *       always false for file-based loadAdventureModule() adventures, so
+ *       pre-written modules always just play through to their own
+ *       authored ending unmodified).
+ *     - sessionsPlayed / climaxAfterSessions: a simple counter + threshold
+ *       (see markSessionEnd()) used by the bot-side director to decide
+ *       when a dynamic-growth adventure should stop generating regular
+ *       scenes and instead generate a climax/conclusion.
+ *     - climaxTriggered: set once via markClimaxTriggered() so the
+ *       climax-generation path only ever fires once per adventure.
+ *   Also adds four new content-mutation functions -- appendScene(),
+ *   appendAct(), addNpc(), addCreature() -- that let a caller (the bot's
+ *   adventure-director.js, typically after an LLM call) grow the
+ *   currently-loaded module's own content in place. Appending BEFORE
+ *   calling the existing advanceScene() with no explicit target means
+ *   the existing sequential-advance logic below needs NO changes at all
+ *   to correctly land on newly-appended content -- it just sees a
+ *   longer scenes[]/acts[] array than it did a moment ago.
+ *
  * SCHEMA: matches the real, already-authored adventure content format
  * used by the client (features/adventure-manager/index.js), NOT an
  * earlier simplified server-invented one. Top level:
@@ -40,16 +63,12 @@
  * Adventure state lives at room.data.adventure. room.data is already the
  * room's generic free-form data store (see room.js's createRoom()).
  *
- * INTEGRATION NOTE (this pass): this file used to live at the wrong path
- * (files/adventure.js) and was never actually require()'d by api.js,
- * ws-handlers.js, or socketio-handlers.js -- it was dead code sitting
- * alongside two bare, logic-less passthrough case labels
- * ('adventure-timer' / 'adventure-log') in ws-handlers.js's switch. It's
- * now at server/adventure.js and wired into all three real-time/REST
- * entry points, so state mutations are authoritative on the server
- * (recomputed here, not just relayed from whichever client/AI happened
- * to compute a value locally) and every connected client/AI agent stays
- * in sync regardless of who drove the change.
+ * INTEGRATION NOTE: this file lives at server/adventure.js and is wired
+ * into api.js's REST routes (see the "Adventure Engine" section there).
+ * State mutations are authoritative on the server (recomputed here, not
+ * just relayed from whichever client/AI happened to compute a value
+ * locally) and every connected client/AI agent stays in sync regardless
+ * of who drove the change.
  *
  * "PUSH": distributing the adventure's *source content* to connected web
  * clients uses the EXISTING, unmodified module-push mechanism
@@ -58,9 +77,9 @@
  * (manifest.json + adventure.json), that endpoint already reads and
  * broadcasts adventure.json's raw content with zero changes needed here.
  * That push carries the STATIC file, not live progress; live state
- * (position, timer ticks, completed flags) only travels through this
- * file's own broadcasts (scene-changed, encounter-started, etc.), which
- * is why getPublicState() below always includes full inline scene/
+ * (position, timer ticks, completed flags, dynamically-appended
+ * scenes/acts/npcs) only travels through this file's own broadcasts,
+ * which is why getPublicState() below always includes full inline scene/
  * encounter data -- a client needs no local copy of the adventure at all
  * to render the current moment from a broadcast alone.
  */
@@ -74,6 +93,7 @@ const ADVENTURES_DIR = path.resolve(process.cwd(), 'data', 'adventures');
 
 const MAX_LOG_ENTRIES = 200;
 const VALID_OUTCOMES = ['clean', 'partial', 'miss'];
+const DEFAULT_CLIMAX_AFTER_SESSIONS = 4;
 
 /** Ensure room.data.adventure exists, and return it. */
 function ensureAdventureState(room) {
@@ -89,6 +109,11 @@ function ensureAdventureState(room) {
             completedAt: null,
             log: [],
             updatedAt: null,
+            // NEW: dynamic growth tracking (see file header)
+            dynamicGrowth: false,
+            sessionsPlayed: 0,
+            climaxAfterSessions: DEFAULT_CLIMAX_AFTER_SESSIONS,
+            climaxTriggered: false,
         };
     }
     return room.data.adventure;
@@ -148,6 +173,11 @@ function enrichEncounter(adventure, encounter) {
  * of whatever the source file's own currentAct/currentScene/timer values
  * are -- matches the client's own startAdventure() behavior exactly, so
  * loading the same file server-side and client-side never disagrees.
+ *
+ * NOTE: file-based modules ALWAYS get dynamicGrowth=false -- pre-written
+ * adventures play through exactly what their author wrote, start to
+ * finish, with no bot-generated additions. Only loadAdventureContent()
+ * (AI-generated Crown Spread adventures) can opt into dynamic growth.
  */
 function loadAdventureModule(room, moduleId) {
     if (!isSafeModuleId(moduleId)) {
@@ -185,6 +215,12 @@ function loadAdventureModule(room, moduleId) {
     adventure.startedAt = Date.now();
     adventure.completedAt = null;
     adventure.log = [];
+    // NEW: always reset growth tracking on a fresh load, and force
+    // dynamicGrowth off for file-based modules (see docstring above).
+    adventure.dynamicGrowth = false;
+    adventure.sessionsPlayed = 0;
+    adventure.climaxAfterSessions = DEFAULT_CLIMAX_AFTER_SESSIONS;
+    adventure.climaxTriggered = false;
     appendLog(adventure, { type: 'loaded', message: `Loaded adventure "${moduleCopy.title}"` });
     adventure.updatedAt = Date.now();
     room.lastActivity = Date.now();
@@ -199,6 +235,11 @@ function loadAdventureModule(room, moduleId) {
  * the content, resets all timers and scene completed flags, and
  * initialises the room's adventure state. `options.id` can be used
  * to set the module id (defaults to 'custom').
+ *
+ * NEW: `options.dynamicGrowth` (boolean) and `options.climaxAfterSessions`
+ * (number) opt this adventure into the growth system -- see file header.
+ * Both default to "off"/DEFAULT_CLIMAX_AFTER_SESSIONS if omitted, so
+ * existing callers that don't pass them behave exactly as before.
  */
 function loadAdventureContent(room, content, options = {}) {
     if (!content || typeof content !== 'object') {
@@ -235,6 +276,11 @@ function loadAdventureContent(room, content, options = {}) {
     adventure.startedAt = Date.now();
     adventure.completedAt = null;
     adventure.log = [];
+    // NEW: growth tracking, opt-in via options
+    adventure.dynamicGrowth = !!options.dynamicGrowth;
+    adventure.sessionsPlayed = 0;
+    adventure.climaxAfterSessions = options.climaxAfterSessions || DEFAULT_CLIMAX_AFTER_SESSIONS;
+    adventure.climaxTriggered = false;
     appendLog(adventure, { type: 'loaded', message: `Loaded custom adventure "${moduleCopy.title}"` });
     adventure.updatedAt = Date.now();
     room.lastActivity = Date.now();
@@ -249,6 +295,14 @@ function loadAdventureContent(room, content, options = {}) {
  * Pass { actIndex, sceneIndex } to jump to a specific scene instead (e.g.
  * a GM/AI backtracking, or skipping ahead). The scene being LEFT is
  * marked completed either way.
+ *
+ * UNCHANGED from the original version -- this function has NO knowledge
+ * of dynamic growth at all, by design. The bot-side director is
+ * responsible for calling appendScene()/appendAct() BEFORE calling this
+ * with no explicit target whenever it wants to grow the story instead of
+ * letting it complete; once appended, this function's existing
+ * "does the next scene/act exist" checks naturally see the longer
+ * array and advance into the new content with zero special-casing here.
  */
 function advanceScene(room, target = {}) {
     const adventure = ensureAdventureState(room);
@@ -291,6 +345,153 @@ function advanceScene(room, target = {}) {
     adventure.updatedAt = Date.now();
     room.lastActivity = Date.now();
 
+    return getPublicState(room);
+}
+
+/**
+ * NEW: Append a single new scene to an existing act (identified by
+ * index). The scene is normalized to the standard shape (completed:
+ * false, timers reset to 0, encounters as given) regardless of what
+ * partial shape the caller provides -- callers are typically an LLM's
+ * JSON output, which won't always include every field. Does NOT advance
+ * into it; call advanceScene(room, {}) afterward (with no explicit
+ * target) to move into the newly-appended scene via ordinary sequential
+ * advance.
+ */
+function appendScene(room, actIndex, sceneContent) {
+    const adventure = ensureAdventureState(room);
+    if (!adventure.module) throw new Error('No adventure module is loaded in this room');
+    if (typeof actIndex !== 'number') throw new Error('actIndex (number) is required');
+    const act = adventure.module.acts[actIndex];
+    if (!act) throw new Error(`Act index ${actIndex} does not exist`);
+    if (!sceneContent || !sceneContent.title) throw new Error('sceneContent.title is required');
+
+    const scene = {
+        id: sceneContent.id || `scene-gen-${Date.now()}`,
+        title: sceneContent.title,
+        description: sceneContent.description || '',
+        completed: false,
+        timers: (sceneContent.timers || []).map(t => ({ ...t, current: 0 })),
+        encounters: sceneContent.encounters || [],
+    };
+    if (!act.scenes) act.scenes = [];
+    act.scenes.push(scene);
+
+    appendLog(adventure, { type: 'scene-appended', message: `New scene appended to "${act.title}": ${scene.title}` });
+    adventure.updatedAt = Date.now();
+    room.lastActivity = Date.now();
+    return getPublicState(room);
+}
+
+/**
+ * NEW: Append a whole new act (with its own scenes) to the currently
+ * loaded module. Used for climax/conclusion generation -- see file
+ * header. Same normalization behavior as appendScene() for each of the
+ * act's scenes. Does NOT advance into it; call advanceScene(room, {})
+ * afterward.
+ */
+function appendAct(room, actContent) {
+    const adventure = ensureAdventureState(room);
+    if (!adventure.module) throw new Error('No adventure module is loaded in this room');
+    if (!actContent || !actContent.title) throw new Error('actContent.title is required');
+    if (!Array.isArray(actContent.scenes) || actContent.scenes.length === 0) {
+        throw new Error('actContent.scenes must be a non-empty array');
+    }
+
+    const act = {
+        id: actContent.id || `act-gen-${Date.now()}`,
+        title: actContent.title,
+        description: actContent.description || '',
+        scenes: actContent.scenes.map((s, i) => ({
+            id: s.id || `scene-gen-${Date.now()}-${i}`,
+            title: s.title,
+            description: s.description || '',
+            completed: false,
+            timers: (s.timers || []).map(t => ({ ...t, current: 0 })),
+            encounters: s.encounters || [],
+        })),
+    };
+    if (!adventure.module.acts) adventure.module.acts = [];
+    adventure.module.acts.push(act);
+
+    appendLog(adventure, { type: 'act-appended', message: `New act appended: ${act.title}` });
+    adventure.updatedAt = Date.now();
+    room.lastActivity = Date.now();
+    return getPublicState(room);
+}
+
+/**
+ * NEW: Register an ad-hoc NPC into the currently loaded module's own
+ * npcs[] array, making it a "real", trackable NPC from this point
+ * forward (matched by adventure-context.js's getActiveNpc() the same as
+ * any pre-authored one) instead of disposable narration with no
+ * mechanical backing.
+ */
+function addNpc(room, npcObj) {
+    const adventure = ensureAdventureState(room);
+    if (!adventure.module) throw new Error('No adventure module is loaded in this room');
+    if (!npcObj || !npcObj.name) throw new Error('npc.name is required');
+
+    if (!adventure.module.npcs) adventure.module.npcs = [];
+    const npc = { id: npcObj.id || `npc-adhoc-${Date.now()}`, ...npcObj };
+    adventure.module.npcs.push(npc);
+
+    appendLog(adventure, { type: 'npc-added', message: `Ad-hoc NPC added: ${npc.name}` });
+    adventure.updatedAt = Date.now();
+    room.lastActivity = Date.now();
+    return getPublicState(room);
+}
+
+/**
+ * NEW: Register an ad-hoc creature into the currently loaded module's
+ * own bestiary[] array. Same purpose as addNpc() but for the bestiary
+ * (used by getActiveCreature() and creature-reference encounters).
+ */
+function addCreature(room, creatureObj) {
+    const adventure = ensureAdventureState(room);
+    if (!adventure.module) throw new Error('No adventure module is loaded in this room');
+    if (!creatureObj || !creatureObj.name) throw new Error('creature.name is required');
+
+    if (!adventure.module.bestiary) adventure.module.bestiary = [];
+    const creature = { id: creatureObj.id || `creature-adhoc-${Date.now()}`, ...creatureObj };
+    adventure.module.bestiary.push(creature);
+
+    appendLog(adventure, { type: 'creature-added', message: `Ad-hoc creature added: ${creature.name}` });
+    adventure.updatedAt = Date.now();
+    room.lastActivity = Date.now();
+    return getPublicState(room);
+}
+
+/**
+ * NEW: Increment the session counter for the currently loaded adventure.
+ * A "session" here is a human/GM concept (a real-world play session
+ * ending) rather than something inferable from chat volume alone, so
+ * this is deliberately a manual marker -- see !gm session end in
+ * commands.js. Once sessionsPlayed reaches climaxAfterSessions, the
+ * bot-side director (adventure-director.js) will generate a climax act
+ * the next time a scene-complete would otherwise exhaust content.
+ */
+function markSessionEnd(room) {
+    const adventure = ensureAdventureState(room);
+    if (!adventure.module) throw new Error('No adventure module is loaded in this room');
+    adventure.sessionsPlayed = (adventure.sessionsPlayed || 0) + 1;
+    appendLog(adventure, { type: 'session', message: `Session ${adventure.sessionsPlayed} ended` });
+    adventure.updatedAt = Date.now();
+    room.lastActivity = Date.now();
+    return getPublicState(room);
+}
+
+/**
+ * NEW: Mark that the climax act has been generated/appended for this
+ * adventure, so the growth logic only ever does that once per
+ * adventure -- the NEXT time content is exhausted, the adventure is
+ * allowed to actually complete instead of generating another climax.
+ */
+function markClimaxTriggered(room) {
+    const adventure = ensureAdventureState(room);
+    adventure.climaxTriggered = true;
+    adventure.updatedAt = Date.now();
+    room.lastActivity = Date.now();
     return getPublicState(room);
 }
 
@@ -427,6 +628,12 @@ function tickTimer(room, { scope = 'scene', ref, name, amount = 1 } = {}) {
  * completedAt, position, every scene's completed flag, and every timer.
  * Matches the client's own resetAdventure() exactly. Does NOT unload the
  * module (call loadAdventureModule again to swap to a different one).
+ *
+ * NEW: also resets sessionsPlayed and climaxTriggered back to their
+ * starting values, since a reset restarts the whole clock -- but
+ * deliberately leaves dynamicGrowth and climaxAfterSessions untouched,
+ * since those are structural properties of the adventure itself, not
+ * progress state.
  */
 function resetAdventure(room) {
     const adventure = ensureAdventureState(room);
@@ -438,6 +645,8 @@ function resetAdventure(room) {
     adventure.currentAct = 0;
     adventure.currentScene = 0;
     adventure.activeEncounterRef = null;
+    adventure.sessionsPlayed = 0;
+    adventure.climaxTriggered = false;
     for (const act of adventure.module.acts || []) {
         for (const scene of act.scenes || []) {
             scene.completed = false;
@@ -479,6 +688,10 @@ function logBeat(room, { text, author = 'GM' } = {}) {
  * material (bestiary/npcs/locations/factions/notes) is deliberately NOT
  * included here -- see getReferenceData() for that, fetched once rather
  * than resent on every tick/scene-change/encounter broadcast.
+ *
+ * NEW: also includes dynamicGrowth/sessionsPlayed/climaxAfterSessions/
+ * climaxTriggered so the bot-side director can make growth decisions
+ * from this same GET /adventure call, with no additional round-trip.
  */
 function getPublicState(room) {
     const adventure = ensureAdventureState(room);
@@ -488,6 +701,10 @@ function getPublicState(room) {
             status: adventure.status,
             log: adventure.log.slice(-20),
             updatedAt: adventure.updatedAt,
+            dynamicGrowth: adventure.dynamicGrowth,
+            sessionsPlayed: adventure.sessionsPlayed,
+            climaxAfterSessions: adventure.climaxAfterSessions,
+            climaxTriggered: adventure.climaxTriggered,
         };
     }
 
@@ -507,6 +724,7 @@ function getPublicState(room) {
     return {
         moduleId: adventure.module.id,
         title: adventure.module.title,
+        description: adventure.module.description || '', // NEW: needed for !gm adventure preview
         tier: adventure.module.tier,
         tierRange: adventure.module.tierRange || adventure.module.tier,
         status: adventure.status,
@@ -523,6 +741,11 @@ function getPublicState(room) {
         })),
         saga: adventure.module.saga ? { sagaParts: adventure.module.sagaParts || [] } : null,
         updatedAt: adventure.updatedAt,
+        // NEW
+        dynamicGrowth: adventure.dynamicGrowth,
+        sessionsPlayed: adventure.sessionsPlayed,
+        climaxAfterSessions: adventure.climaxAfterSessions,
+        climaxTriggered: adventure.climaxTriggered,
     };
 }
 
@@ -551,6 +774,12 @@ module.exports = {
     loadAdventureModule,
     loadAdventureContent,
     advanceScene,
+    appendScene,
+    appendAct,
+    addNpc,
+    addCreature,
+    markSessionEnd,
+    markClimaxTriggered,
     startEncounter,
     resolveEncounter,
     tickTimer,
