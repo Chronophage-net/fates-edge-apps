@@ -33,6 +33,12 @@ env:
   DOCKER_PASS: ${{ secrets.DOCKERHUB_TOKEN }}
   REGISTRY: docker.io
   IMAGE_BASE: chronophage/fates-edge
+  # NEW: also push to GitHub Container Registry so images show up as
+  # Packages on the repo itself, with zero extra secrets (GITHUB_TOKEN
+  # already has packages: write above). GHCR requires an all-lowercase
+  # image path, so the owner is lowercased at runtime below rather than
+  # here (env context has no string functions).
+  GHCR_REGISTRY: ghcr.io
 
 jobs:
   docker-build:
@@ -63,6 +69,14 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
+      # NEW: log in to GHCR too, using the built-in token (no secrets to manage).
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.GHCR_REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Determine tags
         id: tags
         run: |
@@ -76,6 +90,17 @@ jobs:
           if [[ "$VERSION" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
             TAGS="${TAGS},${IMAGE_BASE}:${APP}-${VERSION},${IMAGE_BASE}:${APP}-latest"
           fi
+
+          # NEW: mirror the same tag set to ghcr.io. GHCR image paths must
+          # be all-lowercase, so the repository owner is lowercased here.
+          GHCR_OWNER=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
+          GHCR_BASE="${GHCR_REGISTRY}/${GHCR_OWNER}/fates-edge"
+          GHCR_TAGS="${GHCR_BASE}:${VERSION},${GHCR_BASE}:${APP}-${VERSION},${GHCR_BASE}:${APP}-${SHA}"
+          if [[ "$VERSION" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            GHCR_TAGS="${GHCR_TAGS},${GHCR_BASE}:${APP}-latest"
+          fi
+          TAGS="${TAGS},${GHCR_TAGS}"
+
           echo "tags=${TAGS}" >> $GITHUB_OUTPUT
 
       - name: Build and push

@@ -1,0 +1,15 @@
+node_modules
+dist
+.git
+.github
+*.log
+.DS_Store
+npm-debug.log*
+.env
+.env.*
+CHANGELOG.md
+DESIGN.md
+TODO.md
+README.md
+creating_adventures.md
+tests
