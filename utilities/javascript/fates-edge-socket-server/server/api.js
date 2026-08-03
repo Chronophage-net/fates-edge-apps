@@ -77,6 +77,25 @@ try {
             const filePath = path.join(campaignsDir, fileName);
             const data = await fsPromises.readFile(filePath, 'utf-8');
             return JSON.parse(data);
+        },
+        // NEW: dedicated auto-save read/write, in a SEPARATE directory
+        // from the manual-share campaigns above. Same fix as storage.js's
+        // dedicated `autosaves` table -- if this reused saveCampaign's
+        // directory/pruning (MAX_CAMPAIGNS=2, keyed by mtime), constant
+        // auto-save churn would crowd out and silently delete a player's
+        // manually-uploaded !gm upload snapshot before they got to use
+        // it. One file per room, always overwritten in place, nothing to
+        // prune.
+        async saveAutoSave(roomCode, data) {
+            const autosaveDir = path.join(__dirname, 'campaigns', 'autosave');
+            await fsPromises.mkdir(autosaveDir, { recursive: true });
+            const filePath = path.join(autosaveDir, `${roomCode}.json`);
+            await fsPromises.writeFile(filePath, JSON.stringify(data, null, 2));
+        },
+        async loadAutoSave(roomCode) {
+            const filePath = path.join(__dirname, 'campaigns', 'autosave', `${roomCode}.json`);
+            const data = await fsPromises.readFile(filePath, 'utf-8');
+            return JSON.parse(data);
         }
     };
     console.log('📁 Using file system storage for campaigns.');
@@ -921,6 +940,53 @@ function createApiRouter(appConfig) {
             }
             res.json(result);
         } catch (err) {
+            res.status(500).json({ error: err.message });
+        }
+    });
+
+    // ─── Campaign auto-save (deterministic per-room slot) ────────────
+    // NEW: unlike the random-code routes below (POST /campaigns,
+    // GET /campaigns/:campaignCode -- kept unchanged, for the explicit
+    // manual share flow via !gm upload / !gm load <code>), these use a
+    // FIXED key equal to the room code itself, so the bot's automatic
+    // restart-survival persistence (CampaignManager.save()/load() in
+    // world-manager.js) never needs to track a separately-generated
+    // random code via a local pointer file that might not survive a
+    // restart. Declared BEFORE the `:campaignCode` param routes below so
+    // Express's declaration-order route matching doesn't ambiguously
+    // swallow a literal request to `.../campaigns/auto-save`.
+    //
+    // FIXED: these used to call storage.saveCampaign/loadCampaign with a
+    // magic campaignCode of 'autosave' -- reusing the SAME table/pruning
+    // logic as manual !gm upload snapshots. Since auto-save fires after
+    // nearly every command, its row was almost always the most recently
+    // updated one for a room, leaving only one slot for manual uploads
+    // under the default retention of 2 -- silently pruning a player's
+    // shared snapshot code before they could use it. Now calls dedicated
+    // saveAutoSave/loadAutoSave functions (both storage.js and the
+    // file-based fallback above implement these completely separately
+    // from the manual-share retention logic).
+    router.post('/api/rooms/:code/campaigns/auto-save', authenticate, async (req, res) => {
+        try {
+            const roomCode = req.params.code.toUpperCase();
+            room.getRoom(roomCode); // verify room exists
+            await storage.saveAutoSave(roomCode, req.body);
+            res.json({ success: true, room: roomCode, message: 'Campaign auto-saved' });
+        } catch (err) {
+            res.status(err.message.includes('not found') ? 404 : 500).json({ error: err.message });
+        }
+    });
+
+    router.get('/api/rooms/:code/campaigns/auto-save', authenticate, async (req, res) => {
+        try {
+            const roomCode = req.params.code.toUpperCase();
+            room.getRoom(roomCode); // verify room exists
+            const data = await storage.loadAutoSave(roomCode);
+            res.json(data);
+        } catch (err) {
+            if (err.code === 'ENOENT' || err.message.includes('not found')) {
+                return res.status(404).json({ error: 'No auto-saved campaign found' });
+            }
             res.status(500).json({ error: err.message });
         }
     });

@@ -9,15 +9,12 @@
  * - Avatar support
  * - Fixed attribute/skill lookup to match character data model
  * - Rich chat message rendering: Deck/Crown Spread synthesis text
- *   posted to chat (which carries the same embedded <em> tags and
- *   [Bracket] annotations as region card data) now renders as
- *   structured HTML instead of one escaped run-on line, matching the
- *   treatment already applied to Adventure Manager descriptions.
- *
- * NEW: Roll event dispatching – when a roll with outcome "Partial" or
- * "Miss" appears, dispatch `timer-tick-request`. When a roll has
- * storyBeats > 0, dispatch `sb-generated`. Uses a processed-ids Set
- * to avoid duplicate events on re-renders.
+ *   posted to chat renders as structured HTML.
+ * - Roll event dispatching: timer-tick-request and sb-generated.
+ * - REMOVED "Show full reading" toggle – all messages are shown in full.
+ * - NEW: Character detail panel with full sheet (attributes, skills, talents, assets, followers).
+ * - NEW: Follower chat – clicking a follower prompts for a message and sends as follower.
+ * - IMPROVED: Character sheet layout now looks like a TTRPG sheet with styled blocks.
  */
 
 import { vttStore } from '../../core/vtt-store.js';
@@ -105,13 +102,7 @@ export function qa(selector) {
 }
 
 // ============================================================
-// RICH CHAT TEXT RENDERING (plain text → nice HTML, composed from
-// sub-components at display time — same approach as Adventure
-// Manager's description renderer, for the same underlying reason:
-// Deck draws / Crown Spreads post their synthesis text straight to
-// chat, complete with inline <em> flavor tags and [Bracket: ...]
-// annotations from the region card data. Escaping that wholesale
-// turns it into a wall of "&lt;em&gt;" and literal brackets.
+// RICH CHAT TEXT RENDERING
 // ============================================================
 
 const RICH_TEXT_ALLOWED_TAGS = ['em', 'strong', 'i', 'b'];
@@ -164,9 +155,6 @@ function renderCrownSpreadChatHtml(text) {
         const marker = CHAT_POSITION_MARKERS.find(m => seg.startsWith(m));
         const rest = marker ? seg.slice(marker.length).trim() : seg;
         const colonIdx = rest.indexOf(':');
-        // Only treat a colon within the first ~25 chars as a "Label:" —
-        // further out (or inside "**Ace Effect:**"-style markdown) it's
-        // just punctuation inside the body text.
         let label = '';
         let body = rest;
         if (colonIdx > -1 && colonIdx <= 25) {
@@ -185,29 +173,11 @@ function renderCrownSpreadChatHtml(text) {
     }).join('');
 }
 
-// Clean, tag/bracket/marker-free text for the collapsed preview line.
-function chatPlainPreview(text, maxLen = 160) {
-    let plain = String(text)
-        .replace(/<\/?[^>]+>/g, '')
-        .replace(/\[[^\]]+\]/g, '')
-        .replace(/\*\*/g, '')
-        .replace(/[🌱🏔️👑🤝🌟⏱️♠️]/g, '')
-        .replace(/\s+/g, ' ')
-        .trim();
-    if (plain.length > maxLen) plain = plain.slice(0, maxLen).trim() + '…';
-    return plain;
-}
-
-let richChatMsgCounter = 0;
-
 /**
- * Renders a chat message's text nicely. Crown Spread / deck synthesis
- * text (detected by its emoji position markers) gets the structured
- * block treatment; anything else gets newline-aware paragraphing plus
- * the same [Bracket]/**bold** treatment, so ordinary player chat still
- * reads naturally (and looks identical to before for a normal one-line
- * message). Long messages get a "Show full reading" toggle so the
- * chat feed doesn't get overwhelmed by one giant Crown Spread post.
+ * Renders a chat message's text nicely. 
+ * - Trusted senders (GM, System) get full HTML sanitised – no "Show full reading" toggle.
+ * - Untrusted senders get the rich text treatment (Crown Spread blocks, bracket chips, bold).
+ * - Long messages are always fully shown.
  */
 function renderChatMessageText(rawText, sender = '') {
     const text = String(rawText || '');
@@ -215,19 +185,8 @@ function renderChatMessageText(rawText, sender = '') {
 
     const isTrusted = (sender === 'GM' || sender === 'System');
 
-    // --- Trusted senders: render HTML directly (sanitised) ---
+    // --- Trusted senders: render full sanitised HTML ---
     if (isTrusted) {
-        // For long messages, add a toggle
-        if (text.length > 220) {
-            const toggleId = `chat-msg-full-${++richChatMsgCounter}`;
-            const sanitizedFull = trustedSanitize(text);
-            return `
-                <span class="chat-msg-preview">${escHtml(chatPlainPreview(text))}</span>
-                <button class="btn btn-xs btn-ghost chat-msg-expand-btn" data-target="${toggleId}" style="font-size:0.7rem;padding:0.05rem 0.4rem;margin-left:0.3rem;">Show full reading</button>
-                <div id="${toggleId}" class="chat-msg-full" style="display:none;margin-top:0.3rem;">${sanitizedFull}</div>
-            `;
-        }
-        // Short trusted message: just sanitise and return
         return trustedSanitize(text);
     }
 
@@ -243,7 +202,7 @@ function renderChatMessageText(rawText, sender = '') {
 }
 
 // ============================================================
-// Roll event dispatching helpers (NEW)
+// Roll event dispatching helpers
 // ============================================================
 
 // Map outcome labels to machine‑friendly codes
@@ -433,21 +392,6 @@ export function renderChat() {
 
         setHtml(chatContainer, html);
 
-        // Wire up "Show full reading" toggles for long/Crown-Spread messages.
-        chatContainer.querySelectorAll('.chat-msg-expand-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                const target = chatContainer.querySelector(`#${btn.dataset.target}`);
-                const preview = btn.previousElementSibling;
-                if (!target) return;
-                const showing = target.style.display !== 'none';
-                target.style.display = showing ? 'none' : 'block';
-                if (preview && preview.classList.contains('chat-msg-preview')) {
-                    preview.style.display = showing ? 'inline' : 'none';
-                }
-                btn.textContent = showing ? 'Show full reading' : 'Show less';
-            });
-        });
-
         if (VTT_CONFIG.chatAutoScroll) {
             chatContainer.scrollTop = chatContainer.scrollHeight;
         }
@@ -507,21 +451,31 @@ function renderDeckDetails(deckData) {
 
 // ============================================================
 // Party Status – Vertical JRPG-style roster (scrollable list)
+// with expanded detail panel – NOW with a TTRPG-style sheet
 // ============================================================
 let charUnsubscribe = null;
+let detailUnsubscribe = null;
 
 export function renderVTTChars() {
     if (!currentContainer) return;
     const grid = currentContainer.querySelector('#vttCharGrid');
     if (!grid) return;
 
+    const detailContainer = currentContainer.querySelector('#vtt-char-detail');
+    if (!detailContainer) return;
+
+    // Clean up old subscriptions
     if (charUnsubscribe) charUnsubscribe();
+    if (detailUnsubscribe) detailUnsubscribe();
+
+    // Subscribe to characters list
     charUnsubscribe = vttStore.subscribe('characters', (chars) => {
         const vttChars = chars.filter(c => c.vtt !== false);
         const selectedId = vttStore.getSelectedCharacterId();
 
         if (vttChars.length === 0) {
             setHtml(grid, `<div style="text-align:center;padding:1.5rem;color:var(--text3);font-size:1.1rem;">👤 No VTT characters</div>`);
+            setHtml(detailContainer, '');
             return;
         }
 
@@ -570,15 +524,219 @@ export function renderVTTChars() {
         html += `</div>`;
         setHtml(grid, html);
 
+        // Click handler for character cards
         grid.querySelectorAll('.vtt-char-card').forEach(card => {
             card.addEventListener('click', (e) => {
                 const id = card.dataset.charId;
                 if (id) {
-                    vttStore.selectCharacter(id);
+                    // Toggle selection: if already selected, deselect; else select
+                    const current = vttStore.getSelectedCharacterId();
+                    if (current === id) {
+                        vttStore.selectCharacter(null);
+                    } else {
+                        vttStore.selectCharacter(id);
+                    }
                 }
             });
         });
     });
+
+    // Subscribe to selected character for detail panel – redesigned TTRPG sheet
+    detailUnsubscribe = vttStore.subscribe('selectedCharacterId', (id) => {
+        if (!id) {
+            setHtml(detailContainer, '');
+            return;
+        }
+        const char = vttStore.getSelectedCharacter();
+        if (!char) {
+            setHtml(detailContainer, '');
+            return;
+        }
+
+        // Normalise attribute keys: we expect 'body', 'wits', 'spirit', 'presence' or capitalized
+        const attrs = char.attributes || {};
+        const skillObj = char.skills || {};
+        const talents = char.talents || [];
+        const assets = char.assets || [];
+        const followers = char.followers || [];
+
+        // Helper to get attribute value with fallback
+        const getAttr = (key) => {
+            const lowerKey = key.toLowerCase();
+            const foundKey = Object.keys(attrs).find(k => k.toLowerCase() === lowerKey);
+            return foundKey ? attrs[foundKey] : 1;
+        };
+
+        // Build attribute blocks
+        const attrKeys = ['Body', 'Wits', 'Spirit', 'Presence'];
+        const attrEmojis = { 'Body': '💪', 'Wits': '🧠', 'Spirit': '✨', 'Presence': '👑' };
+        const attrBlocks = attrKeys.map(key => {
+            const val = getAttr(key);
+            return `
+                <div style="
+                    display:flex;
+                    flex-direction:column;
+                    align-items:center;
+                    background:var(--bg3);
+                    border-radius:6px;
+                    padding:0.3rem 0.6rem;
+                    border:1px solid var(--border);
+                    flex:1;
+                ">
+                    <span style="font-size:0.6rem;color:var(--text3);text-transform:uppercase;">${key}</span>
+                    <span style="font-size:1.2rem;font-weight:700;color:var(--gold);">${val}</span>
+                </div>
+            `;
+        }).join('');
+
+        // Skills – build a compact grid
+        let skillsHtml = '';
+        if (Object.keys(skillObj).length) {
+            const skillEntries = Object.entries(skillObj)
+                .filter(([k, v]) => v > 0) // show only skills with ranks > 0
+                .sort((a, b) => b[1] - a[1]); // sort by rank descending
+            if (skillEntries.length) {
+                skillsHtml = `
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.2rem 0.8rem;font-size:0.75rem;">
+                        ${skillEntries.map(([k, v]) => `
+                            <div style="display:flex;justify-content:space-between;border-bottom:1px dotted var(--border);padding:0.05rem 0;">
+                                <span>${escHtml(k)}</span>
+                                <span style="color:var(--gold);font-weight:600;">${v}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+            } else {
+                skillsHtml = `<div style="color:var(--text3);font-size:0.75rem;">No skills ranked</div>`;
+            }
+        } else {
+            skillsHtml = `<div style="color:var(--text3);font-size:0.75rem;">No skills</div>`;
+        }
+
+        // Talents, Assets, Followers as compact lists
+        const renderList = (items, label) => {
+            if (!items || items.length === 0) return '';
+            const listItems = items.map(item => {
+                const name = typeof item === 'string' ? item : (item.name || 'Unnamed');
+                return `<span style="
+                    display:inline-block;
+                    background:var(--bg4);
+                    border-radius:12px;
+                    padding:0.05rem 0.5rem;
+                    font-size:0.7rem;
+                    margin:0.1rem 0.2rem 0.1rem 0;
+                    border:1px solid var(--border);
+                    color:var(--text2);
+                ">${escHtml(name)}</span>`;
+            }).join('');
+            return `
+                <div style="margin-top:0.4rem;">
+                    <span style="font-weight:600;font-size:0.7rem;color:var(--text3);text-transform:uppercase;">${label}</span>
+                    <div style="display:flex;flex-wrap:wrap;margin-top:0.2rem;">${listItems}</div>
+                </div>
+            `;
+        };
+
+        // Followers – clickable chips with a special class
+        let followersHtml = '';
+        if (followers && followers.length) {
+            const followerItems = followers.map(f => {
+                const name = f.name || 'Unnamed';
+                return `<button class="btn btn-xs btn-secondary vtt-follower-btn" 
+                                data-char="${escHtml(char.name)}" 
+                                data-follower="${escHtml(name)}"
+                                style="
+                                    display:inline-block;
+                                    background:var(--bg4);
+                                    border-radius:12px;
+                                    padding:0.05rem 0.6rem;
+                                    font-size:0.7rem;
+                                    margin:0.1rem 0.2rem 0.1rem 0;
+                                    border:1px solid var(--gold);
+                                    color:var(--gold);
+                                    cursor:pointer;
+                                    transition:all 0.2s;
+                                "
+                                onmouseover="this.style.background='var(--gold)'; this.style.color='#1a1400';"
+                                onmouseout="this.style.background='var(--bg4)'; this.style.color='var(--gold)';"
+                            >💬 ${escHtml(name)}</button>`;
+            }).join('');
+            followersHtml = `
+                <div style="margin-top:0.4rem;">
+                    <span style="font-weight:600;font-size:0.7rem;color:var(--text3);text-transform:uppercase;">Followers</span>
+                    <div style="display:flex;flex-wrap:wrap;margin-top:0.2rem;">${followerItems}</div>
+                </div>
+            `;
+        }
+
+        // Build the full sheet
+        let detailHtml = `
+            <div style="
+                margin-top:0.8rem;
+                padding:0.8rem;
+                background:var(--bg2);
+                border-radius:var(--radius);
+                border:1px solid var(--gold);
+                box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            ">
+                <!-- Header -->
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.5rem;border-bottom:2px solid var(--gold);padding-bottom:0.3rem;">
+                    <div>
+                        <span style="font-size:1.2rem;font-weight:700;color:var(--gold);">${escHtml(char.name)}</span>
+                        <span style="font-size:0.7rem;color:var(--text3);background:var(--bg4);padding:0.05rem 0.5rem;border-radius:12px;margin-left:0.5rem;">Tier ${char.tier || 1}</span>
+                    </div>
+                    <button class="btn btn-xs btn-ghost" id="vtt-close-detail" style="font-size:1rem;padding:0.1rem 0.4rem;">✕</button>
+                </div>
+
+                <!-- Attributes -->
+                <div style="display:flex;gap:0.3rem;margin-bottom:0.5rem;">
+                    ${attrBlocks}
+                </div>
+
+                <!-- Skills -->
+                <div style="margin-top:0.3rem;">
+                    <div style="font-weight:600;font-size:0.7rem;color:var(--text3);text-transform:uppercase;margin-bottom:0.2rem;">Skills</div>
+                    ${skillsHtml}
+                </div>
+
+                <!-- Talents & Assets -->
+                ${renderList(talents, 'Talents')}
+                ${renderList(assets, 'Assets')}
+
+                <!-- Followers -->
+                ${followersHtml}
+            </div>
+        `;
+        setHtml(detailContainer, detailHtml);
+
+        // Close detail button
+        const closeBtn = detailContainer.querySelector('#vtt-close-detail');
+        if (closeBtn) {
+            closeBtn.addEventListener('click', () => {
+                vttStore.selectCharacter(null);
+            });
+        }
+
+        // Follower chat buttons (use event delegation or re-attach)
+        detailContainer.querySelectorAll('.vtt-follower-btn').forEach(btn => {
+            // Remove any old listener to avoid duplicates (if any)
+            btn.removeEventListener('click', followerClickHandler);
+            btn.addEventListener('click', followerClickHandler);
+        });
+    });
+}
+
+// Separate handler for follower clicks to avoid duplication
+function followerClickHandler(e) {
+    const btn = e.currentTarget;
+    const charName = btn.dataset.char;
+    const followerName = btn.dataset.follower;
+    const message = window.prompt(`What does ${followerName} say?`, '');
+    if (message && message.trim()) {
+        document.dispatchEvent(new CustomEvent('follower-chat', {
+            detail: { characterName: charName, followerName, message: message.trim() }
+        }));
+    }
 }
 
 // ============================================================
@@ -597,13 +755,9 @@ function populateRollerFromSelected(char) {
     const skillSelect = q('#vtt-skill');
     const boonsInput = q('#vtt-boons');
     if (attrSelect) {
-        // Use char.body as the default attribute; but we could also use the highest attribute
-        // For simplicity, we set to body (primary for many actions)
         attrSelect.value = char.body ?? 3;
     }
     if (skillSelect) {
-        // We can't auto-set a skill because there's no single "main" skill.
-        // The common rolls will set specific skills; we'll keep it as 0 here.
         skillSelect.value = 0;
     }
     if (boonsInput) {
@@ -643,7 +797,6 @@ export function renderCommonRolls() {
 
         let html = `<div style="display:flex;flex-wrap:wrap;gap:0.4rem;margin-top:0.4rem;">`;
         for (const [label, config] of Object.entries(COMMON_ROLLS)) {
-            // Use the character's actual attributes and skills
             const attrVal = char[config.attr] ?? 3;
             const skillVal = char.skills?.[config.skill] ?? 0;
             html += `
@@ -732,7 +885,6 @@ export function renderLocalPresence() {
     const presenceList = currentContainer.querySelector('#presence-list');
     if (!presenceList) return;
 
-    // Track both presence and characters
     let presenceUnsub = null;
     let charUnsub = null;
 
@@ -822,22 +974,18 @@ export function renderLocalPresence() {
         `;
         setHtml(presenceList, html);
 
-        // Attach change event for dropdowns
         presenceList.querySelectorAll('.vtt-char-select').forEach(select => {
             select.removeEventListener('change', handleCharSelect);
             select.addEventListener('change', handleCharSelect);
         });
     }
 
-    // Clean up old subscriptions
     if (presenceUnsub) presenceUnsub();
     if (charUnsub) charUnsub();
 
-    // Subscribe to both presence and characters
     presenceUnsub = vttStore.subscribe('presence', renderPresence);
     charUnsub = vttStore.subscribe('characters', renderPresence);
 
-    // Initial render
     renderPresence();
 }
 

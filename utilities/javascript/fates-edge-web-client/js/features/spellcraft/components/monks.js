@@ -34,6 +34,11 @@
  * Also replaced this file's private `rollDice()` with the shared
  * `performRoll()` from `core/dice.js` — there is no longer a second,
  * independently-tuned dice engine living in this file.
+ *
+ * ────────────────────────────────────────────────────────────────────────
+ * NEW: VTT integration – Meditation, Flow usage, and Technique usage
+ * now send formatted cards to the VTT via window.sendToVTT.
+ * ────────────────────────────────────────────────────────────────────────
  */
 
 import { getCharacterData, saveCharacter } from '../index.js';
@@ -96,6 +101,45 @@ function findPatronData(state, patronId) {
         }
     }
     return null;
+}
+
+// ============================================================
+// VTT HELPERS
+// ============================================================
+
+function sendVTTMessage(html) {
+    if (typeof window.sendToVTT === 'function') {
+        window.sendToVTT(html, 'System', { isHTML: true });
+    } else {
+        console.warn('[Monks] VTT not available — message not sent.');
+    }
+}
+
+function buildMonkCardHtml(title, patronName, patronIcon, effect, costDetails, extraNote = '') {
+    return `
+        <div style="
+            background:var(--bg2);
+            border-radius:var(--radius);
+            padding:0.5rem 0.8rem;
+            border:1px solid var(--border);
+            border-left:4px solid var(--gold);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            max-width: 450px;
+            margin:0.1rem 0;
+            font-family: inherit;
+        ">
+            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.2rem;">
+                <div style="display:flex;align-items:center;gap:0.3rem;">
+                    <span style="font-size:1.2rem;">${escHtml(patronIcon || '🧘')}</span>
+                    <span style="font-weight:700;font-size:1.05rem;color:var(--gold);">${escHtml(title)}</span>
+                </div>
+                <span style="font-size:0.65rem;color:var(--text3);">${escHtml(patronName || 'Monk')}</span>
+            </div>
+            ${effect ? `<div style="font-size:0.8rem;color:var(--text);margin-top:0.2rem;line-height:1.4;">${formatText(effect)}</div>` : ''}
+            ${costDetails ? `<div style="font-size:0.7rem;color:var(--text3);margin-top:0.15rem;">${formatText(costDetails)}</div>` : ''}
+            ${extraNote ? `<div style="font-size:0.65rem;color:var(--text3);margin-top:0.1rem;">${formatText(extraNote)}</div>` : ''}
+        </div>
+    `;
 }
 
 // ============================================================
@@ -627,10 +671,11 @@ export async function renderMonks(el) {
                 <div class="monks-flow" style="background:var(--bg2);border-radius:var(--radius);padding:0.3rem 0.5rem;border-left:4px solid var(--blue);text-align:center;">
                     <div style="font-size:0.7rem;color:var(--text3);">🌀 Flow Points</div>
                     <div style="font-size:1.2rem;font-weight:600;color:var(--blue);">${flowPoints} / ${maxFlowPoints}</div>
-                    <div style="display:flex;gap:0.2rem;justify-content:center;margin-top:0.1rem;">
+                    <div style="display:flex;gap:0.2rem;justify-content:center;margin-top:0.1rem;flex-wrap:wrap;">
                         <button class="btn btn-xs btn-secondary" onclick="window.monkAddFlow(1)">+</button>
                         <button class="btn btn-xs btn-secondary" onclick="window.monkAddFlow(-1)">−</button>
-                        <span style="font-size:0.55rem;color:var(--text3);">(Spend instead of Fatigue)</span>
+                        <button class="btn btn-xs btn-gold" onclick="window.monkUseFlow()">🌀 Use Flow</button>
+                        <span style="font-size:0.55rem;color:var(--text3);">(Spend 1 to avoid Fatigue)</span>
                     </div>
                 </div>
             </div>
@@ -862,17 +907,23 @@ function renderTechniques(traditionData, char) {
             (level === 'advanced' && hasTechnique(char, patronId, 'basic')) ||
             (level === 'master' && hasTechnique(char, patronId, 'advanced'))
         );
+        const effect = tech.effect || tech.description || '';
+        const cost = tech.cost || '';
         return `
             <div class="technique-item" style="display:flex;justify-content:space-between;align-items:center;padding:0.1rem 0.3rem;border-bottom:1px solid var(--border);font-size:0.75rem;${has ? `border-left:3px solid ${color};background:var(--bg3);` : ''}">
-                <div style="display:flex;align-items:center;gap:0.3rem;flex-wrap:wrap;">
+                <div style="display:flex;align-items:center;gap:0.3rem;flex-wrap:wrap;flex:1;min-width:0;">
                     <span>${has ? '✅' : '⬜'}</span>
                     <span style="${has ? 'font-weight:600;' : ''}">${escHtml(tech.name)}</span>
                     <span style="font-size:0.6rem;color:var(--text3);">${xpMap[level] || tech.xp || '?'} XP</span>
                     <span style="font-size:0.55rem;color:${color};">${labels[level]}</span>
-                    ${tech.effect ? `<div style="width:100%;font-size:0.6rem;color:var(--text2);">${formatText(tech.effect)}</div>` : ''}
+                    ${effect ? `<div style="width:100%;font-size:0.6rem;color:var(--text2);">${formatText(effect)}</div>` : ''}
+                    ${cost ? `<div style="font-size:0.6rem;color:var(--text3);">Cost: ${formatText(cost)}</div>` : ''}
                 </div>
-                ${!has && canLearn ? `<button class="btn btn-xs btn-gold" onclick="window.monkBuyTechnique('${patronId}','${level}')">Learn</button>` : ''}
-                ${!has && !canLearn ? `<span style="font-size:0.55rem;color:var(--text3);">${level === 'advanced' ? 'Requires Basic' : 'Requires Advanced'}</span>` : ''}
+                <div style="display:flex;gap:0.2rem;flex-shrink:0;margin-left:0.3rem;">
+                    ${has ? `<button class="btn btn-xs btn-gold" onclick="window.monkUseTechnique('${patronId}','${level}')">Use</button>` : ''}
+                    ${!has && canLearn ? `<button class="btn btn-xs btn-gold" onclick="window.monkBuyTechnique('${patronId}','${level}')">Learn</button>` : ''}
+                    ${!has && !canLearn ? `<span style="font-size:0.55rem;color:var(--text3);">${level === 'advanced' ? 'Requires Basic' : 'Requires Advanced'}</span>` : ''}
+                </div>
             </div>
         `;
     }).join('');
@@ -968,8 +1019,9 @@ window.monkChooseTradition = function() {
 };
 
 // ─── Meditate from dropdown ───────────────────────────────────
+// FIX: add async keyword to use await inside
 
-window.monkMeditateFromSelect = function() {
+window.monkMeditateFromSelect = async function() {
     const char = getCharacterData();
     if (!char) return;
 
@@ -1014,6 +1066,7 @@ window.monkMeditateFromSelect = function() {
 
     sessionStorage.setItem('fates-edge-meditation-result', resultHtml);
 
+    // ─── Send VTT card for successful meditation ──────────────
     if (result.achieved && !result.drained) {
         const fatigue = char.fatigue || 0;
         if (fatigue > 0) {
@@ -1046,6 +1099,21 @@ window.monkMeditateFromSelect = function() {
             breathState: char.breathState
         });
 
+        // Send VTT card
+        const patronName = char.monasticTradition ? (await getMonasticTraditionData(char))?.patronName || 'Monk' : 'Monk';
+        const patronIcon = char.monasticTradition ? (await getMonasticTraditionData(char))?.patronIcon || '🧘' : '🧘';
+        const effects = result.benefits.join('; ');
+        const costDetails = `Breath advanced to ${BREATH_LABELS[next]}`;
+        const cardHtml = buildMonkCardHtml(
+            'Meditation Success',
+            patronName,
+            patronIcon,
+            effects,
+            costDetails,
+            `DV ${dv} — The still point reached.`
+        );
+        sendVTTMessage(cardHtml);
+
         showToast(`🧘 Meditation successful! Breath advanced to ${BREATH_LABELS[next]}`, 'success');
     } else if (result.achieved && result.drained) {
         // Drained: no net benefit, but still advances breath
@@ -1055,6 +1123,20 @@ window.monkMeditateFromSelect = function() {
         const next = states[(idx + 1) % states.length];
         char.breathState = next;
         saveCharacter({ breathState: char.breathState });
+
+        // Send VTT card for drained meditation
+        const patronName = char.monasticTradition ? (await getMonasticTraditionData(char))?.patronName || 'Monk' : 'Monk';
+        const patronIcon = char.monasticTradition ? (await getMonasticTraditionData(char))?.patronIcon || '🧘' : '🧘';
+        const cardHtml = buildMonkCardHtml(
+            'Meditation (Drained)',
+            patronName,
+            patronIcon,
+            'Partial success – drained, but breath advances.',
+            `Breath advanced to ${BREATH_LABELS[next]}`,
+            'Mark 1 Fatigue (net no change)'
+        );
+        sendVTTMessage(cardHtml);
+
         showToast(`⚠️ Meditation drained, but breath advanced to ${BREATH_LABELS[next]}`, 'warning');
     } else {
         showToast('❌ Meditation failed. Try again after rest.', 'error');
@@ -1115,6 +1197,45 @@ window.monkAddFlow = function(amount) {
     saveCharacter({ flowPoints: newVal });
     renderMonks(container);
     showToast(`🌀 Flow: ${newVal}/${max}`, 'info');
+};
+
+// ─── Use Flow (spend 1 to avoid Fatigue) ──────────────────────
+// FIX: add async keyword to use await inside
+
+window.monkUseFlow = async function() {
+    const char = getCharacterData();
+    if (!char) return;
+
+    if (!isMonkInitiate(char)) {
+        showToast('Learn a Foundation talent first.', 'error');
+        return;
+    }
+
+    const current = getFlowPoints(char);
+    if (current < 1) {
+        showToast('No Flow points available.', 'error');
+        return;
+    }
+
+    // In practice, using Flow means you avoid Fatigue on a roll.
+    // We'll just mark the spend and send a VTT card.
+    char.flowPoints = current - 1;
+    saveCharacter({ flowPoints: char.flowPoints });
+
+    const patronName = char.monasticTradition ? (await getMonasticTraditionData(char))?.patronName || 'Monk' : 'Monk';
+    const patronIcon = char.monasticTradition ? (await getMonasticTraditionData(char))?.patronIcon || '🧘' : '🧘';
+    const cardHtml = buildMonkCardHtml(
+        '🌀 Flow Spent',
+        patronName,
+        patronIcon,
+        'You channel your inner stillness to avoid exhaustion.',
+        `Flow: ${char.flowPoints}/${getMaxFlowPoints(char)} remaining`,
+        'Use this to avoid marking Fatigue on a roll.'
+    );
+    sendVTTMessage(cardHtml);
+
+    showToast(`🌀 Spent 1 Flow. ${char.flowPoints}/${getMaxFlowPoints(char)} remaining.`, 'success');
+    renderMonks(container);
 };
 
 // ─── Learn Talent from dropdown ───────────────────────────────
@@ -1279,6 +1400,49 @@ window.monkBuyTechnique = async function(traditionId, level) {
     });
     showToast(`✅ Learned "${tech.name}"`, 'success');
     renderMonks(container);
+};
+
+// ─── Use Technique (send VTT card) ────────────────────────────
+// FIX: add async keyword to use await inside
+
+window.monkUseTechnique = async function(traditionId, level) {
+    const char = getCharacterData();
+    if (!char) return;
+
+    if (!isMonkInitiate(char)) {
+        showToast('Learn a Foundation talent first.', 'error');
+        return;
+    }
+
+    const traditionData = await findPatronTradition(traditionId);
+    if (!traditionData) return showToast('Tradition not found.', 'error');
+
+    const tech = traditionData.tradition.techniques?.[level];
+    if (!tech) return showToast('Technique not found.', 'error');
+
+    if (!hasTechnique(char, traditionId, level)) {
+        showToast('You haven\'t learned this technique.', 'error');
+        return;
+    }
+
+    const effect = tech.effect || tech.description || 'The technique is performed.';
+    const cost = tech.cost || '';
+    const name = tech.name || `${level} technique`;
+    const patronName = traditionData.patron.name || traditionData.patron.title;
+    const patronIcon = traditionData.patron.icon || '🧘';
+    const levelLabel = { basic: 'Basic', advanced: 'Advanced', master: 'Master' }[level] || level;
+
+    const cardHtml = buildMonkCardHtml(
+        `${levelLabel} Technique: ${name}`,
+        patronName,
+        patronIcon,
+        effect,
+        cost,
+        `Tradition: ${traditionData.tradition.name}`
+    );
+    sendVTTMessage(cardHtml);
+
+    showToast(`🧘 Used "${name}" — VTT card sent.`, 'success');
 };
 
 // ─── Legacy Learn Technique (redirects to dropdown) ───────────

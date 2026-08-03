@@ -26,7 +26,7 @@ const CONFIG = {
     get DEFAULT_WS_URL() {
         const isSecure = window.location.protocol === 'https:';
         return isSecure 
-            ? 'wss://fates-edge-ws.onrender.com'
+            ? 'ws://fates-edge-ws.onrender.com'
             : 'ws://localhost:10000';
     },
     get DEFAULT_SOCKET_URL() {
@@ -35,7 +35,7 @@ const CONFIG = {
             ? 'https://fates-edge-ws.onrender.com'
             : 'http://localhost:10000';
     },
-    DEFAULT_ROOM: 'vtt-room',
+    DEFAULT_ROOM: 'VTRM',
     MAX_RECONNECT: 5,
     RECONNECT_INTERVAL: 3000,
     CONNECTION_TIMEOUT: 10000

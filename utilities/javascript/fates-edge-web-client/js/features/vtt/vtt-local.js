@@ -13,6 +13,8 @@
  *      pool above the old 5-option dropdown range still work — every
  *      other reference to these fields (rollLocal, renderCommonRolls,
  *      etc.) reads `.value` the same way, so nothing else changes.
+ * v5 – Added character detail panel (TTRPG sheet) and follower chat,
+ *      matching the connected mode; chat height increased.
  */
 
 import { vttStore } from '../../core/vtt-store.js';
@@ -38,7 +40,7 @@ import {
   renderCommonRolls,
 } from './vtt-core.js';
 import { initVoice, toggleMute, getVoiceStatus, cleanupVoice, getActiveVoiceClients, getVoiceClient, onVoiceClientsChanged } from './voice.js';
-import { renderCombatActions, resetCombatScene } from './combat-actions.js'; // 👈 NEW
+import { renderCombatActions, resetCombatScene } from './combat-actions.js';
 
 // ============================================================
 // STATE
@@ -48,8 +50,10 @@ let container = null;
 let voiceInitialized = false;
 let presenceInterval = null;
 let eventListeners = [];
+let docEventListeners = [];
 let isDestroyed = false;
 let voiceUnsubscribe = null;
+const voiceStatus = { muted: false };
 
 // ============================================================
 // HELPERS – Get sender from selected character
@@ -58,7 +62,6 @@ let voiceUnsubscribe = null;
 function getSenderName() {
   const selected = vttStore.getSelectedCharacter();
   if (selected && selected.name) return selected.name;
-  // Fallback: first active character
   const chars = vttStore.state.characters || [];
   const active = chars.find(c => c.active !== false);
   if (active && active.name) return active.name;
@@ -89,20 +92,6 @@ export function sendMessage(text, sender, recipient = 'all', metadata = {}) {
   const msg = createLocalMessage(text, sender, recipient, metadata);
   vttStore.addChatMessage(msg);
   return msg;
-}
-
-// ============================================================
-// 👇 NEW: forward a roll summary into the GM's Combat Tracker log, if
-// it's open. Silently no-ops otherwise — the roll still posts to chat
-// as normal either way, this is just a convenience for the GM so they
-// don't have to cross-reference chat separately.
-// ============================================================
-
-async function logToGMTracker(sender, message) {
-  try {
-    const combat = await import('../encounters/combat.js');
-    combat.logExternalAction?.(sender, message, 'roll');
-  } catch (e) { /* combat module not available — ignore */ }
 }
 
 // ============================================================
@@ -169,7 +158,6 @@ function rollLocal(postToChat = true) {
         reRolls: result.reRolls
       }
     });
-    logToGMTracker(sender, msg); // 👈 NEW
   }
 }
 
@@ -203,19 +191,19 @@ function handleSlash(text) {
           storyBeats: result.storyBeats
         }
       });
-      logToGMTracker(sender, msg); // 👈 NEW
       break;
     }
     case 'timer': {
-      const segments = parseInt(parts[parts.length - 1], 10) || 4;
       const name = parts.slice(1, parts.length - 1).join(' ') || 'Scene Timer';
+      const segments = parseInt(parts[parts.length - 1], 10) || 4;
       import('../../core/state.js').then(module => {
         const state = module.getState();
-        const newTimer = { id: state._nextId++, name, segments, current: 0 };
-        module.addTimer(newTimer);
-        vttStore.updateTimers(state.timers || []);
-        const msg = `Timer created: ${name} (${segments} segments)`;
-        sendMessage(msg, 'System', 'all');
+        const newTimer = { id: 'timer-' + Date.now() + '-' + Math.random().toString(36).substr(2, 4), name, segments, current: 0 };
+        state.timers = state.timers || [];
+        state.timers.push(newTimer);
+        vttStore.updateTimers(state.timers);
+        sendMessage(`Timer created: ${name} (${segments} segments)`, 'System', 'all');
+        showToast(`Timer "${name}" created.`, 'success');
       }).catch(err => {
         showToast('Failed to create timer', 'error');
       });
@@ -262,7 +250,7 @@ function handleSlash(text) {
 }
 
 // ============================================================
-// VOICE (unchanged)
+// VOICE
 // ============================================================
 
 async function toggleVoice() {
@@ -330,7 +318,7 @@ function updateVoiceUI() {
 }
 
 // ============================================================
-// EVENT HANDLING – uses selected character
+// EVENT HANDLING
 // ============================================================
 
 function handleSendMessage() {
@@ -401,10 +389,9 @@ function attachEvents() {
           c.boons = Math.min(c.boons || 0, 2);
           if (before > c.boons) trimmed += (before - c.boons);
         });
-        // Re‑normalize characters after modification
         const chars = getCharacters();
         vttStore.updateCharacters(chars);
-        resetCombatScene(); // 👈 NEW: also refresh once-per-scene combat talents
+        resetCombatScene();
         if (trimmed > 0) {
           showToast(`Scene ended: trimmed ${trimmed} excess Boons.`, 'success');
         } else {
@@ -435,6 +422,17 @@ function attachEvents() {
   eventListeners.forEach(({event, handler}) => {
     container.addEventListener(event, handler);
   });
+
+  // ─── Follower chat listener ──────────────────────────────────────
+  const followerChatHandler = (e) => {
+    const { characterName, followerName, message } = e.detail;
+    if (!message || !followerName) return;
+    const sender = `${followerName} (${characterName})`;
+    sendMessage(message, sender, 'all');
+  };
+  document.addEventListener('follower-chat', followerChatHandler);
+  // Store for cleanup
+  docEventListeners.push({ event: 'follower-chat', handler: followerChatHandler });
 }
 
 // ============================================================
@@ -451,6 +449,7 @@ export function render(el) {
 
   const voiceClients = getActiveVoiceClients();
   const voiceAvailable = isConnectedToServer();
+  const status = getVoiceStatus();
 
   const voiceClientsHtml = voiceClients.map(id => {
     const client = getVoiceClient(id);
@@ -462,8 +461,7 @@ export function render(el) {
     </span>`;
   }).join('');
 
-  // In vtt-local.js, inside render():
-el.innerHTML = `
+  el.innerHTML = `
   <div class="vtt-live-table">
 
     <!-- Header -->
@@ -488,7 +486,7 @@ el.innerHTML = `
       <div class="vtt-stat-row" style="justify-content:space-between;">
         <div class="vtt-btn-row" style="align-items:center;">
           <button class="btn btn-sm ${voiceInitialized ? 'btn-primary' : ''}" id="vtt-voice-toggle">${voiceInitialized ? '🎤 Voice On' : '🎤 Voice Off'}</button>
-          ${voiceInitialized ? `<button class="btn btn-sm ${voiceStatus?.muted ? 'btn-danger' : 'btn-green'}" id="vtt-mute-toggle">${voiceStatus?.muted ? '🔇 Muted' : '🎙️ Live'}</button>` : ''}
+          ${voiceInitialized ? `<button class="btn btn-sm ${status?.muted ? 'btn-danger' : 'btn-green'}" id="vtt-mute-toggle">${status?.muted ? '🔇 Muted' : '🎙️ Live'}</button>` : ''}
           <span class="vtt-stat-pill" id="voice-clients-count">${voiceClients.length} voice users</span>
         </div>
       </div>
@@ -512,7 +510,8 @@ el.innerHTML = `
             <button class="btn btn-sm btn-ghost" id="vtt-clear-chat" title="Clear chat">🗑️</button>
           </div>
         </div>
-        <div class="chat-messages" id="chatMessages" style="flex:1;overflow-y:auto;padding:0.5rem;background:var(--vtt-surface2);border-radius:calc(var(--vtt-radius) - 2px);margin-bottom:0.5rem;font-size:1rem;display:flex;flex-direction:column;max-height:450px;min-height:250px;"></div>
+        <!-- INCREASED max-height from 450px to 600px to match connected mode -->
+        <div class="chat-messages" id="chatMessages" style="flex:1;overflow-y:auto;padding:0.5rem;background:var(--vtt-surface2);border-radius:calc(var(--vtt-radius) - 2px);margin-bottom:0.5rem;font-size:1rem;display:flex;flex-direction:column;max-height:600px;min-height:300px;"></div>
         <div id="selected-character-display" style="margin-bottom:0.4rem;padding:0.2rem 0.4rem;background:var(--vtt-surface2);border-radius:calc(var(--vtt-radius) - 2px);min-height:2.5rem;"></div>
         <div class="chat-input-row" style="display:flex;gap:0.4rem;">
           <input type="text" id="chatInput" placeholder="Type… (/roll, /timer, /help)" style="flex:1;font-size:1rem;padding:0.5rem 0.6rem;" />
@@ -538,9 +537,11 @@ el.innerHTML = `
               <button class="btn btn-sm btn-ghost" id="vtt-refresh-btn" title="Refresh">↻</button>
             </div>
             <div id="vttCharGrid" class="vtt-char-grid"></div>
+            <!-- NEW: detail panel for selected character (TTRPG sheet) -->
+            <div id="vtt-char-detail" style="margin-top:0.5rem;"></div>
           </div>
 
-          <!-- 👇 NEW: Combat Actions -->
+          <!-- Combat Actions -->
           <div class="vtt-panel vtt-card">
             <div class="vtt-card-header">
               <span class="vtt-card-title" style="font-size:1.05rem;">⚔️ Combat Actions</span>
@@ -608,7 +609,7 @@ el.innerHTML = `
   renderChat();
   renderVTTChars();
   renderCommonRolls();
-  renderCombatActions(); // 👈 NEW
+  renderCombatActions();
   renderVTTTimers();
   renderLocalPresence();
   renderVoiceClients();
@@ -621,16 +622,13 @@ el.innerHTML = `
   vttStore.updateTimers(getState().timers || []);
   vttStore.setConnectionStatus('local');
 
-  // Register voice client callback to update the store
   if (voiceUnsubscribe) voiceUnsubscribe();
   voiceUnsubscribe = onVoiceClientsChanged((clients) => {
     vttStore.updateVoiceClients(clients);
   });
 
-  // Attach DOM events
   attachEvents();
 
-  // Start presence update interval
   if (presenceInterval) clearInterval(presenceInterval);
   presenceInterval = setInterval(() => {
     if (isDestroyed || !container) {
@@ -643,7 +641,7 @@ el.innerHTML = `
     vttStore.updateTimers(getState().timers || []);
   }, VTT_CONFIG.presenceUpdateInterval);
 
-  console.log('[VTT Local] Rendered with reactive store (JRPG style + selection)');
+  console.log('[VTT Local] Rendered with reactive store (JRPG style + selection + detail panel)');
 }
 
 // ============================================================
@@ -665,6 +663,10 @@ export function destroy() {
     setContainer(null);
     container = null;
   }
+  docEventListeners.forEach(({event, handler}) => {
+    document.removeEventListener(event, handler);
+  });
+  docEventListeners = [];
   if (voiceUnsubscribe) {
     voiceUnsubscribe();
     voiceUnsubscribe = null;

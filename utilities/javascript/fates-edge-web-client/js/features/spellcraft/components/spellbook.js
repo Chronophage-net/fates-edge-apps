@@ -69,6 +69,32 @@
  *   no way to re-summon a *specific* spirit at all, so the directory
  *   would have no mechanical purpose yet.
  * ────────────────────────────────────────────────────────────────────────
+ *
+ * ────────────────────────────────────────────────────────────────────────
+ * NEW: "Send to VTT" — pushes a formatted Spell Card over the same
+ * websocket connection the rest of the app uses (js/core/websocket.js),
+ * so the connected VTT can display it. Two related actions:
+ *
+ * - 📡 Send Card: broadcasts the spell's name/tags/DV/effect/cost plus a
+ *   readable roll suggestion (both attribute options, since Free Casters
+ *   choose Wits or Spirit at cast time) via sendEvent({ type: 'spell-card', ... }).
+ *   Works for any spell regardless of magic path, since it's just a
+ *   reference card — no roll is performed.
+ * - Casting (spellbookUse, Free Caster only) now ALSO broadcasts the
+ *   already-rolled result via sendRoll() when connected, matching this
+ *   app's existing pattern of rolling client-side and broadcasting the
+ *   outcome (see sendRoll's doc comment in websocket.js) rather than
+ *   asking the VTT to roll on its own.
+ *
+ * - NEW: Full HTML spell card with magic path context:
+ *   - Free Caster: recommended DV, roll options (Wits+Arcana/Spirit+Arcana)
+ *   - Runekeeper/Invoker: Patron + Obligation
+ *   - Cantor: Corruption, Bloom Count, Resonant Rites
+ *   - Psion: Mental Strain
+ *   - Summoner: Leash capacity
+ *   - Interactive cast buttons on the card (Free Caster only) that trigger
+ *     the casting flow directly without additional prompts.
+ * ────────────────────────────────────────────────────────────────────────
  */
 
 import { getCharacterData, saveCharacter } from '../index.js';
@@ -77,6 +103,7 @@ import { showToast } from '../../../components/Toast.js';
 import { performRoll } from '../../../core/dice.js';
 import { getState } from '../../../core/state.js';
 import patronsModule from '../../patrons/index.js';
+import { sendEvent, sendRoll, isConnectedToServer } from '../../../core/websocket.js';
 
 // ============================================================
 // CONSTANTS
@@ -345,7 +372,6 @@ function getSpellbookMountEl() {
 // ============================================================
 // GRIMOIRE COLLECTION — Rites / Repertoire / Spirit Relationships
 // ============================================================
-// See file header note for the rules basis of each section.
 
 function findPatronDataForLookup(state, patronId) {
     if (!patronId) return null;
@@ -380,14 +406,21 @@ function getAllPatronsForLookup(state) {
     return all;
 }
 
-/**
- * Find full rite/song details by name across whichever patrons the
- * character actually has access to (bound patron for Runekeeper/Cantor,
- * carried Symbols for Invoker, or all patrons for an Unbound Cantor).
- * Falls back to searching every loaded patron if none of those narrow it
- * down, so a known name never just silently disappears.
- */
-function findKnownRiteDetails(state, char, riteName) {
+function parseRiteEntry(entry) {
+    const sep = entry.indexOf('::');
+    if (sep === -1) return { patronId: null, name: entry };
+    return { patronId: entry.slice(0, sep), name: entry.slice(sep + 2) };
+}
+
+function findKnownRiteDetails(state, char, entry) {
+    const { patronId, name: riteName } = parseRiteEntry(entry);
+
+    if (patronId) {
+        const patron = findPatronDataForLookup(state, patronId);
+        const rite = patron?.rites?.find(r => r.name === riteName);
+        if (rite) return { ...rite, patronName: patron.name || patron.title, patronIcon: patron.icon };
+    }
+
     const candidatePatronIds = [];
     if (char.patron) candidatePatronIds.push(char.patron);
     if (char.boundPatron) candidatePatronIds.push(char.boundPatron);
@@ -399,8 +432,6 @@ function findKnownRiteDetails(state, char, riteName) {
         if (rite) return { ...rite, patronName: patron.name || patron.title, patronIcon: patron.icon };
     }
 
-    // Fallback: search everything loaded (covers Unbound Cantors, or a
-    // rite learned before a patron change).
     for (const patron of getAllPatronsForLookup(state)) {
         const rite = patron.rites?.find(r => r.name === riteName);
         if (rite) return { ...rite, patronName: patron.name || patron.title, patronIcon: patron.icon };
@@ -412,7 +443,10 @@ function renderRitesKnownSection(char, state) {
     const known = char.rites || [];
     if (known.length === 0) return '';
 
-    const items = known.map(name => findKnownRiteDetails(state, char, name) || { name, tier: '', effect: '' });
+    const items = known.map(entry => {
+        const { name } = parseRiteEntry(entry);
+        return findKnownRiteDetails(state, char, entry) || { name, tier: '', effect: '' };
+    });
 
     return `
         <div class="grimoire-collection-section" style="background:var(--bg2);border-radius:var(--radius);padding:0.3rem 0.5rem;border-left:4px solid var(--gold);">
@@ -442,7 +476,10 @@ function renderRepertoireSection(char, state) {
     const known = char.repertoire || [];
     if (known.length === 0) return '';
 
-    const items = known.map(name => findKnownRiteDetails(state, char, name) || { name, tier: '', effect: '' });
+    const items = known.map(entry => {
+        const { name } = parseRiteEntry(entry);
+        return findKnownRiteDetails(state, char, entry) || { name, tier: '', effect: '' };
+    });
 
     return `
         <div class="grimoire-collection-section" style="background:var(--bg2);border-radius:var(--radius);padding:0.3rem 0.5rem;border-left:4px solid var(--gold);">
@@ -547,6 +584,145 @@ function renderGrimoireCollection(char, state) {
     if (hasSpiritStuff) html += renderSpiritRelationshipsSection(char);
     html += `</div>`;
     return html;
+}
+
+// ============================================================
+// BUILD SPELL CARD HTML (NEW)
+// ============================================================
+
+function buildSpellCardHTML(spell, char) {
+    const name = safeString(spell.name || 'Unnamed Spell');
+    const tags = spell.tags || [];
+    const dv = spell.dv || 1;
+    const effect = safeString(spell.effect || spell.description || '');
+    const category = spell.category || 'Utility';
+    const signature = !!spell.signature;
+    const cost = spell.cost || {};
+    const costObligation = cost.obligation || 0;
+    const wits = char.wits || 1;
+    const spirit = char.spirit || 1;
+    const arcana = char.skills?.arcana || 0;
+    const magicPath = char.magicPath || 'none';
+    const signatureBonus = signature ? 1 : 0;
+    const witsPool = wits + arcana + signatureBonus;
+    const spiritPool = spirit + arcana + signatureBonus;
+    const recommendedDv = 1 + tags.length;
+
+    // Tag badges
+    const tagBadges = tags.map(tag => {
+        const color = getTagColor(tag);
+        const def = getTagDefinition(tag);
+        return `<span style="display:inline-block;padding:0.05rem 0.4rem;margin:0.05rem;border-radius:8px;background:${color}22;border:1px solid ${color};font-size:0.6rem;color:${color};cursor:help;" title="${escHtml(def)}">${escHtml(tag)}</span>`;
+    }).join(' ');
+
+    // Magic path specific info
+    let pathInfo = '';
+    let buttonsHtml = '';
+
+    if (magicPath === 'free-caster') {
+        pathInfo = `
+            <div style="background:var(--bg3);padding:0.3rem 0.5rem;border-radius:6px;font-size:0.7rem;color:var(--text2);margin-top:0.2rem;">
+                <strong>Recommended DV:</strong> ${recommendedDv} (1 + ${tags.length} tag${tags.length > 1 ? 's' : ''})
+                ${signature ? '<br>⭐ <strong>Signature:</strong> +1 die' : ''}
+                <br><strong>Roll options:</strong>
+                <ul style="margin:0.1rem 0;padding-left:1rem;">
+                    <li><strong>Wits + Arcana:</strong> ${witsPool}d vs DV ${dv}</li>
+                    <li><strong>Spirit + Arcana:</strong> ${spiritPool}d vs DV ${dv}</li>
+                </ul>
+            </div>
+        `;
+        buttonsHtml = `
+            <div style="display:flex;gap:0.3rem;margin-top:0.3rem;flex-wrap:wrap;">
+                <button class="btn btn-xs btn-gold spell-cast-from-vtt" data-spell-id="${spell.id}" data-attr="wits">🔮 Cast with Wits</button>
+                <button class="btn btn-xs btn-gold spell-cast-from-vtt" data-spell-id="${spell.id}" data-attr="spirit">🔮 Cast with Spirit</button>
+            </div>
+        `;
+    } else {
+        // Other paths – show relevant stats
+        let pathLabel = '';
+        let pathStat = '';
+        if (magicPath === 'runekeeper' || magicPath === 'invoker') {
+            const patron = char.patron || 'None';
+            pathLabel = 'Patron';
+            pathStat = patron;
+            if (char.obligation > 0) {
+                pathStat += ` · Obligation: ${char.obligation}`;
+            }
+        } else if (magicPath === 'cantor') {
+            pathLabel = 'Cantor';
+            const corruption = char.corruption || 0;
+            const bloom = char.bloomCount || 0;
+            const rites = (char.resonantRites || []).length;
+            pathStat = `Corruption ${corruption} · Bloom ${bloom} · Resonant Rites ${rites}`;
+        } else if (magicPath === 'psion') {
+            pathLabel = 'Psion';
+            const strain = char.mentalStrain || 0;
+            pathStat = `Mental Strain ${strain}`;
+        } else if (magicPath === 'summoner') {
+            pathLabel = 'Summoner';
+            const leash = char.leash || 0;
+            const capacity = (char.spirit || 2) + (char.presence || 2);
+            pathStat = `Leash ${leash}/${capacity}`;
+        } else {
+            pathLabel = 'Magic Path';
+            pathStat = magicPath || 'None';
+        }
+        if (pathStat) {
+            pathInfo = `
+                <div style="background:var(--bg3);padding:0.2rem 0.5rem;border-radius:6px;font-size:0.65rem;color:var(--text2);margin-top:0.2rem;">
+                    <strong>${pathLabel}:</strong> ${escHtml(pathStat)}
+                </div>
+            `;
+        }
+        buttonsHtml = `
+            <div style="margin-top:0.3rem;font-size:0.65rem;color:var(--text3);">
+                ⚠️ Only Free Casters can cast from the grimoire.
+            </div>
+        `;
+    }
+
+    // Cost display
+    let costHtml = '';
+    if (costObligation > 0) {
+        costHtml = `<span style="background:var(--bg3);padding:0.05rem 0.4rem;border-radius:8px;font-size:0.6rem;color:var(--text3);">⛓️ Obligation ${costObligation}</span>`;
+    }
+
+    // Build the full card
+    return `
+        <div style="
+            background:var(--bg2);
+            border-radius:var(--radius);
+            padding:0.5rem 0.8rem;
+            border:1px solid var(--border);
+            border-left:4px solid ${signature ? 'var(--gold)' : 'var(--text3)'};
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            max-width: 450px;
+            margin:0.1rem 0;
+            font-family: inherit;
+        ">
+            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.2rem;">
+                <div style="display:flex;align-items:center;gap:0.3rem;flex-wrap:wrap;">
+                    ${signature ? '<span style="color:var(--gold);font-size:1rem;">⭐</span>' : ''}
+                    <span style="font-weight:700;font-size:1.05rem;color:${signature ? 'var(--gold)' : 'var(--text)'};">${escHtml(name)}</span>
+                    <span style="font-size:0.7rem;color:var(--text3);background:var(--bg3);padding:0.05rem 0.4rem;border-radius:8px;">DV ${dv}</span>
+                    ${costHtml}
+                </div>
+                <span style="font-size:0.65rem;color:var(--text3);">${getCategoryIcon(category)} ${category}</span>
+            </div>
+
+            <div style="font-size:0.75rem;color:var(--text2);margin-top:0.1rem;">
+                <strong>Caster:</strong> ${escHtml(char.name || 'Unknown')}
+            </div>
+
+            ${tags.length > 0 ? `<div style="display:flex;flex-wrap:wrap;gap:0.1rem;margin-top:0.1rem;">${tagBadges}</div>` : ''}
+
+            ${effect ? `<div style="font-size:0.8rem;color:var(--text);margin-top:0.2rem;line-height:1.4;padding-left:0.1rem;">${escHtml(effect)}</div>` : ''}
+
+            ${pathInfo}
+
+            ${buttonsHtml}
+        </div>
+    `;
 }
 
 // ============================================================
@@ -843,6 +1019,7 @@ function renderSpellItem(spell, index) {
                     ${usage > 0 ? `<span style="font-size:0.6rem;color:var(--text2);">cast ${usage}x ${rate > 0 ? `· ${rate}%` : ''}</span>` : ''}
                     ${costDisplay ? `<span style="font-size:0.55rem;color:var(--text3);">${escHtml(costDisplay)}</span>` : ''}
                     <button class="btn btn-xs btn-gold" onclick="window.spellbookUse('${escHtml(id)}')" title="Cast this spell" style="font-size:0.6rem;padding:0.05rem 0.3rem;">🔮 Cast</button>
+                    <button class="btn btn-xs btn-ghost" onclick="window.spellbookSendToVTT('${escHtml(id)}')" title="Send a formatted Spell Card to the connected VTT" style="font-size:0.6rem;">📡</button>
                     <button class="btn btn-xs btn-ghost" onclick="window.spellbookToggleSignature('${escHtml(id)}')" title="${signature ? 'Remove signature' : 'Mark as signature (gives +1 die)'}" style="color:${signature ? 'var(--gold)' : 'var(--text3)'};font-size:0.6rem;">⭐</button>
                     <button class="btn btn-xs btn-ghost" onclick="window.spellbookCopySpell('${escHtml(id)}')" title="Copy this spell" style="font-size:0.6rem;">📋</button>
                     <button class="btn btn-xs btn-ghost" onclick="window.spellbookEdit('${escHtml(id)}')" title="Edit" style="font-size:0.6rem;">✏️</button>
@@ -935,9 +1112,6 @@ function attachSpellbookEvents(el) {
 // ============================================================
 
 // ─── Add Spell ─────────────────────────────────────────────────
-// FIX: was a plain (non-async) function that never awaited
-// spellbookPromptCategory()'s Promise — see file header note.
-
 window.spellbookAddSpell = async function() {
     const char = getCharacterData();
     if (!char) return;
@@ -950,9 +1124,8 @@ window.spellbookAddSpell = async function() {
     const tags = tagsInput.trim() ? tagsInput.split(/\s+/) : [];
     const dv = safeParseInt(prompt('DV (difficulty, default 2):') || '2', 2);
 
-    // ─── Category dropdown ────────────────────────────────────
     const category = await window.spellbookPromptCategory('Category:', 'Utility');
-    if (category === null) return; // cancelled
+    if (category === null) return;
 
     const costObligation = safeParseInt(prompt('Obligation cost (if any):') || '0', 0);
 
@@ -984,8 +1157,6 @@ window.spellbookAddSpell = async function() {
 };
 
 // ─── From Tags (Free Caster) ──────────────────────────────────
-// FIX: same missing-await bug as spellbookAddSpell — see file header note.
-
 window.spellbookFromTags = async function() {
     const char = getCharacterData();
     if (!char) return;
@@ -994,7 +1165,6 @@ window.spellbookFromTags = async function() {
     if (!tagsInput) return;
     const tags = tagsInput.trim().split(/\s+/).map(t => t.toUpperCase());
 
-    // Validate tags
     const validTags = tags.filter(t => TAG_COLORS[t]);
     const invalidTags = tags.filter(t => !TAG_COLORS[t]);
     if (invalidTags.length > 0) {
@@ -1006,7 +1176,6 @@ window.spellbookFromTags = async function() {
     if (!name) return;
     const description = prompt('Description / Effect:') || '';
 
-    // ─── Category dropdown ────────────────────────────────────
     const category = await window.spellbookPromptCategory('Category:', 'Utility');
     if (category === null) return;
 
@@ -1034,24 +1203,14 @@ window.spellbookFromTags = async function() {
 };
 
 // ─── Templates ─────────────────────────────────────────────────
-
-// Legacy function – redirects to the dropdown version
 window.spellbookTemplates = function() {
     const select = document.getElementById('spellbook-template-select');
     if (select) {
-        // If the dropdown exists, use it
         window.spellbookLoadTemplateFromSelect();
     } else {
-        // Fallback: show a prompt with numbered list (kept for backward compatibility)
-        // But we want to eliminate modals, so we'll create the dropdown dynamically.
         const char = getCharacterData();
         if (!char) return;
 
-        const options = SPELL_TEMPLATES.map((t, i) =>
-            `${i + 1}. ${t.name} (DV ${t.dv}) — ${t.category}`
-        ).join('\n');
-
-        // Instead of prompt, we'll use a custom dropdown in a toast
         const modalHtml = `
             <div style="display:flex;flex-direction:column;gap:0.5rem;">
                 <p style="font-weight:600;">📋 Choose a template:</p>
@@ -1086,8 +1245,6 @@ window.spellbookTemplates = function() {
         }, 100);
     }
 };
-
-// ─── Load Template from dropdown ────────────────────────────
 
 window.spellbookLoadTemplateFromSelect = function() {
     const select = document.getElementById('spellbook-template-select');
@@ -1132,10 +1289,7 @@ window.spellbookLoadTemplateByIndex = function(idx) {
 };
 
 // ─── Category Prompt (shared helper) ─────────────────────────
-
 window.spellbookPromptCategory = function(promptText, defaultValue = 'Utility') {
-    // This returns the selected category from a dropdown in a toast.
-    // We use a synchronous-like pattern with a promise.
     return new Promise((resolve) => {
         const modalHtml = `
             <div style="display:flex;flex-direction:column;gap:0.5rem;">
@@ -1174,7 +1328,6 @@ window.spellbookPromptCategory = function(promptText, defaultValue = 'Utility') 
 };
 
 // ─── Copy Spell ─────────────────────────────────────────────────
-
 window.spellbookCopySpell = function(id) {
     const char = getCharacterData();
     if (!char) return;
@@ -1199,7 +1352,6 @@ window.spellbookCopySpell = function(id) {
 };
 
 // ─── Edit ──────────────────────────────────────────────────────
-
 window.spellbookEdit = async function(id) {
     const char = getCharacterData();
     if (!char) return;
@@ -1213,7 +1365,6 @@ window.spellbookEdit = async function(id) {
     const tags = tagsInput.trim() ? tagsInput.split(/\s+/) : [];
     const dv = safeParseInt(prompt('DV:', spell.dv || 2), 2);
 
-    // ─── Category dropdown ────────────────────────────────────
     const category = await window.spellbookPromptCategory('Category:', spell.category || 'Utility');
     if (category === null) return;
 
@@ -1238,7 +1389,6 @@ window.spellbookEdit = async function(id) {
 };
 
 // ─── Delete ────────────────────────────────────────────────────
-
 window.spellbookDelete = function(id) {
     const char = getCharacterData();
     if (!char) return;
@@ -1252,7 +1402,6 @@ window.spellbookDelete = function(id) {
 };
 
 // ─── Clear All ─────────────────────────────────────────────────
-
 window.spellbookClearAll = function() {
     const char = getCharacterData();
     if (!char) return;
@@ -1268,7 +1417,6 @@ window.spellbookClearAll = function() {
 };
 
 // ─── Toggle Signature ─────────────────────────────────────────
-
 window.spellbookToggleSignature = function(id) {
     const char = getCharacterData();
     if (!char) return;
@@ -1282,7 +1430,6 @@ window.spellbookToggleSignature = function(id) {
 };
 
 // ─── Clear Filters ─────────────────────────────────────────────
-
 window.spellbookClearFilters = function() {
     localStorage.removeItem('fates-edge-spellbook-filter-tag');
     localStorage.removeItem('fates-edge-spellbook-filter-signature');
@@ -1292,19 +1439,83 @@ window.spellbookClearFilters = function() {
 };
 
 // ============================================================
-// USE SPELL – Cast and Track (Free Caster only)
+// SEND TO VTT — Formatted Spell Card (UPDATED)
 // ============================================================
-// FIX: was a plain (non-async) function that never awaited
-// spellbookPromptAttribute()'s Promise, so the roll fired immediately with
-// an unresolved Promise as `attributeChoice` — casting always silently
-// used Wits, and the Cancel button never actually cancelled anything. See
-// file header note.
 
-window.spellbookUse = async function(id) {
+window.spellbookSendToVTT = function(id) {
+    const char = getCharacterData();
+    if (!char) {
+        showToast('No character selected.', 'error');
+        return;
+    }
+    const spell = char.spellbook?.find(s => s.id === id);
+    if (!spell) {
+        showToast('Spell not found.', 'error');
+        return;
+    }
+
+    if (typeof window.sendToVTT !== 'function') {
+        showToast('VTT not available. Please open the VTT module first.', 'error');
+        return;
+    }
+
+    const htmlCard = buildSpellCardHTML(spell, char);
+    window.sendToVTT(htmlCard, 'System', { isHTML: true });
+    showToast(`📡 Spell card for "${spell.name}" sent to VTT.`, 'success');
+};
+
+// ─── VTT Cast Button Listener ────────────────────────────────
+// Any button with class 'spell-cast-from-vtt' will trigger casting.
+// We also listen for a custom event from the VTT card.
+document.addEventListener('click', function(e) {
+    const target = e.target.closest('.spell-cast-from-vtt');
+    if (!target) return;
+    e.preventDefault();
+
+    const spellId = target.dataset.spellId;
+    const attr = target.dataset.attr; // 'wits' or 'spirit'
+    if (!spellId) {
+        showToast('Spell ID missing.', 'error');
+        return;
+    }
+
+    const char = getCharacterData();
+    if (!char) {
+        showToast('No character selected.', 'error');
+        return;
+    }
+    if ((char.magicPath || 'none') !== 'free-caster') {
+        showToast('Only Free Casters can cast spells.', 'error');
+        return;
+    }
+
+    // Fire the cast via the spellbookUse function with the chosen attribute.
+    window.spellbookUse(spellId, attr);
+});
+
+// ─── Also listen for a custom event (in case the card is rendered elsewhere) ──
+document.addEventListener('spell-cast-request', function(e) {
+    const { spellId, attribute } = e.detail || {};
+    if (!spellId || !attribute) return;
+    const char = getCharacterData();
+    if (!char) return;
+    if ((char.magicPath || 'none') !== 'free-caster') {
+        showToast('Only Free Casters can cast spells.', 'error');
+        return;
+    }
+    window.spellbookUse(spellId, attribute);
+});
+
+// ============================================================
+// USE SPELL – Cast and Track (Free Caster only) — REVISED
+// ============================================================
+// Now accepts an optional `attributeChoice` parameter so it can be called
+// directly from the VTT card buttons without prompting.
+
+window.spellbookUse = async function(id, attributeChoice) {
     const char = getCharacterData();
     if (!char) return;
 
-    // ─── CRITICAL: Only Free Casters can cast spells ────────────
     const magicPath = char.magicPath || 'none';
     if (magicPath !== 'free-caster') {
         showToastWithHTML(`
@@ -1316,10 +1527,6 @@ window.spellbookUse = async function(id) {
                 <p style="font-size:0.75rem;color:var(--text3);font-style:italic;">
                     "The Weave answers those who speak its raw grammar." – Lysandra
                 </p>
-                <p style="font-size:0.75rem;color:var(--text3);">
-                    Your current path is <strong>${PATH_META[magicPath]?.label || magicPath}</strong>.
-                    ${magicPath === 'none' ? 'Choose the Free Caster path to cast spells.' : 'Free Casters are the only ones who can improvise spellcasting.'}
-                </p>
                 <div style="display:flex;gap:0.3rem;flex-wrap:wrap;">
                     <button class="btn btn-sm btn-primary" onclick="this.closest('.custom-toast-modal').remove(); window.location.hash='spellcraft';">📖 Go to Spellcraft</button>
                     <button class="btn btn-sm btn-secondary" onclick="this.closest('.custom-toast-modal').remove();">Close</button>
@@ -1330,11 +1537,16 @@ window.spellbookUse = async function(id) {
     }
 
     const spell = char.spellbook.find(s => s.id === id);
-    if (!spell) return showToast('Spell not found.', 'error');
+    if (!spell) {
+        showToast('Spell not found.', 'error');
+        return;
+    }
 
-    // Determine dice pool with dropdown instead of confirm
-    const attributeChoice = await window.spellbookPromptAttribute();
-    if (attributeChoice === null) return; // cancelled
+    // If attributeChoice not provided, prompt
+    if (!attributeChoice) {
+        attributeChoice = await window.spellbookPromptAttribute();
+        if (attributeChoice === null) return;
+    }
 
     const wits = char.wits || 1;
     const spirit = char.spirit || 1;
@@ -1344,7 +1556,6 @@ window.spellbookUse = async function(id) {
     const attrName = attributeChoice === 'spirit' ? 'Spirit' : 'Wits';
     let pool = attr + arcana;
 
-    // Apply signature bonus
     const signatureBonus = getSignatureBonus(spell);
     if (signatureBonus > 0) {
         pool += signatureBonus;
@@ -1357,7 +1568,6 @@ window.spellbookUse = async function(id) {
         return;
     }
 
-    // Perform the roll
     const result = performRoll(pool, dv);
 
     // Determine outcome
@@ -1384,14 +1594,12 @@ window.spellbookUse = async function(id) {
         boonGain = 2;
     }
 
-    // Update usage stats
     spell.usage = (spell.usage || 0) + 1;
     if (result.successes >= dv) {
         spell._successes = (spell._successes || 0) + 1;
     }
     spell.updatedAt = Date.now();
 
-    // Apply Boon gain
     if (boonGain > 0) {
         char.boons = (char.boons || 0) + boonGain;
         if (char.boons > 5) char.boons = 5;
@@ -1417,8 +1625,21 @@ window.spellbookUse = async function(id) {
         backlashColor = 'var(--green)';
     }
 
-    // Signature bonus display
     const sigDisplay = signatureBonus > 0 ? `⭐ +${signatureBonus} die (signature)` : '';
+
+    if (isConnectedToServer()) {
+        sendRoll({
+            caster: char.name || 'Unknown Caster',
+            spellName: spell.name,
+            attribute: attrName,
+            pool,
+            dv,
+            dice: result.dice,
+            successes: result.successes,
+            outcome: outcomeLabel,
+            storyBeats: result.storyBeats || 0
+        });
+    }
 
     // Show result modal
     const msg = `
@@ -1437,6 +1658,7 @@ window.spellbookUse = async function(id) {
                 <strong>⚡ Backlash:</strong> ${backlashSeverity} — ${backlashDesc}
             </div>
             ${boonGain > 0 ? `<div style="font-size:0.75rem;color:var(--gold);">+${boonGain} Boon${boonGain > 1 ? 's' : ''} gained</div>` : ''}
+            ${isConnectedToServer() ? `<div style="font-size:0.6rem;color:var(--text3);">📡 Broadcast to VTT</div>` : ''}
             <div style="font-size:0.65rem;color:var(--text3);font-style:italic;margin-top:0.1rem;">
                 ${outcome === 'clean' ? '"The Weave remembers your precision." – Lysandra' :
                   outcome === 'miss' ? '"The Weave\'s receipt is your teacher." – Lysandra' :
@@ -1450,14 +1672,12 @@ window.spellbookUse = async function(id) {
 
     showToastWithHTML(msg, outcome === 'clean' ? 'success' : outcome === 'miss' ? 'error' : 'info');
 
-    // If signature spell, show a special animation effect
     if (signatureBonus > 0 && outcome === 'clean') {
         setTimeout(() => {
             showToast('⭐ Signature spell resonates! Extra die well spent.', 'success');
         }, 500);
     }
 
-    // Refresh the spellbook to update usage stats
     setTimeout(() => {
         const el = getSpellbookMountEl();
         if (el) renderSpellbook(el);
@@ -1465,10 +1685,7 @@ window.spellbookUse = async function(id) {
 };
 
 // ─── Attribute Prompt (for casting) ──────────────────────────
-
 window.spellbookPromptAttribute = function() {
-    // Returns 'wits' or 'spirit' or null if cancelled
-    // Using a synchronous-like pattern with a promise
     return new Promise((resolve) => {
         const modalHtml = `
             <div style="display:flex;flex-direction:column;gap:0.5rem;">
@@ -1509,10 +1726,6 @@ window.spellbookPromptAttribute = function() {
 // ============================================================
 // SPIRIT RELATIONSHIPS (Summoner — True Name Keeper, 15 XP)
 // ============================================================
-// See file header note. Gated on having actually learned the talent,
-// since RAW gives no mechanical way to re-summon a *specific* spirit
-// without it — recording one here without the talent would just be a
-// list with nothing to do.
 
 window.grimoireAddSpiritRelationship = function() {
     const char = getCharacterData();

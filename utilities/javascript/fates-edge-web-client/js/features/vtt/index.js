@@ -1,6 +1,7 @@
 /**
  * VTT – Main entry point
  * Selects Local or Connected module based on WebSocket availability.
+ * Exposes window.sendToVTT for other modules to post messages/cards.
  */
 
 import { isConnectedToServer, onEvent, offEvent } from '../../core/websocket.js';
@@ -11,7 +12,7 @@ let currentModule = null;
 let currentMode = null;
 let currentContainer = null;
 let connectionListener = null;
-let isDestroying = false; // Prevent reentrant destroys
+let isDestroying = false;
 
 function getModuleForMode(mode) {
     return mode === 'local' ? LocalVTT : ConnectedVTT;
@@ -19,7 +20,6 @@ function getModuleForMode(mode) {
 
 function safeDestroy(module) {
     if (!module) return;
-    // Only call destroy if the module exports it as a function
     if (typeof module.destroy === 'function') {
         try {
             module.destroy();
@@ -34,35 +34,49 @@ function renderModule(el) {
     const mode = isConnected ? 'connected' : 'local';
     const Module = getModuleForMode(mode);
 
-    // If mode changed or first load, destroy previous
     if (currentModule && currentModule !== Module) {
         safeDestroy(currentModule);
         currentModule = null;
         currentMode = null;
     }
 
-    // If same module, just render (it will reattach)
     if (currentModule === Module) {
-        // Ensure the container is up to date
         currentContainer = el;
         Module.render(el);
         return;
     }
 
-    // First time or mode change
     currentModule = Module;
     currentMode = mode;
     currentContainer = el;
     Module.render(el);
+
+    // ─── Expose global send function ──────────────────────────
+    // Other modules can call window.sendToVTT(text, sender, options)
+    // where options: { isHTML: boolean, recipient: string, metadata: object }
+    // If sender is 'System' or 'GM' and isHTML is true, the message is sanitised.
+    if (typeof Module.sendMessage === 'function') {
+        window.sendToVTT = (text, sender = 'System', options = {}) => {
+            const { isHTML = false, recipient = 'all', metadata = {} } = options;
+            // Only allow HTML for trusted senders
+            if (isHTML && sender !== 'System' && sender !== 'GM') {
+                console.warn('[VTT] HTML messages only allowed for System or GM senders.');
+                return false;
+            }
+            // The renderer in vtt-core already treats System/GM as trusted and sanitises.
+            Module.sendMessage(text, sender, recipient, metadata);
+            return true;
+        };
+        console.log('[VTT] Global sendToVTT exposed');
+    }
+
     console.log(`[VTT] Switched to ${mode} mode`);
 }
 
 export function render(el) {
-    // Ensure we are listening to connection changes
     if (!connectionListener) {
         connectionListener = (connected) => {
             if (currentContainer) {
-                // Re-render with the correct mode
                 renderModule(currentContainer);
             }
         };
@@ -72,12 +86,12 @@ export function render(el) {
     renderModule(el);
 }
 
-// Re-export functions that might be needed externally (like sendMessage)
 export function sendMessage(text, sender, recipient = 'all', metadata = {}) {
     if (currentModule && typeof currentModule.sendMessage === 'function') {
         return currentModule.sendMessage(text, sender, recipient, metadata);
     }
     console.warn('[VTT] No active module to send message');
+    return false;
 }
 
 export function isWSConnected() {
@@ -85,17 +99,17 @@ export function isWSConnected() {
 }
 
 export function destroy() {
-    // Clean up connection listener
     if (connectionListener) {
         offEvent('connected', connectionListener);
         offEvent('disconnected', connectionListener);
         connectionListener = null;
     }
-    // Destroy current module
     safeDestroy(currentModule);
     currentModule = null;
     currentMode = null;
     currentContainer = null;
+    // Clean up global
+    if (window.sendToVTT) delete window.sendToVTT;
     console.log('[VTT] Destroyed');
 }
 

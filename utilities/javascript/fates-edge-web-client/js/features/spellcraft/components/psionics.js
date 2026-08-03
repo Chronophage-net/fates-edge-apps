@@ -18,6 +18,11 @@
  *
  * All selection modals have been replaced with inline dropdowns.
  * Text-entry prompts (name, description) remain as simple prompt() calls.
+ *
+ * ────────────────────────────────────────────────────────────────────────
+ * NEW: VTT integration – Psionic Art usage now sends a formatted card
+ * to the VTT via window.sendToVTT.
+ * ────────────────────────────────────────────────────────────────────────
  */
 
 import { getCharacterData, saveCharacter } from '../index.js';
@@ -328,6 +333,47 @@ function getFallbackPsionTalents() {
             cost: o.cost
         }))
     ];
+}
+
+// ============================================================
+// VTT HELPERS (NEW)
+// ============================================================
+
+function sendVTTMessage(html) {
+    if (typeof window.sendToVTT === 'function') {
+        window.sendToVTT(html, 'System', { isHTML: true });
+    } else {
+        console.warn('[Psion] VTT not available — message not sent.');
+    }
+}
+
+function buildPsionCardHtml(title, patronName, target, effect, rollSummary, costDetails, extraNote = '') {
+    return `
+        <div style="
+            background:var(--bg2);
+            border-radius:var(--radius);
+            padding:0.5rem 0.8rem;
+            border:1px solid var(--border);
+            border-left:4px solid var(--blue);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            max-width: 450px;
+            margin:0.1rem 0;
+            font-family: inherit;
+        ">
+            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.2rem;">
+                <div style="display:flex;align-items:center;gap:0.3rem;">
+                    <span style="font-size:1.2rem;">🧠</span>
+                    <span style="font-weight:700;font-size:1.05rem;color:var(--blue);">${escHtml(title)}</span>
+                </div>
+                <span style="font-size:0.65rem;color:var(--text3);">${escHtml(patronName || 'Psion')}</span>
+            </div>
+            ${target ? `<div style="font-size:0.75rem;color:var(--text3);">Target: ${escHtml(target)}</div>` : ''}
+            ${effect ? `<div style="font-size:0.8rem;color:var(--text);margin-top:0.2rem;line-height:1.4;">${formatText(effect)}</div>` : ''}
+            ${rollSummary ? `<div style="font-size:0.75rem;color:var(--text2);margin-top:0.1rem;">${formatText(rollSummary)}</div>` : ''}
+            ${costDetails ? `<div style="font-size:0.7rem;color:var(--text3);margin-top:0.15rem;">${formatText(costDetails)}</div>` : ''}
+            ${extraNote ? `<div style="font-size:0.65rem;color:var(--text3);margin-top:0.1rem;">${formatText(extraNote)}</div>` : ''}
+        </div>
+    `;
 }
 
 // ============================================================
@@ -649,22 +695,42 @@ function performPsionicAction(char, artId, dv, strainCost, target) {
         const fatigueCost = overflow * 2;
         const harmCost = overflow;
         const confirmMsg = `Mental Strain would overflow by ${overflow} points. You can either:\n- Pay ${fatigueCost} Fatigue (standard conversion)\n- Pay ${harmCost} Harm (Stress)\n\nChoose "OK" to pay Fatigue, "Cancel" to pay Harm.`;
+        let overflowHandled = false;
+        let overflowCost = 0;
+        let overflowType = '';
         if (!confirm(confirmMsg)) {
             // Pay Harm
             const newHarm = (char.harm || 0) + harmCost;
             char.harm = newHarm;
             char.mentalStrain = mentalStrainMax;
-            showToast(`Overflow converted to Harm ${harmCost}. Mental Strain set to max.`, 'error');
+            overflowHandled = true;
+            overflowCost = harmCost;
+            overflowType = 'Harm';
         } else {
             // Pay Fatigue
             const newFatigue = (char.fatigue || 0) + fatigueCost;
             char.fatigue = newFatigue;
             char.mentalStrain = mentalStrainMax;
-            showToast(`Overflow converted to Fatigue ${fatigueCost}. Mental Strain set to max.`, 'warning');
+            overflowHandled = true;
+            overflowCost = fatigueCost;
+            overflowType = 'Fatigue';
         }
-        saveCharacter({ mentalStrain: char.mentalStrain, harm: char.harm, fatigue: char.fatigue });
-        window.psionRefresh();
-        return;
+        if (overflowHandled) {
+            saveCharacter({ mentalStrain: char.mentalStrain, harm: char.harm, fatigue: char.fatigue });
+            // Send VTT card for overflow
+            const cardHtml = buildPsionCardHtml(
+                `${art.label} — Overflow`,
+                'Psion',
+                target,
+                `Overflow: ${overflow} points converted to ${overflowType} ${overflowCost}.`,
+                `Mental Strain set to ${mentalStrainMax}/${mentalStrainMax}.`,
+                `Strain cost would have been ${strainCost}.`,
+                '⚠️ Mental Strain capacity exceeded.'
+            );
+            sendVTTMessage(cardHtml);
+            window.psionRefresh();
+            return;
+        }
     }
 
     // Roll
@@ -675,8 +741,28 @@ function performPsionicAction(char, artId, dv, strainCost, target) {
     // Apply Mental Strain
     char.mentalStrain = mentalStrain + strainCost;
 
-    // Apply Story Beats (GM can use them)
-    // For now, just display them
+    // Build roll summary for VTT card
+    const outcomeText = success ? '✅ Success' : '❌ Failure';
+    const rollSummary = `${pool}d vs DV ${dv} → ${rollResult.successes} successes (rolled: ${rollResult.dice.join(', ')})`;
+    const costDetails = `Mental Strain +${strainCost} (now ${char.mentalStrain}/${mentalStrainMax})${sb > 0 ? ` · 🎲 ${sb} SB generated` : ''}`;
+
+    // Build effect description based on chosen effect from dropdown
+    // We don't have the effect text here, but we can try to get it from the selected option
+    // In the inline flow, we could pass the effect text, but we'll use the art.description.
+    const effectText = `${art.label} on ${target}`;
+
+    // Build VTT card
+    const patronName = 'Psion'; // No patron for psions
+    const cardHtml = buildPsionCardHtml(
+        art.label,
+        patronName,
+        target,
+        effectText,
+        rollSummary,
+        costDetails,
+        `${outcomeText}`
+    );
+    sendVTTMessage(cardHtml);
 
     // Determine outcome message
     let outcome = success ? '✅ Success' : '❌ Failure';

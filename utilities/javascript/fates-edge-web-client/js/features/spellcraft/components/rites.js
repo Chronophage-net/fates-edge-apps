@@ -34,6 +34,12 @@
  * full (so you can browse and decide what's worth learning) with a
  * "📖 Learn (X XP)" button that spends the Rite's own listed `xp` cost.
  * ────────────────────────────────────────────────────────────────────────
+ *
+ * ────────────────────────────────────────────────────────────────────────
+ * NEW: VTT integration — every invocation (Patron's Gift, Borrowed Grace,
+ * Crack the Seal) now sends a beautifully formatted card to the VTT,
+ * matching the spellbook's style. Uses window.sendToVTT if available.
+ * ────────────────────────────────────────────────────────────────────────
  */
 
 import { getState, saveState, getCharacter, updateCharacter } from '../../../core/state.js';
@@ -204,33 +210,56 @@ function getPatronGift(patronData) {
 }
 
 // ─── Rite Obligation cost parsing (for Crack the Seal) ──────
-//
-// RULES FIX (Player's Guide §4.2.3): "Crack the Seal — Resolve a known Rite
-// instantly as 1 action. Set the Symbol to Compromised and mark double the
-// Rite's base cost (minimum +2, or +3 for High Rites)."
-//
-// Rite JSON objects give their base Obligation cost as a string like
-// "Mark +1 Obligation." or "Mark +2 Obligation." — this pulls the numeric
-// value out of that string so Crack the Seal can double the RIGHT number
-// instead of a flat guess.
-
 function parseRiteBaseObligationCost(rite) {
     const costStr = safeString(rite?.cost || '');
     const match = costStr.match(/\+\s*(\d+)\s*Obligation/i);
     if (match) return parseInt(match[1], 10);
-    return 1; // sensible default for rites that don't specify a numeric cost
+    return 1;
+}
+
+// ─── Character Tier (for High Rite gating) ─────────────────
+const TIER_THRESHOLDS = [
+    { min: 0,   max: 40,       tier: 'I',   name: 'Novice' },
+    { min: 41,  max: 90,       tier: 'II',  name: 'Seasoned' },
+    { min: 91,  max: 150,      tier: 'III', name: 'Veteran' },
+    { min: 151, max: 220,      tier: 'IV',  name: 'Paragon' },
+    { min: 221, max: Infinity, tier: 'V',   name: 'Mythic' }
+];
+
+const TIER_RANK = { 'I': 1, 'II': 2, 'III': 3, 'IV': 4, 'V': 5 };
+
+function getCharacterTier(char) {
+    if (char && char.tier && TIER_RANK[char.tier]) return char.tier;
+    const totalXp = (char && char.totalXp) || 0;
+    const found = TIER_THRESHOLDS.find(t => totalXp >= t.min && totalXp <= t.max);
+    return found ? found.tier : 'I';
+}
+
+function meetsTierRequirement(char, requiredTier) {
+    const charRank = TIER_RANK[getCharacterTier(char)] || 1;
+    const requiredRank = TIER_RANK[requiredTier] || 1;
+    return charRank >= requiredRank;
+}
+
+// ─── Rite identity (patron-scoped) ─────────────────────────
+function riteKey(patronId, riteName) {
+    return `${patronId}::${riteName}`;
+}
+
+function isRiteKnown(char, patronId, riteName) {
+    const known = (char && char.rites) || [];
+    if (known.includes(riteKey(patronId, riteName))) return true;
+    // Legacy fallback: pre-fix characters may only have the bare name.
+    return known.includes(riteName);
 }
 
 // ─── Check if character has access to Patron's Gifts ──────
-
 function hasAccessToPatronGifts(char) {
     if (!char) return false;
     if (char.magicPath === 'runekeeper') {
-        // Runekeeper needs Familiar (Thiasos) to access Patron's Gift
         return (char.learnedTalents || []).includes('familiar');
     }
     if (char.magicPath === 'invoker') {
-        // Invoker needs at least one Symbol
         return (char.symbols || []).length > 0;
     }
     return false;
@@ -239,14 +268,78 @@ function hasAccessToPatronGifts(char) {
 function hasAccessToRites(char) {
     if (!char) return false;
     if (char.magicPath === 'runekeeper') {
-        // Runekeeper needs Codex to access Rites
         return (char.learnedTalents || []).includes('codex');
     }
     if (char.magicPath === 'invoker') {
-        // Invoker needs at least one Symbol to perform rituals
         return (char.symbols || []).length > 0;
     }
     return false;
+}
+
+// ============================================================
+// VTT HELPERS
+// ============================================================
+
+function sendVTTMessage(html) {
+    if (typeof window.sendToVTT === 'function') {
+        window.sendToVTT(html, 'System', { isHTML: true });
+    } else {
+        console.warn('[Rites] VTT not available — message not sent.');
+    }
+}
+
+function buildGiftCardHtml(title, patronName, patronIcon, effect, costDetails, extraNote = '') {
+    return `
+        <div style="
+            background:var(--bg2);
+            border-radius:var(--radius);
+            padding:0.5rem 0.8rem;
+            border:1px solid var(--border);
+            border-left:4px solid var(--gold);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            max-width: 450px;
+            margin:0.1rem 0;
+            font-family: inherit;
+        ">
+            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.2rem;">
+                <div style="display:flex;align-items:center;gap:0.3rem;">
+                    <span style="font-size:1.2rem;">${escHtml(patronIcon || '🔮')}</span>
+                    <span style="font-weight:700;font-size:1.05rem;color:var(--gold);">${escHtml(title)}</span>
+                </div>
+                <span style="font-size:0.65rem;color:var(--text3);">${escHtml(patronName)}</span>
+            </div>
+            ${effect ? `<div style="font-size:0.8rem;color:var(--text);margin-top:0.2rem;line-height:1.4;">${formatText(effect)}</div>` : ''}
+            ${costDetails ? `<div style="font-size:0.7rem;color:var(--text3);margin-top:0.15rem;">${formatText(costDetails)}</div>` : ''}
+            ${extraNote ? `<div style="font-size:0.65rem;color:var(--text3);margin-top:0.1rem;">${formatText(extraNote)}</div>` : ''}
+        </div>
+    `;
+}
+
+function buildRiteCardHtml(riteName, patronName, patronIcon, effect, costDetails, extraNote = '') {
+    return `
+        <div style="
+            background:var(--bg2);
+            border-radius:var(--radius);
+            padding:0.5rem 0.8rem;
+            border:1px solid var(--border);
+            border-left:4px solid var(--gold);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            max-width: 450px;
+            margin:0.1rem 0;
+            font-family: inherit;
+        ">
+            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.2rem;">
+                <div style="display:flex;align-items:center;gap:0.3rem;">
+                    <span style="font-size:1.2rem;">${escHtml(patronIcon || '📜')}</span>
+                    <span style="font-weight:700;font-size:1.05rem;color:var(--gold);">${escHtml(riteName)}</span>
+                </div>
+                <span style="font-size:0.65rem;color:var(--text3);">${escHtml(patronName)}</span>
+            </div>
+            ${effect ? `<div style="font-size:0.8rem;color:var(--text);margin-top:0.2rem;line-height:1.4;">${formatText(effect)}</div>` : ''}
+            ${costDetails ? `<div style="font-size:0.7rem;color:var(--text3);margin-top:0.15rem;">${formatText(costDetails)}</div>` : ''}
+            ${extraNote ? `<div style="font-size:0.65rem;color:var(--text3);margin-top:0.1rem;">${formatText(extraNote)}</div>` : ''}
+        </div>
+    `;
 }
 
 // ============================================================
@@ -614,8 +707,9 @@ function renderSinglePatronRites(patronData, characterId, charName, allPatronIds
                 </div>
         `;
 
-        ritesInTier.forEach((rite, idx) => {
-            html += renderRiteItem(rite, patronId, idx, isInvoker, characterId, char);
+        ritesInTier.forEach((rite, localIdx) => {
+            const globalIdx = rites.indexOf(rite);
+            html += renderRiteItem(rite, patronId, globalIdx, isInvoker, characterId, char, localIdx === 0);
         });
 
         html += `</div>`;
@@ -633,7 +727,7 @@ function renderSinglePatronRites(patronData, characterId, charName, allPatronIds
 // RENDER A SINGLE RITE
 // ============================================================
 
-function renderRiteItem(rite, patronId, idx, isInvoker, characterId, char) {
+function renderRiteItem(rite, patronId, idx, isInvoker, characterId, char, isFirstInTier = false) {
     const riteId = `${patronId}-rite-${idx}`;
     const name = safeString(rite.name);
     const tier = safeString(rite.tier || 'Basic');
@@ -655,23 +749,19 @@ function renderRiteItem(rite, patronId, idx, isInvoker, characterId, char) {
     const hasDetails = !!(effect || pushIt || materials || cost || requires || invoke || duration || timer || tags.length > 0);
     const color = getTierColor(tier);
 
-    const expanded = idx === 0 && hasDetails;
+    const expanded = isFirstInTier && hasDetails;
 
-    // RULES FIX (see file header note): only Rites in char.rites are
-    // actually known — Crack the Seal ("resolve a KNOWN Rite") and any
-    // future invocation UI should gate on this, not just on having a
-    // Symbol/Codex at all.
-    const knownRites = (char && char.rites) || [];
-    const isKnown = knownRites.includes(name);
+    const isKnown = isRiteKnown(char, patronId, name);
 
-    // ─── Crack the Seal (Invokers only, and only once the Rite is known) ──
     const canCrackSeal = isInvoker && isKnown;
 
-    // Preview the Crack the Seal cost inline so it's visible before clicking.
     const baseObligationCost = parseRiteBaseObligationCost(rite);
     const isHighTier = tier.toLowerCase() === 'high';
     const crackMinimum = isHighTier ? 3 : 2;
     const crackCostPreview = Math.max(baseObligationCost * 2, crackMinimum);
+
+    const tierLocked = isHighTier && !isKnown && !meetsTierRequirement(char, 'III');
+    const charTierDisplay = getCharacterTier(char);
 
     let detailsHtml = '';
     if (hasDetails) {
@@ -696,7 +786,11 @@ function renderRiteItem(rite, patronId, idx, isInvoker, characterId, char) {
                     </div>
                 ` : ''}
                 <div style="margin-top:0.2rem;display:flex;gap:0.4rem;align-items:center;flex-wrap:wrap;">
-                    ${!isKnown ? `
+                    ${tierLocked ? `
+                        <span style="font-size:0.65rem;color:var(--red);" title="High Rites require Tier III or higher">
+                            🔒 Requires Tier III (currently Tier ${escHtml(charTierDisplay)})
+                        </span>
+                    ` : !isKnown ? `
                         <button class="btn btn-xs btn-gold" onclick="window.learnRite('${patronId}', ${idx}, '${characterId}')" title="Add this Rite to your known Rites for ${xpCost} XP">
                             📖 Learn (${xpCost} XP)
                         </button>
@@ -732,7 +826,7 @@ function renderRiteItem(rite, patronId, idx, isInvoker, characterId, char) {
 }
 
 // ============================================================
-// GLOBAL FUNCTIONS: Patron's Gift (Runekeeper)
+// GLOBAL FUNCTIONS: Patron's Gift (Runekeeper) — WITH VTT
 // ============================================================
 
 window.usePatronGift = async function(patronId, characterId) {
@@ -741,9 +835,6 @@ window.usePatronGift = async function(patronId, characterId) {
         showToast('Character not found.', 'error');
         return;
     }
-    if (!char) return;
-
-    // Check if Runekeeper with Familiar
     if (char.magicPath !== 'runekeeper') {
         showToast('Only Runekeepers can use Patron\'s Gift.', 'error');
         return;
@@ -753,7 +844,6 @@ window.usePatronGift = async function(patronId, characterId) {
         return;
     }
 
-    // Fetch patron data
     const state = getState();
     const patronData = findPatronData(state, patronId);
     if (!patronData) {
@@ -771,11 +861,22 @@ window.usePatronGift = async function(patronId, characterId) {
     setPatronObligation(char.id, patronId, currentObligation + 1);
     savePatronData();
 
-    // Apply effect (narrative, +1 die to thematic skill, etc.)
-    // In a real game, the GM would adjudicate; we show a confirmation.
     const name = safeString(gift.name || 'Patron\'s Gift');
     const effect = safeString(gift.effect || 'The item glows with patron\'s favor.');
+    const costDetails = `Obligation +1 (now ${currentObligation + 1})`;
+
     showToast(`✨ ${name}: ${effect} (Obligation +1)`, 'success');
+
+    // Send VTT card
+    const cardHtml = buildGiftCardHtml(
+        name,
+        patronData.name || patronData.title || patronId,
+        patronData.icon || '🔮',
+        effect,
+        costDetails,
+        'Runekeeper — Patron\'s Gift (Imbuement)'
+    );
+    sendVTTMessage(cardHtml);
 
     // Refresh the rites view
     const container = document.getElementById('spellcraft-content');
@@ -787,25 +888,13 @@ window.usePatronGift = async function(patronId, characterId) {
 };
 
 // ============================================================
-// GLOBAL FUNCTIONS: Borrowed Grace (Invoker)
+// GLOBAL FUNCTIONS: Borrowed Grace (Invoker) — WITH VTT
 // ============================================================
-//
-// RULES FIX (Player's Guide §4.2.3/§4.7.2, Invoker Guide App. A.2):
-// Borrowed Grace is usable ONCE PER SCENE, and if the Symbol invoked is
-// Compromised it works at -1 die. Neither of those was tracked before —
-// the ability could be spammed repeatedly, and a Compromised Symbol (the
-// very thing Crack the Seal produces) had no consequence at all.
-// "Scene" isn't otherwise tracked in this app, so this uses a simple
-// char.sceneFlags.borrowedGrace flag with a manual "New Scene" reset
-// button, matching the app's existing pattern of manually-logged state
-// (Resonant Rites, Corruption, etc.) rather than inventing an automatic
-// scene-detection system.
 
 window.useBorrowedGrace = async function(patronId, costType, characterId = 'default-character') {
     const char = getCharacterData(characterId);
     if (!char) return;
 
-    // Check if Invoker with Symbols
     if (char.magicPath !== 'invoker') {
         showToast('Only Invokers can use Borrowed Grace.', 'error');
         return;
@@ -852,7 +941,6 @@ window.useBorrowedGrace = async function(patronId, costType, characterId = 'defa
     if (!char.sceneFlags) char.sceneFlags = {};
     char.sceneFlags.borrowedGrace = true;
 
-    // Fetch patron data for gift effect
     const state = getState();
     const patronData = findPatronData(state, patronId);
     if (!patronData) {
@@ -865,14 +953,26 @@ window.useBorrowedGrace = async function(patronId, costType, characterId = 'defa
         return;
     }
 
-    // Apply effect (narrative)
     const name = safeString(gift.name || 'Borrowed Grace');
     const effect = safeString(gift.effect || 'The Symbol flares with borrowed power.');
-    const penaltyNote = isCompromised ? ' ⚠️ Symbol is Compromised — this applies at −1 die.' : '';
-    showToast(`🎴 ${name}: ${effect}${penaltyNote} (Cost: 1 ${costType}, Obligation +1)`, 'success');
+    const costDetails = `Cost: 1 ${costType}, Obligation +1 (now ${currentObligation + 1})`;
+    const penaltyNote = isCompromised ? '⚠️ Symbol is Compromised — this applies at −1 die.' : '';
 
-    // Save character changes (boons/fatigue/scene flag)
-    saveCharacter({ boons: char.boons, fatigue: char.fatigue, sceneFlags: char.sceneFlags });
+    showToast(`🎴 ${name}: ${effect}${penaltyNote ? ' ' + penaltyNote : ''} (Cost: 1 ${costType}, Obligation +1)`, 'success');
+
+    // Send VTT card
+    const cardHtml = buildGiftCardHtml(
+        name,
+        patronData.name || patronData.title || patronId,
+        patronData.icon || '🔮',
+        effect,
+        costDetails,
+        `Invoker — Borrowed Grace${penaltyNote ? ' · ' + penaltyNote : ''}`
+    );
+    sendVTTMessage(cardHtml);
+
+    // Save character changes
+    saveCharacter(characterId, { boons: char.boons, fatigue: char.fatigue, sceneFlags: char.sceneFlags });
 
     // Refresh the rites view
     const container = document.getElementById('spellcraft-content');
@@ -902,53 +1002,9 @@ window.startNewScene = function(characterId = 'default-character') {
     }
 };
 
-// ─── Helper to get character data (imported from main spellcraft) ──
-// We assume the global getCharacterData is available.
-// If not, we import from the spellcraft main.
-// We'll use a fallback.
-
-// ─── Safe character access using state.js ──────────────────
-
-function getCharacterData(characterId) {
-    if (!characterId) return null;
-    return getCharacter(characterId);
-}
-
-function saveCharacter(characterId, updates) {
-    if (!characterId) return false;
-    const result = updateCharacter(characterId, updates);
-    return !!result;
-}
-
-// Expose for onclick handlers (they pass characterId)
-window.getCharacterData = getCharacterData;
-window.saveCharacter = saveCharacter;
-
-// We'll expose these functions to window for onclick.
-window.getCharacterData = getCharacterData;
-window.saveCharacter = saveCharacter;
-
 // ============================================================
-// CRACK THE SEAL (Invokers only)
+// CRACK THE SEAL (Invokers only) — WITH VTT
 // ============================================================
-//
-// RULES FIX (Player's Guide §4.2.3): "Crack the Seal — Resolve a known Rite
-// instantly as 1 action. Set the Symbol to Compromised and mark double the
-// Rite's base cost (minimum +2, or +3 for High Rites)."
-//
-// This used to add a flat +2 to the running Obligation total regardless of
-// which rite or its tier — coincidentally correct for Low/Standard rites
-// (whose base cost is usually 1, doubled = 2), but it silently undercharged
-// every High-tier rite (base cost 2, doubled = 4, floored at 3 — the code
-// only ever charged 2). It now reads the rite's own listed cost and doubles
-// that, applying the correct minimum for its tier.
-
-// ─── Learn Rite (add to known Rites) ───────────────────────────
-//
-// RULES FIX (see file header note): Rites must be individually learned —
-// this spends the Rite's own listed XP cost and adds it to char.rites,
-// the same field name already present on the character schema (see
-// editor.js/wizard.js). Available to both Runekeepers and Invokers.
 
 window.learnRite = function(patronId, riteIndex, characterId = 'default-character') {
     const state = getState();
@@ -972,8 +1028,15 @@ window.learnRite = function(patronId, riteIndex, characterId = 'default-characte
 
     const riteName = safeString(rite.name);
     if (!char.rites) char.rites = [];
-    if (char.rites.includes(riteName)) {
+    if (isRiteKnown(char, patronId, riteName)) {
         showToast(`"${riteName}" is already known.`, 'info');
+        return;
+    }
+
+    // RULES FIX: High Rites require Tier III+.
+    const riteTier = safeString(rite.tier || '');
+    if (riteTier.toLowerCase() === 'high' && !meetsTierRequirement(char, 'III')) {
+        showToast(`"${riteName}" is a High Rite and requires Tier III (you're Tier ${getCharacterTier(char)}).`, 'error');
         return;
     }
 
@@ -989,7 +1052,7 @@ window.learnRite = function(patronId, riteIndex, characterId = 'default-characte
 
     if (!confirm(`Learn "${riteName}" (${rite.tier || ''}) for ${xpCost} XP?`)) return;
 
-    char.rites.push(riteName);
+    char.rites.push(riteKey(patronId, riteName));
     char.xpSpent = spent + xpCost;
     saveState();
     showToast(`📖 Learned "${riteName}" (${xpCost} XP spent).`, 'success');
@@ -1018,9 +1081,8 @@ window.crackTheSeal = function(patronId, riteIndex, characterId = 'default-chara
 
     const riteName = safeString(rite.name);
 
-    // RULES FIX: Crack the Seal only works on "a known Rite" (§4.2.3).
     const char = state.characters?.find(c => c.id === characterId) || state.characters?.[characterId];
-    if (!char || !(char.rites || []).includes(riteName)) {
+    if (!char || !isRiteKnown(char, patronId, riteName)) {
         showToast(`You haven't learned "${riteName}" yet — learn it first.`, 'error');
         return;
     }
@@ -1051,7 +1113,22 @@ window.crackTheSeal = function(patronId, riteIndex, characterId = 'default-chara
         }
     }
 
+    const costDetails = `Obligation +${crackCost} (now ${newObligation}) · Symbol Compromised`;
+    const effect = safeString(rite.effect || rite.description || 'The rite resolves instantly.');
+    const extraNote = `Crack the Seal — ${isHighTier ? 'High' : 'Standard'} Rite, instant action.`;
+
     showToast(`💥 "${riteName}" invoked instantly! Obligation +${crackCost} (now ${newObligation}). Symbol is now Compromised (−1 die on Borrowed Grace until restored).`, 'warning');
+
+    // Send VTT card
+    const cardHtml = buildRiteCardHtml(
+        riteName,
+        patronData.name || patronData.title || patronId,
+        patronData.icon || '📜',
+        effect,
+        costDetails,
+        extraNote
+    );
+    sendVTTMessage(cardHtml);
 
     // Refresh the rites view
     const container = document.getElementById('spellcraft-content');

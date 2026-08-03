@@ -37,6 +37,11 @@
  * learning) with a "📖 Learn (X XP)" button that spends the Song's own
  * listed `xp` cost via the new cantorLearnSong().
  * ────────────────────────────────────────────────────────────────────────
+ *
+ * ────────────────────────────────────────────────────────────────────────
+ * NEW: VTT integration — Push and Bloom events now send formatted cards
+ * to the VTT via window.sendToVTT.
+ * ────────────────────────────────────────────────────────────────────────
  */
 
 import { getCharacterData, saveCharacter } from '../index.js';
@@ -213,6 +218,71 @@ function renderMagicPathReferenceHtml(highlightLabel) {
                     <div style="font-size:0.68rem;color:var(--text3);margin-top:0.15rem;line-height:1.3;">${p.blurb}</div>
                 </div>
             `).join('')}
+        </div>
+    `;
+}
+
+// ============================================================
+// VTT HELPERS (NEW)
+// ============================================================
+
+function sendVTTMessage(html) {
+    if (typeof window.sendToVTT === 'function') {
+        window.sendToVTT(html, 'System', { isHTML: true });
+    } else {
+        console.warn('[Cantor] VTT not available — message not sent.');
+    }
+}
+
+function buildSongCardHtml(songName, patronName, patronIcon, effect, costDetails, extraNote = '') {
+    return `
+        <div style="
+            background:var(--bg2);
+            border-radius:var(--radius);
+            padding:0.5rem 0.8rem;
+            border:1px solid var(--border);
+            border-left:4px solid var(--gold);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            max-width: 450px;
+            margin:0.1rem 0;
+            font-family: inherit;
+        ">
+            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.2rem;">
+                <div style="display:flex;align-items:center;gap:0.3rem;">
+                    <span style="font-size:1.2rem;">${escHtml(patronIcon || '🎵')}</span>
+                    <span style="font-weight:700;font-size:1.05rem;color:var(--gold);">${escHtml(songName)}</span>
+                </div>
+                <span style="font-size:0.65rem;color:var(--text3);">${escHtml(patronName || 'Cantor')}</span>
+            </div>
+            ${effect ? `<div style="font-size:0.8rem;color:var(--text);margin-top:0.2rem;line-height:1.4;">${formatText(effect)}</div>` : ''}
+            ${costDetails ? `<div style="font-size:0.7rem;color:var(--text3);margin-top:0.15rem;">${formatText(costDetails)}</div>` : ''}
+            ${extraNote ? `<div style="font-size:0.65rem;color:var(--text3);margin-top:0.1rem;">${formatText(extraNote)}</div>` : ''}
+        </div>
+    `;
+}
+
+function buildBloomCardHtml(patronName, patronIcon, bloomCount, tierUnlocked, corruptionMax, effect = '') {
+    return `
+        <div style="
+            background:var(--bg2);
+            border-radius:var(--radius);
+            padding:0.5rem 0.8rem;
+            border:1px solid var(--gold);
+            border-left:4px solid var(--gold);
+            box-shadow: 0 2px 12px rgba(212,175,55,0.3);
+            max-width: 450px;
+            margin:0.1rem 0;
+            font-family: inherit;
+        ">
+            <div style="text-align:center;font-size:1.5rem;">🌸🌿🌸</div>
+            <div style="text-align:center;font-weight:700;font-size:1.2rem;color:var(--gold);">THE BLOOM</div>
+            <div style="text-align:center;font-size:0.9rem;color:var(--text2);">
+                ${patronName ? `A song of <strong>${escHtml(patronName)}</strong> resonates through you.` : 'The Weave answers your voice.'}
+            </div>
+            ${effect ? `<div style="font-size:0.8rem;color:var(--text);margin-top:0.2rem;line-height:1.4;">${formatText(effect)}</div>` : ''}
+            <div style="margin-top:0.2rem;font-size:0.75rem;color:var(--text3);border-top:1px solid var(--border);padding-top:0.15rem;">
+                🌸 Bloom #${bloomCount} · Corruption: 0/${corruptionMax} · Tier ${tierUnlocked}
+            </div>
         </div>
     `;
 }
@@ -817,6 +887,14 @@ window.cantorPushRite = function(riteName, buttonElement) {
 
     const pushEffect = rite.push_it || rite.effect || 'The song resolves instantly, exactly as sung.';
 
+    // ─── Send VTT card ──────────────────────────────────────────
+    const patronName = rite.patronName || char.boundPatron || 'Cantor';
+    const patronIcon = rite.patronIcon || '🎵';
+    const costDetails = `Fatigue +1 · Corruption +1 · GM gains 1 SB (now ${char.fatigue}/${fatigueMax} Fatigue, ${char.corruption}/${char.corruptionMax || char.spirit || 1} Corruption)`;
+    const extraNote = '⚡ Pushed — no roll required, instant success.';
+    const cardHtml = buildSongCardHtml(riteName, patronName, patronIcon, pushEffect, costDetails, extraNote);
+    sendVTTMessage(cardHtml);
+
     showToastWithHTML(`
         <div style="display:flex;flex-direction:column;gap:0.3rem;">
             <div style="display:flex;justify-content:space-between;align-items:center;">
@@ -949,6 +1027,13 @@ window.cantorToggleResonantRite = function(riteName) {
                     (char.corruption || 0) > 0 ? Math.floor(char.corruption / 2) + 1 : 1,
                     corruptionTableLength || 1
                 );
+
+                // ─── Send VTT bloom card ──────────────────────────
+                const patronName = patronData?.name || boundPatronId || 'Unknown';
+                const patronIcon = patronData?.icon || '🌸';
+                const effect = patronData?.corruption?.[unlockedTier - 1]?.benefit || 'The bloom transforms you.';
+                const bloomCard = buildBloomCardHtml(patronName, patronIcon, bloomCount, unlockedTier, corruptionMax, effect);
+                sendVTTMessage(bloomCard);
 
                 showToastWithHTML(`
                     <div style="display:flex;flex-direction:column;gap:0.3rem;">

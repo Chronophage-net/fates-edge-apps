@@ -9,20 +9,13 @@
  *      talent buttons driven by the selected character's sheet). See
  *      combat-actions.js. #vtt-attr / #vtt-skill switched from <select>
  *      to <input type="number"> so weapon/talent bonuses that push a
- *      pool above the old 5-option dropdown range still work — every
- *      other reference to these fields (rollConnected, renderCommonRolls,
- *      etc.) reads `.value` the same way, so nothing else changes.
+ *      pool above the old 5-option dropdown range still work.
  * v6 – Added player‑to‑character selection sync via WebSocket.
- *      - Each client broadcasts their selected character name.
- *      - Presence list shows each player's selected character.
- *      - Current player gets a dropdown to pick their character.
  * v7 – Fixed player name vs character name separation.
- *      - sendClientName() sends the player's name (from localStorage).
- *      - sendCharacterSelection() sends the character name separately.
- *      - Presence list displays player name and selected character as distinct fields.
- * v8 – Added reactive presence subscription to auto‑refresh the player list
- *      whenever presence data changes via WebSocket, ensuring the "online list"
- *      updates instantly without manual refresh.
+ * v8 – Added reactive presence subscription to auto‑refresh the player list.
+ * v9 – Increased chat pane height for more vertical space; no "Show full reading".
+ * v10 – Added character detail panel and follower chat functionality.
+ * v11 – Exposed global window.sendToVTT() for other modules to post messages/cards.
  */
 
 import { vttStore } from '../../core/vtt-store.js';
@@ -96,7 +89,7 @@ let voiceUnsubscribe = null;
 let presenceInterval = null;
 let deckCountInterval = null;
 let selectedCharUnsubscribe = null;
-let presenceUnsubscribe = null;   // 👈 NEW: subscription to presence store updates
+let presenceUnsubscribe = null;
 
 // Deck state
 let deckState = {
@@ -119,10 +112,7 @@ let clientsMap = new Map();
 
 let charactersPushed = false;
 
-// 👇 NEW: live combat status pushed from the Encounter Tracker
 let combatStatus = null;
-
-// 👇 NEW: live "where are we" status pushed from the Adventures module
 let sceneStatus = null;
 
 // ─── Player name helpers ──────────────────────────────────────────────
@@ -146,17 +136,12 @@ function sendClientName() {
 // CHARACTER SELECTION SYNC
 // ============================================================
 
-/**
- * Send the current character selection to the server for broadcasting.
- * @param {string} characterName - The name of the selected character (or empty string to clear)
- */
 export function sendCharacterSelection(characterName) {
     if (!isConnectedToServer()) return;
     const clientId = getSocketId();
     if (!clientId) return;
     sendEvent({ type: 'character-select', clientId, character: characterName || '' });
     
-    // Update local presence immediately
     const presence = vttStore.state.presence || [];
     const updated = presence.map(p => {
         if (p.id === clientId) {
@@ -166,7 +151,6 @@ export function sendCharacterSelection(characterName) {
     });
     vttStore.updatePresence(updated);
     
-    // Also update local selected character
     if (characterName) {
         const chars = vttStore.state.characters || [];
         const found = chars.find(c => c.name === characterName);
@@ -257,6 +241,38 @@ export function sendMessage(text, sender, recipient = 'all', metadata = {}) {
     }
     return msg;
 }
+
+// ─── Global VTT send function (exposed for other modules) ───────────
+// This stores a reference to the internal sendMessage so other modules
+// can post to VTT chat without needing to import this module directly.
+let vttSendMessageFn = null;
+
+/**
+ * Send a message to the VTT chat from anywhere.
+ * @param {string} text – The message content (plain text or HTML if isHTML=true and sender is trusted)
+ * @param {string} sender – Default 'System' (trusted for HTML). Use 'GM' for GM messages.
+ * @param {object} options – { isHTML: boolean, recipient: string, metadata: object }
+ * @returns {boolean} true if sent, false if VTT not initialized.
+ */
+function sendToVTT(text, sender = 'System', options = {}) {
+    if (!vttSendMessageFn) {
+        console.warn('[VTT] Not initialized – message not sent.');
+        return false;
+    }
+    const { isHTML = false, recipient = 'all', metadata = {} } = options;
+    // HTML is only allowed for trusted senders (System, GM)
+    if (isHTML && sender !== 'System' && sender !== 'GM') {
+        console.warn('[VTT] HTML messages only allowed for System or GM senders.');
+        return false;
+    }
+    // If it's HTML, we mark it so the renderer knows it's trusted.
+    // The renderer in vtt-core.js already trusts System/GM and sanitises.
+    vttSendMessageFn(text, sender, recipient, metadata);
+    return true;
+}
+
+// Expose globally
+window.sendToVTT = sendToVTT;
 
 // ============================================================
 // DECK COMMANDS (using unified WebSocket module)
@@ -584,7 +600,6 @@ function rollConnected(postToChat = true) {
             } catch (e) { /* ignore */ }
         }
 
-        // Log to GM tracker
         import('../encounters/combat.js').then(module => {
             module.logExternalAction?.(sender, msg, 'roll');
         }).catch(() => {});
@@ -671,28 +686,22 @@ async function pushCharactersToServer() {
     const updates = {};
     characters.forEach(c => {
         if (c.name) {
-            // Define attrs before using it
             const attrs = c.attributes || { body: 1, wits: 1, spirit: 1, presence: 1 };
             const entry = {
-                // Core stats from attributes
                 attributes: {
                     body: attrs.body ?? 1,
                     wits: attrs.wits ?? 1,
                     spirit: attrs.spirit ?? 1,
                     presence: attrs.presence ?? 1,
                 },
-                // Tracks
                 harm: c.harm || 0,
                 fatigue: c.fatigue || 0,
                 obligation: c.obligation || 0,
                 boons: c.boons || 0,
                 leash: c.leash || 0,
                 corruption: c.corruption || 0,
-                // Skills
                 skills: c.skills || {},
-                // Avatar
                 avatar: c.avatar || null,
-                // Player association
                 playerName: playerName,
             };
             updates[c.name] = entry;
@@ -1048,7 +1057,6 @@ function setupWebSocketSync() {
         });
         vttStore.updatePresence(updated);
         
-        // If this is from our own client, update the local selected character ID
         if (clientId === getSocketId() && character) {
             const chars = vttStore.state.characters || [];
             const found = chars.find(c => c.name === character);
@@ -1084,14 +1092,12 @@ function setupWebSocketSync() {
                     document.dispatchEvent(new CustomEvent('gmRoleUpdate', { detail: { role: myClient.role } }));
                 }
             }
-            // 👇 CRITICAL FIX: Use the server's presence data directly.
-            // The server now includes selectedCharacter in each client object.
             const updatedClients = data.clients.map(c => ({
                 id: c.id,
                 name: c.name || 'Player',
                 role: c.role || 'player',
                 online: true,
-                selectedCharacter: c.selectedCharacter || '',  // 👈 from server
+                selectedCharacter: c.selectedCharacter || '',
                 avatar: c.avatar || null,
             }));
             vttStore.updatePresence(updatedClients);
@@ -1159,9 +1165,7 @@ function setupWebSocketSync() {
         showToast('Reconnected to server!', 'success');
         charactersPushed = false;
         pushCharactersToServer();
-        // Send client name
         sendClientName();
-        // Send current character selection
         const selected = vttStore.getSelectedCharacter();
         if (selected) {
             sendCharacterSelection(selected.name);
@@ -1468,6 +1472,16 @@ function attachEvents() {
     };
     document.addEventListener('voice-call-request', voiceCallHandler);
     docEventListeners.push({ event: 'voice-call-request', handler: voiceCallHandler });
+
+    // --- Follower chat listener ---
+    const followerChatHandler = (e) => {
+        const { characterName, followerName, message } = e.detail;
+        if (!message || !followerName) return;
+        const sender = `${followerName} (${characterName})`;
+        sendMessage(message, sender, 'all');
+    };
+    document.addEventListener('follower-chat', followerChatHandler);
+    docEventListeners.push({ event: 'follower-chat', handler: followerChatHandler });
 }
 
 // ============================================================
@@ -1481,6 +1495,9 @@ export function render(el) {
     container = el;
     setContainer(el);
     if (!el) return;
+
+    // Capture the sendMessage function for global use
+    vttSendMessageFn = sendMessage;
 
     const isConnected = isConnectedToServer();
     const roomCode = isConnected ? getRoomCode() : null;
@@ -1501,8 +1518,7 @@ export function render(el) {
         </span>`;
     }).join('');
 
-    // In vtt-connected.js, inside the render() function, replace the innerHTML with:
-
+    // Main HTML – with chat pane height increased and detail panel container added
     el.innerHTML = `
     <div class="vtt-live-table">
 
@@ -1596,7 +1612,7 @@ export function render(el) {
                 <button class="btn btn-sm btn-ghost" id="vtt-clear-chat" title="Clear chat">🗑️</button>
             </div>
             </div>
-            <div class="chat-messages" id="chatMessages" style="flex:1;overflow-y:auto;padding:0.5rem;background:var(--vtt-surface2);border-radius:calc(var(--vtt-radius) - 2px);margin-bottom:0.5rem;font-size:1rem;display:flex;flex-direction:column;max-height:450px;min-height:250px;"></div>
+            <div class="chat-messages" id="chatMessages" style="flex:1;overflow-y:auto;padding:0.5rem;background:var(--vtt-surface2);border-radius:calc(var(--vtt-radius) - 2px);margin-bottom:0.5rem;font-size:1rem;display:flex;flex-direction:column;max-height:600px;min-height:300px;"></div>
             <div id="selected-character-display" style="margin-bottom:0.4rem;padding:0.2rem 0.4rem;background:var(--vtt-surface2);border-radius:calc(var(--vtt-radius) - 2px);min-height:2.5rem;"></div>
             <div class="chat-input-row" style="display:flex;gap:0.4rem;">
             <input type="text" id="chatInput" placeholder="Type… (/roll, /timer, /deck, /help)" style="flex:1;font-size:1rem;padding:0.5rem 0.6rem;" />
@@ -1622,6 +1638,8 @@ export function render(el) {
                 <button class="btn btn-sm btn-ghost" id="vtt-refresh-btn" title="Refresh">↻</button>
                 </div>
                 <div id="vttCharGrid" class="vtt-char-grid"></div>
+                <!-- NEW: detail panel for selected character -->
+                <div id="vtt-char-detail" style="margin-top:0.5rem;"></div>
             </div>
 
             <!-- Combat Actions -->
@@ -1712,14 +1730,13 @@ export function render(el) {
     renderCommonRolls();
     renderCombatActions();
     renderVTTTimers();
-    renderLocalPresence(); // This now shows selected character
+    renderLocalPresence();
     renderVoiceClients();
     updateMessageCount();
     populateChatRecipients();
     updateCombatStatusUI();
     updateSceneStatusUI();
 
-    // Normalize and set initial characters from local state
     const chars = getCharacters();
     vttStore.updateCharacters(chars);
     vttStore.updateTimers(getState().timers || []);
@@ -1730,7 +1747,6 @@ export function render(el) {
         vttStore.updateVoiceClients(clients);
     });
 
-    // Subscribe to character selection changes to broadcast
     if (selectedCharUnsubscribe) selectedCharUnsubscribe();
     selectedCharUnsubscribe = vttStore.subscribe('selectedCharacterId', (id) => {
         if (!id) return;
@@ -1740,7 +1756,6 @@ export function render(el) {
         }
     });
 
-    // ─── NEW: Subscribe to presence changes to re‑render the player list ──
     if (presenceUnsubscribe) presenceUnsubscribe();
     presenceUnsubscribe = vttStore.subscribe('presence', () => {
         if (!isDestroyed) renderLocalPresence();
@@ -1749,7 +1764,6 @@ export function render(el) {
     setupWebSocketSync();
     attachEvents();
     updateGMUI();
-    // Send client name if connected
     if (isConnectedToServer()) {
         sendClientName();
     }
@@ -1828,6 +1842,14 @@ export function destroy() {
     if (voiceInitialized) {
         cleanupVoice();
         voiceInitialized = false;
+    }
+    // Clean up global VTT send function
+    vttSendMessageFn = null;
+    if (window.sendToVTT === sendToVTT) {
+        delete window.sendToVTT;
+    }
+    if (window.__vttSendMessage) {
+        delete window.__vttSendMessage;
     }
     window.__vttConnected = null;
     console.log('[VTT Connected] Destroyed');
