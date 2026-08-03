@@ -824,9 +824,185 @@ function createApiRouter(appConfig) {
     router.get('/api/rooms/:code/whiteboard', authenticate, (req, res) => {
         try {
             const r = room.getRoom(req.params.code);
-            res.json({ whiteboard: r.whiteboard || {} });
+            // CHANGED: return the whiteboard fields directly on the response
+            // body (not nested under a `whiteboard` key) -- the AI GM bot's
+            // `!gm whiteboard`/`!gm grid` commands read `data.drawings`,
+            // `data.notes`, `data.images`, `data.gridCombat` straight off
+            // whatever apiRequest() resolves to, matching the shape the
+            // socket-pushed `sync-state`/`room-state` payloads already use
+            // (`state: roomState.whiteboard`). A `{ whiteboard: {...} }`
+            // wrapper would have silently made every one of those fields
+            // read as undefined.
+            res.json({ ...(r.whiteboard || {}) });
         } catch (err) {
             res.status(404).json({ error: err.message });
+        }
+    });
+
+    // ─── Grid Combat: token sync for the AI GM ─────────────────────
+    // NEW: gives the AI GM a way to actually WRITE to the whiteboard,
+    // not just read it. Previously the only whiteboard mutation path was
+    // the `whiteboard-update` socket event that the human whiteboard UI
+    // sends wholesale (the entire whiteboard object, freeform); a bot
+    // driving a text conversation has no canvas of its own to compute a
+    // full replacement object from. These routes instead expose small,
+    // targeted, authenticated REST operations on just `gridCombat.tokens`
+    // -- the piece of whiteboard state that maps directly onto things the
+    // AI GM already tracks in prose (an NPC/creature entering a scene, an
+    // encounter's participants, who's still standing). Every mutation
+    // updates `room.whiteboard` (the same object the socket handlers
+    // read/write) and re-broadcasts a `whiteboard-update` event with the
+    // exact payload shape `handleWhiteboardUpdate()` in ws-handlers.js
+    // already uses, so connected human clients (Socket.IO or plain-WS)
+    // see the token appear/move/disappear live, same as if a human had
+    // dragged it.
+    //
+    // Tokens are addressed by grid CELL (col/row), not raw canvas pixels
+    // -- the bot has no idea how large anyone's canvas is, but it knows
+    // "this creature is now 2 cells away". `x`/`y` (pixel) are derived
+    // from `col`/`row` * the room's current `gridCombat.cellSize` (or the
+    // default 40) at write time, matching exactly how the whiteboard's own
+    // addGridToken() computes token position.
+    function tokenCellToPixel(gc, col, row) {
+        const cellSize = gc.cellSize || 40;
+        return { x: Math.round(col * cellSize), y: Math.round(row * cellSize) };
+    }
+
+    router.post('/api/rooms/:code/whiteboard/tokens', authenticate, (req, res) => {
+        try {
+            const r = room.getRoom(req.params.code);
+            const { token } = req.body || {};
+            if (!token || typeof token !== 'object') {
+                return res.status(400).json({ error: 'token object is required' });
+            }
+            if (!r.whiteboard) r.whiteboard = { drawings: [], notes: [], images: [], gridCombat: { enabled: false, gridType: 'square', cellSize: 40, tokens: [] } };
+            const gc = r.whiteboard.gridCombat = r.whiteboard.gridCombat || { enabled: false, gridType: 'square', cellSize: 40, tokens: [] };
+            gc.tokens = gc.tokens || [];
+
+            const col = Number.isFinite(token.col) ? token.col : 0;
+            const row = Number.isFinite(token.row) ? token.row : 0;
+            const { x, y } = tokenCellToPixel(gc, col, row);
+
+            let saved;
+            const existingIdx = token.id ? gc.tokens.findIndex(t => t.id === token.id) : -1;
+            if (existingIdx >= 0) {
+                saved = gc.tokens[existingIdx] = {
+                    ...gc.tokens[existingIdx],
+                    ...token,
+                    x, y
+                };
+            } else {
+                saved = {
+                    id: token.id || `token-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+                    label: token.label || token.name || 'Token',
+                    faction: token.faction || 'enemy',
+                    body: Number.isFinite(token.body) ? token.body : 3,
+                    x, y,
+                    color: token.color || (token.faction === 'ally' ? '#5a8ab5' : '#c45a5a'),
+                    harm: token.harm || 0,
+                    fatigue: token.fatigue || 0,
+                    tags: token.tags || [],
+                    layerId: 'tokens',
+                    vision: Number.isFinite(token.vision) ? token.vision : 0
+                };
+                gc.tokens.push(saved);
+            }
+            // Placing a token implies the fight is now visible on the board.
+            gc.enabled = true;
+            r.whiteboard.lastActivity = Date.now();
+
+            const roomCode = req.params.code.toUpperCase();
+            room.broadcastToRoom(roomCode, 'whiteboard-update', {
+                whiteboard: r.whiteboard,
+                timestamp: Date.now(),
+                source: 'api'
+            });
+            res.json({ success: true, token: saved, gridCombat: gc });
+        } catch (err) {
+            res.status(400).json({ error: err.message });
+        }
+    });
+
+    router.post('/api/rooms/:code/whiteboard/tokens/:id/move', authenticate, (req, res) => {
+        try {
+            const r = room.getRoom(req.params.code);
+            const gc = r.whiteboard?.gridCombat;
+            if (!gc || !Array.isArray(gc.tokens)) {
+                return res.status(404).json({ error: 'No grid combat tokens in this room' });
+            }
+            const tokenObj = gc.tokens.find(t => t.id === req.params.id);
+            if (!tokenObj) return res.status(404).json({ error: `No token with id "${req.params.id}"` });
+
+            const { col, row } = req.body || {};
+            if (!Number.isFinite(col) || !Number.isFinite(row)) {
+                return res.status(400).json({ error: 'col and row (numbers) are required' });
+            }
+            const { x, y } = tokenCellToPixel(gc, col, row);
+            tokenObj.x = x;
+            tokenObj.y = y;
+            r.whiteboard.lastActivity = Date.now();
+
+            const roomCode = req.params.code.toUpperCase();
+            room.broadcastToRoom(roomCode, 'whiteboard-update', {
+                whiteboard: r.whiteboard,
+                timestamp: Date.now(),
+                source: 'api'
+            });
+            res.json({ success: true, token: tokenObj });
+        } catch (err) {
+            res.status(400).json({ error: err.message });
+        }
+    });
+
+    router.delete('/api/rooms/:code/whiteboard/tokens/:id', authenticate, (req, res) => {
+        try {
+            const r = room.getRoom(req.params.code);
+            const gc = r.whiteboard?.gridCombat;
+            if (!gc || !Array.isArray(gc.tokens)) {
+                return res.status(404).json({ error: 'No grid combat tokens in this room' });
+            }
+            const before = gc.tokens.length;
+            gc.tokens = gc.tokens.filter(t => t.id !== req.params.id);
+            if (gc.tokens.length === before) {
+                return res.status(404).json({ error: `No token with id "${req.params.id}"` });
+            }
+            r.whiteboard.lastActivity = Date.now();
+
+            const roomCode = req.params.code.toUpperCase();
+            room.broadcastToRoom(roomCode, 'whiteboard-update', {
+                whiteboard: r.whiteboard,
+                timestamp: Date.now(),
+                source: 'api'
+            });
+            res.json({ success: true, removed: req.params.id, remaining: gc.tokens.length });
+        } catch (err) {
+            res.status(400).json({ error: err.message });
+        }
+    });
+
+    // Toggle/configure grid combat mode itself (e.g. the AI GM enabling it
+    // the moment an encounter starts, even before any tokens exist yet).
+    router.post('/api/rooms/:code/whiteboard/grid-combat', authenticate, (req, res) => {
+        try {
+            const r = room.getRoom(req.params.code);
+            if (!r.whiteboard) r.whiteboard = { drawings: [], notes: [], images: [], gridCombat: { enabled: false, gridType: 'square', cellSize: 40, tokens: [] } };
+            const gc = r.whiteboard.gridCombat = r.whiteboard.gridCombat || { enabled: false, gridType: 'square', cellSize: 40, tokens: [] };
+
+            const { enabled, gridType, cellSize } = req.body || {};
+            if (typeof enabled === 'boolean') gc.enabled = enabled;
+            if (gridType) gc.gridType = gridType;
+            if (Number.isFinite(cellSize) && cellSize > 0) gc.cellSize = cellSize;
+            r.whiteboard.lastActivity = Date.now();
+
+            const roomCode = req.params.code.toUpperCase();
+            room.broadcastToRoom(roomCode, 'whiteboard-update', {
+                whiteboard: r.whiteboard,
+                timestamp: Date.now(),
+                source: 'api'
+            });
+            res.json({ success: true, gridCombat: gc });
+        } catch (err) {
+            res.status(400).json({ error: err.message });
         }
     });
 
@@ -1101,7 +1277,11 @@ function createApiRouter(appConfig) {
                     log: 'POST /api/rooms/:code/adventure/log - Append a free-form narrative beat to the adventure log ({ text, author? })'
                 },
                 whiteboard: {
-                    get: 'GET /api/rooms/:code/whiteboard - Get current whiteboard state ({ whiteboard })'
+                    get: 'GET /api/rooms/:code/whiteboard - Get current whiteboard state (drawings, notes, images, gridCombat, ... returned directly, not wrapped)',
+                    gridCombat: 'POST /api/rooms/:code/whiteboard/grid-combat - Enable/configure grid combat ({ enabled?, gridType?, cellSize? })',
+                    tokenPlace: 'POST /api/rooms/:code/whiteboard/tokens - Place or update a token ({ token: { id?, label, faction, col, row, color?, harm?, fatigue?, tags?, vision?, body? } }); col/row are grid cells, not pixels; auto-enables grid combat',
+                    tokenMove: 'POST /api/rooms/:code/whiteboard/tokens/:id/move - Move an existing token ({ col, row })',
+                    tokenRemove: 'DELETE /api/rooms/:code/whiteboard/tokens/:id - Remove a token'
                 },
                 characters: {
                     get: 'GET /api/rooms/:code/characters/:name - Get full character object',
