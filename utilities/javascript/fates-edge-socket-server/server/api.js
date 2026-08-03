@@ -351,7 +351,14 @@ function createApiRouter(appConfig) {
     });
 
     // ─── Modules ──────────────────────────────────────────────────────
-    router.get('/api/modules', authenticate, (req, res) => {
+    // NEW: also mounted at /api/rooms/:code/modules (see listModulesHandler
+    // below) -- the module catalog itself isn't room-scoped, but the AI GM
+    // bot's apiRequest() helper always builds URLs as
+    // `${API_BASE}/rooms/${ROOM_CODE}/${...}`, so `apiRequest('GET',
+    // ['modules'])` was hitting a path that never existed server-side and
+    // 404ing every time (`!gm modules`/module-browsing commands). Both
+    // routes now serve the identical handler/response.
+    function listModulesHandler(req, res) {
         const modules = [];
         // 1. Scan server/modules/ (legacy module folders)
         const modulesPath = path.join(__dirname, 'modules');
@@ -414,7 +421,9 @@ function createApiRouter(appConfig) {
         }
 
         res.json({ modules, count: modules.length, timestamp: Date.now() });
-    });
+    }
+    router.get('/api/modules', authenticate, listModulesHandler);
+    router.get('/api/rooms/:code/modules', authenticate, listModulesHandler);
 
     // Permanently install an adventure module: writes manifest.json +
     // adventure.json to server/modules/<id>/, so it shows up in the list
@@ -804,6 +813,23 @@ function createApiRouter(appConfig) {
     // to lowercase internally -- see room.js's normalizeCharKey()),
     // removing the duplication and the case bug in the same change.
 
+    // ─── Get current whiteboard state ─────────────────────────────
+    // NEW: previously the only way to read whiteboard state was the
+    // initial handshake/sync-request payload over the socket connection;
+    // there was no REST route at all, so any caller doing an on-demand
+    // GET (the AI GM bot's `!gm whiteboard` command calls exactly this)
+    // always failed with "route doesn't exist server-side". `room.js`
+    // already tracks whiteboard state per-room (see createDefaultWhiteboard()
+    // / handleWhiteboardUpdate() in ws-handlers.js) -- this just exposes it.
+    router.get('/api/rooms/:code/whiteboard', authenticate, (req, res) => {
+        try {
+            const r = room.getRoom(req.params.code);
+            res.json({ whiteboard: r.whiteboard || {} });
+        } catch (err) {
+            res.status(404).json({ error: err.message });
+        }
+    });
+
     // ─── Get all characters in a room ────────────────────────────
     router.get('/api/rooms/:code/characters', authenticate, (req, res) => {
         try {
@@ -1051,7 +1077,7 @@ function createApiRouter(appConfig) {
                     clearHistory: 'DELETE /api/rooms/:code/deck/history - Clear deck history'
                 },
                 modules: {
-                    list: 'GET /api/modules - List available modules',
+                    list: 'GET /api/modules (also aliased at GET /api/rooms/:code/modules) - List available modules',
                     install: 'POST /api/modules - Permanently install an adventure module ({ id, content, manifest?, overwrite? }); manifest is derived from content if omitted',
                     push: 'POST /api/modules/:id/push - Push module to clients',
                     cleanup: 'POST /api/modules/:id/cleanup - Clean up module from clients'
@@ -1073,6 +1099,9 @@ function createApiRouter(appConfig) {
                     encounterResolve: 'POST /api/rooms/:code/adventure/encounter/resolve - Resolve the active encounter ({ outcome: "clean"|"partial"|"miss", notes? })',
                     timer: 'POST /api/rooms/:code/adventure/timer - Tick a timer ({ scope: "scene"|"campaign", ref (index or name), amount? } amount defaults to +1, can be negative)',
                     log: 'POST /api/rooms/:code/adventure/log - Append a free-form narrative beat to the adventure log ({ text, author? })'
+                },
+                whiteboard: {
+                    get: 'GET /api/rooms/:code/whiteboard - Get current whiteboard state ({ whiteboard })'
                 },
                 characters: {
                     get: 'GET /api/rooms/:code/characters/:name - Get full character object',
