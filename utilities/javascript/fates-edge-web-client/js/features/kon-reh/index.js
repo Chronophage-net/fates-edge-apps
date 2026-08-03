@@ -744,6 +744,79 @@ export const SCHOOLS = {
   },
 };
 
+// NEW: Table Talk — a pool of in-character lines per School, used instead
+// of always repeating the same tagline whenever the AI speaks up. A mix of
+// verbatim (or lightly trimmed) lines from the Concordance's own School
+// writings, plus a few new lines written to match each School's voice.
+// See TABLE_TALK_OPENING for the one-off line said at game start.
+export const TABLE_TALK = {
+  ykrul: [
+    'Count exits, not victims.',
+    'A house with one door is already mine.',
+    'I did not chase your Blue. I closed the road it needed.',
+    'Close the corridor, spare the village.',
+    'The stone that never moves controls more than the one that runs.',
+    'Every square you cannot reach is a square I already own.',
+  ],
+  vilikari: [
+    'Sell them the hour you stole.',
+    "By the third beat, the lane you needed is already for sale.",
+    "I don't take pieces. I take minutes.",
+    'You blinked. I moved twice.',
+    'A gale ignores charts.',
+    'Tempo spends the same as material — I just spend it faster.',
+  ],
+  thepyrgosi: [
+    'Q.E.D.',
+    'Brush the sand until only one path remains.',
+    'Inevitability needs no applause.',
+    'The proof finished three moves ago. This is just the reading aloud.',
+    'I do not gamble. I demonstrate.',
+    'Refuse the noise. Prove the silence.',
+  ],
+  aeler: [
+    'Every square pays, or closes.',
+    'I weigh your step like coin.',
+    'I do not bleed for a road. I bankrupt it first.',
+    'Patience is the only currency that never depreciates.',
+    'The toll is due, one way or another.',
+    "Every profitable road already belongs to me.",
+  ],
+  lethai: [
+    'One clean stroke ends the poem.',
+    'The pond holds its face until the moon moves.',
+    "I have said nothing all game. Now I don't need to.",
+    'When it breaks once, everything is already over.',
+    'Win by inevitability, not attrition.',
+    'Mud the water, then hold still.',
+  ],
+  vhasian: [
+    'The helm is for the crowd. The blade is for you.',
+    'Polish the helm in public, strike in shadow.',
+    'You admired the pageant. You missed the alley.',
+    'No pageants. Only blades.',
+    'Honor is the bait. The knife was never lost.',
+    'Bright brass up top; the true cut lands where no one is looking.',
+  ],
+};
+
+// One-off greeting said at the start of a vs-Computer game, before any
+// captures have happened — keeps Table Talk from feeling purely reactive.
+export const TABLE_TALK_OPENING = {
+  ykrul: "Let's see how many exits you think you have.",
+  vilikari: "Clock's already running. Try to keep up.",
+  thepyrgosi: 'State your opening. I will state the refutation.',
+  aeler: "Every move you make from here on out, I'm billing you for.",
+  lethai: 'Play quietly. I only need one stroke.',
+  vhasian: 'Welcome to the table — mind the pageantry.',
+};
+
+function randomSaying(schoolId) {
+  const pool = TABLE_TALK[schoolId] || [];
+  if (!pool.length) return SCHOOLS[schoolId]?.tagline || '';
+  return pool[Math.floor(Math.random() * pool.length)];
+}
+
 const PIECE_VALUE = { red: 100, orange: 180, green: 140, blue: 300 };
 
 // School-flavored piece titles, drawn directly from the Concordance's
@@ -801,6 +874,18 @@ function isNearCross(engine, x, y) {
   return false;
 }
 
+// FIX: turn-agnostic Exit Certainty (XS), used by evaluate()'s Cross term
+// below. This mirrors computeExitCertainty() (used for the live Coach
+// hint) but drives it off pseudoMoves() instead of getValidMoves(), so it
+// works regardless of whose turn the evaluated node happens to be on —
+// exactly like pieceProgress()/isNearCross() already do for their terms.
+// Per the rulebook's own "XS (Exit Certainty)" heuristic: "count legal
+// exits before entering the Cross. One is playable; two is safe."
+function blueExitCertainty(engine, blue) {
+  if (!blue || blue.rooted) return 0;
+  return pseudoMoves(engine, blue).filter(m => !engine.isCross(m.x, m.y)).length;
+}
+
 // ---- Evaluation function ----
 // Material, mobility, threat-value-weighted aggression, multi-attacker
 // Blue danger, Cross control, piece advancement, Cross/Rooted status for
@@ -821,6 +906,14 @@ function evaluate(engine, weights, me) {
   let myCrossControl = 0, oppCrossControl = 0;
   const myBlue = engine.getBlue(me);
   const oppBlue = engine.getBlue(opp);
+
+  // FIX: "struggles with the endgame" — as material thins out, hunting the
+  // enemy Blue and actually firing off Blue's own specials matter more
+  // (fewer pieces means fewer future chances, and the rulebook's own
+  // heuristics say to trade freely once a Reforge race is in reach). Scale
+  // the two new bonuses below up when few non-Blue pieces remain.
+  const totalNonBluePieces = engine.pieces.filter(p => p.isAlive && p.type !== 'blue').length;
+  const endgameFactor = totalNonBluePieces <= 8 ? 1.6 : 1.0;
 
   for (const p of engine.pieces) {
     if (!p.isAlive) continue;
@@ -846,6 +939,32 @@ function evaluate(engine, weights, me) {
       const targetValue = target ? PIECE_VALUE[target.type] : 0;
       if (p.player === me) myThreatValue += targetValue; else oppThreatValue += targetValue;
 
+      // FIX: "not taking blues" — capturing/threatening the enemy Blue is
+      // worth far more than its raw material value suggests, since it
+      // forces a whole Reforge race (rulebook: "Reforge math beats
+      // material — if you can force a failed Reforge, trade pieces
+      // freely"). The generic material-weighted threatValue term above
+      // already counts it once at PIECE_VALUE.blue; this adds a large,
+      // aggression-scaled bonus on top so even low-aggression Schools
+      // still go looking for it.
+      if (target && target.type === 'blue') {
+        const blueHuntBonus = weights.aggression * 90 * endgameFactor;
+        score += p.player === me ? blueHuntBonus : -blueHuntBonus;
+      }
+
+      // FIX: "not USING the blue (it's a tactical nuke)" — Blue's S:D/S:H
+      // specials are its only way to ever capture anything, each usable
+      // once per life. A cautious School (low `aggression`) would
+      // otherwise happily sit on both specials forever purely to dodge
+      // the Crown Stagger `rooted` penalty below. Give any available
+      // special-capture its own explicit incentive, independent of that
+      // caution, so the piece actually gets used as the powerful (if
+      // risky) weapon it is rather than hoarded.
+      if (m.special) {
+        const specialBonus = weights.aggression * 30 * endgameFactor;
+        score += p.player === me ? specialBonus : -specialBonus;
+      }
+
       if (p.player === opp && myBlue && m.targetId === myBlue.id) myBlueAttackers++;
       if (p.player === me && oppBlue && m.targetId === oppBlue.id) oppBlueAttackers++;
     }
@@ -862,12 +981,28 @@ function evaluate(engine, weights, me) {
   if (myBlueAttackers > 0) score -= weights.blueSafety * 250 * myBlueAttackers;
   if (oppBlueAttackers > 0) score += weights.blueSafety * 250 * oppBlueAttackers;
 
+  // FIX: "not utilizing the cross" — this used to be a blanket bonus/
+  // penalty from weights.cross alone, and most Schools carry a NEGATIVE
+  // cross weight, which coded in blanket avoidance of the center. But the
+  // rulebook treats the Cross as "leverage with a fuse": valuable to
+  // occupy for the lane pressure it gives Blue, risky only if you don't
+  // have a safe way back out ("Enter to pivot, not to pose" / "enter only
+  // with XS >= 1"). So instead of a flat weight, scale by exit certainty
+  // (XS): a Blue holding the Cross with a certified exit is a real asset;
+  // one with none is a real liability. |weights.cross| now just controls
+  // how much a School cares about Cross outcomes at all, not which way.
   if (myBlue) {
-    if (engine.isCross(myBlue.x, myBlue.y)) score += weights.cross * (40 - myBlue.crossStays * 10);
+    if (engine.isCross(myBlue.x, myBlue.y)) {
+      const xs = Math.min(blueExitCertainty(engine, myBlue), 2);
+      score += Math.abs(weights.cross) * (10 + xs * 20 - myBlue.crossStays * 8);
+    }
     if (myBlue.rooted) score -= weights.rooted * 60;
   }
   if (oppBlue) {
-    if (engine.isCross(oppBlue.x, oppBlue.y)) score -= weights.cross * (40 - oppBlue.crossStays * 10);
+    if (engine.isCross(oppBlue.x, oppBlue.y)) {
+      const xs = Math.min(blueExitCertainty(engine, oppBlue), 2);
+      score -= Math.abs(weights.cross) * (10 + xs * 20 - oppBlue.crossStays * 8);
+    }
     if (oppBlue.rooted) score += weights.rooted * 60;
   }
 
@@ -880,14 +1015,18 @@ function evaluate(engine, weights, me) {
   score += weights.cap * 30 * (myGreens - oppGreens);
 
   // --- Reforge urgency: quadratic penalty for the player whose Blue is dead ---
+  // FIX: changed from urgency^2 to (urgency+1)^2 so the very first turn
+  // after a Blue capture already carries a meaningful swing (80 instead of
+  // 30 at urgency=1), not just once the countdown is nearly out. Capturing
+  // Blue should look clearly good to the AI immediately, not only in
+  // hindsight a few turns later — see "Reforge math beats material" above.
   if (!engine.blueAlive[me]) {
     const urgency = 6 - engine.reforgeCountdown[me]; // 1 at start, 5 at last turn
-    // Quadratic: as turns dwindle, the penalty grows sharply
-    score -= weights.reforge * urgency * urgency * 30;
+    score -= weights.reforge * (urgency + 1) * (urgency + 1) * 20;
   }
   if (!engine.blueAlive[opp]) {
     const urgency = 6 - engine.reforgeCountdown[opp];
-    score += weights.reforge * urgency * urgency * 30;
+    score += weights.reforge * (urgency + 1) * (urgency + 1) * 20;
   }
 
   // --- Proximity bonus for the player in Reforge: encourage moving toward the enemy Home Apex ---
@@ -934,8 +1073,14 @@ function moveOrderScore(engine, cand) {
     const targetVal = target ? PIECE_VALUE[target.type] : 0;
     const moverVal = PIECE_VALUE[piece.type];
     s += 1000 + targetVal * 2 - moverVal / 10;
+    // FIX: always examine a shot at the enemy Blue first — alpha-beta
+    // prunes far more when the actually-best move (which a Blue capture
+    // almost always is) is searched first at each node.
+    if (target && target.type === 'blue') s += 500;
   }
-  if (cand.move.special) s += 50;
+  // FIX: bumped from 50 — Blue's own specials are rare, decisive, and
+  // easy for a shallow search to underrate against ordinary captures.
+  if (cand.move.special) s += 150;
   const enemyHome = engine.enemyHomeApexOf(piece.player);
   const dPrev = Math.abs(piece.x - enemyHome.x) + Math.abs(piece.y - enemyHome.y);
   const dNew = Math.abs(cand.move.x - enemyHome.x) + Math.abs(cand.move.y - enemyHome.y);
@@ -1591,6 +1736,8 @@ export function openKonrehModal(netConfig = null) {
     if (aiConfig) {
       const depthLabel = aiConfig.depth === 2 ? 'Easy' : aiConfig.depth === 3 ? 'Medium' : aiConfig.depth === 4 ? 'Hard' : 'Expert';
       log(`<i>Game started — vs computer (${SCHOOLS[aiConfig.schoolId].name}, ${depthLabel}).</i>`);
+      const opening = TABLE_TALK_OPENING[aiConfig.schoolId];
+      if (opening) talkLine(`<i style="color:var(--muted);">${SCHOOLS[aiConfig.schoolId].name}: "${opening}"</i>`);
     } else {
       log('<i>Game started — Player 1 to move.</i>');
     }
@@ -2060,14 +2207,21 @@ export function openKonrehModal(netConfig = null) {
     const moverName = isAiMove ? pieceTitle(piece) : TYPE_LABEL[piece.type];
     let entry = `<span class="p${player}">P${player} ${moverName}</span>${schoolTag} ${describeMove(game, piece, move, pieceTitle)}`;
     if (game.greenCount > greenBefore) entry += ' <span class="kr-badge">Seed</span>';
-    if (blueAliveBefore[player === 1 ? 2 : 1] && !game.blueAlive[player === 1 ? 2 : 1]) {
+    const blueJustCaptured = blueAliveBefore[player === 1 ? 2 : 1] && !game.blueAlive[player === 1 ? 2 : 1];
+    if (blueJustCaptured) {
       entry += ' <span class="kr-badge">Blue captured!</span>';
     }
     if (game.pendingReforge) entry += ' <span class="kr-badge">Banner planted</span>';
     log(entry);
 
-    if (isAiMove && (move.capture || move.special) && Math.random() < 0.35) {
-      talkLine(`<i style="color:var(--muted);">${SCHOOLS[aiConfig.schoolId].name}: "${SCHOOLS[aiConfig.schoolId].tagline}"</i>`);
+    if (isAiMove) {
+      // Capturing the enemy Blue is the biggest moment in the game — always
+      // say something, and prefer a dedicated line if the School has one.
+      if (blueJustCaptured) {
+        talkLine(`<i style="color:var(--muted);">${SCHOOLS[aiConfig.schoolId].name}: "${randomSaying(aiConfig.schoolId)}"</i>`);
+      } else if ((move.capture || move.special) && Math.random() < 0.35) {
+        talkLine(`<i style="color:var(--muted);">${SCHOOLS[aiConfig.schoolId].name}: "${randomSaying(aiConfig.schoolId)}"</i>`);
+      }
     }
 
     selectedPiece = null; validMoves = []; pendingChoice = null;
@@ -2228,27 +2382,28 @@ export function openKonrehModal(netConfig = null) {
 
 function getRulesText() {
   return `
-    <p><b>Goal:</b> Capture the enemy Blue. If yours is captured, plant any piece on the enemy Home Apex within <b>5 of your own turns</b> to Reforge it back, choosing Home (free), a Sanctum (bars future Seed there), or the Opposing Apex (costs a Green).</p>
-    <p><b>Movement — Onward (exact) / Homeward (up to):</b> Every piece has two Onward lanes (away from your Home Apex) and two Homeward lanes (back toward it).</p>
+    <p><b>Goal:</b> Capture the enemy Blue. Losing yours doesn't end the game — see <b>Reforge</b> below.</p>
+    <p><b>Setup:</b> each side starts with 1 Blue, 2 Oranges, 6 Reds, and 1 Green in a tight 4-rank pyramid at its Home Apex. Almost everything starts boxed in, so the first move or two usually comes from an outer Red.</p>
+    <p><b>Turn order:</b> Player 1 moves once. Player 2 then gets <b>two</b> moves (two different pieces) on their very first turn only. After that, players alternate one move per turn.</p>
+    <p><b>How pieces move — the core rhythm:</b> every piece has two lanes pointing <i>away</i> from its own Home Apex (Onward) and two lanes pointing <i>back</i> toward it (Homeward). The two directions behave differently:</p>
     <ul>
-      <li><b>Onward is exact:</b> you must travel the piece's full Onward distance in one of those two lanes — no shorter stop is allowed. If anything blocks the path before that exact square, that lane has no legal move at all this turn.</li>
-      <li><b>Homeward is "up to":</b> you may stop at any square from 1 up to the piece's Homeward distance, same as a normal slide.</li>
-      <li><b>Distances:</b> Red 2 / 1 &nbsp; Orange 3 / 2 &nbsp; Green 4 / 3 &nbsp; Blue 5 / 4 (Onward / Homeward).</li>
+      <li><b>Onward = exact distance.</b> You must travel the piece's full Onward distance, in one straight line, along one of its two Onward lanes — you can't stop early. If something blocks that exact square (or the path to it), that lane simply has no legal move this turn.</li>
+      <li><b>Homeward = up to that distance.</b> You may stop anywhere from 1 square up to the piece's Homeward distance, like a normal slide — stopping short is fine.</li>
+      <li><b>Distances by piece</b> (Onward / Homeward): Red 2 / 1 &nbsp;•&nbsp; Orange 3 / 2 &nbsp;•&nbsp; Green 4 / 3 &nbsp;•&nbsp; Blue 5 / 4.</li>
     </ul>
-    <p><b>Zone of Control (ZoC):</b> every piece controls its 4 adjacent squares. A Homeward slide that enters enemy ZoC stops there (that square is still a legal landing, you just can't continue past it). No piece — friend or foe — can ever be passed through.</p>
-    <p><b>Captures:</b> Red/Orange/Green capture by landing on an enemy square, on either lane. <b>Blue's own slide cannot capture</b> — Blue only captures via its Specials below.</p>
-    <p><b>Blue:</b> May slide (Onward 5 exact / Homeward up to 4), then use one Special per turn (each usable once per life):</p>
+    <p><b>Zone of Control (ZoC):</b> every piece "controls" the 4 squares directly next to it. A Homeward slide that crosses into an enemy-controlled square must stop there — it's still a legal landing, you just can't continue past it. No piece, friend or foe, can ever be moved through (jumped over), except for Blue's Hop special below.</p>
+    <p><b>Capturing:</b> Red, Orange, and Green capture the normal way — land on a square an enemy occupies, on either an Onward or Homeward move. <b>Blue is different: its slide alone never captures.</b> Blue can only remove enemy pieces using one of its two Specials, below.</p>
+    <p><b>Blue's turn:</b> Blue may slide (Onward 5 exact, or Homeward up to 4), then optionally use <b>one</b> Special — each of the two is usable only once per Blue "life" (i.e., until it's captured and later Reforged):</p>
     <ul>
-      <li><b>Displacement:</b> step onto an adjacent enemy.</li>
-      <li><b>Hop:</b> jump an adjacent enemy to the empty square beyond.</li>
-      <li>No Special if the slide entered ZoC. Using both Specials in one life Roots Blue until your next turn (Crown Stagger).</li>
+      <li><b>Displacement:</b> step onto an adjacent enemy square, capturing it.</li>
+      <li><b>Hop:</b> jump over an adjacent enemy into the empty square just beyond it, capturing the piece jumped.</li>
+      <li>A Special isn't available if Blue's slide that turn ended by entering enemy ZoC. Using <i>both</i> Specials across the same life Roots Blue (it can't move) until your next turn — this is called Crown Stagger.</li>
     </ul>
-    <p><b>Seed:</b> Ending on a Sanctum with the opposite Sanctum empty spawns a Green there (cap 6 total) and Roots Blue. Blocked on the very first turn Blue ever leaves Home.</p>
-    <p><b>The Cross:</b> Center 2×2. A Blue may stay up to 3 <i>consecutive</i> turns there; leaving resets that count to 0 for its next visit. After leaving, it's barred from re-entry for 2 full turns.</p>
-    <p><b>Setup:</b> each side has 1 Blue, 2 Oranges, 6 Reds, and 1 Green in a tight 4-rank pyramid from its Home Apex — expect the very first move or two to come from the outer Reds, since everything else starts boxed in.</p>
-    <p><b>Turn order:</b> P1 moves once; P2 then gets two moves (different pieces) on their first turn only; alternate afterward.</p>
-    <p><b>vs Computer:</b> pick a School (Ykrul, Vilikari, Thepyrgosi, Aeler, Lethai, Vhasian) and the computer will play that side in that School's style — the rules never change, only how it weighs risk, tempo, and the Cross.</p>
-    <p style="color:var(--muted); font-size:11px;">Click a piece, then a highlighted square. Squares with several legal moves show a number — click it to choose.</p>
+    <p><b>Seeding new Greens:</b> if Blue ends its move on a Sanctum (one of the two side-corner squares) and the opposite Sanctum is empty, a new Green spawns there (there's a cap of 6 Greens total) and Blue becomes Rooted for a turn. This can't happen on the very first turn Blue ever leaves Home.</p>
+    <p><b>The Cross:</b> the central 2×2 block of squares. Blue may spend up to 3 <i>consecutive</i> turns sitting there; leaving resets that counter for its next visit. Once Blue leaves the Cross, it's barred from re-entering for the next 2 full turns — so don't drift in without a way back out.</p>
+    <p><b>Reforge — losing your Blue isn't fatal:</b> once your Blue is captured, you have <b>5 of your own turns</b> to plant any piece on the enemy's Home Apex and bring it back. You choose where it returns: Home (free, no cost), a Sanctum (free, but blocks future Seeding there), or the enemy's Apex itself (costs one Green). If the 5 turns run out with no piece planted, the game is over.</p>
+    <p><b>Playing against the computer:</b> pick a School — Ykrul, Vilikari, Thepyrgosi, Aeler, Lethai, or Vhasian — and the computer plays that side in that School's style. The rules never change; only how the AI weighs risk, tempo, material, and the Cross changes from School to School.</p>
+    <p style="color:var(--muted); font-size:11px;">To move: click a piece, then click a highlighted destination square. If a square has more than one legal move onto it, it shows a number — click it to pick which one.</p>
   `;
 }
 

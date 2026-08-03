@@ -22,6 +22,12 @@ import { escHtml } from '../../../core/utils.js';
 import { isConnectedToServer, sendMessage } from '../../../core/websocket.js';
 import { onVoiceClientsChanged } from '../../vtt/voice.js';
 import { openKonrehModal } from '../../kon-reh/index.js';
+import { initKonrehVttBridge, challengeToKonreh } from '../../kon-reh/vtt-bridge.js';
+
+// Wire the Kon'reh <-> VTT bridge's incoming-event listener once, at
+// module load, so a challenge can arrive even before the Whiteboard
+// panel itself has been opened this session.
+initKonrehVttBridge();
 import { logRecordingEvent } from '../../../core/media.js';
 import { activeLayerId } from './layers.js';
 import { getCharacters as getCoreCharacters } from '../../../core/state.js';
@@ -402,6 +408,7 @@ export function render(el) {
                             <button class="btn btn-sm btn-secondary" id="whiteboard-add-token" style="${isGridCombatActive() && !isKonrehActive() ? '' : 'display:none;'}">🎯 Add Token</button>
                             <button class="btn btn-sm btn-secondary" id="whiteboard-import-tracker" style="${isGridCombatActive() && !isKonrehActive() ? '' : 'display:none;'}">🔗 Import Tracker</button>
                             <button class="btn btn-sm ${isKonrehActive() ? 'btn-gold' : 'btn-secondary'}" id="whiteboard-konreh">🌀 Kon'reh</button>
+                            <button class="btn btn-sm btn-secondary" id="whiteboard-konreh-challenge" title="Challenge another connected player to a real-time Kon'reh match" style="${isConnectedToServer() ? '' : 'display:none;'}">🌐 Challenge Player</button>
                             <span id="whiteboard-tracker-link-status" class="text-muted text-sm"></span>
                         </div>
                     </div>
@@ -606,6 +613,17 @@ export function attachEvents() {
         toggleKonreh();
         openKonrehModal();
         postToVTTChat(`🌀 ${getWhiteboardSenderName()} opened Kon'reh on the Whiteboard.`);
+    });
+    // NEW: real-time 2-player Kon'reh over the existing VTT connection —
+    // see js/features/kon-reh/vtt-bridge.js for the pairing protocol.
+    document.getElementById('whiteboard-konreh-challenge')?.addEventListener('click', () => {
+        const name = getWhiteboardSenderName();
+        const started = challengeToKonreh(name);
+        if (started) {
+            postToVTTChat(`🌀🌐 ${name} is challenging the table to a real-time game of Kon'reh! Anyone else can accept from the banner that just appeared.`);
+        } else {
+            showToast("Can't start a challenge right now (not connected, or already in a match).", 'error');
+        }
     });
 
     // ── Clear / Export / Notes / Images ──
