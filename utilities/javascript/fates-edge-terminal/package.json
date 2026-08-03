@@ -5,6 +5,7 @@
   "main": "terminal-client.js",
   "scripts": {
     "start": "node terminal-client.js",
+    "curses": "node terminal-client.js --curses",
     "test": "echo \"No tests specified\" && exit 0"
   },
   "keywords": [
@@ -19,6 +20,7 @@
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
+    "blessed": "^0.1.81",
     "ws": "^8.21.1"
   },
   "_license": "Fate's Edge Proprietary Content – © 2024 Nicholas A. Gasper. All rights reserved."

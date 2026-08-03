@@ -10,6 +10,11 @@
  *  - Improved /status, /whoami with adventure state
  *  - Auto‑refresh adventure status on relevant broadcasts
  *  - /adventure help for command reference
+ *
+ * NEW: --curses / --tui flag (or EDGE_TUI=1) launches a full-screen
+ * curses-style UI (blessed): scrolling log pane + live status sidebar +
+ * dedicated input box, instead of the classic readline prompt. Same
+ * commands, same wire protocol — just a different skin.
  */
 
 const WebSocket = require('ws');
@@ -36,6 +41,14 @@ for (let i = 2; i < process.argv.length; i++) {
     }
 }
 const ADMIN_MODE = !!adminApiKey;
+
+// ─── Curses/TUI mode (NEW: vanity feature) ──────────────────────
+// A "curses"-style full-screen UI, built on `blessed`, opt-in via
+// --curses / --tui flag (or EDGE_TUI=1). Falls back gracefully to
+// classic readline mode if blessed isn't installed.
+let TUI_MODE = process.argv.includes('--curses') || process.argv.includes('--tui') || process.env.EDGE_TUI === '1';
+let blessed = null;
+let screen = null, logBox = null, sidebarBox = null, inputBox = null;
 
 function getApiBaseUrl(serverUrl) {
     const httpUrl = serverUrl.replace(/^ws/, 'http');
@@ -253,31 +266,136 @@ let sessionStats = {
 const MAX_ROLL_HISTORY = 20;
 let rollHistory = [];
 
-// ─── Readline ──────────────────────────────────────────────────
-const rl = readline.createInterface({
+// ─── Curses/TUI setup (NEW) ──────────────────────────────────────
+// Builds a three-pane blessed screen: a scrolling log on the left,
+// a live status sidebar on the right, and an input box on the bottom.
+// All existing output keeps flowing through console.log/printX
+// helpers unchanged — we just patch console.log to route into the
+// log pane instead of stdout while TUI_MODE is active.
+function initTUI() {
+    try {
+        blessed = require('blessed');
+    } catch (e) {
+        console.error(`Curses mode requested but 'blessed' isn't installed (run "npm install" in the terminal client folder). Falling back to classic mode.`);
+        TUI_MODE = false;
+        return;
+    }
+
+    screen = blessed.screen({ smartCSR: true, title: `Edge CLI v${CONFIG.version}`, fullUnicode: true });
+
+    logBox = blessed.log({
+        top: 0, left: 0, width: '75%', height: '100%-3',
+        border: { type: 'line' }, label: ' Edge CLI ',
+        tags: false, scrollback: 5000, mouse: true, keys: true, vi: true, alwaysScroll: true,
+        scrollbar: { ch: ' ', inverse: true },
+        style: { border: { fg: 'magenta' } }
+    });
+
+    sidebarBox = blessed.box({
+        top: 0, left: '75%', width: '25%', height: '100%-3',
+        border: { type: 'line' }, label: ' Status ',
+        tags: true, style: { border: { fg: 'cyan' } }
+    });
+
+    inputBox = blessed.textbox({
+        bottom: 0, left: 0, width: '100%', height: 3,
+        border: { type: 'line' }, label: ' > ',
+        inputOnFocus: true, style: { border: { fg: 'yellow' }, focus: { border: { fg: 'green' } } }
+    });
+
+    screen.append(logBox);
+    screen.append(sidebarBox);
+    screen.append(inputBox);
+
+    inputBox.on('submit', (value) => {
+        inputBox.clearValue();
+        screen.render();
+        if (value && value.trim()) handleInputLine(value);
+        inputBox.focus();
+    });
+    // Re-focus after Escape/blur so the user isn't stranded without an input target.
+    inputBox.key(['escape'], () => inputBox.focus());
+    screen.key(['C-c'], () => { if (ws) ws.close(); if (screen) screen.destroy(); process.exit(0); });
+
+    inputBox.focus();
+    updateSidebar();
+    screen.render();
+
+    // Route console.log (used by every print* helper and inline command
+    // output) into the log pane instead of the real stdout.
+    console.log = (...args) => {
+        const str = args.map(a => typeof a === 'string' ? a : JSON.stringify(a, null, 2)).join(' ');
+        if (logBox) logBox.log(str);
+        if (screen) screen.render();
+    };
+}
+
+function updateSidebar() {
+    if (!sidebarBox) return;
+    const gm = getCurrentGM();
+    const lines = [];
+    lines.push(`{yellow-fg}{bold}Edge CLI v${CONFIG.version}{/bold}{/yellow-fg}`);
+    lines.push('');
+    lines.push(`{bold}Status:{/bold} ${connected ? '{green-fg}Connected{/green-fg}' : '{red-fg}Disconnected{/red-fg}'}`);
+    if (connected) {
+        lines.push(`Server: ${serverUrl}`);
+        lines.push(`Room:   ${roomCode}`);
+        lines.push(`Name:   ${clientName}`);
+        lines.push(`Role:   ${myRole}`);
+        lines.push(`GM:     ${gm ? gm.name : 'None'}`);
+        lines.push(`Region: ${defaultRegion}`);
+        lines.push(`Deck:   ${deckRemaining}`);
+        lines.push(`Clients: ${Object.keys(clients).length}`);
+    }
+    if (adventureState.moduleId) {
+        lines.push('');
+        lines.push(`{magenta-fg}{bold}Adventure{/bold}{/magenta-fg}`);
+        lines.push(`${adventureState.title || adventureState.moduleId}`);
+        lines.push(`${adventureState.status || ''}`);
+    }
+    lines.push('');
+    lines.push(`{cyan-fg}Session{/cyan-fg}`);
+    lines.push(`Rolls: ${sessionStats.rollsMade}`);
+    lines.push(`Crits: ${sessionStats.crits}  Fumbles: ${sessionStats.fumbles}`);
+    if (ADMIN_MODE) { lines.push(''); lines.push('{green-fg}Admin mode ON{/green-fg}'); }
+    lines.push('');
+    lines.push('{white-fg}Ctrl+C to quit{/white-fg}');
+    sidebarBox.setContent(lines.join('\n'));
+    if (screen) screen.render();
+}
+
+if (TUI_MODE) initTUI();
+
+// ─── Readline (classic mode only; curses mode uses the blessed input box) ──
+const rl = TUI_MODE ? null : readline.createInterface({
     input: process.stdin,
     output: process.stdout,
     prompt: `${colors.gray}>${colors.reset} `
 });
 
+function promptAgain(force) {
+    if (TUI_MODE) { updateSidebar(); return; }
+    if (rl) rl.prompt(force);
+}
+
 // ─── Print helpers ──────────────────────────────────────────────
 function printSystemMessage(msg, color = colors.gray) {
     process.stdout.write('\r\x1b[K');
     console.log(`${color}[System] ${msg}${colors.reset}`);
-    rl.prompt(true);
+    promptAgain(true);
 }
 
 function printChatMessage(sender, text) {
     process.stdout.write('\r\x1b[K');
     console.log(`${colors.cyan}[${sender}]: ${colors.reset}${text}`);
-    rl.prompt(true);
+    promptAgain(true);
 }
 
 function printRollResult(sender, formula, result, details = '') {
     process.stdout.write('\r\x1b[K');
     const detailStr = details ? ` (${details})` : '';
     console.log(`${colors.yellow}🎲 ${sender} rolled ${formula}: ${colors.bold}${result}${colors.reset}${detailStr}`);
-    rl.prompt(true);
+    promptAgain(true);
 }
 
 function printDeckDraw(count, region, cards, synthesis) {
@@ -287,7 +405,7 @@ function printDeckDraw(count, region, cards, synthesis) {
     console.log(`  ${cardNames}`);
     if (synthesis) console.log(`${colors.dim}${synthesis}${colors.reset}`);
     console.log(`${colors.gray}Cards remaining: ${deckRemaining}${colors.reset}`);
-    rl.prompt(true);
+    promptAgain(true);
 }
 
 function printCrownSpread(result) {
@@ -299,7 +417,7 @@ function printCrownSpread(result) {
         });
     }
     if (result.wildcard) console.log(`  🌟 Wildcard: ${result.wildcard}`);
-    rl.prompt(true);
+    promptAgain(true);
 }
 
 function printGMStatus() {
@@ -315,7 +433,7 @@ function printGMStatus() {
     } else {
         console.log(`  No pending requests.`);
     }
-    rl.prompt(true);
+    promptAgain(true);
 }
 
 function printClientList() {
@@ -328,7 +446,7 @@ function printClientList() {
         const isSelf = c.id === ws?.clientId ? ' (you)' : '';
         console.log(`  ${isGM}${c.name}${isSelf} — ${c.role || 'player'}`);
     });
-    rl.prompt(true);
+    promptAgain(true);
 }
 
 // ─── Adventure helpers ──────────────────────────────────────────
@@ -374,7 +492,7 @@ function printAdventureState(state) {
     if (state.updatedAt) {
         console.log(`  🕐 Updated: ${new Date(state.updatedAt).toLocaleTimeString()}`);
     }
-    rl.prompt(true);
+    promptAgain(true);
 }
 
 function printAdventureReference(ref) {
@@ -414,7 +532,7 @@ function printAdventureReference(ref) {
     if (ref.notes) {
         console.log(`  📝 Notes: ${ref.notes.slice(0, 200)}${ref.notes.length > 200 ? '…' : ''}`);
     }
-    rl.prompt(true);
+    promptAgain(true);
 }
 
 // ─── Help command ──────────────────────────────────────────────
@@ -483,6 +601,7 @@ ${colors.yellow}Extras:${colors.reset}
   /banner [reload|fetch]       Show a random banner; reload from cache, fetch new
   /help                        This help
   /quit / exit                 Quit
+${colors.dim}(Launch with "node terminal-client.js --curses" for a full-screen curses UI.)${colors.reset}
 ${ADMIN_MODE ? `
 ${colors.yellow}Admin (API Key Active):${colors.reset}
   /admin players              List clients
@@ -492,7 +611,7 @@ ${colors.yellow}Admin (API Key Active):${colors.reset}
 ` : ''}
 ${colors.dim}(Some commands aren't listed here. Curiosity is rewarded.)${colors.reset}
 `);
-    rl.prompt(true);
+    promptAgain(true);
 }
 
 function printAdventureHelp() {
@@ -509,7 +628,7 @@ ${colors.magenta}📖 Adventure Commands${colors.reset}
   /adventure reference          Show reference data (bestiary, NPCs, locations, factions)
 ${colors.dim}All adventure commands require a connection and GM role (or admin).${colors.reset}
 `);
-    rl.prompt(true);
+    promptAgain(true);
 }
 
 // ─── ASCII art (unchanged) ─────────────────────────────────────
@@ -599,6 +718,12 @@ function getRandomFortune() {
 }
 
 function playMatrixRain(durationMs = 2500) {
+    // NEW: raw cursor-positioning ANSI writes fight with blessed's own
+    // screen buffer in curses mode, so just print a one-liner instead.
+    if (TUI_MODE) {
+        console.log(`${colors.green}...you'll see (matrix rain is classic-mode only for now)${colors.reset}`);
+        return Promise.resolve();
+    }
     return new Promise(resolve => {
         const cols = Math.min(process.stdout.columns || 80, 120);
         const rows = Math.min(process.stdout.rows || 24, 30);
@@ -629,12 +754,21 @@ function playMatrixRain(durationMs = 2500) {
 
 async function playPartyMode() {
     const rainbow = [colors.red, colors.yellow, colors.green, colors.cyan, colors.blue, colors.magenta];
+    // NEW: in curses mode, animate via the log pane instead of raw \r writes.
+    if (TUI_MODE) {
+        for (let i = 0; i < 12; i++) {
+            console.log(rainbow[i % rainbow.length] + '🎉 PARTY MODE 🎉' + colors.reset);
+            await new Promise(r => setTimeout(r, 100));
+        }
+        promptAgain(true);
+        return;
+    }
     for (let i = 0; i < 12; i++) {
         process.stdout.write('\r\x1b[K' + rainbow[i % rainbow.length] + '🎉 PARTY MODE 🎉' + colors.reset);
         await new Promise(r => setTimeout(r, 100));
     }
     process.stdout.write('\r\x1b[K');
-    rl.prompt(true);
+    promptAgain(true);
 }
 
 const COFFEE_ART = `
@@ -653,7 +787,7 @@ ${colors.yellow}${colors.bold}⬆️⬆️⬇️⬇️⬅️➡️⬅️➡️�
 ${colors.magenta}You feel a strange sense of ancient power...
 Nothing actually happens. This isn't that kind of game.${colors.reset}
 `);
-    rl.prompt(true);
+    promptAgain(true);
 }
 
 const CHAT_EASTER_EGGS = [
@@ -714,7 +848,7 @@ async function handleAdminCommand(args) {
                 const result = await makeApiRequest(`/rooms/${roomCode}/clients`);
                 printSystemMessage(`👥 Clients in room (${result.clients.length}):`);
                 result.clients.forEach(c => console.log(`  \`${c.id}\` - ${c.name} (${c.role})`));
-                rl.prompt(true);
+                promptAgain(true);
                 break;
             }
             case 'kick': {
@@ -809,7 +943,7 @@ function disconnect() {
     pendingRequests = [];
     myRole = 'player';
     printSystemMessage('Disconnected.');
-    rl.prompt(true);
+    promptAgain(true);
 }
 
 function scheduleReconnect() {
@@ -872,9 +1006,11 @@ function rollDice(formula, mode = 'normal') {
 }
 
 // ─── Command processing ──────────────────────────────────────────
-rl.on('line', (input) => {
+// NEW: named function (was an inline rl.on('line', ...) callback) so the
+// blessed input box in curses mode can drive the exact same command logic.
+function handleInputLine(input) {
     const trimmed = input.trim();
-    if (!trimmed) { rl.prompt(); return; }
+    if (!trimmed) { promptAgain(); return; }
 
     if (trimmed.startsWith('/')) {
         const parts = trimmed.slice(1).split(/\s+/);
@@ -974,7 +1110,7 @@ rl.on('line', (input) => {
                     const modeTag = r.mode && r.mode !== 'normal' ? ` (${r.mode})` : '';
                     console.log(`  ${r.formula}${modeTag} → ${colors.bold}${r.total}${colors.reset}${tag}`);
                 });
-                rl.prompt(true);
+                promptAgain(true);
                 break;
             }
 
@@ -1146,7 +1282,7 @@ rl.on('line', (input) => {
                 if (sub === 'reload') {
                     loadBannerCache();
                     printSystemMessage(`Banners reloaded from cache (${bannerCache.length} loaded)`, colors.green);
-                    rl.prompt(true);
+                    promptAgain(true);
                 } else if (sub === 'fetch') {
                     printSystemMessage('Fetching a remote banner...', colors.dim);
                     fetchRemoteBanner()
@@ -1154,15 +1290,15 @@ rl.on('line', (input) => {
                             addToCache(banner);
                             console.log(banner);
                             printSystemMessage(`Added new banner to cache (now ${bannerCache.length} total)`, colors.green);
-                            rl.prompt(true);
+                            promptAgain(true);
                         })
                         .catch(err => {
                             printSystemMessage(`Failed to fetch: ${err.message}`, colors.red);
-                            rl.prompt(true);
+                            promptAgain(true);
                         });
                 } else {
                     console.log(getRandomBanner());
-                    rl.prompt(true);
+                    promptAgain(true);
                 }
                 break;
             }
@@ -1187,7 +1323,7 @@ ${colors.magenta}╔════════════════════
 ${adventureState.moduleId ? `  Adventure: ${colors.green}${adventureState.title || adventureState.moduleId}${colors.reset}` : ''}
 ${colors.magenta}╚════════════════════════════════╝${colors.reset}
 `);
-                rl.prompt(true);
+                promptAgain(true);
                 break;
             }
 
@@ -1204,7 +1340,7 @@ ${colors.cyan}📊 Session Stats${colors.reset}
   Messages sent:  ${sessionStats.messagesSent}
   Cards drawn:    ${sessionStats.cardsDrawn}
 `);
-                rl.prompt(true);
+                promptAgain(true);
                 break;
             }
 
@@ -1221,7 +1357,7 @@ ${colors.cyan}📊 Session Stats${colors.reset}
                 colors = THEMES[name];
                 userConfig.theme = name;
                 saveUserConfig();
-                rl.setPrompt(`${colors.gray}>${colors.reset} `);
+                if (rl) rl.setPrompt(`${colors.gray}>${colors.reset} `);
                 printSystemMessage(`🎨 Theme switched to "${name}".`, colors.green);
                 break;
             }
@@ -1242,7 +1378,7 @@ ${colors.cyan}📊 Session Stats${colors.reset}
                 const text = argStr.slice(0, 20);
                 process.stdout.write('\r\x1b[K');
                 console.log(colors.cyan + renderAsciiText(text) + colors.reset);
-                rl.prompt(true);
+                promptAgain(true);
                 break;
             }
 
@@ -1256,7 +1392,7 @@ ${colors.cyan}📊 Session Stats${colors.reset}
 
             case 'coffee':
                 console.log(COFFEE_ART);
-                rl.prompt(true);
+                promptAgain(true);
                 break;
 
             case 'about':
@@ -1266,7 +1402,7 @@ ${colors.dim}Built by someone who definitely tested this in production.${colors.
 ${colors.dim}Powered by dice, dread, and an unreasonable number of ANSI codes.${colors.reset}
 ${colors.gray}Try typing things you shouldn't. You might find more than this.${colors.reset}
 `);
-                rl.prompt(true);
+                promptAgain(true);
                 break;
 
             case 'help':
@@ -1276,6 +1412,7 @@ ${colors.gray}Try typing things you shouldn't. You might find more than this.${c
             case 'quit':
             case 'exit':
                 if (ws) ws.close();
+                if (screen) screen.destroy();
                 process.exit(0);
                 break;
 
@@ -1299,8 +1436,9 @@ ${colors.gray}Try typing things you shouldn't. You might find more than this.${c
             printSystemMessage('Not connected.');
         }
     }
-    rl.prompt();
-});
+    promptAgain();
+}
+if (rl) rl.on('line', handleInputLine);
 
 // ─── Message handler (updated for adventure events) ────────────
 function handleMessage(msg) {
@@ -1514,7 +1652,7 @@ function handleMessage(msg) {
         default:
             process.stdout.write('\r\x1b[K');
             console.log(`${colors.gray}[Unknown] ${JSON.stringify(msg)}${colors.reset}`);
-            rl.prompt(true);
+            promptAgain(true);
     }
 }
 
@@ -1553,12 +1691,14 @@ console.log(`Set your name with ${colors.yellow}/name <Your Name>${colors.reset}
 console.log(`Connect with ${colors.yellow}/connect [url] [room]${colors.reset}`);
 if (ADMIN_MODE) console.log(`${colors.green}Admin mode enabled. Use /admin for player management.${colors.reset}`);
 else console.log(`${colors.dim}Tip: Set API_KEY env to enable admin commands.${colors.reset}`);
+if (!TUI_MODE) console.log(`${colors.dim}Tip: Launch with --curses for a full-screen curses UI.${colors.reset}`);
 console.log(`${colors.dim}💭 ${getRandomFortune()}${colors.reset}`);
 console.log('');
 
-rl.prompt();
+promptAgain();
 
 process.on('SIGINT', () => {
     if (ws) ws.close();
+    if (screen) screen.destroy();
     process.exit(0);
 });
