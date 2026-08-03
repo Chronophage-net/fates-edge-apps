@@ -694,6 +694,7 @@ function createApiRouter(appConfig) {
             const r = room.getRoom(req.params.code);
             const state = adventure.markClimaxTriggered(r);
             const roomCode = req.params.code.toUpperCase();
+            room.broadcastToRoom(roomCode, 'adventure-climax-triggered', { source: 'api', ...state });
             res.json({ success: true, code: roomCode, ...state });
         } catch (err) {
             res.status(400).json({ error: err.message });

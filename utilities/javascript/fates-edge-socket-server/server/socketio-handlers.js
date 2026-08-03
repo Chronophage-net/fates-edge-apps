@@ -581,6 +581,47 @@ function setupSocketIO(io) {
         });
 
         // ─── Disconnect ─────────────────────────────────────────────
+        // ─── Leave Room ─────────────────────────────────────────────
+        // Explicit leave (as opposed to disconnect): client is staying
+        // connected but navigating away from this room.
+        socket.on('leave-room', (roomCodeArg) => {
+            const targetRoom = (typeof roomCodeArg === 'string' ? roomCodeArg : socket.room);
+            if (!targetRoom || targetRoom !== socket.room) return;
+            socket.leave(targetRoom);
+            const r = room.rooms.get(targetRoom);
+            if (r) {
+                const wasGm = r.clients.get(socket.id)?.role === 'gm';
+                r.clients.delete(socket.id);
+                room.broadcastToRoom(targetRoom, 'presence', { clients: room.getClientsList(r) }, socket.id);
+                room.broadcastToRoom(targetRoom, 'player-left', {
+                    clientId: socket.id,
+                    clientName: socket.clientData?.name || 'Player',
+                    clients: room.getClientsList(r)
+                }, socket.id);
+                if (wasGm) {
+                    room.broadcastToRoom(targetRoom, 'server_announcement', {
+                        message: 'The Game Master has disconnected.',
+                        timestamp: Date.now()
+                    }, socket.id);
+                }
+                if (r.clients.size === 0) {
+                    room.rooms.delete(targetRoom);
+                    logger.info('🗑️ Room deleted (empty)', { room: targetRoom });
+                }
+            }
+            socket.room = null;
+        });
+
+        // ─── Get Clients ────────────────────────────────────────────
+        // Returns the client list for the caller's current room via the
+        // ack callback, per DESIGN.md's documented `get-clients` event.
+        socket.on('get-clients', (callback) => {
+            if (typeof callback !== 'function') return;
+            if (!socket.room) { callback([]); return; }
+            const r = room.rooms.get(socket.room);
+            callback(r ? room.getClientsList(r) : []);
+        });
+
         socket.on('disconnect', () => {
             socketStats.socketIOConnections--;
             if (socket.room) {

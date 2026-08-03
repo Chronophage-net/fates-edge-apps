@@ -465,12 +465,15 @@ function performDicePoolRoll(pool, dv, options = {}) {
                 currentDice = newDice;
                 dice = [...dice, ...newDice];
                 // Update successes and story beats
-                successes = dice.filter(r => r >= 6).length;
+                successes = countSuccesses(dice);
                 storyBeats = dice.filter(r => r === 1).length;
             }
         }
     }
-    
+
+    const tens = countTens(dice);
+    const critical = isCriticalRoll(tens, successes, dv);
+
     // Determine outcome
     let outcome, outcomeClass, resultText;
     const outcomeCode = getRollOutcomeCode(successes, dv, storyBeats);
@@ -493,13 +496,15 @@ function performDicePoolRoll(pool, dv, options = {}) {
         outcomeClass = 'miss';
         resultText = 'Miss';
     }
-    
+
     return {
         pool: effectivePool,
         dice,
         initialDice,
         successes,
         storyBeats,
+        tens,
+        critical,               // NEW: true only if a 10 was rolled AND successes >= dv
         dv,
         position,
         boons,
@@ -535,7 +540,7 @@ function performRoll(attr, skill, dv, position = 'controlled', boons = 0, option
     // Roll the initial pool
     let dice = rollDice(pool);
     let storyBeats = dice.filter(r => r === 1).length;
-    let successes = dice.filter(r => r >= 6).length;
+    let successes = countSuccesses(dice);
     let reRolls = 0;
     let reRolledDice = [];
     let rerollSuccesses = 0;
@@ -550,7 +555,7 @@ function performRoll(attr, skill, dv, position = 'controlled', boons = 0, option
             const rerollResults = rollDice(failures.length);
             reRolledDice = failures.map((old, i) => ({ old, new: rerollResults[i] || 1 }));
             reRolls = rerollResults.length;
-            rerollSuccesses = rerollResults.filter(r => r >= 6).length;
+            rerollSuccesses = countSuccesses(rerollResults);
             rerollStoryBeats = rerollResults.filter(r => r === 1).length;
             // Update dice array with re-roll results
             let idx = 0;
@@ -571,7 +576,7 @@ function performRoll(attr, skill, dv, position = 'controlled', boons = 0, option
             const rerollResults = rollDice(successDice.length);
             reRolledDice = successDice.map((old, i) => ({ old, new: rerollResults[i] || 1 }));
             reRolls = rerollResults.length;
-            rerollSuccesses = rerollResults.filter(r => r >= 6).length;
+            rerollSuccesses = countSuccesses(rerollResults);
             rerollStoryBeats = rerollResults.filter(r => r === 1).length;
             // Replace success dice with re-roll results
             let idx = 0;
@@ -587,6 +592,9 @@ function performRoll(attr, skill, dv, position = 'controlled', boons = 0, option
         }
     }
     
+    const tens = countTens(dice);
+    const critical = isCriticalRoll(tens, successes, dv);
+
     // Determine outcome
     let outcome, outcomeClass, resultText;
     let storyBeatOutcome = '';
@@ -614,13 +622,15 @@ function performRoll(attr, skill, dv, position = 'controlled', boons = 0, option
         resultText = 'Miss';
         storyBeatOutcome = 'The action fails. Gain 2 Boons. The GM gains Story Beats to escalate.';
     }
-    
+
     return {
         pool,
         dice,
         initialDice,
         successes,
         storyBeats,
+        tens,
+        critical,               // NEW: true only if a 10 was rolled AND successes >= dv
         dv,
         position,
         boons,
@@ -762,7 +772,11 @@ export {
     // NEW exports for outcome codes
     //OUTCOME_CODES,
     getRollOutcomeCode,
-    getOutcomeLabelFromCode
+    getOutcomeLabelFromCode,
+    // NEW exports for 10s-as-2-successes + critical detection
+    countSuccesses,
+    countTens,
+    isCriticalRoll
 };
 
 // Default export for the module loader
@@ -789,5 +803,8 @@ export default {
     defaultSkills,
     OUTCOME_CODES,
     getRollOutcomeCode,
-    getOutcomeLabelFromCode
+    getOutcomeLabelFromCode,
+    countSuccesses,
+    countTens,
+    isCriticalRoll
 };

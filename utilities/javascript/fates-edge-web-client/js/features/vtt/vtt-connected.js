@@ -633,6 +633,7 @@ function rollConnected(postToChat = true) {
                     <span>Story Beats: <strong style="color:var(--red);">${result.storyBeats}</strong></span>
                     ${result.reRolls > 0 ? `<span>Re-rolls: <strong>${result.reRolls}</strong></span>` : ''}
                     ${range ? `<span>📏 <strong style="color:var(--gold);">${RANGE_BAND_LABEL_MAP[range] || range}</strong>${rangeNote}</span>` : ''}
+                    ${result.critical ? `<span>💥 <strong style="color:#e91e63;">Critical (${result.tens}×10)</strong></span>` : (result.tens > 0 ? `<span style="color:var(--text3);">${result.tens}×10</span>` : '')}
                 </div>
             </div>
         `;
@@ -651,6 +652,7 @@ function rollConnected(postToChat = true) {
         if (result.reRolls > 0) {
             msg += ` | Re-rolls: ${result.reRolledDice.map(r => `${r.old}→${r.new}`).join(', ')}`;
         }
+        if (result.critical) msg += ` | 💥 CRIT (${result.tens}×10)`;
         msg += ` — ${result.resultText}${rangeNote}`;
 
         sendMessage(msg, sender, 'all', {
@@ -663,7 +665,9 @@ function rollConnected(postToChat = true) {
                 storyBeats: result.storyBeats,
                 reRolls: result.reRolls,
                 reRolledDice: result.reRolledDice,
-                range: range || null
+                range: range || null,
+                tens: result.tens,
+                critical: result.critical
             }
         });
 
@@ -702,7 +706,7 @@ function handleSlash(text) {
             const note = parts.slice(6).join(' ') || '';
             const result = performRoll(attr, skill, dv, pos, boons);
             if (!result) { showToast('Pool must be at least 1 die.', 'error'); return; }
-            const msg = `[${result.outcome}] ${attr}+${skill} vs DV${dv} (${pos}) → ${result.dice.join(' ')} (S:${result.successes} SB:${result.storyBeats})${note ? ' — ' + note : ''}`;
+            const msg = `[${result.outcome}] ${attr}+${skill} vs DV${dv} (${pos}) → ${result.dice.join(' ')} (S:${result.successes} SB:${result.storyBeats})${result.critical ? ' | 💥 CRIT' : ''}${note ? ' — ' + note : ''}`;
             sendMessage(msg, sender, 'all', {
                 rollData: {
                     outcome: result.outcome,
@@ -712,7 +716,9 @@ function handleSlash(text) {
                     successes: result.successes,
                     storyBeats: result.storyBeats,
                     reRolls: result.reRolls,
-                    reRolledDice: result.reRolledDice
+                    reRolledDice: result.reRolledDice,
+                    tens: result.tens,
+                    critical: result.critical
                 }
             });
             import('../encounters/combat.js').then(module => {
@@ -763,13 +769,19 @@ async function pushCharactersToServer() {
     const updates = {};
     characters.forEach(c => {
         if (c.name) {
-            const attrs = c.attributes || { body: 1, wits: 1, spirit: 1, presence: 1 };
+            // NOTE: attribute keys are capitalized (Body/Wits/Spirit/Presence) to match
+            // the client's own character schema (roller.js, wizard.js, vtt-core.js) and
+            // the server's DEFAULT_ATTRIBUTES — sending lowercase keys here previously
+            // clobbered the character's real attributes on the server with a bogus
+            // lowercase object that nothing else (including an AI GM reading this data)
+            // could read.
+            const attrs = c.attributes || { Body: 2, Wits: 2, Spirit: 2, Presence: 2 };
             const entry = {
                 attributes: {
-                    body: attrs.body ?? 1,
-                    wits: attrs.wits ?? 1,
-                    spirit: attrs.spirit ?? 1,
-                    presence: attrs.presence ?? 1,
+                    Body: attrs.Body ?? 2,
+                    Wits: attrs.Wits ?? 2,
+                    Spirit: attrs.Spirit ?? 2,
+                    Presence: attrs.Presence ?? 2,
                 },
                 harm: c.harm || 0,
                 fatigue: c.fatigue || 0,

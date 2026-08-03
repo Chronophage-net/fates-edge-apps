@@ -211,6 +211,7 @@ function rollLocal(postToChat = true) {
           <span>Story Beats: <strong style="color:var(--red);">${result.storyBeats}</strong></span>
           ${result.reRolls > 0 ? `<span>Re-rolls: <strong>${result.reRolls}</strong></span>` : ''}
           ${range ? `<span>📏 <strong style="color:var(--gold);">${RANGE_BAND_LABEL_MAP[range] || range}</strong>${rangeNote}</span>` : ''}
+          ${result.critical ? `<span>💥 <strong style="color:#e91e63;">Critical (${result.tens}×10)</strong></span>` : (result.tens > 0 ? `<span style="color:var(--text3);">${result.tens}×10</span>` : '')}
         </div>
       </div>
     `;
@@ -224,6 +225,7 @@ function rollLocal(postToChat = true) {
     msg += ' → ';
     msg += result.dice.join(' ');
     msg += ` | S:${result.successes} SB:${result.storyBeats}`;
+    if (result.critical) msg += ` | 💥 CRIT (${result.tens}×10)`;
     msg += ` — ${result.resultText}${rangeNote}`;
     sendMessage(msg, sender, 'all', {
       rollData: {
@@ -234,7 +236,9 @@ function rollLocal(postToChat = true) {
         successes: result.successes,
         storyBeats: result.storyBeats,
         reRolls: result.reRolls,
-        range: range || null
+        range: range || null,
+        tens: result.tens,
+        critical: result.critical
       }
     });
   }
@@ -259,7 +263,7 @@ function handleSlash(text) {
       const note = parts.slice(6).join(' ') || '';
       const result = performRoll(attr, skill, dv, pos, boons);
       if (!result) { showToast('Pool must be at least 1 die.', 'error'); return; }
-      const msg = `[${result.outcome}] ${attr}+${skill} vs DV${dv} (${pos}) → ${result.dice.join(' ')} (S:${result.successes} SB:${result.storyBeats})${note ? ' — ' + note : ''}`;
+      const msg = `[${result.outcome}] ${attr}+${skill} vs DV${dv} (${pos}) → ${result.dice.join(' ')} (S:${result.successes} SB:${result.storyBeats})${result.critical ? ' | 💥 CRIT' : ''}${note ? ' — ' + note : ''}`;
       sendMessage(msg, sender, 'all', {
         rollData: {
           outcome: result.outcome,
@@ -267,7 +271,9 @@ function handleSlash(text) {
           resultText: result.resultText,
           dice: result.dice,
           successes: result.successes,
-          storyBeats: result.storyBeats
+          storyBeats: result.storyBeats,
+          tens: result.tens,
+          critical: result.critical
         }
       });
       break;
