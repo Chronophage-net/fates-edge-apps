@@ -317,6 +317,9 @@ function setupWSS(wss) {
                         if (data.role) {
                             ws.clientData.role = data.role;
                         }
+                        if (data.activeView) {
+                            ws.clientData.activeView = data.activeView;
+                        }
                         // Preserve selectedCharacter
                         const r = room.rooms.get(roomKey);
                         if (r) {
@@ -324,6 +327,7 @@ function setupWSS(wss) {
                             if (clientEntry) {
                                 clientEntry.name = ws.clientData.name;
                                 clientEntry.role = ws.clientData.role;
+                                if (data.activeView) clientEntry.activeView = data.activeView;
                                 // selectedCharacter stays as is
                                 r.clients.set(clientId, clientEntry);
                             }
@@ -360,12 +364,16 @@ function setupWSS(wss) {
                             if (data.role) {
                                 ws.clientData.role = data.role;
                             }
+                            if (data.activeView) {
+                                ws.clientData.activeView = data.activeView;
+                            }
                             const r2 = room.rooms.get(roomKey);
                             if (r2) {
                                 const clientEntry2 = r2.clients.get(clientId);
                                 if (clientEntry2) {
                                     clientEntry2.name = ws.clientData.name;
                                     clientEntry2.role = ws.clientData.role;
+                                    if (data.activeView) clientEntry2.activeView = data.activeView;
                                     r2.clients.set(clientId, clientEntry2);
                                 }
                                 room.broadcastToRoom(roomKey, 'presence', { clients: room.getClientsList(r2) }, ws.clientId);

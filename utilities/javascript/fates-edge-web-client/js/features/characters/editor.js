@@ -29,6 +29,9 @@ import { getState, addCharacter, getCharacter, updateCharacter, deleteCharacter 
 import { generateId, escHtml, safeParseInt, clamp } from '../../core/utils.js';
 import { showToast } from '../../components/Toast.js';
 import { loadPatronData } from '../patrons/index.js';
+import { openTalentEditor } from './talent-editor.js';
+import { ensureTalentEffects } from '../../core/talent-effects.js';
+import { loadTalentCatalog } from '../../core/talent-loader.js';
 
 console.log('[Editor] Module loaded');
 
@@ -72,10 +75,16 @@ const ARMOR_TYPES = [
     { id: 'mythic', label: 'Mythic Armor', xpCost: 20, conversion: '5→4 (min 1 Fatigue/hit)', penalty: 'Special' }
 ];
 
+// Weight class is the ONE axis that drives the range-band dice bonus (see
+// core/talent-effects.js's RANGE_BONUS_TABLE) — Light/Medium/Heavy numbers
+// are the Player's Guide §3.12.2 Melee Modifiers table verbatim; Ranged
+// collapses the Guide's own Light/Medium/Heavy Ranged sub-table (§3.12.3,
+// each with its own Tempo) into one representative curve.
 const WEAPON_CLASSES = [
     { id: 'light', label: 'Light Weapon (4 XP)', close: '+2d', near: '+1d', notes: 'Fast, concealable' },
     { id: 'medium', label: 'Medium Weapon (8 XP)', close: '+1d', near: '+2d', notes: 'Balanced, battlefield standard' },
-    { id: 'heavy', label: 'Heavy Weapon (12 XP)', close: '-1d', near: '+3d', notes: 'Punishing, slow' }
+    { id: 'heavy', label: 'Heavy Weapon (12 XP)', close: '-1d', near: '+3d', notes: 'Punishing, slow' },
+    { id: 'ranged', label: 'Ranged Weapon', close: '-2d', near: '+2d', notes: 'Bow, crossbow, thrown — Close carries the "Ranged in Close = Desperate" penalty; see §3.12.3 for Far/Tempo' }
 ];
 
 const WEAPON_TAGS = [
@@ -281,7 +290,17 @@ function initEditor() {
             e.preventDefault();
         }
     });
-    
+
+    // talent-editor.js dispatches this after saving/deleting a talent (catalog or
+    // character-scoped). Refresh the character editor's talent list if it's open so
+    // both talent-editing surfaces stay visibly in sync.
+    document.addEventListener('talent-updated', () => {
+        if (editorState.isOpen) {
+            renderCETalentList();
+            recalculateXpBudget();
+        }
+    });
+
     editorState.initialized = true;
     console.log('[Editor] initEditor complete');
 }
@@ -381,7 +400,7 @@ function renderTalentCatalog() {
         return;
     }
 
-    catalogEl.innerHTML = available.map(t => {
+    catalogEl.innerHTML = available.map((t, i) => {
         const cost = safeParseInt(t.cost, 0);
         const tierObj = TALENT_TIERS.find(ti => cost >= ti.min && cost <= ti.max);
         const tierLabel = tierObj ? tierObj.label : '?';
@@ -394,7 +413,7 @@ function renderTalentCatalog() {
                     ${t.description ? `<div style="color:var(--text2); font-size:0.7rem;">${escHtml(t.description)}</div>` : ''}
                     ${t.prerequisites ? `<div style="color:var(--text3); font-size:0.65rem;">Requires: ${escHtml(t.prerequisites)}</div>` : ''}
                 </div>
-                <button class="btn btn-xs btn-primary ce-catalog-add-btn" data-name="${escHtml(t.name)}" data-cost="${cost}">Add</button>
+                <button class="btn btn-xs btn-primary ce-catalog-add-btn" data-index="${i}">Add</button>
             </div>
         `;
     }).join('');
@@ -402,30 +421,115 @@ function renderTalentCatalog() {
     catalogEl.querySelectorAll('.ce-catalog-add-btn').forEach(btn => {
         btn.addEventListener('click', function(e) {
             e.preventDefault();
-            const name = this.dataset.name;
-            const cost = parseInt(this.dataset.cost, 10);
-            addTalentFromCatalog(name, cost);
+            const idx = parseInt(this.dataset.index, 10);
+            addTalentFromCatalog(available[idx]);
         });
     });
 }
 
-function addTalentFromCatalog(name, cost) {
-    const listEl = document.getElementById('ce-talent-list');
-    if (!listEl) {
-        showToast('Talent list not found.', 'error');
+/**
+ * Add a talent to the character currently open in the editor. Takes the FULL
+ * talent object (tier/activation/category/useLimit/effects/prerequisites/etc.),
+ * not just name+cost — previously this only carried {name, cost} into
+ * character.talents, silently discarding everything the talent catalog and the
+ * dedicated talent editor (talent-editor.js) captured. Persists immediately via
+ * updateCharacter so the two talent-editing surfaces stay in sync.
+ */
+function addTalentFromCatalog(talent) {
+    if (!editorState.currentId) {
+        showToast('Open a character first.', 'error');
         return;
     }
+    const c = getCharacter(editorState.currentId);
+    if (!c) return;
+    if (!Array.isArray(c.talents)) c.talents = [];
 
-    const row = document.createElement('div');
-    row.className = 'dynamic-row ce-talent-row';
-    row.innerHTML = `
-        <span class="ce-talent-name" style="flex:2; padding:0.2rem;">${escHtml(name)}</span>
-        <span class="ce-talent-cost" style="width:70px; text-align:center;">${cost}</span>
-        <button class="btn btn-xs editor-remove-btn">✕</button>
-    `;
-    listEl.appendChild(row);
+    const { source, ...rest } = talent; // drop the 'local'/'wiki' catalog-source tag
+    const talentCopy = {
+        ...rest,
+        id: generateId('talent_'),
+        clonedFrom: talent.id || null,
+    };
+    ensureTalentEffects(talentCopy);
+    c.talents.push(talentCopy);
+    updateCharacter(editorState.currentId, { talents: c.talents });
+    renderCETalentList();
     recalculateXpBudget();
-    showToast(`Added "${name}" (${cost} XP)`, 'success');
+    showToast(`Added "${talent.name}" (${safeParseInt(talent.cost, 0)} XP)`, 'success');
+}
+
+/**
+ * Render the character's talent list from state (the single source of truth),
+ * instead of from ad-hoc DOM rows that only ever captured {name, cost}.
+ */
+function renderCETalentList() {
+    const listEl = document.getElementById('ce-talent-list');
+    if (!listEl || !editorState.currentId) return;
+    const c = getCharacter(editorState.currentId);
+    const talents = (c?.talents || []).filter(t => t && t.name);
+
+    const LIMITED_USE = new Set(['once-scene', 'once-session', 'once-arc', 'once-campaign']);
+    const uses = c?.talentUses || {};
+
+    listEl.innerHTML = talents.map((t, i) => {
+        const tierObj = TALENT_TIERS.find(ti => ti.id === t.tier);
+        const tierLabel = tierObj ? tierObj.label : (t.tier || '');
+        const hasMechanicalEffect = Array.isArray(t.effects) && t.effects.length > 0;
+        const isLimited = LIMITED_USE.has(t.useLimit);
+        const spent = isLimited && uses[t.id || t.name]?.spent;
+        let chargeBadge = '';
+        if (isLimited) {
+            chargeBadge = spent
+                ? `<span title="Charge spent — refreshes at ${t.useLimit.replace('once-', '')} end" style="color:var(--text3);font-size:0.7rem;margin-left:0.3rem;">○ spent</span>
+                   <button type="button" class="btn btn-xs ce-talent-refresh-btn" data-index="${i}" title="Manually refresh this charge">↻</button>`
+                : `<span title="Charge available" style="color:var(--green);font-size:0.7rem;margin-left:0.3rem;">● ready</span>`;
+        }
+        return `
+            <div class="dynamic-row ce-talent-row" data-index="${i}" style="display:flex;align-items:center;gap:0.4rem;padding:0.2rem 0;">
+                <div style="flex:2;">
+                    <span style="font-weight:500;">${escHtml(t.name)}</span>
+                    ${tierLabel ? `<span style="color:var(--text3);font-size:0.7rem;margin-left:0.3rem;">(${escHtml(tierLabel)})</span>` : ''}
+                    ${hasMechanicalEffect ? `<span title="Has a mechanical effect the dice roller applies automatically" style="margin-left:0.3rem;">⚙️</span>` : ''}
+                    ${chargeBadge}
+                    ${t.effect ? `<div style="color:var(--text3);font-size:0.7rem;">${escHtml(t.effect)}</div>` : ''}
+                </div>
+                <span style="width:50px;text-align:center;">${safeParseInt(t.cost, 0)} XP</span>
+                <button type="button" class="btn btn-xs ce-talent-edit-btn" data-index="${i}">✏️</button>
+                <button type="button" class="btn btn-xs editor-remove-btn ce-talent-remove-btn" data-index="${i}">✕</button>
+            </div>
+        `;
+    }).join('');
+
+    listEl.querySelectorAll('.ce-talent-edit-btn').forEach(btn => {
+        btn.addEventListener('click', function () {
+            openTalentEditor(editorState.currentId, parseInt(this.dataset.index, 10));
+        });
+    });
+    listEl.querySelectorAll('.ce-talent-remove-btn').forEach(btn => {
+        btn.addEventListener('click', function () {
+            const idx = parseInt(this.dataset.index, 10);
+            const cc = getCharacter(editorState.currentId);
+            if (!cc || !Array.isArray(cc.talents)) return;
+            cc.talents.splice(idx, 1);
+            updateCharacter(editorState.currentId, { talents: cc.talents });
+            renderCETalentList();
+            recalculateXpBudget();
+        });
+    });
+    listEl.querySelectorAll('.ce-talent-refresh-btn').forEach(btn => {
+        btn.addEventListener('click', function () {
+            const idx = parseInt(this.dataset.index, 10);
+            const cc = getCharacter(editorState.currentId);
+            if (!cc || !Array.isArray(cc.talents)) return;
+            const t = cc.talents[idx];
+            if (!t) return;
+            const key = t.id || t.name;
+            const newUses = { ...(cc.talentUses || {}) };
+            delete newUses[key];
+            updateCharacter(editorState.currentId, { talentUses: newUses });
+            renderCETalentList();
+        });
+    });
 }
 
 // ============================================================
@@ -639,13 +743,16 @@ function recalculateXpBudget() {
     const totalXp = safeParseInt(totalXpInput.value, 32);
     
     try {
+        // Talents are read from state (see renderCETalentList/addTalentFromCatalog),
+        // not from the DOM — the talent list no longer renders plain name/cost inputs.
+        const liveChar = editorState.currentId ? getCharacter(editorState.currentId) : null;
         const tempChar = {
             body: safeParseInt(document.getElementById('ce-body')?.value, 1),
             wits: safeParseInt(document.getElementById('ce-wits')?.value, 1),
             spirit: safeParseInt(document.getElementById('ce-spirit')?.value, 1),
             presence: safeParseInt(document.getElementById('ce-presence')?.value, 1),
             skills: {},
-            talents: readDynamicList('talent'),
+            talents: liveChar?.talents || [],
             assets: readDynamicList('asset'),
             equipment: readDynamicList('equipment')
         };
@@ -817,6 +924,7 @@ function createNewCharacter() {
     return {
         id: generateId(),
         name: '',
+        avatar: '',
         heritage: 'human',
         heritageNote: '',
         background: '',
@@ -840,6 +948,7 @@ function createNewCharacter() {
         presence: 1,
         skills: defaultSkills(),
         talents: [],
+        talentUses: {},
         assets: [],
         equipment: [],
         bonds: [],
@@ -992,19 +1101,14 @@ function buildEditorHTML(c) {
         `;
     }).join('');
 
-    const validTalents = (c.talents || []).filter(t => t && typeof t === 'object' && t.name);
     const validAssets = (c.assets || []).filter(a => a && typeof a === 'object' && a.name);
     const validEquipment = (c.equipment || []).filter(e => e && typeof e === 'object' && e.name);
     const validBonds = (c.bonds || []).filter(b => b && typeof b === 'object' && b.name);
     const validComplications = (c.complications || []).filter(cp => cp && typeof cp === 'object' && cp.name);
 
-    const talentRows = validTalents.map((t, i) => `
-        <div class="dynamic-row ce-talent-row">
-            <span class="ce-talent-name" style="flex:2; padding:0.2rem;">${escHtml(t.name)}</span>
-            <span class="ce-talent-cost" style="width:70px; text-align:center;">${t.cost ?? 0}</span>
-            <button class="btn btn-xs editor-remove-btn">✕</button>
-        </div>
-    `).join('');
+    // Talent rows are rendered by renderCETalentList() after this HTML is injected,
+    // since they read live from character.talents (the single source of truth) rather
+    // than from a static string built at open-time — see renderCETalentList().
 
     const assetRows = validAssets.map((a, i) => dynamicRowHTML('asset', i, a)).join('');
     const equipRows = validEquipment.map((e, i) => dynamicRowHTML('equipment', i, e)).join('');
@@ -1027,7 +1131,19 @@ function buildEditorHTML(c) {
             </div>
 
             <!-- Identity -->
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;">
+            <div style="display:flex;gap:0.8rem;align-items:flex-start;">
+                <div style="flex-shrink:0;text-align:center;">
+                    <img id="ce-avatar-preview" src="${escHtml(c.avatar || '')}" alt="" style="width:64px;height:64px;border-radius:50%;object-fit:cover;border:1px solid var(--border);background:var(--bg3);display:${c.avatar ? 'block' : 'none'};" onerror="this.style.display='none'" />
+                    <div style="font-size:0.65rem;color:var(--text3);margin-top:0.2rem;">Portrait</div>
+                </div>
+                <div style="flex:1;">
+                    <label>Portrait URL</label>
+                    <input id="ce-avatar" value="${escHtml(c.avatar || '')}" placeholder="https://... image link (optional)" />
+                </div>
+            </div>
+
+            <!-- Identity -->
+            <div class="ce-fixed-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;">
                 <div>
                     <label>Name *</label>
                     <input id="ce-name" value="${escHtml(c.name)}" placeholder="Character name" />
@@ -1068,7 +1184,7 @@ function buildEditorHTML(c) {
             </div>
 
             <!-- Attributes -->
-            <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:0.5rem;">
+            <div class="ce-fixed-grid" style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:0.5rem;">
                 ${['body','wits','spirit','presence'].map(attr => `
                     <div style="background:var(--bg3);padding:0.3rem;border-radius:4px;text-align:center;">
                         <label style="font-weight:600;font-size:0.85rem;">${attr.charAt(0).toUpperCase()+attr.slice(1)}</label>
@@ -1087,7 +1203,7 @@ function buildEditorHTML(c) {
             </div>
 
             <!-- Magic Path -->
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;">
+            <div class="ce-fixed-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;">
                 <div>
                     <label>Magic Path</label>
                     <select id="ce-magic-path">${magicPathOptions}</select>
@@ -1100,7 +1216,7 @@ function buildEditorHTML(c) {
 
             <!-- Runekeeper Fields -->
             <div id="ce-runekeeper-fields" style="display:${isRunekeeper ? 'block' : 'none'};">
-                <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;">
+                <div class="ce-fixed-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;">
                     <div>
                         <label>Thiasos (Familiar)</label>
                         <input id="ce-thiasos" value="${escHtml(c.thiasos || '')}" placeholder="e.g., white-hound, garden-spider" />
@@ -1115,7 +1231,7 @@ function buildEditorHTML(c) {
             <!-- Cantor Fields -->
             <div id="ce-cantor-fields" style="display:${isCantor ? 'block' : 'none'};border-top:1px solid var(--border);padding-top:0.3rem;">
                 <h5 style="margin:0.2rem 0;">🎵 Cantor</h5>
-                <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;">
+                <div class="ce-fixed-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;">
                     <div>
                         <label>Bound Patron</label>
                         <select id="ce-bound-patron">${boundPatronOptions}</select>
@@ -1136,7 +1252,7 @@ function buildEditorHTML(c) {
             </div>
 
             <!-- Combat Loadout -->
-            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0.5rem;">
+            <div class="ce-fixed-grid" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0.5rem;">
                 <div>
                     <label>Armor</label>
                     <select id="ce-armor-type">${armorOptions}</select>
@@ -1157,8 +1273,8 @@ function buildEditorHTML(c) {
             <div>
                 <h4 style="margin:0.3rem 0;">🧠 Talents</h4>
                 <div id="ce-talent-catalog" class="talent-catalog" style="max-height:200px;overflow-y:auto;border:1px solid var(--border);border-radius:4px;background:var(--bg3);margin-bottom:0.3rem;"></div>
-                <div id="ce-talent-list">${talentRows}</div>
-                <button class="btn btn-sm btn-secondary" id="ce-add-custom-talent">+ Add Custom Talent</button>
+                <div id="ce-talent-list"></div>
+                <button type="button" class="btn btn-sm btn-secondary" id="ce-add-custom-talent">+ Add Custom Talent</button>
             </div>
 
             <!-- Assets -->
@@ -1176,7 +1292,7 @@ function buildEditorHTML(c) {
             </div>
 
             <!-- Bonds & Complications -->
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;">
+            <div class="ce-fixed-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;">
                 <div>
                     <h4 style="margin:0.3rem 0;">🤝 Bonds</h4>
                     <div id="ce-bond-list">${bondRows}</div>
@@ -1232,6 +1348,12 @@ export async function openEditor(id) {
         console.log('[Editor] Patron data loaded');
     } catch (err) {
         console.warn('[Editor] Failed to load patron data:', err);
+    }
+
+    try {
+        await loadTalentCatalog();
+    } catch (err) {
+        console.warn('[Editor] Failed to load talent catalog:', err);
     }
 
     initEditor();
@@ -1293,6 +1415,7 @@ export async function openEditor(id) {
     attachEditorEvents();
     recalculateXpBudget();
     renderTalentCatalog();
+    renderCETalentList();
     updateMagicPathDisplay();
     updateTierDisplay();
     updateArmorConversion();
@@ -1365,6 +1488,7 @@ export function saveEditor() {
 
     try {
         c.name = name.trim();
+        c.avatar = v('#ce-avatar').trim();
         c.heritage = v('#ce-heritage') || 'human';
         c.region = v('#ce-region');
         c.culturalAffinity = v('#ce-cultural-affinity');
@@ -1447,7 +1571,12 @@ export function saveEditor() {
         c.monkCorruptionTier = Math.max(0, n('#ce-monk-corruption-tier'));
         c.knownTags = readDynamicList('known-tag').map(row => row.name).filter(Boolean);
 
-        c.talents = readDynamicList('talent').filter(t => t.name);
+        // NOTE: c.talents is intentionally NOT re-read from the DOM here. Talents are
+        // now added/edited/removed directly against state (addTalentFromCatalog,
+        // renderCETalentList's edit/remove handlers, and the talent-editor.js modal),
+        // each of which persists immediately via updateCharacter. Re-reading from a
+        // simple name+cost row here would silently discard tier/category/effects/
+        // useLimit/prerequisites — which used to happen, and is the bug this fixes.
         c.assets = readDynamicList('asset').filter(a => a.name);
         c.equipment = readDynamicList('equipment').filter(e => e.name);
         c.bonds = readDynamicList('bond').filter(b => b.name);
@@ -1546,6 +1675,21 @@ function attachEditorEvents() {
         }
     });
 
+    // Avatar live preview
+    const avatarInput = document.getElementById('ce-avatar');
+    const avatarPreview = document.getElementById('ce-avatar-preview');
+    if (avatarInput && avatarPreview) {
+        avatarInput.addEventListener('input', () => {
+            const url = avatarInput.value.trim();
+            if (url) {
+                avatarPreview.src = url;
+                avatarPreview.style.display = 'block';
+            } else {
+                avatarPreview.style.display = 'none';
+            }
+        });
+    }
+
     // Heritage
     const heritageSelect = document.getElementById('ce-heritage');
     if (heritageSelect) {
@@ -1581,10 +1725,14 @@ function attachEditorEvents() {
         }
     });
 
-    // Custom talent button
+    // Custom talent button — opens the full talent editor (tier/activation/category/
+    // useLimit/prerequisites/effect) instead of a bare name+cost row, so custom talents
+    // get the same structured effects as catalog talents.
     const customTalentBtn = document.getElementById('ce-add-custom-talent');
     if (customTalentBtn) {
-        customTalentBtn.addEventListener('click', () => addCEDynamic('talent'));
+        customTalentBtn.addEventListener('click', () => {
+            if (editorState.currentId) openTalentEditor(editorState.currentId, -1);
+        });
     }
 
     // Weapon tags

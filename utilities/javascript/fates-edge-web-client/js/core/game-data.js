@@ -1,11 +1,19 @@
-// js/core/dice.js
-// Fate's Edge game data and constants
+// js/core/game-data.js
+// Fate's Edge game data and constants.
+//
+// NOTE: nothing in the app currently imports this module (verified — no other file
+// references 'core/game-data'). It previously listed a 19-skill set that disagreed
+// with the 16-skill canonical list actually used by js/features/characters/editor.js
+// and roller.js (Melee/Ranged/Unarmed/Athletics/Stealth/Endurance/Craft/Sway/
+// Deception/Subterfuge/Performance/Insight/Lore/Investigation/Medicine/Arcana — no
+// Brawl/Tactics/Survival/Command/Ritual). Left in place as a small standalone utility,
+// but updated to match the canonical list so it doesn't silently drift if something
+// starts importing it later.
 
 export const ALL_SKILLS = [
-    'Melee', 'Ranged', 'Brawl', 'Tactics', 'Athletics',
-    'Stealth', 'Endurance', 'Craft', 'Survival', 'Sway',
-    'Command', 'Deception', 'Performance', 'Insight',
-    'Lore', 'Investigation', 'Medicine', 'Arcana', 'Ritual'
+    'Melee', 'Ranged', 'Unarmed', 'Athletics', 'Stealth', 'Endurance', 'Craft',
+    'Sway', 'Deception', 'Subterfuge', 'Performance', 'Insight', 'Lore',
+    'Investigation', 'Medicine', 'Arcana'
 ];
 
 /**

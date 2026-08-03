@@ -18,11 +18,13 @@
  */
 
 import { vttStore } from '../../core/vtt-store.js';
-import { getState, getCharacters, ensureCharacterDefaults, clearChatHistory } from '../../core/state.js';
+import { getState, getCharacters, ensureCharacterDefaults, clearChatHistory, saveState } from '../../core/state.js';
 import { performRoll } from '../../core/dice.js';
 import { showToast } from '../../components/Toast.js';
 import { escHtml } from '../../core/utils.js';
 import { isConnectedToServer } from '../../core/websocket.js';
+import { collectEquipmentModifiers } from '../../core/talent-effects.js';
+import { RANGE_BAND_OPTIONS, RANGE_BAND_LABEL_MAP } from '../characters/roller.js';
 import {
   setContainer,
   q,
@@ -58,6 +60,57 @@ const voiceStatus = { muted: false };
 // ============================================================
 // HELPERS – Get sender from selected character
 // ============================================================
+
+// ============================================================
+// MINI COMBAT TRACKER (VTT sidebar) — see #vtt-mini-tracker-body
+// ============================================================
+
+async function renderMiniTracker() {
+  const el = q('#vtt-mini-tracker-body');
+  if (!el) return;
+  try {
+    const combatModule = await import('../encounters/combat.js');
+    const trackerState = combatModule.getTrackerState();
+    if (!trackerState.combatants || trackerState.combatants.length === 0) {
+      el.innerHTML = '<div class="text-muted text-sm">No active encounter. Open Encounters to start one.</div>';
+      return;
+    }
+
+    const selected = vttStore.getSelectedCharacter();
+    const selfCombatant = selected
+      ? trackerState.combatants.find(c => (c.name || '').toLowerCase() === (selected.name || '').toLowerCase())
+      : null;
+
+    el.innerHTML = `
+      <div class="text-muted text-sm" style="margin-bottom:0.3rem;">Round ${trackerState.round || 0}</div>
+      <div style="display:flex;flex-direction:column;gap:0.15rem;">
+        ${trackerState.combatants.map(c => {
+          const isActive = c.id === trackerState.activeCombatantId;
+          const weaponGlyph = { light: '🗡️', medium: '⚔️', heavy: '🔨', ranged: '🏹' }[c.weaponClass] || '';
+          let rangeHtml = '';
+          if (selfCombatant && selfCombatant.id !== c.id) {
+            const band = combatModule.getRangeBandBetween(selfCombatant.id, c.id);
+            const info = combatModule.getRangeBandInfo(band);
+            rangeHtml = `<span class="vtt-stat-pill" style="background:${info.color}22;border:1px solid ${info.color};color:${info.color};font-size:0.7rem;" title="Range to ${escHtml(selfCombatant.name)}">${info.short}</span>`;
+          }
+          return `
+            <div style="display:flex;align-items:center;gap:0.4rem;padding:0.25rem 0.3rem;border-radius:4px;${isActive ? 'background:var(--bg4);border-left:2px solid var(--gold);' : ''}font-size:0.85rem;">
+              <span style="flex:0 0 1.1rem;text-align:center;">${isActive ? '▶' : ''}</span>
+              <span style="flex:0 0 auto;color:${c.type === 'player' ? 'var(--blue)' : 'var(--red)'};">${weaponGlyph}</span>
+              <span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${escHtml(c.name)}</span>
+              ${c.harm > 0 ? `<span class="text-muted text-sm" style="color:var(--red);" title="Harm">H${c.harm}</span>` : ''}
+              ${c.fatigue > 0 ? `<span class="text-muted text-sm" title="Fatigue">F${c.fatigue}</span>` : ''}
+              ${rangeHtml}
+            </div>
+          `;
+        }).join('')}
+      </div>
+    `;
+  } catch (err) {
+    console.debug('[VTT Local] Mini tracker unavailable:', err?.message);
+    el.innerHTML = '<div class="text-muted text-sm">Combat tracker unavailable.</div>';
+  }
+}
 
 function getSenderName() {
   const selected = vttStore.getSelectedCharacter();
@@ -104,14 +157,36 @@ function rollLocal(postToChat = true) {
   const dvEl = q('#vtt-dv');
   const posEl = q('#vtt-pos');
   const boonsEl = q('#vtt-boons');
+  const attackTypeEl = q('#vtt-attack-type');
+  const rangeEl = q('#vtt-range');
   const out = q('#vtt-roll-output');
   if (!attrEl || !skillEl || !dvEl || !posEl) return;
 
-  const attr = parseInt(attrEl.value, 10) || 1;
+  let attr = parseInt(attrEl.value, 10) || 1;
   const skill = parseInt(skillEl.value, 10) || 0;
   const dv = parseInt(dvEl.value, 10) || 3;
   const pos = posEl.value;
   const boons = parseInt(boonsEl?.value, 10) || 0;
+
+  // Weapon weight-class × range-band bonus (same table as the Character
+  // Roller — see core/talent-effects.js's RANGE_BONUS_TABLE). Manually
+  // selected here since the Quick Roller takes raw attr/skill numbers rather
+  // than a named skill/character weaponClass.
+  const weaponClass = attackTypeEl?.value || '';
+  const range = rangeEl?.value || '';
+  let rangeNote = '';
+  let rangeBonus = 0;
+  if (weaponClass && range) {
+    const selectedChar = vttStore.getSelectedCharacter();
+    const equipMods = collectEquipmentModifiers(
+      { armorType: selectedChar?.armorType, range, weaponClass, shieldType: selectedChar?.shieldType },
+      true
+    );
+    rangeBonus = equipMods.diceBonus || 0;
+    attr = Math.max(0, attr + rangeBonus);
+    if (equipMods.notes.length) rangeNote = ` [${equipMods.notes.join(', ')}]`;
+  }
+
   const result = performRoll(attr, skill, dv, pos, boons);
   if (!result) {
     showToast('Pool must be at least 1 die.', 'error');
@@ -135,6 +210,7 @@ function rollLocal(postToChat = true) {
           <span>Successes: <strong style="color:var(--green);">${result.successes}</strong></span>
           <span>Story Beats: <strong style="color:var(--red);">${result.storyBeats}</strong></span>
           ${result.reRolls > 0 ? `<span>Re-rolls: <strong>${result.reRolls}</strong></span>` : ''}
+          ${range ? `<span>📏 <strong style="color:var(--gold);">${RANGE_BAND_LABEL_MAP[range] || range}</strong>${rangeNote}</span>` : ''}
         </div>
       </div>
     `;
@@ -143,10 +219,12 @@ function rollLocal(postToChat = true) {
   const shouldPost = postToChat && postCheckbox?.checked;
   if (shouldPost) {
     const sender = getSenderName();
-    let msg = `[${result.outcome}] ${attr}+${skill} vs DV${dv} (${pos}) → `;
+    let msg = `[${result.outcome}] ${attr}+${skill} vs DV${dv} (${pos})`;
+    if (range) msg += ` @ ${RANGE_BAND_LABEL_MAP[range] || range} range`;
+    msg += ' → ';
     msg += result.dice.join(' ');
     msg += ` | S:${result.successes} SB:${result.storyBeats}`;
-    msg += ` — ${result.resultText}`;
+    msg += ` — ${result.resultText}${rangeNote}`;
     sendMessage(msg, sender, 'all', {
       rollData: {
         outcome: result.outcome,
@@ -155,7 +233,8 @@ function rollLocal(postToChat = true) {
         dice: result.dice,
         successes: result.successes,
         storyBeats: result.storyBeats,
-        reRolls: result.reRolls
+        reRolls: result.reRolls,
+        range: range || null
       }
     });
   }
@@ -382,21 +461,27 @@ function attachEvents() {
         break;
       }
       case 'vtt-scene-end': {
-        const state = getState();
-        let trimmed = 0;
-        (state.characters || []).forEach(c => {
-          const before = c.boons || 0;
-          c.boons = Math.min(c.boons || 0, 2);
-          if (before > c.boons) trimmed += (before - c.boons);
+        // Delegate to gm-tools' sceneEndTrimBoons() instead of duplicating the
+        // boon-trim logic here — this copy used to drift from the GM Tools
+        // version (it never reset once/scene talent charges or called
+        // saveState() directly). Dynamic import avoids a circular top-level
+        // import between vtt-local.js and gm-tools/index.js.
+        import('../gm-tools/index.js').then(module => {
+          if (typeof module.sceneEndTrimBoons === 'function') {
+            module.sceneEndTrimBoons();
+          }
+          const chars = getCharacters();
+          vttStore.updateCharacters(chars);
+          resetCombatScene();
+        }).catch(err => {
+          console.warn('[VTT Local] sceneEndTrimBoons unavailable, falling back to local trim:', err?.message);
+          const state = getState();
+          (state.characters || []).forEach(c => { c.boons = Math.min(c.boons || 0, 2); });
+          saveState();
+          vttStore.updateCharacters(getCharacters());
+          resetCombatScene();
+          showToast('Scene ended: Boons trimmed.', 'info');
         });
-        const chars = getCharacters();
-        vttStore.updateCharacters(chars);
-        resetCombatScene();
-        if (trimmed > 0) {
-          showToast(`Scene ended: trimmed ${trimmed} excess Boons.`, 'success');
-        } else {
-          showToast('Scene ended: all Boons already at 2 or below.', 'info');
-        }
         break;
       }
       case 'vtt-voice-toggle': toggleVoice(); break;
@@ -502,7 +587,7 @@ export function render(el) {
     <!-- Main Grid -->
     <div class="vtt-section-grid">
       <!-- Chat Column -->
-      <div class="chat-box vtt-card" style="display:flex;flex-direction:column;min-height:500px;">
+      <div class="chat-box vtt-card" style="display:flex;flex-direction:column;min-height:min(55vh, 500px);">
         <div class="vtt-card-header">
           <span class="vtt-card-title">💬 Chat</span>
           <div class="vtt-btn-row" style="align-items:center;">
@@ -510,8 +595,10 @@ export function render(el) {
             <button class="btn btn-sm btn-ghost" id="vtt-clear-chat" title="Clear chat">🗑️</button>
           </div>
         </div>
-        <!-- INCREASED max-height from 450px to 600px to match connected mode -->
-        <div class="chat-messages" id="chatMessages" style="flex:1;overflow-y:auto;padding:0.5rem;background:var(--vtt-surface2);border-radius:calc(var(--vtt-radius) - 2px);margin-bottom:0.5rem;font-size:1rem;display:flex;flex-direction:column;max-height:600px;min-height:300px;"></div>
+        <!-- Viewport-relative sizing so short/mobile viewports don't force a
+             fixed 300-600px box that overflows the page; scales with vh,
+             capped so huge desktop monitors don't get an absurdly tall pane. -->
+        <div class="chat-messages" id="chatMessages" style="flex:1;overflow-y:auto;padding:0.5rem;background:var(--vtt-surface2);border-radius:calc(var(--vtt-radius) - 2px);margin-bottom:0.5rem;font-size:1rem;display:flex;flex-direction:column;max-height:min(70vh, 600px);min-height:min(35vh, 300px);"></div>
         <div id="selected-character-display" style="margin-bottom:0.4rem;padding:0.2rem 0.4rem;background:var(--vtt-surface2);border-radius:calc(var(--vtt-radius) - 2px);min-height:2.5rem;"></div>
         <div class="chat-input-row" style="display:flex;gap:0.4rem;">
           <input type="text" id="chatInput" placeholder="Type… (/roll, /timer, /help)" style="flex:1;font-size:1rem;padding:0.5rem 0.6rem;" />
@@ -549,6 +636,18 @@ export function render(el) {
             <div id="vtt-combat-actions" style="min-height:2.5rem;"></div>
           </div>
 
+          <!-- Mini Combat Tracker — live initiative order + range-to-you,
+               without requiring the full Encounters tracker modal open.
+               Reads encounters/combat.js's in-memory session (see
+               getTrackerState() there); safe no-op if none is active. -->
+          <div class="vtt-panel vtt-card">
+            <div class="vtt-card-header">
+              <span class="vtt-card-title" style="font-size:1.05rem;">🗡️ Combat Tracker</span>
+              <button class="btn btn-sm btn-ghost" onclick="window.location.hash='encounters'" title="Open full Encounters tracker">↗️</button>
+            </div>
+            <div id="vtt-mini-tracker-body" style="min-height:2rem;"></div>
+          </div>
+
           <!-- Quick Roller -->
           <div class="vtt-panel vtt-card">
             <div class="vtt-card-header">
@@ -578,6 +677,24 @@ export function render(el) {
               <div class="vtt-field" style="flex:0 0 70px;">
                 <label>Boons</label>
                 <input type="number" id="vtt-boons" value="0" min="0" max="5" />
+              </div>
+            </div>
+            <div class="vtt-dice-row" style="margin-top:0.4rem;">
+              <div class="vtt-field" style="flex:1 1 140px;">
+                <label>Weapon</label>
+                <select id="vtt-attack-type" title="Weapon weight class — drives the range bonus below (Player's Guide §3.12.1-3.12.3).">
+                  <option value="">— N/A —</option>
+                  <option value="light">🗡️ Light</option>
+                  <option value="medium">⚔️ Medium</option>
+                  <option value="heavy">🔨 Heavy</option>
+                  <option value="ranged">🏹 Ranged</option>
+                </select>
+              </div>
+              <div class="vtt-field" style="flex:1 1 160px;">
+                <label>Range (GM-set)</label>
+                <select id="vtt-range" title="The narrative range the GM told you before rolling.">
+                  ${RANGE_BAND_OPTIONS.map(r => `<option value="${r.key}">${r.label}</option>`).join('')}
+                </select>
               </div>
             </div>
             <div id="vtt-common-rolls" style="margin-top:0.5rem;min-height:2.5rem;"></div>
@@ -615,6 +732,7 @@ export function render(el) {
   renderVoiceClients();
   updateMessageCount();
   populateChatRecipients();
+  renderMiniTracker();
 
   // Normalize and set initial characters
   const chars = getCharacters();
@@ -639,6 +757,7 @@ export function render(el) {
     const chars = getCharacters();
     vttStore.updateCharacters(chars);
     vttStore.updateTimers(getState().timers || []);
+    renderMiniTracker();
   }, VTT_CONFIG.presenceUpdateInterval);
 
   console.log('[VTT Local] Rendered with reactive store (JRPG style + selection + detail panel)');

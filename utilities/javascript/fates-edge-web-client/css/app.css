@@ -1426,6 +1426,15 @@ select {
     .region-table { font-size: 0.85rem; }
     .region-table th, .region-table td { padding: 0.35rem 0.5rem; }
 }
+@media (max-width: 700px) {
+    /* Between the 820px sidebar-collapse breakpoint and 480px, the character
+       editor's 3/4-column grids benefit from stepping down to 2 columns before
+       going fully single-column at 480px (see the narrower block below, which
+       must come AFTER this one in source order so it wins at ≤480px despite
+       both rules using !important — later same-specificity rule wins). */
+    .ce-fixed-grid { grid-template-columns: 1fr 1fr !important; }
+}
+
 @media (max-width: 480px) {
     .sidebar {
         width: 52px;
@@ -1439,7 +1448,33 @@ select {
     .toast { max-width: 100%; }
     .region-table { font-size: 0.8rem; }
     .region-description-list dd { margin-left: 0.6rem; }
-}/* ============================================================
+
+    /* Character editor / GM tools: collapse fixed multi-column inline grids
+       (attributes, combat loadout, identity fields, etc.) to a single column
+       so number/text inputs aren't squeezed to unusable widths on a phone.
+       !important is required here since these grids set grid-template-columns
+       inline in js/features/characters/editor.js. */
+    .ce-fixed-grid { grid-template-columns: 1fr !important; }
+
+    /* Character editor modal: use the full viewport on small screens instead
+       of the desktop max-width:950px box with 1.5rem/2rem padding. */
+    #charModal .modal-content {
+        max-width: 100% !important;
+        width: 100% !important;
+        height: 100%;
+        max-height: 100vh !important;
+        border-radius: 0 !important;
+        padding: 1rem !important;
+    }
+
+    /* Talent editor / other small modals */
+    .modal-overlay .modal { max-width: 100% !important; width: 100%; }
+
+    /* Roller quick-roll field grid and dice stage stay comfortably tappable */
+    .dice3d-die { width: 38px; height: 38px; font-size: 1rem; }
+    .macro-chip { font-size: 0.75rem; }
+}
+/* ============================================================
    BESTIARY – Additional Styles
    ============================================================ */
 .bestiary-layout {
@@ -1818,5 +1853,173 @@ body.xcard-active .app-shell {
 @media (max-width: 600px) {
   .welcome-card {
     padding: 1.5rem;
+  }
+}
+
+/* ============================================================
+   3D DICE ANIMATION (js/components/Dice3D.js)
+   Pure CSS 3D-transform dice — no external physics/WebGL library,
+   so it degrades gracefully and never blocks the existing numeric
+   roll result if the animation itself fails for any reason.
+   ============================================================ */
+.dice3d-stage {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  justify-content: center;
+  align-items: center;
+  padding: 1rem 0.5rem;
+  perspective: 900px;
+  min-height: 64px;
+}
+
+.dice3d-die {
+  position: relative;
+  width: 44px;
+  height: 44px;
+  transform-style: preserve-3d;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 1.1rem;
+  border-radius: 10px;
+  background: linear-gradient(145deg, var(--bg4), var(--bg2));
+  border: 1px solid var(--border-strong);
+  box-shadow: 0 4px 10px var(--shadow), inset 0 1px 0 rgba(255,255,255,0.08);
+  color: var(--text);
+  animation: dice3d-tumble 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+.dice3d-die::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 10px;
+  background: linear-gradient(160deg, rgba(255,255,255,0.10), transparent 55%);
+  pointer-events: none;
+}
+
+.dice3d-die.dice3d-settled {
+  animation: dice3d-settle 0.35s ease-out both;
+}
+
+.dice3d-die.dice3d-ten {
+  border-color: var(--purple);
+  box-shadow: 0 0 14px var(--purple-glow), 0 4px 10px var(--shadow);
+  color: var(--purple-light);
+}
+
+.dice3d-die.dice3d-success {
+  border-color: var(--green);
+  box-shadow: 0 0 10px var(--green-glow), 0 4px 10px var(--shadow);
+  color: var(--green-light);
+}
+
+.dice3d-die.dice3d-storybeat {
+  border-color: var(--red);
+  box-shadow: 0 0 10px var(--red-glow), 0 4px 10px var(--shadow);
+  color: var(--red-light);
+}
+
+@keyframes dice3d-tumble {
+  0% {
+    transform: translateY(-30px) rotateX(0deg) rotateY(0deg) rotateZ(0deg) scale(0.6);
+    opacity: 0;
+  }
+  15% { opacity: 1; }
+  55% {
+    transform: translateY(2px) rotateX(320deg) rotateY(260deg) rotateZ(140deg) scale(1.05);
+  }
+  100% {
+    transform: translateY(0) rotateX(360deg) rotateY(360deg) rotateZ(360deg) scale(1);
+  }
+}
+
+@keyframes dice3d-settle {
+  0% { transform: scale(1); }
+  35% { transform: scale(1.18) rotateZ(-4deg); }
+  65% { transform: scale(0.94) rotateZ(2deg); }
+  100% { transform: scale(1) rotateZ(0deg); }
+}
+
+.dice3d-die.dice3d-burst::after {
+  content: '✦';
+  position: absolute;
+  inset: -14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.6rem;
+  color: var(--gold);
+  animation: dice3d-burst 0.6s ease-out both;
+  pointer-events: none;
+}
+
+@keyframes dice3d-burst {
+  0% { transform: scale(0.3); opacity: 0.9; }
+  100% { transform: scale(2.4); opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dice3d-die,
+  .dice3d-die.dice3d-settled,
+  .dice3d-die.dice3d-burst::after {
+    animation: none !important;
+  }
+}
+
+/* ─── WHITEBOARD TOOLBAR SECTIONS ────────────────────────────────────
+   Groups the toolbar's ~15 button clusters into collapsible <details>
+   sections (Draw / Tokens & Combat / Fog & Light / View) instead of one
+   long wrapped row. Purely presentational — all button/select ids are
+   unchanged so existing event wiring in ui.js's attachEvents() still works
+   whether a section is open or closed. */
+.wb-toolbar {
+  align-items: flex-start;
+}
+.wb-toolbar-section {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm, 6px);
+  background: var(--bg2);
+  padding: 0.3rem 0.5rem;
+}
+.wb-toolbar-section > summary {
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text2);
+  list-style: none;
+  user-select: none;
+  padding: 0.15rem 0.2rem;
+}
+.wb-toolbar-section > summary::-webkit-details-marker {
+  display: none;
+}
+.wb-toolbar-section > summary::before {
+  content: '▸';
+  display: inline-block;
+  margin-right: 0.3rem;
+  transition: transform 0.15s ease;
+  color: var(--text3);
+}
+.wb-toolbar-section[open] > summary::before {
+  transform: rotate(90deg);
+}
+.wb-toolbar-section[open] > summary {
+  color: var(--gold);
+}
+.wb-toolbar-section-body {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 0.4rem;
+  padding-top: 0.4rem;
+  border-top: 1px solid var(--border);
+}
+
+@media (max-width: 700px) {
+  .wb-toolbar-section {
+    width: 100%;
   }
 }

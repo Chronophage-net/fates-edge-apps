@@ -16,6 +16,8 @@
 import { getState, saveState } from '../../core/state.js';
 import { showToast } from '../../components/Toast.js';
 import { escHtml, safeParseInt, clamp } from '../../core/utils.js';
+import { parseEffectText } from '../../core/talent-effects.js';
+import { loadTalentCatalog } from '../../core/talent-loader.js';
 
 // ============================================================
 // GAME CONSTANTS (from Player's Guide)
@@ -151,6 +153,10 @@ export function openTalentEditor(characterId, talentIndex = -1) {
 
 function openCatalogEditor(talentId) {
     closeTalentEditor();
+
+    // Best-effort, non-blocking: pull in the built-in talent catalog if it hasn't
+    // loaded yet, so it shows up next time the catalog list is rendered.
+    loadTalentCatalog().catch(() => {});
 
     const state = getState();
     if (!state.talents) state.talents = [];
@@ -365,11 +371,15 @@ function showEditorModal(talent, isNew, mode) {
             <!-- Effect Summary -->
             <div class="form-group">
                 <label for="talent-effect">Effect Summary (mechanical)</label>
-                <input type="text" id="talent-effect" value="${escHtml(talent.effect || '')}" 
-                    placeholder="e.g., +1 die to perception checks | Convert 1 Harm to Fatigue once/scene | +2 dice with chosen weapon" />
+                <input type="text" id="talent-effect" value="${escHtml(talent.effect || '')}"
+                    placeholder="e.g., +1d Stealth | ignore armor penalty | improve Position by 1 step | reroll on a Miss" />
                 <div style="font-size:0.75rem;color:var(--text3);margin-top:0.2rem;">
-                    Brief mechanical effect for quick reference on character sheets.
+                    Brief mechanical effect for quick reference on character sheets. Patterns like
+                    "+1d &lt;skill&gt;", "ignore armor/fatigue/harm penalty", "improve Position by 1 step",
+                    and "reroll on a Miss/Partial" are automatically read by the dice roller — no separate
+                    setup needed. Anything it can't parse still displays as flavor text.
                 </div>
+                <div id="talent-effect-preview" style="font-size:0.75rem;margin-top:0.3rem;"></div>
             </div>
             
             <!-- Description -->
@@ -442,6 +452,45 @@ function showEditorModal(talent, isNew, mode) {
             e.preventDefault();
             saveTalent(talent, isNew, mode);
         });
+    }
+
+    // Live preview of what the text interpreter will read from the Effect Summary
+    const effectInput = document.getElementById('talent-effect');
+    if (effectInput) {
+        effectInput.addEventListener('input', updateEffectPreview);
+        updateEffectPreview();
+    }
+}
+
+function describeEffect(effect) {
+    switch (effect.type) {
+        case 'die_bonus': {
+            const label = effect.scope === 'any' ? 'all rolls' : (effect.key || effect.scope);
+            return `${effect.amount >= 0 ? '+' : ''}${effect.amount}d to ${label}`;
+        }
+        case 'position_shift':
+            return `Position +${effect.amount} step${effect.amount === 1 ? '' : 's'}`;
+        case 'ignore_penalty':
+            return `Ignore ${effect.amount}d of ${effect.source} penalty`;
+        case 'reroll':
+            return `Reroll a failing die (${effect.trigger.replace('_', ' ')})`;
+        default:
+            return effect.type;
+    }
+}
+
+function updateEffectPreview() {
+    const previewEl = document.getElementById('talent-effect-preview');
+    const effectInput = document.getElementById('talent-effect');
+    if (!previewEl || !effectInput) return;
+    const parsed = parseEffectText(effectInput.value || '');
+    if (parsed.length === 0) {
+        previewEl.innerHTML = effectInput.value
+            ? '<span style="color:var(--text3);">No mechanical effect recognized — will display as flavor text only.</span>'
+            : '';
+    } else {
+        previewEl.innerHTML = '<span style="color:var(--green);">⚙ Mechanical: ' +
+            parsed.map(e => escHtml(describeEffect(e))).join(', ') + '</span>';
     }
 }
 
@@ -523,6 +572,7 @@ function saveTalent(originalTalent, isNew, mode) {
         if (!proceed) return;
     }
     
+    const effectText = document.getElementById('talent-effect')?.value?.trim() || '';
     const talentData = {
         name: name,
         description: document.getElementById('talent-description')?.value?.trim() || '',
@@ -533,7 +583,11 @@ function saveTalent(originalTalent, isNew, mode) {
         useLimit: document.getElementById('talent-use-limit')?.value || 'passive',
         source: document.getElementById('talent-source')?.value || 'custom',
         prerequisites: document.getElementById('talent-prereq')?.value?.trim() || '',
-        effect: document.getElementById('talent-effect')?.value?.trim() || ''
+        effect: effectText,
+        // Structured mechanical effects, auto-derived from the free-text summary above
+        // by the talent-effects text interpreter. This is what the dice roller actually
+        // reads at roll time (see js/core/talent-effects.js).
+        effects: parseEffectText(effectText)
     };
     
     // Preserve ID if editing

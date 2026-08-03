@@ -14,7 +14,7 @@
 import { getState, saveState } from '../../core/state.js';
 import { generateId, escHtml, safeParseInt } from '../../core/utils.js';
 import { showToast } from '../../components/Toast.js';
-import { openTracker } from './combat.js';
+import { openTracker } from '../encounters/combat.js';
 import { loadBestiaryData, getCreatureDescription } from './bestiary.js';
 
 let modal = null;

@@ -588,7 +588,7 @@
       "id": 74,
       "title": "Heavy Weapon",
       "category": "equipment",
-      "body": "Punishing, slow. Harm 3. Close: -1d, Near: +3d. Tempo: Slow.",
+      "body": "Punishing, slow. Harm 3. Close: -1d, Near: +3d. Tempo: Slow. Long enough to also threaten the Reach band (+0d) in tables using the extended 5-band range tracker (see Range Bands); blocked at Far and Absent.",
       "tags": ["weapon", "heavy", "melee"],
       "cost": 12
     },
@@ -604,7 +604,7 @@
       "id": 76,
       "title": "Light Weapon",
       "category": "equipment",
-      "body": "Fast, concealable. Harm 1. Close: +2d, Near: +1d. Tempo: Fast.",
+      "body": "Fast, concealable. Harm 1. Close: +2d, Near: +1d. Tempo: Fast. Too short to threaten Reach, Far, or Absent in tables using the extended 5-band range tracker (see Range Bands).",
       "tags": ["weapon", "light", "melee"],
       "cost": 4
     },
@@ -620,7 +620,7 @@
       "id": 78,
       "title": "Medium Weapon",
       "category": "equipment",
-      "body": "Balanced, battlefield standard. Harm 2. Close: +1d, Near: +2d. Tempo: Standard.",
+      "body": "Balanced, battlefield standard. Harm 2. Close: +1d, Near: +2d. Tempo: Standard. Not quite long enough to threaten Reach in tables using the extended 5-band range tracker (see Range Bands); blocked at Reach, Far, and Absent.",
       "tags": ["weapon", "medium", "melee"],
       "cost": 8
     },
@@ -1172,8 +1172,8 @@
       "id": 150,
       "title": "Boons",
       "category": "rules",
-      "body": "Boons are narrative tokens. Earn 1 on Partial, 2 on Miss. Max 5, trim to 2 at scene end. Spend 1 to: re-roll a die, improve Position, activate an Asset, or convert 2 Boons to 1 XP (once per session, max 2 XP).",
-      "tags": ["boons", "resource", "srd"]
+      "body": "Boons are narrative tokens. Earn 1 on Partial, 2 on Miss. Max 5, trim to 2 at scene end. Spend 1 to: re-roll a die, improve Position, activate an Asset, or convert 2 Boons to 1 XP (once per session, max 2 XP). Fatigue-as-Boon: if you have no Boons remaining, you may pay 1 Fatigue in place of 1 Boon to cover the spend (GM may veto).",
+      "tags": ["boons", "resource", "fatigue", "srd"]
     },
     {
       "id": 151,
@@ -3717,6 +3717,28 @@
   "tier": "standard",
   "effect": "Anoints a weapon or threshold; counts as [WARD] or [BLESSED] for one scene.",
   "icon": "🕯️"
+},
+{
+  "id": 458,
+  "title": "Ranged Weapon",
+  "category": "equipment",
+  "body": "Bow, crossbow, sling, thrown weapon, or firearm. Close: -2d (the loose-a-clean-shot penalty; base rules call this Desperate Position instead — see Ranged & Tempo), Near: +2d, Far: +1d. Weight (Light/Medium/Heavy) sets Tempo — Light is Fast (move and shoot), Medium is Standard (move or shoot, or Aim for +1d/+1 Effect), Heavy is Slow (load one round, shoot the next). Cost 4/8/12 XP by weight, same as melee weapons.",
+  "tags": ["weapon", "ranged", "tempo"],
+  "cost": 8
+},
+{
+  "id": 459,
+  "title": "Range Bands (Extended)",
+  "category": "rules",
+  "body": "House rule used by this table's combat tracker and VTT: the base 3-band Close/Near/Far scale is split into five bands for finer-grained weapon reach — Close (knife/grapple distance, well within arm's reach), Medium (striking distance of a one-handed weapon — the tracker's internal name for what the core rules call \"Near\"), Reach (striking distance of a two-handed weapon — only Heavy melee weapons and Reach-tagged weapons threaten this band), Far (beyond melee range — missile-weapon distance), and Absent (beyond missile range — functionally gone, requires a scene change to close). The GM sets range between combatants; players pick the range they were told before rolling so the table's dice bonus applies. See Light/Medium/Heavy/Ranged Weapon entries for the bonus at each band.",
+  "tags": ["range", "position", "combat", "house-rule", "tracker"]
+},
+{
+  "id": 460,
+  "title": "X-Card / Veils",
+  "category": "rules",
+  "body": "A safety tool: any player can call the X-Card at any time to stop a scene that's making them uncomfortable, no questions asked. In this toolkit it's a floating button on every screen (also Ctrl+Shift+X) that pauses the table — when connected to a live campaign, raising it notifies every other connected player and GM, not just the person who called it, and a resume button clears it for everyone. Lines and Veils (hard limits and soft-pedal-past-them content, set by the group during Session Zero) are shown alongside the pause so everyone can see what to avoid before play continues.",
+  "tags": ["safety", "x-card", "veils", "lines", "session zero"]
 }
   ]
 }

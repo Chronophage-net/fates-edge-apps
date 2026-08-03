@@ -17,10 +17,12 @@
  * - Regions match the guide's world chapter
  */
 
-import { getCharacter, addRoll, saveState, getState } from '../../core/state.js';
+import { getCharacter, updateCharacter, addRoll, saveState, getState, getMacros, addMacro, deleteMacro } from '../../core/state.js';
 import { performRoll } from '../../core/dice.js';
 import { showToast } from '../../components/Toast.js';
 import { escHtml, safeParseInt, clamp } from '../../core/utils.js';
+import { collectTalentModifiers, collectEquipmentModifiers, consumeTalentCharge } from '../../core/talent-effects.js';
+import { playDiceAnimation } from '../../components/Dice3D.js';
 
 // ============================================================
 // GAME CONSTANTS (from Player's Guide)
@@ -57,6 +59,20 @@ const POSITIONS = [
     { id: 'controlled', label: 'Controlled', desc: 'Balanced norm. No re-rolls.', color: '#2196f3' },
     { id: 'desperate', label: 'Desperate', desc: 'You act under duress. Re-roll one success.', color: '#f44336' }
 ];
+
+// Narrative range bands (GM-set, see encounters/combat.js RANGE_BANDS). Internal
+// keys match combat.js exactly so a value picked here lines up 1:1 with the
+// tracker's range grid. '' = "not applicable" — no weapon range bonus applied.
+const RANGE_BAND_OPTIONS = [
+    { key: '', label: '— No range (n/a) —' },
+    { key: 'close', label: 'Close — knife/grapple distance' },
+    { key: 'near', label: 'Medium — one-handed weapon reach' },
+    { key: 'reach', label: 'Reach — two-handed weapon reach' },
+    { key: 'far', label: 'Far — missile-weapon distance' },
+    { key: 'absent', label: 'Absent — functionally gone' }
+];
+export const RANGE_BAND_LABEL_MAP = Object.fromEntries(RANGE_BAND_OPTIONS.filter(r => r.key).map(r => [r.key, r.label.split('—')[0].trim()]));
+export { RANGE_BAND_OPTIONS };
 
 const DV_LADDER = [
     { value: 2, label: 'Routine', desc: 'Almost guaranteed' },
@@ -286,20 +302,46 @@ function calculateDicePool(attr, skill, options = {}) {
         harm = 0,
         position = 'controlled',
         assistDice = 0,
-        boonDice = 0
+        boonDice = 0,
+        // Talent/equipment modifier inputs (all optional; roll works unchanged without them)
+        character = null,
+        attrKey = null,
+        skillKey = null,
+        armorType = null,
+        weaponClass = null,
+        weaponTags = null,
+        weaponRange = null,
+        shieldType = null,
+        physicalSkill = false
     } = options;
-    
+
     let pool = attr + skill;
     let diceModifiers = [];
     let positionAfterFatigue = position;
     let fatiguePenalty = 0;
-    
+
+    // Talent modifiers (die bonuses, position shifts, ignored penalties, re-rolls).
+    // Pure/read-only here — charges for use-limited talents are only actually
+    // consumed once a roll executes (see executeRoll/rollForCharacter).
+    let talentMods = { diceBonus: 0, positionShift: 0, ignoredHarm: 0, ignoredFatigue: 0, ignoredArmor: 0, rerolls: [], applied: [] };
+    if (character) {
+        talentMods = collectTalentModifiers(character, { attrKey, skillKey });
+        if (talentMods.diceBonus) {
+            pool += talentMods.diceBonus;
+            diceModifiers.push(`Talent: ${talentMods.diceBonus >= 0 ? '+' : ''}${talentMods.diceBonus}d`);
+        }
+    }
+
+    // Effective fatigue/harm after talents that ignore some of the penalty
+    const effectiveFatigue = Math.max(0, fatigue - (talentMods.ignoredFatigue || 0));
+    const effectiveHarm = Math.max(0, harm - (talentMods.ignoredHarm || 0));
+
     // Fatigue: worsens position or -1 die if already desperate
-    if (fatigue > 0) {
-        positionAfterFatigue = getEffectivePosition(position, fatigue, fatigueMax);
+    if (effectiveFatigue > 0) {
+        positionAfterFatigue = getEffectivePosition(position, effectiveFatigue, fatigueMax);
         if (positionAfterFatigue === 'desperate' && position === 'desperate') {
             // Already desperate: -1 die per fatigue beyond what worsened position
-            const fatigueOverDesperate = fatigue - (2 - order_index(position));
+            const fatigueOverDesperate = effectiveFatigue - (2 - order_index(position));
             if (fatigueOverDesperate > 0) {
                 fatiguePenalty = fatigueOverDesperate;
                 pool -= fatiguePenalty;
@@ -310,34 +352,58 @@ function calculateDicePool(attr, skill, options = {}) {
             diceModifiers.push(`Fatigue: ${position} → ${positionAfterFatigue}`);
         }
     }
-    
+
+    // Talent Position shift (e.g. "improve Position by 1 step"), applied after fatigue
+    if (talentMods.positionShift) {
+        const order = ['desperate', 'controlled', 'dominant'];
+        let idx = order.indexOf(positionAfterFatigue);
+        idx = clamp(idx + talentMods.positionShift, 0, order.length - 1);
+        const shifted = order[idx];
+        if (shifted !== positionAfterFatigue) {
+            diceModifiers.push(`Talent: Position → ${shifted}`);
+            positionAfterFatigue = shifted;
+        }
+    }
+
     // Harm penalties
-    if (harm === 1) {
+    if (effectiveHarm === 1) {
         pool -= 1;
         diceModifiers.push('Harm 1: −1d');
-    } else if (harm === 2) {
+    } else if (effectiveHarm === 2) {
         pool -= 2;
         diceModifiers.push('Harm 2: −2d');
-    } else if (harm >= 3) {
-        return { pool: 0, diceModifiers: ['Harm 3: Incapacitated'], positionAfterFatigue, incapacitated: true };
+    } else if (effectiveHarm >= 3) {
+        return { pool: 0, diceModifiers: ['Harm 3: Incapacitated'], positionAfterFatigue, incapacitated: true, talentMods };
     }
-    
+
+    // Equipment modifiers (armor penalty on physical skills, weapon range bonus, shield)
+    if (armorType || weaponClass || weaponRange || shieldType) {
+        const equipMods = collectEquipmentModifiers(
+            { armorType, weaponClass, range: weaponRange, skillKey, weaponTags, shieldType, ignoredArmor: talentMods.ignoredArmor || 0 },
+            physicalSkill
+        );
+        if (equipMods.diceBonus) {
+            pool += equipMods.diceBonus;
+        }
+        diceModifiers.push(...equipMods.notes);
+    }
+
     // Assist dice (max +3 from all sources)
     const assist = Math.min(assistDice, 3);
     if (assist > 0) {
         pool += assist;
         diceModifiers.push(`Assist: +${assist}d`);
     }
-    
+
     // Boon-spent dice (re-rolls are handled separately, but pre-roll boon spent on +1d)
     if (boonDice > 0) {
         pool += boonDice;
         diceModifiers.push(`Boon: +${boonDice}d`);
     }
-    
+
     pool = Math.max(0, pool);
-    
-    return { pool, diceModifiers, positionAfterFatigue, incapacitated: false };
+
+    return { pool, diceModifiers, positionAfterFatigue, incapacitated: false, talentMods };
 }
 
 function order_index(position) {
@@ -408,13 +474,22 @@ function applyPositionRerolls(dice, position) {
 // ============================================================
 
 function executeRoll(attr, skill, dv, position, boonsSpent, characterData = {}) {
-    const { fatigue = 0, fatigueMax = 0, harm = 0, assistDice = 0 } = characterData;
-    
-    // Calculate pool with modifiers
+    const {
+        fatigue = 0, fatigueMax = 0, harm = 0, assistDice = 0,
+        character = null, attrKey = null, skillKey = null,
+        armorType = null, weaponClass = null, weaponTags = null, weaponRange = null, shieldType = null, physicalSkill = false
+    } = characterData;
+
+    // Calculate pool with modifiers. boonsSpent becomes +1d/boon here — this
+    // was previously dropped on the floor (executeRoll received it but never
+    // forwarded it to calculateDicePool's boonDice), even though the Quick
+    // Roller's "Boons to Spend" field always described itself as "+1d from
+    // boon." Fixed as part of the Fatigue-as-Boon work below.
     const poolInfo = calculateDicePool(attr, skill, {
-        fatigue, fatigueMax, harm, position, assistDice
+        fatigue, fatigueMax, harm, position, assistDice, boonDice: boonsSpent || 0,
+        character, attrKey, skillKey, armorType, weaponClass, weaponTags, weaponRange, shieldType, physicalSkill
     });
-    
+
     if (poolInfo.incapacitated) {
         return {
             outcome: 'miss',
@@ -428,31 +503,51 @@ function executeRoll(attr, skill, dv, position, boonsSpent, characterData = {}) 
             effectivePosition: position,
             diceModifiers: poolInfo.diceModifiers,
             boonsGained: 2,
+            appliedTalents: poolInfo.talentMods?.applied || [],
+            range: weaponRange || null,
             note: 'Character is incapacitated (Harm 3)'
         };
     }
-    
+
     const pool = poolInfo.pool;
     if (pool < 1) {
         return null;
     }
-    
+
     // Roll dice
     const rawDice = [];
     for (let i = 0; i < pool; i++) {
         rawDice.push(Math.floor(Math.random() * 10) + 1);
     }
-    
+
     // Apply position re-rolls
-    const { dice, reRolledDice } = applyPositionRerolls(rawDice, poolInfo.positionAfterFatigue);
-    
+    let { dice, reRolledDice } = applyPositionRerolls(rawDice, poolInfo.positionAfterFatigue);
+
     // Count results
-    const counts = countResults(dice);
-    
+    let counts = countResults(dice);
+
     // Determine outcome
-    const outcome = determineOutcome(counts.successes, dv, counts.storyBeats);
+    let outcome = determineOutcome(counts.successes, dv, counts.storyBeats);
+
+    // Talent-granted conditional re-rolls (e.g. "reroll on a Miss")
+    const rerolls = poolInfo.talentMods?.rerolls || [];
+    for (const rr of rerolls) {
+        const triggerMatches = rr.trigger === 'always' || (rr.trigger === 'on_miss' && outcome === 'miss') || (rr.trigger === 'on_partial' && outcome === 'partial');
+        if (!triggerMatches) continue;
+        for (let i = 0; i < (rr.dice || 1); i++) {
+            const failIdx = dice.findIndex((d, idx) => d < 6 && !reRolledDice.some(r => r.index === idx));
+            if (failIdx < 0) break;
+            const oldVal = dice[failIdx];
+            const newVal = Math.floor(Math.random() * 10) + 1;
+            dice[failIdx] = newVal;
+            reRolledDice.push({ index: failIdx, old: oldVal, new: newVal, talent: true });
+        }
+        counts = countResults(dice);
+        outcome = determineOutcome(counts.successes, dv, counts.storyBeats);
+    }
+
     const boonsGained = calculateBoonsGained(outcome);
-    
+
     // Critical success effects from 10s
     let criticalEffect = null;
     if (counts.tens > 0 && counts.successes >= dv) {
@@ -466,7 +561,7 @@ function executeRoll(attr, skill, dv, position, boonsSpent, characterData = {}) 
             criticalEffect = 'Mythic success — reshape the scene; clear 1–2 segments from a relevant timer.';
         }
     }
-    
+
     return {
         outcome,
         dice: dice.sort((a, b) => b - a),
@@ -483,6 +578,8 @@ function executeRoll(attr, skill, dv, position, boonsSpent, characterData = {}) 
         boonsGained,
         boonsSpent: boonsSpent || 0,
         criticalEffect,
+        appliedTalents: poolInfo.talentMods?.applied || [],
+        range: weaponRange || null,
         dv
     };
 }
@@ -506,21 +603,37 @@ export function rollForCharacter(id, options = {}) {
         silent = false,
         skillOverride = null,
         attrOverride = null,
+        // Named skill/attribute keys (e.g. from a saved macro) — unlike
+        // skillOverride/attrOverride (raw numbers), these look the current
+        // rating up live on the character and preserve attrName/skillName so
+        // talent die-bonus matching and armor's physical-skill check still work.
+        skillKeyName = null,
+        attrKeyName = null,
         useFatigue = true,
         useHarm = true,
-        assistDice = 0
+        assistDice = 0,
+        // Narrative range band the player was told by the GM before rolling
+        // (close|near|reach|far|absent — see encounters/combat.js RANGE_BANDS).
+        // Optional; only affects physical rolls (Melee/Unarmed/Ranged).
+        range = null
     } = options;
-    
+
     // Check for incapacitation
     if (useHarm && (c.harm || 0) >= 3) {
         if (!silent) showToast(`${c.name} is incapacitated (Harm 3) and cannot act.`, 'error');
         return null;
     }
-    
+
     let attr, skill;
     let attrName = '', skillName = '';
-    
-    if (attrOverride != null && skillOverride != null) {
+
+    if (skillKeyName) {
+        const skillInfo = ALL_SKILLS.find(s => s.name.toLowerCase() === skillKeyName.toLowerCase());
+        attrName = attrKeyName || skillInfo?.attr || 'wits';
+        skillName = skillInfo?.name || (skillKeyName.charAt(0).toUpperCase() + skillKeyName.slice(1));
+        attr = c[attrName] || 1;
+        skill = (c.skills || {})[skillKeyName.toLowerCase()] || 0;
+    } else if (attrOverride != null && skillOverride != null) {
         attr = clamp(safeParseInt(attrOverride, 3), 1, 5);
         skill = clamp(safeParseInt(skillOverride, 0), 0, 5);
     } else {
@@ -569,21 +682,49 @@ export function rollForCharacter(id, options = {}) {
         }
     }
     
+    // Physical skills take armor penalties; keep in sync with editor.js's ARMOR_TYPES notes.
+    const PHYSICAL_SKILLS = new Set(['melee', 'ranged', 'unarmed', 'athletics']);
+
+    // Fatigue-as-Boon (Player's Guide): "If no Boons remaining, pay 1 Fatigue
+    // in place of 1 Boon." If the requested boon spend exceeds what the
+    // character actually has, the shortfall is paid in Fatigue instead of
+    // silently over-spending Boons the character doesn't have — the roll
+    // still gets the full requested +1d/boon (see calculateDicePool's
+    // boonDice), but the "cost" for the missing Boons shows up as real
+    // Fatigue (both on this roll's position/penalty calc, and persisted to
+    // the character sheet afterward — see charUpdates below).
+    const availableBoons = c.boons || 0;
+    const boonsActuallySpent = Math.min(boons, availableBoons);
+    const boonShortfall = Math.max(0, boons - availableBoons);
+
     // Get character status
     const charData = {
-        fatigue: useFatigue ? (c.fatigue || 0) : 0,
+        fatigue: (useFatigue ? (c.fatigue || 0) : 0) + boonShortfall,
         fatigueMax: c.body || 1,
         harm: useHarm ? (c.harm || 0) : 0,
-        assistDice: assistDice
+        assistDice: assistDice,
+        character: c,
+        attrKey: attrName || null,
+        skillKey: skillName ? skillName.toLowerCase() : null,
+        armorType: c.armorType || null,
+        weaponClass: c.weaponClass || null,
+        weaponTags: c.weaponTags || null,
+        weaponRange: range,
+        shieldType: c.shieldType || null,
+        physicalSkill: skillName ? PHYSICAL_SKILLS.has(skillName.toLowerCase()) : false
     };
-    
+
     try {
         const result = executeRoll(attr, skill, dv, position, boons, charData);
         if (!result) {
             if (!silent) showToast('Roll failed: dice pool must be at least 1 die.', 'error');
             return null;
         }
-        
+        if (boonShortfall > 0) {
+            result.diceModifiers = result.diceModifiers || [];
+            result.diceModifiers.push(`Fatigue-as-Boon: paid ${boonShortfall} Fatigue for ${boonShortfall} missing Boon${boonShortfall > 1 ? 's' : ''}`);
+        }
+
         // Add metadata
         result.characterId = id;
         result.characterName = c.name;
@@ -593,15 +734,31 @@ export function rollForCharacter(id, options = {}) {
         result.skillName = skillName;
         result.note = note || `${c.name} rolls ${attrName}+${skillName}`;
         result.timestamp = Date.now();
-        
+
         // Store in history
         addRoll(result);
         saveState();
-        
-        // Update character boons if gained
-        if (result.boonsGained > 0) {
-            const newBoons = Math.min(5, (c.boons || 0) + result.boonsGained);
-            updateCharacter(id, { boons: newBoons });
+
+        // Update character boons (both spent and gained), apply any
+        // Fatigue-as-Boon shortfall as real Fatigue, and consume any
+        // use-limited talent charges that contributed to this roll
+        // (once/scene, once/session, etc.)
+        const charUpdates = {};
+        if (boonsActuallySpent > 0 || result.boonsGained > 0) {
+            charUpdates.boons = clamp((c.boons || 0) - boonsActuallySpent + (result.boonsGained || 0), 0, 5);
+        }
+        if (boonShortfall > 0) {
+            charUpdates.fatigue = (c.fatigue || 0) + boonShortfall;
+        }
+        if (result.appliedTalents && result.appliedTalents.length > 0) {
+            let uses = c.talentUses || {};
+            for (const { talent } of result.appliedTalents) {
+                uses = consumeTalentCharge({ ...c, talentUses: uses }, talent);
+            }
+            charUpdates.talentUses = uses;
+        }
+        if (Object.keys(charUpdates).length > 0) {
+            updateCharacter(id, charUpdates);
         }
         
         const msg = buildRollMessage(c.name, result, attr, skill, dv, position, attrName, skillName);
@@ -704,7 +861,18 @@ export function customRoll(config = {}) {
         skillName = '',
         fatigue = 0,
         harm = 0,
-        assistDice = 0
+        assistDice = 0,
+        // Optional equipment/range context — lets the Quick Roll panel apply the
+        // same weapon-type × range-band bonus as the character-linked roller when
+        // an active character is selected (see handleRollerRoll()).
+        character = null,
+        skillKey = null,
+        armorType = null,
+        weaponClass = null,
+        weaponTags = null,
+        weaponRange = null,
+        shieldType = null,
+        physicalSkill = false
     } = config;
     
     if (attr < 1 || attr > 5) {
@@ -723,12 +891,15 @@ export function customRoll(config = {}) {
     }
     
     try {
-        const result = executeRoll(attr, skill, dv, position, boons, { fatigue, harm, assistDice });
+        const result = executeRoll(attr, skill, dv, position, boons, {
+            fatigue, harm, assistDice,
+            character, attrKey: attrName || null, skillKey, armorType, weaponClass, weaponTags, weaponRange, shieldType, physicalSkill
+        });
         if (!result) {
             if (!silent) showToast('Roll failed: dice pool must be at least 1 die.', 'error');
             return null;
         }
-        
+
         result.note = note;
         result.timestamp = Date.now();
         result.isCustom = true;
@@ -816,10 +987,14 @@ export async function renderRollerUI(el) {
         `<option value="${d.value}" ${d.value === 3 ? 'selected' : ''}>DV ${d.value}: ${d.label} — ${d.desc}</option>`
     ).join('');
     
-    const effectOptions = EFFECT_LEVELS.map(e => 
+    const effectOptions = EFFECT_LEVELS.map(e =>
         `<option value="${e.id}" ${e.id === 'standard' ? 'selected' : ''}>${e.label} — ${e.desc}</option>`
     ).join('');
-    
+
+    const rangeOptions = RANGE_BAND_OPTIONS.map(r =>
+        `<option value="${r.key}" ${r.key === '' ? 'selected' : ''}>${r.label}</option>`
+    ).join('');
+
     container.innerHTML = `
         <div class="roller-container">
             <!-- Quick Roll Panel -->
@@ -878,14 +1053,24 @@ export async function renderRollerUI(el) {
                         <label>Effect</label>
                         <select id="roller-effect">${effectOptions}</select>
                     </div>
+                    <div class="field">
+                        <label>Range (GM-set)</label>
+                        <select id="roller-range" title="The narrative range the GM told you before rolling — applies your weapon's range bonus/penalty.">${rangeOptions}</select>
+                    </div>
                 </div>
                 
                 <div style="display:flex;gap:0.5rem;margin-top:0.8rem;flex-wrap:wrap;">
                     <button class="btn btn-gold" id="roller-roll-btn">🎲 Roll Dice</button>
                     <button class="btn btn-secondary" id="roller-generate-npc-btn">👤 Generate NPC Name</button>
                     <button class="btn btn-secondary" id="roller-generate-names-btn">📋 Generate Names</button>
+                    <button class="btn btn-secondary" id="roller-save-macro-btn" title="Save the current Attribute/Skill/DV/Position/Boons/Assist/Fatigue/Harm as a one-click macro">⭐ Save as Macro</button>
                 </div>
-                
+
+                <!-- Macro Bar -->
+                <div style="margin-top:0.6rem;">
+                    <div id="roller-macro-bar" style="display:flex;flex-wrap:wrap;gap:0.4rem;"></div>
+                </div>
+
                 <!-- Rules Quick Reference -->
                 <details style="margin-top:0.8rem;">
                     <summary style="cursor:pointer;font-size:0.85rem;color:var(--text2);">📖 Rules Quick Reference</summary>
@@ -985,6 +1170,11 @@ function attachRollerEvents() {
     
     const genNamesBtn = document.getElementById('roller-generate-names-btn');
     if (genNamesBtn) genNamesBtn.addEventListener('click', handleGenerateNames);
+
+    const saveMacroBtn = document.getElementById('roller-save-macro-btn');
+    if (saveMacroBtn) saveMacroBtn.addEventListener('click', handleSaveMacro);
+
+    renderMacroBar();
 }
 
 function handleRollerRoll() {
@@ -996,20 +1186,157 @@ function handleRollerRoll() {
     const assistDice = safeParseInt(document.getElementById('roller-assist')?.value, 0);
     const fatigue = safeParseInt(document.getElementById('roller-fatigue')?.value, 0);
     const harm = safeParseInt(document.getElementById('roller-harm')?.value, 0);
-    
+    const weaponRange = document.getElementById('roller-range')?.value || null;
+
     const attrSelect = document.getElementById('roller-attr-select');
     const skillSelect = document.getElementById('roller-skill-select');
     const attrName = attrSelect?.selectedOptions[0]?.text?.split('—')[0]?.trim() || '';
     const skillName = skillSelect?.selectedOptions[0]?.text?.split('(')[0]?.trim() || '';
-    
+    const skillKeyRaw = skillSelect?.value || null; // lowercase key, e.g. 'melee'
+
+    // If an active character is selected, pull their armor/weapon so the range
+    // bonus and armor penalty actually apply — the attr/skill VALUE fields are
+    // already auto-filled from them (see attachRollerEvents), this extends that
+    // same convenience to the equipment modifiers.
+    const state = getState();
+    const activeChar = state.characters?.find(c => c.active !== false) || null;
+    const PHYSICAL_SKILLS = new Set(['melee', 'ranged', 'unarmed', 'athletics']);
+
     const note = `Quick roll: ${attrName}+${skillName} (${selectedRegion || 'Acasia'})`;
-    
+
     const result = customRoll({
         attr, skill, dv, position, boons, note, silent: false,
-        attrName, skillName, fatigue, harm, assistDice
+        attrName, skillName, fatigue, harm, assistDice,
+        character: activeChar,
+        skillKey: skillKeyRaw,
+        armorType: activeChar?.armorType || null,
+        weaponClass: activeChar?.weaponClass || null,
+        weaponTags: activeChar?.weaponTags || null,
+        shieldType: activeChar?.shieldType || null,
+        weaponRange,
+        physicalSkill: skillKeyRaw ? PHYSICAL_SKILLS.has(skillKeyRaw) : false
     });
-    
+
     if (result) displayRollResult(result, attrName, skillName);
+}
+
+// ============================================================
+// MACRO BAR (saved roll presets — click-to-fire quick actions)
+// ============================================================
+
+/**
+ * Save the roller form's current configuration as a one-click macro. If an
+ * active character is selected, the macro is linked to them by skill/attribute
+ * KEY (not a frozen numeric value), so firing it later re-reads the character's
+ * current rating and still runs through talent/armor modifiers — it behaves
+ * like "roll this character's Stealth" rather than "roll a fixed 3+2 pool."
+ * With no active character, it falls back to a plain numeric preset (today's
+ * Quick Roll behavior), which is still useful for GM/NPC rolls.
+ */
+function handleSaveMacro() {
+    const attrSelect = document.getElementById('roller-attr-select');
+    const skillSelect = document.getElementById('roller-skill-select');
+    const attrKey = attrSelect?.value || 'wits';
+    const skillKey = skillSelect?.value || '';
+    const attrLabel = attrSelect?.selectedOptions[0]?.text?.split('—')[0]?.trim() || attrKey;
+    const skillLabel = skillSelect?.selectedOptions[0]?.text?.split('(')[0]?.trim() || skillKey;
+
+    const defaultLabel = skillLabel ? `${attrLabel} + ${skillLabel}` : attrLabel;
+    const label = prompt('Macro name:', defaultLabel);
+    if (label === null) return; // cancelled
+    const trimmedLabel = label.trim() || defaultLabel;
+
+    const state = getState();
+    const activeChar = state.characters?.find(c => c.active !== false) || null;
+
+    const macro = {
+        label: trimmedLabel,
+        attrKey,
+        skillKey,
+        attr: safeParseInt(document.getElementById('roller-attr')?.value, 3),
+        skill: safeParseInt(document.getElementById('roller-skill')?.value, 0),
+        dv: safeParseInt(document.getElementById('roller-dv-select')?.value, 3),
+        position: document.getElementById('roller-position')?.value || 'controlled',
+        boons: safeParseInt(document.getElementById('roller-boons')?.value, 0),
+        assistDice: safeParseInt(document.getElementById('roller-assist')?.value, 0),
+        fatigue: safeParseInt(document.getElementById('roller-fatigue')?.value, 0),
+        harm: safeParseInt(document.getElementById('roller-harm')?.value, 0),
+        characterId: activeChar?.id || null,
+        characterName: activeChar?.name || null,
+    };
+
+    addMacro(macro);
+    renderMacroBar();
+    showToast(`⭐ Saved macro "${trimmedLabel}".`, 'success');
+}
+
+function renderMacroBar() {
+    const bar = document.getElementById('roller-macro-bar');
+    if (!bar) return;
+    const macros = getMacros();
+
+    if (macros.length === 0) {
+        bar.innerHTML = '<span style="font-size:0.75rem;color:var(--text3);">No macros saved yet — configure a roll above and click "Save as Macro".</span>';
+        return;
+    }
+
+    bar.innerHTML = macros.map(m => `
+        <span class="macro-chip" style="display:inline-flex;align-items:center;gap:0.3rem;background:var(--bg3);border:1px solid var(--border);border-radius:999px;padding:0.25rem 0.3rem 0.25rem 0.7rem;font-size:0.8rem;">
+            <button type="button" class="macro-fire-btn" data-id="${m.id}" style="background:none;border:none;color:var(--text);cursor:pointer;font-size:0.8rem;padding:0;" title="${m.characterName ? `Rolls ${m.characterName}'s ${m.skillKey || m.attrKey}` : 'Fixed roll preset'}">
+                🎲 ${escHtml(m.label)}${m.characterName ? ` <span style="color:var(--text3);">(${escHtml(m.characterName)})</span>` : ''}
+            </button>
+            <button type="button" class="macro-delete-btn" data-id="${m.id}" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:0.75rem;padding:0 0.3rem;" title="Delete macro">✕</button>
+        </span>
+    `).join('');
+
+    bar.querySelectorAll('.macro-fire-btn').forEach(btn => {
+        btn.addEventListener('click', () => handleFireMacro(btn.dataset.id));
+    });
+    bar.querySelectorAll('.macro-delete-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            deleteMacro(btn.dataset.id);
+            renderMacroBar();
+        });
+    });
+}
+
+function handleFireMacro(macroId) {
+    const macro = getMacros().find(m => m.id === macroId);
+    if (!macro) {
+        showToast('Macro not found.', 'error');
+        return;
+    }
+
+    // Character-linked macro: re-reads live skill/attribute + runs through talents/armor.
+    if (macro.characterId && getCharacter(macro.characterId)) {
+        const result = rollForCharacter(macro.characterId, {
+            dv: macro.dv,
+            position: macro.position,
+            boons: macro.boons,
+            assistDice: macro.assistDice,
+            skillKeyName: macro.skillKey || null,
+            note: `Macro: ${macro.label}`,
+        });
+        if (result) displayRollResult(result, macro.attrKey, macro.skillKey);
+        return;
+    }
+
+    // Unlinked macro: fixed numeric preset, same as a manual Quick Roll.
+    const result = customRoll({
+        attr: macro.attr,
+        skill: macro.skill,
+        dv: macro.dv,
+        position: macro.position,
+        boons: macro.boons,
+        assistDice: macro.assistDice,
+        fatigue: macro.fatigue,
+        harm: macro.harm,
+        attrName: macro.attrKey,
+        skillName: macro.skillKey,
+        note: `Macro: ${macro.label}`,
+        silent: false,
+    });
+    if (result) displayRollResult(result, macro.attrKey, macro.skillKey);
 }
 
 function handleGenerateNPC() {
@@ -1163,19 +1490,24 @@ function displayRollResult(result, attrName = '', skillName = '') {
                 <div style="font-size:0.85rem;color:var(--text3);text-align:right;">
                     ${attrName && skillName ? `${attrName}+${skillName} = ${result.pool}d` : `${result.pool}d`} vs DV ${result.dv}<br>
                     Position: ${posInfo.label}${positionChanged ? ` → <span style="color:${effectivePosInfo.color};">${effectivePosInfo.label}</span> <small>(fatigue)</small>` : ''}
+                    ${result.range ? `<br><span style="color:var(--gold);">📏 ${RANGE_BAND_LABEL_MAP[result.range] || result.range} range</span>` : ''}
                 </div>
             </div>
             <div style="font-size:0.85rem;color:var(--text2);margin-top:0.2rem;">${outcomeType.desc}</div>
             
             ${incapHtml}
-            
+
+            <!-- Animated 3D Dice (Dice3D.js) — plays a tumble animation of the actual
+                 rolled values, purely cosmetic, falls back silently if it can't render. -->
+            ${!result.incapacitated ? `<div id="roller-dice-stage"></div>` : ''}
+
             <!-- Dice Display -->
             ${!result.incapacitated ? `
                 <div style="margin-top:0.6rem;padding:0.5rem;background:var(--bg2);border-radius:6px;">
                     <div style="font-size:0.8rem;color:var(--text3);margin-bottom:0.3rem;">
-                        Dice (${result.pool}d10): <span style="color:#4caf50;">green = success</span> · 
-                        <span style="color:#e91e63;">pink = 10 (×2)</span> · 
-                        <span style="color:#f44336;">red = 1 (SB)</span> · 
+                        Dice (${result.pool}d10): <span style="color:#4caf50;">green = success</span> ·
+                        <span style="color:#e91e63;">pink = 10 (×2)</span> ·
+                        <span style="color:#f44336;">red = 1 (SB)</span> ·
                         <span style="color:#666;">gray = nothing</span>
                     </div>
                     <div style="font-size:1rem;line-height:2;">${diceDisplay}</div>
@@ -1213,6 +1545,15 @@ function displayRollResult(result, attrName = '', skillName = '') {
             ${result.note ? `<div style="margin-top:0.4rem;font-size:0.8rem;color:var(--text3);"><strong>Note:</strong> ${escHtml(result.note)}</div>` : ''}
         </div>
     `;
+
+    if (!result.incapacitated) {
+        const stage = document.getElementById('roller-dice-stage');
+        if (stage) {
+            playDiceAnimation(stage, result.dice || []).catch(err => {
+                console.debug('[CharacterRoller] Dice3D animation skipped:', err?.message);
+            });
+        }
+    }
 }
 
 // ============================================================
@@ -1223,7 +1564,9 @@ function buildRollMessage(name, result, attr, skill, dv, position, attrName = ''
     const outcomeType = OUTCOME_TYPES[result.outcome] || OUTCOME_TYPES['miss'];
     const diceStr = result.dice ? result.dice.join(' ') : '[]';
     
-    let msg = `[${outcomeType.label}] ${name}: ${attrName || attr}+${skillName || skill} vs DV${dv} (${position}) → `;
+    let msg = `[${outcomeType.label}] ${name}: ${attrName || attr}+${skillName || skill} vs DV${dv} (${position})`;
+    if (result.range) msg += ` @ ${RANGE_BAND_LABEL_MAP[result.range] || result.range} range`;
+    msg += ' → ';
     msg += diceStr;
     msg += ` | S:${result.successes || 0} SB:${result.storyBeats || 0}`;
     
@@ -1255,7 +1598,8 @@ function sendToVTT(message, result) {
                         tens: result.tens || 0,
                         boonsGained: result.boonsGained || 0,
                         criticalEffect: result.criticalEffect,
-                        reRolls: result.reRolledDice?.length || 0
+                        reRolls: result.reRolledDice?.length || 0,
+                        range: result.range || null
                     }
                 });
             } else if (module.sendMessage && typeof module.sendMessage === 'function') {
@@ -1410,5 +1754,7 @@ export default {
     ATTRIBUTES,
     POSITIONS,
     DV_LADDER,
-    OUTCOME_TYPES
+    OUTCOME_TYPES,
+    RANGE_BAND_OPTIONS,
+    RANGE_BAND_LABEL_MAP
 };

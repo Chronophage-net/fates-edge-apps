@@ -1,10 +1,13 @@
 /**
  * Fate's Edge Toolkit – Main Application Entry Point
- * v3.2 – Added X‑Card keyboard shortcut & auto‑load of starter adventure.
+ * v4.2 – X-Card actually wired up (button/broadcast/VTT chat notice), talent
+ * effects engine, weapon-class × range-band dice bonuses, shield modifiers,
+ * Fatigue-as-Boon. See CHANGELOG.md for the full list.
  *
  * ────────────────────────────────────────────────────────────────────────
- * NEW: X‑Card overlay toggle via Ctrl+Shift+X.
- * NEW: Auto‑load "The Lantern at Dusk" if no adventures present.
+ * X-Card overlay toggle via Ctrl+Shift+X or the floating button; raises
+ * broadcast to the whole table when connected.
+ * Auto‑load "The Lantern at Dusk" if no adventures present.
  * ────────────────────────────────────────────────────────────────────────
  */
 
@@ -19,6 +22,8 @@ import { getUserAvatar } from './core/gravatar.js';
 import { getStorage, setStorage } from './core/utils.js';
 import { getFeatureAccess, getFeatureLockMessage, watchFeatureVisibility } from './core/feature-toggles.js';
 import { lockApp, initLocalLock } from './core/local-lock.js';
+import { escHtml } from './core/utils.js';
+import { sendEvent, onWSEvent, isConnectedToServer } from './core/websocket.js';
 
 // ============================================================
 // TEST MODE HANDLING (disabled)
@@ -47,7 +52,7 @@ function onUnlockSuccess() {
 }
 
 async function init() {
-    console.log('Fate\'s Edge Toolkit v3.2 — Loading...');
+    console.log('Fate\'s Edge Toolkit v4.2 — Loading...');
 
     try {
         // 1. Load state
@@ -89,7 +94,8 @@ async function init() {
         setupFeatureAccess();
         setupLocalLock();
         setupConflictModalListener();
-        setupXCardShortcut();  // ← NEW
+        setupXCardShortcut();
+        setupXCard();  // button/resume clicks + remote raise/resume listeners
 
         // 6. Password gate
         const hasPassword = !!state.passwordHash;
@@ -112,7 +118,7 @@ async function init() {
         // 8. Sync event listeners
         setupSyncEventListeners();
 
-        console.log('✅ Fate\'s Edge Toolkit v3.2 — Ready');
+        console.log('✅ Fate\'s Edge Toolkit v4.2 — Ready');
     } catch (error) {
         console.error('❌ Failed to initialize app:', error);
         showToast('Failed to initialize application. Please refresh.', 'error');
@@ -154,53 +160,43 @@ async function autoLoadStarterAdventure(state) {
 }
 
 // ============================================================
-// X-CARD KEYBOARD SHORTCUT (NEW)
+// X-CARD / SAFETY TOOL
 // ============================================================
+//
+// The floating #xcard-toggle button + #xcard-overlay (see index.html) are
+// global chrome, rendered outside the router so they float over every
+// route including the VTT. Previously this had two half-built code paths:
+// setupXCardShortcut() (Ctrl+Shift+X, wired) and setupXCard() (the actual
+// button/resume click handlers — defined but NEVER CALLED, so the button
+// itself did nothing). Both are replaced by a single triggerXCard()/
+// resumeXCard() pair so the button, the resume button, and the keyboard
+// shortcut all do exactly the same thing.
+//
+// An X-Card only matters if it stops the WHOLE table, not just the person
+// who clicked it — so raising it also broadcasts over the network (when
+// connected) and posts a notice to VTT chat, and every other connected
+// client's overlay opens too via the 'x-card-raised' listener below.
 
-function setupXCardShortcut() {
-    document.addEventListener('keydown', (e) => {
-        // Ctrl+Shift+X (or Ctrl+Shift+x) toggles the X-Card overlay
-        if (e.ctrlKey && e.shiftKey && (e.key === 'X' || e.key === 'x')) {
-            e.preventDefault();
-            const overlay = document.getElementById('xcard-overlay');
-            if (overlay) {
-                overlay.classList.toggle('open');
-                // Optionally, also toggle a body class for blur effect
-                document.body.classList.toggle('xcard-active');
-                // If opening, maybe focus a close/resume button
-                if (overlay.classList.contains('open')) {
-                    const resumeBtn = overlay.querySelector('.xcard-resume-btn');
-                    if (resumeBtn) setTimeout(() => resumeBtn.focus(), 100);
-                }
-            } else {
-                console.warn('X-Card overlay element (#xcard-overlay) not found.');
-            }
-        }
-    });
+function getXCardSenderName() {
+    try {
+        const state = getState();
+        const active = (state.characters || []).find(c => c.active !== false);
+        return active?.name || 'Someone';
+    } catch (e) {
+        return 'Someone';
+    }
 }
 
-function setupXCard() {
-    const toggleBtn = document.getElementById('xcard-toggle');
-    const resumeBtn = document.getElementById('xcard-resume');
-    const overlay = document.getElementById('xcard-overlay');
-
-    function toggleXCard() {
-        if (!overlay) return;
-        overlay.classList.toggle('open');
-        document.body.classList.toggle('xcard-active');
-        if (overlay.classList.contains('open')) {
-            // Update the overlay with current Lines/Veils
-            updateXCardContent();
-            if (resumeBtn) setTimeout(() => resumeBtn.focus(), 100);
-        }
-    }
-
-    if (toggleBtn) toggleBtn.addEventListener('click', toggleXCard);
-    if (resumeBtn) resumeBtn.addEventListener('click', toggleXCard);
-
-    // Keyboard shortcut already handled in setupXCardShortcut
-    // But we want that to call toggleXCard too
-    // So modify the existing shortcut to call toggleXCard
+function postXCardNoticeToVTT(text) {
+    import('./features/vtt/index.js')
+        .then(module => {
+            if (module.addChatMessage && typeof module.addChatMessage === 'function') {
+                module.addChatMessage({ text, sender: 'System', system: true });
+            } else if (module.sendMessage && typeof module.sendMessage === 'function') {
+                module.sendMessage(text, 'System', 'all', { system: true });
+            }
+        })
+        .catch(() => { /* VTT module not loaded this session — fine, chat-only bridge is best-effort */ });
 }
 
 function updateXCardContent() {
@@ -221,6 +217,101 @@ function updateXCardContent() {
         <div style="font-size:0.7rem;color:var(--text3);margin-top:0.3rem;">These are the safety boundaries set by the group. Respect them.</div>
     `;
     overlay.querySelector('.xcard-content')?.appendChild(info);
+}
+
+/**
+ * Open the X-Card overlay locally. `announce` is false when this call is a
+ * *reaction* to a remote 'x-card-raised' broadcast (so we don't re-broadcast
+ * an echo back out or double-post the chat notice).
+ */
+function openXCard(announce = true) {
+    const overlay = document.getElementById('xcard-overlay');
+    if (!overlay) {
+        console.warn('X-Card overlay element (#xcard-overlay) not found.');
+        return;
+    }
+    overlay.classList.add('open');
+    document.body.classList.add('xcard-active');
+    updateXCardContent();
+    const resumeBtn = overlay.querySelector('.xcard-resume-btn');
+    if (resumeBtn) setTimeout(() => resumeBtn.focus(), 100);
+
+    if (announce) {
+        const from = getXCardSenderName();
+        if (isConnectedToServer()) {
+            try { sendEvent({ type: 'x-card-raised', from }); } catch (e) { /* best-effort */ }
+        }
+        postXCardNoticeToVTT(`🛑 ${escHtml(from)} called an X-Card — pausing the scene. Check in before continuing.`);
+    } else {
+        showToast('🛑 An X-Card was called at the table — scene paused.', 'warning');
+    }
+}
+
+/**
+ * Close the X-Card overlay ("Resume"). Same announce/remote-echo logic as
+ * openXCard().
+ */
+function resumeXCard(announce = true) {
+    const overlay = document.getElementById('xcard-overlay');
+    if (overlay) overlay.classList.remove('open');
+    document.body.classList.remove('xcard-active');
+
+    if (announce) {
+        const from = getXCardSenderName();
+        if (isConnectedToServer()) {
+            try { sendEvent({ type: 'x-card-resumed', from }); } catch (e) { /* best-effort */ }
+        }
+        postXCardNoticeToVTT(`✅ ${escHtml(from)} resumed the scene.`);
+    } else {
+        showToast('✅ The table resumed — X-Card cleared.', 'success');
+    }
+}
+
+function toggleXCard() {
+    const overlay = document.getElementById('xcard-overlay');
+    if (overlay && overlay.classList.contains('open')) {
+        resumeXCard(true);
+    } else {
+        openXCard(true);
+    }
+}
+
+function setupXCardShortcut() {
+    document.addEventListener('keydown', (e) => {
+        // Ctrl+Shift+X (or Ctrl+Shift+x) toggles the X-Card overlay
+        if (e.ctrlKey && e.shiftKey && (e.key === 'X' || e.key === 'x')) {
+            e.preventDefault();
+            toggleXCard();
+        }
+    });
+}
+
+function setupXCard() {
+    const toggleBtn = document.getElementById('xcard-toggle');
+    const resumeBtn = document.getElementById('xcard-resume');
+
+    if (toggleBtn) toggleBtn.addEventListener('click', () => toggleXCard());
+    if (resumeBtn) resumeBtn.addEventListener('click', () => resumeXCard(true));
+
+    // React to OTHER clients raising/resuming the X-Card. Registered on both
+    // the dedicated event names (raw WebSocket transport dispatches these
+    // directly — see websocket.js's handleWebSocketMessage switch) and the
+    // generic 'event' bucket (Socket.IO transport only relays generic
+    // 'event' messages without per-type dispatch — see socket.on('event', ...)
+    // in websocket.js), so this works whichever transport is active.
+    const handleRemoteRaise = (data) => {
+        if (document.getElementById('xcard-overlay')?.classList.contains('open')) return; // already open locally
+        openXCard(false);
+    };
+    const handleRemoteResume = (data) => {
+        resumeXCard(false);
+    };
+    onWSEvent('x-card-raised', handleRemoteRaise);
+    onWSEvent('x-card-resumed', handleRemoteResume);
+    onWSEvent('event', (data) => {
+        if (data?.type === 'x-card-raised') handleRemoteRaise(data);
+        else if (data?.type === 'x-card-resumed') handleRemoteResume(data);
+    });
 }
 
 // ============================================================

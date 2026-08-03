@@ -19,24 +19,28 @@ import { generateId, getBaseUrl as utilsGetBaseUrl, getStorage, setStorage, remo
 
 export const DEFAULT_ATTRIBUTES = { body: 1, wits: 1, spirit: 1, presence: 1 };
 
+// Canonical 16-skill list (matches js/features/characters/editor.js and roller.js,
+// which are the modules that actually read/write character.skills in the live UI).
+// Previously this list used different keys (stealth/investigate/perception/...) than
+// editor.js and roller.js, which meant characters could silently accumulate skill keys
+// nothing in the UI ever displayed or scored. Keeping one canonical list here avoids that.
 export const DEFAULT_SKILLS = {
-  stealth: 0,
-  investigate: 0,
-  perception: 0,
+  melee: 0,
+  ranged: 0,
+  unarmed: 0,
   athletics: 0,
-  acrobatics: 0,
-  persuasion: 0,
+  stealth: 0,
+  endurance: 0,
+  craft: 0,
+  sway: 0,
   deception: 0,
+  subterfuge: 0,
+  performance: 0,
   insight: 0,
-  survival: 0,
+  lore: 0,
+  investigation: 0,
   medicine: 0,
   arcana: 0,
-  history: 0,
-  religion: 0,
-  nature: 0,
-  intimidation: 0,
-  performance: 0,
-  sleightOfHand: 0,
 };
 
 // Magic paths
@@ -66,6 +70,8 @@ const DEFAULT_STATE = {
     wikiEntries: [],
     archives: [],
     diceHistory: [],
+    macros: [],
+    soundboard: { tracks: [] },
     npcs: [],
     chatMessages: [],
     baseUrl: '',
@@ -209,15 +215,41 @@ export function ensureCharacterDefaults(char) {
     if (!char) return null;
 
     // ---- Attributes ----
-    if (!char.attributes || typeof char.attributes !== 'object') {
-        char.attributes = { ...DEFAULT_ATTRIBUTES };
-    } else {
-        for (const [key, val] of Object.entries(DEFAULT_ATTRIBUTES)) {
-            if (char.attributes[key] === undefined) {
-                char.attributes[key] = val;
+    // CANONICAL SCHEMA: flat char.body / char.wits / char.spirit / char.presence.
+    // This is what the character editor (editor.js), the dice roller (roller.js),
+    // and the magic-cost helpers (rites.js/summoning.js/vtt-core.js) all actually
+    // read and write. A separate nested char.attributes.{body,...} shape used to be
+    // built here but nothing in the live UI wrote to it, so characters created via
+    // the editor always rolled with attribute 1 wherever code read char.attributes.*.
+    // We keep char.attributes in sync as a read-only mirror for any code (old saves,
+    // sync payloads, third-party packs) that still expects the nested shape.
+
+    // Migrate legacy mind/soul keys and legacy nested-only data into the flat fields.
+    if (char.attributes && typeof char.attributes === 'object') {
+        if (char.attributes.mind !== undefined && char.attributes.wits === undefined) {
+            char.attributes.wits = char.attributes.mind;
+        }
+        if (char.attributes.soul !== undefined && char.attributes.spirit === undefined) {
+            char.attributes.spirit = char.attributes.soul;
+        }
+        for (const key of ['body', 'wits', 'spirit', 'presence']) {
+            if (char[key] === undefined && char.attributes[key] !== undefined) {
+                char[key] = char.attributes[key];
             }
         }
     }
+    for (const [key, val] of Object.entries(DEFAULT_ATTRIBUTES)) {
+        if (char[key] === undefined || char[key] === null) {
+            char[key] = val;
+        }
+    }
+    // Rebuild the mirror from the now-authoritative flat fields.
+    char.attributes = {
+        body: char.body,
+        wits: char.wits,
+        spirit: char.spirit,
+        presence: char.presence,
+    };
 
     // ---- Skills ----
     if (!char.skills || typeof char.skills !== 'object') {
@@ -229,6 +261,15 @@ export function ensureCharacterDefaults(char) {
             }
         }
     }
+
+    // ---- Portrait ----
+    if (char.avatar === undefined) char.avatar = '';
+
+    // ---- Talents ----
+    if (!Array.isArray(char.talents)) char.talents = [];
+    // Tracks which use-limited talents (once/scene, once/session, etc.) have been
+    // spent, keyed by talent id (or name as a fallback). See js/core/talent-effects.js.
+    if (!char.talentUses || typeof char.talentUses !== 'object') char.talentUses = {};
 
     // ---- Magic Path & Patron ----
     if (char.magicPath === undefined) char.magicPath = 'none';
@@ -264,20 +305,8 @@ export function ensureCharacterDefaults(char) {
     if (char.repertoire === undefined) char.repertoire = [];
     // ---- Symbols (Invoker) ----
     if (char.symbols === undefined) char.symbols = [];
-    // Migration: rename mind→wits, soul→spirit, add presence
-    if (char.attributes) {
-        if (char.attributes.mind !== undefined && char.attributes.wits === undefined) {
-            char.attributes.wits = char.attributes.mind;
-            delete char.attributes.mind;
-        }
-        if (char.attributes.soul !== undefined && char.attributes.spirit === undefined) {
-            char.attributes.spirit = char.attributes.soul;
-            delete char.attributes.soul;
-        }
-        if (char.attributes.presence === undefined) {
-            char.attributes.presence = 1;
-        }
-    }
+    // (mind→wits / soul→spirit / attributes mirror migration now handled above,
+    // in the Attributes section, against the canonical flat fields.)
     return char;
 }
 
@@ -1187,6 +1216,53 @@ export function clearRollHistory() {
 }
 
 // ============================================================
+// MACRO OPERATIONS (saved roll presets / quick-action bar)
+// ============================================================
+
+export function getMacros() {
+    return state.macros || [];
+}
+
+export function getMacro(id) {
+    return (state.macros || []).find(m => m.id === id) || null;
+}
+
+export function addMacro(macro) {
+    if (!macro.id) macro.id = generateId('macro_');
+    if (!macro.createdAt) macro.createdAt = new Date().toISOString();
+    state.macros = [...(state.macros || []), macro];
+    saveState();
+    return macro;
+}
+
+export function updateMacro(id, updates) {
+    const macros = state.macros || [];
+    const index = macros.findIndex(m => m.id === id);
+    if (index === -1) return null;
+    const updated = { ...macros[index], ...updates, updatedAt: new Date().toISOString() };
+    state.macros = [...macros.slice(0, index), updated, ...macros.slice(index + 1)];
+    saveState();
+    return updated;
+}
+
+export function deleteMacro(id) {
+    state.macros = (state.macros || []).filter(m => m.id !== id);
+    saveState();
+    return true;
+}
+
+export function reorderMacros(orderedIds) {
+    const macros = state.macros || [];
+    const byId = new Map(macros.map(m => [m.id, m]));
+    const reordered = orderedIds.map(id => byId.get(id)).filter(Boolean);
+    // Keep any macros not present in orderedIds (defensive) appended at the end.
+    macros.forEach(m => { if (!orderedIds.includes(m.id)) reordered.push(m); });
+    state.macros = reordered;
+    saveState();
+    return state.macros;
+}
+
+// ============================================================
 // CHAT OPERATIONS (unchanged)
 // ============================================================
 
@@ -1373,6 +1449,12 @@ export default {
     addRoll,
     clearDiceHistory,
     clearRollHistory,
+    getMacros,
+    getMacro,
+    addMacro,
+    updateMacro,
+    deleteMacro,
+    reorderMacros,
     addChatMessage,
     getChatMessages,
     clearChatHistory,

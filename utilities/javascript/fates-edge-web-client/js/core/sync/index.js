@@ -1312,6 +1312,28 @@ buildWebSocketUrl(serverUrl, campaignCode) {
     });
   }
 
+  /**
+   * Broadcast which tab/feature this client is currently looking at (e.g.
+   * "characters", "whiteboard", "gm-tools"), so collaborators can see who's
+   * looking at what — a lightweight alternative to full cursor-sharing that
+   * doesn't need a high-frequency event stream. Throttled to avoid spamming
+   * the server on rapid tab-switching.
+   */
+  setActiveView(view) {
+    if (!view || view === this._lastBroadcastView) return;
+    this._lastBroadcastView = view;
+    if (this._activeViewThrottle) clearTimeout(this._activeViewThrottle);
+    this._activeViewThrottle = setTimeout(() => {
+      this.send({
+        type: 'presence',
+        action: 'update',
+        clientId: this.clientId,
+        name: this.clientName,
+        activeView: view
+      });
+    }, 300);
+  }
+
   getEmail() {
     return this.clientEmail || safeGetItem('fates-edge-client-email', '');
   }

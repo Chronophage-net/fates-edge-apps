@@ -24,6 +24,41 @@ import { onVoiceClientsChanged } from '../../vtt/voice.js';
 import { openKonrehModal } from '../../kon-reh/index.js';
 import { logRecordingEvent } from '../../../core/media.js';
 import { activeLayerId } from './layers.js';
+import { getCharacters as getCoreCharacters } from '../../../core/state.js';
+
+// ============================================================
+// WHITEBOARD → VTT CHAT BRIDGE
+// ============================================================
+// Board-only events (pings, fog reveals/hides, scene transitions) are easy
+// to miss for anyone not looking at the Whiteboard tab right now. This posts
+// a short system notice into VTT chat for the events players most need to
+// see (see attachEvents()/handlePing() below for call sites). Best-effort:
+// if the VTT module hasn't been loaded this session, it silently no-ops
+// rather than forcing a load.
+
+function getWhiteboardSenderName() {
+    try {
+        const chars = getCoreCharacters() || [];
+        const active = chars.find(c => c.active !== false);
+        return active?.name || 'Whiteboard';
+    } catch (e) {
+        return 'Whiteboard';
+    }
+}
+
+function postToVTTChat(text) {
+    import('../../vtt/index.js')
+        .then(module => {
+            if (module.addChatMessage && typeof module.addChatMessage === 'function') {
+                module.addChatMessage({ text, sender: 'Whiteboard', system: true });
+            } else if (module.sendMessage && typeof module.sendMessage === 'function') {
+                module.sendMessage(text, 'Whiteboard', 'all', { system: true });
+            }
+        })
+        .catch(err => {
+            console.debug('[Whiteboard] VTT chat bridge skipped:', err?.message);
+        });
+}
 
 // ============================================================
 // UI STATE
@@ -313,82 +348,105 @@ export function render(el) {
                 <button class="btn btn-sm btn-primary" id="whiteboard-connect-btn">🔗 Connect</button>
             </div>
 
-            <div class="panel flex flex-wrap gap-2" id="whiteboard-toolbar" style="padding:0.5rem;">
-                <!-- Drawing tools -->
-                <div class="flex gap-1 flex-center">
-                    <button class="btn btn-sm ${currentTool === 'pen' ? 'btn-gold' : 'btn-secondary'}" data-tool="pen" title="Freehand pen">✏️</button>
-                    <button class="btn btn-sm ${currentTool === 'eraser' ? 'btn-gold' : 'btn-secondary'}" data-tool="eraser" title="Eraser">🧹</button>
-                    <button class="btn btn-sm ${currentTool === 'line' ? 'btn-gold' : 'btn-secondary'}" data-tool="line" title="Line">📏</button>
-                    <button class="btn btn-sm ${currentTool === 'rectangle' ? 'btn-gold' : 'btn-secondary'}" data-tool="rectangle" title="Rectangle">▭</button>
-                    <button class="btn btn-sm ${currentTool === 'circle' ? 'btn-gold' : 'btn-secondary'}" data-tool="circle" title="Ellipse">◯</button>
-                    <button class="btn btn-sm ${currentTool === 'arrow' ? 'btn-gold' : 'btn-secondary'}" data-tool="arrow" title="Arrow">➜</button>
-                    <button class="btn btn-sm ${currentTool === 'polygon' ? 'btn-gold' : 'btn-secondary'}" data-tool="polygon" title="Polygon / Star">⬡</button>
-                    <button class="btn btn-sm ${currentTool === 'ruler' ? 'btn-gold' : 'btn-secondary'}" data-tool="ruler" title="Measure (Shift+release to pin)">📐</button>
-                    <button class="btn btn-sm ${currentTool === 'select' ? 'btn-gold' : 'btn-secondary'}" data-tool="select" title="Select / Drag / Edit lights">👆</button>
-                    <button class="btn btn-sm ${currentTool === 'ping' ? 'btn-gold' : 'btn-secondary'}" data-tool="ping" title="Ping">📍</button>
-                </div>
+            <div class="panel flex flex-wrap gap-2 wb-toolbar" id="whiteboard-toolbar" style="padding:0.5rem;">
+                <!-- Reorganized into collapsible sections (Draw / Fog & Light / Tokens & Combat /
+                     View) so the toolbar doesn't sprawl into one long wrapped row. All ids/data-tool
+                     attributes are unchanged — attachEvents() below still finds everything by id,
+                     so opening/closing a section is purely cosmetic and doesn't affect wiring. -->
 
-                <div class="flex gap-1 flex-center" id="whiteboard-polygon-controls" style="display:${currentTool === 'polygon' ? 'flex' : 'none'};">
-                    <label class="text-muted text-sm flex gap-1 flex-center">Sides <input type="number" id="whiteboard-polygon-sides" min="3" max="12" value="${polygonSides}" style="width:44px;" /></label>
-                    <label class="text-muted text-sm flex gap-1 flex-center"><input type="checkbox" id="whiteboard-polygon-star" ${polygonStarRatio > 0 ? 'checked' : ''} style="width:auto;" /> Star</label>
-                </div>
+                <details class="wb-toolbar-section" open>
+                    <summary>✏️ Draw</summary>
+                    <div class="wb-toolbar-section-body">
+                        <div class="flex gap-1 flex-center">
+                            <button class="btn btn-sm ${currentTool === 'pen' ? 'btn-gold' : 'btn-secondary'}" data-tool="pen" title="Freehand pen">✏️</button>
+                            <button class="btn btn-sm ${currentTool === 'eraser' ? 'btn-gold' : 'btn-secondary'}" data-tool="eraser" title="Eraser">🧹</button>
+                            <button class="btn btn-sm ${currentTool === 'line' ? 'btn-gold' : 'btn-secondary'}" data-tool="line" title="Line">📏</button>
+                            <button class="btn btn-sm ${currentTool === 'rectangle' ? 'btn-gold' : 'btn-secondary'}" data-tool="rectangle" title="Rectangle">▭</button>
+                            <button class="btn btn-sm ${currentTool === 'circle' ? 'btn-gold' : 'btn-secondary'}" data-tool="circle" title="Ellipse">◯</button>
+                            <button class="btn btn-sm ${currentTool === 'arrow' ? 'btn-gold' : 'btn-secondary'}" data-tool="arrow" title="Arrow">➜</button>
+                            <button class="btn btn-sm ${currentTool === 'polygon' ? 'btn-gold' : 'btn-secondary'}" data-tool="polygon" title="Polygon / Star">⬡</button>
+                            <button class="btn btn-sm ${currentTool === 'ruler' ? 'btn-gold' : 'btn-secondary'}" data-tool="ruler" title="Measure (Shift+release to pin)">📐</button>
+                            <button class="btn btn-sm ${currentTool === 'select' ? 'btn-gold' : 'btn-secondary'}" data-tool="select" title="Select / Drag / Edit lights">👆</button>
+                            <button class="btn btn-sm ${currentTool === 'ping' ? 'btn-gold' : 'btn-secondary'}" data-tool="ping" title="Ping">📍</button>
+                        </div>
 
-                <div class="flex gap-1 flex-center">
-                    <input type="color" id="whiteboard-color" value="${currentColor}" style="width:32px;height:32px;padding:0;border:none;background:none;cursor:pointer;" />
-                    <input type="range" id="whiteboard-size" min="1" max="20" value="${currentSize}" title="Stroke size" style="width:70px;" />
-                    <input type="range" id="whiteboard-opacity" min="0.1" max="1" step="0.05" value="${currentOpacity}" title="Stroke opacity" style="width:60px;" />
-                </div>
+                        <div class="flex gap-1 flex-center" id="whiteboard-polygon-controls" style="display:${currentTool === 'polygon' ? 'flex' : 'none'};">
+                            <label class="text-muted text-sm flex gap-1 flex-center">Sides <input type="number" id="whiteboard-polygon-sides" min="3" max="12" value="${polygonSides}" style="width:44px;" /></label>
+                            <label class="text-muted text-sm flex gap-1 flex-center"><input type="checkbox" id="whiteboard-polygon-star" ${polygonStarRatio > 0 ? 'checked' : ''} style="width:auto;" /> Star</label>
+                        </div>
 
-                <div class="flex gap-1 flex-center">
-                    <button class="btn btn-sm btn-secondary" id="whiteboard-undo" title="Undo (Ctrl+Z)">↶</button>
-                    <button class="btn btn-sm btn-secondary" id="whiteboard-redo" title="Redo (Ctrl+Y)">↷</button>
-                </div>
+                        <div class="flex gap-1 flex-center">
+                            <input type="color" id="whiteboard-color" value="${currentColor}" style="width:32px;height:32px;padding:0;border:none;background:none;cursor:pointer;" />
+                            <input type="range" id="whiteboard-size" min="1" max="20" value="${currentSize}" title="Stroke size" style="width:70px;" />
+                            <input type="range" id="whiteboard-opacity" min="0.1" max="1" step="0.05" value="${currentOpacity}" title="Stroke opacity" style="width:60px;" />
+                        </div>
 
-                <div class="flex gap-1 flex-center">
-                    <label class="text-muted text-sm flex gap-1 flex-center"><input type="checkbox" id="whiteboard-grid" ${state.settings.gridSnap ? 'checked' : ''} style="width:auto;"/> Snap</label>
-                    <button class="btn btn-sm ${isGridCombatActive() ? 'btn-danger' : 'btn-secondary'}" id="whiteboard-grid-combat">${isGridCombatActive() ? '⚔️ Combat ON' : '⚔️ Combat OFF'}</button>
-                    <select id="whiteboard-grid-type" style="${isKonrehActive() ? 'display:none;' : ''}font-size:0.8rem;padding:0.25rem 0.3rem;background:var(--bg2);color:var(--text);border:1px solid var(--border);border-radius:4px;">
-                        <option value="square" ${state.gridCombat.gridType === 'square' ? 'selected' : ''}>◻️ Square</option>
-                        <option value="hex" ${state.gridCombat.gridType === 'hex' ? 'selected' : ''}>⬡ Hex</option>
-                        <option value="isometric" ${state.gridCombat.gridType === 'isometric' ? 'selected' : ''}>◇ Isometric</option>
-                    </select>
-                    <button class="btn btn-sm btn-secondary" id="whiteboard-add-token" style="${isGridCombatActive() && !isKonrehActive() ? '' : 'display:none;'}">🎯 Add Token</button>
-                    <button class="btn btn-sm btn-secondary" id="whiteboard-import-tracker" style="${isGridCombatActive() && !isKonrehActive() ? '' : 'display:none;'}">🔗 Import Tracker</button>
-                    <button class="btn btn-sm ${isKonrehActive() ? 'btn-gold' : 'btn-secondary'}" id="whiteboard-konreh">🌀 Kon'reh</button>
-                    <span id="whiteboard-tracker-link-status" class="text-muted text-sm"></span>
-                </div>
+                        <div class="flex gap-1 flex-center">
+                            <button class="btn btn-sm btn-secondary" id="whiteboard-undo" title="Undo (Ctrl+Z)">↶</button>
+                            <button class="btn btn-sm btn-secondary" id="whiteboard-redo" title="Redo (Ctrl+Y)">↷</button>
+                            <label class="text-muted text-sm flex gap-1 flex-center"><input type="checkbox" id="whiteboard-grid" ${state.settings.gridSnap ? 'checked' : ''} style="width:auto;"/> Snap</label>
+                        </div>
+                    </div>
+                </details>
 
-                <div class="flex gap-1 flex-center" style="border-left:1px solid var(--border);padding-left:8px;">
-                    <button class="btn btn-sm ${state.gridCombat.fogOfWar?.enabled ? 'btn-danger' : 'btn-secondary'}" id="whiteboard-fog-toggle">${state.gridCombat.fogOfWar?.enabled ? '🌫️ Fog ON' : '🌫️ Fog OFF'}</button>
-                    <select id="whiteboard-fog-mode" style="font-size:0.8rem;padding:0.25rem 0.3rem;background:var(--bg2);color:var(--text);border:1px solid var(--border);border-radius:4px;">
-                        <option value="manual" ${state.gridCombat.fogOfWar?.mode === 'manual' ? 'selected' : ''}>🖌️ Manual</option>
-                        <option value="token-vision" ${state.gridCombat.fogOfWar?.mode === 'token-vision' ? 'selected' : ''}>👁️ Token Vision</option>
-                        <option value="line-of-sight" ${state.gridCombat.fogOfWar?.mode === 'line-of-sight' ? 'selected' : ''}>📡 Line of Sight</option>
-                    </select>
-                    <button class="btn btn-sm btn-secondary" data-tool="fog-reveal" title="Paint revealed areas">✨ Reveal</button>
-                    <button class="btn btn-sm btn-secondary" data-tool="fog-hide" title="Hide areas">🌑 Hide</button>
-                    <label class="text-muted text-sm flex gap-1 flex-center" title="Brush size for Reveal/Hide, in cells">Brush
-                        <input type="number" id="whiteboard-fog-brush" min="1" max="5" value="${state.gridCombat.fogOfWar?.fogBrushSize ?? 1}" style="width:36px;" />
-                    </label>
-                    <button class="btn btn-sm btn-secondary" data-tool="fog-wall" title="Draw LoS wall">🧱 Wall</button>
-                    <button class="btn btn-sm btn-secondary" data-tool="fog-light" title="Place light source">💡 Light</button>
-                    <label class="text-muted text-sm flex gap-1 flex-center" title="Remember areas tokens have seen (dimmed instead of pitch black)">
-                        <input type="checkbox" id="whiteboard-fog-remember" ${state.gridCombat.fogOfWar?.rememberExplored !== false ? 'checked' : ''} style="width:auto;" /> Remember explored
-                    </label>
-                    <button class="btn btn-sm btn-ghost" id="whiteboard-fog-clear" title="Clear all fog data">Clear Fog</button>
-                </div>
+                <details class="wb-toolbar-section">
+                    <summary>⚔️ Tokens &amp; Combat</summary>
+                    <div class="wb-toolbar-section-body">
+                        <div class="flex gap-1 flex-center">
+                            <button class="btn btn-sm ${isGridCombatActive() ? 'btn-danger' : 'btn-secondary'}" id="whiteboard-grid-combat">${isGridCombatActive() ? '⚔️ Combat ON' : '⚔️ Combat OFF'}</button>
+                            <select id="whiteboard-grid-type" style="${isKonrehActive() ? 'display:none;' : ''}font-size:0.8rem;padding:0.25rem 0.3rem;background:var(--bg2);color:var(--text);border:1px solid var(--border);border-radius:4px;">
+                                <option value="square" ${state.gridCombat.gridType === 'square' ? 'selected' : ''}>◻️ Square</option>
+                                <option value="hex" ${state.gridCombat.gridType === 'hex' ? 'selected' : ''}>⬡ Hex</option>
+                                <option value="isometric" ${state.gridCombat.gridType === 'isometric' ? 'selected' : ''}>◇ Isometric</option>
+                            </select>
+                            <button class="btn btn-sm btn-secondary" id="whiteboard-add-token" style="${isGridCombatActive() && !isKonrehActive() ? '' : 'display:none;'}">🎯 Add Token</button>
+                            <button class="btn btn-sm btn-secondary" id="whiteboard-import-tracker" style="${isGridCombatActive() && !isKonrehActive() ? '' : 'display:none;'}">🔗 Import Tracker</button>
+                            <button class="btn btn-sm ${isKonrehActive() ? 'btn-gold' : 'btn-secondary'}" id="whiteboard-konreh">🌀 Kon'reh</button>
+                            <span id="whiteboard-tracker-link-status" class="text-muted text-sm"></span>
+                        </div>
+                    </div>
+                </details>
 
-                <div class="flex gap-1 flex-center" style="border-left:1px solid var(--border);padding-left:8px;">
-                    <label class="text-muted text-sm flex gap-1 flex-center" title="Darkness level">Dark <input type="range" id="whiteboard-fog-darkness" min="0" max="1" step="0.01" value="${state.gridCombat.fogOfWar?.darkness ?? 0.85}" style="width:80px;" /><span id="whiteboard-darkness-value" class="text-xs" style="min-width:30px;">${Math.round((state.gridCombat.fogOfWar?.darkness ?? 0.85) * 100)}%</span></label>
-                    <button class="btn btn-sm btn-secondary" id="whiteboard-manage-lights">💡 Manage Lights</button>
-                </div>
+                <details class="wb-toolbar-section">
+                    <summary>🌫️ Fog &amp; Light</summary>
+                    <div class="wb-toolbar-section-body">
+                        <div class="flex gap-1 flex-center">
+                            <button class="btn btn-sm ${state.gridCombat.fogOfWar?.enabled ? 'btn-danger' : 'btn-secondary'}" id="whiteboard-fog-toggle">${state.gridCombat.fogOfWar?.enabled ? '🌫️ Fog ON' : '🌫️ Fog OFF'}</button>
+                            <select id="whiteboard-fog-mode" style="font-size:0.8rem;padding:0.25rem 0.3rem;background:var(--bg2);color:var(--text);border:1px solid var(--border);border-radius:4px;">
+                                <option value="manual" ${state.gridCombat.fogOfWar?.mode === 'manual' ? 'selected' : ''}>🖌️ Manual</option>
+                                <option value="token-vision" ${state.gridCombat.fogOfWar?.mode === 'token-vision' ? 'selected' : ''}>👁️ Token Vision</option>
+                                <option value="line-of-sight" ${state.gridCombat.fogOfWar?.mode === 'line-of-sight' ? 'selected' : ''}>📡 Line of Sight</option>
+                            </select>
+                            <button class="btn btn-sm btn-secondary" data-tool="fog-reveal" title="Paint revealed areas">✨ Reveal</button>
+                            <button class="btn btn-sm btn-secondary" data-tool="fog-hide" title="Hide areas">🌑 Hide</button>
+                            <label class="text-muted text-sm flex gap-1 flex-center" title="Brush size for Reveal/Hide, in cells">Brush
+                                <input type="number" id="whiteboard-fog-brush" min="1" max="5" value="${state.gridCombat.fogOfWar?.fogBrushSize ?? 1}" style="width:36px;" />
+                            </label>
+                            <button class="btn btn-sm btn-secondary" data-tool="fog-wall" title="Draw LoS wall">🧱 Wall</button>
+                            <button class="btn btn-sm btn-secondary" data-tool="fog-light" title="Place light source">💡 Light</button>
+                            <label class="text-muted text-sm flex gap-1 flex-center" title="Remember areas tokens have seen (dimmed instead of pitch black)">
+                                <input type="checkbox" id="whiteboard-fog-remember" ${state.gridCombat.fogOfWar?.rememberExplored !== false ? 'checked' : ''} style="width:auto;" /> Remember explored
+                            </label>
+                            <button class="btn btn-sm btn-ghost" id="whiteboard-fog-clear" title="Clear all fog data">Clear Fog</button>
+                        </div>
+                        <div class="flex gap-1 flex-center">
+                            <label class="text-muted text-sm flex gap-1 flex-center" title="Darkness level">Dark <input type="range" id="whiteboard-fog-darkness" min="0" max="1" step="0.01" value="${state.gridCombat.fogOfWar?.darkness ?? 0.85}" style="width:80px;" /><span id="whiteboard-darkness-value" class="text-xs" style="min-width:30px;">${Math.round((state.gridCombat.fogOfWar?.darkness ?? 0.85) * 100)}%</span></label>
+                            <button class="btn btn-sm btn-secondary" id="whiteboard-manage-lights">💡 Manage Lights</button>
+                        </div>
+                    </div>
+                </details>
 
-                <div class="flex gap-1 flex-center" style="border-left:1px solid var(--border);padding-left:8px;">
-                    <button class="btn btn-sm btn-secondary" id="whiteboard-toggle-layers">🗂️ Layers</button>
-                    <button class="btn btn-sm btn-secondary" id="whiteboard-player-view">👁️ Player View</button>
-                    <button class="btn btn-sm btn-secondary" id="whiteboard-toggle-roster">👥 Roster</button>
-                    <button class="btn btn-sm btn-ghost" id="whiteboard-help" title="How to use the Whiteboard">❓ Help</button>
-                </div>
+                <details class="wb-toolbar-section">
+                    <summary>🖥️ View</summary>
+                    <div class="wb-toolbar-section-body">
+                        <div class="flex gap-1 flex-center">
+                            <button class="btn btn-sm btn-secondary" id="whiteboard-toggle-layers">🗂️ Layers</button>
+                            <button class="btn btn-sm btn-secondary" id="whiteboard-player-view">👁️ Player View</button>
+                            <button class="btn btn-sm btn-secondary" id="whiteboard-toggle-roster">👥 Roster</button>
+                            <button class="btn btn-sm btn-ghost" id="whiteboard-help" title="How to use the Whiteboard">❓ Help</button>
+                        </div>
+                    </div>
+                </details>
             </div>
 
             <div id="whiteboard-lights-panel" class="panel" style="display:none; padding:0.5rem;"></div>
@@ -547,6 +605,7 @@ export function attachEvents() {
     document.getElementById('whiteboard-konreh')?.addEventListener('click', () => {
         toggleKonreh();
         openKonrehModal();
+        postToVTTChat(`🌀 ${getWhiteboardSenderName()} opened Kon'reh on the Whiteboard.`);
     });
 
     // ── Clear / Export / Notes / Images ──
@@ -574,6 +633,7 @@ export function attachEvents() {
         restoreDrawings();
         renderGridCombat();
         showToast(fog.enabled ? '🌫️ Fog of War enabled' : '🌫️ Fog of War disabled', fog.enabled ? 'success' : 'info');
+        postToVTTChat(fog.enabled ? '🌫️ The GM enabled Fog of War on the map.' : '🌫️ The GM disabled Fog of War on the map.');
     });
 
     document.getElementById('whiteboard-fog-mode')?.addEventListener('change', (e) => {
@@ -607,6 +667,7 @@ export function attachEvents() {
         restoreDrawings();
         renderGridCombat();
         showToast('🌫️ Fog data cleared', 'info');
+        postToVTTChat('🌫️ The GM cleared all fog data on the map.');
     });
 
     document.getElementById('whiteboard-fog-brush')?.addEventListener('input', (e) => {
@@ -1345,6 +1406,7 @@ function handlePing(pos) {
             sendMessage({ type: 'whiteboard-ping', sheetId: state.activeSheetId, x: pos.x, y: pos.y });
         } catch (e) {}
     }
+    postToVTTChat(`📍 ${getWhiteboardSenderName()} pinged the map — check the Whiteboard.`);
 }
 
 // ============================================================

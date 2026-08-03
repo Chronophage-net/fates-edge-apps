@@ -1,6 +1,7 @@
 // js/module-loader.js - Robust module loader (integrated with router)
 
 import { setHtml } from './core/utils.js';
+import { syncManager } from './core/sync/index.js';
 
 class ModuleLoader {
     constructor() {
@@ -215,6 +216,14 @@ class ModuleLoader {
             // Activate the new module (no automatic refresh – the module is already rendered)
             if (typeof module.onActivate === 'function') {
                 await module.onActivate();
+            }
+
+            // Let collaborators see which tab everyone's looking at (richer presence).
+            // Best-effort: setActiveView() itself no-ops safely if sync isn't connected.
+            try {
+                syncManager?.setActiveView?.(moduleName);
+            } catch (err) {
+                console.debug('[ModuleLoader] setActiveView failed:', err?.message);
             }
 
             this.currentModule = moduleName;

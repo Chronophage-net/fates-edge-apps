@@ -255,6 +255,37 @@ export const OUTCOME_CODES = {
 };
 
 /**
+ * Count successes in a dice pool, where 10s count as 2 successes each and 6-9 count as 1.
+ * @param {number[]} dice - Array of die results
+ * @returns {number} Total successes
+ */
+function countSuccesses(dice) {
+    return dice.reduce((acc, r) => acc + (r === 10 ? 2 : (r >= 6 ? 1 : 0)), 0);
+}
+
+/**
+ * Count the number of 10s rolled (each 10 is a potential critical trigger).
+ * @param {number[]} dice - Array of die results
+ * @returns {number} Number of 10s
+ */
+function countTens(dice) {
+    return dice.filter(r => r === 10).length;
+}
+
+/**
+ * A roll is Critical only when it contains at least one 10 AND the roll actually
+ * meets or exceeds the DV. A 10 on a roll that falls short of the DV is still just
+ * a Partial (or Miss) — the 10 does not grant a critical on its own.
+ * @param {number} tens - Number of 10s rolled
+ * @param {number} successes - Total successes (10s already counted as 2)
+ * @param {number} dv - Difficulty Value
+ * @returns {boolean}
+ */
+function isCriticalRoll(tens, successes, dv) {
+    return tens > 0 && successes >= dv;
+}
+
+/**
  * Get the machine‑friendly outcome code from successes, DV, and story beats.
  * @param {number} successes - Number of successes rolled
  * @param {number} dv - Difficulty Value
@@ -334,9 +365,10 @@ function rollDice(count, sides = 10) {
  */
 function rollPool(pool, sides = 10) {
     const dice = rollDice(pool, sides);
-    const successes = dice.filter(r => r >= 6).length;
+    const successes = countSuccesses(dice);
     const storyBeats = dice.filter(r => r === 1).length;
-    return { dice, successes, storyBeats };
+    const tens = countTens(dice);
+    return { dice, successes, storyBeats, tens };
 }
 
 /**
@@ -362,7 +394,7 @@ function performDicePoolRoll(pool, dv, options = {}) {
     const effectivePool = Math.min(pool + boons, 12);
     let dice = rollDice(effectivePool);
     let storyBeats = dice.filter(r => r === 1).length;
-    let successes = dice.filter(r => r >= 6).length;
+    let successes = countSuccesses(dice);
     let reRolledDice = [];
     let reRollCount = 0;
     let initialDice = [...dice];
@@ -384,7 +416,7 @@ function performDicePoolRoll(pool, dv, options = {}) {
                 return r;
             });
             // Recalculate successes and story beats
-            successes = dice.filter(r => r >= 6).length;
+            successes = countSuccesses(dice);
             storyBeats = dice.filter(r => r === 1).length;
         }
     } else if (position === 'desperate') {
@@ -403,7 +435,7 @@ function performDicePoolRoll(pool, dv, options = {}) {
                 return r;
             });
             // Recalculate successes and story beats
-            successes = dice.filter(r => r >= 6).length;
+            successes = countSuccesses(dice);
             storyBeats = dice.filter(r => r === 1).length;
         }
     }
@@ -529,7 +561,7 @@ function performRoll(attr, skill, dv, position = 'controlled', boons = 0, option
                 return r;
             });
             // Recalculate successes and story beats
-            successes = dice.filter(r => r >= 6).length;
+            successes = countSuccesses(dice);
             storyBeats = dice.filter(r => r === 1).length;
         }
     } else if (position === 'desperate') {
@@ -550,7 +582,7 @@ function performRoll(attr, skill, dv, position = 'controlled', boons = 0, option
                 return r;
             });
             // Recalculate successes and story beats
-            successes = dice.filter(r => r >= 6).length;
+            successes = countSuccesses(dice);
             storyBeats = dice.filter(r => r === 1).length;
         }
     }

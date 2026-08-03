@@ -33,6 +33,11 @@
  */
 
 import { getState, addArchive, clearRollHistory, clearChatHistory, saveState } from '../../core/state.js';
+import { resetTalentCharges } from '../../core/talent-effects.js';
+import {
+    getSoundTracks, addSoundTrack, removeSoundTrack,
+    playAmbience, stopAmbience, getCurrentAmbienceId, playSfx
+} from '../../core/soundboard.js';
 import { getGmState, updateGmState } from '../../core/state.js';
 import { clamp, escHtml } from '../../core/utils.js';
 import { showToast } from '../../components/Toast.js';
@@ -669,6 +674,92 @@ function renderSessionZeroChecklist(sessionZero) {
     `;
 }
 // ============================================================
+// SOUNDBOARD (ambience loop + one-shot SFX)
+// ============================================================
+
+function renderSoundboardPanel(isViewOnly) {
+    const tracks = getSoundTracks();
+    const ambienceTracks = tracks.filter(t => t.type === 'ambience');
+    const sfxTracks = tracks.filter(t => t.type === 'sfx');
+    const currentAmbienceId = getCurrentAmbienceId();
+
+    const ambienceOptions = ambienceTracks.map(t =>
+        `<option value="${t.id}" ${t.id === currentAmbienceId ? 'selected' : ''}>${escHtml(t.name)}</option>`
+    ).join('');
+
+    const sfxButtons = sfxTracks.map(t => `
+        <span style="display:inline-flex;align-items:center;gap:0.2rem;background:var(--bg3);border:1px solid var(--border);border-radius:999px;padding:0.2rem 0.3rem 0.2rem 0.6rem;font-size:0.78rem;">
+            <button type="button" class="btn-sound-sfx" data-id="${t.id}" style="background:none;border:none;color:var(--text);cursor:pointer;font-size:0.78rem;padding:0;" ${isViewOnly ? 'disabled' : ''}>🔊 ${escHtml(t.name)}</button>
+            <button type="button" class="btn-sound-remove" data-id="${t.id}" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:0.72rem;padding:0 0.2rem;" ${isViewOnly ? 'disabled' : ''} title="Remove">✕</button>
+        </span>
+    `).join('');
+
+    return `
+        <div class="panel">
+            <h3 class="panel-title">🔊 Soundboard</h3>
+            <div style="display:flex;flex-direction:column;gap:0.5rem;margin-top:0.3rem;">
+                <div>
+                    <label style="font-size:0.75rem;color:var(--text2);">Ambience (loops)</label>
+                    <div style="display:flex;gap:0.4rem;flex-wrap:wrap;align-items:center;margin-top:0.2rem;">
+                        <select id="sb-ambience-select" style="flex:1;min-width:140px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:0.2rem 0.4rem;font-size:0.8rem;" ${isViewOnly ? 'disabled' : ''}>
+                            <option value="">${ambienceTracks.length ? '— choose ambience —' : 'No ambience tracks yet'}</option>
+                            ${ambienceOptions}
+                        </select>
+                        <button class="btn btn-xs btn-secondary" id="sb-ambience-play" ${isViewOnly ? 'disabled' : ''}>▶ Play</button>
+                        <button class="btn btn-xs btn-secondary" id="sb-ambience-stop" ${isViewOnly || !currentAmbienceId ? 'disabled' : ''}>⏹ Stop</button>
+                    </div>
+                </div>
+                <div>
+                    <label style="font-size:0.75rem;color:var(--text2);">SFX (one-shot)</label>
+                    <div id="sb-sfx-list" style="display:flex;flex-wrap:wrap;gap:0.3rem;margin-top:0.2rem;">
+                        ${sfxButtons || '<span style="font-size:0.75rem;color:var(--text3);">No SFX yet.</span>'}
+                    </div>
+                </div>
+                <div>
+                    <button class="btn btn-xs btn-secondary" id="sb-add-sound-btn" ${isViewOnly ? 'disabled' : ''}>+ Add Sound</button>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+function handleAddSound() {
+    const name = prompt('Sound name (e.g. "Tavern murmur", "Sword clash"):');
+    if (!name || !name.trim()) return;
+    const url = prompt('Audio URL (mp3/ogg/wav link):');
+    if (!url || !url.trim()) return;
+    const isAmbience = confirm('Is this a looping AMBIENCE track?\n\nOK = Ambience (loops)\nCancel = one-shot SFX');
+    addSoundTrack({ name: name.trim(), url: url.trim(), type: isAmbience ? 'ambience' : 'sfx' });
+    showToast(`🔊 Added "${name.trim()}" to the soundboard.`, 'success');
+    refreshView();
+}
+
+function attachSoundboardEvents() {
+    document.getElementById('sb-add-sound-btn')?.addEventListener('click', handleAddSound);
+
+    document.getElementById('sb-ambience-play')?.addEventListener('click', () => {
+        const id = document.getElementById('sb-ambience-select')?.value;
+        if (!id) { showToast('Choose an ambience track first.', 'warning'); return; }
+        playAmbience(id);
+        refreshView();
+    });
+    document.getElementById('sb-ambience-stop')?.addEventListener('click', () => {
+        stopAmbience();
+        refreshView();
+    });
+
+    document.querySelectorAll('.btn-sound-sfx').forEach(btn => {
+        btn.addEventListener('click', () => playSfx(btn.dataset.id));
+    });
+    document.querySelectorAll('.btn-sound-remove').forEach(btn => {
+        btn.addEventListener('click', () => {
+            removeSoundTrack(btn.dataset.id);
+            refreshView();
+        });
+    });
+}
+
+// ============================================================
 // SCENE VIEW
 // ============================================================
 
@@ -711,6 +802,8 @@ function renderSceneView() {
                     <button class="btn btn-secondary" onclick="window.openTravelPlanner()">🗺️ Travel Planner</button>
                 </div>
             </div>
+
+            ${renderSoundboardPanel(isViewOnly)}
 
             <div class="panel">
                 <h3 class="panel-title">⚡ Quick Generate</h3>
@@ -1620,10 +1713,12 @@ function sceneEndTrimBoons() {
         const before = c.boons || 0;
         c.boons = clamp(c.boons || 0, 0, 2);
         if (before > c.boons) trimmed += (before - c.boons);
+        // Refresh any "once per scene" talent charges (Second Wind, Backstab, etc.)
+        c.talentUses = resetTalentCharges(c, 'once-scene');
     });
     saveState();
-    if (trimmed > 0) showToast(`Scene end: trimmed ${trimmed} excess Boons.`, 'success');
-    else showToast('Scene end: all Boons already at 2 or below.', 'info');
+    if (trimmed > 0) showToast(`Scene end: trimmed ${trimmed} excess Boons, refreshed once/scene talents.`, 'success');
+    else showToast('Scene end: Boons already trimmed; refreshed once/scene talents.', 'info');
 }
 
 function resetAllTimers() {
@@ -1637,12 +1732,18 @@ function resetAllTimers() {
 function newSession() {
     const state = getState();
     if ((state.rollHistory || []).length === 0 && (state.chatHistory || []).length === 0) return showToast('No data to archive.', 'info');
-    
+
     const label = prompt('Session label:', `Session ${state.sessionId || 1}`) || `Session ${state.sessionId || 1}`;
     addArchive({ id: Date.now(), timestamp: Date.now(), rollHistory: [...(state.rollHistory || [])], chatHistory: [...(state.chatHistory || [])], label });
     clearRollHistory();
     clearChatHistory();
-    showToast('New session started; previous archived.', 'success');
+    // A new session implies every scene within it has also ended.
+    (state.characters || []).forEach(c => {
+        c.talentUses = resetTalentCharges(c, 'once-session');
+        c.talentUses = resetTalentCharges(c, 'once-scene');
+    });
+    saveState();
+    showToast('New session started; previous archived; refreshed once/session (and once/scene) talents.', 'success');
 }
 
 // ============================================================
@@ -1663,6 +1764,7 @@ function refreshView() {
         attachEvents();
         if (activeTab === 'consequences') attachConsequencesEvents();
         if (activeTab === 'session') attachSessionEvents();
+        if (activeTab === 'scene') attachSoundboardEvents();
     }
 }
 
@@ -1686,13 +1788,15 @@ function attachEvents() {
                 attachEvents();
                 if (view === 'consequences') attachConsequencesEvents();
                 if (view === 'session') attachSessionEvents();
+                if (view === 'scene') attachSoundboardEvents();
             }
         });
     });
     
     if (activeTab === 'consequences') attachConsequencesEvents();
     if (activeTab === 'session') attachSessionEvents();
-    
+    if (activeTab === 'scene') attachSoundboardEvents();
+
     document.getElementById('gen-npc-btn')?.addEventListener('click', generateQuickNPC);
     document.getElementById('gen-location-btn')?.addEventListener('click', generateQuickLocation);
     document.getElementById('gen-rumor-btn')?.addEventListener('click', generateQuickRumor);

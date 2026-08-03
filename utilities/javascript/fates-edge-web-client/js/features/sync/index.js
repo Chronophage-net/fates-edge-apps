@@ -177,12 +177,14 @@ function updatePresenceUI(clients) {
         const name = client && client.name || 'Unknown';
         const role = client && client.role || 'player';
         const isAway = status === 'away';
-        
+        const activeView = client && client.activeView;
+
         return `
             <div style="display:flex;align-items:center;gap:0.5rem;padding:0.2rem 0;border-bottom:1px solid var(--border);">
                 <span class="status-dot" style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${isOnline ? 'var(--green)' : 'var(--red)'};"></span>
                 <span style="font-weight:${isYou ? '600' : '400'};">${name} ${isYou ? '(you)' : ''}</span>
                 <span class="text-muted small">${role}</span>
+                ${activeView && !isYou ? `<span class="text-muted small" title="Currently viewing">👀 ${activeView}</span>` : ''}
                 ${isAway ? '<span class="text-muted small">(away)</span>' : ''}
             </div>
         `;

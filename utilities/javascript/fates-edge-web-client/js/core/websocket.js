@@ -117,6 +117,8 @@ const eventHandlers = {
     'sync-state': [],
     'combat-status-update': [],
     'scene-status-update': [],
+    'x-card-raised': [],
+    'x-card-resumed': [],
     'character-select': [],
     'adventure-timer': [],
     'adventure-log': [],
@@ -501,6 +503,18 @@ function handleWebSocketMessage(data) {
 
         case 'scene-status-update':
             triggerEvent('scene-status-update', data);
+            break;
+
+        // X-Card / safety tool: broadcast so EVERY connected client (not just
+        // the person who clicked it) shows the pause overlay — that's the
+        // whole point of an X-Card at a shared table. See app.js's
+        // setupXCard()/triggerXCard() for the sender side.
+        case 'x-card-raised':
+            triggerEvent('x-card-raised', data);
+            break;
+
+        case 'x-card-resumed':
+            triggerEvent('x-card-resumed', data);
             break;
 
         case 'character-select':

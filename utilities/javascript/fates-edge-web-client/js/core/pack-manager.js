@@ -21,7 +21,7 @@ import { moduleLoader } from '../module-loader.js';
 
 const PACK_STORAGE_KEY = 'fates-edge-packs';
 const ALLOWED_MODULE_PATHS = ['features/', 'core/', 'components/'];
-const ALLOWED_DATA_PATHS = ['data/', 'regions/', 'factions/'];
+const ALLOWED_DATA_PATHS = ['data/', 'regions/', 'factions/', 'talents/'];
 
 // ============================================================
 // STATE
@@ -139,6 +139,8 @@ async function processModule(modFile) {
     validateFileContent(content, modFile.name);
     // ... rest of processing
 }
+
+    return { valid: errors.length === 0, errors };
 }
 
 // ============================================================
@@ -240,8 +242,8 @@ export async function installPack(file) {
                         }
                     }
                     
-                    // Process data files (patrons, factions, regions)
-                    const installedData = { patrons: [], factions: [], regions: [] };
+                    // Process data files (patrons, factions, regions, talents)
+                    const installedData = { patrons: [], factions: [], regions: [], talents: [] };
                     if (manifest.data) {
                         // Process patrons
                         if (manifest.data.patrons) {
@@ -278,6 +280,19 @@ export async function installPack(file) {
                                     const data = JSON.parse(dataContent);
                                     await mergeRegionData(data);
                                     installedData.regions.push(data);
+                                }
+                            }
+                        }
+
+                        // Process talents
+                        if (manifest.data.talents) {
+                            for (const dataPath of manifest.data.talents) {
+                                const dataFile = zip.file(dataPath);
+                                if (dataFile) {
+                                    const dataContent = await dataFile.async('text');
+                                    const data = JSON.parse(dataContent);
+                                    await mergeTalentData(data);
+                                    installedData.talents.push(data);
                                 }
                             }
                         }
@@ -353,6 +368,21 @@ async function mergeRegionData(data) {
     const state = getState();
     if (!state.regions) state.regions = {};
     state.regions[data.slug || data.name] = data;
+    saveState();
+}
+
+async function mergeTalentData(data) {
+    // Talents merge into the same global catalog (state.talents) that the
+    // in-app talent editor (talent-editor.js) and character editor read from,
+    // so packs can ship new talents alongside patrons/factions/regions.
+    const state = getState();
+    if (!state.talents) state.talents = [];
+    const existing = state.talents.find(t => t.id === data.id);
+    if (existing) {
+        Object.assign(existing, data);
+    } else {
+        state.talents.push(data);
+    }
     saveState();
 }
 

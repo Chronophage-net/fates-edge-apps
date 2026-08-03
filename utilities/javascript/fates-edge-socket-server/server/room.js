@@ -65,7 +65,14 @@ function getClientsList(room) {
         id: c.id,
         name: c.name,
         role: c.role,
-        email: c.email || ''
+        email: c.email || '',
+        // NOTE: selectedCharacter was already being SET on the client entry
+        // (see ws-handlers.js 'character-select') but was never included here,
+        // so it silently never reached other clients. Fixed alongside adding
+        // activeView (which tab/feature a client is currently looking at) for
+        // richer presence.
+        selectedCharacter: c.selectedCharacter || '',
+        activeView: c.activeView || ''
     }));
 }
 

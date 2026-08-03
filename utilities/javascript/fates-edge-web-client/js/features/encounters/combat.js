@@ -16,6 +16,17 @@ import { escHtml } from '../../core/utils.js';
 import { loadBestiaryData, getCreatureDescription } from './bestiary.js';
 import { isConnectedToServer, sendEvent } from '../../core/websocket.js';
 import { logToSession, addVTTEvent } from '../gm-tools/index.js';
+import { getMyStoredRole } from '../../core/feature-toggles.js';
+
+/**
+ * Range bands are the GM's call, not a shared table anyone at the table can
+ * nudge — mirrors the rest of the app's GM-only gating (see feature-toggles.js:
+ * role restrictions only apply in a connected multiplayer session; solo/local
+ * play has no GM/player distinction, so it's always allowed there).
+ */
+function canSetRange() {
+    return !isConnectedToServer() || getMyStoredRole() === 'gm';
+}
 
 let modal = null;
 let currentEncounterId = null;
@@ -105,12 +116,22 @@ function tlToMaxHarm(tl) {
     return Math.max(1, (parseInt(tl, 10) || 2) + 2);
 }
 
+// Range bands are narrative distance between two combatants, GM-set (see
+// canSetRange() above). Each band is defined by what can reach across it:
+//   Close  — knife/grapple distance, well within arm's reach.
+//   Medium — striking distance of a one-handed weapon.
+//   Reach  — striking distance of a two-handed (Reach-tagged) weapon.
+//   Far    — beyond melee range entirely; missile-weapon distance.
+//   Absent — beyond missile range; functionally gone, requires a scene change.
+// (Internal key for Medium stays 'near' for backward compatibility with saved
+// encounters/rangeMap entries and setTrackerRangeByName() callers — only the
+// label/description changed.)
 const RANGE_BANDS = [
-    { key: 'close',  label: 'Close',  short: 'C', color: 'var(--red)',    desc: "Arm's length, grappling distance." },
-    { key: 'near',   label: 'Near',   short: 'N', color: 'var(--gold)',   desc: 'Same room or immediate area.' },
-    { key: 'reach',  label: 'Reach',  short: 'R', color: 'var(--orange)', desc: "Just past Near — the gap a Reach-tagged weapon (spear, polearm) can still close." },
-    { key: 'far',    label: 'Far',    short: 'F', color: 'var(--blue)',   desc: 'Visible but not immediately reachable.' },
-    { key: 'absent', label: 'Absent', short: 'A', color: 'var(--text3)',  desc: 'Off-screen; requires a scene change.' }
+    { key: 'close',  label: 'Close',  short: 'C', color: 'var(--red)',    desc: "Knife/grapple distance — well within arm's reach." },
+    { key: 'near',   label: 'Medium', short: 'M', color: 'var(--gold)',   desc: 'Striking distance of a one-handed weapon.' },
+    { key: 'reach',  label: 'Reach',  short: 'R', color: 'var(--orange)', desc: 'Striking distance of a two-handed weapon — the gap a Reach-tagged weapon (spear, polearm) can still close.' },
+    { key: 'far',    label: 'Far',    short: 'F', color: 'var(--blue)',   desc: 'Beyond melee range — missile-weapon distance.' },
+    { key: 'absent', label: 'Absent', short: 'A', color: 'var(--text3)',  desc: 'Beyond missile range — functionally gone; requires a scene change.' }
 ];
 const DEFAULT_RANGE = 'near';
 
@@ -147,50 +168,71 @@ function applyArmorConversion(harm, armorType) {
 // WEAPON RANGE RULES
 // ============================================================
 //
-// House rule (Fate's Edge combat tracker): a combatant's currently-equipped
-// weapon determines which range bands it can actually threaten.
-//   - Melee (no Reach tag): Close, Near.
-//   - Melee with the Reach tag (spear, polearm, other reach weapons): Close,
-//     Near, and Reach — the extra band that lets a longer weapon close the
-//     last bit of distance a standard melee weapon can't.
-//   - Ranged: everything except Absent, but Close and Near carry a penalty
-//     (mirrors "Ranged attack while in Close range → Desperate", extended to
-//     Near as well) since you're too close to loose a clean shot.
+// Weapon weight class (Light/Medium/Heavy/Ranged — Player's Guide §3.12.1-
+// 3.12.3, matches editor.js's WEAPON_CLASSES and core/talent-effects.js's
+// RANGE_BONUS_TABLE exactly) is the single axis that determines which range
+// bands a combatant can actually threaten, and at what dice bonus/penalty.
+// Duplicated here (rather than imported from talent-effects.js) to avoid a
+// circular import — this module is itself imported by gm-tools/index.js,
+// which talent-effects.js's callers sit behind.
+//   - Light:  Close +2d, Near +1d. Blocked beyond Near (fast/short weapon).
+//   - Medium: Close +1d, Near +2d. Blocked beyond Near.
+//   - Heavy:  Close -1d, Near +3d, Reach +0d (real reach — halberd,
+//     greatsword). Blocked at Far/Absent.
+//   - Ranged: Close -2d (the book's "Ranged in Close = Desperate", as a dice
+//     proxy), Near +2d, Reach +2d, Far +1d. Blocked only at Absent.
+// Reach/Absent don't exist in the book — they're this GM's own extended-band
+// house rule on top of the RAW 3-band Close/Near/Far.
 //
-// Combatants with no weaponType set (older saved encounters, imported
+// Combatants with no weaponClass set (older saved encounters, imported
 // Factions/abstract entries, etc.) are left unflagged rather than guessed at.
 //
 // This is a GM-facing indicator, not a hard lock on the damage button — the
 // table still makes the final call — but it makes "wait, can that dagger even
 // reach them?" visible at a glance.
 
+const WEAPON_CLASS_RANGE_BONUS = {
+    light:  { close:  2, near:  1, reach: -3, far: -3, absent: -3 },
+    medium: { close:  1, near:  2, reach: -3, far: -3, absent: -3 },
+    heavy:  { close: -1, near:  3, reach:  0, far: -3, absent: -3 },
+    ranged: { close: -2, near:  2, reach:  2, far:  1, absent: -3 },
+};
+const WEAPON_CLASS_GLYPH = { light: '🗡️', medium: '⚔️', heavy: '🔨', ranged: '🏹' };
+const WEAPON_CLASS_LABEL = { light: 'Light', medium: 'Medium', heavy: 'Heavy', ranged: 'Ranged' };
+
+/**
+ * Best-effort migration for combatants/adversary records saved before this
+ * weapon-class rework (which used a 'melee'|'ranged' weaponType + reach
+ * boolean instead of Light/Medium/Heavy/Ranged). Prefers an explicit
+ * weaponClass if present; otherwise guesses from the old fields so existing
+ * saved encounters don't just go blank.
+ */
+function deriveWeaponClass(source) {
+    if (!source) return undefined;
+    if (WEAPON_CLASS_LABEL[source.weaponClass]) return source.weaponClass;
+    if (source.weaponType === 'ranged') return 'ranged';
+    if (source.weaponType === 'melee') return source.reach ? 'heavy' : 'medium';
+    return undefined;
+}
+
 function getWeaponRangeStatus(combatant, bandKey) {
-    const type = combatant.weaponType;
-    if (type === 'ranged') {
-        if (bandKey === 'absent') return 'blocked';
-        if (bandKey === 'close' || bandKey === 'near') return 'penalty';
-        return 'ok';
-    }
-    if (type === 'melee') {
-        if (bandKey === 'close' || bandKey === 'near') return 'ok';
-        if (bandKey === 'reach') return combatant.reach ? 'ok' : 'blocked';
-        return 'blocked'; // far, absent
-    }
-    return 'ok'; // unknown/untracked weapon type — don't flag anything
+    const cls = combatant.weaponClass;
+    const table = WEAPON_CLASS_RANGE_BONUS[cls];
+    if (!table || table[bandKey] === undefined) return 'ok'; // unknown/untracked weapon class — don't flag anything
+    const bonus = table[bandKey];
+    if (bonus <= -3) return 'blocked';
+    if (bonus < 0) return 'penalty';
+    return 'ok';
 }
 
 function weaponTypeLabel(combatant) {
-    const type = combatant.weaponType;
-    if (type === 'ranged') return '🏹 Ranged';
-    if (type === 'melee') return combatant.reach ? '⚔️ Melee (Reach)' : '⚔️ Melee';
-    return '❔ Weapon not set';
+    const cls = combatant.weaponClass;
+    return WEAPON_CLASS_LABEL[cls] ? `${WEAPON_CLASS_GLYPH[cls]} ${WEAPON_CLASS_LABEL[cls]}` : '❔ Weapon not set';
 }
 
 function weaponToggleGlyph(combatant) {
-    const type = combatant.weaponType;
-    if (type === 'ranged') return '🏹';
-    if (type === 'melee') return combatant.reach ? '⚔️+' : '⚔️';
-    return '❔';
+    const cls = combatant.weaponClass;
+    return WEAPON_CLASS_GLYPH[cls] || '❔';
 }
 
 function weaponRangeNote(status, combatant, bandLabel) {
@@ -255,6 +297,7 @@ function clearRangeForCombatant(id) {
 function buildRangeGridHtml() {
     const players = combatants.filter(c => c.type === 'player');
     const adversaries = combatants.filter(c => c.type === 'adversary');
+    const gmOnly = !canSetRange();
 
     let bodyHtml;
     if (players.length === 0 || adversaries.length === 0) {
@@ -283,15 +326,19 @@ function buildRangeGridHtml() {
                 const glyph = worst === 'blocked' ? '🚫 ' : worst === 'penalty' ? '⚠️ ' : '';
                 const border = worst === 'blocked' ? '2px dashed var(--red)'
                     : worst === 'penalty' ? '2px dashed var(--orange)' : 'none';
+                const rangeTitle = `${escHtml(p.name)} ↔ ${escHtml(a.name)}: ${info.label} — ${info.desc}` +
+                    (gmOnly ? ' (only the GM can change ranges)' : ' (click to cycle)') +
+                    (notes ? ` — ${escHtml(notes)}` : '');
                 return `
                     <td style="padding:0.3rem 0.4rem;text-align:center;">
-                        <button class="range-cell" data-a="${attr(p.id)}" data-b="${attr(a.id)}"
-                            title="${escHtml(p.name)} ↔ ${escHtml(a.name)}: ${info.label} — ${info.desc} (click to cycle)${notes ? ` — ${escHtml(notes)}` : ''}"
+                        <button class="range-cell" data-a="${attr(p.id)}" data-b="${attr(a.id)}" ${gmOnly ? 'disabled' : ''}
+                            title="${rangeTitle}"
                             style="
                                 min-width:64px; font-size:0.75rem; font-weight:700; color:white;
                                 background:${info.color}; border:${border}; border-radius:8px;
-                                padding:0.3rem 0.5rem; cursor:pointer; transition:transform 0.15s ease;
-                            ">${glyph}${info.label}</button>
+                                padding:0.3rem 0.5rem; transition:transform 0.15s ease;
+                                ${gmOnly ? 'cursor:default;opacity:0.7;' : 'cursor:pointer;'}
+                            ">${gmOnly ? '🔒 ' : ''}${glyph}${info.label}</button>
                     </td>`;
             }).join('');
             return `
@@ -324,7 +371,7 @@ function buildRangeGridHtml() {
             margin-bottom: 1.25rem; border: 1px solid var(--border);
         ">
             <div style="font-size:0.7rem;color:var(--text3);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:0.6rem;">
-                📏 Range Grid — click any cell to cycle Close → Near → Reach → Far → Absent
+                📏 Range Grid — ${gmOnly ? 'GM sets ranges; players see them read-only' : 'click any cell to cycle'} Close → Medium → Reach → Far → Absent
             </div>
             ${bodyHtml}
             <div style="margin-top:0.7rem;padding-top:0.6rem;border-top:1px solid var(--border);">
@@ -416,8 +463,7 @@ export async function openTracker(encounterId) {
         const sbSpends = a.sb_spends?.length ? a.sb_spends : (creature?.sb_spends || []);
         const body = a.body || (creature ? getCreatureDescription(creature) : '');
         const stats = a.stats || creature?.stats || {};
-        const weaponType = a.weaponType || creature?.weaponType || undefined;
-        const reach = (a.reach !== undefined) ? !!a.reach : (creature?.reach !== undefined ? !!creature.reach : false);
+        const weaponClass = deriveWeaponClass(a) || deriveWeaponClass(creature);
 
         return {
             id: 'combat-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9),
@@ -426,8 +472,7 @@ export async function openTracker(encounterId) {
             harm: 0,
             fatigue: 0,                         // NEW
             armorType: a.armorType || 'none',   // NEW
-            weaponType,                         // NEW: 'melee' | 'ranged' | undefined (untracked)
-            reach,                              // NEW: only meaningful when weaponType === 'melee'
+            weaponClass,                         // 'light' | 'medium' | 'heavy' | 'ranged' | undefined (untracked)
             maxHarm: tlToMaxHarm(tl),
             status: 'active',
             notes: body || '',
@@ -524,7 +569,7 @@ function renderTracker() {
             fatigueLabel = `<span style="font-size:0.6rem;background:rgba(255,200,0,0.15);color:var(--gold);padding:0.05rem 0.35rem;border-radius:10px;flex-shrink:0;">💤 ${c.fatigue}</span>`;
         }
 
-        // ─── Weapon type toggle (melee / melee+reach / ranged) ────
+        // ─── Weapon class toggle (Light / Medium / Heavy / Ranged) ────
         const weaponLabel = `<button class="combat-weapon-toggle" data-index="${i}" title="${attr(weaponTypeLabel(c))} — click to change"
             style="font-size:0.6rem;background:rgba(212,175,55,0.12);color:var(--text2);border:1px solid var(--border);padding:0.05rem 0.35rem;border-radius:10px;flex-shrink:0;cursor:pointer;">${weaponToggleGlyph(c)}</button>`;
 
@@ -537,11 +582,16 @@ function renderTracker() {
             const glyph = status === 'blocked' ? '🚫' : status === 'penalty' ? '⚠️' : '📏';
             const outline = status === 'blocked' ? 'outline:2px solid var(--red);outline-offset:1px;'
                 : status === 'penalty' ? 'outline:2px solid var(--orange);outline-offset:1px;' : '';
-            rangeChip = `<span class="range-chip" data-a="${attr(c.id)}" data-b="${attr(focusCombatant.id)}"
-                title="Range to ${escHtml(focusCombatant.name)}: ${info.label} — ${info.desc} (click to cycle)${note ? ` — ${escHtml(note)}` : ''}"
+            const chipGmOnly = !canSetRange();
+            const chipTitle = `Range to ${escHtml(focusCombatant.name)}: ${info.label} — ${info.desc}` +
+                (chipGmOnly ? ' (only the GM can change ranges)' : ' (click to cycle)') +
+                (note ? ` — ${escHtml(note)}` : '');
+            rangeChip = `<span class="range-chip" data-a="${attr(c.id)}" data-b="${attr(focusCombatant.id)}" data-gm-only="${chipGmOnly}"
+                title="${chipTitle}"
                 style="font-size:0.65rem; font-weight:700; color:white; background:${info.color};
-                       padding:0.05rem 0.4rem; border-radius:10px; cursor:pointer; flex-shrink:0; ${outline}">
-                ${glyph} ${info.label}
+                       padding:0.05rem 0.4rem; border-radius:10px; flex-shrink:0; ${outline}
+                       ${chipGmOnly ? 'cursor:default;opacity:0.75;' : 'cursor:pointer;'}">
+                ${chipGmOnly ? '🔒 ' : ''}${glyph} ${info.label}
             </span>`;
         }
 
@@ -851,6 +901,10 @@ function renderTracker() {
     modal.querySelectorAll('.range-chip').forEach(chip => {
         chip.addEventListener('click', (e) => {
             e.stopPropagation();
+            if (!canSetRange()) {
+                showToast('Only the GM can change ranges.', 'warning');
+                return;
+            }
             cycleRangeBand(chip.dataset.a, chip.dataset.b);
             renderTracker();
         });
@@ -858,6 +912,10 @@ function renderTracker() {
     modal.querySelectorAll('.range-cell').forEach(cell => {
         cell.addEventListener('click', (e) => {
             e.stopPropagation();
+            if (!canSetRange()) {
+                showToast('Only the GM can change ranges.', 'warning');
+                return;
+            }
             cycleRangeBand(cell.dataset.a, cell.dataset.b);
             renderTracker();
         });
@@ -974,14 +1032,9 @@ function addLog(type, message) {
     if (combatLog.length > 50) combatLog.shift();
 }
 
-function promptWeaponType(defaultType) {
-    const typePrompt = (prompt('Weapon type: melee or ranged', defaultType || 'melee') || defaultType || 'melee').toLowerCase();
-    const weaponType = ['melee', 'ranged'].includes(typePrompt) ? typePrompt : 'melee';
-    let reach = false;
-    if (weaponType === 'melee') {
-        reach = confirm('Does this weapon have the Reach tag (spear, polearm, etc.)? It will be able to act at the Reach band as well as Close/Near.');
-    }
-    return { weaponType, reach };
+function promptWeaponClass(defaultClass) {
+    const typePrompt = (prompt('Weapon class: light, medium, heavy, or ranged', defaultClass || 'medium') || defaultClass || 'medium').toLowerCase();
+    return WEAPON_CLASS_LABEL[typePrompt] ? typePrompt : 'medium';
 }
 
 function addCombatant() {
@@ -991,7 +1044,7 @@ function addCombatant() {
     const harm = parseInt(prompt('Max Harm (1-20):', '3') || '3');
     const armorPrompt = prompt('Armor type: none, light, medium, heavy (default: none)', 'none') || 'none';
     const armorType = ['none', 'light', 'medium', 'heavy'].includes(armorPrompt) ? armorPrompt : 'none';
-    const { weaponType, reach } = promptWeaponType('melee');
+    const weaponClass = promptWeaponClass('medium');
 
     const newAdversary = {
         id: 'combat-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9),
@@ -1000,8 +1053,7 @@ function addCombatant() {
         harm: 0,
         fatigue: 0,
         armorType: armorType,
-        weaponType,
-        reach,
+        weaponClass,
         maxHarm: Math.min(Math.max(harm, 1), 20),
         status: 'active',
         notes: '',
@@ -1027,7 +1079,7 @@ function addPlayer() {
     const harm = parseInt(prompt('Max Harm (1-20):', '4') || '4');
     const armorPrompt = prompt('Armor type: none, light, medium, heavy (default: none)', 'none') || 'none';
     const armorType = ['none', 'light', 'medium', 'heavy'].includes(armorPrompt) ? armorPrompt : 'none';
-    const { weaponType, reach } = promptWeaponType('melee');
+    const weaponClass = promptWeaponClass('medium');
 
     const newPlayer = {
         id: 'combat-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9),
@@ -1036,8 +1088,7 @@ function addPlayer() {
         harm: 0,
         fatigue: 0,
         armorType: armorType,
-        weaponType,
-        reach,
+        weaponClass,
         maxHarm: Math.min(Math.max(harm, 1), 20),
         status: 'active',
         notes: 'Player character',
@@ -1078,7 +1129,7 @@ function importFromFactions() {
         harm: 0,
         fatigue: 0,
         armorType: 'none',
-        // weaponType intentionally left unset — a Faction is an abstract force,
+        // weaponClass intentionally left unset — a Faction is an abstract force,
         // not a single combatant with a weapon, so we don't flag range issues for it.
         maxHarm: 4 + Math.abs(faction.standing || 0),
         status: 'active',
@@ -1171,8 +1222,7 @@ async function importFromBestiary() {
                             stats: entry.stats || {},
                             sb_spends: entry.sb_spends || [],
                             armorType: 'none',  // default armor
-                            weaponType: entry.weaponType || undefined,
-                            reach: entry.reach !== undefined ? !!entry.reach : undefined
+                            weaponClass: deriveWeaponClass(entry)
                         });
                         saveState();
                     }
@@ -1186,9 +1236,8 @@ async function importFromBestiary() {
                     fatigue: 0,
                     armorType: 'none',
                     // Only set if the bestiary entry actually specifies it — otherwise
-                    // leave untracked rather than guessing melee/ranged for a monster.
-                    weaponType: entry.weaponType || undefined,
-                    reach: entry.reach !== undefined ? !!entry.reach : false,
+                    // leave untracked rather than guessing a weight class for a monster.
+                    weaponClass: deriveWeaponClass(entry),
                     maxHarm: tlToMaxHarm(entry.tl),
                     status: 'active',
                     notes: getCreatureDescription(entry) || '',
@@ -1335,22 +1384,13 @@ function toggleCombatant(idx) {
     }
 }
 
-// Cycle a combatant's weapon: unset/other → melee → melee+Reach → ranged → melee → ...
+// Cycle a combatant's weapon: unset/other → Light → Medium → Heavy → Ranged → Light → ...
+const WEAPON_CLASS_CYCLE = ['light', 'medium', 'heavy', 'ranged'];
 function cycleWeaponType(idx) {
     if (idx < 0 || idx >= combatants.length) return;
     const c = combatants[idx];
-    if (c.weaponType !== 'melee' && c.weaponType !== 'ranged') {
-        c.weaponType = 'melee';
-        c.reach = false;
-    } else if (c.weaponType === 'melee' && !c.reach) {
-        c.reach = true;
-    } else if (c.weaponType === 'melee' && c.reach) {
-        c.weaponType = 'ranged';
-        c.reach = false;
-    } else {
-        c.weaponType = 'melee';
-        c.reach = false;
-    }
+    const currentPos = WEAPON_CLASS_CYCLE.indexOf(c.weaponClass);
+    c.weaponClass = WEAPON_CLASS_CYCLE[(currentPos + 1) % WEAPON_CLASS_CYCLE.length];
     addLog('info', `${c.name} switched to ${weaponTypeLabel(c)}`);
     renderTracker();
 }
@@ -1390,9 +1430,48 @@ export function isTrackerOpen(encounterId) {
 export function getLiveCombatants() {
     return combatants.map(c => ({
         id: c.id, name: c.name, type: c.type, status: c.status,
-        harm: c.harm, maxHarm: c.maxHarm, fatigue: c.fatigue || 0, armorType: c.armorType || 'none'
+        harm: c.harm, maxHarm: c.maxHarm, fatigue: c.fatigue || 0, armorType: c.armorType || 'none',
+        initiative: c.initiative, weaponClass: c.weaponClass
     }));
 }
+
+/**
+ * Snapshot of the tracker's live in-memory state for read-only display
+ * elsewhere (e.g. the VTT sidebar's mini combat tracker card). The tracker
+ * itself is a single module-level session — as long as the SPA page hasn't
+ * been reloaded, this stays queryable even after the GM closes the modal, so
+ * a player can glance at initiative order and their range without the
+ * Encounters tab open. Returns combatants sorted by initiative (desc), with
+ * the active-turn combatant's id flagged.
+ */
+export function getTrackerState() {
+    const sorted = [...combatants].sort((a, b) => (b.initiative || 0) - (a.initiative || 0));
+    const activeCombatant = combatants[activeIndex] || null;
+    return {
+        encounterId: currentEncounterId,
+        isModalOpen: !!modal,
+        round,
+        activeCombatantId: activeCombatant?.id || null,
+        combatants: sorted.map(c => ({
+            id: c.id, name: c.name, type: c.type, status: c.status,
+            harm: c.harm, maxHarm: c.maxHarm, fatigue: c.fatigue || 0, armorType: c.armorType || 'none',
+            initiative: c.initiative, weaponClass: c.weaponClass
+        }))
+    };
+}
+
+/**
+ * Range band between two combatants by id (see rangeMap/getRangeBand above).
+ * Exposed read-only for the VTT mini tracker's "range to you" chip.
+ */
+export function getRangeBandBetween(idA, idB) {
+    return getRangeBand(idA, idB);
+}
+
+// getRangeBandInfo(bandKey) — label/short/color lookup for a band key — is
+// already defined above (used internally); exported here too so external
+// callers (VTT mini tracker) don't need to duplicate RANGE_BANDS.
+export { getRangeBandInfo };
 
 export function setTrackerRangeByName(nameA, nameB, bandKey) {
     if (!modal) return false;
