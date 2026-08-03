@@ -4,8 +4,9 @@ import { showToast } from '../../../components/Toast.js';
 import { isConnectedToServer, onWSEvent, offWSEvent, sendMessage } from '../../../core/websocket.js';
 import { state, syncActiveSheetRefs, getActiveSheet, setContainer } from './state.js';
 import { normalizeSheet, createDefaultSheet } from './sheets.js';
-import { refresh } from './ui.js';
-import { isVttGm } from './combat.js'; // we'll implement this
+import { refresh, renderVttCombatToolbar } from './ui.js';
+import { isVttGm, setVttRole, isGridCombatActive, renderGridCombat } from './combat.js';
+import { restoreDrawings } from './renderer.js';
 
 let wsListeners = new Map();
 let isSyncing = false;
@@ -177,6 +178,20 @@ export function setupWebSocketSync() {
     };
     onWSEvent('whiteboard-ping', pingHandler);
     wsListeners.set('whiteboard-ping', pingHandler);
+
+    // GM role corrections from the server (e.g. it enforces a single GM per
+    // room and reassigns someone). This is the real event — see combat.js
+    // for why the whiteboard previously never learned the role at all.
+    const gmRoleHandler = (data) => {
+        setVttRole(data?.role || null);
+        if (isGridCombatActive()) {
+            renderVttCombatToolbar();
+            restoreDrawings();
+            renderGridCombat();
+        }
+    };
+    onWSEvent('gm_role_update', gmRoleHandler);
+    wsListeners.set('gm_role_update', gmRoleHandler);
 }
 
 function cleanupWebSocketListeners() {

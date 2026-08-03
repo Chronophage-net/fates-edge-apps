@@ -5,6 +5,7 @@
  */
 import { render as renderUI, destroy as destroyUI, refresh as refreshUI } from './modules/ui.js';
 import { onActivate, onDeactivate } from './modules/persistence.js';
+import { showOnboardingModal } from './modules/onboarding.js';
 import {
     loadWhiteboardData,
     saveWhiteboardData,
@@ -32,6 +33,7 @@ export {
     onActivate,
     onDeactivate,
     refreshUI as refresh,
+    showOnboardingModal,
     loadWhiteboardData,
     saveWhiteboardData,
     forceSync,
@@ -57,6 +59,7 @@ export default {
     onActivate,
     onDeactivate,
     refresh: refreshUI,
+    showOnboardingModal,
     loadWhiteboardData,
     saveWhiteboardData,
     forceSync,

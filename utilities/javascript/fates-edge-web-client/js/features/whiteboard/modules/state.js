@@ -26,11 +26,18 @@ export let playerViewActive = false;
 // of being duplicated separately in each module.
 export let currentTool = 'pen';
 
+// Same reasoning applies to Table Mode: combat.js needs to know whether it's
+// active (to render bigger, more legible token labels on a shared tabletop
+// display), but ui.js owns the toggle button. Sharing it here avoids a stale
+// hardcoded copy living in combat.js.
+export let tableModeActive = false;
+
 export function setCanvas(c) { canvas = c; }
 export function setCtx(c) { ctx = c; }
 export function setContainer(c) { container = c; }
 export function setPlayerViewActive(val) { playerViewActive = val; }
 export function setCurrentTool(t) { currentTool = t; }
+export function setTableModeActive(v) { tableModeActive = v; }
 
 export function getActiveSheet() {
     let sheet = state.sheets.find(s => s.id === state.activeSheetId);

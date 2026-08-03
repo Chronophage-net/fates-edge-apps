@@ -786,6 +786,9 @@ function renderRiteItem(rite, patronId, idx, isInvoker, characterId, char, isFir
                     </div>
                 ` : ''}
                 <div style="margin-top:0.2rem;display:flex;gap:0.4rem;align-items:center;flex-wrap:wrap;">
+                    <button class="btn btn-xs btn-ghost" onclick="window.sendRiteCard('${patronId}', ${idx}, '${characterId}')" title="Send a formatted reference card to the VTT — no cost, no roll, works whether or not you've learned this rite" style="font-size:0.6rem;">
+                        📡
+                    </button>
                     ${tierLocked ? `
                         <span style="font-size:0.65rem;color:var(--red);" title="High Rites require Tier III or higher">
                             🔒 Requires Tier III (currently Tier ${escHtml(charTierDisplay)})
@@ -794,12 +797,17 @@ function renderRiteItem(rite, patronId, idx, isInvoker, characterId, char, isFir
                         <button class="btn btn-xs btn-gold" onclick="window.learnRite('${patronId}', ${idx}, '${characterId}')" title="Add this Rite to your known Rites for ${xpCost} XP">
                             📖 Learn (${xpCost} XP)
                         </button>
-                    ` : canCrackSeal ? `
-                        <button class="btn btn-xs btn-danger" onclick="window.crackTheSeal('${patronId}', ${idx}, '${characterId}')" title="Invoke instantly at double the rite's Obligation cost (min +2, or +3 for High Rites)">
-                            💥 Crack the Seal
+                    ` : `
+                        <button class="btn btn-xs btn-gold" onclick="window.invokeRite('${patronId}', ${idx}, '${characterId}')" title="Invoke this rite normally, paying its listed Obligation cost, and send a card to the VTT">
+                            🔮 Invoke (+${baseObligationCost} Obligation)
                         </button>
-                        <span style="font-size:0.55rem;color:var(--text3);align-self:center;">+${crackCostPreview} Obligation · Instant · Symbol becomes Compromised</span>
-                    ` : ''}
+                        ${canCrackSeal ? `
+                            <button class="btn btn-xs btn-danger" onclick="window.crackTheSeal('${patronId}', ${idx}, '${characterId}')" title="Invoke instantly at double the rite's Obligation cost (min +2, or +3 for High Rites)">
+                                💥 Crack the Seal
+                            </button>
+                            <span style="font-size:0.55rem;color:var(--text3);align-self:center;">+${crackCostPreview} Obligation · Instant · Symbol becomes Compromised</span>
+                        ` : ''}
+                    `}
                 </div>
             </div>
         `;
@@ -830,7 +838,7 @@ function renderRiteItem(rite, patronId, idx, isInvoker, characterId, char, isFir
 // ============================================================
 
 window.usePatronGift = async function(patronId, characterId) {
-    const char = getCharacterData(characterId);
+    const char = getState().characters?.find(c => c.id === characterId);
     if (!char) {
         showToast('Character not found.', 'error');
         return;
@@ -892,7 +900,7 @@ window.usePatronGift = async function(patronId, characterId) {
 // ============================================================
 
 window.useBorrowedGrace = async function(patronId, costType, characterId = 'default-character') {
-    const char = getCharacterData(characterId);
+    const char = getState().characters?.find(c => c.id === characterId);
     if (!char) return;
 
     if (char.magicPath !== 'invoker') {
@@ -971,8 +979,12 @@ window.useBorrowedGrace = async function(patronId, costType, characterId = 'defa
     );
     sendVTTMessage(cardHtml);
 
-    // Save character changes
-    saveCharacter(characterId, { boons: char.boons, fatigue: char.fatigue, sceneFlags: char.sceneFlags });
+    // Save character changes. char is the live reference returned by
+    // state.characters.find() above, already mutated in place (boons/
+    // fatigue/sceneFlags) — this just needs to persist it, matching
+    // startNewScene()'s pattern below rather than the nonexistent
+    // saveCharacter(characterId, updates) this used to call.
+    saveState();
 
     // Refresh the rites view
     const container = document.getElementById('spellcraft-content');
@@ -1063,6 +1075,112 @@ window.learnRite = function(patronId, riteIndex, characterId = 'default-characte
             if (module.renderActiveTabContent) module.renderActiveTabContent();
         });
     }
+};
+
+// ============================================================
+// INVOKE RITE (normal use — Runekeepers and Invokers) — WITH VTT
+// ============================================================
+// This was the missing piece: previously a known Rite had no action at
+// all for a Runekeeper, and an Invoker only had the emergency-priced
+// Crack the Seal. This pays the rite's listed (non-doubled) Obligation
+// cost, same as Crack the Seal but without the double cost or the
+// Symbol-Compromised penalty, and sends the same style of VTT card.
+window.invokeRite = function(patronId, riteIndex, characterId = 'default-character') {
+    const state = getState();
+    const patronData = findPatronData(state, patronId);
+    if (!patronData) {
+        showToast('Patron not found.', 'error');
+        return;
+    }
+
+    const rite = patronData.rites?.[riteIndex];
+    if (!rite) {
+        showToast('Rite not found.', 'error');
+        return;
+    }
+
+    const riteName = safeString(rite.name);
+    const char = state.characters?.find(c => c.id === characterId) || state.characters?.[characterId];
+    if (!char || !isRiteKnown(char, patronId, riteName)) {
+        showToast(`You haven't learned "${riteName}" yet — learn it first.`, 'error');
+        return;
+    }
+
+    const baseCost = parseRiteBaseObligationCost(rite);
+    const currentObligation = getPatronObligation(characterId, patronId);
+    const newObligation = currentObligation + baseCost;
+    const actionText = safeString(rite.action || '');
+
+    if (!confirm(`Invoke "${riteName}"${actionText ? ` (${actionText})` : ''}?\n\nCost: +${baseCost} Obligation (total: ${currentObligation} → ${newObligation}).`)) return;
+
+    setPatronObligation(characterId, patronId, newObligation);
+    savePatronData();
+
+    const costDetails = `Obligation +${baseCost} (now ${newObligation})`;
+    const effect = safeString(rite.effect || rite.description || 'The rite resolves.');
+    const extraNote = [actionText, safeString(rite.range || '')].filter(Boolean).join(' · ');
+
+    showToast(`📜 "${riteName}" invoked. Obligation +${baseCost} (now ${newObligation}).`, 'success');
+
+    // Send VTT card
+    const cardHtml = buildRiteCardHtml(
+        riteName,
+        patronData.name || patronData.title || patronId,
+        patronData.icon || '📜',
+        effect,
+        costDetails,
+        extraNote
+    );
+    sendVTTMessage(cardHtml);
+
+    // Refresh the rites view
+    const container = document.getElementById('spellcraft-content');
+    if (container) {
+        import('../index.js').then(module => {
+            if (module.renderActiveTabContent) module.renderActiveTabContent();
+        });
+    }
+};
+
+// ============================================================
+// SEND RITE CARD (reference only — no cost, no roll)
+// ============================================================
+// Matches spellbook.js's spellbookSendToVTT: works for any rite regardless
+// of path or whether it's been learned yet, since it's purely informational
+// — lets a player share what a rite does for the GM/table to read, without
+// implying it was actually invoked.
+window.sendRiteCard = function(patronId, riteIndex, characterId = 'default-character') {
+    const state = getState();
+    const patronData = findPatronData(state, patronId);
+    if (!patronData) {
+        showToast('Patron not found.', 'error');
+        return;
+    }
+
+    const rite = patronData.rites?.[riteIndex];
+    if (!rite) {
+        showToast('Rite not found.', 'error');
+        return;
+    }
+
+    const riteName = safeString(rite.name);
+    const tier = safeString(rite.tier || '');
+    const effect = safeString(rite.effect || rite.description || '');
+    const action = safeString(rite.action || '');
+    const range = safeString(rite.range || '');
+    const cost = safeString(rite.cost || '');
+    const detailsNote = [tier, action, range].filter(Boolean).join(' · ');
+
+    const cardHtml = buildRiteCardHtml(
+        riteName,
+        patronData.name || patronData.title || patronId,
+        patronData.icon || '📜',
+        effect,
+        cost ? `Cost: ${cost}` : '',
+        detailsNote
+    );
+    sendVTTMessage(cardHtml);
+    showToast(`📡 "${riteName}" sent to VTT as a reference card.`, 'success');
 };
 
 window.crackTheSeal = function(patronId, riteIndex, characterId = 'default-character') {

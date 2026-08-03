@@ -4,7 +4,7 @@
  * Holds the DOM references, event bindings, and high‑level UI state.
  * Delegates all core logic to the other modules.
  */
-import { state, setContainer, setCanvas, setCtx, playerViewActive, setPlayerViewActive, getActiveSheet, setCurrentTool as setSharedTool } from './state.js';
+import { state, setContainer, setCanvas, setCtx, playerViewActive, setPlayerViewActive, getActiveSheet, setCurrentTool as setSharedTool, setTableModeActive as setSharedTableMode } from './state.js';
 import { loadWhiteboardData, saveWhiteboardData, setupWebSocketSync, forceSync, onActivate, onDeactivate } from './persistence.js';
 import { renderSheetTabs, addSheet, renameSheet, duplicateSheet, deleteSheet, switchToSheet } from './sheets.js';
 import { renderLayersPanel, toggleLayersPanel } from './layers.js';
@@ -13,9 +13,10 @@ import { drawArrow, drawPolygonShape, drawStroke, initCanvas, renderOverlay, ren
 import { drawFogOfWar, paintFogCell } from './fog.js';
 import {
     toggleGridCombat, renderGridCombat, addGridToken, clearGridTokens, toggleKonreh, importFromTracker,
-    isGridCombatActive, isKonrehActive, setVttRole, canControlFog, isVttPlayer, isVttGm, setSpeakingNames
+    isGridCombatActive, isKonrehActive, canControlFog, setSpeakingNames
 } from './combat.js';
 import { populateRoster, toggleRosterPanel, handleRosterDrop } from './roster.js';
+import { maybeShowOnboarding, showOnboardingModal } from './onboarding.js';
 import { showToast } from '../../../components/Toast.js';
 import { escHtml } from '../../../core/utils.js';
 import { isConnectedToServer, sendMessage } from '../../../core/websocket.js';
@@ -54,7 +55,6 @@ let draggedObject = null;
 let draggedObjectType = null;
 
 // Voice & GM role
-let gmRoleHandler = null;
 let voiceUnsub = null;
 
 // Export UI state for other modules
@@ -64,7 +64,7 @@ export function setCurrentTool(t) { currentTool = t; }
 export function setCurrentColor(c) { currentColor = c; }
 export function setCurrentSize(s) { currentSize = s; }
 export function setCurrentOpacity(o) { currentOpacity = o; }
-export function setTableModeActive(v) { tableModeActive = v; }
+export function setTableModeActive(v) { tableModeActive = v; setSharedTableMode(v); }
 export function getPlayerViewActive() { return playerViewActive; }
 
 // ============================================================
@@ -91,6 +91,7 @@ export function togglePlayerView() {
 
 export function toggleTableMode() {
     tableModeActive = !tableModeActive;
+    setSharedTableMode(tableModeActive);
     applyTableMode();
     showToast(tableModeActive ? '🖥️ Table Mode — board maximized' : 'Table Mode off', 'info');
 }
@@ -238,15 +239,23 @@ export function renderVttCombatToolbar() {
         }
     }
     if (manageLightsBtn) {
-        manageLightsBtn.style.display = showFog && fog?.enabled ? 'inline-block' : 'none';
+        // Only gated on permission, not on fog.enabled — a GM should be able
+        // to pre-place light sources before flipping fog on.
+        manageLightsBtn.style.display = showFog ? 'inline-block' : 'none';
     }
 
+    // These are gated on permission alone (showFog), not on fog.enabled.
+    // Requiring fog to already be on before the tools that turn fog on
+    // become clickable was a dead end — clicking any of them now turns fog
+    // on automatically (see the tool-button handler in attachEvents).
     const fogTools = document.querySelectorAll('[data-tool="fog-reveal"], [data-tool="fog-hide"], [data-tool="fog-wall"], [data-tool="fog-light"]');
     fogTools.forEach(btn => {
-        const enabled = showFog && fog?.enabled;
+        const enabled = showFog;
         btn.disabled = !enabled;
         btn.style.opacity = enabled ? '1' : '0.4';
         btn.style.pointerEvents = enabled ? 'auto' : 'none';
+        const baseTitle = (btn.title || '').replace(/ \(GM only\)$/, '');
+        btn.title = enabled ? baseTitle : `${baseTitle} (GM only)`;
     });
 
     if (!fog?.enabled && ['fog-reveal','fog-hide','fog-wall','fog-light'].includes(currentTool)) {
@@ -358,8 +367,14 @@ export function render(el) {
                     </select>
                     <button class="btn btn-sm btn-secondary" data-tool="fog-reveal" title="Paint revealed areas">✨ Reveal</button>
                     <button class="btn btn-sm btn-secondary" data-tool="fog-hide" title="Hide areas">🌑 Hide</button>
+                    <label class="text-muted text-sm flex gap-1 flex-center" title="Brush size for Reveal/Hide, in cells">Brush
+                        <input type="number" id="whiteboard-fog-brush" min="1" max="5" value="${state.gridCombat.fogOfWar?.fogBrushSize ?? 1}" style="width:36px;" />
+                    </label>
                     <button class="btn btn-sm btn-secondary" data-tool="fog-wall" title="Draw LoS wall">🧱 Wall</button>
                     <button class="btn btn-sm btn-secondary" data-tool="fog-light" title="Place light source">💡 Light</button>
+                    <label class="text-muted text-sm flex gap-1 flex-center" title="Remember areas tokens have seen (dimmed instead of pitch black)">
+                        <input type="checkbox" id="whiteboard-fog-remember" ${state.gridCombat.fogOfWar?.rememberExplored !== false ? 'checked' : ''} style="width:auto;" /> Remember explored
+                    </label>
                     <button class="btn btn-sm btn-ghost" id="whiteboard-fog-clear" title="Clear all fog data">Clear Fog</button>
                 </div>
 
@@ -372,6 +387,7 @@ export function render(el) {
                     <button class="btn btn-sm btn-secondary" id="whiteboard-toggle-layers">🗂️ Layers</button>
                     <button class="btn btn-sm btn-secondary" id="whiteboard-player-view">👁️ Player View</button>
                     <button class="btn btn-sm btn-secondary" id="whiteboard-toggle-roster">👥 Roster</button>
+                    <button class="btn btn-sm btn-ghost" id="whiteboard-help" title="How to use the Whiteboard">❓ Help</button>
                 </div>
             </div>
 
@@ -440,6 +456,9 @@ export function render(el) {
     setCanvas(canvasEl);
     if (canvasEl) setCtx(canvasEl.getContext('2d'));
     setContainer(el);
+
+    // ── First-time intro wizard ──
+    maybeShowOnboarding();
 }
 
 // ============================================================
@@ -455,9 +474,27 @@ export function attachEvents() {
     // ── Tool buttons ──
     document.querySelectorAll('.btn[data-tool]').forEach(btn => {
         btn.addEventListener('click', () => {
+            const tool = btn.dataset.tool;
+
+            if (['fog-reveal', 'fog-hide', 'fog-wall', 'fog-light'].includes(tool)) {
+                if (!canControlFog()) {
+                    showToast('Only the GM can edit fog of war', 'warning');
+                    return;
+                }
+                const fog = state.gridCombat.fogOfWar;
+                if (fog && !fog.enabled) {
+                    fog.enabled = true;
+                    saveWhiteboardData();
+                    renderVttCombatToolbar();
+                    restoreDrawings();
+                    renderGridCombat();
+                    showToast('🌫️ Fog of War enabled', 'success');
+                }
+            }
+
             document.querySelectorAll('.btn[data-tool]').forEach(b => b.className = 'btn btn-sm btn-secondary');
             btn.className = 'btn btn-sm btn-gold';
-            currentTool = btn.dataset.tool;
+            currentTool = tool;
             setCurrentTool(currentTool);
             setSharedTool(currentTool);
             const canvasEl = document.getElementById('whiteboard-canvas');
@@ -525,6 +562,7 @@ export function attachEvents() {
     document.getElementById('whiteboard-player-view')?.addEventListener('click', togglePlayerView);
     document.getElementById('whiteboard-table-mode')?.addEventListener('click', toggleTableMode);
     document.getElementById('whiteboard-toggle-roster')?.addEventListener('click', toggleRosterPanel);
+    document.getElementById('whiteboard-help')?.addEventListener('click', () => showOnboardingModal());
 
     // ── Fog controls ──
     document.getElementById('whiteboard-fog-toggle')?.addEventListener('click', () => {
@@ -560,27 +598,36 @@ export function attachEvents() {
     document.getElementById('whiteboard-fog-clear')?.addEventListener('click', () => {
         const fog = state.gridCombat.fogOfWar;
         if (!fog) return;
-        if (!confirm('Clear all fog data (revealed areas, light sources, and walls)?')) return;
+        if (!confirm('Clear all fog data (revealed areas, light sources, walls, and explored memory)?')) return;
         fog.revealed = [];
         fog.lightSources = [];
         fog.walls = [];
+        fog.explored = [];
         saveWhiteboardData();
         restoreDrawings();
         renderGridCombat();
         showToast('🌫️ Fog data cleared', 'info');
     });
 
-    // ── GM role updates ──
-    if (gmRoleHandler) document.removeEventListener('gmRoleUpdate', gmRoleHandler);
-    gmRoleHandler = (e) => {
-        setVttRole(e.detail?.role || null);
-        if (isGridCombatActive()) {
-            renderVttCombatToolbar();
-            restoreDrawings();
-            renderGridCombat();
-        }
-    };
-    document.addEventListener('gmRoleUpdate', gmRoleHandler);
+    document.getElementById('whiteboard-fog-brush')?.addEventListener('input', (e) => {
+        if (!state.gridCombat.fogOfWar) return;
+        const n = parseInt(e.target.value, 10);
+        state.gridCombat.fogOfWar.fogBrushSize = isNaN(n) ? 1 : Math.max(1, Math.min(5, n));
+        saveWhiteboardData();
+    });
+
+    document.getElementById('whiteboard-fog-remember')?.addEventListener('change', (e) => {
+        if (!state.gridCombat.fogOfWar) return;
+        state.gridCombat.fogOfWar.rememberExplored = e.target.checked;
+        saveWhiteboardData();
+        restoreDrawings();
+        renderGridCombat();
+    });
+
+    // GM role updates now come through the real 'gm_role_update' WebSocket
+    // event, handled centrally in persistence.js's setupWebSocketSync — the
+    // DOM 'gmRoleUpdate' CustomEvent this used to listen for was never
+    // actually dispatched anywhere in the app.
 
     // ── Light source double-click edit ──
     const canvasEl = document.getElementById('whiteboard-canvas');
@@ -897,7 +944,7 @@ function startDrawing(e) {
 
         if (currentTool === 'fog-reveal' || currentTool === 'fog-hide') {
             isDrawing = true;
-            paintFogCell(pos, cellSize, currentTool === 'fog-reveal');
+            paintFogCell(pos, cellSize, currentTool === 'fog-reveal', fog.fogBrushSize || 1);
             return;
         }
     }
@@ -1047,7 +1094,8 @@ function draw(e) {
     // Fog painting
     if ((currentTool === 'fog-reveal' || currentTool === 'fog-hide') && isDrawing) {
         const cellSize = state.gridCombat.cellSize || 40;
-        paintFogCell(pos, cellSize, currentTool === 'fog-reveal');
+        const brush = state.gridCombat.fogOfWar?.fogBrushSize || 1;
+        paintFogCell(pos, cellSize, currentTool === 'fog-reveal', brush);
         return;
     }
 
@@ -1463,9 +1511,8 @@ export function destroy() {
     const container = document.getElementById('whiteboard-modern-layout');
     if (container) container.innerHTML = '';
     saveWhiteboardData();
-    if (gmRoleHandler) document.removeEventListener('gmRoleUpdate', gmRoleHandler);
     if (voiceUnsub) voiceUnsub();
-    // Clean up WS listeners etc. done in persistence
+    // Clean up WS listeners (including gm_role_update) done in persistence.js's onDeactivate
 }
 
 // ============================================================

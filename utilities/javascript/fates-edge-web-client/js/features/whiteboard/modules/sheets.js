@@ -44,6 +44,12 @@ function createDefaultFogOfWar() {
         darkness: 0.85,
         lightSources: [],
         walls: [],
+        // Cells a token has ever seen in token-vision/line-of-sight mode,
+        // rendered dimmed (not pitch black) once the token moves away —
+        // matches the "memory fog" behavior of Foundry/Roll20.
+        explored: [],
+        rememberExplored: true,
+        fogBrushSize: 1,
     };
 }
 

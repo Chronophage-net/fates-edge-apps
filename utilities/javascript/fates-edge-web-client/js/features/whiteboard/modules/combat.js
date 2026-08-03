@@ -1,5 +1,5 @@
 // modules/combat.js
-import { state, ctx, canvas, getLayer, isLayerVisibleNow, layersInDrawOrder } from './state.js';
+import { state, ctx, canvas, getLayer, isLayerVisibleNow, layersInDrawOrder, isLayerLocked, tableModeActive } from './state.js';
 import { drawFogOfWar, paintFogCell } from './fog.js';
 import { GRID_COLORS } from './constants.js';
 import { showToast } from '../../../components/Toast.js';
@@ -11,10 +11,27 @@ import { isConnectedToServer, sendMessage } from '../../../core/websocket.js';
 import { getLiveCombatants, isTrackerOpen, setTrackerRangeByName } from '../../encounters/combat.js';
 
 // ── VTT Role Gating (shared) ──
-let vttRole = null; // will be set by ui
+// `vttRole` is an in-session override, set only if the server explicitly
+// corrects it via a 'gm_role_update' message (see persistence.js, which
+// listens for the real event through onWSEvent). Absent that, we fall back
+// to the role the user actually declared in Settings when connecting —
+// stored in localStorage under 'fates-edge-client-role' by
+// js/features/settings/index.js. That's the true source of truth; there is
+// no other synchronous way to know "am I the GM" the moment this feature
+// mounts, which is exactly what the previous event-only approach was
+// missing (the DOM event it listened for, 'gmRoleUpdate', is never actually
+// dispatched anywhere in the app — the real one is 'gm_role_update' on the
+// WebSocket event bus).
+let vttRole = null;
 export function setVttRole(role) { vttRole = role; }
-export function isVttPlayer() { return isConnectedToServer() && vttRole !== 'gm'; }
-export function isVttGm() { return isConnectedToServer() && vttRole === 'gm'; }
+
+function getDeclaredClientRole() {
+    try { return localStorage.getItem('fates-edge-client-role'); } catch (e) { return null; }
+}
+
+export function getVttRole() { return vttRole || getDeclaredClientRole(); }
+export function isVttPlayer() { return isConnectedToServer() && getVttRole() !== 'gm'; }
+export function isVttGm() { return isConnectedToServer() && getVttRole() === 'gm'; }
 export function canControlFog() { return !isConnectedToServer() || isVttGm(); }
 
 let gridCombatActive = false;
@@ -230,7 +247,6 @@ function drawTokens(cellSize) {
 
         ctx.shadowBlur = 0;
         ctx.fillStyle = 'white';
-        const tableModeActive = false; // will be imported from ui later
         ctx.font = tableModeActive ? 'bold 16px sans-serif' : 'bold 12px sans-serif';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';

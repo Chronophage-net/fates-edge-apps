@@ -15,6 +15,63 @@ export function raySegmentIntersect(rx, ry, rdx, rdy, x1, y1, x2, y2) {
     return t;
 }
 
+// ── Fog "memory" (explored-but-not-currently-visible cells) ──
+// fog.explored is the persisted, serializable list of "gx,gy" cell keys.
+// We keep a Set cache per fog object (not persisted) purely so repeated
+// membership checks each frame are O(1) instead of re-scanning the array.
+const exploredSetCache = new WeakMap();
+function getExploredSet(fog) {
+    let set = exploredSetCache.get(fog);
+    if (!set || set.__len !== fog.explored.length) {
+        set = new Set(fog.explored);
+        set.__len = fog.explored.length;
+        exploredSetCache.set(fog, set);
+    }
+    return set;
+}
+
+function markExplored(fog, cx, cy, radius, cellSize) {
+    if (!fog.explored) fog.explored = [];
+    const set = getExploredSet(fog);
+    const gx0 = Math.floor((cx - radius) / cellSize);
+    const gx1 = Math.floor((cx + radius) / cellSize);
+    const gy0 = Math.floor((cy - radius) / cellSize);
+    const gy1 = Math.floor((cy + radius) / cellSize);
+    for (let gx = gx0; gx <= gx1; gx++) {
+        for (let gy = gy0; gy <= gy1; gy++) {
+            const px = gx * cellSize + cellSize / 2;
+            const py = gy * cellSize + cellSize / 2;
+            if (Math.hypot(px - cx, py - cy) <= radius) {
+                const key = gx + ',' + gy;
+                if (!set.has(key)) {
+                    set.add(key);
+                    set.__len++;
+                    fog.explored.push(key);
+                }
+            }
+        }
+    }
+}
+
+// Traces the current path for a light source's reach: a plain circle if
+// there are no walls, or a wall-occluded visibility polygon (same raycast
+// technique used for token vision) so LoS walls actually block light instead
+// of the light bleeding straight through them.
+function traceLightPath(ctx, light, walls) {
+    const radius = Math.max(light.radius, 1);
+    ctx.beginPath();
+    if (walls && walls.length > 0) {
+        const poly = computeLineOfSight(light.x, light.y, radius, walls);
+        if (poly.length > 0) {
+            ctx.moveTo(poly[0].x, poly[0].y);
+            for (let i = 1; i < poly.length; i++) ctx.lineTo(poly[i].x, poly[i].y);
+            ctx.closePath();
+        }
+    } else {
+        ctx.arc(light.x, light.y, radius, 0, Math.PI * 2);
+    }
+}
+
 export function computeLineOfSight(cx, cy, maxRange, walls) {
     const numRays = 72;
     const points = [];
@@ -63,19 +120,38 @@ export function drawFogOfWar(cellSize) {
         grad.addColorStop(0.6, `rgba(0,0,0,${alpha * 0.5})`);
         grad.addColorStop(1, 'rgba(0,0,0,0)');
         ctx.fillStyle = grad;
-        ctx.beginPath();
-        ctx.arc(light.x, light.y, Math.max(light.radius, 1), 0, Math.PI * 2);
+        traceLightPath(ctx, light, fog.walls);
         ctx.fill();
     }
 
     if (fog.mode === 'token-vision' || fog.mode === 'line-of-sight') {
         const tokens = state.gridCombat.tokens || [];
+
+        // "Memory" pass: dim (not pitch-black) any cell a token has ever
+        // seen, so previously-explored rooms don't vanish the instant a
+        // token turns away. Cut before the live-vision holes below so
+        // currently-visible cells still end up fully revealed.
+        if (fog.rememberExplored !== false && fog.explored && fog.explored.length) {
+            ctx.save();
+            ctx.globalCompositeOperation = 'destination-out';
+            ctx.fillStyle = 'rgba(0,0,0,0.5)';
+            for (const key of fog.explored) {
+                const [gx, gy] = key.split(',').map(Number);
+                ctx.fillRect(gx * cellSize, gy * cellSize, cellSize, cellSize);
+            }
+            ctx.restore();
+        }
+
         for (const t of tokens) {
             if (t.faction !== 'ally' && t.faction !== 'player') continue;
-            const visionCells = t.vision > 0 ? t.vision : 3;
+            // Nullish check on purpose: a token explicitly set to 0 vision
+            // (e.g. blinded) must stay blind, not silently fall back to 3.
+            const visionCells = typeof t.vision === 'number' ? t.vision : 3;
+            if (visionCells <= 0) continue;
             const visionRadius = cellSize * visionCells;
             const cx = t.x + cellSize / 2;
             const cy = t.y + cellSize / 2;
+            if (fog.rememberExplored !== false) markExplored(fog, cx, cy, visionRadius, cellSize);
             if (fog.mode === 'line-of-sight' && (fog.walls || []).length > 0) {
                 const poly = computeLineOfSight(cx, cy, visionRadius, fog.walls || []);
                 if (poly.length > 0) {
@@ -112,8 +188,7 @@ export function drawFogOfWar(cellSize) {
         grad.addColorStop(0, light.color || 'rgba(255, 220, 150, 0.25)');
         grad.addColorStop(1, 'rgba(0,0,0,0)');
         ctx.fillStyle = grad;
-        ctx.beginPath();
-        ctx.arc(light.x, light.y, Math.max(light.radius, 1), 0, Math.PI * 2);
+        traceLightPath(ctx, light, fog.walls);
         ctx.fill();
     }
     ctx.restore();
@@ -164,20 +239,32 @@ export function drawFogOfWar(cellSize) {
 }
 
 // ── Painting fog cells ──
-export function paintFogCell(pos, cellSize, reveal) {
+// brushCells: side length of the square brush, in grid cells (default 1 = a
+// single cell, matching the previous behavior). Lets the GM reveal/hide a
+// whole room in a couple of drags instead of one cell per stroke.
+export function paintFogCell(pos, cellSize, reveal, brushCells = 1) {
     const fog = state.gridCombat.fogOfWar;
     if (!fog) return;
-    const cx = Math.floor(pos.x / cellSize) * cellSize;
-    const cy = Math.floor(pos.y / cellSize) * cellSize;
-    if (reveal) {
-        const exists = (fog.revealed || []).some(r =>
-            r.x === cx && r.y === cy && r.w === cellSize && r.h === cellSize
-        );
-        if (!exists) fog.revealed.push({ x: cx, y: cy, w: cellSize, h: cellSize });
-    } else {
-        fog.revealed = (fog.revealed || []).filter(r =>
-            !(r.x === cx && r.y === cy)
-        );
+    const n = Math.max(1, Math.round(brushCells));
+    const half = Math.floor(n / 2);
+    const originGx = Math.floor(pos.x / cellSize) - half;
+    const originGy = Math.floor(pos.y / cellSize) - half;
+
+    for (let dx = 0; dx < n; dx++) {
+        for (let dy = 0; dy < n; dy++) {
+            const cx = (originGx + dx) * cellSize;
+            const cy = (originGy + dy) * cellSize;
+            if (reveal) {
+                const exists = (fog.revealed || []).some(r =>
+                    r.x === cx && r.y === cy && r.w === cellSize && r.h === cellSize
+                );
+                if (!exists) fog.revealed.push({ x: cx, y: cy, w: cellSize, h: cellSize });
+            } else {
+                fog.revealed = (fog.revealed || []).filter(r =>
+                    !(r.x === cx && r.y === cy)
+                );
+            }
+        }
     }
     // Re-render without saving (caller will save)
 }
