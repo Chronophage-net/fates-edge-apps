@@ -1383,7 +1383,7 @@ ${colors.cyan}📊 Session Stats${colors.reset}
             }
 
             case 'matrix':
-                playMatrixRain().then(() => rl.prompt(true));
+                playMatrixRain().then(() => promptAgain(true));
                 break;
 
             case 'party':

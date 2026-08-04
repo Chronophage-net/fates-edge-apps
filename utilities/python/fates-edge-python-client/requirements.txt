@@ -1,0 +1,9 @@
+# Runtime dependencies for fates_edge_client.
+# Kept in sync with the `dependencies` list in pyproject.toml -- if you
+# change one, change the other. This file exists only for the README's
+# `pip install -r requirements.txt` workflow; `pip install .` (which
+# reads pyproject.toml) does not need it.
+
+requests>=2.28.0
+python-socketio[asyncio-client]>=5.9.0
+pyyaml>=6.0

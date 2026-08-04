@@ -3,11 +3,11 @@ requires = ["setuptools>=61.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "fates-edge-python-client"
-version = "4.1.0"
-description = "Python client for Fate's Edge VTT"
+name = "fates-edge-client"
+version = "5.0.0"
+description = "Python client for the Fate's Edge socket server (characters, timers, dice, Deck of Consequences, campaign sync)"
 readme = "README.md"
-requires-python = ">=3.8"
+requires-python = ">=3.9"
 license = {text = "MIT"}
 authors = [
     {name = "Fate's Edge"}
@@ -17,35 +17,47 @@ classifiers = [
     "Intended Audience :: Developers",
     "License :: OSI Approved :: MIT License",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
 ]
+
+# Matches what the code actually imports (see ws_client.py, rest_client.py,
+# io_utils.py) -- the old pyproject.toml/setup.py declared websocket-client
+# (never imported) and python-socketio without its asyncio extra (the async
+# client needs aiohttp), and left pyyaml undeclared entirely despite
+# io_utils.py using it for character export/import.
 dependencies = [
-    "websocket-client>=1.5.0",
     "requests>=2.28.0",
-    "python-socketio>=5.9.0",
+    "python-socketio[asyncio-client]>=5.9.0",
+    "pyyaml>=6.0",
 ]
 
 [project.optional-dependencies]
 dev = [
     "pytest>=7.0.0",
     "pytest-cov>=4.0.0",
+    "pytest-asyncio>=0.23.0",
     "black>=22.0.0",
     "flake8>=6.0.0",
     "mypy>=1.0.0",
 ]
 
 [project.scripts]
-fates-edge = "fates_edge_python_client:main"
+fates-edge = "fates_edge_client.__main__:main"
 
-[tool.setuptools]
-py-modules = ["fates_edge_python_client"]
+[tool.setuptools.packages.find]
+include = ["fates_edge_client*"]
+
+# Bundle the region flavor-text data (deck.py's region-data loader reads
+# these at runtime) into the installed wheel/sdist.
+[tool.setuptools.package-data]
+fates_edge_client = ["data/regions/*.json"]
 
 [tool.black]
 line-length = 100
-target-version = ['py38', 'py39', 'py310', 'py311']
+target-version = ['py39', 'py310', 'py311', 'py312']
 
 [tool.isort]
 profile = "black"
@@ -56,3 +68,7 @@ python_version = "3.11"
 warn_return_any = true
 warn_unused_configs = true
 ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
