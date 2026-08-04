@@ -570,6 +570,23 @@ class VTTClient extends EventEmitter {
         this.send('state-updated', { characters });
     }
 
+    // ─── Timers ──────────────────────────────────────────────────
+    // NOTE: this bot's /vtttimer commands are local, freeform, named
+    // timers, not the same thing as the server's Adventure Engine
+    // timers (adventure.js's scene/campaign `campaignTimers`, which
+    // only exist by name inside a *loaded adventure module* and are
+    // driven by 'adventure-timer'/POST /adventure/timer). Wiring these
+    // into that system would require inventing a matching adventure
+    // timer entry server-side for every ad-hoc name a Discord user
+    // types, which isn't something this bot can safely do unattended.
+    // Instead, this just broadcasts the bot's own timer list as a
+    // plain, non-destructive status notification (server relays
+    // 'combat-status-update' verbatim, no room state is touched) so
+    // any connected client that cares can display it.
+    syncTimers(timers) {
+        this.send('combat-status-update', { timers, source: 'discord-bot', timestamp: Date.now() });
+    }
+
     // ─── Whiteboard ──────────────────────────────────────────────
 
     getWhiteboard() {

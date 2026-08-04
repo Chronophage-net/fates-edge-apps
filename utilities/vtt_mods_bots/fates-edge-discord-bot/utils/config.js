@@ -13,7 +13,7 @@ function loadConfig() {
             guildId: process.env.DISCORD_GUILD_ID
         },
         vtt: {
-            serverUrl: process.env.VTT_SERVER_URL || 'ws://localhost:3000',
+            serverUrl: process.env.VTT_SERVER_URL || 'ws://localhost:10000',
             apiKey: process.env.VTT_API_KEY,
             roomCode: process.env.VTT_ROOM_CODE || '',
             logChannel: process.env.VTT_LOG_CHANNEL || ''  // <-- ADDED

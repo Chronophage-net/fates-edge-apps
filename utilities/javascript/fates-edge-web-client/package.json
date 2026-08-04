@@ -10,7 +10,9 @@
     "serve": "npx serve -s dist -l ${PORT:-10000}",
     "start": "npm run dev",
     "seed": "node js/tools/generate-seed.js",
-    "build:manifests": "node js/tools/generate-manifests.js"
+    "build:manifests": "node js/tools/generate-manifests.js",
+    "precommit": "npm run build",
+    "prepare": "git config core.hooksPath .githooks 2>/dev/null || true"
   },
   "dependencies": {
     "esbuild": "^0.28.1",

@@ -2,12 +2,12 @@
 
 <p align="center">
   <img src="https://img.shields.io/badge/Foundry-VTT-orange" alt="Foundry VTT"/>
-  <img src="https://img.shields.io/badge/version-1.3.0-blue" alt="Version"/>
+  <img src="https://img.shields.io/badge/version-2.1.0-blue" alt="Version"/>
   <img src="https://img.shields.io/badge/license-MIT-green" alt="License"/>
   <img src="https://img.shields.io/badge/status-stable-brightgreen" alt="Status"/>
 </p>
 
-**Fate's Edge Bridge** connects your Foundry VTT instance to the Fate's Edge WebSocket server, enabling real‑time synchronization of chat, dice rolls, characters, timers, scenes, the Deck of Consequences, Crown Spread readings, modules, and **Game Master election/promotion** between Foundry and other connected VTT clients.
+**Fate's Edge Bridge** connects your Foundry VTT instance to the Fate's Edge WebSocket server, enabling real‑time synchronization of chat, dice rolls, characters, scene notifications, the Deck of Consequences, Crown Spread readings, module listing, and **Game Master election/promotion** between Foundry and other connected VTT clients.
 
 ---
 
@@ -17,10 +17,9 @@
 - **💬 Chat Sync** – Bidirectional chat message exchange between Foundry and VTT.
 - **🎲 Dice Roll Sync** – Send dice rolls from Foundry to VTT clients.
 - **👥 Character Sync** – Synchronize character data (Harm, Fatigue, Boons, Tier) as journal entries.
-- **⏱️ Timer Sync** – Share scene timers visible to all connected clients.
-- **🎬 Scene Sync** – Switch Foundry scenes remotely from the VTT.
+- **🎬 Scene Notifications** – Broadcast the active Foundry scene's name to the VTT whenever it changes (one-way, Foundry → VTT).
 - **🃏 Deck Operations** – Draw cards, shuffle, and perform Crown Spread readings, all displayed as Foundry chat messages and journal entries.
-- **📦 Module Management** – List, push, and clean up VTT modules from Foundry.
+- **📦 Module Listing** – List modules available on the server.
 - **👑 GM Election & Promotion** – Request GM status, approve/reject requests, view client lists and roles directly from the Foundry UI.
 - **🔄 Auto‑Reconnect** – Automatically reconnects if the connection drops.
 - **🔐 Secure** – API key authentication and configurable permissions.
@@ -29,7 +28,7 @@
 
 ## 📋 Requirements
 
-- Foundry VTT v11 or higher (tested with v12)
+- Foundry VTT v11 or higher (tested with v13)
 - Fate's Edge WebSocket Server running and accessible
 - (Recommended) A stable internet connection for WebSocket communication
 
@@ -62,7 +61,7 @@ After installation, enable the module in your world and configure it via **Setti
 
 | Setting | Description |
 |---------|-------------|
-| **Server URL** | The WebSocket URL of your Fate's Edge server (e.g., `ws://localhost:3000` or `wss://your-server.com`). |
+| **Server URL** | The WebSocket URL of your Fate's Edge server (e.g., `ws://localhost:10000` or `wss://your-server.com`). |
 | **Room Code** | The room code to join (e.g., `ABC123`). |
 | **API Key** | (Optional) API key for authentication if your server requires it. |
 | **Player Name** | Your display name in the VTT (defaults to your Foundry username). |
@@ -73,11 +72,11 @@ After installation, enable the module in your world and configure it via **Setti
 
 | Setting | Description |
 |---------|-------------|
-| **Sync Chat** | Send Foundry chat messages to the VTT. |
+| **Sync Chat** | Mirror ordinary (non-whisper) Foundry chat messages to the VTT. |
 | **Sync Dice Rolls** | Send Foundry dice rolls to the VTT. |
 | **Sync Characters** | Synchronize characters with the VTT as journal entries. |
-| **Sync Timers** | Share scene timers with the VTT. |
-| **Sync Scenes** | Broadcast scene changes to the VTT. |
+| **Sync Timers** | Reserved for a future scene/campaign timer integration — this toggle is currently registered but not yet wired to any behavior. |
+| **Sync Scenes** | Broadcast the active scene's name to the VTT whenever it changes (one-way notification only, doesn't affect the room whiteboard). |
 | **Sync Deck** | Synchronize Deck of Consequences draws with the VTT. |
 
 ### GM Features
@@ -92,7 +91,7 @@ After installation, enable the module in your world and configure it via **Setti
 
 ### Connecting
 
-- Click **Connect Now** in the module settings, or enable **Auto Connect** and reload Foundry.
+- Enable **Auto Connect** and reload Foundry, or run the `connectFatesEdge()` macro (see [Macros Reference](#-macros-reference)) — or just click the status indicator itself, which toggles connect/disconnect.
 - A status bar element will appear in the top‑left corner showing connection status, deck count, voice status, current region, and a **GM** button.
 
 ### Status Bar Controls
@@ -149,8 +148,8 @@ getDeckStatus();
 ```
 
 #### Character & Scene Sync
-- **Sync Selected Actors**: In the module settings, click **Sync Selected Actors to VTT** to send all currently selected Foundry actors as character journal entries.
-- **Sync Current Scene**: Click **Sync Current Scene** to broadcast the active scene name to the VTT.
+- **Characters**: automatic — whenever combat/character sheet data changes, if **Sync Characters** is enabled, characters are synced to the VTT as journal entries.
+- **Scene**: automatic — whenever you change the active scene, if **Sync Scenes** is enabled, the new scene's name is broadcast to the VTT. There's no separate manual button for either of these; toggle the corresponding setting to turn the behavior on or off.
 
 ---
 
@@ -158,6 +157,8 @@ getDeckStatus();
 
 | Function | Description |
 |----------|-------------|
+| `connectFatesEdge()` | Connect to the configured Fate's Edge server. |
+| `disconnectFatesEdge()` | Disconnect from the server. |
 | `drawCard(count, region)` | Draw `count` cards (1–5) from the specified region (or default). |
 | `crownSpread(region)` | Perform a Crown Spread reading from the given region (or default). |
 | `shuffleDeck()` | Shuffle the deck. |
@@ -167,6 +168,8 @@ getDeckStatus();
 | `requestGM()` | Send a GM request to the server. |
 | `approveGM(targetId)` | Approve a GM request (GM only). |
 | `getGMStatus()` | Returns an object with `currentGM`, `isGM`, `pendingRequests`, and `clients` count. |
+
+All of the above are also available as `FatesEdgeBridge.<methodName>(...)` directly (e.g. `FatesEdgeBridge.connect()`), which the short `window.*` names above just wrap.
 
 ---
 

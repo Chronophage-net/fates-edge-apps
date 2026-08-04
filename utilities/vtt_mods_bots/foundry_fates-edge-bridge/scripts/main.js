@@ -1,5 +1,5 @@
 /**
- * Fate's Edge Bridge v1.2.0 - Main Entry Point
+ * Fate's Edge Bridge v2.1.0 - Main Entry Point
  * Supports Deck of Consequences, Crown Spread, Modules, Regions, and GM Election/Promotion
  */
 
@@ -11,7 +11,7 @@ import { registerSettings } from './settings.js';
 // ============================================================
 
 Hooks.once('init', () => {
-    console.log('⚔️ Fate\'s Edge Bridge v1.2.0 initializing...');
+    console.log('⚔️ Fate\'s Edge Bridge v2.1.0 initializing...');
     
     // Register settings
     registerSettings();
@@ -27,7 +27,7 @@ Hooks.once('init', () => {
         updateGmPanel(state);
     });
     
-    console.log('⚔️ Fate\'s Edge Bridge v1.2.0 initialized (with GM support)');
+    console.log('⚔️ Fate\'s Edge Bridge v2.1.0 initialized (with GM support)');
 });
 
 Hooks.once('ready', () => {
@@ -333,8 +333,12 @@ function updateGmPanel(state) {
 window.FatesEdgeBridge = FatesEdgeBridge;
 
 // Quick macro functions
-window.drawCard = function(count = 1) {
-    FatesEdgeBridge.sendDeckDraw(count);
+// FIXED: sendDeckDraw already accepts a region as its 2nd argument, but
+// this macro dropped it on the floor -- README documents drawCard(3,
+// 'Vhasia') as a region-specific draw, which silently always fell back
+// to the configured default region.
+window.drawCard = function(count = 1, region = null) {
+    FatesEdgeBridge.sendDeckDraw(count, region);
 };
 
 window.crownSpread = function(region = null) {
@@ -379,6 +383,21 @@ window.getGMStatus = function() {
         pendingRequests: FatesEdgeBridge.pendingRequests.length,
         clients: FatesEdgeBridge.clients.size
     };
+};
+
+// Connect/disconnect macro helpers -- previously the only documented way
+// to do this was a "Connect Now"/"Disconnect" button pair in a settings
+// panel (templates/settings.html) that was never actually wired up to
+// any FormApplication/settings menu, so those buttons never existed in a
+// running game. FatesEdgeBridge.connect()/.disconnect() were always
+// callable directly as `FatesEdgeBridge.connect()`; these are just
+// short, documented macro names matching the rest of window.* above.
+window.connectFatesEdge = function() {
+    FatesEdgeBridge.connect();
+};
+
+window.disconnectFatesEdge = function() {
+    FatesEdgeBridge.disconnect();
 };
 
 // ============================================================

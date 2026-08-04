@@ -7,7 +7,7 @@
     "settings": {
       "serverUrl": {
         "name": "Server URL",
-        "hint": "The WebSocket URL of your Fate's Edge server (e.g., ws://localhost:3000 or wss://your-server.com)"
+        "hint": "The WebSocket URL of your Fate's Edge server (e.g., ws://localhost:10000 or wss://your-server.com)"
       },
       "roomCode": {
         "name": "Room Code",

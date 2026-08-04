@@ -178,12 +178,12 @@ module.exports = {
                 )
                 .addStringOption(opt =>
                     opt.setName('x')
-                        .setDescription('X position (for add/move)')
+                        .setDescription('Grid column (for add/move)')
                         .setRequired(false)
                 )
                 .addStringOption(opt =>
                     opt.setName('y')
-                        .setDescription('Y position (for add/move)')
+                        .setDescription('Grid row (for add/move)')
                         .setRequired(false)
                 )
                 .addStringOption(opt =>
@@ -571,12 +571,14 @@ async function handleGrid(interaction, client) {
                 break;
             }
             case 'enable': {
-                await apiRequest(`/rooms/${client.vtt.roomCode}/grid-combat`, 'POST', { enabled: true });
+                // FIXED: real route is under /whiteboard/grid-combat, not
+                // a bare /grid-combat -- this always 404'd.
+                await apiRequest(`/rooms/${client.vtt.roomCode}/whiteboard/grid-combat`, 'POST', { enabled: true });
                 await interaction.editReply('✅ Grid combat enabled.');
                 break;
             }
             case 'disable': {
-                await apiRequest(`/rooms/${client.vtt.roomCode}/grid-combat`, 'POST', { enabled: false });
+                await apiRequest(`/rooms/${client.vtt.roomCode}/whiteboard/grid-combat`, 'POST', { enabled: false });
                 await interaction.editReply('❌ Grid combat disabled.');
                 break;
             }
@@ -614,45 +616,54 @@ async function handleToken(interaction, client) {
     try {
         switch (action) {
             case 'list': {
-                const result = await apiRequest(`/rooms/${client.vtt.roomCode}/tokens`);
-                const tokens = result.tokens || [];
+                // FIXED: there is no GET /rooms/:code/tokens route -- tokens
+                // live inside the whiteboard's gridCombat state, read via
+                // GET /rooms/:code/whiteboard.
+                const wb = await apiRequest(`/rooms/${client.vtt.roomCode}/whiteboard`);
+                const tokens = wb.gridCombat?.tokens || [];
                 if (tokens.length === 0) {
                     return interaction.editReply('No tokens on the grid.');
                 }
                 const embed = new EmbedBuilder()
                     .setColor(0xd4af37)
                     .setTitle(`🎯 Tokens (${tokens.length})`)
-                    .setDescription(tokens.map(t => `**${t.name}** (ID: \`${t.id}\`) — (${t.x}, ${t.y}) ${t.color}`).join('\n'))
+                    .setDescription(tokens.map(t => `**${t.label}** (ID: \`${t.id}\`) — ${t.faction || 'enemy'}, ${t.color}`).join('\n'))
                     .setTimestamp();
                 await interaction.editReply({ embeds: [embed] });
                 break;
             }
             case 'add': {
                 const name = interaction.options.getString('name');
-                const x = parseInt(interaction.options.getString('x')) || 0;
-                const y = parseInt(interaction.options.getString('y')) || 0;
+                // FIXED: the real API places tokens by grid CELL (col/row),
+                // not raw pixels -- it derives x/y itself from cellSize.
+                const col = parseInt(interaction.options.getString('x')) || 0;
+                const row = parseInt(interaction.options.getString('y')) || 0;
                 const color = interaction.options.getString('color') || '#d4af37';
                 if (!name) return interaction.editReply('❌ Please provide a token name.');
-                const result = await apiRequest(`/rooms/${client.vtt.roomCode}/tokens`, 'POST', { name, x, y, color });
-                await interaction.editReply(`✅ Token "${name}" added with ID: \`${result.id}\``);
+                // FIXED: real route is POST /rooms/:code/whiteboard/tokens
+                // with the token nested under a `token` key.
+                const result = await apiRequest(`/rooms/${client.vtt.roomCode}/whiteboard/tokens`, 'POST', {
+                    token: { label: name, col, row, color }
+                });
+                await interaction.editReply(`✅ Token "${name}" added with ID: \`${result.token?.id}\``);
                 break;
             }
             case 'remove': {
                 const tokenId = interaction.options.getString('token-id');
                 if (!tokenId) return interaction.editReply('❌ Please provide a token ID.');
-                await apiRequest(`/rooms/${client.vtt.roomCode}/tokens/${tokenId}`, 'DELETE');
+                await apiRequest(`/rooms/${client.vtt.roomCode}/whiteboard/tokens/${tokenId}`, 'DELETE');
                 await interaction.editReply(`✅ Token \`${tokenId}\` removed.`);
                 break;
             }
             case 'move': {
                 const tokenId = interaction.options.getString('token-id');
-                const x = parseInt(interaction.options.getString('x'));
-                const y = parseInt(interaction.options.getString('y'));
-                if (!tokenId || isNaN(x) || isNaN(y)) {
-                    return interaction.editReply('❌ Usage: /vttadmin token move <token-id> <x> <y>');
+                const col = parseInt(interaction.options.getString('x'));
+                const row = parseInt(interaction.options.getString('y'));
+                if (!tokenId || isNaN(col) || isNaN(row)) {
+                    return interaction.editReply('❌ Usage: /vttadmin token move <token-id> <x=col> <y=row>');
                 }
-                await apiRequest(`/rooms/${client.vtt.roomCode}/tokens/${tokenId}/move`, 'POST', { x, y });
-                await interaction.editReply(`✅ Token \`${tokenId}\` moved to (${x}, ${y}).`);
+                await apiRequest(`/rooms/${client.vtt.roomCode}/whiteboard/tokens/${tokenId}/move`, 'POST', { col, row });
+                await interaction.editReply(`✅ Token \`${tokenId}\` moved to (${col}, ${row}).`);
                 break;
             }
         }

@@ -1,0 +1,35 @@
+#!/usr/bin/env bash
+# Pre-commit hook: build the web client before allowing a commit that
+# touches it, so broken builds never get committed.
+#
+# Installed via `core.hooksPath .githooks` (set automatically by the
+# web-client's `npm install` — see its package.json "prepare" script —
+# or manually with: git config core.hooksPath .githooks)
+
+set -euo pipefail
+
+REPO_ROOT="$(git rev-parse --show-toplevel)"
+WEB_CLIENT_DIR="utilities/javascript/fates-edge-web-client"
+
+# Only run the build if this commit actually touches the web client.
+if ! git diff --cached --name-only --diff-filter=ACMR | grep -q "^${WEB_CLIENT_DIR}/"; then
+  exit 0
+fi
+
+echo "pre-commit: staged changes touch ${WEB_CLIENT_DIR} — running npm run build…"
+
+cd "${REPO_ROOT}/${WEB_CLIENT_DIR}"
+
+if [ ! -d node_modules ]; then
+  echo "pre-commit: node_modules missing in ${WEB_CLIENT_DIR}, run 'npm install' there first." >&2
+  exit 1
+fi
+
+if ! npm run build; then
+  echo "" >&2
+  echo "pre-commit: web-client build failed — commit aborted." >&2
+  echo "Fix the build (npm run build inside ${WEB_CLIENT_DIR}) or use 'git commit --no-verify' to bypass." >&2
+  exit 1
+fi
+
+echo "pre-commit: web-client build succeeded."

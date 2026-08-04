@@ -2,7 +2,7 @@
   "id": "fates-edge-bridge",
   "title": "Fate's Edge Bridge",
   "description": "Connects Foundry VTT to the Fate's Edge WebSocket server for real-time sync of chat, dice rolls, characters, timers, scenes, Deck of Consequences, Crown Spread, modules, and Game Master election/promotion.",
-  "version": "1.3.0",
+  "version": "2.1.0",
   "authors": [
     {
       "name": "Fate's Edge Team",
@@ -26,8 +26,8 @@
   ],
   "compatibility": {
     "minimum": "11",
-    "verified": "12",
-    "maximum": "12"
+    "verified": "13",
+    "maximum": "13"
   },
   "socket": true,
   "url": "https://github.com/fates-edge/fates-edge",
@@ -60,7 +60,7 @@
     }
   ],
   "minimumCoreVersion": "11",
-  "compatibleCoreVersion": "12",
+  "compatibleCoreVersion": "13",
   "system": [],
   "dependencies": [],
   "conflicts": [],
@@ -81,7 +81,7 @@
       ]
     },
     "fates-edge": {
-      "version": "1.3.0",
+      "version": "2.1.0",
       "features": [
         "chat-sync",
         "dice-sync",

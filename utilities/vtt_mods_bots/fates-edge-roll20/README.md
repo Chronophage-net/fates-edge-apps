@@ -2,7 +2,7 @@
 
 <p align="center">
   <img src="https://img.shields.io/badge/Roll20-API-blue" alt="Roll20 API"/>
-  <img src="https://img.shields.io/badge/version-1.3.0-orange" alt="Version"/>
+  <img src="https://img.shields.io/badge/version-2.1.0-orange" alt="Version"/>
   <img src="https://img.shields.io/badge/license-MIT-green" alt="License"/>
 </p>
 
@@ -16,10 +16,10 @@
 - 💬 **Chat Sync** – Bidirectional chat message synchronization.
 - 🎲 **Dice Roll Sync** – Share dice rolls between Roll20 and VTT clients.
 - 👥 **Character Sync** – Synchronize character data (Harm, Fatigue, Boons, Tier) as Roll20 attributes and journal entries.
-- ⏱️ **Timer Sync** – Share scene timers visible to all connected clients.
-- 🎬 **Scene Sync** – Switch Roll20 pages remotely from the VTT.
+- 🎭 **Adventure Engine** – Load modules, advance scenes, run encounters, tick real campaign/scene timers, and log narrative beats.
+- 🎬 **Scene Notifications** – Broadcast the current Roll20 page name to the VTT whenever it changes (one-way, Roll20 → VTT).
 - 🃏 **Deck of Consequences** – Draw cards, shuffle, and perform Crown Spread readings directly from Roll20.
-- 📦 **Module Management** – List, push, and clean up VTT modules.
+- 📦 **Module Listing** – List modules available on the server.
 - 🌍 **Region Support** – Set and sync default region for card meanings.
 - 👑 **GM Election & Promotion** – Request GM status, approve/reject requests, and view client roles – all from Roll20 chat.
 - 🔐 **Secure** – API key authentication support.
@@ -52,7 +52,7 @@ In the Roll20 API console, set these global variables (they can be added at the 
 
 ```javascript
 // Required
-var FATES_EDGE_SERVER_URL = 'ws://your-server:3000';
+var FATES_EDGE_SERVER_URL = 'ws://your-server:10000';
 var FATES_EDGE_ROOM_CODE = 'ABC123';
 
 // Optional – API key if your server requires it
@@ -88,58 +88,44 @@ var FATES_EDGE_DEFAULT_REGION = 'Acasia';
 
 The module exposes a set of `!fates-edge` commands that can be used in Roll20 chat or in macros.
 
+> The command list below is generated directly from the `switch (subcommand)` in `api/fates-edge-api.js`'s chat handler — every command here is implemented in the current script. A few commands from older versions of this README (`ping`, `whisper`, `emote`, `d`, standalone `timer`/`scene` management, `sync char`/`sync selected`, `char list`/`char update`, `modules push`/`modules cleanup`) were removed from this document because the code backing them doesn't currently exist — file an issue or a PR if you'd like them added.
+
 ### Connection & Status
 
 | Command | Description |
 |---------|-------------|
 | `!fates-edge connect` | Connect to the VTT server. |
 | `!fates-edge disconnect` | Disconnect from the VTT server. |
-| `!fates-edge status` | Show connection status, region, deck count, and GM info. |
-| `!fates-edge ping` | Test connection latency. |
+| `!fates-edge status` | Show connection status, region, deck count, whiteboard/grid-combat summary, GM info, and current adventure/scene/encounter if any. |
 
 ### Chat & Dice
 
 | Command | Description |
 |---------|-------------|
 | `!fates-edge send <message>` | Send a chat message to the VTT. |
-| `!fates-edge whisper <player> <message>` | Whisper to a specific VTT client. |
-| `!fates-edge emote <action>` | Send an emote/action. |
-| `!fates-edge roll <dice> [reason]` | Roll dice and broadcast to VTT. |
-| `!fates-edge d <dice>` | Shortcut for dice roll. |
+| `!fates-edge roll <dice>` | Roll dice locally and broadcast the result to VTT. |
 
-### Character Management
+Chat messages you type normally (not prefixed with `!fates-edge`) are also relayed automatically when `FATES_EDGE_SYNC_CHAT` is on, and Roll20 dice-roll results are relayed automatically when `FATES_EDGE_SYNC_ROLLS` is on.
+
+### Character Sync
 
 | Command | Description |
 |---------|-------------|
-| `!fates-edge sync char <name>` | Sync a specific character to VTT. |
 | `!fates-edge sync characters` | Sync all Roll20 characters to VTT. |
-| `!fates-edge sync selected` | Sync selected tokens to VTT. |
-| `!fates-edge char list` | List all synced characters. |
-| `!fates-edge char update <name> <attr> <value>` | Update a character attribute (harm, fatigue, boons, tier). |
 
-### Timer Management
+### Scene Sync
 
 | Command | Description |
 |---------|-------------|
-| `!fates-edge timer create <name> <segments>` | Create a new timer. |
-| `!fates-edge timer tick <name> [ticks]` | Advance a timer by 1 or more. |
-| `!fates-edge timer remove <name>` | Remove a timer. |
-| `!fates-edge timer list` | List all active timers. |
-| `!fates-edge timer reset <name>` | Reset a timer to 0. |
+| `!fates-edge sync scene` | Broadcast the current Roll20 page name to the VTT as a `scene-status-update` notification (non-destructive — does not touch the room whiteboard). |
 
-### Scene Management
-
-| Command | Description |
-|---------|-------------|
-| `!fates-edge sync scene` | Sync the current Roll20 page to VTT. |
-| `!fates-edge scene <name>` | Switch to a Roll20 page and sync it. |
-| `!fates-edge scene list` | List available pages. |
+Roll20 page changes are also synced automatically when `FATES_EDGE_SYNC_SCENES` is on (same non-destructive broadcast, fired on `change:campaign:currentpage`).
 
 ### Deck of Consequences
 
 | Command | Description |
 |---------|-------------|
-| `!fates-edge draw [count] [region]` | Draw N cards from the deck (1–5). |
+| `!fates-edge draw [count]` | Draw N cards from the deck (1–5, capped server-side). |
 | `!fates-edge crown [region]` | Perform a Crown Spread reading. |
 | `!fates-edge shuffle` | Shuffle the deck. |
 | `!fates-edge region [name]` | Set or get the default region. |
@@ -149,10 +135,22 @@ The module exposes a set of `!fates-edge` commands that can be used in Roll20 ch
 | Command | Description |
 |---------|-------------|
 | `!fates-edge modules list` | List loaded modules. |
-| `!fates-edge modules push <id>` | Push a module to all clients (GM only). |
-| `!fates-edge modules cleanup <id>` | Cleanup a module from all clients (GM only). |
 
-### GM Election & Promotion (new in v1.3.0)
+### Adventure Engine
+
+| Command | Description |
+|---------|-------------|
+| `!fates-edge adventure load <moduleId>` | Load an adventure module. |
+| `!fates-edge adventure scene [actIndex] [sceneIndex]` | Advance the adventure (omit both to advance sequentially). |
+| `!fates-edge adventure encounter start <ref>` | Start an encounter by index or name. |
+| `!fates-edge adventure encounter resolve <clean\|partial\|miss> [notes]` | Resolve the active encounter. |
+| `!fates-edge adventure timer <name> [amount] [scene\|campaign]` | Tick a real Adventure Engine timer. |
+| `!fates-edge adventure log <text>` | Append a narrative beat to the adventure log. |
+| `!fates-edge adventure status` | Show current adventure state. |
+| `!fates-edge adventure reference` | Show bestiary/NPCs/locations/factions for the loaded adventure. |
+| `!fates-edge adventure reset` | Reset the loaded adventure back to planned. |
+
+### GM Election & Promotion
 
 | Command | Description |
 |---------|-------------|
@@ -196,14 +194,14 @@ You can create Roll20 macros that use these commands. For a complete reference, 
 // Sync all characters
 !fates-edge sync characters
 
-// Roll with advantage
-!fates-edge roll 2d20kh1 "Attack with Advantage"
-
-// Create a timer
-!fates-edge timer create "Ritual" 6
+// Roll dice and broadcast to VTT
+!fates-edge roll 2d20kh1
 
 // Draw 3 cards
-!fates-edge draw 3 Acasia
+!fates-edge draw 3
+
+// Advance the current adventure's active Ritual timer
+!fates-edge adventure timer "Ritual" 1
 
 // Request GM
 !fates-edge gm request

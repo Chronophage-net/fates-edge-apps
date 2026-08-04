@@ -551,26 +551,28 @@ async function handleInfo(interaction, vtt) {
         return interaction.editReply('❌ Not connected to VTT server');
     }
 
-    vtt.send('sync-request', {});
+    // NOTE: this used to fire 'sync-request' and wait for a 'room-state'
+    // event that the server never actually sends -- the real replies to
+    // sync-request are 'sync-state' (whiteboard) and 'state-updated'
+    // (characters), see ws-handlers.js's handleSyncRequest(). Neither one
+    // carries a client list, and this command always timed out as a
+    // result. VTTClient already keeps `vtt.clients`/`vtt.deck`/
+    // `vtt.whiteboard` continuously up to date from 'presence',
+    // 'player-joined'/'player-left', and 'deck-*' events as they arrive,
+    // so there's no need to round-trip at all -- just render what the
+    // bot already knows right now.
+    const clients = Array.from(vtt.clients.values());
 
-    const timeout = setTimeout(() => {
-        interaction.editReply('⏰ No response from VTT server');
-    }, 5000);
+    const embed = new EmbedBuilder()
+        .setTitle(`🏠 VTT Room: ${vtt.roomCode}`)
+        .setColor(0xd4af37)
+        .addFields(
+            { name: '📊 Stats', value: `Clients: ${clients.length}\nDeck Cards Remaining: ${vtt.deck?.remaining ?? vtt.deck?.cards?.length ?? '?'}`, inline: true },
+            { name: '👥 Clients', value: clients.length ? clients.map(c => `- ${c.name}${c.role === 'gm' ? ' (GM)' : ''}`).join('\n') : 'No clients', inline: true }
+        )
+        .setTimestamp();
 
-    vtt.once('room-state', (data) => {
-        clearTimeout(timeout);
-
-        const embed = new EmbedBuilder()
-            .setTitle(`🏠 VTT Room: ${vtt.roomCode}`)
-            .setColor(0xd4af37)
-            .addFields(
-                { name: '📊 Stats', value: `Clients: ${data.clients?.length || 0}\nChat Messages: ${data.chatHistory?.length || 0}\nDeck Cards: ${vtt.deck?.cards?.length || 0}`, inline: true },
-                { name: '👥 Clients', value: data.clients?.map(c => `- ${c.data?.name || c.name || 'Unknown'}`).join('\n') || 'No clients', inline: true }
-            )
-            .setTimestamp();
-
-        interaction.editReply({ embeds: [embed] });
-    });
+    await interaction.editReply({ embeds: [embed] });
 }
 
 async function handleRegion(interaction, vtt) {

@@ -543,7 +543,15 @@ function setupSocketIO(io) {
         const relayEvents = [
             'media_recording', 'voice-offer', 'voice-answer', 'voice-ice-candidate',
             'voice-status', 'chat-message', 'roll-dice', 'roll-result',
-            'event', 'operation', 'operation_ack', 'presence'
+            'event', 'operation', 'operation_ack', 'presence',
+            // NEW: parity with the plain-WS handler's direct-broadcast list
+            // (ws-handlers.js) -- these were relay-only there but silently
+            // dropped for Socket.IO-connected clients, since Socket.IO only
+            // relays events explicitly listed here. Non-destructive,
+            // broadcast-only notifications (e.g. a VTT mod announcing its
+            // current scene/combat status) should reach every connected
+            // client regardless of which transport they used to connect.
+            'scene-status-update', 'combat-status-update'
         ];
         relayEvents.forEach(eventName => {
             socket.on(eventName, (data) => {

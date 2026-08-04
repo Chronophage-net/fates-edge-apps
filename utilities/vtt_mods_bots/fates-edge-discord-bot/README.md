@@ -8,7 +8,7 @@
   <img src="https://img.shields.io/badge/node-18+-brightgreen" alt="Node.js"/>
 </p>
 
-**Fate's Edge Discord Bot** bridges your Discord server with the Fate's Edge VTT WebSocket server, enabling real‑time interaction between Discord users and your VTT sessions. It now includes **Game Master election and promotion** features, plus an **Avrae module** for seamless integration with Avrae D&D bots.
+**Fate's Edge Discord Bot** bridges your Discord server with the Fate's Edge VTT WebSocket server, enabling real‑time interaction between Discord users and your VTT sessions. It includes **Game Master election and promotion** features alongside deck, character, chat, and Adventure Engine commands.
 
 ---
 
@@ -20,9 +20,9 @@
 - 👥 **Character Management** – Create, update, and list VTT characters.
 - ⏱️ **Timer Management** – Create, tick, and track VTT timers.
 - 🃏 **Deck Operations** – Draw cards, shuffle, perform Crown Spread readings.
-- 📦 **Module Management** – List, push, and clean up VTT modules.
+- 📦 **Module Management** – List, push, and clean up VTT modules (`/vtt modules`, `/vttadmin modules`).
+- 🎭 **Adventure Engine** – Load modules, advance scenes, run encounters, tick timers, and log narrative beats (`/vttadventure`).
 - 👑 **GM Election & Promotion** – Request GM status, approve/reject requests, view GM status and client lists (via `/vtt gm` subcommands).
-- 🤖 **Avrae Integration** – Use Fate's Edge commands directly within Avrae (see [Avrae Module](#-avrae-module)).
 - 🌐 **Webhook Support** – External services can trigger Discord messages.
 - 🔐 **Admin Commands** – Broadcast messages, force sync, view stats.
 - 📊 **Rich Embeds** – Beautiful Discord embed messages for all commands.
@@ -63,7 +63,7 @@ DISCORD_CLIENT_ID=YOUR_CLIENT_ID
 DISCORD_GUILD_ID=YOUR_GUILD_ID  # Optional, for dev
 
 # Fate's Edge VTT Server
-VTT_SERVER_URL=ws://localhost:3000
+VTT_SERVER_URL=ws://localhost:10000
 VTT_API_KEY=your-api-key
 VTT_ROOM_CODE=ABC123
 VTT_LOG_CHANNEL=123456789012345678  # Channel for GM notifications
@@ -178,6 +178,20 @@ npm run dev
 | `/vtttimer remove <name>` | Remove a timer | `/vtttimer remove "Ritual"` |
 | `/vtttimer reset <name>` | Reset a timer to 0 | `/vtttimer reset "Ritual"` |
 
+> **Note:** these are local, freeform timers tracked only by the bot — they're not the same thing as the server's Adventure Engine timers (`/vttadventure timer`, tied to timers defined inside a loaded adventure module). The bot broadcasts its timer list to the room as a non-destructive status notification whenever it changes, so other connected clients can display it, but nothing on the server persists or authoritatively tracks these.
+
+### Adventure Engine
+
+| Command | Description | Example |
+|---------|-------------|---------|
+| `/vttadventure load <moduleid>` | Load an adventure module | `/vttadventure load "the-hazel-root"` |
+| `/vttadventure scene [actindex] [sceneindex]` | Advance the adventure (omit both to advance sequentially) | `/vttadventure scene actindex:1 sceneindex:0` |
+| `/vttadventure encounter start <ref>` | Start an encounter by index or name | `/vttadventure encounter start "Bandit Ambush"` |
+| `/vttadventure encounter resolve <outcome> [notes]` | Resolve the active encounter | `/vttadventure encounter resolve clean` |
+| `/vttadventure timer <name> [amount] [scope]` | Tick a real Adventure Engine timer | `/vttadventure timer "Village Safety" amount:1` |
+| `/vttadventure log <text> [author]` | Append a narrative beat to the adventure log | `/vttadventure log "The bridge collapses behind them."` |
+| `/vttadventure status` | Show current adventure state | `/vttadventure status` |
+
 ### Deck Operations
 
 | Command | Description | Example |
@@ -186,15 +200,17 @@ npm run dev
 | `/vttdeck crown [region]` | Perform Crown Spread | `/vttdeck crown Acasia` |
 | `/vttdeck shuffle` | Shuffle the deck | `/vttdeck shuffle` |
 | `/vttdeck history` | Show deck history | `/vttdeck history` |
-| `/vttdeck clear-history` | Clear deck history | `/vttdeck clear-history` |
+
+> **Note:** `/deck` (in `commands/dice.js`) is a near-duplicate of `/vttdeck` with the same draw/crown/shuffle/status/history subcommands under a shorter name — either works.
 
 ### Module Management
 
 | Command | Description | Example |
 |---------|-------------|---------|
-| `/vttmodules list` | List loaded modules | `/vttmodules list` |
-| `/vttmodules push <moduleId>` | Push a module to clients | `/vttmodules push "my-module"` |
-| `/vttmodules cleanup <moduleId>` | Clean up a module | `/vttmodules cleanup "my-module"` |
+| `/vtt modules` | List loaded modules | `/vtt modules` |
+| `/vttadmin modules list` | List loaded modules (admin) | `/vttadmin modules list` |
+| `/vttadmin modules push <module-id>` | Push a module to clients | `/vttadmin modules push "my-module"` |
+| `/vttadmin modules cleanup <module-id>` | Clean up a module | `/vttadmin modules cleanup "my-module"` |
 
 ### Admin Commands
 
@@ -203,32 +219,6 @@ npm run dev
 | `/vttadmin broadcast <message>` | Broadcast message to all VTT clients | `/vttadmin broadcast "Break time!"` |
 | `/vttadmin sync` | Force sync all state | `/vttadmin sync` |
 | `/vttadmin stats` | Show bot statistics | `/vttadmin stats` |
-
----
-
-## 🤖 Avrae Module
-
-The bot includes an **Avrae module** (`avrae.txt`) that allows you to run Fate's Edge commands directly from **Avrae**, the popular D&D bot for Discord. This module leverages Avrae’s alias system to call the Fate's Edge WebSocket API via HTTP requests.
-
-### Installation (Avrae)
-
-1. Copy the contents of `avrae.txt` (provided in the repository).
-2. In Discord, type `!alias create fe <paste-content>` (or use the Avrae dashboard).
-3. The alias `!fe` will be created with subcommands for deck draws, Crown Spread, GM management, and more.
-
-### Available Avrae Commands
-
-| Command | Description |
-|---------|-------------|
-| `!fe draw [count] [region]` | Draw cards (1–5) from a region. |
-| `!fe crown [region]` | Perform a Crown Spread reading. |
-| `!fe gm request` | Request to become GM. |
-| `!fe gm status` | Show current GM and pending requests. |
-| `!fe gm approve <player>` | Approve a GM request (GM only). |
-| `!fe region [name]` | Get or set the default region. |
-| `!fe help` | Show help text. |
-
-> **Note:** The Avrae module requires the Fate's Edge server's REST API to be accessible and the bot's webhook server to relay events if needed. See the `avrae.txt` file for full implementation details and configuration.
 
 ---
 
@@ -280,13 +270,12 @@ curl -X POST http://localhost:3001/webhook \
 │  Discord Users  │                     │  VTT Clients        │
 │  (Slash cmds)   │                     │  (Foundry/Roll20)   │
 └─────────────────┘                     └─────────────────────┘
-         │                                         │
-         │                                         │
-         ▼                                         ▼
-┌─────────────────┐                     ┌─────────────────────┐
-│  Avrae Users    │                     │  Webhook            │
-│  (!fe commands) │                     │  Server (optional)  │
-└─────────────────┘                     └─────────────────────┘
+         │
+         ▼
+┌─────────────────┐
+│  Webhook         │
+│  Server (optional) │
+└─────────────────┘
 ```
 
 ---
@@ -393,16 +382,15 @@ fates-edge-discord-bot/
 ├── index.js                # Main entry
 ├── package.json            # Dependencies
 ├── .env.example            # Environment template
-├── avrae.txt               # Avrae module alias
 ├── commands/               # Slash commands
-│   ├── vtt.js              # VTT connection + GM commands
-│   ├── dice.js             # Dice rolling
+│   ├── vtt.js              # VTT connection, info, GM, grid/whiteboard, characters
+│   ├── admin.js            # /vttadmin: broadcast, sync, stats, deck, modules, region, kick/ban, grid, token, whiteboard
+│   ├── adventure.js        # /vttadventure: load, scene, encounter, timer, log, status
+│   ├── dice.js             # /deck (near-duplicate of vttdeck.js)
 │   ├── chat.js             # Chat relay
 │   ├── character.js        # Character management
-│   ├── timer.js            # Timer management
-│   ├── vttdeck.js          # Deck operations
-│   ├── vttmodules.js       # Module management
-│   └── admin.js            # Admin commands
+│   ├── timer.js            # Local (bot-only) timer tracking
+│   └── vttdeck.js          # Deck operations
 ├── utils/                  # Utilities
 │   ├── websocket.js        # WebSocket client (with GM support)
 │   ├── logger.js           # Logging

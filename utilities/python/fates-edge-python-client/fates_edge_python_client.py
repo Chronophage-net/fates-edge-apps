@@ -510,7 +510,7 @@ async def with_spinner(coro, message="Processing"):
 # ----------------------------------------------------------------------
 
 class CampaignServer:
-    def __init__(self, base_url: str = "http://localhost:3000", api_key: str = ""):
+    def __init__(self, base_url: str = "http://localhost:10000", api_key: str = ""):
         self.base_url = base_url.rstrip('/')
         self.api_key = api_key or os.environ.get("FATES_EDGE_API_KEY", "")
         self.headers = {"X-API-Key": self.api_key} if self.api_key else {}
@@ -532,42 +532,66 @@ class CampaignServer:
         resp.raise_for_status()
         return resp.json()
 
-    async def upload(self, data: Dict) -> str:
-        """Upload data, returns campaign code."""
-        result = await self._request('POST', '/api/rooms', data)
+    # NOTE: every method below takes `room_code` as its first argument now.
+    # These previously called REST routes that don't exist on the real
+    # server at all (`/api/rooms`, `/api/rooms/:code` bare, `/api/rooms/:code/state`,
+    # `/api/rooms/:code/chat`, `/api/rooms/:code/roll`) -- there is no
+    # generic room-state, chat, or dice-roll REST endpoint; those are
+    # WebSocket-only (`chat-message`/`roll-dice` events), already
+    # implemented correctly elsewhere in this file via `WebSocketClient`.
+    # See API.md in the repo root for the authoritative route list.
+
+    async def upload(self, room_code: str, data: Dict) -> str:
+        """Upload a campaign snapshot for a room, returns a share code."""
+        result = await self._request('POST', f'/api/rooms/{room_code}/campaigns', data)
         return result['code']
 
-    async def load(self, code: str) -> Dict:
-        """Load campaign data by code."""
-        return await self._request('GET', f'/api/rooms/{code}')
+    async def load(self, room_code: str, campaign_code: str) -> Dict:
+        """Load a previously-uploaded campaign snapshot by its share code."""
+        return await self._request('GET', f'/api/rooms/{room_code}/campaigns/{campaign_code}')
 
-    async def delete(self, code: str) -> bool:
-        """Delete campaign by code."""
-        await self._request('DELETE', f'/api/rooms/{code}')
-        return True
+    async def delete(self, room_code: str) -> bool:
+        """Not supported: the server has no route to delete a stored
+        campaign snapshot (manual uploads are pruned automatically, oldest
+        first, once more than 2 are stored for a room)."""
+        raise NotImplementedError(
+            "The server has no endpoint to delete a campaign snapshot manually. "
+            "Manual uploads are auto-pruned (oldest first) once more than 2 exist for a room."
+        )
 
-    async def get_state(self, code: str) -> Dict:
-        """Get room state."""
-        return await self._request('GET', f'/api/rooms/{code}/state')
+    async def get_state(self, room_code: str) -> Dict:
+        """Get the room's auto-save snapshot (a single, deterministic slot
+        per room, distinct from the manual share-code uploads above)."""
+        return await self._request('GET', f'/api/rooms/{room_code}/campaigns/auto-save')
 
-    async def sync_state(self, code: str, state: Dict) -> Dict:
-        """Sync room state."""
-        return await self._request('PUT', f'/api/rooms/{code}/state', state)
+    async def sync_state(self, room_code: str, state: Dict) -> Dict:
+        """Overwrite the room's auto-save snapshot."""
+        return await self._request('POST', f'/api/rooms/{room_code}/campaigns/auto-save', state)
 
-    async def send_chat(self, code: str, message: str, sender: str = "CLI") -> Dict:
-        """Send chat message."""
-        payload = {"message": message, "sender": sender}
-        return await self._request('POST', f'/api/rooms/{code}/chat', payload)
+    async def send_chat(self, room_code: str, message: str, sender: str = "CLI") -> Dict:
+        """Not supported over REST: chat is WebSocket-only (`chat-message`
+        event). Use the interactive `ws` shell mode instead, which already
+        implements this correctly via WebSocketClient.send_chat()."""
+        raise NotImplementedError(
+            "Chat has no REST endpoint on the server -- it's WebSocket-only. "
+            "Use interactive mode (`fates_edge_python_client.py ws --code <room>`) instead."
+        )
 
-    async def get_chat_history(self, code: str) -> List[Dict]:
-        """Get chat history."""
-        result = await self._request('GET', f'/api/rooms/{code}/chat')
-        return result.get('messages', [])
+    async def get_chat_history(self, room_code: str) -> List[Dict]:
+        """Not supported over REST: the server keeps no chat history buffer
+        accessible via a REST route."""
+        raise NotImplementedError(
+            "Chat history has no REST endpoint on the server. "
+            "Use interactive mode and the 'sync-request' response instead."
+        )
 
-    async def roll_dice(self, code: str, roll: str, reason: str = "CLI Roll") -> Dict:
-        """Roll dice via API."""
-        payload = {"roll": roll, "reason": reason}
-        return await self._request('POST', f'/api/rooms/{code}/roll', payload)
+    async def roll_dice(self, room_code: str, roll: str, reason: str = "CLI Roll") -> Dict:
+        """Not supported over REST: dice rolls are WebSocket-only
+        (`roll-dice` event). Use the interactive `ws` shell mode instead."""
+        raise NotImplementedError(
+            "Dice rolling has no REST endpoint on the server -- it's WebSocket-only. "
+            "Use interactive mode (`fates_edge_python_client.py ws --code <room>`) instead."
+        )
 
     # ============================================================
     # DECK API METHODS
@@ -1123,22 +1147,29 @@ def cmd_server(args, store: DataStore):
     server = CampaignServer(args.server, store.apiKey or args.api_key)
 
     if args.upload:
+        if not args.code:
+            print("❌ Please provide --code ROOM_CODE")
+            return
         try:
             async def upload_task():
-                return await server.upload(store.to_dict())
-            
+                return await server.upload(args.code, store.to_dict())
+
             code = asyncio.run(with_spinner(upload_task(), "Uploading campaign"))
-            print(f"✅ Campaign uploaded. Share code: {code}")
+            print(f"✅ Campaign uploaded to room {args.code}. Share code: {code}")
+            print(f"   Load it again with: --code {args.code} --campaign-code {code}")
         except Exception as e:
             print(f"❌ Upload failed: {e}")
 
     elif args.load:
         if not args.code:
-            print("❌ Please provide --code CODE")
+            print("❌ Please provide --code ROOM_CODE")
+            return
+        if not args.campaign_code:
+            print("❌ Please provide --campaign-code CODE (the share code an earlier --upload printed)")
             return
         try:
             async def load_task():
-                return await server.load(args.code)
+                return await server.load(args.code, args.campaign_code)
             
             data = asyncio.run(with_spinner(load_task(), "Loading campaign"))
             new_store = DataStore.from_dict(data)
@@ -1164,13 +1195,13 @@ def cmd_server(args, store: DataStore):
             store._nextEncounterId = new_store._nextEncounterId
             store._nextNpcId = new_store._nextNpcId
             save_data(store)
-            print(f"✅ Campaign {args.code} loaded successfully.")
+            print(f"✅ Campaign {args.campaign_code} (room {args.code}) loaded successfully.")
         except Exception as e:
             print(f"❌ Load failed: {e}")
 
     elif args.delete:
         if not args.code:
-            print("❌ Please provide --code CODE")
+            print("❌ Please provide --code ROOM_CODE")
             return
         try:
             async def delete_task():
@@ -1595,7 +1626,7 @@ Available commands:
 
     def handle_server(self, args):
         parser = argparse.ArgumentParser(prog='server')
-        parser.add_argument('--server', default='http://localhost:3000')
+        parser.add_argument('--server', default='http://localhost:10000')
         parser.add_argument('--upload', action='store_true')
         parser.add_argument('--load', action='store_true')
         parser.add_argument('--delete', action='store_true')
@@ -1623,7 +1654,7 @@ Available commands:
 
     async def handle_websocket(self, args):
         parser = argparse.ArgumentParser(prog='websocket')
-        parser.add_argument('--server', default='http://localhost:3000')
+        parser.add_argument('--server', default='http://localhost:10000')
         parser.add_argument('--code', required=True)
         parser.add_argument('--api-key')
         
@@ -1639,7 +1670,7 @@ Available commands:
         parser.add_argument('--push', action='store_true')
         parser.add_argument('--cleanup', action='store_true')
         parser.add_argument('--module-id')
-        parser.add_argument('--server', default='http://localhost:3000')
+        parser.add_argument('--server', default='http://localhost:10000')
         parser.add_argument('--api-key')
         
         try:
@@ -1726,13 +1757,13 @@ def main():
     module_parser.add_argument('--push', action='store_true', help='Push module to clients')
     module_parser.add_argument('--cleanup', action='store_true', help='Cleanup module from clients')
     module_parser.add_argument('--module-id', help='Module ID')
-    module_parser.add_argument('--server', default='http://localhost:3000', help='Server URL')
+    module_parser.add_argument('--server', default='http://localhost:10000', help='Server URL')
     module_parser.add_argument('--api-key', help='API key')
     module_parser.set_defaults(func=cmd_modules)
 
     # Server
     server_parser = subparsers.add_parser('server', help='Campaign server operations')
-    server_parser.add_argument('--server', default='http://localhost:3000', help='Server URL')
+    server_parser.add_argument('--server', default='http://localhost:10000', help='Server URL')
     server_parser.add_argument('--upload', action='store_true', help='Upload local data')
     server_parser.add_argument('--load', action='store_true', help='Load campaign from server')
     server_parser.add_argument('--delete', action='store_true', help='Delete campaign from server')
@@ -1743,7 +1774,8 @@ def main():
     server_parser.add_argument('--deck-shuffle', action='store_true', help='Shuffle deck')
     server_parser.add_argument('--deck-draw', action='store_true', help='Draw cards from deck')
     server_parser.add_argument('--deck-crown', action='store_true', help='Crown Spread')
-    server_parser.add_argument('--code', help='Campaign code')
+    server_parser.add_argument('--code', help='Room code (required by every --server subcommand)')
+    server_parser.add_argument('--campaign-code', help='Campaign share code (returned by --upload; required by --load)')
     server_parser.add_argument('--message', help='Chat message')
     server_parser.add_argument('--sender', help='Message sender')
     server_parser.add_argument('--dice', help='Dice expression (e.g., 2d6+3)')
@@ -1755,7 +1787,7 @@ def main():
 
     # WebSocket
     ws_parser = subparsers.add_parser('websocket', help='WebSocket operations')
-    ws_parser.add_argument('--server', default='http://localhost:3000', help='Server URL')
+    ws_parser.add_argument('--server', default='http://localhost:10000', help='Server URL')
     ws_parser.add_argument('--code', required=True, help='Room code')
     ws_parser.add_argument('--api-key', help='API key')
     ws_parser.set_defaults(func=lambda args, store: asyncio.run(cmd_websocket(args, store)))

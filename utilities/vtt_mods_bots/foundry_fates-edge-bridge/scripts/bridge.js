@@ -61,14 +61,22 @@ export const FatesEdgeBridge = {
             }
         });
         
-        Hooks.on('chatMessage', (message) => {
-            this.hookChatMessage(message);
+        // FIXED: 'chatMessage' is a pre-flight core hook fired with
+        // (chatLog, messageText: string, chatData: object) -- there is no
+        // message.content/.user on those arguments, so the old handler's
+        // `message.content` check silently always failed and chat sync
+        // never fired. 'createChatMessage' is the actual Document hook
+        // that fires once a ChatMessage has been created, with the real
+        // ChatMessage document as its first argument.
+        //
+        // There is also no core Foundry hook named 'diceRoll'; dice rolls
+        // arrive through the same 'createChatMessage' hook as an ordinary
+        // chat message whose `.rolls` array is non-empty, so both syncs
+        // are now driven from one hook (see hookChatMessage below).
+        Hooks.on('createChatMessage', (chatMessage) => {
+            this.hookChatMessage(chatMessage);
         });
-        
-        Hooks.on('diceRoll', (roll) => {
-            this.hookDiceRoll(roll);
-        });
-        
+
         Hooks.on('canvasReady', () => {
             this.hookSceneChange();
         });
@@ -1262,23 +1270,55 @@ export const FatesEdgeBridge = {
     // Foundry Hooks
     // ============================================================
     
-    hookChatMessage(message) {
+    // FIXED: this now receives a real ChatMessage document (see the
+    // 'createChatMessage' hook registration above), not the old
+    // pre-flight (chatLog, messageText, chatData) tuple whose first
+    // argument never had a `.content`/`.user`/`.whisper`. `.author` is
+    // the current (v12+) accessor for who sent the message -- `.user` is
+    // its deprecated alias, kept here only as a fallback for older
+    // Foundry versions still within this module's compatibility range.
+    hookChatMessage(chatMessage) {
+        const content = chatMessage.content;
+        const whisper = chatMessage.whisper && chatMessage.whisper.length > 0;
+        const senderName = (chatMessage.author || chatMessage.user)?.name || 'Unknown';
+
+        // Dice rolls: a ChatMessage created from a Roll has a non-empty
+        // `.rolls` array (v11+). Route these to sendRoll instead of
+        // sendChatMessage, mirroring what used to be a separate (and
+        // nonexistent) 'diceRoll' hook.
+        if (chatMessage.rolls && chatMessage.rolls.length > 0) {
+            if (!game.settings.get('fates-edge-bridge', 'syncRolls')) return;
+            if (whisper) return;
+            const roll = chatMessage.rolls[0];
+            this.hookDiceRoll(roll);
+            return;
+        }
+
         if (!game.settings.get('fates-edge-bridge', 'syncChat')) return;
-        if (message.content && !message.content.includes('[Fate\'s Edge]') && !message.whisper) {
-            this.sendChatMessage(message.content, message.user?.name || 'Unknown');
+        if (content && !content.includes('[Fate\'s Edge]') && !whisper) {
+            this.sendChatMessage(content, senderName);
         }
     },
-    
+
     hookDiceRoll(roll) {
-        if (!game.settings.get('fates-edge-bridge', 'syncRolls')) return;
         this.sendRoll(roll.formula, roll.total);
     },
-    
+
     hookSceneChange() {
         if (!game.settings.get('fates-edge-bridge', 'syncScenes')) return;
         const scene = game.scenes.active;
         if (scene && scene.name) {
-            this.sendSyncRequest('scene');
+            // FIXED: this used to call sendSyncRequest('scene'), which is
+            // a READ-only pull (server ignores the 'entity' field and
+            // just pushes back whiteboard+character state) -- it never
+            // actually told the server Foundry's scene had changed,
+            // despite the module advertising a "scene-sync" feature and
+            // the README describing an outbound broadcast. Broadcasts the
+            // new scene name via the non-destructive 'scene-status-update'
+            // relay event instead (server relays it as-is, no room state
+            // is touched -- unlike 'sync-state', which overwrites the
+            // whole room whiteboard object).
+            this._send('scene-status-update', { scene: { name: scene.name } });
         }
     }
 };

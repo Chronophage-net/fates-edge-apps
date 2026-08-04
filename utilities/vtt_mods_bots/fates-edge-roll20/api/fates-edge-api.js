@@ -1289,7 +1289,12 @@ function sendAdventureScene(actIndex, sceneIndex) {
     if (sceneIndex !== undefined && sceneIndex !== null && !isNaN(sceneIndex)) {
         target.sceneIndex = Number(sceneIndex);
     }
-    sendMessage({ type: 'adventure-scene', target: target });
+    // NOTE: the server reads actIndex/sceneIndex flat off the message body
+    // (see ws-handlers.js's 'adventure-scene' case), NOT nested under a
+    // `target` key. Nesting them here (as this used to) meant the server
+    // always saw both as undefined and silently fell back to sequential
+    // advance, ignoring whatever act/scene the caller asked for.
+    sendMessage(Object.assign({ type: 'adventure-scene' }, target));
     var msg = '🎭 Scene change requested';
     if (target.actIndex !== undefined) msg += ' to act ' + target.actIndex;
     if (target.sceneIndex !== undefined) msg += ', scene ' + target.sceneIndex;
@@ -1537,9 +1542,20 @@ try {
             try {
                 var page = Campaign.currentPage;
                 if (page && page.name) {
+                    // NOTE: this used to send `{ type: 'sync-state', state: {...} }`.
+                    // On the server, a client-sent 'sync-state' is handled
+                    // identically to 'whiteboard-update' -- it REPLACES the
+                    // room's entire whiteboard object (drawings, notes,
+                    // images, grid-combat tokens, everything) with whatever
+                    // is in `state`. Since scene sync defaults to on, every
+                    // GM page change was silently wiping the shared
+                    // whiteboard for the whole room. 'scene-status-update'
+                    // is a plain broadcast-only event the server relays
+                    // as-is without touching any room state, which is what
+                    // this notification actually needs.
                     sendMessage({
-                        type: 'sync-state',
-                        state: { scene: { name: page.name } }
+                        type: 'scene-status-update',
+                        scene: { name: page.name }
                     });
                 }
             } catch (err) {
@@ -1665,9 +1681,13 @@ function registerCommands() {
                             try {
                                 var page = Campaign.currentPage;
                                 if (page && page.name) {
+                                    // See the note in the change:campaign:currentpage
+                                    // hook above -- 'sync-state' overwrites the whole
+                                    // room whiteboard. 'scene-status-update' is a
+                                    // safe, broadcast-only alternative.
                                     sendMessage({
-                                        type: 'sync-state',
-                                        state: { scene: { name: page.name } }
+                                        type: 'scene-status-update',
+                                        scene: { name: page.name }
                                     });
                                     sendToChat('🎬 Synced scene: ' + page.name);
                                 }

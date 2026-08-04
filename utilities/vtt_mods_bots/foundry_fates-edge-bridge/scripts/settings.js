@@ -10,11 +10,11 @@ export const registerSettings = function() {
     
     game.settings.register('fates-edge-bridge', 'serverUrl', {
         name: 'Server URL',
-        hint: 'WebSocket server URL (e.g., ws://localhost:3000 or wss://your-server.com)',
+        hint: 'WebSocket server URL (e.g., ws://localhost:10000 or wss://your-server.com)',
         scope: 'world',
         config: true,
         type: String,
-        default: 'ws://localhost:3000',
+        default: 'ws://localhost:10000',
         onChange: () => {
             Hooks.call('fates-edge-bridge-settings-changed');
         }
