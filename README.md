@@ -176,7 +176,7 @@ fates-edge-apps/
 │   │   ├── fates-edge-terminal/       # MUD-style CLI client
 │   │   └── fates-edge-desktop-client/ # Electron desktop client
 │   ├── python/
-│   │   ├── fates_edge_tool/           # legacy standalone Python tool
+│   │   ├── fates_edge_tool/           # Tkinter desktop GUI (character sheet + GM screen), optional server sync
 │   │   └── fates-edge-python-client/  # Python CLI client (packaged)
 │   └── vtt_mods_bots/
 │       ├── fates-edge-discord-bot/
