@@ -163,14 +163,24 @@ function docsAreSame(docA, docB) {
     return false;
 }
 
+// FIX: this used to flag any document containing the loose prose phrase
+// "Fate's Edge Toolkit" as "the SPA shell, not a real document" -- but
+// several real documents (like the Kon'reh Definitive Guide, whose own
+// subtitle reads "Fate's Edge Toolkit Edition") legitimately contain that
+// phrase in their own text. That false positive is what caused the
+// "server returned SPA" error when opening the guide from inside the
+// app, even though the raw file loads fine when navigated to directly
+// (which bypasses this check entirely). Detection now only looks for
+// markers that are actually structural/unique to index.html itself --
+// the module entry-point script tag and the toast-container div that
+// only the app shell has -- not phrases that can legitimately appear in
+// a document's own prose.
 function isSpaContent(html) {
     if (!html) return false;
     const spaIndicators = [
-        'Fate\'s Edge Toolkit',
-        '<div id="app"',
-        '<div id="app">',
-        'module-loader.js',
-        'document.documentElement.classList.contains'
+        '<script type="module" src="js/app.js">',
+        'id="toast-container"',
+        '<div id="app">'
     ];
     return spaIndicators.some(indicator => html.includes(indicator));
 }

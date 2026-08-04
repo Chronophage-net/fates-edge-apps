@@ -324,7 +324,26 @@ const state = {
 // LOAD DATA
 // ============================================================
  
+// FIX: cached patron data (saved.patrons in localStorage) can go stale
+// relative to the actual /data/patrons/*.json files on disk -- e.g. after
+// a content update ships but the schema version wasn't bumped, or the
+// cache was written by an older session. Previously the cache-hit fast
+// path in loadPatronData() would trust that cache indefinitely, so Cantor
+// (and anything else reading patron rites) would silently show whatever
+// was cached until the user manually hit "Refresh" (which passes
+// force=true). Now the very first loadPatronData() call of the page
+// session always does a real fetch, regardless of cache, so a stale
+// cache can never be the reason Cantor songs don't show up. Subsequent
+// calls in the same session still use the fast cache path unless the
+// caller explicitly passes force=true.
+let hasLoadedOnceThisSession = false;
+
 export async function loadPatronData(force = false) {
+    if (!hasLoadedOnceThisSession) {
+        force = true;
+    }
+    hasLoadedOnceThisSession = true;
+
     const saved = getState();
     const cacheMatchesCurrentSchema = saved.patrons?._schemaVersion === PATRON_SCHEMA_VERSION;
 

@@ -244,6 +244,18 @@ jobs:
           name: python-client-package
           path: python-client.tar.gz
 
+      # ─── Fate's Edge Tool (Tkinter desktop GUI) ────────────────
+      - name: Package Fate's Edge Tool
+        run: |
+          cd utilities/python/fates_edge_tool
+          tar -czf ../../../fates-edge-tool.tar.gz .
+
+      - name: Upload Fate's Edge Tool artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: fates-edge-tool-package
+          path: fates-edge-tool.tar.gz
+
       # ─── Foundry Module ─────────────────────────────────────────
       - name: Package Foundry Module
         run: |
