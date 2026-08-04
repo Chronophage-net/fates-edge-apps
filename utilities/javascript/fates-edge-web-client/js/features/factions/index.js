@@ -6,6 +6,10 @@
  * Data path:
  * - Faction data: ./data/factions/{id}.json
  * - All data is discovered without a manifest.json – we test known slugs.
+ *
+ * NOTE: No pop-up modals or browser prompt()/confirm() dialogs are used here.
+ * Viewing, adding, and editing all happen as inline full views within the
+ * tab content area (swap-in "screens"), consistent with the rest of the app.
  */
 
 import { getState, saveState } from '../../core/state.js';
@@ -314,7 +318,9 @@ let state = {
     viewMode: 'factions',
     isLoading: false,
     dataLoaded: false,
-    usingFallback: false
+    usingFallback: false,
+    // Screen stack: null = list view. Otherwise { screen: 'view'|'edit'|'add', kind: 'faction'|'asset'|'follower'|'trust', id }
+    screen: null
 };
 
 // ============================================================
@@ -420,13 +426,17 @@ function saveFactionData() {
 }
 
 // ============================================================
-// RENDER
+// RENDER: SHELL
 // ============================================================
 
 export function render(el) {
     container = el;
     loadFactionData();
+    state.screen = null;
+    renderShell();
+}
 
+function renderShell() {
     const usingFallback = state.usingFallback;
 
     container.innerHTML = `
@@ -447,17 +457,35 @@ export function render(el) {
             </div>
 
             <div id="factions-view-container" class="factions-view-container">
-                ${renderView('factions')}
+                ${renderScreen()}
             </div>
-
-            <div id="faction-modal" class="faction-modal" style="display:none;"></div>
         </div>
     `;
 
     attachEvents();
 }
 
-function renderView(view) {
+function refreshView() {
+    const el = document.getElementById('factions-view-container');
+    if (el) {
+        el.innerHTML = renderScreen();
+    }
+    attachEvents();
+}
+
+// Routes to either the tab list view or an inline detail/edit/add screen.
+function renderScreen() {
+    if (state.screen) {
+        switch (state.screen.mode) {
+            case 'view': return renderDetailScreen(state.screen.kind, state.screen.id);
+            case 'edit': return renderFormScreen(state.screen.kind, state.screen.id);
+            case 'add': return renderFormScreen(state.screen.kind, null);
+        }
+    }
+    return renderListView(state.viewMode);
+}
+
+function renderListView(view) {
     state.viewMode = view;
     if (!state.dataLoaded) {
         return `
@@ -469,13 +497,19 @@ function renderView(view) {
         `;
     }
 
-    switch(view) {
+    switch (view) {
         case 'factions': return renderFactions();
         case 'assets': return renderAssets();
         case 'followers': return renderFollowers();
         case 'trusts': return renderTrusts();
         default: return renderFactions();
     }
+}
+
+function goTo(mode, kind, id) {
+    state.screen = mode ? { mode, kind, id } : null;
+    refreshView();
+    window.scrollTo({ top: 0, behavior: 'instant' in window ? 'instant' : 'auto' });
 }
 
 // ============================================================
@@ -695,22 +729,34 @@ function renderTrusts() {
 }
 
 // ============================================================
-// DETAIL VIEWS
+// DETAIL SCREENS (inline, replace list — no popups)
 // ============================================================
+
+function backButton(kind) {
+    return `<button class="btn btn-secondary editor-back" onclick="window.closeFactionScreen('${kind}')">← Back</button>`;
+}
+
+function renderDetailScreen(kind, id) {
+    switch (kind) {
+        case 'faction': return renderFactionDetail(id);
+        case 'asset': return renderAssetDetail(id);
+        case 'follower': return renderFollowerDetail(id);
+        case 'trust': return renderTrustDetail(id);
+        default: return renderListView(state.viewMode);
+    }
+}
 
 function renderFactionDetail(factionId) {
     const faction = state.factions.find(f => f.id === factionId);
     if (!faction) {
         showToast('Faction not found', 'error');
-        return;
+        return renderListView('factions');
     }
 
     const standing = FACTION_STANDINGS[String(faction.standing)] || FACTION_STANDINGS['0'];
-    const modal = document.getElementById('faction-modal');
-    modal.style.display = 'block';
-    modal.innerHTML = `
-        <div class="modal-content faction-detail">
-            <button class="modal-close" onclick="window.closeFactionModal()">✕</button>
+    return `
+        <div class="editor-screen faction-detail">
+            ${backButton('faction')}
             <div class="faction-detail-header">
                 <span class="faction-detail-icon">${faction.icon || '🏛️'}</span>
                 <div>
@@ -761,7 +807,10 @@ function renderFactionDetail(factionId) {
                         ${(faction.hooks || []).map(h => `<li>🔗 ${escHtml(h)}</li>`).join('')}
                         ${(faction.hooks || []).length === 0 ? '<li class="text-muted">No hooks yet.</li>' : ''}
                     </ul>
-                    <button class="btn btn-sm btn-primary" onclick="window.addFactionHook('${faction.id}')">➕ Add Hook</button>
+                    <form class="inline-add-form" onsubmit="window.addFactionHook(event, '${faction.id}')">
+                        <input type="text" name="hook" placeholder="New hook..." required />
+                        <button type="submit" class="btn btn-sm btn-primary">➕ Add Hook</button>
+                    </form>
                 </div>
 
                 <div class="faction-detail-section">
@@ -777,29 +826,23 @@ function renderFactionDetail(factionId) {
             <div class="faction-detail-actions">
                 <button class="btn btn-primary" onclick="window.editFaction('${faction.id}')">✏️ Edit</button>
                 <button class="btn btn-danger" onclick="window.deleteFaction('${faction.id}')">🗑️ Delete</button>
-                <button class="btn btn-secondary" onclick="window.closeFactionModal()">Close</button>
+                ${backButton('faction')}
             </div>
         </div>
     `;
-
-    modal.addEventListener('click', (e) => {
-        if (e.target === modal) closeFactionModal();
-    });
 }
 
 function renderAssetDetail(assetId) {
     const asset = state.assets.find(a => a.id === assetId);
     if (!asset) {
         showToast('Asset not found', 'error');
-        return;
+        return renderListView('assets');
     }
 
     const status = ASSET_STATUS[asset.status || 'maintained'];
-    const modal = document.getElementById('faction-modal');
-    modal.style.display = 'block';
-    modal.innerHTML = `
-        <div class="modal-content asset-detail">
-            <button class="modal-close" onclick="window.closeFactionModal()">✕</button>
+    return `
+        <div class="editor-screen asset-detail">
+            ${backButton('asset')}
             <div class="asset-detail-header">
                 <span class="asset-detail-icon">📦</span>
                 <div>
@@ -849,31 +892,25 @@ function renderAssetDetail(assetId) {
             <div class="asset-detail-actions">
                 <button class="btn btn-primary" onclick="window.editAsset('${asset.id}')">✏️ Edit</button>
                 <button class="btn btn-danger" onclick="window.deleteAsset('${asset.id}')">🗑️ Delete</button>
-                <button class="btn btn-secondary" onclick="window.closeFactionModal()">Close</button>
+                ${backButton('asset')}
             </div>
         </div>
     `;
-
-    modal.addEventListener('click', (e) => {
-        if (e.target === modal) closeFactionModal();
-    });
 }
 
 function renderFollowerDetail(followerId) {
     const follower = state.followers.find(f => f.id === followerId);
     if (!follower) {
         showToast('Follower not found', 'error');
-        return;
+        return renderListView('followers');
     }
 
     const loyalty = FOLLOWER_STATES.loyalty[follower.loyalty || 'faithful'];
     const fitness = FOLLOWER_STATES.fitness[follower.fitness || 'ready'];
 
-    const modal = document.getElementById('faction-modal');
-    modal.style.display = 'block';
-    modal.innerHTML = `
-        <div class="modal-content follower-detail">
-            <button class="modal-close" onclick="window.closeFactionModal()">✕</button>
+    return `
+        <div class="editor-screen follower-detail">
+            ${backButton('follower')}
             <div class="follower-detail-header">
                 <span class="follower-detail-icon">👤</span>
                 <div>
@@ -912,28 +949,25 @@ function renderFollowerDetail(followerId) {
             <div class="follower-detail-actions">
                 <button class="btn btn-primary" onclick="window.editFollower('${follower.id}')">✏️ Edit</button>
                 <button class="btn btn-danger" onclick="window.deleteFollower('${follower.id}')">🗑️ Delete</button>
-                <button class="btn btn-secondary" onclick="window.closeFactionModal()">Close</button>
+                ${backButton('follower')}
             </div>
         </div>
     `;
-
-    modal.addEventListener('click', (e) => {
-        if (e.target === modal) closeFactionModal();
-    });
 }
 
 function renderTrustDetail(trustId) {
     const trust = state.trusts.find(t => t.id === trustId);
     if (!trust) {
         showToast('Trust not found', 'error');
-        return;
+        return renderListView('trusts');
     }
 
-    const modal = document.getElementById('faction-modal');
-    modal.style.display = 'block';
-    modal.innerHTML = `
-        <div class="modal-content trust-detail">
-            <button class="modal-close" onclick="window.closeFactionModal()">✕</button>
+    const availableAssets = state.assets.filter(a => !(trust.assets || []).includes(a.id));
+    const availableFollowers = state.followers.filter(f => !(trust.followers || []).includes(f.id));
+
+    return `
+        <div class="editor-screen trust-detail">
+            ${backButton('trust')}
             <div class="trust-detail-header">
                 <span class="trust-detail-icon">${trust.icon || '🤝'}</span>
                 <div>
@@ -976,7 +1010,15 @@ function renderTrustDetail(trustId) {
                             }).join('')}
                         </ul>
                     ` : '<p class="text-muted">No assets.</p>'}
-                    <button class="btn btn-sm btn-primary" onclick="window.addTrustAsset('${trust.id}')">➕ Add Asset</button>
+                    ${availableAssets.length > 0 ? `
+                        <form class="inline-add-form" onsubmit="window.addTrustAsset(event, '${trust.id}')">
+                            <select name="assetId" required>
+                                <option value="" disabled selected>Select an asset…</option>
+                                ${availableAssets.map(a => `<option value="${a.id}">${escHtml(a.name)} (${escHtml(a.tier || 'Minor')})</option>`).join('')}
+                            </select>
+                            <button type="submit" class="btn btn-sm btn-primary">➕ Add Asset</button>
+                        </form>
+                    ` : '<p class="text-muted" style="font-size:0.85rem;">No available assets to add.</p>'}
                 </div>
 
                 <div class="trust-detail-section">
@@ -989,7 +1031,15 @@ function renderTrustDetail(trustId) {
                             }).join('')}
                         </ul>
                     ` : '<p class="text-muted">No followers.</p>'}
-                    <button class="btn btn-sm btn-primary" onclick="window.addTrustFollower('${trust.id}')">➕ Add Follower</button>
+                    ${availableFollowers.length > 0 ? `
+                        <form class="inline-add-form" onsubmit="window.addTrustFollower(event, '${trust.id}')">
+                            <select name="followerId" required>
+                                <option value="" disabled selected>Select a follower…</option>
+                                ${availableFollowers.map(f => `<option value="${f.id}">${escHtml(f.name)} (Cap ${f.cap})</option>`).join('')}
+                            </select>
+                            <button type="submit" class="btn btn-sm btn-primary">➕ Add Follower</button>
+                        </form>
+                    ` : '<p class="text-muted" style="font-size:0.85rem;">No available followers to add.</p>'}
                 </div>
 
                 ${trust.source === 'default' || state.usingFallback ? '<span class="badge badge-remote">📦 Default Trust</span>' : ''}
@@ -998,28 +1048,201 @@ function renderTrustDetail(trustId) {
             <div class="trust-detail-actions">
                 <button class="btn btn-primary" onclick="window.editTrust('${trust.id}')">✏️ Edit</button>
                 <button class="btn btn-danger" onclick="window.deleteTrust('${trust.id}')">🗑️ Delete</button>
-                <button class="btn btn-secondary" onclick="window.closeFactionModal()">Close</button>
+                ${backButton('trust')}
             </div>
         </div>
     `;
-
-    modal.addEventListener('click', (e) => {
-        if (e.target === modal) closeFactionModal();
-    });
 }
 
 // ============================================================
-// MODAL CONTROLS
+// FORM SCREENS (add / edit — real fields, no prompt())
 // ============================================================
 
-window.closeFactionModal = function() {
-    document.getElementById('faction-modal').style.display = 'none';
+function renderFormScreen(kind, id) {
+    switch (kind) {
+        case 'faction': return renderFactionForm(id);
+        case 'asset': return renderAssetForm(id);
+        case 'follower': return renderFollowerForm(id);
+        case 'trust': return renderTrustForm(id);
+        default: return renderListView(state.viewMode);
+    }
+}
+
+function renderFactionForm(id) {
+    const faction = id ? state.factions.find(f => f.id === id) : null;
+    const isEdit = !!faction;
+    const f = faction || { name: '', standing: 0, agenda: '', keyNPCs: [], resources: '', color: '#d4af37', icon: '🏛️' };
+
+    return `
+        <div class="editor-screen faction-form">
+            ${backButton('faction')}
+            <h2>${isEdit ? '✏️ Edit Faction' : '➕ New Faction'}</h2>
+            <form class="fe-form" onsubmit="window.submitFactionForm(event, ${isEdit ? `'${id}'` : 'null'})">
+                <label>Name
+                    <input type="text" name="name" value="${escHtml(f.name)}" required />
+                </label>
+                <label>Standing (-3 to 3)
+                    <input type="number" name="standing" min="-3" max="3" value="${f.standing ?? 0}" />
+                </label>
+                <label>Agenda
+                    <input type="text" name="agenda" value="${escHtml(f.agenda || '')}" />
+                </label>
+                <label>Key NPCs (comma-separated)
+                    <input type="text" name="keyNPCs" value="${escHtml((f.keyNPCs || []).join(', '))}" />
+                </label>
+                <label>Resources
+                    <input type="text" name="resources" value="${escHtml(f.resources || '')}" />
+                </label>
+                <label>Color
+                    <input type="text" name="color" value="${escHtml(f.color || '#d4af37')}" />
+                </label>
+                <label>Icon (emoji)
+                    <input type="text" name="icon" value="${escHtml(f.icon || '🏛️')}" />
+                </label>
+                <div class="fe-form-actions">
+                    <button type="submit" class="btn btn-primary">💾 Save</button>
+                    <button type="button" class="btn btn-secondary" onclick="window.closeFactionScreen('faction')">Cancel</button>
+                </div>
+            </form>
+        </div>
+    `;
+}
+
+function renderAssetForm(id) {
+    const asset = id ? state.assets.find(a => a.id === id) : null;
+    const isEdit = !!asset;
+    const a = asset || { name: '', type: '', tier: 'Minor', description: '', cost: 4, freeUse: '', sceneSurge: '' };
+
+    return `
+        <div class="editor-screen asset-form">
+            ${backButton('asset')}
+            <h2>${isEdit ? '✏️ Edit Asset' : '➕ New Asset'}</h2>
+            <form class="fe-form" onsubmit="window.submitAssetForm(event, ${isEdit ? `'${id}'` : 'null'})">
+                <label>Name
+                    <input type="text" name="name" value="${escHtml(a.name)}" required />
+                </label>
+                <label>Type (safehouse/network/library/workshop/contract)
+                    <input type="text" name="type" value="${escHtml(a.type || '')}" />
+                </label>
+                <label>Tier (Minor/Standard/Major)
+                    <input type="text" name="tier" value="${escHtml(a.tier || 'Minor')}" />
+                </label>
+                <label>Description
+                    <textarea name="description" rows="3">${escHtml(a.description || '')}</textarea>
+                </label>
+                <label>XP Cost
+                    <input type="number" name="cost" min="0" value="${a.cost ?? 4}" />
+                </label>
+                <label>Free Use
+                    <input type="text" name="freeUse" value="${escHtml(a.freeUse || '')}" />
+                </label>
+                <label>Scene Surge
+                    <input type="text" name="sceneSurge" value="${escHtml(a.sceneSurge || '')}" />
+                </label>
+                <div class="fe-form-actions">
+                    <button type="submit" class="btn btn-primary">💾 Save</button>
+                    <button type="button" class="btn btn-secondary" onclick="window.closeFactionScreen('asset')">Cancel</button>
+                </div>
+            </form>
+        </div>
+    `;
+}
+
+function renderFollowerForm(id) {
+    const follower = id ? state.followers.find(f => f.id === id) : null;
+    const isEdit = !!follower;
+    const f = follower || { name: '', role: 'Follower', cap: 1, description: '', loyalty: 'faithful', fitness: 'ready' };
+
+    return `
+        <div class="editor-screen follower-form">
+            ${backButton('follower')}
+            <h2>${isEdit ? '✏️ Edit Follower' : '➕ New Follower'}</h2>
+            <form class="fe-form" onsubmit="window.submitFollowerForm(event, ${isEdit ? `'${id}'` : 'null'})">
+                <label>Name
+                    <input type="text" name="name" value="${escHtml(f.name)}" required />
+                </label>
+                <label>Role
+                    <input type="text" name="role" value="${escHtml(f.role || 'Follower')}" />
+                </label>
+                <label>Cap (1-5)
+                    <input type="number" name="cap" min="1" max="5" value="${f.cap ?? 1}" />
+                </label>
+                <label>Description
+                    <textarea name="description" rows="3">${escHtml(f.description || '')}</textarea>
+                </label>
+                <label>Loyalty
+                    <select name="loyalty">
+                        ${Object.keys(FOLLOWER_STATES.loyalty).map(k => `<option value="${k}" ${f.loyalty === k ? 'selected' : ''}>${FOLLOWER_STATES.loyalty[k].label}</option>`).join('')}
+                    </select>
+                </label>
+                <label>Fitness
+                    <select name="fitness">
+                        ${Object.keys(FOLLOWER_STATES.fitness).map(k => `<option value="${k}" ${f.fitness === k ? 'selected' : ''}>${FOLLOWER_STATES.fitness[k].label}</option>`).join('')}
+                    </select>
+                </label>
+                <div class="fe-form-actions">
+                    <button type="submit" class="btn btn-primary">💾 Save</button>
+                    <button type="button" class="btn btn-secondary" onclick="window.closeFactionScreen('follower')">Cancel</button>
+                </div>
+            </form>
+        </div>
+    `;
+}
+
+function renderTrustForm(id) {
+    const trust = id ? state.trusts.find(t => t.id === id) : null;
+    const isEdit = !!trust;
+    const t = trust || { name: '', icon: '🤝', tier: 'I', description: '', maxAssets: 2, maxAssetTier: 'Standard', capacity: 4 };
+
+    return `
+        <div class="editor-screen trust-form">
+            ${backButton('trust')}
+            <h2>${isEdit ? '✏️ Edit Trust' : '➕ New Trust'}</h2>
+            <form class="fe-form" onsubmit="window.submitTrustForm(event, ${isEdit ? `'${id}'` : 'null'})">
+                <label>Name
+                    <input type="text" name="name" value="${escHtml(t.name)}" required />
+                </label>
+                <label>Icon (emoji)
+                    <input type="text" name="icon" value="${escHtml(t.icon || '🤝')}" />
+                </label>
+                <label>Tier (I-III)
+                    <input type="text" name="tier" value="${escHtml(t.tier || 'I')}" />
+                </label>
+                <label>Description
+                    <textarea name="description" rows="3">${escHtml(t.description || '')}</textarea>
+                </label>
+                <label>Max Asset Slots
+                    <input type="number" name="maxAssets" min="0" value="${t.maxAssets ?? 2}" />
+                </label>
+                <label>Max Asset Tier
+                    <input type="text" name="maxAssetTier" value="${escHtml(t.maxAssetTier || 'Standard')}" />
+                </label>
+                <label>Obligation Capacity
+                    <input type="number" name="capacity" min="0" value="${t.capacity ?? 4}" />
+                </label>
+                <div class="fe-form-actions">
+                    <button type="submit" class="btn btn-primary">💾 Save</button>
+                    <button type="button" class="btn btn-secondary" onclick="window.closeFactionScreen('trust')">Cancel</button>
+                </div>
+            </form>
+        </div>
+    `;
+}
+
+// ============================================================
+// SCREEN CONTROLS
+// ============================================================
+
+window.closeFactionScreen = function(kind) {
+    const listView = { faction: 'factions', asset: 'assets', follower: 'followers', trust: 'trusts' }[kind] || 'factions';
+    state.viewMode = listView;
+    goTo(null);
 };
 
-window.viewFaction = function(id) { renderFactionDetail(id); };
-window.viewAsset = function(id) { renderAssetDetail(id); };
-window.viewFollower = function(id) { renderFollowerDetail(id); };
-window.viewTrust = function(id) { renderTrustDetail(id); };
+window.viewFaction = function(id) { goTo('view', 'faction', id); };
+window.viewAsset = function(id) { goTo('view', 'asset', id); };
+window.viewFollower = function(id) { goTo('view', 'follower', id); };
+window.viewTrust = function(id) { goTo('view', 'trust', id); };
 window.loadDefaultFactions = function() {
     loadDefaultFactions();
     refreshView();
@@ -1030,44 +1253,43 @@ window.loadDefaultFactions = function() {
 // CRUD OPERATIONS - FACTIONS
 // ============================================================
 
-window.addFaction = function() {
-    const name = prompt('Enter faction name:');
+window.addFaction = function() { goTo('add', 'faction', null); };
+window.editFaction = function(id) { goTo('edit', 'faction', id); };
+
+window.submitFactionForm = function(evt, id) {
+    evt.preventDefault();
+    const fd = new FormData(evt.target);
+    const name = (fd.get('name') || '').trim();
     if (!name) return;
 
-    state.factions.push({
-        id: 'faction-' + Date.now(),
+    const data = {
         name,
-        standing: 0,
-        agenda: prompt('Enter agenda:') || 'None',
-        agendaTimer: { segments: 6, current: 0 },
-        keyNPCs: prompt('Enter key NPCs (comma-separated):')?.split(',').map(s => s.trim()) || [],
-        resources: prompt('Enter resources:') || 'None listed',
-        hooks: [],
-        color: prompt('Enter color (hex):') || '#d4af37',
-        icon: prompt('Enter icon (emoji):') || '🏛️',
-        source: 'local'
-    });
-    saveFactionData();
-    refreshView();
-    showToast(`Added faction: ${name}`, 'success');
-};
+        standing: Math.max(-3, Math.min(3, parseInt(fd.get('standing') || '0', 10) || 0)),
+        agenda: (fd.get('agenda') || '').trim() || 'None',
+        keyNPCs: (fd.get('keyNPCs') || '').split(',').map(s => s.trim()).filter(Boolean),
+        resources: (fd.get('resources') || '').trim() || 'None listed',
+        color: (fd.get('color') || '').trim() || '#d4af37',
+        icon: (fd.get('icon') || '').trim() || '🏛️'
+    };
 
-window.editFaction = function(id) {
-    const faction = state.factions.find(f => f.id === id);
-    if (!faction) return;
-    const name = prompt('Enter name:', faction.name);
-    if (!name) return;
-    faction.name = name;
-    faction.standing = parseInt(prompt('Enter standing (-3 to 3):', faction.standing) || '0');
-    faction.agenda = prompt('Enter agenda:', faction.agenda) || faction.agenda;
-    faction.resources = prompt('Enter resources:', faction.resources) || faction.resources;
-    faction.color = prompt('Enter color:', faction.color) || faction.color;
-    faction.icon = prompt('Enter icon:', faction.icon) || faction.icon;
-    faction.source = 'local';
+    if (id) {
+        const faction = state.factions.find(f => f.id === id);
+        if (!faction) return;
+        Object.assign(faction, data, { source: 'local' });
+        showToast(`Updated faction: ${name}`, 'success');
+    } else {
+        state.factions.push({
+            id: 'faction-' + Date.now(),
+            ...data,
+            agendaTimer: { segments: 6, current: 0 },
+            hooks: [],
+            source: 'local'
+        });
+        showToast(`Added faction: ${name}`, 'success');
+    }
     saveFactionData();
-    refreshView();
-    closeFactionModal();
-    showToast(`Updated faction: ${name}`, 'success');
+    state.viewMode = 'factions';
+    goTo(id ? 'view' : null, id ? 'faction' : undefined, id || undefined);
 };
 
 window.deleteFaction = function(id) {
@@ -1076,8 +1298,8 @@ window.deleteFaction = function(id) {
     if (!confirm(`Delete faction "${faction.name}"?`)) return;
     state.factions = state.factions.filter(f => f.id !== id);
     saveFactionData();
-    refreshView();
-    closeFactionModal();
+    state.viewMode = 'factions';
+    goTo(null);
     showToast(`Deleted faction: ${faction.name}`, 'info');
 };
 
@@ -1087,7 +1309,6 @@ window.changeFactionStanding = function(id, delta) {
     faction.standing = Math.max(-3, Math.min(3, faction.standing + delta));
     saveFactionData();
     refreshView();
-    closeFactionModal();
     showToast(`${faction.name} standing: ${FACTION_STANDINGS[String(faction.standing)].label}`, 'info');
 };
 
@@ -1102,7 +1323,6 @@ window.tickFactionTimer = function(id) {
     }
     saveFactionData();
     refreshView();
-    closeFactionModal();
 };
 
 window.retreatFactionTimer = function(id) {
@@ -1112,7 +1332,6 @@ window.retreatFactionTimer = function(id) {
     faction.agendaTimer.current = Math.max(faction.agendaTimer.current - 1, 0);
     saveFactionData();
     refreshView();
-    closeFactionModal();
 };
 
 window.resetFactionTimer = function(id) {
@@ -1122,19 +1341,18 @@ window.resetFactionTimer = function(id) {
     faction.agendaTimer.current = 0;
     saveFactionData();
     refreshView();
-    closeFactionModal();
 };
 
-window.addFactionHook = function(id) {
+window.addFactionHook = function(evt, id) {
+    evt.preventDefault();
     const faction = state.factions.find(f => f.id === id);
     if (!faction) return;
-    const hook = prompt('Enter hook:');
+    const hook = (new FormData(evt.target).get('hook') || '').trim();
     if (!hook) return;
     if (!faction.hooks) faction.hooks = [];
     faction.hooks.push(hook);
     saveFactionData();
     refreshView();
-    closeFactionModal();
     showToast(`Added hook: ${hook}`, 'success');
 };
 
@@ -1177,44 +1395,42 @@ window.factionTurn = function() {
 // CRUD OPERATIONS - ASSETS
 // ============================================================
 
-window.addAsset = function() {
-    const name = prompt('Enter asset name:');
+window.addAsset = function() { goTo('add', 'asset', null); };
+window.editAsset = function(id) { goTo('edit', 'asset', id); };
+
+window.submitAssetForm = function(evt, id) {
+    evt.preventDefault();
+    const fd = new FormData(evt.target);
+    const name = (fd.get('name') || '').trim();
     if (!name) return;
 
-    state.assets.push({
-        id: 'asset-' + Date.now(),
+    const data = {
         name,
-        type: prompt('Enter type (safehouse/network/library/workshop/contract):') || 'asset',
-        tier: prompt('Enter tier (Minor/Standard/Major):') || 'Minor',
-        description: prompt('Enter description:') || 'An asset.',
-        cost: parseInt(prompt('Enter XP cost:') || '4'),
-        status: 'maintained',
-        freeUse: prompt('Enter Free Use benefit:') || '',
-        sceneSurge: prompt('Enter Scene Surge benefit:') || '',
-        source: 'local'
-    });
-    saveFactionData();
-    refreshView();
-    showToast(`Added asset: ${name}`, 'success');
-};
+        type: (fd.get('type') || '').trim() || 'asset',
+        tier: (fd.get('tier') || '').trim() || 'Minor',
+        description: (fd.get('description') || '').trim() || 'An asset.',
+        cost: parseInt(fd.get('cost') || '4', 10) || 4,
+        freeUse: (fd.get('freeUse') || '').trim(),
+        sceneSurge: (fd.get('sceneSurge') || '').trim()
+    };
 
-window.editAsset = function(id) {
-    const asset = state.assets.find(a => a.id === id);
-    if (!asset) return;
-    const name = prompt('Enter name:', asset.name);
-    if (!name) return;
-    asset.name = name;
-    asset.type = prompt('Enter type:', asset.type) || asset.type;
-    asset.tier = prompt('Enter tier:', asset.tier) || asset.tier;
-    asset.description = prompt('Enter description:', asset.description) || asset.description;
-    asset.cost = parseInt(prompt('Enter XP cost:', asset.cost) || '4');
-    asset.freeUse = prompt('Enter Free Use:', asset.freeUse) || asset.freeUse;
-    asset.sceneSurge = prompt('Enter Scene Surge:', asset.sceneSurge) || asset.sceneSurge;
-    asset.source = 'local';
+    if (id) {
+        const asset = state.assets.find(a => a.id === id);
+        if (!asset) return;
+        Object.assign(asset, data, { source: 'local' });
+        showToast(`Updated asset: ${name}`, 'success');
+    } else {
+        state.assets.push({
+            id: 'asset-' + Date.now(),
+            ...data,
+            status: 'maintained',
+            source: 'local'
+        });
+        showToast(`Added asset: ${name}`, 'success');
+    }
     saveFactionData();
-    refreshView();
-    closeFactionModal();
-    showToast(`Updated asset: ${name}`, 'success');
+    state.viewMode = 'assets';
+    goTo(id ? 'view' : null, id ? 'asset' : undefined, id || undefined);
 };
 
 window.deleteAsset = function(id) {
@@ -1223,8 +1439,8 @@ window.deleteAsset = function(id) {
     if (!confirm(`Delete asset "${asset.name}"?`)) return;
     state.assets = state.assets.filter(a => a.id !== id);
     saveFactionData();
-    refreshView();
-    closeFactionModal();
+    state.viewMode = 'assets';
+    goTo(null);
     showToast(`Deleted asset: ${asset.name}`, 'info');
 };
 
@@ -1234,7 +1450,6 @@ window.changeAssetStatus = function(id, status) {
     asset.status = status;
     saveFactionData();
     refreshView();
-    closeFactionModal();
     const statusInfo = ASSET_STATUS[status];
     showToast(`${asset.name}: ${statusInfo.icon} ${statusInfo.label}`, 'info');
 };
@@ -1243,39 +1458,40 @@ window.changeAssetStatus = function(id, status) {
 // CRUD OPERATIONS - FOLLOWERS
 // ============================================================
 
-window.addFollower = function() {
-    const name = prompt('Enter follower name:');
+window.addFollower = function() { goTo('add', 'follower', null); };
+window.editFollower = function(id) { goTo('edit', 'follower', id); };
+
+window.submitFollowerForm = function(evt, id) {
+    evt.preventDefault();
+    const fd = new FormData(evt.target);
+    const name = (fd.get('name') || '').trim();
     if (!name) return;
 
-    state.followers.push({
-        id: 'follower-' + Date.now(),
+    const data = {
         name,
-        role: prompt('Enter role:') || 'Follower',
-        cap: parseInt(prompt('Enter Cap (1-5):') || '1'),
-        description: prompt('Enter description:') || 'A follower.',
-        loyalty: prompt('Enter loyalty (faithful/strained/broken):') || 'faithful',
-        fitness: prompt('Enter fitness (ready/hurt/down):') || 'ready',
-        source: 'local'
-    });
-    saveFactionData();
-    refreshView();
-    showToast(`Added follower: ${name}`, 'success');
-};
+        role: (fd.get('role') || '').trim() || 'Follower',
+        cap: parseInt(fd.get('cap') || '1', 10) || 1,
+        description: (fd.get('description') || '').trim() || 'A follower.',
+        loyalty: fd.get('loyalty') || 'faithful',
+        fitness: fd.get('fitness') || 'ready'
+    };
 
-window.editFollower = function(id) {
-    const follower = state.followers.find(f => f.id === id);
-    if (!follower) return;
-    const name = prompt('Enter name:', follower.name);
-    if (!name) return;
-    follower.name = name;
-    follower.role = prompt('Enter role:', follower.role) || follower.role;
-    follower.cap = parseInt(prompt('Enter Cap:', follower.cap) || '1');
-    follower.description = prompt('Enter description:', follower.description) || follower.description;
-    follower.source = 'local';
+    if (id) {
+        const follower = state.followers.find(f => f.id === id);
+        if (!follower) return;
+        Object.assign(follower, data, { source: 'local' });
+        showToast(`Updated follower: ${name}`, 'success');
+    } else {
+        state.followers.push({
+            id: 'follower-' + Date.now(),
+            ...data,
+            source: 'local'
+        });
+        showToast(`Added follower: ${name}`, 'success');
+    }
     saveFactionData();
-    refreshView();
-    closeFactionModal();
-    showToast(`Updated follower: ${name}`, 'success');
+    state.viewMode = 'followers';
+    goTo(id ? 'view' : null, id ? 'follower' : undefined, id || undefined);
 };
 
 window.deleteFollower = function(id) {
@@ -1284,8 +1500,8 @@ window.deleteFollower = function(id) {
     if (!confirm(`Delete follower "${follower.name}"?`)) return;
     state.followers = state.followers.filter(f => f.id !== id);
     saveFactionData();
-    refreshView();
-    closeFactionModal();
+    state.viewMode = 'followers';
+    goTo(null);
     showToast(`Deleted follower: ${follower.name}`, 'info');
 };
 
@@ -1301,7 +1517,6 @@ window.changeFollowerState = function(id, type) {
     follower[type] = next;
     saveFactionData();
     refreshView();
-    closeFactionModal();
     const label = type === 'loyalty' ? 'Loyalty' : 'Fitness';
     showToast(`${label}: ${current} → ${next}`, 'info');
 };
@@ -1310,46 +1525,44 @@ window.changeFollowerState = function(id, type) {
 // CRUD OPERATIONS - TRUSTS
 // ============================================================
 
-window.addTrust = function() {
-    const name = prompt('Enter trust name:');
+window.addTrust = function() { goTo('add', 'trust', null); };
+window.editTrust = function(id) { goTo('edit', 'trust', id); };
+
+window.submitTrustForm = function(evt, id) {
+    evt.preventDefault();
+    const fd = new FormData(evt.target);
+    const name = (fd.get('name') || '').trim();
     if (!name) return;
 
-    state.trusts.push({
-        id: 'trust-' + Date.now(),
+    const data = {
         name,
-        icon: prompt('Enter icon (emoji):') || '🤝',
-        tier: prompt('Enter tier (I-III):') || 'I',
-        description: prompt('Enter description:') || 'A player trust.',
-        maxAssets: parseInt(prompt('Enter max asset slots:') || '2'),
-        maxAssetTier: prompt('Enter max asset tier (Minor/Standard/Major):') || 'Standard',
-        assets: [],
-        followers: [],
-        obligation: 0,
-        capacity: parseInt(prompt('Enter obligation capacity:') || '4'),
-        source: 'local'
-    });
-    saveFactionData();
-    refreshView();
-    showToast(`Created trust: ${name}`, 'success');
-};
+        icon: (fd.get('icon') || '').trim() || '🤝',
+        tier: (fd.get('tier') || '').trim() || 'I',
+        description: (fd.get('description') || '').trim() || 'A player trust.',
+        maxAssets: parseInt(fd.get('maxAssets') || '2', 10) || 2,
+        maxAssetTier: (fd.get('maxAssetTier') || '').trim() || 'Standard',
+        capacity: parseInt(fd.get('capacity') || '4', 10) || 4
+    };
 
-window.editTrust = function(id) {
-    const trust = state.trusts.find(t => t.id === id);
-    if (!trust) return;
-    const name = prompt('Enter name:', trust.name);
-    if (!name) return;
-    trust.name = name;
-    trust.icon = prompt('Enter icon:', trust.icon) || trust.icon;
-    trust.tier = prompt('Enter tier:', trust.tier) || trust.tier;
-    trust.description = prompt('Enter description:', trust.description) || trust.description;
-    trust.maxAssets = parseInt(prompt('Enter max asset slots:', trust.maxAssets) || '2');
-    trust.maxAssetTier = prompt('Enter max asset tier:', trust.maxAssetTier) || trust.maxAssetTier;
-    trust.capacity = parseInt(prompt('Enter obligation capacity:', trust.capacity) || '4');
-    trust.source = 'local';
+    if (id) {
+        const trust = state.trusts.find(t => t.id === id);
+        if (!trust) return;
+        Object.assign(trust, data, { source: 'local' });
+        showToast(`Updated trust: ${name}`, 'success');
+    } else {
+        state.trusts.push({
+            id: 'trust-' + Date.now(),
+            ...data,
+            assets: [],
+            followers: [],
+            obligation: 0,
+            source: 'local'
+        });
+        showToast(`Created trust: ${name}`, 'success');
+    }
     saveFactionData();
-    refreshView();
-    closeFactionModal();
-    showToast(`Updated trust: ${name}`, 'success');
+    state.viewMode = 'trusts';
+    goTo(id ? 'view' : null, id ? 'trust' : undefined, id || undefined);
 };
 
 window.deleteTrust = function(id) {
@@ -1358,31 +1571,20 @@ window.deleteTrust = function(id) {
     if (!confirm(`Delete trust "${trust.name}"?`)) return;
     state.trusts = state.trusts.filter(t => t.id !== id);
     saveFactionData();
-    refreshView();
-    closeFactionModal();
+    state.viewMode = 'trusts';
+    goTo(null);
     showToast(`Deleted trust: ${trust.name}`, 'info');
 };
 
-window.addTrustAsset = function(trustId) {
+window.addTrustAsset = function(evt, trustId) {
+    evt.preventDefault();
     const trust = state.trusts.find(t => t.id === trustId);
     if (!trust) return;
     if (!trust.assets) trust.assets = [];
 
-    const availableAssets = state.assets.filter(a => !trust.assets.includes(a.id));
-    if (availableAssets.length === 0) {
-        showToast('No available assets to add. Create a new asset first.', 'warning');
-        return;
-    }
-
-    const assetOptions = availableAssets.map((a, i) => `${i+1}. ${a.name} (${a.tier})`).join('\n');
-    const choice = prompt(`Select an asset to add to "${trust.name}":\n${assetOptions}\n\nEnter number:`);
-    if (!choice) return;
-    const idx = parseInt(choice) - 1;
-    if (idx < 0 || idx >= availableAssets.length) {
-        showToast('Invalid selection', 'error');
-        return;
-    }
-    const selected = availableAssets[idx];
+    const assetId = new FormData(evt.target).get('assetId');
+    const selected = state.assets.find(a => a.id === assetId);
+    if (!selected) return;
     trust.assets.push(selected.id);
 
     if (trust.assets.length > (trust.maxAssets || 2)) {
@@ -1391,49 +1593,28 @@ window.addTrustAsset = function(trustId) {
 
     saveFactionData();
     refreshView();
-    closeFactionModal();
     showToast(`Added ${selected.name} to ${trust.name}`, 'success');
 };
 
-window.addTrustFollower = function(trustId) {
+window.addTrustFollower = function(evt, trustId) {
+    evt.preventDefault();
     const trust = state.trusts.find(t => t.id === trustId);
     if (!trust) return;
     if (!trust.followers) trust.followers = [];
 
-    const availableFollowers = state.followers.filter(f => !trust.followers.includes(f.id));
-    if (availableFollowers.length === 0) {
-        showToast('No available followers to add. Create a new follower first.', 'warning');
-        return;
-    }
-
-    const followerOptions = availableFollowers.map((f, i) => `${i+1}. ${f.name} (Cap ${f.cap})`).join('\n');
-    const choice = prompt(`Select a follower to add to "${trust.name}":\n${followerOptions}\n\nEnter number:`);
-    if (!choice) return;
-    const idx = parseInt(choice) - 1;
-    if (idx < 0 || idx >= availableFollowers.length) {
-        showToast('Invalid selection', 'error');
-        return;
-    }
-    const selected = availableFollowers[idx];
+    const followerId = new FormData(evt.target).get('followerId');
+    const selected = state.followers.find(f => f.id === followerId);
+    if (!selected) return;
     trust.followers.push(selected.id);
 
     saveFactionData();
     refreshView();
-    closeFactionModal();
     showToast(`Added ${selected.name} to ${trust.name}`, 'success');
 };
 
 // ============================================================
 // VIEW MANAGEMENT
 // ============================================================
-
-function refreshView() {
-    const container = document.getElementById('factions-view-container');
-    if (container) {
-        container.innerHTML = renderView(state.viewMode);
-    }
-    attachEvents();
-}
 
 window.refreshFactions = function() {
     // Clear cache and reload
@@ -1452,10 +1633,11 @@ export function attachEvents() {
         tab.addEventListener('click', () => {
             document.querySelectorAll('.factions-tab').forEach(t => t.classList.remove('active'));
             tab.classList.add('active');
+            state.screen = null;
             const view = tab.dataset.view;
-            const container = document.getElementById('factions-view-container');
-            if (container) {
-                container.innerHTML = renderView(view);
+            const el = document.getElementById('factions-view-container');
+            if (el) {
+                el.innerHTML = renderListView(view);
                 attachEvents();
             }
         });

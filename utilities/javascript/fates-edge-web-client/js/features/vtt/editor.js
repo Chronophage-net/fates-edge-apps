@@ -21,6 +21,7 @@ let modal = null;
 let editingId = null;
 let isNew = false;
 let currentEncounter = null;
+let hiddenSiblings = null;
 
 // Mirrors characters/editor.js WEAPON_CLASSES at a glance — kept minimal
 // here since adversaries don't need the full XP-cost character sheet,
@@ -75,10 +76,15 @@ export function closeEditor() {
     editingId = null;
     isNew = false;
     currentEncounter = null;
+
+    if (hiddenSiblings) {
+        hiddenSiblings.forEach(ch => { ch.style.display = ''; });
+        hiddenSiblings = null;
+    }
 }
 
 // ============================================================
-// RENDER EDITOR
+// RENDER EDITOR (inline screen — not a pop-up)
 // ============================================================
 
 function weaponClassOptionsHtml(selected) {
@@ -108,21 +114,18 @@ function adversaryRowHtml(a, i) {
 
 function renderEditor(encounter) {
     modal = document.createElement('div');
-    modal.style.cssText = `
-        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-        background: rgba(0,0,0,0.8); display: flex; align-items: center; justify-content: center;
-        z-index: 1000; padding: 1rem; backdrop-filter: blur(8px);
-    `;
-    
+    modal.className = 'editor-screen-host';
+    modal.style.cssText = `width:100%;padding:1rem 0;`;
+
     const advRows = (encounter.adversaries || []).map((a, i) => adversaryRowHtml(a, i)).join('');
 
     const trackerDisabled = isNew ? 'disabled' : '';
 
     modal.innerHTML = `
-        <div style="background:var(--bg2);padding:1.5rem;border-radius:12px;max-width:650px;width:100%;max-height:90vh;overflow-y:auto;border:1px solid var(--border);">
+        <div class="editor-screen" style="max-width:650px;margin:0 auto;">
+            <button id="editor-close" class="btn btn-secondary editor-back">← Back</button>
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;">
                 <h2 style="margin:0;color:var(--gold);">${isNew ? 'New Encounter' : 'Edit Encounter'}</h2>
-                <button id="editor-close" style="background:none;border:none;color:var(--text2);font-size:1.5rem;cursor:pointer;">✕</button>
             </div>
             
             <div class="form-group" style="margin-bottom:0.8rem;">
@@ -175,12 +178,15 @@ function renderEditor(encounter) {
         </div>
     `;
     
-    document.body.appendChild(modal);
-    
+    const hostContainer = document.getElementById('app-content') || document.body;
+    hiddenSiblings = Array.from(hostContainer.children);
+    hiddenSiblings.forEach(ch => { ch.style.display = 'none'; });
+    hostContainer.appendChild(modal);
+    window.scrollTo({ top: 0 });
+
     // Event listeners
     modal.querySelector('#editor-close')?.addEventListener('click', closeEditor);
     modal.querySelector('#editor-cancel')?.addEventListener('click', closeEditor);
-    modal.addEventListener('click', (e) => { if (e.target === modal) closeEditor(); });
     
     modal.querySelector('#editor-save')?.addEventListener('click', () => saveEditor(encounter));
     
@@ -234,24 +240,27 @@ async function importFromBestiary() {
         return;
     }
 
+    // Renders inline, in the flow of the encounter form itself — no floating
+    // overlay or backdrop.
+    const existing = modal?.querySelector('#bestiary-import-panel');
+    if (existing) existing.remove();
+
     const searchModal = document.createElement('div');
+    searchModal.id = 'bestiary-import-panel';
     searchModal.style.cssText = `
-        position: fixed; inset: 0; background: rgba(0,0,0,0.7);
-        display: flex; align-items: center; justify-content: center;
-        z-index: 2000; backdrop-filter: blur(8px);
+        background: var(--bg-panel); padding: 1rem; border-radius: 10px;
+        border: 1px solid var(--border); margin-top: 0.5rem;
     `;
     searchModal.innerHTML = `
-        <div style="background: var(--bg-panel); padding: 1.5rem; border-radius: 12px;
-                    max-width: 500px; width: 100%; max-height: 80vh; overflow-y: auto;">
-            <h3 style="margin-top:0;">📖 Import from Bestiary</h3>
-            <input type="text" id="bestiary-import-search" placeholder="Search creatures..." 
-                   style="width:100%; padding:0.4rem; margin-bottom:0.5rem;">
-            <div id="bestiary-import-list" style="max-height:300px; overflow-y:auto;"></div>
-            <button id="bestiary-import-close" class="btn btn-sm btn-ghost" 
-                    style="margin-top:0.5rem;">Cancel</button>
-        </div>
+        <h3 style="margin-top:0;">📖 Import from Bestiary</h3>
+        <input type="text" id="bestiary-import-search" placeholder="Search creatures..."
+               style="width:100%; padding:0.4rem; margin-bottom:0.5rem;">
+        <div id="bestiary-import-list" style="max-height:300px; overflow-y:auto;"></div>
+        <button id="bestiary-import-close" class="btn btn-sm btn-ghost"
+                style="margin-top:0.5rem;">Close</button>
     `;
-    document.body.appendChild(searchModal);
+    const advSection = modal?.querySelector('#adv-list')?.parentElement;
+    (advSection || modal).appendChild(searchModal);
 
     const searchInput = searchModal.querySelector('#bestiary-import-search');
     const listContainer = searchModal.querySelector('#bestiary-import-list');
@@ -301,9 +310,9 @@ async function importFromBestiary() {
 
     searchInput.addEventListener('input', (e) => renderList(e.target.value));
     closeBtn.addEventListener('click', () => searchModal.remove());
-    searchModal.addEventListener('click', (e) => { if (e.target === searchModal) searchModal.remove(); });
 
     renderList('');
+    searchInput.focus();
 }
 
 // ============================================================

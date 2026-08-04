@@ -305,32 +305,24 @@ function injectModalStyles() {
     const style = document.createElement('style');
     style.id = 'wizard-modal-styles';
     style.textContent = `
+        /* Inline editor screen — NOT a pop-up modal. Takes over the page in
+           place of whatever was shown before (see openWizard/closeWizard). */
         #wizardModal {
             display: none;
-            position: fixed;
-            inset: 0;
-            z-index: 10000;
-            align-items: center;
-            justify-content: center;
-            background: rgba(0,0,0,0.6);
-            backdrop-filter: blur(4px);
-            animation: wizardFadeIn 0.25s ease;
         }
-        #wizardModal.open { display: flex; }
+        #wizardModal.open { display: block; }
         @keyframes wizardFadeIn { from { opacity: 0; } to { opacity: 1; } }
-        .wizard-overlay { position: absolute; inset: 0; cursor: pointer; }
         .wizard-content {
-            position: relative;
             background: var(--bg, #1e1e2e);
             color: var(--text, #e0e0e0);
             border-radius: 12px;
             max-width: 780px;
-            width: 92%;
-            max-height: 90vh;
-            overflow-y: auto;
+            width: 100%;
+            margin: 0 auto;
             padding: 1.5rem;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.7);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.35);
             border: 1px solid var(--border, #333);
+            animation: wizardFadeIn 0.25s ease;
         }
         .wizard-progress-step {
             flex: 1;
@@ -445,11 +437,10 @@ function ensureModal() {
     modal.style.display = 'none';
 
     modal.innerHTML = `
-        <div class="wizard-overlay"></div>
         <div class="wizard-content">
+            <button id="wizardModalClose" class="btn btn-secondary editor-back">← Cancel</button>
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;">
                 <h3 id="wizard-title" style="margin:0;">Character Wizard</h3>
-                <button id="wizardModalClose" style="font-size:1.8rem;line-height:1;padding:0 0.3rem;background:none;border:none;color:var(--text2);cursor:pointer;">&times;</button>
             </div>
             <div id="wizard-progress" style="display:flex;gap:0.5rem;margin-bottom:1.2rem;justify-content:center;">
                 ${[1,2,3,4,5].map(() => `<div class="wizard-progress-step"></div>`).join('')}
@@ -462,7 +453,8 @@ function ensureModal() {
         </div>
     `;
 
-    document.body.appendChild(modal);
+    const hostContainer = document.getElementById('app-content') || document.body;
+    hostContainer.appendChild(modal);
     return modal;
 }
 
@@ -575,8 +567,15 @@ export async function openWizard() {
         state.step = 0;
         state.isOpen = true;
 
+        // Hide whatever else is currently shown (e.g. the character list) —
+        // the wizard takes over the view in place instead of floating above it.
+        const hostContainer = document.getElementById('app-content') || document.body;
+        state._hiddenSiblings = Array.from(hostContainer.children).filter(ch => ch !== modal);
+        state._hiddenSiblings.forEach(ch => { ch.style.display = 'none'; });
+
         modal.classList.add('open');
-        modal.style.display = 'flex';
+        modal.style.display = 'block';
+        window.scrollTo({ top: 0 });
 
         renderStep();
         attachEvents();
@@ -593,6 +592,10 @@ export function closeWizard() {
     if (modal) {
         modal.classList.remove('open');
         modal.style.display = 'none';
+    }
+    if (state._hiddenSiblings) {
+        state._hiddenSiblings.forEach(ch => { ch.style.display = ''; });
+        state._hiddenSiblings = null;
     }
     state.data = null;
     state.step = 0;
@@ -1722,9 +1725,6 @@ function attachEvents() {
     addListener(document.getElementById('wizard-back'), 'click', wizardBack);
     addListener(document.getElementById('wizard-next'), 'click', wizardNext);
     addListener(document.getElementById('wizardModalClose'), 'click', closeWizard);
-
-    const overlay = modal.querySelector('.wizard-overlay');
-    if (overlay) addListener(overlay, 'click', closeWizard);
 
     const keyHandler = (e) => {
         if (!state.isOpen) return;

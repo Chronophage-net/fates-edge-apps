@@ -48,6 +48,7 @@ const STEPS = [
 
 let currentStep = 0;
 let modalEl = null;
+let onboardingHiddenSiblings = null;
 
 function hasSeenOnboarding() {
     try { return localStorage.getItem(SEEN_KEY) === '1'; } catch (e) { return false; }
@@ -65,28 +66,40 @@ export function maybeShowOnboarding() {
 export function showOnboardingModal() {
     currentStep = 0;
     if (!modalEl) buildModal();
+
+    // Hide whatever's currently shown (the whiteboard) — this takes over the
+    // view in place instead of floating above it as a pop-up.
+    const hostContainer = document.getElementById('app-content') || document.body;
+    onboardingHiddenSiblings = Array.from(hostContainer.children).filter(ch => ch !== modalEl);
+    onboardingHiddenSiblings.forEach(ch => { ch.style.display = 'none'; });
+    hostContainer.appendChild(modalEl);
+
     renderStep();
     modalEl.style.display = 'flex';
+    window.scrollTo({ top: 0 });
 }
 
 export function hideOnboardingModal(markSeen = true) {
     if (modalEl) modalEl.style.display = 'none';
+    if (onboardingHiddenSiblings) {
+        onboardingHiddenSiblings.forEach(ch => { ch.style.display = ''; });
+        onboardingHiddenSiblings = null;
+    }
     if (markSeen) markOnboardingSeen();
 }
 
 function buildModal() {
+    // Inline editor screen — not a pop-up. See showOnboardingModal for how
+    // it's inserted into the page in place of the whiteboard.
     modalEl = document.createElement('div');
     modalEl.id = 'whiteboard-onboarding-modal';
+    modalEl.className = 'editor-screen-host';
     modalEl.style.cssText = `
-        position:fixed; inset:0; z-index:1000; display:none;
-        align-items:center; justify-content:center;
-        background:rgba(5,5,10,0.72);
+        display:none; align-items:center; justify-content:center; padding: 1rem 0;
     `;
     modalEl.innerHTML = `
-        <div id="whiteboard-onboarding-card" style="
-            max-width:480px; width:90%; padding:1.5rem; border-radius:8px;
-            border:1px solid var(--gold, #d4af37); background:var(--bg2, #1a1a22);
-            position:relative; box-shadow:0 8px 32px rgba(0,0,0,0.5);
+        <div id="whiteboard-onboarding-card" class="editor-screen" style="
+            max-width:480px; width:90%; position:relative;
         ">
             <button id="whiteboard-onboarding-close" title="Close" style="
                 position:absolute; top:10px; right:12px; background:none; border:none;
@@ -107,9 +120,6 @@ function buildModal() {
     `;
     document.body.appendChild(modalEl);
 
-    modalEl.addEventListener('click', (e) => {
-        if (e.target === modalEl) hideOnboardingModal(true);
-    });
     modalEl.querySelector('#whiteboard-onboarding-close').addEventListener('click', () => hideOnboardingModal(true));
     modalEl.querySelector('#whiteboard-onboarding-skip').addEventListener('click', () => hideOnboardingModal(true));
     modalEl.querySelector('#whiteboard-onboarding-back').addEventListener('click', () => {

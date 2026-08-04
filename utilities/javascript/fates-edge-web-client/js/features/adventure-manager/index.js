@@ -70,6 +70,7 @@ import { isConnectedToServer, sendEvent } from '../../core/websocket.js';
 import { loadBestiaryData, getCreatureDescription } from '../encounters/bestiary.js';
 // ─── Role check ──────────────────────────────────────────────
 import { getMyStoredRole } from '../../core/feature-toggles.js';
+import { openInlineScreen, closeInlineScreen, inlineScreenShell } from '../../components/InlineScreen.js';
 
 // ============================================================
 // CONSTANTS
@@ -501,30 +502,21 @@ async function browseAdventureLibrary() {
         return;
     }
 
+    // Inline editor screen — not a pop-up. Takes over the page in place of
+    // whatever's currently shown.
     const modal = document.createElement('div');
+    modal.className = 'editor-screen-host';
     modal.style.cssText = `
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0,0,0,0.7);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        z-index: 10000;
-        animation: fadeIn 0.2s ease;
+        display: flex; align-items: center; justify-content: center;
+        padding: 1rem 0; animation: fadeIn 0.2s ease;
     `;
 
     const content = document.createElement('div');
+    content.className = 'editor-screen';
     content.style.cssText = `
-        background: var(--bg1);
-        padding: 1.5rem;
-        border-radius: var(--radius);
         max-width: 500px;
         width: 90%;
         max-height: 80vh;
-        border: 1px solid var(--border);
         display: flex;
         flex-direction: column;
     `;
@@ -558,12 +550,21 @@ async function browseAdventureLibrary() {
             `).join('')}
         </div>
         <div style="margin-top:0.8rem;display:flex;justify-content:flex-end;">
-            <button class="btn btn-sm btn-secondary" id="adv-library-cancel">Cancel</button>
+            <button class="btn btn-sm btn-secondary" id="adv-library-cancel">← Back</button>
         </div>
     `;
 
     modal.appendChild(content);
-    document.body.appendChild(modal);
+    const hostContainer = document.getElementById('app-content') || document.body;
+    const advLibraryHiddenSiblings = Array.from(hostContainer.children);
+    advLibraryHiddenSiblings.forEach(ch => { ch.style.display = 'none'; });
+    hostContainer.appendChild(modal);
+    window.scrollTo({ top: 0 });
+
+    const closeAdvLibrary = () => {
+        modal.remove();
+        advLibraryHiddenSiblings.forEach(ch => { ch.style.display = ''; });
+    };
 
     if (!document.getElementById('adv-library-styles')) {
         const style = document.createElement('style');
@@ -583,11 +584,7 @@ async function browseAdventureLibrary() {
     }
 
     const cancelBtn = content.querySelector('#adv-library-cancel');
-    cancelBtn.addEventListener('click', () => modal.remove());
-
-    modal.addEventListener('click', (e) => {
-        if (e.target === modal) modal.remove();
-    });
+    cancelBtn.addEventListener('click', closeAdvLibrary);
 
     const items = content.querySelectorAll('.adv-library-item');
     items.forEach(item => {
@@ -599,11 +596,11 @@ async function browseAdventureLibrary() {
 
             const data = await loadAdventureFromFile(slug);
             if (isDestroyed) {
-                modal.remove();
+                closeAdvLibrary();
                 return;
             }
 
-            modal.remove();
+            closeAdvLibrary();
 
             if (data) {
                 showToast(`📚 Loaded "${data.title}" from the library.`, 'success');
@@ -1705,6 +1702,24 @@ function buildAdventureDetailHtml(adventure) {
         </div>
     `).join('') || '<span class="text-muted text-sm">No creatures in adventure bestiary. Add some to use in encounters.</span>';
 
+    // ─── GM Hints ─────────────────────────────────────────────────
+    // GM-only tonal/pacing guidance authored alongside the adventure.
+    // Not every adventure has it (older/simpler ones don't), and it's
+    // deliberately hidden from players — same gate as the edit tools.
+    const gmHints = adventure._gmhints;
+    const gmHintsPreview = gmHints?.tone
+        ? `${gmHints.tone.slice(0, 140)}${gmHints.tone.length > 140 ? '…' : ''}`
+        : '';
+    const gmHintsHtml = (canEdit && gmHints) ? `
+        <div class="panel" style="border-left:2px solid var(--accent);">
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+                <h4 style="margin:0;font-size:0.9rem;">🧭 GM Hints</h4>
+                <button class="btn btn-xs btn-secondary" onclick="window.adventureOpenGmHints('${adventure.id}')">Expand ↗</button>
+            </div>
+            ${gmHintsPreview ? `<div style="font-size:0.7rem;color:var(--text2);margin-top:0.2rem;">${escHtml(gmHintsPreview)}</div>` : `<div style="font-size:0.7rem;color:var(--text3);margin-top:0.2rem;">Pacing notes available — click Expand to view.</div>`}
+        </div>
+    ` : '';
+
     // ─── Notes ────────────────────────────────────────────────────
     const notesEditor = canEdit
         ? `<textarea id="adv-notes" rows="3" style="width:100%;font-size:0.75rem;background:var(--bg3);color:var(--text);border:1px solid var(--border);border-radius:var(--radius);padding:0.3rem;">${escHtml(adventure.notes || '')}</textarea>
@@ -1777,6 +1792,8 @@ function buildAdventureDetailHtml(adventure) {
                         <div style="max-height:200px;overflow-y:auto;margin-bottom:0.3rem;">${bestiaryHtml}</div>
                         ${canEdit ? `<button class="btn btn-xs btn-secondary" onclick="window.adventureAddBestiaryCreature('${adventure.id}')">+ Add Creature</button>` : ''}
                     </div>
+
+                    ${gmHintsHtml}
 
                     <div class="panel">
                         <h4 style="margin:0;font-size:0.9rem;">📝 Notes</h4>
@@ -2252,6 +2269,43 @@ window.adventureStartEncounter = function(id, actIdx, sceneIdx) {
 window.adventureToggleSceneDesc = function(descId) {
     const el = document.getElementById(descId);
     if (el) el.style.display = el.style.display === 'none' ? 'block' : 'none';
+};
+
+window.adventureOpenGmHints = function(id) {
+    const adventure = getAdventure(id);
+    const hints = adventure?._gmhints;
+    if (!hints) return;
+
+    const pacingHtml = hints.pacing && typeof hints.pacing === 'object'
+        ? Object.entries(hints.pacing).map(([act, text]) => `
+            <div style="margin:0.5rem 0;">
+                <div style="font-weight:600;font-size:0.8rem;color:var(--gold);text-transform:capitalize;">${escHtml(act.replace(/_/g, ' '))}</div>
+                <div style="font-size:0.8rem;color:var(--text2);white-space:pre-wrap;">${escHtml(text)}</div>
+            </div>
+        `).join('')
+        : '';
+
+    const body = `
+        ${hints.tone ? `
+            <div class="panel" style="margin-bottom:0.5rem;">
+                <h4 style="margin:0 0 0.2rem;font-size:0.85rem;">🎭 Tone</h4>
+                <div style="font-size:0.85rem;color:var(--text);white-space:pre-wrap;">${escHtml(hints.tone)}</div>
+            </div>
+        ` : ''}
+        ${pacingHtml ? `
+            <div class="panel">
+                <h4 style="margin:0 0 0.2rem;font-size:0.85rem;">⏳ Pacing</h4>
+                ${pacingHtml}
+            </div>
+        ` : ''}
+        ${!hints.tone && !pacingHtml ? `<p class="text-muted">No GM hints recorded for this adventure.</p>` : ''}
+    `;
+
+    const panel = openInlineScreen('adv-gmhints-screen');
+    panel.innerHTML = inlineScreenShell('adv-gmhints-screen', `🧭 GM Hints — ${escHtml(adventure.title)}`, body, { maxWidth: '640px' });
+    document.getElementById('adv-gmhints-screen-back')?.addEventListener('click', () => {
+        closeInlineScreen('adv-gmhints-screen');
+    });
 };
 
 window.adventureAdvanceTimer = function(id, idx) {

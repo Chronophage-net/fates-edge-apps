@@ -753,13 +753,12 @@ function injectStyles() {
       line-height: 1.5;
     }
 
-    /* ===== WELCOME OVERLAY (added) ===== */
+    /* ===== WELCOME SCREEN (inline, not a pop-up) ===== */
     .welcome-overlay {
-      position: fixed; inset: 0; z-index: 99999;
-      background: rgba(0,0,0,0.85); backdrop-filter: blur(12px);
       display: flex; align-items: center; justify-content: center;
       animation: welcomeFadeIn 0.4s ease;
-      padding: 1rem;
+      padding: 1rem 0;
+      width: 100%;
     }
     @keyframes welcomeFadeIn {
       from { opacity: 0; transform: scale(0.96); }
@@ -871,31 +870,32 @@ function showWelcomeOverlay() {
     </div>
   `;
 
-  document.body.appendChild(overlay);
+  // Inline screen — takes over the home view in place instead of floating
+  // above it as a pop-up.
+  const hostContainer = document.getElementById('app-content') || document.body;
+  const welcomeHiddenSiblings = Array.from(hostContainer.children);
+  welcomeHiddenSiblings.forEach(ch => { ch.style.display = 'none'; });
+  hostContainer.appendChild(overlay);
+  window.scrollTo({ top: 0 });
+
+  const closeWelcome = () => {
+    overlay.remove();
+    overlayShown = false;
+    welcomeHiddenSiblings.forEach(ch => { ch.style.display = ''; });
+  };
 
   // Event listeners
   const quickBtn = overlay.querySelector('[data-action="quick-start"]');
   const dismissBtn = overlay.querySelector('[data-action="dismiss-welcome"]');
 
   quickBtn?.addEventListener('click', () => {
-    overlay.remove();
-    overlayShown = false;
+    closeWelcome();
     quickStart();
   });
 
   dismissBtn?.addEventListener('click', () => {
-    overlay.remove();
-    overlayShown = false;
+    closeWelcome();
     markWelcomeSeen();
-  });
-
-  // Click outside to dismiss
-  overlay.addEventListener('click', (e) => {
-    if (e.target === overlay) {
-      overlay.remove();
-      overlayShown = false;
-      markWelcomeSeen();
-    }
   });
 }
 

@@ -1,8 +1,9 @@
 /**
  * Fate's Edge Toolkit – Main Application Entry Point
- * v4.2 – X-Card actually wired up (button/broadcast/VTT chat notice), talent
- * effects engine, weapon-class × range-band dice bonuses, shield modifiers,
- * Fatigue-as-Boon. See CHANGELOG.md for the full list.
+ * v4.3a – Account authentication (register/login/JWT) against the campaign
+ * server, redone Python client (structured CLI package), VTT bridge/mod
+ * updates, and inline-screen conversions replacing pop-up modals app-wide.
+ * See CHANGELOG.md for the full list.
  *
  * ────────────────────────────────────────────────────────────────────────
  * X-Card overlay toggle via Ctrl+Shift+X or the floating button; raises
@@ -52,7 +53,7 @@ function onUnlockSuccess() {
 }
 
 async function init() {
-    console.log('Fate\'s Edge Toolkit v4.2 — Loading...');
+    console.log('Fate\'s Edge Toolkit v4.3a — Loading...');
 
     try {
         // 1. Load state
@@ -118,7 +119,7 @@ async function init() {
         // 8. Sync event listeners
         setupSyncEventListeners();
 
-        console.log('✅ Fate\'s Edge Toolkit v4.2 — Ready');
+        console.log('✅ Fate\'s Edge Toolkit v4.3a — Ready');
     } catch (error) {
         console.error('❌ Failed to initialize app:', error);
         showToast('Failed to initialize application. Please refresh.', 'error');
@@ -930,22 +931,28 @@ function setupConflictModalListener() {
     });
 }
 
+let conflictModalHiddenSiblings = null;
+
 function showConflictModal(conflicts) {
     if (!conflicts || conflicts.length === 0) return;
 
     let modal = document.getElementById('conflictModal');
     if (!modal) {
+        // Inline editor screen — not a pop-up. Takes over the page in place
+        // of whatever's currently shown.
         modal = document.createElement('div');
         modal.id = 'conflictModal';
-        modal.className = 'modal-overlay';
-        document.body.appendChild(modal);
+        modal.className = 'editor-screen-host';
+        modal.style.cssText = 'display:none;padding:1rem 0;';
+        const hostContainer = document.getElementById('app-content') || document.body;
+        hostContainer.appendChild(modal);
     }
 
     modal.innerHTML = `
-        <div class="modal" style="max-width: 600px;">
+        <div class="editor-screen" style="max-width: 600px;margin:0 auto;">
             <div class="modal-header">
+                <button class="btn btn-secondary editor-back modal-close">← Back</button>
                 <h3>⚠️ Sync Conflict Detected</h3>
-                <button class="modal-close">&times;</button>
             </div>
             <div class="modal-body">
                 ${conflicts.map(c => `
@@ -972,25 +979,37 @@ function showConflictModal(conflicts) {
         </div>
     `;
 
-    modal.classList.add('open');
+    const hostContainer = document.getElementById('app-content') || document.body;
+    conflictModalHiddenSiblings = Array.from(hostContainer.children).filter(ch => ch !== modal);
+    conflictModalHiddenSiblings.forEach(ch => { ch.style.display = 'none'; });
+    modal.style.display = 'block';
+    window.scrollTo({ top: 0 });
 
-    modal.querySelector('.modal-close').addEventListener('click', () => modal.classList.remove('open'));
+    const closeConflictModal = () => {
+        modal.style.display = 'none';
+        if (conflictModalHiddenSiblings) {
+            conflictModalHiddenSiblings.forEach(ch => { ch.style.display = ''; });
+            conflictModalHiddenSiblings = null;
+        }
+    };
+
+    modal.querySelector('.modal-close').addEventListener('click', closeConflictModal);
 
     conflicts.forEach(c => {
         modal.querySelector('#conflict-keep-local').addEventListener('click', () => {
             resolveConflict(c.id, 'local');
             showToast('Kept local version.', 'info');
-            modal.classList.remove('open');
+            closeConflictModal();
         });
         modal.querySelector('#conflict-use-remote').addEventListener('click', () => {
             resolveConflict(c.id, 'remote');
             showToast('Applied remote version.', 'info');
-            modal.classList.remove('open');
+            closeConflictModal();
         });
         modal.querySelector('#conflict-merge').addEventListener('click', () => {
             resolveConflict(c.id, 'merge');
             showToast('Merged both versions.', 'success');
-            modal.classList.remove('open');
+            closeConflictModal();
         });
     });
 }

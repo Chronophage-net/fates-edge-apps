@@ -880,10 +880,13 @@ async function handleRegionChange() {
 
     if (descEl) {
         if (data && data.description) {
-            const parsed = parseRegionDescription(data.description);
-            descEl.innerHTML = parsed;
+            // Rich "generator"-schema regions arrive with clean, already-built
+            // HTML (see transformRegionData). Legacy blob regions carry raw
+            // LaTeX-ish markup that still needs parseRegionDescription.
+            const isPreBuilt = data.metadata && data.metadata.type === 'generator';
+            descEl.innerHTML = isPreBuilt ? data.description : parseRegionDescription(data.description);
         } else {
-            descEl.textContent = 'No description available.';
+            descEl.innerHTML = '<span style="color:var(--text2);">No description available.</span>';
         }
     }
 
@@ -1001,8 +1004,8 @@ export async function render(el) {
                 <span style="font-size:0.7rem;color:var(--text3);white-space:nowrap;">(${regionCount} regions)</span>
             </div>
             ${regionNames.length === 0 ? `<div style="color:var(--warn);font-size:0.8rem;margin-top:0.3rem;">⚠️ No region files found. Using fallback defaults.</div>` : ''}
-            <div id="region-description" style="margin-top:0.8rem;background:var(--bg2);padding:0.8rem 1rem;border-radius:var(--radius);border-left:4px solid var(--gold);color:var(--text2);font-size:1rem;line-height:1.6;max-height:60vh;overflow-y:auto;">
-                Select a region to display its description.
+            <div id="region-description" style="margin-top:0.8rem;background:var(--bg2);padding:0.8rem 1rem;border-radius:var(--radius);border-left:4px solid var(--gold);color:var(--text);font-size:1rem;line-height:1.6;max-height:60vh;overflow-y:auto;">
+                <span style="color:var(--text2);">Select a region to display its description.</span>
             </div>
         </div>
 
@@ -1518,6 +1521,7 @@ export function attachEvents() {
 }
 
 let crownSpreadModal = null;
+let crownSpreadHiddenSiblings = null;
 
 export function openCrownSpread() {
     // Only GM can open Crown Spread
@@ -1530,15 +1534,18 @@ export function openCrownSpread() {
     if (crownSpreadModal && crownSpreadModal.parentNode) {
         crownSpreadModal.remove();
         crownSpreadModal = null;
+        if (crownSpreadHiddenSiblings) {
+            crownSpreadHiddenSiblings.forEach(ch => { ch.style.display = ''; });
+            crownSpreadHiddenSiblings = null;
+        }
     }
 
+    // Inline editor screen — not a pop-up.
     crownSpreadModal = document.createElement('div');
-    crownSpreadModal.className = 'crown-spread-modal';
+    crownSpreadModal.className = 'crown-spread-modal editor-screen-host';
     crownSpreadModal.style.cssText = `
-        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-        background: rgba(0,0,0,0.85); display: flex; align-items: center; justify-content: center;
-        z-index: 1000; padding: 1rem; backdrop-filter: blur(12px);
-        animation: fadeIn 0.3s ease;
+        display: flex; align-items: center; justify-content: center;
+        padding: 1rem 0; animation: fadeIn 0.3s ease;
     `;
 
     if (deck.length < 5) buildDeck();
@@ -1592,7 +1599,7 @@ export function openCrownSpread() {
                                 <strong style="color:${p.isJoker ? 'var(--gold)' : p.color};">${p.position.label}</strong>
                                 <span style="color:var(--text3);font-size:0.8rem;">${p.rankName} of ${p.suitName}</span>
                             </div>
-                            <div style="color:var(--text2);font-size:0.9rem;margin-left:1.5rem;">${renderCardText(p.regionMeaning || p.description)}</div>
+                            <div style="color:var(--text);font-size:0.95rem;line-height:1.55;margin-left:1.5rem;">${renderCardText(p.regionMeaning || p.description)}</div>
                         </div>
                     `).join('')}
                     <div>
@@ -1600,7 +1607,7 @@ export function openCrownSpread() {
                             <span style="color:var(--gold);">🌟</span>
                             <strong style="color:var(--gold);">Wildcard Twist</strong>
                         </div>
-                        <div style="color:var(--text2);font-size:0.9rem;margin-left:1.5rem;">${renderCardText(result.wildcard)}</div>
+                        <div style="color:var(--text);font-size:0.95rem;line-height:1.55;margin-left:1.5rem;">${renderCardText(result.wildcard)}</div>
                     </div>
                 </div>
 
@@ -1618,14 +1625,12 @@ export function openCrownSpread() {
             </div>
         `;
 
-        document.body.appendChild(crownSpreadModal);
+        const hostContainer = document.getElementById('app-content') || document.body;
+        crownSpreadHiddenSiblings = Array.from(hostContainer.children);
+        crownSpreadHiddenSiblings.forEach(ch => { ch.style.display = 'none'; });
+        hostContainer.appendChild(crownSpreadModal);
+        window.scrollTo({ top: 0 });
         broadcastDraw(cards, 'crown', regionName, result.synthesis);
-
-        crownSpreadModal.addEventListener('click', (e) => {
-            if (e.target === crownSpreadModal) {
-                window.closeCrownSpread();
-            }
-        });
 
         document.addEventListener('keydown', function escHandler(e) {
             if (e.key === 'Escape' && crownSpreadModal && crownSpreadModal.parentNode) {
@@ -1640,6 +1645,10 @@ window.closeCrownSpread = function() {
     if (crownSpreadModal && crownSpreadModal.parentNode) {
         crownSpreadModal.remove();
         crownSpreadModal = null;
+    }
+    if (crownSpreadHiddenSiblings) {
+        crownSpreadHiddenSiblings.forEach(ch => { ch.style.display = ''; });
+        crownSpreadHiddenSiblings = null;
     }
     updateDeckCount();
 };

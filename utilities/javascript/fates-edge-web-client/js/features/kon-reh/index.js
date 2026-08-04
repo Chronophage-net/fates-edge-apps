@@ -1376,14 +1376,23 @@ export function openKonrehModal(netConfig = null) {
   `;
   document.head.appendChild(style);
 
-  // ---- Modal container ----
+  // ---- Inline editor screen (not a pop-up) ----
   const modal = document.createElement('div');
   modal.id = 'konreh-modal';
+  modal.className = 'editor-screen-host';
   modal.style.cssText = `
-    position: fixed; inset: 0; background: rgba(6,6,10,0.88); display: flex;
-    align-items: center; justify-content: center; z-index: 10000;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; padding: 16px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; padding: 16px 0;
   `;
+
+  let konrehHiddenSiblings = null;
+  const closeKonrehModal = () => {
+    modal.remove();
+    if (konrehHiddenSiblings) {
+      konrehHiddenSiblings.forEach(ch => { ch.style.display = ''; });
+      konrehHiddenSiblings = null;
+    }
+  };
 
   const content = document.createElement('div');
   content.style.cssText = `
@@ -1415,7 +1424,7 @@ export function openKonrehModal(netConfig = null) {
   closeBtnTop.className = 'kr-btn';
   closeBtnTop.textContent = '✕';
   closeBtnTop.title = 'Close';
-  closeBtnTop.onclick = () => { stopCoachAnimation(); modal.remove(); };
+  closeBtnTop.onclick = () => { stopCoachAnimation(); closeKonrehModal(); };
   titleRow.appendChild(closeBtnTop);
   gameArea.appendChild(titleRow);
 
@@ -1658,7 +1667,11 @@ export function openKonrehModal(netConfig = null) {
   content.appendChild(gameArea);
   content.appendChild(sidebar);
   modal.appendChild(content);
-  document.body.appendChild(modal);
+  const konrehHost = document.getElementById('app-content') || document.body;
+  konrehHiddenSiblings = Array.from(konrehHost.children);
+  konrehHiddenSiblings.forEach(ch => { ch.style.display = 'none'; });
+  konrehHost.appendChild(modal);
+  window.scrollTo({ top: 0 });
 
   // ---- Game Engine & UI state ----
   const ctx = canvas.getContext('2d');
@@ -2371,7 +2384,7 @@ export function openKonrehModal(netConfig = null) {
         render();
       },
       getSeq() { return localSeq; },
-      destroy() { stopCoachAnimation(); modal.remove(); },
+      destroy() { stopCoachAnimation(); closeKonrehModal(); },
     };
   }
 }

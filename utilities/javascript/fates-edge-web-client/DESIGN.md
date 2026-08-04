@@ -1,9 +1,11 @@
 # Updated Fate's Edge Toolkit v3.0 — Real-Time Collaboration Design Document
 
-**Version:** 3.0  
-**Date:** 2026-07-13  
-**Status:** Design Specification  
-**Author:** Nicholas A. Gasper  
+**Version:** 3.0
+**Date:** 2026-07-13
+**Status:** Implemented (see `js/core/sync/`); toolkit is now at v4.3a
+**Author:** Nicholas A. Gasper
+
+> **Note (v4.3a):** The real-time sync design below shipped and is unchanged in shape. Since this document was written, the toolkit has added account authentication against the campaign server (register/login/JWT, see the socket server's `DESIGN.md`), a redone Python client, and VTT bridge/mod updates. The previously-planned AI GM bot companion project has been removed from the ecosystem.
 
 ---
 

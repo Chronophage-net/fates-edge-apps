@@ -733,26 +733,14 @@ function showCreatureDetail(entry) {
     const description = getCreatureDescription(entry);
     const lore = entry.lore ? formatText(entry.lore) : '';
 
+    // Inline editor screen — takes over the bestiary view in place instead
+    // of floating above it as a pop-up.
     const overlay = document.createElement('div');
-    overlay.style.cssText = `
-        position:fixed;inset:0;background:rgba(0,0,0,0.7);backdrop-filter:blur(4px);
-        display:flex;justify-content:center;align-items:center;z-index:1000;
-        padding:1rem;
-    `;
+    overlay.className = 'editor-screen-host';
+
     overlay.innerHTML = `
-        <div style="
-            background:var(--bg-panel);
-            border:1px solid var(--border);
-            border-radius:var(--radius);
-            max-width:600px;
-            width:100%;
-            max-height:80vh;
-            overflow-y:auto;
-            padding:1.5rem 2rem;
-            position:relative;
-            animation:scaleIn 0.2s ease-out;
-        ">
-            <button class="modal-close" style="position:absolute;top:0.5rem;right:0.5rem;background:transparent;border:none;font-size:1.5rem;cursor:pointer;color:var(--text2);">&times;</button>
+        <div class="editor-screen" style="max-width:600px;margin:0 auto;">
+            <button class="btn btn-secondary editor-back creature-detail-close">← Back</button>
             <h2 style="margin-top:0;color:var(--gold);display:flex;gap:0.5rem;align-items:center;flex-wrap:wrap;">
                 ${escHtml(name)}
                 ${entry.tl ? `<span style="font-size:0.7rem;color:var(--text2);background:var(--bg2);padding:0.05rem 0.5rem;border-radius:12px;">TL ${entry.tl}</span>` : ''}
@@ -776,19 +764,28 @@ function showCreatureDetail(entry) {
             </div>
         </div>
     `;
-    document.body.appendChild(overlay);
 
-    overlay.querySelector('.modal-close').addEventListener('click', () => overlay.remove());
-    overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.remove(); });
+    const hostContainer = document.getElementById('app-content') || document.body;
+    const hiddenSiblings = Array.from(hostContainer.children);
+    hiddenSiblings.forEach(ch => { ch.style.display = 'none'; });
+    hostContainer.appendChild(overlay);
+    window.scrollTo({ top: 0 });
+
+    const closeDetail = () => {
+        overlay.remove();
+        hiddenSiblings.forEach(ch => { ch.style.display = ''; });
+    };
+
+    overlay.querySelector('.creature-detail-close').addEventListener('click', closeDetail);
 
     overlay.querySelector('.add-adversary-from-detail').addEventListener('click', () => {
         addCreatureAsAdversary(entry);
-        overlay.remove();
+        closeDetail();
     });
 
     overlay.querySelector('.add-encounter-from-detail').addEventListener('click', () => {
         addCreatureToEncounter(entry);
-        overlay.remove();
+        closeDetail();
     });
 
     overlay.querySelector('.open-tracker-from-detail').addEventListener('click', () => {

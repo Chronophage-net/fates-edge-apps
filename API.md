@@ -179,7 +179,7 @@ Remove a client ID from the ban list.
 
 ### Modules
 
-**`GET /api/modules`** — also aliased at **`GET /api/rooms/:code/modules`** (the module catalog isn't actually room-scoped; the alias exists because some callers, e.g. the AI GM bot, always build URLs under `/rooms/:code/...`)
+**`GET /api/modules`** — also aliased at **`GET /api/rooms/:code/modules`** (the module catalog isn't actually room-scoped; the alias exists because some callers always build URLs under `/rooms/:code/...`)
 List available modules — legacy folders under `server/modules/` plus standalone adventure JSON files under `data/adventures/`.
 
 **`POST /api/modules`**

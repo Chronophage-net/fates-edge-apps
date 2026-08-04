@@ -24,35 +24,25 @@ function injectModalStyles() {
     const style = document.createElement('style');
     style.id = 'timer-modal-styles';
     style.textContent = `
+        /* Inline editor screen — not a pop-up. */
         #timerModal {
             display: none;
-            position: fixed;
-            inset: 0;
-            z-index: 10000;
-            align-items: center;
-            justify-content: center;
-            background: rgba(0,0,0,0.6);
-            backdrop-filter: blur(4px);
         }
         #timerModal.open {
             display: flex;
-        }
-        #timerModal .modal-overlay {
-            position: absolute;
-            inset: 0;
-            cursor: pointer;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem 0;
         }
         #timerModal .modal-content {
-            position: relative;
             background: var(--bg, #1e1e2e);
             color: var(--text, #e0e0e0);
             border-radius: 12px;
             max-width: 500px;
-            width: 92%;
-            max-height: 90vh;
-            overflow-y: auto;
+            width: 100%;
+            margin: 0 auto;
             padding: 1.5rem;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.7);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.35);
             border: 1px solid var(--border, #333);
         }
         #timerModal .modal-header {
@@ -104,17 +94,18 @@ function injectModalStyles() {
 
 function getModalTemplate() {
     return `
-        <div class="modal-overlay"></div>
         <div class="modal-content">
             <div class="modal-header">
+                <button id="timerModalClose" class="btn btn-secondary editor-back">← Back</button>
                 <h3 id="timer-modal-title">Timer</h3>
-                <button id="timerModalClose" style="font-size:1.8rem;line-height:1;padding:0 0.3rem;background:none;border:none;color:var(--text2);cursor:pointer;">&times;</button>
             </div>
             <div id="timer-editor-content" class="modal-body"></div>
             <div class="modal-footer"></div>
         </div>
     `;
 }
+
+let timerModalHiddenSiblings = null;
 
 function ensureModal() {
     // Remove any existing modal to avoid stale references
@@ -127,19 +118,12 @@ function ensureModal() {
 
     const modal = document.createElement('div');
     modal.id = 'timerModal';
-    modal.setAttribute('role', 'dialog');
-    modal.setAttribute('aria-modal', 'true');
+    modal.className = 'editor-screen-host';
     modal.style.display = 'none';
     modal.innerHTML = getModalTemplate();
 
-    document.body.appendChild(modal);
-
-    // Close on overlay click
-    modal.addEventListener('click', (e) => {
-        if (e.target === modal || e.target.classList.contains('modal-overlay')) {
-            closeModal();
-        }
-    });
+    const hostContainer = document.getElementById('app-content') || document.body;
+    hostContainer.appendChild(modal);
 
     return modal;
 }
@@ -152,8 +136,12 @@ function openModal() {
         console.error('[Timers] Modal not found when trying to open');
         return;
     }
+    const hostContainer = document.getElementById('app-content') || document.body;
+    timerModalHiddenSiblings = Array.from(hostContainer.children).filter(ch => ch !== modal);
+    timerModalHiddenSiblings.forEach(ch => { ch.style.display = 'none'; });
     modal.classList.add('open');
     modal.style.display = 'flex';
+    window.scrollTo({ top: 0 });
 }
 
 function closeModal() {
@@ -161,6 +149,10 @@ function closeModal() {
     if (modal) {
         modal.classList.remove('open');
         modal.style.display = 'none';
+    }
+    if (timerModalHiddenSiblings) {
+        timerModalHiddenSiblings.forEach(ch => { ch.style.display = ''; });
+        timerModalHiddenSiblings = null;
     }
     editingTimerId = null;
 }

@@ -2023,3 +2023,80 @@ body.xcard-active .app-shell {
     width: 100%;
   }
 }
+
+/* ============================================================
+   Inline editor screens (replaces pop-up modals app-wide)
+   Used by factions/assets/followers/trusts and other features
+   that swap a full "screen" into the view container instead of
+   opening an overlay dialog.
+   ============================================================ */
+.editor-screen {
+    background: var(--bg-panel);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md, var(--radius));
+    padding: 1.5rem 2rem;
+    box-shadow: var(--shadow-elevated);
+    animation: scaleIn 0.2s ease-out;
+    max-width: 760px;
+    margin: 0 auto;
+}
+.editor-screen .editor-back {
+    margin-bottom: 1rem;
+}
+.editor-screen h2 {
+    color: var(--gold);
+    margin-bottom: 1.2rem;
+    font-size: 1.4rem;
+}
+
+.fe-form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.9rem;
+}
+.fe-form label {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+.fe-form input[type="text"],
+.fe-form input[type="number"],
+.fe-form select,
+.fe-form textarea {
+    background: var(--bg3, var(--bg-panel));
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    padding: 0.5rem 0.7rem;
+    color: var(--text);
+    font-size: 0.95rem;
+    font-family: inherit;
+}
+.fe-form textarea {
+    resize: vertical;
+}
+.fe-form-actions {
+    display: flex;
+    gap: 0.6rem;
+    margin-top: 0.5rem;
+}
+
+.inline-add-form {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 0.6rem;
+    flex-wrap: wrap;
+    align-items: center;
+}
+.inline-add-form input[type="text"],
+.inline-add-form select {
+    background: var(--bg3, var(--bg-panel));
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    padding: 0.4rem 0.6rem;
+    color: var(--text);
+    font-size: 0.9rem;
+    flex: 1;
+    min-width: 160px;
+}

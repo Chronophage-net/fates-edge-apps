@@ -122,6 +122,7 @@ Some talents allow spending Boons to push effects further.`;
 
 let activeModal = null;
 let activeOverlay = null;
+let hiddenSiblings = null;
 let escapeHandler = null;
 let currentEditMode = null; // 'catalog' or 'character'
 let currentEditContext = null; // { talentId } or { characterId, talentIndex }
@@ -247,13 +248,17 @@ function showEditorModal(talent, isNew, mode) {
         if (e.key === 'Escape') closeTalentEditor();
     };
 
+    // Inline editor panel — NOT a pop-up overlay. Inserted directly into the
+    // page in place of whatever's currently shown (character list, character
+    // editor, etc.), with an explicit "← Back" affordance.
     const overlay = document.createElement('div');
-    overlay.className = 'modal-overlay open';
+    overlay.className = 'editor-screen-host';
     overlay.id = 'talent-editor-modal';
 
     const modal = document.createElement('div');
-    modal.className = 'modal';
+    modal.className = 'editor-screen';
     modal.style.maxWidth = '700px';
+    modal.style.margin = '0 auto';
 
     const tierOptions = TALENT_TIERS.map(t => 
         `<option value="${t.id}" ${talent.tier === t.id ? 'selected' : ''}>${t.label} (${t.xpRange})</option>`
@@ -278,7 +283,7 @@ function showEditorModal(talent, isNew, mode) {
     const tierInfo = TALENT_TIERS.find(t => t.id === (talent.tier || 'minor')) || TALENT_TIERS[0];
 
     modal.innerHTML = `
-        <button class="modal-close" id="talent-editor-close">&times;</button>
+        <button class="btn btn-secondary editor-back" id="talent-editor-close">← Back</button>
         <h2>${isNew ? '➕ Add Talent' : '✏️ Edit Talent'}</h2>
         
         <!-- Guide Reference -->
@@ -404,7 +409,11 @@ function showEditorModal(talent, isNew, mode) {
     `;
 
     overlay.appendChild(modal);
-    document.body.appendChild(overlay);
+    const hostContainer = document.getElementById('app-content') || document.body;
+    hiddenSiblings = Array.from(hostContainer.children);
+    hiddenSiblings.forEach(ch => { ch.style.display = 'none'; });
+    hostContainer.appendChild(overlay);
+    window.scrollTo({ top: 0 });
 
     activeOverlay = overlay;
     activeModal = modal;
@@ -414,7 +423,6 @@ function showEditorModal(talent, isNew, mode) {
 
     document.getElementById('talent-editor-close')?.addEventListener('click', closeModal);
     document.getElementById('talent-editor-cancel')?.addEventListener('click', closeModal);
-    overlay.addEventListener('click', (e) => { if (e.target === overlay) closeModal(); });
     document.addEventListener('keydown', escapeHandler);
 
     // Delete handler
@@ -678,6 +686,11 @@ export function closeTalentEditor() {
 
     if (activeOverlay && activeOverlay.parentNode) {
         activeOverlay.parentNode.removeChild(activeOverlay);
+    }
+
+    if (hiddenSiblings) {
+        hiddenSiblings.forEach(ch => { ch.style.display = ''; });
+        hiddenSiblings = null;
     }
 
     activeOverlay = null;

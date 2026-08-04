@@ -708,32 +708,30 @@ function attachDocEvents() {
 // UPLOAD DIALOG
 // ============================================================
 
+let uploadHiddenSiblings = null;
+function closeUploadDialog(modal) {
+    modal.remove();
+    if (uploadHiddenSiblings) {
+        uploadHiddenSiblings.forEach(ch => { ch.style.display = ''; });
+        uploadHiddenSiblings = null;
+    }
+}
+
 function openUploadDialog() {
+    // Inline editor screen — not a pop-up. Takes over the page in place of
+    // whatever's currently shown.
     const modal = document.createElement('div');
+    modal.className = 'editor-screen-host';
     modal.style.cssText = `
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0,0,0,0.7);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        z-index: 10000;
-        animation: fadeIn 0.2s ease;
+        display: flex; align-items: center; justify-content: center;
+        padding: 1rem 0; animation: fadeIn 0.2s ease;
     `;
 
     const content = document.createElement('div');
+    content.className = 'editor-screen';
     content.style.cssText = `
-        background: var(--bg1);
-        padding: 2rem;
-        border-radius: var(--radius);
         max-width: 500px;
         width: 90%;
-        border: 1px solid var(--border);
-        max-height: 80vh;
-        overflow-y: auto;
     `;
 
     const typeOptions = Object.entries(DOC_TYPES).map(([id, type]) => {
@@ -771,7 +769,11 @@ function openUploadDialog() {
     `;
 
     modal.appendChild(content);
-    document.body.appendChild(modal);
+    const hostContainer = document.getElementById('app-content') || document.body;
+    uploadHiddenSiblings = Array.from(hostContainer.children);
+    uploadHiddenSiblings.forEach(ch => { ch.style.display = 'none'; });
+    hostContainer.appendChild(modal);
+    window.scrollTo({ top: 0 });
 
     if (!document.getElementById('upload-modal-styles')) {
         const style = document.createElement('style');
@@ -796,7 +798,7 @@ function openUploadDialog() {
     }
 
     const cancelBtn = content.querySelector('#upload-cancel-btn');
-    cancelBtn.addEventListener('click', () => modal.remove());
+    cancelBtn.addEventListener('click', () => closeUploadDialog(modal));
 
     const confirmBtn = content.querySelector('#upload-confirm-btn');
     confirmBtn.addEventListener('click', async () => {
@@ -866,7 +868,7 @@ function openUploadDialog() {
             const exists = allDocs.some(d => docsAreSame(d, doc));
             if (exists) {
                 showToast('A document with this file already exists.', 'warning');
-                modal.remove();
+                closeUploadDialog(modal);
                 return;
             }
 
@@ -874,7 +876,7 @@ function openUploadDialog() {
             saveUploadedDoc(doc);
             saveCache();
             refreshView();
-            modal.remove();
+            closeUploadDialog(modal);
             showToast(`📤 Uploaded "${title}" to ${typeInfo.label}`, 'success');
 
         } catch (err) {

@@ -921,19 +921,19 @@ function showToastWithHTML(html, type = 'info') {
         return;
     }
 
+    // A toast-style notice, anchored to a corner — not a full-screen pop-up
+    // with a backdrop blocking the rest of the page.
     const modal = document.createElement('div');
     modal.style.cssText = `
-        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-        background: rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center;
-        z-index: 9999;
+        position: fixed; bottom: 1rem; right: 1rem; z-index: 9999;
         animation: toastFadeIn 0.2s ease;
     `;
     const inner = document.createElement('div');
     inner.style.cssText = `
         background: var(--bg1); padding: 1.2rem; border-radius: var(--radius);
-        max-width: 420px; width: 90%; border: 1px solid var(--border);
+        max-width: 420px; width: 90vw; border: 1px solid var(--border);
         box-shadow: 0 8px 32px rgba(0,0,0,0.5);
-        max-height: 80vh; overflow-y: auto;
+        max-height: 60vh; overflow-y: auto;
     `;
     inner.innerHTML = html + `<br><button class="btn btn-xs btn-secondary" onclick="this.closest('div').parentElement.remove()">Close</button>`;
     modal.appendChild(inner);

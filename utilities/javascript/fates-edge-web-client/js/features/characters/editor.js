@@ -250,8 +250,8 @@ const editorState = {
     saved: false,
     initialized: false,
     modalElement: null,
+    hiddenSiblings: null,
     escListener: null,
-    overlayListener: null,
     saveListener: null,
     cancelListeners: []
 };
@@ -1005,40 +1005,24 @@ function createNewCharacter() {
 // ============================================================
 
 function createModal() {
+    // Inline editor panel — NOT a pop-up overlay. It's inserted directly into
+    // the page flow (see openEditor) in place of the character list, with an
+    // explicit "← Back" affordance instead of a floating close button.
     const modal = document.createElement('div');
     modal.id = 'charModal';
-    modal.className = 'modal-overlay';
+    modal.className = 'editor-screen char-editor-screen';
     modal.style.cssText = `
         display: none;
-        position: fixed;
-        top: 0;
-        left: 0;
+        max-width: 950px;
         width: 100%;
-        height: 100%;
-        background: rgba(0,0,0,0.8);
-        z-index: 9999;
-        align-items: center;
-        justify-content: center;
-        padding: 1rem;
+        margin: 0 auto;
     `;
     modal.innerHTML = `
-        <div class="modal-content" style="
-            background: var(--bg2);
-            border-radius: var(--radius);
-            max-width: 950px;
-            width: 100%;
-            max-height: 90vh;
-            overflow-y: auto;
-            padding: 1.5rem 2rem;
-            border: 1px solid var(--border);
-            position: relative;
-        ">
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;">
-                <h2 id="char-modal-title" style="margin:0;color:var(--gold);">Character Editor</h2>
-                <button id="charModalClose" style="background:none;border:none;color:var(--text2);font-size:1.5rem;cursor:pointer;padding:0.2rem 0.5rem;">✕</button>
-            </div>
-            <div id="char-editor-content"></div>
+        <button id="charModalClose" class="btn btn-secondary editor-back">← Back</button>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;">
+            <h2 id="char-modal-title" style="margin:0;color:var(--gold);">Character Editor</h2>
         </div>
+        <div id="char-editor-content"></div>
     `;
     return modal;
 }
@@ -1359,7 +1343,12 @@ export async function openEditor(id) {
     initEditor();
 
     const modal = createModal();
-    document.body.appendChild(modal);
+    const hostContainer = document.getElementById('app-content') || document.body;
+    // Hide the sibling content (e.g. the character list) instead of floating
+    // an overlay above it — the editor takes over the view in place.
+    editorState.hiddenSiblings = Array.from(hostContainer.children);
+    editorState.hiddenSiblings.forEach(ch => { ch.dataset.ceHidden = '1'; ch.style.display = 'none'; });
+    hostContainer.appendChild(modal);
 
     const title = document.getElementById('char-modal-title');
     const content = document.getElementById('char-editor-content');
@@ -1409,8 +1398,9 @@ export async function openEditor(id) {
         return;
     }
     content.innerHTML = html;
-    modal.style.display = 'flex';
-    document.body.classList.add('modal-open');
+    modal.style.display = 'block';
+    hostContainer.scrollTop = 0;
+    window.scrollTo({ top: 0 });
 
     attachEditorEvents();
     recalculateXpBudget();
@@ -1434,7 +1424,15 @@ export function closeEditor() {
 
     const modal = document.getElementById('charModal');
     if (modal) modal.remove();
-    document.body.classList.remove('modal-open');
+
+    // Restore whatever content the editor hid (e.g. the character list)
+    if (editorState.hiddenSiblings) {
+        editorState.hiddenSiblings.forEach(ch => {
+            if (ch.dataset) delete ch.dataset.ceHidden;
+            ch.style.display = '';
+        });
+        editorState.hiddenSiblings = null;
+    }
 
     if (editorState.escListener) {
         document.removeEventListener('keydown', editorState.escListener);
@@ -1648,13 +1646,6 @@ function attachEditorEvents() {
             btn.addEventListener('click', handler);
             editorState.cancelListeners.push({ btn, handler });
         }
-    }
-
-    const modal = document.getElementById('charModal');
-    if (modal) {
-        const handler = (e) => { if (e.target === modal) closeEditor(); };
-        modal.addEventListener('click', handler);
-        editorState.overlayListener = handler;
     }
 
     if (editorState.escListener) {

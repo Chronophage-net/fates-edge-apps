@@ -1,6 +1,6 @@
 [![Build Apps and Packages](https://github.com/Chronophage-net/fates-edge-apps/actions/workflows/build-apps-and-packages.yml/badge.svg)](https://github.com/Chronophage-net/fates-edge-apps/actions/workflows/build-apps-and-packages.yml)
 
-# Fate's Edge Toolkit v4.1.2b – Complete VTT Ecosystem
+# Fate's Edge Toolkit v4.3a – Complete VTT Ecosystem
 
 > A modular, self-contained toolkit for running Fate's Edge TTRPG campaigns, with real‑time collaboration, VTT integrations, Game Master management, and a full in-browser magic/monastic-path system.
 
@@ -10,14 +10,14 @@
 [![Node.js](https://img.shields.io/badge/Node.js-24.x-green.svg)](https://nodejs.org/)
 [![Foundry VTT](https://img.shields.io/badge/Foundry-VTT-orange)](https://foundryvtt.com/)
 [![Discord](https://img.shields.io/badge/Discord-Bot-5865F2)](https://discord.com/)
-[![Version](https://img.shields.io/badge/version-4.1.2b-blue)](https://github.com/nicholasagaspar/fates-edge-apps)
+[![Version](https://img.shields.io/badge/version-4.3a-blue)](https://github.com/nicholasagaspar/fates-edge-apps)
 
 ---
 
 ## 📖 Table of Contents
 
 - [Overview](#-overview)
-- [What's New in v4.1.2b](#-whats-new-in-v412b)
+- [What's New in v4.3a](#-whats-new-in-v43a)
 - [Features](#-features)
 - [Quick Start](#-quick-start)
 - [Architecture](#-architecture)
@@ -40,14 +40,15 @@ The toolkit includes **real‑time VTT features** via a WebSocket/Socket.io serv
 
 ---
 
-## 🆕 What's New in v4.1.2b
+## 🆕 What's New in v4.3a
 
-- **🕸️ Kon'reh** – A full original 8×8 strategy board game, playable two-player local or vs. a computer opponent with six distinct AI "Schools," each with its own evaluation style (material, mobility, aggression, board control). Includes a live Coach Mode that suggests and explains moves.
-- **🧭 Travel Planner** – A new feature module for planning overland routes and travel time across the regional maps.
-- **🛠️ GM Tools** – GM-facing utilities split out into their own dedicated tab, separate from the general VTT view.
-- **🔮 Spellcraft & Magic System** – A unified interface covering every magic path in one place: the TAGS Calculator (Free Caster), Rites (Runekeeper/Invoker), Cantor songs & corruption, Witchcraft hedge gifts & rituals, Summoning & the bestiary, a Spellbook, and character Trackers (Obligation/Corruption/Leash/Mental Strain/Shadow-Shame-Identity).
-- **🥋 Monastic Traditions** – Monk is no longer gated behind a magic path; any character can walk a monastic path by investing XP into Foundation → Working → Signature talents, tied to patron-defined traditions (breath states, techniques, and a scaling corruption track).
-- **🩹 Fixes** – Corrected async rendering in the Spellcraft tab system (Calculator/Cantor/Summoning could previously render blank on first load), removed duplicate tab-click event wiring, and fixed a stale-reference bug in the Monk module's refresh button.
+- **🔐 Account Authentication** – The campaign server now supports real account registration and login (`/api/auth/register`, `/api/auth/login`) with bcrypt password hashing and JWT-backed sessions, alongside the existing API-key and playtester-password gates. See `utilities/javascript/fates-edge-socket-server/server/auth.js`.
+- **🐍 Redone Python Client** – The Python CLI (`fates-edge-client`, now v5.0.0) has been rebuilt as a proper structured package (`cli/`, `rest_client.py`, `ws_client.py`, `shell.py`, `deck.py`, `models.py`, `store.py`) instead of a flat script, with clearer separation between REST and WebSocket transport.
+- **🕹️ VTT Bridge & Mod Updates** – Refreshed Foundry VTT bridge and Roll20 API script, with fixes to region/deck sync and clearer setup docs.
+- **🖥️ No More Pop-Up Modals** – Every feature that previously used a floating pop-up modal (factions, characters, encounters, spellcraft, wiki, whiteboard, timers, decks, Kon'reh, and more) now opens as a real inline "editor screen" that takes over the view in place, with a `← Back` button — no more backdrop dialogs to dismiss.
+- **📖 Region & Patron Content Pass** – Rebuilt several regions (Theona, Linn, Vilikari, Black Banners, The Ways Between) from their authored source material into the same rich, structured schema used across the rest of the map, and cleaned up stray leftover data files from an earlier broken conversion pass.
+- **🩹 Fixes** – Region descriptions no longer render flattened/dimmed in the Decks region browser and Crown Spread (a formatting/color regression), region and patron manifests re-synced across all consumer packages, and various smaller data-consistency fixes.
+- **🗑️ Removed: AI GM Bot** – The standalone AI Game Master bot has been removed from the ecosystem. It is no longer part of the toolkit, quick start, or integrations.
 
 > **Note on Session Logging & Voice Recording:** an earlier release cycle documented automatic session logging, voice recording, and SRT subtitle generation as shipped features. They were never actually implemented in this codebase and have been moved to [Roadmap](#-roadmap) rather than listed as available.
 
@@ -96,7 +97,7 @@ The toolkit includes **real‑time VTT features** via a WebSocket/Socket.io serv
 - **Roll20 API** — Sync chat, dice, characters, deck, and GM management
 - **Avrae Module** — Use Fate's Edge commands directly in Avrae (D&D bot) with `!fe` commands
 - **Terminal Client** — MUD‑style CLI for testing and administration
-- **Python CLI** — Full‑featured command‑line client
+- **Python CLI** — Full‑featured command‑line client, rebuilt as a structured package (v5.0.0)
 
 ---
 
@@ -428,7 +429,16 @@ Licensed under **CC BY-NC-SA 4.0**. See [LICENSE.srd](LICENSE.srd).
 
 ## 📋 Version History
 
-### v4.1.2b (Current)
+### v4.3a (Current)
+- **Added** Account authentication on the campaign server — register/login with bcrypt-hashed passwords and JWT sessions, alongside the existing API-key and playtester-password gates
+- **Redone** Python CLI client, now a structured package (`cli/`, `rest_client.py`, `ws_client.py`, `shell.py`) at v5.0.0
+- **Updated** Foundry VTT bridge and Roll20 API mod integrations
+- **Changed** All feature pop-up modals replaced app-wide with inline "editor screen" views (real in-place navigation with a `← Back` button instead of floating dialogs)
+- **Rebuilt** Theona, Linn, Vilikari, Black Banners, and The Ways Between region data from authored source material into the standard rich schema
+- **Fixed** Flattened/dimmed region description rendering in the Decks region browser and Crown Spread
+- **Removed** The standalone AI GM Bot — no longer part of the toolkit or its integrations
+
+### v4.1.2b
 - **Added** Kon'reh, an original strategy board game with six AI "Schools" and Coach Mode
 - **Added** Travel Planner module
 - **Added** GM Tools as its own dedicated tab

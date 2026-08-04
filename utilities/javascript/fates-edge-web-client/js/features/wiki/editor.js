@@ -10,6 +10,7 @@ import { showToast } from '../../components/Toast.js';
 
 let modalOverlay = null;
 let currentEntryId = null;
+let hiddenSiblings = null;
 
 // ============================================================
 // OPEN EDITOR
@@ -50,20 +51,21 @@ export function openEditor(id) {
 function createEditorModal(entry, isNew) {
     removeEditorModal();
 
+    // Inline editor screen — not a pop-up. Takes over the page in place of
+    // whatever's currently shown.
     const overlay = document.createElement('div');
-    overlay.className = 'modal-overlay open';
+    overlay.className = 'editor-screen-host';
     overlay.id = 'wiki-editor-modal';
-    overlay.style.display = 'flex !important';
 
     const modal = document.createElement('div');
-    modal.className = 'modal';
+    modal.className = 'editor-screen';
     modal.style.maxWidth = '800px';
-    modal.style.width = '95%';
+    modal.style.margin = '0 auto';
 
     const titleText = isNew ? '📝 Create Wiki Entry' : `✏️ Edit: ${entry.title}`;
 
     modal.innerHTML = `
-        <button class="close" id="wiki-editor-close">&times;</button>
+        <button class="btn btn-secondary editor-back" id="wiki-editor-close">← Back</button>
         <h2>${titleText}</h2>
 
         <form id="wiki-editor-form">
@@ -141,7 +143,11 @@ function createEditorModal(entry, isNew) {
     `;
 
     overlay.appendChild(modal);
-    document.body.appendChild(overlay);
+    const hostContainer = document.getElementById('app-content') || document.body;
+    hiddenSiblings = Array.from(hostContainer.children);
+    hiddenSiblings.forEach(ch => { ch.style.display = 'none'; });
+    hostContainer.appendChild(overlay);
+    window.scrollTo({ top: 0 });
     modalOverlay = overlay;
 
     if (!isNew) {
@@ -169,10 +175,6 @@ function setupEditorEvents(entry, isNew) {
 
     closeBtn.addEventListener('click', closeModal);
     cancelBtn.addEventListener('click', closeModal);
-
-    modalOverlay.addEventListener('click', (e) => {
-        if (e.target === modalOverlay) closeModal();
-    });
 
     // Preview toggle
     previewToggle.addEventListener('change', () => {
@@ -381,6 +383,10 @@ function removeEditorModal() {
     if (modalOverlay && modalOverlay.parentNode) {
         modalOverlay.parentNode.removeChild(modalOverlay);
         modalOverlay = null;
+    }
+    if (hiddenSiblings) {
+        hiddenSiblings.forEach(ch => { ch.style.display = ''; });
+        hiddenSiblings = null;
     }
     currentEntryId = null;
 }

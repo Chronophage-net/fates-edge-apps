@@ -97,11 +97,14 @@ export function openKonrehModalConnected(transport, options = {}) {
   function showConnectingIndicator() {
     connectingEl = document.createElement('div');
     connectingEl.id = 'konreh-connecting';
+    // Small corner indicator — not a full-screen pop-up — while we wait for
+    // the remote peer's state sync.
     connectingEl.style.cssText = `
-      position: fixed; inset: 0; background: rgba(6,6,10,0.88); display: flex;
-      align-items: center; justify-content: center; z-index: 10000;
-      color: #e8e6df; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-      font-size: 15px;
+      position: fixed; bottom: 1rem; right: 1rem; z-index: 10000;
+      background: #1b1c26; border: 1px solid #d4af37; border-radius: 10px;
+      padding: 10px 16px; color: #e8e6df;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-size: 14px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
     `;
     connectingEl.textContent = 'Connecting to game…';
     document.body.appendChild(connectingEl);

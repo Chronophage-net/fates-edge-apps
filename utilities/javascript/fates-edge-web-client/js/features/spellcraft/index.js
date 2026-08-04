@@ -386,13 +386,12 @@ function ensureStyles() {
             color: var(--text);
         }
 
-        /* ─── Magic Paths Tour ─────────────────────────────────── */
+        /* ─── Magic Paths Tour (inline screen, not a pop-up) ──────── */
         .magic-tour-overlay {
-            position: fixed; inset: 0; z-index: 100000;
-            background: rgba(0,0,0,0.88); backdrop-filter: blur(12px);
             display: flex; align-items: center; justify-content: center;
             animation: magicTourFadeIn 0.4s ease;
-            padding: 1rem;
+            padding: 1rem 0;
+            width: 100%;
         }
         @keyframes magicTourFadeIn {
             from { opacity: 0; transform: scale(0.96); }
@@ -619,10 +618,16 @@ export function showMagicTour() {
     renderTourSlide(char);
 }
 
+let tourHiddenSiblings = null;
+
 function closeTour() {
     tourActive = false;
     const overlay = document.getElementById('magic-tour-overlay');
     if (overlay) overlay.remove();
+    if (tourHiddenSiblings) {
+        tourHiddenSiblings.forEach(ch => { ch.style.display = ''; });
+        tourHiddenSiblings = null;
+    }
     // Refocus on the main spellcraft container
     if (container) render(container);
 }
@@ -633,7 +638,11 @@ function renderTourSlide(char) {
         overlay = document.createElement('div');
         overlay.id = 'magic-tour-overlay';
         overlay.className = 'magic-tour-overlay';
-        document.body.appendChild(overlay);
+        const hostContainer = document.getElementById('app-content') || document.body;
+        tourHiddenSiblings = Array.from(hostContainer.children);
+        tourHiddenSiblings.forEach(ch => { ch.style.display = 'none'; });
+        hostContainer.appendChild(overlay);
+        window.scrollTo({ top: 0 });
     }
 
     const pathId = TOUR_PATH_IDS[tourSlideIndex];
@@ -720,14 +729,6 @@ function renderTourSlide(char) {
     overlay.querySelector('#tour-skip')?.addEventListener('click', () => {
         setMagicTourSeen(true);
         closeTour();
-    });
-
-    // Close on overlay background click
-    overlay.addEventListener('click', (e) => {
-        if (e.target === overlay) {
-            setMagicTourSeen(true);
-            closeTour();
-        }
     });
 }
 

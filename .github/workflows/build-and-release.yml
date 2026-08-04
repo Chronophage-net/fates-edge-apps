@@ -37,7 +37,7 @@ jobs:
       - name: Determine release version
         id: version
         run: |
-          if [[ "${{ github.ref_type }}" == "tag" && "${{ github.ref_name }}" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+          if [[ "${{ github.ref_type }}" == "tag" && "${{ github.ref_name }}" =~ ^v[0-9]+\.[0-9]+(\.[0-9]+)?[a-z]?$ ]]; then
             TAG="${{ github.ref_name }}"
             echo "release_tag=${TAG}" >> $GITHUB_OUTPUT
             echo "release_name=${TAG}" >> $GITHUB_OUTPUT
