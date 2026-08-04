@@ -159,7 +159,19 @@ class FatesEdgeWsClient:
         if not self.connected:
             return False
         try:
-            await self.sio.emit("join-room", [self.room_code, self.client_data])
+            # The server's join-room handler (socketio-handlers.js)
+            # destructures a single object -- { roomCode, playerName,
+            # ... } -- not a positional [roomCode, clientData] array.
+            # Emitting a list would arrive server-side as two separate
+            # positional arguments; since the handler only reads its
+            # first parameter, `data` would end up being the bare
+            # room-code string with no `.roomCode` field, always failing
+            # as "Invalid room code". Matches the shape
+            # js/core/websocket.js's joinRoom() uses.
+            await self.sio.emit("join-room", {
+                "roomCode": self.room_code,
+                "playerName": self.client_data.get("name", "CLI Client"),
+            })
             logger.info(f"Joined room {self.room_code}")
             return True
         except Exception as e:

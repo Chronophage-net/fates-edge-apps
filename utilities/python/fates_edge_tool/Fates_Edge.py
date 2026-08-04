@@ -3,7 +3,38 @@ from tkinter import ttk, messagebox, simpledialog
 import json
 import os
 import random
+import queue
+import threading
 from datetime import datetime
+
+# ---- Optional networking deps -------------------------------------
+# `requests` powers REST sync (campaign snapshot upload/download);
+# `python-socketio` powers the live WebSocket connection (character
+# push, chat/roll broadcast). Both are soft dependencies: the tool
+# still runs fully offline if neither is installed, it just disables
+# the Server tab's corresponding buttons and says why.
+try:
+    import requests
+    REQUESTS_AVAILABLE = True
+except ImportError:
+    REQUESTS_AVAILABLE = False
+
+try:
+    import socketio
+    SOCKETIO_AVAILABLE = True
+except ImportError:
+    SOCKETIO_AVAILABLE = False
+
+DEFAULT_SERVER_URL = "http://localhost:10000"
+
+DEFAULT_PREFERENCES = {
+    "theme": "dark",
+    "autosave": True,
+    "server_url": DEFAULT_SERVER_URL,
+    "room_code": "",
+    "api_key": "",
+    "broadcast_rolls": False,
+}
 
 # -------------------------------
 # Data Models
@@ -87,6 +118,112 @@ def attr_total_cost(rating):
     # sum_{i=2..rating} i*3 = 3*(sum_{i=2..rating} i) = 3*((rating*(rating+1)//2) - 1)
     return 3 * ((rating * (rating + 1) // 2) - 1)
 
+# -------------------------------
+# Server integration helpers
+# -------------------------------
+
+def player_data_to_room_character(player_data):
+    """Map this tool's local (lowercase) character schema onto the shape
+    the socket server's live room.characters dict expects: capitalized
+    attribute/skill keys matching server/room.js's ALL_SKILLS /
+    DEFAULT_ATTRIBUTES exactly (Melee, Ranged, Unarmed, ... / Body, Wits,
+    Spirit, Presence). The server just shallow-merges whatever character
+    object it's given, so extra fields (harm, fatigue, boons, ...) ride
+    along safely without needing a stricter contract."""
+    identity = player_data.get("identity", {})
+    attrs = player_data.get("attributes", {})
+    skills = player_data.get("skills", {})
+    resources = player_data.get("resources", {})
+
+    return {
+        "name": identity.get("name") or "Unnamed",
+        "heritage": identity.get("heritage", ""),
+        "patron": identity.get("patron", ""),
+        "tier": identity.get("tier", 1),
+        "xp": identity.get("xp", 0),
+        "attributes": {
+            "Body": attrs.get("body", 1),
+            "Wits": attrs.get("wits", 1),
+            "Spirit": attrs.get("spirit", 1),
+            "Presence": attrs.get("presence", 1),
+        },
+        "skills": {k.capitalize(): v for k, v in skills.items()},
+        "harm": resources.get("harm", 0),
+        "fatigue": resources.get("fatigue", 0),
+        "boons": resources.get("boons", 0),
+        "obligation": resources.get("obligation", 0),
+        "corruption": resources.get("corruption", 0),
+        "leash": resources.get("leash", 0),
+    }
+
+
+class RoomConnection:
+    """Thin wrapper around a synchronous python-socketio Client. The sync
+    client (as opposed to the AsyncClient used by fates_edge_client, this
+    tool's CLI sibling) runs its own network thread internally, which is
+    exactly what a Tkinter app needs -- no asyncio event loop to juggle
+    against Tkinter's own mainloop. Incoming server events are pushed
+    onto a thread-safe queue; the Tkinter app drains it periodically via
+    `root.after(...)` so all UI updates still happen on the main thread."""
+
+    RELAY_EVENTS = ('chat-message', 'roll-dice', 'roll-result', 'state-updated',
+                     'deck-drawn', 'deck-shuffled', 'crown-spread', 'error')
+
+    def __init__(self, event_queue):
+        self.sio = socketio.Client(reconnection=True, reconnection_attempts=5)
+        self.event_queue = event_queue
+        self.room_code = None
+        self.connected = False
+
+        @self.sio.event
+        def connect():
+            self.connected = True
+            self.event_queue.put(('_status', 'Connected'))
+
+        @self.sio.event
+        def disconnect():
+            self.connected = False
+            self.event_queue.put(('_status', 'Disconnected'))
+
+        @self.sio.event
+        def connect_error(data):
+            self.event_queue.put(('_status', f'Connection failed: {data}'))
+
+        for event_name in self.RELAY_EVENTS:
+            self.sio.on(event_name, self._make_relay_handler(event_name))
+
+    def _make_relay_handler(self, event_name):
+        def handler(data=None):
+            self.event_queue.put((event_name, data))
+        return handler
+
+    def connect(self, server_url, room_code, api_key, client_name="Fate's Edge Tool"):
+        headers = {"X-API-Key": api_key} if api_key else {}
+        self.sio.connect(server_url, headers=headers, wait_timeout=10)
+        self.room_code = room_code
+        # NOTE: the server's join-room handler (socketio-handlers.js)
+        # destructures a single object -- { roomCode, playerName, ... }
+        # -- not a positional [roomCode, clientData] array. Emitting a
+        # list here would arrive server-side as two separate positional
+        # arguments, and since the handler only reads its first
+        # parameter, `data` would end up being the bare room-code string
+        # with no `.roomCode` field, always failing as "Invalid room
+        # code". Matches the shape js/core/websocket.js's joinRoom() uses.
+        self.sio.emit('join-room', {"roomCode": room_code, "playerName": client_name})
+
+    def disconnect(self):
+        if self.sio.connected:
+            try:
+                self.sio.disconnect()
+            except Exception:
+                pass
+        self.connected = False
+
+    def emit(self, event, data):
+        if self.connected:
+            self.sio.emit(event, data)
+
+
 def skill_total_cost(level):
     # Total cost to raise from 0 to level: sum_{i=1..level} i*2 = 2*(level*(level+1)//2)
     return level * (level + 1)
@@ -104,11 +241,18 @@ class FateEdgeApp:
         self.player_file = "fate_edge_player.json"
         self.gm_file = "fate_edge_gm.json"
         self.talent_file = "talents.json"
+        self.preferences_file = "preferences.json"
 
         self.load_data()
         self.load_talents()
+        self.load_preferences()
 
         self.roll_history = []
+
+        # ---- Server connection state ----
+        self.room = None                    # RoomConnection instance, once connected
+        self.event_queue = queue.Queue()    # thread-safe: network thread -> Tk main thread
+        self.server_log_widget = None
 
         self.notebook = ttk.Notebook(root)
         self.notebook.pack(fill='both', expand=True, padx=10, pady=10)
@@ -116,10 +260,12 @@ class FateEdgeApp:
         self.create_character_tab()
         self.create_dice_tab()
         self.create_gm_tab()
+        self.create_server_tab()
         self.create_history_tab()
 
         root.protocol("WM_DELETE_WINDOW", self.on_close)
         self.refresh_all_display()
+        self._poll_event_queue()
 
     def load_data(self):
         if os.path.exists(self.player_file):
@@ -186,9 +332,41 @@ class FateEdgeApp:
             except:
                 pass
 
+    def load_preferences(self):
+        """Load saved server connection settings (URL/room/API key) and
+        UI preferences. The API key is stored in plaintext locally, same
+        as this project's other clients (e.g. the CLI's ~/.fates_edge/
+        data.json) -- set FATES_EDGE_API_KEY in the environment instead
+        if you'd rather not have it on disk; that takes precedence."""
+        self.preferences = DEFAULT_PREFERENCES.copy()
+        if os.path.exists(self.preferences_file):
+            try:
+                with open(self.preferences_file, 'r') as f:
+                    saved = json.load(f)
+                for key in DEFAULT_PREFERENCES:
+                    if key in saved:
+                        self.preferences[key] = saved[key]
+            except Exception as e:
+                print(f"Error loading preferences: {e}")
+        env_key = os.environ.get("FATES_EDGE_API_KEY")
+        if env_key:
+            self.preferences["api_key"] = env_key
+
+    def save_preferences(self):
+        try:
+            with open(self.preferences_file, 'w') as f:
+                json.dump(self.preferences, f, indent=2)
+        except Exception as e:
+            print(f"Error saving preferences: {e}")
+
     def on_close(self):
         self.save_player_data()
         self.save_gm_data()
+        if hasattr(self, 'broadcast_rolls_var'):
+            self.preferences["broadcast_rolls"] = self.broadcast_rolls_var.get()
+        self.save_preferences()
+        if self.room:
+            self.room.disconnect()
         self.root.destroy()
 
     def open_builder_wizard(self):
@@ -1140,9 +1318,10 @@ class FateEdgeApp:
         self.dice_result_text.delete('1.0', tk.END)
         self.dice_result_text.insert('1.0', result)
 
+        character_name = self.player_data["identity"]["name"] or "Unnamed"
         self.roll_history.append({
             "timestamp": datetime.now().strftime("%H:%M:%S"),
-            "character": self.player_data["identity"]["name"] or "Unnamed",
+            "character": character_name,
             "pool": pool,
             "dice": dice,
             "successes": successes,
@@ -1152,6 +1331,16 @@ class FateEdgeApp:
             "position": position
         })
         self.update_history_display()
+
+        if getattr(self, 'broadcast_rolls_var', None) and self.broadcast_rolls_var.get() \
+                and self.room and self.room.connected:
+            self.room.emit('roll-dice', {
+                "sender": character_name,
+                "expr": f"{pool}d10 vs DV{dv} ({position})",
+                "result": f"{successes} successes" + (f", {story_beats} SB" if story_beats else ""),
+                "outcome": outcome,
+                "dice": dice,
+            })
 
     def do_armor_convert(self):
         harm_in = self.armor_harm_var.get()
@@ -1661,6 +1850,249 @@ class FateEdgeApp:
 
         self.gm_notes_text.delete('1.0', tk.END)
         self.gm_notes_text.insert('1.0', self.gm_data["notes"])
+
+    # -------------------------------
+    # Server Tab
+    # -------------------------------
+    def create_server_tab(self):
+        server_frame = ttk.Frame(self.notebook)
+        self.notebook.add(server_frame, text="Server")
+
+        conn_frame = ttk.LabelFrame(server_frame, text="Connection")
+        conn_frame.pack(fill='x', padx=10, pady=5)
+
+        ttk.Label(conn_frame, text="Server URL:").grid(row=0, column=0, sticky='e', padx=5, pady=3)
+        self.server_url_var = tk.StringVar(value=self.preferences.get("server_url", DEFAULT_SERVER_URL))
+        ttk.Entry(conn_frame, textvariable=self.server_url_var, width=30).grid(row=0, column=1, padx=5, pady=3)
+
+        ttk.Label(conn_frame, text="Room Code:").grid(row=0, column=2, sticky='e', padx=5, pady=3)
+        self.room_code_var = tk.StringVar(value=self.preferences.get("room_code", ""))
+        ttk.Entry(conn_frame, textvariable=self.room_code_var, width=12).grid(row=0, column=3, padx=5, pady=3)
+
+        ttk.Label(conn_frame, text="API Key:").grid(row=1, column=0, sticky='e', padx=5, pady=3)
+        self.api_key_var = tk.StringVar(value=self.preferences.get("api_key", ""))
+        ttk.Entry(conn_frame, textvariable=self.api_key_var, width=30, show='*').grid(row=1, column=1, padx=5, pady=3)
+
+        self.server_status_var = tk.StringVar(value="Not connected")
+        ttk.Label(conn_frame, textvariable=self.server_status_var, foreground="#555").grid(
+            row=1, column=2, columnspan=2, sticky='w', padx=5, pady=3)
+
+        btn_row = ttk.Frame(conn_frame)
+        btn_row.grid(row=2, column=0, columnspan=4, pady=5)
+        self.connect_btn = ttk.Button(btn_row, text="Connect", command=self.connect_to_room)
+        self.connect_btn.pack(side='left', padx=5)
+        self.disconnect_btn = ttk.Button(btn_row, text="Disconnect", command=self.disconnect_from_room, state="disabled")
+        self.disconnect_btn.pack(side='left', padx=5)
+
+        if not SOCKETIO_AVAILABLE:
+            ttk.Label(conn_frame,
+                      text="⚠ python-socketio is not installed -- live connection is disabled. "
+                           "Run: pip install \"python-socketio[client]\"",
+                      foreground="#a00").grid(row=3, column=0, columnspan=4, sticky='w', padx=5, pady=3)
+            self.connect_btn.config(state="disabled")
+
+        self.broadcast_rolls_var = tk.BooleanVar(value=self.preferences.get("broadcast_rolls", False))
+        ttk.Checkbutton(conn_frame, text="Broadcast my dice rolls to the room",
+                         variable=self.broadcast_rolls_var).grid(row=4, column=0, columnspan=4, sticky='w', padx=5, pady=3)
+
+        char_frame = ttk.LabelFrame(server_frame, text="Character Sync")
+        char_frame.pack(fill='x', padx=10, pady=5)
+        ttk.Button(char_frame, text="Push My Character to Room", command=self.push_character_to_room).pack(
+            side='left', padx=5, pady=5)
+        ttk.Label(char_frame, text="(sends name/attributes/skills/resources into the room's live character list)",
+                  foreground="#555").pack(side='left', padx=5)
+
+        snap_frame = ttk.LabelFrame(server_frame, text="Campaign Snapshot (REST)")
+        snap_frame.pack(fill='x', padx=10, pady=5)
+        if not REQUESTS_AVAILABLE:
+            ttk.Label(snap_frame, text="⚠ requests is not installed -- snapshot sync is disabled. Run: pip install requests",
+                      foreground="#a00").pack(anchor='w', padx=5, pady=3)
+        else:
+            ttk.Button(snap_frame, text="Upload Snapshot", command=self.upload_snapshot).pack(side='left', padx=5, pady=5)
+            ttk.Button(snap_frame, text="Download Snapshot", command=self.download_snapshot).pack(side='left', padx=5, pady=5)
+            ttk.Label(snap_frame, text="Uploads/downloads this tool's local player+GM data as one campaign snapshot.",
+                      foreground="#555").pack(side='left', padx=5)
+
+        log_frame = ttk.LabelFrame(server_frame, text="Live Activity")
+        log_frame.pack(fill='both', expand=True, padx=10, pady=5)
+        self.server_log_widget = tk.Text(log_frame, height=14, state='disabled', wrap='word')
+        self.server_log_widget.pack(fill='both', expand=True, padx=5, pady=5)
+
+    def _log_server_event(self, text):
+        if not self.server_log_widget:
+            return
+        self.server_log_widget.config(state='normal')
+        self.server_log_widget.insert('end', f"[{datetime.now().strftime('%H:%M:%S')}] {text}\n")
+        self.server_log_widget.see('end')
+        self.server_log_widget.config(state='disabled')
+
+    def _poll_event_queue(self):
+        """Drain events pushed by the background network thread onto the
+        Tk main thread. Runs continuously via root.after -- this is the
+        one safe way to move data from python-socketio's own thread into
+        Tkinter widgets, which are not thread-safe to touch directly."""
+        try:
+            while True:
+                event_name, data = self.event_queue.get_nowait()
+                self._handle_server_event(event_name, data)
+        except queue.Empty:
+            pass
+        self.root.after(150, self._poll_event_queue)
+
+    def _handle_server_event(self, event_name, data):
+        if event_name == '_status':
+            self.server_status_var.set(data)
+            connected = (self.room is not None and self.room.connected)
+            self.connect_btn.config(state="disabled" if connected else ("normal" if SOCKETIO_AVAILABLE else "disabled"))
+            self.disconnect_btn.config(state="normal" if connected else "disabled")
+            self._log_server_event(data)
+            return
+
+        if event_name == 'chat-message':
+            sender = (data or {}).get('sender', 'Unknown')
+            text = (data or {}).get('text', '')
+            self._log_server_event(f"[CHAT] {sender}: {text}")
+        elif event_name in ('roll-dice', 'roll-result'):
+            sender = (data or {}).get('sender', 'Unknown')
+            self._log_server_event(f"[ROLL] {sender}: {data}")
+        elif event_name == 'deck-drawn':
+            region = (data or {}).get('region', 'Unknown')
+            cards = (data or {}).get('cards', [])
+            self._log_server_event(f"[DECK] {len(cards)} card(s) drawn from {region}")
+        elif event_name == 'crown-spread':
+            self._log_server_event("[CROWN] Crown Spread performed")
+        elif event_name == 'state-updated':
+            chars = (data or {}).get('characters')
+            if chars:
+                self._log_server_event(f"[SYNC] Room character list updated ({len(chars)} character(s))")
+        elif event_name == 'error':
+            self._log_server_event(f"[ERROR] {data}")
+
+    def connect_to_room(self):
+        if not SOCKETIO_AVAILABLE:
+            messagebox.showerror("Missing Dependency",
+                                  "python-socketio is not installed. Run:\n\npip install \"python-socketio[client]\"")
+            return
+        server_url = self.server_url_var.get().strip()
+        room_code = self.room_code_var.get().strip()
+        api_key = self.api_key_var.get().strip()
+        if not room_code:
+            messagebox.showwarning("Room Code Required", "Enter a room code to connect.")
+            return
+
+        self.preferences["server_url"] = server_url
+        self.preferences["room_code"] = room_code
+        self.preferences["api_key"] = api_key
+        self.save_preferences()
+
+        self.server_status_var.set("Connecting...")
+        self.connect_btn.config(state="disabled")
+        char_name = self.player_data.get("identity", {}).get("name") or "Fate's Edge Tool"
+
+        def worker():
+            room = RoomConnection(self.event_queue)
+            try:
+                room.connect(server_url, room_code, api_key, client_name=char_name)
+                self.room = room
+                self.event_queue.put(('_status', f"Connected to room {room_code}"))
+            except Exception as e:
+                self.event_queue.put(('_status', f"Connection failed: {e}"))
+
+        threading.Thread(target=worker, daemon=True).start()
+
+    def disconnect_from_room(self):
+        if self.room:
+            self.room.disconnect()
+            self.room = None
+        self.server_status_var.set("Not connected")
+        self.connect_btn.config(state="normal" if SOCKETIO_AVAILABLE else "disabled")
+        self.disconnect_btn.config(state="disabled")
+        self._log_server_event("Disconnected.")
+
+    def push_character_to_room(self):
+        if not self.room or not self.room.connected:
+            messagebox.showwarning("Not Connected", "Connect to a room first (Server tab).")
+            return
+        payload = player_data_to_room_character(self.player_data)
+        self.room.emit('state-updated', {'characters': [payload]})
+        self._log_server_event(f"[SYNC] Pushed character '{payload['name']}' to the room.")
+
+    def _snapshot_payload(self):
+        """Bundle local player+GM data into one blob for the campaign
+        auto-save REST endpoint -- the same shape/route the CLI client's
+        `server --sync` command uses, so a campaign can be picked up
+        interchangeably between this tool and the CLI."""
+        return {
+            "player": self.player_data,
+            "gm": self.gm_data,
+            "version": 1,
+        }
+
+    def upload_snapshot(self):
+        if not REQUESTS_AVAILABLE:
+            return
+        room_code = self.room_code_var.get().strip()
+        server_url = self.server_url_var.get().strip()
+        api_key = self.api_key_var.get().strip()
+        if not room_code:
+            messagebox.showwarning("Room Code Required", "Enter a room code to upload to.")
+            return
+
+        headers = {"X-API-Key": api_key} if api_key else {}
+        url = f"{server_url.rstrip('/')}/api/rooms/{room_code}/campaigns/auto-save"
+
+        def worker():
+            try:
+                resp = requests.post(url, json=self._snapshot_payload(), headers=headers, timeout=10)
+                resp.raise_for_status()
+                self.event_queue.put(('_status', f"Snapshot uploaded to room {room_code}."))
+            except Exception as e:
+                self.event_queue.put(('_status', f"Upload failed: {e}"))
+
+        threading.Thread(target=worker, daemon=True).start()
+
+    def download_snapshot(self):
+        if not REQUESTS_AVAILABLE:
+            return
+        room_code = self.room_code_var.get().strip()
+        server_url = self.server_url_var.get().strip()
+        api_key = self.api_key_var.get().strip()
+        if not room_code:
+            messagebox.showwarning("Room Code Required", "Enter a room code to download from.")
+            return
+        if not messagebox.askyesno("Overwrite Local Data",
+                                    "This replaces your local player and GM data with the room's saved snapshot. Continue?"):
+            return
+
+        headers = {"X-API-Key": api_key} if api_key else {}
+        url = f"{server_url.rstrip('/')}/api/rooms/{room_code}/campaigns/auto-save"
+
+        def worker():
+            try:
+                resp = requests.get(url, headers=headers, timeout=10)
+                resp.raise_for_status()
+                data = resp.json()
+                self.root.after(0, lambda: self._apply_downloaded_snapshot(data))
+            except Exception as e:
+                self.event_queue.put(('_status', f"Download failed: {e}"))
+
+        threading.Thread(target=worker, daemon=True).start()
+
+    def _apply_downloaded_snapshot(self, data):
+        if "player" in data:
+            self.player_data = data["player"]
+            for key in DEFAULT_PLAYER_DATA:
+                if key not in self.player_data:
+                    self.player_data[key] = DEFAULT_PLAYER_DATA[key]
+            for sk in DEFAULT_PLAYER_DATA["skills"]:
+                if sk not in self.player_data["skills"]:
+                    self.player_data["skills"][sk] = 0
+            self.save_player_data()
+        if "gm" in data:
+            self.gm_data = data["gm"]
+            self.save_gm_data()
+        self.refresh_all_display()
+        self._log_server_event("Snapshot downloaded and applied.")
 
     # -------------------------------
     # History Tab
