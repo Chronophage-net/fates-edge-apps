@@ -1032,9 +1032,13 @@ export function joinRoom(code, clientData = {}) {
             reject(new Error('Join room timeout'));
         }, CONFIG.CONNECTION_TIMEOUT);
         
-        socket.emit('join-room', { 
-            roomCode, 
-            playerName: clientData.name || 'Player' 
+        socket.emit('join-room', {
+            roomCode,
+            playerName: clientData.name || 'Player',
+            // NEW: optional account auth, see js/core/sync/index.js's
+            // identical note -- omitted/invalid tokens just mean an
+            // anonymous join, same as always.
+            authToken: clientData.authToken || localStorage.getItem('fates-edge-auth-token') || undefined
         }, (response) => {
             clearTimeout(timeout);
             if (response && response.error) {

@@ -522,6 +522,11 @@ export class SyncManager {
     this.clientName = config.name || this.getDefaultName();
     this.clientEmail = config.email || safeGetItem('fates-edge-client-email', '');
     this.clientRole = config.role || this.getDefaultRole();
+    // NEW: optional account auth. If a client never logs in, this stays
+    // empty and every join behaves exactly as it always has (anonymous,
+    // room password required every time). See js/features/settings/
+    // index.js for the login/register UI that populates the stored token.
+    this.authToken = config.authToken || safeGetItem('fates-edge-auth-token', '');
     this.isConnected = false;
     this.isConnecting = false;
     this.reconnectAttempts = 0;
@@ -584,6 +589,7 @@ export class SyncManager {
     this.clientName = options.name || this.clientName;
     this.clientEmail = options.email || this.clientEmail;
     this.clientRole = options.role || this.clientRole;
+    this.authToken = options.authToken !== undefined ? options.authToken : this.authToken;
     this.lastPassword = password || '';
     this.isConnecting = true;
 
@@ -699,6 +705,9 @@ buildWebSocketUrl(serverUrl, campaignCode) {
       type: 'handshake',
       campaignCode: this.campaignCode,
       password: password || '',
+      // NEW: optional -- omitted/invalid tokens are ignored server-side
+      // and the join proceeds anonymously, exactly as before.
+      authToken: this.authToken || undefined,
       clientId: this.clientId,
       clientName: this.clientName,
       clientEmail: this.clientEmail,

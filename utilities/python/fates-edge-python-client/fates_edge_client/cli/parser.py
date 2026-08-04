@@ -11,7 +11,7 @@ of sharing one schema with `main()`.
 import argparse
 
 from ..config import BASE_START_XP, DEFAULT_SERVER_URL, __version__
-from .commands import characters, config, deck, modules, roll, server, timers, websocket
+from .commands import account, characters, config, deck, modules, roll, server, timers, websocket
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -117,6 +117,28 @@ def build_parser() -> argparse.ArgumentParser:
     config_parser.add_argument('--set-api-key', help='Set API key')
     config_parser.add_argument('--show', action='store_true', help='Show configuration')
     config_parser.set_defaults(func=config.run)
+
+    # Account (NEW): optional login/register + server-owned character
+    # library + admin room-password/ban helpers. See account.py's
+    # module docstring -- none of this affects any other subcommand
+    # unless a token has actually been stored via --login/--register.
+    account_parser = subparsers.add_parser('account', help='Optional account login, character library, and admin tools')
+    account_parser.add_argument('--server', default=DEFAULT_SERVER_URL, help='Server URL')
+    account_parser.add_argument('--api-key', help='Admin API key (for --set-room-password/--ban-user/--unban-user)')
+    account_parser.add_argument('--register', action='store_true', help='Create an account and log in')
+    account_parser.add_argument('--login', action='store_true', help='Log in to an existing account')
+    account_parser.add_argument('--logout', action='store_true', help='Forget the locally stored login token')
+    account_parser.add_argument('--whoami', action='store_true', help='Show current login status')
+    account_parser.add_argument('--username', help='Username for --register/--login')
+    account_parser.add_argument('--password', help='Password for --register/--login')
+    account_parser.add_argument('--list-characters', action='store_true', help='List characters stored on your account')
+    account_parser.add_argument('--upload-character', type=int, help='Copy a local character (by ID) to your account')
+    account_parser.add_argument('--delete-character', help='Delete a character from your account by its account character ID')
+    account_parser.add_argument('--set-room-password', help='(admin) Set/replace a room join password')
+    account_parser.add_argument('--ban-user', help='(admin) Persistently ban an account (by user ID) from a room')
+    account_parser.add_argument('--unban-user', help='(admin) Lift a persistent ban')
+    account_parser.add_argument('--code', help='Room code (required by --set-room-password/--ban-user/--unban-user)')
+    account_parser.set_defaults(func=account.run)
 
     # Interactive shell -- func is wired up in __main__.py to avoid a
     # circular import (shell.py itself calls build_parser()).

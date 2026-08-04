@@ -10,6 +10,13 @@ const deck = require('./deck.js');
 const logger = require('./logger.js').createLogger(process.env.LOG_LEVEL || 'INFO');
 const { buildSafeDict, clampCount } = require('./security.js');
 const adventure = require('./adventure.js');
+const auth = require('./auth.js');
+
+// See socketio-handlers.js's identical note -- accounts degrade
+// gracefully if the DB storage module didn't load.
+let storage = null;
+try { storage = require('./storage.js'); } catch (e) { storage = null; }
+function hasAccountSupport() { return !!(storage && typeof storage.getMembership === 'function'); }
 
 let socketStats = { wsConnections: 0, totalConnections: 0 };
 
@@ -191,6 +198,12 @@ function setupWSS(wss) {
                         if (ws.clientData.role === 'gm') {
                             room.unbanClient(currentRoom, data.targetId);
                             ws.send(JSON.stringify({ type: 'unban_client_ack', targetId: data.targetId }));
+                        }
+                        break;
+
+                    case 'set_room_password':
+                        if (ws.clientData.role === 'gm') {
+                            handleSetRoomPassword(ws, currentRoom, data);
                         }
                         break;
 
@@ -450,12 +463,50 @@ function setupWSS(wss) {
 
 // ─── Handler implementations ──────────────────────────────────────────
 
-function handleHandshake(ws, roomState, data) {
-    // Password check
-    if (roomState.password && roomState.password !== data.password) {
-        ws.send(JSON.stringify({ type: 'error', message: 'Incorrect room password.' }));
-        ws.close(4003, 'Incorrect password');
-        return;
+// NEW: async -- see socketio-handlers.js's join-room comment for the full
+// rationale. `data.authToken` is optional; everything here degrades to
+// exactly the previous anonymous behavior when it's absent or invalid.
+async function handleHandshake(ws, roomState, data) {
+    const authUser = auth.verifyTokenOptional(data.authToken);
+
+    // See socketio-handlers.js's identical comment: rooms get GC'd when
+    // empty and recreated fresh (password: null) on the next connection,
+    // so a persisted password needs to be rehydrated here before it's
+    // checked below, or it would silently stop being enforced between
+    // any two connections to an otherwise-empty room.
+    if (!roomState.password && hasAccountSupport()) {
+        try {
+            const persistedHash = await storage.getRoomPasswordHash(roomState.code);
+            if (persistedHash) roomState.password = persistedHash;
+        } catch (e) {
+            logger.warn('Failed to hydrate persisted room password', { error: e.message });
+        }
+    }
+
+    // Persistent ban check (by account -- survives reconnects/new
+    // ephemeral clientIds, unlike the connection-time Set-based check).
+    let membership = null;
+    if (authUser && hasAccountSupport()) {
+        try {
+            if (await storage.isMemberBanned(roomState.code, authUser.userId)) {
+                ws.send(JSON.stringify({ type: 'error', message: 'You are banned from this room.' }));
+                ws.close(4002, 'Banned');
+                return;
+            }
+            membership = await storage.getMembership(roomState.code, authUser.userId);
+        } catch (e) {
+            logger.warn('Account membership lookup failed', { error: e.message });
+        }
+    }
+
+    // Password check -- known members skip it (see socketio-handlers.js).
+    if (roomState.password && !membership) {
+        const ok = await auth.verifyPassword(data.password, roomState.password);
+        if (!ok) {
+            ws.send(JSON.stringify({ type: 'error', message: 'Incorrect room password.' }));
+            ws.close(4003, 'Incorrect password');
+            return;
+        }
     }
 
     let assignedRole = data.role || 'player';
@@ -464,11 +515,18 @@ function handleHandshake(ws, roomState, data) {
         assignedRole = 'player';
         ws.send(JSON.stringify({ type: 'error', message: 'A GM is already hosting this room. You have joined as a Player.', code: 'GM_CONFLICT' }));
     }
-    ws.clientData.name = data.clientName || 'Player';
+    ws.clientData.name = data.clientName || (authUser ? authUser.username : 'Player');
     ws.clientData.role = assignedRole;
     ws.clientData.email = data.clientEmail || '';
+    ws.clientData.userId = authUser ? authUser.userId : null;
     // selectedCharacter remains empty initially
     roomState.clients.set(ws.clientId, ws.clientData);
+
+    if (authUser && hasAccountSupport()) {
+        storage.upsertMembership(roomState.code, authUser.userId, {}).catch(e =>
+            logger.warn('Failed to upsert room membership', { error: e.message })
+        );
+    }
 
     const clientsList = room.getClientsList(roomState);
     ws.send(JSON.stringify({ type: 'handshake_ack', success: true, clientId: ws.clientId, clientRole: assignedRole, versionVector: {}, activeClients: clientsList }));
@@ -479,6 +537,21 @@ function handleHandshake(ws, roomState, data) {
         role: ws.clientData.role,
         clients: clientsList
     }, ws.clientId);
+}
+
+// NEW: live GM-driven room password set/change/clear over plain WS,
+// mirroring socketio-handlers.js's 'set_room_password' event and the
+// REST admin route POST /api/rooms/:code/password.
+async function handleSetRoomPassword(ws, roomState, data) {
+    const password = data && data.password;
+    const hash = password ? await auth.hashPassword(String(password)) : null;
+    room.setRoomPassword(roomState, hash);
+    if (hasAccountSupport()) {
+        storage.setRoomPasswordHash(roomState.code, hash).catch(e =>
+            logger.warn('Failed to persist room password', { error: e.message })
+        );
+    }
+    ws.send(JSON.stringify({ type: 'set_room_password_ack', success: true, passwordSet: !!hash }));
 }
 
 // ─── CHARACTER SYNC: store full characters ──────────────────────────

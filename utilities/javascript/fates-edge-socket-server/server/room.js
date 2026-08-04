@@ -6,6 +6,19 @@
 const WebSocket = require('ws');
 const { safeAssign, buildSafeDict, UNSAFE_KEYS } = require('./security.js');
 
+// Optional -- room.js stays usable with zero DB configured; these calls
+// are always best-effort (fire-and-forget, errors logged not thrown) and
+// only fire at all for clients that joined with a valid account token
+// (see socketio-handlers.js / ws-handlers.js, which set clientData.userId).
+let _storage = null;
+try { _storage = require('./storage.js'); } catch (e) { _storage = null; }
+function _hasAccountSupport() { return !!(_storage && typeof _storage.setMemberRole === 'function'); }
+function _persistRole(roomObj, client, role) {
+    if (client && client.userId && _hasAccountSupport()) {
+        _storage.setMemberRole(roomObj.code, client.userId, role).catch(() => {});
+    }
+}
+
 // ─── Shared default character constants ────────────────────────────
 // Matches the defaults in modules/characters.js so the server and bot
 // never disagree on what a "fresh" character looks like.
@@ -217,6 +230,15 @@ function kickClient(room, targetId, reason = 'Kicked by GM') {
 function banClient(room, targetId, reason = 'Banned by GM') {
     if (!room.banned) room.banned = new Set();
     room.banned.add(targetId);
+    // NEW: if the target is (or was) an authenticated account, persist
+    // the ban against their userId too -- the in-memory Set above is
+    // keyed by ephemeral socket/ws id and won't catch them on their next
+    // reconnect (which gets a brand new id). See socketio-handlers.js /
+    // ws-handlers.js's persistent ban check at join time.
+    const target = room.clients.get(targetId);
+    if (target && target.userId && _hasAccountSupport()) {
+        _storage.setMemberBanned(room.code, target.userId, true).catch(() => {});
+    }
     if (room.clients.has(targetId)) {
         kickClient(room, targetId, reason);
     }
@@ -233,6 +255,36 @@ function isBanned(room, clientId) {
     return room.banned ? room.banned.has(clientId) : false;
 }
 
+// NEW: ban/unban by persistent account id directly, for a user who isn't
+// currently connected (so there's no live socket/ws id to pass to
+// banClient/unbanClient above). Used by the new REST route
+// POST/DELETE /api/rooms/:code/members/:userId/ban.
+//
+// Takes a room CODE, not a live room object, and does NOT require the
+// room to currently exist in the in-memory `rooms` Map -- that Map is
+// garbage-collected empty rooms aggressively (see the disconnect
+// handlers in socketio-handlers.js / ws-handlers.js), and the whole
+// point of banning-by-account is to be able to act on someone who isn't
+// connected right now. The persisted membership row is the source of
+// truth; the live room (if it happens to exist) is only consulted to
+// kick an already-connected match immediately instead of waiting for
+// their next join attempt to be rejected.
+async function setMemberBannedByUserId(roomCode, userId, banned) {
+    if (!_hasAccountSupport()) return false;
+    const roomKey = roomCode.toUpperCase();
+    await _storage.setMemberBanned(roomKey, userId, banned);
+    const liveRoom = rooms.get(roomKey);
+    if (banned && liveRoom) {
+        for (const [id, client] of liveRoom.clients) {
+            if (client.userId === userId) {
+                kickClient(liveRoom, id, 'Banned by GM');
+                break;
+            }
+        }
+    }
+    return true;
+}
+
 // ---------- GM Election ----------
 function handleGmRequest(room, requesterId) {
     const requester = room.clients.get(requesterId);
@@ -242,6 +294,7 @@ function handleGmRequest(room, requesterId) {
     if (!currentGm) {
         requester.role = 'gm';
         room.clients.set(requesterId, requester);
+        _persistRole(room, requester, 'gm');
         const clientsList = getClientsList(room);
         broadcastToRoom(room.code, 'presence', { clients: clientsList });
         broadcastToRoom(room.code, 'server_announcement', {
@@ -280,6 +333,8 @@ function handleGmApproval(room, approverId, targetId) {
     target.role = 'gm';
     room.clients.set(approverId, approver);
     room.clients.set(targetId, target);
+    _persistRole(room, approver, 'player');
+    _persistRole(room, target, 'gm');
 
     const clientsList = getClientsList(room);
     broadcastToRoom(room.code, 'presence', { clients: clientsList });
@@ -355,8 +410,15 @@ function createRoom(roomCode) {
     return room;
 }
 
-function setRoomPassword(room, password) {
-    room.password = password ? String(password) : null;
+// NEW: `password` here is expected to already be a bcrypt hash (or null
+// to clear it) -- see auth.js's hashPassword(). Callers used to pass
+// plaintext, compared with a raw `!==` at join time; that's fixed at the
+// two join call sites (socketio-handlers.js / ws-handlers.js), which now
+// use auth.verifyPassword() instead. Kept as `room.password` (not renamed
+// to `room.passwordHash`) so this doesn't touch every existing reference,
+// but the value it now holds is always a hash, never plaintext.
+function setRoomPassword(room, passwordHash) {
+    room.password = passwordHash || null;
     room.lastActivity = Date.now();
     return room.password !== null;
 }
@@ -402,6 +464,7 @@ module.exports = {
     banClient,
     unbanClient,
     isBanned,
+    setMemberBannedByUserId,
     handleGmRequest,
     handleGmApproval,
     setIo,

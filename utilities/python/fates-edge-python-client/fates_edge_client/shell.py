@@ -20,7 +20,7 @@ from .store import DataStore
 
 _TOP_LEVEL_COMMANDS = [
     'characters', 'timers', 'roll', 'deck', 'server', 'websocket',
-    'modules', 'config', 'help', 'exit', 'quit',
+    'modules', 'config', 'account', 'help', 'exit', 'quit',
 ]
 
 
@@ -105,6 +105,8 @@ Available commands:
   websocket --server URL --code CODE     - Connect to WebSocket
   modules [--list|--push|--cleanup]      - Module management
   config [--set-api-key KEY|--show]      - Configuration
+  account [--login|--register|--logout|--whoami|--list-characters]
+                                          - Optional account login + character library (see 'account' for full help)
   help                                   - Show this help
   exit                                   - Exit the shell
 """)

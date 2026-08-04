@@ -69,6 +69,12 @@ const DOC_TYPES = {
         icon: '♟️',
         description: 'Kon\'reh strategy game content'
     },
+    quickstart: {
+        label: '⚡ Quickstart',
+        folder: 'quickstart',
+        icon: '⚡',
+        description: 'One-page quickstart guides for new players'
+    },
     uploaded: {
         label: '📤 Uploaded',
         folder: 'uploaded',
@@ -90,7 +96,7 @@ for (const [id, type] of Object.entries(DOC_TYPES)) {
 }
 
 // ─── Type order for sorting ──────────────────────────────────
-const TYPE_ORDER = ['core', 'resources', 'adventures', 'expansions', 'travel', 'design', 'konreh', 'uploaded', 'other'];
+const TYPE_ORDER = ['core', 'quickstart', 'resources', 'adventures', 'expansions', 'travel', 'design', 'konreh', 'uploaded', 'other'];
 
 // ============================================================
 // STATE

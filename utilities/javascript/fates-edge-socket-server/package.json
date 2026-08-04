@@ -7,12 +7,15 @@
   "scripts": {
     "start": "node server-start.js",
     "dev": "nodemon server-start.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "test:auth": "node scripts/run-auth-e2e-test.js"
   },
   "dependencies": {
+    "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
     "express": "^4.21.0",
+    "jsonwebtoken": "^9.0.3",
     "socket.io": "^4.8.0",
     "sqlite3": "^5.1.7",
     "ws": "^8.17.0"
@@ -27,6 +30,7 @@
   "engines": {
     "node": ">=18.0.0"
   },
-  "_license": "Fate's Edge Proprietary Content – © 2024 Nicholas A. Gasper. All rights reserved.",
+  "license": "MIT",
+  "_license": "Code: MIT. Game content: CC BY-NC-SA 4.0 (SRD) / All Rights Reserved (proprietary). © 2024 Nicholas A. Gasper.",
   "author": "Nicholas A. Gasper"
 }

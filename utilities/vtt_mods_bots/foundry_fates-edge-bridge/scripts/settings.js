@@ -32,6 +32,24 @@ export const registerSettings = function() {
         }
     });
     
+    // NOTE: bridge.js's connect() has always read a 'password' setting
+    // here (for the room's join password), but it was never registered
+    // -- game.settings.get() would throw on a room that actually has one
+    // set. Registering it now, since the server-side room password is a
+    // real persistent feature (server/room.js) worth this bridge
+    // actually supporting rather than silently erroring.
+    game.settings.register('fates-edge-bridge', 'password', {
+        name: 'Room Password',
+        hint: "The room's join password, if the GM has set one (only needed for this account's first join -- see Account Token below to skip re-entering it after that)",
+        scope: 'world',
+        config: true,
+        type: String,
+        default: '',
+        onChange: () => {
+            Hooks.call('fates-edge-bridge-settings-changed');
+        }
+    });
+
     game.settings.register('fates-edge-bridge', 'apiKey', {
         name: 'API Key',
         hint: 'API key for authentication (optional)',
@@ -44,6 +62,24 @@ export const registerSettings = function() {
         }
     });
     
+    // NEW: optional per-user JWT from the server's optional accounts
+    // feature (server/auth.js). Get one via the web client's Account
+    // panel, or the terminal/python client's login command, then paste
+    // it here. Distinct from the static apiKey above -- the two auth
+    // models don't overlap server-side. Leave blank for the exact same
+    // anonymous-join behavior as before this setting existed.
+    game.settings.register('fates-edge-bridge', 'authToken', {
+        name: 'Account Token',
+        hint: 'Optional per-account login token. Lets a GM skip re-entering a room password on later joins, and makes bans against this account persist across reconnects.',
+        scope: 'world',
+        config: true,
+        type: String,
+        default: '',
+        onChange: () => {
+            Hooks.call('fates-edge-bridge-settings-changed');
+        }
+    });
+
     game.settings.register('fates-edge-bridge', 'playerName', {
         name: 'Player Name',
         hint: 'Name to display in the VTT (leave empty to use Foundry user name)',

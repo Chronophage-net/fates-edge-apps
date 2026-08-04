@@ -33,10 +33,27 @@
  * upsert vs. "keep my last couple of deliberate exports"), so they now
  * live in entirely separate tables and never compete for the same
  * retention budget.
+ *
+ * v3 -- ADDED optional account support: `users`, `rooms` (hashed room
+ * password, persisted across restarts -- previously room.password lived
+ * only in memory, plaintext, and nothing ever actually set it), and
+ * `room_memberships` (a persistent user<->room link with role/banned
+ * flags, so a returning known member can skip re-entering the room
+ * password and a ban survives across reconnects/new socket ids instead
+ * of resetting whenever the in-memory Set is rebuilt). Also added
+ * `characters`, a per-user character library capped at MAX_CHARACTERS_
+ * PER_USER -- storage-layer prep for account-owned characters; nothing
+ * in room.js/the live room-sync path reads from this table yet (that's
+ * a separate, larger bridging change), but the persistence + limit
+ * enforcement is real and usable via the new /api/account/characters
+ * routes today.
  */
 
 const fs = require('fs');
 const path = require('path');
+const crypto = require('crypto');
+
+const MAX_CHARACTERS_PER_USER = 5;
 
 // Determine database type from environment
 const dbType = (process.env.DATABASE_TYPE || 'sqlite').toLowerCase();
@@ -107,6 +124,47 @@ async function initSqlite() {
         )
     `);
 
+    // v3: accounts + persistent membership/password + character library
+    await run(`
+        CREATE TABLE IF NOT EXISTS users (
+            id TEXT PRIMARY KEY,
+            username TEXT UNIQUE NOT NULL,
+            password_hash TEXT NOT NULL,
+            created_at INTEGER,
+            updated_at INTEGER
+        )
+    `);
+    await run(`
+        CREATE TABLE IF NOT EXISTS rooms (
+            room_code TEXT PRIMARY KEY,
+            password_hash TEXT,
+            created_at INTEGER,
+            updated_at INTEGER
+        )
+    `);
+    await run(`
+        CREATE TABLE IF NOT EXISTS room_memberships (
+            room_code TEXT NOT NULL,
+            user_id TEXT NOT NULL,
+            role TEXT DEFAULT 'member',
+            banned INTEGER DEFAULT 0,
+            joined_at INTEGER,
+            last_seen_at INTEGER,
+            PRIMARY KEY (room_code, user_id)
+        )
+    `);
+    await run(`
+        CREATE TABLE IF NOT EXISTS characters (
+            id TEXT PRIMARY KEY,
+            user_id TEXT NOT NULL,
+            name TEXT NOT NULL,
+            data TEXT,
+            created_at INTEGER,
+            updated_at INTEGER
+        )
+    `);
+    await run(`CREATE INDEX IF NOT EXISTS idx_characters_user ON characters (user_id)`);
+
     return {
         async save(roomCode, campaignCode, data) {
             const now = Date.now();
@@ -162,6 +220,136 @@ async function initSqlite() {
             return JSON.parse(row.data);
         },
 
+        // ─── Users ────────────────────────────────────────────────
+        async createUser(username, passwordHash) {
+            const id = crypto.randomUUID();
+            const now = Date.now();
+            try {
+                await run(
+                    'INSERT INTO users (id, username, password_hash, created_at, updated_at) VALUES (?, ?, ?, ?, ?)',
+                    [id, username, passwordHash, now, now]
+                );
+            } catch (e) {
+                if (String(e.message).includes('UNIQUE')) throw new Error('Username already taken');
+                throw e;
+            }
+            return { id, username };
+        },
+
+        async getUserByUsername(username) {
+            return (await get('SELECT * FROM users WHERE username = ?', [username])) || null;
+        },
+
+        async getUserById(id) {
+            return (await get('SELECT * FROM users WHERE id = ?', [id])) || null;
+        },
+
+        // ─── Room password (persistent, hashed) ─────────────────────
+        async setRoomPasswordHash(roomCode, passwordHash) {
+            const now = Date.now();
+            await run(
+                `INSERT INTO rooms (room_code, password_hash, created_at, updated_at)
+                 VALUES (?, ?, COALESCE((SELECT created_at FROM rooms WHERE room_code = ?), ?), ?)
+                 ON CONFLICT(room_code) DO UPDATE SET password_hash = excluded.password_hash, updated_at = excluded.updated_at`,
+                [roomCode, passwordHash, roomCode, now, now]
+            );
+        },
+
+        async getRoomPasswordHash(roomCode) {
+            const row = await get('SELECT password_hash FROM rooms WHERE room_code = ?', [roomCode]);
+            return row ? row.password_hash : null;
+        },
+
+        // ─── Room memberships ────────────────────────────────────────
+        async upsertMembership(roomCode, userId, { role } = {}) {
+            const now = Date.now();
+            const existing = await get(
+                'SELECT * FROM room_memberships WHERE room_code = ? AND user_id = ?',
+                [roomCode, userId]
+            );
+            if (existing) {
+                await run(
+                    'UPDATE room_memberships SET last_seen_at = ?, role = COALESCE(?, role) WHERE room_code = ? AND user_id = ?',
+                    [now, role || null, roomCode, userId]
+                );
+            } else {
+                await run(
+                    'INSERT INTO room_memberships (room_code, user_id, role, banned, joined_at, last_seen_at) VALUES (?, ?, ?, 0, ?, ?)',
+                    [roomCode, userId, role || 'member', now, now]
+                );
+            }
+            return await get('SELECT * FROM room_memberships WHERE room_code = ? AND user_id = ?', [roomCode, userId]);
+        },
+
+        async getMembership(roomCode, userId) {
+            return (await get('SELECT * FROM room_memberships WHERE room_code = ? AND user_id = ?', [roomCode, userId])) || null;
+        },
+
+        async isMemberBanned(roomCode, userId) {
+            const row = await get('SELECT banned FROM room_memberships WHERE room_code = ? AND user_id = ?', [roomCode, userId]);
+            return !!(row && row.banned);
+        },
+
+        async setMemberBanned(roomCode, userId, banned) {
+            await this.upsertMembership(roomCode, userId, {});
+            await run('UPDATE room_memberships SET banned = ? WHERE room_code = ? AND user_id = ?', [banned ? 1 : 0, roomCode, userId]);
+        },
+
+        async setMemberRole(roomCode, userId, role) {
+            await this.upsertMembership(roomCode, userId, { role });
+        },
+
+        // ─── Character library (per-user, capped) ────────────────────
+        async listCharacters(userId) {
+            const rows = await all('SELECT * FROM characters WHERE user_id = ? ORDER BY created_at ASC', [userId]);
+            return rows.map(r => ({ id: r.id, userId: r.user_id, name: r.name, data: JSON.parse(r.data || '{}'), createdAt: r.created_at, updatedAt: r.updated_at }));
+        },
+
+        async getCharacterById(userId, characterId) {
+            const row = await get('SELECT * FROM characters WHERE id = ? AND user_id = ?', [characterId, userId]);
+            if (!row) return null;
+            return { id: row.id, userId: row.user_id, name: row.name, data: JSON.parse(row.data || '{}'), createdAt: row.created_at, updatedAt: row.updated_at };
+        },
+
+        async countCharacters(userId) {
+            const row = await get('SELECT COUNT(*) as c FROM characters WHERE user_id = ?', [userId]);
+            return row ? row.c : 0;
+        },
+
+        async createCharacter(userId, name, data) {
+            const count = await this.countCharacters(userId);
+            if (count >= MAX_CHARACTERS_PER_USER) {
+                const err = new Error(`Character limit reached (max ${MAX_CHARACTERS_PER_USER} per account)`);
+                err.code = 'CHARACTER_LIMIT';
+                throw err;
+            }
+            const id = crypto.randomUUID();
+            const now = Date.now();
+            await run(
+                'INSERT INTO characters (id, user_id, name, data, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)',
+                [id, userId, name, JSON.stringify(data || {}), now, now]
+            );
+            return this.getCharacterById(userId, id);
+        },
+
+        async updateCharacterById(userId, characterId, updates) {
+            const existing = await this.getCharacterById(userId, characterId);
+            if (!existing) return null;
+            const merged = { ...existing.data, ...(updates.data || {}) };
+            const name = updates.name || existing.name;
+            const now = Date.now();
+            await run(
+                'UPDATE characters SET name = ?, data = ?, updated_at = ? WHERE id = ? AND user_id = ?',
+                [name, JSON.stringify(merged), now, characterId, userId]
+            );
+            return this.getCharacterById(userId, characterId);
+        },
+
+        async deleteCharacter(userId, characterId) {
+            const result = await run('DELETE FROM characters WHERE id = ? AND user_id = ?', [characterId, userId]);
+            return true; // sqlite3's run() doesn't reliably expose affected rows via promisify; existence was already checked by callers via getCharacterById
+        },
+
         close() {
             return new Promise((resolve, reject) => {
                 _db.close((err) => {
@@ -208,6 +396,46 @@ async function initPostgres() {
                 updated_at BIGINT
             )
         `);
+        // v3: accounts + persistent membership/password + character library
+        await client.query(`
+            CREATE TABLE IF NOT EXISTS users (
+                id TEXT PRIMARY KEY,
+                username TEXT UNIQUE NOT NULL,
+                password_hash TEXT NOT NULL,
+                created_at BIGINT,
+                updated_at BIGINT
+            )
+        `);
+        await client.query(`
+            CREATE TABLE IF NOT EXISTS rooms (
+                room_code TEXT PRIMARY KEY,
+                password_hash TEXT,
+                created_at BIGINT,
+                updated_at BIGINT
+            )
+        `);
+        await client.query(`
+            CREATE TABLE IF NOT EXISTS room_memberships (
+                room_code TEXT NOT NULL,
+                user_id TEXT NOT NULL,
+                role TEXT DEFAULT 'member',
+                banned BOOLEAN DEFAULT FALSE,
+                joined_at BIGINT,
+                last_seen_at BIGINT,
+                PRIMARY KEY (room_code, user_id)
+            )
+        `);
+        await client.query(`
+            CREATE TABLE IF NOT EXISTS characters (
+                id TEXT PRIMARY KEY,
+                user_id TEXT NOT NULL,
+                name TEXT NOT NULL,
+                data JSONB,
+                created_at BIGINT,
+                updated_at BIGINT
+            )
+        `);
+        await client.query(`CREATE INDEX IF NOT EXISTS idx_characters_user ON characters (user_id)`);
     } finally {
         client.release();
     }
@@ -269,6 +497,134 @@ async function initPostgres() {
             return res.rows[0].data;
         },
 
+        // ─── Users ────────────────────────────────────────────────
+        async createUser(username, passwordHash) {
+            const id = crypto.randomUUID();
+            const now = Date.now();
+            try {
+                await pool.query(
+                    'INSERT INTO users (id, username, password_hash, created_at, updated_at) VALUES ($1, $2, $3, $4, $5)',
+                    [id, username, passwordHash, now, now]
+                );
+            } catch (e) {
+                if (e.code === '23505') throw new Error('Username already taken');
+                throw e;
+            }
+            return { id, username };
+        },
+
+        async getUserByUsername(username) {
+            const res = await pool.query('SELECT * FROM users WHERE username = $1', [username]);
+            return res.rows[0] || null;
+        },
+
+        async getUserById(id) {
+            const res = await pool.query('SELECT * FROM users WHERE id = $1', [id]);
+            return res.rows[0] || null;
+        },
+
+        // ─── Room password (persistent, hashed) ─────────────────────
+        async setRoomPasswordHash(roomCode, passwordHash) {
+            const now = Date.now();
+            await pool.query(
+                `INSERT INTO rooms (room_code, password_hash, created_at, updated_at)
+                 VALUES ($1, $2, $3, $4)
+                 ON CONFLICT (room_code) DO UPDATE SET password_hash = EXCLUDED.password_hash, updated_at = EXCLUDED.updated_at`,
+                [roomCode, passwordHash, now, now]
+            );
+        },
+
+        async getRoomPasswordHash(roomCode) {
+            const res = await pool.query('SELECT password_hash FROM rooms WHERE room_code = $1', [roomCode]);
+            return res.rows[0] ? res.rows[0].password_hash : null;
+        },
+
+        // ─── Room memberships ────────────────────────────────────────
+        async upsertMembership(roomCode, userId, { role } = {}) {
+            const now = Date.now();
+            await pool.query(
+                `INSERT INTO room_memberships (room_code, user_id, role, banned, joined_at, last_seen_at)
+                 VALUES ($1, $2, $3, FALSE, $4, $4)
+                 ON CONFLICT (room_code, user_id) DO UPDATE SET
+                     last_seen_at = $4,
+                     role = COALESCE($3, room_memberships.role)`,
+                [roomCode, userId, role || 'member', now]
+            );
+            const res = await pool.query('SELECT * FROM room_memberships WHERE room_code = $1 AND user_id = $2', [roomCode, userId]);
+            return res.rows[0];
+        },
+
+        async getMembership(roomCode, userId) {
+            const res = await pool.query('SELECT * FROM room_memberships WHERE room_code = $1 AND user_id = $2', [roomCode, userId]);
+            return res.rows[0] || null;
+        },
+
+        async isMemberBanned(roomCode, userId) {
+            const res = await pool.query('SELECT banned FROM room_memberships WHERE room_code = $1 AND user_id = $2', [roomCode, userId]);
+            return !!(res.rows[0] && res.rows[0].banned);
+        },
+
+        async setMemberBanned(roomCode, userId, banned) {
+            await this.upsertMembership(roomCode, userId, {});
+            await pool.query('UPDATE room_memberships SET banned = $1 WHERE room_code = $2 AND user_id = $3', [!!banned, roomCode, userId]);
+        },
+
+        async setMemberRole(roomCode, userId, role) {
+            await this.upsertMembership(roomCode, userId, { role });
+        },
+
+        // ─── Character library (per-user, capped) ────────────────────
+        async listCharacters(userId) {
+            const res = await pool.query('SELECT * FROM characters WHERE user_id = $1 ORDER BY created_at ASC', [userId]);
+            return res.rows.map(r => ({ id: r.id, userId: r.user_id, name: r.name, data: r.data, createdAt: Number(r.created_at), updatedAt: Number(r.updated_at) }));
+        },
+
+        async getCharacterById(userId, characterId) {
+            const res = await pool.query('SELECT * FROM characters WHERE id = $1 AND user_id = $2', [characterId, userId]);
+            const row = res.rows[0];
+            if (!row) return null;
+            return { id: row.id, userId: row.user_id, name: row.name, data: row.data, createdAt: Number(row.created_at), updatedAt: Number(row.updated_at) };
+        },
+
+        async countCharacters(userId) {
+            const res = await pool.query('SELECT COUNT(*)::int as c FROM characters WHERE user_id = $1', [userId]);
+            return res.rows[0] ? res.rows[0].c : 0;
+        },
+
+        async createCharacter(userId, name, data) {
+            const count = await this.countCharacters(userId);
+            if (count >= MAX_CHARACTERS_PER_USER) {
+                const err = new Error(`Character limit reached (max ${MAX_CHARACTERS_PER_USER} per account)`);
+                err.code = 'CHARACTER_LIMIT';
+                throw err;
+            }
+            const id = crypto.randomUUID();
+            const now = Date.now();
+            await pool.query(
+                'INSERT INTO characters (id, user_id, name, data, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $6)',
+                [id, userId, name, JSON.stringify(data || {}), now, now]
+            );
+            return this.getCharacterById(userId, id);
+        },
+
+        async updateCharacterById(userId, characterId, updates) {
+            const existing = await this.getCharacterById(userId, characterId);
+            if (!existing) return null;
+            const merged = { ...existing.data, ...(updates.data || {}) };
+            const name = updates.name || existing.name;
+            const now = Date.now();
+            await pool.query(
+                'UPDATE characters SET name = $1, data = $2, updated_at = $3 WHERE id = $4 AND user_id = $5',
+                [name, JSON.stringify(merged), now, characterId, userId]
+            );
+            return this.getCharacterById(userId, characterId);
+        },
+
+        async deleteCharacter(userId, characterId) {
+            const res = await pool.query('DELETE FROM characters WHERE id = $1 AND user_id = $2', [characterId, userId]);
+            return res.rowCount > 0;
+        },
+
         close() {
             return pool.end();
         }
@@ -310,6 +666,46 @@ async function initMysql() {
                 room_code VARCHAR(64) PRIMARY KEY,
                 data JSON,
                 updated_at BIGINT
+            )
+        `);
+        // v3: accounts + persistent membership/password + character library
+        await conn.query(`
+            CREATE TABLE IF NOT EXISTS users (
+                id VARCHAR(36) PRIMARY KEY,
+                username VARCHAR(32) UNIQUE NOT NULL,
+                password_hash VARCHAR(255) NOT NULL,
+                created_at BIGINT,
+                updated_at BIGINT
+            )
+        `);
+        await conn.query(`
+            CREATE TABLE IF NOT EXISTS rooms (
+                room_code VARCHAR(64) PRIMARY KEY,
+                password_hash VARCHAR(255),
+                created_at BIGINT,
+                updated_at BIGINT
+            )
+        `);
+        await conn.query(`
+            CREATE TABLE IF NOT EXISTS room_memberships (
+                room_code VARCHAR(64) NOT NULL,
+                user_id VARCHAR(36) NOT NULL,
+                role VARCHAR(32) DEFAULT 'member',
+                banned TINYINT(1) DEFAULT 0,
+                joined_at BIGINT,
+                last_seen_at BIGINT,
+                PRIMARY KEY (room_code, user_id)
+            )
+        `);
+        await conn.query(`
+            CREATE TABLE IF NOT EXISTS characters (
+                id VARCHAR(36) PRIMARY KEY,
+                user_id VARCHAR(36) NOT NULL,
+                name VARCHAR(255) NOT NULL,
+                data JSON,
+                created_at BIGINT,
+                updated_at BIGINT,
+                INDEX idx_characters_user (user_id)
             )
         `);
     } finally {
@@ -383,6 +779,132 @@ async function initMysql() {
             return typeof raw === 'string' ? JSON.parse(raw) : raw;
         },
 
+        // ─── Users ────────────────────────────────────────────────
+        async createUser(username, passwordHash) {
+            const id = crypto.randomUUID();
+            const now = Date.now();
+            try {
+                await pool.query(
+                    'INSERT INTO users (id, username, password_hash, created_at, updated_at) VALUES (?, ?, ?, ?, ?)',
+                    [id, username, passwordHash, now, now]
+                );
+            } catch (e) {
+                if (e.code === 'ER_DUP_ENTRY') throw new Error('Username already taken');
+                throw e;
+            }
+            return { id, username };
+        },
+
+        async getUserByUsername(username) {
+            const [rows] = await pool.query('SELECT * FROM users WHERE username = ?', [username]);
+            return rows[0] || null;
+        },
+
+        async getUserById(id) {
+            const [rows] = await pool.query('SELECT * FROM users WHERE id = ?', [id]);
+            return rows[0] || null;
+        },
+
+        // ─── Room password (persistent, hashed) ─────────────────────
+        async setRoomPasswordHash(roomCode, passwordHash) {
+            const now = Date.now();
+            await pool.query(
+                `INSERT INTO rooms (room_code, password_hash, created_at, updated_at)
+                 VALUES (?, ?, ?, ?)
+                 ON DUPLICATE KEY UPDATE password_hash = VALUES(password_hash), updated_at = VALUES(updated_at)`,
+                [roomCode, passwordHash, now, now]
+            );
+        },
+
+        async getRoomPasswordHash(roomCode) {
+            const [rows] = await pool.query('SELECT password_hash FROM rooms WHERE room_code = ?', [roomCode]);
+            return rows[0] ? rows[0].password_hash : null;
+        },
+
+        // ─── Room memberships ────────────────────────────────────────
+        async upsertMembership(roomCode, userId, { role } = {}) {
+            const now = Date.now();
+            await pool.query(
+                `INSERT INTO room_memberships (room_code, user_id, role, banned, joined_at, last_seen_at)
+                 VALUES (?, ?, ?, 0, ?, ?)
+                 ON DUPLICATE KEY UPDATE last_seen_at = VALUES(last_seen_at), role = COALESCE(?, role)`,
+                [roomCode, userId, role || 'member', now, now, role || null]
+            );
+            const [rows] = await pool.query('SELECT * FROM room_memberships WHERE room_code = ? AND user_id = ?', [roomCode, userId]);
+            return rows[0];
+        },
+
+        async getMembership(roomCode, userId) {
+            const [rows] = await pool.query('SELECT * FROM room_memberships WHERE room_code = ? AND user_id = ?', [roomCode, userId]);
+            return rows[0] || null;
+        },
+
+        async isMemberBanned(roomCode, userId) {
+            const [rows] = await pool.query('SELECT banned FROM room_memberships WHERE room_code = ? AND user_id = ?', [roomCode, userId]);
+            return !!(rows[0] && rows[0].banned);
+        },
+
+        async setMemberBanned(roomCode, userId, banned) {
+            await this.upsertMembership(roomCode, userId, {});
+            await pool.query('UPDATE room_memberships SET banned = ? WHERE room_code = ? AND user_id = ?', [banned ? 1 : 0, roomCode, userId]);
+        },
+
+        async setMemberRole(roomCode, userId, role) {
+            await this.upsertMembership(roomCode, userId, { role });
+        },
+
+        // ─── Character library (per-user, capped) ────────────────────
+        async listCharacters(userId) {
+            const [rows] = await pool.query('SELECT * FROM characters WHERE user_id = ? ORDER BY created_at ASC', [userId]);
+            return rows.map(r => ({ id: r.id, userId: r.user_id, name: r.name, data: typeof r.data === 'string' ? JSON.parse(r.data) : r.data, createdAt: Number(r.created_at), updatedAt: Number(r.updated_at) }));
+        },
+
+        async getCharacterById(userId, characterId) {
+            const [rows] = await pool.query('SELECT * FROM characters WHERE id = ? AND user_id = ?', [characterId, userId]);
+            const row = rows[0];
+            if (!row) return null;
+            return { id: row.id, userId: row.user_id, name: row.name, data: typeof row.data === 'string' ? JSON.parse(row.data) : row.data, createdAt: Number(row.created_at), updatedAt: Number(row.updated_at) };
+        },
+
+        async countCharacters(userId) {
+            const [rows] = await pool.query('SELECT COUNT(*) as c FROM characters WHERE user_id = ?', [userId]);
+            return rows[0] ? rows[0].c : 0;
+        },
+
+        async createCharacter(userId, name, data) {
+            const count = await this.countCharacters(userId);
+            if (count >= MAX_CHARACTERS_PER_USER) {
+                const err = new Error(`Character limit reached (max ${MAX_CHARACTERS_PER_USER} per account)`);
+                err.code = 'CHARACTER_LIMIT';
+                throw err;
+            }
+            const id = crypto.randomUUID();
+            const now = Date.now();
+            await pool.query(
+                'INSERT INTO characters (id, user_id, name, data, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)',
+                [id, userId, name, JSON.stringify(data || {}), now, now]
+            );
+            return this.getCharacterById(userId, id);
+        },
+
+        async updateCharacterById(userId, characterId, updates) {
+            const existing = await this.getCharacterById(userId, characterId);
+            if (!existing) return null;
+            const merged = { ...existing.data, ...(updates.data || {}) };
+            const name = updates.name || existing.name;
+            const now = Date.now();
+            await pool.query(
+                'UPDATE characters SET name = ?, data = ?, updated_at = ? WHERE id = ? AND user_id = ?',
+                [name, JSON.stringify(merged), now, characterId, userId]
+            );
+            return this.getCharacterById(userId, characterId);
+        },
+
+        async deleteCharacter(userId, characterId) {
+            const [result] = await pool.query('DELETE FROM characters WHERE id = ? AND user_id = ?', [characterId, userId]);
+            return result.affectedRows > 0;
+        },
+
         close() {
             return pool.end();
         }
@@ -442,6 +964,82 @@ async function closeDatabase() {
     }
 }
 
+// ─── v3: accounts + persistent membership/password + character library ──
+async function createUser(username, passwordHash) {
+    const d = await init();
+    return d.createUser(username, passwordHash);
+}
+
+async function getUserByUsername(username) {
+    const d = await init();
+    return d.getUserByUsername(username);
+}
+
+async function getUserById(id) {
+    const d = await init();
+    return d.getUserById(id);
+}
+
+async function setRoomPasswordHash(roomCode, passwordHash) {
+    const d = await init();
+    return d.setRoomPasswordHash(roomCode, passwordHash);
+}
+
+async function getRoomPasswordHash(roomCode) {
+    const d = await init();
+    return d.getRoomPasswordHash(roomCode);
+}
+
+async function upsertMembership(roomCode, userId, opts) {
+    const d = await init();
+    return d.upsertMembership(roomCode, userId, opts);
+}
+
+async function getMembership(roomCode, userId) {
+    const d = await init();
+    return d.getMembership(roomCode, userId);
+}
+
+async function isMemberBanned(roomCode, userId) {
+    const d = await init();
+    return d.isMemberBanned(roomCode, userId);
+}
+
+async function setMemberBanned(roomCode, userId, banned) {
+    const d = await init();
+    return d.setMemberBanned(roomCode, userId, banned);
+}
+
+async function setMemberRole(roomCode, userId, role) {
+    const d = await init();
+    return d.setMemberRole(roomCode, userId, role);
+}
+
+async function listCharacters(userId) {
+    const d = await init();
+    return d.listCharacters(userId);
+}
+
+async function getCharacterById(userId, characterId) {
+    const d = await init();
+    return d.getCharacterById(userId, characterId);
+}
+
+async function createCharacter(userId, name, data) {
+    const d = await init();
+    return d.createCharacter(userId, name, data);
+}
+
+async function updateCharacterById(userId, characterId, updates) {
+    const d = await init();
+    return d.updateCharacterById(userId, characterId, updates);
+}
+
+async function deleteCharacter(userId, characterId) {
+    const d = await init();
+    return d.deleteCharacter(userId, characterId);
+}
+
 module.exports = {
     saveCampaign,
     loadCampaign,
@@ -449,4 +1047,22 @@ module.exports = {
     loadAutoSave,
     closeDatabase,
     init, // for manual initialization if needed
+    // accounts / membership / room password
+    createUser,
+    getUserByUsername,
+    getUserById,
+    setRoomPasswordHash,
+    getRoomPasswordHash,
+    upsertMembership,
+    getMembership,
+    isMemberBanned,
+    setMemberBanned,
+    setMemberRole,
+    // character library
+    MAX_CHARACTERS_PER_USER,
+    listCharacters,
+    getCharacterById,
+    createCharacter,
+    updateCharacterById,
+    deleteCharacter,
 };

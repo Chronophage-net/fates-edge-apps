@@ -25,6 +25,7 @@ const deck = require('./deck.js');
 const { safeAssign, buildSafeDict, isSafeModuleId, isSafeCampaignCode, clampCount, UNSAFE_KEYS } = require('./security.js');
 const adventure = require('./adventure.js');
 const { deriveManifestFromContent } = require('./module-manifest-utils.js');
+const auth = require('./auth.js');
 
 let config = {};
 
@@ -136,6 +137,160 @@ function createApiRouter(appConfig) {
     router.get('/api/rooms', authenticate, (req, res) => {
         const roomStats = Array.from(room.rooms.keys()).map(code => room.getRoomStats(code)).filter(Boolean);
         res.json({ rooms: roomStats, count: roomStats.length, timestamp: Date.now() });
+    });
+
+    // ─── Optional account auth ──────────────────────────────────────
+    // NEW: layered on top of the existing anonymous room-code+password
+    // flow, not a replacement for it. A client that never calls any of
+    // these routes keeps working exactly as it always has (see
+    // join-room handling in socketio-handlers.js / ws-handlers.js).
+    //
+    // Only available when the real DB-backed storage module loaded (the
+    // file-system fallback above doesn't implement accounts -- reusing
+    // that fallback for password hashes/PII didn't seem worth building
+    // out, since it exists purely as a last resort for saveCampaign/
+    // loadCampaign). hasAccountSupport() gates all account routes so
+    // they fail with a clear 503 instead of a confusing TypeError if
+    // that fallback is ever active.
+    function hasAccountSupport() {
+        return typeof storage.createUser === 'function';
+    }
+    function requireAccountSupport(req, res, next) {
+        if (!hasAccountSupport()) {
+            return res.status(503).json({ error: 'Account features require the database storage module (server/storage.js), which failed to load. Check server logs.' });
+        }
+        next();
+    }
+
+    router.post('/api/auth/register', requireAccountSupport, async (req, res) => {
+        try {
+            const { username, password } = req.body || {};
+            if (!auth.isValidUsername(username)) {
+                return res.status(400).json({ error: 'username must be 3-32 characters: letters, numbers, underscore, dash' });
+            }
+            if (!auth.isValidPassword(password)) {
+                return res.status(400).json({ error: 'password must be 8-256 characters' });
+            }
+            const existing = await storage.getUserByUsername(username);
+            if (existing) {
+                return res.status(409).json({ error: 'Username already taken' });
+            }
+            const passwordHash = await auth.hashPassword(password);
+            const user = await storage.createUser(username, passwordHash);
+            const token = auth.signToken({ userId: user.id, username: user.username });
+            res.status(201).json({ success: true, token, user: { id: user.id, username: user.username } });
+        } catch (err) {
+            res.status(err.message === 'Username already taken' ? 409 : 500).json({ error: err.message });
+        }
+    });
+
+    router.post('/api/auth/login', requireAccountSupport, async (req, res) => {
+        try {
+            const { username, password } = req.body || {};
+            if (!username || !password) {
+                return res.status(400).json({ error: 'username and password are required' });
+            }
+            const user = await storage.getUserByUsername(username);
+            // Always run the compare (even against a dummy hash) so a
+            // nonexistent username doesn't respond measurably faster than
+            // a wrong password -- avoids a trivial username-enumeration
+            // timing side-channel.
+            const passwordHash = user ? user.password_hash : '$2a$10$invalidsaltinvalidsaltinvalidsalthashvalue0000000000000';
+            const ok = await auth.verifyPassword(password, passwordHash);
+            if (!user || !ok) {
+                return res.status(401).json({ error: 'Invalid username or password' });
+            }
+            const token = auth.signToken({ userId: user.id, username: user.username });
+            res.json({ success: true, token, user: { id: user.id, username: user.username } });
+        } catch (err) {
+            res.status(500).json({ error: err.message });
+        }
+    });
+
+    router.get('/api/auth/me', requireAccountSupport, auth.requireAuth, async (req, res) => {
+        try {
+            const user = await storage.getUserById(req.user.userId);
+            if (!user) return res.status(404).json({ error: 'User not found' });
+            res.json({ id: user.id, username: user.username });
+        } catch (err) {
+            res.status(500).json({ error: err.message });
+        }
+    });
+
+    // ─── Room password (persistent, hashed) ────────────────────────
+    // NEW: previously room.js exported setRoomPassword() but NOTHING
+    // ever called it -- there was no route or socket event that could
+    // actually put a password on a room, so the password-gated join
+    // check in socketio-handlers.js/ws-handlers.js was permanently dead
+    // code. This is the admin/API path (gated by the existing static
+    // x-api-key, same as the other /api/rooms/:code/* admin routes);
+    // GMs can also set it live from the client via the `set_room_password`
+    // socket event (see socketio-handlers.js / ws-handlers.js).
+    router.post('/api/rooms/:code/password', authenticate, async (req, res) => {
+        try {
+            const roomCode = req.params.code.toUpperCase();
+            const r = room.getRoom(roomCode); // verify room exists
+            const { password } = req.body || {};
+            const hash = password ? await auth.hashPassword(String(password)) : null;
+            room.setRoomPassword(r, hash); // in-memory (now stores a hash, not plaintext), checked at join time
+            if (hasAccountSupport()) {
+                await storage.setRoomPasswordHash(roomCode, hash); // survives restarts
+            }
+            res.json({ success: true, code: roomCode, passwordSet: !!hash });
+        } catch (err) {
+            res.status(err.message.includes('not found') ? 404 : 500).json({ error: err.message });
+        }
+    });
+
+    // ─── Account character library (prep for account-owned characters) ──
+    // NEW: a per-user character library, capped at storage.MAX_CHARACTERS_
+    // PER_USER (5). This is intentionally separate from room.js's
+    // room.characters (the live, in-session character state synced to
+    // everyone at the table) -- nothing here is wired into a room's live
+    // state yet. That bridge (attaching one of your saved characters to a
+    // room's live roster on join) is a larger, separate change; this is
+    // the account-side storage + CRUD it would build on.
+    router.get('/api/account/characters', requireAccountSupport, auth.requireAuth, async (req, res) => {
+        try {
+            const characters = await storage.listCharacters(req.user.userId);
+            res.json({ characters, count: characters.length, limit: storage.MAX_CHARACTERS_PER_USER });
+        } catch (err) {
+            res.status(500).json({ error: err.message });
+        }
+    });
+
+    router.post('/api/account/characters', requireAccountSupport, auth.requireAuth, async (req, res) => {
+        try {
+            const { name, data } = req.body || {};
+            if (!name || typeof name !== 'string' || UNSAFE_KEYS.has(name)) {
+                return res.status(400).json({ error: 'A valid character name is required' });
+            }
+            const character = await storage.createCharacter(req.user.userId, name, data || {});
+            res.status(201).json({ success: true, character });
+        } catch (err) {
+            if (err.code === 'CHARACTER_LIMIT') return res.status(409).json({ error: err.message });
+            res.status(500).json({ error: err.message });
+        }
+    });
+
+    router.put('/api/account/characters/:id', requireAccountSupport, auth.requireAuth, async (req, res) => {
+        try {
+            const character = await storage.updateCharacterById(req.user.userId, req.params.id, req.body || {});
+            if (!character) return res.status(404).json({ error: 'Character not found' });
+            res.json({ success: true, character });
+        } catch (err) {
+            res.status(500).json({ error: err.message });
+        }
+    });
+
+    router.delete('/api/account/characters/:id', requireAccountSupport, auth.requireAuth, async (req, res) => {
+        try {
+            const deleted = await storage.deleteCharacter(req.user.userId, req.params.id);
+            if (!deleted) return res.status(404).json({ error: 'Character not found' });
+            res.json({ success: true });
+        } catch (err) {
+            res.status(500).json({ error: err.message });
+        }
     });
 
     // ─── Deck endpoints (unchanged) ────────────────────────────────
@@ -345,6 +500,39 @@ function createApiRouter(appConfig) {
             const targetId = req.params.clientId;
             const removed = room.unbanClient(r, targetId);
             res.json({ success: true, message: removed ? `Client ${targetId} unbanned.` : `Client ${targetId} was not banned.` });
+        } catch (err) {
+            res.status(500).json({ error: err.message });
+        }
+    });
+
+    // ─── Ban/unban by persistent account (userId), not live client id ──
+    // NEW: the routes above ban whoever currently holds a given
+    // socket/ws id, which resets the moment that id disconnects. These
+    // target a userId directly (from a membership row, or from the AI
+    // GM bot's own knowledge of who's misbehaving), so it works even
+    // against someone who isn't connected right now, and survives their
+    // next reconnect under a fresh id. Requires account support.
+    router.post('/api/rooms/:code/members/:userId/ban', authenticate, requireAccountSupport, async (req, res) => {
+        try {
+            if (!room.validateRoomCode(req.params.code)) {
+                return res.status(400).json({ error: 'Invalid room code format' });
+            }
+            const roomKey = req.params.code.toUpperCase();
+            await room.setMemberBannedByUserId(roomKey, req.params.userId, true);
+            res.json({ success: true, message: `User ${req.params.userId} banned from room ${roomKey}.` });
+        } catch (err) {
+            res.status(500).json({ error: err.message });
+        }
+    });
+
+    router.post('/api/rooms/:code/members/:userId/unban', authenticate, requireAccountSupport, async (req, res) => {
+        try {
+            if (!room.validateRoomCode(req.params.code)) {
+                return res.status(400).json({ error: 'Invalid room code format' });
+            }
+            const roomKey = req.params.code.toUpperCase();
+            await room.setMemberBannedByUserId(roomKey, req.params.userId, false);
+            res.json({ success: true, message: `User ${req.params.userId} unbanned from room ${roomKey}.` });
         } catch (err) {
             res.status(500).json({ error: err.message });
         }
@@ -1241,8 +1429,26 @@ function createApiRouter(appConfig) {
                 clients: {
                     list: 'GET /api/rooms/:code/clients - List clients in room',
                     kick: 'POST /api/rooms/:code/clients/:clientId/kick - Kick a client',
-                    ban: 'POST /api/rooms/:code/clients/:clientId/ban - Ban a client',
-                    unban: 'POST /api/rooms/:code/clients/:clientId/unban - Unban a client'
+                    ban: 'POST /api/rooms/:code/clients/:clientId/ban - Ban a client (ephemeral, by live socket/ws id)',
+                    unban: 'POST /api/rooms/:code/clients/:clientId/unban - Unban a client (ephemeral)',
+                    banMember: 'POST /api/rooms/:code/members/:userId/ban - Ban an account by userId (persistent, survives reconnects; requires account support)',
+                    unbanMember: 'POST /api/rooms/:code/members/:userId/unban - Unban an account by userId (requires account support)'
+                },
+                auth: {
+                    register: 'POST /api/auth/register - Create an account ({ username, password }); returns a JWT (requires account support)',
+                    login: 'POST /api/auth/login - Log in ({ username, password }); returns a JWT (requires account support)',
+                    me: 'GET /api/auth/me - Get the current account for a Bearer token (requires account support)',
+                    note: 'Accounts are OPTIONAL. Clients that never call these routes join rooms exactly as before -- anonymous, with the room password (if any) required on every join. An authenticated client that has joined a password-protected room once can rejoin without re-entering the password, and a ban tied to their account survives reconnects. Pass the JWT as { authToken } in the join-room / handshake payload.'
+                },
+                roomPassword: {
+                    set: 'POST /api/rooms/:code/password - Set/change/clear a room password ({ password } or {} to clear); also settable live by a GM via the set_room_password socket event',
+                },
+                accountCharacters: {
+                    list: 'GET /api/account/characters - List the current account\'s saved characters (max 5; requires Bearer token + account support)',
+                    create: 'POST /api/account/characters - Save a new character ({ name, data }); 409 once 5 are already saved',
+                    update: 'PUT /api/account/characters/:id - Update a saved character ({ name?, data? })',
+                    remove: 'DELETE /api/account/characters/:id - Delete a saved character',
+                    note: 'This is an account-owned character LIBRARY, separate from a room\'s live character roster (GET /api/rooms/:code/characters below). There is no bridge yet between the two -- attaching a saved character to a room\'s live state on join is a planned follow-up, not implemented here.'
                 },
                 deck: {
                     get: 'GET /api/rooms/:code/deck - Get current deck state',

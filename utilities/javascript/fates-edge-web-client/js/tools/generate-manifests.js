@@ -21,6 +21,7 @@ const EXCLUDED_FILES = new Set(['manifest.json', 'manifest-core.json', 'manifest
 // ─── Category mapping: subdir → category info ────────────────────
 const CATEGORY_MAP = {
   'core': { id: 'core', label: '📘 Core', path: '/data/docs/core/' },
+  'quickstart': { id: 'quickstart', label: '⚡ Quickstart', path: '/data/docs/quickstart/' },
   'resources': { id: 'resources', label: '📚 Resources', path: '/data/docs/resources/' },
   'adventures': { id: 'adventures', label: '🗡️ Adventures', path: '/data/docs/adventures/' },
   'expansions': { id: 'expansions', label: '📦 Expansions', path: '/data/docs/expansions/' },

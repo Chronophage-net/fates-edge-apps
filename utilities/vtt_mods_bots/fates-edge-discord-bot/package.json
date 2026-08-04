@@ -19,6 +19,7 @@
   "devDependencies": {
     "nodemon": "^3.0.1"
   },
-  "_license": "Fate's Edge Proprietary Content – © 2024 Nicholas A. Gasper. All rights reserved.",
+  "license": "MIT",
+  "_license": "Code: MIT. Game content: CC BY-NC-SA 4.0 (SRD) / All Rights Reserved (proprietary). © 2024 Nicholas A. Gasper.",
   "author": "Nicholas A. Gasper"
 }

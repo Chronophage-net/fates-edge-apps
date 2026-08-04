@@ -41,11 +41,17 @@ const KNOWN_RELIGION_SLUGS = [
 
 // ─── REGION SLUGS ──────────────────────────────────────────────
 
+// NEW: kept in sync with data/regions/manifest.json -- the core setting's
+// canonical region list (see fates-edge-docs' Amaranthine Core Setting,
+// Condensed). Non-canonical region files (e.g. midh_ahkaz, theona,
+// tulkani, and several one-off Eastern locales) were removed from
+// data/regions/, so this fallback list no longer references them.
 const KNOWN_REGION_SLUGS = [
-    'acasia', 'aelaerem', 'aeler', 'aelinnel', 'ecktoria',
-    'kahfagia', 'midh_ahkaz', 'mistlands', 'silkstrand',
-    'the_wilds', 'thepyrgos', 'ubral', 'valewood',
-    'vhasia', 'viterra', 'ykrul', 'zakov', 'dungeons'
+    'acasia', 'aelaerem', 'aeler', 'aelinnel', 'black_banners',
+    'dungeons', 'ecktoria', 'kahfagia', 'linn', 'mistlands',
+    'silkstrand', 'the_ways_between', 'the_wilds', 'thepyrgos',
+    'ubral', 'valewood', 'vhasia', 'vilikari', 'viterra',
+    'ykrul', 'zakov'
 ];
 
 const FALLBACK_REGIONS = ['Acasia', 'Ecktoria', 'Vhasia', 'Viterra', 'Ykrul', 'Silkstrand'];

@@ -46,11 +46,15 @@ _DEFAULT_PRINTERS = (
 
 class FatesEdgeWsClient:
     def __init__(self, server_url: str, api_key: str, room_code: str,
-                 client_name: str = "CLI Client"):
+                 client_name: str = "CLI Client", auth_token: str = ""):
         self.server_url = server_url.rstrip('/')
         self.api_key = api_key
         self.room_code = room_code
         self.client_data = {"name": client_name, "type": "cli"}
+        # NEW: optional per-user JWT from FatesEdgeRestClient.login()/
+        # register(). Purely additive -- omitted/invalid, join-room behaves
+        # exactly as before (room password required if the room has one).
+        self.auth_token = auth_token
 
         self.connected = False
         self.message_queue = MessageQueue()
@@ -168,10 +172,15 @@ class FatesEdgeWsClient:
             # room-code string with no `.roomCode` field, always failing
             # as "Invalid room code". Matches the shape
             # js/core/websocket.js's joinRoom() uses.
-            await self.sio.emit("join-room", {
+            payload = {
                 "roomCode": self.room_code,
                 "playerName": self.client_data.get("name", "CLI Client"),
-            })
+            }
+            # NEW: optional -- an absent/invalid token just means an
+            # anonymous join, same as before this was added.
+            if self.auth_token:
+                payload["authToken"] = self.auth_token
+            await self.sio.emit("join-room", payload)
             logger.info(f"Joined room {self.room_code}")
             return True
         except Exception as e:

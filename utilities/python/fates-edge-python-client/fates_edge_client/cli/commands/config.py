@@ -11,6 +11,7 @@ def run(args, store: DataStore) -> None:
 
     elif args.show:
         print(f"API Key: {store.apiKey[:8]}...{store.apiKey[-4:] if store.apiKey else 'Not set'}")
+        print(f"Account: {store.authUsername or 'Not logged in'} (use `account --login`/`--register`)")
         print(f"Server URL: {store.baseUrl or 'Not set'}")
         print(f"Characters: {len(store.characters)}")
         print(f"Timers: {len(store.timers)}")

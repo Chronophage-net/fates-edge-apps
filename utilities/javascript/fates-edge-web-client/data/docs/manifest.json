@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "generated": "2026-08-04T02:35:17.186Z",
+  "generated": "2026-08-04T14:56:13.187Z",
   "documents": [
     {
       "id": "systems_reference_document",
@@ -53,6 +53,16 @@
       "active": true
     },
     {
+      "id": "kon_reh_quickstart",
+      "title": "Kon'Reh   Quickstart",
+      "file": "Kon'reh-_-Quickstart.html",
+      "path": "/data/docs/quickstart/",
+      "category": "quickstart",
+      "categoryLabel": "⚡ Quickstart",
+      "core": false,
+      "active": true
+    },
+    {
       "id": "kon_reh_the_definitive_guide",
       "title": "Kon'Reh   The   Definitive   Guide",
       "file": "Kon'reh-_-The-_-Definitive-_-Guide.html",
@@ -79,6 +89,16 @@
       "path": "/data/docs/resources/",
       "category": "resources",
       "categoryLabel": "📚 Resources",
+      "core": false,
+      "active": true
+    },
+    {
+      "id": "quickstart",
+      "title": "Quickstart",
+      "file": "Fates_-_Edge_-_-Quickstart.html",
+      "path": "/data/docs/quickstart/",
+      "category": "quickstart",
+      "categoryLabel": "⚡ Quickstart",
       "core": false,
       "active": true
     },
@@ -143,7 +163,7 @@
       "active": true
     }
   ],
-  "total_count": 14,
-  "active_count": 14,
+  "total_count": 16,
+  "active_count": 16,
   "_license": "Fate's Edge Proprietary Content – © 2024 Nicholas A. Gasper. All rights reserved."
 }

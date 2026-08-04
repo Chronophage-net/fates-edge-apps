@@ -83,7 +83,13 @@ let colors = THEMES.default;
 
 // ─── Local config ──────────────────────────────────────────────
 const USER_CONFIG_FILE = path.join(__dirname, 'edge_config.json');
-let userConfig = { theme: 'default' };
+// NEW: authToken/authUsername -- optional account login (see /login,
+// /register, /logout below). Completely optional: without them, joining
+// works exactly as before (room password required every time this
+// client connects). Persisted here alongside the theme so logging in
+// once survives restarts, same as the existing config file already does
+// for appearance settings.
+let userConfig = { theme: 'default', authToken: null, authUsername: null };
 
 function loadUserConfig() {
     try {
@@ -548,6 +554,15 @@ ${colors.yellow}Connection:${colors.reset}
   /disconnect                 Disconnect
   /status                     Show status
 
+${colors.yellow}Account (optional):${colors.reset}
+  /register <user> <pass>      Create an account and log in
+  /login <user> <pass>         Log in to an existing account
+  /logout                      Log out (local only)
+  /whoami                      Show login status
+  Logging in is optional -- takes effect on your next /connect. Lets a
+  GM skip re-asking for a room password once you've joined, and makes
+  bans against you survive reconnects.
+
 ${colors.yellow}Chat & Dice:${colors.reset}
   <message>                   Send chat
   /roll <dice> [adv|dis] [reason]  Roll dice (e.g., /roll 1d20 adv "Attack")
@@ -814,6 +829,25 @@ async function makeApiRequest(endpoint, method = 'GET', data = null) {
     return res.json();
 }
 
+// ─── REST API (optional account auth) ───────────────────────────
+// NEW: separate from makeApiRequest() above, which always attaches the
+// static admin x-api-key -- /api/auth/register and /api/auth/login don't
+// require it at all, and /api/auth/me needs a per-user Bearer token
+// instead. Kept as its own helper rather than overloading makeApiRequest
+// so the two auth models (admin key vs. player account) can't get
+// accidentally crossed.
+async function makeAuthRequest(endpoint, method = 'GET', data = null, bearerToken = null) {
+    const url = `${apiBaseUrl}${endpoint}`;
+    const headers = { 'Content-Type': 'application/json' };
+    if (bearerToken) headers['Authorization'] = `Bearer ${bearerToken}`;
+    const options = { method, headers };
+    if (data && method !== 'GET') options.body = JSON.stringify(data);
+    const res = await fetch(url, options);
+    const body = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(body?.error || `HTTP ${res.status}`);
+    return body;
+}
+
 async function getClientIdFromApi(name) {
     if (!ADMIN_MODE || !roomCode) return null;
     try {
@@ -903,6 +937,9 @@ function connectToServer(url = serverUrl, room = roomCode) {
                 type: 'handshake',
                 campaignCode: roomCode,
                 password: password,
+                // NEW: optional -- omitted/invalid tokens just mean an
+                // anonymous join, exactly as before. See /login, /register.
+                authToken: userConfig.authToken || undefined,
                 clientName: clientName,
                 role: 'player',
                 version: CONFIG.version
@@ -1055,6 +1092,54 @@ function handleInputLine(input) {
             case 'name':
                 if (argStr) { clientName = argStr; printSystemMessage(`Name set to: ${clientName}`); }
                 else printSystemMessage(`Current name: ${clientName}`);
+                break;
+
+            // ─── Optional account login (NEW) ───────────────────
+            // Entirely optional -- without logging in, /connect keeps
+            // working exactly as it always has. Logging in lets a GM
+            // exempt you from re-entering a room's password on later
+            // joins, and makes a ban against you survive reconnects
+            // (see server/room.js's persistent-membership notes).
+            case 'register':
+            case 'login': {
+                const [username, ...pwParts] = args;
+                const pw = pwParts.join(' ');
+                if (!username || !pw) {
+                    printSystemMessage(`Usage: /${cmd} <username> <password>`);
+                    break;
+                }
+                (async () => {
+                    try {
+                        const body = await makeAuthRequest(
+                            cmd === 'register' ? '/auth/register' : '/auth/login',
+                            'POST', { username, password: pw }
+                        );
+                        userConfig.authToken = body.token;
+                        userConfig.authUsername = body.user?.username || username;
+                        saveUserConfig();
+                        printSystemMessage(`✅ ${cmd === 'register' ? 'Registered and logged in' : 'Logged in'} as ${userConfig.authUsername}. This applies on your NEXT /connect.`, colors.green);
+                    } catch (e) {
+                        printSystemMessage(`❌ ${cmd} failed: ${e.message}`, colors.red);
+                    }
+                    promptAgain();
+                })();
+                return; // async -- prompt is re-shown by the callback above
+            }
+
+            case 'logout':
+                userConfig.authToken = null;
+                userConfig.authUsername = null;
+                saveUserConfig();
+                printSystemMessage('Logged out. (Takes effect on your next /connect.)');
+                break;
+
+            case 'whoami':
+                if (userConfig.authUsername) {
+                    printSystemMessage(`🔐 Logged in as: ${userConfig.authUsername}`, colors.green);
+                } else {
+                    printSystemMessage('🔓 Not logged in (playing anonymously). Use /login or /register.');
+                }
+                if (connected) printSystemMessage(`In-room display name: ${clientName} (${myRole})`);
                 break;
 
             // ─── Dice rolling ──────────────────────────────────

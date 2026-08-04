@@ -14,6 +14,7 @@
     "vitest": "^1.0.0",
     "eslint": "^8.0.0"
   },
-  "_license": "Fate's Edge Proprietary Content – © 2024 Nicholas A. Gasper. All rights reserved.",
+  "license": "MIT",
+  "_license": "Code: MIT. Game content (data files, lore, SRD-marked material): see LICENSE.md for the CC BY-NC-SA 4.0 / All Rights Reserved split. © 2024 Nicholas A. Gasper.",
   "author": "Nicholas A. Gasper"
 }

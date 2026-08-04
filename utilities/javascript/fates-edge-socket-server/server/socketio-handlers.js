@@ -10,6 +10,14 @@ const fs = require('fs');
 const path = require('path');
 const { buildSafeDict, isSafeModuleId, clampCount } = require('./security.js');
 const adventure = require('./adventure.js');
+const auth = require('./auth.js');
+
+// Optional -- see storage.js's file-header note on why account features
+// degrade gracefully instead of hard-failing if the DB module isn't
+// available (e.g. the file-system fallback in api.js is active).
+let storage = null;
+try { storage = require('./storage.js'); } catch (e) { storage = null; }
+function hasAccountSupport() { return !!(storage && typeof storage.getMembership === 'function'); }
 
 let socketStats = { socketIOConnections: 0, totalConnections: 0 };
 
@@ -30,11 +38,24 @@ function setupSocketIO(io) {
         };
 
         // ─── Join Room ──────────────────────────────────────────────
-        socket.on('join-room', (data) => {
+        // NEW: `authToken` is optional -- a client with no account (or an
+        // expired/invalid token) joins exactly as before, anonymously,
+        // always subject to the room password if one is set. A client
+        // that supplies a valid token gets three things layered on top:
+        // (1) a persistent ban tied to their account survives across
+        // reconnects/new socket ids, where the old ban Set (keyed by
+        // ephemeral socket.id) didn't; (2) once they've joined a
+        // password-protected room once, they don't have to re-enter the
+        // password on later joins; (3) their GM status can be persisted
+        // (see room.js's handleGmRequest/handleGmApproval) for future
+        // features to build on, though live GM election behavior itself
+        // is unchanged.
+        socket.on('join-room', async (data) => {
             // Flexible payload: accept either clientData object or flat fields
             const {
                 roomCode,
                 password,
+                authToken,
                 clientData = {},
                 playerName = clientData.name || 'Player',
                 playerRole = clientData.role || 'player',
@@ -46,6 +67,7 @@ function setupSocketIO(io) {
                 return;
             }
             const roomKey = roomCode.toUpperCase();
+            const authUser = auth.verifyTokenOptional(authToken);
 
             // Leave previous room
             if (socket.room) {
@@ -75,18 +97,58 @@ function setupSocketIO(io) {
                 logger.info('📋 Room created via Socket.io', { room: roomKey });
             }
 
-            // Ban check
+            // NEW: rooms are deleted from the in-memory Map whenever they
+            // go empty (see the disconnect handler below) and rebuilt
+            // fresh -- with password: null -- on the next join. Without
+            // this, a persisted room password would silently stop being
+            // enforced the moment a room's last client left, even for
+            // seconds. Only hydrate when the in-memory value is empty;
+            // set_room_password / the admin route already keep storage
+            // and the in-memory room in sync going forward, so this is
+            // strictly "recover what we lost when the room object was
+            // recreated", not a competing source of truth.
+            if (!currentRoom.password && hasAccountSupport()) {
+                try {
+                    const persistedHash = await storage.getRoomPasswordHash(roomKey);
+                    if (persistedHash) currentRoom.password = persistedHash;
+                } catch (e) {
+                    logger.warn('Failed to hydrate persisted room password', { error: e.message });
+                }
+            }
+
+            // Ban check (ephemeral, by socket id -- unaffected by accounts)
             if (room.isBanned(currentRoom, socket.id)) {
                 socket.emit('error', { message: 'You are banned from this room.' });
                 socket.disconnect(true);
                 return;
             }
 
-            // Password check (if room has one)
-            if (currentRoom.password && currentRoom.password !== password) {
-                socket.emit('error', { message: 'Incorrect room password.' });
-                socket.disconnect(true);
-                return;
+            // Persistent ban check (by account, survives reconnects/new socket ids)
+            let membership = null;
+            if (authUser && hasAccountSupport()) {
+                try {
+                    if (await storage.isMemberBanned(roomKey, authUser.userId)) {
+                        socket.emit('error', { message: 'You are banned from this room.' });
+                        socket.disconnect(true);
+                        return;
+                    }
+                    membership = await storage.getMembership(roomKey, authUser.userId);
+                } catch (e) {
+                    logger.warn('Account membership lookup failed', { error: e.message });
+                }
+            }
+
+            // Password check (if room has one) -- known members (an
+            // existing membership row) skip re-entering it. Everyone else
+            // (anonymous clients, or an authenticated user's first visit
+            // to this room) still needs it.
+            if (currentRoom.password && !membership) {
+                const ok = await auth.verifyPassword(password, currentRoom.password);
+                if (!ok) {
+                    socket.emit('error', { message: 'Incorrect room password.' });
+                    socket.disconnect(true);
+                    return;
+                }
             }
 
             // GM conflict
@@ -99,11 +161,18 @@ function setupSocketIO(io) {
 
             socket.join(roomKey);
             socket.room = roomKey;
-            socket.clientData.name = playerName;
+            socket.clientData.name = playerName || (authUser ? authUser.username : 'Player');
             socket.clientData.role = assignedRole;
             socket.clientData.email = playerEmail;
+            socket.clientData.userId = authUser ? authUser.userId : null;
             currentRoom.clients.set(socket.id, socket.clientData);
             currentRoom.lastActivity = Date.now();
+
+            if (authUser && hasAccountSupport()) {
+                storage.upsertMembership(roomKey, authUser.userId, {}).catch(e =>
+                    logger.warn('Failed to upsert room membership', { error: e.message })
+                );
+            }
 
             const clientsList = room.getClientsList(currentRoom);
 
@@ -561,6 +630,26 @@ function setupSocketIO(io) {
                     clientName: socket.clientData?.name || 'Player'
                 }, socket.id);
             });
+        });
+
+        // ─── Room password (GM only) ─────────────────────────────────
+        // NEW: previously nothing could actually set room.password (see
+        // room.js's setRoomPassword comment) -- this is the live,
+        // client-facing way for a GM to add/change/clear it mid-session,
+        // mirroring the REST admin route POST /api/rooms/:code/password.
+        socket.on('set_room_password', async (data) => {
+            if (!socket.room || socket.clientData.role !== 'gm') return;
+            const r = room.rooms.get(socket.room);
+            if (!r) return;
+            const password = data && data.password;
+            const hash = password ? await auth.hashPassword(String(password)) : null;
+            room.setRoomPassword(r, hash);
+            if (hasAccountSupport()) {
+                storage.setRoomPasswordHash(r.code, hash).catch(e =>
+                    logger.warn('Failed to persist room password', { error: e.message })
+                );
+            }
+            socket.emit('set_room_password_ack', { success: true, passwordSet: !!hash });
         });
 
         // ─── Ban/Kick ───────────────────────────────────────────────

@@ -18,7 +18,8 @@ from ...store import DataStore, save_data
 
 
 async def run(args, store: DataStore) -> None:
-    client = FatesEdgeRestClient(args.server, store.apiKey or args.api_key)
+    client = FatesEdgeRestClient(args.server, store.apiKey or args.api_key,
+                                  auth_token=store.authToken)
 
     if args.upload:
         if not args.code:

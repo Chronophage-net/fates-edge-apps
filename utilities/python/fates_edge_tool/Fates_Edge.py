@@ -34,6 +34,11 @@ DEFAULT_PREFERENCES = {
     "room_code": "",
     "api_key": "",
     "broadcast_rolls": False,
+    # NEW: optional per-user JWT from the server's optional accounts
+    # feature (server/auth.js). Distinct from api_key above (that's the
+    # static admin key). Leaving this blank behaves exactly as before --
+    # a fully anonymous join, room password required if the room has one.
+    "auth_token": "",
 }
 
 # -------------------------------
@@ -197,7 +202,7 @@ class RoomConnection:
             self.event_queue.put((event_name, data))
         return handler
 
-    def connect(self, server_url, room_code, api_key, client_name="Fate's Edge Tool"):
+    def connect(self, server_url, room_code, api_key, client_name="Fate's Edge Tool", auth_token=""):
         headers = {"X-API-Key": api_key} if api_key else {}
         self.sio.connect(server_url, headers=headers, wait_timeout=10)
         self.room_code = room_code
@@ -209,7 +214,12 @@ class RoomConnection:
         # parameter, `data` would end up being the bare room-code string
         # with no `.roomCode` field, always failing as "Invalid room
         # code". Matches the shape js/core/websocket.js's joinRoom() uses.
-        self.sio.emit('join-room', {"roomCode": room_code, "playerName": client_name})
+        payload = {"roomCode": room_code, "playerName": client_name}
+        # NEW: optional -- an absent/invalid token just means an
+        # anonymous join, same as before this was added.
+        if auth_token:
+            payload["authToken"] = auth_token
+        self.sio.emit('join-room', payload)
 
     def disconnect(self):
         if self.sio.connected:
@@ -1873,12 +1883,21 @@ class FateEdgeApp:
         self.api_key_var = tk.StringVar(value=self.preferences.get("api_key", ""))
         ttk.Entry(conn_frame, textvariable=self.api_key_var, width=30, show='*').grid(row=1, column=1, padx=5, pady=3)
 
+        # NEW: optional per-account login token (separate from the static
+        # admin API key above). Get one via the web client's Account panel
+        # or the terminal/python client's /login|/register command, then
+        # paste it here. Leave blank for a fully anonymous connection --
+        # nothing else on this tab changes behavior if it's empty.
+        ttk.Label(conn_frame, text="Account Token:").grid(row=2, column=0, sticky='e', padx=5, pady=3)
+        self.auth_token_var = tk.StringVar(value=self.preferences.get("auth_token", ""))
+        ttk.Entry(conn_frame, textvariable=self.auth_token_var, width=30, show='*').grid(row=2, column=1, padx=5, pady=3)
+
         self.server_status_var = tk.StringVar(value="Not connected")
         ttk.Label(conn_frame, textvariable=self.server_status_var, foreground="#555").grid(
             row=1, column=2, columnspan=2, sticky='w', padx=5, pady=3)
 
         btn_row = ttk.Frame(conn_frame)
-        btn_row.grid(row=2, column=0, columnspan=4, pady=5)
+        btn_row.grid(row=3, column=0, columnspan=4, pady=5)
         self.connect_btn = ttk.Button(btn_row, text="Connect", command=self.connect_to_room)
         self.connect_btn.pack(side='left', padx=5)
         self.disconnect_btn = ttk.Button(btn_row, text="Disconnect", command=self.disconnect_from_room, state="disabled")
@@ -1888,12 +1907,12 @@ class FateEdgeApp:
             ttk.Label(conn_frame,
                       text="⚠ python-socketio is not installed -- live connection is disabled. "
                            "Run: pip install \"python-socketio[client]\"",
-                      foreground="#a00").grid(row=3, column=0, columnspan=4, sticky='w', padx=5, pady=3)
+                      foreground="#a00").grid(row=4, column=0, columnspan=4, sticky='w', padx=5, pady=3)
             self.connect_btn.config(state="disabled")
 
         self.broadcast_rolls_var = tk.BooleanVar(value=self.preferences.get("broadcast_rolls", False))
         ttk.Checkbutton(conn_frame, text="Broadcast my dice rolls to the room",
-                         variable=self.broadcast_rolls_var).grid(row=4, column=0, columnspan=4, sticky='w', padx=5, pady=3)
+                         variable=self.broadcast_rolls_var).grid(row=5, column=0, columnspan=4, sticky='w', padx=5, pady=3)
 
         char_frame = ttk.LabelFrame(server_frame, text="Character Sync")
         char_frame.pack(fill='x', padx=10, pady=5)
@@ -1976,6 +1995,7 @@ class FateEdgeApp:
         server_url = self.server_url_var.get().strip()
         room_code = self.room_code_var.get().strip()
         api_key = self.api_key_var.get().strip()
+        auth_token = self.auth_token_var.get().strip()
         if not room_code:
             messagebox.showwarning("Room Code Required", "Enter a room code to connect.")
             return
@@ -1983,6 +2003,7 @@ class FateEdgeApp:
         self.preferences["server_url"] = server_url
         self.preferences["room_code"] = room_code
         self.preferences["api_key"] = api_key
+        self.preferences["auth_token"] = auth_token
         self.save_preferences()
 
         self.server_status_var.set("Connecting...")
@@ -1992,7 +2013,7 @@ class FateEdgeApp:
         def worker():
             room = RoomConnection(self.event_queue)
             try:
-                room.connect(server_url, room_code, api_key, client_name=char_name)
+                room.connect(server_url, room_code, api_key, client_name=char_name, auth_token=auth_token)
                 self.room = room
                 self.event_queue.put(('_status', f"Connected to room {room_code}"))
             except Exception as e:

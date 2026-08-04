@@ -50,24 +50,44 @@ class NotSupportedByServerError(FatesEdgeApiError):
 
 
 class FatesEdgeRestClient:
-    def __init__(self, base_url: str = "http://localhost:10000", api_key: str = ""):
+    def __init__(self, base_url: str = "http://localhost:10000", api_key: str = "",
+                 auth_token: str = ""):
         self.base_url = base_url.rstrip('/')
         self.api_key = api_key or os.environ.get("FATES_EDGE_API_KEY", "")
+        # NEW: optional per-user JWT (from /api/auth/login|register), fully
+        # separate from the static admin api_key above -- the two auth
+        # models don't overlap server-side (see auth.js/api.js), so this
+        # client keeps them as two separate constructor args rather than
+        # collapsing them into one "credential" concept.
+        self.auth_token = auth_token or os.environ.get("FATES_EDGE_AUTH_TOKEN", "")
         self.headers = {"X-API-Key": self.api_key} if self.api_key else {}
 
-    async def _request(self, method: str, endpoint: str, data: Dict = None) -> Dict:
+    def _auth_headers(self, use_bearer: bool = False) -> Dict[str, str]:
+        """Headers for a request. use_bearer=True adds the per-user JWT
+        (for /api/auth/me and /api/account/characters*); the static
+        X-API-Key is still included whenever present since some deployments
+        may want both, and the server only checks the header(s) it cares
+        about for a given route."""
+        headers = dict(self.headers)
+        if use_bearer and self.auth_token:
+            headers["Authorization"] = f"Bearer {self.auth_token}"
+        return headers
+
+    async def _request(self, method: str, endpoint: str, data: Dict = None,
+                        use_bearer: bool = False) -> Dict:
         """Make an API request, translating HTTP errors into typed
         exceptions."""
         url = f"{self.base_url}{endpoint}"
+        headers = self._auth_headers(use_bearer)
         try:
             if method == 'GET':
-                resp = requests.get(url, headers=self.headers)
+                resp = requests.get(url, headers=headers)
             elif method == 'POST':
-                resp = requests.post(url, json=data, headers=self.headers)
+                resp = requests.post(url, json=data, headers=headers)
             elif method == 'PUT':
-                resp = requests.put(url, json=data, headers=self.headers)
+                resp = requests.put(url, json=data, headers=headers)
             elif method == 'DELETE':
-                resp = requests.delete(url, headers=self.headers)
+                resp = requests.delete(url, headers=headers)
             else:
                 raise ValueError(f"Unsupported method: {method}")
 
@@ -179,3 +199,88 @@ class FatesEdgeRestClient:
         if room_code:
             payload['roomCode'] = room_code
         return await self._request('POST', f'/api/modules/{module_id}/cleanup', payload)
+
+    # ------------------------------------------------------------
+    # Optional account auth (NEW)
+    # ------------------------------------------------------------
+    # These hit the server's optional accounts feature (server/auth.js,
+    # server/api.js). All are no-ops on an older/unpatched server: it
+    # will 404/503 rather than the client crashing, since these routes
+    # simply won't exist there. Nothing here is required for the
+    # anonymous flow above -- register/login just populate self.auth_token
+    # for subsequent calls, or for a caller to persist into DataStore.
+
+    async def register(self, username: str, password: str) -> Dict:
+        """Create an account and return {token, user}. Also updates
+        self.auth_token so subsequent calls on this instance are
+        authenticated immediately."""
+        result = await self._request('POST', '/api/auth/register', {
+            "username": username, "password": password,
+        })
+        if result.get('token'):
+            self.auth_token = result['token']
+        return result
+
+    async def login(self, username: str, password: str) -> Dict:
+        """Log in and return {token, user}; updates self.auth_token."""
+        result = await self._request('POST', '/api/auth/login', {
+            "username": username, "password": password,
+        })
+        if result.get('token'):
+            self.auth_token = result['token']
+        return result
+
+    async def whoami(self) -> Dict:
+        """Return the account associated with self.auth_token."""
+        return await self._request('GET', '/api/auth/me', use_bearer=True)
+
+    # ------------------------------------------------------------
+    # Account character library (up to 5 per account, server-enforced)
+    # ------------------------------------------------------------
+
+    async def list_account_characters(self) -> List[Dict]:
+        result = await self._request('GET', '/api/account/characters', use_bearer=True)
+        return result.get('characters', result if isinstance(result, list) else [])
+
+    async def create_account_character(self, name: str, data: Dict) -> Dict:
+        """Raises FatesEdgeApiError (status_code=409) if the account
+        already has 5 characters stored -- the server enforces the cap,
+        this client doesn't duplicate that logic locally."""
+        return await self._request('POST', '/api/account/characters', {
+            "name": name, "data": data,
+        }, use_bearer=True)
+
+    async def update_account_character(self, character_id: str, name: str = None,
+                                        data: Dict = None) -> Dict:
+        payload = {}
+        if name is not None:
+            payload['name'] = name
+        if data is not None:
+            payload['data'] = data
+        return await self._request('PUT', f'/api/account/characters/{character_id}', payload,
+                                    use_bearer=True)
+
+    async def delete_account_character(self, character_id: str) -> Dict:
+        return await self._request('DELETE', f'/api/account/characters/{character_id}',
+                                    use_bearer=True)
+
+    # ------------------------------------------------------------
+    # Admin: room passwords + persistent bans (x-api-key gated)
+    # ------------------------------------------------------------
+
+    async def set_room_password(self, room_code: str, password: str) -> Dict:
+        """Admin-only (static X-API-Key): set/replace a room's persistent
+        join password. Requires the server to have account support
+        enabled (returns 503 FatesEdgeApiError otherwise)."""
+        return await self._request('POST', f'/api/rooms/{room_code}/password', {
+            "password": password,
+        })
+
+    async def ban_member(self, room_code: str, user_id: str) -> Dict:
+        """Admin-only: ban an account from a room persistently -- survives
+        the member reconnecting with a new socket id, unlike the older
+        purely in-memory/ephemeral ban."""
+        return await self._request('POST', f'/api/rooms/{room_code}/members/{user_id}/ban')
+
+    async def unban_member(self, room_code: str, user_id: str) -> Dict:
+        return await self._request('POST', f'/api/rooms/{room_code}/members/{user_id}/unban')

@@ -42,6 +42,11 @@ the System Reference Document (SRD).
 
 © 2024 Nicholas A. Gasper. All rights reserved.
 
+All proprietary names, characters, factions, patrons, and setting elements are used with the
+permission of the author — Nicholas A. Gasper, who is the sole rights holder of this material and
+grants himself and this project that permission. Third parties do not have this permission and
+must request it separately (see below).
+
 The Proprietary Content includes, but is not limited to:
 
 - Setting lore (Acasia, Aeler, Vhasia, the Curse, etc.)

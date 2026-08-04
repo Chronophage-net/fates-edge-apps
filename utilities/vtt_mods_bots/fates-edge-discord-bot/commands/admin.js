@@ -210,6 +210,40 @@ module.exports = {
                             { name: 'sync', value: 'sync' }
                         )
                 )
+        )
+        // ── NEW: Room password + persistent account bans ──
+        // These use the server's optional accounts feature
+        // (server/auth.js, server/api.js) -- they 503 gracefully on an
+        // older/unpatched server rather than the bot crashing. Distinct
+        // from the existing `ban`/`unban` above, which target a live
+        // socket by name/client-id and don't survive that client
+        // reconnecting with a fresh id.
+        .addSubcommand(sub =>
+            sub.setName('room-password')
+                .setDescription("Set/replace the VTT room's persistent join password")
+                .addStringOption(opt =>
+                    opt.setName('password')
+                        .setDescription('New room password')
+                        .setRequired(true)
+                )
+        )
+        .addSubcommand(sub =>
+            sub.setName('ban-account')
+                .setDescription('Persistently ban a logged-in account from the room (survives reconnects)')
+                .addStringOption(opt =>
+                    opt.setName('user-id')
+                        .setDescription("The account's user ID (see /vttadmin players or the room's member list)")
+                        .setRequired(true)
+                )
+        )
+        .addSubcommand(sub =>
+            sub.setName('unban-account')
+                .setDescription('Lift a persistent account ban')
+                .addStringOption(opt =>
+                    opt.setName('user-id')
+                        .setDescription("The account's user ID")
+                        .setRequired(true)
+                )
         ),
 
     async execute(interaction, client) {
@@ -233,6 +267,9 @@ module.exports = {
                 case 'grid':        return handleGrid(interaction, client);
                 case 'token':       return handleToken(interaction, client);
                 case 'whiteboard':  return handleWhiteboard(interaction, client);
+                case 'room-password':   return handleRoomPassword(interaction, client);
+                case 'ban-account':     return handleBanAccount(interaction, client);
+                case 'unban-account':   return handleUnbanAccount(interaction, client);
             }
         } catch (err) {
             await interaction.editReply(`❌ Error: ${err.message}`);
@@ -726,6 +763,69 @@ async function handleWhiteboard(interaction, client) {
         }
     } catch (err) {
         await interaction.editReply(`❌ Whiteboard operation failed: ${err.message}`);
+    }
+}
+
+// ─── NEW: Room password + persistent account bans ────────
+// Same x-api-key admin auth pattern used everywhere else in this file
+// (see handleCharacters/handleGrid/handleToken/handleWhiteboard above).
+// These hit the server's optional accounts feature; a server without it
+// enabled returns 503, surfaced below as a normal error message rather
+// than a crash.
+
+async function apiRequestAdmin(client, endpoint, method = 'GET', data = null) {
+    const apiBase = client.vtt.getApiBaseUrl ? client.vtt.getApiBaseUrl() : `${client.vtt.config.serverUrl.replace('ws', 'http')}/api`;
+    const apiKey = process.env.API_KEY || client.vtt.config.apiKey || '';
+    const url = `${apiBase}${endpoint}`;
+    const headers = { 'Content-Type': 'application/json' };
+    if (apiKey) headers['x-api-key'] = apiKey;
+    const options = { method, headers };
+    if (data && method !== 'GET') options.body = JSON.stringify(data);
+    const res = await fetch(url, options);
+    if (!res.ok) {
+        const text = await res.text();
+        throw new Error(`HTTP ${res.status}: ${text}`);
+    }
+    if (res.status === 204) return {};
+    return res.json();
+}
+
+async function handleRoomPassword(interaction, client) {
+    if (!client.vtt.connected) {
+        return interaction.editReply('❌ Not connected to VTT server.');
+    }
+    const password = interaction.options.getString('password');
+    try {
+        await apiRequestAdmin(client, `/rooms/${client.vtt.roomCode}/password`, 'POST', { password });
+        await interaction.editReply(`🔒 Room password updated for \`${client.vtt.roomCode}\`.`);
+    } catch (err) {
+        await interaction.editReply(`❌ Failed to set room password: ${err.message}`);
+    }
+}
+
+async function handleBanAccount(interaction, client) {
+    if (!client.vtt.connected) {
+        return interaction.editReply('❌ Not connected to VTT server.');
+    }
+    const userId = interaction.options.getString('user-id');
+    try {
+        await apiRequestAdmin(client, `/rooms/${client.vtt.roomCode}/members/${userId}/ban`, 'POST');
+        await interaction.editReply(`🚫 Account \`${userId}\` persistently banned from \`${client.vtt.roomCode}\` (survives reconnects).`);
+    } catch (err) {
+        await interaction.editReply(`❌ Ban failed: ${err.message}`);
+    }
+}
+
+async function handleUnbanAccount(interaction, client) {
+    if (!client.vtt.connected) {
+        return interaction.editReply('❌ Not connected to VTT server.');
+    }
+    const userId = interaction.options.getString('user-id');
+    try {
+        await apiRequestAdmin(client, `/rooms/${client.vtt.roomCode}/members/${userId}/unban`, 'POST');
+        await interaction.editReply(`✅ Account \`${userId}\` unbanned from \`${client.vtt.roomCode}\`.`);
+    } catch (err) {
+        await interaction.editReply(`❌ Unban failed: ${err.message}`);
     }
 }
 

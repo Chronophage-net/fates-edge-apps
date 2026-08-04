@@ -49,6 +49,12 @@ class DataStore:
     passwordHash: Optional[str] = None
     baseUrl: str = ""
     apiKey: str = ""
+    # NEW: optional per-user JWT from /api/auth/login|register, distinct
+    # from the static admin apiKey above. Lets `server`/`ws` subcommands
+    # skip a room's password once, and makes account-owned character
+    # library calls (`characters --account-*`) possible. Never required.
+    authToken: str = ""
+    authUsername: str = ""
     _nextId: int = 1
     _nextTalentId: int = 1
     _nextEncounterId: int = 1
@@ -69,6 +75,8 @@ class DataStore:
             "passwordHash": self.passwordHash,
             "baseUrl": self.baseUrl,
             "apiKey": self.apiKey,
+            "authToken": self.authToken,
+            "authUsername": self.authUsername,
             "_nextId": self._nextId,
             "_nextTalentId": self._nextTalentId,
             "_nextEncounterId": self._nextEncounterId,
@@ -96,6 +104,8 @@ class DataStore:
             passwordHash=data.get("passwordHash"),
             baseUrl=data.get("baseUrl", ""),
             apiKey=data.get("apiKey", ""),
+            authToken=data.get("authToken", ""),
+            authUsername=data.get("authUsername", ""),
             _nextId=data.get("_nextId", 1),
             _nextTalentId=data.get("_nextTalentId", 1),
             _nextEncounterId=data.get("_nextEncounterId", 1),

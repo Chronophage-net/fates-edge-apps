@@ -17,7 +17,10 @@ async def run(args, store: DataStore) -> None:
         print("❌ Please provide --code CODE")
         return
 
-    client = FatesEdgeWsClient(args.server, store.apiKey or args.api_key, args.code)
+    client = FatesEdgeWsClient(
+        args.server, store.apiKey or args.api_key, args.code,
+        auth_token=store.authToken,
+    )
 
     try:
         await client.connect_with_retry()

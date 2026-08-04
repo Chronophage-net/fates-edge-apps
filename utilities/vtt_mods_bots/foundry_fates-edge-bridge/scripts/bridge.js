@@ -97,6 +97,8 @@ export const FatesEdgeBridge = {
         const serverUrl = game.settings.get('fates-edge-bridge', 'serverUrl');
         const roomCode = game.settings.get('fates-edge-bridge', 'roomCode');
         const password = game.settings.get('fates-edge-bridge', 'password') || '';
+        // NEW: optional -- see settings.js's authToken registration.
+        const authToken = game.settings.get('fates-edge-bridge', 'authToken') || '';
         const playerName = game.settings.get('fates-edge-bridge', 'playerName') || game.user.name || 'Foundry GM';
         this.defaultRegion = game.settings.get('fates-edge-bridge', 'defaultRegion') || 'Acasia';
         
@@ -121,7 +123,7 @@ export const FatesEdgeBridge = {
             
             this.ws = new WebSocket(fullUrl);
             
-            this.ws.onopen = () => this._onOpen(playerName, password);
+            this.ws.onopen = () => this._onOpen(playerName, password, authToken);
             this.ws.onmessage = (event) => this._onMessage(event);
             this.ws.onerror = (error) => this._onError(error);
             this.ws.onclose = (event) => this._onClose(event);
@@ -187,12 +189,12 @@ export const FatesEdgeBridge = {
     // WebSocket Event Handlers
     // ============================================================
     
-    _onOpen(playerName, password) {
+    _onOpen(playerName, password, authToken) {
         console.log('✅ WebSocket connected');
         this.connected = true;
         this.reconnectAttempts = 0;
         this._updateStatusUI('connected');
-        
+
         const message = {
             type: 'handshake',
             clientName: playerName,
@@ -200,6 +202,11 @@ export const FatesEdgeBridge = {
             password: password,
             version: '2.1.0'
         };
+        // NEW: optional -- an absent/invalid token just means an
+        // anonymous join, same as before this was added.
+        if (authToken) {
+            message.authToken = authToken;
+        }
         this.ws.send(JSON.stringify(message));
         console.log('📤 Handshake sent');
         

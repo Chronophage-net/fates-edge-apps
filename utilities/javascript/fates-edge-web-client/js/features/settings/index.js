@@ -155,6 +155,7 @@ export function render(el) {
     const userName = localStorage.getItem('fates-edge-client-name') || '';
     const showAvatars = localStorage.getItem('fates-edge-show-avatars') !== 'false';
     const useGravatars = localStorage.getItem('fates-edge-use-gravatars') !== 'false';
+    const accountUsername = localStorage.getItem('fates-edge-auth-username') || '';
     
     const wsConnected = isWSConnected ? isWSConnected() : false;
     const wsStatus = getWSStatus ? getWSStatus() : 'disconnected';
@@ -531,6 +532,44 @@ export function render(el) {
                 <div id="settings-ws-result" class="mt-1" style="display:none;"></div>
             </div>
             
+            <!-- ============================================================
+                 ACCOUNT (optional)
+                 ============================================================ -->
+            <div class="panel settings-panel" id="account-panel">
+                <div class="panel-header">
+                    <h3>🔐 Account <span class="text-muted small">(optional)</span></h3>
+                    <span id="account-status-badge" class="badge ${accountUsername ? '' : 'disconnected'}">${accountUsername ? `✅ ${escHtml(accountUsername)}` : '🔴 Not logged in'}</span>
+                </div>
+                <p class="text-muted small">
+                    Completely optional. Without an account, joining a campaign works exactly as before --
+                    you'll just need the room password every time. With an account, a GM can let you back into
+                    a password-protected room without re-entering it, and bans against your account stick even
+                    across reconnects. Accounts require the server you're connecting to have database storage
+                    configured -- ask your GM/host if registration fails.
+                </p>
+                ${accountUsername ? `
+                <div class="flex">
+                    <button class="btn btn-sm btn-danger" id="account-logout-btn">🚪 Log Out (${escHtml(accountUsername)})</button>
+                </div>
+                ` : `
+                <div class="form-row">
+                    <div class="field">
+                        <label>Username</label>
+                        <input type="text" id="account-username" placeholder="3-32 chars, letters/numbers/_/-" />
+                    </div>
+                    <div class="field">
+                        <label>Password</label>
+                        <input type="password" id="account-password" placeholder="8+ characters" />
+                    </div>
+                </div>
+                <div class="flex">
+                    <button class="btn btn-sm btn-gold" id="account-login-btn">🔑 Log In</button>
+                    <button class="btn btn-sm btn-secondary" id="account-register-btn">✨ Register</button>
+                </div>
+                <div id="account-result" class="mt-1" style="display:none;"></div>
+                `}
+            </div>
+
             <!-- ============================================================
                  LIVE CAMPAIGN (Sync)
                  ============================================================ -->
@@ -963,6 +1002,99 @@ function initSyncUI() {
 }
 
 // ============================================================
+// ACCOUNT (optional login/register)
+// ============================================================
+// Layers on top of the existing anonymous room-code+password flow --
+// see js/core/sync/index.js's sendHandshake() and js/core/websocket.js's
+// joinRoom(), both of which now send whatever token is stored under
+// 'fates-edge-auth-token'. A client that never uses this panel keeps
+// joining exactly as it always has.
+
+/** Turn whatever's in the Server URL field (ws://, wss://, bare host, or
+ *  already http(s)://) into an http(s) base for plain REST fetch()
+ *  calls to the same server's /api/auth/* routes. Mirrors the inverse
+ *  logic of SyncManager.buildWebSocketUrl(). */
+function deriveHttpBase(serverUrl) {
+    let base = (serverUrl || '').trim();
+    if (!base) return '';
+    if (base.startsWith('ws://')) base = 'http://' + base.slice(5);
+    else if (base.startsWith('wss://')) base = 'https://' + base.slice(6);
+    else if (!base.startsWith('http://') && !base.startsWith('https://')) {
+        const isSecure = typeof window !== 'undefined' && window.location.protocol === 'https:';
+        base = (isSecure ? 'https://' : 'http://') + base;
+    }
+    return base.replace(/\/+$/, '');
+}
+
+async function submitAccountAuth(mode) {
+    const serverUrl = document.getElementById('sync-server-url')?.value.trim() || DEFAULT_SERVER_URL;
+    const username = document.getElementById('account-username')?.value.trim();
+    const password = document.getElementById('account-password')?.value;
+    const resultEl = document.getElementById('account-result');
+
+    if (!username || !password) {
+        showToast('Enter a username and password', 'error');
+        return;
+    }
+
+    const httpBase = deriveHttpBase(serverUrl);
+    const endpoint = mode === 'register' ? '/api/auth/register' : '/api/auth/login';
+
+    try {
+        const res = await fetch(`${httpBase}${endpoint}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, password })
+        });
+        const data = await res.json().catch(() => ({}));
+
+        if (!res.ok) {
+            const message = data?.error || `Request failed (${res.status})`;
+            if (resultEl) {
+                resultEl.style.display = 'block';
+                resultEl.innerHTML = `<span style="color:var(--red);">❌ ${escHtml(message)}</span>`;
+            }
+            showToast(message, 'error');
+            return;
+        }
+
+        localStorage.setItem('fates-edge-auth-token', data.token);
+        localStorage.setItem('fates-edge-auth-username', data.user?.username || username);
+
+        // Keep any already-connected sync session's token current too --
+        // it only re-reads localStorage at connect() time otherwise.
+        try {
+            const { syncManager } = await import('../../core/sync/index.js');
+            syncManager.authToken = data.token;
+        } catch (e) { /* sync module not loaded yet -- fine, connect() will pick it up */ }
+
+        showToast(mode === 'register' ? 'Account created and logged in!' : 'Logged in!', 'success');
+        render(container); // re-render to swap the form for the logged-in state
+    } catch (e) {
+        const message = `Could not reach ${httpBase}: ${e.message}`;
+        if (resultEl) {
+            resultEl.style.display = 'block';
+            resultEl.innerHTML = `<span style="color:var(--red);">❌ ${escHtml(message)}</span>`;
+        }
+        showToast(message, 'error');
+    }
+}
+
+function loginAccount() { submitAccountAuth('login'); }
+function registerAccount() { submitAccountAuth('register'); }
+
+async function logoutAccount() {
+    localStorage.removeItem('fates-edge-auth-token');
+    localStorage.removeItem('fates-edge-auth-username');
+    try {
+        const { syncManager } = await import('../../core/sync/index.js');
+        syncManager.authToken = '';
+    } catch (e) { /* fine */ }
+    showToast('Logged out', 'info');
+    render(container);
+}
+
+// ============================================================
 // CONNECT TO SYNC SERVER
 // ============================================================
 
@@ -994,7 +1126,11 @@ async function connectToSyncServer() {
         await syncManager.connect(serverUrl, campaignCode, password, {
             name: userName,
             email: userEmail,
-            role: userRole
+            role: userRole,
+            // Explicit (rather than relying on SyncManager's constructor-
+            // time read) so logging in/out AFTER the manager already
+            // exists takes effect on the next connect without a reload.
+            authToken: localStorage.getItem('fates-edge-auth-token') || ''
         });
 
         showToast('Connected to campaign!', 'success');
@@ -1261,6 +1397,10 @@ export function attachEvents() {
     document.getElementById('campaign-delete-btn')?.addEventListener('click', campaignDelete);
     
     // Sync
+    document.getElementById('account-login-btn')?.addEventListener('click', loginAccount);
+    document.getElementById('account-register-btn')?.addEventListener('click', registerAccount);
+    document.getElementById('account-logout-btn')?.addEventListener('click', logoutAccount);
+
     document.getElementById('sync-connect-btn')?.addEventListener('click', connectToSyncServer);
     document.getElementById('sync-disconnect-btn')?.addEventListener('click', disconnectFromSyncServer);
     document.getElementById('sync-refresh-btn')?.addEventListener('click', () => {

@@ -30,6 +30,12 @@
  *    - FATES_EDGE_API_KEY: Your API key (if required)
  *    - FATES_EDGE_AUTO_CONNECT: true/false
  *    - FATES_EDGE_DEFAULT_REGION: Acasia
+ *    - FATES_EDGE_ROOM_PASSWORD: Optional (only needed for the first
+ *      anonymous join to a password-protected room)
+ *    - FATES_EDGE_AUTH_TOKEN: Optional per-account login token (from the
+ *      server's optional accounts feature). Skips re-entering the room
+ *      password on later joins, and gives this GM connection a real
+ *      account identity. Leave unset for unchanged anonymous behavior.
  */
 
 // ============================================================
@@ -49,7 +55,13 @@ var CONFIG = {
     syncDeck: getConfigVar('FATES_EDGE_SYNC_DECK', 'true') === 'true',
     playerName: getConfigVar('FATES_EDGE_PLAYER_NAME', ''),
     defaultRegion: getConfigVar('FATES_EDGE_DEFAULT_REGION', 'Acasia'),
-    password: getConfigVar('FATES_EDGE_ROOM_PASSWORD', '')  // optional room password
+    password: getConfigVar('FATES_EDGE_ROOM_PASSWORD', ''),  // optional room password
+    // NEW: optional per-user JWT from the server's optional accounts
+    // feature (server/auth.js). Get one via the web client's Account
+    // panel, or the terminal/python client's login command, then set it
+    // here. Leave blank for the exact same anonymous-GM behavior as
+    // before this was added.
+    authToken: getConfigVar('FATES_EDGE_AUTH_TOKEN', '')
 };
 
 function getConfigVar(name, defaultValue) {
@@ -242,12 +254,18 @@ function onOpen() {
     reconnectAttempts = 0;
 
     var playerName = getPlayerName();
-    sendMessage({
+    var handshake = {
         type: 'handshake',
         clientName: playerName,
         role: 'gm',
         password: CONFIG.password || ''
-    });
+    };
+    // NEW: optional -- an absent/invalid token just means an anonymous
+    // join, same as before this was added.
+    if (CONFIG.authToken) {
+        handshake.authToken = CONFIG.authToken;
+    }
+    sendMessage(handshake);
 
     if (heartbeatInterval) {
         clearInterval(heartbeatInterval);
