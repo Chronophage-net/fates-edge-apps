@@ -232,7 +232,7 @@ function loadRegionDataSync(regionName) {
         return regionCache.get(regionName);
     }
 
-    const slug = regionName.toLowerCase().replace(/ /g, '-').replace(/[^a-z0-9-]/g, '');
+    const slug = regionName.toLowerCase().replace(/ /g, '_').replace(/[^a-z0-9_]/g, '');
     const filePath = path.join(REGION_DIR, `${slug}.json`);
 
     try {

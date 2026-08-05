@@ -1,18 +1,51 @@
 // features/travel-planner/index.js
 /**
  * Travel Planner - Cartomancy-based journey generation
- * Uses the Deck of Consequences to plan journeys with place, actor, pressure, and leverage.
- * Integrates with the existing decks module for region data and RNG.
+ *
+ * Implements the "Core Travel Procedure" from the Amaranthine Core's Travel
+ * Reference chapter, built on the universal suit grammar from The
+ * Cartomancer's Compass (see fates_edge_amaranthine_condensed.tex /
+ * fates_edge_amaranthine.tex, "Travel Reference" chapter):
+ *
+ *   For each leg of a journey, draw one card per suit:
+ *     ♠ Spades   (Place)    — from the DESTINATION deck: sets the scene.
+ *     ♥ Hearts   (Actor)    — from the DESTINATION deck: the local actor/faction.
+ *     ♣ Clubs    (Pressure) — from the WILDS deck (general hazards), unless
+ *                              the route is strongly policed, in which case
+ *                              it's drawn from the destination deck instead.
+ *     ♦ Diamonds (Leverage) — from the GATEWAY AUTHORITY deck: whichever
+ *                              polity's papers, escorts, or rights actually
+ *                              gate the route (often the destination, but
+ *                              not always — a mountain pass into Viterra
+ *                              might be gated by Ubral or Aeler instead).
+ *   The highest-ranked card among the four sets the leg's timer (2-5 -> 4
+ *   segments, 6-10 -> 6, J/Q/K -> 8, A -> 10 -- see "Rank and Severity").
+ *   An Ace draws the Hollow's attention (+1 SB). A face card (J/Q/K) is a
+ *   person or personified force with agency, not just a high number (see
+ *   "Card Faces: The Court as Character").
+ *
+ * Region card data (place/actor/pressure/leverage per rank) is loaded
+ * through decks/index.js's fetchRegionData(), which already transforms
+ * each region's generator-schema JSON into the {spades:{rank:text}, ...}
+ * lookup this module needs -- reusing it here (instead of re-fetching and
+ * re-parsing region JSON independently, as this file used to) guarantees
+ * the Travel Planner and the Deck of Consequences always agree on what a
+ * given card means in a given region.
  */
 
 import { logRecordingEvent } from '../../core/media.js';
 import { showToast } from '../../components/Toast.js';
 import { addTimer } from '../../core/state.js';
-import { 
-    getSelectedRegion, 
-    getRegionNames, 
+import decksModule from '../decks/index.js';
+import {
+    getSelectedRegion,
+    getRegionNames,
     setSelectedRegion
 } from '../decks/index.js';
+
+const { fetchRegionData } = decksModule;
+
+const WILDS_REGION_NAME = 'The Wilds';
 
 // ============================================================
 // CONSTANTS
@@ -38,6 +71,49 @@ const TRAVEL_ROLES = [
     { key: 'quartermaster', label: 'Quartermaster', icon: '📦', desc: 'Manages supplies; rolls Wits + Craft to prevent depletion.', skill: 'Craft' },
     { key: 'watch', label: 'Watch', icon: '👁️', desc: 'Keeps lookout; rolls Presence + Insight for first defense.', skill: 'Insight' }
 ];
+
+// ─── The Traveler's Spread (Tulkani three-card journey reading) ───────
+// From "Tulkani Cartomancy Traditions" in The Cartomancer's Compass: a
+// Quick Working, three cards laid for the road behind, the road ahead,
+// and the road beneath. No suit is fixed to a position -- any card can
+// land anywhere -- so this uses a genuine mixed 52-card draw rather than
+// the suit-locked draws the four-card leg procedure uses.
+const TRAVELERS_SPREAD_POSITIONS = [
+    { key: 'behind', label: 'The Road Behind', icon: '👣', prompt: 'What have you left behind, and what follows you?' },
+    { key: 'ahead', label: 'The Road Ahead', icon: '🌄', prompt: 'What waits for you, and what will you face?' },
+    { key: 'beneath', label: 'The Road Beneath', icon: '🪨', prompt: 'What is true, whether you wish it or not?' }
+];
+
+// Universal suit grammar, for when no region data is available to give a
+// card a specific meaning (see "Interpreting Any Draw, Any Region").
+const SUIT_UNIVERSAL_PROMPT = {
+    spades: 'A place or landmark. What is its name? What happened here?',
+    hearts: 'A person or faction. What do they want? What do they fear?',
+    clubs: 'A complication or threat. Who or what is the obstacle?',
+    diamonds: 'A reward, token, or secret. What can be gained?'
+};
+
+// "Card Faces: The Court as Character" -- face cards are persons (or
+// personified forces) with agency, not just a high number.
+const FACE_CARD_ROLE = {
+    J: { name: 'Jack', role: "an agent or functionary, acting on someone else's authority — competent but replaceable" },
+    Q: { name: 'Queen', role: 'a power in their own right, with influence and a network — not easily replaced' },
+    K: { name: 'King', role: 'the ultimate authority in their domain — to challenge them is to challenge the order itself' }
+};
+
+function getFaceCardNote(suit, rank) {
+    const face = FACE_CARD_ROLE[rank];
+    if (!face) return null;
+    if (suit === 'hearts') {
+        return `🎭 Face card — give this actor a name and a motive. As a ${face.name}, they are ${face.role}.`;
+    }
+    const personified = {
+        spades: 'a landmark that remembers every traveler who has crossed it',
+        clubs: 'a feud, blockade, or crisis that has lasted generations',
+        diamonds: 'a boon so significant it carries its own reputation'
+    };
+    return `🎭 Face card — treat this as a personified force, not a person: a ${face.name} of ${SUIT_NAMES[suit] || suit} might be ${personified[suit] || 'unusually significant'}.`;
+}
 
 // ============================================================
 // ACE EFFECTS (Travel Edition)
@@ -130,66 +206,51 @@ let selectedStartRegion = null;
 let selectedDestRegion = null;
 let journeyHistory = [];
 let currentJourney = null;
+let currentReading = null;   // last Traveler's Spread reading
 let isInitialized = false;
 let regionList = [];
-let regionDataCache = {};
+
+// "Core Travel Procedure" leg-sourcing controls (see file header):
+let policedRoute = false;    // true -> ♣ Pressure drawn from destination, not the Wilds
+let gatewayRegion = null;    // region whose deck ♦ Leverage is drawn from (defaults to destination)
 
 // ============================================================
 // HELPERS
 // ============================================================
 
-function getRegionSlug(name) {
-    return name.toLowerCase().replace(/ /g, '_');
-}
-
-async function fetchRegionData(regionName) {
-    if (regionDataCache[regionName]) {
-        return regionDataCache[regionName];
-    }
-    try {
-        const slug = getRegionSlug(regionName);
-        const res = await fetch(`/data/regions/${slug}.json`);
-        if (!res.ok) throw new Error(`Region "${regionName}" not found`);
-        const data = await res.json();
-        regionDataCache[regionName] = data;
-        return data;
-    } catch (e) {
-        console.warn(`[TravelPlanner] Error loading region ${regionName}:`, e);
-        const fallbackData = {
-            name: regionName,
-            description: `${regionName} - A region of Fate's Edge.`,
-            hearts: ["A matter of loyalty or love arises."],
-            spades: ["A conflict or struggle emerges."],
-            clubs: ["A physical challenge or obstacle appears."],
-            diamonds: ["A resource, treasure, or opportunity is found."]
-        };
-        regionDataCache[regionName] = fallbackData;
-        return fallbackData;
-    }
-}
-
+/**
+ * Look up a card's meaning for a region, using decks/index.js's already-
+ * transformed, rank-keyed region data ({ spades: { A: '...', 2: '...' },
+ * hearts: {...}, ... } — see fetchRegionData/transformRegionData there).
+ *
+ * BUGFIX: this file used to fetch region JSON itself and index into
+ * `regionData[suit]` as if it were a flat ARRAY, hashing suit+rank into
+ * an array index. But every real region file is in the "generator"
+ * schema (places/people_and_factions/complications/rewards, each an
+ * array of per-rank card objects) -- `regionData.spades` was always
+ * `undefined` on the raw JSON, so every single leg silently fell through
+ * to the generic "A complication of clubs arises." filler text, for
+ * every region, always. Reusing decks/index.js's fetchRegionData (which
+ * already runs transformRegionData()) gives real per-rank text and keeps
+ * this file's card meanings identical to what the Decks feature shows
+ * for the same card in the same region.
+ */
 function getCardMeaningFromRegion(suit, rank, regionData) {
-    const suitKey = suit;
-    const arr = regionData[suitKey];
-    if (!arr || arr.length === 0) {
-        return `A complication of ${suit} arises.`;
-    }
-    const seed = suit + rank;
-    let hash = 0;
-    for (let i = 0; i < seed.length; i++) {
-        hash = ((hash << 5) - hash) + seed.charCodeAt(i);
-        hash = hash & hash;
-    }
-    const index = Math.abs(hash) % arr.length;
-    return arr[index];
+    const meaning = regionData?.[suit]?.[rank];
+    if (meaning) return meaning;
+    return SUIT_UNIVERSAL_PROMPT[suit] || `A complication of ${suit} arises.`;
 }
 
+// "Rank and Severity: The Weight of the Card" / "Timer Conversion" --
+// BUGFIX: this used to gate the 6-segment tier on rank >= 7, so a 6
+// (which the book puts in the 6-10 -> 6-segment band) fell through to
+// the 4-segment "2-5" band instead.
 function getTimerSizeFromRank(rank) {
     const val = POKER_RANK[rank] || 0;
-    if (val >= 14) return 10;
-    if (val >= 11) return 8;
-    if (val >= 7) return 6;
-    return 4;
+    if (val >= 14) return 10;      // A
+    if (val >= 11) return 8;       // J, Q, K
+    if (val >= 6) return 6;        // 6-10
+    return 4;                      // 2-5
 }
 
 function getRankName(rank) {
@@ -335,35 +396,19 @@ initTravelSeed();
 // JOURNEY GENERATION
 // ============================================================
 
-function generateCard(deck) {
-    // Ensure we have a deck with cards
-    if (!deck || deck.length === 0) {
-        console.warn('[generateCard] Deck is empty, building a fresh one.');
-        // Rebuild the caller's deck by mutating it (so caller sees the change)
-        const fresh = buildDeck();
-        deck.length = 0;
-        deck.push(...fresh);
-    }
+// ─── Suit-locked decks ──────────────────────────────────────────────
+// BUGFIX: the previous version drew four cards from one shared 52-card
+// deck and simply LABELED the first draw "the spade," the second "the
+// heart," etc. -- regardless of the card's actual suit (a "spade" draw
+// could really be, say, the King of Hearts, whose suit was then shown
+// as-is in the UI while its MEANING was computed as if it were a Spade).
+// The Core Travel Procedure calls for one card per suit, so each suit
+// gets its own 13-card deck here and card identity always matches its
+// role.
+let suitDecks = { spades: [], hearts: [], clubs: [], diamonds: [] };
+const CARD_RANKS = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
 
-    const idx = getTravelRandomInt(0, deck.length);
-    const card = deck.splice(idx, 1)[0];
-
-    if (!card) {
-        console.error('[generateCard] Failed to draw a card. deck.length:', deck.length, 'idx:', idx);
-        // Fallback to a safe card (this should rarely happen)
-        return { suit: 'spades', rank: 'A' };
-    }
-
-    return card;
-}
-
-function buildDeck() {
-    const deck = [];
-    for (const suit of SUITS) {
-        for (const rank of ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K']) {
-            deck.push({ suit, rank });
-        }
-    }
+function shuffle(deck) {
     for (let i = deck.length - 1; i > 0; i--) {
         const j = getTravelRandomInt(0, i + 1);
         [deck[i], deck[j]] = [deck[j], deck[i]];
@@ -371,19 +416,54 @@ function buildDeck() {
     return deck;
 }
 
-function generateLeg(deck, regionData, regionName, legIndex) {
-    const spade = generateCard(deck);
-    const heart = generateCard(deck);
-    const club = generateCard(deck);
-    const diamond = generateCard(deck);
-    
+function buildSuitDeck(suit) {
+    return shuffle(CARD_RANKS.map(rank => ({ suit, rank })));
+}
+
+function resetSuitDecks() {
+    suitDecks = {
+        spades: buildSuitDeck('spades'),
+        hearts: buildSuitDeck('hearts'),
+        clubs: buildSuitDeck('clubs'),
+        diamonds: buildSuitDeck('diamonds')
+    };
+}
+
+function drawSuitCard(suit) {
+    if (!suitDecks[suit] || suitDecks[suit].length === 0) {
+        suitDecks[suit] = buildSuitDeck(suit);
+    }
+    return suitDecks[suit].pop();
+}
+
+// A genuine mixed 52-card deck, for draws where suit isn't fixed to a
+// position (the Traveler's Spread).
+function buildMixedDeck() {
+    const deck = [];
+    for (const suit of SUITS) {
+        for (const rank of CARD_RANKS) deck.push({ suit, rank });
+    }
+    return shuffle(deck);
+}
+
+// ============================================================
+// JOURNEY GENERATION — Core Travel Procedure (4 cards/leg)
+// ============================================================
+
+function generateLeg(sources, legIndex) {
+    // sources: { destData, destRegion, clubData, diamondData, diamondRegionName }
+    const spade = drawSuitCard('spades');
+    const heart = drawSuitCard('hearts');
+    const club = drawSuitCard('clubs');
+    const diamond = drawSuitCard('diamonds');
+
     const cards = { spade, heart, club, diamond };
-    
-    const place = getCardMeaningFromRegion('spades', spade.rank, regionData);
-    const actor = getCardMeaningFromRegion('hearts', heart.rank, regionData);
-    const pressure = getCardMeaningFromRegion('clubs', club.rank, regionData);
-    const leverage = getCardMeaningFromRegion('diamonds', diamond.rank, regionData);
-    
+
+    const place = getCardMeaningFromRegion('spades', spade.rank, sources.destData);
+    const actor = getCardMeaningFromRegion('hearts', heart.rank, sources.destData);
+    const pressure = getCardMeaningFromRegion('clubs', club.rank, sources.clubData);
+    const leverage = getCardMeaningFromRegion('diamonds', diamond.rank, sources.diamondData);
+
     const highestRank = [spade, heart, club, diamond].reduce((a, b) => {
         const rankA = POKER_RANK[a.rank] || 0;
         const rankB = POKER_RANK[b.rank] || 0;
@@ -394,20 +474,22 @@ function generateLeg(deck, regionData, regionName, legIndex) {
     });
     const timerSegments = getTimerSizeFromRank(highestRank.rank);
     const timerCard = `${getRankName(highestRank.rank)} of ${getSuitName(highestRank.suit)}`;
-    
+
+    // "Aces and the Ninth: The Hollow's Attention" -- any Ace in the draw
+    // draws the Hollow's notice (GM gains 1 extra SB), separate from
+    // the region-flavored Ace omen already shown.
     const allCards = [spade, heart, club, diamond];
     const aces = allCards.filter(c => c.rank === 'A');
     let aceEffect = null;
     if (aces.length > 0) {
-        const aceCard = aces[0];
-        aceEffect = getAceEffect(regionName, aceCard);
+        aceEffect = getAceEffect(sources.destRegion, aces[0]);
         if (typeof logRecordingEvent === 'function') {
-            logRecordingEvent('travel_leg_ace', `♠️ Travel Ace Effect: ${aceEffect.emoji} ${aceEffect.text} (Leg ${legIndex + 1}, ${regionName})`);
+            logRecordingEvent('travel_leg_ace', `♠️ Travel Ace Effect: ${aceEffect.emoji} ${aceEffect.text} (Leg ${legIndex + 1}, ${sources.destRegion})`);
         }
     }
-    
+
     const synthesis = `Place: ${place}\nActor: ${actor}\nPressure: ${pressure}\nLeverage: ${leverage}`;
-    
+
     return {
         cards,
         place,
@@ -418,11 +500,14 @@ function generateLeg(deck, regionData, regionName, legIndex) {
         timerCard,
         synthesis,
         aceEffect,
+        aceCount: aces.length,
+        clubSource: sources.clubData === sources.destData ? sources.destRegion : WILDS_REGION_NAME,
+        diamondSource: sources.diamondRegionName,
         cardDetails: {
-            spade: { rank: spade.rank, suit: spade.suit, symbol: getSuitSymbol('spades'), color: getSuitColor('spades'), meaning: place },
-            heart: { rank: heart.rank, suit: heart.suit, symbol: getSuitSymbol('hearts'), color: getSuitColor('hearts'), meaning: actor },
-            club: { rank: club.rank, suit: club.suit, symbol: getSuitSymbol('clubs'), color: getSuitColor('clubs'), meaning: pressure },
-            diamond: { rank: diamond.rank, suit: diamond.suit, symbol: getSuitSymbol('diamonds'), color: getSuitColor('diamonds'), meaning: leverage }
+            spade: { rank: spade.rank, suit: spade.suit, symbol: getSuitSymbol('spades'), color: getSuitColor('spades'), meaning: place, faceNote: getFaceCardNote('spades', spade.rank) },
+            heart: { rank: heart.rank, suit: heart.suit, symbol: getSuitSymbol('hearts'), color: getSuitColor('hearts'), meaning: actor, faceNote: getFaceCardNote('hearts', heart.rank) },
+            club: { rank: club.rank, suit: club.suit, symbol: getSuitSymbol('clubs'), color: getSuitColor('clubs'), meaning: pressure, faceNote: getFaceCardNote('clubs', club.rank) },
+            diamond: { rank: diamond.rank, suit: diamond.suit, symbol: getSuitSymbol('diamonds'), color: getSuitColor('diamonds'), meaning: leverage, faceNote: getFaceCardNote('diamonds', diamond.rank) }
         }
     };
 }
@@ -432,21 +517,34 @@ async function generateJourneyAsync(startRegion, destRegion, numLegs = 3) {
         showToast('Please select both start and destination regions.', 'error');
         return null;
     }
-    
-    const data = await fetchRegionData(destRegion);
-    if (!data) {
+
+    const destData = await fetchRegionData(destRegion);
+    if (!destData) {
         showToast('Could not load region data.', 'error');
         return null;
     }
-    
-    const deck = buildDeck();
+
+    // ♣ Pressure: the Wilds' general hazards, unless the route is
+    // strongly policed (destination's own complications instead).
+    const clubData = policedRoute ? destData : await fetchRegionData(WILDS_REGION_NAME);
+
+    // ♦ Leverage: whichever authority actually gates the route. Defaults
+    // to the destination, but a GM can name a different gateway (e.g. a
+    // mountain pass into Viterra gated by Ubral or Aeler papers instead).
+    const diamondRegionName = gatewayRegion && gatewayRegion !== destRegion ? gatewayRegion : destRegion;
+    const diamondData = diamondRegionName === destRegion ? destData : await fetchRegionData(diamondRegionName);
+
+    resetSuitDecks();
+
+    const sources = { destData, destRegion, clubData, diamondData, diamondRegionName };
+
     const legs = [];
     let totalTimer = 0;
     let highestCardOverall = null;
     let allAceEffects = [];
-    
+
     for (let i = 0; i < numLegs; i++) {
-        const leg = generateLeg(deck, data, destRegion, i);
+        const leg = generateLeg(sources, i);
         legs.push(leg);
         totalTimer += leg.timerSegments;
         if (leg.aceEffect) {
@@ -468,19 +566,19 @@ async function generateJourneyAsync(startRegion, destRegion, numLegs = 3) {
             }
         }
     }
-    
+
     const totalSegments = Math.min(totalTimer, 10);
-    
+
     let overallSynthesis = `Journey from ${startRegion} to ${destRegion}. ${legs.length} leg(s). ` +
         legs.map((leg, i) => `Leg ${i+1}: ${leg.place} | ${leg.actor} | ${leg.pressure} | ${leg.leverage}`).join('; ');
-    
+
     if (allAceEffects.length > 0) {
         overallSynthesis += '\n\n♠️ **Ace Effects:**\n' +
             allAceEffects.map((e, i) => `${e.emoji} ${e.text}`).join('\n');
     }
-    
+
     const roles = TRAVEL_ROLES.map(role => ({ ...role, assigned: true }));
-    
+
     const journey = {
         startRegion,
         destRegion,
@@ -490,13 +588,15 @@ async function generateJourneyAsync(startRegion, destRegion, numLegs = 3) {
         maxTimer: legs.reduce((max, leg) => Math.max(max, leg.timerSegments), 0),
         overallSynthesis,
         roles,
+        policedRoute,
+        gatewayRegion: diamondRegionName,
         highestCard: highestCardOverall ? `${getRankName(highestCardOverall.rank)} of ${getSuitName(highestCardOverall.suit)}` : 'N/A',
         timestamp: new Date().toISOString(),
         aceEffects: allAceEffects
     };
-    
+
     currentJourney = journey;
-    
+
     // Comprehensive logging
     if (typeof logRecordingEvent === 'function') {
         logRecordingEvent('journey_generated', `🗺️ Journey: ${journey.startRegion} → ${journey.destRegion} (${journey.numLegs} legs, ${journey.totalSegments} segments, ${journey.aceEffects.length} Ace effects)`);
@@ -509,8 +609,56 @@ async function generateJourneyAsync(startRegion, destRegion, numLegs = 3) {
             logRecordingEvent('journey_leg', `Leg ${idx+1}: Place: ${leg.place} | Actor: ${leg.actor} | Pressure: ${leg.pressure} | Leverage: ${leg.leverage} | Timer: ${leg.timerSegments} segments`);
         });
     }
-    
+
     return journey;
+}
+
+// ============================================================
+// THE TRAVELER'S SPREAD — Tulkani three-card quick reading
+// ============================================================
+
+async function generateTravelersSpread(regionName) {
+    const data = regionName ? await fetchRegionData(regionName) : null;
+    const deck = buildMixedDeck();
+
+    const cards = TRAVELERS_SPREAD_POSITIONS.map(position => {
+        const card = deck.pop();
+        const meaning = data
+            ? getCardMeaningFromRegion(card.suit, card.rank, data)
+            : SUIT_UNIVERSAL_PROMPT[card.suit];
+        return {
+            position,
+            card,
+            symbol: getSuitSymbol(card.suit),
+            color: getSuitColor(card.suit),
+            meaning,
+            faceNote: getFaceCardNote(card.suit, card.rank),
+            isAce: card.rank === 'A'
+        };
+    });
+
+    const anyAces = cards.some(c => c.isAce);
+    let aceEffect = null;
+    if (anyAces) {
+        const aceCard = cards.find(c => c.isAce).card;
+        aceEffect = getAceEffect(regionName, aceCard);
+    }
+
+    const reading = {
+        region: regionName || null,
+        cards,
+        aceEffect,
+        timestamp: new Date().toISOString()
+    };
+
+    currentReading = reading;
+
+    if (typeof logRecordingEvent === 'function') {
+        logRecordingEvent('travelers_spread', `🔮 Traveler's Spread${regionName ? ` (${regionName})` : ''}: ` +
+            cards.map(c => `${c.position.label}: ${getRankName(c.card.rank)} of ${getSuitName(c.card.suit)} — ${c.meaning}`).join(' | '));
+    }
+
+    return reading;
 }
 
 // ============================================================
@@ -577,12 +725,42 @@ export async function render(el) {
                     <button class="btn btn-gold" id="travel-generate-btn">🃏 Generate Journey</button>
                     <button class="btn" id="travel-reshuffle-btn">↺ Reshuffle</button>
                 </div>
+                <div style="display:flex;flex-wrap:wrap;gap:1rem;align-items:end;margin-top:0.7rem;">
+                    <div class="field" style="display:flex;align-items:center;gap:0.4rem;">
+                        <input type="checkbox" id="travel-policed-route" ${policedRoute ? 'checked' : ''}>
+                        <label for="travel-policed-route" style="margin:0;">Strongly Policed Route</label>
+                    </div>
+                    <div class="field" style="flex:1;min-width:180px;">
+                        <label>Gateway Authority <span style="color:var(--text3);font-weight:normal;">(who gates this route — defaults to destination)</span></label>
+                        <select id="travel-gateway-region">
+                            <option value="">Same as Destination</option>
+                            ${regionNames.map(name => `<option value="${name}" ${name === gatewayRegion ? 'selected' : ''}>${name}</option>`).join('')}
+                        </select>
+                    </div>
+                </div>
                 <div style="margin-top:0.5rem;font-size:0.85rem;color:var(--text2);">
-                    Each leg draws four cards: Place (♠), Actor (♥), Pressure (♣), Leverage (♦). The highest card sets a suggested timer.
-                    <span style="color:var(--gold);">♠ Ace cards trigger special journey omens!</span>
+                    Each leg draws one card per suit — Place (♠) and Actor (♥) from the destination; Pressure (♣) from the Wilds' general hazards
+                    unless the route is strongly policed (then the destination); Leverage (♦) from whichever authority actually gates the route.
+                    The highest card sets a suggested timer.
+                    <span style="color:var(--gold);">♠️ Aces draw the Hollow's attention (+1 SB)!</span>
                 </div>
             </div>
-            
+
+            <div class="panel">
+                <h3>🔮 The Traveler's Spread <span style="font-size:0.75rem;color:var(--text3);font-weight:normal;">(Tulkani quick reading — Road Behind / Road Ahead / Road Beneath)</span></h3>
+                <div style="display:flex;flex-wrap:wrap;gap:1rem;align-items:end;">
+                    <div class="field" style="flex:1;min-width:180px;">
+                        <label>Region <span style="color:var(--text3);font-weight:normal;">(optional — leave blank for universal meanings)</span></label>
+                        <select id="travel-spread-region">
+                            <option value="">— Universal (no region) —</option>
+                            ${regionNames.map(name => `<option value="${name}">${name}</option>`).join('')}
+                        </select>
+                    </div>
+                    <button class="btn btn-secondary" id="travel-spread-btn">🔮 Draw Traveler's Spread</button>
+                </div>
+                <div id="travel-spread-display" style="margin-top:0.6rem;display:none;"></div>
+            </div>
+
             <div id="travel-journey-display" class="panel" style="display:none;">
                 <div id="travel-journey-header">
                     <h3 id="travel-journey-title">Journey</h3>
@@ -667,6 +845,25 @@ function attachEvents() {
             selectedDestRegion = e.target.value;
         });
     }
+
+    const policedCheck = document.getElementById('travel-policed-route');
+    if (policedCheck) {
+        policedCheck.addEventListener('change', (e) => {
+            policedRoute = e.target.checked;
+        });
+    }
+
+    const gatewaySelect = document.getElementById('travel-gateway-region');
+    if (gatewaySelect) {
+        gatewaySelect.addEventListener('change', (e) => {
+            gatewayRegion = e.target.value || null;
+        });
+    }
+
+    const spreadBtn = document.getElementById('travel-spread-btn');
+    if (spreadBtn) {
+        spreadBtn.addEventListener('click', handleTravelersSpread);
+    }
 }
 
 // ============================================================
@@ -716,6 +913,47 @@ async function handleGenerate() {
 
 function handleReshuffle() {
     handleGenerate();
+}
+
+async function handleTravelersSpread() {
+    const regionSelect = document.getElementById('travel-spread-region');
+    const regionName = regionSelect ? (regionSelect.value || null) : null;
+
+    showToast("Drawing the Traveler's Spread...", 'info');
+
+    try {
+        const reading = await generateTravelersSpread(regionName);
+        displayTravelersSpread(reading);
+        showToast(`Traveler's Spread drawn${regionName ? ` for ${regionName}` : ''}.`, 'success');
+    } catch (err) {
+        console.error("Error generating Traveler's Spread:", err);
+        showToast("Error drawing the Traveler's Spread.", 'error');
+    }
+}
+
+function displayTravelersSpread(reading) {
+    const display = document.getElementById('travel-spread-display');
+    if (!display) return;
+    display.style.display = 'block';
+
+    display.innerHTML = `
+        ${reading.aceEffect ? `
+            <div style="margin-bottom:0.5rem;padding:0.3rem 0.6rem;background:var(--bg4);border-radius:var(--radius);border:1px solid var(--gold);color:var(--gold);font-size:0.85rem;">
+                ♠️ <strong>The Hollow's Attention:</strong> ${reading.aceEffect.emoji} ${reading.aceEffect.text} <em>(GM gains 1 SB)</em>
+            </div>
+        ` : ''}
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:0.5rem;">
+            ${reading.cards.map(c => `
+                <div style="background:var(--bg2);border-radius:var(--radius);padding:0.6rem;border-left:4px solid ${c.color};">
+                    <div style="font-size:0.75rem;color:var(--text3);">${c.position.icon} ${c.position.label}</div>
+                    <div style="font-size:0.8rem;font-style:italic;color:var(--text2);margin:0.15rem 0;">${c.position.prompt}</div>
+                    <div style="font-weight:bold;margin-top:0.2rem;">${getRankName(c.card.rank)} ${c.symbol} of ${getSuitName(c.card.suit)}</div>
+                    <div style="margin-top:0.2rem;">${c.meaning}</div>
+                    ${c.faceNote ? `<div style="margin-top:0.3rem;font-size:0.75rem;color:var(--text3);">${c.faceNote}</div>` : ''}
+                </div>
+            `).join('')}
+        </div>
+    `;
 }
 
 function handleClearHistory() {
@@ -902,7 +1140,9 @@ function displayJourney(journey) {
             <span>Legs: ${journey.numLegs}</span>
             <span style="margin-left:1rem;">Total Timer: ${journey.totalSegments} segments</span>
             <span style="margin-left:1rem;">Highest Card: ${journey.highestCard}</span>
-            ${journey.aceEffects && journey.aceEffects.length > 0 ? `<span style="margin-left:1rem;color:var(--gold);">♠️ ${journey.aceEffects.length} Ace effect(s)</span>` : ''}
+            <span style="margin-left:1rem;">♣ Pressure from: ${journey.policedRoute ? journey.destRegion + ' (policed)' : 'The Wilds'}</span>
+            <span style="margin-left:1rem;">♦ Gateway: ${journey.gatewayRegion}</span>
+            ${journey.aceEffects && journey.aceEffects.length > 0 ? `<span style="margin-left:1rem;color:var(--gold);">♠️ ${journey.aceEffects.length} Ace effect(s) — the Hollow's Attention (GM +${journey.aceEffects.length} SB)</span>` : ''}
         `;
     }
     
@@ -918,21 +1158,27 @@ function displayJourney(journey) {
                 </div>
                 ${hasAce ? `
                     <div style="margin:0.3rem 0;padding:0.2rem 0.6rem;background:var(--bg4);border-radius:var(--radius);border:1px solid var(--gold);color:var(--gold);font-size:0.85rem;">
-                        ♠️ <strong>Ace Effect:</strong> ${leg.aceEffect.emoji} ${leg.aceEffect.text}
+                        ♠️ <strong>The Hollow's Attention:</strong> ${leg.aceEffect.emoji} ${leg.aceEffect.text} <em>(GM gains ${leg.aceCount} SB)</em>
                     </div>
                 ` : ''}
                 <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:0.5rem;margin-top:0.3rem;">
                     <div style="background:var(--bg3);padding:0.3rem 0.5rem;border-radius:4px;border-left:3px solid ${leg.cardDetails.spade.color};">
                         <span style="font-weight:bold;">♠ Place:</span> ${leg.place}
+                        ${leg.cardDetails.spade.faceNote ? `<div style="margin-top:0.2rem;font-size:0.7rem;color:var(--text3);">${leg.cardDetails.spade.faceNote}</div>` : ''}
                     </div>
                     <div style="background:var(--bg3);padding:0.3rem 0.5rem;border-radius:4px;border-left:3px solid ${leg.cardDetails.heart.color};">
                         <span style="font-weight:bold;">♥ Actor:</span> ${leg.actor}
+                        ${leg.cardDetails.heart.faceNote ? `<div style="margin-top:0.2rem;font-size:0.7rem;color:var(--text3);">${leg.cardDetails.heart.faceNote}</div>` : ''}
                     </div>
                     <div style="background:var(--bg3);padding:0.3rem 0.5rem;border-radius:4px;border-left:3px solid ${leg.cardDetails.club.color};">
                         <span style="font-weight:bold;">♣ Pressure:</span> ${leg.pressure}
+                        <div style="font-size:0.7rem;color:var(--text3);">from ${leg.clubSource}</div>
+                        ${leg.cardDetails.club.faceNote ? `<div style="margin-top:0.2rem;font-size:0.7rem;color:var(--text3);">${leg.cardDetails.club.faceNote}</div>` : ''}
                     </div>
                     <div style="background:var(--bg3);padding:0.3rem 0.5rem;border-radius:4px;border-left:3px solid ${leg.cardDetails.diamond.color};">
                         <span style="font-weight:bold;">♦ Leverage:</span> ${leg.leverage}
+                        <div style="font-size:0.7rem;color:var(--text3);">from ${leg.diamondSource}</div>
+                        ${leg.cardDetails.diamond.faceNote ? `<div style="margin-top:0.2rem;font-size:0.7rem;color:var(--text3);">${leg.cardDetails.diamond.faceNote}</div>` : ''}
                     </div>
                 </div>
                 <div style="margin-top:0.2rem;font-size:0.75rem;color:var(--text3);">

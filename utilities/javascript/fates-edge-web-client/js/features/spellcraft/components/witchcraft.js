@@ -14,29 +14,37 @@
  * - Promise Timers
  * - Full Ritual system
  * - Quick Workings
- * - Crafting with ingredients (wiki‑driven): forage, purchase, combine, craft from recipe
- * - Crafted item inventory with uses tracking
  * - Magic path detection
- * - All data for ingredients & recipes loaded from /data/wiki.json (with fallbacks)
+ *
+ * ────────────────────────────────────────────────────────────────────────
+ * CRAFTING HAS MOVED (this pass): the ingredient/recipe "Crafting Bench"
+ * that used to live at the bottom of this panel — forage, purchase,
+ * combine, craft from recipe, crafted-item inventory, plus the new Codex
+ * of magic items/artifacts and attunement/upkeep tracking — is now its
+ * own top-level feature at js/features/crafting/index.js, reachable from
+ * the sidebar independent of any magic path. It never had anything to do
+ * with hedge magic specifically; it was only ever here because this was
+ * the first panel open to every character. char.crafting is its state
+ * namespace now, entirely separate from char.witch. Nothing in this file
+ * reads or writes ingredients/recipes/crafted items anymore.
+ * ────────────────────────────────────────────────────────────────────────
  *
  * ────────────────────────────────────────────────────────────────────────
  * BUGFIX NOTE (read this before touching saveCharacter calls below):
  * getWitchState(char) does `if (!char.witch) char.witch = {}` and returns a
  * live reference into the character object, and getPriceTracks/
- * getHedgeGifts/getPromiseTimers/getFullRituals/getCraftedItems all read
- * and mutate through that same reference. That means char.witch already
- * holds the up-to-date {prices, hedgeGifts, promiseTimers, rituals,
- * crafted, ingredients} object at the moment we call saveCharacter.
+ * getHedgeGifts/getPromiseTimers/getFullRituals all read and mutate
+ * through that same reference. That means char.witch already holds the
+ * up-to-date {prices, hedgeGifts, promiseTimers, rituals} object at the
+ * moment we call saveCharacter.
  *
- * The previous version of this file called saveCharacter with only ONE of
- * those sub-keys at a time, e.g. saveCharacter({ witch: { prices } }) or
- * saveCharacter({ witch: { crafted } }). If saveCharacter's merge is a
- * normal shallow merge (as it appears to be elsewhere in this codebase,
- * e.g. cantor.js's saveCharacter({ fatigue, corruption })), passing
- * `witch: { prices }` REPLACES char.witch entirely with just { prices },
- * silently deleting hedgeGifts/promiseTimers/rituals/crafted every time.
- * In practice: add a Hedge Gift, then tick a Promise Timer, and the gift
- * you just added would vanish.
+ * Calling saveCharacter with only ONE of those sub-keys at a time, e.g.
+ * saveCharacter({ witch: { prices } }), would REPLACE char.witch entirely
+ * with just { prices } under a normal shallow merge (as elsewhere in this
+ * codebase, e.g. cantor.js's saveCharacter({ fatigue, corruption })),
+ * silently deleting hedgeGifts/promiseTimers/rituals every time. In
+ * practice: add a Hedge Gift, then tick a Promise Timer, and the gift you
+ * just added would vanish.
  *
  * Fix: always pass the whole, already-mutated char.witch object, so
  * nothing sibling gets clobbered regardless of merge depth.
@@ -48,65 +56,26 @@
  * Patrons) read straight from `getState().patrons`, but this file never
  * actually loaded that data itself — it silently relied on some OTHER
  * panel (Patrons, Cantor, Rites) having been opened first to populate it.
- * That meant opening Witchcraft as the very first thing in a session could
- * show an empty weaver list for no visible reason. This file now calls the
- * same shared `patrons/index.js` loader everyone else uses, at the top of
- * `renderWitchcraft` and before `witchChooseWeaver` runs, so it always has
- * current data regardless of what the player clicked first.
+ * This file now calls the same shared `patrons/index.js` loader everyone
+ * else uses, at the top of `renderWitchcraft` and before
+ * `witchChooseWeaver` runs, so it always has current data regardless of
+ * what the player clicked first.
  *
- * Also replaced this file's private `rollDice()` (which tracked "ones" as
- * a proxy for Story Beats) with the shared `performRoll()` from
- * `core/dice.js`, whose `storyBeats` field is that same concept — this
- * file no longer runs its own, independently-tuned dice math.
+ * Dice rolls use the shared `performRoll()` from `core/dice.js`, whose
+ * `storyBeats` field is the Story Beat count — this file doesn't run its
+ * own dice math.
  * ────────────────────────────────────────────────────────────────────────
  *
  * ────────────────────────────────────────────────────────────────────────
- * WIKI DATA LOADING:
- * This file loads ingredients and recipes from `/data/wiki.json` via the
- * same mechanism as characters/index.js (state.wikiEntries). If the wiki
- * isn't loaded yet, we fetch it on demand (ensureWikiLoaded). Fallback
- * data is provided so the panel works even without network.
- * ────────────────────────────────────────────────────────────────────────
- *
- * ────────────────────────────────────────────────────────────────────────
- * REWRITE (this pass) — Crafting Bench + no more native dialogs:
- *
- * 1. GENERAL CRAFTING IS NOW OPEN TO EVERYONE. Previously this whole panel
- *    (including the ingredient/recipe crafting system, which has nothing
- *    to do with hedge magic specifically) was hidden behind an early
- *    return unless the character was a Witch, had the Craft of the Hedge
- *    talent, or already had a hedge gift recorded. That gate has been
- *    removed for the crafting bench: any character can forage, buy,
- *    combine, and craft recipes into items. Only the genuinely
- *    witchcraft-specific pieces — Hedge Gifts, Quick Workings, Full
- *    Rituals, and the Shadow/Shame/Identity Strain price tracks — stay
- *    gated behind `hasHedgeAccess` (Witch path, Craft of the Hedge
- *    talent, or an already-recorded hedge gift), with Full Rituals
- *    further restricted to the Witch path itself, matching the original
- *    `showFullWitch` behavior.
- *
- * 2. NO MORE prompt()/confirm() DIALOGS. Every native browser dialog in
- *    this file (recipe selection by typed number, ingredient combination
- *    by typed comma-separated indices, the ritual/quick-work/timer
- *    step-by-step prompts, the weaver numbered list, the "clear prices?"
- *    confirm) has been replaced with in-panel UI: checkboxes on inventory
- *    ingredients for combining, expandable recipe cards with a live
- *    ingredients-owned/missing checklist, inline collapsible forms for
- *    Quick Work / Full Ritual / new Promise Timers, clickable weaver
- *    cards, and a two-step inline confirm for clearing price tracks.
- *    Result summaries (roll outcomes) still use the existing
- *    `showToastWithHTML` styled dialog — that's this app's established
- *    non-blocking result-readout pattern (see spellbook.js), not a
- *    native dialog, so it's kept for consistency.
- *
- * 3. LIGHTER REFRESHES. Previously almost every action (adding a gift,
- *    ticking a timer, foraging) called `window.witchRefresh()`, which
- *    force-reloads patron data AND re-fetches /data/wiki.json from disk
- *    every time — a network round-trip for something as small as
- *    unchecking an ingredient. Pure UI/state changes now call a local
- *    `refreshWitchcraftPanel()` that just re-renders from current state;
- *    `window.witchRefresh()` (the 🔄 button) is reserved for an actual
- *    forced reload of patron/wiki data.
+ * NO NATIVE prompt()/confirm() DIALOGS. Every native browser dialog that
+ * used to live in this file (the ritual/quick-work/timer step-by-step
+ * prompts, the weaver numbered list, the "clear prices?" confirm) is
+ * in-panel UI instead: inline collapsible forms for Quick Work / Full
+ * Ritual / new Promise Timers, clickable weaver cards, and a two-step
+ * inline confirm for clearing price tracks. Result summaries (roll
+ * outcomes) use the existing `showToastWithHTML` styled dialog — that's
+ * this app's established non-blocking result-readout pattern (see
+ * spellbook.js), not a native dialog, so it's kept for consistency.
  * ────────────────────────────────────────────────────────────────────────
  */
 
@@ -154,8 +123,6 @@ const PRICE_THRESHOLDS = {
 // so stale selections/expansions from a previous character can't leak in.
 
 let lastCraftCharId = null;
-let craftCombineSelection = [];   // indices into char.witch.ingredients
-let craftExpandedRecipe = null;   // recipe id currently expanded in the browser
 let craftShowQuickWorkForm = false;
 let craftShowRitualForm = false;
 let craftShowTimerForm = false;
@@ -164,8 +131,6 @@ let craftConfirmClearPrices = false;
 
 function resetCraftUIStateIfCharChanged(char) {
     if (lastCraftCharId !== char.id) {
-        craftCombineSelection = [];
-        craftExpandedRecipe = null;
         craftShowQuickWorkForm = false;
         craftShowRitualForm = false;
         craftShowTimerForm = false;
@@ -191,244 +156,6 @@ async function refreshWitchcraftPanel() {
         });
     }
 }
-
-// ============================================================
-// WIKI DATA LOADING
-// ============================================================
-
-/**
- * Ensures wiki data is loaded into state.wikiEntries.
- * If not present, fetches from /data/wiki.json.
- */
-async function ensureWikiLoaded(force = false) {
-    const state = getState();
-    if (state.wikiEntries && !force) return;
-
-    try {
-        const response = await fetch('/data/wiki.json');
-        if (!response.ok) throw new Error(`HTTP ${response.status}`);
-        const data = await response.json();
-        state.wikiEntries = data.data || [];
-        // Also store raw for other modules
-        state.wikiData = data;
-        saveState();
-        console.log('[Witchcraft] Wiki data loaded:', state.wikiEntries.length, 'entries');
-    } catch (err) {
-        console.warn('[Witchcraft] Failed to load wiki.json, using fallback data.', err);
-        // Provide fallback entries for ingredients and recipes (matching the hardcoded ones)
-        state.wikiEntries = [
-            // Ingredients (common and rare)
-            { id: 430, title: 'Herbs', category: 'ingredient', body: 'Common herbs.', tags: ['common', 'herb', 'forage'], cost: 0, icon: '🌿' },
-            { id: 431, title: 'Clean cloth', category: 'ingredient', body: 'Clean linen.', tags: ['common', 'fabric', 'forage'], cost: 0, icon: '🧻' },
-            { id: 432, title: 'Rare herb', category: 'ingredient', body: 'Rare herb.', tags: ['rare', 'herb', 'purchase'], cost: 1, icon: '🌱' },
-            { id: 433, title: 'Distilled water', category: 'ingredient', body: 'Pure water.', tags: ['common', 'liquid', 'forage'], cost: 0, icon: '💧' },
-            { id: 434, title: 'Charcoal', category: 'ingredient', body: 'Charcoal.', tags: ['common', 'mineral', 'forage'], cost: 0, icon: '🪵' },
-            { id: 435, title: 'Valerian root', category: 'ingredient', body: 'Valerian.', tags: ['common', 'herb', 'forage'], cost: 0, icon: '🌰' },
-            { id: 436, title: 'Honey', category: 'ingredient', body: 'Honey.', tags: ['common', 'food', 'forage'], cost: 0, icon: '🍯' },
-            { id: 437, title: 'Moonwater', category: 'ingredient', body: 'Moonwater.', tags: ['rare', 'liquid', 'purchase'], cost: 1, icon: '🌙' },
-            { id: 438, title: 'Salt', category: 'ingredient', body: 'Salt.', tags: ['common', 'mineral', 'forage'], cost: 0, icon: '🧂' },
-            { id: 439, title: 'Blessed ash', category: 'ingredient', body: 'Blessed ash.', tags: ['rare', 'ash', 'purchase'], cost: 1, icon: '🔥' },
-            { id: 440, title: 'Iron filings', category: 'ingredient', body: 'Iron filings.', tags: ['common', 'mineral', 'forage'], cost: 0, icon: '⚙️' },
-            { id: 441, title: 'Nightshade', category: 'ingredient', body: 'Nightshade.', tags: ['rare', 'herb', 'purchase'], cost: 1, icon: '☠️' },
-            { id: 442, title: 'Pure water', category: 'ingredient', body: 'Pure spring water.', tags: ['common', 'liquid', 'forage'], cost: 0, icon: '💧' },
-            { id: 443, title: 'Blood', category: 'ingredient', body: 'Blood.', tags: ['common', 'liquid', 'forage'], cost: 0, icon: '🩸' },
-            { id: 444, title: 'Chamomile', category: 'ingredient', body: 'Chamomile.', tags: ['common', 'herb', 'forage'], cost: 0, icon: '🌼' },
-            { id: 445, title: 'Moonwort', category: 'ingredient', body: 'Moonwort.', tags: ['rare', 'herb', 'purchase'], cost: 1, icon: '🌙' },
-            { id: 446, title: 'Sulphur', category: 'ingredient', body: 'Sulphur.', tags: ['common', 'mineral', 'forage'], cost: 0, icon: '🟡' },
-            { id: 447, title: 'Saltpetre', category: 'ingredient', body: 'Saltpetre.', tags: ['common', 'mineral', 'forage'], cost: 0, icon: '🧪' },
-            { id: 448, title: 'Olive oil', category: 'ingredient', body: 'Olive oil.', tags: ['common', 'liquid', 'forage'], cost: 0, icon: '🫒' },
-            { id: 449, title: 'Incense', category: 'ingredient', body: 'Incense.', tags: ['common', 'herb', 'forage'], cost: 0, icon: '🪔' },
-            // Recipes (mirroring hardcoded CRAFTING_RECIPES)
-            { id: 450, title: 'Healing Poultice', category: 'recipe', body: 'Remove 1 Fatigue when applied during a short rest.', tags: ['recipe', 'medicine', 'minor'], ingredients: ['Herbs', 'Clean cloth'], skill: 'medicine', dv: 2, xpCost: 1, tier: 'minor', effect: 'Remove 1 Fatigue when applied during a short rest.', icon: '🩹' },
-            { id: 451, title: 'Antidote', category: 'recipe', body: 'Remove one Poisoned Condition.', tags: ['recipe', 'medicine', 'minor'], ingredients: ['Rare herb', 'Distilled water', 'Charcoal'], skill: 'medicine', dv: 3, xpCost: 2, tier: 'minor', effect: 'Remove one Poisoned Condition.', icon: '🧪' },
-            { id: 452, title: 'Sleep Draught', category: 'recipe', body: 'Target tests Spirit+Resolve (DV 3) or falls asleep for 1 hour.', tags: ['recipe', 'craft', 'minor'], ingredients: ['Valerian root', 'Honey', 'Moonwater'], skill: 'craft', dv: 3, xpCost: 1, tier: 'minor', effect: 'Target tests Spirit+Resolve (DV 3) or falls asleep for 1 hour.', icon: '💤' },
-            { id: 453, title: 'Ward Salt', category: 'recipe', body: 'Line wards against spirits and undead (Spirit+Resolve DV 4 to cross).', tags: ['recipe', 'lore', 'minor'], ingredients: ['Salt', 'Blessed ash', 'Iron filings'], skill: 'lore', dv: 3, xpCost: 2, tier: 'minor', effect: 'Line wards against spirits and undead (Spirit+Resolve DV 4 to cross).', icon: '🧂' },
-            { id: 454, title: 'Truth Serum', category: 'recipe', body: 'Target tests Spirit+Resolve (DV 4) or speaks only truth for one exchange.', tags: ['recipe', 'craft', 'standard'], ingredients: ['Nightshade', 'Pure water', 'Blood'], skill: 'craft', dv: 4, xpCost: 3, tier: 'standard', effect: 'Target tests Spirit+Resolve (DV 4) or speaks only truth for one exchange.', icon: '🔮' },
-            { id: 455, title: 'Moon Tea', category: 'recipe', body: '+1 die on next Wits or Spirit roll within 1 hour.', tags: ['recipe', 'craft', 'minor'], ingredients: ['Chamomile', 'Moonwort', 'Honey'], skill: 'craft', dv: 2, xpCost: 1, tier: 'minor', effect: '+1 die on next Wits or Spirit roll within 1 hour.', icon: '🌙' },
-            { id: 456, title: 'Fire Powder', category: 'recipe', body: 'Creates a small fire (Harm 2, Area) in Close range. One use.', tags: ['recipe', 'craft', 'standard'], ingredients: ['Sulphur', 'Charcoal', 'Saltpetre'], skill: 'craft', dv: 4, xpCost: 3, tier: 'standard', effect: 'Creates a small fire (Harm 2, Area) in Close range. One use.', icon: '🔥' },
-            { id: 457, title: 'Blessed Oil', category: 'recipe', body: 'Anoints a weapon or threshold; counts as [WARD] or [BLESSED] for one scene.', tags: ['recipe', 'lore', 'standard'], ingredients: ['Olive oil', 'Incense'], skill: 'lore', dv: 3, xpCost: 2, tier: 'standard', effect: 'Anoints a weapon or threshold; counts as [WARD] or [BLESSED] for one scene.', icon: '🕯️' }
-        ];
-        // Also ensure state.wikiData exists
-        state.wikiData = { data: state.wikiEntries };
-        saveState();
-    }
-}
-
-// ============================================================
-// CRAFTING DATA PARSING
-// ============================================================
-
-function parseIngredientsFromWiki(entries) {
-    const map = {};
-    for (const entry of entries) {
-        if (entry.category === 'ingredient' && entry.title) {
-            map[entry.title] = {
-                name: entry.title,
-                cost: entry.cost !== undefined ? entry.cost : 0,
-                common: entry.tags?.includes('common') ?? true,
-                icon: entry.icon || '🧪',
-                description: entry.body || ''
-            };
-        }
-    }
-    return map;
-}
-
-function parseRecipesFromWiki(entries) {
-    const recipes = {};
-    for (const entry of entries) {
-        if (entry.category === 'recipe' && entry.title) {
-            const id = String(entry.id) || entry.title.toLowerCase().replace(/ /g, '-');
-            recipes[id] = {
-                id: id,
-                name: entry.title,
-                description: entry.body || '',
-                effect: entry.effect || entry.body || '',
-                materials: entry.ingredients || [],
-                ingredients: entry.ingredients || [],
-                skill: entry.skill || 'craft',
-                dv: entry.dv !== undefined ? entry.dv : 3,
-                xpCost: entry.xpCost !== undefined ? entry.xpCost : 1,
-                tier: entry.tier || 'minor',
-                icon: entry.icon || '🔧'
-            };
-        }
-    }
-    return recipes;
-}
-
-// ─── Fallback data (in case parsing fails) ────────────────────
-
-// Hardcoded ingredient definitions (same as before, used as fallback)
-const FALLBACK_INGREDIENTS = {
-    'Herbs': { name: 'Herbs', cost: 0, common: true, icon: '🌿' },
-    'Clean cloth': { name: 'Clean cloth', cost: 0, common: true, icon: '🧻' },
-    'Rare herb': { name: 'Rare herb', cost: 1, common: false, icon: '🌱' },
-    'Distilled water': { name: 'Distilled water', cost: 0, common: true, icon: '💧' },
-    'Charcoal': { name: 'Charcoal', cost: 0, common: true, icon: '🪵' },
-    'Valerian root': { name: 'Valerian root', cost: 0, common: true, icon: '🌰' },
-    'Honey': { name: 'Honey', cost: 0, common: true, icon: '🍯' },
-    'Moonwater': { name: 'Moonwater', cost: 1, common: false, icon: '🌙' },
-    'Salt': { name: 'Salt', cost: 0, common: true, icon: '🧂' },
-    'Blessed ash': { name: 'Blessed ash', cost: 1, common: false, icon: '🔥' },
-    'Iron filings': { name: 'Iron filings', cost: 0, common: true, icon: '⚙️' },
-    'Nightshade': { name: 'Nightshade', cost: 1, common: false, icon: '☠️' },
-    'Pure water': { name: 'Pure water', cost: 0, common: true, icon: '💧' },
-    'Blood': { name: 'Blood', cost: 0, common: true, icon: '🩸' },
-    'Chamomile': { name: 'Chamomile', cost: 0, common: true, icon: '🌼' },
-    'Moonwort': { name: 'Moonwort', cost: 1, common: false, icon: '🌙' },
-    'Sulphur': { name: 'Sulphur', cost: 0, common: true, icon: '🟡' },
-    'Saltpetre': { name: 'Saltpetre', cost: 0, common: true, icon: '🧪' },
-    'Olive oil': { name: 'Olive oil', cost: 0, common: true, icon: '🫒' },
-    'Incense': { name: 'Incense', cost: 0, common: true, icon: '🪔' }
-};
-
-const FALLBACK_RECIPES = {
-    'healing-poultice': {
-        id: 'healing-poultice',
-        name: '🩹 Healing Poultice',
-        description: 'A balm of herbs and salves that speeds recovery.',
-        effect: 'Remove 1 Fatigue when applied during a short rest.',
-        materials: ['Herbs (1 Supply)', 'Clean cloth', 'Time (1 hour)'],
-        ingredients: ['Herbs', 'Clean cloth'],
-        skill: 'medicine',
-        dv: 2,
-        xpCost: 1,
-        tier: 'minor',
-        icon: '🩹'
-    },
-    'antidote': {
-        id: 'antidote',
-        name: '🧪 Antidote',
-        description: 'A bitter draught that neutralises common poisons.',
-        effect: 'Remove one Poisoned Condition.',
-        materials: ['Specific herb (rare)', 'Distilled water', 'Charcoal'],
-        ingredients: ['Rare herb', 'Distilled water', 'Charcoal'],
-        skill: 'medicine',
-        dv: 3,
-        xpCost: 2,
-        tier: 'minor',
-        icon: '🧪'
-    },
-    'sleep-draught': {
-        id: 'sleep-draught',
-        name: '💤 Sleep Draught',
-        description: 'A sweet syrup that induces deep, dreamless sleep.',
-        effect: 'Target tests Spirit+Resolve (DV 3) or falls asleep for 1 hour.',
-        materials: ['Valerian root', 'Honey', 'Moonwater'],
-        ingredients: ['Valerian root', 'Honey', 'Moonwater'],
-        skill: 'craft',
-        dv: 3,
-        xpCost: 1,
-        tier: 'minor',
-        icon: '💤'
-    },
-    'ward-salt': {
-        id: 'ward-salt',
-        name: '🧂 Ward Salt',
-        description: 'Salt blessed with protective herbs and iron filings.',
-        effect: 'Line wards against spirits and undead (Spirit+Resolve DV 4 to cross).',
-        materials: ['Salt (1 Supply)', 'Blessed ash', 'Iron filings'],
-        ingredients: ['Salt', 'Blessed ash', 'Iron filings'],
-        skill: 'lore',
-        dv: 3,
-        xpCost: 2,
-        tier: 'minor',
-        icon: '🧂'
-    },
-    'truth-serum': {
-        id: 'truth-serum',
-        name: '🔮 Truth Serum',
-        description: 'A clear liquid that loosens the tongue.',
-        effect: 'Target tests Spirit+Resolve (DV 4) or speaks only truth for one exchange.',
-        materials: ['Nightshade (carefully prepared)', 'Pure water', 'A drop of blood'],
-        ingredients: ['Nightshade', 'Pure water', 'Blood'],
-        skill: 'craft',
-        dv: 4,
-        xpCost: 3,
-        tier: 'standard',
-        icon: '🔮'
-    },
-    'moon-tea': {
-        id: 'moon-tea',
-        name: '🌙 Moon Tea',
-        description: 'A calming infusion that sharpens dreams and intuition.',
-        effect: '+1 die on next Wits or Spirit roll within 1 hour.',
-        materials: ['Chamomile', 'Moonwort', 'Honey'],
-        ingredients: ['Chamomile', 'Moonwort', 'Honey'],
-        skill: 'craft',
-        dv: 2,
-        xpCost: 1,
-        tier: 'minor',
-        icon: '🌙'
-    },
-    'fire-powder': {
-        id: 'fire-powder',
-        name: '🔥 Fire Powder',
-        description: 'A volatile powder that ignites on contact with air.',
-        effect: 'Creates a small fire (Harm 2, Area) in Close range. One use.',
-        materials: ['Sulphur', 'Charcoal', 'Saltpetre'],
-        ingredients: ['Sulphur', 'Charcoal', 'Saltpetre'],
-        skill: 'craft',
-        dv: 4,
-        xpCost: 3,
-        tier: 'standard',
-        icon: '🔥'
-    },
-    'blessed-oil': {
-        id: 'blessed-oil',
-        name: '🕯️ Blessed Oil',
-        description: 'Oil consecrated to a Patron or Threshold.',
-        effect: 'Anoints a weapon or threshold; counts as [WARD] or [BLESSED] for one scene.',
-        materials: ['Olive oil', 'Incense', 'A prayer or rite'],
-        ingredients: ['Olive oil', 'Incense'],
-        skill: 'lore',
-        dv: 3,
-        xpCost: 2,
-        tier: 'standard',
-        icon: '🕯️'
-    }
-};
 
 // ============================================================
 // WITCHCRAFT LOOKUP
@@ -614,37 +341,6 @@ function getFullRituals(char) {
     return w.rituals;
 }
 
-function getCraftedItems(char) {
-    const w = getWitchState(char);
-    if (!w.crafted) w.crafted = [];
-    return w.crafted;
-}
-
-function getIngredients(char) {
-    const w = getWitchState(char);
-    if (!w.ingredients) w.ingredients = [];
-    return w.ingredients;
-}
-
-/**
- * Returns the current ingredient map (from wiki or fallback).
- */
-function getIngredientMap() {
-    const state = getState();
-    const wikiEntries = state.wikiEntries || [];
-    let map = parseIngredientsFromWiki(wikiEntries);
-    if (Object.keys(map).length === 0) map = FALLBACK_INGREDIENTS;
-    return map;
-}
-
-function getRecipeMap() {
-    const state = getState();
-    const wikiEntries = state.wikiEntries || [];
-    let map = parseRecipesFromWiki(wikiEntries);
-    if (Object.keys(map).length === 0) map = FALLBACK_RECIPES;
-    return map;
-}
-
 // ============================================================
 // MAIN RENDER – Path-aware
 // ============================================================
@@ -667,26 +363,7 @@ export async function renderWitchcraft(el) {
 
     // Ensure patron data is loaded
     await ensurePatronDataLoaded();
-    // Ensure wiki data is loaded
-    await ensureWikiLoaded();
 
-    const state = getState();
-    const wikiEntries = state.wikiEntries || [];
-    // Parse ingredients and recipes from wiki (or fallback)
-    let ingredientMap = parseIngredientsFromWiki(wikiEntries);
-    let recipeMap = parseRecipesFromWiki(wikiEntries);
-
-    // If no entries found, use fallback
-    if (Object.keys(ingredientMap).length === 0) {
-        ingredientMap = FALLBACK_INGREDIENTS;
-    }
-    if (Object.keys(recipeMap).length === 0) {
-        recipeMap = FALLBACK_RECIPES;
-    }
-
-    // RULES CHANGE: General crafting (ingredients/recipes/crafted items)
-    // is available to every character, full stop. Only the witchcraft-
-    // specific pieces below are gated.
     const isWitch = char.magicPath === 'witch';
     const hasCraftOfTheHedge = (char.talents || []).some(t =>
         t.name === 'Craft of the Hedge' || t.id === 'craft-of-the-hedge'
@@ -723,20 +400,21 @@ export async function renderWitchcraft(el) {
                 <div style="display:flex;align-items:center;gap:0.4rem;">
                     <span style="font-size:1.4rem;">🧹</span>
                     <div>
-                        <span style="font-weight:600;font-size:1.05rem;color:var(--gold);">${hasHedgeAccess ? 'Hedge Magic & Crafting' : 'Crafting Bench'}</span>
+                        <span style="font-weight:600;font-size:1.05rem;color:var(--gold);">Hedge Magic</span>
                         <span style="font-size:0.7rem;color:var(--text3);margin-left:0.3rem;">${isWitch ? 'Witch' : hasHedgeAccess ? 'Hedge-Gifted' : 'Any character'}</span>
                         ${witchcraftData ? `<span style="font-size:0.6rem;color:var(--text3);">· ${witchcraftData.patron.name}</span>` : ''}
                     </div>
                 </div>
                 <div style="display:flex;gap:0.3rem;flex-wrap:wrap;">
                     ${hasHedgeAccess ? `<button class="btn btn-sm btn-primary" onclick="window.witchQuickWork()">${craftShowQuickWorkForm ? '✕ Cancel' : '⚡ Quick Work'}</button>` : ''}
-                    <button class="btn btn-sm btn-ghost" onclick="window.witchRefresh()" title="Reloads patron and wiki data from disk, bypassing any cached copy">🔄</button>
+                    <button class="btn btn-sm btn-ghost" onclick="window.witchRefresh()" title="Reloads patron data from disk, bypassing any cached copy">🔄</button>
                 </div>
             </div>
 
             ${!hasHedgeAccess ? `
                 <div style="font-size:0.7rem;color:var(--text3);background:var(--bg2);border:1px dashed var(--border);border-radius:var(--radius);padding:0.4rem 0.6rem;">
-                    🌿 Learn the <strong>Craft of the Hedge</strong> talent (or walk the Witch path) to unlock Hedge Gifts, Quick Workings, Full Rituals, and the price tracks. The Crafting Bench below is open to every character.
+                    🌿 Learn the <strong>Craft of the Hedge</strong> talent (or walk the Witch path) to unlock Hedge Gifts, Quick Workings, Full Rituals, and the price tracks.
+                    Looking for the ingredient/recipe crafting bench? It moved to its own <strong>Crafting</strong> page in the sidebar — open to every character regardless of path.
                 </div>
             ` : ''}
 
@@ -754,20 +432,18 @@ export async function renderWitchcraft(el) {
             <!-- ─── Promise Timers (hedge-access only) ──────────── -->
             ${hasHedgeAccess ? renderPromiseTimersSection(timers) : ''}
 
-            <!-- ─── Crafting Bench (everyone) ───────────────────── -->
-            ${renderCraftingSection(char, ingredientMap, recipeMap)}
-
             <!-- ─── Full Rituals (Witches only) ─────────────────── -->
             ${isWitch ? renderFullRitualsSection(rituals) : ''}
 
             <!-- ─── Quick Reference ─────────────────────────────── -->
-            <div class="witchcraft-quickref" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:0.1rem;font-size:0.6rem;color:var(--text3);background:var(--bg2);border-radius:var(--radius);padding:0.15rem 0.3rem;border:1px solid var(--border);">
-                ${hasHedgeAccess ? `<div>🌿 <strong>Gifts:</strong> No-roll, limited scope</div>` : ''}
-                ${hasHedgeAccess ? `<div>⚡ <strong>Quick:</strong> Single action, roll required</div>` : ''}
-                ${isWitch ? `<div>🕯️ <strong>Ritual:</strong> Extended, lasting effects</div>` : ''}
-                <div>🔧 <strong>Craft:</strong> Ingredients, recipes, XP</div>
-                ${hasHedgeAccess ? `<div>⏳ <strong>Timer:</strong> When full, price comes due</div>` : ''}
-            </div>
+            ${hasHedgeAccess ? `
+                <div class="witchcraft-quickref" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:0.1rem;font-size:0.6rem;color:var(--text3);background:var(--bg2);border-radius:var(--radius);padding:0.15rem 0.3rem;border:1px solid var(--border);">
+                    <div>🌿 <strong>Gifts:</strong> No-roll, limited scope</div>
+                    <div>⚡ <strong>Quick:</strong> Single action, roll required</div>
+                    ${isWitch ? `<div>🕯️ <strong>Ritual:</strong> Extended, lasting effects</div>` : ''}
+                    <div>⏳ <strong>Timer:</strong> When full, price comes due</div>
+                </div>
+            ` : ''}
 
             ${hasHedgeAccess ? `
                 <!-- ─── The Gray Wanderer's Wisdom ──────────────────── -->
@@ -1054,169 +730,6 @@ function renderFullRitualsSection(rituals) {
 }
 
 // ============================================================
-// RENDER HELPERS — Crafting Bench (open to everyone)
-// ============================================================
-
-function renderCraftingToolbar(ingredientMap) {
-    const rare = Object.values(ingredientMap).filter(i => !i.common);
-    return `
-        <div style="display:flex;gap:0.4rem;flex-wrap:wrap;align-items:center;">
-            <button class="btn btn-xs btn-secondary" onclick="window.witchForageIngredient()" title="Forage a random common ingredient">🌿 Forage</button>
-            ${rare.length > 0 ? `
-                <div style="display:flex;gap:0.2rem;align-items:center;background:var(--bg3);border-radius:6px;padding:0.15rem 0.3rem;border:1px solid var(--border);">
-                    <select id="witch-buy-select" style="background:var(--bg3);color:var(--text);border:none;font-size:0.7rem;">
-                        ${rare.map(i => `<option value="${escHtml(i.name)}">${i.icon} ${escHtml(i.name)} — ${i.cost} XP</option>`).join('')}
-                    </select>
-                    <button class="btn btn-xs btn-secondary" onclick="window.witchPurchaseIngredient()">💰 Buy</button>
-                </div>
-            ` : ''}
-            ${craftCombineSelection.length > 0 ? `
-                <button class="btn btn-xs btn-gold" onclick="window.witchCombineIngredients()">⚗️ Combine Selected (${craftCombineSelection.length})</button>
-                <button class="btn btn-xs btn-ghost" onclick="window.witchClearCombineSelection()">✕ Clear selection</button>
-            ` : `
-                <span style="font-size:0.6rem;color:var(--text3);">Check ingredients below to combine (up to 3)</span>
-            `}
-        </div>
-    `;
-}
-
-function renderIngredientInventory(char, ingredientMap) {
-    const ingredients = getIngredients(char);
-    if (ingredients.length === 0) {
-        return `<div style="font-size:0.75rem;color:var(--text3);text-align:center;padding:0.4rem 0;">No ingredients yet. Forage or buy some above.</div>`;
-    }
-    return `
-        <div class="craft-inventory-grid" style="display:flex;flex-wrap:wrap;gap:0.3rem;">
-            ${ingredients.map((name, idx) => {
-                const def = ingredientMap[name] || { name, icon: '🧪', common: true };
-                const selected = craftCombineSelection.includes(idx);
-                return `
-                    <span class="craft-ingredient-chip" style="display:inline-flex;align-items:center;gap:0.25rem;background:${selected ? 'var(--gold)' : 'var(--bg3)'};color:${selected ? 'var(--bg1)' : 'var(--text)'};border:1px solid ${selected ? 'var(--gold)' : 'var(--border)'};border-radius:6px;padding:0.15rem 0.4rem;font-size:0.7rem;">
-                        <input type="checkbox" ${selected ? 'checked' : ''} onchange="window.witchToggleCombineSelect(${idx})" style="margin:0;cursor:pointer;" title="Select for combining" />
-                        <span>${def.icon || '🧪'} ${escHtml(name)}</span>
-                        <button type="button" onclick="window.witchRemoveIngredientAt(${idx})" title="Discard" style="border:none;background:none;color:inherit;cursor:pointer;font-size:0.65rem;opacity:0.7;padding:0;">✕</button>
-                    </span>
-                `;
-            }).join('')}
-        </div>
-    `;
-}
-
-function renderRecipeCard(recipe, counts, char) {
-    const required = recipe.ingredients || [];
-    const missing = required.filter(req => !(counts[req] > 0));
-    const canCraftFull = missing.length === 0;
-    const expanded = craftExpandedRecipe === recipe.id;
-    const totalXp = (char.totalXp || 0) - (char.xpSpent || 0);
-    const canAffordXp = totalXp >= recipe.xpCost;
-
-    return `
-        <div class="craft-recipe-card" style="background:var(--bg3);border-radius:var(--radius);border-left:3px solid ${canCraftFull ? 'var(--green)' : 'var(--orange)'};padding:0.25rem 0.45rem;">
-            <div style="display:flex;justify-content:space-between;align-items:center;cursor:pointer;" onclick="window.witchToggleRecipeExpand('${escHtml(recipe.id)}')">
-                <div style="display:flex;align-items:center;gap:0.3rem;flex-wrap:wrap;">
-                    <span>${recipe.icon || '🔧'}</span>
-                    <span style="font-weight:600;font-size:0.8rem;">${escHtml(recipe.name)}</span>
-                    <span style="font-size:0.6rem;color:var(--text3);">${escHtml(recipe.tier)} · DV ${recipe.dv} · ${recipe.xpCost} XP</span>
-                    ${canCraftFull
-                        ? `<span style="font-size:0.55rem;color:var(--green);">✓ Ready</span>`
-                        : `<span style="font-size:0.55rem;color:var(--orange);">missing ${missing.length}</span>`}
-                </div>
-                <span style="font-size:0.65rem;color:var(--text3);">${expanded ? '▾' : '▸'}</span>
-            </div>
-            ${expanded ? `
-                <div style="margin-top:0.3rem;display:flex;flex-direction:column;gap:0.2rem;">
-                    <div style="font-size:0.7rem;color:var(--text2);">${escHtml(recipe.description || recipe.effect || '')}</div>
-                    <div style="font-size:0.65rem;color:var(--text3);"><strong>Effect:</strong> ${escHtml(recipe.effect)}</div>
-                    <div style="display:flex;flex-wrap:wrap;gap:0.2rem;">
-                        ${required.map(req => {
-                            const has = counts[req] > 0;
-                            return `<span style="font-size:0.6rem;padding:0.05rem 0.3rem;border-radius:6px;background:${has ? 'rgba(107,170,122,0.15)' : 'rgba(217,74,74,0.15)'};color:${has ? 'var(--green)' : 'var(--red)'};border:1px solid ${has ? 'var(--green)' : 'var(--red)'};">${has ? '✓' : '✕'} ${escHtml(req)}</span>`;
-                        }).join('')}
-                    </div>
-                    <div style="font-size:0.6rem;color:${canAffordXp ? 'var(--text3)' : 'var(--red)'};">XP available: ${totalXp}${canAffordXp ? '' : ' (not enough)'}</div>
-                    <div>
-                        <button class="btn btn-xs btn-gold" ${canAffordXp ? '' : 'disabled'} onclick="window.witchCraftFromRecipe('${escHtml(recipe.id)}')" title="${canCraftFull ? 'Craft this recipe' : 'Missing ingredients — crafting anyway risks a Flawed result'}">
-                            🔨 ${canCraftFull ? 'Craft' : 'Craft Anyway'}
-                        </button>
-                    </div>
-                </div>
-            ` : ''}
-        </div>
-    `;
-}
-
-function renderRecipeBrowser(char, recipeMap, ingredientMap) {
-    const recipes = Object.values(recipeMap);
-    const ingredients = getIngredients(char);
-    const counts = {};
-    ingredients.forEach(n => { counts[n] = (counts[n] || 0) + 1; });
-
-    if (recipes.length === 0) {
-        return `<div style="font-size:0.75rem;color:var(--text3);text-align:center;padding:0.4rem 0;">No recipes available.</div>`;
-    }
-
-    return `
-        <div class="craft-recipe-grid" style="display:flex;flex-direction:column;gap:0.25rem;">
-            ${recipes.map(r => renderRecipeCard(r, counts, char)).join('')}
-        </div>
-    `;
-}
-
-function renderCraftedItem(item) {
-    const uses = item.uses || 1;
-    return `
-        <div class="crafted-item" style="display:flex;justify-content:space-between;align-items:center;padding:0.1rem 0.3rem;border-bottom:1px solid var(--border);font-size:0.75rem;">
-            <div style="flex:1;min-width:0;">
-                <span style="font-weight:600;">${escHtml(item.name)}</span>
-                <span style="font-size:0.65rem;color:var(--text3);">${escHtml(item.effect)}</span>
-                ${item.quality ? `<span style="font-size:0.55rem;color:${item.quality === 'standard' ? 'var(--green)' : 'var(--orange)'};">(${item.quality})</span>` : ''}
-                <span style="font-size:0.55rem;color:var(--text2);">${uses} uses</span>
-            </div>
-            <div style="display:flex;gap:0.2rem;">
-                <button class="btn btn-xs btn-gold" onclick="window.witchUseCraftedItem('${item.id}')" style="font-size:0.6rem;">Use</button>
-                <button class="btn btn-xs btn-ghost" onclick="window.witchRemoveCraftedItem('${item.id}')" style="color:var(--red);font-size:0.6rem;">✕</button>
-            </div>
-        </div>
-    `;
-}
-
-function renderCraftingSection(char, ingredientMap, recipeMap) {
-    const crafted = getCraftedItems(char);
-    return `
-        <div class="witchcraft-crafting" style="background:var(--bg2);border-radius:var(--radius);padding:0.4rem 0.5rem;border:1px solid var(--border);display:flex;flex-direction:column;gap:0.4rem;">
-            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.2rem;">
-                <span style="font-size:0.85rem;font-weight:600;color:var(--gold);">🔧 Crafting Bench</span>
-                <span style="font-size:0.6rem;color:var(--text3);">Ingredients, recipes & alchemy — open to every character</span>
-            </div>
-
-            ${renderCraftingToolbar(ingredientMap)}
-
-            <div>
-                <div style="font-size:0.7rem;font-weight:600;color:var(--text2);margin-bottom:0.15rem;">📦 Inventory</div>
-                ${renderIngredientInventory(char, ingredientMap)}
-            </div>
-
-            <div>
-                <div style="font-size:0.7rem;font-weight:600;color:var(--text2);margin-bottom:0.15rem;">📜 Recipes</div>
-                ${renderRecipeBrowser(char, recipeMap, ingredientMap)}
-            </div>
-
-            <div>
-                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.15rem;">
-                    <span style="font-size:0.7rem;font-weight:600;color:var(--text2);">🎒 Crafted Items</span>
-                    <span style="font-size:0.6rem;color:var(--text3);">${crafted.length} on hand</span>
-                </div>
-                <div style="max-height:120px;overflow-y:auto;">
-                    ${crafted.length === 0 ? `
-                        <div style="font-size:0.75rem;color:var(--text3);text-align:center;padding:0.3rem 0;">No crafted items yet.</div>
-                    ` : crafted.map(c => renderCraftedItem(c)).join('')}
-                </div>
-            </div>
-        </div>
-    `;
-}
-
-// ============================================================
 // GLOBAL FUNCTIONS (exposed to HTML onclick)
 // ============================================================
 
@@ -1266,290 +779,6 @@ window.witchRemoveGift = function(giftId) {
     char.witch.hedgeGifts = gifts;
     saveCharacter({ witch: char.witch });
     showToast('Removed gift.', 'info');
-    refreshWitchcraftPanel();
-};
-
-// ─── Ingredients ─────────────────────────────────────────────
-
-window.witchForageIngredient = function() {
-    const char = getCharacterData();
-    if (!char) return;
-
-    const ingredientMap = getIngredientMap();
-    const common = Object.values(ingredientMap).filter(i => i.common);
-    if (common.length === 0) {
-        showToast('No common ingredients defined.', 'error');
-        return;
-    }
-    const picked = common[Math.floor(Math.random() * common.length)];
-    const ingredients = getIngredients(char);
-    ingredients.push(picked.name);
-    saveCharacter({ witch: char.witch });
-    showToast(`🌿 Foraged ${picked.icon} ${picked.name}`, 'success');
-    refreshWitchcraftPanel();
-};
-
-window.witchPurchaseIngredient = function() {
-    const char = getCharacterData();
-    if (!char) return;
-
-    const select = document.getElementById('witch-buy-select');
-    if (!select || !select.value) {
-        showToast('Choose a rare ingredient to buy first.', 'error');
-        return;
-    }
-
-    const ingredientMap = getIngredientMap();
-    const picked = ingredientMap[select.value];
-    if (!picked) {
-        showToast('Ingredient not found.', 'error');
-        return;
-    }
-
-    const totalXp = char.totalXp || 0;
-    const spent = char.xpSpent || 0;
-    const available = totalXp - spent;
-    if (available < picked.cost) {
-        showToast(`Not enough XP. Need ${picked.cost}, have ${available}.`, 'error');
-        return;
-    }
-    char.xpSpent = spent + picked.cost;
-    const ingredients = getIngredients(char);
-    ingredients.push(picked.name);
-    saveCharacter({ xpSpent: char.xpSpent, witch: char.witch });
-    showToast(`💰 Purchased ${picked.icon} ${picked.name} for ${picked.cost} XP`, 'success');
-    refreshWitchcraftPanel();
-};
-
-window.witchRemoveIngredientAt = function(index) {
-    const char = getCharacterData();
-    if (!char) return;
-    const ingredients = getIngredients(char);
-    if (index < 0 || index >= ingredients.length) return;
-    const [removed] = ingredients.splice(index, 1);
-    char.witch.ingredients = ingredients;
-    // Selection indices shift once something before them is removed.
-    craftCombineSelection = craftCombineSelection
-        .filter(i => i !== index)
-        .map(i => (i > index ? i - 1 : i));
-    saveCharacter({ witch: char.witch });
-    showToast(`Removed ${removed}.`, 'info');
-    refreshWitchcraftPanel();
-};
-
-window.witchToggleCombineSelect = function(index) {
-    const pos = craftCombineSelection.indexOf(index);
-    if (pos === -1) {
-        if (craftCombineSelection.length >= 3) {
-            showToast('You can combine up to 3 ingredients at once.', 'warning');
-            return;
-        }
-        craftCombineSelection.push(index);
-    } else {
-        craftCombineSelection.splice(pos, 1);
-    }
-    refreshWitchcraftPanel();
-};
-
-window.witchClearCombineSelection = function() {
-    craftCombineSelection = [];
-    refreshWitchcraftPanel();
-};
-
-// ─── Combine Ingredients (checkbox-selected, no prompts) ──────
-
-window.witchCombineIngredients = function() {
-    const char = getCharacterData();
-    if (!char) return;
-
-    if (craftCombineSelection.length === 0) {
-        showToast('Check at least one ingredient below to combine.', 'warning');
-        return;
-    }
-
-    const ingredients = getIngredients(char);
-    const indices = [...new Set(craftCombineSelection)]
-        .filter(i => i >= 0 && i < ingredients.length)
-        .sort((a, b) => b - a); // remove back-to-front so earlier indices stay valid
-    const selectedNames = indices.map(i => ingredients[i]).reverse();
-
-    for (const i of indices) ingredients.splice(i, 1);
-    char.witch.ingredients = ingredients;
-    craftCombineSelection = [];
-
-    // Check against recipes
-    const recipeMap = getRecipeMap();
-    let matchedRecipe = null;
-    for (const recipe of Object.values(recipeMap)) {
-        const recipeIngs = recipe.ingredients || [];
-        const allPresent = selectedNames.every(name =>
-            recipeIngs.some(r => r.toLowerCase() === name.toLowerCase())
-        );
-        if (allPresent && selectedNames.length > 0) {
-            matchedRecipe = recipe;
-            break;
-        }
-    }
-
-    if (matchedRecipe) {
-        const crafted = getCraftedItems(char);
-        crafted.push({
-            id: generateId('crafted_'),
-            name: matchedRecipe.name,
-            effect: matchedRecipe.effect,
-            quality: 'standard',
-            uses: matchedRecipe.tier === 'standard' ? 2 : 1,
-            recipe: matchedRecipe.id,
-            icon: matchedRecipe.icon || '🔧',
-            createdAt: Date.now()
-        });
-        saveCharacter({ witch: char.witch });
-        showToast(`⚗️ Successfully crafted ${matchedRecipe.icon} ${matchedRecipe.name}!`, 'success');
-    } else {
-        // No recipe matched – random concoction
-        const randomEffects = [
-            'A bubbly green liquid that smells of mint; drink it to restore 1 Fatigue.',
-            'A grey powder that sparkles; it can be thrown to create a flash of light (distract enemies).',
-            'A sticky tar that hardens on contact; can be used to patch a leak or jam a lock.',
-            'A sweet syrup that induces vivid dreams; take it to gain +1 die on a future Wits roll.',
-            'A bitter tonic that purges the system; removes one Poisoned condition (if any).'
-        ];
-        const effect = randomEffects[Math.floor(Math.random() * randomEffects.length)];
-        const crafted = getCraftedItems(char);
-        crafted.push({
-            id: generateId('crafted_'),
-            name: '🧪 Unknown Concoction',
-            effect: effect,
-            quality: 'flawed',
-            uses: 1,
-            recipe: null,
-            icon: '🧪',
-            createdAt: Date.now()
-        });
-        saveCharacter({ witch: char.witch });
-        showToast(`⚗️ You created an unknown concoction: ${effect}`, 'info');
-    }
-
-    refreshWitchcraftPanel();
-};
-
-// ─── Craft from Recipe (click a recipe card, no prompts) ──────
-
-window.witchToggleRecipeExpand = function(recipeId) {
-    craftExpandedRecipe = craftExpandedRecipe === recipeId ? null : recipeId;
-    refreshWitchcraftPanel();
-};
-
-window.witchCraftFromRecipe = function(recipeId) {
-    const char = getCharacterData();
-    if (!char) return;
-
-    const recipeMap = getRecipeMap();
-    const recipe = recipeMap[recipeId];
-    if (!recipe) {
-        showToast('Recipe not found.', 'error');
-        return;
-    }
-
-    const required = recipe.ingredients || [];
-    const ingredients = getIngredients(char);
-    const missing = required.filter(req => !ingredients.some(i => i.toLowerCase() === req.toLowerCase()));
-
-    const totalXp = char.totalXp || 0;
-    const spent = char.xpSpent || 0;
-    const available = totalXp - spent;
-    if (available < recipe.xpCost) {
-        showToast(`Not enough XP. Need ${recipe.xpCost}, have ${available}.`, 'error');
-        return;
-    }
-
-    // Perform the crafting roll
-    const skillLevel = char.skills?.[recipe.skill] || 0;
-    const attr = recipe.skill === 'medicine' ? 'wits' :
-                 recipe.skill === 'craft' ? 'wits' : 'spirit';
-    const attrValue = char[attr] || 1;
-    const pool = attrValue + skillLevel;
-    const dv = recipe.dv;
-    const result = performRoll(pool, dv);
-
-    let success = false;
-    let outcome = '';
-    let boons = 0;
-    let sbCount = 0;
-
-    if (result.successes >= dv) {
-        success = true;
-        outcome = '✅ Success';
-    } else if (result.successes > 0) {
-        outcome = '⚠️ Partial';
-        boons = 1;
-    } else {
-        outcome = '❌ Failure';
-        sbCount = result.storyBeats || 1;
-        boons = 2;
-    }
-
-    const updates = {};
-
-    if (success || outcome === '⚠️ Partial') {
-        char.xpSpent = spent + recipe.xpCost;
-        updates.xpSpent = char.xpSpent;
-    }
-
-    if (boons > 0) {
-        char.boons = (char.boons || 0) + boons;
-        if (char.boons > 5) char.boons = 5;
-        updates.boons = char.boons;
-    }
-
-    // Consume whatever required ingredients we actually have on hand.
-    const consumed = [];
-    for (const req of required) {
-        const idx = ingredients.findIndex(i => i.toLowerCase() === req.toLowerCase());
-        if (idx !== -1) {
-            consumed.push(ingredients[idx]);
-            ingredients.splice(idx, 1);
-        }
-    }
-    char.witch.ingredients = ingredients;
-    updates.witch = char.witch;
-
-    if (success || outcome === '⚠️ Partial') {
-        const quality = success ? 'standard' : 'flawed';
-        const crafted = getCraftedItems(char);
-        crafted.push({
-            id: generateId('crafted_'),
-            name: recipe.name,
-            effect: recipe.effect,
-            quality: quality,
-            uses: recipe.tier === 'standard' ? 2 : 1,
-            recipe: recipe.id,
-            icon: recipe.icon || '🔧',
-            createdAt: Date.now()
-        });
-        updates.witch = char.witch;
-    }
-
-    saveCharacter(updates);
-    craftExpandedRecipe = null;
-
-    const outcomeColor = success ? 'var(--green)' : outcome === '⚠️ Partial' ? 'var(--orange)' : 'var(--red)';
-    const msg = `
-        <div style="display:flex;flex-direction:column;gap:0.3rem;max-width:400px;">
-            <div style="font-weight:600;font-size:1rem;color:var(--gold);">🔧 Crafting: ${escHtml(recipe.name)}</div>
-            <div style="font-size:0.8rem;color:var(--text2);">${escHtml(recipe.description)}</div>
-            <div style="font-size:0.75rem;color:var(--text3);">Pool: ${pool}d · DV: ${dv}</div>
-            <div style="font-size:0.7rem;color:var(--text3);">Roll: ${result.dice.join(', ')}</div>
-            <div style="font-size:0.8rem;">Rolled: <strong>${result.successes}</strong> successes</div>
-            <div style="font-size:1rem;font-weight:600;color:${outcomeColor};">${outcome}</div>
-            ${success || outcome === '⚠️ Partial' ? `<div style="color:var(--text3);font-size:0.75rem;">Cost: ${recipe.xpCost} XP</div>` : ''}
-            ${boons > 0 ? `<div style="color:var(--gold);font-size:0.75rem;">⭐ +${boons} Boon${boons > 1 ? 's' : ''}</div>` : ''}
-            ${sbCount > 0 ? `<div style="color:var(--text3);font-size:0.75rem;">📖 GM gains ${sbCount} SB</div>` : ''}
-            ${consumed.length > 0 ? `<div style="font-size:0.7rem;color:var(--text3);">Consumed: ${consumed.join(', ')}</div>` : ''}
-            ${missing.length > 0 ? `<div style="font-size:0.7rem;color:var(--orange);">Missing ingredients (crafted anyway): ${missing.join(', ')}</div>` : ''}
-        </div>
-    `;
-    showToastWithHTML(msg, 'info');
     refreshWitchcraftPanel();
 };
 
@@ -1828,38 +1057,6 @@ window.witchCancelClearPrices = function() {
     refreshWitchcraftPanel();
 };
 
-// ─── Crafted Item Usage ──────────────────────────────────────
-
-window.witchUseCraftedItem = function(itemId) {
-    const char = getCharacterData();
-    if (!char) return;
-    const crafted = getCraftedItems(char);
-    const item = crafted.find(c => c.id === itemId);
-    if (!item) return showToast('Item not found.', 'error');
-
-    const effect = item.effect || 'The item is used.';
-    showToast(`🧪 Used "${item.name}": ${effect}`, 'success');
-
-    item.uses = (item.uses || 1) - 1;
-    if (item.uses <= 0) {
-        window.witchRemoveCraftedItem(itemId);
-    } else {
-        saveCharacter({ witch: char.witch });
-        refreshWitchcraftPanel();
-    }
-};
-
-window.witchRemoveCraftedItem = function(itemId) {
-    const char = getCharacterData();
-    if (!char) return;
-    let crafted = getCraftedItems(char);
-    crafted = crafted.filter(c => c.id !== itemId);
-    char.witch.crafted = crafted;
-    saveCharacter({ witch: char.witch });
-    showToast('Item removed.', 'info');
-    refreshWitchcraftPanel();
-};
-
 // ─── Weaver Selection ─────────────────────────────────────────
 
 window.witchChooseWeaver = function() {
@@ -1880,12 +1077,11 @@ window.witchSelectWeaver = function(patronId) {
     refreshWitchcraftPanel();
 };
 
-// ─── Refresh (forces a real data reload — patron + wiki) ──────
+// ─── Refresh (forces a real data reload — patron data) ─────────
 
 window.witchRefresh = async function() {
-    showToast('🔄 Reloading patron and wiki data…', 'info');
+    showToast('🔄 Reloading patron data…', 'info');
     await ensurePatronDataLoaded(true);
-    await ensureWikiLoaded(true);
     await refreshWitchcraftPanel();
     showToast('✅ Hedge magic refreshed.', 'success');
 };

@@ -36,6 +36,7 @@ const ROUTE_IMPORTS = {
     characters:  () => import('./features/characters/index.js'),
     dice:        () => import('./features/dice/index.js'),
     decks:       () => import('./features/decks/index.js'),
+    crafting:    () => import('./features/crafting/index.js'),
     encounters:  () => import('./features/encounters/index.js'),
     timers:      () => import('./features/timers/index.js'),
     factions:    () => import('./features/factions/index.js'),

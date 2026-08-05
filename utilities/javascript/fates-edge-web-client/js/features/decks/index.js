@@ -485,7 +485,7 @@ function renderSynthesisHtml(text) {
 // ============================================================
 
 function getRegionSlug(name) {
-    return name.toLowerCase().replace(/ /g, '-').replace(/[^a-z0-9-]/g, '');
+    return name.toLowerCase().replace(/ /g, '_').replace(/[^a-z0-9_]/g, '');
 }
 
 function transformRegionData(raw) {

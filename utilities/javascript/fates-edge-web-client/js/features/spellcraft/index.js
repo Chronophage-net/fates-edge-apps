@@ -6,8 +6,11 @@
  *
  * Features:
  * - Character tracks (Obligation, Corruption, Leash, Mental Strain, Shadow/Shame/Identity)
- * - Path-specific components: Rites, Spellbook, Crafting, Calculator, Summoning, Monks, Cantor, Psionics
- * - Crafting (Hedge Gifts, Quick Workings, Rituals) is available to ALL characters
+ * - Path-specific components: Rites, Spellbook, Witchcraft, Calculator, Summoning, Monks, Cantor, Psionics
+ * - Witchcraft (Hedge Gifts, Quick Workings, Full Rituals) is available to the Witch path AND
+ *   anyone with the "Craft of the Hedge" talent — not gated on magicPath alone
+ * - The ingredient/recipe Crafting Bench and item Codex live outside Spellcraft entirely now
+ *   (sidebar → Crafting), open to every character regardless of path
  * - TAGS Calculator for Free Casters (and as a learning tool for others)
  * - Unified character selection via VTT
  * - Default "Path Finder" view helps players choose their magical tradition
@@ -40,7 +43,7 @@ const PATH_META = {
         label: 'No Path',
         icon: '👤',
         color: 'var(--text3)',
-        description: 'No magical path chosen. Crafting (Hedge Gifts, rituals) is still available.',
+        description: 'No magical path chosen. The Crafting Bench (sidebar) is still available.',
         longDescription: 'You have not yet chosen a magical tradition. Explore the paths below to find the one that calls to you.',
         recommendations: []
     },
@@ -527,7 +530,7 @@ function ensureStyles() {
 
 let container = null;
 let eventListeners = [];
-let activeTab = 'crafting';
+let activeTab = 'spellbook';
 let renderToken = 0;
 let isPathFinder = false;
 
@@ -793,7 +796,7 @@ function renderNoCharacterView() {
                         `).join('')}
                 </div>
                 <div style="margin-top:0.6rem;font-size:0.75rem;color:var(--text3);text-align:center;">
-                    Crafting (Hedge Gifts, Quick Workings, Rituals) and the Spellbook are available to every character, regardless of path.
+                    The Spellbook is available to every character regardless of path. Witchcraft (Hedge Gifts, Quick Workings, Full Rituals) also works without the Witch path if you've taken "Craft of the Hedge." Ingredient/recipe crafting and the item Codex live in their own <strong>Crafting</strong> page in the sidebar.
                 </div>
             </div>
         </div>
@@ -838,7 +841,7 @@ export function render(el) {
     // If no path is selected, show the Path Finder view
     if (path === 'none') {
         isPathFinder = true;
-        activeTab = 'crafting';
+        activeTab = 'spellbook';
         renderPathFinder(char, name, pathMeta, patron);
         attachEvents();
         // Check if we should show the magic tour
@@ -849,7 +852,7 @@ export function render(el) {
     isPathFinder = false;
     const tabs = getAvailableTabs(char);
     if (!tabs.some(t => t.id === activeTab)) {
-        activeTab = 'crafting';
+        activeTab = 'spellbook';
     }
 
     const pathOptionsHtml = buildPathSelectOptions(path);
@@ -956,8 +959,9 @@ function renderPathFinder(char, name, pathMeta, patron) {
                         Runekeeper to the raw will of the Psion.
                     </p>
                     <p style="font-size:0.8rem;color:var(--text3);">
-                        <strong>💡 Tip:</strong> You can still access Crafting (Hedge Gifts, Quick Workings, Rituals)
-                        regardless of your path. Choose the path that feels right for your character's story.
+                        <strong>💡 Tip:</strong> The Crafting page (sidebar) works regardless of your path, and
+                        "Craft of the Hedge" unlocks Witchcraft's Hedge Gifts without committing to the Witch path.
+                        Choose the path that feels right for your character's story.
                     </p>
                 </div>
 
@@ -1000,7 +1004,7 @@ function renderPathFinder(char, name, pathMeta, patron) {
                     <div style="font-size:0.7rem;color:var(--text3);">No active tracks. Choose a path to begin.</div>
                 </div>
 
-                <!-- ─── Tabs (Crafting + Spellbook only) ─────────── -->
+                <!-- ─── Tabs (Spellbook, + Witchcraft if hedge-gifted) ─────────── -->
                 <div class="spellcraft-tabs" style="display:flex;gap:0.2rem;border-bottom:1px solid var(--border);padding-bottom:0.1rem;flex-wrap:wrap;">
                     ${renderTabButtons(getAvailableTabs(char))}
                 </div>
@@ -1087,12 +1091,29 @@ function renderTabButtons(tabs) {
     `).join('');
 }
 
+function hasHedgeAccess(char) {
+    const hasCraftOfTheHedge = (char.talents || []).some(t =>
+        t.name === 'Craft of the Hedge' || t.id === 'craft-of-the-hedge'
+    );
+    return char.magicPath === 'witch' || hasCraftOfTheHedge
+        || (char.hedgeGifts || []).length > 0
+        || (char.witch?.hedgeGifts || []).length > 0;
+}
+
 function getAvailableTabs(char) {
     const path = char.magicPath || 'none';
     const tabs = [];
 
-    tabs.push({ id: 'crafting', label: 'Crafting', icon: '🌿' });
     tabs.push({ id: 'spellbook', label: 'Spellbook', icon: '📚' });
+
+    // Hedge magic (Hedge Gifts, Quick Workings, Full Rituals, price
+    // tracks) is available to the Witch path AND to anyone who's picked
+    // up the "Craft of the Hedge" talent — not gated on magicPath alone.
+    // The ingredient/recipe Crafting Bench itself lives outside Spellcraft
+    // entirely now (sidebar → Crafting), open to every character.
+    if (hasHedgeAccess(char)) {
+        tabs.push({ id: 'witchcraft', label: 'Witchcraft', icon: '🧹' });
+    }
 
     if (path === 'none') return tabs;
 
@@ -1120,10 +1141,6 @@ function getAvailableTabs(char) {
         tabs.push({ id: 'monks', label: 'Monks', icon: '🧘' });
     }
 
-    if (path === 'witch') {
-        tabs.push({ id: 'witchcraft', label: 'Witchcraft', icon: '🧹' });
-    }
-
     return tabs;
 }
 
@@ -1141,9 +1158,6 @@ async function renderActiveTabContent() {
 
     try {
         switch (activeTab) {
-            case 'crafting':
-                renderWitchcraft(wrapper);
-                break;
             case 'spellbook':
                 renderSpellbook(wrapper);
                 break;
@@ -1210,7 +1224,7 @@ function renderAll() {
 
     const tabs = getAvailableTabs(char);
     if (!tabs.some(t => t.id === activeTab)) {
-        activeTab = 'crafting';
+        activeTab = 'spellbook';
     }
     const tabsContainer = document.querySelector('.spellcraft-tabs');
     if (tabsContainer) {
@@ -1370,7 +1384,7 @@ function setPathFromSelect() {
 
     const result = updateCharacter(char.id, { magicPath: pathId });
     if (result) {
-        activeTab = 'crafting';
+        activeTab = 'spellbook';
         setMagicTourSeen(true);
         showToast(`⚙️ Magic path changed to ${PATH_META[pathId]?.label || pathId}`, 'success');
         render(container);

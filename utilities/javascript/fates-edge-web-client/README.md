@@ -50,10 +50,15 @@ This client is part of the larger [Fate's Edge Applications](https://github.com/
 - **TAGS Calculator** – Free Caster spell creation and testing.
 - **Rites** – Runekeeper and Invoker rite management.
 - **Cantor** – Songs and corruption mechanics.
-- **Witchcraft** – Hedge gifts, rituals, and price tracks.
+- **Witchcraft** – Hedge Gifts, Quick Workings, Full Rituals, and the Shadow/Shame/Identity Strain price tracks. Available to the Witch path, and to any character who's taken the "Craft of the Hedge" talent — not gated on magic path alone.
 - **Summoning** – Spirit binding and leash management.
 - **Spellbook** – Spell collection and casting.
 - **Monastic Traditions** – Breath states, techniques, and corruption track.
+
+### 🔨 Crafting – *Its own sidebar page, open to every character*
+- **Crafting Bench** – Forage or buy ingredients, combine them, and work recipes into consumables (per the *Gear, Magic Items, and Crafting* rules: a downtime action, 1–2 XP, a DV 3 skill roll). Tracks a per‑character crafted‑item inventory with uses remaining.
+- **The Codex** – A browsable reference of sample magic items, consumables, and artifacts (Minor/Major/Prestige/Epic tiers), loaded from `/data/wiki.json`. Attune up to 3 magic items and track their upkeep — pay XP (Efficient) or spend a downtime scene (Intensive) each downtime, or let an item slide from Maintained → Neglected → Compromised.
+- Split out from Witchcraft, since ingredient/recipe crafting never had anything to do with hedge magic specifically — see `js/features/crafting/index.js`.
 
 ### 🎮 Bonus: Kon'reh Strategy Board Game
 - Original 8×8 strategy game with two‑player local or AI opponents (six distinct schools of play).
