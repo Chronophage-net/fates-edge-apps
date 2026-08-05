@@ -1,9 +1,8 @@
 /**
  * Fate's Edge Toolkit – Main Application Entry Point
- * v4.3a – Account authentication (register/login/JWT) against the campaign
- * server, redone Python client (structured CLI package), VTT bridge/mod
- * updates, and inline-screen conversions replacing pop-up modals app-wide.
- * See CHANGELOG.md for the full list.
+ * See CHANGELOG.md at the repo root for the full version history —
+ * this file no longer hardcodes a version number in its own comments;
+ * see core/version.js for the single source of truth the app displays.
  *
  * ────────────────────────────────────────────────────────────────────────
  * X-Card overlay toggle via Ctrl+Shift+X or the floating button; raises
@@ -13,6 +12,7 @@
  */
 
 import { initMediaModule } from './core/media.js';
+import { APP_VERSION, applyDisplayedVersion } from './core/version.js';
 import './core/highlight-tags.js';
 import { loadState, onSave, getState, mergeState, resolveConflict, saveState, getStableClientId } from './core/state.js';
 import { checkPasswordGate, isToolkitUnlocked, unlockToolkit } from './core/password.js';
@@ -53,7 +53,8 @@ function onUnlockSuccess() {
 }
 
 async function init() {
-    console.log('Fate\'s Edge Toolkit v4.3a — Loading...');
+    console.log(`Fate's Edge Toolkit v${APP_VERSION} — Loading...`);
+    applyDisplayedVersion();
 
     try {
         // 1. Load state
@@ -124,7 +125,7 @@ async function init() {
         // 8. Sync event listeners
         setupSyncEventListeners();
 
-        console.log('✅ Fate\'s Edge Toolkit v4.3a — Ready');
+        console.log(`✅ Fate's Edge Toolkit v${APP_VERSION} — Ready`);
     } catch (error) {
         console.error('❌ Failed to initialize app:', error);
         showToast('Failed to initialize application. Please refresh.', 'error');

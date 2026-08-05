@@ -157,7 +157,7 @@ function detectLevel(commits) {
 // package.json discovery / VERSION-file fallback
 // ────────────────────────────────────────────────────────────────────
 
-function findPackageJsons(dir, out = []) {
+function findFilesByName(dir, names, out = []) {
     let entries;
     try {
         entries = readdirSync(dir, { withFileTypes: true });
@@ -167,12 +167,64 @@ function findPackageJsons(dir, out = []) {
     for (const entry of entries) {
         if (entry.isDirectory()) {
             if (EXCLUDE_DIR_NAMES.has(entry.name)) continue;
-            findPackageJsons(path.join(dir, entry.name), out);
-        } else if (entry.isFile() && entry.name === 'package.json') {
+            findFilesByName(path.join(dir, entry.name), names, out);
+        } else if (entry.isFile() && names.includes(entry.name)) {
             out.push(path.join(dir, entry.name));
         }
     }
     return out;
+}
+
+function findPackageJsons(dir) {
+    return findFilesByName(dir, ['package.json']);
+}
+
+// ────────────────────────────────────────────────────────────────────
+// Auxiliary hardcoded-version display files.
+//
+// WHY: v4.4.0 shipped with every package.json correctly bumped but
+// js/features/.../app.js's console-log banner still hardcoded at the
+// PREVIOUS version, because that string existed nowhere this script
+// looked. Rather than trust every future contributor to remember every
+// spot a version is echoed for humans, this scans for the two known
+// patterns across the whole repo and fixes them automatically:
+//   - any file literally named `version.js` containing an
+//     `APP_VERSION = '...'` (or "...") assignment — see
+//     fates-edge-web-client/js/core/version.js, which is the intended
+//     single source of truth other code should import from instead of
+//     hardcoding a version string of its own.
+//   - any file literally named `index.html` containing `vX.Y.Z`-shaped
+//     text anywhere (title, meta description, a `.brand-version` badge,
+//     etc.) — replaced indiscriminately since these files are small and
+//     "vX.Y.Z" is a distinctive-enough pattern not to false-positive.
+// If a repo has neither file (e.g. fates-edge-ai-gm-bot, fates-edge-docs)
+// this is just a no-op.
+// ────────────────────────────────────────────────────────────────────
+
+const VERSION_STRING_PATTERN = /v\d+\.\d+\.\d+[a-zA-Z0-9-]*/g;
+
+function updateAuxiliaryVersionFiles(newVersionStr) {
+    const touched = [];
+    const files = findFilesByName(repoRoot, ['index.html', 'version.js']);
+    for (const f of files) {
+        const content = readFileSync(f, 'utf8');
+        let next = content;
+
+        if (f.endsWith('index.html') && VERSION_STRING_PATTERN.test(content)) {
+            next = content.replace(VERSION_STRING_PATTERN, `v${newVersionStr}`);
+        } else if (f.endsWith('version.js')) {
+            const versionJsRe = /(APP_VERSION\s*=\s*)(['"])[^'"]*\2/;
+            if (versionJsRe.test(content)) {
+                next = content.replace(versionJsRe, `$1$2${newVersionStr}$2`);
+            }
+        }
+
+        if (next !== content) {
+            writeFileSync(f, next, 'utf8');
+            touched.push(f);
+        }
+    }
+    return touched;
 }
 
 function readJson(p) {
@@ -290,6 +342,10 @@ function main() {
     console.log(`Commits since ${tag || '(no previous tag)'}: ${commits.length}`);
 
     if (dryRun) {
+        const wouldTouchAux = findFilesByName(repoRoot, ['index.html', 'version.js']);
+        if (wouldTouchAux.length) {
+            console.log(`Would also check for stale version strings in: ${wouldTouchAux.map(f => path.relative(repoRoot, f)).join(', ')}`);
+        }
         console.log('\n--dry-run: no files written, no git commands run.');
         console.log('\n--- CHANGELOG entry preview ---\n');
         console.log(buildChangelogEntry(newVersion, commits, summary));
@@ -312,14 +368,19 @@ function main() {
         console.log(`Updated ${path.relative(repoRoot, versionFilePath)}`);
     }
 
-    // 2. CHANGELOG.md
+    // 2. Auxiliary hardcoded-version display files (index.html, version.js)
+    const auxTouched = updateAuxiliaryVersionFiles(newVersionStr);
+    for (const f of auxTouched) console.log(`Updated ${path.relative(repoRoot, f)}`);
+    touchedFiles.push(...auxTouched);
+
+    // 3. CHANGELOG.md
     const entry = buildChangelogEntry(newVersion, commits, summary);
     const { changelogPath, newContent } = prependChangelog(entry);
     writeFileSync(changelogPath, newContent, 'utf8');
     touchedFiles.push(changelogPath);
     console.log(`Updated ${path.relative(repoRoot, changelogPath)}`);
 
-    // 3. git commit + tag
+    // 4. git commit + tag
     if (noCommit) {
         console.log('\n--no-commit: files updated, but no git commit/tag was created.');
         return;
