@@ -204,6 +204,36 @@ export function clearState() {
 }
 
 // ============================================================
+// STABLE CLIENT SESSION ID
+// ============================================================
+//
+// BUGFIX: `state.sessionId` was read (with a `Date.now().toString(36)`
+// fallback) in four different places — app.js, gm-tools/index.js,
+// vtt/voice.js, vtt-connected.js — but NEVER actually assigned anywhere,
+// so every single read hit the fallback and minted a brand-new random id.
+// Each of those four call sites feeds this into core/media.js's
+// `initMediaModule(userId)`, which stores it as `currentUserId` and uses
+// it to (a) tell your own recording broadcasts apart from a remote
+// player's so the "🔴 Recording" HUD doesn't show for your own capture,
+// and (b) match a later 'stop' broadcast back to the 'start' entry it's
+// supposed to clear. Regenerating the id every time a feature that calls
+// initMediaModule() is (re)entered — e.g. navigating into GM Tools or the
+// VTT after a recording has already started — desyncs start/stop
+// bookkeeping and can leave the recording HUD showing "Someone is
+// recording" indefinitely (only self-clearing after the module's 60s
+// OVERLAY_TIMEOUT), which reads as "an overlay that appeared and won't
+// dismiss." getStableClientId() fixes this by minting the id once and
+// persisting it in state, so every caller gets the same value all
+// session (and across reloads).
+export function getStableClientId() {
+    if (!state.sessionId) {
+        state.sessionId = 'client-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 8);
+        saveState();
+    }
+    return state.sessionId;
+}
+
+// ============================================================
 // CHARACTER DEFAULTS (extended for Spellcraft)
 // ============================================================
 

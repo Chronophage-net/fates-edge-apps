@@ -1687,7 +1687,15 @@ select {
     background: rgba(0,0,0,0.85);
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
-    display: flex;
+    /* DEFENSE IN DEPTH: hidden by default via the stylesheet, not just via
+       the inline style="display:none" in index.html. Several inline
+       wizard/editor screens save+restore the app shell's siblings'
+       `style.display` while they're open (see the id="app-content" note
+       on the .app-shell div in index.html) — if that inline style is ever
+       cleared by mistake again (bug or future regression), this rule is
+       the fallback that keeps the overlay from popping up unprompted.
+       .open still wins via !important below. */
+    display: none;
     align-items: center;
     justify-content: center;
     animation: xcardFadeIn 0.3s ease;
@@ -1765,6 +1773,16 @@ select {
 body.xcard-active .app-shell {
     filter: blur(4px);
     transition: filter 0.3s;
+}
+
+/* DEFENSE IN DEPTH: same reasoning as .xcard-overlay above. This element
+   is created dynamically by core/media.js's createOverlay() with an
+   inline `display:none`, then toggled inline by showOverlay()/
+   hideOverlay(). This stylesheet rule is a fallback so it can't get stuck
+   visible if something clears its inline style out from under it (see the
+   id="app-content" note in index.html for the actual bug this covers). */
+#media-recording-overlay {
+    display: none;
 }
 /* ─── WELCOME OVERLAY ────────────────────────────────────────────── */
 .welcome-overlay {

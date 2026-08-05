@@ -51,6 +51,13 @@ export class PresenceManager {
     getClientCount() {
         return this.clients.size;
     }
+
+    /**
+     * Check whether a given client id is currently tracked as online
+     */
+    isOnline(clientId) {
+        return this.clients.has(clientId);
+    }
     
     /**
      * Set local client ID

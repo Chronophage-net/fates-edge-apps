@@ -27,14 +27,23 @@ export const OPERATION_TYPES = {
  * Validate an operation
  */
 export function validateOperation(operation) {
+    // NOTE: wrapped in Boolean(...) below - several branches previously
+    // returned the truthy/falsy value they checked (e.g. `operation.value.id`,
+    // a string) instead of an actual boolean, which violates this function's
+    // documented boolean contract and can misbehave for callers that do
+    // strict `=== true` checks or serialize the result.
+    return Boolean(validateOperationInternal(operation));
+}
+
+function validateOperationInternal(operation) {
     if (!operation || typeof operation !== 'object') {
         return false;
     }
-    
+
     if (!operation.type || typeof operation.type !== 'string') {
         return false;
     }
-    
+
     // Validate required fields for each operation type
     switch (operation.type) {
         case OPERATION_TYPES.ADD_CHARACTER:

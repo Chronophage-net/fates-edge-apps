@@ -1,5 +1,5 @@
 import { describe, it, assert, assertEqual, assertTrue } from '../runner.js';
-import { PresenceManager } from '../../core/sync/presence.js';
+import { PresenceManager } from '../../js/core/sync/presence.js';
 
 describe('PresenceManager', () => {
     

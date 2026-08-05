@@ -595,7 +595,7 @@ function renderFactions() {
 
         <div class="factions-actions">
             <button class="btn btn-primary" onclick="window.addFaction()">➕ Add Faction</button>
-            <button class="btn btn-secondary" onclick="window.factionTurn()">🔄 Faction Turn</button>
+            <button class="btn btn-secondary" onclick="window.factionTurn()" title="Advances faction agendas/standing AND fires a downtime-tick other features (e.g. Crafting's magic item upkeep) listen for — see Player's Guide ch. 11 Downtime, 'the world may advance timers while you rest'.">🔄 GM Downtime (Faction Turn)</button>
             <button class="btn btn-secondary" onclick="window.refreshFactions()">🔄 Refresh</button>
             <button class="btn btn-secondary" onclick="window.loadDefaultFactions()">📥 Load Defaults</button>
         </div>
@@ -1356,6 +1356,17 @@ window.addFactionHook = function(evt, id) {
     showToast(`Added hook: ${hook}`, 'success');
 };
 
+// "Faction Turn" doubles as the app's stand-in for a GM-adjudicated
+// "downtime" passing (Player's Guide ch. 11: "Downtime is not a pause...
+// the world may advance timers -- faction agendas, rival plans -- while
+// you rest"). Kept the original name/global (nothing else in the app
+// calls it by a different name) but it now also broadcasts a
+// 'downtime-tick' CustomEvent so any other feature that cares about "a
+// downtime has passed" -- currently just Crafting's magic-item upkeep
+// decay (Maintained -> Neglected -> Compromised, see items.tex
+// "Attunement and Upkeep") -- can react without factions/index.js needing
+// to know that feature exists. See js/features/crafting/index.js's
+// `document.addEventListener('downtime-tick', ...)`.
 window.factionTurn = function() {
     let changes = [];
     state.factions.forEach(f => {
@@ -1389,6 +1400,9 @@ window.factionTurn = function() {
     } else {
         showToast('🔄 Faction turn complete - no changes', 'info');
     }
+    // NEW: broadcast that a downtime has passed so unrelated features
+    // (Crafting upkeep decay, and anything added later) can react.
+    document.dispatchEvent(new CustomEvent('downtime-tick', { detail: { source: 'faction-turn' } }));
 };
 
 // ============================================================

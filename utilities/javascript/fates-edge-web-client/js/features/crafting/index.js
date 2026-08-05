@@ -36,6 +36,15 @@
  * plus lightweight bookkeeping so a table can actually track attunement
  * and upkeep instead of doing it on paper.
  * ────────────────────────────────────────────────────────────────────────
+ *
+ * ────────────────────────────────────────────────────────────────────────
+ * DECAY STATE: attuned items track condition ('maintained'/'neglected'/
+ * 'compromised') per items.tex "Attunement and Upkeep". Decay advances
+ * once per GM-adjudicated downtime, driven by a 'downtime-tick'
+ * CustomEvent dispatched from js/features/factions/index.js's
+ * "GM Downtime (Faction Turn)" button — see applyDowntimeTick() and the
+ * document-level listener near the bottom of this file.
+ * ────────────────────────────────────────────────────────────────────────
  */
 
 import { vttStore } from '../../core/vtt-store.js';
@@ -491,9 +500,89 @@ function renderCraftingBench(char, ingredientMap, recipeMap) {
 // RENDER – THE CODEX (magic items / consumables / artifacts)
 // ============================================================
 
-function upkeepCostFor(item) {
+// Attunement/upkeep pure helpers, exported for unit testing (see
+// tests/unit/crafting.test.js). Extracted rather than duplicated in the
+// test so the tests exercise the exact logic the UI uses.
+
+export const ATTUNEMENT_LIMIT = 3;
+
+// "Efficient" upkeep: pay XP equal to ceil(cost / 3), minimum 1.
+export function upkeepCostFor(item) {
     const cost = item.cost || 0;
     return Math.max(1, Math.ceil(cost / 3));
+}
+
+// "Intensive" upkeep: a flat 1 XP plus spending a downtime scene (the
+// scene itself isn't numerically tracked here - it's a narrative/table
+// cost enforced by the GM, same as the "Scene" button's tooltip says).
+export function intensiveUpkeepCostFor(item) {
+    return 1;
+}
+
+// Whether a new item can be attuned given the currently-attuned list.
+// Already-attuned items can always be toggled off regardless of count.
+export function canAttune(attunedItems, entryId) {
+    const alreadyAttuned = attunedItems.some(a => a.id === entryId);
+    if (alreadyAttuned) return true;
+    return attunedItems.length < ATTUNEMENT_LIMIT;
+}
+
+// ────────────────────────────────────────────────────────────────────
+// DECAY STATE (Maintained -> Neglected -> Compromised)
+//
+// Player's Guide, sections/items.tex "Attunement and Upkeep":
+//   "If you neglect upkeep, the item becomes Neglected (no benefit
+//    until you pay the upkeep retroactively). If neglected for two
+//    consecutive downtimes, it becomes Compromised (requires a quest
+//    to restore)."
+//   "Unlike ordinary magic items, artifacts require no upkeep."
+//
+// A "downtime" here is whatever the table's GM calls one -- there's no
+// in-app calendar. The app's stand-in is the 'downtime-tick' event
+// (see js/features/factions/index.js's "GM Downtime (Faction Turn)"
+// button), which fires once per GM-adjudicated downtime and this
+// module listens for below. Each attuned item tracks a
+// `paidUpkeepThisDowntime` flag, set true by paying upkeep (either
+// mode) and consumed/reset by the next tick:
+//   - paid this downtime  -> condition becomes/stays 'maintained'
+//   - not paid            -> condition advances one step down the
+//                             Maintained -> Neglected -> Compromised
+//                             track (Compromised items don't decay
+//                             further; per the rule they need a quest,
+//                             not upkeep, to fix -- see
+//                             restoreCompromisedItem() below).
+// ────────────────────────────────────────────────────────────────────
+
+export const DECAY_ORDER = ['maintained', 'neglected', 'compromised'];
+
+// One step down the decay track. Compromised is a floor, not a cycle.
+export function advanceDecay(condition) {
+    const idx = DECAY_ORDER.indexOf(condition || 'maintained');
+    const next = idx === -1 ? 0 : Math.min(idx + 1, DECAY_ORDER.length - 1);
+    return DECAY_ORDER[next];
+}
+
+// Artifacts require no upkeep at all (items.tex "No Upkeep, but No
+// Escape") -- they never decay regardless of attunement.
+export function itemRequiresUpkeep(item) {
+    return item.category !== 'artifact';
+}
+
+// Applies one downtime's worth of decay/renewal to a list of attuned
+// items (mutates and returns them). Pure w.r.t. everything except the
+// items themselves, so it's testable without touching character/save
+// state or the DOM.
+export function applyDowntimeTick(attunedItems) {
+    for (const item of attunedItems) {
+        if (!itemRequiresUpkeep(item)) continue;
+        if (item.paidUpkeepThisDowntime) {
+            item.condition = 'maintained';
+        } else {
+            item.condition = advanceDecay(item.condition);
+        }
+        item.paidUpkeepThisDowntime = false;
+    }
+    return attunedItems;
 }
 
 function conditionMeta(condition) {
@@ -561,16 +650,24 @@ function renderAttunedList(char) {
             ${attuned.map(item => {
                 const cond = conditionMeta(item.condition);
                 const upkeep = upkeepCostFor(item);
+                const needsUpkeep = itemRequiresUpkeep(item);
+                const compromised = item.condition === 'compromised';
                 return `
                     <div style="display:flex;justify-content:space-between;align-items:center;gap:0.3rem;padding:0.15rem 0.4rem;background:var(--bg3);border-radius:6px;flex-wrap:wrap;">
                         <div>
                             <span style="font-weight:600;font-size:0.75rem;">${item.icon || '✨'} ${escHtml(item.name)}</span>
                             <span style="font-size:0.6rem;color:${cond.color};margin-left:0.3rem;">${cond.label}</span>
+                            ${!needsUpkeep ? `<span style="font-size:0.55rem;color:var(--text3);margin-left:0.3rem;">(no upkeep — artifact)</span>` : ''}
+                            ${compromised ? `<span style="font-size:0.55rem;color:var(--red);margin-left:0.3rem;">requires a quest to restore</span>` : ''}
                         </div>
                         <div style="display:flex;gap:0.2rem;align-items:center;">
-                            <span style="font-size:0.6rem;color:var(--text3);">Upkeep: ${upkeep} XP</span>
-                            <button class="btn btn-xs btn-gold" data-pay-upkeep="${item.id}" title="Efficient upkeep: pay XP">Pay</button>
-                            <button class="btn btn-xs btn-secondary" data-scene-upkeep="${item.id}" title="Intensive upkeep: 1 XP + a downtime scene">Scene</button>
+                            ${needsUpkeep ? (compromised ? `
+                                <button class="btn btn-xs btn-gold" data-restore-item="${item.id}" title="Record that a quest restored this item">✨ Restore</button>
+                            ` : `
+                                <span style="font-size:0.6rem;color:var(--text3);">Upkeep: ${upkeep} XP</span>
+                                <button class="btn btn-xs btn-gold" data-pay-upkeep="${item.id}" title="Efficient upkeep: pay XP">Pay</button>
+                                <button class="btn btn-xs btn-secondary" data-scene-upkeep="${item.id}" title="Intensive upkeep: 1 XP + a downtime scene">Scene</button>
+                            `) : ''}
                             <button class="btn btn-xs btn-ghost" data-retire-item="${item.id}" title="Retire — regain half the XP cost" style="color:var(--red);">Retire</button>
                         </div>
                     </div>
@@ -802,8 +899,8 @@ function toggleAttune(char, codex, entryId) {
         attuned.splice(idx, 1);
         showToast(`Broke attunement with ${entry.title}.`, 'info');
     } else {
-        if (attuned.length >= 3) return showToast('Already attuned to 3 items — break one first.', 'warning');
-        attuned.push({ id: entry.id, name: entry.title, cost: entry.cost, tier: entry.tier, icon: entry.icon, condition: 'maintained', attunedAt: Date.now() });
+        if (!canAttune(attuned, entryId)) return showToast(`Already attuned to ${ATTUNEMENT_LIMIT} items — break one first.`, 'warning');
+        attuned.push({ id: entry.id, name: entry.title, cost: entry.cost, tier: entry.tier, icon: entry.icon, category: entry.category, condition: 'maintained', paidUpkeepThisDowntime: false, attunedAt: Date.now() });
         showToast(`🔗 Attuned to ${entry.title}.`, 'success');
     }
     saveCharacter({ crafting: char.crafting });
@@ -815,20 +912,76 @@ function payUpkeep(char, itemId, mode) {
     const item = attuned.find(a => a.id === itemId);
     if (!item) return showToast('Item not found.', 'error');
 
+    // Compromised items don't come back from paying upkeep -- items.tex:
+    // "requires a quest to restore". Send the player to restoreCompromisedItem().
+    if (item.condition === 'compromised') {
+        return showToast(`${item.name} is Compromised — upkeep won't fix it. It requires a quest to restore.`, 'warning');
+    }
+
     if (mode === 'efficient') {
         const cost = upkeepCostFor(item);
         if (availableXp(char) < cost) return showToast(`Not enough XP for upkeep. Need ${cost}.`, 'error');
         char.xpSpent = (char.xpSpent || 0) + cost;
         item.condition = 'maintained';
+        item.paidUpkeepThisDowntime = true;
         saveCharacter({ xpSpent: char.xpSpent, crafting: char.crafting });
         showToast(`💰 Paid ${cost} XP upkeep for ${item.name}.`, 'success');
     } else {
-        char.xpSpent = (char.xpSpent || 0) + 1;
+        char.xpSpent = (char.xpSpent || 0) + intensiveUpkeepCostFor(item);
         item.condition = 'maintained';
+        item.paidUpkeepThisDowntime = true;
         saveCharacter({ xpSpent: char.xpSpent, crafting: char.crafting });
         showToast(`🕯️ Spent a downtime scene maintaining ${item.name}.`, 'success');
     }
     refreshPanel();
+}
+
+// Compromised items require a quest, not upkeep, to fix (items.tex).
+// This app has no quest-tracking of its own, so this is a deliberate,
+// explicit GM/player action to record that the quest happened —
+// distinct from payUpkeep(), which is blocked for compromised items.
+function restoreCompromisedItem(char, itemId) {
+    const attuned = getAttunedItems(char);
+    const item = attuned.find(a => a.id === itemId);
+    if (!item) return showToast('Item not found.', 'error');
+    if (item.condition !== 'compromised') return showToast(`${item.name} isn't Compromised.`, 'info');
+    item.condition = 'maintained';
+    item.paidUpkeepThisDowntime = true;
+    saveCharacter({ crafting: char.crafting });
+    showToast(`✨ ${item.name} restored after a quest to fix it.`, 'success');
+    refreshPanel();
+}
+
+// ─── Downtime tick (decay) ─────────────────────────────────────────
+//
+// Listens for the 'downtime-tick' event dispatched by
+// js/features/factions/index.js's "GM Downtime (Faction Turn)" button.
+// Applies to every character's attuned items, not just whichever
+// character is currently selected in this panel — downtime passes for
+// the whole party at once. Registered once at module load (not inside
+// render()) so it fires regardless of which panel is on screen.
+function handleDowntimeTick() {
+    const characters = getState().characters || [];
+    let anyChanges = false;
+    for (const char of characters) {
+        const attuned = getAttunedItems(char);
+        if (attuned.length === 0) continue;
+        const before = attuned.map(a => a.condition);
+        applyDowntimeTick(attuned);
+        const changed = attuned.some((a, i) => a.condition !== before[i]);
+        if (changed) {
+            anyChanges = true;
+            updateCharacter(char.id, { crafting: char.crafting });
+        }
+    }
+    if (anyChanges) {
+        showToast('🕯️ Downtime passed — some attuned items decayed (unpaid upkeep).', 'warning');
+    }
+    refreshPanel();
+}
+
+if (typeof document !== 'undefined') {
+    document.addEventListener('downtime-tick', handleDowntimeTick);
 }
 
 function retireItem(char, itemId) {
@@ -912,6 +1065,9 @@ function attachEvents(char) {
 
         const retireBtn = e.target.closest('[data-retire-item]');
         if (retireBtn) return retireItem(char, retireBtn.dataset.retireItem);
+
+        const restoreBtn = e.target.closest('[data-restore-item]');
+        if (restoreBtn) return restoreCompromisedItem(char, restoreBtn.dataset.restoreItem);
     });
 
     container.addEventListener('change', (e) => {
@@ -955,6 +1111,11 @@ function showToastWithHTML(html) {
 
 export function destroy() {
     container = null;
+    // Deliberately NOT removing the 'downtime-tick' listener here: decay
+    // must keep applying to attuned items even while the Crafting panel
+    // isn't the visible tab (a GM can call downtime while players are
+    // looking at Characters or the VTT). handleDowntimeTick() itself
+    // guards refreshPanel() against a null `container`.
 }
 
 export default { render, destroy };

@@ -124,7 +124,29 @@
     </div>
 
     <!-- ===== APP SHELL ===== -->
-    <div class="app-shell">
+    <!-- id="app-content" added here deliberately: ~17 inline wizard/editor
+         modules (characters/wizard.js, characters/editor.js,
+         encounters/editor.js, wiki/editor.js, vtt/editor.js, timers,
+         adventure-manager, docs upload, spellcraft tour, whiteboard
+         onboarding, etc.) all do
+           `document.getElementById('app-content') || document.body`
+         to find a container whose direct children they can hide while
+         they take over the screen, then restore (`ch.style.display = ''`)
+         on close. That id never existed anywhere in this file, so EVERY
+         one of them was silently falling back to `document.body` — which
+         sweeps up ALL of its direct children, including the floating
+         #xcard-toggle button, the #xcard-overlay safety-tool overlay, and
+         the dynamically-created #media-recording-overlay HUD. Restoring
+         `style.display = ''` on close clears each one's inline
+         `display:none`, and since neither has a stylesheet rule hiding it
+         by default, they'd pop up full-screen/visible the moment any of
+         those wizards/editors closed — reported as "exiting some features
+         causes the Veils/Lines and Recording overlays to appear, not
+         dismissable." Giving the actual app shell this id makes all of
+         those call sites resolve correctly and stop reaching document.body
+         at all. (module-loader.js's `this.container` lookup was hitting
+         this exact same missing-id fallback too — see its constructor.) -->
+    <div class="app-shell" id="app-content">
         <!-- ===== SIDEBAR ===== -->
         <aside class="sidebar" id="sidebar" role="navigation" aria-label="Main Navigation">
             <div class="sidebar-brand">

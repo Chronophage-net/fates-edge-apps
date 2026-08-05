@@ -1,5 +1,5 @@
 import { describe, it, assert, assertEqual, assertDeepEqual, assertTrue } from '../runner.js';
-import { OfflineQueue } from '../../core/sync/offline-queue.js';
+import { OfflineQueue } from '../../js/core/sync/offline-queue.js';
 
 describe('OfflineQueue', () => {
     

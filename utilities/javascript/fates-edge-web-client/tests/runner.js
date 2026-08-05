@@ -3,8 +3,12 @@
  * Minimal testing framework with assertion support
  */
 
-import { syncManager } from '../core/sync/index.js';
-import { getState, loadState, saveState } from '../core/state.js';
+// Install headless DOM/localStorage/window shims before any production
+// module (which may touch these globals at import time) is loaded.
+import './support/dom-shim.js';
+
+import { syncManager } from '../js/core/sync/index.js';
+import { getState, loadState, saveState } from '../js/core/state.js';
 
 // ===== Test Framework =====
 
@@ -329,3 +333,74 @@ export default {
     createMockStorage,
     initTestRunner
 };
+
+// ===== Node CLI Runner =====
+// When this file is executed directly with `node tests/runner.js`, discover
+// every tests/**/*.test.js file, import it (each import registers its
+// describe()/it() blocks into TESTS above), run the whole suite headlessly,
+// print a summary, and exit non-zero on failure so it works in CI.
+
+async function runCli() {
+    const { readdirSync } = await import('node:fs');
+    const path = await import('node:path');
+    const { fileURLToPath } = await import('node:url');
+
+    const testsDir = path.dirname(fileURLToPath(import.meta.url));
+    const suiteDirs = ['unit', 'integration'];
+
+    for (const dirName of suiteDirs) {
+        const fullDir = path.join(testsDir, dirName);
+        let files = [];
+        try {
+            files = readdirSync(fullDir)
+                .filter(f => f.endsWith('.test.js'))
+                .sort();
+        } catch {
+            continue;
+        }
+        for (const file of files) {
+            await import(path.join(fullDir, file));
+        }
+    }
+
+    const summary = await runTests();
+
+    console.log('');
+    for (const result of testResults) {
+        const icon = result.passed ? '✓' : '✗';
+        console.log(`  ${icon} ${result.suite} › ${result.name} (${result.duration}ms)`);
+        if (!result.passed && result.error) {
+            console.log(`      ${result.error.message}`);
+        }
+    }
+
+    console.log('');
+    console.log(`${summary.passed}/${summary.total} passed, ${summary.failed} failed`);
+
+    if (summary.failed > 0) {
+        process.exitCode = 1;
+    }
+}
+
+// NOTE: deliberately NOT using a top-level `await` here. Test files import
+// `describe`/`it`/etc. from this same module ('../runner.js'), so running
+// the CLI via dynamic import() while this module's own top-level evaluation
+// is suspended on an await would deadlock (the circular re-import can't
+// observe this module as "settled" until the pending top-level await
+// resolves, but that await is itself waiting on the import). Firing the
+// async work without awaiting it at the top level lets this module finish
+// evaluating immediately, so the later circular imports resolve normally.
+if (typeof process !== 'undefined' && process.argv[1]) {
+    const { fileURLToPath } = await import('node:url');
+    const path = await import('node:path');
+    const thisFile = fileURLToPath(import.meta.url);
+    const argvFile = path.isAbsolute(process.argv[1])
+        ? process.argv[1]
+        : path.resolve(process.cwd(), process.argv[1]);
+    if (thisFile === argvFile) {
+        runCli().catch(e => {
+            console.error('Test runner crashed:', e);
+            process.exitCode = 1;
+        });
+    }
+}

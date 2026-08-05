@@ -323,7 +323,7 @@ function getCardMeaningFromRegion(suit, rank, regionData) {
 // BUGFIX: this used to gate the 6-segment tier on rank >= 7, so a 6
 // (which the book puts in the 6-10 -> 6-segment band) fell through to
 // the 4-segment "2-5" band instead.
-function getTimerSizeFromRank(rank) {
+export function getTimerSizeFromRank(rank) {
     const val = POKER_RANK[rank] || 0;
     if (val >= 14) return 10;      // A
     if (val >= 11) return 8;       // J, Q, K
@@ -409,7 +409,7 @@ function getAceEffect(region, card) {
 let travelSeed = null;
 let travelPRNG = null;
 
-class Xorshift128 {
+export class Xorshift128 {
     constructor(seed) {
         this.seed = seed;
         this.state = this._seedToState(seed);
@@ -529,6 +529,14 @@ initTravelSeed();
 // role.
 let suitDecks = { spades: [], hearts: [], clubs: [], diamonds: [] };
 const CARD_RANKS = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
+
+export function resetSuitDecksForTest() {
+    resetSuitDecks();
+}
+
+export function drawSuitCardForTest(suit) {
+    return drawSuitCard(suit);
+}
 
 function shuffle(deck) {
     for (let i = deck.length - 1; i > 0; i--) {

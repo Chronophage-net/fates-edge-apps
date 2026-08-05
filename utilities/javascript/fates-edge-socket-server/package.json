@@ -7,7 +7,7 @@
   "scripts": {
     "start": "node server-start.js",
     "dev": "nodemon server-start.js",
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "node --test tests/*.test.js",
     "test:auth": "node scripts/run-auth-e2e-test.js"
   },
   "dependencies": {

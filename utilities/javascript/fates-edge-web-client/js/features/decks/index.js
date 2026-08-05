@@ -484,7 +484,7 @@ function renderSynthesisHtml(text) {
 // HELPERS
 // ============================================================
 
-function getRegionSlug(name) {
+export function getRegionSlug(name) {
     return name.toLowerCase().replace(/ /g, '_').replace(/[^a-z0-9_]/g, '');
 }
 

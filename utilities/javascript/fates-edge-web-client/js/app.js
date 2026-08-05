@@ -14,7 +14,7 @@
 
 import { initMediaModule } from './core/media.js';
 import './core/highlight-tags.js';
-import { loadState, onSave, getState, mergeState, resolveConflict, saveState } from './core/state.js';
+import { loadState, onSave, getState, mergeState, resolveConflict, saveState, getStableClientId } from './core/state.js';
 import { checkPasswordGate, isToolkitUnlocked, unlockToolkit } from './core/password.js';
 import { initRouter, navigate, ROUTE_REDIRECTS, preloadModule } from './router.js';
 import { showToast } from './components/Toast.js';
@@ -64,7 +64,12 @@ async function init() {
         await autoLoadStarterAdventure(state);
 
         // 3. Init media (requires user ID)
-        const userId = state.sessionId || 'app-' + Date.now().toString(36);
+        // BUGFIX: was `state.sessionId || 'app-' + Date.now().toString(36)`.
+        // state.sessionId was never assigned anywhere, so this always hit the
+        // fallback and minted a fresh random id on every app load/module
+        // re-init — see getStableClientId()'s doc comment in core/state.js
+        // for how that desynced the recording HUD's start/stop tracking.
+        const userId = getStableClientId();
         initMediaModule(userId);
 
         // 4. Setup save indicator

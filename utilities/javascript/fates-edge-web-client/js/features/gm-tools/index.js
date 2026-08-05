@@ -32,7 +32,7 @@
  * *this* file — a static import the other way would be circular.
  */
 
-import { getState, addArchive, clearRollHistory, clearChatHistory, saveState } from '../../core/state.js';
+import { getState, addArchive, clearRollHistory, clearChatHistory, saveState, getStableClientId } from '../../core/state.js';
 import { resetTalentCharges } from '../../core/talent-effects.js';
 import {
     getSoundTracks, addSoundTrack, removeSoundTrack,
@@ -543,8 +543,13 @@ function render(el) {
     container = el;
     loadCampaignData();
 
-    const state = getState();
-    const userId = state.sessionId || 'local-' + Date.now().toString(36);
+    // BUGFIX: was `state.sessionId || 'local-' + Date.now().toString(36)`,
+    // which minted a fresh random id every time this render() ran (i.e.
+    // every visit to GM Tools) since state.sessionId was never actually
+    // assigned. See getStableClientId() in core/state.js for why that
+    // desynced the recording HUD's start/stop tracking and could leave it
+    // stuck showing "Someone is recording" after navigating away and back.
+    const userId = getStableClientId();
     initMediaModule(userId);
 
     // Init automation listeners (only once)

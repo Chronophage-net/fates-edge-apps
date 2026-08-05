@@ -6,7 +6,7 @@
  */
 
 import { initMediaModule } from '../../core/media.js';
-import { getState } from '../../core/state.js';
+import { getState, getStableClientId } from '../../core/state.js';
 import { VoiceChat } from '../../components/VoiceChat.js';
 import { onEvent, sendEvent, getSocketId, isConnectedToServer, onWSEvent, offWSEvent } from '../../core/websocket.js';
 import { showToast } from '../../components/Toast.js';
@@ -102,8 +102,9 @@ export function onVoiceClientsChanged(callback) {
 
 async function initializeMediaModule() {
     try {
-        const state = getState();
-        const userId = state.sessionId || 'voice-' + Date.now().toString(36);
+        // BUGFIX: was `state.sessionId || 'voice-' + Date.now().toString(36)`
+        // — see getStableClientId() in core/state.js.
+        const userId = getStableClientId();
         initMediaModule(userId);
         console.log('[Voice] Media module initialized');
     } catch (e) {

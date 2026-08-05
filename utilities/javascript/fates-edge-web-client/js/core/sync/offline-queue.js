@@ -23,12 +23,18 @@ export class OfflineQueue {
   async init() {
     try {
       this.db = await this.openDatabase();
-      this.queue = await this.loadQueue();
+      const loaded = await this.loadQueue();
+      // Merge rather than overwrite: enqueue() can run synchronously
+      // before this async init() resolves (constructor fires init()
+      // without awaiting it), so items may already be sitting in
+      // this.queue by the time we get here. Blowing the queue away
+      // would silently drop them.
+      this.queue = [...loaded, ...this.queue];
       this.isPersisted = true;
     } catch (e) {
       console.warn('IndexedDB not available, using memory queue:', e);
       this.isPersisted = false;
-      this.queue = [];
+      // Do NOT reset this.queue here - see comment above.
     }
   }
   

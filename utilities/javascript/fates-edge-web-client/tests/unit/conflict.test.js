@@ -1,5 +1,5 @@
-import { describe, it, assert, assertEqual, assertDeepEqual } from '../runner.js';
-import { ConflictResolver } from '../../core/sync/conflict.js';
+import { describe, it, assert, assertEqual, assertDeepEqual, assertFalse } from '../runner.js';
+import { ConflictResolver } from '../../js/core/sync/conflict.js';
 
 describe('ConflictResolver', () => {
     
@@ -30,7 +30,12 @@ describe('ConflictResolver', () => {
         assert(result.winner);
         assertEqual(result.winner.body, 4);
         assertEqual(result.winner.wits, 3);
-        assertEqual(result.strategy, 'field_level_merge_with_conflicts');
+        // op1 and op2 touch different fields (body vs wits), so this is a
+        // clean field-level merge, not an actual conflict - conflicts only
+        // arise when both ops set the *same* field to different values
+        // (see the "last-write-wins for same field conflicts" case below).
+        assertEqual(result.strategy, 'field_level_merge');
+        assertFalse(result.conflict);
     });
     
     it('should handle last-write-wins for same field conflicts', () => {
@@ -111,7 +116,9 @@ describe('ConflictResolver', () => {
         
         const result = resolver.resolve(op1, op2, state);
         assert(result);
-        assertEqual(result.appliedTicks, 2);
+        // mergeTimerTick's result doesn't expose an `appliedTicks` field -
+        // it just returns the post-merge winner state (current tick count).
         assertEqual(result.winner.current, 2);
+        assertEqual(result.strategy, 'merge_timer_ticks');
     });
 });

@@ -19,7 +19,7 @@
  */
 
 import { vttStore } from '../../core/vtt-store.js';
-import { getState, clearChatHistory, getCharacter, addVTTEvent, addSessionLogEntry, getCharacters, ensureCharacterDefaults } from '../../core/state.js';
+import { getState, clearChatHistory, getCharacter, addVTTEvent, addSessionLogEntry, getCharacters, ensureCharacterDefaults, getStableClientId } from '../../core/state.js';
 import { performRoll } from '../../core/dice.js';
 import { collectEquipmentModifiers } from '../../core/talent-effects.js';
 import { RANGE_BAND_OPTIONS, RANGE_BAND_LABEL_MAP } from '../characters/roller.js';
@@ -1340,8 +1340,9 @@ function updateGMUI() {
 
 async function toggleVoice() {
     try {
-        const state = getState();
-        const userId = state.sessionId || 'vtt-' + Date.now().toString(36);
+        // BUGFIX: was `state.sessionId || 'vtt-' + Date.now().toString(36)`
+        // — see getStableClientId() in core/state.js.
+        const userId = getStableClientId();
         const { initMediaModule } = await import('../../core/media.js');
         initMediaModule(userId);
     } catch (e) { /* ignore */ }

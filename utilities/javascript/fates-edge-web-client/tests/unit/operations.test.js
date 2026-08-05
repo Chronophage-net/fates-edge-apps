@@ -1,12 +1,13 @@
 import { describe, it, assert, assertEqual, assertDeepEqual, assertTrue } from '../runner.js';
-import { 
-    OPERATION_TYPES, 
-    validateOperation, 
-    createOperation,
-    createAddCharacterOperation,
-    createUpdateCharacterOperation,
-    createDeleteCharacterOperation
-} from '../../core/sync/operations.js';
+import {
+    OPERATION_TYPES,
+    validateOperation
+} from '../../js/core/sync/operations.js';
+
+// Note: operations.js does not export operation-factory helpers
+// (createAddCharacterOperation, etc.) - these tests build operations as
+// plain objects, matching how production code (e.g. SyncManager.broadcast)
+// constructs them.
 
 describe('Operations', () => {
     
@@ -26,32 +27,45 @@ describe('Operations', () => {
         assert(!validateOperation(op));
     });
     
-    it('should reject invalid operation type', () => {
+    it('should allow forward-compatible/unknown operation types with a valid shape', () => {
+        // validateOperation()'s default case intentionally allows unknown
+        // types through (see operations.js: "Allow custom operations but
+        // require basic structure") so older clients don't hard-reject
+        // operations introduced by newer ones. Only missing/non-string
+        // `type` is rejected outright - see the next test.
         const op = {
-            type: 'invalid_type',
+            type: 'some_future_operation_type',
             value: {}
         };
+        assertTrue(validateOperation(op));
+    });
+
+    it('should reject an operation with no type', () => {
+        const op = { value: {} };
         assert(!validateOperation(op));
     });
     
-    it('should create an add_character operation', () => {
+    it('should validate an add_character operation shape', () => {
         const char = { id: 'char-1', name: 'Thorn' };
-        const op = createAddCharacterOperation(char);
+        const op = { type: OPERATION_TYPES.ADD_CHARACTER, value: char, timestamp: Date.now() };
         assertEqual(op.type, OPERATION_TYPES.ADD_CHARACTER);
         assertDeepEqual(op.value, char);
         assertTrue(op.timestamp > 0);
+        assertTrue(validateOperation(op));
     });
-    
-    it('should create an update_character operation', () => {
-        const op = createUpdateCharacterOperation('char-1', { name: 'New Name' });
+
+    it('should validate an update_character operation shape', () => {
+        const op = { type: OPERATION_TYPES.UPDATE_CHARACTER, path: ['char-1'], value: { name: 'New Name' } };
         assertEqual(op.type, OPERATION_TYPES.UPDATE_CHARACTER);
         assertDeepEqual(op.path, ['char-1']);
         assertDeepEqual(op.value, { name: 'New Name' });
+        assertTrue(validateOperation(op));
     });
-    
-    it('should create a delete_character operation', () => {
-        const op = createDeleteCharacterOperation('char-1');
+
+    it('should validate a delete_character operation shape', () => {
+        const op = { type: OPERATION_TYPES.DELETE_CHARACTER, path: ['char-1'] };
         assertEqual(op.type, OPERATION_TYPES.DELETE_CHARACTER);
         assertDeepEqual(op.path, ['char-1']);
+        assertTrue(validateOperation(op));
     });
 });

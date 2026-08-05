@@ -9,6 +9,7 @@
     "preview": "vite preview",
     "serve": "npx serve -s dist -l ${PORT:-10000}",
     "start": "npm run dev",
+    "test": "node tests/runner.js",
     "seed": "node js/tools/generate-seed.js",
     "build:manifests": "node js/tools/generate-manifests.js",
     "precommit": "npm run build",
