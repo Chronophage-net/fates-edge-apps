@@ -116,6 +116,79 @@ function getFaceCardNote(suit, rank) {
 }
 
 // ============================================================
+// WORKED ITINERARIES (Travel Reference chapter, "Worked Itineraries")
+// ============================================================
+// Travel in the setting is charted the way medieval travel actually was --
+// as an itinerary of named waypoints and gates, not a coordinate map. The
+// sourcebook's Regional Routes / Route Tables / Worked Itineraries sections
+// lay out several canonical journeys where each leg's four cards are drawn
+// from SPECIFIC (and not always matching) region decks -- e.g. the first
+// leg of the Coastal Haul draws its Diamond from Kahfagia even though the
+// leg's destination is Ecktoria. That's richer than the generic "policed
+// route / gateway authority" fallback below can express on its own, so
+// named itineraries are modeled as an explicit leg-by-leg script. Each leg
+// may offer `variants` (the sourcebook's "Pick 1" branch points); the
+// first variant is the default. Legs use the real dataset region names so
+// they can be fed straight into fetchRegionData().
+const WORKED_ITINERARIES = [
+    {
+        key: 'coastal_haul',
+        name: 'West-to-East Coastal Haul',
+        description: 'Kahfagia → Ecktoria → Silkstrand (Acasia) → Marcott (Vhasia) → Fairport (Viterra).',
+        legs: [
+            { label: 'Kassamira → Ecktoria', spade: 'Ecktoria', heart: 'Ecktoria', club: WILDS_REGION_NAME, diamond: 'Kahfagia', clockHint: 6, flavor: 'Aqueduct arcades; Coin-house factor; gale; convoy letter.' },
+            { label: 'Ecktoria → Silkstrand', spade: 'Acasia', heart: 'Acasia', club: 'Acasia', diamond: 'Acasia', clockHint: 7, flavor: "Three-Queens Bridge; Dyers' Guildmistress; loom strike; Exchange pass." },
+            { label: 'Silkstrand → Marcott', spade: 'Vhasia', heart: 'Vhasia', club: 'Vhasia', diamond: 'Vhasia', flavor: 'Pont-du-Tithe; Parlement clerk; coin rumor; letters patent.' },
+            { label: 'Marcott → Fairport', spade: 'Viterra', heart: 'Viterra', club: 'Linn', diamond: 'Viterra', clockHint: 6, flavor: 'Fairport tideworks; shipwright; boom lifts; customs seal.' }
+        ]
+    },
+    {
+        key: 'acasia_mistlands',
+        name: 'Acasia → Mistlands (Forgotten Pass + Under-Gate)',
+        description: 'Silkstrand (Acasia) → Aeler Gate → Mistlands.',
+        legs: [
+            { label: 'Silkstrand → Aeler Gate', spade: 'Aeler', heart: 'Aeler', club: 'Aeler', diamond: 'Aeler', flavor: 'Avalanche gallery; Geometer; Engineer requisition; Underway Pass.' },
+            { label: 'Gate → Mistlands', spade: 'Mistlands', heart: 'Mistlands', club: 'Mistlands', diamond: 'Mistlands', flavor: 'Bell-Line levee; Bell-warden; wraith crossing; Ward-salt.' }
+        ]
+    },
+    {
+        key: 'thin_shore_zakov_theona',
+        name: 'Thin Shore → Zakov → Theona (Corsair Jobs)',
+        description: 'A fast arc for crews running the misted coast into pirate politics and back into isle taboos.',
+        legs: [
+            { label: "Payden's Port → Thin Shore (Shadow Corridor)", spade: 'Valewood', heart: 'Mistlands', club: 'Mistlands', diamond: 'Mistlands', clockHint: 6, flavor: 'Green lane / Unfound stile; Protectorate clerk; bell-line failure; Lantern Writ. Rule of 9s applies.' },
+            { label: 'Thin Shore Transit (toward Zakov)', spade: 'Valewood', heart: 'Valewood', club: 'Valewood', diamond: 'Valewood', clockHint: 6, flavor: 'Sea-mist arcade; Path-warden; Sweet wind; Way-cord (spending it negates one Sweet wind lie).' },
+            { label: 'Approach to Zakov (Roadstead & Booms)', spade: 'Zakov', heart: 'Zakov', club: 'Zakov', diamond: 'Zakov', clockHint: 7, flavor: 'Boomhouse or Red Wharf; Pilot-Matron or Night Magistrate; Boom Drop or Customs Sweep; Harbor-Green Chit or Pilot Token. Apply the Gatekeepers overlay on arrival; a 9 triggers Missing Ninth.' },
+            {
+                label: 'Corsair Job Inside Zakov (pick one)', spade: 'Zakov', heart: 'Zakov', club: 'Zakov', diamond: 'Zakov',
+                variants: [
+                    { name: 'A) Lift a Hull from Drydock Four', flavor: "Drydock Four; Corsair Quartermaster; Admiralty Audit; Shipwright's Lien Release -- avoids bond but flips a debt later." },
+                    { name: 'B) Court the Black Bishop for Indulgence', flavor: "Black Bell Tower; Black Bishop; Bounty Proclamation; Magistrate's Hush -- rumor must be paid in coin or gossip." },
+                    { name: "C) Smuggler's Ladder Run", flavor: "Lantern Ladder; Lampman; Informant Flip; Smuggler's Ladder Map -- your tip was sold twice." }
+                ]
+            },
+            { label: 'Zakov → Theona (Isles & Moot)', spade: 'Theona', heart: 'Theona', club: 'Linn', diamond: 'Theona', clockHint: 7, flavor: "Uncounted Bridge; Matron of Wells or Moot Envoy; fogfall raids; Moot Token. Taboo: don't count the steps aloud." },
+            {
+                label: 'Theona Contract (pick one)', spade: 'Theona', heart: 'Theona', club: 'Theona', diamond: 'Theona',
+                variants: [
+                    { name: 'A) Raid-Truce at the Skerries', spade: 'Theona', heart: 'Theona', club: 'Theona', diamond: 'Theona', flavor: 'Tide caves; Isle Moot Envoy; Muster drum; Raid-truce Ribbon -- failure triggers a Linn muster timer.' },
+                    { name: 'B) Deliver the Ledger Shard', spade: 'Theona', heart: 'Theona', club: 'Zakov', diamond: 'Theona', flavor: 'Well-yard; Matron of Wells; a Zakov Debt Call follows you; Sanctuary Night buys time.' }
+                ]
+            }
+        ]
+    },
+    {
+        key: 'steppe_passage',
+        name: 'Steppe Passage: Black Banner Territory',
+        description: 'A dangerous journey through contested lands where three powers vie for control.',
+        legs: [
+            { label: 'Foedus Stone → Black Banner Camp', spade: 'Vilikari', heart: 'Black Banners', club: WILDS_REGION_NAME, diamond: 'Black Banners', clockHint: 7, flavor: 'Wolf Road milepost or Foedus Stone; Clan Elder or War Captain; Rasputitsa or Remount Sickness; Safe-conduct or Remount Chit. Foedus recall may invalidate your papers.' },
+            { label: 'Black Banner Camp → Ykrul Territory', spade: 'Ykrul', heart: 'Ykrul', club: WILDS_REGION_NAME, diamond: 'Ykrul', clockHint: 7, flavor: "Winter camp ring or Khagan's way-station; Khatun of the Ring or Noyan envoy; Hostage protocol or Feud spark; Paiza tablet or Foedus seal. Choose which law applies." }
+        ]
+    }
+];
+
+// ============================================================
 // ACE EFFECTS (Travel Edition)
 // ============================================================
 
@@ -214,6 +287,11 @@ let regionList = [];
 let policedRoute = false;    // true -> ♣ Pressure drawn from destination, not the Wilds
 let gatewayRegion = null;    // region whose deck ♦ Leverage is drawn from (defaults to destination)
 
+// Worked-itinerary controls: '' means "freeform journey" (Core Travel
+// Procedure above); otherwise a WORKED_ITINERARIES[].key.
+let selectedItinerary = '';
+let itineraryVariantChoices = {}; // { legIndex: variantIndex }
+
 // ============================================================
 // HELPERS
 // ============================================================
@@ -251,6 +329,40 @@ function getTimerSizeFromRank(rank) {
     if (val >= 11) return 8;       // J, Q, K
     if (val >= 6) return 6;        // 6-10
     return 4;                      // 2-5
+}
+
+// Region card meanings can contain inline HTML (e.g. <em>...</em>) meant
+// for the per-leg cards, which render via innerHTML. Plain-text contexts
+// (the synthesis panel's textContent, copy/export summaries) don't parse
+// HTML, so those tags were showing up literally. Strip them for any text
+// destined for a plain-text display.
+function stripHtml(str) {
+    if (!str) return str;
+    return String(str).replace(/<[^>]*>/g, '');
+}
+
+// Builds the plain-text journey synthesis shown in the "synthesis" panel
+// (rendered via textContent, so it must not contain HTML) and reused for
+// copy/export. One line per leg, tags stripped, Ace effects listed once
+// at the end -- replaces the old single-line, pipe-and-semicolon-joined
+// blob that also leaked <em> tags from region flavor text as literal
+// characters since textContent doesn't parse HTML.
+function buildOverallSynthesis(headerLine, legs, aceEffects) {
+    const lines = [`${headerLine} (${legs.length} leg${legs.length === 1 ? '' : 's'})`, ''];
+    legs.forEach((leg, i) => {
+        const label = leg.legLabel || `Leg ${i + 1}`;
+        lines.push(`${label}:`);
+        lines.push(`  Place: ${stripHtml(leg.place)}`);
+        lines.push(`  Actor: ${stripHtml(leg.actor)}`);
+        lines.push(`  Pressure: ${stripHtml(leg.pressure)}`);
+        lines.push(`  Leverage: ${stripHtml(leg.leverage)}`);
+        lines.push('');
+    });
+    if (aceEffects && aceEffects.length > 0) {
+        lines.push("The Hollow's Attention:");
+        aceEffects.forEach(e => lines.push(`  ${e.emoji || '🃏'} ${stripHtml(e.text || 'The Hollow takes notice.')}`));
+    }
+    return lines.join('\n').trimEnd();
 }
 
 function getRankName(rank) {
@@ -339,8 +451,18 @@ class Xorshift128 {
         
         this.state.s0 = y;
         this.state.s1 = x;
-        
-        const result = Number((x + y) & BigInt(0xFFFFFFFFFFFFFFFF)) / 18446744073709551616;
+
+        // BUGFIX: converting the full 64-bit combined state straight to a
+        // JS Number loses precision (doubles only hold 53 mantissa bits)
+        // and occasionally rounds UP to exactly 2^64, which divided by
+        // 2^64 yields random() === 1 instead of a value < 1. That let
+        // randomInt(0, n) return n itself (out of bounds), which corrupted
+        // the Fisher-Yates shuffle by swapping in `undefined` -- the cause
+        // of "Cannot read properties of undefined (reading 'rank')".
+        // Masking to 53 bits keeps the value exactly representable as a
+        // double, so it is always strictly < 1.
+        const combined = (x + y) & BigInt(0x1FFFFFFFFFFFFF); // 2^53 - 1
+        const result = Number(combined) / 9007199254740992; // 2^53
         return result;
     }
     
@@ -450,8 +572,14 @@ function buildMixedDeck() {
 // JOURNEY GENERATION — Core Travel Procedure (4 cards/leg)
 // ============================================================
 
+// sources: { spadeData, heartData, clubData, diamondData,
+//            spadeLabel, heartLabel, clubLabel, diamondLabel,
+//            aceRegion, legLabel, legFlavor, clockHint }
+// spadeData/heartData/etc. may point to the SAME region-data object (the
+// generic Core Travel Procedure) or to four different ones (a Worked
+// Itinerary leg, where the sourcebook sometimes draws, say, the Diamond
+// from a different region entirely than the Spade/Heart).
 function generateLeg(sources, legIndex) {
-    // sources: { destData, destRegion, clubData, diamondData, diamondRegionName }
     const spade = drawSuitCard('spades');
     const heart = drawSuitCard('hearts');
     const club = drawSuitCard('clubs');
@@ -459,8 +587,8 @@ function generateLeg(sources, legIndex) {
 
     const cards = { spade, heart, club, diamond };
 
-    const place = getCardMeaningFromRegion('spades', spade.rank, sources.destData);
-    const actor = getCardMeaningFromRegion('hearts', heart.rank, sources.destData);
+    const place = getCardMeaningFromRegion('spades', spade.rank, sources.spadeData);
+    const actor = getCardMeaningFromRegion('hearts', heart.rank, sources.heartData);
     const pressure = getCardMeaningFromRegion('clubs', club.rank, sources.clubData);
     const leverage = getCardMeaningFromRegion('diamonds', diamond.rank, sources.diamondData);
 
@@ -482,9 +610,9 @@ function generateLeg(sources, legIndex) {
     const aces = allCards.filter(c => c.rank === 'A');
     let aceEffect = null;
     if (aces.length > 0) {
-        aceEffect = getAceEffect(sources.destRegion, aces[0]);
+        aceEffect = getAceEffect(sources.aceRegion || sources.spadeLabel, aces[0]);
         if (typeof logRecordingEvent === 'function') {
-            logRecordingEvent('travel_leg_ace', `♠️ Travel Ace Effect: ${aceEffect.emoji} ${aceEffect.text} (Leg ${legIndex + 1}, ${sources.destRegion})`);
+            logRecordingEvent('travel_leg_ace', `♠️ Travel Ace Effect: ${aceEffect.emoji} ${aceEffect.text} (Leg ${legIndex + 1}, ${sources.spadeLabel})`);
         }
     }
 
@@ -501,8 +629,12 @@ function generateLeg(sources, legIndex) {
         synthesis,
         aceEffect,
         aceCount: aces.length,
-        clubSource: sources.clubData === sources.destData ? sources.destRegion : WILDS_REGION_NAME,
-        diamondSource: sources.diamondRegionName,
+        legLabel: sources.legLabel || null,
+        legFlavor: sources.legFlavor || null,
+        spadeSource: sources.spadeLabel,
+        heartSource: sources.heartLabel,
+        clubSource: sources.clubLabel,
+        diamondSource: sources.diamondLabel,
         cardDetails: {
             spade: { rank: spade.rank, suit: spade.suit, symbol: getSuitSymbol('spades'), color: getSuitColor('spades'), meaning: place, faceNote: getFaceCardNote('spades', spade.rank) },
             heart: { rank: heart.rank, suit: heart.suit, symbol: getSuitSymbol('hearts'), color: getSuitColor('hearts'), meaning: actor, faceNote: getFaceCardNote('hearts', heart.rank) },
@@ -536,7 +668,13 @@ async function generateJourneyAsync(startRegion, destRegion, numLegs = 3) {
 
     resetSuitDecks();
 
-    const sources = { destData, destRegion, clubData, diamondData, diamondRegionName };
+    const sources = {
+        spadeData: destData, heartData: destData, clubData, diamondData,
+        spadeLabel: destRegion, heartLabel: destRegion,
+        clubLabel: policedRoute ? destRegion : WILDS_REGION_NAME,
+        diamondLabel: diamondRegionName,
+        aceRegion: destRegion
+    };
 
     const legs = [];
     let totalTimer = 0;
@@ -568,14 +706,7 @@ async function generateJourneyAsync(startRegion, destRegion, numLegs = 3) {
     }
 
     const totalSegments = Math.min(totalTimer, 10);
-
-    let overallSynthesis = `Journey from ${startRegion} to ${destRegion}. ${legs.length} leg(s). ` +
-        legs.map((leg, i) => `Leg ${i+1}: ${leg.place} | ${leg.actor} | ${leg.pressure} | ${leg.leverage}`).join('; ');
-
-    if (allAceEffects.length > 0) {
-        overallSynthesis += '\n\n♠️ **Ace Effects:**\n' +
-            allAceEffects.map((e, i) => `${e.emoji} ${e.text}`).join('\n');
-    }
+    const overallSynthesis = buildOverallSynthesis(`Journey: ${startRegion} → ${destRegion}`, legs, allAceEffects);
 
     const roles = TRAVEL_ROLES.map(role => ({ ...role, assigned: true }));
 
@@ -607,6 +738,124 @@ async function generateJourneyAsync(startRegion, destRegion, numLegs = 3) {
         // Log each leg's details
         legs.forEach((leg, idx) => {
             logRecordingEvent('journey_leg', `Leg ${idx+1}: Place: ${leg.place} | Actor: ${leg.actor} | Pressure: ${leg.pressure} | Leverage: ${leg.leverage} | Timer: ${leg.timerSegments} segments`);
+        });
+    }
+
+    return journey;
+}
+
+// ============================================================
+// WORKED ITINERARY JOURNEYS — named, leg-scripted journeys
+// ============================================================
+
+function resolveItineraryLeg(legDef) {
+    // Applies the chosen variant (if any) over its parent leg's defaults.
+    const variantIdx = itineraryVariantChoices[legDef._index] || 0;
+    if (legDef.variants && legDef.variants[variantIdx]) {
+        const v = legDef.variants[variantIdx];
+        return {
+            label: `${legDef.label} — ${v.name}`,
+            spade: v.spade || legDef.spade,
+            heart: v.heart || legDef.heart,
+            club: v.club || legDef.club,
+            diamond: v.diamond || legDef.diamond,
+            flavor: v.flavor || legDef.flavor,
+            clockHint: legDef.clockHint
+        };
+    }
+    return legDef;
+}
+
+async function generateItineraryJourneyAsync(itineraryKey) {
+    const itinerary = WORKED_ITINERARIES.find(it => it.key === itineraryKey);
+    if (!itinerary) {
+        showToast('Unknown itinerary.', 'error');
+        return null;
+    }
+
+    resetSuitDecks();
+
+    // Cache region-data fetches across legs -- worked itineraries often
+    // reuse the same region deck for several consecutive legs.
+    const dataCache = new Map();
+    async function getData(name) {
+        if (!dataCache.has(name)) {
+            dataCache.set(name, await fetchRegionData(name));
+        }
+        return dataCache.get(name);
+    }
+
+    const legs = [];
+    let totalTimer = 0;
+    let highestCardOverall = null;
+    let allAceEffects = [];
+
+    for (let i = 0; i < itinerary.legs.length; i++) {
+        const raw = { ...itinerary.legs[i], _index: i };
+        const resolved = resolveItineraryLeg(raw);
+
+        const [spadeData, heartData, clubData, diamondData] = await Promise.all([
+            getData(resolved.spade), getData(resolved.heart), getData(resolved.club), getData(resolved.diamond)
+        ]);
+        if (!spadeData || !heartData || !clubData || !diamondData) {
+            showToast(`Could not load region data for "${resolved.label}".`, 'error');
+            return null;
+        }
+
+        const sources = {
+            spadeData, heartData, clubData, diamondData,
+            spadeLabel: resolved.spade, heartLabel: resolved.heart,
+            clubLabel: resolved.club, diamondLabel: resolved.diamond,
+            aceRegion: resolved.spade,
+            legLabel: resolved.label, legFlavor: resolved.flavor
+        };
+
+        const leg = generateLeg(sources, i);
+        legs.push(leg);
+        totalTimer += leg.timerSegments;
+        if (leg.aceEffect) allAceEffects.push(leg.aceEffect);
+        if (!highestCardOverall) {
+            highestCardOverall = leg.cards.spade;
+        } else {
+            const rankA = POKER_RANK[leg.cards.spade.rank] || 0;
+            const rankB = POKER_RANK[highestCardOverall.rank] || 0;
+            if (rankA > rankB) {
+                highestCardOverall = leg.cards.spade;
+            } else if (rankA === rankB) {
+                const suitA = SUIT_ORDER[leg.cards.spade.suit] || 0;
+                const suitB = SUIT_ORDER[highestCardOverall.suit] || 0;
+                if (suitA > suitB) highestCardOverall = leg.cards.spade;
+            }
+        }
+    }
+
+    const totalSegments = Math.min(totalTimer, 10);
+    const overallSynthesis = buildOverallSynthesis(`Worked Itinerary: ${itinerary.name}`, legs, allAceEffects);
+
+    const roles = TRAVEL_ROLES.map(role => ({ ...role, assigned: true }));
+
+    const journey = {
+        startRegion: itinerary.legs[0].spade,
+        destRegion: itinerary.legs[itinerary.legs.length - 1].spade,
+        itineraryKey: itinerary.key,
+        itineraryName: itinerary.name,
+        numLegs: legs.length,
+        legs,
+        totalSegments,
+        maxTimer: legs.reduce((max, leg) => Math.max(max, leg.timerSegments), 0),
+        overallSynthesis,
+        roles,
+        highestCard: highestCardOverall ? `${getRankName(highestCardOverall.rank)} of ${getSuitName(highestCardOverall.suit)}` : 'N/A',
+        timestamp: new Date().toISOString(),
+        aceEffects: allAceEffects
+    };
+
+    currentJourney = journey;
+
+    if (typeof logRecordingEvent === 'function') {
+        logRecordingEvent('journey_generated', `🗺️ Worked Itinerary: ${itinerary.name} (${journey.numLegs} legs, ${journey.totalSegments} segments, ${journey.aceEffects.length} Ace effects)`);
+        legs.forEach((leg) => {
+            logRecordingEvent('journey_leg', `${leg.legLabel}: Place: ${leg.place} | Actor: ${leg.actor} | Pressure: ${leg.pressure} | Leverage: ${leg.leverage} | Timer: ${leg.timerSegments} segments`);
         });
     }
 
@@ -697,6 +946,18 @@ export async function render(el) {
             </div>
             
             <div class="panel">
+                <h3>🗒️ Worked Itinerary <span style="font-size:0.75rem;color:var(--text3);font-weight:normal;">(named journeys from the Travel Reference chapter — travel here is charted as an itinerary of waypoints and gates, not a map)</span></h3>
+                <div class="field">
+                    <label>Itinerary</label>
+                    <select id="travel-itinerary-select">
+                        <option value="">— Freeform Journey (Core Travel Procedure) —</option>
+                        ${WORKED_ITINERARIES.map(it => `<option value="${it.key}" ${it.key === selectedItinerary ? 'selected' : ''}>${it.name}</option>`).join('')}
+                    </select>
+                </div>
+                <div id="travel-itinerary-preview" style="margin-top:0.5rem;${selectedItinerary ? '' : 'display:none;'}"></div>
+            </div>
+
+            <div class="panel" id="travel-freeform-panel" style="${selectedItinerary ? 'display:none;' : ''}">
                 <h3>Journey Configuration</h3>
                 <div style="display:flex;flex-wrap:wrap;gap:1rem;align-items:end;">
                     <div class="field" style="flex:1;min-width:150px;">
@@ -722,8 +983,6 @@ export async function render(el) {
                             <option value="5">5</option>
                         </select>
                     </div>
-                    <button class="btn btn-gold" id="travel-generate-btn">🃏 Generate Journey</button>
-                    <button class="btn" id="travel-reshuffle-btn">↺ Reshuffle</button>
                 </div>
                 <div style="display:flex;flex-wrap:wrap;gap:1rem;align-items:end;margin-top:0.7rem;">
                     <div class="field" style="display:flex;align-items:center;gap:0.4rem;">
@@ -743,6 +1002,13 @@ export async function render(el) {
                     unless the route is strongly policed (then the destination); Leverage (♦) from whichever authority actually gates the route.
                     The highest card sets a suggested timer.
                     <span style="color:var(--gold);">♠️ Aces draw the Hollow's attention (+1 SB)!</span>
+                </div>
+            </div>
+
+            <div class="panel">
+                <div style="display:flex;gap:0.5rem;flex-wrap:wrap;">
+                    <button class="btn btn-gold" id="travel-generate-btn">🃏 Generate Journey</button>
+                    <button class="btn" id="travel-reshuffle-btn">↺ Reshuffle</button>
                 </div>
             </div>
 
@@ -864,6 +1130,59 @@ function attachEvents() {
     if (spreadBtn) {
         spreadBtn.addEventListener('click', handleTravelersSpread);
     }
+
+    const itinerarySelect = document.getElementById('travel-itinerary-select');
+    if (itinerarySelect) {
+        itinerarySelect.addEventListener('change', (e) => {
+            selectedItinerary = e.target.value;
+            itineraryVariantChoices = {};
+            const freeformPanel = document.getElementById('travel-freeform-panel');
+            if (freeformPanel) freeformPanel.style.display = selectedItinerary ? 'none' : '';
+            renderItineraryPreview();
+        });
+    }
+
+    renderItineraryPreview();
+}
+
+function renderItineraryPreview() {
+    const preview = document.getElementById('travel-itinerary-preview');
+    if (!preview) return;
+    if (!selectedItinerary) {
+        preview.style.display = 'none';
+        preview.innerHTML = '';
+        return;
+    }
+    const itinerary = WORKED_ITINERARIES.find(it => it.key === selectedItinerary);
+    if (!itinerary) return;
+
+    preview.style.display = 'block';
+    preview.innerHTML = `
+        <p style="font-size:0.85rem;color:var(--text2);margin:0 0 0.5rem;">${itinerary.description}</p>
+        ${itinerary.legs.map((leg, idx) => `
+            <div style="background:var(--bg2);border-radius:var(--radius);padding:0.5rem 0.7rem;margin-bottom:0.4rem;">
+                <strong style="font-size:0.85rem;">Leg ${idx + 1}: ${leg.label}</strong>
+                <div style="font-size:0.75rem;color:var(--text3);margin-top:0.15rem;">
+                    ♠${leg.spade} ♥${leg.heart} ♣${leg.club} ♦${leg.diamond}${leg.clockHint ? ` — suggested clock ${leg.clockHint}` : ''}
+                </div>
+                ${leg.flavor ? `<div style="font-size:0.75rem;font-style:italic;color:var(--text2);margin-top:0.15rem;">${leg.flavor}</div>` : ''}
+                ${leg.variants ? `
+                    <div class="field" style="margin-top:0.3rem;">
+                        <select class="travel-itinerary-variant-select" data-leg-index="${idx}" style="font-size:0.8rem;">
+                            ${leg.variants.map((v, vi) => `<option value="${vi}" ${(itineraryVariantChoices[idx] || 0) === vi ? 'selected' : ''}>${v.name}</option>`).join('')}
+                        </select>
+                    </div>
+                ` : ''}
+            </div>
+        `).join('')}
+    `;
+
+    preview.querySelectorAll('.travel-itinerary-variant-select').forEach(sel => {
+        sel.addEventListener('change', (e) => {
+            const legIdx = parseInt(e.target.getAttribute('data-leg-index'), 10);
+            itineraryVariantChoices[legIdx] = parseInt(e.target.value, 10);
+        });
+    });
 }
 
 // ============================================================
@@ -871,26 +1190,49 @@ function attachEvents() {
 // ============================================================
 
 async function handleGenerate() {
+    if (selectedItinerary) {
+        showToast('Generating journey...', 'info');
+        try {
+            const itinerary = WORKED_ITINERARIES.find(it => it.key === selectedItinerary);
+            const journey = await generateItineraryJourneyAsync(selectedItinerary);
+            if (!journey) {
+                showToast('Failed to generate journey.', 'error');
+                return;
+            }
+            displayJourney(journey);
+            addToHistory(journey);
+            const aceCount = journey.aceEffects ? journey.aceEffects.length : 0;
+            showToast(`"${itinerary.name}" generated (${journey.numLegs} legs). ${aceCount > 0 ? `♠️ ${aceCount} Ace effect(s) triggered!` : ''}`, 'success');
+            if (typeof logRecordingEvent === 'function') {
+                logRecordingEvent('travel_planner_generate', `User generated worked itinerary: ${itinerary.name}`);
+            }
+        } catch (err) {
+            console.error('Error generating journey:', err);
+            showToast('Error generating journey.', 'error');
+        }
+        return;
+    }
+
     const startSelect = document.getElementById('travel-start-region');
     const destSelect = document.getElementById('travel-dest-region');
     const legsSelect = document.getElementById('travel-legs');
-    
+
     if (!startSelect || !destSelect || !legsSelect) {
         showToast('Form elements not found.', 'error');
         return;
     }
-    
+
     const start = startSelect.value;
     const dest = destSelect.value;
     const numLegs = parseInt(legsSelect.value, 10) || 3;
-    
+
     if (start === dest) {
         showToast('Start and destination regions must be different.', 'warning');
         return;
     }
-    
+
     showToast('Generating journey...', 'info');
-    
+
     try {
         const journey = await generateJourneyAsync(start, dest, numLegs);
         if (!journey) {
@@ -901,7 +1243,7 @@ async function handleGenerate() {
         addToHistory(journey);
         const aceCount = journey.aceEffects ? journey.aceEffects.length : 0;
         showToast(`Journey from ${start} to ${dest} generated with ${numLegs} leg(s). ${aceCount > 0 ? `♠️ ${aceCount} Ace effect(s) triggered!` : ''}`, 'success');
-        
+
         if (typeof logRecordingEvent === 'function') {
             logRecordingEvent('travel_planner_generate', `User generated journey: ${start} → ${dest} (${numLegs} legs)`);
         }
@@ -1132,7 +1474,9 @@ function displayJourney(journey) {
     
     const title = document.getElementById('travel-journey-title');
     if (title) {
-        title.textContent = `🗺️ Journey: ${journey.startRegion} → ${journey.destRegion}`;
+        title.textContent = journey.itineraryName
+            ? `🗒️ Worked Itinerary: ${journey.itineraryName}`
+            : `🗺️ Journey: ${journey.startRegion} → ${journey.destRegion}`;
     }
     const meta = document.getElementById('travel-journey-meta');
     if (meta) {
@@ -1140,8 +1484,10 @@ function displayJourney(journey) {
             <span>Legs: ${journey.numLegs}</span>
             <span style="margin-left:1rem;">Total Timer: ${journey.totalSegments} segments</span>
             <span style="margin-left:1rem;">Highest Card: ${journey.highestCard}</span>
-            <span style="margin-left:1rem;">♣ Pressure from: ${journey.policedRoute ? journey.destRegion + ' (policed)' : 'The Wilds'}</span>
-            <span style="margin-left:1rem;">♦ Gateway: ${journey.gatewayRegion}</span>
+            ${journey.itineraryName ? '' : `
+                <span style="margin-left:1rem;">♣ Pressure from: ${journey.policedRoute ? journey.destRegion + ' (policed)' : 'The Wilds'}</span>
+                <span style="margin-left:1rem;">♦ Gateway: ${journey.gatewayRegion}</span>
+            `}
             ${journey.aceEffects && journey.aceEffects.length > 0 ? `<span style="margin-left:1rem;color:var(--gold);">♠️ ${journey.aceEffects.length} Ace effect(s) — the Hollow's Attention (GM +${journey.aceEffects.length} SB)</span>` : ''}
         `;
     }
@@ -1153,9 +1499,10 @@ function displayJourney(journey) {
             return `
             <div style="background:var(--bg2);border-radius:var(--radius);padding:0.8rem;margin-bottom:0.5rem;border-left:4px solid ${hasAce ? 'var(--gold)' : 'var(--border)'};">
                 <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;">
-                    <strong style="font-size:1rem;">Leg ${idx+1}</strong>
+                    <strong style="font-size:1rem;">${leg.legLabel ? `Leg ${idx+1}: ${leg.legLabel}` : `Leg ${idx+1}`}</strong>
                     <span style="font-size:0.8rem;color:var(--text3);">Timer: ${leg.timerSegments} segments (${leg.timerCard})</span>
                 </div>
+                ${leg.legFlavor ? `<div style="font-size:0.8rem;font-style:italic;color:var(--text2);margin-top:0.15rem;">${leg.legFlavor}</div>` : ''}
                 ${hasAce ? `
                     <div style="margin:0.3rem 0;padding:0.2rem 0.6rem;background:var(--bg4);border-radius:var(--radius);border:1px solid var(--gold);color:var(--gold);font-size:0.85rem;">
                         ♠️ <strong>The Hollow's Attention:</strong> ${leg.aceEffect.emoji} ${leg.aceEffect.text} <em>(GM gains ${leg.aceCount} SB)</em>
@@ -1164,10 +1511,12 @@ function displayJourney(journey) {
                 <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:0.5rem;margin-top:0.3rem;">
                     <div style="background:var(--bg3);padding:0.3rem 0.5rem;border-radius:4px;border-left:3px solid ${leg.cardDetails.spade.color};">
                         <span style="font-weight:bold;">♠ Place:</span> ${leg.place}
+                        <div style="font-size:0.7rem;color:var(--text3);">from ${leg.spadeSource}</div>
                         ${leg.cardDetails.spade.faceNote ? `<div style="margin-top:0.2rem;font-size:0.7rem;color:var(--text3);">${leg.cardDetails.spade.faceNote}</div>` : ''}
                     </div>
                     <div style="background:var(--bg3);padding:0.3rem 0.5rem;border-radius:4px;border-left:3px solid ${leg.cardDetails.heart.color};">
                         <span style="font-weight:bold;">♥ Actor:</span> ${leg.actor}
+                        <div style="font-size:0.7rem;color:var(--text3);">from ${leg.heartSource}</div>
                         ${leg.cardDetails.heart.faceNote ? `<div style="margin-top:0.2rem;font-size:0.7rem;color:var(--text3);">${leg.cardDetails.heart.faceNote}</div>` : ''}
                     </div>
                     <div style="background:var(--bg3);padding:0.3rem 0.5rem;border-radius:4px;border-left:3px solid ${leg.cardDetails.club.color};">
@@ -1249,28 +1598,30 @@ function addToHistory(journey) {
 }
 
 function generateJourneySummary(journey) {
-    let summary = `Journey from ${journey.startRegion} to ${journey.destRegion}\n`;
+    const headerLabel = journey.itineraryName
+        ? `Worked Itinerary: ${journey.itineraryName}`
+        : `Journey from ${journey.startRegion} to ${journey.destRegion}`;
+    let summary = `${headerLabel}\n`;
     summary += `Legs: ${journey.numLegs}\n`;
     summary += `Total Timer: ${journey.totalSegments} segments\n`;
     if (journey.aceEffects && journey.aceEffects.length > 0) {
-        summary += `♠️ Ace Effects:\n`;
-        journey.aceEffects.forEach(e => summary += `  ${e.emoji} ${e.text}\n`);
+        summary += `♠️ Ace Effects (The Hollow's Attention):\n`;
+        journey.aceEffects.forEach(e => summary += `  ${e.emoji || '🃏'} ${stripHtml(e.text || 'The Hollow takes notice.')}\n`);
     }
     summary += `\n`;
     journey.legs.forEach((leg, i) => {
-        summary += `Leg ${i+1}:\n`;
-        summary += `  Place: ${leg.place}\n`;
-        summary += `  Actor: ${leg.actor}\n`;
-        summary += `  Pressure: ${leg.pressure}\n`;
-        summary += `  Leverage: ${leg.leverage}\n`;
+        summary += `${leg.legLabel || `Leg ${i+1}`}:\n`;
+        summary += `  Place: ${stripHtml(leg.place)}\n`;
+        summary += `  Actor: ${stripHtml(leg.actor)}\n`;
+        summary += `  Pressure: ${stripHtml(leg.pressure)}\n`;
+        summary += `  Leverage: ${stripHtml(leg.leverage)}\n`;
         summary += `  Timer: ${leg.timerSegments} segments (${leg.timerCard})\n`;
         if (leg.aceEffect) {
-            summary += `  ♠️ Ace Effect: ${leg.aceEffect.emoji} ${leg.aceEffect.text}\n`;
+            summary += `  ♠️ Ace Effect: ${leg.aceEffect.emoji || '🃏'} ${stripHtml(leg.aceEffect.text || 'The Hollow takes notice.')}\n`;
         }
         summary += `\n`;
     });
-    summary += `Overall: ${journey.overallSynthesis}`;
-    return summary;
+    return summary.trimEnd();
 }
 
 // ============================================================
