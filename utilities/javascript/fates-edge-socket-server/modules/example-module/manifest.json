@@ -1,0 +1,9 @@
+{
+  "name": "The Salt Road Incident",
+  "version": "1.0.0",
+  "description": "A short, self-contained adventure demonstrating the adventure.json schema: two acts, three scenes, one scripted encounter and one open-ended one.",
+  "author": "Fate's Edge",
+  "type": "adventure",
+  "icon": "🧂",
+  "tierRange": "I"
+}

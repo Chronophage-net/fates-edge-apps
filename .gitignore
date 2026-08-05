@@ -57,6 +57,9 @@ Desktop.ini
 .env.local
 .env.*.local
 
+# TURN (coturn) TLS certs -- never commit real certs/keys
+utilities/javascript/fates-edge-socket-server/coturn/*.pem
+
 # Web client
 # CHANGED: these used to point at a "ttrpg/..." prefix this repo doesn't
 # actually have (utilities/javascript/... is the real path -- looks

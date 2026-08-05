@@ -5,12 +5,22 @@
  */
 
 const WebSocket = require('ws');
+const fs = require('fs');
+const path = require('path');
 const room = require('./room.js');
 const deck = require('./deck.js');
 const logger = require('./logger.js').createLogger(process.env.LOG_LEVEL || 'INFO');
-const { buildSafeDict, clampCount } = require('./security.js');
+const { buildSafeDict, clampCount, isSafeModuleId } = require('./security.js');
 const adventure = require('./adventure.js');
 const auth = require('./auth.js');
+const turn = require('./turn.js');
+
+// Installable modules (see server/api.js's /api/modules routes and
+// DATA_SCHEMA.md's "Adventure modules" section) live at <repo-root>/modules/,
+// a sibling of server/ -- NOT server/modules/. This transport's
+// 'module-push-request'/'module-cleanup-request'/'module-list' handlers
+// mirror socketio-handlers.js's, which already got this path right.
+const MODULES_DIR = path.join(__dirname, '..', 'modules');
 
 // See socketio-handlers.js's identical note -- accounts degrade
 // gracefully if the DB storage module didn't load.
@@ -19,8 +29,10 @@ try { storage = require('./storage.js'); } catch (e) { storage = null; }
 function hasAccountSupport() { return !!(storage && typeof storage.getMembership === 'function'); }
 
 let socketStats = { wsConnections: 0, totalConnections: 0 };
+let wssConfig = {};
 
-function setupWSS(wss) {
+function setupWSS(wss, appConfig) {
+    wssConfig = appConfig || {};
     wss.on('connection', (ws, req) => {
         const url = new URL(req.url, `http://${req.headers.host}`);
         let roomCode = url.searchParams.get('room');
@@ -310,6 +322,116 @@ function setupWSS(wss) {
 
                     case 'adventure-state-request': {
                         ws.send(JSON.stringify({ type: 'adventure-state', ...adventure.getPublicState(currentRoom) }));
+                        break;
+                    }
+
+                    // ─── Client list ────────────────────────────────────────
+                    // The Socket.io transport has always answered this via a
+                    // callback (see socketio-handlers.js's `get-clients`), but
+                    // this transport never handled it at all -- websocket.js's
+                    // getConnectedClients() would silently time out after 2s
+                    // and resolve to [] on every call over plain WebSocket
+                    // (the default transport). Echoes `requestId` so the
+                    // client's generic pendingCallbacks correlation picks it
+                    // up (see sendWSMessage()/handleWebSocketMessage() client-side).
+                    case 'get-clients':
+                        ws.send(JSON.stringify({ type: 'clients', clients: room.getClientsList(currentRoom), requestId: data.requestId }));
+                        break;
+
+                    // ─── TURN credentials ──────────────────────────────────
+                    // See server/turn.js. Not gated behind anything beyond
+                    // "you're connected" -- same trust boundary as any
+                    // other in-room WS message.
+                    case 'turn-credentials-request': {
+                        const result = turn.mintCredentials(wssConfig, clientId);
+                        ws.send(JSON.stringify({ type: 'turn-credentials', ...(result || { iceServers: [] }) }));
+                        break;
+                    }
+
+                    // ─── Module management ──────────────────────────────────
+                    // FIX: this transport had NO handling at all for any of
+                    // these three message types -- only socketio-handlers.js
+                    // did. Since plain WebSocket is the client's default
+                    // transport (see websocket.js CONFIG.mode), every
+                    // module push/cleanup/list request from the web client
+                    // silently timed out (10s/5s) and resolved to an error,
+                    // regardless of whether the module itself was ever
+                    // reachable. Mirrors socketio-handlers.js's equivalent
+                    // handlers (including the MODULES_DIR path fix -- see
+                    // this file's top-of-file comment).
+                    case 'module-push-request': {
+                        const respond = (payload) => ws.send(JSON.stringify({ type: 'module-push-response', requestId: data.requestId, ...payload }));
+                        const moduleId = data.moduleId;
+                        if (!moduleId) { respond({ error: 'Module ID required' }); break; }
+                        if (!isSafeModuleId(moduleId)) { respond({ error: 'Invalid module id' }); break; }
+                        const modulesPath = path.join(MODULES_DIR, moduleId);
+                        if (!fs.existsSync(modulesPath)) { respond({ error: 'Module not found' }); break; }
+                        const manifestPath = path.join(modulesPath, 'manifest.json');
+                        if (!fs.existsSync(manifestPath)) { respond({ error: 'Module manifest not found' }); break; }
+                        try {
+                            const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf-8'));
+                            const moduleData = { id: moduleId, manifest, files: {} };
+                            for (const file of fs.readdirSync(modulesPath)) {
+                                if (file === 'manifest.json') continue;
+                                const filePath = path.join(modulesPath, file);
+                                if (fs.statSync(filePath).isFile()) {
+                                    moduleData.files[file] = fs.readFileSync(filePath, 'utf-8');
+                                }
+                            }
+                            room.broadcastToRoom(roomKey, 'module-push', {
+                                source: clientId,
+                                clientName: ws.clientData?.name || 'Player',
+                                module: moduleData,
+                                timestamp: Date.now()
+                            }, ws.clientId);
+                            respond({ success: true, module: moduleData });
+                        } catch (error) {
+                            respond({ error: error.message });
+                        }
+                        break;
+                    }
+
+                    case 'module-cleanup-request': {
+                        const moduleId = data.moduleId;
+                        if (!moduleId) {
+                            ws.send(JSON.stringify({ type: 'module-cleanup-response', requestId: data.requestId, error: 'Module ID required' }));
+                            break;
+                        }
+                        room.broadcastToRoom(roomKey, 'module-cleanup', {
+                            moduleId,
+                            source: clientId,
+                            clientName: ws.clientData?.name || 'Player',
+                            timestamp: Date.now()
+                        }, ws.clientId);
+                        ws.send(JSON.stringify({ type: 'module-cleanup-response', requestId: data.requestId, success: true, moduleId }));
+                        break;
+                    }
+
+                    case 'module-list': {
+                        const modules = [];
+                        if (fs.existsSync(MODULES_DIR)) {
+                            for (const item of fs.readdirSync(MODULES_DIR)) {
+                                const itemPath = path.join(MODULES_DIR, item);
+                                if (!fs.statSync(itemPath).isDirectory()) continue;
+                                const manifestPath = path.join(itemPath, 'manifest.json');
+                                if (!fs.existsSync(manifestPath)) continue;
+                                try {
+                                    const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf-8'));
+                                    modules.push({
+                                        id: item,
+                                        name: manifest.name || item,
+                                        version: manifest.version || '1.0.0',
+                                        description: manifest.description || '',
+                                        author: manifest.author || '',
+                                        type: manifest.type || 'module',
+                                        icon: manifest.icon || '📦',
+                                        route: manifest.route || null,
+                                        tier: manifest.tier || manifest.tierRange || '?'
+                                    });
+                                } catch (e) { /* skip invalid manifest */ }
+                            }
+                        }
+                        ws.send(JSON.stringify({ type: 'module-list-response', requestId: data.requestId, modules, count: modules.length }));
                         break;
                     }
 

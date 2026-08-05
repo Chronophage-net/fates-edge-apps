@@ -97,6 +97,16 @@ For development with auto-restart:
 npm run dev
 ```
 
+### Docker
+
+A `Dockerfile` is included, and the bot is also wired into the monorepo root's `docker-compose.yml` under the `bots`/`discord-bot` profiles:
+
+```bash
+# from the fates-edge-apps repo root
+cp .env.example .env   # fill in DISCORD_TOKEN
+docker-compose --profile discord-bot up
+```
+
 ---
 
 ## 🔧 Discord Bot Setup

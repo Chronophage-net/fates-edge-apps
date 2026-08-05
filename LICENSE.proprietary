@@ -1,0 +1,64 @@
+# Fate's Edge — Proprietary Content License
+
+This file covers the **Proprietary Content** shipped in this repository —
+setting lore, original characters, factions, adventures, and similar — not
+the software source code (see [LICENSE.code](LICENSE.code)) and not the
+System Reference Document (see [LICENSE.srd](LICENSE.srd)). See
+[COMMUNITY_USE_POLICY.md](COMMUNITY_USE_POLICY.md) for a plain-language
+breakdown of what falls into which category and what you can/can't do
+with each.
+
+---
+
+## Proprietary Content — All Rights Reserved (Freely Distributed)
+
+© 2024 Nicholas A. Gasper. All rights reserved.
+
+All proprietary names, characters, factions, patrons, and setting elements
+are used with the permission of the author — Nicholas A. Gasper, who is the
+sole rights holder of this material and grants himself and this project
+that permission. Third parties do not have this permission and must
+request it separately (see below).
+
+The Proprietary Content includes, but is not limited to:
+
+- Setting lore (Acasia, Aeler, Vhasia, the Curse, etc.)
+- Original characters, NPCs, and named figures
+- Faction descriptions and campaign-specific content
+- Proprietary magic systems as published (Runekeeper, Invoker, Cantor, Witch, Summoner, Monk, etc.)
+- Artwork, maps, and graphical elements
+- Original prose, framing devices, and narrative text
+- The Deck of Consequences and Crown Spread systems
+- The Travel Framework and regional generators
+- The Kon'reh board game
+- Any data files (`*.json`, `*.yaml`, `*.md`, etc.) not specifically designated as SRD
+
+**Permitted use** — You are granted a non-exclusive, non-transferable,
+revocable license to use the Proprietary Content solely for personal,
+non-commercial play of Fate's Edge, and only in conjunction with an
+instance of this software (the Virtual Tabletop application, or a fork of
+it). This permission does **not** extend to:
+
+- Commercial use (e.g., paid games, subscription services, merchandise)
+- Redistribution of the content outside of this software
+- Creation of derivative works (fan games, adaptations, novels, etc.) for commercial release
+- Incorporation into other commercial software, websites, or tools
+
+Free/non-commercial fan content (adventures, actual play, fan art, house
+rules set in the Amaranthine, etc.) is welcome without asking first — see
+[fates-edge-docs' third-party-policy.md](https://github.com/Chronophage-net/fates-edge-docs/blob/main/third-party-policy.md)
+for the full creator-facing policy and FAQ.
+
+For any commercial use, contact **support@fates-edge.com**.
+
+---
+
+## Disclaimer
+
+THIS SOFTWARE AND ALL ACCOMPANYING CONTENT ARE PROVIDED "AS IS" WITHOUT
+WARRANTY OF ANY KIND. IN NO EVENT SHALL THE COPYRIGHT HOLDER BE LIABLE FOR
+ANY CLAIM, DAMAGES, OR OTHER LIABILITY ARISING FROM THE USE OF THE SOFTWARE
+OR CONTENT.
+
+See [LICENSE.md](LICENSE.md) for the full combined license (code + game
+content together) if you only want to read one file.

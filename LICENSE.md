@@ -1,5 +1,11 @@
 # FATE'S EDGE — LICENSE
 
+> Looking for a plain-language "can I do X with this repo" FAQ instead of
+> full legal text? See [COMMUNITY_USE_POLICY.md](COMMUNITY_USE_POLICY.md).
+> This same content is also split into standalone [LICENSE.code](LICENSE.code),
+> [LICENSE.srd](LICENSE.srd), and [LICENSE.proprietary](LICENSE.proprietary)
+> files if you only need one category.
+
 This repository contains two distinct categories of intellectual property:
 1. **Software Source Code** – the application code that makes the Virtual Tabletop run.
 2. **Game Content** – all rules, lore, characters, and data files.

@@ -1,6 +1,6 @@
 [![Build Apps and Packages](https://github.com/Chronophage-net/fates-edge-apps/actions/workflows/build-apps-and-packages.yml/badge.svg)](https://github.com/Chronophage-net/fates-edge-apps/actions/workflows/build-apps-and-packages.yml)
 
-# Fate's Edge Toolkit v4.4.2 – Complete VTT Ecosystem
+# Fate's Edge Toolkit v4.5.0 – Complete VTT Ecosystem
 
 > A modular, self-contained toolkit for running Fate's Edge TTRPG campaigns, with real‑time collaboration, VTT integrations, Game Master management, and a full in-browser magic/monastic-path system.
 
@@ -10,14 +10,14 @@
 [![Node.js](https://img.shields.io/badge/Node.js-24.x-green.svg)](https://nodejs.org/)
 [![Foundry VTT](https://img.shields.io/badge/Foundry-VTT-orange)](https://foundryvtt.com/)
 [![Discord](https://img.shields.io/badge/Discord-Bot-5865F2)](https://discord.com/)
-[![Version](https://img.shields.io/badge/version-4.4.2-blue)](https://github.com/nicholasagaspar/fates-edge-apps)
+[![Version](https://img.shields.io/badge/version-4.5.0-blue)](https://github.com/nicholasagaspar/fates-edge-apps)
 
 ---
 
 ## 📖 Table of Contents
 
 - [Overview](#-overview)
-- [What's New in v4.4.1](#-whats-new-in-v441)
+- [What's New in v4.5.0](#-whats-new-in-v450)
 - [Features](#-features)
 - [Quick Start](#-quick-start)
 - [Architecture](#-architecture)
@@ -39,6 +39,16 @@
 The toolkit includes **real‑time VTT features** via a WebSocket/Socket.io server, a **campaign sharing server** with GM election and shared Deck of Consequences draws, **integrations** for Foundry VTT, Discord, Roll20, and Avrae, and a growing set of **standalone in-browser mini-tools** (including an original strategy board game, Kon'reh).
 
 ---
+
+## 🆕 What's New in v4.5.0
+
+- **🎙️ Voice Chat & TURN NAT Traversal, Actually Working** — Audited and fixed voice signaling end-to-end: both the plain-WebSocket and Socket.io transports now correctly route offer/answer/ICE-candidate/status messages (they were silently dropped over Socket.io before), and voice-status broadcasts now carry the `clientId` peers need to identify the sender. Added a `server/turn.js` short-lived TURN credential minting endpoint (`GET /api/turn-credentials`), a `coturn` service in `docker-compose.yml` (the `turn` profile), and client-side wiring (`js/core/turn.js`) so voice chat works behind symmetric NAT/restrictive firewalls, not just STUN-friendly networks.
+- **🐳 One `docker-compose up` for the Whole Ecosystem** — A root `docker-compose.yml` now brings up the web client, socket server, and (via `bots` profile) the AI GM bot and Discord bot together, with TURN as an opt-in `turn` profile. See [Quick Start](#-quick-start).
+- **📜 Community Use Policy & Split License Files** — [COMMUNITY_USE_POLICY.md](COMMUNITY_USE_POLICY.md) is a plain-language FAQ over what you can and can't do with the code/SRD/proprietary-content split. The `LICENSE.code`/`LICENSE.srd`/`LICENSE.proprietary` files the badges above link to now actually exist (they were broken links before).
+- **🩺 System Status Page** — Sidebar → System → 🩺 Status (`js/features/system-status/`) shows real-time server connection, voice chat + TURN availability, active recording, sync/offline-queue state, who else is in the room, and browser feature support, auto-refreshing every 5s. Building this surfaced and fixed a real bug: `getConnectedClients()` only worked over Socket.io — the plain-WS transport (the client's default) had no `get-clients` handler and always timed out to an empty list.
+- **📦 Module System Fixed (it never actually worked)** — The installable-adventure "module" system (`POST/GET /api/modules`, push/cleanup, and the matching WS events) resolved its storage directory as `server/modules/` in five places across `api.js` and `socketio-handlers.js`, when the real directory has always been `<repo-root>/modules/` — meaning every module install/list/push/cleanup call failed in every deployment. Also fixed: the plain-WS transport had zero handling for module events at all (Socket.io-only, same bug pattern as `get-clients` above); the `generate-manifest.js` CLI crashed on every run from a bad require path; the shipped example module's files were misnamed and invisible to every loader; and pushing a module never actually installed it into the pushing GM's own client (broadcasts don't echo to the sender). See [MODULES.md](utilities/javascript/fates-edge-socket-server/MODULES.md) for how to author and distribute one.
+- **📚 Data Schema Documentation** — [DATA_SCHEMA.md](utilities/javascript/fates-edge-web-client/DATA_SCHEMA.md) documents the on-disk shape of factions/patrons/regions/religions/talents/bestiary and exactly how manifest-based discovery works, including a fix so newly-added factions are discovered via `manifest.json` the same way regions already were (previously, "add a JSON file" alone did nothing for factions — you had to also edit a hardcoded slug array in source).
+- **🧪 57/57 socket-server tests, 61/61 web-client tests passing** after all of the above.
 
 ## 🆕 What's New in v4.4.1
 
@@ -133,17 +143,23 @@ node server-start.js
 
 The server listens on port 3000 by default. Connect your clients (web, Foundry, Discord, Roll20, terminal) to it. See [Real‑Time Campaign Server](#-real-time-campaign-server) for what it actually does under the hood.
 
-### Docker
+### Docker (the whole ecosystem, one command)
+
+The repo root has a single `docker-compose.yml` that brings up the web client and the real-time server together, with the AI GM bot, Discord bot, and a TURN relay (for voice chat NAT traversal) available as opt-in profiles:
 
 ```bash
-cd utilities/javascript/fates-edge-web-client
-docker build -t fates-edge-toolkit .
-docker run -p 3000:80 fates-edge-toolkit
-# or, for the client + dev container variant:
-docker compose -f docker-compose.yml up
+cp .env.example .env       # every value is optional for the default path
+docker-compose up          # client (localhost:8080) + server (localhost:10000)
+
+# opt in to more as needed:
+docker-compose --profile turn up         # + coturn TURN relay for voice chat
+docker-compose --profile bots up         # + AI GM bot + Discord bot
+docker-compose --profile discord-bot up  # + just the Discord bot
 ```
 
-The socket server has its own `Dockerfile` and `build.sh` under `utilities/javascript/fates-edge-socket-server/`.
+The AI GM bot lives in the separate [`fates-edge-ai-gm-bot`](https://github.com/Chronophage-net/fates-edge-ai-gm-bot) repo — clone it as a sibling directory to `fates-edge-apps` if you want the `ai-gm-bot`/`bots` profiles; every other profile works without it. See the comments at the top of `docker-compose.yml` and `.env.example` for the full option list.
+
+Each individual app also still has its own standalone `Dockerfile`/`docker-compose.yml`/`build.sh` (`utilities/javascript/fates-edge-web-client/`, `utilities/javascript/fates-edge-socket-server/`) if you only want to run one piece in isolation.
 
 ---
 
@@ -153,6 +169,8 @@ The socket server has its own `Dockerfile` and `build.sh` under `utilities/javas
 fates-edge-apps/
 ├── ADVISORY.md
 ├── API.md
+├── docker-compose.yml             # whole-ecosystem compose: client + server + optional coturn/bots (see Quick Start)
+├── .env.example
 ├── misc/                          # design notes, TODO, wiki seed data
 ├── tools/                         # repo-wide maintenance scripts (copyright headers, package sync)
 ├── utilities/
@@ -362,16 +380,20 @@ cd utilities/python/fates-edge-python-client && pip install -e . && fates-edge-c
 
 ## 🗺️ Roadmap
 
+**Shipped since the last update:** Voice chat (WebRTC, `js/features/vtt/voice.js` + `js/components/VoiceChat.js`) and session recording/logging (screen + mic capture with an auto-generated SRT subtitle manifest for video editors, `js/core/media.js`, surfaced in GM Tools) are both implemented and wired end-to-end, including short-lived TURN credentials (see `docker-compose.yml`'s `turn` profile) so voice chat traverses symmetric NAT / restrictive firewalls, not just STUN-friendly networks. A single root `docker-compose.yml` now also brings up the whole ecosystem (client + server + optional bots) in one command — see [Quick Start](#-quick-start). Licensing is also now spelled out in plain language per-category (code/SRD/proprietary) in [COMMUNITY_USE_POLICY.md](COMMUNITY_USE_POLICY.md), and the `LICENSE.code`/`LICENSE.srd`/`LICENSE.proprietary` files the badges above link to actually exist now. A **System Status** page (sidebar → System → 🩺 Status, `js/features/system-status/`) now shows real-time server connection, voice chat + TURN availability, active recording, sync/offline-queue state, who's in the room, and browser feature support, all auto-refreshing. The installable-adventure **module system** (`/api/modules`, push/cleanup) has been fixed end-to-end (it was pointed at a directory that never existed) and is documented in [MODULES.md](utilities/javascript/fates-edge-socket-server/MODULES.md); the custom-content **data schema** is documented in [DATA_SCHEMA.md](utilities/javascript/fates-edge-web-client/DATA_SCHEMA.md).
+
 Features that have been discussed or partially scaffolded but are **not yet implemented** in this build:
 
-- **Session Logging & Voice-Chat Recording** — automatic JSON session logs, recorded audio, and SRT subtitle generation. No `core/logging.js`, `core/subtitle.js`, or `features/session/` module exists yet.
-- **Session Playback / Export** — replaying or exporting a logged session as HTML/Markdown/plain text depends on the above.
+- **Session Playback / Export** — replaying or exporting a recorded/logged session as HTML/Markdown/plain text (beyond the SRT manifest voice/logging already produces).
+- **VTT/bot audit for new server APIs** — the Discord bot, AI GM bot, Foundry bridge, Roll20 integration, terminal client, and Python clients haven't yet been individually reviewed for whether they should adopt the new TURN-credentials endpoint or the fixed module-push API.
 
-If you were looking for these from an earlier README revision: they were documented ahead of implementation and have been pulled back to this roadmap section until they actually ship.
+If you were looking for the voice-chat/logging line from an earlier README revision: it was documented ahead of implementation at the time and pulled back to this roadmap section — it has since actually shipped, per the note above.
 
 ---
 
 ## 🔐 License
+
+**New here?** [COMMUNITY_USE_POLICY.md](COMMUNITY_USE_POLICY.md) is a plain-language FAQ over the license files below — start there if you're wondering "can I do X with this repo."
 
 ### Code (MIT License)
 All source code in this repository is licensed under the **MIT License**. See [LICENSE.code](LICENSE.code).
@@ -428,7 +450,18 @@ Licensed under **CC BY-NC-SA 4.0**. See [LICENSE.srd](LICENSE.srd).
 
 ## 📋 Version History
 
-### v4.4.1 (Current)
+### v4.5.0 (Current)
+- **Added** TURN credential minting (`server/turn.js`, `GET /api/turn-credentials`) and a `coturn` docker-compose service, so voice chat traverses symmetric NAT/restrictive firewalls
+- **Added** Unified root `docker-compose.yml` bringing up client + server + optional bots in one command
+- **Added** `COMMUNITY_USE_POLICY.md` plus split `LICENSE.code`/`LICENSE.srd`/`LICENSE.proprietary` files
+- **Added** System Status page (`js/features/system-status/`)
+- **Added** [MODULES.md](utilities/javascript/fates-edge-socket-server/MODULES.md) and [DATA_SCHEMA.md](utilities/javascript/fates-edge-web-client/DATA_SCHEMA.md)
+- **Fixed** Voice signaling was silently dropped over Socket.io, and voice-status broadcasts were missing the `clientId` peers need to identify the sender
+- **Fixed** `getConnectedClients()`/`get-clients` only worked over Socket.io; the plain-WS default transport always timed out to an empty list
+- **Fixed** The module system's storage path resolved to a directory (`server/modules/`) that has never existed, in 5 places across 2 files — every module install/list/push/cleanup call failed in every deployment. Also fixed: missing plain-WS handlers for module events, a broken `generate-manifest.js` require path, a misnamed shipped example module, and pushed modules never installing into the pushing GM's own client.
+- **Fixed** Factions were only discoverable via a hardcoded slug array; now tries `data/factions/manifest.json` first, consistent with regions (which had the same bug, also fixed this cycle)
+
+### v4.4.1
 - **Added** Full test suites across the ecosystem (ai-gm-bot, socket server, web client — see "What's New" above)
 - **Added** Magic item decay/upkeep tracking (Maintained → Neglected → Compromised) tied to a new `downtime-tick` event, and a per-downtime Forage limit in Crafting
 - **Added** `/mychar` account-character commands in the terminal client

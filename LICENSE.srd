@@ -1,0 +1,41 @@
+# Fate's Edge — System Reference Document (SRD) License
+
+This file covers the **System Reference Document (SRD)** portion of the
+game content shipped in this repository — not the software source code
+(see [LICENSE.code](LICENSE.code)) and not the setting-specific proprietary
+content (see [LICENSE.proprietary](LICENSE.proprietary)). See
+[COMMUNITY_USE_POLICY.md](COMMUNITY_USE_POLICY.md) for a plain-language
+breakdown of what falls into which category and what you can/can't do
+with each.
+
+---
+
+## System Reference Document (SRD) — CC BY-NC-SA 4.0
+
+A portion of the rules and mechanical frameworks is released as the Fate's
+Edge System Reference Document under the **Creative Commons
+Attribution-NonCommercial-ShareAlike 4.0 International License**.
+
+To view a copy of this license, visit
+https://creativecommons.org/licenses/by-nc-sa/4.0/
+
+The SRD includes:
+- Core mechanical systems (dice pools, Position/Effect, Boons, Story Beats)
+- General game terminology and resolution procedures
+- The *Essentials Guide* (when marked as SRD)
+- Any file explicitly tagged as "SRD" (including `data/docs/` content marked as such)
+
+You are free to share and adapt the SRD for non-commercial purposes, provided
+you:
+- Give appropriate credit to Nicholas A. Gasper
+- Indicate if changes were made
+- Distribute your contributions under this same license (CC BY-NC-SA 4.0)
+
+For the fuller creator-facing FAQ on publishing/streaming/selling SRD-based
+work, see [fates-edge-docs' third-party-policy.md](https://github.com/Chronophage-net/fates-edge-docs/blob/main/third-party-policy.md).
+
+---
+
+© 2024 Nicholas A. Gasper. See [LICENSE.md](LICENSE.md) for the full
+combined license (code + game content together) if you only want to read
+one file.

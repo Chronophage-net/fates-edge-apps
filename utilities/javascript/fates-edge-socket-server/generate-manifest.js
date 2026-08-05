@@ -20,7 +20,11 @@
 
 const fs = require('fs');
 const path = require('path');
-const { deriveManifestFromContent } = require('./module-manifest-utils.js');
+// FIX: module-manifest-utils.js actually lives under server/, not at the
+// repo root alongside this script -- this require() has been throwing
+// MODULE_NOT_FOUND unconditionally, meaning this CLI tool has never been
+// able to run at all.
+const { deriveManifestFromContent } = require('./server/module-manifest-utils.js');
 
 const MODULES_DIR = path.join(__dirname, 'modules');
 

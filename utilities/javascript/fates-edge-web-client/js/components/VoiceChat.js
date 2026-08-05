@@ -5,7 +5,14 @@
 import { showToast } from './Toast.js';
 
 export class VoiceChat {
-    constructor() {
+    /**
+     * @param {Array<{urls: string, username?: string, credential?: string}>} [extraIceServers]
+     *   Additional ICE servers (typically short-lived TURN credentials
+     *   fetched from the server -- see core/turn.js) to use alongside the
+     *   default public STUN servers. STUN alone can't traverse symmetric
+     *   NAT / restrictive firewalls, which is what TURN is for.
+     */
+    constructor(extraIceServers = []) {
         this.localStream = null;
         this.remoteStreams = new Map();
         this.peerConnections = new Map();
@@ -16,12 +23,13 @@ export class VoiceChat {
         this.voiceActivity = 0;
         this.animationId = null;
         this.activityListeners = [];
-        
+
         this.configuration = {
             iceServers: [
                 { urls: 'stun:stun.l.google.com:19302' },
                 { urls: 'stun:stun1.l.google.com:19302' },
-                { urls: 'stun:stun2.l.google.com:19302' }
+                { urls: 'stun:stun2.l.google.com:19302' },
+                ...(Array.isArray(extraIceServers) ? extraIceServers : [])
             ],
             iceCandidatePoolSize: 10
         };

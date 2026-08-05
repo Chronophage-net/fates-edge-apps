@@ -1102,6 +1102,78 @@ function exportAdventure(id) {
     showToast(`📤 Exported "${adventure.title}"`, 'success');
 }
 
+/**
+ * Normalize + merge an adventure content object into the local adventure
+ * library and persist it. Shared by importAdventureFromFile() (manual
+ * "Load from File") and installAdventureContent() (automated installs,
+ * e.g. a GM/bot pushing a module over the wire — see
+ * js/features/vtt/vtt-connected.js's 'module-push' handler).
+ *
+ * Re-syncs with persisted state first, so this is safe to call even if
+ * this module was loaded a while ago in a tab that isn't the active one
+ * (avoids clobbering changes made elsewhere with a stale in-memory copy).
+ *
+ * @param {object} data - adventure content (same shape as a
+ *   data/adventures/*.json file: at minimum { title, acts: [...] }).
+ * @param {{ confirmOverwrite?: boolean, silent?: boolean, sourceLabel?: string }} [options]
+ * @returns {object} the normalized, installed adventure object.
+ * @throws if `data` is missing a `title`.
+ */
+function installAdventureContent(data, options = {}) {
+    const { confirmOverwrite = false, silent = false, sourceLabel = 'Imported' } = options;
+
+    if (!data || typeof data !== 'object' || !data.title) {
+        throw new Error('Invalid adventure format: missing "title".');
+    }
+
+    if (!Array.isArray(data.acts)) data.acts = [];
+    data.acts = data.acts.map(act => ({ ...act, scenes: Array.isArray(act.scenes) ? act.scenes : [] }));
+    if (!Array.isArray(data.npcs)) data.npcs = [];
+    if (!Array.isArray(data.locations)) data.locations = [];
+    if (!Array.isArray(data.campaignTimers)) data.campaignTimers = [];
+    if (!Array.isArray(data.bestiary)) data.bestiary = [];
+    if (!data.timerIds) data.timerIds = [];
+    repairAdventureIds(data);
+
+    // Round-trip through JSON to catch anything non-serializable before it
+    // ever reaches persisted state.
+    JSON.parse(JSON.stringify(data));
+
+    loadAdventuresFromState();
+
+    const existing = adventures.find(a => a.id === data.id);
+    if (existing) {
+        if (confirmOverwrite && !confirm(`Adventure "${data.title}" already exists. Overwrite?`)) {
+            return null;
+        }
+        Object.assign(existing, data);
+    } else {
+        adventures.push(data);
+    }
+
+    const saved = saveAdventuresToState();
+    if (saved && !silent) {
+        showToast(`📥 ${sourceLabel}: "${data.title}"`, 'success');
+    }
+    return data;
+}
+
+/**
+ * Remove a previously-installed adventure by id (e.g. in response to a
+ * 'module-cleanup' broadcast). Silent no-op if it isn't present — cleanup
+ * requests can arrive for a module this client never actually installed.
+ */
+function removeInstalledAdventure(id) {
+    loadAdventuresFromState();
+    const before = adventures.length;
+    adventures = adventures.filter(a => a.id !== id);
+    if (adventures.length !== before) {
+        saveAdventuresToState();
+        return true;
+    }
+    return false;
+}
+
 async function importAdventureFromFile() {
     if (!isGM()) {
         showToast('Only the GM can import adventures.', 'error');
@@ -1129,44 +1201,16 @@ async function importAdventureFromFile() {
                     resolve(null);
                     return;
                 }
-                if (!data.title) {
-                    showToast('Invalid adventure format: missing "title".', 'error');
-                    resolve(null);
-                    return;
-                }
 
-                if (!Array.isArray(data.acts)) data.acts = [];
-                data.acts = data.acts.map(act => ({ ...act, scenes: Array.isArray(act.scenes) ? act.scenes : [] }));
-                if (!Array.isArray(data.npcs)) data.npcs = [];
-                if (!Array.isArray(data.locations)) data.locations = [];
-                if (!Array.isArray(data.campaignTimers)) data.campaignTimers = [];
-                if (!Array.isArray(data.bestiary)) data.bestiary = [];
-                if (!data.timerIds) data.timerIds = [];
-                repairAdventureIds(data);
-
+                let installed;
                 try {
-                    JSON.parse(JSON.stringify(data));
-                } catch (e) {
-                    showToast(`This file's data can't be used (${e.message}).`, 'error');
+                    installed = installAdventureContent(data, { confirmOverwrite: true, sourceLabel: 'Imported' });
+                } catch (validationErr) {
+                    showToast(validationErr.message, 'error');
                     resolve(null);
                     return;
                 }
-
-                const existing = adventures.find(a => a.id === data.id);
-                if (existing) {
-                    if (!confirm(`Adventure "${data.title}" already exists. Overwrite?`)) {
-                        resolve(null);
-                        return;
-                    }
-                    Object.assign(existing, data);
-                } else {
-                    adventures.push(data);
-                }
-                const saved = saveAdventuresToState();
-                if (saved) {
-                    showToast(`📥 Imported "${data.title}"`, 'success');
-                }
-                resolve(data);
+                resolve(installed);
             } catch (err) {
                 showToast('Failed to import adventure: ' + err.message, 'error');
                 resolve(null);
@@ -2447,5 +2491,7 @@ export {
     importAdventureFromFile,
     importCrownSpreadAsAdventure,
     createAdventureFromCrownSpreadReading,
-    startSceneEncounter
+    startSceneEncounter,
+    installAdventureContent,
+    removeInstalledAdventure
 };

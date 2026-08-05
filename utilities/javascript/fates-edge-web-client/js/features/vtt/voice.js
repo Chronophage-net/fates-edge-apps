@@ -8,7 +8,8 @@
 import { initMediaModule } from '../../core/media.js';
 import { getState, getStableClientId } from '../../core/state.js';
 import { VoiceChat } from '../../components/VoiceChat.js';
-import { onEvent, sendEvent, getSocketId, isConnectedToServer, onWSEvent, offWSEvent } from '../../core/websocket.js';
+import { sendVoiceOffer, sendVoiceAnswer, sendVoiceICECandidate, sendVoiceStatus, getSocketId, isConnectedToServer, onWSEvent, offWSEvent } from '../../core/websocket.js';
+import { fetchTurnIceServers } from '../../core/turn.js';
 import { showToast } from '../../components/Toast.js';
 
 // ============================================================
@@ -133,7 +134,14 @@ export async function initVoice() {
         // Initialize media module for session recording
         await initializeMediaModule();
 
-        voiceChat = new VoiceChat();
+        // Best-effort: pulls short-lived TURN credentials from the
+        // connected server if it has any configured (see core/turn.js).
+        // Resolves to [] instantly on any failure/absence, so this never
+        // delays or blocks voice init -- it just means STUN-only ICE
+        // servers, same as before this existed.
+        const extraIceServers = await fetchTurnIceServers();
+
+        voiceChat = new VoiceChat(extraIceServers);
         const success = await voiceChat.init();
         if (!success) {
             showToast('Failed to initialize voice chat.', 'error');
@@ -146,8 +154,16 @@ export async function initVoice() {
         setupVoiceEvents();
 
         // Notify room
-        sendEvent({
-            type: 'voice-status',
+        // 👇 FIX: was missing `clientId`, so every receiving client's
+        // statusHandler (`if (!clientId ...) return;`) bailed out
+        // immediately and never learned this client had voice enabled.
+        // Group auto-connect via voice-status was silently a no-op.
+        // Also switched from the generic event-relay helper (which is
+        // dropped server-side under Socket.io transport -- see the
+        // dedicated offer/answer/ICE-candidate send calls below) to the
+        // dedicated, transport-aware sendVoiceStatus().
+        sendVoiceStatus({
+            clientId: getSocketId(),
             enabled: true,
             name: localStorage.getItem('fates-edge-client-name') || 'Player'
         });
@@ -210,8 +226,7 @@ function setupVoiceEvents() {
             const answer = await pc.createAnswer();
             await pc.setLocalDescription(answer);
 
-            sendEvent({
-                type: 'voice-answer',
+            sendVoiceAnswer({
                 from: getSocketId(),
                 to: from,
                 answer: answer
@@ -429,8 +444,7 @@ function detectSpeaking(clientId, stream) {
  * Handle ICE candidate from peer
  */
 function onIceCandidate(clientId, candidate) {
-    sendEvent({
-        type: 'voice-ice-candidate',
+    sendVoiceICECandidate({
         from: getSocketId(),
         to: clientId,
         candidate: candidate
@@ -503,8 +517,7 @@ export async function initiateVoiceCall(targetClientId) {
         const offer = await pc.createOffer();
         await pc.setLocalDescription(offer);
 
-        sendEvent({
-            type: 'voice-offer',
+        sendVoiceOffer({
             from: getSocketId(),
             to: targetClientId,
             offer: offer,
@@ -612,8 +625,8 @@ export function cleanupVoice() {
 
     // Notify room
     try {
-        sendEvent({
-            type: 'voice-status',
+        sendVoiceStatus({
+            clientId: getSocketId(),
             enabled: false
         });
     } catch (e) { /* ignore */ }

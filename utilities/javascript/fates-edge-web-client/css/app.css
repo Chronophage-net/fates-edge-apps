@@ -411,6 +411,25 @@ h1, h2, h3, h4, h5, h6 {
 }
 .status-dot.saving { background: var(--gold); box-shadow: 0 0 6px var(--gold-glow); animation: pulse 1s infinite; }
 .status-dot.error { background: var(--accent-red); box-shadow: 0 0 6px var(--red-glow); }
+/* Generic online/offline/connecting variants, usable outside .sync-status
+   and .presence-item (which previously scoped these same three states) --
+   e.g. the System Status page applies them directly to a bare .status-dot. */
+.status-dot.online { background: var(--green); box-shadow: 0 0 6px var(--green-glow); }
+.status-dot.offline { background: var(--red); box-shadow: 0 0 6px var(--red-glow); }
+.status-dot.connecting { background: var(--gold); box-shadow: 0 0 6px var(--gold-glow); animation: pulse 1s infinite; }
+
+/* Simple label/value row used by System Status (and available anywhere
+   else a compact key-value status list is useful). */
+.status-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    padding: 0.35rem 0;
+    border-bottom: 1px solid var(--border, rgba(255,255,255,0.06));
+    font-size: 0.85rem;
+}
+.status-row:last-child { border-bottom: none; }
 
 .footer-actions {
     display: flex;

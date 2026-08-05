@@ -164,10 +164,33 @@ export async function discoverRegions(regionDir = './data/regions') {
     } catch (_) {}
 
     console.log('[Discovery] Discovering available regions...');
+
+    // 2. Try manifest.json first. FIX: this function's own doc comment on
+    // KNOWN_REGION_SLUGS already claimed "used only as a fallback if
+    // manifest.json cannot be fetched", but the code never actually tried
+    // the manifest at all -- it went straight to the hardcoded list below,
+    // every time. That meant dropping a new region JSON file (and adding
+    // it to data/regions/manifest.json, as documented) did nothing; the
+    // only way to make a new region show up was editing this source file
+    // and shipping a new build. See js/tools/generate-manifests.js to
+    // (re)generate manifest.json from whatever's actually in the folder.
+    let slugs = KNOWN_REGION_SLUGS;
+    try {
+        const res = await fetch(`${regionDir}/manifest.json`);
+        if (res.ok) {
+            const manifest = await res.json();
+            if (Array.isArray(manifest) && manifest.length > 0) {
+                slugs = manifest;
+                console.log(`[Discovery] Loaded region manifest (${slugs.length} entries)`);
+            }
+        }
+    } catch (_) { /* fall through to KNOWN_REGION_SLUGS */ }
+
     const found = [];
 
-    // 2. Test each known slug with HEAD
-    await Promise.all(KNOWN_REGION_SLUGS.map(async (slug) => {
+    // 3. Test each candidate slug with HEAD (still needed even with a
+    // manifest, since the manifest may list stale/renamed/removed files).
+    await Promise.all(slugs.map(async (slug) => {
         try {
             const res = await fetch(`${regionDir}/${slug}.json`, { method: 'HEAD' });
             if (res.ok) {

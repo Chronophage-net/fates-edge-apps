@@ -11,6 +11,7 @@ const path = require('path');
 const { buildSafeDict, isSafeModuleId, clampCount } = require('./security.js');
 const adventure = require('./adventure.js');
 const auth = require('./auth.js');
+const turn = require('./turn.js');
 
 // Optional -- see storage.js's file-header note on why account features
 // degrade gracefully instead of hard-failing if the DB module isn't
@@ -20,8 +21,10 @@ try { storage = require('./storage.js'); } catch (e) { storage = null; }
 function hasAccountSupport() { return !!(storage && typeof storage.getMembership === 'function'); }
 
 let socketStats = { socketIOConnections: 0, totalConnections: 0 };
+let ioConfig = {};
 
-function setupSocketIO(io) {
+function setupSocketIO(io, appConfig) {
+    ioConfig = appConfig || {};
     io.on('connection', (socket) => {
         socketStats.socketIOConnections++;
         socketStats.totalConnections++;
@@ -471,12 +474,26 @@ function setupSocketIO(io) {
             }
         });
 
+        // ─── TURN credentials ──────────────────────────────────────────
+        // See server/turn.js. Supports both the ack-callback style (used
+        // here) and, since the client only calls this via a fire-and-listen
+        // pattern for transport symmetry with the plain-WS path, also
+        // emits a 'turn-credentials' event back to the same socket.
+        socket.on('turn-credentials-request', (callback) => {
+            const result = turn.mintCredentials(ioConfig, socket.id);
+            const payload = result || { iceServers: [] };
+            if (typeof callback === 'function') callback(payload);
+            socket.emit('turn-credentials', payload);
+        });
+
         // ─── Module management ──────────────────────────────────────
         socket.on('module-push-request', (data, callback) => {
             const { moduleId } = data || {};
             if (!moduleId) return callback?.({ error: 'Module ID required' });
             if (!isSafeModuleId(moduleId)) return callback?.({ error: 'Invalid module id' });
-            const modulesPath = path.join(__dirname, 'modules', moduleId);
+            // FIX: was `path.join(__dirname, 'modules', moduleId)` -- see
+            // the identical fix + explanation in api.js's listModulesHandler.
+            const modulesPath = path.join(__dirname, '..', 'modules', moduleId);
             if (!fs.existsSync(modulesPath)) return callback?.({ error: 'Module not found' });
             const manifestPath = path.join(modulesPath, 'manifest.json');
             if (!fs.existsSync(manifestPath)) return callback?.({ error: 'Module manifest not found' });
@@ -523,7 +540,7 @@ function setupSocketIO(io) {
 
         socket.on('module-list', (callback) => {
             const modules = [];
-            const modulesPath = path.join(__dirname, 'modules');
+            const modulesPath = path.join(__dirname, '..', 'modules');
             if (fs.existsSync(modulesPath)) {
                 const items = fs.readdirSync(modulesPath);
                 for (const item of items) {

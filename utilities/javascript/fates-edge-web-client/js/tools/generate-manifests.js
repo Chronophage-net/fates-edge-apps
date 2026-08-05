@@ -17,6 +17,13 @@ const DATA_DIRS = [
 ];
 
 const EXCLUDED_FILES = new Set(['manifest.json', 'manifest-core.json', 'manifest-core.json.tmp']);
+// FIX: EXCLUDED_FILES only ever caught the exact name "manifest.json" --
+// any *other* manifest-shaped file living alongside real data (e.g.
+// data/factions/factions-manifest.json, a leftover/alternate manifest)
+// slipped through the `f.endsWith('.json')` filter below and got listed
+// as if it were a real faction/patron/etc. entry, which then 404s when
+// something tries to fetch "factions-manifest.json" as actual content.
+const EXCLUDED_FILE_PATTERN = /manifest.*\.json(\.tmp)?$/i;
 
 // ─── Category mapping: subdir → category info ────────────────────
 const CATEGORY_MAP = {
@@ -183,7 +190,7 @@ function generateSimpleManifest(dirPath) {
   } catch (_) { return null; }
 
   const slugs = files
-    .filter(f => f.endsWith('.json') && !EXCLUDED_FILES.has(f))
+    .filter(f => f.endsWith('.json') && !EXCLUDED_FILES.has(f) && !EXCLUDED_FILE_PATTERN.test(f))
     .map(f => getFileSlug(f));
 
   if (slugs.length === 0) {

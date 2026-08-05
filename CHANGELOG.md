@@ -3,6 +3,12 @@ All notable changes to this project will be documented here.
 
 Format loosely follows [Keep a Changelog](https://keepachangelog.com/), versions follow [Semantic Versioning](https://semver.org/).
 
+## [4.5.0] - 2026-08-05
+
+Voice/logging fully implemented (TURN NAT traversal), unified docker-compose for the whole ecosystem, community use policy + split license files, System Status page, module system fixed and documented, data schema docs
+
+_No commits since the last tag — manual version bump._
+
 ## [4.4.2] - 2026-08-05
 
 Fixed remaining stale v4.3a version references in README.md/DESIGN.md files (root README title/badge/What's New/Version History, JS toolkit README, socket-server README/DESIGN, web-client DESIGN). Taught bump-version.mjs to auto-catch README/DESIGN title lines and version badges going forward (conservatively — narrative changelog sections still need a human).

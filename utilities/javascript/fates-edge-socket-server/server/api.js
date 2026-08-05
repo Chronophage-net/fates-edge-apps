@@ -26,6 +26,7 @@ const { safeAssign, buildSafeDict, isSafeModuleId, isSafeCampaignCode, clampCoun
 const adventure = require('./adventure.js');
 const { deriveManifestFromContent } = require('./module-manifest-utils.js');
 const auth = require('./auth.js');
+const turn = require('./turn.js');
 
 let config = {};
 
@@ -131,6 +132,21 @@ function createApiRouter(appConfig) {
                 rooms: roomStats
             }
         });
+    });
+
+    // ─── TURN credentials ─────────────────────────────────────────────
+    // Deliberately NOT behind `authenticate` (the admin API key). Any
+    // player's browser needs this to establish voice chat, same trust
+    // boundary as being able to join a room/WS connection at all -- the
+    // credential itself is short-lived (see turn.js) specifically so it's
+    // safe to hand out without an admin key.
+    router.get('/api/turn-credentials', (req, res) => {
+        const label = typeof req.query.clientId === 'string' ? req.query.clientId : 'anon';
+        const result = turn.mintCredentials(config, label);
+        if (!result) {
+            return res.status(404).json({ error: 'No TURN server configured on this deployment.' });
+        }
+        res.json(result);
     });
 
     // ─── Room list ──────────────────────────────────────────────────
@@ -548,8 +564,14 @@ function createApiRouter(appConfig) {
     // routes now serve the identical handler/response.
     function listModulesHandler(req, res) {
         const modules = [];
-        // 1. Scan server/modules/ (legacy module folders)
-        const modulesPath = path.join(__dirname, 'modules');
+        // 1. Scan <repo-root>/modules/ (installable module folders).
+        // FIX: this was `path.join(__dirname, 'modules')` -- __dirname
+        // here is server/, so that resolved to server/modules/, which
+        // has never existed. The real directory (what the Dockerfile
+        // COPYs, what generate-manifest.js targets, and where the
+        // shipped example-module/ actually lives) is one level up. Every
+        // module install/list/push/cleanup route below had this same bug.
+        const modulesPath = path.join(__dirname, '..', 'modules');
         if (fs.existsSync(modulesPath)) {
             const items = fs.readdirSync(modulesPath);
             for (const item of items) {
@@ -639,7 +661,7 @@ function createApiRouter(appConfig) {
                 return res.status(400).json({ error: 'content.acts must be a non-empty array' });
             }
 
-            const moduleDir = path.join(__dirname, 'modules', id);
+            const moduleDir = path.join(__dirname, '..', 'modules', id);
             const manifestPath = path.join(moduleDir, 'manifest.json');
             const adventurePath = path.join(moduleDir, 'adventure.json');
 
@@ -666,7 +688,7 @@ function createApiRouter(appConfig) {
                 return res.status(400).json({ error: 'Invalid module id' });
             }
             const { roomCode } = req.body;
-            const modulesPath = path.join(__dirname, 'modules', moduleId);
+            const modulesPath = path.join(__dirname, '..', 'modules', moduleId);
             if (!fs.existsSync(modulesPath)) return res.status(404).json({ error: 'Module not found' });
             const manifestPath = path.join(modulesPath, 'manifest.json');
             if (!fs.existsSync(manifestPath)) return res.status(404).json({ error: 'Module manifest not found' });
@@ -1425,6 +1447,7 @@ function createApiRouter(appConfig) {
             version: "9.0.0",
             endpoints: {
                 health: { get: `GET ${config.healthEndpoint} - Server health check with stats` },
+                turn: { get: 'GET /api/turn-credentials?clientId=X - Mint short-lived TURN credentials (no API key required; 404 if TURN_SECRET is not configured)' },
                 rooms: { get: 'GET /api/rooms - List all rooms with stats' },
                 clients: {
                     list: 'GET /api/rooms/:code/clients - List clients in room',

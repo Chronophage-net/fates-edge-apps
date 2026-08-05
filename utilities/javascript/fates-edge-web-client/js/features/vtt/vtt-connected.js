@@ -531,14 +531,31 @@ async function handleModuleList() {
 async function handleModulePush(moduleId) {
     if (isDestroyed) return;
     const isConnected = isConnectedToServer();
-    
+
     if (isConnected) {
         try {
             const result = await requestModulePush(moduleId);
             if (result && result.error) {
                 showToast(`Module push failed: ${result.error}`, 'error');
-            } else {
-                showToast(`📦 Module pushed: ${moduleId}`, 'success');
+                return;
+            }
+
+            showToast(`📦 Module pushed: ${moduleId}`, 'success');
+
+            // FIX: the server's broadcast excludes the sender (standard
+            // "don't echo my own action back to me" pattern -- see
+            // room.broadcastToRoom's exclude-client-id param), so without
+            // this the person who actually pushed the module never got it
+            // installed locally, only everyone else in the room did.
+            const adventureJson = result?.module?.files && result.module.files['adventure.json'];
+            if (adventureJson) {
+                try {
+                    const content = JSON.parse(adventureJson);
+                    const adventureManager = await import('../adventure-manager/index.js');
+                    adventureManager.installAdventureContent(content, { sourceLabel: '📦 Module installed' });
+                } catch (err) {
+                    console.warn('[VTT Connected] Pushed module could not be auto-installed locally:', err);
+                }
             }
         } catch (error) {
             console.warn('[VTT Connected] Failed to push module:', error);
@@ -1084,19 +1101,52 @@ function setupWebSocketSync() {
     onWSEvent('module-list', moduleListHandler);
     wsListeners.set('module-list', moduleListHandler);
 
-    const modulePushHandler = (data) => {
+    // FIX: this used to just show a toast and do nothing else -- a pushed
+    // module never actually became loadable. It's now installed into the
+    // local adventure library (the same place "Load from File" puts
+    // things), so it shows up in Adventure Manager immediately, same as
+    // if the GM had imported the file by hand. Only `files['adventure.json']`
+    // is understood right now (see server/api.js's module-push payload
+    // shape and DATA_SCHEMA.md's "Adventure modules" section) -- modules
+    // whose sole file is a differently-named adventure JSON (like the
+    // shipped server/modules/example-module/ before it was renamed to
+    // match) won't auto-install; this still announces the push either way.
+    const modulePushHandler = async (data) => {
         if (isDestroyed) return;
         const module = data.module || {};
         const name = module.manifest?.name || module.id || 'Unknown';
-        showToast(`📦 Module pushed: ${name}`, 'success');
+        const adventureJson = module.files && module.files['adventure.json'];
+
+        if (!adventureJson) {
+            showToast(`📦 Module pushed: ${name} (no adventure.json to auto-install)`, 'info');
+            return;
+        }
+
+        try {
+            const content = JSON.parse(adventureJson);
+            const adventureManager = await import('../adventure-manager/index.js');
+            adventureManager.installAdventureContent(content, {
+                sourceLabel: `📦 Module pushed`
+            });
+        } catch (err) {
+            console.warn('[VTT] Failed to auto-install pushed module:', err);
+            showToast(`📦 Module pushed: ${name} (auto-install failed: ${err.message})`, 'warning');
+        }
     };
     onWSEvent('module-push', modulePushHandler);
     wsListeners.set('module-push', modulePushHandler);
 
-    const moduleCleanupHandler = (data) => {
+    const moduleCleanupHandler = async (data) => {
         if (isDestroyed) return;
         const moduleId = data.moduleId || 'Unknown';
-        showToast(`🧹 Module cleanup: ${moduleId}`, 'info');
+        try {
+            const adventureManager = await import('../adventure-manager/index.js');
+            const removed = adventureManager.removeInstalledAdventure(moduleId);
+            showToast(removed ? `🧹 Module removed: ${moduleId}` : `🧹 Module cleanup: ${moduleId} (was not installed here)`, 'info');
+        } catch (err) {
+            console.warn('[VTT] Failed to clean up module:', err);
+            showToast(`🧹 Module cleanup: ${moduleId}`, 'info');
+        }
     };
     onWSEvent('module-cleanup', moduleCleanupHandler);
     wsListeners.set('module-cleanup', moduleCleanupHandler);

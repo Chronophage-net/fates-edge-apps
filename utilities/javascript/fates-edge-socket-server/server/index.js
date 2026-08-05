@@ -51,11 +51,11 @@ const io = socketIo(server, {
     transports: ['websocket', 'polling']
 });
 room.setIo(io);                // enable room.broadcastToRoom for Socket.io
-ioHandlers.setupSocketIO(io);
+ioHandlers.setupSocketIO(io, config);
 
 // ---------- Plain WebSocket ----------
 const wss = new WebSocket.Server({ server, path: '/' });
-wsHandlers.setupWSS(wss);
+wsHandlers.setupWSS(wss, config);
 
 // Prevent the WebSocket server from crashing on underlying HTTP errors
 wss.on('error', (err) => {

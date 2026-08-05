@@ -44,6 +44,7 @@ const ROUTE_IMPORTS = {
     docs:        () => import('./features/docs/index.js'),
     search:      () => import('./features/search/index.js'),
     settings:    () => import('./features/settings/index.js'),
+    'system-status': () => import('./features/system-status/index.js'),
     sync:        () => import('./features/sync/index.js'),
     whiteboard:  () => import('./features/whiteboard/index.js'),
     kanban:      () => import('./features/kanban/index.js'),
