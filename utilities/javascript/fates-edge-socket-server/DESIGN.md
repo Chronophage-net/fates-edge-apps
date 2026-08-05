@@ -1,6 +1,6 @@
 # Fate's Edge VTT - Design Documentation
 
-> **Status (Toolkit v4.3a):** Account authentication (register/login, JWT-backed sessions, bcrypt password hashing) described below is implemented in `server/auth.js` / `server/api.js`. The AI GM bot referenced in earlier revisions of the wider ecosystem has been removed; this server's design is otherwise unchanged.
+> **Status (Toolkit v4.4.1):** Account authentication (register/login, JWT-backed sessions, bcrypt password hashing) described below is implemented in `server/auth.js` / `server/api.js`, and now has real unit-level test coverage (`tests/auth.test.js`, `tests/deck.test.js`, `tests/adventure.test.js` — see the root README's "What's New"). The AI GM bot referenced in earlier revisions of the wider ecosystem has been removed; this server's design is otherwise unchanged.
 
 ## System Architecture
 

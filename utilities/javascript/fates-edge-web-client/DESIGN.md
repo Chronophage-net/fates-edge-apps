@@ -2,10 +2,10 @@
 
 **Version:** 3.0
 **Date:** 2026-07-13
-**Status:** Implemented (see `js/core/sync/`); toolkit is now at v4.3a
+**Status:** Implemented (see `js/core/sync/`); toolkit is now at v4.4.1
 **Author:** Nicholas A. Gasper
 
-> **Note (v4.3a):** The real-time sync design below shipped and is unchanged in shape. Since this document was written, the toolkit has added account authentication against the campaign server (register/login/JWT, see the socket server's `DESIGN.md`), a redone Python client, and VTT bridge/mod updates. The previously-planned AI GM bot companion project has been removed from the ecosystem.
+> **Note (v4.4.1):** The real-time sync design below shipped and is unchanged in shape. Since this document was written, the toolkit has added account authentication against the campaign server (register/login/JWT, see the socket server's `DESIGN.md`), a redone Python client, VTT bridge/mod updates, and a real test suite (`tests/unit/`, `tests/integration/` — see the root README's "What's New"). The previously-planned AI GM bot companion project has been removed from the ecosystem.
 
 ---
 

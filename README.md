@@ -1,6 +1,6 @@
 [![Build Apps and Packages](https://github.com/Chronophage-net/fates-edge-apps/actions/workflows/build-apps-and-packages.yml/badge.svg)](https://github.com/Chronophage-net/fates-edge-apps/actions/workflows/build-apps-and-packages.yml)
 
-# Fate's Edge Toolkit v4.3a – Complete VTT Ecosystem
+# Fate's Edge Toolkit v4.4.2 – Complete VTT Ecosystem
 
 > A modular, self-contained toolkit for running Fate's Edge TTRPG campaigns, with real‑time collaboration, VTT integrations, Game Master management, and a full in-browser magic/monastic-path system.
 
@@ -10,14 +10,14 @@
 [![Node.js](https://img.shields.io/badge/Node.js-24.x-green.svg)](https://nodejs.org/)
 [![Foundry VTT](https://img.shields.io/badge/Foundry-VTT-orange)](https://foundryvtt.com/)
 [![Discord](https://img.shields.io/badge/Discord-Bot-5865F2)](https://discord.com/)
-[![Version](https://img.shields.io/badge/version-4.3a-blue)](https://github.com/nicholasagaspar/fates-edge-apps)
+[![Version](https://img.shields.io/badge/version-4.4.2-blue)](https://github.com/nicholasagaspar/fates-edge-apps)
 
 ---
 
 ## 📖 Table of Contents
 
 - [Overview](#-overview)
-- [What's New in v4.3a](#-whats-new-in-v43a)
+- [What's New in v4.4.1](#-whats-new-in-v441)
 - [Features](#-features)
 - [Quick Start](#-quick-start)
 - [Architecture](#-architecture)
@@ -40,15 +40,14 @@ The toolkit includes **real‑time VTT features** via a WebSocket/Socket.io serv
 
 ---
 
-## 🆕 What's New in v4.3a
+## 🆕 What's New in v4.4.1
 
-- **🔐 Account Authentication** – The campaign server now supports real account registration and login (`/api/auth/register`, `/api/auth/login`) with bcrypt password hashing and JWT-backed sessions, alongside the existing API-key and playtester-password gates. See `utilities/javascript/fates-edge-socket-server/server/auth.js`.
-- **🐍 Redone Python Client** – The Python CLI (`fates-edge-client`, now v5.0.0) has been rebuilt as a proper structured package (`cli/`, `rest_client.py`, `ws_client.py`, `shell.py`, `deck.py`, `models.py`, `store.py`) instead of a flat script, with clearer separation between REST and WebSocket transport.
-- **🕹️ VTT Bridge & Mod Updates** – Refreshed Foundry VTT bridge and Roll20 API script, with fixes to region/deck sync and clearer setup docs.
-- **🖥️ No More Pop-Up Modals** – Every feature that previously used a floating pop-up modal (factions, characters, encounters, spellcraft, wiki, whiteboard, timers, decks, Kon'reh, and more) now opens as a real inline "editor screen" that takes over the view in place, with a `← Back` button — no more backdrop dialogs to dismiss.
-- **📖 Region & Patron Content Pass** – Rebuilt several regions (Theona, Linn, Vilikari, Black Banners, The Ways Between) from their authored source material into the same rich, structured schema used across the rest of the map, and cleaned up stray leftover data files from an earlier broken conversion pass.
-- **🩹 Fixes** – Region descriptions no longer render flattened/dimmed in the Decks region browser and Crown Spread (a formatting/color regression), region and patron manifests re-synced across all consumer packages, and various smaller data-consistency fixes.
-- **🗑️ Removed: AI GM Bot** – The standalone AI Game Master bot has been removed from the ecosystem. It is no longer part of the toolkit, quick start, or integrations.
+- **🧪 Real Test Coverage Across the Ecosystem** – `fates-edge-ai-gm-bot` (120 tests: drivers, tag parsing, world data), the socket server (34 tests: auth, deck region-slug resolution, adventure state machine), and the web client (49 tests, including a fixed/repaired test harness with real DOM-event and IndexedDB shims) all now have real, passing test suites where most had none before. See each repo's `TEST_TODO.md` for the full backlog and what's still open.
+- **🐛 Fixed a Real Tag-Parsing Bug** – `modules/commands.js`'s `[APPLY ...]`/`[ROLL ...]`/etc. tag handlers used a stateful global regex while mutating the string it was scanning; with more than one tag of the same type in a single AI response, later tags could silently fail to resolve. Fixed across every tag handler in that file.
+- **🔨 Magic Item Decay & Forage Limits** – Attuned magic items now actually decay (Maintained → Neglected → Compromised) per the Player's Guide's Attunement & Upkeep rules, driven by a `downtime-tick` event fired from the Factions tab's "GM Downtime (Faction Turn)" button. Crafting's Forage action is now capped per downtime (a web-client pacing choice, not a rulebook number — see `state.js`).
+- **🎨 Crafting Modularized, No More Inline CSS** – `js/features/crafting/` split into `data.js`/`state.js`/`render.js`/`index.js`; every inline `style="..."` and injected `<style>` block replaced with real classes in `css/app.css`, which also picked up two previously-undefined-but-widely-used button classes (`.btn-secondary`, `.btn-xs`).
+- **🖥️ Terminal Client Account Commands** – `/mychar list|save|delete` now exposes the account-character endpoints the terminal client's auth system already supported but never surfaced.
+- **🔢 Real Semantic Versioning** – Replaced the inconsistent `4.3a`-style version scheme with strict `MAJOR.MINOR.PATCH` across every repo, plus `tools/bump-version.mjs` to automate future bumps (version sync across every `package.json`, CHANGELOG generation, git tag) — see `VERSIONING.md`.
 
 > **Note on Session Logging & Voice Recording:** an earlier release cycle documented automatic session logging, voice recording, and SRT subtitle generation as shipped features. They were never actually implemented in this codebase and have been moved to [Roadmap](#-roadmap) rather than listed as available.
 
@@ -429,7 +428,16 @@ Licensed under **CC BY-NC-SA 4.0**. See [LICENSE.srd](LICENSE.srd).
 
 ## 📋 Version History
 
-### v4.3a (Current)
+### v4.4.1 (Current)
+- **Added** Full test suites across the ecosystem (ai-gm-bot, socket server, web client — see "What's New" above)
+- **Added** Magic item decay/upkeep tracking (Maintained → Neglected → Compromised) tied to a new `downtime-tick` event, and a per-downtime Forage limit in Crafting
+- **Added** `/mychar` account-character commands in the terminal client
+- **Added** `tools/bump-version.mjs` — automated semver bump + CHANGELOG + git tag across every repo, see `VERSIONING.md`
+- **Fixed** A tag-parsing regex-desync bug in the AI GM bot's `modules/commands.js` affecting multiple same-type `[TAG ...]`s in one response
+- **Changed** Version scheme moved from `4.3a`-style to strict semver (`MAJOR.MINOR.PATCH`)
+- **Changed** Crafting feature split into `data.js`/`state.js`/`render.js`/`index.js`; all inline CSS moved into `css/app.css`
+
+### v4.3a
 - **Added** Account authentication on the campaign server — register/login with bcrypt-hashed passwords and JWT sessions, alongside the existing API-key and playtester-password gates
 - **Redone** Python CLI client, now a structured package (`cli/`, `rest_client.py`, `ws_client.py`, `shell.py`) at v5.0.0
 - **Updated** Foundry VTT bridge and Roll20 API mod integrations

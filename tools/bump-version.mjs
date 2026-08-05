@@ -199,6 +199,16 @@ function findPackageJsons(dir) {
 //     "vX.Y.Z" is a distinctive-enough pattern not to false-positive.
 // If a repo has neither file (e.g. fates-edge-ai-gm-bot, fates-edge-docs)
 // this is just a no-op.
+//
+// README.md/DESIGN.md get a SEPARATE, much more conservative pass (see
+// updateReadmeStyleFiles() below): those files mix "current version"
+// mentions (safe to auto-bump) with historical version-history entries
+// like "### v4.3a" or "### v4.1.2b" changelog sections that must NEVER
+// be rewritten to the new version — a blind find/replace would corrupt
+// release history. Only two narrow, unambiguous patterns are touched
+// automatically; everything else in those files (What's New prose,
+// version-history bullet lists, inline notes) is left for a human to
+// update deliberately, the way this session did by hand.
 // ────────────────────────────────────────────────────────────────────
 
 const VERSION_STRING_PATTERN = /v\d+\.\d+\.\d+[a-zA-Z0-9-]*/g;
@@ -219,6 +229,31 @@ function updateAuxiliaryVersionFiles(newVersionStr) {
             }
         }
 
+        if (next !== content) {
+            writeFileSync(f, next, 'utf8');
+            touched.push(f);
+        }
+    }
+    return touched;
+}
+
+// Only two patterns, both unambiguous "this IS the current version, not
+// a history entry": the H1 title line ("# ... vX.Y.Z ...") and a
+// shields.io version badge ("version-X.Y.Z-blue"). Deliberately does
+// NOT touch "### vX.Y.Z" section headers or any other version mention —
+// those need a human deciding whether they're history (leave alone) or
+// a genuinely stale "current status" note (update by hand, and consider
+// adding a matching README/DESIGN update to your release checklist).
+function updateReadmeStyleFiles(newVersionStr) {
+    const touched = [];
+    const files = findFilesByName(repoRoot, ['README.md', 'DESIGN.md']);
+    const titleRe = /^(#\s+.*?)v\d+\.\d+\.\d+[a-zA-Z0-9-]*/m;
+    const badgeRe = /version-\d+\.\d+\.\d+[a-zA-Z0-9-]*-blue/g;
+    for (const f of files) {
+        const content = readFileSync(f, 'utf8');
+        let next = content;
+        if (titleRe.test(next)) next = next.replace(titleRe, `$1v${newVersionStr}`);
+        if (badgeRe.test(next)) next = next.replace(badgeRe, `version-${newVersionStr}-blue`);
         if (next !== content) {
             writeFileSync(f, next, 'utf8');
             touched.push(f);
@@ -346,6 +381,10 @@ function main() {
         if (wouldTouchAux.length) {
             console.log(`Would also check for stale version strings in: ${wouldTouchAux.map(f => path.relative(repoRoot, f)).join(', ')}`);
         }
+        const wouldTouchReadme = findFilesByName(repoRoot, ['README.md', 'DESIGN.md']);
+        if (wouldTouchReadme.length) {
+            console.log(`Would also check title lines/badges (only) in: ${wouldTouchReadme.map(f => path.relative(repoRoot, f)).join(', ')}`);
+        }
         console.log('\n--dry-run: no files written, no git commands run.');
         console.log('\n--- CHANGELOG entry preview ---\n');
         console.log(buildChangelogEntry(newVersion, commits, summary));
@@ -372,6 +411,18 @@ function main() {
     const auxTouched = updateAuxiliaryVersionFiles(newVersionStr);
     for (const f of auxTouched) console.log(`Updated ${path.relative(repoRoot, f)}`);
     touchedFiles.push(...auxTouched);
+
+    // 2b. README.md/DESIGN.md title lines + version badges (conservative —
+    // see updateReadmeStyleFiles()'s comment for what it deliberately
+    // does NOT touch).
+    const readmeTouched = updateReadmeStyleFiles(newVersionStr);
+    for (const f of readmeTouched) console.log(`Updated ${path.relative(repoRoot, f)} (title/badge only)`);
+    touchedFiles.push(...readmeTouched);
+    const readmeFilesFound = findFilesByName(repoRoot, ['README.md', 'DESIGN.md']);
+    if (readmeFilesFound.length) {
+        console.log(`\nReminder: check README.md/DESIGN.md "What's New"/Version History sections by hand —`);
+        console.log(`only title lines and version badges were auto-updated in: ${readmeFilesFound.map(f => path.relative(repoRoot, f)).join(', ')}`);
+    }
 
     // 3. CHANGELOG.md
     const entry = buildChangelogEntry(newVersion, commits, summary);
