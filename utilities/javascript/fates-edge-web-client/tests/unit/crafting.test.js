@@ -7,7 +7,12 @@ import {
     DECAY_ORDER,
     advanceDecay,
     itemRequiresUpkeep,
-    applyDowntimeTick
+    applyDowntimeTick,
+    FORAGE_LIMIT_PER_DOWNTIME,
+    canForage,
+    getForageCount,
+    recordForageAttempt,
+    resetForageCount
 } from '../../js/features/crafting/index.js';
 
 describe('crafting: attunement cap', () => {
@@ -131,5 +136,44 @@ describe('crafting: decay state transitions', () => {
         applyDowntimeTick(attuned);
         applyDowntimeTick(attuned);
         assertEqual(artifact.condition, 'maintained');
+    });
+});
+
+describe('crafting: forage attempts per downtime', () => {
+    // Not specified in the rulebook (world_interactions.tex's
+    // "Foraging and Subsistence by Region" table is an unrelated travel
+    // mechanic) — this cap is a web-client-only economy/pacing decision.
+    // See state.js's FORAGE_LIMIT_PER_DOWNTIME comment. Resets on the
+    // same 'downtime-tick' event as upkeep decay.
+
+    it('FORAGE_LIMIT_PER_DOWNTIME is a small positive number', () => {
+        assertTrue(FORAGE_LIMIT_PER_DOWNTIME > 0);
+        assertEqual(FORAGE_LIMIT_PER_DOWNTIME, 3);
+    });
+
+    it('canForage() allows attempts until the limit, then blocks', () => {
+        const char = { crafting: {} };
+        for (let i = 0; i < FORAGE_LIMIT_PER_DOWNTIME; i++) {
+            assertTrue(canForage(char), `attempt ${i + 1} should still be allowed`);
+            recordForageAttempt(char);
+        }
+        assertFalse(canForage(char), 'should be blocked once the limit is reached');
+        assertEqual(getForageCount(char), FORAGE_LIMIT_PER_DOWNTIME);
+    });
+
+    it('recordForageAttempt() increments and getForageCount() defaults to 0', () => {
+        const char = {};
+        assertEqual(getForageCount(char), 0);
+        assertEqual(recordForageAttempt(char), 1);
+        assertEqual(recordForageAttempt(char), 2);
+        assertEqual(getForageCount(char), 2);
+    });
+
+    it('resetForageCount() (the downtime-tick step) restores a full allowance', () => {
+        const char = { crafting: { forageCount: FORAGE_LIMIT_PER_DOWNTIME } };
+        assertFalse(canForage(char));
+        resetForageCount(char);
+        assertEqual(getForageCount(char), 0);
+        assertTrue(canForage(char));
     });
 });

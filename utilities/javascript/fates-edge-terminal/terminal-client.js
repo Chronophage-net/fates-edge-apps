@@ -563,6 +563,11 @@ ${colors.yellow}Account (optional):${colors.reset}
   GM skip re-asking for a room password once you've joined, and makes
   bans against you survive reconnects.
 
+${colors.yellow}Saved Characters (requires /login):${colors.reset}
+  /mychar list                 List your saved characters (max 5)
+  /mychar save <name> <json>   Save a character (json = character data)
+  /mychar delete <id>          Delete a saved character
+
 ${colors.yellow}Chat & Dice:${colors.reset}
   <message>                   Send chat
   /roll <dice> [adv|dis] [reason]  Roll dice (e.g., /roll 1d20 adv "Attack")
@@ -1132,6 +1137,53 @@ function handleInputLine(input) {
                 saveUserConfig();
                 printSystemMessage('Logged out. (Takes effect on your next /connect.)');
                 break;
+
+            // ─── Saved characters (NEW) ─────────────────────────
+            // Thin wrapper around GET/POST/DELETE /api/account/characters,
+            // the Bearer-token-protected endpoints for a logged-in user's
+            // up-to-5 saved characters. Reuses makeAuthRequest() and the
+            // token from /login|/register above -- no new auth plumbing.
+            case 'mychar': {
+                if (!userConfig.authToken) {
+                    printSystemMessage('You must /login or /register first.', colors.red);
+                    break;
+                }
+                const mySub = args[0]?.toLowerCase();
+                (async () => {
+                    try {
+                        if (mySub === 'list' || !mySub) {
+                            const body = await makeAuthRequest('/account/characters', 'GET', null, userConfig.authToken);
+                            const chars = body.characters || body || [];
+                            if (!chars.length) { printSystemMessage('No saved characters.'); }
+                            else {
+                                process.stdout.write('\r\x1b[K');
+                                console.log(`${colors.cyan}🗂️ Saved Characters (${chars.length}/5):${colors.reset}`);
+                                chars.forEach(c => console.log(`  \`${c.id}\` - ${c.name}`));
+                                promptAgain(true);
+                            }
+                        } else if (mySub === 'save') {
+                            const charName = args[1];
+                            const jsonStr = args.slice(2).join(' ');
+                            if (!charName || !jsonStr) { printSystemMessage('Usage: /mychar save <name> <json>', colors.red); promptAgain(); return; }
+                            let data;
+                            try { data = JSON.parse(jsonStr); } catch (e) { printSystemMessage(`Invalid JSON: ${e.message}`, colors.red); promptAgain(); return; }
+                            await makeAuthRequest('/account/characters', 'POST', { name: charName, data }, userConfig.authToken);
+                            printSystemMessage(`✅ Saved character "${charName}".`, colors.green);
+                        } else if (mySub === 'delete') {
+                            const id = args[1];
+                            if (!id) { printSystemMessage('Usage: /mychar delete <id>', colors.red); promptAgain(); return; }
+                            await makeAuthRequest(`/account/characters/${id}`, 'DELETE', null, userConfig.authToken);
+                            printSystemMessage(`🗑️ Deleted character ${id}.`, colors.green);
+                        } else {
+                            printSystemMessage('Usage: /mychar list | save <name> <json> | delete <id>');
+                        }
+                    } catch (e) {
+                        printSystemMessage(`❌ /mychar ${mySub || 'list'} failed: ${e.message}`, colors.red);
+                    }
+                    promptAgain();
+                })();
+                return; // async -- prompt is re-shown by the callback above
+            }
 
             case 'whoami':
                 if (userConfig.authUsername) {

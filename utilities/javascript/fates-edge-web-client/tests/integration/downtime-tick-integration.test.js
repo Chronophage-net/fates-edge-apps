@@ -1,5 +1,6 @@
-import { describe, it, assertEqual } from '../runner.js';
+import { describe, it, assertEqual, assertTrue, assertFalse } from '../runner.js';
 import { getState, addCharacter, updateCharacter, getCharacter } from '../../js/core/state.js';
+import { FORAGE_LIMIT_PER_DOWNTIME, canForage } from '../../js/features/crafting/index.js';
 
 // End-to-end path: js/features/factions/index.js's "GM Downtime (Faction
 // Turn)" button (window.factionTurn(), triggered here directly rather
@@ -64,5 +65,19 @@ describe('downtime-tick integration: factions -> crafting', () => {
         const after = getCharacter(char.id);
         assertEqual(after.crafting.attuned[0].condition, 'maintained');
         assertEqual(after.crafting.attuned[0].paidUpkeepThisDowntime, false, 'the paid flag is consumed by the tick, not carried forward for free');
+    });
+
+    it('window.factionTurn() also resets every character\'s forage attempts for the new downtime', () => {
+        const char = addCharacter({ name: 'Forager', totalXp: 10, xpSpent: 0 });
+        updateCharacter(char.id, {
+            crafting: { ingredients: [], crafted: [], attuned: [], forageCount: FORAGE_LIMIT_PER_DOWNTIME }
+        });
+        assertFalse(canForage(getCharacter(char.id)), 'sanity check: exhausted before the tick');
+
+        window.factionTurn();
+
+        const after = getCharacter(char.id);
+        assertEqual(after.crafting.forageCount, 0);
+        assertTrue(canForage(after));
     });
 });

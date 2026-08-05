@@ -582,6 +582,7 @@ h1, h2, h3, h4, h5, h6 {
 .btn-danger:hover { box-shadow: 0 4px 20px var(--red-glow); }
 
 .btn-sm { padding: 0.3rem 0.8rem; font-size: 0.8rem; }
+.btn-xs { padding: 0.15rem 0.5rem; font-size: 0.7rem; gap: 0.25rem; }
 .btn-lg { padding: 0.7rem 1.8rem; font-size: 1.05rem; }
 .btn-ghost {
     background: transparent;
@@ -590,6 +591,29 @@ h1, h2, h3, h4, h5, h6 {
 .btn-ghost:hover {
     background: var(--bg3);
     border-color: var(--border-color);
+}
+/* NOTE: .btn-secondary and .btn-xs are used by many features
+   (crafting, timers, dice, whiteboard, wiki, etc. — grep `btn-secondary`
+   / `btn-xs` under js/features) alongside the base .btn class, but
+   neither was ever actually defined here; those buttons were silently
+   falling back to bare .btn styling app-wide. Added as a real modifier
+   pair rather than leaving the gap. */
+.btn-secondary {
+    background: var(--bg3);
+    border-color: var(--border-color);
+    color: var(--text);
+}
+.btn-secondary:hover {
+    background: var(--bg4);
+}
+.btn:disabled,
+.btn-gold:disabled,
+.btn-secondary:disabled,
+.btn-ghost:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none !important;
+    box-shadow: none !important;
 }
 
 /* ----- Modals (fixed) ----- */
@@ -2118,3 +2142,434 @@ body.xcard-active .app-shell {
     flex: 1;
     min-width: 160px;
 }
+
+/* ============================================================
+   CRAFTING FEATURE (js/features/crafting/)
+   All styling for the Crafting Bench + Codex panels. The templates in
+   render.js emit only these classes (plus the app-wide .btn/.panel/
+   .flex-between/.gap-1/.mt-1 component classes above) — no inline
+   `style="..."` attributes or per-render `<style>` blocks.
+   ============================================================ */
+
+.crafting-container {
+    color: var(--text);
+    background: var(--bg1, var(--bg));
+    border-radius: var(--radius);
+    padding: 0.2rem 0.5rem 0.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+}
+
+.crafting-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.3rem;
+    border-bottom: 2px solid var(--border);
+    padding: 0.2rem 0.3rem 0.3rem;
+    background: linear-gradient(135deg, var(--bg2) 0%, var(--bg1, var(--bg)) 100%);
+    border-radius: var(--radius) var(--radius) 0 0;
+}
+.crafting-header-left {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+.crafting-icon-lg { font-size: 1.4rem; }
+.crafting-header-title {
+    font-weight: 600;
+    font-size: 1.05rem;
+    color: var(--gold);
+}
+.crafting-header-sub {
+    font-size: 0.7rem;
+    color: var(--text3);
+    margin-left: 0.3rem;
+}
+.crafting-header-actions {
+    display: flex;
+    gap: 0.3rem;
+    flex-wrap: wrap;
+    align-items: center;
+}
+.crafting-xp-display {
+    font-size: 0.7rem;
+    color: var(--text3);
+    align-self: center;
+}
+
+.crafting-tabs {
+    display: flex;
+    gap: 0.2rem;
+    border-bottom: 1px solid var(--border);
+}
+.crafting-tab {
+    padding: 0.2rem 0.8rem;
+    border-radius: var(--radius) var(--radius) 0 0;
+    background: transparent;
+    border: none;
+    color: var(--text2);
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition, 0.2s);
+}
+.crafting-tab.active {
+    background: var(--bg2);
+    color: var(--gold);
+    border: 1px solid var(--border);
+    border-bottom: 2px solid var(--gold);
+}
+.crafting-tab:hover {
+    background: var(--bg2);
+    color: var(--text);
+}
+
+.crafting-panel-content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+}
+
+.crafting-toolbar {
+    display: flex;
+    gap: 0.3rem;
+    flex-wrap: wrap;
+    align-items: center;
+    background: var(--bg2);
+    border-radius: var(--radius);
+    padding: 0.2rem 0.4rem;
+    border: 1px solid var(--border);
+}
+.crafting-inline-group {
+    display: flex;
+    align-items: center;
+    gap: 0.2rem;
+}
+.crafting-hint {
+    font-size: 0.6rem;
+    color: var(--text3);
+}
+.crafting-forage-count {
+    font-size: 0.6rem;
+    opacity: 0.8;
+}
+
+.crafting-select,
+.crafting-input {
+    background: var(--bg3);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 0.1rem 0.3rem;
+    font-size: 0.7rem;
+}
+.crafting-input-narrow { width: 50px; }
+
+.crafting-recipe-filters { flex-wrap: wrap; }
+.crafting-recipe-filters .crafting-input { width: 120px; }
+
+/* ── Inventory / ingredients ─────────────────────────────── */
+.craft-inventory-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.3rem;
+    max-height: 120px;
+    overflow-y: auto;
+    padding: 0.1rem 0;
+}
+.craft-ingredient-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.2rem;
+    background: var(--bg3);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 0.1rem 0.3rem;
+    font-size: 0.7rem;
+    transition: var(--transition, 0.15s);
+}
+.craft-ingredient-chip.selected {
+    background: var(--gold);
+    color: var(--text-inverse);
+    border-color: var(--gold);
+}
+.craft-ingredient-chip input[type="checkbox"] {
+    margin: 0;
+    cursor: pointer;
+}
+.craft-ingredient-remove {
+    border: none;
+    background: none;
+    color: inherit;
+    cursor: pointer;
+    font-size: 0.6rem;
+    opacity: 0.7;
+    padding: 0;
+}
+.craft-ingredient-remove:hover { opacity: 1; }
+
+/* ── Recipes & refinement ────────────────────────────────── */
+.craft-recipe-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    max-height: 350px;
+    overflow-y: auto;
+}
+.craft-refinement-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.3rem;
+}
+.craft-recipe-card {
+    background: var(--bg3);
+    border-radius: var(--radius);
+    border-left: 3px solid var(--text3);
+    padding: 0.15rem 0.4rem;
+    transition: var(--transition, 0.15s);
+}
+.craft-recipe-card.refinement {
+    flex: 1 1 180px;
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+    border-radius: 6px;
+    padding: 0.2rem 0.4rem;
+}
+.craft-recipe-card.ready { border-left-color: var(--green); }
+.craft-recipe-card.missing { border-left-color: var(--orange); }
+.craft-recipe-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    gap: 0.2rem;
+    flex-wrap: wrap;
+}
+.craft-recipe-header-left {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    flex-wrap: wrap;
+}
+.craft-recipe-name { font-weight: 600; font-size: 0.8rem; }
+.craft-refine-output { font-size: 0.55rem; color: var(--text3); }
+.craft-recipe-desc { font-size: 0.7rem; color: var(--text2); }
+.craft-recipe-meta { font-size: 0.6rem; color: var(--text3); }
+.craft-recipe-toggle { font-size: 0.65rem; color: var(--text3); }
+.craft-recipe-status {
+    font-size: 0.55rem;
+    padding: 0.05rem 0.3rem;
+    border-radius: 4px;
+}
+.craft-recipe-status.ready { background: var(--green-glow); color: var(--green); }
+.craft-recipe-status.missing { background: var(--red-glow); color: var(--red); }
+.craft-recipe-details {
+    margin-top: 0.2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    font-size: 0.7rem;
+    padding-left: 0.2rem;
+}
+.craft-ingredient-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.2rem;
+}
+.craft-ingredient-tag {
+    font-size: 0.6rem;
+    padding: 0.05rem 0.3rem;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+}
+.craft-ingredient-tag.has { background: var(--green-glow); color: var(--green); border-color: var(--green); }
+.craft-ingredient-tag.missing { background: var(--red-glow); color: var(--red); border-color: var(--red); }
+.recipe-xp-note { font-size: 0.6rem; color: var(--text3); }
+.recipe-xp-note.insufficient { color: var(--red); }
+.recipe-missing-note {
+    font-size: 0.55rem;
+    color: var(--orange);
+    margin-left: 0.3rem;
+}
+
+/* ── Crafted items ────────────────────────────────────────── */
+.craft-crafted-list { max-height: 120px; overflow-y: auto; }
+.crafted-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.1rem 0.3rem;
+    border-bottom: 1px solid var(--border);
+    font-size: 0.75rem;
+}
+.crafted-item-info { flex: 1; min-width: 0; }
+.crafted-item-name { font-weight: 600; }
+.crafted-item-effect { font-size: 0.65rem; color: var(--text3); margin-left: 0.3rem; }
+.crafted-item-quality { font-size: 0.55rem; margin-left: 0.3rem; }
+.crafted-item-quality.standard { color: var(--green); }
+.crafted-item-quality.flawed { color: var(--orange); }
+.crafted-item-uses { font-size: 0.55rem; color: var(--text2); margin-left: 0.3rem; }
+.crafted-item-actions { display: flex; gap: 0.2rem; }
+.crafted-item-remove { color: var(--red); }
+
+/* ── Crafting log ─────────────────────────────────────────── */
+.crafting-log {
+    font-size: 0.7rem;
+    color: var(--text2);
+    max-height: 80px;
+    overflow-y: auto;
+    border-top: 1px solid var(--border);
+    padding-top: 0.2rem;
+}
+.crafting-log-title { font-size: 0.7rem; font-weight: 600; color: var(--text2); }
+.crafting-log-entry {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.05rem 0.2rem;
+    border-bottom: 1px dashed var(--border);
+    font-size: 0.65rem;
+}
+.crafting-log-time { color: var(--text3); font-size: 0.55rem; }
+
+/* ── Codex tab (attunement, upkeep, browsing) ────────────── */
+.codex-filters {
+    display: flex;
+    gap: 0.3rem;
+    flex-wrap: wrap;
+    align-items: center;
+    margin-bottom: 0.2rem;
+}
+.codex-entry-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    max-height: 320px;
+    overflow-y: auto;
+    margin-top: 0.2rem;
+}
+.codex-entry {
+    background: var(--bg3);
+    border-radius: var(--radius);
+    border-left: 3px solid var(--codex-entry-accent, var(--gold));
+    padding: 0.3rem 0.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+}
+.codex-entry-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.2rem;
+}
+.codex-entry-title { font-weight: 600; font-size: 0.8rem; }
+.codex-entry-body { font-size: 0.7rem; color: var(--text2); line-height: 1.35; }
+.codex-cost { font-size: 0.65rem; color: var(--text3); }
+.codex-cost.obligation { color: var(--gold); }
+
+.attuned-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+}
+.attuned-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.1rem 0.4rem;
+    background: var(--bg3);
+    border-radius: 6px;
+    flex-wrap: wrap;
+}
+.attuned-item-info { display: flex; align-items: center; gap: 0.3rem; flex-wrap: wrap; }
+.attuned-item-name { font-weight: 600; font-size: 0.75rem; }
+.attuned-condition {
+    font-size: 0.6rem;
+    padding: 0.05rem 0.3rem;
+    border-radius: 4px;
+}
+.attuned-condition.maintained { background: var(--green-glow); color: var(--green); }
+.attuned-condition.neglected { background: rgba(230, 126, 34, 0.2); color: var(--orange); }
+.attuned-condition.compromised { background: var(--red-glow); color: var(--red); }
+.attuned-note { font-size: 0.55rem; color: var(--text3); }
+.attuned-note.compromised { color: var(--red); }
+.attuned-item-actions { display: flex; gap: 0.2rem; align-items: center; flex-wrap: wrap; }
+.attuned-upkeep-cost { font-size: 0.6rem; color: var(--text3); }
+.attuned-retire { color: var(--red); }
+
+/* ── No-character empty state ────────────────────────────── */
+.crafting-empty-state {
+    text-align: center;
+    padding: 1.5rem 1.5rem 2rem;
+    color: var(--text3);
+    background: var(--bg2);
+    border: 1px dashed var(--border);
+}
+.crafting-empty-icon { font-size: 3rem; }
+.crafting-empty-title { margin: 0.5rem 0; color: var(--text); }
+.crafting-empty-text { margin: 0 0 0.8rem; }
+.crafting-empty-actions {
+    display: flex;
+    gap: 0.4rem;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+}
+.crafting-char-select {
+    padding: 0.35rem 0.6rem;
+    font-size: 0.85rem;
+    min-width: 220px;
+}
+
+/* ── Craft/refine result toast (injected via showToastWithHTML) ─── */
+.custom-toast-modal {
+    position: fixed;
+    bottom: 1rem;
+    right: 1rem;
+    z-index: 9999;
+    animation: toastFadeIn 0.2s ease;
+}
+.custom-toast-modal-inner {
+    background: var(--bg1, var(--bg));
+    padding: 1.2rem;
+    border-radius: var(--radius);
+    max-width: 420px;
+    width: 90vw;
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-elevated, 0 8px 32px rgba(0, 0, 0, 0.5));
+    max-height: 60vh;
+    overflow-y: auto;
+}
+@keyframes toastFadeIn {
+    from { opacity: 0; transform: scale(0.95); }
+    to { opacity: 1; transform: scale(1); }
+}
+.craft-result-toast {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    max-width: 400px;
+}
+.craft-result-title { font-weight: 600; font-size: 1rem; color: var(--gold); }
+.craft-result-desc { font-size: 0.8rem; color: var(--text2); }
+.craft-result-meta,
+.craft-result-roll { font-size: 0.75rem; color: var(--text3); }
+.craft-result-successes { font-size: 0.8rem; }
+.craft-result-outcome { font-size: 1rem; font-weight: 600; }
+.craft-result-outcome.success { color: var(--green); }
+.craft-result-outcome.partial { color: var(--orange); }
+.craft-result-outcome.failure { color: var(--red); }
+.craft-result-cost,
+.craft-result-consumed { color: var(--text3); font-size: 0.75rem; }
+.craft-result-boons { color: var(--gold); font-size: 0.75rem; }
+.craft-result-sb { color: var(--text3); font-size: 0.75rem; }
+.craft-result-missing { color: var(--orange); font-size: 0.75rem; }
+.craft-result-created { color: var(--green); font-size: 0.75rem; }
+.craft-result-close { align-self: flex-start; }
