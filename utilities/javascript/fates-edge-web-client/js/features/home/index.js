@@ -6,6 +6,7 @@
 
 import { showToast } from '../../components/Toast.js';
 import { getState, saveState } from '../../core/state.js';
+import { escHtml } from '../../core/utils.js';
 
 // ─── Constants ──────────────────────────────────────────────────────────
 
@@ -21,6 +22,9 @@ const SELECTORS = {
 let container = null;
 let stylesInjected = false;
 let overlayShown = false; // prevent duplicate overlays
+let quickStartInFlight = false; // guard against double-fire (delegated handler + direct listener both match [data-action="quick-start"])
+
+const ESSENTIALS_DOC_URL = '/data/docs/resources/Fates_-_Edge_-_-Essentials.html';
 
 // ─── Render Functions ──────────────────────────────────────────────────
 
@@ -793,6 +797,9 @@ function injectStyles() {
     .welcome-card .welcome-actions .btn {
       width: 100%;
     }
+    .welcome-card .welcome-subtext {
+      font-size: 0.85rem; color: var(--text3); margin: -0.25rem 0 0;
+    }
     .welcome-card .welcome-dismiss {
       color: var(--text3); font-size: 0.85rem; cursor: pointer;
       background: none; border: none; text-decoration: underline;
@@ -860,8 +867,9 @@ function showWelcomeOverlay() {
 
       <div class="welcome-actions">
         <button class="btn btn-gold btn-large" data-action="quick-start" style="font-weight:700;border-width:2px;">
-          🚀 Quick Start – The Lantern at Dusk
+          ⚡ Jump to the Action
         </button>
+        <p class="welcome-subtext">Drops you straight into <strong>The Lantern at Dusk</strong> (a short one‑shot) with a ready‑made character. No setup required.</p>
         <button class="btn btn-secondary" data-action="dismiss-welcome">
           Skip – I'll explore on my own
         </button>
@@ -889,13 +897,68 @@ function showWelcomeOverlay() {
   const dismissBtn = overlay.querySelector('[data-action="dismiss-welcome"]');
 
   quickBtn?.addEventListener('click', () => {
-    closeWelcome();
-    quickStart();
+    runQuickStart(overlay);
   });
 
   dismissBtn?.addEventListener('click', () => {
     closeWelcome();
     markWelcomeSeen();
+  });
+}
+
+/**
+ * Runs the "Jump to the Action" flow and, on success, swaps the welcome
+ * card's content in place for a short confirmation pane (character name +
+ * a link to the Essentials quickstart doc) instead of silently navigating
+ * away. Safe to call more than once concurrently (e.g. if the delegated
+ * container click handler and this direct listener both fire for the same
+ * click) — only the first call actually runs.
+ */
+async function runQuickStart(overlayEl) {
+  if (quickStartInFlight) return;
+  quickStartInFlight = true;
+  try {
+    const result = await quickStart();
+    if (result && overlayEl?.isConnected) {
+      renderQuickStartConfirmation(overlayEl, result);
+    }
+  } finally {
+    quickStartInFlight = false;
+  }
+}
+
+/** Replace the welcome card's contents with a short "you're playing as X" confirmation + doc link. */
+function renderQuickStartConfirmation(overlayEl, { character, adventure }) {
+  const card = overlayEl.querySelector('.welcome-card');
+  if (!card) return;
+  const charLine = character
+    ? `Playing as <strong>${escHtml(character.name)}</strong> — ${escHtml(character.tagline || 'ready to go')} — in <strong>${escHtml(adventure.title)}</strong>.`
+    : `<strong>${escHtml(adventure.title)}</strong> is loaded and ready — head to Characters to pick or build one.`;
+  card.innerHTML = `
+    <span style="font-size:3rem;">🏮</span>
+    <h1>You're in!</h1>
+    <p style="color:var(--text2);font-size:1.05rem;margin:0;">
+      ${charLine}
+    </p>
+    <div class="welcome-docs">
+      <p style="margin:0;font-weight:500;">📖 New to Fate's Edge?</p>
+      <ul>
+        <li><a href="${ESSENTIALS_DOC_URL}" target="_blank" rel="noopener">⚡ Essentials</a> – the quickstart rules primer, keep it open in a tab while you play</li>
+      </ul>
+    </div>
+    <div class="welcome-actions">
+      <button class="btn btn-gold btn-large" data-action="enter-game" style="font-weight:700;border-width:2px;">
+        ▶ Enter the Game
+      </button>
+    </div>
+  `;
+  card.querySelector('[data-action="enter-game"]')?.addEventListener('click', () => {
+    overlayEl.remove();
+    overlayShown = false;
+    const hostContainer = document.getElementById('app-content') || document.body;
+    Array.from(hostContainer.children).forEach(ch => { ch.style.display = ''; });
+    markWelcomeSeen();
+    window.location.hash = 'adventure-manager';
   });
 }
 
@@ -919,6 +982,19 @@ function checkWelcomeOverlay() {
 
 // js/features/home/index.js
 
+const PREGENS_URL = '/data/pre-gens.json';
+
+/**
+ * "Jump to the Action" — loads the pre-bundled one-shot adventure (The
+ * Lantern at Dusk), makes sure the pre-generated characters exist in the
+ * roster, starts the adventure, and marks the welcome tour seen.
+ *
+ * Returns `{ character, adventure }` on success (character is the one
+ * pregen flagged `recommendedFor: "Jump to the Action"` in pre-gens.json,
+ * falling back to the first pregen loaded/found if that flag is missing)
+ * so the caller can show a confirmation naming who you're playing, or
+ * `null`/`undefined` on failure (a toast has already been shown either way).
+ */
 async function quickStart() {
     console.log('[QuickStart] Starting quick start...');
     try {
@@ -935,7 +1011,7 @@ async function quickStart() {
             if (!loaded) {
                 console.error('[QuickStart] loadAdventureFromFile failed.');
                 showToast('Could not load the starter adventure. Check that lantern_at_dusk.json exists in /data/adventures/.', 'error');
-                return;
+                return null;
             }
             // Re-fetch state after load
             const newState = getState();
@@ -943,7 +1019,7 @@ async function quickStart() {
             if (!adventure) {
                 console.error('[QuickStart] Adventure still not found after loading.');
                 showToast('Starter adventure not found after loading.', 'error');
-                return;
+                return null;
             }
             console.log('[QuickStart] Adventure loaded successfully:', adventure.title);
         } else {
@@ -954,37 +1030,41 @@ async function quickStart() {
         advModule.loadAdventuresFromState();
         console.log('[QuickStart] Adventure manager cache synced with state.');
 
-        // 3. Load pre‑generated characters if not present
-        if (!state.characters || state.characters.length === 0) {
-            console.log('[QuickStart] Loading pre-gens...');
-            try {
-                const response = await fetch('/data/pre-gens.json');
-                if (response.ok) {
-                    const chars = await response.json();
-                    if (Array.isArray(chars) && chars.length > 0) {
-                        let added = 0;
-                        chars.forEach(char => {
-                            const exists = state.characters.some(c => c.name === char.name);
-                            if (!exists) {
-                                if (!char.id) char.id = 'pregen-' + Date.now() + '-' + Math.random().toString(36).substr(2, 6);
-                                state.characters.push(char);
-                                added++;
-                            }
-                        });
-                        if (added > 0) {
-                            saveState();
-                            console.log(`[QuickStart] Added ${added} pre-gens.`);
-                            showToast(`📋 Loaded ${added} pre‑generated characters.`, 'success');
+        // 3. Load pre‑generated characters if any are missing from the roster,
+        // and figure out which one to hand the player by default.
+        if (!state.characters) state.characters = [];
+        let featuredCharacter = null;
+        console.log('[QuickStart] Checking pre-gens...');
+        try {
+            const response = await fetch(PREGENS_URL);
+            if (response.ok) {
+                const chars = await response.json();
+                if (Array.isArray(chars) && chars.length > 0) {
+                    let added = 0;
+                    chars.forEach(char => {
+                        const existing = state.characters.find(c => c.name === char.name);
+                        if (!existing) {
+                            if (!char.id) char.id = 'pregen-' + Date.now() + '-' + Math.random().toString(36).substr(2, 6);
+                            state.characters.push(char);
+                            added++;
                         }
+                        if (char.recommendedFor === 'Jump to the Action') {
+                            featuredCharacter = existing || char;
+                        }
+                    });
+                    if (!featuredCharacter) featuredCharacter = state.characters.find(c => chars.some(pc => pc.name === c.name)) || chars[0];
+                    if (added > 0) {
+                        saveState();
+                        console.log(`[QuickStart] Added ${added} pre-gens.`);
                     }
-                } else {
-                    console.warn('[QuickStart] Pre-gen fetch failed with status:', response.status);
-                    showToast('Could not load pre‑gens (HTTP ' + response.status + ').', 'warning');
                 }
-            } catch (e) {
-                console.warn('[QuickStart] Pre‑gen load error:', e);
-                // Non‑fatal
+            } else {
+                console.warn('[QuickStart] Pre-gen fetch failed with status:', response.status);
+                showToast('Could not load pre‑gens (HTTP ' + response.status + ').', 'warning');
             }
+        } catch (e) {
+            console.warn('[QuickStart] Pre‑gen load error:', e);
+            // Non‑fatal — the adventure can still start without a character.
         }
 
         // 4. Start the adventure
@@ -994,21 +1074,32 @@ async function quickStart() {
         if (!started) {
             console.error('[QuickStart] startAdventure failed.');
             showToast('Failed to start adventure. Check console for errors.', 'error');
-            return;
+            return null;
         }
 
-        // 5. Mark welcome as seen (if not already)
-        markWelcomeSeen();
-
-        // 6. Navigate to Adventure Manager
-        window.location.hash = 'adventure-manager';
-        showToast(`🚀 Launched "${adventure.title}" with pre‑gens!`, 'success');
         console.log('[QuickStart] Quick start completed successfully.');
+        return { character: featuredCharacter, adventure };
 
     } catch (error) {
         console.error('[QuickStart] Unhandled error:', error);
         showToast('Quick Start failed: ' + (error.message || 'unknown error'), 'error');
+        return null;
     }
+}
+
+/**
+ * Fallback path for triggering Jump to the Action somewhere the welcome
+ * overlay isn't present to show its own confirmation pane (e.g. a future
+ * button elsewhere in the app) — does the same setup, then falls back to a
+ * toast + direct navigation instead of the in-overlay confirmation step.
+ */
+async function quickStartAndGo() {
+    const result = await quickStart();
+    if (!result) return;
+    markWelcomeSeen();
+    window.location.hash = 'adventure-manager';
+    const who = result.character ? ` as ${result.character.name}` : '';
+    showToast(`🚀 Launched "${result.adventure.title}"${who}!`, 'success');
 }
 // ─── Event Handling ──────────────────────────────────────────────────
 
@@ -1050,13 +1141,16 @@ function handleContainerClick(e) {
     scrollToSlide('slide-toolkit');
   } else if (action === 'quick-start') {
     e.preventDefault();
-    // If the overlay is open, dismiss it first
-    const overlay = document.getElementById('welcome-overlay');
-    if (overlay) {
-      overlay.remove();
-      overlayShown = false;
+    // The overlay's own click listener (added in showWelcomeOverlay) already
+    // handles this exact click since the overlay lives inside this same
+    // delegated container — don't also fire it here, or Jump to the Action
+    // runs twice. runQuickStart()'s quickStartInFlight guard makes this a
+    // no-op if it somehow does double-fire, but avoid it outright: only
+    // handle this action here for the case where the quick-start button
+    // was reached some other way (no overlay present).
+    if (!document.getElementById('welcome-overlay')) {
+      quickStartAndGo();
     }
-    quickStart();
   } else if (action === 'dismiss-welcome') {
     e.preventDefault();
     const overlay = document.getElementById('welcome-overlay');

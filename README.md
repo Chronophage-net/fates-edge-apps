@@ -1,6 +1,6 @@
 [![Build Apps and Packages](https://github.com/Chronophage-net/fates-edge-apps/actions/workflows/build-apps-and-packages.yml/badge.svg)](https://github.com/Chronophage-net/fates-edge-apps/actions/workflows/build-apps-and-packages.yml)
 
-# Fate's Edge Toolkit v4.5.0 – Complete VTT Ecosystem
+# Fate's Edge Toolkit v4.5.1 – Complete VTT Ecosystem
 
 > A modular, self-contained toolkit for running Fate's Edge TTRPG campaigns, with real‑time collaboration, VTT integrations, Game Master management, and a full in-browser magic/monastic-path system.
 
@@ -10,14 +10,14 @@
 [![Node.js](https://img.shields.io/badge/Node.js-24.x-green.svg)](https://nodejs.org/)
 [![Foundry VTT](https://img.shields.io/badge/Foundry-VTT-orange)](https://foundryvtt.com/)
 [![Discord](https://img.shields.io/badge/Discord-Bot-5865F2)](https://discord.com/)
-[![Version](https://img.shields.io/badge/version-4.5.0-blue)](https://github.com/nicholasagaspar/fates-edge-apps)
+[![Version](https://img.shields.io/badge/version-4.5.1-blue)](https://github.com/nicholasagaspar/fates-edge-apps)
 
 ---
 
 ## 📖 Table of Contents
 
 - [Overview](#-overview)
-- [What's New in v4.5.0](#-whats-new-in-v450)
+- [What's New in v4.5.1](#-whats-new-in-v451)
 - [Features](#-features)
 - [Quick Start](#-quick-start)
 - [Architecture](#-architecture)
@@ -39,6 +39,11 @@
 The toolkit includes **real‑time VTT features** via a WebSocket/Socket.io server, a **campaign sharing server** with GM election and shared Deck of Consequences draws, **integrations** for Foundry VTT, Discord, Roll20, and Avrae, and a growing set of **standalone in-browser mini-tools** (including an original strategy board game, Kon'reh).
 
 ---
+
+## 🆕 What's New in v4.5.1
+
+- **⚡ "Jump to the Action" — one‑click into a one‑shot** — The welcome overlay's Quick Start button is now **Jump to the Action**: it hands you a ready‑made pre‑gen character, loads and starts the bundled starter adventure (*The Lantern at Dusk*), and shows a short confirmation pane naming your character with a link to the Essentials quickstart doc, before dropping you into the Adventure Manager. Building this surfaced a real bug: `data/pre-gens.json` — the file the old Quick Start button fetched — never actually existed anywhere in the repo, so pre‑gen loading had always silently failed. Three new pre‑gens themed to the starter adventure were added, and a double‑fire bug in the button's click handling was fixed along the way.
+- **🧪 72/72 web-client tests passing** after the above (11 new).
 
 ## 🆕 What's New in v4.5.0
 
@@ -450,7 +455,13 @@ Licensed under **CC BY-NC-SA 4.0**. See [LICENSE.srd](LICENSE.srd).
 
 ## 📋 Version History
 
-### v4.5.0 (Current)
+### v4.5.1 (Current)
+- **Added** "Jump to the Action" one-click flow in the welcome overlay: pre-gen character + starter adventure + a link to the Essentials doc
+- **Added** `data/pre-gens.json` with three pre-gen characters themed to *The Lantern at Dusk*
+- **Fixed** The old Quick Start button's pre-gen loading step had silently failed forever — `data/pre-gens.json` never existed
+- **Fixed** A double-fire bug where the quick-start click could run twice (delegated container handler + the overlay's own direct listener)
+
+### v4.5.0
 - **Added** TURN credential minting (`server/turn.js`, `GET /api/turn-credentials`) and a `coturn` docker-compose service, so voice chat traverses symmetric NAT/restrictive firewalls
 - **Added** Unified root `docker-compose.yml` bringing up client + server + optional bots in one command
 - **Added** `COMMUNITY_USE_POLICY.md` plus split `LICENSE.code`/`LICENSE.srd`/`LICENSE.proprietary` files

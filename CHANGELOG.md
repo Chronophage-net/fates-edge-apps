@@ -3,6 +3,12 @@ All notable changes to this project will be documented here.
 
 Format loosely follows [Keep a Changelog](https://keepachangelog.com/), versions follow [Semantic Versioning](https://semver.org/).
 
+## [4.5.1] - 2026-08-05
+
+Jump to the Action: one-click pregen + starter adventure flow in the welcome overlay
+
+_No commits since the last tag — manual version bump._
+
 ## [4.5.0] - 2026-08-05
 
 Voice/logging fully implemented (TURN NAT traversal), unified docker-compose for the whole ecosystem, community use policy + split license files, System Status page, module system fixed and documented, data schema docs
