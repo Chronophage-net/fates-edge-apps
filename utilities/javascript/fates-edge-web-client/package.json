@@ -16,7 +16,6 @@
   },
   "dependencies": {
     "esbuild": "^0.28.1",
-    "fs": "^0.0.1-security",
     "serve": "^6.5.8"
   },
   "devDependencies": {

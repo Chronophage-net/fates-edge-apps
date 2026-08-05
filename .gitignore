@@ -22,7 +22,8 @@ __pycache__/
 *.pyo
 *.pyd
 .Python
-env/ venv/
+env/
+venv/
 .venv/
 pip-log.txt
 pip-delete-this-directory.txt
@@ -57,15 +58,27 @@ Desktop.ini
 .env.*.local
 
 # Web client
-ttrpg/utilities/javascript/fates-edge-web-client/dist/
-ttrpg/utilities/javascript/fates-edge-web-client/.vite/
+# CHANGED: these used to point at a "ttrpg/..." prefix this repo doesn't
+# actually have (utilities/javascript/... is the real path -- looks
+# copy-pasted from fates-edge-docs' layout, which does use that prefix).
+# The blanket node_modules/ and dist/ rules above already cover most of
+# this, but keep the specific paths correct and non-misleading.
+utilities/javascript/fates-edge-web-client/dist/
+utilities/javascript/fates-edge-web-client/.vite/
 
 # Desktop client
-ttrpg/utilities/javascript/fates-edge-desktop-client/dist/
-ttrpg/utilities/javascript/fates-edge-desktop-client/out/
+utilities/javascript/fates-edge-desktop-client/dist/
+utilities/javascript/fates-edge-desktop-client/out/
 
 # Discord bot
-ttrpg/utilities/fates-edge-discord-bot/node_modules/
+utilities/vtt_mods_bots/fates-edge-discord-bot/node_modules/
+
+# Runtime data -- databases are generated/mutable state, not source; they
+# don't diff/merge meaningfully and grow forever if tracked. See
+# campaigns.db, which was tracked with real session data in its history.
+*.db
+*.sqlite
+*.sqlite3
 
 #misc
 
