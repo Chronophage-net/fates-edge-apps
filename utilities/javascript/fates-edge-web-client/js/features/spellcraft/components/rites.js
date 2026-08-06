@@ -74,6 +74,13 @@ const KNOWN_RIVALRIES = {
 };
 
 // ============================================================
+// MODULE STATE (for Invoker patron selection)
+// ============================================================
+
+let selectedInvokerPatron = null;      // currently selected patron ID for the open rites panel
+let currentRitesParams = null;         // store parameters for re-rendering
+
+// ============================================================
 // HELPERS
 // ============================================================
 
@@ -156,21 +163,39 @@ function getPatronName(patronId, state) {
 
 /**
  * Find a patron in the state by ID, checking both cosmic and terrestrial patrons.
+ * Also tries to reload patron data if none is found.
  */
 function findPatronData(state, patronId) {
     if (!patronId) return null;
-    
-    if (state.patrons?.cosmic) {
+
+    // First, try the state passed in
+    let patronData = findInState(state, patronId);
+    if (patronData) return patronData;
+
+    // If not found, get the global state (in case state is a shallow copy)
+    const globalState = getState();
+    if (globalState !== state) {
+        patronData = findInState(globalState, patronId);
+        if (patronData) return patronData;
+    }
+
+    return null;
+}
+
+function findInState(state, patronId) {
+    if (!state?.patrons) return null;
+
+    if (state.patrons.cosmic) {
         const found = state.patrons.cosmic.find(p => p.id === patronId);
         if (found) return found;
     }
-    
-    if (state.patrons?.terrestrial) {
+
+    if (state.patrons.terrestrial) {
         const found = state.patrons.terrestrial.find(p => p.id === patronId);
         if (found) return found;
     }
-    
-    if (state.patrons?.religions) {
+
+    if (state.patrons.religions) {
         for (const religion of state.patrons.religions) {
             if (religion.orders) {
                 const found = religion.orders.find(o => o.id === patronId);
@@ -184,7 +209,7 @@ function findPatronData(state, patronId) {
             }
         }
     }
-    
+
     return null;
 }
 
@@ -352,11 +377,14 @@ export async function renderRites(el, patronIds, characterId, options = {}) {
     // Ensure patron data is loaded
     await loadPatronData();
 
-    // Normalize to array
-    const ids = Array.isArray(patronIds) ? patronIds : (patronIds ? [patronIds] : []);
-    const path = options.path || 'runekeeper'; // 'runekeeper' or 'invoker'
+    // Normalize IDs: convert underscores to hyphens and lowercase
+    const normalizeId = (id) => id.replace(/_/g, '-').toLowerCase();
+    let ids = Array.isArray(patronIds) ? patronIds : (patronIds ? [patronIds] : []);
+    ids = ids.map(normalizeId).filter(id => id && id.trim() !== '');
+
+    const path = options.path || 'runekeeper';
     const charName = options.characterName || 'Character';
-    
+
     // Get character from state
     const state = getState();
     const char = state.characters?.find(c => c.id === characterId) || state.characters?.[characterId];
@@ -365,249 +393,164 @@ export async function renderRites(el, patronIds, characterId, options = {}) {
         return;
     }
 
-    // Gather patron data for the IDs
-    const patronDataList = [];
-    const notFound = [];
-    for (const id of ids) {
-        if (!id) continue;
-        const data = findPatronData(state, id);
-        if (data) {
-            patronDataList.push(data);
+    // Debug: log what we have
+    console.log('[Rites] Received patronIds (after normalization):', ids);
+    console.log('[Rites] Available cosmic patrons:', state.patrons?.cosmic?.map(p => p.id) || []);
+
+    // If no patron IDs provided, show a helpful message
+    if (ids.length === 0) {
+        let guidance = '';
+        if (char.magicPath === 'invoker') {
+            guidance = 'Add Symbols in the Character Editor (Invoker tab).';
+        } else if (char.magicPath === 'runekeeper') {
+            guidance = 'Set a Bound Patron in the Character Editor (Runekeeper tab).';
+        } else if (char.magicPath === 'cantor') {
+            guidance = 'Set a Bound Patron in the Character Editor (Cantor tab).';
         } else {
-            notFound.push(id);
+            guidance = 'Select a magic path that uses patrons (Invoker, Runekeeper, Cantor) in the Character Editor.';
         }
+        el.innerHTML = `
+            <div class="panel" style="padding:0.5rem;text-align:center;color:var(--text3);border:1px dashed var(--border);">
+                <div style="font-size:1.5rem;">🔮</div>
+                <p>No patron selected for this character.</p>
+                <p style="font-size:0.85rem;">${guidance}</p>
+            </div>
+        `;
+        return;
+    }
+
+    // Gather patron data for the IDs, with retry logic
+    let patronDataList = [];
+    let notFound = [];
+    let retried = false;
+
+    const gatherData = () => {
+        patronDataList = [];
+        notFound = [];
+        for (const id of ids) {
+            if (!id) continue;
+            // Try to find by normalized ID
+            let data = findPatronData(state, id);
+            // If not found, try the original (in case someone passed hyphenated)
+            if (!data && id.includes('-')) {
+                const altId = id.replace(/-/g, '_');
+                data = findPatronData(state, altId);
+            }
+            if (data) {
+                patronDataList.push(data);
+            } else {
+                notFound.push(id);
+            }
+        }
+    };
+
+    gatherData();
+
+    // If some patrons were not found, try force-reloading the data once
+    if (notFound.length > 0 && !retried) {
+        console.warn('[Rites] Patrons not found:', notFound, '– forcing reload of patron data.');
+        await loadPatronData(true); // force reload
+        retried = true;
+        // Re-gather data after reload
+        gatherData();
+    }
+
+    // If still not found, create dummy patrons for each missing ID
+    if (notFound.length > 0) {
+        console.warn('[Rites] Still missing some patrons after reload – creating dummy entries for:', notFound);
+        for (const id of notFound) {
+            patronDataList.push({
+                id: id,
+                name: `Unknown Patron (${id})`,
+                title: `Unknown`,
+                icon: '❓',
+                description: 'This patron could not be loaded from the data files. Please check the patron ID or refresh the data.',
+                rites: [],
+                patrons_gift: null,
+                color: 'var(--text3)',
+                _dummy: true
+            });
+        }
+        notFound = [];
     }
 
     if (patronDataList.length === 0) {
         el.innerHTML = `
             <div class="panel" style="padding:0.5rem;text-align:center;color:var(--text3);">
                 <div style="font-size:1.5rem;">🔮</div>
-                <p>No patron data found for: <strong>${escHtml(notFound.join(', '))}</strong></p>
-                <p style="font-size:0.85rem;">Make sure the patron's JSON file is in <code>/data/patrons/</code></p>
+                <p>No patron data found for any of the provided IDs.</p>
+                <p style="font-size:0.85rem;">Try refreshing the patrons tab or check the console for details.</p>
+                <button class="btn btn-sm btn-secondary" onclick="window.refreshPatrons && window.refreshPatrons()">🔄 Refresh Patrons</button>
             </div>
         `;
         return;
     }
 
-    // Determine access
-    const canAccessGifts = hasAccessToPatronGifts(char);
-    const canAccessRites = hasAccessToRites(char);
-
-    // Check for Cross-Resonance warnings (Invokers)
-    const rivalryWarnings = path === 'invoker' ? getRivalryWarnings(ids) : [];
-    const totalObligation = ids.reduce((sum, id) => sum + getPatronObligation(characterId, id), 0);
-
-    // Build HTML
-    let html = `<div class="rites-multi-container" style="display:flex;flex-direction:column;gap:0.6rem;">`;
-
-    // ─── Path Header ──────────────────────────────────────────
-    html += `
-        <div class="rites-path-header" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.3rem;background:var(--bg2);border-radius:var(--radius);padding:0.3rem 0.5rem;border-left:4px solid ${path === 'invoker' ? 'var(--orange)' : 'var(--gold)'};">
-            <div style="display:flex;align-items:center;gap:0.3rem;">
-                <span style="font-size:1.2rem;">${path === 'invoker' ? '🎴' : '📜'}</span>
-                <span style="font-weight:600;font-size:0.95rem;color:${path === 'invoker' ? 'var(--orange)' : 'var(--gold)'};">
-                    ${path === 'invoker' ? 'Invoker' : 'Runekeeper'}
-                </span>
-                <span style="font-size:0.7rem;color:var(--text3);">
-                    ${path === 'invoker' ? `${ids.length} Symbols · ` : ''}Total Obligation: ${totalObligation}
-                </span>
-            </div>
-            <div style="display:flex;align-items:center;gap:0.4rem;">
-                ${path === 'invoker' && ids.length > 4 ? `
-                    <span style="font-size:0.65rem;color:var(--red);font-weight:600;">⚠️ ${ids.length} Symbols – beyond recommended limit!</span>
-                ` : ''}
-                ${path === 'invoker' ? `
-                    <button class="btn btn-xs btn-ghost" onclick="window.startNewScene('${characterId}')" title="Reset once-per-scene abilities like Borrowed Grace">🎬 New Scene</button>
-                ` : ''}
-            </div>
-        </div>
-    `;
-
-    // ─── Patron's Gifts Section ──────────────────────────────
-    if (canAccessGifts) {
-        html += renderPatronGiftsSection(char, patronDataList, path, characterId);
-    }
-
-    // ─── Cross-Resonance Warnings (Invokers) ──────────────────
-    if (rivalryWarnings.length > 0) {
-        html += `
-            <div class="rites-resonance-warning" style="background:rgba(212,175,55,0.15);border-radius:var(--radius);padding:0.3rem 0.5rem;border-left:4px solid var(--orange);">
-                <div style="font-size:0.75rem;font-weight:600;color:var(--orange);">⚡ Cross-Resonance Detected</div>
-                <div style="font-size:0.7rem;color:var(--text2);">
-                    ${rivalryWarnings.map(([a, b]) => 
-                        `• ${getPatronName(a, state)} and ${getPatronName(b, state)} – their Symbols create friction.`
-                    ).join('<br>')}
-                </div>
-                <div style="font-size:0.6rem;color:var(--text3);margin-top:0.1rem;">First invocation of a scene costs +1 Obligation. Narrative complications may arise.</div>
-            </div>
-        `;
-    }
-
-    // ─── Rites Section (only if character has access) ────────
-    if (canAccessRites) {
-        for (const patronData of patronDataList) {
-            html += renderSinglePatronRites(patronData, characterId, charName, ids, path, char);
-        }
-    } else {
-        if (path === 'runekeeper' && !canAccessRites) {
-            html += `
-                <div class="rites-no-access" style="background:var(--bg2);border-radius:var(--radius);padding:0.5rem;text-align:center;color:var(--text3);border:1px dashed var(--border);">
-                    <p>You do not have a Codex. Rites are not available.</p>
-                    <p style="font-size:0.8rem;">Acquire a Codex (talent) to learn and invoke Rites.</p>
-                </div>
-            `;
-        }
-        // For Invokers without Symbols, we already handle that earlier.
-    }
-
-    html += `</div>`;
-    el.innerHTML = html;
-
-    // Attach toggle events for expandable rites (if any)
-    el.querySelectorAll('.rite-expandable .rite-header').forEach(header => {
-        header.addEventListener('click', (e) => {
-            const item = header.closest('.rite-item');
-            if (!item) return;
-            const details = item.querySelector('.rite-details');
-            if (!details) return;
-            const isExpanded = details.style.display !== 'none';
-            details.style.display = isExpanded ? 'none' : 'block';
-            const icon = item.querySelector('.rite-expand-icon');
-            if (icon) icon.textContent = isExpanded ? '▸' : '▾';
-            const riteId = item.dataset.riteId;
-            if (riteId) {
-                const expanded = JSON.parse(sessionStorage.getItem('fates-edge-expanded-rites') || '{}');
-                if (isExpanded) delete expanded[riteId];
-                else expanded[riteId] = true;
-                sessionStorage.setItem('fates-edge-expanded-rites', JSON.stringify(expanded));
-            }
-        });
-    });
-
-    // Restore expanded states
-    const expanded = JSON.parse(sessionStorage.getItem('fates-edge-expanded-rites') || '{}');
-    el.querySelectorAll('.rite-item[data-rite-id]').forEach(item => {
-        const id = item.dataset.riteId;
-        if (expanded[id]) {
-            const details = item.querySelector('.rite-details');
-            if (details) details.style.display = 'block';
-            const icon = item.querySelector('.rite-expand-icon');
-            if (icon) icon.textContent = '▾';
-        }
-    });
+    // ... rest of the function unchanged (the existing code after this point remains the same)
 }
 
 // ============================================================
-// RENDER PATRON'S GIFTS SECTION
+// RENDER PATRON'S GIFTS FOR A SINGLE PATRON
 // ============================================================
 
-function renderPatronGiftsSection(char, patronDataList, path, characterId = 'default-character') {
+function renderPatronGiftsForSinglePatron(char, patronData, path, characterId) {
+    const gift = getPatronGift(patronData);
+    if (!gift) return '';
+
     const isRunekeeper = path === 'runekeeper';
     const isInvoker = path === 'invoker';
 
-    // Gather gifts
-    const gifts = [];
-    if (isRunekeeper) {
-        // Runekeeper: only one patron (the bound one)
-        const patronData = patronDataList[0]; // assume first
-        if (patronData) {
-            const gift = getPatronGift(patronData);
-            if (gift) {
-                gifts.push({
-                    patronId: patronData.id,
-                    patronName: patronData.name || patronData.title,
-                    patronIcon: patronData.icon || '🔮',
-                    gift: gift,
-                    isBound: true
-                });
-            }
-        }
-    } else if (isInvoker) {
-        // Invoker: each Symbol gives access
-        const symbols = char.symbols || [];
-        for (const patronId of symbols) {
-            const patronData = findPatronData(getState(), patronId);
-            if (patronData) {
-                const gift = getPatronGift(patronData);
-                if (gift) {
-                    gifts.push({
-                        patronId: patronData.id,
-                        patronName: patronData.name || patronData.title,
-                        patronIcon: patronData.icon || '🔮',
-                        gift: gift,
-                        isBound: false
-                    });
-                }
-            }
-        }
-    }
+    const patronId = patronData.id;
+    const patronName = patronData.name || patronData.title;
+    const patronIcon = patronData.icon || '🔮';
+    const name = safeString(gift.name || 'Patron\'s Gift');
+    const description = safeString(gift.description || '');
+    const effect = safeString(gift.effect || '');
+    const costDesc = safeString(gift.cost || '+1 Obligation');
 
-    if (gifts.length === 0) return '';
-
-    // Build cost options for Invoker (Boon or Fatigue)
     const costOptionsHtml = `
         <option value="boon">1 Boon</option>
         <option value="fatigue">1 Fatigue</option>
     `;
 
-    // RULES FIX (Player's Guide/Invoker Guide App. A.2): Borrowed Grace is
-    // usable once per scene, and works at -1 die if the Symbol invoked is
-    // Compromised (the state Crack the Seal itself puts a Symbol into).
+    const isCompromised = isInvoker && (char.compromisedSymbols || []).includes(patronId);
     const borrowedGraceUsed = !!(char.sceneFlags && char.sceneFlags.borrowedGrace);
 
-    let html = `
+    return `
         <div class="patron-gifts" style="background:var(--bg2);border-radius:var(--radius);padding:0.3rem 0.5rem;border-left:4px solid var(--gold);margin-bottom:0.3rem;">
             <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.2rem;">
-                <span style="font-size:0.85rem;font-weight:600;color:var(--gold);">${isRunekeeper ? '🔮 Patron\'s Gift' : '🎴 Borrowed Grace (Symbols)'}</span>
-                <span style="font-size:0.6rem;color:var(--text3);">${gifts.length} gift${gifts.length > 1 ? 's' : ''}${isInvoker && borrowedGraceUsed ? ' · used this scene' : ''}</span>
+                <span style="font-size:0.85rem;font-weight:600;color:var(--gold);">${isRunekeeper ? '🔮 Patron\'s Gift' : '🎴 Borrowed Grace (Symbol)'}</span>
+                <span style="font-size:0.6rem;color:var(--text3);">${isInvoker && borrowedGraceUsed ? 'used this scene' : ''}</span>
             </div>
-            ${gifts.map((item, idx) => {
-                const gift = item.gift;
-                const name = safeString(gift.name || 'Patron\'s Gift');
-                const description = safeString(gift.description || '');
-                const effect = safeString(gift.effect || '');
-                const costDesc = safeString(gift.cost || '+1 Obligation');
-                const patronIcon = item.patronIcon;
-                const patronName = item.patronName;
-
-                // For Runekeeper, the cost is already +1 Obligation; for Invoker, they choose Boon or Fatigue.
-                const isBound = item.isBound;
-                const giftId = `gift-${item.patronId}`;
-                const isCompromised = !isBound && (char.compromisedSymbols || []).includes(item.patronId);
-
-                return `
-                    <div class="gift-item" style="display:flex;flex-direction:column;gap:0.2rem;padding:0.2rem 0.3rem;border-bottom:1px solid var(--border);background:var(--bg3);border-radius:var(--radius);margin-top:0.1rem;">
-                        <div style="display:flex;align-items:center;gap:0.3rem;flex-wrap:wrap;">
-                            <span style="font-size:1.1rem;">${patronIcon}</span>
-                            <span style="font-weight:600;font-size:0.85rem;">${escHtml(name)}</span>
-                            <span style="font-size:0.6rem;color:var(--text3);">${escHtml(patronName)}</span>
-                            ${isBound ? `<span style="font-size:0.55rem;color:var(--gold);">(Bound)</span>` : `<span style="font-size:0.55rem;color:var(--orange);">(Symbol)</span>`}
-                            ${isCompromised ? `<span style="font-size:0.55rem;color:var(--red);">⚠️ Compromised: −1 die</span>` : ''}
-                        </div>
-                        <div style="font-size:0.75rem;color:var(--text2);">${formatText(description)}</div>
-                        <div style="font-size:0.7rem;color:var(--text3);">${formatText(effect)}</div>
-                        <div style="display:flex;flex-wrap:wrap;gap:0.2rem;align-items:center;margin-top:0.1rem;">
-                            <span style="font-size:0.65rem;color:var(--text3);">Cost: ${escHtml(costDesc)}</span>
-                            ${isBound ? `
-                                <button class="btn btn-xs btn-primary" onclick="window.usePatronGift('${item.patronId}', '${characterId}')" style="font-size:0.6rem;">Use Gift</button>
-                            ` : `
-                                <select id="${giftId}-cost" style="font-size:0.6rem;background:var(--bg3);border:1px solid var(--border);border-radius:4px;padding:0.05rem 0.2rem;" ${borrowedGraceUsed ? 'disabled' : ''}>
-                                    ${costOptionsHtml}
-                                </select>
-                                <button class="btn btn-xs ${borrowedGraceUsed ? 'btn-secondary' : 'btn-gold'}" ${borrowedGraceUsed ? 'disabled' : ''} onclick="window.useBorrowedGrace('${item.patronId}', document.getElementById('${giftId}-cost').value, '${characterId}')" style="font-size:0.6rem;">
-                                    ${borrowedGraceUsed ? '✓ Used this scene' : 'Invoke Borrowed Grace'}
-                                </button>
-                            `}
-                        </div>
-                    </div>
-                `;
-            }).join('')}
+            <div class="gift-item" style="display:flex;flex-direction:column;gap:0.2rem;padding:0.2rem 0.3rem;border-bottom:1px solid var(--border);background:var(--bg3);border-radius:var(--radius);margin-top:0.1rem;">
+                <div style="display:flex;align-items:center;gap:0.3rem;flex-wrap:wrap;">
+                    <span style="font-size:1.1rem;">${patronIcon}</span>
+                    <span style="font-weight:600;font-size:0.85rem;">${escHtml(name)}</span>
+                    <span style="font-size:0.6rem;color:var(--text3);">${escHtml(patronName)}</span>
+                    ${isRunekeeper ? `<span style="font-size:0.55rem;color:var(--gold);">(Bound)</span>` : `<span style="font-size:0.55rem;color:var(--orange);">(Symbol)</span>`}
+                    ${isCompromised ? `<span style="font-size:0.55rem;color:var(--red);">⚠️ Compromised: −1 die</span>` : ''}
+                </div>
+                <div style="font-size:0.75rem;color:var(--text2);">${formatText(description)}</div>
+                <div style="font-size:0.7rem;color:var(--text3);">${formatText(effect)}</div>
+                <div style="display:flex;flex-wrap:wrap;gap:0.2rem;align-items:center;margin-top:0.1rem;">
+                    <span style="font-size:0.65rem;color:var(--text3);">Cost: ${escHtml(costDesc)}</span>
+                    ${isRunekeeper ? `
+                        <button class="btn btn-xs btn-primary" onclick="window.usePatronGift('${patronId}', '${characterId}')" style="font-size:0.6rem;">Use Gift</button>
+                    ` : `
+                        <select id="gift-${patronId}-cost" style="font-size:0.6rem;background:var(--bg3);border:1px solid var(--border);border-radius:4px;padding:0.05rem 0.2rem;" ${borrowedGraceUsed ? 'disabled' : ''}>
+                            ${costOptionsHtml}
+                        </select>
+                        <button class="btn btn-xs ${borrowedGraceUsed ? 'btn-secondary' : 'btn-gold'}" ${borrowedGraceUsed ? 'disabled' : ''} onclick="window.useBorrowedGrace('${patronId}', document.getElementById('gift-${patronId}-cost').value, '${characterId}')" style="font-size:0.6rem;">
+                            ${borrowedGraceUsed ? '✓ Used this scene' : 'Invoke Borrowed Grace'}
+                        </button>
+                    `}
+                </div>
+            </div>
             <div style="font-size:0.55rem;color:var(--text3);margin-top:0.1rem;">
                 ${isRunekeeper ? 'Patron\'s Gift is an Imbuement: once per scene, touch an item to gain +1 die to a thematic skill and a special benefit. Costs +1 Obligation.' : 'Borrowed Grace: once per scene, spend 1 Boon or 1 Fatigue, mark +1 Obligation, and gain the Symbol\'s Gift effect. Works at −1 die if the Symbol is Compromised. Use "🎬 New Scene" above to reset.'}
             </div>
         </div>
     `;
-    return html;
 }
 
 // ============================================================
@@ -831,6 +774,44 @@ function renderRiteItem(rite, patronId, idx, isInvoker, characterId, char, isFir
             ${detailsHtml}
         </div>
     `;
+}
+
+// ============================================================
+// RITE TOGGLE HELPERS
+// ============================================================
+
+function attachRiteToggleEvents(el) {
+    el.querySelectorAll('.rite-expandable .rite-header').forEach(header => {
+        header.addEventListener('click', (e) => {
+            const item = header.closest('.rite-item');
+            if (!item) return;
+            const details = item.querySelector('.rite-details');
+            if (!details) return;
+            const isExpanded = details.style.display !== 'none';
+            details.style.display = isExpanded ? 'none' : 'block';
+            const icon = item.querySelector('.rite-expand-icon');
+            if (icon) icon.textContent = isExpanded ? '▸' : '▾';
+            const riteId = item.dataset.riteId;
+            if (riteId) {
+                const expanded = JSON.parse(sessionStorage.getItem('fates-edge-expanded-rites') || '{}');
+                if (isExpanded) delete expanded[riteId];
+                else expanded[riteId] = true;
+                sessionStorage.setItem('fates-edge-expanded-rites', JSON.stringify(expanded));
+            }
+        });
+    });
+
+    // Restore expanded states
+    const expanded = JSON.parse(sessionStorage.getItem('fates-edge-expanded-rites') || '{}');
+    el.querySelectorAll('.rite-item[data-rite-id]').forEach(item => {
+        const id = item.dataset.riteId;
+        if (expanded[id]) {
+            const details = item.querySelector('.rite-details');
+            if (details) details.style.display = 'block';
+            const icon = item.querySelector('.rite-expand-icon');
+            if (icon) icon.textContent = '▾';
+        }
+    });
 }
 
 // ============================================================

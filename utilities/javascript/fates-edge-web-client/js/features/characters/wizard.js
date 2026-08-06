@@ -1124,7 +1124,7 @@ function renderStep2Skills(d) {
                     <div style="font-size:0.65rem;color:var(--text3);">${attrName}</div>
                 </div>
                 <input type="number" id="wz-sk-${key}" value="${val}" min="0" max="5" 
-                    style="width:45px;text-align:center;" data-skill="${key}" data-attr="${attrId}" />
+                    style="width:60px;text-align:center;" data-skill="${key}" data-attr="${attrId}" />
                 <div style="font-size:0.65rem;color:var(--gold);width:50px;text-align:right;" id="wz-sk-${key}-cost">
                     ${val > 0 ? `${cost}XP` : '—'}
                 </div>
@@ -1267,6 +1267,47 @@ function renderStep3TalentsAndLoadout(d) {
         `<option value="${p.id}" ${d.magicPath === p.id ? 'selected' : ''}>${escHtml(p.label)}</option>`
     ).join('');
     
+    // ─── Invoker Symbols section ──────────────────────────────────────
+    const isInvoker = d.magicPath === 'invoker';
+    const symbolRows = (d.symbols || []).map((patronId, idx) => {
+        const patronName = getPatronLabel(patronId) || patronId;
+        return `
+            <div class="dynamic-row wz-symbol-row" data-index="${idx}">
+                <span class="wz-symbol-patron" style="flex:2; padding:0.2rem;">${escHtml(patronName)}</span>
+                <span class="wz-symbol-id" style="flex:1; padding:0.2rem;color:var(--text3);">${escHtml(patronId)}</span>
+                <button class="wizard-remove-btn" data-remove-symbol="${patronId}">✕</button>
+            </div>
+        `;
+    }).join('');
+
+    // In the HTML output, after the magic path fields, add:
+    `
+    <!-- ─── Invoker Symbols ──────────────────────────────────────────── -->
+    <div id="wz-invoker-fields" style="display:${isInvoker ? 'block' : 'none'}; margin-top:0.3rem;">
+        <div class="invoker-fields">
+            <h5>🎴 Invoker Symbols</h5>
+            <div class="info-box" style="font-size:0.75rem;">
+                Each symbol grants access to a patron's Borrowed Grace and rites. You can carry up to 4 symbols without penalty.
+                Symbols are assets that count toward your asset slots (but you may treat them as free for simplicity at creation).
+            </div>
+            <div style="display:flex; gap:0.4rem; margin-bottom:0.3rem;">
+                <select id="wz-add-symbol-select" style="flex:1;">
+                    <option value="">— Select a patron —</option>
+                    ${getPatronOptions().filter(p => p.id).map(p => 
+                        `<option value="${p.id}">${escHtml(p.label)}</option>`
+                    ).join('')}
+                </select>
+                <button class="btn btn-sm btn-primary" id="wz-add-symbol-btn">➕ Add Symbol</button>
+            </div>
+            <div id="wz-symbol-list">
+                ${symbolRows}
+            </div>
+            <div style="font-size:0.65rem;color:var(--text3);margin-top:0.2rem;">
+                Symbols added here will appear as assets "Symbol of [Patron]" and will be available in the Spellcraft panel.
+            </div>
+        </div>
+    </div>
+    `
     const patronOptions = buildPatronOptionsHTML(d.patron || '');
     const boundPatronOptions = buildPatronOptionsHTML(d.boundPatron || '');
     
@@ -1374,7 +1415,41 @@ function renderStep3TalentsAndLoadout(d) {
                     </div>
                 </div>
             </div>
-            
+            // ─── Invoker: Symbols ──────────────────────────────────────────────
+            <div id="wz-invoker-fields" style="display:${d.magicPath === 'invoker' ? 'block' : 'none'}; margin-top:0.3rem;">
+                <div class="invoker-fields">
+                    <h5>🎴 Invoker Symbols</h5>
+                    <div class="info-box" style="font-size:0.75rem;">
+                        Each symbol grants access to a patron's Borrowed Grace and rites. You can carry up to 4 symbols without penalty.
+                        Symbols are assets that count toward your asset slots (but you may treat them as free for simplicity at creation).
+                    </div>
+                    <div style="display:flex; gap:0.4rem; margin-bottom:0.3rem;">
+                        <select id="wz-add-symbol-select" style="flex:1;">
+                            <option value="">— Select a patron —</option>
+                            ${getPatronOptions().filter(p => p.id).map(p => 
+                                `<option value="${p.id}">${escHtml(p.label)}</option>`
+                            ).join('')}
+                        </select>
+                        <button class="btn btn-sm btn-primary" id="wz-add-symbol-btn">➕ Add Symbol</button>
+                    </div>
+                    <div id="wz-symbol-list">
+                        ${(d.symbols || []).map((patronId) => {
+                            const patronName = getPatronLabel(patronId) || patronId;
+                            return `
+                                <div class="dynamic-row wz-symbol-row" data-patron="${patronId}">
+                                    <span class="wz-symbol-patron" style="flex:2; padding:0.2rem;">${escHtml(patronName)}</span>
+                                    <span class="wz-symbol-id" style="flex:1; padding:0.2rem;color:var(--text3);">${escHtml(patronId)}</span>
+                                    <button class="wizard-remove-btn" data-remove-symbol="${patronId}">✕</button>
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>
+                    <div style="font-size:0.65rem;color:var(--text3);margin-top:0.2rem;">
+                        Symbols added here will appear as assets "Symbol of [Patron]" and will be available in the Spellcraft panel.
+                    </div>
+                </div>
+            </div>
+
             <h4 style="margin:0.8rem 0 0.2rem;">⚔️ Combat Loadout</h4>
             <div class="info-box" style="font-size:0.75rem;">
                 Starting gear (free): One set of clothing, a Light weapon, Light armor (if needed), 
@@ -1722,10 +1797,12 @@ function attachEvents() {
 
     clearListeners();
 
+    // ─── Navigation ──────────────────────────────────────────────
     addListener(document.getElementById('wizard-back'), 'click', wizardBack);
     addListener(document.getElementById('wizard-next'), 'click', wizardNext);
     addListener(document.getElementById('wizardModalClose'), 'click', closeWizard);
 
+    // ─── Keyboard shortcuts ──────────────────────────────────────
     const keyHandler = (e) => {
         if (!state.isOpen) return;
         if (e.key === 'Escape') closeWizard();
@@ -1736,44 +1813,74 @@ function attachEvents() {
     };
     addListener(document, 'keydown', keyHandler);
 
+    // ─── Click handler ──────────────────────────────────────────
     const clickHandler = (e) => {
         const target = e.target;
 
+        // Dynamic row add
         if (target.matches('[data-wizard-add]')) {
             const prefix = target.dataset.wizardAdd;
             addWizardDynamic(prefix);
             e.preventDefault();
+            return;
         }
 
+        // Remove dynamic row (talents, assets, equipment, symbols)
         if (target.matches('.wizard-remove-btn')) {
             const row = target.closest('.dynamic-row');
-            if (row) row.remove();
-            if (state.data) state.data.talents = readTalentListFromDOM();
-            updateXpBudgetFromDOM();
-            if (state.step === 4) setTimeout(updateSummaryDisplay, 50);
+            if (row) {
+                // Check if it's a symbol row (has data-patron)
+                const patronId = row.dataset.patron;
+                if (patronId) {
+                    // Remove symbol
+                    if (state.data.symbols) {
+                        state.data.symbols = state.data.symbols.filter(id => id !== patronId);
+                        const patronName = getPatronLabel(patronId) || patronId;
+                        const assetName = `Symbol of ${patronName}`;
+                        if (state.data.assets) {
+                            state.data.assets = state.data.assets.filter(a => a.name !== assetName);
+                        }
+                        renderStep();
+                        showToast(`Removed Symbol of ${patronName}`, 'info');
+                    }
+                } else {
+                    // Regular dynamic row removal (talents, assets, equipment)
+                    row.remove();
+                    if (state.data) state.data.talents = readTalentListFromDOM();
+                    updateXpBudgetFromDOM();
+                    if (state.step === 4) setTimeout(updateSummaryDisplay, 50);
+                }
+            }
             e.preventDefault();
+            return;
         }
 
+        // Bond/Complication start checkbox
         if (target.matches('.wz-bond-start, .wz-comp-start')) {
             if (state.isOpen && state.step === 4) {
                 setTimeout(updateSummaryDisplay, 50);
             }
+            return;
         }
 
+        // Heritage change
         if (target.matches('#wz-heritage')) {
             const heritage = HERITAGES.find(h => h.id === target.value);
             const noteEl = document.getElementById('wz-heritage-note');
             if (noteEl && heritage) {
                 noteEl.innerHTML = `<strong>Adjustments:</strong> ${escHtml(heritage.adj)}<br>${escHtml(heritage.note)}`;
             }
+            return;
         }
 
+        // Magic path change
         if (target.matches('#wz-magic-path')) {
             const path = MAGIC_PATHS.find(p => p.id === target.value);
             const noteEl = document.getElementById('wz-magic-path-note');
             if (noteEl && path) {
                 noteEl.textContent = path.note;
             }
+            // Toggle path-specific fields
             const runekeeperFields = document.getElementById('wz-runekeeper-fields');
             if (runekeeperFields) {
                 runekeeperFields.style.display = target.value === 'runekeeper' ? 'block' : 'none';
@@ -1782,46 +1889,91 @@ function attachEvents() {
             if (cantorFields) {
                 cantorFields.style.display = target.value === 'cantor' ? 'block' : 'none';
             }
+            const invokerFields = document.getElementById('wz-invoker-fields');
+            if (invokerFields) {
+                invokerFields.style.display = target.value === 'invoker' ? 'block' : 'none';
+            }
+            return;
         }
 
+        // Armor type change
         if (target.matches('#wz-armor-type')) {
             const armor = ARMOR_TYPES.find(a => a.id === target.value);
             const infoEl = document.getElementById('wz-armor-info');
             if (infoEl && armor) {
                 infoEl.textContent = armor.conversion;
             }
+            return;
         }
 
+        // Weapon class change
         if (target.matches('#wz-weapon-class')) {
             const weapon = WEAPON_CLASSES.find(w => w.id === target.value);
             const infoEl = document.getElementById('wz-weapon-info');
             if (infoEl && weapon) {
                 infoEl.textContent = `${weapon.note} | Close: ${weapon.close} | Near: ${weapon.near}`;
             }
+            return;
         }
 
+        // Catalog add button
         if (target.matches('.catalog-add-btn')) {
             const name = target.dataset.name;
             const cost = parseInt(target.dataset.cost, 10);
             addTalentFromCatalog(name, cost);
             e.preventDefault();
+            return;
         }
 
+        // Add custom talent
         if (target.matches('#wz-add-custom-talent')) {
             addCustomTalentRow();
             e.preventDefault();
+            return;
+        }
+
+        // ─── Add Symbol button ────────────────────────────────────
+        if (target.matches('#wz-add-symbol-btn')) {
+            const select = document.getElementById('wz-add-symbol-select');
+            if (!select) return;
+            const patronId = select.value;
+            if (!patronId) {
+                showToast('Please select a patron.', 'warning');
+                return;
+            }
+            if (!state.data.symbols) state.data.symbols = [];
+            if (state.data.symbols.includes(patronId)) {
+                showToast('Symbol already added.', 'info');
+                return;
+            }
+            state.data.symbols.push(patronId);
+            // Also add as asset
+            const patronName = getPatronLabel(patronId) || patronId;
+            const assetName = `Symbol of ${patronName}`;
+            if (!state.data.assets) state.data.assets = [];
+            if (!state.data.assets.some(a => a.name === assetName)) {
+                state.data.assets.push({ name: assetName, cost: 0 });
+            }
+            renderStep();
+            showToast(`Added Symbol of ${patronName}`, 'success');
+            e.preventDefault();
+            return;
         }
     };
     addListener(document, 'click', clickHandler);
-    
+
+    // ─── Input handlers ──────────────────────────────────────────
     const inputHandler = (e) => {
         if (!state.isOpen) return;
-        if (state.step === 4 && e.target.matches('.wz-bond-name, .wz-bond-desc, .wz-comp-name, .wz-comp-desc, .wz-talent-name, .wz-talent-cost')) {
-            if (e.target.matches('.wz-talent-cost')) {
-                state.data.talents = readTalentListFromDOM();
-            }
-            setTimeout(updateSummaryDisplay, 50);
+        // Update talent list when talent name/cost changes
+        if (e.target.matches('.wz-talent-name, .wz-talent-cost')) {
+            state.data.talents = readTalentListFromDOM();
             updateXpBudgetFromDOM();
+            if (state.step === 4) setTimeout(updateSummaryDisplay, 50);
+        }
+        // Update bonds/complications when they change
+        if (state.step === 4 && e.target.matches('.wz-bond-name, .wz-bond-desc, .wz-comp-name, .wz-comp-desc')) {
+            setTimeout(updateSummaryDisplay, 50);
         }
     };
     addListener(document, 'input', inputHandler);

@@ -23,6 +23,12 @@
  * 3. saveEditor normalises backgroundTags to an array before saving.
  * 4. recalculateXpBudget now catches errors from readDynamicList.
  * ────────────────────────────────────────────────────────────────────────
+ * 
+ * 5. Skill input width increased from 45px to 60px so values are readable.
+ * 6. Editor content container now scrollable (max-height:80vh; overflow-y:auto).
+ * 7. Invoker Symbols section added for managing symbols (patron + state).
+ * 8. Event listeners for adding/removing symbols.
+ * ────────────────────────────────────────────────────────────────────────
  */
 
 import { getState, addCharacter, getCharacter, updateCharacter, deleteCharacter } from '../../core/state.js';
@@ -1022,7 +1028,7 @@ function createModal() {
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;">
             <h2 id="char-modal-title" style="margin:0;color:var(--gold);">Character Editor</h2>
         </div>
-        <div id="char-editor-content"></div>
+        <div id="char-editor-content" style="max-height:80vh; overflow-y:auto;"></div>
     `;
     return modal;
 }
@@ -1080,7 +1086,7 @@ function buildEditorHTML(c) {
                     <label style="font-size:0.8rem;font-weight:500;">${s}</label>
                     <div style="font-size:0.6rem;color:var(--text3);">${attrName}</div>
                 </div>
-                <input type="number" id="ce-sk-${key}" value="${val}" min="0" max="5" style="width:45px;text-align:center;" />
+                <input type="number" id="ce-sk-${key}" value="${val}" min="0" max="5" style="width:60px;text-align:center;" />
             </div>
         `;
     }).join('');
@@ -1098,6 +1104,14 @@ function buildEditorHTML(c) {
     const equipRows = validEquipment.map((e, i) => dynamicRowHTML('equipment', i, e)).join('');
     const bondRows = validBonds.map((b, i) => dynamicRowHTML('bond', i, b)).join('');
     const compRows = validComplications.map((cp, i) => dynamicRowHTML('complication', i, cp)).join('');
+
+    // ─── Invoker Symbols ──────────────────────────────────────────────
+    // Ensure c.symbols is an array
+    const symbols = Array.isArray(c.symbols) ? c.symbols : [];
+    const symbolRows = symbols.map((patronId, idx) => {
+        const stateVal = (c.symbolStates && c.symbolStates[patronId]) || 'active';
+        return dynamicRowHTML('symbol', idx, { patron: patronId, state: stateVal });
+    }).join('');
 
     const isRunekeeper = c.magicPath === 'runekeeper';
     const isCantor = c.magicPath === 'cantor';
@@ -1232,6 +1246,27 @@ function buildEditorHTML(c) {
                         <label>Resonant Rites</label>
                         <input id="ce-resonant-rites" value="${escHtml((c.resonantRites || []).join(', '))}" placeholder="Comma-separated" />
                     </div>
+                </div>
+            </div>
+
+            <!-- Invoker Fields -->
+            <div id="ce-invoker-fields" style="display:${isInvoker ? 'block' : 'none'}; border-top:1px solid var(--border); padding-top:0.3rem;">
+                <h5 style="margin:0.2rem 0;">🎴 Invoker Symbols</h5>
+                <div class="info-box" style="font-size:0.75rem; background:var(--bg3); padding:0.3rem; border-radius:4px;">
+                    Each symbol grants access to a patron's Borrowed Grace and rites. You can carry up to 4 symbols without penalty.
+                </div>
+                <div style="display:flex; gap:0.4rem; margin-bottom:0.3rem;">
+                    <select id="ce-add-symbol-select" style="flex:1; background:var(--bg3); border:1px solid var(--border); border-radius:4px; padding:0.1rem 0.3rem;">
+                        <option value="">— Select a patron —</option>
+                        ${getPatronOptions().filter(p => p.id).map(p => 
+                            `<option value="${p.id}">${escHtml(p.label)}</option>`
+                        ).join('')}
+                    </select>
+                    <button class="btn btn-sm btn-primary" id="ce-add-symbol-btn">➕ Add Symbol</button>
+                </div>
+                <div id="ce-symbol-list">${symbolRows}</div>
+                <div style="font-size:0.65rem;color:var(--text3);margin-top:0.2rem;">
+                    Symbols added here appear in the Spellcraft panel for Invokers.
                 </div>
             </div>
 
@@ -1723,6 +1758,48 @@ function attachEditorEvents() {
     if (customTalentBtn) {
         customTalentBtn.addEventListener('click', () => {
             if (editorState.currentId) openTalentEditor(editorState.currentId, -1);
+        });
+    }
+
+    // ─── Invoker Symbols: Add Symbol ───────────────────────────────
+    const addSymbolBtn = document.getElementById('ce-add-symbol-btn');
+    if (addSymbolBtn) {
+        addSymbolBtn.addEventListener('click', () => {
+            const select = document.getElementById('ce-add-symbol-select');
+            if (!select) return;
+            const patronId = select.value;
+            if (!patronId) {
+                showToast('Please select a patron.', 'warning');
+                return;
+            }
+            // Check if already added
+            const list = document.getElementById('ce-symbol-list');
+            if (!list) return;
+            // Check if the patron is already in the list
+            const existingRows = list.querySelectorAll('.ce-symbol-row');
+            for (const row of existingRows) {
+                const sel = row.querySelector('.ce-symbol-patron');
+                if (sel && sel.value === patronId) {
+                    showToast('Symbol already added.', 'info');
+                    return;
+                }
+            }
+            // Build new row
+            const patronOptions = buildPatronOptionsHTML(patronId);
+            const row = document.createElement('div');
+            row.className = 'dynamic-row ce-symbol-row';
+            row.innerHTML = `
+                <select class="ce-symbol-patron" style="flex:1;">${patronOptions}</select>
+                <select class="ce-symbol-state" style="width:100px;">
+                    <option value="active" selected>Active</option>
+                    <option value="compromised">Compromised</option>
+                    <option value="shattered">Shattered</option>
+                </select>
+                <button class="btn btn-xs editor-remove-btn">✕</button>
+            `;
+            list.appendChild(row);
+            showToast(`Added Symbol of ${select.options[select.selectedIndex].text}`, 'success');
+            recalculateXpBudget();
         });
     }
 
