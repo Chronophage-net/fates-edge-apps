@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "generated": "2026-08-06T20:45:30.875Z",
+  "generated": "2026-08-07T17:10:24.011Z",
   "documents": [
     {
       "id": "systems_reference_document",
@@ -10,6 +10,26 @@
       "category": "core",
       "categoryLabel": "📘 Core",
       "core": true,
+      "active": true
+    },
+    {
+      "id": "ashes_of_the_infernal_accord",
+      "title": "Ashes   Of   The   Infernal   Accord",
+      "file": "Fates_-_Edge_-_-Ashes-_-of-_-the-_-Infernal-_-Accord.html",
+      "path": "/data/docs/adventures/",
+      "category": "adventures",
+      "categoryLabel": "🗡️ Adventures",
+      "core": false,
+      "active": true
+    },
+    {
+      "id": "black_barrow_keep",
+      "title": "Black   Barrow   Keep",
+      "file": "Fates_-_Edge_-_-Black-_-Barrow-_-Keep.html",
+      "path": "/data/docs/adventures/",
+      "category": "adventures",
+      "categoryLabel": "🗡️ Adventures",
+      "core": false,
       "active": true
     },
     {
@@ -53,6 +73,26 @@
       "active": true
     },
     {
+      "id": "hollowed_hunger",
+      "title": "Hollowed   Hunger",
+      "file": "Fates_-_Edge_-_-Hollowed-_-Hunger.html",
+      "path": "/data/docs/adventures/",
+      "category": "adventures",
+      "categoryLabel": "🗡️ Adventures",
+      "core": false,
+      "active": true
+    },
+    {
+      "id": "into_the_direwood",
+      "title": "Into   The   Direwood",
+      "file": "Fates_-_Edge_-_-Into-_-the-_-Direwood.html",
+      "path": "/data/docs/adventures/",
+      "category": "adventures",
+      "categoryLabel": "🗡️ Adventures",
+      "core": false,
+      "active": true
+    },
+    {
       "id": "kon_reh_quickstart",
       "title": "Kon'Reh   Quickstart",
       "file": "Kon'reh-_-Quickstart.html",
@@ -83,6 +123,16 @@
       "active": true
     },
     {
+      "id": "mist_walker",
+      "title": "Mist   Walker",
+      "file": "Fates_-_Edge_-_-Mist-_-Walker.html",
+      "path": "/data/docs/adventures/",
+      "category": "adventures",
+      "categoryLabel": "🗡️ Adventures",
+      "core": false,
+      "active": true
+    },
+    {
       "id": "playing_and_running_fate_s_edge",
       "title": "Playing   And   Running   Fate'S   Edge",
       "file": "Fates_-_Edge_-_-Playing-_-and-_-Running-_-Fate's-_-Edge.html",
@@ -103,9 +153,29 @@
       "active": true
     },
     {
+      "id": "the_court_of_the_silent_shepherds",
+      "title": "The   Court   Of   The   Silent   Shepherds",
+      "file": "Fates_-_Edge_-_-The-_-Court-_-of-_-the-_-Silent-_-Shepherds.html",
+      "path": "/data/docs/adventures/",
+      "category": "adventures",
+      "categoryLabel": "🗡️ Adventures",
+      "core": false,
+      "active": true
+    },
+    {
       "id": "the_cursed_caravan",
       "title": "The   Cursed   Caravan",
       "file": "Fates_-_Edge_-_-The-_-Cursed-_-Caravan.html",
+      "path": "/data/docs/adventures/",
+      "category": "adventures",
+      "categoryLabel": "🗡️ Adventures",
+      "core": false,
+      "active": true
+    },
+    {
+      "id": "the_dwarven_debt",
+      "title": "The   Dwarven   Debt",
+      "file": "Fates_-_Edge_-_-The-_-Dwarven-_-Debt.html",
       "path": "/data/docs/adventures/",
       "category": "adventures",
       "categoryLabel": "🗡️ Adventures",
@@ -143,9 +213,29 @@
       "active": true
     },
     {
+      "id": "the_recursive_garden",
+      "title": "The   Recursive   Garden",
+      "file": "Fates_-_Edge_-_-The-_-Recursive-_-Garden.html",
+      "path": "/data/docs/adventures/",
+      "category": "adventures",
+      "categoryLabel": "🗡️ Adventures",
+      "core": false,
+      "active": true
+    },
+    {
       "id": "the_serpent_s_coil",
       "title": "The   Serpent'S   Coil",
       "file": "Fates_-_Edge_-_-The-_-Serpent's-_-Coil.html",
+      "path": "/data/docs/adventures/",
+      "category": "adventures",
+      "categoryLabel": "🗡️ Adventures",
+      "core": false,
+      "active": true
+    },
+    {
+      "id": "the_usurper_s_gambit",
+      "title": "The   Usurper'S   Gambit",
+      "file": "Fates_-_Edge_-_-The-_-Usurper's-_-Gambit.html",
       "path": "/data/docs/adventures/",
       "category": "adventures",
       "categoryLabel": "🗡️ Adventures",
@@ -163,7 +253,7 @@
       "active": true
     }
   ],
-  "total_count": 16,
-  "active_count": 16,
+  "total_count": 25,
+  "active_count": 25,
   "_license": "Fate's Edge Proprietary Content – © 2024 Nicholas A. Gasper. All rights reserved."
 }
