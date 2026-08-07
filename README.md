@@ -17,7 +17,7 @@
 ## 📖 Table of Contents
 
 - [Overview](#-overview)
-- [What's New in v4.5.1](#-whats-new-in-v451)
+- [What's New in v4.6.0](#-whats-new-in-v460)
 - [Features](#-features)
 - [Quick Start](#-quick-start)
 - [Architecture](#-architecture)
@@ -39,6 +39,14 @@
 The toolkit includes **real‑time VTT features** via a WebSocket/Socket.io server, a **campaign sharing server** with GM election and shared Deck of Consequences draws, **integrations** for Foundry VTT, Discord, Roll20, and Avrae, and a growing set of **standalone in-browser mini-tools** (including an original strategy board game, Kon'reh).
 
 ---
+
+## 🆕 What's New in v4.6.0
+
+- **🎯 Diverse Encounter Objective Types** — Encounters used to frame *every* clock in Harm/Heal combat terms even when the encounter wasn't a fight. A new shared `js/core/objective-types.js` registry (mirrored in the socket server and AI GM bot) adds Obstruction, Skill Challenge, Trap/Ward, Lockpick, Heist, Social/Negotiation, and a freeform Custom type (your own Timer/Tick labels) alongside Combat — each with its own icon, progress/relief vocabulary, and log text. Real combat's Harm/Fatigue/armor math is untouched and strictly gated to actual fights. Wired through the Encounters editor, the combat tracker, Adventure Manager scenes, and the VTT's mini tracker; the socket server's adventure API now carries an optional `type` field end to end, defaulting to `combat` for full backward compatibility.
+- **🔧 Character Editor/Wizard Symbol Fix** — Removed a redundant "auto-symbol" feature that force-added whatever patron sat in the generic Patron dropdown as an Invoker Symbol, conflicting with the existing purpose-built Add Symbol flow and risking silently corrupting `char.symbols` on save.
+- **🔄 Patrons/Cantor No Longer Need a Manual Refresh** — Root-caused to `discoverPatrons()`'s 1-hour localStorage cache never being bypassed by a forced reload; added a real `force` parameter threaded from `loadPatronData()` all the way down, plus a retry-once safeguard in the Cantor panel.
+- **♟️ Phase-Aware Kon'reh AI** — The built-in strategy game's AI now recognizes opening/midgame/endgame phases, races Sanctum Seed tempo instead of camping, refuses to let Blue idle safely on a Sanctum, and searches deeper (with an explanatory coach hint) once a Reforge race is on.
+- **🧪 100/100 web-client tests, 59/59 socket-server tests, 146/146 ai-gm-bot tests passing** after all of the above.
 
 ## 🆕 What's New in v4.5.1
 

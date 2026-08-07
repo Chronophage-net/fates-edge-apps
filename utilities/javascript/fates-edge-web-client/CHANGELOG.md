@@ -2,7 +2,7 @@
 
 All notable changes to the Fate's Edge Web Client are logged here. This file starts at 4.2 — earlier versions (up through 4.1.2a) predate this convention and aren't reconstructed retroactively.
 
-## [Unreleased]
+## [4.6.0] - 2026-08-07
 
 ### Encounters — objective types for non-combat clocks
 - The Encounters feature framed *every* clock in Harm/Heal combat terms even when the encounter wasn't a fight (picking a lock, disarming a trap, a heist, a skill challenge, a negotiation). New shared registry `js/core/objective-types.js` (`OBJECTIVE_TYPES` / `getObjectiveType()` / `isCombatType()`) defines seven objective types — Combat, Obstruction, Skill Challenge, Trap/Ward, Lockpick, Heist, Social/Negotiation — each with its own icon and progress/relief vocabulary (e.g. Lockpick's "Tumblers"/"Jam" instead of "Harm"/"Heal"). This exact shape is shared with `fates-edge-socket-server` and `fates-edge-ai-gm-bot` to keep the systems compatible.
