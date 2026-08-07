@@ -10,7 +10,10 @@ WORKDIR /app
 # Install Node dependencies
 # ---------------------------------------------------------------
 COPY package*.json ./
-RUN npm ci --only=production
+# --only=production is deprecated/removed in newer npm; --omit=dev is the
+# supported equivalent (was causing npm to print its help text and exit
+# non-zero on node:24-alpine's bundled npm).
+RUN npm ci --omit=dev
 
 # Optional upload tools
 RUN if [ "$ENABLE_UPLOAD" = "true" ]; then \
