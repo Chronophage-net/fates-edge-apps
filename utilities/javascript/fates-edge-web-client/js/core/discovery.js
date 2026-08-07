@@ -60,24 +60,27 @@ const FALLBACK_REGIONS = ['Acasia', 'Ecktoria', 'Vhasia', 'Viterra', 'Ykrul', 'S
  * @param {string} type - 'cosmic', 'terrestrial', or 'religion'
  * @param {string} dataPath - base path to the JSON files (e.g., './data/patrons/')
  * @param {string|null} fallbackPath - optional fallback path (e.g., './data/factions/')
+ * @param {boolean} force - when true, skip the localStorage cache read and force a fresh discovery
  * @returns {Promise<string[]>} array of found slugs
  */
-export async function discoverPatrons(type, dataPath, fallbackPath = null) {
+export async function discoverPatrons(type, dataPath, fallbackPath = null, force = false) {
     let slugs = [];
     let manifestPath = dataPath + 'manifest.json';
     const cacheKey = `fates-edge-patrons-cache-${type}`;
 
-    // 1. Check cache
-    try {
-        const cached = localStorage.getItem(cacheKey);
-        if (cached) {
-            const data = JSON.parse(cached);
-            if (data.slugs && Date.now() - data.timestamp < CACHE_TTL) {
-                console.log(`[Discovery] Using cached ${type} list (${data.slugs.length} items)`);
-                return data.slugs;
+    // 1. Check cache (skipped entirely when force=true)
+    if (!force) {
+        try {
+            const cached = localStorage.getItem(cacheKey);
+            if (cached) {
+                const data = JSON.parse(cached);
+                if (data.slugs && Date.now() - data.timestamp < CACHE_TTL) {
+                    console.log(`[Discovery] Using cached ${type} list (${data.slugs.length} items)`);
+                    return data.slugs;
+                }
             }
-        }
-    } catch (_) {}
+        } catch (_) {}
+    }
 
     console.log(`[Discovery] Discovering ${type} patrons...`);
 
@@ -146,22 +149,25 @@ export async function discoverPatrons(type, dataPath, fallbackPath = null) {
 /**
  * Discover available region slugs by testing known region files.
  * @param {string} regionDir - directory path (default './data/regions')
+ * @param {boolean} force - when true, skip the localStorage cache read and force a fresh discovery
  * @returns {Promise<string[]>} array of region names (display names)
  */
-export async function discoverRegions(regionDir = './data/regions') {
+export async function discoverRegions(regionDir = './data/regions', force = false) {
     const cacheKey = 'fates-edge-region-cache';
 
-    // 1. Check cache
-    try {
-        const cached = localStorage.getItem(cacheKey);
-        if (cached) {
-            const { names, timestamp } = JSON.parse(cached);
-            if (Date.now() - timestamp < CACHE_TTL) {
-                console.log(`[Discovery] Using cached region list (${names.length} regions)`);
-                return names;
+    // 1. Check cache (skipped entirely when force=true)
+    if (!force) {
+        try {
+            const cached = localStorage.getItem(cacheKey);
+            if (cached) {
+                const { names, timestamp } = JSON.parse(cached);
+                if (Date.now() - timestamp < CACHE_TTL) {
+                    console.log(`[Discovery] Using cached region list (${names.length} regions)`);
+                    return names;
+                }
             }
-        }
-    } catch (_) {}
+        } catch (_) {}
+    }
 
     console.log('[Discovery] Discovering available regions...');
 
@@ -244,22 +250,25 @@ const KNOWN_BESTIARY_SLUGS = [
  * Tries to load a manifest.json first, then falls back to known slugs.
  * Tests each slug with HEAD and caches the result.
  * @param {string} dataPath - path to the bestiary files (default './data/bestiary/')
+ * @param {boolean} force - when true, skip the localStorage cache read and force a fresh discovery
  * @returns {Promise<string[]>} array of found slugs
  */
-export async function discoverBestiary(dataPath = './data/bestiary/') {
+export async function discoverBestiary(dataPath = './data/bestiary/', force = false) {
     const cacheKey = BESTIARY_CACHE_KEY;
 
-    // 1. Check cache
-    try {
-        const cached = localStorage.getItem(cacheKey);
-        if (cached) {
-            const data = JSON.parse(cached);
-            if (data.slugs && Date.now() - data.timestamp < CACHE_TTL) {
-                console.log(`[Discovery] Using cached bestiary list (${data.slugs.length} items)`);
-                return data.slugs;
+    // 1. Check cache (skipped entirely when force=true)
+    if (!force) {
+        try {
+            const cached = localStorage.getItem(cacheKey);
+            if (cached) {
+                const data = JSON.parse(cached);
+                if (data.slugs && Date.now() - data.timestamp < CACHE_TTL) {
+                    console.log(`[Discovery] Using cached bestiary list (${data.slugs.length} items)`);
+                    return data.slugs;
+                }
             }
-        }
-    } catch (_) {}
+        } catch (_) {}
+    }
 
     console.log('[Discovery] Discovering bestiary creatures...');
     let slugs = [];

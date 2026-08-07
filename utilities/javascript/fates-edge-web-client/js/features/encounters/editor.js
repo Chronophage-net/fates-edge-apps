@@ -10,6 +10,7 @@ import { generateId, escHtml, safeParseInt } from '../../core/utils.js';
 import { showToast } from '../../components/Toast.js';
 import { openTracker } from './combat.js';
 import { loadBestiaryData, getCreatureDescription } from './bestiary.js';
+import { OBJECTIVE_TYPES, DEFAULT_OBJECTIVE_TYPE, getObjectiveType } from '../../core/objective-types.js';
 
 let modal = null;
 let editingId = null;
@@ -67,6 +68,7 @@ export function openEditor(id) {
             difficulty: 3,
             location: '',
             status: 'draft',
+            type: DEFAULT_OBJECTIVE_TYPE,
             adversaries: [],
             created: Date.now()
         };
@@ -146,6 +148,30 @@ function renderEditor(encounter) {
             </div>
 
             <div class="form-group" style="margin-bottom:0.8rem;">
+                <label title="What kind of clock is this? Combat keeps its real Harm/Fatigue/armor math; every other type is a labeled progress/setback track for the appropriate scene — a heist, a lock, a negotiation, etc.">
+                    Objective Type
+                </label>
+                <select id="enc-objective-type">
+                    ${Object.entries(OBJECTIVE_TYPES).map(([id, t]) => `
+                        <option value="${attr(id)}" ${(encounter.type || DEFAULT_OBJECTIVE_TYPE) === id ? 'selected' : ''}>
+                            ${t.icon} ${escHtml(t.label)} — ${escHtml(t.description)}
+                        </option>
+                    `).join('')}
+                </select>
+            </div>
+
+            <div id="enc-custom-fields" style="display:${(encounter.type || DEFAULT_OBJECTIVE_TYPE) === 'custom' ? 'grid' : 'none'};grid-template-columns:1fr 1fr;gap:0.8rem;margin-bottom:0.8rem;">
+                <div class="form-group">
+                    <label>Timer Label</label>
+                    <input id="enc-custom-label" value="${attr(encounter.customLabel || '')}" placeholder="e.g. Ritual Completion" style="width:100%;" />
+                </div>
+                <div class="form-group">
+                    <label>Tick Label</label>
+                    <input id="enc-custom-tick-label" value="${attr(encounter.customTickLabel || '')}" placeholder="e.g. chant" style="width:100%;" />
+                </div>
+            </div>
+
+            <div class="form-group" style="margin-bottom:0.8rem;">
                 <label>Status</label>
                 <select id="enc-status">
                     <option value="draft" ${encounter.status === 'draft' ? 'selected' : ''}>Draft</option>
@@ -217,12 +243,24 @@ function renderEditor(encounter) {
 
     modal.querySelector('#adv-import-bestiary')?.addEventListener('click', importFromBestiary);
 
+    modal.querySelector('#enc-objective-type')?.addEventListener('change', updateCustomFieldsDisplay);
+    updateCustomFieldsDisplay();
+
     modal.querySelector('#adv-list')?.addEventListener('click', (e) => {
         if (e.target.classList.contains('adv-remove')) {
             const row = e.target.closest('.adv-row');
             if (row) row.remove();
         }
     });
+}
+
+// Shows the Timer Label / Tick Label inputs only when the Objective Type
+// select is set to the freeform 'custom' entry — mirrors the house style
+// used for e.g. updateMagicPathDisplay() in characters/editor.js.
+function updateCustomFieldsDisplay() {
+    const type = document.getElementById('enc-objective-type')?.value || DEFAULT_OBJECTIVE_TYPE;
+    const fields = document.getElementById('enc-custom-fields');
+    if (fields) fields.style.display = type === 'custom' ? 'grid' : 'none';
 }
 
 // ============================================================
@@ -344,6 +382,11 @@ function saveEditor(baseEncounter, silent = false) {
     const difficulty = Math.min(Math.max(safeParseInt(document.getElementById('enc-difficulty')?.value, 3), 1), 10);
     const location = document.getElementById('enc-location')?.value.trim() || '';
     const status = document.getElementById('enc-status')?.value || 'draft';
+    // Falls back to combat if the select is somehow missing/blank — keeps
+    // old-data-equivalent behavior rather than saving an empty type.
+    const type = document.getElementById('enc-objective-type')?.value || DEFAULT_OBJECTIVE_TYPE;
+    const customLabel = document.getElementById('enc-custom-label')?.value.trim() || '';
+    const customTickLabel = document.getElementById('enc-custom-tick-label')?.value.trim() || '';
 
     const adversaries = [];
     document.querySelectorAll('.adv-row').forEach(row => {
@@ -374,6 +417,9 @@ function saveEditor(baseEncounter, silent = false) {
             difficulty,
             location,
             status,
+            type,
+            customLabel,
+            customTickLabel,
             adversaries,
             created: Date.now()
         };
@@ -391,6 +437,9 @@ function saveEditor(baseEncounter, silent = false) {
             existing.difficulty = difficulty;
             existing.location = location;
             existing.status = status;
+            existing.type = type;
+            existing.customLabel = customLabel;
+            existing.customTickLabel = customTickLabel;
             existing.adversaries = adversaries;
             currentEncounter = existing;
             saved = true;

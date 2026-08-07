@@ -409,7 +409,7 @@ export async function renderCantor(el) {
 
     // Ensure patron data is loaded
     await loadPatronData();
-    const state = getState();
+    let state = getState();
 
     // Determine if High Cantor
     const learnedTalents = char.learnedTalents || [];
@@ -417,7 +417,18 @@ export async function renderCantor(el) {
 
     // Determine bound patron
     const boundPatronId = char.boundPatron || char.patron || null;
-    const boundPatronData = boundPatronId ? findPatronData(state, boundPatronId) : null;
+    let boundPatronData = boundPatronId ? findPatronData(state, boundPatronId) : null;
+
+    // If the character expects a bound patron but its data didn't come back
+    // (e.g. discovery/patron cache was stale on this page load), retry once
+    // with a forced reload before falling through to the unbound state —
+    // mirrors rites.js's retry-once-on-miss pattern.
+    if (boundPatronId && !boundPatronData) {
+        await loadPatronData(true);
+        state = getState();
+        boundPatronData = findPatronData(state, boundPatronId);
+    }
+
     const isBound = !!boundPatronData;
 
     // ─── Collect rites with case‑insensitive tier matching ────

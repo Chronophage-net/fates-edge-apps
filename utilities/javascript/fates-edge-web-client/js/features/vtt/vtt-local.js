@@ -70,6 +70,7 @@ async function renderMiniTracker() {
   if (!el) return;
   try {
     const combatModule = await import('../encounters/combat.js');
+    const { resolveObjectiveType, isCombatType } = await import('../../core/objective-types.js');
     const trackerState = combatModule.getTrackerState();
     if (!trackerState.combatants || trackerState.combatants.length === 0) {
       el.innerHTML = '<div class="text-muted text-sm">No active encounter. Open Encounters to start one.</div>';
@@ -93,13 +94,20 @@ async function renderMiniTracker() {
             const info = combatModule.getRangeBandInfo(band);
             rangeHtml = `<span class="vtt-stat-pill" style="background:${info.color}22;border:1px solid ${info.color};color:${info.color};font-size:0.7rem;" title="Range to ${escHtml(selfCombatant.name)}">${info.short}</span>`;
           }
+          const isCombat = isCombatType(c.objectiveType);
+          const objType = resolveObjectiveType(c.objectiveType, c);
+          const progressPill = c.harm > 0
+            ? (isCombat
+                ? `<span class="text-muted text-sm" style="color:var(--red);" title="Harm">H${c.harm}</span>`
+                : `<span class="text-muted text-sm" style="color:var(--orange);" title="${escHtml(objType.progressLabel)}">${objType.icon}${c.harm}/${c.maxHarm}</span>`)
+            : '';
           return `
             <div style="display:flex;align-items:center;gap:0.4rem;padding:0.25rem 0.3rem;border-radius:4px;${isActive ? 'background:var(--bg4);border-left:2px solid var(--gold);' : ''}font-size:0.85rem;">
               <span style="flex:0 0 1.1rem;text-align:center;">${isActive ? '▶' : ''}</span>
               <span style="flex:0 0 auto;color:${c.type === 'player' ? 'var(--blue)' : 'var(--red)'};">${weaponGlyph}</span>
               <span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${escHtml(c.name)}</span>
-              ${c.harm > 0 ? `<span class="text-muted text-sm" style="color:var(--red);" title="Harm">H${c.harm}</span>` : ''}
-              ${c.fatigue > 0 ? `<span class="text-muted text-sm" title="Fatigue">F${c.fatigue}</span>` : ''}
+              ${progressPill}
+              ${(isCombat && c.fatigue > 0) ? `<span class="text-muted text-sm" title="Fatigue">F${c.fatigue}</span>` : ''}
               ${rangeHtml}
             </div>
           `;
