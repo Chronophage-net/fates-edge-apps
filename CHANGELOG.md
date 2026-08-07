@@ -3,6 +3,23 @@ All notable changes to this project will be documented here.
 
 Format loosely follows [Keep a Changelog](https://keepachangelog.com/), versions follow [Semantic Versioning](https://semver.org/).
 
+## [4.6.0] - 2026-08-07
+
+Diverse encounter objective-type clocks (obstruction, skill challenge, trap/ward, lockpick, heist, social, custom), symbol management fixes, patron/cantor discovery reliability, Kon'reh AI phase-awareness
+
+### Added
+- generic objective-type clocks instead of hardcoded Harm/Heal
+- phase-aware Kon'reh AI evaluation
+
+### Fixed
+- stop Cantor/Patrons needing a manual refresh to see current data
+- remove redundant auto-symbol injection in character editor/wizard
+
+### Other
+- Merge branch 'symbol_character_update': symbol management fixes, patron/cantor discovery fix, Kon'reh AI phase-awareness, generic objective-type encounters
+- Working on getting characters to track symbols properly and to have rites be able to choose between them.
+- Updated adventures and added Terrestrial Patrons
+
 ## [4.5.1] - 2026-08-05
 
 Jump to the Action: one-click pregen + starter adventure flow in the welcome overlay

@@ -1,4 +1,4 @@
-# Fate's Edge JavaScript Toolkit v4.5.1
+# Fate's Edge JavaScript Toolkit v4.6.0
 
 **Fate's Edge** is a narrative‑first TTRPG system. This directory holds the JavaScript half of the toolkit's cross‑platform ecosystem:
 
