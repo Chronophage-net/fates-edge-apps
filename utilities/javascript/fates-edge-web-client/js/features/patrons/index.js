@@ -365,7 +365,7 @@ export async function loadPatronData(force = false) {
         console.log(`📦 Cached patron data is schema v${saved.patrons._schemaVersion ?? 'unknown'}, current is v${PATRON_SCHEMA_VERSION} — reloading from disk.`);
     }
 
-    await loadRemotePatrons();
+    await loadRemotePatrons(force);
 }
  
 // FIX: concurrent callers used to just check `state.isLoading` and bail
@@ -381,15 +381,23 @@ export async function loadPatronData(force = false) {
 // of silently no-op'ing.
 let loadingPromise = null;
 
-async function loadRemotePatrons() {
+// FIX: discoverPatrons() (js/core/discovery.js) keeps its own 1-hour
+// localStorage cache of which patron slugs exist, checked BEFORE
+// loadPatronData()'s own force-reload logic ever runs. That meant even a
+// forced reload (window.refreshPatrons()/window.cantorRefresh(), or the
+// very-first-call-this-session force above) still returned a stale slug
+// list if discovery had cached one recently — the actual root cause of
+// "Cantor needs a manual refresh to see new/changed patron rites". `force`
+// is threaded through here so a real reload also bypasses discovery's cache.
+async function loadRemotePatrons(force = false) {
     if (loadingPromise) return loadingPromise;
 
     state.isLoading = true;
     loadingPromise = (async () => {
         try {
-            const cosmicSlugs = await discoverPatrons('cosmic', COSMIC_DATA_PATH);
-            const terrestrialSlugs = await discoverPatrons('terrestrial', TERRESTRIAL_DATA_PATH, TERRESTRIAL_FALLBACK_DATA_PATH);
-            const religionSlugs = await discoverPatrons('religion', RELIGION_DATA_PATH);
+            const cosmicSlugs = await discoverPatrons('cosmic', COSMIC_DATA_PATH, null, force);
+            const terrestrialSlugs = await discoverPatrons('terrestrial', TERRESTRIAL_DATA_PATH, TERRESTRIAL_FALLBACK_DATA_PATH, force);
+            const religionSlugs = await discoverPatrons('religion', RELIGION_DATA_PATH, null, force);
  
             // Fetch cosmic
             let cosmicPatrons = [];
