@@ -951,8 +951,10 @@ function createApiRouter(appConfig) {
     // `ref` is looked up in the CURRENT scene by index (number) or by
     // name/creatureId (string). `encounter`, if given, is used directly
     // as a full ad-hoc encounter object instead ({ name/creatureId, dv,
-    // position, outcomes }), for an improvised fight with no pre-written
-    // encounter.
+    // position, outcomes, type? }), for an improvised fight (or any other
+    // objective) with no pre-written encounter. `type` is an OPTIONAL
+    // objective-type id passed through verbatim (see adventure.js's schema
+    // comment for the full id list); defaults to 'combat' when absent.
     router.post('/api/rooms/:code/adventure/encounter/start', authenticate, (req, res) => {
         try {
             const r = room.getRoom(req.params.code);
@@ -1500,7 +1502,7 @@ function createApiRouter(appConfig) {
                     creatureAdd: 'POST /api/rooms/:code/adventure/creature - Register an ad-hoc creature into the bestiary ({ creature: { name, ... } })',
                     sessionEnd: 'POST /api/rooms/:code/adventure/session/end - Mark a real-world play session as ended (increments sessionsPlayed)',
                     climaxTriggered: 'POST /api/rooms/:code/adventure/climax-triggered - Mark that the climax act has already been generated for this adventure',
-                    encounterStart: "POST /api/rooms/:code/adventure/encounter/start - Start an encounter ({ ref } by index or name/creatureId in the current scene, OR { encounter } as a full ad-hoc object for an improvised fight)",
+                    encounterStart: "POST /api/rooms/:code/adventure/encounter/start - Start an encounter ({ ref } by index or name/creatureId in the current scene, OR { encounter } as a full ad-hoc object for an improvised fight/objective; optional encounter.type sets its objective-type id, e.g. 'combat'|'lockpick'|'heist'|'social', default 'combat')",
                     encounterResolve: 'POST /api/rooms/:code/adventure/encounter/resolve - Resolve the active encounter ({ outcome: "clean"|"partial"|"miss", notes? })',
                     timer: 'POST /api/rooms/:code/adventure/timer - Tick a timer ({ scope: "scene"|"campaign", ref (index or name), amount? } amount defaults to +1, can be negative)',
                     log: 'POST /api/rooms/:code/adventure/log - Append a free-form narrative beat to the adventure log ({ text, author? })'

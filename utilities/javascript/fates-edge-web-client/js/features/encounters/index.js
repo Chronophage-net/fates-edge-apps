@@ -19,6 +19,7 @@ import {
     getCreatureDescription
 } from './bestiary.js';
 import { openTracker } from './combat.js';
+import { getObjectiveType, DEFAULT_OBJECTIVE_TYPE } from '../../core/objective-types.js';
 // ─── Role check ──────────────────────────────────────────────
 import { getMyStoredRole } from '../../core/feature-toggles.js';
 import { isConnectedToServer } from '../../core/websocket.js'
@@ -542,7 +543,9 @@ function renderEncounters() {
         const activeClass = isActive ? 'active' : '';
         const tl = e.difficulty || 3;
         const tlBadge = `<span class="creature-tag tl-badge" title="Difficulty / TL">TL ${tl}</span>`;
-        
+        const objType = getObjectiveType(e.type);
+        const objTypeBadge = `<span class="creature-tag" title="${escHtml(objType.description)}">${objType.icon} ${escHtml(objType.label)}</span>`;
+
         let actionsHtml = '';
         if (canEdit) {
             actionsHtml = `
@@ -560,6 +563,7 @@ function renderEncounters() {
                     <div class="name" style="font-weight:600;display:flex;align-items:center;gap:0.4rem;flex-wrap:wrap;">
                         ${escHtml(e.title)}
                         ${tlBadge}
+                        ${objTypeBadge}
                         <span style="color:${statusColor};font-size:0.75rem;">${e.status || 'draft'}</span>
                     </div>
                     <div class="meta" style="font-size:0.8rem;color:var(--text2);">
@@ -767,6 +771,7 @@ function createEncounterFromAdversary(name, body) {
         difficulty: 2,
         location: '',
         status: 'draft',
+        type: DEFAULT_OBJECTIVE_TYPE, // quick-add from bestiary is always a fight
         adversaries: [{ name: name, body: body }],
         created: Date.now()
     };

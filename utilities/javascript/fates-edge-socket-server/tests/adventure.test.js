@@ -99,3 +99,37 @@ describe('adventure.js status transitions', () => {
         assert.throws(() => adventure.advanceScene(room), /No adventure module is loaded/);
     });
 });
+
+describe('adventure.js encounter objective type', () => {
+    test('an ad-hoc encounter with type: "lockpick" round-trips through startEncounter into the active-encounter snapshot', () => {
+        const room = makeRoom();
+        adventure.loadAdventureContent(room, CONTENT);
+        const state = adventure.startEncounter(room, 'door', {
+            name: 'Stuck Door',
+            dv: 3,
+            position: 'risky',
+            outcomes: { clean: 'Open', partial: 'Open, but noisy', miss: 'Jammed' },
+            type: 'lockpick',
+        });
+        assert.equal(state.activeEncounter.type, 'lockpick');
+        assert.equal(state.activeEncounter.name, 'Stuck Door');
+    });
+
+    test('an ad-hoc encounter started with no type field defaults to "combat" and behaves as before', () => {
+        const room = makeRoom();
+        adventure.loadAdventureContent(room, CONTENT);
+        const state = adventure.startEncounter(room, 'goblin', {
+            name: 'Goblin Ambush',
+            dv: 3,
+            position: 'controlled',
+            outcomes: { clean: 'Win', partial: 'Bloodied', miss: 'Retreat' },
+        });
+        assert.equal(state.activeEncounter.type, 'combat');
+        assert.equal(state.activeEncounter.name, 'Goblin Ambush');
+
+        // resolving also carries the defaulted type through lastResolution
+        const resolved = adventure.resolveEncounter(room, { outcome: 'clean' });
+        assert.equal(resolved.lastResolution.type, 'combat');
+        assert.equal(resolved.lastResolution.encounter, 'Goblin Ambush');
+    });
+});

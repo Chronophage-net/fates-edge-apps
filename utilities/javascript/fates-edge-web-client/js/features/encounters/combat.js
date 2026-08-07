@@ -17,6 +17,14 @@ import { loadBestiaryData, getCreatureDescription } from './bestiary.js';
 import { isConnectedToServer, sendEvent } from '../../core/websocket.js';
 import { logToSession, addVTTEvent } from '../gm-tools/index.js';
 import { getMyStoredRole } from '../../core/feature-toggles.js';
+import { getObjectiveType, resolveObjectiveType, isCombatType, DEFAULT_OBJECTIVE_TYPE } from '../../core/objective-types.js';
+
+// NOTE: combatant.type ('player'|'adversary') is the *role* field, pre-existing
+// and unrelated to the objective type below — kept separate to avoid a naming
+// collision. Each combatant/clock carries its own `objectiveType` (an
+// OBJECTIVE_TYPES id), inherited from the encounter's `type` when the
+// combatant is added. Missing/unrecognized objectiveType == 'combat', for
+// exact back-compat with every encounter saved before this feature existed.
 
 /**
  * Range bands are the GM's call, not a shared table anyone at the table can
@@ -42,6 +50,12 @@ let keyHandler = null;
 
 let rangeMap = {};
 let rangeGridOpen = false;
+let currentEncounterObjectiveType = DEFAULT_OBJECTIVE_TYPE;
+// GM-supplied Timer/Tick label overrides for the 'custom' objective type,
+// inherited from the encounter and stamped onto new combatants the same
+// way currentEncounterObjectiveType is — see objective-types.js.
+let currentEncounterCustomLabel = '';
+let currentEncounterCustomTickLabel = '';
 
 // ============================================================
 // SHARED GM STORY BEAT BANK (same key as bestiary.js)
@@ -453,6 +467,13 @@ export async function openTracker(encounterId) {
 
     currentEncounterId = encounterId;
     const bestiaryCreatures = await loadBestiaryData();
+    // encounter.type — the objective type picked in the Encounters panel when
+    // this encounter was created/edited. Missing on any pre-existing saved
+    // encounter, in which case it's treated as 'combat' (see objective-types.js).
+    const encounterObjectiveType = encounter.type || DEFAULT_OBJECTIVE_TYPE;
+    currentEncounterObjectiveType = encounterObjectiveType;
+    currentEncounterCustomLabel = encounter.customLabel || '';
+    currentEncounterCustomTickLabel = encounter.customTickLabel || '';
 
     combatants = (encounter.adversaries || []).map(a => {
         const creature = bestiaryCreatures.find(c =>
@@ -478,6 +499,10 @@ export async function openTracker(encounterId) {
             status: 'active',
             notes: body || '',
             type: 'adversary',
+            objectiveType: a.objectiveType || encounterObjectiveType,
+            customLabel: a.customLabel || currentEncounterCustomLabel,
+            customTickLabel: a.customTickLabel || currentEncounterCustomTickLabel,
+            maxMeansSuccess: a.maxMeansSuccess !== undefined ? a.maxMeansSuccess : undefined,
             tl,
             class: cls,
             category,
@@ -553,10 +578,19 @@ function renderTracker() {
     const focusCombatant = combatants[activeIndex] || null;
 
     const combatantsHtml = combatants.map((c, i) => {
+        const objType = resolveObjectiveType(c.objectiveType, c);
+        const isCombat = isCombatType(c.objectiveType);
         const isActive = i === activeIndex && c.status === 'active';
-        const isDefeated = c.status === 'defeated';
+        const isDefeated = c.status === 'defeated' || c.status === 'resolved';
         const harmPercent = (c.harm / c.maxHarm) * 100;
         const hasLinks = c.linkedFaction || c.linkedPatron || c.linkedFollower || c.linkedAsset || c.linkedRival;
+        // Non-combat clocks: whether hitting max is a good or bad outcome for
+        // this particular clock is scenario-dependent (GM's call) — see
+        // maxMeansSuccess toggle rendered in the actions row below.
+        const maxIsSuccess = c.maxMeansSuccess === true;
+        const resolvedLabel = !isCombat
+            ? (maxIsSuccess ? `✅ ${objType.label} succeeded` : `❌ ${objType.label} failed`)
+            : `${c.name} is defeated!`;
 
         // ─── Armor & fatigue display ──────────────────────────────
         let armorLabel = '';
@@ -651,6 +685,7 @@ function renderTracker() {
                     </div>
 
                     <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        ${!isCombat ? `<span style="font-size:0.65rem;color:var(--text3);white-space:nowrap;">${objType.icon} ${escHtml(objType.progressLabel)}</span>` : ''}
                         <div style="flex: 1; height: 6px; background: var(--bg4); border-radius: 4px; overflow: hidden;">
                             <div class="harm-bar" style="
                                 width: ${harmPercent}%; height: 100%;
@@ -662,11 +697,21 @@ function renderTracker() {
                             ${c.harm}/${c.maxHarm}
                         </span>
                     </div>
+                    ${(!isCombat && c.status !== 'active') ? `<div style="font-size:0.7rem;color:${maxIsSuccess ? 'var(--green)' : 'var(--red)'};margin-top:0.15rem;">${resolvedLabel}</div>` : ''}
                 </div>
 
-                <div style="display: flex; gap: 0.25rem; flex-shrink: 0;">
+                <div style="display: flex; gap: 0.25rem; flex-shrink: 0; flex-wrap: wrap; align-items:center;">
+                    ${isCombat ? `
                     <button class="btn btn-xs btn-ghost combat-damage-btn" data-index="${i}" title="Deal damage" style="padding: 0.25rem 0.4rem; font-size: 0.8rem; color: var(--red);">💥</button>
                     <button class="btn btn-xs btn-ghost combat-heal-btn" data-index="${i}" title="Heal" style="padding: 0.25rem 0.4rem; font-size: 0.8rem; color: var(--green);">💚</button>
+                    ` : `
+                    <button class="btn btn-xs btn-ghost combat-damage-btn" data-index="${i}" title="${escHtml(objType.progressLabel)} (${objType.progressVerb})" style="padding: 0.25rem 0.4rem; font-size: 0.8rem; color: var(--orange);">${objType.icon} ${escHtml(objType.progressLabel)}</button>
+                    <button class="btn btn-xs btn-ghost combat-heal-btn" data-index="${i}" title="${escHtml(objType.reliefLabel)} (${objType.reliefVerb})" style="padding: 0.25rem 0.4rem; font-size: 0.8rem; color: var(--green);">↩️ ${escHtml(objType.reliefLabel)}</button>
+                    <button class="btn btn-xs btn-ghost combat-maxmeaning-btn" data-index="${i}" title="Toggle whether hitting max on this clock is success or failure"
+                        style="padding: 0.25rem 0.4rem; font-size: 0.7rem; color: var(--text2); border: 1px solid var(--border); border-radius: 6px;">
+                        Max = ${maxIsSuccess ? '✅ Success' : '❌ Failure'}
+                    </button>
+                    `}
                     <button class="btn btn-xs btn-ghost combat-toggle-btn" data-index="${i}" title="Toggle active" style="padding: 0.25rem 0.4rem; font-size: 0.8rem; color: ${c.status === 'active' ? 'var(--green)' : 'var(--text3)'};">${c.status === 'active' ? '●' : '○'}</button>
                     <button class="btn btn-xs btn-ghost combat-remove-btn" data-index="${i}" title="Remove" style="padding: 0.25rem 0.4rem; font-size: 0.8rem; color: var(--red);">✕</button>
                 </div>
@@ -979,6 +1024,9 @@ function renderTracker() {
     modal.querySelectorAll('.combat-weapon-toggle').forEach(btn => {
         btn.addEventListener('click', (e) => { e.stopPropagation(); cycleWeaponType(parseInt(btn.dataset.index)); });
     });
+    modal.querySelectorAll('.combat-maxmeaning-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => { e.stopPropagation(); toggleMaxMeaning(parseInt(btn.dataset.index)); });
+    });
 
     // Keyboard shortcuts
     if (keyHandler) {
@@ -1067,6 +1115,9 @@ function addCombatant() {
         status: 'active',
         notes: '',
         type: 'adversary',
+        objectiveType: currentEncounterObjectiveType,
+        customLabel: currentEncounterCustomLabel,
+        customTickLabel: currentEncounterCustomTickLabel,
         linkedFaction: getLinkedFaction(name),
         linkedPatron: getLinkedPatron(name),
         linkedFollower: getLinkedFollower(name),
@@ -1101,7 +1152,10 @@ function addPlayer() {
         maxHarm: Math.min(Math.max(harm, 1), 20),
         status: 'active',
         notes: 'Player character',
-        type: 'player'
+        type: 'player',
+        objectiveType: currentEncounterObjectiveType,
+        customLabel: currentEncounterCustomLabel,
+        customTickLabel: currentEncounterCustomTickLabel
     };
     combatants.push(newPlayer);
     initRangeForNewCombatant(newPlayer);
@@ -1144,6 +1198,9 @@ function importFromFactions() {
         status: 'active',
         notes: `Faction: ${faction.agenda || 'No agenda'}`,
         type: 'adversary',
+        objectiveType: currentEncounterObjectiveType,
+        customLabel: currentEncounterCustomLabel,
+        customTickLabel: currentEncounterCustomTickLabel,
         linkedFaction: faction
     };
     combatants.push(newFactionCombatant);
@@ -1252,6 +1309,9 @@ async function importFromBestiary() {
                     status: 'active',
                     notes: getCreatureDescription(entry) || '',
                     type: 'adversary',
+                    objectiveType: currentEncounterObjectiveType,
+                    customLabel: currentEncounterCustomLabel,
+                    customTickLabel: currentEncounterCustomTickLabel,
                     tl: entry.tl,
                     class: entry.class || '',
                     category: entry.category || '',
@@ -1332,56 +1392,110 @@ function endRound() {
 // ─── UPDATED damageCombatant with Armor Conversion ──────────────
 
 function damageCombatant(idx) {
-    const amount = parseInt(prompt('Damage amount:', '1') || '1');
+    if (idx < 0 || idx >= combatants.length) return;
+    const c = combatants[idx];
+    const isCombat = isCombatType(c.objectiveType);
+    const objType = resolveObjectiveType(c.objectiveType, c);
+
+    const amount = parseInt(prompt(isCombat ? 'Damage amount:' : `${objType.progressLabel} amount:`, '1') || '1');
     if (isNaN(amount) || amount < 1) {
-        showToast('Invalid damage amount.', 'error');
+        showToast('Invalid amount.', 'error');
         return;
     }
-    if (idx >= 0 && idx < combatants.length) {
-        const c = combatants[idx];
-        // Apply armor conversion
-        const armorType = c.armorType || 'none';
-        const converted = applyArmorConversion(amount, armorType);
-        // Apply fatigue first (if any)
-        if (converted.fatigue > 0) {
-            c.fatigue = (c.fatigue || 0) + converted.fatigue;
-            addLog('damage', `${c.name} gains ${converted.fatigue} Fatigue from armor (${armorType})`);
-        }
-        // Apply remaining harm
-        if (converted.harm > 0) {
-            c.harm = Math.min(c.harm + converted.harm, c.maxHarm);
-            addLog('damage', `${c.name} takes ${converted.harm} harm (${c.harm}/${c.maxHarm})`);
-            if (c.harm >= c.maxHarm && c.status !== 'defeated') {
-                c.status = 'defeated';
-                addLog('damage', `${c.name} is defeated!`);
-                showToast(`💀 ${c.name} is defeated!`, 'error');
-            } else {
-                showToast(`💥 ${c.name} takes ${converted.harm} harm (${c.harm}/${c.maxHarm})`, 'warning');
-            }
-        } else if (converted.fatigue > 0) {
-            showToast(`🛡️ ${c.name} absorbs harm, gains ${converted.fatigue} Fatigue`, 'info');
+
+    if (!isCombat) {
+        // Non-combat clocks are a plain current/max track — no armor
+        // conversion, no Fatigue, no "defeated" status. Hitting max just
+        // resolves the clock; whether that's success or failure for THIS
+        // clock is the GM's own maxMeansSuccess toggle (see UI), not assumed.
+        c.harm = Math.min(c.harm + amount, c.maxHarm);
+        addLog('damage', `${c.name} ${objType.progressVerb}s ${amount} ${objType.progressLabel} (${c.harm}/${c.maxHarm})`);
+        if (c.harm >= c.maxHarm && c.status !== 'resolved') {
+            c.status = 'resolved';
+            const maxIsSuccess = c.maxMeansSuccess === true;
+            addLog('damage', `${c.name}'s ${objType.label} clock is full — ${maxIsSuccess ? 'succeeded' : 'failed'}!`);
+            showToast(`${maxIsSuccess ? '✅' : '❌'} ${c.name}'s ${objType.label} clock is full!`, maxIsSuccess ? 'success' : 'error');
         } else {
-            showToast(`🛡️ ${c.name}'s armor completely absorbs the damage.`, 'info');
+            showToast(`${objType.icon} ${c.name}: ${objType.progressLabel} ${c.harm}/${c.maxHarm}`, 'warning');
         }
         renderTracker();
+        return;
     }
+
+    // Combat — real Harm/Fatigue/armor math, unchanged.
+    const armorType = c.armorType || 'none';
+    const converted = applyArmorConversion(amount, armorType);
+    // Apply fatigue first (if any)
+    if (converted.fatigue > 0) {
+        c.fatigue = (c.fatigue || 0) + converted.fatigue;
+        addLog('damage', `${c.name} gains ${converted.fatigue} Fatigue from armor (${armorType})`);
+    }
+    // Apply remaining harm
+    if (converted.harm > 0) {
+        c.harm = Math.min(c.harm + converted.harm, c.maxHarm);
+        addLog('damage', `${c.name} takes ${converted.harm} harm (${c.harm}/${c.maxHarm})`);
+        if (c.harm >= c.maxHarm && c.status !== 'defeated') {
+            c.status = 'defeated';
+            addLog('damage', `${c.name} is defeated!`);
+            showToast(`💀 ${c.name} is defeated!`, 'error');
+        } else {
+            showToast(`💥 ${c.name} takes ${converted.harm} harm (${c.harm}/${c.maxHarm})`, 'warning');
+        }
+    } else if (converted.fatigue > 0) {
+        showToast(`🛡️ ${c.name} absorbs harm, gains ${converted.fatigue} Fatigue`, 'info');
+    } else {
+        showToast(`🛡️ ${c.name}'s armor completely absorbs the damage.`, 'info');
+    }
+    renderTracker();
 }
 
 function healCombatant(idx) {
-    const amount = parseInt(prompt('Heal amount:', '1') || '1');
-    if (idx >= 0 && idx < combatants.length) {
-        const c = combatants[idx];
+    if (idx < 0 || idx >= combatants.length) return;
+    const c = combatants[idx];
+    const isCombat = isCombatType(c.objectiveType);
+    const objType = resolveObjectiveType(c.objectiveType, c);
+
+    const amount = parseInt(prompt(isCombat ? 'Heal amount:' : `${objType.reliefLabel} amount:`, '1') || '1');
+
+    if (!isCombat) {
         c.harm = Math.max(c.harm - amount, 0);
-        if (c.status === 'defeated' && c.harm < c.maxHarm) {
+        if (c.status === 'resolved' && c.harm < c.maxHarm) {
             c.status = 'active';
-            addLog('heal', `${c.name} revived!`);
-            showToast(`💚 ${c.name} revived!`, 'success');
+            addLog('heal', `${c.name}'s ${objType.label} clock reopens — no longer resolved.`);
+            showToast(`${objType.icon} ${c.name}'s clock reopens`, 'success');
         } else {
-            addLog('heal', `${c.name} healed for ${amount} (${c.harm}/${c.maxHarm})`);
-            showToast(`💚 ${c.name} healed for ${amount}`, 'success');
+            addLog('heal', `${c.name} ${objType.reliefVerb}s ${amount} ${objType.reliefLabel} (${c.harm}/${c.maxHarm})`);
+            showToast(`${objType.icon} ${c.name}: ${objType.reliefLabel} ${c.harm}/${c.maxHarm}`, 'success');
         }
         renderTracker();
+        return;
     }
+
+    c.harm = Math.max(c.harm - amount, 0);
+    if (c.status === 'defeated' && c.harm < c.maxHarm) {
+        c.status = 'active';
+        addLog('heal', `${c.name} revived!`);
+        showToast(`💚 ${c.name} revived!`, 'success');
+    } else {
+        addLog('heal', `${c.name} healed for ${amount} (${c.harm}/${c.maxHarm})`);
+        showToast(`💚 ${c.name} healed for ${amount}`, 'success');
+    }
+    renderTracker();
+}
+
+/**
+ * Toggle whether hitting max on a non-combat clock represents success or
+ * failure for that specific clock — scenario-dependent (GM's call), e.g. a
+ * "heist alarm" clock hitting max is bad; a "skill challenge progress"
+ * clock hitting max is good. No-op for combat entries (defeat/revive is
+ * the real mechanic there, not this toggle).
+ */
+function toggleMaxMeaning(idx) {
+    if (idx < 0 || idx >= combatants.length) return;
+    const c = combatants[idx];
+    if (isCombatType(c.objectiveType)) return;
+    c.maxMeansSuccess = !(c.maxMeansSuccess === true);
+    renderTracker();
 }
 
 function toggleCombatant(idx) {
@@ -1441,7 +1555,10 @@ export function getLiveCombatants() {
     return combatants.map(c => ({
         id: c.id, name: c.name, type: c.type, status: c.status,
         harm: c.harm, maxHarm: c.maxHarm, fatigue: c.fatigue || 0, armorType: c.armorType || 'none',
-        initiative: c.initiative, weaponClass: c.weaponClass
+        initiative: c.initiative, weaponClass: c.weaponClass,
+        objectiveType: c.objectiveType || DEFAULT_OBJECTIVE_TYPE,
+        customLabel: c.customLabel || '', customTickLabel: c.customTickLabel || '',
+        maxMeansSuccess: c.maxMeansSuccess === true
     }));
 }
 
@@ -1465,7 +1582,10 @@ export function getTrackerState() {
         combatants: sorted.map(c => ({
             id: c.id, name: c.name, type: c.type, status: c.status,
             harm: c.harm, maxHarm: c.maxHarm, fatigue: c.fatigue || 0, armorType: c.armorType || 'none',
-            initiative: c.initiative, weaponClass: c.weaponClass
+            initiative: c.initiative, weaponClass: c.weaponClass,
+            objectiveType: c.objectiveType || DEFAULT_OBJECTIVE_TYPE,
+        customLabel: c.customLabel || '', customTickLabel: c.customTickLabel || '',
+        maxMeansSuccess: c.maxMeansSuccess === true
         }))
     };
 }

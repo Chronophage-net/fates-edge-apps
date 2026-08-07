@@ -42,9 +42,19 @@
  *           timers: [ { name, segments, current, description } ],
  *           encounters: [
  *             // abstract skill-challenge form:
- *             { name, dv, position, outcomes: { clean, partial, miss } }
+ *             { name, dv, position, outcomes: { clean, partial, miss }, type? }
  *             // OR creature-reference form (creatureId -> bestiary):
- *             { creatureId, quantity, dv, position, outcomes: {...} }
+ *             { creatureId, quantity, dv, position, outcomes: {...}, type? }
+ *             // `type` is an OPTIONAL objective-type id used purely for
+ *             // client-side terminology/framing (progress-clock labels,
+ *             // icons, verbs) -- the server stores/passes it through
+ *             // verbatim and never validates or requires it. Known ids
+ *             // (full registry lives client-side in
+ *             // fates-edge-web-client's js/core/objective-types.js):
+ *             //   'combat' | 'obstruction' | 'skill_challenge' |
+ *             //   'trap_ward' | 'lockpick' | 'heist' | 'social'
+ *             // Missing `type` (all existing encounters/data) defaults to
+ *             // 'combat' and behaves exactly as before.
  *           ]
  *         }
  *     ] } ],
@@ -156,7 +166,10 @@ function resolveEncounterRef(scene, ref) {
 /** Join a creature-reference encounter against the module's bestiary, if applicable. */
 function enrichEncounter(adventure, encounter) {
     if (!encounter) return null;
-    const enriched = { ...encounter };
+    // `type` (objective-type id, see schema comment near the top of this
+    // file) survives the spread below faithfully; default to 'combat' for
+    // back-compat with encounters/data authored before `type` existed.
+    const enriched = { ...encounter, type: encounter.type || 'combat' };
     if (enriched.creatureId) {
         const creature = (adventure.module.bestiary || []).find(b => b.id === enriched.creatureId);
         if (creature) enriched.creature = creature;
@@ -508,8 +521,11 @@ function startEncounter(room, ref, adHocEncounter = null) {
     const adventure = ensureAdventureState(room);
 
     if (adHocEncounter) {
-        adventure.activeEncounterRef = { source: 'adhoc', data: adHocEncounter };
-        appendLog(adventure, { type: 'encounter-start', message: `Encounter started (ad-hoc): ${adHocEncounter.name || adHocEncounter.creatureId || ref}` });
+        // Objective-type id (see schema comment above); defaults to
+        // 'combat' when absent so pre-existing ad-hoc callers are unaffected.
+        const objectiveType = adHocEncounter.type || 'combat';
+        adventure.activeEncounterRef = { source: 'adhoc', data: { ...adHocEncounter, type: objectiveType } };
+        appendLog(adventure, { type: 'encounter-start', message: `Encounter started (ad-hoc): ${adHocEncounter.name || adHocEncounter.creatureId || ref}`, encounterType: objectiveType });
         adventure.updatedAt = Date.now();
         room.lastActivity = Date.now();
         return getPublicState(room);
@@ -524,7 +540,10 @@ function startEncounter(room, ref, adHocEncounter = null) {
 
     adventure.activeEncounterRef = { source: 'scene', index: found.index };
     const name = found.encounter.name || found.encounter.creatureId || String(ref);
-    appendLog(adventure, { type: 'encounter-start', message: `Encounter started: ${name}` });
+    // Objective-type id read from the scene's encounter data; defaults to
+    // 'combat' when the source data has no `type` field (back-compat).
+    const objectiveType = found.encounter.type || 'combat';
+    appendLog(adventure, { type: 'encounter-start', message: `Encounter started: ${name}`, encounterType: objectiveType });
     adventure.updatedAt = Date.now();
     room.lastActivity = Date.now();
 
@@ -552,19 +571,23 @@ function resolveEncounter(room, { outcome, notes = '' } = {}) {
 
     const resultText = encounter.outcomes?.[outcome] || '';
     const name = encounter.name || encounter.creatureId || 'Encounter';
+    // Objective-type id, defaulting to 'combat' for back-compat (see schema
+    // comment near the top of this file).
+    const objectiveType = encounter.type || 'combat';
 
     appendLog(adventure, {
         type: 'encounter-resolve',
         message: `Encounter resolved: ${name} (${outcome})`,
         result: resultText,
         notes,
+        encounterType: objectiveType,
     });
     adventure.activeEncounterRef = null;
     adventure.updatedAt = Date.now();
     room.lastActivity = Date.now();
 
     const state = getPublicState(room);
-    state.lastResolution = { encounter: name, outcome, result: resultText, notes };
+    state.lastResolution = { encounter: name, outcome, result: resultText, notes, type: objectiveType };
     return state;
 }
 

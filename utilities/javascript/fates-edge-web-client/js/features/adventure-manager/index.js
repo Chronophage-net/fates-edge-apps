@@ -68,6 +68,7 @@ import { escHtml, safeParseInt } from '../../core/utils.js';
 import { logToSession, addVTTEvent } from '../gm-tools/index.js';
 import { isConnectedToServer, sendEvent } from '../../core/websocket.js';
 import { loadBestiaryData, getCreatureDescription } from '../encounters/bestiary.js';
+import { OBJECTIVE_TYPES, DEFAULT_OBJECTIVE_TYPE, getObjectiveType } from '../../core/objective-types.js';
 // ─── Role check ──────────────────────────────────────────────
 import { getMyStoredRole } from '../../core/feature-toggles.js';
 import { openInlineScreen, closeInlineScreen, inlineScreenShell } from '../../components/InlineScreen.js';
@@ -1036,6 +1037,9 @@ async function startSceneEncounter(adventureId, actIndex, sceneIndex) {
             difficulty: 2,
             location: '',
             status: 'active',
+            type: scene.type || DEFAULT_OBJECTIVE_TYPE,
+            customLabel: scene.customLabel || '',
+            customTickLabel: scene.customTickLabel || '',
             adversaries,
             created: Date.now(),
             fromAdventureId: adventure.id,
@@ -1295,6 +1299,7 @@ function buildAdventureFromCrownSpread({ parsed, title, tier, region, cardNames 
         description: [pos?.flavor, extraDescription].filter(Boolean).join('\n\nWildcard Twist: '),
         timers: [{ name: `${pos?.cardLabel || label} Timer`, segments: pos?.tierSegments || 4, current: 0 }],
         encounters: [],
+        type: DEFAULT_OBJECTIVE_TYPE,
         completed: false
     });
 
@@ -1435,6 +1440,7 @@ function createAdventureFromCrownSpreadReading({ synthesis, cardNames, region, t
                     description: synthesis,
                     timers: [{ name: 'Adventure Clock', segments: 6, current: 0 }],
                     encounters: [],
+                    type: DEFAULT_OBJECTIVE_TYPE,
                     completed: false
                 }]
             }],
@@ -1688,6 +1694,7 @@ function buildAdventureDetailHtml(adventure) {
                         <div style="display:flex;align-items:center;gap:0.3rem;">
                             <span style="font-size:0.8rem;">${isCompleted ? '✅' : isCurrent ? '▶️' : '⏹️'}</span>
                             <span style="font-size:0.75rem;${isCurrent ? 'font-weight:600;color:var(--gold);' : ''}">${escHtml(scene.title)}</span>
+                            <span style="font-size:0.65rem;color:var(--text3);" title="${escHtml(getObjectiveType(scene.type).description)}">${getObjectiveType(scene.type).icon} ${escHtml(getObjectiveType(scene.type).label)}</span>
                             ${scene.description ? `<button class="btn btn-xs btn-ghost" onclick="window.adventureToggleSceneDesc('${descId}')" title="Show/hide scene description" style="padding:0 0.3rem;font-size:0.7rem;">📖</button>` : ''}
                         </div>
                         <div style="display:flex;gap:0.2rem;align-items:center;">
@@ -2031,6 +2038,11 @@ function attachCreateEvents() {
                     <span style="font-size:0.6rem;color:var(--text3);width:20px;">${sceneIdx + 1}.</span>
                     <input type="text" class="adv-scene-title" placeholder="Scene title" style="flex:2;min-width:100px;background:var(--bg2);color:var(--text);border:1px solid var(--border);border-radius:var(--radius);padding:0.15rem 0.3rem;font-size:0.75rem;" />
                     <input type="text" class="adv-scene-desc" placeholder="Scene description" style="flex:3;min-width:100px;background:var(--bg2);color:var(--text);border:1px solid var(--border);border-radius:var(--radius);padding:0.15rem 0.3rem;font-size:0.75rem;" />
+                    <select class="adv-scene-objective-type" title="Objective type — what kind of clock this scene's encounter uses" style="min-width:100px;background:var(--bg2);color:var(--text);border:1px solid var(--border);border-radius:var(--radius);padding:0.15rem 0.3rem;font-size:0.7rem;">
+                        ${Object.entries(OBJECTIVE_TYPES).map(([id, t]) => `<option value="${id}" ${id === DEFAULT_OBJECTIVE_TYPE ? 'selected' : ''}>${t.icon} ${t.label}</option>`).join('')}
+                    </select>
+                    <input type="text" class="adv-scene-custom-label" placeholder="Timer Label" style="display:none;min-width:90px;background:var(--bg2);color:var(--text);border:1px solid var(--border);border-radius:var(--radius);padding:0.15rem 0.3rem;font-size:0.7rem;" />
+                    <input type="text" class="adv-scene-custom-tick-label" placeholder="Tick Label" style="display:none;min-width:90px;background:var(--bg2);color:var(--text);border:1px solid var(--border);border-radius:var(--radius);padding:0.15rem 0.3rem;font-size:0.7rem;" />
                     <input type="number" class="adv-scene-timer-segments" placeholder="Timer segments" value="6" style="width:60px;background:var(--bg2);color:var(--text);border:1px solid var(--border);border-radius:var(--radius);padding:0.15rem 0.3rem;font-size:0.7rem;" />
                     <button class="btn btn-xs btn-danger adv-remove-scene-btn">✕</button>
                 `;
@@ -2038,6 +2050,16 @@ function attachCreateEvents() {
                 sceneDiv.querySelector('.adv-remove-scene-btn').addEventListener('click', () => {
                     sceneDiv.remove();
                 });
+                const sceneTypeSelect = sceneDiv.querySelector('.adv-scene-objective-type');
+                const sceneCustomLabel = sceneDiv.querySelector('.adv-scene-custom-label');
+                const sceneCustomTickLabel = sceneDiv.querySelector('.adv-scene-custom-tick-label');
+                const updateSceneCustomFields = () => {
+                    const show = sceneTypeSelect.value === 'custom' ? 'inline-block' : 'none';
+                    sceneCustomLabel.style.display = show;
+                    sceneCustomTickLabel.style.display = show;
+                };
+                sceneTypeSelect.addEventListener('change', updateSceneCustomFields);
+                updateSceneCustomFields();
             });
 
             div.querySelector('.adv-remove-act-btn').addEventListener('click', () => {
@@ -2150,12 +2172,18 @@ function attachCreateEvents() {
                     const sceneTitle = sceneRow.querySelector('.adv-scene-title')?.value.trim() || 'Untitled Scene';
                     const sceneDesc = sceneRow.querySelector('.adv-scene-desc')?.value.trim() || '';
                     const timerSegs = safeParseInt(sceneRow.querySelector('.adv-scene-timer-segments')?.value, 6);
+                    const sceneObjectiveType = sceneRow.querySelector('.adv-scene-objective-type')?.value || DEFAULT_OBJECTIVE_TYPE;
+                    const sceneCustomLabel = sceneRow.querySelector('.adv-scene-custom-label')?.value.trim() || '';
+                    const sceneCustomTickLabel = sceneRow.querySelector('.adv-scene-custom-tick-label')?.value.trim() || '';
                     scenes.push({
                         id: makeId('scene_'),
                         title: sceneTitle,
                         description: sceneDesc,
                         timers: [{ name: `${sceneTitle} Timer`, segments: timerSegs, current: 0 }],
                         encounters: [],
+                        type: sceneObjectiveType,
+                        customLabel: sceneCustomLabel,
+                        customTickLabel: sceneCustomTickLabel,
                         completed: false
                     });
                 });
