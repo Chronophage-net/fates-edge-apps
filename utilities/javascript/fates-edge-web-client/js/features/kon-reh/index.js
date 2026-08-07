@@ -695,6 +695,22 @@ export class KonrehEngine {
 //      down the board toward the enemy Home Apex (rather than the AI
 //      being indifferent between a piece sitting at home and one
 //      pressing forward).
+//   5. Game-phase awareness: Kon'reh plays as three distinct phases —
+//      an OPENING Sanctum-tempo race (the shared 6-Green cap means every
+//      Seed you land is one the opponent can never have), a MIDGAME of
+//      tactical/material pressure once both Blues are developed, and an
+//      ENDGAME dominated by Reforge math the instant a Blue falls. A
+//      single static weight blend for the whole game undervalues Seed
+//      tempo early and undervalues Reforge urgency late. `gamePhase()`
+//      classifies the current position and `PHASE_MULTIPLIER` re-weights
+//      evaluate()'s terms accordingly — on top of, not instead of, each
+//      School's own doctrine. NOTE: Blue is not a king to be hidden away.
+//      It is the only piece that can Seed, the only piece the Cross's
+//      special stay/exclusion rules even apply to, and (per the
+//      rulebook) the piece a strong player spends most actively — the
+//      evaluation below treats it that way: an asset to deploy for
+//      tempo and center leverage, with `blueSafety` pricing the real
+//      risk of that instead of arguing for permanent caution.
 //
 // This file has zero DOM dependencies (pure logic over KonrehEngine),
 // so it can be unit tested the same way as engine.mjs.
@@ -886,12 +902,63 @@ function blueExitCertainty(engine, blue) {
   return pseudoMoves(engine, blue).filter(m => !engine.isCross(m.x, m.y)).length;
 }
 
+// ---- Game phase detection ----
+// The rulebook itself is structured as three phases even though the core
+// rules never branch on a turn counter: an OPENING Sanctum-tempo race
+// (the 6-Green cap is GLOBAL and shared, so every Seed you land is one
+// the opponent can never have — see KonrehEngine.addPiece/makeMove), a
+// MIDGAME of tactical/material pressure once both Blues are developed,
+// and an ENDGAME dominated entirely by Reforge math the instant a Blue
+// falls ("Reforge math beats material"). `evaluate()` used to apply one
+// static blend of a School's weights for the whole game, which is why
+// the AI both under-raced the opening Seed window and under-prioritized
+// Reforge once it actually mattered. `gamePhase()` classifies the
+// current position; `PHASE_MULTIPLIER` re-weights specific evaluation
+// terms on top of (never instead of) each School's own doctrine.
+export function gamePhase(engine) {
+  // ENDGAME: either side's Blue is already down and racing the 5-turn
+  // Reforge clock, or the board has thinned out enough (rulebook's own
+  // "as material thins, hunting the enemy Blue matters more" heuristic)
+  // that every remaining piece and every remaining turn counts far more
+  // than opening-style development ever could.
+  if (!engine.blueAlive[1] || !engine.blueAlive[2]) return 'endgame';
+  const totalNonBlue = engine.pieces.filter(p => p.isAlive && p.type !== 'blue').length;
+  if (totalNonBlue <= 8) return 'endgame';
+
+  // OPENING: neither side has Seeded yet (greenCount is still at the
+  // starting 2 — one Green per side) and the game is still young by move
+  // count. This is the window where reaching a Sanctum first actually
+  // denies the opponent a Green they can never get back, per the shared
+  // global cap — the single highest-leverage tempo play early on.
+  if (engine.greenCount <= 2 && engine.moveHistory.length < 16) return 'opening';
+
+  return 'midgame';
+}
+
+const PHASE_MULTIPLIER = {
+  // Opening: Seed tempo and Cross leverage matter most; go easy on
+  // all-out aggression and on babying Blue's safety before there's even
+  // been contact.
+  opening: { cap: 1.8, control: 1.4, advance: 1.3, cross: 1.3, reforge: 1.0, aggression: 0.8, blueSafety: 0.9 },
+  // Midgame: this is the tactical/material fight — threats, mobility,
+  // and Blue danger dominate; Seed tempo matters less once the race is
+  // largely decided (either the cap is close to full or both sides have
+  // already banked their early Seeds).
+  midgame: { cap: 1.0, control: 1.0, advance: 1.0, cross: 1.0, reforge: 1.1, aggression: 1.25, blueSafety: 1.15 },
+  // Endgame: Reforge math swamps everything else the moment a Blue
+  // falls, and Blue's own safety/positioning matters more with fewer
+  // pieces left to cover for a mistake. Seed tempo is nearly worthless
+  // this late — there usually isn't time left to enjoy it.
+  endgame: { cap: 0.5, control: 0.7, advance: 0.8, cross: 0.8, reforge: 2.2, aggression: 1.1, blueSafety: 1.3 },
+};
+
 // ---- Evaluation function ----
 // Material, mobility, threat-value-weighted aggression, multi-attacker
 // Blue danger, Cross control, piece advancement, Cross/Rooted status for
-// Blue specifically, Green cap parity, and a steep Reforge-urgency term
-// (including a large bonus for already standing on the enemy Apex,
-// ready to plant immediately).
+// Blue specifically, Green cap parity, Sanctum Seed tempo/anti-camping,
+// and a steep Reforge-urgency term (including a large bonus for already
+// standing on the enemy Apex, ready to plant immediately) — all of it
+// re-weighted per `gamePhase()` above.
 function evaluate(engine, weights, me) {
   if (engine.winner === me) return 1_000_000;
   if (engine.winner === 'draw') return 0;
@@ -899,6 +966,10 @@ function evaluate(engine, weights, me) {
 
   const opp = me === 1 ? 2 : 1;
   let score = 0;
+
+  // Phase-aware re-weighting — see gamePhase()/PHASE_MULTIPLIER above.
+  const phase = gamePhase(engine);
+  const pm = PHASE_MULTIPLIER[phase];
 
   let myMobility = 0, oppMobility = 0;
   let myThreatValue = 0, oppThreatValue = 0;
@@ -911,7 +982,10 @@ function evaluate(engine, weights, me) {
   // enemy Blue and actually firing off Blue's own specials matter more
   // (fewer pieces means fewer future chances, and the rulebook's own
   // heuristics say to trade freely once a Reforge race is in reach). Scale
-  // the two new bonuses below up when few non-Blue pieces remain.
+  // the two new bonuses below up when few non-Blue pieces remain. This is
+  // now folded into phase detection too (`phase === 'endgame'` covers the
+  // same threshold) but kept as its own factor since it should ramp with
+  // material count rather than snap on/off at the phase boundary.
   const totalNonBluePieces = engine.pieces.filter(p => p.isAlive && p.type !== 'blue').length;
   const endgameFactor = totalNonBluePieces <= 8 ? 1.6 : 1.0;
 
@@ -926,7 +1000,7 @@ function evaluate(engine, weights, me) {
 
     if (p.type !== 'blue') {
       const progress = pieceProgress(engine, p) * 25;
-      score += p.player === me ? weights.advance * progress : -weights.advance * progress;
+      score += p.player === me ? weights.advance * pm.advance * progress : -weights.advance * pm.advance * progress;
     }
 
     const moves = pseudoMoves(engine, p);
@@ -948,7 +1022,7 @@ function evaluate(engine, weights, me) {
       // aggression-scaled bonus on top so even low-aggression Schools
       // still go looking for it.
       if (target && target.type === 'blue') {
-        const blueHuntBonus = weights.aggression * 90 * endgameFactor;
+        const blueHuntBonus = weights.aggression * pm.aggression * 90 * endgameFactor;
         score += p.player === me ? blueHuntBonus : -blueHuntBonus;
       }
 
@@ -961,7 +1035,7 @@ function evaluate(engine, weights, me) {
       // caution, so the piece actually gets used as the powerful (if
       // risky) weapon it is rather than hoarded.
       if (m.special) {
-        const specialBonus = weights.aggression * 30 * endgameFactor;
+        const specialBonus = weights.aggression * pm.aggression * 30 * endgameFactor;
         score += p.player === me ? specialBonus : -specialBonus;
       }
 
@@ -974,12 +1048,12 @@ function evaluate(engine, weights, me) {
   // Threats are now weighted by the value of what's threatened, not just
   // counted — a School that "sees" it can win a Blue for a Red values
   // that far more than winning a Red for a Red.
-  score += weights.aggression * (myThreatValue - oppThreatValue) / 40;
+  score += weights.aggression * pm.aggression * (myThreatValue - oppThreatValue) / 40;
 
   // A doubly (or triply) attacked Blue is meaningfully more dangerous
   // than a singly attacked one — extra attackers mean fewer safe replies.
-  if (myBlueAttackers > 0) score -= weights.blueSafety * 250 * myBlueAttackers;
-  if (oppBlueAttackers > 0) score += weights.blueSafety * 250 * oppBlueAttackers;
+  if (myBlueAttackers > 0) score -= weights.blueSafety * pm.blueSafety * 250 * myBlueAttackers;
+  if (oppBlueAttackers > 0) score += weights.blueSafety * pm.blueSafety * 250 * oppBlueAttackers;
 
   // FIX: "not utilizing the cross" — this used to be a blanket bonus/
   // penalty from weights.cross alone, and most Schools carry a NEGATIVE
@@ -991,28 +1065,94 @@ function evaluate(engine, weights, me) {
   // (XS): a Blue holding the Cross with a certified exit is a real asset;
   // one with none is a real liability. |weights.cross| now just controls
   // how much a School cares about Cross outcomes at all, not which way.
+  // Scaled by pm.cross so this actually matters most in the opening/
+  // midgame tempo fight, not equally throughout the whole game.
   if (myBlue) {
     if (engine.isCross(myBlue.x, myBlue.y)) {
       const xs = Math.min(blueExitCertainty(engine, myBlue), 2);
-      score += Math.abs(weights.cross) * (10 + xs * 20 - myBlue.crossStays * 8);
+      score += Math.abs(weights.cross) * pm.cross * (10 + xs * 20 - myBlue.crossStays * 8);
     }
-    if (myBlue.rooted) score -= weights.rooted * 60;
+    if (myBlue.rooted) score -= weights.rooted * pm.blueSafety * 60;
   }
   if (oppBlue) {
     if (engine.isCross(oppBlue.x, oppBlue.y)) {
       const xs = Math.min(blueExitCertainty(engine, oppBlue), 2);
-      score -= Math.abs(weights.cross) * (10 + xs * 20 - oppBlue.crossStays * 8);
+      score -= Math.abs(weights.cross) * pm.cross * (10 + xs * 20 - oppBlue.crossStays * 8);
     }
-    if (oppBlue.rooted) score += weights.rooted * 60;
+    if (oppBlue.rooted) score += weights.rooted * pm.blueSafety * 60;
   }
 
   // Central control: non-Blue presence in/around the Cross, contesting
   // the board's most valuable real estate rather than leaving it open.
-  score += weights.control * 15 * (myCrossControl - oppCrossControl);
+  score += weights.control * pm.control * 15 * (myCrossControl - oppCrossControl);
 
   const myGreens = engine.pieces.filter(p => p.isAlive && p.player === me && p.type === 'green').length;
   const oppGreens = engine.pieces.filter(p => p.isAlive && p.player === opp && p.type === 'green').length;
-  score += weights.cap * 30 * (myGreens - oppGreens);
+  score += weights.cap * pm.cap * 30 * (myGreens - oppGreens);
+
+  // FIX: "Blue should be incentivized to out-spawn Greens and utilize the
+  // Cross" — the green-count differential above only rewards Seeding
+  // AFTER it already happened. Because the 6-Green cap is GLOBAL (shared
+  // by both players — see KonrehEngine.makeMove's Twin Apex Seed check),
+  // reaching a live Sanctum first is a genuine race: every Green you Seed
+  // is one the opponent can never have, not just one more piece for you.
+  // Give this real lookahead pressure instead of leaving it to be
+  // discovered only once it's already on the board:
+  //   - `canSeedNow`: a direct, large bonus when Blue could Seed THIS
+  //     ply (a real Seed opportunity available right now beats "material
+  //     is roughly equal" in most opening positions).
+  //   - `sanctumTempo`: a smaller, distance-graded bonus for closing on
+  //     ANY Sanctum that's still live to Seed from, so the search has a
+  //     gradient to climb turns before the opportunity is actually there.
+  // Both reuse weights.cap (the School's existing "green race" weight)
+  // rather than adding a new per-School tunable, and are phase-scaled via
+  // pm.cap so they matter most during the opening race and taper off
+  // once the cap is nearly spent or the game has moved on.
+  function blueCanSeedNow(blue) {
+    if (!blue || blue.rooted || engine.greenCount >= 6) return false;
+    return pseudoMoves(engine, blue).some(m => {
+      if (!engine.isSanctum(m.x, m.y)) return false;
+      const oppX = m.x === 0 ? 7 : 0, oppY = m.y === 7 ? 0 : 7;
+      return !engine.getPieceAt(oppX, oppY) && blue.seedBanSanctum !== `${m.x},${m.y}` && !blue.mobilizationDelay;
+    });
+  }
+  function sanctumTempo(blue) {
+    if (!blue || blue.mobilizationDelay || engine.greenCount >= 6) return null;
+    let best = Infinity;
+    for (const [sx, sy] of [[0, 7], [7, 0]]) {
+      if (blue.seedBanSanctum === `${sx},${sy}`) continue;
+      const oppX = sx === 0 ? 7 : 0, oppY = sy === 7 ? 0 : 7;
+      if (engine.getPieceAt(oppX, oppY)) continue; // opposite corner occupied — not live right now
+      const d = Math.abs(blue.x - sx) + Math.abs(blue.y - sy);
+      if (d < best) best = d;
+    }
+    return best === Infinity ? null : best;
+  }
+  if (myBlue && blueCanSeedNow(myBlue)) score += weights.cap * pm.cap * 45;
+  if (oppBlue && blueCanSeedNow(oppBlue)) score -= weights.cap * pm.cap * 45;
+  const myTempo = myBlue ? sanctumTempo(myBlue) : null;
+  const oppTempo = oppBlue ? sanctumTempo(oppBlue) : null;
+  if (myTempo !== null) score += weights.cap * pm.cap * Math.max(0, 10 - myTempo) * 2.5;
+  if (oppTempo !== null) score -= weights.cap * pm.cap * Math.max(0, 10 - oppTempo) * 2.5;
+
+  // FIX: "Blue shouldn't just be able to camp — there's a limit to how
+  // safe it is in its Sanctum." Sanctum squares carry NO special
+  // protection from ordinary capture (the myBlueAttackers/blueSafety
+  // terms above already apply there exactly as anywhere else), and the
+  // rulebook is explicit that treating a Sanctum as a hideout is a
+  // mistake ("no camping," "Seed on a pull, not a push"). Without this
+  // term the search had no reason to ever move Blue OFF a Sanctum once
+  // it got there and wasn't under immediate attack — Seed tempo alone
+  // doesn't punish idling. Penalize a Blue parked on a Sanctum with no
+  // live Seed available (cap maxed, opposite occupied, or still under
+  // Mobilization Delay): it isn't accomplishing anything and isn't any
+  // safer than the open board.
+  function sanctumIdle(blue) {
+    if (!blue || !engine.isSanctum(blue.x, blue.y)) return false;
+    return !blueCanSeedNow(blue);
+  }
+  if (myBlue && sanctumIdle(myBlue)) score -= weights.cap * pm.cap * 25;
+  if (oppBlue && sanctumIdle(oppBlue)) score += weights.cap * pm.cap * 25;
 
   // --- Reforge urgency: quadratic penalty for the player whose Blue is dead ---
   // FIX: changed from urgency^2 to (urgency+1)^2 so the very first turn
@@ -1020,16 +1160,29 @@ function evaluate(engine, weights, me) {
   // 30 at urgency=1), not just once the countdown is nearly out. Capturing
   // Blue should look clearly good to the AI immediately, not only in
   // hindsight a few turns later — see "Reforge math beats material" above.
+  // Now also scaled by pm.reforge (2.2x in the endgame phase), on top of
+  // the quadratic urgency curve, so nothing else in the evaluation can
+  // ever outweigh actually racing the clock once it's running.
   if (!engine.blueAlive[me]) {
     const urgency = 6 - engine.reforgeCountdown[me]; // 1 at start, 5 at last turn
-    score -= weights.reforge * (urgency + 1) * (urgency + 1) * 20;
+    score -= weights.reforge * pm.reforge * (urgency + 1) * (urgency + 1) * 20;
   }
   if (!engine.blueAlive[opp]) {
     const urgency = 6 - engine.reforgeCountdown[opp];
-    score += weights.reforge * (urgency + 1) * (urgency + 1) * 20;
+    score += weights.reforge * pm.reforge * (urgency + 1) * (urgency + 1) * 20;
   }
 
   // --- Proximity bonus for the player in Reforge: encourage moving toward the enemy Home Apex ---
+  // FIX: "the coach doesn't seem to understand the need to re-forge" — the
+  // per-square gradient below is now scaled by pm.reforge too (so it's the
+  // dominant concern in the endgame phase, not just a tie-breaker), and a
+  // feasibility cliff has been added: once the fastest possible runner can
+  // no longer reach the enemy Home Apex within the turns actually left on
+  // the clock, that's a losing Reforge, and the evaluation should say so
+  // loudly rather than let some unrelated tactical nicety look better by
+  // comparison. (See also chooseAiMove/updateCoachHint, which now search
+  // deeper specifically in the endgame phase so this gradient is visible
+  // far enough ahead to actually steer toward the winning path.)
   if (!engine.blueAlive[me]) {
     const enemyHome = engine.enemyHomeApexOf(me);
     let bestDist = Infinity;
@@ -1040,10 +1193,37 @@ function evaluate(engine, weights, me) {
       }
     }
     if (bestDist !== Infinity) {
-      // Bonus: (max possible distance = 14) - current distance, scaled by 20
-      score += (14 - bestDist) * 20;
+      // Bonus: (max possible distance = 14) - current distance, scaled by
+      // 20 and by pm.reforge (dominant in the endgame phase).
+      score += (14 - bestDist) * 20 * pm.reforge;
       // Extra large bonus if already on the Apex (ready to plant)
-      if (bestDist === 0) score += 1000;
+      if (bestDist === 0) score += 1000 * pm.reforge;
+      // Feasibility cliff: 5 is the fastest any piece can ever cover in a
+      // single turn (Blue's own Onward distance — the ceiling for every
+      // piece type). If the remaining distance can no longer be covered
+      // in the turns actually left, the Reforge is failing.
+      const turnsLeft = engine.reforgeCountdown[me];
+      if (turnsLeft > 0 && bestDist > turnsLeft * 5) {
+        score -= 400 * pm.reforge;
+      }
+    }
+  }
+  if (!engine.blueAlive[opp]) {
+    const enemyHome = engine.enemyHomeApexOf(opp);
+    let bestDist = Infinity;
+    for (const p of engine.pieces) {
+      if (p.isAlive && p.player === opp) {
+        const d = Math.abs(p.x - enemyHome.x) + Math.abs(p.y - enemyHome.y);
+        if (d < bestDist) bestDist = d;
+      }
+    }
+    if (bestDist !== Infinity) {
+      score -= (14 - bestDist) * 20 * pm.reforge;
+      if (bestDist === 0) score -= 1000 * pm.reforge;
+      const turnsLeft = engine.reforgeCountdown[opp];
+      if (turnsLeft > 0 && bestDist > turnsLeft * 5) {
+        score += 400 * pm.reforge;
+      }
     }
   }
 
@@ -1781,7 +1961,16 @@ export function openKonrehModal(netConfig = null) {
         return;
       }
       const player = game.turn;
-      const cand = chooseAiMove(game, player, aiConfig.schoolId, aiConfig.depth);
+      // FIX: "the endgame needs refinement" — a fixed search depth can be
+      // too shallow to actually see the Reforge path once a Blue is down
+      // (the enemy Home Apex can be up to 14 squares away, and the
+      // per-square Reforge-proximity gradient in evaluate() only steers
+      // the search toward it if the search is deep enough to notice it
+      // moving). Search one ply deeper, capped at 5, whenever either
+      // Blue is dead so the AI reliably finds/commits to the beeline.
+      const isReforgeRace = !game.blueAlive[1] || !game.blueAlive[2];
+      const moveDepth = isReforgeRace ? Math.min(5, aiConfig.depth + 1) : aiConfig.depth;
+      const cand = chooseAiMove(game, player, aiConfig.schoolId, moveDepth);
       aiThinking = false;
       if (!cand) { render(); return; }
       const piece = game.pieces.find(p => p.id === cand.pieceId);
@@ -1978,7 +2167,16 @@ export function openKonrehModal(netConfig = null) {
     const key = `${game.moveHistory.length}:${game.turn}:${coachSchoolId}`;
     if (key === coachHintKey && coachHint) return; // cached suggestion is still valid
     coachHintKey = key;
-    const result = chooseAiMove(game, game.turn, coachSchoolId, 3);
+    // FIX: "the coach doesn't seem to understand the need to re-forge" —
+    // the coach used to always search at a flat depth of 3, which is
+    // often too shallow to see far enough toward the enemy Home Apex once
+    // your own Blue is down (a Reforge run can be up to 14 squares).
+    // Search one ply deeper during a Reforge race so the suggested move
+    // actually commits to the beeline instead of defaulting to whatever
+    // ordinary tactical move happens to look best 3 plies out.
+    const isReforgeRace = !game.blueAlive[1] || !game.blueAlive[2];
+    const coachDepth = isReforgeRace ? 4 : 3;
+    const result = chooseAiMove(game, game.turn, coachSchoolId, coachDepth);
     if (!result) { coachHint = null; return; }
     const piece = game.pieces.find(p => p.id === result.pieceId);
     coachHint = piece ? { piece, move: result.move } : null;
@@ -1994,6 +2192,21 @@ export function openKonrehModal(netConfig = null) {
     if (!coachHint) return '🤔 No strong suggestions available.';
     const { piece, move } = coachHint;
     const coachSchool = SCHOOLS[coachSchoolId] || SCHOOLS.ykrul;
+    // FIX: "the coach doesn't seem to understand the need to re-forge" —
+    // surface the Reforge race explicitly in the coach's own reasoning,
+    // not just in its move choice, so a player watching the hint text
+    // actually understands WHY the suggested move heads where it does.
+    if (!game.blueAlive[game.turn]) {
+      const turnsLeft = game.reforgeCountdown[game.turn];
+      const enemyHome = game.enemyHomeApexOf(game.turn);
+      const dist = Math.abs(move.x - enemyHome.x) + Math.abs(move.y - enemyHome.y);
+      let urgent = `💡 ${coachSchool.name}: your Blue is down — Reforge race, ${turnsLeft} turn${turnsLeft === 1 ? '' : 's'} left. `;
+      urgent += `Run the ${TYPE_NAME[piece.type]} at (${piece.x},${piece.y}) to (${move.x},${move.y})`;
+      urgent += dist === 0
+        ? ` — plants the banner on the enemy Home Apex right now!`
+        : ` — ${dist} square${dist === 1 ? '' : 's'} left to the enemy Home Apex.`;
+      return urgent;
+    }
     let reason = `${coachSchool.name}: move the ${TYPE_NAME[piece.type]} at (${piece.x},${piece.y}) to (${move.x},${move.y})`;
     if (move.capture) {
       const target = game.pieces.find(p => p.id === move.targetId);
