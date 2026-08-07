@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Mist Walker — Bells, Salt, and Breath</title>
+    <style>
+        :root {
+            --bg1: #070d10;
+            --bg2: #0f1a20;
+            --bg3: #16252c;
+            --bg4: #203339;
+            --text: #dfe8e8;
+            --text2: #a8bcbe;
+            --text3: #7a9294;
+            --gold: #c9b04c;
+            --gold-hover: #d4bd5c;
+            --border: #223c40;
+            --red: #a8402a;
+            --green: #2a7a6a;
+            --blue: #2a7a9a;
+            --teal: #3fa0a0;
+            --silver: #b8c8c8;
+            --purple: #5a6a8a;
+            --orange: #c07830;
+            --gray: #364a4c;
+            --radius: 8px;
+            --font: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            background: var(--bg1);
+            color: var(--text);
+            font-family: var(--font);
+            padding: 1.5rem;
+            max-width: 1100px;
+            margin: 0 auto;
+            line-height: 1.6;
+            background-image: radial-gradient(ellipse at top, rgba(63,160,160,0.06), transparent 60%);
+        }
+        h1, h2, h3, h4, h5 { color: var(--gold); margin: 0.5rem 0 0.3rem; }
+        h1 { font-size: 1.8rem; border-bottom: 2px solid var(--gold); padding-bottom: 0.3rem; }
+        h2 { font-size: 1.4rem; border-bottom: 1px solid var(--border); padding-bottom: 0.2rem; }
+        h3 { font-size: 1.1rem; }
+        h4 { font-size: 0.95rem; color: var(--text); }
+        a { color: var(--gold); text-decoration: none; }
+        .panel {
+            background: var(--bg2);
+            border-radius: var(--radius);
+            padding: 0.6rem 0.8rem;
+            border: 1px solid var(--border);
+            margin: 0.5rem 0;
+        }
+        .panel-gold { border-left: 4px solid var(--gold); }
+        .panel-red { border-left: 4px solid var(--red); }
+        .panel-blue { border-left: 4px solid var(--blue); }
+        .panel-green { border-left: 4px solid var(--green); }
+        .panel-teal { border-left: 4px solid var(--teal); }
+        .panel-purple { border-left: 4px solid var(--purple); }
+        .panel-orange { border-left: 4px solid var(--orange); }
+        .badge {
+            display: inline-block;
+            padding: 0.05rem 0.5rem;
+            border-radius: 12px;
+            font-size: 0.65rem;
+            font-weight: 600;
+        }
+        .badge-gold { background: var(--gold); color: #1a1400; }
+        .badge-red { background: var(--red); color: #fff; }
+        .badge-green { background: var(--green); color: #fff; }
+        .badge-blue { background: var(--blue); color: #fff; }
+        .badge-teal { background: var(--teal); color: #04191a; }
+        .badge-purple { background: var(--purple); color: #fff; }
+        .badge-orange { background: var(--orange); color: #fff; }
+        .badge-gray { background: var(--bg4); color: var(--text3); }
+        .flex { display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center; }
+        .flex-between { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.3rem; }
+        .text-muted { color: var(--text3); }
+        .text-gold { color: var(--gold); }
+        .text-sm { font-size: 0.85rem; }
+        .text-xs { font-size: 0.7rem; }
+        .mt-1 { margin-top: 0.5rem; }
+        .mb-1 { margin-bottom: 0.5rem; }
+        .gap-1 { gap: 0.3rem; }
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; }
+        @media (max-width: 600px) { .grid-2 { grid-template-columns: 1fr; } }
+        .scene-card {
+            background: var(--bg3);
+            border-radius: var(--radius);
+            padding: 0.4rem 0.6rem;
+            margin: 0.3rem 0;
+            border-left: 3px solid var(--gold);
+        }
+        .scene-card.completed { opacity: 0.6; border-left-color: var(--green); }
+        .scene-card .scene-title { font-weight: 600; font-size: 0.9rem; }
+        .scene-card .scene-desc { font-size: 0.8rem; color: var(--text2); }
+        .scene-card.scene-mist { border-left-color: var(--teal); background: rgba(63, 160, 160, 0.05); }
+        .timer-bar {
+            background: var(--bg4);
+            border-radius: 4px;
+            height: 6px;
+            overflow: hidden;
+            flex: 1;
+            min-width: 60px;
+        }
+        .timer-bar-fill { height: 100%; border-radius: 4px; transition: width 0.3s; }
+        .npc-card, .loc-card {
+            background: var(--bg3);
+            border-radius: var(--radius);
+            padding: 0.3rem 0.5rem;
+            margin: 0.15rem 0;
+            border-left: 2px solid var(--gold);
+        }
+        .npc-card .npc-name { font-weight: 600; font-size: 0.85rem; }
+        .npc-card .npc-role { font-size: 0.7rem; color: var(--text3); }
+        .npc-card .npc-motivation { font-size: 0.75rem; color: var(--text2); }
+        .creature-stats {
+            background: var(--bg4);
+            border-radius: var(--radius);
+            padding: 0.3rem 0.5rem;
+            margin: 0.2rem 0;
+            font-size: 0.8rem;
+            border-left: 2px solid var(--teal);
+        }
+        .creature-name { color: var(--teal); font-weight: 600; }
+        .meta-tag {
+            display: inline-block;
+            padding: 0.05rem 0.4rem;
+            border-radius: 6px;
+            background: var(--bg4);
+            border: 1px solid var(--border);
+            font-size: 0.6rem;
+            color: var(--text3);
+        }
+        .status-badge {
+            padding: 0.1rem 0.5rem;
+            border-radius: 12px;
+            font-size: 0.6rem;
+            font-weight: 600;
+        }
+        .status-planned { background: var(--bg4); color: var(--text3); }
+        .status-active { background: var(--gold); color: #1a1400; }
+        .status-completed { background: var(--green); color: #fff; }
+        hr { border: none; border-top: 1px solid var(--border); margin: 0.5rem 0; }
+        details summary { cursor: pointer; color: var(--gold); font-weight: 600; }
+        details summary:hover { color: var(--gold-hover); }
+        .toc { background: var(--bg3); border-radius: var(--radius); padding: 0.5rem 0.8rem; border: 1px solid var(--border); }
+        .toc a { color: var(--text2); display: block; padding: 0.1rem 0; font-size: 0.85rem; }
+        .toc a:hover { color: var(--gold); }
+        .timers-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 0.3rem; }
+        blockquote {
+            border-left: 3px solid var(--teal);
+            padding-left: 1rem;
+            margin: 0.5rem 0;
+            color: var(--text2);
+            font-style: italic;
+        }
+        .whisper-box {
+            background: rgba(63, 160, 160, 0.08);
+            border: 1px solid var(--teal);
+            border-radius: var(--radius);
+            padding: 0.3rem 0.6rem;
+            margin: 0.2rem 0;
+            font-size: 0.8rem;
+            color: var(--text2);
+        }
+        .whisper-box strong { color: var(--teal); }
+        .outcome-table { font-size: 0.8rem; border-collapse: collapse; width: 100%; margin: 0.2rem 0; }
+        .outcome-table td { padding: 0.1rem 0.3rem; vertical-align: top; }
+        .outcome-table .outcome-label { color: var(--gold); font-weight: 600; }
+        .secret-box {
+            background: rgba(168, 64, 42, 0.08);
+            border: 1px solid var(--red);
+            border-radius: var(--radius);
+            padding: 0.3rem 0.6rem;
+            margin: 0.2rem 0;
+            font-size: 0.78rem;
+            color: var(--text2);
+        }
+        .secret-box strong { color: var(--red); }
+    </style>
+</head>
+<body>
+
+<h1>🔔 The Mist Walker</h1>
+<p style="color:var(--text2);margin-bottom:1rem;">
+    <span class="badge badge-gold">Tier II</span>
+    <span class="badge badge-blue">3–4 Sessions</span>
+    <span class="badge badge-teal">Folk Horror / Liminal Investigation</span>
+    <span class="badge badge-gray">Author: Nicholas A. Gasper</span>
+    <span class="badge badge-gray">Region: Mistlands</span>
+</p>
+<p style="color:var(--text2);margin-bottom:0.5rem;">
+    Something is teaching the bells of the Mistlands to lie. Along the levees, watch-towers ring warnings that lead
+    travelers <em>onto</em> the soft ground instead of away from it. At Ghost-Ferry Slip, boats arrive before they
+    leave, and passengers remember crossings that haven't happened. At the Weeping Gate, the iron bells have begun
+    to weep real tears. An entity from the Ways Between has found a seam in the old wards and is working it wider,
+    bell-pull by bell-pull, breath by breath. The party must trace the corruption from its first false toll to its
+    anchor at the Gate — and decide whether the Mist Walker should be banished, bargained with, or bound.
+</p>
+
+<blockquote>
+    "It doesn't want to kill you. It wants a door. That's so much worse, because a door is something you can
+    be talked into opening."
+    — Bell-Warden Maren Thorne
+</blockquote>
+
+<!-- Table of Contents -->
+<div class="toc">
+    <strong style="color:var(--gold);">📑 Table of Contents</strong>
+    <a href="#premise">🌫️ Premise &amp; Tone</a>
+    <a href="#act-1">📯 Act I: Signs of Disturbance</a>
+    <a href="#act-2">🌁 Act II: Into the Mist</a>
+    <a href="#act-3">🔔 Act III: The Weeping Gate</a>
+    <a href="#resolutions">⚖️ Possible Resolutions</a>
+    <a href="#npcs">👤 Key NPCs</a>
+    <a href="#locations">📍 Key Locations</a>
+    <a href="#factions">🏛️ Factions</a>
+    <a href="#timers">⏱️ Campaign Timers</a>
+    <a href="#bestiary">🐉 Bestiary</a>
+    <a href="#gmnotes">🗒️ GM Notes</a>
+</div>
+
+<hr>
+
+<!-- ===== PREMISE ===== -->
+<h2 id="premise">🌫️ Premise &amp; Tone</h2>
+
+<div class="panel panel-teal">
+    <strong>The Hook:</strong> The party encounters one of three openings — a ferryman who won't cross a normally
+    safe waterway because "the mist walks where it shouldn't," a Bell-Warden begging for help as towers ring
+    themselves without being touched, or a letter that arrived on time by the courier's account but three days
+    late by the recipient's. All three point at the same wrongness: something is slipping between what happened
+    and what's remembered.
+</div>
+
+<p style="color:var(--text2);">
+    This is a slow, atmospheric folk-horror investigation, not a monster hunt. The Mist Walker never simply
+    attacks — it offers, it borrows, it waits. It speaks with voices you trust or grieve, and it is honest about
+    wanting a door even when it lies about the price. The horror lives in doubting your own memory and your own
+    eyes, not in body count.
+</p>
+
+<div class="grid-2">
+    <div class="panel panel-teal">
+        <strong>Theme: Thresholds Between Worlds</strong>
+        <div class="text-xs text-muted mt-1">Bells, salt-lines, and ferry crossings are all thresholds — places where the rules bend if you let them. The Mist Walker's whole vocabulary is thresholds; it cannot cross a boundary held with genuine intent, only ones held out of habit.</div>
+    </div>
+    <div class="panel panel-red">
+        <strong>Theme: Corruption of Sacred Wards</strong>
+        <div class="text-xs text-muted mt-1">Every ward in this adventure was built to protect, and every one is failing quietly before it fails loudly. The bells that warn become the bells that lure. The dread is watching something meant to keep you safe slowly stop meaning it.</div>
+    </div>
+</div>
+
+<div class="whisper-box">
+    <strong>🌫️ The Mist Walker:</strong> Not evil the way a wolf is not evil — hungry for a threshold, and thresholds
+    are its whole vocabulary. Two hundred years ago something tore a hole in the barrier near the Weeping Gate; it
+    has been leaning against that old wound ever since, waiting for the wards to grow tired enough to let it lean
+    all the way through.
+</div>
+
+<hr>
+
+<!-- ===== ACT I ===== -->
+<h2 id="act-1">📯 Act I: Signs of Disturbance</h2>
+<p><span class="badge badge-gold">Tier II</span> <span class="badge badge-blue">Session 1</span></p>
+<p style="color:var(--text2);">The bells have started lying. Small wrongnesses accumulate — a ferry that shouldn't have crossed yet, a tower-keeper who answers before you finish the question. The party's first job is simply believing what they're seeing.</p>
+
+<div class="scene-card scene-mist">
+    <div class="scene-title">⛴️ The Ferryman's Refusal</div>
+    <div class="scene-desc">Eddis Crow won't cross tonight. He's heard bells tolling from underwater — notes that don't belong to any scale he knows. If pressed, he'll go, but he'll watch the fog the whole way like it's watching back.</div>
+    <div class="flex text-xs mt-1">
+        <span class="badge badge-gray">Timer: Mist Corruption [8]</span>
+        <span class="badge badge-teal">Encounter: Talk Eddis Into the Crossing (DV 3, Controlled)</span>
+        <span class="badge badge-teal">Encounter: The Crossing Itself (DV 3, Controlled)</span>
+    </div>
+    <div class="outcome-table mt-1">
+        <tr><td class="outcome-label">Clean:</td><td>Eddis agrees and shares everything he's seen: underwater tolling, a bell-note outside any register, a passenger last week with no shadow.</td></tr>
+        <tr><td class="outcome-label">Partial:</td><td>Eddis agrees, reluctantly, but holds back what he knows until the party earns more trust.</td></tr>
+        <tr><td class="outcome-label">Miss:</td><td>Eddis refuses outright; the party must find a longer, more exposed route past the Levee at night.</td></tr>
+    </div>
+</div>
+
+<div class="scene-card">
+    <div class="scene-title">🔔 The Bell-Line Levee</div>
+    <div class="scene-desc">The raised path along the fen is strung with watch-towers whose bells are supposed to warn travelers off soft ground. Lately the bells warn travelers onto it. Bell-Warden Maren Thorne meets the party here, exhausted and increasingly convinced she's losing her mind.</div>
+    <div class="flex text-xs mt-1">
+        <span class="badge badge-gray">Timer: Mist Corruption [8]</span>
+        <span class="badge badge-teal">Encounter: Navigate the Levee (DV 4, Controlled)</span>
+        <span class="badge badge-teal">Encounter: Question the Tower Keeper (DV 4, Controlled)</span>
+    </div>
+    <div class="outcome-table mt-1">
+        <tr><td class="outcome-label">Clean:</td><td>The party reads the bell patterns correctly, crosses safely, and identifies which towers are affected.</td></tr>
+        <tr><td class="outcome-label">Partial:</td><td>The party crosses, but someone sinks knee-deep in fen-mud — a cold reminder the bells wanted that.</td></tr>
+        <tr><td class="outcome-label">Miss:</td><td>The party follows a false warning onto soft ground. Mark 1 Fatigue and 1 segment on Mist Corruption.</td></tr>
+    </div>
+</div>
+
+<div class="scene-card scene-mist">
+    <div class="scene-title">🕰️ Ghost-Ferry Slip</div>
+    <div class="scene-desc">A dock where boats have started arriving before they leave. Passengers disembark with memories of crossings that haven't happened yet — the party's first unambiguous proof this isn't superstition.</div>
+    <div class="flex text-xs mt-1">
+        <span class="badge badge-gray">Timer: Mist Corruption [8]</span>
+        <span class="badge badge-red">Encounter: Temporal Echo (Cap 1, DV 3, Desperate)</span>
+    </div>
+    <div class="outcome-table mt-1">
+        <tr><td class="outcome-label">Clean:</td><td>The party identifies the echo — themselves, performing actions they haven't taken yet — and it unravels, leaving behind a useful fragment: it was searching for something at the Weeping Gate.</td></tr>
+        <tr><td class="outcome-label">Partial:</td><td>A PC interacts with the echo before realizing what it is, gaining a vivid false memory that colors their judgment for the session.</td></tr>
+        <tr><td class="outcome-label">Miss:</td><td>The echo convinces a PC of something false and consequential. Mark 1 segment on Mist Corruption.</td></tr>
+    </div>
+    <div class="whisper-box mt-1">
+        <strong>🌫️ Whisper:</strong> "You already did this. You just haven't gotten here yet."
+    </div>
+</div>
+
+<hr>
+
+<!-- ===== ACT II ===== -->
+<h2 id="act-2">🌁 Act II: Into the Mist</h2>
+<p><span class="badge badge-gold">Tier II</span> <span class="badge badge-blue">Session 2</span></p>
+<p style="color:var(--text2);">The party goes looking for the source instead of waiting for it to find them. The phenomena stop being ambient and start being aimed. This act should end with the party knowing the Weeping Gate is the anchor.</p>
+
+<div class="scene-card scene-mist">
+    <div class="scene-title">🏚️ Pall Watch-Tower</div>
+    <div class="scene-desc">An observation post above the mist-line. Its reflections have started moving a half-second out of step with reality, and its watch-log describes events that haven't happened yet — or happened differently.</div>
+    <div class="flex text-xs mt-1">
+        <span class="badge badge-gray">Timer: Mist Corruption [8]</span>
+        <span class="badge badge-teal">Encounter: Climb While Disoriented (DV 4, Desperate)</span>
+        <span class="badge badge-teal">Encounter: Real vs. Echo Observations (DV 5, Desperate)</span>
+    </div>
+    <div class="outcome-table mt-1">
+        <tr><td class="outcome-label">Clean:</td><td>The party reaches the top and sees mist pooling unnaturally around the Weeping Gate, far heavier than anywhere else on the levee.</td></tr>
+        <tr><td class="outcome-label">Partial:</td><td>The climb costs a PC their footing for a moment — 1 Fatigue and a scare.</td></tr>
+        <tr><td class="outcome-label">Miss:</td><td>A temporal displacement strands one PC a half-second out of sync with the party for the rest of the scene.</td></tr>
+    </div>
+</div>
+
+<div class="scene-card">
+    <div class="scene-title">👻 The Possessed Passenger</div>
+    <div class="scene-desc">Eddis's ferry runs one more time, this trip with a passenger who insists — reasonably, calmly, with the Walker's borrowed patience — that the safest course is straight into the thickest mist bank on the water.</div>
+    <div class="flex text-xs mt-1">
+        <span class="badge badge-gray">Timer: Mist Corruption [8]</span>
+        <span class="badge badge-red">Encounter: Possessed Bell-Warden (Cap 2, DV 4, Controlled)</span>
+    </div>
+    <div class="outcome-table mt-1">
+        <tr><td class="outcome-label">Clean:</td><td>The party recognizes the possession before the boat commits and restrains or talks down the passenger. No harm done.</td></tr>
+        <tr><td class="outcome-label">Partial:</td><td>The party acts late; the boat clips the mist bank. Everyone hears the underwater bell again, closer. Mark 1 segment on Mist Corruption.</td></tr>
+        <tr><td class="outcome-label">Miss:</td><td>The passenger nearly steers the boat under. Mark 1 Fatigue and 1 segment on Mist Corruption.</td></tr>
+    </div>
+</div>
+
+<div class="scene-card scene-mist">
+    <div class="scene-title">🎼 The Bell Correlation Puzzle</div>
+    <div class="scene-desc">Back at the Levee with better information, the party cross-references which towers ring true and which lie, using that pattern to find a safe route deep into corrupted territory — straight to the Weeping Gate.</div>
+    <div class="flex text-xs mt-1">
+        <span class="badge badge-gray">Timer: Mist Corruption [8]</span>
+        <span class="badge badge-teal">Encounter: Decode the Corrupted Pattern (DV 5, Controlled)</span>
+    </div>
+    <div class="outcome-table mt-1">
+        <tr><td class="outcome-label">Clean:</td><td>The party maps a safe route and confirms the Weeping Gate as the primary anchor point beyond doubt.</td></tr>
+        <tr><td class="outcome-label">Partial:</td><td>The party finds a route, but slower — an optional dangerous shortcut past a fully corrupted tower is available.</td></tr>
+        <tr><td class="outcome-label">Miss:</td><td>The pattern resists decoding; the party proceeds on guesswork. Mark 1 segment on Mist Corruption.</td></tr>
+    </div>
+</div>
+
+<hr>
+
+<!-- ===== ACT III ===== -->
+<h2 id="act-3">🔔 Act III: The Weeping Gate</h2>
+<p><span class="badge badge-gold">Tier II</span> <span class="badge badge-blue">Session 3 (+4)</span></p>
+<p style="color:var(--text2);">The western palisade, where the iron bells have begun to weep actual tears and the barrier between here and the Ways Between has gone thin as wet paper. Full manifestation. The party chooses how this ends.</p>
+
+<div class="scene-card scene-mist">
+    <div class="scene-title">👁️ The Gate Wakes Up</div>
+    <div class="scene-desc">As the party approaches, every Bell-Warden posted at the Gate turns at once — not aggressively, just attentively, all facing the party with the same too-patient stillness. The mask doesn't slip; it stops bothering to hold.</div>
+    <div class="flex text-xs mt-1">
+        <span class="badge badge-gray">Timer: Mist Corruption [8]</span>
+        <span class="badge badge-gray">Timer: Sanctification Progress [6]</span>
+        <span class="badge badge-red">Encounter: Possessed Bell-Wardens (1d3+1, Cap 2, DV 4, Desperate)</span>
+    </div>
+    <div class="outcome-table mt-1">
+        <tr><td class="outcome-label">Clean:</td><td>The party subdues or disperses the Wardens without lasting harm — the possession breaks when the Walker's attention moves elsewhere. No one need die here.</td></tr>
+        <tr><td class="outcome-label">Partial:</td><td>The party gets through, but a Warden is hurt. Mark 1 segment on Mist Corruption for the violence at the threshold.</td></tr>
+        <tr><td class="outcome-label">Miss:</td><td>The Wardens force the party back. Mark 2 segments on Mist Corruption; the party must find another way in.</td></tr>
+    </div>
+</div>
+
+<div class="scene-card">
+    <div class="scene-title">🧂 The Sanctification Ritual</div>
+    <div class="scene-desc">Purifying the anchor point is not a fight, it's a working — sanctified iron and true salt laid in old patterns while the mist actively resists. This is the party's best tool no matter which resolution they choose.</div>
+    <div class="flex text-xs mt-1">
+        <span class="badge badge-gray">Timer: Mist Corruption [8]</span>
+        <span class="badge badge-gray">Timer: Sanctification Progress [6]</span>
+        <span class="badge badge-teal">Encounter: Extended Ritual — Craft + Arcana (DV 6, Desperate)</span>
+    </div>
+    <div class="outcome-table mt-1">
+        <tr><td class="outcome-label">Clean:</td><td>The ritual takes hold cleanly. Mark Sanctification Progress +3 and Mist Corruption -1 — the nearby bells ring one true, clear note.</td></tr>
+        <tr><td class="outcome-label">Partial:</td><td>The ritual works, but the officiant marks 1 segment on their personal Corruption Timer. Mark Sanctification Progress +2.</td></tr>
+        <tr><td class="outcome-label">Miss:</td><td>The mist actively resists; the working collapses. Mark Mist Corruption +2.</td></tr>
+    </div>
+</div>
+
+<div class="scene-card scene-mist">
+    <div class="scene-title">🌫️ The Mist Walker</div>
+    <div class="scene-desc">It arrives the way it always has — a step behind, then a step ahead — and it does not want a fight. It wants a door. What the party offers it, denies it, or destroys to keep it from having, decides how this region looks a generation from now.</div>
+    <div class="flex text-xs mt-1">
+        <span class="badge badge-gray">Timer: Mist Corruption [8]</span>
+        <span class="badge badge-gray">Timer: Sanctification Progress [6]</span>
+        <span class="badge badge-red">Encounter: The Mist Walker (Cap 4, DV 6, Desperate)</span>
+    </div>
+    <div class="outcome-table mt-1">
+        <tr><td class="outcome-label">Clean:</td><td>The party achieves their chosen resolution on favorable terms. Mist Corruption stops advancing and begins to recede.</td></tr>
+        <tr><td class="outcome-label">Partial:</td><td>The party achieves their resolution, but at real cost — mark 1 segment on each participant's personal Corruption Timer.</td></tr>
+        <tr><td class="outcome-label">Miss:</td><td>The confrontation goes badly; the party retreats. Mark Mist Corruption +2. The Walker remains.</td></tr>
+    </div>
+    <div class="whisper-box mt-1">
+        <strong>🌫️ Whisper:</strong> "I only want what was already open. You're the one holding it shut."
+    </div>
+</div>
+
+<hr>
+
+<!-- ===== RESOLUTIONS ===== -->
+<h2 id="resolutions">⚖️ Possible Resolutions</h2>
+<div class="grid-2">
+    <div class="panel panel-gold">
+        <strong>Banishment</strong>
+        <div class="text-xs text-muted mt-1">Sanctify all four major corrupted bell-towers, gather three bells that still ring true, and perform a willing sacrifice. Requires the whole party. Costs 2 segments on each participant's personal Corruption Timer.</div>
+        <div class="text-xs text-muted mt-1"><strong>Outcome:</strong> The Mist Walker is banished and bell-lines restored, but some supernatural knowledge is lost with it.</div>
+    </div>
+    <div class="panel panel-blue">
+        <strong>Negotiation</strong>
+        <div class="text-xs text-muted mt-1">The entity was drawn by barrier damage from 200 years ago. Repair the original wound, offer a new anchoring point, or trade knowledge for departure. Costs an ongoing obligation to monitor the new anchor and 1 segment of Corruption per party member.</div>
+        <div class="text-xs text-muted mt-1"><strong>Outcome:</strong> The entity departs but may return with new demands; the party gains forbidden knowledge.</div>
+    </div>
+    <div class="panel panel-teal">
+        <strong>Containment</strong>
+        <div class="text-xs text-muted mt-1">Strengthen the existing wards rather than eliminate the entity: new protective measures, a monitoring protocol, and acceptance of the entity's continued presence as an ongoing complication.</div>
+        <div class="text-xs text-muted mt-1"><strong>Outcome:</strong> The entity is contained; the party becomes its wardens and gains a Bell-Warden apprentice follower.</div>
+    </div>
+    <div class="panel panel-red">
+        <strong>Failure / Partial Success</strong>
+        <div class="text-xs text-muted mt-1">If the party fails outright: corruption is reduced but not eliminated (sets up a sequel), or the party is forced into a Pyrrhic banishment at great cost (a major NPC death, permanent regional scarring).</div>
+        <div class="text-xs text-muted mt-1"><strong>Outcome:</strong> The region survives, changed — and owes someone a story it hasn't told yet.</div>
+    </div>
+</div>
+
+<hr>
+
+<!-- ===== NPCS ===== -->
+<h2 id="npcs">👤 Key NPCs</h2>
+<div class="grid-2">
+    <div class="npc-card">
+        <div class="npc-name">Bell-Warden Maren Thorne</div>
+        <div class="npc-role">Dedicated keeper of the bell-lines</div>
+        <div class="npc-motivation">🎯 Protect the wards she's spent her life tending, and prove to herself she isn't losing her mind.</div>
+        <div class="text-xs text-muted">Lore 3, Notice 2, Command 2. Increasingly rattled by the corruption — may make poor decisions under stress.</div>
+    </div>
+    <div class="npc-card">
+        <div class="npc-name">Ferryman Eddis Crow</div>
+        <div class="npc-role">River guide with supernatural awareness</div>
+        <div class="npc-motivation">🎯 Keep his passengers alive and keep working the water he's worked for thirty years, even as it stops making sense.</div>
+        <div class="text-xs text-muted">Lore 3, Notice 3, Skirmish 1. Seeing things that aren't there yet — becoming unreliable.</div>
+    </div>
+</div>
+
+<hr>
+
+<!-- ===== LOCATIONS ===== -->
+<h2 id="locations">📍 Key Locations</h2>
+<div class="grid-2">
+    <div class="loc-card"><strong>Bell-Line Levee</strong> — A raised causeway across the fen, its safety maintained by a chain of watch-towers. Corruption here means misleading tolls, thickening mist, and possessed keepers who answer before you finish asking.</div>
+    <div class="loc-card"><strong>Pall Watch-Tower</strong> — An elevated post above the mist-line. Reflections move a half-second out of step; the watch-log records events slightly wrong.</div>
+    <div class="loc-card"><strong>Ghost-Ferry Slip</strong> — The dock where boats arrive before they depart and passengers disembark with memories of crossings that haven't happened.</div>
+    <div class="loc-card"><strong>The Weeping Gate</strong> — The western palisade, ringed with iron-tear bells weeping actual tears of rust and brine. The primary anchor point and the adventure's climax.</div>
+</div>
+
+<hr>
+
+<!-- ===== FACTIONS ===== -->
+<h2 id="factions">🏛️ Factions</h2>
+<div class="panel panel-gold">
+    <strong>The Bell-Wardens Guild</strong> — Maintain the bell-line wards keeping the Mistlands' worst hazards at bay. Allies, though frightened and increasingly unreliable ones. Maren Thorne is the party's primary contact; other Wardens may already be compromised.
+</div>
+<div class="panel panel-blue">
+    <strong>The Ferry Guild</strong> — Keep the water crossings running and keep quiet about anything that would make passengers refuse to pay. Cautiously helpful; leadership would rather this be handled off the record and fast.
+</div>
+<div class="panel panel-red">
+    <strong>The Mist Walker</strong> — Wants to widen the seam at the Weeping Gate into a door it can use freely, by whatever combination of temptation, possession, and patience the wards allow. The adventure's central antagonist — though not incapable of negotiation.
+</div>
+
+<hr>
+
+<!-- ===== TIMERS ===== -->
+<h2 id="timers">⏱️ Campaign Timers</h2>
+<div class="timers-grid">
+    <div class="panel panel-teal">
+        <div style="display:flex;justify-content:space-between;font-size:0.8rem;">
+            <strong>🌫️ Mist Corruption</strong>
+            <span>0/8</span>
+        </div>
+        <div class="timer-bar"><div class="timer-bar-fill" style="width:0%;background:var(--teal);"></div></div>
+        <div class="text-xs text-muted">How far the Mist Walker has worked into the Mistlands. Advance +1 when bell-lines fail or an NPC is possessed; +2 when the party fails to sanctify a corrupted area or retreats from the entity; +1 when a PC accepts a Tempting Toll. When full, the barrier at the Weeping Gate fails and the region takes on permanent supernatural scarring.</div>
+    </div>
+    <div class="panel panel-gold">
+        <div style="display:flex;justify-content:space-between;font-size:0.8rem;">
+            <strong>🧂 Sanctification Progress</strong>
+            <span>0/6</span>
+        </div>
+        <div class="timer-bar"><div class="timer-bar-fill" style="width:0%;background:var(--gold);"></div></div>
+        <div class="text-xs text-muted">The party's cumulative progress purifying the Weeping Gate, tracked across Act III. A full track makes Banishment and Containment available on favorable terms without further extended rituals.</div>
+    </div>
+</div>
+
+<hr>
+
+<!-- ===== BESTIARY ===== -->
+<h2 id="bestiary">🐉 Bestiary</h2>
+<div class="creature-stats">
+    <div class="creature-name">The Mist Walker</div>
+    <span class="badge badge-gold">Tier IV</span>
+    <span class="badge badge-teal">Outsider</span>
+    <span class="badge badge-red">HP 40</span>
+    <div class="text-xs text-muted">A shape that is almost a person, seen best from the corner of the eye and worst face-on. It speaks with borrowed voices — the ferryman who drowned in '02, the child who never came home from the levee. It wants a door, not a kill.</div>
+    <div class="text-xs text-muted mt-1"><strong>SB Spends:</strong> 1 – Borrowed Voice (target Distracted, -1 die, until they act on or refuse what was said); 2 – Phase Step (passes through an unsealed barrier, repositions within Near); 3 – Tempting Toll (offers forbidden knowledge for a small yes — if accepted, mark 1 Mist Corruption); 4 – The Gate Remembers (forces open a seam; a possessed proxy acts immediately, out of sequence).</div>
+    <div class="text-xs text-muted mt-1"><strong>Weakness:</strong> Sanctified iron and salt disrupt its coherence; it cannot hold physical form inside a properly warded circle or cross a line of salt laid with genuine intent.</div>
+</div>
+
+<div class="creature-stats">
+    <div class="creature-name">Possessed Bell-Warden</div>
+    <span class="badge badge-gold">Tier II</span>
+    <span class="badge badge-teal">Possessed</span>
+    <span class="badge badge-red">HP 12</span>
+    <div class="text-xs text-muted">A tower-keeper or levee guard whose eyes have gone the color of standing water. They act normally and are wrong in every particular a stranger wouldn't notice. Under stress, the mask slips.</div>
+    <div class="text-xs text-muted mt-1"><strong>SB Spends:</strong> 1 – False Warning (gives confident, wrong directions — next navigation DV +1); 2 – Mask Slips (the borrowed voice bleeds through for one line — unsettling, but a free clue).</div>
+    <div class="text-xs text-muted mt-1"><strong>Weakness:</strong> Cleansing (Lore + Arcana vs DV 5, requires sanctified iron and salt) restores the Warden and ends the possession without harming them.</div>
+</div>
+
+<div class="creature-stats">
+    <div class="creature-name">Temporal Echo</div>
+    <span class="badge badge-gold">Tier I</span>
+    <span class="badge badge-teal">Phenomenon</span>
+    <span class="badge badge-red">HP 1</span>
+    <div class="text-xs text-muted">Not a creature so much as a wound in sequence — a repeated moment that thinks it's the present. Echoes look and sound exactly like the people or objects they duplicate, right up until they contradict themselves.</div>
+    <div class="text-xs text-muted mt-1"><strong>SB Spends:</strong> 1 – False Memory (a PC gains a vivid false memory and must act as though it's true until Insight vs DV 3 notices the seam).</div>
+    <div class="text-xs text-muted mt-1"><strong>Weakness:</strong> Cannot be harmed and cannot harm directly — only mislead. Identifying one (Wits + Notice vs DV 3) causes it to unravel harmlessly.</div>
+</div>
+
+<hr>
+
+<!-- ===== GM NOTES ===== -->
+<h2 id="gmnotes">🗒️ GM Notes</h2>
+
+<div class="panel panel-teal">
+    <strong>Tone</strong>
+    <div class="text-sm text-muted mt-1">A slow-building folk-horror investigation, not a monster-of-the-week. The Mist Walker never simply attacks — it offers, it borrows, it waits. Keep violence rare and consequential; the dread is in doubting your own memory and eyes, not in body count. Debts owed to the entity (a Tempting Toll accepted, a bargain struck at Negotiation) are always social and narrative — favors owed, names given away, promises to be called in later — never accounting.</div>
+</div>
+
+<div class="grid-2">
+    <div class="panel panel-gold">
+        <strong>Pacing — Act I</strong>
+        <div class="text-xs text-muted mt-1">Establish wrongness without danger: false bell warnings, an off keeper, a temporal echo. End with the party believing the corruption is real and supernatural, without knowing its source. Let Maren and Eddis's fear set the tone, not exposition.</div>
+    </div>
+    <div class="panel panel-gold">
+        <strong>Pacing — Act II</strong>
+        <div class="text-xs text-muted mt-1">Escalate from ambient to directed — phenomena start feeling aimed at the party. The Bell Correlation Puzzle should land as an earned "aha," not a lecture. End the act with the Weeping Gate confirmed as the anchor.</div>
+    </div>
+    <div class="panel panel-gold">
+        <strong>Pacing — Act III</strong>
+        <div class="text-xs text-muted mt-1">Full manifestation. The possession wave should feel like the mask finally coming off, not a straightforward fight — most Wardens can be saved. Let every approach across the whole adventure (combat, investigation, social, ritual) pay off here.</div>
+    </div>
+    <div class="panel panel-red">
+        <strong>Tactical Hints</strong>
+        <div class="text-xs text-muted mt-1">Make every Mist Corruption tick sensory — never just say "the timer advances." Possessed Wardens are not meant to be killed; signpost Cleansing even mid-fight. The Walker never lies about wanting a door, only about the cost — let its offers sound genuinely reasonable.</div>
+    </div>
+</div>
+
+<div class="secret-box mt-1">
+    <strong>🔒 Maren Thorne's Secret:</strong> She's been hearing her drowned sister's voice in the bells for three weeks and has told no one, terrified that her willingness to listen means she's already compromised. A powerful reveal once trust is earned — not a twist, just an honest confession from someone who has been alone with this too long.
+</div>
+<div class="secret-box mt-1">
+    <strong>🔒 Eddis Crow's Secret:</strong> He's been seeing a future version of the ferry slip — burned, broken — and hasn't decided if it's a warning or an invitation. Never resolve this into "Eddis is secretly evil"; he's tired and scared, and has started to wonder if giving in would at least be quiet.
+</div>
+
+<div class="panel panel-purple mt-1">
+    <strong>Forbidden Early Revelations</strong>
+    <ul class="text-xs text-muted mt-1" style="padding-left:1.1rem;">
+        <li>That the Weeping Gate is the anchor point — earned through Act II, not stated in Act I.</li>
+        <li>That the original barrier damage is 200 years old — reserved for the Negotiation resolution.</li>
+        <li>That Maren hears her sister's voice — surfaces through roleplay, not GM narration.</li>
+        <li>That most possessed Bell-Wardens can be saved — discovered via the Cleansing mechanic, not announced.</li>
+        <li>That the Mist Walker is capable of negotiation — early scenes play it as purely predatory; the possibility should emerge organically at the Gate.</li>
+    </ul>
+</div>
+
+<hr>
+
+<div style="font-size:0.75rem;color:var(--text3);text-align:center;padding:1rem 0;">
+    The Mist Walker — A Fate's Edge Adventure<br>
+    © Nicholas A. Gasper — For use with the Fate's Edge RPG<br>
+    Mistlands — Bells, Salt, and Breath<br>
+    The bells remember what you don't.
+</div>
+
+</body>
+</html>

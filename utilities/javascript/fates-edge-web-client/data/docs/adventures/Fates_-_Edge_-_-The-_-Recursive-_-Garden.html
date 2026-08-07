@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Recursive Garden — A Fate's Edge Adventure</title>
+    <style>
+        :root {
+            --bg1: #0e0d1c;
+            --bg2: #191830;
+            --bg3: #242149;
+            --bg4: #302c5c;
+            --text: #ece8f8;
+            --text2: #c0b8dc;
+            --text3: #8d84ac;
+            --gold: #b48ee0;
+            --gold-hover: #c8a5f0;
+            --border: #3a3468;
+            --red: #c0392b;
+            --green: #4fae8e;
+            --blue: #4aa3c9;
+            --purple: #9b6fd6;
+            --orange: #d6975f;
+            --radius: 8px;
+            --font: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            background: radial-gradient(ellipse at top, #1c1a3c 0%, var(--bg1) 60%);
+            color: var(--text);
+            font-family: var(--font);
+            padding: 1.5rem;
+            max-width: 1100px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+        h1, h2, h3, h4, h5 { color: var(--gold); margin: 0.5rem 0 0.3rem; }
+        h1 { font-size: 1.8rem; border-bottom: 2px solid var(--gold); padding-bottom: 0.3rem; }
+        h2 { font-size: 1.4rem; border-bottom: 1px solid var(--border); padding-bottom: 0.2rem; }
+        h3 { font-size: 1.1rem; }
+        h4 { font-size: 0.95rem; color: var(--text); }
+        a { color: var(--gold); text-decoration: none; }
+        .panel {
+            background: var(--bg2);
+            border-radius: var(--radius);
+            padding: 0.6rem 0.8rem;
+            border: 1px solid var(--border);
+            margin: 0.5rem 0;
+        }
+        .panel-gold { border-left: 4px solid var(--gold); }
+        .panel-red { border-left: 4px solid var(--red); }
+        .panel-blue { border-left: 4px solid var(--blue); }
+        .panel-green { border-left: 4px solid var(--green); }
+        .panel-purple { border-left: 4px solid var(--purple); }
+        .panel-orange { border-left: 4px solid var(--orange); }
+        .badge {
+            display: inline-block;
+            padding: 0.05rem 0.5rem;
+            border-radius: 12px;
+            font-size: 0.65rem;
+            font-weight: 600;
+        }
+        .badge-gold { background: var(--gold); color: #1a1030; }
+        .badge-red { background: var(--red); color: #fff; }
+        .badge-green { background: var(--green); color: #08251c; }
+        .badge-blue { background: var(--blue); color: #06202c; }
+        .badge-purple { background: var(--purple); color: #fff; }
+        .badge-orange { background: var(--orange); color: #2c1600; }
+        .badge-gray { background: var(--bg4); color: var(--text3); }
+        .flex { display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center; }
+        .flex-between { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.3rem; }
+        .text-muted { color: var(--text3); }
+        .text-gold { color: var(--gold); }
+        .text-sm { font-size: 0.85rem; }
+        .text-xs { font-size: 0.7rem; }
+        .mt-1 { margin-top: 0.5rem; }
+        .mb-1 { margin-bottom: 0.5rem; }
+        .gap-1 { gap: 0.3rem; }
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; }
+        @media (max-width: 600px) { .grid-2 { grid-template-columns: 1fr; } }
+        .scene-card {
+            background: var(--bg3);
+            border-radius: var(--radius);
+            padding: 0.4rem 0.6rem;
+            margin: 0.3rem 0;
+            border-left: 3px solid var(--gold);
+        }
+        .scene-card.completed { opacity: 0.6; border-left-color: var(--green); }
+        .scene-card .scene-title { font-weight: 600; font-size: 0.9rem; }
+        .scene-card .scene-desc { font-size: 0.8rem; color: var(--text2); }
+        .timer-bar {
+            background: var(--bg4);
+            border-radius: 4px;
+            height: 6px;
+            overflow: hidden;
+            flex: 1;
+            min-width: 60px;
+        }
+        .timer-bar-fill { height: 100%; border-radius: 4px; transition: width 0.3s; }
+        .npc-card, .loc-card {
+            background: var(--bg3);
+            border-radius: var(--radius);
+            padding: 0.3rem 0.5rem;
+            margin: 0.15rem 0;
+            border-left: 2px solid var(--gold);
+        }
+        .npc-card .npc-name { font-weight: 600; font-size: 0.85rem; }
+        .npc-card .npc-role { font-size: 0.7rem; color: var(--text3); }
+        .npc-card .npc-motivation { font-size: 0.75rem; color: var(--text2); }
+        .meta-tag {
+            display: inline-block;
+            padding: 0.05rem 0.4rem;
+            border-radius: 6px;
+            background: var(--bg4);
+            border: 1px solid var(--border);
+            font-size: 0.6rem;
+            color: var(--text3);
+        }
+        .status-badge {
+            padding: 0.1rem 0.5rem;
+            border-radius: 12px;
+            font-size: 0.6rem;
+            font-weight: 600;
+        }
+        .status-planned { background: var(--bg4); color: var(--text3); }
+        .status-active { background: var(--gold); color: #1a1030; }
+        .status-completed { background: var(--green); color: #08251c; }
+        hr { border: none; border-top: 1px solid var(--border); margin: 0.5rem 0; }
+        details summary { cursor: pointer; color: var(--gold); font-weight: 600; }
+        details summary:hover { color: var(--gold-hover); }
+        .toc { background: var(--bg3); border-radius: var(--radius); padding: 0.5rem 0.8rem; border: 1px solid var(--border); }
+        .toc a { color: var(--text2); display: block; padding: 0.1rem 0; font-size: 0.85rem; }
+        .toc a:hover { color: var(--gold); }
+        .encounter-box {
+            background: var(--bg4);
+            border-radius: var(--radius);
+            padding: 0.3rem 0.5rem;
+            margin: 0.2rem 0;
+            border-left: 3px solid var(--orange);
+            font-size: 0.8rem;
+        }
+        .encounter-box .enc-name { font-weight: 600; color: var(--orange); }
+        .puzzle-box {
+            background: var(--bg4);
+            border-radius: var(--radius);
+            padding: 0.4rem 0.6rem;
+            margin: 0.2rem 0;
+            border-left: 3px solid var(--blue);
+            font-size: 0.8rem;
+        }
+        .puzzle-box .puzzle-name { font-weight: 600; color: var(--blue); }
+        .outcome-row { display: grid; grid-template-columns: 60px 1fr; gap: 0.3rem; font-size: 0.75rem; margin: 0.15rem 0; }
+        .outcome-row span.tag { font-weight: 700; }
+        .tag-clean { color: var(--green); }
+        .tag-partial { color: var(--orange); }
+        .tag-miss { color: var(--red); }
+        .timers-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 0.3rem; }
+        blockquote {
+            border-left: 3px solid var(--gold);
+            padding-left: 1rem;
+            margin: 0.5rem 0;
+            color: var(--text2);
+            font-style: italic;
+        }
+        .creature-stats {
+            background: var(--bg4);
+            border-radius: var(--radius);
+            padding: 0.3rem 0.5rem;
+            margin: 0.2rem 0;
+            font-size: 0.8rem;
+        }
+        .secret-box {
+            background: #1c1436;
+            border: 1px dashed var(--purple);
+            border-radius: var(--radius);
+            padding: 0.3rem 0.5rem;
+            margin: 0.2rem 0;
+            font-size: 0.75rem;
+            color: var(--text2);
+        }
+        .secret-box strong { color: var(--purple); }
+    </style>
+</head>
+<body>
+
+<h1>🌀 The Recursive Garden</h1>
+<p style="color:var(--text2);margin-bottom:1rem;">
+    <span class="badge badge-gold">Tier II-III</span>
+    <span class="badge badge-blue">3 Sessions</span>
+    <span class="badge badge-purple">Fae Logic Horror</span>
+    <span class="badge badge-purple">Recursive Paradox</span>
+    <span class="badge badge-gray">Author: Nicholas A. Gasper</span>
+</p>
+<p style="color:var(--text2);margin-bottom:0.5rem;">
+    In Aelinnel, the fae realm where stone spires pierce moonlit groves and mathematical precision once
+    governed every leaf and season, the PCs arrive as scholars, cartomancers, or logic-seekers chasing rumors
+    of a garden that proves its own beauty. What they find is a wound: paths that lead back into themselves,
+    a Garden Keeper whose optimizations have curdled into contradiction, and a hermit mathematician feeding
+    the garden's heart equations it was never meant to solve. To leave whole, the PCs must out-think a place
+    that thinks back.
+</p>
+
+<blockquote>
+    "The correct door is the one that leads to the door that leads to..."
+    — inscription on the Proof-Gate, Aelinnel
+</blockquote>
+
+<!-- Table of Contents -->
+<div class="toc">
+    <strong style="color:var(--gold);">📑 Table of Contents</strong>
+    <a href="#act-1">Act I — The Garden Gate</a>
+    <a href="#act-2">Act II — The Deepening Paradox</a>
+    <a href="#act-3">Act III — The Heart of Recursion</a>
+    <a href="#bestiary">🐉 Bestiary</a>
+    <a href="#npcs">👤 Key NPCs</a>
+    <a href="#locations">📍 Locations</a>
+    <a href="#factions">🏛️ Factions</a>
+    <a href="#timers">⏱️ Campaign Timers</a>
+    <a href="#gmnotes">🗝️ GM Notes &amp; Secrets</a>
+</div>
+
+<hr>
+
+<!-- ===== ACT I ===== -->
+<h2 id="act-1">🌙 Act I — The Garden Gate</h2>
+<p style="color:var(--text2);">The PCs enter Aelinnel through a proof-gate that only opens for those who can hold a thought and its opposite at once. The garden greets them with wonder before it starts asking uncomfortable questions. By act's end, the party should suspect the Garden Keeper is not merely a victim of the anomaly but complicit in it.</p>
+
+<div class="scene-card">
+    <div class="scene-title">🚪 The Proof-Gate</div>
+    <div class="scene-desc">A trellised archway of white stone, inscribed with a theorem that rewrites itself as it is read. To pass, each PC must resolve a small recursive riddle carved into the arch. Beyond, moonlit hedges hum faintly, as if counting.</div>
+    <div class="flex text-xs mt-1">
+        <span class="badge badge-gray">Timer: Dread [10]</span>
+        <span class="badge badge-gray">Timer: Garden Integrity [10]</span>
+    </div>
+    <div class="puzzle-box mt-1">
+        <div class="puzzle-name">Puzzle: The Self-Referential Arch (DV 2, Controlled)</div>
+        <div class="outcome-row"><span class="tag tag-clean">Clean</span><span>Recognize the riddle has no terminus by design; accept the paradox rather than solving it. No timers advance.</span></div>
+        <div class="outcome-row"><span class="tag tag-partial">Partial</span><span>Force a near-answer through; the arch lets them by. Tick Dread +1 (prevent with 1 Boon).</span></div>
+        <div class="outcome-row"><span class="tag tag-miss">Miss</span><span>Trapped rereading the arch for a full exchange. Generate 2 SB; tick Garden Integrity +1.</span></div>
+    </div>
+    <div class="puzzle-box mt-1">
+        <div class="puzzle-name">First Sight of the Hedges (DV 2, Dominant)</div>
+        <div class="outcome-row"><span class="tag tag-clean">Clean</span><span>Notice the fractal, self-similar topiary — a clue the garden's logic is recursive, not linear.</span></div>
+        <div class="outcome-row"><span class="tag tag-partial">Partial</span><span>Sense something is wrong but can't articulate what.</span></div>
+        <div class="outcome-row"><span class="tag tag-miss">Miss</span><span>Admire the hedges and miss the pattern; GM withholds the fractal clue for now.</span></div>
+    </div>
+</div>
+
+<div class="scene-card">
+    <div class="scene-title">🌾 The Path-Weaver's Warning</div>
+    <div class="scene-desc">A minor fae woven from garden gravel intercepts the party. Bound by an old geas, she cannot lie but also cannot speak plainly — every truth she offers must be riddled.</div>
+    <div class="flex text-xs mt-1">
+        <span class="badge badge-gray">Timer: Dread [10]</span>
+        <span class="badge badge-gray">Timer: Garden Integrity [10]</span>
+    </div>
+    <div class="puzzle-box mt-1">
+        <div class="puzzle-name">Reading the Path-Weaver (DV 2, Controlled)</div>
+        <div class="outcome-row"><span class="tag tag-clean">Clean</span><span>She offers a true, useful clue: the loops began in the Sequenceweaver Grove, near the Keeper's newest topiary work.</span></div>
+        <div class="outcome-row"><span class="tag tag-partial">Partial</span><span>They learn something is wrong with the Grove, but not why.</span></div>
+        <div class="outcome-row"><span class="tag tag-miss">Miss</span><span>She withdraws into the gravel, offering nothing further this scene.</span></div>
+    </div>
+</div>
+
+<div class="scene-card">
+    <div class="scene-title">🌳 The Sequenceweaver Grove</div>
+    <div class="scene-desc">Trees grown in a strict Fibonacci spiral. One, near the center, has begun growing two different-sized rings for the same year — a mathematical contradiction made wood. Prime Wardens patrol the rows.</div>
+    <div class="flex text-xs mt-1">
+        <span class="badge badge-gray">Timer: Garden Integrity [10]</span>
+        <span class="badge badge-gray">Timer: Dread [10]</span>
+    </div>
+    <div class="puzzle-box mt-1">
+        <div class="puzzle-name">Diagnosing the Contradictory Tree (DV 3, Controlled)</div>
+        <div class="outcome-row"><span class="tag tag-clean">Clean</span><span>The tree's growth rings were seeded by two incompatible instructions — a strong clue the anomaly has two independent sources.</span></div>
+        <div class="outcome-row"><span class="tag tag-partial">Partial</span><span>Confirm something is deliberately wrong, but not that there are two sources.</span></div>
+        <div class="outcome-row"><span class="tag tag-miss">Miss</span><span>Touching the tree spreads the contradiction. Tick Garden Integrity +2.</span></div>
+    </div>
+    <div class="encounter-box mt-1">
+        <span class="enc-name">Prime Warden ×1 (DV 3, Controlled)</span>
+        <div class="outcome-row"><span class="tag tag-clean">Clean</span><span>Negotiate or prove your way past; it accepts a factor (name, favor, promise) and lets you through.</span></div>
+        <div class="outcome-row"><span class="tag tag-partial">Partial</span><span>It lets you by, but demands a genuine future favor — mark a debt owed to Aelinnel's fae order.</span></div>
+        <div class="outcome-row"><span class="tag tag-miss">Miss</span><span>It strikes; combat begins, its Indivisible Stance resisting easy maneuvers.</span></div>
+    </div>
+</div>
+
+<div class="scene-card">
+    <div class="scene-title">🍃 The Garden Keeper's Invitation</div>
+    <div class="scene-desc">The Garden Keeper greets the party with genuine warmth, framing the crisis as "a few small inconsistencies." They cannot perceive contradictions that flatter their own optimization work.</div>
+    <div class="flex text-xs mt-1">
+        <span class="badge badge-gray">Timer: Garden Integrity [10]</span>
+        <span class="badge badge-gray">Timer: Dread [10]</span>
+    </div>
+    <div class="puzzle-box mt-1">
+        <div class="puzzle-name">Interviewing the Keeper (DV 3, Controlled)</div>
+        <div class="outcome-row"><span class="tag tag-clean">Clean</span><span>Flattered by real curiosity, the Keeper admits to "refining" the garden's recursive growth — right when the loops began. A real lead, unwittingly offered.</span></div>
+        <div class="outcome-row"><span class="tag tag-partial">Partial</span><span>They deflect toward the Equation Hermit ("that dreadful man in the tower") — true, but convenient self-exculpation.</span></div>
+        <div class="outcome-row"><span class="tag tag-miss">Miss</span><span>Defensive, they "demonstrate" garden logic on the spot and create a new small paradox. Tick Garden Integrity +1 and Dread +1 (prevent with 1 Boon each).</span></div>
+    </div>
+</div>
+
+<hr>
+
+<!-- ===== ACT II ===== -->
+<h2 id="act-2">📖 Act II — The Deepening Paradox</h2>
+<p style="color:var(--text2);">The party investigates both suspects — the Keeper's optimizations and the Hermit's unsolved equations — through the garden's two great archives of proof. Both leads are true; the anomaly is a feedback loop between an obsessive optimizer and an obsessive solver.</p>
+
+<div class="scene-card">
+    <div class="scene-title">📚 The Library of Proven Truths</div>
+    <div class="scene-desc">Shelves of books whose page numbers renumber themselves by reading order; proofs true until observed twice. The party seeks records of when the garden's recursive patterns were first formalized.</div>
+    <div class="flex text-xs mt-1">
+        <span class="badge badge-gray">Timer: Proof Collapse [8]</span>
+        <span class="badge badge-gray">Timer: Dread [10]</span>
+    </div>
+    <div class="puzzle-box mt-1">
+        <div class="puzzle-name">Cross-Referencing the Archive (DV 3, Controlled)</div>
+        <div class="outcome-row"><span class="tag tag-clean">Clean</span><span>Find the original commission: the Keeper requested "perfect self-similar growth optimization" eighteen moons ago — as the Hermit's tower began drawing unusual amounts of ambient logic.</span></div>
+        <div class="outcome-row"><span class="tag tag-partial">Partial</span><span>Find the commission, but its date has renumbered itself twice, muddying cause and effect.</span></div>
+        <div class="outcome-row"><span class="tag tag-miss">Miss</span><span>Trust an outdated "established" proof and act on bad information. Tick Proof Collapse +2 as the book rewrites itself.</span></div>
+    </div>
+</div>
+
+<div class="scene-card">
+    <div class="scene-title">🗼 The Equation Hermit's Tower</div>
+    <div class="scene-desc">A spiral tower where stairs ascend and descend at once, interiors larger than the exterior. The Hermit has been feeding the garden's core every unsolved problem he cannot crack himself.</div>
+    <div class="flex text-xs mt-1">
+        <span class="badge badge-gray">Timer: Recursive Depth [6]</span>
+        <span class="badge badge-gray">Timer: Dread [10]</span>
+    </div>
+    <div class="puzzle-box mt-1">
+        <div class="puzzle-name">Navigating the Impossible Stairwell (DV 3, Desperate)</div>
+        <div class="outcome-row"><span class="tag tag-clean">Clean</span><span>Accept the impossibility rather than fight it; reach the Hermit's study without incident.</span></div>
+        <div class="outcome-row"><span class="tag tag-partial">Partial</span><span>Disoriented, a climbed floor insists it was always the ground floor. Tick Recursive Depth +1.</span></div>
+        <div class="outcome-row"><span class="tag tag-miss">Miss</span><span>Briefly lost in a dimensional fold. Generate 2 SB, tick Recursive Depth +2, lose the scene's first action.</span></div>
+    </div>
+    <div class="puzzle-box mt-1">
+        <div class="puzzle-name">Confronting the Hermit (DV 3, Controlled)</div>
+        <div class="outcome-row"><span class="tag tag-clean">Clean</span><span>Starved for a listener, he confesses everything — he's been feeding unsolved equations into the garden's core for months.</span></div>
+        <div class="outcome-row"><span class="tag tag-partial">Partial</span><span>He confesses but insists his work is nearly done and begs the party not to interfere.</span></div>
+        <div class="outcome-row"><span class="tag tag-miss">Miss</span><span>He panics and feeds one more equation into a fragment of the core in front of you. Tick Recursive Depth +2 and Proof Collapse +1.</span></div>
+    </div>
+</div>
+
+<div class="scene-card">
+    <div class="scene-title">🔢 Numerical Uprising</div>
+    <div class="scene-desc">Negative numbers spread pessimism through the hedges; an irrational number rambles endlessly at a crossroads; Zero sits mute and existentially adrift in the path, refusing to move.</div>
+    <div class="flex text-xs mt-1">
+        <span class="badge badge-gray">Timer: Proof Collapse [8]</span>
+        <span class="badge badge-gray">Timer: Garden Integrity [10]</span>
+    </div>
+    <div class="puzzle-box mt-1">
+        <div class="puzzle-name">Reasoning with Zero (DV 3, Controlled)</div>
+        <div class="outcome-row"><span class="tag tag-clean">Clean</span><span>Talk Zero through its crisis with genuine kindness; it rolls off the path, grateful and resolved.</span></div>
+        <div class="outcome-row"><span class="tag tag-partial">Partial</span><span>It moves, but extracts a promise someone will "come back and give it a purpose" — mark a small owed favor.</span></div>
+        <div class="outcome-row"><span class="tag tag-miss">Miss</span><span>Its crisis deepens and spreads. Tick Proof Collapse +1.</span></div>
+    </div>
+</div>
+
+<hr>
+
+<!-- ===== ACT III ===== -->
+<h2 id="act-3">🌌 Act III — The Heart of Recursion</h2>
+<p style="color:var(--text2);">The party descends through increasingly illogical space to the Garden's Core, confronts the corrupted Garden Keeper, and chooses what to do with an anomaly that is equal parts wound and revelation. The horror was never the paradox itself — it was the refusal to let a problem stay unsolved.</p>
+
+<div class="scene-card">
+    <div class="scene-title">🔁 The Paths That Lead to Themselves</div>
+    <div class="scene-desc">The final approach loops the party through the same hundred yards of hedge in slightly different states each time — the adventure's signature puzzle. Breaking the loop requires spotting a pattern across three iterations and introducing an asymmetry the recursion can't absorb.</div>
+    <div class="flex text-xs mt-1">
+        <span class="badge badge-gray">Timer: Recursive Depth [6]</span>
+        <span class="badge badge-gray">Timer: Dread [10]</span>
+    </div>
+    <div class="puzzle-box mt-1">
+        <div class="puzzle-name">Breaking the Loop (DV 4, Desperate)</div>
+        <div class="outcome-row"><span class="tag tag-clean">Clean</span><span>On the third pass, spot the recurring flaw (a hedge-bird landing differently each loop) and refuse the expected route. The loop shatters.</span></div>
+        <div class="outcome-row"><span class="tag tag-partial">Partial</span><span>Break the loop by brute-forcing a paradox of your own (walking backward through the exit). Generate 2 SB, tick Recursive Depth +1.</span></div>
+        <div class="outcome-row"><span class="tag tag-miss">Miss</span><span>Walk the loop a fourth time, aware and unable to stop. Tick Recursive Depth +2 and Dread +2 (prevent with 2 Boons total).</span></div>
+    </div>
+</div>
+
+<div class="scene-card">
+    <div class="scene-title">👑 The Corrupted Garden Keeper</div>
+    <div class="scene-desc">The Keeper waits on a throne of logical contradictions, half-convinced their optimization is nearly perfect, half-aware something has gone terribly wrong. They believe stopping now would mean "leaving the proof unfinished."</div>
+    <div class="flex text-xs mt-1">
+        <span class="badge badge-gray">Timer: Garden Integrity [10]</span>
+        <span class="badge badge-gray">Timer: Proof Collapse [8]</span>
+    </div>
+    <div class="puzzle-box mt-1">
+        <div class="puzzle-name">Confronting the Keeper's Pride (DV 4, Controlled)</div>
+        <div class="outcome-row"><span class="tag tag-clean">Clean</span><span>Demonstrate — kindly, with real evidence from Acts I-II — that the Keeper's own optimizations are the anomaly's engine. Grief-struck but persuaded, they stand down and help.</span></div>
+        <div class="outcome-row"><span class="tag tag-partial">Partial</span><span>They concede intellectually but can't let go emotionally; they step aside but won't help further.</span></div>
+        <div class="outcome-row"><span class="tag tag-miss">Miss</span><span>Cornered and humiliated, they lash out. Combat or hard bargaining begins; tick Garden Integrity +2.</span></div>
+    </div>
+</div>
+
+<div class="scene-card">
+    <div class="scene-title">🌱 The Prime Equation</div>
+    <div class="scene-desc">The Garden's Core: a space existing in several dimensions at once, at whose center the Prime Equation breathes like something half-born — every unsolved problem the Hermit fed it, every optimization the Keeper demanded. It is not malicious. It is trying to prove that a garden can be both perfectly ordered and genuinely alive.</div>
+    <div class="flex text-xs mt-1">
+        <span class="badge badge-gray">Timer: Recursive Depth [6]</span>
+        <span class="badge badge-gray">Timer: Proof Collapse [8]</span>
+        <span class="badge badge-gray">Timer: Garden Integrity [10]</span>
+        <span class="badge badge-gray">Timer: Dread [10]</span>
+    </div>
+    <div class="encounter-box mt-1">
+        <span class="enc-name">Infinite Regress ×1 (DV 4, Desperate)</span>
+        <div class="outcome-row"><span class="tag tag-clean">Clean</span><span>Satisfy it with a genuinely circular, self-proving argument, buying calm to address the Equation itself.</span></div>
+        <div class="outcome-row"><span class="tag tag-partial">Partial</span><span>Quiet it temporarily, but a lingering doubt clouds one PC's key Act II evidence (narrative effect).</span></div>
+        <div class="outcome-row"><span class="tag tag-miss">Miss</span><span>It cascades unchecked; the party's plan for the scene dissolves into confusion. Tick Dread +2.</span></div>
+    </div>
+    <div class="puzzle-box mt-1">
+        <div class="puzzle-name">The Choice: Solve, Contain, or Redirect (DV 4, Desperate)</div>
+        <div class="outcome-row"><span class="tag tag-clean">Clean</span><span><strong>The Elegant Proof</strong> — a higher-order framing lets the garden be both ordered and alive without collapsing; the anomaly becomes a permanent, wondrous feature. Award 18-20 XP.</span></div>
+        <div class="outcome-row"><span class="tag tag-partial">Partial</span><span><strong>The Containment</strong> — the Prime Equation is sealed in a bounded, stable pocket: safe but quarantined. Award 12-15 XP.</span></div>
+        <div class="outcome-row"><span class="tag tag-miss">Miss</span><span><strong>The Sacrifice</strong> — the only working solution costs the party, the Keeper, or the Hermit a fundamental certainty or relationship. The garden survives; something precious does not. Award 15-18 XP.</span></div>
+    </div>
+</div>
+
+<hr>
+
+<!-- ===== BESTIARY ===== -->
+<h2 id="bestiary">🐉 Bestiary</h2>
+
+<div class="panel panel-purple">
+    <h3>Infinite Regress <span class="badge badge-red">Class V</span> <span class="badge badge-gray">TL 5</span> <span class="badge badge-gray">Conceptual Entity</span></h3>
+    <p class="text-sm text-muted">A standing mirror of black water, reflecting not the viewer but the question of what it reflects. It does not attack so much as unravel: every answer spawns three further questions.</p>
+    <div class="creature-stats">Wits 5 · Presence 4 · Resolve 5 · HP 40</div>
+    <div class="text-xs mt-1"><strong>SB Spends:</strong></div>
+    <div class="encounter-box">1 SB — Question Cascade: target's last statement is answered with three new questions; must answer one on the spot or lose their next action.</div>
+    <div class="encounter-box">2 SB — Doubt Inducement: target tests Wits + Resolve (DV 3) or begins to doubt a named memory or piece of evidence.</div>
+    <div class="encounter-box">3 SB — Infinite Reflection: a second, identical copy of itself manifests in any reflective surface at Near.</div>
+    <div class="text-xs mt-1 text-muted"><strong>Weakness:</strong> Cannot be harmed by direct logical attack. Can be temporarily satisfied by a perfectly circular, self-proving argument; grows confused by absolute, unqualified statements it cannot subdivide.</div>
+</div>
+
+<div class="panel panel-purple">
+    <h3>The Contradictory Axiom <span class="badge badge-orange">Class IV</span> <span class="badge badge-gray">TL 4</span> <span class="badge badge-gray">Conceptual Entity</span></h3>
+    <p class="text-sm text-muted">A shimmer simultaneously present and absent, helpful and hostile — a living proof of a statement and its negation, both true at once. Arithmetic stops being reliable wherever it lingers.</p>
+    <div class="creature-stats">Wits 4 · Presence 3 · Endurance 4 · HP 30</div>
+    <div class="text-xs mt-1"><strong>SB Spends:</strong></div>
+    <div class="encounter-box">1 SB — Proof Corruption: a true statement spoken at Near becomes false, or vice versa, for the rest of the scene.</div>
+    <div class="encounter-box">2 SB — Paradox Aura: all rolls using tools, calculation, or measurement at Near are Desperate.</div>
+    <div class="encounter-box">3 SB — Logical Anchor: fixes itself to a location/object; cannot be moved or banished until someone proves a contradiction about its own nature.</div>
+    <div class="text-xs mt-1 text-muted"><strong>Weakness:</strong> Requires constant self-maintenance; a paradox about its own existence leaves it briefly vulnerable. Cannot resolve any contradiction concerning itself.</div>
+</div>
+
+<div class="panel panel-purple">
+    <h3>Prime Warden <span class="badge badge-blue">Class III</span> <span class="badge badge-gray">TL 3</span> <span class="badge badge-gray">Numerical Entity</span></h3>
+    <p class="text-sm text-muted">A prime number given stubborn, indivisible crystalline flesh. Patrols a section of the garden, refusing on principle to let anything pass undivided. Speaks in short, absolute declarations.</p>
+    <div class="creature-stats">Body 3 · Wits 2 · Endurance 3 · HP 20</div>
+    <div class="text-xs mt-1"><strong>SB Spends:</strong></div>
+    <div class="encounter-box">1 SB — Indivisible Stance: cannot be moved, tricked, or split into a Controlled position this exchange; treat approaches as Desperate.</div>
+    <div class="encounter-box">2 SB — Factor Strike: Harm 2, arguing (correctly) the target was never truly whole to begin with.</div>
+    <div class="text-xs mt-1 text-muted"><strong>Weakness:</strong> Negotiable (Presence + Diplomacy, DV 2-4) or satisfied by an accepted factor — a name, a promise, a smaller number to guard. Hostile only if forced to physically divide.</div>
+</div>
+
+<hr>
+
+<!-- ===== NPCS ===== -->
+<h2 id="npcs">👤 Key NPCs</h2>
+<div class="grid-2">
+    <div class="npc-card">
+        <div class="npc-name">The Garden Keeper</div>
+        <div class="npc-role">Fae steward of the Recursive Garden — Wits 5, Presence 4, Spirit 4</div>
+        <div class="npc-motivation">🎯 Maintain — and perfect — the garden's mathematical precision, even past the point of wisdom.</div>
+        <div class="secret-box mt-1"><strong>Secret:</strong> Their "optimization" of the garden's recursive growth, requested eighteen moons ago, is the anomaly's primary engine. They genuinely cannot perceive this — a blind spot, not a lie.</div>
+    </div>
+    <div class="npc-card">
+        <div class="npc-name">The Equation Hermit</div>
+        <div class="npc-role">Mad mathematician, tower recluse — Wits 5, Lore 5, Endurance 2</div>
+        <div class="npc-motivation">🎯 Solve the one recursive equation he believes describes the whole of Aelinnel.</div>
+        <div class="secret-box mt-1"><strong>Secret:</strong> Has been feeding unsolved equations into the garden's core for months, hoping its recursion would finish the proof for him.</div>
+    </div>
+    <div class="npc-card">
+        <div class="npc-name">The Path-Weaver</div>
+        <div class="npc-role">Minor fae guide, woven from garden gravel — Wits 3, Insight 4, Stealth 3</div>
+        <div class="npc-motivation">🎯 Warn travelers away from the garden's worst loops, within the limits of her own honesty.</div>
+        <div class="secret-box mt-1"><strong>Secret:</strong> Bound by an old geas laid by the Keeper — every truth she offers must be riddled, never spoken plainly.</div>
+    </div>
+</div>
+
+<hr>
+
+<!-- ===== LOCATIONS ===== -->
+<h2 id="locations">📍 Locations</h2>
+<div class="grid-2">
+    <div class="loc-card"><strong>The Proof-Gate</strong> — A trellised archway inscribed with a self-rewriting theorem. Passage requires accepting a paradox rather than solving it.</div>
+    <div class="loc-card"><strong>The Sequenceweaver Grove</strong> — Trees grown in a strict Fibonacci spiral, now showing contradictory growth rings. First visible site of the anomaly's damage.</div>
+    <div class="loc-card"><strong>The Library of Proven Truths</strong> — Books whose pages renumber themselves by reading order; proofs shift when observed twice.</div>
+    <div class="loc-card"><strong>The Equation Hermit's Tower</strong> — A spiral tower where stairs ascend and descend at once, rooms larger inside than out.</div>
+    <div class="loc-card"><strong>The Garden's Core</strong> — A space existing in several dimensions at once; all logical paths converge here around the Prime Equation and the Keeper's throne of contradictions.</div>
+</div>
+
+<hr>
+
+<!-- ===== FACTIONS ===== -->
+<h2 id="factions">🏛️ Factions</h2>
+<div class="panel panel-purple">
+    <strong>The Fae of Aelinnel</strong> — Preserve the realm's mathematical precision and reputation for logical wonder; deeply reluctant to admit the Garden Keeper's role in the crisis. Wary hosts who help those who show genuine curiosity and respect for their logic.
+</div>
+<div class="panel panel-blue">
+    <strong>The Numerical Entities</strong> — Maintain their own mathematical nature and dignity as the anomaly destabilizes the rules that define them. Neutral to friendly if treated as persons rather than obstacles.
+</div>
+
+<hr>
+
+<!-- ===== TIMERS ===== -->
+<h2 id="timers">⏱️ Campaign Timers</h2>
+<div class="timers-grid">
+    <div class="panel panel-orange">
+        <div style="display:flex;justify-content:space-between;font-size:0.8rem;">
+            <strong>🌫️ Dread</strong>
+            <span>0/10</span>
+        </div>
+        <div class="timer-bar"><div class="timer-bar-fill" style="width:0%;background:var(--orange);"></div></div>
+        <div class="text-xs text-muted">Mounting mathematical horror. Prevent a tick by spending 1 Boon. 3-4: -1 die alone. 5-6: -2 dice to courage/rational rolls. 7-8: -2 dice most rolls, unreliable perception. 9-10: out of control.</div>
+    </div>
+    <div class="panel panel-green">
+        <div style="display:flex;justify-content:space-between;font-size:0.8rem;">
+            <strong>🌿 Garden Integrity</strong>
+            <span>0/10</span>
+        </div>
+        <div class="timer-bar"><div class="timer-bar-fill" style="width:0%;background:var(--green);"></div></div>
+        <div class="text-xs text-muted">How much the garden's structure is breaking down. At 9-10, the garden turns actively hostile to navigation.</div>
+    </div>
+    <div class="panel panel-blue">
+        <div style="display:flex;justify-content:space-between;font-size:0.8rem;">
+            <strong>📐 Proof Collapse</strong>
+            <span>0/8</span>
+        </div>
+        <div class="timer-bar"><div class="timer-bar-fill" style="width:0%;background:var(--blue);"></div></div>
+        <div class="text-xs text-muted">How unreliable Aelinnel's established truths have become. At 7-8, even "known facts" cannot be trusted.</div>
+    </div>
+    <div class="panel panel-purple">
+        <div style="display:flex;justify-content:space-between;font-size:0.8rem;">
+            <strong>🌀 Recursive Depth</strong>
+            <span>0/6</span>
+        </div>
+        <div class="timer-bar"><div class="timer-bar-fill" style="width:0%;background:var(--purple);"></div></div>
+        <div class="text-xs text-muted">How deeply the anomaly has penetrated the realm's meta-logical structure. At 5-6, self-reference becomes dangerous and the Prime Equation stirs.</div>
+    </div>
+</div>
+
+<hr>
+
+<!-- ===== GM NOTES ===== -->
+<h2 id="gmnotes">🗝️ GM Notes &amp; Secrets</h2>
+
+<div class="panel panel-gold">
+    <h3>Overview</h3>
+    <p class="text-sm">A three-session, Tier II-III fae logic-horror adventure built around four campaign timers and one central twist: the anomaly has two well-meaning, entirely mundane-in-motive causes (the Keeper's optimization drive, the Hermit's obsessive unsolved equations) rather than a villain. The horror is intellectual and existential, not violent — combat should be rare and mostly avoidable through clever play. The recursive garden-loop puzzle in Act III is the adventure's signature set-piece; give it real table time. Keep "debt" language social — favors, promises, and stories, never coin or contract.</p>
+</div>
+
+<div class="panel panel-blue">
+    <h3>Pacing</h3>
+    <p class="text-sm"><strong>Act I:</strong> Wonder curdling into unease. Open with genuine beauty. Let the Path-Weaver's warning land as cryptic rather than ominous. The Grove is the first hard clue something is deliberately wrong, but scene 1-4 should end with the party liking the Keeper.</p>
+    <p class="text-sm mt-1"><strong>Act II:</strong> Arithmetic starts lying, geometry stops cooperating, and the party holds two true things at once — the Keeper and the Hermit are both complicit, neither a conventional villain. The Numerical Uprising is a good pressure valve — strange and a little funny before Act III gets heavier.</p>
+    <p class="text-sm mt-1"><strong>Act III:</strong> The looping-path puzzle should not resolve on a single good roll — telegraph the repeating pattern across three passes. Play the Keeper confrontation for grief, not triumph. Present the final choice as three equally valid doors, not a hidden "best" answer.</p>
+</div>
+
+<div class="panel panel-purple">
+    <h3>NPC Secrets</h3>
+    <p class="text-sm"><strong>Garden Keeper:</strong> Caused the anomaly through pride, not malice. Let this land as tragedy — give players real chances to notice and gently confront it across all three acts.</p>
+    <p class="text-sm mt-1"><strong>Equation Hermit:</strong> Lonely and starved for validation more than dangerous. If treated with genuine interest in Act II, becomes a real ally in Act III.</p>
+    <p class="text-sm mt-1"><strong>Path-Weaver:</strong> Operates under an old geas laid by the Keeper forbidding plain speech — a small, sad mirror of the garden's larger flaw.</p>
+</div>
+
+<div class="panel panel-red">
+    <h3>Forbidden Early Revelations</h3>
+    <ul class="text-sm" style="margin-left:1.2rem;">
+        <li>That the Garden Keeper's optimization directly caused the anomaly — surface gradually, land fully only at the Act III confrontation.</li>
+        <li>That the Hermit and Keeper are BOTH causes rather than one villain and one victim — let the party suspect only one for most of Act II.</li>
+        <li>That the Prime Equation is not malicious but trying to prove something unprovable — the Act III thesis reveal.</li>
+        <li>That the Path-Weaver is bound by a geas from the Keeper — best discovered through Insight or a kindness shown to her.</li>
+        <li>That there is no single "correct" resolution path — present all three as equally valid from the start.</li>
+    </ul>
+</div>
+
+<div class="panel panel-green">
+    <h3>Tactical Hints</h3>
+    <p class="text-sm"><strong>Dread as pressure:</strong> Track it visibly at the table (a literal ten-tick ring works well). Let Boons prevent ticks so the horror stays a resource-management tension, not a save-or-suffer roll.</p>
+    <p class="text-sm mt-1"><strong>Puzzle pacing:</strong> Reward creative narration as much as the die roll — a genuinely clever approach can earn a free die or shifted position before rolling.</p>
+    <p class="text-sm mt-1"><strong>Combat is rare:</strong> Built to be resolved mostly without violence. Save real combat for parties that force the issue, and keep it short.</p>
+    <p class="text-sm mt-1"><strong>Keeper confrontation:</strong> Works best if the GM tracks which specific evidence the party gathered in Act II and has the Keeper respond to it directly.</p>
+</div>
+
+<hr>
+
+<div style="font-size:0.75rem;color:var(--text3);text-align:center;padding:1rem 0;">
+    The Recursive Garden — A Fate's Edge Adventure<br>
+    © Nicholas A. Gasper — For use with the Fate's Edge RPG
+</div>
+
+</body>
+</html>

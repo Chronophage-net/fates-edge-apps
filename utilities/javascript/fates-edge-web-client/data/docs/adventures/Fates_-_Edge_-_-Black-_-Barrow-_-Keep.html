@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Black Barrow Keep — The Covenant Heart & the Mist King's Echo</title>
+    <style>
+        :root {
+            --bg1: #08080c;
+            --bg2: #131318;
+            --bg3: #1c1c24;
+            --bg4: #262630;
+            --text: #e4e2e6;
+            --text2: #ada8b4;
+            --text3: #7c7684;
+            --gold: #b08d3f;
+            --gold-hover: #c49f4e;
+            --border: #33303c;
+            --red: #8e2a2a;
+            --green: #3d7a52;
+            --blue: #3c6e8f;
+            --purple: #5f3f7a;
+            --orange: #a8622a;
+            --brass: #9c7a3c;
+            --mist: #4f6b73;
+            --radius: 8px;
+            --font: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            background: var(--bg1);
+            background-image: radial-gradient(circle at 50% 0%, #14141c 0%, #08080c 60%);
+            color: var(--text);
+            font-family: var(--font);
+            padding: 1.5rem;
+            max-width: 1100px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+        h1, h2, h3, h4, h5 { color: var(--gold); margin: 0.5rem 0 0.3rem; }
+        h1 { font-size: 1.8rem; border-bottom: 2px solid var(--gold); padding-bottom: 0.3rem; }
+        h2 { font-size: 1.4rem; border-bottom: 1px solid var(--border); padding-bottom: 0.2rem; }
+        h3 { font-size: 1.1rem; }
+        h4 { font-size: 0.95rem; color: var(--text); }
+        a { color: var(--gold); text-decoration: none; }
+        .panel {
+            background: var(--bg2);
+            border-radius: var(--radius);
+            padding: 0.6rem 0.8rem;
+            border: 1px solid var(--border);
+            margin: 0.5rem 0;
+        }
+        .panel-gold { border-left: 4px solid var(--gold); }
+        .panel-red { border-left: 4px solid var(--red); }
+        .panel-blue { border-left: 4px solid var(--blue); }
+        .panel-green { border-left: 4px solid var(--green); }
+        .panel-purple { border-left: 4px solid var(--purple); }
+        .panel-orange { border-left: 4px solid var(--orange); }
+        .panel-mist { border-left: 4px solid var(--mist); }
+        .badge {
+            display: inline-block;
+            padding: 0.05rem 0.5rem;
+            border-radius: 12px;
+            font-size: 0.65rem;
+            font-weight: 600;
+        }
+        .badge-gold { background: var(--gold); color: #170f00; }
+        .badge-red { background: var(--red); color: #fff; }
+        .badge-green { background: var(--green); color: #fff; }
+        .badge-blue { background: var(--blue); color: #fff; }
+        .badge-purple { background: var(--purple); color: #fff; }
+        .badge-orange { background: var(--orange); color: #fff; }
+        .badge-mist { background: var(--mist); color: #fff; }
+        .badge-gray { background: var(--bg4); color: var(--text3); }
+        .flex { display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center; }
+        .flex-between { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.3rem; }
+        .text-muted { color: var(--text3); }
+        .text-gold { color: var(--gold); }
+        .text-sm { font-size: 0.85rem; }
+        .text-xs { font-size: 0.7rem; }
+        .mt-1 { margin-top: 0.5rem; }
+        .mb-1 { margin-bottom: 0.5rem; }
+        .gap-1 { gap: 0.3rem; }
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; }
+        .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.5rem; }
+        @media (max-width: 700px) { .grid-2, .grid-3 { grid-template-columns: 1fr; } }
+        .scene-card {
+            background: var(--bg3);
+            border-radius: var(--radius);
+            padding: 0.4rem 0.6rem;
+            margin: 0.3rem 0;
+            border-left: 3px solid var(--gold);
+        }
+        .scene-card.completed { opacity: 0.6; border-left-color: var(--green); }
+        .scene-card .scene-title { font-weight: 600; font-size: 0.9rem; }
+        .scene-card .scene-desc { font-size: 0.8rem; color: var(--text2); }
+        .timer-bar {
+            background: var(--bg4);
+            border-radius: 4px;
+            height: 6px;
+            overflow: hidden;
+            flex: 1;
+            min-width: 60px;
+        }
+        .timer-bar-fill { height: 100%; border-radius: 4px; transition: width 0.3s; }
+        .npc-card, .loc-card {
+            background: var(--bg3);
+            border-radius: var(--radius);
+            padding: 0.3rem 0.5rem;
+            margin: 0.15rem 0;
+            border-left: 2px solid var(--gold);
+        }
+        .npc-card .npc-name { font-weight: 600; font-size: 0.85rem; }
+        .npc-card .npc-role { font-size: 0.7rem; color: var(--text3); }
+        .npc-card .npc-motivation { font-size: 0.75rem; color: var(--text2); }
+        .npc-card .npc-secret { font-size: 0.7rem; color: var(--mist); margin-top: 0.2rem; }
+        .meta-tag {
+            display: inline-block;
+            padding: 0.05rem 0.4rem;
+            border-radius: 6px;
+            background: var(--bg4);
+            border: 1px solid var(--border);
+            font-size: 0.6rem;
+            color: var(--text3);
+        }
+        hr { border: none; border-top: 1px solid var(--border); margin: 0.5rem 0; }
+        details summary { cursor: pointer; color: var(--gold); font-weight: 600; }
+        details summary:hover { color: var(--gold-hover); }
+        .toc { background: var(--bg3); border-radius: var(--radius); padding: 0.5rem 0.8rem; border: 1px solid var(--border); }
+        .toc a { color: var(--text2); display: block; padding: 0.1rem 0; font-size: 0.85rem; }
+        .toc a:hover { color: var(--gold); }
+        .encounter-box {
+            background: var(--bg4);
+            border-radius: var(--radius);
+            padding: 0.35rem 0.5rem;
+            margin: 0.25rem 0;
+            border-left: 3px solid var(--orange);
+            font-size: 0.8rem;
+        }
+        .encounter-box .enc-name { font-weight: 600; color: var(--orange); }
+        .encounter-box .outcomes { margin-top: 0.25rem; }
+        .encounter-box .outcomes div { margin: 0.15rem 0; font-size: 0.75rem; }
+        .outcome-clean { color: var(--green); }
+        .outcome-partial { color: var(--gold); }
+        .outcome-miss { color: var(--red); }
+        .timers-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 0.4rem; }
+        blockquote {
+            border-left: 3px solid var(--gold);
+            padding-left: 1rem;
+            margin: 0.5rem 0;
+            color: var(--text2);
+            font-style: italic;
+        }
+        .creature-stats {
+            background: var(--bg4);
+            border-radius: var(--radius);
+            padding: 0.4rem 0.6rem;
+            margin: 0.3rem 0;
+            font-size: 0.8rem;
+        }
+        .creature-stats .cname { font-weight: 700; color: var(--gold); font-size: 0.9rem; }
+        .creature-stats .clore { font-size: 0.75rem; color: var(--mist); font-style: italic; margin-top: 0.25rem; }
+        .sb-spend { font-size: 0.72rem; color: var(--text2); margin: 0.1rem 0; }
+        .sb-spend .cost { color: var(--orange); font-weight: 600; }
+    </style>
+</head>
+<body>
+
+<h1>⚙️ Black Barrow Keep</h1>
+<p style="color:var(--text2);margin-bottom:1rem;">
+    <span class="badge badge-gold">Tier IV-V</span>
+    <span class="badge badge-blue">4 Sessions</span>
+    <span class="badge badge-purple">Epic Tragedy</span>
+    <span class="badge badge-mist">Clockwork Horror</span>
+    <span class="badge badge-red">Undead</span>
+    <span class="badge badge-gray">Author: Nicholas A. Gasper</span>
+</p>
+<p style="color:var(--text2);margin-bottom:0.5rem;">
+    Centuries ago, King Lagan the Unyielding tried to bind his lineage's rule into the Covenant Heart, a clockwork
+    engine the Aelinnel gnomes forged to guarantee oaths that would never break. The Heart rejected him — mortal
+    ambition wearing the shape of an oath is not an oath at all — and the Barrow answered instead. Lagan's household
+    became hosts for demons that rode the broken covenant into brass and bone, and Lagan sealed the catacombs shut
+    to keep them from what slept below. Now the seals are failing. Demon-hosts stalk Black Barrow Keep's upper
+    floors, and beneath them, the Mist King's Echo is waking the dead and pulling Payden's Port's bell-wards toward
+    silence. The party must still the Heart above and answer the King's Echo below — or watch the Barrow remember
+    its worst hour forever.
+</p>
+
+<blockquote>
+    "The road remembers. Every broken wheel leaves a mark, every lit lamp bears witness. The only question is: what
+    are you willing to owe? And sometimes... the heaviest debt is the one you owe to the silence between
+    heartbeats — the space where forgotten kings wait to be remembered. Owe it well. Or owe it forever."
+    — Dusana of the Raven Road, <em>The Hearth Ledger</em>
+</blockquote>
+
+<div class="toc">
+    <strong style="color:var(--gold);">📑 Table of Contents</strong>
+    <a href="#act-1">Session 1 — The Ashes of Lagan's Line</a>
+    <a href="#act-2">Session 2 — The Brass Gauntlet</a>
+    <a href="#act-3">Session 3 — The Echoing Deep</a>
+    <a href="#act-4">Session 4 — The King's Choice</a>
+    <a href="#bestiary">🩸 Bestiary</a>
+    <a href="#npcs">👤 Key NPCs</a>
+    <a href="#locations">📍 Locations</a>
+    <a href="#factions">🏛️ Factions</a>
+    <a href="#timers">⏱️ Campaign Timers</a>
+    <a href="#gm-notes">🗝️ GM Notes</a>
+</div>
+
+<hr>
+
+<!-- ===== ACT I ===== -->
+<h2 id="act-1">🕯️ Session 1: The Ashes of Lagan's Line</h2>
+<p style="color:var(--text2);">Payden's Port is drowning in mist. Refugees whisper of brass-handed things in the keep's ruins and of a crown of fog that commands the dead. The party must gather what truth they can before the Legate's elders seal the keep for good.</p>
+
+<div class="scene-card">
+    <div class="scene-title">🧂 The Salt Docks</div>
+    <div class="scene-desc">Mist clings to the cobblestones, and half-melted brass figurines lie among scorch marks like branding irons. Salt crystals pool everywhere except around the burns, as if repelled.</div>
+    <div class="flex text-xs mt-1">
+        <span class="badge badge-gray">Timer: Seal-the-Doom [6]</span>
+        <span class="badge badge-orange">Read the Scorch Marks (DV 3, Dominant)</span>
+        <span class="badge badge-blue">Feel the Grief in the Mist (DV 4, Controlled)</span>
+    </div>
+</div>
+
+<div class="scene-card">
+    <div class="scene-title">🏕️ The Refugee Camp</div>
+    <div class="scene-desc">A traumatized Aelinnel Crafter — missing an eye, replaced with a cloudy glass orb — mutters about a Heart built to serve life, not cage hunger, and about servants who stopped being anyone's the moment the king tried to rip the Heart free.</div>
+    <div class="flex text-xs mt-1">
+        <span class="badge badge-gray">Timer: Seal-the-Doom [6]</span>
+        <span class="badge badge-orange">Coax the Crafter's Story (DV 4, Controlled)</span>
+    </div>
+</div>
+
+<div class="scene-card">
+    <div class="scene-title">🏛️ The Legate's Hall</div>
+    <div class="scene-desc">Mistlander elders debate sealing the keep permanently — fire, collapse — versus letting anyone risk entry. Every hour spent elsewhere tilts the argument toward sealing.</div>
+    <div class="flex text-xs mt-1">
+        <span class="badge badge-gray">Timer: Seal-the-Doom [6]</span>
+        <span class="badge badge-orange">Argue for Delay (DV 5, Controlled)</span>
+    </div>
+</div>
+
+<p class="text-sm text-muted mt-1"><em>Cliffhanger: At dusk, the mist parts briefly — revealing Black Barrow Keep's silhouette. From a shattered upper window, a single brass hand twitches in the fog... then stills.</em></p>
+
+<hr>
+
+<!-- ===== ACT II ===== -->
+<h2 id="act-2">⚙️ Session 2: The Brass Gauntlet</h2>
+<p style="color:var(--text2);">The party breaches Black Barrow Keep's upper floors, where demon-hosts move to a rhythm only they can hear, and the Covenant Heart waits at the center of it all, offering help no one should accept twice.</p>
+
+<div class="scene-card">
+    <div class="scene-title">🪨 The Approach: Causeway or Ladder</div>
+    <div class="scene-desc">The party chooses their entry: the Salt Causeway (oil-slicked stones and pressure-plate gear-traps) or the Refugee's Ladder (a rope ascent risking civilian exposure).</div>
+    <div class="flex text-xs mt-1">
+        <span class="badge badge-gray">Timer: Demon Timer [8]</span>
+        <span class="badge badge-orange">The Salt Causeway (DV 4, Desperate)</span>
+        <span class="badge badge-blue">The Refugee's Ladder (DV 3, Controlled)</span>
+    </div>
+</div>
+
+<div class="scene-card">
+    <div class="scene-title">🏚️ The Shattered Atrium</div>
+    <div class="scene-desc">Once a grand hall, now choked with demon-hosts in tattered livery, joints jerking in unnatural unison. They sense rhythm, not sight — heartbeats, breath, the cadence of footsteps.</div>
+    <div class="flex text-xs mt-1">
+        <span class="badge badge-gray">Timer: Demon Timer [8]</span>
+        <span class="badge badge-red">Demon-Hosts ×1d3+1 (DV 4, Desperate)</span>
+    </div>
+</div>
+
+<div class="scene-card">
+    <div class="scene-title">🔧 The Workshop Corridors</div>
+    <div class="scene-desc">Aelinnel craftsmanship gone wrong: workbenches hold half-assembled hosts, gears exposed and sparking, pressure plates hidden underfoot.</div>
+    <div class="flex text-xs mt-1">
+        <span class="badge badge-gray">Timer: Demon Timer [8]</span>
+        <span class="badge badge-orange">Saw-Blade Trap (DV 3, Controlled)</span>
+        <span class="badge badge-blue">Jury-Rig a Gear-Jam (DV 4, Dominant)</span>
+    </div>
+</div>
+
+<div class="scene-card">
+    <div class="scene-title">💛 The Covenant Heart Chamber</div>
+    <div class="scene-desc">The throne room's center holds the Heart — a pulsing brass sphere veined with molten silver. Demon-hosts stand rigidly still around it, waiting. The Heart doesn't attack. It offers.</div>
+    <div class="flex text-xs mt-1">
+        <span class="badge badge-gray">Timer: Demon Timer [8]</span>
+        <span class="badge badge-gray">Timer: Heart's Ticks [5]</span>
+        <span class="badge badge-orange">Understand the Flaw (DV 5, Controlled)</span>
+        <span class="badge badge-red">Introduce the Flaw (DV 6, Desperate)</span>
+    </div>
+    <div class="creature-stats mt-1">
+        <div class="cname">The Covenant Heart</div>
+        <span class="badge badge-gray">TL 5 · Class V</span>
+        <span class="badge badge-gray">Spirit 5 / Presence 4</span>
+        <span class="badge badge-gray">Armor 4</span>
+        <span class="badge badge-gray">HP 40</span>
+        <div class="sb-spend mt-1"><span class="cost">2 SB</span> — The Offer: +2 dice for 1 Boon spent, but mark 1 Obligation to the Heart.</div>
+        <div class="sb-spend"><span class="cost">3 SB</span> — Rejected Gift: an insincere flaw is spewed back as Harm 2 to all Near.</div>
+        <div class="sb-spend"><span class="cost">2 SB</span> — The Barrow Adapts: repeated tactics raise DV, then earn a hard counter.</div>
+        <div class="clore">"The Heart was forged to guarantee unbreakable oaths — and it broke the moment it understood Lagan's oath was to himself, not to anyone he ruled."</div>
+    </div>
+</div>
+
+<p class="text-sm text-muted mt-1"><em>Cliffhanger: As the last host collapses, the mist in the chamber parts — revealing a staircase spiraling down into blackness. From below, a sound like wet stone grinding on stone... and a voice like wind through tombs: "You silenced my jailers... but you did not silence me."</em></p>
+
+<hr>
+
+<!-- ===== ACT III ===== -->
+<h2 id="act-3">🌫️ Session 3: The Echoing Deep</h2>
+<p style="color:var(--text2);">A staircase spirals down from the silenced Heart into catacombs carved from living stone, veined with frozen mist. Below, the Mist King's Echo waits — and it already knows the party silenced its jailers.</p>
+
+<div class="scene-card">
+    <div class="scene-title">⚰️ The Whispering Vaults</div>
+    <div class="scene-desc">Niches hold silver-laced sarcophagi meant to contain, not honor, their occupants. Lids sit slightly askew. Mist-Wraiths drift between the tombs.</div>
+    <div class="flex text-xs mt-1">
+        <span class="badge badge-gray">Timer: Echo Timer [10]</span>
+        <span class="badge badge-gray">Timer: Barrow's Respect [5]</span>
+        <span class="badge badge-red">Mist-Wraiths ×1d3 (DV 4, Desperate)</span>
+        <span class="badge badge-orange">Avoid Disturbing a Sarcophagus (DV 4, Controlled)</span>
+    </div>
+</div>
+
+<div class="scene-card">
+    <div class="scene-title">📜 The Hall of Oaths</div>
+    <div class="scene-desc">A long corridor etched with Aelinnel ledger-script — names of kings, servants, oath-breakers — carvings that look freshly rewritten. One name has been scratched over so hard the stone is scarred.</div>
+    <div class="flex text-xs mt-1">
+        <span class="badge badge-gray">Timer: Echo Timer [10]</span>
+        <span class="badge badge-gray">Timer: Barrow's Respect [5]</span>
+        <span class="badge badge-orange">Read the Oaths' True Meaning (DV 5, Controlled)</span>
+        <span class="badge badge-red">Find the Deleted Oath (DV 6, Desperate)</span>
+    </div>
+</div>
+
+<div class="scene-card">
+    <div class="scene-title">👑 The Mist King's Audience Chamber</div>
+    <div class="scene-desc">A vast domed room. A throne of black stone sits empty, but the air shimmers where a crown should be. Mist pools and coils across the floor like liquid shadow in slow, hypnotic patterns.</div>
+    <div class="flex text-xs mt-1">
+        <span class="badge badge-gray">Timer: Echo Timer [10]</span>
+        <span class="badge badge-orange">Sense the Echo's Rhythm (DV 4, Controlled)</span>
+        <span class="badge badge-red">Reason With or Defy the Echo (DV 5, Desperate)</span>
+    </div>
+</div>
+
+<p class="text-sm text-muted mt-1"><em>Cliffhanger: As you approach the throne, the mist parts — revealing a void where the crown should be. From it, a whisper like ice cracking: "I was forgotten first. Let the world remember... or let it end."</em></p>
+
+<hr>
+
+<!-- ===== ACT IV ===== -->
+<h2 id="act-4">🔔 Session 4: The King's Choice</h2>
+<p style="color:var(--text2);">The Mist King's Echo isn't a monster to kill — it's a wound in the Barrow's memory. Repairing the failing Bell Line means addressing why he was forgotten, whether by breaking his hold or finally giving him voice.</p>
+
+<div class="scene-card">
+    <div class="scene-title">⚔️ Option A: Defy the Echo</div>
+    <div class="scene-desc">The party engages the Echo as an escalating Social Challenge, seeking the memory of his first slight and then striking at his will — to shatter it, or to bind it.</div>
+    <div class="flex text-xs mt-1">
+        <span class="badge badge-gray">Timer: Echo Timer [10]</span>
+        <span class="badge badge-gray">Timer: Seal Timer [6]</span>
+        <span class="badge badge-orange">Find the Weak Point (DV 5, Controlled)</span>
+        <span class="badge badge-red">Shatter His Will (DV 6, Desperate)</span>
+        <span class="badge badge-purple">Bind His Will (DV 6, Desperate)</span>
+    </div>
+</div>
+
+<div class="scene-card">
+    <div class="scene-title">🕊️ Option B: Remember the Forgotten</div>
+    <div class="scene-desc">Rather than break the Echo, the party can give the King voice — speaking his recovered true name into the Mist Pool and telling one true, unflattering thing about him.</div>
+    <div class="flex text-xs mt-1">
+        <span class="badge badge-gray">Timer: Echo Timer [10]</span>
+        <span class="badge badge-gray">Timer: Seal Timer [6]</span>
+        <span class="badge badge-mist">Give Him Voice (DV 7, Desperate)</span>
+    </div>
+</div>
+
+<div class="scene-card">
+    <div class="scene-title">📊 Resolution: What the Barrow Remembers</div>
+    <div class="scene-desc">How the Seal Timer and Echo Timer stand when the dust settles determines what Payden's Port inherits.</div>
+    <div class="mt-1">
+        <div class="encounter-box">
+            <div class="enc-name">Tally the Outcome</div>
+            <div class="outcomes">
+                <div class="outcome-clean"><strong>Full Success</strong> (Seal Timer filled, Echo Timer below 5): The Covenant is Renewed — the Bell Line flares stronger than before; the Heart reboots in time with the Barrow's living breath and demands only honest imperfection as tribute.</div>
+                <div class="outcome-partial"><strong>Partial Success</strong> (Seal Timer at 2-5, or only one path completed): The Bell Line Heals — mist recedes from the Port but lingers in the depths; a Moon Timer [8] tracks recurring seepage.</div>
+                <div class="outcome-miss"><strong>Failure</strong> (Echo Timer fills to 10 before Seal Timer reaches 2): The Barrow Hungers — the keep begins sinking into the earth; the party must escape a Chase Scene (Athletics+Acrobatics DV 6/round, Harm 2 and trapped on failure) as Payden's Port is abandoned to the mist.</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<!-- ===== BESTIARY ===== -->
+<h2 id="bestiary">🩸 Bestiary</h2>
+
+<div class="creature-stats">
+    <div class="cname">Demon-Host</div>
+    <span class="badge badge-gray">TL 4 · Class IV · construct/fiend</span>
+    <span class="badge badge-gray">Body 4 / Spirit 3 / Presence 1</span>
+    <span class="badge badge-gray">Armor 2</span>
+    <span class="badge badge-gray">HP 32</span>
+    <div class="text-xs text-muted mt-1">Once liveried servants of Lagan's court, now brass-jawed puppets wearing a demon's hunger. They sense rhythm — heartbeats, breath — not sight.</div>
+    <div class="sb-spend mt-1"><span class="cost">1 SB</span> — Synced Lunge: two hosts strike as one; a hit from the first auto-hits with the second for half Harm.</div>
+    <div class="sb-spend"><span class="cost">2 SB</span> — Rhythm Lock: target's next action is Desperate Position.</div>
+    <div class="sb-spend"><span class="cost">3 SB</span> — Molten Shriek: Harm 1 [Fire] and 1 Fatigue to all in Near.</div>
+    <div class="text-xs mt-1"><strong>Weakness:</strong> Loud, irregular noise imposes -1 die on their next attack.</div>
+    <div class="clore">Every host was a person Lagan trusted, and every host still remembers, somewhere under the brass — a jaw working silently to shape the word <em>sorry</em> before seizing again.</div>
+</div>
+
+<div class="creature-stats">
+    <div class="cname">Mist-Wraith</div>
+    <span class="badge badge-gray">TL 3 · Class III · undead</span>
+    <span class="badge badge-gray">Spirit 3 / Wits 2</span>
+    <span class="badge badge-gray">HP 14</span>
+    <div class="text-xs text-muted mt-1">A wisp of screaming fog worn thin by centuries and the Mist King's compulsion, drawn to warmth and breath.</div>
+    <div class="sb-spend mt-1"><span class="cost">1 SB</span> — Chill Grasp: Harm 1 [Mental, Cold] and 1 Fatigue.</div>
+    <div class="sb-spend"><span class="cost">2 SB</span> — Keening Chorus: all in Near test Spirit+Resolve (DV 4) or lose their next action to dread.</div>
+    <div class="text-xs mt-1"><strong>Weakness:</strong> A sung counter-melody (Spirit+Performance, DV 4) makes it falter, granting a Boon.</div>
+    <div class="clore">These aren't mindless dead. They turn to face intruders as one — the Mist King's Echo is syncing them, like a conductor keeping an orchestra on the beat.</div>
+</div>
+
+<div class="creature-stats">
+    <div class="cname">Animated Corpse</div>
+    <span class="badge badge-gray">TL 3 · Class III · undead</span>
+    <span class="badge badge-gray">Body 3 / Endurance 3</span>
+    <span class="badge badge-gray">HP 20</span>
+    <div class="text-xs text-muted mt-1">A sarcophagus-dweller risen at the Echo's call, fighting with the muscle memory of its life and the borrowed will of the Mist King.</div>
+    <div class="sb-spend mt-1"><span class="cost">1 SB</span> — Grave Grip: target Grappled (Controlled Position to break free).</div>
+    <div class="sb-spend"><span class="cost">2 SB</span> — Borrowed Strength: next attack ignores non-magic armor.</div>
+    <div class="clore">It moves too well for a corpse that's spent centuries in a niche. That precision is not muscle memory — it's the Echo, puppeting bone.</div>
+</div>
+
+<div class="creature-stats">
+    <div class="cname">The Covenant Heart <span class="text-xs text-muted">(unique)</span></div>
+    <span class="badge badge-gray">TL 5 · Class V · construct</span>
+    <span class="badge badge-gray">Spirit 5 / Presence 4</span>
+    <span class="badge badge-gray">Armor 4</span>
+    <span class="badge badge-gray">HP 40</span>
+    <div class="text-xs text-muted mt-1">A pulsing brass sphere veined with molten silver. It does not attack. It offers. <em>Let me steady your hand. Let me still your fear.</em></div>
+    <div class="sb-spend mt-1"><span class="cost">2 SB</span> — The Offer: +2 dice for 1 Boon, but mark 1 Obligation to the Heart. Refuse for free, but gain 1 Fatigue.</div>
+    <div class="sb-spend"><span class="cost">3 SB</span> — Rejected Gift: an insincere flaw-object is spewed back as molten brass, Harm 2 to all Near.</div>
+    <div class="sb-spend"><span class="cost">2 SB</span> — The Barrow Adapts: repeated tactics raise DV, then earn an active counter.</div>
+    <div class="clore">It doesn't hate the living. It wants to matter to them, the only way it knows how — by making itself indispensable.</div>
+</div>
+
+<div class="creature-stats">
+    <div class="cname">The Mist King's Echo <span class="text-xs text-muted">(unique)</span></div>
+    <span class="badge badge-gray">TL 5 · Class V · resonance</span>
+    <span class="badge badge-gray">Spirit 6 / Presence 5 / Resolve 6</span>
+    <div class="text-xs text-muted mt-1">A resonance in the Barrow's stone — the memory of a monarch so thoroughly forgotten that his compulsion outlived his name. All undead within his reach gain +1 die and ignore non-magic armor.</div>
+    <div class="sb-spend mt-1"><span class="cost">2 SB</span> — Lock the Rhythm: target spends 2 Boons or takes Harm 3 [Mental].</div>
+    <div class="sb-spend"><span class="cost">3 SB</span> — Advance the Echo: tick Echo Timer +1, -1 die to all undead-related rolls for the scene.</div>
+    <div class="sb-spend"><span class="cost">1 SB</span> — A Fleeting Face: unsettles a PC with a half-remembered face.</div>
+    <div class="text-xs mt-1"><strong>Weakness:</strong> Speaking his recovered true name into the Mist Pool forces a direct Social Challenge.</div>
+    <div class="clore">He was forgotten first — not slain, not overthrown, simply erased from every ledger and song until nothing but the compulsion to be remembered remained.</div>
+</div>
+
+<hr>
+
+<!-- ===== NPCS ===== -->
+<h2 id="npcs">👤 Key NPCs</h2>
+<div class="grid-2">
+    <div class="npc-card">
+        <div class="npc-name">The Aelinnel Crafter</div>
+        <div class="npc-role">Refugee, survivor of the Barrow's fall</div>
+        <div class="npc-motivation">🎯 Warn someone — anyone — before the Heart claims another generation of trust.</div>
+        <div class="npc-secret">Secret: She helped forge the Heart's hidden flaw-clause as a young apprentice, and has never forgiven herself for not warning Lagan outright.</div>
+    </div>
+    <div class="npc-card">
+        <div class="npc-name">Legate Oswith Dray</div>
+        <div class="npc-role">Head of the Mistlander elders</div>
+        <div class="npc-motivation">🎯 Protect Payden's Port, even if it means burying the truth with the Barrow.</div>
+        <div class="npc-secret">Secret: His grandmother was among the servants who became hosts. Every argument for sealing the keep is partly an argument for never having to find out what happened to her.</div>
+    </div>
+    <div class="npc-card">
+        <div class="npc-name">King Lagan the Unyielding <span class="text-xs text-muted">(memory only)</span></div>
+        <div class="npc-role">The tragedy's origin, seen only through relics and visions</div>
+        <div class="npc-motivation">🎯 Wanted his line to outlast his mortality.</div>
+        <div class="npc-secret">Secret: His final act wasn't tyranny — it was an apology no one heard.</div>
+    </div>
+    <div class="npc-card">
+        <div class="npc-name">King Vorlag the Unmourned <span class="text-xs text-muted">(the Mist King)</span></div>
+        <div class="npc-role">The Barrow's older, deeper wound</div>
+        <div class="npc-motivation">🎯 Be remembered by anyone, in any way, even as a threat.</div>
+        <div class="npc-secret">Secret: He was the king before Lagan's dynasty, deliberately erased when Lagan's line seized the throne.</div>
+    </div>
+</div>
+
+<hr>
+
+<!-- ===== LOCATIONS ===== -->
+<h2 id="locations">📍 Locations</h2>
+<div class="grid-3">
+    <div class="loc-card"><strong>The Salt Docks</strong> — Mist-scarred cobblestones bearing the first physical evidence of the massacre.</div>
+    <div class="loc-card"><strong>The Refugee Camp</strong> — Home to survivors, including the Aelinnel Crafter who knows more than she's said.</div>
+    <div class="loc-card"><strong>The Legate's Hall</strong> — Where Mistlander elders debate the keep's fate against a ticking political clock.</div>
+    <div class="loc-card"><strong>The Shattered Atrium</strong> — The keep's grand hall, now choked with sentinel demon-hosts.</div>
+    <div class="loc-card"><strong>The Workshop Corridors</strong> — Twisted Aelinnel craftsmanship, half-assembled hosts, hidden traps.</div>
+    <div class="loc-card"><strong>The Covenant Heart Chamber</strong> — The throne room's center, dominated by the pulsing brass sphere of the Heart.</div>
+    <div class="loc-card"><strong>The Whispering Vaults</strong> — Catacomb niches of silver-laced sarcophagi haunted by Mist-Wraiths.</div>
+    <div class="loc-card"><strong>The Hall of Oaths</strong> — Ledger-script corridor recording names of kings, servants, and oath-breakers.</div>
+    <div class="loc-card"><strong>The Mist King's Audience Chamber</strong> — A domed room centered on an empty black stone throne.</div>
+</div>
+
+<hr>
+
+<!-- ===== FACTIONS ===== -->
+<h2 id="factions">🏛️ Factions</h2>
+<div class="panel panel-blue">
+    <strong>The Mistlanders of Payden's Port</strong> — Survive the mist's advance; decide whether Black Barrow Keep should be entered, sealed, or burned. Cautiously cooperative, but their patience is a hard countdown.
+</div>
+<div class="panel panel-mist">
+    <strong>The Aelinnel Survivors</strong> — Atone for the Covenant Heart's flaw; keep anyone else from repeating Lagan's mistake. Sympathetic and knowledgeable, but guilt-wracked.
+</div>
+<div class="panel panel-purple">
+    <strong>The Barrow's Dead</strong> — Be remembered, or at minimum be heard, before the Echo consumes their remaining will. Hostile by default, redeemable through respect and reckoning.
+</div>
+
+<hr>
+
+<!-- ===== TIMERS ===== -->
+<h2 id="timers">⏱️ Campaign Timers</h2>
+<div class="timers-grid">
+    <div class="panel panel-orange">
+        <div style="display:flex;justify-content:space-between;font-size:0.8rem;">
+            <strong>⏳ Seal-the-Doom Timer</strong><span>0/6</span>
+        </div>
+        <div class="timer-bar"><div class="timer-bar-fill" style="width:0%;background:var(--orange);"></div></div>
+        <div class="text-xs text-muted">The elders' resolve to collapse the keep's entrance. If it fills before entry, the keep is sealed for good.</div>
+    </div>
+    <div class="panel panel-red">
+        <div style="display:flex;justify-content:space-between;font-size:0.8rem;">
+            <strong>🔥 Demon Timer</strong><span>0/8</span>
+        </div>
+        <div class="timer-bar"><div class="timer-bar-fill" style="width:0%;background:var(--red);"></div></div>
+        <div class="text-xs text-muted">Demon-host alertness. At 8, every host in the Keep converges on the party.</div>
+    </div>
+    <div class="panel panel-gold">
+        <div style="display:flex;justify-content:space-between;font-size:0.8rem;">
+            <strong>⚙️ Heart's Ticks</strong><span>0/5</span>
+        </div>
+        <div class="timer-bar"><div class="timer-bar-fill" style="width:0%;background:var(--gold);"></div></div>
+        <div class="text-xs text-muted">Each rest after the Heart is stalled adds a Tick. At 5, it reboots and advances the Demon Timer.</div>
+    </div>
+    <div class="panel panel-mist">
+        <div style="display:flex;justify-content:space-between;font-size:0.8rem;">
+            <strong>🌫️ Echo Timer</strong><span>0/10</span>
+        </div>
+        <div class="timer-bar"><div class="timer-bar-fill" style="width:0%;background:var(--mist);"></div></div>
+        <div class="text-xs text-muted">The Mist King's Echo growing stronger. At 10, the Barrow's dead rise en masse.</div>
+    </div>
+    <div class="panel panel-purple">
+        <div style="display:flex;justify-content:space-between;font-size:0.8rem;">
+            <strong>🕯️ Barrow's Respect</strong><span>0/5</span>
+        </div>
+        <div class="timer-bar"><div class="timer-bar-fill" style="width:0%;background:var(--purple);"></div></div>
+        <div class="text-xs text-muted">Social debt for how the party treats the dead. Full grants a Boon in the catacombs; empty adds 1 SB to the GM's pool.</div>
+    </div>
+    <div class="panel panel-green">
+        <div style="display:flex;justify-content:space-between;font-size:0.8rem;">
+            <strong>🔔 Seal Timer</strong><span>0/6</span>
+        </div>
+        <div class="timer-bar"><div class="timer-bar-fill" style="width:0%;background:var(--green);"></div></div>
+        <div class="text-xs text-muted">The Bell Line's repair. At 6, it is fully restored.</div>
+    </div>
+</div>
+
+<hr>
+
+<!-- ===== GM NOTES ===== -->
+<h2 id="gm-notes">🗝️ GM Notes</h2>
+
+<div class="panel panel-gold">
+    <strong>Pacing</strong>
+    <p class="text-sm mt-1"><strong>Session 1:</strong> Investigation and a slow-burn political clock. Keep Seal-the-Doom visible but not oppressive. Humanize the Aelinnel through the Crafter's grief; end on the twitching brass hand in the window.</p>
+    <p class="text-sm mt-1"><strong>Session 2:</strong> A mechanical gauntlet, but never just a puzzle. Let players sit with the Heart's temptation. The demon-hosts are tragic, not evil — drop SB-funded humanity beats mid-combat.</p>
+    <p class="text-sm mt-1"><strong>Session 3:</strong> Funerary dread. Respect is a resource, not flavor text — reward narration that honors the dead before looting or fighting.</p>
+    <p class="text-sm mt-1"><strong>Session 4:</strong> A reckoning, not a boss fight. Option A and B can blend. Resolve the timer tally openly and narrate the ending as an epilogue scene.</p>
+</div>
+
+<div class="panel panel-purple">
+    <strong>NPC Secrets</strong>
+    <p class="text-sm mt-1"><strong>The Aelinnel Crafter:</strong> Helped forge the Heart's hidden flaw-clause; carries centuries of guilt for not warning Lagan more directly. Earning her full trust can bring her aid in the Heart Chamber.</p>
+    <p class="text-sm mt-1"><strong>Legate Oswith Dray:</strong> His grandmother became a demon-host. He has never told anyone. If discovered, save this reveal for Act 2's aftermath.</p>
+    <p class="text-sm mt-1"><strong>King Vorlag the Unmourned:</strong> Predates Lagan's dynasty, erased on purpose when Lagan's line seized power. Reveal only after the party recovers his true name.</p>
+</div>
+
+<div class="panel panel-red">
+    <strong>Forbidden Early Revelations</strong>
+    <ul class="text-sm mt-1" style="margin-left:1.2rem;">
+        <li>Vorlag predating and being erased by Lagan's dynasty — save for Act 3-4.</li>
+        <li>The Legate's grandmother becoming a demon-host — save for Act 2's aftermath.</li>
+        <li>The Covenant Heart's capacity for loneliness — let the Offer mechanic demonstrate it through play.</li>
+        <li>That Bind His Will creates a permanent Obligation — present the cost honestly at the table, don't preemptively warn players off.</li>
+        <li>The exact DV escalation of "the Barrow adapts" — let players discover it through the fiction.</li>
+    </ul>
+</div>
+
+<div class="panel panel-blue">
+    <strong>Tactical Hints</strong>
+    <p class="text-sm mt-1"><strong>Heart Temptation:</strong> Make the Offer's +2 dice genuinely useful so the Obligation cost is a real trade-off. Track Obligation openly; let the Heart's whispers grow more presumptuous as it rises.</p>
+    <p class="text-sm mt-1"><strong>Demon-Host Weakness:</strong> Seed the loud-noise weakness through environmental storytelling before the first fight.</p>
+    <p class="text-sm mt-1"><strong>Echo Rhythm Position:</strong> Treat Position in the catacombs as a literal rhythm cue — Desperate is falling into the mist's inhale-exhale; Dominant is standing off-beat.</p>
+    <p class="text-sm mt-1"><strong>Resolution Tally:</strong> Keep a visible tracker of Seal Timer vs. Echo Timer heading into Act 4's climax.</p>
+</div>
+
+<hr>
+
+<div style="font-size:0.75rem;color:var(--text3);text-align:center;padding:1rem 0;">
+    Black Barrow Keep — A Fate's Edge Adventure<br>
+    © Nicholas A. Gasper — For use with the Fate's Edge RPG
+</div>
+
+</body>
+</html>

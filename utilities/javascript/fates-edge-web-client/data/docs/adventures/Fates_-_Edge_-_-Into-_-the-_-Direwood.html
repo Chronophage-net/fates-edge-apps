@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Into the Direwood — The Nameless Heroine of the Mist</title>
+    <style>
+        :root {
+            --bg1: #0a0d0a;
+            --bg2: #12160f;
+            --bg3: #1a2118;
+            --bg4: #232b20;
+            --text: #d8e0d4;
+            --text2: #a8b4a2;
+            --text3: #77826f;
+            --gold: #b8925a;
+            --gold-hover: #c9a56e;
+            --border: #2c3628;
+            --red: #7a2b2b;
+            --green: #3d6b4a;
+            --blue: #3a5a6a;
+            --purple: #5a4a6e;
+            --orange: #a06430;
+            --mist: #8a9a92;
+            --radius: 8px;
+            --font: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            background: var(--bg1);
+            color: var(--text);
+            font-family: var(--font);
+            padding: 1.5rem;
+            max-width: 1100px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+        h1, h2, h3, h4, h5 { color: var(--gold); margin: 0.5rem 0 0.3rem; }
+        h1 { font-size: 1.8rem; border-bottom: 2px solid var(--gold); padding-bottom: 0.3rem; }
+        h2 { font-size: 1.4rem; border-bottom: 1px solid var(--border); padding-bottom: 0.2rem; }
+        h3 { font-size: 1.1rem; color: var(--mist); }
+        h4 { font-size: 0.95rem; color: var(--text); }
+        a { color: var(--gold); text-decoration: none; }
+        .panel {
+            background: var(--bg2);
+            border-radius: var(--radius);
+            padding: 0.6rem 0.8rem;
+            border: 1px solid var(--border);
+            margin: 0.5rem 0;
+        }
+        .panel-gold { border-left: 4px solid var(--gold); }
+        .panel-red { border-left: 4px solid var(--red); }
+        .panel-blue { border-left: 4px solid var(--blue); }
+        .panel-green { border-left: 4px solid var(--green); }
+        .panel-purple { border-left: 4px solid var(--purple); }
+        .panel-orange { border-left: 4px solid var(--orange); }
+        .badge {
+            display: inline-block;
+            padding: 0.05rem 0.5rem;
+            border-radius: 12px;
+            font-size: 0.65rem;
+            font-weight: 600;
+        }
+        .badge-gold { background: var(--gold); color: #1a1000; }
+        .badge-red { background: var(--red); color: #fff; }
+        .badge-green { background: var(--green); color: #fff; }
+        .badge-blue { background: var(--blue); color: #fff; }
+        .badge-purple { background: var(--purple); color: #fff; }
+        .badge-orange { background: var(--orange); color: #fff; }
+        .badge-gray { background: var(--bg4); color: var(--text3); }
+        .badge-mist { background: var(--mist); color: #0a0d0a; }
+        .flex { display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center; }
+        .flex-between { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.3rem; }
+        .text-muted { color: var(--text3); }
+        .text-gold { color: var(--gold); }
+        .text-sm { font-size: 0.85rem; }
+        .text-xs { font-size: 0.7rem; }
+        .mt-1 { margin-top: 0.5rem; }
+        .mb-1 { margin-bottom: 0.5rem; }
+        .gap-1 { gap: 0.3rem; }
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; }
+        @media (max-width: 600px) { .grid-2 { grid-template-columns: 1fr; } }
+        .scene-card {
+            background: var(--bg3);
+            border-radius: var(--radius);
+            padding: 0.5rem 0.7rem;
+            margin: 0.4rem 0;
+            border-left: 3px solid var(--gold);
+        }
+        .scene-card.completed { opacity: 0.6; border-left-color: var(--green); }
+        .scene-card .scene-title { font-weight: 600; font-size: 0.9rem; }
+        .scene-card .scene-desc { font-size: 0.8rem; color: var(--text2); }
+        .timer-bar {
+            background: var(--bg4);
+            border-radius: 4px;
+            height: 6px;
+            overflow: hidden;
+            flex: 1;
+            min-width: 60px;
+        }
+        .timer-bar-fill { height: 100%; border-radius: 4px; transition: width 0.3s; }
+        .npc-card, .loc-card {
+            background: var(--bg3);
+            border-radius: var(--radius);
+            padding: 0.4rem 0.6rem;
+            margin: 0.15rem 0;
+            border-left: 2px solid var(--gold);
+        }
+        .npc-card .npc-name { font-weight: 600; font-size: 0.85rem; }
+        .npc-card .npc-role { font-size: 0.7rem; color: var(--text3); }
+        .npc-card .npc-motivation { font-size: 0.75rem; color: var(--text2); }
+        .npc-card .npc-secret { font-size: 0.7rem; color: var(--mist); margin-top: 0.2rem; }
+        .meta-tag {
+            display: inline-block;
+            padding: 0.05rem 0.4rem;
+            border-radius: 6px;
+            background: var(--bg4);
+            border: 1px solid var(--border);
+            font-size: 0.6rem;
+            color: var(--text3);
+        }
+        .status-badge {
+            padding: 0.1rem 0.5rem;
+            border-radius: 12px;
+            font-size: 0.6rem;
+            font-weight: 600;
+        }
+        .status-planned { background: var(--bg4); color: var(--text3); }
+        .status-active { background: var(--gold); color: #1a1000; }
+        .status-completed { background: var(--green); color: #fff; }
+        hr { border: none; border-top: 1px solid var(--border); margin: 0.8rem 0; }
+        details summary { cursor: pointer; color: var(--gold); font-weight: 600; }
+        details summary:hover { color: var(--gold-hover); }
+        .toc { background: var(--bg3); border-radius: var(--radius); padding: 0.5rem 0.8rem; border: 1px solid var(--border); }
+        .toc a { color: var(--text2); display: block; padding: 0.1rem 0; font-size: 0.85rem; }
+        .toc a:hover { color: var(--gold); }
+        .encounter-box {
+            background: var(--bg4);
+            border-radius: var(--radius);
+            padding: 0.35rem 0.5rem;
+            margin: 0.25rem 0;
+            border-left: 3px solid var(--orange);
+            font-size: 0.8rem;
+        }
+        .encounter-box .enc-name { font-weight: 600; color: var(--orange); }
+        .encounter-box .enc-outcomes { margin-top: 0.2rem; font-size: 0.75rem; color: var(--text2); }
+        .encounter-box .enc-outcomes div { margin: 0.1rem 0; }
+        .timers-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 0.4rem; }
+        blockquote {
+            border-left: 3px solid var(--gold);
+            padding-left: 1rem;
+            margin: 0.5rem 0;
+            color: var(--text2);
+            font-style: italic;
+        }
+        .creature-stats {
+            background: var(--bg4);
+            border-radius: var(--radius);
+            padding: 0.4rem 0.6rem;
+            margin: 0.3rem 0;
+            font-size: 0.8rem;
+        }
+        .creature-stats .creature-lore { font-size: 0.75rem; color: var(--mist); margin-top: 0.3rem; font-style: italic; }
+        .gm-note {
+            background: linear-gradient(135deg, var(--bg2), var(--bg3));
+            border: 1px dashed var(--purple);
+            border-radius: var(--radius);
+            padding: 0.5rem 0.7rem;
+            margin: 0.4rem 0;
+            font-size: 0.8rem;
+        }
+        .gm-note .gm-note-label { color: var(--purple); font-weight: 600; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.05em; }
+    </style>
+</head>
+<body>
+
+<h1>🌫️ Into the Direwood</h1>
+<p style="color:var(--text2);margin-bottom:1rem;">
+    <span class="badge badge-gold">Tier III–IV</span>
+    <span class="badge badge-blue">8–12 Sessions</span>
+    <span class="badge badge-purple">Survival Horror</span>
+    <span class="badge badge-mist">Wilderness Gothic</span>
+    <span class="badge badge-gray">Author: Nicholas A. Gasper</span>
+</p>
+<p style="color:var(--text2);margin-bottom:0.5rem;">
+    Beyond the last bell-line, where the mist never lifts and the roots drink only memory, an ancient spear pins a
+    dead druid to a fortress of bone. Payden's Port is drowning in fog because the Chord of the First Curse — the
+    relic that once harmonized the warding bells with a hero's name — was lost in the Direwood centuries ago. The
+    crew must cross a forest that remembers instead of forgives, find the Chord, and reckon with the Nameless
+    Heroine: a shade bound not by the druid she slew, but by the erasure of her own saga. The curse does not end
+    when the monster dies. It ends when someone says her name and means it.
+</p>
+
+<blockquote>
+    "Find my name, free me… or drown with me."
+</blockquote>
+
+<div class="toc">
+    <strong style="color:var(--gold);">📑 Table of Contents</strong>
+    <a href="#act-1">Act I — Payden's Port and the Forgotten Chord</a>
+    <a href="#act-2">Act II — Through the Direwood</a>
+    <a href="#act-3">Act III — The Fortress Heart</a>
+    <a href="#act-4">Act IV — Descent into the Root-Vault</a>
+    <a href="#act-5">Act V — The Last Saga</a>
+    <a href="#bestiary">🦴 Bestiary</a>
+    <a href="#npcs">👤 Key NPCs</a>
+    <a href="#locations">📍 Locations</a>
+    <a href="#factions">🏛️ Factions</a>
+    <a href="#timers">⏱️ Campaign Timers</a>
+    <a href="#gmnotes">🗒️ GM Notes &amp; Secrets</a>
+</div>
+
+<hr>
+
+<!-- ===== ACT I ===== -->
+<h2 id="act-1">🔔 Act I: Payden's Port and the Forgotten Chord</h2>
+<p style="color:var(--text2);">The warding bell-line falters. Bells toll out of sequence, Mist incursions grow bolder, and refugees whisper of shapes in the fog. Payden's Port — a sea-garrison city of cracked statues, storm-beaten docks, and chanting wardens — pulls the crew into its crisis, and only the long-lost Chord of the First Curse can set the bells right.</p>
+
+<div class="scene-card">
+    <div class="scene-title">⚖️ The City in Crisis</div>
+    <div class="scene-desc">Three factions want the crew's loyalty before the crew has even chosen a side: the Aeler garrison, the Mistlander priests, and the Guild factors. Dead gulls arrange themselves in votive circles on the docks. Fog-children whisper names no living person spoke to them.</div>
+    <div class="flex text-xs mt-1">
+        <span class="badge badge-gray">Timer: Dread Timer [6]</span>
+    </div>
+    <div class="encounter-box mt-1">
+        <div class="enc-name">Faction Courtship — DV 3, Controlled</div>
+        <div class="enc-outcomes">
+            <div><strong>Clean:</strong> Secure a clear ally without over-promising; gain a Standard Asset for the crossing.</div>
+            <div><strong>Partial:</strong> Ally secured, but a rival takes offense. Tick Dread +1; mark a minor Obligation.</div>
+            <div><strong>Miss:</strong> No faction commits — word spreads the party can't be trusted with a crisis.</div>
+        </div>
+    </div>
+    <div class="encounter-box">
+        <div class="enc-name">Reading the Omens — DV 4, Dominant</div>
+        <div class="enc-outcomes">
+            <div><strong>Clean:</strong> Correctly interpret the omens; learn the Chord's location and gain an early Name Fragment.</div>
+            <div><strong>Partial:</strong> Right direction, wrong warning heeded. Tick Dread +1.</div>
+            <div><strong>Miss:</strong> Signs dismissed as coincidence. Tick Dread +1.</div>
+        </div>
+    </div>
+</div>
+
+<div class="scene-card">
+    <div class="scene-title">🌊 The First Breach</div>
+    <div class="scene-desc">The outer bell-line sputters and fails at dusk. Mistwraiths claw up from the tideline onto the storm-beaten docks. This is the party's first taste of the Mist.</div>
+    <div class="flex text-xs mt-1">
+        <span class="badge badge-gray">Timer: Dread Timer [6]</span>
+        <span class="badge badge-red">Encounter: Mistwraith Pack ×4 (DV 4, Controlled)</span>
+    </div>
+    <div class="encounter-box mt-1">
+        <div class="enc-outcomes">
+            <div><strong>Clean:</strong> Pack driven back; bell-line re-anchored. Gain a garrison Contact.</div>
+            <div><strong>Partial:</strong> Breach sealed, but a warden or bystander is Fatigued or maimed.</div>
+            <div><strong>Miss:</strong> Bell-line fails for the night. Tick Dread +2; a district suffers memory-blight.</div>
+        </div>
+    </div>
+</div>
+
+<div class="scene-card">
+    <div class="scene-title">🚪 The Charge</div>
+    <div class="scene-desc">Divination, confession, or coercion converges on one truth: the Chord lies deep in the Direwood, near the fortress where the heroine fell. The party departs with blessings, suspicions, or threats at their back.</div>
+    <div class="encounter-box mt-1">
+        <div class="enc-name">The Send-Off — DV 3, Controlled</div>
+        <div class="enc-outcomes">
+            <div><strong>Clean:</strong> Genuine support and supplies; someone promises to remember them.</div>
+            <div><strong>Partial:</strong> Grudging, conditional support.</div>
+            <div><strong>Miss:</strong> Party leaves under threat — fail to return with proof, and they're branded deserters.</div>
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<!-- ===== ACT II ===== -->
+<h2 id="act-2">🌲 Act II: Through the Direwood</h2>
+<p style="color:var(--text2);">Crossing the tree-line is not entering a forest — it is passing into a place shaped by memory, undeath, and betrayal. Each night, one PC dreams fragments of the nameless heroine's life, out of order and half-corrupted, until her true name is pieced together.</p>
+
+<div class="scene-card">
+    <div class="scene-title">🌀 Twisting Trails</div>
+    <div class="scene-desc">Paths repeat. A day's march loops back to a familiar tree, now hung with new corpses. The party must learn to navigate by intention and reverence rather than by map.</div>
+    <div class="flex text-xs mt-1">
+        <span class="badge badge-mist">Timer: Memory Track [6]</span>
+        <span class="badge badge-gray">Timer: Dread Timer [6]</span>
+    </div>
+    <div class="encounter-box mt-1">
+        <div class="enc-name">Direwood Encounter Generator — DV 4, Risky</div>
+        <div class="enc-outcomes">
+            <div><strong>Clean:</strong> The wood is read correctly; a bad omen becomes useful information. Gain a Name Fragment.</div>
+            <div><strong>Partial:</strong> The wood takes something — gear tarnishes, a memory blurs, a day is lost.</div>
+            <div><strong>Miss:</strong> The forest closes a loop. Tick Dread +1; roll an extra Threat Manifestation immediately.</div>
+        </div>
+    </div>
+</div>
+
+<div class="scene-card">
+    <div class="scene-title">🐺 The Hunting Pack</div>
+    <div class="scene-desc">Fatigue and fear draw a Mistwraith pack from the fog. They circle, testing which PC is most worn thin, most ready to forget who they are.</div>
+    <div class="flex text-xs mt-1">
+        <span class="badge badge-mist">Timer: Memory Track [6]</span>
+        <span class="badge badge-red">Encounter: Mistwraith Pack ×5 (DV 4, Risky)</span>
+    </div>
+    <div class="encounter-box mt-1">
+        <div class="enc-outcomes">
+            <div><strong>Clean:</strong> Pack driven off before anyone is marked.</div>
+            <div><strong>Partial:</strong> Pack broken; most exhausted PC takes 1 Fatigue and briefly forgets a companion's name.</div>
+            <div><strong>Miss:</strong> Pack fixes on one PC — 2 Fatigue and a temporary [FORGETTING] condition.</div>
+        </div>
+    </div>
+</div>
+
+<div class="scene-card">
+    <div class="scene-title">💀 The Shadewalker Patrol</div>
+    <div class="scene-desc">A column of revenant infantry marches in silent formation through a birch grove, reenacting a war centuries dead. They will not break ranks unless interrupted — or dismissed by the right words.</div>
+    <div class="flex text-xs mt-1">
+        <span class="badge badge-mist">Timer: Memory Track [6]</span>
+        <span class="badge badge-red">Encounter: Shadewalker Patrol ×4 (DV 5, Controlled)</span>
+    </div>
+    <div class="encounter-box mt-1">
+        <div class="enc-outcomes">
+            <div><strong>Clean:</strong> The captain's battle-cry fragment is learned (a Name Fragment); the patrol is slipped past or stood down.</div>
+            <div><strong>Partial:</strong> The patrol is destroyed in a fight, but its Fragment is lost in the wreckage.</div>
+            <div><strong>Miss:</strong> The patrol treats the party as enemy combatants. Tick Dread +1.</div>
+        </div>
+    </div>
+</div>
+
+<div class="scene-card">
+    <div class="scene-title">🎼 The Forgotten Chorus</div>
+    <div class="scene-desc">In a silent clearing where sound itself dies, mourning voices rise from hollow birches, singing in the shape of each PC's worst memory.</div>
+    <div class="flex text-xs mt-1">
+        <span class="badge badge-mist">Timer: Memory Track [6]</span>
+        <span class="badge badge-purple">Encounter: The Forgotten Chorus (DV 5, Desperate)</span>
+    </div>
+    <div class="encounter-box mt-1">
+        <div class="enc-outcomes">
+            <div><strong>Clean:</strong> The party answers grief with a memory of their own, spoken aloud — the Chorus quiets and grants a Name Fragment.</div>
+            <div><strong>Partial:</strong> The party escapes; one PC carries a [SORROW] condition until they can properly grieve at camp.</div>
+            <div><strong>Miss:</strong> A PC is fixated, suffering Fatigue each exchange until pulled physically from the clearing.</div>
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<!-- ===== ACT III ===== -->
+<h2 id="act-3">🦴 Act III: The Fortress Heart</h2>
+<p style="color:var(--text2);">The fortress is not built — it is grown. Petrified roots coil into walls, bone-columns hold up roofs of fungus-stone. The druid's corpse still hangs impaled on the Golden Thorn, and the Nameless Heroine prowls the halls — testing, haunting, or confronting.</p>
+
+<div class="scene-card">
+    <div class="scene-title">📜 The Oath Archive</div>
+    <div class="scene-desc">A chamber of bone tablets, each scored through with a name that no longer belongs to anyone. Fragments of the heroine's own name are hidden among them, deliberately obscured.</div>
+    <div class="flex text-xs mt-1">
+        <span class="badge badge-mist">Timer: Memory Track [6]</span>
+    </div>
+    <div class="encounter-box mt-1">
+        <div class="enc-name">Reading the Scored Tablets — DV 5, Risky</div>
+        <div class="enc-outcomes">
+            <div><strong>Clean:</strong> Correctly identify her erasure among dozens of forgotten dead. Gain a Name Fragment.</div>
+            <div><strong>Partial:</strong> The right tablet is found, but disturbs the adjacent Bloodless Barracks — a Shadewalker squad wakes.</div>
+            <div><strong>Miss:</strong> The wrong name is read aloud. Minor spectral backlash; tick Dread +1.</div>
+        </div>
+    </div>
+</div>
+
+<div class="scene-card">
+    <div class="scene-title">🪞 Hall of the Betrayed</div>
+    <div class="scene-desc">Mirrors line a long hall, each showing the PCs as future undead — a trap of despair, not claws.</div>
+    <div class="encounter-box mt-1">
+        <div class="enc-name">The Reflected Self — DV 4, Controlled</div>
+        <div class="enc-outcomes">
+            <div><strong>Clean:</strong> The mirrors are recognized for what they are; a PC gains insight into the heroine's own despair. Name Fragment gained.</div>
+            <div><strong>Partial:</strong> One PC is rattled and marks Mental Strain.</div>
+            <div><strong>Miss:</strong> A PC briefly believes the reflection is real. Tick Dread +1.</div>
+        </div>
+    </div>
+</div>
+
+<div class="scene-card">
+    <div class="scene-title">⚔️ The Spear Hall</div>
+    <div class="scene-desc">The druid's husk hangs nailed to reality by the Golden Thorn, wreathed in eternal fog. The Nameless Heroine watches from the root-columns, weighing what the party has proven itself to be.</div>
+    <div class="flex text-xs mt-1">
+        <span class="badge badge-mist">Timer: Memory Track [6]</span>
+        <span class="badge badge-gray">Timer: Dread Timer [6]</span>
+        <span class="badge badge-purple">Encounter: The Nameless Heroine (DV 5, Risky)</span>
+    </div>
+    <div class="encounter-box mt-1">
+        <div class="enc-outcomes">
+            <div><strong>Clean:</strong> At Memory 4+, she speaks directly, offering the last fragments' locations and a Root-Vault warning. Below 4, she withdraws with a riddle.</div>
+            <div><strong>Partial:</strong> She tests one PC — success grants a Name Fragment, failure marks [UNWORTHY] for the rest of the adventure.</div>
+            <div><strong>Miss:</strong> High Dread makes her hostile; she strikes to wound, not kill — a warning. Tick Dread +1.</div>
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<!-- ===== ACT IV ===== -->
+<h2 id="act-4">🕳️ Act IV: Descent into the Root-Vault</h2>
+<p style="color:var(--text2);">The Root-Vault is an inverted underworld where roots are ossified memory, words become walls, and oaths have gravity. Here rests the Resonant Keystone — a crystalline bell-core wrapped in the heroine's erasure.</p>
+
+<div class="scene-card">
+    <div class="scene-title">📖 The Name-Eaters</div>
+    <div class="scene-desc">Spectral archivists drift through the root-corridors, ripping identity pages from memory — drawn to anyone carrying unspoken Name Fragments.</div>
+    <div class="flex text-xs mt-1">
+        <span class="badge badge-mist">Timer: Memory Track [6]</span>
+        <span class="badge badge-purple">Encounter: Name-Eater Swarm (DV 5, Desperate)</span>
+    </div>
+    <div class="encounter-box mt-1">
+        <div class="enc-outcomes">
+            <div><strong>Clean:</strong> Fragments protected; archivists driven off. Gain the final Name Fragment.</div>
+            <div><strong>Partial:</strong> An uncommitted Fragment is stolen; must be recovered or reasoned out again.</div>
+            <div><strong>Miss:</strong> A PC permanently loses a minor personal memory (GM's choice).</div>
+        </div>
+    </div>
+</div>
+
+<div class="scene-card">
+    <div class="scene-title">⚙️ The Root-Engine</div>
+    <div class="scene-desc">A biomechanical heart-node reorganizes the vault's corridors in real time, threatening to seal the path behind the party.</div>
+    <div class="flex text-xs mt-1">
+        <span class="badge badge-gray">Timer: Vault Collapse [5]</span>
+    </div>
+    <div class="encounter-box mt-1">
+        <div class="enc-name">Racing the Root-Engine — DV 5, Risky</div>
+        <div class="enc-outcomes">
+            <div><strong>Clean:</strong> The Keystone chamber is reached before full reorganization. No tick.</div>
+            <div><strong>Partial:</strong> Reached, but the return path is compromised. Tick Vault Collapse +2.</div>
+            <div><strong>Miss:</strong> A corridor seals behind a party member, splitting the group. Tick +2.</div>
+        </div>
+    </div>
+</div>
+
+<div class="scene-card">
+    <div class="scene-title">🕯️ The Trial of Worth</div>
+    <div class="scene-desc">To claim the Keystone, the party must speak or assemble the heroine's name, acknowledge her sacrifice and its injustice, and swear a public oath to restore her saga. Testimony, not combat.</div>
+    <div class="flex text-xs mt-1">
+        <span class="badge badge-mist">Timer: Memory Track [6]</span>
+        <span class="badge badge-gold">Encounter: The Name Rite (DV 6, Desperate)</span>
+    </div>
+    <div class="encounter-box mt-1">
+        <div class="enc-outcomes">
+            <div><strong>Clean:</strong> The full name is spoken correctly. The Keystone settles into the party's hands; her shade kneels, ceasing hostility.</div>
+            <div><strong>Partial:</strong> A fragment is misplaced; the Keystone is claimed but inert — must be re-tuned later.</div>
+            <div><strong>Miss:</strong> The party takes the Keystone without the oath. It fractures, marked with their names — she becomes an eternal Nemesis.</div>
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<!-- ===== ACT V ===== -->
+<h2 id="act-5">🗡️ Act V: The Last Saga — The Seal and the Spear</h2>
+<p style="color:var(--text2);">The Heart-Fortress shudders as roots split and mist curls in reverse. The pinned druid's body flexes against the Golden Thorn. The party stands where the curse began and will end — or repeat.</p>
+
+<div class="scene-card">
+    <div class="scene-title">🌪️ The Husk Wakes</div>
+    <div class="scene-desc">If the Thorn was disturbed or the Name remains incomplete, the Druid of the Mist reanimates. Root-bone walls shatter into a spiral arena. The husk cannot be killed — only forced back beneath the Thorn.</div>
+    <div class="flex text-xs mt-1">
+        <span class="badge badge-red">Timer: Husk Stabilization [6]</span>
+    </div>
+    <div class="encounter-box mt-1">
+        <div class="enc-name">Phase I: The Husk Wakes — DV 5, Desperate</div>
+        <div class="enc-outcomes">
+            <div><strong>Clean:</strong> Stabilization disrupted; early transition to Phase II.</div>
+            <div><strong>Partial:</strong> Root-shade guardians cost Fatigue or Harm.</div>
+            <div><strong>Miss:</strong> Attacks ignore armor unless a sacred name/oath is invoked. Tick Dread +1.</div>
+        </div>
+    </div>
+    <div class="encounter-box">
+        <div class="enc-name">Phase II: The Unbound Druid — DV 6, Desperate</div>
+        <div class="enc-outcomes">
+            <div><strong>Clean:</strong> The druid's true form is forced back toward the sanctum-heart without losing ground.</div>
+            <div><strong>Partial:</strong> Corrupted Command rerolls a success into failure; the party pushes on.</div>
+            <div><strong>Miss:</strong> Mist Rebirth reforms a guardian; an exchange is lost regaining ground.</div>
+        </div>
+    </div>
+    <div class="encounter-box">
+        <div class="enc-name">Phase III: The Heart Rift — DV 6, Desperate</div>
+        <div class="enc-outcomes">
+            <div><strong>Clean:</strong> The druid is driven to the spike altar and re-impaled through sacrifice, bargain, or declared deed.</div>
+            <div><strong>Partial:</strong> Re-pinned, but pyrrhic — the Mist threshold expands regardless.</div>
+            <div><strong>Miss:</strong> The druid attempts to rewrite one PC into its replacement host.</div>
+        </div>
+    </div>
+</div>
+
+<div class="scene-card">
+    <div class="scene-title">✨ Intervention of the Heroine Shade</div>
+    <div class="scene-desc">If the Name Quest was completed, the Heroine Shade manifests in full Valkyric radiance, spear alight, weakening the husk's regeneration. A PC must proclaim her Name aloud as she strikes — only then does the cycle break.</div>
+    <div class="encounter-box mt-1">
+        <div class="enc-name">Proclaiming the Name — DV 4, Dominant</div>
+        <div class="enc-outcomes">
+            <div><strong>Clean:</strong> The Name is spoken true. The arena collapses inward, the mist recoils violently, and the curse breaks. She becomes a lasting Patron.</div>
+            <div><strong>Partial:</strong> Spoken hesitantly — the curse breaks, but her parting is sorrowful rather than triumphant.</div>
+            <div><strong>Miss:</strong> The moment is lost. The husk is re-pinned without her help; the Golden Thorn remains inert until she is remembered in future play.</div>
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<!-- ===== BESTIARY ===== -->
+<h2 id="bestiary">🦴 Bestiary</h2>
+
+<div class="creature-stats">
+    <strong style="color:var(--gold);">Mistwraith</strong>
+    <span class="badge badge-gray">TL 3 · Class III</span>
+    <span class="badge badge-gray">Undead</span>
+    <div class="text-xs text-muted mt-1">Body 2 · Spirit 4 · Presence 1 · Armor 0 · HP 12</div>
+    <div class="text-xs text-muted">A ragged human silhouette woven from fog and hunger. It does not eat flesh — it eats the certainty that you are who you think you are. Hunts in packs of 3–5, drawn to exhaustion and fear.</div>
+    <div class="text-xs mt-1"><strong>1 SB — Erasing Touch:</strong> a PC forgets a minor fact for the scene.</div>
+    <div class="text-xs"><strong>2 SB — Feeding Frenzy:</strong> the pack converges on the most fatigued PC (+1 Fatigue, pack gains +1 die against them).</div>
+    <div class="creature-lore">Mistwraiths do not remember being people. They remember only the shape of being forgotten — and they want company in that condition.</div>
+</div>
+
+<div class="creature-stats">
+    <strong style="color:var(--gold);">Shadewalker</strong>
+    <span class="badge badge-gray">TL 2 · Class II–III</span>
+    <span class="badge badge-gray">Undead</span>
+    <div class="text-xs text-muted mt-1">Body 3 · Spirit 1 · Presence 1 · Armor 2 · HP 14</div>
+    <div class="text-xs text-muted">A revenant infantryman still marching a patrol that ended centuries ago. Will not break formation, will not retreat, will not stop until destroyed or dismissed by a recognized command.</div>
+    <div class="text-xs mt-1"><strong>1 SB — Shield the Line:</strong> a Shadewalker grants an ally-corpse +1 Position for one exchange.</div>
+    <div class="text-xs"><strong>2 SB — Signal the Patrol:</strong> bone horns sound; another squad arrives in two exchanges.</div>
+    <div class="creature-lore">Speak the last order they ever received, if you can learn it — some will simply stop.</div>
+</div>
+
+<div class="creature-stats">
+    <strong style="color:var(--gold);">Hunger Wolf</strong>
+    <span class="badge badge-gray">TL 3 · Class III</span>
+    <span class="badge badge-gray">Beast-Spirit</span>
+    <div class="text-xs text-muted mt-1">Body 4 · Spirit 2 · Presence 1 · Armor 1 · HP 18</div>
+    <div class="text-xs text-muted">Sinew stretched taut over a wrong number of bones, jaws unhinging wider than the skull should allow. Swallows light itself in small mouthfuls, leaving patches of true darkness.</div>
+    <div class="text-xs mt-1"><strong>1 SB — Swallow the Torch:</strong> a light source in Near gutters out.</div>
+    <div class="text-xs"><strong>2 SB — Pack Howl:</strong> all PCs in Near test Resolve or gain 1 Fatigue.</div>
+    <div class="creature-lore">They were ordinary wolves once. The forest remembers what hunger feels like, and it made them into an argument about it.</div>
+</div>
+
+<div class="creature-stats">
+    <strong style="color:var(--gold);">The Forgotten Chorus</strong>
+    <span class="badge badge-gray">TL 4 · Class IV</span>
+    <span class="badge badge-gray">Psychic Hazard</span>
+    <div class="text-xs text-muted mt-1">Spirit 5 · Presence 4</div>
+    <div class="text-xs text-muted">Not a creature so much as grief given harmony — dozens of mourning voices that rise from hollow trees and sing in the exact key of a listener's worst memory. Cannot be fought with weapons, only endured, silenced, or answered in kind.</div>
+    <div class="text-xs mt-1"><strong>2 SB — Harmonize Grief:</strong> DV 4 Resolve test or become fixated, repeating a dead loved one's words.</div>
+    <div class="text-xs"><strong>3 SB — Psychic Drowning:</strong> a fixated PC suffers Fatigue each exchange until pulled away or the Chorus is silenced.</div>
+    <div class="creature-lore">The Chorus is what became of every soldier, refugee, and companion the heroine failed to save. It sings because no one else will.</div>
+</div>
+
+<div class="creature-stats">
+    <strong style="color:var(--gold);">The Nameless Heroine (Shade)</strong>
+    <span class="badge badge-gray">TL 4 · Class IV</span>
+    <span class="badge badge-purple">Nemesis</span>
+    <div class="text-xs text-muted mt-1">Spirit 6 · Resolve 5 · Body 4 · Speed 3 · Presence 6 · Armor 2 · HP 24</div>
+    <div class="text-xs text-muted">A spectral shieldmaiden formed of mist and radiant sorrow — tragedy weaponized. She tests before she strikes, and strikes only those who prove themselves unworthy of the memory she is fighting to keep. Cannot be harmed until her Name is restored.</div>
+    <div class="text-xs mt-1"><strong>1 SB — Mark of Unworthy:</strong> a PC who broke an oath or desecrated the dead is branded, becoming a priority target for other undead.</div>
+    <div class="text-xs"><strong>2 SB — Spear-Light:</strong> her spectral spear manifests fully: Harm 2, ignores Armor, for one exchange.</div>
+    <div class="text-xs"><strong>3 SB — Reverence Withdrawn:</strong> she vanishes for a full scene — a warning, not a mercy.</div>
+    <div class="creature-lore">Full phase structure and GM guidance in the notes below — she is this adventure's central nemesis, and potentially its patron ally.</div>
+</div>
+
+<hr>
+
+<!-- ===== NPCS ===== -->
+<h2 id="npcs">👤 Key NPCs</h2>
+<div class="grid-2">
+    <div class="npc-card">
+        <div class="npc-name">Warden-Captain Adra Hale</div>
+        <div class="npc-role">Commander of Payden's Port's Aeler garrison</div>
+        <div class="npc-motivation">🎯 Hold the bell-line by any means necessary; she has buried too many wardens to care whose methods work, only that they do.</div>
+        <div class="npc-secret">Secret: Her own grandmother was one of the shield-sisters who died with the nameless heroine — a bloodline she doesn't know of, but the Mist does.</div>
+    </div>
+    <div class="npc-card">
+        <div class="npc-name">Prior Oswin Greywick</div>
+        <div class="npc-role">Senior Mistlander priest, keeper of the port's fog-rituals</div>
+        <div class="npc-motivation">🎯 Believes the Mist can be appeased rather than fought, and fears breaking the curse outright unleashes something worse.</div>
+        <div class="npc-secret">Secret: He has a fragment of the Chord already — inherited, unrecognized — and has been using it as a paperweight for a decade.</div>
+    </div>
+    <div class="npc-card">
+        <div class="npc-name">Factor Lenna Voss</div>
+        <div class="npc-role">Senior Guild trade factor</div>
+        <div class="npc-motivation">🎯 Wants the Direwood's dangers cataloged and monetized — safe passage, salvage rights, first refusal on artifacts.</div>
+        <div class="npc-secret">Secret: She has already lost two salvage crews to the Direwood and told no one.</div>
+    </div>
+    <div class="npc-card">
+        <div class="npc-name">The Nameless Heroine</div>
+        <div class="npc-role">Bound shade, tragic antagonist and potential patron</div>
+        <div class="npc-motivation">🎯 To be remembered as she was — not the villain's foil, not a ghost story, but a person with a name and a saga worth singing.</div>
+        <div class="npc-secret">Secret: She does not remember her own name either. She is grieving its absence alongside the party.</div>
+    </div>
+</div>
+
+<hr>
+
+<!-- ===== LOCATIONS ===== -->
+<h2 id="locations">📍 Locations</h2>
+<div class="grid-2">
+    <div class="loc-card"><strong>Payden's Port</strong> — A sea-garrison city of cracked statues, storm-beaten docks, and chanting wardens holding the frontier. The bell-line is failing, tolling out of sequence as if it has forgotten its pattern.</div>
+    <div class="loc-card"><strong>The Direwood</strong> — A blighted frontier forest that resists mapping and reacts to intrusion. Paths repeat, distances elongate; the dead outnumber the living. Less a place than a memory that refuses to stay in the past.</div>
+    <div class="loc-card"><strong>The Fortress Heart</strong> — A fortress grown rather than built: petrified roots, bone-columns, fungus-stone roofs. The druid's corpse hangs impaled here on the Golden Thorn, a font of eternal fog.</div>
+    <div class="loc-card"><strong>The Root-Vault</strong> — An inverted underworld where roots are ossified memory, words become walls, and oaths have gravity. The Resonant Keystone rests here at the breach-point of the First Curse.</div>
+</div>
+
+<hr>
+
+<!-- ===== FACTIONS ===== -->
+<h2 id="factions">🏛️ Factions</h2>
+<div class="panel panel-blue">
+    <strong>The Aeler Garrison of Payden's Port</strong> — Restore the bell-line and hold the frontier, by force if necessary. Pragmatic potential allies; they'll owe the party a genuine favor if the bell-line is restored, redeemable as reputation, protection, or a blind eye when needed later.
+</div>
+<div class="panel panel-purple">
+    <strong>The Mistlander Priesthood</strong> — Appease the Mist rather than destroy it; fear that breaking the curse outright invites something worse. Wary allies who provide ritual knowledge, but only if the Mist's victims are treated with genuine reverence, not as obstacles.
+</div>
+<div class="panel panel-orange">
+    <strong>The Guild Trade Factors</strong> — Monetize the Direwood's dangers: salvage rights, safe-passage tolls, first claim on recovered artifacts. Transactional; overpromising to them creates an owed favor that can be called in awkwardly, at the worst possible moment.
+</div>
+
+<hr>
+
+<!-- ===== TIMERS ===== -->
+<h2 id="timers">⏱️ Campaign Timers</h2>
+<div class="timers-grid">
+    <div class="panel panel-red">
+        <div style="display:flex;justify-content:space-between;font-size:0.8rem;">
+            <strong>🌫️ Dread Timer</strong>
+            <span>0/6</span>
+        </div>
+        <div class="timer-bar"><div class="timer-bar-fill" style="width:0%;background:var(--red);"></div></div>
+        <div class="text-xs text-muted">Rises when the party ignores omens, mishandles the dead, or bargains carelessly with the Mist. High Dread makes the Heroine appear as a hostile nemesis rather than a testing guide.</div>
+    </div>
+    <div class="panel panel-gold">
+        <div style="display:flex;justify-content:space-between;font-size:0.8rem;">
+            <strong>📜 Memory Track</strong>
+            <span>0/6</span>
+        </div>
+        <div class="timer-bar"><div class="timer-bar-fill" style="width:0%;background:var(--gold);"></div></div>
+        <div class="text-xs text-muted">Marked by uncovering name fragments, fulfilling oaths, suffering hardship in defense of the innocent, or being recognized by shades as her lost companions. At 6, the party may attempt the Name Rite.</div>
+    </div>
+</div>
+
+<hr>
+
+<!-- ===== GM NOTES ===== -->
+<h2 id="gmnotes">🗒️ GM Notes &amp; Secrets</h2>
+
+<div class="gm-note">
+    <div class="gm-note-label">Pacing — Act I</div>
+    Payden's Port should feel politically alive before it feels haunted. Let the three factions genuinely compete for the party's attention — none of them are wrong to want what they want, and none of them fully understand what's actually in the Direwood. The First Breach is the pivot: frightening but survivable, a promise of worse to come.
+</div>
+<div class="gm-note">
+    <div class="gm-note-label">Pacing — Act II</div>
+    This act is the adventure's engine. Roll 1–2 results per travel segment from the Terrain Distortion / Threat Manifestation / Psychological Pressure tables to keep every crossing feeling different. Nightly Visitations should arrive out of order and slightly wrong — names inserted that aren't hers — so players feel the shape of the truth before they can name it. Escalate on desecration or mockery; reward reverence.
+</div>
+<div class="gm-note">
+    <div class="gm-note-label">Pacing — Act III</div>
+    The fortress should feel alive and predatory, not a static crawl. The Heroine here is a mirror, not a boss — her behavior should visibly track the party's Memory Track and Dread Timer. If she attacks, it reads as testing or warning, not a fight to the death.
+</div>
+<div class="gm-note">
+    <div class="gm-note-label">Pacing — Act IV</div>
+    The Root-Vault should feel claustrophobic and time-pressured — a tonal tightening before the climax. The Trial of Worth is the emotional crux; run it as roleplay-heavy testimony, not a skill-challenge grind. Let players actually say the name aloud, assembled from gathered fragments.
+</div>
+<div class="gm-note">
+    <div class="gm-note-label">Pacing — Act V</div>
+    A set-piece boss sequence, but the real climax is the naming, not the damage numbers. If the Name was restored, the Heroine's intervention should feel triumphant and unbearably sad. If not, survival should still feel like a real victory — just an incomplete one — leaving the door open for her return.
+</div>
+
+<div class="gm-note">
+    <div class="gm-note-label">NPC Secret — The Nameless Heroine</div>
+    She genuinely does not remember her own name. This is not a puzzle she's gatekeeping — it's the wound itself. Never let her seem coy about it; her tragedy only lands if the players understand she wants this as badly as they need it.
+</div>
+<div class="gm-note">
+    <div class="gm-note-label">NPC Secret — Prior Oswin</div>
+    His paperweight is a Chord fragment. If the party investigates Mistlander holdings with any care in Act I, this can be found early — a delightful, slightly unsettling discovery, not a gotcha withheld from the players.
+</div>
+<div class="gm-note">
+    <div class="gm-note-label">NPC Secret — Warden-Captain Hale</div>
+    Her bloodline tie to the heroine's shield-sisters should surface only if the party researches the port's founding history or the heroine's companions specifically. It should deepen Hale as a person, not recontextualize her motives.
+</div>
+
+<div class="gm-note">
+    <div class="gm-note-label">Forbidden Early Revelations</div>
+    <ul style="margin-left:1.2rem;">
+        <li>That the Heroine doesn't remember her own name either — land only at Memory Track 4+</li>
+        <li>That killing the husk again solves nothing without the Name — discover via the pyrrhic Act V outcome, not exposition</li>
+        <li>That Prior Oswin already has a Chord fragment — discoverable, not dumped</li>
+        <li>That the Trial of Worth requires an oath, not just correct pronunciation — telegraph, don't state outright</li>
+        <li>The full extent of Hale's bloodline connection — reveal only through deliberate research</li>
+    </ul>
+</div>
+
+<div class="gm-note">
+    <div class="gm-note-label">Tactical Hints</div>
+    <strong>Dread Timer:</strong> make it visceral — a taste in the air, a wrongness in how sound carries. Every tick has an immediate sensory consequence.<br>
+    <strong>Memory Track:</strong> track openly with players as a shared quest resource; celebrate each mark with real narrative weight.<br>
+    <strong>Name Fragments:</strong> deliberately ambiguous — resist making assembly purely mechanical; adjudicate generously.<br>
+    <strong>Heroine as Mirror:</strong> her hostility or help should always trace to specific party behavior the table can point to.<br>
+    <strong>SB Economy:</strong> 1 SB minor environmental shifts, 2 SB moderate complications, 3 SB serious threats, 4+ SB major escalations (the Heroine's wrath, the fortress restructuring itself).
+</div>
+
+<hr>
+
+<div style="font-size:0.75rem;color:var(--text3);text-align:center;padding:1rem 0;">
+    Into the Direwood — A Fate's Edge Adventure<br>
+    © Nicholas A. Gasper — For use with the Fate's Edge RPG
+</div>
+
+</body>
+</html>
