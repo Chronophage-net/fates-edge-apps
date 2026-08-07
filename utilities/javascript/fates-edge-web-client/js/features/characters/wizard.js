@@ -735,8 +735,24 @@ function collectTalentsAndLoadout(d) {
     d.weaponClass = getVal('#wz-weapon-class') || 'light';
     const armor = ARMOR_TYPES.find(a => a.id === d.armorType);
     d.armorConversion = armor?.conversion || '';
+
+    // Read Invoker symbols from the DOM (rows added via the "Add Symbol" button).
+    d.symbols = readSymbolListFromDOM();
+
     d._stepDataCollected[3] = true;
     return true;
+}
+
+// Read symbol rows from the DOM (populated by the manual "Add Symbol" flow —
+// see the #wz-add-symbol-btn handler and .wz-symbol-row markup below).
+function readSymbolListFromDOM() {
+    const items = [];
+    document.querySelectorAll('.wz-symbol-row').forEach(row => {
+        const patronSpan = row.querySelector('.wz-symbol-id');
+        const patronId = patronSpan ? patronSpan.textContent.trim() : '';
+        if (patronId) items.push(patronId);
+    });
+    return items;
 }
 
 function collectBondsAndFinish(d) {
@@ -952,6 +968,7 @@ function renderStep() {
     if (state.step === 1) attachAttributeListeners();
     if (state.step === 2) attachSkillListeners();
     if (state.step === 3) renderTalentCatalog();
+
     if (state.step === 4) updateSummaryDisplay();
 
     const firstInput = stepsEl.querySelector('input, select, textarea');
@@ -1366,7 +1383,9 @@ function renderStep3TalentsAndLoadout(d) {
                 <div>
                     <label>Patron</label>
                     <select id="wz-patron">${patronOptions}</select>
-                    <div class="field-hint" style="margin-top:0.2rem;">Patrons loaded from /data/patrons/</div>
+                    <div class="field-hint" style="margin-top:0.2rem;">
+                        ${d.magicPath === 'invoker' ? 'Runekeeper/Cantor only — Invokers use Symbols below.' : 'Patrons loaded from /data/patrons/'}
+                    </div>
                 </div>
             </div>
             

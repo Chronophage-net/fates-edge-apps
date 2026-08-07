@@ -808,6 +808,14 @@ function updateMagicPathDisplay() {
     if (witchFields) witchFields.style.display = path === 'witch' ? 'block' : 'none';
     if (psionFields) psionFields.style.display = path === 'psion' ? 'block' : 'none';
     if (monkFields) monkFields.style.display = path === 'monk' ? 'block' : 'none';
+
+    // Show a hint that the top-level Patron field is for Runekeeper/Cantor
+    // (a single Bound Patron concept), not Invokers, who carry multiple
+    // Symbols instead (see the dedicated "Invoker Symbols" section below).
+    const patronHint = document.getElementById('ce-patron-hint');
+    if (patronHint) {
+        patronHint.style.display = path === 'invoker' ? 'block' : 'none';
+    }
 }
 
 // ============================================================
@@ -1209,6 +1217,9 @@ function buildEditorHTML(c) {
                 <div>
                     <label>Patron</label>
                     <select id="ce-patron">${patronOptions}</select>
+                    <div id="ce-patron-hint" style="display:${isInvoker ? 'block' : 'none'};font-size:0.65rem;color:var(--text3);margin-top:0.2rem;">
+                        Runekeeper/Cantor only — Invokers use Symbols below.
+                    </div>
                 </div>
             </div>
 
@@ -1493,7 +1504,7 @@ export function closeEditor() {
 }
 
 // ============================================================
-// SAVE EDITOR (with backgroundTags normalisation)
+// SAVE EDITOR (with backgroundTags normalisation and auto-symbol enforcement)
 // ============================================================
 
 export function saveEditor() {
@@ -1589,11 +1600,11 @@ export function saveEditor() {
         c.mentalStrain = clamp(n('#ce-mental-strain'), 0, c.mentalStrainMax);
         c.vtt = document.getElementById('ce-vtt')?.checked || false;
 
-        c.symbols = readDynamicList('symbol').map(row => row.patron).filter(Boolean);
-        c.symbolStates = {};
-        readDynamicList('symbol').forEach(row => {
-            if (row.patron) c.symbolStates[row.patron] = row.state || 'active';
-        });
+        // ─── Read symbols from DOM (Invoker Symbols section) ──────────
+        const symbolRows = readDynamicList('symbol');
+        c.symbols = symbolRows.map(s => s.patron);
+        c.symbolStates = symbolRows.reduce((acc, s) => { acc[s.patron] = s.state || 'active'; return acc; }, {});
+
         c.rites = readDynamicList('rite').map(row => row.name).filter(Boolean);
         c.repertoire = readDynamicList('repertoire').map(row => row.name).filter(Boolean);
         c.hedgeGifts = readDynamicList('hedge-gift').map(row => row.name).filter(Boolean);

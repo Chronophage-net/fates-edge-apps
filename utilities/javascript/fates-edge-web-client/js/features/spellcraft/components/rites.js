@@ -486,7 +486,57 @@ export async function renderRites(el, patronIds, characterId, options = {}) {
         return;
     }
 
-    // ... rest of the function unchanged (the existing code after this point remains the same)
+    // ─── BUILD THE RITES PANEL ──────────────────────────────────────
+    // We'll construct HTML for all patrons, showing gifts and rites.
+    let html = '';
+    const isInvoker = path === 'invoker';
+    const isMultiPatron = patronDataList.length > 1;
+
+    // Cross-Resonance warnings for Invokers
+    if (isInvoker && isMultiPatron) {
+        const patronIds = patronDataList.map(p => p.id);
+        const warnings = getRivalryWarnings(patronIds);
+        if (warnings.length > 0) {
+            html += `
+                <div class="info-box" style="border-left-color:var(--orange);margin-bottom:0.5rem;">
+                    <strong>⚠️ Cross-Resonance Warning:</strong> Carrying symbols from rival patrons:
+                    ${warnings.map(([a, b]) => {
+                        const nameA = getPatronName(a, state);
+                        const nameB = getPatronName(b, state);
+                        return `<span style="color:var(--orange);">${nameA} & ${nameB}</span>`;
+                    }).join('; ')}
+                    <br><span style="font-size:0.7rem;color:var(--text3);">Using rites from rival patrons simultaneously may incur additional Obligation or complications.</span>
+                </div>
+            `;
+        }
+    }
+
+    // ─── New Scene button ────────────────────────────────────────────
+    html += `
+        <div style="display:flex;justify-content:flex-end;margin-bottom:0.5rem;">
+            <button class="btn btn-sm btn-secondary" onclick="window.startNewScene('${characterId}')">🎬 New Scene</button>
+        </div>
+    `;
+
+    // ─── Render each patron ──────────────────────────────────────────
+    for (const patronData of patronDataList) {
+        // Render Patron's Gift (if any)
+        const giftHtml = renderPatronGiftsForSinglePatron(char, patronData, path, characterId);
+        if (giftHtml) html += giftHtml;
+
+        // Render Rites
+        const ritesHtml = renderSinglePatronRites(patronData, characterId, charName, ids, path, char);
+        html += ritesHtml;
+    }
+
+    // ─── Insert into container ──────────────────────────────────────
+    el.innerHTML = html;
+
+    // ─── Attach event listeners for expand/collapse ────────────────
+    attachRiteToggleEvents(el);
+
+    // ─── Store current parameters for future updates ────────────────
+    currentRitesParams = { patronIds: ids, characterId, options };
 }
 
 // ============================================================
