@@ -5,6 +5,7 @@
   "tier": "major",
   "activation": "passive",
   "category": "social",
+  "tags": ["passive", "sway", "performance", "leadership", "major"],
   "useLimit": "passive",
   "prerequisites": "Presence 2+",
   "effect": "+1d Sway | +1d Performance",

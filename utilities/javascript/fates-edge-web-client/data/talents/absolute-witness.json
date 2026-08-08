@@ -5,6 +5,7 @@
   "tier": "epic",
   "activation": "passive",
   "category": "investigation",
+  "tags": ["passive", "insight", "epic", "anti-deception", "social-defense"],
   "useLimit": "passive",
   "prerequisites": "Insight 4+, Requires: Tier IV",
   "effect": "+2d Insight",

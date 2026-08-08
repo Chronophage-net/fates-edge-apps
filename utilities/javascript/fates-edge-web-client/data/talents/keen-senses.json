@@ -5,6 +5,7 @@
   "tier": "minor",
   "activation": "passive",
   "category": "investigation",
+  "tags": ["passive", "investigation", "perception", "minor", "starter"],
   "useLimit": "passive",
   "prerequisites": "",
   "effect": "+1d Investigation",

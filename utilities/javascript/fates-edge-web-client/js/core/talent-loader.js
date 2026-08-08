@@ -77,4 +77,33 @@ export async function loadTalentCatalog(force = false) {
     }
 }
 
-export default { loadTalentCatalog };
+/**
+ * Filter helpers so feature modules (Cantor, Monk, character editor filter bar,
+ * etc.) can key off a talent's tags/category instead of hardcoding name lists.
+ * Both accept the full catalog array (e.g. state.talents) plus a bare filter value.
+ */
+export function talentsByTag(talents, tag) {
+    if (!Array.isArray(talents) || !tag) return [];
+    const t = String(tag).toLowerCase();
+    return talents.filter(talent => Array.isArray(talent.tags) && talent.tags.includes(t));
+}
+
+export function talentsByCategory(talents, category) {
+    if (!Array.isArray(talents) || !category) return [];
+    return talents.filter(talent => talent.category === category);
+}
+
+/**
+ * Every distinct tag present across a talent list, sorted — used to populate
+ * tag-filter dropdowns without maintaining a separate hardcoded tag list.
+ */
+export function collectTalentTags(talents) {
+    if (!Array.isArray(talents)) return [];
+    const set = new Set();
+    for (const t of talents) {
+        if (Array.isArray(t.tags)) t.tags.forEach(tag => set.add(tag));
+    }
+    return Array.from(set).sort();
+}
+
+export default { loadTalentCatalog, talentsByTag, talentsByCategory, collectTalentTags };

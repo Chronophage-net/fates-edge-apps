@@ -37,7 +37,8 @@ import { showToast } from '../../components/Toast.js';
 import { loadPatronData } from '../patrons/index.js';
 import { openTalentEditor } from './talent-editor.js';
 import { ensureTalentEffects } from '../../core/talent-effects.js';
-import { loadTalentCatalog } from '../../core/talent-loader.js';
+import { loadTalentCatalog, collectTalentTags } from '../../core/talent-loader.js';
+import { TALENT_CATEGORIES } from './talent-editor.js';
 
 console.log('[Editor] Module loaded');
 
@@ -262,6 +263,15 @@ const editorState = {
     cancelListeners: []
 };
 
+// Talent catalog filter — search text + category + tag, all AND-ed together.
+// Lives outside editorState since it resets to "no filter" per editor session
+// rather than being part of the character/editor persistence lifecycle.
+const talentFilterState = {
+    search: '',
+    category: '',
+    tag: ''
+};
+
 // ============================================================
 // INITIALIZATION
 // ============================================================
@@ -395,31 +405,185 @@ function getAvailableTalentsForTier(totalXp) {
     });
 }
 
+/**
+ * Apply the search/category/tag filter bar on top of the tier-eligible talent
+ * list. Category is the talent's single classification; tag is any one of its
+ * (possibly several) cross-cutting tags — see talent-editor.js's Tags field
+ * and core/talent-loader.js's talentsByTag/collectTalentTags helpers.
+ */
+function applyTalentFilters(talents) {
+    const { search, category, tag } = talentFilterState;
+    return talents.filter(t => {
+        if (category && t.category !== category) return false;
+        if (tag && !(Array.isArray(t.tags) && t.tags.includes(tag))) return false;
+        if (search) {
+            const haystack = `${t.name || ''} ${t.description || ''} ${t.effect || ''}`.toLowerCase();
+            if (!haystack.includes(search.toLowerCase())) return false;
+        }
+        return true;
+    });
+}
+
+// Signature of the last filter-bar option set rendered — avoids rebuilding
+// (and re-focus-stealing) the search input's DOM node on every keystroke.
+// Only rebuilt when the underlying category/tag option set actually changes
+// (e.g. total XP crosses a tier boundary, unlocking new talents).
+let talentFilterBarSignature = null;
+
+function renderTalentFilterBar(allAvailable) {
+    const barEl = document.getElementById('ce-talent-filter-bar');
+    if (!barEl) return;
+
+    const categoriesPresent = TALENT_CATEGORIES.filter(c =>
+        allAvailable.some(t => t.category === c.id)
+    );
+    const tagsPresent = collectTalentTags(allAvailable);
+
+    const signature = categoriesPresent.map(c => c.id).join(',') + '|' + tagsPresent.join(',');
+    const showClear = !!(talentFilterState.search || talentFilterState.category || talentFilterState.tag);
+    if (signature === talentFilterBarSignature && barEl.dataset.hasClear === String(showClear)) {
+        return; // options unchanged — leave existing DOM (and focus) alone
+    }
+    talentFilterBarSignature = signature;
+    barEl.dataset.hasClear = String(showClear);
+
+    const categoryOptions = categoriesPresent.map(c =>
+        `<option value="${c.id}" ${talentFilterState.category === c.id ? 'selected' : ''}>${escHtml(c.label)}</option>`
+    ).join('');
+    const tagOptions = tagsPresent.map(tg =>
+        `<option value="${escHtml(tg)}" ${talentFilterState.tag === tg ? 'selected' : ''}>${escHtml(tg)}</option>`
+    ).join('');
+
+    barEl.innerHTML = `
+        <input type="text" id="ce-talent-filter-search" placeholder="Search talents..."
+            value="${escHtml(talentFilterState.search)}"
+            style="flex:1;min-width:100px;font-size:0.75rem;padding:0.2rem 0.4rem;" />
+        <select id="ce-talent-filter-category" style="font-size:0.75rem;padding:0.2rem;">
+            <option value="">All categories</option>
+            ${categoryOptions}
+        </select>
+        <select id="ce-talent-filter-tag" style="font-size:0.75rem;padding:0.2rem;">
+            <option value="">All tags</option>
+            ${tagOptions}
+        </select>
+        ${showClear ? `<button type="button" class="btn btn-xs" id="ce-talent-filter-clear">Clear</button>` : ''}
+    `;
+
+    document.getElementById('ce-talent-filter-search')?.addEventListener('input', (e) => {
+        talentFilterState.search = e.target.value;
+        renderTalentList();
+    });
+    document.getElementById('ce-talent-filter-category')?.addEventListener('change', (e) => {
+        talentFilterState.category = e.target.value;
+        renderTalentCatalog();
+    });
+    document.getElementById('ce-talent-filter-tag')?.addEventListener('change', (e) => {
+        talentFilterState.tag = e.target.value;
+        renderTalentCatalog();
+    });
+    document.getElementById('ce-talent-filter-clear')?.addEventListener('click', () => {
+        talentFilterState.search = '';
+        talentFilterState.category = '';
+        talentFilterState.tag = '';
+        renderTalentCatalog();
+    });
+}
+
 function renderTalentCatalog() {
+    const totalXp = safeParseInt(document.getElementById('ce-total-xp')?.value, 32);
+    const tierAvailable = getAvailableTalentsForTier(totalXp);
+    renderTalentFilterBar(tierAvailable);
+    renderTalentList(tierAvailable);
+}
+
+/**
+ * Rank + annotate a talent list so the catalog can "smartly" surface talents
+ * appropriate to where the character actually is right now, rather than just
+ * a flat alphabetical/tier-gated dump:
+ *   - talents tagged 'starter' are pinned to the top while the character has
+ *     no talents yet (the exact moment a starter recommendation is useful —
+ *     once they've picked something, starter talents stop being special-cased).
+ *   - among the rest, talents the character can actually afford with their
+ *     remaining unspent XP right now sort ahead of ones that are tier-unlocked
+ *     but not yet affordable (those are still shown, just visually secondary).
+ *   - ties break on cost (cheapest first), then name.
+ * Returns the same talent objects with `_recommended`/`_affordable` flags
+ * attached for the renderer to badge/dim.
+ */
+function rankTalentsForDisplay(talents, { remainingXp, showStarterPicks }) {
+    return talents
+        .map(t => {
+            const cost = safeParseInt(t.cost, 0);
+            const isStarter = Array.isArray(t.tags) && t.tags.includes('starter');
+            return {
+                ...t,
+                _recommended: showStarterPicks && isStarter,
+                _affordable: remainingXp == null || cost <= remainingXp
+            };
+        })
+        .sort((a, b) => {
+            if (a._recommended !== b._recommended) return a._recommended ? -1 : 1;
+            if (a._affordable !== b._affordable) return a._affordable ? -1 : 1;
+            const costDiff = safeParseInt(a.cost, 0) - safeParseInt(b.cost, 0);
+            if (costDiff !== 0) return costDiff;
+            return (a.name || '').localeCompare(b.name || '');
+        });
+}
+
+// Renders just the catalog list (not the filter bar controls) — safe to call
+// on every keystroke in the search box without stealing input focus.
+function renderTalentList(tierAvailableArg) {
     const catalogEl = document.getElementById('ce-talent-catalog');
     if (!catalogEl) return;
     const totalXp = safeParseInt(document.getElementById('ce-total-xp')?.value, 32);
-    const available = getAvailableTalentsForTier(totalXp);
+    const tierAvailable = tierAvailableArg || getAvailableTalentsForTier(totalXp);
+    const filtered = applyTalentFilters(tierAvailable);
 
-    if (available.length === 0) {
-        catalogEl.innerHTML = '<div style="padding:0.5rem;color:var(--text3);font-size:0.85rem;">No talents available for your current tier.</div>';
+    if (filtered.length === 0) {
+        catalogEl.innerHTML = `<div style="padding:0.5rem;color:var(--text3);font-size:0.85rem;">${
+            tierAvailable.length === 0
+                ? 'No talents available for your current tier.'
+                : 'No talents match the current filter.'
+        }</div>`;
         return;
     }
 
+    // "Appropriate to XP" — rank by remaining budget, and surface starter
+    // talents specifically while the character hasn't taken any talent yet.
+    const character = editorState.currentId ? getCharacter(editorState.currentId) : null;
+    const remainingXp = character ? (totalXp - calculateTotalXpSpent(character)) : null;
+    const showStarterPicks = !character || !(character.talents && character.talents.length);
+    const available = rankTalentsForDisplay(filtered, { remainingXp, showStarterPicks });
+
+    let printedRecommendedHeader = false;
     catalogEl.innerHTML = available.map((t, i) => {
         const cost = safeParseInt(t.cost, 0);
         const tierObj = TALENT_TIERS.find(ti => cost >= ti.min && cost <= ti.max);
         const tierLabel = tierObj ? tierObj.label : '?';
+        let header = '';
+        if (t._recommended && !printedRecommendedHeader) {
+            header = `<div style="padding:0.25rem 0.5rem 0.1rem;font-size:0.65rem;font-weight:600;color:var(--gold);text-transform:uppercase;letter-spacing:0.03em;">⭐ Recommended starting talents</div>`;
+            printedRecommendedHeader = true;
+        } else if (!t._recommended && printedRecommendedHeader) {
+            header = `<div style="padding:0.35rem 0.5rem 0.1rem;font-size:0.65rem;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.03em;border-top:1px solid var(--border);">All talents</div>`;
+            printedRecommendedHeader = false; // only print once per transition
+        }
         return `
-            <div class="talent-catalog-item" style="display:flex;align-items:center;padding:0.3rem 0.5rem;font-size:0.8rem;border-bottom:1px solid var(--border);">
+            ${header}
+            <div class="talent-catalog-item" style="display:flex;align-items:center;padding:0.3rem 0.5rem;font-size:0.8rem;border-bottom:1px solid var(--border);${t._affordable ? '' : 'opacity:0.55;'}">
                 <div class="talent-info" style="flex:1;">
+                    ${t._recommended ? '<span title="Common starting talent" style="margin-right:0.2rem;">⭐</span>' : ''}
                     <span style="font-weight:500;">${escHtml(t.name)}</span>
                     <span style="color:var(--gold); margin-left:0.3rem;">${cost} XP</span>
                     <span style="color:var(--text3); font-size:0.75rem; margin-left:0.3rem;">(${tierLabel})</span>
+                    ${!t._affordable ? `<span style="color:var(--text3); font-size:0.7rem; margin-left:0.3rem;">— need ${cost - (remainingXp || 0)} more XP</span>` : ''}
                     ${t.description ? `<div style="color:var(--text2); font-size:0.7rem;">${escHtml(t.description)}</div>` : ''}
                     ${t.prerequisites ? `<div style="color:var(--text3); font-size:0.65rem;">Requires: ${escHtml(t.prerequisites)}</div>` : ''}
+                    ${Array.isArray(t.tags) && t.tags.length ? `<div style="margin-top:0.15rem;">${t.tags.map(tg =>
+                        `<span class="ce-talent-tag-chip" data-tag="${escHtml(tg)}" style="display:inline-block;font-size:0.6rem;color:var(--text3);background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:0.02rem 0.35rem;margin:0.1rem 0.15rem 0 0;cursor:pointer;">${escHtml(tg)}</span>`
+                    ).join('')}</div>` : ''}
                 </div>
-                <button class="btn btn-xs btn-primary ce-catalog-add-btn" data-index="${i}">Add</button>
+                <button class="btn btn-xs btn-primary ce-catalog-add-btn" data-index="${i}" ${t._affordable ? '' : 'title="Not enough remaining XP yet — you can still add it and adjust XP later"'}>Add</button>
             </div>
         `;
     }).join('');
@@ -429,6 +593,17 @@ function renderTalentCatalog() {
             e.preventDefault();
             const idx = parseInt(this.dataset.index, 10);
             addTalentFromCatalog(available[idx]);
+        });
+    });
+
+    // Clicking a tag chip on a talent row filters the catalog to that tag —
+    // a quick way to discover related talents (e.g. click "cantor" to see
+    // every Cantor-tagged talent) without opening the tag dropdown.
+    catalogEl.querySelectorAll('.ce-talent-tag-chip').forEach(chip => {
+        chip.addEventListener('click', function(e) {
+            e.preventDefault();
+            talentFilterState.tag = this.dataset.tag;
+            renderTalentCatalog();
         });
     });
 }
@@ -1302,6 +1477,7 @@ function buildEditorHTML(c) {
             <!-- Talents -->
             <div>
                 <h4 style="margin:0.3rem 0;">🧠 Talents</h4>
+                <div id="ce-talent-filter-bar" style="display:flex;gap:0.3rem;flex-wrap:wrap;margin-bottom:0.3rem;"></div>
                 <div id="ce-talent-catalog" class="talent-catalog" style="max-height:200px;overflow-y:auto;border:1px solid var(--border);border-radius:4px;background:var(--bg3);margin-bottom:0.3rem;"></div>
                 <div id="ce-talent-list"></div>
                 <button type="button" class="btn btn-sm btn-secondary" id="ce-add-custom-talent">+ Add Custom Talent</button>

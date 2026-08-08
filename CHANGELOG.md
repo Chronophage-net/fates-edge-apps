@@ -3,6 +3,18 @@ All notable changes to this project will be documented here.
 
 Format loosely follows [Keep a Changelog](https://keepachangelog.com/), versions follow [Semantic Versioning](https://semver.org/).
 
+## [4.6.1] - 2026-08-08
+
+Talent catalog overhaul: JSON-per-talent expansion (10 -> 55), tagging + category filter bar in the character editor/wizard, and starter/XP-appropriate talent recommendations.
+
+### Chore
+- prune 5 not-yet-free adventures from web-client per updated allowlist
+- sync 9 new adventures (JSON + HTML docs) from fates-edge-docs
+- sync 18 new patron files from fates-edge-docs
+
+### Other
+- Fixed an annoying yet prominant typo.
+
 ## [4.6.0] - 2026-08-07
 
 Diverse encounter objective-type clocks (obstruction, skill challenge, trap/ward, lockpick, heist, social, custom), symbol management fixes, patron/cantor discovery reliability, Kon'reh AI phase-awareness

@@ -72,7 +72,7 @@ const ACTIVATION_TYPES = [
     { id: 'reactive', label: 'Reactive', desc: 'Triggers automatically on a condition. Only one reactive talent per trigger.', icon: '🔁' }
 ];
 
-const TALENT_CATEGORIES = [
+export const TALENT_CATEGORIES = [
     { id: 'general', label: 'General', desc: 'Universal benefits usable by any character' },
     { id: 'combat', label: 'Combat', desc: 'Melee, ranged, defense, and battlefield tactics' },
     { id: 'magic-access', label: 'Magic Access', desc: 'Grants access to a magic path (Spellcraft, Codex, Symbol, etc.)' },
@@ -185,6 +185,7 @@ function openCatalogEditor(talentId) {
             tier: 'minor',
             activation: 'passive',
             category: 'general',
+            tags: [],
             useLimit: 'passive',
             description: '',
             prerequisites: '',
@@ -226,6 +227,7 @@ function openCharacterEditor(characterId, talentIndex) {
         tier: 'minor',
         activation: 'passive',
         category: 'general',
+        tags: [],
         useLimit: 'passive',
         description: '',
         prerequisites: '',
@@ -362,6 +364,18 @@ function showEditorModal(talent, isNew, mode) {
                 </div>
             </div>
             
+            <!-- Tags -->
+            <div class="form-group">
+                <label for="talent-tags">Tags</label>
+                <input type="text" id="talent-tags" value="${escHtml((talent.tags || []).join(', '))}"
+                    placeholder="e.g., melee, once-per-scene, stealth, cantor" />
+                <div style="font-size:0.75rem;color:var(--text3);margin-top:0.2rem;">
+                    Comma-separated. Independent of Category — use tags for cross-cutting traits
+                    (skills touched, activation timing, subsystem) so features and filters can key
+                    off a talent without depending on its single Category value.
+                </div>
+            </div>
+
             <!-- Prerequisites -->
             <div class="form-group">
                 <label for="talent-prereq">Prerequisites</label>
@@ -581,6 +595,10 @@ function saveTalent(originalTalent, isNew, mode) {
     }
     
     const effectText = document.getElementById('talent-effect')?.value?.trim() || '';
+    const tags = (document.getElementById('talent-tags')?.value || '')
+        .split(',')
+        .map(t => t.trim().toLowerCase())
+        .filter(Boolean);
     const talentData = {
         name: name,
         description: document.getElementById('talent-description')?.value?.trim() || '',
@@ -588,6 +606,7 @@ function saveTalent(originalTalent, isNew, mode) {
         tier: tierId,
         activation: document.getElementById('talent-activation')?.value || 'passive',
         category: document.getElementById('talent-category')?.value || 'general',
+        tags,
         useLimit: document.getElementById('talent-use-limit')?.value || 'passive',
         source: document.getElementById('talent-source')?.value || 'custom',
         prerequisites: document.getElementById('talent-prereq')?.value?.trim() || '',

@@ -1201,30 +1201,79 @@ function getAvailableTalentsForTier(d) {
     });
 }
 
+/**
+ * Same "smart" ranking used by the character editor's talent catalog (see
+ * features/characters/editor.js's rankTalentsForDisplay) — pin talents tagged
+ * 'starter' to the top while the character has taken none yet (exactly the
+ * new-character wizard's situation most of the time), and sort what's left
+ * by what's actually affordable with the remaining starting XP budget before
+ * cost/name. Kept as a separate copy rather than a shared import since the
+ * wizard's talent data shape (name/cost pairs, no character record yet) and
+ * XP model (fixed starting pool vs. later downtime XP) differ enough that a
+ * shared helper would need its own branching anyway.
+ */
+function rankTalentsForDisplay(talents, { remainingXp, showStarterPicks }) {
+    return talents
+        .map(t => {
+            const cost = safeParseInt(t.cost, 0);
+            const isStarter = Array.isArray(t.tags) && t.tags.includes('starter');
+            return {
+                ...t,
+                _recommended: showStarterPicks && isStarter,
+                _affordable: remainingXp == null || cost <= remainingXp
+            };
+        })
+        .sort((a, b) => {
+            if (a._recommended !== b._recommended) return a._recommended ? -1 : 1;
+            if (a._affordable !== b._affordable) return a._affordable ? -1 : 1;
+            const costDiff = safeParseInt(a.cost, 0) - safeParseInt(b.cost, 0);
+            if (costDiff !== 0) return costDiff;
+            return (a.name || '').localeCompare(b.name || '');
+        });
+}
+
 function renderTalentCatalog() {
     const catalogContainer = document.getElementById('wz-talent-catalog');
     if (!catalogContainer || !state.data) return;
 
-    const available = getAvailableTalentsForTier(state.data);
-    if (available.length === 0) {
+    const d = state.data;
+    const tierAvailable = getAvailableTalentsForTier(d);
+    if (tierAvailable.length === 0) {
         catalogContainer.innerHTML = '<div class="text-muted" style="padding:0.5rem;">No talents available for your current tier.</div>';
         return;
     }
 
+    const spent = calculateTotalXpSpent(d);
+    const remainingXp = (safeParseInt(d.totalXp, 32)) - spent;
+    const showStarterPicks = !(d.talents && d.talents.length);
+    const available = rankTalentsForDisplay(tierAvailable, { remainingXp, showStarterPicks });
+
+    let printedRecommendedHeader = false;
     catalogContainer.innerHTML = available.map(t => {
         const cost = safeParseInt(t.cost, 0);
         const tierObj = TALENT_TIERS.find(ti => cost >= ti.min && cost <= ti.max);
         const tierLabel = tierObj ? tierObj.label : '?';
+        let header = '';
+        if (t._recommended && !printedRecommendedHeader) {
+            header = `<div style="padding:0.25rem 0.5rem 0.1rem;font-size:0.65rem;font-weight:600;color:var(--gold);text-transform:uppercase;letter-spacing:0.03em;">⭐ Recommended starting talents</div>`;
+            printedRecommendedHeader = true;
+        } else if (!t._recommended && printedRecommendedHeader) {
+            header = `<div style="padding:0.35rem 0.5rem 0.1rem;font-size:0.65rem;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.03em;border-top:1px solid var(--border);">All talents</div>`;
+            printedRecommendedHeader = false;
+        }
         return `
-            <div class="talent-catalog-item">
+            ${header}
+            <div class="talent-catalog-item" style="${t._affordable ? '' : 'opacity:0.55;'}">
                 <div class="talent-info">
+                    ${t._recommended ? '<span title="Common starting talent" style="margin-right:0.2rem;">⭐</span>' : ''}
                     <span style="font-weight:500;">${escHtml(t.name)}</span>
                     <span style="color:var(--gold); margin-left:0.3rem;">${cost} XP</span>
                     <span style="color:var(--text3); font-size:0.75rem; margin-left:0.3rem;">(${tierLabel})</span>
+                    ${!t._affordable ? `<span style="color:var(--text3); font-size:0.7rem; margin-left:0.3rem;">— need ${cost - remainingXp} more XP</span>` : ''}
                     ${t.description ? `<div style="color:var(--text2); font-size:0.7rem;">${escHtml(t.description)}</div>` : ''}
                     ${t.prerequisites ? `<div style="color:var(--text3); font-size:0.65rem;">Requires: ${escHtml(t.prerequisites)}</div>` : ''}
                 </div>
-                <button class="btn btn-xs btn-primary catalog-add-btn" data-name="${escHtml(t.name)}" data-cost="${cost}">Add</button>
+                <button class="btn btn-xs btn-primary catalog-add-btn" data-name="${escHtml(t.name)}" data-cost="${cost}" ${t._affordable ? '' : 'title="Not enough remaining starting XP — you can still add it and adjust elsewhere"'}>Add</button>
             </div>
         `;
     }).join('');

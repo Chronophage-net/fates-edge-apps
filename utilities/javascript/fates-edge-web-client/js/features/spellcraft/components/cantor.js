@@ -324,7 +324,7 @@ function getFallbackCantorTalents() {
             title: "Cantor's Path",
             category: 'magic',
             body: 'Required for Cantor. Grants access to Songs and a Corruption Timer (size = Spirit).',
-            tags: ['talent', 'magic', 'cantor'],
+            tags: ['talent', 'magic', 'magic-access', 'cantor', 'starter', 'major', 'passive'],
             cost: 8
         },
         {
@@ -332,7 +332,7 @@ function getFallbackCantorTalents() {
             title: 'Master Cantor',
             category: 'magic',
             body: 'Once per session, treat a significant Performance roll as one degree better (Miss→Partial, etc.). Once per arc, inspire a community; allies gain +1 die to a single goal for one session. Requires: Performance 4+, Presence 4+, Captivating Performance, Tier III.',
-            tags: ['talent', 'magic', 'cantor', 'prestige'],
+            tags: ['talent', 'magic', 'cantor', 'performance', 'prestige'],
             cost: 10
         },
         {
@@ -380,7 +380,7 @@ function getFallbackCantorTalents() {
             title: 'Bound Patron (Homebrew)',
             category: 'magic',
             body: 'Homebrew — not found in the core rulebooks. Choose one patron. You gain +1 position when singing that patron’s rites, but suffer -1 position when singing any other patron’s rites. Your Corruption is bound to that patron’s bloom table.',
-            tags: ['talent', 'cantor'],
+            tags: ['talent', 'cantor', 'homebrew', 'patron', 'passive'],
             cost: 5
         }
     ];

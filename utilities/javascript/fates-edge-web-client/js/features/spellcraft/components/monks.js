@@ -173,6 +173,14 @@ const BREATH_BONUSES = {
 
 const TALENT_CATEGORY_ORDER = ['foundation', 'working', 'signature', 'quiet'];
 
+// Each talent keeps its original flavor tags (capitalized — 'Strike', 'BOD',
+// 'Flow', etc., unused elsewhere in the UI today but preserved in case a
+// future Monk-specific view wants them) and additionally carries the shared
+// lowercase system-tag vocabulary used by data/talents/*.json and the
+// character editor's talent filter bar (core/talent-loader.js's
+// talentsByTag/collectTalentTags), so a generic "show me monk talents" or
+// "show me starter talents" filter also picks these up even though they live
+// in their own catalog rather than state.talents.
 const FOUNDATION_TALENTS = [
     {
         id: 'open-hand',
@@ -180,7 +188,7 @@ const FOUNDATION_TALENTS = [
         xp: 2,
         category: 'foundation',
         description: 'Once per scene, when you attempt to parry, deflect, or disarm an opponent, treat your first Body or Melee roll as Position +1.',
-        tags: ['Strike', 'BOD', 'Flow'],
+        tags: ['Strike', 'BOD', 'Flow', 'monk', 'unarmed', 'defense', 'reactive', 'once-per-scene', 'starter', 'minor'],
         effect: 'Position +1 on first defensive roll per scene.'
     },
     {
@@ -189,7 +197,7 @@ const FOUNDATION_TALENTS = [
         xp: 2,
         category: 'foundation',
         description: 'When you do not move during your turn, gain +1 die to your next defense roll. This benefit lasts until you move or take an aggressive action.',
-        tags: ['Move', 'SPT', 'Flow'],
+        tags: ['Move', 'SPT', 'Flow', 'monk', 'unarmed', 'defense', 'conditional', 'starter', 'minor'],
         effect: '+1 die to defense when standing still.'
     },
     {
@@ -198,7 +206,7 @@ const FOUNDATION_TALENTS = [
         xp: 2,
         category: 'foundation',
         description: 'Once per session, you may clear 1 Fatigue by meditating for one minute uninterrupted. No roll required.',
-        tags: ['Heal', 'SPT', 'Restoration'],
+        tags: ['Heal', 'SPT', 'Restoration', 'monk', 'unarmed', 'fatigue', 'active', 'once-per-session', 'starter', 'minor'],
         effect: 'Clear 1 Fatigue with 1 minute of meditation.'
     }
 ];
@@ -210,7 +218,7 @@ const WORKING_TALENTS = [
         xp: 3,
         category: 'working',
         description: 'When an enemy misses you with a melee attack, you may immediately reposition them one range band in a direction of your choice. Once per scene.',
-        tags: ['Move', 'Flow', 'Gambit'],
+        tags: ['Move', 'Flow', 'Gambit', 'monk', 'unarmed', 'movement', 'reactive', 'once-per-scene', 'minor'],
         effect: 'Reposition a missing attacker.'
     },
     {
@@ -219,7 +227,7 @@ const WORKING_TALENTS = [
         xp: 4,
         category: 'working',
         description: 'When unarmoured, convert the first point of Harm you would take each scene to Fatigue instead.',
-        tags: ['Armour', 'BOD', 'Flow'],
+        tags: ['Armour', 'BOD', 'Flow', 'monk', 'unarmed', 'defense', 'passive', 'major'],
         effect: 'First Harm per scene becomes Fatigue when unarmoured.'
     },
     {
@@ -228,7 +236,7 @@ const WORKING_TALENTS = [
         xp: 4,
         category: 'working',
         description: 'When you make an unarmed attack, declare a Pressure Point Strike. On a hit, the target suffers -1 die on all physical actions until the end of their next turn.',
-        tags: ['Strike', 'AGI', 'Gambit'],
+        tags: ['Strike', 'AGI', 'Gambit', 'monk', 'unarmed', 'combat', 'active', 'major'],
         effect: '-1 die to target\'s physical actions on hit.'
     }
 ];
@@ -240,7 +248,7 @@ const SIGNATURE_TALENTS = [
         xp: 5,
         category: 'signature',
         description: 'Once per session, when you would be hit by an attack, declare that the attack misses you entirely. Describe how you were not there.',
-        tags: ['Defense', 'Flow', 'Overload'],
+        tags: ['Defense', 'Flow', 'Overload', 'monk', 'unarmed', 'defense', 'reactive', 'once-per-session', 'major'],
         effect: 'Negate one attack per session.',
         cost: 'GM gains 1 Story Beat.'
     },
@@ -250,7 +258,7 @@ const SIGNATURE_TALENTS = [
         xp: 5,
         category: 'signature',
         description: 'Once per session, convert a successful unarmed strike into a healing touch instead of dealing Harm. The target clears 1 Fatigue and may remove a minor Condition.',
-        tags: ['Strike', 'Combo', 'Restoration'],
+        tags: ['Strike', 'Combo', 'Restoration', 'monk', 'unarmed', 'healer', 'active', 'once-per-session', 'major'],
         effect: 'Convert strike to healing touch.'
     }
 ];
@@ -261,7 +269,7 @@ const QUIET_TALENT = {
     xp: 6,
     category: 'quiet',
     description: 'Once per arc, move through a space that should be impassable as if you were never there. You do not break, force, or open. You simply arrive on the other side.',
-    tags: ['Move', 'Flow', 'Overload'],
+    tags: ['Move', 'Flow', 'Overload', 'monk', 'unarmed', 'movement', 'active', 'once-per-arc', 'major', 'capstone'],
     effect: 'Pass through impassable space once per arc.',
     cost: 'Permanent Breath Scar: You can never again be surprised, but neither can you ever truly rest.'
 };
