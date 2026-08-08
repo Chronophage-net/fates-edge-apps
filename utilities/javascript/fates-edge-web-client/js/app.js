@@ -25,6 +25,8 @@ import { getFeatureAccess, getFeatureLockMessage, watchFeatureVisibility } from 
 import { lockApp, initLocalLock } from './core/local-lock.js';
 import { escHtml } from './core/utils.js';
 import { sendEvent, onWSEvent, isConnectedToServer } from './core/websocket.js';
+import { initTheme, setTheme, getCurrentPreference, getResolvedThemeId } from './core/theme-manager.js';
+import { initPackManager } from './core/pack-manager.js';
 
 // ============================================================
 // TEST MODE HANDLING (disabled)
@@ -92,6 +94,17 @@ async function init() {
         }
 
         // 5. Setup UI components
+        //
+        // CHANGED: initPackManager() used to only run when the Settings tab
+        // was opened (settings/index.js's tab-render hook), so any
+        // pack-supplied theme (see core/theme-manager.js) sat unregistered —
+        // and the app silently fell back to dark — until the user happened
+        // to visit Settings after every reload. Running it here too (it's
+        // idempotent — just re-reads localStorage and rebuilds the in-memory
+        // pack registry) means a previously-selected pack theme is
+        // registered and applied before setupTheme()/initTheme() resolves
+        // the user's saved preference, with no flash of the wrong theme.
+        initPackManager();
         setupImportExport();
         setupTheme();
         setupModals();
@@ -570,36 +583,32 @@ function setupImportExport() {
     }
 }
 
+// CHANGED: this used to be its OWN independent dark/light toggle
+// implementation (documentElement.classList.add/remove('light') +
+// localStorage['fates-edge-theme']) — a second copy of exactly the same
+// logic settings/index.js's setTheme() also had, with no registry, no way
+// for a third theme (built-in or pack-supplied) to plug in, and no shared
+// source of truth between the two copies. Both now go through
+// core/theme-manager.js; this function just keeps the sidebar's quick-toggle
+// button in sync with whatever theme-manager resolves (dark/light/auto or —
+// once one is installed — any pack-supplied theme, in which case the quick
+// toggle simply flips between dark and light as a convenience, same as
+// before; the Settings panel's theme picker is where every registered theme
+// is actually selectable).
 function setupTheme() {
+    initTheme();
+
     const toggle = document.getElementById('theme-toggle');
     if (!toggle) return;
 
-    const theme = getStorage('fates-edge-theme');
-    if (theme === 'light') {
-        document.documentElement.classList.add('light');
-        toggle.textContent = '☀️';
-    } else if (theme === 'dark') {
-        document.documentElement.classList.remove('light');
-        toggle.textContent = '🌙';
-    } else {
-        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-        if (!prefersDark) {
-            document.documentElement.classList.add('light');
-            toggle.textContent = '☀️';
-        }
-    }
+    const syncToggleIcon = () => {
+        toggle.textContent = getResolvedThemeId() === 'light' ? '☀️' : '🌙';
+    };
+    syncToggleIcon();
+    document.addEventListener('theme-changed', syncToggleIcon);
 
     toggle.addEventListener('click', () => {
-        const isLight = document.documentElement.classList.contains('light');
-        if (isLight) {
-            document.documentElement.classList.remove('light');
-            setStorage('fates-edge-theme', 'dark');
-            toggle.textContent = '🌙';
-        } else {
-            document.documentElement.classList.add('light');
-            setStorage('fates-edge-theme', 'light');
-            toggle.textContent = '☀️';
-        }
+        setTheme(getResolvedThemeId() === 'light' ? 'dark' : 'light');
     });
 }
 

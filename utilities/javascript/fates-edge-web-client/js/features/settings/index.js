@@ -40,14 +40,19 @@ import {
     sendWSMessage,
     onWSEvent
 } from '../../core/websocket.js';
-import { 
-    installPack, 
-    uninstallPack, 
-    getInstalledPacks, 
+import {
+    installPack,
+    uninstallPack,
+    getInstalledPacks,
     getPack,
     getDocuments,
     initPackManager
 } from '../../core/pack-manager.js';
+import {
+    getThemes,
+    setTheme as applyTheme,
+    getCurrentPreference
+} from '../../core/theme-manager.js';
 
 let container = null;
 
@@ -445,6 +450,7 @@ export function render(el) {
                                     <span class="pack-name">${escHtml(pack.name)}</span>
                                     <span class="pack-version">v${escHtml(pack.version)}</span>
                                     <span class="pack-type">${pack.type}</span>
+                                    ${pack.theme ? `<span class="pack-type" title="This pack registers a theme: ${escHtml(pack.theme.label)}">🎨 theme</span>` : ''}
                                     <span class="pack-meta">${pack.author ? `by ${escHtml(pack.author)}` : ''} · ${new Date(pack.installed).toLocaleDateString()}</span>
                                 </div>
                                 <div class="flex">
@@ -751,15 +757,21 @@ export function render(el) {
             
             <!-- ============================================================
                  THEME & APPEARANCE
+                 CHANGED: the built-in dark/light/auto buttons used to be the
+                 only three that could ever exist here — now the row is
+                 rendered from theme-manager's registry, so any theme a pack
+                 registers (see core/theme-manager.js's doc comment, and a
+                 pack's optional pack.json theme block) shows up right
+                 alongside them the moment that pack is installed, no code
+                 change needed here. "Auto" is still handled as a meta-option
+                 (not a registered theme) exactly as before.
                  ============================================================ -->
             <div class="panel settings-panel">
                 <div class="panel-header">
                     <h3>🎨 Theme & Appearance</h3>
                 </div>
-                <div class="flex" style="gap:0.5rem;">
-                    <button class="btn btn-sm theme-btn" data-theme="dark">🌙 Dark</button>
-                    <button class="btn btn-sm theme-btn" data-theme="light">☀️ Light</button>
-                    <button class="btn btn-sm theme-btn" data-theme="auto">🔄 Auto</button>
+                <div class="flex" style="gap:0.5rem;flex-wrap:wrap;" id="theme-picker">
+                    ${renderThemeButtons()}
                 </div>
             </div>
             
@@ -1818,26 +1830,27 @@ function newSessionHandler() {
 
 // ============================================================
 // THEME FUNCTIONS
+//
+// CHANGED: this used to be its own complete reimplementation of the same
+// dark/light/auto toggle app.js's setupTheme() had (independently touching
+// documentElement.classList and localStorage['fates-edge-theme']) — now
+// both go through core/theme-manager.js, and this module's job is just
+// rendering + rebinding the button row, including any pack-supplied themes.
 // ============================================================
 
+function renderThemeButtons() {
+    const current = getCurrentPreference();
+    const buttons = getThemes().map(t =>
+        `<button class="btn btn-sm theme-btn${current === t.id ? ' active' : ''}" data-theme="${t.id}">${t.icon || '🎨'} ${escHtml(t.label)}</button>`
+    );
+    buttons.push(
+        `<button class="btn btn-sm theme-btn${current === 'auto' ? ' active' : ''}" data-theme="auto">🔄 Auto</button>`
+    );
+    return buttons.join('');
+}
+
 function setTheme(mode) {
-    if (mode === 'light') {
-        document.documentElement.classList.add('light');
-        localStorage.setItem('fates-edge-theme', 'light');
-    } else if (mode === 'dark') {
-        document.documentElement.classList.remove('light');
-        localStorage.setItem('fates-edge-theme', 'dark');
-    } else {
-        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-        if (prefersDark) document.documentElement.classList.remove('light');
-        else document.documentElement.classList.add('light');
-        localStorage.removeItem('fates-edge-theme');
-    }
-    const toggle = document.getElementById('theme-toggle');
-    if (toggle) {
-        const isLight = document.documentElement.classList.contains('light');
-        toggle.textContent = isLight ? '☀️' : '🌙';
-    }
+    applyTheme(mode);
     document.querySelectorAll('.theme-btn').forEach(btn => {
         btn.classList.toggle('active', btn.dataset.theme === mode);
     });

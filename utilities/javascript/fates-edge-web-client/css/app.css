@@ -720,6 +720,70 @@ h1, h2, h3, h4, h5, h6 {
 #combatModal .modal { max-width: 800px; }
 #factionModal .modal { max-width: 700px; }
 
+/* AUDIT FIX: .modal-content/.modal-header/.modal-body/.modal-footer are
+   referenced across app.js (sync conflict screen), kanban/index.js (item &
+   clock detail popups), and patrons/index.js (patron/asset detail popups),
+   but only ever had a stopgap #timerModal-scoped copy of them
+   (features/timers/index.js's injectModalStyles()) — nowhere else. Two of
+   kanban's own usages (`<div class="modal-content item-detail">`,
+   `<div class="modal-content clock-detail">`) carry no inline style at all,
+   so without this they rendered as unstyled, unbounded-width text blocks.
+   This is the shared base every one of those call sites was implicitly
+   assuming existed; per-caller inline styles (patrons/index.js sets its own
+   width/max-width/background on .modal-content) still override it as
+   normal CSS cascade. */
+.modal-content {
+    background: var(--bg-panel);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md, var(--radius));
+    width: 100%;
+    max-width: 550px;
+    max-height: 85vh;
+    overflow-y: auto;
+    padding: 1.5rem 2rem;
+    margin: 0 auto;
+    box-shadow: var(--shadow-elevated);
+    position: relative;
+    animation: scaleIn 0.2s ease-out;
+}
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+.modal-header h2, .modal-header h3 { color: var(--gold); margin: 0; }
+.modal-body { color: var(--text); }
+.modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+    margin-top: 1rem;
+    padding-top: 0.8rem;
+    border-top: 1px solid var(--border-color);
+}
+
+/* AUDIT FIX: .kanban-modal and .patron-modal (also reused verbatim for
+   #asset-modal) are toggled with a bare `modal.style.display = 'block'` /
+   `'none'` in kanban/index.js and patrons/index.js, but neither class had
+   ANY rule here — no fixed positioning, no backdrop, no centering. They
+   rendered inline in the normal document flow instead of as an overlay.
+   z-index matches .modal-overlay/.password-overlay's existing scheme (below
+   #toast-container's 2000 so toasts still surface over an open modal). */
+.kanban-modal,
+.patron-modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    z-index: 1000;
+    overflow-y: auto;
+    padding: 2rem;
+}
+
 .license-box {
     background: var(--bg3);
     border-radius: var(--radius);
@@ -1457,6 +1521,7 @@ select {
     .nav-icon { font-size: 1.3rem; width: auto; }
     .footer-status .status-label { display: none; }
     .main-content { padding: 1rem; }
+    .editor-screen-host { padding: 1rem; }
 
     .grid-2, .grid-3 { grid-template-columns: 1fr; }
     .modal { padding: 1.2rem; }
@@ -1486,6 +1551,7 @@ select {
     .nav-item { padding: 0.5rem 0; }
     .nav-icon { font-size: 1.1rem; }
     .main-content { padding: 0.6rem; }
+    .editor-screen-host { padding: 0.6rem; }
     .patrons-grid, .factions-grid, .trusts-grid, .assets-grid { grid-template-columns: 1fr; }
     .modal { padding: 0.8rem; }
     .toast { max-width: 100%; }
@@ -1500,8 +1566,14 @@ select {
     .ce-fixed-grid { grid-template-columns: 1fr !important; }
 
     /* Character editor modal: use the full viewport on small screens instead
-       of the desktop max-width:950px box with 1.5rem/2rem padding. */
-    #charModal .modal-content {
+       of the desktop max-width:950px box with 1.5rem/2rem padding.
+       AUDIT FIX: this targeted a `.modal-content` descendant of #charModal
+       that has never existed — createModal() in characters/editor.js puts
+       the `editor-screen` class directly ON #charModal itself (with its own
+       inline max-width:950px override), so this rule silently never matched
+       anything and the character editor never got the intended full-viewport
+       mobile treatment. Target #charModal directly instead. */
+    #charModal {
         max-width: 100% !important;
         width: 100% !important;
         height: 100%;
@@ -2091,6 +2163,37 @@ body.xcard-active .app-shell {
    that swap a full "screen" into the view container instead of
    opening an overlay dialog.
    ============================================================ */
+
+/* AUDIT FIX: .editor-screen-host is the outer container every inline
+   screen actually gets — created by components/InlineScreen.js's
+   openInlineScreen() and hand-rolled the same way in ~14 other feature
+   modules (talent-editor.js, app.js's conflict modal, encounters/editor.js,
+   wiki/editor.js, vtt/editor.js, timers, adventure-manager, docs, decks,
+   kon-reh, bestiary, whiteboard onboarding, etc.). It had NO rule anywhere
+   in this file. Since it's appended straight into #app-content
+   (`.app-shell`, a `display:flex; height:100vh; overflow:hidden` row
+   alongside the sidebar), an unstyled host became a flex item with
+   default `align-items:stretch` (so it happened to fill the row's
+   height) but auto/content-based width and no overflow handling of its
+   own — any screen taller than the viewport had nowhere to scroll,
+   since the flex row itself clips overflow. This gives it the same
+   flex-basis/scroll/padding contract `.main-content` (the pane it's
+   standing in for) already has, so every inline screen scrolls and
+   sizes consistently no matter which feature opened it. */
+.editor-screen-host {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    min-width: 0;
+    overflow-y: auto;
+    padding: 2rem 3rem;
+    background: var(--bg-main);
+    animation: fadeIn 0.2s ease-in-out;
+}
+.editor-screen-host::-webkit-scrollbar { width: 8px; }
+.editor-screen-host::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 4px; }
+
 .editor-screen {
     background: var(--bg-panel);
     border: 1px solid var(--border-color);

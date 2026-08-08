@@ -1,0 +1,75 @@
+/* ============================================================
+   MODERN NOIR — cyberpunk reskin (DRAFT / v0.1.0)
+   ============================================================
+   Paired with pack.json's `theme.variables` (the color-token pass — see
+   that file for the full custom-property palette). Everything in THIS file
+   is the second layer theme-manager.js supports: changes CSS variables
+   alone can't express (typography, corner treatment, decorative touches).
+
+   Loaded via a <link> that theme-manager.js only attaches while
+   data-theme="modern-noir" is active (see core/theme-manager.js's
+   applyResolvedTheme()) — every selector below is still scoped with the
+   `html[data-theme="modern-noir"]` prefix anyway, defense-in-depth against
+   a future change to how/when themes get swapped, and so this file is safe
+   to read standalone and know exactly what it touches.
+
+   STATUS: intentionally minimal. This is the plug-point + a starting
+   palette, not a finished reskin — see the sibling README.md for the
+   intended next passes (typography, iconography, VTT grid/token treatment)
+   once the Modern Noir setting expansion content itself
+   (fates-edge-docs/ttrpg/reference/expansions/modern_noir.tex) is revised.
+   ============================================================ */
+
+/* Sharp, "terminal readout" corners instead of the default soft rounding —
+   pairs with the --radius overrides in pack.json's variables block. */
+html[data-theme="modern-noir"] .panel,
+html[data-theme="modern-noir"] .modal,
+html[data-theme="modern-noir"] .modal-content,
+html[data-theme="modern-noir"] .editor-screen,
+html[data-theme="modern-noir"] .btn,
+html[data-theme="modern-noir"] input,
+html[data-theme="modern-noir"] select,
+html[data-theme="modern-noir"] textarea {
+    border-radius: var(--radius);
+}
+
+/* Monospace for headings — the "readout" feel — body copy stays legible
+   in the default sans so long text (rules, wiki entries, chat) isn't
+   compromised for style. */
+html[data-theme="modern-noir"] h1,
+html[data-theme="modern-noir"] h2,
+html[data-theme="modern-noir"] h3,
+html[data-theme="modern-noir"] .brand-name,
+html[data-theme="modern-noir"] .nav-group-title {
+    font-family: 'Courier New', ui-monospace, monospace;
+    letter-spacing: 0.02em;
+}
+
+/* Neon edge-glow instead of a soft drop shadow on elevated surfaces. */
+html[data-theme="modern-noir"] .modal,
+html[data-theme="modern-noir"] .modal-content,
+html[data-theme="modern-noir"] .editor-screen {
+    box-shadow: var(--shadow-elevated), 0 0 0 1px var(--border), var(--shadow-glow);
+}
+
+/* Gold-accent gradient text (brand name, .modal h2::after underline) reads
+   oddly once "gold" IS cyan — repoint the underline gradient to the accent
+   pair instead of assuming warm tones. */
+html[data-theme="modern-noir"] .modal h2::after {
+    background: linear-gradient(90deg, var(--gold), var(--blue));
+}
+
+/* Scanline texture on the sidebar only — cheap, subtle, doesn't fight with
+   text contrast, and keeps the effect from being applied to reading-heavy
+   surfaces (wiki, docs, chat) where it would hurt legibility. */
+html[data-theme="modern-noir"] .sidebar {
+    background:
+        repeating-linear-gradient(
+            0deg,
+            rgba(0, 245, 212, 0.025) 0px,
+            rgba(0, 245, 212, 0.025) 1px,
+            transparent 1px,
+            transparent 3px
+        ),
+        linear-gradient(180deg, var(--bg-sidebar) 0%, var(--bg) 100%);
+}

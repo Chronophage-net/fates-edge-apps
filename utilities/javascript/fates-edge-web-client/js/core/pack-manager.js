@@ -14,6 +14,7 @@ import { getState, saveState } from './state.js';
 import { showToast } from '../components/Toast.js';
 import { registerRoute } from '../router.js';
 import { moduleLoader } from '../module-loader.js';
+import { registerTheme, unregisterTheme } from './theme-manager.js';
 
 // ============================================================
 // CONSTANTS
@@ -43,12 +44,47 @@ export function loadInstalledPacks() {
         // Rebuild registry from installed packs
         installedPacks.forEach(pack => {
             packRegistry.set(pack.id, pack);
+            // NEW: re-register any theme a pack carries. Route modules
+            // (mod.blobUrl) DON'T survive this — blob: URLs only live for
+            // the browser session that created them, and nothing here
+            // recreates them from the stored `code` text, so a pack's
+            // routes silently stop resolving after a reload (pre-existing
+            // limitation, not introduced by theme support). Themes avoid
+            // that: installPack() below stores the theme's raw CSS as text
+            // (not just a blob URL), so a fresh blob can be reconstituted
+            // here every time, and `variables` is already plain JSON — a
+            // pack theme (unlike a pack's JS modules) genuinely survives
+            // reload.
+            if (pack.theme) {
+                reregisterPackTheme(pack.theme);
+            }
         });
     } catch (e) {
         console.warn('Failed to load installed packs:', e);
         installedPacks = [];
     }
     return installedPacks;
+}
+
+/** Rebuilds a fresh blob: URL from a pack's stored CSS text (if any) and
+ *  (re-)registers the theme with theme-manager. Used both right after
+ *  install and on every subsequent app boot via loadInstalledPacks(). */
+function reregisterPackTheme(themeInfo) {
+    if (!themeInfo || !themeInfo.id) return;
+    let cssUrl;
+    if (themeInfo.cssText) {
+        const blob = new Blob([themeInfo.cssText], { type: 'text/css' });
+        cssUrl = URL.createObjectURL(blob);
+    }
+    registerTheme({
+        id: themeInfo.id,
+        label: themeInfo.label,
+        icon: themeInfo.icon,
+        isDark: themeInfo.isDark,
+        variables: themeInfo.variables,
+        cssUrl,
+    });
+    return cssUrl;
 }
 
 export function saveInstalledPacks() {
@@ -72,10 +108,32 @@ export function validatePack(manifest) {
     if (!manifest.type) errors.push('Pack type is required');
     
     // Type validation
-    if (!['module', 'document', 'hybrid'].includes(manifest.type)) {
-        errors.push('Pack type must be "module", "document", or "hybrid"');
+    //
+    // NEW: 'theme' added — a pack whose only real payload is a re-skin (a
+    // Modern Noir cyberpunk reskin being the motivating case; see
+    // data/themes/modern-noir/ for the starter scaffold). It's just sugar
+    // for "hybrid pack with no modules/documents required, but a theme
+    // block instead" — the manifest.theme validation below applies to ANY
+    // pack type, so an existing 'module' or 'hybrid' pack can carry a theme
+    // alongside its routes/data too without needing type: 'theme'.
+    if (!['module', 'document', 'hybrid', 'theme'].includes(manifest.type)) {
+        errors.push('Pack type must be "module", "document", "hybrid", or "theme"');
     }
-    
+
+    // Theme validation (optional block, any pack type)
+    if (manifest.theme) {
+        if (!manifest.theme.id) errors.push('theme.id is required');
+        if (!manifest.theme.label) errors.push('theme.label is required');
+        if (!manifest.theme.cssPath && !manifest.theme.variables) {
+            errors.push('theme must specify at least one of theme.cssPath or theme.variables');
+        }
+        if (manifest.theme.variables && typeof manifest.theme.variables !== 'object') {
+            errors.push('theme.variables must be an object of CSS custom-property overrides');
+        }
+    } else if (manifest.type === 'theme') {
+        errors.push('Pack type is "theme" but no theme block is present');
+    }
+
     // Module validation
     if (manifest.modules && manifest.modules.length > 0) {
         manifest.modules.forEach((mod, idx) => {
@@ -297,7 +355,35 @@ export async function installPack(file) {
                             }
                         }
                     }
-                    
+
+                    // Process theme (optional, any pack type — see
+                    // theme-manager.js and validatePack()'s theme block
+                    // above). cssPath is read as TEXT (not just turned into
+                    // a throwaway blob URL) specifically so it can be
+                    // persisted to localStorage and reconstituted into a
+                    // fresh blob URL on every future app boot — see
+                    // reregisterPackTheme()/loadInstalledPacks().
+                    let installedTheme = null;
+                    if (manifest.theme) {
+                        let cssText = null;
+                        if (manifest.theme.cssPath) {
+                            const cssFile = zip.file(manifest.theme.cssPath);
+                            if (!cssFile) {
+                                reject(new Error(`Theme CSS file not found: ${manifest.theme.cssPath}`));
+                                return;
+                            }
+                            cssText = await cssFile.async('text');
+                        }
+                        installedTheme = {
+                            id: manifest.theme.id,
+                            label: manifest.theme.label,
+                            icon: manifest.theme.icon,
+                            isDark: manifest.theme.isDark !== false,
+                            variables: manifest.theme.variables || null,
+                            cssText,
+                        };
+                    }
+
                     // Store pack info
                     const packInfo = {
                         ...manifest,
@@ -306,14 +392,20 @@ export async function installPack(file) {
                         modules: installedModules,
                         documents: installedDocs,
                         data: installedData,
+                        theme: installedTheme,
                         active: true
                     };
-                    
+
                     // Add to registry
                     packRegistry.set(packInfo.id, packInfo);
                     installedPacks.push(packInfo);
                     saveInstalledPacks();
-                    
+
+                    if (installedTheme) {
+                        reregisterPackTheme(installedTheme);
+                        console.log(`🎨 Registered theme "${installedTheme.label}" from pack "${manifest.name}".`);
+                    }
+
                     // Show success
                     showToast(`📦 Pack "${manifest.name}" installed successfully!`, 'success');
                     resolve(packInfo);
@@ -441,7 +533,13 @@ export function uninstallPack(packId) {
             }
         });
     }
-    
+
+    // Unregister this pack's theme, if any — falls back to 'dark' via
+    // theme-manager if it was the active theme (see unregisterTheme()).
+    if (pack.theme) {
+        unregisterTheme(pack.theme.id);
+    }
+
     // Remove from registry
     packRegistry.delete(packId);
     installedPacks = installedPacks.filter(p => p.id !== packId);
