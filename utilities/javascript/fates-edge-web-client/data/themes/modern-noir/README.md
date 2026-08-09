@@ -1,4 +1,4 @@
-# Modern Noir theme pack (draft, v0.1.0)
+# Modern Noir theme pack (v0.2.0)
 
 A cyberpunk visual reskin, meant to eventually accompany the **Modern Noir**
 setting expansion (`fates-edge-docs/ttrpg/reference/expansions/modern_noir.tex`
@@ -57,18 +57,32 @@ install, you can also just hand-register it for local dev by calling
 `pack.json`'s `theme` block — useful while iterating on `theme.css` without
 re-zipping on every change.
 
-## Roadmap (not yet done)
+## What's new in v0.2.0
 
-- Typography pass beyond headings (a real display face for the brand mark,
-  not just `monospace`).
-- VTT grid/token treatment — the whiteboard/combat grid currently inherits
-  plain theme colors only; a cyberpunk pass would want its own grid line
-  style and token glow.
-- Iconography — the emoji icons used throughout (🎲, 📜, ⚔️, etc.) read
-  oddly against a neon-noir palette; likely wants a small SVG icon set
-  swapped in per-theme eventually, which the current theme system doesn't
-  have a hook for yet (icons are hardcoded in each feature's template
-  strings, not themed) — flagging this as a real limitation of the theme
-  system as it stands today, not just this draft.
-- Coordinate the palette/tone with whatever the `modern_noir.tex` content
-  revision lands on, rather than the other way around.
+- Typography: brand mark now gets its own rule (uppercase, wider tracking,
+  cyan text-shadow) on top of the existing h1–h3 monospace treatment.
+- VTT grid/token treatment: `.vtt-grid`/`.whiteboard-grid`/`.combat-grid`
+  get a tinted grid line color instead of inheriting neutral defaults, and
+  tokens/markers get a neon rim-light (`--token-color` custom property,
+  falling back to the theme accent) instead of a plain outline.
+- Iconography: a targeted `filter` desaturate-and-retint on the handful of
+  icon classes most likely to read oddly in full color (dice, scroll,
+  flame, brand icon).
+- This theme now ships as part of the full **Modern Noir module package**
+  in the docs repo (`fates-edge-docs/ttrpg/reference/expansions/modern-noir-module/`),
+  which bundles this theme with case/faction data for the web client and a
+  ready-to-push socket-server adventure. This folder remains the
+  development copy; the docs module folder is the distributable.
+
+## Roadmap (still not done)
+
+- A real SVG icon set swapped in per-theme — the `filter` spot-fix above
+  covers the worst offenders but isn't a substitute for actual themed
+  iconography. Icons are still hardcoded in each feature's template
+  strings, not themed, which remains a real limitation of the theme system
+  as it stands today.
+- `--token-color` is read by the CSS above but nothing sets it per-token
+  yet — the VTT token/marker components would need to write that custom
+  property (e.g. from a faction color) for the glow to vary; today every
+  token gets the same accent-color glow.
+- Further coordinate palette/tone with the `modern_noir.tex` revision.

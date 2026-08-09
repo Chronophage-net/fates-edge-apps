@@ -1,10 +1,10 @@
 {
   "id": "modern-noir",
   "name": "Modern Noir (Cyberpunk Reskin)",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "type": "theme",
   "author": "Nicholas A. Gasper",
-  "description": "A cyberpunk visual reskin for the toolkit, paired with the Modern Noir setting expansion (see fates-edge-docs/ttrpg/reference/expansions/modern_noir.tex). Currently a color/typography pass only — no modules or data yet. Palette and layout are a STARTING POINT, expected to be revised alongside the expansion content itself.",
+  "description": "A cyberpunk visual reskin for the toolkit, paired with the Modern Noir setting expansion (see fates-edge-docs/ttrpg/reference/expansions/modern_noir.tex) and the full Modern Noir module package (fates-edge-docs/ttrpg/reference/expansions/modern-noir-module/), which bundles this same theme with case data for the web client and a ready-to-push socket-server adventure module. Color/typography pass plus a first VTT grid/token treatment and spot icon fixes — see README's roadmap for what's still open.",
   "theme": {
     "id": "modern-noir",
     "label": "Modern Noir",

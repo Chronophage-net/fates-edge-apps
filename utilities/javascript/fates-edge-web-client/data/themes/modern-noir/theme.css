@@ -73,3 +73,63 @@ html[data-theme="modern-noir"] .sidebar {
         ),
         linear-gradient(180deg, var(--bg-sidebar) 0%, var(--bg) 100%);
 }
+
+/* --------------------------------------------------------------
+   VTT grid/token treatment — first pass at the README's roadmap
+   item. Scoped so it only touches the whiteboard/combat surfaces,
+   not the theme generally.
+   -------------------------------------------------------------- */
+
+/* Combat grid lines get the same cyan readout tint as the sidebar
+   scanlines, instead of inheriting a neutral grid color. */
+html[data-theme="modern-noir"] .vtt-grid,
+html[data-theme="modern-noir"] .whiteboard-grid,
+html[data-theme="modern-noir"] .combat-grid {
+    background-color: var(--bg2);
+    background-image:
+        linear-gradient(var(--border-light) 1px, transparent 1px),
+        linear-gradient(90deg, var(--border-light) 1px, transparent 1px);
+}
+
+/* Token glow — replaces a plain outline with a neon rim light keyed to
+   whichever accent the token/marker already uses (falls back to --gold,
+   i.e. cyan in this palette, when no per-token color is set). */
+html[data-theme="modern-noir"] .token,
+html[data-theme="modern-noir"] .vtt-token,
+html[data-theme="modern-noir"] .map-marker {
+    box-shadow: 0 0 6px 1px var(--token-color, var(--gold-glow-strong));
+    border-color: var(--token-color, var(--gold));
+}
+
+html[data-theme="modern-noir"] .token.is-selected,
+html[data-theme="modern-noir"] .vtt-token.is-selected {
+    box-shadow: 0 0 10px 3px var(--token-color, var(--gold-glow-strong));
+}
+
+/* --------------------------------------------------------------
+   Iconography — targeted overrides for the handful of emoji icons
+   that read most oddly against a neon-noir palette (dice, scrolls,
+   flame). This is a spot-fix, not the SVG icon-set hook flagged as
+   a real gap in the README — that still doesn't exist. Desaturates
+   the emoji via a CSS filter so it reads as "terminal glyph" rather
+   than the default full-color emoji rendering.
+   -------------------------------------------------------------- */
+html[data-theme="modern-noir"] .icon-dice,
+html[data-theme="modern-noir"] .icon-scroll,
+html[data-theme="modern-noir"] .icon-flame,
+html[data-theme="modern-noir"] .brand-icon {
+    filter: grayscale(1) sepia(1) hue-rotate(130deg) saturate(4) brightness(1.1);
+}
+
+/* --------------------------------------------------------------
+   Typography — display face for the brand mark, beyond the plain
+   monospace heading treatment above. Stacks system-available
+   condensed/mono faces before falling back to the h1-h3 monospace
+   rule already defined; doesn't require a webfont import.
+   -------------------------------------------------------------- */
+html[data-theme="modern-noir"] .brand-name {
+    font-family: 'Courier New', 'Consolas', ui-monospace, monospace;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    text-shadow: 0 0 8px var(--gold-glow-strong);
+}
