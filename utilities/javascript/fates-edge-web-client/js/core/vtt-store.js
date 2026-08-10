@@ -1,9 +1,16 @@
 /**
  * Reactive store for VTT state.
  * All state mutations go through this store, and UI components subscribe to slices.
- * 
+ *
  * v2 – Added character selection and avatar support.
+ * v3 – "Remote enabled": a client can drive more than one character at once
+ *      (up to MAX_CONTROLLED_CHARACTERS), not just a single selection.
  */
+
+// Mirrors server/security.js's MAX_CONTROLLED_CHARACTERS. Kept as a client-
+// side constant too so the UI can stop a 7th selection locally instead of
+// letting the server silently drop it after the fact.
+export const MAX_CONTROLLED_CHARACTERS = 6;
 
 class VTTStore {
   constructor() {
@@ -14,7 +21,14 @@ class VTTStore {
       voiceClients: [],
       presence: [],
       connectionStatus: 'local',
+      // `selectedCharacterId` stays the single "active sheet" -- the
+      // character whose detail panel/tracker math is shown right now.
+      // `selectedCharacterIds` is the broader "which characters is this
+      // client claiming/driving" set used by Remote mode; when Remote is
+      // off the two are always kept in lockstep (0 or 1 entries).
       selectedCharacterId: null,
+      selectedCharacterIds: [],
+      remoteEnabled: false,
     };
     this.subscribers = new Map();
     this._nextId = 1;
@@ -88,17 +102,81 @@ class VTTStore {
     }
   }
 
+  /**
+   * Single-select: replaces whatever was selected before (Remote mode
+   * off). Also resets `selectedCharacterIds` to match, so the two stay in
+   * lockstep whenever the caller isn't using multi-select.
+   */
   selectCharacter(id) {
     const chars = this.state.characters || [];
     if (id !== null && !chars.some(c => c.id === id)) {
       console.warn('[VTTStore] Character not found:', id);
       return;
     }
-    this.setState({ selectedCharacterId: id });
+    this.setState({ selectedCharacterId: id, selectedCharacterIds: id ? [id] : [] });
     const selectedChar = id ? chars.find(c => c.id === id) : null;
     document.dispatchEvent(new CustomEvent('characterSelected', {
       detail: { character: selectedChar, id }
     }));
+  }
+
+  setRemoteEnabled(enabled) {
+    this.setState({ remoteEnabled: !!enabled });
+    if (!enabled) {
+      // Dropping back to single-select: keep only the current "active"
+      // character (if any) instead of leaving a stale multi-selection
+      // the single-select UI can't represent.
+      const first = this.state.selectedCharacterIds[0] || null;
+      this.selectCharacter(first);
+    }
+  }
+
+  isRemoteEnabled() {
+    return !!this.state.remoteEnabled;
+  }
+
+  /**
+   * Multi-select toggle for Remote mode: adds/removes `id` from
+   * `selectedCharacterIds`, capped at MAX_CONTROLLED_CHARACTERS. The
+   * first entry in the set is also treated as the "active" character
+   * (selectedCharacterId) for anything that only knows about a single
+   * selection (detail panel, combat tracker range math, etc.).
+   * Returns false (and leaves state unchanged) if the cap would be
+   * exceeded, so the caller can surface that to the user.
+   */
+  toggleCharacterSelection(id) {
+    const chars = this.state.characters || [];
+    if (!chars.some(c => c.id === id)) {
+      console.warn('[VTTStore] Character not found:', id);
+      return false;
+    }
+    const current = this.state.selectedCharacterIds || [];
+    let next;
+    if (current.includes(id)) {
+      next = current.filter(cid => cid !== id);
+    } else {
+      if (current.length >= MAX_CONTROLLED_CHARACTERS) return false;
+      next = [...current, id];
+    }
+    this.setState({ selectedCharacterIds: next, selectedCharacterId: next[0] || null });
+    document.dispatchEvent(new CustomEvent('characterSelected', {
+      detail: { character: next[0] ? chars.find(c => c.id === next[0]) : null, id: next[0] || null }
+    }));
+    return true;
+  }
+
+  /**
+   * Replace the full selection set at once (e.g. syncing from a
+   * server-broadcast presence update, where we already know the exact
+   * final set rather than one toggle at a time). Deduped and capped at
+   * MAX_CONTROLLED_CHARACTERS, silently dropping anything past the cap
+   * rather than throwing -- the server is the source of truth for
+   * enforcement, this is just keeping the local view in sync with it.
+   */
+  setSelectedCharacterIds(ids) {
+    const chars = this.state.characters || [];
+    const deduped = [...new Set((ids || []).filter(id => chars.some(c => c.id === id)))].slice(0, MAX_CONTROLLED_CHARACTERS);
+    this.setState({ selectedCharacterIds: deduped, selectedCharacterId: deduped[0] || null });
   }
 
   getSelectedCharacter() {
@@ -110,6 +188,17 @@ class VTTStore {
 
   getSelectedCharacterId() {
     return this.state.selectedCharacterId;
+  }
+
+  /** All characters this client currently has selected (Remote mode). */
+  getSelectedCharacters() {
+    const ids = this.state.selectedCharacterIds || [];
+    const chars = this.state.characters || [];
+    return ids.map(id => chars.find(c => c.id === id)).filter(Boolean);
+  }
+
+  getSelectedCharacterIds() {
+    return this.state.selectedCharacterIds || [];
   }
 
   _updatePresence() {

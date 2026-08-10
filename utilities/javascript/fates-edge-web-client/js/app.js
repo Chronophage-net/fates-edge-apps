@@ -907,8 +907,8 @@ function updatePresenceUI(clients) {
                 ${showAvatars ? generateAvatarHTML(client.email, client.name, 32) : `
                     <span class="status-dot" style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${client.status === 'online' ? 'var(--green)' : 'var(--gold)'};"></span>
                 `}
-                <span style="font-weight:${isYou ? '600' : '400'};">${client.name || 'Unknown'} ${isYou ? '(you)' : ''}</span>
-                <span class="text-muted small" style="font-size:0.7rem;background:var(--bg4);padding:0.05rem 0.4rem;border-radius:12px;">${client.role || 'player'}</span>
+                <span style="font-weight:${isYou ? '600' : '400'};">${escHtml(client.name) || 'Unknown'} ${isYou ? '(you)' : ''}</span>
+                <span class="text-muted small" style="font-size:0.7rem;background:var(--bg4);padding:0.05rem 0.4rem;border-radius:12px;">${escHtml(client.role) || 'player'}</span>
                 ${client.status === 'away' ? '<span class="text-muted small">(away)</span>' : ''}
             </div>
         `;
@@ -929,7 +929,7 @@ function generateAvatarHTML(email, name, size = 32) {
     const fallbackDataUrl = `data:image/svg+xml,${fallbackSvg}`;
 
     return `
-        <img src="${avatarUrl}" alt="${name || 'User'}"
+        <img src="${escHtml(avatarUrl)}" alt="${escHtml(name) || 'User'}"
              style="width:${size}px;height:${size}px;border-radius:50%;object-fit:cover;background:var(--bg3);border:2px solid var(--border);flex-shrink:0;"
              loading="lazy"
              onerror="this.src='${fallbackDataUrl.replace(/'/g, "\\'")}'" />

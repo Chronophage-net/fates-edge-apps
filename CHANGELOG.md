@@ -3,6 +3,12 @@ All notable changes to this project will be documented here.
 
 Format loosely follows [Keep a Changelog](https://keepachangelog.com/), versions follow [Semantic Versioning](https://semver.org/).
 
+## [4.7.0] - 2026-08-10
+
+Security hardening pass (XSS fixes, auth rate limiting, input length limits) and multi-character 'Remote enabled' control (up to 6 characters per client)
+
+_No commits since the last tag — manual version bump._
+
 ## [4.6.3] - 2026-08-10
 
 ### Other

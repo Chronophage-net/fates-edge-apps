@@ -229,7 +229,15 @@ export function escHtml(str) {
     if (!str) return '';
     const div = document.createElement('div');
     div.textContent = str;
-    return div.innerHTML;
+    // div.innerHTML only escapes characters that are special in *text*
+    // node content (& < >) -- it does NOT escape quote characters, since
+    // they have no special meaning there. Callers throughout the app use
+    // escHtml() output inside quoted HTML attributes (alt="...", value="...",
+    // title="...", etc.), where an unescaped `"` or `'` lets attacker-
+    // controlled data (player names, chat text, notes) break out of the
+    // attribute and inject arbitrary markup/event handlers. Escape quotes
+    // explicitly so escHtml() is safe in both text and attribute contexts.
+    return div.innerHTML.replace(/"/g, '&quot;').replace(/'/g, '&#39;');
 }
 
 /**

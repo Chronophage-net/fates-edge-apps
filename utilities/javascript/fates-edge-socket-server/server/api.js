@@ -22,7 +22,7 @@ const path = require('path');
 const crypto = require('crypto');
 const room = require('./room.js');
 const deck = require('./deck.js');
-const { safeAssign, buildSafeDict, isSafeModuleId, isSafeCampaignCode, clampCount, UNSAFE_KEYS } = require('./security.js');
+const { safeAssign, buildSafeDict, isSafeModuleId, isSafeCampaignCode, clampCount, UNSAFE_KEYS, createRateLimiter, MAX_NAME_LENGTH } = require('./security.js');
 const adventure = require('./adventure.js');
 const { deriveManifestFromContent } = require('./module-manifest-utils.js');
 const auth = require('./auth.js');
@@ -178,7 +178,19 @@ function createApiRouter(appConfig) {
         next();
     }
 
-    router.post('/api/auth/register', requireAccountSupport, async (req, res) => {
+    // NEW: /api/auth/login and /api/auth/register are the only routes in
+    // this file that are reachable WITHOUT the admin x-api-key -- by
+    // design, anyone should be able to create an account or log in. That
+    // also means they were previously wide open to unlimited password
+    // guessing (login) or account-creation spam (register), with nothing
+    // slowing an attacker down beyond bcrypt's own per-attempt cost. Cap
+    // both to a modest per-IP rate so credential stuffing / brute force
+    // is impractical without blocking legitimate users who mistype a
+    // password a few times.
+    const loginLimiter = createRateLimiter({ windowMs: 15 * 60 * 1000, max: 10, message: 'Too many login attempts. Please wait a few minutes and try again.' });
+    const registerLimiter = createRateLimiter({ windowMs: 60 * 60 * 1000, max: 10, message: 'Too many accounts created from this address. Please try again later.' });
+
+    router.post('/api/auth/register', registerLimiter, requireAccountSupport, async (req, res) => {
         try {
             const { username, password } = req.body || {};
             if (!auth.isValidUsername(username)) {
@@ -200,7 +212,7 @@ function createApiRouter(appConfig) {
         }
     });
 
-    router.post('/api/auth/login', requireAccountSupport, async (req, res) => {
+    router.post('/api/auth/login', loginLimiter, requireAccountSupport, async (req, res) => {
         try {
             const { username, password } = req.body || {};
             if (!username || !password) {
@@ -278,8 +290,8 @@ function createApiRouter(appConfig) {
     router.post('/api/account/characters', requireAccountSupport, auth.requireAuth, async (req, res) => {
         try {
             const { name, data } = req.body || {};
-            if (!name || typeof name !== 'string' || UNSAFE_KEYS.has(name)) {
-                return res.status(400).json({ error: 'A valid character name is required' });
+            if (!name || typeof name !== 'string' || UNSAFE_KEYS.has(name) || name.length > MAX_NAME_LENGTH) {
+                return res.status(400).json({ error: `A valid character name (max ${MAX_NAME_LENGTH} characters) is required` });
             }
             const character = await storage.createCharacter(req.user.userId, name, data || {});
             res.status(201).json({ success: true, character });
@@ -1289,7 +1301,7 @@ function createApiRouter(appConfig) {
             try {
                 const r = room.getRoom(req.params.code);
                 const name = req.params.name;
-                if (!name || UNSAFE_KEYS.has(name)) {
+                if (!name || UNSAFE_KEYS.has(name) || name.length > MAX_NAME_LENGTH) {
                     return res.status(400).json({ error: 'Invalid character name' });
                 }
                 const existing = room.getCharacter(r, name);

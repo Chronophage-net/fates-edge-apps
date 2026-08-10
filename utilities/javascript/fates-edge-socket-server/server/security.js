@@ -92,6 +92,111 @@ function clampCount(count, { min = 1, max = 10, fallback = 1 } = {}) {
     return Math.max(min, Math.min(max, n));
 }
 
+// ─── Free-text length limits ─────────────────────────────────────────
+// Nothing previously capped how long a display name / character name /
+// NPC name etc. a client could send -- an attacker (or just a fat-
+// fingered client) could push an arbitrarily large string into room
+// state that then gets stored, broadcast to everyone in the room on
+// every update, and re-rendered client-side. Two tiers:
+//   - NAME: short identity fields (player display name, character/NPC/
+//     creature name, token label). Matches the existing account
+//     username bound (isValidUsername allows up to 32) with a little
+//     headroom for display names that aren't also login handles.
+//   - TEXT: free-form prose (whiteboard notes, adventure log entries).
+const MAX_NAME_LENGTH = 40;
+const MAX_TEXT_LENGTH = 1000;
+
+// A single connected client ("Remote enabled") may drive more than one
+// game character at once -- e.g. a solo player running a full party, or
+// a GM puppeting several NPCs. Capped at a full standard TTRPG party size
+// so one client can't claim an unbounded slice of a room's roster.
+const MAX_CONTROLLED_CHARACTERS = 6;
+
+/**
+ * Normalize a client's requested character-selection payload (which may
+ * arrive as a single legacy `character` string or a new `characters`
+ * array) into a deduped array of valid, length-checked name strings,
+ * capped at MAX_CONTROLLED_CHARACTERS. Never throws.
+ */
+function sanitizeCharacterSelection(input) {
+    const raw = Array.isArray(input) ? input : (input ? [input] : []);
+    const seen = new Set();
+    const out = [];
+    for (const item of raw) {
+        if (typeof item !== 'string') continue;
+        const name = item.trim();
+        if (!name || name.length > MAX_NAME_LENGTH) continue;
+        const key = name.toLowerCase();
+        if (seen.has(key)) continue;
+        seen.add(key);
+        out.push(name);
+        if (out.length >= MAX_CONTROLLED_CHARACTERS) break;
+    }
+    return out;
+}
+
+/** True if `str` is a string no longer than `max` characters. */
+function isValidLength(str, max) {
+    return typeof str === 'string' && str.length <= max;
+}
+
+/** Coerce to a string and truncate to `max` characters (never throws). */
+function clampString(value, max, fallback = '') {
+    if (typeof value !== 'string') return fallback;
+    return value.slice(0, max);
+}
+
+/**
+ * Minimal in-memory fixed-window rate limiter, keyed by IP (or any string
+ * key the caller derives). No dependency on express-rate-limit -- this is
+ * intentionally small since it only needs to guard a handful of sensitive
+ * routes (login/register), not general API traffic.
+ *
+ * NOTE: per-process state -- resets on restart and isn't shared across
+ * multiple server instances behind a load balancer. That's an acceptable
+ * trade-off for slowing down credential-stuffing/brute-force attempts; it
+ * is not a substitute for account lockout or a shared store (e.g. Redis)
+ * in a real multi-instance deployment.
+ */
+function createRateLimiter({ windowMs = 15 * 60 * 1000, max = 10, message = 'Too many requests, please try again later.' } = {}) {
+    const hits = new Map(); // key -> { count, resetAt }
+
+    // Periodically drop expired entries so this Map can't grow unbounded
+    // under sustained traffic from many distinct IPs.
+    const sweepInterval = setInterval(() => {
+        const now = Date.now();
+        for (const [key, entry] of hits) {
+            if (entry.resetAt <= now) hits.delete(key);
+        }
+    }, windowMs).unref();
+
+    function middleware(req, res, next) {
+        // req.ip (not a raw X-Forwarded-For header read) -- Express only
+        // honors X-Forwarded-For when `app.set('trust proxy', ...)` is
+        // configured for the deployment's actual proxy hop count. Reading
+        // the header ourselves here would let a client trivially spoof a
+        // fresh key on every request (X-Forwarded-For is attacker-supplied
+        // unless a trusted proxy overwrites it) and bypass the limiter
+        // entirely.
+        const key = req.ip || 'unknown';
+        const now = Date.now();
+        let entry = hits.get(key);
+        if (!entry || entry.resetAt <= now) {
+            entry = { count: 0, resetAt: now + windowMs };
+            hits.set(key, entry);
+        }
+        entry.count += 1;
+        if (entry.count > max) {
+            res.setHeader('Retry-After', Math.ceil((entry.resetAt - now) / 1000));
+            return res.status(429).json({ error: message });
+        }
+        next();
+    }
+    middleware._hits = hits; // exposed for tests
+    middleware._stop = () => clearInterval(sweepInterval);
+    return middleware;
+}
+
 module.exports = {
     UNSAFE_KEYS,
     safeAssign,
@@ -101,4 +206,11 @@ module.exports = {
     isSafeCampaignCode,
     sanitizeRegionName,
     clampCount,
+    createRateLimiter,
+    MAX_NAME_LENGTH,
+    MAX_TEXT_LENGTH,
+    isValidLength,
+    clampString,
+    MAX_CONTROLLED_CHARACTERS,
+    sanitizeCharacterSelection,
 };

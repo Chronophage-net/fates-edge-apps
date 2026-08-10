@@ -4,7 +4,7 @@
  */
 
 const WebSocket = require('ws');
-const { safeAssign, buildSafeDict, UNSAFE_KEYS } = require('./security.js');
+const { safeAssign, buildSafeDict, UNSAFE_KEYS, MAX_NAME_LENGTH } = require('./security.js');
 
 // Optional -- room.js stays usable with zero DB configured; these calls
 // are always best-effort (fire-and-forget, errors logged not thrown) and
@@ -85,6 +85,12 @@ function getClientsList(room) {
         // activeView (which tab/feature a client is currently looking at) for
         // richer presence.
         selectedCharacter: c.selectedCharacter || '',
+        // NEW: "Remote enabled" clients can drive more than one character at
+        // once (capped at MAX_CONTROLLED_CHARACTERS -- see security.js's
+        // sanitizeCharacterSelection()). `selectedCharacter` above is kept
+        // as-is (first entry of this array) so older clients that only know
+        // about a single selection keep working unchanged.
+        selectedCharacters: c.selectedCharacters || (c.selectedCharacter ? [c.selectedCharacter] : []),
         activeView: c.activeView || ''
     }));
 }
@@ -105,7 +111,15 @@ function getCharacter(room, name) {
 
 function setCharacters(room, charactersArray) {
     if (!Array.isArray(charactersArray)) return;
-    const dict = buildSafeDict(charactersArray, c => c && c.name);
+    // Reject (rather than silently truncate) an over-long name here --
+    // this path replaces the WHOLE character roster in one call, so
+    // truncating would risk two different long names colliding on the
+    // same truncated key and silently clobbering one character with
+    // another's data.
+    const dict = buildSafeDict(
+        charactersArray.filter(c => c && typeof c.name === 'string' && c.name.length <= MAX_NAME_LENGTH),
+        c => c && c.name
+    );
     const normalized = Object.create(null);
     for (const [rawKey, value] of Object.entries(dict)) {
         normalized[normalizeCharKey(rawKey)] = value;
@@ -120,6 +134,7 @@ function setCharacters(room, charactersArray) {
  */
 function updateCharacter(room, name, data) {
     if (!name || UNSAFE_KEYS.has(name)) return null;
+    if (typeof name !== 'string' || name.length > MAX_NAME_LENGTH) return null;
     const key = normalizeCharKey(name);
     if (UNSAFE_KEYS.has(key)) return null;
     if (!room.characters) room.characters = Object.create(null);
@@ -142,7 +157,7 @@ function updateCharacter(room, name, data) {
     safeAssign(char, data);
 
     // Ensure the display name is preserved
-    if (data && data.name) {
+    if (data && typeof data.name === 'string' && data.name.length <= MAX_NAME_LENGTH) {
         char.name = data.name;
     } else if (!char.name) {
         char.name = name;

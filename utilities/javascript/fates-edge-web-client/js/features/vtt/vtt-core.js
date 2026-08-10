@@ -17,10 +17,11 @@
  * - IMPROVED: Character sheet layout now looks like a TTRPG sheet with styled blocks.
  */
 
-import { vttStore } from '../../core/vtt-store.js';
-import { escHtml, getStorage, setHtml, createElement, sanitizeHtml } from '../../core/utils.js';
+import { vttStore, MAX_CONTROLLED_CHARACTERS } from '../../core/vtt-store.js';
+import { escHtml, getStorage, setStorage, setHtml, createElement, sanitizeHtml } from '../../core/utils.js';
 import { isConnectedToServer, getRoomCode, getSocketId, getConnectionMode } from '../../core/websocket.js';
 import { getOutcomeColor, getOutcomeLabel, getOutcomeClass } from '../../core/dice.js';
+import { showToast } from '../../components/Toast.js';
 
 // ============================================================
 // Configuration
@@ -925,14 +926,32 @@ export function renderLocalPresence() {
                 : '';
 
             let charDisplayHtml = '';
+            const isRemoteEnabled = getStorage('fates-edge-remote-enabled', 'false') === 'true';
             if (isSelf) {
                 const currentChar = p.selectedCharacter || '';
+                const currentChars = Array.isArray(p.selectedCharacters) ? p.selectedCharacters : (currentChar ? [currentChar] : []);
                 if (characters.length > 0) {
+                    // "Remote enabled" lets one client drive more than one
+                    // character at once (up to MAX_CONTROLLED_CHARACTERS) --
+                    // a full party on one client, or a GM running several
+                    // NPCs. Off by default: a plain single-choice <select>,
+                    // unchanged from before. On: a native multi-select, which
+                    // gets ctrl/cmd-click (desktop) or tap-to-toggle (most
+                    // mobile browsers) for free with no custom widget needed.
+                    const selector = isRemoteEnabled
+                        ? `<select class="vtt-char-select" multiple size="${Math.min(Math.max(characters.length, 2), MAX_CONTROLLED_CHARACTERS)}" data-client-id="${p.id}" title="Up to ${MAX_CONTROLLED_CHARACTERS} characters (ctrl/cmd-click to select more than one)" style="font-size:0.75rem;padding:0.15rem;background:var(--bg3);border:1px solid var(--border);border-radius:4px;color:var(--text);max-width:140px;">
+                                ${characters.map(c => `<option value="${escHtml(c.name)}" ${currentChars.includes(c.name) ? 'selected' : ''}>${escHtml(c.name)}</option>`).join('')}
+                            </select>`
+                        : `<select class="vtt-char-select" data-client-id="${p.id}" style="font-size:0.75rem;padding:0.05rem 0.3rem;background:var(--bg3);border:1px solid var(--border);border-radius:4px;color:var(--text);max-width:120px;">
+                                <option value="">— Select —</option>
+                                ${characters.map(c => `<option value="${escHtml(c.name)}" ${c.name === currentChar ? 'selected' : ''}>${escHtml(c.name)}</option>`).join('')}
+                            </select>`;
                     charDisplayHtml = `
-                        <select class="vtt-char-select" data-client-id="${p.id}" style="font-size:0.75rem;padding:0.05rem 0.3rem;background:var(--bg3);border:1px solid var(--border);border-radius:4px;color:var(--text);max-width:120px;">
-                            <option value="">— Select —</option>
-                            ${characters.map(c => `<option value="${c.name}" ${c.name === currentChar ? 'selected' : ''}>${c.name}</option>`).join('')}
-                        </select>
+                        <label style="display:flex;align-items:center;gap:0.2rem;font-size:0.65rem;color:var(--text3);white-space:nowrap;cursor:pointer;" title="Allow this client to control more than one character at once">
+                            <input type="checkbox" class="vtt-remote-toggle" ${isRemoteEnabled ? 'checked' : ''} style="margin:0;" />
+                            Remote
+                        </label>
+                        ${selector}
                     `;
                 } else {
                     charDisplayHtml = `
@@ -941,8 +960,11 @@ export function renderLocalPresence() {
                     `;
                 }
             } else {
-                charDisplayHtml = p.selectedCharacter
-                    ? `<span style="font-size:0.75rem;color:var(--text2);white-space:nowrap;">🎭 ${escHtml(p.selectedCharacter)}</span>`
+                const otherChars = Array.isArray(p.selectedCharacters) && p.selectedCharacters.length > 0
+                    ? p.selectedCharacters
+                    : (p.selectedCharacter ? [p.selectedCharacter] : []);
+                charDisplayHtml = otherChars.length > 0
+                    ? `<span style="font-size:0.75rem;color:var(--text2);white-space:nowrap;">🎭 ${escHtml(otherChars.join(', '))}</span>`
                     : `<span style="font-size:0.75rem;color:var(--text3);white-space:nowrap;">No character selected</span>`;
             }
 
@@ -978,6 +1000,10 @@ export function renderLocalPresence() {
             select.removeEventListener('change', handleCharSelect);
             select.addEventListener('change', handleCharSelect);
         });
+        presenceList.querySelectorAll('.vtt-remote-toggle').forEach(toggle => {
+            toggle.removeEventListener('change', handleRemoteToggle);
+            toggle.addEventListener('change', handleRemoteToggle);
+        });
     }
 
     if (presenceUnsub) presenceUnsub();
@@ -989,20 +1015,47 @@ export function renderLocalPresence() {
     renderPresence();
 }
 
-// Separate handler for character selection
+// Separate handler for character selection. Works for both the plain
+// single-choice <select> (Remote off) and the multi-select <select
+// multiple> (Remote on) -- vtt-connected.js's sendCharacterSelection()
+// accepts either a single name or an array.
 function handleCharSelect(e) {
     const select = e.target;
-    const clientId = select.dataset.clientId;
-    const selectedChar = select.value;
+    let selection;
+    if (select.multiple) {
+        selection = Array.from(select.selectedOptions).map(o => o.value).filter(Boolean);
+        if (selection.length > MAX_CONTROLLED_CHARACTERS) {
+            showToast(`You can only control up to ${MAX_CONTROLLED_CHARACTERS} characters at once.`, 'warning');
+            selection = selection.slice(0, MAX_CONTROLLED_CHARACTERS);
+            // Reflect the trim back into the widget itself, since the
+            // browser already applied the user's (over-)selection.
+            Array.from(select.options).forEach(o => { o.selected = selection.includes(o.value); });
+        }
+    } else {
+        selection = select.value;
+    }
     if (window.__vttConnected && window.__vttConnected.sendCharacterSelection) {
-        window.__vttConnected.sendCharacterSelection(selectedChar);
+        window.__vttConnected.sendCharacterSelection(selection);
     } else {
         import('./vtt-connected.js').then(module => {
             if (module.sendCharacterSelection) {
-                module.sendCharacterSelection(selectedChar);
+                module.sendCharacterSelection(selection);
             }
         });
     }
+}
+
+// "Remote enabled" checkbox: toggles between single-choice and
+// multi-select character control for this client, persisted so it
+// survives a reload.
+function handleRemoteToggle(e) {
+    const enabled = !!e.target.checked;
+    setStorage('fates-edge-remote-enabled', enabled ? 'true' : 'false');
+    vttStore.setRemoteEnabled(enabled);
+    // Re-render immediately so the select widget swaps single/multi right
+    // away instead of waiting for the next unrelated presence update.
+    const presence = vttStore.state.presence || [];
+    vttStore.updatePresence([...presence]);
 }
 
 // ============================================================

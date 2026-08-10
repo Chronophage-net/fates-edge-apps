@@ -8,7 +8,7 @@ const deck = require('./deck.js');
 const logger = require('./logger.js').createLogger(process.env.LOG_LEVEL || 'INFO');
 const fs = require('fs');
 const path = require('path');
-const { buildSafeDict, isSafeModuleId, clampCount } = require('./security.js');
+const { buildSafeDict, isSafeModuleId, clampCount, clampString, MAX_NAME_LENGTH, sanitizeCharacterSelection } = require('./security.js');
 const adventure = require('./adventure.js');
 const auth = require('./auth.js');
 const turn = require('./turn.js');
@@ -164,7 +164,13 @@ function setupSocketIO(io, appConfig) {
 
             socket.join(roomKey);
             socket.room = roomKey;
-            socket.clientData.name = playerName || (authUser ? authUser.username : 'Player');
+            // NEW: previously unbounded -- a client could send an
+            // arbitrarily long playerName, which then gets stored in
+            // clientData and re-broadcast to every other client in the
+            // room (presence lists, chat attribution, etc.) on every
+            // update. Clamp rather than reject so a long paste doesn't
+            // just disconnect a well-meaning player.
+            socket.clientData.name = clampString(playerName, MAX_NAME_LENGTH) || (authUser ? authUser.username : 'Player');
             socket.clientData.role = assignedRole;
             socket.clientData.email = playerEmail;
             socket.clientData.userId = authUser ? authUser.userId : null;
@@ -210,6 +216,30 @@ function setupSocketIO(io, appConfig) {
                 role: socket.clientData.role,
                 clients: clientsList
             }, socket.id);
+        });
+
+        // ─── Character selection ───────────────────────────────────
+        // NEW: the plain-WS transport (ws-handlers.js) already had this;
+        // Socket.IO never did, so a client connected via Socket.IO could
+        // never actually tell the room "I'm playing character X" -- their
+        // presence row's `selectedCharacter(s)` just stayed empty forever.
+        // Mirrors ws-handlers.js's handling: accepts either the legacy
+        // single `character` string or a `characters` array ("Remote
+        // enabled" -- one client driving more than one PC/NPC at once),
+        // normalized and capped at MAX_CONTROLLED_CHARACTERS (6) by
+        // sanitizeCharacterSelection().
+        socket.on('character-select', (data) => {
+            const targetId = (data && data.clientId) || socket.id;
+            const r = room.rooms.get(socket.room);
+            if (!r) return;
+            const clientEntry = r.clients.get(targetId);
+            if (!clientEntry) return;
+            const selected = sanitizeCharacterSelection(data && (data.characters !== undefined ? data.characters : data.character));
+            clientEntry.selectedCharacters = selected;
+            clientEntry.selectedCharacter = selected[0] || '';
+            r.clients.set(targetId, clientEntry);
+            room.broadcastToRoom(socket.room, 'presence', { clients: room.getClientsList(r) }, socket.id);
+            room.broadcastToRoom(socket.room, 'character-select', data || {}, socket.id);
         });
 
         // ─── GM requests ────────────────────────────────────────────

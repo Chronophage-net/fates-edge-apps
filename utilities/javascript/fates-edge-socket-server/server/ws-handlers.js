@@ -10,7 +10,7 @@ const path = require('path');
 const room = require('./room.js');
 const deck = require('./deck.js');
 const logger = require('./logger.js').createLogger(process.env.LOG_LEVEL || 'INFO');
-const { buildSafeDict, clampCount, isSafeModuleId } = require('./security.js');
+const { buildSafeDict, clampCount, isSafeModuleId, clampString, MAX_NAME_LENGTH, sanitizeCharacterSelection } = require('./security.js');
 const adventure = require('./adventure.js');
 const auth = require('./auth.js');
 const turn = require('./turn.js');
@@ -447,7 +447,7 @@ function setupWSS(wss, appConfig) {
                     // ─── Presence update ───────────────────────────────────
                     case 'presence':
                         if (data.name) {
-                            ws.clientData.name = data.name;
+                            ws.clientData.name = clampString(data.name, MAX_NAME_LENGTH) || ws.clientData.name;
                         }
                         if (data.role) {
                             ws.clientData.role = data.role;
@@ -473,13 +473,23 @@ function setupWSS(wss, appConfig) {
                         break;
 
                     // ─── Character selection ──────────────────────────────
+                    // NEW: accepts either the legacy single `character` string
+                    // or a `characters` array ("Remote enabled" -- one client
+                    // driving more than one PC/NPC at once). Either way, the
+                    // result is normalized and capped at
+                    // MAX_CONTROLLED_CHARACTERS (6) by sanitizeCharacterSelection()
+                    // -- a client can't claim an unbounded slice of the room's
+                    // roster. `selectedCharacter` is kept in sync as the first
+                    // selected name for older clients that only read that field.
                     case 'character-select':
                         if (data.clientId) {
                             const r = room.rooms.get(roomKey);
                             if (r) {
                                 const clientEntry = r.clients.get(data.clientId);
                                 if (clientEntry) {
-                                    clientEntry.selectedCharacter = data.character || '';
+                                    const selected = sanitizeCharacterSelection(data.characters !== undefined ? data.characters : data.character);
+                                    clientEntry.selectedCharacters = selected;
+                                    clientEntry.selectedCharacter = selected[0] || '';
                                     r.clients.set(data.clientId, clientEntry);
                                     room.broadcastToRoom(roomKey, 'presence', { clients: room.getClientsList(r) }, ws.clientId);
                                 }
@@ -524,7 +534,9 @@ function setupWSS(wss, appConfig) {
                                 if (r2) {
                                     const clientEntry2 = r2.clients.get(data.clientId);
                                     if (clientEntry2) {
-                                        clientEntry2.selectedCharacter = data.character || '';
+                                        const selected2 = sanitizeCharacterSelection(data.characters !== undefined ? data.characters : data.character);
+                                        clientEntry2.selectedCharacters = selected2;
+                                        clientEntry2.selectedCharacter = selected2[0] || '';
                                         r2.clients.set(data.clientId, clientEntry2);
                                         room.broadcastToRoom(roomKey, 'presence', { clients: room.getClientsList(r2) }, ws.clientId);
                                     }
@@ -637,7 +649,9 @@ async function handleHandshake(ws, roomState, data) {
         assignedRole = 'player';
         ws.send(JSON.stringify({ type: 'error', message: 'A GM is already hosting this room. You have joined as a Player.', code: 'GM_CONFLICT' }));
     }
-    ws.clientData.name = data.clientName || (authUser ? authUser.username : 'Player');
+    // NEW: clamp -- see the matching comment in socketio-handlers.js's
+    // join-room handler for why this was previously unbounded.
+    ws.clientData.name = clampString(data.clientName, MAX_NAME_LENGTH) || (authUser ? authUser.username : 'Player');
     ws.clientData.role = assignedRole;
     ws.clientData.email = data.clientEmail || '';
     ws.clientData.userId = authUser ? authUser.userId : null;

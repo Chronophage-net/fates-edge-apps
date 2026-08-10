@@ -1,4 +1,4 @@
-# Modern Noir theme pack (v4.6.3)
+# Modern Noir theme pack (v4.7.0)
 
 A cyberpunk visual reskin, meant to eventually accompany the **Modern Noir**
 setting expansion (`fates-edge-docs/ttrpg/reference/expansions/modern_noir.tex`

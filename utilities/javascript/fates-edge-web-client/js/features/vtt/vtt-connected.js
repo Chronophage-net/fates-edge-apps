@@ -18,7 +18,7 @@
  * v11 – Exposed global window.sendToVTT() for other modules to post messages/cards.
  */
 
-import { vttStore } from '../../core/vtt-store.js';
+import { vttStore, MAX_CONTROLLED_CHARACTERS } from '../../core/vtt-store.js';
 import { getState, clearChatHistory, getCharacter, addVTTEvent, addSessionLogEntry, getCharacters, ensureCharacterDefaults, getStableClientId } from '../../core/state.js';
 import { performRoll } from '../../core/dice.js';
 import { collectEquipmentModifiers } from '../../core/talent-effects.js';
@@ -138,30 +138,35 @@ function sendClientName() {
 // CHARACTER SELECTION SYNC
 // ============================================================
 
-export function sendCharacterSelection(characterName) {
+// NEW: accepts either a single character name (legacy single-select) or
+// an array of names ("Remote enabled" -- driving more than one character
+// at once). Either way it's normalized to an array before sending, capped
+// client-side to MAX_CONTROLLED_CHARACTERS as a courtesy (the server
+// enforces the same cap independently -- see security.js's
+// sanitizeCharacterSelection() -- so a stale/hacked client can't exceed it).
+export function sendCharacterSelection(characterNameOrNames) {
     if (!isConnectedToServer()) return;
     const clientId = getSocketId();
     if (!clientId) return;
-    sendEvent({ type: 'character-select', clientId, character: characterName || '' });
-    
+
+    const names = (Array.isArray(characterNameOrNames) ? characterNameOrNames : [characterNameOrNames])
+        .filter(Boolean)
+        .slice(0, MAX_CONTROLLED_CHARACTERS);
+
+    sendEvent({ type: 'character-select', clientId, characters: names, character: names[0] || '' });
+
     const presence = vttStore.state.presence || [];
     const updated = presence.map(p => {
         if (p.id === clientId) {
-            return { ...p, selectedCharacter: characterName || '' };
+            return { ...p, selectedCharacter: names[0] || '', selectedCharacters: names };
         }
         return p;
     });
     vttStore.updatePresence(updated);
-    
-    if (characterName) {
-        const chars = vttStore.state.characters || [];
-        const found = chars.find(c => c.name === characterName);
-        if (found) {
-            vttStore.selectCharacter(found.id);
-        }
-    } else {
-        vttStore.selectCharacter(null);
-    }
+
+    const chars = vttStore.state.characters || [];
+    const ids = names.map(n => chars.find(c => c.name === n)?.id).filter(Boolean);
+    vttStore.setSelectedCharacterIds(ids);
 }
 
 // ============================================================
@@ -1196,25 +1201,28 @@ function setupWebSocketSync() {
     // ─── CHARACTER SELECTION ──────────────────────────
     const charSelectHandler = (data) => {
         if (isDestroyed) return;
-        const { clientId, character } = data;
+        const { clientId, character, characters } = data;
         if (!clientId) return;
+        // Accept either the legacy single `character` string or the
+        // newer `characters` array ("Remote enabled"); prefer the array
+        // when present since it's the more complete representation.
+        const names = (Array.isArray(characters) ? characters : (character ? [character] : []))
+            .filter(Boolean)
+            .slice(0, MAX_CONTROLLED_CHARACTERS);
+
         const presence = vttStore.state.presence || [];
         const updated = presence.map(p => {
             if (p.id === clientId) {
-                return { ...p, selectedCharacter: character || '' };
+                return { ...p, selectedCharacter: names[0] || '', selectedCharacters: names };
             }
             return p;
         });
         vttStore.updatePresence(updated);
-        
-        if (clientId === getSocketId() && character) {
+
+        if (clientId === getSocketId()) {
             const chars = vttStore.state.characters || [];
-            const found = chars.find(c => c.name === character);
-            if (found) {
-                vttStore.selectCharacter(found.id);
-            } else {
-                vttStore.selectCharacter(null);
-            }
+            const ids = names.map(n => chars.find(c => c.name === n)?.id).filter(Boolean);
+            vttStore.setSelectedCharacterIds(ids);
         }
     };
     onWSEvent('character-select', charSelectHandler);

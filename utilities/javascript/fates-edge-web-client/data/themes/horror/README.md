@@ -1,4 +1,4 @@
-# Horror theme pack (v4.6.3)
+# Horror theme pack (v4.7.0)
 
 A gothic/cosmic-horror visual reskin, built the same way as the sibling
 `modern-noir/` theme (same `theme-manager.js`/`pack-manager.js`

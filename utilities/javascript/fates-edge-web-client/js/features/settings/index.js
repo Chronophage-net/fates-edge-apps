@@ -951,7 +951,7 @@ function initSyncUI() {
                                 : '';
                             return `
                                 <div class="presence-item">
-                                    ${showAvatars ? `<img src="${avatarUrl}" alt="${client.name || 'User'}" class="avatar" loading="lazy" />` : ''}
+                                    ${showAvatars ? `<img src="${escHtml(avatarUrl)}" alt="${escHtml(client.name) || 'User'}" class="avatar" loading="lazy" />` : ''}
                                     <span class="name">${escHtml(client.name || 'Anonymous')}</span>
                                     <span class="role">${client.role === 'gm' ? '🎯 GM' : '👤 Player'}</span>
                                     <span class="status-dot ${client.status === 'online' ? 'online' : 'away'}"></span>
