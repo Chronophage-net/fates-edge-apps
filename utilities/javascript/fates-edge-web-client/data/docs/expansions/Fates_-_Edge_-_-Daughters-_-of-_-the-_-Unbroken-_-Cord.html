@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fate's Edge — Daughters of the Unbroken Cord</title>
+<style>
+    :root {
+        --bg1: #0a0a0c;
+        --bg2: #131317;
+        --bg3: #1b1b21;
+        --bg4: #25252c;
+        --text: #e2e1e5;
+        --text2: #a9a7b0;
+        --text3: #78767f;
+        --gold: #9098a8;
+        --gold-hover: #aab1bf;
+        --border: #33333c;
+        --red: #8e3a3a;
+        --green: #3d6b56;
+        --blue: #3c5f7a;
+        --purple: #5f4f7a;
+        --orange: #8a6a3c;
+        --ash: #7d7a72;
+        --thread: #6e7482;
+        --radius: 8px;
+        --font: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+        background: var(--bg1);
+        background-image: radial-gradient(circle at 50% 0%, #16161b 0%, #0a0a0c 60%);
+        color: var(--text);
+        font-family: var(--font);
+        padding: 1.5rem;
+        max-width: 1100px;
+        margin: 0 auto;
+        line-height: 1.6;
+    }
+    h1, h2, h3, h4, h5 { color: var(--gold); margin: 0.8rem 0 0.4rem; }
+    h1 { font-size: 1.9rem; border-bottom: 2px solid var(--gold); padding-bottom: 0.3rem; }
+    .subtitle { color: var(--text2); font-style: italic; margin-bottom: 0.8rem; font-size: 1rem; }
+    h2 { font-size: 1.4rem; border-bottom: 1px solid var(--border); padding-bottom: 0.2rem; margin-top: 1.8rem; }
+    h3 { font-size: 1.12rem; margin-top: 1.2rem; }
+    h4 { font-size: 0.98rem; color: var(--text); }
+    p { margin: 0.5rem 0; }
+    a { color: var(--gold); text-decoration: none; }
+    a:hover { color: var(--gold-hover); }
+    ul, ol { margin: 0.4rem 0 0.4rem 1.4rem; }
+    li { margin: 0.2rem 0; }
+    .panel {
+        background: var(--bg2);
+        border-radius: var(--radius);
+        padding: 0.7rem 0.9rem;
+        border: 1px solid var(--border);
+        margin: 0.6rem 0;
+    }
+    .panel-gold { border-left: 4px solid var(--gold); }
+    .panel-red { border-left: 4px solid var(--red); }
+    .panel-blue { border-left: 4px solid var(--blue); }
+    .panel-green { border-left: 4px solid var(--green); }
+    .panel-purple { border-left: 4px solid var(--purple); }
+    .panel-orange { border-left: 4px solid var(--orange); }
+    .panel-ash { border-left: 4px solid var(--ash); }
+    .panel > strong:first-child, .panel > .panel-title { display: block; color: var(--gold); margin-bottom: 0.3rem; }
+    .badge {
+        display: inline-block;
+        padding: 0.08rem 0.55rem;
+        border-radius: 12px;
+        font-size: 0.68rem;
+        font-weight: 600;
+        white-space: nowrap;
+        margin: 0.1rem 0.2rem 0.1rem 0;
+    }
+    .badge-gold { background: var(--gold); color: #0c0d10; }
+    .badge-red { background: var(--red); color: #fff; }
+    .badge-green { background: var(--green); color: #fff; }
+    .badge-blue { background: var(--blue); color: #fff; }
+    .badge-purple { background: var(--purple); color: #fff; }
+    .badge-orange { background: var(--orange); color: #fff; }
+    .badge-ash { background: var(--ash); color: #fff; }
+    .badge-gray { background: var(--bg4); color: var(--text3); }
+    .flex { display: flex; gap: 0.4rem; flex-wrap: wrap; align-items: center; }
+    .text-muted { color: var(--text3); }
+    .text-gold { color: var(--gold); }
+    .text-sm { font-size: 0.88rem; }
+    .text-xs { font-size: 0.72rem; }
+    .mt-1 { margin-top: 0.5rem; }
+    .rite-box {
+        background: var(--bg3);
+        border-radius: var(--radius);
+        border: 1px solid var(--border);
+        border-left: 4px solid var(--thread);
+        padding: 0.6rem 0.9rem;
+        margin: 0.7rem 0;
+    }
+    .rite-box h4 { color: var(--thread); font-size: 1rem; }
+    .rite-box .rite-meta { margin: 0.15rem 0 0.4rem; }
+    .office-box {
+        background: var(--bg2);
+        border-radius: var(--radius);
+        border: 1px solid var(--border);
+        padding: 0.7rem 0.9rem;
+        margin: 0.8rem 0;
+    }
+    table {
+        border-collapse: collapse;
+        width: 100%;
+        margin: 0.6rem 0;
+        font-size: 0.88rem;
+        background: var(--bg2);
+        border-radius: var(--radius);
+        overflow: hidden;
+    }
+    th, td {
+        border: 1px solid var(--border);
+        padding: 0.4rem 0.6rem;
+        text-align: left;
+        vertical-align: top;
+    }
+    th { background: var(--bg4); color: var(--gold); font-weight: 600; }
+    tr:nth-child(even) td { background: rgba(255,255,255,0.02); }
+    hr { border: none; border-top: 1px solid var(--border); margin: 1rem 0; }
+    .toc { background: var(--bg3); border-radius: var(--radius); padding: 0.6rem 0.9rem; border: 1px solid var(--border); }
+    .toc-title { color: var(--gold); font-weight: 600; display: block; margin-bottom: 0.3rem; }
+    .toc-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0 1rem; }
+    .toc a { color: var(--text2); display: block; padding: 0.1rem 0; font-size: 0.85rem; }
+    .toc a:hover { color: var(--gold); }
+    @media (max-width: 700px) { .toc-grid { grid-template-columns: 1fr; } }
+    blockquote {
+        border-left: 3px solid var(--gold);
+        padding-left: 1rem;
+        margin: 0.6rem 0;
+        color: var(--text2);
+        font-style: italic;
+    }
+    .story-box {
+        background: var(--bg2);
+        border-left: 4px solid var(--thread);
+        border-radius: var(--radius);
+        padding: 0.9rem 1.1rem;
+        margin: 0.8rem 0;
+        font-style: italic;
+        color: var(--text2);
+    }
+    .story-box p { margin: 0.6rem 0; }
+    .sep {
+        text-align: center;
+        color: var(--text3);
+        letter-spacing: 0.4em;
+        margin: 1.2rem 0;
+        font-size: 0.85rem;
+    }
+    footer {
+        font-size: 0.75rem;
+        color: var(--text3);
+        text-align: center;
+        padding: 1.2rem 0 0.4rem;
+    }
+</style>
+</head>
+<body>
+
+<h1>Daughters of the Unbroken Cord</h1>
+<p class="subtitle">A Fate's Edge Patron / Faction Expansion</p>
+<p class="flex" style="margin-bottom:0.8rem;">
+    <span class="badge badge-gold">Faction Expansion</span>
+    <span class="badge badge-ash">Cord Mechanics</span>
+    <span class="badge badge-blue">Player Options</span>
+    <span class="badge badge-gray">Author: Nicholas A. Gasper</span>
+</p>
+
+<div class="panel panel-gold">
+    <p>This expansion details the <strong>Daughters of the Unbroken Cord</strong>, a mendicant coven bound to the High Mother — a threshold entity sustained by accumulated debt, subtle sacrifice, and the silent witness of the Hollowed. They appear as midwives, hospice nurses, deathbed attendants, and keepers of alms-houses. They offer the mercy of warm hands and the comfort of final words.</p>
+    <p>But the mercy has a ledger. The comfort has a price.</p>
+    <p>In these pages, Game Masters will find the philosophy and hierarchy of the Cord; mechanics for the Cord Timer, a personal Obligation track for player Daughters; the Hollowed as followers and witnesses; rivalries with other Patrons; player options for Runekeeper and Witch Daughters; sample Rites, adventure hooks, and GM tools; and a confession from a midwife who serves the Cord.</p>
+    <p class="text-sm text-muted" style="margin-top:0.6rem;"><em>The soup is always free. The price never is.</em></p>
+</div>
+
+<nav class="toc">
+    <span class="toc-title">Table of Contents</span>
+    <div class="toc-grid">
+        <div>
+            <a href="#what-they-are">What the Daughters Are (And Are Not)</a>
+            <a href="#hierarchy">Hierarchy — The Three Offices</a>
+            <a href="#cord-mechanics">The Cord — Mechanics</a>
+            <a href="#player-options">Player Options — Daughter of the Cord</a>
+            <a href="#sample-rites">Sample Rites of the High Mother</a>
+            <a href="#conspiracy">The Conspiracy — Propping and Culling Dynasties</a>
+        </div>
+        <div>
+            <a href="#rivalries">Rivalries with Other Patrons</a>
+            <a href="#gm-tools">GM Tools — Running the Cord</a>
+            <a href="#hooks">Adventure Hooks &amp; Campaign Frames</a>
+            <a href="#hollowed-confession">The Hollowed — A Confession</a>
+            <a href="#colophon">Colophon</a>
+        </div>
+    </div>
+</nav>
+
+<hr>
+
+<div class="panel panel-ash">
+    <strong class="panel-title">Core Rules Reminder (Fate's Edge SRD)</strong>
+    <ul>
+        <li><strong>Obligation Capacity:</strong> Spirit + Presence. Exceeding capacity = 1 Fatigue per segment.</li>
+        <li><strong>Boons:</strong> Max 5. Reduce to 2 at scene end. Convert 2 → 1 XP (once/session).</li>
+        <li><strong>Harm:</strong> 1 = -1 die, 2 = -2 dice, 3 = incapacitated.</li>
+        <li><strong>Fatigue:</strong> Each point worsens Position (Dominant → Controlled → Desperate). Full track → Harm+1, clear Fatigue.</li>
+    </ul>
+</div>
+
+<h2 id="what-they-are">What the Daughters Are (And What They Are Not)</h2>
+<p>The Daughters of the Unbroken Cord are not a cult in the conventional sense. They have no temples, no holy texts, no recruitment drives. They are a <em>system</em> — an invisible infrastructure of obligation woven into the fabric of birth, illness, and death across dozens of cultures.</p>
+
+<h3 id="cord-as-ledger">The Cord as Ledger</h3>
+<p>The <strong>Cord</strong> is their ledger: a vast, non-physical tangle of gray thread that records every secret whispered, every grief accepted, every name surrendered. The <strong>High Mother</strong> sits at its center, weaving the threads into patterns that shape dynasties, cull the weak, and prop up the powerful.</p>
+
+<h3 id="two-faces">Two Faces of the Cord</h3>
+<p>Some Sisters embrace the power. They see themselves as surgeons of society, cutting away dead weight, nurturing worthy bloodlines.</p>
+<p>Others feel <em>trapped</em> — bound by oaths sworn in desperation, unable to leave because the Cord knows their truest secrets.</p>
+<p>A few have tried to flee; those who succeeded are now hunted. Most remain, hollowed by degrees, tending the dying while the Cord tightens around their own throats.</p>
+
+<h3 id="unspoken-ethic">The Unspoken Ethic</h3>
+<p>The Daughters do not preach. Their ethics are encoded in practices, not scriptures:</p>
+<ol>
+    <li><strong>Debt is the only immortality.</strong> What you owe outlives you; what you are owed defines your descendants.</li>
+    <li><strong>Mercy is a futures contract.</strong> Every kindness is a thread. The one who accepts may not pay; their children will.</li>
+    <li><strong>The weak must be culled — but gently.</strong> A bad death (alone, unmourned) breeds hungry ghosts. A Daughter ensures a <em>good death</em> — and harvests the debt.</li>
+    <li><strong>Witness is power.</strong> To see a thing is to own it. To record a name is to possess it. The Hollowed are perfect witnesses: they cannot lie, and they cannot speak.</li>
+    <li><strong>No thread is ever cut.</strong> Debts are not forgiven; they are <em>transferred</em> — to a child, to a rival, to a village. The Cord never breaks; it only changes shape.</li>
+</ol>
+
+<h2 id="hierarchy">Hierarchy — The Three Offices</h2>
+<p>The Coven is organized in triads of three offices. These are functions, not fixed ranks. A Sister may serve in one role for a decade, then shift to another. The High Mother is the only fixed position; she who sits at the Cord's center is effectively immortal.</p>
+
+<table>
+<thead><tr><th>Office</th><th>Function</th><th>Sacrifice</th></tr></thead>
+<tbody>
+<tr><td><strong>Keeper of the Door (Weaver)</strong></td><td>Sets terms, knocks, enters. Midwife, hospice intake, first contact.</td><td>Must never be alone. Always witnessed by another Sister or a Hollowed.</td></tr>
+<tr><td><strong>Keeper of the Name (Widow)</strong></td><td>Remembers debts, records names, holds the coven's collective memory in her flesh.</td><td>Must keep fresh the memory of one dead thing. If she forgets, she loses a finger (added to the Cord).</td></tr>
+<tr><td><strong>Keeper of the Price (Winter)</strong></td><td>Collects debts, carries Thorn-Pins, decides when obligations come due. The only Office allowed to lie to outsiders.</td><td>Cannot feel heat. Fire burns unnoticed until she is ash.</td></tr>
+</tbody>
+</table>
+
+<p>A full coven consists of three Sisters, one of each Office, bonded by a shared Hollowed. Larger covens are multiple triads, each reporting to a senior Winter.</p>
+
+<div class="panel panel-gold">
+    <p><strong>The High Mother</strong> is not an Office; she is the Cord's avatar. She no longer walks the world. Her whispers guide the Winters; her dreams shape the pattern. To meet her is to enter the <em>House Without Doors</em> — a liminal space at the center of the Cord — and to leave behind a piece of yourself.</p>
+</div>
+
+<h2 id="cord-mechanics">The Cord — Mechanics</h2>
+<p>A Daughter (player character) has a <strong>Cord Timer</strong> — a track representing her accumulated debt to the Cord.</p>
+
+<h3 id="cord-timer">The Cord Timer [6]</h3>
+<p>Mark a segment when:</p>
+<ul>
+    <li>She accepts a major debt from a dying person (grief, a secret, a name) → +1</li>
+    <li>She performs a Rite of the High Mother without a Hollowed witness → +1</li>
+    <li>She fails to collect a promised debt within a season → +1</li>
+    <li>She disobeys a direct order from a Winter → +2</li>
+    <li>She helps someone escape the Cord (knowingly) → +3</li>
+</ul>
+
+<div class="panel panel-red">
+    <strong class="panel-title">When the Cord Timer Fills (6/6)</strong>
+    <p>The High Mother demands payment. The Sister must perform one of:</p>
+    <ul>
+        <li><strong>Harvest a life</strong> (cause a patient to die a "good death" — the debt is paid in soul-stuff)</li>
+        <li><strong>Give up a memory</strong> (permanent — choose a significant NPC or event to forget)</li>
+        <li><strong>Cut a thread</strong> (sever a relationship — lose a Bond with another PC or a significant ally)</li>
+        <li><strong>Accept a Scar</strong> (permanent visible mark — all social rolls are Desperate with those who know the Cord)</li>
+    </ul>
+    <p class="mt-1">After payment, the Cord Timer resets to 0, but the Sister's <strong>Obligation</strong> to the High Mother increases by 1 permanent segment (cannot be cleared except by leaving the coven — see <a href="#breaking-the-cord">Breaking the Cord</a>).</p>
+</div>
+
+<h3 id="the-hollowed">The Hollowed</h3>
+<p>Every Sister receives a Hollowed — a child or animal whose heart was removed and replaced with a bundle of gray thread and the ash of a forgotten name. The eyes are sewn open with silver wire. They do not eat, sleep, or age. They witness every working.</p>
+<div class="panel panel-ash">
+    <strong class="panel-title">Mechanics</strong>
+    <ul>
+        <li>The Hollowed is a <strong>Cap 2 Follower</strong> that never needs upkeep. It cannot fight, speak, or be targeted by mundane attacks (spirits can harm it).</li>
+        <li>While within Near range, you count as having <strong>Soft Witness</strong> (improve Position by one step for any Rite of the High Mother).</li>
+        <li>If your Hollowed is destroyed, you immediately mark +1 Obligation and your Cord Timer ticks +2. You may acquire a new Hollowed after a significant ritual (4 XP and a major sacrifice — a memory, a scar, or a life).</li>
+    </ul>
+</div>
+
+<h3 id="flesh-codex">Flesh-Codex</h3>
+<p>A Daughter's Rites are not stored in a book; they are tattooed into her flesh. These tattoos writhe, weep, and occasionally bleed.</p>
+<ul>
+    <li>You do not need a Codex asset. Your body is the Codex.</li>
+    <li>Your Rites cannot be stolen or destroyed (short of flaying you alive).</li>
+    <li>Anyone who sees your tattoos can attempt a Wits + Lore test (DV 3) to deduce which Patron and which Rites you carry. Inquisitors can identify you on sight.</li>
+</ul>
+
+<h2 id="player-options">Player Options — Daughter of the Cord</h2>
+<p>Players may join the Cord as a <strong>Runekeeper</strong> (most common) or a <strong>Witch</strong>. Invokers cannot become full Daughters (they carry too many conflicting Symbols), but they can be contractors.</p>
+
+<h3 id="runekeeper-path">Daughter of the Cord (Runekeeper Path)</h3>
+
+<div class="panel panel-blue">
+    <strong class="panel-title">Requirements</strong>
+    <p class="text-sm">Spirit 3+, Body 2+. Lore (Thresholds) 1+. Talents: <em>Disciplined Body</em> (3 XP, Monk) and <em>Gray Thread</em> (new, 4 XP).</p>
+</div>
+
+<p><strong>Patron:</strong> The High Mother (treated as a Patron for Obligation). Her Rites appear below and in <em>Witches of Fate's Edge, §IV</em>.</p>
+
+<p><strong>Unique Mechanic — Cord as Obligation:</strong> Your Obligation to the High Mother is tracked separately from other Patrons. You cannot swear to another Patron without breaking your vow to the Cord.</p>
+
+<h4>Talent Progression</h4>
+<table>
+<thead><tr><th>Tier</th><th>Recommended Talents</th><th>Cumulative XP</th></tr></thead>
+<tbody>
+<tr><td>I</td><td>Gray Thread + Cord of Flesh</td><td>12 XP</td></tr>
+<tr><td>II</td><td>Open Palm, Closed Cord</td><td>20 XP</td></tr>
+<tr><td>III</td><td>Milk and Ashes</td><td>29 XP</td></tr>
+<tr><td>IV</td><td>The Unnamed Strike</td><td>41 XP</td></tr>
+<tr><td>V</td><td>The High Mother's Shadow</td><td>59 XP</td></tr>
+</tbody>
+</table>
+
+<h4>Talents</h4>
+
+<div class="rite-box">
+    <h4>Gray Thread <span class="badge badge-gray">Minor</span> <span class="badge badge-gold">4 XP</span></h4>
+    <p class="text-sm">You receive a Hollowed (Cap 2). While it is within Near range, your first Rite of the High Mother each scene costs -1 Obligation (min 0) and you count as having Soft Witness.</p>
+</div>
+
+<div class="rite-box">
+    <h4>Cord of Flesh <span class="badge badge-gray">Major</span> <span class="badge badge-gold">8 XP</span></h4>
+    <p class="text-sm"><strong>Requires:</strong> Gray Thread, Body 3+</p>
+    <p class="text-sm">Your body stores Fatigue as invisible knots. Convert up to Body rating points of Fatigue into <em>Knots</em>. You appear uninjured. You may spend a Knot as 1 Boon for any Rite of the High Mother. Between sessions, if you have any Knots remaining, you must perform a Subtle Sacrifice (take a memory, a shadow, or a name) or take 2 Harm.</p>
+</div>
+
+<div class="rite-box">
+    <h4>The Open Palm, Closed Cord <span class="badge badge-gray">Major</span> <span class="badge badge-gold">8 XP</span></h4>
+    <p class="text-sm"><strong>Requires:</strong> Gray Thread, Melee 2+</p>
+    <p class="text-sm">Your unarmed strikes or subtle touch (DV +1) carry <em>Widow's Measure</em>. Instead of dealing Harm, you may mark a Promise [4] timer on the target — they owe the Cord a truth or grief. If they already owe the Cord, you may activate that debt: they suffer Position -1 for the scene, or you gain Effect +1 against them.</p>
+</div>
+
+<div class="rite-box">
+    <h4>Milk and Ashes <span class="badge badge-gray">Major</span> <span class="badge badge-gold">9 XP</span></h4>
+    <p class="text-sm"><strong>Requires:</strong> Cord of Flesh</p>
+    <p class="text-sm">When you offer hospitality (food, healing, shelter) to an enemy or stranger, create a <em>Threshold Contract</em> without their knowledge. They gain the <strong>Hospiced</strong> condition: cannot lie to you (Veil -2), and any Harm they deal to you is stored as Fatigue on themselves.</p>
+</div>
+
+<div class="rite-box">
+    <h4>The Unnamed Strike <span class="badge badge-purple">Prestige</span> <span class="badge badge-gold">12 XP</span></h4>
+    <p class="text-sm"><strong>Requires:</strong> Tier III+, Open Palm Closed Cord</p>
+    <p class="text-sm">Unarmed attack vs. Spirit+Resolve. On hit: target loses their True Name for one scene. Cannot be targeted by beneficial magic, cannot speak binding oaths, and is <em>Invisible to Fate</em>. You may record this Name in your flesh to Command them once (DV 4).</p>
+</div>
+
+<div class="rite-box">
+    <h4>The High Mother's Shadow <span class="badge badge-red">Epic</span> <span class="badge badge-gold">18 XP</span></h4>
+    <p class="text-sm"><strong>Requires:</strong> Tier IV+, Unnamed Strike, Cord of Flesh</p>
+    <p class="text-sm">You become Cord-blooded. You no longer age. Fatigue converts to Obligation automatically. You may spend Obligation segments as if they were Boons (1 segment = 1 Boon) for rolls involving silence, memory, or binding.</p>
+    <p class="text-sm">When you would die, the High Mother claims your body; you rise as a Hollowed under her control for a number of days equal to your current Obligation segments. If you have no Obligation, you die permanently.</p>
+</div>
+
+<h3 id="witch-path">Daughter of the Cord (Witch Path)</h3>
+
+<div class="panel panel-blue">
+    <strong class="panel-title">Requirements</strong>
+    <p class="text-sm">Spirit 3+, Wits 3+. The <em>Gray Thread</em> talent (as above, but costing 2 XP less — the Hollowed replaces a Codex). Witch talents (e.g., <em>Warm Hand</em>, <em>Cup and Salt</em>) are recommended.</p>
+</div>
+
+<p><strong>Differences from Runekeeper:</strong> You practice threshold witchcraft. Your Cord Timer replaces Obligation. Your Rites are those of the High Mother (see below) and any Witch Rites that fit the themes of death, memory, or debt.</p>
+<p>When the Cord fills, the High Mother demands a payment (as above), but you may also choose to <em>Bloom</em> — gain a permanent Cord-based mutation.</p>
+
+<h4>Cord Mutations (d6)</h4>
+<table>
+<thead><tr><th>Mutation</th><th>Effect</th></tr></thead>
+<tbody>
+<tr><td><strong>Silver Eyes</strong></td><td>+1 die to Insight about debts, obligations, or promises. -1 die to ignore them.</td></tr>
+<tr><td><strong>Thread-Fingers</strong></td><td>Once per scene, reroll a failed social roll involving an oath or promise.</td></tr>
+<tr><td><strong>Hollowed Voice</strong></td><td>Once per session, compel a short confession (target resists with Spirit+Resolve, DV 4). Afterward, you cannot speak for one exchange.</td></tr>
+<tr><td><strong>Witness Scar</strong></td><td>Visible mark on your cheek. +1 die to Intimidation with those who fear the Cord; -1 die to social rolls with those who revile it.</td></tr>
+<tr><td><strong>Cold Blood</strong></td><td>Ignore first environmental penalty from cold. Suffer -1 die to Insight when reading emotions.</td></tr>
+<tr><td><strong>Fugue Memory</strong></td><td>Once per session, you may accept a minor forgotten detail (GM chooses) to gain +1 Boon.</td></tr>
+</tbody>
+</table>
+
+<h3 id="breaking-the-cord">Breaking the Cord — Leaving the Coven</h3>
+<p>Leaving the Daughters is a major arc, not a simple respec.</p>
+<div class="panel panel-red">
+    <strong class="panel-title">Costs</strong>
+    <ul>
+        <li>You lose all Daughter-specific talents (they become inert)</li>
+        <li>You gain the <strong>Unbound</strong> condition: the High Mother's attention follows you. Once per session, the GM may impose a <em>Debt Echo</em> — a former obligation resurfaces unpredictably</li>
+        <li>You may never again take a Daughter talent, nor accept a Hollowed</li>
+        <li>You must perform the <em>Rite of Unbinding</em></li>
+    </ul>
+</div>
+<p><strong>Rite of Unbinding (20 XP arc or narrative quest):</strong> Find a threshold (doorway, crossroads, ford) at dawn. Light a beeswax candle. Speak your true name three times. Drink salt water. Do not look behind you. The Hollowed will be there, watching. If you meet its eyes, you will forget why you began.</p>
+<p>If successful, the Cord Timer shatters. Your Obligation to the High Mother becomes 0 (cannot be raised). You are free — but the Cord remembers.</p>
+
+<h2 id="sample-rites">Sample Rites of the High Mother</h2>
+<p class="text-sm text-muted"><em>Low Rites of the High Mother appear in Witches of Fate's Edge, §IV. The following are additional Standard and High Rites for experienced Daughters.</em></p>
+
+<div class="rite-box">
+    <h4>Rite of the Unspoken Grief</h4>
+    <div class="rite-meta flex"><span class="badge badge-blue">ECHO</span><span class="badge badge-purple">VEIL</span><span class="badge badge-gray">Low</span><span class="badge badge-gold">4 XP</span></div>
+    <p class="text-sm"><strong>Threshold:</strong> A deathbed or a grave.</p>
+    <p class="text-sm">Absorb the grief of one dying person. They die peacefully, forgetting their sorrow. You gain a <strong>Grief Token</strong> (counts as 1 Boon for any Rite involving memory or comfort). The grief is stored in your Cord; you may release it later as a <em>Wail</em> (Fear effect, DV 3, area).</p>
+    <p class="text-sm"><strong>Cost:</strong> 1 Obligation. <strong>Push (Mark +1 Shadow):</strong> Absorb grief from a living person; they forget the source of their sorrow entirely (may create a narrative mystery).</p>
+</div>
+
+<div class="rite-box">
+    <h4>Rite of the Silent Tithe</h4>
+    <div class="rite-meta flex"><span class="badge badge-orange">PRICE</span><span class="badge badge-ash">THRESHOLD</span><span class="badge badge-gray">Standard</span><span class="badge badge-gold">7 XP</span><span class="badge badge-gray">DV 4</span></div>
+    <p class="text-sm"><strong>Threshold:</strong> A doorway of a house you have tended.</p>
+    <p class="text-sm">Once per season, you may declare that a household owes the Cord a <em>tithe</em> — a memory, a shadow, or a first breath of a newborn. The tithe is collected within the week, often without the household's awareness. You gain 1 permanent segment of Influence (as an Asset) within that household's community.</p>
+    <p class="text-sm"><strong>Cost:</strong> 2 Obligation. <strong>Push (Mark +1 Shame):</strong> Collect the tithe immediately (if the household resists, start a Debt [4] timer that fills with conflict).</p>
+</div>
+
+<div class="rite-box">
+    <h4>Rite of the Hollowed Union</h4>
+    <div class="rite-meta flex"><span class="badge badge-red">BIND</span><span class="badge badge-purple">NINTH</span><span class="badge badge-gray">High</span><span class="badge badge-gold">12 XP</span></div>
+    <p class="text-sm"><strong>Threshold:</strong> A birthing bed or a deathbed where three generations have passed.</p>
+    <p class="text-sm">Join two bloodlines through a debt that will be paid by a child not yet conceived. Write the terms in blood on a strip of linen, then feed the linen to your Hollowed. The Hollowed's eyes film over for a day. One year later, the debt will manifest — a stillbirth, a windfall, a sudden illness — as you decreed.</p>
+    <p class="text-sm"><strong>Cost:</strong> 3 Obligation, and the Hollowed must witness the union. <strong>Push (Mark +1 Identity):</strong> The debt is paid immediately, but the Cord takes a permanent interest in the bloodline (GM may introduce complications whenever that family is involved).</p>
+</div>
+
+<h2 id="conspiracy">The Conspiracy — Propping and Culling Dynasties</h2>
+<p>The Daughters are the hidden hand of succession across dozens of noble houses, merchant dynasties, and patron-bound bloodlines.</p>
+
+<h3>How It Works</h3>
+<p>A Sister attends a dying matriarch. She listens to the matriarch's secrets, her fears about her heirs, her desire to see the family continue — or her wish to see it burn. The Sister offers a <em>good death</em>: peace, release, the promise that the matriarch's will is done. In exchange for a <em>thread</em> — a name, a memory, a future favor.</p>
+<p>The thread is woven into the Cord. Later, when an heir contests the inheritance, a Daughter appears — not as a witch, but as a neutral nurse who "happens" to recall the dying matriarch's final words. Or a key document is "found" in a Daughter's alms-house. Or a rival family suffers a sudden plague, tended by Sisters who ensure a very efficient death rate.</p>
+
+<h3>The Goal</h3>
+<p>Not mere wealth, but <strong>balance</strong>. The Cord prefers stable, predictable dynasties — those that will pay their debts quietly. It culls unstable houses (those prone to war, to Inquisitor purges, to wild magic) by letting them fade through "natural" death rates. It props up houses that are useful: those that sponsor Daughters' hospices, that ignore the Cord's activities, that provide a steady stream of unclaimed bodies for the Hollowing.</p>
+
+<h3>Player Hooks</h3>
+<ul>
+    <li>A PC learns that their own noble house has been <em>managed</em> by the Cord for generations. Their grandmother's death was not natural; it was a <em>collection</em>.</li>
+    <li>A rival house is collapsing from a "mysterious wasting disease" — actually a targeted curse delivered through a Daughter's soup. The party must decide whether to expose the Cord or exploit the weakness.</li>
+    <li>A Winter approaches the party with an offer: help her cull an upstart magocracy that threatens to destabilize the region, and the Cord will forget a debt the party owes (from a previous adventure).</li>
+</ul>
+
+<h2 id="rivalries">Rivalries with Other Patrons</h2>
+<p>The Daughters are not allied with major Patrons; they exist in tension with many, and outright hostility with some.</p>
+
+<h3>Malachai — Addiction vs. Generational Debt</h3>
+<p>Malachai offers <em>immediate</em> relief — a silver coin that buys sea-lungs, a thorn that makes arrows strike true. The Daughters offer <em>deferred</em> relief. A Daughter sees a Malachai-touched addict as a wasted asset — they burn out before their debt can compound.</p>
+<p class="text-sm text-muted"><strong>Conflict:</strong> Daughters refuse to tend Malachai's followers; Malachai sends cursed items into Daughter-run hospices.</p>
+
+<h3>Ikasha — Latent Debt vs. Hidden Potential</h3>
+<p>Ikasha is the patron of <em>latent</em> debt — obligations not yet called, secrets not yet spoken. The Daughters deal in <em>active</em> debt — threads already woven. They see Ikasha's followers as hoarders of potential.</p>
+<p class="text-sm text-muted"><strong>Conflict:</strong> A Daughter and an Ikasha cultist both seek the same dying person. The Daughter wants the death to be witnessed and recorded; the Ikasha wants it silent. Neither can act openly; a cold war of whispers.</p>
+
+<h3>Inaea — Web of Mercy vs. Web of Debt</h3>
+<p>Inaea weaves mercy — threads that comfort, knots that bind gently. The Daughters weave debt. They are the dark mirror of Inaea's covenant.</p>
+<p class="text-sm text-muted"><strong>Conflict:</strong> An Inaean silk-weaver and a Daughter both tend the same community. The weaver establishes a Wedding Line (sanctuary); the Daughter establishes a Hospitality Toll (every meal incurs a debt). The party must mediate — or choose which web to support.</p>
+
+<h3>Isoka — Transformation vs. Perpetuation</h3>
+<p>Isoka teaches shedding — the old self dies, the new self emerges. The Daughters teach perpetuation — the debt continues, the bloodline continues. A Daughter sees Isoka's shedding as waste; Isoka sees the Cord as stagnation.</p>
+<p class="text-sm text-muted"><strong>Conflict:</strong> An Isoka cult is trying to help a noble heir "shed" their identity — escape the family, abandon their debts. The Daughters have a vested interest in keeping that heir bound.</p>
+
+<h3>Minor Rivalries</h3>
+<ul>
+    <li><strong>The Pale Shepherd:</strong> Respectful distance. Both tend thresholds between life and death. The Shepherd guides; the Daughters harvest.</li>
+    <li><strong>The Witness:</strong> Hostile. The Witness records truths; the Daughters hide, omit, and occasionally destroy records. A Witness-bound Runekeeper is a natural enemy.</li>
+    <li><strong>The Traveler:</strong> Neutral. Daughters maintain waystation hospices — useful to travelers. The Traveler's followers respect their hospitality, even if they dislike the cost.</li>
+</ul>
+
+<h2 id="gm-tools">GM Tools — Running the Cord</h2>
+
+<h3>Campaign Timers</h3>
+<table>
+<thead><tr><th>Timer</th><th>Purpose</th><th>Advance / Retreat</th></tr></thead>
+<tbody>
+<tr><td><strong>Cord's Patience [6]</strong></td><td>How long the Daughters tolerate interference before taking action.</td><td>Advance when PCs expose a Daughter, steal a Hollowed, or break a promise. Retreat when PCs pay a tithe, help a Daughter, or keep a secret.</td></tr>
+<tr><td><strong>Debt Spread [8]</strong></td><td>How extensively the Cord has entangled local nobles and merchants.</td><td>Advance when PCs witness a "natural" death that seems too convenient, or a dynasty suddenly collapses. Retreat when PCs expose a conspiracy, save an endangered heir, or redirect a tithe.</td></tr>
+<tr><td><strong>Hollowed Hunger [4]</strong></td><td>How close a local Hollowed is to acting independently (dangerous).</td><td>Advance when the Hollowed is ignored, mistreated, or separated from its Sister. Retreat when the Sister performs a soothing rite or sacrifices a small memory.</td></tr>
+<tr><td><strong>Winter's Goal [6]</strong></td><td>A specific Sister's personal agenda (culling a house, collecting a rare debt, etc.).</td><td>Advance as the Winter succeeds. Retreat when the party thwarts her. Filling the timer means her goal is achieved (or she is promoted).</td></tr>
+</tbody>
+</table>
+
+<h3>Sample SB Spends for Daughter Encounters</h3>
+<ul>
+    <li><strong>1 SB:</strong> A Hollowed's gaze lingers on a PC; they feel watched. Next roll involving secrecy is Desperate.</li>
+    <li><strong>2 SB:</strong> A thread of gray cord appears tied around a PC's wrist. They cannot recall when it happened. Remove it (action, DV 3) or suffer -1 die to social rolls with anyone who knows the Cord.</li>
+    <li><strong>3 SB:</strong> A Winter invokes a <em>Threshold Contract</em> the party unknowingly accepted (they ate soup at a Daughter's hospice). The party must choose: accept a minor debt (lose 1 Boon, gain 1 Obligation to the Cord) or reject it (gain 2 SB banked for the Winter in the next scene).</li>
+    <li><strong>4 SB:</strong> The High Mother's attention falls on a PC. They dream of the Cord. When they wake, they have forgotten a significant memory (GM chooses — a face, a secret, a location). To recover it, they must travel to a Daughter's hospice and bargain.</li>
+</ul>
+
+<h3>Cultural Integration</h3>
+<table>
+<thead><tr><th>Region</th><th>Daughters' Status</th></tr></thead>
+<tbody>
+<tr><td><strong>Aeler</strong></td><td>Tolerated as "Breath Wardens" in the Deep Vaults — they tend miners dying of stone-lung. The Aeler audit their ledgers. As long as the Cord's debts are recorded, the dwarves accept them.</td></tr>
+<tr><td><strong>Aelaerem</strong></td><td>Rejected. Halfling Hearth-Mothers see the Cord as a perversion of hospitality. Aelfish communities actively warn travelers against Daughter-run hospices.</td></tr>
+<tr><td><strong>Ecktoria</strong></td><td>Hunted. The Everflame's Inquisition pursues Daughters as heretics (magic without patriarchal witness). But many noble families secretly employ Daughters for discreet end-of-life arrangements.</td></tr>
+<tr><td><strong>Kahfagia</strong></td><td>Tolerated in port infirmaries — they reduce plague mortality. Any Sister caught interfering with a ship's manifest is hanged.</td></tr>
+<tr><td><strong>Vilikari</strong></td><td>Symbiotic. Syndicates provide bodies for Hollowing (unclaimed debtors); Daughters provide untraceable poison and alibis.</td></tr>
+<tr><td><strong>Ykrul</strong></td><td>Reviled. The steppe clans' concept of <em>good death</em> is to die in the open, under sky, witnessed by the wind. A Daughter's hospice is a desecration. Any Sister found on the steppe is killed.</td></tr>
+</tbody>
+</table>
+
+<h2 id="hooks">Adventure Hooks &amp; Campaign Frames</h2>
+
+<div class="office-box">
+    <h4>1. The Trapped Sister <span class="badge badge-gray">Introductory</span></h4>
+    <p class="text-sm">A Daughter contacts the party secretly. She feels the Cord closing around her — she has been ordered to harvest a child's breath to pay a debt she did not incur. She wants help to reroute the debt to a deserving target. The party must decide: assist her (gaining a Daughter ally, but incurring the Cord's attention) or betray her (earning a String with the local Winter, but losing a potential ally).</p>
+</div>
+
+<div class="office-box">
+    <h4>2. The Winter's Cull <span class="badge badge-gray">Political</span></h4>
+    <p class="text-sm">A Winter has decided to cull a noble house that has grown too independent. She has infiltrated their staff, and their matriarch is dying. The Cord wants the house to fragment, so its lands become available for a "loyal" family. The party is hired by a loyalist of the house to ensure a peaceful transition — one that passes leadership smoothly. They must outmaneuver the Winter's agents (who are also acting as nurses and healers). No one is obviously evil; both sides want a good death — just different heirs.</p>
+</div>
+
+<div class="office-box">
+    <h4>3. The Debt That Walks <span class="badge badge-gray">Horror</span></h4>
+    <p class="text-sm">A Duke's daughter was saved from a plague by a Daughter, but the price was a promise on her firstborn. She now has a child, and the Cord is coming to collect — not the child's life, but a <em>shadow</em> (rendering the child legally invisible, unable to inherit). The Duke hires the party to break the promise. They must find a way to nullify the debt without harming the Daughter (who is just following orders) or inciting the High Mother's wrath. Options: find a loophole (the promise was made under duress), pay an equivalent debt (steal a shadow from a criminal), or confront the Winter directly.</p>
+</div>
+
+<div class="office-box">
+    <h4>4. The High Mother's Shadow <span class="badge badge-gray">Epic</span></h4>
+    <p class="text-sm">A powerful necromancer threatens one of the Cord's key hospices. The Daughters cannot fight openly; they ask the party to act as their weapon. In exchange, they will erase a debt the party owes. But as the party investigates, they discover that the necromancer is actually a former Daughter who broke free — and she claims the Cord has been manipulating royal bloodlines for centuries to breed a perfect vessel for the High Mother. Decide: help the Daughters (perpetuate the conspiracy) or help the necromancer (risk unleashing a greater evil).</p>
+</div>
+
+<div class="office-box">
+    <h4>5. The House Without Doors <span class="badge badge-gray">Dungeon</span></h4>
+    <p class="text-sm">The party is invited to a Daughter's hospice — a place of healing and peace. They soon realize that every kindness is a thread, every meal a debt. The doors do not lead where they expect. The Hollowed watch from corners. A Winter offers them a deal: help her prune a troublesome ghost, and she will let them leave. But the ghost is the spirit of a woman who died in childbirth — and her baby now toils as a Hollowed. The party must find a way to unbind both mother and child without breaking the Cord's laws.</p>
+</div>
+
+<h2 id="hollowed-confession">The Hollowed — A Confession</h2>
+<p class="text-sm text-muted">The following confession was recorded by a silenced scribe of the Witness, found in a lead-lined box. It is told from the lips of Sister Aris, Keeper of the Door, to her Hollowed son.</p>
+
+<div class="story-box">
+<p>The first thing you learn, little one, is that a woman in labor does not see you. She sees the pain. She sees the face of her mother, or the face of her god. She does not see the boy who never blinks, who holds the linens with hands that do not warm.</p>
+
+<p>You are good at linens. I am proud of you.</p>
+
+<p>This was a farmhouse, a good one. Stone floor, thick beams, ash on the hearth. The father was the nervous type. He kept touching his belt where a knife should hang. I told him to boil water. Men need tasks. It keeps them from counting their fears.</p>
+
+<p>The mother was young, maybe eighteen, with the broad hips of a woman built for this. Her name was Ellia. I had delivered her own mother twenty-three years ago, a quick birth, a quiet one. That mother paid with a lock of hair and a promise to name her first daughter after my own mother, who had no name I ever spoke aloud.</p>
+
+<p>That debt is still in the Cord. It will be collected eventually. Maybe by you.</p>
+
+<p>Ellia screamed. Good screams — productive, open-throated. I checked her progress. Eight centimeters, then nine. The child was positioned well. I told her to push.</p>
+
+<p>You stood by the washbasin, your hands folded, your eyes open. The father glanced at you once, then again. He could not hold your gaze. No one ever can. They think it's shyness. They think you are simple. They do not see the silver wire, even when it glints in the firelight. That is the miracle of the Cord, little one. No one sees the help.</p>
+
+<p>The first twin came fast. A boy, red-faced, strong, with fists that knew how to hold the air. I tied the cord, passed him to the mother. She laughed and wept at once. The father touched the boy's cheek, and his hand did not shake.</p>
+
+<p>Then the second twin.</p>
+
+<p>He was smaller, paler, and his cord was wrapped around his neck twice, maybe three times. I felt the knot with my fingers. I could have unwrapped him. I have done it before. But I also felt the weight of the thread in my pocket — the thread that would have bound him to a lifetime of coughing, of debts to physicians, of nights when his parents would not be sure if he would wake.</p>
+
+<p>I looked at you. You were watching the father.</p>
+
+<p>He was still smiling at the first boy. He had not yet looked at the second.</p>
+
+<p>So I did not unwrap the cord. I held it tight, just for a moment. I felt his heart slow. It was quick. It was quiet. It was kind.</p>
+
+<p>I wrapped the second boy in a clean cloth and laid him on the table.</p>
+
+<p>"The second one did not make it," I said. My voice was calm. It is always calm. That is why they trust me.</p>
+
+<p>The mother's face did what faces do — the grief tried to arrive. I placed my hand on her forehead. "You have one healthy son. Focus on him. Do not let the shadow of the one you lost touch the one you hold."</p>
+
+<p>She nodded. Her eyelids fluttered. I had not given her anything yet. But the words were enough. The debt of the dead child was already transferring — from her memory to the Cord.</p>
+
+<p>The father looked at the still bundle. "He was so small," he whispered.</p>
+
+<p>"He was weak," I said. "He would have grown sickly, frail. A lifetime of coughing, of debts to physicians, of nights when you are not sure if he will wake. This is easier. Kinder."</p>
+
+<p>He did not argue.</p>
+
+<p>I cut two pieces of the umbilical cord. One for his mother's memory box. One for the Cord.</p>
+
+<p>You took it. You placed it in your pocket, next to your heart that does not beat.</p>
+
+<p>The mother asked for tea. I poured it. Dark, a little milk, a little iron. The father asked if he could have some. I poured a second cup. He drank it without tasting.</p>
+
+<p>As he drank, he looked at you.</p>
+
+<p>He saw you.</p>
+
+<p>Not the shy boy. Not the helper. He saw the thread where your mouth had been sewn. He saw the hollow where your heart should be. He saw the gray cord trailing from your chest, pulsing with the rhythm of his own heartbeat.</p>
+
+<p>His hand went to his throat. His mouth opened.</p>
+
+<p>"Drink," I said. "The tea will help you forget."</p>
+
+<p>He drank.</p>
+
+<p>I told him: "The child was weak. This is better. You have one healthy son. That is enough."</p>
+
+<p>He nodded. He was already forgetting the shape of the dead boy's face.</p>
+
+<div class="sep">— · · · —</div>
+
+<p class="text-sm text-muted" style="font-style:normal;">The testimony continues for several pages, describing the three days of recovery, the forgetting, and the eventual visit months later when the father offers water and calls the Hollowed a "kind face." The confession ends with the midwife's ambiguous penance:</p>
+
+<div class="sep">— · · · —</div>
+
+<p>I do not know if I am confessing because I am sorry, little one, or because the ritual demands it. Perhaps there is no difference.</p>
+
+<p>The mother was young. The father was kind. The dead child was weak. I told the truth.</p>
+
+<p>But truth, like tea, is a matter of preparation.</p>
+
+<p style="text-align:right;">The soup is always free. The price never is.</p>
+</div>
+
+<h2 id="colophon">Colophon</h2>
+<p>This expansion was written in the margins of hospice ledgers, on paper that smelled of milk and iron. The ink is lamp-black, cut with the ash of a forgotten name. The binding is gray cord, tied with nine knots. The ninth knot is not cut.</p>
+<p>The Cord waits. The Hollowed watches.</p>
+<p class="text-sm text-muted"><em>The ink is fresh. The road is south.</em></p>
+
+<hr>
+
+<footer>
+    <em>Fate's Edge Proprietary Content — © 2024 Nicholas A. Gasper. All rights reserved.</em>
+</footer>
+
+</body>
+</html>

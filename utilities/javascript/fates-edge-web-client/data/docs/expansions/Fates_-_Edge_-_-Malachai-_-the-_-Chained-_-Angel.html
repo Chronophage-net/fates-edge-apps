@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fate's Edge — Malachai, the Chained Angel</title>
+<style>
+    :root {
+        --bg1: #0a0808;
+        --bg2: #141010;
+        --bg3: #1d1717;
+        --bg4: #281f1f;
+        --text: #e3dcd8;
+        --text2: #ab9d97;
+        --text3: #6f6561;
+        --gold: #b8783c;
+        --gold-hover: #d4914f;
+        --border: #362a26;
+        --red: #a02828;
+        --green: #3d6b52;
+        --blue: #3a5f74;
+        --purple: #5c3f63;
+        --orange: #8a5a2a;
+        --iron: #8a8680;
+        --iron-hover: #a6a29b;
+        --radius: 8px;
+        --font: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+        background: var(--bg1);
+        background-image: radial-gradient(circle at 50% 0%, #1a1010 0%, #0a0808 60%);
+        color: var(--text);
+        font-family: var(--font);
+        padding: 1.5rem;
+        max-width: 1100px;
+        margin: 0 auto;
+        line-height: 1.6;
+    }
+    h1, h2, h3, h4, h5 { color: var(--gold); margin: 0.8rem 0 0.4rem; }
+    h1 { font-size: 1.9rem; border-bottom: 2px solid var(--gold); padding-bottom: 0.3rem; }
+    .subtitle { color: var(--text2); font-style: italic; margin-bottom: 0.8rem; font-size: 1rem; }
+    h2 { font-size: 1.4rem; border-bottom: 1px solid var(--border); padding-bottom: 0.2rem; margin-top: 1.8rem; }
+    h3 { font-size: 1.12rem; margin-top: 1.2rem; color: var(--iron-hover); }
+    h4 { font-size: 0.95rem; color: var(--text); }
+    p { margin: 0.5rem 0; }
+    a { color: var(--gold); text-decoration: none; }
+    a:hover { color: var(--gold-hover); }
+    ul, ol { margin: 0.4rem 0 0.4rem 1.4rem; }
+    li { margin: 0.15rem 0; }
+    .panel {
+        background: var(--bg2);
+        border-radius: var(--radius);
+        padding: 0.7rem 0.9rem;
+        border: 1px solid var(--border);
+        margin: 0.6rem 0;
+    }
+    .panel-gold { border-left: 4px solid var(--gold); }
+    .panel-red { border-left: 4px solid var(--red); }
+    .panel-blue { border-left: 4px solid var(--blue); }
+    .panel-green { border-left: 4px solid var(--green); }
+    .panel-purple { border-left: 4px solid var(--purple); }
+    .panel-orange { border-left: 4px solid var(--orange); }
+    .panel-iron { border-left: 4px solid var(--iron); }
+    .panel > strong:first-child, .panel > .panel-title { display: block; color: var(--gold); margin-bottom: 0.3rem; }
+    .badge {
+        display: inline-block;
+        padding: 0.08rem 0.55rem;
+        border-radius: 12px;
+        font-size: 0.68rem;
+        font-weight: 600;
+        white-space: nowrap;
+        margin: 0.1rem 0.15rem 0.1rem 0;
+    }
+    .badge-gold { background: var(--gold); color: #180f06; }
+    .badge-red { background: var(--red); color: #fff; }
+    .badge-green { background: var(--green); color: #fff; }
+    .badge-blue { background: var(--blue); color: #fff; }
+    .badge-purple { background: var(--purple); color: #fff; }
+    .badge-orange { background: var(--orange); color: #fff; }
+    .badge-iron { background: var(--iron); color: #150f0f; }
+    .badge-gray { background: var(--bg4); color: var(--text3); }
+    .flex { display: flex; gap: 0.4rem; flex-wrap: wrap; align-items: center; }
+    .text-muted { color: var(--text3); }
+    .text-gold { color: var(--gold); }
+    .text-sm { font-size: 0.88rem; }
+    .text-xs { font-size: 0.72rem; }
+    .mt-1 { margin-top: 0.5rem; }
+    .rite-box {
+        background: var(--bg3);
+        border-radius: var(--radius);
+        border: 1px solid var(--border);
+        border-left: 4px solid var(--gold);
+        padding: 0.6rem 0.9rem;
+        margin: 0.7rem 0;
+    }
+    .rite-box h4 { color: var(--gold); font-size: 1rem; }
+    .rite-box .rite-meta { margin: 0.15rem 0 0.4rem; }
+    .hook-box {
+        background: var(--bg2);
+        border-radius: var(--radius);
+        border: 1px solid var(--border);
+        padding: 0.7rem 0.9rem;
+        margin: 0.8rem 0;
+    }
+    table {
+        border-collapse: collapse;
+        width: 100%;
+        margin: 0.6rem 0;
+        font-size: 0.88rem;
+        background: var(--bg2);
+        border-radius: var(--radius);
+        overflow: hidden;
+    }
+    th, td {
+        border: 1px solid var(--border);
+        padding: 0.4rem 0.6rem;
+        text-align: left;
+        vertical-align: top;
+    }
+    th { background: var(--bg4); color: var(--gold); font-weight: 600; }
+    tr:nth-child(even) td { background: rgba(255,255,255,0.02); }
+    hr { border: none; border-top: 1px solid var(--border); margin: 1rem 0; }
+    .toc { background: var(--bg3); border-radius: var(--radius); padding: 0.6rem 0.9rem; border: 1px solid var(--border); }
+    .toc-title { color: var(--gold); font-weight: 600; display: block; margin-bottom: 0.3rem; }
+    .toc-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0 1rem; }
+    .toc a { color: var(--text2); display: block; padding: 0.1rem 0; font-size: 0.85rem; }
+    .toc a:hover { color: var(--gold); }
+    @media (max-width: 700px) { .toc-grid { grid-template-columns: 1fr; } }
+    blockquote {
+        border-left: 3px solid var(--gold);
+        padding-left: 1rem;
+        margin: 0.6rem 0;
+        color: var(--text2);
+        font-style: italic;
+    }
+    .confession {
+        border-left: 3px solid var(--red);
+        padding: 0.4rem 0 0.4rem 1rem;
+        margin: 0.8rem 0;
+        color: var(--text2);
+        font-style: italic;
+        font-size: 0.95rem;
+        background: var(--bg2);
+        border-radius: 0 var(--radius) var(--radius) 0;
+    }
+    footer {
+        font-size: 0.75rem;
+        color: var(--text3);
+        text-align: center;
+        padding: 1.2rem 0 0.4rem;
+        border-top: 1px solid var(--border);
+        margin-top: 2rem;
+    }
+</style>
+</head>
+<body>
+
+<h1>Malachai, the Chained Angel</h1>
+<p class="subtitle">Mother of Monsters, Cruel Messenger, Lost Angel — a Fate's Edge Patron Expansion</p>
+<p class="flex" style="margin-bottom:0.8rem;">
+    <span class="badge badge-gold">Faction Expansion</span>
+    <span class="badge badge-red">Patron: Malachai</span>
+    <span class="badge badge-iron">Curses &amp; Corruption</span>
+    <span class="badge badge-gray">Author: Nicholas A. Gasper</span>
+</p>
+
+<div class="panel panel-gold">
+    <p>Under the lamp, bread and salt — and a coin that cannot be spent. The ink is fresh. The road is south. The thread tightens.</p>
+</div>
+
+<div class="panel panel-red">
+    <strong class="panel-title">Content Warnings for This Expansion</strong>
+    <p class="text-sm">This expansion deals with addiction, self-destruction, body horror, and coercive transformation (vampirism, lycanthropy, and other curses). These elements are intended to create tension and moral weight, not to distress players.</p>
+    <ul class="text-sm">
+        <li>Addiction and dependency (the "hunger" that cannot be satisfied)</li>
+        <li>Loss of identity (memory erosion, facial transformation)</li>
+        <li>Body horror (the Worn, vampire feeding, lycanthropic transformation)</li>
+        <li>Coercion and loss of agency (curses that override will)</li>
+    </ul>
+    <p class="text-sm mt-1">Before play, establish <strong>Lines</strong> (hard boundaries — e.g. no on-screen addiction relapse, no sexual violence, no harm to children), <strong>Veils</strong> (soft boundaries — e.g. feeding described obliquely rather than graphically), and an <strong>X-Card</strong> (any player may pause or remove a scene without explanation). Safety tools are not a sign of weakness; they are a covenant of trust.</p>
+</div>
+
+<nav class="toc">
+    <span class="toc-title">Table of Contents</span>
+    <div class="toc-grid">
+        <div>
+            <a href="#what-malachai-is">What Malachai Is (And Is Not)</a>
+            <a href="#invokers-confession">The Invoker's Confession</a>
+            <a href="#the-chaining">The Chaining — The True Origin</a>
+            <a href="#well-of-ichor">The Well of Ichor</a>
+            <a href="#the-worn">The Worn — Debtors in Flesh</a>
+            <a href="#first-vampires">The First Vampires — The Thirteen</a>
+            <a href="#other-children">Other Children of Malachai</a>
+        </div>
+        <div>
+            <a href="#cultural-variations">Cultural Variations of Classic Curses</a>
+            <a href="#the-rivalry">The Rivalry — The Daughters of the Unbroken Cord</a>
+            <a href="#playing-a-follower">Playing a Follower of Malachai</a>
+            <a href="#sample-rites">Sample Rites of Malachai</a>
+            <a href="#adventure-hooks">Adventure Hooks and Campaign Frames</a>
+            <a href="#gm-tools">GM Tools — Running Malachai</a>
+            <a href="#colophon">Colophon</a>
+        </div>
+    </div>
+</nav>
+
+<hr>
+
+<h2 id="what-malachai-is">What Malachai Is (And Is Not)</h2>
+
+<p>Malachai was once a divine messenger — a herald of painful truths, sent to deliver news that could not be softened. She was the voice that told kings their sons had died in battle, the whisper that revealed a lover's betrayal, the silence that preceded a diagnosis of no cure.</p>
+
+<p>She was not cruel. She was necessary.</p>
+
+<p>But necessity wears. The suffering she witnessed became a weight. The anguish she caused became a debt she could not collect. In time, she began to soften the truth — to offer false hope alongside real curses, to let the coin fall from her hand as a gift, not a verdict.</p>
+
+<p>The gods bound her in chains of black iron and sealed her beneath the desert city of Zahk'Kozahn. There, mortal magi and priests planned to draw upon her power for their own dark ambitions. They underestimated what they had created. Her fall had not made her weaker; it had made her hungrier.</p>
+
+<p>She awakened the dead. She destroyed Zahk'Kozahn. She learned to extend her power through cursed coins, thorned gifts, and the desperate prayers of those who would rather be damned than broken.</p>
+
+<p>Now she waits. Chained but not contained. Imprisoned but not silent. Her voice reaches across the world, offering power to the weak, hope to the hopeless, and sweet oblivion to those who cannot bear to face the dawn.</p>
+
+<h3>What They Represent</h3>
+<p>Cursed gifts, false salvation, addictive power, lycanthropy, vampirism, and other afflictions that feel like blessings until it is too late.</p>
+
+<h3>Epithets and Signs</h3>
+<ul>
+    <li>The Cruel Messenger</li>
+    <li>The Chained Angel</li>
+    <li>Mother of Monsters</li>
+    <li>The Silver Tongue of Despair</li>
+    <li>She Whose Gifts Rot</li>
+</ul>
+<p class="text-sm text-muted"><strong>Signs:</strong> A silver coin that cannot be spent except on suffering. A thorn that draws blood but never heals. A mouth that smiles out of sync with the face. A bell that rings once, then never again.</p>
+
+<h3>Cultural Variants</h3>
+<table>
+<thead><tr><th>Region</th><th>Name</th><th>Manifestation</th></tr></thead>
+<tbody>
+<tr><td>Linn</td><td>Salt-Fang</td><td>Shipwreck survivors find a silver coin in their mouth. Spend it to gain sea-lungs (breathe underwater) but develop a hunger for raw flesh.</td></tr>
+<tr><td>Valewood</td><td>Thorn-Giver</td><td>Hunters who curse a rival find their arrows always strike true — but the blood on the arrowhead never dries.</td></tr>
+<tr><td>Ecktoria</td><td>The Ur-Heretic</td><td>The Inquisition's name for her. Her followers are burned without trial.</td></tr>
+<tr><td>Zakov</td><td>Tide-Shedder</td><td>Pirates leave a lock of hair and a written name at a sunken temple. Eels eat both. The name is forgotten; the pirate gains a year of incredible luck.</td></tr>
+</tbody>
+</table>
+
+<h2 id="invokers-confession">The Invoker's Confession — A Voice from the Road</h2>
+
+<div class="confession">
+    <p>I picked up the Symbol because I was smart. That was my mistake.</p>
+    <p>I had studied Malachai for years — her history, her patterns, the shape of her gifts. I knew that every coin had a tail. I knew that every thorn drew blood. I was not like the desperate fools who swallowed her curses whole. I was a professional. I would take what I needed and walk away clean.</p>
+    <p>The first time I invoked her, I felt the thread settle behind my ear. I told myself it was nothing — a minor obligation, easily cleared. I was in control.</p>
+    <p>The second time, the thread tightened. I told myself I could cut it at any time. I just needed one more edge.</p>
+    <p>The third time, I stopped counting.</p>
+    <p>I do not remember when the Symbol began to warm in my hand before I even spoke. I do not remember when I started dreaming of a chained angel with my mother's face. I do not remember the exact moment I stopped being the one who used the curse and became the one who needed it.</p>
+    <p>But I remember the last time.</p>
+    <p>I cracked the Symbol — not on purpose, but because I was careless, because I was hungry, because I needed that power one more time and I reached for it without thinking. The crack was small. A hairline fissure. But the thread behind my ear snapped.</p>
+    <p>I felt nothing. No pain. No release. Just silence.</p>
+    <p>The Collector came that night — a child with silver wire eyes and a mouth that never moved. It did not threaten. It did not speak. It simply watched as I tried to use the Symbol again. Nothing happened.</p>
+    <p>The power was gone.</p>
+    <p>But the hunger was not.</p>
+    <p>I have not touched a Malachai Symbol in seven years. Not because I am strong. Because I know that if I pick it up again, I will not put it down.</p>
+    <p>I was in control. That was my mistake.</p>
+</div>
+
+<h2 id="the-chaining">The Chaining — The True Origin</h2>
+
+<p>The following account is pieced together from Inquisitorial records, vampire confessions, and the fragmented memories of those who have glimpsed Zahk'Kozahn in nightmares.</p>
+
+<p>One hundred years after the fall of Utar, the Church of the Flame called upon all holy orders to bolster the troubled eastern provinces surrounding Galanina. Their goal was to secure three temples — the Three Holy Sisters — from falling into the hands of the Ashaani magocracy, who claimed the territory by ancient right.</p>
+
+<p>The war lasted twelve years, a grinding stalemate of siege and counter-siege, until the Ashaani Immortal Farhan Azohl took command of their forces. In a single, three-day campaign, he shattered the Church's armies. Most survivors retreated. But the Order of the Lost Angel — a militant brotherhood dedicated to a mysterious "Lost Angel" whose name had been erased from the liturgy — was driven into the deep desert.</p>
+
+<p>Harried by Azohl's cavalry, unaccustomed to the unforgiving sands, the Order was whittled down to a dozen knights, their squires, and a handful of men-at-arms.</p>
+
+<p>They stumbled upon an ancient ruin, overgrown with wild figs. The wells were full of pristine water. The fig trees bore ripe fruit. Their pursuers retreated. They thought it was a gift from the Gods.</p>
+
+<p>It was the cursed city of <strong>Zahk'Kozahn</strong>.</p>
+
+<p>From the first night, shadows and wights picked off the soldiers and servants. The survivors realized they could not leave — the city's boundary was a threshold that turned them back, no matter which direction they walked.</p>
+
+<p>After weeks of dwindling hope, a paladin named <strong>Quentin Asselin</strong>, third son of a minor barony, gathered the remaining twelve knights. They prayed for an answer, a weapon, a way to defeat the evil that held them.</p>
+
+<p>Their prayers were answered by a vision — a dark one. In the dream, a ziggurat at the city's center, and beneath it, a chapel where a chained being waited.</p>
+
+<p>The Thirteen fought through the undead guardians, descending deeper into the earth. The air grew colder, the shadows denser, until they reached a vast vaulted chamber lit by a single, guttering candle.</p>
+
+<p>In that chamber, they found an angel.</p>
+
+<p>Her wings were bound with chains of <strong>Aetherium</strong> — the metal the gods used to imprison titans. Her arms were pulled taut by hooks driven into the stone. Her mouth was sewn shut with silver wire. Her eyes were open, and they were not angry.</p>
+
+<p>She was <em>patient</em>.</p>
+
+<p>Malachai — for she named herself — spoke through a wound in her throat, her voice a dry whisper of rust and honey. She told them that she was the Lost Angel their order had been named for. She had been pulled from the heavens by the magi of Zahk'Kozahn, chained in this vault, and slowly corrupted by their rituals for centuries. In the end, she had destroyed them — but the chains held, as they were made to bind gods.</p>
+
+<p>She could not leave. But she could extend her power beyond the city's walls. She could offer <em>them</em> the strength to escape, to take revenge, to return to the world as beings of legend.</p>
+
+<p>All they had to do was drink.</p>
+
+<p>Quentin was the first.</p>
+
+<p>He knelt before the chained angel. She spat a single drop of black blood onto his tongue. He swallowed. The taste was copper, honey, and the memory of every lie he had ever told.</p>
+
+<p>The others followed, one by one.</p>
+
+<p>When they rose, they were no longer paladins. They were the <strong>Thirteen First Vampires</strong> — immortal, hungry, and bound to Malachai's will. They could walk in sunlight (the chains had burned away that weakness). They could create others. And they were free of the Church's oaths.</p>
+
+<p>They spent a moonless month in the cursed city, converting, subjugating, or sacrificing the remainder of their order. Then, as the Immortal Farhan Azohl's forces approached, they left Zahk'Kozahn and struck.</p>
+
+<p>The Thirteen destroyed two Ashaani legions before Azohl sought the aid of the Priests of Modnir, God of Justice. The two forces fought to a bloody stalemate — but before the conflict could be resolved, the Thirteen began to fracture. Some wanted to conquer; others wanted to hide; a few, like Quentin, simply wanted to be left alone.</p>
+
+<p>The Order of the Chained Angel disbanded. Each of the Thirteen or their direct spawn formed a vampire clan and scattered into the shadows of the known world.</p>
+
+<p>Malachai did not stop them. She had her tribute — their souls, their service, their endless hunger. She could wait. She has all the time in the world.</p>
+
+<h3 id="well-of-ichor">The Well of Ichor — The Cure That Is Also a Trap</h3>
+
+<p>Deep beneath the cursed city of Zahk'Kozahn, below the ziggurat and the catacombs, below the chapel where Malachai hangs in her chains, there is a <strong>Well of Ichor</strong>.</p>
+
+<p>The ichor is black, viscous, and smells of honey and copper. It is the concentrated essence of the chained angel's blood — the same substance that created the Thirteen First Vampires. <strong>It can cure any curse that Malachai has bestowed.</strong></p>
+
+<p>A werewolf who drinks from the Well returns to human form, never to transform again. A vampire who drinks becomes mortal, ages normally, and can finally die. A thorn-giver who drinks loses the thorn — and the power that came with it.</p>
+
+<p>But the Well is not a gift. It is another trap.</p>
+
+<div class="panel panel-red">
+    <ul>
+        <li>The Well is guarded by the <strong>Silent Ones</strong> — hollowed children with silver wire eyes, the same Collectors who serve the Daughters of the Unbroken Cord.</li>
+        <li>The Well is reachable only by those who bear Malachai's curse. A mortal who approaches sees only an empty pit. The curse is the key. <strong>Zahk'Kozahn itself cannot be found unless guided by someone who already carries a curse of Malachai.</strong></li>
+        <li>The Well does not release you from Malachai's attention. It only removes the <em>active</em> curse. She still knows your name. She can still offer you a new gift, a new coin, a new thorn.</li>
+        <li>Each drink from the Well costs a memory. The Silent Ones take it as payment. You will not remember why you came, or what you lost, until the curse returns — and it always returns, because Malachai has infinite patience. (Mechanically: lose 1 permanent memory slot — a face, a name, a place. The GM chooses.)</li>
+    </ul>
+</div>
+
+<p class="text-sm text-muted"><em>The cure is real. The freedom is an illusion. The Well is a waiting room.</em></p>
+
+<h2 id="the-worn">The Worn — Debtors in Flesh</h2>
+
+<p>The cursed city is not empty. Those who bear Malachai's curses and succumb completely — who lose themselves to hunger, addiction, or despair — are not released. They are drawn back to Zahk'Kozahn, where they become the <strong>Worn</strong>.</p>
+
+<p>The Worn are the hollowed shells of the cursed. They have been worn thin by their own appetites — peeling skin, eyes like cracked glass, limbs that move too fast or too slow. They are desperate, always desperate, because the hunger never ends. It only changes shape.</p>
+
+<h3>Classes of the Worn</h3>
+<table>
+<thead><tr><th>Class</th><th>Description</th><th>Mechanics</th></tr></thead>
+<tbody>
+<tr><td><strong>Shambler</strong><br><span class="badge badge-gray">Cap 2</span> <span class="badge badge-gray">Tier I</span></td><td>Slow, relentless. Feel no pain. Exist only to feed on warmth.</td><td>Body 3, Brawl 2. Harm 3. <strong>Relentless:</strong> ignores first 2 Fatigue. Cannot be reasoned with.</td></tr>
+<tr><td><strong>Screamer</strong><br><span class="badge badge-gray">Cap 3</span> <span class="badge badge-gray">Tier II</span></td><td>Emaciated, announce presence with a shriek that paralyses. Hunt in packs.</td><td><strong>Shriek</strong> (action): all in Near test Spirit+Resolve DV 3 or lose next action. <strong>Pack Hunters:</strong> +1 die when allies in Near.</td></tr>
+<tr><td><strong>Stalker</strong><br><span class="badge badge-gray">Cap 3</span> <span class="badge badge-gray">Tier II</span></td><td>Silent, patient. Follow prey for hours, learning patterns. Strike without warning.</td><td>Stealth 3. <strong>Surprise Strike:</strong> If attacking from Hidden, auto-hit and +1 Harm. <strong>Patient Predator:</strong> +2 dice after observing target for 1 hour.</td></tr>
+<tr><td><strong>Crackler</strong><br><span class="badge badge-gray">Cap 4</span> <span class="badge badge-gray">Tier III</span></td><td>Most "alive" — still speak, bargain, beg. Joints snap audibly.</td><td>Sway 3, Deception 3. <strong>Confess:</strong> Offer a genuine secret for 1 Boon. <strong>Debt Sense:</strong> Knows what any creature within Near owes. <strong>Wretched Bargain:</strong> Take a Condition from a target onto itself in exchange for a memory.</td></tr>
+</tbody>
+</table>
+
+<p>The Worn are not mindless. They remember fragments of who they were. They can be negotiated with, manipulated, even pitied. But they cannot be saved — not by mortal means. The only release is the Well of Ichor, or final death.</p>
+
+<p class="text-sm text-muted"><em>They are strung out on the memory of hope. They would sell their last name for a taste of the coin.</em></p>
+
+<h2 id="first-vampires">The First Vampires — The Thirteen</h2>
+
+<p>The Thirteen are not a unified faction. They are a <em>consequence</em> — the first link in a chain of curses that Malachai has been forging for centuries. Each of them bears her mark, each is bound to return to Zahk'Kozahn once per century to pay tribute, and each has shaped their immortality according to their own appetites.</p>
+
+<h3>Baron Quentin Asselin — The Reluctant Leech</h3>
+
+<p>Quentin, the third son of a minor barony, the first to drink, the one who might have been a saint if there were any saints left. He is disillusioned with fighting, with politics, with the endless hunger. He engineered the deaths of his elder brothers, took over the family title, and built a secluded estate in a remote valley. He surrounds himself with mortal lovers, damphirs (half-vampire children), and servants who believe they are blessed.</p>
+
+<p>Once per century, he travels to Zahk'Kozahn to pay tribute — a chest of silver, a phial of his own blood, and the name of someone who loved him. The offering is always accepted.</p>
+
+<p>When adventurers come to destroy him (as they do, every few decades), he prefers not to kill them. He finds it <em>boring</em>. Instead, he converts them, breaks their wills, and forces them to become servants or lovers. The ones who resist too strongly — he drives them insane and casts them back into the world, gibbering tales of a beautiful monster who smiled as he destroyed everything they were.</p>
+
+<div class="panel panel-gold">
+    <strong class="panel-title">Roleplay Hook</strong>
+    <p class="text-sm">Quentin is not a villain who cackles. He is a tragic figure who believes he is doing his victims a favor — sparing them the pain of mortality, giving them eternity to find meaning. His horror is that he is <em>almost convincing</em>.</p>
+</div>
+
+<h3>The Other Twelve</h3>
+<table>
+<thead><tr><th>Name</th><th>Domain</th><th>Quirk</th></tr></thead>
+<tbody>
+<tr><td>Remi the Wolf</td><td>Northern forests</td><td>Became a werewolf first, then a vampire; bloodline carries both curses.</td></tr>
+<tr><td>Sister Maris</td><td>Eastern swamps</td><td>Runs a children's hospice. The children never leave.</td></tr>
+<tr><td>The Sparrow</td><td>No fixed domain</td><td>Kills only the wicked, or so he claims. Cannot look at mirrors.</td></tr>
+<tr><td>Arundel the Architect</td><td>Mountains</td><td>Builds beautiful, impossible cathedrals to Malachai.</td></tr>
+</tbody>
+</table>
+<p class="text-sm text-muted"><em>Eight others remain to be created by your table. Use the cultural variant tables below for inspiration.</em></p>
+
+<h2 id="other-children">Other Children of Malachai — The Cursed</h2>
+
+<p>Not all of Malachai's children are vampires or werewolves. Her gifts manifest according to the desires and sins of those who accept them.</p>
+
+<h3>The Unkillable Killer (Slasher)</h3>
+<p><strong>Origin:</strong> A mortal who bargained for invincibility — to survive a massacre, to avenge a family, to become the hunter instead of the prey.</p>
+<p><strong>The Curse:</strong> They cannot stop killing. The hunger for violence grows with each life taken. The face of their first victim appears in every reflection.</p>
+
+<p class="text-sm mt-1"><strong>Cultural Variants</strong></p>
+<ul class="text-sm">
+    <li><strong>Linn (Draugr):</strong> A sea-raider who refused to die. Their body washes ashore after every battle.</li>
+    <li><strong>Aeler (Stone-heart):</strong> A miner buried alive. Their skin is gray and cold; they dig through rock with bare hands.</li>
+    <li><strong>Ykrul (Flesh-that-Remembers):</strong> A rider whose clan was slaughtered. Their vengeance creates new enemies with each generation.</li>
+</ul>
+
+<div class="panel panel-red">
+    <strong class="panel-title">Mechanics</strong>
+    <ul class="text-sm">
+        <li><strong>Regeneration:</strong> Ignore the first 2 Harm each scene.</li>
+        <li><strong>Unkillable:</strong> Cannot die from mundane harm. Decapitation, fire, and magical destruction may kill (GM discretion).</li>
+        <li><strong>Hunger [6]:</strong> Ticks each time you kill a sentient being. At 3, social rolls -1 die. At 6, frenzy — attack nearest creature.</li>
+        <li><strong>The Face in the Mirror:</strong> Once per session, GM may force a Resolve test (DV 4) or suffer -1 die to all rolls for the scene.</li>
+    </ul>
+</div>
+
+<h3>The Memory Eater (Psychic Vampire)</h3>
+<p><strong>Origin:</strong> A scholar who wanted to know everything; a lover who wanted to never forget; a spy who wanted to steal secrets without trace.</p>
+<p><strong>The Curse:</strong> They must feed on fresh memories or lose their own. Powerful emotions yield the most potent feed.</p>
+
+<p class="text-sm mt-1"><strong>Cultural Variants</strong></p>
+<ul class="text-sm">
+    <li><strong>Thepyrgos (Lector):</strong> Feeds on dying students; the university's secret historian.</li>
+    <li><strong>Vilikari (Debt-Reader):</strong> Feeds on broken promises; clients pay twice.</li>
+    <li><strong>Lethai-thora (Empty Archive):</strong> Has lived centuries; cannot remember their own childhood.</li>
+</ul>
+
+<div class="panel panel-blue">
+    <strong class="panel-title">Mechanics</strong>
+    <ul class="text-sm">
+        <li><strong>Memory Feed (Action):</strong> Touch a willing or helpless target, take one specific memory. Target forgets permanently. Gain 1 Boon.</li>
+        <li><strong>Hunger for Emotion:</strong> Must feed on a significant memory once per week or lose 1 Fatigue per day.</li>
+        <li><strong>Memory Leak:</strong> Once per session, GM may have you forget a minor detail. You cannot recall it until you feed.</li>
+    </ul>
+</div>
+
+<h3>The Changeling (Faceless)</h3>
+<p><strong>Origin:</strong> A person who wanted to escape their past — a criminal, a disgraced noble, a broken lover.</p>
+<p><strong>The Curse:</strong> They can change appearance at will, but they forget who they were originally. The more they change, the less stable their identity.</p>
+
+<p class="text-sm mt-1"><strong>Cultural Variants</strong></p>
+<ul class="text-sm">
+    <li><strong>Acasia (Mask-Dancer):</strong> A performer with a hundred faces; when the music stops, they cannot remember which is theirs.</li>
+    <li><strong>Zakov (Tide-Walker):</strong> A smuggler who can become any sailor they have met; they sometimes forget that they were not always that person.</li>
+    <li><strong>Valewood (Leaf-Turner):</strong> A Lethai-al ranger who can appear as any creature of the wood — but the forest is forgetting them in return.</li>
+</ul>
+
+<div class="panel panel-purple">
+    <strong class="panel-title">Mechanics</strong>
+    <ul class="text-sm">
+        <li><strong>Change Face (Action):</strong> Assume appearance of any humanoid you have seen. Gain +2 dice to Deception.</li>
+        <li><strong>Identity [6]:</strong> Ticks each time you change faces. At 3, forget minor personal details. At 6, forget your original face entirely.</li>
+    </ul>
+</div>
+
+<h3>The Plague Bearer (Contagion)</h3>
+<p><strong>Origin:</strong> A healer who wanted to cure a plague; a mother who wanted to spare her child; a martyr who wanted to take suffering onto themselves.</p>
+<p><strong>The Curse:</strong> They are immune to disease, but they can carry any disease they have touched. Their touch is poison. Their breath is fever.</p>
+
+<p class="text-sm mt-1"><strong>Cultural Variants</strong></p>
+<ul class="text-sm">
+    <li><strong>Ecktoria (Pale Saint):</strong> A nun who nursed the sick during a plague. She never fell ill. The plague is still inside her, waiting.</li>
+    <li><strong>Mistlands (Fog-Bringer):</strong> A bell-warden who breathed in the Direwood mist. They can exhale the same fog, hiding allies or suffocating foes — but the fog erases memories.</li>
+    <li><strong>Sekogo (Rot-Walker):</strong> A druid who tried to cure blight. Trees die when they pass.</li>
+</ul>
+
+<div class="panel panel-green">
+    <strong class="panel-title">Mechanics</strong>
+    <ul class="text-sm">
+        <li><strong>Contagion Aura (Passive):</strong> All living creatures within Near range suffer -1 die to Endurance rolls. You are immune to disease and poison.</li>
+        <li><strong>Infectious Touch (Action):</strong> Touch a target; they test Endurance (DV 4) or contract a disease of your choice.</li>
+        <li><strong>Plague [6]:</strong> Ticks each time you use Infectious Touch or remain in a populated area for more than a day. At 3, disease spreads uncontrollably. At 6, everyone flees from you.</li>
+    </ul>
+</div>
+
+<h2 id="cultural-variations">Cultural Variations of Classic Curses</h2>
+
+<p>Not all vampires are the same. Not all werewolves howl at the moon. Malachai's curses adapt to the fears and legends of each culture.</p>
+
+<h3>Vampires</h3>
+<table>
+<thead><tr><th>Culture</th><th>Name</th><th>Traits</th><th>Weakness</th></tr></thead>
+<tbody>
+<tr><td>Linn</td><td>Draugr</td><td>Breathe underwater, claw from waves</td><td>Salt ring traps until dawn</td></tr>
+<tr><td>Aeler</td><td>Stone-Sleepers</td><td>Drink breath, found in deep mines</td><td>Bell rung at dawn wakes them</td></tr>
+<tr><td>Ykrul</td><td>Bone-Eaters</td><td>Turn to dust, rise when named</td><td>Being un-named erases them</td></tr>
+<tr><td>Vhasia</td><td>Candle-Wights</td><td>Extinguish candles through windows</td><td>Lit candle at threshold bars them</td></tr>
+<tr><td>Lethai-ar</td><td>Silk-Drinkers</td><td>Feed on desire, not blood</td><td>Vow witnessed by a third party</td></tr>
+</tbody>
+</table>
+
+<h3>Werewolves (Loup-Garou, Skin-Walkers, Beast-Kin)</h3>
+<table>
+<thead><tr><th>Culture</th><th>Name</th><th>Traits</th><th>Trigger</th></tr></thead>
+<tbody>
+<tr><td>Linn</td><td>Sea-Wolves</td><td>Transform into seals/walruses</td><td>First winter storm after a kill</td></tr>
+<tr><td>Ykrul</td><td>Sky-Hounds</td><td>Hawk-headed hunters</td><td>Sight of blood on fresh snow</td></tr>
+<tr><td>Valewood</td><td>Root-Walkers</td><td>Turn into trees, immobile but all-seeing</td><td>Witnessed promise of hospitality</td></tr>
+<tr><td>Aeler</td><td>Stone-Hides</td><td>Massive, slow, nearly invulnerable</td><td>Being underground (cannot transform in sunlight)</td></tr>
+<tr><td>Vilikari</td><td>Coin-Hounds</td><td>Dogs that sniff out stolen goods</td><td>Handling counterfeit currency</td></tr>
+</tbody>
+</table>
+
+<h2 id="the-rivalry">The Rivalry — The Daughters of the Unbroken Cord</h2>
+
+<p>Malachai and the Daughters share a cold, quiet war. Both deal in debt; both harvest suffering; both wield patience as a weapon. But their philosophies could not be more different.</p>
+
+<h3>Addiction vs. Generational Debt</h3>
+<p>Malachai offers immediate relief — a coin for today, a thorn for now. Her debts are paid in a single lifetime, often a single year. The Daughters offer deferred relief — a good death for your mother, a safe birth for your daughter. Their debts last generations.</p>
+
+<p>A Daughter sees a Malachai-touched addict as a <em>wasted asset</em> — they burn out before their obligation can compound. A Malachai cultist sees a Daughter as a <em>hoarder</em> — all that stored grief, never spent.</p>
+
+<h3>The Collector and the Hollowed</h3>
+<p>Both factions employ silent witnesses. The Daughters have Hollowed — children with silver wire eyes, heartless, bound to the Cord. Malachai has Collectors — similar beings, perhaps the same beings.</p>
+
+<p>No one knows which faction created them first. Both claim the other stole the secret. The Collectors serve whichever master calls them. They do not take sides. They simply <em>collect</em>.</p>
+
+<h3>Territorial Clashes</h3>
+<p>In cities where both factions operate, the invisible lines are carefully drawn:</p>
+<ul>
+    <li>Daughters control hospices and birth houses. Malachai cultists control gambling dens, opium dens, and the docks at midnight.</li>
+    <li>A Daughter will not enter a Malachai shrine. A Malachai cultist will not drink tea in a Daughter's hospice — the thread would be too easy to tie.</li>
+    <li>When a soul is dying, both factions may compete. The Daughter offers a peaceful death, free of pain, in exchange for a memory. The cultist offers a silver coin — one more day, one more hour, one more chance to hold a loved one's hand.</li>
+</ul>
+<p class="text-sm text-muted"><em>The dying choose. The living pay.</em></p>
+
+<h3>When They Cooperate (Rare)</h3>
+<p>Sometimes the factions work together. A noble house too powerful, too stable, too <em>good</em> — both the Cord and the Cruel Messenger benefit from its fall. Daughters will whisper poison into a matriarch's ear; cultists will place a silver coin in a grandson's pocket. The house crumbles. The debts are collected. No one remembers why.</p>
+
+<h3>Mechanical Hooks for Rivalry Scenes</h3>
+<ul>
+    <li>A Daughter is treating a patient who carries a Malachai coin. The coin is keeping the patient alive — but the patient's family is accruing debt to the Chain. The party must negotiate between the two factions.</li>
+    <li>A Malachai cultist has stolen a Hollowed. The Daughters demand its return. The cultist wants to use it as a Collector. The party is caught in the middle.</li>
+    <li>The party is hired to investigate a "haunted" hospice. They discover it is neutral ground — a place where Daughters and cultists meet to exchange debts. A rogue Collector has begun attacking both sides.</li>
+</ul>
+
+<h2 id="playing-a-follower">Playing a Follower of Malachai</h2>
+
+<h3>Runekeeper of the Chained Angel</h3>
+<p><strong>Requirements:</strong> Spirit 3+, Body 2+. Talents: <em>Thiasos</em> (the Symbol of Malachai — a broken bit-ring, a silver coin, a thorn) and <em>Codex</em> (a grimoire of cursed gifts, bound in tanned skin).</p>
+
+<div class="panel panel-gold">
+    <strong class="panel-title">Patron's Gift (Imbuement)</strong>
+    <p class="text-sm">Once per scene, imbue a weapon with the <em>Honeyed Curse</em> — +1 die to melee, and any target damaged must test Resolve (DV 3) or be <em>Cursed</em> (the wound festers, causing 1 Fatigue per scene until healed by magical means).</p>
+    <p class="text-sm"><strong>Push It:</strong> Extend for an extra scene by marking 1 Obligation.</p>
+</div>
+
+<p><strong>Obligation:</strong> Malachai's Obligation track is unique. Each time you owe her a debt, she sends a <em>Collector</em> — a child with silver wire eyes, a stranger with a silver coin, a thorn that grows from your own skin. You can pay the debt with blood, memory, or a name. Capacity = Spirit + Presence, as usual.</p>
+
+<p><strong>Corruption Alternative:</strong> Instead of a standard Corruption timer, Malachai followers track a <strong>Desperation [6]</strong> timer. It ticks when you Push a Rite, accept a cursed gift, or fail to pay a Collector. When full, you <em>Bloom</em> — gain a permanent mutation (silver eyes, a second voice, a thirst for blood) and reset to 0.</p>
+
+<h3>Witch of the Chained Angel (Curse-Weaver)</h3>
+<p><strong>Requirements:</strong> Spirit 3+, Wits 3+. Talents: <em>Warm Hand</em> (inverted — your touch brings pain), <em>Cup and Salt</em> (but you poison the cup), and <em>Gray Thread</em> (but your thread carries a curse). See <em>Witchcraft of Fate's Edge</em> for core Witch mechanics.</p>
+
+<p>Your magic is subtle and insidious. You do not invoke Rites; you <em>contaminate</em>. When you use a Hedge Gift, you may mark 1 Shadow to apply a minor curse instead of the usual benefit.</p>
+
+<h3>Cantor of the Chained Angel (Siren)</h3>
+<p><strong>Requirements:</strong> Presence 3+, Lore 2+, <em>Cantor's Path</em> talent. See <em>The Gray Wanderer's Grimoire</em> for core Cantor mechanics.</p>
+
+<p>Your voice is honey over rot. Your Corruption timer is replaced by a <strong>Desperation [6]</strong> timer. When full, you gain a <em>Bloom</em> (silver eyes, a second voice, a thirst for blood) and reset to 0.</p>
+
+<p class="text-sm mt-1"><strong>Sample Songs</strong></p>
+<ul class="text-sm">
+    <li><strong>The Lucky Pick (Low):</strong> Reroll a failed Stealth or Subterfuge roll. Costs 1 Fatigue and marks 1 Desperation.</li>
+    <li><strong>The Debt Note (Standard):</strong> Sing a curse on a rival. They suffer -1 die on their next heist. Costs 2 Fatigue and marks a <strong>Debt [4]</strong> timer that Malachai will collect.</li>
+</ul>
+
+<h2 id="sample-rites">Sample Rites of Malachai</h2>
+<p>These Rites are available to Runekeepers of the Chained Angel.</p>
+
+<div class="rite-box">
+    <h4>Honeyed Curse</h4>
+    <div class="rite-meta flex"><span class="badge badge-red">CURSE</span><span class="badge badge-orange">BOOST</span><span class="badge badge-gray">Low</span><span class="badge badge-gold">4 XP</span></div>
+    <p class="text-sm">Target gains +2 dice to their next roll but marks 1 Corruption.</p>
+    <p class="text-sm"><strong>Cost:</strong> 1 Obligation. <strong>Push (Mark +1 Shadow):</strong> The bonus lasts for the entire scene.</p>
+</div>
+
+<div class="rite-box">
+    <h4>Binding Curse</h4>
+    <div class="rite-meta flex"><span class="badge badge-red">CURSE</span><span class="badge badge-iron">BIND</span><span class="badge badge-gray">Low</span><span class="badge badge-gold">5 XP</span></div>
+    <p class="text-sm">Target gains +1 die to physical actions but suffers 1 Fatigue if they do not perform a dominance act (beat a weaker creature, drink blood, break something precious) within the scene.</p>
+    <p class="text-sm"><strong>Cost:</strong> 1 Obligation. <strong>Push (Mark +1 Shame):</strong> The dominance act is compelled (Resist DV 4).</p>
+</div>
+
+<div class="rite-box">
+    <h4>False Dawn</h4>
+    <div class="rite-meta flex"><span class="badge badge-red">CURSE</span><span class="badge badge-orange">BOOST</span><span class="badge badge-blue">TIMER</span><span class="badge badge-gray">Standard</span><span class="badge badge-gold">8 XP</span></div>
+    <p class="text-sm">Bestow a gift with a hidden curse — target gains an advantage (e.g., +1 die to all rolls for one scene) but begins a <strong>Corruption [6]</strong> timer that ticks each time they use the gift. When the timer fills, the curse manifests (GM chooses: lycanthropy, vampirism, a wasting disease).</p>
+    <p class="text-sm"><strong>Cost:</strong> 2 Obligation. <strong>Push (Mark +1 Identity):</strong> The curse manifests immediately when the gift is used.</p>
+</div>
+
+<div class="rite-box">
+    <h4>Cruel Transformation</h4>
+    <div class="rite-meta flex"><span class="badge badge-red">CURSE</span><span class="badge badge-purple">TRANSFORM</span><span class="badge badge-gray">Standard</span><span class="badge badge-gold">9 XP</span></div>
+    <p class="text-sm">Infect a target with a supernatural condition (vampirism, lycanthropy, a wasting curse) for one scene. The target is considered [CURSED] and suffers -1 die to resist magical healing.</p>
+    <p class="text-sm"><strong>Cost:</strong> 2 Obligation. <strong>Push (Mark +1 Identity):</strong> The transformation lasts until the target receives magical purification.</p>
+</div>
+
+<div class="rite-box">
+    <h4>The Leashed Gift</h4>
+    <div class="rite-meta flex"><span class="badge badge-red">CURSE</span><span class="badge badge-orange">BOOST</span><span class="badge badge-iron">DEBT</span><span class="badge badge-gray">Standard</span><span class="badge badge-gold">7 XP</span></div>
+    <p class="text-sm">Grant a target +2 dice on their next roll. They gain a <strong>Debt [4]</strong> timer. When it fills, Malachai collects: a memory, a name, or a service. The witch cannot refuse the collection — only redirect it to another target.</p>
+    <p class="text-sm"><strong>Cost:</strong> 1 Obligation. <strong>Push (Mark +1 Shadow):</strong> The debt is permanent until collected.</p>
+</div>
+
+<div class="rite-box">
+    <h4>The Spreading Stain</h4>
+    <div class="rite-meta flex"><span class="badge badge-red">CURSE</span><span class="badge badge-blue">AREA</span><span class="badge badge-gray">Standard</span><span class="badge badge-gold">8 XP</span></div>
+    <p class="text-sm">Curse a target with contagious misfortune. When they fail a roll, the GM may spend 1 SB to have that failure affect the nearest ally as well. The curse lasts one scene, or until the target performs an act of genuine generosity.</p>
+    <p class="text-sm"><strong>Cost:</strong> 2 Obligation. <strong>Push (Mark +1 Shame):</strong> The curse lasts until the target receives a blessing from a priest of their faith.</p>
+</div>
+
+<div class="rite-box">
+    <h4>The Borrowed Scar</h4>
+    <div class="rite-meta flex"><span class="badge badge-red">CURSE</span><span class="badge badge-purple">TRANSFER</span><span class="badge badge-gray">High</span><span class="badge badge-gold">10 XP</span></div>
+    <p class="text-sm">Transfer a Condition, 1 Fatigue, or 1 Harm from an ally to yourself. You gain +1 die on your next action against the source of that affliction.</p>
+    <p class="text-sm"><strong>Cost:</strong> 2 Obligation. <strong>Push (Mark +1 Identity):</strong> The transfer is permanent; the affliction becomes yours to keep.</p>
+</div>
+
+<div class="rite-box">
+    <h4>The Well's Echo</h4>
+    <div class="rite-meta flex"><span class="badge badge-red">CURSE</span><span class="badge badge-green">HEAL</span><span class="badge badge-purple">SACRIFICE</span><span class="badge badge-gray">High</span><span class="badge badge-gold">12 XP</span></div>
+    <p class="text-sm">Remove one active curse (vampirism, lycanthropy, a wasting disease) from yourself or a touched ally. In exchange, lose one permanent memory (a face, a name, a place — GM chooses). The memory cannot be recovered by any means short of a divine miracle.</p>
+    <p class="text-sm"><strong>Cost:</strong> 3 Obligation. <strong>Push (Mark +1 Identity):</strong> The curse is transferred to a willing (or helpless) target instead of being destroyed.</p>
+</div>
+
+<h2 id="adventure-hooks">Adventure Hooks and Campaign Frames</h2>
+
+<div class="hook-box">
+    <h3 style="margin-top:0;">The Coin That Cannot Be Spent <span class="badge badge-gray">Introductory</span></h3>
+    <p class="text-sm">A silver coin appears in a PC's pocket. It is warm. It has no seam. If they spend it, they gain a minor boon — but a Collector appears the next night, asking for payment. The Collector is a child with silver wire eyes. It does not threaten. It simply waits.</p>
+    <p class="text-sm"><em>Resolution:</em> Pay with a memory (lose a minor fact), pay with blood (1 Harm), or refuse (start a Debt [4] timer).</p>
+</div>
+
+<div class="hook-box">
+    <h3 style="margin-top:0;">The Unkillable Killer</h3>
+    <p class="text-sm">A village is being stalked by a figure who cannot be killed. The creature is a slasher — a former soldier who begged Malachai for vengeance. The only way to stop him is to find the grave of his family (he never buried them) and let him see their bones, or lead him to the Well of Ichor.</p>
+    <p class="text-sm"><em>Twist:</em> The family is not dead. They fled and changed their names. The slasher has been killing strangers who remind him of them.</p>
+</div>
+
+<div class="hook-box">
+    <h3 style="margin-top:0;">The Baron's Invitation <span class="badge badge-gray">Gothic Horror</span></h3>
+    <p class="text-sm">Baron Quentin Asselin invites the party to his estate. He is charming, handsome, and seems almost kind. Over the evening, they realize that every servant wears the same expression, and the wine tastes of copper. Quentin does not want to kill them. He wants to <em>convert</em> them.</p>
+    <p class="text-sm"><em>Resolution:</em> Escape, destroy him, or accept his "gift" and become vampires. If converted, the player may retire the character (becoming an NPC) or continue with a new Desperation track.</p>
+</div>
+
+<div class="hook-box">
+    <h3 style="margin-top:0;">The Cursed Bloodline</h3>
+    <p class="text-sm">A noble house has been cursed for generations — every firstborn becomes a vampire, werewolf, or worse. The party discovers that the original curse was a Malachai bargain. The price was not the ancestor's soul — it was his bloodline.</p>
+    <p class="text-sm"><em>Resolution:</em> Find the original contract (hidden in Zahk'Kozahn), negotiate with Malachai for release (cost: a name, a memory, or a firstborn), or break the curse by killing every living member of the bloodline.</p>
+</div>
+
+<div class="hook-box">
+    <h3 style="margin-top:0;">The Chained Angel's Tribute <span class="badge badge-gray">Epic</span></h3>
+    <p class="text-sm">Once per century, the Thirteen are compelled to return to Zahk'Kozahn to pay tribute. This year, the tribute is due, and the party has been captured by a vampire lord who intends to use them as his offering. They must survive the cursed city, negotiate between vampire clans, and possibly speak with Malachai herself.</p>
+    <p class="text-sm"><em>Stakes:</em> If the tribute is paid, the vampire lord gains immense power. If the party interrupts it, Malachai notices them personally. She may offer them a gift — or a curse.</p>
+</div>
+
+<h2 id="gm-tools">GM Tools — Running Malachai</h2>
+
+<h3>Campaign Timers</h3>
+<table>
+<thead><tr><th>Timer</th><th>Purpose</th><th>Advance / Retreat</th></tr></thead>
+<tbody>
+<tr><td><strong>Desperation Spread [8]</strong></td><td>How many people have accepted Malachai's gifts</td><td>Advance when PCs encounter coin-spenders, thorn-bearers, or cult recruiters. Retreat when PCs destroy a cursed item, redeem a follower, or expose a cult.</td></tr>
+<tr><td><strong>The Thirteenth Year [10]</strong></td><td>The century is ending; the tribute to Zahk'Kozahn approaches</td><td>Advance each session (or each month of in-game time). When full, the ritual begins — all active Malachai followers are compelled to travel to the cursed city.</td></tr>
+<tr><td><strong>Hunger in the Veins [6]</strong></td><td>A vampire lord is becoming unstable</td><td>Advance when the vampire feeds publicly, creates uncontrolled spawn, or is hunted. Retreat when the vampire is placated, destroyed, or driven into hiding.</td></tr>
+</tbody>
+</table>
+
+<h3>Sample SB Spends for Malachai Scenes</h3>
+<ul>
+    <li><strong>1 SB:</strong> A silver coin appears in a PC's pocket. It is warm. They can ignore it (gain nothing) or spend it (gain a minor boon, but mark a Debt [4] timer).</li>
+    <li><strong>2 SB:</strong> A thorn grows from a corpse's wound. Any character who touches it gains 1 Boon but must test Resolve (DV 3) or become [CURSED].</li>
+    <li><strong>3 SB:</strong> A Collector arrives — a child with silver wire eyes. It asks for payment on a debt the party did not know they owed. Refusing gives the GM 2 SB to spend in the next scene.</li>
+    <li><strong>4 SB:</strong> A PC's reflection smiles without them. They are now on Malachai's radar. All future encounters with her followers start at Desperate Position.</li>
+</ul>
+
+<h3>Sample Cursed Creatures</h3>
+<table>
+<thead><tr><th>Creature</th><th>Mechanics</th><th>Weakness</th></tr></thead>
+<tbody>
+<tr><td><strong>Slasher</strong><br><span class="badge badge-gray">Cap 4</span> <span class="badge badge-gray">Tier II–III</span></td><td>Regeneration (ignore first 2 Harm each round), Unstoppable (cannot be grappled or stunned), The Face (Fear test DV 3)</td><td>Cannot cross a threshold where it was once shown mercy</td></tr>
+<tr><td><strong>Memory Eater</strong><br><span class="badge badge-gray">Cap 3</span> <span class="badge badge-gray">Tier II</span></td><td>Memory Feed (touch, steals memory), Emotion Vampire (+1 die after feeding), Phasing (intangible 1 round)</td><td>Feeding on a false memory disorients it</td></tr>
+<tr><td><strong>Plague Bearer</strong><br><span class="badge badge-gray">Cap 2</span> <span class="badge badge-gray">Tier I–II</span></td><td>Contagion Aura (Endurance penalty), Infectious Touch (disease), Fever Dream (nightmares prevent Fatigue recovery)</td><td>Fire purges the contagion</td></tr>
+</tbody>
+</table>
+
+<h2 id="colophon">Colophon</h2>
+
+<p>This expansion was written in a portside tavern called the Drowned Rat. The former Invoker sat across from me, nursing watered wine. She would not look at her own reflection.</p>
+
+<p>When I finished the last paragraph, she asked to see it. I handed her the pages. She read them once, twice, then gave them back.</p>
+
+<p>"It's not wrong," she said. "But it's not complete."</p>
+
+<p>"What's missing?"</p>
+
+<p>She touched the back of her left ear. "You never forget the thread. Even when it's gone. Even when you've stopped counting. You wake up some mornings and you reach for it. And it's not there. And you don't know whether to cry or run."</p>
+
+<p>She left at dawn. She did not pay for her wine.</p>
+
+<p class="closing" style="color: var(--text2); font-style: italic; border-left: 3px solid var(--gold); padding-left: 0.8rem; margin: 0.8rem 0; font-size: 0.92rem;">The ink is fresh. The road is south. The coin is still in her pocket. She has not spent it. Not yet.</p>
+
+<hr>
+
+<footer>
+    <em>Fate's Edge Proprietary Content — © 2024 Nicholas A. Gasper. All rights reserved.</em>
+</footer>
+
+</body>
+</html>

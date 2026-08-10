@@ -198,32 +198,97 @@ function docsAreSame(docA, docB) {
 // "Fate's Edge Toolkit" as "the SPA shell, not a real document" -- but
 // several real documents (like the Kon'reh Definitive Guide, whose own
 // subtitle reads "Fate's Edge Toolkit Edition") legitimately contain that
-// phrase in their own text. That false positive is what caused the
-// "server returned SPA" error when opening the guide from inside the
-// app, even though the raw file loads fine when navigated to directly
-// (which bypasses this check entirely). Detection now only looks for
-// markers that are actually structural/unique to index.html itself --
-// the module entry-point script tag and the toast-container div that
-// only the app shell has -- not phrases that can legitimately appear in
-// a document's own prose.
+// phrase in their own text. That was a raw substring search over the
+// whole HTML string, which is fragile in both directions: it can
+// false-positive on a doc that merely *mentions* the shell's markers in
+// its own prose or an unescaped code sample, and it can false-negative
+// the moment the shell's markup changes shape without every indicator
+// string being updated to match (one of the three indicators here,
+// `<div id="app">`, doesn't actually exist anywhere in index.html --
+// the real mount point is `id="app-content"` -- so that check has
+// silently never matched anything).
+//
+// This now parses the fetched HTML with DOMParser and looks for the
+// shell's actual structural elements (by id/selector, not string
+// position), and requires at least two independent signals to agree
+// before calling it the SPA shell. Parsing as an inert DOM document also
+// means a doc that merely *prints* these markers as escaped text in a
+// code sample can't trigger a false positive the way substring matching
+// could, since escaped text never becomes a real element node.
 function isSpaContent(html) {
     if (!html) return false;
-    const spaIndicators = [
-        '<script type="module" src="js/app.js">',
-        'id="toast-container"',
-        '<div id="app">'
-    ];
-    return spaIndicators.some(indicator => html.includes(indicator));
+    try {
+        const parsed = new DOMParser().parseFromString(html, 'text/html');
+        const hasAppMount = !!parsed.getElementById('app-content');
+        const hasToastHost = !!parsed.getElementById('toast-container');
+        const hasAppScript = !!parsed.querySelector('script[type="module"][src*="app.js"]');
+        const signals = [hasAppMount, hasToastHost, hasAppScript].filter(Boolean).length;
+        return signals >= 2;
+    } catch (_) {
+        // If it doesn't even parse as HTML, it's not the SPA shell.
+        return false;
+    }
+}
+
+// ─── HTML sanitization ───────────────────────────────────────────
+// Documents rendered here can come from three places: the build's own
+// /data/docs/ tree (trusted), a user's "Upload Doc" action (untrusted --
+// any local file the user picks), and localStorage replay of a previous
+// upload. All three go through this before ever touching innerHTML.
+//
+// This used to only strip <script> and <base> tags via regex, which
+// leaves the door wide open to inline event handlers
+// (onerror/onload/onclick/...), javascript: URLs, <iframe>/<object>/
+// <embed>/<link>/<meta http-equiv="refresh">/<form> content, and is
+// generally unreliable since regex can't correctly parse nested or
+// malformed HTML. This now parses with DOMParser (inert -- nothing in
+// it executes or loads network resources during parsing) and removes
+// disallowed elements and attributes structurally instead.
+const SANITIZE_DISALLOWED_TAGS = ['script', 'iframe', 'object', 'embed', 'link', 'base', 'meta', 'applet', 'form'];
+const SANITIZE_URL_ATTRS = ['href', 'src', 'action', 'formaction', 'xlink:href'];
+
+function isDangerousUrl(value) {
+    const v = (value || '').trim().toLowerCase();
+    if (v.startsWith('javascript:') || v.startsWith('vbscript:')) return true;
+    // data: URIs are legitimate for embedded images/fonts in a
+    // self-contained doc; only block the executable/document kinds.
+    if (v.startsWith('data:') && !/^data:(image\/|font\/|application\/font)/.test(v)) return true;
+    return false;
 }
 
 function sanitizeHtml(html) {
-    let sanitized = html.replace(/<script[^>]*>[\s\S]*?<\/script>/gi, '');
-    sanitized = sanitized.replace(/<base[^>]*>/gi, '');
-    const bodyMatch = sanitized.match(/<body[^>]*>([\s\S]*?)<\/body>/i);
-    if (bodyMatch) {
-        sanitized = bodyMatch[1];
+    if (!html) return '';
+    let parsed;
+    try {
+        parsed = new DOMParser().parseFromString(html, 'text/html');
+    } catch (_) {
+        // Parsing itself failed -- don't render anything rather than
+        // fall back to unsanitized raw HTML.
+        return '';
     }
-    return sanitized;
+
+    SANITIZE_DISALLOWED_TAGS.forEach(tag => {
+        parsed.querySelectorAll(tag).forEach(el => el.remove());
+    });
+
+    parsed.querySelectorAll('*').forEach(el => {
+        Array.from(el.attributes).forEach(attr => {
+            const name = attr.name.toLowerCase();
+            if (name.startsWith('on')) {
+                el.removeAttribute(attr.name);
+                return;
+            }
+            if (name === 'srcdoc') {
+                el.removeAttribute(attr.name);
+                return;
+            }
+            if (SANITIZE_URL_ATTRS.includes(name) && isDangerousUrl(attr.value)) {
+                el.removeAttribute(attr.name);
+            }
+        });
+    });
+
+    return parsed.body ? parsed.body.innerHTML : '';
 }
 
 function getDocType(doc) {
@@ -1113,13 +1178,20 @@ export function loadDocument(docPath, preserveTheme = false) {
                     </div>
                 </div>
                 <div style="flex:1;min-height:450px;background:var(--bg3);border-radius:var(--radius);overflow:hidden;">
-                    <iframe 
-                        src="${escHtml(pdfUrl)}" 
+                    <iframe
+                        src="${escHtml(pdfUrl)}"
                         style="width:100%;height:100%;min-height:450px;border:none;background:var(--bg3);"
                         allow="fullscreen"
-                        sandbox="allow-same-origin allow-scripts allow-forms"
+                        sandbox="allow-same-origin"
                         loading="lazy"
                     ></iframe>
+                    <!-- Sandbox note: only allow-same-origin is granted, so the
+                         browser's built-in PDF viewer can actually fetch/render
+                         a same-origin file. allow-scripts is deliberately
+                         omitted -- the PDF viewer doesn't need script execution
+                         to render, and allow-same-origin + allow-scripts
+                         together is the combination that lets sandboxed
+                         content script its way back out of the sandbox. -->
                 </div>
                 <div style="font-size:0.65rem;color:var(--text3);padding:0.3rem 0;text-align:center;">
                     If the PDF does not display, your browser may not support embedded PDF viewing. 

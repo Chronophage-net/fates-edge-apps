@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "generated": "2026-08-10T12:46:17.387Z",
+  "generated": "2026-08-10T15:52:29.224Z",
   "documents": [
     {
       "id": "systems_reference_document",
@@ -89,6 +89,16 @@
       "path": "/data/docs/adventures/",
       "category": "adventures",
       "categoryLabel": "🗡️ Adventures",
+      "core": false,
+      "active": true
+    },
+    {
+      "id": "daughters_of_the_unbroken_cord",
+      "title": "Daughters   Of   The   Unbroken   Cord",
+      "file": "Fates_-_Edge_-_-Daughters-_-of-_-the-_-Unbroken-_-Cord.html",
+      "path": "/data/docs/expansions/",
+      "category": "expansions",
+      "categoryLabel": "📦 Expansions",
       "core": false,
       "active": true
     },
@@ -433,6 +443,16 @@
       "active": true
     },
     {
+      "id": "malachai_the_chained_angel",
+      "title": "Malachai   The   Chained   Angel",
+      "file": "Fates_-_Edge_-_-Malachai-_-the-_-Chained-_-Angel.html",
+      "path": "/data/docs/expansions/",
+      "category": "expansions",
+      "categoryLabel": "📦 Expansions",
+      "core": false,
+      "active": true
+    },
+    {
       "id": "mist_walker",
       "title": "Mist   Walker",
       "file": "Fates_-_Edge_-_-Mist-_-Walker.html",
@@ -763,6 +783,16 @@
       "active": true
     },
     {
+      "id": "the_hollowed_plague",
+      "title": "The   Hollowed   Plague",
+      "file": "Fates_-_Edge_-_-The-_-Hollowed-_-Plague.html",
+      "path": "/data/docs/adventures/",
+      "category": "adventures",
+      "categoryLabel": "🗡️ Adventures",
+      "core": false,
+      "active": true
+    },
+    {
       "id": "the_ninth_proof",
       "title": "The   Ninth   Proof",
       "file": "Fates_-_Edge_-_-The-_-Ninth-_-Proof.html",
@@ -853,7 +883,7 @@
       "active": true
     }
   ],
-  "total_count": 85,
-  "active_count": 85,
+  "total_count": 88,
+  "active_count": 88,
   "_license": "Fate's Edge Proprietary Content – © 2024 Nicholas A. Gasper. All rights reserved."
 }
