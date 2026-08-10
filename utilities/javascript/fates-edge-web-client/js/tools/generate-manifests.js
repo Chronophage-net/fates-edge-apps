@@ -29,9 +29,12 @@ const EXCLUDED_FILE_PATTERN = /manifest.*\.json(\.tmp)?$/i;
 const CATEGORY_MAP = {
   'core': { id: 'core', label: '📘 Core', path: '/data/docs/core/' },
   'quickstart': { id: 'quickstart', label: '⚡ Quickstart', path: '/data/docs/quickstart/' },
+  'players-guide': { id: 'players-guide', label: '🎲 Player\'s Guide', path: '/data/docs/players-guide/' },
+  'gm-guide': { id: 'gm-guide', label: '🎬 GM Guide', path: '/data/docs/gm-guide/' },
   'resources': { id: 'resources', label: '📚 Resources', path: '/data/docs/resources/' },
   'adventures': { id: 'adventures', label: '🗡️ Adventures', path: '/data/docs/adventures/' },
   'expansions': { id: 'expansions', label: '📦 Expansions', path: '/data/docs/expansions/' },
+  'anthology': { id: 'anthology', label: '📖 Anthology', path: '/data/docs/anthology/' },
   'travel': { id: 'travel', label: '🗺️ Travel', path: '/data/docs/travel/' },
   'design': { id: 'design', label: '🎨 Design', path: '/data/docs/design/' },
   'konreh': { id: 'konreh', label: '♟️ Kon\'reh', path: '/data/docs/konreh/' },

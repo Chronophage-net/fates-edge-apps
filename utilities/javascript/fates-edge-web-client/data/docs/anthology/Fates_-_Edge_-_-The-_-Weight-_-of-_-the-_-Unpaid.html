@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Weight of the Unpaid — A Fate's Edge Anthology of Oaths and Debts</title>
+<style>
+:root {
+    --bg1: #0a0c0f;
+    --bg2: #12151a;
+    --bg3: #191d24;
+    --bg4: #22272f;
+    --text: #d9dce1;
+    --text2: #a5abb4;
+    --text3: #6d747d;
+    --iron: #8b93a0;
+    --iron-hover: #a5adb8;
+    --border: #2b313a;
+    --blood: #8f2434;
+    --blood-hover: #ab2c3f;
+    --bone: #ded6c2;
+    --red: #8f2434;
+    --green: #4c6b56;
+    --blue: #3d5a72;
+    --purple: #5c4d70;
+    --orange: #79582f;
+    --radius: 8px;
+    --font: 'Georgia', 'Iowan Old Style', 'Palatino Linotype', serif;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+    background: var(--bg1);
+    background-image: radial-gradient(circle at 50% 0%, #14181f 0%, #0a0c0f 60%);
+    color: var(--text);
+    font-family: var(--font);
+    padding: 1.5rem;
+    max-width: 980px;
+    margin: 0 auto;
+    line-height: 1.7;
+}
+h1, h2, h3, h4 { color: var(--blood); margin: 0.6rem 0 0.4rem; font-weight: 600; letter-spacing: 0.01em; }
+h1 { font-size: 2rem; border-bottom: 2px solid var(--blood); padding-bottom: 0.4rem; }
+.subtitle { color: var(--text2); font-style: italic; margin-bottom: 0.8rem; font-size: 1rem; }
+h2 { font-size: 1.5rem; border-bottom: 1px solid var(--border); padding-bottom: 0.25rem; margin-top: 2.5rem; color: var(--iron); }
+h3 { font-size: 1.2rem; margin-top: 1.6rem; color: var(--bone); }
+a { color: var(--blood); text-decoration: none; }
+a:hover { color: var(--blood-hover); }
+p { margin: 0.6rem 0; color: var(--text); }
+.byline { color: var(--text3); font-style: italic; font-size: 0.88rem; margin: -0.1rem 0 0.6rem; padding-left: 0.7rem; border-left: 2px solid var(--border); }
+.closing { color: var(--text2); font-style: italic; border-left: 3px solid var(--blood); padding-left: 0.8rem; margin: 0.8rem 0; font-size: 0.92rem; }
+.panel {
+    background: var(--bg2);
+    border-radius: var(--radius);
+    padding: 0.8rem 1rem;
+    border: 1px solid var(--border);
+    margin: 0.7rem 0;
+}
+.panel-blood { border-left: 4px solid var(--blood); }
+.panel-red { border-left: 4px solid var(--red); }
+.panel-blue { border-left: 4px solid var(--blue); }
+.panel-green { border-left: 4px solid var(--green); }
+.panel-purple { border-left: 4px solid var(--purple); }
+.panel-orange { border-left: 4px solid var(--orange); }
+.badge {
+    display: inline-block;
+    padding: 0.05rem 0.55rem;
+    border-radius: 12px;
+    font-size: 0.68rem;
+    font-weight: 600;
+    margin: 0.1rem 0.2rem 0.1rem 0;
+}
+.badge-blood { background: var(--blood); color: #fff; }
+.badge-red { background: var(--red); color: #fff; }
+.badge-green { background: var(--green); color: #fff; }
+.badge-blue { background: var(--blue); color: #fff; }
+.badge-purple { background: var(--purple); color: #fff; }
+.badge-orange { background: var(--orange); color: #fff; }
+.badge-gray { background: var(--bg4); color: var(--text3); }
+.text-muted { color: var(--text3); }
+.text-sm { font-size: 0.88rem; }
+hr { border: none; border-top: 1px solid var(--border); margin: 1.4rem 0; }
+.toc { background: var(--bg3); border-radius: var(--radius); padding: 0.8rem 1.1rem; border: 1px solid var(--border); columns: 2; column-gap: 1.6rem; }
+.toc-title { column-span: all; }
+.toc h3 { margin-top: 0; color: var(--blood); font-size: 1.05rem; }
+.toc-section { margin: 0.7rem 0 0.3rem; color: var(--bone); font-weight: 600; font-size: 0.95rem; break-inside: avoid; }
+.toc a { color: var(--text2); display: block; padding: 0.08rem 0; font-size: 0.85rem; break-inside: avoid; }
+.toc a:hover { color: var(--blood-hover); }
+@media (max-width: 650px) { .toc { columns: 1; } }
+blockquote {
+    border-left: 3px solid var(--blood);
+    padding-left: 1rem;
+    margin: 0.6rem 0;
+    color: var(--text2);
+    font-style: italic;
+}
+.frame {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 0.9rem 1.1rem;
+    margin: 0.8rem 0;
+}
+.sep {
+    text-align: center;
+    color: var(--text3);
+    letter-spacing: 0.4em;
+    margin: 1.6rem 0;
+    font-size: 0.9rem;
+}
+table { border-collapse: collapse; width: 100%; margin: 0.8rem 0; font-size: 0.88rem; }
+th, td { border: 1px solid var(--border); padding: 0.4rem 0.6rem; text-align: left; }
+th { background: var(--bg3); color: var(--bone); }
+td { background: var(--bg2); color: var(--text2); }
+footer {
+    font-size: 0.75rem;
+    color: var(--text3);
+    text-align: center;
+    padding: 1.4rem 0 0.5rem;
+    border-top: 1px solid var(--border);
+    margin-top: 2.5rem;
+}
+</style>
+</head>
+<body>
+
+<h1>⚖️ The Weight of the Unpaid</h1>
+<p class="subtitle">A Fate's Edge Anthology of Oaths and Debts</p>
+<p class="text-sm text-muted" style="margin-bottom:1rem;">
+    <span class="badge badge-blood">Anthology</span>
+    <span class="badge badge-blue">9 Tales</span>
+    <span class="badge badge-purple">Duty, Debt &amp; Confession</span>
+    <span class="badge badge-gray">Author: Nicholas A. Gasper</span>
+</p>
+
+<div class="frame">
+<p>Every story in this book is about a ledger. Not always one kept in ink — sometimes it is kept in silver wire and knotted cord, in a gorget that will not unbuckle, in a promise with no legs and no mouth that sits in the town square until someone pays it. But a ledger all the same, and every ledger, eventually, comes due.</p>
+<p>These are stories about what people owe each other — a life for a life, a name for a night's shelter, a story for a stolen tree, a confession for a soul let go too easily — and what it costs to pay it. Some of these debts are paid in full and the payer is worse for it. Some are refused, and the refusal is its own kind of payment. A few are never settled at all; they are only carried, a little further down the road, by someone who was never asked whether they wanted the weight.</p>
+<p>This is quieter, darker material than a session opener or a campfire aside. Read it when your table wants to sit with consequence for a while — after a hard choice, before a reckoning, or whenever a Game Master needs to remind their players that the world keeps a ledger too, and it does not forget to collect.</p>
+</div>
+
+<div class="toc" id="toc">
+    <div class="toc-title"><h3>📖 Contents</h3></div>
+
+    <div class="toc-section">I. Broken Vows</div>
+    <a href="#knight-who-forgot-his-face">The Knight Who Forgot His Face</a>
+    <a href="#ledger-of-mercies-refused">The Ledger of Mercies Refused</a>
+
+    <div class="toc-section">II. The Cord's Accounting</div>
+    <a href="#the-hollowed-confession">The Hollowed — A Confession</a>
+    <a href="#bargain-broken-well">The Bargain at the Broken Well</a>
+    <a href="#sunset-black-river">Sunset Over the Black River</a>
+
+    <div class="toc-section">III. What the Oath Demands</div>
+    <a href="#oath-of-the-unsung-dead">The Oath of the Unsung Dead</a>
+    <a href="#the-walking-promise">The Walking Promise</a>
+    <a href="#the-dwarfs-bridge">The Dwarf's Bridge</a>
+
+    <div class="toc-section">IV. Small Mercies, Quietly Paid</div>
+    <a href="#the-naming-of-stones">The Naming of Stones</a>
+</div>
+
+<hr>
+
+<h2 id="section-1">I. Broken Vows</h2>
+<p class="text-sm text-muted">From the fractured cantons of Vhasia, where chivalry survives as a code of armor and isolation — protection that costs connection, mercy that costs the mercy-giver everything.</p>
+
+<h3 id="knight-who-forgot-his-face">The Knight Who Forgot His Face</h3>
+<p class="byline">Sung by Alain of the Cantor's Road, years before he ever carried water for a dying cook — the ballad he learned before he had a story of his own to add to it.</p>
+<p>Before there was Corin, there was the knight the Ethorians only ever call the Iron Bard, though no one remembers if he sang or only listened. The story says he served forty years in a canton whose name has been polished off the telling, the way a coin is polished smooth by too many hands. He wore his armor to his own wedding. He wore it to his mother's funeral pyre, standing so close the varnish blistered, and did not feel the heat through the plate.</p>
+<p>He was, by every measure his order kept, a perfect knight. He had never been struck through a seam. He had never gone hungry in a siege, because he had never removed his helm to eat in front of an enemy who might see his face and remember it. He was so armored, the Ethorians say, that he forgot his own face — forgot the shape of it, the color of his own eyes, the way his mouth moved when he was afraid. He had not seen himself, skin to open air, in longer than he could count.</p>
+<p>He loved a woman of the sacred groves, where the barrow-kings hold their tribute and the trees remember every oath sworn beneath them. She would not come to his hall. The groves do not travel. So at the end of forty years he rode to meet her, the way he had always ridden to meet everything — sealed, plated, correct.</p>
+<p>The trees would not part for him.</p>
+<p>He rode the tree line three times, and three times the grove closed its paths in front of him like a hand closing around a coin. An old woman selling salt at the grove's edge told him plainly: the trees do not fear steel. They fear what steel is for. A blade is an argument that ends before it begins. The grove does not admit arguments. It only admits people.</p>
+<p>He unbuckled the gorget first, because that was the piece nearest his throat and the piece he trusted least to remove. Then the gauntlets, because a bare hand can hold a bare hand and a gauntlet cannot. Then the helm, last, because the helm was the only thing that had ever let him pretend he had no face to lose.</p>
+<p>The trees parted.</p>
+<p>He walked into the grove bareheaded, in the open air, for the first time since he had been a boy too young to be knighted. He felt the sun on skin that had not felt weather in forty years, and the story says he laughed — not a knight's laugh, not a courtly laugh, but the laugh of someone startled by their own gladness. He found her waiting at the grove's heart, and whatever passed between them there, the ballad does not say, because it was theirs and not the singer's to sell.</p>
+<p>An arrow took him on the walk back to the tree line. A raiding party from a rival canton, working the border the way border raiders always work it, saw an unarmored man where armor was expected and did not ask why. He did not have time to remember he had a body worth protecting. He had spent that time, all forty years of it, learning not to feel anything through the steel — and so, when the steel was finally gone, and the arrow found him, the Ethorians insist he did not flinch. He was smiling. He had, at last and only once, felt the sun, and it seems he judged that a fair trade.</p>
+<p>His order buried him in his armor anyway, sealed shut, gorget buckled, helm down — the only way they knew how to bury a knight, and the only way, perhaps, that would have let him rest. The grove keeps no marker. It does not need one. Every year on the anniversary, they say, the trees at that one crossing lean very slightly toward the sun, as if remembering a face they only saw the once.</p>
+<p class="closing">"Protection requires isolation. Honor requires connection. The armor is the wall that makes mercy possible — but you cannot deliver mercy through a wall. You can only open the gate, and hope the moment you are exposed is not the moment the world chooses to collect."</p>
+
+<h3 id="ledger-of-mercies-refused">The Ledger of Mercies Refused</h3>
+<p class="byline">A tale of the Order of the Iron Gorget, told in the canton of Ethor by a hedge-priest who keeps their old chapter house swept, though no knight has slept there in a generation.</p>
+<p>Dame Guenna of the Iron Gorget had not unbuckled in nineteen years. Not to eat — she had learned to slide bread and broth beneath the lower rim of her helm. Not to sleep — she slept sitting upright, plate and all, in a chair built for exactly that purpose. Not to bathe, which her Order handled with oiled cloths and a vow of no comment. She had taken the Order's furthest promise, the one few knights complete and fewer still survive with their minds unbroken: never once, in any hour of any day, to be caught with the gorget open and the throat bare.</p>
+<p>In exchange she kept the Ledger — the canton's true accounting of debts owed and mercies extended, older than any duke currently claiming the sunburst seal. Every ransom paid, every widow's tithe forgiven, every peasant spared the gallows because a lord's mood happened to be generous that morning: all of it, in Guenna's hand, locked in a strongbox she wore chained to her belt so that not even sleep could separate her from it. The Order called this the highest form of protection. The realm's memory, guarded by a woman who could not be moved, bribed, seduced, or frightened, because she could not be reached at all.</p>
+<p>When word came that the throne at Lence stood empty — sacked a decade past, its royal line scattered, its bells cracked and its courts gone quiet, leaving every claimant on both sides of the Belworth circling like gulls over a wreck — the border lords began settling old scores under cover of the confusion. A raiding column crossed into Ethor lands at harvest, burning barns for the spite of it, and Guenna's chapter house stood in its path.</p>
+<p>She could have opened the strongbox and burned the Ledger herself, denying the raiders any claim they might have pressed from its pages. She could have unbuckled, taken up a plow-hand's pitchfork, and helped drag children out of a granary already catching flame. She did neither. She stood in the chapter house doorway in full plate, gorget sealed, and held the line with her sword while the granary burned, because the Order's law was clear on the order of things: the record must be protected first, the flesh after, and only if time remained.</p>
+<p>Time did not remain. Three children died in that granary. Guenna killed eleven raiders defending a strongbox that was never actually threatened — the raiders had wanted grain, not paper — and when the smoke cleared she was found standing over the ash exactly where she had stood the whole night, unmarked, unmoved, the Ledger's chain still looped twice around her wrist.</p>
+<p>A Cantor came through a season later, gathering news the way Cantors do, and heard the story from a farmer who had lost a nephew in the granary. He went to the chapter house and asked Dame Guenna, plainly, whether she would do it again the same way. Through the gorget's grille, her voice came out flat as the plate that made it: "The Ledger protects thousands. The granary protected three. I did the arithmetic the Order trained me to do."</p>
+<p>The Cantor wrote the song anyway — not as praise, and not quite as condemnation. He called it <em>The Weight of Iron</em>, and it is sung today as a warning to Order novices before they take their final vow: that a code built to protect everyone, followed exactly, will eventually ask you to let three children burn to keep a strongbox safe, and that the strongbox will never once thank you for it. Dame Guenna is said to be Keeper of the Ledger still. No one has seen her face in longer than the song has existed. Some in the Order consider this proof of her discipline. The Cantors consider it the whole point of the song.</p>
+<p class="closing">"The Armor Closes when knights choose protection over mercy, when gorgets are buckled tight and chivalry curdles into siege mentality. No one rings a bell when it happens. It only closes a little further, ledger by ledger, until the thing being protected is smaller than the thing being lost to protect it."</p>
+
+<h2 id="section-2">II. The Cord's Accounting</h2>
+<p class="text-sm text-muted">The Daughters of the Unbroken Cord trade in deferred mercy — a good death, a quiet birth, a debt that outlives the debtor by generations. The three accounts below are not three separate stories but one, read across a lifetime: a confession, a bargain, and a vision, all belonging to the same two women.</p>
+
+<div class="panel panel-blood">
+<p class="text-sm" style="margin:0;"><strong>A note on how these came to be gathered.</strong> All three pieces below survive because a scholar named Lerris Fenwood went looking for a family secret and found someone else's instead. Sent north to a Baron's holdfast beyond the Belworth to settle an old debt of his own house, Fenwood was handed a lead-lined box by the Baron's inquisitor-valet — payment, of a kind, for a guest's polite request — and told plainly that the price was not his to bear, but that he would carry it anyway. Inside was Sister Aris's confession. Fenwood transcribed it, and what the Cord's own archive later yielded alongside it, and passed both into wider circulation under the same plain acknowledgment the Baron gave him at the door: <em>the price is never free, and someone always ends up carrying it who never agreed to.</em> The vision that closes this trilogy was recovered separately, through a different diviner's rite, and only makes sense once the first two pieces are read.</p>
+</div>
+
+<h3 id="the-hollowed-confession">The Hollowed — A Confession</h3>
+<p class="byline">Recorded by a silenced scribe of the Witness, found in a lead-lined box. Spoken by Sister Aris, Keeper of the Door, to her Hollowed son. Presented here nearly as it was found, with only the lightest polish to the transcription.</p>
+<p>The first thing you learn, little one, is that a woman in labor does not see you. She sees the pain. She sees the face of her mother, or the face of her god. She does not see the boy who never blinks, who holds the linens with hands that do not warm.</p>
+<p>You are good at linens. I am proud of you.</p>
+<p>This was a farmhouse, a good one. Stone floor, thick beams, ash on the hearth. The father was the nervous type. He kept touching his belt where a knife should hang. I told him to boil water. Men need tasks. It keeps them from counting their fears.</p>
+<p>The mother was young, maybe eighteen, with the broad hips of a woman built for this. Her name was Ellia. I had delivered her own mother twenty-three years ago, a quick birth, a quiet one. That mother paid with a lock of hair and a promise to name her first daughter after my own mother, who had no name I ever spoke aloud.</p>
+<p>That debt is still in the Cord. It will be collected eventually. Maybe by you.</p>
+<p>Ellia screamed. Good screams — productive, open-throated. I checked her progress. Eight fingers, then nine. The child was positioned well. I told her to push.</p>
+<p>You stood by the washbasin, your hands folded, your eyes open. The father glanced at you once, then again. He could not hold your gaze. No one ever can. They think it's shyness. They think you are simple. They do not see the silver wire, even when it glints in the firelight. That is the miracle of the Cord, little one. No one sees the help.</p>
+<p>The first twin came fast. A boy, red-faced, strong, with fists that knew how to hold the air. I tied the cord, passed him to the mother. She laughed and wept at once. The father touched the boy's cheek, and his hand did not shake.</p>
+<p>Then the second twin.</p>
+<p>He was smaller, paler, and his cord was wrapped around his neck twice, maybe three times. I felt the knot with my fingers. I could have unwrapped him. I have done it before. But I also felt the weight of the thread in my pocket — the thread that would have bound him to a lifetime of coughing, of debts to physicians, of nights when his parents would not be sure if he would wake.</p>
+<p>I looked at you. You were watching the father.</p>
+<p>He was still smiling at the first boy. He had not yet looked at the second.</p>
+<p>So I did not unwrap the cord. I held it tight, just for a moment. I felt his heart slow. It was quick. It was quiet. It was kind.</p>
+<p>I wrapped the second boy in a clean cloth and laid him on the table.</p>
+<p>"The second one did not make it," I said. My voice was calm. It is always calm. That is why they trust me.</p>
+<p>The mother's face did what faces do — the grief tried to arrive. I placed my hand on her forehead. "You have one healthy son. Focus on him. Do not let the shadow of the one you lost touch the one you hold."</p>
+<p>She nodded. Her eyelids fluttered. I had not given her anything yet. But the words were enough. The debt of the dead child was already transferring — from her memory to the Cord.</p>
+<p>The father looked at the still bundle. "He was so small," he whispered.</p>
+<p>"He was weak," I said. "He would have grown sickly, frail. A lifetime of coughing, of debts to physicians, of nights when you are not sure if he will wake. This is easier. Kinder."</p>
+<p>He did not argue.</p>
+<p>I cut two pieces of the umbilical cord. One for his mother's memory box. One for the Cord.</p>
+<p>You took it. You placed it in your pocket, next to your heart that does not beat.</p>
+<p>The mother asked for tea. I poured it. Dark, a little milk, a little iron. The father asked if he could have some. I poured a second cup. He drank it without tasting.</p>
+<p>As he drank, he looked at you.</p>
+<p>He saw you.</p>
+<p>Not the shy boy. Not the helper. He saw the thread where your mouth had been sewn. He saw the hollow where your heart should be. He saw the gray cord trailing from your chest, pulsing with the rhythm of his own heartbeat.</p>
+<p>His hand went to his throat. His mouth opened.</p>
+<p>"Drink," I said. "The tea will help you forget."</p>
+<p>He drank.</p>
+<p>I told him: "The child was weak. This is better. You have one healthy son. That is enough."</p>
+<p>He nodded. He was already forgetting the shape of the dead boy's face.</p>
+<p class="sep">⁂</p>
+<p class="text-sm text-muted">The testimony continues for several pages, describing the three days of recovery, the forgetting, and the eventual visit months later when the father offers water and calls the Hollowed a "kind face." The confession ends with the midwife's ambiguous penance.</p>
+<p class="sep">⁂</p>
+<p>I do not know if I am confessing because I am sorry, little one, or because the ritual demands it. Perhaps there is no difference.</p>
+<p>The mother was young. The father was kind. The dead child was weak. I told the truth.</p>
+<p>But truth, like tea, is a matter of preparation.</p>
+<p class="closing">"The soup is always free. The price never is."</p>
+
+<h3 id="bargain-broken-well">The Bargain at the Broken Well</h3>
+<p class="byline">A second confession from Sister Aris, recovered from the same hidden archive as the first, written on the back of a grain manifest in ink mixed from lampblack and tears. She wrote it, by her own account, only because she would not remember writing it by morning — the Cord takes memories as interest, and she meant to outrun the collection.</p>
+<p>Under the lamp, bread and salt. The soup was free. The price was her.</p>
+<p>I am Sister Aris, Keeper of the Door, and I am writing this because I will not remember it in the morning. The Cord takes memories as interest. But I have hidden this page, and I have paid a wayfarer's toll to forget where. When the Cord finds it — and it will — I will already be ash.</p>
+<p>My Hollowed has no name. I call him little one. He was weak. His mother was dead. A dark, uncertain life lay ahead. I held the cord tight. I did not unwrap it. The Cord demanded a breath or a death; I gave it a death.</p>
+<p>He has been my witness for forty years. He does not eat. He does not sleep. He does not age. His eyes are sewn open with silver wire, and he watches every soul I tend, every death I harvest, every thread I tie. I have told myself he is not my son. I have told myself he is a tool.</p>
+<p>I have lied.</p>
+<p>The Cord does not forbid love. It forbids <em>attachment</em>. Love is a debt; attachment is a loan with no interest. The High Mother weaves attachment into the pattern, but she does not permit us to keep the thread for ourselves.</p>
+<p>I have kept the thread.</p>
+<p class="sep">⁂</p>
+<p>I fled the Cord at the dark of the moon, taking only my Hollowed, a skin of water, and a silver coin pressed once into a dead man's eye. The place I walked toward is not on any map. You find it by walking toward the place where the stars forget their names. I walked for nine nights, through waking and through dreams, and on the ninth the walls rose from the dust — black stone, slick with a wet that smelled of honey and copper. The gates were open. The gates are always open.</p>
+<p>Inside, the Worn shuffled past me — shamblers, screamers, stalkers, and one who spoke in a cracked and patient voice and asked me for a name. I gave her the name of a Sister who had wronged me. She took it and laughed, and her joints snapped like dry twigs. "She will dream of drowning tonight," she said. "That is the interest." I did not ask for the principal.</p>
+<p>At the heart of that place, in a vaulted chamber lit by a single guttering candle, I found what I had come for. She hangs in chains that drink light. Her wings are bound to the stone. Her mouth is sewn shut with silver wire. Her eyes are open, and they are not angry. They are patient.</p>
+<p>She spoke through a wound in her throat, her voice the rasp of rust and honey. "You have brought a Hollowed," she said. "And you wish to restore his heart."</p>
+<p>I knelt. "I wish to raise him as my son. Not as a witness. Not as a tool. As a child."</p>
+<p>"He was dead. He was killed with kindness long ago, letting the breath fade. The Cord accepted that death as payment for another. He is not yours. He is the Cord's."</p>
+<p>"Then I will pay the Cord's price. Whatever it is."</p>
+<p>"You do not understand, little sister. The Cord does not sell. It transfers. You cannot buy a Hollowed's heart from the High Mother. She does not own it. She merely holds it."</p>
+<p>I did not understand. I still do not.</p>
+<p>She smiled, and ash fell from her lips. "I can restore their heart. I can make their lungs fill with air, their blood move with warmth, their eyes close at night. They will grow. They will laugh. They will weep. They will be everything you lost when you held that cord."</p>
+<p>"And the price?"</p>
+<p>"A plague upon the Cord, three generations from this night. Not death — death is mercy. A <em>plague</em>. That is all you need know. The High Mother will forget a thread. A knot will loosen. A debt will be lost. The Cord will fray, just a little, just enough to let one soul slip free."</p>
+<p>I thought of my Hollowed — his silver-wire eyes, his hands that never warmed, his heart that did not beat.</p>
+<p>"One soul," I said. "You will let one soul slip free from the Cord?"</p>
+<p>"One soul. Not yours. Not theirs. But one."</p>
+<p>I agreed.</p>
+<p class="sep">⁂</p>
+<p>She reached through her chains. Her fingers were long and cold and smelled of a well gone bitter. She touched my Hollowed's chest. The gray thread that bound the child's heart unraveled — it did not fall, it dissolved, turning to ash that smelled of milk and iron. The ash swirled, then settled into the shape of a heart, small and pink and pulsing.</p>
+<p>The Hollowed gasped. Her eyes closed. When they opened, the silver wire was gone. Her eyes were brown — warm, bewildered, alive. And yet the way she tilted her head, the small furrow of her brow — that was his. That was always his. And I loved her for it.</p>
+<p>She looked at me. "Mama?" she said.</p>
+<p>I wept. I had not wept in forty years. The Cord does not permit tears — tears are a debt unpaid. But I wept.</p>
+<p>She watched me weep the way a creditor watches a debtor sign — with the small, satisfied patience of someone who has just written a new clause in fine print. "The plague will come in three generations. You will not see it. But you will have raised a daughter. Is that not enough?"</p>
+<p>I held my child. She was warm. She was real. I did not ask what the fine print said.</p>
+<p class="sep">⁂</p>
+<p>We fled that place at dawn. My daughter — I named her Bryn, after my own mother, who had no name I ever spoke aloud — walked beside me. Her hand was small and warm.</p>
+<p>We reached the Black River by nightfall. I built a fire. I poured two cups of tea.</p>
+<p>As she drank, I saw it. A gray thread, thin as a spider's silk, wrapped loosely around her neck — the way a Daughter ties her witness cord before a binding. The thread trailed behind her, disappearing into the dark. I reached for it. My fingers passed through.</p>
+<p>"Mama?" she said. "What's wrong?"</p>
+<p>I looked at her. Her eyes were warm. Her heart beat. She was alive.</p>
+<p>But she was not free.</p>
+<p>The Cord had not released her. The heart had been restored, yes — but the Cord had never owned her heart. The Cord owned the <em>debt</em> that her death had paid. And that debt had not been erased. It had been transferred — from the dead twin to the living child.</p>
+<p>Bryn is a Daughter of the Unbroken Cord. She always has been. She always will be.</p>
+<p>I did not flee the Cord. I delivered my own daughter into its keeping. My own little sister.</p>
+<p class="sep">⁂</p>
+<p>I have raised her. She does not remember the walled city. She does not remember the well. She does not remember the day her heart began to beat. She wears gray robes. She tends the dying. She collects debts. She is a good Daughter — efficient, precise, and cold.</p>
+<p>Sometimes, when she sleeps, the gray thread around her neck glows faintly. I think the High Mother is whispering to her. I have tried to cut the thread. I cannot. I have tried to tie it in knots. It loosens. I have tried to offer the Cord a substitute — a memory, a name, a year of my own life. The Cord does not accept substitutes.</p>
+<p>The plague will come in three generations. I will not live to see it. But I have written this confession so that someone, somewhere, will know: the debt-holder keeps her bargains. The Cord does not forgive. And I am the woman who sold her daughter's soul to buy her a heartbeat.</p>
+<p class="closing">"The soup is always free. The price never is." — Sister Aris, Keeper of the Door, fleeing south. The ink is ash. The thread is gray. The child is Bryn.</p>
+
+<h3 id="sunset-black-river">Sunset Over the Black River</h3>
+<p class="byline">The third piece of the trilogy: what was seen decades later, through the Rite of the Echoing Vessel — a divination that draws a vision from still water and a lock of the dead's hair. The caster who witnessed this vision reported only what is set down here; the ritual's mechanics have been omitted as they add nothing to the account itself. Read after the two confessions above, there is no ambiguity left in who Aris and Bryn are to each other — only in what, at the very end, Aris chose.</p>
+<p>The voice came to Bryn in dreams — not as a memory, but as a presence. A honeyed rasp, sweet as rot, patient as a sealed tomb. She had heard it only once before, in a vaulted chamber far beneath the earth, when she was small enough to fit in her mother's arms. She had not understood the words then. She understood them now. They came to her in the half-dark of dawn, when her mother's breathing was shallow and the Cord lay heavy against her collarbone.</p>
+<p><em>But not for her. Never for her.</em></p>
+<p>Bryn's thumb brushed sweat from Aris's temple. The skin was paper-thin over bone, mapped with old scars like healed cracks in dry earth. "Your time is soon, mother," Bryn said, voice flat as a stone. "Don't worry. I'll do my duty. I'll take your last breath. Your debt to the Cord will be paid."</p>
+<p>Aris's eyes flickered — just a shadow crossing water — and she turned her head. Not fear. Sadness. Deep and quiet, like a well long drained. "Help me up," she whispered. "I want to see the sunset over the Black River."</p>
+<p>Bryn shifted her weight, ready to lift. They moved slow, Aris leaning hard on Bryn's shoulder, each step a small surrender. The path wound through knee-high grass, silent except for the rasp of Aris's breath and the distant cry of a lone crow. Bryn kept her hands loose at her sides, ready to steady or support. No words came. The Cord's weight against her collarbone was a familiar pressure — steady, expected.</p>
+<p>At the river's edge, Aris stopped. She didn't look at Bryn. Her gaze fixed on the water, where the sun bled gold into the valley's green folds. "I tried," Aris said, voice thin as old thread. "Several times. To escape. Every time... they brought me back." A pause. The wind stirred the reeds. "You told them each time."</p>
+<p>Bryn's throat tightened. She hadn't meant for Aris to know. Not like this. "The Cord requires honesty," she said. "Secrets weaken the weave."</p>
+<p>Aris didn't nod. Just sighed — a sound like fabric tearing — and fell silent. They stood shoulder to shoulder, watching the light thin to amber, then rise. The river whispered over stones, indifferent.</p>
+<p>Aris finally spoke, soft as a sigh. "I don't want to go to the Cord. The House Without Doors. Child... I have no friends there." Her hand lifted, trembling, to wipe her cheek. Came away wet. "Everything I ever wanted... everything... is right here."</p>
+<p>Bryn's jaw locked. She'd said those words to dying women a hundred times. Duty was the only warmth left. "You know the rules, mother. And no tears. They're... inefficient." Her voice sounded thin even to her own ears. She kept her hands unclenched at her sides, nails digging into her palms.</p>
+<p>Aris turned her face fully toward her. The sunset caught the tears tracking through the dust on her cheeks. "You were always a good daughter," she said. Her thumb brushed Bryn's knuckle — barely there, gone before Bryn could flinch. "And... more besides. I know the rules. And I have earned my tears."</p>
+<p>Bryn swallowed. The Cord felt tighter, a live thing against her throat. "A breath, or a death, mother. The Cord demands. Nature chooses."</p>
+<p>Aris's eyes were suddenly sharp, ancient in their weariness. "No, Bryn." Her voice dropped to a blade's edge. "No tears. <em>And I choose.</em>" Then she wasn't leaning. She was falling.</p>
+<p>Bryn's arms jerked out — too late, too weak — to catch air. Aris vanished over the edge. The river swallowed the sound of her fall before it could finish.</p>
+<p>Bryn crashed to her knees. Stone bit through her robes. She pressed her palms flat to the earth, head down, and tried to break. Tried to let the grief crack her open like rotten wood. Nothing came. No sound. No wet heat on her cheeks. Just the hollow press of her own ribs, and the Cord — tight, insistent — pulsing once, twice, like a second heartbeat where hers should have been.</p>
+<p>She stayed there, knuckles white in the dirt, waiting for tears that would not come. The Cord held her silent. The river kept singing. The sun dipped below the hills, and the light went gray.</p>
+<p class="closing">"The vision ends the way these visions always end — without a verdict. The Cord does not say whether Aris paid her debt or escaped it by falling before it could be collected. It only shows what happened, and lets the living decide what kind of choice a fall like that was."</p>
+
+<h2 id="section-3">III. What the Oath Demands</h2>
+<p class="text-sm text-muted">Tallies kept by rivers and forests and roads that do not forget a debt, no matter how small, and do not care whether the debtor remembers incurring it.</p>
+
+<h3 id="oath-of-the-unsung-dead">The Oath of the Unsung Dead</h3>
+<p class="byline">Told by the Direwood itself — or so the teller dreamed. A voice of bark and moss and running sap, heard in sleep and written down still half-asleep.</p>
+<p>The Direwood lies west of the Mistland, a forest of black trees and gray moss where the sun does not reach the ground. The wraiths of forgotten kings walk between the trunks. The dead do not stay buried there — they rise as mist-shrouded things with hollow voices and colder hands.</p>
+<p>A Linn jarl — call him Bjorn — cut down a tree in the Direwood to build a longship. He did not ask permission. He did not leave an offering. He just cut.</p>
+<p>The tree fell. The wood was strong. The ship was fast. The jarl raided for forty years and died rich.</p>
+<p>But his descendants did not prosper. Their crops failed. Their ships sank. Their children were born with teeth already grown and eyes that did not blink.</p>
+<p>A völva came. She touched the jarl's grave. "The Direwood remembers the tree you cut. It wants the tree back. But the tree is a ship, and the ship is at the bottom of the sea."</p>
+<p>"Then how do we pay?" the descendants asked.</p>
+<p>"With stories. One story for every ring in the tree. The tree was three hundred years old. You owe three hundred stories. But the Direwood also wants the axe. The axe was forged in the Mistland, from iron that belonged to a wraith-lord. The wraith wants it back."</p>
+<p>The descendants told stories. They told of battles, births, deaths, feasts, storms, loves, betrayals, and one cat who learned to speak. They told for three years.</p>
+<p>On the last night, the Direwood spoke. "I have heard three hundred stories. The tree is paid for. But the axe remains. The wraith-lord is impatient."</p>
+<p>The descendants searched. The axe hung in a hall of relics in Ecktoria, mounted on a wall and labeled as a curiosity from a northern people no one there had ever met. They stole it back. They returned it to the Mistland. They buried it in a barrow where the wraith-lord was said to sleep.</p>
+<p>That night, the wraith-lord rose. It was a thing of fog and bone, with eyes like frozen stars. It took the axe. It looked at the descendants. It said nothing. Then it sank back into the earth.</p>
+<p>The barrow sealed itself. The wraith-lord did not return.</p>
+<p>The descendants prospered. But every year, they walk to the edge of the Direwood and leave a single coin — a toll for the next tree they might cut. And every year, they walk to the Mistland and leave a cup of ale for the wraith-lord, who sleeps with his axe across his knees.</p>
+<p class="closing">"The Direwood remembers. The Mistland remembers. The axe remembers. Do not borrow from the west without asking. The price is paid in stories, and the stories are never cheap."</p>
+
+<h3 id="the-walking-promise">The Walking Promise</h3>
+<p class="byline">This tale arrived by letter, found tucked in a book's binding, written in a hand no one recognized and dated the same night the teller had left a certain baronet's forest.</p>
+<p>A promise walked into a town. It had no legs and no mouth, but it walked. It sat at the town square, and it waited.</p>
+<p>The townspeople were afraid. "What does it want?"</p>
+<p>An old woman said, "It wants what it is owed."</p>
+<p>They brought coins. The promise did not take them. They brought grain. The promise did not take it. They brought a prisoner. The promise did not move.</p>
+<p>The old woman said, "The promise is not owed in things. It is owed in stories."</p>
+<p>She sat beside the promise. She told a story. The promise listened. When she finished, the promise stood and walked to the next town.</p>
+<p>The townspeople were relieved. But the old woman said, "The promise will return. It always returns. A story only adds another thread."</p>
+<p class="closing">"A promise is a story we tell ourselves to make the world feel fair. The world is not fair. But a story — a story can buy time."</p>
+
+<h3 id="the-dwarfs-bridge">The Dwarf's Bridge</h3>
+<p class="byline">Told by an Aeler tunnel-wright named Vorn, who had built bridges under three mountains. He smelled of stone dust and old beer.</p>
+<p>The Hyaar peninsula is split by a river that has no name. The dwarves call it the Vein. The Pereshi call it the Weight. The Sidhi call it the Salt Line.</p>
+<p>A bridge was built across the Salt Line by an Aeler engineer — call her Helga. She built it to last a thousand years. She carved her name into the keystone.</p>
+<p>The bridge lasted a hundred. Then a flood washed away the approaches. The dwarves came to rebuild.</p>
+<p>"The agreement says we built it to last a thousand years," the locals said.</p>
+<p>"The agreement says nothing about floods," the dwarves said. "The flood is an act of the river. The river is not a signatory."</p>
+<p>A Pereshi judge was called. She listened to both sides. Then she asked, "Where is the keystone?"</p>
+<p>They brought the keystone. Helga's name was still carved into it. But underneath, in smaller letters, was a new name: <em>The River.</em></p>
+<p>"The engineer signed on behalf of the river," the judge said. "The river did not consent. Therefore, the agreement is void. Rebuild the bridge. This time, ask the river for permission."</p>
+<p>They did not know how to ask a river for permission. So they sent a Sidhi diver down to the riverbed. He came back with a single stone, smooth and black.</p>
+<p>"The river says yes," he said. "It also says the toll is one story per crossing."</p>
+<p>The dwarves rebuilt the bridge. They left a niche in the arch for a storyteller. And every traveler who crosses must tell a story to the river — or pay double.</p>
+<p class="closing">"A bridge is a conversation. Speak to the river before you build. It has a longer memory than your agreement."</p>
+
+<h2 id="section-4">IV. Small Mercies, Quietly Paid</h2>
+<p class="text-sm text-muted">Not every debt is collected by a spirit or a ledger. Some are paid in the plain, unglamorous work of showing up for someone who cannot show up for themselves.</p>
+
+<h3 id="the-naming-of-stones">The Naming of Stones</h3>
+<p class="byline">A quieter chapter from the road of the storyteller once known as Quinn, now called Thyme — the same fugitive girl whose flight from the Chain-Lanterns is told elsewhere as "The Smell of Thyme." This is what she found, grown, on a road with no name left to give it.</p>
+<p>Thyme comes to the village at dusk, when the light turns the dust to gold and the air smells of woodsmoke and wet stone. There is no sign, no gate — only a milestone at the crossroads, its face worn smooth as a river stone by wind and time. Where a name should be carved, there is only a shallow depression, like a held breath.</p>
+<p>She dismounts from her borrowed mare and runs her fingers over the hollow. Not erased. <em>Unmade.</em> As if the village chose to forget its own name, or something took it and left only the shape behind.</p>
+<p>A woman steps from the tall grass at the field's edge. Her hemp bracelet is frayed to individual threads, each one catching the last light. She carries a basket of dried figs and a waterskin, but her eyes are on Thyme's wrist — where a red thread, tied by a weaver long since left behind, still circles, faded to the color of old blood.</p>
+<p>"We don't remember what we were called," the woman says. Her voice is low, like stone grinding on stone. "Only that we are still here."</p>
+<p>Thyme nods. "How do you survive it?"</p>
+<p>The woman gestures toward the village center, where a standing stone rises from the earth like a broken tooth. Pebbles, bread crusts, a single red thread are tucked into its cracks. "We leave offerings. We don't ask who left them. We take what we need and leave what we can. It's not a cure. It's just... holding."</p>
+<p>Thyme touches her own thread. It feels warm from the day's sun. "I'll stay three days," she says. "I walk the roads. If I find anyone out there, I'll bring them in."</p>
+<p>The woman's lips twitch — almost a smile. "The roads bring us what we need. Sometimes that's a stranger. Sometimes it's a mirror."</p>
+<p>She finds a man on the third loop of an old road, the same broken milestone, the same scorched oak, the same silence where a bird's call should be. He walks with his head down, his lips shaping words that never leave his mouth. She matches his pace without speaking. After a mile he stops at the milestone, his hand trembling as it touches the chipped letters — <em>Regret. Hunger. The Same.</em> He presses his forehead to the stone.</p>
+<p>Thyme sits beside him in the dust and takes a piece of white chalk from her pocket. She draws a single vertical line on the stone's face. Not a name. Not a plea. Just a mark, like a stitch holding fabric together. "You don't have to say it aloud," she says. "You can leave it here." He doesn't look at her. But he doesn't walk away, either. His fingers trace the chalk line once, twice. Then he pulls a small knife from his boot and etches a second line beside it — parallel, deliberate.</p>
+<p>That night she brings him to the village. She doesn't tell the elder his story. She asks only for a bowl of nettle soup and a space by the fire. Afterward, he takes a scrap of bark from the kindling pile and scratches a single word into it: <em>Sorry.</em> He folds it small and tucks it into the milestone's crack, beside the red thread and a crumbling piece of barley bread. He doesn't speak again for the rest of her stay. But he stops walking the loop.</p>
+<p>She finds a mother at the edge of a burned orchard, walking its perimeter, arranging fallen branches into a loose circle at the base of the oldest tree. Thyme kneels and adds a snapped twig to the circle without a word. They work an hour in silence, the circle taking shape — not a door, but a low, wide arch. "It's not a door," the woman finally says, her voice raw. "It's a grave marker." Thyme nods. "Then you know where she is." That evening the woman lights a single candle in an empty room and throws the window wide to the wind. The flame bends but does not go out.</p>
+<p>She finds a girl at a triple crossroads, no older than twelve, arranging pebbles in a slow, widening spiral, humming a tune with no clear beginning or end. Thyme sits at the spiral's outer edge and answers with a low drone in the spaces between the girl's notes — not harmony, accompaniment. She sets a smooth river stone where the spiral's next turn might begin, if the girl wishes it to continue. The girl studies it, then nudges it half an inch, just enough to turn the spiral inward. They build it together for twenty minutes, Thyme never leading, only ever answering. When the girl finally stands, she walks to the standing stone and presses her palm flat against it, leaving a single pebble at its base, placed exactly where the noon shadow falls.</p>
+<p>On her last morning, Thyme walks to the standing stone before the sun clears the ridge. The offerings are all still there — the folded bark, the candle stub, the pebble in its precise spiral. The elder joins her.</p>
+<p>"You didn't cure anyone," the elder says.</p>
+<p>"No."</p>
+<p>"But they're still here."</p>
+<p>"Yes."</p>
+<p>The elder touches the milestone where the village's name used to live, her finger tracing the shallow depression where letters once were. "We've forgotten what we were called. But we haven't forgotten how to be together."</p>
+<p>Thyme unties the thread from her own wrist, feeling the silk catch on her skin like a memory. She kneels at the stone and ties it around its base — low enough for the girl to reach, high enough that it won't drag in the dirt. It lies atop the girl's pebble, beside the man's bark scrap, beneath the elder's own red thread.</p>
+<p>"Then this is your name now," Thyme says. "The place where threads hold."</p>
+<p>She stands, and the elder does not try to stop her as she walks back toward the road. Behind her, the stone waits. The threads wait. She does not look back. She knows the thread will hold.</p>
+<p class="closing">"Some debts are not paid in coin or courage, but in the quiet insistence of showing up — again and again — for the ones who cannot show up for themselves. It is the cheapest currency in the world, and almost no one can afford it."</p>
+
+<hr>
+
+<div class="frame">
+<h2 style="margin-top:0;">Colophon</h2>
+<p>The nine pieces gathered here are drawn from four of Fate's Edge's expansion sourcebooks. Two are new short works, adapted and expanded from the introduction, canton descriptions, and faction lore of the chivalric-fracture material of Vhasia, built to stand alongside — not replace — the siege narrative already told in full elsewhere. Three form a single trilogy pulled from two different sources: a confession and a bargain recorded nearly verbatim from the appendix material of the Daughters of the Unbroken Cord, and a vision recovered from a divination rite recorded in a separate expansion's appendix, its garbled transcription cleaned into readable prose without touching the events it recorded. That bargain was itself recovered secondhand — copied from a Daughter's hidden archive into a horror-focused expansion's own framing narrative, in which a scholar named Lerris Fenwood is handed the same lead-lined box under very different circumstances; the frame around that discovery belongs to that expansion and is only nodded to here, not reprinted. The remaining four pieces are chosen from the wider story-cycles of the northern, southern, and hedge-witch traditions — tales of tolls, tallies, and quiet obligations that were left unused by this collection's two sibling volumes.</p>
+<p>Every piece has had the same light hand run over it: typographic artifacts and stray markup mended, real-world echoes filed off and replaced with the setting's own vocabulary, prose tightened where it wandered — but no plot altered, no voice rewritten, no ending softened. These are dark, quiet stories, and they were left dark and quiet on purpose.</p>
+<p>This volume was assembled to complement, not repeat, its two sibling anthologies — <em>Tales of the Threshold</em> and <em>The Hearth Ledger</em>. Where those collections gather the wide spread of Fate's Edge's regional folklore for flavor and session color, this one narrows its focus to a single throughline: what is owed, and what it costs to pay it, refuse it, or simply carry it a little further down the road. Readers who want the fuller siege of Corvane, the wider Hearth Cycle, or the region-by-region folk tales should look to those companion volumes; nothing here retells what they have already told.</p>
+</div>
+
+<footer>
+Fate's Edge Proprietary Content — (c) 2024 Nicholas A. Gasper. All rights reserved.
+</footer>
+
+</body>
+</html>

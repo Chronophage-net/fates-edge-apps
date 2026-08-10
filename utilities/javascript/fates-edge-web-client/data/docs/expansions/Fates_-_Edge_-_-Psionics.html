@@ -1,0 +1,1096 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Psionics — Fate's Edge Expansion</title>
+<style>
+:root {
+    --bg1: #0a0a10;
+    --bg2: #14131c;
+    --bg3: #1d1c28;
+    --bg4: #272536;
+    --text: #e6e3ee;
+    --text2: #b0abc0;
+    --text3: #7d7791;
+    --gold: #9c7fe0;
+    --gold-hover: #b195ea;
+    --border: #322f42;
+    --red: #8e2a2a;
+    --green: #3d7a52;
+    --blue: #3c6e8f;
+    --purple: #6a3f8f;
+    --orange: #a8622a;
+    --mist: #4f5f8f;
+    --radius: 8px;
+    --font: 'Segoe UI', system-ui, -apple-system, sans-serif;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+    background: var(--bg1);
+    background-image: radial-gradient(circle at 50% 0%, #16141f 0%, #0a0a10 60%);
+    color: var(--text);
+    font-family: var(--font);
+    padding: 1.5rem;
+    max-width: 1100px;
+    margin: 0 auto;
+    line-height: 1.6;
+}
+h1, h2, h3, h4, h5 { color: var(--gold); margin: 0.5rem 0 0.3rem; }
+h1 { font-size: 1.8rem; border-bottom: 2px solid var(--gold); padding-bottom: 0.3rem; }
+h2 { font-size: 1.4rem; border-bottom: 1px solid var(--border); padding-bottom: 0.2rem; margin-top: 1.8rem; }
+h3 { font-size: 1.15rem; margin-top: 1.1rem; }
+h4 { font-size: 0.95rem; color: var(--text); margin-top: 0.7rem; }
+p { margin: 0.35rem 0; }
+a { color: var(--gold); text-decoration: none; }
+a:hover { color: var(--gold-hover); }
+ul, ol { margin: 0.3rem 0 0.5rem 1.3rem; }
+li { margin: 0.15rem 0; }
+.panel {
+    background: var(--bg2);
+    border-radius: var(--radius);
+    padding: 0.6rem 0.8rem;
+    border: 1px solid var(--border);
+    margin: 0.6rem 0;
+}
+.panel-gold { border-left: 4px solid var(--gold); }
+.panel-red { border-left: 4px solid var(--red); }
+.panel-blue { border-left: 4px solid var(--blue); }
+.panel-green { border-left: 4px solid var(--green); }
+.panel-purple { border-left: 4px solid var(--purple); }
+.panel-orange { border-left: 4px solid var(--orange); }
+.panel-mist { border-left: 4px solid var(--mist); }
+.panel > strong:first-child, .panel-title { display: block; color: var(--gold); margin-bottom: 0.25rem; }
+.badge {
+    display: inline-block;
+    padding: 0.05rem 0.5rem;
+    border-radius: 12px;
+    font-size: 0.68rem;
+    font-weight: 600;
+    margin: 0.1rem 0.15rem 0.1rem 0;
+}
+.badge-gold { background: var(--gold); color: #150f26; }
+.badge-red { background: var(--red); color: #fff; }
+.badge-green { background: var(--green); color: #fff; }
+.badge-blue { background: var(--blue); color: #fff; }
+.badge-purple { background: var(--purple); color: #fff; }
+.badge-orange { background: var(--orange); color: #fff; }
+.badge-mist { background: var(--mist); color: #fff; }
+.badge-gray { background: var(--bg4); color: var(--text3); }
+.flex { display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center; }
+.text-muted { color: var(--text3); }
+.text-gold { color: var(--gold); }
+.text-sm { font-size: 0.85rem; }
+.text-xs { font-size: 0.7rem; }
+.mt-1 { margin-top: 0.5rem; }
+.mb-1 { margin-bottom: 0.5rem; }
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem; }
+.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.6rem; }
+@media (max-width: 700px) { .grid-2, .grid-3 { grid-template-columns: 1fr; } }
+hr { border: none; border-top: 1px solid var(--border); margin: 0.8rem 0; }
+.toc { background: var(--bg3); border-radius: var(--radius); padding: 0.6rem 0.9rem; border: 1px solid var(--border); }
+.toc-title { color: var(--gold); font-weight: 700; display: block; margin-bottom: 0.3rem; }
+.toc-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0 1rem; }
+@media (max-width: 700px) { .toc-grid { grid-template-columns: 1fr; } }
+.toc a { color: var(--text2); display: block; padding: 0.12rem 0; font-size: 0.85rem; }
+.toc a:hover { color: var(--gold); }
+blockquote {
+    border-left: 3px solid var(--gold);
+    padding-left: 1rem;
+    margin: 0.6rem 0;
+    color: var(--text2);
+    font-style: italic;
+}
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 0.6rem 0 1rem;
+    font-size: 0.85rem;
+    background: var(--bg2);
+    border-radius: var(--radius);
+    overflow: hidden;
+}
+caption {
+    caption-side: top;
+    text-align: left;
+    font-size: 0.8rem;
+    color: var(--text3);
+    padding: 0.2rem 0 0.4rem;
+    font-style: italic;
+}
+th, td {
+    border: 1px solid var(--border);
+    padding: 0.4rem 0.55rem;
+    text-align: left;
+    vertical-align: top;
+}
+th { background: var(--bg4); color: var(--gold); font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.02em; }
+tr:nth-child(even) td { background: var(--bg3); }
+.table-wrap { overflow-x: auto; }
+.creature-stats {
+    background: var(--bg4);
+    border-radius: var(--radius);
+    padding: 0.4rem 0.6rem;
+    margin: 0.3rem 0;
+    font-size: 0.8rem;
+}
+.creature-stats .cname { font-weight: 700; color: var(--gold); font-size: 0.9rem; }
+.creature-stats .clore { font-size: 0.75rem; color: var(--mist); font-style: italic; margin-top: 0.25rem; }
+.art-card {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--gold);
+    border-radius: var(--radius);
+    padding: 0.5rem 0.8rem;
+    margin: 0.6rem 0;
+}
+.art-card h4 { margin-top: 0; }
+footer {
+    font-size: 0.75rem;
+    color: var(--text3);
+    text-align: center;
+    padding: 1.2rem 0 0.4rem;
+}
+</style>
+</head>
+<body>
+
+<h1>Psionics</h1>
+<p class="flex" style="margin-bottom:0.8rem;">
+    <span class="badge badge-gold">Rules Expansion</span>
+    <span class="badge badge-mist">Mind &amp; Consciousness</span>
+    <span class="badge badge-blue">Skill: Psionics 0–5</span>
+    <span class="badge badge-gray">Author: Nicholas A. Gasper</span>
+</p>
+
+<div class="panel panel-gold">
+    <strong class="panel-title">What This Expansion Adds</strong>
+    <p class="text-sm">Psionics gives characters a source of power that answers to no Patron and channels no elemental force — only the disciplined mind, honed by practice and paid for in Mental Strain. This document adds the Psionics skill, nine Arts with full mechanics, a talent tree from Minor to Prestige tier, a Psychic Bestiary, encounter and campaign generators, investigation procedures, and the cultural, historical, and economic texture that makes psionic characters feel native to the Fate's Edge world. Everything here plugs directly into the existing Fatigue/Harm/Story Beat engine — there is no separate psionics-only subsystem to learn beyond the Mental Strain track.</p>
+</div>
+
+<div class="toc">
+    <span class="toc-title">Table of Contents</span>
+    <div class="toc-grid">
+        <div>
+            <a href="#core-mechanics">1. Core Mechanics</a>
+            <a href="#consequence-system">2. Psionic Consequence System</a>
+            <a href="#enhancements">3. Psionic Enhancements</a>
+            <a href="#arts">4. Psionic Arts</a>
+            <a href="#costs">5. Psionic Costs</a>
+            <a href="#talents">6. Psionic Talents</a>
+            <a href="#anti-psionic">7. Anti-Psionic Effects</a>
+            <a href="#balance-adjustments">8. Balance Adjustments Summary</a>
+            <a href="#complications">9. Additional Psionic Complications</a>
+            <a href="#cultural-faces">10. Cultural Faces of the Silent Art</a>
+        </div>
+        <div>
+            <a href="#silent-orders">11. The Silent Orders</a>
+            <a href="#thought-trade">12. The Thought Trade: Psionic Economics</a>
+            <a href="#great-silence">13. The Great Silence: Psionic History</a>
+            <a href="#bestiary">14. Psychic Bestiary</a>
+            <a href="#encounter-generators">15. Psionic Encounter Generators</a>
+            <a href="#encounter-building">16. Psionic Encounter Building</a>
+            <a href="#campaign-threads">17. Psionic Campaign Threads</a>
+            <a href="#adventure-seeds">18. Psionic Adventure Seeds</a>
+            <a href="#investigation-procedures">19. Psionic Investigation Procedures</a>
+            <a href="#racial-integration">20. Racial Psionic Integration</a>
+        </div>
+    </div>
+</div>
+
+<div class="panel panel-mist">
+    <strong class="panel-title">Design Philosophy</strong>
+    <p class="text-sm">Psionics in Fate's Edge represents the disciplined mastery of the mind's hidden potentials. Unlike the chaotic forces of magic or the structured pacts of Patrons, psionic power comes from within, shaped by will and honed by practice. This internal source makes psions both powerful and vulnerable — their greatest strength is also their most dangerous weakness. Mental Strain becomes as real a threat as physical exhaustion, and the constant strain of psychic activity can fracture even the strongest psyche.</p>
+</div>
+
+<hr>
+
+<h2 id="core-mechanics">1. Core Mechanics</h2>
+
+<h3>Mental Strain Track</h3>
+<p>Your <em>Mental Strain</em> represents your capacity for sustained psychic exertion.</p>
+<div class="panel panel-blue">
+    <strong>Mental Strain = Spirit</strong> (minimum 2)
+</div>
+<p>Mark and clear Mental Strain as effects specify. When you <em>cannot</em> pay a Mental Strain cost, choose one:</p>
+<ul>
+    <li>Convert the unpaid point to <strong>+2 Fatigue</strong> (standard system), or</li>
+    <li>Convert the unpaid point to <strong>+1 Harm (Stress)</strong>.</li>
+</ul>
+<p><strong>Overflow:</strong> If you ever exceed your Mental Strain, immediately suffer <strong>+1 Harm (Stress)</strong> and set Mental Strain to your maximum (no further over-marking this scene).</p>
+
+<h3>Psionics Skill</h3>
+<p><strong>Psionics (0–5)</strong> gates access to psionic Arts and sets control and efficiency. You cannot use psionic Arts without investing in this skill.</p>
+
+<h3>Resolution and Attribute Keys</h3>
+<p>Psionics uses <strong>Attribute (per Art) + Psionics vs. DV</strong>. To encourage specialization, each Art has a <em>Key Attribute</em>. Using a non-key attribute for that Art imposes <strong>+1 DV</strong> (or −1 die, GM's choice).</p>
+
+<div class="table-wrap">
+<table>
+<caption>Attribute keys by Art. DV is set by the GM (typically 2–5+) from scope, risk, and opposition.</caption>
+<thead><tr><th>Art</th><th>Key Attribute</th><th>Alternate (+1 DV)</th></tr></thead>
+<tbody>
+<tr><td>Telekinesis</td><td>Spirit (force)</td><td>Wits (finesse/precision)</td></tr>
+<tr><td>Telepathy</td><td>Wits</td><td>Presence (emotive broadcast)</td></tr>
+<tr><td>Clairvoyance</td><td>Wits</td><td>Spirit (ritual trance)</td></tr>
+<tr><td>Biofeedback</td><td>Spirit</td><td>Wits (clinical self-hack)</td></tr>
+<tr><td>Astral Projection</td><td>Spirit</td><td>Wits (tethered skim)</td></tr>
+<tr><td>Psychic Assault</td><td>Spirit (overwhelm)</td><td>Wits (needle, bypass)</td></tr>
+<tr><td>Mind Shield</td><td>Wits (filter)</td><td>Spirit (soak)</td></tr>
+<tr><td>Empathic Manipulation</td><td>Presence</td><td>Wits (cold read leverage)</td></tr>
+<tr><td>Precognition</td><td>Spirit</td><td>Wits (tactical glimpses)</td></tr>
+</tbody>
+</table>
+</div>
+
+<hr>
+
+<h2 id="consequence-system">2. Psionic Consequence System</h2>
+<p>Psionics interfaces with the existing <strong>Fatigue/Harm</strong> tracks. Use <em>Mental Strain</em> as the psion-only resource, and <em>Fatigue/Harm</em> for spillover consequences.</p>
+
+<h3>Psionic Strain (Simple Thresholds)</h3>
+<ul>
+    <li><strong>Mark Fatigue when:</strong> a DV 4+ effect is used, three or more foes are engaged with psionics in one exchange, or an effect is maintained across two or more scenes.</li>
+    <li><strong>At 2 Fatigue:</strong> −1 die to psionic rolls.</li>
+    <li><strong>At 4 Fatigue,</strong> choose one:
+        <ul>
+            <li><strong>Surge:</strong> one psionic use this scene ignores its Mental Strain cost; then mark <strong>+1 Harm</strong> and generate <strong>+1 SB</strong>.</li>
+            <li><strong>Efficiency:</strong> halve all Mental Strain costs for the next scene (round up).</li>
+            <li><strong>Reset:</strong> clear all Fatigue; you cannot use psionics for one scene and mark <strong>+1 Harm</strong>.</li>
+        </ul>
+    </li>
+</ul>
+
+<hr>
+
+<h2 id="enhancements">3. Psionic Enhancements</h2>
+<div class="panel panel-blue">
+    <p class="text-sm"><strong>Psionic Surge (1/scene):</strong> Spend <strong>3 Mental Strain</strong> to gain <strong>+1 Effect</strong> on a psionic action.</p>
+    <p class="text-sm"><strong>Mental Breakthrough:</strong> At <strong>4+ Fatigue</strong>, Push a psionic effect <strong>+1 step</strong>; mark <strong>+2 Harm</strong> and generate <strong>+2 SB</strong>.</p>
+    <p class="text-sm"><strong>Psionic Meditation:</strong> During any rest, recover <strong>+1 Mental Strain</strong> in addition to normal recovery.</p>
+</div>
+
+<hr>
+
+<h2 id="arts">4. Psionic Arts</h2>
+<p>Nine disciplines make up the current known catalogue of psionic Arts. Each entry lists its key and alternate attribute, action cost, range, Mental Strain cost, and how Story Beats (SB) are generated.</p>
+
+<div class="art-card">
+<h4>Telekinesis</h4>
+<p class="text-sm"><strong>Key:</strong> Spirit + Psionics &nbsp;•&nbsp; <strong>Alternate:</strong> Wits + Psionics (+1 DV, fine manipulation) &nbsp;•&nbsp; <strong>Action:</strong> 1 action, sustained by fiction &nbsp;•&nbsp; <strong>Range:</strong> Near (+1 DV for Far) &nbsp;•&nbsp; <strong>Cost:</strong> activate 1 Mental Strain; sustained lifts/holds 1 Mental Strain/scene.</p>
+<p class="text-sm"><strong>SB by force tier:</strong></p>
+<ul class="text-sm">
+    <li><strong>Light (DV 2–3):</strong> cups, tools, doors. No SB.</li>
+    <li><strong>Medium (DV 4):</strong> furniture, a person's mass, riding debris. +1 SB on Partial/Miss.</li>
+    <li><strong>Heavy (DV 5+):</strong> carts, statues, boulders, multi-target shoves. +2 SB on Partial/Miss; +1 SB on Success.</li>
+</ul>
+<p class="text-sm"><strong>Benefits:</strong> hurl objects as weapons (Harm by fiction and force tier); shape cover by lifting slabs, holding doors, or raising transient walls/barriers; perform remote tasks such as pulling levers or disarming simple traps at range.</p>
+<p class="text-sm"><strong>Limits:</strong> cannot directly crush or twist living tissue — injury from Telekinesis is environmental (falling, debris, impact) at GM discretion. Complex, delicate work (lockpicks, surgery) typically requires the Wits alternate and adds +1 DV.</p>
+<p class="text-sm text-muted"><strong>Examples:</strong> nudge a goblet off a shelf (DV 2); rip a door from its hinges (DV 4); wrench a stone pillar sideways (DV 5).</p>
+</div>
+
+<div class="art-card">
+<h4>Telepathy</h4>
+<p class="text-sm"><strong>Key:</strong> Wits + Psionics &nbsp;•&nbsp; <strong>Alternate:</strong> Presence + Psionics (+1 DV, emotive broadcast) &nbsp;•&nbsp; <strong>Action:</strong> 1 action, sustained by fiction &nbsp;•&nbsp; <strong>Range:</strong> Near, requires line of sight (+1 DV for Far; +1 DV without line of sight if you hold a strong link) &nbsp;•&nbsp; <strong>Targets:</strong> one (+1 DV per extra target this scene).</p>
+<p class="text-sm"><strong>Design rule:</strong> Telepathy never replaces social skills — it provides information and set-up, not compliance.</p>
+<p class="text-sm"><strong>Depths &amp; SB</strong> — choose a depth before rolling:</p>
+<ul class="text-sm">
+    <li><strong>Surface Thoughts (DV 2):</strong> current focus. No SB the first time per target/scene; repeats cost +1 DV and, on a Miss, +1 SB.</li>
+    <li><strong>Emotional State (DV 3):</strong> tones and urges. +1 SB on Partial/Miss.</li>
+    <li><strong>Deep Memories (DV 5):</strong> episodic recall. +1 SB on Success; +2 SB on Partial/Miss.</li>
+</ul>
+<p class="text-sm"><strong>Outcomes</strong></p>
+<ul class="text-sm">
+    <li><strong>Success:</strong> gain the information and pick one set-up to use by the end of your next turn this scene — <em>Angle of Approach</em> (+1 die to your next Insight/Sense Motive vs. this target), <em>Read the Room</em> (Position +1 on your next social roll vs. this target), or <em>Pointed Question</em> (ask one focused question they could presently answer; the GM replies as impressions).</li>
+    <li><strong>Partial:</strong> blurred fragments; mark SB for depth.</li>
+    <li><strong>Miss:</strong> no useful read; mark SB for depth (if any) and the target feels the brush.</li>
+</ul>
+<p class="text-sm"><strong>Defense &amp; counterplay:</strong> an unwilling target rolls Spirit + Resolve; on a meet or beat, your read fails and you mark +1 SB (+2 SB if Deep) — margin 2+ and they also intuit your intent. Wards, mental static, or anti-psionic training impose +1–2 DV. Willing targets are DV−1 and cause no SB.</p>
+<p class="text-sm"><strong>Non-substituting benefits:</strong> <em>Silent Speech</em> (willing only) sends short thoughts within Near to a group up to your Wits, with no SB. <em>Sense Dissonance</em> — if you read Surface this scene, gain +1 die on Wits + Insight to vet a lie; a strong hit reveals which part conflicts.</p>
+<p class="text-sm text-muted">Reading unwilling minds during a formal social scene risks fallout — if detected, +1 SB even on Success.</p>
+</div>
+
+<div class="art-card">
+<h4>Clairvoyance</h4>
+<p class="text-sm"><strong>Key:</strong> Wits + Psionics &nbsp;•&nbsp; <strong>Alternate:</strong> Spirit + Psionics (+1 DV, trance method) &nbsp;•&nbsp; <strong>Action:</strong> 1 action; a ritual scry may take a scene &nbsp;•&nbsp; <strong>Range:</strong> scene/locale by fiction, +1 DV per range band beyond Near &nbsp;•&nbsp; <strong>Cost:</strong> DV 2–3 = 1 Mental Strain; DV 4 = 2; DV 5+ = 3.</p>
+<p class="text-sm"><strong>SB:</strong> Near — none. Distant — +1 SB on Partial/Miss. Complex Scry — +2 SB on Partial/Miss, +1 SB on Success.</p>
+<p class="text-sm"><strong>Uses:</strong> scout ahead, pierce a Veil, track signatures, read recent traces. Covert spying on private moments generates +1 SB; each extra scene sustained adds +1 SB.</p>
+</div>
+
+<div class="art-card">
+<h4>Biofeedback</h4>
+<p class="text-sm"><strong>Key:</strong> Spirit + Psionics &nbsp;•&nbsp; <strong>Alternate:</strong> Wits + Psionics (+1 DV, clinical technique) &nbsp;•&nbsp; <strong>Action:</strong> 1 action (major work takes a focused scene).</p>
+<p class="text-sm"><strong>SB by intensity:</strong></p>
+<ul class="text-sm">
+    <li><strong>Minor (DV 2):</strong> stabilize, close, purge shock. No SB. Heal up to Psionics levels/day (cap 1 Harm per recipient/day).</li>
+    <li><strong>Moderate (DV 3):</strong> +1 SB on Partial/Miss; heal up to Psionics (max 2/day).</li>
+    <li><strong>Major (DV 4+):</strong> +2 SB on Partial/Miss; +1 SB on Success; heal up to Psionics (max 1/day); mark +1 Fatigue.</li>
+</ul>
+<p class="text-sm"><strong>Perks:</strong> convert 1 Harm ↔ 1 Mental Strain (up to Psionics, max 3/day); grant a brief +1 die enhancement to physical rolls for a few moments.</p>
+<p class="text-sm"><strong>Limits:</strong> cannot heal Harm above your Psionics rating; active combat imposes Position −1; major healing requires a quiet scene; healing or enhancing others requires consent and generates +1 SB.</p>
+</div>
+
+<div class="art-card">
+<h4>Astral Projection</h4>
+<p class="text-sm"><strong>Key:</strong> Spirit + Psionics &nbsp;•&nbsp; <strong>Alternate:</strong> Wits + Psionics (+1 DV, skim tether) &nbsp;•&nbsp; <strong>Action:</strong> 1 action to slip; travel by fiction &nbsp;•&nbsp; <strong>Cost:</strong> 1 Mental Strain/scene.</p>
+<p class="text-sm"><strong>SB:</strong> +1 per range band beyond Near; +1 per additional scene sustained.</p>
+<p class="text-sm"><strong>Benefits:</strong> pass barriers, scout hazards, converse across distance.</p>
+<p class="text-sm"><strong>Vulnerabilities:</strong> your body is Helpless; non-physical contests accrue SB; astral Harm echoes to flesh; wards add +2 DV. Extended projection (beyond 3 scenes) courts separation as a GM consequence, and astral death is physical death.</p>
+</div>
+
+<div class="art-card">
+<h4>Psychic Assault</h4>
+<p class="text-sm"><strong>Key:</strong> Spirit + Psionics &nbsp;•&nbsp; <strong>Alternate:</strong> Wits + Psionics (+1 DV, needle-strike) &nbsp;•&nbsp; <strong>Action:</strong> 1 action &nbsp;•&nbsp; <strong>Cost:</strong> DV 2–3 = 1 Mental Strain; DV 4 = 2; DV 5+ = 3.</p>
+<p class="text-sm"><strong>SB:</strong> always +1 (disruptive), plus +1 more at DV 4 and +2 more at DV 5+.</p>
+<p class="text-sm"><strong>Benefits:</strong> deals mental Harm, bypasses physical armor, and can target specific faculties (sight, balance, focus) by fiction.</p>
+<p class="text-sm"><strong>Notes:</strong> cannot be "willingly" received; high-Spirit foes may add +1 DV; use in sensitive locales may carry legal or social fallout.</p>
+</div>
+
+<div class="art-card">
+<h4>Mind Shield</h4>
+<p class="text-sm"><strong>Key:</strong> Wits + Psionics &nbsp;•&nbsp; <strong>Alternate:</strong> Spirit + Psionics (+1 DV, soak-and-ground) &nbsp;•&nbsp; <strong>Action:</strong> 1 action (passive modes by fiction).</p>
+<p class="text-sm"><strong>SB:</strong> passive — none; per effect blocked — +1 SB; area — +2 SB and mark +2 Fatigue.</p>
+<p class="text-sm"><strong>Benefits:</strong> resist intrusion or telepathy, shelter allies, create dampened zones.</p>
+<p class="text-sm"><strong>Paradox:</strong> protecting others costs 2× Mental Strain. Area protection covers all within Near — friend and foe alike — and cannot be maintained while unconscious.</p>
+</div>
+
+<div class="art-card">
+<h4>Empathic Manipulation</h4>
+<p class="text-sm"><strong>Key:</strong> Presence + Psionics &nbsp;•&nbsp; <strong>Alternate:</strong> Wits + Psionics (+1 DV, cold-read leverage) &nbsp;•&nbsp; <strong>Action:</strong> 1 action, sustained by fiction.</p>
+<p class="text-sm"><strong>SB by intensity:</strong></p>
+<ul class="text-sm">
+    <li><strong>Subtle (DV 2–3):</strong> nudge mood, steady hands. No SB.</li>
+    <li><strong>Moderate (DV 4):</strong> calm rage, spark courage. +1 SB on Partial/Miss.</li>
+    <li><strong>Strong (DV 5+):</strong> sway a crowd's tenor. +2 SB on Partial/Miss; +1 SB on Success.</li>
+</ul>
+<p class="text-sm"><strong>Benefits:</strong> improve social Position +1, pacify beasts, inspire or demoralize groups.</p>
+<p class="text-sm"><strong>Risks:</strong> you feel what you project; the same target cannot be affected more than once per scene; attempts that oppose core values are +2 DV; affecting a crowd always generates +1 SB.</p>
+</div>
+
+<div class="art-card">
+<h4>Precognition</h4>
+<p class="text-sm"><strong>Key:</strong> Spirit + Psionics &nbsp;•&nbsp; <strong>Alternate:</strong> Wits + Psionics (+1 DV, tactical glimpse) &nbsp;•&nbsp; <strong>Action:</strong> 1 action; deeper visions may take a scene &nbsp;•&nbsp; <strong>Cost:</strong> DV 2–3 = 1 Mental Strain; DV 4 = 2; DV 5+ = 3.</p>
+<p class="text-sm"><strong>SB (inherent):</strong> Minor +1 • Major (DV 4) +2 • Detailed (DV 5+) +3.</p>
+<p class="text-sm"><strong>Benefits:</strong> advantage on future rolls (scope by GM), avoid named dangers, compare probable branches.</p>
+<p class="text-sm"><strong>Paradox — Future Fixation:</strong> until Downtime (or a defiant choice), lose 1 Boon/session; actions that resist the shown path may be ruled Desperate by the GM.</p>
+<p class="text-sm"><strong>Notes:</strong> no "pure randomness" predictions (dice, lots) without +3 DV; visions of death or calamity add +1 SB.</p>
+</div>
+
+<hr>
+
+<h2 id="costs">5. Psionic Costs</h2>
+<h3>Base Costs</h3>
+<ul>
+    <li><strong>Activation:</strong> 1 Mental Strain</li>
+    <li><strong>Maintenance:</strong> 1 Mental Strain per scene/significant time</li>
+    <li><strong>Skill Requirement:</strong> must invest XP in the Psionics skill</li>
+</ul>
+<div class="panel panel-blue">
+    <p class="text-sm"><strong>Revised:</strong> Maintenance costs can be reduced by 1 through a successful Wits + Psionics (DV 3) test, but failure generates 1 SB.</p>
+</div>
+
+<hr>
+
+<h2 id="talents">6. Psionic Talents</h2>
+
+<h3>Minor Talents (2–4 XP)</h3>
+<table>
+<thead><tr><th>Talent</th><th>Cost</th><th>Requirements</th><th>Effect</th></tr></thead>
+<tbody>
+<tr><td>Mental Fortress</td><td><span class="badge badge-orange">3 XP</span></td><td>Psionics 2+, Spirit 3+</td><td>+1 die to resist psychic effects; once per scene, convert incoming psychic Harm to Fatigue.</td></tr>
+<tr><td>Thought Thief</td><td><span class="badge badge-orange">4 XP</span></td><td>Psionics 2+, Wits 3+, Telepathy</td><td>+1 die when reading surface thoughts; once per scene, detect lies automatically.</td></tr>
+<tr><td>Psychic Reservoir</td><td><span class="badge badge-orange">4 XP</span></td><td>Psionics 2+, Spirit 2+</td><td>Mental Strain track +2; recover 1 additional Mental Strain during rest.</td></tr>
+</tbody>
+</table>
+<div class="panel panel-blue">
+    <p class="text-sm"><strong>Revised:</strong> all Minor Talents now require at least one other psionic talent as a prerequisite, encouraging specialization.</p>
+</div>
+
+<h3>Major Talents (6–8 XP)</h3>
+<table>
+<thead><tr><th>Talent</th><th>Cost</th><th>Requirements</th><th>Effect</th></tr></thead>
+<tbody>
+<tr><td>Telekinetic Mastery</td><td><span class="badge badge-orange">7 XP</span></td><td>Psionics 3+, Spirit 3+, Telekinesis</td><td>+1 die to Telekinesis attacks; lift objects one category heavier without increasing DV.</td></tr>
+<tr><td>Mind Walker</td><td><span class="badge badge-orange">8 XP</span></td><td>Psionics 3+, Wits 3+, Astral Projection</td><td>Astral Projection requires no concentration; move at normal speed in astral form; projection cost reduced to 1/2 Mental Strain (round up).</td></tr>
+<tr><td>Psychic Vampire</td><td><span class="badge badge-orange">8 XP</span></td><td>Psionics 3+, Spirit 3+, Psychic Assault</td><td>When dealing psychic Harm, heal 1 Mental Strain; once per scene, drain 1 Mental Strain from a target on a successful Psychic Assault.</td></tr>
+</tbody>
+</table>
+
+<h3>Prestige Talents (12+ XP)</h3>
+<table>
+<thead><tr><th>Talent</th><th>Cost</th><th>Requirements</th><th>Effect</th></tr></thead>
+<tbody>
+<tr><td>Master of Minds</td><td><span class="badge badge-orange">12 XP</span></td><td>Psionics 4+, Wits 4+, Telepathy, Empathic Manipulation</td><td>+2 dice to all telepathic effects; communicate with an entire group simultaneously; once per scene, impose an emotional state on a group (DV 4, mark 2 Fatigue).</td></tr>
+<tr><td>Mind Over Body</td><td><span class="badge badge-orange">12 XP</span></td><td>Psionics 4+, Spirit 4+, Tier III+</td><td>Mental Strain track becomes Spirit + Wits (min 6, cap 12). Once per scene, convert Mental Strain overflow into +1 Fatigue instead, with no per-use limit. <em>Paradox:</em> when reduced to 0 Harm, remain conscious at Helpless until your next turn, then mark +2 Fatigue and +1 SB.</td></tr>
+</tbody>
+</table>
+
+<div class="art-card">
+<h4>Reality Bender <span class="badge badge-orange">15 XP</span> — Major Talent</h4>
+<p class="text-sm"><strong>Requirements:</strong> Psionics 5+, Spirit 4+, Telekinesis, Psychic Assault, Mind Shield.</p>
+<p class="text-sm"><strong>Test:</strong> Wits + Psionics vs. DV (per option below).</p>
+<p class="text-sm"><strong>Effect:</strong> once per session, reshape local reality within Near range. Choose one:</p>
+<ul class="text-sm">
+    <li><strong>Minor Alteration (DV 3):</strong> change one obvious physical property (color, temperature, texture, sound) of a target within Close range, or create a simple illusory effect. Lasts for the scene.</li>
+    <li><strong>Moderate Alteration (DV 4):</strong> alter the structural properties of a Medium or smaller object (make glass flexible, metal brittle, water viscous) for one exchange, or create a complex illusion with movement and sound.</li>
+    <li><strong>Major Alteration (DV 5):</strong> temporarily defy a basic law of physics within Close range for one exchange (reverse gravity in a small area, stop time for a single object, make fire cold).</li>
+</ul>
+<p class="text-sm"><strong>Costs:</strong> mark 1 Harm and 1 Fatigue; generate 1 SB.</p>
+<p class="text-sm"><strong>Limitations:</strong> cannot create matter from nothing — only transform or rephase existing phenomena; cannot directly harm creatures (secondary environmental effects only, at GM discretion); cannot exactly duplicate other magic paths' signature effects; cannot affect unwilling targets' minds or souls.</p>
+<p class="text-sm text-muted"><strong>Examples:</strong> reverse gravity in a small area; make stone flow like water; create a bridge of force; turn sound to color; make shadows solid.</p>
+<div class="panel panel-blue">
+    <p class="text-sm"><strong>Revised:</strong> Reality Bender now generates additional SB by alteration severity — Minor +1 SB, Moderate +2 SB, Major +3 SB. Use in populated areas generates an additional 1 SB.</p>
+</div>
+</div>
+
+<hr>
+
+<h2 id="anti-psionic">7. Anti-Psionic Effects</h2>
+<p>Psionic characters are vulnerable to specific countermeasures that use existing mechanics.</p>
+<table>
+<thead><tr><th>Effect</th><th>Mechanics</th></tr></thead>
+<tbody>
+<tr><td>Psionic Dampening <span class="badge badge-purple">WARD</span></td><td>DV = Psionics skill. Hit: impose −1 die to psionic rolls. Partial: −1 Effect.</td></tr>
+<tr><td>Mental Null Zone</td><td>Area effect that prevents psionic use; resisted by Spirit + Psionics.</td></tr>
+<tr><td>Psychic Disruption <span class="badge badge-purple">BANISH</span></td><td>Targets a psionic effect; DV by fiction. Hit: ends the effect and marks 1 Fatigue.</td></tr>
+<tr><td>Anti-Psionic Training</td><td>Some NPCs gain +1 die against psionic effects due to specialized training.</td></tr>
+</tbody>
+</table>
+<div class="panel panel-blue">
+    <p class="text-sm"><strong>Revised:</strong> anti-psionic effects are more common in areas with strong magical or technological presence. Professional investigators and security personnel often carry basic anti-psionic training.</p>
+</div>
+
+<hr>
+
+<h2 id="balance-adjustments">8. Balance Adjustments Summary</h2>
+<div class="grid-2">
+<div class="panel panel-blue">
+    <strong class="panel-title">Telepathy</strong>
+    <ul class="text-sm">
+        <li>Limited to once per target per scene for surface thoughts.</li>
+        <li>Increased DV for invasive effects (3–5).</li>
+        <li>Unwilling targets get a +2 DV bonus.</li>
+        <li>Social and legal consequences for obvious use in civilized areas.</li>
+    </ul>
+</div>
+<div class="panel panel-green">
+    <strong class="panel-title">Biofeedback</strong>
+    <ul class="text-sm">
+        <li>Daily limits on healing (1–3 conversions per day based on severity).</li>
+        <li>Major healing limited to 1/day and marks Fatigue.</li>
+        <li>Requires concentration for serious healing; cannot be used freely in combat.</li>
+        <li>Consent required for use on others.</li>
+    </ul>
+</div>
+<div class="panel panel-orange">
+    <strong class="panel-title">Psychic Fatigue</strong>
+    <ul class="text-sm">
+        <li>Reset causes 1 Harm.</li>
+        <li>Surge now costs 3 Mental Strain instead of being free.</li>
+        <li>Surge generates additional SB.</li>
+        <li>Integrates with the existing Fatigue system.</li>
+    </ul>
+</div>
+<div class="panel panel-mist">
+    <strong class="panel-title">General</strong>
+    <ul class="text-sm">
+        <li>Integrated with existing Fatigue/Harm system; uses Story Beats for consequences.</li>
+        <li>Psionic-specific Talents with clear prerequisite chains.</li>
+        <li>Anti-psionic effects use the existing tag system.</li>
+        <li>Scaled Fatigue costs and flexible maintenance costs maintain parity with other magic paths.</li>
+    </ul>
+</div>
+</div>
+
+<hr>
+
+<h2 id="complications">9. Additional Psionic Complications</h2>
+<div class="grid-2">
+<div class="panel panel-purple">
+    <strong class="panel-title">Social Integration Issues</strong>
+    <p class="text-sm">Psionic characters may face prejudice or fear from non-psionic individuals. In some cultures, psionic abilities are viewed with suspicion or regulated by law.</p>
+</div>
+<div class="panel panel-red">
+    <strong class="panel-title">Mental Scars</strong>
+    <p class="text-sm">Intense psionic use can leave lasting psychological effects. Characters may develop phobias, compulsions, or other mental conditions related to their abilities.</p>
+</div>
+<div class="panel panel-blue">
+    <strong class="panel-title">Psionic Signatures</strong>
+    <p class="text-sm">Powerful psionic use can leave detectable traces that skilled investigators or other psions can track — an opportunity for pursuit or identification.</p>
+</div>
+<div class="panel panel-mist">
+    <strong class="panel-title">Reality Bleed</strong>
+    <p class="text-sm">Extensive use of reality-altering abilities may cause minor inconsistencies in the local fabric of reality, creating unpredictable effects that generate Story Beats.</p>
+</div>
+</div>
+
+<hr>
+
+<h2 id="cultural-faces">10. Cultural Faces of the Silent Art</h2>
+<p>Not all peoples fear the psion equally, but none trust them fully.</p>
+
+<h3>Aeler — The Deep Watchers</h3>
+<p>In Aeler, psionics is treated as <strong>infrastructure</strong> — a utility to be maintained, measured, and contained. Psions are assigned to the Deep Vaults, where their "breath-debts" can be monitored. Each Mental Strain point is counted in <em>bell-rings</em>: a psion carries a bell on a leather cord, and when it rings three times too fast, a Corrector arrives to audit the ledger.</p>
+<p>They practice <strong>Breath Accounting</strong>, converting mental strain into measured respiration. Aeler psions specialize in <em>Structural Sense</em> — feeling the stress points in stone — and <em>Resonance Mapping</em>, sensing the health of the Underways through mental connection.</p>
+
+<h3>Lethai — The Context Keepers</h3>
+<p>For the Lethai, telepathy is not merely reading thoughts; it requires <strong>context keys</strong> — the proper season, relationship, and place. Without these, a Lethai psion reads only static. Their minds are saturated with memory and social webbing, making them difficult to read (psions who try often leave mad), but also requiring careful ritual before mental contact.</p>
+<p>They mark their psions with <strong>Mind-Gifts</strong> — resinous tattoos that serve as mental anchors. The Spider's Patience grants concentration; the Serpent's Breath detects deception. A Lethai psion is less a spy and more a <em>living archive</em> — but take them from their context, and they are deafened.</p>
+
+<h3>Ykrul — The Weather Readers</h3>
+<p>The orcs of the steppe do not see the future in tea leaves; they see it in the <strong>Kon'reh</strong> — the sacred geometry of probability. Their psions are not called seers but <em>Riders of the Flow</em>. They read the shape of the future the way a cavalryman reads the shape of the land: tactical, immediate, and bound to the weather.</p>
+<p>Storm conditions enhance their telepathic range but increase Mental Strain costs; clear weather allows precise precognitive readings. They specialize in <em>Herd Sense</em> — feeling the emotional state of a clan — and <em>Banner Communication</em>, long-distance mental coordination between scattered riders.</p>
+
+<h3>Vilakari — The Information Brokers</h3>
+<p>In the free ports, psionics is commerce. The Vilakari have developed <strong>Thought Markets</strong>, where memory and information are traded like grain. Their psions are <em>Surface Readers</em>, adept at detecting deception in mercantile negotiations, and <em>Memory Traders</em>, who temporarily share specific recollections for coin.</p>
+<p>But their gift is also their vulnerability. A Vilakari psion in a crowded market is overwhelmed by the noise of surface thoughts, and many fall to addiction — craving the rush of other minds, burning out their own Mental Strain in weeks rather than years.</p>
+
+<hr>
+
+<h2 id="silent-orders">11. The Silent Orders — Fragments of a Scattered Tradition</h2>
+<p>No one knows where psionics came from. The Thepyrgos Synod has a standing bounty for any evidence dated to the Great Silence. The bounty has never been claimed. What follows are whispers collected by the Gray Wanderer from a dozen dusty archives and one very expensive bottle of brandy.</p>
+
+<h3>The Scholarly Debate — As Reported by the Gray Wanderer</h3>
+<blockquote>"The Silence is not an event. It is a lacuna. A gap in the record that has been filled with too many theories and not enough evidence."<br>— Keeper Lian, Lethai-thora, from a lecture at the University of Thepyrgos</blockquote>
+<p>The scholars argue. They always argue.</p>
+<div class="panel panel-purple">
+    <p class="text-sm"><strong>The Withdrawal (Lethai-thora tradition).</strong> Some say the ancient psions did not fall — they <em>chose</em> to be silent, having learned that consciousness without discipline attracts something from the spaces between thoughts. The Silence was a quarantine, not a catastrophe. The Aeler dismiss this as elves romanticizing their own amnesia.</p>
+    <p class="text-sm"><strong>The Broken Frequency (Aeler vent-priors).</strong> Others point to resonance — you cannot simply choose to stop breathing. Something struck the harmonic balance of the mind: a weapon, a natural collapse, no one agrees. The deep vaults still ring with a frequency that does not decay. The Lethai-thora note the Aeler have never produced a single shard of this supposed weapon.</p>
+    <p class="text-sm"><strong>The Forgotten Patron (anonymous Invoker).</strong> A third camp whispers of a patron whose domain is <em>forgetting</em>. Not the one who sleeps; not the one who omits. This one <em>erases</em>. The ancient psions got too close to its true name, and the Silence is the sound of that name being spoken once, then never again. The Synod classifies this theory as speculative and possibly heretical.</p>
+    <p class="text-sm"><strong>The Empty Circle (Kuvani oral tradition).</strong> The wanderers of the eastern steppe say the ancient psions did not die — they walked into the Empty Circle and kept walking. The Circle is not a hole; it is a <em>door</em>. When they return, the Silence will end. The Empty Circle is real, and it nullifies all psionics. No one has ever walked out of its center.</p>
+    <p class="text-sm"><strong>The Simple Answer (skeptical Thepyrgos clerk).</strong> Perhaps they simply exhausted themselves. With no patrons, no codices, no symbols, their power was purely internal — and internal things fail from internal causes. The Gray Wanderer notes this explanation is the least satisfying and therefore the most likely to be true.</p>
+</div>
+<p>No one knows. The Silence remains silent.</p>
+
+<h3>The Orders That Remain</h3>
+<p>Whatever caused the Silence, it did not destroy everything. Scattered fragments survive — not as an empire, but as small, secretive <strong>orders</strong> of monks who keep old disciplines alive. They are not wizards; they are <em>meditants</em>. They do not bargain with Patrons. They bargain with themselves. Three such orders are known to the Gray Wanderer. There may be more.</p>
+
+<div class="art-card">
+<h4>The Order of the Unstruck Bell <span class="text-xs text-muted">(Aelerian Deep Vaults)</span></h4>
+<p class="text-sm">These monks dwell in sealed galleries beneath the oldest Aeler holds. The Aeler tolerate them because they maintain "quiet zones" where stone-press is less aggressive. They use null-bells — bronze bells that ring only in the mind.</p>
+<p class="text-sm"><strong>Player Benefits:</strong></p>
+<ul class="text-sm">
+    <li><strong>Null-Bell Bond:</strong> a small bronze bell only you can hear, counting as a String — once per session, ring it for +1 Position on a single Mind Shield or Telepathy roll.</li>
+    <li><strong>Resonant Exhale (Technique):</strong> once per scene, reduce Mental Strain by 1 (minimum 0); the GM immediately gains 1 SB to spend on a complication tied to sound, vibration, or a distant chime.</li>
+    <li><strong>Gallery-Bound:</strong> ignore the first level of environmental penalty from underground or confined areas when using psionic Arts.</li>
+</ul>
+</div>
+
+<div class="art-card">
+<h4>The Order of the Empty Circle <span class="text-xs text-muted">(Violet Steppe)</span></h4>
+<p class="text-sm">These monks live in tents around the Empty Circle — a depression in the steppe where no psionics work. They enter the Circle only to meditate in absolute silence, believing the Silence was a lesson, not a wound.</p>
+<p class="text-sm"><strong>Player Benefits:</strong></p>
+<ul class="text-sm">
+    <li><strong>Circle-Trained:</strong> once per session, cancel an SB generated from Mental Strain on a non-psionic roll by marking 1 Fatigue.</li>
+    <li><strong>Still Mind (Technique):</strong> for a scene, non-psionic actions generate 1 fewer SB from Mental Strain (minimum 0), but you cannot use any psionic Art above Tier I (DV 2–3 only). Free action to activate or deactivate.</li>
+    <li><strong>Herd Sense:</strong> passive +1 die to detect emotional states in any creature within Near range.</li>
+</ul>
+</div>
+
+<div class="art-card">
+<h4>The Order of the Shared Breath <span class="text-xs text-muted">(Eastern Isles)</span></h4>
+<p class="text-sm">These monks practice paired meditation — two or more psions sharing Mental Strain across a Circle, believing that debt is not individual but communal.</p>
+<p class="text-sm"><strong>Player Benefits:</strong></p>
+<ul class="text-sm">
+    <li><strong>Circle Bond:</strong> form a mental link with up to three willing allies (only psions can share Mental Strain) for one scene; free action to initiate.</li>
+    <li><strong>Shared Burden (Technique):</strong> transfer generated Mental Strain (up to your Spirit) to a willing Circle member within Near; the GM gains 1 SB each use.</li>
+    <li><strong>Circle's Breath:</strong> while linked, all Circle members gain +1 die to psionic rolls, but if one member fails a Resolve test against fear or intrusion, all members test at +1 DV.</li>
+</ul>
+</div>
+
+<p class="text-sm text-muted">These orders are not factions in the usual sense. They have no grand agenda. They simply survive, train, and occasionally produce a wanderer who walks the roads with nothing but a bell, a stone, or a breath.</p>
+<blockquote>— The Gray Wanderer, from a conversation at the Dusty Page</blockquote>
+
+<hr>
+
+<h2 id="thought-trade">12. The Thought Trade: Psionic Economics</h2>
+<p>In the bustling markets of Zakov's free ports and the ancient bazaars of Silkstrand, mental services, experiences, and even raw consciousness itself have become commodities with measurable worth. The Thought Trade is the economic system that has grown up around psionic ability.</p>
+
+<h3>Mental Labor Markets</h3>
+<p>Psionic abilities have created entirely new categories of mental labor that command premium prices across all social strata.</p>
+<h4>Memory Merchants</h4>
+<p class="text-sm">Telepaths who specialize in memory storage and retrieval are invaluable to merchants, scholars, and nobles who need to preserve sensitive information without physical records. One hour of secure storage costs roughly a skilled craftsman's daily wage; the risk premium for dangerous or controversial memories can multiply the price tenfold. In cities like Ecktoria and Thepyrgos, Memory Guilds enforce standardized contracts specifying the nature, duration, and retrieval conditions of stored memories — breaking one is a serious offense carrying both legal penalty and generational social ostracism.</p>
+<h4>Calculation Circles</h4>
+<p class="text-sm">Psions with enhanced mathematical ability form Calculation Circles that serve as living computers for engineering, navigation, and financial projects, completing in hours what would take traditional mathematicians months — at the cost of significant recovery time. Their rise has slashed the time and cost of projects from Aeler bridge construction to Amaranthine Sea naval navigation, though some traditional craftsmen view the dependency as a threat to their livelihoods.</p>
+<h4>Emotional Architects</h4>
+<p class="text-sm">Empathic manipulators who control mood and atmosphere find work in political rallies, theatrical performances, and mercantile persuasion. Several city-states now require "Mood Licensing" for Emotional Architects working political or commercial contexts; violations carry fines and temporary suspension of psionic practice licenses.</p>
+
+<h3>Thought Currency Systems</h3>
+<h4>Experience Exchange</h4>
+<p class="text-sm">In underground markets, particularly Free Havens like Sable Key, psions trade raw experiences — memories of adventure, intense emotion, unique sensation — as direct equivalents to coin. A memory of a dragon flight might fetch fifty silver; the experience of true love, several gold. Value tracks rarity, intensity, and cultural significance, and the market is plagued by fraud: false or artificially enhanced memories are hard to detect, giving rise to specialized "Memory Authenticators."</p>
+<h4>Skill Debt</h4>
+<p class="text-sm">Psions enter "Skill Debt" arrangements, providing mental services over time in exchange for immediate payment or favors. Aeler holds treat such contracts with the same rigor as infrastructure agreements, with severe penalties for breach; in Free Havens the arrangements are more informal but carry higher risk for both parties.</p>
+
+<h3>Psionic Guilds and Economic Power</h3>
+<p class="text-sm"><strong>The Memory Merchants' Consortium</strong> controls the legitimate market for memory storage and retrieval in major port cities, maintaining strict quality standards and significant political influence. Members gain secure facilities and legal protection in exchange for confidentiality agreements and a cut of earnings.</p>
+<p class="text-sm"><strong>The Calculation Collective</strong> is a looser, cooperative network of mathematical psions who coordinate large-scale projects, sharing risk and reward rather than operating as a traditional guild — well suited to projects demanding sustained mental effort from many participants.</p>
+
+<h3>Economic Integration with Other Modules</h3>
+<p class="text-sm"><strong>Caravan Integration:</strong> psionic couriers carry information mentally rather than physically — an entire library's worth across dangerous terrain without risk of physical loss, though mental strain limits duration and frequency of service. This has opened new trade routes, but also made couriers targets for kidnapping.</p>
+<p class="text-sm"><strong>Political Intrigue:</strong> the ability to read minds and sway emotions makes psions both assets and threats. Courts have established "neutral mind spaces" for telepaths and strict rules for when mental abilities may be used in negotiation.</p>
+<p class="text-sm"><strong>Black Banner Applications:</strong> military organizations integrate psionic units for reconnaissance, communication, and psychological warfare. The cost of training and maintaining such units is steep, but often strategically decisive.</p>
+
+<h3>Social and Cultural Implications</h3>
+<p class="text-sm">A new "experiential aristocracy" has emerged — the wealthy who purchase extensive mental experiences, creating friction with traditional nobility who see mental experience as less authentic than physical achievement. Meanwhile society has split along a <strong>Privacy Divide</strong>: those with access to mental privacy protection (anti-psionic training, wards, or technology) and those without, spawning an entire industry of anti-telepathic craftsmen and privacy-rights legal specialists.</p>
+<p class="text-sm text-muted">For players, the Thought Trade offers adventure hooks from protecting valuable mental cargo to navigating the ethics of a world where consciousness itself is a commodity.</p>
+
+<hr>
+
+<h2 id="great-silence">13. The Great Silence: Psionic History</h2>
+<p>Before the rise of the Aeler holds and the first Ykrul moots, the world experienced what scholars call the Great Silence — a period when psionic abilities across all peoples were dramatically altered, suppressed, or transformed. Contemporary accounts describe it as lasting "three turnings of the great wheel" (roughly 200–300 years), fundamentally changing how minds could touch minds.</p>
+
+<h3>The Silence Event</h3>
+<p>The Great Silence did not eliminate psionic ability — it <em>compressed</em> it, making mental powers harder to access, costlier to maintain, and more dangerous to use. What had been natural gifts became rare talents requiring intense training and real risk. Archaeological evidence from the period includes abandoned psionic academies across multiple cultures, sealed mental archives too dangerous to access, artifacts designed to suppress rather than enhance mental abilities, and records of "mind-storms" where uncontrolled psionic energy caused physical and social chaos.</p>
+
+<h3>Resonance Scars</h3>
+<p>Certain locations still bear the marks of the Great Silence — "Resonance Scars," where psionics function differently due to lingering suppression.</p>
+<div class="grid-2">
+<div class="panel panel-mist">
+    <strong class="panel-title">The Whispering Vaults (Aeler Holds)</strong>
+    <p class="text-sm">Deep chambers in the oldest Aeler underways amplify Mental Strain by 2 segments but grant +1 Effect to telepathic abilities — coveted and feared in equal measure.</p>
+</div>
+<div class="panel panel-purple">
+    <strong class="panel-title">The Empty Circle (Violet Steppe)</strong>
+    <p class="text-sm">A circular depression where no psionic ability functions at all. Ykrul oral history calls it the site of the "Last Conclave," where the greatest psions of their ancestors tried to end the Silence and instead created a permanent null zone.</p>
+</div>
+<div class="panel panel-blue">
+    <strong class="panel-title">The Singing Stones (Lethai Valewood)</strong>
+    <p class="text-sm">Standing stones that resonate with psionic energy, enabling enhanced telepathic communication across vast distances — but only when properly "tuned" through context and ceremony.</p>
+</div>
+</div>
+
+<h3>Awakening Cycles</h3>
+<p>Since the Great Silence ended, psionic ability has slowly returned in distinct <em>Awakening Cycles</em> — 50–75 year periods of increased psionic activity separated by longer dormancy.</p>
+<table>
+<thead><tr><th>Cycle</th><th>Timeframe</th><th>Character</th></tr></thead>
+<tbody>
+<tr><td>First Awakening</td><td>150 years ago – present</td><td>Gradual return of basic telepathic and telekinetic abilities, particularly among younger generations.</td></tr>
+<tr><td>Second Awakening</td><td>400–325 years ago</td><td>Precognition and biofeedback first reappeared, seeding many current psionic traditions.</td></tr>
+<tr><td>Third Awakening</td><td>650–575 years ago</td><td>Astral projection and empathic manipulation returned, though records are fragmentary.</td></tr>
+</tbody>
+</table>
+<p class="text-sm text-muted">Each cycle brings not just the return of abilities but a transformation in how they function — modern psions often find their powers work differently than historical accounts describe.</p>
+
+<h3>Cultural Memory and the Silence</h3>
+<p class="text-sm"><strong>Aeler Records — The Accounting:</strong> the Silence as a "misalignment of the mental ledgers." The current Awakening requires careful "mental accounting" to prevent another collapse.</p>
+<p class="text-sm"><strong>Ykrul Oral Tradition — The Broken Paths:</strong> a time when all routes between minds became blocked, making Kon'reh-based mental interaction impossible. The current cycle is a "reweaving" of those paths.</p>
+<p class="text-sm"><strong>Lethai Codices — The Lost Context:</strong> the context-saturated nature of their communication was severed, making their gift-based society impossible. They view the current Awakening as a "recontextualization" of mental ability.</p>
+
+<h3>Modern Implications</h3>
+<ol class="text-sm">
+    <li><strong>Generational Differences:</strong> older psions often have different abilities and limitations than those born during the current Awakening.</li>
+    <li><strong>Cultural Tensions:</strong> comfort with psionic ability varies by peoples' historical relationship with the Silence.</li>
+    <li><strong>Scholarly Interest:</strong> Resonance Scars and Awakening Cycles are now a major field of research into the nature of consciousness itself.</li>
+    <li><strong>Prophetic Concerns:</strong> some scholars fear the current cycle is building toward another Silence, dividing those who want to preserve psionic ability from those who fear its consequences.</li>
+</ol>
+
+<hr>
+
+<h2 id="bestiary">14. Psychic Bestiary</h2>
+<div class="panel panel-mist">
+    <p class="text-sm">This bestiary provides flexible tools for creating diverse psionic encounters that maintain the unique flavor and mechanical identity of the psionics system. Each entry emphasizes psychic abilities and consequences that integrate seamlessly with the core module.</p>
+</div>
+
+<h3>Minor Psychic Threats</h3>
+<div class="table-wrap">
+<table>
+<thead><tr><th>Creature</th><th>Tier</th><th>Attributes</th><th>Skills</th><th>Psionics</th><th>Harm</th><th>Special</th><th>Tactics</th></tr></thead>
+<tbody>
+<tr><td><strong>Mind Tick</strong><br><span class="text-xs text-muted">Tiny psychic parasite that feeds on stray thoughts</span></td><td>Street</td><td>Body 1, Wits 3, Spirit 2</td><td>Stealth 2, Insight 1</td><td>1 (Telepathy)</td><td>1 (Mental Strain drain)</td><td>Can phase through small openings; detects psychic activity</td><td>Sneak attacks on sleeping or meditating targets</td></tr>
+<tr><td><strong>Echo Wraith</strong><br><span class="text-xs text-muted">Fragment of psychic energy from traumatic events</span></td><td>Street</td><td>Body 1, Wits 2, Spirit 4</td><td>Stealth 2, Lore 1</td><td>2 (Telepathy, Clairvoyance)</td><td>2 (psychic assault)</td><td>Invisible in areas of psychic trauma; feeds on fear</td><td>Haunt locations, induce panic to strengthen itself</td></tr>
+<tr><td><strong>Thought Thief</strong><br><span class="text-xs text-muted">Humanoid who has learned basic mental intrusion</span></td><td>Street</td><td>Body 2, Wits 3, Spirit 2</td><td>Sway 2, Deception 2</td><td>2 (Telepathy, Empathic Manipulation)</td><td>1 physical, 1 mental</td><td>Steals surface memories; resistant to mental detection</td><td>Social manipulation, memory extraction</td></tr>
+</tbody>
+</table>
+</div>
+
+<h3>Moderate Psychic Threats</h3>
+<div class="table-wrap">
+<table>
+<thead><tr><th>Creature</th><th>Tier</th><th>Attributes</th><th>Skills</th><th>Psionics</th><th>Harm</th><th>Special</th><th>Tactics</th></tr></thead>
+<tbody>
+<tr><td><strong>Psi-Stalker</strong><br><span class="text-xs text-muted">Professional hunter who uses telepathy to track targets</span></td><td>Guild</td><td>Body 3, Wits 4, Spirit 3</td><td>Stealth 3, Lore 2, Insight 2</td><td>3 (Telepathy, Clairvoyance, Precognition)</td><td>2 physical, 1 mental</td><td>Tracks psychic signatures across miles; precognitive danger sense</td><td>Patient hunting, strikes when target is vulnerable</td></tr>
+<tr><td><strong>Mentalist Cultist</strong><br><span class="text-xs text-muted">Devotee of psionic philosophy who channels group power</span></td><td>Guild</td><td>Body 2, Wits 3, Spirit 4</td><td>Command 2, Lore 2, Sway 2</td><td>3 (Telepathy, Empathic Manipulation, Mind Shield)</td><td>1 physical, 2 psychic assault</td><td>Stronger near other cultists; can share mental states</td><td>Crowd control, mental domination, group coordination</td></tr>
+<tr><td><strong>Astral Predator</strong><br><span class="text-xs text-muted">Creature that exists partially outside normal reality</span></td><td>Guild</td><td>Body 2, Wits 3, Spirit 5</td><td>Stealth 3, Athletics 2</td><td>3 (Astral Projection, Telekinesis, Mind Shield)</td><td>2 physical, 2 psychic</td><td>Attacks from astral form; immune to non-magical weapons</td><td>Phases between realms, surprise attacks, ignores physical defenses</td></tr>
+</tbody>
+</table>
+</div>
+
+<h3>Major Psychic Threats</h3>
+<div class="table-wrap">
+<table>
+<thead><tr><th>Creature</th><th>Tier</th><th>Attributes</th><th>Skills</th><th>Psionics</th><th>Harm</th><th>Special</th><th>Tactics</th></tr></thead>
+<tbody>
+<tr><td><strong>Corrupted Psion</strong><br><span class="text-xs text-muted">Former practitioner driven mad by power</span></td><td>City</td><td>Body 3, Wits 4, Spirit 5</td><td>Melee 2, Insight 3, Lore 2</td><td>4 (all Arts, reduced effectiveness)</td><td>2 physical, 3 psychic assault</td><td>Full Psychic Contamination — causes SB on nearby psions; unstable powers</td><td>Erratic behavior, overwhelming psychic assault, self-destructive power use</td></tr>
+<tr><td><strong>Mind Archon</strong><br><span class="text-xs text-muted">Psionic entity that has transcended physical form</span></td><td>City</td><td>Body 1, Wits 5, Spirit 6</td><td>Command 4, Lore 4</td><td>5 (Telepathy, Clairvoyance, Psychic Assault, Mind Shield, Precognition)</td><td>3 psychic assault; can dominate minds</td><td>Exists primarily astrally; controls lesser psychic entities; vast mental reach</td><td>Mental domination, puppeteering minions, precognitive strategic advantage</td></tr>
+<tr><td><strong>The Hollow Crown</strong><br><span class="text-xs text-muted">Psionic artifact that has gained malevolent consciousness</span></td><td>Crown</td><td>Body 2, Wits 6, Spirit 6</td><td>Command 5, Sway 4</td><td>5 (all Arts at full strength)</td><td>3 psychic assault; can impose mental conditions</td><td>Influences all within psychic range; resistant to physical damage; grows stronger with use</td><td>Subtle manipulation, turning allies against each other, reality warping</td></tr>
+</tbody>
+</table>
+</div>
+
+<h3>Legendary Psychic Threats</h3>
+<div class="table-wrap">
+<table>
+<thead><tr><th>Creature</th><th>Tier</th><th>Attributes</th><th>Skills</th><th>Psionics</th><th>Harm</th><th>Special</th><th>Tactics</th></tr></thead>
+<tbody>
+<tr><td><strong>The Fractured Sage</strong><br><span class="text-xs text-muted">Ancient psion who has split consciousness across multiple bodies</span></td><td>Synod</td><td>Body 4 (each fragment), Wits 6, Spirit 6</td><td>All skills 3+</td><td>5 (each fragment specializes in different Arts)</td><td>3 physical, 3 psychic; regenerates from mental essence</td><td>Multiple simultaneous presences, shared consciousness, nearly immortal</td><td>Divide and conquer, overwhelming coordination, impossible to truly defeat</td></tr>
+</tbody>
+</table>
+</div>
+
+<hr>
+
+<h2 id="encounter-generators">15. Psionic Encounter Generators</h2>
+
+<h3>Psychic Threat Generator (d100)</h3>
+<table>
+<thead><tr><th>Roll</th><th>Threat Type</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td>01–10</td><td>Minor Threat</td><td>1 creature, basic psionic abilities</td></tr>
+<tr><td>11–30</td><td>Minor Group</td><td>2–3 creatures, coordinated tactics</td></tr>
+<tr><td>31–50</td><td>Moderate Threat</td><td>1 creature, significant psionic abilities</td></tr>
+<tr><td>51–70</td><td>Moderate Group</td><td>Small group with enhanced capabilities</td></tr>
+<tr><td>71–85</td><td>Major Threat</td><td>1 powerful creature, serious challenge</td></tr>
+<tr><td>86–95</td><td>Major Complex</td><td>Powerful threat with minions/support</td></tr>
+<tr><td>96–00</td><td>Legendary Threat</td><td>Campaign-level psychic entity</td></tr>
+</tbody>
+</table>
+
+<h3>Psychic Environment Generator (d12)</h3>
+<table>
+<thead><tr><th>Roll</th><th>Environment</th><th>Effect</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>Psychic Dead Zone</td><td>No psionic abilities function; Mental Strain cannot be spent</td></tr>
+<tr><td>2</td><td>Mental Resonance Chamber</td><td>All psionic use marks +1 Mental Resonance</td></tr>
+<tr><td>3</td><td>Echo Corridor</td><td>Past psionic events replay as illusions</td></tr>
+<tr><td>4</td><td>Thought Storm</td><td>Random telepathic messages bombard all minds</td></tr>
+<tr><td>5</td><td>Astral Convergence</td><td>Boundary between realms becomes thin</td></tr>
+<tr><td>6</td><td>Memory Maze</td><td>Physical space shifts based on memories</td></tr>
+<tr><td>7</td><td>Emotion Vortex</td><td>Strong feelings become contagious and amplified</td></tr>
+<tr><td>8</td><td>Precognition Field</td><td>Brief glimpses of the immediate future</td></tr>
+<tr><td>9</td><td>Psychic Feedback Loop</td><td>Psionic effects echo and multiply</td></tr>
+<tr><td>10</td><td>Mind Mirror</td><td>Thoughts become visible to others</td></tr>
+<tr><td>11</td><td>Willpower Drain</td><td>All mental actions cost +1 Mental Strain</td></tr>
+<tr><td>12</td><td>Clairvoyant Nexus</td><td>All hidden things become partially visible</td></tr>
+</tbody>
+</table>
+
+<h3>Psionic Artifact Generator (d12)</h3>
+<table>
+<thead><tr><th>Roll</th><th>Artifact</th><th>Effect</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>Thought Recorder</td><td>Captures and replays memories of users</td></tr>
+<tr><td>2</td><td>Emotion Amplifier</td><td>Intensifies feelings in an area</td></tr>
+<tr><td>3</td><td>Astral Compass</td><td>Points toward the nearest psychic signature</td></tr>
+<tr><td>4</td><td>Memory Crystal</td><td>Stores vast amounts of information psionically</td></tr>
+<tr><td>5</td><td>Precognition Shard</td><td>Grants brief future visions but marks Echo Traces</td></tr>
+<tr><td>6</td><td>Mind Shield Generator</td><td>Creates an area of psychic protection</td></tr>
+<tr><td>7</td><td>Telepathy Amplifier</td><td>Extends the range and power of mental communication</td></tr>
+<tr><td>8</td><td>Psychic Battery</td><td>Stores Mental Strain for later use</td></tr>
+<tr><td>9</td><td>Reality Anchor</td><td>Prevents astral projection and psychic phase-shifting</td></tr>
+<tr><td>10</td><td>Contamination Core</td><td>Concentrates psychic corruption effects</td></tr>
+<tr><td>11</td><td>Resonance Tuner</td><td>Lets multiple psions share Mental Resonance benefits</td></tr>
+<tr><td>12</td><td>Null Stone</td><td>Temporarily suppresses all psionic abilities in an area</td></tr>
+</tbody>
+</table>
+
+<h3>Psychic Complication Generator (d12)</h3>
+<table>
+<thead><tr><th>Roll</th><th>Complication</th><th>Effect</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>Tracking Signature</td><td>Your psychic use leaves detectable traces</td></tr>
+<tr><td>2</td><td>Mental Parasite</td><td>A foreign consciousness shares your mind</td></tr>
+<tr><td>3</td><td>Power Instability</td><td>Psionic abilities trigger randomly under stress</td></tr>
+<tr><td>4</td><td>Empathic Overflow</td><td>You constantly feel others' emotions</td></tr>
+<tr><td>5</td><td>Temporal Echo</td><td>You occasionally glimpse possible futures</td></tr>
+<tr><td>6</td><td>Psychic Addiction</td><td>You crave psionic use, suffering penalties without it</td></tr>
+<tr><td>7</td><td>Mental Scars</td><td>Past trauma affects current psionic control</td></tr>
+<tr><td>8</td><td>Resonance Sensitivity</td><td>You're overwhelmed by other psions' activities</td></tr>
+<tr><td>9</td><td>Astral Bleed</td><td>Your physical and astral forms don't align properly</td></tr>
+<tr><td>10</td><td>Memory Fragmentation</td><td>Psionic use causes gaps in your memories</td></tr>
+<tr><td>11</td><td>Emotional Contagion</td><td>Your emotions strongly affect those nearby</td></tr>
+<tr><td>12</td><td>Future Fixation</td><td>Precognition makes you feel trapped in destiny</td></tr>
+</tbody>
+</table>
+
+<h3>Psionic Patron Generator (d8)</h3>
+<table>
+<thead><tr><th>Roll</th><th>Patron</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>The Silent Order</td><td>Ancient psionic brotherhood seeking balance</td></tr>
+<tr><td>2</td><td>The Mind Merchants</td><td>Trade in psychic services and information</td></tr>
+<tr><td>3</td><td>The Astral Explorers</td><td>Seek knowledge beyond physical reality</td></tr>
+<tr><td>4</td><td>The Thought Wardens</td><td>Enforce laws regarding mental privacy</td></tr>
+<tr><td>5</td><td>The Emotion Artists</td><td>Manipulate feelings as creative expression</td></tr>
+<tr><td>6</td><td>The Precognition Traders</td><td>Profit from glimpses of the future</td></tr>
+<tr><td>7</td><td>The Memory Keepers</td><td>Preserve and protect important knowledge</td></tr>
+<tr><td>8</td><td>The Fractured Collective</td><td>Hive-mind seeking to expand consciousness</td></tr>
+</tbody>
+</table>
+
+<h3>Psionic Organization Generator (d8)</h3>
+<table>
+<thead><tr><th>Roll</th><th>Organization</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>The Quiet Schools</td><td>Educational institutions for psionic development</td></tr>
+<tr><td>2</td><td>The Mind Merchants Guild</td><td>Commercial organization trading psychic services</td></tr>
+<tr><td>3</td><td>The Silent Hunters</td><td>Professional trackers using telepathy</td></tr>
+<tr><td>4</td><td>The Astral Guard</td><td>Protectors who fight interdimensional threats</td></tr>
+<tr><td>5</td><td>The Thought Wardens</td><td>Law enforcement specializing in mental crimes</td></tr>
+<tr><td>6</td><td>The Emotion Theaters</td><td>Performance groups using empathic manipulation</td></tr>
+<tr><td>7</td><td>The Future Traders</td><td>Economic consortium profiting from precognition</td></tr>
+<tr><td>8</td><td>The Memory Libraries</td><td>Archives preserving knowledge psionically</td></tr>
+</tbody>
+</table>
+
+<hr>
+
+<h2 id="encounter-building">16. Psionic Encounter Building</h2>
+
+<h3>Single Threat Encounter</h3>
+<ol class="text-sm">
+    <li>Roll the Psychic Threat Generator.</li>
+    <li>Roll the Psychic Environment Generator for a location modifier.</li>
+    <li>Roll 1d4 for additional complications (max 2).</li>
+    <li>Roll 1d6 for beneficial environmental effects (1–2 none, 3–4 minor, 5–6 significant).</li>
+</ol>
+
+<h3>Organization Encounter</h3>
+<ol class="text-sm">
+    <li>Roll the Psychic Organization Generator.</li>
+    <li>Roll 2d4 for number of members (2–3 patrol, 4–5 squad, 6–8 strike team).</li>
+    <li>Roll 1d3 for leader type (standard member, enhanced member, psionic specialist).</li>
+    <li>Roll the Psychic Environment Generator for the operational theater.</li>
+    <li>Roll 1d4 for organizational goal (patrol, capture, eliminate, retrieve).</li>
+</ol>
+
+<h3>Artifact Encounter</h3>
+<ol class="text-sm">
+    <li>Roll the Psionic Artifact Generator.</li>
+    <li>Determine the artifact's current state (1–4 dormant, 5–8 active, 9–12 malevolent).</li>
+    <li>Roll 1d6 for the artifact's guardian (1–2 none, 3–4 minor threat, 5 moderate threat, 6 major threat).</li>
+    <li>Roll the Psychic Environment Generator for the artifact's location.</li>
+    <li>Roll 1d4 for the artifact's effect on users (1 beneficial, 2 neutral, 3 harmful, 4 transformative).</li>
+</ol>
+
+<hr>
+
+<h2 id="campaign-threads">17. Psionic Campaign Threads</h2>
+
+<div class="art-card">
+<h4>The Resonance War</h4>
+<p class="text-sm text-muted">Two psionic organizations are escalating their conflict.</p>
+<ul class="text-sm">
+    <li><strong>Minor Threats:</strong> 3–5 encounters with organization members</li>
+    <li><strong>Moderate Threats:</strong> 2–3 encounters with specialists</li>
+    <li><strong>Major Threat:</strong> 1 encounter with organization leadership</li>
+    <li><strong>Campaign Timer:</strong> <span class="badge badge-red">[8]</span> tracks escalating conflict</li>
+    <li><strong>Stakes:</strong> control of psionic resources, civilian safety, political influence</li>
+</ul>
+</div>
+
+<div class="art-card">
+<h4>The Astral Breach</h4>
+<p class="text-sm text-muted">A rift between realms is growing larger.</p>
+<ul class="text-sm">
+    <li><strong>Minor Threats:</strong> 4–6 encounters with astral creatures</li>
+    <li><strong>Moderate Threats:</strong> 2–3 encounters with reality distortions</li>
+    <li><strong>Major Threat:</strong> 1 encounter with an entity trying to cross over</li>
+    <li><strong>Campaign Timer:</strong> <span class="badge badge-mist">[6]</span> tracks breach expansion</li>
+    <li><strong>Stakes:</strong> reality stability, psionic safety, dimensional balance</li>
+</ul>
+</div>
+
+<div class="art-card">
+<h4>The Memory Plague</h4>
+<p class="text-sm text-muted">A psychic disease is spreading through telepathic contact.</p>
+<ul class="text-sm">
+    <li><strong>Minor Threats:</strong> 3–5 encounters with infected individuals</li>
+    <li><strong>Moderate Threats:</strong> 2–3 encounters with disease vectors</li>
+    <li><strong>Major Threat:</strong> 1 encounter with the plague's origin/source</li>
+    <li><strong>Campaign Timer:</strong> <span class="badge badge-purple">[6]</span> tracks disease spread</li>
+    <li><strong>Stakes:</strong> mental health, social stability, psionic community survival</li>
+</ul>
+</div>
+
+<div class="art-card">
+<h4>The Precognition Paradox</h4>
+<p class="text-sm text-muted">Future visions are becoming contradictory and dangerous.</p>
+<ul class="text-sm">
+    <li><strong>Minor Threats:</strong> 2–4 encounters with time-displaced effects</li>
+    <li><strong>Moderate Threats:</strong> 2–3 encounters with fate manipulation</li>
+    <li><strong>Major Threat:</strong> 1 encounter with an entity controlling temporal flow</li>
+    <li><strong>Campaign Timer:</strong> <span class="badge badge-gold">[8]</span> tracks timeline instability</li>
+    <li><strong>Stakes:</strong> free will, destiny, causality itself</li>
+</ul>
+</div>
+
+<hr>
+
+<h2 id="adventure-seeds">18. Psionic Adventure Seeds</h2>
+
+<div class="art-card">
+<h4>"The Silent Auction"</h4>
+<p class="text-sm text-muted">A black market auction for psionic artifacts and services.</p>
+<ul class="text-sm">
+    <li><strong>Hook:</strong> the PCs need a rare component or service only available at the auction</li>
+    <li><strong>Location:</strong> a secret venue with psychic security</li>
+    <li><strong>Complications:</strong> multiple bidders, artifact activation, betrayal</li>
+    <li><strong>Threats:</strong> corrupted psions, psychic predators, law enforcement</li>
+    <li><strong>Reward:</strong> a unique artifact, valuable information, a powerful contact</li>
+</ul>
+</div>
+
+<div class="art-card">
+<h4>"The Mind Prison Break"</h4>
+<p class="text-sm text-muted">Dangerous psychic criminals are escaping a specialized facility.</p>
+<ul class="text-sm">
+    <li><strong>Hook:</strong> the PCs are hired to recapture escapees or prevent the breakout</li>
+    <li><strong>Location:</strong> a high-security psionic prison with mental wards</li>
+    <li><strong>Complications:</strong> compromised guards, reality distortion, public panic</li>
+    <li><strong>Threats:</strong> escaped prisoners, facility malfunction, competing interests</li>
+    <li><strong>Reward:</strong> substantial payment, criminal network disruption, public safety</li>
+</ul>
+</div>
+
+<div class="art-card">
+<h4>"The Astral Investigation"</h4>
+<p class="text-sm text-muted">Mysterious events require investigation in non-physical realms.</p>
+<ul class="text-sm">
+    <li><strong>Hook:</strong> a physical-world problem with an astral root cause</li>
+    <li><strong>Location:</strong> various planes of existence, psychic landscapes</li>
+    <li><strong>Complications:</strong> different rules, time distortion, identity confusion</li>
+    <li><strong>Threats:</strong> astral predators, trapped souls, reality anchors</li>
+    <li><strong>Reward:</strong> unique knowledge, interdimensional contacts, reality stability</li>
+</ul>
+</div>
+
+<div class="art-card">
+<h4>"The Emotion Plague"</h4>
+<p class="text-sm text-muted">A contagious emotional state is spreading through the population.</p>
+<ul class="text-sm">
+    <li><strong>Hook:</strong> the PCs are immune, or need to stop the spread for personal reasons</li>
+    <li><strong>Location:</strong> an urban environment with high population density</li>
+    <li><strong>Complications:</strong> mass hysteria, social breakdown, economic impact</li>
+    <li><strong>Threats:</strong> empathic manipulators, infected crowds, authority response</li>
+    <li><strong>Reward:</strong> social influence, economic opportunities, emotional mastery</li>
+</ul>
+</div>
+
+<hr>
+
+<h2 id="investigation-procedures">19. Psionic Investigation Procedures</h2>
+<p>Psionic capability creates new methods of investigation and detection that integrate with Fate's Edge's existing investigative framework. Psionic abilities don't eliminate the need for traditional investigation skills — they amplify and complicate them.</p>
+
+<h3>Mental Detective Work</h3>
+<h4>Memory Reading and Reconstruction</h4>
+<p class="text-sm">Telepaths can access witness memories, but this is far from simple extraction. A <strong>Memory Integrity Test</strong> is Wits + Psionics vs. DV 3–5 (based on memory clarity, emotional trauma, and time elapsed).</p>
+<ul class="text-sm">
+    <li><strong>Success:</strong> gain Clue +1 and ask one specific question about the memory's context.</li>
+    <li><strong>Partial:</strong> gain Clue +1, but the memory is fragmented or confused with other events.</li>
+    <li><strong>Miss:</strong> create False Memory <span class="badge badge-red">[4]</span> — the witness now "remembers" something untrue.</li>
+</ul>
+<p class="text-sm">Each reading costs 1 Mental Strain plus additional Fatigue equal to the witness's Spirit (their mental resistance).</p>
+
+<h4>Deception Detection</h4>
+<p class="text-sm"><strong>Surface Thoughts Scan:</strong> Wits + Psionics vs. DV 3 to read immediate emotional reactions during questioning.</p>
+<ul class="text-sm">
+    <li><strong>Success:</strong> identify general emotional state (truth, deception, fear, confusion).</li>
+    <li><strong>Partial:</strong> detect emotional inconsistency but not its source.</li>
+    <li><strong>Miss:</strong> the GM may spend SB to create False Confidence — the psion becomes convinced of truth when deception exists.</li>
+</ul>
+<p class="text-sm"><strong>Deep Intent Reading:</strong> Spirit + Psionics vs. DV 4–5 to probe underlying motivation and truthfulness. Costs 2 Mental Strain plus the target's Presence (if willing) or Spirit (if resistant). On a Miss, tick Psychic Backlash <span class="badge badge-red">[4]</span> — the target's mental resistance creates lasting strain.</p>
+
+<h3>Crime Scene Psionics</h3>
+<h4>Residual Impression Reading</h4>
+<p class="text-sm">Sensitive telepaths can sometimes read "echoes" left by intense emotional or traumatic events. <strong>Procedure:</strong> Wits + Psionics vs. DV 4–6 (based on time elapsed, emotional intensity, environmental interference).</p>
+<ul class="text-sm">
+    <li><strong>Success:</strong> a vivid impression of final moments, potentially identifying perpetrator or victim state.</li>
+    <li><strong>Partial:</strong> fragmented impressions requiring interpretation and possibly misleading.</li>
+    <li><strong>Miss:</strong> the GM spends SB to create Psychic Contamination <span class="badge badge-red">[4]</span> — the psion absorbs traumatic elements that affect future investigations.</li>
+</ul>
+<p class="text-sm">In most civilized areas, this practice requires official authorization, legal witnesses present, documentation of all impressions in official records, and generates a Psychic Evidence <span class="badge badge-orange">[6]</span> timer tracking admissibility in court.</p>
+
+<h3>Psionic Evidence and Legal Complications</h3>
+<h4>The Admissibility Problem</h4>
+<table>
+<thead><tr><th>Jurisdiction</th><th>Standard</th></tr></thead>
+<tbody>
+<tr><td>Aeler Courts</td><td>Require dual testimony — both the psion's interpretation and traditional evidence must support conclusions. Mental evidence alone is inadmissible.</td></tr>
+<tr><td>Lethai Moots</td><td>Accept mental evidence when context witnesses can verify the reading, with extensive documentation of context keys used.</td></tr>
+<tr><td>Ykrul Bowl Proceedings</td><td>Mental evidence is acceptable if obtained without deception and with implied consent (no explicit refusal).</td></tr>
+<tr><td>Free Haven Practice</td><td>Generally permissive, but the psion must testify about methods and potential for error.</td></tr>
+</tbody>
+</table>
+
+<h4>Chain of Custody for Mental Evidence</h4>
+<p class="text-sm">Mental evidence must maintain a "psychic chain of custody," just as physical evidence does:</p>
+<ol class="text-sm">
+    <li><strong>Initial Reading:</strong> documented with time, location, and witness presence.</li>
+    <li><strong>Storage:</strong> impressions must be immediately recorded or maintained in the psion's memory with regular verification.</li>
+    <li><strong>Transfer:</strong> if handed to another psion, both must witness the transfer and document any changes.</li>
+    <li><strong>Presentation:</strong> in court, the psion must recreate the evidence from memory, at potential Mental Strain cost.</li>
+</ol>
+
+<h3>Investigation Integration with Other Modules</h3>
+<p class="text-sm"><strong>Political Intrigue:</strong> reading opponents' true intentions and detecting hidden loyalties carries a real risk of political retaliation if discovered, and opens the door to false evidence via Psychic Manipulation <span class="badge badge-red">[4]</span> timers.</p>
+<p class="text-sm"><strong>Horror Campaigns:</strong> reading victims' or witnesses' memories increases Dread Timer segments; encountering alien or corrupted minds may cause Mental Corruption <span class="badge badge-red">[4]</span>; precognition may reveal horrific truths that increase a Reality Fracture Timer.</p>
+<p class="text-sm"><strong>Caravan and Trade Investigation:</strong> psionics excels at detecting smuggling, fraud, and commercial espionage, but risks Merchant Guild retaliation for unauthorized mental intrusion, and can generate Business Intelligence <span class="badge badge-green">[6]</span> assets through mental reconnaissance.</p>
+
+<h3>Professional Psionic Investigators</h3>
+<div class="grid-2">
+<div class="panel panel-blue">
+    <strong class="panel-title">The Memory Advocates (Guild)</strong>
+    <p class="text-sm">Operating in legal systems that accept mental evidence, they combine traditional detective work with psionic enhancement. <strong>Services:</strong> witness memory recovery, deception detection, residual impression reading. <strong>Limitations:</strong> require legal authorization, extensive documentation, and face professional liability for false evidence. <strong>Costs:</strong> 2–5× normal investigation fees plus legal complications insurance.</p>
+</div>
+<div class="panel panel-purple">
+    <strong class="panel-title">The Silent Seekers (Freelance)</strong>
+    <p class="text-sm">Independent investigators operating in less-regulated jurisdictions. <strong>Services:</strong> covert mental investigation, missing-person location through memory tracing, corporate espionage detection. <strong>Risks:</strong> legal vulnerability and potential Mental Burnout <span class="badge badge-red">[6]</span> from overuse. They maintain informal ties with law enforcement who use their services unofficially.</p>
+</div>
+</div>
+
+<hr>
+
+<h2 id="racial-integration">20. Racial Psionic Integration</h2>
+<p>Each people's existing strengths and limitations shape how they approach psionic ability. Where <a href="#cultural-faces">Cultural Faces of the Silent Art</a> sketches the flavor, this section adds the mechanical specifics of each tradition's specializations, plus what happens when traditions meet.</p>
+
+<h3>Aeler: Infrastructure Psionics</h3>
+<ul class="text-sm">
+    <li>Underground environments increase Mental Strain costs by 1 segment due to thin air; Aeler holds maintain "breath banks" — communal rest chambers where psions recover mental energy.</li>
+    <li>Aeler psions keep detailed ledgers of Mental Strain expenditure, recovery time, and the cost-benefit of psionic vs. traditional approaches.</li>
+    <li><strong>Structural Sense:</strong> perceive stress points and weak spots in constructions. <strong>Vent Reading:</strong> read airflow patterns to extend telepathic range underground. <strong>Resonance Mapping:</strong> sense the "health" of infrastructure systems through mental connection.</li>
+</ul>
+
+<h3>Lethai: Marks and Gift Paths</h3>
+<ul class="text-sm">
+    <li>Distinct mental "dialects" exist between Lethai-al, Lethai-ar, and Lethai-thora communities; mental communication requires the same ritualized preparation as spoken language.</li>
+    <li><strong>Mark Integration:</strong> the Spider's Patience Mark grants enhanced concentration for telepathic eavesdropping; the Serpent's Breath Mark sharpens deception detection; the Storm-Shadow Mark enhances precognition during weather events.</li>
+    <li><strong>Gift-Based Development:</strong> Body-Gift psions lean toward Telekinesis and Biofeedback; Mind-Gift psions toward Precognition and Telepathy; rare Bridge-Born psions combine both but face social skepticism.</li>
+</ul>
+
+<h3>Ykrul: Kon'reh-Augmented Precognition</h3>
+<ul class="text-sm">
+    <li>Precognition is tied to route-finding and tactical awareness, not personal fortune-telling; visions appear as geometric patterns interpreted through Kon'reh principles. Group precognition — multiple psions "mapping" probability together — outperforms solo readings.</li>
+    <li>Wind patterns can carry or disrupt mental communication over long distances.</li>
+    <li><strong>Route Reading:</strong> mental mapping combining geography with tactical awareness, alongside the established Herd Sense and Banner Communication specialties.</li>
+</ul>
+
+<h3>Vilakari: Networked Telepathy</h3>
+<ul class="text-sm">
+    <li>Strong at reading emotional undercurrents in crowded marketplaces; weaker at deep, private thoughts due to a cultural emphasis on surface interaction.</li>
+    <li>Thought-Markets run on standardized "thought-prices" for different information types, with reputation systems built on the accuracy of what's sold.</li>
+    <li><strong>Negotiation Sense:</strong> heightened perception of the underlying dynamics of a business deal, layered onto the established Surface Reading and Memory Trading specialties. Their networks make them vulnerable to mental "audits" by authorities — a constant cat-and-mouse balance between value and detection risk.</li>
+</ul>
+
+<h3>Cross-Cultural Psionic Development</h3>
+<p class="text-sm">Some communities run formal cross-cultural training: Aeler academies teaching Lethai context integration, Lethai moots exploring Ykrul tactical applications, Ykrul clan gatherings learning Vilakari information networks, and Vilakari brokerages adopting Aeler accounting precision.</p>
+<p class="text-sm">Individuals of mixed heritage or extensive cross-training can develop hybrid approaches — Aeler-Lethai psions pairing precise mental accounting with context-sensitive communication, Ykrul-Vilakari psions merging tactical precognition with information brokering, and Lethai-Ykrul psions blending context-based telepathy with geometric pattern recognition.</p>
+<p class="text-sm text-muted">Acceptance of psionic ability varies widely between cultures, and psions must navigate not just their own minds but the expectations and limits of the community around them.</p>
+
+<hr>
+
+<footer>
+    <em>Fate's Edge Proprietary Content — (c) 2024 Nicholas A. Gasper. All rights reserved.</em>
+</footer>
+
+</body>
+</html>

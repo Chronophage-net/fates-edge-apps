@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "generated": "2026-08-09T01:51:54.051Z",
+  "generated": "2026-08-10T12:46:17.387Z",
   "documents": [
     {
       "id": "systems_reference_document",
@@ -13,12 +13,52 @@
       "active": true
     },
     {
+      "id": "advanced_campaigns",
+      "title": "Advanced   Campaigns",
+      "file": "Fates_-_Edge_-_-Advanced-_-Campaigns.html",
+      "path": "/data/docs/expansions/",
+      "category": "expansions",
+      "categoryLabel": "📦 Expansions",
+      "core": false,
+      "active": true
+    },
+    {
+      "id": "amaranthine_sea",
+      "title": "Amaranthine   Sea",
+      "file": "Fates_-_Edge_-_-Amaranthine-_-Sea.html",
+      "path": "/data/docs/expansions/",
+      "category": "expansions",
+      "categoryLabel": "📦 Expansions",
+      "core": false,
+      "active": true
+    },
+    {
+      "id": "art_of_war",
+      "title": "Art   Of   War",
+      "file": "Fates_-_Edge_-_-Art-_-of-_-War.html",
+      "path": "/data/docs/expansions/",
+      "category": "expansions",
+      "categoryLabel": "📦 Expansions",
+      "core": false,
+      "active": true
+    },
+    {
       "id": "ashes_of_the_infernal_accord",
       "title": "Ashes   Of   The   Infernal   Accord",
       "file": "Fates_-_Edge_-_-Ashes-_-of-_-the-_-Infernal-_-Accord.html",
       "path": "/data/docs/adventures/",
       "category": "adventures",
       "categoryLabel": "🗡️ Adventures",
+      "core": false,
+      "active": true
+    },
+    {
+      "id": "black_banners",
+      "title": "Black   Banners",
+      "file": "Fates_-_Edge_-_-Black-_-Banners.html",
+      "path": "/data/docs/expansions/",
+      "category": "expansions",
+      "categoryLabel": "📦 Expansions",
       "core": false,
       "active": true
     },
@@ -53,6 +93,16 @@
       "active": true
     },
     {
+      "id": "dragons_lair",
+      "title": "Dragons   Lair",
+      "file": "Fates_-_Edge_-_-Dragons-_-Lair.html",
+      "path": "/data/docs/expansions/",
+      "category": "expansions",
+      "categoryLabel": "📦 Expansions",
+      "core": false,
+      "active": true
+    },
+    {
       "id": "essentials",
       "title": "Essentials",
       "file": "Fates_-_Edge_-_-Essentials.html",
@@ -69,6 +119,266 @@
       "path": "/data/docs/resources/",
       "category": "resources",
       "categoryLabel": "📚 Resources",
+      "core": false,
+      "active": true
+    },
+    {
+      "id": "gm_guide_01_introduction",
+      "title": "GM   Guide   01   Introduction",
+      "file": "GM-_-Guide-_-01-_-Introduction.html",
+      "path": "/data/docs/gm-guide/",
+      "category": "gm-guide",
+      "categoryLabel": "🎬 GM Guide",
+      "core": false,
+      "active": true
+    },
+    {
+      "id": "gm_guide_02_core_procedures",
+      "title": "GM   Guide   02   Core   Procedures",
+      "file": "GM-_-Guide-_-02-_-Core-_-Procedures.html",
+      "path": "/data/docs/gm-guide/",
+      "category": "gm-guide",
+      "categoryLabel": "🎬 GM Guide",
+      "core": false,
+      "active": true
+    },
+    {
+      "id": "gm_guide_03_managing_resources",
+      "title": "GM   Guide   03   Managing   Resources",
+      "file": "GM-_-Guide-_-03-_-Managing-_-Resources.html",
+      "path": "/data/docs/gm-guide/",
+      "category": "gm-guide",
+      "categoryLabel": "🎬 GM Guide",
+      "core": false,
+      "active": true
+    },
+    {
+      "id": "gm_guide_04_running_a_currency_free_game",
+      "title": "GM   Guide   04   Running   A   Currency   Free   Game",
+      "file": "GM-_-Guide-_-04-_-Running-_-a-_-Currency-_-Free-_-Game.html",
+      "path": "/data/docs/gm-guide/",
+      "category": "gm-guide",
+      "categoryLabel": "🎬 GM Guide",
+      "core": false,
+      "active": true
+    },
+    {
+      "id": "gm_guide_05_magic_and_backlash",
+      "title": "GM   Guide   05   Magic   And   Backlash",
+      "file": "GM-_-Guide-_-05-_-Magic-_-and-_-Backlash.html",
+      "path": "/data/docs/gm-guide/",
+      "category": "gm-guide",
+      "categoryLabel": "🎬 GM Guide",
+      "core": false,
+      "active": true
+    },
+    {
+      "id": "gm_guide_06_running_scenarios",
+      "title": "GM   Guide   06   Running   Scenarios",
+      "file": "GM-_-Guide-_-06-_-Running-_-Scenarios.html",
+      "path": "/data/docs/gm-guide/",
+      "category": "gm-guide",
+      "categoryLabel": "🎬 GM Guide",
+      "core": false,
+      "active": true
+    },
+    {
+      "id": "gm_guide_07_assets_and_followers",
+      "title": "GM   Guide   07   Assets   And   Followers",
+      "file": "GM-_-Guide-_-07-_-Assets-_-and-_-Followers.html",
+      "path": "/data/docs/gm-guide/",
+      "category": "gm-guide",
+      "categoryLabel": "🎬 GM Guide",
+      "core": false,
+      "active": true
+    },
+    {
+      "id": "gm_guide_08_travel_framework",
+      "title": "GM   Guide   08   Travel   Framework",
+      "file": "GM-_-Guide-_-08-_-Travel-_-Framework.html",
+      "path": "/data/docs/gm-guide/",
+      "category": "gm-guide",
+      "categoryLabel": "🎬 GM Guide",
+      "core": false,
+      "active": true
+    },
+    {
+      "id": "gm_guide_09_downtime",
+      "title": "GM   Guide   09   Downtime",
+      "file": "GM-_-Guide-_-09-_-Downtime.html",
+      "path": "/data/docs/gm-guide/",
+      "category": "gm-guide",
+      "categoryLabel": "🎬 GM Guide",
+      "core": false,
+      "active": true
+    },
+    {
+      "id": "gm_guide_10_campaigns_timers_consequences",
+      "title": "GM   Guide   10   Campaigns   Timers   Consequences",
+      "file": "GM-_-Guide-_-10-_-Campaigns-_-Timers-_-Consequences.html",
+      "path": "/data/docs/gm-guide/",
+      "category": "gm-guide",
+      "categoryLabel": "🎬 GM Guide",
+      "core": false,
+      "active": true
+    },
+    {
+      "id": "gm_guide_11_epic_tier_adventures",
+      "title": "GM   Guide   11   Epic   Tier   Adventures",
+      "file": "GM-_-Guide-_-11-_-Epic-_-Tier-_-Adventures.html",
+      "path": "/data/docs/gm-guide/",
+      "category": "gm-guide",
+      "categoryLabel": "🎬 GM Guide",
+      "core": false,
+      "active": true
+    },
+    {
+      "id": "gm_guide_12_advanced_gm_techniques",
+      "title": "GM   Guide   12   Advanced   GM   Techniques",
+      "file": "GM-_-Guide-_-12-_-Advanced-_-GM-_-Techniques.html",
+      "path": "/data/docs/gm-guide/",
+      "category": "gm-guide",
+      "categoryLabel": "🎬 GM Guide",
+      "core": false,
+      "active": true
+    },
+    {
+      "id": "gm_guide_13_player_archetypes_at_the_table",
+      "title": "GM   Guide   13   Player   Archetypes   At   The   Table",
+      "file": "GM-_-Guide-_-13-_-Player-_-Archetypes-_-at-_-the-_-Table.html",
+      "path": "/data/docs/gm-guide/",
+      "category": "gm-guide",
+      "categoryLabel": "🎬 GM Guide",
+      "core": false,
+      "active": true
+    },
+    {
+      "id": "gm_guide_14_lore_compendium",
+      "title": "GM   Guide   14   Lore   Compendium",
+      "file": "GM-_-Guide-_-14-_-Lore-_-Compendium.html",
+      "path": "/data/docs/gm-guide/",
+      "category": "gm-guide",
+      "categoryLabel": "🎬 GM Guide",
+      "core": false,
+      "active": true
+    },
+    {
+      "id": "gm_guide_app_a_core_reference_tables",
+      "title": "GM   Guide   App   A   Core   Reference   Tables",
+      "file": "GM-_-Guide-_-App-_-A-_-Core-_-Reference-_-Tables.html",
+      "path": "/data/docs/gm-guide/",
+      "category": "gm-guide",
+      "categoryLabel": "🎬 GM Guide",
+      "core": false,
+      "active": true
+    },
+    {
+      "id": "gm_guide_app_b_optional_rules_and_tactical_tools",
+      "title": "GM   Guide   App   B   Optional   Rules   And   Tactical   Tools",
+      "file": "GM-_-Guide-_-App-_-B-_-Optional-_-Rules-_-and-_-Tactical-_-Tools.html",
+      "path": "/data/docs/gm-guide/",
+      "category": "gm-guide",
+      "categoryLabel": "🎬 GM Guide",
+      "core": false,
+      "active": true
+    },
+    {
+      "id": "gm_guide_app_c_deck_and_magic_reference",
+      "title": "GM   Guide   App   C   Deck   And   Magic   Reference",
+      "file": "GM-_-Guide-_-App-_-C-_-Deck-_-and-_-Magic-_-Reference.html",
+      "path": "/data/docs/gm-guide/",
+      "category": "gm-guide",
+      "categoryLabel": "🎬 GM Guide",
+      "core": false,
+      "active": true
+    },
+    {
+      "id": "gm_guide_app_d_campaign_management",
+      "title": "GM   Guide   App   D   Campaign   Management",
+      "file": "GM-_-Guide-_-App-_-D-_-Campaign-_-Management.html",
+      "path": "/data/docs/gm-guide/",
+      "category": "gm-guide",
+      "categoryLabel": "🎬 GM Guide",
+      "core": false,
+      "active": true
+    },
+    {
+      "id": "gm_guide_app_e_safety_and_inclusivity",
+      "title": "GM   Guide   App   E   Safety   And   Inclusivity",
+      "file": "GM-_-Guide-_-App-_-E-_-Safety-_-and-_-Inclusivity.html",
+      "path": "/data/docs/gm-guide/",
+      "category": "gm-guide",
+      "categoryLabel": "🎬 GM Guide",
+      "core": false,
+      "active": true
+    },
+    {
+      "id": "gm_guide_app_f_rival_party_generator",
+      "title": "GM   Guide   App   F   Rival   Party   Generator",
+      "file": "GM-_-Guide-_-App-_-F-_-Rival-_-Party-_-Generator.html",
+      "path": "/data/docs/gm-guide/",
+      "category": "gm-guide",
+      "categoryLabel": "🎬 GM Guide",
+      "core": false,
+      "active": true
+    },
+    {
+      "id": "gm_guide_app_g_one_page_gm_screen_summary",
+      "title": "GM   Guide   App   G   One   Page   GM   Screen   Summary",
+      "file": "GM-_-Guide-_-App-_-G-_-One-_-Page-_-GM-_-Screen-_-Summary.html",
+      "path": "/data/docs/gm-guide/",
+      "category": "gm-guide",
+      "categoryLabel": "🎬 GM Guide",
+      "core": false,
+      "active": true
+    },
+    {
+      "id": "gm_guide_app_h_sample_deck_reading",
+      "title": "GM   Guide   App   H   Sample   Deck   Reading",
+      "file": "GM-_-Guide-_-App-_-H-_-Sample-_-Deck-_-Reading.html",
+      "path": "/data/docs/gm-guide/",
+      "category": "gm-guide",
+      "categoryLabel": "🎬 GM Guide",
+      "core": false,
+      "active": true
+    },
+    {
+      "id": "gm_guide_app_i_session_zero_checklist",
+      "title": "GM   Guide   App   I   Session   Zero   Checklist",
+      "file": "GM-_-Guide-_-App-_-I-_-Session-_-Zero-_-Checklist.html",
+      "path": "/data/docs/gm-guide/",
+      "category": "gm-guide",
+      "categoryLabel": "🎬 GM Guide",
+      "core": false,
+      "active": true
+    },
+    {
+      "id": "gm_guide_app_j_using_expansions_and_adversary_templates",
+      "title": "GM   Guide   App   J   Using   Expansions   And   Adversary   Templates",
+      "file": "GM-_-Guide-_-App-_-J-_-Using-_-Expansions-_-and-_-Adversary-_-Templates.html",
+      "path": "/data/docs/gm-guide/",
+      "category": "gm-guide",
+      "categoryLabel": "🎬 GM Guide",
+      "core": false,
+      "active": true
+    },
+    {
+      "id": "gm_guide_app_k_patron_quick_reference",
+      "title": "GM   Guide   App   K   Patron   Quick   Reference",
+      "file": "GM-_-Guide-_-App-_-K-_-Patron-_-Quick-_-Reference.html",
+      "path": "/data/docs/gm-guide/",
+      "category": "gm-guide",
+      "categoryLabel": "🎬 GM Guide",
+      "core": false,
+      "active": true
+    },
+    {
+      "id": "grey_wanderers_grimoire",
+      "title": "Grey   Wanderers   Grimoire",
+      "file": "Fates_-_Edge_-_-Grey-_-Wanderers-_-Grimoire.html",
+      "path": "/data/docs/expansions/",
+      "category": "expansions",
+      "categoryLabel": "📦 Expansions",
       "core": false,
       "active": true
     },
@@ -133,6 +443,206 @@
       "active": true
     },
     {
+      "id": "peoples_and_cultures",
+      "title": "Peoples   And   Cultures",
+      "file": "Fates_-_Edge_-_-Peoples-_-and-_-Cultures.html",
+      "path": "/data/docs/expansions/",
+      "category": "expansions",
+      "categoryLabel": "📦 Expansions",
+      "core": false,
+      "active": true
+    },
+    {
+      "id": "players_guide_01_quickstart",
+      "title": "Players   Guide   01   Quickstart",
+      "file": "Players-_-Guide-_-01-_-Quickstart.html",
+      "path": "/data/docs/players-guide/",
+      "category": "players-guide",
+      "categoryLabel": "🎲 Player's Guide",
+      "core": false,
+      "active": true
+    },
+    {
+      "id": "players_guide_02_character_creation",
+      "title": "Players   Guide   02   Character   Creation",
+      "file": "Players-_-Guide-_-02-_-Character-_-Creation.html",
+      "path": "/data/docs/players-guide/",
+      "category": "players-guide",
+      "categoryLabel": "🎲 Player's Guide",
+      "core": false,
+      "active": true
+    },
+    {
+      "id": "players_guide_03_core_mechanics",
+      "title": "Players   Guide   03   Core   Mechanics",
+      "file": "Players-_-Guide-_-03-_-Core-_-Mechanics.html",
+      "path": "/data/docs/players-guide/",
+      "category": "players-guide",
+      "categoryLabel": "🎲 Player's Guide",
+      "core": false,
+      "active": true
+    },
+    {
+      "id": "players_guide_04_magic",
+      "title": "Players   Guide   04   Magic",
+      "file": "Players-_-Guide-_-04-_-Magic.html",
+      "path": "/data/docs/players-guide/",
+      "category": "players-guide",
+      "categoryLabel": "🎲 Player's Guide",
+      "core": false,
+      "active": true
+    },
+    {
+      "id": "players_guide_05_healing",
+      "title": "Players   Guide   05   Healing",
+      "file": "Players-_-Guide-_-05-_-Healing.html",
+      "path": "/data/docs/players-guide/",
+      "category": "players-guide",
+      "categoryLabel": "🎲 Player's Guide",
+      "core": false,
+      "active": true
+    },
+    {
+      "id": "players_guide_06_talents",
+      "title": "Players   Guide   06   Talents",
+      "file": "Players-_-Guide-_-06-_-Talents.html",
+      "path": "/data/docs/players-guide/",
+      "category": "players-guide",
+      "categoryLabel": "🎲 Player's Guide",
+      "core": false,
+      "active": true
+    },
+    {
+      "id": "players_guide_07_advancement",
+      "title": "Players   Guide   07   Advancement",
+      "file": "Players-_-Guide-_-07-_-Advancement.html",
+      "path": "/data/docs/players-guide/",
+      "category": "players-guide",
+      "categoryLabel": "🎲 Player's Guide",
+      "core": false,
+      "active": true
+    },
+    {
+      "id": "players_guide_08_xp_paths",
+      "title": "Players   Guide   08   XP   Paths",
+      "file": "Players-_-Guide-_-08-_-XP-_-Paths.html",
+      "path": "/data/docs/players-guide/",
+      "category": "players-guide",
+      "categoryLabel": "🎲 Player's Guide",
+      "core": false,
+      "active": true
+    },
+    {
+      "id": "players_guide_09_your_first_magical_character",
+      "title": "Players   Guide   09   Your   First   Magical   Character",
+      "file": "Players-_-Guide-_-09-_-Your-_-First-_-Magical-_-Character.html",
+      "path": "/data/docs/players-guide/",
+      "category": "players-guide",
+      "categoryLabel": "🎲 Player's Guide",
+      "core": false,
+      "active": true
+    },
+    {
+      "id": "players_guide_10_assets_and_followers",
+      "title": "Players   Guide   10   Assets   And   Followers",
+      "file": "Players-_-Guide-_-10-_-Assets-_-and-_-Followers.html",
+      "path": "/data/docs/players-guide/",
+      "category": "players-guide",
+      "categoryLabel": "🎲 Player's Guide",
+      "core": false,
+      "active": true
+    },
+    {
+      "id": "players_guide_11_downtime",
+      "title": "Players   Guide   11   Downtime",
+      "file": "Players-_-Guide-_-11-_-Downtime.html",
+      "path": "/data/docs/players-guide/",
+      "category": "players-guide",
+      "categoryLabel": "🎲 Player's Guide",
+      "core": false,
+      "active": true
+    },
+    {
+      "id": "players_guide_12_world_regions_and_cultures",
+      "title": "Players   Guide   12   World   Regions   And   Cultures",
+      "file": "Players-_-Guide-_-12-_-World-_-Regions-_-and-_-Cultures.html",
+      "path": "/data/docs/players-guide/",
+      "category": "players-guide",
+      "categoryLabel": "🎲 Player's Guide",
+      "core": false,
+      "active": true
+    },
+    {
+      "id": "players_guide_13_world_powers_and_patrons",
+      "title": "Players   Guide   13   World   Powers   And   Patrons",
+      "file": "Players-_-Guide-_-13-_-World-_-Powers-_-and-_-Patrons.html",
+      "path": "/data/docs/players-guide/",
+      "category": "players-guide",
+      "categoryLabel": "🎲 Player's Guide",
+      "core": false,
+      "active": true
+    },
+    {
+      "id": "players_guide_14_world_interaction",
+      "title": "Players   Guide   14   World   Interaction",
+      "file": "Players-_-Guide-_-14-_-World-_-Interaction.html",
+      "path": "/data/docs/players-guide/",
+      "category": "players-guide",
+      "categoryLabel": "🎲 Player's Guide",
+      "core": false,
+      "active": true
+    },
+    {
+      "id": "players_guide_15_currency_free_economy",
+      "title": "Players   Guide   15   Currency   Free   Economy",
+      "file": "Players-_-Guide-_-15-_-Currency-_-Free-_-Economy.html",
+      "path": "/data/docs/players-guide/",
+      "category": "players-guide",
+      "categoryLabel": "🎲 Player's Guide",
+      "core": false,
+      "active": true
+    },
+    {
+      "id": "players_guide_16_character_backgrounds",
+      "title": "Players   Guide   16   Character   Backgrounds",
+      "file": "Players-_-Guide-_-16-_-Character-_-Backgrounds.html",
+      "path": "/data/docs/players-guide/",
+      "category": "players-guide",
+      "categoryLabel": "🎲 Player's Guide",
+      "core": false,
+      "active": true
+    },
+    {
+      "id": "players_guide_17_the_legacy_engine",
+      "title": "Players   Guide   17   The   Legacy   Engine",
+      "file": "Players-_-Guide-_-17-_-The-_-Legacy-_-Engine.html",
+      "path": "/data/docs/players-guide/",
+      "category": "players-guide",
+      "categoryLabel": "🎲 Player's Guide",
+      "core": false,
+      "active": true
+    },
+    {
+      "id": "players_guide_18_enhanced_player_play",
+      "title": "Players   Guide   18   Enhanced   Player   Play",
+      "file": "Players-_-Guide-_-18-_-Enhanced-_-Player-_-Play.html",
+      "path": "/data/docs/players-guide/",
+      "category": "players-guide",
+      "categoryLabel": "🎲 Player's Guide",
+      "core": false,
+      "active": true
+    },
+    {
+      "id": "players_guide_19_appendix_quick_reference",
+      "title": "Players   Guide   19   Appendix   Quick   Reference",
+      "file": "Players-_-Guide-_-19-_-Appendix-_-Quick-_-Reference.html",
+      "path": "/data/docs/players-guide/",
+      "category": "players-guide",
+      "categoryLabel": "🎲 Player's Guide",
+      "core": false,
+      "active": true
+    },
+    {
       "id": "playing_and_running_fate_s_edge",
       "title": "Playing   And   Running   Fate'S   Edge",
       "file": "Fates_-_Edge_-_-Playing-_-and-_-Running-_-Fate's-_-Edge.html",
@@ -143,12 +653,52 @@
       "active": true
     },
     {
+      "id": "psionics",
+      "title": "Psionics",
+      "file": "Fates_-_Edge_-_-Psionics.html",
+      "path": "/data/docs/expansions/",
+      "category": "expansions",
+      "categoryLabel": "📦 Expansions",
+      "core": false,
+      "active": true
+    },
+    {
       "id": "quickstart",
       "title": "Quickstart",
       "file": "Fates_-_Edge_-_-Quickstart.html",
       "path": "/data/docs/quickstart/",
       "category": "quickstart",
       "categoryLabel": "⚡ Quickstart",
+      "core": false,
+      "active": true
+    },
+    {
+      "id": "talents_and_special_abilities",
+      "title": "Talents   And   Special   Abilities",
+      "file": "Fates_-_Edge_-_-Talents-_-and-_-Special-_-Abilities.html",
+      "path": "/data/docs/expansions/",
+      "category": "expansions",
+      "categoryLabel": "📦 Expansions",
+      "core": false,
+      "active": true
+    },
+    {
+      "id": "tales_of_the_threshold",
+      "title": "Tales   Of   The   Threshold",
+      "file": "Fates_-_Edge_-_-Tales-_-of-_-the-_-Threshold.html",
+      "path": "/data/docs/anthology/",
+      "category": "anthology",
+      "categoryLabel": "📖 Anthology",
+      "core": false,
+      "active": true
+    },
+    {
+      "id": "the_concordance_fragments",
+      "title": "The   Concordance   Fragments",
+      "file": "Fates_-_Edge_-_-The-_-Concordance-_-Fragments.html",
+      "path": "/data/docs/anthology/",
+      "category": "anthology",
+      "categoryLabel": "📖 Anthology",
       "core": false,
       "active": true
     },
@@ -203,6 +753,16 @@
       "active": true
     },
     {
+      "id": "the_hearth_ledger",
+      "title": "The   Hearth   Ledger",
+      "file": "Fates_-_Edge_-_-The-_-Hearth-_-Ledger.html",
+      "path": "/data/docs/anthology/",
+      "category": "anthology",
+      "categoryLabel": "📖 Anthology",
+      "core": false,
+      "active": true
+    },
+    {
       "id": "the_ninth_proof",
       "title": "The   Ninth   Proof",
       "file": "Fates_-_Edge_-_-The-_-Ninth-_-Proof.html",
@@ -243,6 +803,36 @@
       "active": true
     },
     {
+      "id": "the_velvet_touch",
+      "title": "The   Velvet   Touch",
+      "file": "Fates_-_Edge_-_-The-_-Velvet-_-Touch.html",
+      "path": "/data/docs/expansions/",
+      "category": "expansions",
+      "categoryLabel": "📦 Expansions",
+      "core": false,
+      "active": true
+    },
+    {
+      "id": "the_weight_of_the_unpaid",
+      "title": "The   Weight   Of   The   Unpaid",
+      "file": "Fates_-_Edge_-_-The-_-Weight-_-of-_-the-_-Unpaid.html",
+      "path": "/data/docs/anthology/",
+      "category": "anthology",
+      "categoryLabel": "📖 Anthology",
+      "core": false,
+      "active": true
+    },
+    {
+      "id": "way_of_warrior",
+      "title": "Way   Of   Warrior",
+      "file": "Fates_-_Edge_-_-Way-_-of-_-Warrior.html",
+      "path": "/data/docs/expansions/",
+      "category": "expansions",
+      "categoryLabel": "📦 Expansions",
+      "core": false,
+      "active": true
+    },
+    {
       "id": "whispers_in_the_tunnels",
       "title": "Whispers   In   The   Tunnels",
       "file": "Fates_-_Edge_-_-Whispers-_-in-_-the-_-Tunnels.html",
@@ -251,9 +841,19 @@
       "categoryLabel": "🗡️ Adventures",
       "core": false,
       "active": true
+    },
+    {
+      "id": "witchcraft",
+      "title": "Witchcraft",
+      "file": "Fates_-_Edge_-_-Witchcraft.html",
+      "path": "/data/docs/expansions/",
+      "category": "expansions",
+      "categoryLabel": "📦 Expansions",
+      "core": false,
+      "active": true
     }
   ],
-  "total_count": 25,
-  "active_count": 25,
+  "total_count": 85,
+  "active_count": 85,
   "_license": "Fate's Edge Proprietary Content – © 2024 Nicholas A. Gasper. All rights reserved."
 }

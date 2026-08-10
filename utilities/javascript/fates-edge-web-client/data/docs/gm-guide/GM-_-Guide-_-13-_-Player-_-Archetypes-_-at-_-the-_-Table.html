@@ -1,0 +1,1115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GM Guide 13 — Player Archetypes at the Table</title>
+<style>
+    :root {
+        --bg1: #0d0d1a;
+        --bg2: #1a1a2e;
+        --bg3: #252540;
+        --bg4: #2f2f4a;
+        --text: #e8e8f0;
+        --text2: #b8b8c8;
+        --text3: #8888a0;
+        --gold: #c9a84c;
+        --gold-hover: #d4b85c;
+        --border: #333355;
+        --red: #c0392b;
+        --green: #27ae60;
+        --blue: #2980b9;
+        --purple: #8e44ad;
+        --orange: #e67e22;
+        --radius: 8px;
+        --font: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+        background: var(--bg1);
+        color: var(--text);
+        font-family: var(--font);
+        padding: 1.5rem;
+        max-width: 1100px;
+        margin: 0 auto;
+        line-height: 1.6;
+    }
+    h1, h2, h3, h4, h5 { color: var(--gold); margin: 0.5rem 0 0.3rem; }
+    h1 { font-size: 1.8rem; border-bottom: 2px solid var(--gold); padding-bottom: 0.3rem; }
+    h2 { font-size: 1.4rem; border-bottom: 1px solid var(--border); padding-bottom: 0.2rem; margin-top: 1.2rem; }
+    h3 { font-size: 1.1rem; margin-top: 0.8rem; }
+    h4 { font-size: 0.95rem; color: var(--text); margin-top: 0.6rem; }
+    a { color: var(--gold); text-decoration: none; }
+    a:hover { color: var(--gold-hover); text-decoration: underline; }
+    p { margin: 0.4rem 0; }
+    ul, ol { margin: 0.3rem 0 0.5rem 1.4rem; }
+    li { margin: 0.15rem 0; }
+    .subtitle { color: var(--text2); margin-bottom: 1rem; font-size: 0.95rem; }
+    .panel {
+        background: var(--bg2);
+        border-radius: var(--radius);
+        padding: 0.6rem 0.9rem;
+        border: 1px solid var(--border);
+        margin: 0.7rem 0;
+    }
+    .panel-title { color: var(--gold); font-weight: 700; display: block; margin-bottom: 0.3rem; }
+    .panel-gold { border-left: 4px solid var(--gold); }
+    .panel-red { border-left: 4px solid var(--red); }
+    .panel-red .panel-title { color: var(--red); }
+    .panel-blue { border-left: 4px solid var(--blue); }
+    .panel-blue .panel-title { color: var(--blue); }
+    .panel-green { border-left: 4px solid var(--green); }
+    .panel-green .panel-title { color: var(--green); }
+    .panel-purple { border-left: 4px solid var(--purple); }
+    .badge {
+        display: inline-block;
+        padding: 0.05rem 0.5rem;
+        border-radius: 12px;
+        font-size: 0.65rem;
+        font-weight: 600;
+        background: var(--bg4);
+        color: var(--text3);
+        border: 1px solid var(--border);
+    }
+    .badge-gold { background: var(--gold); color: #1a1400; border-color: var(--gold); }
+    .text-muted { color: var(--text3); }
+    .text-gold { color: var(--gold); }
+    .text-sm { font-size: 0.85rem; }
+    .text-xs { font-size: 0.7rem; }
+    .mt-1 { margin-top: 0.5rem; }
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; margin: 0.6rem 0; }
+    th, td { padding: 0.4rem 0.6rem; border: 1px solid var(--border); text-align: left; vertical-align: top; }
+    th { background: var(--bg4); color: var(--gold); font-weight: 600; }
+    tr:nth-child(even) { background: var(--bg2); }
+    blockquote {
+        font-style: italic;
+        border-left: 4px solid var(--gold);
+        padding: 0.5rem 1rem;
+        margin: 0.5rem 0;
+        background: var(--bg2);
+        border-radius: var(--radius);
+        color: var(--text2);
+    }
+    code { background: var(--bg4); padding: 0.1rem 0.3rem; border-radius: 4px; font-size: 0.85rem; color: var(--gold); }
+    hr { border: none; border-top: 1px solid var(--border); margin: 1rem 0; }
+    .concept {
+        background: var(--bg2);
+        border: 1px solid var(--border);
+        border-left: 4px solid var(--gold);
+        border-radius: var(--radius);
+        padding: 0.8rem 1rem;
+        margin: 1rem 0;
+    }
+    .concept h2 { border-bottom: none; margin-top: 0; }
+    footer {
+        font-size: 0.75rem;
+        color: var(--text3);
+        text-align: center;
+        padding: 1.2rem 0 0.5rem;
+        margin-top: 1.5rem;
+        border-top: 1px solid var(--border);
+    }
+</style>
+</head>
+<body>
+
+<h1>Example Character Concepts</h1>
+<p class="subtitle">Fate's Edge GM Guide — Chapter 13</p>
+
+<p>This chapter presents example character concepts to illustrate how the game's systems can create diverse and interesting heroes. These are <strong>examples only</strong> — not prescriptive templates or exhaustive lists. Use them for inspiration, as pre-generated characters, or as starting points for your own unique creations.</p>
+
+<h2>Important Disclaimer</h2>
+<p><strong>These examples are provided for illustrative purposes only.</strong> They demonstrate how the game's mechanics can support different character archetypes and play styles. You are encouraged to:</p>
+<ul>
+    <li>Modify these concepts to fit your preferences</li>
+    <li>Create completely original characters</li>
+    <li>Mix and match elements from different examples</li>
+    <li>Work with your Game Master to develop unique concepts</li>
+</ul>
+<p>The game system is designed to support a wide variety of character types beyond these examples.</p>
+
+<h2>How to Use These Examples</h2>
+<p>Each concept includes:</p>
+<ul>
+    <li><strong>Concept Overview:</strong> Narrative identity and role</li>
+    <li><strong>Traditional Analogues:</strong> Common RPG classes that share similar themes — <em>not</em> mechanical restrictions, just touchstones</li>
+    <li><strong>Cultural Affinities:</strong> Which regions or peoples commonly produce this archetype</li>
+    <li><strong>Mechanical Foundation:</strong> Suggested starting capabilities</li>
+    <li><strong>Play Style:</strong> How the character typically engages with challenges</li>
+    <li><strong>Development Path (by Tier):</strong> What to buy at Tier I, II, and III</li>
+    <li><strong>Tactical Advice:</strong> Tips for playing the role effectively</li>
+    <li><strong>Story Hooks:</strong> Plot opportunities for the Game Master</li>
+    <li><strong>Legacy Note:</strong> How this character might pass the torch (see the Epic Tier chapter)</li>
+    <li><strong>Build Blocks:</strong> A <em>32 XP</em> starting build, plus an optional <em>36 XP</em> variant using Bonds/Complications (+4 XP)</li>
+</ul>
+
+<div class="concept">
+<h2>1. The Guardian (Fighter / Paladin / Knight)</h2>
+<p><strong>Concept</strong>: A protector who stands between danger and those they've sworn to defend. <em>Steel in hand, vow in heart.</em> Whether a chivalrous knight, a grizzled mercenary, or a holy warrior of the Everflame, the Guardian makes others safe through sacrifice.</p>
+<p><strong>Traditional Analogues</strong>: Fighter, Paladin, Barbarian (defensive), Knight, Samurai, Legionary</p>
+<p><strong>Cultural Affinities</strong>: Vhasia (chivalric knight), Viterra (hedge-knight), Aeler (shield-warden), Ubral (clan champion), Ecktoria (legionary), Oshiira (Vermilion Corps guardian)</p>
+<p><strong>Mechanical Foundation</strong>:</p>
+<ul>
+    <li><strong>Primary</strong>: Body (strength, endurance), Spirit (willpower, resolve)</li>
+    <li><strong>Skills</strong>: Melee, Athletics, Insight (reading opponents), Endurance</li>
+    <li><strong>Talents</strong>: Defensive Survival, Combat Reflexes, Conditioning</li>
+</ul>
+<p><strong>Play Style</strong>:</p>
+<ul>
+    <li>Frontline combat and protection</li>
+    <li>Drawing attention away from allies (positioning, taunts, the Protect action)</li>
+    <li>Using presence and authority to control situations</li>
+    <li>Taking risks to protect others — absorbing Harm meant for teammates</li>
+</ul>
+<h4>Development Path (by Tier)</h4>
+<ul>
+    <li><strong>Tier I (0&ndash;40 XP)</strong>: Raise Body to 3, Melee to 2, take <em>Defensive Survival</em> and <em>Combat Reflexes</em>. Use a shield.</li>
+    <li><strong>Tier II (41&ndash;90 XP)</strong>: Raise Body to 4, take <em>Conditioning</em> and <em>Tactical Movement</em>. Consider a War Mount Asset (8 XP) for mobility.</li>
+    <li><strong>Tier III (91&ndash;150 XP)</strong>: Take <em>Battlefield Mastery</em> or <em>Mystic Bulwark</em>. Upgrade armor to Heavy if you have Body 4+. Start training a successor (Cap 3+ follower).</li>
+</ul>
+<h4>Tactical Advice</h4>
+<ul>
+    <li><strong>Use the Defend action</strong> when outnumbered; it improves your Position by one step and can protect allies.</li>
+    <li><strong>Spend Boons on re-rolling failed defense</strong> rolls, not on offense. Your job is to survive.</li>
+    <li><strong>Position matters more than damage.</strong> A Dominant position lets you re-roll one failure — use shoves, terrain, and cover to stay in control.</li>
+    <li><strong>When you take Harm, remember it clears Fatigue.</strong> Sometimes a small wound is worth the reset.</li>
+    <li><strong>The Protect action</strong> (intercepting a hit on an ally) is your signature move. Use it when a squishier ally is about to take a big hit.</li>
+</ul>
+<p><strong>Story Hooks</strong>:</p>
+<ul>
+    <li>Who or what are they protecting? A person, a place, an ideal?</li>
+    <li>What oath or duty drives them — sworn, inherited, or self-imposed?</li>
+    <li>What happens if they fail in their protection?</li>
+    <li>What personal costs do they bear for their role (scars, lost loved ones, broken oaths)?</li>
+    <li>Did they inherit their duty from a fallen predecessor?</li>
+</ul>
+<p><strong>Legacy Note</strong>: A loyal follower (squire, apprentice, sworn shield) can become your successor, inheriting your sworn duty and reputation. See the Epic Tier chapter.</p>
+<h4>Build Blocks</h4>
+<p><strong>Starting Build (32 XP).</strong></p>
+<ul>
+    <li><strong>Attributes</strong> (Cost = rating &times; 3 XP): Body 3 (9), Spirit 2 (6), Wits 1 (3), Presence 1 (3) &rarr; <strong>21 XP</strong></li>
+    <li><strong>Skills</strong> (Cost = level &times; 2 XP): Melee 2 (4), Athletics 1 (2), Insight 1 (2) &rarr; <strong>8 XP</strong></li>
+    <li><strong>Total</strong>: 29 XP (bank 1 XP)</li>
+</ul>
+<p><strong>With Bonds/Complications (36 XP).</strong></p>
+<ul>
+    <li>Add <strong>Talent</strong>: Combat Reflexes (2 XP)</li>
+    <li>Add <strong>Talent</strong>: Defensive Survival (3 XP)</li>
+    <li><strong>Total</strong>: 29 + 5 = 34 XP (bank 2 XP)</li>
+</ul>
+</div>
+
+<div class="concept">
+<h2>2. The Mage (Wizard / Sorcerer / Arcanist)</h2>
+<p><strong>Concept</strong>: A wielder of arcane power who reshapes reality through study, intuition, or pact. <em>Candlesmoke, marginalia, and dangerous truths.</em> From the rational Wizard of Thepyrgos to the instinctive Sorcerer of the Bloodlands, magic flows through them — and sometimes over them.</p>
+<p><strong>Traditional Analogues</strong>: Wizard, Sorcerer, Warlock (pact magic), Arcanist, Runekeeper, Invoker</p>
+<p><strong>Cultural Affinities</strong>: Thepyrgos (academic caster), Aelinnel (fae-touched), Valewood (Lethai-thora archivist), Ashaan (Breath-less resistance mage), Zakov (sea-witch), Sekogo (nganga spirit-worker)</p>
+<p><strong>Mechanical Foundation</strong>:</p>
+<ul>
+    <li><strong>Primary</strong>: Wits (theory, precision), Spirit (willpower, channeling)</li>
+    <li><strong>Skills</strong>: Lore, Arcana, Investigation, (optionally) Sway (for social casting)</li>
+    <li><strong>Talents</strong>: Spellcraft (freeform), Codex (runekeeper), Patron's Symbol (invoker)</li>
+</ul>
+<p><strong>Play Style</strong>:</p>
+<ul>
+    <li>Information gathering and magical analysis</li>
+    <li>Solving puzzles and mysteries with arcane insight</li>
+    <li>Using magic to gain advantages in combat and social scenes</li>
+    <li>Researching new spells and rituals between adventures</li>
+    <li>Managing Obligation (for Runekeepers and Invokers) or Backlash (for free casters)</li>
+</ul>
+<h4>Development Path (by Tier)</h4>
+<ul>
+    <li><strong>Tier I</strong>: Take <em>Spellcraft</em> (6 XP) or <em>Codex</em> + <em>Thiasos</em> (6 XP). Raise Wits to 3, Arcana/Lore to 2.</li>
+    <li><strong>Tier II</strong>: Add <em>Elemental Focus</em> (4 XP) or <em>Ritual Mastery</em> (4 XP). Raise Spirit to 3 for more Obligation capacity.</li>
+    <li><strong>Tier III</strong>: Take <em>Arcane Dominance</em> or <em>Crack Specialist</em> (if Invoker). Build a library (Standard Asset, 8 XP) to research faster.</li>
+</ul>
+<h4>Tactical Advice</h4>
+<ul>
+    <li><strong>Push It</strong> only when necessary — extra Obligation or Fatigue can snowball. Use Boons to improve Position before rolling.</li>
+    <li><strong>Free casters:</strong> Use cantrips (single tag) for safe, repeatable effects. Reserve multi-tag spells for critical moments.</li>
+    <li><strong>Runekeepers:</strong> Your Patron's Gift gives +1 Melee and +1 Thematic skill. Use it even if you aren't a fighter — the Thematic skill can be Sway, Lore, or Stealth.</li>
+    <li><strong>Invokers:</strong> <em>Crack the Seal</em> is for emergencies. Restore your Symbol during downtime before you need it again.</li>
+    <li><strong>Learn the tags library.</strong> Knowing which tags combine efficiently (e.g., AREA + BIND for crowd control) will make you a more effective caster.</li>
+</ul>
+<p><strong>Story Hooks</strong>:</p>
+<ul>
+    <li>What forbidden knowledge are they seeking?</li>
+    <li>How did they acquire their magical talent — bloodline, study, pact, accident, trauma?</li>
+    <li>What dangerous secrets might they uncover?</li>
+    <li>Who opposes their research (rival mages, witch-hunters, the Church, the Chain-Lanterns)?</li>
+    <li>What price have they already paid for power (a lost sense, a forgotten loved one, a cursed mark)?</li>
+</ul>
+<p><strong>Legacy Note</strong>: A trusted apprentice (follower) can inherit your Codex or Symbol collection, continuing your magical legacy. See the Epic Tier chapter.</p>
+<h4>Build Blocks</h4>
+<p><strong>Starting Build (32 XP).</strong></p>
+<ul>
+    <li><strong>Attributes</strong>: Wits 3 (9), Spirit 2 (6), Body 1 (3), Presence 1 (3) &rarr; <strong>21 XP</strong></li>
+    <li><strong>Skills</strong>: Lore 2 (4), Arcana 1 (2) &rarr; <strong>6 XP</strong></li>
+    <li><strong>Total</strong>: 27 XP (bank 3 XP)</li>
+</ul>
+<p><strong>With Bonds/Complications (36 XP).</strong></p>
+<ul>
+    <li>Add <strong>Talent</strong>: Spellcraft (6 XP) using banked 3 + 4 = 7 XP; bank 1 XP</li>
+    <li><strong>Total</strong>: 27 + 6 = 33 XP (bank 1 XP)</li>
+</ul>
+</div>
+
+<div class="concept">
+<h2>3. The Rogue (Thief / Assassin / Scout)</h2>
+<p><strong>Concept</strong>: A shadow who moves where others cannot, taking what others cannot keep. <em>Quiet footfalls, hawk eyes, and no loyalties but coin.</em> From the street-wise cutpurse of Silkstrand to the deadly assassin of Zakov, the Rogue survives by wits, speed, and one hidden knife.</p>
+<p><strong>Traditional Analogues</strong>: Rogue, Thief, Assassin, Scout, Ranger (stealth focus), Spy</p>
+<p><strong>Cultural Affinities</strong>: Zakov (pirate/rogue), Silkstrand (cutpurse), Vilikari (smuggler), Ykrul (steppe scout), Sidhi (lighthouse spy), Ashaan (Breath-less infiltrator)</p>
+<p><strong>Mechanical Foundation</strong>:</p>
+<ul>
+    <li><strong>Primary</strong>: Wits (perception, quick thinking), Body (agility, stealth)</li>
+    <li><strong>Skills</strong>: Stealth, Subterfuge, Investigation, (optionally) Melee (light weapons)</li>
+    <li><strong>Talents</strong>: Backstab, Elusive Dodge, Shadow Dance (later)</li>
+</ul>
+<p><strong>Play Style</strong>:</p>
+<ul>
+    <li>Scouting ahead and gathering intelligence</li>
+    <li>Infiltrating secured areas and disabling traps</li>
+    <li>Ambush and skirmish tactics — striking from stealth</li>
+    <li>Finding paths, contacts, and secrets in cities and wilderness</li>
+    <li>Information brokering and black market connections</li>
+</ul>
+<h4>Development Path (by Tier)</h4>
+<ul>
+    <li><strong>Tier I</strong>: Raise Wits to 3, Stealth/Subterfuge to 2. Take <em>Backstab</em> (6 XP) — you can afford it at 36 XP start.</li>
+    <li><strong>Tier II</strong>: Take <em>Elusive Dodge</em> (6 XP). Raise Body to 3 for better tracking. Consider a Minor Asset (Hidden Cache, 4 XP).</li>
+    <li><strong>Tier III</strong>: Take <em>Shadow Dance</em> (10 XP) and <em>Deathblow</em> (12 XP) — the classic assassination chain. Build a spy network (Standard Asset, 8 XP).</li>
+</ul>
+<h4>Tactical Advice</h4>
+<ul>
+    <li><strong>Always aim for Dominant Position before attacking from stealth.</strong> Spend a Boon to improve Position if needed.</li>
+    <li><strong>Use the environment.</strong> Ask the GM: &ldquo;Is there a chandelier? A shadowed alcove? Loose gravel?&rdquo; Use it to gain advantage.</li>
+    <li><strong>Backstab + Shadow Dance + Deathblow</strong> is lethal, but requires Boons. Engage only when you have 2&ndash;3 Boons saved.</li>
+    <li><strong>When outmatched, retreat.</strong> Spend a Boon to make a Controlled withdrawal instead of Desperate.</li>
+    <li><strong>Your skills are not just for combat.</strong> Use Subterfuge and Investigation to navigate criminal networks, find black markets, and gather rumors.</li>
+</ul>
+<p><strong>Story Hooks</strong>:</p>
+<ul>
+    <li>What crime or secret forced them into the shadows?</li>
+    <li>What treasure or truth are they hunting?</li>
+    <li>How do they balance loyalty to allies with self-preservation?</li>
+    <li>Who wants them dead — and why?</li>
+    <li>What do they owe to the criminal underworld that trained them?</li>
+</ul>
+<p><strong>Legacy Note</strong>: A young pickpocket or informant (follower) could inherit your network of fences and contacts. See the Epic Tier chapter.</p>
+<h4>Build Blocks</h4>
+<p><strong>Starting Build (32 XP).</strong></p>
+<ul>
+    <li><strong>Attributes</strong>: Wits 3 (9), Body 2 (6), Presence 1 (3), Spirit 1 (3) &rarr; <strong>21 XP</strong></li>
+    <li><strong>Skills</strong>: Stealth 2 (4), Subterfuge 2 (4) &rarr; <strong>8 XP</strong></li>
+    <li><strong>Total</strong>: 29 XP (bank 1 XP)</li>
+</ul>
+<p><strong>With Bonds/Complications (36 XP).</strong></p>
+<ul>
+    <li>Add <strong>Talent</strong>: Backstab (6 XP) — needs 6 XP; bank 1 + 4 = 5 XP &rarr; not enough. Alternative: Add <strong>Skill</strong>: Investigation 1 (2 XP) and <strong>Talent</strong>: Combat Reflexes (2 XP) and bank 2 XP. Or take a Minor Asset: Hidden Cache (4 XP) and bank 2 XP.</li>
+    <li><strong>Suggested</strong>: Hidden Cache + bank 2 XP &rarr; total 33 XP.</li>
+</ul>
+</div>
+
+<div class="concept">
+<h2>4. The Cleric (Priest / Healer / Exorcist)</h2>
+<p><strong>Concept</strong>: A vessel of divine or spiritual power, channeling healing, truth, and judgment. <em>Sacred flame, holy water, and a prayer on the lips.</em> From the Lampers of Ecktoria to the fog-named exorcists of the Mistlands, the Cleric binds wounds and banishes darkness.</p>
+<p><strong>Traditional Analogues</strong>: Cleric, Priest, Paladin (healing focus), Exorcist, Shaman, Healer</p>
+<p><strong>Cultural Affinities</strong>: Ecktoria (Everflame priest), Viterra (Temple of Light), Thepyrgos (Covenant judge), Pereshi (Flame-Keeper), Tulkani (Caravan Judge), Sidhi (lighthouse healer)</p>
+<p><strong>Mechanical Foundation</strong>:</p>
+<ul>
+    <li><strong>Primary</strong>: Spirit (faith, willpower), Presence (authority, channeling)</li>
+    <li><strong>Skills</strong>: Lore (theology, rites), Medicine, Sway (prayer, exhortation), (optionally) Melee (symbolic weapon)</li>
+    <li><strong>Talents</strong>: Invoker (Patron's Symbol) or Runekeeper (Thiasos + Codex of a divine Patron like Everflame, Oath of Flame &amp; Light, Pale Shepherd)</li>
+</ul>
+<p><strong>Play Style</strong>:</p>
+<ul>
+    <li>Healing and protecting allies</li>
+    <li>Purifying curses, diseases, and undead</li>
+    <li>Ley line and ritual magic (wards, consecrations)</li>
+    <li>Using authority of faith to command or persuade</li>
+    <li>Exorcising spirits and banishing the Unquiet Dead</li>
+</ul>
+<h4>Development Path (by Tier)</h4>
+<ul>
+    <li><strong>Tier I</strong>: Raise Spirit to 3, Lore/Medicine to 2. Take a divine Patron's <em>Symbol</em> (4 XP) or <em>Codex</em> (4 XP).</li>
+    <li><strong>Tier II</strong>: Take <em>Symbol Resonance</em> (4 XP) or <em>Efficient Invocation</em> (4 XP). Raise Presence to 3 for better social influence.</li>
+    <li><strong>Tier III</strong>: Take <em>Crack Specialist</em> or <em>Patron's Favor</em>. Build a hospice or shrine (Standard Asset, 8 XP) to support your community.</li>
+</ul>
+<h4>Tactical Advice</h4>
+<ul>
+    <li><strong>Healing is powerful but slow.</strong> In combat, stabilize Harm 2+ allies first; use HEAL (Fatigue recovery) on everyone else.</li>
+    <li><strong>Your Patron's Symbol grants a free +1 to ritual rolls.</strong> Keep it displayed.</li>
+    <li><strong>Consecrate ground before a big fight</strong> — <em>Rite of Consecrated Ground</em> can turn the tide against undead or demons.</li>
+    <li><strong>Obligation is story fuel.</strong> When your Patron's presence is felt, answer — it will lead to adventure.</li>
+    <li><strong>Exorcism is negotiation, not combat.</strong> Use Insight and Lore to understand what the spirit wants, then use Sway or Rites to resolve the haunting peacefully.</li>
+</ul>
+<p><strong>Story Hooks</strong>:</p>
+<ul>
+    <li>What crisis of faith have they survived?</li>
+    <li>What heresy or supernatural threat haunts them?</li>
+    <li>How do they serve both the living and the dead?</li>
+    <li>What price do they pay for divine power?</li>
+    <li>What secret does their faith hide from the faithful?</li>
+</ul>
+<p><strong>Legacy Note</strong>: An acolyte or lay healer (follower) can take up your Patron's Symbol and continue your mission. See the Epic Tier chapter.</p>
+<h4>Build Blocks</h4>
+<p><strong>Starting Build (32 XP).</strong></p>
+<ul>
+    <li><strong>Attributes</strong>: Spirit 3 (9), Presence 2 (6), Wits 1 (3), Body 1 (3) &rarr; <strong>21 XP</strong></li>
+    <li><strong>Skills</strong>: Medicine 2 (4), Lore 1 (2), Sway 1 (2) &rarr; <strong>8 XP</strong></li>
+    <li><strong>Total</strong>: 29 XP (bank 1 XP)</li>
+</ul>
+<p><strong>With Bonds/Complications (36 XP).</strong></p>
+<ul>
+    <li>Add <strong>Talent</strong>: Patron's Symbol (4 XP) for a divine Patron (e.g., Oath of Flame &amp; Light), using banked 1 + 4 = 5 XP; bank 1 XP</li>
+    <li><strong>Total</strong>: 33 XP (bank 1 XP)</li>
+</ul>
+</div>
+
+<div class="concept">
+<h2>5. The Bard (Diplomat / Skald / Courtier)</h2>
+<p><strong>Concept</strong>: A master of words, music, and social influence who changes minds and opens doors. <em>A smile for the foyer, steel for the parlor.</em> From the Skald of Linn to the Courtier of Vhasia, the Bard wields charm, rumor, and reputation as weapons.</p>
+<p><strong>Traditional Analogues</strong>: Bard, Diplomat, Courtier, Skald, Spy (social), Negotiator, Cantor</p>
+<p><strong>Cultural Affinities</strong>: Vhasia (courtier), Linn (skald), Thepyrgos (academic rhetorician), Tulkani (storyteller), Ecktoria (civic orator), Kahfagia (trade negotiator)</p>
+<p><strong>Mechanical Foundation</strong>:</p>
+<ul>
+    <li><strong>Primary</strong>: Presence (charm, performance), Wits (reading people, timing)</li>
+    <li><strong>Skills</strong>: Sway, Performance, Insight, (optionally) Lore (customs, history), Deception</li>
+    <li><strong>Talents</strong>: Silver Tongue, Inspire, Network Builder (or Read Emotions), Cantor's Path (optional, for Songs)</li>
+</ul>
+<p><strong>Play Style</strong>:</p>
+<ul>
+    <li>Social interaction and negotiation</li>
+    <li>Gathering information through rumors and contacts</li>
+    <li>Resolving conflicts without violence (or making violence fashionable)</li>
+    <li>Building alliances, manipulating factions</li>
+    <li>Inspiring allies in combat (through Songs or simple words)</li>
+</ul>
+<h4>Development Path (by Tier)</h4>
+<ul>
+    <li><strong>Tier I</strong>: Raise Presence to 3, Sway to 2. Take <em>Silver Tongue</em> (2 XP) and <em>Inspire</em> (3 XP).</li>
+    <li><strong>Tier II</strong>: Take <em>Command Presence</em> (4 XP) and <em>Network Builder</em> (4 XP). Raise Wits to 3 for social reading.</li>
+    <li><strong>Tier III</strong>: Take <em>High Stance Duelist</em> (if you use a blade) or <em>Battlefield Terror</em>. Build a spy network (Standard Asset, 8 XP) or a courtly title (Major Asset, 12 XP). Consider taking <em>Cantor's Path</em> (8 XP) for magical Songs.</li>
+</ul>
+<h4>Tactical Advice</h4>
+<ul>
+    <li><strong>Social scenes are your domain.</strong> Use <em>Inspire</em> to give allies +1 die or +1 Boon — it can turn a negotiation.</li>
+    <li><strong>Flashback declarations</strong> (spend 1 Boon) are perfect for bards. &ldquo;I already bribed the guard last night.&rdquo;</li>
+    <li><strong>Don't neglect combat skills entirely.</strong> A rapier and <em>High Stance Duelist</em> can make you a credible threat.</li>
+    <li><strong>Use <em>Intricate</em> descriptions</strong> to gain free re-rolls on 1s. Describe your performance, your charming smile, your family crest.</li>
+    <li><strong>The best lie is built on truth.</strong> Use Insight to learn what someone wants, then offer it to them (even if you have to fabricate it).</li>
+</ul>
+<p><strong>Story Hooks</strong>:</p>
+<ul>
+    <li>What major conflict are they trying to resolve?</li>
+    <li>What secret do they know that could topple a dynasty?</li>
+    <li>How do they handle betrayal or failed negotiations?</li>
+    <li>What personal relationships affect their diplomacy?</li>
+    <li>Whose favor are they trying to win — and at what cost?</li>
+</ul>
+<p><strong>Legacy Note</strong>: A prot&eacute;g&eacute; or herald (follower) can inherit your reputation and contacts, keeping your network alive. See the Epic Tier chapter.</p>
+<h4>Build Blocks</h4>
+<p><strong>Starting Build (32 XP).</strong></p>
+<ul>
+    <li><strong>Attributes</strong>: Presence 3 (9), Wits 2 (6), Spirit 1 (3), Body 1 (3) &rarr; <strong>21 XP</strong></li>
+    <li><strong>Skills</strong>: Sway 2 (4), Performance 1 (2), Insight 1 (2) &rarr; <strong>8 XP</strong></li>
+    <li><strong>Total</strong>: 29 XP (bank 1 XP)</li>
+</ul>
+<p><strong>With Bonds/Complications (36 XP).</strong></p>
+<ul>
+    <li>Add <strong>Talent</strong>: Inspire (3 XP) — once/scene, gain +1 die and potentially +1 Boon for bonded ally, using banked 1 + 4 = 5 XP; bank 2 XP</li>
+    <li><strong>Total</strong>: 32 XP (bank 2 XP)</li>
+</ul>
+</div>
+
+<div class="concept">
+<h2>6. The Ranger (Hunter / Tracker / Beastmaster)</h2>
+<p><strong>Concept</strong>: A wilderness expert who navigates dangerous territories and hunts down quarry. <em>Quiet footfalls, hawk eyes, and the long road.</em> From the Ykrul scout to the Valewood warden, the Ranger lives where roads end.</p>
+<p><strong>Traditional Analogues</strong>: Ranger, Hunter, Tracker, Beastmaster, Pathfinder, Wilderness Scout</p>
+<p><strong>Cultural Affinities</strong>: Ykrul (steppe scout), Kuvani (remount rider), Valewood (Lethai-al warden), Ubral (hill tracker), Mistlands (fog-walker), Sekogo (jungle hunter)</p>
+<p><strong>Mechanical Foundation</strong>:</p>
+<ul>
+    <li><strong>Primary</strong>: Wits (perception, navigation), Body (agility, endurance)</li>
+    <li><strong>Skills</strong>: Lore (terrain knowledge, tracking), Stealth, Investigation (following trails), Melee or Ranged</li>
+    <li><strong>Talents</strong>: Wilderness Lore, Keen Senses, (optionally) Animal Companion</li>
+</ul>
+<p><strong>Play Style</strong>:</p>
+<ul>
+    <li>Scouting ahead and gathering intelligence</li>
+    <li>Wilderness survival and navigation</li>
+    <li>Tracking creatures or people across terrain</li>
+    <li>Ambushing from concealment, using terrain</li>
+    <li>(Optional) Bonding with an animal companion</li>
+</ul>
+<h4>Development Path (by Tier)</h4>
+<ul>
+    <li><strong>Tier I</strong>: Raise Wits to 3, Lore/Stealth to 2. Take <em>Wilderness Lore</em> (2 XP) and <em>Keen Senses</em> (2 XP).</li>
+    <li><strong>Tier II</strong>: Take <em>Trackless Step</em> (2 XP) and <em>Elusive Dodge</em> (6 XP) or a War Hound (Minor Asset, 4 XP). Raise Body to 3.</li>
+    <li><strong>Tier III</strong>: Take <em>Shadow Dance</em> (10 XP) (if melee) or <em>Relentless</em> (6 XP) for traversal. Upgrade your animal companion to a War Mount (Standard Asset, 8 XP) if allowed.</li>
+</ul>
+<h4>Tactical Advice</h4>
+<ul>
+    <li><strong>Use terrain to your advantage.</strong> High ground, cover, and difficult terrain are your best friends. Ask the GM to set Position based on these.</li>
+    <li><strong>Scout ahead</strong> even when not required. Knowledge of what's coming negates ambushes and reduces travel timers.</li>
+    <li><strong>If you have an animal companion</strong>, use it to harass enemies (Distract &amp; Draw independent action) rather than direct combat.</li>
+    <li><strong>Lore 3+ means you rarely need to roll for basic tasks.</strong> Leverage that for guaranteed successes in wilderness travel.</li>
+    <li><strong>Know your prey.</strong> Use Keen Senses to learn a creature's weakness before engaging.</li>
+</ul>
+<p><strong>Story Hooks</strong>:</p>
+<ul>
+    <li>What uncharted territory are they exploring?</li>
+    <li>What secrets have they discovered in the wild?</li>
+    <li>How do they balance civilization and wilderness?</li>
+    <li>What prey (beast or man) still eludes them?</li>
+    <li>What ancient guardian did they once encounter and survive?</li>
+</ul>
+<p><strong>Legacy Note</strong>: Your animal companion or a young tracker (follower) could carry on your legacy. See the Epic Tier chapter.</p>
+<h4>Build Blocks</h4>
+<p><strong>Starting Build (32 XP).</strong></p>
+<ul>
+    <li><strong>Attributes</strong>: Wits 3 (9), Body 2 (6), Spirit 1 (3), Presence 1 (3) &rarr; <strong>21 XP</strong></li>
+    <li><strong>Skills</strong>: Lore 2 (4), Stealth 2 (4) &rarr; <strong>8 XP</strong></li>
+    <li><strong>Total</strong>: 29 XP (bank 1 XP)</li>
+</ul>
+<p><strong>With Bonds/Complications (36 XP).</strong></p>
+<ul>
+    <li>Add <strong>Talent</strong>: Keen Senses (2 XP)</li>
+    <li>Add <strong>Talent</strong>: Wilderness Lore (2 XP)</li>
+    <li><strong>Total</strong>: 29 + 4 = 33 XP (bank 1 XP)</li>
+</ul>
+</div>
+
+<div class="concept">
+<h2>7. The Survivor (Veteran / Outcast / Hardened)</h2>
+<p><strong>Concept</strong>: Someone who has endured hardship and developed resilience. <em>Scars are maps; read them well.</em> From the war-torn mercenary to the plague survivor, the Survivor won't break — they've already been broken and rebuilt.</p>
+<p><strong>Traditional Analogues</strong>: Barbarian (resilience focus), Veteran, Ranger (endurance), Drifter, Refugee, Hollow-Touched</p>
+<p><strong>Cultural Affinities</strong>: Acasia (war survivor), Ubral (clan exile), Mistlands (fog-touched), Linn (shipwreck survivor), Zakov (pressed crew), Ashaan (escaped slave)</p>
+<p><strong>Mechanical Foundation</strong>:</p>
+<ul>
+    <li><strong>Primary</strong>: Spirit (willpower, resolve), Body (toughness)</li>
+    <li><strong>Skills</strong>: Endurance, Lore (survival knowledge, terrain), (optionally) Insight (danger sense), Medicine (field)</li>
+    <li><strong>Talents</strong>: Iron Stomach, Conditioning, Second Wind</li>
+</ul>
+<p><strong>Play Style</strong>:</p>
+<ul>
+    <li>Enduring difficult conditions (lack of food, exposure, poison)</li>
+    <li>Overcoming physical and mental challenges through grit</li>
+    <li>Using experience to avoid dangers</li>
+    <li>Helping others survive hardships</li>
+    <li>Taking hits that would fell others and still standing</li>
+</ul>
+<h4>Development Path (by Tier)</h4>
+<ul>
+    <li><strong>Tier I</strong>: Raise Spirit to 3, Endurance/Lore to 2. Take <em>Iron Stomach</em> (3 XP) and <em>Second Wind</em> (2 XP).</li>
+    <li><strong>Tier II</strong>: Take <em>Conditioning</em> (4 XP) — your Body counts as +1 for Fatigue track. Raise Body to 3.</li>
+    <li><strong>Tier III</strong>: Take <em>Hollow-Touched</em> (8 XP) or <em>Stone-Bound Interdictor</em> (8 XP) to convert Harm to Fatigue. Build a safehouse (Minor Asset, 4 XP) for respite.</li>
+</ul>
+<h4>Tactical Advice</h4>
+<ul>
+    <li><strong>Embrace the roller-coaster effect.</strong> Taking Harm clears Fatigue — sometimes a small wound is a tactical reset.</li>
+    <li><strong>Iron Stomach makes you immune to mundane poisons and spoiled food.</strong> Volunteer to test unknown rations.</li>
+    <li><strong>Use <em>Second Wind</em> to clear Fatigue before it overflows into Harm.</strong></li>
+    <li><strong>When outmatched, use the environment.</strong> Collapse a wall, start a fire, or trigger a rockfall. Your survival skills tell you how.</li>
+    <li><strong>Know your limits, then push past them.</strong> You can take more punishment than anyone else. Use that.</li>
+</ul>
+<p><strong>Story Hooks</strong>:</p>
+<ul>
+    <li>What trauma or hardship have they survived?</li>
+    <li>How has their past shaped their present?</li>
+    <li>What survival skills have saved them repeatedly?</li>
+    <li>How do they help others facing similar challenges?</li>
+    <li>What do they still fear, despite everything?</li>
+</ul>
+<p><strong>Legacy Note</strong>: A fellow survivor (follower) can inherit your network of caches and safehouses. See the Epic Tier chapter.</p>
+<h4>Build Blocks</h4>
+<p><strong>Starting Build (32 XP).</strong></p>
+<ul>
+    <li><strong>Attributes</strong>: Spirit 3 (9), Body 2 (6), Wits 1 (3), Presence 1 (3) &rarr; <strong>21 XP</strong></li>
+    <li><strong>Skills</strong>: Endurance 2 (4), Lore 2 (4) &rarr; <strong>8 XP</strong></li>
+    <li><strong>Total</strong>: 29 XP (bank 1 XP)</li>
+</ul>
+<p><strong>With Bonds/Complications (36 XP).</strong></p>
+<ul>
+    <li>Add <strong>Talent</strong>: Iron Stomach (3 XP)</li>
+    <li><strong>Total</strong>: 29 + 3 = 32 XP (bank 2 XP)</li>
+</ul>
+</div>
+
+<div class="concept">
+<h2>8. The Innovator (Artificer / Engineer / Craft)</h2>
+<p><strong>Concept</strong>: A creative problem-solver who finds new solutions through craft and invention. <em>Blueprints on napkins, tomorrow in your pocket.</em> From the Aeler engineer to the Gnome timermaker, the Innovator builds what others only dream.</p>
+<p><strong>Traditional Analogues</strong>: Artificer, Engineer, Craft, Alchemist, Inventor, Savant</p>
+<p><strong>Cultural Affinities</strong>: Aeler (vent-prior), Aelinnel (clockwork artisan), Thepyrgos (academic engineer), Ngomebe (stone-singer), Cog-Cults (Monad devotee)</p>
+<p><strong>Mechanical Foundation</strong>:</p>
+<ul>
+    <li><strong>Primary</strong>: Wits (design, analysis), Body (fine manipulation)</li>
+    <li><strong>Skills</strong>: Craft, Investigation (analyzing mechanisms), (optionally) Lore (for alchemy or magical theory)</li>
+    <li><strong>Talents</strong>: Quick Study, Technical Expert, (optionally) Magical Laboratory asset</li>
+</ul>
+<p><strong>Play Style</strong>:</p>
+<ul>
+    <li>Solving problems with unique inventions</li>
+    <li>Creating or repairing specialized items</li>
+    <li>Providing services others cannot (lockpicking, trap disarm, device creation)</li>
+    <li>Using knowledge to gain advantages in planning</li>
+    <li>Building and maintaining Assets (workshops, laboratories, caches)</li>
+</ul>
+<h4>Development Path (by Tier)</h4>
+<ul>
+    <li><strong>Tier I</strong>: Raise Wits to 3, Craft/Investigation to 2. Take <em>Quick Study</em> (3 XP) and <em>Workshop</em> (Minor Asset, 4 XP).</li>
+    <li><strong>Tier II</strong>: Take <em>Efficient Invocation</em> (if magical) or <em>Weapon Mastery</em> (if martial). Raise Body to 3 for fine manipulation.</li>
+    <li><strong>Tier III</strong>: Take <em>Technical Expert</em> (custom) or <em>Crack Specialist</em> (for magical items). Build a Guild Workshop (Standard Asset, 8 XP) to attract apprentices.</li>
+</ul>
+<h4>Tactical Advice</h4>
+<ul>
+    <li><strong>Preparation is your superpower.</strong> Spend downtime building tools, traps, and contingencies. Your GM will reward that.</li>
+    <li><strong>Use <em>Quick Study</em> to learn enemy weaknesses</strong> on the fly. &ldquo;I notice the golem's joints are unarmored — aim there.&rdquo;</li>
+    <li><strong>Your workshop asset can jury-rig solutions.</strong> Spend 1 Boon to &ldquo;have the right tool&rdquo; for a lock, a trap, or a repair.</li>
+    <li><strong>When combat starts, use gadgets.</strong> Caltrops, smoke bombs, and flash pellets can shift Position without a spell slot.</li>
+    <li><strong>Document your inventions.</strong> Keep a list of gadgets you've built and their effects — this will make your play smoother and more creative.</li>
+</ul>
+<p><strong>Story Hooks</strong>:</p>
+<ul>
+    <li>What makes their specialty unique or valuable?</li>
+    <li>How did they acquire their special skills (guild, apprenticeship, self-taught)?</li>
+    <li>What problems require their specific expertise?</li>
+    <li>Who seeks to control or exploit their abilities?</li>
+    <li>What invention of theirs caused unintended harm?</li>
+</ul>
+<p><strong>Legacy Note</strong>: An apprentice (follower) can inherit your workshop and blueprints, continuing your inventive tradition. See the Epic Tier chapter.</p>
+<h4>Build Blocks</h4>
+<p><strong>Starting Build (32 XP).</strong></p>
+<ul>
+    <li><strong>Attributes</strong>: Wits 3 (9), Body 2 (6), Presence 1 (3), Spirit 1 (3) &rarr; <strong>21 XP</strong></li>
+    <li><strong>Skills</strong>: Craft 2 (4), Investigation 2 (4) &rarr; <strong>8 XP</strong></li>
+    <li><strong>Total</strong>: 29 XP (bank 1 XP)</li>
+</ul>
+<p><strong>With Bonds/Complications (36 XP).</strong></p>
+<ul>
+    <li>Add <strong>Talent</strong>: Quick Study (3 XP) — +1 die to learn or adapt from observation, using banked 1 + 4 = 5 XP; bank 2 XP</li>
+    <li><strong>Total</strong>: 32 XP (bank 2 XP)</li>
+</ul>
+</div>
+
+<div class="concept">
+<h2>9. The Summoner (Pact-Whisperer / Necromancer / Shaman)</h2>
+<p><strong>Concept</strong>: A binder of spirits, elementals, and otherworldly entities. <em>Circles of salt, whispered names, and bargains struck in shadows.</em> From the necromancer of the Mistlands to the shaman of the Steppe, the Summoner commands powers that others fear.</p>
+<p><strong>Traditional Analogues</strong>: Necromancer, Conjurer, Summoner, Shaman, Spirit Caller, Demonologist</p>
+<p><strong>Cultural Affinities</strong>: Mistlands (bell-warden), Ykrul (bone-singer), Tulkani (dream-speaker), Ashaan (Breath-less spirit-binder), Zakov (drowned caller), Sekogo (nganga)</p>
+<p><strong>Mechanical Foundation</strong>:</p>
+<ul>
+    <li><strong>Primary</strong>: Spirit (willpower, binding), Wits (rituals, names)</li>
+    <li><strong>Skills</strong>: Arcana, Lore (spirits), (optionally) Insight (reading spirits), Investigation (finding spirit traces)</li>
+    <li><strong>Talents</strong>: Pact-Whisperer (Lesser/Greater), Spirit Link, (optionally) Codex of Names</li>
+</ul>
+<p><strong>Play Style</strong>:</p>
+<ul>
+    <li>Summoning creatures to fight, scout, or work</li>
+    <li>Binding entities to solve problems (guard, research, transport)</li>
+    <li>Negotiating with spirits and outsiders (social challenges)</li>
+    <li>Managing Leash timers and Boon Finesse</li>
+    <li>Building relationships with specific spirits over time (Spirit Bond progression)</li>
+</ul>
+<h4>Development Path (by Tier)</h4>
+<ul>
+    <li><strong>Tier I</strong>: Take <em>Pact-Whisperer</em> (2 XP) and <em>Lesser Pactwright</em> (2 XP). Raise Spirit to 3, Arcana/Lore to 2.</li>
+    <li><strong>Tier II</strong>: Take <em>Greater Pactwright</em> (4 XP) to summon Cap 3 spirits. Take <em>Spirit Synergy</em> (4 XP) if you want two spirits.</li>
+    <li><strong>Tier III</strong>: Take <em>Spirit Link</em> (10 XP) or <em>True Name Keeper</em> (15 XP). Build a Spirit Circle (Minor Asset, 4 XP) to reduce Leash ticks.</li>
+</ul>
+<h4>Tactical Advice</h4>
+<ul>
+    <li><strong>Boon Finesse</strong> is your most important tool. Spend 1 Boon to clear 1 Leash tick — keep a reserve of 2&ndash;3 Boons for emergencies.</li>
+    <li><strong>Spirits are disposable but not free.</strong> Use them for dangerous tasks (scouting a trapped room, triggering a trap) before risking your own skin.</li>
+    <li><strong>When the Leash fills, the spirit acts once to its nature.</strong> Plan for it — position it near enemies before it breaks free.</li>
+    <li><strong>Negotiate with spirits.</strong> They have desires — a promise of freedom, a drop of blood, a secret. A willing spirit ticks Leash slower.</li>
+    <li><strong>Track Spirit Bonds.</strong> If you summon the same spirit repeatedly, you can build a Spirit Bond Timer, reducing Leash ticks over time.</li>
+</ul>
+<p><strong>Story Hooks</strong>:</p>
+<ul>
+    <li>What entity are they bound to or seeking?</li>
+    <li>What price did they pay for their first summoning?</li>
+    <li>How do others react to their &ldquo;dark&rdquo; magic?</li>
+    <li>Who hunts them for their forbidden practices?</li>
+    <li>What debt do they owe to a spirit that saved their life?</li>
+</ul>
+<p><strong>Legacy Note</strong>: A bonded spirit or an apprentice medium (follower) could inherit your spirit contracts, continuing your work. See the Epic Tier chapter.</p>
+<h4>Build Blocks</h4>
+<p><strong>Starting Build (32 XP).</strong></p>
+<ul>
+    <li><strong>Attributes</strong>: Spirit 3 (9), Wits 2 (6), Body 1 (3), Presence 1 (3) &rarr; <strong>21 XP</strong></li>
+    <li><strong>Skills</strong>: Arcana 2 (4), Lore 1 (2) &rarr; <strong>6 XP</strong></li>
+    <li><strong>Total</strong>: 27 XP (bank 3 XP)</li>
+</ul>
+<p><strong>With Bonds/Complications (36 XP).</strong></p>
+<ul>
+    <li>Add <strong>Talent</strong>: Pact-Whisperer (2 XP)</li>
+    <li>Add <strong>Talent</strong>: Lesser Pactwright (2 XP)</li>
+    <li><strong>Total</strong>: 27 + 4 = 31 XP (bank 3 XP; can add Familiar (2 XP) later or upgrade to Greater Pactwright)</li>
+</ul>
+</div>
+
+<div class="concept">
+<h2>10. The Commander (Warlord / Tactician / Leader)</h2>
+<p><strong>Concept</strong>: A leader who directs allies, controls battlefields, and shapes conflicts through strategy. <em>Orders in a whisper, victory in formation.</em> From the Condotta captain to the Ecktorian legate, the Commander wins before blades are drawn.</p>
+<p><strong>Traditional Analogues</strong>: Warlord, Marshal, Tactician, Commander, Strategist, Banneret</p>
+<p><strong>Cultural Affinities</strong>: Ecktoria (legate), Acasia (free company captain), Vhasia (marshal), Black Banners (condotta captain), Oshiira (Narrow Captain), Ykrul (war-leader)</p>
+<p><strong>Mechanical Foundation</strong>:</p>
+<ul>
+    <li><strong>Primary</strong>: Presence (authority, command), Wits (tactics, observation)</li>
+    <li><strong>Skills</strong>: Sway (leadership, morale), Insight (reading the battlefield, reading people), (optionally) Investigation (battlefield analysis)</li>
+    <li><strong>Talents</strong>: Inspire, Command Presence, Tactical Movement (for allies)</li>
+</ul>
+<p><strong>Play Style</strong>:</p>
+<ul>
+    <li>Directing allies in combat (bonus dice, improved Position)</li>
+    <li>Planning and executing tactical maneuvers</li>
+    <li>Leading followers and assets in mass action</li>
+    <li>Using authority to intimidate or persuade</li>
+    <li>Managing resources (supplies, morale, positioning) across extended operations</li>
+</ul>
+<h4>Development Path (by Tier)</h4>
+<ul>
+    <li><strong>Tier I</strong>: Raise Presence to 3, Sway/Insight to 2. Take <em>Command Presence</em> (4 XP) and <em>Inspire</em> (3 XP).</li>
+    <li><strong>Tier II</strong>: Take <em>Tactical Movement</em> (4 XP) and <em>Network Builder</em> (4 XP). Acquire a Cap 2&ndash;3 follower (soldier, herald).</li>
+    <li><strong>Tier III</strong>: Take <em>Battlefield Mastery</em> (6 XP) or <em>Mystic Bulwark</em> (8 XP). Build a War Chest (Standard Asset, 8 XP) to fund operations.</li>
+</ul>
+<h4>Tactical Advice</h4>
+<ul>
+    <li><strong>Use <em>Inspire</em> to give allies +1 die and +1 Boon.</strong> A well-timed inspiration can turn a miss into a success.</li>
+    <li><strong>Your followers are your strength.</strong> Keep them alive — spend Boons to protect them. A Cap 3 scout is worth more than a single attack.</li>
+    <li><strong>Use <em>Tactical Movement</em> to reposition without disengaging.</strong> Order allies to flank while you hold the line.</li>
+    <li><strong>In mass combat, treat your unit as a high-Cap follower.</strong> Your command roll can advance the War Timer faster than any sword.</li>
+    <li><strong>Know when to fight and when to retreat.</strong> A good commander wins battles; a great commander wins campaigns, sometimes by losing a skirmish.</li>
+</ul>
+<p><strong>Story Hooks</strong>:</p>
+<ul>
+    <li>What army or company did they lead before?</li>
+    <li>What strategic defeat haunts them?</li>
+    <li>Who are their rivals in the art of war?</li>
+    <li>What cause do they fight for — coin, country, or creed?</li>
+    <li>What soldiers died under their command, and how do they honor them?</li>
+</ul>
+<p><strong>Legacy Note</strong>: A loyal lieutenant or sergeant (follower) can inherit your command, leading the company after you. See the Epic Tier chapter.</p>
+<h4>Build Blocks</h4>
+<p><strong>Starting Build (32 XP).</strong></p>
+<ul>
+    <li><strong>Attributes</strong>: Presence 3 (9), Wits 2 (6), Body 1 (3), Spirit 1 (3) &rarr; <strong>21 XP</strong></li>
+    <li><strong>Skills</strong>: Sway 2 (4), Insight 2 (4) &rarr; <strong>8 XP</strong></li>
+    <li><strong>Total</strong>: 29 XP (bank 1 XP)</li>
+</ul>
+<p><strong>With Bonds/Complications (36 XP).</strong></p>
+<ul>
+    <li>Add <strong>Talent</strong>: Command Presence (4 XP) — +1 die on leadership/intimidation rolls, using banked 1 + 4 = 5 XP; bank 1 XP</li>
+    <li><strong>Total</strong>: 33 XP (bank 1 XP)</li>
+</ul>
+</div>
+
+<div class="concept">
+<h2>11. The Duelist (Swashbuckler / Fencer / Blade)</h2>
+<p><strong>Concept</strong>: A master of one-on-one combat, relying on speed, precision, and flair rather than heavy armor. <em>Steel is a conversation; you speak it fluently.</em> From the Vhasian tournament knight to the Sidhi knife-dancer, the Duelist lives for the clash of blades.</p>
+<p><strong>Traditional Analogues</strong>: Swashbuckler, Fencer, Duelist, Blade, Rogue (combat focus), Monk (weapon focus)</p>
+<p><strong>Cultural Affinities</strong>: Vhasia (tourney knight), Viterra (legal duelist), Zakov (pirate duelist), Ubral (clan champion), Sidhi (knife-dancer), Nihori (wandering ronin)</p>
+<p><strong>Mechanical Foundation</strong>:</p>
+<ul>
+    <li><strong>Primary</strong>: Body (agility, speed), Wits (timing, reading opponents)</li>
+    <li><strong>Skills</strong>: Melee (Light weapons), Athletics (acrobatics), Insight (reading opponents), (optionally) Sway (taunt, feint)</li>
+    <li><strong>Talents</strong>: Weapon Master (Light Blade), Elusive Dodge, High Stance Duelist</li>
+</ul>
+<p><strong>Play Style</strong>:</p>
+<ul>
+    <li>One-on-one combat dominance</li>
+    <li>Mobility and positioning (flanking, dancing around enemies)</li>
+    <li>Using feints and taunts to control opponent's actions</li>
+    <li>Parrying and riposting (converting defense into offense)</li>
+    <li>Social dueling (fighting for honor or reputation, not just survival)</li>
+</ul>
+<h4>Development Path (by Tier)</h4>
+<ul>
+    <li><strong>Tier I</strong>: Raise Body to 3, Melee to 2. Take <em>Weapon Master</em> (Light Blade, 5 XP) and <em>Elusive Dodge</em> (2 XP).</li>
+    <li><strong>Tier II</strong>: Take <em>High Stance Duelist</em> (6 XP) and <em>Flurry Strike</em> (6 XP). Raise Wits to 3 for reading opponents.</li>
+    <li><strong>Tier III</strong>: Take <em>Duelist's Edge</em> (6 XP) or <em>Deathblow</em> (12 XP). Acquire a signature blade (Minor Asset, 4 XP) with an enchantment.</li>
+</ul>
+<h4>Tactical Advice</h4>
+<ul>
+    <li><strong>Your goal is to isolate a single target.</strong> Use mobility to separate an enemy from the group.</li>
+    <li><strong>Use <em>High Stance Duelist</em> to gain advantage</strong> when fighting a single opponent. Spend Boons to improve Position.</li>
+    <li><strong>Flurry Strike lets you make two attacks</strong> as one action. Use it to finish a wounded foe or to test a high-defense enemy.</li>
+    <li><strong>Parry and riposte are your friends.</strong> When you successfully defend, look for opportunities to counterattack as a free action (ask your GM).</li>
+    <li><strong>Social dueling matters.</strong> In honor cultures (Vhasia, Viterra, Ubral), winning a duel fairly can resolve conflicts without further bloodshed.</li>
+</ul>
+<p><strong>Story Hooks</strong>:</p>
+<ul>
+    <li>What duel did they lose that still stings?</li>
+    <li>Whose honor are they sworn to defend?</li>
+    <li>What signature technique did they develop themselves?</li>
+    <li>Why did they leave their fencing school or tradition?</li>
+    <li>What blade do they carry, and whose was it before theirs?</li>
+</ul>
+<p><strong>Legacy Note</strong>: A promising student (follower) can inherit your signature technique and blade. See the Epic Tier chapter.</p>
+<h4>Build Blocks</h4>
+<p><strong>Starting Build (32 XP).</strong></p>
+<ul>
+    <li><strong>Attributes</strong>: Body 3 (9), Wits 2 (6), Spirit 1 (3), Presence 1 (3) &rarr; <strong>21 XP</strong></li>
+    <li><strong>Skills</strong>: Melee 2 (4), Athletics 1 (2), Insight 1 (2) &rarr; <strong>8 XP</strong></li>
+    <li><strong>Total</strong>: 29 XP (bank 1 XP)</li>
+</ul>
+<p><strong>With Bonds/Complications (36 XP).</strong></p>
+<ul>
+    <li>Add <strong>Talent</strong>: Weapon Master (Light Blade, 5 XP) using banked 1 + 4 = 5 XP; bank 0 XP</li>
+    <li><strong>Total</strong>: 34 XP (bank 0 XP)</li>
+</ul>
+</div>
+
+<div class="concept">
+<h2>12. The Occultist (Investigator of the Unseen)</h2>
+<p><strong>Concept</strong>: A detective of the supernatural, solving mysteries that involve spirits, curses, and forbidden lore. <em>Dusty tomes, silver mirrors, and the patience to listen to what does not speak.</em> From the Thepyrgos scholar to the Mistlands exorcist, the Occultist knows that every haunting has a witness.</p>
+<p><strong>Traditional Analogues</strong>: Investigator (supernatural), Occultist, Lorekeeper, Exorcist, Paranormal Detective, Witch-Finder</p>
+<p><strong>Cultural Affinities</strong>: Thepyrgos (academic occultist), Mistlands (bell-warden), Valewood (Lethai-thora archivist), Ashaan (Breath-less researcher), Tulkani (dream-interpreter), Sekogo (nganga diagnostician)</p>
+<p><strong>Mechanical Foundation</strong>:</p>
+<ul>
+    <li><strong>Primary</strong>: Wits (investigation, pattern recognition), Spirit (willpower, sensing the unseen)</li>
+    <li><strong>Skills</strong>: Investigation, Lore (spirits, curses), Insight, (optionally) Arcana (for magical detection)</li>
+    <li><strong>Talents</strong>: Keen Senses, Occult Knowledge (custom), Ritual Mastery</li>
+</ul>
+<p><strong>Play Style</strong>:</p>
+<ul>
+    <li>Investigating supernatural phenomena</li>
+    <li>Identifying curses, possessions, and hauntings</li>
+    <li>Performing exorcisms and banishing rites</li>
+    <li>Researching forgotten lore in archives and libraries</li>
+    <li>Consulting with spirits (through ritual or mediumship)</li>
+</ul>
+<h4>Development Path (by Tier)</h4>
+<ul>
+    <li><strong>Tier I</strong>: Raise Wits to 3, Investigation/Lore to 2. Take <em>Keen Senses</em> (2 XP) and <em>Occult Knowledge</em> (custom, 3 XP).</li>
+    <li><strong>Tier II</strong>: Take <em>Ritual Mastery</em> (4 XP) and <em>Contamination Control</em> (custom, 4 XP). Raise Spirit to 3.</li>
+    <li><strong>Tier III</strong>: Take <em>Crack Specialist</em> or <em>Hollow-Sight</em> (custom, 8 XP). Build an Archive (Standard Asset, 8 XP) to store your findings.</li>
+</ul>
+<h4>Tactical Advice</h4>
+<ul>
+    <li><strong>Investigation is your primary tool.</strong> Ask the GM questions: &ldquo;What kind of spirit is this? What unfinished business does it have? What's the anchor?&rdquo;</li>
+    <li><strong>Lore checks can reveal weaknesses.</strong> A spirit may be vulnerable to a specific salt, a forgotten name, or an iron bell.</li>
+    <li><strong>Rituals take time, but they work.</strong> Use <em>Ritual Mastery</em> to reduce casting time when the ghost is about to attack.</li>
+    <li><strong>Document everything.</strong> Your notes may become Assets (case files) that give bonuses to future investigations.</li>
+    <li><strong>Sometimes the solution is not to banish, but to listen.</strong> Many spirits just need to be witnessed.</li>
+</ul>
+<p><strong>Story Hooks</strong>:</p>
+<ul>
+    <li>What unsolved haunting drives them?</li>
+    <li>What forbidden text did they read (and what did it cost them)?</li>
+    <li>Who refuses to believe their findings?</li>
+    <li>What spirit have they failed to help, and how does it haunt them?</li>
+    <li>What secret does the Church want them to stop investigating?</li>
+</ul>
+<p><strong>Legacy Note</strong>: A student or junior investigator (follower) can inherit your case files and contacts. See the Epic Tier chapter.</p>
+<h4>Build Blocks</h4>
+<p><strong>Starting Build (32 XP).</strong></p>
+<ul>
+    <li><strong>Attributes</strong>: Wits 3 (9), Spirit 2 (6), Body 1 (3), Presence 1 (3) &rarr; <strong>21 XP</strong></li>
+    <li><strong>Skills</strong>: Investigation 2 (4), Lore 2 (4) &rarr; <strong>8 XP</strong></li>
+    <li><strong>Total</strong>: 29 XP (bank 1 XP)</li>
+</ul>
+<p><strong>With Bonds/Complications (36 XP).</strong></p>
+<ul>
+    <li>Add <strong>Talent</strong>: Keen Senses (2 XP)</li>
+    <li>Add <strong>Talent</strong>: Occult Knowledge (3 XP, custom: +1 die to identify supernatural creatures and curses)</li>
+    <li><strong>Total</strong>: 29 + 5 = 34 XP (bank 0 XP)</li>
+</ul>
+</div>
+
+<div class="concept">
+<h2>13. The Infiltrator (Spy / Agent / Intelligence Officer)</h2>
+<p><strong>Concept</strong>: A master of disguise, deception, and covert action. <em>Faces are costumes; trust is a vulnerability.</em> From the Vilikari spy to the Ashaani Breath-less agent, the Infiltrator moves through the world unnoticed, collecting secrets and planting lies.</p>
+<p><strong>Traditional Analogues</strong>: Spy, Agent, Infiltrator, Social Rogue, Intelligence Officer, Saboteur</p>
+<p><strong>Cultural Affinities</strong>: Vilikari (border agent), Ashaan (Breath-less spy), Ecktoria (Censorate informer), Thepyrgos (Chain-Lantern mole), Silkstrand (information broker), Zakov (syndicate agent)</p>
+<p><strong>Mechanical Foundation</strong>:</p>
+<ul>
+    <li><strong>Primary</strong>: Presence (disguise, deception), Wits (observation, planning)</li>
+    <li><strong>Skills</strong>: Deception, Subterfuge, Insight, (optionally) Stealth</li>
+    <li><strong>Talents</strong>: Silver Tongue, Silk Palms, Shadow Dance (for escapes)</li>
+</ul>
+<p><strong>Play Style</strong>:</p>
+<ul>
+    <li>Infiltrating secure locations under false identities</li>
+    <li>Planting misinformation and framing rivals</li>
+    <li>Extracting secrets from unwilling targets</li>
+    <li>Operating behind enemy lines</li>
+    <li>Maintaining a cover identity for months or years</li>
+</ul>
+<h4>Development Path (by Tier)</h4>
+<ul>
+    <li><strong>Tier I</strong>: Raise Presence to 3, Deception/Subterfuge to 2. Take <em>Silver Tongue</em> (2 XP) and <em>Silk Palms</em> (2 XP).</li>
+    <li><strong>Tier II</strong>: Take <em>Trackless Step</em> (2 XP) and <em>Network Builder</em> (4 XP). Raise Wits to 3.</li>
+    <li><strong>Tier III</strong>: Take <em>Shadow Dance</em> (10 XP) for escapes. Build a Spy Network (Standard Asset, 8 XP).</li>
+</ul>
+<h4>Tactical Advice</h4>
+<ul>
+    <li><strong>Cover identities are your most valuable asset.</strong> Spend downtime building them. Have at least one backup.</li>
+    <li><strong>Use <em>Silk Palms</em> to create temporary Strings.</strong> A bribe today becomes a favor tomorrow.</li>
+    <li><strong>Never reveal your true agenda.</strong> Let your targets think you're a merchant, a pilgrim, a lost traveler.</li>
+    <li><strong>Always have an escape route.</strong> <em>Shadow Dance</em> is expensive, but worth it when the guard patrol turns the corner.</li>
+    <li><strong>The best intelligence is what they give you willingly.</strong> Use Insight to learn what someone wants, then position yourself as the one who can provide it.</li>
+</ul>
+<p><strong>Story Hooks</strong>:</p>
+<ul>
+    <li>What intelligence agency or patron do they serve?</li>
+    <li>What secret are they trying to uncover?</li>
+    <li>What cover identity has become uncomfortably real?</li>
+    <li>Who burned them, and how will they get even?</li>
+    <li>What would they sacrifice to protect their true identity?</li>
+</ul>
+<p><strong>Legacy Note</strong>: A handler or junior agent (follower) can inherit your network of covers and contacts. See the Epic Tier chapter.</p>
+<h4>Build Blocks</h4>
+<p><strong>Starting Build (32 XP).</strong></p>
+<ul>
+    <li><strong>Attributes</strong>: Presence 3 (9), Wits 2 (6), Body 1 (3), Spirit 1 (3) &rarr; <strong>21 XP</strong></li>
+    <li><strong>Skills</strong>: Deception 2 (4), Subterfuge 2 (4) &rarr; <strong>8 XP</strong></li>
+    <li><strong>Total</strong>: 29 XP (bank 1 XP)</li>
+</ul>
+<p><strong>With Bonds/Complications (36 XP).</strong></p>
+<ul>
+    <li>Add <strong>Talent</strong>: Silver Tongue (2 XP)</li>
+    <li>Add <strong>Talent</strong>: Silk Palms (2 XP)</li>
+    <li><strong>Total</strong>: 29 + 4 = 33 XP (bank 1 XP)</li>
+</ul>
+</div>
+
+<div class="concept">
+<h2>14. The Channeler (Medium / Spiritualist / Oracle)</h2>
+<p><strong>Concept</strong>: A vessel for spirits, voices, and visions from beyond the veil. <em>The dead speak through me; I am their mouth and their mercy.</em> From the Tulkani dream-speaker to the Mistlands spirit-medium, the Channeler bridges the living and the dead.</p>
+<p><strong>Traditional Analogues</strong>: Medium, Spiritualist, Oracle, Seer, Shaman (spirit channeling), Vessel</p>
+<p><strong>Cultural Affinities</strong>: Tulkani (dream-speaker), Mistlands (spirit-medium), Sekogo (nganga channeler), Theona (Green Host whisperer), Ashaan (Breath-less spirit-binder), Linn (volva)</p>
+<p><strong>Mechanical Foundation</strong>:</p>
+<ul>
+    <li><strong>Primary</strong>: Spirit (willpower, channeling), Presence (conduit strength)</li>
+    <li><strong>Skills</strong>: Arcana (rituals, spirit work), Lore (spirits, the dead), Insight (reading spirits), (optionally) Performance (trance work)</li>
+    <li><strong>Talents</strong>: Summoning (spirit focus), Cantor's Path (for spirit-Songs), Spirit Link</li>
+</ul>
+<p><strong>Play Style</strong>:</p>
+<ul>
+    <li>Channeling spirits to gain knowledge or perform tasks</li>
+    <li>Serving as a medium between the living and the dead</li>
+    <li>Receiving visions and prophecies (with GM guidance)</li>
+    <li>Performing seances and spirit consultations</li>
+    <li>Managing the risk of possession or spiritual contamination</li>
+</ul>
+<h4>Development Path (by Tier)</h4>
+<ul>
+    <li><strong>Tier I</strong>: Raise Spirit to 3, Arcana/Lore to 2. Take <em>Pact-Whisperer</em> (2 XP) and a spiritual Patron (Ikasha, Pale Shepherd, or Witness).</li>
+    <li><strong>Tier II</strong>: Take <em>Spirit Link</em> (10 XP) or <em>Cantor's Path</em> (8 XP). Raise Presence to 3.</li>
+    <li><strong>Tier III</strong>: Take <em>True Name Keeper</em> (15 XP) or <em>Embraced Corruption</em> (12 XP for Cantors). Build a Spirit Circle (Standard Asset, 8 XP).</li>
+</ul>
+<h4>Tactical Advice</h4>
+<ul>
+    <li><strong>Channeling is risky.</strong> Each time you let a spirit speak through you, tick a Spirit Obligation timer. On fill, the spirit may try to stay.</li>
+    <li><strong>Visions are clues, not scripts.</strong> When you receive a prophecy, work with your GM to interpret it. It may be cryptic, but it's never false.</li>
+    <li><strong>Use rituals to consult the dead.</strong> A successful ritual can answer one question about a death or a hidden secret.</li>
+    <li><strong>Protect yourself.</strong> Salt circles, iron bells, and witness cords can keep unwanted spirits from piggybacking on your channeling.</li>
+    <li><strong>The dead have their own agendas.</strong> A spirit may answer your question, but it may also ask for something in return.</li>
+</ul>
+<p><strong>Story Hooks</strong>:</p>
+<ul>
+    <li>What spirit first spoke through them, and why?</li>
+    <li>What prophecy do they carry that no one believes?</li>
+    <li>How do they manage the constant presence of the dead?</li>
+    <li>What spirit wants to possess them permanently, and how do they resist?</li>
+    <li>What secret do the dead want revealed, and who wants it to stay hidden?</li>
+</ul>
+<p><strong>Legacy Note</strong>: A student medium (follower) can inherit your spirit contacts and channeling techniques. See the Epic Tier chapter.</p>
+<h4>Build Blocks</h4>
+<p><strong>Starting Build (32 XP).</strong></p>
+<ul>
+    <li><strong>Attributes</strong>: Spirit 3 (9), Presence 2 (6), Wits 1 (3), Body 1 (3) &rarr; <strong>21 XP</strong></li>
+    <li><strong>Skills</strong>: Arcana 2 (4), Lore 1 (2), Insight 1 (2) &rarr; <strong>8 XP</strong></li>
+    <li><strong>Total</strong>: 29 XP (bank 1 XP)</li>
+</ul>
+<p><strong>With Bonds/Complications (36 XP).</strong></p>
+<ul>
+    <li>Add <strong>Talent</strong>: Pact-Whisperer (2 XP)</li>
+    <li><strong>Total</strong>: 31 XP (bank 3 XP; can add Cantor's Path or Spirit Link later)</li>
+</ul>
+</div>
+
+<div class="concept">
+<h2>15. The Psion (Mindwalker / Outsider / Untrusted)</h2>
+<p class="text-muted"><em>Note: Psionics is an optional system detailed in the Gray Warden's Grimoire.</em></p>
+<p><strong>Concept</strong>: A wielder of purely internal power — no Patron, no Codex, no Symbol, no visible sign. <em>The mind is a fortress; the walls are your own skull.</em> From the Deep Watchers of Aeler to the Weather Readers of the Ykrul, the Psion is feared because they cannot be accounted for. They owe nothing — and therefore can be trusted with nothing.</p>
+<p><strong>Traditional Analogues</strong>: Psion, Psychic, Mentalist, Telepath, Mind Mage, Aberrant</p>
+<p><strong>Cultural Affinities</strong>: Aeler (Deep Watcher — sealed in vaults, useful but contained), Thepyrgos (licensed investigator, monitored by the Synod), Ykrul (Weather Reader — sees the shape of the future), Vilikari (information broker, memory trader), Tulkani (dream-speaker), Lethai (context keeper, but distrusted), Ubral (oracle or exile)</p>
+<p><strong>Mechanical Foundation</strong>:</p>
+<ul>
+    <li><strong>Primary</strong>: Spirit (willpower, mental fortitude), Wits (perception, psychic finesse)</li>
+    <li><strong>Skills</strong>: Psionics (the core skill), Investigation (reading minds, piecing together fragments), Lore (understanding the mind's architecture), Insight (reading emotions), (optionally) Stealth (for psychic infiltration)</li>
+    <li><strong>Talents</strong>: See <strong><em>The Gray Wanderer's Grimoire</em></strong> for full rules on Mental Strain, the Nine Arts, and Psionic Talents.</li>
+</ul>
+<p><strong>Play Style</strong>:</p>
+<ul>
+    <li>Gathering information through telepathy and clairvoyance</li>
+    <li>Influencing others through empathic manipulation and telepathic suggestion</li>
+    <li>Protecting allies with psychic shields</li>
+    <li>Solving problems through perception and mental agility</li>
+    <li>Investigating mysteries and uncovering secrets</li>
+    <li><strong>Note:</strong> Psions are <em>system outsiders</em>. They don't fit the Obligation/debt structure that governs other magic paths. This makes them powerful — and deeply mistrusted.</li>
+</ul>
+<h4>Development Path (by Tier)</h4>
+<ul>
+    <li><strong>Tier I (0&ndash;40 XP)</strong>: Take the Psionics skill at 2. Raise Spirit to 3. Take a foundational Art: Telepathy (surface thoughts) or Mind Shield (basic resilience). You are an investigator, not a combatant — yet.</li>
+    <li><strong>Tier II (41&ndash;90 XP)</strong>: Take a second Art (Clairvoyance for scouting, Telekinesis for utility). Raise Wits to 3. Consider taking <em>Mental Fortress</em> (6 XP) to resist psychic intrusion and reduce Mental Strain.</li>
+    <li><strong>Tier III (91&ndash;150 XP)</strong>: Take a third Art (Psychic Assault for combat, Precognition for foresight). Take <em>Expanded Resonance</em> (8 XP) to increase your Mental Strain capacity. Build an Archive of Secrets (Standard Asset, 8 XP) to store the memories you've extracted from others. Your power is now a resource, not just a curiosity.</li>
+</ul>
+<h4>Tactical Advice</h4>
+<ul>
+    <li><strong>Mental Strain is your primary resource.</strong> It recovers slowly; treat it like a limited spell pool. Use Boons to improve Position instead of forcing extra psychic exertions.</li>
+    <li><strong>Telepathy is your signature ability.</strong> Read surface thoughts before entering any negotiation. Learn the emotional states of guards, merchants, and rivals. Knowledge is power — and you have the most intimate kind.</li>
+    <li><strong>Mind Shield is your survival tool.</strong> In a world that fears you, enemies will try to break into your mind. Keep it up.</li>
+    <li><strong>Clairvoyance lets you scout without risk.</strong> Use it to survey a building, a battlefield, or a social gathering before you commit to action.</li>
+    <li><strong>Psychic Assault bypasses armor.</strong> A well-placed mental strike can incapacitate a warrior in full plate. But it costs Strain — use it only when necessary.</li>
+</ul>
+<p><strong>Story Hooks</strong>:</p>
+<ul>
+    <li><strong>System Outsider:</strong> You don't owe Obligation to any Patron. This makes you <em>free</em> — but also <em>suspect</em>. The Chain-Lanterns want to license you; the Aeler want to seal you; the Ykrul want to read you. What is the price of freedom?</li>
+    <li><strong>The Great Silence:</strong> Psions have been hunted and feared since the Great Silence. What caused it? Are you part of the Second Awakening — or a remnant of the First? What did the ancient psions learn that the world forced them to forget?</li>
+    <li><strong>The Empty Circle:</strong> The Ykrul say the psions of old walked into the Empty Circle and never came out. You have dreamed of it. What waits there for you?</li>
+    <li><strong>The Thought Trade:</strong> In Vilikari and Silkstrand, memories and sensations are traded like currency. You have extracted secrets from a noble's mind and sold them to a rival. What do you owe the client? What does the client owe you?</li>
+    <li><strong>The Whispering Vaults:</strong> In Aeler, your kind are useful but contained. You were once sealed in a Deep Vault to &ldquo;protect&rdquo; you. What did you see there? What did they make you forget?</li>
+</ul>
+<p><strong>Legacy Note</strong>: A corrupted student or a fragment of your own psyche (a psychic echo) can inherit your path. But caution: the student may attract the Chain-Lanterns, and the echo may become independent. See the Epic Tier chapter.</p>
+<h4>Build Blocks</h4>
+<p><strong>Starting Build (32 XP).</strong></p>
+<ul>
+    <li><strong>Attributes</strong>: Spirit 3 (9), Wits 2 (6), Body 1 (3), Presence 1 (3) &rarr; <strong>21 XP</strong></li>
+    <li><strong>Skills</strong>: Psionics 2 (4), Investigation 1 (2), Insight 1 (2) &rarr; <strong>8 XP</strong></li>
+    <li><strong>Total</strong>: 29 XP (bank 1 XP)</li>
+</ul>
+<p><strong>With Bonds/Complications (36 XP).</strong></p>
+<ul>
+    <li>Add <strong>Talent</strong>: Telepathy (foundational Art) — costs 0 XP with Psionics skill, but requires training. Alternatively, spend 4 XP to take <em>Mental Fortress</em> (reduces Mental Strain from resisted intrusions) and bank 2 XP.</li>
+    <li><strong>Suggested</strong>: Take <em>Mental Fortress</em> (4 XP) and bank 2 XP. Use remaining XP for a Minor Asset: Hidden Cache (4 XP) to store your secret notes and research.</li>
+    <li><strong>Total</strong>: 33 XP (bank 1 XP)</li>
+</ul>
+<h4>Psionics Quick Reference</h4>
+<ul>
+    <li><strong>Mental Strain Capacity:</strong> Spirit + 2.</li>
+    <li><strong>Psionics Skill:</strong> Governs all psychic Arts. Each Art has a Key Attribute (Spirit for Telekinesis, Wits for Clairvoyance, etc.).</li>
+    <li><strong>Nine Arts:</strong> Telekinesis, Telepathy, Clairvoyance, Biofeedback, Astral Projection, Psychic Assault, Mind Shield, Empathic Manipulation, Precognition.</li>
+    <li><strong>The Great Silence:</strong> A historical cataclysm that nearly erased psionics. Psions are still feared because they don't fit the Obligation/debt structure that binds other magic paths.</li>
+    <li><strong>Cultural Reception:</strong> Feared in Ecktoria, licensed in Thepyrgos, sealed in Aeler, shunned in Aelaerem, respected-but-distrusted in Lethai.</li>
+</ul>
+<p class="text-sm text-muted"><em>For full rules on Mental Strain, the Nine Arts, and the cultural history of psionics, see <strong>The Gray Wanderer's Grimoire</strong>.</em></p>
+</div>
+
+<h2>Reskinning the Paths: Runekeeper and Invoker as Familiar Concepts</h2>
+<p>The magic systems in <em>Fate's Edge</em> are designed to be reimagined. Neither <strong>Runekeeper</strong> (Thiasos + Codex) nor <strong>Invoker</strong> (Patron's Symbol) is locked into a single narrative identity. Below are common reskins — use the same mechanics, change the fiction.</p>
+
+<h3>Runekeeper &mdash; The Devoted Agent</h3>
+<p>A Runekeeper has sworn themselves to a single Patron, learning its Rites and bearing its Obligation. This framework can represent:</p>
+<ul>
+    <li><strong>Paladin / Crusader:</strong> Sworn to the <em>Oath of Flame &amp; Light</em> or the <em>Inquisitor Prime</em>. Rites become prayers, smites, and consecrations. The Codex is a prayer book or a vow-etched gauntlet.</li>
+    <li><strong>Warlock / Pact-Bearer:</strong> Bound to a distant, alien, or dangerous Patron (e.g., Khemesh, Malachai, the Ninth). Rites are granted, not learned. Obligation is the steady pull of a bargain.</li>
+    <li><strong>Cleric / Priest:</strong> Devoted to the Everflame, the Pale Shepherd, or other divine powers. Rites are liturgies. The Patron's Gift is a blessing or a relic.</li>
+    <li><strong>Dark Knight / Death Knight:</strong> A fallen or morally ambiguous warrior who draws power from a grim Patron (Carrion-King, Mor'iraath). Melee and Rites mix; Obligation is a slow doom.</li>
+</ul>
+<p><em>Mechanical core unchanged:</em> 1 action Rites, Obligation track, Patron's Gift imbuement, Push It option.</p>
+
+<h3>Invoker &mdash; The Professional Occultist</h3>
+<p>An Invoker does not fully commit to a single Patron. Instead, they carry <strong>Symbols</strong> (often tools, badges, or relics) of several Powers and perform rituals to invoke their Rites. This framework can represent:</p>
+<ul>
+    <li><strong>Exorcist / Witch Hunter:</strong> Carries symbols of several protective Patrons (The Sealed Gate, Oath of Flame, Gallow's Bell). Rites are wards, banishments, and purification rituals. <em>Crack the Seal</em> is an emergency exorcism.</li>
+    <li><strong>Alienist / Scholar of the Unseen:</strong> Studies forbidden Patrons (The Ninth, Khemesh, Mor'iraath) from a safe distance — &ldquo;safe&rdquo; being relative. Uses Symbol libraries to invoke their power without full devotion. Rituals are experimental and dangerous.</li>
+    <li><strong>Consulting Occultist / Paranormal Investigator:</strong> Carries a briefcase or satchel of Symbols — a bell from the Mistlands, a sun-seal from Ecktoria, a hag's stone from Aelinnel. Hired to solve magical problems. Rituals are filed like work orders; <em>Crack the Seal</em> is &ldquo;burning a favor.&rdquo;</li>
+    <li><strong>Ritualist / Ceremonial Mage:</strong> Believes that power lies in procedure, not faith. Each Symbol is a &ldquo;key&rdquo; — a geometric diagram, a calendar, a consecrated blade. Rites are slow, deliberate, and precise. The Invoker is a technician, not a worshipper.</li>
+</ul>
+<p><em>Mechanical core unchanged:</em> Ritual time, Obligation per invocation, Symbol display reduces cost, <em>Crack the Seal</em> for instant effect.</p>
+
+<h3>Mixing and Blurring Lines</h3>
+<p>Characters may also blend these frameworks — a Runekeeper who occasionally carries a second Symbol for emergency rites, or an Invoker who one day pledges fully to a Patron and becomes a Runekeeper. The system does not penalize narrative growth; simply retrain Talents during downtime when the fiction justifies it.</p>
+<p><em>Remember:</em> The fiction leads. If you want to play a Paladin, describe your Runekeeper's Rites as prayers. If you want a Vodouisant or Hoodoo practitioner, reflavor Patron's Symbols as sacred bundles, veves, or spirit vessels. If you want a monster hunter, carry a satchel of monster-specific Symbols (silver stake, iron bell, cold iron nail). The mechanics stay the same; the story breathes.</p>
+
+<h2>Creating Your Own Concept</h2>
+<h3>Start with Narrative</h3>
+<ul>
+    <li>What is your character's background and motivation?</li>
+    <li>What role do they play in their community or society?</li>
+    <li>What relationships are important to them?</li>
+    <li>What goals are they pursuing?</li>
+</ul>
+<h3>Add Mechanical Support</h3>
+<ul>
+    <li>Choose attributes that support your concept</li>
+    <li>Select skills that reflect their training and experience</li>
+    <li>Consider talents that provide unique capabilities</li>
+    <li>Think about assets that represent their resources</li>
+</ul>
+<h3>Consider Group Role</h3>
+<ul>
+    <li>How does your concept complement other party members?</li>
+    <li>What gaps in group capability can you fill?</li>
+    <li>What unique contributions can you make?</li>
+    <li>How will you work with other characters?</li>
+</ul>
+<h3>Plan for Growth</h3>
+<ul>
+    <li>What short-term improvements make sense?</li>
+    <li>What long-term development aligns with your concept?</li>
+    <li>How might your character change over time?</li>
+    <li>What legacy do you want to build? (See the Epic Tier chapter)</li>
+</ul>
+
+<div class="panel panel-green">
+    <span class="panel-title">Character Concept Worksheet</span>
+    <p><strong>Narrative Elements:</strong></p>
+    <ul>
+        <li>Concept: ______________________</li>
+        <li>Traditional Analogues: ______________________</li>
+        <li>Cultural Origin: ______________________</li>
+        <li>Motivation: ______________________</li>
+        <li>Background: ______________________</li>
+        <li>Relationships: ______________________</li>
+    </ul>
+    <p class="mt-1"><strong>Mechanical Foundation:</strong></p>
+    <ul>
+        <li>Primary Attributes: ______________________</li>
+        <li>Key Skills: ______________________</li>
+        <li>Starting Talents: ______________________</li>
+        <li>Initial Assets: ______________________</li>
+    </ul>
+    <p class="mt-1"><strong>Development Plan:</strong></p>
+    <ul>
+        <li>Short-term goals: ______________________</li>
+        <li>Long-term vision: ______________________</li>
+    </ul>
+</div>
+
+<h2>Final Notes</h2>
+<p>Remember that these examples are starting points, not limitations. The most interesting characters often combine elements from multiple concepts or create entirely new approaches. Work with your Game Master to ensure your character concept fits the campaign and provides engaging story opportunities.</p>
+<p>The best characters are those that you find interesting to play and that contribute to an enjoyable experience for everyone at the table.</p>
+
+<h3>Quick Reference: Concept Summary Table</h3>
+<div class="table-wrap">
+<table>
+<thead><tr><th>Concept</th><th>Primary Attributes</th><th>Key Talents</th></tr></thead>
+<tbody>
+<tr><td>Guardian</td><td>Body, Spirit</td><td>Defensive Survival, Combat Reflexes, Conditioning</td></tr>
+<tr><td>Mage</td><td>Wits, Spirit</td><td>Spellcraft, Codex, Patron's Symbol</td></tr>
+<tr><td>Rogue</td><td>Wits, Body</td><td>Backstab, Elusive Dodge, Shadow Dance</td></tr>
+<tr><td>Cleric</td><td>Spirit, Presence</td><td>Patron's Symbol, Ritual Mastery, Symbol Resonance</td></tr>
+<tr><td>Bard</td><td>Presence, Wits</td><td>Silver Tongue, Inspire, Network Builder</td></tr>
+<tr><td>Ranger</td><td>Wits, Body</td><td>Wilderness Lore, Keen Senses, Trackless Step</td></tr>
+<tr><td>Survivor</td><td>Spirit, Body</td><td>Iron Stomach, Conditioning, Second Wind</td></tr>
+<tr><td>Innovator</td><td>Wits, Body</td><td>Quick Study, Workshop, Technical Expert</td></tr>
+<tr><td>Summoner</td><td>Spirit, Wits</td><td>Pact-Whisperer, Greater Pactwright, Spirit Link</td></tr>
+<tr><td>Commander</td><td>Presence, Wits</td><td>Command Presence, Inspire, Tactical Movement</td></tr>
+<tr><td>Duelist</td><td>Body, Wits</td><td>Weapon Master, High Stance Duelist, Flurry Strike</td></tr>
+<tr><td>Occultist</td><td>Wits, Spirit</td><td>Keen Senses, Occult Knowledge, Ritual Mastery</td></tr>
+<tr><td>Infiltrator</td><td>Presence, Wits</td><td>Silver Tongue, Silk Palms, Shadow Dance</td></tr>
+<tr><td>Channeler</td><td>Spirit, Presence</td><td>Pact-Whisperer, Spirit Link, Cantor's Path</td></tr>
+</tbody>
+</table>
+</div>
+
+<footer>Fate's Edge Proprietary Content &mdash; &copy; 2024 Nicholas A. Gasper. All rights reserved.</footer>
+
+</body>
+</html>

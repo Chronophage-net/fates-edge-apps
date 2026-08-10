@@ -1,0 +1,720 @@
+<!-- ============ Players-_-Guide-_-07-_-Advancement.html ============ -->
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <title>Fate's Edge Player's Guide — Character Advancement and Capabilities</title>
+    <style>
+        :root {
+            --bg1: #0d0d1a;
+            --bg2: #1a1a2e;
+            --bg3: #252540;
+            --bg4: #2f2f4a;
+            --text: #e8e8f0;
+            --text2: #b8b8c8;
+            --text3: #8888a0;
+            --gold: #c9a84c;
+            --gold-hover: #d4b85c;
+            --border: #333355;
+            --red: #c0392b;
+            --green: #27ae60;
+            --blue: #2980b9;
+            --purple: #8e44ad;
+            --orange: #e67e22;
+            --radius: 8px;
+            --font: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            background: var(--bg1);
+            color: var(--text);
+            font-family: var(--font);
+            padding: 1.5rem;
+            max-width: 1100px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+        h1, h2, h3, h4, h5 { color: var(--gold); margin: 0.5rem 0 0.3rem; }
+        h1 { font-size: 1.8rem; border-bottom: 2px solid var(--gold); padding-bottom: 0.3rem; }
+        h2 { font-size: 1.4rem; border-bottom: 1px solid var(--border); padding-bottom: 0.2rem; margin-top: 1.2rem; }
+        h3 { font-size: 1.1rem; margin-top: 0.8rem; }
+        h4 { font-size: 0.95rem; color: var(--text); }
+        p { margin: 0.4rem 0; }
+        p.subtitle { color: var(--text3); font-style: italic; margin-top: -0.2rem; margin-bottom: 0.8rem; }
+        a { color: var(--gold); text-decoration: none; }
+        a:hover { color: var(--gold-hover); text-decoration: underline; }
+        ul, ol { margin: 0.3rem 0 0.5rem 1.4rem; }
+        li { margin: 0.15rem 0; }
+        dt { font-weight: 600; color: var(--gold); margin-top: 0.4rem; }
+        dd { margin: 0.1rem 0 0.3rem 1.2rem; }
+        .panel {
+            background: var(--bg2);
+            border-radius: var(--radius);
+            padding: 0.6rem 0.8rem;
+            border: 1px solid var(--border);
+            margin: 0.5rem 0;
+        }
+        .panel-gold { border-left: 4px solid var(--gold); }
+        .panel-red { border-left: 4px solid var(--red); }
+        .panel-blue { border-left: 4px solid var(--blue); }
+        .panel-green { border-left: 4px solid var(--green); }
+        .panel-purple { border-left: 4px solid var(--purple); }
+        .panel h4 { margin-top: 0; }
+        .tag-anno { font-size: 0.72rem; font-weight: 600; color: var(--text3); }
+        .badge {
+            display: inline-block;
+            padding: 0.05rem 0.5rem;
+            border-radius: 12px;
+            font-size: 0.65rem;
+            font-weight: 600;
+            background: var(--bg4);
+            color: var(--text3);
+            border: 1px solid var(--border);
+        }
+        .badge-gold { background: var(--gold); color: #1a1400; border-color: var(--gold); }
+        .badge-red { background: var(--red); color: #fff; border-color: var(--red); }
+        .badge-green { background: var(--green); color: #fff; border-color: var(--green); }
+        .badge-blue { background: var(--blue); color: #fff; border-color: var(--blue); }
+        .badge-purple { background: var(--purple); color: #fff; border-color: var(--purple); }
+        .badge-orange { background: var(--orange); color: #fff; border-color: var(--orange); }
+        .text-muted { color: var(--text3); }
+        .text-gold { color: var(--gold); }
+        .text-sm { font-size: 0.85rem; }
+        .text-xs { font-size: 0.7rem; }
+        .mt-1 { margin-top: 0.5rem; }
+        .mb-1 { margin-bottom: 0.5rem; }
+        .flex { display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center; }
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; }
+        @media (max-width: 600px) { .grid-2 { grid-template-columns: 1fr; } }
+        .toc {
+            background: var(--bg3);
+            border-radius: var(--radius);
+            padding: 0.5rem 0.8rem;
+            border: 1px solid var(--border);
+            margin: 0.5rem 0;
+        }
+        .toc summary { cursor: pointer; color: var(--gold); font-weight: 600; }
+        .toc summary:hover { color: var(--gold-hover); }
+        .toc a { color: var(--text2); display: block; padding: 0.1rem 0; font-size: 0.85rem; }
+        .toc a:hover { color: var(--gold); }
+        .table-wrap { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; margin: 0.5rem 0; }
+        th, td { padding: 0.4rem 0.6rem; border: 1px solid var(--border); text-align: left; }
+        th { background: var(--bg4); color: var(--gold); font-weight: 600; }
+        tr:nth-child(even) { background: var(--bg2); }
+        blockquote {
+            font-style: italic;
+            border-left: 4px solid var(--gold);
+            padding: 0.5rem 1rem;
+            margin: 0.5rem 0;
+            background: var(--bg2);
+            border-radius: var(--radius);
+            color: var(--text2);
+        }
+        blockquote .attribution { display: block; font-style: normal; color: var(--text3); font-size: 0.85rem; margin-top: 0.3rem; }
+        code { background: var(--bg4); padding: 0.1rem 0.3rem; border-radius: 4px; font-size: 0.85rem; color: var(--gold); }
+        pre { background: var(--bg3); padding: 0.5rem; border-radius: var(--radius); overflow-x: auto; border: 1px solid var(--border); }
+        hr { border: none; border-top: 1px solid var(--border); margin: 1rem 0; }
+        .titlepage { text-align: center; margin: 1rem 0 0.5rem; }
+        .titlepage h1 { font-size: 2.5rem; border-bottom: none; margin-bottom: 0.1rem; }
+        .titlepage h2 { font-size: 1.8rem; font-weight: normal; border-bottom: none; margin-top: 0; }
+        .copyright-page { text-align: center; margin: 1rem 0; padding: 1rem 0; border-top: 2px solid var(--gold); border-bottom: 2px solid var(--gold); }
+        .copyright-page h1 { border-bottom: none; }
+        .srd-reference { background: var(--bg2); border: 1px solid var(--gold); padding: 0.5rem 1rem; margin: 1rem 0; border-radius: var(--radius); }
+        .back-to-top { position: fixed; bottom: 1rem; right: 1rem; background: var(--bg3); padding: 0.5rem 0.8rem; border-radius: 50%; border: 1px solid var(--gold); color: var(--gold); text-decoration: none; font-size: 1.2rem; box-shadow: 0 2px 8px rgba(0,0,0,0.5); z-index: 100; }
+        .back-to-top:hover { background: var(--gold); color: var(--bg1); }
+        .search-box { background: var(--bg3); border: 1px solid var(--border); border-radius: var(--radius); padding: 0.5rem; color: var(--text); width: 100%; max-width: 300px; }
+        .search-box:focus { outline: none; border-color: var(--gold); }
+        .highlight { background: var(--bg4); border-left: 3px solid var(--gold); padding-left: 0.5rem; }
+        .multicols { column-count: 2; column-gap: 2rem; }
+        @media (max-width: 600px) { .multicols { column-count: 1; } }
+        .eq { background: var(--bg3); border: 1px solid var(--border); border-radius: var(--radius); padding: 0.4rem 0.8rem; margin: 0.4rem 0; font-family: 'Cambria Math', serif; text-align: center; }
+        dl { margin: 0.3rem 0 0.5rem 0; }
+        footer.doc-footer { margin-top: 2rem; padding-top: 0.8rem; border-top: 2px solid var(--gold); text-align: center; color: var(--text3); font-size: 0.8rem; }
+    </style>
+</head>
+<body>
+<a href="#" class="back-to-top">⬆</a>
+<div id="main-content">
+
+<h1>Character Advancement and Capabilities</h1>
+<p class="subtitle">Fate's Edge Player's Guide — Chapter 7</p>
+<div class="panel panel-blue">
+<h4>Philosophy of Growth</h4>
+<p><strong>Every XP spent is a choice about who your character becomes &ndash; invest in yourself, your network, or your legacy.</strong></p>
+<p>Your character is not just a collection of numbers; they are a living story. When you spend XP on an Attribute, you are saying &ldquo;I become stronger, smarter, more resilient.&rdquo; When you invest in a Follower or an Asset, you are saying &ldquo;I build relationships and influence that outlast me.&rdquo; When you buy a Talent, you are saying &ldquo;This is my signature, my unique edge.&rdquo;</p>
+<p>There is no single &ldquo;correct&rdquo; way to grow. A lone duelist (see the Player Archetypes section) might pour everything into personal skill; a merchant prince might build a trading empire. Both are valid. The question is: <em>what kind of story do you want to tell?</em></p>
+</div>
+<h2>Why This Chapter Matters</h2>
+<p>In this game, growth is not just about numbers &mdash; it is about deciding who your character becomes. Advancement through <strong>Experience Points (XP)</strong> lets you shape your capabilities, influence, and legacy in the world. Every XP choice is a statement about your character&rsquo;s priorities and the mark they leave behind.</p>
+<p>Your capabilities are built on four core <strong>Attributes</strong> and a set of specialized <strong>Skills</strong>. This chapter explains how they work together, what advancement looks like in play, and offers player-facing tips for making satisfying choices.</p>
+<h2>Core Attributes</h2>
+<p>Attributes represent your character&rsquo;s fundamental capabilities. Each is rated from 1 to 5; higher numbers mean greater potential in that area.</p>
+<h3>Body</h3>
+<p>Physical strength, endurance, coordination, and health.</p>
+<ul>
+<li><p><strong>Used for:</strong> melee combat, athletics, endurance tests, physical labor.</p></li>
+<li><p><strong>Typical applications:</strong> lifting, running, climbing, fighting, resisting physical harm.</p></li>
+<li><p><strong>Associated skills:</strong> Athletics, Unarmed, Melee, Endurance (see the Skill System section (Chapter 7)).</p></li>
+</ul>
+<p><strong>Rating guide:</strong></p>
+<ul>
+<li><p>1: Average person; some physical activity.</p></li>
+<li><p>2: Fit; trains or works physically on a regular basis.</p></li>
+<li><p>3: Athlete or soldier; excellent condition.</p></li>
+<li><p>4: Exceptional athlete; near peak human.</p></li>
+<li><p>5: Peak human capability; legendary strength and stamina.</p></li>
+</ul>
+<h3>Wits</h3>
+<p>Mental acuity, perception, quick thinking, and problem-solving.</p>
+<ul>
+<li><p><strong>Used for:</strong> investigation, perception, tactics, snap decisions.</p></li>
+<li><p><strong>Typical applications:</strong> spotting details, solving puzzles, planning, reacting quickly.</p></li>
+<li><p><strong>Associated skills:</strong> Investigation, Lore, Craft, Insight (reading people), (see the Skill System section (Chapter 7)).</p></li>
+</ul>
+<p><strong>Rating guide:</strong></p>
+<ul>
+<li><p>1: Average awareness; sometimes misses important cues.</p></li>
+<li><p>2: Observant; notices most relevant details.</p></li>
+<li><p>3: Sharp-minded; quick to spot patterns.</p></li>
+<li><p>4: Exceptionally perceptive; rarely surprised.</p></li>
+<li><p>5: Almost uncanny awareness; sees connections others miss.</p></li>
+</ul>
+<h3>Spirit</h3>
+<p>Willpower, intuition, mental resilience, and connection to intangible forces.</p>
+<ul>
+<li><p><strong>Used for:</strong> resisting mental effects, intuition, magical aptitude, persistence.</p></li>
+<li><p><strong>Typical applications:</strong> resisting fear, sensing danger, channeling magic, enduring hardship.</p></li>
+<li><p><strong>Associated skills:</strong> Arcana, Endurance, Insight (intuition), (and certain magical Talents).</p></li>
+</ul>
+<p><strong>Rating guide:</strong></p>
+<ul>
+<li><p>1: Average willpower; somewhat suggestible.</p></li>
+<li><p>2: Strong-minded; resists ordinary pressure.</p></li>
+<li><p>3: Very determined; hard to intimidate.</p></li>
+<li><p>4: Exceptional will; can inspire others.</p></li>
+<li><p>5: Iron will; nearly unshakeable resolve.</p></li>
+</ul>
+<h3>Presence</h3>
+<p>Charisma, social influence, appearance, and force of personality.</p>
+<ul>
+<li><p><strong>Used for:</strong> social interactions, leadership, persuasion, intimidation.</p></li>
+<li><p><strong>Typical applications:</strong> negotiating, leading, charming, commanding attention.</p></li>
+<li><p><strong>Associated skills:</strong> Sway, Deception, Performance, Subterfuge (social manipulation) (see the Skill System section (Chapter 7)).</p></li>
+</ul>
+<p><strong>Rating guide:</strong></p>
+<ul>
+<li><p>1: Average presence; does not particularly stand out.</p></li>
+<li><p>2: Noticeable; leaves a mild impression.</p></li>
+<li><p>3: Charismatic; naturally influential.</p></li>
+<li><p>4: Commanding; people listen when you speak.</p></li>
+<li><p>5: Magnetic; can sway crowds and redefine the mood of a room.</p></li>
+</ul>
+<h2>Skill System</h2>
+<p>Skills represent specialized training and expertise. In play, you combine an Attribute with a relevant Skill to form your dice pool (see the Core Mechanics chapter).</p>
+<h3>Skill Ratings</h3>
+<div class="table-wrap"><table>
+<thead><tr><th><strong>Rating</strong></th><th><strong>Description</strong></th></tr></thead>
+<tbody>
+<tr><td>0</td><td>Untrained &mdash; no formal experience</td></tr>
+<tr><td>1</td><td>Novice &mdash; basic understanding</td></tr>
+<tr><td>2</td><td>Competent &mdash; reliable and capable</td></tr>
+<tr><td>3</td><td>Professional &mdash; expert in the field</td></tr>
+<tr><td>4</td><td>Master &mdash; renowned specialist</td></tr>
+<tr><td>5</td><td>Grand Master &mdash; legendary skill</td></tr>
+</tbody></table></div>
+<h3>The Sixteen Core Skills</h3>
+<dl>
+<dt>Combat Skills</dt><dd><ul>
+<li><p><strong>Melee</strong>: swords, axes, close-quarters weapons.</p></li>
+<li><p><strong>Ranged</strong>: bows, crossbows, thrown weapons, firearms (if present).</p></li>
+<li><p><strong>Unarmed</strong>: fistfighting, grappling, improvised brawling.</p></li>
+</ul></dd>
+<dt>Physical Skills</dt><dd><ul>
+<li><p><strong>Athletics</strong>: running, climbing, jumping, swimming.</p></li>
+<li><p><strong>Stealth</strong>: moving unseen, hiding, blending into shadows.</p></li>
+<li><p><strong>Endurance</strong>: resisting fatigue, harsh weather, poison, disease.</p></li>
+<li><p><strong>Craft</strong>: building, repairing, creating tools, art, or structures.</p></li>
+</ul></dd>
+<dt>Social Skills</dt><dd><ul>
+<li><p><strong>Sway</strong>: persuasion, negotiation, charm.</p></li>
+<li><p><strong>Deception</strong>: lying, bluffing, misdirection.</p></li>
+<li><p><strong>Subterfuge</strong>: social infiltration, disguise, manipulation of information.</p></li>
+<li><p><strong>Performance</strong>: entertainment, oration, acting, musical display (used by Cantors for Songs).</p></li>
+<li><p><strong>Insight</strong>: reading emotions, detecting lies, understanding motives (covers social observation and &ldquo;reading&rdquo; people).</p></li>
+</ul></dd>
+<dt>Knowledge Skills</dt><dd><ul>
+<li><p><strong>Lore</strong>: history, culture, religion, customs, general knowledge (cities, civilizations, scholarly topics).</p></li>
+<li><p><strong>Investigation</strong>: research, deduction, analysis of clues (covers finding and interpreting evidence).</p></li>
+<li><p><strong>Medicine</strong>: healing, anatomy, first aid, treatment.</p></li>
+</ul></dd>
+<dt>Magic Skill</dt><dd><ul>
+<li><p><strong>Arcana</strong>: magic theory, rituals (identification), mystical phenomena, free casting (TAGS system), counter-spelling. This skill covers all general magical knowledge and the performance of rituals; many magical Talents (Runekeeper, Invoker, etc.) build upon it.</p></li>
+</ul></dd>
+</dl>
+<p><strong>Optional Module &ndash; Psionics:</strong> If your table uses the <em>Psionics</em> expansion (see <em>The Gray Wanderer&rsquo;s Grimoire</em>), a separate <strong>Psionics</strong> skill is added. It is not part of the core skill list and is used for telepathy, telekinesis, clairvoyance, etc.</p>
+<h2>Building Dice Pools</h2>
+<p>Your dice pool for any action is: <div class="eq"> Dice Pool = Attribute + Skill. </div></p>
+<p>You roll that many d10s and interpret the results according to the core rules (see the Core Mechanics chapter).</p>
+<h3>Choosing the Right Combination</h3>
+<p>The same fictional action can often be approached with different Attribute + Skill pairs, depending on how your character does it. The GM has final say, but the default is to use the most obvious pairing (e.g., <em>Body + Melee</em> for a straightforward sword swing). Creative alternatives are encouraged when they fit the fiction.</p>
+<ul>
+<li><p><strong>Climbing a wall:</strong></p>
+<ul>
+<li><p><em>Body + Athletics</em>: sheer strength and stamina.</p></li>
+<li><p><em>Wits + Athletics</em>: clever route-finding and leverage.</p></li>
+<li><p><em>Spirit + Athletics</em>: grim determination against fear or pain.</p></li>
+</ul></li>
+<li><p><strong>Persuading a guard:</strong></p>
+<ul>
+<li><p><em>Presence + Sway</em>: charm and personality.</p></li>
+<li><p><em>Wits + Sway</em>: logical, well-constructed arguments.</p></li>
+<li><p><em>Spirit + Sway</em>: conviction that burns through doubt.</p></li>
+</ul></li>
+<li><p><strong>Investigating a crime scene:</strong></p>
+<ul>
+<li><p><em>Wits + Investigation</em>: methodical observation and deduction.</p></li>
+<li><p><em>Spirit + Investigation</em>: intuitive leaps and gut feelings.</p></li>
+<li><p><em>Presence + Investigation</em>: getting witnesses to open up.</p></li>
+</ul></li>
+</ul>
+<h3>Creative Combinations</h3>
+<p>With your GM&rsquo;s agreement, you can justify unusual combinations that fit the fiction. The table below offers common alternatives, but the GM may allow others based on the scene.</p>
+<div class="table-wrap"><table>
+<thead><tr><th><strong>Intended Action</strong></th><th><strong>Standard Pair</strong></th><th><strong>Alternative Pairs (Example)</strong></th></tr></thead>
+<tbody>
+<tr><td>Recall a combat drill</td><td>Wits + Lore</td><td>Body + Lore (muscle memory)</td></tr>
+<tr><td>Soothe a patient</td><td>Presence + Medicine</td><td>Spirit + Medicine (laying on hands)</td></tr>
+<tr><td>Forge a masterwork</td><td>Wits + Craft</td><td>Spirit + Craft (inspired artistry)</td></tr>
+<tr><td>Read weather signs</td><td>Wits + Lore (local knowledge)</td><td>Spirit + Insight (omen-sense)</td></tr>
+<tr><td>Feint in a duel</td><td>Wits + Melee</td><td>Presence + Melee (intimidation feint)</td></tr>
+<tr><td>Track a spirit</td><td>Wits + Arcana</td><td>Spirit + Lore (follow its legend)</td></tr>
+<tr><td>Bribe a guard</td><td>Presence + Sway</td><td>Wits + Subterfuge (know the right price)</td></tr>
+</tbody></table></div>
+<h3>GM Guidance for Creative Pairs</h3>
+<ul>
+<li><p><strong>Ask &ldquo;How?&rdquo;</strong> &ndash; The player must describe <em>how</em> they use that Attribute and Skill together.</p></li>
+<li><p><strong>Maintain Position</strong> &ndash; A creative pair does not automatically improve Position or reduce DV. It just changes the dice pool.</p></li>
+<li><p><strong>Consistency</strong> &ndash; If you allow <em>Spirit + Craft</em> for visionary work, allow it again in similar circumstances.</p></li>
+<li><p><strong>No Double Dipping</strong> &ndash; The player cannot swap both Attribute <em>and</em> Skill to max out a single stat; the combination must still respect the fiction.</p></li>
+</ul>
+<h3>When to Roll (and When Not To)</h3>
+<p>Not every action requires a roll. The GM should call for a roll when:</p>
+<ol>
+<li><p>The outcome is uncertain.</p></li>
+<li><p>Failure would meaningfully change the situation.</p></li>
+<li><p>The action is significant (not routine).</p></li>
+</ol>
+<p>For routine actions with no real risk, the group can simply agree that you succeed. Example: climbing a knotted rope in calm weather &ndash; no roll. Climbing the same rope while goblins shoot arrows &ndash; roll.</p>
+<h3>Assistance and Teamwork</h3>
+<p>When multiple characters contribute to the same action:</p>
+<ul>
+<li><p><strong>Assistance:</strong> One character is primary; up to three others add +1 die each by describing how they help (e.g., &ldquo;I hold the ladder steady&rdquo;).</p></li>
+<li><p><strong>Cooperation:</strong> Several characters each roll; the group succeeds or fails based on combined results (e.g., all must sneak past a patrol).</p></li>
+<li><p><strong>Complementary:</strong> Different skills cover different parts of a larger task (e.g., one distracts a guard, another picks the lock).</p></li>
+</ul>
+<p><em>Example:</em> A ranger scales an ice wall using <strong>Wits + Athletics</strong> to find the safest holds, then switches to <strong>Body + Athletics</strong> to muscle over the lip. The fiction guides which combination fits each moment.</p>
+<h3>Selling the Action &ndash; Intricate Description</h3>
+<p>You are always welcome to state your action plainly. But when you take a moment to <strong>sell it</strong> &ndash; to invest in the fiction, reveal what your character cares about, or show why this moment matters &ndash; the GM may reward you with a mechanical edge. This is about <em>roleplay investment</em>, not word count.</p>
+<ul>
+<li><p><strong>Basic description:</strong> &ldquo;I attack the goblin with my sword.&rdquo; No bonus.</p></li>
+<li><p><strong>Tactical description:</strong> Use the environment, positioning, or a clever tactic. &ldquo;I feint high, then drive my shoulder into the goblin&rsquo;s shield, shoving it aside to open its flank.&rdquo; The GM may or may not upgrade your Position by one step (e.g., <em>Controlled</em> &rarr; <em>Dominant</em>) for this roll.</p></li>
+<li><p><strong>Character-driven description:</strong> Reveal a stake, a bond, a fear, or a hard choice. <em>One heartfelt sentence counts more than a paragraph of adjectives.</em></p>
+<ul>
+<li><p>Example: &ldquo;I think of my mother, who died because I wasn&rsquo;t brave enough to fight. I won&rsquo;t let that happen again. I plant my feet and dare the goblin to come through me.&rdquo;</p></li>
+</ul>
+<p>The GM may grant a larger benefit &ndash; e.g., upgrade Position <em>and</em> bank a <strong>Boon</strong> you can use later, or upgrade Effect by one step.</p></li>
+</ul>
+<h4>What Counts (and What Doesn&rsquo;t)</h4>
+<p><strong>Counts:</strong></p>
+<ul>
+<li><p>Stating a clear stake: &ldquo;If I fail this lockpick, my sister doesn&rsquo;t eat.&rdquo;</p></li>
+<li><p>Invoking a bond mid-action: &ldquo;I owe Ethan my life. I&rsquo;m not letting him face this alone.&rdquo;</p></li>
+<li><p>Revealing a fear or hope tied to the roll: &ldquo;I&rsquo;m terrified of fire, but I grab the burning beam &ndash; because the children are behind me.&rdquo;</p></li>
+<li><p>Making a hard choice visible: &ldquo;I could run, but I don&rsquo;t. Running is what got me exiled.&rdquo;</p></li>
+</ul>
+<p><strong>Does not count:</strong></p>
+<ul>
+<li><p>Piling on adjectives (&ldquo;gleaming,&rdquo; &ldquo;mighty,&rdquo; &ldquo;ancient&rdquo;) without stakes.</p></li>
+<li><p>Passive sensory laundry lists (&ldquo;the cold wind, the wet stones, the dim light&rdquo;).</p></li>
+<li><p>Repeating the same florid description for every roll.</p></li>
+</ul>
+<h4>Guidelines for the GM</h4>
+<ul>
+<li><p><strong>No penalty for plain speech.</strong> Never punish a player who is tired, shy, or simply prefers quick resolution. The bonus is a gift, not a tax.</p></li>
+<li><p><strong>Be consistent.</strong> Reward genuine investment, not vocabulary. A quiet player who delivers one heartfelt sentence deserves the bonus as much as an eloquent storyteller.</p></li>
+<li><p><strong>The bonus should fit the fiction.</strong> A desperate, reckless action described with real stakes might upgrade Effect but worsen Position &ndash; let the mechanics mirror the emotion.</p></li>
+<li><p><strong>Invite quiet players.</strong> Ask leading questions: &ldquo;What&rsquo;s at stake for your character right now?&rdquo; or &ldquo;What are you afraid will happen if you fail?&rdquo; Gentle prompts help shy players find their moment.</p></li>
+<li><p><strong>Group &ldquo;selling.&rdquo;</strong> If the whole table contributes to describing a group action (a coordinated ambush, a joint ritual), grant the bonus to the primary roller or give each participant a small benefit.</p></li>
+</ul>
+<h4>Example</h4>
+<p><em>Basic:</em> &ldquo;I sneak past the sentry.&rdquo; (No bonus, roll as normal.)</p>
+<p><em>Selling it (tactical):</em> &ldquo;I wait for the wind to rattle the shutters, then pad across the wet cobblestones &ndash; heel-toe, heel-toe &ndash; keeping the stack of barrels between me and the sentry&rsquo;s gaze.&rdquo; The GM nods: &ldquo;Great. Because you&rsquo;re using the wind and the barrels, roll at <em>Dominant</em> Position.&rdquo;</p>
+<p><em>Selling it (character-driven):</em> &ldquo;My little brother is in that camp. I&rsquo;ve hidden from every fight since we left home &ndash; but not this time. I creep forward, not quiet anymore, because he needs to know someone came for him.&rdquo; The GM: &ldquo;That&rsquo;s the heart of it. Roll at <em>Dominant</em> Position, and I&rsquo;ll bank a Story Beat to make his reaction matter.&rdquo;</p>
+<p><em>Remember:</em> The dice still decide success or failure. But a well-told action makes the story richer &ndash; and earns you an edge when the dice fall.</p>
+<h2>Earning Experience Points</h2>
+<p>XP represents learning through action. You gain it by engaging meaningfully with the world: overcoming challenges, taking risks, making hard choices, and leaning into your character&rsquo;s story.</p>
+<h3>Session Breakdown</h3>
+<p>At the end of each session, XP is awarded based on what happened at the table. A typical breakdown might look like:</p>
+<ul>
+<li><p><strong>Base Participation</strong>: +2 XP for attending and contributing.</p></li>
+<li><p><strong>Major Objectives</strong>: +2&ndash;4 XP for completing significant story goals.</p></li>
+<li><p><strong>Discoveries</strong>: +1&ndash;2 XP for uncovering important lore, locations, or secrets.</p></li>
+<li><p><strong>Hard Choices</strong>: +1&ndash;2 XP for making difficult moral or strategic decisions.</p></li>
+<li><p><strong>Story Engagement</strong>: +1&ndash;3 XP for embracing complications and twists.</p></li>
+<li><p><strong>Personal Goals</strong>: +1&ndash;2 XP for pursuing your character&rsquo;s individual storylines.</p></li>
+</ul>
+<p><em>Example:</em> At the end of a session, the party rogue gains:</p>
+<ul>
+<li><p>+2 XP for participation,</p></li>
+<li><p>+2 XP for helping retrieve a cursed artifact,</p></li>
+<li><p>+1 XP for pushing a personal rivalry subplot.</p></li>
+</ul>
+<p>Total: 5 XP.</p>
+<h3>Game Pace Options</h3>
+<p>You and your GM can decide how quickly characters advance, matching the tone you want:</p>
+<div class="table-wrap"><table>
+<thead><tr><th><strong>Mode</strong></th><th><strong>XP / Session</strong></th><th><strong>Tone</strong></th></tr></thead>
+<tbody>
+<tr><td>Gritty</td><td>4&ndash;6</td><td>Hard choices, slow growth</td></tr>
+<tr><td>Standard</td><td>6&ndash;10</td><td>Balanced progression</td></tr>
+<tr><td>Epic</td><td>10&ndash;14</td><td>Heroic, rapid development</td></tr>
+</tbody></table></div>
+<p><strong>Player Tip:</strong> If you want a sweeping, mythic tale, ask for an <em>Epic</em> pace. If you want advancement to feel hard-won, lean toward <em>Gritty</em>.</p>
+<h3>Arc Completion Bonus</h3>
+<p>When a major story arc finishes (typically 3&ndash;6 sessions), everyone gains an additional +8&ndash;12 XP. One player may receive +2 XP more for a particularly memorable contribution. This rewards the story as a whole, not just individual rolls.</p>
+<div class="panel panel-gold">
+<h4>Boons vs. XP</h4>
+<p>You may convert 2 Boons &rarr; 1 XP (once per session, max 2 XP per session via conversion). <strong>But:</strong> Spending Boons during play is almost always more fun. A re-rolled failure, an improved Position, or an activated Asset creates a memorable moment. Hoarding Boons for XP conversion starves the table of drama. Spend freely; the XP will come from your adventures.</p>
+</div>
+<h2>Spending Experience Points</h2>
+<p>XP is your currency for growth. You can invest it in three broad areas:</p>
+<ol>
+<li><p><strong>Personal Improvement</strong> (Attributes and Skills)</p></li>
+<li><p><strong>Special Abilities</strong> (Talents, magic, unique tricks)</p></li>
+<li><p><strong>Resources and Influence</strong> (Assets, followers, organizations)</p></li>
+</ol>
+<p>Think of these as three pillars: <em>what you can do</em>, <em>what makes you unique</em>, and <em>what you own or command</em>.</p>
+<h3>Personal Improvement</h3>
+<h4>Attributes</h4>
+<p>Attributes are expensive but powerful. The cost to raise an Attribute is: <div class="eq"> XP Cost = 3 &times; new rating. </div> Examples:</p>
+<ul>
+<li><p>Raising Body from 2 to 3 costs 3 &times; 3 = 9 XP.</p></li>
+<li><p>Raising Spirit from 4 to 5 costs 3 &times; 5 = 15 XP.</p></li>
+</ul>
+<p>Attribute increases usually require downtime equal to the new rating in days, spent training, reflecting, or transforming yourself (see the Training and Development Time section).</p>
+<h4>Skills</h4>
+<p>Skills are cheaper and represent focused practice. The cost is: <div class="eq"> XP Cost = 2 &times; new level. </div> Examples:</p>
+<ul>
+<li><p>Lore 1 &rarr; 2 costs 2 &times; 2 = 4 XP.</p></li>
+<li><p>Melee 3 &rarr; 4 costs 2 &times; 4 = 8 XP.</p></li>
+</ul>
+<p>Skill increases typically require downtime equal to the new level in days.</p>
+<p><em>Example:</em> Kara wants to improve her swordsmanship (Melee) from 2 to 3. She saves 6 XP and spends three in-game days training with her mentor. This training becomes part of the story, not just a line on a sheet.</p>
+<h3>Special Abilities</h3>
+<p>Special abilities are unique moves, talents, or tricks that define your style.</p>
+<dl>
+<dt>General Abilities (4&ndash;8 XP)</dt><dd><p>Universal benefits, like improved recovery, bonus dice in a common situation, or a signature combat technique. <em>Example:</em> &ldquo;Quick Recovery&rdquo; &mdash; heal 1 extra Harm when you rest.</p></dd>
+<dt>Cultural Abilities (variable)</dt><dd><p>Abilities tied to heritage or background. They may require specific fictional positioning (see the Small Folk background material). <em>Example:</em> &ldquo;Stone Sense&rdquo; &mdash; an instinctive feel for stonework and tunnels.</p></dd>
+<dt>Advanced Abilities (12+ XP)</dt><dd><p>High-impact features available at higher tiers, often with strong narrative hooks or prerequisites (see the Character Progression Tiers section (Chapter 7)). <em>Example:</em> &ldquo;Master Diplomat&rdquo; &mdash; once per session, you can reroll or soften the outcome of a failed major negotiation.</p></dd>
+</dl>
+<p><em>Example:</em> A veteran bard purchases <em>Silver Tongue</em> for 6 XP, gaining the ability to sway a hostile crowd once per session. This quickly becomes their trademark in tense public scenes.</p>
+<h3>Resources and Influence</h3>
+<p>See Chapter 10, &ldquo;Assets and Followers&rdquo; for full rules. As a quick reference:</p>
+<dl>
+<dt>Minor Resource (4 XP, 1 week)</dt><dd><p>A small shop, basic workshop, discreet safe house, or minor contact network. Offers modest but reliable benefits.</p></dd>
+<dt>Standard Resource (8 XP, 2 weeks)</dt><dd><p>A decent-sized business, crew, or operation with real impact. Comes with some upkeep and obligations.</p></dd>
+<dt>Major Resource (12 XP, 1 month)</dt><dd><p>A large enterprise, elite team, or rare capability. Very potent but also demanding; often becomes a major part of your character&rsquo;s story.</p></dd>
+</dl>
+<p><strong>Player Tip:</strong> Resources pull the camera out from your character to your <em>sphere of influence</em>. A spy network means intrigue. A workshop means invention. A guild hall means politics.</p>
+<div class="panel panel-green">
+<h4>When to Invest in Assets and Followers</h4>
+<div class="table-wrap"><table>
+<thead><tr><th><strong>Player Archetype</strong></th><th><strong>Typical Investment</strong></th><th><strong>Best For</strong></th></tr></thead>
+<tbody>
+<tr><td>Solo</td><td>0&ndash;10% XP</td><td>Reliable personal power, minimal upkeep.</td></tr>
+<tr><td>Mixed (Balanced)</td><td>15&ndash;25% XP</td><td>One solid Follower or Asset (e.g., a scout or a safehouse).</td></tr>
+<tr><td>Mastermind</td><td>35&ndash;55% XP</td><td>Networks, informants, multiple Assets; build a faction.</td></tr>
+</tbody></table></div>
+<p><strong>Planning for succession?</strong> A loyal Follower (Cap 3+) can become your successor &ndash; see the <strong>Legacy Engine</strong> (The Legacy Engine chapter). Investing in a potential heir early pays off when your character retires or falls.</p>
+</div>
+<h2>Character Development Paths</h2>
+<p>How you spend XP shapes your character&rsquo;s growth. These are broad patterns, not rigid classes.</p>
+<div class="table-wrap"><table>
+<thead><tr><th><strong>Path</strong></th><th><strong>Typical XP Split</strong></th><th><strong>Strengths / Weaknesses</strong></th></tr></thead>
+<tbody>
+<tr><td>Specialist</td><td>70&ndash;90% personal, 0&ndash;10% resources, 0&ndash;20% abilities</td><td>Extremely effective in a narrow niche. Vulnerable outside it.</td></tr>
+<tr><td>Leader</td><td>50&ndash;65% personal, 15&ndash;25% resources, 15&ndash;25% abilities</td><td>Well-rounded, boosts the group. Rarely the best at one thing.</td></tr>
+<tr><td>Mastermind</td><td>25&ndash;40% personal, 35&ndash;55% resources, 20&ndash;40% abilities</td><td>Solves problems through assets. Personally vulnerable, many moving parts.</td></tr>
+</tbody></table></div>
+<p><em>Example (Leader):</em> A merchant-prince spends 60% of XP on personal skills and social abilities, 20% on a network of trade contacts, and 20% on talents that improve negotiation and command.</p>
+<p>These patterns are <em>guides</em>, not rules. You can shift between them as your story evolves.</p>
+<h2>Training and Development Time</h2>
+<p>Most improvements take time in the fiction. Training montages, study scenes, and building projects are all opportunities for character moments.</p>
+<h3>Standard Time Requirements</h3>
+<ul>
+<li><p><strong>Attribute increase:</strong> new rating in days.</p></li>
+<li><p><strong>Skill improvement:</strong> new level in days.</p></li>
+<li><p><strong>Resource acquisition:</strong> about 1 week to 1 month depending on scope.</p></li>
+<li><p><strong>Ability learning:</strong> typically 3&ndash;10 days.</p></li>
+</ul>
+<h3>Accelerated Development (Rush Rule)</h3>
+<p>You <em>can</em> attempt to learn faster, but rushing has a price.</p>
+<ul>
+<li><p>The group tracks a short <strong>Risk Timer </strong> (4 segments) for your crash training.</p></li>
+<li><p>If it fills, the new capability has flaws:</p>
+<ul>
+<li><p>Attribute/Skill: temporary &ndash;1 die penalty until you retrain properly.</p></li>
+<li><p>Resource: loyalty issues, partial effectiveness, or hidden problems.</p></li>
+<li><p>Ability: unreliable effects or quirky side consequences.</p></li>
+</ul></li>
+</ul>
+<p><em>Example:</em> A wizard crams advanced spellwork into three frantic days. She gains the ability, but the Risk Timer fills: her spells spark and flicker until she takes time to train safely.</p>
+<h2>Character Progression Tiers</h2>
+<p>As you accumulate XP and capabilities, you advance through tiers that represent your growing reputation and influence.</p>
+<h3>Tier I: Novice (0&ndash;40 XP)</h3>
+<ul>
+<li><p>Learning the ropes, establishing yourself.</p></li>
+<li><p>Local reputation, modest capabilities.</p></li>
+<li><p>Typical assets: basic equipment, a few contacts.</p></li>
+<li><p><strong>Position Manifestation:</strong> The difference between life and death; a shift from Desperate to Controlled means &ldquo;I live to fight another day.&rdquo;</p></li>
+</ul>
+<h3>Tier II: Seasoned (41&ndash;90 XP)</h3>
+<ul>
+<li><p>Proven capability, reliable in your specialty.</p></li>
+<li><p>Regional reputation, respected in your field.</p></li>
+<li><p>Typical assets: skilled followers, specialized equipment.</p></li>
+<li><p><strong>Position Manifestation:</strong> The difference between victory and defeat; a shift from Controlled to Dominant means &ldquo;I&rsquo;ve earned the right to choose how this ends.&rdquo;</p></li>
+</ul>
+<h3>Tier III: Veteran (91&ndash;150 XP)</h3>
+<ul>
+<li><p>Master of your craft, significant influence.</p></li>
+<li><p>National reputation, can handle major challenges.</p></li>
+<li><p>Typical assets: multiple operations, elite teams.</p></li>
+<li><p><strong>Position Manifestation:</strong> The difference between influence and control; a shift from Controlled to Dominant means &ldquo;The city hangs on my decision.&rdquo;</p></li>
+</ul>
+<h3>Tier IV: Paragon (151&ndash;220 XP)</h3>
+<ul>
+<li><p>Exceptional capability, strategic influence.</p></li>
+<li><p>Continental influence, shapes regional outcomes.</p></li>
+<li><p>Typical assets: organizations, unique capabilities.</p></li>
+<li><p><strong>Position Manifestation:</strong> The difference between shaping events and defining eras; a shift from Controlled to Dominant means &ldquo;I am the axis upon which history turns.&rdquo;</p></li>
+</ul>
+<h3>Tier V: Mythic (221+ XP)</h3>
+<ul>
+<li><p>Legendary status, world-changing influence.</p></li>
+<li><p>Historical reputation, defines eras.</p></li>
+<li><p>Typical assets: nations, legendary artifacts.</p></li>
+<li><p><strong>Position Manifestation:</strong> The difference between ending and remaking the world; a shift from Desperate to Controlled means &ldquo;The universe waits on my choice.&rdquo;</p></li>
+</ul>
+<h3>Position Scales with Narrative Weight</h3>
+<p>The mechanical effect of Position (re-rolling one die, see the Core Mechanics chapter) never changes &mdash; but what it <em>means</em> evolves with your tier:</p>
+<ul>
+<li><p><strong>Tier I:</strong> Position defines personal survival.</p></li>
+<li><p><strong>Tier III:</strong> Position shapes regional outcomes.</p></li>
+<li><p><strong>Tier V:</strong> Position reshapes reality.</p></li>
+</ul>
+<p>The system does not need to scale &mdash; your story does.</p>
+<div class="panel panel-blue">
+<p><strong>GM Tip:</strong> Never add mechanical bonuses to Position. Instead, deepen the narrative weight:</p>
+<ul>
+<li><p><strong>Tier I:</strong> &ldquo;Your Position shows whether you live or die.&rdquo;</p></li>
+<li><p><strong>Tier V:</strong> &ldquo;Your Position shows how the world bends to your will.&rdquo;</p></li>
+</ul>
+<p>The mechanics stay consistent so the narrative can grow as large as your imagination allows.</p>
+</div>
+<h2>Managing Allies and Followers</h2>
+<p>Allies can extend your reach but also create obligations and risks. For full rules, see Chapter 10, &ldquo;Assets and Followers&rdquo;.</p>
+<h3>Acquisition Costs</h3>
+<p>A skilled helper&rsquo;s cost in XP is roughly their <em>capability rating squared</em>. <em>Example:</em> A capability 3 scout costs 3^2 = 9 XP.</p>
+<h3>Upkeep Requirements</h3>
+<p>Each downtime period, you either:</p>
+<ul>
+<li><p>spend XP equal to their capability rating, <strong>or</strong></p></li>
+<li><p>dedicate a meaningful scene to maintaining the relationship (time, favors, protection).</p></li>
+</ul>
+<h3>Risk Management</h3>
+<ul>
+<li><p>When big complications arise, your allies can be targeted instead of you.</p></li>
+<li><p>Allies can handle one significant task off-screen per downtime, but this often creates extra story fallout (the GM gains a Story Beat).</p></li>
+</ul>
+<h2>Skill Advancement and Synergies</h2>
+<h3>XP Costs</h3>
+<div class="table-wrap"><table>
+<thead><tr><th><strong>Improvement</strong></th><th><strong>XP Cost</strong></th></tr></thead>
+<tbody>
+<tr><td>0 &rarr; 1</td><td>2 XP</td></tr>
+<tr><td>1 &rarr; 2</td><td>4 XP</td></tr>
+<tr><td>2 &rarr; 3</td><td>6 XP</td></tr>
+<tr><td>3 &rarr; 4</td><td>8 XP</td></tr>
+<tr><td>4 &rarr; 5</td><td>10 XP</td></tr>
+</tbody></table></div>
+<h3>Training Time</h3>
+<ul>
+<li><p>0 &rarr; 1: 1 day of practice.</p></li>
+<li><p>1 &rarr; 2: 3 days of training.</p></li>
+<li><p>2 &rarr; 3: 1 week of intensive study.</p></li>
+<li><p>3 &rarr; 4: 2 weeks with a master or rigorous practice.</p></li>
+<li><p>4 &rarr; 5: 1 month of dedicated focus.</p></li>
+</ul>
+<h3>Attribute Limits</h3>
+<p>You cannot have a Skill rating higher than the relevant Attribute. To advance a Skill further, you must first raise its primary Attribute (see the Core Attributes section (Chapter 7)).</p>
+<h3>Skill Synergies</h3>
+<p>When the fiction supports it, well-justified combinations of skills can grant +1 die or better Position/Effect. Examples:</p>
+<ul>
+<li><p><strong>Combat:</strong> Melee + Athletics (acrobatic strikes), Unarmed + Athletics (grappling and throws).</p></li>
+<li><p><strong>Social:</strong> Sway + Lore (persuasion backed by knowledge), Deception + Subterfuge (elaborate cons).</p></li>
+<li><p><strong>Exploration:</strong> Investigation + Lore (deductive research), Craft + Investigation (forensic analysis).</p></li>
+</ul>
+<h2>Using Skills in Play</h2>
+<h3>When to Roll</h3>
+<p>You roll when:</p>
+<ul>
+<li><p>the outcome is uncertain,</p></li>
+<li><p>failure would matter to the story, and</p></li>
+<li><p>the action is significant enough to deserve the spotlight.</p></li>
+</ul>
+<p>For routine actions with no real risk, the group can often simply agree that you succeed.</p>
+<h3>Difficulty and Skill Level</h3>
+<p>As your skill rises, routine tasks become trivial. A rough guideline:</p>
+<div class="table-wrap"><table>
+<thead><tr><th><strong>Skill Level</strong></th><th><strong>Routine Task</strong></th><th><strong>Challenging Task</strong></th></tr></thead>
+<tbody>
+<tr><td>0</td><td>Needs a roll; modest DV</td><td>Needs a roll; higher DV</td></tr>
+<tr><td>1</td><td>Often needs a roll</td><td>Challenging but fair</td></tr>
+<tr><td>2</td><td>Usually automatic</td><td>Needs a roll; moderate DV</td></tr>
+<tr><td>3</td><td>Automatic</td><td>Needs a roll; interesting stakes</td></tr>
+<tr><td>4+</td><td>Automatic</td><td>Automatic for simple cases</td></tr>
+</tbody></table></div>
+<p><strong>Reading this as a player:</strong> by Skill 3, basic tasks in your area of expertise should rarely require rolls. You are there to be impressive, not to trip over routine jobs.</p>
+<h3>Group Skill Use</h3>
+<p>When multiple characters contribute:</p>
+<ul>
+<li><p><strong>Assistance:</strong> One character is primary; up to three others add +1 die each by describing how they help (see the Core Mechanics chapter).</p></li>
+<li><p><strong>Cooperation:</strong> Several characters each roll; the group succeeds or fails based on combined results.</p></li>
+<li><p><strong>Complementary:</strong> Different skills cover different parts of a larger task (e.g. one distracts, one picks a lock).</p></li>
+</ul>
+<h2>Skill Challenges</h2>
+<p>Some goals are too big for a single roll.</p>
+<h3>Extended Tests</h3>
+<p>For long, involved tasks:</p>
+<ul>
+<li><p>The group sets a progress timer (4&ndash;8 segments).</p></li>
+<li><p>Each significant success fills one or more segments.</p></li>
+<li><p>Complications can add segments or create new problems.</p></li>
+</ul>
+<h3>Complex Challenges</h3>
+<p>For multi-step or multi-skill situations:</p>
+<ul>
+<li><p>Different skills tackle different phases of the challenge.</p></li>
+<li><p>Success in one area creates opportunities; failure creates obstacles.</p></li>
+</ul>
+<p><em>Example (Heist):</em> <strong>Stealth</strong> to infiltrate, <strong>Craft</strong> to bypass locks, <strong>Investigation</strong> to find the vault, <strong>Deception</strong> to mislead guards. Each roll advances a <em>Heist Timer </em>; complications add heat, suspicion, or security changes.</p>
+<h2>Strategic Advancement Considerations</h2>
+<h3>Early Game (Tiers I&ndash;II)</h3>
+<ul>
+<li><p>Focus on survival and a clear niche.</p></li>
+<li><p>Raise a key Attribute to 3 early.</p></li>
+<li><p>Bring core Skills to 2&ndash;3.</p></li>
+<li><p>Establish one or two modest resources or safe havens.</p></li>
+</ul>
+<h3>Mid Game (Tier III)</h3>
+<ul>
+<li><p>Develop signature moves or combinations.</p></li>
+<li><p>Expand your resource base.</p></li>
+<li><p>Consider your role in the group and lean into it.</p></li>
+</ul>
+<h3>Late Game (Tiers IV&ndash;V)</h3>
+<ul>
+<li><p>Choose advanced abilities that reshape the story around you.</p></li>
+<li><p>Build organizations, movements, or legacies.</p></li>
+<li><p>Decide how your character will leave their mark on the world.</p></li>
+</ul>
+<div class="panel panel-red">
+<h4>Common Advancement Mistakes</h4>
+<p><strong>Avoid these pitfalls:</strong></p>
+<ul>
+<li><p><strong>Over-specializing too early:</strong> A Melee 5 character with Body 3 is fragile and incapable outside combat.</p></li>
+<li><p><strong>Forgetting training time:</strong> You cannot learn a new skill in the middle of a dungeon without justification.</p></li>
+<li><p><strong>Neglecting resources:</strong> A few well-chosen assets can solve problems no amount of personal skill can.</p></li>
+<li><p><strong>Hoarding XP:</strong> Spend your XP! Characters who never improve become irrelevant to the escalating threats.</p></li>
+</ul>
+</div>
+<h2>Practical Examples</h2>
+<h3>Combat Example</h3>
+<p>A warrior with Body 4 and Melee 3 attacks:</p>
+<ul>
+<li><p>Dice pool: 4 + 3 = 7d10.</p></li>
+<li><p>Opponent&rsquo;s defenses and the fiction help set the difficulty (see the Core Mechanics chapter).</p></li>
+<li><p>Strong successes translate into higher Effect or better Position.</p></li>
+</ul>
+<h3>Social Example</h3>
+<p>A diplomat with Presence 3 and Sway 2 negotiates:</p>
+<ul>
+<li><p>Dice pool: 3 + 2 = 5d10.</p></li>
+<li><p>Position might be <em>Controlled</em> if circumstances favor them, or worse if under suspicion.</p></li>
+<li><p>Consequences for failure could be mistrust, delays, or new complications.</p></li>
+</ul>
+<h3>Exploration Example</h3>
+<p>A scout with Wits 3 and Investigation 2 searches for tracks:</p>
+<ul>
+<li><p>Dice pool: 3 + 2 = 5d10.</p></li>
+<li><p>Easier tasks (fresh tracks) are more forgiving; older or obscured tracks are harder.</p></li>
+<li><p>Partial successes might reveal some information but not all, or come with side effects (e.g., you find the tracks but disturb a nest of predators).</p></li>
+</ul>
+<p>Your Attributes and Skills determine not just <em>if</em> you succeed, but <em>how</em> you tackle problems. Lean into combinations that express your character&rsquo;s style.</p>
+<div class="panel panel-green">
+<h4>XP Planning Guide</h4>
+<p><strong>Early Tier Priorities:</strong></p>
+<ul>
+<li><p>Raise a core Attribute to 3 (9 XP).</p></li>
+<li><p>Bring key Skills to 2&ndash;3 (4&ndash;6 XP each).</p></li>
+<li><p>Claim 1&ndash;2 minor resources (4 XP each).</p></li>
+</ul>
+<p><strong>Mid Tier Expansion:</strong></p>
+<ul>
+<li><p>Push core Attributes toward 4 (12 XP).</p></li>
+<li><p>Specialize key Skills to 4 (8 XP).</p></li>
+<li><p>Add standard resources (8 XP each).</p></li>
+<li><p>Explore cultural or thematic abilities (6&ndash;10 XP).</p></li>
+</ul>
+<p><strong>Late Tier Mastery:</strong></p>
+<ul>
+<li><p>Purchase capstone abilities (12+ XP).</p></li>
+<li><p>Establish major resources (12 XP).</p></li>
+<li><p>Launch legacy projects, organizations, or movements.</p></li>
+</ul>
+</div>
+<div class="panel panel-blue">
+<h4>Attributes and Skills Quick Reference</h4>
+<p><strong>Attributes (1&ndash;5):</strong></p>
+<ul>
+<li><p><strong>Body</strong>: physical capability</p></li>
+<li><p><strong>Wits</strong>: mental acuity</p></li>
+<li><p><strong>Spirit</strong>: willpower and inner strength</p></li>
+<li><p><strong>Presence</strong>: social influence</p></li>
+</ul>
+<p><strong>Skill Levels:</strong></p>
+<ul>
+<li><p>0: Untrained &emsp; 1: Novice &emsp; 2: Competent</p></li>
+<li><p>3: Professional &emsp; 4: Master &emsp; 5: Grand Master</p></li>
+</ul>
+<p><strong>Core Skills (16):</strong></p>
+<ul>
+<li><p>Combat: Melee, Ranged, Unarmed</p></li>
+<li><p>Physical: Athletics, Stealth, Endurance, Craft</p></li>
+<li><p>Social: Sway, Deception, Subterfuge, Performance, Insight</p></li>
+<li><p>Knowledge: Lore, Investigation, Medicine</p></li>
+<li><p>Magic: Arcana</p></li>
+</ul>
+<p><strong>Dice Pool:</strong> Attribute + Skill d10s.</p>
+<p><strong>Skill Improvement:</strong> New level &times; 2 XP (plus training time).</p>
+<p><strong>Specialization:</strong> At Skill 3+, you are a known expert in that field.</p>
+<p><strong>Synergy:</strong> Well-justified combinations of skills can grant +1 die or better Position/Effect when the fiction supports it.</p>
+</div>
+
+
+</div>
+<footer class="doc-footer">Fate's Edge Proprietary Content — (c) 2024 Nicholas A. Gasper. All rights reserved.</footer>
+</body>
+</html>

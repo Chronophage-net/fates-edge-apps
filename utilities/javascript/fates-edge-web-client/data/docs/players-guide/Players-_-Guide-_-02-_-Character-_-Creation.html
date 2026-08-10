@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fate's Edge Player's Guide — Chapter 2: Character Creation Summary</title>
+<style>
+    :root {
+        --bg1: #0d0d1a;
+        --bg2: #1a1a2e;
+        --bg3: #252540;
+        --bg4: #2f2f4a;
+        --text: #e8e8f0;
+        --text2: #b8b8c8;
+        --text3: #8888a0;
+        --gold: #c9a84c;
+        --gold-hover: #d4b85c;
+        --border: #333355;
+        --red: #c0392b;
+        --green: #27ae60;
+        --blue: #2980b9;
+        --purple: #8e44ad;
+        --orange: #e67e22;
+        --radius: 8px;
+        --font: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+        background: var(--bg1);
+        color: var(--text);
+        font-family: var(--font);
+        padding: 1.5rem;
+        max-width: 1100px;
+        margin: 0 auto;
+        line-height: 1.6;
+    }
+    h1, h2, h3, h4, h5 { color: var(--gold); margin: 0.5rem 0 0.3rem; }
+    h1 { font-size: 1.8rem; border-bottom: 2px solid var(--gold); padding-bottom: 0.3rem; }
+    h2 { font-size: 1.4rem; border-bottom: 1px solid var(--border); padding-bottom: 0.2rem; margin-top: 1.2rem; }
+    h3 { font-size: 1.1rem; margin-top: 0.8rem; }
+    h4 { font-size: 0.95rem; color: var(--text); }
+    a { color: var(--gold); text-decoration: none; }
+    a:hover { color: var(--gold-hover); text-decoration: underline; }
+    p { margin: 0.4rem 0; }
+    p.subtitle { color: var(--text2); font-size: 1rem; margin-bottom: 1rem; }
+    ul, ol { margin: 0.4rem 0 0.6rem 1.4rem; }
+    li { margin: 0.15rem 0; }
+    .panel {
+        background: var(--bg2);
+        border-radius: var(--radius);
+        padding: 0.6rem 0.8rem;
+        border: 1px solid var(--border);
+        margin: 0.6rem 0;
+    }
+    .panel-gold { border-left: 4px solid var(--gold); }
+    .panel-red { border-left: 4px solid var(--red); }
+    .panel-blue { border-left: 4px solid var(--blue); }
+    .panel-green { border-left: 4px solid var(--green); }
+    .panel-purple { border-left: 4px solid var(--purple); }
+    .panel-orange { border-left: 4px solid var(--orange); }
+    .panel-title { color: var(--gold); font-weight: 700; display: block; margin-bottom: 0.3rem; }
+    .badge {
+        display: inline-block;
+        padding: 0.05rem 0.5rem;
+        border-radius: 12px;
+        font-size: 0.65rem;
+        font-weight: 600;
+        background: var(--bg4);
+        color: var(--text3);
+        border: 1px solid var(--border);
+    }
+    .badge-gold { background: var(--gold); color: #1a1400; border-color: var(--gold); }
+    .text-muted { color: var(--text3); }
+    .text-gold { color: var(--gold); }
+    .text-sm { font-size: 0.85rem; }
+    .text-xs { font-size: 0.7rem; }
+    .mt-1 { margin-top: 0.5rem; }
+    .mb-1 { margin-bottom: 0.5rem; }
+    .flex { display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; }
+    @media (max-width: 600px) { .grid-2 { grid-template-columns: 1fr; } }
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; margin: 0.5rem 0; }
+    th, td { padding: 0.4rem 0.6rem; border: 1px solid var(--border); text-align: left; }
+    th { background: var(--bg4); color: var(--gold); font-weight: 600; }
+    tr:nth-child(even) { background: var(--bg2); }
+    blockquote {
+        font-style: italic;
+        border-left: 4px solid var(--gold);
+        padding: 0.5rem 1rem;
+        margin: 0.5rem 0;
+        background: var(--bg2);
+        border-radius: var(--radius);
+        color: var(--text2);
+    }
+    blockquote .attribution { display: block; font-style: normal; color: var(--text3); font-size: 0.85rem; margin-top: 0.3rem; }
+    code { background: var(--bg4); padding: 0.1rem 0.3rem; border-radius: 4px; font-size: 0.85rem; color: var(--gold); }
+    hr { border: none; border-top: 1px solid var(--border); margin: 1rem 0; }
+    dl { margin: 0.4rem 0 0.6rem 0.4rem; }
+    dt { color: var(--gold); font-weight: 700; margin-top: 0.4rem; }
+    dd { margin: 0.1rem 0 0.3rem 1.2rem; color: var(--text2); }
+    .multicols { column-count: 2; column-gap: 2rem; }
+    @media (max-width: 600px) { .multicols { column-count: 1; } }
+    .tree { margin: 0.4rem 0 0.4rem 1rem; }
+    .tree ul { list-style: none; border-left: 1px dashed var(--border); margin-left: 0.6rem; padding-left: 0.9rem; }
+    .tree > ul { border-left: none; margin-left: 0; padding-left: 0; }
+    .tree li { margin: 0.25rem 0; }
+    .branch-label { color: var(--orange); font-weight: 600; font-size: 0.8rem; }
+    footer.doc-footer { font-size: 0.75rem; color: var(--text3); text-align: center; padding: 1.5rem 0 0.5rem; border-top: 1px solid var(--border); margin-top: 1.5rem; }
+</style>
+</head>
+<body>
+
+<h1>Character Creation Summary</h1>
+<p class="subtitle">Fate's Edge Player's Guide — Chapter 2</p>
+
+<div class="panel panel-blue">
+    <span class="panel-title">Quick Start</span>
+    This chapter walks you through building a character in about 10–15 minutes. Follow the steps in order. Most choices are guided by your character concept; the numbers come later.
+</div>
+
+<h2 id="mindset">How to Think Like a Fate's Edge Player</h2>
+<p>Before you assign a single point of XP, take a moment to understand the mindset that makes Fate's Edge sing. This is not a game of optimisation or perfect builds — it is a game of meaningful choices, dramatic risks, and shared storytelling.</p>
+
+<h3>Embrace the Fiction</h3>
+<p>Your character is not a collection of numbers — they are a living story. When you declare an action, think first about what your character would do in this moment, and only then let the mechanics follow. The dice are not a barrier to your creativity; they are a conversation partner. A roll of 1 is not a failure — it is an invitation for the world to push back, and that pushback is what makes the story memorable.</p>
+
+<h3>Spend Your Boons</h3>
+<p>Boons are not XP tokens. They are dramatic fuel. Hoarding them for conversion (2 Boons &rarr; 1 XP) starves the table of tension and robs you of your safety net. A Boon spent to re-roll a critical failure or improve Position before a desperate gamble creates a moment everyone at the table will remember. The XP will come from your adventures; the Boons are for the stories you tell right now.</p>
+
+<h3>Embrace Failure</h3>
+<p>A Miss is never "nothing happens." It is an opportunity for the GM to escalate, for your character to learn, and for the party to adapt. When you fail, you gain 2 Boons — the system rewards you for leaning into risk. Treat every Miss as a gift: it changes the situation, gives you resources, and makes the eventual success sweeter.</p>
+
+<h3>You Are a Co-Creator</h3>
+<p>The GM frames the pressure; you drive the fiction. You are not trying to "beat" the game or outsmart the GM. You are collaborating to tell a compelling story. When you describe your actions with detail — showing the dust in your eyes, the tremble in your arm, the desperate prayer you whisper — you give the GM permission to reward you with Position, Effect, or even a free Boon. Flavor is free, and it is your greatest tool.</p>
+
+<h3>Know Your Resources</h3>
+<p>You track your own Obligation, Fatigue, Harm, and Boons. Keep your sheet visible and your trackers up to date. When your Obligation is near capacity, that is not a warning — it is a promise of future adventure. When your Fatigue is high, that is not a penalty — it is a chance for a dramatic comeback. Own your resources, and use them as narrative levers.</p>
+
+<h3>Trust the System</h3>
+<p>The core loop (Attribute + Skill, Position, DV, Outcome Matrix) is robust enough to carry any scene. If you forget a rule, fall back on the Golden Rule: make the choice that serves the story. The rest will follow.</p>
+
+<h3>Play to Find Out</h3>
+<p>You do not know how the scene will end any more than the GM does. That uncertainty is the game's heartbeat. Lean into it. Ask questions, take risks, and let the dice sing. The most memorable sessions come from characters who act boldly and accept the consequences.</p>
+
+<blockquote>
+"The road does not promise a safe journey — only a true one."
+<span class="attribution">— The Gray Wanderer</span>
+</blockquote>
+
+<h2 id="engagement-flowchart">Player Engagement Flowchart</h2>
+<p>Fate's Edge is modular by design. You can play with just the core resolution loop and nothing else — or you can add layers of complexity as your table grows comfortable. The following flowchart helps you navigate that choice. Start at the top and follow the path that matches your preferred play style. Remember: you can always opt in (or out) of subsystems as your character evolves and the campaign demands.</p>
+
+<div class="panel panel-gold">
+    <span class="panel-title">Complexity Opt-In Flowchart for Fate's Edge Players</span>
+    <div class="tree">
+    <ul>
+        <li><strong>Start here:</strong> What do you want?
+            <ul>
+                <li><span class="branch-label">Just play with core resolution?</span>
+                    <ul>
+                        <li><span class="branch-label">Yes →</span> <strong>Core Loop Only</strong> — Attributes + Skills, no Talents, no assets.</li>
+                        <li><span class="branch-label">No →</span> Want a signature edge?
+                            <ul>
+                                <li><span class="branch-label">No →</span> Take 1–2 <strong>Minor Talents</strong>, then continue to: Want magic?</li>
+                                <li><span class="branch-label">Yes →</span> Want magic?
+                                    <ul>
+                                        <li><span class="branch-label">No →</span> Choose a <strong>Patron + one magic path</strong>, then continue to: Want off-screen influence?</li>
+                                        <li><span class="branch-label">Yes →</span> Want off-screen influence?
+                                            <ul>
+                                                <li><span class="branch-label">No →</span> Acquire an <strong>Asset or Follower</strong>, then continue to: Want to build a shared legacy?</li>
+                                                <li><span class="branch-label">Yes →</span> Want to build a shared legacy?
+                                                    <ul>
+                                                        <li><span class="branch-label">No →</span> Form a <strong>Trust</strong> with your party.</li>
+                                                        <li><span class="branch-label">Yes →</span> <strong>Mix and match all layers!</strong></li>
+                                                    </ul>
+                                                </li>
+                                            </ul>
+                                        </li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+        </li>
+    </ul>
+    </div>
+</div>
+
+<h3>How to Use This Flowchart</h3>
+<ul>
+    <li><strong>Core Loop Only:</strong> Perfect for one-shots or players who want a pure narrative experience. You are still fully effective in any scene — Attributes and Skills give you plenty of dice.</li>
+    <li><strong>Minor Talents:</strong> Add one or two signature moves (e.g., Keen Senses, Second Wind) to give your character a mechanical identity without much overhead.</li>
+    <li><strong>Patron + Magic:</strong> Choose a Patron and one of the five magic paths (Runekeeper, Invoker, Cantor, Summoner, or Free Caster). This adds resource tracking (Obligation, Corruption, etc.) but opens new narrative and mechanical possibilities.</li>
+    <li><strong>Assets/Followers:</strong> Extend your influence beyond your character sheet. Assets are off-screen resources; Followers are on-screen allies. Both require upkeep but provide lasting leverage.</li>
+    <li><strong>Trusts:</strong> Pool XP with your party to build a shared organization — a guild, a merchant company, a spy network. This is for long-term campaigns and collective legacy.</li>
+    <li><strong>Mix and Match:</strong> You can combine any or all of these layers. The system is modular; you are not locked into a single path. You can start simple and add complexity as your campaign evolves.</li>
+</ul>
+
+<h3>A Note on Progression</h3>
+<p>You are never penalised for choosing a simpler path. A character with high Attributes and Skills is as capable as one with many Talents and Patrons — they simply express their power differently. The game balances breadth against depth, and both are valid. Choose what excites you, and change your mind later. The road is long, and the Gray Wanderer walks it with you.</p>
+
+<h2 id="overview">Overview</h2>
+<p>With the philosophy and the opt-in framework in mind, you are ready to build your character. You begin at <strong>Tier I (Novice)</strong> with <strong>32 Experience Points (XP)</strong>. You may gain up to <strong>+4 XP</strong> by taking meaningful <strong>Bonds</strong> (with other player characters) and <strong>Complications</strong> (see Step 8, below). Maximum starting XP: <strong>36</strong>.</p>
+
+<div class="table-wrap">
+<table>
+<thead><tr><th>Step</th><th>Where to Find Rules</th><th>Time</th></tr></thead>
+<tbody>
+<tr><td>1. Concept</td><td>Anywhere</td><td>2 min</td></tr>
+<tr><td>2. Attributes</td><td>Attributes &amp; Skills chapter</td><td>2 min</td></tr>
+<tr><td>3. Skills</td><td>Attributes &amp; Skills chapter</td><td>2 min</td></tr>
+<tr><td>4. Talents</td><td>Talents chapter</td><td>3 min</td></tr>
+<tr><td>5. Patron (optional)</td><td>World Powers &amp; Obligation chapter</td><td>2 min</td></tr>
+<tr><td>6. Assets / Followers (optional)</td><td>Assets &amp; Followers chapter</td><td>1 min</td></tr>
+<tr><td>7. Bonds &amp; Complications</td><td>Step 8, below</td><td>2 min</td></tr>
+<tr><td>8. Gear &amp; Final Touches</td><td>Step 9, below</td><td>1 min</td></tr>
+</tbody>
+</table>
+</div>
+
+<h2 id="step1">Step 1 — Concept</h2>
+<p>Write one sentence that describes your character's <strong>origin, profession, and one defining trait</strong>. Examples:</p>
+<ul>
+  <li>"An Aeler tunnel-wright who lost her breath-count and now hears stone sing."</li>
+  <li>"A Vhasian duelist with a scarred face and a vow to never lose again."</li>
+  <li>"A Ykrul sky-speaker who owes a blood-price to a rival clan."</li>
+</ul>
+<p>Also choose your character's <strong>ancestry</strong>:</p>
+<ul>
+  <li>Small Folk (Aelaerem / Aelinnel)</li>
+  <li>Aeler (dwarf)</li>
+  <li>Lethai (wood, high, or dark elf)</li>
+  <li>Ykrul (orc)</li>
+  <li>Mixed Heritage</li>
+  <li>Human (any culture: Ecktorian, Vhasian, Viterran, Linn, etc.)</li>
+</ul>
+
+<h2 id="step2">Step 2 — Attributes</h2>
+<p>You have four <strong>Attributes</strong> (1–5). Spend XP to raise them from a base of 1 each.</p>
+<p><strong>Cost:</strong> Each step costs <strong>new rating &times; 3 XP</strong>. This is incremental:</p>
+<ul>
+  <li>1 &rarr; 2 costs 6 XP (2 &times; 3)</li>
+  <li>2 &rarr; 3 costs 9 XP (3 &times; 3)</li>
+  <li>3 &rarr; 4 costs 12 XP (4 &times; 3)</li>
+  <li>4 &rarr; 5 costs 15 XP (5 &times; 3)</li>
+</ul>
+<p>So raising an Attribute from 1 to 3 costs 6 + 9 = <strong>15 XP total</strong>.</p>
+<p><strong>Recommended starting ranges:</strong></p>
+<ul>
+  <li>Primary attribute (the one you use most): <strong>3</strong> (costs 15 XP total: 1&rarr;2 = 6, 2&rarr;3 = 9)</li>
+  <li>Secondary attributes: <strong>2</strong> each (costs 6 XP each: 1&rarr;2 = 6)</li>
+</ul>
+<p><strong>Example:</strong> Body 3 (1&rarr;2 = 6, 2&rarr;3 = 9 &rarr; total 15 XP), Wits 2 (1&rarr;2 = 6 XP) &rarr; 21 XP spent. Spirit and Presence remain at 1.</p>
+
+<h2 id="step3">Step 3 — Skills</h2>
+<p>Choose <strong>Skills</strong> (0–5) that match your concept. <strong>Key skills</strong> (used often) should be 2–3; others 0–1.</p>
+<p><strong>Cost:</strong> Each step costs <strong>new level &times; 2 XP</strong>. This is incremental:</p>
+<ul>
+  <li>0 &rarr; 1 costs 2 XP (1 &times; 2)</li>
+  <li>1 &rarr; 2 costs 4 XP (2 &times; 2)</li>
+  <li>2 &rarr; 3 costs 6 XP (3 &times; 2)</li>
+  <li>3 &rarr; 4 costs 8 XP (4 &times; 2)</li>
+  <li>4 &rarr; 5 costs 10 XP (5 &times; 2)</li>
+</ul>
+<p>So raising a Skill from 0 to 2 costs 2 + 4 = <strong>6 XP total</strong>.</p>
+<p><strong>Recommended starting total:</strong> Spend <strong>8–12 XP</strong> on skills.</p>
+<p><strong>Example:</strong> Melee 2 (0&rarr;1 = 2, 1&rarr;2 = 4 &rarr; total 6 XP), Athletics 1 (0&rarr;1 = 2 XP), Endurance 1 (0&rarr;1 = 2 XP) &rarr; total 10 XP.</p>
+
+<h2 id="step4">Step 4 — Talents</h2>
+
+<div class="panel panel-blue">
+    <span class="panel-title">You Don't Need Talents to Be Effective</span>
+    A character with <strong>just Attributes and Skills</strong> is a complete, viable character — <em>especially at Tier I</em>.
+    <p class="mt-1">Talents are <strong>optional extras</strong>. They give you a signature edge, but they are not required to contribute meaningfully to the party. A Body 3 + Melee 2 warrior with no Talents is still rolling 5 dice in combat. A Spirit 3 + Lore 2 scholar with no Talents is still rolling 5 dice to recall ancient secrets.</p>
+    <p class="mt-1"><strong>Start simple.</strong> Take 0–2 Talents. Add more as you grow. The system is designed so that Attributes and Skills do the heavy lifting.</p>
+</div>
+
+<p>Talents are special abilities. Start with <strong>0–3 talents</strong>. Many concepts work well with two minor talents (2–3 XP each) or one major talent (4–6 XP). Some concepts work perfectly with <strong>zero</strong> Talents — your Attributes and Skills are enough.</p>
+
+<p><strong>Magic access talents (if you want magic):</strong></p>
+<ul>
+  <li><strong>Spellcraft (6 XP)</strong> — free casting</li>
+  <li><strong>Familiar (2 XP) + Codex (4 XP)</strong> — Runekeeper (rites)</li>
+  <li><strong>Patron's Symbol (4 XP)</strong> — Invoker (rituals)</li>
+  <li><strong>Cantor's Path (8 XP)</strong> — Cantor (songs)</li>
+  <li><strong>Pact-Whisperer (2 XP) + Lesser Pactwright (2 XP)</strong> — Summoner</li>
+</ul>
+
+<p><strong>Non-magic talents (examples):</strong></p>
+<div class="table-wrap">
+<table>
+<thead><tr><th>Talent</th><th>Cost</th><th>Effect</th></tr></thead>
+<tbody>
+<tr><td><em>None</em></td><td><em>0 XP</em></td><td><em>A valid, complete character. Attributes + Skills do the work.</em></td></tr>
+<tr><td>Keen Senses</td><td>2 XP</td><td>+1 die to perception checks.</td></tr>
+<tr><td>Defensive Survival</td><td>3 XP</td><td>+1 die to melee defense, convert Harm to Fatigue.</td></tr>
+<tr><td>Weapon Mastery</td><td>5 XP</td><td>+2 dice with a chosen weapon.</td></tr>
+</tbody>
+</table>
+</div>
+<p class="text-sm text-muted">See the Talents chapter for the full list.</p>
+
+<h2 id="step5">Step 5 — Patron (Optional)</h2>
+<p>If your character uses magic through a <strong>Patron</strong>, choose one (see the World Powers and Obligation chapter). The six recommended for first characters are:</p>
+<div class="table-wrap">
+<table>
+<thead><tr><th>Patron</th><th>Theme</th></tr></thead>
+<tbody>
+<tr><td>Oath of Flame &amp; Light</td><td>vows, radiance, smiting</td></tr>
+<tr><td>The Traveler</td><td>roads, safe passage</td></tr>
+<tr><td>Inaea (Angel of the Spider)</td><td>mercy, community</td></tr>
+<tr><td>The Witness</td><td>truth, memory</td></tr>
+<tr><td>Carrion King</td><td>decay, renewal</td></tr>
+<tr><td>Ikasha (She Who Sleeps)</td><td>shadows, secrets</td></tr>
+</tbody>
+</table>
+</div>
+<p>You do <strong>not</strong> need a Patron if you are a free caster (Spellcraft) or a psion (optional).</p>
+
+<h3>Step 6 — Cultural Affinity</h3>
+<p>Choose a cultural affinity from the region where your character was raised (see Chapter 14). This grants a once-per-session benefit.</p>
+<p><strong>Note on Stacking.</strong> If your ancestral gift (from your people) and your cultural affinity provide the same benefit (e.g., both improve Position), they do not stack. You may use one per scene. Choose which applies when you need it.</p>
+
+<h2 id="step7">Step 7 — Assets &amp; Followers (Optional)</h2>
+<p>You may spend XP on:</p>
+<ul>
+  <li><strong>Minor Asset (4 XP)</strong> — e.g., a safehouse, a workshop</li>
+  <li><strong>Follower (Cap&sup2; XP)</strong> — e.g., Cap 2 scout (4 XP), Cap 3 lieutenant (9 XP)</li>
+</ul>
+<p>Most starting characters skip these or take one minor asset. See the Assets &amp; Followers chapter.</p>
+
+<h2 id="step8">Step 8 — Bonds &amp; Complications</h2>
+<p><strong>Bonds:</strong> Establish <strong>up to two bonds</strong> with other player characters. Each bond grants a one-per-session Boon when you act on it with an intricate description. At Tier III (90+ XP) bonds also allow Boon transfers.</p>
+<p><strong>Complications:</strong> You may take up to <strong>two complications</strong> (e.g., a feud, a cursed item, a debt). Each gives <strong>+2 XP</strong> but each character with a complication adds <strong>+1 banked Story Beat</strong> to early scenes. Work with your GM.</p>
+<p class="text-sm text-muted">See the Backgrounds chapter for examples.</p>
+
+<h2 id="step9">Step 9 — Gear &amp; Final Touches</h2>
+<p><strong>Starting gear (assumed):</strong></p>
+<ul>
+  <li>One set of clothing appropriate to your culture</li>
+  <li>A Light melee weapon or ranged weapon with ammunition</li>
+  <li>Light armor (if your concept demands it)</li>
+  <li>A backpack, a waterskin, 1d6 days of rations, a utility knife, flint and steel, a small lantern or candle</li>
+  <li>Any tools required for your skills (e.g., lockpicks, healer's kit, writing materials)</li>
+</ul>
+<p>For special gear (heavy armor, heavy weapons, magical items), spend XP or acquire them through play.</p>
+
+<p><strong>Final XP tally:</strong></p>
+<ul>
+  <li>Start with <strong>32 XP</strong>.</li>
+  <li>Add <strong>+2 XP per Bond</strong> (max +4).</li>
+  <li>Add <strong>+2 XP per Complication</strong> (max +4).</li>
+  <li>Maximum starting XP: <strong>36</strong>.</li>
+</ul>
+<p>Spend all XP; you cannot bank starting XP.</p>
+
+<h2 id="build-examples">Build Examples</h2>
+<p>Here are three legal starting builds at 32 XP and 36 XP. The 36 XP builds assume you took one Bond (or Complication) for +2 XP — you may need to adjust based on your table's choices.</p>
+
+<h3>Build 1: The Duelist (32 XP)</h3>
+<ul>
+  <li><strong>Attributes:</strong> Body 3 (15 XP), Wits 2 (6 XP) &rarr; 21 XP</li>
+  <li><strong>Skills:</strong> Melee 2 (6 XP), Athletics 1 (2 XP), Endurance 1 (2 XP) &rarr; 10 XP</li>
+  <li><strong>Talents:</strong> Keen Senses (2 XP) &rarr; 2 XP</li>
+  <li><strong>Total:</strong> 21 + 10 + 2 = <strong>33 XP</strong> (slightly over — drop Athletics to 0 and take 1 Bond for +2 XP)</li>
+</ul>
+<p><strong>Adjusted (32 XP):</strong> Body 3 (15), Wits 2 (6), Melee 2 (6), Endurance 1 (2), Keen Senses (2) = <strong>31 XP</strong> (bank 1 XP)</p>
+<p><strong>Adjusted (36 XP with Bond):</strong> Body 3 (15), Wits 2 (6), Melee 2 (6), Athletics 1 (2), Endurance 1 (2), Keen Senses (2) = <strong>33 XP</strong> + 1 Bond (+2) = <strong>35 XP</strong> (bank 1 XP)</p>
+<p><strong>Dice pool:</strong> Body 3 + Melee 2 = 5 dice. Keen Senses adds +1 die to perception.</p>
+
+<h3>Build 2: The Scholar (32 XP)</h3>
+<ul>
+  <li><strong>Attributes:</strong> Wits 3 (15 XP), Spirit 2 (6 XP) &rarr; 21 XP</li>
+  <li><strong>Skills:</strong> Lore 2 (6 XP), Investigation 1 (2 XP), Insight 1 (2 XP) &rarr; 10 XP</li>
+  <li><strong>Talents:</strong> None &rarr; 0 XP</li>
+  <li><strong>Total:</strong> 21 + 10 = <strong>31 XP</strong> (bank 1 XP)</li>
+</ul>
+<p><strong>36 XP with Bond:</strong> Add Sway 1 (2 XP) and take 1 Bond (+2 XP). Total: 31 + 2 + 2 = <strong>35 XP</strong> (bank 1 XP)</p>
+<p><strong>Dice pool:</strong> Wits 3 + Lore 2 = 5 dice. No Talents needed — the character is defined by knowledge.</p>
+
+<h3>Build 3: The Scout (32 XP)</h3>
+<ul>
+  <li><strong>Attributes:</strong> Wits 3 (15 XP), Body 2 (6 XP) &rarr; 21 XP</li>
+  <li><strong>Skills:</strong> Stealth 2 (6 XP), Athletics 2 (6 XP) &rarr; 12 XP</li>
+  <li><strong>Total:</strong> 21 + 12 = <strong>33 XP</strong> (slightly over — drop Athletics to 1)</li>
+</ul>
+<p><strong>Adjusted (32 XP):</strong> Wits 3 (15), Body 2 (6), Stealth 2 (6), Athletics 1 (2) = <strong>29 XP</strong> (bank 3 XP, or add a 2 XP Talent)</p>
+<p><strong>36 XP with Bond:</strong> Add Keen Senses (2 XP), take 1 Bond (+2 XP). Total: 29 + 2 + 2 = <strong>33 XP</strong> (bank 3 XP, or add a second Bond)</p>
+<p><strong>Dice pool:</strong> Wits 3 + Stealth 2 = 5 dice. Athletics 1 adds basic mobility.</p>
+
+<h3>Build 4: The Healer (32 XP)</h3>
+<ul>
+  <li><strong>Attributes:</strong> Spirit 3 (15 XP), Wits 2 (6 XP) &rarr; 21 XP</li>
+  <li><strong>Skills:</strong> Medicine 2 (6 XP), Insight 1 (2 XP), Lore 1 (2 XP) &rarr; 10 XP</li>
+  <li><strong>Total:</strong> 21 + 10 = <strong>31 XP</strong> (bank 1 XP)</li>
+</ul>
+<p><strong>36 XP with Bond:</strong> Add Athletics 1 (2 XP), take 1 Bond (+2 XP). Total: 31 + 2 + 2 = <strong>35 XP</strong> (bank 1 XP)</p>
+<p><strong>Dice pool:</strong> Spirit 3 + Medicine 2 = 5 dice. No Talents needed to be an effective healer.</p>
+
+<h3>Build 5: The Commander (32 XP)</h3>
+<ul>
+  <li><strong>Attributes:</strong> Presence 3 (15 XP), Wits 2 (6 XP) &rarr; 21 XP</li>
+  <li><strong>Skills:</strong> Sway 2 (6 XP), Lore 1 (2 XP), Insight 1 (2 XP) &rarr; 10 XP</li>
+  <li><strong>Total:</strong> 21 + 10 = <strong>31 XP</strong> (bank 1 XP)</li>
+</ul>
+<p><strong>36 XP with Bond:</strong> Add Command Presence (4 XP) (or Keen Senses for 2 XP), take 1 Bond (+2 XP). Total: 31 + 4 + 2 = <strong>37 XP</strong> (adjust: drop Lore to 0, add 1 Bond = 31 + 4 + 2 = 37, then drop one skill point)</p>
+<p><strong>Adjusted (32 XP with Bond):</strong> Presence 3 (15), Wits 2 (6), Sway 2 (6), Insight 1 (2), Lore 0 = 29 XP, take 1 Bond (+2) = 31 XP (bank 1 XP, add Command Presence later)</p>
+<p><strong>Dice pool:</strong> Presence 3 + Sway 2 = 5 dice.</p>
+
+<h3>Build 6: The Subterfuge Rogue (32 XP)</h3>
+<ul>
+  <li><strong>Attributes:</strong> Wits 3 (15 XP), Body 2 (6 XP) &rarr; 21 XP</li>
+  <li><strong>Skills:</strong> Stealth 2 (6 XP), Subterfuge 2 (6 XP) &rarr; 12 XP</li>
+  <li><strong>Total:</strong> 21 + 12 = <strong>33 XP</strong> (slightly over — drop Subterfuge to 1)</li>
+</ul>
+<p><strong>Adjusted (32 XP):</strong> Wits 3 (15), Body 2 (6), Stealth 2 (6), Subterfuge 1 (2) = <strong>29 XP</strong> (bank 3 XP)</p>
+<p><strong>36 XP with Bond:</strong> Add Insight 1 (2 XP), take 1 Bond (+2 XP). Total: 29 + 2 + 2 = <strong>33 XP</strong> (bank 3 XP, or add a second Bond)</p>
+<p><strong>Dice pool:</strong> Wits 3 + Stealth 2 = 5 dice. Subterfuge 1 covers basic deception.</p>
+
+<h2 id="starting-gear">Starting Gear Options</h2>
+<h3>Weapons and Armor</h3>
+<div class="table-wrap">
+<table>
+<thead><tr><th>Item</th><th>XP Cost</th><th>Notes</th></tr></thead>
+<tbody>
+<tr><td>Light weapon (dagger, shortsword)</td><td>Free (or 4 XP for special)</td><td>Harm 1, +2d Close, +1d Near</td></tr>
+<tr><td>Medium weapon (longsword, spear)</td><td>Free (or 8 XP for special)</td><td>Harm 2, +1d Close, +2d Near</td></tr>
+<tr><td>Heavy weapon (greatsword, halberd)</td><td>12 XP</td><td>Harm 3, -1d Close, +3d Near</td></tr>
+<tr><td>Light armor</td><td>4 XP</td><td>Harm 1 → Fatigue 1</td></tr>
+<tr><td>Medium armor</td><td>8 XP</td><td>Harm 2 → Fatigue 1</td></tr>
+<tr><td>Heavy armor</td><td>12 XP</td><td>Harm 3 → Fatigue 2</td></tr>
+</tbody>
+</table>
+</div>
+<p>Most starting characters take a free Light weapon and Light armor. Heavy weapons and armor are significant investments.</p>
+
+<div class="panel panel-green">
+    <span class="panel-title">The Gray Wanderer's Advice</span>
+    "A warrior with Body 3 and Melee 2 rolls 5 dice. No Talents required. A scholar with Wits 3 and Lore 2 rolls 5 dice. No Talents required. The dice do the work. Talents are flavor — they add a signature move, but they don't define your competence. If you want a simple character, skip Talents entirely. You will still be effective. You will still be a hero."
+</div>
+
+<h2 id="next-steps">Next Steps</h2>
+<ul>
+  <li>Read the Core Mechanics chapter to learn how to roll dice, use Position, and spend Boons.</li>
+  <li>Read the Magic chapter if your character uses magic.</li>
+  <li>Read the World Interaction chapter for travel, time, and social rules.</li>
+  <li>Work with your GM to decide on starting situation and campaign timers.</li>
+</ul>
+
+<div class="panel panel-green">
+    <span class="panel-title">The Gray Wanderer's Advice</span>
+    "Do not try to build a 'perfect' character. Build one who owes a debt, carries a scar, and has a name that someone will remember. The numbers will follow the story — not the other way around.
+    <p class="mt-1">And remember: a character with <strong>no Talents</strong> is still a complete character. Attributes and Skills are all you need. Talents are for flavor, not viability. If you want to keep it simple, skip them. You will still roll plenty of dice."</p>
+</div>
+
+<h2 id="party-composition">Party Composition Guide</h2>
+
+<div class="panel panel-blue">
+    <span class="panel-title">Building a Balanced Party</span>
+    Fate's Edge does not require a "balanced" party in the traditional sense. A party of four duelists is viable — they will simply solve problems with steel rather than words. However, parties that cover multiple roles have more tools and are more resilient when things go wrong.
+    <p class="mt-1">This guide helps you think about what roles your party might cover, how different character builds can fill those roles, and — crucially — how <strong>Followers</strong> can fill gaps when no player character covers a needed role. Use it as a conversation starter during Session Zero.</p>
+</div>
+
+<h3>The Five Roles</h3>
+
+<div class="panel panel-blue">
+    <span class="panel-title">Attributes and Skills Are Enough</span>
+    Each role below is defined by its <strong>Primary Attribute</strong> and <strong>Key Skills</strong>. These are the foundation. Talents add specialization, but the core of any role is Attribute + Skill. A Tank needs Body and Melee; a Support needs Spirit and Medicine. Talents are extras — not requirements.
+</div>
+
+<p>Fate's Edge characters are defined by <em>approach</em>, not by class. The same mechanics can support different playstyles. Think of these roles as <strong>what you do at the table</strong>, not as <strong>what your character is</strong>.</p>
+
+<div class="table-wrap">
+<table>
+<thead><tr><th>Role</th><th>Primary Attribute</th><th>What You Do</th></tr></thead>
+<tbody>
+<tr><td><strong>Tank</strong></td><td>Body</td><td>Stand in front, absorb damage, protect allies</td></tr>
+<tr><td><strong>Striker</strong></td><td>Body or Wits</td><td>Deal damage, eliminate threats, break lines</td></tr>
+<tr><td><strong>Controller</strong></td><td>Spirit or Presence</td><td>Shape the battlefield, impose conditions, manage fear</td></tr>
+<tr><td><strong>Support</strong></td><td>Spirit</td><td>Heal, remove conditions, transfer burdens</td></tr>
+<tr><td><strong>Utility</strong></td><td>Wits or Spirit</td><td>Gather information, solve puzzles, negotiate with spirits</td></tr>
+</tbody>
+</table>
+</div>
+
+<h4>Tank — The Wall</h4>
+<p>You stand between danger and the people you protect. You do not need to deal the most damage — you need to be the hardest to kill.</p>
+<p><strong>Key Mechanics:</strong></p>
+<ul>
+  <li>High Body (4+ for Fatigue track and defense)</li>
+  <li>Heavy Armor (converts Harm to Fatigue)</li>
+  <li>Defensive talents (Defensive Survival, Shield Bearer) — optional</li>
+</ul>
+<p><strong>Build Example (36 XP with Bond):</strong></p>
+<ul>
+  <li>Body 3 (15 XP), Spirit 2 (6 XP) &rarr; 21 XP</li>
+  <li>Melee 2 (6 XP), Athletics 1 (2 XP), Endurance 1 (2 XP) &rarr; 10 XP</li>
+  <li>Defensive Survival (3 XP) &rarr; 3 XP</li>
+  <li>1 Bond (+2 XP) &rarr; 36 XP</li>
+</ul>
+<p><strong>Dice pool:</strong> Body 3 + Melee 2 = 5 dice.</p>
+
+<h4>Striker — The Blade</h4>
+<p>You eliminate threats. Whether through precision or overwhelming force, your job is to end fights.</p>
+<p><strong>Key Mechanics:</strong></p>
+<ul>
+  <li>High Body (melee) or Wits (ranged)</li>
+  <li>Weapon Mastery (optional — adds +2 dice)</li>
+</ul>
+<p><strong>Build Example (36 XP with Bond):</strong></p>
+<ul>
+  <li>Body 3 (15 XP), Wits 2 (6 XP) &rarr; 21 XP</li>
+  <li>Melee 2 (6 XP), Athletics 1 (2 XP), Stealth 1 (2 XP) &rarr; 10 XP</li>
+  <li>Weapon Mastery (5 XP) &rarr; 5 XP</li>
+  <li>1 Bond (+2 XP) &rarr; 36 XP (21 + 10 + 5 + 2 = 38 — adjust: drop Stealth to 0, add Bond = 21 + 8 + 5 + 2 = 36)</li>
+</ul>
+<p><strong>Adjusted:</strong> Body 3 (15), Wits 2 (6), Melee 2 (6), Athletics 1 (2), Weapon Mastery (5), 1 Bond (+2) = <strong>36 XP</strong></p>
+<p><strong>Dice pool:</strong> Body 3 + Melee 2 + Weapon Mastery 2 = 7 dice with chosen weapon.</p>
+
+<h4>Controller — The Weaver</h4>
+<p>You shape the battlefield. Fear, conditions, and positioning are your weapons.</p>
+<p><strong>Key Mechanics:</strong></p>
+<ul>
+  <li>High Spirit (willpower) or Presence (intimidation)</li>
+  <li>Social skills (Sway, Deception) are the foundation</li>
+</ul>
+<p><strong>Build Example (32 XP):</strong></p>
+<ul>
+  <li>Presence 3 (15 XP), Spirit 2 (6 XP) &rarr; 21 XP</li>
+  <li>Sway 2 (6 XP), Deception 1 (2 XP), Insight 1 (2 XP) &rarr; 10 XP</li>
+  <li><strong>Total:</strong> 21 + 10 = <strong>31 XP</strong> (bank 1 XP)</li>
+</ul>
+<p><strong>Dice pool:</strong> Presence 3 + Sway 2 = 5 dice.</p>
+
+<h4>Support — The Mender</h4>
+<p>You keep the party on their feet. Healing, condition removal, and burden transfer are your domain.</p>
+<p><strong>Key Mechanics:</strong></p>
+<ul>
+  <li>High Spirit (willpower) or Wits (medicine)</li>
+  <li>Medicine skill is the foundation</li>
+</ul>
+<p><strong>Build Example (32 XP):</strong></p>
+<ul>
+  <li>Spirit 3 (15 XP), Wits 2 (6 XP) &rarr; 21 XP</li>
+  <li>Medicine 2 (6 XP), Insight 1 (2 XP), Lore 1 (2 XP) &rarr; 10 XP</li>
+  <li><strong>Total:</strong> 21 + 10 = <strong>31 XP</strong> (bank 1 XP)</li>
+</ul>
+<p><strong>Dice pool:</strong> Spirit 3 + Medicine 2 = 5 dice.</p>
+
+<h4>Utility — The Eyes and Ears</h4>
+<p>You solve problems that cannot be solved with steel. Information, negotiation, and spirit consultation are your tools.</p>
+<p><strong>Key Mechanics:</strong></p>
+<ul>
+  <li>High Wits (perception) or Spirit (intuition)</li>
+  <li>Knowledge skills (Lore, Investigation) are the foundation</li>
+</ul>
+<p><strong>Build Example (32 XP):</strong></p>
+<ul>
+  <li>Wits 3 (15 XP), Spirit 2 (6 XP) &rarr; 21 XP</li>
+  <li>Lore 2 (6 XP), Investigation 1 (2 XP), Insight 1 (2 XP) &rarr; 10 XP</li>
+  <li><strong>Total:</strong> 21 + 10 = <strong>31 XP</strong> (bank 1 XP)</li>
+</ul>
+<p><strong>Dice pool:</strong> Wits 3 + Lore 2 = 5 dice.</p>
+
+<h3>Filling Gaps with Followers</h3>
+<p>Not every party has a player who wants to play every role. That is where <strong>Followers</strong> (see Chapter 12) come in. A well-chosen Follower can cover a missing role, provide specialized assistance, or handle tasks that no player character wants to do.</p>
+
+<h4>When to Use a Follower</h4>
+<ul>
+  <li><strong>No one wants to play Support:</strong> A Follower with Medicine or healing Rites can keep the party alive.</li>
+  <li><strong>No one wants to play Tank:</strong> A Follower with Heavy Armor and a shield can hold the line.</li>
+  <li><strong>No one has high Investigation:</strong> A scout or informant Follower can gather information off-screen.</li>
+  <li><strong>No one speaks a particular language or knows a region's customs:</strong> A local guide Follower can navigate cultural pitfalls.</li>
+  <li><strong>The party needs a specialist for a single mission:</strong> A Follower can be hired for the duration of a task.</li>
+</ul>
+
+<h4>Follower Roles (By Capability)</h4>
+<div class="table-wrap">
+<table>
+<thead><tr><th>Follower Type</th><th>Cap Range</th><th>What They Can Do</th></tr></thead>
+<tbody>
+<tr><td><strong>Bodyguard (Tank)</strong></td><td>2–3</td><td>Hold a line, absorb damage, protect a PC</td></tr>
+<tr><td><strong>Scout (Utility)</strong></td><td>2–3</td><td>Gather information, navigate, spot dangers</td></tr>
+<tr><td><strong>Healer (Support)</strong></td><td>2–3</td><td>Stabilize wounds, clear Fatigue, remove Conditions</td></tr>
+<tr><td><strong>Scholar (Utility)</strong></td><td>2–3</td><td>Research, translate, identify relics</td></tr>
+<tr><td><strong>Mercenary (Striker)</strong></td><td>2–3</td><td>Deal damage in combat, follow orders</td></tr>
+<tr><td><strong>Guide (Utility)</strong></td><td>2–3</td><td>Navigate terrain, interpret local customs, translate</td></tr>
+<tr><td><strong>Fence (Controller/Utility)</strong></td><td>2</td><td>Access black markets, spread rumors, create leverage</td></tr>
+<tr><td><strong>Apprentice (Any)</strong></td><td>1–2</td><td>Assist a PC in their specialty (adds assist dice)</td></tr>
+</tbody>
+</table>
+</div>
+
+<h4>Follower Costs and Upkeep</h4>
+<p>Followers are acquired by spending XP: Cap&sup2; XP (Cap 1 = 1 XP, Cap 2 = 4 XP, Cap 3 = 9 XP). They require upkeep:</p>
+<ul>
+  <li><strong>Efficient:</strong> Pay XP equal to the Follower's Cap (minimum 1 XP) per downtime. No scene required.</li>
+  <li><strong>Intensive:</strong> Pay 1 XP and spend a scene maintaining the relationship (training, sharing a meal, resolving a personal problem).</li>
+</ul>
+<p><strong>Neglect Consequences:</strong></p>
+<ul>
+  <li>Loyalty worsens: Faithful &rarr; Strained &rarr; Broken.</li>
+  <li>A Strained Follower assists at -1 die; a Broken Follower leaves or becomes hostile.</li>
+  <li>If a Follower is neglected for two consecutive downtimes, they leave permanently (or worse — they join a rival).</li>
+</ul>
+
+<div class="panel panel-gold">
+    <span class="panel-title">Player Tip: The Follower as Successor</span>
+    A Cap 3+ Follower can become your successor when your character retires or falls. They inherit your faction standing, one unresolved burden, and a Legacy Bond. If you are playing a long campaign, consider investing in a Follower you would trust to carry your banner. See Chapter 18 (The Legacy Engine) for full rules.
+</div>
+
+<h3>Party Composition at a Glance</h3>
+<p>Use this table to see if your party has gaps. One character can cover multiple roles. Followers can fill the gaps marked with (F).</p>
+<div class="table-wrap">
+<table>
+<thead><tr><th>Party Size</th><th>Recommended Coverage</th></tr></thead>
+<tbody>
+<tr><td><strong>2 players</strong></td><td>1 Tank/Striker + 1 Support/Controller (F for missing roles)</td></tr>
+<tr><td><strong>3 players</strong></td><td>Tank + Striker + Support (or Controller); F for the missing role</td></tr>
+<tr><td><strong>4 players</strong></td><td>Tank + Striker + Controller + Support (Utility often folds into Support or Controller)</td></tr>
+<tr><td><strong>5+ players</strong></td><td>All roles covered; consider secondary roles</td></tr>
+</tbody>
+</table>
+</div>
+
+<h3>Sample Party Compositions</h3>
+
+<h4>The Balanced Party (4 Players, 32 XP each)</h4>
+<ul>
+  <li><strong>Tank:</strong> Body 3, Melee 2 (5 dice). Heavy Armor.</li>
+  <li><strong>Striker:</strong> Body 3, Melee 2 (5 dice). Medium weapon.</li>
+  <li><strong>Support:</strong> Spirit 3, Medicine 2 (5 dice). HEAL cantrip.</li>
+  <li><strong>Utility:</strong> Wits 3, Lore 2 (5 dice). Investigation.</li>
+</ul>
+<p><strong>Note:</strong> This party has <strong>zero Talents</strong> and is still fully effective. Total XP per character: <strong>30-31 XP</strong>, leaving room for one or two skills or a minor Talent.</p>
+
+<h4>The Aggressive Party (3 Players + Follower)</h4>
+<ul>
+  <li><strong>Striker/Tank:</strong> Body 3, Melee 2 (5 dice). Medium armor.</li>
+  <li><strong>Striker:</strong> Wits 3, Stealth 2 (5 dice). Light weapons.</li>
+  <li><strong>Utility/Support:</strong> Spirit 3, Arcana 2 (5 dice). Spellcraft.</li>
+  <li><strong>Follower: Healer (Cap 2, 4 XP)</strong> — keeps the party alive.</li>
+</ul>
+
+<h4>The Social Party (3 Players + Follower)</h4>
+<ul>
+  <li><strong>Controller:</strong> Presence 3, Sway 2 (5 dice).</li>
+  <li><strong>Utility:</strong> Wits 3, Subterfuge 2 (5 dice).</li>
+  <li><strong>Support/Utility:</strong> Spirit 3, Lore 2 (5 dice).</li>
+  <li><strong>Follower: Bodyguard (Cap 2, 4 XP)</strong> — protects the diplomats.</li>
+</ul>
+
+<h3>Final Advice from the Gray Wanderer</h3>
+<blockquote>
+"Do not obsess over party composition. The game is flexible. A party of four duelists is viable — they will simply solve problems with steel rather than words. A party of four scholars is viable — they will negotiate, research, and find the path that avoids combat altogether. The question is not whether your party is 'balanced.' The question is whether your party is prepared for the kind of problems your GM will present. Talk to your GM. Ask what kind of campaign they are running. Then build accordingly. And if you are missing a role, hire a Follower. They are not as strong as a PC, but they are better than nothing — and they can become something more.
+<p class="mt-1">"A Follower is not a servant. A Follower is a relationship. Treat them well, and they will save your life. Treat them poorly, and they will remember. The road is long. Walk it with people you trust — or at least pay on time."</p>
+</blockquote>
+
+<h3>Covering Gaps with Followers (Quick Reference)</h3>
+<div class="table-wrap">
+<table>
+<thead><tr><th>Missing Role</th><th>Recommended Follower</th><th>What They Do</th></tr></thead>
+<tbody>
+<tr><td>No Tank</td><td>Bodyguard (Cap 2–3)</td><td>Hold the line, absorb damage, protect a PC</td></tr>
+<tr><td>No Striker</td><td>Mercenary (Cap 2–3)</td><td>Deal damage in combat, follow orders</td></tr>
+<tr><td>No Controller</td><td>Interrogator or Witch (Cap 2–3)</td><td>Impose fear, manage conditions, manipulate</td></tr>
+<tr><td>No Support</td><td>Healer (Cap 2–3)</td><td>Stabilize, clear Fatigue, remove Conditions</td></tr>
+<tr><td>No Utility</td><td>Scholar or Guide (Cap 2–3)</td><td>Research, translate, navigate, identify</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="panel panel-green">
+    <span class="panel-title">The Gray Wanderer's Advice</span>
+    "A party without a Tank can still win — they just have to be smarter. A party without a Striker can still win — they just have to be patient. A party without a Support can still win — they just have to be careful. A party without a Utility can still win — they just have to ask the right questions. The only party that cannot win is the one that does not talk to each other. Coordination is the only role that matters. And if you are missing a role, hire a Follower. The road is long. Walk it with people you trust — or at least pay on time."
+</div>
+
+<footer class="doc-footer">
+    Fate's Edge Proprietary Content — (c) 2024 Nicholas A. Gasper. All rights reserved.
+</footer>
+
+</body>
+</html>

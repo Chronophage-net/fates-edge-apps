@@ -1,0 +1,952 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fate's Edge GM Guide — Chapter 7: Assets and Followers</title>
+<style>
+    :root {
+        --bg1: #0d0d1a;
+        --bg2: #1a1a2e;
+        --bg3: #252540;
+        --bg4: #2f2f4a;
+        --text: #e8e8f0;
+        --text2: #b8b8c8;
+        --text3: #8888a0;
+        --gold: #c9a84c;
+        --gold-hover: #d4b85c;
+        --border: #333355;
+        --red: #c0392b;
+        --green: #27ae60;
+        --blue: #2980b9;
+        --purple: #8e44ad;
+        --orange: #e67e22;
+        --radius: 8px;
+        --font: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+        background: var(--bg1);
+        color: var(--text);
+        font-family: var(--font);
+        padding: 1.5rem;
+        max-width: 1100px;
+        margin: 0 auto;
+        line-height: 1.6;
+    }
+    h1, h2, h3, h4, h5 { color: var(--gold); margin: 1rem 0 0.4rem; }
+    h1 { font-size: 1.9rem; border-bottom: 2px solid var(--gold); padding-bottom: 0.4rem; margin-top: 0; }
+    h2 { font-size: 1.4rem; border-bottom: 1px solid var(--border); padding-bottom: 0.2rem; margin-top: 1.6rem; }
+    h3 { font-size: 1.15rem; margin-top: 1.1rem; }
+    h4 { font-size: 1rem; color: var(--text); margin-top: 0.8rem; }
+    h5 { font-size: 0.9rem; color: var(--gold-hover); }
+    p { margin: 0.5rem 0; }
+    p.subtitle { color: var(--text2); font-style: italic; margin-top: -0.2rem; margin-bottom: 1rem; }
+    a { color: var(--gold); text-decoration: none; }
+    a:hover { color: var(--gold-hover); text-decoration: underline; }
+    ul, ol { margin: 0.4rem 0 0.6rem 1.4rem; }
+    li { margin: 0.2rem 0; }
+    dl { margin: 0.5rem 0; }
+    dt { font-weight: 600; color: var(--gold-hover); margin-top: 0.7rem; }
+    dd { margin-left: 1.2rem; color: var(--text2); }
+    .panel {
+        background: var(--bg2);
+        border-radius: var(--radius);
+        padding: 0.7rem 1rem;
+        border: 1px solid var(--border);
+        margin: 0.8rem 0;
+    }
+    .panel-title { color: var(--gold); font-weight: 700; margin-bottom: 0.4rem; display: block; }
+    .panel-gold { border-left: 4px solid var(--gold); }
+    .panel-red { border-left: 4px solid var(--red); }
+    .panel-blue { border-left: 4px solid var(--blue); }
+    .panel-green { border-left: 4px solid var(--green); }
+    .panel-purple { border-left: 4px solid var(--purple); }
+    .panel-orange { border-left: 4px solid var(--orange); }
+    .badge {
+        display: inline-block;
+        padding: 0.05rem 0.5rem;
+        border-radius: 12px;
+        font-size: 0.7rem;
+        font-weight: 600;
+        background: var(--bg4);
+        color: var(--text3);
+        border: 1px solid var(--border);
+    }
+    .badge-gold { background: var(--gold); color: #1a1400; border-color: var(--gold); }
+    .text-muted { color: var(--text3); }
+    .text-sm { font-size: 0.9rem; }
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; margin: 0.7rem 0; }
+    th, td { padding: 0.45rem 0.65rem; border: 1px solid var(--border); text-align: left; vertical-align: top; }
+    th { background: var(--bg4); color: var(--gold); font-weight: 600; }
+    tr:nth-child(even) { background: var(--bg2); }
+    blockquote {
+        font-style: italic;
+        border-left: 4px solid var(--gold);
+        padding: 0.5rem 1rem;
+        margin: 0.7rem 0;
+        background: var(--bg2);
+        border-radius: var(--radius);
+        color: var(--text2);
+    }
+    code { background: var(--bg4); padding: 0.1rem 0.3rem; border-radius: 4px; font-size: 0.85rem; color: var(--gold); }
+    hr { border: none; border-top: 1px solid var(--border); margin: 1.2rem 0; }
+    .toc { background: var(--bg3); border-radius: var(--radius); padding: 0.6rem 1rem; border: 1px solid var(--border); margin: 0.8rem 0 1.2rem; }
+    .toc-title { color: var(--gold); font-weight: 600; display: block; margin-bottom: 0.3rem; }
+    .toc a { color: var(--text2); display: block; padding: 0.08rem 0; font-size: 0.85rem; }
+    .toc a:hover { color: var(--gold); }
+    footer { margin-top: 2rem; padding-top: 1rem; border-top: 2px solid var(--gold); text-align: center; color: var(--text3); font-size: 0.8rem; }
+</style>
+</head>
+<body>
+
+<h1>Chapter 7: Running Assets and Followers</h1>
+<p class="subtitle">Fate's Edge GM Guide — Chapter 7</p>
+
+<p>In <em>Fate's Edge</em>, Assets and Followers are not mere mechanical bonuses — they are narrative levers that shape the world between scenes. As GM, your role is to introduce them as earned rewards, adjudicate their benefits <strong>only when narratively justified</strong>, and use their neglect as a primary source of compelling complications. They thrive when they create tension between player ambition and worldly consequences — not when they become spreadsheets of passive benefits.</p>
+
+<h2 id="design-principles">Design Principles for GM Use</h2>
+<p>When managing Assets and Followers in your campaign, remember:</p>
+<ul>
+<li><strong>They shift fiction between scenes</strong>: Assets open doors, quiet rumors, or stock larders <em>off-screen</em>. Followers act offscreen to gather information or manage responsibilities — <em>never</em> autonomously in scenes (that's player agency).</li>
+<li><strong>They create hooks</strong>: Every Asset or Follower should suggest <em>both</em> opportunities (if tended) <em>and</em> complications (if neglected). Neglect isn't "broken" — it's a story waiting to happen.</li>
+<li><strong>Stay narrative-first</strong>: Prefer position, scale, and access over flat modifiers. Instead of "+2 die," grant "start <strong>Dominant</strong> in negotiations with the guild" or "Your contact in the watch means the patrol arrives 10 minutes late."</li>
+<li><strong>Never let them replace player agency</strong>: If an Asset or Follower solves a problem too cleanly, add a cost (obligation, timer advance, or narrative complication). Their value is in <em>how</em> they enable player action, not in removing risk.</li>
+<li><strong>They scale with tier</strong>: In Tier I, a single safehouse feels significant; in Tier IV, players should manage networks of Assets or high-Cap Followers to match their influence.</li>
+</ul>
+
+<h4>What They Are <em>Not</em> (GM Guidance)</h4>
+<p>Ensure Assets and Followers <em>never</em>:</p>
+<ul>
+<li>Act as scene-solvers (e.g., "My safehouse automatically disarms all traps").</li>
+<li>Generate wealth or XP passively (their value is in narrative leverage, not bookkeeping).</li>
+<li>Stack identical effects — if two Followers would grant the same Assist, the GM chooses the <em>best narrative fit</em> (not the strongest mechanical bonus).</li>
+</ul>
+
+<h2 id="assets-procedures">Assets: GM Procedures for Introduction and Adjudication</h2>
+<p>Assets are properties, charters, networks, or institutions under player control. <strong>As GM, follow these steps when introducing or adjudicating Assets:</strong></p>
+<ol>
+<li><strong>Introduce as Narrative Reward:</strong> Never grant Assets via XP alone. Tie them to fiction:
+<ul>
+<li>"After clearing the bandit camp, the grateful village grants you use of their old mill as a Safehouse."</li>
+<li>"Your successful negotiation earns you a Guild Seat — vote and shop-rights in the artisan's quarter."</li>
+</ul>
+<em>Never</em> say "Spend 4 XP for a Safehouse." Instead: "The mill is yours — but it needs repair before it's useful."</li>
+<li><strong>Price for Story Weight, Not Just XP:</strong>
+<ul>
+<li>In Tier I (0–40 XP), a Minor Asset (4 XP) should feel like a major investment — adjust cost slightly up/down for narrative significance (e.g., a unique heirloom weapon might cost 6 XP as a Minor Asset).</li>
+<li>In Tier IV+ (151+ XP), Minor Assets are pocket change — reserve 4 XP costs for trivial holdings; Standard (8 XP) and Major (12 XP) Assets should feel meaningful.</li>
+</ul>
+</li>
+<li><strong>Always Attach a Hook:</strong> When introducing an Asset, immediately establish:
+<ul>
+<li><strong>What happens if tended?</strong> (e.g., "The informant ring whispers of a shipment tonight.")</li>
+<li><strong>What happens if neglected?</strong> (e.g., "If ignored for two sessions, the informants go silent — or worse, start talking to rivals.")</li>
+</ul>
+</li>
+<li><strong>Adjudicate Benefits Only When Fiction Supports It:</strong>
+<ul>
+<li><strong>Free Use</strong>: Once per session, trigger the off-screen benefit <em>only if</em> the Asset is maintained and the fiction supports it (e.g., a Safehouse is only useful if prepared and stocked — track via downtime scenes).</li>
+<li><strong>Scene Surge</strong>: Spend 1 Boon to turn an Asset into a dramatic on-screen intervention (one beat). <strong>Limit to one meaningful use per scene</strong> — more than that feels like a deus ex machina. Describe it vividly.</li>
+<li><em>Never</em> grant Free Use automatically — ask: "Does the fiction support using this benefit <em>now</em>?" If no, require a scene of preparation or a Boon spend.</li>
+</ul>
+</li>
+<li><strong>Use Neglect as Your Complication Engine:</strong>
+<ul>
+<li>Track Asset condition visibly (Maintained → Neglected → Compromised).</li>
+<li>When Neglected: Advance a relevant timer (e.g., <em>Informant Network [4]</em> ticks +1 per session neglected) or spend 1–2 SB to create complications tied to decay (e.g., "The safehouse landlord demands rent — or eviction.").</li>
+<li>When Compromised: Deny all benefits until fixed via quest or major downtime.</li>
+</ul>
+</li>
+</ol>
+
+<div class="panel panel-blue">
+<span class="panel-title">GM Tip: The Asset Neglect Engine</span>
+<p><strong>Neglect is your best storytelling tool.</strong> When players ignore an Asset:</p>
+<ul>
+<li>Advance a relevant timer (e.g., <em>Shop Rent [4]</em> ticks +1 per session neglected for a Market Front).</li>
+<li>Spend 1–2 SB to create a complication tied to the Asset's decay (e.g., "The Scholar's Cell custodian leaves — research now requires a DV +1 roll").</li>
+<li>Let the fiction degrade the Asset's benefit (e.g., a neglected Healing House now only clears Fatigue 1 once per downtime).</li>
+</ul>
+<p><em>Never</em> treat neglect as "nothing happens." A neglected Asset is a ticking time bomb — or a chance for players to re-engage with their world.</p>
+</div>
+
+<h2 id="followers-procedures">Followers: GM Procedures for Introduction and Adjudication</h2>
+<p>Followers are named NPCs with a personal relationship to the player character. Before any procedure, you must understand what makes a Follower mechanically distinct from an Asset: <strong>Cap</strong>.</p>
+
+<h4>What is Cap?</h4>
+<p><strong>Cap (Capacity)</strong> is a single number that answers one question: <em>how capable is this Follower on their own?</em> Cap governs two things:</p>
+<ol>
+<li><strong>Independent actions</strong>: When a Follower acts on their own (an off-screen task, a delegated mission, an autonomous duty), they roll up to <strong>Cap</strong>d10 against a DV you set. A Cap 3 Follower rolling 3d10 is performing at the level of a Tier III NPC in their area of expertise.</li>
+<li><strong>Assist actions</strong>: When a Follower helps a PC's roll, the Follower contributes <strong>+1d10 per Cap tier</strong>, capped at +3 total assist dice per action. A Cap 1 Follower adds one die; a Cap 5 Follower adds up to three.</li>
+</ol>
+<p><strong>Cap is a ceiling, not a skill list.</strong> A Cap 3 Follower is not "proficient at three things" — they are "as competent as a Tier III specialist within their defined role." Their specialty is determined by fiction (the street urchin knows locks; the mercenary captain knows cavalry), not by the number.</p>
+<p><strong>Cap is not Obligation Pool.</strong> A Follower's Cap and a Patron's Obligation Pool are different systems and may share the word "capacity" in colloquial use; this chapter uses <strong>Cap</strong> exclusively for Followers and <strong>Obligation Pool</strong> for Patrons.</p>
+
+<div class="panel">
+<span class="panel-title">Follower Cap at a Glance</span>
+<div class="table-wrap"><table>
+<tr><th>Cap</th><th>Independent Action</th><th>Assist</th></tr>
+<tr><td>1</td><td>Routine tasks unaided; combat or professional work at +1 DV; rolls 1d10.</td><td>+1 die</td></tr>
+<tr><td>2</td><td>Competent hireling; rolls 2d10 at the DV you set.</td><td>+2 dice</td></tr>
+<tr><td>3</td><td>Skilled professional; rolls 3d10; may manage up to Cap Assets.</td><td>+3 dice</td></tr>
+<tr><td>4</td><td>Veteran leader; rolls 4d10; commands an organization.</td><td>+3 dice</td></tr>
+<tr><td>5</td><td>Legendary figure; rolls 5d10; shapes regional events.</td><td>+3 dice</td></tr>
+</table></div>
+<p class="text-sm text-muted"><em>Remember</em>: Cap is the <em>ceiling</em>. A Cap 3 Follower whose Loyalty is Strained contributes at −1 die; a Cap 5 Follower whose Fitness is Down cannot assist at all.</p>
+</div>
+
+<h3>Introduction and Cost</h3>
+<p>Followers are earned through fiction, never purchased as a mechanical upgrade. <strong>As GM, follow these procedures:</strong></p>
+<ol>
+<li><strong>Introduce as Narrative Reward:</strong> Never grant Followers via XP alone. Tie them to fiction:
+<ul>
+<li>"After saving the merchant's daughter, she swears loyalty — now she's your Informant."</li>
+<li>"The defeated captain yields — now he follows you as your Mercenary Lieutenant."</li>
+</ul>
+<em>Never</em> say "Spend XP for a Follower." Instead: "They'll follow you — but only if you prove yourself worthy."</li>
+<li><strong>Price for Story Weight, Not Just XP:</strong>
+<ul>
+<li>Base cost is Cap² XP (Cap 1 = 1 XP, Cap 2 = 4 XP, Cap 3 = 9 XP, Cap 4 = 16 XP, Cap 5 = 25 XP).</li>
+<li><strong>Tier I Floor</strong>: Until the character reaches Tier II (41 XP), Cap 1 Followers cost a minimum of 3 XP. This prevents Tier I characters from accumulating a small army of urchins before they have anything else.</li>
+<li>Adjust for narrative weight: a unique spirit ally might cost 3 XP as a Cap 1 Follower; a politically pivotal Cap 3 might cost 12 XP. High-Cap Followers (4–5) should be rare and hard-won — reserve them for Tier III+ play.</li>
+</ul>
+</li>
+<li><strong>Always Attach a Hook:</strong> When introducing a Follower, immediately establish:
+<ul>
+<li><strong>What happens if tended?</strong> (e.g., "Your Informant whispers of a shipment tonight.")</li>
+<li><strong>What happens if neglected?</strong> (e.g., "If ignored for two sessions, your Informant goes silent — or worse, starts talking to rivals.")</li>
+</ul>
+</li>
+</ol>
+
+<h3>Adjudicating Follower Benefits</h3>
+<p>Followers do not act autonomously in scenes. Their benefits come only through three channels:</p>
+<ol>
+<li><strong>Bonds (1 Boon)</strong>: Draw on trust and loyalty for insight or support — a whispered warning, a remembered favor, a moment of hesitation in an enemy.</li>
+<li><strong>Assists (1 Boon)</strong>: The Follower contributes +1d10 per Cap tier to a PC's roll, capped at +3 total assist dice per action. The Boon represents the <em>PC's attention</em> to coordinating the Follower; a Cap 1 street urchin and a Cap 5 spymaster cost the same Boon because the cost prices the player's effort, not the Follower's capability.</li>
+<li><strong>Offscreen Action (1 Boon or 1 downtime scene)</strong>: The Follower handles tasks that would otherwise demand PC time ("Your Informant spends the week gathering rumors — report next session").</li>
+</ol>
+<p><em>Never</em> say "My Follower scouts ahead." The player must spend a Boon for an Assist or declare a Bond-driven action; otherwise the Follower waits off-screen.</p>
+
+<h4>Cap 1 Followers and the Boon Economy</h4>
+<p>Because Tier I characters have few Boons, <strong>Cap 1 Followers do not require Boon expenditure for baseline loyalty actions</strong>: asking Pip to watch a door, carry a note, or notice a familiar face is a narrative request, not a Boon spend. Boons are required only when the Cap 1 Follower's contribution <em>replaces a die roll</em> (Assist) or <em>provides unprompted insight</em> (Bond). This preserves the player's Boon economy while keeping the Follower useful.</p>
+
+<h4>What Cap Determines</h4>
+<p>The Follower's Cap dictates what they can credibly attempt without your intervention:</p>
+<ul>
+<li><strong>Cap 1</strong>: Routine personal service. They can carry messages, watch doors, identify familiar faces in their home neighborhood, and notice details in their area of expertise. They <em>cannot</em> fight trained opponents, forge documents, scout wilderness, or lie convincingly to authority figures. If asked to perform a Cap 2+ task, they roll their 1d10 at the normal DV and likely fail — if they fail a task the PC pressed them into, Loyalty drops one step automatically (the Follower tried and was exposed to danger for nothing).</li>
+<li><strong>Cap 2</strong>: A competent hireling. They can hold a post, run a small operation, or fight alongside the party in light skirmishes.</li>
+<li><strong>Cap 3</strong>: A skilled professional. They can manage a Cap number of Assets, lead a small team, or serve as a regional specialist.</li>
+<li><strong>Cap 4–5</strong>: Veterans and legends. They command organizations, shape regional events, and have their own agendas that may conflict with the PC's.</li>
+</ul>
+
+<h3>Loyalty and Fitness as States</h3>
+<p>Instead of numeric timers, track each Follower's <strong>Loyalty</strong> and <strong>Fitness</strong> as one of three states each:</p>
+<div class="panel">
+<span class="panel-title">Follower States</span>
+<div class="table-wrap"><table>
+<tr><th>State</th><th>Levels</th><th>Mechanical Effect</th></tr>
+<tr><td>Loyalty</td><td>Faithful / Strained / Broken</td><td>Strained = Assist at −1 die, may refuse risky orders. Broken = leaves or becomes hostile.</td></tr>
+<tr><td>Fitness</td><td>Ready / Hurt / Down</td><td>Hurt = Assist at −1 die, no independent actions. Down = requires rescue or medical care; contributes nothing.</td></tr>
+</table></div>
+</div>
+<p><strong>Change states only when the fiction demands it.</strong> No rolls are required; you change states in response to events. A Follower whose sister is sold into indentured service does not need a Persuasion check to feel Strained — they simply are.</p>
+
+<h3>Loyalty Degradation by Cap</h3>
+<p>A Cap 1 street urchin's loyalty fails for different reasons than a Cap 5 spymaster's. <strong>As GM, use these triggers as defaults, then adjust for fiction:</strong></p>
+<div class="panel">
+<span class="panel-title">Loyalty Degradation Triggers by Cap</span>
+<div class="table-wrap"><table>
+<tr><th>Cap</th><th>Strained Trigger</th><th>Broken Trigger</th></tr>
+<tr><td>1</td><td>1 session without direct contact</td><td>2 sessions without direct contact, <em>or</em> asked to do Cap 2+ work without success</td></tr>
+<tr><td>2</td><td>2 sessions without meaningful interaction</td><td>Betrayal witnessed or pay withheld</td></tr>
+<tr><td>3</td><td>Betrayal of stated principles</td><td>Failure to clear a major obligation</td></tr>
+<tr><td>4–5</td><td>Failure to honor a factional oath</td><td>Public humiliation or sacrifice of the Follower</td></tr>
+</table></div>
+<p class="text-sm text-muted"><em>Rationale</em>: Cap 1 Followers are tied to the PC personally, not institutionally. Their loyalty is maintained by <em>attention</em>, not abstract duty. High-Cap Followers have obligations and agendas of their own; their loyalty is more durable but their breaking points are more dramatic.</p>
+</div>
+
+<h3>Neglect as Your Complication Engine</h3>
+<ul>
+<li>If a Follower's Loyalty becomes Strained or Broken, all Assets they manage immediately become Neglected.</li>
+<li>If a Follower's Fitness becomes Down, they cannot perform off-screen tasks — they need tending first.</li>
+<li>Neglecting a Follower's upkeep degrades their state — <strong>use this as your complication engine</strong>, just as you do with Assets.</li>
+</ul>
+
+<h3>Follower Upkeep by Cap</h3>
+<p>Upkeep cost scales with Cap, but the form changes:</p>
+<div class="panel">
+<span class="panel-title">Follower Upkeep by Cap</span>
+<div class="table-wrap"><table>
+<tr><th>Cap</th><th>Upkeep Cost</th><th>If Neglected</th></tr>
+<tr><td>1</td><td>1 downtime scene per <em>chapter</em> (no XP option)</td><td>Loyalty degrades per Cap 1 triggers; Failure to perform task the PC demanded drops Loyalty one step.</td></tr>
+<tr><td>2–5</td><td>XP = Cap × 2 per session <em>OR</em> 1 downtime scene</td><td>Loyalty/Fitness degrade per Cap-appropriate triggers; Asset neglect cascades.</td></tr>
+</table></div>
+<p class="text-sm text-muted"><em>Why the asymmetry</em>: A Tier I character cannot afford 2 XP/session/Cap 1 Follower without going bankrupt by session 5. Cap 1 Followers cost <em>attention</em>, tracked by the Loyalty table; Cap 2–5 Followers cost <em>XP or time</em>, scaling with their capability.</p>
+</div>
+
+<div class="panel panel-blue">
+<span class="panel-title">GM Tip: The Follower Neglect Engine</span>
+<p><strong>Neglect is your best storytelling tool.</strong> When players ignore a Follower:</p>
+<ul>
+<li>Degrade their Loyalty/Fitness state based on fiction (e.g., "After missing pay for two sessions, your Mercenary Lieutenant's Loyalty turns Strained — Assist at −1 die").</li>
+<li>If neglected for 2+ sessions, trigger a consequence (e.g., "Your Informant sells your secrets to a rival — spend 1 SB to learn what they revealed").</li>
+<li>Let the fiction reflect the strain (e.g., a Hurt Follower can't undertake offscreen tasks — they need tending first).</li>
+</ul>
+<p><em>Never</em> treat neglect as "nothing happens." A neglected Follower is a relationship in crisis — or a chance for players to rebuild trust.</p>
+</div>
+
+<h2 id="interaction-loop">The Interaction Loop: Assets, Followers, and the Core Mechanics</h2>
+<p>Assets and Followers integrate seamlessly with Fate's Edge's core resolution loop. <strong>As GM, guide players through this cycle:</strong></p>
+<ol>
+<li><strong>Player declares intent and approach</strong> (Attribute + Skill).</li>
+<li><strong>You state Position and set relevant Timers</strong>.</li>
+<li><strong>Player rolls d10s; counts Successes (6+) and Story Beats (1s)</strong>.</li>
+<li><strong>Compare to DV → use Outcome Matrix</strong>.</li>
+<li><strong>Apply consequences and update the fiction</strong> — <strong>this is where Assets and Followers shine</strong>:
+<ul>
+<li><strong>On Partial or Miss</strong>: Players may spend Boons to activate Assets/Followers (Scene Surge or Bond-driven action).</li>
+<li><strong>On Success</strong>: Players may use Assets/Followers offscreen to prepare for next scene (Free Use or downtime action).</li>
+<li><strong>Always</strong>: Check Asset/Follower condition — neglect triggers complications <em>before</em> applying the roll's outcome.</li>
+</ul>
+</li>
+<li><strong>Pass the spotlight</strong> — <strong>but first, remind players of pending upkeep</strong>:
+<ul>
+<li>"Before we move on — your Safehouse needs tending this downtime. Pay 4 XP or devote a scene to it, or it becomes Neglected."</li>
+<li>"Your Informant's Loyalty is Strained — they'll refuse risky orders until you make amends."</li>
+</ul>
+</li>
+</ol>
+
+<div class="panel panel-gold">
+<span class="panel-title">GM Tip: The Upkeep Reminder</span>
+<p><strong>Make upkeep a narrative moment — not bookkeeping.</strong> At scene end:</p>
+<ul>
+<li>Ask: "Who tends their Assets/Followers this downtime? What does that look like in fiction?"</li>
+<li>Let players describe the action (e.g., "I spend the morning greasing the Safehouse chains," "I buy my Follower a drink and apologize for the last mission").</li>
+<li>Only <em>then</em> apply mechanical effects: pay XP, change state, or advance neglect timers.</li>
+</ul>
+<p><em>This turns upkeep from a chore into roleplay — exactly where Assets and Followers belong.</em></p>
+</div>
+
+<h2 id="using-in-play">Using Assets and Followers in Play: GM Procedures</h2>
+<p><strong>As GM, your role is to:</strong></p>
+<ul>
+<li><strong>Frame Asset/Follower benefits only when fiction supports it</strong>:
+<ul>
+<li>A Safehouse is only useful if prepared and stocked (track via downtime scenes).</li>
+<li>A Follower only assists if their Loyalty/Fitness state allows it (track via fiction-driven state changes).</li>
+<li><em>Never</em> grant benefits automatically — ask: "Does the fiction support using this benefit <em>now</em>?" If no, require a scene of preparation, a Boon spend (Scene Surge/Bond-driven action), or a narrative cost.</li>
+</ul>
+</li>
+<li><strong>Allow flashbacks only with a modest cost</strong>:
+<ul>
+<li>To show prior work (e.g., "You spent yesterday preparing the Safehouse"), require 1 Boon <em>or</em> 1 downtime scene.</li>
+<li><em>Never</em> allow free exposition — flashbacks must cost something meaningful.</li>
+</ul>
+</li>
+<li><strong>Tie complications directly to Asset/Follower condition</strong>:
+<ul>
+<li>If Neglected: Spend SB against it first (e.g., "The Safehouse is Neglected — spend 1 SB to advance the <em>Landlord Dispute [4]</em> timer").</li>
+<li>If Compromised: Deny benefits until fixed via quest or major downtime.</li>
+<li>If Follower Loyalty Broken: They leave or become hostile — spend 1 SB to show their departure or betrayal.</li>
+</ul>
+</li>
+<li><strong>Spotlight spread</strong>: Rotate which Assets/Followers take the stage so each investment breathes on-screen now and then — <strong>never</strong> let one Asset or Follower dominate all scenes.</li>
+<li><strong>Use them to create obligation and timers</strong>:
+<ul>
+<li>Leveraging an Asset against faction interests may add Obligation.</li>
+<li>Neglecting a Follower may advance a <em>Trust Eroded [4]</em> timer.</li>
+<li>Using a Follower for offscreen work may fill segments on a <em>Reputation [6]</em> timer.</li>
+</ul>
+</li>
+</ul>
+
+<h4>Example of Play (GM Perspective)</h4>
+<p>A player has a <strong>Safehouse (Minor Asset)</strong> and an <strong>Informant (Cap 1 Follower)</strong>. <strong>As GM:</strong></p>
+<p><strong>Scene Start</strong><br>Ask: "Is the Safehouse maintained and stocked? Is the Informant tended?"</p>
+<ul>
+<li><strong>Both tended</strong>: Grant Free Use to start an entry/exit scene at <strong>Dominant</strong> position. Describe: "The landlord nods at your signal — 'All clear. Proceed to the cellar.'"</li>
+<li><strong>Safehouse Neglected</strong>: Describe: "The floorboard creaks differently. Your landlord eyes you over tea: 'Business has been slow. I wonder why.'" Then spend 1 SB to advance <em>Landlord Dispute [4]</em> timer +1.</li>
+<li><strong>Informant Loyalty Strained</strong>: Describe: "Your Informant avoids your gaze. 'I've got nothing for you this week — business's been rough.'" They refuse to assist until tended.</li>
+</ul>
+<p><strong>During the Scene</strong><br>When the player wants to use Asset/Follower:</p>
+<ul>
+<li><strong>Safehouse Scene Surge (1 Boon)</strong>: Describe: "You grip the hidden lever — 'Hold!' The wine rack slides aside, revealing the escape tunnel. For one beat, pursuit is negated — just enough to slip into the alley."</li>
+<li><strong>Informant Bond-driven action (1 Boon)</strong>: Describe: "You slide a coin across the table — 'Remember the river bend?' Their eyes light up: 'The shipment leaves at midnight. Take the north ridge.'" Grant +1 die on the next Stealth roll (Cap 1, baseline loyalty).</li>
+</ul>
+<p><strong>Scene End</strong><br>Remind players of upkeep:</p>
+<ul>
+<li>"Your Safehouse needs tending — pay 4 XP or devote a scene to avoid Neglect."</li>
+<li>"Your Informant's Loyalty is Strained — spend downtime mending trust or they'll go silent next session."</li>
+</ul>
+
+<h2 id="pacing-scaling">Pacing and Scaling Guidance</h2>
+<p><strong>As GM, use Assets and Followers to scale challenge naturally with tier:</strong></p>
+<ul>
+<li><strong>Tier I (0–40 XP)</strong>:
+<ul>
+<li>Assets are rare and hyper-local (e.g., a single Safehouse, a trusted Informant).</li>
+<li>Followers are low-Cap (Cap 1–2) and deeply personal (e.g., a sibling, a mentor).</li>
+<li><em>GM Guidance</em>: One Asset or Follower should feel significant — neglect creates immediate, personal complications (e.g., "Your Informant won't help until you repay their favor"). Cap 1 Followers are introduced through fiction (oath, blood-debt) and their cost is <em>attention</em>, not XP — this preserves the Tier I economy.</li>
+</ul>
+</li>
+<li><strong>Tier II (41–90 XP)</strong>:
+<ul>
+<li>Assets begin to show regional reach (e.g., a Guild Seat, a Harbor Office).</li>
+<li>Followers include mid-Cap (Cap 2–3) figures (e.g., a guild factor, a veteran sergeant).</li>
+<li><em>GM Guidance</em>: Assets/Followers should tie into regional politics or trade — neglect invites rivals or invites scrutiny (e.g., "Neglect your Guild Seat for two sessions, and rivals challenge your voting rights").</li>
+</ul>
+</li>
+<li><strong>Tier III (91–150 XP)</strong>:
+<ul>
+<li>Assets scale to national influence (e.g., a Banking Charter, a Fortress).</li>
+<li>Followers include high-Cap (Cap 3–4) figures (e.g., a bank director, a garrison commander).</li>
+<li><em>GM Guidance</em>: Assets/Followers should tie into national economics or military power — neglect risks invasion, embargo, or revolt (e.g., "Neglect your Fortress for two sessions, and the garrison mutinies").</li>
+</ul>
+</li>
+<li><strong>Tier IV+ (151+ XP)</strong>:
+<ul>
+<li>Assets are empire-shaping (see Tier III Institutions, in the Compendium of Assets below).</li>
+<li>Followers include Cap 4–5 figures who can manage Assets on your behalf.</li>
+<li><em>GM Guidance</em>: Assets/Followers should tie into imperial succession or continental wars — neglect risks civil war or foreign invasion (e.g., "Neglect your Palace Complex for two sessions, and court factions secede").</li>
+</ul>
+</li>
+</ul>
+
+<div class="panel panel-blue">
+<span class="panel-title">GM Tip: The Scaling Mantra</span>
+<p><strong>At high tiers, Assets and Followers aren't "more powerful" — they're "more complex."</strong></p>
+<ul>
+<li>A Tier V character doesn't need "a better Safehouse" — they need "a Safehouse network with competing landlords and shifting loyalties."</li>
+<li>A Tier V character doesn't need "a stronger Follower" — they need "a Follower with their own agenda, Obligations, and potential to betray."</li>
+</ul>
+<p><em>The challenge isn't in the mechanical bonus — it's in navigating the web of relationships and responsibilities they create.</em></p>
+</div>
+
+<h2 id="pitfalls">Common Pitfalls and Fixes</h2>
+<p><strong>As GM, watch for these issues and apply these fixes:</strong></p>
+<div class="table-wrap"><table>
+<tr><th>Pitfall</th><th>Fix</th></tr>
+<tr><td><strong>Asset hoarding:</strong> Players collect Assets like XP, neglecting most.</td><td>Enforce Capacity (optional rule: Assets &gt; Spirit cost +50% upkeep or extra downtime scene). Make neglect hurt — advance timers, spend SB, or degrade benefits.</td></tr>
+<tr><td><strong>Follower automation:</strong> Players treat Followers as scene-solvers.</td><td>Remind them: Followers only act through Bonds/Assists (Boon spend) or offscreen work. Never grant autonomous scene actions.</td></tr>
+<tr><td><strong>Cap mismatch:</strong> Players assign Cap 1 urchins to tasks only Cap 3+ Followers can credibly attempt.</td><td>Enforce Cap as a ceiling. A Cap 1 Follower asked to do Cap 2+ work rolls 1d10 at the normal DV and likely fails; if they fail a task the PC pressed them into, Loyalty drops automatically.</td></tr>
+<tr><td><strong>Power creep:</strong> Assets/Followers make rolls too easy.</td><td>Never grant flat modifiers (+2 die). Always use narrative benefits (Position shift, DV −1, timer fill). If it feels too strong, add a cost (e.g., "Using the Safehouse tonight costs 1 Obligation to the guild").</td></tr>
+<tr><td><strong>Neglect ignored:</strong> Players overlook Asset/Follower decay.</td><td>Make neglect visible and consequential: describe the decay (rust, empty coffers, strained voices) and tie it to immediate complications (SB spends, timer advances).</td></tr>
+<tr><td><strong>One Asset/Follower dominance:</strong> One investment overshadows all others.</td><td>Enforce spotlight spread: require players to rotate focus. If one Asset dominates, advance a neglect timer on it to force diversification.</td></tr>
+<tr><td><strong>Free Use abuse:</strong> Players treat Free Use as automatic.</td><td>Only grant Free Use if fiction supports it. Require a Boon spend (Scene Surge) or downtime scene for offscreen benefits when neglected or unprepared.</td></tr>
+<tr><td><strong>Boon economy collapse:</strong> Tier I players spend every Boon on Follower upkeep, starving the core loop.</td><td>Cap 1 Followers do not require Boons for baseline loyalty actions (watching a door, carrying a note). Boons are required only when the Follower's contribution <em>replaces a roll</em> or <em>provides unprompted insight</em>.</td></tr>
+</table></div>
+
+<h2 id="advanced-rules">Optional Advanced Rules</h2>
+<p>Use these sparingly to add depth — but only when the fiction demands it.</p>
+
+<h3>Asset Networks (GM Guidance)</h3>
+<p>For players with multiple Assets, <strong>as GM, allow them to declare a "Network" once per session</strong> (cost: 1 Boon or 1 downtime scene) to:</p>
+<ul>
+<li>Treat two Minor Assets' upkeep as waived this downtime (like the Market Front Standard Asset benefit).</li>
+<li>Grant +1 die to a roll involving <strong>both</strong> Assets (e.g., using a Safehouse <em>and</em> Informant to gather intelligence).</li>
+<li>Mitigate 1 SB from a complication tied to <em>either</em> Asset (e.g., "Your Informant warns of the landlord's visit — spend the Boon to avoid the rent dispute").</li>
+</ul>
+<p><em>GM Guidance:</em> Limit to one Network declaration per session. Networks should feel earned — require players to describe how the Assets connect (e.g., "I pay the Informant to tip off the Safehouse landlord about incoming inspectors").</p>
+
+<h3>Follower Management (GM Guidance)</h3>
+<p>For players with high-Cap Followers (Cap 3+), <strong>as GM, allow them to delegate Asset management</strong> once per session (cost: 1 Boon or 1 downtime scene) to:</p>
+<ul>
+<li>Have the Follower tend up to <strong>Cap</strong> Assets (e.g., a Cap 3 Follower tends 3 Assets).</li>
+<li>The Follower's own upkeep (XP or downtime scene) <strong>automatically covers</strong> the upkeep of delegated Assets — no separate cost.</li>
+<li>If the Follower's Loyalty becomes Strained or Broken, <strong>all delegated Assets immediately become Neglected</strong>.</li>
+<li><strong>Cap 1 and Cap 2 Followers cannot manage Assets.</strong> Asset management requires organizational capacity the Follower does not possess. Cap 1–2 Followers can perform single discrete tasks on an Asset's behalf ("Watch the safehouse door for one night," "Carry this message to the landlord"), but not ongoing management.</li>
+</ul>
+<p><em>GM Guidance:</em> This creates meaningful tension — players must choose between tending Followers directly or delegating Asset management. Neglecting the Follower risks losing <em>multiple</em> Assets at once.</p>
+
+<h3>Obligation Integration (GM Guidance)</h3>
+<p>When Assets or Followers are tied to a faction (e.g., Temple Complex, Informant Ring), <strong>as GM, use them to drive Obligation</strong>:</p>
+<ul>
+<li>Leveraging an Asset against faction interests adds 1–2 Obligation segments (e.g., "Using the Banking Charter to freeze a rival's account adds 2 Obligation to the bank").</li>
+<li>Neglecting a Follower tied to a faction adds 1 Obligation segment per session neglected (e.g., "Ignoring your Informant's pleas adds 1 Obligation to the spy network").</li>
+<li>Tending a Follower's welfare reduces Obligation by 1 segment per scene (e.g., "Spending downtime with your Informant clears 1 Obligation").</li>
+</ul>
+<p><em>GM Guidance:</em> Track this Obligation visibly — use it to create complications when full (e.g., "Your Obligation to the bank is full — spend 1 SB to advance the <em>Bank Audit [6]</em> timer").</p>
+
+<h2 id="quick-ref">Quick Reference (GM)</h2>
+<div class="panel panel-blue">
+<span class="panel-title">Asset/Follower Quick Reference (GM)</span>
+<ul>
+<li><strong>Asset Costs</strong>: Minor 4 XP / Standard 8 XP / Major 12 XP / Tier III 16–20 XP. <em>GM Guidance:</em> Adjust slightly for narrative weight (e.g., a unique artifact might cost 6 XP as a Minor Asset).</li>
+<li><strong>Follower Costs</strong>: Cap² XP, with a <strong>Tier I floor of 3 XP for Cap 1</strong> until the character reaches Tier II. <em>GM Guidance:</em> Adjust for story weight (e.g., a unique spirit ally might cost 3 XP as Cap 1). High-Cap Followers (4–5) reserved for Tier III+.</li>
+<li><strong>Cap (Capacity)</strong>: Maximum die a Follower may roll independently; maximum assist contribution to a PC's roll (capped at +3 dice per action). <em>Remember</em>: Cap is a ceiling, not a skill list. It is not the Patron's Obligation Pool.</li>
+<li><strong>Asset Free Use</strong>: Once per session, off-screen leverage <em>only if fiction supports it</em>. Frame at scene start or as flashback with GM assent (cost: 1 Boon or 1 downtime scene).</li>
+<li><strong>Asset Scene Surge</strong>: Spend 1 Boon for a one-beat, on-screen intervention. <strong>Limit to one meaningful use per scene</strong>.</li>
+<li><strong>Follower Benefits</strong>: Bonds (1 Boon for insight/support), Assists (1 Boon for +1 die per Cap tier, max +3), or Offscreen Action (1 Boon or 1 downtime scene). Cap 1 baseline loyalty actions are <em>free</em>.</li>
+<li><strong>Asset Upkeep</strong>: Pay XP = base cost <em>OR</em> devote a downtime scene. Neglect degrades condition (Maintained → Neglected → Compromised).</li>
+<li><strong>Follower Upkeep</strong>: Cap 1 = 1 downtime scene/chapter (no XP option). Cap 2–5 = XP = Cap × 2 per session <em>OR</em> 1 downtime scene.</li>
+<li><strong>Asset Capacity (Optional)</strong>: Assets ≤ Spirit are easy; beyond that, upkeep taxes mount (+50% per extra Asset) or requires extra downtime scene.</li>
+<li><strong>Follower Management (Optional, Cap 3+)</strong>: A Follower tends up to Cap Assets once per session (cost: 1 Boon or 1 downtime scene). Cap 1–2 Followers cannot manage Assets.</li>
+<li><strong>Neglect is Your Engine</strong>: Always use Asset/Follower neglect to create complications — advance timers, spend SB, or degrade benefits. <strong>Never</strong> let neglect be "nothing happens."</li>
+</ul>
+</div>
+
+<h2 id="cap-1-example">Worked Example: A Cap 1 Follower</h2>
+<p><strong>"Pip," the Locksmith's Apprentice</strong></p>
+<dl>
+<dt>Cap</dt><dd>1 (independent rolls: 1d10; assists: +1 die)</dd>
+<dt>Loyalty</dt><dd>Faithful (introduced this session; player saved him from a press gang)</dd>
+<dt>Fitness</dt><dd>Ready</dd>
+<dt>Hook</dt><dd>Pip's sister is indentured to the Velvet Court; he'll do anything to buy her contract back.</dd>
+<dt>What he does for free</dt><dd>Watch a door, carry a note, identify a familiar face in the locksmith's district, notice a new lock on a familiar shop.</dd>
+<dt>What he does for 1 Boon</dt><dd>+1 die on a <em>Crafting</em> or <em>Subterfuge</em> roll in his home neighborhood (he knows the locksmiths and the beggars); unprompted Bond insight ("The lock on that warehouse — I can tell you who made it.").</dd>
+<dt>What he can't do</dt><dd>Fight a soldier, travel farther than one day's ride, keep a secret from his sister for more than a day, forge a document, scout wilderness.</dd>
+<dt>If asked to do Cap 2+ work</dt><dd>He rolls 1d10 at the normal DV and likely fails. If the PC pressed him into a task beyond his capacity and he failed, his Loyalty drops to Strained automatically (he tried and was exposed to danger for nothing).</dd>
+<dt>Neglect consequence</dt><dd>If 2 sessions pass without the player asking after his sister, Loyalty drops to Strained and Pip starts leaking small rumors to the Velvet Court.</dd>
+</dl>
+<p><em>Why this works</em>: Pip is useful in his niche, free to maintain (1 downtime scene per chapter), and his limitations are encoded in the fiction, not in arbitrary rules. The player can choose to invest in him (asking after his sister, spending Boons to use him well) and see those investments pay off, or neglect him and watch him become a liability. Either path produces story.</p>
+
+<h2 id="summary1">Summary</h2>
+<p><strong>As GM, remember:</strong></p>
+<ul>
+<li>Assets and Followers are <strong>narrative levers</strong>, not mechanical bonuses — they shape the world <em>between scenes</em>, not <em>during</em> them.</li>
+<li>Their <strong>true value lies in the hooks they create</strong> — what happens if tended? what if neglected?</li>
+<li><strong>Neglect is your best storytelling tool</strong> — use it to advance timers, spend SB, or degrade benefits.</li>
+<li><strong>Always tie benefits to fiction</strong> — never grant Free Use or Follower assistance automatically. Require a Boon spend, downtime scene, or narrative cost when unprepared or neglected.</li>
+<li><strong>Cap is the Follower's ceiling</strong>, not their skill list. A Cap 1 Follower is not a weaker Cap 5 — they are a <em>different kind of tool</em>, useful in their niche and limited outside it.</li>
+<li><strong>Spotlight spread is essential</strong> — rotate which Assets/Followers take the stage so each investment feels earned and consequential.</li>
+<li><strong>At high tiers, complexity &gt; power</strong> — the challenge isn't in stronger bonuses, but in navigating webs of loyalty, obligation, and competing interests.</li>
+</ul>
+<p>Choose what to own and who to follow — then let the world answer. The best Assets and Followers create as many problems as they solve, and the best complications come from neglect, not power.</p>
+
+<div class="panel">
+<span class="panel-title">From Faction to Asset/Follower: Taking Over a Terrestrial Patron (GM Guidance)</span>
+<p>Sometimes you stop owing the guild — and start owning it. Rising to lead a faction (Thieves' Guild, Mercenary Company, Banking Charter, etc.) is a major story arc, not a simple XP purchase. <strong>As GM, run this arc as a 2–3 session collaboration with the player.</strong></p>
+
+<h4>Narrative Prerequisites (GM Verification)</h4>
+<p>Before approving a takeover attempt, verify:</p>
+<ul>
+<li>The player has at least <strong>6 Obligation</strong> with the faction (deep entanglement).</li>
+<li>They completed a <strong>major service</strong> for the faction (your discretion — e.g., saving it from destruction, winning a war, exposing a traitor at great cost).</li>
+<li>They secured at least one <strong>internal ally</strong> with significant influence (another captain, a guildmaster, a wealthy backer).</li>
+</ul>
+<p><em>If prerequisites aren't met, the takeover attempt fails narratively — no XP cost, just a complication.</em></p>
+
+<h4>The Takeover Arc (GM Collaboration)</h4>
+<p>Collaborate on a 2–3 session arc that typically involves:</p>
+<ol>
+<li><strong>Crisis or Power Vacuum</strong> — The current leader dies, disappears, or is disgraced (you define the crisis).</li>
+<li><strong>Claim of Right</strong> — The player presents a valid claim (charter, election, duel victory, popular support — you judge validity).</li>
+<li><strong>Consolidation</strong> — Defeat or co-opt rivals, bribe or intimidate dissenters, and secure the faction's resources (you play the opposition).</li>
+</ol>
+<p><em>This arc should test the player's ingenuity, not just their XP pool.</em></p>
+
+<h4>Mechanical Cost (GM Enforcement)</h4>
+<p>Once the arc is complete, the player must spend <strong>12 XP</strong> (the cost of a Major Asset) to convert the faction into a personal Asset. <strong>As GM:</strong></p>
+<ul>
+<li>Enforce this cost strictly — no conversions without payment.</li>
+<li>Describe the conversion as institutional restructuring: "The ledgers are rewritten, the oaths renewed — it's yours now, but the work has only begun."</li>
+</ul>
+
+<h4>Converting the Asset/Follower (GM Guidance)</h4>
+<p>The new Asset uses the statistics of the most appropriate existing Asset from this compendium, modified by the faction's nature:</p>
+<ul>
+<li><strong>Thieves' Guild</strong> → <strong>Informant Ring</strong> (Standard) or <strong>Smuggler's Network</strong> (Standard)</li>
+<li><strong>Mercenary Company</strong> → <strong>Mercenary Contract</strong> (Minor/Standard) or <strong>Military Outpost</strong> (Major)</li>
+<li><strong>Banking Charter</strong> → <strong>Banking Charter</strong> (Major) or <strong>Trading Consortium</strong> (Major)</li>
+<li><strong>Royalist Network</strong> → <strong>Intelligence Bureau</strong> (Specialized) or <strong>Diplomatic Enclave</strong> (Major)</li>
+<li><strong>Ecktorian Mystery Cult</strong> → <strong>Temple Complex</strong> (Standard) or <strong>Magical Laboratory</strong> (Specialized)</li>
+</ul>
+<p><em>As GM, feel free to create a custom Asset using the Asset procedures above if none fit the faction's nature.</em></p>
+
+<h4>What You Gain (GM Description)</h4>
+<p>Upon conversion, grant:</p>
+<ul>
+<li>The Asset's normal <strong>Free Use</strong> and <strong>Scene Surge</strong> benefits.</li>
+<li>The <strong>Access Tag</strong> associated with the faction (e.g., <em>Guild-Ledgered</em>, <em>Harbor Handsigns</em>).</li>
+<li>A permanent <strong>obligation track</strong> toward the faction's members (now your underlings). This track is smaller (4 segments) and fills when you neglect their welfare or make reckless decisions that endanger them.</li>
+</ul>
+<p><em>As GM, track this obligation and use it to create complications when neglected (e.g., "The crew grumbles — pay is late again. After 2 sessions neglected, they threaten to walk.")</em></p>
+
+<h4>What You Lose (GM Enforcement)</h4>
+<p>Enforce these losses strictly:</p>
+<ul>
+<li>The player can no longer use the faction as a <em>terrestrial patron</em> to gain Obligation-free perks — they are now responsible for it.</li>
+<li>The faction becomes a target for your enemies — advance a <strong>Rival Faction timer</strong> whenever they use the Asset aggressively.</li>
+<li>They must pay normal <strong>upkeep</strong> (XP or downtime scenes) to keep the Asset <em>Maintained</em>. Neglect causes internal dissent, corruption, or defections — <strong>use this as your complication engine</strong>.</li>
+</ul>
+
+<h4>Optional: Gradual Takeover (GM Permission)</h4>
+<p>For a slower, more story-driven approach, the player may forgo the 12 XP cost but must instead <strong>spend a downtime scene per session</strong> managing the faction (equivalent to Intensive upkeep) and accept that the Asset's benefits are unreliable until they have successfully completed a full arc of consolidation. <strong>As GM, you may allow the XP cost to be paid in installments</strong> (e.g., 4 XP per downtime period) to represent gradual investment.</p>
+
+<h4>Example: Rellan Takes the Black Ledger (GM Narration)</h4>
+<p>Rellan has served the Black Ledger smuggling syndicate for two arcs, accruing 6 Obligation. After exposing a rival who betrayed the syndicate (your narration), the aging leader steps down. Rellan spends 12 XP, completes a short arc consolidating loyal captains (you play the opposition), and converts the syndicate into a <strong>Smuggler's Network (Standard Asset)</strong>. He now commands hidden routes and safehouses — but must keep the crew paid and protected, or an internal revolt timer will start ticking.</p>
+<p><em>As GM, describe the takeover's cost: "The syndicates' marks are scratched from the walls. New oaths are sworn — and new enemies are made."</em></p>
+</div>
+
+<hr>
+
+<h1 id="compendium">Compendium of Assets</h1>
+<p>In <em>Fate's Edge</em>, <strong>Assets</strong> are your off-screen levers — properties, charters, networks, and institutions that change the fiction between scenes. They do not fight beside you (see Followers, above) but they shape the ground you walk on. As GM, your role is to:</p>
+<ul>
+<li>Introduce assets as narrative rewards (not automatic power-ups).</li>
+<li>Price them appropriately to campaign tier and fiction.</li>
+<li>Adjudicate their benefits <strong>only when narratively justified</strong>.</li>
+<li>Use their neglect as a source of meaningful complications.</li>
+</ul>
+<p>Assets thrive when they create tension between player ambition and worldly consequences — not when they become spreadsheets.</p>
+
+<h2 id="asset-design">Design Principles for GM Use</h2>
+<p>When introducing or homebrewing assets for your campaign, remember:</p>
+<ul>
+<li><strong>Assets shift fiction between scenes</strong>: Use them to open doors, quiet rumors, stock larders, or calm crowds <em>off-screen</em>. Their power lies in what happens <em>when players aren't looking</em>.</li>
+<li><strong>Assets create hooks</strong>: Every asset should suggest <em>both</em> opportunities (if tended) <em>and</em> complications (if neglected). A neglected asset isn't "broken" — it's a story waiting to happen.</li>
+<li><strong>Stay narrative-first</strong>: Prefer position, scale, and access over flat modifiers. Instead of "+2 die," grant "start <strong>Dominant</strong> in negotiations with the guild."</li>
+<li><strong>Never let assets replace player agency</strong>: If an asset solves a problem too cleanly, add a cost (obligation, timer advance, or narrative cost).</li>
+</ul>
+
+<h4>What Assets Are <em>Not</em> (GM Guidance)</h4>
+<p>As GM, ensure assets <em>never</em>:</p>
+<ul>
+<li>Act autonomously <em>inside</em> a scene (that's Followers' role).</li>
+<li>Generate wealth or XP passively (their value is in narrative leverage, not bookkeeping).</li>
+<li>Stack identical effects — if two assets would grant the same edge, the GM chooses the <em>best narrative fit</em> (not the strongest mechanical bonus).</li>
+</ul>
+
+<h4>Narrative First, Mechanics Second (GM Application)</h4>
+<p>When an asset grants "start <strong>Dominant</strong>," it applies to social/informational rolls where positioning matters. For practical challenges (lock-picking, repairs), "reduce DV by 1" is preferred. <strong>As GM, choose the form that best serves the fiction:</strong></p>
+<ul>
+<li>If the asset represents <em>influence</em> (e.g., a noble's favor), use Position shifts.</li>
+<li>If it represents <em>tools or preparation</em> (e.g., a well-stocked workshop), use DV reduction.</li>
+<li>When in doubt, ask: "Does this change <em>how</em> the character approaches the problem, or just make the roll easier?" Favor the former.</li>
+</ul>
+
+<h2 id="introducing-assets">Introducing Assets: GM Best Practices</h2>
+<p>Assets should feel earned, not bought. Use these guidelines when placing assets in your campaign:</p>
+<ul>
+<li><strong>Tier Appropriateness</strong>:
+<ul>
+<li><strong>Tier I (0–40 XP)</strong>: Assets are rare and local (e.g., a single safehouse, a trusted informant). Cost 4 XP feels significant.</li>
+<li><strong>Tier II (41–90 XP)</strong>: Assets begin to show regional reach (e.g., a guild seat, a harbor office). Standard (8 XP) assets emerge as meaningful investments.</li>
+<li><strong>Tier III (91–150 XP)</strong>: Assets scale to national influence (e.g., a banking charter, a fortress). Major (12 XP) assets become campaign-defining.</li>
+<li><strong>Tier IV+ (151+ XP)</strong>: Assets are empire-shaping (see Tier III Institutions, below). Reserve 16–20 XP assets for hard-won victories.</li>
+</ul>
+</li>
+<li><strong>Fiction First, Cost Second</strong>: Never assign an asset cost based solely on XP. Ask:
+<ul>
+<li>What narrative justification exists for this asset? (e.g., "The character saved the merchant's caravan — now they're granted a trade charter.")</li>
+<li>Does the asset's scope match the fiction? (A village herbalist shouldn't grant a "National Healing House" asset.)</li>
+<li>What complication arises if neglected? (This is your hook for future scenes.)</li>
+</ul>
+</li>
+<li><strong>Price for Narrative Weight, Not Power</strong>: A 4 XP asset in Tier I should feel as impactful as a 12 XP asset in Tier III — because it represents a larger <em>proportion</em> of the character's influence. Adjust XP costs slightly up/down to reflect narrative significance (e.g., a unique artifact might cost 6 XP as a Minor Asset due to story weight).</li>
+<li><strong>Always Attach a Hook</strong>: When introducing an asset, immediately establish:
+<ul>
+<li><strong>What happens if tended?</strong> (e.g., "The informant ring whispers of a shipment tonight.")</li>
+<li><strong>What happens if neglected?</strong> (e.g., "If ignored for two sessions, the informants go silent — or worse, start talking to rivals.")</li>
+</ul>
+</li>
+</ul>
+
+<div class="panel panel-blue">
+<span class="panel-title">GM Tip: The Asset Neglect Engine</span>
+<p><strong>Neglect is your best storytelling tool.</strong> When players ignore an asset:</p>
+<ul>
+<li>Advance a relevant timer (e.g., <em>Informant Network [4]</em> ticks +1 per session neglected).</li>
+<li>Spend 1–2 SB to create a complication tied to the asset's decay (e.g., "The safehouse landlord demands rent — or eviction.").</li>
+<li>Let the fiction degrade the asset's benefit (e.g., a neglected Scholar's Cell now requires a DV +1 roll for research).</li>
+</ul>
+<p><em>Never</em> treat neglect as "nothing happens." A neglected asset is a ticking time bomb — or a chance for players to re-engage with their world.</p>
+</div>
+
+<h2 id="asset-mechanics">Asset Mechanics (GM Procedures)</h2>
+<p>All assets share these core mechanics. <strong>As GM, apply them consistently:</strong></p>
+<dl>
+<dt>Cost</dt><dd>Minor <strong>4 XP</strong>, Standard <strong>8 XP</strong>, Major <strong>12 XP</strong>. <em>GM Guidance:</em> Treat cost as a narrative threshold. In Tier I, 4 XP is a major investment; in Tier IV, it's pocket change. Adjust slightly for story weight (see above).</dd>
+<dt>Establishment</dt><dd>1 day / 1 week / 1 month respectively to become operational. <em>GM Guidance:</em> Use this for downtime storytelling. "The safehouse takes a week to prepare — what do you do while waiting?"</dd>
+<dt>Upkeep</dt><dd>Each downtime, either pay XP equal to the Asset's base cost <em>or</em> devote a full scene tending it. Neglect degrades condition (Maintained → Neglected → Compromised). <em>GM Guidance:</em> Track condition visibly. When an asset becomes Neglected, it's your cue to introduce complications. Compromised means it's broken — fixing it requires a quest or major downtime.</dd>
+<dt>Free Use</dt><dd>Once per session, trigger the listed <em>off-screen</em> benefit (framed at scene start or as flashback with GM assent). <em>GM Guidance:</em> This is <strong>not</strong> automatic. Ask: "Does the fiction support using this benefit <em>now</em>?" If yes, grant it; if no, require a scene of preparation or a Boon spend (Scene Surge).</dd>
+<dt>Scene Surge</dt><dd>Spend <strong>1 Boon</strong> to turn an Asset into a dramatic <em>on-screen</em> intervention as described (one beat, fiction permitting). <em>GM Guidance:</em> This is the asset's "big moment." Limit to <strong>one meaningful use per scene</strong> — more than that feels like a deus ex machina.</dd>
+<dt>Extra Use</dt><dd>Spend <strong>2 XP</strong> to trigger the off-screen benefit an additional time this session. <em>GM Guidance:</em> Rarely allow this — it risks making assets feel like vending machines. Reserve for narrative crescendos (e.g., "You've poured everything into this safehouse — use it twice this session to flee the duke's guards.").</dd>
+<dt>Risk Interface</dt><dd>When an asset covers risk, it typically <strong>improves Position</strong>, <strong>lowers DV by 1</strong>, <strong>fills 1 segment on a relevant timer</strong>, or <strong>mitigates 1 SB</strong> (Story Beat) from a thematically linked complication. <em>GM Guidance:</em> This is where assets shine. Instead of "+2 die," say "Your contacts in the watch mean the patrol arrives 10 minutes late — start <strong>Dominant</strong>."</dd>
+</dl>
+
+<h4>Capacity (Optional GM Rule)</h4>
+<p>A character comfortably maintains a number of assets up to their <strong>Spirit</strong> rating. For each asset beyond this:</p>
+<ul>
+<li>Increase its upkeep by +50% (round up) <em>OR</em></li>
+<li>Require an additional downtime scene to keep it <em>Maintained</em>.</li>
+</ul>
+<p><em>GM Guidance:</em> Use this to prevent asset hoarding. At Spirit 3, a 4th asset should feel like a strain — perhaps requiring a scene of frantic paperwork or causing minor complications until tended. This creates natural tension between ambition and upkeep.</p>
+
+<h4>Cross-Reference to Faction Ties</h4>
+<p>Assets tied to a specific faction (e.g., Temple Complex, Banking Charter, Guild Seat) may generate <strong>Obligation</strong> if used recklessly or ignored. As GM:</p>
+<ul>
+<li>Award Obligation segments when players leverage assets against faction interests.</li>
+<li>Let Obligation decay naturally if players tend the faction's welfare.</li>
+<li>Use neglected assets as Obligation sources (e.g., "Ignoring the temple's pleas adds 1 Obligation to the gods each session neglected").</li>
+</ul>
+
+<h2 id="minor-assets">Minor Assets (4 XP): GM Tools for Local Leverage</h2>
+<p>Minor assets are small holdings, charters, or kits that grant reliable, localized leverage. <strong>As GM, use them to:</strong></p>
+<ul>
+<li>Reward early-game ingenuity without unbalancing the campaign.</li>
+<li>Create intimate, character-driven story hooks (e.g., a family heirloom, a neighborhood favor).</li>
+<li>Introduce complications that feel personal and immediate when neglected.</li>
+</ul>
+<p>Each entry below includes <strong>GM-specific guidance</strong> on introduction, adjudication, and neglect consequences.</p>
+
+<dl>
+<dt>Signature Weapon</dt>
+<dd><em>A named heirloom or masterpiece.</em> <strong>Free Use:</strong> If gear damage would compromise it, downgrade to a minor flaw and require a quiet maintenance scene to clear — do not auto-repair. <strong>Scene Surge:</strong> Produce it at the perfect moment; improve Position one step for the first attack this scene. <strong>Neglect Hook:</strong> If unused for 2+ sessions, the weapon requires repair (Cost: 1 XP or a downtime scene). Neglect further risks it being stolen or broken beyond repair. <em>Example:</em> "The hilt is loose — swinging it feels like shaking a tooth. Repair it, or it flies from your grip next clash."</dd>
+
+<dt>Scholar's Cell</dt>
+<dd><em>A quiet room, permits, and a custodian.</em> <strong>Free Use:</strong> Begin one research scene at Dominant (or lower DV by 1), only if the cell is prepared and the custodian is present. <strong>Scene Surge:</strong> Reveal a cited source now; fill 1 segment on a relevant Information timer. <strong>Neglect Hook:</strong> If neglected, the custodian leaves or permits lapse — research requires a DV +1 roll; after 3 sessions neglected, the cell is seized by authorities. <em>Example:</em> "The landlord knocks: 'Your rent's due — and I've heard whispers about those strange books.' Pay up, or they're calling the watch."</dd>
+
+<dt>Safehouse Network (Quarter)</dt>
+<dd><em>Trapdoors, false walls, and a landlord who never saw you.</em> <strong>Free Use:</strong> Start an entry/exit scene Dominant, only if the safehouse is prepared and stocked. <strong>Scene Surge:</strong> Produce a hidden egress; convert one pursuit consequence into a temporary complication you can interact with. <strong>Neglect Hook:</strong> If neglected, the landlord grows suspicious or sells the property. After 1 session, safehouse use costs 1 Boon to start Dominant; after 2 sessions, it's compromised (requires a scene to re-secure). <em>Example:</em> "The floorboard creaks differently now. Your landlord eyes you over tea: 'Business has been slow. I wonder why.'"</dd>
+
+<dt>Artisan's Bench</dt>
+<dd><em>Tools for field repairs and fabrication.</em> <strong>Free Use:</strong> Remove Compromised from one mundane item between scenes, only if the bench is maintained and stocked. <strong>Scene Surge:</strong> Improvise a single-use tool; gain a Boon on the immediate Craft check. <strong>Neglect Hook:</strong> If neglected, tools rust or go missing — repair requires a downtime scene + 1 XP; after 2 sessions, the bench is Compromised. <em>Example:</em> "The file's teeth are choked with rust. One good stroke — and it snaps. Time to visit the smith."</dd>
+
+<dt>Courier Chain</dt>
+<dd><em>Runners, dead-drops, and codes in one city.</em> <strong>Free Use:</strong> Move a message or small parcel safely; start the related parley Dominant, only if the chain is active. <strong>Scene Surge:</strong> A courier appears now; mitigate 1 SB tied to a missed appointment or lost message. <strong>Neglect Hook:</strong> If neglected, couriers go missing or codes change. After 1 session, delivery requires a Boon spend; after 2 sessions, the chain is Compromised. <em>Example:</em> "The drop-box is empty. The usual sign — a blue ribbon — is gone. Someone's been here."</dd>
+
+<dt>Small Holding (Farm/Orchard)</dt>
+<dd><em>Steady larder and a trusted foreman.</em> <strong>Free Use:</strong> Waive a minor Supply complication or clear Fatigue 1 for one PC during downtime, only if the holding is tended. <strong>Scene Surge:</strong> Produce a timely wagon, mule, or crates to justify a plausible cover story. <strong>Neglect Hook:</strong> If neglected, crops fail or foreman quits. After 1 session, clear Fatigue 1 only once per downtime; after 2 sessions, the holding is Strained (yields half, requires 1 XP to maintain). <em>Example:</em> "The orchard's quiet — too quiet. No birds, no wind — and the trees are dropping fruit before it's ripe."</dd>
+
+<dt>Neighborhood Inn/Tavern</dt>
+<dd><em>A familiar house of bread and rumor.</em> <strong>Free Use:</strong> First social opener in that neighborhood starts Dominant, only if the inn is maintained and the proprietor is friendly. <strong>Scene Surge:</strong> Call in the proprietor; shift a hostile crowd one step toward neutral. <strong>Neglect Hook:</strong> If neglected, rumors turn sour or the inn changes hands. After 1 session, social openers start at Controlled; after 2 sessions, the inn is Strained (proprietor drunk or surly, −1 die on social rolls there). <em>Example:</em> "The usual smile is tight. 'Rough crowd tonight,' the proprietor mutters, wiping a glass that's already clean."</dd>
+
+<dt>Ritual Niche/Shrine</dt>
+<dd><em>A consecrated corner with a small flame.</em> <strong>Free Use:</strong> Clear Fatigue 1 or mitigate 1 SB from spiritual/psychological complications, only if the niche is maintained and consecrated. <strong>Scene Surge:</strong> Sanctify a doorway for one scene; hostile supernatural presence must reveal itself or back away one band. <strong>Neglect Hook:</strong> If neglected, the flame sputters or the niche is desecrated. After 1 session, mitigate only 0.5 SB (round down); after 2 sessions, it's Compromised. <em>Example:</em> "The wick is low, the oil gone. The flame guttered out hours ago — leaving only cold stone and regret."</dd>
+
+<dt>River Skiff/Barge Share</dt>
+<dd><em>Limited access to a hull and a taciturn pilot.</em> <strong>Free Use:</strong> Water crossing scenes begin Dominant, only if the skiff is maintained and pilot is available. <strong>Scene Surge:</strong> Evade a patrol with a practiced channel; reduce DV by 1 on the escape roll. <strong>Neglect Hook:</strong> If neglected, the hull leaks or pilot is unavailable. After 1 session, crossings require a Boon spend; after 2 sessions, the share is Compromised. <em>Example:</em> "The pilot eyes the cracks in the hull. 'One more storm, and we're swimming. Pay for tar, or we walk.'"</dd>
+
+<dt>Herbal Plot</dt>
+<dd><em>Drying racks, clay pots, and a steady hand at dawn.</em> <strong>Free Use:</strong> Remove Fatigue 1 from one character or gain a Boon to a single mundane healing attempt this downtime, only if the plot is tended. <strong>Scene Surge:</strong> Produce a rare poultice; convert a Severe healing timer into two Moderate ticks. <strong>Neglect Hook:</strong> If neglected, herbs fail or plot is overgrown. After 1 session, remove Fatigue 1 only once per downtime; after 2 sessions, it's Compromised. <em>Example:</em> "The mint's gone to seed. The soil's hard as baked clay — and the rabbits have turned it into a warren."</dd>
+
+<dt>Personal Library</dt>
+<dd><em>Shelves of annotated tomes and a reading chair.</em> <strong>Free Use:</strong> Gain a Boon on one Lore roll per session, only if the library is maintained and accessible. <strong>Scene Surge:</strong> Quote a relevant passage; reduce DV of a related Investigation by 1. <strong>Neglect Hook:</strong> If neglected, books are damaged or stolen. After 1 session, gain a Boon only every other session; after 2 sessions, the library is Strained (−1 die on Lore rolls there until repaired). <em>Example:</em> "The spine's cracked, the pages water-stained. One more rain — and that treaty copy is pulp."</dd>
+
+<dt>Stable/Coach House</dt>
+<dd><em>Reliable mounts and drivers who ask few questions.</em> <strong>Free Use:</strong> Land travel scenes begin Dominant, only if the stable is maintained and mounts/vehicles are ready. <strong>Scene Surge:</strong> Produce a fresh mount or spare vehicle; ignore the first exhaustion complication. <strong>Neglect Hook:</strong> If neglected, mounts sicken or vehicles break down. After 1 session, ignore exhaustion only once per downtime; after 2 sessions, the stable is Strained (−1 die on travel rolls there until repaired). <em>Example:</em> "The mare's favoring her left foreleg. The vet's bill is steep — but better than a lame horse on the road."</dd>
+
+<dt>Alchemist's Workshop</dt>
+<dd><em>Reagents, retorts, and a suspicious chimney.</em> <strong>Free Use:</strong> Produce one dose of a common alchemical item between scenes, only if the workshop is maintained and stocked. <strong>Scene Surge:</strong> Brew a specialized compound; gain a Boon on the next Craft (Alchemy) roll. <strong>Neglect Hook:</strong> If neglected, reagents degrade or equipment fails. After 1 session, yield halved; after 2 sessions, Compromised. <em>Example:</em> "The vitriol's eaten through the glass. Time for new bottles — and a stern word to the supplier."</dd>
+
+<dt>Messenger Birds</dt>
+<dd><em>Trained pigeons or ravens with coded leg bands.</em> <strong>Free Use:</strong> Send a simple message across moderate distance safely, only if the birds are maintained and trained. <strong>Scene Surge:</strong> Receive urgent news now; mitigate 1 SB from miscommunication. <strong>Neglect Hook:</strong> If neglected, birds go astray or codes break. After 1 session, message sending requires a Boon spend; after 2 sessions, the network is Compromised. <em>Example:</em> "The coop's silent. No wings beat the dusk — and the leg bands are dull with dirt. Someone forgot to feed them."</dd>
+</dl>
+
+<h2 id="standard-assets">Standard Assets (8 XP): GM Tools for Regional Influence</h2>
+<p>Standard assets are established holdings with regional reach. <strong>As GM, use them to:</strong></p>
+<ul>
+<li>Reward mid-tier accomplishments with meaningful influence (e.g., a guild seat, a harbor office).</li>
+<li>Create hooks that tie into regional politics, trade, or faction play.</li>
+<li>Introduce complications that scale with neglect (e.g., losing favor, inviting rivals).</li>
+</ul>
+
+<dl>
+<dt>Charter or Minor Title</dt>
+<dd><em>Recognized papers and privileges.</em> <strong>Free Use:</strong> Secure an audience or official hearing; start Dominant, only if valid and recognized. <strong>Scene Surge:</strong> Invoke prerogative to delay immediate sanctions; mitigate 1 SB of civic backlash. <strong>Neglect Hook:</strong> If neglected, the charter lapses or is challenged. After 1 session, audiences start at Controlled; after 2 sessions, Strained (requires 1 XP or a scene to renew/defend). <em>Example:</em> "The ink's faded, the seal cracked. The clerk squints: 'This expired last month. Renew it — or we start from scratch.'"</dd>
+
+<dt>Guild Seat</dt>
+<dd><em>Voting rights and shop-rights.</em> <strong>Free Use:</strong> Commission or procurement opens Dominant or DV −1, only if the seat is active and voting rights intact. <strong>Scene Surge:</strong> A guild factor vouches; fill 1 segment on a Permit/Access timer. <strong>Neglect Hook:</strong> If neglected, the seat is challenged or voting rights suspended. After 1 session, commission starts at Controlled; after 2 sessions, Strained (requires 1 XP or a scene to defend seat/rights). <em>Example:</em> "The Master frowns at your slate. 'Your dues are three months late. Pay up — or we vote you out.'"</dd>
+
+<dt>Market Front</dt>
+<dd><em>A fixed stall and regular customers.</em> <strong>Free Use:</strong> Treat one Minor Asset's upkeep as waived this downtime, only if the stall is operational and customers loyal. <strong>Scene Surge:</strong> Liquidate stock; justify on-hand mundane gear within reason. <strong>Neglect Hook:</strong> If neglected, customers dwindle or stock spoils. After 1 session, waive upkeep only every other downtime; after 2 sessions, Strained (requires 1 XP or a scene to revive trade). <em>Example:</em> "The usual faces are missing. The bread's stale — and the fishmonger eyes your empty stall with pity."</dd>
+
+<dt>Informant Ring</dt>
+<dd><em>Eyes and ears on retainer.</em> <strong>Free Use:</strong> Targeted inquiry begins Dominant, only if the ring is active and informants are loyal. <strong>Scene Surge:</strong> Reveal a hidden schedule or route now; mitigate 1 SB from ambush/surprise. <strong>Neglect Hook:</strong> If neglected, informants go silent or turn hostile. After 1 session, inquiries start at Controlled; after 2 sessions, Strained (−1 die on inquiry rolls there until trust is rebuilt). <em>Example:</em> "The drop-box is empty. The usual sign — a blue ribbon — is gone. Someone's been here."</dd>
+
+<dt>Mercenary Contract (Cap 2)</dt>
+<dd><em>Access to a small trained unit.</em> <strong>Free Use:</strong> Introduce temporary off-screen security that downgrades "raid" to "attempted raid," only if the contract is active and mercenaries are paid. <strong>Scene Surge:</strong> One on-screen intervention (one beat) that improves Position for a withdrawal or breach. <strong>Neglect Hook:</strong> If neglected, mercenaries leave or demand higher pay. After 1 session, security downgrade requires 1 Boon spend; after 2 sessions, Strained (unit reduced or unreliable until paid/replaced). <em>Example:</em> "The captain spits in the dirt. 'Pay's late. We'll hold the line — but don't count on us for the counter.'"</dd>
+
+<dt>Trading Charter</dt>
+<dd><em>Right-of-way at gates and tolls.</em> <strong>Free Use:</strong> Border/inspection scenes start Dominant, only if the charter is valid and honored. <strong>Scene Surge:</strong> Produce stamped manifests; DV −1 on the next scrutiny roll. <strong>Neglect Hook:</strong> If neglected, the charter lapses or tolls increase. After 1 session, border scenes start at Controlled; after 2 sessions, Strained (requires 1 XP or a scene to renew/defend rights). <em>Example:</em> "The clerk frowns at your papers. 'Tolls went up yesterday. Pay the difference — or turn back.'"</dd>
+
+<dt>Licensed Library</dt>
+<dd><em>Stacks and a learned custodian.</em> <strong>Free Use:</strong> Deep-topic research begins Dominant and gains a Boon, only if licensed and custodian is present. <strong>Scene Surge:</strong> Cite a precedent to force a pause in debate (one exchange). <strong>Neglect Hook:</strong> If neglected, the license lapses or custodian leaves. After 1 session, research starts at Controlled; after 2 sessions, Strained (requires 1 XP or a scene to renew license/replace custodian). <em>Example:</em> "The custodian packs her satchel. 'The Bishop's men came for the license. I'm heading to the abbey — good luck.'"</dd>
+
+<dt>Craftsman's Quarter</dt>
+<dd><em>Shop plus apprentices.</em> <strong>Free Use:</strong> Clear Compromised from a crafted item or structure, only if the quarter is maintained and stocked. <strong>Scene Surge:</strong> Rush a bespoke piece; fill 1 segment on a Build/Repair timer. <strong>Neglect Hook:</strong> If neglected, apprentices leave or tools degrade. After 1 session, clear Compromised only once per downtime; after 2 sessions, Strained (requires 1 XP or a scene to restore staff/tools). <em>Example:</em> "The anvil's cracked. One good swing — and it sends shards flying. Time for a new one — and a lecture on metallurgy."</dd>
+
+<dt>Temple Complex</dt>
+<dd><em>Courts, choirs, charity.</em> <strong>Free Use:</strong> Among adherents, start Dominant or mitigate 1 SB from crowd/morale, only if the temple is maintained and active. <strong>Scene Surge:</strong> Sanctuary: hostile social pressure must escalate openly or wait. <strong>Neglect Hook:</strong> If neglected, adherents dwindle or charity falters. After 1 session, start Dominant only every other session; after 2 sessions, Strained (requires 1 XP or a scene to restore trust/activity). <em>Example:</em> "The collection plate is light. The priest's smile is tight — 'Hard times, my child. But the gods still watch.'"</dd>
+
+<dt>Harbor Office</dt>
+<dd><em>Berths, booms, bells.</em> <strong>Free Use:</strong> Priority loading/unloading; start Dominant, only if the office is maintained and honors are in place. <strong>Scene Surge:</strong> Hold the chain for one beat; negate a single pursuit by water consequence. <strong>Neglect Hook:</strong> If neglected, berths silt up or honors lapse. After 1 session, priority loading starts at Controlled; after 2 sessions, Strained (requires 1 XP or a scene to dredge/renew honors). <em>Example:</em> "The harbormaster checks the tide chart. 'Silt's built up at Berth 3. Pay for dredging — or we wait for the spring flood.'"</dd>
+
+<dt>Healing House</dt>
+<dd><em>Beds, herbs, bells.</em> <strong>Free Use:</strong> During downtime, clear Harm 1 or Fatigue 2 from one ally, only if the house is maintained and stocked. <strong>Scene Surge:</strong> Stabilize now; convert a Severe injury consequence into a 4-segment Recovery timer. <strong>Neglect Hook:</strong> If neglected, beds go bad or herbs spoil. After 1 session, clear Harm/Fatigue only once per downtime; after 2 sessions, Strained (requires 1 XP or a scene to restock/repair). <em>Example:</em> "The bells are silent. The wards are faded — and the cough in Ward 2 sounds wetter every day."</dd>
+
+<dt>Observatory</dt>
+<dd><em>Lenses and ephemerides.</em> <strong>Free Use:</strong> Predict timing; navigation/timing openers start Dominant, only if maintained and calibrated. <strong>Scene Surge:</strong> Name a narrow window; DV −1 for an action attempted inside it. <strong>Neglect Hook:</strong> If neglected, instruments drift or lenses crack. After 1 session, predictions require a Boon spend; after 2 sessions, Strained (requires 1 XP or a scene to recalibrate/replace). <em>Example:</em> "The glass is spiderwebbed. The stars are hard to read — and the ephemeris is missing three months."</dd>
+
+<dt>Performance Venue</dt>
+<dd><em>Stage and regulars.</em> <strong>Free Use:</strong> Begin Performance with a receptive crowd, only if maintained and crowd is receptive. <strong>Scene Surge:</strong> Spotlight an ally; shift a crowd one step toward your desired mood. <strong>Neglect Hook:</strong> If neglected, the stage decays or crowd turns hostile. After 1 session, begin at Controlled; after 2 sessions, Strained (requires 1 XP or a scene to repair/rebook). <em>Example:</em> "The seats are squeaky. The curtain sticks halfway — and the usual crowd's been replaced by sailors looking for a fight."</dd>
+
+<dt>Hospitality House</dt>
+<dd><em>Beds, bread, rumor.</em> <strong>Free Use:</strong> Gain a Protected pause in parley on your ground, only if maintained and guest-right is honored. <strong>Scene Surge:</strong> Invoke guest-right; hostile social pressure must step into the open. <strong>Neglect Hook:</strong> If neglected, beds go bad or rumor turns sour. After 1 session, Protected pause requires a Boon spend; after 2 sessions, Strained (requires 1 XP or a scene to restock/reinvite). <em>Example:</em> "The loaves are dense as stone. The gossip's turned vicious — and the children won't come inside anymore."</dd>
+
+<dt>Storage Vault</dt>
+<dd><em>Locks and ledgers, damp stone and iron.</em> <strong>Free Use:</strong> Ignore the first theft/sabotage targeting stored goods, only if maintained and secure. <strong>Scene Surge:</strong> Produce a cached item plausibly stored here. <strong>Neglect Hook:</strong> If neglected, locks rust or ledgers rot. After 1 session, ignore theft only every other downtime; after 2 sessions, Strained (requires 1 XP or a scene to repair/reinforce). <em>Example:</em> "The ledger's pages are stuck together. One tug — and they tear. Time for new paper — and a dry cellar."</dd>
+
+<dt>Hidden Cache</dt>
+<dd><em>A buried lockbox or hollow tree, accessible anywhere in the city.</em> <strong>Free Use:</strong> Once per session, access emergency gear when cornered; start the scene Dominant, only if maintained and accessible. <strong>Scene Surge:</strong> Reveal a larger stash; fill 1 segment on a Supply timer. <strong>Neglect Hook:</strong> If neglected, the cache is discovered or compromised. After 1 session, access requires a Boon spend; after 2 sessions, Strained (requires 1 XP or a scene to re-hide/replenish). <em>Example:</em> "The moss is disturbed. The hollow smells of damp earth — and the lockbox is gone. Someone's been here."</dd>
+
+<dt>Signal Relay</dt>
+<dd><em>Fires, flags, drums.</em> <strong>Free Use:</strong> Coordinated actions across distance start Dominant, only if maintained and signals are clear. <strong>Scene Surge:</strong> Push a ready signal now; mitigate 1 SB from confusion/lag. <strong>Neglect Hook:</strong> If neglected, signals fail or equipment degrades. After 1 session, coordinated actions require a Boon spend; after 2 sessions, Strained (requires 1 XP or a session to repair/replace). <em>Example:</em> "The drumskin's split. The fire's low — and the flags are rotting in the rain. Time for new hides and a steady hand."</dd>
+
+<dt>Merchant Caravan</dt>
+<dd><em>One wagon, two guards, and a route.</em> <strong>Free Use:</strong> Trade missions begin Dominant, only if maintained and route is secure. <strong>Scene Surge:</strong> Call in the caravan early; provide unexpected supplies or reinforcements. <strong>Neglect Hook:</strong> If neglected, the caravan disbands or route becomes unsafe. After 1 session, trade missions require a Boon spend; after 2 sessions, Strained (requires 1 XP or a scene to re-form/re-secure route). <em>Example:</em> "The guards eye the broken bridge. 'We can't cross here. Pay for a detour — or we turn back.'"</dd>
+
+<dt>Legal Practice</dt>
+<dd><em>Papers, precedents, and clients.</em> <strong>Free Use:</strong> Legal proceedings start Dominant or DV −1, only if maintained and clients are active. <strong>Scene Surge:</strong> Produce a forgotten writ; negate one legal complication. <strong>Neglect Hook:</strong> If neglected, papers decay or clients leave. After 1 session, proceedings start at Controlled; after 2 sessions, Strained (requires 1 XP or a scene to restore papers/clients). <em>Example:</em> "The ink's bled through the paper. One more flood — and that precedent is soup."</dd>
+
+<dt>Smuggler's Network</dt>
+<dd><em>Contacts and hidden routes.</em> <strong>Free Use:</strong> Illicit transport begins Dominant, only if maintained and contacts are active. <strong>Scene Surge:</strong> Bypass a checkpoint; mitigate 1 SB from customs/patrols. <strong>Neglect Hook:</strong> If neglected, contacts go silent or routes are compromised. After 1 session, transport starts at Controlled; after 2 sessions, Strained (requires 1 XP or a scene to restore contacts/routes). <em>Example:</em> "The drop-point is cold. The usual signal — a tapped stone — is missing. Someone's been here."</dd>
+
+<dt>Crafting Guildhall</dt>
+<dd><em>Tools, masters, and apprentices.</em> <strong>Free Use:</strong> Complex crafting projects gain a Boon, only if maintained and stocked. <strong>Scene Surge:</strong> Rush production; fill 1 segment on a Manufacturing timer. <strong>Neglect Hook:</strong> If neglected, masters leave or tools degrade. After 1 session, projects gain a Boon only every other session; after 2 sessions, Strained (requires 1 XP or a scene to restore masters/tools). <em>Example:</em> "The spindle's worn smooth. One more pull — and it snaps. Time for new wire — and a stern look at the apprentice."</dd>
+</dl>
+
+<h2 id="major-assets">Major Assets (12 XP): GM Tools for Regional Power</h2>
+<p>Major assets are significant holdings that bend regional outcomes. <strong>As GM, use them to:</strong></p>
+<ul>
+<li>Reward high-tier accomplishments with transformative influence (e.g., a fortress, a banking charter).</li>
+<li>Create hooks that tie into national politics, economics, or major faction play.</li>
+<li>Introduce complications that scale with neglect (e.g., invasion, embargo, revolt).</li>
+</ul>
+
+<dl>
+<dt>Ward License</dt>
+<dd><em>You run a city district's levers.</em> <strong>Free Use:</strong> In-ward civic openers start Dominant, only if active and honors are in place. <strong>Scene Surge:</strong> Re-route patrols or light — shift a chase route 1 step in your favor. <strong>Neglect Hook:</strong> If neglected, the ward lapses or honors are challenged. After 1 session, civic openers start at Controlled; after 2 sessions, Strained (requires 1 XP or a scene to renew license/defend honors). <em>Example:</em> "The Warden frowns at your papers. 'Your tribute's late. Pay up — or we reassess the ward's boundaries.'"</dd>
+
+<dt>Exclusive Right (Monopoly)</dt>
+<dd><em>Control of a staple (salt, timber, ferries).</em> <strong>Free Use:</strong> In market scenes, ignore the first supply complication, only if active and honored. <strong>Scene Surge:</strong> Declare a brief scarcity/surplus to leverage terms; DV −1 on a single negotiation. <strong>Neglect Hook:</strong> If neglected, the monopoly lapses or is challenged. After 1 session, ignore supply complication only every other session; after 2 sessions, Strained (requires 1 XP or a scene to renew/defend rights). <em>Example:</em> "The customs officer checks your seal. 'The monopoly expired yesterday. Pay the market rate — or we seize the shipment.'"</dd>
+
+<dt>Fortress/Stronghold</dt>
+<dd><em>Stone, stores, signals.</em> <strong>Free Use:</strong> In raid/siege framing, negate the first breach consequence, only if maintained and garrisoned. <strong>Scene Surge:</strong> Sound beacons; allies arrive in time to improve Position for withdrawal or stand. <strong>Neglect Hook:</strong> If neglected, the fortress decays or garrison mutinies. After 1 session, negate breach only every other session; after 2 sessions, Strained (requires 1 XP or a scene to repair/reinforce/garrison). <em>Example:</em> "The mortar's crumbling in the northwest tower. One good storm — and we're digging bodies out of the rubble."</dd>
+
+<dt>Demesne (Estate)</dt>
+<dd><em>Fields, mills, tenants.</em> <strong>Free Use:</strong> Waive minor Supply fallout this arc or treat one additional Minor Asset as having free upkeep, only if maintained and productive. <strong>Scene Surge:</strong> Muster teamsters and hands; fill 1 segment on a Logistics timer. <strong>Neglect Hook:</strong> If neglected, fields lie fallow or mills seize up. After 1 session, waive Supply fallout only every other arc; after 2 sessions, Strained (requires 1 XP or a scene to restore productivity). <em>Example:</em> "The well's run dry. The mill's seized — and the tenants are whispering about leaving."</dd>
+
+<dt>Fleet Share</dt>
+<dd><em>A cut of hulls and signals.</em> <strong>Free Use:</strong> Maritime travel starts Dominant, only if maintained and signals are honored. <strong>Scene Surge:</strong> Signal a safe corridor; mitigate 1 SB from storm/patrol. <strong>Neglect Hook:</strong> If neglected, the fleet deteriorates or signals lapse. After 1 session, travel starts at Controlled; after 2 sessions, Strained (requires 1 XP or a scene to repair/reinforce/renew signals). <em>Example:</em> "The bosun eyes the frayed ropes. 'One more gale — and we're swimming. Pay for new line — or we head for port.'"</dd>
+
+<dt>College (University Seat)</dt>
+<dd><em>Faculty, quad, seal.</em> <strong>Free Use:</strong> In downtime, reduce one skill advancement cost by 1 XP (minimum 1), only if maintained and the seat is active. <strong>Scene Surge:</strong> Convene a colloquy to force a pause in magical proceedings. <strong>Neglect Hook:</strong> If neglected, faculty departs or seal is challenged. After 1 session, reduce skill cost only every other downtime; after 2 sessions, Strained (requires 1 XP or a scene to renew seat/replace faculty). <em>Example:</em> "The Dean signs the transfer. 'Your funding's cut. We'll teach what we can — but no new arts.'"</dd>
+
+<dt>Banking Charter</dt>
+<dd><em>Letters, liens, a counting house.</em> <strong>Free Use:</strong> Present credit to bypass petty fees and minor delays, only if maintained and honored. <strong>Scene Surge:</strong> Freeze a rival's access for one exchange; mitigate 1 SB from bribery/extortion. <strong>Neglect Hook:</strong> If neglected, the charter lapses or is challenged. After 1 session, present credit only every other session; after 2 sessions, Strained (requires 1 XP or a scene to renew/defend rights). <em>Example:</em> "The teller checks the ledger. 'Your credit line's frozen. Pay the fee — or we close the account.'"</dd>
+
+<dt>Diplomatic Enclave</dt>
+<dd><em>Flag, immunity, ink.</em> <strong>Free Use:</strong> In foreign courts, begin Dominant, only if maintained and immunity is honored. <strong>Scene Surge:</strong> Invoke safe-conduct; hostile action must escalate openly or withdraw. <strong>Neglect Hook:</strong> If neglected, immunity lapses or enclave is compromised. After 1 session, court openers start at Controlled; after 2 sessions, Strained (requires 1 XP or a scene to renew immunity/rebuild trust). <em>Example:</em> "The ambassador folds her arms. 'Your immunity's revoked. We'll talk — but only in the chancery.'"</dd>
+
+<dt>Mine/Quarry</dt>
+<dd><em>Ore, stone, skilled crews.</em> <strong>Free Use:</strong> Clear Compromised on one structure or armament, only if maintained and crew is skilled. <strong>Scene Surge:</strong> Deliver timbers/stone now; DV −1 on a reinforce/repair roll. <strong>Neglect Hook:</strong> If neglected, ore veins fade or crews desert. After 1 session, delivery only every other session; after 2 sessions, Strained (requires 1 XP or a scene to restore ore/crews). <em>Example:</em> "The foreman spits in the dust. 'The vein's pinching out. Pay for a new shaft — or we abandon the claim.'"</dd>
+
+<dt>Mining Operation</dt>
+<dd><em>Shafts, carts, and crews.</em> <strong>Free Use:</strong> Ignore the first resource shortage complication this arc, only if maintained and crews are active. <strong>Scene Surge:</strong> Strike a rich vein; produce unexpected wealth or materials. <strong>Neglect Hook:</strong> If neglected, shafts flood or crews leave. After 1 session, ignore shortage only every other arc; after 2 sessions, Strained (requires 1 XP or a scene to dewater/rehire crews). <em>Example:</em> "The pumps are silent. The water's rising — and the foreman's face is grim. Time for new hands — or we admit defeat."</dd>
+
+<dt>Military Outpost</dt>
+<dd><em>Barracks, stores, and command.</em> <strong>Free Use:</strong> Military operations begin Dominant, only if maintained and garrisoned. <strong>Scene Surge:</strong> Call for reinforcements; improve Position for a tactical withdrawal or assault. <strong>Neglect Hook:</strong> If neglected, the outpost decays or garrison mutinies. After 1 session, call for reinforcements only every other session; after 2 sessions, Strained (requires 1 XP or a scene to repair/reinforce/rehire garrison). <em>Example:</em> "The sergeant eyes the empty barracks. 'Half the squad's gone AWOL. We'll hold — but don't expect miracles.'"</dd>
+
+<dt>Trading Consortium</dt>
+<dd><em>Multiple fronts and shared capital.</em> <strong>Free Use:</strong> Ignore the first price gouging or supply shortage complication this arc, only if maintained and fronts are active. <strong>Scene Surge:</strong> Coordinate a multi-front deal; DV −1 on a major commercial negotiation. <strong>Neglect Hook:</strong> If neglected, fronts withdraw or capital dries up. After 1 session, ignore price gouging only every other arc; after 2 sessions, Strained (requires 1 XP or a scene to restore fronts/capital). <em>Example:</em> "The consul shrugs. 'Your front's pulled out. We'll renegotiate — or we walk.'"</dd>
+
+<dt>Religious Order</dt>
+<dd><em>Chapters, rites, and influence.</em> <strong>Free Use:</strong> Among believers, start Dominant or mitigate 1 SB from heresy/doubt, only if maintained and active. <strong>Scene Surge:</strong> Call a council; force a pause in hostile religious proceedings. <strong>Neglect Hook:</strong> If neglected, chapters secede or rites are corrupted. After 1 session, start Dominant only every other session; after 2 sessions, Strained (requires 1 XP or a scene to restore order/rebuild trust). <em>Example:</em> "The prioress signs the letter. 'The schism's widening. We'll hold the line — but don't expect unity.'"</dd>
+</dl>
+
+<h2 id="specialized-assets">Specialized Assets: GM Tools for Niche Power</h2>
+<p>Specialized assets are narrow tools with sharp edges. <strong>As GM, use them to:</strong></p>
+<ul>
+<li>Reward specific, high-skill accomplishments with targeted leverage (e.g., a magical lab, an intelligence bureau).</li>
+<li>Create hooks that tie into arcane, espionage, or technical complications.</li>
+<li>Introduce complications that reflect the asset's fragility (e.g., lab accidents, blown covers).</li>
+</ul>
+
+<dl>
+<dt>Magical Laboratory (10 XP)</dt>
+<dd><em>Wards, benches, focus crystals.</em> <strong>Free Use:</strong> Once per session, reduce Ritual Backlash by 1 SB, only if the lab is maintained and wards are intact. <strong>Scene Surge:</strong> Contain an emergent effect for one beat; begin the control roll Dominant. <strong>Neglect Hook:</strong> If neglected, wards fade or equipment degrades. After 1 session, reduce backlash only every other session; after 2 sessions, Strained (requires 1 XP or a scene to renew wards/replace gear). <em>Example:</em> "The sigils are smudged. The crystal's cracked — and the air smells of ozone. Time for new wards — and a stern look at the apprentice."</dd>
+
+<dt>Training Academy (12 XP)</dt>
+<dd><em>Masters and mats.</em> <strong>Free Use:</strong> In downtime, reduce one skill advancement cost by 1 XP (min 1) for a designated trainee, only if maintained and trainee is progressing. <strong>Scene Surge:</strong> Call in a drilled team to assist off-screen; fill 1 segment on a Preparation timer. <strong>Neglect Hook:</strong> If neglected, masters leave or mats tear. After 1 session, reduce skill cost only every other downtime; after 2 sessions, Strained (requires 1 XP or a scene to renew masters/replace mats). <em>Example:</em> "The mat's split in two. One more fall — and it's useless. Time for new gear — and a lecture on safety."</dd>
+
+<dt>Intelligence Bureau (10 XP)</dt>
+<dd><em>Analysts and cut-outs.</em> <strong>Free Use:</strong> Avoid surprise; the first recon opener starts Dominant, only if maintained and analysts are active. <strong>Scene Surge:</strong> Burn a channel; mitigate 1 SB from counterintelligence. <strong>Neglect Hook:</strong> If neglected, analysts depart or channels fail. After 1 session, avoid surprise only every other session; after 2 sessions, Strained (requires 1 XP or a scene to renew analysts/repair gear). <em>Example:</em> "The tape's snarled. The signal's weak — and the cut-outs are missing three names. Time for new wire — and a headache."</dd>
+</dl>
+
+<h2 id="tier-iii-institutions">Tier III Institutions (16–20 XP): GM Tools for Empire-Shaping Power</h2>
+<p>Tier III institutions are empire-shaping engines requiring ongoing political play. <strong>As GM, use them to:</strong></p>
+<ul>
+<li>Reward pinnacle accomplishments with world-shaping influence (e.g., a grand forge-citadel, a great library).</li>
+<li>Create hooks that tie into imperial politics, economics, or major faction wars.</li>
+<li>Introduce complications that scale with neglect (e.g., invasion, famine, heresy).</li>
+</ul>
+
+<dl>
+<dt>Grand Forge-Citadel (18 XP)</dt>
+<dd><em>City heat and hammer.</em> <strong>Free Use:</strong> Treat a batch of masterwork gear as immune to the first gear complication this arc, only if maintained and operational. <strong>Scene Surge:</strong> Rush a critical piece; fill 2 segments on a Build/Arm timer. <strong>Neglect Hook:</strong> If neglected, the citadel decays or workers revolt. After 1 session, immunity applies only every other arc; after 2 sessions, Strained (requires 1 XP or a scene to renew infrastructure/appease workers). <em>Example:</em> "The bellows are stiff. The hammer's head is loose — and the apprentices are whispering about walking out."</dd>
+
+<dt>Great Library (16 XP)</dt>
+<dd><em>Memory palace of the region.</em> <strong>Free Use:</strong> Major inquiry begins Dominant and gains a Boon, only if maintained and the inquiry is valid. <strong>Scene Surge:</strong> Produce a sealed citation; negate a single misinterpretation complication. <strong>Neglect Hook:</strong> If neglected, the library decays or scholars depart. After 1 session, inquiry begins at Controlled; after 2 sessions, Strained (requires 1 XP or a scene to restore infrastructure/replace scholars). <em>Example:</em> "The shelves are sagging. The ink's faded — and the rats are nesting in the stacks."</dd>
+
+<dt>Grand Exchange (20 XP)</dt>
+<dd><em>Markets move when you breathe.</em> <strong>Free Use:</strong> In high finance, ignore the first market shock, only if maintained and active. <strong>Scene Surge:</strong> Halt trading bells for one exchange; DV −1 on one decisive deal. <strong>Neglect Hook:</strong> If neglected, the exchange falters or is challenged. After 1 session, ignore market shock only every other arc; after 2 sessions, Strained (requires 1 XP or a scene to renew infrastructure/defend against challenges). <em>Example:</em> "The clerk checks the ledger. 'The market's volatile today. Pay the premium — or we wait for calm.'"</dd>
+
+<dt>Fleet Command (18 XP)</dt>
+<dd><em>Signals across sea lanes.</em> <strong>Free Use:</strong> Declare blockade/corridor; hostile egress gains +1 step of difficulty, only if maintained and signals are honored. <strong>Scene Surge:</strong> Redirect a squadron; improve Position for a maritime raid or escape. <strong>Neglect Hook:</strong> If neglected, the command decays or signals lapse. After 1 session, blockade declaration only every other session; after 2 sessions, Strained (requires 1 XP or a scene to renew infrastructure/defend signals). <em>Example:</em> "The signalman eyes the broken mast. 'We can't send flags until it's fixed. Pay for new spars — or we drift.'"</dd>
+
+<dt>Hydraulic Works (16 XP)</dt>
+<dd><em>Water is wealth.</em> <strong>Free Use:</strong> Cancel the first shortage/drought fallout this arc, only if maintained and flowing. <strong>Scene Surge:</strong> Flood or feed a field at the critical moment; fill 1 segment on a Famine Relief timer. <strong>Neglect Hook:</strong> If neglected, the works clog or flow dwindles. After 1 session, cancel shortage/drought only every other arc; after 2 sessions, Strained (requires 1 XP or a scene to clear clogs/restore flow). <em>Example:</em> "The foreman points to the crack. 'One more freeze — and we're leaking. Pay for new stone — or we watch the crops die.'"</dd>
+
+<dt>Palace Complex (20 XP)</dt>
+<dd><em>Keys to office and omen.</em> <strong>Free Use:</strong> Political openers start Dominant, only if maintained and the court is active. <strong>Scene Surge:</strong> Convene a chamber; convert one scandal consequence into a public inquiry you can contest. <strong>Neglect Hook:</strong> If neglected, the palace decays or court factions secede. After 1 session, political openers start at Controlled; after 2 sessions, Strained (requires 1 XP or a scene to renew infrastructure/mediate factions). <em>Example:</em> "The gardener sighs at the wilted roses. 'One more neglect — and we're digging graves instead of growing joy.'"</dd>
+</dl>
+
+<h2 id="using-assets-play">Using Assets in Play: GM Procedures</h2>
+<p><strong>As GM, your role is to:</strong></p>
+<ul>
+<li>Frame asset benefits <em>only when the fiction supports it</em> (e.g., a safehouse is only useful if prepared and stocked).</li>
+<li>Allow flashbacks <em>only with a modest cost</em> (1 Boon or 1 downtime scene) to show the asset's prior work — <em>never</em> as free exposition.</li>
+<li>Tie complications <strong>directly to asset condition</strong>: If neglected, spend SB against it first; if compromised, deny benefits until fixed.</li>
+<li><strong>Spotlight spread</strong>: Rotate which assets take the stage so each investment breathes on-screen now and then — <em>never</em> let one asset dominate all scenes.</li>
+</ul>
+
+<h4>Example of Play (GM Perspective)</h4>
+<p>Rellan uses his <strong>Harbor Office (Standard Asset)</strong>. <strong>As GM:</strong></p>
+<ul>
+<li><strong>Frame the benefit:</strong> At scene start, ask: "Is the harbor office maintained and honored?" If yes, grant free use to start customs inspection at <strong>Dominant</strong> position. Describe: "The harbormaster nods at your seal — 'All clear. Proceed to Berth 7.'"</li>
+<li><strong>Allow flashback:</strong> If Rellan wants to flash back to preparing the office, require 1 Boon or 1 downtime scene (e.g., "You spent yesterday greasing the chains and bribing the night watch.").</li>
+<li><strong>Scene Surge:</strong> When a rival tries to trap him on the wharf, Rellan spends a Boon for a Scene Surge. <strong>As GM:</strong> Describe the intervention vividly: "You grip the chain lever — 'Hold!' The great iron links groan into place, blocking the channel. For one beat, the pursuit by water is negated — just enough to slip into a waiting skiff."</li>
+<li><strong>Neglect consequence:</strong> If Rellan neglects the harbor office for 2+ sessions, advance a timer (e.g., <em>Harbor Silt [4]</em> ticks +1 per session neglected) or spend 1–2 SB to create complications (e.g., "The harbormaster frowns: 'Berth 3's silted up. Pay for dredging — or we wait for spring.'").</li>
+</ul>
+
+<div class="panel panel-blue">
+<span class="panel-title">Asset Quick Reference (GM)</span>
+<ul>
+<li><strong>Costs</strong>: Minor 4 XP / Standard 8 XP / Major 12 XP / Tier III 16–20 XP. <em>GM Guidance:</em> Adjust slightly for narrative weight (e.g., a unique artifact might cost 6 XP as a Minor Asset).</li>
+<li><strong>Free Use</strong>: Once per session, off-screen leverage <em>only if fiction supports it</em>. Frame at scene start or as flashback with GM assent (cost: 1 Boon or 1 downtime scene).</li>
+<li><strong>Scene Surge</strong>: Spend 1 Boon for a one-beat, on-screen intervention. <strong>Limit to one meaningful use per scene</strong>.</li>
+<li><strong>Upkeep</strong>: Pay XP = base cost <em>OR</em> devote a downtime scene. Neglect degrades condition — <strong>use this as your complication engine</strong>.</li>
+<li><strong>Capacity (Optional)</strong>: Assets ≤ <strong>Spirit</strong> are easy; beyond that, upkeep taxes mount or requires extra downtime scenes.</li>
+</ul>
+</div>
+
+<h2 id="summary2">Summary</h2>
+<p>Minor assets grease doors; Standard ones bend routes; Major holdings set tables; Tier III institutions tilt the map. <strong>As GM:</strong></p>
+<ul>
+<li>Introduce assets as <strong>narrative rewards</strong>, not automatic power-ups.</li>
+<li>Price them to reflect <strong>story weight</strong>, not just XP.</li>
+<li>Always attach a <strong>hook</strong> (what happens if tended? what if neglected?).</li>
+<li>Use asset <strong>neglect</strong> to drive complications — <strong>never</strong> let it be "nothing happens."</li>
+<li><strong>Spotlight spread</strong>: Rotate asset focus so each investment feels earned and consequential.</li>
+</ul>
+
+<footer>Fate's Edge Proprietary Content — (c) 2024 Nicholas A. Gasper. All rights reserved.</footer>
+
+</body>
+</html>

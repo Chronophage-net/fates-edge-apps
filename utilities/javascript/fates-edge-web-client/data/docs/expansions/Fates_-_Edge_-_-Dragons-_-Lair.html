@@ -1,0 +1,1299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dragon's Lair — A Fate's Edge Supplement</title>
+<style>
+    :root {
+        --bg1: #0c0805;
+        --bg2: #17100a;
+        --bg3: #201709;
+        --bg4: #2b1e0e;
+        --text: #f0e6d8;
+        --text2: #c9a983;
+        --text3: #8a6b4c;
+        --gold: #e08a2c;
+        --gold-hover: #f5a63e;
+        --border: #3d2a14;
+        --red: #a83a1e;
+        --green: #4c7a3d;
+        --blue: #3c6e8f;
+        --purple: #6a3f7a;
+        --orange: #c9601f;
+        --brass: #9c7a3c;
+        --mist: #4f6b73;
+        --radius: 8px;
+        --font: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+        background: var(--bg1);
+        background-image: radial-gradient(circle at 50% 0%, #1c1006 0%, #0c0805 60%);
+        color: var(--text);
+        font-family: var(--font);
+        padding: 1.5rem;
+        max-width: 1100px;
+        margin: 0 auto;
+        line-height: 1.6;
+    }
+    h1, h2, h3, h4, h5 { color: var(--gold); margin: 0.5rem 0 0.3rem; }
+    h1 { font-size: 1.9rem; border-bottom: 2px solid var(--gold); padding-bottom: 0.3rem; }
+    h2 { font-size: 1.4rem; border-bottom: 1px solid var(--border); padding-bottom: 0.2rem; margin-top: 1.6rem; }
+    h3 { font-size: 1.15rem; margin-top: 1.1rem; }
+    h4 { font-size: 0.98rem; color: var(--text); margin-top: 0.8rem; }
+    p { margin: 0.4rem 0; }
+    a { color: var(--gold); text-decoration: none; }
+    ul, ol { margin: 0.3rem 0 0.3rem 1.4rem; }
+    li { margin: 0.15rem 0; }
+    .panel {
+        background: var(--bg2);
+        border-radius: var(--radius);
+        padding: 0.7rem 0.9rem;
+        border: 1px solid var(--border);
+        margin: 0.6rem 0;
+    }
+    .panel-gold { border-left: 4px solid var(--gold); }
+    .panel-red { border-left: 4px solid var(--red); }
+    .panel-blue { border-left: 4px solid var(--blue); }
+    .panel-green { border-left: 4px solid var(--green); }
+    .panel-purple { border-left: 4px solid var(--purple); }
+    .panel-orange { border-left: 4px solid var(--orange); }
+    .panel-mist { border-left: 4px solid var(--mist); }
+    .badge {
+        display: inline-block;
+        padding: 0.05rem 0.5rem;
+        border-radius: 12px;
+        font-size: 0.65rem;
+        font-weight: 600;
+        margin: 0 0.15rem 0.15rem 0;
+    }
+    .badge-gold { background: var(--gold); color: #170f00; }
+    .badge-red { background: var(--red); color: #fff; }
+    .badge-green { background: var(--green); color: #fff; }
+    .badge-blue { background: var(--blue); color: #fff; }
+    .badge-purple { background: var(--purple); color: #fff; }
+    .badge-orange { background: var(--orange); color: #fff; }
+    .badge-mist { background: var(--mist); color: #fff; }
+    .badge-gray { background: var(--bg4); color: var(--text3); }
+    .tag {
+        display: inline-block;
+        padding: 0.03rem 0.4rem;
+        border-radius: 6px;
+        background: var(--bg4);
+        border: 1px solid var(--orange);
+        color: var(--orange);
+        font-size: 0.62rem;
+        font-weight: 700;
+        letter-spacing: 0.02em;
+        margin: 0 0.15rem 0.15rem 0;
+    }
+    .flex { display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center; }
+    .text-muted { color: var(--text3); }
+    .text-gold { color: var(--gold); }
+    .text-sm { font-size: 0.85rem; }
+    .text-xs { font-size: 0.7rem; }
+    .mt-1 { margin-top: 0.5rem; }
+    .mb-1 { margin-bottom: 0.5rem; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem; }
+    .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.6rem; }
+    @media (max-width: 700px) { .grid-2, .grid-3 { grid-template-columns: 1fr; } }
+    hr { border: none; border-top: 1px solid var(--border); margin: 1rem 0; }
+    .toc { background: var(--bg3); border-radius: var(--radius); padding: 0.7rem 1rem; border: 1px solid var(--border); }
+    .toc a { color: var(--text2); display: block; padding: 0.12rem 0; font-size: 0.87rem; }
+    .toc a:hover { color: var(--gold); }
+    .toc .toc-sub { margin-left: 1.2rem; }
+    .toc .toc-sub a { font-size: 0.8rem; color: var(--text3); }
+    .toc-heading { color: var(--gold); font-weight: 700; display: block; margin-top: 0.5rem; }
+    blockquote {
+        border-left: 3px solid var(--gold);
+        padding-left: 1rem;
+        margin: 0.6rem 0;
+        color: var(--text2);
+        font-style: italic;
+    }
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 0.5rem 0 0.8rem;
+        font-size: 0.85rem;
+        background: var(--bg2);
+        border-radius: var(--radius);
+        overflow: hidden;
+    }
+    thead th {
+        background: var(--bg4);
+        color: var(--gold);
+        text-align: left;
+        padding: 0.4rem 0.6rem;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.03em;
+        border-bottom: 1px solid var(--border);
+    }
+    tbody td {
+        padding: 0.35rem 0.6rem;
+        border-bottom: 1px solid var(--border);
+        vertical-align: top;
+    }
+    tbody tr:last-child td { border-bottom: none; }
+    tbody tr:nth-child(odd) { background: rgba(255,255,255,0.015); }
+    td.roll { color: var(--gold); font-weight: 700; width: 2.5rem; white-space: nowrap; }
+    .creature-stats {
+        background: var(--bg4);
+        border-radius: var(--radius);
+        padding: 0.5rem 0.7rem;
+        margin: 0.4rem 0;
+        font-size: 0.85rem;
+        border-left: 3px solid var(--orange);
+    }
+    .creature-stats .cname { font-weight: 700; color: var(--gold); font-size: 0.95rem; }
+    .creature-stats .clore { font-size: 0.78rem; color: var(--mist); font-style: italic; margin-top: 0.3rem; }
+    .sb-spend { font-size: 0.75rem; color: var(--text2); margin: 0.15rem 0; }
+    .sb-spend .cost { color: var(--orange); font-weight: 600; }
+    .dragon-card {
+        background: var(--bg2);
+        border: 1px solid var(--border);
+        border-left: 4px solid var(--gold);
+        border-radius: var(--radius);
+        padding: 0.8rem 1rem;
+        margin: 0.7rem 0 1.2rem;
+    }
+    .dragon-card h3 { margin-top: 0; }
+    .order-card {
+        background: var(--bg2);
+        border: 1px solid var(--border);
+        border-left: 4px solid var(--brass);
+        border-radius: var(--radius);
+        padding: 0.8rem 1rem;
+        margin: 0.7rem 0;
+    }
+    .rite-box {
+        background: var(--bg3);
+        border-radius: var(--radius);
+        padding: 0.5rem 0.7rem;
+        margin: 0.4rem 0;
+        border: 1px solid var(--border);
+    }
+    .rite-box .rite-name { color: var(--gold); font-weight: 700; }
+    .relic-card {
+        background: var(--bg2);
+        border-radius: var(--radius);
+        border: 1px solid var(--border);
+        border-left: 3px solid var(--purple);
+        padding: 0.5rem 0.7rem;
+        margin: 0.4rem 0;
+    }
+    .relic-card .rname { color: var(--gold); font-weight: 700; }
+    .adventure-card {
+        background: var(--bg2);
+        border-radius: var(--radius);
+        border: 1px solid var(--border);
+        border-left: 3px solid var(--blue);
+        padding: 0.5rem 0.7rem;
+        margin: 0.4rem 0;
+    }
+    .adventure-card .aname { color: var(--gold); font-weight: 700; }
+    footer {
+        font-size: 0.75rem;
+        color: var(--text3);
+        text-align: center;
+        padding: 1.2rem 0 0.5rem;
+    }
+</style>
+</head>
+<body>
+
+<h1>🐲 Dragon's Lair</h1>
+<p style="color:var(--text2);margin-bottom:0.6rem;">
+    <span class="badge badge-gold">A Fate's Edge Supplement</span>
+    <span class="badge badge-orange">Lairs · Hoards · Elder Sovereigns</span>
+    <span class="badge badge-purple">Mythic Escalation</span>
+    <span class="badge badge-red">Tier III–V</span>
+    <span class="badge badge-gray">Author: Nicholas A. Gasper</span>
+</p>
+
+<blockquote>
+    Where ancient wings blot out the sun, and the earth remembers every claw.<br>
+    Dragons are not beasts. They are epochs with teeth.
+</blockquote>
+
+<div class="panel panel-gold">
+    <h3 style="margin-top:0;">Introduction</h3>
+    <p>Dragons in <strong>Fate's Edge</strong> are more than apex predators or piles of gold atop a nest. They are elder sovereignties wrapped in scale and fire, tyrants and sages older than cities, walking catastrophes whose slumber shapes continents.</p>
+    <p>A dragon is a <em>force of narrative gravity</em>. When one wakes, kingdoms bend. When one dies, the world changes.</p>
+
+    <h4>What This Supplement Adds</h4>
+    <ul>
+        <li><strong>A complete Dragon Lair Generator</strong> — rooms, traps, hazards, ancient puzzles, and living geography.</li>
+        <li><strong>Hoard Generator</strong> — treasure worth dying for, and curses worth fleeing from.</li>
+        <li><strong>Named Elder Dragons</strong> — unique sovereigns with motives, voices, and agendas.</li>
+        <li><strong>Knightly Orders &amp; Geasa</strong> — mortal traditions forged under draconic shadow.</li>
+        <li><strong>Minor Wyrms, Drakes, &amp; Cults</strong> — lesser terrors and those who worship them.</li>
+        <li><strong>Runekeeper Patron Rules</strong> — how mortals gain draconic power without losing themselves.</li>
+        <li><strong>Adventure Seeds &amp; Campaign Arcs</strong> — lairs that swallow parties whole.</li>
+    </ul>
+
+    <h4>Tone &amp; Playstyle</h4>
+    <p><strong>Dragon's Lair</strong> is written to support deadly delves, moral and political dilemmas, mythic bargains, and the uneasy awe of meeting something older than hope. This is not a bestiary update. It is a <strong>mythic escalation</strong>. A dragon is a rival kingdom, a natural disaster, and a thinking god.</p>
+
+    <h4>Using This Book</h4>
+    <p>Each section stands alone, but together they let you build lairs on the fly, create new dragons with rules and personality, and tie entire campaigns to a single ancient sovereign. No two dragons are the same. Every lair breathes. Every hoard has a history.</p>
+    <p style="text-align:center;margin-top:0.6rem;"><strong>It is not the dragon's home.<br>It is the world that belongs to the dragon.</strong></p>
+</div>
+
+<div class="panel panel-orange">
+    <strong>How to use these tables:</strong> pick or roll — results stack. Where a result says "Ask a Player," treat it as a prompt that grants a Clue if they answer honestly. All <span class="tag">TAGS</span> are Fate's Edge effects you can apply as scene traits, treasures, or obstacles.
+</div>
+
+<div class="toc">
+    <strong style="color:var(--gold);">📑 Table of Contents</strong>
+    <a href="#lair-generator">1. Lair Generator</a>
+    <a href="#hoard-generator">2. Hoard Generator</a>
+    <a href="#terrestrial-allegiances">3. Terrestrial Allegiances Generator</a>
+    <a href="#gm-quick-start">4. GM Quick Start (Index Card)</a>
+    <a href="#named-elder-dragons">5. Named Elder Dragons</a>
+    <span class="toc-sub">
+        <a href="#vyrmja">Vyrmja the Winter Coil (The Linnic Wyrm)</a>
+        <a href="#azghal">Azghal of the Red Vault (The Aelaerem Doomfire)</a>
+        <a href="#tyrgoth">Tyrgoth the Thunder-Eater (Ykrul Trial Dragon)</a>
+        <a href="#cadmorrant">Sir Cadmorrant the Gilded (Chivalric Golden Drake)</a>
+    </span>
+    <a href="#knightly-orders">6. Knightly Orders, Geasa, and Minor Dragons</a>
+    <span class="toc-sub">
+        <a href="#orders">Knightly Orders</a>
+        <a href="#geasa">Geasa &amp; Draconic Bonds</a>
+        <a href="#minor-dragons">Minor Dragons (Tier I–III)</a>
+        <a href="#shared-tables">Knights &amp; Dragons: Shared Tables</a>
+    </span>
+    <a href="#dragon-cults">7. Dragon Cults, Schisms, and Infiltration</a>
+    <a href="#draconic-hoards">8. Draconic Hoards &amp; Treasure That Changes Futures</a>
+    <a href="#ancient-wyrms">9. Patron: The Ancient Wyrms (Draconic Runes)</a>
+    <a href="#adventure-seeds">10. Adventure Seeds &amp; Campaign Arcs</a>
+    <a href="#dragon-forged-artifacts">11. Dragon-Forged Artifacts</a>
+    <a href="#relics-draconic-memory">12. Relics of Draconic Memory</a>
+</div>
+
+<hr>
+
+<!-- ===================================================== -->
+<h2 id="lair-generator">1. Lair Generator</h2>
+
+<h3>Step 1: Domain (Roll d12)</h3>
+<table>
+<thead><tr><th>Roll</th><th>Domain</th></tr></thead>
+<tbody>
+<tr><td class="roll">1</td><td>Volcanic Caldera; magma lenses; ash snows <span class="tag">HEAT</span> <span class="tag">IGNITE</span></td></tr>
+<tr><td class="roll">2</td><td>Storm Fortress upon anvil-clouds; chained towers <span class="tag">WIND</span> <span class="tag">LIGHTNING</span></td></tr>
+<tr><td class="roll">3</td><td>Desert Canyon of Petrified Titans; fossil courts <span class="tag">STONE</span> <span class="tag">ECHO</span></td></tr>
+<tr><td class="roll">4</td><td>River Gorge; mirrored pools, bone dams <span class="tag">WATER</span> <span class="tag">REFLECTION</span></td></tr>
+<tr><td class="roll">5</td><td>Black Pines; trees bow when the dragon dreams <span class="tag">WOOD</span> <span class="tag">DREAD</span></td></tr>
+<tr><td class="roll">6</td><td>Sunken Metropolis; air-bubble halls <span class="tag">PRESSURE</span> <span class="tag">DROWN</span></td></tr>
+<tr><td class="roll">7</td><td>Glacier Cathedral; blue caverns sing <span class="tag">COLD</span> <span class="tag">RESOUND</span></td></tr>
+<tr><td class="roll">8</td><td>Subterranean Geode; crystal weather <span class="tag">SHARD</span> <span class="tag">GLARE</span></td></tr>
+<tr><td class="roll">9</td><td>Sky Needles; knife peaks, updraft mazes <span class="tag">HEIGHT</span> <span class="tag">LETHAL FALL</span></td></tr>
+<tr><td class="roll">10</td><td>Salt Flats; mirage gates, glass currents <span class="tag">MIRAGE</span> <span class="tag">CORRODE</span></td></tr>
+<tr><td class="roll">11</td><td>Ruined City Crown; throne of broken oaths <span class="tag">OATH</span> <span class="tag">WARD</span></td></tr>
+<tr><td class="roll">12</td><td>Dream-Scar; overlap of waking and myth <span class="tag">ONEIRIC</span> <span class="tag">UNREAL</span></td></tr>
+</tbody>
+</table>
+
+<h3>Step 2: Territory Signs (Roll d8, pick 2)</h3>
+<table>
+<thead><tr><th>Roll</th><th>Sign</th></tr></thead>
+<tbody>
+<tr><td class="roll">1</td><td>Tracks flow uphill; rivers reverse at dusk.</td></tr>
+<tr><td class="roll">2</td><td>Herds kneel at noon facing the lair.</td></tr>
+<tr><td class="roll">3</td><td>Lightning strikes only marked stones.</td></tr>
+<tr><td class="roll">4</td><td>Ash carries whispers that name trespassers.</td></tr>
+<tr><td class="roll">5</td><td>Trees lean; boughs form an archway road.</td></tr>
+<tr><td class="roll">6</td><td>Fossils turn to watch; mouths shape words.</td></tr>
+<tr><td class="roll">7</td><td>Coins in pockets sweat; metal tastes of blood.</td></tr>
+<tr><td class="roll">8</td><td>Breath-fog forms runes warning a tithe is due.</td></tr>
+</tbody>
+</table>
+
+<h3>Step 3: Lair Heart (Roll d6)</h3>
+<table>
+<thead><tr><th>Roll</th><th>Heart</th></tr></thead>
+<tbody>
+<tr><td class="roll">1</td><td>Hoard Chamber arranged as a <em>memory theater</em>; narrative paths <span class="tag">SCRY</span>.</td></tr>
+<tr><td class="roll">2</td><td>Throne of Element; terrain obeys the dragon's breath <span class="tag">AREA</span> <span class="tag">FORCE</span>.</td></tr>
+<tr><td class="roll">3</td><td>Court of Oaths; binding circles, herald-gargoyles <span class="tag">BIND</span> <span class="tag">WARD</span>.</td></tr>
+<tr><td class="roll">4</td><td>Egg Crypt; slumbering brood, choral heartbeat <span class="tag">AWE</span>.</td></tr>
+<tr><td class="roll">5</td><td>Observatory of Scars; sky windows show bygone wars <span class="tag">DIVINE</span>.</td></tr>
+<tr><td class="roll">6</td><td>Ossuary Forge; bones smelted into relics <span class="tag">RELIC</span> <span class="tag">BLASPHEMY</span>.</td></tr>
+</tbody>
+</table>
+
+<h3>Step 4: Approaches &amp; Hazards (Roll d10, pick 2–3)</h3>
+<table>
+<thead><tr><th>Roll</th><th>Hazard</th></tr></thead>
+<tbody>
+<tr><td class="roll">1</td><td>Knife-ledge path; crosswinds every beat (<span class="tag">TEST: Mobility</span>).</td></tr>
+<tr><td class="roll">2</td><td>Ashfall smothers light; torches fail <span class="tag">SUFFOCATE</span>.</td></tr>
+<tr><td class="roll">3</td><td>Flood-tunnel; pressure doors; shifting currents.</td></tr>
+<tr><td class="roll">4</td><td>Fossil courts demand a plea; fail → turned aside.</td></tr>
+<tr><td class="roll">5</td><td>Glass rain; movement causes cuts (<span class="tag">Harm 1</span>, mitigable).</td></tr>
+<tr><td class="roll">6</td><td>Null updraft; flight negated; climbing ropes mandatory.</td></tr>
+<tr><td class="roll">7</td><td>Siren vents; infrasound lures gear from hands.</td></tr>
+<tr><td class="roll">8</td><td>Mirror-pool maze; reflections lie about exits.</td></tr>
+<tr><td class="roll">9</td><td>Avalanche memory; any loud noise triggers rockfall.</td></tr>
+<tr><td class="roll">10</td><td>Sky-leeches drain Stamina (<span class="tag">Fatigue +1</span> on linger).</td></tr>
+</tbody>
+</table>
+
+<h3>Step 5: Lair Moves (use 1–3 as soft/hard moves)</h3>
+<ul>
+    <li><strong>Reposition the World</strong>: stairs invert; Near becomes Far; archways swallow pursuit.</li>
+    <li><strong>Demand the Tithe</strong>: the place itself asks a price (blood, vow, name, memory).</li>
+    <li><strong>Answer With Weather</strong>: the dragon emotes via storm, quake, or flood for a beat.</li>
+    <li><strong>Arouse the Hoard</strong>: objects animate to defend a <em>story</em> (not a room).</li>
+    <li><strong>Close the Eye</strong>: vision narrows; ranged actions become Desperate until you change position.</li>
+</ul>
+
+<h3>Step 6: Denizens (Roll d8, 1–2 results)</h3>
+<table>
+<thead><tr><th>Roll</th><th>Denizen</th></tr></thead>
+<tbody>
+<tr><td class="roll">1</td><td>Drake-Knights (Tier II) patrolling.</td></tr>
+<tr><td class="roll">2</td><td>Hoard-Wyrds (Tier II–III) bonded to artifacts.</td></tr>
+<tr><td class="roll">3</td><td>Sky Serpents (Tier III) nesting.</td></tr>
+<tr><td class="roll">4</td><td>Fossil Jurors (Tier II) animate to judge intruders.</td></tr>
+<tr><td class="roll">5</td><td>Ember Imps (Tier I) trade heat for secrets.</td></tr>
+<tr><td class="roll">6</td><td>River Wights (Tier II) bound by drowned oaths.</td></tr>
+<tr><td class="roll">7</td><td>Glass Wyrmlings (Tier II) mirror and shatter.</td></tr>
+<tr><td class="roll">8</td><td>Herald Gargoyles (Tier II) enforce etiquette.</td></tr>
+</tbody>
+</table>
+
+<div class="panel panel-orange">
+    <strong>Quick Build Procedure (2 minutes)</strong>
+    <ol>
+        <li>Roll Domain, pick two Territory Signs.</li>
+        <li>Choose one Lair Heart and 2–3 Approaches/Hazards.</li>
+        <li>Pick 1–2 Denizens and 2 Lair Moves.</li>
+        <li>State a <strong>Tithe</strong>: "What must mortals surrender to pass?"</li>
+        <li>Name a <strong>Violation</strong>: the one act that wakes the dragon immediately.</li>
+    </ol>
+</div>
+
+<hr>
+
+<!-- ===================================================== -->
+<h2 id="hoard-generator">2. Hoard Generator</h2>
+
+<div class="panel panel-blue">A dragon's hoard is a <em>biography</em>. Build by strata. Use d12 within each stratum; pick 1–2 per stratum for a compact hoard, or roll all for a mythic hoard. Apply <span class="tag">TAGS</span> as treasure properties or scene traits.</div>
+
+<h3>Stratum A: Coin &amp; Commodity (d12)</h3>
+<table>
+<thead><tr><th>Roll</th><th>Treasure</th></tr></thead>
+<tbody>
+<tr><td class="roll">1</td><td>Scales of electrum stamped with extinct dynasties.</td></tr>
+<tr><td class="roll">2</td><td>River-pearls that hum in rain <span class="tag">WATER</span>.</td></tr>
+<tr><td class="roll">3</td><td>Salt-bricks worth a city's winter.</td></tr>
+<tr><td class="roll">4</td><td>Demon-minted coppers — warm to the touch <span class="tag">BLIGHT</span>.</td></tr>
+<tr><td class="roll">5</td><td>Glass coins: spend with a lie, shatter on truth.</td></tr>
+<tr><td class="roll">6</td><td>Star-iron beads (forge-grade) <span class="tag">RELIC</span>.</td></tr>
+<tr><td class="roll">7</td><td>Amber lumps with insects that whisper routes.</td></tr>
+<tr><td class="roll">8</td><td>Scrip of a fallen bank; redeemable with the right story.</td></tr>
+<tr><td class="roll">9</td><td>Temple tithes bound with blue twine (oath-sealed).</td></tr>
+<tr><td class="roll">10</td><td>Trade bars etched with river-depth marks (pilot's tools).</td></tr>
+<tr><td class="roll">11</td><td>Coral crowns; brittle but potent at sea <span class="tag">COMMAND (sailors)</span>.</td></tr>
+<tr><td class="roll">12</td><td>Black spice; anesthetic or poison by dose.</td></tr>
+</tbody>
+</table>
+
+<h3>Stratum B: Art &amp; Relic (d12)</h3>
+<table>
+<thead><tr><th>Roll</th><th>Treasure</th></tr></thead>
+<tbody>
+<tr><td class="roll">1</td><td>Masks of the Seven Winds (sing for <span class="tag">WIND</span> once/scene).</td></tr>
+<tr><td class="roll">2</td><td>Tapestry that updates current wars nightly.</td></tr>
+<tr><td class="roll">3</td><td>Bone flutes that call extinct birds.</td></tr>
+<tr><td class="roll">4</td><td>Chalice that refuses poisoned liquid.</td></tr>
+<tr><td class="roll">5</td><td>Crown of Oaths: swearing while wearing it binds magically <span class="tag">BIND</span>.</td></tr>
+<tr><td class="roll">6</td><td>Twin mirrors: speak into one, echo from the other at midnight.</td></tr>
+<tr><td class="roll">7</td><td>Zodiac astrolabe; points to eclipses <span class="tag">DIVINE</span>.</td></tr>
+<tr><td class="roll">8</td><td>Ember harp; strings ignite when lies are told nearby.</td></tr>
+<tr><td class="roll">9</td><td>Saint's gauntlet; unburnt by any fire.</td></tr>
+<tr><td class="roll">10</td><td>Library sigil-stamp: seals are obeyed by lesser courts.</td></tr>
+<tr><td class="roll">11</td><td>Fossil codex; pages of shale can be read once each.</td></tr>
+<tr><td class="roll">12</td><td>Lantern with bottled dawn (3 uses) <span class="tag">LIGHT</span>.</td></tr>
+</tbody>
+</table>
+
+<h3>Stratum C: Names, Oaths, and Intangibles (d12)</h3>
+<table>
+<thead><tr><th>Roll</th><th>Treasure</th></tr></thead>
+<tbody>
+<tr><td class="roll">1</td><td>A king's true name in a lead vial.</td></tr>
+<tr><td class="roll">2</td><td>A bridge's right-of-way (you collect the toll).</td></tr>
+<tr><td class="roll">3</td><td>Seven unspent apologies; each removes one curse.</td></tr>
+<tr><td class="roll">4</td><td>A ship's luck bound in twine; cut to claim it.</td></tr>
+<tr><td class="roll">5</td><td>The deed to a moonlit crossroads.</td></tr>
+<tr><td class="roll">6</td><td>A treaty's missing clause; add it to rewrite borders.</td></tr>
+<tr><td class="roll">7</td><td>The last lullaby of a nation; sing to calm armies.</td></tr>
+<tr><td class="roll">8</td><td>A festival's first toast; begin it to unite feuds.</td></tr>
+<tr><td class="roll">9</td><td>Weather's favor over one valley for a year.</td></tr>
+<tr><td class="roll">10</td><td>The memory of a siege ladder; place it to open a gate.</td></tr>
+<tr><td class="roll">11</td><td>A duel's outcome, never fought; declare to bind fate.</td></tr>
+<tr><td class="roll">12</td><td>The debt of a cathedral to its mason's bloodline.</td></tr>
+</tbody>
+</table>
+
+<h3>Stratum D: Cursed Complications (d10)</h3>
+<table>
+<thead><tr><th>Roll</th><th>Complication</th></tr></thead>
+<tbody>
+<tr><td class="roll">1</td><td>Taking coins awakens a Hoard-Wyrd.</td></tr>
+<tr><td class="roll">2</td><td>The art objects are witnesses; they may testify in court.</td></tr>
+<tr><td class="roll">3</td><td>Removing any crown asserts a claim; rivals appear.</td></tr>
+<tr><td class="roll">4</td><td>Intangibles are tracked by Herald Gargoyles.</td></tr>
+<tr><td class="roll">5</td><td>A rival dragon has a lien on half the hoard.</td></tr>
+<tr><td class="roll">6</td><td>Curse of Counting: must tally treasure nightly or suffer <span class="tag">Fatigue +1</span>.</td></tr>
+<tr><td class="roll">7</td><td>Hoard Scent: predators pursue the bearer.</td></tr>
+<tr><td class="roll">8</td><td>Echo of Theft: the original owners dream of you.</td></tr>
+<tr><td class="roll">9</td><td>Oath-Magnet: you attract sworn duels.</td></tr>
+<tr><td class="roll">10</td><td>Tide-Tithe: waters reclaim 10% during each full moon.</td></tr>
+</tbody>
+</table>
+
+<div class="panel panel-orange">
+    <strong>Quick Hoard Build</strong>
+    <ol>
+        <li>Pick 1–2 from A, 1–2 from B, 1 from C, 1 from D.</li>
+        <li>Assign 1–2 <span class="tag">TAGS</span> as properties (e.g., <span class="tag">WARD</span>, <span class="tag">COMMAND</span>, <span class="tag">LIGHT</span>).</li>
+        <li>State a <strong>Hoard Law</strong>: who may touch what (breaking it triggers a Lair Move).</li>
+    </ol>
+</div>
+
+<hr>
+
+<!-- ===================================================== -->
+<h2 id="terrestrial-allegiances">3. Terrestrial Allegiances Generator</h2>
+
+<div class="panel panel-blue">Mortal patrons use the same cadence as mystic patrons but grounded: <strong>Boons</strong>, <strong>Obligations</strong>, <strong>Claims</strong>, <strong>Fallout</strong>. Build one with the tables below or roll to discover who steps into the dragon's shadow.</div>
+
+<h3>Step 1: Who Are They? (d12)</h3>
+<table>
+<thead><tr><th>Roll</th><th>Patron</th></tr></thead>
+<tbody>
+<tr><td class="roll">1</td><td>River Guildmaster (controls ferries and floodgates).</td></tr>
+<tr><td class="roll">2</td><td>Air-Navy Commodore (skyships, storm-anchors).</td></tr>
+<tr><td class="roll">3</td><td>Fossil Court Magistrate (petrified law).</td></tr>
+<tr><td class="roll">4</td><td>Ember Syndicate Kapitan (ash trade, hot metals).</td></tr>
+<tr><td class="roll">5</td><td>Abbot of the Seven Vows (oath economy).</td></tr>
+<tr><td class="roll">6</td><td>Royal Cartographer (maps that make roads true).</td></tr>
+<tr><td class="roll">7</td><td>Archivist of Banned Names (permits and erasures).</td></tr>
+<tr><td class="roll">8</td><td>Duchess of the Green March (beast levies).</td></tr>
+<tr><td class="roll">9</td><td>Master of the Glassworks (mirrors, lenses, spies).</td></tr>
+<tr><td class="roll">10</td><td>Harbor Warden (customs, tides, quarantine).</td></tr>
+<tr><td class="roll">11</td><td>Warden of the Sky-Needles (peak fortresses).</td></tr>
+<tr><td class="roll">12</td><td>Speaker for the Displaced (refugee armadas).</td></tr>
+</tbody>
+</table>
+
+<h3>Step 2: What Do They Want? (d10)</h3>
+<table>
+<thead><tr><th>Roll</th><th>Want</th></tr></thead>
+<tbody>
+<tr><td class="roll">1</td><td>Bind or divert the dragon, not kill it.</td></tr>
+<tr><td class="roll">2</td><td>Monopolize a tithe (they profit forever).</td></tr>
+<tr><td class="roll">3</td><td>Recover a stolen oath/name from the hoard.</td></tr>
+<tr><td class="roll">4</td><td>Weaponize dragon weather against a rival.</td></tr>
+<tr><td class="roll">5</td><td>Legalize a new rite or outlaw an old one.</td></tr>
+<tr><td class="roll">6</td><td>Seat on the Fossil Court.</td></tr>
+<tr><td class="roll">7</td><td>Move a city; redraw a river.</td></tr>
+<tr><td class="roll">8</td><td>Elevate their house via draconic heraldry.</td></tr>
+<tr><td class="roll">9</td><td>Provoke a rival dragon to war (then broker peace).</td></tr>
+<tr><td class="roll">10</td><td>Break the ancient pact (free their people).</td></tr>
+</tbody>
+</table>
+
+<h3>Step 3: Boons (choose 1–2)</h3>
+<ul>
+    <li><strong>Seal of Passage</strong> <span class="tag">WARD</span>: ignore one lair hazard once/scene for bearers.</li>
+    <li><strong>Leveraged Favor</strong> <span class="tag">COMMAND</span>: call 1 squad of specialists when in their domain.</li>
+    <li><strong>Licensed Rite</strong>: learn 1 <em>legal</em> minor rite without heat.</li>
+    <li><strong>Logistics Surge</strong>: +1 Supply per delve while allied; revoke on betrayal.</li>
+    <li><strong>Heraldry of Safe-Conduct</strong>: neutral status among denizens who honor law.</li>
+</ul>
+
+<h3>Step 4: Obligations (pick 1, d6 for flavor)</h3>
+<table>
+<thead><tr><th>Roll</th><th>Obligation</th></tr></thead>
+<tbody>
+<tr><td class="roll">1</td><td>Pay a tithe (coin, captured relic, or name) each session.</td></tr>
+<tr><td class="roll">2</td><td>Render one unpleasant task without question.</td></tr>
+<tr><td class="roll">3</td><td>Uphold their edict in the field; report violations.</td></tr>
+<tr><td class="roll">4</td><td>Carry their mark openly; accept legal consequences.</td></tr>
+<tr><td class="roll">5</td><td>Share first pick of hoard items that match their aim.</td></tr>
+<tr><td class="roll">6</td><td>Do not slay the dragon without their assent.</td></tr>
+</tbody>
+</table>
+
+<h3>Step 5: Claims &amp; Fallout</h3>
+<ul>
+    <li><strong>Claim (they assert)</strong>: jurisdiction over a route, rite, or rumor.</li>
+    <li><strong>Fallout on Betrayal</strong>: lose Boons; gain <span class="tag">OUTLAW</span> tag; a bounty or legal curse.</li>
+    <li><strong>Escalation Track (4)</strong>: <em>Notice</em> → <em>Audit</em> → <em>Sanction</em> → <em>Seizure</em>. Tick on refusal or deception.</li>
+</ul>
+
+<div class="panel panel-orange">
+    <strong>Quick Allegiance Build</strong>
+    <ol>
+        <li>Roll <strong>Who</strong> and <strong>Want</strong>.</li>
+        <li>Pick Boons that further that Want.</li>
+        <li>Set 1 Obligation and the Escalation Track position.</li>
+        <li>Name the <strong>Shared Enemy</strong> (often a rival patron or a dragon cult).</li>
+    </ol>
+</div>
+
+<hr>
+
+<!-- ===================================================== -->
+<h2 id="gm-quick-start">4. GM Quick Start (Index Card)</h2>
+<div class="panel panel-gold">
+    <ul>
+        <li><strong>Lair</strong>: Domain &amp; Heart; state Tithe and Violation.</li>
+        <li><strong>Two Lair Moves</strong>: Reposition the World; Demand the Tithe.</li>
+        <li><strong>Denizens</strong>: 1 patrol, 1 guardian.</li>
+        <li><strong>Hoard</strong>: 1 Coin, 1 Art, 1 Intangible, 1 Complication; set Hoard Law.</li>
+        <li><strong>Terrestrial Patron</strong>: Who + Want; 1 Boon, 1 Obligation; Escalation = Notice.</li>
+    </ul>
+</div>
+
+<hr>
+
+<!-- ===================================================== -->
+<h2 id="named-elder-dragons">5. Named Elder Dragons</h2>
+<div class="panel panel-blue">Use these as legendary fixtures: a dragon is a setting choice, not a single encounter. Their lairs and hoards reflect their personality, memories, and the debts of nations.</div>
+
+<div class="dragon-card" id="vyrmja">
+    <h3>Vyrmja the Winter Coil <span class="text-xs text-muted">(The Linnic Wyrm)</span></h3>
+    <p><strong>Domain</strong>: Glacier Cathedral (singing ice, hollow spires)</p>
+    <p><strong>Disposition</strong>: Patient, judicial, slow to speak and slower to forgive</p>
+    <p><strong>Lair Moves</strong></p>
+    <ul>
+        <li><em>Seal the Throat</em>: Ice doors grow shut; PCs must negotiate or cut through echoing frost.</li>
+        <li><em>Witness of Snow</em>: Falling frost reveals every footstep, lie, and hidden name.</li>
+    </ul>
+    <p><strong>Legend</strong>: Vyrmja remembers every betrayal carved into her scales — each scar is a story.</p>
+    <p><strong>Hoards</strong></p>
+    <ul>
+        <li>Frost-bloom sapphires that sing regrets.</li>
+        <li>Treaties frozen into slabs of river-ice (still legally binding).</li>
+        <li>The first lost name of a king; speak it to end a bloodline.</li>
+    </ul>
+    <p><strong>Boons</strong></p>
+    <ul>
+        <li><strong>Winter Oath</strong> <span class="tag">WARD</span>: as long as you keep your sworn word, winter spirits ignore you.</li>
+        <li><strong>Glacial Memory</strong>: once/session, Vyrmja recounts a forgotten truth from centuries past.</li>
+    </ul>
+    <p><strong>Price</strong>: You owe her the truth of your lineage — if unknown, she will take blood for proof.</p>
+    <p><strong>Why She Wakes</strong>: Broken pacts, defiled graves, fire-rites in frozen lands.</p>
+</div>
+
+<div class="dragon-card" id="azghal">
+    <h3>Azghal of the Red Vault <span class="text-xs text-muted">(The Aelaerem Doomfire)</span></h3>
+    <p><strong>Domain</strong>: Ruined City Crown — throne of broken oaths and molten gates</p>
+    <p><strong>Disposition</strong>: Eloquent tyrant; thinks in conquests, currencies, and catastrophes</p>
+    <p><strong>Lair Moves</strong></p>
+    <ul>
+        <li><em>Tithe by Ash</em>: Any spoken falsehood ignites as choking smoke.</li>
+        <li><em>Molten Ledger</em>: Gold flows uphill to write debts in liquid script along the walls.</li>
+    </ul>
+    <p><strong>Legend</strong>: Built his hoard from <em>payments of surrender</em>. Entire nations paid tribute in hopes he'd sleep forever.</p>
+    <p><strong>Hoards</strong></p>
+    <ul>
+        <li>Crowns bent into collars.</li>
+        <li>Vaults of conquered treaties, each with a missing clause.</li>
+        <li>Relics he thrones on: each burned clean of its former bearer.</li>
+    </ul>
+    <p><strong>Boons</strong></p>
+    <ul>
+        <li><strong>Doomfire Brand</strong> <span class="tag">IGNITE</span> <span class="tag">COMMAND</span>: speak a command word; flames mark a liar's tongue.</li>
+        <li><strong>Cindersworn Heraldry</strong>: soldiers step aside rather than challenge your passage.</li>
+    </ul>
+    <p><strong>Price</strong>: Must bring him a symbol of pride taken from another — humiliation fuels his hoard.</p>
+    <p><strong>Why He Wakes</strong>: Armies mass, vaults open, kings forget fear.</p>
+</div>
+
+<div class="dragon-card" id="tyrgoth">
+    <h3>Tyrgoth the Thunder-Eater <span class="text-xs text-muted">(Ykrul Trial Dragon)</span></h3>
+    <p><strong>Domain</strong>: Sky Needles — knife peaks, broken storm-altars</p>
+    <p><strong>Disposition</strong>: Pure instinct and honor; words mean nothing, deeds everything</p>
+    <p><strong>Lair Moves</strong></p>
+    <ul>
+        <li><em>Sky-Split</em>: lightning carves paths between foes; melee becomes a gauntlet.</li>
+        <li><em>Bone Bellows</em>: roar turns stone to splinters; must keep footing or fall.</li>
+    </ul>
+    <p><strong>Legend</strong>: The Ykrul tell of champions who challenge Tyrgoth for three breaths: if they survive, they earn glory. If not, he remembers their courage forever.</p>
+    <p><strong>Hoards</strong></p>
+    <ul>
+        <li>Weapons that shattered against his scales (kept as trophies).</li>
+        <li>Shards of peak-altars struck by lightning.</li>
+        <li>The ashes of fallen challengers held in iron urns.</li>
+    </ul>
+    <p><strong>Boons</strong></p>
+    <ul>
+        <li><strong>Storm-Mark</strong>: gain <span class="tag">WIND</span> on leaps and <span class="tag">AREA</span> on shouts once/session.</li>
+        <li><strong>Honor of the Dead</strong>: you may request a name from the urns — use it as Inspiration once.</li>
+    </ul>
+    <p><strong>Price</strong>: One blow, honestly struck, on dragon-scale. Harm him, or be found wanting.</p>
+    <p><strong>Why He Wakes</strong>: Cowards rule, mountains bow, or a false boast reaches his ears.</p>
+</div>
+
+<div class="dragon-card" id="cadmorrant">
+    <h3>Sir Cadmorrant the Gilded <span class="text-xs text-muted">(Chivalric Golden Drake)</span></h3>
+    <p><strong>Domain</strong>: Valley of Heralds — ruined chapels, broken tilting-grounds, gilded bones</p>
+    <p><strong>Disposition</strong>: Regal, prideful, obsessed with honor and reputation</p>
+    <p><strong>Lair Moves</strong></p>
+    <ul>
+        <li><em>Court of Challenge</em>: intruders must name titles and lineage or face his wrath.</li>
+        <li><em>Knight's Charge</em>: illusions of undead lancers ride beside him.</li>
+    </ul>
+    <p><strong>Legend</strong>: Cadmorrant once demanded knights swear oaths of defense to his valley. When they failed, he took their banners and bones for his heraldic host.</p>
+    <p><strong>Hoards</strong></p>
+    <ul>
+        <li>Suits of armor filled with golden dust — empty but vigilant.</li>
+        <li>Banners soaked in sunlight; shine too bright for false heraldry.</li>
+        <li>Scepters bearing the marks of noble houses long erased.</li>
+    </ul>
+    <p><strong>Boons</strong></p>
+    <ul>
+        <li><strong>Sun-Banner</strong>: reveal a banner to frighten lesser foes; <span class="tag">FEAR</span> until the end of scene.</li>
+        <li><strong>Knight's Courtesy</strong>: parley before claws — Cadmorrant grants terms.</li>
+    </ul>
+    <p><strong>Price</strong>: Speak a lineage he has never heard, true or false, and bear its consequences.</p>
+    <p><strong>Why He Wakes</strong>: Dishonor spreads, heraldry is forged, or a fallen knight seeks vengeance.</p>
+</div>
+
+<hr>
+
+<!-- ===================================================== -->
+<h2 id="knightly-orders">6. Knightly Orders, Geasa, and Minor Dragons</h2>
+<div class="panel panel-blue">Knights are political weather vanes as much as warriors. A geis (plural: geasa) is the sharp edge of honor; it binds meaning into the world. Minor dragons are the living barometer of frontier fate.</div>
+
+<h3 id="orders">Knightly Orders</h3>
+
+<div class="order-card">
+    <h4 style="margin-top:0;">Order of the Sun-Banner</h4>
+    <p class="text-sm"><em>Heraldry</em>: Sun on scarlet field; pennons stitched with gold thread.<br><em>Ethos</em>: Radiant mercy, public vows, honor-by-daylight.</p>
+    <p><strong>Tenets</strong></p>
+    <ul>
+        <li>Never draw first blood in shadow.</li>
+        <li>Keep faith with the poor and the pledged.</li>
+        <li>Names are to be spoken clearly; titles weighed.</li>
+    </ul>
+    <p><strong>Moves</strong></p>
+    <ul>
+        <li><strong>Proclaim Terms</strong>: Before violence, declare terms; if accepted, gain Dominant Position for the first exchange.</li>
+        <li><strong>Sun-Blessed Stand</strong>: When you shield another, mark 1 Fatigue to give them +1d and <span class="tag">WARD</span> for this beat.</li>
+    </ul>
+    <div class="rite-box"><span class="rite-name">Order Rite (DV 3)</span> <span class="tag">LIGHT</span> <span class="tag">WARD</span><br>Unfurl a luminous banner; lesser foes must hesitate or test <em>Resolve</em> at −1d to act against you for a scene. <em>Backlash</em>: Your name spreads; a rival order learns your route.</div>
+    <p><strong>Obligation (4-segment)</strong></p>
+    <ul>
+        <li><strong>Dues of Mercy</strong>: Rescue a declared innocent within three days of plea.</li>
+        <li><strong>Violation</strong>: If you refuse a plea in daylight, tick Obligation twice and lose access to the Rite until you atone.</li>
+    </ul>
+    <p><strong>Boons &amp; Favors</strong></p>
+    <ul>
+        <li>Sanctuary at templar hostels; <span class="tag">SUPPLY</span> 1 once per delve.</li>
+        <li><strong>Sun-Banner</strong> (relic): Reveal to impose <span class="tag">FEAR</span> on Tier I mobs for one beat.</li>
+    </ul>
+    <p class="text-sm"><strong>Rivalries</strong>: Despises oath-courts that bargain in secret. Touchy peace with Sir Cadmorrant's valley heralds.</p>
+</div>
+
+<div class="order-card">
+    <h4 style="margin-top:0;">Thorn-Guard Compact</h4>
+    <p class="text-sm"><em>Heraldry</em>: Black bramble on iron-gray.<br><em>Ethos</em>: Keep borders. Hold lines. Speak little.</p>
+    <p><strong>Tenets</strong></p>
+    <ul>
+        <li>No trespass without toll or task.</li>
+        <li>The hedge remembers every cut.</li>
+        <li>Winter keeps what winter is owed.</li>
+    </ul>
+    <p><strong>Moves</strong></p>
+    <ul>
+        <li><strong>Set the Hedge</strong>: Mark 1 Supply to lace thorns; enemies entering a Zone act at Dominant and suffer Harm 1 (Bleed) on a miss.</li>
+        <li><strong>Countermarch</strong>: When the enemy surges, step back one Zone with formation intact; cancel their positional gain.</li>
+    </ul>
+    <div class="rite-box"><span class="rite-name">Order Rite (DV 4)</span> <span class="tag">BIND</span> <span class="tag">EARTH</span><br>Raise a living briar wall; <span class="tag">WALL</span> across a chokepoint for a scene. <em>Backlash</em>: The hedge wants payment — sacrifice blood or a keepsake (lose a tag) or suffer −1 die until rest.</div>
+    <p><strong>Obligation (6-segment)</strong>: <strong>Border Dues</strong> — patrol a named boundary each new moon. Missing a circuit ticks twice and invites a supernatural crossing.</p>
+    <p><strong>Boons</strong>: Custom thornmail (Armor: counts as 2 vs. Grapple/Pull); hedge-wives share old-road maps.</p>
+</div>
+
+<div class="order-card">
+    <h4 style="margin-top:0;">Order of the Glass Vow</h4>
+    <p class="text-sm"><em>Heraldry</em>: Clear chalice on midnight blue.<br><em>Ethos</em>: Transparent oaths, public records, duels by witness.</p>
+    <p><strong>Tenets</strong></p>
+    <ul>
+        <li>No sealed bargains.</li>
+        <li>A liar stands alone.</li>
+        <li>Mercy is written first, then wrath.</li>
+    </ul>
+    <p><strong>Moves</strong></p>
+    <ul>
+        <li><strong>Read the Cut</strong>: When speech and steel mingle, ask "What part of this is pretense?" GM answers plainly; gain +1d to act against the pretense this beat.</li>
+        <li><strong>Chalice Interdict</strong>: Hold the chalice aloft; violence pauses for one exchange unless a party breaks faith (they act Desperate if they do).</li>
+    </ul>
+    <div class="rite-box"><span class="rite-name">Order Rite (DV 3)</span> <span class="tag">TRUTH</span> <span class="tag">BIND</span><br>Inscribe the terms of a dispute into sand or glass; those present cannot knowingly contradict the text without suffering Harm 1 (Burn) each time. <em>Backlash</em>: The text clings — any later edits cost 1 Stress per change.</div>
+    <p><strong>Obligation (5-segment)</strong>: <strong>Record of Account</strong> — file a public writ after any duel or negotiation you mediate. Failure breeds rumor: −1d to sway officials for a session.</p>
+    <p><strong>Boons</strong>: Access to public archives; Glass Signet (once/session: certify a truth; NPCs in earshot must treat it as if witnessed).</p>
+</div>
+
+<div class="order-card">
+    <h4 style="margin-top:0;">Ashen Spur Brotherhood</h4>
+    <p class="text-sm"><em>Heraldry</em>: Silver spur over coal-black wing.<br><em>Ethos</em>: Ride fast, end threats, no graves for tyrants.</p>
+    <p><strong>Tenets</strong></p>
+    <ul>
+        <li>Strike first against monsters that stalk roads.</li>
+        <li>No ransom for slavers or marauders.</li>
+        <li>A swift horse is a citizen.</li>
+    </ul>
+    <p><strong>Moves</strong></p>
+    <ul>
+        <li><strong>Break the Line</strong>: On a mounted charge from Far to Near, gain +2d and <span class="tag">AREA</span> for the first clash; then mark 1 Fatigue.</li>
+        <li><strong>Spur Smoke</strong>: Kick up dust/ash: create cover for one exchange; ranged foes act at −1d.</li>
+    </ul>
+    <div class="rite-box"><span class="rite-name">Order Rite (DV 2)</span> <span class="tag">WIND</span> <span class="tag">SPEED</span><br>Whistle the Spur Cant; mounts and riders move one Zone without provoking. <em>Backlash</em>: Your trail is obvious; the next ambush against you gains +1d.</div>
+    <p><strong>Obligation (4-segment)</strong>: <strong>Road Tithe</strong> — answer posted horn-calls within a week. Missed calls convert to bounties against your name.</p>
+    <p><strong>Boons</strong>: Relay shelters; Greywind Spurs (ignore the first Entangle/Slow each delve).</p>
+</div>
+
+<h3 id="geasa">Geasa &amp; Draconic Bonds</h3>
+
+<h4>Swearing a Geis (Player-Facing Rule)</h4>
+<ul>
+    <li><strong>Propose Terms</strong>: A concrete vow with a trigger and a limit (scope, place, time).</li>
+    <li><strong>Seal It</strong>: Choose a seal (blood, name, relic, witness). Mark 1 Obligation (Geis) per magnitude of the boon.</li>
+    <li><strong>Boon</strong>: Gain a situational tag (e.g., <span class="tag">WARD</span>, <span class="tag">FEAR</span>, <span class="tag">WIND</span>) or +1d in the vowed context.</li>
+    <li><strong>Breakage</strong>: If you knowingly break the geis, suffer Backlash and tick all Obligation segments at once.</li>
+</ul>
+
+<table>
+<thead><tr><th>Scope</th><th>Boon</th><th>Obligation</th></tr></thead>
+<tbody>
+<tr><td>Duel/Scene</td><td>+1d or 1 situational Tag</td><td>2-segment</td></tr>
+<tr><td>Quest/Arc</td><td>+1d and 1 Tag; or 2 Tags</td><td>4-segment</td></tr>
+<tr><td>Season/War</td><td>2 Tags and special clause</td><td>6-segment</td></tr>
+</tbody>
+</table>
+
+<h4>Backlash on Break (Roll d6)</h4>
+<table>
+<thead><tr><th>Roll</th><th>Backlash</th></tr></thead>
+<tbody>
+<tr><td class="roll">1</td><td><em>Harm 2 (Ban)</em> vs. your gift (cannot use granted Tag this session).</td></tr>
+<tr><td class="roll">2</td><td><em>Truth Leech</em>: you lose a memory tied to the vow (GM chooses).</td></tr>
+<tr><td class="roll">3</td><td><em>Name Tarnish</em>: −1d with any witness or herald.</td></tr>
+<tr><td class="roll">4</td><td><em>Omen Debt</em>: a rival gains +1d once against you.</td></tr>
+<tr><td class="roll">5</td><td><em>Geis Echo</em>: the geis attempts to re-bind with a harsher clause.</td></tr>
+<tr><td class="roll">6</td><td><em>Dragon's Interest</em>: a local drake or elder hears your broken word.</td></tr>
+</tbody>
+</table>
+
+<h4>Draconic Bonds (NPC or Elder-Facing)</h4>
+<ul>
+    <li><strong>Hoard Clause</strong>: Payment must change a story (humiliate a tyrant, bury a feud, return a relic).</li>
+    <li><strong>Scale Clause</strong>: Accept a scar or brand; while marked, you gain a relevant Tag, but dragons notice you.</li>
+    <li><strong>Word Clause</strong>: Speak your lineage or craft a new one. If found false, immediate Backlash and enmity.</li>
+</ul>
+
+<h4>Sample Geasa (d6)</h4>
+<ol>
+    <li>Guard a boundary until first snow melts (<span class="tag">WARD</span> at gates).</li>
+    <li>Speak no lies under open sky (+1d to Parley; cannot Deceive outside).</li>
+    <li>Draw first blood only after terms declared (+1d on formal duels).</li>
+    <li>Offer quarter once each battle (gain <span class="tag">FEAR</span> vs. oath-breakers).</li>
+    <li>Shed blood to save a stranger by sundown (+1d to Rescue/Heal).</li>
+    <li>Carry no gold by hand (<span class="tag">LUCK</span> on travel checks).</li>
+</ol>
+
+<h3 id="minor-dragons">Minor Dragons (Tier I–III)</h3>
+<div class="panel panel-blue">Use these freely. They aren't puzzles so much as omens. Clever play, bribes, and geasa matter more than raw harm.</div>
+
+<div class="creature-stats">
+    <div class="cname">Emberdrake (Tier I)</div>
+    <div class="text-xs text-muted mt-1">Harm 1 (Fire/Nip) • Armor 1 • Fast • <span class="tag">IGNITE</span></div>
+    <div class="sb-spend mt-1"><strong>Moves</strong>: Scorch the ground; steal a bright trinket; flare in panic to blind for a beat.</div>
+    <div class="sb-spend"><strong>Pressure</strong>: In tight spaces, actions with cloth/leather act at Dominant.</div>
+    <div class="sb-spend"><strong>Weakness</strong>: Milk, ash, or sweet-smoke pacifies.</div>
+    <div class="clore">Trophy — <em>Cinder Pearl</em>: once, add <span class="tag">IGNITE</span> to a small action.</div>
+</div>
+
+<div class="creature-stats">
+    <div class="cname">Mirewing Basilisk-Drake (Tier II)</div>
+    <div class="text-xs text-muted mt-1">Harm 2 (Venom/Glare) • Armor 1 • Loping • <span class="tag">BIND</span></div>
+    <div class="sb-spend mt-1"><strong>Moves</strong>: Fix a victim with a muddy gaze (rooted); lash tail to topple; foul water.</div>
+    <div class="sb-spend"><strong>Pressure</strong>: Any stumble becomes Desperate in swampy Zones.</div>
+    <div class="sb-spend"><strong>Weakness</strong>: Polished mirrors; sudden bright clatter.</div>
+    <div class="clore">Trophy — <em>Gleam Reed</em>: counter one Root/Slow effect.</div>
+</div>
+
+<div class="creature-stats">
+    <div class="cname">Barrow Serpent (Tier II)</div>
+    <div class="text-xs text-muted mt-1">Harm 2 (Grave-Chill) • Armor 2 in darkness • Burrow • <span class="tag">FEAR</span></div>
+    <div class="sb-spend mt-1"><strong>Moves</strong>: Suck warmth from air; crumble graves into pits; coil to pin a shieldwall.</div>
+    <div class="sb-spend"><strong>Pressure</strong>: Torches sputter; without steady light, −1d.</div>
+    <div class="sb-spend"><strong>Weakness</strong>: Funeral bells or true names of the buried.</div>
+    <div class="clore">Trophy — <em>Cold Scale</em>: ignore one chill/terror effect.</div>
+</div>
+
+<div class="creature-stats">
+    <div class="cname">Sky-Needle Wyvern (Tier II–III)</div>
+    <div class="text-xs text-muted mt-1">Harm 2–3 (Pierce/Wind) • Armor 1 • Fly • <span class="tag">WIND</span></div>
+    <div class="sb-spend mt-1"><strong>Moves</strong>: Snatch and drop; turn arrows with wing sheer; scream to scatter.</div>
+    <div class="sb-spend"><strong>Pressure</strong>: Open ground is Desperate unless you secure cover or ropes.</div>
+    <div class="sb-spend"><strong>Weakness</strong>: Nets, whistling cords, anchored lines.</div>
+    <div class="clore">Trophy — <em>Pinion Hook</em>: climb/descend a cliff at Dominant once.</div>
+</div>
+
+<div class="creature-stats">
+    <div class="cname">Lampwyrm Archivist (Tier I–II)</div>
+    <div class="text-xs text-muted mt-1">Harm 1 (Gum/Ink) • Armor 0 • Glide • <span class="tag">TRUTH</span></div>
+    <div class="sb-spend mt-1"><strong>Moves</strong>: Illuminate lies (speaker acts at −1d); hoard scribbles; hum lullabies.</div>
+    <div class="sb-spend"><strong>Pressure</strong>: Any deception in scene ticks a Suspicion timer [4].</div>
+    <div class="sb-spend"><strong>Weakness</strong>: Candles snuffed respectfully; gifted annotation.</div>
+    <div class="clore">Trophy — <em>Proof-Mote</em>: once, ask "What here is misfiled?"</div>
+</div>
+
+<div class="creature-stats">
+    <div class="cname">Frostling Wyrm (Tier III)</div>
+    <div class="text-xs text-muted mt-1">Harm 3 (Rime/Crush) • Armor 2 • Slow • <span class="tag">WARD</span> <span class="tag">COLD</span></div>
+    <div class="sb-spend mt-1"><strong>Moves</strong>: Breathe hoarfrost (<span class="tag">AREA</span>); seal doors with ice-ribbing; hibernate-ambush.</div>
+    <div class="sb-spend"><strong>Pressure</strong>: Cold checks tax Fatigue; gear becomes Brittle.</div>
+    <div class="sb-spend"><strong>Weakness</strong>: Resonant bells; shared fire and stories (reduce hostility).</div>
+    <div class="clore">Trophy — <em>Rime Crown</em>: once, gain <span class="tag">COLD</span> and <span class="tag">WARD</span> for a scene; then mark 1 Fatigue.</div>
+</div>
+
+<h3 id="shared-tables">Knights &amp; Dragons: Shared Tables</h3>
+
+<h4>Honor or Hunger? (d6 prompt)</h4>
+<ol>
+    <li>A geis is offered if you return a banner.</li>
+    <li>The border hedge demands blood for passage.</li>
+    <li>A drake steals a treaty — who signed it, and why?</li>
+    <li>A knight's record contradicts the living memory of a wyrm.</li>
+    <li>A hoard piece sings a rival's name at dawn.</li>
+    <li>A spur-call horn echoes from two directions at once.</li>
+</ol>
+
+<h4>Quick Geis Seeds (d6)</h4>
+<ol>
+    <li>Eat only saltless bread until the pact is done (<span class="tag">LUCK</span> on travel).</li>
+    <li>Speak first to the lowest-born in any hall (+1d to Gather Rumors).</li>
+    <li>Do not cross water after dusk (<span class="tag">WARD</span> vs. Night-Terrors).</li>
+    <li>Wear no helm while bearing news (NPCs treat you as messenger).</li>
+    <li>Take no payment for slaying beasts that cannot parley (<span class="tag">MERCY</span>).</li>
+    <li>Let enemies choose ground; you choose terms (+1d to Set Terms).</li>
+</ol>
+
+<hr>
+
+<!-- ===================================================== -->
+<h2 id="dragon-cults">7. Dragon Cults, Schisms, and Infiltration</h2>
+<div class="panel panel-blue">Not every dragon claims a cult. Some inherit them. Some tolerate them. Some devour them. Most cults collapse long before a wyrm ever notices. When one survives, entire provinces tilt.</div>
+
+<h3>Cult Anatomy</h3>
+<p>A Dragon Cult is built from three pillars:</p>
+<ol>
+    <li><strong>Myth Engine</strong> (what story powers it)</li>
+    <li><strong>Scarce Rite</strong> (what only initiates can do)</li>
+    <li><strong>Territorial Claim</strong> (where its influence holds)</li>
+</ol>
+<p>At the table, a cult is treated like a slow-moving faction with a <em>Public Face</em>, <em>Inner Knives</em>, and a <em>Hidden Egg</em>.</p>
+
+<table>
+<thead><tr><th>Layer</th><th>What They Want</th><th>What They Do</th></tr></thead>
+<tbody>
+<tr><td>Public Face</td><td>Pilgrimage, blessings, harvest rites</td><td>Festivals, petitions, tithes</td></tr>
+<tr><td>Inner Knives</td><td>Power, silence, rival removal</td><td>Kidnapping, extortion, sabotage</td></tr>
+<tr><td>Hidden Egg</td><td>Transform the world for the dragon</td><td>Summonings, wyrm-binding, prophecy</td></tr>
+</tbody>
+</table>
+
+<h3>Cult Timers</h3>
+<ul>
+    <li><strong>Infiltration [6]</strong> — Converts militia, merchants, clergy, children.</li>
+    <li><strong>Manifestation [8]</strong> — Tries to physically call, awaken, or anchor a dragon.</li>
+    <li><strong>Rupture [10]</strong> — The cult's success changes law, season, or geography.</li>
+</ul>
+<p class="text-sm"><strong>Ticks when</strong>: PCs ignore rumors or disappearances; blood rites occur at solstice or equinox; a hoard-piece changes hands.</p>
+<p class="text-sm"><strong>Reduce ticks by</strong>: breaking oaths publicly; shaming the cult in open ritual; returning a stolen "scale-word" (artifact, relic).</p>
+
+<h3>Cells &amp; Schisms (d6)</h3>
+<ol>
+    <li><strong>Ash-Feather Choir</strong> — Believe their dragon is dead, but fragments of its soul live in hymns. Singers awaken pieces in listeners.</li>
+    <li><strong>Molten Ascetics</strong> — Burn mundane identity; take new names in heat and ash. Wear iron masks. Suffer no lies.</li>
+    <li><strong>Hoard-Tenders of Quiet Coin</strong> — A thieves' guild turned self-styled curators. Every stolen jewel becomes "a verse of praise."</li>
+    <li><strong>The Charm-Broken</strong> — Former drake victims whose trauma has been canonized. They hijack caravans to "spare others" and accidentally summon the dragon's attention.</li>
+    <li><strong>Veil of the First Scale</strong> — Alchemists chasing transmutation via drakestone dust. Brew "scale-tonics" that sometimes work, sometimes rot bone.</li>
+    <li><strong>Candle-Keepers of the Hollow</strong> — Believe light is sin against the dragon's perfect night. Snuff lamps and open crypts.</li>
+</ol>
+
+<h3>Cult Rites</h3>
+<div class="rite-box"><span class="rite-name">Low Rite: Ember-Send (DV 2)</span> <span class="tag">IGNITE</span> <span class="tag">MESSENGER</span><br>Burn a sealed scrap; the smoke carries a whispered message to a known cultist within a day's travel. <em>Backlash</em>: the ember remembers — leave a traceable scent of ash for one scene.</div>
+<div class="rite-box"><span class="rite-name">Standard Rite: Scaled Veil (DV 4)</span> <span class="tag">WARD</span> <span class="tag">FEAR</span><br>Those under the veil resemble "favored kin." NPCs feel a prickle of dread. Mortal foes at Near must test Resolve (Dominant) to strike first. <em>Backlash</em>: the veil cracks; one participant gains serpentine eyes for a night, acting at −1d vs. bright light.</div>
+<div class="rite-box"><span class="rite-name">Greater Rite: Hoard-Calling (DV 5)</span> <span class="tag">BIND</span> <span class="tag">STONE</span> <span class="tag">AREA</span><br>Stones tremble; coins shiver; metal leaps toward a chosen point, forming a nest-mound. Can trap foes (<span class="tag">BIND</span>), or prepare a resting ground for a minor drake. <em>Backlash</em>: metal becomes brittle afterward; any gear used this scene risks loss of a tag.</div>
+<div class="rite-box"><span class="rite-name">Cataclysm Rite: Scale-Dawn (DV 6+)</span> <span class="tag">IGNITE</span> <span class="tag">WIND</span> <span class="tag">FEAR</span> <span class="tag">AREA</span><br>Sky reddens; a spectral draconic shape blots the sun. Panic in a town or keep; all social rolls begin at Desperate. If the Manifestation Timer is full, a real dragon takes notice. <em>Backlash</em>: caster coughs embers, marking 2 Fatigue and 1 Corruption.</div>
+
+<h3>What They Really Want (d6 Truths)</h3>
+<ol>
+    <li>Not power — <em>certainty</em>. A world without contradictions.</li>
+    <li>To resurrect a dragon that does not wish to return.</li>
+    <li>To bargain: share their souls to become one being.</li>
+    <li>To build a "perfect" kingdom the dragon once dreamed.</li>
+    <li>To stop a prophecy about the dragon's final death.</li>
+    <li>To feed the dragon with <em>memory</em>, not flesh.</li>
+</ol>
+
+<h3>Cult Leaders (d6)</h3>
+<ol>
+    <li>Exiled monk with a shard of dragon tooth lodged in his ribs.</li>
+    <li>Merchant-matriarch who believes the wyrm saved her ancestors.</li>
+    <li>Knight stripped of banner, now "chosen herald."</li>
+    <li>Street preacher who speaks in dragon-tongue while asleep.</li>
+    <li>Scholar who mapped ley-lines into a hoard-shaped sigil.</li>
+    <li>War-orphan raised by a drake's distant dream.</li>
+</ol>
+
+<h3>Infiltration Scene Hooks</h3>
+<ul>
+    <li>A town's taxes are being paid "in gems only."</li>
+    <li>A child draws a dragon crest they've never seen.</li>
+    <li>A caravan guard wakes breathing smoke.</li>
+    <li>Bells ring backward in a border keep.</li>
+    <li>Sheep bleed gold-dust when shorn.</li>
+    <li>A knight's blade curls like warm wax.</li>
+</ul>
+
+<div class="grid-2">
+    <div class="panel panel-green">
+        <strong>Cult Collapse (When PCs Win)</strong>
+        <ul>
+            <li>The hoard scatters: treasures seek new owners.</li>
+            <li>The dragon's "dream" breaks — storms or tremors cease.</li>
+            <li>A grieving remnant becomes fanatically good or murderously bitter.</li>
+            <li>Lost eggs surface: orphans, relics, half-made creations.</li>
+            <li>Power vacuum: bandits, lords, elders move to claim land.</li>
+        </ul>
+    </div>
+    <div class="panel panel-red">
+        <strong>Cult Ascendance (When PCs Lose)</strong>
+        <ul>
+            <li>Local laws change: tithes paid in metal, not grain.</li>
+            <li>Heralds declare amnesty for "scaled blood."</li>
+            <li>A drake circles the keep at dawn, unseen but heard.</li>
+            <li>Crops fail, then regrow into gold-tinged weeds.</li>
+            <li>The dragon speaks through dreams to hundreds at once.</li>
+        </ul>
+    </div>
+</div>
+
+<hr>
+
+<!-- ===================================================== -->
+<h2 id="draconic-hoards">8. Draconic Hoards &amp; Treasure That Changes Futures</h2>
+<div class="panel panel-blue">A dragon's hoard is a ledger of grudges, victories, insults, and impossible promises. No two hoards are alike. Each object has <strong>weight</strong>, <strong>memory</strong>, and a <em>price to use</em>.</div>
+
+<h3>Hoard Procedure (Fast Table)</h3>
+<p>Roll 3d6: <strong>Form</strong> (what the hoard looks like), <strong>Heart-Piece</strong> (what defines it), <strong>Volatile Treasure</strong> (dangerous item). Optional: roll a second Heart-Piece for elder wyrms.</p>
+
+<h3>Form of the Hoard (d6)</h3>
+<ol>
+    <li>A chamber of molten gold: coins flow like syrup, heat warps steel.</li>
+    <li>Catacomb of trophies: banners, crowns, bones, swords in stone.</li>
+    <li>Flooded vault of gems: water refracts hypnotic patterns.</li>
+    <li>Dust-plain of ash and broken weapons: no metal holds a shine.</li>
+    <li>A serene temple of coins stacked perfectly into pillars.</li>
+    <li>A living garden of ore-veins and crystal blooms that change color with breath.</li>
+</ol>
+
+<h3>Heart-Piece (d8)</h3>
+<ol>
+    <li><strong>The Crown of Three Kingdoms</strong> — Wearer gains +1d to Command, but must never kneel or they take Harm 2 (Shame).</li>
+    <li><strong>A Mirror Full of Stars</strong> — Shows a possible future; first viewer gains +1 Boon next session; second viewer suffers 1 Corruption.</li>
+    <li><strong>Seven Iron Coils</strong> — Chains that bind spirits, ghosts, or oaths. Using them marks +1 Obligation (Dragon).</li>
+    <li><strong>Heart-Forge Ember</strong> — Heat of a dying world; can reforge any blade; next time it draws blood, the GM may tick a Doom timer.</li>
+    <li><strong>A Name in a Lantern</strong> — Speak the name to summon its owner (dead or alive). Each use burns a memory of the speaker's past.</li>
+    <li><strong>Tear of the First Storm</strong> — Once: create a violent storm. Afterward, the user dreams of the dragon every night.</li>
+    <li><strong>Ledger of Broken Promises</strong> — Read it to reveal a tyrant's secret. Writing in it creates a new secret for the GM to use later.</li>
+    <li><strong>Seed of Stone</strong> — Bury it: grows a fortress in a day. It will "remember" the builder's fears and shape itself accordingly.</li>
+</ol>
+
+<h3>Volatile Treasure (d8)</h3>
+<ol>
+    <li><strong>Gold-Eater Idol</strong> — Animates at night, swallowing coins unless fed a vow.</li>
+    <li><strong>Candle of Reverse Shadows</strong> — Reveals invisible things; extinguishing it summons one of them.</li>
+    <li><strong>Grave-Silver Thimble</strong> — Sews any wound shut; steals one breath per stitch.</li>
+    <li><strong>Drake-Bone Horn</strong> — Call for help; a drake answers, furious you have its relative's bone.</li>
+    <li><strong>Memory-Coin</strong> — Flip it: recall a forgotten truth; or lose one.</li>
+    <li><strong>Obsidian Chalice</strong> — Liquids become poison or panacea; the GM chooses secretly.</li>
+    <li><strong>Mirror-Shard Key</strong> — Opens a "door" into reflected spaces; someone follows you back.</li>
+    <li><strong>Scales of Debt</strong> — Weigh a soul's worth; the dragon learns the result instantly.</li>
+</ol>
+
+<h3>Value (What It Buys)</h3>
+<p>Treasure from a wyrm's hoard does not buy grain — it buys <strong>exceptions</strong>. Each PC chooses:</p>
+<ul>
+    <li><strong>One-time Favor</strong> from a lord, guild, or knightly order.</li>
+    <li><strong>A Seal of Transit</strong>, ignoring borders or tolls.</li>
+    <li><strong>A Year of Silence</strong>: no one may legally question you.</li>
+    <li><strong>A Cleared Name</strong>: erase a crime or accusation.</li>
+    <li><strong>A Writ of Passage</strong> into sacred or forbidden ground.</li>
+</ul>
+<div class="panel panel-orange">Each time treasure is spent this way, tick the <strong>Dragon's Attention [6]</strong> timer. At 6 ticks, the wyrm knows where its treasure went.</div>
+
+<h3>Hoard Curses (d6)</h3>
+<ol>
+    <li>The taker dreams of wings every night and speaks in smoke.</li>
+    <li>Metal gleams unnaturally; thieves follow you.</li>
+    <li>A rival cult believes <em>you</em> are their prophesied herald.</li>
+    <li>Birds fall silent when you approach.</li>
+    <li>Children stare, animals kneel, elders weep.</li>
+    <li>Fire bends toward you like a hungry pet.</li>
+</ol>
+
+<h3>Hoard Guardians (d6)</h3>
+<ol>
+    <li>Wyrm-bound knights (oath-ink on tongue)</li>
+    <li>Coin-golems that assemble from treasure</li>
+    <li>Paper-wyrmlings (burn like phosphorus)</li>
+    <li>Shadow-bats that steal names</li>
+    <li>Thief-priest pretending to help you escape</li>
+    <li>Dragon's echo (astral projection)</li>
+</ol>
+
+<h3>Turning Treasure Into Power</h3>
+<p><strong>Forge-Boons</strong>: Your smith reforges a relic → gain a unique item tag (GM chooses one): <span class="tag">Hoard-Eater</span> (ignores armor), <span class="tag">Moon-Reflective</span> (blocks illusions), <span class="tag">Sky-Drawn</span> (returns to hand), <span class="tag">Fate-Marked</span> (+1 Boon when spilling noble blood).</p>
+<p><strong>Ritual Sale</strong>: Selling treasure to a cult increases Manifestation +1. Selling to a kingdom starts a war.</p>
+<p><strong>Draconic Favor</strong>: Return a Heart-Piece as tribute — ask one question the dragon must answer, gain one safe night in its territory, or mark +1 Renown in noble courts.</p>
+<p><strong>Draconic Wrath</strong>: Attempt to destroy a Heart-Piece — the dragon awakens or sends a herald, weather changes dramatically, wards falter across a province.</p>
+
+<hr>
+
+<!-- ===================================================== -->
+<h2 id="ancient-wyrms">9. Patron: The Ancient Wyrms (Draconic Runes)</h2>
+<div class="panel panel-purple">
+    <p><strong>Symbol</strong>: A spiral of seven scales encircling an empty eye.</p>
+    <p><strong>Epithets</strong>: The Crowned Flames, First Sovereigns, The Hoard Unending, The Living Citadels.</p>
+    <p><strong>Nature</strong>: Any wyrm of sufficient age and will may forge a pact. Each bond is unique, sealed in molten speech and unbreakable oath. Dragons do not choose lightly: to grant runes is to acknowledge a mortal as <em>kin by fire</em>.</p>
+</div>
+
+<h4>Doctrine</h4>
+<ul>
+    <li>Power is owed only to power; tribute is proof of worth.</li>
+    <li>What is taken must be paid for — in gold, in oath, or in blood.</li>
+    <li>Knowledge is treasure; hoards guard secrets, not merely gold.</li>
+    <li>A promise given in a dragon's presence is a chain in the soul.</li>
+</ul>
+
+<h4>Pact Price (Obligation)</h4>
+<ul>
+    <li>Protect a treasure (object, name, land, or secret).</li>
+    <li>Enforce a vow sworn by others.</li>
+    <li>Extend the dragon's influence: fear, tribute, renown.</li>
+    <li>Once per season: deliver a worthy offering.</li>
+</ul>
+<p class="text-sm text-muted">Refusing a demand marks +2 Obligation. Betrayal awakens the wyrm.</p>
+
+<h4>Draconic Rites</h4>
+<p><strong>Low Rites</strong></p>
+<ul>
+    <li><strong>Spark of the First Flame</strong> — Ignite a melee weapon with searing heat (Harm 2) for a scene.</li>
+    <li><strong>Scaled Skin</strong> — Target gains Armor 1 vs. mundane attacks.</li>
+    <li><strong>Voice of Embers</strong> — Speak with commanding resonance; +1d to Coercion, Threats, or Demands.</li>
+    <li><strong>Hoard-Sense</strong> — Sense precious metals or magical relics within Near range.</li>
+</ul>
+<p><strong>Standard Rites</strong></p>
+<ul>
+    <li><strong>Dragon's Gaze</strong> — Force a creature to obey a single, short, simple command; if resisted, they suffer Harm 1 (Fear).</li>
+    <li><strong>Crown of Scales</strong> — Your skin becomes iron-hard; gain Armor 2 for a scene and immunity to fire.</li>
+    <li><strong>Molten Breath</strong> — Exhale a cone of flame: Harm 2 (Area), set objects ablaze, produce smoke cover.</li>
+    <li><strong>Wyrm-Ward</strong> — Raise a shimmering wall of heat or stone that blocks passage until shattered or dispelled.</li>
+</ul>
+<p><strong>High Rites (Tier IV+)</strong></p>
+<ul>
+    <li><strong>Fire Unending</strong> — Sustain a blazing inferno that burns water, stone, and armor; ignore cover. Scene-long if Concentrating.</li>
+    <li><strong>Name-Binding Coil</strong> — A creature who speaks their name aloud is bound to fulfill a sworn term. Breaking it causes immediate Harm 3 and starts a Doom timer.</li>
+    <li><strong>Wings of the Crowned Flame</strong> — Grow spectral wings; fly freely; your voice carries for miles.</li>
+    <li><strong>Dragonheart Ascendancy</strong> — For one scene, act as a minor wyrm: +1 Tier, immune to fear, fire, and mundane weapons. At scene's end: 2 Fatigue and +2 Obligation.</li>
+</ul>
+
+<h4>Runekeeper Notes</h4>
+<ul>
+    <li>Every dragon grants different Rune "accents" — a frost wyrm's breath freezes; a desert wyrm's voice scorches the soul.</li>
+    <li>Using Rites against a dragon is not betrayal, but <em>challenge</em>; most elders approve.</li>
+    <li>A Runekeeper who dies with honor may have their name placed in the Hoard, becoming a draconic ancestor-spirit.</li>
+</ul>
+
+<h4>Boons &amp; Complications</h4>
+<ul>
+    <li>Spend 1 Boon to speak any mortal language with draconic authority.</li>
+    <li>Gain +1 Corruption when hoarding wealth without purpose.</li>
+    <li>While wearing metal, you leave faint scorch-marks where you step.</li>
+    <li>Children stare. Horses bow. Priests tremble.</li>
+</ul>
+
+<div class="panel panel-mist"><strong>Tone</strong>: This Patron lets any ancient dragon act as a cosmic power without naming or binding the GM to a specific entity. Each wyrm interprets the pact differently — some demand gold, others secrets, others worship. The Runekeeper becomes a herald, tax-collector, prophet, or enforcer depending on culture and dragon.</div>
+
+<hr>
+
+<!-- ===================================================== -->
+<h2 id="adventure-seeds">10. Adventure Seeds &amp; Campaign Arcs</h2>
+<p>Dragons are not random encounters. They are story engines. Use these hooks to build entire arcs around a single sovereign.</p>
+
+<div class="adventure-card">
+    <div class="aname">The Sleeping Crown</div>
+    <p class="text-sm">A dragon older than the kingdom lies beneath the capital's foundation. For centuries, priests have maintained the wards that keep it dreaming. Now the wards fail, one by one.</p>
+    <ul class="text-sm">
+        <li><strong>Early Signs</strong>: Stone sweating, iron bending, nightmares in the noble courts.</li>
+        <li><strong>Middlegame</strong>: Streets buckle; ancient districts sink; the dragon murmurs in its sleep.</li>
+        <li><strong>Climax</strong>: Do the PCs restore the wards, or awaken a god-king who remembers betrayal?</li>
+        <li><strong>Twist</strong>: The dragon does not want vengeance. It wants a throne rebuilt.</li>
+    </ul>
+</div>
+
+<div class="adventure-card">
+    <div class="aname">Ash Above the Orchard</div>
+    <p class="text-sm">A small village prospers beyond reason: lush crops, perfect health, uncanny fortune. Their patron? A young scarlet drake nesting in the orchard caves.</p>
+    <ul class="text-sm">
+        <li><strong>Complication</strong>: A wounded elder dragon comes to reclaim a runaway "child."</li>
+        <li><strong>Choices</strong>: Protect the village, negotiate the return, or help the drake escape into legend.</li>
+        <li><strong>Price</strong>: The drake's love for mortals might doom them.</li>
+    </ul>
+</div>
+
+<div class="adventure-card">
+    <div class="aname">The Knight With No Shadow</div>
+    <p class="text-sm">A legendary knight commands armies without speaking. His foes break like dust in the wind. He never casts a shadow — because his shadow is a dragon bound in human form.</p>
+    <ul class="text-sm">
+        <li><strong>Goal</strong>: Free the dragon, or break the knight's pact.</li>
+        <li><strong>Clue</strong>: Where the knight passes, mirrors crack.</li>
+        <li><strong>Twist</strong>: The dragon does not want freedom — it wants the knight's body.</li>
+    </ul>
+</div>
+
+<div class="adventure-card">
+    <div class="aname">The Broken Sky</div>
+    <p class="text-sm">Stars vanish one by one. Astronomers panic. A celestial wyrm circles the heavens, devouring forgotten constellations.</p>
+    <ul class="text-sm">
+        <li><strong>Play</strong>: Skyborne chase, ancient observatories, riddles in star-tongue.</li>
+        <li><strong>Threat</strong>: When the last constellation falls, prophecy ends — fate becomes chaos.</li>
+        <li><strong>Hope</strong>: Restore a constellation with a sacrifice of memory.</li>
+    </ul>
+</div>
+
+<div class="adventure-card">
+    <div class="aname">A Tax of Wings</div>
+    <p class="text-sm">A kingdom pays tribute in grain, steel, and prisoners. Every spring, the sky darkens — black-scaled tithe-collectors return.</p>
+    <ul class="text-sm">
+        <li><strong>Complication</strong>: The tyrant-dragon is gone; its brood comes anyway.</li>
+        <li><strong>Underlying Truth</strong>: The kingdom was never forced. Its nobles offered the pact willingly.</li>
+        <li><strong>PC Role</strong>: Unravel a generations-long lie, end a monstrous tradition, or seize the pact.</li>
+    </ul>
+</div>
+
+<div class="adventure-card">
+    <div class="aname">The Dragon's Bride</div>
+    <p class="text-sm">A cursed noble bloodline produces a marriage-bonded "tribute" every century. The wedding gift: immense prosperity. The wedding cost: the bride never returns.</p>
+    <ul class="text-sm">
+        <li><strong>Conflict</strong>: The newest bride refuses to go — and bears dragon-touched powers.</li>
+        <li><strong>Twist</strong>: The dragon is not cruel — it is protecting her from a worse fate.</li>
+    </ul>
+</div>
+
+<hr>
+
+<!-- ===================================================== -->
+<h2 id="dragon-forged-artifacts">11. Dragon-Forged Artifacts</h2>
+<p>A dragon's breath changes steel. A dragon's blood writes spells. A dragon's will makes history. These relics are found in hoards, as knightly heirlooms, or as cursed treasures.</p>
+
+<div class="relic-card">
+    <div class="rname">Irisil, the Moon-Thread Bow</div>
+    <p class="text-sm"><span class="tag">PRECISION</span> <span class="tag">SILENCE</span> <span class="tag">MOON</span></p>
+    <p class="text-sm"><strong>Power</strong>: Shoot a line of silver thread through shadow; the arrow passes through walls of darkness and illusion.</p>
+    <p class="text-sm"><strong>Cost</strong>: If drawn under a blood moon, the bow whispers truths the wielder cannot forget.</p>
+</div>
+
+<div class="relic-card">
+    <div class="rname">Mantle, the Silver-Edge Sword</div>
+    <p class="text-sm"><span class="tag">BLEED</span> <span class="tag">CLEAVE</span> <span class="tag">COMMAND</span></p>
+    <p class="text-sm"><strong>Power</strong>: A leader struck by Mantle rolls social actions with +1d while blood spills — they become decisive, ruthless, brilliant.</p>
+    <p class="text-sm"><strong>Curse</strong>: When the blade is sheathed, every decision made becomes unbearable guilt.</p>
+</div>
+
+<div class="relic-card">
+    <div class="rname">Wyrm-Heart Lantern</div>
+    <p class="text-sm"><span class="tag">LIGHT</span> <span class="tag">TRUE SIGHT</span></p>
+    <p class="text-sm"><strong>Effect</strong>: Reveals invisible, astral, or shapeshifted creatures. Burns cold; does not harm flesh.</p>
+    <p class="text-sm"><strong>Price</strong>: It remembers every lie told within its light. A dragon may ask for those truths later.</p>
+</div>
+
+<div class="relic-card">
+    <div class="rname">The Crown of Molten Brass</div>
+    <p class="text-sm">Forged from the molten scale of a volcano wyrm. <span class="tag">FIRE</span> <span class="tag">RULE</span> <span class="tag">AURA</span></p>
+    <p class="text-sm"><strong>Effect</strong>: The wearer cannot be burned; fire bends away. Mortals instinctively obey commands delivered with heat or flame.</p>
+    <p class="text-sm"><strong>Curse</strong>: Every night, the crown dreams of conquest. If ignored, it imposes +1 Obligation.</p>
+</div>
+
+<div class="relic-card">
+    <div class="rname">Grimwing Mantle</div>
+    <p class="text-sm">A cloak made from a young storm-wyrm's feathers. <span class="tag">FLIGHT</span> <span class="tag">SILENCE</span> <span class="tag">STORM</span></p>
+    <p class="text-sm"><strong>Effect</strong>: Glide across city rooftops; never leave a footprint. Grant Dominant Position when ambushing from above.</p>
+    <p class="text-sm"><strong>Curse</strong>: Thunder follows your arrival. Eventually, someone notices.</p>
+</div>
+
+<div class="relic-card">
+    <div class="rname">The Heart-Shard Chalice</div>
+    <p class="text-sm"><span class="tag">HEAL</span> <span class="tag">SOUL</span> <span class="tag">BARGAIN</span></p>
+    <p class="text-sm"><strong>Effect</strong>: Drinking from it restores one Harm and removes a Curse.</p>
+    <p class="text-sm"><strong>Price</strong>: A dragon now knows your name. The next time you call for help, it answers — at a cost.</p>
+</div>
+
+<div class="relic-card">
+    <div class="rname">Ash-Coil Arbalest</div>
+    <p class="text-sm">A dragonbone siege-crossbow that fires iron like lightning. <span class="tag">AREA</span> <span class="tag">PIERCE</span> <span class="tag">SHOCK</span></p>
+    <p class="text-sm"><strong>Effect</strong>: Harm 3 to a Near zone; armor counts as 1 lower.</p>
+    <p class="text-sm"><strong>Catastrophe</strong>: On a 1, the arbalest explodes — dragonbone remembers how to scream.</p>
+</div>
+
+<hr>
+
+<!-- ===================================================== -->
+<h2 id="relics-draconic-memory">12. Relics of Draconic Memory</h2>
+<p>These are stranger, older, and rarely safe.</p>
+
+<div class="relic-card">
+    <div class="rname">The Egg That Will Not Hatch</div>
+    <p class="text-sm">A cold, glass-smooth egg. Inside, an idea sleeps.</p>
+    <p class="text-sm"><strong>Effect</strong>: Whisper a question; the egg answers in dreams.</p>
+    <p class="text-sm"><strong>Truth</strong>: It will only hatch when someone dies willingly for it.</p>
+    <p class="text-sm"><strong>Consequence</strong>: Whatever emerges remembers the one who fed it.</p>
+</div>
+
+<div class="relic-card">
+    <div class="rname">The Scale of Ancestors</div>
+    <p class="text-sm">A black scale as large as a shield.</p>
+    <p class="text-sm"><strong>Effect</strong>: Once per campaign, negate a dragon's attack entirely.</p>
+    <p class="text-sm"><strong>Cost</strong>: The next time you face a wyrm, you act at Desperate Position. Dragons smell betrayal.</p>
+</div>
+
+<div class="relic-card">
+    <div class="rname">The Library of Ashen Wings</div>
+    <p class="text-sm">A portable archive of scorched pages bound in silver wire.</p>
+    <p class="text-sm"><strong>Effect</strong>: Learn any ancient secret, prophecy, or ward.</p>
+    <p class="text-sm"><strong>Ruin</strong>: One page burns itself away for every truth gained. When the last page burns, something escapes.</p>
+</div>
+
+<hr>
+
+<footer>
+    Fate's Edge Proprietary Content — (c) 2024 Nicholas A. Gasper. All rights reserved.
+</footer>
+
+</body>
+</html>

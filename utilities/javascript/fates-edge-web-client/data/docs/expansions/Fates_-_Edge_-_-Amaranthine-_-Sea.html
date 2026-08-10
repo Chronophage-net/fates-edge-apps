@@ -1,0 +1,2336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Amaranthine Sea — A Fate's Edge Maritime Campaign Expansion</title>
+<style>
+:root {
+  --bg1: #050b10;
+  --bg2: #0c1a22;
+  --bg3: #12242e;
+  --bg4: #1a323d;
+  --text: #dde9ec;
+  --text2: #9db2b9;
+  --text3: #6c8289;
+  --gold: #3fb6c9;
+  --gold-hover: #5fd0e0;
+  --border: #204049;
+  --red: #8e2a2a;
+  --green: #3d7a52;
+  --blue: #3c6e8f;
+  --purple: #5f3f7a;
+  --orange: #a8622a;
+  --brass: #9c7a3c;
+  --mist: #4f6b73;
+  --radius: 8px;
+  --font: 'Segoe UI', system-ui, -apple-system, sans-serif;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  background: var(--bg1);
+  background-image: radial-gradient(circle at 50% 0%, #0e1c24 0%, #050b10 60%);
+  color: var(--text);
+  font-family: var(--font);
+  padding: 1.5rem;
+  max-width: 1100px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+h1, h2, h3, h4, h5 { color: var(--gold); margin: 1rem 0 0.4rem; }
+h1 { font-size: 1.9rem; border-bottom: 2px solid var(--gold); padding-bottom: 0.4rem; margin-top: 0; }
+h2 { font-size: 1.5rem; border-bottom: 1px solid var(--border); padding-bottom: 0.25rem; margin-top: 2rem; }
+h3 { font-size: 1.15rem; margin-top: 1.4rem; }
+h4 { font-size: 0.98rem; color: var(--text); margin-top: 1rem; }
+p { margin: 0.4rem 0; color: var(--text2); }
+a { color: var(--gold); text-decoration: none; }
+a:hover { color: var(--gold-hover); }
+strong { color: var(--text); }
+em { color: var(--text2); }
+ul, ol { margin: 0.4rem 0 0.4rem 1.4rem; color: var(--text2); }
+li { margin: 0.15rem 0; }
+li strong { color: var(--text); }
+.panel {
+  background: var(--bg2);
+  border-radius: var(--radius);
+  padding: 0.7rem 0.9rem;
+  border: 1px solid var(--border);
+  margin: 0.7rem 0;
+}
+.panel p, .panel ul { color: var(--text2); }
+.panel-gold { border-left: 4px solid var(--gold); }
+.panel-red { border-left: 4px solid var(--red); }
+.panel-blue { border-left: 4px solid var(--blue); }
+.panel-green { border-left: 4px solid var(--green); }
+.panel-purple { border-left: 4px solid var(--purple); }
+.panel-orange { border-left: 4px solid var(--orange); }
+.panel-mist { border-left: 4px solid var(--mist); }
+.badge {
+  display: inline-block;
+  padding: 0.05rem 0.5rem;
+  border-radius: 12px;
+  font-size: 0.68rem;
+  font-weight: 600;
+  margin: 0.1rem 0.15rem 0.1rem 0;
+}
+.badge-gold { background: var(--gold); color: #04191d; }
+.badge-red { background: var(--red); color: #fff; }
+.badge-green { background: var(--green); color: #fff; }
+.badge-blue { background: var(--blue); color: #fff; }
+.badge-purple { background: var(--purple); color: #fff; }
+.badge-orange { background: var(--orange); color: #fff; }
+.badge-mist { background: var(--mist); color: #fff; }
+.badge-brass { background: var(--brass); color: #1a1204; }
+.badge-gray { background: var(--bg4); color: var(--text3); }
+.tag {
+  display: inline-block;
+  font-family: 'SFMono-Regular', Consolas, monospace;
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  padding: 0.05rem 0.4rem;
+  border-radius: 4px;
+  border: 1px solid var(--border);
+  background: var(--bg4);
+  color: var(--gold-hover);
+  margin: 0 0.15rem 0.15rem 0;
+  white-space: nowrap;
+}
+.flex { display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center; }
+.text-muted { color: var(--text3); }
+.text-gold { color: var(--gold); }
+.text-sm { font-size: 0.85rem; }
+.text-xs { font-size: 0.75rem; }
+.mt-1 { margin-top: 0.5rem; }
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem; }
+.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.6rem; }
+@media (max-width: 700px) { .grid-2, .grid-3 { grid-template-columns: 1fr; } }
+hr { border: none; border-top: 1px solid var(--border); margin: 1.2rem 0; }
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0.6rem 0 1rem;
+  font-size: 0.85rem;
+  background: var(--bg2);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+caption { caption-side: top; text-align: left; color: var(--text3); font-size: 0.78rem; padding-bottom: 0.3rem; }
+th, td { border: 1px solid var(--border); padding: 0.4rem 0.55rem; text-align: left; vertical-align: top; }
+th { background: var(--bg4); color: var(--gold); font-size: 0.8rem; }
+td { color: var(--text2); }
+td strong, th strong { color: var(--text); }
+tr:nth-child(even) td { background: rgba(255,255,255,0.015); }
+.toc { background: var(--bg3); border-radius: var(--radius); padding: 0.8rem 1rem; border: 1px solid var(--border); margin: 1rem 0; }
+.toc h2 { margin-top: 0; border: none; }
+.toc-chapter { margin-top: 0.6rem; }
+.toc-chapter > a { color: var(--gold); font-weight: 700; display: block; padding: 0.15rem 0; font-size: 0.95rem; }
+.toc-sections { margin: 0 0 0 1rem; }
+.toc-sections a { color: var(--text2); display: block; padding: 0.05rem 0; font-size: 0.82rem; }
+.toc-sections a:hover { color: var(--gold); }
+.lead { color: var(--text2); font-style: italic; }
+blockquote {
+  border-left: 3px solid var(--gold);
+  padding-left: 1rem;
+  margin: 0.7rem 0;
+  color: var(--text2);
+  font-style: italic;
+}
+.chapter-block { margin-top: 2.5rem; padding-top: 0.5rem; }
+footer {
+  font-size: 0.75rem;
+  color: var(--text3);
+  text-align: center;
+  padding: 1.5rem 0 1rem;
+  margin-top: 2rem;
+  border-top: 1px solid var(--border);
+}
+</style>
+</head>
+<body>
+
+<h1>🌊 The Amaranthine Sea</h1>
+<p class="flex" style="margin-bottom:0.6rem;">
+  <span class="badge badge-gold">Maritime Campaign Expansion</span>
+  <span class="badge badge-blue">Naval Heists &amp; Blockade Running</span>
+  <span class="badge badge-mist">Faction Warfare</span>
+  <span class="badge badge-purple">Magic at Sea</span>
+  <span class="badge badge-gray">Author: Nicholas A. Gasper</span>
+</p>
+
+<div class="panel panel-gold">
+  <strong>What This Is.</strong>
+  <p class="mt-1">A maritime campaign framework for <em>Fate's Edge</em>: naval heists, blockade running, exploration, and faction warfare across the Amaranthine Sea under the Kahfagian "bottle." Built to use Position/Effect, Story Beats (SB), and Timers. Tuned to Oshiira's limited passage, Ykrul pressure from the west, Ashaan corsairs through the reed-chains, and the politics of Free Havens, Vilikari smugglers, and Linns dock unions.</p>
+</div>
+
+<div class="panel panel-red">
+  <strong>Safety &amp; Sensitivity.</strong>
+  <p class="mt-1">This theater includes press-gangs, seizure courts, and Ashaani slaving content, which can be intense. Use lines/veils, X-card-style tools, and Session Zero to set expectations; reframe slavers as "press-gangers/abductors" if your table prefers. Represent every people as multifaceted — priests, poets, pilots — not caricatures.</p>
+</div>
+
+<div class="toc">
+<h2 id="toc">📑 Table of Contents</h2>
+
+<div class="toc-chapter"><a href="#ch1">1. The Setting</a>
+<div class="toc-sections">
+<a href="#ch1-1">The Amaranthine Sea and Titan's Throat</a>
+<a href="#ch1-2">Major Factions and Their Interests</a>
+<a href="#ch1-3">Geography and Navigation Challenges</a>
+<a href="#ch1-4">The Blockade System</a>
+<a href="#ch1-5">Cultural Maritime Traditions</a>
+</div></div>
+
+<div class="toc-chapter"><a href="#ch2">2. Core Mechanics</a>
+<div class="toc-sections">
+<a href="#ch2-1">Naval Movement and Positioning</a>
+<a href="#ch2-2">Ship Combat</a>
+<a href="#ch2-3">Weather and Sea Conditions</a>
+<a href="#ch2-4">Inspection and Paperwork Systems</a>
+<a href="#ch2-5">Faction Standing and Reputation</a>
+</div></div>
+
+<div class="toc-chapter"><a href="#ch3">3. Ships and Equipment</a>
+<div class="toc-sections">
+<a href="#ch3-1">Ship Classes and TAGS</a>
+<a href="#ch3-2">Naval Weapons and Armor</a>
+<a href="#ch3-3">Magical Maritime Equipment</a>
+<a href="#ch3-4">Ship Modifications and Customization</a>
+<a href="#ch3-5">Maintenance and Upkeep</a>
+<a href="#ch3-6">Quick Reference: Building &amp; Tuning</a>
+</div></div>
+
+<div class="toc-chapter"><a href="#ch4">4. Magic at Sea: Raéyn's Wake &amp; the Kraken's Chain</a>
+<div class="toc-sections">
+<a href="#ch4-1">Cosmology of the Waterline</a>
+<a href="#ch4-2">Conducting Magic Aboard</a>
+<a href="#ch4-3">Sea Rites &amp; Invocations</a>
+<a href="#ch4-4">Summoning at Sea</a>
+<a href="#ch4-5">Backlash at Sea</a>
+<a href="#ch4-6">Cantors &amp; the Law of Song</a>
+<a href="#ch4-7">Omens &amp; Demands at Sea</a>
+<a href="#ch4-8">Putting It to the Table</a>
+<a href="#ch4-9">Quick Lists</a>
+</div></div>
+
+<div class="toc-chapter"><a href="#ch5">5. Harbor Credit &amp; Scrip (Optional)</a></div>
+
+<div class="toc-chapter"><a href="#ch6">6. Crew and Leadership</a>
+<div class="toc-sections">
+<a href="#ch6-1">Crew Roles and Specializations</a>
+<a href="#ch6-2">Watches, Fatigue, and Duty Cycle</a>
+<a href="#ch6-3">Leadership Challenges and Mutiny</a>
+<a href="#ch6-4">Training and Advancement</a>
+<a href="#ch6-5">Followers and Retainers at Sea</a>
+<a href="#ch6-6">Naval Traditions and Superstitions</a>
+<a href="#ch6-7">Quick Crew Creation</a>
+</div></div>
+
+<div class="toc-chapter"><a href="#ch7">7. The Heist Engine (Expanded)</a>
+<div class="toc-sections">
+<a href="#ch7-1">Sea Score Structure</a>
+<a href="#ch7-2">Planning and Approach Vectors</a>
+<a href="#ch7-3">Inside/Outside Team Coordination</a>
+<a href="#ch7-4">Checkpoint Navigation and Papers</a>
+<a href="#ch7-5">Escalation and Complications</a>
+<a href="#ch7-6">Payoff, Heat, and Entanglements</a>
+<a href="#ch7-7">Score Playbooks</a>
+<a href="#ch7-8">Checklists &amp; Quick Procedure</a>
+</div></div>
+
+<div class="toc-chapter"><a href="#ch8">8. Adventure Framework</a>
+<div class="toc-sections">
+<a href="#ch8-1">Naval Travel and Random Encounters</a>
+<a href="#ch8-2">Dockside Intrigue and Harbor Adventures</a>
+<a href="#ch8-3">Underwater Exploration and Diving</a>
+<a href="#ch8-4">Island Exploration and Ruins</a>
+<a href="#ch8-5">Naval Battles and Fleet Actions</a>
+</div></div>
+
+<div class="toc-chapter"><a href="#ch9">9. Campaign Frames</a>
+<div class="toc-sections">
+<a href="#ch9-1">Shared Campaign Procedures</a>
+<a href="#ch9-2">Break the Titan — The Blockade War</a>
+<a href="#ch9-3">Merchant Princes — Trade Amid the Storm</a>
+<a href="#ch9-4">Pirate Kings — Crowns of Salt</a>
+<a href="#ch9-5">Patron's Fleet — The Sea's Chosen</a>
+<a href="#ch9-6">Frame Dials &amp; Crossovers</a>
+<a href="#ch9-7">Rewards, Legacy, and Epilogues</a>
+</div></div>
+
+<div class="toc-chapter"><a href="#ch10">10. Adventure Outlines</a>
+<div class="toc-sections">
+<a href="#ch10-1">Mini-Adventures (Drop-Ins)</a>
+<a href="#ch10-2">Showpiece Adventures</a>
+<a href="#ch10-3">Linking Threads &amp; Progression</a>
+</div></div>
+
+<div class="toc-chapter"><a href="#ch11">Appendix: Quick Reference Charts</a></div>
+<div class="toc-chapter"><a href="#ch12">Appendix: Random Generators</a></div>
+<div class="toc-chapter"><a href="#ch13">Appendix: Patron Integration at Sea</a></div>
+<div class="toc-chapter"><a href="#ch14">Appendix: Campaign Scaling</a></div>
+
+</div>
+
+<hr>
+<div class="chapter-block">
+<h2 id="ch1">1. The Setting</h2>
+
+<h3 id="ch1-1">The Amaranthine Sea and Titan's Throat</h3>
+<p>The <strong>Amaranthine Sea</strong> is a semi-enclosed inland ocean of busy trade lanes, sudden fogs, and spirit-haunted shoals. Its primary western mouth is throttled by a labyrinth of islands, reefs, and boom-chains called <strong>Titan's Throat</strong>: a natural choke that the Kahfagian Admiralty has engineered into an artificial bottle.</p>
+
+<h4>Key Theaters (Node Map)</h4>
+<ul>
+<li><strong>Western Reach</strong> — long swell, fast water; Ykrul longboats probe here.</li>
+<li><strong>Reef Cuts</strong> — Vilikari eel-channels; only low-draft pilots dare them.</li>
+<li><strong>Amber Straits</strong> — spirit buoys, pilot tests, and rangefinders.</li>
+<li><strong>Bottle Chain</strong> — lantern posts and boom-gates maintained by Kahfagia.</li>
+<li><strong>Saffron Lane</strong> — Oshiiran convoy corridor with timed windows and lamp codes.</li>
+<li><strong>Harbor Underbelly</strong> — dockside warrens; Linns stevedores control lists and rumor.</li>
+<li><strong>Dolmis Narrows</strong> — treacherous eastern strait: city-league pilots, tolls, courts.</li>
+<li><strong>Eastern Reach (Chain of Reeds)</strong> — Ashaan delta approaches; reed-winds and hidden inlets.</li>
+<li><strong>Free Havens</strong> (e.g., Sable Key, Indigo Shoals) — neutral anchorages and gray courts.</li>
+</ul>
+
+<h4>Titan's Throat at a Glance</h4>
+<ul>
+<li><strong>Boom-Anchors:</strong> chained logs, iron links, and embedded purity bells.</li>
+<li><strong>Lantern Pylons:</strong> weekly phrases; failure ticks <em>Papers Scrutiny</em>.</li>
+<li><strong>Spirit Buoys:</strong> weigh "soul-scent" for contraband, blood-debt, or bondage.</li>
+<li><strong>Pilot Rights:</strong> only registered pilots may shift Position safely in the channels.</li>
+</ul>
+
+<h3 id="ch1-2">Major Factions and Their Interests</h3>
+<table>
+<thead><tr><th>Faction</th><th>Domain</th><th>Interests / Levers</th></tr></thead>
+<tbody>
+<tr><td><strong>Kahfagian Admiralty</strong></td><td>Titan's Throat</td><td>Total compliance; revenue from tolls; humiliation of rivals. <em>Levers:</em> inspections, duels of honor, seizure courts.</td></tr>
+<tr><td><strong>Oshiiran Harbory</strong></td><td>Saffron Lane</td><td>Predictable convoys, political neutrality, quiet debts repaid. <em>Levers:</em> transit tabs, lamp phrases.</td></tr>
+<tr><td><strong>Vilikari Syndicate</strong></td><td>Reef Cuts</td><td>Smuggler tithe, access to eel-channels, "no blood on the cuts." <em>Levers:</em> secret charts, family leverage.</td></tr>
+<tr><td><strong>Linns Union</strong></td><td>Underbelly</td><td>Dock priority, fair dues, control of stevedores and rumor. <em>Levers:</em> audits, slowdowns.</td></tr>
+<tr><td><strong>Ykrul Sea-Kin</strong></td><td>Western Reach</td><td>Worthy plunder, songs of courage, duel-parleys. <em>Levers:</em> sudden raids, honor bargains.</td></tr>
+<tr><td><strong>Ashaan Corsair-Phylakes</strong></td><td>Eastern Reach</td><td>Tribute, bodies, fear along the reed-chains. <em>Levers:</em> tenders, false flags, reed-wind rites.</td></tr>
+<tr><td><strong>Dolmis City-League</strong></td><td>Narrows</td><td>Tolls paid, pilotage control, maritime law prestige. <em>Levers:</em> pilot tokens, injunctions.</td></tr>
+<tr><td><strong>Free Haven Magistracies</strong></td><td>Neutral Ports</td><td>Balance of power, reputation of neutrality. <em>Levers:</em> admiralty courts, safe-conduct writs.</td></tr>
+</tbody>
+</table>
+<p><strong>Distant Actors.</strong> Several distant powers hold interests but little presence here; their policies can tilt alliances but rarely put hulls on-screen.</p>
+
+<h3 id="ch1-3">Geography and Navigation Challenges</h3>
+<h4>Hazards (d8)</h4>
+<table>
+<thead><tr><th>#</th><th>Hazard &amp; Effect</th></tr></thead>
+<tbody>
+<tr><td>1</td><td><strong>Banked Fog:</strong> Great cover; treacherous reefs. Position −1 unless piloted.</td></tr>
+<tr><td>2</td><td><strong>Cross Chop:</strong> Tight maneuvers at −1 Position; boarding is harder.</td></tr>
+<tr><td>3</td><td><strong>Blood-Tide:</strong> Spirits restless; Story Beats escalate faster.</td></tr>
+<tr><td>4</td><td><strong>Mirror Calm:</strong> Oars only; sound carries far; stealth is harder.</td></tr>
+<tr><td>5</td><td><strong>Drift Mines:</strong> Hidden scuttlers near booms; Damage or Cargo Risk +1.</td></tr>
+<tr><td>6</td><td><strong>Lantern Squall:</strong> Codes misread; <em>Papers Scrutiny</em> +1 on failures.</td></tr>
+<tr><td>7</td><td><strong>Reed-Winds:</strong> Short, sharp tailwinds in the Chain of Reeds; great if timed.</td></tr>
+<tr><td>8</td><td><strong>Spirit Surge:</strong> Buoys overread "guilt"; requires rite or Position penalty.</td></tr>
+</tbody>
+</table>
+
+<h4>Currents, Soundings, and Sightlines</h4>
+<ul>
+<li><strong>Currents:</strong> A sly west-to-east drift runs along the Saffron Lane, with back-eddies behind pylons.</li>
+<li><strong>Soundings:</strong> Shifting bars in the Dolmis; pilots quiz outsiders with "false sands."</li>
+<li><strong>Sightlines:</strong> Lantern chains create overlapping cones; hugging pylons can blind a picket while risking boom-snag.</li>
+</ul>
+
+<h3 id="ch1-4">The Blockade System</h3>
+<h4>How the Bottle Works</h4>
+<ol>
+<li><strong>Layered Detection:</strong> lookouts, lamp phrases, spirit buoys, and keel drags.</li>
+<li><strong>Timed Windows:</strong> Oshiiran convoys receive fixed slots; all other traffic delays.</li>
+<li><strong>Mobile Courts:</strong> shipboard magistrates seize, fine, or brand papers.</li>
+<li><strong>Public Duels:</strong> officers may demand "courtesy duels" to settle suspicion without bloodshed — win Position, not necessarily lives.</li>
+</ol>
+
+<h4>Inspection Types (d10)</h4>
+<table>
+<thead><tr><th>#</th><th>Procedure</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>Lantern Chain ID challenge (weekly phrase).</td></tr>
+<tr><td>2</td><td>Spirit Buoy Weighing (reads soul-scent, bondage, blood-debt).</td></tr>
+<tr><td>3</td><td>Hull Stamp &amp; Keel Drag (registry vs. draft).</td></tr>
+<tr><td>4</td><td>Powder Inspection (magazine safety; smuggling check).</td></tr>
+<tr><td>5</td><td>Crew Muster &amp; Oaths (false names, press-gang marks).</td></tr>
+<tr><td>6</td><td>Cargo Sigil Scan (wards, curses, illicit spirits).</td></tr>
+<tr><td>7</td><td>Convoy Count-Off (strays flagged).</td></tr>
+<tr><td>8</td><td>Harbor List Cross-Check (Linns auditors spot anomalies).</td></tr>
+<tr><td>9</td><td>Pilot Challenge (local soundings quiz).</td></tr>
+<tr><td>10</td><td>Courtesy Duel (Face vs. Officer; win grants safe conduct).</td></tr>
+</tbody>
+</table>
+
+<h4>Bypassing the Bottle (Position &amp; Cost)</h4>
+<ul>
+<li><strong>Reef Cuts (Vilikari):</strong> <span class="tag">LOW-DRAFT</span><span class="tag">HIDDEN HOLD</span> — start Dominant; on failure tick <em>Patrol Net</em>.</li>
+<li><strong>Saffron Shadow (Oshiira):</strong> Ghost a convoy wake — start Dominant if codes are perfect; failure ticks <em>Papers Scrutiny</em>.</li>
+<li><strong>Narrows Toll (Dolmis):</strong> Pay or persuade a blind eye — start Dominant with a bribe; Desperate without.</li>
+<li><strong>Reed-Drift (Ashaan):</strong> <span class="tag">SILENT RIG</span> and reed-wind rites — Position improves, but <em>Corsair Alert</em> rises on failures.</li>
+</ul>
+
+<h3 id="ch1-5">Cultural Maritime Traditions</h3>
+<h4>Signal, Etiquette, and What Earns Respect</h4>
+<table>
+<thead><tr><th>Culture</th><th>Practices That Shift Position</th></tr></thead>
+<tbody>
+<tr><td><strong>Kahfagia</strong></td><td>Formal salutes; pristine logbooks; accepting a duel without bluster. (+Position in inspections.)</td></tr>
+<tr><td><strong>Oshiira</strong></td><td>Precise lampwork; no haggling at sea; debts repaid quietly. (+Position when shadowing convoys.)</td></tr>
+<tr><td><strong>Vilikari</strong></td><td>No blood on the Cuts; share eel-channel tolls; respect Mother-brokers. (+Effect on smuggler routes.)</td></tr>
+<tr><td><strong>Linns</strong></td><td>Pay dues, tip stevedores, don't skip the line. (+Position in ports; reduces Audit chances.)</td></tr>
+<tr><td><strong>Ykrul</strong></td><td>Stand your ground, offer parley with gifts, honor the song. (+Position to avoid raids.)</td></tr>
+<tr><td><strong>Ashaan</strong></td><td>Keep your oars low, show deference in the reeds, ransom first. (+Position in Eastern Reach; failure draws tenders.)</td></tr>
+<tr><td><strong>Dolmis</strong></td><td>Hire a pilot, respect the ledger, submit to court. (+Position in the Narrows.)</td></tr>
+<tr><td><strong>Free Havens</strong></td><td>No flags, no questions, pay the magistrate. (+Position with neutral courts.)</td></tr>
+</tbody>
+</table>
+
+</div>
+<div class="chapter-block">
+<h2 id="ch2">2. Core Mechanics</h2>
+<p class="lead">This chapter merges fast, table-facing procedures with optional depth. Use Fate's Edge Position/Effect, Story Beats (SB), and Timers. Ship TAGS justify advantage, tools, or Effect.</p>
+
+<h3 id="ch2-1">Naval Movement and Positioning</h3>
+<h4>Two Scales of Play</h4>
+<ul>
+<li><strong>Theater Scale (Node Map).</strong> Move between zones (Western Reach, Reef Cuts, Amber Straits, etc.). Each move is a <em>leg</em> resolved by one <strong>Pilot/Navigator</strong> test; hazards may tick timers.</li>
+<li><strong>Tactical Scale (Range Bands).</strong> When exact distance matters for guns, rites, or boarding, switch to <strong>Range Bands</strong>.</li>
+</ul>
+
+<h4>Range Bands at Sea</h4>
+<table>
+<thead><tr><th>Band</th><th>Description and Implications</th></tr></thead>
+<tbody>
+<tr><td><strong>Close</strong></td><td>Boarding distance; grapples, cutlass work, harpoons, powder &amp; fire pots. Boarding occurs at Close and becomes its own scene.</td></tr>
+<tr><td><strong>Near</strong></td><td>Same vessel cluster; shouting distance, coordinated maneuvers, ballista/harpoon range.</td></tr>
+<tr><td><strong>Far</strong></td><td>Visual contact; signal flags/lantern codes, long-range ballista or storm-calling.</td></tr>
+<tr><td><strong>Absent</strong></td><td>Beyond horizon; requires a <strong>Travel Timer [4]</strong> to close, or a kite/lantern relay, spirit messenger, or courier.</td></tr>
+</tbody>
+</table>
+
+<h4>Naval Movement Actions (Tactical)</h4>
+<ul>
+<li><strong>Sail.</strong> Shift one Range Band on success; <em>Dash</em> attempts a second shift at −1 Position if it fails.</li>
+<li><strong>Maneuver.</strong> Complex positioning (flank, cut-off, evade) uses <strong>Pilot + Navigation</strong> vs. DV 2–4; success may also grant +1 Effect or impose −1 Position on a foe.</li>
+<li><strong>Drift.</strong> Dominant drift masks wake/noise using <strong>Rigger + Lore</strong>; on failure a nearby picket hears you, or <em>Patrol Net</em> +1.</li>
+<li><strong>Anchor / Drop Sail.</strong> Secure the ship under pressure with a <strong>Crew Muster</strong> test (Presence + Command); failure scatters crew or marks <em>Rigging Damage</em>.</li>
+</ul>
+
+<h4>Theater Movement (per Leg)</h4>
+<ol>
+<li><strong>State Speed Profile:</strong> Stealth Drift (−1 leg; +Position), Standard Run (normal), Press the Sails (+1 leg; −Position on a failure).</li>
+<li><strong>Pilot Test:</strong> Wits + Navigation (+1 die for relevant leverage: pilot-token, eel-chart, convoy slot).</li>
+<li><strong>Set Start Position by Successes:</strong> 0–1 Desperate, 2–3 Controlled, 4+ Dominant. (A 10 counts as 2 successes.)</li>
+<li><strong>Hazards:</strong> If a leg lists hazards (boom, fog, reef), resolve or tick a timer (GM).</li>
+</ol>
+
+<h4>Chases on the Node Map</h4>
+<p>Track <strong>Quarry Lead [6]</strong> and <strong>Pursuer Closure [6]</strong>; opposed Pilot tests at each leg tick the winner's timer +1. <strong>Catch</strong> at 6 ⇒ shift to Tactical at Near. <strong>Escape</strong> at 6 ⇒ chase ends.</p>
+
+<h4>Position at Sea</h4>
+<ul>
+<li><strong>Dominant</strong> — clear weather, pilots, known water; errors usually tick paperwork, not blood.</li>
+<li><strong>Controlled</strong> — contested water, moderate weather, eyes upon you; errors cost time or minor harm.</li>
+<li><strong>Desperate</strong> — storms, shoals, superior force; the acting ship re-rolls one success on that action.</li>
+</ul>
+
+<h4>Common Maneuvers (apply TAGS to justify bonuses)</h4>
+<table>
+<thead><tr><th>Maneuver</th><th>Mechanical Effect</th></tr></thead>
+<tbody>
+<tr><td><strong>Beat to Windward</strong></td><td>Improve Position +1 this round; fail ⇒ lose one band or mark <em>Rigging Damage [1]</em>.</td></tr>
+<tr><td><strong>Cut the Wake</strong></td><td>Shadow the target's wake; +1 die to concealment; fail ⇒ <em>Papers Scrutiny</em> +1 at next checkpoint.</td></tr>
+<tr><td><strong>Heave-To</strong></td><td>Hold place; +1 Effect to repairs/rites; fail ⇒ drift (−1 Position).</td></tr>
+<tr><td><strong>Kedging</strong></td><td>Shift 1 band against current in tight water (Reef Cuts/Narrows).</td></tr>
+<tr><td><strong>Reef &amp; Run</strong></td><td>Reduce sail to ride a squall; avoid <em>Cargo Risk</em> ticks; fail ⇒ <em>Weather Window</em> −1.</td></tr>
+<tr><td><strong>Masked Sail</strong></td><td>Disguise silhouette (<span class="tag">DISGUISE</span>); +1 die vs. lookouts; fail ⇒ <em>Blockade Awareness</em> +1.</td></tr>
+<tr><td><strong>Silent Oars</strong></td><td>Drift under oars (<span class="tag">SILENT RIG</span>); failure alerts the nearest picket.</td></tr>
+<tr><td><strong>Smoke Screen</strong></td><td>Spend powder/rite; −1 Position to all gunnery through the screen this round.</td></tr>
+</tbody>
+</table>
+
+<h3 id="ch2-2">Ship Combat</h3>
+<h4>Conflict Modes</h4>
+<ul>
+<li><strong>Side-Based Turns (Recommended).</strong> Each side chooses up to two distinct ship actions per round (different roles): <strong>Helm</strong> (change Range/maneuver), <strong>Rig</strong> (repairs, grapples, smoke), <strong>Guns</strong> (ballista/harpoon/chain-shot), <strong>Board</strong> (grapple/cross/secure), <strong>Ritual</strong> (weather/ward/veil).</li>
+<li><strong>Initiative Variant.</strong> Roll Wits + Command; highest acts first. Each PC/NPC ship role takes one action per round.</li>
+</ul>
+
+<h4>Combat Procedure (Both Modes)</h4>
+<ol>
+<li><strong>Declare Engagement.</strong> GM sets Position from fiction (weather, surprise, Range).</li>
+<li><strong>Assign Roles.</strong> Pilot, Rigger/Engineer, Gunner, Boarder/Cutter, Whisper/Ritualist, Signal/Face.</li>
+<li><strong>Take Actions.</strong> Resolve rolls; apply Range/Position; spend/earn SB.</li>
+<li><strong>Resolve Consequences.</strong> Mark damage timers, shift Position, tick scene timers.</li>
+</ol>
+
+<h4>Gunnery &amp; Naval Weapons</h4>
+<table>
+<thead><tr><th>Weapon</th><th>Range</th><th>Tags / Notes</th></tr></thead>
+<tbody>
+<tr><td>Light Ballista</td><td>Near</td><td><span class="tag">ACCURATE</span><span class="tag">CREW 2</span><span class="tag">RELOAD</span> — tends to mark Rigging.</td></tr>
+<tr><td>Heavy Ballista</td><td>Far/Near</td><td><span class="tag">PIERCING</span><span class="tag">SLOW</span><span class="tag">CREW 3</span> — marks Hull; crit may also mark Crew Morale.</td></tr>
+<tr><td>Harpoon Gun</td><td>Near/Close</td><td><span class="tag">TETHER</span><span class="tag">RELOAD</span> — enables grapples; can drag at Close.</td></tr>
+<tr><td>Fire Pot Launcher</td><td>Near</td><td><span class="tag">FIRE</span><span class="tag">VOLATILE</span> — marks Fire; mishap risks Powder Mag.</td></tr>
+<tr><td>Chain Shot</td><td>Near</td><td><span class="tag">RIG-KILLER</span> — on hit mark Rigging +1 extra.</td></tr>
+</tbody>
+</table>
+<p><strong>Resolve Gunnery.</strong> Roll Body or Wits + Gunnery/Craft. Position comes from Range and fiction; Effect from TAGS and ammo. <span class="tag">ARMORED</span> reduces Hull marks by 1 (min 0) per hit; <span class="tag">SPIRIT-WARD</span> negates the first ritual/fire mark once per scene.</p>
+
+<h4>Boarding Sequence (Three Beats)</h4>
+<ol>
+<li><strong>Grapple</strong> (Rig/Gunner): Craft or Gunnery at Close. Success ⇒ proceed.</li>
+<li><strong>Cross</strong> (Cutter): Athletics or Melee; <span class="tag">BOARDING NETS</span> +1 die; fail ⇒ mark Crew Morale or Rigging.</li>
+<li><strong>Secure</strong> (All): clear deck leaders, cut lines if needed; success shifts to personal combat or a surrender test.</li>
+</ol>
+
+<h4>Signals, Ramming, and Command</h4>
+<ul>
+<li><strong>Signal.</strong> Presence + Sway/Etiquette to coordinate allies or demoralize foes; on success, grant +1 die or impose −1 die for a round.</li>
+<li><strong>Ram (Desperate).</strong> Body + Athletics/Pilot vs. target Hull; on success mark both ships' Hull; great Effect may also Grapple.</li>
+<li><strong>Command Presence.</strong> Presence + Command to steady crew, cancel a panic, or seize initiative for one role.</li>
+</ul>
+
+<h4>Ship Condition: Quick or Detailed</h4>
+<p><strong>Quick Play:</strong> Ship Integrity [6] — when full, the ship is Unseaworthy; further marks risk sinking or forced beaching.</p>
+<p><strong>Detailed Tracks (replace Integrity):</strong></p>
+<ul>
+<li><strong>Hull Damage [4]</strong> — breaches/leaks; on fill: Sinking.</li>
+<li><strong>Rigging Damage [4]</strong> — on fill: no Range changes.</li>
+<li><strong>Crew Morale [4]</strong> — on fill: panic/surrender test.</li>
+<li><strong>Fire/Explosion [4]</strong> — on fill: catastrophic loss unless contained.</li>
+</ul>
+<p><strong>Hull Integrity Test:</strong> Body + Lore to resist catastrophic damage. <strong>Crew Loyalty Test:</strong> Presence + Command to maintain order.</p>
+
+<h4>Magic at Sea (Combat Note)</h4>
+<ul>
+<li><strong>Unstable Platform.</strong> Casting at Controlled: −1 die; at Desperate: −2 dice unless anchored/lashed.</li>
+<li><strong>Backlash Amplification.</strong> Rites that misfire tick Ship Integrity (or Fire/Morale) in addition to personal harm.</li>
+<li><strong>Patron Interference.</strong> Naval battles increase omen/demand frequency at GM discretion.</li>
+<li><strong>Ritual Constraints.</strong> Major rites require a stabilized anchor point and mark Obligation.</li>
+</ul>
+
+<table>
+<thead><tr><th>Sea Rite</th><th>DV</th><th>Effect / Consequence</th></tr></thead>
+<tbody>
+<tr><td><strong>Veil the Wake</strong></td><td>3</td><td>Conceal wake/noise at Near/Close; fail ⇒ Patrol Net +1.</td></tr>
+<tr><td><strong>Borrowed Wind</strong></td><td>3</td><td>+1 Range shift this round; fail ⇒ Rigging +1.</td></tr>
+<tr><td><strong>Break the Lantern</strong></td><td>4</td><td>Blind a checkpoint cone; fail ⇒ Papers Scrutiny +2.</td></tr>
+<tr><td><strong>Call the Squall</strong></td><td>4</td><td>−1 Position to all gunnery; fail ⇒ Weather Window −1.</td></tr>
+<tr><td><strong>Ward the Hull</strong></td><td>3</td><td>First ritual/fire mark negated this scene; fail ⇒ Spirit Buoy flags you.</td></tr>
+</tbody>
+</table>
+
+<div class="panel panel-purple">
+<strong>SB Escalations (Naval)</strong>
+<ul class="mt-1">
+<li><strong>1 SB:</strong> headwind, or +1 to any one ship timer.</li>
+<li><strong>2 SB:</strong> unseen shoal (Rigging +1), or picket enters at Far.</li>
+<li><strong>3 SB:</strong> powder flare (Fire +2), or lantern phrase changes now.</li>
+<li><strong>4 SB:</strong> seal a lane (no Range change this round), or boarding starts at Desperate.</li>
+</ul>
+</div>
+
+<h3 id="ch2-3">Weather and Sea Conditions</h3>
+<h4>Weather Effects Table (d8)</h4>
+<table>
+<thead><tr><th>#</th><th>Weather Effect</th></tr></thead>
+<tbody>
+<tr><td>1</td><td><strong>Mirror Calm:</strong> No wind; oars only. Sound carries far. Stealth −1 Position.</td></tr>
+<tr><td>2</td><td><strong>Cross Chop:</strong> −1 Position to tight maneuvers; boarding defaults to Controlled.</td></tr>
+<tr><td>3</td><td><strong>Monsoon Squall:</strong> Free veil for stealth; sailing tests risk Desperate on failures.</td></tr>
+<tr><td>4</td><td><strong>Star-Clear:</strong> Long sightlines; +1 Position to spotting/aiming; Papers Scrutiny DV −1.</td></tr>
+<tr><td>5</td><td><strong>Banked Fog:</strong> Great cover; treacherous reefs; Navigation requires Skill + Lore or tick Cargo Risk.</td></tr>
+<tr><td>6</td><td><strong>Blood-Tide:</strong> Spirits restless; GM SB costs −1 (faster escalations).</td></tr>
+<tr><td>7</td><td><strong>Tailwind Run:</strong> <span class="tag">FAST</span>/<span class="tag">SPRINTER</span> hulls gain +1 band on a success.</td></tr>
+<tr><td>8</td><td><strong>Lightning Stairs:</strong> Powerful rites +1 Effect; on failure mark Fire.</td></tr>
+</tbody>
+</table>
+
+<h4>Weather as Position Modifier</h4>
+<ul>
+<li><strong>Favorable:</strong> +1 Position to sailing/stealth maneuvers.</li>
+<li><strong>Neutral:</strong> No modifier (default).</li>
+<li><strong>Adverse:</strong> −1 Position to all sailing actions.</li>
+<li><strong>Severe:</strong> −1 Position and +1 DV to all actions.</li>
+</ul>
+
+<h4>Weather Window [6]</h4>
+<p>Represents timing and stamina against the environment. Each hour of push, squall mishap, or major rite can reduce the window. At 0, further Press the Sails becomes Desperate and Cargo Risk ticks on failures.</p>
+
+<h3 id="ch2-4">Inspection and Paperwork Systems</h3>
+<h4>Checkpoint Scene Procedure</h4>
+<ol>
+<li><strong>Declare Cover.</strong> What papers/story are you presenting?</li>
+<li><strong>Set Position.</strong> Etiquette, bribes, or favors can improve Position.</li>
+<li><strong>Primary Test.</strong> Presence + Etiquette/Deception, or Wits + Lore/Craft for paperwork.</li>
+<li><strong>Secondary Checks.</strong> Keel drag, muster, sigil scan; each failure ticks Papers Scrutiny.</li>
+<li><strong>Outcomes.</strong> Dominant: pass and reduce Blockade Awareness. Controlled: pass with a condition (escort, stamp, toll). Desperate: board/search, duel, or seizure court.</li>
+</ol>
+
+<h4>The Papers Game</h4>
+<p><strong>Oshiira Transit Pack (Legitimate):</strong> Saffron Tab (convoy slot), Amber Bill (cargo), Lantern Phrase (weekly code), Pilot's Knot (navigator sigil). Missing/mismatched elements tick Papers Scrutiny +1.</p>
+
+<h4>Forgery Challenges</h4>
+<ul>
+<li><strong>Downtime (Prepared).</strong> Perfect match: Craft + Lore, DV 3, proper tools.</li>
+<li><strong>On Approach (Time Pressure).</strong> Improvised: DV 4.</li>
+<li><strong>Live Boarding (Desperate).</strong> DV 5+; on failure, expect seizure or a duel.</li>
+</ul>
+
+<h4>Paper Problems (d10)</h4>
+<table>
+<thead><tr><th>#</th><th>Problem</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>Out-of-date lantern phrase.</td></tr>
+<tr><td>2</td><td>Smudged amber ink.</td></tr>
+<tr><td>3</td><td>Knotwork mirrored (left-handed).</td></tr>
+<tr><td>4</td><td>Convoy tab double-issued.</td></tr>
+<tr><td>5</td><td>Bill weight off by 4%.</td></tr>
+<tr><td>6</td><td>Pilot seal clipped wrong.</td></tr>
+<tr><td>7</td><td>The hand that signed it is dead.</td></tr>
+<tr><td>8</td><td>Ghost watermark for the wrong tide.</td></tr>
+<tr><td>9</td><td>Transit tax unpaid.</td></tr>
+<tr><td>10</td><td>Attached addendum contradicts the cargo.</td></tr>
+</tbody>
+</table>
+
+<h4>Bribes, Duels, and Cutouts</h4>
+<ul>
+<li><strong>Bribe Track [3].</strong> Each paid step grants +1 Position or cancels a tick; on fill you're on a list (future Audit entanglement).</li>
+<li><strong>Courtesy Duel.</strong> One PC vs. an officer (Duel/Etiquette/Melee); win ⇒ safe conduct and −1 Awareness.</li>
+<li><strong>Cutouts.</strong> Dock fixers (Linns/Vilikari) substitute their rep once per score: consume a favor to avoid a full inspection.</li>
+</ul>
+
+<h3 id="ch2-5">Faction Standing and Reputation</h3>
+<h4>Faction Standing Timers [6]</h4>
+<p>Each major faction keeps a Standing timer with your crew.</p>
+<ul>
+<li><strong>−6 to −5 (Hostile).</strong> Bounties, blacklists, kill-on-sight, or seizure.</li>
+<li><strong>−4 to −3 (Unfavorable).</strong> More inspections, higher tolls, patrol "attention."</li>
+<li><strong>−2 to 2 (Neutral).</strong> Standard treatment, normal prices, limited help.</li>
+<li><strong>3 to 4 (Favorable).</strong> Easier inspections, better prices, occasional favors.</li>
+<li><strong>5 to 6 (Favored).</strong> Convoy slots, legal shelter, special services (pilot tokens, codes).</li>
+</ul>
+
+<h4>Changing Standing</h4>
+<ul>
+<li><strong>Favors/Jobs.</strong> +1–2 for completing marked work; −1–2 for insults or unpaid debts.</li>
+<li><strong>Protocols.</strong> Following maritime etiquette can improve Position and Standing over time.</li>
+<li><strong>Court Results.</strong> Win a Free Haven case: +1 with courts. Humiliate an admiralty: −1 with Kahfagia.</li>
+</ul>
+
+<h4>Reputation Tracks (Campaign) [8] (Optional)</h4>
+<table>
+<thead><tr><th>Track</th><th>Thresholds</th></tr></thead>
+<tbody>
+<tr><td><strong>Smuggler's Rep</strong></td><td>2: eel-charts; 4: fence network; 6: shadow convoy slot; 8: "Ghost Tab" (−1 Heat from stealth scores).</td></tr>
+<tr><td><strong>Warrior's Fame</strong></td><td>2: no-raids token; 4: feared signal (Ykrul parley first); 6: letters of marque; 8: call a flotilla once per arc.</td></tr>
+<tr><td><strong>Merchant's Net</strong></td><td>2: better rates; 4: bonded warehouses; 6: credit line; 8: market sway once per arc.</td></tr>
+<tr><td><strong>Explorer's Legend</strong></td><td>2: safe havens; 4: secret routes; 6: deep salvage rights; 8: living map (once per session Position tweak).</td></tr>
+</tbody>
+</table>
+
+<div class="panel panel-gold">
+<strong>GM Tip: Natural Hooks from Standing.</strong>
+<p class="mt-1">When a Standing timer crosses a threshold, surface an envoy with a job, warning, or demand that fits the relationship. Tie rewards/penalties to Position in their waters.</p>
+</div>
+
+</div>
+<div class="chapter-block">
+<h2 id="ch3">3. Ships and Equipment</h2>
+<p class="lead">Ready-to-sail hulls, weapons, fittings, and magical kit — plus rules to customize, maintain, and repair your ship under blockade pressure. Ship entries use TAGS to signal capabilities at a glance.</p>
+
+<div class="panel panel-blue">
+<strong>Reading a Ship Statline</strong>
+<p class="mt-1"><strong>Crew (Min/Rec)</strong> — minimum hands to operate / comfortable complement. <strong>Draft</strong> — <span class="tag">SHALLOW</span> passes eel-cuts; <span class="tag">DEEP</span> rides smoother offshore. <strong>Speed</strong> — baseline sail power; <span class="tag">FAST</span> or <span class="tag">SPRINTER</span> alters Range shifts. <strong>Hardpoints</strong> — mounts for Light/Heavy ballista. <strong>Upgrade Slots</strong> — Hull / Rig / Hold / Signal / Ritual. <strong>Base TAGS</strong> — baked-in traits (not upgrades).</p>
+</div>
+
+<h3 id="ch3-1">Ship Classes and TAGS</h3>
+<h4>Core Hulls (Amaranthine Theater)</h4>
+<table>
+<thead><tr><th>Class (Role)</th><th>Crew (Min/Rec)</th><th>Draft / Speed</th><th>Hardpoints</th><th>Upgrade Slots</th><th>Base TAGS</th></tr></thead>
+<tbody>
+<tr><td>Sloop (Runner)</td><td>6 / 10</td><td><span class="tag">SHALLOW</span> <span class="tag">FAST</span></td><td>1 Light</td><td>1/1/1/1/0</td><td><span class="tag">LOW-DRAFT</span><span class="tag">SPRINTER</span></td></tr>
+<tr><td>Cutter (Picket)</td><td>8 / 14</td><td><span class="tag">SHALLOW</span> Standard</td><td>1 Light</td><td>1/1/1/1/0</td><td><span class="tag">SILENT RIG</span><span class="tag">MASKED SAIL</span></td></tr>
+<tr><td>Corvette (Escort)</td><td>14 / 22</td><td><span class="tag">MEDIUM</span> Standard</td><td>2 Light</td><td>2/2/1/1/1</td><td><span class="tag">BALLISTA PLATFORM</span><span class="tag">STIFF HULL</span></td></tr>
+<tr><td>Brigantine (Trader)</td><td>16 / 28</td><td><span class="tag">MEDIUM</span> Standard</td><td>2 Light</td><td>2/2/2/1/1</td><td><span class="tag">CARGO +2</span><span class="tag">STABLE</span></td></tr>
+<tr><td>Frigate (Warship)</td><td>28 / 44</td><td><span class="tag">DEEP</span> Standard</td><td>2 Light, 1 Heavy</td><td>2/2/1/1/1</td><td><span class="tag">ARMORED</span><span class="tag">BOARDING NETS</span></td></tr>
+<tr><td>Galleon (Carrier)</td><td>36 / 60</td><td><span class="tag">DEEP</span> Steady</td><td>2 Light, 2 Heavy</td><td>3/2/2/1/2</td><td><span class="tag">CARGO +3</span><span class="tag">KEEL ARMOR</span></td></tr>
+</tbody>
+</table>
+
+<h4>Regional Hull Packages (apply to a Core Hull or use as templates)</h4>
+<table>
+<thead><tr><th>Package</th><th>Adjustments</th></tr></thead>
+<tbody>
+<tr><td><strong>Ykrul Longboat (Raid)</strong></td><td>Treat as Sloop but <span class="tag">OARS</span><span class="tag">SHALLOW</span>; +1 Crew (Min/Rec) to 7/12; Hardpoints: 1 Light or none; gains <span class="tag">BOARD-FAST</span> (boarding at Near on a crit).</td></tr>
+<tr><td><strong>Vilikari Eel-Cutter (Smuggle)</strong></td><td>Treat as Cutter; add <span class="tag">HIDDEN HOLD +1</span>; gains <span class="tag">EEL-CHARTS</span> (once per leg ignore a Reef hazard on success).</td></tr>
+<tr><td><strong>Oshiiran Lantern-Runner (Convoy)</strong></td><td>Treat as Brigantine; add <span class="tag">LANTERN ARRAY</span> &amp; <span class="tag">PRISTINE PAPERS</span>; Signal slots +1.</td></tr>
+<tr><td><strong>Kahfagian Pylon-Guard (Interdictor)</strong></td><td>Treat as Corvette; swap Stiff Hull for <span class="tag">KEEL ARMOR</span>; add <span class="tag">SPIRIT BUOY</span> (built-in, detects bindings/debts).</td></tr>
+<tr><td><strong>Ashaan Reed-Tender (Corsair)</strong></td><td>Treat as Sloop; add <span class="tag">REED-WIND SAILS</span> (Tailwind grants a free band on 10); Hold slots −1.</td></tr>
+<tr><td><strong>Dolmis Pilot Bark (Service)</strong></td><td>Treat as Cutter; add <span class="tag">PILOT CHAIR</span> (+1 die Navigation in Narrows) &amp; <span class="tag">SIGNAL MAST</span>.</td></tr>
+</tbody>
+</table>
+
+<div class="panel panel-gold">
+<strong>Build-a-Ship (Quick)</strong>
+<p class="mt-1">1) Pick a Core Hull. 2) Optionally apply 1 Regional Package. 3) Choose Upgrades up to slot limits. 4) Pick 1 Signature Quirk (cosmetic or minor +1 die once per score). 5) Name, heraldry, and lamp colors.</p>
+<p class="text-sm mt-1"><em>Tip:</em> Smaller crews change Range faster; larger crews soak Crew Morale loss better.</p>
+</div>
+
+<h3 id="ch3-2">Naval Weapons and Armor</h3>
+<h4>Shipboard Weapons</h4>
+<table>
+<thead><tr><th>Weapon</th><th>Mount/Crew</th><th>Range</th><th>Tags / Effect</th></tr></thead>
+<tbody>
+<tr><td>Light Ballista</td><td>Light / 2</td><td>Near</td><td><span class="tag">ACCURATE</span><span class="tag">RELOAD</span>; marks Rigging on hits; chain-shot option.</td></tr>
+<tr><td>Heavy Ballista</td><td>Heavy / 3</td><td>Far/Near</td><td><span class="tag">PIERCING</span><span class="tag">SLOW</span>; marks Hull; crit may also mark Crew Morale.</td></tr>
+<tr><td>Harpoon Thrower</td><td>Light / 2</td><td>Near/Close</td><td><span class="tag">TETHER</span><span class="tag">BARBED</span>; enables Grapple; drag contest at Close.</td></tr>
+<tr><td>Scorpion Swivels</td><td>Rail / 1 ea</td><td>Near</td><td><span class="tag">SWIVEL</span><span class="tag">QUICKDRAW</span>; −1 Effect vs. Hull, +1 vs. crew on deck.</td></tr>
+<tr><td>Fire Pot Launcher</td><td>Light / 2</td><td>Near</td><td><span class="tag">FIRE</span><span class="tag">VOLATILE</span>; marks Fire; mishap risks Powder Mag.</td></tr>
+<tr><td>Smoke Mortar</td><td>Light / 2</td><td>Near</td><td><span class="tag">OBSCURE</span>; −1 Position to all gunnery through the smoke; helps disengage.</td></tr>
+</tbody>
+</table>
+
+<h4>Ammunition &amp; Shot</h4>
+<table>
+<thead><tr><th>Type</th><th>Mechanical Text</th></tr></thead>
+<tbody>
+<tr><td>Chain Shot</td><td>On hit: Rigging Damage +1 extra mark; −1 die vs. Hull.</td></tr>
+<tr><td>Barbed Harpoon</td><td>On winning a Tether contest: impose −1 Position to target next round.</td></tr>
+<tr><td>Fire Pots</td><td>On hit: mark Fire +1–2; adjacent crew tests Presence + Command or take a Morale mark.</td></tr>
+<tr><td>Salt Bags</td><td>On hit: snuff small flames; remove 1 Fire mark instead of dealing damage.</td></tr>
+<tr><td>Spirit Bolts</td><td>On hit: counts as <span class="tag">SPIRIT-WOUND</span>; can suppress spirit wards for one scene.</td></tr>
+</tbody>
+</table>
+
+<h4>Ship Defenses &amp; Armor</h4>
+<table>
+<thead><tr><th>Fitting</th><th>Mechanical Text</th></tr></thead>
+<tbody>
+<tr><td>Bulwark Plating</td><td><span class="tag">ARMORED</span>: reduce Hull marks from physical hits by 1 (min 0) once per round.</td></tr>
+<tr><td>Keel Shoes</td><td><span class="tag">KEEL ARMOR</span>: ignore first reef/grounding mark per scene.</td></tr>
+<tr><td>Fire Screens</td><td><span class="tag">FIREBREAKS</span>: first Fire mark each scene negated.</td></tr>
+<tr><td>Ward Braziers</td><td><span class="tag">SPIRIT-WARD</span>: negate first ritual/fire or spirit bolt mark each scene.</td></tr>
+<tr><td>Boarding Nets</td><td><span class="tag">BOARDING NETS</span>: +1 die to Cross/Secure; enemies board at −1 die.</td></tr>
+</tbody>
+</table>
+
+<h4>Personal Naval Arms (Crew)</h4>
+<table>
+<thead><tr><th>Item</th><th>Tags / Notes</th></tr></thead>
+<tbody>
+<tr><td>Cutlass (Light)</td><td><span class="tag">QUICKDRAW</span><span class="tag">BALANCED</span></td></tr>
+<tr><td>Boarding Pike (Medium)</td><td><span class="tag">REACH</span><span class="tag">BRUTAL</span></td></tr>
+<tr><td>Naval Crossbow (Ranged)</td><td><span class="tag">RELOAD</span><span class="tag">PRECISE</span>; safe on slick decks.</td></tr>
+<tr><td>Grapnel &amp; Line</td><td><span class="tag">TETHER</span><span class="tag">UTILITY</span>; climb/cross +1 die.</td></tr>
+<tr><td>Sea Cloak</td><td><span class="tag">WEATHERPROOF</span>; resist chill/fog conditions.</td></tr>
+<tr><td>Brigantine (Light Armor)</td><td><span class="tag">FLEXIBLE</span>; on a fall: reduce harm by 1.</td></tr>
+</tbody>
+</table>
+
+<h3 id="ch3-3">Magical Maritime Equipment</h3>
+<h4>Common Enchanted Kit</h4>
+<table>
+<thead><tr><th>Item</th><th>DV/Cost</th><th>Tags / Mechanical Effect</th></tr></thead>
+<tbody>
+<tr><td>Spirit Compass</td><td>— / 1 Cred</td><td><span class="tag">GUIDE</span>: points to nearest safe-harbor scene; once per leg shift Position +1 when routing to "safety."</td></tr>
+<tr><td>Weather Glass</td><td>— / 2 Cred</td><td><span class="tag">FORECAST</span>: predict next day's Sea State; once per day cancel one Weather Window −1.</td></tr>
+<tr><td>Soul Lantern</td><td>— / 2 Cred</td><td><span class="tag">REVEAL</span><span class="tag">WARD</span>: shows unseen presences; once per scene resist fear or illusion at +1 die.</td></tr>
+<tr><td>Tide Stone</td><td>Rite 3 / 3 Cred</td><td><span class="tag">CURRENT</span>: once per scene improve a Range-change Effect by one step when moving with a set current.</td></tr>
+<tr><td>Storm Cloak (set)</td><td>Rite 3 / 3 Cred</td><td><span class="tag">WEATHERWARD</span>: crew ignore mundane weather penalties for one scene.</td></tr>
+<tr><td>Lantern Phrase Cryptor</td><td>— / 3 Cred</td><td><span class="tag">CODES</span>: +1 die to Papers/Etiquette vs. lantern challenges; failure ticks Papers Scrutiny +1.</td></tr>
+<tr><td>Eel-Chart Folio</td><td>— / 2 Cred</td><td><span class="tag">LOCAL</span>: in Reef Cuts, once per leg downgrade Desperate → Dominant.</td></tr>
+<tr><td>Pilot's Knot Seal</td><td>— / 2 Cred</td><td><span class="tag">LEGIT</span>: acts as a Dolmis pilot token in a pinch (one-time use); thereafter Audit risk +1.</td></tr>
+</tbody>
+</table>
+
+<h4>Ritual Fittings (Shipboard)</h4>
+<table>
+<thead><tr><th>Fitting</th><th>Install</th><th>Effect</th></tr></thead>
+<tbody>
+<tr><td>Keel Sigils</td><td>1 Ritual slot</td><td>First grounding/reef mishap each leg becomes a warning (no mark).</td></tr>
+<tr><td>Bell of True Wake</td><td>1 Ritual slot</td><td>Once per scene, cancel an enemy Veil the Wake on a success (Opposed Rite).</td></tr>
+<tr><td>Salt Circle Locker</td><td>1 Ritual slot</td><td>+1 die resisting Spirit Buoy readings; on failure Papers Scrutiny +1.</td></tr>
+</tbody>
+</table>
+
+<h3 id="ch3-4">Ship Modifications and Customization</h3>
+<p>Each hull lists slots: Hull / Rig / Hold / Signal / Ritual. Installing an upgrade consumes 1 slot of its category unless noted.</p>
+
+<h4>Upgrades (Choose to Taste)</h4>
+<table>
+<thead><tr><th>Upgrade</th><th>Category</th><th>Detect?</th><th>Mechanical Text</th></tr></thead>
+<tbody>
+<tr><td>Reinforced Hull</td><td>Hull</td><td>Visible</td><td><span class="tag">ARMORED</span>: reduce Hull marks by 1 once per round. Adds weight: −1 to Dash attempts.</td></tr>
+<tr><td>Self-Sealing Planks</td><td>Hull</td><td>—</td><td>On taking a Hull mark, roll d10=8+ to ignore 1 leak mark (once per scene).</td></tr>
+<tr><td>False Bottom</td><td>Hold</td><td>Hidden</td><td><span class="tag">HIDDEN HOLD +1</span>; if found, Papers Scrutiny +2 ongoing.</td></tr>
+<tr><td>Cold Locker</td><td>Hold</td><td>—</td><td>Preserve perishables; remove one Cargo Risk tick per leg.</td></tr>
+<tr><td>Silent Rig</td><td>Rig</td><td>Visible</td><td><span class="tag">SILENT RIG</span>: +1 die to Drift; −1 die to Dash in storms.</td></tr>
+<tr><td>Reef-Reels</td><td>Rig</td><td>—</td><td><span class="tag">REEF FAST</span>: ignore first Weather Window −1 per leg.</td></tr>
+<tr><td>Ballista Platform</td><td>Hull</td><td>Visible</td><td>Mount an extra Light weapon; counts against Hardpoint limits.</td></tr>
+<tr><td>Signal Mast</td><td>Signal</td><td>Visible</td><td>+1 die to Signal; convoy coordination improves ally Position +1 on success.</td></tr>
+<tr><td>Lantern Array</td><td>Signal</td><td>Visible</td><td>+1 die to lantern challenges; once per scene "flare" imposes −1 Position to enemy gunnery.</td></tr>
+<tr><td>Spirit Mask</td><td>Signal</td><td>Hidden</td><td><span class="tag">VEIL</span>: −1 to Spirit Buoy readings; on failure, doubles the tick.</td></tr>
+<tr><td>Powder Magazine Baffles</td><td>Hull</td><td>—</td><td>On Fire escalation, downgrade +2 → +1.</td></tr>
+<tr><td>Kedge Kit</td><td>Rig</td><td>—</td><td>Once per scene shift a band against current in tight water.</td></tr>
+<tr><td>Pilot Chair</td><td>Signal</td><td>Visible</td><td><span class="tag">NAV CHAIR</span>: +1 die Navigation in Narrows/Reef zones.</td></tr>
+</tbody>
+</table>
+
+<h4>Illicit Rigs (Gray/Black Market)</h4>
+<table>
+<thead><tr><th>Rig</th><th>Tradeoffs</th></tr></thead>
+<tbody>
+<tr><td>Ghost Well (hold shrine)</td><td><span class="tag">VEIL</span> on cargo scent; detection ⇒ immediate Seizure Court.</td></tr>
+<tr><td>Reed-Wind Sails (stolen)</td><td>Tailwind grants a free band on 10; any checkpoint adds Scrutiny +1.</td></tr>
+<tr><td>Boom-Cutter (spar saws)</td><td>Ignore first boom-chain barrier this leg; if witnessed, Blockade Awareness +2.</td></tr>
+</tbody>
+</table>
+
+<div class="panel panel-orange">
+<strong>Installation &amp; Time.</strong>
+<p class="mt-1">Harbor work order (Linns): 1–3 days per upgrade; rush jobs cost +1 Cred and start the next scene at Dominant due to "loose pins." Illicit installs can't use official slips — failure risks Audit.</p>
+</div>
+
+<h3 id="ch3-5">Maintenance and Upkeep</h3>
+<h4>Wear &amp; Salt [6] (Campaign Track)</h4>
+<p>Mark when you: Press the Sails for a leg, finish a storm at Controlled/Desperate, or complete a battle where any ship timer filled. Thresholds:</p>
+<ul>
+<li><strong>2 — Squeaks &amp; Seams:</strong> −1 die to Dash until serviced.</li>
+<li><strong>4 — Strained Rig:</strong> first Range change each battle is Controlled.</li>
+<li><strong>6 — Tired Hull:</strong> start sea scenes at −1 Position.</li>
+</ul>
+<p><strong>Service:</strong> Pay Linns crew and haul: Sloop/Cutter 1 Cred, Corvette/Brigantine 2 Cred, Frigate 3 Cred, Galleon 4 Cred. Clears the track and 1 mark on Rigging or Hull.</p>
+
+<h4>Repairs</h4>
+<table>
+<thead><tr><th>Method</th><th>Effect</th></tr></thead>
+<tbody>
+<tr><td>Drydock (Full)</td><td>Pay class cost (above) + 1 Cred per filled ship timer; clear all Hull/Rigging/Fire marks; Crew Morale +1.</td></tr>
+<tr><td>Alongside Repairs (Quick)</td><td>Craft test; on success remove 1 mark from one ship timer; on failure tick Wear &amp; Salt +1.</td></tr>
+<tr><td>At-Sea Patching</td><td>Lore test at Dominant; on success remove 1 Hull mark; on failure escalate to Desperate next round.</td></tr>
+</tbody>
+</table>
+
+<h4>Crew Pay, Rations, &amp; Morale</h4>
+<table>
+<thead><tr><th>Upkeep (per leg)</th><th>Mechanical Text</th></tr></thead>
+<tbody>
+<tr><td>Fair Shares (1 Cred)</td><td>Crew Morale clears 1 mark if any; +1 die to Command Presence once per leg.</td></tr>
+<tr><td>Short Rations (0 Cred)</td><td>Tick Crew Morale +1; if full, test Crew Loyalty or suffer desertion.</td></tr>
+<tr><td>Prize Money (2 Cred)</td><td>Reduce Heat by 1 in Free Havens; +1 Standing with Linns.</td></tr>
+</tbody>
+</table>
+
+<h4>Inspections &amp; Illicit Work</h4>
+<p>If you arrive with Illicit upgrades: each checkpoint adds +1 to Papers Scrutiny (cumulative) unless masked by Spirit Mask or perfect papers. A failed inspection may trigger a Courtesy Duel, Seizure Court, or forced removal of the offending gear.</p>
+
+<h3 id="ch3-6">Quick Reference: Building &amp; Tuning</h3>
+<ol>
+<li><strong>Choose a Hull</strong> (size sets crew, mounts, slots).</li>
+<li><strong>Add a Regional Package</strong> (optional flavor + rules).</li>
+<li><strong>Spend Slots on Upgrades</strong> (Hull/Rig/Hold/Signal/Ritual).</li>
+<li><strong>Pick Weapons</strong> (respect Hardpoints; ammo mix matters).</li>
+<li><strong>Buy Magical Kit</strong> (compass, lantern, glass; pick one Rite fitting).</li>
+<li><strong>Name Crew Roles</strong> (Pilot, Rigger, Gunner, Cutter, Whisper, Face).</li>
+<li><strong>Note Upkeep Plan</strong> (Cred per leg; where to dock for repairs).</li>
+</ol>
+
+<div class="panel panel-gold">
+<strong>GM Tip: Slot Pressure = Drama.</strong>
+<p class="mt-1">Let hard choices bite. If players want everything — speed, stealth, cargo, guns — make them chase it with favors, Standing, or a second hull. The bottle rewards specialization... and bold improvisation.</p>
+</div>
+
+</div>
+<div class="chapter-block">
+<h2 id="ch4">4. Magic at Sea: Raéyn's Wake &amp; the Kraken's Chain</h2>
+<p class="lead">The Amaranthine is a choir of winds and a vault of pressure. Above, <strong>Raéyn the Storm Queen</strong> writes with lightning and breath; below, <strong>Khemesh, the Kraken of the Deep</strong>, constricts with current, chain, and weight. Between them, other Patrons make claims — veils, truths, bargains, and songs. This chapter frames sea-magic through their contest and gives procedures for rites, summoning, backlash, and the Cantor's work aboard.</p>
+
+<div class="panel panel-mist">
+<strong>Design Note.</strong>
+<p class="mt-1">These rules expand Magical Combat Limitations, Weather Rituals, and Patron Integration at Sea. Use Devotion/Obligation, Position/Effect, and Timers as the backbone. Where fiction disagrees with tables, fiction rules — name what it looks like on your deck.</p>
+</div>
+
+<h3 id="ch4-1">Cosmology of the Waterline</h3>
+<h4>Raéyn the Storm Queen (Breath, Surge, Mercy)</h4>
+<p>Raéyn governs winds, squalls, and the breath that lifts sails. She favors movement that spares the helpless and courage that holds formation. Her omens taste of ozone; her touch speeds rigging and clears lungs. Raéyn abhors stagnant waters used for cruelty.</p>
+
+<h4>Khemesh the Kraken (Constriction, Pressure, Debt)</h4>
+<p>Khemesh claims the column from keel to trench. He binds with ropes, chains, oaths, and barnacled ledgers. Calm seas that smother motion and currents that drag below are his tools. He loves proper weights, tolls, and the price of disobedience.</p>
+
+<h4>Other Sea-Relevant Patrons (At a Glance)</h4>
+<table>
+<thead><tr><th>Patron</th><th>Sea Domain &amp; Friction</th></tr></thead>
+<tbody>
+<tr><td><strong>Ikasha of Veils</strong></td><td>Fog, shadow, unread wakes. Aids stealth lanes; angers Raéyn if used to abandon the helpless.</td></tr>
+<tr><td><strong>The Witness</strong></td><td>True charts, honest codes, exposed false ensigns. Strains with Khemesh's debt-ink.</td></tr>
+<tr><td><strong>The Traveler</strong></td><td>Fortunes of passage, hidden cuts, lucky currents. Often mediates Storm vs. Chain.</td></tr>
+<tr><td><strong>Carrion King</strong></td><td>Wrecks, drowned oaths, rusted bells. Ally of Khemesh when debts drown; enemy when mercy is due.</td></tr>
+<tr><td><strong>Clockwork Monad</strong></td><td>Predictable tides, precise pilotage. Loves order; clashes with Raéyn's wild grace in squalls.</td></tr>
+<tr><td><strong>Thrysos</strong></td><td>Revelry, frenzy, ecstatic song. At sea, taboo: his choruses turn crews from duty to riot.</td></tr>
+</tbody>
+</table>
+
+<h3 id="ch4-2">Conducting Magic Aboard</h3>
+<h4>The Ship as Circle</h4>
+<p>A seaworthy hull is a moving ritual diagram. Treat Mast, Bells, Lanterns, Keel, and Figurehead as anchor points. A rite needs three of five to be stable. Fewer anchors: +1 DV and counts as Controlled. No anchors: Desperate and primed for backlash.</p>
+
+<h4>Casting Windows &amp; Position</h4>
+<ul>
+<li><strong>Dominant.</strong> Steady way on, trimmed canvas, crew at stations. Standard DV.</li>
+<li><strong>Controlled.</strong> Maneuvering hard, cross chop, or contested water. −1 die or +1 DV (choose).</li>
+<li><strong>Desperate.</strong> Storm-on-bow, reefs, boarding melee. −2 dice or +2 DV; on backlash, extend to crew (tick Ship Integrity or Morale).</li>
+</ul>
+
+<h4>The Barometer Track [6]</h4>
+<p>Place a visible track between Breath (Raéyn) on the left and Pressure (Khemesh) on the right. At scene start, mark 1–2 toward whichever force dominates (weather, depth, fiction).</p>
+<ul>
+<li>Breath 1–2: Wind rites −1 DV; constricting effects +1 DV.</li>
+<li>Breath 3–4: Free Wind Call once; chain/grapple actions are Dominant.</li>
+<li>Pressure 1–2: Binding, ballast, and holdfast rites −1 DV; sailing Maneuvers +1 DV.</li>
+<li>Pressure 3–4: Free Holdfast once; capsize checks +1 tier of consequence.</li>
+</ul>
+<p>Shift the marker when omens land, when Cantors sing properly (toward Breath), or when debts are enforced (toward Pressure).</p>
+
+<h3 id="ch4-3">Sea Rites &amp; Invocations (Templates)</h3>
+<p>Each rite lists DV, Cost (Obligation or Boon), Anchor (how many ship anchors needed), and Effect. Modify by Barometer and Position.</p>
+<table>
+<thead><tr><th>Rite</th><th>DV</th><th>Cost</th><th>Anchor</th><th>Effect</th></tr></thead>
+<tbody>
+<tr><td><strong>Raéyn's Wake</strong></td><td>4</td><td>1 Obl.</td><td>3</td><td>Favorable wind for one leg; Tailwind Run tag for the scene. On backlash: Rigging mark to all wings.</td></tr>
+<tr><td><strong>Storm's Eye</strong></td><td>5+</td><td>2 Obl.</td><td>4</td><td>Create a pocket of Dominant Position in a storm for 1 scene.</td></tr>
+<tr><td><strong>Holdfast of Khemesh</strong></td><td>3</td><td>1 Obl.</td><td>3</td><td>Treat boarding, grapples, and anchors as +1 Effect; resist knock-down seas.</td></tr>
+<tr><td><strong>Chain the Wake</strong></td><td>4</td><td>1–2 Obl.</td><td>4</td><td>Slow a target hull one Range step; if Pressure ≥ 3, also −1 Position to target.</td></tr>
+<tr><td><strong>Ikasha's Curtain</strong></td><td>4</td><td>1 Obl.</td><td>3</td><td>First detection per leg reads false; fog drapes your sail numbers.</td></tr>
+<tr><td><strong>Witness's Lens</strong></td><td>3</td><td>1 Obl.</td><td>2</td><td>Reveal false ensigns within Far; Papers vs. you −1 DV next inspection.</td></tr>
+<tr><td><strong>Traveler's Crossing</strong></td><td>5</td><td>2 Obl.</td><td>4</td><td>Shift Range +2 as though through a hidden cut; mark Patrol Net +1 (you made a wake).</td></tr>
+<tr><td><strong>Carrion Quiet</strong></td><td>3</td><td>1 Obl.</td><td>2</td><td>Calm drowned spirits for a scene; salvage at +1 die. On fail: Ghost Net wakes.</td></tr>
+</tbody>
+</table>
+<div class="panel panel-gold">
+<strong>Natural/Compatible/Tension.</strong> Apply alignment benefits from Campaign Frames. Example: Natural with Raéyn reduces Raéyn's Wake cost by 1 Obligation once per Tide Turn.
+</div>
+
+<h3 id="ch4-4">Summoning at Sea</h3>
+<h4>Circles, Lines, and Depth</h4>
+<p>Summons declared on deck use salt circles, bells, and rope-knots (prefer Breath). Over the side (in water) uses weighted chains, iron, and name-plates (prefer Pressure). In a boat below decks, mix both — harder to control, easier to hide.</p>
+
+<h4>Entity Table (Summon or Parley)</h4>
+<table>
+<thead><tr><th>Entity</th><th>DV</th><th>Cost</th><th>Anchor</th><th>Bargain / Threat</th></tr></thead>
+<tbody>
+<tr><td><strong>Wind-Sister</strong> (gust sprite)</td><td>3</td><td>1 Boon</td><td>2</td><td>Shifts sails, carries whispers; hates knots in her hair (no rope splices on the altar).</td></tr>
+<tr><td><strong>Current-Hand</strong> (eddy spirit)</td><td>3</td><td>1 Boon</td><td>2</td><td>Nudges the hull; demands the weighted names of those spared from drowning.</td></tr>
+<tr><td><strong>Lantern Wight</strong> (tower ghost)</td><td>4</td><td>1 Obl.</td><td>3</td><td>Reads codes true; will name one lie on your papers aloud.</td></tr>
+<tr><td><strong>Net-Singer</strong> (reef choir)</td><td>4</td><td>1 Obl.</td><td>3</td><td>Parts nets, calms shoals; exacts a harvest tithe from your next catch.</td></tr>
+<tr><td><strong>Chain-Caller</strong> (minor kraken-hand)</td><td>5</td><td>2 Obl.</td><td>4</td><td>Binds a foe hull; adds Pressure +1. Demands a debt paid in iron.</td></tr>
+<tr><td><strong>Storm Herald</strong> (Raéyn envoy)</td><td>5</td><td>2 Obl.</td><td>4</td><td>Grants Eye or Wake; forbids firing first this voyage.</td></tr>
+<tr><td><strong>Whale-Mother's Calf</strong> (beast ally)</td><td>6</td><td>2 Obl.</td><td>4</td><td>Escorts convoy; demands silence at dawn and mercy to a supplicant.</td></tr>
+</tbody>
+</table>
+<p><strong>Binding &amp; Banishing Tags.</strong> Use two of four to bind safely; one to banish at Dominant; none is Desperate. <span class="tag">SALT</span><span class="tag">IRON</span><span class="tag">KNOT</span><span class="tag">NAME</span></p>
+
+<h3 id="ch4-5">Backlash at Sea</h3>
+<h4>General Backlash (d12)</h4>
+<table>
+<thead><tr><th>#</th><th>Effect</th></tr></thead>
+<tbody>
+<tr><td>1</td><td><strong>Whipped Lines:</strong> Rigging snaps; mark Rigging 1; nearest sailor takes Harm 1 (Lashed).</td></tr>
+<tr><td>2</td><td><strong>Salt in the Lungs:</strong> Caster marks 1 Fatigue; crew checks Morale or suffers −1 die next action.</td></tr>
+<tr><td>3</td><td><strong>Turned Compass:</strong> For this leg, Navigation is +1 DV; false bearing by one point.</td></tr>
+<tr><td>4</td><td><strong>Lantern Lies:</strong> Next inspection starts Dominant, even if papers are perfect.</td></tr>
+<tr><td>5</td><td><strong>Hungry Wake:</strong> Pursuers gain +1 Position once this scene.</td></tr>
+<tr><td>6</td><td><strong>Blood in the Bilge:</strong> The sea takes a tithe — choose cargo loss or a Crew Morale +1 tick.</td></tr>
+<tr><td>7</td><td><strong>Ozone Stare:</strong> Everyone hears distant thunder; next magic test −1 die (crew braced wrong).</td></tr>
+<tr><td>8</td><td><strong>Ghost Net Brush:</strong> Lines snag on the unseen; take −1 Position or spend 1 Boon to cut clean.</td></tr>
+<tr><td>9</td><td><strong>Name Spoken:</strong> Your ship's true-name rings; enemies at Far recognize you.</td></tr>
+<tr><td>10</td><td><strong>Rope Memory:</strong> All knots creep; Boarding/Anchor tests +1 DV this scene.</td></tr>
+<tr><td>11</td><td><strong>Figurehead Weeps:</strong> Supernatural attention; GM ticks an appropriate Faction timer.</td></tr>
+<tr><td>12</td><td><strong>Sea's Judgment:</strong> Choose: Ship Integrity +1, or Devotion/Obligation ticks +1 (GM says which track).</td></tr>
+</tbody>
+</table>
+
+<h4>Patron-Specific Twists (d6 Each)</h4>
+<table>
+<thead><tr><th>Patron</th><th>#</th><th>Distinct Backlash</th></tr></thead>
+<tbody>
+<tr><td rowspan="6"><strong>Raéyn</strong></td><td>1</td><td>Ball lightning crawls the yard — next two melee actions are Desperate.</td></tr>
+<tr><td>2</td><td>Sudden lull; Barometer shifts 1 toward Pressure.</td></tr>
+<tr><td>3</td><td>Squall veers; your Wake aids a foe this round.</td></tr>
+<tr><td>4</td><td>Storm birds strike the deck; a random PC drops what they hold.</td></tr>
+<tr><td>5</td><td>Crew's breath runs short; all checks to sing/chant −1 die this scene.</td></tr>
+<tr><td>6</td><td>Lightning marks your banner — recognizable for a Tide Turn.</td></tr>
+<tr><td rowspan="6"><strong>Khemesh</strong></td><td>1</td><td>Barnacle bloom; next Drydock costs +1.</td></tr>
+<tr><td>2</td><td>Chain-sense awakens; any oath broken ticks Crew Morale +1.</td></tr>
+<tr><td>3</td><td>Dragline: speed −1 band for one exchange unless you cut a line (lose 1 Supply).</td></tr>
+<tr><td>4</td><td>Bilge rises; choose: stink (Harbor actions −1 die) or pump (two crew actions).</td></tr>
+<tr><td>5</td><td>Iron thirst: your IRON tag is spent (needs reforging) to bind further summons.</td></tr>
+<tr><td>6</td><td>Depth-call: a crewmember sleeps and dreams below — waking them costs 1 Boon.</td></tr>
+<tr><td><strong>Ikasha</strong></td><td>1–2</td><td>Fog clings, misreading friend-or-foe lanterns; or footfalls vanish, wasting a Signal action. (Add more on the fly; keep effects stealthy, not explosive.)</td></tr>
+<tr><td><strong>Witness</strong></td><td>1</td><td>A lie is spoken aloud by the breeze — mark Faction Standing drift if ignored.</td></tr>
+<tr><td><strong>Carrion King</strong></td><td>1</td><td>A drowned name knocks on the hull — deny it or suffer a Ghost Net tick.</td></tr>
+</tbody>
+</table>
+
+<h3 id="ch4-6">Cantors &amp; the Law of Song</h3>
+<h4>The Cantor's Role</h4>
+<p>A Cantor keeps time with breath and line. They bind the crew's lungs to the mast's rhythm, turn panic to cadence, and carry oaths into the wake.</p>
+
+<h4>Cantor Actions (Once per Scene Unless Pushed)</h4>
+<table>
+<thead><tr><th>Song</th><th>Effect</th></tr></thead>
+<tbody>
+<tr><td><strong>Batten Hymn</strong></td><td>Improve Position by +1 for Maneuver/Brace this exchange.</td></tr>
+<tr><td><strong>Borrow the Breath</strong></td><td>Clear 1 Fatigue from up to two crew; Barometer shifts 1 toward Breath.</td></tr>
+<tr><td><strong>Knot-Psalm</strong></td><td>Boarding/Anchor tests −1 DV this round (echoed counting, perfect timing).</td></tr>
+<tr><td><strong>Lament of Names</strong></td><td>Calm a restless spirit aboard; prevents one Ghost Net tick.</td></tr>
+<tr><td><strong>Silent Verse</strong></td><td>For one exchange, no shouted orders can be overheard at Far.</td></tr>
+</tbody>
+</table>
+
+<h4>Taboo: Songs to Thrysos</h4>
+<p>At sea, revelry is mutiny's cousin. Thrysos promises ecstasy that drowns the voice of duty. Any hymn that names him (or steals his cadence) risks a <strong>Revelry Spiral [6]</strong>:</p>
+<ol>
+<li>Cups rise; work slows (Crew Morale +1 tick).</li>
+<li>Lines slack; watch drifts (−1 Position).</li>
+<li>Drums answer; feet stomp (inspection starts Dominant).</li>
+<li>Knives drum on rails (first boarding check Desperate — you or them).</li>
+<li>Names forgotten (one crew contact burns).</li>
+<li>Riot or trance (GM picks): Admiralty Fury +1, or an omen demands atonement.</li>
+</ol>
+<p>A Cantor may cut the chorus: test Presence + Insight vs. DV 3; on success, freeze the spiral at its current step for the scene. On fail, advance it and suffer Harm 1 (Split Throat).</p>
+
+<h3 id="ch4-7">Omens &amp; Demands at Sea (d8 Each)</h3>
+<h4>Raéyn's Omens</h4>
+<table>
+<thead><tr><th>#</th><th>Sign / Demand</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>St. Elmo crowns your yard — spare a supplicant this leg.</td></tr>
+<tr><td>2</td><td>Cloudhole over a reef — guide a stranger through, or lose the hole.</td></tr>
+<tr><td>3</td><td>Petrel lands on the rail — feed the hungry in the next port.</td></tr>
+<tr><td>4</td><td>Double rainbow — do not fire first until dawn.</td></tr>
+<tr><td>5</td><td>Ozone on the tongue — sing Borrow the Breath before any rite today.</td></tr>
+<tr><td>6</td><td>Squall skirts your wake — share wind with a slower hull.</td></tr>
+<tr><td>7</td><td>Broken gust — lower a flag taken in cruelty.</td></tr>
+<tr><td>8</td><td>Night so clear it hums — name your fear aloud on deck.</td></tr>
+</tbody>
+</table>
+
+<h4>Khemesh's Omens</h4>
+<table>
+<thead><tr><th>#</th><th>Sign / Demand</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>Barnacles spell a rune — pay a tithe in iron.</td></tr>
+<tr><td>2</td><td>Calm that feels heavy — honor all oaths today or suffer drag.</td></tr>
+<tr><td>3</td><td>Chain found in the bilge — bind a debtor and deliver them.</td></tr>
+<tr><td>4</td><td>Sounding-line hums — heave-to at noon and read the names of the drowned.</td></tr>
+<tr><td>5</td><td>A net knots itself — return a stolen thing.</td></tr>
+<tr><td>6</td><td>Bell rings wrong — accept inspection without a bribe.</td></tr>
+<tr><td>7</td><td>Copper turns green overnight — abstain from magic for one leg.</td></tr>
+<tr><td>8</td><td>Weights miscounted — balance the ledger: forgive a debt or double a price.</td></tr>
+</tbody>
+</table>
+<p>Ignoring a clear omen marks Obligation +1 toward that Patron, or ticks Backlash immediately (GM's choice, foreshadowed by fiction).</p>
+
+<h3 id="ch4-8">Putting It to the Table</h3>
+<h4>Scene Starters</h4>
+<ul>
+<li><strong>Eye Duel on the Yard.</strong> A Seven Bell Court variant: form, spirit, and intent judged by wind and bell — the winner writes the parley terms.</li>
+<li><strong>Chains from the Trench.</strong> Khemesh answers a slaver's prayer; iron claws your keel. Can you pay a debt you never made?</li>
+<li><strong>Lantern Court at Sea.</strong> The Witness convenes a floating trial; papers, oaths, and a single squall as cross-examination.</li>
+</ul>
+<h4>Heist Hooks via Rites</h4>
+<ul>
+<li>Use Ikasha's Curtain to ghost past pickets, then Witness's Lens to unmask a false convoy mid-escape.</li>
+<li>Pair Traveler's Crossing with a Vilikari eel-cut map; shift Range +2 and skip a checkpoint, but Patrol Net +1.</li>
+</ul>
+<h4>GM Tips</h4>
+<ul>
+<li>Keep the Barometer visible and let Cantors shove it with song or duty.</li>
+<li>Tie Backlash to what players loved — if they leaned on wind, punish with rope memory; if they bound foes, tempt with debt.</li>
+<li>Let Omens rewrite plans. A demand to spare a ship makes a clean heist richer and harder.</li>
+</ul>
+
+<h3 id="ch4-9">Quick Lists</h3>
+<p><strong>Sea-Magic Components (Pick 2 for −1 DV):</strong><br>
+<span class="tag">SALT</span> (ritual purity) <span class="tag">IRON</span> (binding) <span class="tag">KNOT</span> (memory) <span class="tag">BELL</span> (call) <span class="tag">LANTERN</span> (witness) <span class="tag">NAME</span> (true-call)</p>
+
+<h4>Cantor Conditions (d6)</h4>
+<table>
+<thead><tr><th>#</th><th>Condition</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>Salt-Burnt Throat — −1 die to sing until rest.</td></tr>
+<tr><td>2</td><td>Sour Ear — mishears orders; first Signal action fails.</td></tr>
+<tr><td>3</td><td>Storm-Struck — hair white at the roots; once per session ignore fear.</td></tr>
+<tr><td>4</td><td>Sea-Quiet — can silence a brawl on eye contact (1/scene).</td></tr>
+<tr><td>5</td><td>Revel's Echo — Thrysos whispers; resist or tick Spiral +1.</td></tr>
+<tr><td>6</td><td>Bell-Marked — bells answer when you breathe; +1 die to Lament.</td></tr>
+</tbody>
+</table>
+
+<div class="panel panel-gold">
+<strong>Endstate.</strong> If your crew sanctifies a Storm Lane (Raéyn) or lays a Chainway (Khemesh), change procedures on that route: DV shifts, omen lists alter, and your figurehead earns a title sailors repeat in the dark.
+</div>
+
+</div>
+<div class="chapter-block">
+<h2 id="ch5">5. Harbor Credit &amp; Scrip (Optional)</h2>
+<p class="lead">Money at sea moves as letters and favors. Use Supply, Standing, and Credit Slips instead of coins.</p>
+
+<h4>Instruments of Exchange</h4>
+<table>
+<thead><tr><th>Instrument</th><th>Function</th></tr></thead>
+<tbody>
+<tr><td><strong>Harbor Credit Slip</strong> <span class="tag">SCRIBE</span><span class="tag">BIND</span></td><td>Transferable note issued by a Free Haven broker; counts as 1 Supply tick when honored.</td></tr>
+<tr><td><strong>Bonded Warehouse Writ</strong> <span class="tag">BIND</span><span class="tag">NAME</span></td><td>Secures storage or releases sealed cargo; +1 die to Paper Shop tests in that port.</td></tr>
+<tr><td><strong>Pilotage Mark</strong> <span class="tag">LEGAL</span><span class="tag">KNOT</span></td><td>Prepaid pilot fee; −1 DV to the first Guide test in this harbor.</td></tr>
+<tr><td><strong>Lantern Scrip</strong> <span class="tag">LANTERN</span><span class="tag">SCRIBE</span></td><td>Oshiira tower voucher; reduces Papers Scrutiny by 1 for one inspection.</td></tr>
+</tbody>
+</table>
+
+<h4>Typical Costs (Expressed in Supply/Timers)</h4>
+<table>
+<thead><tr><th>Service</th><th>Cost</th><th>Notes</th></tr></thead>
+<tbody>
+<tr><td>Crew wages (one leg)</td><td>1 Supply</td><td>Reduces Crew Morale by 1 tick if unpaid.</td></tr>
+<tr><td>Pilot through narrows</td><td>1 Slip</td><td>Or +1 DV to all Guide tests if declined.</td></tr>
+<tr><td>Drydock patch</td><td>1–2 Supply</td><td>Clear 1–2 Ship Integrity ticks.</td></tr>
+<tr><td>Expedite inspection</td><td>1 Slip</td><td>Counts as a bribe without Standing loss.</td></tr>
+<tr><td>Black-lane intel</td><td>1 Slip</td><td>Treat the next Patrol Net tick as −1 segment.</td></tr>
+</tbody>
+</table>
+
+<div class="panel panel-gold">
+<strong>Design Dial.</strong> Keep coin abstract: convert cash hauls to Supply ticks, Harbor Credit Slips, or Standing bumps. Only price things when tension matters.
+</div>
+</div>
+
+<div class="chapter-block">
+<h2 id="ch6">6. Crew and Leadership</h2>
+<p class="lead">Ships are people. This chapter gives procedures for roles, watches, morale, mutiny, training, and the specialists who keep you alive under blockade. Use Fate's Edge Position/Effect, Story Beats (SB), and Timers; ship TAGS justify advantages.</p>
+
+<h3 id="ch6-1">Crew Roles and Specializations</h3>
+<h4>Crew Quality (CQ)</h4>
+<table>
+<thead><tr><th>Band</th><th>Dice Mod</th><th>Morale Edge</th><th>Notes</th></tr></thead>
+<tbody>
+<tr><td>Green</td><td>−1 die</td><td>—</td><td>New hands; the first Wear &amp; Salt tick each leg also ticks Crew Morale.</td></tr>
+<tr><td>Seasoned</td><td>0</td><td>+1d to one Helm or Rig test per scene</td><td>Default commercial crews.</td></tr>
+<tr><td>Veteran</td><td>+1 die</td><td>Resist 1 Crew Morale tick per leg</td><td>Drilled under fire.</td></tr>
+<tr><td>Elite</td><td>+2 dice</td><td>Once per scene improve Position +1</td><td>Famous companies, temple-marines, privateers.</td></tr>
+</tbody>
+</table>
+
+<h4>Core Roles (Assign at Least One PC/NPC per Role)</h4>
+<table>
+<thead><tr><th>Role</th><th>Key Tests</th><th>Examples of Scene Authority</th></tr></thead>
+<tbody>
+<tr><td>Captain / Master</td><td>Presence + Command</td><td>Set doctrine, call All-Hands, seize initiative for one role, address the crew.</td></tr>
+<tr><td>Pilot / Navigator</td><td>Wits + Navigation</td><td>Change Range; plot legs; hazard checks; Beat to Windward, Kedging.</td></tr>
+<tr><td>Bosun / Rigger</td><td>Body/Wits + Craft</td><td>Reef, repair, grapples, kedges; cancel a Rigging mark on a crit.</td></tr>
+<tr><td>Gunner / Artillerist</td><td>Body/Wits + Gunnery</td><td>Select shot; volley timing; chain-shot; firepots; suppress decks.</td></tr>
+<tr><td>Cutter / Boarders</td><td>Body + Melee/Athletics</td><td>Lead grapples and crossings; secure the deck; repel boarders.</td></tr>
+<tr><td>Whisper / Ritualist</td><td>Spirit/Wits + Arcana/Lore</td><td>Veil the Wake, Borrowed Wind, wards; handle omens.</td></tr>
+<tr><td>Signal / Face</td><td>Presence + Sway/Etiquette</td><td>Flags/lamps; parley; bribes; duel forms; paper presentation.</td></tr>
+<tr><td>Carpenter / Caulker</td><td>Wits + Craft</td><td>Hull patches; pumps; self-sealing planks; triage Hull.</td></tr>
+<tr><td>Surgeon / Cantor</td><td>Spirit + Medicine/Cant</td><td>Treat Harm; steady Crew Morale; chant against fear.</td></tr>
+<tr><td>Purser / Quartermaster</td><td>Wits + Lore/Trade</td><td>Rations; pay; prize-books; reduce Wear &amp; Salt by 1 on good stores.</td></tr>
+</tbody>
+</table>
+
+<div class="panel panel-blue">
+<strong>Assigning Dice.</strong>
+<p class="mt-1">If a PC leads a role, roll PC dice as normal; CQ grants help dice per band (max +2). If an NPC leads, roll CQ as the pool (Green 1d, Seasoned 2d, Veteran 3d, Elite 4d) with Position from fiction and ship TAGS.</p>
+</div>
+
+<h3 id="ch6-2">Watches, Fatigue, and Duty Cycle</h3>
+<p>Ships run two or three watches. Mark <strong>Watch Fatigue [4]</strong> when you: sail through a full night at Controlled/Desperate, fight a battle, or work storm drills.</p>
+<ul>
+<li>At 2: −1 die to Rig or Guns until rest.</li>
+<li>At 4: first Crew Morale tick each scene is free (auto-tick) until anchored rest.</li>
+</ul>
+<p><strong>All-Hands!</strong> Clear one Watch Fatigue tick at end of crisis if food &amp; hot drink are served (Purser test).</p>
+
+<h4>Berths &amp; Overmanning</h4>
+<p>If crew aboard exceeds Rec by 25%+, mark <strong>Cramped Berths [4]</strong>. At 2: +1 Crew Morale tick on any failure; at 4: disease check (Surgeon test) or Harm 1 to random hands.</p>
+
+<h3 id="ch6-3">Leadership Challenges and Mutiny</h3>
+<h4>The Grievance Engine</h4>
+<p>Track three timers that point at trouble:</p>
+<ul>
+<li><strong>Late Shares [4]</strong> — unpaid prize, dockside "adjustments," missing wages.</li>
+<li><strong>Hard Usage [4]</strong> — cruel orders, needless risks, taboos broken.</li>
+<li><strong>Bad Stores [4]</strong> — foul water, weevils, short rations.</li>
+</ul>
+<p>When any two fill, start the <strong>Mutiny Timer [6]</strong>. While it runs, Command actions are −1 die unless supported by Purser/Surgeon/Chaplain.</p>
+
+<h4>How Grievances Tick</h4>
+<table>
+<thead><tr><th>Event</th><th>Tick</th></tr></thead>
+<tbody>
+<tr><td>Short Rations (Upkeep 0)</td><td>Bad Stores +1; if repeated next leg, +2.</td></tr>
+<tr><td>Broken Promise / Lie Caught</td><td>Hard Usage +1–2.</td></tr>
+<tr><td>Seized Prize "for the Admiralty"</td><td>Late Shares +2 unless compensated (1–2 Cred).</td></tr>
+<tr><td>Taboo Violation (see Traditions)</td><td>Hard Usage +1; GM gains 1 SB.</td></tr>
+<tr><td>Cruel Punishment</td><td>Hard Usage +2; immediate Address the Crew test or Mutiny +1.</td></tr>
+</tbody>
+</table>
+
+<h4>Crisis Procedures</h4>
+<p><strong>Address the Crew.</strong> Presence + Command; success lowers one Grievance by 1 and pauses Mutiny this scene. Bring proof, prize shares, or apologies for +1 die.</p>
+<p><strong>Distribute Shares.</strong> Spend 1–2 Cred to clear Late Shares entirely; also clear 1 Crew Morale mark.</p>
+<p><strong>Call the Hands (Duel or Vote).</strong> Courtesy duel with the spokesman (Duel/Etiquette/Melee). Win: Mutiny −2. Lose: Mutiny +2 and choose — step down, make restitution, or fight on deck (Desperate).</p>
+
+<h4>Mutiny Resolution</h4>
+<p>When Mutiny [6] fills, resolve as a scene: PCs may parley, duel, bribe, or split the company. On a clean success, choose two:</p>
+<ul>
+<li>Clear one Grievance entirely.</li>
+<li>Promote a loyal petty officer (create a Face or Bosun with Seasoned CQ).</li>
+<li>Keep the ship intact; otherwise Rigging +1 and Crew Morale resets to 2 ticks.</li>
+</ul>
+
+<h3 id="ch6-4">Training and Advancement</h3>
+<h4>Drills (Downtime Projects)</h4>
+<p>Choose a drill; each requires a 4-segment timer per CQ band you aim to affect (Green→Seasoned = 4, to Veteran = 8, to Elite = 12). Pay 1 Cred per segment or run scenes to mark.</p>
+<table>
+<thead><tr><th>Drill</th><th>Mechanical Benefit</th></tr></thead>
+<tbody>
+<tr><td>Damage Control</td><td>First Fire or Hull mark each battle is reduced by 1 (min 0).</td></tr>
+<tr><td>Silent Running</td><td>+1 die to Drift; on failure, reduce Patrol Net ticks by 1.</td></tr>
+<tr><td>Boarding School</td><td>+1 die on Cross/Secure; on crit, also mark enemy Crew Morale +1.</td></tr>
+<tr><td>Gunnery Cadence</td><td>First volley each battle +1 Effect; on mishap, downgrade to complication not damage.</td></tr>
+<tr><td>Storm Work</td><td>In squalls, Range changes are not auto-Desperate; treat as Controlled.</td></tr>
+<tr><td>Ritual Chorus</td><td>Shipboard rites roll one extra help die if 4+ crew chant; backlash −1 mark to Morale (not Integrity).</td></tr>
+</tbody>
+</table>
+
+<h4>Petty Officers (Advance the Tree)</h4>
+<p>Promote named NPCs into PO slots (Bosun's Mate, Master Gunner, Sailing Master, Surgeon's Mate). Each PO grants a once-per-scene assist die to their station and can take Address the Hands at +1 die.</p>
+
+<h4>Skill Badges (Crew Perks)</h4>
+<p>Award up to two badges to a crew per arc:</p>
+<ul>
+<li><strong>Topmen:</strong> +1 die to reef/rig at height; ignore first Cross Chop penalty.</li>
+<li><strong>Powder Monkeys:</strong> Guns reloads ignore one RELOAD step each round, once per scene.</li>
+<li><strong>Prize Crew:</strong> Can crew a captured hull at Green CQ without ticking Wear &amp; Salt on departure.</li>
+</ul>
+
+<h3 id="ch6-5">Followers and Retainers at Sea</h3>
+<h4>Hiring Specialists (per Leg Unless Noted)</h4>
+<table>
+<thead><tr><th>Specialist</th><th>Cost</th><th>Benefit</th></tr></thead>
+<tbody>
+<tr><td>Dolmis Pilot</td><td>2 Cred</td><td>+1 die Navigation in Narrows; once per leg ignore one reef hazard on a success.</td></tr>
+<tr><td>Linns Dock Fixer</td><td>1 Cred</td><td>One checkpoint per score: avoid full inspection; then tick Audit entanglement.</td></tr>
+<tr><td>Oshiira Signal Officer</td><td>2 Cred</td><td>Lantern phrase advantage: +1 die to Papers/Signals; once per leg negate a code-change SB.</td></tr>
+<tr><td>Ykrul Bosun-At-Arms</td><td>2 Cred</td><td>Boarding parties roll +1 die; on victory, enemy Crew Morale +1 from terror.</td></tr>
+<tr><td>Ashaan Corsair Guide</td><td>2 Cred</td><td>REED-WIND SAILS synergy: on 10 during Tailwind, a free band.</td></tr>
+<tr><td>Ship's Mage (Licensed)</td><td>3 Cred</td><td>+1 die to sea rites; legal cover against Seizure Court for ritual fittings.</td></tr>
+<tr><td>Chirurgeon / Cantor</td><td>2 Cred</td><td>Treat one Harm level per leg; once per leg clear 1 Crew Morale tick with sermon/salve.</td></tr>
+<tr><td>Quartermaster (Master Purser)</td><td>2 Cred</td><td>Upkeep "Fair Shares" counts as Prize Money for Standing with Linns.</td></tr>
+</tbody>
+</table>
+
+<h4>Loyalty &amp; Casualties</h4>
+<p>Track each named follower with Loyalty [4]. Mark on broken promises or danger without shares; clear on payday, rescues, or public praise. If a specialist is targeted in a scene, allow a save: Body/Spirit + relevant Skill; failure risks Harm or loss (replace at next port for +1 Cred premium).</p>
+
+<h3 id="ch6-6">Naval Traditions and Superstitions</h3>
+<h4>Taboos &amp; Favors of the Sea (d10)</h4>
+<p>Break a taboo: GM gains 1 SB and may tick a Grievance. Keep a favor: take its boon once per voyage.</p>
+<table>
+<thead><tr><th>#</th><th>Tradition &amp; Mechanical Hook</th></tr></thead>
+<tbody>
+<tr><td>1</td><td><strong>Coin Under the Mast.</strong> First Hull mark each voyage is reduced by 1 (min 0).</td></tr>
+<tr><td>2</td><td><strong>Bell at Dawn.</strong> The first Pilot test after sunrise gains +1 die.</td></tr>
+<tr><td>3</td><td><strong>No Whistling Aloft.</strong> If broken in a scene, headwinds arrive: Position −1 for Range changes this round.</td></tr>
+<tr><td>4</td><td><strong>Name the Wind.</strong> Speak its true name before a run: once per leg, turn Desperate → Dominant for a Range change.</td></tr>
+<tr><td>5</td><td><strong>Red Thread on the Tiller.</strong> Resist fear: one Presence + Command save at +1 die per leg.</td></tr>
+<tr><td>6</td><td><strong>Salt on the Threshold.</strong> The first boarding attempt against you is −1 die.</td></tr>
+<tr><td>7</td><td><strong>Lantern for the Lost.</strong> Light it at fog's edge: +1 Position to stealth this scene; forget, and Spirit Buoy pings you.</td></tr>
+<tr><td>8</td><td><strong>No Renaming at Sea.</strong> Rename and sail off: GM may immediately tick Wear &amp; Salt +1 and Papers Scrutiny +1.</td></tr>
+<tr><td>9</td><td><strong>Fish for the Figurehead.</strong> Cast an offering before reef water: next reef hazard you face is downgraded one step.</td></tr>
+<tr><td>10</td><td><strong>Keep a Cat.</strong> Once per voyage, cancel a vermin/disease complication; harm to the cat: Crew Morale +1.</td></tr>
+</tbody>
+</table>
+
+<h3 id="ch6-7">Quick Crew Creation (Table Procedure)</h3>
+<ol>
+<li><strong>Pick Crew Quality:</strong> Green / Seasoned / Veteran (start) / Elite (rare).</li>
+<li><strong>Name 3–5 NPCs:</strong> assign Core Roles; note one quirk each.</li>
+<li><strong>Select One Drill:</strong> start its timer at 2/4 if Veteran CQ.</li>
+<li><strong>Choose One Tradition:</strong> gain its boon; write its taboo.</li>
+<li><strong>Set Upkeep Plan:</strong> Fair Shares / Prize Money / Short Rations.</li>
+</ol>
+
+<div class="panel panel-gold">
+<strong>GM Tip: Crew Are Levers.</strong>
+<p class="mt-1">Put faces on hands. Let promotions, funerals, weddings, and shore-leave calendars change Position and timers. When players invest in people, the sea can be cruel without feeling petty.</p>
+</div>
+
+</div>
+<div class="chapter-block">
+<h2 id="ch7">7. The Heist Engine (Expanded)</h2>
+<p class="lead">A sea score is a moving target: tide tables, code lamps, pilots, and pylon-chains. This chapter gives a fast, repeatable score loop tuned for blockade-running, theft, swaps, extractions, and covert convoys. Use Position/Effect, Story Beats (SB), and Timers. Ship and gear TAGS justify bonuses and permissions.</p>
+
+<h3 id="ch7-1">Sea Score Structure</h3>
+<h4>Phases at a Glance</h4>
+<ol>
+<li><strong>Intel &amp; Setup</strong> — learn lanes, codes, and watches; pick an Approach Vector. Create/advance Intel Timers.</li>
+<li><strong>Engagement</strong> — one roll sets the opening Position for the score.</li>
+<li><strong>On-the-Water</strong> — theater movement legs toward the target; hazards, patrols, and Vector Windows.</li>
+<li><strong>Checkpoint</strong> — paperwork, parley, or cutout; papers versus scrutiny.</li>
+<li><strong>Objective</strong> — steal, swap, extract, signal, or sink.</li>
+<li><strong>Exfiltration</strong> — break contact, melt into convoy, or hide in eel-cuts.</li>
+<li><strong>Payoff &amp; Heat</strong> — Cred, Standing, Awareness, and entanglements.</li>
+</ol>
+
+<div class="panel panel-blue">
+<strong>One-Roll Engagement.</strong>
+<p class="mt-1">Roll Wits + Plan Skill (see Approach Table). A 10 counts as two successes. 0–1: Desperate, 2–3: Controlled, 4+: Dominant. <em>Plan Skill examples:</em> Stealth (Drift), Con (Etiquette/Deception), Force (Command), Occult (Arcana/Lore), Diplomatic (Etiquette/Sway).</p>
+</div>
+
+<h3 id="ch7-2">Planning and Approach Vectors</h3>
+<h4>Approach Types (Choose One)</h4>
+<table>
+<thead><tr><th>Approach</th><th>Plan Skill</th><th>Opening Detail (choose one)</th></tr></thead>
+<tbody>
+<tr><td><strong>Stealth</strong></td><td>Lore + Drift</td><td>Dark Drift, Fog Veil, Silent Oars, Masked Sail.</td></tr>
+<tr><td><strong>Con / Papers</strong></td><td>Etiquette + Lore/Craft</td><td>Lantern Phrase, Pilot's Knot, Convoy Slot, Cutout.</td></tr>
+<tr><td><strong>Force</strong></td><td>Command + Gunnery</td><td>Chain-Shot Slash, Ram and Grapple, Shock Volley.</td></tr>
+<tr><td><strong>Occult</strong></td><td>Arcana/Lore</td><td>Veil the Wake, Break the Lantern, Borrowed Wind.</td></tr>
+<tr><td><strong>Diplomatic</strong></td><td>Sway + Etiquette</td><td>Courtesy Duel, Flag of Truce, Pilot Mediation.</td></tr>
+</tbody>
+</table>
+
+<h4>Vector Menu (Stack Up to Two)</h4>
+<ul>
+<li><strong>Lantern Gate</strong> — pass as authorized traffic (needs codes/escort).</li>
+<li><strong>Reef Cuts</strong> — eel-charts, kedging, and shallow draft; risks reefs.</li>
+<li><strong>Under-Keel Route</strong> — tides and kedges; low wake; risks grounding.</li>
+<li><strong>False Ensign</strong> — silhouette + flags; risks Challenge &amp; Response.</li>
+<li><strong>Ghost Convoy</strong> — hide inside legal traffic; risks betrayal.</li>
+<li><strong>Storm Screen</strong> — squall as cover; risks rigging damage.</li>
+</ul>
+
+<h4>Intel Timers (4–6 Each, Pick What Matters)</h4>
+<table>
+<thead><tr><th>Clock</th><th>Benefit on Fill</th></tr></thead>
+<tbody>
+<tr><td>Lantern Cycle [4]</td><td>Know when phrases rotate; +1 die on Papers tests.</td></tr>
+<tr><td>Patrol Net [6]</td><td>Current patrol pattern; first patrol encounter starts at Dominant.</td></tr>
+<tr><td>Boom Map [4]</td><td>Exact boom-chain locations; once per score, ignore a boom barrier.</td></tr>
+<tr><td>Pilot List [4]</td><td>Meet a friendly pilot; one free Vector Window tick.</td></tr>
+<tr><td>Harbor Graft [6]</td><td>Two bribe tiers prepaid; reduce Papers Scrutiny by 2 total.</td></tr>
+</tbody>
+</table>
+
+<h3 id="ch7-3">Inside/Outside Team Coordination</h3>
+<table>
+<thead><tr><th>Team</th><th>Typical Tasks</th></tr></thead>
+<tbody>
+<tr><td><strong>Outside (Sea)</strong></td><td>Run the vector, spoof signals, time the window, cut booms, jam buoys, gunnery cover, tow.</td></tr>
+<tr><td><strong>Inside (Harbor/Target)</strong></td><td>Papers, bribes, sabotage, crate swap, prisoner escort, pilot liaison, lantern tower misdirection.</td></tr>
+</tbody>
+</table>
+
+<h4>Vector Windows [4]</h4>
+<p>A shared timing timer. Each leg or meaningful delay marks +1. On 3+, checkpoints go to Controlled. At 4, the window closes — shift to Desperate until you create a new window (signal, diversion, storm).</p>
+
+<h4>Coordination Actions</h4>
+<ul>
+<li><strong>Signal Sync</strong> (Presence + Etiquette): align lamps/flags; on success, clear 1 from Vector Windows.</li>
+<li><strong>Diversion</strong> (Gunnery/Deception/Occult): spawn a false contact; impose −1 die to enemy search this scene.</li>
+<li><strong>Tow &amp; Drift</strong> (Athletics + Lore): hold a passive hull in wake at Near without a wake trail.</li>
+</ul>
+
+<div class="panel panel-purple">
+<strong>Flashbacks at Sea.</strong>
+<p class="mt-1">Pay 0–2 SB (or 0–2 Stress, if you use that module) to reveal preparations: cached lanterns, an inside badge, a scribed boom map. Hard, risky flashbacks may also tick Blockade Awareness +1.</p>
+</div>
+
+<h3 id="ch7-4">Checkpoint Navigation and Papers</h3>
+<h4>Three-Layer Check</h4>
+<ol>
+<li><strong>Gate Story</strong> — who are you? (Presence + Etiquette/Sway)</li>
+<li><strong>Paper Hands</strong> — are the forms right? (Wits + Lore/Craft)</li>
+<li><strong>Keel &amp; Lantern</strong> — do the hull and code match? (Survey/Craft; mystic scan vs. Spirit Mask)</li>
+</ol>
+<p>Each failure ticks <strong>Papers Scrutiny [6]</strong>. At 3+: escorted inspection. At 6: seizure court or duel.</p>
+
+<h4>Cutouts &amp; Bribe Tiers</h4>
+<table>
+<thead><tr><th>Option</th><th>Cost</th><th>Effect</th></tr></thead>
+<tbody>
+<tr><td>Linns Dock Fixer</td><td>1 Cred</td><td>Skip one layer this checkpoint; start an Audit entanglement.</td></tr>
+<tr><td>Pilot's Word</td><td>Favor</td><td>−2 Papers Scrutiny this scene; owe the pilot later.</td></tr>
+<tr><td>Saffron Tab</td><td>1–2 Cred</td><td>Enter the convoy queue; −1 Position to surprise searches against you.</td></tr>
+</tbody>
+</table>
+
+<h4>Challenge &amp; Response (False Ensign)</h4>
+<p>If challenged, roll Presence + Etiquette to answer the hail with the correct code phrase and hull detail. Failing turns all subsequent checkpoint tests Dominant (for the inspector) and ticks Blockade Awareness +1.</p>
+
+<h3 id="ch7-5">Escalation and Complications</h3>
+<h4>SB Spend Menu (Naval Scores)</h4>
+<table>
+<thead><tr><th>SB</th><th>Escalation</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>Headwind, +1 to any one ship timer (Rigging/Hull/Fire or Vector Windows).</td></tr>
+<tr><td>2</td><td>Picket cuts in at Far; or Papers Scrutiny +1.</td></tr>
+<tr><td>3</td><td>Lantern phrase rotates early; or boom-chain drifts into the lane (Range change locked 1 round).</td></tr>
+<tr><td>4</td><td>Spirit Buoy pings you; patrol enters at Near with advantage; or Blockade Awareness +1.</td></tr>
+</tbody>
+</table>
+
+<h4>Complications (d12)</h4>
+<table>
+<thead><tr><th>#</th><th>Twist</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>Pilot token counterfeit; inside man panics.</td></tr>
+<tr><td>2</td><td>Boom winch jammed; requires at-sea repair under watchfire.</td></tr>
+<tr><td>3</td><td>Spirit net across the eel-cut; needs Ward or sacrifice.</td></tr>
+<tr><td>4</td><td>Lantern tower replaced its crew; new officer loves procedure.</td></tr>
+<tr><td>5</td><td>Cargo stinks of contraband spice; dogs alert.</td></tr>
+<tr><td>6</td><td>Friendly convoy is bait; hidden interdictor behind fog.</td></tr>
+<tr><td>7</td><td>Rival smugglers mirror your codes; collisions of story.</td></tr>
+<tr><td>8</td><td>Weather window slams; cross chop makes boarding Dominant.</td></tr>
+<tr><td>9</td><td>Ghost ballast sings; occult backwash risks crew morale.</td></tr>
+<tr><td>10</td><td>Courtesy duel demanded by a junior; public.</td></tr>
+<tr><td>11</td><td>Harbormaster's nephew aboard; scandal risk.</td></tr>
+<tr><td>12</td><td>Prisoner knows you; shouts your alias.</td></tr>
+</tbody>
+</table>
+
+<div class="panel panel-orange">
+<strong>Fail Forward.</strong>
+<p class="mt-1">Checks that fail move the fiction: you pass, but with escorts; you enter, but at Dominant scrutiny; you get the crate, but Blockade Awareness +1. Don't stall — complicate.</p>
+</div>
+
+<h3 id="ch7-6">Payoff, Heat, and Entanglements</h3>
+<h4>Payoff (Cred)</h4>
+<table>
+<thead><tr><th>Score Type</th><th>Base Pay</th></tr></thead>
+<tbody>
+<tr><td>Blockade Run (standard)</td><td>3 Cred; +1 if time-sensitive; +1 if bulk cargo; +1 if through Titan's Throat.</td></tr>
+<tr><td>Extraction / Prisoner</td><td>2 Cred; +1 if notable; +1 if unharmed; +1 if papers intact.</td></tr>
+<tr><td>Cargo Swap / Heist</td><td>3 Cred; +1 if high-value, +1 if undetected at departure, +1 if it framed a rival.</td></tr>
+<tr><td>Writ / Papers Job</td><td>2 Cred; +1 if permanent code access, +1 if Standing boost.</td></tr>
+</tbody>
+</table>
+<p>Fences, patrons, or Free Havens can add +1–2 on exceptional proof or favors.</p>
+
+<h4>Heat Tracks</h4>
+<table>
+<thead><tr><th>Track</th><th>When It Ticks</th></tr></thead>
+<tbody>
+<tr><td><strong>Blockade Awareness [8]</strong></td><td>Any public confrontation, code theft discovered, boom-cutter witnessed, occult trace. Thresholds: 4 — extra pickets on routes; 8 — named ship hunted.</td></tr>
+<tr><td><strong>Harbor Heat [6]</strong></td><td>Bribes, fights, thefts in port; at 6: Free Haven embargo or court summons.</td></tr>
+<tr><td><strong>Papers Scrutiny [6]</strong></td><td>Cumulative checkpoint issues; at 6: seizure court/duel.</td></tr>
+</tbody>
+</table>
+
+<h4>Entanglements (Roll 1d6 per Filled Track, Pick Highest)</h4>
+<table>
+<thead><tr><th>#</th><th>Result</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>Audit: produce records or pay 1 Cred per missing proof.</td></tr>
+<tr><td>2</td><td>Snitch: a dockhand sells a route; Patrol Net +1.</td></tr>
+<tr><td>3</td><td>Blacklist: one faction's Standing −1 until a favor.</td></tr>
+<tr><td>4</td><td>Counter-Score: rivals move your marked cargo.</td></tr>
+<tr><td>5</td><td>Admiralty Notice: name your captain; duels/letters of marque in play.</td></tr>
+<tr><td>6</td><td>Seizure Court: show papers or forfeit 1 upgrade until cleared.</td></tr>
+</tbody>
+</table>
+
+<h3 id="ch7-7">Score Playbooks</h3>
+
+<h4>Break the Boom</h4>
+<ul>
+<li><strong>Objective:</strong> Open a lane through a boom-chain for one tide.</li>
+<li><strong>Key Timers:</strong> Boom Winch [4], Lantern Watch [6], Vector Windows [4].</li>
+<li><strong>Vectors:</strong> Reef Cuts + Ghost Convoy; or Storm Screen + Under-Keel.</li>
+<li><strong>Inside Team:</strong> Lantern tower misdirection, bribe the winch crew, salt the spirit buoy.</li>
+<li><strong>Outside Team:</strong> Kedging under the chain, firepots on a decoy hull.</li>
+<li><strong>Payoff:</strong> 3–5 Cred + Standing with smugglers; Blockade Awareness +1–2.</li>
+</ul>
+
+<h4>The Crate That Wasn't</h4>
+<ul>
+<li><strong>Objective:</strong> Swap a bonded crate before inspection.</li>
+<li><strong>Key Timers:</strong> Harbor Graft [6], Papers Scrutiny [6], Vector Windows [4].</li>
+<li><strong>Vectors:</strong> Lantern Gate + Ghost Convoy.</li>
+<li><strong>Inside Team:</strong> Purser's office con; soul lantern to read seals; false-bottom mule.</li>
+<li><strong>Outside Team:</strong> Silent Oars to the under-pier; smoke mortar if burned.</li>
+<li><strong>Twist:</strong> The crate is warded to a name — needs Mirror's Truth or an equivalent.</li>
+<li><strong>Payoff:</strong> 3–4 Cred; +1 if it framed a rival manifest.</li>
+</ul>
+
+<h4>Lantern Tower Down</h4>
+<ul>
+<li><strong>Objective:</strong> Blind a checkpoint for one night.</li>
+<li><strong>Key Timers:</strong> Lantern Mechanism [6], Tower Garrison [4], Patrol Net [6].</li>
+<li><strong>Vectors:</strong> Con/Occult (Break the Lantern), or Force (take the tower).</li>
+<li><strong>Inside Team:</strong> Mechanism jam, codebook lift, or duel the lieutenant.</li>
+<li><strong>Outside Team:</strong> Screen with smoke, scorpions to suppress, tow a decoy.</li>
+<li><strong>Payoff:</strong> 2–3 Cred; Standing with rivals of the tower's faction.</li>
+</ul>
+
+<h4>Pull the Man</h4>
+<ul>
+<li><strong>Objective:</strong> Extract a prisoner from a convoy flagship.</li>
+<li><strong>Key Timers:</strong> Flag Watch [6], Brig Locks [4], Vector Windows [4].</li>
+<li><strong>Vectors:</strong> False Ensign + Diplomatic parley; or Storm Screen + Boarding.</li>
+<li><strong>Inside Team:</strong> Surgeon transfer ruse; pilot mediation; bribe the master-at-arms.</li>
+<li><strong>Outside Team:</strong> Chain-shot to the rigging if blown; harpoon tether for emergency tow.</li>
+<li><strong>Payoff:</strong> 2–4 Cred; +Standing with employer; Blockade Awareness +1.</li>
+</ul>
+
+<h4>Ghost Convoy</h4>
+<ul>
+<li><strong>Objective:</strong> Ride an authorized convoy to slip cargo and passengers.</li>
+<li><strong>Key Timers:</strong> Convoy Protocol [4], Papers Scrutiny [6], Rival Sniffers [6].</li>
+<li><strong>Vectors:</strong> Lantern Gate primary; fallback to Reef Cuts.</li>
+<li><strong>Inside Team:</strong> Etiquette at mess; prepare the captain's speech; manage rumors.</li>
+<li><strong>Outside Team:</strong> Drift at Near; cut wake when challenged; salt circle locker ready.</li>
+<li><strong>Payoff:</strong> 3–5 Cred; low Heat if clean, massive Heat if exposed.</li>
+</ul>
+
+<h3 id="ch7-8">Checklists &amp; Quick Procedure</h3>
+<h4>Player Heist Checklist</h4>
+<ol>
+<li>Name the Approach and pick up to two Vectors.</li>
+<li>Choose two Intel Timers to pursue (start each at 2/4 or 3/6 with prep).</li>
+<li>Assign Inside/Outside roles; start Vector Windows [4] at 1.</li>
+<li>Pick papers/cover story; list your bribe ceiling.</li>
+<li>State abort signal and rally point.</li>
+</ol>
+<h4>GM Heist Checklist</h4>
+<ol>
+<li>Set lane hazards (weather, boom, patrol). Name the checkpoint officer.</li>
+<li>Seed 2–3 Complications tied to factions on the route.</li>
+<li>Prep SB spends that make sense for this lane (see menu).</li>
+<li>Decide Payoff range, Heat tracks likely to tick, and one entanglement seed.</li>
+<li>Ask each PC for one memory, contact, or superstition that might help — those are Flashback hooks.</li>
+</ol>
+
+<div class="panel panel-gold">
+<strong>Tuning Difficulty.</strong>
+<p class="mt-1">Want a harsher bottle? Start Papers Scrutiny at 1–2, shorten the Weather Window, and give the checkpoint a named duelist. Gentler sea? Allow one free Cutout and start Vector Windows at 0.</p>
+</div>
+
+</div>
+<div class="chapter-block">
+<h2 id="ch8">8. Adventure Framework</h2>
+<p class="lead">This chapter turns the sea lanes, harbors, ruins, and deeps into repeatable procedures with flavorful tables. Use Position/Effect, Story Beats (SB), and Timers throughout; ship and gear TAGS justify bonuses.</p>
+
+<h3 id="ch8-1">Naval Travel and Random Encounters</h3>
+<h4>Travel Procedure (Per Sea Leg)</h4>
+<ol>
+<li><strong>Plot the Course.</strong> Choose a route across sea zones; each leg is a Travel Timer [4] (short) or [6] (long).</li>
+<li><strong>Assign Roles.</strong> Each PC (or PO/NPC) claims a travel role: Guide, Scout, Quartermaster, Watch.</li>
+<li><strong>Advance the Leg.</strong> Each watch, resolve one key action (Guide, Scout, etc.). On a success, mark the Travel Timer +1; on a critical, +2; on a failure, +0 and the GM spends SB or ticks a hazard timer.</li>
+<li><strong>Resolve the Turn.</strong> When the Travel Timer fills, arrive at the next zone and roll a Random Encounter if conditions warrant, then set the next leg.</li>
+</ol>
+
+<h4>Sea Zones (Amaranthine Theater)</h4>
+<table>
+<thead><tr><th>Zone</th><th>Features / Default Hazards</th></tr></thead>
+<tbody>
+<tr><td><strong>Free Havens</strong></td><td>Busy lanes, informants; Harbor Heat likely.</td></tr>
+<tr><td><strong>Boom Chains &amp; Pylons</strong></td><td>Lantern towers, code challenges, Papers Scrutiny.</td></tr>
+<tr><td><strong>Reef Cuts</strong></td><td>Shallow, shifting channels; Grounding/Keel risks.</td></tr>
+<tr><td><strong>Open Blue</strong></td><td>Weather-driven; long sightlines; patrol pickets at Far.</td></tr>
+<tr><td><strong>Dolmis Narrows</strong></td><td>Pilotage, cross-chop; collision hazards.</td></tr>
+<tr><td><strong>Ashaan Reeds</strong></td><td>Corsair activity, tailwinds; moral entanglements.</td></tr>
+</tbody>
+</table>
+
+<h4>Travel Roles</h4>
+<table>
+<thead><tr><th>Role</th><th>Responsibilities and Benefits</th></tr></thead>
+<tbody>
+<tr><td><strong>Guide</strong></td><td>Wits + Navigation to set course, read tides, dodge reefs. <em>On success:</em> −1 DV to navigation tests this leg.</td></tr>
+<tr><td><strong>Scout</strong></td><td>Notice/Survey to spot weather, pickets, shoals. <em>On success:</em> ignore the next GM SB spend this leg.</td></tr>
+<tr><td><strong>Quartermaster</strong></td><td>Lore/Trade/Craft to manage stores, repairs. <em>On success:</em> reduce Supplies by 1 (or clear a minor Rigging mark).</td></tr>
+<tr><td><strong>Watch</strong></td><td>Presence + Command or Lore to keep hands sharp. <em>On success:</em> next sea scene opens at Dominant.</td></tr>
+</tbody>
+</table>
+
+<h4>Travel Timers (Campaign Scale)</h4>
+<ul>
+<li><strong>Supplies [6]</strong> — food, water, pitch, powder. At 6: Short Rations penalty until resupply.</li>
+<li><strong>Weather Window [6]</strong> — favorable run of days. At 6: window closes; all Range changes −1 Position until it resets (storm breaks or harbor layover).</li>
+<li><strong>Patrol Net [8]</strong> — detection pressure along the route. 4: pickets at Near instead of Far; 8: named hunter joins the leg.</li>
+<li><strong>Ship Integrity [6]</strong> — creeping wear. 2: Dash −1 die; 4: first Range change each battle is Controlled; 6: start sea scenes at −1 Position (clear in dock).</li>
+</ul>
+
+<h4>Random Encounters (d12)</h4>
+<table>
+<thead><tr><th>#</th><th>Encounter (Prompt &amp; Hook)</th></tr></thead>
+<tbody>
+<tr><td>1</td><td><strong>Friendly Vessel</strong> — News-of-the-sea, rumor swap, or convoy invite.</td></tr>
+<tr><td>2</td><td><strong>Distress Signal</strong> — Flare, bell, or torn lantern code; rescue vs. trap.</td></tr>
+<tr><td>3</td><td><strong>Weather Hazard</strong> — Squall wall, fog bank, heat-still; adjust Position.</td></tr>
+<tr><td>4</td><td><strong>Patrol Encounter</strong> — Picket at Far; hail &amp; code, or shadow &amp; evade.</td></tr>
+<tr><td>5</td><td><strong>Floating Debris</strong> — Wreck boards, spice casks, shrine flotsam (omen?).</td></tr>
+<tr><td>6</td><td><strong>Island Sighting</strong> — Cistern cove, eel-cut camp, or shrine on the head.</td></tr>
+<tr><td>7</td><td><strong>Sea Creature</strong> — Curious leviathan, whale-mother, or hungry thing.</td></tr>
+<tr><td>8</td><td><strong>Derelict</strong> — Crew gone; papers intact? Ghost ballast sings at night.</td></tr>
+<tr><td>9</td><td><strong>Fishing Fleet</strong> — Linns kin boats; trade fresh water for salt pork.</td></tr>
+<tr><td>10</td><td><strong>Religious Vessel</strong> — Temple barge, vow convoy; etiquette challenge.</td></tr>
+<tr><td>11</td><td><strong>Smuggler Contact</strong> — Hand signals to a cutout pier; favor for a favor.</td></tr>
+<tr><td>12</td><td><strong>Mysterious Light</strong> — Lanterns walking on the water or star-fall.</td></tr>
+</tbody>
+</table>
+
+<div class="panel panel-mist">
+<strong>Travel Pacing.</strong>
+<p class="mt-1">Long crossings: string 2–3 legs; roll one encounter per leg at Controlled/Desperate Weather or high Patrol Net. Quiet seas: only on 6+ on 1d6.</p>
+</div>
+
+<h3 id="ch8-2">Dockside Intrigue and Harbor Adventures</h3>
+<h4>Harbor Zones</h4>
+<ul>
+<li><strong>The Docks</strong> — stevedores, cranes, cargo sheds, night-watch lamps.</li>
+<li><strong>The Underbelly</strong> — taverns, dens, forgery rooms, ropewalk gossip.</li>
+<li><strong>The Markets</strong> — chandlers, spice brokers, scrimshaw stalls, fences.</li>
+<li><strong>The Administration</strong> — customs house, seizure court, pilotage guild.</li>
+<li><strong>The Yards</strong> — slipways, caulk fires, mast stores, salvage rows.</li>
+</ul>
+
+<h4>Harbor Actions (Freeplay Procedures)</h4>
+<table>
+<thead><tr><th>Action</th><th>Mechanical Hook</th></tr></thead>
+<tbody>
+<tr><td><strong>Information Sweep</strong></td><td>Wits + Notice/Sway; on success gain +1 die to next harbor move or start Harbor Graft [6] at 2/6.</td></tr>
+<tr><td><strong>Paper Shop</strong></td><td>Craft/Lore; forge/validate; on crit clear 2 from Papers Scrutiny.</td></tr>
+<tr><td><strong>Crew Shore Leave</strong></td><td>Presence + Command vs. Crew Morale; clear 1–2 ticks or attract a Complication.</td></tr>
+<tr><td><strong>Fix &amp; Fit</strong></td><td>Craft; remove one Hull/Rigging/Fire mark; on failure tick Audit.</td></tr>
+<tr><td><strong>Broker's Table</strong></td><td>Trade/Etiquette; set Payoff terms (+1 Cred ceiling) or reduce Harbor Heat by 1.</td></tr>
+</tbody>
+</table>
+
+<h4>Harbor Complications (d10)</h4>
+<table>
+<thead><tr><th>#</th><th>Complication</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>Linns union strike stalls cranes; delays and hazard fees.</td></tr>
+<tr><td>2</td><td>Random inspection sweep; Papers Scrutiny +1.</td></tr>
+<tr><td>3</td><td>Rival crew posts watchers; rumor duel in taverns.</td></tr>
+<tr><td>4</td><td>Papers expire at dawn; midnight run to the scribe.</td></tr>
+<tr><td>5</td><td>Crewman jailed; bail or exchange at the pilot's dock.</td></tr>
+<tr><td>6</td><td>Storm damage claim contested; court favors locals.</td></tr>
+<tr><td>7</td><td>Stowaway discovered; wants sanctuary or to knife you.</td></tr>
+<tr><td>8</td><td>Harbormaster surcharge; pay or duel of signatures.</td></tr>
+<tr><td>9</td><td>Holy procession blocks the wharf; breach is a taboo.</td></tr>
+<tr><td>10</td><td>Quarantine flag rises; cargo spoils while you wait.</td></tr>
+</tbody>
+</table>
+
+<div class="panel panel-orange">
+<strong>Harbor Heat &amp; Faces.</strong>
+<p class="mt-1">When Harbor Heat hits 4+, give the port a Face (title, quirk, leverage). Let favors and slights flow through them.</p>
+</div>
+
+<h3 id="ch8-3">Underwater Exploration and Diving</h3>
+<h4>Depth Bands &amp; Effects</h4>
+<table>
+<thead><tr><th>Band</th><th>Approx. Depth</th><th>Mechanical Notes</th></tr></thead>
+<tbody>
+<tr><td><strong>Shallows</strong></td><td>0–10 m</td><td>No pressure penalty; swim freely; light good.</td></tr>
+<tr><td><strong>Below Light</strong></td><td>10–30 m</td><td>−1 die to unassisted actions; lanterns needed; silt clouds common.</td></tr>
+<tr><td><strong>Deep</strong></td><td>30–60 m</td><td>−1 Position; Pressure checks on exertion; air use doubles.</td></tr>
+<tr><td><strong>Abyssal</strong></td><td>60 m+</td><td>Actions Desperate; special gear/rites; monsters and myths.</td></tr>
+</tbody>
+</table>
+
+<h4>Diving Kit &amp; TAGS</h4>
+<table>
+<thead><tr><th>Item</th><th>Tags / Mechanics</th></tr></thead>
+<tbody>
+<tr><td>Diving Helm &amp; Hose</td><td><span class="tag">AIRFEED</span><span class="tag">HEAVY</span>; tether to pump; on cut: Air Timer [4] starts.</td></tr>
+<tr><td>Lead Weights</td><td><span class="tag">STABILITY</span>; ignore first current shove each scene.</td></tr>
+<tr><td>Air Bladder</td><td><span class="tag">SPARE AIR</span>; clear 2 from Air Timer once per scene.</td></tr>
+<tr><td>Weighted Line</td><td><span class="tag">GUIDE</span>; +1 die to Navigate/Ascend.</td></tr>
+<tr><td>Harpoon Gun</td><td><span class="tag">TETHER</span><span class="tag">UNDERWATER</span>; Near range; on hit: drag contest.</td></tr>
+<tr><td>Soul Lantern (sea)</td><td><span class="tag">REVEAL</span>; shows currents/spirits; +1 die vs. Drowned.</td></tr>
+</tbody>
+</table>
+
+<h4>Underwater Procedure</h4>
+<ol>
+<li><strong>Set Depth Band</strong> and Air Timer [4]. Each scene below Below Light ticks 1; exertion ticks +1.</li>
+<li><strong>Establish Visibility</strong> (clear / silt / night) and currents (still / drift / run).</li>
+<li><strong>Run Tasks</strong> (Search, Salvage, Navigate, Combat). Search = Notice+Lore, Salvage = Athletics+Craft.</li>
+<li><strong>Ascend &amp; Decompress.</strong> If Air Timer empties or you sprint to the surface, test Body+Medicine (or Cant) or mark Bends [4] (penalty timer).</li>
+</ol>
+
+<h4>Underwater Hazards (d8)</h4>
+<table>
+<thead><tr><th>#</th><th>Hazard</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>Ripping Current: shove 1–2 zones; lose line if you fail.</td></tr>
+<tr><td>2</td><td>Predator: reef-shark, moray coil, or hunting shadow.</td></tr>
+<tr><td>3</td><td>Entanglement: nets, kelp, chain; cut/test or share air.</td></tr>
+<tr><td>4</td><td>Kit Failure: hose nick, lens crack, pump jam.</td></tr>
+<tr><td>5</td><td>Silt Cloud: zero vis; Navigation at −1 die until it settles.</td></tr>
+<tr><td>6</td><td>Pressure Creep: mark Bends +1 on exertion.</td></tr>
+<tr><td>7</td><td>Cave Mouth: air pockets, false floors, hungry echo.</td></tr>
+<tr><td>8</td><td>Supernatural: drowned choir, warded gates, waking statue.</td></tr>
+</tbody>
+</table>
+
+<h4>Salvage &amp; Ruin Tasks</h4>
+<table>
+<thead><tr><th>Task</th><th>Mechanical Hook</th></tr></thead>
+<tbody>
+<tr><td>Tag &amp; Lift</td><td>Craft; on success, create Lift Timer [4]; fill to surface a crate/hull fragment.</td></tr>
+<tr><td>Map the Site</td><td>Wits + Lore/Notice; fill Site Map [4] for +1 die to future dives here.</td></tr>
+<tr><td>Ward-Break</td><td>Arcana; on fail, Air Timer +1 and spirit attention.</td></tr>
+</tbody>
+</table>
+
+<h3 id="ch8-4">Island Exploration and Ruins</h3>
+<h4>Island Types &amp; Features</h4>
+<table>
+<thead><tr><th>Type</th><th>Prompts</th></tr></thead>
+<tbody>
+<tr><td><strong>Volcanic</strong></td><td>Springs, glass fields, ash winds, fumaroles, mineral veins.</td></tr>
+<tr><td><strong>Coral</strong></td><td>Reef maze, cistern caves, bright markets, sacred lagoons.</td></tr>
+<tr><td><strong>Rocky</strong></td><td>Cliffs, blowholes, ledge paths, rookery shelves, stormwatch.</td></tr>
+<tr><td><strong>Sandy</strong></td><td>Dunes, turtle beaches, shifting bars, mirage flats.</td></tr>
+<tr><td><strong>Jungle</strong></td><td>Canopy walks, ruin-temples, fever swales, apothecary groves.</td></tr>
+<tr><td><strong>Ice</strong></td><td>Blue caves, crevasse bridges, preserved wrecks, white squalls.</td></tr>
+</tbody>
+</table>
+
+<h4>Island Crawl (Hex/Point Procedure)</h4>
+<ol>
+<li><strong>Frame the Objective</strong> (water, herb, ruin, beacon).</li>
+<li><strong>Set an Island Timer [6]</strong> (heat, storm, patrol return).</li>
+<li><strong>Each Move:</strong> one lead action (Scout/Guide/Lore). On success, progress; on failure, mark the Island Timer or roll a table.</li>
+<li><strong>Ruin Dive:</strong> switch to Ruin Timer [6] with Find/Bypass/Endure/Loot beats.</li>
+</ol>
+
+<h4>Volcanic Island (d8)</h4>
+<table>
+<thead><tr><th>#</th><th>Encounter</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>Healing Spring vs. choking steam (test Spirit or Body).</td></tr>
+<tr><td>2</td><td>Lava Tongue cuts the path; leap or detour.</td></tr>
+<tr><td>3</td><td>Steam Vent erupts; visibility zero, scald risk.</td></tr>
+<tr><td>4</td><td>Vein of Amberglass; sharp, valuable, cursed?</td></tr>
+<tr><td>5</td><td>Cave System to sea; tides make timing critical.</td></tr>
+<tr><td>6</td><td>Obsidian Blades shrine; taboo &amp; gift.</td></tr>
+<tr><td>7</td><td>Ash Storm; −1 Position and disease risk.</td></tr>
+<tr><td>8</td><td>Observatory ruin; stellar map puzzle.</td></tr>
+</tbody>
+</table>
+
+<h4>Jungle Island (d8)</h4>
+<table>
+<thead><tr><th>#</th><th>Encounter</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>Poison Thicket; craft antidote or mark Harm 1.</td></tr>
+<tr><td>2</td><td>Apex Stalker hunts the slowest.</td></tr>
+<tr><td>3</td><td>Hidden Kin; parley, trade, or trespass.</td></tr>
+<tr><td>4</td><td>Spring guarded by a spirit contract.</td></tr>
+<tr><td>5</td><td>Quicksand runnels; rope or sacrifice.</td></tr>
+<tr><td>6</td><td>Temple swallowed by roots; singing stones.</td></tr>
+<tr><td>7</td><td>Fever Gnats; Malaria Timer [4].</td></tr>
+<tr><td>8</td><td>Apothecary Grove; rare remedy tags.</td></tr>
+</tbody>
+</table>
+
+<h3 id="ch8-5">Naval Battles and Fleet Actions</h3>
+<h4>Fleet Composition (Toolbox)</h4>
+<table>
+<thead><tr><th>Element</th><th>Typical #</th><th>Role</th><th>Notes</th></tr></thead>
+<tbody>
+<tr><td>Flagship</td><td>1</td><td>Command</td><td>Signal focus; Command Dice source.</td></tr>
+<tr><td>Warships</td><td>2–6</td><td>Strike</td><td>Frigates/corvettes; main gunnery.</td></tr>
+<tr><td>Scouts</td><td>2–3</td><td>Recon</td><td>Sloops/cutters; screens &amp; flanks.</td></tr>
+<tr><td>Support</td><td>1–3</td><td>Sustain</td><td>Tenders, repair hulks, surgeons.</td></tr>
+<tr><td>Transports</td><td>0–4</td><td>Payload</td><td>Troops, diplomats, treasure.</td></tr>
+</tbody>
+</table>
+
+<h4>Command Dice &amp; Wings</h4>
+<ul>
+<li><strong>Command Dice Pool</strong> = Admiral's Presence+Command (min 2, max 6).</li>
+<li>Split fleet into Wings (Van, Center, Rear). Each Wing has a Wing Timer [4] (cohesion). On severe hits or mis-signals, tick. At 4: Wing breaks (Controlled-only actions until rallied).</li>
+<li>Each round, spend Command Dice to issue Orders to Wings (one die per Order).</li>
+</ul>
+
+<h4>Order Menu (per Wing)</h4>
+<table>
+<thead><tr><th>Order</th><th>Mechanical Effect</th></tr></thead>
+<tbody>
+<tr><td>Line Ahead</td><td>Gunnery +1 die this round; Range changes −1 die.</td></tr>
+<tr><td>Cross the T</td><td>Opposed Maneuver; on win, enemy Wing suffers −1 Position and takes a Rigging mark.</td></tr>
+<tr><td>Concentrate Fire</td><td>Choose one enemy hull: +1 Effect to all attacks from this Wing.</td></tr>
+<tr><td>Screen &amp; Scout</td><td>Detect ambush; first enemy volley −1 Effect; your Scouts may flank.</td></tr>
+<tr><td>Boarding Signal</td><td>Boarders +1 die; enemy Crew Morale +1 on your success.</td></tr>
+<tr><td>Disengage</td><td>Attempt to break contact; on success shift one band for the whole Wing.</td></tr>
+</tbody>
+</table>
+
+<h4>Fleet Turn Structure</h4>
+<ol>
+<li><strong>Initial Positioning</strong> — set Range bands for Wings and weather.</li>
+<li><strong>Command Phase</strong> — allocate Command Dice to Orders; test signals (Etiquette+Presence) if under stress.</li>
+<li><strong>Movement Phase</strong> — resolve Range shifts and maneuvers (Pilot/Navigation).</li>
+<li><strong>Combat Phase</strong> — resolve Wing attacks/boarding; apply marks/timers.</li>
+<li><strong>Resolution Phase</strong> — tick Wing Timers, Crew Morale shifts, check surrender/strike-colors triggers.</li>
+</ol>
+
+<h4>Fleet Complications (d8)</h4>
+<table>
+<thead><tr><th>#</th><th>Complication</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>Signal book mix-up; Rear follows yesterday's code.</td></tr>
+<tr><td>2</td><td>Weather shears the line; Center loses wind.</td></tr>
+<tr><td>3</td><td>Powder barge low; volley cadence suffers.</td></tr>
+<tr><td>4</td><td>Crew refuse an order on one hull (mutiny spike).</td></tr>
+<tr><td>5</td><td>Rudder jam aboard a key escort.</td></tr>
+<tr><td>6</td><td>Enemy reinforcements at Far; a fresh Van arrives.</td></tr>
+<tr><td>7</td><td>Friendly fire in smoke; morale check on the stricken.</td></tr>
+<tr><td>8</td><td>Admiral wounded; Command Dice −2 until relieved.</td></tr>
+</tbody>
+</table>
+
+<div class="panel panel-mist">
+<strong>Scaling Naval Adventures.</strong>
+<p class="mt-1"><strong>Solo Sailor:</strong> One hull, sharp stakes, personal duels, tight timers. <strong>Small Crew:</strong> Two to four hull actions, detailed boarding, Heist Engine overlay. <strong>Fleet Command:</strong> Wings, Orders, and Command Dice; zoom in for pivotal boards and signal duels.</p>
+</div>
+
+</div>
+<div class="chapter-block">
+<h2 id="ch9">9. Campaign Frames</h2>
+<p class="lead">Four ways to sail the Amaranthine: topple a bottle, crown a flag, ride the ledger, or bend the sea to a Patron's will. Each frame supplies premise, timers, play structure, milestones, and endgames. Use earlier procedures (Heist Engine, Crew &amp; Leadership, Ships) as the core loop. Swap frames mid-campaign by advancing or collapsing frame timers.</p>
+
+<div class="panel panel-red">
+<strong>Content Note.</strong> This theater includes press-gangs, seizure courts, and Ashaani slaving operations. At Session Zero, set Lines/Veils/Themes; use safety tools (X-card, Script Change). Replace or reframe elements to suit your table.
+</div>
+
+<h3 id="ch9-1">Shared Campaign Procedures</h3>
+<h4>The Tide Turn (Campaign Phase)</h4>
+<p>At the end of each major score, voyage, or session:</p>
+<ol>
+<li><strong>Advance Global Timers</strong> relevant to your frame (see each frame).</li>
+<li><strong>Faction News.</strong> Roll or choose 1 Sea Event (below) and 1 Harbor Event in the active region.</li>
+<li><strong>Prices &amp; Papers.</strong> Adjust one route's tariffs or lantern phrases (Heist Engine: Lantern Cycle).</li>
+<li><strong>Standing Drift.</strong> For each faction you ignored while harming their interests, −1 Standing (min Hostile).</li>
+</ol>
+
+<h4>Sea / Harbor Events (d6 Each)</h4>
+<table>
+<thead><tr><th>#</th><th>Sea Event</th><th>#</th><th>Harbor Event</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>Storm season arrives early; Weather Window −1 on all legs.</td><td>1</td><td>Seizure Court backlog; Papers Scrutiny caps at 4 for a week.</td></tr>
+<tr><td>2</td><td>Spirit buoys re-tuned; occult scans +1 Effect.</td><td>2</td><td>Dockworker strike; loading costs +1 Cred, Heist gets +1 cover.</td></tr>
+<tr><td>3</td><td>Ykrul longboats raid west lanes; patrols shift.</td><td>3</td><td>Codebook leak; False Ensign easier (−1 DV) until patched.</td></tr>
+<tr><td>4</td><td>Ashaan corsairs push east; convoy density +1.</td><td>4</td><td>Admiralty inspection tour; random hails in-port.</td></tr>
+<tr><td>5</td><td>Whale migration; creature encounters +1 die to interact.</td><td>5</td><td>Festival week; etiquette at Dominant, theft Dominant (for thieves).</td></tr>
+<tr><td>6</td><td>Free Haven pact: one port grants Amnesty Night.</td><td>6</td><td>Rival smuggler killed; heat spills toward PCs (Harbor Heat +1).</td></tr>
+</tbody>
+</table>
+
+<p><strong>Victory &amp; Collapse.</strong> Each frame lists Victory Conditions. If a Collapse Trigger fills first, pivot the campaign: map fallout, carry reputation and enemies forward, and choose the next frame.</p>
+
+<h3 id="ch9-2">Break the Titan — The Blockade War</h3>
+<p><strong>Premise.</strong> Kahfagia's bottle strangles the Amaranthine. Oshiira passes; others pay or drown. You will open lanes — by code, coin, or cannon.</p>
+<p><strong>Who Thrives Here.</strong> Cutter crews, privateers, covert traders, pilots-in-exile, lantern-scribes.</p>
+<table>
+<thead><tr><th>Clock</th><th>Meaning / Thresholds</th></tr></thead>
+<tbody>
+<tr><td><strong>Blockade Awareness [8]</strong></td><td>4: extra pickets on two lanes; 6: named hunter squadron; 8: your hull named in notices.</td></tr>
+<tr><td><strong>Lantern Dominion [10]</strong></td><td>Strength of checkpoint network. 3: sloppy watches; 6: normal; 9+: double-inspections.</td></tr>
+<tr><td><strong>Free Haven Solidarity [6]</strong></td><td>Harbor pact power. 3+: one port offers Amnesty Night; 6: convoy immunity once.</td></tr>
+</tbody>
+</table>
+<p><strong>Signature Scores:</strong> Blind the Tower (Lantern Tower Down; reduce Lantern Dominion −2 for one Tide Turn), Break the Boom (open an eel-cut; grant all allies a free Range change), Steal the Cycle (swap Oshiira's lantern phrases; Papers at −1 DV for a week), Pilot Revolt (flip a Dolmis pilot house into a permanent friendly Pilot List contact).</p>
+<p><strong>Milestones (3 Acts):</strong> I — Find the Seams (complete any 2 signature scores; recruit a tower insider or boom crew chief). II — Bottle the Bottle (a synchronized two-vector score; survive the hunter squadron). III — The Titan's Heart (infiltrate HQ, publish proof of illegal seizures; Lantern Dominion −3, faction map shifts).</p>
+<p><strong>Victory:</strong> Lantern Dominion ≤ 4 and Free Haven Solidarity ≥ 4 for one Tide Turn. Lanes open; prices normalize; your crew gains a Letter of Marque or Pardon.<br>
+<strong>Collapse:</strong> Blockade Awareness hits 8 while Lantern Dominion ≥ 7: Wanted Fleet. Campaign pivots to Pirate Kings or an exile arc.</p>
+<p><strong>Endgame Set Pieces:</strong> Duel under the lantern lens (Seven Bell Court variant for naval etiquette); Night of Five Signals (miscode three towers in one hour); the Hunter's Run (a stern chase through reef cuts with chain-shot and spirit nets).</p>
+
+<h3 id="ch9-3">Merchant Princes — Trade Amid the Storm</h3>
+<p><strong>Premise.</strong> Profit under pressure. You build a legal(ish) network that bends tariffs, papers, and convoy politics without snapping them.</p>
+<p><strong>Who Thrives Here.</strong> Pursers, factors, diplomats, convoy escorts, forgery artists, quartermasters.</p>
+<table>
+<thead><tr><th>Track</th><th>Meaning / Thresholds</th></tr></thead>
+<tbody>
+<tr><td><strong>Merchant Network [10]</strong></td><td>Your routes, warehouses, and cutouts. 4: discount in one port; 7: cross-port credit; 10: private convoy.</td></tr>
+<tr><td><strong>Tariff Pressure [8]</strong></td><td>Taxes, seizures, graft. 4: random audits; 6: escort required; 8: embargo one port.</td></tr>
+<tr><td><strong>Reputation Ledger [8]</strong></td><td>Trust among shippers. 4+: priority cargo; 6+: exclusives; 8: set market price once.</td></tr>
+</tbody>
+</table>
+<p><strong>Signature Scores:</strong> The Crate That Wasn't (bonded swap in daylight; Merchant Network +1), Convoy Mastery (a ghost convoy arrives clean; Reputation +2 if no one burns), Letter Game (win a seizure court on paper alone; Tariff Pressure −2), Port of Call (invest in a Free Haven; unlock a permanent Broker's Table advantage).</p>
+<p><strong>Milestones:</strong> Secure three reliable buyers/sellers across different zones; establish bonded storage in two harbors and complete one Letter Game; run a Tri-Sea Chain (three cargos, three ports, one Tide Turn).</p>
+<p><strong>Victory:</strong> Merchant Network ≥ 8 and Reputation ≥ 6 while Tariff Pressure ≤ 4. You become a named house; choose privileges (private pilotage, tower vote, or bonded immunity once per arc).<br>
+<strong>Collapse:</strong> Tariff Pressure hits 8: embargo + court summons; pivot to Break the Titan or Patron's Fleet for political cover.</p>
+<p><strong>Endgame Set Pieces:</strong> The Auction at Low Tide (bid with secrets, not coin); the Quarantine Waltz (deliver perishables through three red-flag ports without touching a dock).</p>
+
+<h3 id="ch9-4">Pirate Kings — Crowns of Salt</h3>
+<p><strong>Premise.</strong> If the bottle will not open, drink from the throat. You claim islands, take prizes, and write law with iron and oaths.</p>
+<p><strong>Who Thrives Here.</strong> Boarding captains, terror bosuns (Ykrul allies), island governors, oathbinders, chaplains.</p>
+<table>
+<thead><tr><th>Clock</th><th>Meaning / Thresholds</th></tr></thead>
+<tbody>
+<tr><td><strong>Prize Ledger [10]</strong></td><td>Value of taken hulls. 5: hire veterans; 8: field a squadron; 10: claim a haven.</td></tr>
+<tr><td><strong>Oath Web [8]</strong></td><td>Vows with crews, clans, fixers. 4: call 1 allied cutter; 6: call a warship; 8: hold a moot.</td></tr>
+<tr><td><strong>Admiralty Fury [8]</strong></td><td>Retaliation level. 4: hunter captain; 6: squadron; 8: punitive expedition to your haven.</td></tr>
+</tbody>
+</table>
+<p><strong>Signature Scores:</strong> Strike Colors (capture a named warship; Prize Ledger +2, Admiralty Fury +1), Crown the Key (seize an island chokepoint, plant codes &amp; guns), Moot of Knives (bind Ykrul, Vilikari, and Linns captains to an accord — or betray it), Turn the Tide (force a tower to take your levy; Fury −1, Oath Web +1).</p>
+<p><strong>Haven Sheet (Upgrades).</strong> Choose two to start when you claim land: Hidden Dock (HIDDEN HOLD tag for haven), Guns on the Headland (+1 die to repel), Water Cisterns (Supplies ticks clear faster), Oath-Stone (binds treaties; +1 die to parley).</p>
+<p><strong>Victory:</strong> Hold a haven through one punitive expedition and maintain Oath Web ≥ 6. You are recognized (feared or honored); write a local law.<br>
+<strong>Collapse:</strong> Admiralty Fury hits 8 before Oath Web 6: sack and exile; pivot to Break the Titan (guerilla) or Merchant Princes (amnesty deal).</p>
+<p><strong>Endgame Set Pieces:</strong> The Night of Rope and Fire (simultaneous boards across a convoy); Storm Moot (treaty bound by thunder; break it and take backlash as oath harm).</p>
+
+<h3 id="ch9-5">Patron's Fleet — The Sea's Chosen</h3>
+<p><strong>Premise.</strong> A great power — Witness of Truth, Raéyn of Storms, Ikasha of Veils, or another — extends favor. You carry rites, omens, and obligations to reshape the lanes.</p>
+<p><strong>Who Thrives Here.</strong> Ritualists, chaplains, order-monks, oathwrights, vision-haunted pilots.</p>
+<table>
+<thead><tr><th>Element</th><th>Implementation</th></tr></thead>
+<tbody>
+<tr><td><strong>Devotion Timer [8]</strong></td><td>Marks service and piety. At 4: one rite discount (−1 Obligation) per Tide Turn; at 8: Patron Gift (ship-scale).</td></tr>
+<tr><td><strong>Obligation Timer [6]</strong></td><td>Marks demands and debts. At 4+: omens compel a score; at 6: lose secular Standing until atoned.</td></tr>
+<tr><td><strong>Doctrine Edicts</strong></td><td>Three taboos or duties (e.g., spare supplicants; accept duels of vow; never break treaty first).</td></tr>
+</tbody>
+</table>
+<p><strong>Patron Gifts (Ship-Scale Examples):</strong> Witness's Lens (reveal false ensigns within Far; Papers Scrutiny −1 against you, truth favors), Raéyn's Wake (once per Tide Turn, ignore a storm penalty; on backlash, rigging Harm 1 to all wings), Ikasha's Veil (treat first detection each leg as if Ghost Convoy).</p>
+<p><strong>Signature Scores:</strong> Sanctify the Lane (three rites at pylons; lay a sacred corridor where allies gain +1 Position), Atonement Voyage (escort a penitent convoy through hostile waters; clear 2 from Obligation), Revelation Trial (public duel of truth with a checkpoint officer; shift a faction's Standing by ±2).</p>
+<p><strong>Victory:</strong> Devotion ≥ 8 and two Sanctified Lanes stand for a Tide Turn; write a maritime precept (law, truce, or rite) the theater respects.<br>
+<strong>Collapse:</strong> Obligation hits 6 and a Doctrine is broken on screen: Patron withdraws; convert to Break the Titan (secular reform) or Pirate Kings (fallen zeal).</p>
+<p><strong>Endgame Set Pieces:</strong> The Procession of Lamps (fleet-wide ritual under storm-lit skies); Court of Salt (adjudicate a maritime law before five factions; the verdict shapes the map).</p>
+
+<h3 id="ch9-6">Frame Dials &amp; Crossovers</h3>
+<h4>Difficulty Dials</h4>
+<ul>
+<li><strong>Harsh Bottle:</strong> Start Lantern Dominion at 7; Patrol Net +1 per Tide Turn until challenged.</li>
+<li><strong>Greasy Palms:</strong> Harbor Graft starts at 3/6; Tariff Pressure ticks only on failures.</li>
+<li><strong>Hungry Sea:</strong> Sea Creature results on Random Encounters are +1 step rarer but +1 Effect.</li>
+</ul>
+<h4>Crossing the Streams</h4>
+<ul>
+<li>Break the Titan → Merchant Princes: an open lane grants bonded status.</li>
+<li>Merchant Princes → Patron's Fleet: sponsor temple barges for a rite-lane.</li>
+<li>Pirate Kings → Break the Titan: your haven becomes the insurgent base.</li>
+</ul>
+
+<h3 id="ch9-7">Rewards, Legacy, and Epilogues</h3>
+<h4>Tiered Rewards</h4>
+<table>
+<thead><tr><th>Type</th><th>Examples</th></tr></thead>
+<tbody>
+<tr><td><strong>Material</strong></td><td>Letters of Marque, bonded warehouse, tower vote, escort owed, haven upgrades.</td></tr>
+<tr><td><strong>Mechanical</strong></td><td>Permanent −1 DV on one lane; +1 die to a specific harbor action; ship TAG unlocked.</td></tr>
+<tr><td><strong>Reputational</strong></td><td>Rename a sea lane; your banner grants +1 Position to parley aboard.</td></tr>
+</tbody>
+</table>
+
+<h4>The Sea Remembers [10]</h4>
+<p>A persistent legacy timer for the crew. Mark on mythic deeds, public verdicts, or named victories. At 10, choose one Legend:</p>
+<ul>
+<li><strong>Chart in Every Locker</strong> — all Free Havens know your safe cut; allies gain +1 die once per session when citing your run.</li>
+<li><strong>Law of Your Name</strong> — a custom at sea (duels, ransom, parley) bears your rule; breaking it is a taboo (SB to GM).</li>
+<li><strong>Figurehead's Oath</strong> — your figurehead is recognized; first hail each voyage starts at Dominant.</li>
+</ul>
+
+<div class="panel panel-gold">
+<strong>GM Tip.</strong> Let victories change procedures. If the PCs sanctify a lane, actually lower DV and alter events there. If they crown a haven, put it on the map with upgrades and enemies.
+</div>
+
+</div>
+<div class="chapter-block">
+<h2 id="ch10">10. Adventure Outlines</h2>
+<p class="lead">Twelve drop-in mini-adventures and two showpiece arcs for the Amaranthine. Each outline includes a Hook, Objective, Key Faces, scene Procedure &amp; Timers, Complications, Rewards, and Scaling. Use the Heist Engine, Ship &amp; Crew rules, and Faction Standing throughout.</p>
+
+<div class="panel panel-red">
+<strong>Content Note.</strong> This theater touches on blockade violence and Ashaani coercive labor practices. Set Lines/Veils at Session Zero, use safety tools, and reframe elements (e.g., "bondage detection buoys" as contract-violation alarms) to fit your table.
+</div>
+
+<h3 id="ch10-1">Mini-Adventures (Drop-Ins)</h3>
+
+<div class="panel panel-blue">
+<strong>1. The Scent of Fear.</strong>
+<p class="mt-1"><strong>Hook.</strong> Contract-buoys report unlawful bondage aboard several "clean" hulls queued for Oshiiran transit. <strong>Objective.</strong> Trace the false positives without tipping off the saboteurs.</p>
+<p class="text-sm mt-1"><strong>Key Faces:</strong> Scribe-Pilot Orel Vass (by-the-lantern), Free Haven broker Sola Nemet, covert Kahfagian runner "The Quiet Bosun." <strong>Timers:</strong> Audit Chain [6] (dock, manifest, buoy), Saboteur Window [4]. <strong>Complications (d4):</strong> 1) buoy key swapped in court; 2) a rival crew frames the PCs; 3) a witness vanishes at sea; 4) the "victims" are embedded agents pinging the net. <strong>Rewards:</strong> −1 Papers Scrutiny for one lantern cycle; Standing +1 with Free Havens. <strong>Scaling:</strong> Tier I: one pier. Tier II–III: three synchronized docks across two ports.</p>
+</div>
+
+<div class="panel panel-blue">
+<strong>2. Pilot's Gambit.</strong>
+<p class="mt-1"><strong>Hook.</strong> Dolmis pilots strike; the harbor sits idle. <strong>Objective.</strong> Move a priority hull through the Narrows without official pilotage.</p>
+<p class="text-sm mt-1"><strong>Faces:</strong> Pilot-Mistress Dara Choksun (strike leader), "false pilot" Grin Halvek (Vilikari), Dock Judge Ibn Kas. <strong>Timers:</strong> Reef Cut [6], Strike Violence [4], Smuggler Lift [4]. <strong>Complications:</strong> surprise counter-current; pilot boat pursuit; counterfeit charts. <strong>Rewards:</strong> friendly Pilot List contact; a hidden cut (treat one leg as Far to Absent). <strong>Scaling:</strong> add night fog (Dominant) or a hunter cutter shadowing.</p>
+</div>
+
+<div class="panel panel-blue">
+<strong>3. Reef Runners.</strong>
+<p class="mt-1"><strong>Hook.</strong> The Vilikari syndicate sells access to eel-cuts. <strong>Objective.</strong> Run the secret channels, then sever the syndicate's leverage.</p>
+<p class="text-sm mt-1"><strong>Faces:</strong> Reef-Mother Veika (tide-reader), Old Iron (syndicate oarmaster), the Many-Eyed Idol (temple ward). <strong>Timers:</strong> Reef Maze [6], Ward Attention [4], Syndicate Payback [6]. <strong>Complications:</strong> living coral grinds the hull; the idol demands an oath; Linns reef-fishers claim taboo. <strong>Rewards:</strong> a cut map — once per arc, shift one sea pursuit by +1 Range. <strong>Scaling:</strong> temple allies shorten the maze; angering the idol ticks Ward Attention +2.</p>
+</div>
+
+<div class="panel panel-blue">
+<strong>4. Lantern Lies.</strong>
+<p class="mt-1"><strong>Hook.</strong> Last cycle's lantern phrases still open one tower. <strong>Objective.</strong> Find the leak before a ghost convoy sails through.</p>
+<p class="text-sm mt-1"><strong>Faces:</strong> Lantern-Keeper Eshra Tan, tower acolyte "Polliwog," Free Haven "historian" Master Gray. <strong>Timers:</strong> Leak Source [6], Ghost Convoy [4], Hunter Ready [4]. <strong>Complications:</strong> the leak is ritual, not ink; an ancestral fleet repeats old codes. <strong>Rewards:</strong> a Ghost Convoy tactic once (treat detection as false). <strong>Scaling:</strong> Tier III: three towers sync; a miscode cascade heist.</p>
+</div>
+
+<div class="panel panel-blue">
+<strong>5. Ballista Diplomacy.</strong>
+<p class="mt-1"><strong>Hook.</strong> Ykrul longboats demand tribute along a headland. <strong>Objective.</strong> Resolve the standoff without igniting a clan war.</p>
+<p class="text-sm mt-1"><strong>Faces:</strong> Skain of the Three Oars (Ykrul chief), Linns wreck-diver Tarin Rope, Wreck-Spirit Salt-Red. <strong>Timers:</strong> Clan Honor [6], Wreck Claim [4], Hot Blood [4]. <strong>Complications:</strong> tribute is funeral duty; the wreck shelters sacred bones. <strong>Rewards:</strong> a Ykrul oath-token — +1 die to parley with longboats. <strong>Scaling:</strong> add a rival captain trying to snipe the claim.</p>
+</div>
+
+<div class="panel panel-blue">
+<strong>6. The Silent Fleet.</strong>
+<p class="mt-1"><strong>Hook.</strong> Ships vanish under fair winds. <strong>Objective.</strong> Track, enter, and survive an ancient collector's lair.</p>
+<p class="text-sm mt-1"><strong>Faces:</strong> The Archivist Below (leviathan/construct), survivor Meryn Fluke. <strong>Timers:</strong> Wake Trail [4], Abyss Door [6], Collection Protocol [6]. <strong>Complications:</strong> your hull gets cataloged; voices of prior crews tempt rest. <strong>Rewards:</strong> a "taken" hull returned; deep salvage rights. <strong>Scaling:</strong> add pressure wards; require AIRFEED kit and rites.</p>
+</div>
+
+<div class="panel panel-blue">
+<strong>7. Paper Trail.</strong>
+<p class="mt-1"><strong>Hook.</strong> Forged Oshiira sets flood the market. <strong>Objective.</strong> Identify the master-plate and flip the press.</p>
+<p class="text-sm mt-1"><strong>Faces:</strong> Forger Needle-Kei, customs hawk Captain Rhaz, guild scrivener Aunt Imra. <strong>Timers:</strong> Plate Hunt [6], Seizure Sweep [4], Guild Wrath [6]. <strong>Complications:</strong> the press is mobile; a court case hinges on your testimony. <strong>Rewards:</strong> −1 DV to Paper Shop in this port; Standing +1 (Administration). <strong>Scaling:</strong> Tier III: the plate is protected by oath-ink wards.</p>
+</div>
+
+<div class="panel panel-blue">
+<strong>8. Storm Riders.</strong>
+<p class="mt-1"><strong>Hook.</strong> Raiders ambush only during perfect storms. <strong>Objective.</strong> Reveal the riders' purpose and choose a side.</p>
+<p class="text-sm mt-1"><strong>Faces:</strong> Weather-mage Suri-of-the-Bays, coastal abbot Hako, militia commodore Fen Jarlan. <strong>Timers:</strong> Squall Window [4], Coastal Evac [6], Militia Fury [6]. <strong>Complications:</strong> the riders divert storms from villages, at traders' expense. <strong>Rewards:</strong> a Wind Call charm (once per arc, shift Weather to Favorable). <strong>Scaling:</strong> add a corsair convoy exploiting the storm lanes.</p>
+</div>
+
+<div class="panel panel-blue">
+<strong>9. The Drowned City.</strong>
+<p class="mt-1"><strong>Hook.</strong> The tide reveals streets of a lost port. <strong>Objective.</strong> Explore, bargain, or flee its jealous keepers.</p>
+<p class="text-sm mt-1"><strong>Faces:</strong> Tide-Warden Ashaelt, the Gong-Fishers (local kin), the Salt Judges (statues). <strong>Timers:</strong> Tide Window [4], Salt Law [6], Plunder Greed [4]. <strong>Complications:</strong> taking relics invokes trial by tide; the Judges speak true-names. <strong>Rewards:</strong> a tide charter (safe approach map) or a lawful relic. <strong>Scaling:</strong> make the approach Abyssal with living causeways.</p>
+</div>
+
+<div class="panel panel-blue">
+<strong>10. Cargo Cult.</strong>
+<p class="mt-1"><strong>Hook.</strong> Island rites elevate cargo to covenant objects. <strong>Objective.</strong> Untangle ritual from racket without scorning local law.</p>
+<p class="text-sm mt-1"><strong>Faces:</strong> Elder Pela (covenant keeper), fixer Black Tamas, novice Lumi. <strong>Timers:</strong> Rite of Welcome [4], Smuggler Spine [6], Offense Given [4]. <strong>Complications:</strong> rites mask bonded caches; insult brings a storm-ban. <strong>Rewards:</strong> a covenant safe-passage mark; a fence route to the inner market. <strong>Scaling:</strong> add a rival who weaponizes "sacrilege" against you.</p>
+</div>
+
+<div class="panel panel-blue">
+<strong>11. The Ghost Net.</strong>
+<p class="mt-1"><strong>Hook.</strong> A Linns fishing fleet hits invisible walls. <strong>Objective.</strong> Free the lanes from spirit nets.</p>
+<p class="text-sm mt-1"><strong>Faces:</strong> Net-Singer Iri, the drowned oath Chain-of-Names. <strong>Timers:</strong> Net Map [4], Appeasement Rite [6], Corsair Poach [4]. <strong>Complications:</strong> slavers exploit the snare; appeasement demands witness names. <strong>Rewards:</strong> +1 Standing with Linns; a Spirit Mask pattern. <strong>Scaling:</strong> the net is keyed to broken vows; requires atonement scenes.</p>
+</div>
+
+<div class="panel panel-blue">
+<strong>12. Harbor Wars.</strong>
+<p class="mt-1"><strong>Hook.</strong> Two Free Havens slide toward open conflict. <strong>Objective.</strong> Cool the powder — or capitalize.</p>
+<p class="text-sm mt-1"><strong>Faces:</strong> Harbor Masters Rav Kade and Sestrel Mora; third-party provocateur, Ashaan factor Nemed. <strong>Timers:</strong> Dock Riots [6], Provocation Trail [6], Seizure Court Trigger [4]. <strong>Complications:</strong> strike-breakers; tower letters leaked; a staged arson. <strong>Rewards:</strong> an Amnesty Night token; a bonded storage rate cut. <strong>Scaling:</strong> add a tower audit flotilla on day three.</p>
+</div>
+
+<h3 id="ch10-2">Showpiece Adventures</h3>
+
+<h4>A. The Titan's Heart</h4>
+<p><strong>Scope.</strong> Multi-session blockade-break heist against Titan's Chain HQ. <strong>Premise.</strong> Expose the illegal seizure ledgers and miscode the chain for a night.</p>
+<ol>
+<li><strong>Lantern Dust (Intel).</strong> Free Haven legwork: fill Ledger Map [6], Tower Schedules [4]. Faces: Lantern Auditor Peth, Signal-Nun Verri.</li>
+<li><strong>Two Vectors (Insertion).</strong> Inside team rides a supply lighter; Outside team stages a cutter collision. Timers: Badge Scrutiny [6], Alarm Chain [6].</li>
+<li><strong>The Pull (Extraction).</strong> Swap ledgers, plant false cycles. Consequence moves: Hunter Squadron Arrives [6], Lantern Dominion −2 if clean.</li>
+<li><strong>The Run (Escape).</strong> Reef-cut chase under chain-shot; use Ghost Convoy or Spirit Mask. Final duel: Hunter-Captain Naima the Pale.</li>
+</ol>
+<p><strong>Victory.</strong> Publish ledgers and exit with one hull intact: Lantern Dominion −3, Standing +2 (Free Havens). <strong>Failure.</strong> Alarm cascade fills; your name is posted; the next arc starts at Hostile with Kahfagia. <strong>Set Pieces:</strong> tower lens duel (Seven Bell Court at sea), chain-cutter reef-surge, signal-book auction mid-fight.</p>
+
+<h4>B. Empire of the Deep</h4>
+<p><strong>Scope.</strong> Underwater diplomacy and ruin run; 2–4 sessions. <strong>Premise.</strong> Seek the Deep Folk, earn a treaty, and open a sub-tide trade.</p>
+<ol>
+<li><strong>The Girding.</strong> Acquire AIRFEED kit, rites, and a Leviathan Guide. Timers: Gear Fit [4], Surface Interference [4].</li>
+<li><strong>Descent Through Ruins.</strong> Navigate the Rift Way [6]; hazards from the Diving chapter; a rival expedition nips your heels.</li>
+<li><strong>The Court Below.</strong> Three petitions: Memory, Tribute, Restraint. Fail one → Court Suspicion [6] rises.</li>
+<li><strong>Third Echo War.</strong> A hostile Deep faction strikes. Fight in 3D currents; protect the pact-stone.</li>
+</ol>
+<p><strong>Victory.</strong> Sign the Salt-and-Stone Accords: unlock a Sub-Tide Route (once per arc: bypass one checkpoint entirely). <strong>Failure.</strong> The sea closes; mark Sea's Disfavor [6] (weather swings harsher until atoned). <strong>Set Pieces:</strong> choir of bubbles parley, whale-mother escort, mirrored labyrinth of currents.</p>
+
+<h3 id="ch10-3">Linking Threads &amp; Progression</h3>
+<h4>Thread Seeds</h4>
+<ul>
+<li><strong>The Third Ledger.</strong> A missing book ties Paper Trail, Harbor Wars, and Titan's Heart.</li>
+<li><strong>The Walking Lights.</strong> Lantern Lies results echo into Silent Fleet and Drowned City.</li>
+<li><strong>Storm Mercy.</strong> Storm Riders can sponsor safer monsoon lanes for Merchant Princes.</li>
+</ul>
+<h4>Progression Payouts</h4>
+<p>After three minis or one showpiece, award one:</p>
+<ul>
+<li><strong>Route Claim.</strong> Name a safe leg; +1 die on Travel there.</li>
+<li><strong>Harbor Face.</strong> A permanent contact with leverage (choose 1 tag: GRAFT, LEGAL, RITUAL).</li>
+<li><strong>Figurehead Boon.</strong> Once per arc: start a sea scene at Dominant.</li>
+</ul>
+
+<div class="panel panel-gold">
+<strong>GM Tip.</strong> Keep timers visible. When a mini ends, tick or clear the larger frame timers to make every outing reshape the sea.
+</div>
+
+</div>
+<div class="chapter-block">
+<h2 id="ch11">Appendix: Quick Reference Charts</h2>
+<p class="lead">Tear-out tables and procedures for fast adjudication on the water.</p>
+
+<h4>Ship Combat (One-Glance Flow)</h4>
+<table>
+<thead><tr><th>Step</th><th>What Happens</th></tr></thead>
+<tbody>
+<tr><td><strong>Frame Scene</strong></td><td>GM sets Position (Dominant/Controlled/Desperate), Range Band (Close/Near/Far), weather tag, and visible timers.</td></tr>
+<tr><td><strong>Assign Roles</strong></td><td>Pilot, Gunner(s), Boarder Lead, Signal, Rigger, Ritualist. PCs can double up; POs fill gaps.</td></tr>
+<tr><td><strong>Initiative</strong></td><td>Table-wide: Wits+Command contest to seize Tempo. Winning side acts first this round.</td></tr>
+<tr><td><strong>Actions</strong></td><td>Each role takes 1 action: Maneuver, Fire, Board, Signal, Patch, Cast/Invoke. SB fuels GM moves (hazards, enemy orders).</td></tr>
+<tr><td><strong>Resolve</strong></td><td>Mark damage (Hull/Rigging/Fire), shift Range, tick Morale/Integrity, check surrender/strike-colors triggers.</td></tr>
+</tbody>
+</table>
+
+<h4>Common DVs &amp; Position Nudges</h4>
+<table>
+<thead><tr><th>Test</th><th>Baseline DV / Nudge</th></tr></thead>
+<tbody>
+<tr><td>Tight Tack in Cross Chop</td><td>DV 3; on success also +1 Position if Pilot has Swift Keel.</td></tr>
+<tr><td>Long-Range Ballista Volley</td><td>DV 3 vs. target Position; +1 DV in fog; −1 DV if Gunnery Drill.</td></tr>
+<tr><td>Emergency Brace for Impact</td><td>DV 2 (Presence+Command); on crit ignore Rigging mark.</td></tr>
+<tr><td>Boarding Leap in Swell</td><td>DV 4 unless grapples set; on fail: Harm 1 (Bruised/Soaked).</td></tr>
+<tr><td>Ritual on Rolling Deck</td><td>Add −1 die at Controlled, −2 at Desperate; backlash ticks Ship Integrity or Crew Morale.</td></tr>
+</tbody>
+</table>
+
+<h4>Range Bands &amp; Effects</h4>
+<table>
+<thead><tr><th>Band</th><th>Implications</th></tr></thead>
+<tbody>
+<tr><td><strong>Close</strong></td><td>Boarding, grenadoes, chain-shot surety; powder risks; collisions possible.</td></tr>
+<tr><td><strong>Near</strong></td><td>Standard ballista/crossbow; shouting distance; signal flags readable.</td></tr>
+<tr><td><strong>Far</strong></td><td>Spotting, lantern code, long arcs; gunnery at −1 die; pursuit checks.</td></tr>
+<tr><td><strong>Absent</strong></td><td>Over-horizon; use Travel Timer [4], pigeons, or relay cutters.</td></tr>
+</tbody>
+</table>
+
+<h4>Weather Effects (d8)</h4>
+<table>
+<thead><tr><th>#</th><th>Apply This for the Scene</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>Mirror Calm — oars only; stealth −1 Position.</td></tr>
+<tr><td>2</td><td>Cross Chop — tight maneuvers −1 Position.</td></tr>
+<tr><td>3</td><td>Monsoon Squall — stealth veil; sailing Desperate.</td></tr>
+<tr><td>4</td><td>Star-Clear — long sightlines; +1 Position to spotting/aiming.</td></tr>
+<tr><td>5</td><td>Banked Fog — Navigation uses Lore; reefs lurk.</td></tr>
+<tr><td>6</td><td>Blood-Tide — SB escalate faster; spirit signs.</td></tr>
+<tr><td>7</td><td>Tailwind Run — fast hulls +1 Position in pursuit.</td></tr>
+<tr><td>8</td><td>Lightning Stairs — magic backlash +1 tier.</td></tr>
+</tbody>
+</table>
+
+<h4>Inspection Checklist (Oshiira Transit Pack)</h4>
+<ol>
+<li>Saffron Tab (convoy slot) — date, tower seal, hull mark.</li>
+<li>Amber Bill (manifest) — cargo type/weight/origin matches holds.</li>
+<li>Lantern Phrase (weekly) — spoken + flashed; cross-check codebook.</li>
+<li>Pilot's Knot — authorized navigator sigil, not mirrored.</li>
+<li>Tax chit, ballast report, crew list (deaths logged).</li>
+</ol>
+<p class="text-sm"><strong>Red Flags (d6):</strong> 1 smudged ink; 2 wrong tide watermark; 3 double-issued tab; 4 seal clipped shallow; 5 left-handed knot; 6 signer deceased.</p>
+
+<h4>Faction Relationship Sketch</h4>
+<table>
+<thead><tr><th>Pair</th><th>Default Posture</th></tr></thead>
+<tbody>
+<tr><td>Kahfagia ↔ Free Havens</td><td>Tense: seizures vs. graft.</td></tr>
+<tr><td>Kahfagia ↔ Oshiira</td><td>Formal: transit preference, brittle courtesy.</td></tr>
+<tr><td>Free Havens ↔ Vilikari</td><td>Symbiotic: cuts &amp; syndicate fees.</td></tr>
+<tr><td>Linns ↔ Ykrul</td><td>Seasonal friction: reefs vs. raiding lanes.</td></tr>
+<tr><td>Ashaan ↔ Everyone</td><td>Predatory: corsair pushes during storms.</td></tr>
+</tbody>
+</table>
+
+<div class="panel panel-gold">
+<strong>GM Tip.</strong> When players cite proper papers and etiquette, treat the first inspection each voyage as Controlled rather than Desperate. Botch it loudly; Heat follows them port-to-port.
+</div>
+</div>
+
+<div class="chapter-block">
+<h2 id="ch12">Appendix: Random Generators</h2>
+
+<h4>Ship Names &amp; Captains (d12)</h4>
+<table>
+<thead><tr><th>#</th><th>Name — Captain (Quirk)</th></tr></thead>
+<tbody>
+<tr><td>1</td><td><em>Saffron Gale</em> — Captain Orel (never lands on odd days).</td></tr>
+<tr><td>2</td><td><em>Chain-Whisper</em> — Mistress Veika (speaks to reefs).</td></tr>
+<tr><td>3</td><td><em>The Quiet Bosun</em> — "Polliwog" (won't touch iron).</td></tr>
+<tr><td>4</td><td><em>Amberglass</em> — Rhaz (collector of court seals).</td></tr>
+<tr><td>5</td><td><em>Moon of Rope</em> — Tarin Rope (knots as signature).</td></tr>
+<tr><td>6</td><td><em>Salt-Red</em> — Skain Three Oars (oath on oars).</td></tr>
+<tr><td>7</td><td><em>Festival Star</em> — Sola Nemet (throws feasts for intel).</td></tr>
+<tr><td>8</td><td><em>Pale Hunter</em> — Naima the Pale (takes flags as trophies).</td></tr>
+<tr><td>9</td><td><em>Leviathan's Loan</em> — Meryn Fluke (debt to a whale-mother).</td></tr>
+<tr><td>10</td><td><em>Court of Lamps</em> — Eshra Tan (lantern scholar).</td></tr>
+<tr><td>11</td><td><em>Reef-Mother's Due</em> — Old Iron (syndicate oarmaster).</td></tr>
+<tr><td>12</td><td><em>Witness's Wake</em> — Auditor Peth (truth duel veteran).</td></tr>
+</tbody>
+</table>
+
+<h4>Cargo Manifests (d12)</h4>
+<table>
+<thead><tr><th>#</th><th>Contents (Complication)</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>Indigo dye (leaks, stains papers).</td></tr>
+<tr><td>2</td><td>Salted fish (spoils if delayed).</td></tr>
+<tr><td>3</td><td>Amberglass shards (cut risk, high value).</td></tr>
+<tr><td>4</td><td>Temple bells (ritual tax applies).</td></tr>
+<tr><td>5</td><td>Ballista timber (marked military).</td></tr>
+<tr><td>6</td><td>Medical opium (permit required).</td></tr>
+<tr><td>7</td><td>Pilgrim relics (taboo to open).</td></tr>
+<tr><td>8</td><td>Clockwork parts (missing one gear).</td></tr>
+<tr><td>9</td><td>Coal oil (fire hazard).</td></tr>
+<tr><td>10</td><td>Bonded wines (counterfeit seals mixed in).</td></tr>
+<tr><td>11</td><td>Spice seedstock (quarantine risk).</td></tr>
+<tr><td>12</td><td>Whale bone (protested by monks).</td></tr>
+</tbody>
+</table>
+
+<h4>Naval Encounters (d12)</h4>
+<table>
+<thead><tr><th>#</th><th>Encounter</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>Lantern tower drills live-fire across the lane.</td></tr>
+<tr><td>2</td><td>Picket cutter shadows at Far, testing codes.</td></tr>
+<tr><td>3</td><td>Longboats cross-wake, drum challenge issued.</td></tr>
+<tr><td>4</td><td>Spirit buoys drift off-station, chiming wrong names.</td></tr>
+<tr><td>5</td><td>Contraband flare sighted; race to claim salvage.</td></tr>
+<tr><td>6</td><td>Reef smoke: unseen breakers ahead.</td></tr>
+<tr><td>7</td><td>Whale-mother sings; crew falls quiet (omen).</td></tr>
+<tr><td>8</td><td>Floating court convenes; present papers or tithe.</td></tr>
+<tr><td>9</td><td>Fire at sea; a burning hulk drifts toward you.</td></tr>
+<tr><td>10</td><td>Rival convoy flashes old phrases (trap?).</td></tr>
+<tr><td>11</td><td>Storm glass spiderwebs; pressure crash incoming.</td></tr>
+<tr><td>12</td><td>Sea judges (statues) stand above the tide, pointing.</td></tr>
+</tbody>
+</table>
+
+<h4>Harbor Details (d12)</h4>
+<table>
+<thead><tr><th>#</th><th>Detail</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>Ropewalk choir keeps time with knives.</td></tr>
+<tr><td>2</td><td>Customs bell rung by a blind boy.</td></tr>
+<tr><td>3</td><td>Cistern under the chandlery (cold, echoing).</td></tr>
+<tr><td>4</td><td>Seizure court posts names on sails.</td></tr>
+<tr><td>5</td><td>Pilot stones painted with last year's colors.</td></tr>
+<tr><td>6</td><td>Shrine to drowned kin tends lanterns for strangers.</td></tr>
+<tr><td>7</td><td>Spice dust colors the gutters red.</td></tr>
+<tr><td>8</td><td>Drydock fire-scar never fully repaired.</td></tr>
+<tr><td>9</td><td>Smugglers' chalk marks on the quay's shadow side.</td></tr>
+<tr><td>10</td><td>Barricade scars at the warehouse quarter.</td></tr>
+<tr><td>11</td><td>Harbor gulls carry ribbons from oath ceremonies.</td></tr>
+<tr><td>12</td><td>Tide-timer carved from a wrecked tower lens.</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="chapter-block">
+<h2 id="ch13">Appendix: Patron Integration at Sea</h2>
+<p class="lead">Optional rites, obligations, and omens tailored to maritime play. Choose Patrons that fit your table's cosmology.</p>
+
+<h4>Sample Sea Rites (DV, Cost, Effect)</h4>
+<table>
+<thead><tr><th>Rite</th><th>DV</th><th>Cost</th><th>Effect</th></tr></thead>
+<tbody>
+<tr><td>Witness's Wake</td><td>3</td><td>1 Obl.</td><td>Reveal false ensigns within Far; next inspection vs. you at −1 DV.</td></tr>
+<tr><td>Raéyn's Breath</td><td>4</td><td>1 Obl.</td><td>Favorable wind for one leg; if backlash, Rigging mark.</td></tr>
+<tr><td>Ikasha's Curtain</td><td>4</td><td>1 Obl.</td><td>Treat first detection per leg as a false reading.</td></tr>
+<tr><td>Carrion King's Due</td><td>3</td><td>1 Obl.</td><td>Calm drowned spirits for a scene; on fail, Ghost Net awakens.</td></tr>
+<tr><td>Traveler's Crossing</td><td>5</td><td>2 Obl.</td><td>Once per voyage, shift Range +2 as if through a hidden cut.</td></tr>
+</tbody>
+</table>
+
+<h4>Naval Obligation Consequences (d8)</h4>
+<table>
+<thead><tr><th>#</th><th>Consequence</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>Omen: a gull drops a sealed knot — fulfill the errand this Tide Turn.</td></tr>
+<tr><td>2</td><td>Vow: spare a supplicant ship; break it and mark Crew Morale +1.</td></tr>
+<tr><td>3</td><td>Tithe: gift a cargo share to the Patron's shrine or lose the sanctuary bonus.</td></tr>
+<tr><td>4</td><td>Trial: accept a duel of truth with the next officer who challenges you.</td></tr>
+<tr><td>5</td><td>Scar: your ship bears a visible sign; first hail each leg starts at Dominant.</td></tr>
+<tr><td>6</td><td>Edict: do not fire first this voyage; if you do, Integrity +1 tick.</td></tr>
+<tr><td>7</td><td>Quest: sanctify a pylon; until done, magic at sea is −1 die.</td></tr>
+<tr><td>8</td><td>Witness: an NPC acolyte joins the crew and judges your deeds.</td></tr>
+</tbody>
+</table>
+
+<h4>Maritime Blessings &amp; Curses (d8)</h4>
+<table>
+<thead><tr><th>#</th><th>Effect</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>Blessing — Figurehead speaks once to warn of reefs (auto-spot hazard).</td></tr>
+<tr><td>2</td><td>Blessing — Lantern light pierces fog; spotting +1 die this scene.</td></tr>
+<tr><td>3</td><td>Blessing — Crew sleeps dreamless; clear 1 tick from Morale.</td></tr>
+<tr><td>4</td><td>Blessing — Lines never tangle this leg; first Maneuver +1 die.</td></tr>
+<tr><td>5</td><td>Curse — Bells ring wrong at dawn; first inspection is Desperate.</td></tr>
+<tr><td>6</td><td>Curse — Salt eats ink; all papers tests +1 DV until replaced.</td></tr>
+<tr><td>7</td><td>Curse — Whales ignore you; cannot call sea life for aid this arc.</td></tr>
+<tr><td>8</td><td>Curse — Storms favor your wake; pursuit against you +1 Position.</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="chapter-block">
+<h2 id="ch14">Appendix: Campaign Scaling</h2>
+<p class="lead">Dials and templates to tune difficulty from single-hull skulduggery to wing-on-wing fleet actions.</p>
+
+<h4>Party Tier &amp; Challenge Budget</h4>
+<table>
+<thead><tr><th>Party Tier</th><th>Per-Scene Budget</th><th>Guidance</th></tr></thead>
+<tbody>
+<tr><td>Tier I</td><td>1–2 Timers (4–6) + 1 named foe</td><td>Keep Range simple, few tags; one severe consequence at most.</td></tr>
+<tr><td>Tier II</td><td>2–3 Timers (6–8) + 1–2 named</td><td>Add weather play, inspections, and one environmental hazard.</td></tr>
+<tr><td>Tier III</td><td>3–4 Timers (8–10) + 2 named</td><td>Layer Heist + Naval; simultaneous vectors; hungry SB economy.</td></tr>
+</tbody>
+</table>
+
+<h4>Enemy Hull Templates (Pick 2 Tags)</h4>
+<table>
+<thead><tr><th>Template</th><th>Hooks</th></tr></thead>
+<tbody>
+<tr><td><strong>Picket Cutter</strong></td><td>Fast, light; +1 Position in pursuit; weak in boarding.</td></tr>
+<tr><td><strong>Convoy Sloop</strong></td><td>Papers strong; escort bonus if in formation.</td></tr>
+<tr><td><strong>Raid Longboat</strong></td><td>Fear drums; excels at Close; hates chain-shot.</td></tr>
+<tr><td><strong>Syndicate Runner</strong></td><td>Hidden hold; forgery kit; hates long chases.</td></tr>
+<tr><td><strong>Tower Tender</strong></td><td>Knows codes; brittle morale once isolated.</td></tr>
+</tbody>
+</table>
+
+<h4>Scene Construction (Sea)</h4>
+<ol>
+<li><strong>One Clear Aim</strong> (escape, seize, pass, rescue).</li>
+<li><strong>One Map Element</strong> (reef, boom, fog, tower arc).</li>
+<li><strong>One Pressure Timer</strong> (Patrol Net, Weather Window, Morale).</li>
+<li><strong>One Signature Move</strong> for the foe (signal trick, chain-shot, spirit net).</li>
+<li><strong>One Reward</strong> that alters procedure (safe cut, face, rite).</li>
+</ol>
+
+<h4>Miniatures Zoom (Optional)</h4>
+<ul>
+<li>Hexes at 2 m; Facing matters: rear attacks +1 die and +1 Effect.</li>
+<li>Zone of Control: adjacent hexes; large foes extend one ring; incorporeal creatures ignore ZoC for movement.</li>
+<li>Dash: +2 hexes but next action is Desperate; Disengage: DV 4 to avoid opportunity attacks.</li>
+</ul>
+
+<div class="panel panel-gold">
+<strong>Finish Strong.</strong> Let victories change the map: lower a lane's DV, pin a new Face to a port, or add the crew's mark to the signal books. The sea should remember.
+</div>
+</div>
+
+<footer>
+Fate's Edge Proprietary Content — (c) 2024 Nicholas A. Gasper. All rights reserved.
+</footer>
+
+</body>
+</html>

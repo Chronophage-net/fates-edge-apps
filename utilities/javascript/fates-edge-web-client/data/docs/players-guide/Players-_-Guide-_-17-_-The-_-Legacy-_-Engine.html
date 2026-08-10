@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Legacy Engine — Fate's Edge Player's Guide</title>
+    <style>
+        :root {
+            --bg1: #0d0d1a;
+            --bg2: #1a1a2e;
+            --bg3: #252540;
+            --bg4: #2f2f4a;
+            --text: #e8e8f0;
+            --text2: #b8b8c8;
+            --text3: #8888a0;
+            --gold: #c9a84c;
+            --gold-hover: #d4b85c;
+            --border: #333355;
+            --red: #c0392b;
+            --green: #27ae60;
+            --blue: #2980b9;
+            --purple: #8e44ad;
+            --orange: #e67e22;
+            --radius: 8px;
+            --font: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            background: var(--bg1);
+            color: var(--text);
+            font-family: var(--font);
+            padding: 1.5rem;
+            max-width: 1100px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+        h1, h2, h3, h4, h5 { color: var(--gold); margin: 0.5rem 0 0.3rem; }
+        h1 { font-size: 1.8rem; border-bottom: 2px solid var(--gold); padding-bottom: 0.3rem; }
+        h2 { font-size: 1.4rem; border-bottom: 1px solid var(--border); padding-bottom: 0.2rem; margin-top: 1.2rem; }
+        h3 { font-size: 1.1rem; margin-top: 0.8rem; }
+        h4 { font-size: 0.95rem; color: var(--text); margin-top: 0.6rem; }
+        p.subtitle { color: var(--text2); margin-bottom: 1rem; font-size: 1rem; }
+        a { color: var(--gold); text-decoration: none; }
+        a:hover { color: var(--gold-hover); text-decoration: underline; }
+        p { margin: 0.5rem 0; }
+        ul, ol { margin: 0.4rem 0 0.6rem 1.5rem; }
+        li { margin: 0.2rem 0; }
+        .panel {
+            background: var(--bg2);
+            border-radius: var(--radius);
+            padding: 0.6rem 0.8rem;
+            border: 1px solid var(--border);
+            margin: 0.7rem 0;
+        }
+        .panel-gold { border-left: 4px solid var(--gold); }
+        .panel-red { border-left: 4px solid var(--red); }
+        .panel-blue { border-left: 4px solid var(--blue); }
+        .panel-green { border-left: 4px solid var(--green); }
+        .panel-purple { border-left: 4px solid var(--purple); }
+        .panel-orange { border-left: 4px solid var(--orange); }
+        .panel h3, .panel h4 { margin-top: 0; }
+        .badge {
+            display: inline-block;
+            padding: 0.05rem 0.5rem;
+            border-radius: 12px;
+            font-size: 0.65rem;
+            font-weight: 600;
+            background: var(--bg4);
+            color: var(--text3);
+            border: 1px solid var(--border);
+        }
+        .badge-gold { background: var(--gold); color: #1a1400; border-color: var(--gold); }
+        .table-wrap { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; margin: 0.6rem 0; }
+        th, td { padding: 0.4rem 0.6rem; border: 1px solid var(--border); text-align: left; }
+        th { background: var(--bg4); color: var(--gold); font-weight: 600; }
+        tr:nth-child(even) { background: var(--bg2); }
+        blockquote {
+            font-style: italic;
+            border-left: 4px solid var(--gold);
+            padding: 0.5rem 1rem;
+            margin: 0.7rem 0;
+            background: var(--bg2);
+            border-radius: var(--radius);
+            color: var(--text2);
+        }
+        blockquote .attribution { display: block; font-style: normal; color: var(--text3); font-size: 0.85rem; margin-top: 0.3rem; }
+        hr { border: none; border-top: 1px solid var(--border); margin: 1rem 0; }
+        .entry { margin: 0.8rem 0; }
+        .entry-title { font-weight: 700; color: var(--text); }
+        footer { margin-top: 2.5rem; padding-top: 1rem; border-top: 2px solid var(--gold); text-align: center; color: var(--text3); font-size: 0.8rem; }
+    </style>
+</head>
+<body>
+
+<h1>The Legacy Engine</h1>
+<p class="subtitle">Fate's Edge Player's Guide — Chapter 17</p>
+
+<div class="panel panel-blue">
+<h4>Planning for Legacy</h4>
+<p>If you are playing a long campaign or enjoy the idea of your character's influence outlasting them, consider investing in a <strong>Follower</strong> (Cap 3+) early. That follower can become your <strong>successor</strong> when your character retires or falls &mdash; inheriting your faction standing, one unresolved burden, and a Legacy Bond. See the checklist at the end of this chapter for steps to prepare.</p>
+</div>
+
+<h2 id="succession-and-faction-building">Succession &amp; Faction Building</h2>
+
+<blockquote>
+<em>&ldquo;Your legacy is not what you build &mdash; it is who you build.&rdquo;</em>
+</blockquote>
+
+<p>The Legacy Engine is a narrative framework that helps your campaign grow across generations without losing emotional continuity. It treats succession as a story event &mdash; earned through action, consequence, and choice &mdash; rather than a mechanical transaction.</p>
+
+<p>This chapter is for tables where characters retire, die, or pass on their cause to a follower. It is not required for every campaign, but when the moment comes, these tools help the transition feel earned and the new character feel connected.</p>
+
+<h2 id="core-philosophy">Core Philosophy</h2>
+<p>The Legacy Engine follows three principles:</p>
+<ol>
+<li><strong>Narrative Primacy</strong> &mdash; Succession happens because the story demands it, not because a timer fills.</li>
+<li><strong>People Before Power</strong> &mdash; A follower becomes a PC because of who they are, not what they can do.</li>
+<li><strong>Consequences Persist</strong> &mdash; Every legacy creates debts, rivals, and unfinished work that the successor must carry.</li>
+</ol>
+<p>Legacy is not inherited cleanly. It comes wrapped in obligation.</p>
+
+<h2 id="when-does-succession-happen">When Does Succession Happen?</h2>
+<p>Succession is not automatic. It emerges from play. Common triggers include:</p>
+<ul>
+<li>A PC retires after completing a major arc.</li>
+<li>A PC dies or is permanently removed from play.</li>
+<li>A player wants to explore a new character but keep the same faction or cause alive.</li>
+<li>The campaign shifts to a new generation (years or decades later).</li>
+</ul>
+<p>In all cases, the transition should be discussed openly at the table. The GM and player collaborate to find the right moment.</p>
+
+<h2 id="choosing-a-successor">Choosing a Successor</h2>
+<p>A successor should already exist in the fiction. Typically, this is a <strong>Follower</strong> with whom the PC has a meaningful relationship. It could also be a family member, a student, a loyal lieutenant, or even a rival who earns respect.</p>
+
+<h4>What Makes a Good Successor?</h4>
+<ul>
+<li>They have a name, a face, and a voice.</li>
+<li>They have acted independently (off-screen or on-screen) at least once.</li>
+<li>They want something that the PC's faction or cause can provide.</li>
+<li>They have a flaw or burden that will complicate their rise.</li>
+</ul>
+
+<p>If no suitable follower exists, the GM and player can create one retroactively &mdash; but that character arrives with less established history. The player may need to spend a session or two building them up before succession feels earned.</p>
+
+<h2 id="the-succession-arc">The Succession Arc</h2>
+<p>A smooth transition usually follows three beats. They can span one session or several, depending on the table's pace.</p>
+
+<h3>1. The Call</h3>
+<p>The follower faces a moment where they must act beyond their role. Examples:</p>
+<ul>
+<li>The PC is incapacitated, absent, or compromised.</li>
+<li>A decision must be made that no one else can make.</li>
+<li>A crisis demands leadership rather than obedience.</li>
+</ul>
+<p>This scene answers: <em>Why this person, now?</em></p>
+
+<h3>2. The Trial</h3>
+<p>The follower is tested. The trial can be:</p>
+<ul>
+<li>A single high-stakes scene (e.g., a duel, a negotiation, a desperate escape).</li>
+<li>A short sequence of escalating challenges (2&ndash;3 scenes).</li>
+<li>A moral or political decision with lasting impact.</li>
+</ul>
+<p>Success is not guaranteed. Failure does not end the story &mdash; it changes it. A follower who fails may still become a PC, but they carry a scar, a doubt, or a broken promise into their new role.</p>
+
+<h3>3. The Ascension</h3>
+<p>At a dramatically appropriate moment &mdash; often during downtime or immediately after a crisis &mdash; the follower formally takes up the mantle. This might involve:</p>
+<ul>
+<li>A public ceremony (crowning, oath-swearing, banner-raising).</li>
+<li>A private passing of a symbol (sword, key, ledger).</li>
+<li>A quiet acknowledgment (&ldquo;You're in charge now.&rdquo;).</li>
+</ul>
+<p>The departing PC may be present, or they may be gone. Either way, the scene marks the end of one chapter and the beginning of another.</p>
+
+<h2 id="what-the-successor-inherits">What the Successor Inherits</h2>
+<p>When a follower becomes a PC, they do not simply copy the old character sheet. Instead, they inherit three things:</p>
+
+<h3>1. Faction Standing</h3>
+<p>The successor begins with the same reputation, allies, and enemies that the previous PC cultivated. The GM may adjust specific relationships based on how the succession occurred (e.g., a contested succession might lose one ally but gain a bitter rival).</p>
+
+<h3>2. One Unresolved Burden</h3>
+<p>The player and GM choose one burden that the successor must carry forward. Examples:</p>
+<ul>
+<li><strong>Oath of Succession</strong>: &ldquo;You must protect the valley as I did.&rdquo;</li>
+<li><strong>Unfinished Task</strong>: &ldquo;Find my daughter. Tell her I'm sorry.&rdquo;</li>
+<li><strong>Rival Claim</strong>: Another faction &mdash; or a jealous lieutenant &mdash; disputes your right to lead.</li>
+</ul>
+<p>This burden is a narrative hook, not a mechanical penalty. It gives the new character immediate purpose.</p>
+
+<h3>3. A Legacy Bond</h3>
+<p>The successor has a bond to their predecessor. Once per session, the player may invoke this bond to:</p>
+<ul>
+<li>Recall a memory that provides insight.</li>
+<li>Receive instinctive guidance in a familiar situation.</li>
+<li>Gain a free <strong>Boon</strong> when acting to uphold the predecessor's values.</li>
+</ul>
+<p>This bond fades over time as the successor finds their own identity &mdash; but it never vanishes entirely.</p>
+
+<h2 id="building-a-faction-through-succession">Building a Faction Through Succession</h2>
+<p>Each time a character passes the torch, the faction (or cause) grows. It accumulates history, traditions, and institutional memory.</p>
+
+<h3>Growth Through People</h3>
+<p>Rather than tracking territory or wealth, track the faction's <strong>reach</strong> through the people who are now part of its story. Each successor adds:</p>
+<ul>
+<li>A new contact or ally they brought with them.</li>
+<li>A new problem they inherited.</li>
+<li>A new custom or saying that arose from their trials.</li>
+</ul>
+<p>The GM keeps a simple list: <em>&ldquo;The Banner of the Broken Wheel,&rdquo; &ldquo;the annual vigil at Sootfall Abbey,&rdquo; &ldquo;the debt to the Mistland ferryman.&rdquo;</em> These are the faction's real assets.</p>
+
+<h3>Faction Timers (Optional)</h3>
+<p>For tables that want mechanical weight, the faction can track two simple timers:</p>
+<ul>
+<li><strong>Growth (6&ndash;8)</strong>: When filled, the faction gains a new narrative permission (e.g., a safehouse in a new city, a reliable spy, a permanent shrine).</li>
+<li><strong>Health (6)</strong>: When filled, a crisis erupts &mdash; a rival attacks, a leader dies, a secret is exposed. The current PC must deal with it or watch the faction fracture.</li>
+</ul>
+<p>These timers advance only when the fiction demands &mdash; not automatically.</p>
+
+<h2 id="example-the-fallen-captain">Example: The Fallen Captain</h2>
+<p>Miranda has played Michael, captain of the Iron Tide mercenary company, for two years. Michael dies defending a village from a wyrm. The player wants to continue the story.</p>
+
+<h4>The Successor</h4>
+<p>Michael's second-in-command, a grizzled scout named Vesper, has been a follower (Cap 3) for many sessions. Vesper once disobeyed an order to save wounded civilians &mdash; a defining moment.</p>
+
+<h4>The Call</h4>
+<p>At Michael's funeral pyre, the company looks to Vesper. No one else steps forward.</p>
+
+<h4>The Trial</h4>
+<p>Vesper must negotiate a new contract with a wary noble who doubts the company's future without Michael. The player rolls, succeeds with cost &mdash; the noble agrees, but demands a hostage.</p>
+
+<h4>The Ascension</h4>
+<p>Vesper takes up Michael's banner. The player erases Michael's character sheet and creates Vesper as a new PC (starting XP based on campaign tier). Vesper inherits:</p>
+<ul>
+<li>The Iron Tide as a <strong>Mercenary Contract (Standard Asset)</strong>.</li>
+<li>The burden: <em>&ldquo;Find the noble's missing son &mdash; or lose the contract.&rdquo;</em></li>
+<li>A legacy bond to Michael: once per session, recall Michael's advice to gain a Boon when leading the company.</li>
+</ul>
+<p>The campaign continues without missing a beat.</p>
+
+<h2 id="legacy-planning-checklist">Legacy Planning Checklist</h2>
+<p>Before your character retires, dies, or steps aside, work with your GM to prepare your successor. Use this checklist to ensure a smooth transition.</p>
+
+<div class="panel panel-green">
+<h4>Player's Legacy Planning Checklist</h4>
+<ol>
+<li><strong>Name a Successor</strong> &mdash; Choose a Follower (Cap 3+), family member, or loyal ally. Give them a name, a face, and a voice.</li>
+<li><strong>Clarify the Relationship</strong> &mdash; What does your character mean to them? What do they owe each other?</li>
+<li><strong>Identify One Unresolved Burden</strong> &mdash; What task, oath, or problem will the successor inherit? (e.g., &ldquo;Find my stolen sword,&rdquo; &ldquo;Protect the village,&rdquo; &ldquo;Pay the guild debt.&rdquo;)</li>
+<li><strong>Pass Down an Asset (Optional)</strong> &mdash; If your character controls a Minor or Standard Asset, the GM may allow the successor to retain it with suitable narrative justification (e.g., &ldquo;The family safehouse,&rdquo; &ldquo;The guild seat passes to the heir&rdquo;). Major or Tier III Assets usually require the successor to earn them through play.</li>
+<li><strong>Settle Outstanding Obligations</strong> &mdash; Clear or transfer any standing debts to terrestrial patrons before stepping down. Unpaid debts may become part of the successor's burden.</li>
+<li><strong>Hold a Ceremony (On-Screen)</strong> &mdash; A funeral, a passing of the torch, a swearing of oaths. This scene marks the transition and gives the new PC immediate presence.</li>
+<li><strong>Create the New Character</strong> &mdash; Build the successor using standard character creation rules, adjusted to the campaign's current tier. The GM may award a small XP bonus (e.g., 4&ndash;8 XP) to represent inherited training or resources.</li>
+<li><strong>Keep a Legacy Note</strong> &mdash; Write one sentence that the old character leaves behind (a proverb, a scar, a rumor). The GM can use it as a future story hook.</li>
+</ol>
+</div>
+
+<h2 id="campaign-end-the-final-legacy">Campaign End: The Final Legacy</h2>
+<p>When the campaign ends, the player may describe one lasting mark the faction leaves on the world. Examples:</p>
+<ul>
+<li>A new law named after the first PC.</li>
+<li>A shrine where the PC fell, still tended by followers.</li>
+<li>A phrase that enters common speech (&ldquo;Stand like Michael&rdquo;).</li>
+</ul>
+<p>The story ends &mdash; but the legacy remains.</p>
+
+<blockquote>
+<em>A character dies. A faction endures. A story echoes forward.</em>
+</blockquote>
+
+<footer>Fate's Edge Proprietary Content &mdash; (c) 2024 Nicholas A. Gasper. All rights reserved.</footer>
+
+</body>
+</html>

@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enhanced Player Play — Fate's Edge Player's Guide</title>
+    <style>
+        :root {
+            --bg1: #0d0d1a;
+            --bg2: #1a1a2e;
+            --bg3: #252540;
+            --bg4: #2f2f4a;
+            --text: #e8e8f0;
+            --text2: #b8b8c8;
+            --text3: #8888a0;
+            --gold: #c9a84c;
+            --gold-hover: #d4b85c;
+            --border: #333355;
+            --red: #c0392b;
+            --green: #27ae60;
+            --blue: #2980b9;
+            --purple: #8e44ad;
+            --orange: #e67e22;
+            --radius: 8px;
+            --font: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            background: var(--bg1);
+            color: var(--text);
+            font-family: var(--font);
+            padding: 1.5rem;
+            max-width: 1100px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+        h1, h2, h3, h4, h5 { color: var(--gold); margin: 0.5rem 0 0.3rem; }
+        h1 { font-size: 1.8rem; border-bottom: 2px solid var(--gold); padding-bottom: 0.3rem; }
+        h2 { font-size: 1.4rem; border-bottom: 1px solid var(--border); padding-bottom: 0.2rem; margin-top: 1.2rem; }
+        h3 { font-size: 1.1rem; margin-top: 0.8rem; }
+        h4 { font-size: 0.95rem; color: var(--text); margin-top: 0.6rem; }
+        h5 { font-size: 0.88rem; color: var(--text2); margin-top: 0.5rem; }
+        p.subtitle { color: var(--text2); margin-bottom: 1rem; font-size: 1rem; }
+        a { color: var(--gold); text-decoration: none; }
+        a:hover { color: var(--gold-hover); text-decoration: underline; }
+        p { margin: 0.5rem 0; }
+        ul, ol { margin: 0.4rem 0 0.6rem 1.5rem; }
+        li { margin: 0.2rem 0; }
+        .panel {
+            background: var(--bg2);
+            border-radius: var(--radius);
+            padding: 0.6rem 0.8rem;
+            border: 1px solid var(--border);
+            margin: 0.7rem 0;
+        }
+        .panel-gold { border-left: 4px solid var(--gold); }
+        .panel-red { border-left: 4px solid var(--red); }
+        .panel-blue { border-left: 4px solid var(--blue); }
+        .panel-green { border-left: 4px solid var(--green); }
+        .panel-purple { border-left: 4px solid var(--purple); }
+        .panel-orange { border-left: 4px solid var(--orange); }
+        .panel h3, .panel h4 { margin-top: 0; }
+        .badge {
+            display: inline-block;
+            padding: 0.05rem 0.5rem;
+            border-radius: 12px;
+            font-size: 0.65rem;
+            font-weight: 600;
+            background: var(--bg4);
+            color: var(--text3);
+            border: 1px solid var(--border);
+        }
+        .badge-gold { background: var(--gold); color: #1a1400; border-color: var(--gold); }
+        .table-wrap { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; margin: 0.6rem 0; }
+        th, td { padding: 0.4rem 0.6rem; border: 1px solid var(--border); text-align: left; }
+        th { background: var(--bg4); color: var(--gold); font-weight: 600; }
+        tr:nth-child(even) { background: var(--bg2); }
+        blockquote {
+            font-style: italic;
+            border-left: 4px solid var(--gold);
+            padding: 0.5rem 1rem;
+            margin: 0.7rem 0;
+            background: var(--bg2);
+            border-radius: var(--radius);
+            color: var(--text2);
+        }
+        blockquote .attribution { display: block; font-style: normal; color: var(--text3); font-size: 0.85rem; margin-top: 0.3rem; }
+        code { background: var(--bg4); padding: 0.1rem 0.3rem; border-radius: 4px; font-size: 0.85rem; color: var(--gold); }
+        hr { border: none; border-top: 1px solid var(--border); margin: 1rem 0; }
+        .entry { margin: 0.8rem 0; }
+        .entry-title { font-weight: 700; color: var(--text); }
+        .example { background: var(--bg3); border-left: 3px solid var(--orange); border-radius: var(--radius); padding: 0.5rem 0.8rem; margin: 0.6rem 0; font-size: 0.92rem; }
+        .example .example-label { color: var(--orange); font-weight: 700; margin-bottom: 0.2rem; }
+        footer { margin-top: 2.5rem; padding-top: 1rem; border-top: 2px solid var(--gold); text-align: center; color: var(--text3); font-size: 0.8rem; }
+    </style>
+</head>
+<body>
+
+<h1>Enhanced Player Play</h1>
+<p class="subtitle">Fate's Edge Player's Guide — Chapter 18</p>
+
+<p>The world of <strong>Fate's Edge</strong> sings when players help steer the tune. This chapter gathers <em>player-facing dials</em>&mdash;lightweight, opt-in mechanics that turn your table's choices into momentum. Treat these as a menu: use a few, or layer many as your group grows comfortable.</p>
+
+<h2 id="role-based-tactics">Role-Based Tactics</h2>
+<p>Your role in the party determines how to best apply pressure, conserve resources, and turn the tide. Use these tactical guidelines regardless of your specific build.</p>
+
+<h3>Melee Striker (Duelist / Assassin / Berserker)</h3>
+<p><em>Your job is to eliminate high-value targets and break enemy lines.</em></p>
+<ul>
+<li><strong>Be aggressive.</strong> You move faster than magic and hit harder than ranged fire. Close the distance early; every round you spend not engaged is a round you are not doing your job.</li>
+<li><strong>Flank, flank, flank.</strong> A flanked enemy loses Position advantages. Coordinate with another melee character to attack from two sides.</li>
+<li><strong>Use Boons on re-rolling failed attacks, not defense.</strong> Your HP is a resource; their death is the objective.</li>
+<li><strong>When outnumbered, use the terrain.</strong> A narrow corridor or doorway lets you fight one enemy at a time while allies shoot over your shoulder.</li>
+<li><strong>Know your exit.</strong> If you go down, the party loses its hammer. Keep a backup plan (a smoke bomb, a doorway to retreat through, a Bonded ally who can pull you out).</li>
+</ul>
+
+<h3>Defender (Guardian / Shield / Tank)</h3>
+<p><em>You hold the line so others don't have to.</em></p>
+<ul>
+<li><strong>Use the Defend action early.</strong> It improves your Position by one step and gives you a free reaction to intercept attacks on allies.</li>
+<li><strong>Spend Boons on re-rolling defense failures.</strong> Your survival keeps the party safe; a missed attack on your part is less catastrophic than a missed defense.</li>
+<li><strong>Position yourself between the enemy and your squishy allies.</strong> The GM will honor the fiction &mdash; a foe cannot shoot past you without moving around you.</li>
+<li><strong>Trade Harm for Fatigue whenever possible.</strong> A wound that clears your Fatigue track is often worth it.</li>
+<li><strong>Protect at least one ally with a Bond.</strong> That Bond gives you a free Boon refund when you assist them &mdash; perfect for <em>Cover &amp; Protect</em>.</li>
+</ul>
+
+<h3>Controller (Mage / Crowd Control / Terrain Shaper)</h3>
+<p><em>You shape the battlefield, forcing enemies into bad positions.</em></p>
+<ul>
+<li><strong>Open with area control.</strong> A <code>[AREA]</code> <code>[BIND]</code> or <code>[WALL]</code> spell can split the enemy force, letting your strikers pick them off.</li>
+<li><strong>Use Boons to improve Position before casting, not after.</strong> A Controlled cast is much safer than a Desperate one.</li>
+<li><strong>Accept SB as a resource, not a penalty.</strong> You generate them anyway &mdash; lean into it. Offer the GM a Devil's Bargain to make your spell more effective in exchange for a later complication.</li>
+<li><strong>Tags matter.</strong> <code>[EARTH]</code> + <code>[WALL]</code> blocks movement; <code>[AIR]</code> + <code>[LEAP]</code> repositions allies; <code>[FATE]</code> + <code>[OMEN]</code> gives the party a clue. Read the Tag reference.</li>
+<li><strong>Do not waste spells on enemies your strikers can kill in one hit.</strong> Save your power for clusters, bosses, or emergencies.</li>
+</ul>
+
+<h3>Support (Healer / Buffer / Bard)</h3>
+<p><em>You multiply the party's effectiveness.</em></p>
+<ul>
+<li><strong>First action: improve Position or grant a Boon to a striker.</strong> A Dominant striker kills faster than you can heal.</li>
+<li><strong>Use <em>Inspire</em> early.</strong> The +1 die and extra Boon can turn a fight.</li>
+<li><strong>Heal Harm after the fight, Fatigue during it.</strong> <code>[HEAL]</code> as a cantrip clears Fatigue (safe and fast); healing Harm requires a full action and may generate SB.</li>
+<li><strong>Carry a ranged weapon.</strong> You do not need to be a damage dealer, but plinking a foe can distract them or force a reaction.</li>
+<li><strong>Your Bonds are your fuel.</strong> Transfer Boons to the striker who needs them. A bonded ally gets a Boon refund on their first assist &mdash; use it.</li>
+</ul>
+
+<h3>Scout (Rogue / Ranger / Infiltrator)</h3>
+<p><em>You see the danger before it sees the party.</em></p>
+<ul>
+<li><strong>Go first.</strong> Before the fight, scout ahead. The information you bring is worth more than an extra sword.</li>
+<li><strong>Strike from stealth, then vanish.</strong> <em>Backstab</em> + <em>Shadow Dance</em> + <em>Deathblow</em> is a classic chain.</li>
+<li><strong>Use the environment.</strong> High ground, cover, and shadow are your friends. Spend a Move action to reposition even if you do not attack.</li>
+<li><strong>Your independent action (Scout &amp; Signal) is free Position for the party.</strong> Use it before the first roll of a fight.</li>
+<li><strong>Do not be the first to engage in a fair fight.</strong> If you are trading blows, something went wrong.</li>
+</ul>
+
+<h3>Leader (Commander / Tactician / Face)</h3>
+<p><em>You turn a group of individuals into a unit.</em></p>
+<ul>
+<li><strong>Setup actions are your bread and butter.</strong> Grant an ally +1 Position or step up Effect &mdash; no roll, just fiction.</li>
+<li><strong>Use <em>Command</em> to rally.</strong> A successful Command roll can remove Fear conditions or improve morale.</li>
+<li><strong>Delegate.</strong> Your followers are not just dice &mdash; they can take independent actions. Trust them.</li>
+<li><strong>Call shots.</strong> &ldquo;Focus the mage,&rdquo; &ldquo;Take cover,&rdquo; &ldquo;Fall back&rdquo; &mdash; the GM will adjust Position based on coherent orders.</li>
+<li><strong>Your Boons are best spent on assisting others.</strong> You are a force multiplier. A Boon spent on a striker's attack is worth more than your own attack.</li>
+</ul>
+
+<h2 id="tactical-play-for-players">Tactical Play for Players</h2>
+<p>Combat and high-stakes scenes reward clever thinking as much as raw dice. Use these tactics to turn the fiction in your favor.</p>
+
+<h3>Closing on Ranged and Magic Users</h3>
+<p>A bowman on a balcony or a mage behind a ward can shred your party from a distance. Close the gap without getting shredded.</p>
+<ul>
+<li><strong>Use Cover and Movement.</strong> Move from cover to cover. Spend a <strong>Move action</strong> to dash between obstacles. Ending behind solid cover may let the GM set your next defense roll as <strong>Controlled</strong> instead of Desperate.</li>
+<li><strong>Create Distractions.</strong> Spend <strong>1 Boon</strong> to describe a diversion. On a successful <strong>Deception</strong> or <strong>Command</strong> roll, the ranged attacker may lose their aim or shift attention for one exchange, dropping your Position penalty by one step.</li>
+<li><strong>Teamwork: The Running Shield.</strong> Have a heavily armoured ally take the <strong>Defend</strong> action while moving forward. They intercept shots (converting Harm to Fatigue) while you sprint behind them. The GM may rule that the defender blocks line of sight, granting you <strong>Dominant</strong> position for your next approach.</li>
+<li><strong>Suppress Them.</strong> Use the <strong>Suppress</strong> option (core rules). You don't need to hit &mdash; just force the enemy to keep their head down. The GM may impose a &minus;1 die penalty on their next attack or worsen their Position.</li>
+<li><strong>Spend Boons to Close.</strong> Spend <strong>1 Boon</strong> to improve your Position by one step before rolling movement or defense. That can mean the difference between a bolt in the chest and a glancing hit.</li>
+</ul>
+
+<div class="example">
+<div class="example-label">Example</div>
+Lyra (rogue) wants to cross a courtyard to reach a mage on a balcony. She spends 1 Boon to improve her Position from Desperate to Controlled, then stays close to a crumbling wall. The GM rules that the mage's magic missile is at &minus;1 die because of partial cover. Lyra makes it across with a Partial success, taking Fatigue instead of Harm.
+</div>
+
+<h3>When You're Outmatched</h3>
+<p>Sometimes the enemy is bigger, faster, or more numerous. You can still win &mdash; or survive.</p>
+<ul>
+<li><strong>Don't Trade Blows.</strong> Instead of attacking, use your action to <strong>Setup</strong> for an ally (grant them +1 Position or step up Effect). Spend 1 Boon to assist them directly (+1 die). One well-supported PC can turn a fight faster than two desperate ones.</li>
+<li><strong>Accept Story Beats (SB) to Buy Time.</strong> When you roll a Partial or Miss, the GM gets SB. You can proactively offer to accept <strong>+1 SB</strong> (banked, not spent now) in exchange for a short narrative delay: &ldquo;I fall back behind a pillar &mdash; they lose sight of me for a moment.&rdquo; This doesn't change the roll's outcome, but gives you a breath to reposition.</li>
+<li><strong>Spend Boons on Defense, Not Offense.</strong> When outnumbered, a missed attack hurts less than a received hit. Save Boons to re-roll failed defense rolls or to improve your Position before an enemy's big swing. A <strong>Boon spent to re-roll a 1 on a defense roll</strong> can prevent Harm 2 or 3.</li>
+<li><strong>Escape and Reset.</strong> There's no shame in running. Use the <strong>Withdraw</strong> action (core rules). Spend 1 Boon to make it a <strong>Controlled</strong> withdrawal instead of Desperate. Live to fight another scene.</li>
+<li><strong>Use the Environment as a Weapon.</strong> Ask the GM: &ldquo;Is there a chandelier? A sand pile? A steep stair?&rdquo; Describe how you trigger it. The GM may set a low DV (2&ndash;3); on success, the obstacle deals Harm, imposes a Condition, or improves the party's Position for a round.</li>
+</ul>
+
+<div class="example">
+<div class="example-label">Example</div>
+Benjamin (fighter) faces three bandits. Instead of attacking, he spends 1 Boon to assist the group's archer, then kicks over a brazier. The GM calls for a Body + Athletics roll (DV 2). Benjamin succeeds &mdash; the fire creates a smoky screen, worsening the bandits' Position to Desperate for one exchange. The archer picks one off.
+</div>
+
+<h3>When to Push It &mdash; and When Not To</h3>
+<p>The <strong>Push It</strong> mechanic (usually on Rites or Cantor Songs) escalates an effect immediately at a cost: extra Obligation, Fatigue, Corruption, or a GM Story Beat. Use it wisely.</p>
+
+<h5>Good Times to Push</h5>
+<ul>
+<li><strong>Preventing a Party Wipe.</strong> If a teammate is about to take lethal Harm, Push to get that heal or ward now.</li>
+<li><strong>Ending a Scene.</strong> The timer is about to fill, or the enemy leader is fleeing. Push to finish it.</li>
+<li><strong>When the Cost Is Acceptable.</strong> If you have spare Fatigue, or you're already at max Obligation and about to trigger a Patron demand anyway, the extra cost doesn't hurt as much.</li>
+</ul>
+
+<h5>Avoid Pushing When</h5>
+<ul>
+<li><strong>You're Already in Trouble.</strong> Pushing adds Fatigue or SB. If you're already at Fatigue 2 or have a full Death Timer, the extra cost could break you.</li>
+<li><strong>A Partial Success Is Enough.</strong> Many Rites and Songs still work on a Partial &mdash; just weaker or shorter. Don't pay extra for power you don't require.</li>
+<li><strong>The GM Is Low on SB.</strong> If the GM has 0&ndash;1 SB banked, they can't immediately punish a miss. But if they have 3+, a failed Push could trigger a major twist. Check the table's SB tracker.</li>
+</ul>
+
+<h5>How to Avoid Needing to Push</h5>
+<ul>
+<li><strong>Use Boons Early.</strong> Spend 1 Boon to improve your Position before the roll. A Controlled roll is less likely to fail than a Desperate one.</li>
+<li><strong>Get Help.</strong> Have an ally assist you (spend 1 Boon for +1 die). That +1 die might turn a Partial into a Clean Success.</li>
+<li><strong>Lower the DV with Fiction.</strong> &ldquo;I wait for the guards to change shift&rdquo; might lower DV by 1. &ldquo;I use my Scholar's Cell free use to research the ward's pattern&rdquo; could drop DV from 4 to 3.</li>
+<li><strong>Accept Failure and Bank Boons.</strong> A Miss gives you 2 Boons. Sometimes it's better to fail now, take the Boons, and try again next round with a bigger pool or better Position.</li>
+</ul>
+
+<div class="example">
+<div class="example-label">Example</div>
+Sariel (Cantor) needs to charm a guard quickly. She could Push to resolve the Song instantly, but she's already at Fatigue 2. Instead, she spends 1 Boon to improve her Position from Controlled to Dominant, then has an ally whisper a distraction (assist, another Boon). She rolls 4 dice (Lore + Performance) against DV 3. She gets 3 successes &mdash; a Clean Success. No Push needed, and she saved her Fatigue.
+</div>
+
+<div class="panel panel-blue">
+<h4>Reminder</h4>
+<p>You can spend <strong>1 Boon</strong> before a roll to increase Effect by one step.</p>
+</div>
+
+<h3>General Player Tips for Enhanced Experience</h3>
+<ul>
+<li><strong>Track Your Boons, Fatigue, and Obligation.</strong> These are your resources. A character with 4 Boons and 0 Fatigue is much stronger than one with 0 Boons and Fatigue 2.</li>
+<li><strong>Use Bonds to Shift Boons.</strong> At Tier III, you can transfer up to 2 Boons to a bonded ally as a free action. Fuel the party's best character for a crucial roll. Don't hoard.</li>
+<li><strong>Communicate Your Intent.</strong> Tell the GM what you want to achieve, not just what skill you're rolling. &ldquo;I want to scare him into dropping the keys&rdquo; is better than &ldquo;I roll Intimidation.&rdquo; The GM can set a fairer DV and offer better consequences.</li>
+<li><strong>Ask About the Environment.</strong> &ldquo;Is there loose gravel? A tapestried wall? A rain barrel?&rdquo; These become levers. The GM wants you to use them.</li>
+<li><strong>Know When to Fold.</strong> Not every fight is winnable. Spending 2 Boons to escape with everyone alive is a victory. The game rewards survival and smart choices.</li>
+<li><strong>Use Downtime.</strong> Between sessions, update your logs, tend your Assets, and clear Complications. A well-maintained Asset (Neglected &rarr; Maintained) can save your life next session. A cleared Complication removes a &ldquo;free SB&rdquo; button from the GM.</li>
+<li><strong>Talk to Your GM.</strong> If a rule feels off or a scene drags, speak up. Fate's Edge is collaborative. The GM can adjust DV, offer alternative stakes, or introduce a Devil's Bargain to keep things moving.</li>
+</ul>
+
+<h2 id="player-resources">Player Resources</h2>
+<p>Two shared currencies appear throughout this chapter:</p>
+<ul>
+<li><strong>Boons</strong> &mdash; Core system edge; spend to power talents or convert to XP.</li>
+<li><strong>SB</strong> &mdash; The GM's Story Beats; several options here invite players to accept SB in exchange for narrative benefits.</li>
+</ul>
+
+<h2 id="engagement-rewards">Engagement Rewards</h2>
+
+<h3>Session Investment Tracker</h3>
+<p>At session close, each player privately rates their <em>investment</em> (1&ndash;3). The tracker rewards steady participation without penalising quiet nights.</p>
+<ul>
+<li><strong>1 &mdash; Low</strong>: You followed others' lead. Gain <strong>+1d</strong> once next session on any <em>support</em> action.</li>
+<li><strong>2 &mdash; Medium</strong>: You took initiative in some scenes. Gain <strong>+1d</strong> once next session on a <em>relationship</em> roll and bank <strong>1 Momentum</strong>.</li>
+<li><strong>3 &mdash; High</strong>: You anchored or elevated multiple scenes. Gain <strong>+1d</strong> twice next session (different scenes) and bank <strong>1 Momentum</strong>.</li>
+</ul>
+
+<h4>Table Boon</h4>
+<p>If <em>all</em> players report 2+ in a session, the GM may award the table <strong>1 free Boon</strong> to assign at the start of the next session.</p>
+
+<h3>Cultural Immersion Bonus</h3>
+<p>Reward lived-in play with light, predictable benefits.</p>
+<ul>
+<li><strong>Earn 1 Culture Point</strong> when you enrich a scene with apt language, rites, or customs (Sea-Patter hail; bell-speech courtesy; Aeler craft-honorifics). Max <strong>3/session</strong>.</li>
+<li><strong>Spend 3 Culture</strong> for <strong>+1d</strong> on a culturally keyed roll.</li>
+<li><strong>Spend 5 Culture</strong> (across sessions) to declare a <em>trusted door</em>: one institution in that culture treats you as <em>Friendly</em> for the next approach.</li>
+</ul>
+
+<h2 id="collaborative-play">Collaborative Play</h2>
+
+<h3>Information Trading</h3>
+<p>When the table hunts answers, convert curiosity into structure.</p>
+
+<h4>Request &amp; Price</h4>
+<p>State the question and choose a price the table accepts:</p>
+<ul>
+<li><strong>Devil's Bargain</strong> &mdash; Offer the GM a future complication to &ldquo;pay&rdquo; for deeper intel.</li>
+<li><strong>Accept SB</strong> &mdash; The GM gains <strong>+1 SB</strong> now; you gain a strategic clue or reduced DV.</li>
+<li><strong>Spend Boon</strong> &mdash; Spend <strong>1 Boon</strong> to lower DV by 1 on the research/social approach.</li>
+</ul>
+
+<h4>Creative Methods</h4>
+<p>Swap coin for color: poetry duels, shrine petitions, map-reading at a parish stone. If your method sings with setting, take <strong>+1 Effect</strong> on the check.</p>
+
+<h3>Timer Manipulation</h3>
+<p>Players can nudge tension without rewriting stakes.</p>
+<ul>
+<li><strong>Slow</strong> a visible Timer by <strong>1 segment</strong> by either <strong>spending 1 Boon</strong> <em>or</em> <strong>accepting +1 SB</strong> into the scene (fiction must justify delay).</li>
+<li><strong>Hasten</strong> a visible Timer by <strong>1 segment</strong> by <strong>spending 1 Momentum</strong> <em>or</em> <strong>taking a Devil's Bargain</strong>.</li>
+<li><strong>Limit:</strong> Once per player per scene. If three or more players affect the same Timer in a scene, the GM gains <strong>+1 SB</strong>.</li>
+</ul>
+
+<h3>Complication Bargaining</h3>
+<p>Invite the kind of trouble you want to play.</p>
+<ul>
+<li>Name a <em>type</em>: social, physical, mystery, or moral (e.g., Valora court etiquette; Ubral scree; Isoka whispers; oath vs. mercy).</li>
+<li>The GM frames the complication accordingly and grants you <strong>+1d</strong> on your next roll <em>within</em> that trouble, or reduces DV by 1 if your approach leans into the specified texture.</li>
+</ul>
+
+<h2 id="faction-awareness">Faction Awareness</h2>
+
+<h3>Loyalty Recognition</h3>
+<p>Track a simple ladder (&minus;3&hellip;+3): <em>Enemy, Hostile, Unfriendly, Neutral, Friendly, Supportive, Ally</em>. When you act <em>with</em> an institution's aims, mark a <strong>tick</strong> toward the next step (GM pacing). When you betray a stated value, drop one step immediately and the GM banks <strong>+1 SB</strong> for future headaches.</p>
+
+<h3>Cross-Cultural Synergies</h3>
+<p>Spotting a neat cultural combo (Zakov pilots + Kahfagia signals; Aeler engineering + Ecktoria charters) grants <strong>+1d</strong> once per scene the synergy is actively used.</p>
+
+<h2 id="advanced-techniques">Advanced Techniques</h2>
+
+<h3 id="momentum-banking">Momentum Banking</h3>
+<p>When your team resolves a Timer <em>early</em> (segments unspent), bank <strong>1 Momentum</strong> per unused segment (max <strong>2/session</strong>). Spend 1 Momentum to:</p>
+<ul>
+<li>Gain <strong>+1d</strong> on a future approach tied to that victory (<em>lessons learned</em>); or</li>
+<li><em>Telescope</em> a travel beat (skip a routine obstacle the same route would present); or</li>
+<li>Trigger a <em>Prepared Move</em>: declare a sensible minor setup you plausibly arranged off-screen.</li>
+</ul>
+
+<h3>Escalation Management</h3>
+<p>Trade heat for shape.</p>
+<ul>
+<li><strong>De-escalate (spend 1 Boon):</strong> Downgrade a Major consequence to Minor with a plausible concession (quiet tolls paid, harsh words eaten).</li>
+<li><strong>Redirect (accept +1 SB):</strong> Shift pressure to a new venue or actor you name; the GM places that SB there as attention.</li>
+<li><strong>Truce (spend 1 Momentum):</strong> Freeze a faction's hostility for one scene if you can cite a shared value (oath, rite, charter clause).</li>
+</ul>
+
+<h2 id="enhanced-coordination">Enhanced Coordination</h2>
+<p>Teamwork isn't just about helping&mdash;it's about creating decisive moments through coordinated action.</p>
+
+<h3>Core Principles</h3>
+<ul>
+<li><strong>Fiction First:</strong> Describe how you help before rolling dice.</li>
+<li><strong>Clear Stakes:</strong> State what help changes and what risk the helper accepts.</li>
+<li><strong>One Spotlight:</strong> Resolve one acting character's roll; fold assistance into that action.</li>
+<li><strong>Visible Costs:</strong> Story Beats, Fatigue, and consequences are tracked openly.</li>
+</ul>
+
+<h3>Basic Assistance</h3>
+<ul>
+<li><strong>Declare Help:</strong> An ally states a concrete contribution (tools, opening, cover).</li>
+<li><strong>Benefit:</strong> Acting character gains <strong>+1d</strong> (up to the table's assist cap).</li>
+<li><strong>Limits:</strong> One assistant per PC per exchange by default.</li>
+<li><strong>Cost:</strong> Assistant accepts any risk named by the GM (SB, Fatigue, collateral).</li>
+</ul>
+
+<h3>Cooperative Talents</h3>
+<p>Certain talents enhance group coordination:</p>
+
+<div class="entry">
+<p class="entry-title">Inspire (3 XP)</p>
+<p>Once per scene, spend 1 Boon to choose one:</p>
+<ul>
+<li>Bonded Ally: That ally gains +1 Boon and +1d on their next roll.</li>
+<li>Self: Gain +1d on your next roll.</li>
+<li>Rally: Each other PC in Near gains +1d on their next roll.</li>
+<li>Tactical Coordination: All allies currently acting gain +1 Position.</li>
+</ul>
+</div>
+
+<div class="entry">
+<p class="entry-title">Spotter's Mark (3 XP)</p>
+<p>Aim a target (1 action). Until end of scene, allies in Near may claim +1d or +1 Effect once vs. that target.</p>
+</div>
+
+<div class="entry">
+<p class="entry-title">Battle Cant (2 XP)</p>
+<p>Once per scene, establish silent signals. On the next coordinated action where at least two PCs act, those PCs gain +1 Position.</p>
+</div>
+
+<div class="entry">
+<p class="entry-title">Shield Wall (4 XP)</p>
+<p>If you and at least one ally each wield a shield and are adjacent: as a Defend action, grant +1d Defend to all in the Wall and convert the first incoming Harm to Fatigue.</p>
+</div>
+
+<h3>Stacking Limits</h3>
+<p>To prevent overwhelming combinations, a PC may benefit from at most <strong>two cooperative effects</strong> on the same action. Choose which apply when multiple sources could stack.</p>
+
+<h3>Timing and Sequencing</h3>
+<ul>
+<li><strong>Declare Order:</strong> Players state intent in any order; resolve the acting roll first.</li>
+<li><strong>Ready/Overwatch:</strong> Hold an action with a clear trigger; resolve before the next exchange.</li>
+<li><strong>Refresh Windows:</strong> &ldquo;Once/scene&rdquo; effects reset at scene end.</li>
+</ul>
+
+<h3>Working With Followers</h3>
+<p>Followers can assist for up to +3d (or +4d with the Exceptional Coordination talent). They cannot receive PC-only benefits unless a talent states otherwise.</p>
+
+<h3>Magic Coordination</h3>
+<ul>
+<li><strong>Ritual Support:</strong> Allies can assist Weave or Cast phases if the fiction allows.</li>
+<li><strong>Rite Preparation:</strong> Helpers can provide components or maintain focus.</li>
+<li><strong>Imbuement Synergy:</strong> Multiple characters can prepare for shared magical effort.</li>
+</ul>
+
+<h3>Best Practices for Players</h3>
+<ol>
+<li><strong>Be Specific:</strong> &ldquo;I'll flank left to give you advantage&rdquo; is better than &ldquo;I help.&rdquo;</li>
+<li><strong>Accept Risk:</strong> Good assistance often means putting yourself in harm's way.</li>
+<li><strong>Think Creatively:</strong> Tools, positioning, and timing matter more than raw dice.</li>
+<li><strong>Support Bonds:</strong> Use coordination to strengthen character relationships.</li>
+<li><strong>Keep Momentum:</strong> Quick, clear assistance keeps scenes moving.</li>
+</ol>
+
+<p><em>Remember:</em> The best coordination enhances the story and makes everyone's moments shine brighter together.</p>
+
+<h2 id="character-creation-enhancements">Character Creation Enhancements</h2>
+<p>Players may take up to <strong>2 Bonds</strong> (+2 XP total) and up to <strong>2 Starting Complications</strong> (+4 XP total) for a cap of <strong>36 XP</strong>. Each unresolved starting Complication adds <strong>+1 banked SB</strong> to early scenes until cleared. Favor <em>storyful</em> picks (clan honor, guild debt, patron notice) over pure math.</p>
+
+<h2 id="war-mount">War Mount (Asset)</h2>
+<p><strong>Type:</strong> Standard Asset<br>
+<strong>XP Cost:</strong> 8 XP<br>
+<strong>Scale:</strong> Personal<br>
+<strong>Maintenance:</strong> Regular care, feed, rest</p>
+
+<p>A trained combat mount&mdash;warhorse, dune-strider, battle elk, ash lizard, or equivalent&mdash;conditioned for violence, chaos, and discipline.</p>
+
+<h4>Passive Benefits</h4>
+<p>While mounted:</p>
+<ul>
+<li>Increase overland travel speed and endurance.</li>
+<li>Ignore the first movement-based complication per session (mud, crowd, loose terrain).</li>
+<li>Mounted positioning may override terrain restrictions at GM discretion.</li>
+</ul>
+
+<h4>Mounted Combat</h4>
+<p>If the rider has the <strong>Cavalier</strong> talent:</p>
+<ul>
+<li>Melee attacks made while moving <strong>Far &rarr; Near</strong>: <strong>+2d</strong></li>
+<li>Ranged attacks made while moving <strong>Near &rarr; Far</strong>: <strong>+2d</strong></li>
+</ul>
+
+<h4>Boon Activation</h4>
+<p>Spend <strong>1 Boon</strong> to invoke the mount dramatically:</p>
+<ul>
+<li>Break through a hostile line or crowd</li>
+<li>Escape pursuit across hostile terrain</li>
+<li>Gain <strong>Controlled Position</strong> for a mounted action</li>
+<li>Advance or suppress a movement-related Timer</li>
+</ul>
+
+<h4>Risk and Wear</h4>
+<p>On a <em>Partial</em> or <em>Miss</em> involving mounted actions, the GM may:</p>
+<ul>
+<li>Mark <strong>Mount Fatigue</strong></li>
+<li>Damage tack, barding, or terrain access</li>
+<li>Threaten or compromise the Asset</li>
+</ul>
+
+<h4>Mount Fatigue</h4>
+<p>If Mount Fatigue reaches 3:</p>
+<ul>
+<li>The mount cannot be used in combat until rested</li>
+<li>Further strain risks permanent injury or loss</li>
+</ul>
+
+<h4>Promoting a War Mount</h4>
+<p>A War Mount may be promoted to a <strong>Follower</strong> if:</p>
+<ul>
+<li>It is named and narratively significant</li>
+<li>The rider takes a dedicated Bond or Talent</li>
+</ul>
+<p>As a Follower, the mount can take actions independently (trample, defend, flee), suffer Harm, and may generate Boons through sacrifice or risk.</p>
+
+<h3>Pike Discipline (Major Talent, 4 XP) <span class="text-muted" style="color:var(--text3);font-size:0.85em;">[FORMATION] [CONTROL]</span></h3>
+<p><strong>Requirements:</strong> Melee 2+, Discipline or Command 1+</p>
+<p>You are trained to break mounted assaults through spacing, timing, and fearlessness.</p>
+
+<h4>Effect</h4>
+<p>When you <strong>Brace</strong> against a mounted opponent:</p>
+<ul>
+<li>Cancel all <strong>Cavalier</strong> movement bonuses</li>
+<li>Mounted attackers suffer <strong>&minus;1d</strong> on the attack</li>
+</ul>
+
+<h4>On Success</h4>
+<ul>
+<li>Reduce incoming Harm by 1</li>
+<li>You may force the rider to <strong>Disengage</strong> or risk mount injury</li>
+</ul>
+
+<h4>On Partial</h4>
+<ul>
+<li>Reduce Harm by 1</li>
+<li>Mark 1 Fatigue or lose formation</li>
+</ul>
+
+<h4>Limits</h4>
+<ul>
+<li>Requires braced footing or prepared terrain</li>
+<li>Ineffective if flanked, surprised, or outnumbered</li>
+</ul>
+
+<h2 id="downtime">Downtime</h2>
+<p>Between sessions, tend your garden&mdash;quietly moving the world.</p>
+
+<h3>Bookkeeping</h3>
+<ul>
+<li>Allocate XP (respecting training days).</li>
+<li>Update Assets/Followers (status: Maintained, Neglected, Compromised).</li>
+<li>Track Boons (conversion cap remains 2 XP/session).</li>
+<li>Note SB Debt from unresolved Complications.</li>
+</ul>
+
+<h3>Activities</h3>
+<ul>
+<li><strong>Recovery:</strong> Clear Harm/Exposure with scenes that show the work.</li>
+<li><strong>Training:</strong> Buy advances; narrate mentors, gyms, scriptoria.</li>
+<li><strong>Research:</strong> Lower DVs with good sources; log new leads.</li>
+<li><strong>Social:</strong> Strengthen Bonds; tune faction attitudes.</li>
+<li><strong>Preparation:</strong> Cache gear, sow rumors, line up ferries.</li>
+</ul>
+
+<h3>Strategic Considerations</h3>
+<p>Clear SB-debt complications first; synchronise travel plans; decide which Asset gets love this interval, and which follower needs face-time to avoid Neglect.</p>
+
+<h2 id="between-sessions-activities-log">Between-Sessions Activities Log</h2>
+<p>Use or print the following trackers.</p>
+
+<h3>Character Advancement</h3>
+<h4>XP Allocation</h4>
+<ul>
+<li><strong>Total XP Available</strong>: ______</li>
+<li><strong>Attributes Spent</strong>: ______ (= ___ days)</li>
+<li><strong>Skills Spent</strong>: ______ (= ___ days)</li>
+<li><strong>Remaining XP</strong>: ______</li>
+</ul>
+
+<h4>Attribute Improvements</h4>
+<div class="table-wrap">
+<table>
+<tr><th>Attribute</th><th>Old</th><th>New</th><th>Cost</th><th>Days</th></tr>
+<tr><td>Body</td><td></td><td></td><td></td><td></td></tr>
+<tr><td>Spirit</td><td></td><td></td><td></td><td></td></tr>
+<tr><td>Presence</td><td></td><td></td><td></td><td></td></tr>
+<tr><td>Wits</td><td></td><td></td><td></td><td></td></tr>
+</table>
+</div>
+
+<h4>Skill Improvements</h4>
+<div class="table-wrap">
+<table>
+<tr><th>Skill</th><th>Old</th><th>New</th><th>Cost</th><th>Days</th></tr>
+<tr><td>Arcana</td><td></td><td></td><td></td><td></td></tr>
+<tr><td>Combat</td><td></td><td></td><td></td><td></td></tr>
+<tr><td>Investigate</td><td></td><td></td><td></td><td></td></tr>
+<tr><td>Lore</td><td></td><td></td><td></td><td></td></tr>
+<tr><td>Move</td><td></td><td></td><td></td><td></td></tr>
+<tr><td>Notice</td><td></td><td></td><td></td><td></td></tr>
+<tr><td>Physique</td><td></td><td></td><td></td><td></td></tr>
+<tr><td>Resolve</td><td></td><td></td><td></td><td></td></tr>
+<tr><td>Stealth</td><td></td><td></td><td></td><td></td></tr>
+<tr><td>Sway</td><td></td><td></td><td></td><td></td></tr>
+<tr><td>Survival</td><td></td><td></td><td></td><td></td></tr>
+</table>
+</div>
+
+<h3>Asset &amp; Follower Management</h3>
+<h4>Assets</h4>
+<div class="table-wrap">
+<table>
+<tr><th>Name</th><th>Tier</th><th>Status</th><th>Notes</th></tr>
+<tr><td></td><td></td><td></td><td></td></tr>
+</table>
+</div>
+
+<h4>Followers</h4>
+<div class="table-wrap">
+<table>
+<tr><th>Name</th><th>Role</th><th>Harm</th><th>Exposure</th><th>Status</th></tr>
+<tr><td></td><td></td><td></td><td></td><td></td></tr>
+</table>
+</div>
+
+<h3>Bonds &amp; Complications</h3>
+<h4>Bonds Updated</h4>
+<ul>
+<li><strong>With:</strong> ______ &mdash; <strong>Change:</strong> ______</li>
+</ul>
+
+<h4>Complications</h4>
+<div class="table-wrap">
+<table>
+<tr><th>Complication</th><th>Resolution or Status</th></tr>
+<tr><td></td><td></td></tr>
+</table>
+</div>
+
+<h3>Boons &amp; Momentum Summary</h3>
+<ul>
+<li><strong>Boons Held:</strong> __/5 &nbsp; <strong>Converted to XP</strong>: __ (max 2 XP/session)</li>
+<li><strong>Momentum Banked:</strong> __ (max 2/session)</li>
+</ul>
+
+<h3>Campaign Timers</h3>
+<ul>
+<li><strong>Mandate:</strong> __ / 6 &nbsp;&nbsp; <strong>Crisis:</strong> __ / 6</li>
+<li><strong>Notables:</strong> ________________</li>
+</ul>
+
+<footer>Fate's Edge Proprietary Content &mdash; (c) 2024 Nicholas A. Gasper. All rights reserved.</footer>
+
+</body>
+</html>

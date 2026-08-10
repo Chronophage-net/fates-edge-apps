@@ -1,0 +1,672 @@
+<!-- ============ Players-_-Guide-_-08-_-XP-_-Paths.html ============ -->
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <title>Fate's Edge Player's Guide — Experience Paths and Character Building</title>
+    <style>
+        :root {
+            --bg1: #0d0d1a;
+            --bg2: #1a1a2e;
+            --bg3: #252540;
+            --bg4: #2f2f4a;
+            --text: #e8e8f0;
+            --text2: #b8b8c8;
+            --text3: #8888a0;
+            --gold: #c9a84c;
+            --gold-hover: #d4b85c;
+            --border: #333355;
+            --red: #c0392b;
+            --green: #27ae60;
+            --blue: #2980b9;
+            --purple: #8e44ad;
+            --orange: #e67e22;
+            --radius: 8px;
+            --font: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            background: var(--bg1);
+            color: var(--text);
+            font-family: var(--font);
+            padding: 1.5rem;
+            max-width: 1100px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+        h1, h2, h3, h4, h5 { color: var(--gold); margin: 0.5rem 0 0.3rem; }
+        h1 { font-size: 1.8rem; border-bottom: 2px solid var(--gold); padding-bottom: 0.3rem; }
+        h2 { font-size: 1.4rem; border-bottom: 1px solid var(--border); padding-bottom: 0.2rem; margin-top: 1.2rem; }
+        h3 { font-size: 1.1rem; margin-top: 0.8rem; }
+        h4 { font-size: 0.95rem; color: var(--text); }
+        p { margin: 0.4rem 0; }
+        p.subtitle { color: var(--text3); font-style: italic; margin-top: -0.2rem; margin-bottom: 0.8rem; }
+        a { color: var(--gold); text-decoration: none; }
+        a:hover { color: var(--gold-hover); text-decoration: underline; }
+        ul, ol { margin: 0.3rem 0 0.5rem 1.4rem; }
+        li { margin: 0.15rem 0; }
+        dt { font-weight: 600; color: var(--gold); margin-top: 0.4rem; }
+        dd { margin: 0.1rem 0 0.3rem 1.2rem; }
+        .panel {
+            background: var(--bg2);
+            border-radius: var(--radius);
+            padding: 0.6rem 0.8rem;
+            border: 1px solid var(--border);
+            margin: 0.5rem 0;
+        }
+        .panel-gold { border-left: 4px solid var(--gold); }
+        .panel-red { border-left: 4px solid var(--red); }
+        .panel-blue { border-left: 4px solid var(--blue); }
+        .panel-green { border-left: 4px solid var(--green); }
+        .panel-purple { border-left: 4px solid var(--purple); }
+        .panel h4 { margin-top: 0; }
+        .tag-anno { font-size: 0.72rem; font-weight: 600; color: var(--text3); }
+        .badge {
+            display: inline-block;
+            padding: 0.05rem 0.5rem;
+            border-radius: 12px;
+            font-size: 0.65rem;
+            font-weight: 600;
+            background: var(--bg4);
+            color: var(--text3);
+            border: 1px solid var(--border);
+        }
+        .badge-gold { background: var(--gold); color: #1a1400; border-color: var(--gold); }
+        .badge-red { background: var(--red); color: #fff; border-color: var(--red); }
+        .badge-green { background: var(--green); color: #fff; border-color: var(--green); }
+        .badge-blue { background: var(--blue); color: #fff; border-color: var(--blue); }
+        .badge-purple { background: var(--purple); color: #fff; border-color: var(--purple); }
+        .badge-orange { background: var(--orange); color: #fff; border-color: var(--orange); }
+        .text-muted { color: var(--text3); }
+        .text-gold { color: var(--gold); }
+        .text-sm { font-size: 0.85rem; }
+        .text-xs { font-size: 0.7rem; }
+        .mt-1 { margin-top: 0.5rem; }
+        .mb-1 { margin-bottom: 0.5rem; }
+        .flex { display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center; }
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; }
+        @media (max-width: 600px) { .grid-2 { grid-template-columns: 1fr; } }
+        .toc {
+            background: var(--bg3);
+            border-radius: var(--radius);
+            padding: 0.5rem 0.8rem;
+            border: 1px solid var(--border);
+            margin: 0.5rem 0;
+        }
+        .toc summary { cursor: pointer; color: var(--gold); font-weight: 600; }
+        .toc summary:hover { color: var(--gold-hover); }
+        .toc a { color: var(--text2); display: block; padding: 0.1rem 0; font-size: 0.85rem; }
+        .toc a:hover { color: var(--gold); }
+        .table-wrap { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; margin: 0.5rem 0; }
+        th, td { padding: 0.4rem 0.6rem; border: 1px solid var(--border); text-align: left; }
+        th { background: var(--bg4); color: var(--gold); font-weight: 600; }
+        tr:nth-child(even) { background: var(--bg2); }
+        blockquote {
+            font-style: italic;
+            border-left: 4px solid var(--gold);
+            padding: 0.5rem 1rem;
+            margin: 0.5rem 0;
+            background: var(--bg2);
+            border-radius: var(--radius);
+            color: var(--text2);
+        }
+        blockquote .attribution { display: block; font-style: normal; color: var(--text3); font-size: 0.85rem; margin-top: 0.3rem; }
+        code { background: var(--bg4); padding: 0.1rem 0.3rem; border-radius: 4px; font-size: 0.85rem; color: var(--gold); }
+        pre { background: var(--bg3); padding: 0.5rem; border-radius: var(--radius); overflow-x: auto; border: 1px solid var(--border); }
+        hr { border: none; border-top: 1px solid var(--border); margin: 1rem 0; }
+        .titlepage { text-align: center; margin: 1rem 0 0.5rem; }
+        .titlepage h1 { font-size: 2.5rem; border-bottom: none; margin-bottom: 0.1rem; }
+        .titlepage h2 { font-size: 1.8rem; font-weight: normal; border-bottom: none; margin-top: 0; }
+        .copyright-page { text-align: center; margin: 1rem 0; padding: 1rem 0; border-top: 2px solid var(--gold); border-bottom: 2px solid var(--gold); }
+        .copyright-page h1 { border-bottom: none; }
+        .srd-reference { background: var(--bg2); border: 1px solid var(--gold); padding: 0.5rem 1rem; margin: 1rem 0; border-radius: var(--radius); }
+        .back-to-top { position: fixed; bottom: 1rem; right: 1rem; background: var(--bg3); padding: 0.5rem 0.8rem; border-radius: 50%; border: 1px solid var(--gold); color: var(--gold); text-decoration: none; font-size: 1.2rem; box-shadow: 0 2px 8px rgba(0,0,0,0.5); z-index: 100; }
+        .back-to-top:hover { background: var(--gold); color: var(--bg1); }
+        .search-box { background: var(--bg3); border: 1px solid var(--border); border-radius: var(--radius); padding: 0.5rem; color: var(--text); width: 100%; max-width: 300px; }
+        .search-box:focus { outline: none; border-color: var(--gold); }
+        .highlight { background: var(--bg4); border-left: 3px solid var(--gold); padding-left: 0.5rem; }
+        .multicols { column-count: 2; column-gap: 2rem; }
+        @media (max-width: 600px) { .multicols { column-count: 1; } }
+        .eq { background: var(--bg3); border: 1px solid var(--border); border-radius: var(--radius); padding: 0.4rem 0.8rem; margin: 0.4rem 0; font-family: 'Cambria Math', serif; text-align: center; }
+        dl { margin: 0.3rem 0 0.5rem 0; }
+        footer.doc-footer { margin-top: 2rem; padding-top: 0.8rem; border-top: 2px solid var(--gold); text-align: center; color: var(--text3); font-size: 0.8rem; }
+    </style>
+</head>
+<body>
+<a href="#" class="back-to-top">⬆</a>
+<div id="main-content">
+
+<h1>Experience Paths and Character Building</h1>
+<p class="subtitle">Fate's Edge Player's Guide — Chapter 8</p>
+<p>How you spend your <strong>Experience Points (XP)</strong> shapes more than your numbers on a sheet&mdash;it defines your character&rsquo;s <em>career</em>, their growth over time, and the kind of stories they invite into play.</p>
+<p>This chapter focuses on:</p>
+<ul>
+<li><p>turning a loose idea into a clear <strong>character concept</strong>,</p></li>
+<li><p>mapping that concept into <strong>starting choices</strong> that fit the campaign rules,</p></li>
+<li><p>choosing a <strong>career path</strong> (how you plan to grow),</p></li>
+<li><p>and understanding how your character can evolve across <strong>early, mid, and late</strong> game.</p></li>
+</ul>
+<p>All examples in this chapter are <em>legal starting builds</em> under the standard creation rules, and are written to be directly usable by players.</p>
+<h2>From Concept to Career</h2>
+<p>Before you spend a single XP, start with the story you want to tell.</p>
+<h3>Step 1: Concept Seed</h3>
+<p>Begin with a simple statement of who your character is:</p>
+<ul>
+<li><p>&ldquo;Stoic bodyguard who will take the hit for anyone else.&rdquo;</p></li>
+<li><p>&ldquo;Nervy courier who knows every back alley in the city.&rdquo;</p></li>
+<li><p>&ldquo;Soft-spoken merchant who pulls strings behind the scenes.&rdquo;</p></li>
+</ul>
+<p>This is your <strong>concept seed</strong>. Everything else grows from here.</p>
+<h3>Step 2: Role in the Party</h3>
+<p>Decide what you want to <em>do at the table</em>:</p>
+<ul>
+<li><p>Take hits and lock down threats?</p></li>
+<li><p>Spot danger and solve practical problems?</p></li>
+<li><p>Talk through conflicts and manage social fallout?</p></li>
+<li><p>Create tools, magic, or plans that enable everyone else?</p></li>
+</ul>
+<p>Your role helps you choose a <strong>Primary Attribute</strong> and 2&ndash;3 <strong>Key Skills</strong> (see Chapter 7, &ldquo;Character Advancement and Capabilities&rdquo;).</p>
+<h3>Step 3: Career Theme</h3>
+<p>Ask yourself:</p>
+<ul>
+<li><p>Is this a story of <em>self-mastery</em>? (training, discipline, pushing limits)</p></li>
+<li><p>A story of <em>connections</em>? (alliances, obligations, webs of influence)</p></li>
+<li><p>A story of <em>balance</em>? (learning to juggle many demands at once)</p></li>
+</ul>
+<p>Your answer naturally points you toward one of the three <strong>XP paths</strong> in this chapter.</p>
+<h3>Step 4: Long Arc in One Sentence</h3>
+<p>Write a single sentence for where you imagine your character at high XP:</p>
+<ul>
+<li><p>&ldquo;I want to become the greatest duelist in the realm.&rdquo;</p></li>
+<li><p>&ldquo;I want to map the unknown and bring others safely home.&rdquo;</p></li>
+<li><p>&ldquo;I want to run the network everyone relies on but no one sees.&rdquo;</p></li>
+</ul>
+<p>You do not have to stick to this forever, but it gives you a <em>direction</em> for your early choices.</p>
+<div class="panel panel-blue">
+<h4>Character Career Checklist</h4>
+<p><strong>Before spending XP, decide:</strong></p>
+<ol>
+<li><p>Your <strong>concept seed</strong> (one sentence).</p></li>
+<li><p>Your <strong>role in the party</strong> (what you do most).</p></li>
+<li><p>Your preferred <strong>career theme</strong>: self, balance, or influence.</p></li>
+<li><p>A rough <strong>long arc</strong> (where you want to end up).</p></li>
+</ol>
+<p>Start simple. You can always refine these as the campaign unfolds.</p>
+</div>
+<h2>Mapping Concept to Mechanics</h2>
+<p>Once you have a concept, you turn it into numbers. Use this as a guideline:</p>
+<ol>
+<li><p>Pick a <strong>Primary Attribute</strong> that supports your role (Body, Wits, Spirit, or Presence) &ndash; see the Core Attributes section (Chapter 7).</p></li>
+<li><p>Choose 2&ndash;3 <strong>Key Skills</strong> that you want to be noticeably good at (see the Skill System section (Chapter 7)).</p></li>
+<li><p>Choose a <strong>Career Path</strong> (Personal, Balanced, Influencer) that matches your theme.</p></li>
+<li><p>Use the starting XP budget in the Starting Character Guidelines section to buy:</p>
+<ul>
+<li><p>Attribute steps for your primary and possibly secondary stats.</p></li>
+<li><p>Skill steps for your key and supporting skills.</p></li>
+<li><p>Optional resources or special abilities, if your path calls for them.</p></li>
+</ul></li>
+</ol>
+<p>Throughout this chapter, each example shows how a concept becomes a legal build.</p>
+<h2>Three Career Paths</h2>
+<p>There are three broad approaches to character development, each representing a different <strong>career philosophy</strong>:</p>
+<dl>
+<dt>Personal Path</dt><dd><p>Focus on personal mastery and self-improvement (the Personal Path section (Chapter 8)).</p></dd>
+<dt>Balanced Path</dt><dd><p>Mix personal growth with resources and influence (the Balanced Path section (Chapter 8)).</p></dd>
+<dt>Influencer Path</dt><dd><p>Build networks, assets, and strategic power (the Influencer Path section (Chapter 8)).</p></dd>
+</dl>
+<p>These paths are not rigid classes. They are <em>patterns</em> that help you decide where most of your XP will go, especially in the early game.</p>
+<h2>Player Archetypes</h2>
+<p>Not every player spends XP the same way. These three <strong>player archetypes</strong> describe common patterns. Identify yours &ndash; it will help you choose a career path and avoid frustration.</p>
+<h3>The Solo</h3>
+<p><strong>Definition:</strong> Invests XP primarily in Attributes and Skills. Minimal followers, minimal holdings. All power is on the character sheet.</p>
+<p><strong>Typical XP Spread:</strong> 70&ndash;90% Self; 0&ndash;10% On-screen help; 0&ndash;20% Off-screen assets.</p>
+<p><strong>Strengths:</strong> Consistent scene impact; few moving parts; resilient to follower loss.</p>
+<p><strong>Risks:</strong> Limited fiction reach between sessions; can stall when problems demand logistics or networks.</p>
+<p><strong>Starting Focus:</strong> Attributes 2&ndash;3, Skills 1&ndash;2, minimal assets.</p>
+<h3>The Mixed Player</h3>
+<p><strong>Definition:</strong> Splits XP between self-growth and one or two meaningful assets (a small follower or a reliable holding).</p>
+<p><strong>Typical XP Spread:</strong> 50&ndash;65% Self; 15&ndash;25% On-screen help; 15&ndash;25% Off-screen assets.</p>
+<p><strong>Strengths:</strong> Versatile: credible in scenes and has a lever for special problems.</p>
+<p><strong>Risks:</strong> Upkeep pressure; helper can be targeted when the GM spends 2+ Story Beats.</p>
+<p><strong>Starting Focus:</strong> Balanced approach with one minor asset or low-cap follower.</p>
+<h3>The Mastermind</h3>
+<p><strong>Definition:</strong> Prioritises followers / cadres / familiars and off-screen networks. The character sheet is the hub of a larger apparatus.</p>
+<p><strong>Typical XP Spread:</strong> 25&ndash;40% Self; 35&ndash;55% On-screen help; 20&ndash;40% Off-screen assets.</p>
+<p><strong>Strengths:</strong> Scene control via assistance; strategic reach between sessions; strong heist / social-planning play.</p>
+<p><strong>Risks:</strong> Dependency on assist lanes; followers can be endangered on 2+ SB spends; upkeep pressure.</p>
+<p><strong>Starting Focus:</strong> Significant investment in followers or major assets from the beginning.</p>
+<div class="panel panel-blue">
+<h4>Which Archetype Are You?</h4>
+<p>Ask yourself:</p>
+<ul>
+<li><p>Do I want my character to be self-sufficient and always ready? &rarr; <strong>Solo</strong></p></li>
+<li><p>Do I enjoy having a helpful sidekick or a home base, but not too much bookkeeping? &rarr; <strong>Mixed</strong></p></li>
+<li><p>Do I love managing networks, commanding troops, and solving problems through influence? &rarr; <strong>Mastermind</strong></p></li>
+</ul>
+<p>There is no wrong answer &ndash; but knowing your style helps you build a character you will enjoy for many sessions.</p>
+</div>
+<h2>Path 1: Personal Development</h2>
+<p>The <strong>Personal Path</strong> centers your character&rsquo;s career on what <em>they</em> can do: their body, mind, and honed skills. This is the path of the duelist, the ascetic, the elite scout, the master healer.</p>
+<h3>Typical Investment</h3>
+<ul>
+<li><p>70&ndash;90% Personal improvement (Attributes and Skills)</p></li>
+<li><p>0&ndash;10% Resources and assets</p></li>
+<li><p>0&ndash;20% Special abilities</p></li>
+</ul>
+<h3>Strengths</h3>
+<ul>
+<li><p>Reliable in direct challenges and combat</p></li>
+<li><p>Minimal upkeep or management required</p></li>
+<li><p>Resilient to loss of external resources</p></li>
+<li><p>Consistent performance in spotlight moments</p></li>
+</ul>
+<h3>Weaknesses</h3>
+<ul>
+<li><p>Limited influence in social or strategic scenes</p></li>
+<li><p>May struggle with problems requiring networks</p></li>
+<li><p>Less capable in logistics or large-scale operations</p></li>
+<li><p>Dependent on personal presence for all solutions</p></li>
+</ul>
+<h3>Career View</h3>
+<p>On this path, your &ldquo;career ladder&rdquo; is mostly about pushing numbers related to <strong>you</strong>: raising Attributes, deepening Skills, and picking a few defining abilities. Your late-game questions are:</p>
+<ul>
+<li><p>&ldquo;What does a legendary version of this look like?&rdquo;</p></li>
+<li><p>&ldquo;What scenes prove that I have truly mastered my craft?&rdquo;</p></li>
+</ul>
+<h3>Build Example: The Duelist (Legal Start)</h3>
+<p><strong>Concept Seed:</strong> &ldquo;A proud blade whose entire life is training and challenge.&rdquo;</p>
+<p><strong>Total XP: 30</strong> &emsp; (<strong>34</strong> with +4 from Bonds/Complications; see the Starting Character Guidelines section)</p>
+<ul>
+<li><p><strong>Attributes</strong>: Body 3, Wits 2, Spirit 1, Presence 1</p>
+<ul>
+<li><p>Costs (Attributes cost <em>new rating</em> &times; 3): Body 1&rarr;2 (6), 2&rarr;3 (9) = <strong>15</strong>; Wits 1&rarr;2 (6) = <strong>6</strong>; Spirit/Presence remain 1 = <strong>0</strong>. <em>Subtotal: 21 XP</em></p></li>
+</ul></li>
+<li><p><strong>Skills</strong>: Melee 2, Athletics 1</p>
+<ul>
+<li><p>Costs (Skills cost <em>new level</em> &times; 2): Melee 0&rarr;1 (2), 1&rarr;2 (4) = <strong>6</strong>; Athletics 0&rarr;1 = <strong>2</strong>. <em>Subtotal: 8 XP</em></p></li>
+</ul></li>
+<li><p><strong>Totals</strong>: 21 + 8 = <strong>29 XP</strong>. Bank <strong>1 XP</strong>.</p></li>
+<li><p><strong>With +4 XP (Bonds/Complications)</strong>: Add <em>Perception 0&rarr;1</em> (2) and spend banked 1 XP on <em>Stealth 0&rarr;1</em> (2), or instead take <em>Perception 0&rarr;1</em> (2) and <em>Sway 0&rarr;1</em> (2) for broader utility. <em>Cap: 36XP</em>.</p></li>
+</ul>
+<p><strong>Career Hook:</strong> Early scenes show duels and drills. Mid game focuses on notorious opponents. Late game tells the story of a blade whose name carries across borders.</p>
+<h2>Path 2: Balanced Approach</h2>
+<p>The <strong>Balanced Path</strong> mixes personal capability with supportive resources. This is the path of the scout-captain, the field medic with a small clinic, the problem-solver who always seems to have <em>something</em> ready.</p>
+<h3>Typical Investment</h3>
+<ul>
+<li><p>50&ndash;65% Personal improvement</p></li>
+<li><p>15&ndash;25% Resources and assets</p></li>
+<li><p>15&ndash;25% Special abilities</p></li>
+</ul>
+<h3>Strengths</h3>
+<ul>
+<li><p>Adaptable to diverse situations</p></li>
+<li><p>Handles both direct and indirect challenges</p></li>
+<li><p>Excellent supporting role for the group</p></li>
+<li><p>Moderate risk profile</p></li>
+</ul>
+<h3>Weaknesses</h3>
+<ul>
+<li><p>Not exceptional in any single area</p></li>
+<li><p>Requires management of resources</p></li>
+<li><p>Moderate upkeep demands</p></li>
+<li><p>Can be outshone by focused specialists</p></li>
+</ul>
+<h3>Career View</h3>
+<p>Balanced characters often have careers that feel like juggling:</p>
+<ul>
+<li><p>they add contacts, gear, or small bases <em>and</em></p></li>
+<li><p>keep raising the core skills that let them use those tools well.</p></li>
+</ul>
+<p>Their late-game questions are:</p>
+<ul>
+<li><p>&ldquo;What does my little network or operation look like at full size?&rdquo;</p></li>
+<li><p>&ldquo;How do my personal skills and resources fit together as a whole?&rdquo;</p></li>
+</ul>
+<h3>Build Example: The Scout (Legal Start)</h3>
+<p><strong>Concept Seed:</strong> &ldquo;A pathfinder who knows how to get in, get out, and get others home.&rdquo;</p>
+<p><strong>Total XP: 30</strong> &emsp; (<strong>34</strong> with +4 from Bonds/Complications)</p>
+<ul>
+<li><p><strong>Attributes</strong>: Wits 2, Body 2, Spirit 1, Presence 1</p>
+<ul>
+<li><p>Costs: Wits 1&rarr;2 (6), Body 1&rarr;2 (6) = <strong>12 XP</strong></p></li>
+</ul></li>
+<li><p><strong>Skills</strong>: Survival 2, Perception 1, Stealth 1</p>
+<ul>
+<li><p>Costs: Survival 0&rarr;1 (2), 1&rarr;2 (4) = <strong>6</strong>; Perception 0&rarr;1 <strong>2</strong>; Stealth 0&rarr;1 <strong>2</strong>. <em>Subtotal: 10 XP</em></p></li>
+</ul></li>
+<li><p><strong>Resources</strong>: <em>Minor equipment cache</em> (camp gear, maps, signal kit) = <strong>4 XP</strong></p></li>
+<li><p><strong>Special Abilities</strong>: <em>Wilderness Lore</em> (broad travel benefits) = <strong>4 XP</strong></p></li>
+<li><p><strong>Totals</strong>: 12 + 10 + 4 + 4 = <strong>32 XP</strong>.</p></li>
+<li><p><strong>With +4 XP</strong>: add <em>Perception 1&rarr;2</em> (+4) <em>or</em> take a <em>trained hawk companion</em> (Minor Resource, 4 XP).</p></li>
+</ul>
+<p><strong>Career Hook:</strong> Early stories show small journeys. Mid game explores dangerous routes and rescue missions. Late game might see the scout running expeditions, caravans, or an entire mapping guild.</p>
+<h2>Path 3: Influencer Focus</h2>
+<p>The <strong>Influencer Path</strong> emphasizes networks, assets, and strategic power. This is the path of the merchant-prince, the fixer, the spymaster, the noble with more favors owed than coins in their purse.</p>
+<h3>Typical Investment</h3>
+<ul>
+<li><p>25&ndash;40% Personal improvement</p></li>
+<li><p>35&ndash;55% Resources and assets</p></li>
+<li><p>20&ndash;40% Special abilities</p></li>
+</ul>
+<h3>Strengths</h3>
+<ul>
+<li><p>Strong strategic and social influence</p></li>
+<li><p>Can solve problems indirectly</p></li>
+<li><p>Excellent at planning and preparation</p></li>
+<li><p>Creates opportunities for the whole group</p></li>
+</ul>
+<h3>Weaknesses</h3>
+<ul>
+<li><p>Personally vulnerable in direct confrontations</p></li>
+<li><p>High maintenance requirements</p></li>
+<li><p>Complications can cascade through networks</p></li>
+<li><p>Dependent on external factors</p></li>
+</ul>
+<h3>Career View</h3>
+<p>Influencer careers are about building and surviving <strong>webs</strong>:</p>
+<ul>
+<li><p>webs of contacts, debts, trade routes, cells, or clients.</p></li>
+</ul>
+<p>Late game questions become:</p>
+<ul>
+<li><p>&ldquo;How big can this web reasonably grow within the fiction?&rdquo;</p></li>
+<li><p>&ldquo;What happens when a strand of my web is cut, or pulled tight?&rdquo;</p></li>
+</ul>
+<h3>Build Example: The Merchant (Legal Start)</h3>
+<p><strong>Concept Seed:</strong> &ldquo;A friendly shopkeeper whose real power lies in who owes them favors.&rdquo;</p>
+<p><strong>Total XP: 30</strong> &emsp; (<strong>34</strong> with +4 from Bonds/Complications)</p>
+<ul>
+<li><p><strong>Attributes</strong>: Presence 2, Wits 2, Spirit 1, Body 1</p>
+<ul>
+<li><p>Costs: Presence 1&rarr;2 (6), Wits 1&rarr;2 (6) = <strong>12 XP</strong></p></li>
+</ul></li>
+<li><p><strong>Skills</strong>: Sway 2, Deception 1, Lore 1</p>
+<ul>
+<li><p>Costs: Sway 0&rarr;1 (2), 1&rarr;2 (4) = <strong>6</strong>; Deception 0&rarr;1 <strong>2</strong>; Lore 0&rarr;1 <strong>2</strong>. <em>Subtotal: 10 XP</em></p></li>
+</ul></li>
+<li><p><strong>Resources</strong>: <em>Standard trading office</em> (staffed storefront, ledgers, storage) = <strong>8 XP</strong></p></li>
+<li><p><strong>Totals</strong>: 12 + 10 + 8 = <strong>32 XP</strong>.</p></li>
+<li><p><strong>With +4 XP</strong>: add <em>Negotiation Mastery</em> (4 XP general ability) <em>or</em> expand to a second <em>Minor merchant route</em> (4 XP).</p></li>
+</ul>
+<p><strong>Career Hook:</strong> Early scenes are about one shop and a few key clients. Mid game introduces caravans, deals, and rivals. Late game might place the merchant at the center of regional politics and supply chains.</p>
+<h2>Building for Group Synergy</h2>
+<p>Your character&rsquo;s career path matters most in context with the rest of the party. A well-constructed party covers key roles without excessive overlap.</p>
+<h3>Key Roles to Consider</h3>
+<dl>
+<dt>Combat</dt><dd><p>Frontline defense, skirmishing, or ranged fire support.</p></dd>
+<dt>Social</dt><dd><p>Negotiation, intimidation, information gathering.</p></dd>
+<dt>Exploration</dt><dd><p>Scouting, navigating, surviving hostile environments.</p></dd>
+<dt>Magic</dt><dd><p>Free casting, rites, rituals, or summoning.</p></dd>
+<dt>Assets</dt><dd><p>Logistics, networks, safehouses, followers.</p></dd>
+</dl>
+<h3>Complementary Paths</h3>
+<ul>
+<li><p><strong>Personal path</strong> characters provide reliable combat and specialist solutions.</p></li>
+<li><p><strong>Balanced path</strong> characters handle diverse, connective challenges.</p></li>
+<li><p><strong>Influencer path</strong> characters create opportunities and resources for everyone.</p></li>
+</ul>
+<p>Together, a mixed party can cover nearly every type of problem.</p>
+<h3>Redundant Paths</h3>
+<ul>
+<li><p>Multiple personal path characters may overlap in combat or role.</p></li>
+<li><p>Multiple influencer path characters may compete for spotlight and assets.</p></li>
+<li><p>Consider diversifying within similar paths: different weapon styles, different Patrons, different social approaches.</p></li>
+<li><p>Example: Two combatants &ndash; one a duelist (single-target damage), one a shield-focused guardian (area protection).</p></li>
+</ul>
+<h3>Balancing Your Table</h3>
+<p>If you notice a gap (e.g., no one has investment in social skills or no one has a safehouse asset), consider adjusting your XP spending or discussing with the group. A party that talks about roles early will have a smoother campaign.</p>
+<h2>Starting Character Guidelines</h2>
+<h3>Base XP Allocation</h3>
+<ul>
+<li><p><strong>Standard Starting XP</strong>: <strong>32</strong> points</p></li>
+<li><p><strong>Bonds and Complications</strong>: You may take up to <strong>two total</strong> from any mix of meaningful <em>Bonds</em> (up to 2, +2 XP each) and significant <em>Complications</em> (up to 2, +2 XP each), granting maximum <strong>+4 XP</strong>. (See the Backgrounds chapter for Bonds and Complications.)</p></li>
+<li><p><strong>Maximum Starting XP</strong>: <strong>36</strong> points</p></li>
+<li><p><strong>Complication Effect</strong>: Each unresolved starting Complication adds +1 banked SB to early scenes until cleared.</p></li>
+</ul>
+<h3>Recommended Starting Ranges</h3>
+<div class="table-wrap"><table>
+<thead><tr><th><strong>Category</strong></th><th><strong>Recommended XP</strong></th></tr></thead>
+<tbody>
+<tr><td>Primary Attribute</td><td>9&ndash;12 XP (rating 3&ndash;4)</td></tr>
+<tr><td>Secondary Attributes</td><td>0&ndash;9 XP each (rating 1&ndash;3)</td></tr>
+<tr><td>Key Skills</td><td>4&ndash;6 XP each (rating 2&ndash;3)</td></tr>
+<tr><td>Supporting Skills</td><td>2&ndash;4 XP each (rating 1&ndash;2)</td></tr>
+<tr><td>Resources</td><td>0&ndash;8 XP total</td></tr>
+<tr><td>Special Abilities</td><td>0&ndash;8 XP total</td></tr>
+</tbody></table></div>
+<h5>Cost Reminders:</h5>
+<ul>
+<li><p><strong>Attributes</strong>: Each step costs <em>new rating</em> &times; 3 XP (e.g., 1&rarr;2 costs 6; 2&rarr;3 costs 9). See the Core Attributes section (Chapter 7).</p></li>
+<li><p><strong>Skills</strong>: Each step costs <em>new level</em> &times; 2 XP (e.g., 0&rarr;1 costs 2; 1&rarr;2 costs 4). See the Skill System section (Chapter 7).</p></li>
+<li><p><strong>Resources</strong>: Minor 4 XP; Standard 8 XP; Major 12 XP.</p></li>
+<li><p><strong>Special Abilities</strong>: Minor Edge 2 XP; Major Edge 4 XP; Prestige 6+ XP.</p></li>
+</ul>
+<h2>Progression Planning</h2>
+<p>Think of your character&rsquo;s career in phases. These XP bands are approximate and assume you began at 30&ndash;36XP.</p>
+<h3>Early Game (0&ndash;40 XP)</h3>
+<p>Focus on establishing core capabilities:</p>
+<ul>
+<li><p>Reach attribute rating 3 in your primary area.</p></li>
+<li><p>Develop 2&ndash;3 key skills to rating 2&ndash;3.</p></li>
+<li><p>Acquire basic resources or one special ability (if your path uses them).</p></li>
+<li><p>Clarify your character&rsquo;s niche in the group.</p></li>
+</ul>
+<p><strong>When to take a Follower vs. Asset vs. Talent (Early):</strong></p>
+<ul>
+<li><p><strong>Follower:</strong> If you want on-screen help (a scout, a bodyguard, an apprentice). Start with Cap 1&ndash;2.</p></li>
+<li><p><strong>Asset:</strong> If you want an off-screen advantage (a safehouse, a workshop, a contact network). Start with Minor Asset (4 XP).</p></li>
+<li><p><strong>Talent:</strong> If you want a signature move (combat technique, social edge, magic access). Minor talents (2&ndash;3 XP) are great early.</p></li>
+</ul>
+<h3>Mid Game (41&ndash;90 XP)</h3>
+<p>Expand and specialize:</p>
+<ul>
+<li><p>Increase your primary attribute to 4.</p></li>
+<li><p>Specialize key skills to rating 3&ndash;4.</p></li>
+<li><p>Develop supporting capabilities that fit your concept.</p></li>
+<li><p>Build strategic resources or networks if on the Balanced or Influencer path.</p></li>
+<li><p>Acquire signature special abilities that define your style.</p></li>
+</ul>
+<p><strong>When to take a Follower vs. Asset vs. Talent (Mid):</strong></p>
+<ul>
+<li><p><strong>Follower:</strong> Upgrade a loyal contact to Cap 3 (9 XP) &ndash; they become a reliable asset who can act independently.</p></li>
+<li><p><strong>Asset:</strong> Expand your network &ndash; a Standard Asset (8 XP) turns a safehouse into a spy ring or a workshop into a guild connection.</p></li>
+<li><p><strong>Talent:</strong> Major talents (4&ndash;6 XP) define your mid-game identity &ndash; Backstab, Ritual Mastery, Command Presence.</p></li>
+</ul>
+<h3>Late Game (91&ndash;150 XP)</h3>
+<p>Master your chosen path:</p>
+<ul>
+<li><p>Achieve peak attributes (rating 4&ndash;5).</p></li>
+<li><p>Master key skills (rating 4&ndash;5).</p></li>
+<li><p>Build substantial influence or unique capabilities.</p></li>
+<li><p>Develop advanced special abilities.</p></li>
+<li><p>Consider legacy projects, organizations, or long-term changes to the setting.</p></li>
+</ul>
+<p><strong>When to take a Follower vs. Asset vs. Talent (Late):</strong></p>
+<ul>
+<li><p><strong>Follower:</strong> A Cap 4&ndash;5 follower (16&ndash;25 XP) can become a successor (see The Legacy Engine chapter) &ndash; invest in someone who could carry on your cause.</p></li>
+<li><p><strong>Asset:</strong> Major Assets (12 XP) give you regional influence &ndash; a fortress, a charter, a fleet.</p></li>
+<li><p><strong>Talent:</strong> Prestige (7&ndash;10 XP) and Epic (11+ XP) talents reshape the story. Plan your build around one or two capstones.</p></li>
+</ul>
+<div class="panel panel-green">
+<h4>XP Path Quick Reference</h4>
+<p><strong>Personal Path (70&ndash;90% self):</strong></p>
+<ul>
+<li><p>Reliable individual performance.</p></li>
+<li><p>Low upkeep, high consistency.</p></li>
+<li><p>Best for combatants and focused specialists.</p></li>
+</ul>
+<p><strong>Balanced Path (50&ndash;65% self):</strong></p>
+<ul>
+<li><p>Good all-around capability.</p></li>
+<li><p>Moderate risk and upkeep.</p></li>
+<li><p>Flexible support and problem-solving role.</p></li>
+</ul>
+<p><strong>Influencer Path (25&ndash;40% self):</strong></p>
+<ul>
+<li><p>Strategic power and influence.</p></li>
+<li><p>High upkeep, high reward.</p></li>
+<li><p>Creates opportunities for the entire group.</p></li>
+</ul>
+<p><strong>Starting XP:</strong> <strong>30</strong> base \;+\; up to <strong>+4</strong> from Bonds/Complications (max start <strong>34</strong>).</p>
+</div>
+<h2>Path Combination Strategies</h2>
+<p>Many players mix elements from different paths as their character&rsquo;s life unfolds.</p>
+<h3>Combat Specialist with Resources</h3>
+<ul>
+<li><p>Strong personal combat capabilities.</p></li>
+<li><p>Moderate resource investment for support.</p></li>
+<li><p>Good for frontline fighters who need logistical backup.</p></li>
+<li><p>Example: Warrior with a fortified base and loyal troops.</p></li>
+</ul>
+<h3>Social Character with Personal Skills</h3>
+<ul>
+<li><p>Excellent social capabilities.</p></li>
+<li><p>Solid personal skills for self-defense or utility.</p></li>
+<li><p>Good for diplomats who operate independently.</p></li>
+<li><p>Example: Ambassador with combat training and persuasion skills.</p></li>
+</ul>
+<h3>Technical Expert with Networks</h3>
+<ul>
+<li><p>Deep technical or magical expertise.</p></li>
+<li><p>Network of contacts and resources to enable projects.</p></li>
+<li><p>Good for specialists who need supply chains and helpers.</p></li>
+<li><p>Example: Master crafter with supplier network and apprentices.</p></li>
+</ul>
+<h2>Resource Management</h2>
+<p>Each path asks for different management styles across your character&rsquo;s career.</p>
+<h3>Personal Path Management</h3>
+<ul>
+<li><p>Minimal upkeep requirements.</p></li>
+<li><p>Focus on equipment, training scenes, and personal growth.</p></li>
+<li><p>Low complexity, high reliability.</p></li>
+</ul>
+<h3>Balanced Path Management</h3>
+<ul>
+<li><p>Moderate upkeep for resources.</p></li>
+<li><p>Relationship maintenance with contacts.</p></li>
+<li><p>Skill development alongside resource management.</p></li>
+<li><p>Balanced time investment between self and assets.</p></li>
+</ul>
+<h3>Influencer Path Management</h3>
+<ul>
+<li><p>Significant upkeep demands.</p></li>
+<li><p>Network maintenance and expansion.</p></li>
+<li><p>Resource allocation and development.</p></li>
+<li><p>Strategic planning and opportunity management.</p></li>
+</ul>
+<h2>Risk Assessment</h2>
+<p>Each path carries different career risks.</p>
+<h3>Personal Path Risks</h3>
+<ul>
+<li><p>Over-specialization in one area.</p></li>
+<li><p>Vulnerability to problems outside your specialty.</p></li>
+<li><p>Limited diversification later in the game.</p></li>
+<li><p>May become predictable in approach.</p></li>
+</ul>
+<h3>Balanced Path Risks</h3>
+<ul>
+<li><p>Jack-of-all-trades, master of none.</p></li>
+<li><p>Spread too thin across capabilities.</p></li>
+<li><p>Moderate risks in multiple areas.</p></li>
+<li><p>May lack standout, defining capabilities if unfocused.</p></li>
+</ul>
+<h3>Influencer Path Risks</h3>
+<ul>
+<li><p>Networks are vulnerable to attack and betrayal.</p></li>
+<li><p>High maintenance requirements.</p></li>
+<li><p>Cascade failure potential if a key asset falls.</p></li>
+<li><p>Personal safety concerns when the web is targeted.</p></li>
+</ul>
+<h2>Adapting Your Path</h2>
+<p>Your chosen path is a starting point, not a contract. You can shift focus as your character&rsquo;s story changes.</p>
+<h3>Early Shift (0&ndash;40 XP)</h3>
+<ul>
+<li><p>Easy to change direction.</p></li>
+<li><p>Minimal sunk cost in any single approach.</p></li>
+<li><p>Good time to experiment with different styles.</p></li>
+<li><p>You can respond quickly to group needs or unexpected story turns.</p></li>
+</ul>
+<h3>Mid Game Shift (41&ndash;90 XP)</h3>
+<ul>
+<li><p>Requires more deliberate planning.</p></li>
+<li><p>Some capabilities need to be maintained while others change.</p></li>
+<li><p>You can fill emerging gaps in group capability.</p></li>
+<li><p>Temporary performance dips may occur during the transition.</p></li>
+</ul>
+<h3>Late Game Shift (91+ XP)</h3>
+<ul>
+<li><p>Significant investment in your current path.</p></li>
+<li><p>Major shifts require substantial XP and story justification.</p></li>
+<li><p>Often better to add complementary capabilities than completely pivot.</p></li>
+<li><p>Consider how changes reflect pivotal events in your character&rsquo;s life.</p></li>
+</ul>
+<h2>Practical Building Examples (Narrative Roles, Legal Starts)</h2>
+<p>Each of the following examples combines:</p>
+<ul>
+<li><p>a short <strong>concept</strong>,</p></li>
+<li><p>a <strong>path choice</strong>,</p></li>
+<li><p>a legal <strong>starting build</strong>,</p></li>
+<li><p>and a sketch of their <strong>career arc</strong>.</p></li>
+</ul>
+<h3>Example 1: The Guardian</h3>
+<p><strong>Path</strong>: Personal &emsp; <strong>Total: 32 XP</strong></p>
+<p><strong>Concept Seed:</strong> &ldquo;Quiet wall of muscle who would rather bleed than lose anyone.&rdquo;</p>
+<ul>
+<li><p><strong>Attributes</strong>: Body 3 (1&rarr;2: 6, 2&rarr;3: 9), Wits 2 (1&rarr;2: 6) = <strong>21 XP</strong></p></li>
+<li><p><strong>Skills</strong>: Melee 2 (0&rarr;1: 2, 1&rarr;2: 4 = 6), Athletics 1 (0&rarr;1: 2) = <strong>8 XP</strong></p></li>
+<li><p><strong>Bank</strong>: <strong>1 XP</strong></p></li>
+<li><p><strong>Role at table</strong>: Frontline protection and reliable pressure in fights.</p></li>
+<li><p><strong>With +4 XP</strong>: add <em>Combat Reflexes</em> (2 XP talent) and <em>Shield Mastery</em> (4 XP talent) using banked 1 + 4 = 5 XP (GM may allow rounding or an extra minor Complication), or instead buy more supporting skills.</p></li>
+</ul>
+<p><strong>Career Arc:</strong> Early on, the Guardian is &ldquo;the one who stands in front.&rdquo; Mid game adds tactical awareness and maybe leadership. Late game might see them training others or becoming the symbol of a cause.</p>
+<h3>Example 2: The Explorer</h3>
+<p><strong>Path</strong>: Balanced &emsp; <strong>Total: 32 XP</strong></p>
+<p><strong>Concept Seed:</strong> &ldquo;Curious wanderer whose maps are more valuable than gold.&rdquo;</p>
+<ul>
+<li><p><strong>Attributes</strong>: Wits 2 (6), Body 2 (6) = <strong>12 XP</strong></p></li>
+<li><p><strong>Skills</strong>: Survival 2 (0&rarr;1: 2, 1&rarr;2: 4 = 6), Perception 1 (2), Stealth 1 (2) = <strong>10 XP</strong></p></li>
+<li><p><strong>Resources</strong>: Minor mapping kit \& route notes = <strong>4 XP</strong></p></li>
+<li><p><strong>Ability</strong>: Trail Sense = <strong>4 XP</strong></p></li>
+<li><p><strong>Totals</strong>: <strong>32 XP</strong>. With +4 XP, raise <em>Perception 1&rarr;2</em> (+4) or add a trained beast (Minor Resource, 4 XP).</p></li>
+</ul>
+<p><strong>Career Arc:</strong> Early stories focus on survival and discovery. Mid game might see them guiding trade, armies, or refugees. Late game, they may literally redraw the map of the setting.</p>
+<h3>Example 3: The Schemer</h3>
+<p><strong>Path</strong>: Influencer &emsp; <strong>Total: 32 XP</strong></p>
+<p><strong>Concept Seed:</strong> &ldquo;The person who always knows someone who knows someone.&rdquo;</p>
+<ul>
+<li><p><strong>Attributes</strong>: Presence 2 (6), Wits 2 (6) = <strong>12 XP</strong></p></li>
+<li><p><strong>Skills</strong>: Sway 2 (0&rarr;1: 2, 1&rarr;2: 4 = 6), Deception 1 (2), Lore 1 (2) = <strong>10 XP</strong></p></li>
+<li><p><strong>Resources</strong>: Standard safehouse \& message drops = <strong>8 XP</strong></p></li>
+<li><p><strong>Totals</strong>: <strong>32 XP</strong>. With +4 XP, take <em>Network Builder</em> (4 XP talent) or add <em>Minor informant ring</em> (4 XP).</p></li>
+</ul>
+<p><strong>Career Arc:</strong> Early on, the Schemer is just &ldquo;the one with connections.&rdquo; Mid game grows their network and enemies. Late game, they might operate entire webs of spies, informants, merchants, or political factions.</p>
+<h5>Reminder:</h5>
+<p>All builds above assume baseline <em>Attributes at 1</em> and <em>Skills at 0</em> before spending. Attribute and Skill advances are cumulative by step (see costs in the Starting Character Guidelines section).</p>
+<p>Remember: Your chosen path should reflect both your character concept and your preferred play style. There is no single &ldquo;correct&rdquo; path&mdash;only what works for you, your group, and the story you want to tell.</p>
+<h3>Planning for Succession (The Legacy Engine)</h3>
+<p>If you are playing a long campaign or enjoy the idea of your character&rsquo;s influence outlasting them, consider investing in a <strong>Follower</strong> (Cap 3+) early. That follower can become your <strong>successor</strong> when your character retires or falls &ndash; inheriting your faction standing, one unresolved burden, and a Legacy Bond (see <strong>Chapter The Legacy Engine chapter: The Legacy Engine</strong>). A loyal apprentice, a trusted lieutenant, or a family member can carry your story forward.</p>
+<h2>Narrative-Heavy Character Building Options</h2>
+<p>For groups that prefer a strong narrative focus in character building, you can treat XP as a tool for telling the story of a career, not just a currency.</p>
+<h5>Story-Driven Milestones</h5>
+<p>Instead of tracking XP numerically, the GM can award advancement when characters reach significant story milestones. &ldquo;You have trained with the master for months&mdash;you&rsquo;ve improved your skill.&rdquo;</p>
+<h5>Experience Through Reflection</h5>
+<p>Players can spend downtime scenes reflecting on past experiences to earn XP. A meaningful flashback, confession, or revelation can justify growth without counting every point.</p>
+<h5>Collaborative Advancement</h5>
+<p>The group can discuss and agree on advancement choices, ensuring everyone&rsquo;s growth supports the overall story direction and shared arcs.</p>
+<h5>Narrative Justification Focus</h5>
+<p>When spending XP, players should explain how their character gained this capability through in-game experiences, creating richer backstory and continuity. &ldquo;I raise Presence because I&rsquo;ve been forced to handle the group&rsquo;s negotiations for weeks.&rdquo;</p>
+<h5>Path as Theme</h5>
+<p>Use your chosen path as a <strong>theme</strong> rather than a strict budget:</p>
+<ul>
+<li><p>A Personal Path character emphasizes physical, mental, or spiritual self-mastery.</p></li>
+<li><p>A Balanced Path character emphasizes learning how to juggle tools and relationships.</p></li>
+<li><p>An Influencer Path character emphasizes their growing web of relationships and obligations.</p></li>
+</ul>
+<p>In all cases, let your character&rsquo;s <strong>career</strong> on the page match the career they are living in the fiction.</p>
+
+
+</div>
+<footer class="doc-footer">Fate's Edge Proprietary Content — (c) 2024 Nicholas A. Gasper. All rights reserved.</footer>
+</body>
+</html>

@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fate's Edge — Talents and Special Abilities</title>
+<style>
+    :root {
+        --bg1: #08080c;
+        --bg2: #131318;
+        --bg3: #1c1c24;
+        --bg4: #262630;
+        --text: #e4e2e6;
+        --text2: #ada8b4;
+        --text3: #7c7684;
+        --gold: #b08d3f;
+        --gold-hover: #c49f4e;
+        --border: #33303c;
+        --red: #8e2a2a;
+        --green: #3d7a52;
+        --blue: #3c6e8f;
+        --purple: #5f3f7a;
+        --orange: #a8622a;
+        --brass: #9c7a3c;
+        --mist: #4f6b73;
+        --radius: 8px;
+        --font: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+        background: var(--bg1);
+        background-image: radial-gradient(circle at 50% 0%, #1a1610 0%, #08080c 60%);
+        color: var(--text);
+        font-family: var(--font);
+        padding: 1.5rem;
+        max-width: 1100px;
+        margin: 0 auto;
+        line-height: 1.6;
+    }
+    h1, h2, h3, h4, h5 { color: var(--gold); margin: 0.8rem 0 0.4rem; }
+    h1 { font-size: 1.9rem; border-bottom: 2px solid var(--gold); padding-bottom: 0.3rem; }
+    h2 { font-size: 1.4rem; border-bottom: 1px solid var(--border); padding-bottom: 0.2rem; margin-top: 1.6rem; }
+    h3 { font-size: 1.12rem; margin-top: 1.1rem; }
+    h4 { font-size: 0.95rem; color: var(--text); }
+    p { margin: 0.4rem 0; }
+    a { color: var(--gold); text-decoration: none; }
+    a:hover { color: var(--gold-hover); }
+    ul, ol { margin: 0.4rem 0 0.4rem 1.4rem; }
+    li { margin: 0.15rem 0; }
+    .panel {
+        background: var(--bg2);
+        border-radius: var(--radius);
+        padding: 0.7rem 0.9rem;
+        border: 1px solid var(--border);
+        margin: 0.6rem 0;
+    }
+    .panel-gold { border-left: 4px solid var(--gold); }
+    .panel-red { border-left: 4px solid var(--red); }
+    .panel-blue { border-left: 4px solid var(--blue); }
+    .panel-green { border-left: 4px solid var(--green); }
+    .panel-purple { border-left: 4px solid var(--purple); }
+    .panel-orange { border-left: 4px solid var(--orange); }
+    .panel-mist { border-left: 4px solid var(--mist); }
+    .panel > strong:first-child, .panel > .panel-title { display: block; color: var(--gold); margin-bottom: 0.3rem; }
+    .badge {
+        display: inline-block;
+        padding: 0.08rem 0.55rem;
+        border-radius: 12px;
+        font-size: 0.68rem;
+        font-weight: 600;
+        white-space: nowrap;
+    }
+    .badge-gold { background: var(--gold); color: #0c1408; }
+    .badge-red { background: var(--red); color: #fff; }
+    .badge-green { background: var(--green); color: #fff; }
+    .badge-blue { background: var(--blue); color: #fff; }
+    .badge-purple { background: var(--purple); color: #fff; }
+    .badge-orange { background: var(--orange); color: #fff; }
+    .badge-mist { background: var(--mist); color: #fff; }
+    .badge-gray { background: var(--bg4); color: var(--text3); }
+    .flex { display: flex; gap: 0.4rem; flex-wrap: wrap; align-items: center; }
+    .text-muted { color: var(--text3); }
+    .text-gold { color: var(--gold); }
+    .text-sm { font-size: 0.88rem; }
+    .text-xs { font-size: 0.72rem; }
+    .mt-1 { margin-top: 0.5rem; }
+    table {
+        border-collapse: collapse;
+        width: 100%;
+        margin: 0.6rem 0;
+        font-size: 0.86rem;
+        background: var(--bg2);
+        border-radius: var(--radius);
+        overflow: hidden;
+    }
+    th, td {
+        border: 1px solid var(--border);
+        padding: 0.4rem 0.6rem;
+        text-align: left;
+        vertical-align: top;
+    }
+    th { background: var(--bg4); color: var(--gold); font-weight: 600; }
+    tr:nth-child(even) td { background: rgba(255,255,255,0.02); }
+    hr { border: none; border-top: 1px solid var(--border); margin: 1rem 0; }
+    .toc { background: var(--bg3); border-radius: var(--radius); padding: 0.6rem 0.9rem; border: 1px solid var(--border); }
+    .toc-title { color: var(--gold); font-weight: 600; display: block; margin-bottom: 0.3rem; }
+    .toc-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0 1rem; }
+    .toc a { color: var(--text2); display: block; padding: 0.1rem 0; font-size: 0.85rem; }
+    .toc a:hover { color: var(--gold); }
+    @media (max-width: 700px) { .toc-grid { grid-template-columns: 1fr; } }
+    blockquote {
+        border-left: 3px solid var(--gold);
+        padding-left: 1rem;
+        margin: 0.6rem 0;
+        color: var(--text2);
+        font-style: italic;
+    }
+    footer {
+        font-size: 0.75rem;
+        color: var(--text3);
+        text-align: center;
+        padding: 1.2rem 0 0.4rem;
+    }
+</style>
+</head>
+<body>
+
+<h1>Talents and Special Abilities</h1>
+<p class="flex" style="margin-bottom:0.8rem;">
+    <span class="badge badge-gold">Core Rules Expansion</span>
+    <span class="badge badge-purple">Character Advancement</span>
+    <span class="badge badge-mist">XP Catalog</span>
+    <span class="badge badge-gray">Author: Nicholas A. Gasper</span>
+</p>
+
+<div class="panel panel-gold">
+    <p>Talents are the building blocks of character specialization &mdash; learned techniques, supernatural gifts, and cultural inheritances purchased with Experience Points (XP). This document is a complete reference catalog organized into four XP tiers, from small once-per-scene tricks to legendary, story-defining powers, grouped further by archetype (Healer, Rogue, Monk, Runic Warrior, Free Caster, and more). Use it alongside character creation and advancement: pick an archetype's early talents first, then follow the tier guidance and synergy examples in the closing section to plan a build across a campaign. Every entry lists its cost, activation type, full mechanical effect, and any prerequisites.</p>
+</div>
+
+<div class="toc">
+    <span class="toc-title">Table of Contents</span>
+    <div class="toc-grid">
+        <a href="#understanding-talents">Understanding Talents</a>
+        <a href="#minor-talents">Minor Talents (2&ndash;3 XP)</a>
+        <a href="#major-talents">Major Talents (4&ndash;6 XP)</a>
+        <a href="#prestige-talents">Prestige Talents (7&ndash;10 XP)</a>
+        <a href="#epic-talents">Epic Talents (11+ XP)</a>
+        <a href="#talent-synergies">Talent Synergies and Building Strategies</a>
+        <a href="#custom-talents">Custom Talents</a>
+        <a href="#talent-respec">Talent Respecification</a>
+    </div>
+</div>
+
+<hr>
+<h2 id="understanding-talents">Understanding Talents</h2>
+<p>Talents are purchased with Experience Points and provide special capabilities that go beyond simple skill bonuses. They often have specific activation conditions, may grant narrative permissions (letting you attempt things others cannot), and can define your character's unique identity at the table.</p>
+<h3 id="talent-costs">Talent Costs by Tier</h3>
+<table><thead><tr><th>Tier</th><th>Cost</th><th>Scope</th></tr></thead><tbody>
+<tr><td><strong>Minor</strong></td><td><span class="badge badge-gold">2&ndash;3 XP</span></td><td>Small situational bonus, once per scene.</td></tr>
+<tr><td><strong>Major</strong></td><td><span class="badge badge-gold">4&ndash;6 XP</span></td><td>Strong upgrade, permanent effect in a niche.</td></tr>
+<tr><td><strong>Prestige</strong></td><td><span class="badge badge-gold">7&ndash;10 XP</span></td><td>Campaign-defining, breaks fundamental limits.</td></tr>
+<tr><td><strong>Epic</strong></td><td><span class="badge badge-gold">11+ XP</span></td><td>Legendary ability, shapes the story.</td></tr>
+</tbody></table>
+<h3 id="talent-activation">Activation Types</h3>
+<ul>
+<li><strong>Passive</strong>: always on; no action required.</li>
+<li><strong>Active</strong>: requires an action or scene focus to use.</li>
+<li><strong>Reactive</strong>: triggers automatically on a condition.</li>
+</ul>
+<h3 id="talent-limits">Limits and Economy</h3>
+<p>Unless a talent says otherwise:</p>
+<ul>
+<li><strong>Per scene</strong> uses refresh at scene end.</li>
+<li><strong>Per session</strong> uses refresh after downtime.</li>
+<li>Some talents allow you to spend <strong>Boons</strong> to push effects further.</li>
+</ul>
+<div class="panel panel-orange">
+    <strong class="panel-title">Only One Active Talent?</strong>
+    <p class="text-sm">The rule &ldquo;only one talent can be active at a time&rdquo; applies only to <strong>activated abilities</strong> that require a decision or action. <strong>Passive</strong> talents (e.g., +1 die to perception) are always active and stack. <strong>Active</strong> talents that require an action or reaction cannot be used simultaneously &mdash; you choose which one to activate when the trigger occurs. Talents that are &ldquo;once per scene&rdquo; reset at the end of the scene.</p>
+</div><hr>
+<h2 id="minor-talents">Minor Talents (2&ndash;3 XP)</h2>
+<p>Minor talents are small, situational bonuses &mdash; typically once-per-scene tricks or narrow passive edges. They are the cheapest way to give a character a distinct signature move early in a campaign.</p>
+<h3 id="minor-general">General</h3>
+<table>
+<thead><tr><th style="width:16%;">Talent</th><th style="width:8%;">Cost</th><th style="width:14%;">Type</th><th>Effect</th><th style="width:18%;">Requires</th></tr></thead>
+<tbody>
+<tr><td><strong>Keen Senses</strong><br><span class="text-xs text-muted">[PERCEPTION]</span></td><td><span class="badge badge-gold">2 XP</span></td><td class="text-sm">Passive</td><td class="text-sm">+1 die on perception checks to spot danger or hidden details.</td><td><span class="text-xs text-muted">&mdash;</span></td></tr>
+<tr><td><strong>Silver Tongue</strong><br><span class="text-xs text-muted">[PERSUASION]</span></td><td><span class="badge badge-gold">2 XP</span></td><td class="text-sm">Passive</td><td class="text-sm">+1 die on persuasion attempts.</td><td><span class="text-xs text-muted">&mdash;</span></td></tr>
+<tr><td><strong>Second Wind</strong><br><span class="text-xs text-muted">[RECOVERY]</span></td><td><span class="badge badge-gold">2 XP</span></td><td class="text-sm">Active, once per scene</td><td class="text-sm">Clear 1 Fatigue when you take a moment to catch your breath.</td><td><span class="text-xs text-muted">&mdash;</span></td></tr>
+<tr><td><strong>Combat Reflexes</strong><br><span class="text-xs text-muted">[REACTIVE]</span></td><td><span class="badge badge-gold">2 XP</span></td><td class="text-sm">Reactive</td><td class="text-sm">+1 DV on defense when surprised or flanked.</td><td><span class="text-xs text-muted">&mdash;</span></td></tr>
+<tr><td><strong>Precise Strike</strong><br><span class="text-xs text-muted">[STRIKE]</span></td><td><span class="badge badge-gold">2 XP</span></td><td class="text-sm">Active, once per scene</td><td class="text-sm">Ignore armor on one attack if you had Dominant or Controlled position.</td><td><span class="text-xs text-muted">&mdash;</span></td></tr>
+<tr><td><strong>Trackless Step</strong><br><span class="text-xs text-muted">[EVADE]</span></td><td><span class="badge badge-gold">2 XP</span></td><td class="text-sm">Active, once per scene</td><td class="text-sm">Leave no trail for the rest of the scene.</td><td><span class="text-xs text-muted">&mdash;</span></td></tr>
+<tr><td><strong>Urban Navigation</strong><br><span class="text-xs text-muted">[DIRECTION]</span></td><td><span class="badge badge-gold">2 XP</span></td><td class="text-sm">Passive</td><td class="text-sm">Never get lost in cities.</td><td><span class="text-xs text-muted">&mdash;</span></td></tr>
+<tr><td><strong>Wilderness Lore</strong><br><span class="text-xs text-muted">[NATURE]</span></td><td><span class="badge badge-gold">2 XP</span></td><td class="text-sm">Passive</td><td class="text-sm">Automatically find food and water in hospitable biomes.</td><td><span class="text-xs text-muted">&mdash;</span></td></tr>
+<tr><td><strong>Read Emotions</strong><br><span class="text-xs text-muted">[INSIGHT]</span></td><td><span class="badge badge-gold">2 XP</span></td><td class="text-sm">Active, once per scene</td><td class="text-sm">Automatically detect surface emotions in a social exchange.</td><td><span class="text-xs text-muted">&mdash;</span></td></tr>
+<tr><td><strong>Iron Patience</strong><br><span class="text-xs text-muted">[RESISTANCE]</span></td><td><span class="badge badge-gold">2 XP</span></td><td class="text-sm">Passive</td><td class="text-sm">When you Defend, gain +1 die to resist Conditions (fear, charm, fatigue) for the rest of the exchange, even outside the triggering roll.</td><td><span class="text-xs text-muted">Resolve 1+</span></td></tr>
+<tr><td><strong>Stand Firm</strong><br><span class="text-xs text-muted">[PROTECT]</span></td><td><span class="badge badge-gold">2 XP</span></td><td class="text-sm">Reactive</td><td class="text-sm">When you Defend and roll a Miss, downgrade incoming Harm by 1 level (minimum 0).</td><td><span class="text-xs text-muted">Body 2+</span></td></tr>
+<tr><td><strong>Counterpoise</strong><br><span class="text-xs text-muted">[EVADE]</span></td><td><span class="badge badge-gold">2 XP</span></td><td class="text-sm">Reactive</td><td class="text-sm">When you take a Defend action and score a Partial, you may immediately move 1 range band or reposition within Near without provoking retaliation.</td><td><span class="text-xs text-muted">Athletics 1+ or Melee 1+</span></td></tr>
+<tr><td><strong>Smooth Talker</strong><br><span class="text-xs text-muted">[SOCIAL / FIRST IMPRESSION]</span></td><td><span class="badge badge-gold">2 XP</span></td><td class="text-sm">Passive</td><td class="text-sm">When you make a social roll against a person you have never met before, you gain +1 die. Once the conversation ends, this bonus no longer applies to that NPC.</td><td><span class="text-xs text-muted">Presence 2+</span></td></tr>
+<tr><td><strong>Ear to the Ground</strong><br><span class="text-xs text-muted">[INFORMATION / NETWORK]</span></td><td><span class="badge badge-gold">2 XP</span></td><td class="text-sm">Active, once per session</td><td class="text-sm">When you spend at least an hour in a settlement, you may ask the GM one question about local rumors, faction activity, or recent events. The GM must answer truthfully, though the answer may be vague or incomplete.</td><td><span class="text-xs text-muted">&mdash;</span></td></tr>
+<tr><td><strong>Friendly Face</strong><br><span class="text-xs text-muted">[SOCIAL / RAPPORT]</span></td><td><span class="badge badge-gold">2 XP</span></td><td class="text-sm">Passive</td><td class="text-sm">When you spend a scene socializing with a group (buying drinks, sharing stories, playing cards), you gain +1 die on your next social roll against any member of that group within the same session.</td><td><span class="text-xs text-muted">&mdash;</span></td></tr>
+<tr><td><strong>Negotiation Stance</strong><br><span class="text-xs text-muted">[SOCIAL / BARGAIN]</span></td><td><span class="badge badge-gold">2 XP</span></td><td class="text-sm">Active, once per scene</td><td class="text-sm">When you propose a deal that both parties could reasonably accept (GM discretion), treat your Position as one step better (Controlled &rarr; Dominant, Desperate &rarr; Controlled). This talent cannot raise Position above Dominant.</td><td><span class="text-xs text-muted">&mdash;</span></td></tr>
+<tr><td><strong>Projecting Voice</strong><br><span class="text-xs text-muted">[PERFORMANCE / AUDIENCE]</span></td><td><span class="badge badge-gold">2 XP</span></td><td class="text-sm">Passive</td><td class="text-sm">Your voice carries clearly over crowds, wind, and moderate noise. You can be heard by any willing listener within Far range without rolling. When you attempt to calm, command, or inspire a crowd (DV 3&ndash;5), treat your Position as one step better (Controlled &rarr; Dominant, Desperate &rarr; Controlled).</td><td><span class="text-xs text-muted">Performance 1+</span></td></tr>
+</tbody></table>
+<h3 id="minor-healer">Healer Talents</h3>
+<table>
+<thead><tr><th style="width:16%;">Talent</th><th style="width:8%;">Cost</th><th style="width:14%;">Type</th><th>Effect</th><th style="width:18%;">Requires</th></tr></thead>
+<tbody>
+<tr><td><strong>Field Dressing</strong><br><span class="text-xs text-muted">[HEALING / STABILIZE]</span></td><td><span class="badge badge-gold">2 XP</span></td><td class="text-sm">Active, once per scene</td><td class="text-sm">When a character within Touch range would take Harm that would reduce them to Harm 3 (Incapacitated or dying), you may use your reaction to stabilize them. They remain at Harm 2 (instead of Harm 3) and will not die from this wound for the rest of the scene. You must describe how you apply pressure, a tourniquet, or a makeshift bandage.</td><td><span class="text-xs text-muted">Medicine 1+</span></td></tr>
+</tbody></table>
+<h3 id="minor-ranger">Ranger/Tracker Talents</h3>
+<table>
+<thead><tr><th style="width:16%;">Talent</th><th style="width:8%;">Cost</th><th style="width:14%;">Type</th><th>Effect</th><th style="width:18%;">Requires</th></tr></thead>
+<tbody>
+<tr><td><strong>Keen Tracker</strong><br><span class="text-xs text-muted">[TRACKING / SURVIVAL]</span></td><td><span class="badge badge-gold">2 XP</span></td><td class="text-sm">Passive</td><td class="text-sm">When you attempt to track a creature or follow a trail, you may reroll one failed die on your Lore or Investigation roll. This does not apply to magical or supernatural tracking unless you have relevant magic.</td><td><span class="text-xs text-muted">Lore 1+ or Investigation 1+</span></td></tr>
+</tbody></table>
+<h3 id="minor-artificer">Artificer/Crafter Talents</h3>
+<table>
+<thead><tr><th style="width:16%;">Talent</th><th style="width:8%;">Cost</th><th style="width:14%;">Type</th><th>Effect</th><th style="width:18%;">Requires</th></tr></thead>
+<tbody>
+<tr><td><strong>Master Craft</strong><br><span class="text-xs text-muted">[CRAFT / REPAIR]</span></td><td><span class="badge badge-gold">2 XP</span></td><td class="text-sm">Passive</td><td class="text-sm">+1 die to all Craft rolls when repairing, modifying, or maintaining equipment. Additionally, you may perform minor repairs on the go without a workshop (fix a broken lockpick, patch a leaky waterskin, reattach a strap) as a short action.</td><td><span class="text-xs text-muted">Craft 1+</span></td></tr>
+</tbody></table>
+<h3 id="minor-rogue">Rogue (Thief) Talents</h3>
+<table>
+<thead><tr><th style="width:16%;">Talent</th><th style="width:8%;">Cost</th><th style="width:14%;">Type</th><th>Effect</th><th style="width:18%;">Requires</th></tr></thead>
+<tbody>
+<tr><td><strong>Light Fingers</strong><br><span class="text-xs text-muted">[STRIKE / AGILITY]</span></td><td><span class="badge badge-gold">2 XP</span></td><td class="text-sm">Active, once per scene</td><td class="text-sm">When you attempt to lift a small object (purse, key, letter, seal) from a person or desk, treat your first Stealth or Subterfuge roll as Position +1.</td><td><span class="text-xs text-muted">&mdash;</span></td></tr>
+<tr><td><strong>The Unlocked Window</strong><br><span class="text-xs text-muted">[MOVE / AGILITY]</span></td><td><span class="badge badge-gold">2 XP</span></td><td class="text-sm">Passive</td><td class="text-sm">When infiltrating a structure you have cased for at least an hour, ignore one security obstacle (locked door, patrolled corridor, guard dog) per session. Describe how you already prepared for it.</td><td><span class="text-xs text-muted">&mdash;</span></td></tr>
+<tr><td><strong>Silk Palms</strong><br><span class="text-xs text-muted">[INFLUENCE]</span></td><td><span class="badge badge-gold">2 XP</span></td><td class="text-sm">Active</td><td class="text-sm">When you bribe or gift a minor official, you gain a temporary String: <em>Bought Silence</em>. Once, you may activate this String to reduce DV by 1 on a Petition or Broker action involving that official. The String is consumed afterward.</td><td><span class="text-xs text-muted">&mdash;</span></td></tr>
+</tbody></table>
+<h3 id="minor-monk">Monk (Unarmed) Talents</h3>
+<table>
+<thead><tr><th style="width:16%;">Talent</th><th style="width:8%;">Cost</th><th style="width:14%;">Type</th><th>Effect</th><th style="width:18%;">Requires</th></tr></thead>
+<tbody>
+<tr><td><strong>Disciplined Body</strong><br><span class="text-xs text-muted">[STRENGTH / RECOVERY]</span></td><td><span class="badge badge-gold">3 XP</span></td><td class="text-sm">Passive + Active</td><td class="text-sm">+1 die to unarmed combat attacks. Once per scene, convert 1 Harm to Fatigue, and once per scene improve Position by one step.</td><td><span class="text-xs text-muted">Melee 1+, Body 2+</span></td></tr>
+<tr><td><strong>Open Hand Technique</strong><br><span class="text-xs text-muted">[CONTROL / STRIKE]</span></td><td><span class="badge badge-gold">2 XP</span></td><td class="text-sm">Active, once per scene</td><td class="text-sm">When you hit with an unarmed attack, you may choose one: knock the target prone, push them back one range band, or force them to drop a held item.</td><td><span class="text-xs text-muted">Melee 1+, Body 2+</span></td></tr>
+<tr><td><strong>Iron Skin</strong><br><span class="text-xs text-muted">[ENDURANCE / PROTECT]</span></td><td><span class="badge badge-gold">2 XP</span></td><td class="text-sm">Passive</td><td class="text-sm">When you take physical Harm, you may convert the first point of Harm each scene to Fatigue instead.</td><td><span class="text-xs text-muted">Body 2+</span></td></tr>
+<tr><td><strong>Still Point</strong><br><span class="text-xs text-muted">[FOCUS / DEFENSE]</span></td><td><span class="badge badge-gold">2 XP</span></td><td class="text-sm">Passive</td><td class="text-sm">When you do not move during your turn, gain +1 die to your next defense roll. This benefit lasts until you move or take an aggressive action.</td><td><span class="text-xs text-muted">&mdash;</span></td></tr>
+<tr><td><strong>Monk's Breath</strong><br><span class="text-xs text-muted">[RECOVERY / CLEANSE]</span></td><td><span class="badge badge-gold">2 XP</span></td><td class="text-sm">Active, once per session</td><td class="text-sm">You may clear 1 Fatigue by meditating for one minute uninterrupted. No roll required.</td><td><span class="text-xs text-muted">&mdash;</span></td></tr>
+</tbody></table>
+<h3 id="minor-combat">Combat</h3>
+<table>
+<thead><tr><th style="width:16%;">Talent</th><th style="width:8%;">Cost</th><th style="width:14%;">Type</th><th>Effect</th><th style="width:18%;">Requires</th></tr></thead>
+<tbody>
+<tr><td><strong>Defensive Survival</strong><br><span class="text-xs text-muted">[DEFENSE / RECOVERY]</span></td><td><span class="badge badge-gold">3 XP</span></td><td class="text-sm">Passive + Active</td><td class="text-sm">+1 to defense DV while engaged in melee. Once per scene, convert first Harm 1 from melee to Fatigue.</td><td><span class="text-xs text-muted">Melee 2+</span></td></tr>
+<tr><td><strong>Weapon Training</strong><br><span class="text-xs text-muted">[MASTERY]</span></td><td><span class="badge badge-gold">3 XP</span></td><td class="text-sm">Passive</td><td class="text-sm">+1 die with a chosen weapon category (instead of +2 from the Major version). <span class="text-muted text-xs">Note: the full +2 dice version is the Major talent Weapon Mastery.</span></td><td><span class="text-xs text-muted">&mdash;</span></td></tr>
+<tr><td><strong>Mounted Archery</strong><br><span class="text-xs text-muted">[MOUNTED / RANGED]</span></td><td><span class="badge badge-gold">2 XP</span></td><td class="text-sm">Passive</td><td class="text-sm">You ignore the usual &minus;1 die penalty for firing a ranged weapon while your mount is moving at a walk or trot. When your mount is galloping or taking evasive action, you suffer only &minus;1 die instead of &minus;2. <span class="text-muted text-xs">Cultural Affinity: Ykrul and Kuvani characters may take this talent for 1 XP instead of 2.</span></td><td><span class="text-xs text-muted">Ranged 1+, Ride (or Athletics) 1+</span></td></tr>
+<tr><td><strong>The Miss That Feeds</strong><br><span class="text-xs text-muted">[DEFENSE / FLOW]</span></td><td><span class="badge badge-gold">2 XP</span></td><td class="text-sm">Passive</td><td class="text-sm">When an enemy's attack against you results in a Miss, you gain +1 Position on your next action against that enemy.</td><td><span class="text-xs text-muted">Body 2+</span></td></tr>
+<tr><td><strong>Glancing Failure</strong><br><span class="text-xs text-muted">[DEFENSE / GAMBIT]</span></td><td><span class="badge badge-gold">3 XP</span></td><td class="text-sm">Passive</td><td class="text-sm">When an enemy's attack against you results in a Partial, you may improve your Position by one step on your next action.</td><td><span class="text-xs text-muted">Body 2+, Spirit 2+</span></td></tr>
+<tr><td><strong>Effortless Charge</strong><br><span class="text-xs text-muted">[MOVEMENT / MARTIAL]</span></td><td><span class="badge badge-gold">3 XP</span></td><td class="text-sm">Active, once per scene</td><td class="text-sm">When you take the Charge action, you may ignore the Fatigue cost. All other costs and restrictions (Desperate defense, open ground requirement) still apply.</td><td><span class="text-xs text-muted">Body 3+, Melee 2+</span></td></tr>
+<tr><td><strong>Effortless Skirmish</strong><br><span class="text-xs text-muted">[MOVEMENT / MARTIAL]</span></td><td><span class="badge badge-gold">3 XP</span></td><td class="text-sm">Active, once per scene</td><td class="text-sm">When you take the Skirmish (or Harrying Shot) action, you may ignore the Fatigue cost. All other costs and restrictions (Desperate defense, open ground requirement) still apply.</td><td><span class="text-xs text-muted">Wits 3+, Ranged 2+</span></td></tr>
+</tbody></table>
+<h3 id="minor-witch">Witch Talents</h3>
+<table>
+<thead><tr><th style="width:16%;">Talent</th><th style="width:8%;">Cost</th><th style="width:14%;">Type</th><th>Effect</th><th style="width:18%;">Requires</th></tr></thead>
+<tbody>
+<tr><td><strong>Craft of the Hedge</strong><br><span class="text-xs text-muted">[THRESHOLD / WITCHCRAFT]</span></td><td><span class="badge badge-gold">2 XP</span></td><td class="text-sm">Passive + Active</td><td class="text-sm">You have learned the small magics of thresholds and edges. You gain two Hedge Gifts of your choice from the Witchcraft expansion, plus the ability to perform Quick Workings (single-action threshold magic). Once per session, when you fail a Quick Working roll, you may convert the Miss into a Partial Success by marking 1 Fatigue.</td><td><span class="text-xs text-muted">Lore 1+</span></td></tr>
+<tr><td><strong>Hedge Gift Selection</strong><br><span class="text-xs text-muted">[WITCHCRAFT / UTILITY]</span></td><td><span class="badge badge-gold">2 XP per gift</span></td><td class="text-sm">Passive</td><td class="text-sm">When you take Craft of the Hedge, you choose two Hedge Gifts. Additional gifts may be purchased separately. Hedge Gifts require no roll and simply work within their limited scope.</td><td><span class="text-xs text-muted">&mdash;</span></td></tr>
+</tbody></table>
+<h4>Sample Hedge Gifts</h4>
+<p class="text-sm text-muted">When you take Craft of the Hedge, you choose two of the Hedge Gifts below (or others from the Witchcraft expansion). Additional gifts may be purchased separately at the listed cost.</p>
+<table><thead><tr><th style="width:20%;">Gift</th><th style="width:10%;">Cost</th><th>Effect</th></tr></thead><tbody>
+<tr><td><strong>Steady Hand</strong></td><td><span class="badge badge-gold">2 XP</span></td><td class="text-sm">Remove 1 Fatigue from yourself or a touched ally. Once per scene.</td></tr>
+<tr><td><strong>Salt Line</strong></td><td><span class="badge badge-gold">2 XP</span></td><td class="text-sm">Pour a line of salt; spirits test Spirit+Resolve DV 3 to cross. Once per scene.</td></tr>
+<tr><td><strong>Hearth-Sense</strong></td><td><span class="badge badge-gold">2 XP</span></td><td class="text-sm">Ask the GM one yes/no question about a threshold, boundary, or debt. Once per scene.</td></tr>
+<tr><td><strong>The Unlit Candle</strong></td><td><span class="badge badge-gold">2 XP</span></td><td class="text-sm">Extinguish a light source you can see; create dim light or darkness in Near range. Once per session.</td></tr>
+<tr><td><strong>Knot of Mercy</strong></td><td><span class="badge badge-gold">2 XP</span></td><td class="text-sm">Remove one Condition (Fear, Poisoned, Cursed, Marked) from a touched ally. Once per session; requires Significant Time.</td></tr>
+</tbody></table><hr>
+<h2 id="major-talents">Major Talents (4&ndash;6 XP)</h2>
+<p>Major talents are strong, permanent upgrades within a niche &mdash; the core building blocks of most character paths from the mid-game onward.</p>
+<h3 id="major-magic-access">Magic Access</h3>
+<table>
+<thead><tr><th style="width:16%;">Talent</th><th style="width:8%;">Cost</th><th style="width:14%;">Type</th><th>Effect</th><th style="width:18%;">Requires</th></tr></thead>
+<tbody>
+<tr><td><strong>Spellcraft</strong><br><span class="text-xs text-muted">[FIRE / WATER]</span></td><td><span class="badge badge-gold">6 XP</span></td><td class="text-sm">Passive</td><td class="text-sm">Grants access to Weave &amp; Cast freeform spellcasting using the Eight Elements. Without this talent, characters cannot freeform cast.</td><td><span class="text-xs text-muted">&mdash;</span></td></tr>
+<tr><td><strong>Codex</strong><br><span class="text-xs text-muted">[FATE / RITUAL]</span></td><td><span class="badge badge-gold">4 XP</span></td><td class="text-sm">Passive</td><td class="text-sm">Required to fully join a Patron's service as a Runekeeper. Grants access to that Patron's Rites and Obligation system.</td><td><span class="text-xs text-muted">&mdash;</span></td></tr>
+<tr><td><strong>Patron's Symbol</strong><br><span class="text-xs text-muted">[WARD / SIGIL]</span></td><td><span class="badge badge-gold">4 XP</span></td><td class="text-sm">Minor Asset</td><td class="text-sm">Allows an Invoker to access a Patron's Rites via ritual precision. Each Patron requires its own Symbol.</td><td><span class="text-xs text-muted">&mdash;</span></td></tr>
+<tr><td><strong>Patron's Gift</strong><br><span class="text-xs text-muted">[IMBUEMENT]</span></td><td><span class="badge badge-gold">Free (requires Familiar)</span></td><td class="text-sm">Active, once per scene</td><td class="text-sm">Imbue one item with +1 Melee and +1 thematic Skill for the scene. Push (mark +1 Obligation) to extend one more scene.</td><td><span class="text-xs text-muted">&mdash;</span></td></tr>
+</tbody></table>
+<h3 id="major-general">General</h3>
+<table>
+<thead><tr><th style="width:16%;">Talent</th><th style="width:8%;">Cost</th><th style="width:14%;">Type</th><th>Effect</th><th style="width:18%;">Requires</th></tr></thead>
+<tbody>
+<tr><td><strong>Weapon Mastery</strong><br><span class="text-xs text-muted">[WEAPON]</span></td><td><span class="badge badge-gold">5 XP</span></td><td class="text-sm">Passive</td><td class="text-sm">Choose a weapon type; +2 dice when using it. Once per scene, +1 Effect with your signature weapon.</td><td><span class="text-xs text-muted">Melee 2+</span></td></tr>
+<tr><td><strong>Command Presence</strong><br><span class="text-xs text-muted">[LEADERSHIP]</span></td><td><span class="badge badge-gold">4 XP</span></td><td class="text-sm">Passive</td><td class="text-sm">+1 die on leadership and intimidation rolls.</td><td><span class="text-xs text-muted">&mdash;</span></td></tr>
+<tr><td><strong>Network Weaver</strong><br><span class="text-xs text-muted">[BOND]</span></td><td><span class="badge badge-gold">4 XP</span></td><td class="text-sm">Passive</td><td class="text-sm">Gain a minor contact in each new settlement visited.</td><td><span class="text-xs text-muted">&mdash;</span></td></tr>
+<tr><td><strong>Tactical Movement</strong><br><span class="text-xs text-muted">[MOVEMENT / POSITION]</span></td><td><span class="badge badge-gold">4 XP</span></td><td class="text-sm">Passive + Active</td><td class="text-sm">Move within an engagement zone as a Move action (instead of a full action). Once per scene, disengage from Close as a Move action.</td><td><span class="text-xs text-muted">Athletics 2+</span></td></tr>
+<tr><td><strong>Conditioning</strong><br><span class="text-xs text-muted">[RESISTANCE / ENDURANCE]</span></td><td><span class="badge badge-gold">4 XP</span></td><td class="text-sm">Passive</td><td class="text-sm">Body attribute counts as +1 for Fatigue track calculations. +1 die to resist Fatigue overflow effects.</td><td><span class="text-xs text-muted">Body 3+</span></td></tr>
+<tr><td><strong>Spell Shaping</strong><br><span class="text-xs text-muted">[CONTROL]</span></td><td><span class="badge badge-gold">4 XP</span></td><td class="text-sm">Active</td><td class="text-sm">When you Weave a spell, modify range, scale, or targeting by one step.</td><td><span class="text-xs text-muted">Spellcraft</span></td></tr>
+<tr><td><strong>Elemental Focus</strong><br><span class="text-xs text-muted">[ELEMENT]</span></td><td><span class="badge badge-gold">4 XP</span></td><td class="text-sm">Passive</td><td class="text-sm">Choose one element (Fire, Water, Earth, Air, Fate, Life, Luck, Death/Thresholds). +1 die when casting spells of that element.</td><td><span class="text-xs text-muted">Spellcraft</span></td></tr>
+<tr><td><strong>Ritual Mastery</strong><br><span class="text-xs text-muted">[RITUAL]</span></td><td><span class="badge badge-gold">4 XP</span></td><td class="text-sm">Passive</td><td class="text-sm">When you suffer backlash from a ritual (including any SB generated by your roll), reduce the severity of the Backlash by one step (Catastrophic &rarr; Major, Major &rarr; Moderate, Moderate &rarr; Minor, Minor &rarr; none). This applies once per scene.</td><td><span class="text-xs text-muted">Familiar or Patron's Symbol</span></td></tr>
+<tr><td><strong>Efficient Invocation</strong><br><span class="text-xs text-muted">[RITUAL]</span></td><td><span class="badge badge-gold">4 XP</span></td><td class="text-sm">Passive</td><td class="text-sm">Reduce ritual casting time by one step (minimum 1 action).</td><td><span class="text-xs text-muted">Patron's Symbol</span></td></tr>
+<tr><td><strong>Trusted Reputation</strong><br><span class="text-xs text-muted">[SOCIAL / FAVOR]</span></td><td><span class="badge badge-gold">4 XP</span></td><td class="text-sm">Active, once per session</td><td class="text-sm">When you are in good standing with a faction (GM discretion), you may call in a minor favor: a temporary discount, a piece of information, or a small service (a guard looks the other way, a merchant offers a fair price). The faction will expect reciprocity eventually.</td><td><span class="text-xs text-muted">&mdash;</span></td></tr>
+<tr><td><strong>Information Broker</strong><br><span class="text-xs text-muted">[INVESTIGATION / NETWORK]</span></td><td><span class="badge badge-gold">4 XP</span></td><td class="text-sm">Passive</td><td class="text-sm">When you successfully gather information (via Investigation, Subterfuge, or similar), you may ask the GM two questions instead of one. The second question may be less detailed at the GM's discretion.</td><td><span class="text-xs text-muted">&mdash;</span></td></tr>
+<tr><td><strong>Unshakeable Composure</strong><br><span class="text-xs text-muted">[SOCIAL / RESISTANCE]</span></td><td><span class="badge badge-gold">4 XP</span></td><td class="text-sm">Passive</td><td class="text-sm">You gain +1 die to resist intimidation, coercion, social manipulation (e.g., Sway, Command), and fear effects in social situations. Additionally, once per scene, you may ignore the first social Condition imposed on you (e.g., Shaken, Guilty Tell).</td><td><span class="text-xs text-muted">Resolve 2+ or Spirit 2+</span></td></tr>
+</tbody></table>
+<h3 id="major-healer">Healer Talents</h3>
+<table>
+<thead><tr><th style="width:16%;">Talent</th><th style="width:8%;">Cost</th><th style="width:14%;">Type</th><th>Effect</th><th style="width:18%;">Requires</th></tr></thead>
+<tbody>
+<tr><td><strong>Triage</strong><br><span class="text-xs text-muted">[HEALING / RECOVERY]</span></td><td><span class="badge badge-gold">4 XP</span></td><td class="text-sm">Active, once per scene</td><td class="text-sm">When you spend an action tending to a wounded ally within Touch range, you may heal 1 Fatigue from them and, if they are at Harm 1 or 2, they treat their Harm level as one step lower for the purpose of penalties until the end of the scene (e.g., Harm 2 &rarr; Harm 1, Harm 1 &rarr; none). This does not actually reduce their Harm track; it only mitigates penalties.</td><td><span class="text-xs text-muted">Medicine 2+</span></td></tr>
+</tbody></table>
+<h3 id="major-ranger">Ranger/Tracker Talents</h3>
+<table>
+<thead><tr><th style="width:16%;">Talent</th><th style="width:8%;">Cost</th><th style="width:14%;">Type</th><th>Effect</th><th style="width:18%;">Requires</th></tr></thead>
+<tbody>
+<tr><td><strong>Camouflage</strong><br><span class="text-xs text-muted">[STEALTH / TERRAIN]</span></td><td><span class="badge badge-gold">4 XP</span></td><td class="text-sm">Active, once per scene</td><td class="text-sm">When you are in natural terrain (forest, jungle, swamp, rocky hills, snow), you may spend an action to blend into the environment. For the remainder of the scene, you gain +2 dice to Stealth rolls while remaining still, and pursuers suffer &minus;1 die to detect you. Moving at more than a slow crawl breaks the camouflage.</td><td><span class="text-xs text-muted">Lore 2+, Stealth 1+</span></td></tr>
+</tbody></table>
+<h3 id="major-artificer">Artificer/Crafter Talents</h3>
+<table>
+<thead><tr><th style="width:16%;">Talent</th><th style="width:8%;">Cost</th><th style="width:14%;">Type</th><th>Effect</th><th style="width:18%;">Requires</th></tr></thead>
+<tbody>
+<tr><td><strong>Master Artificer</strong><br><span class="text-xs text-muted">[CRAFT / CREATION]</span></td><td><span class="badge badge-gold">5 XP</span></td><td class="text-sm">Passive</td><td class="text-sm">+1 die to all Craft rolls when creating, building, or upgrading items, structures, or devices. Additionally, once per downtime, you may reduce the required time to craft a mundane item by half (minimum 1 hour) and reduce the material cost (Supply) by 1 (minimum 0).</td><td><span class="text-xs text-muted">Craft 2+, Master Craft</span></td></tr>
+<tr><td><strong>Asset Crafter</strong><br><span class="text-xs text-muted">[ASSET / CRAFT]</span></td><td><span class="badge badge-gold">4 XP</span></td><td class="text-sm">Passive</td><td class="text-sm">Reduce the XP cost to acquire a new Asset by 1 per tier (Minor: 4 &rarr; 3 XP; Standard: 8 &rarr; 6 XP; Major: 12 &rarr; 9 XP; Artifact: 16+ &rarr; 12+ XP). Also reduce the required downtime by half (rounded up, minimum 1 day). This talent does not apply to Assets gained through narrative events without XP cost.</td><td><span class="text-xs text-muted">&mdash;</span></td></tr>
+</tbody></table>
+<h3 id="major-cantor">Cantor (Performer) Talents</h3>
+<table>
+<thead><tr><th style="width:16%;">Talent</th><th style="width:8%;">Cost</th><th style="width:14%;">Type</th><th>Effect</th><th style="width:18%;">Requires</th></tr></thead>
+<tbody>
+<tr><td><strong>Captivating Performance</strong><br><span class="text-xs text-muted">[PERFORMANCE / INSPIRE]</span></td><td><span class="badge badge-gold">4 XP</span></td><td class="text-sm">Active, once per scene</td><td class="text-sm">When you perform (sing, recite, play an instrument) for at least one full exchange, all allies who can hear you gain +1 die to resist fear, despair, or charm for the remainder of the scene. Additionally, you may choose one ally; they also gain +1 die to their next social roll.</td><td><span class="text-xs text-muted">Performance 2+, Presence 2+</span></td></tr>
+<tr><td><strong>Voice of Reason</strong><br><span class="text-xs text-muted">[PERFORMANCE / PERSUASION]</span></td><td><span class="badge badge-gold">4 XP</span></td><td class="text-sm">Active, once per scene</td><td class="text-sm">When you attempt to de-escalate a tense situation or convince a hostile NPC to stand down, you may roll Performance instead of Sway or Command. On a success, the NPC hesitates or agrees to parley for at least one exchange. On a Partial, they still listen but may demand a concession.</td><td><span class="text-xs text-muted">Performance 2+, Presence 2+</span></td></tr>
+<tr><td><strong>Harmonious Aid</strong><br><span class="text-xs text-muted">[PERFORMANCE / TEAMWORK]</span></td><td><span class="badge badge-gold">4 XP</span></td><td class="text-sm">Active, once per scene</td><td class="text-sm">When you use the Assist action (spend 1 Boon to give +1 die to an ally), you may describe how you support them with a hummed tune or whispered rhythm. The ally gains an additional +1 die (total +2 from your Assist). This does not count against the usual +3 assist cap.</td><td><span class="text-xs text-muted">Performance 1+</span></td></tr>
+<tr><td><strong>Well-Timed Encore</strong><br><span class="text-xs text-muted">[PERFORMANCE / RECOVERY]</span></td><td><span class="badge badge-gold">5 XP</span></td><td class="text-sm">Active, once per session</td><td class="text-sm">After a successful Performance roll that impressed an audience (GM discretion), you may declare an encore. The audience demands more. This extends any active Performance-based effect (e.g., Captivating Performance) for an additional scene, but the GM gains 2 SB (the guards grow curious, a rival takes notice, or the crowd becomes over-enthusiastic).</td><td><span class="text-xs text-muted">Captivating Performance</span></td></tr>
+</tbody></table>
+<h3 id="major-follower-asset">Follower and Asset Talents</h3>
+<table>
+<thead><tr><th style="width:16%;">Talent</th><th style="width:8%;">Cost</th><th style="width:14%;">Type</th><th>Effect</th><th style="width:18%;">Requires</th></tr></thead>
+<tbody>
+<tr><td><strong>Efficient Recruiter</strong><br><span class="text-xs text-muted">[FOLLOWER / COST REDUCTION]</span></td><td><span class="badge badge-gold">4 XP</span></td><td class="text-sm">Passive</td><td class="text-sm">Reduce the XP cost to acquire a new follower by 1 (minimum 1 XP). Additionally, reduce the required downtime for recruitment by 1 day (minimum 1 day). This talent applies to each follower individually.</td><td><span class="text-xs text-muted">Presence 2+</span></td></tr>
+<tr><td><strong>Loyalty Bond</strong><br><span class="text-xs text-muted">[FOLLOWER / LOYALTY]</span></td><td><span class="badge badge-gold">5 XP</span></td><td class="text-sm">Passive</td><td class="text-sm">Your followers' Loyalty tag improves by one step (Wary &rarr; Steady &rarr; Devoted). A Devoted follower cannot be turned, bribed, or intimidated into betraying you without a major narrative event (GM discretion). This talent applies to all followers you currently have and any you acquire later.</td><td><span class="text-xs text-muted">Spirit 2+, at least one follower</span></td></tr>
+<tr><td><strong>Delegated Upkeep</strong><br><span class="text-xs text-muted">[FOLLOWER / ASSET MANAGEMENT]</span></td><td><span class="badge badge-gold">5 XP</span></td><td class="text-sm">Passive</td><td class="text-sm">Choose a follower with Capability 3 or higher. That follower may manage your Assets using their own upkeep (paid in XP or downtime action) to cover the Assets' upkeep costs, at no separate XP or action cost to you: <br><strong>Cap 3</strong> &mdash; 1 Minor Asset. <strong>Cap 4</strong> &mdash; 3 Assets (any tier). <strong>Cap 5</strong> &mdash; 5 Assets (any tier). <br>If the follower's Loyalty becomes Strained or Broken, all delegated Assets immediately worsen one step (Flourishing &rarr; Stable, etc.) until the follower is restored. If the follower becomes Broken, those Assets are lost.</td><td><span class="text-xs text-muted">At least one follower with Cap 3+</span></td></tr>
+</tbody></table>
+<h3 id="major-rogue">Rogue (Thief) Talents</h3>
+<table>
+<thead><tr><th style="width:16%;">Talent</th><th style="width:8%;">Cost</th><th style="width:14%;">Type</th><th>Effect</th><th style="width:18%;">Requires</th></tr></thead>
+<tbody>
+<tr><td><strong>Always Another Exit</strong><br><span class="text-xs text-muted">[MOVE / ESCAPE]</span></td><td><span class="badge badge-gold">4 XP</span></td><td class="text-sm">Active, once per session</td><td class="text-sm">When you are cornered or a heist goes wrong, you may declare you prepared an escape route earlier. Describe it plausibly (rope out a window, bribed a guard, secret door). The GM may impose a cost &mdash; a dropped item, a witness, a future obligation &mdash; but you get out.</td><td><span class="text-xs text-muted">&mdash;</span></td></tr>
+<tr><td><strong>The Forger's Eye</strong><br><span class="text-xs text-muted">[CRAFT / PRECISION]</span></td><td><span class="badge badge-gold">4 XP</span></td><td class="text-sm">Active</td><td class="text-sm">You can copy any handwriting, seal, or signature with uncanny accuracy. When you attempt to forge a document, roll Wits + Craft (DV 3 for simple, 4&ndash;5 for complex). On a hit, create a Forged credential. On a partial, the forgery holds for one scene; thereafter it may be detected.</td><td><span class="text-xs text-muted">Craft 1+</span></td></tr>
+<tr><td><strong>The Velvet Glove</strong><br><span class="text-xs text-muted">[INFLUENCE / NETWORK]</span></td><td><span class="badge badge-gold">5 XP</span></td><td class="text-sm">Active, once per session</td><td class="text-sm">You have cultivated a network of informants, fence contacts, and corrupted clerks. You may declare that a minor NPC (a servant, a dockworker, a scribe) owes you a favor. They provide a specific service: unlock a door, delay a patrol, deliver a message. The GM may dictate a cost (the NPC will later need help, or their favor expires after use).</td><td><span class="text-xs text-muted">Presence 2+, Subterfuge 1+</span></td></tr>
+<tr><td><strong>Master of Misdirection</strong><br><span class="text-xs text-muted">[INFLUENCE / DECEPTION]</span></td><td><span class="badge badge-gold">5 XP</span></td><td class="text-sm">Active</td><td class="text-sm">When you are discovered during a crime, you may spend 1 Boon to redirect suspicion to another person or faction. Roll Deception vs. DV 4. On a hit, the heat shifts; on a miss, you gain Exposure +1 and the target becomes hostile.</td><td><span class="text-xs text-muted">Deception 2+</span></td></tr>
+</tbody></table>
+<h3 id="major-freecaster">Free Caster Talents</h3>
+<table>
+<thead><tr><th style="width:16%;">Talent</th><th style="width:8%;">Cost</th><th style="width:14%;">Type</th><th>Effect</th><th style="width:18%;">Requires</th></tr></thead>
+<tbody>
+<tr><td><strong>Controlled Burn</strong><br><span class="text-xs text-muted">[FIRE / WILL]</span></td><td><span class="badge badge-gold">4 XP</span></td><td class="text-sm">Active, once per scene</td><td class="text-sm">When you roll a 1 on a Free Casting roll, you may immediately gain 1 Boon (instead of the GM gaining that SB). The GM still gains the Story Beat as normal. This does not prevent other 1s on the same roll from generating SB normally.</td><td><span class="text-xs text-muted">Spellcraft</span></td></tr>
+<tr><td><strong>Weave Resilience</strong><br><span class="text-xs text-muted">[SHIELD / STAMINA]</span></td><td><span class="badge badge-gold">4 XP</span></td><td class="text-sm">Passive</td><td class="text-sm">When you suffer Backlash from a Free Casting roll, reduce the severity by one step: Catastrophic &rarr; Major, Major &rarr; Moderate, Moderate &rarr; Minor, Minor &rarr; none. This applies to the first Backlash each scene. Subsequent Backlashes in the same scene are not reduced.</td><td><span class="text-xs text-muted">Spellcraft</span></td></tr>
+<tr><td><strong>Elemental Attunement</strong><br><span class="text-xs text-muted">[ELEMENT / FOCUS]</span></td><td><span class="badge badge-gold">5 XP</span></td><td class="text-sm">Passive</td><td class="text-sm">Choose one element (Fire, Water, Earth, Air, Fate, Life, Luck, Death/Thresholds). When you cast a Free spell using that element's tag (e.g., [FIRE]), you may reroll one failed die (not a 1) once per casting. Additionally, you gain +1 die to Arcana rolls when identifying or analyzing that element.</td><td><span class="text-xs text-muted">Spellcraft, Elemental Focus</span></td></tr>
+<tr><td><strong>Backlash Siphon</strong><br><span class="text-xs text-muted">[VOID / EXCHANGE]</span></td><td><span class="badge badge-gold">6 XP</span></td><td class="text-sm">Reactive, once per scene</td><td class="text-sm">When you would suffer a Backlash effect (e.g., Fatigue, Harm, Condition) from a Free Casting roll, you may instead mark 1 Obligation to a Patron of your choice (or gain 1 Corruption if you have no Patron). The Backlash is negated, but the Patron's attention is drawn.</td><td><span class="text-xs text-muted">Spellcraft, Spirit 3+</span></td></tr>
+</tbody></table>
+<h3 id="major-combat">Combat</h3>
+<table>
+<thead><tr><th style="width:16%;">Talent</th><th style="width:8%;">Cost</th><th style="width:14%;">Type</th><th>Effect</th><th style="width:18%;">Requires</th></tr></thead>
+<tbody>
+<tr><td><strong>Flurry Strike</strong><br><span class="text-xs text-muted">[STRIKE / SPEED]</span></td><td><span class="badge badge-gold">6 XP</span></td><td class="text-sm">Active, once per scene</td><td class="text-sm">When engaged with multiple opponents, make 2 attacks as one action. Each attack at &minus;1 die.</td><td><span class="text-xs text-muted">Melee 3+, Body 3+</span></td></tr>
+<tr><td><strong>Duelist's Edge</strong><br><span class="text-xs text-muted">[DOMINANCE / TECHNIQUE]</span></td><td><span class="badge badge-gold">6 XP</span></td><td class="text-sm">Passive + Active</td><td class="text-sm">When engaged with a single opponent: +1 die to all melee rolls. Once per scene, ignore first Harm 1 or 2 from that opponent.</td><td><span class="text-xs text-muted">Melee 3+, Wits 3+</span></td></tr>
+<tr><td><strong>Battlefield Mastery</strong><br><span class="text-xs text-muted">[STRATEGY / LEADERSHIP]</span></td><td><span class="badge badge-gold">6 XP</span></td><td class="text-sm">Active, once per scene</td><td class="text-sm">When engaged with 3+ opponents, for the next 3 exchanges: all melee attacks gain +1 Effect, enemies act at &minus;1 die, your Position improves by one step, and you may convert one Harm 1 per exchange to Fatigue.</td><td><span class="text-xs text-muted">Melee 4+, Wits 4+, Command 2+</span></td></tr>
+<tr><td><strong>Backstab</strong><br><span class="text-xs text-muted">[STEALTH / STRIKE]</span></td><td><span class="badge badge-gold">6 XP</span></td><td class="text-sm">Active, once per scene</td><td class="text-sm">When you attack an Unaware or Engaged foe from Stealth, deal +1 Harm and ignore 1 point of their Armor. On a miss, you are Exposed (Desperate Position or mark 1 Harm).</td><td><span class="text-xs text-muted">Stealth 2+, Melee 2+, light weapon</span></td></tr>
+<tr><td><strong>Elusive Dodge</strong><br><span class="text-xs text-muted">[DEFENSE / EVADE]</span></td><td><span class="badge badge-gold">6 XP</span></td><td class="text-sm">Reactive, once per exchange</td><td class="text-sm">When targeted by a physical attack, you may immediately enter a Defend stance as a free reaction. Mark 1 Fatigue after use.</td><td><span class="text-xs text-muted">Stealth 2+, Wits 3+, Tier II</span></td></tr>
+<tr><td><strong>Berserker Rage</strong><br><span class="text-xs text-muted">[FURY / POWER]</span></td><td><span class="badge badge-gold">6 XP</span></td><td class="text-sm">Active, once per scene</td><td class="text-sm">For 3 rounds: +2 dice to melee attacks, ignore first Harm 1 each round, ignore Harm/Fatigue penalties, Position becomes Desperate (reroll one success). When rage ends, mark Fatigue equal to Spirit. Cannot be ended early. Cannot activate any talents or Rites for the rest of the scene.</td><td><span class="text-xs text-muted">Melee 3+, Spirit 3+, Body 3+</span></td></tr>
+<tr><td><strong>Cavalier</strong><br><span class="text-xs text-muted">[MOBILITY / MARTIAL]</span></td><td><span class="badge badge-gold">4 XP</span></td><td class="text-sm">Passive while mounted</td><td class="text-sm">Gain +2 dice to melee attacks when moving Far&rarr;Near, or +2 dice to ranged attacks when moving Near&rarr;Far.</td><td><span class="text-xs text-muted">War Mount Asset, Melee 2+ or Ranged 2+</span></td></tr>
+<tr><td><strong>Subtle Casting</strong><br><span class="text-xs text-muted">[HIDDEN / CONTROL]</span></td><td><span class="badge badge-gold">6 XP</span></td><td class="text-sm">Active</td><td class="text-sm">Make a Performance + Lore roll to quietly cast a spell, invoke a Rite, or sing a Cantos against DV (Tier). If successful, the casting does not generate Story Beats on the Channel or initial roll. Any SB generated are banked by the GM and applied later. Cannot be used for Great or Extreme Tier effects.</td><td><span class="text-xs text-muted">Lore 3+, Performance 2+ or Runekeeper with Codex</span></td></tr>
+<tr><td><strong>Relentless</strong><br><span class="text-xs text-muted">[MOVEMENT / TERRAIN]</span></td><td><span class="badge badge-gold">6 XP</span></td><td class="text-sm">Passive</td><td class="text-sm">You may take the Charge or Skirmish action over difficult terrain (rubble, dense forest, shallow water, steep slopes). The Fatigue cost (1) is <em>not</em> waived unless you also have the relevant Effortless talent.</td><td><span class="text-xs text-muted">Body 3+, Athletics 2+</span></td></tr>
+<tr><td><strong>Stubborn Pursuer</strong><br><span class="text-xs text-muted">[MOVEMENT / REACTION]</span></td><td><span class="badge badge-gold">6 XP</span></td><td class="text-sm">Reactive</td><td class="text-sm">When an opponent within Close range uses the Disengage action (or any movement intended to leave your engagement without provoking an opportunity attack), you may use your reaction to move with them, staying in Close range. This movement does not cost an action and does not provoke opportunity attacks. You move the same number of range bands as they do (e.g., Close &rarr; Near, or Near &rarr; Far), up to your normal movement limit for the round. You cannot use this talent if you have already taken a Move action or Dash this round. Once per round.</td><td><span class="text-xs text-muted">Body 3+, Athletics 2+</span></td></tr>
+<tr><td><strong>Horse Archer's Art</strong><br><span class="text-xs text-muted">[MOUNTED / RANGED / FLOW]</span></td><td><span class="badge badge-gold">5 XP</span></td><td class="text-sm">Passive + Active</td><td class="text-sm">You treat the Mounted Archery talent's penalties as fully eliminated for walk/trot, and for gallop/evade you suffer no penalty. Additionally, once per scene when you take a Skirmish action (move one band and make a ranged attack) while mounted, you may also have your mount move an additional band (up to two bands total) as part of the same action. This extra movement costs no additional action and does not provoke opportunity attacks. <span class="text-muted text-xs">Cultural Affinity: Ykrul and Kuvani characters may reduce the XP cost to 4 XP.</span></td><td><span class="text-xs text-muted">Mounted Archery, Ranged 2+, Ride (or Athletics) 2+</span></td></tr>
+<tr><td><strong>Called Shot</strong><br><span class="text-xs text-muted">[STRIKE / RNG / GAMBIT]</span></td><td><span class="badge badge-gold">6 XP</span></td><td class="text-sm">Active, once per scene</td><td class="text-sm">When you attack an Unaware target or a target you have aimed at for a full round, you may declare a Called Shot. On a hit, deal +1 Harm, ignore 1 Armor, and choose one: Blind (&minus;2 dice to sight), Disarm (drop held item), Hamstring (half speed), or Vitals (+2 Harm instead of +1). On a miss, you are Exposed (Desperate Position and mark 1 Harm). <strong>Must be a ranged attack.</strong></td><td><span class="text-xs text-muted">Ranged 2+, Stealth 2+</span></td></tr>
+<tr><td><strong>Riposte Instinct</strong><br><span class="text-xs text-muted">[COUNTER / STRIKE]</span></td><td><span class="badge badge-gold">4 XP</span></td><td class="text-sm">Reactive, once per scene</td><td class="text-sm">When you Defend and score a Success, you may make a free Melee attack against the attacker at Position &minus;1.</td><td><span class="text-xs text-muted">Melee 2+</span></td></tr>
+<tr><td><strong>Adaptive Guard</strong><br><span class="text-xs text-muted">[DEFENSE / FLEXIBILITY]</span></td><td><span class="badge badge-gold">4 XP</span></td><td class="text-sm">Active</td><td class="text-sm">When you take the Defend action, you may declare your defense pool (Attribute + Skill) after the GM calls Position. Once per scene, you may instead choose the pool after seeing the roll result.</td><td><span class="text-xs text-muted">Athletics 2+ or Shield Proficiency or Perception 2+</span></td></tr>
+<tr><td><strong>Wardbreaker Reflex</strong><br><span class="text-xs text-muted">[WARD / DEFENSE]</span></td><td><span class="badge badge-gold">4 XP</span></td><td class="text-sm">Reactive</td><td class="text-sm">When Defending against spells or supernatural effects, you may reroll 1 failed die. If your reroll succeeds, mark +1 Fatigue (arcane recoil).</td><td><span class="text-xs text-muted">Spirit 2+ or any magical Path</span></td></tr>
+</tbody></table>
+<div class="panel panel-blue">
+    <strong class="panel-title">Mounted Combat Traditions</strong>
+    <p class="text-sm">Among the horse-clans of the Ykrul and the steppe riders of the Kuvani, archery from horseback is not a specialization &mdash; it is a birthright. Characters from these cultures may take <strong>Mounted Archery</strong> at a reduced cost (1 XP instead of 2) and <strong>Horse Archer's Art</strong> at 4 XP instead of 5. Game Masters may extend this cultural discount to other mounted traditions in their setting (e.g., Linn skirmishers, Vilikari border riders).</p>
+</div>
+<h3 id="major-monk">Monk (Unarmed) Talents</h3>
+<table>
+<thead><tr><th style="width:16%;">Talent</th><th style="width:8%;">Cost</th><th style="width:14%;">Type</th><th>Effect</th><th style="width:18%;">Requires</th></tr></thead>
+<tbody>
+<tr><td><strong>Iron Fist Technique</strong><br><span class="text-xs text-muted">[STRIKE / POWER]</span></td><td><span class="badge badge-gold">6 XP</span></td><td class="text-sm">Passive</td><td class="text-sm">+1 die to unarmed attacks; strikes count as enchanted for purposes of harming supernatural creatures.</td><td><span class="text-xs text-muted">Disciplined Body, Melee 2+</span></td></tr>
+<tr><td><strong>Flowing Spirit Technique</strong><br><span class="text-xs text-muted">[WIND / STRENGTH]</span></td><td><span class="badge badge-gold">6 XP</span></td><td class="text-sm">Passive + Active</td><td class="text-sm">Convert up to 1 Harm into Fatigue per attack; +1 die against fear or charm effects.</td><td><span class="text-xs text-muted">Spirit 2+, Melee 2+</span></td></tr>
+<tr><td><strong>Perfect Timing Technique</strong><br><span class="text-xs text-muted">[FATE / MOVEMENT]</span></td><td><span class="badge badge-gold">6 XP</span></td><td class="text-sm">Active</td><td class="text-sm">Twice per scene, improve Position by +1 step; +1 die to reaction rolls.</td><td><span class="text-xs text-muted">Wits 3+, Melee 2+</span></td></tr>
+<tr><td><strong>Whirlwind Kick</strong><br><span class="text-xs text-muted">[AREA / STRIKE]</span></td><td><span class="badge badge-gold">5 XP</span></td><td class="text-sm">Active, once per scene</td><td class="text-sm">Make an unarmed attack against all enemies within Close range. Roll once, compare to each target's defense. Each hit deals normal damage.</td><td><span class="text-xs text-muted">Iron Fist Technique, Body 3+</span></td></tr>
+<tr><td><strong>Meditative Focus</strong><br><span class="text-xs text-muted">[RECOVERY / CLEANSE]</span></td><td><span class="badge badge-gold">4 XP</span></td><td class="text-sm">Active, once per session</td><td class="text-sm">Spend a short rest in meditation. Clear 2 Fatigue and remove one Condition (Fear, Poisoned, or Guilty).</td><td><span class="text-xs text-muted">Spirit 2+</span></td></tr>
+<tr><td><strong>Deflect Projectiles</strong><br><span class="text-xs text-muted">[REACTION / DEFENSE]</span></td><td><span class="badge badge-gold">5 XP</span></td><td class="text-sm">Reactive</td><td class="text-sm">When targeted by a ranged physical attack (arrow, bolt, thrown weapon), you may roll Melee vs. DV 3. On a success, the attack misses. On a partial, reduce Harm by 1. You must have a free hand or be wielding a suitable parrying tool.</td><td><span class="text-xs text-muted">Melee 2+, Perception 2+</span></td></tr>
+</tbody></table>
+<h3 id="major-runic-warrior">Runic Warrior Talents</h3>
+<table>
+<thead><tr><th style="width:16%;">Talent</th><th style="width:8%;">Cost</th><th style="width:14%;">Type</th><th>Effect</th><th style="width:18%;">Requires</th></tr></thead>
+<tbody>
+<tr><td><strong>Flesh Codex</strong><br><span class="text-xs text-muted">[BODY / RITUAL]</span></td><td><span class="badge badge-gold">4 XP</span></td><td class="text-sm">Passive</td><td class="text-sm">Your Rites are tattooed, branded, or scarred onto your skin. Your Codex cannot be stolen, is always accessible, and requires no action to retrieve. However, damage to your skin may damage the Codex, and some cultures fear flesh-writing.</td><td><span class="text-xs text-muted">Body 3+</span></td></tr>
+<tr><td><strong>Living Thiasos</strong><br><span class="text-xs text-muted">[BOND / ALLY]</span></td><td><span class="badge badge-gold">3 XP</span></td><td class="text-sm">Passive</td><td class="text-sm">You have a living Thiasos (warhorse, spirit-hound, wolf-ancestor, fungal familiar, or hollowed bird). Your Thiasos gains +1 Cap and may act independently once per scene.</td><td><span class="text-xs text-muted">Codex</span></td></tr>
+<tr><td><strong>Scarred Resilience</strong><br><span class="text-xs text-muted">[ENDURANCE / RECOVERY]</span></td><td><span class="badge badge-gold">3 XP</span></td><td class="text-sm">Active, once per scene</td><td class="text-sm">Ignore 1 Fatigue from physical exertion.</td><td><span class="text-xs text-muted">Body 2+</span></td></tr>
+<tr><td><strong>Oath-Bound</strong><br><span class="text-xs text-muted">[VOW / COMMITMENT]</span></td><td><span class="badge badge-gold">4 XP</span></td><td class="text-sm">Active, once per session</td><td class="text-sm">Reroll a failed Body roll when serving a sworn oath.</td><td><span class="text-xs text-muted">Resolve 2+</span></td></tr>
+<tr><td><strong>Talking Weapon</strong><br><span class="text-xs text-muted">[BOND / THIASOS]</span></td><td><span class="badge badge-gold">2 XP</span></td><td class="text-sm">Passive</td><td class="text-sm">Your Thiasos is a sentient weapon that speaks aloud and counts as a witness.</td><td><span class="text-xs text-muted">Codex</span></td></tr>
+<tr><td><strong>Engraved Defense</strong><br><span class="text-xs text-muted">[ARMOR / RITUAL]</span></td><td><span class="badge badge-gold">6 XP</span></td><td class="text-sm">Passive + Active</td><td class="text-sm">Your Codex grants +1 Armor. You may mark 1 Obligation to reduce incoming Harm by 1.</td><td><span class="text-xs text-muted">Physical Codex (Stone or Steel), Body 2+</span></td></tr>
+<tr><td><strong>Shared Burden</strong><br><span class="text-xs text-muted">[BOND / ALLY]</span></td><td><span class="badge badge-gold">6 XP</span></td><td class="text-sm">Active, once per scene</td><td class="text-sm">Transfer 1 Fatigue to your Thiasos; it becomes Winded (&minus;1 die) for the scene.</td><td><span class="text-xs text-muted">Living Thiasos</span></td></tr>
+<tr><td><strong>Witnessed Scar</strong><br><span class="text-xs text-muted">[MEMORY / RITUAL]</span></td><td><span class="badge badge-gold">8 XP</span></td><td class="text-sm">Active, once per session</td><td class="text-sm">Touch one of your three permanent Obligation scars and gain +1 die on any roll tied to that event.</td><td><span class="text-xs text-muted">Three permanent Obligation scars</span></td></tr>
+<tr><td><strong>Iron Resolve</strong><br><span class="text-xs text-muted">[ENDURANCE / SURVIVAL]</span></td><td><span class="badge badge-gold">7 XP</span></td><td class="text-sm">Reactive, once per scene</td><td class="text-sm">When reduced to 0 Harm, remain standing with 1 Harm and mark 2 Fatigue.</td><td><span class="text-xs text-muted">Body 3+, Scarred Resilience</span></td></tr>
+<tr><td><strong>Way of the Horse</strong><br><span class="text-xs text-muted">[MOUNTED / MOVEMENT]</span></td><td><span class="badge badge-gold">6 XP</span></td><td class="text-sm">Active, once per scene</td><td class="text-sm">Your Thiasos grants your mount +1 Speed and the ability to ignore difficult terrain for one scene. Mark 1 Obligation each time you use this ability.</td><td><span class="text-xs text-muted">Living Thiasos (mounted tradition)</span></td></tr>
+</tbody></table>
+<h3 id="major-cultural-weapons">Cultural Weapon Talents</h3>
+<table>
+<thead><tr><th style="width:16%;">Talent</th><th style="width:8%;">Cost</th><th style="width:14%;">Type</th><th>Effect</th><th style="width:18%;">Requires</th></tr></thead>
+<tbody>
+<tr><td><strong>Khopesh Hook</strong><br><span class="text-xs text-muted">[WEAPON / CONTROL]</span></td><td><span class="badge badge-gold">6 XP</span></td><td class="text-sm">Active, once per scene</td><td class="text-sm">When you attack with a khopesh, you may declare a hook attempt. Make a normal attack roll. On a hit, you may choose to forgo damage and instead disarm the target (they drop one held item) or pull them off balance (&minus;1 die to their next action).</td><td><span class="text-xs text-muted">Weapon Mastery (khopesh or light blades)</span></td></tr>
+<tr><td><strong>Lance Couch</strong><br><span class="text-xs text-muted">[CHARGE / CONTROL]</span></td><td><span class="badge badge-gold">6 XP</span></td><td class="text-sm">Active, once per scene</td><td class="text-sm">When you charge with a lance and hit, your target must test Body + Endurance (DV 4) or be knocked prone. If the target is prone, your next attack against them gains +1 die.</td><td><span class="text-xs text-muted">Weapon Mastery (lance), Mounted Charger</span></td></tr>
+<tr><td><strong>Lance Recover</strong><br><span class="text-xs text-muted">[THROWN / RECOVERY]</span></td><td><span class="badge badge-gold">6 XP</span></td><td class="text-sm">Passive</td><td class="text-sm">After impaling an enemy with your lance, you may recover the weapon as a free action (you have trained to brace, strike, and withdraw in one motion). If you fail to recover, you must draw your saber.</td><td><span class="text-xs text-muted">&mdash;</span></td></tr>
+<tr><td><strong>Curved Blade</strong><br><span class="text-xs text-muted">[MOUNTED / STRIKE]</span></td><td><span class="badge badge-gold">8 XP</span></td><td class="text-sm">Passive + Active</td><td class="text-sm">Your saber's curved edge is designed for slashing while riding past. When you make a melee attack from horseback and continue moving, your attack gains +1 die and, on a hit, you may move an additional Near distance after the strike.</td><td><span class="text-xs text-muted">Weapon Mastery (saber), Mounted Charger</span></td></tr>
+<tr><td><strong>The Hollow Lance</strong><br><span class="text-xs text-muted">[THROWN / FEAR]</span></td><td><span class="badge badge-gold">10 XP</span></td><td class="text-sm">Active, once per session</td><td class="text-sm">Your lance is made of a hollow tube that whistles when thrown. You may throw your lance as a ranged weapon (Near range). On a hit, the target is Shaken (&minus;1 die to all actions) for one exchange, and the whistling sound panics nearby horses (they must test Resolve or flee).</td><td><span class="text-xs text-muted">Lance Recover, Weapon Mastery (lance)</span></td></tr>
+</tbody></table>
+<h3 id="major-heavy-mounted">Heavy and Mounted Talents</h3>
+<table>
+<thead><tr><th style="width:16%;">Talent</th><th style="width:8%;">Cost</th><th style="width:14%;">Type</th><th>Effect</th><th style="width:18%;">Requires</th></tr></thead>
+<tbody>
+<tr><td><strong>Heavy Armor Training</strong><br><span class="text-xs text-muted">[ARMOR / ENDURANCE]</span></td><td><span class="badge badge-gold">4 XP</span></td><td class="text-sm">Passive</td><td class="text-sm">You ignore the first &minus;1 die penalty for wearing heavy armor.</td><td><span class="text-xs text-muted">Body 3+</span></td></tr>
+<tr><td><strong>Cataphract Charge</strong><br><span class="text-xs text-muted">[CHARGE / DOMINANCE]</span></td><td><span class="badge badge-gold">6 XP</span></td><td class="text-sm">Active, once per scene</td><td class="text-sm">When you charge with a kontos lance, your attack ignores 1 point of Armor and, on a hit, the target must test Resolve (DV 4) or be Shaken (&minus;1 die to all actions for one exchange).</td><td><span class="text-xs text-muted">Heavy Armor Training, Weapon Mastery (lance)</span></td></tr>
+<tr><td><strong>Armored Fence</strong><br><span class="text-xs text-muted">[FORMATION / DEFENSE]</span></td><td><span class="badge badge-gold">8 XP</span></td><td class="text-sm">Passive + Active</td><td class="text-sm">When you form a line with at least two other cataphracts, your unit gains +1 Armor and cannot be charged without the enemy first testing Resolve (DV 5). Breaking the formation costs 1 Fatigue.</td><td><span class="text-xs text-muted">Cataphract Charge, Heavy Armor Training</span></td></tr>
+<tr><td><strong>Kontos Thrust</strong><br><span class="text-xs text-muted">[WEAPON / VERSATILITY]</span></td><td><span class="badge badge-gold">6 XP</span></td><td class="text-sm">Passive</td><td class="text-sm">The kontos lance is held with two hands and braced against the horse's neck. You may use it one-handed while carrying a shield, but your attack suffers &minus;1 die. If you use it two-handed, you gain +1 die and +1 Harm, but cannot use a shield.</td><td><span class="text-xs text-muted">Weapon Mastery (lance)</span></td></tr>
+<tr><td><strong>Mahout's Bond</strong><br><span class="text-xs text-muted">[MOUNTED / BOND]</span></td><td><span class="badge badge-gold">6 XP</span></td><td class="text-sm">Passive</td><td class="text-sm">You have bonded with a specific war elephant. While riding it, your melee reach extends to Near, and you may treat the elephant as having +1 Armor.</td><td><span class="text-xs text-muted">Animal Handling 2+</span></td></tr>
+<tr><td><strong>Elephant Charge</strong><br><span class="text-xs text-muted">[AREA / CONTROL]</span></td><td><span class="badge badge-gold">8 XP</span></td><td class="text-sm">Active, once per scene</td><td class="text-sm">Your elephant may make a trample attack against all enemies in a Near zone. Each target must test Body + Athletics (DV 4) or take Harm 2 and be knocked prone. Using this ability costs 2 Fatigue for the elephant.</td><td><span class="text-xs text-muted">Mahout's Bond</span></td></tr>
+<tr><td><strong>Howdah Archery</strong><br><span class="text-xs text-muted">[MOUNTED / RANGED]</span></td><td><span class="badge badge-gold">6 XP</span></td><td class="text-sm">Passive</td><td class="text-sm">You may fire a bow or throw a javelin from the howdah without penalty, even while the elephant is moving. Additionally, you gain +1 Armor while in the howdah (cover).</td><td><span class="text-xs text-muted">Mahout's Bond, Ranged 2+</span></td></tr>
+<tr><td><strong>Stampede</strong><br><span class="text-xs text-muted">[AREA / FEAR]</span></td><td><span class="badge badge-gold">10 XP</span></td><td class="text-sm">Active, once per session</td><td class="text-sm">You may send your elephant into a stampede. All enemies in a Large zone must test Spirit + Resolve (DV 5) or flee in panic. Those who fail also take Harm 1 (trampled). After the stampede, your elephant is Winded (&minus;1 die on all actions for the rest of the scene).</td><td><span class="text-xs text-muted">Elephant Charge, Mahout's Bond</span></td></tr>
+</tbody></table>
+<h3 id="major-light-skirmish">Light and Skirmish Talents</h3>
+<table>
+<thead><tr><th style="width:16%;">Talent</th><th style="width:8%;">Cost</th><th style="width:14%;">Type</th><th>Effect</th><th style="width:18%;">Requires</th></tr></thead>
+<tbody>
+<tr><td><strong>Light Cavalry</strong><br><span class="text-xs text-muted">[MOUNTED / SKIRMISH]</span></td><td><span class="badge badge-gold">4 XP</span></td><td class="text-sm">Passive</td><td class="text-sm">You may ride without saddle or bridle; your horse responds to knee pressure and spoken commands. When you make a Ride test, you gain +1 die.</td><td><span class="text-xs text-muted">&mdash;</span></td></tr>
+<tr><td><strong>Javelin Volley</strong><br><span class="text-xs text-muted">[RANGED / THROWN]</span></td><td><span class="badge badge-gold">6 XP</span></td><td class="text-sm">Active, once per scene</td><td class="text-sm">You carry four javelins. As an action, you may throw two of them at the same target. Resolve each attack separately. After the volley, you are unarmed until you retrieve more javelins.</td><td><span class="text-xs text-muted">Weapon Mastery (javelins)</span></td></tr>
+<tr><td><strong>Harassing Skirmish</strong><br><span class="text-xs text-muted">[SKIRMISH / CONTROL]</span></td><td><span class="badge badge-gold">8 XP</span></td><td class="text-sm">Active, once per round</td><td class="text-sm">When you throw a javelin and then move away, your target suffers &minus;1 die to their next action (distracted by the near miss).</td><td><span class="text-xs text-muted">Light Cavalry, Weapon Mastery (javelin)</span></td></tr>
+<tr><td><strong>Feigned Flight</strong><br><span class="text-xs text-muted">[DECEPTION / SKIRMISH]</span></td><td><span class="badge badge-gold">6 XP</span></td><td class="text-sm">Active, once per scene</td><td class="text-sm">You may pretend to retreat, luring an enemy into pursuit. Make a Deception test (DV 3). On a success, the enemy pursues, and on their next turn they must move toward you. On your following turn, you may turn and attack with +2 dice. This ability costs 1 Fatigue.</td><td><span class="text-xs text-muted">Light Cavalry, Deception 2+</span></td></tr>
+</tbody></table>
+<h3 id="major-desert-rider">Desert Rider Talents</h3>
+<table>
+<thead><tr><th style="width:16%;">Talent</th><th style="width:8%;">Cost</th><th style="width:14%;">Type</th><th>Effect</th><th style="width:18%;">Requires</th></tr></thead>
+<tbody>
+<tr><td><strong>Desert Rider</strong><br><span class="text-xs text-muted">[ENVIRONMENT / SURVIVAL]</span></td><td><span class="badge badge-gold">4 XP</span></td><td class="text-sm">Passive</td><td class="text-sm">You ignore the first environmental penalty from heat or sand. Your horse also ignores the first penalty.</td><td><span class="text-xs text-muted">Lore 1+</span></td></tr>
+<tr><td><strong>Furusiyya Training</strong><br><span class="text-xs text-muted">[MOUNTED / MASTERY]</span></td><td><span class="badge badge-gold">6 XP</span></td><td class="text-sm">Passive + Active</td><td class="text-sm">You have trained in the full art of the horse warrior: lance, saber, bow, and horsemanship. You gain +1 die to all Ride tests and may reroll one failed attack with a lance or saber per scene.</td><td><span class="text-xs text-muted">Weapon Mastery (lance or saber), Desert Rider</span></td></tr>
+</tbody></table><hr>
+<h2 id="prestige-talents">Prestige Talents (7&ndash;10 XP)</h2>
+<p>Prestige talents are campaign-shaping abilities that break fundamental limits &mdash; the signature powers of a character who has committed deeply to a path, a Patron, or an origin.</p>
+<h3 id="prestige-general">General</h3>
+<table>
+<thead><tr><th style="width:16%;">Talent</th><th style="width:8%;">Cost</th><th style="width:14%;">Type</th><th>Effect</th><th style="width:18%;">Requires</th></tr></thead>
+<tbody>
+<tr><td><strong>Arcane Dominance</strong><br><span class="text-xs text-muted">[POWER / OVERRIDE]</span></td><td><span class="badge badge-gold">8 XP</span></td><td class="text-sm">Passive</td><td class="text-sm">When you contest another magical effect, you automatically overpower weaker effects (Tier II or lower).</td><td><span class="text-xs text-muted">Spirit 4, Arcana 4</span></td></tr>
+<tr><td><strong>Forbidden Knowledge</strong><br><span class="text-xs text-muted">[SECRETS / DANGEROUS]</span></td><td><span class="badge badge-gold">8 XP</span></td><td class="text-sm">Active, once per session</td><td class="text-sm">Access one forbidden summon or dangerous rite without its normal prerequisites. The GM gains 2 SB.</td><td><span class="text-xs text-muted">Tier II</span></td></tr>
+<tr><td><strong>Crack Specialist</strong><br><span class="text-xs text-muted">[RITUAL / INSTANT]</span></td><td><span class="badge badge-gold">8 XP</span></td><td class="text-sm">Passive</td><td class="text-sm">Reduce the Obligation cost of Crack the Seal by 1 (minimum +1).</td><td><span class="text-xs text-muted">3 Patron Symbols</span></td></tr>
+<tr><td><strong>Dual Covenant</strong><br><span class="text-xs text-muted">[BOND / SYNCHRONIZATION]</span></td><td><span class="badge badge-gold">8 XP</span></td><td class="text-sm">Passive</td><td class="text-sm">You may maintain two active summoned spirits simultaneously.</td><td><span class="text-xs text-muted">Pact-Whisperer, Lesser Pactwright</span></td></tr>
+<tr><td><strong>Triad Bond</strong><br><span class="text-xs text-muted">[BOND / SYNCHRONIZATION]</span></td><td><span class="badge badge-gold">10 XP</span></td><td class="text-sm">Passive</td><td class="text-sm">You may maintain three active summoned spirits simultaneously.</td><td><span class="text-xs text-muted">Dual Covenant, Tier III</span></td></tr>
+<tr><td><strong>Shrike Parry</strong><br><span class="text-xs text-muted">[COUNTER / PARRY]</span></td><td><span class="badge badge-gold">8 XP</span></td><td class="text-sm">Reactive</td><td class="text-sm">When Defending against a melee attack: on Success, negate the hit and make a free attack at equal Position; on Partial, reduce Harm by two levels; on Miss, improve Position one step next turn without Defending again.</td><td><span class="text-xs text-muted">Melee 3+, Athletics 2+, notable duel history</span></td></tr>
+<tr><td><strong>Mystic Bulwark</strong><br><span class="text-xs text-muted">[PROTECT / BOND]</span></td><td><span class="badge badge-gold">8 XP</span></td><td class="text-sm">Active</td><td class="text-sm">When you Defend, you may Shield an adjacent ally (they gain your Position bonus). If you succeed, both avoid the effect. Once per scene, spend 2 Fatigue to extend to all allies in Near.</td><td><span class="text-xs text-muted">Resolve 3+, Spirit 2+, access to Rites or Cantos</span></td></tr>
+<tr><td><strong>High Stance Duelist</strong><br><span class="text-xs text-muted">[DOMINANCE / TECHNIQUE]</span></td><td><span class="badge badge-gold">8 XP</span></td><td class="text-sm">Passive</td><td class="text-sm">While Defending: enemies suffer &minus;1 die to attacks against you; on a Success, your riposte becomes Dominant instead of Controlled.</td><td><span class="text-xs text-muted">Melee 3+, Presence 1+</span></td></tr>
+<tr><td><strong>Hollow-Touched</strong><br><span class="text-xs text-muted">[RESILIENCE]</span></td><td><span class="badge badge-gold">8 XP</span></td><td class="text-sm">Reactive</td><td class="text-sm">When you would take Harm, you may mark that amount as Fatigue instead. If you do, either the GM gains 1 SB or you mark 1 Obligation to the Pale Shepherd. Overflow triggers normal Fatigue&rarr;Harm conversion plus the chosen cost.</td><td><span class="text-xs text-muted">Aelaerem affinity, Spirit 3+, Stealth 2+</span></td></tr>
+<tr><td><strong>Stone-Bound Interdictor</strong><br><span class="text-xs text-muted">[RESILIENCE]</span></td><td><span class="badge badge-gold">8 XP</span></td><td class="text-sm">Reactive</td><td class="text-sm">When you would take Harm, you may mark that amount as Fatigue instead. If you do, either spend 1 Boon immediately or speak a binding condition (until fulfilled, &minus;1 die on social rolls with fae and stone-kin). Overflow triggers normal conversion plus the cost.</td><td><span class="text-xs text-muted">Aelinnel affinity, Body 3+, Wits 3+</span></td></tr>
+<tr><td><strong>Large Soul</strong><br><span class="text-xs text-muted">[ADAPTATION]</span></td><td><span class="badge badge-gold">8 XP</span></td><td class="text-sm">Passive</td><td class="text-sm">You may wear Heavy Armor and wield Heavy Weapons without restriction. You lose your Small Folk racial bonuses (+1 Position when Dodging or Resisting Knockback, +1 die on Hide or Evasion rolls while in cover).</td><td><span class="text-xs text-muted">Aelaerem or Aelinnel affinity, Body 4+, Spirit 3+</span></td></tr>
+<tr><td><strong>Ghost Heist</strong><br><span class="text-xs text-muted">[STRIKE / ERASURE]</span></td><td><span class="badge badge-gold">7 XP</span></td><td class="text-sm">Active, once per arc</td><td class="text-sm">You may commit a crime that leaves no traceable evidence &mdash; but only if you do the work. To perform a Ghost Heist, you must: (1) spend a Downtime Action preparing the scene (casing the location, planting false leads, corrupting guard logs, or bribing key personnel); (2) spend a String &mdash; a favor, a bribe, a secret, or a compromised official &mdash; to secure a key element of the erasure (a blind witness, a missing page, a corrupted seal); and (3) make a Subterfuge or Stealth test (DV 4). On a Clean Success, no traceable evidence remains and the GM cannot use Social SB to retroactively implicate you from that scene. On a Partial, evidence points elsewhere &mdash; the GM chooses a scapegoat (an NPC or faction), who may become a complication later. On a Miss, evidence points to you, and the GM gains 2 SB to spend on pursuit, investigation, or a bounty. <strong>Cost:</strong> you must accept a permanent <em>Reputation: Whispers</em> tag; some will always suspect you, even without proof. Additionally, the GM gains a String against you: &ldquo;The one who got away with it.&rdquo;</td><td><span class="text-xs text-muted">Tier II, Stealth 3+</span></td></tr>
+<tr><td><strong>Spymaster</strong><br><span class="text-xs text-muted">[SOCIAL / NETWORK / PRESTIGE]</span></td><td><span class="badge badge-gold">8 XP</span></td><td class="text-sm">Passive + Active</td><td class="text-sm">You have a permanent network of informants in any city you have visited for at least a week. Once per session, you may ask the GM one detailed question about faction movements, hidden plans, or NPC secrets in that city. Additionally, the GM may provide a rumor or warning unprompted once per arc.</td><td><span class="text-xs text-muted">Network Weaver, Information Broker, Tier II</span></td></tr>
+<tr><td><strong>Master Cantor</strong><br><span class="text-xs text-muted">[PERFORMANCE / LEGENDARY]</span></td><td><span class="badge badge-gold">10 XP</span></td><td class="text-sm">Passive + Active</td><td class="text-sm">Your performances are legendary. Once per session, when you roll Performance for a significant performance (in front of a crowd of at least 10 people), treat the result as one degree better (Miss &rarr; Partial, Partial &rarr; Success, Success &rarr; Critical). Additionally, once per arc, you may inspire an entire community; allies within the community gain +1 die to all rolls related to a single goal (e.g., defending the town, finding a lost child) for one session.</td><td><span class="text-xs text-muted">Performance 4+, Presence 4+, Captivating Performance, Tier III</span></td></tr>
+</tbody></table>
+<h3 id="prestige-rogue-cantor">Rogue Cantor Talents (Corrupted Voice)</h3>
+<table>
+<thead><tr><th style="width:16%;">Talent</th><th style="width:8%;">Cost</th><th style="width:14%;">Type</th><th>Effect</th><th style="width:18%;">Requires</th></tr></thead>
+<tbody>
+<tr><td><strong>Shadow Song</strong><br><span class="text-xs text-muted">[SHADOW / SILENCE]</span></td><td><span class="badge badge-gold">7 XP</span></td><td class="text-sm">Active</td><td class="text-sm">You learn to sing in frequencies that do not carry. Gain access to two songs: <strong>Cradle Song</strong> (Low) &mdash; lull a single target (Resist DV 3), costs 1 Fatigue; and <strong>Lockpick's Refrain</strong> (Standard) &mdash; unlock one mundane or warded lock by humming its true pitch, costs 1 Obligation.</td><td><span class="text-xs text-muted">Performance 2+, Presence 2+, Patron: Ikasha</span></td></tr>
+<tr><td><strong>Velvet Hook</strong><br><span class="text-xs text-muted">[INFLUENCE / BINDING]</span></td><td><span class="badge badge-gold">7 XP</span></td><td class="text-sm">Active</td><td class="text-sm">You learn that every song is a seduction. Gain access to two songs: <strong>Golden Tongue</strong> (Low) &mdash; gain +2 dice to Sway for one social exchange, costs 1 Fatigue; after use, the target feels a mild attraction or obligation. <strong>The Unrefusable Offer</strong> (Standard) &mdash; sing a bargain; the target must accept or suffer &minus;2 dice to all rolls until they do, costs 2 Obligation.</td><td><span class="text-xs text-muted">Performance 2+, Presence 2+, Patron: Livaea</span></td></tr>
+<tr><td><strong>Desperate Cadence</strong><br><span class="text-xs text-muted">[DESPERATION / CURSE]</span></td><td><span class="badge badge-gold">7 XP</span></td><td class="text-sm">Active</td><td class="text-sm">You sing of easy scores and cursed luck. Gain access to two songs: <strong>The Lucky Pick</strong> (Low) &mdash; reroll a failed Stealth or Subterfuge roll, costs 1 Fatigue and 1 Corruption tick. <strong>Blood Price</strong> (Standard) &mdash; sing a curse on a rival; they suffer &minus;1 die on their next heist, costs 2 Fatigue and marks a Reckoning Timer [4] that the Patron will collect.</td><td><span class="text-xs text-muted">Performance 2+, Patron: Malachai</span></td></tr>
+</tbody></table>
+<h3 id="prestige-monk">Monk (Unarmed) Prestige Talents</h3>
+<table>
+<thead><tr><th style="width:16%;">Talent</th><th style="width:8%;">Cost</th><th style="width:14%;">Type</th><th>Effect</th><th style="width:18%;">Requires</th></tr></thead>
+<tbody>
+<tr><td><strong>Untouchable Form</strong><br><span class="text-xs text-muted">[EVADE / STRENGTH]</span></td><td><span class="badge badge-gold">10 XP</span></td><td class="text-sm">Passive + Active</td><td class="text-sm">+1 die to unarmed attacks; convert 2 Harm into Fatigue; cannot be grappled.</td><td><span class="text-xs text-muted">Iron Fist Technique + Flowing Spirit Technique</span></td></tr>
+<tr><td><strong>Inevitable Strike</strong><br><span class="text-xs text-muted">[FATE / FORCE]</span></td><td><span class="badge badge-gold">10 XP</span></td><td class="text-sm">Passive + Reactive</td><td class="text-sm">+2 dice to unarmed attacks; ignore 1 Armor; may counterattack when an enemy misses.</td><td><span class="text-xs text-muted">Iron Fist Technique + Perfect Timing Technique</span></td></tr>
+<tr><td><strong>Way of the Empty Mind</strong><br><span class="text-xs text-muted">[CLARITY / IMMUNITY]</span></td><td><span class="badge badge-gold">9 XP</span></td><td class="text-sm">Passive</td><td class="text-sm">You are immune to fear effects and magical attempts to read your thoughts. Additionally, you gain +2 dice to resist charm or mind control.</td><td><span class="text-xs text-muted">Spirit 3+, Meditative Focus</span></td></tr>
+</tbody></table>
+<h3 id="prestige-freecaster">Free Caster Prestige Talents</h3>
+<table>
+<thead><tr><th style="width:16%;">Talent</th><th style="width:8%;">Cost</th><th style="width:14%;">Type</th><th>Effect</th><th style="width:18%;">Requires</th></tr></thead>
+<tbody>
+<tr><td><strong>Spell Echo</strong><br><span class="text-xs text-muted">[ECHO / FATE]</span></td><td><span class="badge badge-gold">8 XP</span></td><td class="text-sm">Reactive, once per session</td><td class="text-sm">When you roll a 1 on a Free Casting roll, you may immediately reroll that die. The new result stands, and any 1 on the reroll generates an additional SB as normal. After using this talent, you cannot use it again until you have taken a Short Rest.</td><td><span class="text-xs text-muted">Spellcraft, Controlled Burn, Tier II</span></td></tr>
+<tr><td><strong>Resonance Anchor</strong><br><span class="text-xs text-muted">[ANCHOR / STABILITY]</span></td><td><span class="badge badge-gold">9 XP</span></td><td class="text-sm">Passive</td><td class="text-sm">Your connection to the Weave is more stable. The first time you would generate a Story Beat from a 1 in a scene, you may choose to bank that SB for yourself (it does not go to the GM). You may have up to 2 banked SB at a time, and you may spend them as if they were Boons (reroll a die, activate an Asset, improve Position). Unused banked SB are lost at the end of the scene.</td><td><span class="text-xs text-muted">Spellcraft, Weave Resilience, Tier II</span></td></tr>
+</tbody></table>
+<h3 id="prestige-combat">Combat Prestige</h3>
+<table>
+<thead><tr><th style="width:16%;">Talent</th><th style="width:8%;">Cost</th><th style="width:14%;">Type</th><th>Effect</th><th style="width:18%;">Requires</th></tr></thead>
+<tbody>
+<tr><td><strong>Battlefield Terror</strong><br><span class="text-xs text-muted">[FEAR / DOMINANCE]</span></td><td><span class="badge badge-gold">10 XP</span></td><td class="text-sm">Passive + Active</td><td class="text-sm">Enemies in Close range act at &minus;1 die due to intimidation. Once per scene, convert an enemy's success to a partial with cost.</td><td><span class="text-xs text-muted">Melee 4+, Body 4+, Harm 2+ experience</span></td></tr>
+<tr><td><strong>Shadow Dance</strong><br><span class="text-xs text-muted">[EVADE / STEALTH]</span></td><td><span class="badge badge-gold">10 XP</span></td><td class="text-sm">Active</td><td class="text-sm">After a successful Backstab, test Stealth vs. DV (Tier). On success, re-enter Stealth and clear 1 Fatigue or improve Position +1. On failure, remain Exposed and mark 1 Fatigue. May only chain once per scene.</td><td><span class="text-xs text-muted">Backstab, Stealth 3+, Mobility 2+</span></td></tr>
+<tr><td><strong>Embrace the Void</strong><br><span class="text-xs text-muted">[CORRUPTION / POWER]</span></td><td><span class="badge badge-gold">8 XP</span></td><td class="text-sm">Active, once per session</td><td class="text-sm">Embrace your Patron's corrupting influence. Mark 2 Obligation and 1 Corruption segment, then gain one benefit for the scene: +1 die and +1 Effect on Patron-domain rolls, immunity to one consequence type, use one Rite without Obligation, or +1 Effect on social manipulations. This choice becomes a permanent mark on your sheet, and the GM gains +1 SB against you when your Patron is relevant.</td><td><span class="text-xs text-muted">Any character with 2+ skill levels tied to Patron, at least 1 Obligation segment to that Patron</span></td></tr>
+</tbody></table>
+<h3 id="prestige-faction">Faction and Asset Prestige Talents</h3>
+<table>
+<thead><tr><th style="width:16%;">Talent</th><th style="width:8%;">Cost</th><th style="width:14%;">Type</th><th>Effect</th><th style="width:18%;">Requires</th></tr></thead>
+<tbody>
+<tr><td><strong>Faction Ally</strong><br><span class="text-xs text-muted">[SOCIAL / FACTION]</span></td><td><span class="badge badge-gold">8 XP</span></td><td class="text-sm">Passive</td><td class="text-sm">You have a permanent ally within a faction of your choice. Once per session, you may call on them for information, safe passage, or a minor favor. The favor is not free; it may create a minor obligation (a future task, a small debt).</td><td><span class="text-xs text-muted">Trusted Reputation, Tier II</span></td></tr>
+<tr><td><strong>Asset Network</strong><br><span class="text-xs text-muted">[ASSET / NETWORK]</span></td><td><span class="badge badge-gold">9 XP</span></td><td class="text-sm">Passive</td><td class="text-sm">You may maintain twice the normal number of Assets (if using the Assets system). Additionally, once per session, you may use an Asset without spending the usual Boon (once-per-scene activation still applies).</td><td><span class="text-xs text-muted">Asset Crafter, Tier II</span></td></tr>
+</tbody></table>
+<h3 id="prestige-runic-warrior">Runic Warrior Prestige Talents</h3>
+<table>
+<thead><tr><th style="width:16%;">Talent</th><th style="width:8%;">Cost</th><th style="width:14%;">Type</th><th>Effect</th><th style="width:18%;">Requires</th></tr></thead>
+<tbody>
+<tr><td><strong>The Unbroken Vow</strong><br><span class="text-xs text-muted">[VOW / POWER]</span></td><td><span class="badge badge-gold">10 XP</span></td><td class="text-sm">Passive</td><td class="text-sm">You have kept a sworn oath for one year. When you swear an oath before a witness, gain +2 dice to all actions serving it.</td><td><span class="text-xs text-muted">Oath-Bound, Witnessed Scar</span></td></tr>
+<tr><td><strong>Avatar of the Codex</strong><br><span class="text-xs text-muted">[TRANSFORMATION / POWER]</span></td><td><span class="badge badge-gold">12 XP</span></td><td class="text-sm">Active, once per session</td><td class="text-sm">You become the embodiment of your Codex: Body +2, and your Thiasos fights as a second combatant. Mark 2 Fatigue and 1 Obligation afterward.</td><td><span class="text-xs text-muted">Tier III, physical Codex</span></td></tr>
+<tr><td><strong>The Scar That Remembers</strong><br><span class="text-xs text-muted">[MEMORY / TRUTH]</span></td><td><span class="badge badge-gold">11 XP</span></td><td class="text-sm">Active, once per session</td><td class="text-sm">Touch a scar and speak a sentence about the event that caused it. That sentence is considered witnessed truth in any court.</td><td><span class="text-xs text-muted">Witnessed Scar, Tier III</span></td></tr>
+</tbody></table>
+<h3 id="prestige-beastfolk">Beastfolk Talents</h3>
+<table>
+<thead><tr><th style="width:16%;">Talent</th><th style="width:8%;">Cost</th><th style="width:14%;">Type</th><th>Effect</th><th style="width:18%;">Requires</th></tr></thead>
+<tbody>
+<tr><td><strong>Keen Scent of the Valewood</strong><br><span class="text-xs text-muted">[SENSE / TRACKING]</span></td><td><span class="badge badge-gold">6 XP</span></td><td class="text-sm">Passive + Active</td><td class="text-sm">You can &ldquo;read&rdquo; a scene with your senses. Once per scene in the Wilds, when you Study or Take Stock, you may ask one additional question on a hit. The GM marks +1 SB tied to an unseen predator, rival clan, or old obligation.</td><td><span class="text-xs text-muted">Beastfolk origin</span></td></tr>
+<tr><td><strong>Run With the Pack</strong><br><span class="text-xs text-muted">[TEAMWORK / TACTICS]</span></td><td><span class="badge badge-gold">8 XP</span></td><td class="text-sm">Passive</td><td class="text-sm">When you fight or act alongside an ally who trusts you, you both gain +1 Effect when you coordinate using pack tactics (flanking, driving prey, trading blows). On a miss, the GM may mark +1 Harm or +1 Fatigue on an ally instead of you; your instinctive coordination pulls them into danger.</td><td><span class="text-xs text-muted">Beastfolk origin</span></td></tr>
+</tbody></table>
+<h3 id="prestige-dragonfolk">Dragonfolk Talents</h3>
+<table>
+<thead><tr><th style="width:16%;">Talent</th><th style="width:8%;">Cost</th><th style="width:14%;">Type</th><th>Effect</th><th style="width:18%;">Requires</th></tr></thead>
+<tbody>
+<tr><td><strong>Hoard-Sense</strong><br><span class="text-xs text-muted">[SENSE / VALUE]</span></td><td><span class="badge badge-gold">6 XP</span></td><td class="text-sm">Passive + Active</td><td class="text-sm">You can feel where stories and value pool. When you Survey a location for treasure, secrets, or leverage, on a hit you may also ask: &ldquo;What here would I be most tempted to claim and keep?&rdquo; If you pursue that answer, gain +1 die on the relevant action. If you walk away from it, the GM may mark +1 SB for future temptation.</td><td><span class="text-xs text-muted">Dragonfolk origin</span></td></tr>
+<tr><td><strong>Draconic Breath</strong><br><span class="text-xs text-muted">[ELEMENT / POWER]</span></td><td><span class="badge badge-gold">12 XP</span></td><td class="text-sm">Active, once per session</td><td class="text-sm">Unleash a Breath Attack as a risky or desperate action. Gain +2 Effect against a group or large target when you do so. After using it, mark +2 Fatigue. If this would cause overflow, the GM instead marks +1 SB and you gain a new visible draconic mutation (eyes, scales, voice, or other change).</td><td><span class="text-xs text-muted">Dragonfolk origin, Tier II+</span></td></tr>
+</tbody></table>
+<h3 id="prestige-other">Other (Liminal) Talents</h3>
+<table>
+<thead><tr><th style="width:16%;">Talent</th><th style="width:8%;">Cost</th><th style="width:14%;">Type</th><th>Effect</th><th style="width:18%;">Requires</th></tr></thead>
+<tbody>
+<tr><td><strong>Step Sideways</strong><br><span class="text-xs text-muted">[MOVEMENT / THRESHOLD]</span></td><td><span class="badge badge-gold">8 XP</span></td><td class="text-sm">Active, once per scene</td><td class="text-sm">When you move through a threshold (doorway, tree-line, fog bank, mirror, or similar boundary), you may reposition yourself or an ally fictionally: appear behind foes, bypass mundane guards, or &ldquo;skip&rdquo; a short distance. Roll the appropriate move. On a hit, you arrive where and how you intended. On a miss, you arrive altered, late, or not alone. The GM marks +1 SB tied to what followed you.</td><td><span class="text-xs text-muted">Liminal origin (Other)</span></td></tr>
+<tr><td><strong>Unsettling Truth</strong><br><span class="text-xs text-muted">[SOCIAL / OMEN]</span></td><td><span class="badge badge-gold">6 XP</span></td><td class="text-sm">Passive + Active</td><td class="text-sm">You can speak in the language of omens. When you Sway, Provoke, or Command by revealing a hidden truth, omen, or uncanny insight about someone, gain +1 Effect on a hit. The target is left shaken or marked by dread or hope (GM's choice). On a miss, they reject you and label you a danger or blasphemy; mark +1 Fatigue.</td><td><span class="text-xs text-muted">Liminal origin (Other)</span></td></tr>
+</tbody></table><hr>
+<h2 id="epic-talents">Epic Talents (11+ XP)</h2>
+<p>Epic talents are legendary, story-defining powers. They typically require Tier III+ characters and multiple prerequisite talents, and they should reshape how a table experiences your character in play.</p>
+<h3 id="epic-general">General</h3>
+<table>
+<thead><tr><th style="width:16%;">Talent</th><th style="width:8%;">Cost</th><th style="width:14%;">Type</th><th>Effect</th><th style="width:18%;">Requires</th></tr></thead>
+<tbody>
+<tr><td><strong>Elemental Mastery</strong><br><span class="text-xs text-muted">[ELEMENT / HARMONY]</span></td><td><span class="badge badge-gold">18 XP</span></td><td class="text-sm">Passive + Active</td><td class="text-sm">Reduce Backlash severity by one step when casting with your focus elements. When casting with two focus elements, gain +2 dice and +1 Effect. Once per scene, cast a spell without generating SB on the Weave roll. Allies gain +1 die when you cast an aligned element spell.</td><td><span class="text-xs text-muted">Tier III, Spellcraft, Arcana 5, 2+ Focus Elements</span></td></tr>
+<tr><td><strong>Crack the Seal Mastery</strong><br><span class="text-xs text-muted">[RITUAL / PRECISION]</span></td><td><span class="badge badge-gold">18 XP</span></td><td class="text-sm">Passive + Active</td><td class="text-sm">When Cracking the Seal, choose one: reduce Obligation cost by 1, prevent your Symbol from becoming Compromised, or gain +1 Effect. With 4+ Symbols, reduce all ritual casting times by 1 round. Once per scene, Crack the Seal on up to 3 Symbols as one action. Ignore No Symbol penalties.</td><td><span class="text-xs text-muted">Tier III, Invoker's Grimoire, 3+ Patron Symbols</span></td></tr>
+<tr><td><strong>Blade Dance</strong><br><span class="text-xs text-muted">[STRIKE / MASTERY]</span></td><td><span class="badge badge-gold">18 XP</span></td><td class="text-sm">Active, once per scene</td><td class="text-sm">Engage and attack up to 3 targets in one action. Each attack at &minus;1 die, but your Position improves by one step.</td><td><span class="text-xs text-muted">Melee 5+, Duelist's Edge, Flurry Strike</span></td></tr>
+<tr><td><strong>Miststep Reflex</strong><br><span class="text-xs text-muted">[DEFENSE / MOVEMENT]</span></td><td><span class="badge badge-gold">12 XP</span></td><td class="text-sm">Passive</td><td class="text-sm">You are always treated as Defending against physical attacks unless Exposed, Grappled, or Surprised. If you take the Defend action, improve Position by +2 steps instead. Once per scene when you roll 1s while defending, you must mark 2 Fatigue or lose the benefit for the scene.</td><td><span class="text-xs text-muted">Elusive Dodge, Tier III, Stealth 4+, Athletics 3+</span></td></tr>
+<tr><td><strong>Transcendent Harmony</strong><br><span class="text-xs text-muted">[LIFE / WIND]</span></td><td><span class="badge badge-gold">18 XP</span></td><td class="text-sm">Passive + Active</td><td class="text-sm">Convert 2 Harm into Fatigue; once per session become immune to Harm; allies gain +1 defense.</td><td><span class="text-xs text-muted">Flowing Spirit Technique + Perfect Timing Technique, Spirit 4+</span></td></tr>
+<tr><td><strong>Deathblow</strong><br><span class="text-xs text-muted">[STRIKE / OVERLOAD]</span></td><td><span class="badge badge-gold">12 XP</span></td><td class="text-sm">Active, once per scene</td><td class="text-sm">You know exactly where to strike to end a fight instantly. When you make a melee attack from stealth and score a Critical Hit (a roll of 10 counts as two successes), you may declare a Deathblow. The target is immediately reduced to Harm 3 (incapacitated) if they are not a boss-tier enemy (GM discretion). If they are a boss-tier enemy, the attack instead deals +2 Harm and ignores an additional 1 point of Armor. <strong>Cost:</strong> using Deathblow marks 1 Fatigue. If the target survives, you are revealed and cannot re-enter stealth until the end of your next turn.</td><td><span class="text-xs text-muted">Tier II, Melee 3+</span></td></tr>
+<tr><td><strong>Assassin's Mark</strong><br><span class="text-xs text-muted">[STRIKE / DEATH]</span></td><td><span class="badge badge-gold">12 XP</span></td><td class="text-sm">Active, once per scene</td><td class="text-sm">You have trained to deliver a single, devastating blow from the shadows &mdash; a strike that bypasses defenses and leaves no room for recovery. When you attack a target while Hidden, you may declare an Assassin's Mark. Resolve the attack as a single action with the following effects: you gain +1 Harm and ignore 1 point of Armor (this stacks with Backstab and Called Shot); if the attack is a Critical Hit (a roll of 10 counting as two successes) and the target is not a boss-tier enemy (GM discretion), they are instantly incapacitated (reduced to Harm 3, unconscious, or otherwise removed from the scene); after the attack, you may immediately make a Stealth test (DV 3) to re-enter stealth &mdash; on a success, you are Hidden again, on a failure, you are revealed. <strong>Cost:</strong> using this talent marks 1 Fatigue and consumes your movement for the turn (you may still use Shadow Meld or similar abilities as your move action, but cannot take a second move). <strong>Called Shot Synergy:</strong> if you also possess the Called Shot talent, you may apply one Called Shot effect to this attack without spending its normal once-per-scene use.</td><td><span class="text-xs text-muted">Tier II, Stealth 3+, Backstab, Shadow Dance</span></td></tr>
+<tr><td><strong>Weave Harmonist</strong><br><span class="text-xs text-muted">[HARMONY / FLOW]</span></td><td><span class="badge badge-gold">16 XP</span></td><td class="text-sm">Passive + Active</td><td class="text-sm">You have learned to ride the Weave's turbulence. Once per session, you may ignore all SB generated by a single Free Casting roll (the GM gains none). Additionally, whenever you generate a Story Beat from a 1, you may immediately spend 1 Boon to cancel that SB (the GM does not gain it). You cannot cancel more than 3 SB per scene this way.</td><td><span class="text-xs text-muted">Spellcraft, Resonance Anchor, Tier III</span></td></tr>
+</tbody></table>
+<h3 id="epic-monk">Monk Epic Talents</h3>
+<table>
+<thead><tr><th style="width:16%;">Talent</th><th style="width:8%;">Cost</th><th style="width:14%;">Type</th><th>Effect</th><th style="width:18%;">Requires</th></tr></thead>
+<tbody>
+<tr><td><strong>Fist of the Mountain</strong><br><span class="text-xs text-muted">[EARTH / POWER]</span></td><td><span class="badge badge-gold">15 XP</span></td><td class="text-sm">Active, once per session</td><td class="text-sm">Your unarmed strike becomes a cataclysmic blow. Deal +4 Harm, ignore all Armor, and the target is knocked back two range bands and stunned (loses next action). After the blow, you suffer 2 Fatigue from the strain.</td><td><span class="text-xs text-muted">Iron Fist Technique, Inevitable Strike, Body 5+</span></td></tr>
+<tr><td><strong>Breath of Stillness</strong><br><span class="text-xs text-muted">[CLEANSE / RENEWAL]</span></td><td><span class="badge badge-gold">14 XP</span></td><td class="text-sm">Active, once per session</td><td class="text-sm">Enter a deep meditative trance. Clear all Fatigue, remove one Harm level, and remove all Conditions. The meditation takes one full scene of uninterrupted peace.</td><td><span class="text-xs text-muted">Meditative Focus, Spirit 4+</span></td></tr>
+</tbody></table>
+<h3 id="epic-runic-warrior">Runic Warrior Epic Talents</h3>
+<table>
+<thead><tr><th style="width:16%;">Talent</th><th style="width:8%;">Cost</th><th style="width:14%;">Type</th><th>Effect</th><th style="width:18%;">Requires</th></tr></thead>
+<tbody>
+<tr><td><strong>Runebound Resilience</strong><br><span class="text-xs text-muted">[ENDURANCE / RITUAL]</span></td><td><span class="badge badge-gold">18 XP</span></td><td class="text-sm">Passive + Active</td><td class="text-sm">You have learned to transform the very essence of harm into deeper communion with your Patron. <strong>Harm Conversion:</strong> once per round, you may convert up to 2 Harm levels to +2 Obligation instead of taking the damage. <strong>Obligation Endurance:</strong> while at 6+ Obligation segments, gain +1 die to all Rite invocations. <strong>Patron's Shield:</strong> when reduced to Harm 3, you may immediately Invoke any known Rite without marking additional Obligation. <strong>Debt Fortification:</strong> at 8+ Obligation segments, ignore first Harm 1 each round. Once per scene use.</td><td><span class="text-xs text-muted">Tier III+, Codex, Spirit 4+</span></td></tr>
+<tr><td><strong>Patron's Favored</strong><br><span class="text-xs text-muted">[FAVOR / RITUAL]</span></td><td><span class="badge badge-gold">18 XP</span></td><td class="text-sm">Passive + Active</td><td class="text-sm">Your Patron has marked you as specially favored, granting you unprecedented access to their power with reduced cost. <strong>Low Rite Discount:</strong> reduce Obligation cost for Low Rites by 1 (minimum 0). <strong>Empower:</strong> once per scene, spend 1 Action + 1 Boon &mdash; target gains +1 die to all rolls for 3 rounds, and while empowered, you gain +1 die to all rolls. <strong>Empower Push:</strong> spend 1 Action + 1 Boon + 3 Obligation &mdash; target gains +2 dice to all rolls for 3 rounds, but gains +Corruption fatigue at the end of the scene. <strong>Enhanced Gift:</strong> your Patron's Gift now provides +2 dice instead of +1. <strong>Debt Bound:</strong> you cannot Empower again until all Obligation is cleared.</td><td><span class="text-xs text-muted">Tier III+, Codex, Familiar, 8+ total Obligation segments</span></td></tr>
+</tbody></table><hr>
+<h2 id="talent-synergies">Talent Synergies and Building Strategies</h2>
+<p>The talents above are designed to combine. This section gathers proven synergy chains, tier-by-tier purchase guidance, and worked character-build examples to help you (and your GM) plan a talent progression across a campaign.</p>
+<h3 id="synergy-examples">Synergy Examples</h3>
+<div class="panel panel-gold"><ul class="text-sm">
+<li><strong>Spellcraft + Elemental Focus + Elemental Mastery</strong>: reliable freeform casting with reduced backlash and epic control.</li>
+<li><strong>Backstab + Shadow Dance + Deathblow</strong>: a stealth assassination chain.</li>
+<li><strong>Ritual Mastery + Efficient Invocation + Crack Specialist</strong>: fast, safe, low-cost rituals.</li>
+<li><strong>Defensive Survival + Elusive Dodge + Miststep Reflex</strong>: high survivability in melee.</li>
+<li><strong>Iron Fist Technique + Flowing Spirit Technique + Untouchable Form</strong>: unstoppable monk durability.</li>
+<li><strong>Iron Fist Technique + Perfect Timing Technique + Inevitable Strike</strong>: a monk counterattack master.</li>
+<li><strong>Effortless Charge + Relentless</strong>: charge over difficult terrain once per scene without a Fatigue cost.</li>
+<li><strong>Stubborn Pursuer + Tactical Movement</strong>: stay glued to a disengaging foe while preserving your own movement options.</li>
+<li><strong>Free Caster Progression</strong>: Controlled Burn &rarr; Spell Echo &rarr; Resonance Anchor &rarr; Weave Harmonist reduces SB generation and turns risk into personal resource.</li>
+<li><strong>Rogue Progression</strong>: Light Fingers &rarr; Always Another Exit &rarr; Ghost Heist for the ultimate phantom thief.</li>
+<li><strong>Rogue Cantor Progression</strong>: Crowd Veil + Shadow Song for the infiltrator who sings guards to sleep.</li>
+<li><strong>Mounted Combat Progression</strong>: Mounted Archery &rarr; Horse Archer's Art for the steppe rider who rains arrows from a galloping horse.</li>
+<li><strong>Social Face Progression</strong>: Smooth Talker + Trusted Reputation + Spymaster for the character who knows everyone and can call in favors across the city.</li>
+<li><strong>Follower/Asset Progression</strong>: Efficient Recruiter + Loyalty Bond + Delegated Upkeep for the commander who builds a loyal network that runs itself.</li>
+<li><strong>Cantor Progression</strong>: Projecting Voice &rarr; Captivating Performance &rarr; Master Cantor for the legendary performer who inspires armies.</li>
+<li><strong>Healer Progression</strong>: Field Dressing &rarr; Triage for the combat medic who keeps allies fighting.</li>
+<li><strong>Ranger Progression</strong>: Keen Tracker &rarr; Camouflage for the scout who moves unseen and never loses the trail.</li>
+<li><strong>Artificer Progression</strong>: Master Craft &rarr; Master Artificer for the crafter who builds anything, faster and cheaper.</li>
+<li><strong>Witch Progression</strong>: Craft of the Hedge &rarr; additional Hedge Gifts &rarr; a Hedge Gift of the Patron for the threshold worker who masters the quiet work of names.</li>
+<li><strong>Runic Warrior Progression</strong>: Flesh Codex &rarr; Witnessed Scar &rarr; The Unbroken Vow for the warrior whose body is a covenant and whose scars are scripture.</li>
+<li><strong>Beastfolk Progression</strong>: Keen Scent of the Valewood &rarr; Run With the Pack for the wild hunter who moves with the pack.</li>
+<li><strong>Dragonfolk Progression</strong>: Hoard-Sense &rarr; Draconic Breath for the dragon-kin who hoards secrets and breathes fire.</li>
+<li><strong>Other (Liminal) Progression</strong>: Step Sideways &rarr; Unsettling Truth for the threshold-walker who speaks in omens.</li>
+</ul></div>
+<h3 id="when-to-take">When to Take Talents (By Tier)</h3>
+<div class="panel panel-blue">
+<p class="text-sm"><strong>Early Game (0&ndash;40 XP)</strong>: take 1&ndash;2 access talents (Spellcraft, Codex, Familiar) and 2&ndash;3 minor talents that support your core concept.</p>
+<ul class="text-sm">
+<li><strong>Free Casters</strong>: prioritize Controlled Burn and Weave Resilience.</li>
+<li><strong>Rogues</strong>: take Light Fingers and Silk Palms.</li>
+<li><strong>Mounted Archers</strong>: take Mounted Archery.</li>
+<li><strong>Social Characters</strong>: take Smooth Talker and Ear to the Ground.</li>
+<li><strong>Healers</strong>: take Field Dressing.</li>
+<li><strong>Rangers</strong>: take Keen Tracker.</li>
+<li><strong>Crafters</strong>: take Master Craft.</li>
+<li><strong>Performers</strong>: take Projecting Voice.</li>
+<li><strong>Witches</strong>: take Craft of the Hedge.</li>
+<li><strong>Runic Warriors</strong>: take Flesh Codex and Oath-Bound.</li>
+<li><strong>Beastfolk</strong>: take Keen Scent of the Valewood.</li>
+<li><strong>Dragonfolk</strong>: take Hoard-Sense.</li>
+<li><strong>Others (Liminal)</strong>: take Step Sideways.</li>
+</ul>
+<p class="text-sm mt-1"><strong>Mid Game (41&ndash;90 XP)</strong>: add major talents (Patron's Symbol, Backstab, The Velvet Glove, Iron Fist Technique, Horse Archer's Art, Trusted Reputation, Efficient Recruiter, Triage, Camouflage, Master Artificer, Captivating Performance, Poisoner, Heavy Armor Training, Light Cavalry, Desert Rider, Scarred Resilience, Witnessed Scar, and similar) plus 2&ndash;3 synergistic power talents.</p>
+<ul class="text-sm">
+<li><strong>Free Casters</strong>: take Elemental Attunement and Backlash Siphon.</li>
+<li><strong>Rogues</strong>: take Always Another Exit and The Forger's Eye.</li>
+<li><strong>Monks</strong>: take Iron Fist Technique and Flowing Spirit Technique.</li>
+<li><strong>Runic Warriors</strong>: take Engraved Defense and Shared Burden.</li>
+<li><strong>Commanders</strong>: take Delegated Upkeep.</li>
+<li><strong>Dragonfolk</strong>: take Draconic Breath (if Tier II+).</li>
+</ul>
+<p class="text-sm mt-1"><strong>Late Game (91+ XP)</strong>: acquire 1&ndash;2 prestige or epic talents that define your legacy.</p>
+<ul class="text-sm">
+<li><strong>Free Casters</strong>: Spell Echo, Resonance Anchor, Weave Harmonist.</li>
+<li><strong>Rogues</strong>: Shadow Dance, Deathblow, Ghost Heist.</li>
+<li><strong>Social Characters</strong>: Spymaster.</li>
+<li><strong>Performers</strong>: Master Cantor.</li>
+<li><strong>Runic Warriors</strong>: The Unbroken Vow, Avatar of the Codex, Runebound Resilience.</li>
+<li><strong>Monks</strong>: Untouchable Form, Fist of the Mountain.</li>
+<li><strong>Beastfolk</strong>: Run With the Pack.</li>
+<li><strong>Others</strong>: Unsettling Truth.</li>
+</ul>
+</div><h3 id="build-examples">Worked Build Examples</h3>
+<p class="text-sm text-muted">Each example traces one path through the tiers above, showing how a concept accretes talents from Tier I to Tier III+.</p>
+<div class="panel panel-purple">
+<h4>The Shadow Assassin</h4>
+<p class="text-sm">A rogue who takes <strong>Backstab</strong> at Tier I, <strong>Shadow Dance</strong> at Tier II, and <strong>Deathblow</strong> at Tier III can execute a devastating assassination chain: attack from stealth with Backstab (+1 Harm, ignore armor); after a kill, use Shadow Dance to re-enter stealth; then later strike from Dominant Position with Deathblow. This combination requires careful positioning and Boon management, but is highly effective.</p>
+<h4>The Silent Infiltrator</h4>
+<p class="text-sm mt-1">A rogue who takes <strong>The Unlocked Window</strong> at Tier I, then <strong>Always Another Exit</strong> at Tier II, can bypass security and escape any corner. Add <strong>Shadow Song</strong> for the ability to lull guards and unlock spirit-locks with song.</p>
+<h4>The Stable Free Caster</h4>
+<p class="text-sm mt-1">A Free Caster who takes <strong>Controlled Burn</strong> at Tier I, <strong>Weave Resilience</strong> at Tier I&ndash;II, <strong>Spell Echo</strong> at Tier II, <strong>Resonance Anchor</strong> at Tier III, and finally <strong>Weave Harmonist</strong> at Tier IV can reduce the swinginess of free casting dramatically. The first 1 of each scene becomes player currency rather than GM fuel; backlash is softened; and once per session, the caster can completely ignore SB from a critical spell.</p>
+<h4>The Unarmed Master</h4>
+<p class="text-sm mt-1">A monk who takes <strong>Disciplined Body</strong> and <strong>Open Hand Technique</strong> at Tier I, then <strong>Iron Fist Technique</strong> and <strong>Flowing Spirit Technique</strong> at Tier II, and finally <strong>Untouchable Form</strong> at Tier III becomes a durable, mobile unarmed fighter who converts harm to fatigue, shrugs off fear, and cannot be grappled.</p>
+<h4>The Horse Archer</h4>
+<p class="text-sm mt-1">A Ykrul rider who takes <strong>Mounted Archery</strong> at Tier I and <strong>Horse Archer's Art</strong> at Tier II can fire accurately from a galloping horse and use the Skirmish action to move twice as far while shooting.</p>
+<h4>The Face of the Party</h4>
+<p class="text-sm mt-1">A social character who takes <strong>Smooth Talker</strong> and <strong>Negotiation Stance</strong> at Tier I, then <strong>Trusted Reputation</strong> and <strong>Information Broker</strong> at Tier II, and finally <strong>Spymaster</strong> at Tier III can navigate any court, gather intelligence from thin air, and call in favors across the city.</p>
+<h4>The Commander</h4>
+<p class="text-sm mt-1">A leader who takes <strong>Efficient Recruiter</strong> at Tier I, <strong>Loyalty Bond</strong> and <strong>Delegated Upkeep</strong> at Tier II, and builds a network of Cap 3+ followers can run a faction from the shadows.</p>
+<h4>The Legendary Performer</h4>
+<p class="text-sm mt-1">A performer who takes <strong>Projecting Voice</strong> at Tier I, <strong>Captivating Performance</strong> and <strong>Voice of Reason</strong> at Tier II, and finally <strong>Master Cantor</strong> at Tier III can calm a riot, inspire an army, or negotiate peace between warring factions.</p>
+<h4>The Combat Medic</h4>
+<p class="text-sm mt-1">A healer who takes <strong>Field Dressing</strong> at Tier I and <strong>Triage</strong> at Tier II can keep allies alive through the deadliest battles.</p>
+<h4>The Master Artificer</h4>
+<p class="text-sm mt-1">A crafter who takes <strong>Master Craft</strong> at Tier I, then <strong>Master Artificer</strong> and <strong>Asset Crafter</strong> at Tier II can build a workshop, forge magical items, and construct Assets at half the cost and time.</p>
+<h4>The Hedge Witch</h4>
+<p class="text-sm mt-1">A witch who takes <strong>Craft of the Hedge</strong> at Tier I, selects Steady Hand and Salt Line as Hedge Gifts, then takes additional Hedge Gifts at Tier II can work subtle threshold magic and ward against spirits.</p>
+<h4>The Runic Warrior</h4>
+<p class="text-sm mt-1">A Runic Warrior who takes <strong>Flesh Codex</strong> at Tier I, <strong>Oath-Bound</strong> and <strong>Scarred Resilience</strong> at Tier I&ndash;II, <strong>Witnessed Scar</strong> at Tier II, and finally <strong>The Unbroken Vow</strong> or <strong>Runebound Resilience</strong> at Tier III+ becomes a warrior whose body is a living covenant.</p>
+<h4>The Beast of the Wild</h4>
+<p class="text-sm mt-1">A Beastfolk character who takes <strong>Keen Scent of the Valewood</strong> at Tier I and <strong>Run With the Pack</strong> at Tier II becomes a fearsome hunter who reads the wild and moves with their pack.</p>
+<h4>The Dragon's Heir</h4>
+<p class="text-sm mt-1">A Dragonfolk character who takes <strong>Hoard-Sense</strong> at Tier I and <strong>Draconic Breath</strong> at Tier II+ becomes a hoarder of secrets and a force of elemental destruction.</p>
+<h4>The Threshold Walker</h4>
+<p class="text-sm mt-1">An Other (Liminal) character who takes <strong>Step Sideways</strong> at Tier I and <strong>Unsettling Truth</strong> at Tier II moves through thresholds and speaks in omens, their very presence unsettling the world around them.</p>
+</div><hr>
+<h2 id="custom-talents">Custom Talents</h2>
+<p>Work with your GM to create custom talents:</p>
+<ul>
+<li>Base them on story events.</li>
+<li>Use the cost tiers above (2&ndash;3 / 4&ndash;6 / 7&ndash;10 / 11+ XP).</li>
+<li>Define clear prerequisites, activation, and limits.</li>
+</ul><hr>
+<h2 id="talent-respec">Talent Respecification</h2>
+<p>With GM approval, you may retrain talents during downtime (one downtime period). Provide a narrative justification. Typically limited to once per major story arc.</p>
+<div class="panel panel-purple">
+    <strong class="panel-title">Talent Selection Quick Reference</strong>
+    <p class="text-sm"><strong>Minor (2&ndash;3 XP)</strong>: small bonuses, once/scene tricks.</p>
+    <p class="text-sm"><strong>Major (4&ndash;6 XP)</strong>: strong permanent upgrades, core path abilities.</p>
+    <p class="text-sm"><strong>Prestige (7&ndash;10 XP)</strong>: campaign-shaping, breaks limits.</p>
+    <p class="text-sm"><strong>Epic (11+ XP)</strong>: legendary, story-defining power.</p>
+    <p class="text-sm mt-1"><em>Remember: passive talents stack; active talents require an action or reaction.</em></p>
+</div><hr>
+<footer>
+    <em>Fate's Edge Proprietary Content &mdash; &copy; 2024 Nicholas A. Gasper. All rights reserved.</em>
+</footer>
+
+</body>
+</html>

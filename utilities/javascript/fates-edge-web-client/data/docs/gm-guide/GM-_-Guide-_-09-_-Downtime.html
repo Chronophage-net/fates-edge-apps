@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fate's Edge GM Guide — Chapter 9: Downtime Management</title>
+<style>
+    :root {
+        --bg1: #0d0d1a;
+        --bg2: #1a1a2e;
+        --bg3: #252540;
+        --bg4: #2f2f4a;
+        --text: #e8e8f0;
+        --text2: #b8b8c8;
+        --text3: #8888a0;
+        --gold: #c9a84c;
+        --gold-hover: #d4b85c;
+        --border: #333355;
+        --red: #c0392b;
+        --green: #27ae60;
+        --blue: #2980b9;
+        --purple: #8e44ad;
+        --orange: #e67e22;
+        --radius: 8px;
+        --font: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+        background: var(--bg1);
+        color: var(--text);
+        font-family: var(--font);
+        padding: 1.5rem;
+        max-width: 1100px;
+        margin: 0 auto;
+        line-height: 1.6;
+    }
+    h1, h2, h3, h4, h5 { color: var(--gold); margin: 1rem 0 0.4rem; }
+    h1 { font-size: 1.9rem; border-bottom: 2px solid var(--gold); padding-bottom: 0.4rem; margin-top: 0; }
+    h2 { font-size: 1.4rem; border-bottom: 1px solid var(--border); padding-bottom: 0.2rem; margin-top: 1.6rem; }
+    h3 { font-size: 1.15rem; margin-top: 1.1rem; }
+    h4 { font-size: 1rem; color: var(--text); margin-top: 0.8rem; }
+    h5 { font-size: 0.9rem; color: var(--gold-hover); }
+    p { margin: 0.5rem 0; }
+    p.subtitle { color: var(--text2); font-style: italic; margin-top: -0.2rem; margin-bottom: 1rem; }
+    a { color: var(--gold); text-decoration: none; }
+    a:hover { color: var(--gold-hover); text-decoration: underline; }
+    ul, ol { margin: 0.4rem 0 0.6rem 1.4rem; }
+    li { margin: 0.2rem 0; }
+    dl { margin: 0.5rem 0; }
+    dt { font-weight: 600; color: var(--gold-hover); margin-top: 0.5rem; }
+    dd { margin-left: 1.2rem; color: var(--text2); }
+    .panel {
+        background: var(--bg2);
+        border-radius: var(--radius);
+        padding: 0.7rem 1rem;
+        border: 1px solid var(--border);
+        margin: 0.8rem 0;
+    }
+    .panel-title { color: var(--gold); font-weight: 700; margin-bottom: 0.4rem; display: block; }
+    .panel-gold { border-left: 4px solid var(--gold); }
+    .panel-red { border-left: 4px solid var(--red); }
+    .panel-blue { border-left: 4px solid var(--blue); }
+    .panel-green { border-left: 4px solid var(--green); }
+    .panel-purple { border-left: 4px solid var(--purple); }
+    .panel-orange { border-left: 4px solid var(--orange); }
+    .badge {
+        display: inline-block;
+        padding: 0.05rem 0.5rem;
+        border-radius: 12px;
+        font-size: 0.7rem;
+        font-weight: 600;
+        background: var(--bg4);
+        color: var(--text3);
+        border: 1px solid var(--border);
+    }
+    .badge-gold { background: var(--gold); color: #1a1400; border-color: var(--gold); }
+    .text-muted { color: var(--text3); }
+    .text-sm { font-size: 0.9rem; }
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; margin: 0.7rem 0; }
+    th, td { padding: 0.45rem 0.65rem; border: 1px solid var(--border); text-align: left; vertical-align: top; }
+    th { background: var(--bg4); color: var(--gold); font-weight: 600; }
+    tr:nth-child(even) { background: var(--bg2); }
+    blockquote {
+        font-style: italic;
+        border-left: 4px solid var(--gold);
+        padding: 0.5rem 1rem;
+        margin: 0.7rem 0;
+        background: var(--bg2);
+        border-radius: var(--radius);
+        color: var(--text2);
+    }
+    code { background: var(--bg4); padding: 0.1rem 0.3rem; border-radius: 4px; font-size: 0.85rem; color: var(--gold); }
+    hr { border: none; border-top: 1px solid var(--border); margin: 1.2rem 0; }
+    .toc { background: var(--bg3); border-radius: var(--radius); padding: 0.6rem 1rem; border: 1px solid var(--border); margin: 0.8rem 0 1.2rem; }
+    .toc-title { color: var(--gold); font-weight: 600; display: block; margin-bottom: 0.3rem; }
+    .toc a { color: var(--text2); display: block; padding: 0.08rem 0; font-size: 0.85rem; }
+    .toc a:hover { color: var(--gold); }
+    footer { margin-top: 2rem; padding-top: 1rem; border-top: 2px solid var(--gold); text-align: center; color: var(--text3); font-size: 0.8rem; }
+</style>
+</head>
+<body>
+
+<h1>Chapter 9: Downtime Management</h1>
+<p class="subtitle">Fate's Edge GM Guide — Chapter 9</p>
+
+<p>Downtime is the narrative space between adventures — days, weeks, or even months when characters rest, train, build assets, settle debts, and pursue personal projects. <strong>As GM, your role is to:</strong></p>
+<ul>
+<li>Set duration and DVs based on fiction, not XP budgets.</li>
+<li>Hear player declarations and call for appropriate rolls.</li>
+<li>Apply the Outcome Matrix to determine progress/complications.</li>
+<li>Spend Story Beats from player rolls to introduce rumors, rival actions, or unexpected events.</li>
+<li>Manage campaign timers (Mandate, Crisis, faction) based on player choices.</li>
+<li>Track Asset/Follower upkeep and enforce neglect consequences.</li>
+<li>Run the Echo Character system for off-screen PCs.</li>
+<li>Adjudicate Rush Rules for accelerated development.</li>
+</ul>
+<p>Unlike many games, Fate's Edge treats downtime as an active phase where <strong>your adjudication shapes the fiction</strong> — not a mere pause. This chapter gives you the tools to run downtime efficiently and dramatically.</p>
+
+<h2 id="gm-procedures">GM Procedures for Running Downtime</h2>
+<p>Each downtime phase follows this loop. <strong>Follow these steps as GM:</strong></p>
+<ol>
+<li><strong>Set the Duration.</strong> Determine how much time passes based on fiction (usually 1–4 weeks for standard play; longer for epic campaigns). <em>Example:</em> "After the siege, two weeks pass while the army regroups — what do you do with this time?"</li>
+<li><strong>Hear Player Declarations.</strong> Each player states one or two major goals (training, research, carousing, etc.). <em>Note:</em> Players declare intent — you set DVs and call for rolls.</li>
+<li><strong>Call for Rolls &amp; Resolve.</strong> For each declaration:
+<ul>
+<li>Set a Difficulty Value (DV) using the Common Downtime Rolls table (below) as a guide; increase by +1/+2 for rushed/dangerous projects.</li>
+<li>Have the player roll Attribute + Skill d10s; count Successes (6+) and Story Beats (1s).</li>
+<li>Apply the Outcome Matrix (Clean Success / Success with SB / Partial / Miss).</li>
+<li><strong>Note all Story Beats generated</strong> for later spending.</li>
+</ul>
+</li>
+<li><strong>Spend Story Beats.</strong> Use any Story Beats generated during downtime to:
+<ul>
+<li>Introduce a minor rumor (1 SB): "A street urchin whispers you're being watched by the Black Ledger."</li>
+<li>Signal faction awareness (2 SB): "The City Guard captain mentions your name at roll call."</li>
+<li>Advance a complication timer (3+ SB): "The <em>Harbormaster's Grudge [4]</em> timer ticks +1–2."</li>
+</ul>
+<em>GM Tip:</em> Spend SB to create <em>immediate hooks</em> for the next session — never waste them.</li>
+<li><strong>Manage Upkeep &amp; Timers.</strong>
+<ul>
+<li><strong>Asset/Follower Upkeep</strong>: Remind players to pay XP or devote downtime scenes. If neglected, degrade condition (Maintained → Neglected → Compromised) and apply consequences.</li>
+<li><strong>Campaign Timers</strong>: Advance Mandate/Crisis/faction timers based on player choices.</li>
+<li><strong>Obligation Clearing</strong>: When players clear Obligation via acts of service, describe the narrative cost (e.g., "You spend the day repairing the temple roof — your hands blister, but the priests nod in approval").</li>
+</ul>
+</li>
+<li><strong>Handle Off-Screen Characters.</strong> Process Downtime Logs using the Echo Character system. <em>GM Tip:</em> Treat off-screen characters as active NPCs — their logs are your source for complications and opportunities.</li>
+<li><strong>Log the Results.</strong> Use the downtime log template to record key outcomes for session-to-session continuity.</li>
+</ol>
+
+<h2 id="downtime-ref">Common Downtime Rolls Reference (GM)</h2>
+<p>Use this table to set DVs for player declarations. Increase DV by +1 (risky) or +2 (dangerous) as fiction demands.</p>
+<div class="table-wrap"><table>
+<tr><th>Player Goal</th><th>Skill Roll</th><th>Base DV</th><th>Effect on Success</th></tr>
+<tr><td>Recover from Harm</td><td>Medicine + Wits</td><td>3</td><td>Remove 1 Harm (stacks with rest)</td></tr>
+<tr><td>Train a Skill</td><td>relevant Attribute + Skill</td><td>4</td><td>Advance 1 segment on a Training Timer [4].</td></tr>
+<tr><td>Learn a New Talent</td><td>appropriate Attribute + Lore</td><td>5</td><td>Advance 1 segment on a Talent Acquisition Timer [6].</td></tr>
+<tr><td>Clear Obligation</td><td>Spirit + Lore (act of service)</td><td>3</td><td>Reduce Obligation by 1 segment (you describe the act).</td></tr>
+<tr><td>Carouse for Information</td><td>Presence + Subterfuge</td><td>3</td><td>Gain a rumor or a minor String.</td></tr>
+<tr><td>Craft an Item</td><td>Wits + Craft</td><td>DV by item (3–6)</td><td>Create a mundane or minor magical item.</td></tr>
+<tr><td>Research a Topic</td><td>Wits + Investigation</td><td>4</td><td>Gain one piece of true information (you may be cryptic).</td></tr>
+<tr><td>Manage an Asset</td><td>Presence + Command</td><td>3</td><td>Reduce or prevent condition degradation.</td></tr>
+<tr><td>Establish a Contact</td><td>Presence + Sway</td><td>4</td><td>Gain a new Minor String.</td></tr>
+<tr><td>Reduce a Debt Timer</td><td>Presence + Sway or service roll</td><td>4</td><td>Clear 1–2 segments (your discretion).</td></tr>
+<tr><td>Train a Follower</td><td>Spirit + Command</td><td>4</td><td>Improve Follower Cap by 1 (requires Training Timer).</td></tr>
+</table></div>
+
+<h2 id="rush-rules">Rush Rules: GM Procedures for Risk Timers</h2>
+<p>Players can attempt to rush downtime activities. <strong>As GM, follow this procedure:</strong></p>
+<ol>
+<li><strong>Player declares rushing</strong> (e.g., "I want to learn Acrobatics in 3 days instead of a week").</li>
+<li><strong>You create a Risk Timer</strong> of 4–6 segments, named after the potential consequence (e.g., <em>Pulled Muscle [6]</em>, <em>Backlash [4]</em>, <em>Patron Ire [4]</em>). <em>Narrate the risk:</em> "Pushing this hard could tear a tendon — I'm starting a <em>Pulled Muscle [6]</em> timer."</li>
+<li><strong>For each downtime action related to the rush, the player rolls as normal.</strong>
+<ul>
+<li>On a <strong>Clean Success</strong>: The timer does not advance.</li>
+<li>On a <strong>Partial</strong> or <strong>Miss</strong>: The timer advances by 1 segment (or more, at your discretion for extreme failure).</li>
+</ul>
+</li>
+<li><strong>When the Risk Timer fills</strong>, choose one outcome based on fiction:
+<ul>
+<li><strong>Project fails entirely</strong>, but the player gains 2 Boons to use on a later attempt.</li>
+<li><strong>Project succeeds, but the character suffers a permanent Condition</strong> (e.g., <em>Twisted Ankle</em>, <em>Migraines</em>) that lasts until treated.</li>
+<li><strong>Character gains the new ability, but immediately marks 1 Harm (overexertion) and gains a Debt Timer [4]</strong> to a terrestrial patron who "helped" them cheat time.</li>
+</ul>
+</li>
+<li><strong>If the timer never fills</strong>, the rush succeeds as normal with no extra cost.</li>
+</ol>
+
+<div class="panel panel-red">
+<span class="panel-title">Example: Rushing a Skill (GM Narration)</span>
+<p>Michael wants to raise his Melee from 3 to 4. Normal training takes 4 days. He rushes to do it in 2 days. You create a <em>Pulled Muscle [6]</em> timer: "Push too hard, and you'll tear something." Michael rolls three downtime actions (one per day). He gets a Partial and a Miss — the timer fills. You rule: "You gain the skill, but during the final drill you tear a tendon. Mark Harm 1 (Level 1) and you have the <em>Limp</em> Condition until you receive magical healing or rest for a full week."</p>
+</div>
+
+<h2 id="downtime-timers">Using Downtime to Advance Campaign Timers</h2>
+<p>Downtime lets players actively shape campaign threats and favor. <strong>As GM, adjudicate these declarations:</strong></p>
+
+<h3>Mandate and Crisis</h3>
+<p>Players can declare they are working to increase Mandate (public favor) or decrease Crisis (threat level).</p>
+<ul>
+<li><strong>Increase Mandate (public favor):</strong> Player declares charity, problem-solving, or alliance-building. <strong>You set DV 4</strong> for Presence + Sway.
+<ul>
+<li>On success: Increase Mandate by 1 (to a max of 6).</li>
+<li>On a Miss: Increase Crisis by 1 (enemies notice their growing influence).</li>
+</ul>
+</li>
+<li><strong>Decrease Crisis (reduce threat):</strong> Player declares sabotage, truce-brokering, or conspiracy exposure. <strong>You set DV 5</strong> for an appropriate skill (e.g., Stealth, Subterfuge, Lore).
+<ul>
+<li>On success: Reduce Crisis by 1.</li>
+<li>On a Miss: Mandate also decreases by 1 (collateral damage — you describe how).</li>
+</ul>
+</li>
+</ul>
+
+<h3>Faction and Debt Timers</h3>
+<p>Players can influence visible timers through downtime actions.</p>
+<ul>
+<li><strong>Faction Timers</strong>: Player declares action to help or harm a faction (e.g., "I bribe officials in the Dyers' Guild"). <strong>You set DV 4</strong> for Presence + Sway.
+<ul>
+<li>On success: Tick the faction timer <strong>back</strong> by 1 (less threat).</li>
+<li>On a Miss: Tick the timer <strong>forward</strong> by 1 (more threat).</li>
+<li><em>Example:</em> Success on bribing officials: "Your coins find the right palms — the Guild Influence timer retreats one segment."</li>
+</ul>
+</li>
+<li><strong>Debt Timers from Terrestrial Patrons</strong>: Player accepts a Debt Timer during downtime. <strong>You resolve it via</strong>:
+<ul>
+<li>A service scene (roll to clear 1–2 segments),</li>
+<li>Or spending XP (1 XP = 1 segment cleared).</li>
+</ul>
+</li>
+</ul>
+
+<h2 id="echo-system">Handling Off-Screen Characters: The Echo System</h2>
+<p>When a player has multiple characters or steps a character off-screen, <strong>you use this system to keep them active in the fiction</strong>:</p>
+
+<h3>Core Principles</h3>
+<ul>
+<li>Off-screen characters are <strong>not frozen</strong>. They continue to act, gather information, and face consequences.</li>
+<li>The player provides a brief <strong>Downtime Log</strong> for each off-screen character (you provide the template).</li>
+<li>You spend 2–3 minutes per log, describing outcomes and possibly ticking a personal <strong>Crisis Timer [6]</strong> for that character.</li>
+</ul>
+
+<h3>Switch Mechanics</h3>
+<p>When a player wants to bring an off-screen character back into play (or send one off-screen):</p>
+<ol>
+<li><strong>Declare</strong> — Player states: "I'm switching to my other character, the scholar, for the next session."</li>
+<li><strong>Status</strong> — <strong>You assign</strong> the current character one of three statuses based on fiction:
+<ul>
+<li><strong>Supporting</strong> — Works toward active PC goals (gathers intel, manages assets). Minimal risk.</li>
+<li><strong>Advancing</strong> — Pursues their own agenda (research, training). May uncover opportunities or trigger a complication.</li>
+<li><strong>In Peril</strong> — Their absence has made them a target. <strong>You tick a personal Crisis Timer [6]</strong> each session until they return.</li>
+</ul>
+</li>
+<li><strong>Re-entry</strong> — When returning, the character gains 2 Boons for a dramatic entrance. The player rolls Wits + Spirit (DV 3) to re-establish presence. <strong>You adjudicate the roll</strong>:
+<ul>
+<li>On a Miss: A complication follows them back (you describe it using 1–2 SB).</li>
+</ul>
+</li>
+</ol>
+
+<h3>Downtime Log Template (Provide to Players)</h3>
+<p>Give players this simple log to fill out for each off-screen (or on-screen) character between sessions:</p>
+<div class="panel">
+<span class="panel-title">Downtime Log — _____ (Character Name)</span>
+<p><strong>Resource Action:</strong> (How they maintain connections, pay upkeep, or keep assets running)</p>
+<p><strong>Project Action:</strong> (One goal they worked toward — training, research, crafting)</p>
+<p><strong>Event Response:</strong> (How they react to a rumor, threat, or off-screen event you describe)</p>
+<p><strong>GM Response:</strong> (You fill this in after the session)</p>
+</div>
+
+<h3>Off-Screen Crisis Timer</h3>
+<p>Each off-screen character tracks a personal <strong>Crisis Timer [6]</strong>. <strong>You tick this timer when</strong>:</p>
+<ul>
+<li>The player rolls a Miss on a downtime action.</li>
+<li>The character's status is <em>In Peril</em>.</li>
+<li>You spend a Story Beat to introduce trouble for that character.</li>
+</ul>
+<p>When the timer fills, <strong>you introduce a major off-screen consequence</strong>: a rival strikes, an asset is destroyed, or they are captured. This creates immediate hooks for the active party.</p>
+
+<h2 id="downtime-advice">Additional Downtime Tools and Advice (GM)</h2>
+<p>Use these tools to make downtime a tension-filled narrative phase:</p>
+
+<h3>Asset &amp; Follower Upkeep</h3>
+<p>Remind players to pay upkeep (Efficient or Intensive) for each asset and follower. Use the templates from the Assets and Followers chapter. If they forget, <strong>degrade the asset to Neglected or a follower to Wary</strong>. You can also use the Rush rules to restore a degraded asset in half the normal downtime.</p>
+
+<h3>Resolving Complications</h3>
+<p>Downtime is an excellent moment to clear lingering Complications. Players can spend a downtime action to resolve a complication — roll appropriate skill (DV 3–5). <strong>As GM, adjudicate:</strong></p>
+<ul>
+<li>On success: The complication is cleared (describe the narrative resolution).</li>
+<li>On a Miss: It worsens — <strong>you advance a related timer by 1 segment</strong>.</li>
+</ul>
+
+<h3>Using Story Beats from Downtime Rolls</h3>
+<p>Any 1s rolled during downtime generate Story Beats. <strong>Do not waste them. Spend them as follows</strong>:</p>
+<ul>
+<li><strong>1 SB:</strong> A minor rumor begins about the character ("A beggar claims they saw you arguing with the watch captain").</li>
+<li><strong>2 SB:</strong> A rival or faction becomes aware of their activities ("The City Guard captain mentions your name at roll call").</li>
+<li><strong>3 SB:</strong> A complication arises — a theft, a broken item, a social faux pas ("Your safehouse door is jammed — spend 1 Boon to force it open").</li>
+<li><strong>4+ SB:</strong> A major twist — a Patron demands an audience, an enemy strikes an asset ("The Harbormaster confronts you at dawn: 'Your games end today.'").</li>
+</ul>
+<p>These complications will ignite the next session's opening scene.</p>
+
+<h3>Downtime as Collaborative Worldbuilding</h3>
+<p>Encourage players to ask questions during downtime ("I try to find a fence who deals in cursed coins. Is there one in this city?"). <strong>Use their rolls to establish new NPCs and locations</strong>:</p>
+<ul>
+<li><strong>Clean Success</strong>: The fence exists and is reliable ("Old Jem's stall in the market — he'll take any cursed silver for fair price").</li>
+<li><strong>Partial</strong>: The fence exists but has a price (Debt Timer) — you describe the cost ("Old Jem nods, but his eyes flick to your purse: 'Five silver upfront, or no deal.'").</li>
+<li><strong>Miss</strong>: They exist but are working for an enemy ("Old Jem's stall is abandoned — in its place, a Black Ledger enforcer eyes you coldly").</li>
+</ul>
+
+<h3>Sample Downtime Sequence (GM Script)</h3>
+<p>Use this template to frame downtime at your table:</p>
+<blockquote>"[Time period] passes. You each have [number] downtime actions. I need: a roll for skill training, a roll for asset upkeep, and a roll for whatever personal project you declared. You can also use a downtime action to interact with the campaign timers — tell me how you want to affect the Mandate or the Cult's Progress timer. Describe your goal, I'll set a DV, and we'll roll. Any 1s will give me Story Beats to complicate your return to action. Ready?"</blockquote>
+
+<h2 id="cheat-sheet">Downtime Quick Reference (GM Cheat Sheet)</h2>
+<div class="panel panel-blue">
+<span class="panel-title">Downtime GM Cheat Sheet</span>
+<ul>
+<li><strong>Set duration</strong> based on fiction (1–4 weeks typical; adjust for scene weight).</li>
+<li><strong>Hear player declarations</strong> (1–2 goals per player).</li>
+<li><strong>Set DVs</strong> using reference table; increase for risk/rush.</li>
+<li><strong>Call for rolls</strong>; players count Successes/SBs.</li>
+<li><strong>Apply Outcome Matrix</strong>; note SBs generated.</li>
+<li><strong>Spend SB</strong> to introduce rumors/rival actions/complications (1 SB = minor rumor; 2 SB = faction awareness; 3 SB = complication; 4+ SB = major twist).</li>
+<li><strong>Advance/retreat campaign timers</strong> (Mandate, Crisis, faction) based on player choices + fiction.</li>
+<li><strong>Process off-screen characters</strong>: Collect Downtime Logs, apply Echo system mechanics.</li>
+<li><strong>Enforce Rush Rule</strong>: Create Risk Timer [4–6] for rushed actions; process Partial/Miss as timer ticks.</li>
+<li><strong>Track Asset/Follower upkeep</strong>: Players report; you enforce degradation if neglected.</li>
+<li><strong>Resolve complications</strong>: Player rolls vs DV; success = cleared, miss = worsens (you advance timer).</li>
+</ul>
+</div>
+
+<footer>Fate's Edge Proprietary Content — (c) 2024 Nicholas A. Gasper. All rights reserved.</footer>
+
+</body>
+</html>

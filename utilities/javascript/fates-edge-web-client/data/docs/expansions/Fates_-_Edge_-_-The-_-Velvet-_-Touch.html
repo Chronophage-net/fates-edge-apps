@@ -1,0 +1,1064 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Velvet Touch — A Thief's Guide to Silk and Shadow</title>
+<style>
+    :root {
+        --bg1: #0a0609;
+        --bg2: #150d12;
+        --bg3: #1f141b;
+        --bg4: #2a1c24;
+        --text: #e8dfe4;
+        --text2: #b09aa8;
+        --text3: #7c6672;
+        --gold: #b23a63;
+        --gold-hover: #c94875;
+        --border: #3a2530;
+        --red: #8c1e28;
+        --green: #3d7a52;
+        --blue: #3c6e8f;
+        --purple: #6b3f7a;
+        --orange: #a8622a;
+        --brass: #9c7a3c;
+        --mist: #5a5a64;
+        --radius: 8px;
+        --font: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+        background: var(--bg1);
+        background-image: radial-gradient(circle at 50% 0%, #180e14 0%, #0a0609 60%);
+        color: var(--text);
+        font-family: var(--font);
+        padding: 1.5rem;
+        max-width: 1100px;
+        margin: 0 auto;
+        line-height: 1.6;
+    }
+    h1, h2, h3, h4, h5 { color: var(--gold); margin: 0.5rem 0 0.3rem; }
+    h1 { font-size: 1.8rem; border-bottom: 2px solid var(--gold); padding-bottom: 0.3rem; }
+    h2 { font-size: 1.4rem; border-bottom: 1px solid var(--border); padding-bottom: 0.2rem; margin-top: 1.5rem; }
+    h3 { font-size: 1.1rem; margin-top: 1rem; }
+    h4 { font-size: 0.95rem; color: var(--text); }
+    a { color: var(--gold); text-decoration: none; }
+    p { color: var(--text2); }
+    .panel {
+        background: var(--bg2);
+        border-radius: var(--radius);
+        padding: 0.6rem 0.8rem;
+        border: 1px solid var(--border);
+        margin: 0.5rem 0;
+    }
+    .panel-gold { border-left: 4px solid var(--gold); }
+    .panel-red { border-left: 4px solid var(--red); }
+    .panel-blue { border-left: 4px solid var(--blue); }
+    .panel-green { border-left: 4px solid var(--green); }
+    .panel-purple { border-left: 4px solid var(--purple); }
+    .panel-orange { border-left: 4px solid var(--orange); }
+    .panel-mist { border-left: 4px solid var(--mist); }
+    .badge {
+        display: inline-block;
+        padding: 0.05rem 0.5rem;
+        border-radius: 12px;
+        font-size: 0.65rem;
+        font-weight: 600;
+    }
+    .badge-gold { background: var(--gold); color: #170008; }
+    .badge-red { background: var(--red); color: #fff; }
+    .badge-green { background: var(--green); color: #fff; }
+    .badge-blue { background: var(--blue); color: #fff; }
+    .badge-purple { background: var(--purple); color: #fff; }
+    .badge-orange { background: var(--orange); color: #fff; }
+    .badge-mist { background: var(--mist); color: #fff; }
+    .badge-gray { background: var(--bg4); color: var(--text3); }
+    .flex { display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center; }
+    .text-muted { color: var(--text3); }
+    .text-gold { color: var(--gold); }
+    .text-sm { font-size: 0.85rem; }
+    .text-xs { font-size: 0.7rem; }
+    .mt-1 { margin-top: 0.5rem; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; }
+    .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.5rem; }
+    @media (max-width: 700px) { .grid-2, .grid-3 { grid-template-columns: 1fr; } }
+    .npc-card, .loc-card {
+        background: var(--bg3);
+        border-radius: var(--radius);
+        padding: 0.4rem 0.6rem;
+        margin: 0.25rem 0;
+        border-left: 2px solid var(--gold);
+    }
+    .npc-card .npc-name { font-weight: 700; font-size: 0.9rem; color: var(--gold); }
+    .npc-card .npc-role { font-size: 0.72rem; color: var(--text3); margin-bottom: 0.2rem; }
+    .npc-card .npc-motivation, .npc-card .npc-leverage, .npc-card .npc-quirk { font-size: 0.8rem; color: var(--text2); margin-top: 0.15rem; }
+    .npc-card .npc-secret { font-size: 0.75rem; color: var(--mist); margin-top: 0.2rem; font-style: italic; }
+    .talent-card {
+        background: var(--bg3);
+        border-radius: var(--radius);
+        padding: 0.5rem 0.7rem;
+        margin: 0.35rem 0;
+        border-left: 3px solid var(--gold);
+    }
+    .talent-card.rite { border-left-color: var(--purple); }
+    .talent-card .talent-name { font-weight: 700; font-size: 0.95rem; color: var(--gold); }
+    .talent-card.rite .talent-name { color: var(--purple-light, var(--purple)); }
+    .talent-card .talent-body { font-size: 0.85rem; color: var(--text2); margin-top: 0.25rem; }
+    .talent-card .talent-body em { color: var(--text); }
+    hr { border: none; border-top: 1px solid var(--border); margin: 0.75rem 0; }
+    .toc { background: var(--bg3); border-radius: var(--radius); padding: 0.6rem 1rem; border: 1px solid var(--border); }
+    .toc-cols { columns: 2; column-gap: 1.5rem; }
+    @media (max-width: 700px) { .toc-cols { columns: 1; } }
+    .toc a { color: var(--text2); display: block; padding: 0.08rem 0; font-size: 0.83rem; break-inside: avoid; }
+    .toc a:hover { color: var(--gold); }
+    .toc .toc-part { color: var(--gold); font-weight: 700; margin-top: 0.4rem; font-size: 0.85rem; }
+    table { width: 100%; border-collapse: collapse; margin: 0.6rem 0; font-size: 0.82rem; background: var(--bg2); border-radius: var(--radius); overflow: hidden; }
+    th, td { border: 1px solid var(--border); padding: 0.4rem 0.55rem; text-align: left; vertical-align: top; }
+    th { background: var(--bg4); color: var(--gold); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.03em; }
+    tr:nth-child(even) td { background: rgba(255,255,255,0.02); }
+    blockquote {
+        border-left: 3px solid var(--gold);
+        padding-left: 1rem;
+        margin: 0.6rem 0;
+        color: var(--text2);
+        font-style: italic;
+    }
+    ul, ol { margin-left: 1.3rem; color: var(--text2); }
+    ul li, ol li { margin: 0.15rem 0; }
+    .part-divider {
+        text-align: center;
+        margin: 2rem 0 1rem;
+        color: var(--gold);
+        font-size: 1.6rem;
+        font-weight: 700;
+        border-top: 1px solid var(--border);
+        border-bottom: 1px solid var(--border);
+        padding: 0.6rem 0;
+        letter-spacing: 0.04em;
+    }
+    .footer {
+        font-size: 0.75rem;
+        color: var(--text3);
+        text-align: center;
+        padding: 1.2rem 0 0.5rem;
+    }
+</style>
+</head>
+<body>
+
+<h1>🗝️ The Velvet Touch</h1>
+<p style="color:var(--text2);margin-bottom:1rem;">
+    <span class="badge badge-gold">A Thief's Guide to Silk and Shadow</span>
+    <span class="badge badge-purple">Heist &amp; Rogue Expansion</span>
+    <span class="badge badge-mist">Silkstrand / The Velvet Court</span>
+    <span class="badge badge-blue">Blood and Silk Saga</span>
+    <span class="badge badge-gray">Author: Madam Serafine, as recorded by Nicholas A. Gasper</span>
+</p>
+
+<div class="panel panel-gold">
+    <strong>Preface: On Rising from the Gutter</strong>
+    <p class="text-sm mt-1">I was seven when I picked my first pocket — a merchant from Kahfagia, fat with spice money and arrogance. He never felt my fingers slip his purse. I watched him laugh with his friends while I bought bread for a week.</p>
+    <p class="text-sm mt-1">They never caught me. Not because I was clever — I wasn't, not yet. Because I was <em>nothing</em>. A gutter rat, a ghost in the crowd, a face that blends into wet cobblestones. That is the first lesson: power is not in the blade or the coin. It is in being <em>forgotten</em>.</p>
+    <p class="text-sm mt-1">Twenty years later, I own three warehouses, two gambling dens, and a brothel that also launders secrets. The Watch Captain owes me his promotion. The Dye Syndicate pays me not to undercut their prices. And the Archivolt notaries keep a drawer full of my forged seals — they do not know which ones are real.</p>
+    <p class="text-sm mt-1">I am Madam Serafine. They call me the Velvet Touch, because I never leave bruises.</p>
+    <p class="text-sm mt-1">This book is not for heroes. It is for those who understand that the world runs on whispers, debts, and the careful omission of the truth. I learned from the streets. I learned from Ikasha, who sleeps in shadow, and from Livaea, who dresses power in silk and smiles. I learned that a song can open a lock faster than any pick, and that a forged document is worth a thousand swords.</p>
+    <blockquote class="mt-1">"The night I stole my first counting-house, I had nothing but a cold pick and a prayer. Livaea answered. She did not ask for my soul — not yet. She asked for a single night of my memory, a night I still cannot recall. I have been paying interest ever since. Every lock I pick, every secret I sell, every mark I ruin — a fraction of the principal. She is patient. She knows I will never be able to pay it all. That is the cruelty of her kindness. That is the velvet touch of her chain."</blockquote>
+    <p class="text-sm mt-1">You want to be a thief? Good. But first, forget everything you think you know. The mark is not the victim. The mark is the one who believes they are safe. And the coin you take is never the one that costs you. It is the one you leave behind — the debt that collects.</p>
+    <p class="text-xs text-muted mt-1" style="text-align:right;">— Madam Serafine, Silkstrand, under the Three-Queens Bridge</p>
+</div>
+
+<div class="toc">
+    <strong style="color:var(--gold);">📑 Table of Contents</strong>
+    <div class="toc-cols mt-1">
+        <div class="toc-part">Part I — The Philosophy of the Quiet Hand</div>
+        <a href="#on-being-nothing">On Being Nothing</a>
+        <a href="#thief-talents">Thief Talents: The Velvet Ladder</a>
+        <a href="#rogue-builds">Rogue Builds for the Silkstrand Night</a>
+
+        <div class="toc-part">Part II — The Forger's Art</div>
+        <a href="#weight-of-paper">The Weight of Paper</a>
+        <a href="#fence-laundry">Fence and Laundry</a>
+
+        <div class="toc-part">Part III — The Cantor's Cadence</div>
+        <a href="#voice-that-opens-doors">The Voice That Opens Doors</a>
+        <a href="#building-rogue-cantor">Building a Rogue Cantor</a>
+
+        <div class="toc-part">Part IV — The Velvet Court (Expanded)</div>
+        <a href="#court-that-never-sleeps">The Court That Never Sleeps</a>
+        <a href="#courts-assets">The Court's Assets</a>
+        <a href="#jobs-velvet-court">Jobs from the Velvet Court (d12)</a>
+        <a href="#notable-court-npcs">Notable Court NPCs</a>
+        <a href="#court-approved-heists">Court-Approved Heists (The Heist Timer)</a>
+
+        <div class="toc-part">Part V — Patrons of the Underworld</div>
+        <a href="#patron-ikasha">Ikasha — She Who Sleeps in Shadow</a>
+        <a href="#patron-livaea">Livaea — The Crimson Courtier</a>
+        <a href="#patron-lucky-jack">Lucky Jack — The Lord of Thieves</a>
+        <a href="#patron-aveh">Aveh — The Rider Behind the Storm</a>
+        <a href="#patron-malachai">Malachai — The Chained Angel</a>
+        <a href="#choosing-your-patron">Choosing Your Patron</a>
+
+        <div class="toc-part">Appendices</div>
+        <a href="#appendix-schemes">Sample Schemes</a>
+        <a href="#appendix-npcs">NPC Profiles</a>
+        <a href="#appendix-rumors">Velvet Court Rumors (d12)</a>
+        <a href="#appendix-rival-crew">Rival Crew Generator</a>
+        <a href="#silk-house">The Silk House — A Livaean Brothel Asset</a>
+    </div>
+</div>
+
+<hr>
+
+<div class="part-divider">Part I — The Philosophy of the Quiet Hand</div>
+
+<h2 id="on-being-nothing">🌑 On Being Nothing</h2>
+<p>The first time you break into a counting-house, you will be afraid. Good — fear keeps your fingers light and your ears open. The moment you feel safe, you are already caught.</p>
+<p>A thief is not a warrior. We do not fight. We <em>slip</em> — through a window left unlatched, through a crowd that parts without knowing, through a contract signed in too much haste. The world is full of gaps: the ninth step un-counted, the witness who looked away, the seal pressed a moment too soon.</p>
+
+<h3>The Three Principles of the Velvet Hand</h3>
+<div class="panel panel-purple">
+    <strong>The Coin That Is Not There</strong>
+    <p class="text-sm mt-1">Never take what will be missed before dawn. A silver coin from a rich man's purse? He'll curse his servants and forget by noon. A ledger page that proves his fraud? He'll burn the city to find it. Take what they do not know they have <em>until it is too late</em>.</p>
+</div>
+<div class="panel panel-purple">
+    <strong>The Witness Who Looks Away</strong>
+    <p class="text-sm mt-1">Every crime is witnessed. The trick is not to be invisible — it is to be <em>unremarkable</em>. A servant carrying linens. A clerk with a stack of writs. A beggar sleeping in the archway. The guards see you. They just do not <em>notice</em>.</p>
+</div>
+<div class="panel panel-purple">
+    <strong>The Debt That Pays Twice</strong>
+    <p class="text-sm mt-1">When you steal, you create a debt — not yours, <em>theirs</em>. They owe you for the fear you planted, the reputation you damaged, the secret you now hold. A true thief does not take gold. Gold spends. A secret spends forever.</p>
+</div>
+
+<hr>
+
+<h2 id="thief-talents">🗡️ Thief Talents: The Velvet Ladder</h2>
+<p>The following talents suit those who walk the edge of law and shadow — not brawlers or brutes, but the quiet, the cunning, and the patient.</p>
+
+<h3>2 XP Talents — Foundations</h3>
+<div class="talent-card">
+    <div class="talent-name">Light Fingers</div>
+    <div class="flex text-xs mt-1"><span class="badge badge-gray">Strike, AGI, Gambit</span><span class="badge badge-gold">2 XP</span></div>
+    <div class="talent-body"><strong>Active, once per scene.</strong> When you attempt to lift a small object (purse, key, letter, seal) from a person or desk, treat your first Stealth or Subterfuge roll as Position +1. No one notices until it is already in your sleeve.</div>
+</div>
+<div class="talent-card">
+    <div class="talent-name">The Unlocked Window</div>
+    <div class="flex text-xs mt-1"><span class="badge badge-gray">Move, AGI, Flow</span><span class="badge badge-gold">2 XP</span></div>
+    <div class="talent-body"><strong>Passive.</strong> When infiltrating a structure you have cased for at least an hour, ignore one security obstacle (locked door, patrolled corridor, guard dog) per session. Describe how you already prepared for it.</div>
+</div>
+<div class="talent-card">
+    <div class="talent-name">Silk Palms</div>
+    <div class="flex text-xs mt-1"><span class="badge badge-gray">Influence, FAT</span><span class="badge badge-gold">2 XP</span></div>
+    <div class="talent-body"><strong>Active.</strong> When you bribe or gift a minor official, you gain a temporary String: <em>Bought Silence</em>. Once, you may spend this String to reduce DV by 1 on a Petition or Broker action involving that official. The String is consumed afterward.</div>
+</div>
+
+<h3>4 XP Talents — The Working Knife</h3>
+<div class="talent-card">
+    <div class="talent-name">Always Another Exit</div>
+    <div class="flex text-xs mt-1"><span class="badge badge-gray">Move, SPT, Gambit</span><span class="badge badge-gold">4 XP</span></div>
+    <div class="talent-body"><strong>Active, once per session.</strong> When you are cornered or a heist goes wrong, declare that you prepared an escape route earlier. Describe it plausibly (rope out a window, a bribed guard, a secret door). The GM may impose a cost — a dropped item, a witness, a future debt — but you <em>get out</em>.</div>
+</div>
+<div class="talent-card">
+    <div class="talent-name">The Forger's Eye</div>
+    <div class="flex text-xs mt-1"><span class="badge badge-gray">Craft, WIT, Timer</span><span class="badge badge-gold">4 XP</span><span class="badge badge-mist">Requires Craft 1+</span></div>
+    <div class="talent-body"><strong>Active.</strong> You can copy any handwriting, seal, or signature with uncanny accuracy. When you attempt to forge a document, roll Wits + Craft (DV 3 for simple, 4-5 for complex). On a hit, create a Forged Diamond. On a partial, the forgery holds for one scene, then may be detected.</div>
+</div>
+<div class="talent-card">
+    <div class="talent-name">Crowd Veil</div>
+    <div class="flex text-xs mt-1"><span class="badge badge-gray">Observe, MIG, Support</span><span class="badge badge-gold">4 XP</span><span class="badge badge-mist">Requires Stealth 2+</span></div>
+    <div class="talent-body"><strong>Active.</strong> You vanish into crowds. In a populated area (market, festival, dock), roll Stealth vs. DV 3 to become <em>Hidden in plain sight</em>. Pursuers suffer -1 die to find you until you act conspicuously.</div>
+</div>
+
+<h3>5 XP Talents — Signature Moves</h3>
+<div class="talent-card">
+    <div class="talent-name">The Velvet Glove</div>
+    <div class="flex text-xs mt-1"><span class="badge badge-gray">Influence, Strike, Combo</span><span class="badge badge-gold">5 XP</span><span class="badge badge-mist">Requires Presence 2+, Subterfuge 1+</span></div>
+    <div class="talent-body"><strong>Active, once per session.</strong> You have cultivated a network of informants, fence contacts, and corrupted clerks. Declare that a minor NPC (a servant, a dockworker, a scribe) owes you a favor. They provide a specific service: unlock a door, delay a patrol, deliver a message. The GM may dictate a cost — the NPC will need help later, or their favor expires after use.</div>
+</div>
+<div class="talent-card">
+    <div class="talent-name">Master of Misdirection</div>
+    <div class="flex text-xs mt-1"><span class="badge badge-gray">Influence, Gambit, SB</span><span class="badge badge-gold">5 XP</span><span class="badge badge-mist">Requires Deception 2+</span></div>
+    <div class="talent-body"><strong>Active.</strong> When discovered during a crime, spend 1 Boon to redirect suspicion to another person or faction. Roll Deception vs. DV 4. On a hit, the heat shifts; on a miss, you gain Exposure +1 and the target becomes hostile.</div>
+</div>
+
+<h3>7 XP Prestige Talent — The Quiet Catastrophe</h3>
+<div class="talent-card">
+    <div class="talent-name">Ghost Heist</div>
+    <div class="flex text-xs mt-1"><span class="badge badge-gray">Strike, Timer, Overload</span><span class="badge badge-gold">7 XP</span><span class="badge badge-mist">Requires Tier II, Stealth 3+</span></div>
+    <div class="talent-body"><strong>Active, once per arc.</strong> You may commit a crime that is never solved — not because you're perfect, but because the evidence points nowhere. After a successful heist, declare that no traceable evidence remains; the GM cannot use Social SB to retroactively implicate you from that scene. <strong>Cost:</strong> you accept a permanent <em>Reputation: Whispers</em> tag — some will always suspect you, even without proof.</div>
+</div>
+
+<hr>
+
+<h2 id="rogue-builds">🎭 Rogue Builds for the Silkstrand Night</h2>
+<div class="grid-3">
+    <div class="panel panel-gold">
+        <strong>The Cat Burglar</strong>
+        <p class="text-sm mt-1"><strong>Core Talents:</strong> Light Fingers, The Unlocked Window, Always Another Exit</p>
+        <p class="text-sm"><strong>Style:</strong> High, vertical, through windows and rooftops.</p>
+        <p class="text-sm"><strong>Patron:</strong> Ikasha.</p>
+    </div>
+    <div class="panel panel-purple">
+        <strong>The Confidence Artist</strong>
+        <p class="text-sm mt-1"><strong>Core Talents:</strong> Silk Palms, The Forger's Eye, The Velvet Glove</p>
+        <p class="text-sm"><strong>Style:</strong> Social infiltration, false identities, forged documents.</p>
+        <p class="text-sm"><strong>Patron:</strong> Livaea.</p>
+    </div>
+    <div class="panel panel-red">
+        <strong>The Saboteur</strong>
+        <p class="text-sm mt-1"><strong>Core Talents:</strong> Crowd Veil, Master of Misdirection, The Ghost Heist</p>
+        <p class="text-sm"><strong>Style:</strong> Disruption, frame-ups, political chaos.</p>
+        <p class="text-sm"><strong>Patron:</strong> Malachai (rare) or Aveh.</p>
+    </div>
+</div>
+
+<hr>
+
+<div class="part-divider">Part II — The Forger's Art</div>
+
+<h2 id="weight-of-paper">📜 The Weight of Paper</h2>
+<p>In Silkstrand, the right seal is worth more than a ship. A stamped manifest can move contraband past the harbor master. A notary's ribbon can turn stolen goods into legitimate auction lots. A letter of credit can buy a warehouse with no coin changing hands. Forgery is not crime. It is <em>reality editing</em>.</p>
+
+<h3>The Forging Mini-Game</h3>
+<p class="text-sm">To forge a document, you need three things:</p>
+<ol>
+    <li><strong>Knowledge</strong> of what the genuine document looks like — its paper, ink, seal, and language.</li>
+    <li><strong>A Sample</strong> — at least one authentic example to copy, or a witness who can describe it in detail.</li>
+    <li><strong>A Workshop</strong> — a quiet place with the right tools: quills, inks, sealing wax, a press, and a steady hand.</li>
+</ol>
+
+<h4>The Four Steps of Forgery</h4>
+<div class="panel panel-gold">
+    <strong>Step 1: Research</strong> <span class="badge badge-gray">Wits + Investigation, DV 2-4</span>
+    <p class="text-sm mt-1">Learn the document's specifics. On a hit, gain +1 die to the Craft roll. On a miss, you miss a crucial detail — the forgery will be detectable.</p>
+</div>
+<div class="panel panel-gold">
+    <strong>Step 2: Materials</strong> <span class="badge badge-gray">Wits + Subterfuge, DV 3</span>
+    <p class="text-sm mt-1">Source matching paper, ink, and seal. On a hit, the materials are adequate. On a partial, they're close but flawed (the forgery holds for one scene, then degrades). On a miss, you substitute inferior materials — the forgery starts with a <em>Suspicious</em> tag.</p>
+</div>
+<div class="panel panel-gold">
+    <strong>Step 3: The Craft</strong> <span class="badge badge-gray">Wits + Craft, DV 3 simple / 4 standard / 5 complex</span>
+    <p class="text-sm mt-1">Roll to create the forged document. On a hit, you produce a <strong>Forged Diamond</strong>. On a partial, produce a <strong>Fragile Diamond</strong> — it works once, then crumbles (detected). On a miss, the forgery is worthless; you may salvage materials for another attempt, but the GM gains 1 SB.</p>
+</div>
+<div class="panel panel-gold">
+    <strong>Step 4: Presentation</strong> <span class="badge badge-gray">Presence + Deception vs. examiner's DV</span>
+    <p class="text-sm mt-1">When you present the forgery, roll against the target's Insight or relevant skill. On a hit, the document is accepted. On a partial, they're suspicious — offer a concession (bribe, favor, or they keep the document "for verification"). On a miss, they detect the forgery; your Exposure ticks +1 and the document is seized.</p>
+</div>
+
+<h4>Forged Diamond Types</h4>
+<ul>
+    <li><strong>Cargo Manifest</strong> — Legal immunity for smuggling. Lasts one voyage.</li>
+    <li><strong>Notarial Seal</strong> — Validates a contract or deed. Lasts one arbitration.</li>
+    <li><strong>Letter of Credit</strong> — Withdraw funds from a named merchant house. One use.</li>
+    <li><strong>Writ of Passage</strong> — Skip tolls and inspections on a named road or river. One journey.</li>
+    <li><strong>Identity Papers</strong> — Assume a false identity for one scene.</li>
+    <li><strong>Pardon</strong> — Commutes a minor crime. Requires a public reading.</li>
+</ul>
+
+<h4>Failure and Consequences</h4>
+<p class="text-sm">When a forgery is detected, the GM may choose one:</p>
+<ul>
+    <li><strong>Exposure</strong> — Your reputation among officials drops. Tick Exposure [4] for the city or faction.</li>
+    <li><strong>Debt</strong> — The examiner does not report you — instead, they demand a favor.</li>
+    <li><strong>Bounty</strong> — A warrant is quietly issued. A rival thief may claim it.</li>
+    <li><strong>Counterfeit Trail</strong> — Your forged seal is used by someone else later, framing you.</li>
+</ul>
+
+<hr>
+
+<h2 id="fence-laundry">🧺 Fence and Laundry</h2>
+<p>Once you have stolen goods, you need to sell them. The art of laundering is not hiding — it is <em>recontextualizing</em>.</p>
+
+<h3>Market Tiers</h3>
+<p class="text-sm">Different fences operate at different levels of legitimacy and scrutiny, affecting the difficulty of moving goods:</p>
+<ul>
+    <li><strong>Street Market (DV 2)</strong> — Stolen goods sold openly; quick but risky (pawn shops, street vendors).</li>
+    <li><strong>Guild Market (DV 3)</strong> — Hot cargo requiring some paperwork; moderate risk (guild merchants, legitimate fronts).</li>
+    <li><strong>Court Market (DV 4)</strong> — Tracked items needing forged documents; lower risk but higher cost (nobles, officials).</li>
+    <li><strong>Arcane Market (DV 5)</strong> — Warded or psionically significant items; highest risk and reward (rare, supernatural goods).</li>
+</ul>
+<p class="text-sm">Partial results when fencing: price spike (Bank -1), Crew Heat +1, a quality flaw (-1 Effect on next use), or a seller's temporary String. On a complete miss: a sting spring (Sting [6]+2), counterfeit gear, or an owed favor to a rival fence.</p>
+
+<h3>Laundering Timers</h3>
+<p class="text-sm">To launder a stolen item or forged Diamond, start a <strong>Laundry Timer [4]</strong> (small items) or <strong>[6]</strong> (major items). Each downtime scene, work one tick by:</p>
+<ul>
+    <li>Bribing a fence (spend 1 Favor or 1 Boon)</li>
+    <li>Moving goods through a neutral market (risk Exposure +1)</li>
+    <li>Using a genuine paper trail (requires a Forged Diamond)</li>
+</ul>
+<p class="text-sm">When the timer fills, the item is clean — sellable at full value or usable without suspicion. If you fail to complete the timer within three sessions, the item becomes <em>Hot</em>. Selling it then risks Exposure +2 and a visit from the original owner's agents.</p>
+
+<hr>
+
+<div class="part-divider">Part III — The Cantor's Cadence</div>
+
+<h2 id="voice-that-opens-doors">🎵 The Voice That Opens Doors</h2>
+<p>Singing is not for taverns alone. A well-timed tune can calm a crowd, distract a guard, or deliver a secret message in plain hearing. The Cantor's path is the thief's second skin — especially when the singer cares more for the lock than the lyric.</p>
+
+<h3>The Rogue Cantor: Song as Setup</h3>
+<p class="text-sm">Most Cantors perform for applause. A rogue Cantor performs for <em>opportunity</em>. While the audience watches the singer, their pockets are already empty.</p>
+
+<h4>Performance as Distraction</h4>
+<p class="text-sm">When you sing or play in a public space, roll Presence + Performance against a DV set by crowd size (2 for small, 4 for large). On a hit, you create an <strong>Engrossed Audience</strong> tag — for the duration of your song, any ally attempting Stealth or Subterfuge in the same area gains +1 die. On a partial, the crowd is attentive but some watch the exits — Stealth rolls are unchanged, but allies gain +1 Position to social rolls.</p>
+
+<h4>The Encore Gambit</h4>
+<p class="text-sm">Once per session, after a successful performance, declare an <em>Encore</em>. The crowd demands more. This extends your distraction for an additional scene, but the GM gains 1 SB — the guards are curious now.</p>
+
+<h3>Corrupted Cantors: The Cult of the Velvet Note</h3>
+<p class="text-sm">Not all Cantors walk the road alone. Some find patrons in the shadows — beings who grant power in exchange for a different kind of song.</p>
+
+<h4>Ikasha's Whisper (Shadow Cantor)</h4>
+<p class="text-sm">Ikasha speaks in the space between notes. Followers learn to sing in frequencies that do not carry, to hum a lullaby that makes guards sleep, to whistle a tune that unlocks spirit-locks.</p>
+<p class="text-sm"><strong>Corruption:</strong> Your voice develops a second timbre — a whisper that follows your sung words. Strangers shiver when you speak. Allies sometimes hear you when you are not there.</p>
+<div class="talent-card rite"><div class="talent-name">Cradle Song (Low)</div><div class="talent-body">Lull a single target (Resist DV 3). Costs 1 Fatigue.</div></div>
+<div class="talent-card rite"><div class="talent-name">Lockpick's Refrain (Standard)</div><div class="talent-body">Unlock one mundane or warded lock by humming its true pitch. Costs 1 Obligation.</div></div>
+
+<h4>Livaea's Velvet Hook (Social Cantor)</h4>
+<p class="text-sm">Livaea is the patron of courtiers, concubines, escorts, and companions — all who trade in desire. She teaches that every song is a seduction, every glance a contract, every touch a negotiation. Her followers do not charm; they <em>bind</em>. A promise whispered in her name is a thread that tightens with every breath.</p>
+<p class="text-sm"><strong>Corruption:</strong> Your eyes take on a reflective quality. In dim light, others see their own desires mirrored there. Your skin always feels faintly warm to the touch. Those who sleep near you dream of lost lovers.</p>
+<div class="talent-card rite"><div class="talent-name">Golden Tongue (Low)</div><div class="talent-body">Gain +2 dice to Sway for one social exchange. Costs 1 Fatigue; afterward, the target feels a mild attraction or obligation and may seek you out later.</div></div>
+<div class="talent-card rite"><div class="talent-name">The Velvet Invitation (Low)</div><div class="talent-body">Gain automatic entry to any private social function (masquerade, salon, pleasure house). The invitation appears in your pocket, signed by a name you can borrow for one night. Costs 1 Obligation.</div></div>
+<div class="talent-card rite"><div class="talent-name">The Unrefusable Offer (Standard)</div><div class="talent-body">Sing or whisper a bargain while touching the target (a hand on the arm, a brush of fingers). The target must accept the offer or suffer -2 dice to all rolls until they do. The offer must be something they could conceivably agree to (no suicide, no self-mutilation). Costs 2 Obligation; afterward the target remembers the moment as strangely intimate.</div></div>
+<div class="talent-card rite"><div class="talent-name">The Crimson Masquerade (High)</div><div class="talent-body">Assume the appearance of any person you have touched skin-to-skin, for one scene — your voice matches theirs perfectly. Costs 2 Fatigue and marks a Debt Timer [4] with Livaea.</div></div>
+<div class="panel panel-purple mt-1">
+    <strong>Societal Impact</strong>
+    <p class="text-sm mt-1">Livaea's cult is woven into every pleasure house, every high-class escort service, every discreet companionship agency in the Amaranthine. Her temples are not buildings; they are the back rooms of brothels, the upper floors of massage houses, the private salons of courtesans who buy and sell secrets along with flesh. A Livaean courtesan is as dangerous as any assassin — her weapons are a smile, a tear, a carefully timed yawn.</p>
+    <p class="text-sm mt-1">The Velvet Court has a standing agreement with the Livaean network: information flows both ways, and a thief who insults a Livaean courtesan finds every door closed and every guard alerted. Madam Serafine herself is said to be the Velvet Court's living bond to Livaea — a pact sealed in blood and silk, renewed each year with a secret she has never told anyone.</p>
+</div>
+
+<h4>Malachai's False Note (Desperate Cantor)</h4>
+<p class="text-sm">Malachai answers when the thief has nothing left to lose. Her Cantors sing of easy scores, of curses as blessings, of the coin that spends itself. The price is always a piece of the singer's soul. She is the patron of gamblers, addicts, and those who have sold themselves one too many times.</p>
+<p class="text-sm"><strong>Corruption:</strong> Your voice cracks on certain notes. Those who hear you feel a brief, inexplicable hunger. Your shadow seems thinner, hungrier. You find yourself counting coins you never had.</p>
+<div class="talent-card rite"><div class="talent-name">The Lucky Pick (Low)</div><div class="talent-body">Reroll a failed Stealth or Subterfuge roll. Costs 1 Fatigue and 1 Corruption tick.</div></div>
+<div class="talent-card rite"><div class="talent-name">The Debt Note (Standard)</div><div class="talent-body">Sing a curse on a rival — they suffer -1 die on their next heist. Costs 2 Fatigue and marks a Debt Timer [4] that Malachai will collect. The collection is always painful and often ironic.</div></div>
+<div class="talent-card rite"><div class="talent-name">The Final Score (High)</div><div class="talent-body">Once per campaign, automatically succeed at any single heist roll — but immediately mark 2 Corruption and gain a permanent <em>Marked by Malachai</em> condition. The coin you take will never be enough.</div></div>
+
+<hr>
+
+<h2 id="building-rogue-cantor">🎼 Building a Rogue Cantor</h2>
+<div class="grid-2">
+    <div class="panel panel-mist">
+        <strong>The Whisper (Shadow Focus)</strong>
+        <p class="text-sm mt-1"><strong>Talents:</strong> Ikasha's rites, Stealth, Performance.</p>
+        <p class="text-sm"><strong>Role:</strong> Infiltrator, messenger, spy.</p>
+        <p class="text-sm"><strong>Progression:</strong> Low rites → Crowd Veil → Ikasha's Mark.</p>
+    </div>
+    <div class="panel panel-purple">
+        <strong>The Siren (Social Focus)</strong>
+        <p class="text-sm mt-1"><strong>Talents:</strong> Livaea's rites, Sway, Silk Palms.</p>
+        <p class="text-sm"><strong>Role:</strong> Confidence artist, blackmailer, courtesan-spy.</p>
+        <p class="text-sm"><strong>Progression:</strong> Golden Tongue → The Velvet Invitation → The Unrefusable Offer → The Velvet Glove.</p>
+    </div>
+    <div class="panel panel-red">
+        <strong>The Courtesan (Seduction Focus)</strong>
+        <p class="text-sm mt-1"><strong>Talents:</strong> Livaea's rites, Silk Palms, The Velvet Glove.</p>
+        <p class="text-sm"><strong>Role:</strong> Escort, companion, concubine, information broker.</p>
+        <p class="text-sm"><strong>Progression:</strong> The Velvet Invitation → Golden Tongue → The Unrefusable Offer → The Crimson Masquerade.</p>
+    </div>
+    <div class="panel panel-orange">
+        <strong>The Cornered Rat (Desperate Focus)</strong>
+        <p class="text-sm mt-1"><strong>Talents:</strong> Malachai's rites, Always Another Exit, Master of Misdirection.</p>
+        <p class="text-sm"><strong>Role:</strong> Saboteur, desperate fugitive, self-destructive genius.</p>
+        <p class="text-sm"><strong>Progression:</strong> The Lucky Pick → Blood Price → The Final Score.</p>
+    </div>
+</div>
+
+<hr>
+
+<div class="part-divider">Part IV — The Velvet Court (Expanded)</div>
+
+<h2 id="court-that-never-sleeps">🕸️ The Court That Never Sleeps</h2>
+<p>The Velvet Court is not a building. It is a network — of whispers, of debts, of favors owed and collected. It has no single leader, though many claim the title. It has no charter, no treasury, no walls. It is the space between the legitimate and the condemned, and its members are the ones who know how to walk that line.</p>
+<blockquote>"I am Madam Serafine, and I hold the largest share of the Court's influence. But I did not build it alone. No one builds a shadow. You simply learn to stand where it falls."</blockquote>
+
+<h3>The Hierarchy of Shadows</h3>
+<p class="text-sm">The Velvet Court is not a guild. There are no titles, no uniforms, no initiation rituals. Yet every thief in Silkstrand knows who to ask, who to fear, and who to pay. The Court's structure is a web of <strong>Creditors</strong> and <strong>Debtors</strong>. Reputation is currency. Favors are interest.</p>
+
+<h4>The Creditors (The Velvet Seats)</h4>
+<p class="text-sm">Six individuals hold the majority of the Court's influence, each controlling a different resource:</p>
+<ol>
+    <li><strong>Madam Serafine</strong> — Information, Forgery, Laundering</li>
+    <li><strong>Old Kes</strong> — Fence, Smuggling, Markets</li>
+    <li><strong>The Dockmaster</strong> — Movement, Ships, Hidden Warehouses</li>
+    <li><strong>Sister Agatha</strong> — Cover, Sanctuary, False Identities</li>
+    <li><strong>The Archivist</strong> — Legal Precedent, Forged Writs, Court Delays</li>
+    <li><strong>The Gray Eminence</strong> — Unknown; rumored to be a Veiled Sister or a Covenant judge</li>
+</ol>
+<p class="text-sm">Each Creditor has a <strong>Favor Timer [6]</strong>. When you do a significant service for them, tick the timer. When it fills, they owe you a major favor (a heist's worth of help). When you owe them a debt, they may call it in at any time.</p>
+
+<h4>The Debtors (Everyone Else)</h4>
+<p class="text-sm">Every thief, fence, smuggler, and corrupt clerk in Silkstrand owes someone. The Court tracks debts through <strong>Strings</strong>, which can be:</p>
+<ul>
+    <li><em>Intelligence</em> — a secret, a map, a guard schedule</li>
+    <li><em>Safe Passage</em> — a route, a blind eye, a forgotten warrant</li>
+    <li><em>Muscle</em> — a favor from a bruiser, a crew for a job</li>
+    <li><em>Coin</em> — silver, goods, or a Forged Diamond</li>
+</ul>
+<p class="text-sm">Strings are traded, sold, and called in. The Court's ledger is oral — written ink can be burned. A remembered debt is forever.</p>
+
+<h3>Faction Reputation: The Velvet Dial</h3>
+<p class="text-sm">Track the party's standing with the Velvet Court using a <strong>Velvet Dial</strong> from -3 (Enemy of the Court) to +3 (Creditor-in-Waiting). Adjust the dial when:</p>
+<ul>
+    <li>Complete a job for a Creditor (+1)</li>
+    <li>Pay off a major debt (+1)</li>
+    <li>Betray a fellow Court member (-1)</li>
+    <li>Get caught by the Watch and name names (-2)</li>
+    <li>Kill a Creditor (reset to -3, but gain a permanent enemy)</li>
+</ul>
+<div class="grid-3 mt-1">
+    <div class="panel panel-red"><strong>-3 to -2: Hunted</strong><p class="text-sm mt-1">Guards are tipped off; fences refuse you; no safe house in Silkstrand.</p></div>
+    <div class="panel panel-mist"><strong>-1 to +1: Neutral</strong><p class="text-sm mt-1">Standard access to minor fences, but Creditors watch you warily.</p></div>
+    <div class="panel panel-green"><strong>+2 to +3: Trusted</strong><p class="text-sm mt-1">Request a Favor from any Creditor once per arc; you may attend the Velvet Moot.</p></div>
+</div>
+
+<h4>The Velvet Moot</h4>
+<p class="text-sm">Once per season, the Creditors meet at a secret location. At Velvet Dial +2 or higher, you may be invited. At the Moot, you may:</p>
+<ul>
+    <li><strong>Bid on a Job</strong> — gain exclusive access to a high-value heist</li>
+    <li><strong>Settle a Debt</strong> — pay off a major obligation with a rare item or secret</li>
+    <li><strong>Propose a New Creditor</strong> — challenge a current Creditor for their seat (risky)</li>
+    <li><strong>Learn Rumors</strong> — gain 1d3 Strings of intelligence about future events</li>
+</ul>
+
+<hr>
+
+<h2 id="courts-assets">🗄️ The Court's Assets (What the GM Can Offer)</h2>
+<p class="text-sm">When players work for the Velvet Court, they can earn access to:</p>
+<ul>
+    <li><strong>The Blue Ledger</strong> — a record of every bribeable official in Silkstrand</li>
+    <li><strong>The Maze of Whispers</strong> — a network of hidden passages under the city</li>
+    <li><strong>The Ghost Crew</strong> — a team of urchin spies, all Cap 1, good for reconnaissance</li>
+    <li><strong>The Scribe's Seal</strong> — a notary who will stamp anything for a price</li>
+    <li><strong>The Unstable Bridge</strong> — a safe house that can be collapsed to cover an escape</li>
+</ul>
+
+<h3>Velvet Heat Dial</h3>
+<p class="text-sm">The Court tracks two timers that measure active attention from authorities and rivals:</p>
+<ul>
+    <li><em>Watch Interest [6]</em> (Crew Heat) — fills when jobs go loud or evidence is left.</li>
+    <li><em>Syndicate Pressure [6]</em> (City Heat) — fills when rivals or the Exchange take notice.</li>
+</ul>
+<div class="grid-2">
+    <div class="panel panel-orange">
+        <strong>Watch Interest [6]</strong>
+        <ul class="text-sm mt-1">
+            <li>0-2: Background hum.</li>
+            <li>3: Patrol Sweep [4] begins.</li>
+            <li>4-5: Random stops; Notoriety +1 on flashy moves.</li>
+            <li>6: Sting [6] + Exposure +1.</li>
+        </ul>
+    </div>
+    <div class="panel panel-red">
+        <strong>Syndicate Pressure [6]</strong>
+        <ul class="text-sm mt-1">
+            <li>0-2: Routine.</li>
+            <li>3: Curfew murmurs, stop and search; Patrol Sweep [4] starts in hot districts.</li>
+            <li>6: Crackdown [4] (DV +1 on criminal actions).</li>
+        </ul>
+    </div>
+</div>
+
+<hr>
+
+<h2 id="jobs-velvet-court">🎲 Jobs from the Velvet Court (d12)</h2>
+<p class="text-sm">When the players need work (or the GM needs a hook), roll or choose:</p>
+<table>
+<thead><tr><th>d12</th><th>Job</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>The Unopened Letter</td><td>Steal a sealed diplomatic pouch from a courier before dawn. The contents are a treaty that would spark a trade war. Rival thieves are also hunting it.</td></tr>
+<tr><td>2</td><td>The Ghost Ship</td><td>A vessel in the harbor carries a cargo of cursed idols. Smuggle them off without alerting the crew, who are cultists.</td></tr>
+<tr><td>3</td><td>The Silent Ledger</td><td>A merchant's private ledger records debts to the Velvet Court. He is threatening to go to the Watch. Steal the ledger and replace it with a forgery.</td></tr>
+<tr><td>4</td><td>The Fencing Master</td><td>A duellist is blackmailing a Creditor. Challenge him to a public duel and make him lose — no lethal damage, just humiliation.</td></tr>
+<tr><td>5</td><td>The Last Heir</td><td>A noble's lost son has been located in a debtor's prison. Break him out. The noble will pay in land, not coin.</td></tr>
+<tr><td>6</td><td>The Poisoned Well</td><td>Someone is poisoning the Court's informants. Find the source — it may be a rogue alchemist in the Dye District.</td></tr>
+<tr><td>7</td><td>The Crimson Seal</td><td>A forged notarial seal is being sold to rival thieves. Steal the original die and destroy all copies. The forger is a former Court member.</td></tr>
+<tr><td>8</td><td>The Velvet Trap</td><td>A new Creditor has appeared, promising to sell the Court's secrets to the Watch. Prove they are a plant, or eliminate them quietly.</td></tr>
+<tr><td>9</td><td>The Night Market Heist</td><td>The Dust Market is auctioning an item the Court wants. Steal it before the gavel falls. The auctioneer is a rival faction's fence.</td></tr>
+<tr><td>10</td><td>The Ghost of the Archivolt</td><td>A dead notary's ghost is haunting the court records, trying to expose old forgeries. Lay it to rest, or silence it.</td></tr>
+<tr><td>11</td><td>The Broken Bridge</td><td>The Three-Queens Bridge is being repaired. The construction crew has found a hidden vault beneath the old foundation. Empty it before the city engineers arrive.</td></tr>
+<tr><td>12</td><td>The Ninth Key</td><td>Legend says the Velvet Court's founder hid a master key that can open any lock in Silkstrand, split into nine fragments, each held by a different thief. The party is tasked with collecting them — or stealing them from the current holders.</td></tr>
+</tbody>
+</table>
+
+<hr>
+
+<h2 id="notable-court-npcs">👤 Notable Court NPCs</h2>
+
+<div class="npc-card">
+    <div class="npc-name">Madam Serafine (Creditor)</div>
+    <div class="npc-role">Tier IV</div>
+    <div class="npc-motivation">🎯 Maintain the Court's balance and expand her influence to the Brass Coast. But beneath that, a quieter hunger: she is still paying off a debt to Livaea, one that grows heavier with every year she does not ascend.</div>
+    <div class="npc-leverage">💰 She holds information on every major official in Silkstrand, and knows the secret passage into the Archivolt's sealed vault. She knows where the bodies are buried — and in some cases, who buried them.</div>
+    <div class="npc-quirk">🎭 She never wears the same dress twice — each has a hidden pocket large enough for a ledger. She hasn't slept in the same room for more than three nights in a decade. She is running from something, and the something is wearing her face.</div>
+    <blockquote class="text-sm mt-1">"They say I sold my soul to Livaea for the keys to Silkstrand. That is a lie. I sold it for a single night of perfect luck — a night when every door opened, every guard looked away, every lock turned itself. The keys came later, as interest. Livaea is patient. She knows that the greatest debt is the one you forget you owe."</blockquote>
+</div>
+
+<div class="npc-card">
+    <div class="npc-name">Old Kes (Fence)</div>
+    <div class="npc-role">Tier III</div>
+    <div class="npc-motivation">🎯 Increase his share of the smuggling trade and undermine the Kahfagian factors.</div>
+    <div class="npc-leverage">💰 Can move any good, anywhere, within a week. Also holds a contract with a Sidhi ship captain worth a small fortune.</div>
+    <div class="npc-quirk">🎭 Missing three fingers on his left hand, lost to a customs trap. He keeps them in a jar as a warning.</div>
+</div>
+
+<div class="npc-card">
+    <div class="npc-name">Sister Agatha (Sanctuary)</div>
+    <div class="npc-role">Tier II (but with powerful allies)</div>
+    <div class="npc-motivation">🎯 Protect the poor and desperate. She gives sanctuary to thieves on the run, but demands they work off their stay in her soup kitchen.</div>
+    <div class="npc-leverage">💰 Her hospice is neutral ground — no violence permitted within its walls. The Watch respects her because she heals their wounded.</div>
+    <div class="npc-quirk">🎭 A tattoo of a broken chain on her wrist — she was a freed slave from Ashaan.</div>
+</div>
+
+<div class="npc-card">
+    <div class="npc-name">The Archivist</div>
+    <div class="npc-role">Tier III</div>
+    <div class="npc-motivation">🎯 Accumulate legal knowledge and use it to blackmail officials. Secretly keeps the Court's forged-seal database.</div>
+    <div class="npc-leverage">💰 Can make any legal problem disappear — or appear. Knows which notaries are corrupt and which are clean.</div>
+    <div class="npc-quirk">🎭 Never seen without a specific quill, a family heirloom whose nib is made from a saint's finger bone.</div>
+</div>
+
+<div class="npc-card">
+    <div class="npc-name">The Gray Eminence (Secret)</div>
+    <div class="npc-role">Tier ? (rumored IV)</div>
+    <div class="npc-motivation">🎯 Unknown. Some say a Veiled Sister who fled Ashaan. Others say a Covenant judge playing a long game.</div>
+    <div class="npc-leverage">💰 Never seen, never named, but their orders carry weight. May be the only one who knows the true origin of the Velvet Court.</div>
+    <div class="npc-quirk">🎭 Letters from the Gray Eminence arrive on paper that is still warm, as if freshly pressed.</div>
+</div>
+
+<h3>Informant Web Mechanics</h3>
+<p class="text-sm">The party can cultivate 3-5 informants (dock porter, lamplighter, clerk, etc.). Each has Reliability [4] (ticks down on 1s). Pay their Price (a favor, a coin, a secret) for a Clue or DV -1 on one roll. Two informants on the same topic: +1 Effect, and only the lowest Reliability ticks down.</p>
+<div class="panel panel-blue">
+    <strong>Running a Web</strong>
+    <ul class="text-sm mt-1">
+        <li><strong>Access</strong> — what information the informant can provide.</li>
+        <li><strong>Reliability [4]</strong> — tracks trustworthiness; decreases when the informant is stressed or compromised (a roll of 1 when used).</li>
+        <li><strong>Price</strong> — cost to gain information (favor, coin, secret).</li>
+        <li><strong>Flags</strong> — special traits (e.g., "Connected to Watch," "Lives in Dye District").</li>
+    </ul>
+</div>
+<div class="panel panel-blue">
+    <strong>Using Informants</strong>
+    <p class="text-sm mt-1">Pay the Price to gain a Clue (+1 die on an investigation roll), a Small String (a minor favor or piece of information), or DV -1 on one roll within the informant's sphere of influence.</p>
+</div>
+<div class="panel panel-red">
+    <strong>Informant Complications</strong>
+    <p class="text-sm mt-1">When an informant's Reliability reaches 0, they flip allegiance or vanish; start a Burn [4] timer to recover or replace them. The GM may spend SB to create immediate problems.</p>
+</div>
+<div class="panel panel-green">
+    <strong>Cross-Check Advantage &amp; Masking Source</strong>
+    <p class="text-sm mt-1">Spend 2 informants on the same topic for +1 Effect on related rolls (only the lowest Reliability decreases on a roll of 1). Spend 1 Bank to prevent a Reliability -1 once when using informants.</p>
+</div>
+
+<hr>
+
+<h2 id="court-approved-heists">⏱️ Court-Approved Heists (The Heist Timer)</h2>
+<p>When the players accept a job from the Court, the GM sets up a <strong>Heist Timer [6]</strong> (simple) to <strong>[12]</strong> (complex) to track overall progress toward the objective. Additionally, the GM may establish <strong>Threat Timers</strong> to track escalating danger during the heist.</p>
+
+<div class="panel panel-gold">
+    <strong>Heist Engine — GM Quick Reference</strong>
+    <table class="mt-1">
+        <thead><tr><th>If you want…</th><th>Do this…</th><th>Instead of this…</th></tr></thead>
+        <tbody>
+        <tr><td>Tension to rise steadily</td><td>Use 2-3 Threat Timers (Alarm, Patrol, Rival Interference). Tick them on Partials and Misses.</td><td>Using only a single Heist Timer — players need to see multiple pressures.</td></tr>
+        <tr><td>Lockpicking to feel dramatic</td><td>Make the safe a Progress Timer [6]. Each Mechanics roll ticks 1-2 segments on a Partial (full ticks on a success).</td><td>Rolling once for "success/fail" — binary feels flat.</td></tr>
+        <tr><td>Setup rolls to matter</td><td>Grant Kit Tokens (one-use +1d or Position boost) on strong hits. On partials, start a complication timer (e.g., Guard Alert [3]).</td><td>Letting setup rolls have no mechanical effect.</td></tr>
+        <tr><td>Boons to flow (not hoard)</td><td>Remind players: "You have [X] Boons — spend them or lose them at scene end." Offer tempting re-rolls to model spending.</td><td>Letting players sit on multiple Boons for scenes — they're meant to be spent.</td></tr>
+        <tr><td>Flashbacks (preparedness)</td><td>Let players spend 1 Boon to declare a minor flashback ("I loosened that window last night"). For major prep (+2 dice), require a Setup roll before the heist.</td><td>Saying "no" to creative flashbacks — they're the soul of heists.</td></tr>
+        <tr><td>Position to affect stealth</td><td>State Position before every roll: <em>Controlled</em> — cover in the shadows; <em>Risky</em> — the guard glances your way, act fast; <em>Desperate</em> — the guard's lantern sweeps right at you.</td><td>Using Controlled as default — Position must drive narration.</td></tr>
+        <tr><td>Partials to feel like progress</td><td>Offer a menu: reduce next attempt's DV by 1, improve Position by 1 step, tick a Progress Timer, gain a Clue, or succeed at a cost (GM gains 1 SB).</td><td>Saying "nothing happens" — that's a Miss (no effect, GM gains SB).</td></tr>
+        <tr><td>Momentum after a Miss</td><td>Spend the SB immediately: a new guard appears, a door locks or jams, or tick a Threat Timer twice.</td><td>Banking SB — strike while the iron is hot; escalation should feel reactive, not punitive.</td></tr>
+        <tr><td>Teamwork to shine</td><td>Remind players of Strings — a shared favor or debt can be invoked to grant 1 Boon or reduce DV by 1. Strings are specific leverage, not vague "bonds."</td><td>Letting players forget their Strings — they're mechanical leverage.</td></tr>
+        <tr><td>The heist to end memorably</td><td>End with an escape roll (even with Always Another Exit). Failure means a dropped item, a left clue, or gained Heat — not just "you escape."</td><td>Letting them walk out free — the last roll must carry consequence.</td></tr>
+        </tbody>
+    </table>
+</div>
+
+<h3>The Velvet Heist Planner</h3>
+<p class="text-sm">Before a job, each player describes one preparation (casing, bribing, stashing gear). Each strong success on a Setup roll grants +1 Position or -1 DV later. Each player starts with 2 <strong>Kit Tokens</strong> (lockpicks, dark lantern, false papers) that can be spent during the heist for:</p>
+<ul>
+    <li>+1 die on a roll</li>
+    <li>Improve Position by one step</li>
+    <li>Tick the Heist Timer forward by one segment</li>
+    <li>Pause a Threat Timer (prevent it from advancing for one tick)</li>
+</ul>
+<p class="text-sm">After use, the token is consumed.</p>
+
+<h3>The Heist Timer</h3>
+<p class="text-sm">The Heist Timer advances when players complete a phase of the heist (casing, infiltration, acquisition, escape), acquire a key asset (a map, a key, a guard schedule), or eliminate a major obstacle (bribe a captain, disable an alarm).</p>
+<p class="text-sm">It ticks backward when a guard raises an alarm, a rival thief interferes, or the party is forced to leave evidence.</p>
+<p class="text-sm">When the timer fills, the heist is complete — the players gain the loot plus 1 Favor with the Creditor who hired them. The GM may also award a <em>Court Favor</em> (a one-use String tradable for help, information, or a safe house). If the timer empties (reaches 0), the heist fails — the party must escape, may lose a member, and gains a <em>Debt</em> owed to the Creditor, to be called in later.</p>
+
+<h3>Threat Timers</h3>
+<p class="text-sm">The GM sets up Threat Timers to track specific dangers:</p>
+<ul>
+    <li><strong>Alarm [4]</strong> — Security response time and alert level.</li>
+    <li><strong>Security [4]</strong> — Methodical search patterns and guard rotations.</li>
+    <li><strong>Inside Trouble [4]</strong> — Unexpected problems from within the target location.</li>
+</ul>
+<p class="text-sm">When a Threat Timer fills, the corresponding complication occurs (e.g., Alarm filling means guards are fully alerted and responding).</p>
+
+<hr>
+
+<div class="part-divider">Part V — Patrons of the Underworld</div>
+
+<h2 id="patron-ikasha">🌒 Ikasha — She Who Sleeps in Shadow</h2>
+<h3>Lore</h3>
+<p>Ikasha is the hush between footfalls, the patience of dark water, the black-feathered watcher at every threshold. She does not command. She <em>sleeps</em>. But in her dreams, she whispers possibilities. Thieves who follow Ikasha learn to move unseen, to speak unremembered, to become shadows that slip between what is and what could be.</p>
+<h3>Advantages for Rogues</h3>
+<ul>
+    <li><strong>Soft Witness</strong> — Your first Stealth roll each scene is Position +1.</li>
+    <li><strong>Shadow Meld</strong> — Once per session, step into a shadow and emerge from another within Near range.</li>
+    <li><strong>The Unobserved</strong> — When you are Hidden, Social SB cannot be used to frame you (unless you act first).</li>
+</ul>
+<h3>Drawbacks</h3>
+<ul>
+    <li><strong>The Witness Debt</strong> — Every use of Ikasha's power marks a <em>Witness Timer [4]</em>. When it fills, a raven appears to watch your next crime; if you fail that roll, the raven reports to a rival.</li>
+    <li><strong>Light Sensitivity</strong> — In bright conditions (direct sun, magical illumination), your Stealth rolls suffer -1 die.</li>
+</ul>
+<h3>Rites for the Rogue Cantor</h3>
+<div class="talent-card rite"><div class="talent-name">The Unlatched Window (Low)</div><div class="talent-body">Gain +2 dice to open one lock or window silently.</div></div>
+<div class="talent-card rite"><div class="talent-name">Raven Courier (Standard)</div><div class="talent-body">Send a whispered message up to a mile away via a spectral raven.</div></div>
+<div class="talent-card rite"><div class="talent-name">Threshold of Sleep (High)</div><div class="talent-body">Walk through a locked door as if it were mist. Costs 2 Fatigue and marks Obligation.</div></div>
+
+<hr>
+
+<h2 id="patron-livaea">🌹 Livaea — The Crimson Courtier</h2>
+<h3>Lore</h3>
+<p>Livaea is the whisper behind the curtain, the smile that sells secrets, the velvet hand that closes a cage. She rules through allure, performance, and the hunger for connection. Her domain encompasses not just courtiers, but escorts, concubines, companions, and all who trade in intimacy as currency.</p>
+<p>Thieves who follow Livaea do not steal coins — they steal <em>trust</em>. A stolen kiss, a forged letter, a lover's secret sold to the highest bidder. Livaea's temples are the pleasure houses of Silkstrand, the massage parlors of Zakov, the discreet companionship agencies of the Brass Coast. Her priests are courtesans who know that a whispered secret is worth more than a night's fee, and that a carefully cultivated attachment can move armies.</p>
+<h3>Advantages for Rogues</h3>
+<ul>
+    <li><strong>Courtly Graces</strong> — +1 die to Sway and Performance in any refined setting.</li>
+    <li><strong>The Velvet Glove</strong> — Once per session, declare a minor NPC is your secret admirer or blackmail victim. They will help you once.</li>
+    <li><strong>Unreadable Mask</strong> — Spend 1 Boon to ignore one Social SB spend against you (the scandal simply fails to stick).</li>
+    <li><strong>Favoured Companion</strong> — A standing introduction to any pleasure house, escort agency, or discreet social club in the Amaranthine. The staff won't betray you unless the price is overwhelming.</li>
+</ul>
+<h3>Drawbacks</h3>
+<ul>
+    <li><strong>The Jealous Court</strong> — Using Livaea's power publicly marks a <em>Rival Timer [4]</em>. When it fills, a former paramour or jilted client becomes a recurring enemy.</li>
+    <li><strong>Addicted to Adoration</strong> — Go more than a session without a notable social triumph, and you suffer -1 die to all social rolls until you perform a grand gesture (a public seduction, a scandalous revelation, a purchased favor).</li>
+    <li><strong>The Velvet Price</strong> — Livaea expects her followers to keep the oldest profession thriving. Refusing to trade in intimacy (even as a broker, not a direct participant) may cause her to withdraw her favor.</li>
+</ul>
+<h3>Rites for the Rogue Cantor</h3>
+<div class="talent-card rite"><div class="talent-name">Silk Whisper (Low)</div><div class="talent-body">Send a telepathic sentence to a willing target within sight.</div></div>
+<div class="talent-card rite"><div class="talent-name">The Shared Cup (Standard)</div><div class="talent-body">Share a drink with a target; they cannot lie to you for the next hour.</div></div>
+<div class="talent-card rite"><div class="talent-name">The Velvet Invitation (Standard)</div><div class="talent-body">Gain automatic, unquestioned entry to any private social function (masquerade, salon, pleasure house, nobles' retreat). The invitation appears in your pocket, signed by a name you can borrow for one night. Costs 1 Obligation.</div></div>
+<div class="talent-card rite"><div class="talent-name">The Crimson Masquerade (High)</div><div class="talent-body">Assume the appearance of any person you have touched skin-to-skin, for one scene — your voice matches theirs perfectly. Costs 2 Fatigue.</div></div>
+<div class="talent-card rite"><div class="talent-name">The Unrefusable Offer (High)</div><div class="talent-body">Sing a bargain while touching the target. They must accept or suffer -2 dice to all rolls until they do. The offer must be something they could conceivably agree to (no suicide, no self-mutilation). Costs 2 Obligation.</div></div>
+
+<hr>
+
+<h2 id="patron-lucky-jack">🃏 Lucky Jack — The Lord of Thieves (Luck &amp; The Heist)</h2>
+<h3>Lore</h3>
+<p>Lucky Jack was once a mortal — a thief so skilled that even the gods took notice. He stole a coin from the Hollow's own pocket, and the Hollow laughed. "You are clever," it said. "But cleverness is a debt. One day, I will collect." Jack has been collecting luck ever since.</p>
+<p>He is the <em>Unspent Coin</em>, the <em>Magpie King</em>, the patron of urchins, beggars, and thieves who plan their work and work their plan. His followers are not murderers — they are professionals. They know the greatest heist is the one that leaves no trace, no victims, and no debts. Yet every stroke of luck is a loan, and Jack's interest rates are legendary. When he comes to collect, you will wish you had never met him.</p>
+<p>Among the peoples of Fate's Edge, Lucky Jack is known by many names. In Silkstrand, he is the <em>Cut Purse's Blessing</em>, whispered by pickpockets who know a moment's distraction is worth more than a year's labor. In Vhasia, he is the <em>Gorget-Breaker</em>, patron of disgraced knights turned thieves. In Zakov, he is the <em>Tide-That-Eats-The-Shore</em>, a slow, patient consumption that reshapes coastlines. In the Brass Coast, he is the <em>Freedman's Luck</em>, invoked by escaped slaves who steal to survive. Wherever a lock is picked, a purse is cut, or a plan comes together at the last possible second, Lucky Jack is already there — tipping his cap and counting the interest.</p>
+<blockquote>"Luck is not a gift. It is a loan. Pay it forward, or pay it dearly. The coin that never spends is the debt that never dies."</blockquote>
+<h3>Advantages for Rogues</h3>
+<ul>
+    <li><strong>The Lucky Coin</strong> — Once per session, reroll one die that came up 1; you must keep the new result. If the reroll is also a 1, the GM gains 2 SB instead of 1.</li>
+    <li><strong>The Clever Hand</strong> — On a Subterfuge, Craft, or Sleight of Hand roll, spend 1 Boon for +2 dice. If you fail, the GM gains 1 SB.</li>
+    <li><strong>The Quick Exit</strong> — When caught or cornered, reroll one failed escape roll. If you succeed, the GM gains 1 SB — your escape was too close.</li>
+    <li><strong>The Magpie's Eye</strong> — Once per scene, ask the GM one yes/no question about a target's weakness, habit, or hidden valuables. The GM must answer truthfully.</li>
+</ul>
+<h3>Drawbacks</h3>
+<ul>
+    <li><strong>The Unpayable Debt</strong> — Every use of Jack's luck marks a <em>Debt Timer [4]</em>. When it fills, Jack demands a service: a heist, a confession, or a coin given to a beggar who does not deserve it.</li>
+    <li><strong>Compulsive Gambler</strong> — You must take a risk when one is presented; -1 die to refuse a bet or a tempting opportunity.</li>
+    <li><strong>The Hollow's Coin</strong> — If you ever accumulate three unfulfilled Debts, the Hollow takes notice. You gain the <em>Marked by Jack</em> condition: -1 die to all luck-based rolls until you settle with him.</li>
+</ul>
+<h3>Rites for the Rogue Cantor</h3>
+<div class="talent-card rite"><div class="talent-name">The Lucky Pick (Low)</div><div class="talent-body">Reroll a failed Stealth or Subterfuge roll. Costs 1 Fatigue. If the reroll also fails, the GM gains 2 SB.</div></div>
+<div class="talent-card rite"><div class="talent-name">The Crowd's Distraction (Standard)</div><div class="talent-body">Create a distraction affecting all observers in Near range. Gain +2 dice to any Stealth or Subterfuge action taken during it. Costs 1 Obligation.</div></div>
+<div class="talent-card rite"><div class="talent-name">The Unseen Hand (Standard)</div><div class="talent-body">Pick one lock, disarm one trap, or bypass one guard as if you had +2 dice. If you fail, the GM gains 2 SB. Costs 1 Obligation.</div></div>
+<div class="talent-card rite"><div class="talent-name">The Magpie's Hoard (High)</div><div class="talent-body">Gain +2 dice to all rolls for the remainder of the session. Jack will demand repayment before the next session — complete a heist of at least 6 segments, or lose all accumulated Boons. Costs 2 Obligation.</div></div>
+<div class="talent-card rite"><div class="talent-name">The Unpayable Debt (High)</div><div class="talent-body">Demand one service from a creature who has accepted your help in the past. They must comply or gain a permanent Condition (Marked by Jack) imposing -1 die on all luck-based rolls until they comply. Costs 3 Obligation.</div></div>
+
+<div class="panel panel-orange mt-1">
+    <strong>The Cult of the Unlucky Coin</strong>
+    <p class="text-sm mt-1">Lucky Jack's cults gather where thieves naturally congregate: taverns, rooftops, the back rooms of pawn shops, and the spaces beneath bridges where urchins sleep. The Unlucky Coin is not a secret society — it is a fraternity of professionals. In one ritual, each member places a single coin in a central pot, then tells a story of a heist that went wrong. The best story wins the pot; the loser buys drinks for the circle. The coins are melted down and reforged into a single <em>Unlucky Coin</em>, passed to the season's most deserving thief. Their creed is stamped on every coin: "Luck is not a gift. It is a loan. Pay it forward, or pay it dearly." Outsiders may listen, but must speak one truth about a crime they've committed — or leave before the stories begin.</p>
+</div>
+
+<hr>
+
+<h2 id="patron-aveh">🐎 Aveh — The Rider Behind the Storm (For Fugitives)</h2>
+<h3>Lore</h3>
+<p>Aveh is the faceless rider at the horizon's edge. She offers freedom at the cost of belonging. Thieves who need to vanish — from a bad debt, a murder charge, a betrayed partner — pray to Aveh.</p>
+<h3>Advantages</h3>
+<ul>
+    <li><strong>The Escape Clause</strong> — Once per session, declare an escape route that was not there before. The GM must accept it, but may impose a cost (you left something behind).</li>
+    <li><strong>Forgotten Face</strong> — Witnesses have -2 dice to recall your description.</li>
+</ul>
+<h3>Drawbacks</h3>
+<ul>
+    <li><strong>The Erased Name</strong> — Each use of Aveh's power costs a minor personal connection (a contact forgets you, a safe house is no longer safe).</li>
+    <li><strong>No Home</strong> — You cannot stay in one city for more than a season without attracting the Rider's attention.</li>
+</ul>
+
+<hr>
+
+<h2 id="patron-malachai">⛓️ Malachai — The Chained Angel (For the Desperate)</h2>
+<p>See the expansion <em>Malachai, the Chained Angel</em> for full detail. For thieves, she offers cursed luck — a die that always rolls high, at the cost of a slow corruption. Use sparingly; Malachai is a patron for characters who are already falling.</p>
+
+<hr>
+
+<h2 id="choosing-your-patron">⚖️ Choosing Your Patron</h2>
+<table>
+<thead><tr><th>Patron</th><th>Best for</th><th>Worst for</th></tr></thead>
+<tbody>
+<tr><td>Ikasha</td><td>Silent infiltration, ghost thieves</td><td>Social scenes, bright areas</td></tr>
+<tr><td>Livaea</td><td>Courtesans, con artists, spies</td><td>Those who hate attention, the chaste</td></tr>
+<tr><td>Lucky Jack</td><td>Heist planners, gamblers, urchins</td><td>Those who fear debt, the unlucky</td></tr>
+<tr><td>Aveh</td><td>Fugitives, escape artists</td><td>Anyone who wants roots</td></tr>
+<tr><td>Malachai</td><td>Desperate gamblers, cursed builds</td><td>Long-term campaigns</td></tr>
+</tbody>
+</table>
+
+<hr>
+
+<div class="part-divider">Appendices</div>
+
+<h2 id="appendix-schemes">🗺️ Sample Schemes</h2>
+<div class="panel panel-gold">
+    <strong>The False Heir</strong>
+    <p class="text-sm mt-1">Forge a letter of introduction from a distant relative. Infiltrate a noble house. Steal the heirloom. Disappear before the real relative arrives.</p>
+    <p class="text-xs text-muted mt-1"><strong>Timers:</strong> Forgery [6], Infiltration [4], Escape [4].</p>
+</div>
+<div class="panel panel-gold">
+    <strong>The Ghost Cargo</strong>
+    <p class="text-sm mt-1">Steal a shipment of silk. Replace it with crates of sand. Sell the silk in another port using forged manifests. The merchant spends months investigating "thieves" who never existed.</p>
+    <p class="text-xs text-muted mt-1"><strong>Timers:</strong> Heist [6], Laundry [6], Investigation [8] (enemy).</p>
+</div>
+<div class="panel panel-gold">
+    <strong>The Rival's Downfall</strong>
+    <p class="text-sm mt-1">Plant forged evidence of embezzlement in a rival thief's safehouse. Tip off the Watch. Claim their territory when they are arrested.</p>
+    <p class="text-xs text-muted mt-1"><strong>Timers:</strong> Forgery [4], Infiltration [4], Frame Job [6], Territory Grab [4].</p>
+</div>
+<div class="panel panel-purple">
+    <strong>Adventure Seed: The Unspent Coin</strong>
+    <p class="text-sm mt-1">Madam Serafine has lost something she cannot afford to lose: a single unmarked coin she has carried since her first heist. The coin is the <em>interest</em> on her pact with Livaea — as long as she holds it, the debt is manageable. Without it, Livaea can call in the principal at any time.</p>
+    <p class="text-sm mt-1">The coin was stolen by a rival thief who does not know its true value — a follower of Lucky Jack who believes it's just a lucky charm, and is using it to win at cards in the Dye District.</p>
+    <p class="text-sm mt-1">Serafine cannot retrieve it herself — that would be a sign of weakness. She hires the party to find the thief, recover the coin, and return it to her <em>without anyone knowing she sent them</em>. The party must decide: return the coin and earn Serafine's eternal gratitude, or keep it and gain a powerful bargaining chip against the Velvet Court's most dangerous Creditor.</p>
+    <blockquote class="mt-1">"The coin is not silver. It is not gold. It is a piece of my soul, minted the night I made my deal. If you keep it, you will have power over me. If you return it, you will have my loyalty. Choose carefully. Both are debts that can never be fully paid."</blockquote>
+</div>
+
+<hr>
+
+<h2 id="appendix-npcs">👥 NPC Profiles</h2>
+<div class="grid-2">
+    <div class="npc-card">
+        <div class="npc-name">Captain Vellis (The Watch Captain, Corrupt)</div>
+        <div class="npc-role">Tier III</div>
+        <div class="npc-motivation">Strings: patrol routes, jail keys, informant network.</div>
+        <div class="npc-leverage">Leverage: he owes you for not exposing his affair.</div>
+        <div class="npc-quirk">Price: 1 Favor buys one night of ignored patrols.</div>
+    </div>
+    <div class="npc-card">
+        <div class="npc-name">Old Kes (The Fence)</div>
+        <div class="npc-role">Tier II</div>
+        <div class="npc-motivation">Strings: underground market, smuggler boats, counterfeit coin.</div>
+        <div class="npc-leverage">Price: 50% of the value, no questions. For an extra 10%, he'll also launder the goods (start Laundry Timer at +1).</div>
+    </div>
+    <div class="npc-card">
+        <div class="npc-name">"Quick" Lena (The Rival Thief)</div>
+        <div class="npc-role">Tier III</div>
+        <div class="npc-motivation">Strings: a network of urchin spies, a stolen set of master keys, a grudge against you.</div>
+        <div class="npc-leverage">Weakness: she cannot resist a taunt. Use Deception to draw her into a trap.</div>
+    </div>
+    <div class="npc-card">
+        <div class="npc-name">Scribe Marlo (Court Informant)</div>
+        <div class="npc-role">Tier I</div>
+        <div class="npc-motivation">Strings: access to the Archivolt's night shift, a gambling debt.</div>
+        <div class="npc-leverage">Price: 1 Boon buys a copy of tomorrow's court docket (reveals who is being investigated).</div>
+    </div>
+    <div class="npc-card">
+        <div class="npc-name">Celeste (Livaean Courtesan, Information Broker)</div>
+        <div class="npc-role">Tier II (but with access to Tier IV secrets)</div>
+        <div class="npc-motivation">Strings: a network of wealthy clients, a black book of secrets, a standing invitation to every salon.</div>
+        <div class="npc-leverage">Price: a secret for a secret, or a favor for a night's companionship — she never sleeps with anyone she does not choose.</div>
+    </div>
+</div>
+
+<hr>
+
+<h2 id="appendix-rumors">💬 Velvet Court Rumors (d12)</h2>
+<p class="text-sm">Use these to seed adventures or color scenes.</p>
+<ol>
+    <li>The Gray Eminence is actually a Veiled Sister who defected. She knows the true name of a bound spirit that guards the Sunken Quarter.</li>
+    <li>Old Kes is dying. He has hidden his fortune in three different locations. Whoever finds it first inherits his smuggling network.</li>
+    <li>Madam Serafine has a daughter. No one knows who the father is. The daughter is being raised by Sister Agatha.</li>
+    <li>The Archivolt has a secret room containing every forged seal the Court has ever used. The key is held by the Archivist's ghost.</li>
+    <li>The Dockmaster's warehouse on Pier Nine is a front for a Tulkani story-teller who trades in forgotten names.</li>
+    <li>A new faction, the "Silk Purse," is trying to muscle in on the Velvet Court's territory. They are backed by a Kahfagian privateer.</li>
+    <li>The Blue Ledger has a missing page. That page lists the name of a person who cannot be bribed.</li>
+    <li>The Maze of Whispers connects to the Ways Between. Something comes through at midnight.</li>
+    <li>The Ninth Key legend is real. One fragment is held by the Gray Eminence. Another is in the Archivolt's vault.</li>
+    <li>Sister Agatha was once a Veiled Sister. She left the order after being ordered to bind a child's spirit.</li>
+    <li>The Watch Captain's daughter is a member of the Velvet Court. She is the one who feeds him false information.</li>
+    <li>The Velvet Court was founded by a Trow who wanted to study human greed. The Trow is still alive, waiting in the Under-arcades — and the Trow knows who Madam Serafine sold her soul to. It was not a god. It was Livaea herself, and the contract is written on a single silk ribbon tied around Serafine's wrist. She has not cut it because she cannot. The ribbon is her skin now.</li>
+</ol>
+
+<hr>
+
+<h2 id="appendix-rival-crew">🥷 Rival Crew Generator</h2>
+<p class="text-sm">When the GM needs a rival crew, roll on the tables below or choose options that fit the story.</p>
+<div class="grid-2">
+    <div class="panel panel-blue">
+        <strong>Name (d6)</strong>
+        <ol class="text-sm mt-1"><li>Ashen Cord</li><li>Brass Legion</li><li>Thorns of Winter</li><li>Silken Veil</li><li>Iron Maw</li><li>Shadow Consortium</li></ol>
+    </div>
+    <div class="panel panel-blue">
+        <strong>Composition (Leader + 2-4 roles)</strong>
+        <p class="text-sm mt-1">Roll d6 for the number of additional roles (2-5), then choose or roll: Leader (planner/face), Enforcer (violence/intimidation), Fence (moves goods), Informant (street intelligence), Technician (locks/traps/devices), Driver (vehicles/escape), Grifter (cons/social manipulation), Scout (recon/surveillance).</p>
+    </div>
+    <div class="panel panel-mist">
+        <strong>Patron (d6)</strong>
+        <ol class="text-sm mt-1"><li>A noble seeking deniable assets</li><li>A merchant house protecting trade interests</li><li>A temple faction advancing their agenda</li><li>A foreign power gathering intelligence</li><li>A criminal syndicate expanding influence</li><li>A mysterious benefactor with unknown motives</li></ol>
+    </div>
+    <div class="panel panel-mist">
+        <strong>Goal (d6)</strong>
+        <ol class="text-sm mt-1"><li>Same artifact or information the PCs seek</li><li>Eliminate the PCs to remove competition</li><li>Claim a specific turf node or racket</li><li>Expose the PCs to the authorities</li><li>Disrupt a specific Velvet Court operation</li><li>Accumulate wealth and influence in the underworld</li></ol>
+    </div>
+    <div class="panel panel-purple">
+        <strong>Relationship (d6)</strong>
+        <ol class="text-sm mt-1"><li>Open hostility - active conflict</li><li>Professional rivalry - compete for same scores</li><li>Uneasy truce - cooperate when beneficial</li><li>Former allies - bad blood from a past job</li><li>Mentor-struck - one trained the other</li><li>Family ties - complicated personal history</li></ol>
+    </div>
+    <div class="panel panel-purple">
+        <strong>Resource (d6)</strong>
+        <ol class="text-sm mt-1"><li>Specialized equipment (e.g., wardbreaker tools)</li><li>Network of informants in a specific district</li><li>Access to legitimate business fronts</li><li>Political connections in the city guard</li><li>Magical or supernatural assistance</li><li>Large cash reserves for bribes and gear</li></ol>
+    </div>
+</div>
+<div class="panel panel-orange">
+    <strong>Agenda Timer [6]</strong>
+    <p class="text-sm mt-1">Track the rival crew's progress toward their goal. Tick the timer when the party ignores them or their activities, the GM spends 2+ SB on their off-screen activity, or they successfully complete a step toward their goal. When it fills, the rival crew achieves their goal — which may complicate the PCs' plans.</p>
+</div>
+
+<hr>
+
+<h2 id="silk-house">💋 The Silk House — A Livaean Brothel Asset</h2>
+<blockquote>A well-run house of pleasure is a fortress of secrets. The coin paid at the door buys only the first hour. The second hour costs a confession. The third buys a silence that can never be broken.<br>— Madam Serafine, <em>The Velvet Touch</em></blockquote>
+
+<h3>The Velvet Altar</h3>
+<p class="text-sm">In the back rooms of Silkstrand's finest pleasure houses, behind curtains dyed with madder and saffron, small shrines to Livaea stand in alcoves — a candle, a mirror, a single silk ribbon tied in a lover's knot. Livaea does not demand celibacy or shame. She blesses the transaction: the honest exchange of comfort for coin, of secrecy for safety, of power for pleasure.</p>
+<p class="text-sm">A brothel dedicated to Livaea is not merely a business. It is a <strong>threshold</strong> — a place where masks are laid aside, where the powerful become vulnerable, where a whisper in the dark can ruin a dynasty. The courtesans are priestesses. The Madame is her high priestess. Every client who crosses the threshold leaves behind a piece of themselves — a secret, a preference, a name that should not have been spoken.</p>
+<p class="text-sm">The Velvet Court has long maintained an understanding with Livaea's faithful. Information flows both ways. A thief who insults a Livaean courtesan finds every door closed. A patron who pays generously may find a lock unpicked by morning.</p>
+
+<h4>Running a Velvet Racket</h4>
+<p class="text-sm">When the party controls a territory (e.g., the Dye District docks, the Three-Queens Bridge approach), the GM notes this as a Turf Node. Each node has a Racket (Fencing Operation, Smuggling Cut, Protection Circle, or Information Stall). Holding turf requires a Hold roll (Wits+Tactics vs DV 2-4) each session.</p>
+<div class="panel panel-blue">
+    <strong>Example Turf Node: Dye District Docks — Racket: Fencing Operation</strong>
+    <p class="text-sm mt-1"><strong>Hit:</strong> Bank +1 or local goodwill (reduce DV by 1 on one social roll made in this territory).<br><strong>Miss:</strong> War [8] timer starts with 1 segment filled (rivals begin contesting control).</p>
+</div>
+
+<h3>The Silk House as an Asset (Major Asset, 12 XP)</h3>
+<p class="text-sm">A Silk House is a <strong>Major Asset</strong> (12 XP) that provides off-screen leverage through blackmail, rumor, and social access. It cannot be purchased quickly; establishment requires one month of in-game time to recruit staff, secure premises, and build a clientele (or take over an existing establishment).</p>
+<ul>
+    <li><strong>Cost:</strong> 12 XP</li>
+    <li><strong>Establishment:</strong> 1 month (or as story permits)</li>
+    <li><strong>Upkeep:</strong> Pay 12 XP per downtime, or devote a full scene to managing it (settling disputes, bribing the Watch, maintaining cover).</li>
+    <li><strong>Capacity (Optional):</strong> Counts as one Asset against your Spirit limit.</li>
+</ul>
+
+<h4>Free Use (Once per Session, Off-Screen)</h4>
+<p class="text-sm">Choose one benefit at the start of a scene. The effect is narrative, not rolled.</p>
+<ul>
+    <li><strong>Blackmail File</strong> — Compromising information on a named minor NPC. Once, improve Position by one step on a social action against them, or demand a minor favor. The file is consumed after use; a downtime scene is needed to gather new material (part of upkeep).</li>
+    <li><strong>Rumor Mill</strong> — Before a city scene, state a plausible rumor about a person, place, or upcoming event. The GM must incorporate it as true (though possibly incomplete or misleading).</li>
+    <li><strong>Soft Influence</strong> — Skip one social gatekeeping roll (gaining an audience, obtaining an invitation) by stating a Silk House client made the introduction.</li>
+    <li><strong>Safe Harbour</strong> — A fugitive or witness can hide in the Silk House for one scene without risk of discovery (unless searchers explicitly search brothels).</li>
+</ul>
+
+<h4>Scene Surge (Spend 1 Boon, On-Screen)</h4>
+<ul>
+    <li><strong>The Velvet Curtain</strong> — A courtesan distracts a guard or mark at a critical moment; the next Stealth or Subterfuge roll gains +1 die.</li>
+    <li><strong>A Whisper in the Right Ear</strong> — An influential client intervenes on your behalf; reduce DV by 1 on a single Petition or Broker roll.</li>
+    <li><strong>The Back Stair</strong> — Escape through a hidden passage known only to the house; convert a pursuit consequence into a temporary complication.</li>
+    <li><strong>A Taste of Honey</strong> — A courtesan loosens a target's tongue; the next Sway roll against that target treats Position as Dominant.</li>
+</ul>
+<p class="text-sm">You may spend <strong>2 XP</strong> to trigger the Free Use benefit an additional time in a session.</p>
+
+<h3>The Madame as a Terrestrial Patron</h3>
+<p class="text-sm">The Silk House is a living organization with its own will, debts, and demands. The Madame (a named NPC, Tier II or III) acts as a terrestrial patron. Characters who draw deeper on the House's resources may swear an oath to Livaea (or to the Madame) and incur Obligation.</p>
+
+<h4>Obligation Track</h4>
+<p class="text-sm"><strong>Capacity:</strong> Spirit + 2. Mark Obligation when calling on the House's resources beyond normal Free Use:</p>
+<table>
+<thead><tr><th>Request</th><th>Obligation Cost</th></tr></thead>
+<tbody>
+<tr><td>Use Free Use a second time in a session</td><td>+1</td></tr>
+<tr><td>Ask the Madame to hide a fugitive for a week</td><td>+2</td></tr>
+<tr><td>Request a forged letter of introduction to a high noble</td><td>+2</td></tr>
+<tr><td>Borrow a Livaean Rite (e.g., Golden Tongue or The Unrefusable Offer)</td><td>+3</td></tr>
+<tr><td>Demand the House use its blackmail to ruin a rival (major action)</td><td>+4</td></tr>
+</tbody>
+</table>
+<p class="text-sm">When Obligation exceeds Capacity, the Madame sends a polite request: a favor to be named later. Refuse it, and the House's Free Use is unavailable until you clear the debt. Ignore her twice, and she sells one of your secrets to a rival (GM chooses a String you lose).</p>
+
+<h4>Madame's Favors (Clearing Obligation)</h4>
+<ul>
+    <li><strong>Performing a Service</strong> (eliminate a rival brothel, intimidate a blackmail victim, deliver a secret to a client) — reduces Obligation by 2-4 depending on difficulty.</li>
+    <li><strong>Paying Coin</strong> — 1 Boon reduces Obligation by 1; 1 Diamond (a Forged Document or valuable item) reduces it by 2.</li>
+    <li><strong>Sponsoring a New Courtesan</strong> — Recruit a talented individual (Cap 1-2 follower) to work at the House. Reduces Obligation by 3.</li>
+</ul>
+
+<div class="npc-card">
+    <div class="npc-name">Sample Madame: Madam Illara (Tier III)</div>
+    <div class="npc-role">Madam Serafine's Rival</div>
+    <div class="npc-motivation">🎯 Expand her influence into the Brass Coast; compete with Serafine's Velvet Court.</div>
+    <div class="npc-quirk">🎭 Lost an eye to a jealous client; wears a ruby in the socket that glows faintly when someone lies.</div>
+    <div class="npc-leverage">💰 Strings: clients among the Admiralty, the Dye Syndicate, and the Archivolt. Knows which notary can be bought for a night's company.</div>
+</div>
+
+<h3>Upkeep and Complications</h3>
+<p class="text-sm">Each downtime, perform one of the following: pay 12 XP (bribes, repairs, salaries), devote a full scene to managing the House, or perform a Service for Livaea (GM's choice — sponsor a festival, sabotage a purity crusade, deliver a secret to a Livaean shrine).</p>
+<p class="text-sm">If upkeep is neglected for one downtime, the House becomes <strong>Neglected</strong>: Free Use only works half the time (roll 1d6, 1-3 = fail), and Obligation cannot be cleared by Boons (only by services).</p>
+<p class="text-sm">Neglected for two consecutive downtimes, the House becomes <strong>Compromised</strong>: it provides no Free Use until restored, a rival brothel gains +1 Favor with the Watch, and the GM may advance a Rival Timer (e.g., Watch Raid or Syndicate Takeover). Restoring a Compromised House requires a full arc (2-3 sessions) of in-game work, not just XP payment.</p>
+
+<h4>Complications (d6)</h4>
+<ol>
+    <li><strong>A Jealous Rival</strong> — Another pleasure house sends thugs to intimidate your staff. Mark +1 Obligation to the Madame or lose 1 Boon.</li>
+    <li><strong>Watch Inspection</strong> — A corrupt captain demands a bribe. Pay 1 Boon or the House becomes Neglected for this session.</li>
+    <li><strong>A Client's Secret Leaks</strong> — Someone you blackmailed threatens to expose you. Gain Exposure +1 (city faction).</li>
+    <li><strong>Livaea's Price</strong> — The goddess demands a favor: sponsor a festival, deliver a cursed mirror, etc. Refuse and the House's Free Use is unavailable for one session.</li>
+    <li><strong>Purity Crusade</strong> — A temple zealot preaches against the House. Social rolls in that district are -1 Position until you bribe or discredit them.</li>
+    <li><strong>The Hollow's Interest</strong> — An Oath-Keeper is seen loitering outside. The House is safe, but the party feels watched. The GM gains 1 SB to spend on a future complication.</li>
+</ol>
+
+<h4>Sample Blackmail Files (d6)</h4>
+<ol>
+    <li><strong>The Watch Captain's Affair</strong> — He visits every Restday. Leverage: one ignored patrol.</li>
+    <li><strong>The Merchant's False Ledger</strong> — You have a copy of his tax fraud. Leverage: 20% discount on his goods.</li>
+    <li><strong>The Notary's Forged Seal</strong> — He sealed a treaty that never existed. Leverage: one document stamped without question.</li>
+    <li><strong>The Admiral's Illegitimate Child</strong> — He pays for the child's silence. Leverage: safe passage through harbor patrols.</li>
+    <li><strong>The Priest's Coded Letters</strong> — He corresponds with a rival temple. Leverage: he will preach a sermon of your choosing.</li>
+    <li><strong>The Noble's Secret Marriage</strong> — He married below his station. Leverage: one invitation to a closed salon.</li>
+</ol>
+
+<h4>Adventure Hooks</h4>
+<ul>
+    <li><strong>The Purge</strong> — A new temple faction demands the closure of all Livaean houses. The party must defend the Silk House — legally, violently, or by exposing the zealot's own hypocrisy.</li>
+    <li><strong>The Black Book</strong> — A former client steals the House's blackmail ledger. He threatens to publish it unless the party retrieves a cursed artifact for him.</li>
+    <li><strong>The Rival Courtesan</strong> — A newly arrived courtesan is actually a spy for the Veiled Sisters, using the House to identify Livaean followers for elimination.</li>
+    <li><strong>The Ninth Client</strong> — A stranger pays for a night but never leaves his room. He is an Oath-Keeper, waiting for the House to offer him a secret as tribute. The party must learn what he wants before he collects.</li>
+</ul>
+
+<h4>Integration with Velvet Court and Livaea's Cult</h4>
+<p class="text-sm">If the party already belongs to the Velvet Court, the Silk House can be a Creditor's asset — Madam Serafine may own a share. The party's Velvet Dial may affect House benefits (e.g., at +2 Dial, the Free Use ignores one complication per session; at -2 Dial, the House is raided by the Watch).</p>
+<p class="text-sm">For followers of Livaea, the Silk House counts as a Minor Shrine — her Rites (e.g., Golden Tongue, The Unrefusable Offer) can be learned there without a separate temple. Using a Livaean Rite within the House reduces its Obligation cost by 1 (minimum 1).</p>
+
+<blockquote>The silk sheets hide more than skin. They hide the ledger of the soul. Treat the House well, and it will pay you back a thousand times. Treat it poorly, and you will find your own name on a very different kind of list.<br>— Madam Serafine, <em>The Velvet Touch</em></blockquote>
+
+<hr>
+
+<div class="panel panel-mist">
+    <strong>Colophon</strong>
+    <p class="text-sm mt-1">This book was written in a back room of the Velvet Court, on paper that had once been a customs manifest. The ink is lamp-black cut with the ash of a burned ledger. The binding is silk thread, dyed red with madder root and a single drop of the author's own blood — for luck.</p>
+    <p class="text-sm mt-1">The lantern gutters. The night is young. There is a mark waiting at the Counting House, and he does not yet know that his fortune is already spent.</p>
+    <p class="text-xs text-muted mt-1" style="text-align:right;">— Madam Serafine, Silkstrand, under the Three-Queens Bridge. The ink is fresh. The coin is warm.</p>
+</div>
+
+<div class="footer">
+    Fate's Edge Proprietary Content — (c) 2024 Nicholas A. Gasper. All rights reserved.
+</div>
+
+</body>
+</html>

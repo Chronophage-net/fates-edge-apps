@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Hearth Ledger — Tales of the Threshold Regions</title>
+    <style>
+        :root {
+            --bg1: #120d0a;
+            --bg2: #1c130d;
+            --bg3: #241a12;
+            --bg4: #2e2118;
+            --text: #ede0d4;
+            --text2: #c2a892;
+            --text3: #8a7160;
+            --gold: #c1752f;
+            --gold-hover: #d68a42;
+            --border: #3d2c1f;
+            --red: #a13a2a;
+            --green: #6a7a3d;
+            --blue: #3d6a78;
+            --purple: #6b4a72;
+            --orange: #d68a2a;
+            --ember: #e0592b;
+            --ash: #6b5f54;
+            --radius: 8px;
+            --font: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            --serif: Georgia, 'Iowan Old Style', 'Palatino Linotype', serif;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            background: var(--bg1);
+            background-image: radial-gradient(circle at 50% 0%, #1c130a 0%, #120d0a 60%);
+            color: var(--text);
+            font-family: var(--font);
+            padding: 1.5rem;
+            max-width: 1000px;
+            margin: 0 auto;
+            line-height: 1.65;
+        }
+        h1, h2, h3, h4, h5 { color: var(--gold); margin: 0.5rem 0 0.3rem; font-family: var(--font); }
+        h1 { font-size: 1.9rem; border-bottom: 2px solid var(--gold); padding-bottom: 0.35rem; }
+        .subtitle { color: var(--text2); font-style: italic; margin-bottom: 0.8rem; font-size: 1rem; }
+        h2 { font-size: 1.3rem; border-bottom: 1px solid var(--border); padding-bottom: 0.25rem; margin-top: 1.8rem; }
+        h3 { font-size: 1.08rem; color: var(--orange); margin-top: 1.3rem; }
+        a { color: var(--gold); text-decoration: none; }
+        p { margin: 0.55rem 0; }
+        .panel {
+            background: var(--bg2);
+            border-radius: var(--radius);
+            padding: 0.7rem 0.9rem;
+            border: 1px solid var(--border);
+            margin: 0.6rem 0;
+        }
+        .panel-gold { border-left: 4px solid var(--gold); }
+        .panel-red { border-left: 4px solid var(--red); }
+        .panel-blue { border-left: 4px solid var(--blue); }
+        .panel-green { border-left: 4px solid var(--green); }
+        .panel-purple { border-left: 4px solid var(--purple); }
+        .panel-orange { border-left: 4px solid var(--orange); }
+        .badge {
+            display: inline-block;
+            padding: 0.05rem 0.55rem;
+            border-radius: 12px;
+            font-size: 0.65rem;
+            font-weight: 600;
+            margin: 0.1rem 0.15rem 0.1rem 0;
+        }
+        .badge-gold { background: var(--gold); color: #170f00; }
+        .badge-red { background: var(--red); color: #fff; }
+        .badge-green { background: var(--green); color: #fff; }
+        .badge-blue { background: var(--blue); color: #fff; }
+        .badge-purple { background: var(--purple); color: #fff; }
+        .badge-orange { background: var(--orange); color: #170f00; }
+        .badge-gray { background: var(--bg4); color: var(--text3); }
+        .text-muted { color: var(--text3); }
+        .text-sm { font-size: 0.85rem; }
+        .toc {
+            background: var(--bg3);
+            border-radius: var(--radius);
+            padding: 0.7rem 1rem;
+            border: 1px solid var(--border);
+            columns: 2;
+            column-gap: 1.5rem;
+        }
+        .toc-title { column-span: all; }
+        .toc a {
+            color: var(--text2);
+            display: block;
+            padding: 0.12rem 0;
+            font-size: 0.85rem;
+            break-inside: avoid;
+        }
+        .toc a:hover { color: var(--gold); }
+        .toc .toc-cluster { color: var(--orange); font-weight: 600; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.03em; margin-top: 0.5rem; break-inside: avoid; }
+        @media (max-width: 650px) { .toc { columns: 1; } }
+        hr { border: none; border-top: 1px solid var(--border); margin: 0.8rem 0; }
+        .byline {
+            color: var(--text2);
+            font-style: italic;
+            font-size: 0.88rem;
+            margin: 0.2rem 0 0.7rem 0;
+            padding-left: 0.7rem;
+            border-left: 2px solid var(--border);
+        }
+        .story {
+            font-family: var(--serif);
+            font-size: 1rem;
+            color: var(--text);
+        }
+        .story p { margin: 0.7rem 0; }
+        .story em, .story i { color: var(--text2); }
+        .closing {
+            margin-top: 0.8rem;
+            padding: 0.5rem 0.8rem;
+            border-left: 3px solid var(--ember);
+            background: var(--bg2);
+            border-radius: 0 var(--radius) var(--radius) 0;
+            font-style: italic;
+            color: var(--text2);
+            font-size: 0.88rem;
+        }
+        .closing .attrib { display: block; margin-top: 0.3rem; color: var(--text3); font-style: normal; font-size: 0.75rem; }
+        .region-tag { font-size: 0.7rem; color: var(--ash); text-transform: uppercase; letter-spacing: 0.05em; }
+        blockquote {
+            border-left: 3px solid var(--gold);
+            padding-left: 1rem;
+            margin: 0.6rem 0;
+            color: var(--text2);
+            font-style: italic;
+        }
+        .flex { display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center; }
+        .colophon-list { margin-left: 1.2rem; font-size: 0.85rem; color: var(--text2); }
+        .colophon-list li { margin: 0.15rem 0; }
+        footer {
+            font-size: 0.75rem;
+            color: var(--text3);
+            text-align: center;
+            padding: 1.2rem 0 0.5rem;
+            margin-top: 1.5rem;
+            border-top: 1px solid var(--border);
+        }
+    </style>
+</head>
+<body>
+
+<h1>🕯️ The Hearth Ledger</h1>
+<p class="subtitle">Tales of the Threshold Regions — Set down by Dusana of the Raven Road</p>
+<p class="flex" style="margin-bottom:0.8rem;">
+    <span class="badge badge-gold">Anthology</span>
+    <span class="badge badge-orange">17 Regional Tales</span>
+    <span class="badge badge-blue">Folklore &amp; GM Flavor</span>
+    <span class="badge badge-gray">Author: Nicholas A. Gasper</span>
+</p>
+
+<div class="panel panel-gold">
+    <p>A story is not a reckoning. It balances nothing. But it warms the hands.</p>
+    <p>You travel. You sit by fires. Someone speaks. You write. The ash on your cuff becomes ink. That is all. That is enough. These tales were told by midwives, bell-wardens, hedge-mothers, cord-weavers, herders, and ferrymen, gathered on the road from one threshold to the next — one tale for nearly every region and people I have crossed, kept as they were told, or as close to it as ink allows.</p>
+    <p>What follows is not the whole of what I carried home. It is the part worth keeping — the tales that still hold their heat when the fire has gone to coals. A gamemaster may use them as they were given to me: read aloud for flavor when the party arrives somewhere new, as a cold open before a session, or as the seed of a night's trouble in whatever region the road has brought your table to. Read them. Or do not. The hearth waits either way.</p>
+</div>
+
+<div class="toc">
+    <div class="toc-title"><strong style="color:var(--gold);">📖 Table of Contents</strong></div>
+    <div class="toc-cluster">The High Country</div>
+    <a href="#aeler">The Vent That Whispered — Aeler</a>
+    <a href="#ykrul">The Warrior Who Refused to Call the Runner — Ykrul</a>
+    <div class="toc-cluster">Hearth &amp; Harvest</div>
+    <a href="#aelaerem">The Hollow Bride — Aelaerem</a>
+    <a href="#oshiira">The Grain That Spoke — Oshiira</a>
+    <div class="toc-cluster">The Lethai Dominion</div>
+    <a href="#lethai-al">The Silk Witness — Lethai-al</a>
+    <a href="#lethai-ar">The Bargain of the Shed Skin — Lethai-ar</a>
+    <div class="toc-cluster">Coast, Tide &amp; Sail</div>
+    <a href="#linn">The Selkie's Oath — Linn</a>
+    <a href="#kahfagia">The Lantern That Remembered — Kahfagia</a>
+    <a href="#zakov">The Coin That Came Back — Zakov</a>
+    <div class="toc-cluster">The City-States</div>
+    <a href="#ecktoria">The Reckoner's Mask — Ecktoria</a>
+    <a href="#thepyrgos">The Stair That Was Not — Thepyrgos</a>
+    <a href="#vhasia">The Bride of Nine Knots — Vhasia</a>
+    <div class="toc-cluster">The Southern Courts</div>
+    <a href="#ashaan">The Veil and the Cradle — Ashaan</a>
+    <a href="#dhahara">The Ford That Moved — Dhahara</a>
+    <div class="toc-cluster">The Mist and the Threshold</div>
+    <a href="#mistlands">The Bell That Never Rang — Mistlands</a>
+    <a href="#trow">The Bargain of the Unlit Lamp — Trow</a>
+    <a href="#hagmorag">The Soup That Was Free — Hag Morag</a>
+</div>
+
+<hr>
+
+<!-- ===================== THE HIGH COUNTRY ===================== -->
+<h2 id="high-country">⛏️ The High Country</h2>
+
+<h3 id="aeler">The Vent That Whispered</h3>
+<p class="region-tag">Aeler — the Aelerian Range</p>
+<p class="byline">Told by Old Orra, lamp-keeper of the Third Stack. She has not gone underground in thirty years, but still counts her breaths before sleep. She told this tale in the dark and would not light a candle.</p>
+<div class="story">
+<p>You ever walk the Deep Galleries alone? No. Good. Don't start.</p>
+<p>The air down there has a measure. Eight breaths to a corridor. Sixteen to a chamber. Thirty-two, and you've gone too far to matter. Breathe, count, turn. Never answer the ninth.</p>
+<p>I was young. Lamp trimmed, chalk dry, walking from the Third Stack to the old sump — an easy two-hour walk. At the junction — you know the one, three tunnels, the middle one always drips — I stopped. Something was wrong. The drip had stopped. The echo had changed. The stone felt soft under my boot. And then I heard it.</p>
+<p>Not with my ears. Inside. Like a memory that wasn't mine, someone else's grief pressed into my skull like a thumb into clay.</p>
+<p><em>"Count the ninth breath."</em></p>
+<p>I didn't. I walked faster. The voice followed.</p>
+<p><em>"The ninth holds the name of the miner who died here. The year the pillar cracked. The road to the lost sump. The name of the man who forgot to turn back."</em></p>
+<p>My lamp flickered — burned blue for a heartbeat. I didn't stop to trim it. I kept counting. Eight in, eight out, lips moving. The voice couldn't find the crack.</p>
+<p>When I reached the surface, the lamp was dry and my shadow was gone. The sun was setting and I cast nothing. The other miners stared. They did not ask.</p>
+<p>The next morning I looked in a mirror — real brass, not a puddle — and the reflection smiled first.</p>
+<p>It took a week for the shadow to come back, and another for my left hand to stop writing in a script I couldn't read. The Vent-Prior said the deep had spoken and I hadn't answered, and that was mercy — that the mountain respects the ones who know where the door is.</p>
+<p>She made me lamp-keeper after that. I never went down again. I tend the wicks. I count the hours. I do not breathe in rhythm.</p>
+</div>
+<div class="closing">"Stone remembers. So does the space between breaths. Answer neither. And if you must walk the deep, count to eight — then start over. The ninth is not for you."<span class="attrib">— the Witch's Closing</span></div>
+
+<h3 id="ykrul">The Warrior Who Refused to Call the Runner</h3>
+<p class="region-tag">Ykrul — the steppe clans</p>
+<p class="byline">Told by Temur Many-Scars, a steppe rider with a braid to his belt and a laugh like breaking bones. He taught me the board game <em>kon'reh</em> that night. I lost every match.</p>
+<div class="story">
+<p>The clan-mother called a muster. We were young, hungry, and stupid — the kind of stupid that gets carved into the archive as a lesson for grandchildren. My cousin, bold as a winter wolf and half as patient, wanted glory. He pushed his War-Chief forward across the board without counting exits. He just pushed.</p>
+<p>The enemy stepped aside. Let him pass. Let him think he was winning. That's the oldest trick on the steppe: give a fool enough rope and he'll hang himself. Give a warrior enough board and he'll forget the Well.</p>
+<p>By the time he reached the Well, his cut was spent. He looked at the far Well. Empty. He could Call a Runner — but his War-Chief would be Rooted for a breath. Fixed. A target the size of a tent flap.</p>
+<p>I said, "Don't. Their War-Chief still has a cut. They're two breaths from boxing you in. Count the shadow before you move."</p>
+<p>He laughed. "They won't risk it. Cowards. They haven't moved in three beats."</p>
+<p>He called.</p>
+<p>The enemy hopped a single stone — the smallest move on the board, the kind you learn on your first day and forget by your second — landed on the Well, and knocked his War-Chief clean off it. The Five-Breath Race started ticking. Five beats to plant his banner or lose the match, the tribute, and the clan's good opinion.</p>
+<p>He didn't. He couldn't. The enemy had already welded the approach. Every lane ended in the shadow of a stone. The race was dead before it started. The banner never touched ground.</p>
+<p>We lost. The clan paid tribute for a year — silver, horses, three strings of good beads my grandmother had woven. The clan-mother made us watch as she handed them over.</p>
+<p>She demoted him to herd-watcher. Took his braid. Took his seat at the fire. "You forgot the first number," she said. "Not the second, not the third. The first. Count exits before you count glory. Call only when the geometry is yours. The board does not forgive. Neither do I."</p>
+<p>My cousin watched the sheep for three winters. He learned to count. He never played kon'reh again.</p>
+</div>
+<div class="closing">"A free War-Chief is a noose waiting for a neck. Call only when the shadow is yours. Always keep one cut for the door. The board is patient. It will wait for you to forget."<span class="attrib">— the Witch's Closing</span></div>
+
+<hr>
+
+<!-- ===================== HEARTH & HARVEST ===================== -->
+<h2 id="hearth-harvest">🌾 Hearth &amp; Harvest</h2>
+
+<h3 id="aelaerem">The Hollow Bride</h3>
+<p class="region-tag">Aelaerem — the mill villages</p>
+<p class="byline">Told by Mabs the Miller, a round woman with flour on her apron and a cider-cup always half full. She works the grindstone while she talks. She says the Hollow speaks to her at night. She would not say what it says.</p>
+<div class="story">
+<p>You know about the ninth cup, don't you? Course you do. Every child knows: you pour eight. You never pour the ninth. The ninth is for the Hollow.</p>
+<p>But children forget. Or they get curious. Or they think the rules are for other people. That's how it always starts.</p>
+<p>Little Kesta — seven, maybe eight — went to the well at dusk while the grown folk were at the harvest feast, the kind where the ale flows and the children run wild and no one watches the threshold. She was meant to draw water for the morning bread. She'd done it a hundred times.</p>
+<p>She counted the buckets. One, two, three, four, five, six, seven, eight. She pulled them up, set them in a row. The water was clear. The moon wasn't up yet. The well was just a well.</p>
+<p>Then she thought: what's one more? Just to see.</p>
+<p>She drew the ninth bucket. The rope was cold. The water was black — not dark, black, like ink poured into the deep and stirred with a bone. And something climbed out.</p>
+<p>It wore her mother's wedding dress, the one that hung in the cedar chest untouched since the plague year. It smiled with her mother's mouth, the tired smile her mother wore when she was pretending not to be tired. But its eyes were the color of a drowned moon — gray, swollen, watching.</p>
+<p>"Hollow Bride," Kesta whispered. That's what the old folk call it. You don't name it. You don't speak its name. You don't give it that kind of hold. She named it anyway.</p>
+<p>The Bride followed her home, three paces behind, silent as a held breath. It stood outside the red door. It knocked — three knocks, a pause, three more. The rhythm of a heart that stopped. The rhythm of someone counting to eight and waiting.</p>
+<p>Kesta's mother opened the door. She saw the dress. She saw the mouth. She did not see the eyes — she looked at the threshold, not the face. "Come in," she said. "You must be cold." That is the law of hospitality. A red door means bread, salt, and one safe night. You cannot refuse. The door remembers.</p>
+<p>The Hollow Bride stepped inside. It sat at the table. It did not eat. It did not drink. It watched — watched Kesta braid her hair, watched the mother bank the fire, watched the father pretend not to see.</p>
+<p>At midnight it spoke, its voice the sound of water dripping in a well gone dry. "You poured the ninth cup. You named me. Now I am your guest."</p>
+<p>The mother understood then. She cut a loaf with a blessed knife. She set salt on the table with her left hand, palm up. She said: "Guest-right lasts one night. At dawn, you leave."</p>
+<p>The Hollow Bride smiled — the mother's smile, worn wrong. "I will leave," it said. "But I will return. The ninth cup is an invitation. The threshold remembers. And I have a long memory for small slights."</p>
+<p>Kesta is an old woman now. She still sets eight cups on her table and leaves the ninth empty. She still checks the red door at dusk and at dawn, and every harvest, when the lanterns burn blue at the ford and the sheep won't cross the bridge, she walks the perimeter and touches every stone.</p>
+<p>So far, it's held. The Bride hasn't returned. But the miller says the well water tasted of salt last spring, and the sheep still won't drink.</p>
+</div>
+<div class="closing">"Hospitality is a thread. Tie it right, and it binds the guest. Tie it wrong, and it binds you. Never pour the ninth — not even to see what happens. Something always does."<span class="attrib">— the Witch's Closing</span></div>
+
+<h3 id="oshiira">The Grain That Spoke</h3>
+<p class="region-tag">Oshiira — the grain country</p>
+<p class="byline">Told by Granary-keeper Oris, a heavy man with a gentle voice and a ledger that never balances. He says the silo talks to him when the wheat is low. He says it does not whisper — it instructs. He isn't sure there's a difference anymore.</p>
+<div class="story">
+<p>A clerk was tallying grain in the silo, late, the lamp dying, his fingers black with dust. He counted aloud to stay awake: one sack, two, three, four, five, six, seven, eight.</p>
+<p><em>"Ninth,"</em> whispered the grain.</p>
+<p>Not a voice, exactly — a rustle, a shift, the sound of one kernel settling against another in a way that formed a word. He'd been taught: never count the ninth. The ninth isn't grain. The ninth is a door.</p>
+<p>He stopped, and looked. The grain had shifted, just a finger's width, leaving a small hollow. In the hollow, one kernel lay apart from the rest, warm as breath. He picked it up. It sat in his palm like a living thing. He pocketed it without deciding to. His hand simply moved.</p>
+<p>That night he dreamed of debtors — not strangers, people he knew. Farmers who'd borrowed seed and not repaid. Widows who owed for flour. A fisherman who'd taken grain against a catch that never came. Their names were scratched into his ledger, each one a small wound in the page. The grain whispered each name, slow as a tide: <em>"You could. You should. You will not."</em></p>
+<p>He woke, walked to the ledger, and forgave three names — drew a line through each, wrote "paid" in a hand that wasn't quite his own. The ink was warm. The page did not stain.</p>
+<p>The next day the grain was heavier. He could feel it climbing the silo steps, a weight pushing back against his feet. He counted again — eight sacks, and the ninth full of a pale, grain-colored glow that came from somewhere deep, somewhere that hadn't seen the sky in years.</p>
+<p>He forgave another debtor. The grain stayed full. He forgave another. It rose higher.</p>
+<p>For a year he forgave one debtor a night — not the ones who owed the most, but the ones the grain named. The ones it seemed to love.</p>
+<p>The granary never emptied. The villagers called it a miracle. The priest called it suspicious. The clerk said nothing. What could he say — that the grain spoke to him, told him who to spare, and that he listened because he was afraid of what would happen if he didn't?</p>
+<p>When he died — in the silo, at midnight, a kernel in his hand — they found the grain had gone still. Not empty. Still, as if it had been holding its breath for a year, waiting for the next clerk. The kernel in his hand had sprouted a small green shoot, pale as bone, fragile as a promise. They planted it by the silo. It did not take root. It withered by morning.</p>
+<p>The grain never spoke again. Or perhaps it did, and the next clerk simply wasn't listening. The villagers couldn't tell. The grain was heavy. The grain was quiet. The grain was just grain.</p>
+</div>
+<div class="closing">"Mercy enriches the giver — but only the mercy that costs something. The grain counts the name you chose to spare when the ledger told you to collect. The ninth name belongs to the silo. The silo never forgives."<span class="attrib">— the Witch's Closing</span></div>
+
+<hr>
+
+<!-- ===================== THE LETHAI DOMINION ===================== -->
+<h2 id="lethai">🍃 The Lethai Dominion</h2>
+
+<h3 id="lethai-al">The Silk Witness</h3>
+<p class="region-tag">Lethai-al — the Valewood</p>
+<p class="byline">Told by Maer of the Root-Circle, a graying wood elf who mends bridges and remembers every broken oath. Her hands never stop moving — mending, knotting, untangling.</p>
+<div class="story">
+<p>A merchant came to the Valewood, full of himself and his ledgers. He needed a bridge. He had coin. He did not have courtesy.</p>
+<p>He spoke to the Lethai-al wardens. "Name your price," he said. "Double if you build it by autumn."</p>
+<p>They sent for the Silk Vigil. The Vigil hung a thread across the river — white silk, thin as a spider's. "Cross this," they said, "and we will talk."</p>
+<p>The merchant laughed and stepped over. The thread broke.</p>
+<p>The Vigil nodded. "You have refused witness. Build your bridge. It will hold. But every plank will remember your rudeness. No one will sing its name. No child will skip across it. No lover will meet at its center."</p>
+<p>He built it. It held — stone and good timber, no curse in the mortar. But the workers called it "the Rudeness." Travelers spat on its railings. Mothers pulled their children to the other bank.</p>
+<p>Years later he returned, bent and gray. The bridge had not fallen. It had not forgiven either. He knelt at the Vigil's threshold. "What must I pay?"</p>
+<p>The Vigil picked a single strand of silk from the dust and held it to the light. "Say this: 'I am sorry for the courtesy I broke.' Say it once, and mean it. Then build a garden under the bridge, for the eels to hide in. Soft places. Mud. Roots. Let the water slow."</p>
+<p>He did. He knelt in the mud himself, planting rushes. The eels came. The bridge softened. Moss grew over the stone where men had spat.</p>
+<p>Now they sing of it — not as a curse, but as a repair. Travelers leave a thread tied to the rail. One strand. White. Thin.</p>
+</div>
+<div class="closing">"Mercy with memory. That is the thread. Cut it, and you build alone. Heal it, and the road belongs to everyone. The eels remember both."<span class="attrib">— the Witch's Closing</span></div>
+
+<h3 id="lethai-ar">The Bargain of the Shed Skin</h3>
+<p class="region-tag">Lethai-ar — the Coil Court</p>
+<p class="byline">Told by Serpent-keeper Ashai, a dark elf with scales tattooed up her forearms and a voice like a knife wrapped in silk. She has shed three names already. She remembers the first two.</p>
+<div class="story">
+<p>A woman came to the Coil Court, one boot on each side of the threshold. "I gave a Lethaiar my fear of the dark. Now I cannot sleep. The faces in the shadows are not mine."</p>
+<p>The serpent-queen did not look up from her coils. "You paid for a shedding. You received it. The price was never your fear. The price was your solitude."</p>
+<p>The woman wept — a dry, rattling sound. "I did not know."</p>
+<p>"You did not ask. The Coil Court does not sell answers. It sells skins."</p>
+<p>The woman was quiet a long breath. Then she offered a second bargain. "Shed this solitude. Forget the faces. Forget my mother's lullaby. I will owe a favor to the Court."</p>
+<p>The serpent-queen raised her head. "A favor without limit?"</p>
+<p>"Without limit."</p>
+<p>The queen smiled — the smallest possible smile, the kind that says the hook is set. She whispered a word. The woman shed. She slept, dreamless, silent, for the first time in a year, and woke without a name on her tongue.</p>
+<p>A year passed. Then a messenger came — a child with no shadow, carrying a folded leaf.</p>
+<p>"The Court calls," the child said. "A child has been born without a shadow. You will nurse it until the shadow returns."</p>
+<p>The woman nursed it. One year. Three. Seven. The shadow never returned. The child grew strange, calm, watchful, always polite. Never laughed. Never cried. When the child's mother died of a fever, the child shed its own name and joined the Coil Court.</p>
+<p>The woman was free. The favor was paid.</p>
+<p>But she often looked at her hands in the firelight and wondered whose heartbeat she was counting. Not hers. Not the child's. Something older.</p>
+<p>She still cannot sleep. The solitude is gone. But the faces in the shadows have returned — and now she knows their names.</p>
+</div>
+<div class="closing">"A shedding does not erase the debt. It only changes the skin you wear. The scales remember. The shadows keep count."<span class="attrib">— the Witch's Closing</span></div>
+
+<hr>
+
+<!-- ===================== COAST, TIDE & SAIL ===================== -->
+<h2 id="coast">⚓ Coast, Tide &amp; Sail</h2>
+
+<h3 id="linn">The Selkie's Oath</h3>
+<p class="region-tag">Linn — the fisher coast</p>
+<p class="byline">Told by Captain Rana of the <em>Eel-Skiff</em>, a Linn woman with salt-bleached braids and a laugh like shingle in a storm. Never goes ashore without a knife. Never sleeps without the hatch cracked.</p>
+<div class="story">
+<p>A selkie married a fisherman. Same bargain as always: hide the skin, she stays. Lose it, she leaves.</p>
+<p>He hid hers under the hearthstone. Ten years. Children. Mended nets. The quiet arithmetic of storms survived.</p>
+<p>Then the youngest coughed blood into the porridge.</p>
+<p>The nearest healer was a day's sail. The fisherman weighed the distance against the skin under the stone. His wife watched him do it.</p>
+<p>She did not speak. She reached under the hearthstone, pulled out the skin, and cut it into strips with his own gutting knife.</p>
+<p>"Bandages," she said. "The child's breath is worth more than my freedom."</p>
+<p>She wrapped the small chest. The fever broke before dawn. The skin was ruined — salt-stiff, chopped, fit only for the tide.</p>
+<p>At first light the fisherman touched her wrist. "Will you leave?"</p>
+<p>She did not pull away. "I have no skin to return to."</p>
+<p>"That is not an answer."</p>
+<p>She turned his hand over, palm up. "I have a new oath. I choose to stay. That is heavier than any skin."</p>
+<p>They say she grew webbing between her fingers the next winter. Her eyes turned the color of the deep — not gray, not blue, but the shifting place where light fails. The children learned to swim before they could walk.</p>
+<p>The fisherman never asked again.</p>
+</div>
+<div class="closing">"Oaths change. So do the skins we wear. The sea does not care which — only that you choose, and that you choose while there is still breath."<span class="attrib">— the Witch's Closing</span></div>
+
+<h3 id="kahfagia">The Lantern That Remembered</h3>
+<p class="region-tag">Kahfagia — the headland coast</p>
+<p class="byline">Told by Pilot Seref, a woman with one eye and a brass hook for a hand. She captains a cutter called the <em>Red Wake</em>. Says the sea is a poor liar but an excellent witness.</p>
+<div class="story">
+<p>A young pilot lit a beacon on a headland with too many names to agree on. His father had lit it before him. His grandfather had built it. The stone was warm even in winter, and the wind never blew the same direction twice.</p>
+<p>It was his first night alone. His father had died the week before — not at sea, but in his bed, with salt on his lips and a question he'd never finished asking.</p>
+<p>He trimmed the lamp, checked the mirror, poured oil from his great-grandmother's jug. The flame burned steady, small as a child's fist, throwing light across the channel like a net.</p>
+<p>At midnight, the beacon spoke. Not in words — in a pressure behind the eyes, a warmth at the base of the skull, the sense of something old turning its attention toward him the way a tide turns toward a gap in the rocks.</p>
+<p><em>"I have seen this coast for three hundred years,"</em> it said. <em>"I remember every ship that broke. I remember every pilot who listened. I remember the ones who did not."</em></p>
+<p>The pilot's hands did not tremble. His father had taught him that much. "The light does not fear the dark," his father used to say. "The dark is just the light's older sister. They argue. They always make up."</p>
+<p>"What do you want?" the pilot asked.</p>
+<p>The flame flickered — not from wind, but from something inside the glass. <em>"I want someone to listen. Then I want someone to change the light. The channel shifts. The wrecks move. I cannot move myself. I am stone. I am patient. I am also tired."</em></p>
+<p>The pilot listened — to wrecks he'd never seen, crews that had drowned singing, storms that came from nowhere. Then he climbed the cold ladder, reached the lantern, and turned it one degree east.</p>
+<p>The beacon fell silent — not an angry silence, a satisfied one, the silence of a stone finally settled after a long rain.</p>
+<p>The next morning, a ship that would have wrecked passed safely. He didn't wave. He didn't cheer. He simply listened to the silence, which was not empty, which had never been empty.</p>
+<p>He was promoted to a higher tower and a better lamp. He never told anyone about the voice. But every time he lit a new beacon, for a new generation of sailors who would never know his name, he spoke to it first.</p>
+<p>"I am listening," he said. "Tell me when to move. Tell me what you remember. Tell me the names of the ones who did not listen, so I do not become one of them."</p>
+<p>And the beacons — some of them — answered.</p>
+</div>
+<div class="closing">"Beacons are not marks. They are arguments. A mark says, 'You are here.' An argument says, 'You should be somewhere else.' If you do not listen, the beacon will argue without you — and the sea will agree with the oldest voice in the room."<span class="attrib">— the Witch's Closing</span></div>
+
+<h3 id="zakov">The Coin That Came Back</h3>
+<p class="region-tag">Zakov — the free waters</p>
+<p class="byline">Told by Old Salt, a Zakov pirate with a peg leg and a parrot that swears in three tongues. He has drowned twice. The sea gave him back both times, but the second time it kept his left ear.</p>
+<div class="story">
+<p>A smuggler found a coin resting in a dead man's eye — not pressed into the socket, resting there, warm as a fresh egg, as if the dead man had been saving it for someone. Silver, stamped with a ship that had no name, sails furled, masts bare. He pried it loose with two fingers. The eye did not close. The dead man did not stop looking.</p>
+<p>He took it. A smuggler who won't take a coin from a corpse has never been hungry.</p>
+<p>That night, the coin bought him safe passage past a patrol. The watchman glanced at it and waved him through without a word, without a toll, without remembering the ship had ever passed at all.</p>
+<p>The next day, the dead man's ghost sat cross-legged in his cargo hold, hands folded, eye sockets empty but somehow still watching. <em>"You took my toll,"</em> it said, its voice the sound of water finding a crack in a hull. <em>"Now you owe me passage."</em></p>
+<p>The smuggler tried to sell the coin. No one would take it. Merchants paled at the sight of it. A priest of the sea held it a long moment and handed it back, hand shaking.</p>
+<p>He threw it overboard. It rose straight up through the water like a bubble and landed on the deck at his feet with a sound like a bell.</p>
+<p>He gave it to a beggar. The beggar returned it at dawn, pale as milk. "It followed me," was all he'd say. "It knows your name."</p>
+<p>The smuggler sailed to a drowned shrine and set the coin on the altar. The ghost appeared again, legs dangling off the edge like a child waiting for a parent. <em>"Not enough. The shrine is not where I died. You must carry me to the water that took me. You must carry me home."</em></p>
+<p>He sailed to a reef of broken ships and bleached coral, water the color of bruises, and dropped the coin in. It did not float back. It sank, slow as a dying star. The ghost smiled — thin, relieved — took the coin, and vanished.</p>
+<p>The smuggler sailed home with a hold full of fish, more than his nets should have held, species he'd never seen, scales the color of sunset. He sold them. He grew rich. He never picked up a coin from a dead man's eye again.</p>
+<p>But sometimes, on still nights, he hears a coin spinning on the deck. He does not look. He knows better. A coin that has been returned is not a coin that has been forgotten. It is a coin that is waiting.</p>
+</div>
+<div class="closing">"Not all treasure is worth its weight. Some coins carry a ticket, and the ticket is always for a destination you would not choose. The sea does not ask whether you want to go. It only asks whether you are ready to pay the fare."<span class="attrib">— the Witch's Closing</span></div>
+
+<hr>
+
+<!-- ===================== THE CITY-STATES ===================== -->
+<h2 id="cities">🏛️ The City-States</h2>
+
+<h3 id="ecktoria">The Reckoner's Mask</h3>
+<p class="region-tag">Ecktoria — the assembly cities</p>
+<p class="byline">Told by an old clerk who sits by the plaza fountain and feeds the pigeons. Children dare each other to ask him about the mask. He always answers. That is how you know he was the worst of them.</p>
+<div class="story">
+<p>The Reckoner of Ecktoria wears a mask — bronze, old, eyeholes dark as a well at noon. It does not cover the face. It replaces it. He wears it only at the Assizes, when the city brings its petitions and its lies.</p>
+<p>One year a merchant offered a bribe. A bag of silver. The Reckoner refused. The merchant doubled it. Refused again.</p>
+<p>"Name your price," the merchant whispered.</p>
+<p>The Reckoner removed the mask.</p>
+<p>The merchant screamed. There was no face beneath. Only a hollow space, and in it, a whisper: <em>I have seen your ledgers. Every page. Every missing grain.</em></p>
+<p>The merchant fled. The Reckoner put the mask back on. He wore it again at the next Assizes.</p>
+<p>But that night he dreamed of his own lies — the grain he'd skimmed from the public store, the witness he'd ignored because the bribe was smaller but sweeter. The mask had seen him too. The mask saw everyone. It simply waited.</p>
+<p>He tried to remove it. The straps would not loosen. He cut them. The mask stayed. He heated the bronze. It cooled around his jaw. He broke a piece off with a hammer. By morning it had grown back.</p>
+<p>For a year he wore it. He could not eat. He could not drink. He did not starve — the mask fed on his guilt, and he felt the hunger but could not die from it, suspended between confession and silence like a fly in amber.</p>
+<p>At the next Assizes, he walked to the plaza and knelt before the assembly. "I am unworthy," he said. "I have stolen. I have lied. I have worn this mask as armor when it was meant to be a mirror. Judge me."</p>
+<p>The mask fell off.</p>
+<p>His face beneath was not old. It was young. His missing eye had grown back. The brand on his cheek was gone, as if the skin had forgotten the iron.</p>
+<p>He served thirty more years — the most honest Reckoner the city ever had. He never wore the mask again. He didn't need to. It had taught him where to look.</p>
+</div>
+<div class="closing">"Judgment begins at home. The mask only shows what you already know — but will not say."<span class="attrib">— the Witch's Closing</span></div>
+
+<h3 id="thepyrgos">The Stair That Was Not</h3>
+<p class="region-tag">Thepyrgos — the Collegium of Keys</p>
+<p class="byline">Told by Scholar Lyra, who never leaves the library and reads by candlelight. She says the library has a ninth aisle no one has found yet. She has been looking for forty years. The candles are getting shorter.</p>
+<div class="story">
+<p>A student climbed a stair in the Collegium of Keys. He had counted the steps: one through eight. Then the ninth. There was no ninth. The stair continued anyway.</p>
+<p>He should have stopped. A stair that does not know how many steps it has is a stair unsure it exists. But he was young, his thesis was due, and he'd been awake three nights. The body forgets to be afraid when the mind is drowning.</p>
+<p>He climbed until his legs ached. The walls changed from stone to vellum to glass — old foundations, unbound manuscripts, a window looking out on a courtyard long since burned away. The steps became sentences. The banisters became arguments.</p>
+<p>At the top, a desk. No chair, no lamp. Just the desk, the dust, and a single page — his own thesis, submitted three days before, the one his advisor had nodded at and said nothing about.</p>
+<p>It was covered in corrections. Not his advisor's hand — a hand he didn't recognize, letters small as a gnat's wing. But he could read them. That was the worst part. They were right. Every crossed-out line, every margin note that said <em>this is where you lied to yourself</em>, and <em>you knew this was wrong when you wrote it</em>.</p>
+<p>He had not been wrong about the data. He had been wrong about the question. He'd asked the wrong thing. The stair showed him what he should have asked instead.</p>
+<p>He wept — not from sadness, but because the corrections were kind. Whoever had written them had taken the time to explain, had drawn small diagrams in the margins, had crossed out a paragraph and written, in letters no larger than a whisper, <em>"Try this instead. It will hurt less when you read it in the morning."</em></p>
+<p>When he looked up, the desk was gone. The stair was gone. He was standing in the basement, holding a piece of chalk. It was warm. It had been used recently.</p>
+<p>He never told anyone what the corrections said. But his next thesis was not merely clever — it was correct. The examiners had no questions. The archivists bound it in leather and set it on the highest shelf, where the dust falls upward and the light does not reach.</p>
+<p>He never climbed a stair again without counting twice. He never stopped writing, either. Every page he wrote after that night carried a small mark in the corner — a dot so tiny only he could see it. A reminder that somewhere, in a room that existed and did not exist, someone was still reading. Still taking notes. Still being kind.</p>
+</div>
+<div class="closing">"A proof that cannot be improved is already dead. A scholar who cannot be wrong has stopped climbing. The stair judges — but it also teaches. Accept its edits, or stay in the basement. The basement has no windows."<span class="attrib">— the Witch's Closing</span></div>
+
+<h3 id="vhasia">The Bride of Nine Knots</h3>
+<p class="region-tag">Vhasia — the red towers</p>
+<p class="byline">Told by Lady Ysoria, a Vhasian widow who lives in a red tower and receives visitors only at dusk. Her left hand has six fingers. She says the extra one was a wedding gift. She did not say who gave it.</p>
+<div class="story">
+<p>A bride tied her dowry rope with nine knots — one for each year she'd waited for her betrothed while he fought in the southern passes. The priest warned her: "Eight is custom. Nine is a door. Do not tie what you cannot untie."</p>
+<p>She tied it anyway.</p>
+<p>The morning of the wedding, her rival — who had also loved the groom, who had also waited, whose own dowry rope held only seven knots — stepped forward and cut the ninth with a blade of bone.</p>
+<p>The groom forgot his vows. Not slowly. Not gently. He stood at the altar, mouth half open, hands empty, eyes the color of a winter river. He simply stopped.</p>
+<p>The bride did not weep. She stepped around him, took his cold hand, and spoke for him. "I give this ring. I take this name. I close this door. He is not here to refuse. That is not my problem. That is yours."</p>
+<p>She said this to the priest. The priest was afraid. He nodded. The bond held.</p>
+<p>But the rival's hand withered where she'd cut the cord — five fingers to three, the skin drawn tight, the bone showing at the knuckles. She wore a glove the rest of her life and never explained why.</p>
+<p>The bride kept the severed knot in a silver locket. She wore it fifty years. She never opened it. She never needed to.</p>
+<p>On her deathbed she gave the locket to her daughter. "If you ever need to silence a liar," she said, "cut a knot. But be sure you know whose tongue will still speak afterward. The blade does not ask whose blood it spills."</p>
+<p>The daughter opened the locket. The knot was gone. Inside was a single tooth — the rival's, yellowed, cracked.</p>
+<p>The daughter closed the locket. She did not ask.</p>
+</div>
+<div class="closing">"The ninth knot is the thread that holds the story closed. Cut it, and the story unravels — but not always in the direction you expect. The blade remembers who swung it."<span class="attrib">— the Witch's Closing</span></div>
+
+<hr>
+
+<!-- ===================== THE SOUTHERN COURTS ===================== -->
+<h2 id="southern-courts">🏺 The Southern Courts</h2>
+
+<h3 id="ashaan">The Veil and the Cradle</h3>
+<p class="region-tag">Ashaan — the palace cities</p>
+<p class="byline">Told by the Chancellor's widow, a woman who wears a mask even inside her own home and speaks through a silk curtain. No one has seen her face in twenty years. She says the face beneath is not the one she was born with. She does not say how it changed.</p>
+<div class="story">
+<p>A slave girl was bought into the magistrate's household — young, frightened, and silent, not the silence of patience but of a throat that had forgotten how to make sound. She had been taken from a village that no longer existed, from a family whose names she'd been beaten into forgetting. The magistrate's wife took pity on her. Pity in that household was a dangerous thing. It was also the only honest thing.</p>
+<p>"Wear a veil," the wife said. "The magistrate will not see you. He sees only the silk, only the pattern. You may become invisible. You may become safe."</p>
+<p>The girl wore it — pale blue, embroidered with silver thread in patterns that shifted when she moved. She served the magistrate's table. He did not see her. She cleaned his chambers. He did not remember her. She walked the halls like a ghost, present but never noticed.</p>
+<p>For three years she lived this way, learning the palace's secrets — which guards slept on duty, which passages led to the garden, who was loyal and who was waiting. She could have killed the magistrate a dozen times. She did not. She was not a knife. She was a witness.</p>
+<p>One night an enemy sent an assassin through the window, blade poisoned black, raised over the sleeping magistrate's throat.</p>
+<p>The girl saw it. She could not call out — her voice would break the veil, and a broken veil is just cloth. She stepped between the knife and the magistrate, not thinking, not choosing, simply moving the way water moves toward a crack in a dam.</p>
+<p>She took the blade in her chest. The veil fell. The magistrate woke to the sound of silk hitting stone, and saw her for the first time — young, younger than he'd have guessed, her eyes the color of the veil, winter sky, distant and cold.</p>
+<p>"Who are you?" he asked.</p>
+<p>She opened her mouth. After three years of silence she'd almost forgotten how to shape words. But she found them. "The one who was never there."</p>
+<p>Then she died. The poison was fast. He did not have time to call a healer. He did not have time to learn her name.</p>
+<p>The magistrate had the veil woven into a shroud for her — the same silk that had hidden her, now the only thing to touch her skin. He kept it the rest of his life, folded in a cedar chest, never opened. He never married again. He told his advisors he had seen the face of mercy, and mercy had not worn silk. Mercy had worn a slave's collar and a blade in her chest.</p>
+<p>The assassin was never found. But his enemies learned that a veil is not just a hiding place. Sometimes it is a cradle. And the ones who are invisible are the ones who see the most clearly.</p>
+</div>
+<div class="closing">"The veil hides. The knife reveals. The cradle holds what cannot be seen. Choose which you carry — but know that the one who carries the veil also carries the weight of every face she has hidden from."<span class="attrib">— the Witch's Closing</span></div>
+
+<h3 id="dhahara">The Ford That Moved</h3>
+<p class="region-tag">Dhahara — the river roads</p>
+<p class="byline">Told by Ferryman Dav, a Dhaharan with a voice like gravel rolled downhill. He has poled the same ford for fifty years. He says the river has changed course three times in his life. He does not know which change was which.</p>
+<div class="story">
+<p>A caravan master needed to cross a ford. The river ran high, the stones slick, the current muttering to itself like breaking glass. He'd crossed it a hundred times. This time felt different. This time the water was watching.</p>
+<p>He knelt and prayed to the ford itself — not the river, not any god of rivers, but the place where water met stone and let travelers pass. He offered a single grain of wheat.</p>
+<p><em>"I will stay still for one crossing,"</em> the ford whispered, the voice coming from everywhere and nowhere. <em>"Then you will owe me a name."</em></p>
+<p>He crossed. The ford held. He reached the far shore dry-booted.</p>
+<p>The next night he returned. The river was deeper, swifter, darker. The ford had moved — the crossing now a hundred paces downstream, the old path a whirlpool wide enough to drown a horse.</p>
+<p>"Name a price," he said.</p>
+<p><em>"You have already named it,"</em> the ford replied, softer now, almost kind. <em>"The name of your firstborn child. The name you whisper when you think no one is listening. The name you have kept folded in your chest like a letter you are afraid to send."</em></p>
+<p>The merchant had no child. His wife had died that winter. He'd buried her with his own hands and not wept then. He wept now, and the sobs echoed off the water and came back twisted, mocking.</p>
+<p>The ford softened. The current slowed. The stones rose just enough to offer a path.</p>
+<p><em>"Then give me the name you would have given them. The name that died in your throat when your wife died. Give me that, and every year, on this night, return and speak it again. That is the toll. That is always the toll."</em></p>
+<p>He knelt, pressed his forehead to the wet stones, and whispered a name no one had ever heard — a name that existed only between his heartbeat and his breath.</p>
+<p>The ford calmed. He crossed safely.</p>
+<p>He returned every year and spoke the name. The ford drank it whole. His wife did not come back. But some years later he remarried, and his new wife bore a daughter, and he named her the same name. The ford never troubled him again. But the daughter sometimes woke from dreams she could not remember, salt on her lips and water in her ears. She never learned to swim. She never wanted to.</p>
+</div>
+<div class="closing">"A road is a covenant. A ford is a witness. The river remembers every name it has been given. It does not forget. It does not forgive. It only waits for the next traveler who thinks a grain of wheat is enough."<span class="attrib">— the Witch's Closing</span></div>
+
+<hr>
+
+<!-- ===================== THE MIST AND THE THRESHOLD ===================== -->
+<h2 id="mist-threshold">🌫️ The Mist and the Threshold</h2>
+
+<h3 id="mistlands">The Bell That Never Rang</h3>
+<p class="region-tag">The Mistlands — the levee towers</p>
+<p class="byline">Told by Bell-warden Hollis, a gaunt man with soot under his fingernails and a cough that never quite stops. When asked why he keeps no assistant, he said: "The last one asked too many questions. The bell answered one. Neither of us liked the answer."</p>
+<div class="story">
+<p>A bell was cast for a tower in the Mistlands — bronze, etched with ward-runes so dense the metal seemed to hold its breath. The smith who forged it lost his hearing the day of the casting, not to the noise, but to the silence that followed.</p>
+<p>"Ring it once," the smith said, "and the fog retreats to the edges of the valley. Ring it twice, and the dead listen — they do not obey, but sometimes listening is enough. Ring it thrice, and the deep wood speaks. I cannot tell you what it says. I was not brave enough to stay for the third ring."</p>
+<p>The warden hung the bell, polished it, oiled the clapper, and counted the hours without sound. The villagers grew used to the silence. They forgot the bell was there.</p>
+<p>When the fog rose from the river, thick and gray and smelling of wet ash, the villagers pleaded. "Ring the bell!"</p>
+<p>He refused. "It is not time. The fog is testing us. If we ring too soon, it will learn."</p>
+<p>When a child wandered into the mist chasing a fox that was not a fox, they begged at the tower door. "Ring it! The dead will help us find her."</p>
+<p>He refused. "The dead do not help. They collect. If I ring twice, they will come. They will find her. But they will not bring her back. They will ask what she is worth. I do not know how to answer that."</p>
+<p>The child was never found. The villagers never forgot, but they did not stop pleading.</p>
+<p>When three gray wraiths came, tall as pines and silent as the bottom of a well, the villagers fled with their children and livestock. They did not look back.</p>
+<p>The warden stayed. He climbed the tower, cough following him step by step, and stood beside the bell with his arms spread, saying nothing. The wraiths climbed after him. They did not touch him. They circled the bell and waited. He waited longer.</p>
+<p>At dawn the wraiths withdrew. The fog lifted. The villagers returned and found him dead, hands clasped around the clapper, knuckles white, mouth open in a silence that matched the bell's own. He had kept it silent even as his breath left him, even as the dead girl's voice called from the mist, asking him to ring it just once so she could find her way home.</p>
+<p>He had not answered her. That was the part the villagers did not forgive.</p>
+<p>They buried him under the tower. The bell still hangs. No one has rung it. The dead girl's voice still calls on certain nights, when the fog rises and the fox runs. She does not ask for the bell anymore. She asks for the warden.</p>
+</div>
+<div class="closing">"Some warnings should never be spoken. The bell knew. So did he. But the girl did not know. That is the difference between the living and the dead. The dead learn too late."<span class="attrib">— the Witch's Closing</span></div>
+
+<h3 id="trow">The Bargain of the Unlit Lamp</h3>
+<p class="region-tag">Trow — the crossroads folk</p>
+<p class="byline">Told by a Trow who gave no name, smoking a pipe with no ember and no stem in the corner of a tavern. Its hat drank the starlight. I wrote what I heard. By morning the ink had faded, and I rewrote it from memory that was not entirely mine.</p>
+<div class="story">
+<p>A traveler came to a crossroads at midnight — not the kind where two roads simply meet, but the older kind, where the path between the living and the hollow crosses itself, where the shadows lean the wrong way. A figure waited there in a gray robe and a hat that drank the starlight.</p>
+<p>"I am a Trow," it said. "We trade in absence. We deal in the spaces where things used to be. What do you lack?"</p>
+<p>The traveler lacked nothing. He was wealthy, healthy, happy, loved — a wife who smiled when he entered a room, children who ran to the gate, a dog that slept on his feet, a house with a door that swung true.</p>
+<p>"Then sell me something you do not need," said the Trow. "A memory you have not used in years. A breath you were going to waste. A name you have never spoken aloud."</p>
+<p>The traveler laughed, thin and small. He pulled off his left-hand glove — a good glove, but he had another to match — and held it out. The Trow took it, folded it small as a coin, and tucked it into a sleeve that did not bulge.</p>
+<p>In return it gave him a lamp — small, brass, unlit, a wick that had never seen flame. "The light will not fade," it said. "It will burn forever. It will never need oil. But you will forget why you needed it. The light remembers. You will not."</p>
+<p>The traveler took the lamp and walked home. Its light guided him, steady and warm, showing every root and stone. But at his gate he paused. The paint was the right color, but the shape was wrong. He opened it anyway. Inside, a woman looked up from the hearth, her face kind, her hair gray. He did not know her.</p>
+<p>"Who are you?" he asked.</p>
+<p>"I am your wife," she said.</p>
+<p>"I do not have a wife." He meant it. He could not remember ever being loved. The lamp burned steadily in his hand, warm as a heartbeat, patient as stone.</p>
+<p>He turned back to the crossroads. The Trow was gone. Only his glove lay in the dust, unfolded, full-sized, as if dropped by someone in a hurry. He put it on. The lamp went out. The dark was absolute. He sat in it a long time, remembering — his wife's face, her name, the way she laughed when he tripped over the dog, the dog itself. Everything the lamp had taken. And that he had given it willingly, and laughed while he did.</p>
+<p>He left the lamp at the crossroads and walked home in the dark, not looking back. It was still there the next morning, and the next. No one took it. The Trow did not return.</p>
+<p>He never bought from a Trow again. But on winter nights, when the wind was right, he would stand at his gate and look toward the crossroads. He could not see the lamp. It was too far. But he could feel it — waiting, burning, remembering everything he had been willing to forget.</p>
+</div>
+<div class="closing">"Trow trade in gaps. The gap that light fills is the gap where memory used to be. Do not buy a lamp from a creature that wears a hat made of starlight. The seller does not need your glove. The seller needs your forgetting."<span class="attrib">— the Witch's Closing</span></div>
+
+<h3 id="hagmorag">The Soup That Was Free</h3>
+<p class="region-tag">Hag Morag — the dry well</p>
+<p class="byline">Told by the one who calls herself Hag Morag, who sits by a dry well stirring a pot that has no fire beneath it. The soup is hot. The well is dry. She says the pot has been stirring itself longer than the village has stood. She does not explain further.</p>
+<div class="story">
+<p>A starving family came to a cottage that was not their own — they had lost their own to fire, or to a tax collector, or to a winter that would not end; the story changed depending on who told it. What did not change was the hunger.</p>
+<p>A crone answered the door, eyes the color of old milk, hands the color of bark. "I have soup," she said. "It is free. The first bowl is always free. I did not make the rule. The rule was here before me."</p>
+<p>They ate — rich, meaty, warmer than any soup they had known. They did not ask what was in it. Hungry people do not ask. Hungry people eat.</p>
+<p>The crone watched, unblinking. "The soup is free. The first bowl is free. But the seconds will cost you."</p>
+<p>The father spread his hands. "We have no coin. What could we possibly have that you would want?"</p>
+<p>"I do not need coin. I am not a merchant. I am a cook. I need a breath — one from each of you. Not your last. I am not the Pale Shepherd. I take only what you have to spare. I will give it back when you next share a meal at your own hearth, cooked with your own hands."</p>
+<p>They agreed. They breathed into her kettle, one long exhalation each, watching the fog curl and vanish into her shawl. The kettle steamed. The crone nodded.</p>
+<p>That night they dreamed they were drowning — not in water, but in something thicker, tasting of salt and old meat and the memory of hunger. They woke gasping, breath shorter than the day before.</p>
+<p>They returned. "The debt is not due yet," the crone said. "Eat again. The second bowl costs another breath. The third costs two. The fourth costs four. The rule is clear. The bowl does not lie."</p>
+<p>They ate anyway — the father from fear, the mother from exhaustion, the children because the soup was warm and the night was cold. For a year they ate free soup once a week, and each time the crone took a breath, and each time the sleep grew deeper and the dreams more vivid.</p>
+<p>On the night of the forty-eighth bowl, with the father's breath coming in rasps and the children sleeping sixteen hours at a stretch, he finally said: "We cannot pay. We have no breath left. What happens when we have nothing left to give?"</p>
+<p>The crone's eyes softened, for the first time. "Good. Now you are honest. The honesty is the payment I was waiting for. The soup was the toll. The breaths were the interest. The honesty is the principal. Go home. Cook your own meals. Breathe your own air. The kettle will remember you. It will not follow. It does not need to. You know where it lives."</p>
+<p>They went home lighter — not the lightness of a full belly, but of a held note finally sung. Their breath returned. Their sleep cleared.</p>
+<p>They never ate free soup again. But on certain winter nights, when the wind was right, they could smell it drifting from the direction of the dry well. They did not follow the smell. They had learned. The soup was free. The seconds were not.</p>
+</div>
+<div class="closing">"Free soup is a hook. The hook is not the soup. The hook is the second bowl — the one you eat when you are not hungry, because you are afraid of being hungry again. She does not need your coin. She needs your breath. And your breath, once given, is never quite your own again."<span class="attrib">— the Witch's Closing</span></div>
+
+<hr>
+
+<div class="panel panel-orange">
+    <strong>📜 Colophon</strong>
+    <p class="text-sm" style="margin-top:0.4rem;">The seventeen tales gathered here are drawn from the fuller Hearth Cycle — a longer collection of one folk tale per region I crossed on the road, twenty-four in all. What follows was chosen for how well each one stands alone at a table: for the heat it still holds once the fire has burned to coals, and for the spread of the telling, so that no one corner of the map crowds out the rest. Each has had a light hand run over it — a loose thread trimmed, a stumbled word set right, a name made consistent with itself — but no tale has been rebuilt. The voices that told them are still the ones you hear.</p>
+    <p class="text-sm" style="margin-top:0.4rem;"><strong>Regions represented:</strong> Aeler and Ykrul of the high country; Aelaerem and Oshiira of the hearth and harvest lands; the Lethai Dominion's al and ar branches; Linn, Kahfagia, and Zakov of the coast; Ecktoria, Thepyrgos, and Vhasia among the city-states; Ashaan and Dhahara of the southern courts; and the Mistlands, Trow, and Hag Morag of the threshold places.</p>
+    <p class="text-sm" style="margin-top:0.4rem;">Seven regions from the fuller cycle were left out of this ledger for reasons of pacing and repetition rather than quality — among them a second telling from Vhasia's neighboring hall, which had wandered so close to the tale already told here that keeping both would have cost the book more than it gave. Readers who want the complete cycle, notes and all, should look to the full Hearth Cycle expansion.</p>
+</div>
+
+<footer>
+    Fate's Edge Proprietary Content — © 2024 Nicholas A. Gasper. All rights reserved.
+</footer>
+
+</body>
+</html>

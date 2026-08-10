@@ -1,0 +1,1111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Way of Warrior — A Fate's Edge Expansion for Combat, Courage, and the Edge of the Blade</title>
+<style>
+    :root {
+        --bg1: #08080c;
+        --bg2: #131318;
+        --bg3: #1c1c24;
+        --bg4: #262630;
+        --text: #e4e2e6;
+        --text2: #ada8b4;
+        --text3: #7c7684;
+        --gold: #b08d3f;
+        --gold-hover: #c49f4e;
+        --border: #33303c;
+        --red: #8e2a2a;
+        --green: #3d7a52;
+        --blue: #3c6e8f;
+        --purple: #5f3f7a;
+        --orange: #a8622a;
+        --brass: #9c7a3c;
+        --mist: #4f6b73;
+        --radius: 8px;
+        --font: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+        background: var(--bg1);
+        background-image: radial-gradient(circle at 50% 0%, #14141c 0%, #08080c 60%);
+        color: var(--text);
+        font-family: var(--font);
+        padding: 1.5rem;
+        max-width: 1100px;
+        margin: 0 auto;
+        line-height: 1.6;
+    }
+    h1, h2, h3, h4, h5 { color: var(--gold); margin: 0.5rem 0 0.3rem; }
+    h1 { font-size: 1.8rem; border-bottom: 2px solid var(--red); padding-bottom: 0.3rem; }
+    h2 { font-size: 1.4rem; border-bottom: 1px solid var(--border); padding-bottom: 0.2rem; margin-top: 1.6rem; }
+    h3 { font-size: 1.15rem; margin-top: 1.1rem; }
+    h4 { font-size: 0.95rem; color: var(--text); margin-top: 0.7rem; }
+    h5 { font-size: 0.85rem; color: var(--text2); }
+    p { margin: 0.35rem 0; }
+    a { color: var(--gold); text-decoration: none; }
+    ul, ol { margin: 0.3rem 0 0.3rem 1.3rem; }
+    li { margin: 0.15rem 0; }
+    .panel {
+        background: var(--bg2);
+        border-radius: var(--radius);
+        padding: 0.6rem 0.9rem;
+        border: 1px solid var(--border);
+        margin: 0.6rem 0;
+    }
+    .panel-gold { border-left: 4px solid var(--gold); }
+    .panel-red { border-left: 4px solid var(--red); }
+    .panel-blue { border-left: 4px solid var(--blue); }
+    .panel-green { border-left: 4px solid var(--green); }
+    .panel-purple { border-left: 4px solid var(--purple); }
+    .panel-orange { border-left: 4px solid var(--orange); }
+    .panel-mist { border-left: 4px solid var(--mist); }
+    .badge {
+        display: inline-block;
+        padding: 0.05rem 0.5rem;
+        border-radius: 12px;
+        font-size: 0.65rem;
+        font-weight: 600;
+    }
+    .badge-gold { background: var(--gold); color: #170f00; }
+    .badge-red { background: var(--red); color: #fff; }
+    .badge-green { background: var(--green); color: #fff; }
+    .badge-blue { background: var(--blue); color: #fff; }
+    .badge-purple { background: var(--purple); color: #fff; }
+    .badge-orange { background: var(--orange); color: #fff; }
+    .badge-mist { background: var(--mist); color: #fff; }
+    .badge-gray { background: var(--bg4); color: var(--text3); }
+    .flex { display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center; }
+    .text-muted { color: var(--text3); }
+    .text-gold { color: var(--gold); }
+    .text-sm { font-size: 0.85rem; }
+    .text-xs { font-size: 0.7rem; }
+    .mt-1 { margin-top: 0.5rem; }
+    .mb-1 { margin-bottom: 0.5rem; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem; }
+    .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.6rem; }
+    @media (max-width: 700px) { .grid-2, .grid-3 { grid-template-columns: 1fr; } }
+    hr { border: none; border-top: 1px solid var(--border); margin: 0.8rem 0; }
+    .toc { background: var(--bg3); border-radius: var(--radius); padding: 0.6rem 0.9rem; border: 1px solid var(--border); }
+    .toc-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 0 1.5rem; }
+    @media (max-width: 700px) { .toc-cols { grid-template-columns: 1fr; } }
+    .toc a { color: var(--text2); display: block; padding: 0.1rem 0; font-size: 0.85rem; }
+    .toc a:hover { color: var(--gold); }
+    .toc .toc-sub { padding-left: 1rem; font-size: 0.78rem; }
+    blockquote {
+        border-left: 3px solid var(--red);
+        padding-left: 1rem;
+        margin: 0.5rem 0;
+        color: var(--text2);
+        font-style: italic;
+    }
+    table { border-collapse: collapse; width: 100%; margin: 0.6rem 0; font-size: 0.85rem; }
+    caption { caption-side: top; text-align: left; color: var(--text3); font-size: 0.75rem; margin-bottom: 0.2rem; }
+    th, td { border: 1px solid var(--border); padding: 0.35rem 0.55rem; text-align: left; vertical-align: top; }
+    th { background: var(--bg4); color: var(--gold); font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.03em; }
+    tr:nth-child(even) td { background: rgba(255,255,255,0.02); }
+    .talent-card {
+        background: var(--bg3);
+        border-radius: var(--radius);
+        padding: 0.5rem 0.7rem;
+        margin: 0.4rem 0;
+        border-left: 3px solid var(--red);
+    }
+    .talent-card .talent-name { font-weight: 700; font-size: 0.92rem; color: var(--gold); }
+    .talent-card .talent-req { margin-top: 0.15rem; font-style: italic; }
+    .talent-card p { font-size: 0.85rem; margin-top: 0.25rem; }
+    .weapon-card {
+        background: var(--bg3);
+        border-radius: var(--radius);
+        padding: 0.5rem 0.7rem;
+        margin: 0.4rem 0;
+        border-left: 3px solid var(--brass);
+    }
+    .weapon-card .weapon-name { font-weight: 700; font-size: 0.92rem; color: var(--gold); }
+    .weapon-card .weapon-line { font-size: 0.8rem; margin: 0.1rem 0; }
+    .weapon-card .weapon-line strong { color: var(--text2); }
+    .quote-card {
+        background: var(--bg3);
+        border-radius: var(--radius);
+        padding: 0.5rem 0.7rem;
+        margin: 0.4rem 0;
+        border-left: 3px solid var(--mist);
+    }
+    .quote-card .quote-name { font-weight: 700; font-size: 0.85rem; color: var(--gold); }
+    .quote-card p { font-size: 0.82rem; font-style: italic; color: var(--text2); margin-top: 0.2rem; }
+    footer { font-size: 0.75rem; color: var(--text3); text-align: center; padding: 1.2rem 0 0.5rem; }
+</style>
+</head>
+<body>
+
+<h1>&#9876;&#65039; Way of Warrior</h1>
+<p style="color:var(--text2);margin-bottom:0.5rem;">
+    <span class="badge badge-gold">Rules Expansion</span>
+    <span class="badge badge-red">Martial Archetypes</span>
+    <span class="badge badge-blue">Cultural Warriors</span>
+    <span class="badge badge-purple">Runic Warrior</span>
+    <span class="badge badge-mist">Monks &amp; Ascetics</span>
+    <span class="badge badge-gray">Author: Nicholas A. Gasper</span>
+</p>
+
+<div class="panel panel-red">
+    <p>This expansion arms the Warrior's Path — the martial road walked without a Patron's Codex or a witch's Rite. It adds three combat archetypes (Tank, Striker, Ranger), seven culturally distinct warrior traditions drawn from across Fate's Edge, the Runic Warrior — a Runekeeper whose covenant is carved into flesh, stone, or steel instead of ink — and a condensed toolkit for building Unstruck Bell monks and shadow-fighters. Every talent, weapon, and sample build below is ready to hand a player at the table.</p>
+</div>
+
+<blockquote>
+    "Steel is a language. Learn to speak it, or learn to bleed."<br>
+    — Master Tarian Ironhand, Fencing Master of the Iron Rose Academy, Silkstrand
+</blockquote>
+
+<div class="toc">
+    <strong style="color:var(--gold);">&#128220; Table of Contents</strong>
+    <div class="toc-cols mt-1">
+        <div>
+            <a href="#warriors-path">The Warrior's Path</a>
+            <a href="#martial-archetypes">Martial Archetypes</a>
+            <a class="toc-sub" href="#the-tank">&mdash; The Tank</a>
+            <a class="toc-sub" href="#the-striker">&mdash; The Striker</a>
+            <a class="toc-sub" href="#the-ranger">&mdash; The Ranger</a>
+            <a href="#cultural-warriors">Cultural Warriors</a>
+            <a class="toc-sub" href="#culture-ashaan">&mdash; Ashaan, Charioteers of the Twin Rivers</a>
+            <a class="toc-sub" href="#culture-oshiira">&mdash; Oshiira, Sahelian Lancers</a>
+            <a class="toc-sub" href="#culture-sekogo">&mdash; Sekogo, Jungle Throw-Knife Hunters</a>
+            <a class="toc-sub" href="#culture-pereshi">&mdash; Pereshi, Cataphracts of the High Plateau</a>
+            <a class="toc-sub" href="#culture-sidhi">&mdash; Sidhi, Light Skirmishers of the Broken Coast</a>
+            <a class="toc-sub" href="#culture-dhahara">&mdash; Dhahara, Elephant-Riders of the Monsoon Plains</a>
+            <a class="toc-sub" href="#culture-fhara">&mdash; Fhara, Desert Raiders of the Dune Sea</a>
+        </div>
+        <div>
+            <a href="#runic-warrior">Runic Warrior</a>
+            <a class="toc-sub" href="#runic-codex">&mdash; The Runic Codex</a>
+            <a class="toc-sub" href="#obligation-scar">&mdash; Obligation as Physical Scar</a>
+            <a class="toc-sub" href="#thiasos-ally">&mdash; The Thiasos as Ally</a>
+            <a class="toc-sub" href="#runic-core-talents">&mdash; Core Talents</a>
+            <a class="toc-sub" href="#sample-rites">&mdash; Sample Rites</a>
+            <a class="toc-sub" href="#runic-builds">&mdash; Builds by Tradition</a>
+            <a class="toc-sub" href="#dawn-warrior-build">&mdash; Sample Build: Dawn Warrior</a>
+            <a href="#monks-and-ascetics">Monks and Ascetics</a>
+            <a href="#shadow-warriors">Shadow Warriors</a>
+            <a href="#encounter-tactics">Encounter Tactics</a>
+            <a href="#arms-and-armor">Arms and Armor</a>
+            <a href="#voices-from-the-edge">Voices from the Edge</a>
+            <a href="#black-river-at-dawn">The Black River at Dawn</a>
+            <a href="#quick-reference">Quick Reference: Martial Talents by Tier</a>
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<!-- ===== THE WARRIOR'S PATH ===== -->
+<h2 id="warriors-path">&#9876;&#65039; The Warrior's Path</h2>
+<blockquote>"Every scar is a lesson. Some are written in flesh. Some are written in the memories of the ones who watched you survive." — Master Tarian</blockquote>
+<p>To walk the Warrior's Path is to treat violence as a language, with its own grammar and dialects: the Fhara lancer speaks in thunder, the Sidhi skirmisher in whispers, the Ashaan charioteer in patience. All are valid. All will kill you if you mispronounce them.</p>
+<p>This chapter draws on the great warrior traditions of Fate's Edge: the chariot warfare of Ashaan, the armored lancers of Oshiira, the throw-knife hunters of Sekogo, the cataphracts of Pereshi, the light cavalry of the Sidhi, the elephant riders of Dhahara, and the desert raiders of Fhara.</p>
+
+<div class="panel panel-gold">
+    <strong>Lore: The First Edge</strong>
+    <p class="text-sm mt-1">Old soldiers say the first weapon was not stone but a word — "Mine." The second was a broken branch. The third was the lie that you had already won. In the ruins of Old Aeler, a skeleton was found still gripping a bronze khopesh, its blade notched from parrying bone, not steel. The inscription nearby read: <em>"He held the ford for three bells. His name is lost. His edge is not."</em> That is the warrior's true lineage: not victory, but the refusal to drop the line.</p>
+</div>
+
+<h3 id="warriors-attributes">The Warrior's Attributes</h3>
+<p>A warrior's body is their first weapon. The mind is the hand that wields it.</p>
+<ul>
+    <li><strong>Body</strong> — strength, endurance, the ability to deal and receive harm.</li>
+    <li><strong>Wits</strong> — timing, perception, the ability to read an opponent's intent.</li>
+    <li><strong>Spirit</strong> — courage, resolve, the will to stand when standing is foolish.</li>
+    <li><strong>Presence</strong> — command, intimidation, the ability to shape a battlefield with a word.</li>
+</ul>
+
+<h3 id="warriors-talents">The Warrior's Talents</h3>
+
+<h4>Foundation Talents (2&ndash;4 XP)</h4>
+<div class="talent-card">
+    <div class="talent-name">Disciplined Body <span class="badge badge-red">3 XP</span></div>
+    <div class="talent-req text-xs text-muted">Requires: Melee 1+, Body 2+</div>
+    <p><strong>Passive + Active.</strong> +1 die to unarmed combat attacks. Once per scene, convert 1 Harm to Fatigue, and once per scene improve Position by one step.</p>
+</div>
+<div class="talent-card">
+    <div class="talent-name">Weapon Mastery <span class="badge badge-red">5 XP</span></div>
+    <div class="talent-req text-xs text-muted">Requires: Melee 2+</div>
+    <p><strong>Passive.</strong> Choose a weapon type (swords, axes, spears, etc.); +2 dice when using it. Once per scene, +1 Effect with your signature weapon.</p>
+</div>
+<div class="talent-card">
+    <div class="talent-name">Second Wind <span class="badge badge-red">2 XP</span></div>
+    <p><strong>Active, once per scene.</strong> Clear 1 Fatigue when you take a moment to catch your breath.</p>
+</div>
+
+<h4>Advanced Talents (6&ndash;8 XP)</h4>
+<div class="talent-card">
+    <div class="talent-name">Weapon Mastery II &mdash; Flowing Strike <span class="badge badge-red">6 XP</span></div>
+    <div class="talent-req text-xs text-muted">Requires: Weapon Mastery, Melee 3+</div>
+    <p>When you successfully hit a target with your chosen weapon, you may immediately make a free repositioning move (up to Near distance) without provoking opportunity attacks. Once per scene.</p>
+</div>
+<div class="talent-card">
+    <div class="talent-name">Iron Resilience <span class="badge badge-red">6 XP</span></div>
+    <div class="talent-req text-xs text-muted">Requires: Disciplined Body, Tier II, Body 4+</div>
+    <p>You have two additional Harm boxes (5 total). The first time you would be reduced to 0 Harm (Incapacitated) in a scene, you may instead remain standing with 1 Harm and mark 2 Fatigue.</p>
+</div>
+<div class="talent-card">
+    <div class="talent-name">Battlefield Awareness <span class="badge badge-red">6 XP</span></div>
+    <div class="talent-req text-xs text-muted">Requires: Wits 3+</div>
+    <p>At the start of any combat scene, ask the GM one tactical question — "Which enemy is most dangerous?" "Where is the best cover?" "What is the escape route?" The GM must answer truthfully.</p>
+</div>
+
+<hr>
+
+<!-- ===== MARTIAL ARCHETYPES ===== -->
+<h2 id="martial-archetypes">&#128737;&#65039; Martial Archetypes</h2>
+<blockquote>"The tank is the anvil. The striker is the hammer. The ranger is the knife that finds the gap between ribs. Know which you are before the drum sounds." — Master Tarian</blockquote>
+
+<h3 id="the-tank">The Tank</h3>
+<p>The tank stands where others cannot. She absorbs harm, holds chokepoints, and forces enemies to waste their strength on her armored shell.</p>
+
+<h4>Core Talents</h4>
+<ul>
+    <li><em>Disciplined Body</em> <span class="badge badge-gray">2 XP</span></li>
+    <li><em>Shield Bearer</em> <span class="badge badge-gray">4 XP</span> — while wielding a shield, gain +1 Armor and may use the <em>Protect</em> action to interpose yourself between an ally and an attack, taking the harm yourself.</li>
+    <li><em>Disciplined Body II &mdash; Iron Resilience</em> <span class="badge badge-gray">6 XP</span></li>
+</ul>
+
+<h4>Signature Talent Chain &mdash; Sentinel</h4>
+<div class="talent-card">
+    <div class="talent-name">Sentinel &mdash; Stand Fast <span class="badge badge-red">4 XP</span></div>
+    <p>Use an action to adopt a stationary defensive stance. While in this stance you cannot move, but enemies attacking you suffer &minus;1 die, and any enemy that attempts to move past you must test Resolve (DV 3) or be stopped in their tracks. You may end the stance as a free action.</p>
+</div>
+<div class="talent-card">
+    <div class="talent-name">Sentinel II &mdash; Unmovable <span class="badge badge-red">8 XP</span></div>
+    <div class="talent-req text-xs text-muted">Requires: Sentinel &mdash; Stand Fast</div>
+    <p>While in your defensive stance, you ignore the first shove, trip, or knockback attempt each round. Allies within Near range gain +1 die to resist fear or compulsion effects.</p>
+</div>
+<div class="talent-card">
+    <div class="talent-name">Sentinel III &mdash; Shield of the Fallen <span class="badge badge-red">12 XP</span></div>
+    <div class="talent-req text-xs text-muted">Requires: Sentinel II</div>
+    <p>Once per session, when an ally within Near range would be reduced to 0 Harm, you may take that harm yourself instead (reduced by 2 before applying). After using this ability, mark 1 Fatigue and cannot move for one full exchange.</p>
+</div>
+
+<div class="panel panel-blue">
+    <strong>Cultural Variant: Dhaharan Elephant Rider</strong>
+    <p class="text-sm mt-1">The Dhaharan principalities field elephant cavalry that serve as mobile fortresses. A warrior who bonds with a war elephant gains the <em>Mahout's Authority</em> talent: while mounted, your mount gains +1 Armor and your melee reach extends to Near. Requires the <em>Sentinel</em> talent chain.</p>
+</div>
+<div class="quote-card">
+    <div class="quote-name">Rajah Anant, Dhaharan Mahout</div>
+    <p>"You ask why I do not fear the arrows? The elephant's hide is thicker than any Ecktorian armor. But the real shield is memory. This beast remembers the flood that drowned his mother, the sugarcane he tasted as a calf, and the first time he crushed a siege tower. Fear cannot reach a creature who has already survived the worst day of his life. That is what I learned from him: the past is a better shield than any steel."</p>
+</div>
+
+<h3 id="the-striker">The Striker</h3>
+<p>The striker deals harm — fast, precise, and often fragile — ending fights before they become wars.</p>
+
+<h4>Core Talents</h4>
+<ul>
+    <li><em>Weapon Mastery</em> <span class="badge badge-gray">4 XP</span></li>
+    <li><em>Flurry</em> <span class="badge badge-gray">4 XP</span> — once per scene, make two attacks against the same target as a single action. Resolve each separately. After using Flurry, suffer &minus;1 die on your next action.</li>
+    <li><em>Weapon Mastery II &mdash; Flowing Strike</em> <span class="badge badge-gray">6 XP</span></li>
+</ul>
+
+<h4>Signature Talent Chain &mdash; Bladestorm</h4>
+<div class="talent-card">
+    <div class="talent-name">Bladestorm &mdash; Whirlwind <span class="badge badge-red">4 XP</span></div>
+    <p>When surrounded by two or more enemies in Close range, make a single attack roll against all of them simultaneously. Roll once; compare to each enemy's DV. Once per scene.</p>
+</div>
+<div class="talent-card">
+    <div class="talent-name">Bladestorm II &mdash; Death's Draw <span class="badge badge-red">8 XP</span></div>
+    <div class="talent-req text-xs text-muted">Requires: Bladestorm &mdash; Whirlwind</div>
+    <p>Once per session, when you reduce an enemy to 0 Harm, immediately make a free move (up to Near distance) and attack a different enemy. This does not count as your action for the round.</p>
+</div>
+
+<div class="panel panel-blue">
+    <strong>Cultural Variant: Sekogo Throw-Knife Hunter</strong>
+    <p class="text-sm mt-1">The Sekogo warriors of the southern jungles carry the <em>kpinga</em> — a multi-bladed throwing knife with a rotating motion that inflicts deep wounds. Their signature talent is <em>Whirling Steel</em>: when you throw a kpinga, it returns to your hand after striking (or missing) if you have a clear line of sight. This replaces <em>Flurry</em> in the talent chain.</p>
+</div>
+<div class="quote-card">
+    <div class="quote-name">Mkara, Sekogo Hunter</div>
+    <p>"You westerners train to hold the line. We train to disappear. The jungle is not an obstacle — it is a collaborator. When I throw the kpinga, I am not aiming at your heart. I am asking the vines to pull your shield aside, the shadow to hide my second blade, and the mud to remember where you stepped. The dance ends when you stop guessing where I am."</p>
+</div>
+
+<h3 id="the-ranger">The Ranger</h3>
+<p>The ranger fights at range, moves through difficult terrain, and lives by patience — the hunter and scout who sees the enemy before the enemy sees them.</p>
+
+<h4>Core Talents</h4>
+<ul>
+    <li><em>Weapon Mastery (bows or thrown weapons)</em> <span class="badge badge-gray">4 XP</span></li>
+    <li><em>Keen Senses</em> <span class="badge badge-gray">2 XP</span> — +1 die to Perception rolls.</li>
+    <li><em>Heightened Senses</em> <span class="badge badge-gray">3 XP</span> — you cannot be surprised in natural terrain.</li>
+    <li><em>Called Shot</em> <span class="badge badge-gray">6 XP</span> — <strong>Active, once per scene, ranged only.</strong> Against an Unaware target, or one you have aimed at for a full round, declare a Called Shot. On a hit, deal +1 Harm, ignore 1 Armor, and choose one: Blind (&minus;2 dice to sight), Disarm (drop held item), Hamstring (half speed), or Vitals (+2 Harm instead of +1). On a miss, you are Exposed (Desperate Position and mark 1 Harm).</li>
+</ul>
+
+<h4>Signature Talent Chain &mdash; Pathfinder</h4>
+<div class="talent-card">
+    <div class="talent-name">Pathfinder &mdash; Trackless Step <span class="badge badge-red">4 XP</span></div>
+    <p>You leave no trail when moving through natural terrain unless you choose to. Pursuers suffer &minus;2 dice to track you.</p>
+</div>
+<div class="talent-card">
+    <div class="talent-name">Pathfinder II &mdash; Eagle Eye <span class="badge badge-red">6 XP</span></div>
+    <div class="talent-req text-xs text-muted">Requires: Pathfinder &mdash; Trackless Step</div>
+    <p>When you make a ranged attack from a hidden position, treat your Position as one step higher (Desperate &rarr; Controlled, Controlled &rarr; Dominant). You may also ignore one level of range penalty (Near &rarr; Close, Far &rarr; Near).</p>
+</div>
+<div class="talent-card">
+    <div class="talent-name">Pathfinder III &mdash; The Patient Hunter <span class="badge badge-red">10 XP</span></div>
+    <div class="talent-req text-xs text-muted">Requires: Pathfinder II</div>
+    <p>If you spend at least one scene observing a target (tracking them, watching their patterns), gain +2 dice on your first attack against them and may convert a hit into a non-lethal takedown (unconscious, pinned, disarmed) instead of dealing harm.</p>
+</div>
+
+<div class="panel panel-blue">
+    <strong>Cultural Variant: Ashaan Chariot Archer</strong>
+    <p class="text-sm mt-1">The Ashaan horse-drawn chariot is a lightweight vehicle carrying a driver and a warrior. The chariot archer fires from a moving platform, using the vehicle's speed to evade return fire. Their signature talent is <em>Chariot Volley</em>: when you fire from a chariot that has moved at least Near distance this round, make two attacks as a single action. This replaces <em>Eagle Eye</em> in the chain.</p>
+</div>
+<div class="quote-card">
+    <div class="quote-name">Seneny Khenemet, Ashaani Charioteer</div>
+    <p>"A chariot is a lie we tell the wind. The horses are not pulling wood — they are pulling a promise to be somewhere else before the arrow lands. My driver and I have not spoken in ten years. We do not need to. When he leans left, I know the river is three hundred paces ahead. When he spits, I know the enemy has crested the ridge. The quiet between us is the loudest command on the field."</p>
+</div>
+
+<hr>
+
+<!-- ===== CULTURAL WARRIORS ===== -->
+<h2 id="cultural-warriors">&#127993; Cultural Warriors</h2>
+<blockquote>"The same cut that is honorable in one land is an insult in another. Learn the customs of the blade before you learn its weight." — Master Tarian</blockquote>
+
+<h3 id="culture-ashaan">Ashaan &mdash; Charioteers of the Twin Rivers</h3>
+<p>The chariot is the arm of Ashaani power. Lightweight, two-wheeled, crewed by a driver and a warrior, it moves like a striking cobra. Ashaani warriors train from youth in archery, and every noble owns a chariot.</p>
+<div class="panel panel-gold">
+    <strong>Lore of the Twin Rivers</strong>
+    <p class="text-sm mt-1">The oldest Ashaani military text, <em>The Book of the Yoke</em>, warns: "The chariot that charges before the driver has eaten is a chariot that will return empty." The same wisdom applies off the battlefield — never sign a contract hungry, never pursue a fleeing enemy without water in your belly, and always let the horses drink before the archer boasts.</p>
+</div>
+<h4>Core Talents for Ashaani Warriors</h4>
+<ul>
+    <li><em>Weapon Mastery (chariot archery)</em> <span class="badge badge-gray">4 XP</span> — when firing from a chariot, ignore the first range penalty.</li>
+    <li><em>Chariot Driver</em> <span class="badge badge-gray">4 XP</span> — drive a chariot and fire a bow in the same action (one roll for both).</li>
+    <li><em>The Unblinking Eye</em> <span class="badge badge-gray">6 XP</span> — delay your shot for up to one full exchange without losing accuracy; releasing after a delay grants +1 die.</li>
+</ul>
+<h4>Signature Technique: Khopesh Hook</h4>
+<p class="text-sm">The khopesh is a sickle-sword with a curved blade, evolved from battle axes. The Ashaani warrior uses the hook to pull aside an enemy's shield before striking.</p>
+<div class="talent-card">
+    <div class="talent-name">Khopesh Hook <span class="badge badge-red">6 XP</span></div>
+    <p>When you attack with a khopesh, you may declare a hook attempt. Make a normal attack roll; on a hit, forgo damage to instead disarm the target (they drop one held item) or pull them off balance (&minus;1 die to their next action). Once per scene.</p>
+</div>
+<div class="quote-card">
+    <div class="quote-name">Pharaoh's Guard inscription</div>
+    <p>"The khopesh is not a sword. It is a question. The hook asks: will you drop your shield or your life?"</p>
+</div>
+
+<h3 id="culture-oshiira">Oshiira &mdash; Sahelian Lancers</h3>
+<p>The Sahelian grasslands breed fast horses and faster warriors. Oshiira cavalry wear quilted armor and iron helmets, and carry lances, sabers, and sometimes horse-bows, fighting in loose formations that charge, wheel, and charge again.</p>
+<div class="panel panel-gold">
+    <strong>Lore of the Sahel</strong>
+    <p class="text-sm mt-1">The Oshiira have a saying: "The horse that knows two masters is a dead horse." In practice, a lancer must choose — before the charge — whether he fights for honor (hold the line) or for pay (break and reform). The best captains know how to switch masters mid-gallop. The worst die trying.</p>
+</div>
+<h4>Core Talents for Oshiira Warriors</h4>
+<ul>
+    <li><em>Weapon Mastery (lance or saber)</em> <span class="badge badge-gray">4 XP</span></li>
+    <li><em>Mounted Charger</em> <span class="badge badge-gray">4 XP</span> — attacking from horseback after moving at least Near distance grants +2 dice.</li>
+    <li><em>Chainmail Shirt</em> <span class="badge badge-gray">2 XP</span> — light chainmail; +1 Armor, but &minus;1 die to Stealth.</li>
+</ul>
+<h4>Signature Techniques: The Lance and the Bow</h4>
+<div class="talent-card">
+    <div class="talent-name">Lance Couched <span class="badge badge-red">6 XP</span></div>
+    <p>When you charge with a lance and hit, your target must test Body + Endurance (DV 4) or be knocked prone. If the target is prone, your next attack against them gains +1 die.</p>
+</div>
+<div class="talent-card">
+    <div class="talent-name">Horse Archery <span class="badge badge-red">8 XP</span></div>
+    <p>Fire a bow from horseback without penalty, even at a gallop. When making a ranged attack from horseback, you may move up to Near distance before or after the attack without provoking opportunity attacks.</p>
+</div>
+<div class="quote-card">
+    <div class="quote-name">Farari Souleymane, Oshiira War Captain</div>
+    <p>"The horse is my legs. The lance is my arm. The enemy is my proof."</p>
+</div>
+
+<h3 id="culture-sekogo">Sekogo &mdash; Jungle Throw-Knife Hunters</h3>
+<p>The Sekogo warriors of the southern jungles wield the kpinga, a multi-bladed throwing knife that spins through the air, striking with at least one blade. A hunter carries three or four, hidden behind a shield, and throws them only after exhausting his spears.</p>
+<h4>Core Talents for Sekogo Warriors</h4>
+<ul>
+    <li><em>Weapon Mastery (throwing knives)</em> <span class="badge badge-gray">4 XP</span></li>
+    <li><em>Keen Senses</em> <span class="badge badge-gray">2 XP</span></li>
+    <li><em>Poisoner</em> <span class="badge badge-gray">4 XP</span> — craft and apply poisons to your throwing knives; crafting requires a Wits + Craft test (DV 3) and a downtime scene.</li>
+</ul>
+<h4>Signature Technique: The Spiral Throw</h4>
+<div class="talent-card">
+    <div class="talent-name">Spiral Throw <span class="badge badge-red">6 XP</span></div>
+    <p>Declare a spiral throw: the kpinga spins in a wide arc, striking multiple targets in a Near zone. Make a single attack roll and compare it to the DV of every target in the zone. Once per scene.</p>
+</div>
+<div class="talent-card">
+    <div class="talent-name">Court Metal <span class="badge badge-red">8 XP</span></div>
+    <p>Your kpinga is of the highest quality, forged under a chieftain's patronage. Throw it without penalty in melee range, and retrieving a thrown kpinga is a free action (you have trained to catch it by the handle) — but custom demands you announce your throw loudly before releasing it.</p>
+</div>
+<div class="quote-card">
+    <div class="quote-name">Avongara clan proverb</div>
+    <p>"I do not throw the kpinga. I send it to speak for me. When it returns, it brings the truth."</p>
+</div>
+
+<h3 id="culture-pereshi">Pereshi &mdash; Cataphracts of the High Plateau</h3>
+<p>The Pereshi cataphract is a walking fortress. Rider and horse are both encased in scale or chain armor. Armed with the heavy kontos lance, sword, mace, and sometimes a horse-bow, the cataphract is built to smash infantry lines and terrify lighter cavalry.</p>
+<div class="panel panel-gold">
+    <strong>Lore of the High Plateau</strong>
+    <p class="text-sm mt-1">Pereshi smiths say a cataphract's armor is forged in seven layers: iron for the enemy's sword, faith for the enemy's doubt, silence for the enemy's shouts, memory for the enemy's forgetting, salt for the enemy's thirst, wind for the enemy's arrows, and one secret layer known only to the wearer. The secret layer is usually a letter from home.</p>
+</div>
+<h4>Core Talents for Pereshi Warriors</h4>
+<ul>
+    <li><em>Weapon Mastery (lance or mace)</em> <span class="badge badge-gray">4 XP</span></li>
+    <li><em>Heavy Armor Training</em> <span class="badge badge-gray">4 XP</span> — ignore the first &minus;1 die penalty for wearing heavy armor.</li>
+    <li><em>Cataphract Charge</em> <span class="badge badge-gray">6 XP</span> — charging with a kontos lance ignores 1 point of Armor, and on a hit the target must test Resolve (DV 4) or be Shaken (&minus;1 die to all actions for one exchange).</li>
+</ul>
+<h4>Signature Techniques: The Armored Fence</h4>
+<div class="talent-card">
+    <div class="talent-name">Armored Fence <span class="badge badge-red">8 XP</span></div>
+    <p>Forming a line with at least two other cataphracts grants your unit +1 Armor, and it cannot be charged without the enemy first testing Resolve (DV 5). Breaking the formation costs 1 Fatigue.</p>
+</div>
+<div class="talent-card">
+    <div class="talent-name">Kontos Thrust <span class="badge badge-red">6 XP</span></div>
+    <p>The kontos is held two-handed and braced against the horse's neck. Use it one-handed with a shield at &minus;1 die, or two-handed for +1 die and +1 Harm (no shield).</p>
+</div>
+<div class="quote-card">
+    <div class="quote-name">Shahanshah inscription</div>
+    <p>"The cataphract does not fight. He arrives. And arrival is sufficient."</p>
+</div>
+
+<h3 id="culture-sidhi">Sidhi &mdash; Light Skirmishers of the Broken Coast</h3>
+<p>The Sidhi ride fast, unarmored horses, controlling their mounts with a simple rope around the neck. They carry a handful of javelins, a short sword, and a round leather shield. Their tactic is simple: charge, throw javelins, wheel away, repeat.</p>
+<div class="panel panel-gold">
+    <strong>Lore of the Broken Coast</strong>
+    <p class="text-sm mt-1">Sidhi riders do not name their horses. They believe a name is a leash, and a leash is a promise to stay. Instead they whisper a color to the horse each morning: "blue" for rain, "red" for blood, "white" for salt, "black" for goodbye. A horse that dies in battle is not mourned — it is remembered by the color it carried.</p>
+</div>
+<h4>Core Talents for Sidhi Warriors</h4>
+<ul>
+    <li><em>Weapon Mastery (javelin or short sword)</em> <span class="badge badge-gray">4 XP</span></li>
+    <li><em>Light Cavalry</em> <span class="badge badge-gray">4 XP</span> — ride without saddle or bridle, controlling your horse with knee pressure and spoken commands; +1 die on Ride tests.</li>
+    <li><em>Javelin Volley</em> <span class="badge badge-gray">6 XP</span> — carrying four javelins, throw two at the same target as a single action (resolve separately). You are unarmed after the volley until you retrieve more.</li>
+</ul>
+<h4>Signature Technique: Harassing Skirmish</h4>
+<div class="talent-card">
+    <div class="talent-name">Harassing Skirmish <span class="badge badge-red">8 XP</span></div>
+    <p>When you throw a javelin and then move away, your target suffers &minus;1 die to their next action, distracted by the near miss. Once per round.</p>
+</div>
+<div class="talent-card">
+    <div class="talent-name">The Feigned Flight <span class="badge badge-red">6 XP</span></div>
+    <p>Pretend to retreat, luring an enemy into pursuit. Make a Deception test (DV 3); on success the enemy pursues and must move toward you on their next turn. On your following turn, turn and attack with +2 dice. Costs 1 Fatigue.</p>
+</div>
+<div class="quote-card">
+    <div class="quote-name">Sidhi cavalry captain</div>
+    <p>"We do not hold the line. We draw the line, and then we draw it somewhere else."</p>
+</div>
+
+<h3 id="culture-dhahara">Dhahara &mdash; Elephant-Riders of the Monsoon Plains</h3>
+<p>The Dhaharan war elephant is a mobile fortress. The mahout sits on its neck, guiding it with voice and hook, while archers and javelin-throwers on the howdah — a fortified platform on the elephant's back — rain death on enemies below.</p>
+<h4>Core Talents for Dhaharan Warriors</h4>
+<ul>
+    <li><em>Weapon Mastery (composite bow or javelin)</em> <span class="badge badge-gray">4 XP</span></li>
+    <li><em>Mahout's Bond</em> <span class="badge badge-gray">6 XP</span> — bonded with a specific war elephant; while riding it, your melee reach extends to Near, and the elephant gains +1 Armor.</li>
+    <li><em>Elephant Charge</em> <span class="badge badge-gray">8 XP</span> — your elephant may trample all enemies in a Near zone; each must test Body + Athletics (DV 4) or take Harm 2 and be knocked prone. Costs 2 Fatigue for the elephant.</li>
+</ul>
+<h4>Signature Techniques: Howdah Archery</h4>
+<div class="talent-card">
+    <div class="talent-name">Howdah Archery <span class="badge badge-red">6 XP</span></div>
+    <p>Fire a bow or throw a javelin from the howdah without penalty, even while the elephant is moving. You gain +1 Armor while in the howdah (cover).</p>
+</div>
+<div class="talent-card">
+    <div class="talent-name">Stampede <span class="badge badge-red">10 XP</span></div>
+    <p>Once per session, send your elephant into a stampede. All enemies in a Large zone must test Spirit + Resolve (DV 5) or flee in panic; those who fail also take Harm 1 (trampled). Afterward your elephant is Winded (&minus;1 die on all actions for the rest of the scene).</p>
+</div>
+<div class="quote-card">
+    <div class="quote-name">Rajah inscription</div>
+    <p>"The elephant does not forget. It also does not forgive. That is why we ride them into battle."</p>
+</div>
+
+<h3 id="culture-fhara">Fhara &mdash; Desert Raiders of the Dune Sea</h3>
+<p>The Fhara are masters of the lance and the saber. They ride swift horses, wear only light chain or leather, and rely on speed and surprise. Their lance is often a hollow bamboo tube tipped with iron; once spent, they draw their curved saber, the seif.</p>
+<div class="panel panel-gold">
+    <strong>Lore of the Dune Sea</strong>
+    <p class="text-sm mt-1">Fhara poets recite a cycle of verses about horses who outran death. One tells of a rider who tried to repay his gray mare, Debt, with grain after she carried him through three wars — and she bit his sleeve and said, "You owe me a story, not oats." The Fhara believe a warrior's true wealth is the number of enemies who remember his horse's name.</p>
+</div>
+<h4>Core Talents for Fhara Warriors</h4>
+<ul>
+    <li><em>Weapon Mastery (lance or saber)</em> <span class="badge badge-gray">4 XP</span></li>
+    <li><em>Desert Rider</em> <span class="badge badge-gray">4 XP</span> — you and your horse ignore the first environmental penalty from heat or sand.</li>
+    <li><em>Furusiyya Training</em> <span class="badge badge-gray">6 XP</span> — full training in lance, saber, bow, and horsemanship; +1 die to all Ride tests and re-roll one failed lance or saber attack per scene.</li>
+</ul>
+<h4>Signature Techniques: The Lance and the Saber</h4>
+<div class="talent-card">
+    <div class="talent-name">Lance Recover <span class="badge badge-red">6 XP</span></div>
+    <p>After impaling an enemy with your lance, recover the weapon as a free action (brace, strike, and withdraw in one motion). If you fail to recover it, you must draw your saber.</p>
+</div>
+<div class="talent-card">
+    <div class="talent-name">Curved Blade <span class="badge badge-red">8 XP</span></div>
+    <p>The saber's curved edge is built for slashing while riding past. A melee attack from horseback that continues moving gains +1 die, and on a hit you may move an additional Near distance after the strike.</p>
+</div>
+<div class="talent-card">
+    <div class="talent-name">The Hollow Lance <span class="badge badge-red">10 XP</span></div>
+    <p>Once per session, throw your hollow lance as a ranged weapon (Near range). On a hit, the target is Shaken (&minus;1 die to all actions) for one exchange, and the whistling sound panics nearby horses (they must test Resolve or flee).</p>
+</div>
+<div class="quote-card">
+    <div class="quote-name">Fhara poet</div>
+    <p>"The lance is the question. The saber is the answer. The horse is the silence between them."</p>
+</div>
+
+<hr>
+
+<!-- ===== RUNIC WARRIOR ===== -->
+<h2 id="runic-warrior">&#129517; Runic Warrior</h2>
+<blockquote>"Carve your vows into your flesh. Let your scars be your scripture." — Master Tarian</blockquote>
+<p>A Runic Warrior is a Runekeeper who writes their covenant in flesh, stone, or steel rather than ink and paper. Their Codex is not a book — it is a scarred hand, an engraved gorget, a sentient blade that remembers every oath they swore.</p>
+<p>This is not a new class. You still track Obligation, invoke Rites, and serve a Patron. But your tools are different, your costs are visible, and your covenant is written on your body.</p>
+
+<h3 id="runic-codex">The Runic Codex</h3>
+<p>Choose one form:</p>
+<div class="grid-3">
+    <div class="panel panel-red">
+        <strong>Flesh Codex</strong> <span class="text-xs text-muted">(cannot be stolen)</span>
+        <p class="text-sm mt-1">Rites are tattooed, branded, or scarred onto your skin.</p>
+        <p class="text-xs mt-1"><strong>Advantage:</strong> cannot be confiscated, always accessible, no action to retrieve.</p>
+        <p class="text-xs"><strong>Risk:</strong> visible to everyone; damage to your skin may damage the Codex; some cultures fear flesh-writing.</p>
+    </div>
+    <div class="panel panel-blue">
+        <strong>Stone Codex</strong> <span class="text-xs text-muted">(durable, can be lost)</span>
+        <p class="text-sm mt-1">Rites are carved or engraved onto a physical object — a gorget, a shield, a staff, a gauntlet.</p>
+        <p class="text-xs mt-1"><strong>Advantage:</strong> can serve as armor or weapon, durable, may grant social advantage.</p>
+        <p class="text-xs"><strong>Risk:</strong> can be stolen, confiscated, or broken.</p>
+    </div>
+    <div class="panel panel-purple">
+        <strong>Steel Codex</strong> <span class="text-xs text-muted">(sentient, rare)</span>
+        <p class="text-sm mt-1">Rites are engraved on a sentient weapon or object that speaks and remembers.</p>
+        <p class="text-xs mt-1"><strong>Advantage:</strong> functions as both Codex and Thiasos, counts as a witness for all Rites, can offer counsel.</p>
+        <p class="text-xs"><strong>Risk:</strong> has its own personality and opinions, cannot be easily replaced, attracts attention.</p>
+    </div>
+</div>
+<p class="text-sm">Your Codex sees every Rite you invoke. It counts as a <strong>witness</strong> for any Rite that requires one, improving Position or reducing DV.</p>
+
+<h3 id="obligation-scar">Obligation as Physical Scar</h3>
+<p>When you mark Obligation, the cost is visible:</p>
+<table>
+<thead><tr><th>Segments</th><th>Manifestation</th></tr></thead>
+<tbody>
+<tr><td>Minor (1&ndash;2)</td><td>A small scar, a bruise that doesn't fade, an aching tooth.</td></tr>
+<tr><td>Moderate (3&ndash;4)</td><td>A visible scar on the face or hands, a limp, a smouldering brand.</td></tr>
+<tr><td>Significant (5&ndash;6)</td><td>A missing finger, a clouded eye, bark-like skin.</td></tr>
+<tr><td>Critical (7+)</td><td>A numb limb, a face that reflections avoid, a forgotten name.</td></tr>
+</tbody>
+</table>
+<p class="text-sm">A scar is not a punishment. It is a receipt. Touch a scar to recall the Rite that caused it; an NPC may recognize it as the mark of a specific Patron.</p>
+
+<h3 id="thiasos-ally">The Thiasos as Ally</h3>
+<div class="grid-2">
+    <div class="panel panel-green">
+        <strong>Living Thiasos</strong> <span class="text-xs text-muted">(creature)</span>
+        <p class="text-sm mt-1">A warhorse, spirit-hound, wolf-ancestor, fungal familiar, or hollowed bird.</p>
+        <ul class="text-xs mt-1">
+            <li>Cap: 2&ndash;5</li>
+            <li>Harm: Cap + 2</li>
+            <li>Independent action once per scene, on your turn</li>
+            <li>Always counts as a witness for Rites</li>
+            <li><strong>Shared Burden</strong> (talent): transfer Fatigue to your Thiasos (it becomes Winded)</li>
+        </ul>
+    </div>
+    <div class="panel panel-purple">
+        <strong>Sentient Thiasos</strong> <span class="text-xs text-muted">(object, optional)</span>
+        <p class="text-sm mt-1">A weapon, shield, or tool that speaks and remembers. Cannot act independently.</p>
+        <ul class="text-xs mt-1">
+            <li>Always counts as a witness</li>
+            <li>Speaks aloud</li>
+            <li>Can serve as both Thiasos and Codex</li>
+            <li>Cannot accept Shared Burden</li>
+        </ul>
+    </div>
+</div>
+
+<h3 id="runic-core-talents">Core Talents</h3>
+<h4>Foundation Talents (2&ndash;4 XP)</h4>
+<table>
+<thead><tr><th>Talent</th><th>Cost</th><th>Requirement</th><th>Effect</th></tr></thead>
+<tbody>
+<tr><td>Flesh Codex</td><td>4 XP</td><td>Body 3+</td><td>Rites tattooed on body; cannot be stolen.</td></tr>
+<tr><td>Living Thiasos</td><td>3 XP</td><td>A living Thiasos</td><td>+1 Cap; may act independently once per scene.</td></tr>
+<tr><td>Scarred Resilience</td><td>3 XP</td><td>Body 2+</td><td>Once per scene, ignore 1 Fatigue from physical exertion.</td></tr>
+<tr><td>Oath-Bound</td><td>4 XP</td><td>A sworn oath</td><td>Once per session, reroll a failed Body roll when serving a sworn oath.</td></tr>
+<tr><td>Talking Weapon</td><td>6 XP</td><td>Sentient Thiasos</td><td>Your Thiasos speaks aloud and counts as a witness.</td></tr>
+</tbody>
+</table>
+<h4>Advanced Talents (6&ndash;8 XP)</h4>
+<table>
+<thead><tr><th>Talent</th><th>Cost</th><th>Requirement</th><th>Effect</th></tr></thead>
+<tbody>
+<tr><td>Engraved Defense</td><td>6 XP</td><td>Physical Codex</td><td>+1 Armor from your Codex; mark 1 Obligation to reduce incoming Harm by 1.</td></tr>
+<tr><td>Shared Burden</td><td>6 XP</td><td>Living Thiasos</td><td>Transfer 1 Fatigue to your Thiasos; it becomes Winded (&minus;1 die) for the scene.</td></tr>
+<tr><td>Witnessed Scar</td><td>8 XP</td><td>Three permanent Obligation scars</td><td>Once per session, touch a scar for +1 die on any roll tied to that event.</td></tr>
+<tr><td>Iron Resolve</td><td>7 XP</td><td>Body 3+, resilience talent</td><td>When reduced to 0 Harm, remain standing with 1 Harm and mark 2 Fatigue.</td></tr>
+</tbody>
+</table>
+<h4>Prestige Talents (10&ndash;12 XP)</h4>
+<table>
+<thead><tr><th>Talent</th><th>Cost</th><th>Requirement</th><th>Effect</th></tr></thead>
+<tbody>
+<tr><td>The Unbroken Vow</td><td>10 XP</td><td>Kept a sworn oath for one year</td><td>Swearing an oath before a witness grants +2 dice to all actions serving it.</td></tr>
+<tr><td>Avatar of the Codex</td><td>12 XP</td><td>Tier III+, physical Codex</td><td>Once per session, become the embodiment of your Codex: Body +2, your Thiasos fights as a second combatant. Mark 2 Fatigue and 1 Obligation after.</td></tr>
+<tr><td>The Scar That Remembers</td><td>11 XP</td><td>Witnessed Scar, Tier III+</td><td>Once per session, touch a scar and speak a sentence about the event that caused it; that sentence is witnessed truth in any court.</td></tr>
+</tbody>
+</table>
+
+<h3 id="sample-rites">Sample Rites</h3>
+<h4>Low Rites (4&ndash;5 XP)</h4>
+<ul>
+    <li><strong>Rite of the Kindled Blade</strong> <span class="badge badge-gold">4 XP</span> <span class="text-xs text-muted">Oath of Flame &amp; Light</span> — your weapon ignites with radiant light; for one scene, melee attacks deal +1 Harm against undead and oath-breakers.</li>
+    <li><strong>Rite of the Blood Offering</strong> <span class="badge badge-gold">4 XP</span> <span class="text-xs text-muted">Grimmir</span> — +1 die to Lore and Stealth in natural terrain for one scene.</li>
+    <li><strong>Rite of the Unlit Candle</strong> <span class="badge badge-gold">4 XP</span> <span class="text-xs text-muted">Ikasha</span> — +1 die to a single Stealth or Subterfuge roll; on success, declare one minor detail "forgotten" by any observer.</li>
+    <li><strong>Rite of the Shared Bowl</strong> <span class="badge badge-gold">4 XP</span> <span class="text-xs text-muted">Oath of Mercy &amp; Grace</span> — you and a touched ally each clear 1 Fatigue.</li>
+</ul>
+<h4>Standard Rites (7&ndash;9 XP)</h4>
+<ul>
+    <li><strong>Rite of the Unbroken Vow</strong> <span class="badge badge-gold">7 XP</span> <span class="text-xs text-muted">Oath of Flame &amp; Light</span> — swear an oath before a flame and a witness for +1 Armor; allies who hear the oath gain +1 die to actions serving it.</li>
+    <li><strong>Rite of the Sealed Threshold</strong> <span class="badge badge-gold">7 XP</span> <span class="text-xs text-muted">The Sealed Gate</span> — mark a doorway as sealed; unauthorized crossing tests Resolve (DV 3) or suffers a Position penalty.</li>
+    <li><strong>Rite of the Spinner's Debt</strong> <span class="badge badge-gold">9 XP</span> <span class="text-xs text-muted">Inaea</span> — offer a willing creature a boon (clear 1 Fatigue or +1 die); they accept a Promise Timer [4] named "Debt to the Web."</li>
+</ul>
+<h4>High Rites (12&ndash;14 XP)</h4>
+<ul>
+    <li><strong>Rite of the Dawnfire Covenant</strong> <span class="badge badge-gold">12 XP</span> <span class="text-xs text-muted">Oath of Flame &amp; Light</span> — consecrate a zone; allies gain +1 die to resist fear, undead or oath-breaker enemies suffer &minus;1 die.</li>
+    <li><strong>Rite of the Umbral Dream</strong> <span class="badge badge-gold">14 XP</span> <span class="text-xs text-muted">Ikasha</span> — become intangible to mundane harm for one scene, or bypass a major obstacle as if a secret way had always been there.</li>
+    <li><strong>Rite of the Eternal Cycle</strong> <span class="badge badge-gold">14 XP</span> <span class="text-xs text-muted">Carrion-King</span> — destroy one major asset, enemy, or obstacle, and create something new of equal value; player and GM collaborate on the transformation.</li>
+</ul>
+
+<h3 id="runic-builds">Runic Warrior Builds by Tradition</h3>
+
+<h4>The War-Priest of Ashaan <span class="text-xs text-muted">(Mykkiel / Inquisitor Prime)</span></h4>
+<p class="text-sm">The Ashaani war-priest serves the law of the Twin Rivers — judge and executioner, carrying a khopesh that has witnessed a hundred oaths. His Thiasos is often a hound of ash and seal-wax; his Codex, a bronze plaque bound to his shield.</p>
+<p class="text-sm"><strong>Core Talents:</strong> Disciplined Body (2 XP), Shield Bearer (4 XP), Rites of Mykkiel or Inquisitor Prime.</p>
+<div class="talent-card">
+    <div class="talent-name">Oath of the Khopesh &mdash; Hook and Cut <span class="badge badge-red">6 XP</span></div>
+    <p>When you hit with your khopesh, you may hook the target instead of dealing harm; they are pulled off balance and suffer &minus;1 die to their next action. Once per scene.</p>
+</div>
+
+<h4>The Gilded Lancers of Oshiira <span class="text-xs text-muted">(The Traveler / The Sealed Gate)</span></h4>
+<p class="text-sm">The Oshiira Gilded Lancers are professional cavalrymen sworn to protect the trade routes of the Sahel. Their Codex is a saddlebag of route charts; their Thiasos, a spirit horse that leaves no tracks.</p>
+<p class="text-sm"><strong>Core Talents:</strong> Weapon Mastery (lance) (4 XP), Mounted Charger (4 XP), Rites of the Traveler.</p>
+<div class="talent-card">
+    <div class="talent-name">Way of the Horse &mdash; Ride the Wind <span class="badge badge-red">6 XP</span></div>
+    <p>Your Thiasos grants your mount +1 Speed and the ability to ignore difficult terrain for one scene. Mark 1 Obligation each time you use this ability.</p>
+</div>
+
+<h4>The Jungle Wardens of Sekogo <span class="text-xs text-muted">(The Carrion-King / Isoka)</span></h4>
+<p class="text-sm">The Sekogo jungle warden sheds his old skin with each battle, transforming from hunter to hunted to hunter again. His Codex is a belt of throw-knives; his Thiasos, a python that watches from the trees.</p>
+<p class="text-sm"><strong>Core Talents:</strong> Weapon Mastery (throwing knives) (4 XP), Poisoner (4 XP), Rites of the Carrion-King or Isoka.</p>
+<div class="talent-card">
+    <div class="talent-name">The Shed Skin &mdash; Venomous Strike <span class="badge badge-red">6 XP</span></div>
+    <p>When you throw a kpinga, apply a poison (if you have one) as a free action. The poison takes effect on a hit, even against armor.</p>
+</div>
+
+<h4>The Cataphract of Pereshi <span class="text-xs text-muted">(Mykkiel / The Witness)</span></h4>
+<p class="text-sm">The Pereshi cataphract is a knight of the high plateau, sworn to uphold the laws of the ancient empire. His Codex is a lance; his Thiasos, a war-horse clad in scale armor.</p>
+<p class="text-sm"><strong>Core Talents:</strong> Heavy Armor Training (4 XP), Cataphract Charge (6 XP), Rites of Mykkiel or The Witness.</p>
+<div class="talent-card">
+    <div class="talent-name">The Kontos &mdash; Lance of Judgment <span class="badge badge-red">8 XP</span></div>
+    <p>Charging with your kontos lance ignores 1 point of Armor; on a hit the target must test Resolve (DV 4) or be Shaken. Spend 1 Obligation to increase the DV to 5.</p>
+</div>
+
+<h4>The Light Riders of Sidhi <span class="text-xs text-muted">(Aveh / Ikasha)</span></h4>
+<p class="text-sm">The Sidhi light rider has no fixed patron — she answers only to the wind and her own hunger. Her Codex is a handful of javelins; her Thiasos, a horse that has never felt a bridle.</p>
+<p class="text-sm"><strong>Core Talents:</strong> Light Cavalry (4 XP), Harassing Skirmish (8 XP), Rites of Aveh or Ikasha.</p>
+<div class="talent-card">
+    <div class="talent-name">The Feigned Flight &mdash; Dust and Smoke <span class="badge badge-red">6 XP</span></div>
+    <p>When you fake a retreat, throw a javelin behind you as a free action. The attack is made at &minus;1 die, but on a hit the enemy is Shaken, confused by your treachery.</p>
+</div>
+
+<h4>The Elephant-Rider of Dhahara <span class="text-xs text-muted">(Grimmir / Ra&eacute;yn)</span></h4>
+<p class="text-sm">The Dhaharan elephant-rider serves the monsoon and the plain. His Codex is a howdah; his Thiasos, the elephant itself — a living mountain of memory and rage.</p>
+<p class="text-sm"><strong>Core Talents:</strong> Mahout's Bond (6 XP), Elephant Charge (8 XP), Rites of Grimmir or Ra&eacute;yn.</p>
+<div class="talent-card">
+    <div class="talent-name">The Howdah &mdash; Archer's Nest <span class="badge badge-red">6 XP</span></div>
+    <p>While in the howdah, gain +1 Armor (cover) and fire a bow without penalty even while the elephant is moving. Spend 1 Obligation to extend this protection to one other archer in the howdah.</p>
+</div>
+
+<h4>The Desert Raider of Fhara <span class="text-xs text-muted">(Aveh / The Traveler)</span></h4>
+<p class="text-sm">The Fhara desert raider lives by furusiyya: horsemanship, chivalry, and the mutual dependence of man and horse. His Codex is a saddle; his Thiasos, a falcon that returns after each flight.</p>
+<p class="text-sm"><strong>Core Talents:</strong> Furusiyya Training (6 XP), Lance Recover (6 XP), Rites of Aveh or the Traveler.</p>
+<div class="talent-card">
+    <div class="talent-name">The Falcon's Return &mdash; Lance Recall <span class="badge badge-red">6 XP</span></div>
+    <p>After throwing your hollow lance, whistle; it returns to your saddle as a free action. Once per scene.</p>
+</div>
+
+<h3 id="dawn-warrior-build">Sample Build &mdash; Tier I Dawn Warrior (36 XP)</h3>
+<div class="panel panel-orange">
+    <p><strong>Concept:</strong> A crusader who carries vows in steel and fire.</p>
+    <table class="mt-1">
+    <thead><tr><th>Category</th><th>Purchase</th><th>Cost</th></tr></thead>
+    <tbody>
+    <tr><td rowspan="4">Attributes</td><td>Body 3</td><td>9 XP</td></tr>
+    <tr><td>Spirit 2</td><td>6 XP</td></tr>
+    <tr><td>Presence 2</td><td>6 XP</td></tr>
+    <tr><td>Wits 1</td><td>3 XP <span class="text-xs text-muted">(Total: 24 XP)</span></td></tr>
+    <tr><td rowspan="3">Skills</td><td>Melee 2</td><td>4 XP</td></tr>
+    <tr><td>Command 1</td><td>2 XP</td></tr>
+    <tr><td>Athletics 1</td><td>2 XP <span class="text-xs text-muted">(Total: 8 XP)</span></td></tr>
+    <tr><td rowspan="3">Talents</td><td>Flesh Codex</td><td>4 XP</td></tr>
+    <tr><td>Oath-Bound</td><td>4 XP</td></tr>
+    <tr><td>Scarred Resilience</td><td>3 XP <span class="text-xs text-muted">(Total: 9 XP)</span></td></tr>
+    <tr><td>Rites</td><td>Rite of the Kindled Blade</td><td>4 XP</td></tr>
+    </tbody>
+    </table>
+    <p class="text-sm mt-1"><strong>Gear:</strong> Engraved gauntlet (Codex), longsword, chainmail shirt.</p>
+    <p class="text-sm"><strong>Obligation Capacity:</strong> Spirit 2 + Presence 2 = 4.</p>
+</div>
+
+<hr>
+
+<!-- ===== MONKS AND ASCETICS ===== -->
+<h2 id="monks-and-ascetics">&#9775;&#65039; Monks and Ascetics</h2>
+<blockquote>"The fist is a weapon. The open hand is a promise. Learn both before you need either." — Master Tarian</blockquote>
+<p>Monks wear no armor and carry no shields. They walk the world with nothing but body and breath — and are among the deadliest fighters alive. This section distills the core tools needed to build an Unstruck Bell monk in minutes.</p>
+
+<h3>The Unstruck Bell Philosophy</h3>
+<p>A monk's greatest strength is not the clenched fist but the open hand. Power lies in the pause before the strike; the world runs on breath, balance, and the careful stillness between action and consequence.</p>
+<ul>
+    <li><strong>The Coin That Does Not Move:</strong> never resist what cannot be stopped — yield, and the enemy's own force becomes their downfall.</li>
+    <li><strong>The Witness Who Breathes:</strong> stillness is the greatest disguise; be unremarkable.</li>
+    <li><strong>The Debt That Is Never Incurred:</strong> when you do not strike, you create no debt. The open hand offers nothing, and so nothing can be taken from it.</li>
+</ul>
+
+<h3>Meditation Mini-Game</h3>
+<p>To find the still point, you need stillness, time, and intent — the four breaths:</p>
+<ol>
+    <li><strong>The Entering Breath:</strong> inhale the world's noise, threat, opportunity.</li>
+    <li><strong>The Holding Breath:</strong> the pause where decisions are made.</li>
+    <li><strong>The Releasing Breath:</strong> the exhale that becomes action.</li>
+    <li><strong>The Empty Breath:</strong> the space after the exhale — act from here to become invisible to predictions.</li>
+</ol>
+<h4>Meditation Procedure</h4>
+<ol>
+    <li><strong>Settle the Body</strong> (Wits + Medicine, DV 2) — on a hit, gain +1 die to the Meditation roll.</li>
+    <li><strong>Settle the Breath</strong> (Spirit + Meditation, DV 3) — on a hit, enter a light meditative state.</li>
+    <li><strong>The Still Point</strong> (Spirit + Resolve, DV 3 for clarity, DV 4 for healing, DV 5 for transcendence) — achieve your intent.</li>
+</ol>
+<h4>Meditation Benefits</h4>
+<ul>
+    <li><strong>Healing:</strong> clear 1 Fatigue and remove one minor Condition (Fear, Shaken, Guilty) with a test.</li>
+    <li><strong>Clarity:</strong> gain +1 die to your next Wits-based roll.</li>
+    <li><strong>Transcendent:</strong> once per session, reroll any single failed roll; the GM gains 1 Story Beat.</li>
+</ul>
+
+<h3>Core Monk Talents</h3>
+<div class="talent-card">
+    <div class="talent-name">Unarmed Combatant <span class="badge badge-red">4 XP</span></div>
+    <p>Your unarmed strikes deal Harm 1 and may be used to grapple, trip, or pin. +1 die to grapple attempts.</p>
+</div>
+<div class="talent-card">
+    <div class="talent-name">Disciplined Body <span class="badge badge-red">2 XP</span></div>
+    <p>Ignore 1 point of Fatigue from physical exertion once per scene.</p>
+</div>
+<div class="talent-card">
+    <div class="talent-name">Flurry of Blows <span class="badge badge-red">6 XP</span></div>
+    <p>Once per scene, make three unarmed attacks against a single target as one action. Roll each separately. After using Flurry of Blows, suffer &minus;1 to defense DV for one exchange.</p>
+</div>
+<div class="talent-card">
+    <div class="talent-name">Still Point <span class="badge badge-red">2 XP</span></div>
+    <p>When you do not move during your turn, gain +1 die to your next defense roll. Lasts until you move or take an aggressive action.</p>
+</div>
+<div class="talent-card">
+    <div class="talent-name">Monk's Breath <span class="badge badge-red">2 XP</span></div>
+    <p>Once per session, clear 1 Fatigue by meditating for one minute uninterrupted. No roll required.</p>
+</div>
+
+<h3>Monastic Traditions</h3>
+<p>Choose a tradition that defines your martial and philosophical lineage.</p>
+
+<h4>Way of the Unstruck Bell <span class="text-xs text-muted">(Ikasha &mdash; Shadow)</span></h4>
+<p class="text-sm">You read the gaps in perception, become forgettable, and move through shadows.</p>
+<div class="talent-card">
+    <div class="talent-name">Basic Technique &mdash; Shadow Meld <span class="badge badge-red">6 XP</span></div>
+    <div class="talent-req text-xs text-muted">Requires: Stealth 2+</div>
+    <p>Once per session, step into any shadow larger than yourself and emerge from another shadow within Near range. Mark 1 Fatigue.</p>
+</div>
+<div class="talent-card">
+    <div class="talent-name">Advanced Technique &mdash; The Unobserved <span class="badge badge-red">8 XP</span></div>
+    <div class="talent-req text-xs text-muted">Requires: Tier II, Stealth 3+</div>
+    <p>While Hidden, social Story Beats cannot frame you for a crime you did not commit. Witnesses suffer &minus;2 dice to recall your face.</p>
+</div>
+
+<h4>Way of the Iron Vow <span class="text-xs text-muted">(Mykkiel / Oath of Flame &mdash; Law)</span></h4>
+<p class="text-sm">Your body is a temple; your fist is a gavel. Swear binding oaths that grant power in exchange for restriction.</p>
+<div class="talent-card">
+    <div class="talent-name">Basic Technique &mdash; Sworn Defender <span class="badge badge-red">6 XP</span></div>
+    <div class="talent-req text-xs text-muted">Requires: Body 3+</div>
+    <p>When you take the Defend action, an adjacent ally also gains +1 Armor until your next turn.</p>
+</div>
+<div class="talent-card">
+    <div class="talent-name">Advanced Technique &mdash; Unyielding Vow <span class="badge badge-red">8 XP</span></div>
+    <div class="talent-req text-xs text-muted">Requires: Tier II, Spirit 3+</div>
+    <p>Swear a vow before a witness. While actively working toward it, ignore the first point of Fatigue each scene from exhaustion, fear, or despair.</p>
+</div>
+
+<h4>Way of the Endless Cup <span class="text-xs text-muted">(Thrysos &mdash; Unmoored Fist)</span></h4>
+<p class="text-sm">Stagger and stumble to become impossible to anticipate. Every spill is a trip, every belch a battle cry.</p>
+<div class="talent-card">
+    <div class="talent-name">Basic Technique &mdash; Stagger Step <span class="badge badge-red">4 XP</span></div>
+    <div class="talent-req text-xs text-muted">Requires: Body 3+</div>
+    <p>When an enemy misses you with a melee attack, move one range band without provoking opportunity attacks. Mark 1 Fatigue (once per round).</p>
+</div>
+<div class="talent-card">
+    <div class="talent-name">Advanced Technique &mdash; Unmoored Fist <span class="badge badge-red">6 XP</span></div>
+    <div class="talent-req text-xs text-muted">Requires: Body 3+, Spirit 2+</div>
+    <p>Your unarmed strikes gain +1 die and ignore the first point of Armor when you are at Fatigue 2 or more.</p>
+</div>
+
+<h3>Cultural Variants</h3>
+<h4>Ashaan Reed-Stick Dancer</h4>
+<div class="talent-card">
+    <div class="talent-name">Dance of Sticks <span class="badge badge-red">6 XP</span></div>
+    <p>When you wield a long stick or staff, gain +1 die to Parry and make a free trip attempt after a successful parry. Enemies who watch you fight suffer &minus;1 die to attack you.</p>
+</div>
+
+<h4>Dhaharan Coiling Serpent Style</h4>
+<div class="talent-card">
+    <div class="talent-name">Body as Serpent <span class="badge badge-red">6 XP</span></div>
+    <p>Escape grapples as a free action (once per round). On a critical hit with an unarmed strike, impose a Condition (Blinded, Muted, Lamed) for one exchange.</p>
+</div>
+
+<h4>Sidhi Knife Dancer</h4>
+<div class="talent-card">
+    <div class="talent-name">Knife Dance &mdash; Twin Blades <span class="badge badge-red">6 XP</span></div>
+    <p>When you wield two khanjar knives, make two attacks as a single action against two different targets within Close range. Once per scene.</p>
+</div>
+<div class="panel panel-gold">
+    <strong>Voice from the Monastery: Sister Ashwati, Sidhi Knife Dancer</strong>
+    <p class="text-sm mt-1">"My first master told me: 'You are not learning to kill. You are learning to stop being afraid of the gap between your ribs.' Every dance is a conversation with that gap. The left knife says 'come closer.' The right knife says 'never mind.' The spiral says 'I am already behind you.' When the crowd watches, they see violence. When I dance, I see geometry that breathes."</p>
+</div>
+
+<h3>Quick Build: Unstruck Bell Monk (Tier I, 36 XP)</h3>
+<div class="panel panel-orange">
+    <p><strong>Concept:</strong> A silent shadow who strikes from darkness and vanishes.</p>
+    <table class="mt-1">
+    <thead><tr><th>Category</th><th>Purchase</th><th>Cost</th></tr></thead>
+    <tbody>
+    <tr><td rowspan="4">Attributes</td><td>Body 3</td><td>9 XP</td></tr>
+    <tr><td>Wits 3</td><td>9 XP</td></tr>
+    <tr><td>Spirit 2</td><td>6 XP</td></tr>
+    <tr><td>Presence 1</td><td>3 XP <span class="text-xs text-muted">(Total: 27 XP)</span></td></tr>
+    <tr><td rowspan="3">Skills</td><td>Stealth 2</td><td>4 XP</td></tr>
+    <tr><td>Melee 1</td><td>2 XP</td></tr>
+    <tr><td>Meditation 1</td><td>2 XP <span class="text-xs text-muted">(Total: 8 XP)</span></td></tr>
+    <tr><td rowspan="4">Talents</td><td>Unarmed Combatant</td><td>4 XP</td></tr>
+    <tr><td>Disciplined Body</td><td>2 XP</td></tr>
+    <tr><td>Still Point</td><td>2 XP</td></tr>
+    <tr><td>Monk's Breath</td><td>2 XP</td></tr>
+    </tbody>
+    </table>
+    <p class="text-sm mt-1"><strong>Tradition:</strong> Way of the Unstruck Bell (add Shadow Meld later).</p>
+    <p class="text-sm"><strong>Flavor:</strong> Your knuckles are calloused, your eyes are calm, and your shadow sometimes moves a heartbeat after you do.</p>
+    <p class="text-sm"><strong>The Breath Scar:</strong> every monk who walks the Unstruck path accepts a permanent Breath Scar — you can never again be surprised, but neither can you ever truly rest.</p>
+</div>
+
+<hr>
+
+<!-- ===== SHADOW WARRIORS ===== -->
+<h2 id="shadow-warriors">&#128100; Shadow Warriors</h2>
+<blockquote>"The best fight is the one the enemy never knows happened. The second-best is the one they survive to regret." — Master Tarian</blockquote>
+<p>Shadow warriors are martials who prefer stealth, misdirection, and the sudden strike. They are not rogues — they do not pick pockets or climb walls for a living (though they can) — they are killers who hide in plain sight.</p>
+
+<h3>The Ashaani Assassin <span class="text-xs text-muted">(Veiled Hunter)</span></h3>
+<p class="text-sm">Ashaani assassins are trained in the art of the hidden blade, striking from crowds, from shadows, from the moment when the victim blinks.</p>
+<p class="text-sm"><strong>Core Talents:</strong> Stealth (existing), Weapon Mastery (hidden blade or dagger) (4 XP), Poisoner (4 XP).</p>
+<div class="talent-card">
+    <div class="talent-name">Veiled Strike <span class="badge badge-red">8 XP</span></div>
+    <p>When you attack from a hidden position or from a crowd, your target suffers &minus;1 to defense DV, not seeing the threat until too late. If you attack with a poisoned blade, the poison's DV is reduced by 1 (minimum 1).</p>
+</div>
+
+<h3>The Sekogo Ambusher</h3>
+<p class="text-sm">The jungles of Sekogo are dark and dense. Sekogo warriors use the terrain to vanish after each thrown knife, reappearing elsewhere.</p>
+<p class="text-sm"><strong>Core Talents:</strong> Stealth (existing), Weapon Mastery (throwing knives) (4 XP), Keen Senses (2 XP).</p>
+<div class="talent-card">
+    <div class="talent-name">Vanishing Throw <span class="badge badge-red">8 XP</span></div>
+    <p>After throwing a kpinga, immediately move up to Near distance and make a Stealth test (DV 4). On a success, become Hidden. If already Hidden, your next thrown attack gains +1 die.</p>
+</div>
+
+<hr>
+
+<!-- ===== ENCOUNTER TACTICS ===== -->
+<h2 id="encounter-tactics">&#9995; Encounter Tactics</h2>
+<blockquote>"A fool learns from his own scars. A wise warrior learns from the scars of others. A genius never gets scarred at all." — Master Tarian</blockquote>
+
+<h3>Positioning and Terrain</h3>
+<ul>
+    <li><strong>High Ground:</strong> +1 die to ranged attacks and +1 Position when defending against melee.</li>
+    <li><strong>Chokepoints:</strong> a doorway or bridge turns a horde into a queue. Tanks can hold a chokepoint while strikers attack from behind.</li>
+    <li><strong>Cover:</strong> a low wall or a wagon provides Partial Cover (+1 Armor); Total Cover prevents targeting. Destroying cover is a valid tactic.</li>
+    <li><strong>Difficult Terrain:</strong> mud, rubble, or shallow water halves movement. Ranged attackers thrive here; melee fighters suffer.</li>
+</ul>
+
+<h3>Action Economy</h3>
+<p>The side that takes more actions wins. Use these principles:</p>
+<ul>
+    <li><strong>Teamwork:</strong> the Aid action gives an ally +1 die. Two characters aiding a striker can turn a miss into a critical hit.</li>
+    <li><strong>Interrupts:</strong> talents that allow actions outside your turn are gold — use them.</li>
+    <li><strong>Use Boons:</strong> spend Boons to improve Position or re-roll one failure. Do not hoard them.</li>
+</ul>
+
+<h3>Non-Combat Tactics</h3>
+<p>The best fight is the one you avoid. Consider:</p>
+<ul>
+    <li><strong>Intimidation:</strong> after a display of violence (a kill, a shattered weapon), a Presence + Command test may cause remaining enemies to flee or surrender.</li>
+    <li><strong>Deception:</strong> a false flag (dressing as the enemy) can let you walk through a camp, given a Deception test and a plausible story.</li>
+    <li><strong>Parley:</strong> even in combat, a shouted offer of mercy can stop a fight. The GM may allow a Presence + Sway test as a free action.</li>
+    <li><strong>Environmental Manipulation:</strong> cut the rope holding the chandelier, set fire to the grain store, collapse the tunnel. Creativity trumps stats.</li>
+</ul>
+
+<div class="panel panel-mist">
+    <strong>Mercenary Wisdom: The Black Banners</strong>
+    <p class="text-sm mt-1">The Black Banners teach a simple rule: "Camp before clash." A battle is the interest on debts a captain accrued in camp — food, route, weather, rumor. If those sums are wrong, steel won't save you. Before you draw your sword, count the paychest, the latrine trench, the chaplain's bell. If any of those is empty, negotiate. A good mercenary wins more wars with a full belly than a sharp edge.</p>
+</div>
+
+<div class="panel panel-gold">
+    <strong>Table Tactics: The Seven Bells of Combat</strong>
+    <p class="text-sm mt-1">A quick reference for players and GMs to keep combat flowing:</p>
+    <ol class="text-sm mt-1">
+        <li><strong>State Intent:</strong> "I want to flank the spearman."</li>
+        <li><strong>Assess Risk:</strong> the GM sets Position (Controlled/Dominant/Desperate).</li>
+        <li><strong>Declare Action:</strong> roll dice.</li>
+        <li><strong>Spend Boons:</strong> before or after the roll.</li>
+        <li><strong>Resolve Effect:</strong> apply harm, Conditions, or narrative changes.</li>
+        <li><strong>Spend SB:</strong> the GM may introduce complications (reinforcements, collapsing floor).</li>
+        <li><strong>Pivot to Next Player:</strong> keep the rhythm short. Combat should feel urgent.</li>
+    </ol>
+</div>
+
+<hr>
+
+<!-- ===== ARMS AND ARMOR ===== -->
+<h2 id="arms-and-armor">&#9876;&#65039; Arms and Armor</h2>
+<blockquote>"The sword is a lie. What matters is the hand that holds it. But a good lie is easier to sell." — Master Tarian</blockquote>
+
+<h3>Weapon Tags (Reminder)</h3>
+<table>
+<thead><tr><th>Tag</th><th>Effect</th></tr></thead>
+<tbody>
+<tr><td>Accurate</td><td>+1 die to attack rolls.</td></tr>
+<tr><td>Armor Piercing</td><td>Ignore 1 point of Armor.</td></tr>
+<tr><td>Brutal</td><td>On a critical hit, add +1 Harm.</td></tr>
+<tr><td>Defensive</td><td>+1 die to Parry actions.</td></tr>
+<tr><td>Heavy</td><td>Two-handed; cannot be used with a shield.</td></tr>
+<tr><td>Light</td><td>May be dual-wielded.</td></tr>
+<tr><td>Reach</td><td>Can attack from Near range without closing.</td></tr>
+<tr><td>Thrown</td><td>May be used as a ranged weapon (Near).</td></tr>
+</tbody>
+</table>
+
+<h3>Cultural Weapons with Unique Mechanics</h3>
+
+<div class="weapon-card">
+    <div class="weapon-name">Khopesh <span class="text-xs text-muted">(Ashaan)</span></div>
+    <div class="weapon-line"><strong>Type:</strong> Light (one-handed)</div>
+    <div class="weapon-line"><strong>Tags:</strong> Accurate, Hook (see Khopesh Hook talent)</div>
+    <div class="weapon-line"><strong>Damage:</strong> Harm 1 (slashing)</div>
+    <div class="weapon-line"><strong>Special:</strong> can hook shields and weapons; see the Khopesh Hook talent.</div>
+</div>
+<div class="weapon-card">
+    <div class="weapon-name">Kpinga (Throwing Knife) <span class="text-xs text-muted">(Sekogo)</span></div>
+    <div class="weapon-line"><strong>Type:</strong> Light (thrown)</div>
+    <div class="weapon-line"><strong>Tags:</strong> Thrown, Accurate, Brutal</div>
+    <div class="weapon-line"><strong>Damage:</strong> Harm 1 (piercing)</div>
+    <div class="weapon-line"><strong>Special:</strong> a Sekogo warrior carries three or four kpinga. Thrown, the knife spins and deals +1 Harm on a hit (Brutal). Custom demands the throw be announced loudly before release (Court Metal).</div>
+</div>
+<div class="weapon-card">
+    <div class="weapon-name">Kontos Lance <span class="text-xs text-muted">(Pereshi)</span></div>
+    <div class="weapon-line"><strong>Type:</strong> Heavy (two-handed)</div>
+    <div class="weapon-line"><strong>Tags:</strong> Armor Piercing, Reach, Charge (+1 die from horseback after moving)</div>
+    <div class="weapon-line"><strong>Damage:</strong> Harm 2 (piercing)</div>
+    <div class="weapon-line"><strong>Special:</strong> can be used one-handed with a shield, at &minus;1 die.</div>
+</div>
+<div class="weapon-card">
+    <div class="weapon-name">Seif (Saber) <span class="text-xs text-muted">(Fhara)</span></div>
+    <div class="weapon-line"><strong>Type:</strong> Light (one-handed)</div>
+    <div class="weapon-line"><strong>Tags:</strong> Curved Blade (see Curved Blade talent)</div>
+    <div class="weapon-line"><strong>Damage:</strong> Harm 1 (slashing)</div>
+    <div class="weapon-line"><strong>Special:</strong> the curved blade is built for slashing while riding past. See the Curved Blade talent.</div>
+</div>
+<div class="weapon-card">
+    <div class="weapon-name">Javelin <span class="text-xs text-muted">(Sidhi)</span></div>
+    <div class="weapon-line"><strong>Type:</strong> Light (thrown or melee)</div>
+    <div class="weapon-line"><strong>Tags:</strong> Thrown, Accurate</div>
+    <div class="weapon-line"><strong>Damage:</strong> Harm 1 (piercing)</div>
+    <div class="weapon-line"><strong>Special:</strong> a Sidhi warrior carries four javelins. Javelin Volley throws two as a single action.</div>
+</div>
+<div class="weapon-card">
+    <div class="weapon-name">War Elephant (Mount) <span class="text-xs text-muted">(Dhahara)</span></div>
+    <div class="weapon-line"><strong>Type:</strong> Heavy (mount)</div>
+    <div class="weapon-line"><strong>Tags:</strong> Armored, Trample, Fear</div>
+    <div class="weapon-line"><strong>Damage:</strong> trample deals Harm 2 and knocks prone</div>
+    <div class="weapon-line"><strong>Special:</strong> requires the Mahout's Bond talent. The elephant has its own Harm track (4) and Armor (2), and can be targeted separately from the mahout.</div>
+</div>
+
+<hr>
+
+<!-- ===== VOICES FROM THE EDGE ===== -->
+<h2 id="voices-from-the-edge">&#128483;&#65039; Voices from the Edge</h2>
+<blockquote>"Every warrior carries a different song. This is what they sing when they think no one is listening." — Master Tarian</blockquote>
+
+<div class="quote-card">
+    <div class="quote-name">Ykrul Scout, Tashfin of the Salt Flats</div>
+    <p>"The Ykrul do not fight like your banner companies. We do not form lines. We do not charge. We watch. We wait. And then we make the ground remember what it forgot — that a dry riverbed is a highway, that a sand dune is a wall, that a star you cannot see is a dead man's direction. My weapon is not my bow. It is the two days I spent learning your camp's latrine schedule."</p>
+</div>
+<div class="quote-card">
+    <div class="quote-name">Vilikari Night-Ferry Captain, Sanna Breeze-Name</div>
+    <p>"You think ferries are for passengers? No. Ferries are for timing. A battle is a river: it flows one way until a single boat crosses at the wrong hour. Then the whole current changes. I have moved false orders, stolen paychests, and once — only once — a bride who was also a siege weapon. The Vilikari do not fight. We arrange."</p>
+</div>
+<div class="quote-card">
+    <div class="quote-name">Ecktorian Centurion, Varinus the Scarred</div>
+    <p>"The empire teaches us to hold the line. But the empire has never stood in the mud at Third Ford, watching the Dhaharan elephants sway like hills. That day, I learned the truth: a line is only as strong as the two people on either side of you. If they are afraid, you are afraid. If they run, you are dead. The secret is not courage. The secret is choosing to stand because you know your neighbor will, too."</p>
+</div>
+<div class="quote-card">
+    <div class="quote-name">Lethai Hedge-Knight, Dame Xara of the Thorn</div>
+    <p>"The Lethai do not dream of glory. We dream of repair. A broken wall, a burned mill, a child who cannot find her father. War is not a story — it is a debt. Every sword drawn must be repaid in stone, in seed, in silence. I carry a codex of hedges. Not to fight. To remember what I am fighting for."</p>
+</div>
+<div class="quote-card">
+    <div class="quote-name">Bannerless One <span class="text-xs text-muted">(anonymous)</span></div>
+    <p>"The colors do not matter. The contract does not matter. What matters is the moment when the paychest is opened and every soldier inhales at the same time. That breath is the real oath. Not to a captain, not to a crown. To each other: 'We will eat. We will walk. We will bury our dead.' Anyone who forgets that breath — I visit them at night. I do not carry a blade. I carry a mirror."</p>
+</div>
+
+<hr>
+
+<!-- ===== BLACK RIVER AT DAWN ===== -->
+<h2 id="black-river-at-dawn">&#127754; The Black River at Dawn &mdash; A Runic Warrior's Tale</h2>
+<div class="panel panel-mist">
+    <p class="text-sm">Roran did not sleep the night after the trial. He sat on the cold stone bench of the Queen's garrison, a silver gauntlet — his Codex — heavy on his left hand, and on his right, a locket he had never opened, warm against his palm. The gauntlet still smelled of the forge that shaped it. The locket was worn smooth by years pressed against a mother's chest. Whatever lay inside would be the first proof that his mother had existed outside his father's cold ledgers of debts and dues. He was not afraid of its contents. He was afraid of what it would cost him to keep it.</p>
+    <p class="text-sm mt-1">At the third bell he rose and walked through the sleeping city, past the Silent Stair and the chapel where a cantor dreamed of forgotten songs, to the Black River — a slow, dark ribbon drinking the first gray light of dawn. He knelt at the bank, opened the locket, and found not a portrait but a single auburn braid tied with red thread.</p>
+    <p class="text-sm mt-1">A voice came from the water, or from the mist, or from the hollow of his own chest. His mother stood on the far bank, young as she had been the day the birthing fever took her, a red blanket over her shoulders. "You have carried the weight long enough," she said. "The locket was never meant to be a burden. It was meant to be a bridge." She told him to lay it at the bank, tie it with the thread, and let the river carry it to Bryn — the woman who had kept it for forty years and never asked for thanks, but deserved to know it had reached him.</p>
+    <p class="text-sm mt-1">He untied the braid, wound the red thread three times around the locket — once for a promise, once for a knot meant to hold, once for a lesson never finished — and set it on the muddy bank. "You have to let go," his mother said. "I have let go of everything," he answered. "Not everything. Not yet." He closed his eyes and opened his hand. The water rose in a gentle lift, as if the river itself were a hand taking the locket from his grasp, and it slipped beneath the surface with a soft, almost inaudible sigh. When he looked up, she was gone — but the mist had thinned, and the Black River ran clear and cold, carrying nothing but light.</p>
+    <p class="text-sm mt-1">He walked back to the garrison without looking back. The gauntlet on his left hand, which had felt like ice when he first rose, now radiated a quiet warmth.</p>
+    <p class="text-sm mt-1" style="color:var(--gold);"><em>The thread held. The water carried. That is not a Rite. That is grace.</em></p>
+</div>
+
+<hr>
+
+<!-- ===== QUICK REFERENCE ===== -->
+<h2 id="quick-reference">&#128203; Quick Reference: Martial Talents by Tier</h2>
+<table>
+<thead><tr><th>Tier</th><th>Talent</th><th>Effect</th></tr></thead>
+<tbody>
+<tr><td rowspan="5">Foundation (2&ndash;4 XP)</td><td>Disciplined Body</td><td>Ignore 1 Fatigue/scene.</td></tr>
+<tr><td>Weapon Mastery</td><td>+1 die with chosen weapon.</td></tr>
+<tr><td>Second Wind</td><td>Clear 1 Fatigue.</td></tr>
+<tr><td>Shield Bearer</td><td>+1 Armor with shield; Protect action.</td></tr>
+<tr><td>Unarmed Combatant</td><td>Unarmed strikes Harm 1; grapple bonus.</td></tr>
+<tr><td rowspan="8">Advanced (6&ndash;8 XP)</td><td>Weapon Mastery II &mdash; Flowing Strike</td><td>Free reposition after hit.</td></tr>
+<tr><td>Disciplined Body II &mdash; Iron Resilience</td><td>+2 Harm boxes; survive 0 Harm once.</td></tr>
+<tr><td>Battlefield Awareness</td><td>Ask one tactical question before combat.</td></tr>
+<tr><td>Flurry</td><td>Two attacks in one action (once/scene).</td></tr>
+<tr><td>Pathfinder &mdash; Trackless Step</td><td>Leave no trail in natural terrain.</td></tr>
+<tr><td>Khopesh Hook</td><td>Disarm or off-balance with khopesh.</td></tr>
+<tr><td>Harassing Skirmish</td><td>Javelin throw and move imposes &minus;1 die.</td></tr>
+<tr><td>Kontos Thrust</td><td>Two-handed lance use: +1 die, +1 Harm.</td></tr>
+<tr><td rowspan="5">Signature (10&ndash;12 XP)</td><td>Sentinel III &mdash; Shield of the Fallen</td><td>Take harm for an ally.</td></tr>
+<tr><td>Spiral Throw (Sekogo)</td><td>Kpinga throw hits all in a zone.</td></tr>
+<tr><td>Stampede (Dhahara)</td><td>Elephant forces panic in enemies.</td></tr>
+<tr><td>Cataphract Charge</td><td>Lance ignores armor, shakes foes.</td></tr>
+<tr><td>Veiled Strike (Ashaan)</td><td>Hidden attack ignores defense.</td></tr>
+</tbody>
+</table>
+
+<div class="panel panel-red mt-1">
+    <p class="text-sm">"I have taught you what I can. The rest you must learn in the dust, the sand, the blood of the arena, and the mud of the battlefield. Do not fear the edge — it is only the edge. What lies beyond is what you make of it." — Master Tarian Ironhand</p>
+</div>
+
+<footer>
+    <em>Fate's Edge Proprietary Content — (c) 2024 Nicholas A. Gasper. All rights reserved.</em>
+</footer>
+
+</body>
+</html>

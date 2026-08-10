@@ -1,0 +1,710 @@
+<!-- ============ GM-_-Guide-_-05-_-Magic-_-and-_-Backlash.html ============ -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fate's Edge GM Guide — Chapter 5: Magic and Backlash</title>
+<style>
+    :root {
+        --bg1: #0d0d1a;
+        --bg2: #1a1a2e;
+        --bg3: #252540;
+        --bg4: #2f2f4a;
+        --text: #e8e8f0;
+        --text2: #b8b8c8;
+        --text3: #8888a0;
+        --gold: #c9a84c;
+        --gold-hover: #d4b85c;
+        --border: #333355;
+        --red: #c0392b;
+        --green: #27ae60;
+        --blue: #2980b9;
+        --purple: #8e44ad;
+        --orange: #e67e22;
+        --radius: 8px;
+        --font: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+        background: var(--bg1);
+        color: var(--text);
+        font-family: var(--font);
+        padding: 1.5rem;
+        max-width: 1100px;
+        margin: 0 auto;
+        line-height: 1.6;
+    }
+    h1, h2, h3, h4, h5 { color: var(--gold); margin: 0.5rem 0 0.3rem; }
+    h1 { font-size: 1.8rem; border-bottom: 2px solid var(--gold); padding-bottom: 0.3rem; }
+    h2 { font-size: 1.4rem; border-bottom: 1px solid var(--border); padding-bottom: 0.2rem; margin-top: 1.2rem; }
+    h3 { font-size: 1.1rem; margin-top: 0.8rem; }
+    h4 { font-size: 0.95rem; color: var(--text); margin-top: 0.6rem; }
+    p { margin: 0.5rem 0; }
+    a { color: var(--gold); text-decoration: none; }
+    a:hover { color: var(--gold-hover); text-decoration: underline; }
+    ul, ol { margin: 0.4rem 0 0.6rem 1.4rem; }
+    li { margin: 0.15rem 0; }
+    .subtitle { color: var(--text3); font-size: 0.95rem; margin-top: -0.2rem; margin-bottom: 1rem; }
+    .panel {
+        background: var(--bg2);
+        border-radius: var(--radius);
+        padding: 0.6rem 0.9rem;
+        border: 1px solid var(--border);
+        margin: 0.7rem 0;
+    }
+    .panel-title { color: var(--gold); font-weight: 700; margin-bottom: 0.3rem; }
+    .panel-gold { border-left: 4px solid var(--gold); }
+    .panel-red { border-left: 4px solid var(--red); }
+    .panel-blue { border-left: 4px solid var(--blue); }
+    .panel-green { border-left: 4px solid var(--green); }
+    .panel-purple { border-left: 4px solid var(--purple); }
+    .badge {
+        display: inline-block;
+        padding: 0.05rem 0.5rem;
+        border-radius: 12px;
+        font-size: 0.65rem;
+        font-weight: 600;
+        background: var(--bg4);
+        color: var(--text3);
+        border: 1px solid var(--border);
+    }
+    .badge-gold { background: var(--gold); color: #1a1400; border-color: var(--gold); }
+    .badge-red { background: var(--red); color: #fff; border-color: var(--red); }
+    .badge-green { background: var(--green); color: #fff; border-color: var(--green); }
+    .badge-blue { background: var(--blue); color: #fff; border-color: var(--blue); }
+    .badge-purple { background: var(--purple); color: #fff; border-color: var(--purple); }
+    .badge-orange { background: var(--orange); color: #fff; border-color: var(--orange); }
+    .text-muted { color: var(--text3); }
+    .text-gold { color: var(--gold); }
+    .text-sm { font-size: 0.85rem; }
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; margin: 0.6rem 0; }
+    th, td { padding: 0.4rem 0.6rem; border: 1px solid var(--border); text-align: left; vertical-align: top; }
+    th { background: var(--bg4); color: var(--gold); font-weight: 600; }
+    tr:nth-child(even) { background: var(--bg2); }
+    blockquote {
+        font-style: italic;
+        border-left: 4px solid var(--gold);
+        padding: 0.5rem 1rem;
+        margin: 0.6rem 0;
+        background: var(--bg2);
+        border-radius: var(--radius);
+        color: var(--text2);
+    }
+    blockquote .attribution { display: block; font-style: normal; color: var(--text3); font-size: 0.85rem; margin-top: 0.3rem; }
+    code { background: var(--bg4); padding: 0.1rem 0.3rem; border-radius: 4px; font-size: 0.85rem; color: var(--gold); }
+    hr { border: none; border-top: 1px solid var(--border); margin: 1rem 0; }
+    footer { text-align: center; color: var(--text3); font-size: 0.8rem; margin-top: 2rem; padding-top: 1rem; border-top: 1px solid var(--border); }
+</style>
+</head>
+<body>
+
+<h1>Chapter 5: Magic and Backlash</h1>
+<p class="subtitle">Fate's Edge GM Guide — Chapter 5</p>
+
+<blockquote>"You have a student who wants to cast <code>[GATE]</code> into a room they have never seen. They have three dice, no witnesses, and a history of minor backlashes. Do you let them? Yes. Do you warn them? No. The Weave will do the warning."
+<span class="attribution">— Lysandra of the Amber Gate, <em>The Threadweaver's Spellbook</em></span></blockquote>
+
+<p>In <strong>Fate's Edge</strong>, magic is not a clean art practiced in sterile towers. It is a <strong>dangerous negotiation with forces beyond mortal comprehension</strong>. As the GM, your role is to make magic <strong>feel weighty</strong>, <strong>thematic</strong>, and <strong>alive with risk</strong>. This chapter provides tools for adjudicating magical actions, managing consequences, and keeping the story at the forefront.</p>
+
+<p><em>For player-facing rules (spellcasting, Rites, Invoker symbols, Cantor songs, etc.), see the <strong>Player's Guide</strong>, Chapter on Magic and Special Abilities. This chapter focuses on your role as GM.</em></p>
+
+<h2 id="role-of-magic">The Role of Magic in Your Game</h2>
+<p>Magic in Fate's Edge is:</p>
+<ul>
+    <li><strong>Consequential</strong> — Every spell changes the fiction, for good or ill.</li>
+    <li><strong>Risky</strong> — Even success may generate Story Beats (SB) that you spend to complicate the moment.</li>
+    <li><strong>Thematic</strong> — Backlash should reflect the elements and Patrons involved.</li>
+    <li><strong>Creative</strong> — Reward inventive uses, but keep scope within the players' tier.</li>
+</ul>
+<p>Your primary job is not to block magic, but to <strong>frame costs, apply consequences, and escalate drama</strong>. When a player wants to cast a spell, ask:</p>
+<ul>
+    <li>What do they want to achieve?</li>
+    <li>Which elements or Patrons are involved?</li>
+    <li>What is at stake if it goes wrong?</li>
+</ul>
+
+<h3>Patron as Co-Star</h3>
+<p>Patrons are not just sources of power — they are <strong>co-stars</strong> in the story. How you deploy them depends on your campaign's length and tone.</p>
+
+<h4>Passive Patrons (Long Campaigns)</h4>
+<p>In campaigns that run 20+ sessions, let the players accrue Obligation slowly. The GM narrates consequences only when thresholds are breached (e.g., reaching capacity, triggering a Patron Intrusion). The Patron remains a distant, ominous presence — a slow boiler.</p>
+
+<h4>Active Patrons (Short Campaigns / One-Shots)</h4>
+<p>In short arcs (3–6 sessions) or one-shots, the GM should look for hooks aggressively. Offer bargains, push the Obligation spiral, and have the Patron appear in dreams, omens, or via intermediaries <strong>every session</strong>. The goal is to make the price of power immediate and visible.</p>
+
+<p>Use this table to calibrate Patron involvement:</p>
+<div class="table-wrap">
+<table>
+    <thead><tr><th>Campaign Length</th><th>Patron Style</th><th>How Often They Interfere</th></tr></thead>
+    <tbody>
+        <tr><td>One-shot (1–2 sessions)</td><td>Hyperactive</td><td>Every scene, via SB spends or direct demands</td></tr>
+        <tr><td>Short arc (3–6 sessions)</td><td>Active</td><td>Once per session, often as a Devil's Bargain</td></tr>
+        <tr><td>Mid arc (7–15 sessions)</td><td>Pacing</td><td>Every 2–3 sessions; Obligation builds slowly</td></tr>
+        <tr><td>Long campaign (16+ sessions)</td><td>Passive</td><td>Only at thresholds or major story beats</td></tr>
+    </tbody>
+</table>
+</div>
+
+<h4>The Simulation Insight</h4>
+<p>Players enjoy being <strong>tempted, not forced</strong>. Offer a Patron's aid as a choice: "You can succeed automatically, but your Patron will ask for something later. Do you accept?" This turns Obligation from a punishment into a dramatic lever.</p>
+
+<h2 id="adjudicating-magic">Adjudicating Magic at the Table</h2>
+
+<h3>Setting Difficulty Value (DV) and Position</h3>
+<p>Use the standard DV ladder (2–5+), but consider magical specifics:</p>
+
+<div class="panel">
+    <div class="panel-title">DV for Magic</div>
+    <div class="table-wrap">
+    <table>
+        <thead><tr><th>DV</th><th>When to Use</th></tr></thead>
+        <tbody>
+            <tr><td>2</td><td>Routine cantrip, minor sensory effect, no opposition.</td></tr>
+            <tr><td>3</td><td>Standard combat spell, small environmental change, contested but fair.</td></tr>
+            <tr><td>4</td><td>Complex working, area effect, strong opposition, dangerous ritual.</td></tr>
+            <tr><td>5+</td><td>Legendary magic, rewriting reality, binding a major Outsider.</td></tr>
+        </tbody>
+    </table>
+    </div>
+</div>
+
+<h4>Position for Magic</h4>
+<ul>
+    <li><strong>Dominant:</strong> Caster has ritual preparation, rare components, or surprise.</li>
+    <li><strong>Controlled:</strong> Standard casting under normal conditions.</li>
+    <li><strong>Desperate:</strong> Caster is wounded, rushed, or in an anti-magic zone.</li>
+</ul>
+<p>Position affects the severity of backlash (see Backlash Severity by Position, below).</p>
+
+<h3>Quick Reference Table: DV by Spell Scope</h3>
+<div class="table-wrap">
+<table>
+    <thead><tr><th>Scope</th><th>Example</th><th>DV</th></tr></thead>
+    <tbody>
+        <tr><td>Cantrip</td><td>Light a candle, sense magic</td><td>2</td></tr>
+        <tr><td>Combat</td><td>Fire bolt, force shield</td><td>3</td></tr>
+        <tr><td>Ritual (small)</td><td>Find a lost object, speak with a spirit</td><td>4</td></tr>
+        <tr><td>Ritual (large)</td><td>Summon a storm, teleport across a region</td><td>5+</td></tr>
+        <tr><td>Epic</td><td>Raise a dead army, rewrite a law of reality</td><td>6+ (with quest)</td></tr>
+    </tbody>
+</table>
+</div>
+
+<h3>Range Bands for Magic</h3>
+<p>Spells and effects have natural range limits based on their tags and fiction. Use these guidelines:</p>
+<div class="table-wrap">
+<table>
+    <thead><tr><th>Range Band</th><th>Typical Spells</th></tr></thead>
+    <tbody>
+        <tr><td>Close</td><td>Touch, personal aura, short cone.</td></tr>
+        <tr><td>Near</td><td>Same room/zone, thrown magics, most combat spells.</td></tr>
+        <tr><td>Far</td><td>Across a battlefield, line of sight without obstacles.</td></tr>
+        <tr><td>Absent</td><td>Ritual scrying, long-distance teleportation (requires setup).</td></tr>
+    </tbody>
+</table>
+</div>
+<p><strong>Adjusting Range:</strong> A spell can be extended one band by increasing DV by 1, adding a SB, or requiring an extra action. Extreme range (e.g., scrying a distant city) should be a ritual, not a single roll.</p>
+
+<h3>Handling Creative Player Ideas</h3>
+<p>When a player tries something unexpected:</p>
+<ol>
+    <li>Listen to the description. What do they want to achieve?</li>
+    <li>Ask for the tags or elements involved. If none, help them add one.</li>
+    <li>Set DV and Position based on scope and risk (see the Quick Reference Table above).</li>
+    <li>Clearly state the stakes: "If you fail, the spell will backfire and also alert the guards."</li>
+    <li>Let the dice decide, then spend SB to make the outcome interesting.</li>
+</ol>
+
+<div class="panel panel-gold">
+    <div class="panel-title">When in Doubt, Measure Tags by Narrative Impact</div>
+    <p>A spell's power is not measured by how many dice it rolls, but by <strong>how much it changes the story</strong>. Use this rule of thumb:</p>
+    <ul>
+        <li><strong>Minor change (1 TAG):</strong> The player's intent affects only themselves or a single object. Examples: <code>Light</code>, <code>HEAL</code>, <code>Veil</code> (self only). DV 2–3.</li>
+        <li><strong>Moderate change (2 TAGS):</strong> The spell affects a whole zone, creates a significant advantage, or bypasses a notable obstacle. Examples: <code>Area</code> + <code>Force</code>, <code>Barrier</code> across a doorway. DV 3–4.</li>
+        <li><strong>Major change (3+ TAGS):</strong> The spell rewrites the situation, solves a major problem outright, or introduces a new faction/ally/threat. Examples: <code>Teleport</code> across a city, <code>Summon</code> a Cap 3 spirit, <code>Transform</code> a person into a beast. DV 5+ and often a ritual.</li>
+    </ul>
+    <p>If the player's description would <em>skip over a scene</em> (e.g., "I teleport us past the entire fortress"), that's a major change — require components, a timer, or a steep cost. If it would only <em>add flavor</em> (e.g., "I make my eyes glow red"), that's free. Let the fiction guide the DV, not a pre-computed formula.</p>
+</div>
+
+<h3>Dangerous TAGS — When Magic Rewrites the Story</h3>
+<p>Some spell effects are so profound that they cannot be treated as ordinary TAGS. They <strong>break the normal physics of the scene</strong>, <strong>skip over significant narrative obstacles</strong>, or <strong>permanently alter characters or the world</strong>. These are <strong>dangerous TAGS</strong> and they incur <strong>+2 DV</strong> instead of the usual +1.</p>
+
+<h4>Why Are Some TAGS Dangerous?</h4>
+<ul>
+    <li><strong>Narrative Bypass:</strong> A single roll should not invalidate an entire scene or challenge. <code>Teleport</code> past a castle wall, <code>Gate</code> to another continent, or <code>Transform</code> a boss into a mouse — these erase established fiction.</li>
+    <li><strong>Lasting Consequences:</strong> Effects that create permanent changes (resurrection, true polymorph, rewriting memory) demand a higher price.</li>
+    <li><strong>Reality Strain:</strong> The Weave (or whatever magical substrate you use) resists extreme manipulation. Dangerous tags represent that resistance.</li>
+    <li><strong>Patron Attention:</strong> Acts of cosmic magnitude attract the notice of powerful entities — a cost reflected in the higher DV.</li>
+</ul>
+
+<h4>Common Dangerous TAGS (Non-exhaustive)</h4>
+<div class="table-wrap">
+<table>
+    <caption class="text-sm text-muted" style="caption-side:top;text-align:left;margin-bottom:0.3rem;">Dangerous TAGS and Why They Are Dangerous</caption>
+    <thead><tr><th>TAG</th><th>Category</th><th>Why Dangerous (Narrative Impact)</th></tr></thead>
+    <tbody>
+        <tr><td><code>Leap</code></td><td>Space/Motion</td><td>Teleports a person or object across range bands (Near → Far) without traversing the space. Can bypass walls, guards, or entire obstacles if line of sight exists.</td></tr>
+        <tr><td><code>Fold</code></td><td>Space/Motion</td><td>Short-range teleport that can ignore physical barriers (e.g., through a locked door).</td></tr>
+        <tr><td><code>Gate</code></td><td>Space/Motion</td><td>Creates a two-way portal between distant locations. Can bypass entire adventures.</td></tr>
+        <tr><td><code>Gravity</code></td><td>Space/Motion</td><td>Alters local gravity — flight, crushing weight, or throwing enemies into the sky. Scene-rewriting.</td></tr>
+        <tr><td><code>Create</code></td><td>Creation</td><td>Brings a permanent (or long-lasting) object into existence from nothing. Circumvents resource scarcity.</td></tr>
+        <tr><td><code>Summon</code></td><td>Creation</td><td>Calls a creature (Cap 3+) that can fight, scout, or solve problems independently. Adds a new actor to the scene.</td></tr>
+        <tr><td><code>Transmute</code></td><td>Transformation</td><td>Changes one substance into another (lead → gold, stone → flesh). Economic or structural game-changer.</td></tr>
+        <tr><td><code>Animate</code></td><td>Transformation / Creation</td><td>Gives life to inanimate objects — a statue that fights, a rope that ties itself. Adds a persistent minion.</td></tr>
+        <tr><td><code>Transform</code></td><td>Transformation</td><td>Changes a creature's form permanently (or for a long duration). Polymorph, petrification, lycanthropy.</td></tr>
+        <tr><td><code>Dominate</code></td><td>Mind</td><td>Takes total control of a sapient creature's actions. Removes player/NPC agency.</td></tr>
+        <tr><td><code>Rewind</code></td><td>Time</td><td>Reverses time locally — undoes an action, a death, or a scene. Extreme narrative power.</td></tr>
+        <tr><td><code>Resurrect</code></td><td>Life/Death</td><td>Brings a dead character back to life. Undermines mortal stakes.</td></tr>
+    </tbody>
+</table>
+</div>
+
+<h4>How to Decide If a Player's TAG Is Dangerous</h4>
+<p>When a player proposes a spell, ask yourself three questions:</p>
+<ol>
+    <li><strong>Does this effect skip over a significant obstacle or scene?</strong> If the spell would allow the party to bypass a challenge that you intended to be a whole scene (e.g., "I teleport us into the vault" instead of "I pick the lock, evade the guard, and disable the trap"), it is <strong>dangerous</strong>.</li>
+    <li><strong>Does this effect permanently change the character, a major NPC, or the setting?</strong> If the change is not easily reversible by mundane means (e.g., turning a guard into a frog, erasing a memory, raising a corpse), it is <strong>dangerous</strong>.</li>
+    <li><strong>Does this effect introduce a new major asset or remove a major threat with a single roll?</strong> If the spell would instantly defeat a boss ("I transform Garrick into a mouse"), destroy a fortress ("I collapse the mountain"), or create a powerful ally ("I summon a dragon"), it is <strong>dangerous</strong> — and likely requires a ritual, not a single action.</li>
+</ol>
+
+<h4>Edge Cases</h4>
+<ul>
+    <li><code>Leap</code> used to jump a chasm that would otherwise require an Athletics roll — <strong>not dangerous</strong> (that's a minor bypass).</li>
+    <li><code>Leap</code> used to teleport past a locked gate, a patrol, and a guard post — <strong>dangerous</strong> (bypasses multiple obstacles).</li>
+    <li><code>Summon</code> calling a Cap 1 rat to scout a room — <strong>not dangerous</strong> (minor utility).</li>
+    <li><code>Summon</code> calling a Cap 3 demon to fight a boss — <strong>dangerous</strong> (adds a major combatant).</li>
+</ul>
+
+<h4>GM Principle</h4>
+<p>When in doubt, <strong>rule in favor of the story</strong>. A dangerous tag is not a prohibition — it is a <strong>higher cost</strong>. Tell the player:</p>
+<blockquote><em>"That effect is powerful enough to reshape the scene. It's a dangerous tag, so the DV will be +2 higher than usual. On a failure, the backlash will be severe. Are you sure you want to try?"</em></blockquote>
+<p>This keeps player creativity alive while ensuring magic feels weighty and consequential.</p>
+
+<h3>Healing Magic (GM Ruling)</h3>
+<p>Healing in <strong>Fate's Edge</strong> is deliberately gated. <code>HEAL</code> restores <strong>Fatigue</strong> quickly and safely; restoring <strong>Harm</strong> requires more power, more risk, and often a narrative price. This keeps injuries meaningful while still allowing magical support.</p>
+
+<h4>HEAL Restores Fatigue, Not Harm.</h4>
+<p>When a player uses a cantrip (or a free-form casting) with only the <code>[HEAL]</code> tag, it removes <strong>1 Fatigue</strong> from the caster or a touched ally.</p>
+<ul>
+    <li><strong>DV:</strong> 2 (cantrip speed)</li>
+    <li><strong>Action:</strong> 1 action</li>
+    <li><strong>Risk:</strong> None inherent — the GM may still spend Story Beats (from any 1s on the roll) for thematic color (e.g., a scar that tingles, faint spiritual attention).</li>
+</ul>
+<p>This is the "bandage and breath" of magical healing — reliable, fast, and low-risk.</p>
+
+<h4>Healing Harm Costs More.</h4>
+<p>To restore <strong>1 level of Harm</strong> (e.g., Harm 1 → 0, or Harm 2 → 1), the player must either:</p>
+<ol>
+    <li>Accept a <strong>+2 DV modifier</strong> on the spell, or</li>
+    <li>Use <code>[HEAL]</code> together with <strong>at least one other appropriate tag</strong>, such as:
+        <ul>
+            <li><code>[PURIFY]</code> — for poison, disease, or corruption</li>
+            <li><code>[STRENGTHEN]</code> — for broken bones or torn muscles</li>
+            <li><code>[CLEANSE]</code> — for curses or magical wounds</li>
+        </ul>
+    </li>
+</ol>
+<p>The GM may increase the DV further for exceptionally severe injuries:</p>
+<div class="table-wrap">
+<table>
+    <thead><tr><th>Wound Severity</th><th>DV Adjustment</th></tr></thead>
+    <tbody>
+        <tr><td>Minor Harm (level 1)</td><td>no extra</td></tr>
+        <tr><td>Serious Harm (level 2)</td><td>+1 DV</td></tr>
+        <tr><td>Critical Harm (level 3)</td><td>+2 DV (often requires a full ritual)</td></tr>
+    </tbody>
+</table>
+</div>
+<p>Requiring a second tag also makes healing a <strong>full two-action spell</strong> (Weave then Cast) unless the caster has a talent that compresses casting (e.g., <em>Effortless Casting</em>).</p>
+
+<h4>Complications — Story Beats as Narrative Cost.</h4>
+<p>When a player rolls to heal Harm, any <code>1</code>s on the roll generate Story Beats (SB) for you. Spend these SB to introduce <strong>thematic complications</strong> — the healing works, but the world pushes back.</p>
+<div class="panel">
+    <div class="panel-title">Spend SB on Healing Complications</div>
+    <div class="table-wrap">
+    <table>
+        <thead><tr><th>SB Cost</th><th>Example Complication</th></tr></thead>
+        <tbody>
+            <tr><td>1 SB</td><td>The wound leaves a visible scar; the patient feels a strange hunger for a day.</td></tr>
+            <tr><td>2 SB</td><td>A minor spirit of injury is attracted — it watches the patient for a scene.</td></tr>
+            <tr><td>3 SB</td><td>The healing draws a Patron's curiosity: mark +1 Obligation or advance a Corruption timer.</td></tr>
+            <tr><td>4+ SB</td><td>A nearby corpse briefly animates, or the patient remembers a forgotten trauma.</td></tr>
+        </tbody>
+    </table>
+    </div>
+</div>
+<p>These complications <strong>do not undo the healing</strong>. They add story. A scar is a memory; a Patron's interest is a future hook. Healing in Fate's Edge is never trivial.</p>
+
+<h4>Non-Magical Healing — Quick Reference.</h4>
+<p>Even without magic, characters can recover:</p>
+<ul>
+    <li><strong>First Aid (Wits + Medicine, DV 3):</strong> Stabilizes a dying character (prevents Harm progression). Does not heal Harm.</li>
+    <li><strong>Short Rest (1 hour):</strong> Clears 1 Fatigue.</li>
+    <li><strong>Full Night's Rest (safe haven):</strong> Clears all Fatigue and, with medical care, may restore 1 Harm per day of rest.</li>
+</ul>
+
+<h4>Design Note for GMs.</h4>
+<ul>
+    <li><strong>Fatigue is common, Harm is rare.</strong> Keep the party moving by letting them clear Fatigue easily. Harm should feel earned and expensive to remove.</li>
+    <li><strong>Let the cleric (or healer) shine.</strong> A Runekeeper of the Oath of Flame or a Cantor with healing songs should be able to heal Harm — at a cost that makes the table pause.</li>
+    <li><strong>Use the SB menu above as inspiration, not a straitjacket.</strong> A scar that aches in cold weather, a debt to a spirit of mercy, or a public miracle that attracts unwanted attention — all are fair game.</li>
+</ul>
+
+<p><strong>Example in play:</strong></p>
+<blockquote><em>Liam (Harm 1) asks Kestra to heal him. Kestra uses <code>[HEAL]</code> + <code>[PURIFY]</code> and accepts the +2 DV, rolling against DV 5. She succeeds, but rolls two 1s. The GM spends 2 SB: "The wound closes, but a faint scar remains — and you feel a pair of cold eyes watching from the shadows. Something in the fog took notice."</em></blockquote>
+
+<h2 id="story-beats-backlash">Story Beats and Backlash (GM Tools)</h2>
+<p>Every time a player rolls a 1 on a magical action, you gain Story Beats (SB) as described in the Core Resolution Cycle. Spend them to create backlash — complications that fit the magic's element and the fiction.</p>
+
+<h3>SB Spend Menu for Magic</h3>
+<div class="panel">
+    <div class="panel-title">Spend SB on Magical Complications</div>
+    <div class="table-wrap">
+    <table>
+        <thead><tr><th>SB Cost</th><th>Example Backlash</th></tr></thead>
+        <tbody>
+            <tr><td>1 SB</td><td>Minor flare, eerie sound, brief sensory distortion, gear lightly scorched.</td></tr>
+            <tr><td>2 SB</td><td>Backlash harms an ally (Fatigue 1), spell draws attention, caster loses balance (Position −1).</td></tr>
+            <tr><td>3 SB</td><td>Patron omen, secondary target affected, magical feedback (Harm 1 to caster).</td></tr>
+            <tr><td>4+ SB</td><td>Reality warps — zone gains a temporary tag, Patron manifests a demand, a new threat appears.</td></tr>
+        </tbody>
+    </table>
+    </div>
+</div>
+
+<h3>Creating a Choice with SB</h3>
+<p>One of the most powerful GM moves is to spend SB to offer a <strong>hard choice</strong> — not just a consequence.</p>
+<p><strong>Example:</strong></p>
+<p>The player succeeds on a ritual to divine an enemy's location. The roll generates 2 SB. The GM spends them:</p>
+<blockquote>"You see the enemy's camp clearly — but your Patron's symbol glows hot on your hand. <strong>You can have the vision for free, or you can let the spell fizzle and keep your Obligation unchanged.</strong> If you accept the vision, mark +2 Obligation and your Patron will demand a task. What do you choose?"</blockquote>
+<p>This turns a success into a narrative fork, not a punishment.</p>
+
+<h3>Elemental Backlash Examples</h3>
+<p>Use these to color your complications:</p>
+<div class="table-wrap">
+<table>
+    <thead><tr><th>Element</th><th>Sample Backlash</th></tr></thead>
+    <tbody>
+        <tr><td>Fire</td><td>Smoke, heat exhaustion, small secondary fire, blinding flare.</td></tr>
+        <tr><td>Water</td><td>Flooding, slippery footing, emotional surge, dampness ruining supplies.</td></tr>
+        <tr><td>Earth</td><td>Tremor, dust cloud, immobilizing stone grip, cracked floor.</td></tr>
+        <tr><td>Air</td><td>Sudden gust, deafening thunder, scatters important items, voice lost.</td></tr>
+        <tr><td>Fate</td><td>Prophetic nightmare, doors close, a crucial option disappears.</td></tr>
+        <tr><td>Luck</td><td>Allied misfortune, fragile success, random complication.</td></tr>
+        <tr><td>Life</td><td>Overgrowth, healing surge on enemy, parasitic plants.</td></tr>
+        <tr><td>Death</td><td>Ghostly whisper, chill, memory loss, premature decay.</td></tr>
+    </tbody>
+</table>
+</div>
+
+<h3>Backlash Severity by Position</h3>
+<div class="table-wrap">
+<table>
+    <thead><tr><th>Position</th><th>Backlash Severity on Partial/Miss</th></tr></thead>
+    <tbody>
+        <tr><td>Dominant</td><td>Minor — one SB complication, manageable cost.</td></tr>
+        <tr><td>Controlled</td><td>Moderate — 1–2 SB complication, temporary setback.</td></tr>
+        <tr><td>Desperate</td><td>Severe — 2–3 SB complication, lasting consequences or Harm.</td></tr>
+    </tbody>
+</table>
+</div>
+
+<h2 id="obligation-corruption-gm">Managing Obligation and Corruption</h2>
+<p>Players track their own Obligation and Corruption as described in the Player's Guide. <strong>Your job is to enforce thresholds and frame Patron intrusions as story hooks, not punishments.</strong></p>
+
+<h3>Obligation Overflow and Patron Intrusions</h3>
+<p>When a character exceeds their Obligation Capacity (Spirit + Presence):</p>
+<ul>
+    <li>For each segment over capacity, mark 1 Fatigue (player does this).</li>
+    <li>If they exceed <strong>double capacity</strong>, clear all Fatigue, mark Harm 1, and trigger a <strong>Patron Intrusion</strong> — a narrative demand or complication from the Patron.</li>
+</ul>
+
+<h4>Examples of Patron Intrusions</h4>
+<ul>
+    <li>The Patron appears in a dream: "Do this task for me, or else."</li>
+    <li>A rival servant of the same Patron arrives to collect a debt.</li>
+    <li>The Patron's mark becomes visible on the character's skin, causing social trouble.</li>
+    <li>A faction aligned with the Patron forcibly recruits the character.</li>
+</ul>
+
+<h3>Corruption as a Narrative Track</h3>
+<p>Corruption (Cantors, Pact-Whisperers) fills from pushes, resonant rites, and your SB spends. When the timer fills (see Corruption Blooms as Narrative Levers, below):</p>
+<ul>
+    <li>Apply the Patron's "benefit and burden" (see Patron tables in the <strong>Player's Guide</strong>, the World Powers and Obligation chapter).</li>
+    <li>Reset the timer to the character's Tier minimum.</li>
+    <li>If the player chooses <strong>Embrace Corruption</strong>, give them a permanent thematic quirk (not a pure penalty).</li>
+</ul>
+
+<h2 id="summoning-gm">Summoning (GM-Facing)</h2>
+<p>For full summoning mechanics, see the <strong>Player's Guide</strong> (Pact-Whisperer, Magic and Special Abilities chapter). Here are your key responsibilities.</p>
+
+<h3>What to Watch For</h3>
+<ul>
+    <li><strong>Leash ticking:</strong> Tick the Leash whenever the spirit takes Harm, acts against its nature, the summoner splits focus, or the spirit crosses a <code>[WARD]</code> (test DV = Cap).</li>
+    <li><strong>Boon Finesse:</strong> Players may spend 1 Boon once per round to clear 1 tick (before the Leash fills).</li>
+    <li><strong>Quick Commands:</strong> Simple orders (attack nearest, hold, fetch) do not cost the summoner's action. Complex commands do.</li>
+</ul>
+
+<h3>When the Spirit Acts on Its Own</h3>
+<p>On a Miss, or when the Leash fills, the spirit acts once according to its nature before departing (or turning hostile). The spirit's independent action should be <strong>interesting</strong> — not just damage. Use the table below for inspiration.</p>
+<h4>d6 Spirit Whims Table</h4>
+<div class="table-wrap">
+<table>
+    <thead><tr><th>d6</th><th>Spirit's Independent Action</th></tr></thead>
+    <tbody>
+        <tr><td>1</td><td><strong>Reveal a Secret:</strong> The spirit blurts out a hidden fact about a PC or NPC — true, embarrassing, or dangerous.</td></tr>
+        <tr><td>2</td><td><strong>Break Something:</strong> The spirit shatters a mundane object (a lantern, a rope bridge, a crucial tool).</td></tr>
+        <tr><td>3</td><td><strong>Lead Astray:</strong> The spirit moves a short distance and creates a false trail, forcing the party to waste time.</td></tr>
+        <tr><td>4</td><td><strong>Call for Help:</strong> The spirit summons a minor ally (a rat swarm, a will-o'-wisp, a lesser elemental).</td></tr>
+        <tr><td>5</td><td><strong>Curse a PC:</strong> The spirit leaves a lingering mark (−1 die on one skill until the next sunrise).</td></tr>
+        <tr><td>6</td><td><strong>Bargain:</strong> The spirit offers a deal: "Release me now, and I'll tell you where the treasure is hidden."</td></tr>
+    </tbody>
+</table>
+</div>
+
+<h3>Spirit Specializations (Quick Reference)</h3>
+<p>If a player develops a bonded spirit, you may grant one specialization from this list:</p>
+<ul>
+    <li><strong>Combat:</strong> +1 Harm melee, ignore first Harm on attacks.</li>
+    <li><strong>Scout:</strong> Stealthy; Cap 1 carries 2 kg, Cap 3 carries 10 kg.</li>
+    <li><strong>Utility:</strong> Simple tasks (carrying, opening doors).</li>
+    <li><strong>Shield:</strong> Interpose; convert Harm to Fatigue.</li>
+</ul>
+
+<h2 id="cantors-gm">Cantors and Corruption (GM Guidance)</h2>
+<p>Cantors use Songs (Low Rites) with a Corruption Timer. Your main tasks:</p>
+<ul>
+    <li>Track the Corruption Timer only when the player marks it (they manage it per the Player's Guide).</li>
+    <li>On a fill, impose the last Patron's benefit &amp; burden (from Patron tables in the <strong>Player's Guide</strong>, the World Powers and Obligation chapter). Remember that the player then <strong>sets their current Corruption segments to their Tier</strong> (minimum 1). This means high-Tier Cantors always carry a trace of past blooms — use that as a story hook.</li>
+    <li>Spend SB to represent social fallout, Patron omens, or magical residue from their performances. For example, a Cantor who Pushes a song in a crowded tavern might generate a rumor timer or attract the attention of a witch-hunter.</li>
+</ul>
+
+<h3>Inspire Chorus</h3>
+<p>Once per scene, a Cantor can shift all allies' Position +1 for one exchange. If they use it again in the same scene, they mark toward Corruption accumulation (usually 1 segment). This is a non-stacking aura; only the best shift applies.</p>
+
+<h3>Chorus Cults (Optional)</h3>
+<p>If a Cantor performs a <strong>Resonant Rite</strong> (a Song performed with dramatic intent, witnessed by 10+ people, and dedicated to a specific Patron) they may found a <strong>Chorus</strong>. This grants a minor follower benefit (see the Followers and Assets section), but they must mark Obligation to the Cult's Patron (the patron of the Resonant Rite sung) each session they use it.</p>
+
+<p><strong>Managing a Chorus Cult:</strong></p>
+<ul>
+    <li>Define the benefit concretely with the player. Good examples: +1 die to Performance once/session, a single rumor per session, or +1 Boon when singing in public.</li>
+    <li>Track the cult's health with a <strong>Schism Timer [4]</strong>. Tick it when the player ignores the cult (no contact, refuses a request) or when the cult's demands go unmet. On a full timer, introduce a fracture: a rival sect, false rumors, or alliance with a Patron's enemy.</li>
+    <li>Use the Obligation to the Patron as a debt. When it fills, the Patron may demand a service that involves the cult — such as a ritual performance, a pilgrimage, or silencing a troublesome follower.</li>
+    <li>When the Cantor experiences a Corruption bloom, have the cult react. They may be inspired (temporary benefit upgrade) or terrified (temporary penalty). This makes the bloom matter to the faction, not just the character.</li>
+</ul>
+
+<h3>Corruption Blooms as Narrative Levers</h3>
+<p>A Corruption bloom is not a punishment — it is a <strong>character metamorphosis</strong>. Use the Patron's benefit and burden to create roleplaying moments:</p>
+<ul>
+    <li>The burden (e.g., "cannot refuse a request for a song") should complicate the Cantor's life in interesting ways. Enforce it gently but consistently.</li>
+    <li>Let the benefit be genuinely useful (e.g., +1 die to resist fear or a new thematic sense). This encourages players to embrace blooms rather than fear them.</li>
+    <li>After a bloom, ask the player to describe a physical or behavioral change (feathers in hair, a second shadow, a musical tic). Record it on the character sheet. These changes accumulate, making high-Tier Cantors visibly strange.</li>
+</ul>
+
+<h3>Patron's Dedication (Cantor)</h3>
+<p><strong>Prerequisite:</strong> Cantor's Path.<br/>
+<strong>Cost:</strong> 4 XP.<br/>
+<strong>Effect:</strong> You bind your voice to a single Patron (choose one when you take this talent). Your Corruption timer is always keyed to that Patron — it never resets to a different Patron's table when you bloom. Whenever you would gain Corruption from any source, you mark it on this same timer.<br/>
+<strong>Downside (Rivalry):</strong> Singing a Song (Low or Standard Rite) of any other Patron is treacherous. When you do so, your Position for that song is worsened by one step (Dominant → Controlled, Controlled → Desperate). This penalty applies even if the song would otherwise be instant or free.<br/>
+<strong>Note:</strong> This talent does not prevent you from learning or knowing Rites of other Patrons — it merely reflects the jealousy of your chosen Patron and the strain of divided loyalty.</p>
+
+<h3>Resonant Rites — Ruling Guidelines</h3>
+<p>A player may attempt a Resonant Rite to found a cult or simply as a powerful performance. Use these guidelines:</p>
+<ul>
+    <li>The performance requires at least 10 witnesses who are actively paying attention (not just passing by).</li>
+    <li>The player must describe the performance in at least moderate detail — what they sing, how they move, what Patron they invoke.</li>
+    <li>On a successful Lore + Performance roll (DV 3, Position Controlled), the rite is resonant. On a failure, the crowd is unimpressed; the GM may impose a social complication (e.g., heckling, a rival performer).</li>
+    <li>A Resonant Rite always advances the Corruption Timer (mark 1 segment). If the timer fills, the bloom occurs during the performance — describe the Patron's touch manifesting in front of the audience.</li>
+</ul>
+
+<h3>Song Weaver and Compatibility</h3>
+<p>When a player with Song Weaver wants to combine two Songs, you decide compatibility. Use these heuristics:</p>
+<ul>
+    <li><strong>Thematically compatible:</strong> both songs affect healing, both affect movement, both target spirits, etc.</li>
+    <li><strong>Same Patron:</strong> songs from the same Patron are always compatible (they share a thematic resonance).</li>
+    <li><strong>Player justification:</strong> If the player can give a compelling narrative reason why two songs work together, allow it.</li>
+</ul>
+<p>When combined, the player makes a single Lore + Performance roll. If successful, both Song effects occur with +1 Effect (e.g., longer duration, larger area, or +1 die to a related roll). If the roll fails, neither Song takes effect, and the GM gains 1 SB (the discordant notes draw unwanted attention).</p>
+
+<h3>High Cantor and Instant Standard Rites</h3>
+<p>High Cantor is a powerful talent. Keep these points in mind:</p>
+<ul>
+    <li>A Cantor with High Cantor can sing a Standard Rite (from any Patron they have learned) as an instant action. No delay. This does not require a Push unless they want an extra effect.</li>
+    <li>They may still Push the instant Song for +1 Effect at the usual cost (1 Fatigue, mark Corruption). This means a High Cantor can, for example, cast Lay on Hands instantly and also Push it to heal an extra point of Fatigue.</li>
+    <li>Because Standard Rites often cost Obligation for Runekeepers, the Cantor bypasses that cost entirely. This is intentional — their cost is Corruption and potential social fallout. Let them enjoy the power, but remind them that public displays of potent magic attract attention.</li>
+</ul>
+
+<h3>Steady Voice (Optional Talent)</h3>
+<p>The <strong>Steady Voice</strong> talent (2 XP, Player's Guide) allows a Cantor to Push a Song by marking 1 additional Fatigue instead of a Corruption segment (once per scene). This is a safety valve for low-Spirit Cantors. Use it to let a player avoid an untimely bloom, but then apply pressure through Fatigue management (e.g., they are now Fatigued 2 and must rest).</p>
+
+<h3>Final Advice</h3>
+<p>The Cantor's power is <strong>flexibility and speed</strong>. Their weakness is <strong>Corruption accumulation and social visibility</strong>. Lean into both:</p>
+<ul>
+    <li>Give them opportunities to sing for crowds, but also introduce hecklers, rivals, or inquisitors who take notes.</li>
+    <li>Let Corruption blooms change their relationships — old allies may become wary; new contacts may seek them out as oracles.</li>
+    <li>Use Chorus Cults to tie the Cantor to a community that needs protection, guidance, or rescue. Cults are story engines, not just free bonuses.</li>
+</ul>
+
+<blockquote><em>"The Cantor's voice is a candle in the dark. It illuminates, but it also draws the eye of things that hunt by light. Let them sing. Let them bloom. Let their chorus become legend — or a warning."</em>
+<span class="attribution">— The Gray Wanderer, <em>The Gray Wanderer's Grimoire</em></span></blockquote>
+
+<p><strong>Rival Factions:</strong> A neglected Chorus can become a rival faction (see the Advanced GM Techniques chapter). They may split into a competing sect, spread false rumors about the Cantor, or even ally with a Patron's enemy. Use this to generate long-term plot hooks.</p>
+
+<h2 id="rituals-gm">Ritual Magic (GM Advice)</h2>
+<p>Rituals are powerful but slow. Use them for effects that are too big for a single roll.</p>
+
+<h3>Setting DV for Rituals</h3>
+<ul>
+    <li><strong>Low Ritual (DV 3–4):</strong> 10–15 minutes, affects a room or small area.</li>
+    <li><strong>Standard Ritual (DV 4–5):</strong> 30 minutes, affects a building or a scene.</li>
+    <li><strong>High Ritual (DV 5+):</strong> Hours, affects a district or narrative turning point.</li>
+</ul>
+
+<h3>Using Helpers</h3>
+<p>Helpers can reduce DV by 1 each (max −2) or absorb 1 SB of backlash. They must have relevant skills (Arcana, Lore, etc.). Interrupting a helper may disrupt the ritual.</p>
+
+<h3>Pacing and Interruption</h3>
+<p>If a ritual is interrupted, treat as a Miss on the casting roll (see the Core Resolution Cycle). You may also:</p>
+<ul>
+    <li>Advance a doomsday timer.</li>
+    <li>Summon an unexpected entity.</li>
+    <li>Damage a needed component.</li>
+</ul>
+
+<div class="panel panel-green">
+    <div class="panel-title">Components as Devotion (Even with a Symbol/Codex/Thiasos)</div>
+    <p>A common player question: "I already have a Patron's Symbol / Codex / Thiasos — why should I hunt for rare components?"</p>
+    <p><strong>Answer:</strong> Because components are <strong>offerings</strong>. They show the Patron that you are willing to invest time, resources, and risk. Even when a Symbol or Codex technically allows a ritual without physical materials, <strong>acquiring components voluntarily can reduce Obligation or earn the Patron's favor</strong>.</p>
+    <p>Use this rule of thumb:</p>
+    <ul>
+        <li><strong>Ritual with no components (just Symbol/Codex):</strong> Normal DV, normal Obligation cost.</li>
+        <li><strong>Ritual with common components (herbs, salt, a candle):</strong> Reduce Obligation by 1 (minimum 0).</li>
+        <li><strong>Ritual with rare or dangerous components (a phoenix feather, a drop of troll blood, a whispered secret):</strong> Reduce DV by 1 <strong>and</strong> clear 1 segment of existing Obligation to that Patron (once per session max).</li>
+        <li><strong>Ritual with a truly legendary component (the crown of a dead king, a tear from a goddess):</strong> The Patron may waive all Obligation for that ritual — and even grant a free Boon.</li>
+    </ul>
+    <p>This gives players a meaningful choice: use the easy, costly path (Symbol/Codex) or invest legwork to earn the Patron's good will. It also turns component hunting into adventure hooks.</p>
+</div>
+
+<h2 id="psionics-gm">Psionics (Optional) — GM Sidebar</h2>
+<div class="panel">
+    <div class="panel-title">Adjudicating Psionics</div>
+    <p>Psionics is power without intermediaries — no Patrons, no symbols. As GM, ensure it feels precise yet costly.</p>
+    <p><strong>Core Principles:</strong></p>
+    <ul>
+        <li>Set DV by precision, not raw power. Clear intent = lower DV.</li>
+        <li><strong>Generate SB frequently</strong> — mental strain, sensory bleed, NPC suspicion. Psionics generates SB quickly; be prepared to spend them on interesting complications.</li>
+        <li>Respect consent: unwilling minds always resist.</li>
+        <li>On Partial, offer hard choices: surface thoughts only, emotional truth without context.</li>
+        <li>Distinguish from spellcraft: psionics excels at direct influence, not environmental change.</li>
+    </ul>
+    <p><strong>Example Backlash:</strong> headache, nosebleed, fleeting vision, target becomes aware of intrusion, caster loses focus (Fatigue 1).</p>
+</div>
+
+<h2 id="magic-quickref">Quick Reference Tables (GM Only)</h2>
+
+<h3>Spend SB for Magical Complications</h3>
+<div class="table-wrap">
+<table>
+    <thead><tr><th>SB</th><th>Effect</th></tr></thead>
+    <tbody>
+        <tr><td>1</td><td>Minor flare, noise, caster off-balance (−1 die next action).</td></tr>
+        <tr><td>2</td><td>Backlash harms an ally (Fatigue 1), draws attention, Position −1.</td></tr>
+        <tr><td>3</td><td>Patron omen, magical feedback (Harm 1), new timer (e.g., "Leaking Energy").</td></tr>
+        <tr><td>4+</td><td>Reality warp, Patron manifestation, scene shifts (fire, flood, etc.).</td></tr>
+    </tbody>
+</table>
+</div>
+
+<h3>Elemental Backlash Quick Picks</h3>
+<div class="table-wrap">
+<table>
+    <thead><tr><th>Element</th><th>Minor (1–2 SB)</th><th>Major (3+ SB)</th></tr></thead>
+    <tbody>
+        <tr><td>Fire</td><td>Smoke, sparks</td><td>Uncontrolled fire, explosion</td></tr>
+        <tr><td>Water</td><td>Slick floor, damp</td><td>Flooding, emotional storm</td></tr>
+        <tr><td>Earth</td><td>Dust, tremor</td><td>Collapse, binding</td></tr>
+        <tr><td>Air</td><td>Gust, ringing ears</td><td>Hurricane, deafness</td></tr>
+        <tr><td>Fate</td><td>Option closes</td><td>Prophecy becomes fixed</td></tr>
+        <tr><td>Luck</td><td>Small misfortune</td><td>A friend suffers the failure</td></tr>
+        <tr><td>Life</td><td>Overgrowth</td><td>Parasite, fever</td></tr>
+        <tr><td>Death</td><td>Chill whispers</td><td>A ghost manifests</td></tr>
+    </tbody>
+</table>
+</div>
+
+<h3>Patron Intrusion Examples</h3>
+<div class="table-wrap">
+<table>
+    <thead><tr><th>Patron Type</th><th>Sample Intrusion</th></tr></thead>
+    <tbody>
+        <tr><td>Everflame (Oath)</td><td>"Prove your purity — destroy that heretical text."</td></tr>
+        <tr><td>The Traveler</td><td>"You must guide a lost soul to their destination."</td></tr>
+        <tr><td>Inquisitor Prime</td><td>"Report any unsanctioned magic you witness."</td></tr>
+        <tr><td>Malachai</td><td>"Curse someone weaker than you before dawn."</td></tr>
+    </tbody>
+</table>
+</div>
+
+<h3>DV Quick Reference</h3>
+<div class="table-wrap">
+<table>
+    <thead><tr><th>Type</th><th>DV</th></tr></thead>
+    <tbody>
+        <tr><td>Cantrip (one tag)</td><td>2</td></tr>
+        <tr><td>Standard spell (two tags)</td><td>3</td></tr>
+        <tr><td>Advanced spell (three tags)</td><td>4</td></tr>
+        <tr><td>Dangerous tag</td><td>+2 (instead of +1)</td></tr>
+        <tr><td>Unwilling target</td><td>+1</td></tr>
+        <tr><td>Scene duration</td><td>+1</td></tr>
+        <tr><td>Permanent effect</td><td>+3</td></tr>
+        <tr><td>Unknown location</td><td>+2</td></tr>
+    </tbody>
+</table>
+</div>
+
+<h3>Backlash Severity Quick Reference</h3>
+<div class="table-wrap">
+<table>
+    <thead><tr><th>Severity</th><th>Effect</th><th>Example</th></tr></thead>
+    <tbody>
+        <tr><td>Minor</td><td>1 Fatigue, minor environmental effect</td><td>Singed sleeve, chill, whisper</td></tr>
+        <tr><td>Moderate</td><td>Condition, ward collapses, alarm</td><td>Blinded, entangled, exposed</td></tr>
+        <tr><td>Major</td><td>Harm 1, spell inverts, permanent mark</td><td>Scar, healing becomes harm</td></tr>
+        <tr><td>Catastrophic</td><td>Harm 2, reality fracture, Patron manifests</td><td>Time stutter, gravity warps</td></tr>
+    </tbody>
+</table>
+</div>
+
+<h3>Common Spell Chains</h3>
+<div class="table-wrap">
+<table>
+    <thead><tr><th>Chain</th><th>Purpose</th><th>DV per Step</th></tr></thead>
+    <tbody>
+        <tr><td><code>[VEIL]</code> → <code>[LEAP]</code></td><td>Stealthy teleport</td><td>2, 4</td></tr>
+        <tr><td><code>[SILENCE]</code> → <code>[LEAP]</code></td><td>Silent teleport</td><td>2, 4</td></tr>
+        <tr><td><code>[VEIL]</code> → <code>[SILENCE]</code> → <code>[LEAP]</code></td><td>The Quiet Exit</td><td>2, 2, 4</td></tr>
+        <tr><td><code>[SCRY]</code> → <code>[GATE]</code></td><td>Teleport to known location</td><td>4, 5</td></tr>
+        <tr><td><code>[DEFEND]</code> → <code>[HEAL]</code></td><td>Protect then heal</td><td>2, 3</td></tr>
+        <tr><td><code>[BURNING][STRIKE]</code> → <code>[WIND][AREA]</code></td><td>Attack then escape</td><td>3, 4</td></tr>
+    </tbody>
+</table>
+</div>
+
+<h2 id="final-gm-reminder">Final GM Reminder</h2>
+<p>Magic is a narrative engine. Use Story Beats to create drama, not to punish. When in doubt, let the spell work and complicate the result. The world should react — but always in a way that keeps the story moving.</p>
+
+<blockquote><em>"Set the DV low. Spend SB to make the cost visible. Let the fiction lead."</em></blockquote>
+
+<blockquote>"You are not the Weave's master. You are its conversation partner. Treat it with respect, and it will respect you. Treat it with contempt, and it will correct your grammar. The Weave is patient. It has all the time in the world to teach you the lesson you refused to learn.
+<br/><br/>
+When in doubt, be specific. The Weave rewards precision. When you have a choice, be cautious. The Weave charges interest. When you succeed, be humble. The Weave remembers.
+<br/><br/>
+Now go. Teach your students. Let them light their sleeves on fire. Let them learn. The Weave is listening."
+<span class="attribution">— Lysandra of the Amber Gate</span></blockquote>
+
+<footer>Fate's Edge Proprietary Content — (c) 2024 Nicholas A. Gasper. All rights reserved.</footer>
+
+</body>
+</html>

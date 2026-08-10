@@ -1,0 +1,1147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Peoples and Cultures — Fate's Edge Expansion</title>
+<style>
+    :root {
+        --bg1: #0a0c09;
+        --bg2: #12160e;
+        --bg3: #1a2013;
+        --bg4: #242c1b;
+        --text: #e6e8df;
+        --text2: #b2b8a4;
+        --text3: #7d8471;
+        --gold: #93a355;
+        --gold-hover: #a9bb66;
+        --border: #333a28;
+        --red: #8e3a2a;
+        --green: #3d7a52;
+        --blue: #3c6e8f;
+        --purple: #6a4f7a;
+        --orange: #a8752a;
+        --brass: #9c7a3c;
+        --mist: #4f6b73;
+        --radius: 8px;
+        --font: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+        background: var(--bg1);
+        background-image: radial-gradient(circle at 50% 0%, #141c0e 0%, #0a0c09 60%);
+        color: var(--text);
+        font-family: var(--font);
+        padding: 1.5rem;
+        max-width: 1100px;
+        margin: 0 auto;
+        line-height: 1.6;
+    }
+    h1, h2, h3, h4, h5 { color: var(--gold); margin: 0.6rem 0 0.35rem; }
+    h1 { font-size: 1.9rem; border-bottom: 2px solid var(--gold); padding-bottom: 0.3rem; }
+    h2 { font-size: 1.45rem; border-bottom: 1px solid var(--border); padding-bottom: 0.2rem; margin-top: 1.6rem; }
+    h3 { font-size: 1.15rem; margin-top: 1.2rem; }
+    h4 { font-size: 0.98rem; color: var(--text); margin-top: 0.8rem; }
+    p { margin: 0.35rem 0; }
+    a { color: var(--gold); text-decoration: none; }
+    a:hover { color: var(--gold-hover); text-decoration: underline; }
+    ul, ol { margin: 0.35rem 0 0.35rem 1.3rem; }
+    li { margin: 0.15rem 0; }
+    .panel {
+        background: var(--bg2);
+        border-radius: var(--radius);
+        padding: 0.7rem 0.9rem;
+        border: 1px solid var(--border);
+        margin: 0.6rem 0;
+    }
+    .panel-gold { border-left: 4px solid var(--gold); }
+    .panel-red { border-left: 4px solid var(--red); }
+    .panel-blue { border-left: 4px solid var(--blue); }
+    .panel-green { border-left: 4px solid var(--green); }
+    .panel-purple { border-left: 4px solid var(--purple); }
+    .panel-orange { border-left: 4px solid var(--orange); }
+    .panel-brass { border-left: 4px solid var(--brass); }
+    .panel-mist { border-left: 4px solid var(--mist); }
+    .panel > strong.title { display:block; color: var(--gold); margin-bottom:0.3rem; font-size:0.95rem; }
+    .badge {
+        display: inline-block;
+        padding: 0.05rem 0.5rem;
+        border-radius: 12px;
+        font-size: 0.68rem;
+        font-weight: 600;
+        margin: 0.1rem 0.15rem 0.1rem 0;
+    }
+    .badge-gold { background: var(--gold); color: #10130a; }
+    .badge-red { background: var(--red); color: #fff; }
+    .badge-green { background: var(--green); color: #fff; }
+    .badge-blue { background: var(--blue); color: #fff; }
+    .badge-purple { background: var(--purple); color: #fff; }
+    .badge-orange { background: var(--orange); color: #fff; }
+    .badge-brass { background: var(--brass); color: #fff; }
+    .badge-mist { background: var(--mist); color: #fff; }
+    .badge-gray { background: var(--bg4); color: var(--text3); }
+    .text-muted { color: var(--text3); }
+    .text-gold { color: var(--gold); }
+    .text-sm { font-size: 0.87rem; }
+    .text-xs { font-size: 0.75rem; }
+    hr { border: none; border-top: 1px solid var(--border); margin: 0.9rem 0; }
+    .toc { background: var(--bg3); border-radius: var(--radius); padding: 0.7rem 1rem; border: 1px solid var(--border); columns: 2; column-gap: 1.5rem; }
+    .toc a { color: var(--text2); display: block; padding: 0.12rem 0; font-size: 0.87rem; break-inside: avoid; }
+    .toc a:hover { color: var(--gold); }
+    @media (max-width: 700px) { .toc { columns: 1; } }
+    table { width: 100%; border-collapse: collapse; margin: 0.6rem 0; font-size: 0.85rem; }
+    caption { text-align:left; caption-side: top; font-size:0.8rem; color: var(--text3); margin-bottom:0.2rem; font-style: italic; }
+    th, td { border: 1px solid var(--border); padding: 0.45rem 0.65rem; text-align: left; vertical-align: top; }
+    th { background: var(--bg3); color: var(--gold); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.02em; }
+    tr:nth-child(even) td { background: rgba(255,255,255,0.02); }
+    .talent-name { color: var(--gold); font-weight: 700; }
+    blockquote {
+        border-left: 3px solid var(--gold);
+        padding-left: 1rem;
+        margin: 0.6rem 0;
+        color: var(--text2);
+        font-style: italic;
+    }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem; }
+    @media (max-width: 700px) { .grid-2 { grid-template-columns: 1fr; } }
+    footer { font-size: 0.78rem; color: var(--text3); text-align: center; padding: 1.4rem 0 0.5rem; }
+</style>
+</head>
+<body>
+
+<h1>Peoples and Cultures</h1>
+<p class="text-sm text-muted">
+    <span class="badge badge-gold">Expansion</span>
+    <span class="badge badge-blue">Playable Ancestries &amp; Cultures</span>
+    <span class="badge badge-green">Aeler · Lethai · Threshold Folk</span>
+    <span class="badge badge-gray">Author: Nicholas A. Gasper</span>
+</p>
+
+<div class="panel panel-gold">
+    <strong class="title">What This Covers</strong>
+    <p class="text-sm">This expansion adds playable peoples beyond the human default: the <strong>Aeler</strong> (dwarven masters of infrastructure and law), the <strong>Lethai</strong> (elves split by an ancient curse into body-gifted and mind-gifted lines, with root-law forest cultures and their oathbound and urban kin), and the <strong>Threshold Folk</strong> — small, liminal cultures such as the hearth-bound Aelaerem, the counting Aelinnel and their Mazereth and Archive Keeper cousins, and the shadow-walking Umbral Kin. A closing chapter covers the rarer, mythic Beastfolk, Dragonfolk, and Others.</p>
+    <p class="text-sm">Every entry keeps its full crunch — Affinities, starting and key Talents, Strings, sample characters, and GM-facing timers and levers — so you can drop a culture into a game session directly from this page. Use the Table of Contents to jump to any people.</p>
+</div>
+
+<nav class="toc" aria-label="Table of Contents">
+    <a href="#aeler">The Aeler</a>
+    <a href="#aeler-affinity">— Affinity &amp; Starting Talent</a>
+    <a href="#aeler-talents">— Key Talents &amp; Strings</a>
+    <a href="#aeler-sample">— Sample Character &amp; Hooks</a>
+    <a href="#lethai">The Lethai</a>
+    <a href="#lethai-al">— Lethai-al: Root, River, and the Roof-Tree</a>
+    <a href="#lethai-lineages">— Peoples &amp; Lineages</a>
+    <a href="#lethai-two-gifts">— The Two Gifts &amp; Mixed Blood</a>
+    <a href="#lethai-rivals">— Rivals &amp; Distance</a>
+    <a href="#lethai-war">— War by Shade</a>
+    <a href="#lethai-marks">— Marks: Burden, Blessing, and Lost Context</a>
+    <a href="#lethai-samples">— Sample Characters &amp; Hooks</a>
+    <a href="#threshold">The Threshold Folk</a>
+    <a href="#threshold-quickstart">— Quickstart &amp; Play Modes</a>
+    <a href="#aelaerem">— Aelaerem, People of the Hearth</a>
+    <a href="#aelinnel">— Aelinnel, People of Sums</a>
+    <a href="#mazereth">— Mazereth, Deep Tunnelers</a>
+    <a href="#umbral-kin">— Umbral Kin, Ghost-Walkers</a>
+    <a href="#archive-keepers">— Archive Keepers, Knowledge-Bound</a>
+    <a href="#threshold-stats">— Threshold Culture Stats Summary</a>
+    <a href="#nook-sheet">— Nook / Clan Sheet Template</a>
+    <a href="#threshold-tracks">— Threshold Tracks &amp; Toolkit</a>
+    <a href="#threshold-deep-dive">— Cultural Deep-Dives &amp; Portrayal</a>
+    <a href="#threshold-example">— Example of Play</a>
+    <a href="#others">Beastfolk, Dragonfolk, and Others</a>
+    <a href="#beastfolk">— Beastfolk</a>
+    <a href="#dragonfolk">— Dragonfolk</a>
+    <a href="#the-others">— Others</a>
+    <a href="#nonhuman-hooks">— Adventure Hooks</a>
+</nav>
+
+<!-- ================= THE AELER ================= -->
+<h2 id="aeler">The Aeler</h2>
+<p>The Aeler are masters of infrastructure, economics, and subtle influence. Their power lies in making the world work — and in making everyone else quietly dependent on that work.</p>
+
+<h3 id="aeler-affinity">Affinity &amp; Starting Talent</h3>
+<div class="panel panel-green">
+    <strong class="title">Affinity: Stone &amp; Breath / Deep Accounting</strong>
+    <ul class="text-sm">
+        <li><strong>Stone &amp; Breath:</strong> +1 die to Craft/Lore rolls for infrastructure work; +1 Position underground or in urban systems when navigating them.</li>
+        <li><strong>Deep Accounting:</strong> Spend 1 Boon to audit a situation — ask one question about hidden resources, costs, or dependencies.</li>
+    </ul>
+</div>
+<div class="panel panel-gold">
+    <strong class="title"><span class="talent-name">Vent Prior's Training</span> <span class="badge badge-brass">3 XP · Minor</span></strong>
+    <p class="text-sm"><em>Requires Craft 1+, Wits 2+.</em> +1 die to rolls involving air quality, ventilation, or structural integrity. You know the Nine Measures. Once per scene, read a structure like a ledger for +1 die to understand its construction or weaknesses.</p>
+</div>
+
+<h3 id="aeler-talents">Key Talents &amp; Strings</h3>
+<table>
+<caption>Aeler key talent paths</caption>
+<thead><tr><th>Talent</th><th>Cost</th><th>Requires</th><th>Effect</th></tr></thead>
+<tbody>
+<tr><td class="talent-name">Calibrated Weight <em class="text-xs text-muted">(Mint &amp; Measure)</em></td><td><span class="badge badge-brass">4 XP · Minor</span></td><td>—</td><td>+1 die to trade, negotiation, and counterfeit detection. Once/scene, spend 1 Boon to force a public bowl (fairness hearing) that shifts a negotiation's DV by −1 and grants +1 Position.</td></tr>
+<tr><td class="talent-name">Keystone Clause <em class="text-xs text-muted">(Mint &amp; Measure)</em></td><td><span class="badge badge-orange">6 XP · Major</span></td><td>Calibrated Weight</td><td>Establish keystone rights over infrastructure, a contract, or a resource (grants a String). Once/scene, pause a route, contract, or service — turn a chase into a stand (Position +1 for prepared defenders) or force a negotiation.</td></tr>
+<tr><td class="talent-name">Charter Bell <em class="text-xs text-muted">(Oven-Warden's Path)</em></td><td><span class="badge badge-brass">5 XP · Minor</span></td><td>Presence 2+, Command 1+</td><td>In a survival crisis, organize a community with Presence+Command (DV 3); success grants +1 Position to allies for survival actions. Once/scene, invoke the Oven Charter to force a public bowl in crisis and ensure fair distribution.</td></tr>
+<tr><td class="talent-name">Bell-Chain Signal <em class="text-xs text-muted">(Vent-Captain's Path)</em></td><td><span class="badge badge-brass">4 XP · Minor</span></td><td>Wits 2+, Notice 1+</td><td>+1 die to communication, signals, and hidden-information detection. Establish a bell-chain network; once/scene, send an instant message to any ally in it.</td></tr>
+</tbody>
+</table>
+
+<div class="panel panel-blue">
+    <strong class="title">Strings (Aeler)</strong>
+    <ul class="text-sm">
+        <li><strong>Keystone Right:</strong> control critical infrastructure (bridge, sluice, vent shaft) — pause it once/scene.</li>
+        <li><strong>Grain Surety:</strong> control a food source or storage — force fair distribution or gain negotiation leverage.</li>
+        <li><strong>Sluice Key:</strong> control water flow or sanitation — shift DV by −1 on water or flood operations.</li>
+        <li><strong>Mint Die:</strong> control a currency or measurement source — force a public bowl or detect counterfeits.</li>
+        <li><strong>Oven Charter:</strong> control a public resource (oven, shelter, etc.) — invoke its protections.</li>
+    </ul>
+</div>
+
+<h3 id="aeler-sample">Sample Character &amp; Adventure Hooks</h3>
+<div class="panel panel-gold">
+    <strong class="title">Orra Vent-Prior of Third Stack</strong>
+    <p class="text-sm">Body 2, Wits 3, Spirit 2, Presence 2 · Skills: Craft 2, Notice 2, Lore 1, Craft (specialty) 1<br>
+    Talents: Vent Prior's Training, Bell-Chain Signal · Affinity: Stone &amp; Breath<br>
+    Strings: Keystone Right (main elevator shaft), Sluice Key (water reclamation)<br>
+    Complication: Stone-Press Susceptibility (Spirit test DV 3 or −1 die in deep underground/high-stress situations)</p>
+</div>
+<div class="panel panel-purple">
+    <strong class="title">Adventure Hooks</strong>
+    <ul class="text-sm">
+        <li><strong>The Bell That Rang Twice:</strong> a malfunctioning signal system is causing dangerous delays in an Aeler hold.</li>
+        <li><strong>Bread Before Swords:</strong> keep the winter ovens open and fair against a syndicate contesting the Oven Charter.</li>
+        <li><strong>Keystone Courtesy:</strong> a bridge has been "politely rested" — an altered keystone tablet. Track the culprit through chisel marks and contract disputes.</li>
+        <li><strong>Mist Ward Winter:</strong> repair failing towers while locals distrust Aeler ledgers; prove the math keeps them alive.</li>
+        <li><strong>Charter Kitchen:</strong> a reform lodge wants a winter oven without paying tithe. Broker grain, tame politics, and post the bell before ledgers close.</li>
+    </ul>
+</div>
+
+<div class="panel panel-mist">
+    <strong class="title">Integration with Core Rules</strong>
+    <p class="text-sm"><strong>Deep Drakes as Fronts:</strong> Stone-Press [6], Miasma Spread [4], Vent Failure [4]. When Stone-Press fills, escalate with hallucinated ledgers and mis-signed keystones.</p>
+    <p class="text-sm"><strong>Tally-Law Mechanics:</strong> represent Aeler law through the Strings system for contractual obligations, a −1 DV in negotiations backed by proper documentation, and "Audit [4]" timers for contract violations.</p>
+    <p class="text-sm"><strong>Display Rights:</strong> track Aeler status as a Minor Asset (4 XP — Public Display Charter, +1 Position in civic negotiations) or Major Asset (8 XP — Rings of Account, first voice in oven courts, DV −1 on resource management).</p>
+</div>
+
+<!-- ================= THE LETHAI ================= -->
+<h2 id="lethai">The Lethai</h2>
+<p>The Lethai are divided by an ancient curse that prevents any one of them from fully accessing both physical and mental gifts. The split created distinct cultures, each excelling in a different aspect of existence while yearning for wholeness. They master living law, environmental stewardship, and knowledge that only makes sense in context.</p>
+
+<div class="panel panel-green">
+    <strong class="title">Affinity (All Lethai) — Choose One at Creation</strong>
+    <ul class="text-sm">
+        <li><strong>Gift of the Body (Lethai-al/-ar):</strong> +1 die to Body-based skills; once/scene, spend 1 Boon to push a physical ability beyond normal limits for one action.</li>
+        <li><strong>Gift of the Mind (Lethai-thora):</strong> +1 die to Wits/Spirit-based skills; once/scene, spend 1 Boon to recall or deduce information beyond immediate knowledge.</li>
+    </ul>
+    <p class="text-sm"><strong>The Curse of Division:</strong> you cannot take talents that would enhance both physical and mental capabilities at once — if a talent would grant both, choose one benefit.</p>
+</div>
+
+<h3 id="lethai-al">Lethai-al — Root, River, and the Roof-Tree</h3>
+<p class="text-sm text-muted"><em>Woodwise lawkeepers, merchants of light and shade, stewards of living borders.</em></p>
+
+<h4>Ground &amp; Memory</h4>
+<p class="text-sm">Lethai-al dwell where roof-trees braid the sky and rivers think aloud. Their memory is arboreal: rings and seasons, storms and healings, disputes settled in coppice and replanting. An oath among them is <strong>root-law</strong> — it binds living things (people, paths, waters) and is paid in years. Outsiders see quiet; neighbors know them as relentless auditors of footprint and flow.</p>
+
+<h4>Forest Commons (Places That Hold)</h4>
+<ul class="text-sm">
+    <li><strong>Valewood:</strong> tall-canopy forest laced with rain gardens and stone-steps; trails shift with season. Waystones carry moss-tallies — green for open, gray for heal, black for trespass.</li>
+    <li><strong>Roof-Tree Circles:</strong> villages built around elders and one monumental tree per circle, scaffolded with walkways and rain-catchers; sap is consecrated for sealing or dismissing pacts.</li>
+    <li><strong>River Courts:</strong> significant streams keep court on a shingle bank with a willow-bench and a book of pebbles; trade, ferry rights, and flood work are judged where the water can overhear.</li>
+    <li><strong>Edge-Wards:</strong> where wood meets field or steppe, boundary groves are treated as treaties — thorn, ash, and fruit interplanted so the sharp feeds the soft. This hedge law stops hooves while nourishing neighbors.</li>
+</ul>
+
+<h4>Courtesy &amp; Everyday Law</h4>
+<p class="text-sm"><strong>Shade Etiquette</strong> is observed to earn hospitality and a hearing; ignoring it turns the forest against your plans.</p>
+<ul class="text-sm">
+    <li><strong>Iron Covered:</strong> wrap bare iron in leather or cloth — covered iron grants Position +1 in parley or requests to pass.</li>
+    <li><strong>Name Once:</strong> speak your name and intent at the edge; never name the forest as property.</li>
+    <li><strong>Step on Stone:</strong> use set stones or boardwalks — every crushed sprout is a Light-Due.</li>
+    <li><strong>Water First:</strong> pour the first cup to the river or cistern before drinking.</li>
+    <li><strong>Leave the Light:</strong> replace shade taken — plant, heal, or pay a seed-tithe.</li>
+</ul>
+<p class="text-sm text-muted"><em>Timers for breaches:</em> Under-Root Grudge [4] (tariffs, closed ferries), Stream-Clouding [4] (mill shutdowns, fish wardens).</p>
+
+<h4>Courts &amp; Factions</h4>
+<ul class="text-sm">
+    <li><strong>Wardens of the Roof-Tree:</strong> rangers and surveyors measuring canopy health, poacher pressure, and firebreaks; carry leaf-badges and thorn-writs.</li>
+    <li><strong>Merchant Foresters (Syndics of Light):</strong> manage sustainable fellings, resin trade, boat-timber quotas, and lantern-wood auctions; argue that trade funds stewardship.</li>
+    <li><strong>Songkeepers:</strong> priests of repair rites and remembrance festivals; arbitrate forgiveness by counting regrowth, not coin.</li>
+    <li><strong>Ferrymen of the Rain:</strong> river pilots and dam-tenders whose votes swing courts in flood years.</li>
+</ul>
+<p class="text-sm text-muted"><em>Tension lines:</em> quota vs. canopy health; export timbers vs. local craft; river straightening for mills vs. flood meadows for salmon.</p>
+
+<h4>Borders &amp; Neighbors</h4>
+<ul class="text-sm">
+    <li><strong>Silence Furlong (with the Ykrul):</strong> a speechless border strip — no grazing, felling, or naming. Cross in silence, speak once. Honored, it keeps the peace warm; broken twice in a season, it brings gray-fletched messengers at dusk. Joint patrols heal hedges and lift stones together; concessions are marked as seasonal Strings.</li>
+    <li><strong>Ridge Courtesy (with the Aeler):</strong> root-law and stone-law trade proofs — the Aeler build keystone stairs where the Lethai-al choose the line, and the Lethai-al plant edge-wards that keep the roads alive. Disputes end with bread in oven courts or sap at the roof-trees.</li>
+    <li><strong>Moots at the Mouth (with the Linns):</strong> ship-timber quotas bind with replanting moots and harbor dues; storm seasons bite, and both sides sing the river clear.</li>
+</ul>
+
+<h4>Economy of Light (Strings &amp; Ledgers)</h4>
+<p class="text-sm">Light and shade are currencies — every fell, ferry crossing, or fire carries a <strong>light-due</strong>: a balance repaid in replanting, canal-clearing, or trade at kinder rates.</p>
+<div class="panel panel-blue">
+    <strong class="title">At the Table: Light-Due System</strong>
+    <p class="text-sm">Cash a light-due to gain DV −1 on operations framed as repair, replanting, or flood work. Abuse it, and start Under-Root Grudge [1].</p>
+</div>
+<p class="text-sm text-muted"><em>Quotas as Timers:</em> Boat-Timber Quota [6], Lanternwood Allotment [4] — fill the timer to unlock export; overfilling triggers a Canopy Censure.</p>
+
+<h4>Threats &amp; Remedies</h4>
+<ul class="text-sm">
+    <li><strong>Bark Blight:</strong> fungal rot spread by careless carts and damp blades — remedy: ash-wash stations, tool quarantine, fire-lines timed by the moon.</li>
+    <li><strong>Poacher Pressure:</strong> syndicates take ripe resin and seedwood without paying dues — remedy: undercover ferries, tariff traps at market, public shaming rites.</li>
+    <li><strong>River Clouding:</strong> silt from mills and bad embankments chokes fish beds — remedy: settle-ponds, scheduled sluices, mill-weirs redesigned with Aeler math.</li>
+    <li><strong>Old Fire:</strong> lightning scars waking in drought years — remedy: fuel mosaics, controlled burns, ember patrols.</li>
+</ul>
+<p class="text-sm text-muted"><em>Example front chain:</em> Bark Blight [6] → Canopy Hunger [4] → Famine Tariff [4].</p>
+
+<h4>Tools &amp; Tokens (at the Table)</h4>
+<ul class="text-sm">
+    <li><strong>Leaf-Badge (Warden):</strong> once/scene, upgrade Position by +1 when enforcing forest law or conducting a rescue.</li>
+    <li><strong>Seed-Tithe Seal:</strong> convert a sanction into a Repair Project [4] instead of a fine or exile.</li>
+    <li><strong>Ferry-Knot:</strong> skip the first River Hazard consequence on a leg or chase; using it costs a light-due.</li>
+    <li><strong>Moss-Tally:</strong> reveal one hidden quota timer in a market or lumberyard scene.</li>
+</ul>
+
+<h4>Aesthetics &amp; Speech</h4>
+<ul class="text-sm">
+    <li><strong>Materials:</strong> bark-laminate armor, willow-bone frames, resin-glass panes, river-iron sheathed in leather.</li>
+    <li><strong>Colors:</strong> rain green, bark gray, amber, sky-through-leaf.</li>
+    <li><strong>Proverbs:</strong> "Leave the forest no thinner than your shadow." "The river remembers who spoke over it, and what they promised." "Cut where it wants to fall, or do not cut at all." "If the hedge is hungry, the treaty is thin."</li>
+    <li><strong>Names:</strong> given name plus grove and season or deed — e.g., <em>Talan of Reedfall, Who Unknotted the Flood</em>.</li>
+</ul>
+
+<h4>Integration Hooks</h4>
+<ul class="text-sm">
+    <li><strong>Political Intrigue:</strong> forest syndics lobby city councils for lanternwood allotments; bribes are dressed as "donations" to flood work.</li>
+    <li><strong>Caravans:</strong> resin and seed routes require shade-credit; escorts must mind iron covers and the Silence Furlong.</li>
+    <li><strong>Wilderness:</strong> use standard Hinterlands procedures with fuel mosaics and blight quarantine as special orders.</li>
+    <li><strong>Urban Districts:</strong> dock courts host River Days; Lethai-al ferries grant canoe-lane priority to crews who heal ladders and steps.</li>
+</ul>
+
+<h4>Portraying the Lethai-al</h4>
+<p class="text-sm">Let <strong>policy</strong> speak before mystique: quotas, ferries, hedges, the cost of light. Make courtesy concrete — stones, coverings, cups — and consequences seasonal, not theatrical. Treat the forest as a <strong>party to treaty</strong>, not scenery. When in doubt, ask: <em>what did this footstep cost, and who will pay it?</em></p>
+
+<h4>Language &amp; Time (Context Is King)</h4>
+<p class="text-sm">Lethai speech is <strong>context-saturated</strong> — syntax legible to grandparents can baffle grandchildren unless framed by the right place, season, and kinship. Meaning travels with <strong>context keys</strong>: gesture, setting, shared story. A sentence lifted from its grove can die on the road.</p>
+<div class="panel panel-blue">
+    <strong class="title">At the Table: Context Keys</strong>
+    <p class="text-sm">Place-name, season-mark, kinship-hand, roof-tree sign. Absent any two, assume misreadings. Reading or pleading in older registers increases DV by +1 unless you hold a Context String (gloss-tree, witness, song). Cashing a Context String reduces DV by −1 and creates a Shared Frame (Position +1 on the first exchange).</p>
+</div>
+
+<h3 id="lethai-lineages">Peoples &amp; Lineages</h3>
+<div class="panel panel-green">
+    <strong class="title">Lethai-al — The People of the Body</strong>
+    <p class="text-sm">Woodwise and numerous in most great forests — the elves most humans meet, and most willing to integrate in mixed cities. Embodied and present: heightened senses, quick strength, an ease with weather and work. Most half-elves trace their lineage here.</p>
+    <p class="text-sm"><strong>Everyday:</strong> ferry crews, hedge-wardens, resin syndics, ward dancers.<br>
+    <strong>Gifts (examples):</strong> <em>Canopy Spring</em> (Position +1 on leaps/climbs once/scene); <em>Scent of Rain</em> (clue on approaching weather or rot); <em>Root-Balance</em> (resist a shove or knockdown).<br>
+    <strong>Strings:</strong> ferry knot; resin share; roof-tree blessing.</p>
+</div>
+<div class="panel panel-purple">
+    <strong class="title">Lethai-ar — The Oathbound</strong>
+    <p class="text-sm">Wood elves sworn to Inae (the Weaver, Angel of Spiders) or Isoka (the Serpent Queen, Angel of Snakes) — rare in the upper Amaranthine, growing more common along shaded trade arteries and cavernous underways. Their vows shape craft and law: webs of obligation, clean strikes, poison treated as medicine with teeth.</p>
+    <p class="text-sm"><strong>Everyday:</strong> understory judges, silk engineers, antidote keepers, night pilots.<br>
+    <strong>Gifts (examples):</strong> <em>Weaver's Reading</em> (trace networks: DV −1 on uncovering plots or paths); <em>Stillness</em> (go unnoticed in dim light until you move to act); <em>Venin Lore</em> (convert Harm 1 from toxins to Fatigue once/scene).<br>
+    <strong>Strings:</strong> spider-vow token; serpent oath; silk-tithe.<br>
+    <strong>Courtesy:</strong> oath-signs are worn openly; breaking web-law costs Mask Rights for a season.</p>
+</div>
+<div class="panel panel-blue">
+    <strong class="title">Lethai-thora — The People of the Mind</strong>
+    <p class="text-sm">Urban circles found chiefly in Thepyrgos — scholars, civil engineers, translators of other peoples' law. Long memories, sharp minds, and (not without irony) many of the leading experts on human and Aeler culture. Their courts weigh arguments like bridges.</p>
+    <p class="text-sm"><strong>Everyday:</strong> archivists, canal designers, mint auditors, diplomatic tutors.<br>
+    <strong>Gifts (examples):</strong> <em>Memory Canticle</em> (recall a text with line-accurate detail); <em>Number Music</em> (DV −1 on design, repair, or logistics projects framed aloud); <em>Cold Reading</em> (Position +1 on a first parley when you had time to observe).<br>
+    <strong>Strings:</strong> gloss-tree charter; canal seal; ledger witness.</p>
+</div>
+<div class="panel panel-mist">
+    <strong class="title">Sundered Elves — Itinerant Lethai-thora</strong>
+    <p class="text-sm">Lethai-thora who reject the bench for the road, carrying portable gloss-trees and teaching context literacy in market towns. Neither fully grove nor fully court, they translate between the two.</p>
+    <p class="text-sm"><strong>Gifts (examples):</strong> <em>Bridge-Tongue</em> (treat cross-cultural etiquette DV as if in a shared frame, once/scene); <em>Pocket Gloss</em> (create a one-use Context String on the fly).</p>
+</div>
+
+<h3 id="lethai-two-gifts">The Two Gifts &amp; Mixed Blood</h3>
+<p class="text-sm">Lethai tradition holds that <strong>no one may bear both gifts</strong> at once. A person chooses, or is chosen by, Body (Lethai-al, Lethai-ar) <em>or</em> Mind (Lethai-thora). Training and rite reinforce the choice, and law and courtesy expect it.</p>
+<ul class="text-sm">
+    <li><strong>Rule of the Two Gifts:</strong> a Lethai PC selects Body or Mind at creation and picks Gifts only from that list. Swapping lists requires a season-long project with social cost — losing one String tied to the former gift.</li>
+    <li><strong>Half-Elf Exception:</strong> a quarter-heritage half-elf (one quarter Lethai-al or Lethai-ar; one quarter Lethai-thora; the remainder human or other) may take <strong>one</strong> Body Gift and <strong>one</strong> Mind Gift under the rare and controversial <strong>Bridge-Born Clause</strong>.</li>
+    <li><strong>Most Half-Elves:</strong> descend from Lethai-al lines and default to Body Gifts unless the Bridge-Born Clause applies.</li>
+</ul>
+<p class="text-sm text-muted"><em>In play:</em> the Two Gifts are narrative permissions. Body Gifts grant Position shifts and physical resistances; Mind Gifts lean toward DV reduction in planning, repair, or rhetoric. They add no new math — use the core ladders.</p>
+
+<div class="panel panel-red">
+    <strong class="title">Hooks &amp; Complications</strong>
+    <ul class="text-sm">
+        <li><strong>The Gloss That Wouldn't Read:</strong> a treaty text from three generations back refuses to make sense — find the missing context keys, or watch the border go hot.</li>
+        <li><strong>Web-Law, River-Law:</strong> Lethai-ar silk syndics claim a bridge-toll by Inae's charter; Lethai-thora auditors counter with canal clauses. Bowl, then Board, then Shade Etiquette.</li>
+        <li><strong>Bridge-Born in Question:</strong> a half-elf prodigy manifests both gifts, and the circle moves to forbid the rite — protect or persuade before masks come down.</li>
+        <li><strong>Mask Rights Forfeit:</strong> a serpent oath-bearer allegedly broke web-law in human courts — can a seed-tithe seal commute the sanction to a repair project?</li>
+        <li><strong>The Sundered's Lesson:</strong> a Sundered gloss-carrier teaches a market to read Lethai context; someone powerful profits from confusion and wants them gone.</li>
+    </ul>
+</div>
+
+<h3 id="lethai-rivals">Rivals &amp; Distance</h3>
+<div class="panel panel-brass">
+    <strong class="title">With the Aeler — Stone-Law, Root-Law</strong>
+    <p class="text-sm">Stone-law tallies weight and span; root-law tallies shade and years; each doubts the other's ledgers. Aeler keystone stairs bite deep; Lethai-al prefer lines that bend with slope and sap. Trade proofs favor bridges that don't drown salmon and hedges that don't choke roads. Keep councils separate when tempers rise — the Aeler call elves "Aelaef."</p>
+    <p class="text-sm"><em>Treaties in Practice:</em> Keystone-in-Bark accords — where a road enters a grove, the Aeler choose the tread and the Lethai choose the line. Breaking either creates fines paid as repair years.<br>
+    <em>Isolation Habits:</em> pass-keeps ring bells to one side; roof-tree circles refuse iron even when wrapped. Delegations meet at split courts — half oven, half river bank — and adjourn before dusk.<br>
+    <em>Strings:</em> keystone courtesy; shade-credit; river-weir writ; seed-tithe seal.<br>
+    <em>Timers:</em> Ridge-Root Stalemate [4] (a project stalls until a mixed design is signed); Sluice vs. Salmon [4] (silt, tariffs, tempers).<br>
+    <em>Levers at the Table:</em> if a scene honors both "iron-covered" and "step-on-stone," begin in a Shared Frame (Position +1 on the first exchange). If either side arrives with bare iron or cuts outside the plan, advance Ridge-Root Stalemate by +1.</p>
+</div>
+<div class="panel panel-green">
+    <strong class="title">With the Ykrul — Grass-Law, Shade-Law</strong>
+    <p class="text-sm">Respect is edged into distance — the Silence Furlong keeps hooves from roots and axes from borders: cross wordless, name yourself once, keep to the stones. Honored, councils run warm; broken twice in a season, gray-fletched messengers arrive at dusk and rings draw tight.</p>
+    <p class="text-sm"><em>Customs:</em> Bowl, Board, and Shade — fairness, then geometry, then courtesy. A concession on the Ykrul board becomes a seasonal light-due at the forest edge.<br>
+    <em>Isolation Habits:</em> markets meet on the margin (hedge fairs) rather than deep exchange; joint patrols heal hedges together but camp apart; songs are traded by echo, not chorus.<br>
+    <em>Strings:</em> light-due receipt; ferry knot; windbreak right; border-song.<br>
+    <em>Timers:</em> Furlong Breach [4] (speech, grazing, or felling in the strip); Banner at the Hedge [3] (meadow banners crowd the edge and tighten tempers).<br>
+    <em>Levers at the Table:</em> when both sides keep the Furlong and the iron-covered rule, reduce DV by −1 on any parley for passage or pasture. On breach, increase DV by +1 and tick Furlong Breach.</p>
+</div>
+
+<h3 id="lethai-war">War by Shade — Deterrence &amp; Asymmetry</h3>
+<p class="text-sm">The Lethai-al and Lethai-ar avoid open-field banners. They make <strong>routes expensive</strong>, fragment columns, and end campaigns by ledger long before the first arrow. This <strong>war by shade</strong> is why most peoples leave the forests alone.</p>
+<div class="panel panel-red">
+    <strong class="title">War by Shade Principles</strong>
+    <ul class="text-sm">
+        <li><strong>Fight the route, not the regiment:</strong> break ferries, confuse lanes, erase way-marks, make supply walk twice.</li>
+        <li><strong>One strike, five repairs:</strong> every cut obligates replanting or flood-work; the war ends when the repair ledger is signed.</li>
+        <li><strong>Night, rain, understory:</strong> engage when wind and water cover sound; withdraw where canopy eats pursuit.</li>
+        <li><strong>Courtesy as weapon:</strong> uncovered iron or a crushed sprout is grounds to raise tariffs, close ferries, or call wardens without drawing a blade.</li>
+    </ul>
+</div>
+<div class="panel panel-red">
+    <strong class="title">Plays of the Shade</strong>
+    <ul class="text-sm">
+        <li><strong>Hedge War:</strong> edge-wards are cut and reknit to channel intruders into dead-ground pockets watched by wardens (invader Move/Scout DV +1 while Hedge Mosaic stands).</li>
+        <li><strong>River Denial:</strong> ferries vanish upstream, weirs open at dusk, mills idle to strip silt from footing pursuers need (start Supply Strangle [4] on any hostile force dependent on crossings).</li>
+        <li><strong>Night Lanes:</strong> Lethai-ar web-law lays silk trip-lines and warning strings; Inae's oath-bearers strike once and vanish; Isoka's keepers use venin as medicine with teeth (the first ambush in dim light begins at Dominant for defenders; on a hit, intruders mark Fatigue instead of direct Harm unless they stand and escalate).</li>
+        <li><strong>Canopy Runners:</strong> Lethai-al move above sight-lines and arrows fall where footfalls never were (once/scene, defenders convert pursuit into parley or retreat with Position +1).</li>
+    </ul>
+</div>
+<div class="panel panel-orange">
+    <strong class="title">Deterrence, in Practice</strong>
+    <ul class="text-sm">
+        <li><strong>Fearsome Reputation:</strong> before a faction chooses a forest campaign, start "Leave Them Alone" [2]. On fill, leaders choose tariff, treaty, or route-around over invasion.</li>
+        <li><strong>Intruder Exhaustion [6]:</strong> ticks for lost hours, wet powder, spoiled grain, wrong turns. On fill, morale folds without a decisive battle.</li>
+        <li><strong>Arrow Ethics [3]:</strong> overseen by Songkeepers. If intruders withdraw and sign repairs, arrows go quiet; if they burn, mask rights come down and ambushes escalate.</li>
+    </ul>
+</div>
+<div class="panel panel-brass">
+    <strong class="title">Terrain Tags (at the Table)</strong>
+    <ul class="text-sm">
+        <li><strong>Hedge Mosaic:</strong> invaders suffer DV +1 on Navigate/Scout; the first defender action gains Position +1.</li>
+        <li><strong>Resin Smoke:</strong> on ignition, obscures vision and stings eyes; converts the first Ranged Harm 1 against defenders to Fatigue.</li>
+        <li><strong>Stone Steps:</strong> if invaders step on stone and keep iron covered, begin in a Shared Frame (DV −1 to request safe passage). Breaches tick Under-Root Grudge.</li>
+    </ul>
+</div>
+<p class="text-sm text-muted"><em>Why most leave them alone:</em> campaigns end in tariffs and repair years, not trophies to sell at court. Columns starve by inches while ledgers fatten with fines and ferry dues. Bad nights have names — <em>Two Bridges Gone</em>, <em>The River That Walked</em> — and generals remember.</p>
+
+<h3 id="lethai-marks">Marks — Burden, Blessing, and Lost Context</h3>
+<p class="text-sm">Many Lethai artifacts carry <strong>inherited knowing</strong>. Leafblades etched with moss-tallies, resin-glass panels holding songs, riverstones scored by ferrymen — these do not merely remember; they <strong>obligate</strong>. Among the Lethai, especially the woodwise Lethai-al, past knowledge is a burden on the present. What you inherit, you must carry carefully or set down with witness.</p>
+<div class="panel panel-blue">
+    <strong class="title">Passing-Knowledge Artifacts</strong>
+    <ul class="text-sm">
+        <li><strong>Leafblade (moss-tallied):</strong> a knife whose edge carries hedge-law. Invoke: gain a Context String for border disputes. Cost: tick Burden Ledger [1] (owe repair work this season).</li>
+        <li><strong>Resin-Glass Pane:</strong> sun-cured panels holding a chorus. Invoke: reduce DV by −1 on rites requiring old wording. Cost: Under-Root Grudge +1 if used to excuse harm without replanting.</li>
+        <li><strong>Riverstone Book:</strong> pebbles in corded order recording ferry rights. Invoke: create a temporary Ferry Knot String. Cost: pay a light-due before drinking.</li>
+    </ul>
+</div>
+<div class="panel panel-purple">
+    <strong class="title">Marks of the Body (Animist Rites)</strong>
+    <p class="text-sm">Lethai Marks — ink, scar, resin-inlay — amplify embodied gifts by binding a person to a pattern. Every Mark has Context Keys: place, season, witness. <strong>Out of context, a Mark drifts toward curse.</strong></p>
+    <ul class="text-sm">
+        <li><strong>Barkskin Mark:</strong> skin takes the grain of oak. Gift: once/scene, downgrade Physical Harm by one step (Position +1 when braced). Keys: shaded work, sap rite, roof-tree witness. Curse (lost context): brittleness — cold converts the first Fatigue to Harm.</li>
+        <li><strong>River-Ears:</strong> cartilage braided with silver reed. Gift: sense current and voices across water (Clue +1 on rivers). Keys: pour water first, ferryman's knot. Curse: flood-whispers — compelled toward the lowest ground (Downhill Pull).</li>
+        <li><strong>Spider's Patience (Inae oath):</strong> Gift: hold still beyond breath; ambush begins at Dominant in dim light. Keys: web-tithe, oath-sign shown. Curse: fixation — DV +1 to abandon a plan once set.</li>
+        <li><strong>Serpent's Breath (Isoka oath):</strong> Gift: once/scene, convert Toxin Harm 1 to Fatigue; read heat like color. Keys: antivenin rite, shed-skin offering. Curse: cold-blooded — action slows in chill (Position −1 unless warmed).</li>
+        <li><strong>Storm-Shadow:</strong> ink of ash and rain. Gift: vanish in a downpour; ranged attacks against you suffer −1 Effect in rain. Keys: storm cup, gutter song. Curse: thunder-call — loud noises pull attention (start Noticed [1] in loud scenes).</li>
+        <li><strong>Lanternbone:</strong> resin set in a healed break. Gift: glow faintly to mark safe steps; once/scene, grant an ally Position +1 on footing checks. Keys: night watch, seed-tithe. Curse: beacon — predators test the light (the GM may spend a Boon to start Hungry Eyes [2]).</li>
+    </ul>
+</div>
+<div class="panel panel-red">
+    <strong class="title">Curses as Lost Context</strong>
+    <p class="text-sm">A Mark becomes a Curse when used without its Keys or against its ethic.</p>
+    <ul class="text-sm">
+        <li><strong>Context Drift [4]:</strong> ticks when a Mark is invoked off-season, off-place, or without witness. On fill, the Mark expresses its Curse until Context is Restored.</li>
+        <li><strong>Context Restored (project [4]):</strong> recover the Keys — return to the place, invite a songkeeper, repay the light-due. An Aelinnel Sumwright's gloss-tree can substitute for a witness once.</li>
+        <li><strong>Burden Ledger [6]:</strong> tracks obligation from inherited knowledge. On fill, pay with repair years, seed-tithes, or forfeit a String tied to the artifact.</li>
+    </ul>
+</div>
+<div class="panel panel-gold">
+    <strong class="title">At the Table (Simple Levers)</strong>
+    <ul class="text-sm">
+        <li><strong>Strings:</strong> mark-right, context key, songkeeper witness, gloss-tree charter — spend to reduce DV by −1 on rites or negotiations tied to that Mark or artifact.</li>
+        <li><strong>Position/Effect:</strong> most Marks grant Position +1 or Effect +1 once/scene when used with Keys; without Keys, tick Context Drift instead.</li>
+        <li><strong>Mitigation:</strong> Aeler null-bells can mute a Mark's Curse for a scene at the cost of lamp-time, or Public Outrage [1] if used in a Lethai court.</li>
+    </ul>
+</div>
+
+<h3 id="lethai-samples">Sample Characters &amp; Adventure Hooks</h3>
+<div class="grid-2">
+    <div class="panel panel-green">
+        <strong class="title">Talan of Reedfall, Who Unknotted the Flood</strong>
+        <p class="text-sm">Body 3, Wits 3, Spirit 2, Presence 2 · Skills: Athletics 2, Lore 2, Notice 1, Craft 1<br>
+        Talents: Heightened Senses, Root-Balance, Canopy Spring, Scent of Rain · Affinity: Gift of the Body<br>
+        Strings: Ferry Right, Resin Share, Shade-Credit · Complication: Environmental Responsibility</p>
+    </div>
+    <div class="panel panel-blue">
+        <strong class="title">Mira of the High Archive</strong>
+        <p class="text-sm">Body 2, Wits 4, Spirit 3, Presence 2 · Skills: Lore 3, Insight 2, Sway 1, Craft 1<br>
+        Talents: Long Memory, Cold Reading, Memory Canticle, Number Music · Affinity: Gift of the Mind<br>
+        Strings: Gloss-Tree Charter, Ledger Witness, Canal Seal · Complication: Cultural Tension</p>
+    </div>
+    <div class="panel panel-purple">
+        <strong class="title">Sariel, Half-Elf of the Crossroads</strong>
+        <p class="text-sm">Body 3, Wits 3, Spirit 2, Presence 3 · Skills: Melee 2, Lore 2, Lore (specialty) 1, Sway 1<br>
+        Talents: Heightened Senses, Long Memory, Bridge-Born Clause, Bridge-Tongue · Affinity: Both Gifts (via Bridge-Born Clause)<br>
+        Strings: Shade-Credit, Ferry Right, Gloss-Tree Charter · Complication: Cultural Tension</p>
+    </div>
+</div>
+<div class="panel panel-purple">
+    <strong class="title">Adventure Hooks</strong>
+    <ul class="text-sm">
+        <li><strong>The Hedge That Ate a Road:</strong> an edge-ward grew too well and swallowed a toll lane — broker a cut and a replanting that keeps both law and trade intact.</li>
+        <li><strong>The Gloss That Wouldn't Read:</strong> a treaty text refuses to make sense; find the missing context keys before the border goes hot.</li>
+        <li><strong>Web-Law, River-Law:</strong> Lethai-ar silk syndics claim a bridge-toll by Inae's charter while Lethai-thora auditors counter with canal clauses.</li>
+        <li><strong>Bridge-Born in Question:</strong> a half-elf prodigy manifests both gifts, and the circle moves to forbid the rite.</li>
+        <li><strong>Blight Under Boots:</strong> Bark Blight rides in on a caravan's wheel hubs — build ash-wash stations without sparking a tariff war.</li>
+    </ul>
+</div>
+
+<div class="panel panel-mist">
+    <strong class="title">Integration with Core Rules</strong>
+    <p class="text-sm"><strong>The Curse Mechanic:</strong> the Curse of Division works as a persistent condition. When a Lethai uses talents from both paths in the same scene, mark 1 segment on a Curse Timer [4]. When it fills, suffer −1 die to all rolls until next dawn. The Bridge-Born Clause talent negates this effect.</p>
+    <p class="text-sm"><strong>War by Shade:</strong> Hedge War (Invader Move/Scout DV +1), River Denial (Supply Strangle [4] on dependent hostile forces), Night Lanes (first ambush in dim light begins at Dominant), Canopy Runners (once/scene convert pursuit to parley/retreat with Position +1).</p>
+    <p class="text-sm"><strong>Terrain Tags:</strong> Hedge Mosaic (Navigate/Scout DV +1 for invaders; Position +1 for first defender action); Resin Smoke (first Ranged Harm 1 vs. defenders becomes Fatigue); Stone Steps (Shared Frame if iron is covered, DV −1 for safe passage).</p>
+</div>
+
+<!-- ================= THRESHOLD FOLK ================= -->
+<h2 id="threshold">The Threshold Folk: Aelinnel, Aelaerem, and Kin</h2>
+<p>The Threshold Folk are cultures of the in-between — hearths, hollows, hedgerows, stacks, and shadows tucked at the margins of bigfolk life. They are not monsters to be found but neighbors to be reckoned with, complete with law, trade, and grudges of their own.</p>
+
+<div class="panel panel-gold">
+    <strong class="title">Design Goals</strong>
+    <ul class="text-sm">
+        <li><strong>Liminal Focus:</strong> cultures living in thresholds, borders, and in-between spaces.</li>
+        <li><strong>Cultural Integration:</strong> non-human peoples portrayed as complex societies, not monsters.</li>
+        <li><strong>Scale &amp; Perspective:</strong> mechanics reflect size and worldview differences without adding new math.</li>
+        <li><strong>Seamless Integration:</strong> works cleanly with districts, factions, and Patron systems.</li>
+        <li><strong>Narrative Depth:</strong> hidden layers and mystery inside existing settings.</li>
+    </ul>
+</div>
+
+<h3 id="threshold-quickstart">Quickstart &amp; Play Modes</h3>
+<div class="panel panel-brass">
+    <strong class="title">Quickstart (2 Minutes)</strong>
+    <ol class="text-sm">
+        <li>Choose a Play Mode: Small PCs · Mixed Company · Bigfolk in Small Realms.</li>
+        <li>Pick a Threshold Culture: Aelaerem, Mazereth, Umbral Kin, or Archive Keepers.</li>
+        <li>Mark Tracks: Threshold Sense [6], Visibility [6] (optionally map Visibility to Notice on the Nook Sheet).</li>
+        <li>Choose 2 Gifts and 1 Realm Bond.</li>
+        <li>Start with Hidden Knowledge (1) and Surface Connection (1).</li>
+        <li>Make a Nook/Clan Sheet, map a Threshold (4–6 nodes), and start local timers: Bigfolk Stir [6], Lantern Watch [4], Cat's Prowl [4].</li>
+        <li>Pick an opening Score: Borrowing Heist, Rescue &amp; Return, Underway Escort, Oath Moot, Threshold Intrusion, or Knowledge Quest. On any 1, spend from the Crumb &amp; Candle SB.</li>
+    </ol>
+</div>
+<div class="panel panel-blue">
+    <strong class="title">Play Modes &amp; Scale</strong>
+    <p class="text-sm"><strong>Scale Tags — Small:</strong> mouse-to-hare sized folk; treat Infiltrate/Hide/Traverse (tight) as Position +1; treat Break/Force as Effect −1 against big fixtures.</p>
+    <p class="text-sm"><strong>Scale Tags — Big:</strong> human-scale and up; treat Reach as Effect +1 against Small folk in open spaces; Position −1 in cramped venues (beams, pipes, burrows) unless you Shrink the Scene.</p>
+    <p class="text-sm"><strong>Harm Translation:</strong> one scale larger grants Effect +1; one scale smaller gives Effect −1, but the smaller party may Call a Nook — converting the hit into cover or Position once/scene instead of straight Harm.</p>
+    <p class="text-sm"><strong>Mixed Company:</strong> when Small and Big PCs act together, an Assist may convert a scale mismatch into Position +1 or DV −1 if they exploit venue tags — e.g., a Small character opens a vent while a Big one lifts a ledger.</p>
+    <p class="text-sm"><strong>Shrink the Scene (optional):</strong> when Big PCs act in Small Realms, reframe threats as environmental — broom sweeps, lantern swings, cat shadows — and resolve with standard Underway ladders.</p>
+</div>
+
+<h3 id="aelaerem">Aelaerem — The People of the Hearth</h3>
+<p class="text-sm text-muted"><strong>Homeland:</strong> Amedell, south of the Aelinnel halls, neighboring the Valewood and the Dales.</p>
+<p class="text-sm">The Aelaerem keep a country of gentle slopes and hedged lanes, cider barns and red-doored cottages. They are small in stature and large in memory — a people who bind promises with bread and lantern-light, who measure seasons by harvest masks and market bells. Hospitality is their public law; the hidden law beneath it is older still: hedge-counts, cup-marks, and the quiet attention of the Neighbors.</p>
+
+<h4>Hearth-Law &amp; Guest-Right</h4>
+<p class="text-sm">A red door means bread, salt, and one safe night if you come honest; many Aelaerem homes keep a guest-loaf token for travelers. Those who enter "under bread and lantern" find their next parley gentled — hospitality is a shield as much as a courtesy.</p>
+
+<h4>Lantern-Law &amp; the Wardens</h4>
+<p class="text-sm">Roads in Amedell are trimmed with little laws: stiles counted "eight-and-one," village stones turned inward at dusk, door-nails blessed against trespass. Lantern-wardens keep the lanes bright and note which shadows are wrong, while Wold-Wardens speak hedge-law where crowns have no purchase. Offer oil or heal a lamp, and a lonely mile may find you under warded light.</p>
+
+<h4>The Quiet Powers (Neighbors)</h4>
+<p class="text-sm">Aelaerem speak of Neighbors who walk under hedges and barrows. Good manners keep them content: leave butter at the cup-marks, keep to the festival calendar, count the stiles aloud. Observance smooths the night; neglect draws the Hollow's attention, and small things begin to go wrong — bells toll soft for no reason, red thread appears where you did not tie it, a door leads briefly somewhere it should not.</p>
+
+<h4>Seasons of Mask and Harvest</h4>
+<p class="text-sm">Mummers keep stricter rules than any priest, and the Thresher-King's guard walks in red hoods when the fields demand order. Festivals turn the world sideways for a night: masks legitimate certain crossings after dark, private moots under the Oak settle quarrels, and an elder's blessing can open doors that would not budge for coin.</p>
+<p class="text-sm">Yet omens travel with the revels: scarecrows watch the lane, lanterns burn blue at the ford, chalk mazes fill with mist, and sometimes the Moot Oak bleeds sap the color of wine. Wise folk heed the bells, trade a secret for safe passage, and bury a mask at the crossroads when the dance goes wrong.</p>
+
+<h4>Trade, Craft, and Tokens</h4>
+<p class="text-sm">Cider, perry, beeswax, and wool spin Amedell's economy. Orchard grafts from Mother's Orchard serve as living writs in rural parley; a mill-token buys rumor ground fine as flour; a shepherd's whistle can make dogs and door-bolts heed for a scene. Movers of unblessed pressings risk spoilage — favors salvage what coin cannot.</p>
+<p class="text-sm">Aelaerem "hearth magic" is housekeeping writ large: red thread to bind promises, lantern-writ to hold the dark at bay, careful count and courtesy to keep the threshold sweet. It is less spell than system — precise attention to seasons, doors, and debts.</p>
+
+<h4>Borders &amp; Tensions</h4>
+<p class="text-sm">North, the Valewood's moods drift over the downs — moon-sap weather and dream-pollen make first-night omens ring true. East and south, the Rivers and Dales host tight-lipped dalesfolk, stubborn parishers and millers, as often allies as rivals when tolls, water-rights, and mumming calendars misalign. When lantern-law frays or taboos break, figures step out of story: a Lantern Bailiff calling a midnight moot, a Hollow Bride feeding on invitations, a scarecrow crowned with wrong knots.</p>
+
+<div class="panel panel-brass">
+    <strong class="title">Faces of the Hearth</strong>
+    <ul class="text-sm">
+        <li><strong>Apple-Matron:</strong> power sits where she pours — feast and precedent are one art.</li>
+        <li><strong>Thresher-King:</strong> a title that moves but never leaves; his guard opens doors none other can.</li>
+        <li><strong>Lantern-Warden:</strong> trims lamps, reads shadows; escorts earned with oil and respect.</li>
+        <li><strong>Mummers' Captain:</strong> keeper of lawful masks and after-dark crossings on feast-days — anger them and gates close at dusk.</li>
+        <li><strong>Miller &amp; Watch-Geese:</strong> local alarm and local court in one flock and wheel.</li>
+        <li><strong>The Pale Shepherd:</strong> once, pass uncounted; always, pay the lane its due.</li>
+    </ul>
+</div>
+<div class="panel panel-purple">
+    <strong class="title">Play Hooks in Amedell</strong>
+    <ul class="text-sm">
+        <li><strong>The Guest-Loaf Forgers:</strong> counterfeit tokens sour trust from Amedell to the Silk Way; track the mummers' license that legitimized the forgeries, or every night road turns hostile.</li>
+        <li><strong>The Moot Oak Bleeds:</strong> a festival omen turns ugly — mediate before the Hollow answers the knives.</li>
+        <li><strong>Lanterns at the Ford:</strong> blue flames demand a toll "more than coin" — learn what the Neighbors want this season.</li>
+        <li><strong>Apple-Matron's Summons:</strong> refuse her table and prices double; accept, and you inherit a feud with the dalesmen downstream.</li>
+    </ul>
+</div>
+<div class="panel panel-gold">
+    <strong class="title">Using the Aelaerem at the Table</strong>
+    <p class="text-sm">Treat bread, lamps, and counting as levers: produce a guest-loaf and a lit lantern to soften a risky social exchange; observe courtesies to cancel the first strange complication in a scene; pause at a stile and listen to ask what the Hollow wants right now. Even in danger, a shepherd's whistle or mill-token can turn fiction your way — Amedell rewards those who mind the little laws. In Amedell, the hearth is a treaty, the lane a ledger, and the night a neighbor. Keep the count, pour the cup, and the country will keep you.</p>
+</div>
+
+<h3 id="aelinnel">Aelinnel — The People of Sums</h3>
+<p class="text-sm text-muted"><strong>Homeland:</strong> the gnomeholds in the hawthorn hills south of the Valewood; stone, bough, and bright things.</p>
+<p class="text-sm">The Aelinnel keep to counted roads and measured courtesies. Their halls run like veins through granite and hawthorn; their bridges hum when tuned; their bargains arrive on two ledgers — what was said, and what was meant. To walk their country is to feel math underfoot: steps that are safer when even, doors that open to the right sequence, moonlight that prefers tidy logic.</p>
+
+<h4>The Hawthorn Halls</h4>
+<p class="text-sm">South of the Valewood, the hills break into stone spurs and thorn-sheltered gullies. Paths are counted by antler-posts; tide-cut stairs descend to black sea-rifts; causeys of pale flags show themselves at dawn, at dusk, and whenever someone is counting aloud. Basalt organ cliffs breathe in primes; a moonwell stains coins green faster than names; dolmen stairs ring true if you tap the right interval.</p>
+<p class="text-sm">Winged gnomes — fae-kin cousins with leaf-thin pinions — roost in hawthorn crowns and act as go-betweens to the courts. Gnomes as a whole resemble smaller, bright-eyed elves; the winged are simply closer to the other side of the hedge.</p>
+
+<h4>Law of Sums (Courtesy, Copper, Count)</h4>
+<p class="text-sm">Aelinnel civility is exact: count or be counted. Speak your steps, breaths, or stitches, and the land steadies — Position shifts safer for acts that exploit pattern or timing. Favor copper over iron before the courts; copper is polite, iron is an insult unless named or gilded. Recite a simple sequence when tension frays to cancel the first misstep in navigation or negotiation.</p>
+<p class="text-sm">Courts of hawthorn require three clean courtesies: do not bring naked iron; speak in two ledgers; return what points the way (chalk, cord, antler). Keep them, and even thorns hold back; slight them, and arches close, time drifts, and conversations arrive folded and misaddressed.</p>
+<div class="panel panel-blue">
+    <strong class="title">Table Levers</strong>
+    <ul class="text-sm">
+        <li><strong>Counting Etiquette:</strong> once/scene, careful counting shifts Position +1 for patterned action.</li>
+        <li><strong>Copper over Iron:</strong> displaying copper or brass tools avoids the first fae-offense penalty in a scene.</li>
+        <li><strong>Two-Ledger Talk:</strong> state what was said and what was meant to cancel the first social SB this scene.</li>
+    </ul>
+</div>
+
+<h4>People of Stone &amp; Bough</h4>
+<p class="text-sm">You'll meet charcoal-burners who read omens by smoke hums, stone-singers whose low chords relax walls, forester-wardens who hammer copper nails where iron offends, and goat-herds who measure danger in hoof-widths. Markets under living roofs sell truths wrapped for travel; weights and measures matter — producing a certified rod cancels the first jurisdiction or commerce snag.</p>
+<p class="text-sm">Reputation echoes. Earn Hazel Favors by returning way-cords, restoring antler posts, or paying tide-dues; spend them to downgrade a glamour or geas once per leg. Masks and marks — Thorn-Courteous, Market-Square, Forester-Trusted — change which doors open and which clerks squint.</p>
+
+<h4>Courts, Hunts, and Gates</h4>
+<p class="text-sm">Aelinnel bosses are etiquette engines and logic traps more than villains. The Lady of Thorns punishes breaches precisely and rewards perfect sequences; the Bramble Knight duels by paths and proofs; the Moonlit Ride offers one night's clemency to those who name the right horn-count; the Green Gate demands exact change in truths. When an Ace turns up in their stories, echo the motifs — antlers in shadow, petals that cut, a breathing tide, and shortcuts that insist on proper counting.</p>
+
+<h4>Tides, Ledgers, and Names</h4>
+<p class="text-sm">Rivers and sea-caves carry their own arithmetic. Tide-reeves file plans before neap tide to earn a Tide Window; skip the ledger and the first Dolmis crossing suffers Wrong Tide. Unmaintained barge seals invite Wrong Hour. In green markets, you'll sometimes submit a said/meant receipt — try single-ledger haggling and the stalls mark you Exact Change Only, with memory or name demanded to square the sum.</p>
+
+<div class="panel panel-mist">
+    <strong class="title">Aelinnel Mood: Dark-Wonder</strong>
+    <p class="text-sm">Think a math-bright traveler down a hawthorn rabbit-path: routes shorten for those who keep count and lengthen for the proud; petals fall like knives and settle into proofs; moonlight reveals hidden routes; antler-posts rearrange themselves when the land takes offense. Time miscounts, and the sun arrives at the wrong hour with excellent logic.</p>
+</div>
+
+<h4>Omens &amp; Oddities (Roll or Pick)</h4>
+<ul class="text-sm">
+    <li><strong>Spade:</strong> tide-rift steps with votive nails keeping count — safe when the nails agree.</li>
+    <li><strong>Heart:</strong> a hedge-witch prices cures in "unlesses"; pay with a clause you can keep.</li>
+    <li><strong>Club:</strong> a hawthorn arch closes behind you; your footfalls no longer match your steps.</li>
+    <li><strong>Diamond:</strong> a hazel token allows one cut-free hedge crossing; the scratch you didn't get remembers you kindly.</li>
+</ul>
+
+<h4>Winged Kin (Faekin)</h4>
+<p class="text-sm">Some Aelinnel are born to the boughs, pinions veined like leaves. They keep hawthorn courtesies as breath — no naked iron beyond an arch, always return what points the way, speak debts in daylight so leaves can hear. They are the surest messengers between keep and court, and the quickest to warn when counting turns wrong.</p>
+
+<div class="panel panel-purple">
+    <strong class="title">Play Hooks</strong>
+    <ul class="text-sm">
+        <li><strong>The Gate Wants Change:</strong> the Green Gate opens at the wrong hour; pay a memory that fits the posted proof, or roads rewire across your path.</li>
+        <li><strong>Kiln in Thirds:</strong> a charcoal clan's draught hums off-pattern; smoke omens say a geas is miscounted. Set it straight before the court tithe arrives in flowers and warrants.</li>
+        <li><strong>Two Ledgers, One Lie:</strong> a broker sells meanings at a green market; catch them in a one-ledger statement or produce a chilled oath-bead to void their trick.</li>
+        <li><strong>Antler-Posts Out of Order:</strong> posts have rearranged a stag road; foresters whisper someone mocked the count. Restore the sequence before the Wild Hunt claims the short path.</li>
+    </ul>
+</div>
+<div class="panel panel-gold">
+    <strong class="title">Using Aelinnel at the Table (Quick Rules)</strong>
+    <ul class="text-sm">
+        <li><strong>Count:</strong> once/scene, careful counting shifts Position +1 for patterned actions.</li>
+        <li><strong>Copper:</strong> in fae-facing scenes, copper or brass tools negate the first offense; iron escalates.</li>
+        <li><strong>Said/Meant:</strong> declare both to cancel the first social SB; refuse, and the next bargain wants collateral (memory or name).</li>
+        <li><strong>Hazel Favors:</strong> earn by respectful upkeep of way-things; spend to downgrade a glamour or geas once per leg.</li>
+        <li><strong>Region SB (examples):</strong> a hawthorn arch closes; petals cut like blades; moonlight reveals a hidden path.</li>
+    </ul>
+    <p class="text-sm">Among the Aelinnel, numbers have manners. Keep the count, favor copper, return what points the way — and the hills will do the same for you.</p>
+</div>
+
+<h3 id="mazereth">Mazereth — Deep Tunnelers (Aelinnel Subrace)</h3>
+<p class="text-sm text-muted"><em>Stone-song, pressure shafts, and the etiquette of bearings and bridges.</em></p>
+<p class="text-sm">South of the Valewood the hills become ribbed stone and root-warrens, and the Aelinnel sub-culture called the <strong>Mazereth</strong> trace their lives along pressure lines and strata seams. Their halls feel like organs that breathe — pillars tuned to low chords, vents that whisper the time, chalk glyphs that count the load of a wall. But Mazereth are not only cave-keen: they tend weighhouses, keep ledgers for bridge trusts, and carry bearing-cords across market towns. They greet the hill with a palm on stone and a measure of weight; they greet the street with a counted price and a clean tally.</p>
+
+<h4>Stone-Law (Courtesy of Bearings)</h4>
+<ul class="text-sm">
+    <li><strong>Count the Load:</strong> tap a support or beam three times and listen; once/scene, a measured tap sequence grants Position +1 to Traverse/Endure in caves, bridges, or crowded structures.</li>
+    <li><strong>Copper Courtesy:</strong> copper is polite to stone and honest to labor. Presenting copper tools or a mason's tally negates the first environment SB tied to structure stress, or grants DV −1 to parley with miners, masons, or porters.</li>
+    <li><strong>Return the Chalk:</strong> anything that points the way (chalk, cord, placards) must be restored; doing so cancels the first environment SB this scene (dust, sway, signage loss).</li>
+    <li><strong>Two Bearings, One Path:</strong> when asking directions, give both slope and seam ("down-two, east-by-vein") or price and span ("two-pence, one-arch"); this cancels the first social SB with wardens, foremen, or brokers.</li>
+</ul>
+
+<h4>Heritage &amp; Build (as Aelinnel)</h4>
+<p class="text-sm">Mazereth use Aelinnel baselines; apply the following package.</p>
+<table>
+<caption>Mazereth traits, gifts, and complications</caption>
+<thead><tr><th>Category</th><th>Options</th></tr></thead>
+<tbody>
+<tr><td><strong>Traits</strong></td><td>Medium-Small; <strong>Strata Sense</strong> — once/scene, gain +1 die on a roll that reads load, route, or crowd-flow (Survey, Lore: Structures, Tactics: Maneuver) in stonework, bridges, or packed markets. <strong>Pressure Adaptation</strong> — once/scene, ignore the first Desperate caused by crush/squeeze or stampede/crowd surge.</td></tr>
+<tr><td><strong>Gifts (choose 2)</strong></td><td><strong>Deep Earthen Sense</strong> — vibration mapping; Navigate DV −1 below ground or in heavy stoneworks.<br><strong>Tunnel Craft</strong> — declare a safe crawl, drain, or bypass once/scene; GM sets a short timer to open it.<br><strong>Pressure Resistance</strong> — reduce crush/fall Harm by one step (to Fatigue if possible) once/scene.<br><strong>Pattern Reading</strong> — beam/arch logic; Disable/Repair DV −1 for structural tasks and braces.<br><strong>Bearing Factor</strong> — in worksites/weighhouses, a clean ledger grants DV −1 to negotiate labor, tolls, or right-of-way.<br><strong>Cord Etiquette</strong> — under a marked cord or line, you and your guests gain Position +1 on the opening exchange of parley or passage.</td></tr>
+<tr><td><strong>Complications (choose 1)</strong></td><td><strong>Surface Sickness</strong> — open sky disorients; start scenes outdoors at Position −1 until you ground with a counted-breath ritual.<br><strong>Light Sensitivity</strong> — the first bright flare each scene triggers Lantern Sway (ranged penalties; GM tick or tag).<br><strong>Counting Compulsion</strong> — under stress you stall to count supports; the GM may bank +1 SB if you refuse, or you mark 1 Fatigue if you indulge.</td></tr>
+</tbody>
+</table>
+
+<div class="panel panel-brass">
+    <strong class="title">Cultural Paths (Pick One; Grants a Situational Edge)</strong>
+    <ul class="text-sm">
+        <li><strong>Tunnelwright:</strong> when you prepare terrain, your first brace or prop this scene adds a Stability tag (Position +1 vs. collapse).</li>
+        <li><strong>Wayfactor:</strong> at a bridge, ford, or weighhouse, DV −1 on the first toll or permit check each scene.</li>
+        <li><strong>Cord-Keeper:</strong> while your bearing-cord is up, allies treating it as a guide gain +1 die to Traverse once/scene.</li>
+    </ul>
+</div>
+
+<h4>Places &amp; Omens</h4>
+<ul class="text-sm">
+    <li><strong>Organ Cliffs:</strong> basalt pipes that "breathe" in primes; wrong echoes mean a collapse front.</li>
+    <li><strong>Green Vein:</strong> a copper seam used for oaths; promises sworn here bind extra tight.</li>
+    <li><strong>Sump of Coins:</strong> a moonwell that stains copper; a safe ford when counted in fives.</li>
+    <li><strong>Foothill Weighhouse:</strong> ledgers, cords, and posts; disputes settled by span and load before coin.</li>
+    <li><strong>Omens:</strong> dust that falls upward; pebbles ticking in sequence; roots that beat like a slow heart.</li>
+</ul>
+
+<div class="panel panel-brass">
+    <strong class="title">Faces of Stone</strong>
+    <ul class="text-sm">
+        <li><strong>Bearing-Reeve Bronze:</strong> audits props and pistons; will trade three good spans for one good ledger.</li>
+        <li><strong>Chalk-Warden Ness:</strong> scolds for stolen marks; swaps you a shortcut if you return a cord intact.</li>
+        <li><strong>Goat-Singer Ivrin:</strong> her herd keeps time on cliff paths; she knows which ledges forgive missteps.</li>
+        <li><strong>Span-Broker Telma:</strong> keeps the toll honest; buys you Position +1 in parley if your bearings are clean.</li>
+    </ul>
+</div>
+
+<p class="text-sm"><strong>Strings &amp; Tokens:</strong> seam-chalk, bearing cord, copper nail ring, pressure bead (changes hue under load), weighhouse scrip, mason's tally.</p>
+
+<div class="panel panel-red">
+    <strong class="title">Timers &amp; Hazards</strong>
+    <p class="text-sm">Stone Attention [6] (the hill "notices" you), Squeeze Front [4], Bad Air [4], Vein Quarrel [4], Rain-Swell [4] (flooded cuts), Market Panic [4] (crowd crush).</p>
+    <p class="text-sm"><strong>SB Menu (Underground/Works &amp; Markets):</strong> Dust Plume (visibility), Lantern Sway (glare), Slick Calcite (lose Position), Root Snare (pursuit begins), Sour Air (Fatigue), Toll Dispute (parley Position −1), Span Creak (start Stability timer).</p>
+</div>
+
+<div class="panel panel-purple">
+    <strong class="title">Play Hooks</strong>
+    <ul class="text-sm">
+        <li><strong>Kiln in Thirds:</strong> a charcoal draft hums off-pattern; fix the count before the Green Vein judges the debt.</li>
+        <li><strong>The Swallowing Span:</strong> a climbing route "shortens" for liars — prove truth with two bearings.</li>
+        <li><strong>The Stolen Chalk:</strong> a market steals way-marks for profit; restore cords or Stone Attention wakes a sleeping fault.</li>
+        <li><strong>Bridge Trust Audit:</strong> the toll rose without span repair; expose the false ledger or brace the arch mid-parley.</li>
+    </ul>
+</div>
+<div class="panel panel-gold">
+    <strong class="title">Using Mazereth at the Table</strong>
+    <p class="text-sm">Lean on Strata Sense for DV breaks in stonework and tight urban spaces. Spend bearing cords as Strings for Traverse +1 Position, and treat copper courtesy as a one-shot ward against structure/environment SB or a DV nudge with labor strata. Above ground, Surface Sickness is a soft tax for the first minute of a scene — ground with counted breath to clear it. In banner play, a Mazereth Wayfactor smooths crossings; in dungeon play, a Tunnelwright quietly prevents disaster.</p>
+</div>
+
+<h3 id="umbral-kin">Umbral Kin — Ghost-Walkers of the Aelaerem</h3>
+<p class="text-sm text-muted"><em>Twilight courtesies, reflection roads, and the price of borrowed shade.</em></p>
+<p class="text-sm">The Umbral Kin are Aelaerem cousins who learned to live <em>with</em> their shadows rather than flee them. They rent shade like others rent rooms, keep glazier ledgers alongside family bibles, and treat ward-lamps as municipal judges: name them, appease them, or slip between their gazes. In markets they stand where awnings overlap; on roads they walk the cool edge; at home they hang lamp hoods before a greeting.</p>
+
+<h4>Shadow-Law (Etiquette of Edges)</h4>
+<ul class="text-sm">
+    <li><strong>Speak on the Edge:</strong> begin parley half-in, half-out of shadow (doorway, awning, lintel). Once/scene, gain Position +1 on Sway/Diplomacy for the opening exchange.</li>
+    <li><strong>No Naked Lights:</strong> unshaded flame is insult and provocation. A covered lantern (hood, shade, or hand-screen) negates the first ward-lamp penalty or flare this scene.</li>
+    <li><strong>Mirror Oath:</strong> swear with faces side-by-side in a window or polished plate. Once/session, a mirror-oath counts as a Witness for disputes, contracts, or safe-conduct.</li>
+    <li><strong>Name the Shade:</strong> at dusk, name your shadow and touch heel to heel. This leg, cancel the first Memory Echo complication that would expose you.</li>
+</ul>
+
+<h4>Heritage &amp; Build (as Aelaerem)</h4>
+<p class="text-sm">Umbral Kin use Aelaerem baselines; apply the following package.</p>
+<table>
+<caption>Umbral Kin traits, gifts, and complications</caption>
+<thead><tr><th>Category</th><th>Options</th></tr></thead>
+<tbody>
+<tr><td><strong>Traits</strong></td><td>Small-Medium; <strong>Shadow Blend</strong> — in dim/dappled light you count as having soft cover; once/scene gain +1 die to Stealth/Subterfuge when entering or leaving a shadowed zone. <strong>Reflection Reading</strong> — once/scene, study glass or still water to ask one of: "Who's watching?" "What was just done here?" "Where is the lamp's blind side?"</td></tr>
+<tr><td><strong>Gifts (choose 2)</strong></td><td><strong>Shadow Step</strong> — near-range hop between contiguous shadows you can see; costs 1 Fatigue if crossing open light, otherwise free.<br><strong>Memory Echo</strong> — read emotional residue from a cool surface; on success gain Clue +1 (lead timer +1), but the GM may tick Ward-Lamp Attention if you linger.<br><strong>Light Bending</strong> — once/scene, stage the light (hood, sheet, mirrored dish) to gain Position +1 for a vanish or misdirect.<br><strong>Partial Phase</strong> — squeeze through a bar, grille, or door-gap by marking 1 Fatigue; if you would take Harm 1, convert it to 1 Fatigue instead.<br><strong>Lantern Cant</strong> — you know the lamplighters' marks; DV −1 to navigate after curfew or to spoof a lamp's patrol route.</td></tr>
+<tr><td><strong>Complications (choose 1)</strong></td><td><strong>Bleach-Sick</strong> — harsh illumination with no shade starts you at Position −1 until you create or reach cover.<br><strong>Ward-Lamp Attention</strong> — named streetlamps remember you; the GM may tick Ward-Lamp Attention [6] when you commit a notable act in view.<br><strong>Two Shadows</strong> — at noon or under crossed lights you cast a double; the first Subterfuge each scene is DV +1 unless you dim one source.</td></tr>
+</tbody>
+</table>
+
+<div class="panel panel-brass">
+    <strong class="title">Guild Paths (Pick One; Adds a Situational Edge)</strong>
+    <ul class="text-sm">
+        <li><strong>Night Courier:</strong> when you carry under writ, your first Traverse/Stealth this leg gains DV −1.</li>
+        <li><strong>Glazier of Quiet:</strong> while you work a pane or mirror set for silence, allies in Near count as Hidden from casual watchers until they act.</li>
+        <li><strong>Parasol Marshal:</strong> in zones you've flagged with shade markers, your side starts Position +1 against ward patrols and informers.</li>
+    </ul>
+</div>
+
+<h4>Places &amp; Omens</h4>
+<ul class="text-sm">
+    <li><strong>Reflection Lanes:</strong> arcades where one may "walk the pane" if step and breath match the double.</li>
+    <li><strong>Blue Hours:</strong> docks where time comes twice; safer to leave before names are called.</li>
+    <li><strong>Umbrelle Market:</strong> awnings upon awnings; secrets priced in shade.</li>
+    <li><strong>Omens:</strong> lamps that flare without wind; a second shadow arriving late; reflections that refuse to smile.</li>
+</ul>
+
+<div class="panel panel-brass">
+    <strong class="title">Faces of Twilight</strong>
+    <ul class="text-sm">
+        <li><strong>Parasol-Matron Sevi:</strong> rents legal shade; will cover a fugitive for one favor paid at dawn.</li>
+        <li><strong>Lamplighter Orr:</strong> turns ward-lamps to "rest" on a name; looks away if you speak his grandmother's lullaby.</li>
+        <li><strong>Glazier Moth:</strong> sets "forgetful panes" that blunt Memory Echo for a week (and bills you twice).</li>
+    </ul>
+</div>
+
+<p class="text-sm"><strong>Strings &amp; Tokens:</strong> parasol writ; shade-marker ribbon; mirror-shard oath; lamp hood; lamplighter's chalk.</p>
+
+<div class="panel panel-red">
+    <strong class="title">Timers &amp; Hazards</strong>
+    <p class="text-sm">Ward-Lamp Attention [6] (streetlights learn you), Glare Front [4], Reflection Stalker [4], Blue Hour Drift [4], Curfew Sweep [4].</p>
+    <p class="text-sm"><strong>SB Menu (Shadow):</strong> Lamp Flare (scene brightens); Second Shadow (a pursuer appears); Glass Whisper (old rumor resurfaces); Dawn Soon (time compresses); Hood Snag (lose cover).</p>
+</div>
+
+<div class="panel panel-purple">
+    <strong class="title">Play Hooks</strong>
+    <ul class="text-sm">
+        <li><strong>The Lamp That Watches:</strong> a new ward-lamp memorizes faces; steal its name-plate before it "testifies."</li>
+        <li><strong>Blue Hour Heist:</strong> a vault exists twice at twilight; rob the reflection while your doubles distract the guards.</li>
+        <li><strong>Parasol Tax:</strong> city watch bans uncovered candles; smuggling lamp hoods becomes a civic rebellion.</li>
+        <li><strong>The Second Shadow:</strong> someone wears your late shadow in the markets — retrieve it before your debts follow.</li>
+    </ul>
+</div>
+<div class="panel panel-gold">
+    <strong class="title">Using Umbral Kin at the Table</strong>
+    <p class="text-sm">Treat covered light as a one-shot DV −1 against ward systems; mirror shards can invoke Witness per the Mirror Oath. Trade Memory Echo for fast clues at the risk of Ward-Lamp Attention ticking. In bright scenes, expect an initial Position −1 unless you fix the light — Light Bending or a lamp hood clears it. Shadow Step is near-range and demands real, contiguous shade — alleys, awnings, cart undersides — keeping the talent street-grounded rather than supernatural flight.</p>
+</div>
+
+<h3 id="archive-keepers">Archive Keepers — Knowledge-Bound Aelinnel</h3>
+<p class="text-sm text-muted"><em>Index courts, pattern webs, and the peril of perfect memory.</em></p>
+<p class="text-sm">The Archive Keepers are Aelinnel cousins who hoard what others forget. They curate hidden stacks, stitch ledgers to ledgers, and build "pattern webs" that let a fact walk from one book to another. Their manners are footnotes; their quarrels are citations; their pride is a shelf that never lies.</p>
+
+<h4>Index Law (Etiquette of Records)</h4>
+<ul class="text-sm">
+    <li><strong>Cite or Be Cited:</strong> offer a source when making a claim; once/scene, a clean citation grants DV −1 to Plan/Research/Petition.</li>
+    <li><strong>Return the Page:</strong> replace a card where it belongs to cancel the first Index Entropy complication this scene.</li>
+    <li><strong>Two Copies, Two Locks:</strong> a binding writ needs twin copies kept apart; declaring both voids the first forgery SB this scene.</li>
+    <li><strong>Right of Errata:</strong> admit a small error to avoid a larger duel; convert a looming Sting/Inspection into a lesser Public Correction [4].</li>
+</ul>
+
+<table>
+<caption>Archive Keeper traits, gifts, and complications</caption>
+<thead><tr><th>Category</th><th>Options</th></tr></thead>
+<tbody>
+<tr><td><strong>Traits</strong></td><td>Small; <strong>Stacks-Hardened</strong> — treat ladders, rolling stools, and shelf-rungs as normal ground; ignore the first Climb penalty in libraries and scriptoriums. <strong>Index Sense</strong> — once/scene, ask a pattern question: "What's missing?" "What contradicts itself?" or "Where would this belong?" <strong>Shelf-Strider</strong> — you can squeeze through densely packed aisles; tight passages count as one size wider for you.</td></tr>
+<tr><td><strong>Gifts (pick 2)</strong></td><td><strong>Knowledge Tap</strong> — a hidden index of topics; gain DV −1 on Lore/Investigation when you can cite a plausible prior source.<br><strong>Memory Palace</strong> — store a scene perfectly; later "quote" it to gain Clue +1 or Position +1 to disprove a lie (once/scene).<br><strong>Information Bridge</strong> — join two records with cross-refs; allies pursuing that lead gain Clue +1 (lead timer +1) this scene.<br><strong>Threshold Architecture</strong> — lay a subtle through-route with ribbons, tabs, and marks; once/session your party gets Traverse DV −1 through stacks or archives.</td></tr>
+<tr><td><strong>Complications (choose 1)</strong></td><td><strong>Overload</strong> — too many inputs at once mark 1 Fatigue and impose −1 die on your next Insight/Notice.<br><strong>Brittle Focus</strong> — blunt impacts shake you; the first Harm 1 (blunt) in a scene converts to 1 Fatigue, then resolves normally after.</td></tr>
+</tbody>
+</table>
+
+<h4>Places &amp; Omens</h4>
+<ul class="text-sm">
+    <li><strong>Stack Nine-Between:</strong> a shelf that appears where two libraries agree; reachable by whispering the same title.</li>
+    <li><strong>Red Thread Court:</strong> disputes settled by re-stitching a ledger; scissors are weapons here.</li>
+    <li><strong>Binder's Bridge:</strong> a paper-arc you can cross if your name is spelled correctly.</li>
+    <li><strong>Omens:</strong> margins writing back; page numbers that skip a friend's birthday; a shelf that turns its own ladder.</li>
+</ul>
+
+<div class="panel panel-brass">
+    <strong class="title">Faces of the Index</strong>
+    <ul class="text-sm">
+        <li><strong>Card-Clerk Lumo:</strong> knows where the lost catalog sleeps; demands an errata signed in copper.</li>
+        <li><strong>Binder-Monk Pera:</strong> can unmake a contract by re-sewing it; always asks for a mnemonic tithe.</li>
+        <li><strong>Ink-Archivist Thriss:</strong> drinks spoiled ink to taste lies; offers detox at a price.</li>
+    </ul>
+</div>
+
+<p class="text-sm"><strong>Strings &amp; Tokens:</strong> errata slip; card-catalog tag; binder's thread; reference stamp (acts as Witness for documents once).</p>
+
+<div class="panel panel-red">
+    <strong class="title">Timers &amp; Hazards</strong>
+    <p class="text-sm">Index Entropy [6] (systems decay), Leak of Names [4], Plagiarism Duel [4], Redaction Front [6].</p>
+    <p class="text-sm"><strong>SB Menu (Stacks):</strong> Shelf Creep (path shifts), Loose Leaf (evidence scatters), Citation War (resource tax), Spilled Ink (Visibility rises).</p>
+</div>
+
+<div class="panel panel-purple">
+    <strong class="title">Play Hooks</strong>
+    <ul class="text-sm">
+        <li><strong>The Missing Reference:</strong> a city writ cites a book that never existed; build an Information Bridge to the nearest true source before the court rules from nothing.</li>
+        <li><strong>Errata Night:</strong> archivists purge lies; protect a friend's page from redaction, or convince the index it always belonged.</li>
+        <li><strong>The Folded Hall:</strong> two stacks overlap; map the "between" before a Leak of Names turns to amnesia.</li>
+    </ul>
+</div>
+<div class="panel panel-gold">
+    <strong class="title">Using Archive Keepers at the Table</strong>
+    <p class="text-sm">Spend errata slips to downgrade Sting/Inspection into Public Correction [4]; deploy Memory Palace to capture a scene and later "quote" it for Clue +1 or a decisive contradiction. Threshold Architecture grants the whole party a subtle shortcut once/session. Track Overload as Fatigue when too many inputs land at once, and let Index Sense steer you to the next honest place a fact might live.</p>
+</div>
+
+<div class="panel panel-mist">
+    <strong class="title">Cross-Module Integration (All Three Threshold Cultures)</strong>
+    <ul class="text-sm">
+        <li><strong>Urban Districts:</strong> Mazereth stabilize vaults; Umbral Kin run parasol markets and mirror-oaths; Archive Keepers arbitrate contracts through Red Thread Courts.</li>
+        <li><strong>Underworld/Heist Play:</strong> Shadow-Step smuggling; seam-chalk routes under districts; errata slips to soften crackdowns.</li>
+        <li><strong>Caravans/Wilderness:</strong> Mazereth cut safe passes; Umbral Kin guide night legs; Archive Keepers preserve manifests and ward-maps.</li>
+        <li><strong>Political Intrigue:</strong> copper-witness oaths, mirror-witness oaths, and dual-ledger writs recognized as auxiliary evidence.</li>
+        <li><strong>Esoteric/Psionic Play:</strong> Information Bridges as noetic pathways; Deep Earthen Sense as tremor-sense; Umbral light-bending counters ward-storm glare.</li>
+    </ul>
+    <p class="text-sm">Among the Aelinnel, sub-cultures are not splinters but lenses. The hill, the edge, the index — each teaches a way to keep to courtesy when the world tilts.</p>
+</div>
+
+<h3 id="threshold-stats">Threshold Culture Stats Summary</h3>
+<table>
+<caption>Quick-reference traits, gifts, and complications for all four Threshold Cultures</caption>
+<thead><tr><th>Culture</th><th>Key Traits, Gifts &amp; Complications</th></tr></thead>
+<tbody>
+<tr><td><strong>Aelaerem</strong></td><td>Traits: Small; +1 Position in tight spaces; +1 die to Hide/Notice minute details.<br>Gifts (choose 2): Threshold Walking, Object Bond, Minute Craft, Liminal Sight.<br>Complications: overlooked by surface powers; fragile in mass conflict.<br>Bond: Liminbound.<br>Cultural Tags: Hearth-Law, Lantern-Ward, Guest-Right, Festival Calendar.</td></tr>
+<tr><td><strong>Mazereth</strong></td><td>Traits: Medium-Small; +1 die underground; Pressure Adaptation.<br>Gifts: Deep Earthen Sense, Tunnel Craft, Pressure Resistance, Pattern Reading.<br>Complications: surface sickness; light sensitivity (SB: Lantern Sway).</td></tr>
+<tr><td><strong>Umbral Kin</strong></td><td>Traits: variable scale (Partial Phase); Shadow Blend, Reflection Reading.<br>Gifts: Shadow Step, Memory Echo, Light Bending, Partial Phase.<br>Complications: instability in bright light; attention from ward-lamps.</td></tr>
+<tr><td><strong>Archive Keepers</strong></td><td>Traits: micro-to-small scale shift; Index Sense, Shelf-Strider.<br>Gifts: Knowledge Tap, Memory Palace, Information Bridge, Threshold Architecture.<br>Complications: overload sensitivity; bodily fragility.</td></tr>
+</tbody>
+</table>
+
+<h3 id="nook-sheet">Nook / Clan Sheet (Template)</h3>
+<table>
+<caption>Fill-in template for a Threshold Folk nook or clan</caption>
+<tbody>
+<tr><th colspan="2">[NOOK / CLAN NAME]</th></tr>
+<tr><td><strong>Culture</strong></td><td>Aelaerem / Mazereth / Umbral Kin / Archive Keepers</td></tr>
+<tr><td><strong>Venue</strong></td><td>Pantry · Cellar · Beams · Hedge · Roof · Shrine</td></tr>
+<tr><td><strong>Tags (2–3)</strong></td><td>Gnaw-Holes · Ferrier Line · Secret Hooks · Crumb-Bank · Ward Pins · Lantern Lookouts · Root-Road</td></tr>
+<tr><td><strong>Strings (2–3)</strong></td><td>door-charm bead · pantry tithe token · ferrier token · under-map · cat's truce knot · witness broom badge</td></tr>
+<tr><td><strong>Tracks</strong></td><td>Repute [6] (standing among threshold folk) · Notice [6] (ambient risk from Bigfolk/Predators) · Threshold Sense [6] (opt., cultural) · Visibility [6] (opt., public awareness)</td></tr>
+<tr><td><strong>Bank / Allies / Routes</strong></td><td>Bank (tiny economy); Allies/Rivals; Nooks/Routes</td></tr>
+<tr><td><strong>Gifts &amp; Bonds</strong></td><td>Gifts (2): ___________  Realm Bond (1): ___________</td></tr>
+<tr><td><strong>Knowledge &amp; Connections</strong></td><td>Hidden Knowledge (1): ___________  Surface Connection (1): ___________</td></tr>
+<tr><td><strong>Nook Benefits (choose 1)</strong></td><td>Ferrier Line · Ward Pins · Lantern Lookouts</td></tr>
+</tbody>
+</table>
+
+<h3 id="threshold-tracks">Threshold Tracks &amp; GM Toolkit</h3>
+<div class="panel panel-blue">
+    <strong class="title">Threshold Tracks (Optional Layer)</strong>
+    <p class="text-sm"><strong>Threshold Sense [6]</strong> — connection to liminal spaces. 0–2: disconnected (Gifts weaken; Position −1 on realm moves). 3–4: steady access. 5–6: deep current (Gifts enhanced) but visible to entities (Threshold Tension +1 when you flex).</p>
+    <p class="text-sm"><strong>Visibility [6]</strong> — how noticeable you are to surface powers. 0–2: overlooked (Stealth +1 die in crowds). 3–4: normal. 5–6: high profile (authorities begin Lantern Watch [4]).</p>
+    <p class="text-sm"><strong>Realm Stability [6]</strong> — health of your home realm. 0–2: unstable (realm sickness risk). 3–4: stable. 5–6: overconnected (pulled toward realm; DV +1 to resist).</p>
+    <p class="text-sm"><strong>Threshold Tension [4]</strong> — pressure with guardians and veils. At full: crisis, closing, or entity attention.</p>
+    <p class="text-sm"><strong>Mapping (low-overhead):</strong> if you prefer fewer dials, treat Visibility as Notice, and let Realm Stability/Threshold Tension be represented by relevant Front timers.</p>
+</div>
+
+<div class="panel panel-green">
+    <strong class="title">Gifts &amp; Abilities (by Category)</strong>
+    <p class="text-sm"><strong>Movement &amp; Scale:</strong> Size Shift, Threshold Walking, Realm Step, Scale Mastery.<br>
+    <strong>Perception &amp; Knowledge:</strong> Liminal Sight, Micro-Sense, Pattern Reading, Memory Echo.<br>
+    <strong>Craft &amp; Creation:</strong> Minute Work, Object Bond, Realm Infusion, Threshold Architecture.</p>
+    <p class="text-sm text-muted"><em>Gifts are narrative permissions; most grant Position, DV, or Effect shifts once per scene or leg as listed.</em></p>
+</div>
+
+<div class="panel panel-purple">
+    <strong class="title">Realm Bonds &amp; Complications</strong>
+    <p class="text-sm"><strong>Bonds (pick 1):</strong> Earthbound, Shadowtouched, Liminbound, Knowledgebound.</p>
+    <p class="text-sm"><strong>Common Complications:</strong> Scale Shock, Realm Sickness, Oversight, Threshold Attention, Cycle Dependency.</p>
+</div>
+
+<div class="panel panel-brass">
+    <strong class="title">Threshold Maps &amp; Venues</strong>
+    <p class="text-sm"><strong>Nodes (pick 4–6):</strong> Pantry Court · Beams &amp; Rafters · Gutter Run · Hedge Road · Cellar City · Shrine in the Mould · Timer-Room · Mill-Loft · Postern Stairs · Under-Dock Piles.</p>
+    <p class="text-sm"><strong>Local Timers:</strong> Bigfolk Stir [6], Lantern Watch [4], Cat's Prowl [4].</p>
+</div>
+
+<div class="panel panel-mist">
+    <strong class="title">Ladders &amp; Procedures</strong>
+    <p class="text-sm"><strong>Underway Travel Ladders — Foot/Climb:</strong> DV 2 hooks · 3 beams · 4 pipes · 5 storm vent.<br>
+    <strong>Leaf-Ferry:</strong> DV 2 basin · 3 drain · 4 gutter run · 5 downspout.</p>
+    <p class="text-sm"><strong>Venue Effects — Beams &amp; Rafters:</strong> Infiltrate/Traverse Position +1 (Small); Big folk suffer Position −1.<br>
+    <strong>Pantry Court:</strong> Market Position +1 with a tithe token; on a 1, Notice +1.</p>
+</div>
+
+<div class="panel panel-blue">
+    <strong class="title">Hidden Knowledge &amp; Surface Connections</strong>
+    <p class="text-sm"><strong>Hidden Knowledge Types:</strong> secret route map, household weakness, predator schedule, realm boundary location, ancient compact terms, craft technique, Patron whisper.</p>
+    <p class="text-sm"><strong>Surface Connections:</strong> human patron, guild contact, merchant relationship, authority blind spot, family tie, debt owed (or owed to you).</p>
+</div>
+
+<div class="panel panel-gold">
+    <strong class="title">Integration with Existing Modules</strong>
+    <p class="text-sm"><strong>Urban Districts:</strong> hidden communities in district underways, secret services, threshold points in ancient buildings.<br>
+    <strong>Wilderness:</strong> natural threshold spaces, small folk as guides, realm connections to natural features.<br>
+    <strong>Caravans:</strong> specialized small-scale trade goods, hidden route knowledge, realm-based preservation.<br>
+    <strong>Political Intrigue:</strong> secret advisors, hidden faction members, threshold-based communication networks.</p>
+</div>
+
+<div class="panel panel-orange">
+    <strong class="title">Adventure Frameworks</strong>
+    <p class="text-sm"><strong>Score Types:</strong> Borrowing Heist, Rescue &amp; Return, Underway Escort, Oath Moot, Threshold Intrusion, Knowledge Quest.</p>
+    <p class="text-sm"><strong>New Score Types:</strong> Realm Crisis (home realm becoming unstable); Boundary War (conflict between threshold entities); Predator Hunt (a dangerous entity threatening communities); Cycle Disruption (natural rhythms disturbed).</p>
+    <p class="text-sm"><strong>Crumb &amp; Candle SB:</strong> environmental complications, bigfolk attention, predator signs, realm instability.</p>
+</div>
+
+<div class="panel panel-mist">
+    <strong class="title">Generators &amp; Tables</strong>
+    <p class="text-sm"><strong>Threshold Venues (d12):</strong> Pantry Court, Beams &amp; Rafters, Gutter Run, Hedge Road, Cellar City, Shrine in Mould, Timer-Room, Mill-Loft, Postern Stairs, Under-Dock Piles, Root-Warren, Shadow Gap.</p>
+    <p class="text-sm"><strong>Small Folk Complications (d10):</strong> Broom sweep, Lantern sway, Cat prowl, Ferrier dispute, Ward draft, Bigfolk stir, Cycle shift, Predator scent, Realm tremor, Compact breach.</p>
+</div>
+
+<h3 id="threshold-deep-dive">Cultural Deep-Dives &amp; Portrayal</h3>
+<p class="text-sm"><strong>Aelaerem Society:</strong> the Aelaerem organize into hearth-clans centered on craft specialties — coopers, weavers, brewers, and woodcarvers who maintain both trade secrets and seasonal rituals. Each clan keeps a memory-weaver who tracks debts, favors, and omens across generations through story-braids and token-craft. Information flows through guest-right networks and festival moots, where the Apple-Matron mediates disputes through feast-law and proverb-craft. Threshold guardians like the Pale Shepherd are honored with offerings and careful observance; slight them and household luck turns sour. Clan tokens — bread-seals, lantern-writs, red-thread knots — serve as both currency and covenant, in an economy where reputation weighs more than coin.</p>
+
+<p class="text-sm"><strong>Mazereth Engineering:</strong> Mazereth architecture operates on pressure harmonics, where pillars, arches, and support beams are tuned to resonate at frequencies that strengthen stone rather than strain it. Master builders read stress-lines in rock like maps, placing copper nodes at compression points and iron dampeners at tension zones. Their deep history is preserved in geological strata — glyphs carved into cave walls that tell stories through the ages as erosion reveals new layers. Tunnel-network politics revolve around bearing-rights and seam-access; clans feud over prime ventilation shafts and mineral veins, settling disputes through measured duels where contestants navigate obstacle courses while maintaining perfect step-counts and load-balances.</p>
+
+<p class="text-sm"><strong>Umbral Kin Memory:</strong> Umbral Kin share memories through dream-reflection, where important experiences are "polished" until they gleam bright enough to be caught in glass surfaces and still water. Reflection communication allows near-instant long-distance contact — messages passed from mirror to mirror across a city's windows can traverse miles in moments. Shadow-realm territorial disputes arise when one group's reflections begin overlapping another's; boundaries are negotiated through careful light-management and shadow-casting protocols. Memory Echo lets Umbral Kin read emotional residue from surfaces, making them excellent investigators but also vulnerable to psychic pollution from traumatic events embedded in walls and floors.</p>
+
+<p class="text-sm"><strong>Archive Keeper Knowledge:</strong> Archive Keepers store information in pattern-webs — three-dimensional mental constructs connecting related facts across multiple dimensions of meaning. Their scale-shifting libraries exist in probability space, where books grow larger or smaller depending on the reader's need for detail; a general overview might require a text the size of a grain of sand, while deep research could mean entering a tome the size of a cathedral. Knowledge-debt systems track intellectual borrowing — when an Archive Keeper accesses another's memory palace or information bridge, they owe a tithe of new knowledge or a favor in return. The most dangerous debts are memetic — ideas that carry obligations or change the borrower's thinking patterns.</p>
+
+<table>
+<caption>Deep-dive quick levers by culture</caption>
+<thead><tr><th>Culture</th><th>Levers, Strings &amp; Tensions</th></tr></thead>
+<tbody>
+<tr><td><strong>Aelaerem — People of the Hearth</strong></td><td>Levers: Bread &amp; Salt = Position +1 once/scene; Broom Witness = Oath [4–6]; Iron-Lace &amp; Red Thread = +1 Effect vs. compulsion.<br>Strings: guest-loaf, broom badge, hedge measure.<br>Tensions: Barrow Stirring [6], Gloam Choir [6].</td></tr>
+<tr><td><strong>Mazereth — Deep Tunnelers</strong></td><td>Levers: Deep Earthen Sense = Navigate DV −1 underground; Copper Nails avoid the first "hill offense"; Count the Load = Position +1 on Traverse/Endure.<br>Strings: seam-chalk, bearing cord, pressure bead.<br>Tensions: Stone Attention [6], Bad Air [4].</td></tr>
+<tr><td><strong>Umbral Kin — Shadow-Adjacent</strong></td><td>Levers: Covered Light avoids the first ward-lamp penalty; Mirror Oath = Witness; Shadow Step (short hop) and Light Bending = Position +1 to vanish.<br>Strings: parasol writ, mirror shard, lamp hood.<br>Tensions: Ward-Lamp Attention [6], Blue Hour Drift [4].</td></tr>
+<tr><td><strong>Archive Keepers — Knowledge-Bound</strong></td><td>Levers: Cite or Be Cited = DV −1 (Plan/Research); Errata Slip downgrades Sting to Public Correction [4]; Threshold Architecture = Traverse DV −1 (once/session).<br>Strings: errata slip, binder's thread, catalog tag.<br>Tensions: Index Entropy [6], Redaction [6].</td></tr>
+</tbody>
+</table>
+
+<div class="panel panel-gold">
+    <strong class="title">Portrayal Notes</strong>
+    <ul class="text-sm">
+        <li><strong>Emphasize capability over diminutive stereotypes:</strong> these cultures are not weak or helpless despite their size — they are experts in their environments with sophisticated knowledge systems. Show them solving problems through precision, timing, and deep understanding of their realms rather than brute force.</li>
+        <li><strong>Show complex societies with internal diversity:</strong> each culture has factions, dissenters, reformers, and outliers. The Aelaerem have those who reject hospitality laws, Mazereth include those who favor iron over copper, Umbral Kin struggle with those who crave bright light, and Archive Keepers debate the ethics of memory manipulation. Not every member adheres strictly to cultural norms.</li>
+        <li><strong>Use hospitality and reciprocity as mechanical hooks:</strong> treat guest-right, copper courtesy, mirror-oaths, and citation protocols as more than flavor — they're tactical resources. Characters can spend cultural tokens for mechanical benefits, but violating these codes creates escalating complications that drive scenes forward.</li>
+        <li><strong>Balance hidden advantages with genuine vulnerabilities:</strong> Aelaerem are fragile in mass conflict, Mazereth suffer surface sickness, Umbral Kin are unstable in bright light, and Archive Keepers risk overload. Their strengths come with meaningful costs that create interesting choices.</li>
+    </ul>
+</div>
+
+<div class="panel panel-blue">
+    <strong class="title">Scene Framing</strong>
+    <ul class="text-sm">
+        <li><strong>Start in threshold spaces or realm boundaries:</strong> begin scenes at doorways, hedges, cave entrances, shadow edges, or between bookshelves. These liminal zones are where threshold cultures are strongest and where their unique abilities shine.</li>
+        <li><strong>Use scale for tactical variety:</strong> small PCs can use tight spaces, hide in unexpected places, or exploit environmental hazards that don't affect larger characters; big PCs can provide brute force but may struggle with finesse or environmental navigation.</li>
+        <li><strong>Frame conflicts around access and visibility:</strong> tension often comes from who can go where and who knows what. Information control, territorial disputes, and questions of who gets to cross thresholds create natural dramatic friction without resorting to combat.</li>
+        <li><strong>Let cultural differences drive narrative tension:</strong> conflicts arise from different value systems — Aelaerem hospitality vs. Mazereth precision, Umbral Kin secrecy vs. Archive Keeper transparency, surface urgency vs. threshold patience.</li>
+    </ul>
+</div>
+
+<div class="panel panel-purple">
+    <strong class="title">Integration Hooks</strong>
+    <ul class="text-sm">
+        <li><strong>Hidden communities beneath existing venues:</strong> every major location in a campaign world has threshold spaces — palace walls house Aelaerem guest-halls, foundation stones contain Mazereth tunnels, chandeliers cast Umbral reflection-lanes, and library stacks hide Archive Keeper sanctums.</li>
+        <li><strong>Small folk as information brokers:</strong> Aelaerem hearth-clans know everyone's business, Mazereth tunnels connect distant locations, Umbral Kin read emotional residue, and Archive Keepers maintain vast information webs — excellent contacts for investigation scenarios.</li>
+        <li><strong>Realm connections to major plot points:</strong> ancient vaults exist partially in threshold realms, important artifacts hide in scale-shifting spaces, political negotiations happen in neutral threshold zones, and supernatural threats emerge from realm boundaries.</li>
+        <li><strong>Scale-based tactical opportunities:</strong> small PCs can sabotage large mechanisms, infiltrate secure areas, or deliver messages through impossible routes; big PCs can provide protection, move heavy objects, or serve as mobile platforms for smaller allies.</li>
+    </ul>
+</div>
+
+<h3 id="threshold-example">Example of Play</h3>
+<div class="panel panel-gold">
+    <strong class="title">Setup</strong>
+    <p class="text-sm">An Aelaerem craftsperson named Thistle works with the surface merchant guild to investigate reports of a haunted vault beneath the old marketplace. Thistle brings Object Bond (lockpick expertise), Threshold Walking (navigation of liminal spaces), and a Liminbound bond (connection to threshold spaces). The guild provides resources and legal authority but is dependent on Thistle's unique abilities to access the vault's hidden sections.</p>
+</div>
+<div class="panel panel-blue">
+    <strong class="title">Scene</strong>
+    <p class="text-sm">The vault exists partially in threshold space, with some chambers accessible normally and others requiring passage through liminal boundaries. Thistle uses Threshold Walking to navigate sections that shift between dimensions, Object Bond to pick precision locks that respond to careful touch rather than force, and her Liminbound bond to sense stable passages versus areas that might collapse or shift unexpectedly. The guild representatives follow with lanterns and tools, operating well outside their expertise.</p>
+</div>
+<div class="panel panel-red">
+    <strong class="title">Complications</strong>
+    <p class="text-sm">As Thistle delves deeper, her actions increase Threshold Tension, attracting a territorial threshold guardian that begins manifesting as locked doors reappearing after being opened and shadows that move against the light. Meanwhile, the guild masters above notice unusual activity and start asking questions, raising Visibility and creating pressure to finish quickly. The vault's unstable nature threatens Realm Stability — walls occasionally shift, passages close temporarily, and the boundary between threshold and normal space grows indistinct.</p>
+</div>
+<div class="panel panel-green">
+    <strong class="title">Resolution</strong>
+    <p class="text-sm">The "haunting" turns out to be a Mazereth clan using the vault's threshold sections as a shortcut between their deep tunnels and surface access points, inadvertently disrupting the space through their passage. Thistle brokers a compromise — establishing proper guest-right protocols and payment in copper nails that strengthen the vault's structure. The solution opens new connections between surface and threshold communities, but also raises Notice and Visibility, making Thistle a known quantity to both guild authorities and other threshold cultures who may seek her services in the future.</p>
+</div>
+
+<!-- ================= BEASTFOLK, DRAGONFOLK, AND OTHERS ================= -->
+<h2 id="others">Beastfolk, Dragonfolk, and Others</h2>
+<p>In Fate's Edge, Beastfolk, Dragonfolk, and Others are not common "races" but rare, mythic outliers. They dwell primarily in the Valewood and the deep Wilds, rarely appearing in human lands except as rumors, omens, or the subject of contradictory stories.</p>
+<div class="panel panel-gold">
+    <strong class="title">Design Intent</strong>
+    <p class="text-sm">These origins are meant to emphasize rarity and narrative weight; tie directly into core systems — Position &amp; Effect, Story Beats, Boons, Fatigue, Obligation, and Patrons; and root nonhuman characters in specific places and stories rather than generic ancestry.</p>
+</div>
+
+<div class="panel panel-blue">
+    <strong class="title">Using Nonhuman Origins — GM Guidance</strong>
+    <p class="text-sm">Nonhuman PCs should remain uncommon. As a default: limit the party to 0–1 nonhuman PC unless the campaign is primarily set in the Valewood or Wilds. In human lands, nonhumans always shift Position &amp; Effect — social actions often start from worse Position (risky or desperate), but can achieve higher Effect when leaning into fear, myth, or awe. Nonhuman PCs should come with explicit ties: a Patron, a forest court, a dragon enclave, an old debt, or a prophecy.</p>
+    <p class="text-sm"><strong>The "Other in Human Lands" Timer:</strong> when a Beastfolk, Dragonfolk, or Other PC moves openly in human lands, the GM creates an Otherness timer for that community (4–6 segments, as appropriate). Each time the PC acts conspicuously, mark 1 segment. When the timer fills, introduce a consequence — hunters, scholars, inquisitors, curious nobles, street rumors, or religious panic. This timer replaces ambient prejudice with focused, story-relevant pressure.</p>
+</div>
+
+<h3 id="beastfolk">Beastfolk</h3>
+<p class="text-sm">Where the road ends, the people of fur and claw remember no empire but the forest. Beastfolk are Lethai rewritten by the Wild through old pacts, curses, or bloodlines bound to animal spirits. They exist as reminders that civilization is not the only intelligence on the map.</p>
+<p class="text-sm">Beastfolk clans loosely align with <strong>Valewood Circles</strong> (semi-nomadic bands tied to groves, standing stones, or ancient trails) and gather rarely at <strong>Wild Moots</strong>, where multiple clans — and sometimes Others — negotiate seasonal rites, borders, and common threats. The fallen Utar Empire is remembered as an infection that burned out; human kingdoms are regarded as a lingering fever, not the natural order.</p>
+<p class="text-sm"><strong>Common archetypes:</strong> Wolf-blooded (pack-minded scouts and guardians), Stag-marked (antlered wanderers tied to sacrifice and omen), Raven-tongued (tricksters and memory-keepers), Bear-hearted (slow to anger, anchors of their communities, unstoppable when roused).</p>
+
+<div class="panel panel-green">
+    <strong class="title">Core Feature: Beast Instinct</strong>
+    <p class="text-sm">When you create a Beastfolk character, choose an <strong>Instinct</strong> that defines how the Wild speaks through you: <strong>Hunt</strong> (stalk, pursue, reveal weakness), <strong>Guard</strong> (protect, endure, stand firm), <strong>Wander</strong> (roam, explore, cross boundaries), or <strong>Trick</strong> (misdirect, unsettle, reframe).</p>
+    <p class="text-sm"><strong>Instinct Move:</strong> once per scene, when you clearly act in line with your Instinct in a risky moment, gain +1 die to the roll. On a hit, the GM gains +1 SB to spend later on complications tied to the Wild or your nature.</p>
+    <p class="text-sm">If you deliberately betray your Instinct to secure safety or comfort, the GM may mark +1 Fatigue, or mark +1 segment on your personal <em>Alienation from the Wild</em> timer (4 segments). When that timer fills, you owe the Wild — or a Patron of the Wild — a serious price to reconcile who you have become.</p>
+</div>
+
+<table>
+<caption>Beastfolk talents</caption>
+<thead><tr><th>Talent</th><th>Cost</th><th>Effect</th></tr></thead>
+<tbody>
+<tr><td class="talent-name">Keen Scent of the Valewood</td><td><span class="badge badge-orange">6 XP</span></td><td>You can "read" a scene with your senses. Once per scene in the Wilds, when you Study or Take Stock, you may ask one additional question on a hit. The GM marks +1 SB tied to an unseen predator, rival clan, or old obligation.</td></tr>
+<tr><td class="talent-name">Run With the Pack</td><td><span class="badge badge-orange">8 XP</span></td><td>You are never truly alone. When you fight or act alongside an ally who trusts you, you both gain +1 Effect when you coordinate using pack tactics (flanking, driving prey, trading blows). On a miss, the GM may mark +1 Harm or +1 Fatigue on an ally instead of you — your instinctive coordination pulls them into danger.</td></tr>
+</tbody>
+</table>
+
+<h3 id="dragonfolk">Dragonfolk</h3>
+<p class="text-sm">Where a dragon died screaming, someone always wakes up different. Dragonfolk are not full dragons, but living fault-lines where draconic power has leaked into blood, bone, and story. Some claim descent from ancient wyrms of the mountains; others were changed by proximity to hoards, old lairs, or dragon-Patrons. In human lands, most people have never seen a Dragonfolk and would not believe in them outside of folktales.</p>
+<p class="text-sm"><strong>Common archetypes:</strong> Ashscale (scarred by volcanic fire, eyes smoldering with embers), Stormblood (hair and scales crackling with static, voice like thunder), Deepcoil (serpentine, cold-eyed, hungry for secrets and leverage), Shardsoul (reflective, glassy scales, obsessed with memory and perfection).</p>
+
+<div class="panel panel-orange">
+    <strong class="title">Core Feature: Draconic Echo</strong>
+    <p class="text-sm">Choose one <strong>Echo</strong>, a thematic way that dragon-nature manifests in you: <strong>Fire</strong> (fury, destruction, passion), <strong>Storm</strong> (change, disruption, omen), <strong>Hoard</strong> (possession, memory, obsession), or <strong>Dominion</strong> (authority, command, pride).</p>
+    <p class="text-sm"><strong>Echo Move:</strong> once per scene, when you invoke your Echo, describe how it shapes your presence (heat in the air, a rumbling voice, an unblinking gaze, the scent of rain) and gain +1 die to actions that rely on force of personality (Command, Sway, or similar). On a hit, the GM gains +1 SB earmarked for dragon-shaped consequences — old debts, dragon cults, relic awakenings, rival Dragonfolk, or attention from a dragon-Patron.</p>
+    <p class="text-sm">If you refuse to draw on your Echo in a moment where it would clearly help, mark +1 Fatigue — you are fighting your own nature.</p>
+</div>
+<div class="panel panel-orange">
+    <strong class="title">Dragonblooded Resilience</strong>
+    <p class="text-sm">Dragonfolk shrug off some threats but attract others. You gain +1 armor against Fire, Lightning, or Fear effects when it is fictionally appropriate. Artifacts, wards, and rites that bind or repel "dragons and their kin" also affect you, even if they were not meant for your specific bloodline.</p>
+</div>
+
+<table>
+<caption>Dragonfolk talents</caption>
+<thead><tr><th>Talent</th><th>Cost</th><th>Effect</th></tr></thead>
+<tbody>
+<tr><td class="talent-name">Hoard-Sense</td><td><span class="badge badge-orange">6 XP</span></td><td>You can feel where stories and value pool. When you Survey a location for treasure, secrets, or leverage, on a hit you may also ask: "What here would I be most tempted to claim and keep?" If you pursue that answer, gain +1 die on the relevant action. If you walk away from it, the GM may mark +1 SB for future temptation.</td></tr>
+<tr><td class="talent-name">Draconic Breath</td><td><span class="badge badge-red">12 XP · Tier II+</span></td><td>You have learned to vent a fraction of the dragon-fire (or storm, frost, venom) in your blood. Once per session, unleash a Breath Attack as a risky or desperate action for +2 Effect against a group or large target. After using it, mark +2 Fatigue; if this would cause overflow, the GM instead marks +1 SB and you gain a new visible draconic mutation (eyes, scales, voice, or other change).</td></tr>
+</tbody>
+</table>
+
+<h3 id="the-others">Others</h3>
+<p class="text-sm">The world remembers its own dreams, and sometimes they wake up in the shape of people. The <strong>Others</strong> are those not wholly of the mortal world — fae-touched, gloam-born, children of forgotten rites, or walkers between dreams and waking. They stand at boundaries: between Valewood myth and human history, between one Patron's claim and another's silence.</p>
+<p class="text-sm"><strong>Common archetypes:</strong> Gloam-touched (eyes like dusk, never fully in one light or shadow), Hollow-bound (something else peers out through their eyes, patient and curious), Green-vowed (sworn to a forest, river, stone circle, or ancient tree), Masks of Dawn (can pass as human until the wrong light hits them).</p>
+
+<div class="panel panel-purple">
+    <strong class="title">Core Feature: Liminal Nature</strong>
+    <p class="text-sm">Choose one <strong>Liminal Axis</strong> that defines your between-ness: Dream/Waking, Forest/City, Life/Death, or Memory/Forgetting.</p>
+    <p class="text-sm"><strong>Liminal Move:</strong> when you act to bridge or exploit your Axis, gain +1 die to the roll. On a hit, the GM may mark +1 SB to introduce consequences that blur reality — time slippage, lost memories, omens, strange visitors, and similar effects.</p>
+</div>
+
+<div class="panel panel-purple">
+    <strong class="title">Bound Obligation</strong>
+    <p class="text-sm">Others rarely exist without a binding. Choose one: bound to a <strong>Place</strong> (a sacred grove, crossroads, riverbend), bound to a <strong>Story</strong> (prophecy, curse, legend, song), or bound to a <strong>Being</strong> (Patron, ancient spirit, sleeping dragon, forest court). Write one sentence: <em>"I am bound to ____ and must ____."</em></p>
+    <p class="text-sm">Any time you defy this Bond in a major way, the GM may mark +2 SB, or immediately introduce a supernatural consequence tied to your Bond. Any time you honor it at serious personal cost, clear 2 Fatigue, or mark +1 Boon for later use.</p>
+</div>
+
+<table>
+<caption>Talents for Others</caption>
+<thead><tr><th>Talent</th><th>Cost</th><th>Effect</th></tr></thead>
+<tbody>
+<tr><td class="talent-name">Step Sideways</td><td><span class="badge badge-orange">8 XP</span></td><td>You move through liminal spaces as if they were doors. Once per scene, when you move through a threshold (doorway, tree-line, fog bank, mirror, or similar boundary), you may reposition yourself or an ally fictionally: appear behind foes, bypass mundane guards, or "skip" a short distance. Roll the appropriate move — on a hit, you arrive where and how you intended. On a miss, you arrive altered, late, or not alone; the GM marks +1 SB tied to what followed you.</td></tr>
+<tr><td class="talent-name">Unsettling Truth</td><td><span class="badge badge-brass">6 XP</span></td><td>You can speak in the language of omens. When you Sway, Provoke, or Command by revealing a hidden truth, omen, or uncanny insight about someone, gain +1 Effect on a hit. The target is left shaken or marked by dread or hope (GM's choice). On a miss, they reject you and label you a danger or blasphemy; mark +1 Fatigue.</td></tr>
+</tbody>
+</table>
+
+<h3 id="nonhuman-hooks">Adventure Hooks</h3>
+<p class="text-sm">Use these peoples to complicate the Valewood and Wilds rather than simply populate them.</p>
+<div class="panel panel-purple">
+    <ul class="text-sm">
+        <li><strong>The Beastfolk Hunt:</strong> a Beastfolk circle believes a human village has broken an ancient trail-compact and hunts a "trespasser" who is actually a human PC or ally. Can the party negotiate new terms before blood is spilled?</li>
+        <li><strong>Dragon's Debt:</strong> a Dragonfolk PC's Echo stirs an ancient dragon from dormancy. The dragon demands repayment for a boon given to their bloodline long ago — or offers patronage that could reshape the region.</li>
+        <li><strong>The Vanishing Grove:</strong> an Other bound to a sacred grove feels it thinning. Human loggers, Utar relic-hunters, or a rising Patron's followers are siphoning its power. Saving it may mean undermining a human ally or opposing a Patron the party relies on.</li>
+        <li><strong>The "Monster" in the City:</strong> rumors spread of a beast-headed killer in a human city. The culprit is a terrified Beastfolk youth, trapped far from the Valewood and hunted by scholars and zealots. Do the PCs smuggle them home, conceal them, or weaponize the panic?</li>
+    </ul>
+</div>
+
+<hr>
+<footer><em>Fate's Edge Proprietary Content — (c) 2024 Nicholas A. Gasper. All rights reserved.</em></footer>
+
+</body>
+</html>

@@ -75,6 +75,24 @@ const DOC_TYPES = {
         icon: '⚡',
         description: 'One-page quickstart guides for new players'
     },
+    anthology: {
+        label: '📖 Anthology',
+        folder: 'anthology',
+        icon: '📖',
+        description: 'Curated story collections and narrative fiction'
+    },
+    'players-guide': {
+        label: '🎲 Player\'s Guide',
+        folder: 'players-guide',
+        icon: '🎲',
+        description: 'The full Player\'s Guide, chapter by chapter'
+    },
+    'gm-guide': {
+        label: '🎬 GM Guide',
+        folder: 'gm-guide',
+        icon: '🎬',
+        description: 'The full GM Guide, chapters and appendices'
+    },
     uploaded: {
         label: '📤 Uploaded',
         folder: 'uploaded',
@@ -96,7 +114,7 @@ for (const [id, type] of Object.entries(DOC_TYPES)) {
 }
 
 // ─── Type order for sorting ──────────────────────────────────
-const TYPE_ORDER = ['core', 'quickstart', 'resources', 'adventures', 'expansions', 'travel', 'design', 'konreh', 'uploaded', 'other'];
+const TYPE_ORDER = ['core', 'quickstart', 'players-guide', 'gm-guide', 'resources', 'adventures', 'expansions', 'anthology', 'travel', 'design', 'konreh', 'uploaded', 'other'];
 
 // ============================================================
 // STATE
@@ -132,6 +150,19 @@ function getDocTypeFromFile(file) {
 function resolveFullPath(doc) {
     if (!doc) return null;
     if (doc.fullPath) return doc.fullPath;
+
+    // Prefer the manifest's own "path" field when present -- it's written
+    // by generate-manifests.js from the actual folder a doc was found in,
+    // so it's authoritative and doesn't depend on this file's DOC_TYPES map
+    // staying manually in sync with that script's CATEGORY_MAP. Relying on
+    // DOC_TYPES here instead (as this used to) silently dropped the
+    // subfolder -- and therefore pointed at the wrong URL -- for any
+    // category (e.g. "anthology") that had been added to the manifest
+    // generator but not mirrored into DOC_TYPES below.
+    if (doc.path && doc.file) {
+        const path = doc.path.endsWith('/') ? doc.path : doc.path + '/';
+        return path + doc.file.replace(/^\/+/, '');
+    }
 
     if (doc.file) {
         const file = doc.file.replace(/^\/+|\/+$/g, '');

@@ -3,6 +3,13 @@ All notable changes to this project will be documented here.
 
 Format loosely follows [Keep a Changelog](https://keepachangelog.com/), versions follow [Semantic Versioning](https://semver.org/).
 
+## [4.6.2] - 2026-08-10
+
+### Other
+- Added Modern Noir
+- Added Modern Nmoit
+- Updated theme engine and fixed CSS. Made WebGUI theme-able
+
 ## [4.6.1] - 2026-08-08
 
 Talent catalog overhaul: JSON-per-talent expansion (10 -> 55), tagging + category filter bar in the character editor/wizard, and starter/XP-appropriate talent recommendations.

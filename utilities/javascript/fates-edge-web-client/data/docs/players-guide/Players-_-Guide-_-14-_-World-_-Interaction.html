@@ -1,0 +1,642 @@
+<!-- ============ Players-_-Guide-_-14-_-World-_-Interaction.html ============ -->
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <title>Fate's Edge Player's Guide — World Interaction</title>
+    <style>
+        :root {
+            --bg1: #0d0d1a;
+            --bg2: #1a1a2e;
+            --bg3: #252540;
+            --bg4: #2f2f4a;
+            --text: #e8e8f0;
+            --text2: #b8b8c8;
+            --text3: #8888a0;
+            --gold: #c9a84c;
+            --gold-hover: #d4b85c;
+            --border: #333355;
+            --red: #c0392b;
+            --green: #27ae60;
+            --blue: #2980b9;
+            --purple: #8e44ad;
+            --orange: #e67e22;
+            --radius: 8px;
+            --font: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            background: var(--bg1);
+            color: var(--text);
+            font-family: var(--font);
+            padding: 1.5rem;
+            max-width: 1100px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+        h1, h2, h3, h4, h5 { color: var(--gold); margin: 0.5rem 0 0.3rem; }
+        h1 { font-size: 1.8rem; border-bottom: 2px solid var(--gold); padding-bottom: 0.3rem; }
+        h2 { font-size: 1.4rem; border-bottom: 1px solid var(--border); padding-bottom: 0.2rem; margin-top: 1.2rem; }
+        h3 { font-size: 1.1rem; margin-top: 0.8rem; }
+        h4 { font-size: 0.95rem; color: var(--text); }
+        p { margin: 0.4rem 0; }
+        p.subtitle { color: var(--text3); font-style: italic; margin-top: -0.2rem; margin-bottom: 0.8rem; }
+        a { color: var(--gold); text-decoration: none; }
+        a:hover { color: var(--gold-hover); text-decoration: underline; }
+        ul, ol { margin: 0.3rem 0 0.5rem 1.4rem; }
+        li { margin: 0.15rem 0; }
+        dl { margin: 0.4rem 0; }
+        dt { font-weight: 600; color: var(--gold); margin-top: 0.5rem; }
+        dd { margin: 0.15rem 0 0.3rem 1.4rem; color: var(--text2); }
+        .panel {
+            background: var(--bg2);
+            border-radius: var(--radius);
+            padding: 0.6rem 0.8rem;
+            border: 1px solid var(--border);
+            margin: 0.5rem 0;
+        }
+        .panel-gold { border-left: 4px solid var(--gold); }
+        .panel-red { border-left: 4px solid var(--red); }
+        .panel-blue { border-left: 4px solid var(--blue); }
+        .panel-green { border-left: 4px solid var(--green); }
+        .panel-purple { border-left: 4px solid var(--purple); }
+        .panel h4 { margin-top: 0; }
+        .badge {
+            display: inline-block;
+            padding: 0.05rem 0.5rem;
+            border-radius: 12px;
+            font-size: 0.65rem;
+            font-weight: 600;
+            background: var(--bg4);
+            color: var(--text3);
+            border: 1px solid var(--border);
+        }
+        .badge-gold { background: var(--gold); color: #1a1400; border-color: var(--gold); }
+        .badge-red { background: var(--red); color: #fff; border-color: var(--red); }
+        .badge-green { background: var(--green); color: #fff; border-color: var(--green); }
+        .badge-blue { background: var(--blue); color: #fff; border-color: var(--blue); }
+        .badge-purple { background: var(--purple); color: #fff; border-color: var(--purple); }
+        .badge-orange { background: var(--orange); color: #fff; border-color: var(--orange); }
+        .text-muted { color: var(--text3); }
+        .text-gold { color: var(--gold); }
+        .text-sm { font-size: 0.85rem; }
+        .text-xs { font-size: 0.7rem; }
+        .mt-1 { margin-top: 0.5rem; }
+        .mb-1 { margin-bottom: 0.5rem; }
+        .flex { display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center; }
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; }
+        @media (max-width: 600px) { .grid-2 { grid-template-columns: 1fr; } }
+        .toc {
+            background: var(--bg3);
+            border-radius: var(--radius);
+            padding: 0.5rem 0.8rem;
+            border: 1px solid var(--border);
+            margin: 0.5rem 0;
+        }
+        .toc summary { cursor: pointer; color: var(--gold); font-weight: 600; }
+        .toc summary:hover { color: var(--gold-hover); }
+        .toc a { color: var(--text2); display: block; padding: 0.1rem 0; font-size: 0.85rem; }
+        .toc a:hover { color: var(--gold); }
+        .table-wrap { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; margin: 0.5rem 0; }
+        th, td { padding: 0.4rem 0.6rem; border: 1px solid var(--border); text-align: left; }
+        th { background: var(--bg4); color: var(--gold); font-weight: 600; }
+        tr:nth-child(even) { background: var(--bg2); }
+        blockquote {
+            font-style: italic;
+            border-left: 4px solid var(--gold);
+            padding: 0.5rem 1rem;
+            margin: 0.5rem 0;
+            background: var(--bg2);
+            border-radius: var(--radius);
+            color: var(--text2);
+        }
+        blockquote .attribution { display: block; font-style: normal; color: var(--text3); font-size: 0.85rem; margin-top: 0.3rem; }
+        code { background: var(--bg4); padding: 0.1rem 0.3rem; border-radius: 4px; font-size: 0.85rem; color: var(--gold); }
+        pre { background: var(--bg3); padding: 0.5rem; border-radius: var(--radius); overflow-x: auto; border: 1px solid var(--border); }
+        hr { border: none; border-top: 1px solid var(--border); margin: 1rem 0; }
+        .titlepage { text-align: center; margin: 1rem 0 0.5rem; }
+        .titlepage h1 { font-size: 2.5rem; border-bottom: none; margin-bottom: 0.1rem; }
+        .titlepage h2 { font-size: 1.8rem; font-weight: normal; border-bottom: none; margin-top: 0; }
+        .copyright-page { text-align: center; margin: 1rem 0; padding: 1rem 0; border-top: 2px solid var(--gold); border-bottom: 2px solid var(--gold); }
+        .copyright-page h1 { border-bottom: none; }
+        .srd-reference { background: var(--bg2); border: 1px solid var(--gold); padding: 0.5rem 1rem; margin: 1rem 0; border-radius: var(--radius); }
+        .back-to-top { position: fixed; bottom: 1rem; right: 1rem; background: var(--bg3); padding: 0.5rem 0.8rem; border-radius: 50%; border: 1px solid var(--gold); color: var(--gold); text-decoration: none; font-size: 1.2rem; box-shadow: 0 2px 8px rgba(0,0,0,0.5); z-index: 100; }
+        .back-to-top:hover { background: var(--gold); color: var(--bg1); }
+        .search-box { background: var(--bg3); border: 1px solid var(--border); border-radius: var(--radius); padding: 0.5rem; color: var(--text); width: 100%; max-width: 300px; }
+        .search-box:focus { outline: none; border-color: var(--gold); }
+        .highlight { background: var(--bg4); border-left: 3px solid var(--gold); padding-left: 0.5rem; }
+        .multicols { column-count: 2; column-gap: 2rem; }
+        @media (max-width: 600px) { .multicols { column-count: 1; } }
+        footer.doc-footer { margin-top: 2rem; padding-top: 0.8rem; border-top: 2px solid var(--gold); text-align: center; color: var(--text3); font-size: 0.8rem; }
+    </style>
+</head>
+<body>
+<a href="#" class="back-to-top">⬆</a>
+<div id="main-content">
+
+<h1>World Interaction</h1>
+<p class="subtitle">Fate's Edge Player's Guide — Chapter 14</p>
+
+<div class="panel panel-blue">
+<h4>Using This Chapter</h4>
+<p>This chapter gives you the tools to move through the world, interact with its people, and make your journey meaningful. For detailed descriptions of each region's culture, subgenre, and notable NPCs, see <strong>Chapter 12 (World Regions and Cultures)</strong>. The two chapters work together: this one covers <em>how</em> to travel and interact; the other tells you <em>where</em> and <em>with whom</em>.</p>
+</div>
+
+<p>In <strong>Fate's Edge</strong>, the world is not a backdrop — it is a partner in the conversation. Dikes groan under black rain in Viterra, clan horns answer across Acasia's ridgelines, Ecktoria's marble halls echo with careful words, and Kahfagia's pilots read storms by taste. Wherever you go, place, culture, and pressure push back.</p>
+
+<h2>The Known World: A Geographic Overview</h2>
+<p>The following summary orients the major regions relative to one another. (See Chapter 12 for cultural details.)</p>
+
+<dl>
+  <dt>Ecktoria</dt>
+  <dd>Temperate heartland of the old Utaran Imperium. Borders Acasia to the northeast and Kahfagia to the west. Marble cities, imperial roads, codified law.</dd>
+  <dt>Acasia</dt>
+  <dd>Lowland of rivers and petty kingdoms, northeast of Ecktoria. Broken province of mercenary companies and border lords. Borders Vhasia to the east.</dd>
+  <dt>Vhasia</dt>
+  <dd>Fractured kingdom on a southern peninsula. East of Acasia, west of Viterra. Courtly intrigue, martial tradition, and fractured sun symbolism.</dd>
+  <dt>Viterra</dt>
+  <dd>Shares the same peninsula with Vhasia, lying further east. Its eastern coast borders a dark inland body (the Blackwater). Hedge-law, river tolls, and the Last Kingdom.</dd>
+  <dt>Kahfagia</dt>
+  <dd>West of Ecktoria, facing the open ocean. Maritime empire of storm-flags, deep-sea pilots, and exotic imports.</dd>
+  <dt>Thepyrgos</dt>
+  <dd>Occupies the southern part of the great peninsula opposite Vhasia/Viterra. Eastern coast overlooks the Astroegro Straits. City of a Thousand Stairs, center of learning.</dd>
+  <dt>Theona</dt>
+  <dd>Large island off the eastern coast of Viterra. Three isles, causeways, marsh, and the "No Ninth" taboo.</dd>
+  <dt>Mistlands</dt>
+  <dd>Western shore of the Aberderrian Sea (north of the Amaranthine). Bog, fog, and bell-lines; protectorate of the Aeler. Direwood lies to the west.</dd>
+  <dt>Linn</dt>
+  <dd>Scattered around the Yloka River and the Aberderrian Sea. Longships reach the Blackwater and raid Theona and Viterra. Fjords, skerries, storm-oaths.</dd>
+  <dt>Violet Steppe</dt>
+  <dd>North of the Amaranthine, west of the Aberderrian Sea. Vast grassland, home of the Ykrul nomads.</dd>
+  <dt>Valewood</dt>
+  <dd>East of the Blackwater. Ancient forest of phasing ruins, star-roads, and fae courts. Former Lethai empire.</dd>
+  <dt>Aelinnel (Aevrossa)</dt>
+  <dd>South of the Valewood. Gnomish homeland of stone, bough, and bright things. Mist paths, bell-mounds, tide-gates.</dd>
+  <dt>Aelaerem</dt>
+  <dd>South of Aevrossa. Halfling downs of gentle valleys and deep barrows. Homeland spoken of only in euphemisms ("The Silent Welcome").</dd>
+  <dt>Zakov</dt>
+  <dd>Island in the Blackwater, near the mouth of the Yloka River. Pirate haven, reef passages, salt and serpent.</dd>
+  <dt>Oshiira</dt>
+  <dd>Southern grasslands east of the Gulf of Oshiira. Grain confederacy, weigh-houses, and the Vermilion Corps.</dd>
+  <dt>Ashaan</dt>
+  <dd>Eastern desert peninsula, south of the Crimson Valley. Veiled Throne, spirit-binding, and the Red Desert's creeping glass.</dd>
+  <dt>Sekogo</dt>
+  <dd>Jungle realm south of the Crimson Valley and west of Ashaan. Green Council, honey-orchards, and the Ukwe (Speaking Tree).</dd>
+  <dt>Taharka</dt>
+  <dd>Highland kingdom of the Monsoon Crown. Coffee terraces, ridge-watchers, and passes that remember every army.</dd>
+  <dt>Fhara</dt>
+  <dd>Desert peninsula of oasis courts and water-clerks. Well-judges, coffee rituals, and the Sunken City of Qalat al-Madina.</dd>
+  <dt>Sidhi</dt>
+  <dd>Diaspora people of the Brass Coast. Lighthouse courts, freedman's seals, and the green flame of memory.</dd>
+  <dt>Pereshi</dt>
+  <dd>Highland fire-temple nation. Ash Prince's seal, fire-readers, and the ninth coal that never cools.</dd>
+  <dt>Kuvani</dt>
+  <dd>Eastern steppe remount clans. Horse lineages, wind-songs, and the ghost herd of the salt pan.</dd>
+  <dt>Tulkani</dt>
+  <dd>Itinerant storytellers and dream-carriers. Wagon circles, memory-cords, and the Dreamer who sleeps beneath the road.</dd>
+  <dt>Ngomebe</dt>
+  <dd>Walking cities of the southern plateau. Keystone chargers, roller-pits, and the Still Voice of abandoned stone.</dd>
+  <dt>Dhahara (Nine Kingdoms)</dt>
+  <dd>Elephant kingdoms of the monsoon lowlands. Peacock Throne, river wars, and the ninth kingdom that was never whole.</dd>
+</dl>
+
+<h3>The Ways Between</h3>
+<p>Beyond the physical map lie the Ways Between — the dream-roads and spirit-paths of Obishaal, realm of dreams and death. Travel here is measured not in miles but in choices. A wrong turn might lead to yesterday. A right turn might lead to a version of yourself who made a different decision and is still alive to regret it.</p>
+
+<p><strong>Entering the Ways:</strong> Thresholds exist in thin places — crossroads at midnight, bridges that appear only at low tide, caves behind waterfalls, or simply a mist that settles too thick and stays too long. A character may also enter through ritual, dream, or near-death experience.</p>
+
+<p><strong>Navigation in Obishaal:</strong> Use the standard travel procedures, but the GM may replace the Spades (place) draw with a <strong>Virtue Test</strong>. The road judges. Acts of honesty, courage, mercy, or self-sacrifice advance a personal <strong>Virtue Timer [3]</strong>; acts of greed, cowardice, cruelty, or despair advance a <strong>Vice Timer [3]</strong>. When one fills, the character ascends (Virtue) to a higher layer or falls (Vice) to a lower one.</p>
+
+<p><strong>The Thirteenth Stone:</strong> At the deepest layer, pressed into the silt of the oldest dream, lies the Thirteenth Stone — warm, pulsing, and whispering. Here, Ikasha, She Who Sleeps, dreams of freedom. Her voice offers bargains. Her freedom would remake the world.</p>
+
+<h2>Game Structure and Time</h2>
+<p>Understanding how time works in Fate's Edge helps you navigate both the mechanical and narrative flow of play.</p>
+
+<h3>Basic Units</h3>
+<dl>
+  <dt>Scene</dt>
+  <dd>The basic unit of narrative play, covering a specific situation or conflict (Some Time to Significant Time). Resolves a particular question or challenge.</dd>
+  <dt>Player Turn (Beat)</dt>
+  <dd>An individual player's action within a scene: Declare action &rarr; GM sets position &rarr; roll &rarr; resolve outcome &rarr; manage consequences.</dd>
+  <dt>Round</dt>
+  <dd>Simultaneous or near-simultaneous actions within a scene (primarily for combat), representing a few seconds of real time.</dd>
+  <dt>Session</dt>
+  <dd>One complete game session (typically 3–6 hours), containing 2–4 major scenes and resolving significant narrative progress.</dd>
+  <dt>Downtime</dt>
+  <dd>The narrative time between scenes, used for recovery, advancement, and off-screen activities. Measured in days, weeks, or months depending on fiction.</dd>
+  <dt>Campaign</dt>
+  <dd>Entire story arc (6–20+ sessions) with major character development and lasting consequences.</dd>
+</dl>
+
+<h2>Movement and Positioning</h2>
+<p>Space is tracked with <strong>range bands</strong> and <strong>Position</strong> (see the Core Mechanics chapter for full rules).</p>
+
+<h3>Range Bands</h3>
+<dl>
+  <dt>Close</dt>
+  <dd>Touching distance: grapples, knife-work, hand on a relic.</dd>
+  <dt>Near</dt>
+  <dd>Same room/yard/deck; a rush away.</dd>
+  <dt>Far</dt>
+  <dd>Same site but distant; requires route or time to reach.</dd>
+  <dt>Absent</dt>
+  <dd>Off-screen; requires scene change or significant effort to interact.</dd>
+</dl>
+
+<h3>Movement Actions</h3>
+<ul>
+  <li><strong>Move</strong>: Shift one range band as a <em>beat</em>.</li>
+  <li><strong>Dash</strong>: Shift two bands as your full action (terrain may require a roll).</li>
+  <li><strong>Melee Flag</strong>: Mark when two parties are in Near range and directly engaged in combat.</li>
+</ul>
+
+<h3>Position States</h3>
+<dl>
+  <dt>Dominant</dt>
+  <dd>You have cover, leverage, or ritual footing. Failure still leaves options.</dd>
+  <dt>Controlled</dt>
+  <dd>Standard case: exposed lanes, rivals near, watchful eyes. Failure has teeth, but not ruin.</dd>
+  <dt>Desperate</dt>
+  <dd>Bad ground, bad odds, bad timing. Failure is severe; success may bring extra XP.</dd>
+</dl>
+
+<p><strong>Position Shifting:</strong></p>
+<ul>
+  <li>GM can spend <strong>1 SB</strong> to worsen Position by one step.</li>
+  <li>Player can spend <strong>1 Boon</strong> to improve Position by one step (once per action).</li>
+  <li>Narrative triggers (flanking, reinforcements, etc.) can shift Position without cost.</li>
+</ul>
+
+<h2>Narrative Time</h2>
+<p>Time is measured by <em>importance</em> rather than duration.</p>
+<dl>
+  <dt>A Moment</dt>
+  <dd>A glance, a strike, a whisper over a law-stone.</dd>
+  <dt>Some Time</dt>
+  <dd>A skirmish, a negotiation, a careful climb.</dd>
+  <dt>Significant Time</dt>
+  <dd>Hours of march, rites, audits, stakeouts.</dd>
+  <dt>Days</dt>
+  <dd>Drills, recoveries, research, roadwork.</dd>
+</dl>
+
+<h2>Social Interactions</h2>
+<p>Social scenes use the same engine with <strong>cultural color</strong> (see the Core Mechanics chapter).</p>
+
+<h3>Cultural Skill Emphases</h3>
+<p>Different regions value different approaches. The skills listed below are the most frequently used in each region, but the GM may allow others when the fiction justifies it.</p>
+<div class="table-wrap">
+<table>
+<thead>
+<tr><th>Region</th><th>Valued Approach</th></tr>
+</thead>
+<tbody>
+<tr><td>Viterra</td><td>Sway for markets; Insight for reading parishes; Lore for hedge-law.</td></tr>
+<tr><td>Acasia</td><td>Sway for kin-bridges; Insight for reading oaths; Deception risks honor timers.</td></tr>
+<tr><td>Ecktoria</td><td>Sway in salons; Deception at court; Performance in temple fora.</td></tr>
+<tr><td>Kahfagia</td><td>Sway aboard ship; Insight for reading crews; Sway for negotiating piers.</td></tr>
+<tr><td>Vhasia</td><td>Presence for courtly etiquette; Sway for diplomacy; Insight for hidden loyalties.</td></tr>
+<tr><td>Thepyrgos</td><td>Lore for academic debate; Sway for rhetorical argument; Investigation for uncovering truth.</td></tr>
+<tr><td>Mistlands</td><td>Lore for reading fog signs; Spirit + Insight for resisting spirit influence; Arcana for bell-law.</td></tr>
+<tr><td>Ykrul</td><td>Sway for leadership; Performance for boast and saga; Lore for steppe navigation.</td></tr>
+<tr><td>Sidhi</td><td>Sway for negotiation; Subterfuge for smuggling; Investigation for lighthouse justice.</td></tr>
+<tr><td>Tulkani</td><td>Performance for storytelling; Insight for reading truth; Lore for road etiquette.</td></tr>
+</tbody>
+</table>
+</div>
+
+<h3>Social Stakes &amp; Timers</h3>
+<p>Your GM may use visible timers to track social progress:</p>
+<ul>
+  <li><strong>Alliance Timer (Viterra):</strong> Parishes and guilds come to your side.</li>
+  <li><strong>Honor Timer (Acasia):</strong> Feasts, oaths, wyrd — trust builds (or frays).</li>
+  <li><strong>Bureau Timer (Ecktoria):</strong> Stamps, seals, approvals — delay is pressure.</li>
+  <li><strong>Trust Timer (Kahfagia):</strong> Pilots and crews extend favors and routes.</li>
+  <li><strong>Courtesy Timer (Aelinnel):</strong> Fae negotiations — speak true or lose standing.</li>
+  <li><strong>Hollow Attention Timer (Aelaerem/Mistlands):</strong> The uninvited guest draws near.</li>
+</ul>
+
+<h3>Hospitality as a Social Mechanic</h3>
+<p>In many cultures — especially Aelaerem, Ykrul, Tulkani, Ubral, and Fhara — hospitality is sacred. Accepting a cup, a meal, or a night's shelter creates a bond. Breaking hospitality is worse than breaking a sworn oath.</p>
+<p><strong>Hospitality Bond:</strong> When you accept hospitality (food, drink, or shelter) from a host in a culture that honors guest-right, you and the host gain a mutual <strong>Hospitality Bond [3]</strong>. While the bond has segments, neither party may take hostile action against the other. The bond ticks when either party lies to the other, breaks a promise made under the host's roof, or acts to harm the other's interests. When it fills, the bond snaps — and the violator gains a <strong>Black Mark</strong> in that culture (&minus;1 die on all social rolls with that culture for one season).</p>
+<p><strong>Refusing Hospitality:</strong> Refusing an offered cup, meal, or shelter is a grave insult in hospitality cultures. The GM may spend 1 SB to worsen Position by one step in all social interactions with that host and their community for the remainder of the visit.</p>
+
+<h2>Obligation: The Weight of the World</h2>
+<p>Every interaction with the world carries weight. A favor accepted is a thread tied. A promise made is a chain forged. A debt incurred is a story waiting to be told. This is <strong>Obligation</strong>—the accumulated weight of your character's promises, debts, and loyalties.</p>
+
+<h3>What Is Obligation?</h3>
+<p><strong>Obligation</strong> is the mechanical representation of your character's debts—the weight of promises made, favors accepted, and powers borrowed. It is not a punishment. It is a promise of future story.</p>
+<p>In Fate's Edge, power is never free. When you invoke a Patron's Rite, accept a terrestrial patron's favor, or swear an oath that binds your fate, you mark <strong>Obligation</strong>. This debt is not a penalty—it is narrative fuel. It ensures that every gain has a cost, every alliance has a price, and every choice has consequences.</p>
+
+<div class="panel">
+<h4>The Philosophy of Obligation</h4>
+<ul>
+  <li><strong>Power Has Cost:</strong> Every Rite, every favor, every Asset gained through patronage is a thread in a web of obligation.</li>
+  <li><strong>Story Fuel:</strong> A full Obligation track is not a punishment—it's an adventure hook. <em>Your Patron has a task for you.</em></li>
+  <li><strong>Mechanical Weight:</strong> Obligation creates meaningful choices. <em>Can you afford to invoke another Rite, or are you already over capacity?</em></li>
+  <li><strong>Narrative Density:</strong> Debt creates relationships. <em>Who do you owe? What do they want?</em></li>
+</ul>
+</div>
+
+<h3>Tracking Obligation</h3>
+<h4>Capacity</h4>
+<p>Your <strong>Obligation Capacity</strong> is: <strong>Capacity = Spirit + Presence</strong></p>
+<p>This represents the total Obligation you can carry across all Patrons, terrestrial patrons, and other debts before the ledger begins to creak.</p>
+
+<div class="table-wrap">
+<table>
+<thead>
+<tr><th>Spirit</th><th>Presence</th><th>Capacity</th><th>Notes</th></tr>
+</thead>
+<tbody>
+<tr><td>1</td><td>1</td><td>2</td><td>Minimal—one Rite and you're at capacity</td></tr>
+<tr><td>2</td><td>1</td><td>3</td><td>Can invoke three Low Rites before strain</td></tr>
+<tr><td>3</td><td>2</td><td>5</td><td>A dedicated Runekeeper's typical capacity</td></tr>
+<tr><td>4</td><td>3</td><td>7</td><td>A seasoned invoker with social connections</td></tr>
+<tr><td>5</td><td>5</td><td>10</td><td>A legendary figure with immense will and influence</td></tr>
+</tbody>
+</table>
+</div>
+
+<h4>Marking Obligation</h4>
+<p>When you take on a debt, you mark Obligation in one of several ways:</p>
+<ul>
+  <li><strong>Invoking a Rite (Runekeeper):</strong> Mark the Rite's listed Obligation cost.</li>
+  <li><strong>Pushing a Rite:</strong> Mark an additional +1 Obligation for amplified effect.</li>
+  <li><strong>Cracking the Seal (Invoker):</strong> Mark double the Rite's base cost.</li>
+  <li><strong>Accepting a Terrestrial Favor:</strong> Mark +1 Obligation per favor accepted.</li>
+  <li><strong>Acquiring an Asset through Patronage:</strong> Mark Obligation equal to the Asset's value tier (Minor: 1, Standard: 2, Major: 3).</li>
+  <li><strong>Breaking a Promise:</strong> The GM may require you to mark Obligation when you break an oath or fail to fulfill a commitment.</li>
+</ul>
+
+<div class="panel panel-blue">
+<h4>Example: Marking Obligation</h4>
+<p>Kestra (Spirit 3, Presence 1, Capacity 4) invokes a Low Rite of the Traveler (Obligation: 1). She now has 1 Obligation. She later pushes a Rite (additional +1), bringing her to 2. She still has capacity for two more Rites. Later, she invokes a Standard Rite (Obligation: 2), bringing her to 4—exactly at capacity. If she invokes one more Rite, she will exceed capacity and mark Fatigue.</p>
+</div>
+
+<h4>Exceeding Capacity</h4>
+<p>When your total Obligation exceeds your Capacity:</p>
+<ol>
+  <li><strong>Mark Fatigue:</strong> For each segment over Capacity, mark 1 Fatigue.</li>
+  <li><strong>No Further Rites:</strong> You cannot invoke additional Rites or accept additional favors until Obligation is reduced.</li>
+  <li><strong>Patron Intrusion (Double Capacity):</strong> If you exceed double your Capacity, clear all Fatigue, mark Harm 1, and trigger a <strong>Patron Intrusion</strong>—a narrative demand from the Patron.</li>
+</ol>
+
+<h3>Obligation in Social Context</h3>
+<p>In the world of Fate's Edge, Obligation is not just a personal resource—it is a social reality. Others can sense your debts. Some can call them in.</p>
+
+<h4>Strings and Obligation</h4>
+<p>A <strong>String</strong> is a narrative permission—a favor owed, a secret known, a charter held. Strings and Obligation are closely related:</p>
+<ul>
+  <li><strong>A String is a specific favor or leverage.</strong> You hold a String over someone when they owe you.</li>
+  <li><strong>Obligation is the weight of Strings you owe.</strong> Your Obligation track represents the accumulated weight of all the Strings held against you.</li>
+</ul>
+<p><strong>Reading Strings:</strong> When you interact with someone who holds a String on you, you may feel the weight of that debt. The GM may offer you a choice: <em>"You remember that you owe this merchant a favor from last year. He knows it too. You can see it in his smile. What do you do?"</em></p>
+
+<h4>Obligation and Factions</h4>
+<p>Factions—noble houses, guilds, crime syndicates—also track Obligation. When you accept a favor from a faction, you mark Obligation to that faction. When the faction calls in its debt, you must act or face consequences.</p>
+<ul>
+  <li><strong>House Contarini:</strong> Archivolt access, forged charters, legal immunity.</li>
+  <li><strong>The Ragman (Silkstrand):</strong> Smuggling routes, night-boat passage, stolen goods.</li>
+  <li><strong>The Black Banners:</strong> Condotta contracts, war mounts, safe passage.</li>
+</ul>
+<p><strong>Faction Reactions:</strong> A faction with high Obligation from you will be <em>expectant</em>. They will watch you, waiting for the right moment to call in their debt. A faction with no Obligation from you will treat you as a stranger—useful, but not trusted.</p>
+
+<h3>Clearing Obligation</h3>
+<p>Obligation is cleared through meaningful engagement with the Patron or faction to whom the debt is owed. This is not accounting—it is story.</p>
+
+<h4>Acts of Service (Cosmic Patrons)</h4>
+<p>You may clear Obligation by performing an <strong>Act of Service</strong> for your Patron or terrestrial patron. The Act must align with the Patron's themes.</p>
+<div class="table-wrap">
+<table>
+<thead>
+<tr><th>Patron</th><th>Theme</th><th>Example Act of Service</th></tr>
+</thead>
+<tbody>
+<tr><td>The Traveler</td><td>Ways, Journeys</td><td>Guide a lost traveler to safety; repair a broken milestone; leave an offering at a crossroads.</td></tr>
+<tr><td>Oath of Flame &amp; Light</td><td>Dawn, Vows, Protection</td><td>Swear a public vow; consecrate a threshold; defend the innocent.</td></tr>
+<tr><td>Inaea</td><td>Webs, Mercy, Connection</td><td>Mend a broken relationship; tie a red thread at a threshold; offer comfort to the grieving.</td></tr>
+<tr><td>The Witness</td><td>Truth, Memory, Revelation</td><td>Expose a lie; record a forgotten truth; correct an error in a record.</td></tr>
+<tr><td>Ikasha</td><td>Shadow, Secrets, Thresholds</td><td>Hide a secret; protect a fugitive; leave no trace of your passing.</td></tr>
+<tr><td>The Carrion King</td><td>Decay, Renewal</td><td>Tend to the dying; bury the dead; compost something that others discard.</td></tr>
+<tr><td>Grimmir</td><td>Seasons, Nature, Sacrifice</td><td>Plant a tree; make an offering of blood; honor the turning of the seasons.</td></tr>
+<tr><td>Mykkiel</td><td>Law, Covenant, Zeal</td><td>Enforce a just law; witness an oath; correct an injustice.</td></tr>
+<tr><td>Malachai</td><td>Curses, Corruption</td><td>Lay a curse on a deserving target; accept a cursed gift; break a chain.</td></tr>
+</tbody>
+</table>
+<p class="text-sm text-muted">Table: Acts of Service by Cosmic Patron</p>
+</div>
+
+<h4>Acts of Service (Terrestrial Patrons)</h4>
+<p>Terrestrial patrons—noble houses, guilds, crime syndicates, merchant leagues—have their own expectations. Clearing Obligation to them requires tasks that serve their interests, not cosmic principles.</p>
+
+<div class="panel">
+<h4>Clearing Obligation to Terrestrial Patrons</h4>
+<ul>
+  <li><strong>Minor Task (Clears 1 segment):</strong> A small favor that costs time, not risk. Delivering a message, paying a bribe, serving as a witness, or providing information.</li>
+  <li><strong>Significant Task (Clears 2 segments):</strong> A meaningful service with real stakes. Escorting a caravan, breaking a siege, forging a document, or intimidating a rival.</li>
+  <li><strong>Major Task (Clears 3+ segments):</strong> A campaign-defining action. Assassinating a rival, brokering a treaty, stealing a relic, or leading a military operation.</li>
+</ul>
+</div>
+
+<p><strong>Clearing Obligation to a Thieves' Guild</strong></p>
+<p>A Thieves' Guild doesn't care about prayers or offerings. It cares about results. Clearing Obligation to a guild might involve:</p>
+<ul>
+  <li><strong>Minor:</strong> "The guild needs a message delivered to a fence in the Dye Yards. No questions asked. The less you know, the better."</li>
+  <li><strong>Significant:</strong> "A rival crew has been moving in on our territory. I need you to send a message—the kind that doesn't require words. Make sure they understand the cost of competition."</li>
+  <li><strong>Major:</strong> "The Velvet Court has been squeezing our informants. I need you to break into their stronghold and retrieve the ledger that lists our people. Burn it, bring it, or bury it—I don't care. Just make sure no one else reads it."</li>
+</ul>
+<p><strong>GM Guidance:</strong> A guild task should feel like a story hook, not a chore. The message the player delivers might be a lie that starts a war. The person they intimidate might be a future ally. The ledger they retrieve might contain information they wish they hadn't seen.</p>
+
+<p><strong>Clearing Obligation to a Merchant League</strong></p>
+<p>A Merchant League doesn't care about honor or secrets. It cares about profit. Clearing Obligation to a league might involve:</p>
+<ul>
+  <li><strong>Minor:</strong> "A consignment of spice has been held at the customs house. I need you to grease the right palms and get it cleared. Use my name—but don't mention my name." (Presence + Sway, DV 3)</li>
+  <li><strong>Significant:</strong> "The Vilikari route is closed. I need you to find an alternative route for our grain shipments. The Ykrul will want a bribe; the Aeler will want a charter; the Ecktorians will want a tariff. Find the path that costs the least—and if you can't find one, make one."</li>
+  <li><strong>Major:</strong> "A rival has been undercutting our prices. They're selling stolen goods. I need you to expose them—publicly, dramatically, in a way that makes everyone else afraid to do business with them. Ruin them. I don't care how."</li>
+</ul>
+<p><strong>GM Guidance:</strong> Merchant tasks should create tension between profit and principle. The player might find a route that requires them to smuggle untaxed goods. They might have to expose a rival who is actually innocent. They might have to ruin a merchant who once showed them kindness.</p>
+
+<p><strong>Clearing Obligation to a Crime Syndicate</strong></p>
+<p>A Crime Syndicate doesn't care about profit or principles. It cares about control. Clearing Obligation to a syndicate might involve:</p>
+<ul>
+  <li><strong>Minor:</strong> "A captain owes us money. Remind him of his debt. Don't hurt him—just remind him. He'll know what it means when he sees you." (Presence + Intimidation, DV 3)</li>
+  <li><strong>Significant:</strong> "The Watch has been getting too curious. I need you to make sure a certain file disappears from the precinct. No traces, no witnesses, no bodies. Just a file that was never there."</li>
+  <li><strong>Major:</strong> "The Salt Prince has been interfering with our operations. I need you to send a message that will make him reconsider his position. Permanently. The syndicate will provide the resources. You provide the imagination."</li>
+</ul>
+<p><strong>GM Guidance:</strong> Syndicate tasks should challenge the player's moral limits. The debtor might be a desperate mother. The missing file might have contained evidence against a corrupt official who deserved exposure. The Salt Prince might be the only thing holding back a worse power.</p>
+
+<p><strong>Clearing Obligation to a Noble House</strong></p>
+<p>A Noble House cares about reputation and legacy. Clearing Obligation to a house might involve:</p>
+<ul>
+  <li><strong>Minor:</strong> "My daughter is attending a ball at House Contarini. I need someone to ensure she is seen with the right people and not the wrong ones. You'll be a guest—dance, smile, and keep her out of trouble."</li>
+  <li><strong>Significant:</strong> "A rival house has been spreading rumors about my family. I need you to find the source and make sure they stop. Not with violence—with evidence. Make their lies look foolish in public."</li>
+  <li><strong>Major:</strong> "My brother was killed in the last war. I need his standard returned from the battlefield where he fell. The field is occupied by Ykrul riders. The standard is the only proof that his death was honorable. Bring it home, and I will consider our debt settled."</li>
+</ul>
+<p><strong>GM Guidance:</strong> Noble tasks should entangle the player in politics. The daughter might have secrets. The rival's lies might be true. The standard might be the only proof that the brother was a traitor.</p>
+
+<p><strong>Clearing Obligation to a Pirate Captain</strong></p>
+<p>A Pirate Captain cares about wealth and loyalty. Clearing Obligation to a captain might involve:</p>
+<ul>
+  <li><strong>Minor:</strong> "We need a new chart of the Smuggler's Run. The old one is three years out of date. Navigate the channels, chart the hazards, and come back with a map. Don't go too deep—the reefs are patient."</li>
+  <li><strong>Significant:</strong> "A merchant ship has been sailing through our waters without paying tribute. I need you to intercept it and collect the toll. Bring me its cargo. If it resists, sink it. The sea doesn't judge."</li>
+  <li><strong>Major:</strong> "A rival captain has been encroaching on our territory. I need you to capture his ship. Bring me his flag and his first mate. Leave the captain alive—I want to see his face when he learns who took his flag."</li>
+</ul>
+<p><strong>GM Guidance:</strong> Pirate tasks should test loyalty. The merchant ship might be carrying medicine for a plague-stricken village. The rival captain might be old and desperate. The player might have to choose between profit and principle.</p>
+
+<h4>Downtime Clearing</h4>
+<p>During downtime (see the Downtime chapter), you may clear Obligation through one of the following methods:</p>
+<ul>
+  <li><strong>Off-Screen Service (Clears 1 segment):</strong> Describe an Act of Service performed between sessions. No roll required.</li>
+  <li><strong>On-Screen Scene (Clears 1-2 segments):</strong> Play out an Act of Service during a session. The GM may call for a roll if the task is challenging.</li>
+  <li><strong>XP Payment (Clears 2 segments):</strong> Spend 2 XP to clear 2 segments of Obligation. This represents dedicating time and resources to fulfilling the debt.</li>
+</ul>
+
+<h4>Clearing Obligation Through Story</h4>
+<p>Sometimes, Obligation is cleared not through a task, but through a choice. A terrestrial patron may release you from a debt if:</p>
+<ul>
+  <li>You perform an action that aligns with their deeper values (not just their surface demands).</li>
+  <li>You offer them something more valuable than the original debt (a secret, an alliance, a new opportunity).</li>
+  <li>You help them achieve a goal that matters more than the original obligation.</li>
+  <li>You accept a new, more significant debt in exchange for clearing the old one.</li>
+</ul>
+<p><strong>GM Guidance:</strong> Clearing Obligation through story should feel like a negotiation, not a transaction. The patron should weigh your offer. They should demand something in return. The scene should be tense, dramatic, and memorable.</p>
+
+<h4>Declining to Clear Obligation</h4>
+<p>If you allow your Obligation to accumulate without clearing it, the patron or faction will eventually act. When Obligation exceeds capacity:</p>
+<ul>
+  <li><strong>Patron Intrusion:</strong> The patron demands a task. If you refuse, the patron withdraws its favor—you cannot invoke Rites, use Assets, or benefit from their patronage until you make amends.</li>
+  <li><strong>Faction Action:</strong> The faction acts against you—spreading rumors, withholding aid, sending enforcers, or calling in debts you didn't know you owed.</li>
+  <li><strong>Reputation Damage:</strong> Your reputation suffers. Others are less willing to offer you favors or trust your promises.</li>
+</ul>
+
+<h4>The Hollow's Debt</h4>
+<p>The Ninth Taboo (see the Core Mechanics chapter) is a special form of Obligation. When you break an Acasian custom—pour the ninth cup, take the ninth step, speak the ninth name—you mark Obligation to the Hollow. This debt is not cleared by Acts of Service in the usual sense. Instead:</p>
+<ul>
+  <li><strong>Clear by Honoring Customs:</strong> Respect the old ways. Count to eight and stop. Leave offerings at crossroads. Speak no ninth name.</li>
+  <li><strong>Clear by Making Amends:</strong> If you have broken a custom, perform a ritual to acknowledge the debt. The GM determines the form—an offering, a confession, a story.</li>
+  <li><strong>Clear by Fulfilling the Oath:</strong> If the Hollow's attention was drawn by a broken promise, fulfill the promise. The Hollow is patient, but it remembers.</li>
+</ul>
+<p>The Hollow does not demand. It attracts. You will find your way to settling the debt eventually—whether you want to or not.</p>
+
+<h3>Obligation in Play</h3>
+<div class="panel panel-green">
+<h4>Player Guidance: Embracing Obligation</h4>
+<ul>
+  <li><strong>Embrace It:</strong> A full Obligation track means your Patron is about to give you a quest. That quest is a session hook.</li>
+  <li><strong>Clear It Through Story:</strong> Acts of Service are not chores—they are scenes. Describe how you honor your Patron.</li>
+  <li><strong>Don't Hoard:</strong> Obligation is not a resource to be minimized. It is a source of narrative weight.</li>
+  <li><strong>Use It for Leverage:</strong> A terrestrial patron's Obligation can be called in at strategic moments. <em>"I remind the factor that I once carried a message for him."</em></li>
+</ul>
+</div>
+
+<h3>Obligation and the Ninth Taboo</h3>
+<p>In Acasia and beyond, the Ninth Taboo is a form of Obligation—a debt to the land itself. The <strong>Hollow's Attention</strong> timer (see the Core Mechanics chapter) is a form of Obligation to the Curse of Acasia. When the timer fills, the Hollow manifests as an Oath-Keeper and demands payment.</p>
+<p><strong>Breaking Customs:</strong> When you knowingly break an Acasian custom (pours a ninth cup, takes a ninth step, speaks a ninth name), you mark Obligation to the Hollow. This is not a separate track—it is a narrative debt. The Hollow will collect.</p>
+
+<h2>Supply and Resources</h2>
+<p>Track scarcity with a <strong>Supply Timer</strong> shared by the party's expedition.</p>
+<div class="table-wrap">
+<table>
+<thead>
+<tr><th>Segments</th><th>State &amp; Effects</th></tr>
+</thead>
+<tbody>
+<tr><td>0 (Full)</td><td>Well-provisioned; no penalty.</td></tr>
+<tr><td>2 (Low)</td><td>Minor frictions; &minus;1 to resource checks.</td></tr>
+<tr><td>3 (Dangerous)</td><td>Each PC gains <em>Fatigue 1</em>.</td></tr>
+<tr><td>4 (Empty)</td><td>Severe penalties; desperate measures.</td></tr>
+</tbody>
+</table>
+</div>
+
+<h3>Foraging and Subsistence by Region</h3>
+<p>Different regions offer different opportunities (and risks) for finding food and water. Use <strong>Wits + Lore</strong> to identify edible plants, track game, or find water (DV as listed). The GM may also allow <strong>Wits + Investigation</strong> for tracking animals or finding concealed sources.</p>
+<div class="table-wrap">
+<table>
+<thead>
+<tr><th>Region</th><th>Forage DV</th><th>Typical Finds</th></tr>
+</thead>
+<tbody>
+<tr><td>Forest (Valewood, Aelinnel)</td><td>2–3</td><td>Berries, mushrooms, roots, small game</td></tr>
+<tr><td>Steppe (Ykrul, Kuvani)</td><td>3–4</td><td>Edible roots, tubers, small game</td></tr>
+<tr><td>Desert (Ashaan, Fhara)</td><td>4–5</td><td>Cactus water, insects, rare desert herbs</td></tr>
+<tr><td>Marsh (Mistlands, Theona)</td><td>3–4</td><td>Cattails, frogs, medicinal mud</td></tr>
+<tr><td>Mountain (Ubral, Pereshi)</td><td>3–4</td><td>Mountain herbs, small game, clean springs</td></tr>
+<tr><td>Coast (Linn, Sidhi, Zakov)</td><td>2–3</td><td>Shellfish, seaweed, fish</td></tr>
+<tr><td>Tundra (Northern Violet Steppe)</td><td>4–5</td><td>Lichens, frozen berries, small game</td></tr>
+</tbody>
+</table>
+</div>
+
+<h2>Engaging the World — Player Actions</h2>
+<ul>
+  <li><strong>Scout &amp; Signal:</strong> A follower can make the next travel action <em>Dominant</em> (mark Exposure or Harm 1 on them — see the Followers and Assets chapter).</li>
+  <li><strong>Local Color:</strong> Briefly state what locals notice about you; GM offers a small fictional edge <em>or</em> a tempting timer — choose.</li>
+  <li><strong>Mark the Map:</strong> On arrival, declare one change to the fiction (new ford, patron's shrine, toll-skip). GM may attach a minor timer as cost.</li>
+  <li><strong>Asset Activation:</strong> Spend 1 Boon to activate an asset dramatically during a scene (see the Followers and Assets chapter).</li>
+  <li><strong>Follower Assistance:</strong> Have a follower assist your actions for bonus dice (max +3 from all sources, see the Core Mechanics chapter).</li>
+  <li><strong>Invoke Cultural Knowledge:</strong> If your character has a relevant background or has spent significant time in a region, you may ask the GM one straightforward yes/no question about local customs, taboos, or safe practices. This typically uses <strong>Lore</strong> or <strong>Insight</strong>, but the GM may call for other skills.</li>
+  <li><strong>Call in a Favor:</strong> If you have a String on someone in the current scene, you may invoke it to gain +1 die on a social roll or to ask a single favor. The GM may require you to mark Obligation if the favor is significant.</li>
+</ul>
+
+<h2>World Interaction — Quick Reference</h2>
+<div class="table-wrap">
+<table>
+<thead>
+<tr><th>When you want to&hellip;</th><th>Use this approach</th></tr>
+</thead>
+<tbody>
+<tr><td>Travel quickly</td><td>Take the Guide role, prioritize Speed intent</td></tr>
+<tr><td>Travel safely</td><td>Take the Scout role, prioritize Stealth or Survey intent</td></tr>
+<tr><td>Learn local customs</td><td>Ask a local, invoke cultural knowledge, observe before acting</td></tr>
+<tr><td>Gain a patron</td><td>Complete a favor, offer a service, impress with skill or honor</td></tr>
+<tr><td>Avoid attention</td><td>Travel with Stealth intent, keep to back roads, pay bribes</td></tr>
+<tr><td>Negotiate a dispute</td><td>Invoke common ground, offer a compromise, use social skills</td></tr>
+<tr><td>Survive the wilds</td><td>Take the Quartermaster role, forage, find shelter</td></tr>
+<tr><td>Honor hospitality</td><td>Accept offered food/drink, share a story, never draw first blood</td></tr>
+<tr><td>Cross a thin place</td><td>Offer a memory, speak a true name, leave an offering</td></tr>
+<tr><td>Clear Obligation</td><td>Perform an Act of Service, spend XP, or play out a scene</td></tr>
+<tr><td>Call in a favor</td><td>Invoke a String on a person or faction</td></tr>
+</tbody>
+</table>
+</div>
+
+<h2>Obligation at a Glance</h2>
+<div class="table-wrap">
+<table>
+<thead>
+<tr><th>Concept</th><th>Mechanics</th></tr>
+</thead>
+<tbody>
+<tr><td>Capacity</td><td>Spirit + Presence</td></tr>
+<tr><td>Marking</td><td>Invoke Rite (+1), Push (+1), Crack the Seal (+2), Accept Favor (+1)</td></tr>
+<tr><td>Exceeding Capacity</td><td>1 Fatigue per segment over</td></tr>
+<tr><td>Double Capacity</td><td>Clear Fatigue, mark Harm 1, trigger Patron Intrusion</td></tr>
+<tr><td>Clearing (Service)</td><td>Act of Service (1-3 segments)</td></tr>
+<tr><td>Clearing (Downtime)</td><td>Off-screen (1), On-screen (1-2), XP (2 segments for 2 XP)</td></tr>
+<tr><td>Clearing (Talent)</td><td>Focused Devotion: 1 Boon for 1 segment</td></tr>
+<tr><td>Patron Intrusion</td><td>Quest, demand, rival, or omen</td></tr>
+<tr><td>Terrestrial Patrons</td><td>Same mechanics, narrative consequences</td></tr>
+<tr><td>The Ninth Taboo</td><td>Breaking customs marks Obligation to the Hollow</td></tr>
+</tbody>
+</table>
+</div>
+
+<h2>Summary</h2>
+<p>The world has opinions. Movement is timers and color, position rises and sinks with weather and words, and every suit you draw speaks in a regional accent. Ask the land for a favor — then pay it back on the road.</p>
+
+<div class="panel">
+<h4>The Gray Wanderer's Wisdom</h4>
+<p>"The road does not promise a safe journey—only a true one. Every favor you accept is a thread tied. Every promise you make is a chain forged. Every debt you incur is a story waiting to be told. The world remembers. The Hollow collects. And the Patrons—whatever names they are called—are always watching."</p>
+</div>
+
+<p><strong>Remember:</strong> Every interaction with the world is an opportunity. Use your assets, deploy your followers, and engage with the setting actively. The world responds to your choices, and every journey changes both you and the places you pass through. Your Obligation is not a burden—it is the weight of your story, the threads that tie you to the world, and the promise of adventure yet to come.</p>
+
+<p>The road is not a ledger — it is a conversation. Speak carefully. Listen closely. And always leave something behind for the next traveler.</p>
+
+</div>
+<footer class="doc-footer">Fate's Edge Proprietary Content — (c) 2024 Nicholas A. Gasper. All rights reserved.</footer>
+</body>
+</html>

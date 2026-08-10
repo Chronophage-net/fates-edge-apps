@@ -1,0 +1,1371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Black Banners: Condotta and Crowns — Mercenary Company Expansion</title>
+    <style>
+        :root {
+            --bg1: #0a0908;
+            --bg2: #15130f;
+            --bg3: #1e1b15;
+            --bg4: #28241c;
+            --text: #e6ded0;
+            --text2: #b3a890;
+            --text3: #837a68;
+            --gold: #b5822f;
+            --gold-hover: #cf9a42;
+            --border: #3a3327;
+            --red: #8e2a2a;
+            --green: #4a6b3d;
+            --blue: #3c5e70;
+            --purple: #5f4a5e;
+            --orange: #a8622a;
+            --iron: #6e6a63;
+            --bronze: #9c7a3c;
+            --radius: 8px;
+            --font: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            background: var(--bg1);
+            background-image: radial-gradient(circle at 50% 0%, #17140f 0%, #0a0908 60%);
+            color: var(--text);
+            font-family: var(--font);
+            padding: 1.5rem;
+            max-width: 1100px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+        h1, h2, h3, h4, h5 { color: var(--gold); margin: 0.9rem 0 0.4rem; }
+        h1 { font-size: 1.9rem; border-bottom: 2px solid var(--gold); padding-bottom: 0.3rem; }
+        h2 { font-size: 1.4rem; border-bottom: 1px solid var(--border); padding-bottom: 0.2rem; margin-top: 1.6rem; }
+        h3 { font-size: 1.15rem; color: var(--bronze); }
+        h4 { font-size: 0.98rem; color: var(--text); }
+        p { margin: 0.4rem 0; }
+        a { color: var(--gold); text-decoration: none; }
+        a:hover { color: var(--gold-hover); text-decoration: underline; }
+        ul, ol { margin: 0.3rem 0 0.5rem 1.3rem; }
+        li { margin: 0.15rem 0; }
+        .panel {
+            background: var(--bg2);
+            border-radius: var(--radius);
+            padding: 0.7rem 0.9rem;
+            border: 1px solid var(--border);
+            margin: 0.6rem 0;
+        }
+        .panel-gold { border-left: 4px solid var(--gold); }
+        .panel-red { border-left: 4px solid var(--red); }
+        .panel-blue { border-left: 4px solid var(--blue); }
+        .panel-green { border-left: 4px solid var(--green); }
+        .panel-purple { border-left: 4px solid var(--purple); }
+        .panel-orange { border-left: 4px solid var(--orange); }
+        .panel-iron { border-left: 4px solid var(--iron); }
+        .badge {
+            display: inline-block;
+            padding: 0.08rem 0.55rem;
+            border-radius: 12px;
+            font-size: 0.68rem;
+            font-weight: 600;
+            margin: 0.1rem 0.15rem 0.1rem 0;
+        }
+        .badge-gold { background: var(--gold); color: #170f00; }
+        .badge-red { background: var(--red); color: #fff; }
+        .badge-green { background: var(--green); color: #fff; }
+        .badge-blue { background: var(--blue); color: #fff; }
+        .badge-purple { background: var(--purple); color: #fff; }
+        .badge-orange { background: var(--orange); color: #fff; }
+        .badge-iron { background: var(--iron); color: #fff; }
+        .badge-gray { background: var(--bg4); color: var(--text3); }
+        .flex { display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center; }
+        .text-muted { color: var(--text3); }
+        .text-gold { color: var(--gold); }
+        .text-sm { font-size: 0.88rem; }
+        .text-xs { font-size: 0.75rem; }
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem; }
+        .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.6rem; }
+        @media (max-width: 700px) { .grid-2, .grid-3 { grid-template-columns: 1fr; } }
+        hr { border: none; border-top: 1px solid var(--border); margin: 1rem 0; }
+        blockquote {
+            border-left: 3px solid var(--gold);
+            padding-left: 1rem;
+            margin: 0.6rem 0;
+            color: var(--text2);
+            font-style: italic;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 0.6rem 0;
+            font-size: 0.86rem;
+            background: var(--bg2);
+            border-radius: var(--radius);
+            overflow: hidden;
+        }
+        thead th {
+            background: var(--bg4);
+            color: var(--gold);
+            text-align: left;
+            padding: 0.45rem 0.6rem;
+            border-bottom: 2px solid var(--border);
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.02em;
+        }
+        tbody td {
+            padding: 0.4rem 0.6rem;
+            border-bottom: 1px solid var(--border);
+            vertical-align: top;
+        }
+        tbody tr:last-child td { border-bottom: none; }
+        tbody tr:hover { background: var(--bg3); }
+        .sheet-box {
+            background: var(--bg3);
+            border: 1px solid var(--bronze);
+            border-radius: var(--radius);
+            padding: 0.8rem 1rem;
+            margin: 0.7rem 0;
+            font-size: 0.9rem;
+        }
+        .sheet-box .sheet-title { color: var(--gold); font-weight: 700; font-size: 1rem; margin-bottom: 0.3rem; }
+        .unit-card {
+            background: var(--bg3);
+            border-radius: var(--radius);
+            padding: 0.55rem 0.75rem;
+            margin: 0.4rem 0;
+            border-left: 3px solid var(--bronze);
+            font-size: 0.85rem;
+        }
+        .unit-card .unit-name { font-weight: 700; color: var(--gold); font-size: 0.95rem; }
+        .unit-card .unit-meta { color: var(--text3); font-size: 0.75rem; margin: 0.1rem 0; }
+        .unit-card .unit-orders { margin-top: 0.3rem; font-size: 0.8rem; color: var(--text2); }
+        .toc {
+            background: var(--bg3);
+            border-radius: var(--radius);
+            padding: 0.7rem 1rem;
+            border: 1px solid var(--border);
+            column-count: 2;
+            column-gap: 1.5rem;
+        }
+        .toc a { color: var(--text2); display: block; padding: 0.1rem 0; font-size: 0.85rem; break-inside: avoid; }
+        .toc a:hover { color: var(--gold); }
+        .toc .toc-h { color: var(--bronze); font-weight: 700; margin-top: 0.4rem; font-size: 0.82rem; break-inside: avoid; }
+        @media (max-width: 700px) { .toc { column-count: 1; } }
+        .cant { font-style: italic; color: var(--text2); }
+    </style>
+</head>
+<body>
+
+<h1>⚔️ Black Banners: Condotta and Crowns</h1>
+<p style="color:var(--text2);margin-bottom:0.8rem;">
+    <span class="badge badge-gold">Mercenary Company Expansion</span>
+    <span class="badge badge-iron">Wargame &amp; War Table Extension</span>
+    <span class="badge badge-orange">Followers Cap 1&ndash;5</span>
+    <span class="badge badge-blue">Quick Reference Included</span>
+    <span class="badge badge-gray">Author: Nicholas A. Gasper</span>
+</p>
+
+<div class="panel panel-gold">
+    <strong>What This Is</strong>
+    <p class="text-sm">A full mercenary-company expansion for Fate's Edge: the Followers rules for bannered
+    troops (Cap 1&ndash;5, Scale I&ndash;IV), a War Table wargame layer for banner-on-banner engagements, and a
+    Mercenary Company Quick Reference for running any bannered outfit at the table. It also serves as the
+    sourcebook for <strong>the Black Banners</strong> &mdash; the mercenary league whose companies (including the
+    Black Banner Mercenaries under Captain Rusk) turn up wherever contracts, courts, and caravan roads collide
+    elsewhere in the setting.</p>
+</div>
+
+<blockquote>
+    "The contract is the road. The colors are the promise. The pay-chest is the prayer." &mdash; Black Banners Camp Law
+</blockquote>
+
+<div class="toc">
+    <strong style="color:var(--gold);grid-column:1/-1;">📑 Table of Contents</strong>
+    <div class="toc-h">I&ndash;X. Core Expansion</div>
+    <a href="#intro">I. Introduction: The Theater of Banners</a>
+    <a href="#lore">Lore: The Black Banners</a>
+    <a href="#mechanics">II. Core Mechanics Framework</a>
+    <a href="#loyalty">III. Loyalty and Allegiance Systems</a>
+    <a href="#camp-life">IV. Camp Life Procedures</a>
+    <a href="#combat-integration">V. Combat and Campaign Integration</a>
+    <a href="#scenario-seeds">VI. Scenario Seeds and Scores</a>
+    <a href="#cross-system">VII. Cross-System Integration</a>
+    <a href="#roles">VIII. Character Options and Roles</a>
+    <a href="#campaign-framework">IX. Campaign Framework</a>
+    <a href="#gm-toolkit">X. GM Toolkit and Procedures</a>
+    <div class="toc-h">Followers &amp; War Table</div>
+    <a href="#followers">Followers: Condotta &amp; Crowns</a>
+    <a href="#follower-units">Sample Follower Units</a>
+    <a href="#war-table">War Table: The Black Banners Wargame Extension</a>
+    <div class="toc-h">Quick Reference</div>
+    <a href="#quick-ref">Mercenary Company Quick Reference</a>
+    <a href="#qr-company-sheet">Company Sheet</a>
+    <a href="#qr-tracks">Track Management</a>
+    <a href="#qr-allegiances">Allegiances in Flux</a>
+    <a href="#qr-dial">Honor vs. Pragmatism Dial</a>
+    <a href="#qr-camp">Camp Life Procedures</a>
+    <a href="#qr-sb">SB Menu for War</a>
+    <a href="#qr-position">Position/DV Modifiers</a>
+    <a href="#qr-roles">Company Roles</a>
+    <a href="#qr-seeds">Scenario Seeds</a>
+    <a href="#qr-legacy">Legacy Options</a>
+</div>
+
+<hr>
+
+<!-- ===================== I. INTRODUCTION ===================== -->
+<h2 id="intro">I. Introduction: The Theater of Banners</h2>
+
+<h3>A. Core Concept</h3>
+<div class="panel panel-iron">
+    <p><strong>War as Social Theater.</strong> In Fate's Edge, battles are brief flashes. The story lives in the
+    hours before and after: payroll arguments, muddy roads, who eats, who prays, who runs. Camps, fords, and
+    counting-tents are the true stages of war.</p>
+    <p class="mt-1"><strong>Mercenaries as Narrative Bridges.</strong> Bannered companies move between courts,
+    ports, and steppes. They tie urban intrigue to caravan legs, wilderness marches, and political endgames. Hire
+    them, join them, or outmaneuver them &mdash; either way, banners connect arcs.</p>
+    <p class="mt-1"><strong>The Condotta System.</strong> Contracts (condotte) are adventures in legal clothing:
+    clauses, riders, sureties, and scheduled betrayals. This module gives fast procedures to play the deal, the
+    march, and the clash with the same tools as core Fate's Edge (Position / DV / Effect, Strings, and timers).</p>
+</div>
+
+<h3>B. Design Philosophy</h3>
+<ul>
+    <li><strong>Camp Over Clash.</strong> Put logistics, medicine, and morale on the table. The camp is where
+    choices compound; the clash is where they're cashed.</li>
+    <li><strong>Contracts as Stories.</strong> A charter's margins foreshadow your next session. Every clause is a
+    future scene; every omission, a future wound.</li>
+    <li><strong>Dynamic Loyalties.</strong> Allegiances shift without spreadsheets. One die per scene nudges
+    fortune, pay, politics, and position.</li>
+    <li><strong>Cross-Arc Integration.</strong> Banners bring Diamonds (leverage), Clubs (pressure), Hearts
+    (people), and Spades (places) to any arc: court, road, hedge, harbor.</li>
+</ul>
+
+<h3>C. Quickstart Summary</h3>
+<div class="panel panel-gold">
+    <strong>Two-Minute Setup</strong>
+    <ol>
+        <li><strong>Condotta Crossroads.</strong> Put two conflicting charters on the table. Ask who you
+        disappoint first.</li>
+        <li><strong>Company Sheet.</strong> Name, Colors, Captain, Cohorts. Add Payday [4], Supply [4], Cohesion
+        [6].</li>
+        <li><strong>Pressure Timers.</strong> Pick two externals (e.g., Skirmish Spiral [6], Camp Despair [6]).</li>
+        <li><strong>Allegiances in Flux.</strong> At each scene start, roll 1d6 and apply the twist.</li>
+        <li><strong>Honor ↔ Pragmatism.</strong> Slide the dial to reflect recent choices; gain a boon, pay a
+        cost.</li>
+    </ol>
+</div>
+
+<hr>
+
+<!-- ===================== LORE ===================== -->
+<h2 id="lore">Lore: The Black Banners</h2>
+
+<blockquote>"The contract is the road. The colors are the promise. The pay-chest is the prayer."</blockquote>
+
+<p>The Black Banners are not one company but a league &mdash; a loose commonwealth of mercenary outfits that share
+camp law, pay customs, and a habit of turning up wherever the map is loud. Their colors are always some device on
+black: a lantern, a thorn, a bell, a fishbone, a broken scale. Black means coin before crown; witness before
+oath.</p>
+
+<p>They are the thread that stitches frontiers to courts, caravan roads to siege lines. Ask five people who the
+Black Banners are and you'll hear five truths: quartermasters who can feed a ghost army; paymasters who count
+twice; raiders with rules; peacekeepers who charge rent; undertakers who sing.</p>
+
+<h3>Origins &amp; Reputation</h3>
+<ul>
+    <li><strong>Birth at the Crossroads.</strong> The first "black" standards reportedly gathered during a famine
+    campaign when city militias and steppe hosts both ran out of grain. A broker chalked clauses on wagon boards;
+    those who signed swore to take coin, keep order, and leave exits. Black cloth was used because no city would
+    lend its colors.</li>
+    <li><strong>Four Sacks of Ecktoria.</strong> The empire counts four humiliations as "sacks." The banners will
+    say &mdash; privately &mdash; that the gates opened for Vilikari cohorts and Banners logistics, not for steppe
+    charges. It was a war of ledgers, ferries, and night roads&hellip; and the empire paid late every time.</li>
+    <li><strong>Fierce, but priced.</strong> Their reputation is a machine: frightening enough to deter trouble,
+    disciplined enough to be rentable, and bound by camp law that courts grudgingly respect.</li>
+</ul>
+
+<h3>Articles of the Camp (the Eight You Hear Aloud)</h3>
+<div class="panel panel-bronze panel-orange">
+    <ol>
+        <li>Payday comes before parley. No pay, no move.</li>
+        <li>Leech and bell are sacred. Healers and chaplains travel untouched.</li>
+        <li>Colors at dawn, not at night. Sacks and changes of allegiance happen in light, with a witness.</li>
+        <li>Prisoners eat. Ransom or release; no starving.</li>
+        <li>The broker is a bridge. Don't kill bridges.</li>
+        <li>Take no road you won't defend. (Some add: "Leave two exits; take one.")</li>
+        <li>No fire in the hospital quarter. Even if the enemy runs through it.</li>
+        <li>Count twice. Coin, bodies, promises.</li>
+    </ol>
+    <p class="text-sm mt-1">Breaking an Article earns a <strong>Black Mark</strong> &mdash; a stigma that travels
+    faster than mail. Three Black Marks and no reputable broker will carry your charter without triple surety.</p>
+</div>
+
+<h3>How They See War</h3>
+<ul>
+    <li><strong>Camp before clash.</strong> A battle is the interest on debts a captain accrued in camp: food,
+    route, weather, rumor. If those sums are wrong, steel won't save you.</li>
+    <li><strong>Contracts as maps.</strong> A condotta (charter) isn't just payment &mdash; it's terrain in
+    sentences: rights of passage, shares of salvage, witness duties, who feeds prisoners and at what rate. Good
+    captains can march through a clause.</li>
+    <li><strong>Loyalties in motion.</strong> They do change sides, but by rule: daylight, drum, witness, surety
+    paid. The gutter word is "treachery." The banner word is "rider fulfilled."</li>
+</ul>
+
+<h3>The Four Faces of a Banner (Hearts)</h3>
+<ul>
+    <li><strong>Captain.</strong> Judge of risk and reputation. The best can smell a forged clause and a storm in
+    the same breath.</li>
+    <li><strong>Quartermaster.</strong> The real warlord. Controls Supply, hates surprises, loves rain barrels.</li>
+    <li><strong>Surgeon/Leech.</strong> Holds morale together with needles, vinegar, and songs. Chooses who lives
+    when coin runs out.</li>
+    <li><strong>Scout/Sergeant.</strong> Decides if today is a straight road or an honest ambush.</li>
+</ul>
+<p class="text-sm text-muted">If Hearts are rotten, no Spade (place), Club (pressure), or Diamond (writ) will save
+you.</p>
+
+<h3>Colors, Devices, &amp; Cant</h3>
+<p><strong>Common devices:</strong> lantern, bell, thorn, chain, fishbone, ladder, broken bit, river-stone, empty
+ring.</p>
+<p><strong>Cant phrases:</strong></p>
+<ul>
+    <li class="cant">"Black's the bargain." (We do this for pay, not love.)</li>
+    <li class="cant">"Lantern high." (We act under witness.)</li>
+    <li class="cant">"Count on copper." (Do it the hard way; stop promising silver.)</li>
+    <li class="cant">"Two weights, one truth." (Say the public price and the real one.)</li>
+</ul>
+
+<h3>Famous Companies &amp; Rumors</h3>
+<div class="grid-2">
+    <div class="panel panel-iron"><strong>The Iron Lanterns.</strong> Siege specialists who promise no fire in
+    hospitals and keep it. They claim to have taken five cities with fewer dead than one bad winter.</div>
+    <div class="panel panel-iron"><strong>Thornwrights.</strong> Sappers and road-cutters who price bridges by the
+    breath &mdash; your breath at the gallop.</div>
+    <div class="panel panel-iron"><strong>Bone &amp; Bell.</strong> Undertaker company; they bury both sides by the
+    book and take payment in coin, land, or lineage favors.</div>
+    <div class="panel panel-iron"><strong>The Fifth Pay-Chest.</strong> An administrative company that "escorts"
+    money and occasionally a colonel's conscience.</div>
+    <div class="panel panel-iron"><strong>Sea Charters.</strong> Colors on black sails; swear by Blue Moot tariffs;
+    infamous for opening blockades with paperwork and weather.</div>
+</div>
+<div class="panel panel-purple mt-1"><strong>Rumor:</strong> A captain called the Bannerless One walks with no
+colors and settles Payday by sheer presence. Those who accept their help wake with coin&hellip; and a debt that
+isn't money.</div>
+
+<h3>Brokers, Prefects, and Other Power</h3>
+<ul>
+    <li><strong>Condotta Brokers.</strong> They draft the charters, carry news, hold surety. Killing a broker is
+    like burning a bridge: possible, unforgettable, and expensive for a decade.</li>
+    <li><strong>River Prefects.</strong> Stamps that open bridges &mdash; once. Prefects sell time more than
+    passage; banners pay dearly.</li>
+    <li><strong>City Factors.</strong> Neutral accountants; they read your ledger aloud and write you back into
+    polite society &mdash; for a price and a favor. Many banners owe them a Price of Neutrality.</li>
+</ul>
+
+<h3>Faith &amp; Rites</h3>
+<ul>
+    <li><strong>Bell-Tokens.</strong> Camp chaplains carry small bells strung with bone or copper. Three bells rung
+    at dawn means a general amnesty for the morning: bury dead, trade prisoners, fix wells, no ambush. Violating a
+    Bell Dawn is how legends end badly.</li>
+    <li><strong>The Surgeon's Right.</strong> A leech can claim any blade or cloth in arm's reach during a
+    procedure. Interfere and the nearest captain is obligated to cut you down or lose face.</li>
+    <li><strong>Break-Reins Rite.</strong> When leaving a bad charter, a captain hangs a bridle ring on the camp
+    gate. It means: we break this without treachery; pay our arrears, we'll bury your dead. Aveh's riders sometimes
+    attend.</li>
+</ul>
+
+<h3>Money, Loot, &amp; Shares</h3>
+<ul>
+    <li><strong>The Cut.</strong> Standard shares: captain 3; officers 2; soldier 1; specialist +&frac12;. Horses
+    get fed first, surgeons second, then soldiers, then officers, then captains. (Good companies keep it that
+    way.)</li>
+    <li><strong>Black Chest.</strong> An emergency pay-chest sealed under four keys &mdash; captain, quartermaster,
+    leech, and the senior sergeant. Opening it without witness earns a Black Mark.</li>
+    <li><strong>Repair Years.</strong> When a sack goes lawful but ugly, some companies pay in repair years &mdash;
+    labor, stone, seed &mdash; rather than coin. It buys reputations you can recruit with.</li>
+</ul>
+
+<h3>Law &amp; Punishment</h3>
+<ul>
+    <li><strong>Articles Tribunals.</strong> Verdicts delivered at noon, with the lantern high. Penalties range
+    from dock of shares to branding (a small black banner on the forearm) to drumming out (colors stripped, tools
+    kept).</li>
+    <li><strong>The Gentle Noose.</strong> A derisive term for "polite" executions: a leather loop drawn until
+    sleep &mdash; then a posting to the worst job for a year. Leeches hate it. Prefects love it.</li>
+</ul>
+
+<h3>Relationships &amp; Politics</h3>
+<ul>
+    <li><strong>With Ykrul.</strong> Respect and rivalry. Banners can pay for route rights with repair or coin;
+    Ykrul will grant them if you hold your exits honest. Many Ykrul learned to price routes from banner
+    quartermasters &mdash; and many quartermasters learned geometry from Ykrul judges.</li>
+    <li><strong>With Vilikari.</strong> Symbiosis. Vilikari run night ferries, speak to both ledgers, and make
+    false orders less profitable than a right bribe. Every good banner captain owes a Vilikari countkeeper at least
+    one feast.</li>
+    <li><strong>With Ecktoria.</strong> The empire hires, audits, and denounces &mdash; often in that order.
+    Ecktorian "corrections" improve Position but put Black Marks on captains who say no.</li>
+    <li><strong>With Aeler.</strong> Hire for stone and siege; pay in repair contracts and courtesy. Break a
+    keystone charter once and all mountain roads become expensive.</li>
+    <li><strong>With Lethai.</strong> Tricky. Lethai-al will deal if you respect hedges, bell dawns, and seed dues.
+    Lethai-ar offer night work at good rates and terrible luck.</li>
+</ul>
+
+<h3>Seasons &amp; Omens</h3>
+<ul>
+    <li><strong>Winter:</strong> loyalty crystallizes or shatters. Good captains winter under charter; bad ones
+    invent taxes.</li>
+    <li><strong>Storm Season:</strong> the Blue Moot opens sea lanes or closes them. Sea Charters thrive; everyone
+    else writes smaller letters.</li>
+    <li><strong>Omens:</strong> a lantern that won't light before parley; a bell that rings once with no wind; a
+    pay-chest key that twists warm in a pocket.</li>
+</ul>
+
+<h3>What Everyone Knows / What Captains Know / What Only Leeches Say</h3>
+<div class="panel panel-blue">
+    <p><strong>Everyone:</strong> They fight for pay but keep rules that make them safer than warlords.</p>
+    <p><strong>Captains:</strong> The real battle is Payday and Supply; break neither and you can lose three
+    skirmishes and still win the war.</p>
+    <p><strong>Leeches:</strong> If the camp sings, you live. If they stop singing, even the best charter
+    bleeds.</p>
+</div>
+
+<h3>Adventure Sparks</h3>
+<ul>
+    <li><strong>Lantern High at Noon.</strong> A broker calls a bell dawn to arbitrate a massacre blamed on your
+    colors. Find the forger, save the Articles, or carry a Black Mark forever.</li>
+    <li><strong>The Fifth Chest.</strong> Someone stole the black chest and left everyone's keys in their boots.
+    Recover it before Cohesion unravels.</li>
+    <li><strong>Price of Neutrality.</strong> City factors demand a favor: escort a despised official through your
+    own angry camp during Short Rations.</li>
+    <li><strong>The Bannerless One.</strong> A quiet person clears your Payday problems and asks only for a
+    prisoner you'd rather keep. Choose mercy, honor, or coin &mdash; then count the cost.</li>
+    <li><strong>Bridge by Bell.</strong> Blue Moot offers one bell-token to reopen a war-closed bridge for a watch.
+    Who crosses first writes a season's history.</li>
+</ul>
+
+<h3>Using the Black Banners in Your Campaign</h3>
+<p>Drop a bannered company anywhere you need stakes with rules. They carry their own courts, hospitals, road
+crews, and songs. In intrigue arcs, they're leverage; in caravan legs, they're escorts or competitors; in
+wilderness play, they keep the wolves fed and the fires small; in political campaigns, they are the deniable arm
+of policy, standing under black to make the colors behind them look clean.</p>
+<p class="text-sm text-muted">The secret of the Black Banners is simple: they turn war back into agreements. And
+agreements &mdash; like bridges &mdash; are only as strong as the people who keep them in the wind.</p>
+
+<hr>
+
+<!-- ===================== II. CORE MECHANICS ===================== -->
+<h2 id="mechanics">II. Core Mechanics Framework</h2>
+
+<h3>A. The Four-Suit System</h3>
+<div class="grid-2">
+    <div class="panel panel-red">
+        <strong>Hearts (People)</strong>
+        <p class="text-sm">Faces for your theater: Captain (command, parley, risk), Quartermaster (supply, pay,
+        scavenge), Surgeon/Leech (harm control, disease, morale), Scout/Sergeant (terrain, ambush, tempo). Use
+        Hearts to bind scenes to stakes: who bleeds if this goes wrong?</p>
+    </div>
+    <div class="panel panel-iron">
+        <strong>Spades (Places)</strong>
+        <p class="text-sm">Position and Effect live in terrain: frozen fords, rain-cut roads, half-built
+        siegeworks, forest lanes under truce. Spades name the rule of the ground and what it does to dice.</p>
+    </div>
+    <div class="panel panel-purple">
+        <strong>Clubs (Pressures)</strong>
+        <p class="text-sm">The SB menu of war: false orders, cut lines, camp-fever, gear breakage, rival aid that
+        arrives late and loud, political "help." Clubs are how the Keeper spends setbacks.</p>
+    </div>
+    <div class="panel panel-gold">
+        <strong>Diamonds (Leverage)</strong>
+        <p class="text-sm">Fictional assets that bypass a roll once when you pay the price: safe-conducts, bridge
+        priority stamps, debt notes, dispensation writs, blood-truce witnesses. Put at least one Diamond in every
+        scene.</p>
+    </div>
+</div>
+<p class="text-sm text-muted mt-1"><strong>Use in play:</strong> At the top of a leg, draft one of each suit.
+Highest rank sets a major timer (4/6/8/10). Any Ace = winter &amp; loyalty motif: expect hunger, omen,
+promotion-by-attrition.</p>
+
+<h3>B. Company Sheet Structure</h3>
+<div class="sheet-box">
+    <div class="sheet-title">[COMPANY NAME] &mdash; [COLORS/BANNER]</div>
+    <p class="text-sm">Captain: [NAME] &nbsp;&nbsp; Ledger: What we owe / Who owes us</p>
+    <p class="text-sm">Cohorts: Scouts &bull; Sappers &bull; Surgeons &bull; Foragers &bull; Skirmishers</p>
+    <p class="text-sm mt-1"><strong>TRACKS:</strong></p>
+    <ul class="text-sm">
+        <li><strong>Payday [4]</strong> &mdash; missed pay, bad terms, seized chests &rarr; desertion risk</li>
+        <li><strong>Supply [4]</strong> &mdash; weather, marches, sabotage &rarr; worse Position on maneuvers</li>
+        <li><strong>Cohesion [6]</strong> &mdash; losses, betrayals, humiliation &rarr; mutters &rarr;
+        fractures</li>
+    </ul>
+    <p class="text-sm mt-1"><strong>Ledger Notes (Strings):</strong> broker's favor &bull; bridge priority &bull;
+    chapel bell-token &bull; banner voucher &bull; ford right (season). These are receipts you can spend.</p>
+</div>
+
+<h3>C. Track Management</h3>
+<ul>
+    <li><strong>Payday.</strong> Tick for missed coin, broken promises, stolen chest, or a "creative" delay. On
+    fill: a squad peels off, a veteran sells secrets, or the next Allegiances roll is with disadvantage (take the
+    worse of two).</li>
+    <li><strong>Supply.</strong> Tick for hard weather, forced march, siege diet, or sabotage. While Supply
+    &ge; 3, all risky maneuvers start one step worse Position unless you bring a Diamond to bear (scavenge,
+    requisition, dispensation).</li>
+    <li><strong>Cohesion.</strong> Tick for public humiliation, ugly losses, officer feuds, or moral injury. When
+    Cohesion hits 0&ndash;1, the Keeper may convert the first 1 SB each scene into Desertion, Brawl, or Refusal
+    until you repair.</li>
+</ul>
+
+<hr>
+
+<!-- ===================== III. LOYALTY ===================== -->
+<h2 id="loyalty">III. Loyalty and Allegiance Systems</h2>
+
+<h3>A. Allegiances in Flux (1d6, scene start)</h3>
+<table>
+    <thead><tr><th style="width:8%;">d6</th><th>Event</th></tr></thead>
+    <tbody>
+        <tr><td>1</td><td><strong>Condotta Flip.</strong> Rival charter offers better terms. Take it: gain Black
+        Mark [1] with the old patron. Refuse: tick Payday.</td></tr>
+        <tr><td>2</td><td><strong>Ykrul Counter-offer.</strong> Accept an exit-rich but costly route: start
+        Obligation [2] you must pay in concessions later; refuse and tick Payday.</td></tr>
+        <tr><td>3</td><td><strong>Vilikari Shortcut.</strong> +1 Effect on this maneuver via night roads; Keeper
+        gains 1 banked SB to spend as Hostile Terrain this scene.</td></tr>
+        <tr><td>4</td><td><strong>Ecktorian "Correction."</strong> March under "imperial guidance": +1 Position
+        this scene or take a Black Mark [1] for defiance.</td></tr>
+        <tr><td>5</td><td><strong>False Orders.</strong> Clubs rain down. First command this scene risks
+        misinterpretation unless countered with a Diamond (cipher, cantor, witness).</td></tr>
+        <tr><td>6</td><td><strong>Bannerless One.</strong> A myth-wrapped fixer clears Payday by 1 &mdash; but
+        starts Price of Mercy [2]. It will come due (prisoner release, repair years, or a refused sack).</td></tr>
+    </tbody>
+</table>
+<p class="text-sm text-muted">Note: Allegiances events are biases, not dictates. They tilt Position/DV, start
+timers, or offer bargains.</p>
+
+<h3>B. Honor vs. Pragmatism Dial</h3>
+<div class="panel panel-bronze panel-iron">
+    <p style="text-align:center;font-weight:700;">[HONOR] &larr;&mdash; 0 &mdash;&rarr; [PRAGMATISM]</p>
+    <ul class="text-sm mt-1">
+        <li><strong>Honor (left).</strong> +1 Position in parley/oaths; logistics burn faster (tick Supply on a
+        partial where you'd normally be safe).</li>
+        <li><strong>Pragmatism (right).</strong> +1 Effect in ambush/sabotage; social starts one step worse
+        Position when oaths/witnesses matter.</li>
+    </ul>
+    <p class="text-sm mt-1"><strong>Centering Actions:</strong> pay arrears on-screen; return prisoners with
+    witness; fulfill a broken writ at cost. Move the dial one step toward center.</p>
+</div>
+
+<h3>C. Loyalty Management</h3>
+<ul>
+    <li><strong>Black Marks.</strong> Track public betrayals and insulted patrons. At 3, your Diamonds cost more:
+    each use adds Political Pressure [1].</li>
+    <li><strong>Favor Debts.</strong> Who owes you? Who do you owe? Record as Strings. Each unpaid Favor at arc's
+    end ticks Cohesion once (soldiers smell unpaid debts).</li>
+    <li><strong>Reputation Shifts.</strong> Recruiting in civilized ports favors Honor; hiring in hard fronts
+    favors Pragmatism. Slide the dial to attract what you want.</li>
+</ul>
+
+<hr>
+
+<!-- ===================== IV. CAMP LIFE ===================== -->
+<h2 id="camp-life">IV. Camp Life Procedures</h2>
+
+<h3>A. Weekly Entanglements (choose 2 per leg)</h3>
+<ol>
+    <li><strong>Condotta Brokers' Syndicate.</strong> Register colors and surety to bank Broker's Favor (parley
+    DV &minus;1 in camp). Skip registration: gain Unauthorized Colors &mdash; the Keeper can spend the first SB at
+    a checkpoint as False Orders.</li>
+    <li><strong>Camp Quartermasters.</strong> Accept audits: cancel the next Supply tick on this leg. Refuse:
+    start Short Rations [4]; while active, marching starts one Position worse.</li>
+    <li><strong>Field Chaplains &amp; Leech-Circles.</strong> Tithe time or coin: clear Camp-Fever [1] each day,
+    and the Keeper cannot convert the first 1 SB into Disease/Death this leg. Neglect: on the first Clubs spend,
+    camp-fever blooms.</li>
+    <li><strong>Steppe Envoys.</strong> Keep rites (salt/water/shade): bank Remount Rights (once: +1 Effect on
+    retreat/rapid redeploy). Break rites: gain Soured Oath (parley DV +1 with steppe peoples) until you repair
+    with a gift or witness.</li>
+    <li><strong>Hill Truce-Holders.</strong> Stones-circle witness: bank Blood-Truce (cancel one hill ambush or
+    demand parley). Violate: begin Guest Right Forfeit [4]; when it fills, locals refuse aid or safe passage.</li>
+</ol>
+
+<h3>B. Soft-Power Integration</h3>
+<ul>
+    <li><strong>River Prefect Stamps.</strong> Spend to claim Bridge Priority (crossing DV &minus;1 once).</li>
+    <li><strong>Neutral City Factors.</strong> Reroll a market roll in-camp; start Price of Neutrality [4] (the
+    city expects something back).</li>
+    <li><strong>Border Monasteries.</strong> Bell-tokens make the first Prisoners/Parley step safer (Position +1).
+    Burn a bell-token for a clean retreat once/arc.</li>
+</ul>
+
+<hr>
+
+<!-- ===================== V. COMBAT ===================== -->
+<h2 id="combat-integration">V. Combat and Campaign Integration</h2>
+
+<h3>A. SB Menu for War (Keeper)</h3>
+<p class="text-sm">When you roll 1s or on partials/misses, consider:</p>
+<ul>
+    <li>False Orders (split unit, wrong target, delay).</li>
+    <li>Ally Turns Sides (for a scene or for pay).</li>
+    <li>Cut Supply Lines (tick Supply).</li>
+    <li>Camp-Fever Outbreak (start or advance disease).</li>
+    <li>Gear Failure (downgrade Effect; force scavenge).</li>
+    <li>Reinforcements Arrive (tilt Position against you).</li>
+    <li>Authority Intervention (political demand interrupts ops).</li>
+    <li>Winter/Loyalty Omens (hard weather; Allegiances roll with disadvantage).</li>
+</ul>
+
+<h3>B. Position/DV Modifiers (fast dials)</h3>
+<ul>
+    <li><strong>Weather:</strong> Snow (&minus;1 Position), Storm (DV &minus;1 to cross water), Clear (+1 Effect
+    to ranged).</li>
+    <li><strong>Supply:</strong> Short (&minus;1 Position on risky maneuvers), Adequate (normal), Surplus (+1
+    Effect on prepared actions).</li>
+    <li><strong>Morale:</strong> Low (DV &minus;1 to resist fear), Normal, High (+1 Position to hold ground).</li>
+    <li><strong>Terrain:</strong> Familiar (+1 Position), Neutral (normal), Hostile (&minus;1 Effect unless you
+    bring a local Diamond).</li>
+</ul>
+
+<h3>C. Campaign Timer Management</h3>
+<div class="grid-2">
+    <div class="panel panel-gold">
+        <strong>Primary</strong>
+        <ul class="text-sm">
+            <li>Payday [4] &mdash; financial pressure.</li>
+            <li>Supply [4] &mdash; logistical pressure.</li>
+            <li>Cohesion [6] &mdash; morale pressure.</li>
+        </ul>
+    </div>
+    <div class="panel panel-red">
+        <strong>Secondary</strong>
+        <ul class="text-sm">
+            <li>Skirmish Spiral [6] &mdash; tit-for-tat escalates into a war neither side budgeted.</li>
+            <li>Camp Despair [6] &mdash; rumor, grief, and boredom eat discipline.</li>
+            <li>Political Pressure [4] &mdash; courts, patrons, and prefects add new Prices to Diamonds.</li>
+        </ul>
+    </div>
+</div>
+
+<hr>
+
+<!-- ===================== VI. SCENARIO SEEDS ===================== -->
+<h2 id="scenario-seeds">VI. Scenario Seeds and Scores</h2>
+
+<h3>A. Contract Negotiations &mdash; Broker's Table, Two Ledgers</h3>
+<p>Two charters: one legal and thin, one dirty and rich. Pick one; secret the other as leverage (String). Attempt
+a synthesis by proposing a repair project that satisfies both &mdash; on a miss, start Political Pressure [2] and
+tick Payday.</p>
+
+<h3>B. Crisis Management</h3>
+<p><strong>Plague Ground Sanctification.</strong> Camp-Fever [3/4]; coordinate chaplains, leeches, and a
+bell-token circle to reset. Each delay ticks Cohesion; success restores one step toward Honor.</p>
+<p><strong>Banner Swap in the Wind.</strong> Colors change mid-skirmish; prove command while False Orders fly.
+Claim a Diamond (cipher, cantor, or witness) to hold line-of-command.</p>
+
+<h3>C. Leadership Challenges &mdash; Field Promotion</h3>
+<p>A shattered unit's warrant lands in your lap. You inherit their Payday [2/4], Supply [1/4], and Black Mark [1].
+Keep them intact for a leg and you gain Veteran Network (a permanent contact).</p>
+
+<hr>
+
+<!-- ===================== VII. CROSS-SYSTEM ===================== -->
+<h2 id="cross-system">VII. Cross-System Integration</h2>
+<div class="grid-2">
+    <div class="panel panel-purple">
+        <strong>A. Political Intrigue</strong>
+        <p class="text-sm">Map condotta clauses to Influence ticks. Broker's Favor spends like a Boon. Black Marks
+        behave like Exposure in social arcs.</p>
+    </div>
+    <div class="panel panel-blue">
+        <strong>B. Caravan Operations</strong>
+        <p class="text-sm">Quartermaster audits cancel the next Supply tick on a leg. River stamps reduce crossing
+        DV. Vilikari shortcuts give +1 Effect and bank a hostile-terrain SB for the Keeper.</p>
+    </div>
+    <div class="panel panel-green">
+        <strong>C. Wilderness Survival</strong>
+        <p class="text-sm">Hill stones-circles serve as safe trailheads (bank a Blood-Truce). Steppe rites
+        (salt/water/shade) affect travel Position. Environmental hazards tick Supply instead of dealing Harm
+        outright.</p>
+    </div>
+    <div class="panel panel-iron">
+        <strong>D. Urban Adventures</strong>
+        <p class="text-sm">City factors reroll a market roll; guild dispensations act as Diamonds. Municipal
+        politics can rewrite the fine print on your charter mid-arc.</p>
+    </div>
+</div>
+
+<hr>
+
+<!-- ===================== VIII. ROLES ===================== -->
+<h2 id="roles">VIII. Character Options and Roles</h2>
+
+<h3>A. Company Roles</h3>
+<table>
+    <thead><tr><th>Role</th><th>Focus</th><th>Signature Ability</th></tr></thead>
+    <tbody>
+        <tr><td><strong>Captain</strong> (leadership)</td><td>Command, parley, dial control</td><td>Once/scene:
+        convert a No into a Project [4] if you can offer a witness.</td></tr>
+        <tr><td><strong>Quartermaster</strong> (logistics)</td><td>Supply, audits, requisitions</td><td>Once/leg:
+        cancel one Supply tick by cashing a String or finding salvage.</td></tr>
+        <tr><td><strong>Scout/Sergeant</strong> (tactics)</td><td>Recon, ambush, terrain leverage</td><td>Once/
+        scene: treat hostile ground as neutral if you describe the route.</td></tr>
+        <tr><td><strong>Surgeon/Leech</strong> (support)</td><td>Harm, disease, morale rituals</td><td>Once/
+        session: downgrade a fatal consequence to a timer the table can work.</td></tr>
+    </tbody>
+</table>
+
+<h3>B. Specialized Talents</h3>
+<ul>
+    <li><strong>Condotta Veteran (4 XP).</strong> +1 die on contract scenes; spot a forged clause on sight.</li>
+    <li><strong>Banner Reader (3 XP).</strong> Read enemy disposition from standards; predict one Allegiances
+    result per leg.</li>
+    <li><strong>Supply Master (5 XP).</strong> Reduce Supply by 2 segments when you secure forage or plunder;
+    scavenge rolls gain Position +1 in hostile terrain.</li>
+</ul>
+
+<hr>
+
+<!-- ===================== IX. CAMPAIGN FRAMEWORK ===================== -->
+<h2 id="campaign-framework">IX. Campaign Framework</h2>
+
+<h3>A. Session Zero &mdash; Why This War?</h3>
+<blockquote>"Ecktorian treasuries bankroll a perpetual border-war they claim to 'contain,' while companies sell
+steel to whomever keeps the books. Between rigid honor codes and steppe pragmatism, mercenaries survive by reading
+winds, not banners."</blockquote>
+
+<h3>B. Arc Progression</h3>
+<ul>
+    <li><strong>Act I:</strong> Form up, take the first cheap charter, meet the brokers.</li>
+    <li><strong>Act II:</strong> Run lean, juggle loyalties, pay or bleed for Diamonds.</li>
+    <li><strong>Act III:</strong> A crisis demands a side; move the dial hard and live with the ledger.</li>
+</ul>
+
+<h3 id="qr-legacy-anchor">C. Legacy Options</h3>
+<ul>
+    <li><strong>Company Reputation</strong> (affects future rates and riders).</li>
+    <li><strong>Veteran Network</strong> (NPCs become contacts across arcs).</li>
+    <li><strong>War Stories</strong> (Strings you can cash in other modules as legend).</li>
+</ul>
+
+<hr>
+
+<!-- ===================== X. GM TOOLKIT ===================== -->
+<h2 id="gm-toolkit">X. GM Toolkit and Procedures</h2>
+
+<h3>A. Scene Start Procedure</h3>
+<ol>
+    <li>Roll Allegiances in Flux (1d6).</li>
+    <li>Apply the twist (tilt Position/DV, start a timer, or offer a bargain).</li>
+    <li>Check Payday/Supply/Cohesion; surface any on-3+ effects.</li>
+    <li>Set baseline Position from terrain and the Honor/Pragmatism dial.</li>
+    <li>Put one Diamond on the table (named, with a clear price).</li>
+</ol>
+
+<h3>B. Pressure Management</h3>
+<div class="panel panel-orange">
+    <p class="text-sm"><strong>Low:</strong> One primary timer in view; Diamonds plentiful.</p>
+    <p class="text-sm"><strong>Medium:</strong> Two timers pressure; Clubs spend once/scene.</p>
+    <p class="text-sm"><strong>High:</strong> Three timers hot; Allegiances roll with disadvantage; require
+    witness to make anything stick.</p>
+</div>
+
+<h3>C. Keeper Cheatsheet</h3>
+<ul>
+    <li>Allegiances every scene.</li>
+    <li>Payday/Supply visible at all times.</li>
+    <li>Offer fiction-first Diamonds.</li>
+    <li>Spend SB as: False Orders, Ally Turns, Supply Cut, Disease.</li>
+</ul>
+
+<h3>D. Pacing Guidelines</h3>
+<p class="text-sm">A good banner session breathes:</p>
+<ul>
+    <li>2&ndash;3 camp scenes (contracts, audits, rites).</li>
+    <li>1&ndash;2 travel scenes (marches, scouts, weather).</li>
+    <li>1 major encounter (battle, crisis, betrayal) with at least one Diamond on the table.</li>
+</ul>
+
+<hr>
+
+<!-- ===================== FOLLOWERS ===================== -->
+<h2 id="followers">Followers: Condotta &amp; Crowns</h2>
+
+<h3>Cap, Scale, Tracks &mdash; Core</h3>
+<p><strong>Cap (1&ndash;5)</strong> measures capability (training, kit, doctrine). <strong>Scale</strong> is size:
+I (handful), II (squad), III (wing), IV (mixed-arms company).</p>
+<ul>
+    <li><strong>Cap Edge:</strong> If your unit's Cap exceeds opposition by 1+, choose <em>Position +1</em> or
+    <em>Effect +1</em>. If lower by 1+, take <em>Position &minus;1</em> or <em>Effect &minus;1</em>. A 2+ edge
+    shifts both.</li>
+    <li><strong>Scale Effects:</strong>
+        <ul>
+            <li><em>Against smaller targets</em> (you &gt; target by 1+ Scale): take <strong>Effect +1</strong>;
+            if 2+ Scales larger, also <strong>DV &minus;1</strong> on area/control orders.</li>
+            <li><em>Against larger threats</em> (you &lt; target by 1+ Scale): take <strong>Effect
+            &minus;1</strong>; if 2+ Scales smaller, also <strong>DV +1</strong> unless you use precision orders
+            (Recon, Sabotage, Extract).</li>
+        </ul>
+    </li>
+    <li><strong>Follower Tracks:</strong> Loyalty [6], Morale [6], Condition [3]. Companies also interact with
+    Payday [4], Supply [4], Cohesion [6].</li>
+</ul>
+
+<h3>Cap Progression (how it rises)</h3>
+<ul>
+    <li><strong>Training Project [6]:</strong> Raise Cap by +1 (max 5) with drill + doctrine + kit refresh; costs 1
+    Payday and 1 Supply on completion.</li>
+    <li><strong>Kit Upgrade [4]:</strong> No Cap change, but treat the unit as Cap +1 for Effect until the next
+    Supply tick.</li>
+    <li><strong>Battle-Hardened (milestone):</strong> After two strong-hit deployments without Condition loss, mark
+    Veteran. Veterans resist one SB (see below) per scene.</li>
+</ul>
+
+<h3>Follower &harr; Company Track Interactions</h3>
+<ul>
+    <li><strong>Bleed Up:</strong> If a follower ends a leg at Condition &ge; 2, reduce Cohesion &minus;1 (once
+    per leg).</li>
+    <li><strong>Low Loyalty:</strong> When a follower drops to Loyalty 1&ndash;2, mark Cohesion &minus;1 or begin
+    Mutiny [2] (Keeper's choice, fiction-led).</li>
+    <li><strong>Low Morale:</strong> If Morale 1&ndash;2, their first Order each scene suffers Position &minus;1
+    unless Payday is cleared or Chaplain/Leech time is tithed.</li>
+    <li><strong>Thin Company Tracks:</strong> If the Company hits Payday [4] or Supply [4], each deployed follower
+    tests Loyalty &minus;1 on a partial/miss.</li>
+</ul>
+
+<h3>Costs (mechanical teeth)</h3>
+<p class="text-sm">At End of Leg, unpaid Costs (shares, tithes, kit, audits) trigger:</p>
+<ol>
+    <li><strong>Step 1 (warning):</strong> Loyalty &minus;1. If already at 1&ndash;2, also Morale &minus;1.</li>
+    <li><strong>Step 2 (arrears):</strong> Mark a Black Mark on the Company (harder hires; polite courts treat Cap
+    &minus;1 for parley).</li>
+    <li><strong>Step 3 (default):</strong> Begin Desertion [4] for that unit or lock their Bandwidth (cannot take
+    Orders) until paid.</li>
+</ol>
+
+<h3>SB Resistance (Veteran/Elite hardening)</h3>
+<p class="text-sm">Units with Cap 4&ndash;5 or Veteran may ignore one <strong>False Orders</strong> or
+<strong>Ally Wavers</strong> SB spend per scene. Mark a small &diams; by the unit to show the resistance is
+unspent.</p>
+
+<h3>Quick Reference (Cap/Scale vs Opposition)</h3>
+<table>
+    <thead><tr><th>Matchup</th><th>Adjustment</th><th>Example</th></tr></thead>
+    <tbody>
+        <tr><td>Cap 3 vs Cap 2</td><td>Choose Position +1 or Effect +1</td><td>Vet Scouts vs Bandits</td></tr>
+        <tr><td>Cap 2 vs Cap 4</td><td>Choose Position &minus;1 or Effect &minus;1</td><td>Regulars vs
+        Elites</td></tr>
+        <tr><td>Scale II vs I</td><td>Effect +1 (DV &minus;1 on area)</td><td>Platoon vs Team</td></tr>
+        <tr><td>Scale I vs III</td><td>Effect &minus;1 (DV +1 unless precision)</td><td>Squad vs Wing</td></tr>
+    </tbody>
+</table>
+
+<h3>Order Economy (When to use&hellip;)</h3>
+<ul>
+    <li><strong>Hold/Grind:</strong> When you need time/anchor; best with high Scale, high Cap.</li>
+    <li><strong>Screen/Recon:</strong> When information reduces DV later; best early, any Scale.</li>
+    <li><strong>Raid/Sabotage:</strong> When enemy Scale is higher; precision avoids DV +1.</li>
+    <li><strong>Extract/Disengage:</strong> When timers are hot; trades Effect for clean exits.</li>
+    <li><strong>Seal/Control:</strong> When the battle is won and you want revenue/safe lanes.</li>
+</ul>
+
+<h3>Follower Sheet (Template)</h3>
+<div class="sheet-box">
+    <div class="sheet-title">[UNIT NAME] &mdash; Colors/Banner: ____</div>
+    <p class="text-sm">Type: Bodyguard / Strike Force / Division / Company &nbsp;&nbsp; Playbook: Combat Ally /
+    Specialist</p>
+    <p class="text-sm"><strong>Cap:</strong> 1&ndash;5 &nbsp; <strong>Scale:</strong> I/II/III/IV &nbsp;
+    <strong>SB Resist:</strong> &#9633; (Vet/Elite only)</p>
+    <p class="text-sm">Capabilities: ____</p>
+    <p class="text-sm">Edges: ____ &nbsp; Liabilities: ____</p>
+    <p class="text-sm">Strings: ____ &nbsp; Costs: ____</p>
+    <p class="text-sm">Tracks: Loyalty [_/6], Morale [_/6], Condition [_/3]</p>
+    <p class="text-sm">Tags: ____</p>
+    <p class="text-sm">Current Deployment: ____ &nbsp; Active Orders: ____</p>
+</div>
+
+<h2 id="follower-units">Sample Follower Units</h2>
+
+<h3>Elite Bodyguards</h3>
+<div class="unit-card">
+    <div class="unit-name">Captain's Guard</div>
+    <div class="unit-meta">Cap 4 &bull; Scale I &bull; SB Resist &#9633; &bull; Playbook: Combat Ally</div>
+    <p class="text-sm">Capabilities: Close protection, command, last-man extraction. Edges: Veteran drills,
+    duelists. Liabilities: Oath scruples. Strings: Captain's favor, court dispensation. Costs: Shares, oath
+    service.</p>
+    <p class="text-sm">Tracks: Loyalty 5/6, Morale 4/6, Condition 0/3. Tags: Elite Training, Oath-Bound, Honor
+    Guard.</p>
+    <div class="unit-orders"><strong>Orders:</strong> Interpose (protect principal); Counterstroke (impose
+    Disarray [2]); Screen &amp; Extract.</div>
+</div>
+<div class="unit-card">
+    <div class="unit-name">Shield-Sister Cohort</div>
+    <div class="unit-meta">Cap 3 &bull; Scale I&ndash;II &bull; Playbook: Combat Ally</div>
+    <p class="text-sm">Capabilities: Formation fighting, shield wall. Edges: Silent signals. Liabilities: Slow
+    pivot. Strings: Clan bonds. Costs: Tithes, weapon upkeep.</p>
+    <p class="text-sm">Tracks: Loyalty 4/6, Morale 5/6, Condition 0/3. Tags: Shield Wall, Clan-Bonded, Formation
+    Fighters.</p>
+    <div class="unit-orders"><strong>Orders:</strong> Hold the Door; Shield Ram.</div>
+</div>
+
+<h3>Small Strike Forces</h3>
+<div class="unit-card">
+    <div class="unit-name">Scout-Veterans</div>
+    <div class="unit-meta">Cap 3 &bull; Scale I&ndash;II &bull; Playbook: Specialist</div>
+    <p class="text-sm">Capabilities: Recon, ambush, rapid deploy. Edges: Terrain mastery. Liabilities: Independent
+    streak. Strings: Scout nets. Costs: Danger pay, kit.</p>
+    <p class="text-sm">Tracks: Loyalty 3/6, Morale 4/6, Condition 0/3. Tags: Scout Eyes, Rapid Deployment, Terrain
+    Masters.</p>
+    <div class="unit-orders"><strong>Orders:</strong> Eyes Forward (make Flank [2]); Night Harass (tick Skirmish
+    Spiral, stay unseen or Cohesion &minus;1).</div>
+</div>
+<div class="unit-card">
+    <div class="unit-name">Sapper Crew</div>
+    <div class="unit-meta">Cap 3 &bull; Scale I&ndash;II &bull; Playbook: Specialist</div>
+    <p class="text-sm">Capabilities: Siege, demo, field engineering. Edges: Structural sense. Liabilities: Accident
+    risk. Strings: Engineer tools. Costs: Hazard pay, materials.</p>
+    <p class="text-sm">Tracks: Loyalty 4/6, Morale 3/6, Condition 1/3. Tags: Hazardous, Siege Experts, Mobile
+    Assets.</p>
+    <div class="unit-orders"><strong>Orders:</strong> Breach (advance Breach [4]); Field Fix (restore ally
+    Position).</div>
+</div>
+
+<h3>Condotta Divisions</h3>
+<div class="unit-card">
+    <div class="unit-name">Banner Sergeants</div>
+    <div class="unit-meta">Cap 3 &bull; Scale II&ndash;III &bull; Playbook: Combat Ally</div>
+    <p class="text-sm">Capabilities: Unit command, rally. Edges: Tactical precision. Liabilities: Banner pride.
+    Strings: Banner rights. Costs: Command shares.</p>
+    <p class="text-sm">Tracks: Loyalty 4/6, Morale 5/6, Condition 0/3. Tags: Unit Command, Tactical Experts,
+    Banner-Bound.</p>
+    <div class="unit-orders"><strong>Orders:</strong> Dress the Line (stabilize &amp; Position +1); Push of Pike
+    (advance, Rout [1] on strong).</div>
+</div>
+<div class="unit-card">
+    <div class="unit-name">Condotta Engineers</div>
+    <div class="unit-meta">Cap 2 &bull; Scale II &bull; Playbook: Specialist</div>
+    <p class="text-sm">Capabilities: Logistics, repair. Edges: Resource efficiency. Liabilities: Bureaucratic
+    friction. Strings: Supply stamps. Costs: Admin overhead, audits.</p>
+    <p class="text-sm">Tracks: Loyalty 3/6, Morale 4/6, Condition 0/3. Tags: Logistics Masters, Supply Chain,
+    Administrative.</p>
+    <div class="unit-orders"><strong>Orders:</strong> Open the Road (reduce Supply); Patch &amp; Prep (clear
+    Condition or create Reserve [1]).</div>
+</div>
+
+<h3>Condotta Companies</h3>
+<div class="unit-card">
+    <div class="unit-name">Mercenary Company (Small) &mdash; The Iron Lanterns</div>
+    <div class="unit-meta">Cap 3&ndash;4 &bull; Scale III &bull; SB Resist &#9633; &bull; Playbook: Combat
+    Ally</div>
+    <p class="text-sm">Capabilities: Siege ops, heavy weapons. Edges: Bombard train. Liabilities: Heavy upkeep.
+    Strings: Siege contracts. Costs: Veteran pay, trains.</p>
+    <p class="text-sm">Cohorts: 20 vets, 10 support, 5 engineers. Tracks: Cohesion 6/8, Exposure 2/6, Resources
+    4/6. Bandwidth: 3 orders/leg. Tags: Siege Specialists, Heavy Weapons.</p>
+    <div class="unit-orders"><strong>Orders:</strong> Lines &amp; Batteries (Breach/Starve); Seal the Gate (convert
+    Control to tolls or safe lanes).</div>
+</div>
+<div class="unit-card">
+    <div class="unit-name">Condotta Company (Large) &mdash; Thornwrights</div>
+    <div class="unit-meta">Cap 3 &bull; Scale IV &bull; Playbook: Combat Ally</div>
+    <p class="text-sm">Capabilities: Road cutting, sapper ops, mobility. Edges: Bridge kits. Liabilities:
+    Supply-intensive. Strings: Road contracts. Costs: Materials, fuel/forage.</p>
+    <p class="text-sm">Cohorts: 40 combat, 20 engineers, 15 support. Tracks: Cohesion 7/8, Exposure 3/6, Resources
+    5/6. Bandwidth: 4 orders/leg. Tags: Mobile Assets, Engineering Corps.</p>
+    <div class="unit-orders"><strong>Orders:</strong> March Lanes (create Safe Lane); Cut &amp; Run (deny road;
+    enemy Supply &minus;1 on strong).</div>
+</div>
+
+<hr>
+
+<!-- ===================== WAR TABLE ===================== -->
+<h2 id="war-table">War Table: The Black Banners Wargame Extension</h2>
+
+<h3>Scope &amp; Assumptions</h3>
+<p>This extension escalates Black Banners from company skirmishes to banner-on-banner engagements, using the core
+Miniatures and Tactical Layer (ZOC, facing/flanking, special actions) and Mass Combat scaffolding. The Keeper
+still adjudicates Position/Effect and DV, but units act as Followers at formation scale with clear Orders,
+Cohesion, and Supply interplay.</p>
+
+<h3>Table Scale &amp; Bases</h3>
+<ul>
+    <li><strong>Grid:</strong> Hex or square, as per core; declare at setup.</li>
+    <li><strong>Base Sizes:</strong> Skirmish (1&ndash;6 models) = Small; Troop/Line (8&ndash;16) = Medium;
+    Detachment (20&ndash;40) = Large; Wing/Battalion (40+) = Huge.</li>
+    <li><strong>Facing/Flank:</strong> Use core facing; Flank = +1 die, Rear = +1 die and +1 Effect.</li>
+    <li><strong>ZOC:</strong> Entering enemy ZoC ends movement; leaving requires Disengage (DV 4&ndash;6) or a
+    Boon.</li>
+</ul>
+
+<h3>Unit Profile (Cap &amp; Scale)</h3>
+<p class="text-sm">Each unit uses a compact profile: <strong>Name | Type | Cap (1&ndash;5) | Scale | Speed | Tags
+(2) | Tracks: Loyalty, Morale, Condition | Costs</strong></p>
+<p><strong>Cap (1&ndash;5)</strong> is a qualitative "tier" of training/equipment. Cap usually rises through XP
+milestones, training projects, and kit upgrades delivered by Quartermasters between legs (see Cap Advancement
+&amp; Projects below).</p>
+<p><strong>Scale</strong> is the abstract size band (Small/Med/Large/Huge). Use for reach, frontage, and the Scale
+Edge rule below.</p>
+
+<h3>Scale Edge (quick effect dial)</h3>
+<p class="text-sm">When Scale differs, apply <em>one</em> of the following edge nudges (attacker chooses):</p>
+<ul>
+    <li><strong>+1 Position</strong> or <strong>+1 Effect</strong> if attacker's Scale &gt; defender's.</li>
+    <li><strong>+1 DV</strong> against attacks if defender's Scale &gt; attacker's.</li>
+</ul>
+<p class="text-xs text-muted">Design note: This keeps Scale impactful without new math bloat; it layers on top of
+core DV/Position.</p>
+
+<h3>Turn Structure (War Table)</h3>
+<ol>
+    <li><strong>Command</strong> (hidden): Captains assign Orders to each unit; reveal simultaneously.</li>
+    <li><strong>Maneuver:</strong> Move units (Speed, ZoC applies). Facing is chosen at end of move.</li>
+    <li><strong>Actions:</strong> Attack, Rally, Assist, Special, or Resolve Order effects.</li>
+    <li><strong>End Step:</strong> Check Cohesion, Supply, and event timers; apply attrition.</li>
+</ol>
+
+<table>
+    <thead><tr><th>Your Unit</th><th>Opposition</th><th>Edge (crib)</th></tr></thead>
+    <tbody>
+        <tr><td>Cap 0 (Levy)</td><td>Drill Troops (Cap 1)</td><td>You: Position &minus;1 (unless
+        bolstered)</td></tr>
+        <tr><td>Cap 1 (Trained)</td><td>Militia/Levy (Cap 0&ndash;1)</td><td>+1 Position when fresh</td></tr>
+        <tr><td>Cap 2 (Veteran)</td><td>Bandits/Levy (Cap 1&ndash;2)</td><td>+1 die on first decisive
+        action</td></tr>
+        <tr><td>Cap 3 (Elite)</td><td>Regulars (Cap 2&ndash;3)</td><td>+1 Effect on charge/volley</td></tr>
+        <tr><td>Cap 4 (Prime)</td><td>Guard/Chosen (Cap 3&ndash;4)</td><td>Ignore 1 SB war-complication/round</td></tr>
+        <tr><td>Cap 5 (Legend)</td><td>Champions (Cap 4&ndash;5)</td><td>Once/round bump Position up one
+        step</td></tr>
+    </tbody>
+</table>
+
+<h3>Movement, Speed, Terrain, Scale</h3>
+<p class="text-sm"><strong>Speed</strong> is your Movement Points (MP) budget each round; you spend MP per hex
+moved in the Maneuver phase.</p>
+<ul>
+    <li><strong>Base Costs (per hex):</strong> Open/Field = 1 MP; Road = 1 MP (ignore first Difficult modifier);
+    Difficult (forest, rubble, marsh) = 2 MP; Very Difficult (bog, scree, shallow water) = 3 MP; Impassable = 0 MP
+    (no entry).</li>
+    <li><strong>Elevation:</strong> Moving up a level costs +1 MP; moving down is free but may require a test if
+    the hex is Hazardous.</li>
+    <li><strong>Scale Modifiers (per hex):</strong> Large/Huge in Constricted or Difficult terrain (woods,
+    streets, rubble): +1 MP per hex. Small skirmish units ignore the first +1 MP from Difficult once per round
+    (they flow). Road Columns: any Scale on a Road ignores Scale penalties while in column; entering/leaving column
+    costs 1 MP.</li>
+</ul>
+<p class="text-xs text-muted"><em>Example:</em> A Large unit moving through Difficult Forest pays 3 MP per hex (2
+MP Difficult + 1 MP Scale). If also going up elevation, that hex costs 4 MP. These costs are per hex, not a
+one-time surcharge.</p>
+
+<h3>Action &amp; Reaction Economy</h3>
+<p class="text-sm">Each unit follows a simple economy each round:</p>
+<ol>
+    <li><strong>Order (1)</strong> declared in Command phase (e.g., Advance &amp; Hold, Flank &amp; Strike,
+    Volley/Overwatch, Rally &amp; Reform, Sapper Work, Logistics Action).</li>
+    <li><strong>Movement (Maneuver)</strong> spends Speed (MP) according to terrain/Scale.</li>
+    <li><strong>Primary Action (1)</strong> in the Actions phase, as specified by the Order (attack, rally,
+    breach, etc.).</li>
+    <li><strong>Reaction (up to 1/round, optional)</strong> may trigger outside your turn when a listed trigger
+    occurs.</li>
+</ol>
+<p class="text-sm">Reactions are in addition to your primary action but limited to one per round per unit. Mark a
+small &diams; beside the unit when its reaction is spent; clear all reaction markers in the End Step.</p>
+
+<h3>Common Reaction Triggers (choose one to resolve)</h3>
+<ul>
+    <li><strong>Free Strike:</strong> An enemy leaves your ZoC without Disengaging (DV 4&ndash;6).</li>
+    <li><strong>Brace:</strong> An enemy enters your front arc from &ge; 2 hexes away; gain Position +1 versus that
+    charge/attack.</li>
+    <li><strong>Overwatch Fire:</strong> If your unit set Volley/Overwatch this round, make one prepared attack
+    when the first enemy crosses your lane.</li>
+    <li><strong>Counterpush:</strong> If an enemy resolves a Shock Push into your hex, test to Shove 1 hex back on
+    a hit (opposed).</li>
+</ul>
+<p class="text-xs text-muted">Notes: (1) Skirmish Screen grants a free Disengage during your move; it is not a
+reaction. (2) Orders that set a posture (e.g., Volley/Overwatch) consume your action, and the triggered shot uses
+your one reaction for the round. (3) Some tags (e.g., Line-Drilled) may grant a bonus reaction 1/round; if so, it
+will be stated on the unit.</p>
+
+<div class="panel panel-bronze panel-iron text-sm" style="text-align:center;">
+    Order (1) &rArr; Move (MP) &rArr; Primary Action (1) &nbsp;|&nbsp; Reaction: max 1/round when triggered
+</div>
+
+<h3>Orders Economy (choose one per unit/round)</h3>
+<table>
+    <thead><tr><th>Order</th><th>Effect</th></tr></thead>
+    <tbody>
+        <tr><td>Advance &amp; Hold</td><td>Move up to Speed, then Guard. Good for line stabilization.</td></tr>
+        <tr><td>Flank &amp; Strike</td><td>Move; if you end in a flank/rear arc, gain +1 die on one
+        attack.</td></tr>
+        <tr><td>Skirmish Screen</td><td>Enter/exit ZoC freely once (auto-Disengage), but attacks are
+        Limited.</td></tr>
+        <tr><td>Shock Push</td><td>Attempt a Tackle/Shove (DV 4&ndash;6); on success, Push 1&ndash;2 hexes and
+        degrade foe Position.</td></tr>
+        <tr><td>Volley/Overwatch</td><td>Gain Aim benefits (+1 die or +1 Effect), threaten a lane as a
+        Reaction.</td></tr>
+        <tr><td>Rally &amp; Reform</td><td>Test Morale; on success, clear 1 Morale and 1 Condition.</td></tr>
+        <tr><td>Sapper Work</td><td>Place/clear obstacles, breach, or entrench; set a Terrain Tag for your
+        hex/ring.</td></tr>
+        <tr><td>Logistics Action</td><td>Reduce Company Supply by 1 to remove 1 Condition from this unit.</td></tr>
+    </tbody>
+</table>
+
+<h3>Followers &amp; Companies at War</h3>
+<p class="text-sm"><strong>Tracks that Talk.</strong> Individual Loyalty/Morale/Condition bleed upward: at the end
+of any round where &ge; 2 units are at Morale &le; 2 or Condition &ge; 2, tick Company Cohesion +1. When Company
+Cohesion drops a step (e.g., 4/6 &rarr; 5/6), all units take Position &minus;1 until a Rally succeeds.</p>
+<p class="text-sm"><strong>Costs with Teeth.</strong> If a unit's Costs go unpaid this leg, it immediately suffers
+Loyalty &minus;1 and starts a Desertion [3] timer; on fill, remove the unit or convert it to Bannerless (hostile
+neutral).</p>
+<p class="text-sm"><strong>Veteran Resilience.</strong> Veteran/Elite units may ignore one SB war-complication per
+battle (once) &mdash; or convert it into Condition +1 instead.</p>
+
+<h3>Cohesion, Payday, Supply (Company Sync)</h3>
+<div class="grid-3">
+    <div class="panel panel-gold"><strong>Payday (4)</strong><p class="text-sm">Missed payments or broken writs
+    tick this. On fill: Loyalty &minus;1 to all units; begin Pay Raid [4] as soldiers self-requisition.</p></div>
+    <div class="panel panel-blue"><strong>Supply (4)</strong><p class="text-sm">Weather, hard marches, or
+    requisition burn. On fill: all Logistics Actions fail this round; ranged units lose Volley.</p></div>
+    <div class="panel panel-red"><strong>Cohesion (6)</strong><p class="text-sm">Losses, betrayals, poor command.
+    Each step past 4/6 imposes army-wide Position &minus;1 until Rally &amp; Reform succeeds twice.</p></div>
+</div>
+
+<h3>Terrain &amp; Weather (quick plugs)</h3>
+<ul>
+    <li><strong>Difficult:</strong> 2 MP/hex; <strong>Elevation:</strong> +1 DV from below; <strong>Cover:</strong>
+    Position up a step.</li>
+    <li><strong>Storm:</strong> DV &minus;1 for movement tests; <strong>Snow:</strong> Position &minus;1 unless
+    Cold-Drilled.</li>
+</ul>
+
+<h3>Orders &mdash; "When to Use" Quick Guide</h3>
+<ul>
+    <li><strong>I need to pin their center</strong> &rarr; Advance &amp; Hold (then Guard).</li>
+    <li><strong>I need a decisive break</strong> &rarr; Shock Push into Rear/Flank.</li>
+    <li><strong>Their light troops harass us</strong> &rarr; Skirmish Screen.</li>
+    <li><strong>We're wavering</strong> &rarr; Rally &amp; Reform (twice if Cohesion is slipping).</li>
+    <li><strong>We can grind them</strong> &rarr; Volley/Overwatch to tax approaches.</li>
+    <li><strong>Fort ahead</strong> &rarr; Sapper Work to set breach/climb tags.</li>
+</ul>
+
+<h3>Active Orders Box (per unit)</h3>
+<div class="sheet-box">
+    <p class="text-sm"><strong>Current Deployment:</strong> _____ &nbsp; <strong>Active Order:</strong> _____
+    &nbsp; <strong>Objective:</strong> _____</p>
+    <p class="text-sm"><strong>Status:</strong> Loyalty __/6 &nbsp; Morale __/6 &nbsp; Condition __/3 &nbsp;|&nbsp;
+    <strong>Costs Due:</strong> ____</p>
+</div>
+
+<h3>Cap Advancement &amp; Projects</h3>
+<ul>
+    <li><strong>Training Project</strong> (Company Phase): Spend coin/scrip; complete Drill [6]; raise one unit's
+    Cap by +1 (max 5). On completion, mark Supply +1 (ammo/equipment burn).</li>
+    <li><strong>Kit Upgrade:</strong> Attach a Diamond-tier asset (engine, plate, chassis); gain a situational Tag
+    for the campaign (Siege-Drilled, Cold-Drilled, River-Rated).</li>
+    <li><strong>Veteran Cross-posting:</strong> Move a veteran cadre into a green unit; both roll Morale. On
+    success, mentees gain temporary +1 die on their next Rally or Advance.</li>
+</ul>
+
+<h3>SB Menu for War (Keeper) &mdash; Wargame Layer</h3>
+<ul>
+    <li><strong>False Orders</strong> (colors flipped at a ford)</li>
+    <li><strong>Ally Turns Sides</strong> (Favor Debt called)</li>
+    <li><strong>Cut Lines</strong> (Supply +1, Cohesion +1)</li>
+    <li><strong>Camp-Fever</strong> (disease outbreak; Condition +1 unless Chaplains/Leeches intervene)</li>
+    <li><strong>Gear Shear</strong> (siege tool failure; lose Sapper Work this round)</li>
+    <li><strong>Authority Edict</strong> (political interference; Position &minus;1 in parley or movement)</li>
+</ul>
+
+<h3>Setups &amp; Diamonds</h3>
+<ul>
+    <li><strong>River Prefect Stamps:</strong> Crossing DV &minus;1; one forced march ignores Difficult once.</li>
+    <li><strong>Broker's Favor:</strong> Parley DV &minus;1 on contract scenes; on miss, gain a Black Mark.</li>
+    <li><strong>Bell-Tokens:</strong> Safer prisoner handling; cancel one Ally Turns Sides.</li>
+</ul>
+
+<h3>Worked Micro-Scenario</h3>
+<div class="panel panel-bronze panel-orange">
+    <p class="text-sm"><strong>"Banner Swap in the Wind."</strong> A rival plants False Orders. Roll Allegiances in
+    Flux at start. Your Vanguard (Cap 3, Medium, Tags: Line-Drilled, Cold-Drilled) declares Advance &amp; Hold;
+    your Lights (Cap 2, Small, Skirmish) declare Skirmish Screen. Enemy hits your flank; you answer with Shock
+    Push from Reserve (Cap 3, Large Cavalry). If two of your units end the round with Morale &le; 2, tick Company
+    Cohesion +1 and apply army-wide Position &minus;1 until double Rally succeeds.</p>
+</div>
+
+<h3>Reference Tabs</h3>
+<ul>
+    <li><strong>Facing/Flank:</strong> +1 die (Flank), +1 die and +1 Effect (Rear).</li>
+    <li><strong>ZOC:</strong> Enter stops, exit needs Disengage (DV 4&ndash;6) or Boon.</li>
+    <li><strong>Terrain:</strong> Difficult = 2 MP/hex; Elevation = +1 DV from below; Cover raises Position.</li>
+    <li><strong>Reactions:</strong> Each unit 1/round (Free Strike or Shove 1 on ZoC leave).</li>
+</ul>
+
+<hr>
+
+<!-- ===================== QUICK REFERENCE ===================== -->
+<h2 id="quick-ref">Mercenary Company Quick Reference</h2>
+<blockquote>"The contract is the road. The colors are the promise. The pay-chest is the prayer." &mdash; Black
+Banners Camp Law</blockquote>
+<p class="text-sm text-muted">Fast tables for running any mercenary company at the table &mdash; the same rules
+above, condensed for at-a-glance play.</p>
+
+<h3 id="qr-company-sheet">Company Sheet</h3>
+<div class="sheet-box">
+    <div class="sheet-title">[COMPANY NAME] &mdash; [COLORS/BANNER]</div>
+    <p class="text-sm">Captain: [NAME]</p>
+    <p class="text-sm">Ledger: What we owe / Who owes us</p>
+    <p class="text-sm">Cohorts: Scouts &bull; Sappers &bull; Surgeons &bull; Foragers &bull; Skirmishers</p>
+    <p class="text-sm mt-1"><strong>TRACKS:</strong></p>
+    <ul class="text-sm">
+        <li><strong>Payday [4]</strong> &mdash; missed pay, bad terms, seized chests &rarr; desertion risk</li>
+        <li><strong>Supply [4]</strong> &mdash; weather, marches, sabotage &rarr; worse Position on maneuvers</li>
+        <li><strong>Cohesion [6]</strong> &mdash; losses, betrayals, humiliation &rarr; mutters &rarr;
+        fractures</li>
+    </ul>
+    <p class="text-sm mt-1"><strong>Ledger Notes (Strings):</strong> broker's favor &bull; bridge priority &bull;
+    chapel bell-token &bull; banner voucher &bull; ford right (season)</p>
+</div>
+
+<h3 id="qr-tracks">Track Management</h3>
+<ul>
+    <li><strong>Payday.</strong> Tick for missed coin, broken promises, stolen chest. On fill: a squad peels off, a
+    veteran sells secrets, or the next Allegiances roll is with disadvantage.</li>
+    <li><strong>Supply.</strong> Tick for hard weather, forced march, siege diet, or sabotage. While Supply
+    &ge; 3, all risky maneuvers start one step worse Position unless you bring a Diamond.</li>
+    <li><strong>Cohesion.</strong> Tick for public humiliation, ugly losses, officer feuds, or moral injury. When
+    Cohesion hits 0&ndash;1, the Keeper may convert the first 1 SB each scene into Desertion, Brawl, or
+    Refusal.</li>
+</ul>
+
+<h3 id="qr-allegiances">Allegiances in Flux (1d6, Scene Start)</h3>
+<table>
+    <thead><tr><th style="width:8%;">d6</th><th>Event</th></tr></thead>
+    <tbody>
+        <tr><td>1</td><td><strong>Condotta Flip.</strong> Rival charter offers better terms. Take it: gain Black
+        Mark [1]. Refuse: tick Payday.</td></tr>
+        <tr><td>2</td><td><strong>Ykrul Counter-offer.</strong> Accept an exit-rich route: start Obligation [2].
+        Refuse: tick Payday.</td></tr>
+        <tr><td>3</td><td><strong>Vilikari Shortcut.</strong> +1 Effect on this maneuver; Keeper gains 1 SB for
+        Hostile Terrain.</td></tr>
+        <tr><td>4</td><td><strong>Ecktorian "Correction."</strong> +1 Position or take Black Mark [1].</td></tr>
+        <tr><td>5</td><td><strong>False Orders.</strong> First command this scene risks misinterpretation unless
+        countered with a Diamond.</td></tr>
+        <tr><td>6</td><td><strong>Bannerless One.</strong> Clears Payday by 1 &mdash; but starts Price of Mercy
+        [2].</td></tr>
+    </tbody>
+</table>
+
+<h3 id="qr-dial">Honor vs. Pragmatism Dial</h3>
+<div class="panel panel-bronze panel-iron">
+    <p style="text-align:center;font-weight:700;">[HONOR] &larr;&mdash; 0 &mdash;&rarr; [PRAGMATISM]</p>
+    <ul class="text-sm mt-1">
+        <li><strong>Honor (left).</strong> +1 Position in parley/oaths; logistics burn faster (tick Supply on a
+        partial where you'd normally be safe).</li>
+        <li><strong>Pragmatism (right).</strong> +1 Effect in ambush/sabotage; social starts one step worse
+        Position when oaths/witnesses matter.</li>
+    </ul>
+</div>
+
+<h3 id="qr-camp">Camp Life Procedures</h3>
+<h4>Weekly Entanglements (Choose 2 per Leg)</h4>
+<ol>
+    <li><strong>Condotta Brokers' Syndicate.</strong> Register colors and surety to bank Broker's Favor (parley DV
+    &minus;1 in camp). Skip: gain Unauthorized Colors &mdash; Keeper can spend first SB as False Orders.</li>
+    <li><strong>Camp Quartermasters.</strong> Accept audits: cancel next Supply tick. Refuse: start Short Rations
+    [4]; marching starts one Position worse.</li>
+    <li><strong>Field Chaplains &amp; Leech-Circles.</strong> Tithe time or coin: clear Camp-Fever [1] each day.
+    Neglect: on first Clubs spend, camp-fever blooms.</li>
+    <li><strong>Steppe Envoys.</strong> Keep rites: bank Remount Rights (once: +1 Effect on retreat). Break rites:
+    gain Soured Oath (parley DV +1).</li>
+    <li><strong>Hill Truce-Holders.</strong> Stones-circle witness: bank Blood-Truce (cancel one hill ambush).
+    Violate: start Guest Right Forfeit [4].</li>
+</ol>
+
+<h3 id="qr-sb">SB Menu for War (Keeper)</h3>
+<p class="text-sm">When you roll 1s or on partials/misses:</p>
+<table>
+    <thead><tr><th style="width:15%;">SB Cost</th><th>Effect</th></tr></thead>
+    <tbody>
+        <tr><td>1</td><td>Minor pressure: noise, distraction, tick a relevant timer +1.</td></tr>
+        <tr><td>2</td><td>Moderate setback: alarm raised, lose cover/advantage, lesser foe appears.</td></tr>
+        <tr><td>3</td><td>Serious trouble: reinforcements arrive, key gear breaks, major twist shifts the
+        scene.</td></tr>
+        <tr><td>4+</td><td>Scene-shaping turn: trap springs, authority arrives, environment changes
+        dramatically.</td></tr>
+    </tbody>
+</table>
+
+<h4>War-Specific Spends</h4>
+<table>
+    <thead><tr><th style="width:15%;">SB Cost</th><th>Effect</th></tr></thead>
+    <tbody>
+        <tr><td>1</td><td><strong>False Orders:</strong> Split unit, wrong target, delay.</td></tr>
+        <tr><td>2</td><td><strong>Ally Turns Sides:</strong> For a scene or for pay.</td></tr>
+        <tr><td>2</td><td><strong>Cut Supply Lines:</strong> Tick Supply.</td></tr>
+        <tr><td>2</td><td><strong>Camp-Fever Outbreak:</strong> Start or advance disease.</td></tr>
+        <tr><td>2</td><td><strong>Gear Failure:</strong> Downgrade Effect; force scavenge.</td></tr>
+        <tr><td>3</td><td><strong>Reinforcements Arrive:</strong> Tilt Position against you.</td></tr>
+        <tr><td>3</td><td><strong>Authority Intervention:</strong> Political demand interrupts ops.</td></tr>
+        <tr><td>2</td><td><strong>Winter/Loyalty Omens:</strong> Hard weather; Allegiances roll with
+        disadvantage.</td></tr>
+    </tbody>
+</table>
+
+<h3 id="qr-position">Position/DV Modifiers (Fast Dials)</h3>
+<table>
+    <thead><tr><th>Factor</th><th>Modifier</th><th>Effect</th></tr></thead>
+    <tbody>
+        <tr><td rowspan="3">Weather</td><td>Snow</td><td>&minus;1 Position</td></tr>
+        <tr><td>Storm</td><td>DV +1 to cross water</td></tr>
+        <tr><td>Clear</td><td>+1 Effect to ranged</td></tr>
+        <tr><td rowspan="3">Supply</td><td>Short</td><td>&minus;1 Position on risky maneuvers</td></tr>
+        <tr><td>Adequate</td><td>Normal</td></tr>
+        <tr><td>Surplus</td><td>+1 Effect on prepared actions</td></tr>
+        <tr><td rowspan="2">Morale</td><td>Low</td><td>DV +1 to resist fear</td></tr>
+        <tr><td>High</td><td>+1 Position to hold ground</td></tr>
+        <tr><td rowspan="3">Terrain</td><td>Familiar</td><td>+1 Position</td></tr>
+        <tr><td>Neutral</td><td>Normal</td></tr>
+        <tr><td>Hostile</td><td>&minus;1 Effect unless you bring a local Diamond</td></tr>
+    </tbody>
+</table>
+
+<h3 id="qr-roles">Company Roles</h3>
+<table>
+    <thead><tr><th>Role</th><th>Attribute</th><th>Special Ability</th></tr></thead>
+    <tbody>
+        <tr><td>Captain</td><td>Presence</td><td>Once/scene: convert a No into a Project [4] with a
+        witness.</td></tr>
+        <tr><td>Quartermaster</td><td>Wits</td><td>Once/leg: cancel one Supply tick by cashing a String.</td></tr>
+        <tr><td>Scout/Sergeant</td><td>Wits</td><td>Once/scene: treat hostile ground as neutral with a described
+        route.</td></tr>
+        <tr><td>Surgeon/Leech</td><td>Spirit</td><td>Once/session: downgrade a fatal consequence to a
+        timer.</td></tr>
+    </tbody>
+</table>
+
+<h3 id="qr-seeds">Scenario Seeds</h3>
+<div class="grid-2">
+    <div class="panel panel-iron"><strong>Contract Negotiations</strong><p class="text-sm">Two charters: one legal
+    and thin, one dirty and rich. Pick one; secret the other as leverage (String). Attempt a synthesis by proposing
+    a repair project.</p></div>
+    <div class="panel panel-red"><strong>Crisis Management</strong><p class="text-sm">Plague Ground
+    Sanctification. Camp-Fever [3/4]; coordinate chaplains, leeches, and a bell-token circle to reset. Each delay
+    ticks Cohesion.</p></div>
+    <div class="panel panel-purple"><strong>Banner Swap in the Wind</strong><p class="text-sm">Colors change
+    mid-skirmish; prove command while False Orders fly. Claim a Diamond (cipher, cantor, or witness) to hold
+    line-of-command.</p></div>
+    <div class="panel panel-gold"><strong>Leadership Challenges</strong><p class="text-sm">A shattered unit's
+    warrant lands in your lap. Inherit their Payday [2/4], Supply [1/4], and Black Mark [1]. Keep them intact for
+    a leg and gain Veteran Network.</p></div>
+</div>
+
+<h3 id="qr-legacy">Legacy Options</h3>
+<ul>
+    <li><strong>Company Reputation:</strong> Affects future rates and riders.</li>
+    <li><strong>Veteran Network:</strong> NPCs become contacts across arcs.</li>
+    <li><strong>War Stories:</strong> Strings you can cash in other modules as legend.</li>
+</ul>
+
+<hr>
+
+<div style="font-size:0.75rem;color:var(--text3);text-align:center;padding:1rem 0;">
+    Black Banners: Condotta and Crowns &mdash; A Fate's Edge Expansion<br>
+    Fate's Edge Proprietary Content &mdash; (c) 2024 Nicholas A. Gasper. All rights reserved.
+</div>
+
+</body>
+</html>

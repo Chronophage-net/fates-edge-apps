@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Character Backgrounds — Fate's Edge Player's Guide</title>
+    <style>
+        :root {
+            --bg1: #0d0d1a;
+            --bg2: #1a1a2e;
+            --bg3: #252540;
+            --bg4: #2f2f4a;
+            --text: #e8e8f0;
+            --text2: #b8b8c8;
+            --text3: #8888a0;
+            --gold: #c9a84c;
+            --gold-hover: #d4b85c;
+            --border: #333355;
+            --red: #c0392b;
+            --green: #27ae60;
+            --blue: #2980b9;
+            --purple: #8e44ad;
+            --orange: #e67e22;
+            --radius: 8px;
+            --font: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            background: var(--bg1);
+            color: var(--text);
+            font-family: var(--font);
+            padding: 1.5rem;
+            max-width: 1100px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+        h1, h2, h3, h4, h5 { color: var(--gold); margin: 0.5rem 0 0.3rem; }
+        h1 { font-size: 1.8rem; border-bottom: 2px solid var(--gold); padding-bottom: 0.3rem; }
+        h2 { font-size: 1.4rem; border-bottom: 1px solid var(--border); padding-bottom: 0.2rem; margin-top: 1.2rem; }
+        h3 { font-size: 1.1rem; margin-top: 0.8rem; }
+        h4 { font-size: 0.95rem; color: var(--text); margin-top: 0.6rem; }
+        p.subtitle { color: var(--text2); margin-bottom: 1rem; font-size: 1rem; }
+        a { color: var(--gold); text-decoration: none; }
+        a:hover { color: var(--gold-hover); text-decoration: underline; }
+        p { margin: 0.5rem 0; }
+        ul, ol { margin: 0.4rem 0 0.6rem 1.5rem; }
+        li { margin: 0.2rem 0; }
+        .panel {
+            background: var(--bg2);
+            border-radius: var(--radius);
+            padding: 0.6rem 0.8rem;
+            border: 1px solid var(--border);
+            margin: 0.7rem 0;
+        }
+        .panel-gold { border-left: 4px solid var(--gold); }
+        .panel-red { border-left: 4px solid var(--red); }
+        .panel-blue { border-left: 4px solid var(--blue); }
+        .panel-green { border-left: 4px solid var(--green); }
+        .panel-purple { border-left: 4px solid var(--purple); }
+        .panel-orange { border-left: 4px solid var(--orange); }
+        .panel h3, .panel h4 { margin-top: 0; }
+        .badge {
+            display: inline-block;
+            padding: 0.05rem 0.5rem;
+            border-radius: 12px;
+            font-size: 0.65rem;
+            font-weight: 600;
+            background: var(--bg4);
+            color: var(--text3);
+            border: 1px solid var(--border);
+        }
+        .badge-gold { background: var(--gold); color: #1a1400; border-color: var(--gold); }
+        .table-wrap { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; margin: 0.6rem 0; }
+        th, td { padding: 0.4rem 0.6rem; border: 1px solid var(--border); text-align: left; }
+        th { background: var(--bg4); color: var(--gold); font-weight: 600; }
+        tr:nth-child(even) { background: var(--bg2); }
+        blockquote {
+            font-style: italic;
+            border-left: 4px solid var(--gold);
+            padding: 0.5rem 1rem;
+            margin: 0.7rem 0;
+            background: var(--bg2);
+            border-radius: var(--radius);
+            color: var(--text2);
+        }
+        blockquote .attribution { display: block; font-style: normal; color: var(--text3); font-size: 0.85rem; margin-top: 0.3rem; }
+        hr { border: none; border-top: 1px solid var(--border); margin: 1rem 0; }
+        .entry { margin: 0.8rem 0; }
+        .entry-title { font-weight: 700; color: var(--text); }
+        footer { margin-top: 2.5rem; padding-top: 1rem; border-top: 2px solid var(--gold); text-align: center; color: var(--text3); font-size: 0.8rem; }
+    </style>
+</head>
+<body>
+
+<h1>Character Backgrounds</h1>
+<p class="subtitle">Fate's Edge Player's Guide — Chapter 16</p>
+
+<blockquote>
+From the journal of a Thepyrgosi Witch Hunter:<br><br>
+They call it mercy when the Tower does it and cruelty when I do. The difference is a seal of wax and a hymn at the gate.
+<br><br>
+I was a bright spark once&mdash;could taste iron on my tongue when the air went thin before a working. The masters in Thepyrgos tested me, weighed me, and found me <em>nearly</em> enough. &ldquo;Nearly&rdquo; is a door that never opens again.
+<br><br>
+So I learned the other doors.
+<br><br>
+I carry writs that make people look away. I carry cord and a promise I do not speak aloud. The University pays for talent delivered in time; the city pays for fires that never start. Between those accounts, I balance what I can.
+<br><br>
+You will say I go too far. Sometimes I do. Sometimes the street is a tinderbox and a wrong whisper is a spark. When the bells of Thepyrgos answer the river wind, I walk the colonnade to the bursar's door and do not look at the windows. The work is ugly. The work is necessary. The night does not care which of those is true&mdash;only that the lamps keep burning.
+</blockquote>
+
+<p>Before your character took their first deliberate risk, they belonged somewhere. Backgrounds are the trail-dust on your boots, the school-ink on your fingers, the bell-pattern you still tap when frightened. They explain how you know what you know&mdash;and who still knows <em>you</em>. They are also the soil in which your Bonds and Complications take root.</p>
+
+<h2 id="understanding-backgrounds">Understanding Backgrounds</h2>
+<p>Backgrounds serve several important functions:</p>
+<ul>
+<li>Provide narrative context for abilities and choices</li>
+<li>Explain how you gained skills and connections</li>
+<li>Create ties to regions and factions</li>
+<li>Offer roleplaying hooks, responsibilities, and privileges</li>
+<li>Seed reliable <em>contacts</em>, <em>customs</em>, and <em>places</em> that matter on-screen</li>
+<li>Establish the foundation for <em>Bonds</em> and <em>Complications</em> that will shape your story</li>
+</ul>
+
+<h4>Mechanical Hooks</h4>
+<p>Choose <strong>one background</strong> at character creation. It grants:</p>
+<ul>
+<li><strong>Two Access Tags</strong> (narrative permissions; see below)</li>
+<li><strong>A Signature Contact</strong> (named NPC; Cap 1 follower, no XP cost; grants +1d once per scene when their help is plausible)</li>
+<li><strong>A Background Boon</strong> (once per session, gain +1d or reduce DV by 1 for a task strongly tied to the background)</li>
+<li><strong>An Obligation Timer [4]</strong> (when filled, a favor is called in, a duty recalled, or a price comes due&mdash;this is your starting <em>Complication</em>)</li>
+</ul>
+
+<h4>Access Tags</h4>
+<p>Tags describe <em>where</em> and <em>with whom</em> you have standing. Examples: <em>Guild-Ledgered</em>, <em>Court-Announced</em>, <em>Veteran-of-the-Marches</em>, <em>Bell-Kin</em>, <em>Wind-Knot Tokens</em>, <em>Charter-Stamped</em>. When a scene engages a tag, the GM may:</p>
+<ul>
+<li>Waive a trivial gate (no roll)</li>
+<li>Lower Position risk by one step for first contact</li>
+<li>Offer a <em>Devil's Bargain</em> tied to that society's expectations</li>
+</ul>
+
+<h4>Weaving Bonds and Complications into Your Past</h4>
+<p>Your Background is not a static label. It is the first thread in a web of relationships and obligations that will define your character's story. As you build your Background, consider:</p>
+<ul>
+<li><strong>Who do you owe?</strong> Your Obligation Timer is not a punishment&mdash;it is a promise of future adventure. The person or institution you owe is already a part of your story.</li>
+<li><strong>Who owes you?</strong> Your Signature Contact is a beginning, not an end. They are someone who knows you, trusts you, or fears you. That relationship can deepen into a <em>Bond</em> over time.</li>
+<li><strong>What binds you to others?</strong> The best characters are defined not by what they have done, but by who they have done it with. Your Background's skills and tags suggest <em>how</em> you might form Bonds with other player characters.</li>
+</ul>
+
+<blockquote>
+&ldquo;The road is long. Walk it with people you trust&mdash;or at least people you owe. Both will carry you.&rdquo;
+<span class="attribution">&mdash; The Gray Wanderer</span>
+</blockquote>
+
+<h2 id="background-categories">Background Categories</h2>
+
+<h3>Social Class Backgrounds</h3>
+
+<div class="entry">
+<p class="entry-title">Aristocratic House Scion</p>
+<p><strong>Tags:</strong> <em>Court-Announced</em>, <em>Heraldic Right</em><br>
+<strong>Skills:</strong> Sway, Command, Lore (customs)<br>
+<strong>Contact:</strong> Family steward<br>
+<strong>Boon:</strong> Once/session in a formal setting, treat Social Position as one step better for an exchange.<br>
+<strong>Obligation:</strong> Marriage alliances, estate audits, house feuds</p>
+</div>
+
+<div class="entry">
+<p class="entry-title">Merchant Factor</p>
+<p><strong>Tags:</strong> <em>Guild-Ledgered</em>, <em>Caravan Rights</em><br>
+<strong>Skills:</strong> Sway (negotiation), Investigation (accounts), Lore (markets)<br>
+<strong>Contact:</strong> Bookkeeper or quartermaster<br>
+<strong>Boon:</strong> Once/session when buying, selling, or managing logistics, reduce DV by 1 or gain +1d.<br>
+<strong>Obligation:</strong> Notes due, partner demands, embargoes</p>
+</div>
+
+<div class="entry">
+<p class="entry-title">Common Folk</p>
+<p><strong>Tags:</strong> <em>Neighborhood Trust</em>, <em>Guild-Friend</em><br>
+<strong>Skills:</strong> Craft (one), Endurance, Subterfuge or Nature<br>
+<strong>Contact:</strong> Elder, foreman, or midwife<br>
+<strong>Boon:</strong> Once/session among familiar folk, convert a failure on routine labor to a success-with-cost.<br>
+<strong>Obligation:</strong> Communal favors, festival work, mutual aid</p>
+</div>
+
+<h3>Professional Backgrounds</h3>
+
+<div class="entry">
+<p class="entry-title">Marcher Veteran</p>
+<p><strong>Tags:</strong> <em>Veteran-of-the-Marches</em>, <em>Muster Papers</em><br>
+<strong>Skills:</strong> Melee or Ranged, Tactics, Endurance<br>
+<strong>Contact:</strong> Old sergeant<br>
+<strong>Boon:</strong> Once/session in organized violence, ignore the first point of situational disadvantage from confusion or fear.<br>
+<strong>Obligation:</strong> Recall to colors, feud legacies, back-pay claims</p>
+</div>
+
+<div class="entry">
+<p class="entry-title">Academic of the Dialogs</p>
+<p><strong>Tags:</strong> <em>School-Sealed</em>, <em>Reading Privileges</em><br>
+<strong>Skills:</strong> Lore, Investigation, Sway (debate)<br>
+<strong>Contact:</strong> Lecturer or archivist<br>
+<strong>Boon:</strong> Once/session in research or disputation, ask one clarifying question the GM must answer plainly.<br>
+<strong>Obligation:</strong> Citations owed, controversial thesis, patron politics</p>
+</div>
+
+<div class="entry">
+<p class="entry-title">Underworld Hand</p>
+<p><strong>Tags:</strong> <em>Harbor Handsigns</em>, <em>Black Banner Cant</em><br>
+<strong>Skills:</strong> Stealth, Deception, Subterfuge<br>
+<strong>Contact:</strong> Fence or fixer<br>
+<strong>Boon:</strong> Once/session when using a <em>cant</em> (secret coded speech), gain +1d to set up or slip out.<br>
+<strong>Obligation:</strong> Unpaid favors, heat with a rival crew, burned safehouse</p>
+</div>
+
+<h3>Regional Backgrounds</h3>
+
+<div class="entry">
+<p class="entry-title">Urban Child of Silkstrand</p>
+<p><strong>Tags:</strong> <em>Street-Stall Rights</em>, <em>Night-Patrol Familiar</em><br>
+<strong>Skills:</strong> Subterfuge, Perception, Sway (fast talk)<br>
+<strong>Contact:</strong> Watch-lantern or stall-keeper<br>
+<strong>Boon:</strong> Once/session in a dense city, know a shortcut or rumor that reduces time or cost by one step.</p>
+</div>
+
+<div class="entry">
+<p class="entry-title">Rural Valewood Forager</p>
+<p><strong>Tags:</strong> <em>Green Courts Token</em>, <em>River-Ferry Nod</em><br>
+<strong>Skills:</strong> Nature, Lore (spirits)<br>
+<strong>Contact:</strong> Leaf-warden<br>
+<strong>Boon:</strong> Once/session in the wild, downgrade a Travel complication by one step.</p>
+</div>
+
+<div class="entry">
+<p class="entry-title">Frontier Marcher Homesteader</p>
+<p><strong>Tags:</strong> <em>Land-Grant Papers</em>, <em>Border Moot Voice</em><br>
+<strong>Skills:</strong> Craft (build), Endurance, Tactics or Diplomacy<br>
+<strong>Contact:</strong> Neighboring elder<br>
+<strong>Boon:</strong> Once/session at a contested site, shift Position up by one step when defending what is yours.</p>
+</div>
+
+<h3>World-Linked Backgrounds</h3>
+
+<div class="entry">
+<p class="entry-title">Aeler Charter Apprentice</p>
+<p><strong>Tags:</strong> <em>Charter-Stamped</em>, <em>Stone-Speech Initiate</em><br>
+<strong>Skills:</strong> Craft, Lore (engineering), Investigation (plans)<br>
+<strong>Contact:</strong> Oathscribe<br>
+<strong>Boon:</strong> Once/session around structures, ignore the first environmental complication from collapse or strain.</p>
+</div>
+
+<div class="entry">
+<p class="entry-title">Mistlands Bell-Keeper</p>
+<p><strong>Tags:</strong> <em>Bell-Law</em>, <em>Causeway Rights</em><br>
+<strong>Skills:</strong> Perception, Lore (omens), Lore (fens)<br>
+<strong>Contact:</strong> Dusk-warden<br>
+<strong>Boon:</strong> Once/session, ring a lawful pattern to reframe a fog scene's Position from Controlled to Dominant for one exchange.</p>
+</div>
+
+<div class="entry">
+<p class="entry-title">Ykrul Wind-Runner</p>
+<p><strong>Tags:</strong> <em>Wind-Knot Tokens</em>, <em>Banner Hospitality</em><br>
+<strong>Skills:</strong> Lore (steppe), Ranged or Riding, Sway (customs)<br>
+<strong>Contact:</strong> Banner-aunt<br>
+<strong>Boon:</strong> Once/session in open country, coordinate allies at distance; they gain a one-time Boon if they can hear your call.</p>
+</div>
+
+<div class="entry">
+<p class="entry-title">Kahfagian Dock-Priest Acolyte</p>
+<p><strong>Tags:</strong> <em>Harbor Blessings</em>, <em>Beacon Rights</em><br>
+<strong>Skills:</strong> Lore (sea rites), Sway (crews), Investigation (cargo)<br>
+<strong>Contact:</strong> Beacon-keeper<br>
+<strong>Boon:</strong> Once/session at sea or harbor, treat one navigation check as if aided by favorable weather (DV &minus;1).</p>
+</div>
+
+<div class="entry">
+<p class="entry-title">Narethi Unbound (Cat-People of the Deep Desert)</p>
+<p><strong>Tags:</strong> <em>Resonance-Touched</em>, <em>Salt-Kin</em><br>
+<strong>Skills:</strong> Stealth, Psionics (or Arcana), Lore (desert)<br>
+<strong>Contact:</strong> Watcher scout or fellow exile<br>
+<strong>Boon:</strong> Once/session when using a psionic ability or resisting mental intrusion, gain +1 die. The Unburied's dream flickers at the edge of your awareness.<br>
+<strong>Obligation:</strong> The Unburied's attention &mdash; each time you use a significant psionic ability, mark a segment on a hidden GM timer. When full, you experience a waking vision (mark 1 Fatigue). The Hollow watches.<br>
+<strong>Special:</strong> You have <em>night-eyes</em> (see in dim light as if bright). You gain +1 die to any roll involving the Unburied's resonance (psionics, dream communion, or resisting mental intrusion).</p>
+</div>
+
+<div class="entry">
+<p class="entry-title">Tulkani Dream-Speaker</p>
+<p><strong>Tags:</strong> <em>Vow-Cord Knot</em>, <em>Wagon Circle Rights</em><br>
+<strong>Skills:</strong> Performance (storytelling), Insight, Lore (road)<br>
+<strong>Contact:</strong> Caravan Judge or story-singer<br>
+<strong>Boon:</strong> Once/session when you tell a true story (in character), gain +1 die on the next roll related to that story's theme.<br>
+<strong>Obligation:</strong> The Ninth Night Timer [4] &mdash; when you camp in a Tulkani circle, mark a segment each night. On the fourth night, the Hollow asks for a story.</p>
+</div>
+
+<div class="entry">
+<p class="entry-title">Linn Tide-Witch</p>
+<p><strong>Tags:</strong> <em>Storm-Oath Sworn</em>, <em>Skerry Rights</em><br>
+<strong>Skills:</strong> Lore (sea), Lore (weather), Sway (crews)<br>
+<strong>Contact:</strong> Net-wife or steersman<br>
+<strong>Boon:</strong> Once/session on or near salt water, ignore the first weather penalty.<br>
+<strong>Obligation:</strong> The Tide's Due [4] &mdash; when you break a storm-oath or refuse a sailor's plea, mark a segment. When full, a squall finds you.</p>
+</div>
+
+<div class="entry">
+<p class="entry-title">Pereshi Fire-Temple Initiate</p>
+<p><strong>Tags:</strong> <em>Flame-Touched</em>, <em>Ninth Coal Witness</em><br>
+<strong>Skills:</strong> Lore (theology), Ritual, Insight<br>
+<strong>Contact:</strong> Flame-Keeper or archivist<br>
+<strong>Boon:</strong> Once/session when performing a ritual or consecration, reduce DV by 1.<br>
+<strong>Obligation:</strong> The Ninth Coal's Warmth [4] &mdash; when you use a Rite from a fire-aligned Patron, mark a segment. When full, the Ash Prince's shadow appears in a mirror.</p>
+</div>
+
+<div class="entry">
+<p class="entry-title">Sekogo Honey-Gatherer</p>
+<p><strong>Tags:</strong> <em>Grove-Rights</em>, <em>Bee-Speaker</em><br>
+<strong>Skills:</strong> Lore (jungle), Nature, Craft (apothecary)<br>
+<strong>Contact:</strong> Honey-warden or grove elder<br>
+<strong>Boon:</strong> Once/session in jungle terrain, find food or water without a roll.<br>
+<strong>Obligation:</strong> The Ukwe's Witness [4] &mdash; when you break a promise made in the grove, mark a segment. When full, the Speaking Tree demands a name.</p>
+</div>
+
+<h2 id="background-benefits-and-limits">Background Benefits and Limits</h2>
+
+<h3>Typical Benefits</h3>
+<ul>
+<li><strong>Skill Access</strong>: Strong narrative justification for certain tests</li>
+<li><strong>Resource Access</strong>: Borrowed tools, rooms, shrines, or records (scene-time instead of XP)</li>
+<li><strong>Social Access</strong>: Entry to circles your tags recognize</li>
+<li><strong>Knowledge</strong>: Clues, maps, or customs that lower DV by 1</li>
+<li><strong>Reputation</strong>: Advantage on first impressions in-tag</li>
+</ul>
+
+<h3>Common Limitations</h3>
+<ul>
+<li><strong>Duties</strong>: Responsibilities to house, guild, banner, or court</li>
+<li><strong>Restrictions</strong>: Codes, taboos, or public expectations</li>
+<li><strong>Enemies</strong>: Rival houses, crews, or schools</li>
+<li><strong>Secrets</strong>: Leverage others can pull</li>
+<li><strong>Dependencies</strong>: Loss of standing if you neglect ties</li>
+</ul>
+
+<h2 id="creating-a-custom-background">Creating a Custom Background</h2>
+
+<h3>Build Procedure (Player &amp; GM)</h3>
+<p>Pick <strong>2 Access Tags</strong>, <strong>1 Signature Contact</strong>, <strong>1 Boon</strong>, and <strong>1 Obligation Seed</strong>. Name places and people.</p>
+<ul>
+<li><strong>Origin</strong>: Where were you taught/raised/forged?</li>
+<li><strong>Training</strong>: Which <em>two</em> skills does this background naturally support?</li>
+<li><strong>Experiences</strong>: One memory that still changes how you act</li>
+<li><strong>Relationships</strong>: One ally, one rival; both want something</li>
+<li><strong>Values</strong>: What won't you let slide?</li>
+<li><strong>Complications</strong>: What unresolved obligation, feud, or secret follows you?</li>
+</ul>
+
+<h3>Mechanical Considerations</h3>
+<ul>
+<li><strong>Boon Scope</strong>: DV &minus;1 or +1d once/session when strongly on-theme</li>
+<li><strong>Contact Use</strong>: +1d as assist; cannot take independent actions unless purchased as a <em>Follower</em> (Cap<sup>2</sup> XP)</li>
+<li><strong>Assets</strong>: Borrowing an institutional asset costs <em>scene time</em> (counts as upkeep for that asset this downtime) but 0 XP</li>
+<li><strong>Languages</strong>: Choose one tongue linked to the background at <em>Conversational</em> or better</li>
+</ul>
+
+<h2 id="obligation-timer">The Obligation Timer</h2>
+<p>Each background includes an <strong>Obligation Timer [4]</strong>. It advances when:</p>
+<ul>
+<li>You fail a roll tied to your background (GM discretion)</li>
+<li>You accept a favor from your signature contact</li>
+<li>The GM spends 1 SB to represent a duty recalled</li>
+<li>You ignore a responsibility linked to your access tags</li>
+</ul>
+
+<p>When the timer fills, something is <em>due</em>. The GM may choose or roll:</p>
+<div class="table-wrap">
+<table>
+<tr><th>Roll</th><th>Result</th></tr>
+<tr><td>1&ndash;2</td><td>Minor favor, time, or tithe (1 Supply or a scene's work)</td></tr>
+<tr><td>3</td><td>Significant service, costly honesty, dangerous escort (a full scene)</td></tr>
+<tr><td>4</td><td>Defining ordeal: duel, audit, rite, or trial (potential Harm or permanent consequence)</td></tr>
+</table>
+</div>
+<p>Clear segments by honoring duties on-screen, sacrificing resources, or changing affiliation (which creates new timers).</p>
+
+<h2 id="bonds-and-complications-in-play">Bonds and Complications in Play</h2>
+<p>Your Background is not just a list of skills and tags. It is the soil in which your character's relationships and obligations take root. The Bonds you form and the Complications you carry are the living threads of that soil.</p>
+
+<h3>Bonds as Narrative Levers</h3>
+<p>A <strong>Bond</strong> is a mutual relationship of trust, debt, or shared history between your character and another&mdash;whether a fellow player character, a trusted Follower, or a significant NPC who has earned a place in your story. Bonds are the connective tissue of Fate's Edge.</p>
+
+<p>When you act on a Bond with intricate description, you gain <strong>1 Boon</strong> (once per Bond per session). At Tier III (91&ndash;150 XP), Bonds between player characters also allow the transfer of up to 2 Boons as a free action once per scene.</p>
+
+<ul>
+<li><strong>Establish:</strong> Form a Bond with any PC, Follower, or significant NPC through shared experience, oath, or debt.</li>
+<li><strong>Activate:</strong> Once per session per Bond, when you act on it with intricate description, you gain 1 Boon.</li>
+<li><strong>Transfer (Tier III+):</strong> Once per scene, transfer up to 2 Boons to a Bonded PC as a free action.</li>
+<li><strong>Limit:</strong> You may have up to 3 active Bonds at a time (GM discretion for major story Bonds).</li>
+</ul>
+
+<blockquote>
+&ldquo;The best Bonds are the ones that hurt to break. The road is long. Walk it with people you trust&mdash;or at least people who owe you. Both will carry you.&rdquo;
+<span class="attribution">&mdash; The Gray Wanderer</span>
+</blockquote>
+
+<h3>The Obligation Timer as a Complication</h3>
+<p>Your Background's Obligation Timer is a <em>Complication</em>&mdash;a weight you carry forward into the story. It is not a punishment; it is a promise of future adventure. The person or institution you owe is already a part of your story.</p>
+
+<p>When the timer fills, something is due. This can be:</p>
+<ul>
+<li>A debt called in at the worst possible moment</li>
+<li>A rival who has been waiting for you to return</li>
+<li>A duty you cannot ignore without losing face</li>
+<li>A secret that demands to be spoken</li>
+</ul>
+
+<p>The GM may also spend Story Beats to advance your Obligation Timer when the fiction demands it, representing the pressure of your past catching up with you.</p>
+
+<h3>Mechanical Summary</h3>
+<div class="panel panel-blue">
+<h4>Backgrounds, Bonds &amp; Complications at a Glance</h4>
+<p><strong>From Your Background</strong></p>
+<ul>
+<li>2 Access Tags (narrative permissions)</li>
+<li>1 Signature Contact (Cap 1 follower, +1d assist once/scene)</li>
+<li>1 Background Boon (once/session, +1d or DV &minus;1)</li>
+<li>1 Obligation Timer [4] (your starting Complication)</li>
+<li>1 language at Conversational or better</li>
+</ul>
+<p><strong>From Bonds</strong></p>
+<ul>
+<li>Form Bonds with PCs, Followers, or significant NPCs (max 3)</li>
+<li>Once/session per Bond: act on it with intricate description &rarr; gain 1 Boon</li>
+<li>Tier III+: transfer up to 2 Boons to a Bonded PC as a free action (once/scene)</li>
+</ul>
+<p><strong>From Complications</strong></p>
+<ul>
+<li>Your Obligation Timer is a Complication</li>
+<li>When it fills, something is due (favor, duty, debt, secret)</li>
+<li>The GM may spend SB to advance your timer</li>
+<li>You may take additional Complications at character creation for +2 XP each (max +4 XP)</li>
+</ul>
+</div>
+
+<h2 id="background-combinations">Background Combinations</h2>
+
+<h4>Sequential</h4>
+<ul>
+<li><strong>Veteran &rarr; City Watch</strong>: Access shifts from <em>Muster Papers</em> to <em>Badge Rights</em></li>
+<li><strong>Scholar &rarr; Diplomat</strong>: Keep libraries, gain court</li>
+</ul>
+
+<h4>Parallel</h4>
+<ul>
+<li><strong>Noble Merchant</strong>: Both <em>Court-Announced</em> and <em>Guild-Ledgered</em>; responsibilities multiply</li>
+</ul>
+
+<h4>Contrasting</h4>
+<ul>
+<li><strong>Criminal Penitent</strong>: Underworld ties vs. temple vows; great hooks, sharp bargains</li>
+</ul>
+
+<h2 id="using-backgrounds-in-play">Using Backgrounds in Play</h2>
+
+<h3>Player Applications</h3>
+<ul>
+<li>Name your places: the specific stall, shrine, or yard you know</li>
+<li>Cash your Boon when you leverage that familiarity</li>
+<li>Call on your contact to assist or to introduce a new lead</li>
+<li>Use your Bonds to create shared stakes and mechanical advantage</li>
+<li>Let your Obligation Timer guide your decisions&mdash;the price will come due eventually</li>
+</ul>
+
+<h3>GM Applications</h3>
+<ul>
+<li>Offer choices where background allegiance matters</li>
+<li>Turn Access Tags into <em>gates</em> and <em>keys</em></li>
+<li>Spend Story Beats to <em>complicate the old ties</em></li>
+<li>Advance Obligation Timers when the fiction demands it</li>
+<li>Use Backgrounds to seed Bonds between player characters</li>
+</ul>
+
+<h2 id="tables-and-tools">Tables &amp; Tools</h2>
+
+<h3>Quick Background Seeds (d10)</h3>
+<div class="table-wrap">
+<table>
+<tr><th>d10</th><th>Seed</th></tr>
+<tr><td>1</td><td>Failed heir with an honest steward and a dishonest cousin</td></tr>
+<tr><td>2</td><td>Caravan Quartermaster who knows three border tariffs by heart</td></tr>
+<tr><td>3</td><td>Bell-tender whose dusk pattern saved a village once</td></tr>
+<tr><td>4</td><td>Charter apprentice who broke a measure and hid it</td></tr>
+<tr><td>5</td><td>Ykrul courier who owes horses to two banners</td></tr>
+<tr><td>6</td><td>Dock acolyte who lit the beacon in a storm against orders</td></tr>
+<tr><td>7</td><td>Narethi exile who left the Sunken Courts and cannot return</td></tr>
+<tr><td>8</td><td>Tulkani story-singer who heard the ninth syllable in a dream</td></tr>
+<tr><td>9</td><td>Linn tide-witch who bargained with a drowned captain</td></tr>
+<tr><td>10</td><td>Pereshi initiate who touched the ninth coal and felt it pulse</td></tr>
+</table>
+</div>
+
+<h3>GM SB Menu: Background Complications</h3>
+<ul>
+<li><strong>1 SB</strong>: A rival claims your tag is invalid here; prove it or pay time</li>
+<li><strong>2 SB</strong>: Your contact is <em>busy</em> or <em>watched</em>; help will cost you exposure</li>
+<li><strong>3 SB</strong>: Obligation advances; an audit, rite, or muster arrives early</li>
+<li><strong>4 SB</strong>: An enemy weaponizes your background&mdash;publicly</li>
+</ul>
+
+<div class="panel panel-blue">
+<h4>Background Quick Reference</h4>
+<p><strong>At Creation</strong></p>
+<ul>
+<li>Choose: 2 <em>Access Tags</em>, 1 <em>Signature Contact</em> (Cap 1 assist), 1 <em>Boon</em> (once/session), 1 <em>Obligation Seed</em>.</li>
+<li>Pick 1 language tied to the background at <em>Conversational</em> or better.</li>
+<li><strong>Bonds:</strong> You may form 1&ndash;2 Bonds with other player characters. Each Bond grants a once-per-session Boon.</li>
+<li><strong>Complications:</strong> You may take additional Complications at character creation for +2 XP each (max +4 XP).</li>
+</ul>
+<p><strong>In Play</strong></p>
+<ul>
+<li>Invoke tags to open doors or shift Position.</li>
+<li>Call your contact for +1d assist (no independent actions).</li>
+<li>Track the <em>Obligation Timer [4]</em>. Pay it on-screen.</li>
+<li>Act on your Bonds to gain Boons and transfer resources.</li>
+<li>Accept Complications as story fuel, not penalties.</li>
+</ul>
+<p><strong>Advancing</strong></p>
+<ul>
+<li>Upgrade contact to a <em>Follower</em> by paying XP (Cap<sup>2</sup>).</li>
+<li>Add a second tag after a major arc or training.</li>
+<li>Deepen a Bond into a Legacy Bond (see Chapter 17).</li>
+<li>Resolve a Complication to clear an Obligation Timer or gain a new ally.</li>
+</ul>
+</div>
+
+<h2 id="worked-examples">Worked Examples</h2>
+
+<h3>House Shield (Aristocratic-Military Hybrid)</h3>
+<ul>
+<li><strong>Tags</strong>: <em>Court-Announced</em>, <em>Veteran-of-the-Marches</em></li>
+<li><strong>Skills</strong>: Command, Melee, Lore (protocol)</li>
+<li><strong>Contact</strong>: House steward</li>
+<li><strong>Boon</strong>: Once/session while guarding a principal, treat one consequence as one step less severe.</li>
+<li><strong>Obligation Seed</strong>: Duel timer from an old slight; an audit of campaign spoils</li>
+<li><strong>Bonds</strong>: Formed with a fellow PC who served alongside you in the same campaign.</li>
+</ul>
+
+<h3>Ledger Lantern (Merchant-Temple Bridge)</h3>
+<ul>
+<li><strong>Tags</strong>: <em>Guild-Ledgered</em>, <em>Beacon Rights</em></li>
+<li><strong>Skills</strong>: Sway, Investigation (accounts), Lore (sea rites)</li>
+<li><strong>Contact</strong>: Beacon-keeper</li>
+<li><strong>Boon</strong>: Once/session, secure safe harbor or fair rate; DV &minus;1.</li>
+<li><strong>Obligation Seed</strong>: Rivals whisper of skimming tithe; prove the books</li>
+<li><strong>Bonds</strong>: Formed with a Follower who helped you escape a corrupted trade deal.</li>
+</ul>
+
+<h3>Fog Warden (Mistlands Civic)</h3>
+<ul>
+<li><strong>Tags</strong>: <em>Bell-Law</em>, <em>Causeway Rights</em></li>
+<li><strong>Skills</strong>: Perception, Lore, Sway (local law)</li>
+<li><strong>Contact</strong>: Dusk-warden</li>
+<li><strong>Boon</strong>: Once/session in mist, choose <em>route-or-safety</em>: negate a travel delay or downgrade a hazard.</li>
+<li><strong>Obligation Seed</strong>: Someone silences the bells; obligation advances</li>
+<li><strong>Complication</strong>: The bells you were sworn to protect have begun to ring at the wrong hour.</li>
+</ul>
+
+<h3>Narethi Unbound (Exile of the Sunken Courts)</h3>
+<ul>
+<li><strong>Tags</strong>: <em>Resonance-Touched</em>, <em>Salt-Kin</em></li>
+<li><strong>Skills</strong>: Stealth, Psionics, Lore (desert)</li>
+<li><strong>Contact</strong>: Watcher scout or fellow exile</li>
+<li><strong>Boon</strong>: Once/session when using a psionic ability or resisting mental intrusion, gain +1 die.</li>
+<li><strong>Obligation Seed</strong>: The Resonance Leash [4] &mdash; when full, a vision of the First Scouring (Fatigue 1).</li>
+<li><strong>Bonds</strong>: Formed with a fellow exile who shares the burden of the Unburied's dream.</li>
+</ul>
+
+<hr>
+<p><em>Let your background do work for you. Speak its language, call its favors, and pay its dues in play.</em> The world will answer.</p>
+
+<footer>Fate's Edge Proprietary Content &mdash; (c) 2024 Nicholas A. Gasper. All rights reserved.</footer>
+
+</body>
+</html>

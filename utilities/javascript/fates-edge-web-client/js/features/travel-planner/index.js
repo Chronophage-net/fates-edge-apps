@@ -142,6 +142,34 @@ const WORKED_ITINERARIES = [
             { label: 'Marcott → Fairport', spade: 'Viterra', heart: 'Viterra', club: 'Linn', diamond: 'Viterra', clockHint: 6, flavor: 'Fairport tideworks; shipwright; boom lifts; customs seal.' }
         ]
     },
+    // "East-to-West Coastal Haul" -- the full return leg of the above,
+    // previously missing entirely. The sourcebook only scripts the
+    // Kahfagia-outbound direction ("Worked Itineraries: West-to-East
+    // Coastal Haul (Kahfagia -> Viterra)"), but the Core Travel Procedure
+    // (Global Travel Procedures chapter) is direction-agnostic: Spade/Heart
+    // are always drawn from the CURRENT leg's destination, and Diamond from
+    // whichever authority gates that destination -- see the Gateways &
+    // Control Points table, which lists Kassamira Port's Diamond source as
+    // Kahfagia itself. So traveling toward Kahfagia, Kassamira (the
+    // Kahfagia gateway) is where the journey arrives, not where it starts.
+    // Each leg reuses the same region-deck sourcing as the forward leg that
+    // first arrives at that place (arriving somewhere reads the same
+    // regardless of which direction you came from) -- only the order and
+    // labels are reversed. The Kahfagia-Diamond override on the original
+    // leg 1 (an explicit "leaving Kahfagia on a convoy letter" exception,
+    // not a general destination default) isn't carried over, since this
+    // itinerary is arriving at, not departing, Kahfagia.
+    {
+        key: 'coastal_haul_reverse',
+        name: 'East-to-West Coastal Haul (Viterra → Kahfagia)',
+        description: 'Fairport (Viterra) → Marcott (Vhasia) → Silkstrand (Acasia) → Ecktoria → Kassamira (Kahfagia).',
+        legs: [
+            { label: 'Fairport → Marcott', spade: 'Vhasia', heart: 'Vhasia', club: 'Vhasia', diamond: 'Vhasia', flavor: 'Pont-du-Tithe; Parlement clerk; coin rumor; letters patent.' },
+            { label: 'Marcott → Silkstrand', spade: 'Acasia', heart: 'Acasia', club: 'Acasia', diamond: 'Acasia', clockHint: 7, flavor: "Three-Queens Bridge; Dyers' Guildmistress; loom strike; Exchange pass." },
+            { label: 'Silkstrand → Ecktoria', spade: 'Ecktoria', heart: 'Ecktoria', club: WILDS_REGION_NAME, diamond: 'Ecktoria', clockHint: 6, flavor: 'Aqueduct arcades; Coin-house factor; gale; berth priority.' },
+            { label: 'Ecktoria → Kassamira', spade: 'Kahfagia', heart: 'Kahfagia', club: WILDS_REGION_NAME, diamond: 'Kahfagia', clockHint: 6, flavor: 'Kassamira Port auctions; Mirror-Keeper; gale; convoy letter and lantern-law warrant.' }
+        ]
+    },
     {
         key: 'acasia_mistlands',
         name: 'Acasia → Mistlands (Forgotten Pass + Under-Gate)',
@@ -149,6 +177,145 @@ const WORKED_ITINERARIES = [
         legs: [
             { label: 'Silkstrand → Aeler Gate', spade: 'Aeler', heart: 'Aeler', club: 'Aeler', diamond: 'Aeler', flavor: 'Avalanche gallery; Geometer; Engineer requisition; Underway Pass.' },
             { label: 'Gate → Mistlands', spade: 'Mistlands', heart: 'Mistlands', club: 'Mistlands', diamond: 'Mistlands', flavor: 'Bell-Line levee; Bell-warden; wraith crossing; Ward-salt.' }
+        ]
+    },
+    // Reverse of the above -- same Forgotten Pass / Under-Gate, run from
+    // the Mistlands side back down into the Broken Marches.
+    {
+        key: 'mistlands_acasia',
+        name: 'Mistlands → Acasia (Forgotten Pass + Under-Gate, reversed)',
+        description: 'Mistlands → Aeler Gate → Silkstrand (Acasia).',
+        legs: [
+            { label: 'Mistlands → Aeler Gate', spade: 'Aeler', heart: 'Aeler', club: 'Aeler', diamond: 'Aeler', flavor: 'Avalanche gallery; Geometer; Engineer requisition; Underway Pass.' },
+            { label: 'Gate → Silkstrand', spade: 'Acasia', heart: 'Acasia', club: 'Acasia', diamond: 'Acasia', flavor: "Three-Queens Bridge; Dyers' Guildmistress; Exchange pass; the Curse's weight settles as the canals come into view." }
+        ]
+    },
+    // Silkstrand's own region entry is explicit that it borders Acasia to
+    // the north and is routinely reached overland through it ("the Curse
+    // bleeds into the canals"), not just by the Ecktoria sea-lane the
+    // Coastal Haul uses -- a separate short itinerary for that caravan
+    // road, both directions.
+    {
+        key: 'acasia_silkstrand_caravan',
+        name: 'Acasia → Silkstrand (Overland Caravan Road)',
+        description: 'Many caravans skip the Ecktoria sea-lane entirely and cut south through the Broken Marches to the canals -- slower than a coastal hop, but it avoids harbor tariffs.',
+        legs: [
+            { label: 'Broken Marches → Silkstrand (by caravan)', spade: 'Silkstrand', heart: 'Acasia', club: 'Acasia', diamond: 'Acasia', clockHint: 7, flavor: "A condotta escort haggles over the toll before the canals even come into view; the Curse's weight is felt in the dyewater long before the bridges are." }
+        ]
+    },
+    {
+        key: 'silkstrand_acasia_caravan',
+        name: 'Silkstrand → Acasia (Overland Caravan Road, reversed)',
+        description: 'The same caravan road, walked out of the City of Bridges and back into the Broken Marches.',
+        legs: [
+            { label: 'Silkstrand → Broken Marches (by caravan)', spade: 'Acasia', heart: 'Acasia', club: 'Acasia', diamond: 'Acasia', clockHint: 7, flavor: 'The bridges fall behind as the canal road turns to rutted track; a condotta banner marks the marches ahead.' }
+        ]
+    },
+    // Mistlands <-> Violet Steppe (Ykrul): two documented borders, two
+    // routes. Mistlands' own entry lists the Violet Steppe directly to its
+    // north (a route that never touches the mountains at all) AND Aeler
+    // directly to its south (Aeler's own entry then lists the Violet
+    // Steppe to ITS northwest) -- i.e. a slower, better-papered route
+    // through the Aeler high passes instead of around them. "North of the
+    // Aelerian Mountains" / "South of the Aelerian Mountains" below refers
+    // to which of these two documented borders a party uses, not a new
+    // route invented for this planner.
+    {
+        key: 'mistlands_ykrul_north',
+        name: 'Mistlands → Violet Steppe (North of the Aelerian Mountains)',
+        description: 'The direct border crossing north of Aeler -- fog gives way to open grass without ever touching the mountain holds.',
+        legs: [
+            { label: "Payden's Port → the Fogline Border", spade: 'Mistlands', heart: 'Mistlands', club: 'Mistlands', diamond: 'Mistlands', clockHint: 6, flavor: 'Bell-line outposts thin out heading north; a Protectorate patrol logs your papers before the fog gives out.' },
+            { label: 'Fogline → Violet Steppe (Ykrul)', spade: 'Ykrul', heart: 'Ykrul', club: WILDS_REGION_NAME, diamond: 'Ykrul', clockHint: 7, flavor: 'The bells stop; the grass starts. Winter-camp smoke on the horizon -- the Ykrul do not linger where the bells rang false, but they watch the treeline all the same.' }
+        ]
+    },
+    {
+        key: 'ykrul_mistlands_north',
+        name: 'Violet Steppe → Mistlands (North of the Aelerian Mountains, reversed)',
+        description: 'Ykrul territory → the Fogline Border → Payden\'s Port.',
+        legs: [
+            { label: 'Ykrul Territory → the Fogline Border', spade: 'Ykrul', heart: 'Ykrul', club: WILDS_REGION_NAME, diamond: 'Ykrul', clockHint: 7, flavor: 'Grass gives way to fog on the horizon long before the bells are audible. No khagan\'s writ runs past this line.' },
+            { label: "Fogline → Payden's Port (Mistlands)", spade: 'Mistlands', heart: 'Mistlands', club: 'Mistlands', diamond: 'Mistlands', clockHint: 6, flavor: 'The first bell-line outpost logs your papers with visible relief. A Protectorate patrol escorts you the rest of the way in.' }
+        ]
+    },
+    {
+        key: 'mistlands_ykrul_south',
+        name: 'Mistlands → Violet Steppe (South, via the Aeler High Passes)',
+        description: 'Through the mountain holds instead of around them -- slower, but the Aeler under-passages are safer than open steppe in raiding season.',
+        legs: [
+            { label: 'Mistlands → Aeler High Holds', spade: 'Aeler', heart: 'Aeler', club: 'Aeler', diamond: 'Aeler', clockHint: 8, flavor: 'Bell-line caravans trade places with grain barges at the border; the High-Mist Pass toll is paid in iron, not coin. Mountain Passes rule: an Ace here may convert the route to an under-route.' },
+            { label: 'Aeler High Holds → Violet Steppe (Ykrul)', spade: 'Ykrul', heart: 'Ykrul', club: WILDS_REGION_NAME, diamond: 'Aeler', clockHint: 7, flavor: "The passes empty onto contested valleys; the Khagan's scouts watch from the ridgelines. Your Aeler papers may or may not mean anything out here -- the mountain's authority doesn't extend past its own shadow." }
+        ]
+    },
+    {
+        key: 'ykrul_mistlands_south',
+        name: 'Violet Steppe → Mistlands (South, via the Aeler High Passes, reversed)',
+        description: 'Ykrul territory → Aeler High Holds → Mistlands.',
+        legs: [
+            { label: 'Ykrul Territory → Aeler High Holds', spade: 'Aeler', heart: 'Aeler', club: WILDS_REGION_NAME, diamond: 'Aeler', clockHint: 7, flavor: "Contested valleys narrow toward the passes; the Khagan's scouts fall away as the mountain's shadow takes over." },
+            { label: 'Aeler High Holds → Mistlands', spade: 'Mistlands', heart: 'Mistlands', club: 'Aeler', diamond: 'Aeler', clockHint: 8, flavor: 'Grain barges trade places with bell-line caravans at the border; the High-Mist Pass toll is paid in iron, not coin.' }
+        ]
+    },
+    // Continuing the Coastal Haul past Fairport: the sourcebook only takes
+    // it as far as Viterra, but Viterra's own entry documents two further
+    // borders -- Thepyrgos to the south and Ubral to the north -- each
+    // worth its own short itinerary, both directions.
+    {
+        key: 'viterra_thepyrgos',
+        name: 'Viterra → Thepyrgos (South Coastal Road)',
+        description: 'Continuing the Coastal Haul past Fairport, south along the Black River border into Synod territory.',
+        legs: [
+            { label: 'Fairport → the Black River Crossing', spade: 'Thepyrgos', heart: 'Thepyrgos', club: WILDS_REGION_NAME, diamond: 'Thepyrgos', clockHint: 7, flavor: 'Chain-Lanterns watch both banks; a Viterran warrant is kindling here, and vice versa. The boom rises when the moon is high and the tide is low.' }
+        ]
+    },
+    {
+        key: 'thepyrgos_viterra',
+        name: 'Thepyrgos → Viterra (South Coastal Road, reversed)',
+        description: 'The Black River Crossing → Fairport.',
+        legs: [
+            { label: 'Thepyrgos → the Black River Crossing', spade: 'Viterra', heart: 'Viterra', club: WILDS_REGION_NAME, diamond: 'Viterra', clockHint: 7, flavor: "The chain-towers fall behind; hedge-law replaces Synod edict at the ford. The Queen's justiciars ride this border every spring." }
+        ]
+    },
+    // North instead: Ubral, then a Dolmis Sea crossing. Ubral's own entry
+    // gives it direct, undefined sea access ("the sea is a horizon, not a
+    // border"); the four eastern shores a crossing might make landfall on
+    // are modeled as a single "pick a landfall" leg with the compass
+    // layout as given -- Zakov northwest, Valewood (Thin Coast) northeast,
+    // Aelinnel due east, Aelaerem south -- rather than four separate full
+    // itineraries, since the Ubral leg is identical regardless of which
+    // shore the crossing lands on.
+    {
+        key: 'viterra_ubral_dolmis',
+        name: 'Viterra → Ubral → Dolmis Sea Crossing',
+        description: 'North past Fairport into the highland clans, then a sea crossing to whichever eastern shore the winds allow.',
+        legs: [
+            { label: 'Fairport → Ubral Highlands', spade: 'Ubral', heart: 'Ubral', club: WILDS_REGION_NAME, diamond: 'Ubral', clockHint: 7, flavor: "The Queen's writ ends at the highland line; tax collectors go armed here, and the cairns vote against the crown every season." },
+            {
+                label: 'Dolmis Sea Crossing (pick a landfall)', spade: 'Zakov', heart: 'Zakov', club: WILDS_REGION_NAME, diamond: 'Zakov', clockHint: 8,
+                variants: [
+                    { name: 'A) Northwest to Zakov', spade: 'Zakov', heart: 'Zakov', club: WILDS_REGION_NAME, diamond: 'Zakov', flavor: "Salt Wharf lights on the horizon; the Serpent's Spine reef forces a careful approach." },
+                    { name: 'B) Northeast to Valewood (Thin Coast)', spade: 'Valewood', heart: 'Valewood', club: WILDS_REGION_NAME, diamond: 'Valewood', flavor: 'The Thin Coast portage comes into view; star-road shards glitter at the waterline.' },
+                    { name: 'C) Due east to Aelinnel', spade: 'Aelinnel', heart: 'Aelinnel', club: WILDS_REGION_NAME, diamond: 'Aelinnel', flavor: 'The gnomish tide-traders signal from the Dolmis shallows; a counting-song carries across open water.' },
+                    { name: 'D) South to Aelaerem', spade: 'Aelaerem', heart: 'Aelaerem', club: WILDS_REGION_NAME, diamond: 'Aelaerem', flavor: 'The halfling downs rise gently from the water; watch-geese call from the fishing weirs.' }
+                ]
+            }
+        ]
+    },
+    {
+        key: 'dolmis_ubral_viterra',
+        name: 'Dolmis Sea Crossing → Ubral → Viterra (reversed)',
+        description: 'Whichever eastern shore you started from, the crossing lands at Ubral before the road turns south to Fairport.',
+        legs: [
+            {
+                label: 'Dolmis Sea Crossing (pick your point of departure)', spade: 'Ubral', heart: 'Ubral', club: WILDS_REGION_NAME, diamond: 'Ubral', clockHint: 8,
+                variants: [
+                    { name: 'A) Departing Zakov (northwest shore)', spade: 'Ubral', heart: 'Ubral', club: WILDS_REGION_NAME, diamond: 'Ubral', flavor: "The Serpent's Spine falls behind; Ubral's coves and fishing villages are a plainer welcome than Salt Wharf." },
+                    { name: 'B) Departing Valewood / Thin Coast (northeast shore)', spade: 'Ubral', heart: 'Ubral', club: WILDS_REGION_NAME, diamond: 'Ubral', flavor: 'Star-road shards give way to plain cairns; the crossing is calmer heading west than it was heading out.' },
+                    { name: 'C) Departing Aelinnel (due east shore)', spade: 'Ubral', heart: 'Ubral', club: WILDS_REGION_NAME, diamond: 'Ubral', flavor: 'The counting-songs fade behind you; Ubral does not sing back.' },
+                    { name: 'D) Departing Aelaerem (south shore)', spade: 'Ubral', heart: 'Ubral', club: WILDS_REGION_NAME, diamond: 'Ubral', flavor: 'The watch-geese calls fade into open water; the highland coves are a colder shore than the downs.' }
+                ]
+            },
+            { label: 'Ubral Highlands → Fairport', spade: 'Viterra', heart: 'Viterra', club: WILDS_REGION_NAME, diamond: 'Viterra', clockHint: 6, flavor: 'Fairport tideworks rise out of the haze; customs seals are checked twice for anyone coming down from the highlands.' }
         ]
     },
     {
@@ -184,6 +351,50 @@ const WORKED_ITINERARIES = [
         legs: [
             { label: 'Foedus Stone → Black Banner Camp', spade: 'Vilikari', heart: 'Black Banners', club: WILDS_REGION_NAME, diamond: 'Black Banners', clockHint: 7, flavor: 'Wolf Road milepost or Foedus Stone; Clan Elder or War Captain; Rasputitsa or Remount Sickness; Safe-conduct or Remount Chit. Foedus recall may invalidate your papers.' },
             { label: 'Black Banner Camp → Ykrul Territory', spade: 'Ykrul', heart: 'Ykrul', club: WILDS_REGION_NAME, diamond: 'Ykrul', clockHint: 7, flavor: "Winter camp ring or Khagan's way-station; Khatun of the Ring or Noyan envoy; Hostage protocol or Feud spark; Paiza tablet or Foedus seal. Choose which law applies." }
+        ]
+    },
+    // Reverse of the above -- same contested corridor, run from Ykrul
+    // territory back toward the Foedus Stone. Each leg reuses its forward
+    // counterpart's card sourcing (same place, same blended Vilikari/Black
+    // Banners sourcing the forward route uses), just relabeled.
+    {
+        key: 'steppe_passage_reverse',
+        name: 'Steppe Passage: Black Banner Territory (Ykrul → Vilikari, reversed)',
+        description: 'The same contested corridor, run from Ykrul territory back toward the Foedus Stone.',
+        legs: [
+            { label: 'Ykrul Territory → Black Banner Camp', spade: 'Black Banners', heart: 'Black Banners', club: WILDS_REGION_NAME, diamond: 'Black Banners', clockHint: 7, flavor: "Winter camp ring or Khagan's way-station falls behind; Khatun of the Ring or Noyan envoy; Hostage protocol or Feud spark; Paiza tablet or Foedus seal. Choose which law applies." },
+            { label: 'Black Banner Camp → Foedus Stone', spade: 'Vilikari', heart: 'Black Banners', club: WILDS_REGION_NAME, diamond: 'Black Banners', clockHint: 7, flavor: 'Wolf Road milepost or Foedus Stone comes into view; Clan Elder or War Captain; Rasputitsa or Remount Sickness; Safe-conduct or Remount Chit. Foedus recall may invalidate your papers.' }
+        ]
+    },
+    // Reverse of the Corsair Jobs arc -- isle taboos back into pirate
+    // politics and out through the misted coast. The two "pick one"
+    // activity legs (Corsair Job, Theona Contract) don't represent travel
+    // at all -- they're side business at a fixed location -- so they carry
+    // over unchanged (same variants, same sourcing) between the transit
+    // legs around them, which are reversed and relabeled.
+    {
+        key: 'theona_zakov_thin_shore',
+        name: 'Theona → Zakov → Thin Shore (Return Passage)',
+        description: 'The Corsair Jobs itinerary, run in reverse -- isle taboos back into pirate politics and the misted coast.',
+        legs: [
+            {
+                label: 'Theona Contract (pick one)', spade: 'Theona', heart: 'Theona', club: 'Theona', diamond: 'Theona',
+                variants: [
+                    { name: 'A) Raid-Truce at the Skerries', spade: 'Theona', heart: 'Theona', club: 'Theona', diamond: 'Theona', flavor: 'Tide caves; Isle Moot Envoy; Muster drum; Raid-truce Ribbon -- failure triggers a Linn muster timer.' },
+                    { name: 'B) Deliver the Ledger Shard', spade: 'Theona', heart: 'Theona', club: 'Zakov', diamond: 'Theona', flavor: 'Well-yard; Matron of Wells; a Zakov Debt Call follows you; Sanctuary Night buys time.' }
+                ]
+            },
+            { label: 'Theona → Zakov (Isles & Moot, reversed)', spade: 'Zakov', heart: 'Zakov', club: 'Linn', diamond: 'Zakov', clockHint: 7, flavor: "Uncounted Bridge falls behind; Boomhouse gossip waits dockside; fogfall raids; Moot Token still honored. Taboo: don't count the steps aloud." },
+            {
+                label: 'Corsair Job Inside Zakov (pick one)', spade: 'Zakov', heart: 'Zakov', club: 'Zakov', diamond: 'Zakov',
+                variants: [
+                    { name: 'A) Lift a Hull from Drydock Four', flavor: "Drydock Four; Corsair Quartermaster; Admiralty Audit; Shipwright's Lien Release -- avoids bond but flips a debt later." },
+                    { name: 'B) Court the Black Bishop for Indulgence', flavor: "Black Bell Tower; Black Bishop; Bounty Proclamation; Magistrate's Hush -- rumor must be paid in coin or gossip." },
+                    { name: "C) Smuggler's Ladder Run", flavor: "Lantern Ladder; Lampman; Informant Flip; Smuggler's Ladder Map -- your tip was sold twice." }
+                ]
+            },
+            { label: 'Zakov → Thin Shore Transit (reversed)', spade: 'Valewood', heart: 'Valewood', club: 'Valewood', diamond: 'Valewood', clockHint: 6, flavor: 'Sea-mist arcade; Path-warden; Sweet wind; Way-cord (spending it negates one Sweet wind lie).' },
+            { label: "Thin Shore → Payden's Port (Shadow Corridor, reversed)", spade: 'Valewood', heart: 'Mistlands', club: 'Mistlands', diamond: 'Mistlands', clockHint: 6, flavor: 'Green lane / Unfound stile; Protectorate clerk; bell-line failure; Lantern Writ. Rule of 9s applies.' }
         ]
     }
 ];

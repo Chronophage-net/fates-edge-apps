@@ -1,0 +1,1365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Art of War — Mass Combat, Advanced Tactics, and Strategic Command</title>
+<style>
+    :root {
+        --bg1: #08080c;
+        --bg2: #131318;
+        --bg3: #1c1c24;
+        --bg4: #262630;
+        --text: #e4e2e6;
+        --text2: #ada8b4;
+        --text3: #7c7684;
+        --gold: #7c8ba0;
+        --gold-hover: #97a7bd;
+        --border: #33303c;
+        --red: #8e2a2a;
+        --green: #3d7a52;
+        --blue: #3c6e8f;
+        --purple: #5f3f7a;
+        --orange: #a8622a;
+        --brass: #9c7a3c;
+        --mist: #4f6b73;
+        --radius: 8px;
+        --font: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+        background: var(--bg1);
+        background-image: radial-gradient(circle at 50% 0%, #14141c 0%, #08080c 60%);
+        color: var(--text);
+        font-family: var(--font);
+        padding: 1.5rem;
+        max-width: 1100px;
+        margin: 0 auto;
+        line-height: 1.6;
+    }
+    h1, h2, h3, h4, h5 { color: var(--gold); margin: 0.5rem 0 0.3rem; }
+    h1 { font-size: 1.8rem; border-bottom: 2px solid var(--gold); padding-bottom: 0.3rem; }
+    h2 { font-size: 1.4rem; border-bottom: 1px solid var(--border); padding-bottom: 0.2rem; margin-top: 1.5rem; }
+    h3 { font-size: 1.1rem; margin-top: 1rem; }
+    h4 { font-size: 0.95rem; color: var(--text); }
+    p { margin: 0.4rem 0; }
+    a { color: var(--gold); text-decoration: none; }
+    a:hover { color: var(--gold-hover); }
+    ul, ol { margin: 0.3rem 0 0.5rem 1.4rem; }
+    li { margin: 0.15rem 0; }
+    .panel {
+        background: var(--bg2);
+        border-radius: var(--radius);
+        padding: 0.6rem 0.8rem;
+        border: 1px solid var(--border);
+        margin: 0.6rem 0;
+    }
+    .panel-gold { border-left: 4px solid var(--gold); }
+    .panel-red { border-left: 4px solid var(--red); }
+    .panel-blue { border-left: 4px solid var(--blue); }
+    .panel-green { border-left: 4px solid var(--green); }
+    .panel-purple { border-left: 4px solid var(--purple); }
+    .panel-orange { border-left: 4px solid var(--orange); }
+    .panel-mist { border-left: 4px solid var(--mist); }
+    .badge {
+        display: inline-block;
+        padding: 0.05rem 0.5rem;
+        border-radius: 12px;
+        font-size: 0.65rem;
+        font-weight: 600;
+        margin: 0.05rem 0.15rem 0.05rem 0;
+    }
+    .badge-gold { background: var(--gold); color: #0c0f14; }
+    .badge-red { background: var(--red); color: #fff; }
+    .badge-green { background: var(--green); color: #fff; }
+    .badge-blue { background: var(--blue); color: #fff; }
+    .badge-purple { background: var(--purple); color: #fff; }
+    .badge-orange { background: var(--orange); color: #fff; }
+    .badge-mist { background: var(--mist); color: #fff; }
+    .badge-gray { background: var(--bg4); color: var(--text3); }
+    .flex { display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center; }
+    .text-muted { color: var(--text3); }
+    .text-gold { color: var(--gold); }
+    .text-sm { font-size: 0.85rem; }
+    .text-xs { font-size: 0.7rem; }
+    .mt-1 { margin-top: 0.5rem; }
+    .mb-1 { margin-bottom: 0.5rem; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem; }
+    .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.6rem; }
+    @media (max-width: 700px) { .grid-2, .grid-3 { grid-template-columns: 1fr; } }
+    hr { border: none; border-top: 1px solid var(--border); margin: 0.8rem 0; }
+    .toc { background: var(--bg3); border-radius: var(--radius); padding: 0.6rem 0.9rem; border: 1px solid var(--border); }
+    .toc-cols { columns: 2; column-gap: 1.5rem; }
+    @media (max-width: 700px) { .toc-cols { columns: 1; } }
+    .toc a { color: var(--text2); display: block; padding: 0.1rem 0; font-size: 0.85rem; break-inside: avoid; }
+    .toc a:hover { color: var(--gold); }
+    blockquote {
+        border-left: 3px solid var(--gold);
+        padding-left: 1rem;
+        margin: 0.6rem 0;
+        color: var(--text2);
+        font-style: italic;
+    }
+    .table-wrap { overflow-x: auto; margin: 0.5rem 0; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+    caption { caption-side: top; text-align: left; font-weight: 600; color: var(--gold); padding: 0.2rem 0; }
+    th, td { border: 1px solid var(--border); padding: 0.4rem 0.55rem; text-align: left; vertical-align: top; }
+    th { background: var(--bg3); color: var(--gold); font-weight: 600; }
+    tr:nth-child(even) td { background: var(--bg2); }
+    .stat-card {
+        background: var(--bg3);
+        border-radius: var(--radius);
+        padding: 0.5rem 0.7rem;
+        margin: 0.4rem 0;
+        border-left: 3px solid var(--gold);
+        font-size: 0.85rem;
+    }
+    .stat-card .stat-name { font-weight: 700; color: var(--gold); font-size: 0.95rem; }
+    .card { background: var(--bg3); border-radius: var(--radius); padding: 0.5rem 0.7rem; margin: 0.3rem 0; border-left: 2px solid var(--gold); }
+    .card .card-title { font-weight: 600; font-size: 0.9rem; color: var(--gold); }
+    footer { font-size: 0.75rem; color: var(--text3); text-align: center; padding: 1.5rem 0 0.5rem; }
+</style>
+</head>
+<body>
+
+<h1>Art of War</h1>
+<p class="text-sm" style="color:var(--text2); margin-bottom:0.5rem;">
+    <span class="badge badge-gold">Mass Combat</span>
+    <span class="badge badge-blue">Tactical Grid</span>
+    <span class="badge badge-orange">Siege Warfare</span>
+    <span class="badge badge-purple">Campaign Play</span>
+    <span class="badge badge-gray">Author: Nicholas A. Gasper</span>
+</p>
+
+<div class="panel panel-gold">
+    <strong>What This Expansion Adds</strong>
+    <p class="text-sm mt-1">The Art of War scales Fate's Edge combat from a single duel to armies clashing across a continent. It adds an optional tactical grid for precise positioning in ordinary combat, a mass-combat framework for resolving battles of hundreds or thousands of troops without turning the session into a wargame, and a full siege and campaign system for the war behind the war — logistics, morale, and the strategic decisions that outlast any one battle. Use the grid rules whenever you want exact tactical combat; reach for the War Scale, unit rules, and campaign systems once the story escalates past a skirmish.</p>
+</div>
+
+<blockquote>
+    "The sword is a liar. It promises victory through blood, but blood is the interest on a debt of strategy. The true warrior wins before the blades are drawn — through supply lines, through morale, through the geometry of the battlefield. The clash is merely the payment of a bill already written."<br>
+    — General Marcus Valerius of Ecktoria, on the eve of the Fourth Sack
+</blockquote>
+
+<div class="toc">
+    <strong style="color:var(--gold);">Table of Contents</strong>
+    <div class="toc-cols mt-1">
+        <a href="#preface">Preface — The General's Reflection</a>
+        <a href="#part1">Part I: Foundations of War</a>
+        <a href="#ch2">Chapter 2: The War Scale</a>
+        <a href="#part2">Part II: Advanced Tactics</a>
+        <a href="#ch4">Chapter 4: Unit Profiles and Capabilities</a>
+        <a href="#ch5">Chapter 5: Maneuvers, Formations, and Special Actions</a>
+        <a href="#ch6">Chapter 6: Terrain and Environment</a>
+        <a href="#part3">Part III: Mass Combat</a>
+        <a href="#mc-quickref">Mass Combat Quick Reference</a>
+        <a href="#ch9">Chapter 9: Commanders, Heroes, and the Friction of War</a>
+        <a href="#ch10">Chapter 10: Siege Warfare</a>
+        <a href="#part4">Part IV: The War Beyond the Battle</a>
+        <a href="#appendix-a">Appendix A: Quick Reference Tables</a>
+        <a href="#appendix-b">Appendix B: Scenario Generator</a>
+        <a href="#appendix-c">Appendix C: Unit Templates</a>
+        <a href="#appendix-d">Appendix D: War Campaign Generator</a>
+        <a href="#campaign-seeds">Campaign Seeds for The Art of War</a>
+        <a href="#epilogue">Epilogue — The General's Final Counsel</a>
+    </div>
+</div>
+
+<hr>
+
+<h2 id="preface">Preface — The General's Reflection</h2>
+<p class="text-sm">I stand on the western walls of Ecktoria as the first light of dawn touches the Violet Steppe. Below me, the Vilikari cohorts drill with grim precision; beyond them, the Ykrul warbands move like storm clouds on the horizon. This is not my first autumn watching Ecktoria's pride buckle beneath foreign banners — I was a tribune during the Plebian Rebellion, a legate at Kennex Falls, and now, as General of the Eastern Marches, I face the Fourth — and perhaps final — sack of Ecktoria.</p>
+<p class="text-sm">They call me the "Last Utaran" in the streets, though I wear Ecktoria's crimson and gold with as much pride as any born to the Violet Steppe. Victory does not belong to those who shout loudest in the melee, but to those who calculate the weight of grain in a granary, the exit routes from a mountain pass, and the breath between heartbeats in a tense negotiation.</p>
+<p class="text-sm">The Vilikari seek concession, not conquest — they want the trade routes to flow freely and the exits to remain open. The Ykrul warband leader, a stone-cold strategist named Kurgan of the Iron Hoof, understands that Ecktoria's strength lies not in its walls but in its supply chains, its morale, and the thousand small decisions that make an army more than a mob.</p>
+<p class="text-sm">This expansion is not for kings in their towers, but for the officers in the mud, the quartermasters counting rations, and the scouts reading wind patterns in the grass — for those who know that war is won not in the clash of steel, but in the ledger, the latrine, and the last quiet conversation before dawn.</p>
+<p class="text-sm">Every arrow spent is a meal not eaten. Every soldier lost is a field unplowed. War is not a cost to be paid — it is a debt that compounds. Win this battle, and you may lose the next war. The road ahead is long and the scars will remain, but if we fight for something worth saving — something that can grow after the fires dim — those scars become testimony to what we built, not a monument to what we burned.</p>
+<p class="text-sm text-muted mt-1">— General Marcus Valerius, Eastern Marches Command, Ecktoria</p>
+
+<hr>
+
+<h2 id="part1">Part I: Foundations of War</h2>
+
+<h3 id="core-principles">1.1 Core Principles</h3>
+<p class="text-sm">The Art of War extends Fate's Edge's narrative-first philosophy into armies, campaigns, and large-scale conflict. Five principles anchor everything that follows.</p>
+
+<div class="grid-2">
+    <div class="card panel-gold">
+        <div class="card-title">War as Story, Not Simulation</div>
+        <p class="text-sm mt-1">Mass combat is not a wargame simulation — it's a narrative framework that produces dramatic outcomes. Every army has a story: its origin, its commander, its morale, its supplies. Those stories determine outcomes more than any single roll. <strong>The battle serves the story, not the other way around.</strong></p>
+    </div>
+    <div class="card panel-blue">
+        <div class="card-title">Friction and Uncertainty</div>
+        <p class="text-sm mt-1"><em>"The plan is the first casualty of contact with the enemy. Trust your training, not your map."</em> War is chaos; the best-laid plans dissolve in smoke, dust, and terror. <strong>Plans are starting points, not blueprints.</strong> Reward adaptability and punish rigid thinking.</p>
+    </div>
+    <div class="card panel-orange">
+        <div class="card-title">The Decisive Point</div>
+        <p class="text-sm mt-1"><em>"A battle is not a brawl. It is a negotiation with geography, time, and the will of your enemy."</em> Every battle has a center of gravity — where the enemy's strength meets its vulnerability. <strong>Positioning matters more than numbers.</strong> A flanking force of fifty can break a regiment of five hundred.</p>
+    </div>
+    <div class="card panel-red">
+        <div class="card-title">The Human Element</div>
+        <p class="text-sm mt-1"><em>"Soldiers are not numbers. They are names with fears, hopes, and mothers."</em> Morale, exhaustion, loyalty, and fear are the true determinants of battle. <strong>Morale is the army's HP.</strong> Track it, feed it, protect it.</p>
+    </div>
+    <div class="card panel-purple">
+        <div class="card-title">The Economy of Force</div>
+        <p class="text-sm mt-1"><em>"Every arrow spent is a meal not eaten. War is not a cost to be paid; it is a debt that compounds."</em> Supplies, manpower, and time are all currencies. <strong>Sustainability matters</strong> — a pyrrhic victory is a defeat in disguise.</p>
+    </div>
+</div>
+
+<h3 id="core-systems">1.2 War and the Core Systems</h3>
+<p class="text-sm">The Art of War integrates with Fate's Edge's existing mechanics rather than replacing them.</p>
+<ul class="text-sm">
+    <li><strong>Dice Pools:</strong> Unit actions use Attribute + Skill pools, exactly like individual actions. Commanders roll Leadership + Tactics to issue orders; units roll Melee + Cohesion to attack.</li>
+    <li><strong>Position and Effect:</strong> Apply at every scale. A unit charging downhill is Dominant; a unit caught in a crossfire is Desperate.</li>
+    <li><strong>Story Beats (SB):</strong> The GM spends SB to introduce friction — a messenger killed, a bridge collapsing, a regiment's morale breaking.</li>
+    <li><strong>Boons:</strong> Commanders spend Boons to rally troops, redirect attacks, or gain insight into enemy plans.</li>
+    <li><strong>Harm and Fatigue:</strong> Units have Harm tracks (casualties) and Fatigue tracks (exhaustion, low supplies, low morale).</li>
+</ul>
+
+<h3 id="expansion-adds">1.3 What This Expansion Adds</h3>
+<ul class="text-sm">
+    <li><strong>The War Scale:</strong> a framework for escalating from skirmish to full-scale battle.</li>
+    <li><strong>Unit Profiles:</strong> stat blocks for military formations.</li>
+    <li><strong>Command and Control:</strong> rules for issuing and executing orders.</li>
+    <li><strong>Mass Combat Resolution:</strong> fast, narrative-driven systems for resolving large battles.</li>
+    <li><strong>Logistics and Morale:</strong> the war behind the war.</li>
+    <li><strong>Campaign Warfare:</strong> connecting battles into larger strategic arcs.</li>
+</ul>
+
+<hr>
+
+<h2 id="ch2">Chapter 2: The War Scale — From Skirmish to Siege</h2>
+
+<h3 id="five-scales">2.1 The Five Scales of War</h3>
+<p class="text-sm">War in Fate's Edge can be played at five scales, each with different mechanics and narrative focus.</p>
+
+<div class="table-wrap">
+<table>
+<caption>The Five Scales of War</caption>
+<tr><th>Scale</th><th>Scope</th><th>Resolution</th><th>Duration</th><th>Narrative Lens</th></tr>
+<tr><td><span class="badge badge-gold">I — Skirmish</span></td><td>2–20 combatants/side</td><td>Standard grid combat (core rules)</td><td>3–6 rounds</td><td>The PCs are the decisive factor; individual heroics turn the tide. Use for ambushes, raids, duels, small patrol clashes, rescues.</td></tr>
+<tr><td><span class="badge badge-blue">II — Raid</span></td><td>20–100 combatants/side</td><td>Standard combat with unit rules</td><td>6–12 rounds</td><td>PCs are unit commanders or specialists. Use for village attacks, caravan defense, fort assaults, river crossings, commando raids.</td></tr>
+<tr><td><span class="badge badge-orange">III — Battle</span></td><td>100–1,000 combatants/side</td><td>Mass combat system</td><td>12–24 rounds</td><td>PCs are officers, champions, or embedded specialists; the battle is a story with many threads. Use for field battles, sieges, relief operations, major offensives.</td></tr>
+<tr><td><span class="badge badge-purple">IV — Campaign</span></td><td>1,000–10,000 combatants/side</td><td>Campaign turn system</td><td>Weeks to months</td><td>PCs are commanders, advisors, or special operatives; the war is a tapestry of interlocking events. Use for full-scale wars, invasions, wars of attrition.</td></tr>
+<tr><td><span class="badge badge-red">V — War</span></td><td>10,000+ combatants/side</td><td>Campaign turns with strategic-level decisions</td><td>Months to years</td><td>PCs are generals, diplomats, or key political figures; the fate of nations hangs in the balance. Use for wars between nations, existential conflicts.</td></tr>
+</table>
+</div>
+
+<h3 id="choosing-scale">2.2 Choosing the Right Scale</h3>
+<p class="text-sm">Ask the table: What story do we want to tell about this conflict? How much detail do we want in resolution? How much time do we have? What is the role of the PCs?</p>
+<div class="table-wrap">
+<table>
+<tr><th>Desired Experience</th><th>Recommended Scale</th></tr>
+<tr><td>"We're heroes"</td><td>Scale I — Skirmish</td></tr>
+<tr><td>"We're commanders"</td><td>Scale II — Raid</td></tr>
+<tr><td>"We're in a war"</td><td>Scale III — Battle</td></tr>
+<tr><td>"We're shaping history"</td><td>Scale IV–V — Campaign/War</td></tr>
+</table>
+</div>
+
+<h3 id="escalation">2.3 Escalation and De-escalation</h3>
+<p class="text-sm">A conflict can move between scales fluidly. <strong>Escalating:</strong> a skirmish becomes a battle when reinforcements arrive; a battle becomes a campaign when it becomes a series of engagements. <strong>De-escalating:</strong> a battle reduces to a skirmish once the main forces withdraw, leaving only the PCs and a handful of enemies to resolve the final confrontation.</p>
+<div class="panel panel-mist">
+    <strong>Mechanical Transition</strong>
+    <p class="text-sm mt-1">When the scale changes, reset Position and adjust timers. Narrate the transition clearly so the table feels the shift.</p>
+</div>
+
+<hr>
+
+<h2 id="part2">Part II: Advanced Tactics</h2>
+<blockquote>"The grid is a storytelling tool. Every move must be described in fiction." — The Gray Wanderer</blockquote>
+<p class="text-sm">This optional module adds grid-based tactical rules for combat at the skirmish scale. Use it for one encounter, a whole campaign, or never — it changes nothing about the underlying dice math.</p>
+
+<h3 id="tactics-core-principles">Core Principles</h3>
+<ul class="text-sm">
+    <li><strong>Narrative first.</strong> The grid is a storytelling tool. Every move must be described in fiction.</li>
+    <li><strong>No mechanics changes.</strong> Dice pools, Story Beats (SB), Boons, and Position and Effect work exactly as written elsewhere.</li>
+    <li><strong>Predictable tactics.</strong> Cover, flanking, reach, and facing give players concrete ways to gain Position before rolling.</li>
+</ul>
+
+<h3 id="the-grid">The Grid</h3>
+<p class="text-sm"><strong>Scale:</strong> 1 square (or hex) = 5 ft. Pick square or hex before the session. Most characters occupy one cell; large creatures (a horse, for example) occupy a 2×2 block.</p>
+<div class="table-wrap">
+<table>
+<caption>Range Bands (Grid Version)</caption>
+<tr><th>Band</th><th>Distance</th></tr>
+<tr><td>Close</td><td>Adjacent cells (melee)</td></tr>
+<tr><td>Near</td><td>Up to 6 cells (~30 ft)</td></tr>
+<tr><td>Far</td><td>7–12 cells (~35–60 ft)</td></tr>
+<tr><td>Absent</td><td>Beyond 12 cells, or off-screen</td></tr>
+</table>
+</div>
+
+<h3 id="movement">Movement</h3>
+<div class="table-wrap">
+<table>
+<tr><th>Rule</th><th>Formula / Cost</th></tr>
+<tr><td>Move action</td><td>Body + 3 cells (Body 3 → 6 cells)</td></tr>
+<tr><td>Dash</td><td>Use your action to double movement; next defense is <span class="badge badge-red">Desperate</span></td></tr>
+<tr><td>Difficult terrain</td><td>2 movement points per cell (mud, rubble, shallow water)</td></tr>
+<tr><td>Elevation</td><td>+1 movement point per level up; moving down is free</td></tr>
+</table>
+</div>
+
+<h3 id="zones-of-control">Zones of Control (ZoC)</h3>
+<ul class="text-sm">
+    <li>A unit's ZoC is all orthogonal (or all six) adjacent cells.</li>
+    <li>Entering an enemy's ZoC ends your movement and places you in melee (<span class="badge badge-blue">Controlled</span> with that enemy).</li>
+    <li><strong>Leaving ZoC</strong> requires a Disengage test: <span class="badge badge-gray">DV 4</span> plus modifiers. Failure leaves you <span class="badge badge-red">Desperate</span> for your next action.</li>
+    <li><strong>Stacked ZoC:</strong> +1 to Disengage DV per extra enemy.</li>
+    <li><strong>Pushing through ZoC:</strong> Athletics or Acrobatics vs <span class="badge badge-gray">DV 4 + (N − 1)</span>, where N is the number of enemies. Success continues movement; failure ends it. Either way, take one cost: gain 1 Fatigue, OR the GM gains 1 SB, OR your next action drops a step (Controlled → Risky, or Risky → Desperate).</li>
+</ul>
+
+<h3 id="cover-position">Cover &amp; Position</h3>
+<ul class="text-sm">
+    <li><strong>Partial cover</strong> (low wall): defender gains <span class="badge badge-blue">Controlled</span> against ranged attacks only.</li>
+    <li><strong>Full cover</strong> (solid wall): defender gains <span class="badge badge-blue">Controlled</span> against all attacks; the attacker gains <span class="badge badge-gold">Dominant</span> once the defender steps out to act.</li>
+    <li>Cover can be destroyed — the GM spends SB.</li>
+</ul>
+
+<h3 id="flanking">Flanking &amp; Rear Attacks</h3>
+<ul class="text-sm">
+    <li><strong>Flanking:</strong> two allies on opposite sides of a target. The next attacker gains <span class="badge badge-gold">Dominant</span> for that attack.</li>
+    <li><strong>Rear attack:</strong> attacker directly behind the target gains <span class="badge badge-gold">Dominant</span> and upgrades Standard Effect to Great for that strike.</li>
+</ul>
+
+<h3 id="weapon-tags-grid">Weapon Tags (Grid Interactions)</h3>
+<div class="table-wrap">
+<table>
+<tr><th>Tag</th><th>Grid Effect</th></tr>
+<tr><td><span class="badge badge-mist">Reach</span></td><td>Can attack up to 2 cells away (Near). Enemies without Reach suffer −1 Position when trying to close.</td></tr>
+<tr><td><span class="badge badge-mist">Fast</span></td><td>After a successful melee hit, shift 1 cell without triggering ZoC.</td></tr>
+<tr><td><span class="badge badge-mist">Set</span></td><td>Plant the weapon as an action. Any enemy that charges into that cell (≥4 cells in a straight line) triggers an automatic attack at +1 Effect.</td></tr>
+<tr><td><span class="badge badge-mist">Brutal</span></td><td>On a hit, push the target 1 cell orthogonally; their next defensive Position drops one step.</td></tr>
+</table>
+</div>
+
+<h3 id="action-economy">Action Economy (Tactical)</h3>
+<p class="text-sm">Each turn, a character gets <strong>one Action</strong> (attack, cast, use a skill, activate a talent) and <strong>one Move</strong> (up to movement rate, split before, after, or around the action). Dashing consumes the Action — no separate attack that turn unless a talent grants a free one.</p>
+
+<h3 id="position-sources">Position Sources — Quick Lookup</h3>
+<div class="table-wrap">
+<table>
+<tr><th>Situation</th><th>Position Change</th></tr>
+<tr><td>Partial cover (defender)</td><td><span class="badge badge-blue">Controlled</span> vs. ranged only</td></tr>
+<tr><td>Full cover (defender)</td><td><span class="badge badge-blue">Controlled</span> vs. all attacks</td></tr>
+<tr><td>Flanking (attacker)</td><td><span class="badge badge-gold">Dominant</span></td></tr>
+<tr><td>Rear attack (attacker)</td><td><span class="badge badge-gold">Dominant</span> + Great Effect</td></tr>
+<tr><td>Dashing (defender, next turn)</td><td><span class="badge badge-red">Desperate</span></td></tr>
+<tr><td>Disengage failure (defender)</td><td><span class="badge badge-red">Desperate</span></td></tr>
+<tr><td>Spend a Boon before the roll</td><td>Shift Position up one step</td></tr>
+</table>
+</div>
+
+<h3 id="line-of-sight">Line of Sight &amp; Concealment</h3>
+<p class="text-sm">Line of sight is blocked by solid obstacles — walls, large creatures, dense forest. The GM may call for Notice vs. Stealth when a target is partially concealed. Concealment (fog, smoke, darkness) grants the defender <span class="badge badge-blue">Controlled</span> against ranged attacks; melee is unaffected unless the attacker must enter the concealed area to close.</p>
+
+<h3 id="tactical-cheat-sheet">Tactical Combat Cheat-Sheet</h3>
+<p class="text-sm text-muted">Declare your tactical advantage — cover, flanking, high ground — before rolling; the GM sets Position based on the board.</p>
+
+<div class="table-wrap">
+<table>
+<caption>Position / Effect Modifiers</caption>
+<tr><th>Situation</th><th>Result</th></tr>
+<tr><td>Full cover (defender)</td><td>Controlled; attacker gains Dominant once the defender must act</td></tr>
+<tr><td>Partial cover (defender)</td><td>Controlled vs. ranged only</td></tr>
+<tr><td>Flanking (attacker)</td><td>Dominant</td></tr>
+<tr><td>Rear attack (attacker)</td><td>Dominant + Great</td></tr>
+<tr><td>Dashing (defender, next turn)</td><td>Desperate</td></tr>
+<tr><td>Disengage failure (defender)</td><td>Desperate</td></tr>
+<tr><td>Spend a Boon (before roll)</td><td>Shift Position up one step</td></tr>
+</table>
+</div>
+
+<div class="table-wrap">
+<table>
+<caption>Movement</caption>
+<tr><th>Rule</th><th>Formula / Cost</th></tr>
+<tr><td>Base move</td><td>Body + 3 cells</td></tr>
+<tr><td>Dash (action)</td><td>2× move; next defense Desperate</td></tr>
+<tr><td>Difficult terrain</td><td>2 movement per cell</td></tr>
+<tr><td>Elevation up</td><td>+1 movement per level (down free)</td></tr>
+<tr><td>Run (spend Boon)</td><td>2× move; next action Desperate (optional)</td></tr>
+</table>
+</div>
+
+<div class="table-wrap">
+<table>
+<caption>Zones of Control</caption>
+<tr><th>Action</th><th>Effect</th></tr>
+<tr><td>Enter enemy ZoC</td><td>End movement; in melee (Controlled)</td></tr>
+<tr><td>Leave ZoC</td><td>Disengage test (DV 4 + modifiers)</td></tr>
+<tr><td>Stacked ZoC</td><td>+1 DV per extra enemy</td></tr>
+</table>
+</div>
+
+<div class="table-wrap">
+<table>
+<caption>Weapon Tags (Grid)</caption>
+<tr><th>Tag</th><th>Effect</th></tr>
+<tr><td>Reach</td><td>Attack up to 2 cells; enemies without Reach suffer −1 Position closing</td></tr>
+<tr><td>Fast</td><td>After a hit, shift 1 cell (no ZoC)</td></tr>
+<tr><td>Set</td><td>Plant; a charge into the cell triggers an automatic attack at +1 Effect</td></tr>
+<tr><td>Brutal</td><td>Push 1 cell; target's next defense Position drops one step</td></tr>
+</table>
+</div>
+
+<div class="table-wrap">
+<table>
+<caption>Action Economy</caption>
+<tr><th>Action</th><th>Cost</th></tr>
+<tr><td>Attack, cast, skill</td><td>1 Action</td></tr>
+<tr><td>Move (up to movement rate)</td><td>1 Move (can be split)</td></tr>
+<tr><td>Dash</td><td>1 Action (no other action)</td></tr>
+<tr><td>Disengage</td><td>1 Action (or free with a talent)</td></tr>
+<tr><td>Use a Boon for Position</td><td>1 Boon (before the roll)</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2 id="ch4">Chapter 4: Unit Profiles and Capabilities</h2>
+
+<h3>4.1 Anatomy of a Unit</h3>
+<p class="text-sm">A unit is a collection of soldiers represented by a single stat block — the basic building block of tactical combat.</p>
+<div class="panel panel-gold">
+    <strong>Unit Stat Block</strong>
+    <p class="text-sm mt-1"><strong>Unit Name</strong> — the unit's designation. <strong>Type</strong> — Heavy Infantry, Light Cavalry, Archers, etc. <strong>Capability (Cap)</strong> — 1–5. <strong>Scale</strong> — I (Squad), II (Company), III (Battalion), IV (Regiment). <strong>Speed</strong> — base movement rate, varies by type. <strong>Tags</strong> — special qualities (Elite, Siege, Skirmish, etc.). <strong>Tracks</strong> — Cohesion [6] (morale and discipline), Exposure [6] (supplies, fatigue, exhaustion), Resources [6] (ammunition, equipment, rations). <strong>Orders</strong> — what the unit can do (Chapter 5).</p>
+</div>
+
+<p class="text-sm"><strong>Capability (Cap)</strong> represents a unit's training, experience, and equipment.</p>
+<div class="table-wrap">
+<table>
+<tr><th>Cap</th><th>Description</th><th>Example</th></tr>
+<tr><td><span class="badge badge-gray">1</span></td><td>Levy / Recruits</td><td>Peasant levy, raw recruits</td></tr>
+<tr><td><span class="badge badge-gray">2</span></td><td>Trained</td><td>Standard infantry, militia</td></tr>
+<tr><td><span class="badge badge-gray">3</span></td><td>Veteran</td><td>Professional soldiers, experienced mercenaries</td></tr>
+<tr><td><span class="badge badge-gray">4</span></td><td>Elite</td><td>Guard troops, elite mercenaries</td></tr>
+<tr><td><span class="badge badge-gray">5</span></td><td>Legendary</td><td>The Crimson Guard, champions, legendary heroes</td></tr>
+</table>
+</div>
+<p class="text-sm">Cap sets the die pool (Cap + Skill when acting), unit morale (higher Cap resists fear and breaks less often), and damage (higher Cap deals more Harm).</p>
+<div class="table-wrap">
+<table>
+<caption>Cap and Tier Relation</caption>
+<tr><th>Tier</th><th>Typical Unit Cap</th></tr>
+<tr><td>I (Novice)</td><td>Cap 1–2 (Levy/Trained)</td></tr>
+<tr><td>II (Seasoned)</td><td>Cap 2–3 (Trained/Veteran)</td></tr>
+<tr><td>III (Veteran)</td><td>Cap 3–4 (Veteran/Elite)</td></tr>
+<tr><td>IV (Paragon)</td><td>Cap 4 (Elite)</td></tr>
+<tr><td>V (Mythic)</td><td>Cap 5 (Legendary)</td></tr>
+</table>
+</div>
+
+<p class="text-sm"><strong>Scale</strong> represents unit size, larger area of effect, stronger projected ZoC, and easier targeting by area effects.</p>
+<div class="table-wrap">
+<table>
+<tr><th>Scale</th><th>Size</th><th>Examples</th></tr>
+<tr><td>I</td><td>1–10</td><td>Squad, warband</td></tr>
+<tr><td>II</td><td>10–50</td><td>Company, cavalry squadron</td></tr>
+<tr><td>III</td><td>50–200</td><td>Battalion, war-band</td></tr>
+<tr><td>IV</td><td>200–1,000</td><td>Regiment, army</td></tr>
+</table>
+</div>
+
+<h3>4.2 Unit Types</h3>
+<div class="table-wrap">
+<table>
+<caption>Infantry — hold the line, engage in melee, occupy key positions</caption>
+<tr><th>Type</th><th>Speed</th><th>Defense</th><th>Offense</th><th>Special</th><th>Weakness</th></tr>
+<tr><td>Heavy Infantry (Cap 3–4)</td><td>Slow</td><td>High (armor, shields)</td><td>High (two-handed weapons)</td><td>Can Set against cavalry</td><td>Poor in rough terrain; vulnerable to skirmishers</td></tr>
+<tr><td>Medium Infantry (Cap 2–3)</td><td>Standard</td><td>Moderate (shields)</td><td>Moderate (sword and shield)</td><td>Versatile; can hold or attack</td><td>Not exceptional at anything</td></tr>
+<tr><td>Light Infantry (Cap 2–3)</td><td>Fast</td><td>Low (light armor)</td><td>Low (javelins, short swords)</td><td>Skirmishing; can harass enemy flanks</td><td>Cannot hold the line</td></tr>
+</table>
+</div>
+
+<div class="table-wrap">
+<table>
+<caption>Cavalry — flank, charge, pursue, disrupt enemy formations</caption>
+<tr><th>Type</th><th>Speed</th><th>Defense</th><th>Offense</th><th>Special</th><th>Weakness</th></tr>
+<tr><td>Heavy Cavalry (Cap 3–4)</td><td>Fast</td><td>High (armor, shields)</td><td>High (lances)</td><td>Devastating charge; breakthrough</td><td>Poor in rough terrain; vulnerable to prepared infantry</td></tr>
+<tr><td>Medium Cavalry (Cap 2–3)</td><td>Fast</td><td>Moderate</td><td>Moderate</td><td>Flexible; skirmish or charge</td><td>Not as powerful as heavy cavalry</td></tr>
+<tr><td>Light Cavalry (Cap 1–3)</td><td>Very fast</td><td>Low</td><td>Low (bows, javelins)</td><td>Skirmishing; reconnaissance</td><td>Cannot hold against infantry</td></tr>
+</table>
+</div>
+
+<div class="table-wrap">
+<table>
+<caption>Skirmishers — harass, screen, scout, weaken enemy formations</caption>
+<tr><th>Type</th><th>Speed</th><th>Defense</th><th>Offense</th><th>Special</th><th>Weakness</th></tr>
+<tr><td>Archers (Cap 2–3)</td><td>Standard</td><td>Low</td><td>Ranged</td><td>High rate of fire; suppressive fire</td><td>Poor in melee</td></tr>
+<tr><td>Crossbowmen (Cap 2–3)</td><td>Slow</td><td>Low</td><td>Ranged, armor-piercing</td><td>Armor penetration; devastating volleys</td><td>Slow to reload</td></tr>
+<tr><td>Skirmishers/Javelinmen (Cap 2)</td><td>Fast</td><td>Low</td><td>Ranged, short range</td><td>Can engage and disengage</td><td>Cannot hold; short range</td></tr>
+</table>
+</div>
+
+<div class="table-wrap">
+<table>
+<caption>Special Units</caption>
+<tr><th>Type</th><th>Role</th><th>Special</th><th>Weakness</th></tr>
+<tr><td>Engineers (Cap 2–3)</td><td>Siege works, fortifications, bridges, demolition</td><td>Can construct or demolish terrain features</td><td>Not combat units; need protection</td></tr>
+<tr><td>Artillery (Cap 2–3)</td><td>Bombard, siege, area denial</td><td>Area attacks; devastating against formations</td><td>Slow to set up; vulnerable to flanking</td></tr>
+<tr><td>Magical Support (Cap 2–4)</td><td>Buff, debuff, area damage, communication</td><td>Can alter the battlefield in unexpected ways</td><td>Magical energy is finite; vulnerable to counterspelling</td></tr>
+</table>
+</div>
+
+<h3>4.3 Unit Tags</h3>
+<div class="table-wrap">
+<table>
+<tr><th>Tag</th><th>Effect</th></tr>
+<tr><td><span class="badge badge-gold">Elite</span></td><td>+1 Cap; better morale</td></tr>
+<tr><td><span class="badge badge-blue">Veteran</span></td><td>Ignore first Morale check per battle</td></tr>
+<tr><td><span class="badge badge-gray">Green</span></td><td>−1 Cap; worse morale</td></tr>
+<tr><td><span class="badge badge-orange">Siege</span></td><td>+1 Effect vs. fortifications; slow movement</td></tr>
+<tr><td><span class="badge badge-mist">Skirmish</span></td><td>Can engage and disengage at +1 Position</td></tr>
+<tr><td><span class="badge badge-gray">Pikes</span></td><td>+1 Effect vs. cavalry</td></tr>
+<tr><td><span class="badge badge-blue">Shield Wall</span></td><td>+1 Defense when stationary</td></tr>
+<tr><td><span class="badge badge-orange">Raiders</span></td><td>+1 Speed; better loot</td></tr>
+<tr><td><span class="badge badge-red">Fanatic</span></td><td>−1 Morale, but won't rout (dies fighting)</td></tr>
+<tr><td><span class="badge badge-gray">Mercenary</span></td><td>Fights for pay; may switch sides</td></tr>
+<tr><td><span class="badge badge-purple">Magic</span></td><td>Can use magical effects; vulnerable to counterspelling</td></tr>
+</table>
+</div>
+
+<h3>4.4 Follower Units</h3>
+<p class="text-sm">Use the Follower system (Player's Guide, Chapter 12) for unit commanders and embedded specialists.</p>
+<div class="grid-2">
+    <div class="card">
+        <div class="card-title">Unit Commander Template</div>
+        <p class="text-sm mt-1"><strong>Type:</strong> [Unit Type] &middot; <strong>Cap:</strong> 2–4 &middot; <strong>Scale:</strong> I–III &middot; <strong>Tags:</strong> as appropriate &middot; <strong>Tracks:</strong> Cohesion [6], Exposure [6], Resources [6] &middot; <strong>Orders:</strong> as appropriate</p>
+    </div>
+    <div class="card">
+        <div class="card-title">Embedded Specialist Template</div>
+        <p class="text-sm mt-1"><strong>Role:</strong> champion, mage, healer, scout &middot; <strong>Cap:</strong> 1–5 (individual capability) &middot; acts independently within the larger engagement.</p>
+    </div>
+</div>
+
+<hr>
+
+<h2 id="ch5">Chapter 5: Maneuvers, Formations, and Special Actions</h2>
+
+<h3>5.1 Basic Maneuvers</h3>
+<div class="table-wrap">
+<table>
+<tr><th>Maneuver</th><th>Effect</th><th>Position</th><th>Risk / Notes</th></tr>
+<tr><td>Advance</td><td>Move standard speed; maintain formation</td><td>Controlled (unengaged) or Standard (engaged)</td><td>Vulnerable during movement</td></tr>
+<tr><td>Charge</td><td>Move speed + 2; +1 Effect on first attack (cavalry: +2 Effect)</td><td>Dominant from high ground or flank</td><td>−1 Defense until next turn; vulnerable to prepared enemies</td></tr>
+<tr><td>Withdraw</td><td>Move standard speed; maintain formation</td><td>Controlled</td><td>May be pursued; +1 Morale check if pursued. Engaged units need a successful Morale check to withdraw</td></tr>
+<tr><td>Rout</td><td>Move speed + 2; drop all formation bonuses</td><td>Desperate</td><td>Enemies gain +1 Position on all attacks against routing units; can be rallied by a commander</td></tr>
+</table>
+</div>
+
+<h3>5.2 Formations</h3>
+<div class="table-wrap">
+<table>
+<tr><th>Formation</th><th>Requires</th><th>Bonus</th><th>Penalty</th><th>Vulnerable To</th><th>Mechanical Effect</th></tr>
+<tr><td>Shield Wall</td><td>Shields</td><td>+2 Defense, +1 Morale</td><td>−1 Speed, cannot charge</td><td>Flanking, artillery, magic</td><td>Solid block; frontal attackers suffer −1 Position</td></tr>
+<tr><td>Pike Square</td><td>Spears/Pikes</td><td>+2 vs. Cavalry, +1 Defense</td><td>−1 Speed, rigid formation</td><td>Flanking, long-range, magic</td><td>Cavalry charges suffer −2 Effect; resistant to breakthrough</td></tr>
+<tr><td>Wedge</td><td>Heavy infantry or cavalry</td><td>+2 Charge, +1 Breakthrough</td><td>−1 Defense</td><td>Flanking, artillery</td><td>Punches through enemy lines; +1 Position first round</td></tr>
+<tr><td>Skirmish Line</td><td>Skirmishers</td><td>+1 Movement, +1 Ranged</td><td>Cannot hold, −1 Defense in melee</td><td>Heavy units, cavalry</td><td>Screens other units; engages and disengages freely</td></tr>
+<tr><td>Column</td><td>Any</td><td>+2 Speed on roads</td><td>−1 Defense, −1 Melee</td><td>Ambush, artillery</td><td>Moves quickly but is vulnerable while strung out</td></tr>
+</table>
+</div>
+
+<h3>5.3 Special Actions</h3>
+<div class="table-wrap">
+<table>
+<tr><th>Action</th><th>Roll</th><th>Effect</th></tr>
+<tr><td>Rally (Commander)</td><td>Presence + Command vs. DV (Cohesion deficit)</td><td>Restore up to 2 Cohesion on success; partial restores 1</td></tr>
+<tr><td>Flank</td><td>Tactics vs. enemy Command (opposed)</td><td>Success: +1 Position on next attack. Critical: +2 Position (Dominant)</td></tr>
+<tr><td>Feint</td><td>Deception vs. enemy Perception (opposed)</td><td>Success: next friendly action gains +1 Position. Partial: both sides −1 Position</td></tr>
+<tr><td>Set Against Charge</td><td>Tactics + Command (DV 3)</td><td>Success: +2 Effect vs. charging enemies this round. Failure: Desperate vs. charges</td></tr>
+<tr><td>Volley Fire (Ranged)</td><td>—</td><td>Area attack; Harm 1 to all in the zone (Harm 2 on critical). Costs 1 Resource</td></tr>
+<tr><td>Suppressive Fire (Ranged)</td><td>—</td><td>Affected units suffer −1 Position until they leave the zone; suppresses one round (two on critical)</td></tr>
+<tr><td>Breach (Infantry)</td><td>Melee + Cohesion vs. enemy Melee + Cohesion (opposed)</td><td>Success: opens a gap in the enemy line. Failure: unit is repulsed (Morale −1)</td></tr>
+<tr><td>Hold (Infantry)</td><td>—</td><td>Unit stays in position; +1 Defense if attacked. Casualties require a Morale check to remain</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2 id="ch6">Chapter 6: Terrain and Environment</h2>
+
+<h3>6.1 Terrain Types</h3>
+<div class="table-wrap">
+<table>
+<tr><th>Terrain</th><th>Movement</th><th>Cover</th><th>Visibility</th><th>Bonuses</th><th>Penalties</th></tr>
+<tr><td>Open Field</td><td>Normal</td><td>None (or limited)</td><td>Good</td><td>Cavalry charge, artillery, mass formations</td><td>Vulnerable to ranged attacks, no cover</td></tr>
+<tr><td>Hill</td><td>Up 1.5×, down normal</td><td>Partial (on ridge)</td><td>Good from top, limited from bottom</td><td>+1 Position for defenders on high ground</td><td>Slower movement uphill</td></tr>
+<tr><td>Forest</td><td>0.5×</td><td>Good (trees)</td><td>Poor (~2–3 cells)</td><td>Ambush, skirmishers, concealment</td><td>No cavalry charges; reduced missile range; −1 Command</td></tr>
+<tr><td>Marsh</td><td>0.25× or impossible</td><td>None</td><td>Poor (fog)</td><td>Defensive position; slows enemy</td><td>Vulnerable to fire; −1 Melee; heavy units become Desperate</td></tr>
+<tr><td>Urban/Ruin</td><td>0.5× (streets), variable (buildings)</td><td>Good (buildings)</td><td>Limited (blind corners)</td><td>Defensive advantage; ambush; small-unit tactics</td><td>Large units suffer −1 Position; no cavalry; command and control difficult</td></tr>
+<tr><td>Water</td><td>0.5× wading, boats needed for deep water</td><td>None</td><td>Poor (mists, reflections)</td><td>Defensive barrier; slows enemy</td><td>Vulnerable while crossing; heavy units are Desperate</td></tr>
+</table>
+</div>
+
+<h3>6.2 Terrain Mechanics</h3>
+<div class="table-wrap">
+<table>
+<caption>Cover</caption>
+<tr><th>Cover Type</th><th>Defense Bonus</th><th>Effect</th></tr>
+<tr><td>None</td><td>0</td><td>Normal</td></tr>
+<tr><td>Light</td><td>+1</td><td>Trees, low walls, partial cover</td></tr>
+<tr><td>Medium</td><td>+2</td><td>Stone walls, fortifications</td></tr>
+<tr><td>Heavy</td><td>+3</td><td>Fortress walls, bunkers</td></tr>
+<tr><td>Total</td><td>Immune (until breached)</td><td>Castle walls, impenetrable</td></tr>
+</table>
+</div>
+<p class="text-sm">Cover can be destroyed by siege engines or magic — the GM spends SB to degrade it. A unit on higher ground gains +1 Position attacking downhill and +1 Defense when defending from below. When line of sight is obscured, missile attacks suffer −1 die and ambushes become easier (Deception +1).</p>
+
+<h3>6.3 Weather</h3>
+<p class="text-sm">The GM may change weather conditions during a battle by spending 2 SB, or at the end of a round; narrate the shift dramatically.</p>
+<div class="table-wrap">
+<table>
+<caption>Weather Conditions (d6)</caption>
+<tr><th>d6</th><th>Condition</th><th>Effect</th></tr>
+<tr><td>1</td><td>Clear</td><td>Normal</td></tr>
+<tr><td>2</td><td>Light Rain</td><td>−1 missile range, −1 visibility; Morale −1</td></tr>
+<tr><td>3</td><td>Heavy Rain</td><td>−2 missile range, −2 visibility; movement 0.5×; Morale −1</td></tr>
+<tr><td>4</td><td>Snow</td><td>−2 movement; −1 visibility; cold Fatigue; Morale −1</td></tr>
+<tr><td>5</td><td>Fog</td><td>Visibility 3 cells; −2 missile range; ambushes easier; Morale −1</td></tr>
+<tr><td>6</td><td>Storm</td><td>No missile fire; movement 0.25×; units may rout from fear; lightning can strike; Morale −2</td></tr>
+</table>
+</div>
+
+<h3>6.4 Terrain and Cover — Quick Reference</h3>
+<div class="table-wrap">
+<table>
+<tr><th>Situation</th><th>Effect</th></tr>
+<tr><td>Light Cover</td><td>+1 Defense vs. ranged attacks</td></tr>
+<tr><td>Medium Cover</td><td>+2 Defense vs. ranged; +1 Defense vs. melee</td></tr>
+<tr><td>Heavy Cover</td><td>+3 Defense vs. ranged; +2 Defense vs. melee</td></tr>
+<tr><td>High Ground</td><td>+1 Position attacking downhill; +1 Defense defending</td></tr>
+<tr><td>Difficult Terrain</td><td>Movement 0.5×; −1 Position to heavy units</td></tr>
+<tr><td>Rough Terrain</td><td>Movement 0.25×; −1 Position to all units</td></tr>
+<tr><td>Poor Visibility</td><td>Missile attacks −1 die; ambushes easier</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2 id="part3">Part III: Mass Combat</h2>
+
+<h3 id="ch7">Chapter 7: Bridging the Gap — From Squad to Army</h3>
+<blockquote>"I have stood on the hill overlooking a thousand men, knowing that each of them had a mother who would weep for them — and a captain who might die if I made the wrong choice. The weight of that moment is not mechanical. It is moral. If your mass combat system does not make you feel that weight, you are not using it right."</blockquote>
+
+<p class="text-sm"><strong>Design Philosophy:</strong> mass combat in Fate's Edge should be <strong>fast</strong> (no slower than regular combat), <strong>narrative</strong> (focused on decisions, drama, and consequences), <strong>heroic</strong> (PCs remain the main characters), and <strong>meaningful</strong> (the outcome matters).</p>
+
+<p class="text-sm">The mass combat system is a streamlined way to resolve battles involving hundreds or thousands of troops, focused on commander decisions and moments of heroism that change battles. Its components: a <strong>Battle Map</strong> (terrain and positions), <strong>Units</strong> (each with a stat block), <strong>Commanders</strong> (PCs and key NPCs), <strong>Objectives</strong> (what each side wants), and <strong>Timers</strong> (deadlines, reinforcements, key events).</p>
+
+<div class="table-wrap">
+<table>
+<caption>Battle Phases</caption>
+<tr><th>#</th><th>Phase</th><th>What Happens</th></tr>
+<tr><td>1</td><td>Planning</td><td>Players and GM decide objectives, unit positions, and strategies</td></tr>
+<tr><td>2</td><td>Command</td><td>Orders are issued</td></tr>
+<tr><td>3</td><td>Engagement</td><td>Units act and interact</td></tr>
+<tr><td>4</td><td>Resolution</td><td>Casualties, morale, and objective progress are resolved</td></tr>
+<tr><td>5</td><td>End</td><td>The battle round concludes</td></tr>
+</table>
+</div>
+
+<p class="text-sm">Units in mass combat choose from three tiers of action:</p>
+<div class="table-wrap">
+<table>
+<tr><th>Tier</th><th>Actions</th></tr>
+<tr><td>Standard</td><td>Advance (move and attack/prepare), Hold (defend), Withdraw (fall back in good order)</td></tr>
+<tr><td>Complex</td><td>Flank, Charge, Feint, Volley</td></tr>
+<tr><td>Special</td><td>Rally, Breach, Screen, Set</td></tr>
+</table>
+</div>
+
+<p class="text-sm">The <strong>mass combat roll</strong> is opposed: Cap + Skill (Melee, Ranged, etc.) + Boons − Penalties, compared against the enemy's roll. Success: the enemy takes casualties and the objective advances. Partial: stalemate, both sides take casualties. Miss: the unit suffers casualties and the objective recedes.</p>
+
+<p class="text-sm">The battlefield divides into zones: <strong>Frontline</strong> (actively engaged), <strong>Reserve</strong> (behind the frontline, ready to reinforce), <strong>Flank</strong> (vulnerable side areas), and <strong>Rear</strong> (supplies and command). Moving between zones costs an action; flanking attacks gain +1 Position.</p>
+
+<h3 id="ch8">Chapter 8: Mass Combat Resolution</h3>
+<p class="text-sm">A battle turn represents a period of intensive combat, usually 10–30 minutes.</p>
+<div class="table-wrap">
+<table>
+<caption>Turn Sequence</caption>
+<tr><th>Phase</th><th>What Happens</th></tr>
+<tr><td>Command</td><td>Commanders issue orders and make Command rolls; objectives update</td></tr>
+<tr><td>Movement</td><td>Units move per orders, using movement rates and terrain rules</td></tr>
+<tr><td>Ranged</td><td>Missile units and artillery fire; area attacks resolve</td></tr>
+<tr><td>Melee</td><td>Engaged units fight; special actions (charge, breach, etc.) resolve</td></tr>
+<tr><td>Morale</td><td>Units check morale; casualties are tallied; statuses update</td></tr>
+<tr><td>End</td><td>Commanders may issue new orders; special events resolve (reinforcements, supply issues)</td></tr>
+</table>
+</div>
+
+<p class="text-sm"><strong>Attack Roll:</strong> Unit Cap + relevant skill (Melee, Ranged, or Arcana for magic units). Modifiers: Position (+1 Dominant, −1 Desperate), Terrain (+1 favorable, −1 unfavorable), Morale (+1 high, −1 low), Fatigue (−1 moderate, −2 severe). Compare the result to the enemy's Defense Value; success deals Harm.</p>
+
+<div class="table-wrap">
+<table>
+<caption>Unit Harm Tracks</caption>
+<tr><th>Cap</th><th>Harm Levels</th></tr>
+<tr><td>1</td><td>2</td></tr>
+<tr><td>2</td><td>3</td></tr>
+<tr><td>3</td><td>4</td></tr>
+<tr><td>4</td><td>5</td></tr>
+<tr><td>5</td><td>6</td></tr>
+</table>
+</div>
+<p class="text-sm"><strong>Harm effects:</strong> 1 Harm = −1 die to all rolls; 2 Harm = −2 dice; 3 Harm = −3 dice (crippled); 4+ Harm = the unit is destroyed or routed.</p>
+
+<p class="text-sm"><strong>Morale</strong> is tracked as Cohesion [6]. Bonuses: high ground +1, Command success +1 (temporary), Elite unit +1 (permanent), champion presence +1. Penalties: casualties −1 per level of Harm taken, friendly unit routing −1, commander killed −2, supply shortage −1. <strong>Morale Check:</strong> Cohesion + Command vs. DV (current Cohesion deficit). Success: the unit holds. Partial: shaken (−1 Position next turn). Miss: the unit routs.</p>
+
+<div class="panel panel-red">
+    <strong>Routing</strong>
+    <p class="text-sm mt-1">When a unit's Cohesion reaches 0, or it fails a Morale check, it routs: it moves at double speed away from the enemy, drops all formation bonuses, is treated as Desperate for all purposes, and other units suffer −1 Morale in sympathy.</p>
+    <p class="text-sm mt-1"><strong>Rallying:</strong> a commander's Rally action (Presence + Command vs. DV equal to the unit's Cohesion deficit) stops the rout and reforms the unit at Cohesion 1 on success, or Cohesion 2 on a critical success.</p>
+</div>
+
+<p class="text-sm">Mass combat should feel costly. Each unit that routs or is destroyed suffers permanent casualties, tracked as Lost Cohesion that may take weeks to recover; mercenaries who take heavy losses may demand higher pay or leave outright. In the aftermath, units need time to recover, supplies must be replenished, morale must be rebuilt, and the dead must be buried.</p>
+
+<hr>
+
+<h2 id="mc-quickref">Mass Combat Quick Reference</h2>
+<blockquote>"The sword is a liar. It promises victory through blood, but blood is the interest on a debt of strategy. The true warrior wins before the blades are drawn." — General Marcus Valerius</blockquote>
+<p class="text-sm">Fast-lookup tables for running mass combat at the table. For full rules, see the chapters above.</p>
+
+<div class="table-wrap">
+<table>
+<caption>Unit Types</caption>
+<tr><th>Type</th><th>Cap</th><th>Speed</th><th>Role</th></tr>
+<tr><td>Heavy Infantry</td><td>3–4</td><td>Slow</td><td>Hold the line, engage in melee</td></tr>
+<tr><td>Medium Infantry</td><td>2–3</td><td>Standard</td><td>Versatile, can hold or attack</td></tr>
+<tr><td>Light Infantry</td><td>2–3</td><td>Fast</td><td>Skirmishing, harass enemy flanks</td></tr>
+<tr><td>Heavy Cavalry</td><td>3–4</td><td>Fast</td><td>Devastating charge, breakthrough</td></tr>
+<tr><td>Medium Cavalry</td><td>2–3</td><td>Fast</td><td>Flexible, skirmish or charge</td></tr>
+<tr><td>Light Cavalry</td><td>1–3</td><td>Very fast</td><td>Skirmishing, reconnaissance</td></tr>
+<tr><td>Archers</td><td>2–3</td><td>Standard</td><td>Ranged, suppressive fire</td></tr>
+<tr><td>Crossbowmen</td><td>2–3</td><td>Slow</td><td>Ranged, armor-piercing</td></tr>
+<tr><td>Engineers</td><td>2–3</td><td>Slow</td><td>Siege works, fortifications, demolition</td></tr>
+<tr><td>Artillery</td><td>2–3</td><td>Very slow</td><td>Bombard, siege, area denial</td></tr>
+</table>
+</div>
+
+<div class="table-wrap">
+<table>
+<caption>Command Roll Outcomes</caption>
+<tr><th>Outcome</th><th>Effect</th></tr>
+<tr><td>Critical Success</td><td>All units gain +1 Position; commander gains 1 Boon</td></tr>
+<tr><td>Success</td><td>Units act normally; one unit may act at +1 Position</td></tr>
+<tr><td>Partial</td><td>One unit acts at +1 Position, one at −1 Position</td></tr>
+<tr><td>Miss</td><td>All units act at −1 Position; commander may spend 1 Boon to negate</td></tr>
+</table>
+</div>
+<p class="text-sm"><strong>Orders:</strong> Simple ("Advance," "Hold," "Fall Back") need no roll. Complex ("Flank," "Charge," "Feint") roll Presence + Tactics. Special ("Rally," "Breach," "Screen," "Set") require a specific roll.</p>
+
+<div class="table-wrap">
+<table>
+<caption>Fog of War (d6) — roll when the GM spends 2 SB</caption>
+<tr><th>d6</th><th>Complication</th></tr>
+<tr><td>1</td><td><strong>False Report:</strong> a unit is reported dead or routing when it is not</td></tr>
+<tr><td>2</td><td><strong>Misinterpreted Orders:</strong> a unit takes the wrong action</td></tr>
+<tr><td>3</td><td><strong>Delayed Courier:</strong> orders arrive one round late</td></tr>
+<tr><td>4</td><td><strong>Signal Error:</strong> a flanking force attacks a friendly unit</td></tr>
+<tr><td>5</td><td><strong>Rumor Spreads:</strong> a rumor of defeat demoralizes a unit (Morale −1)</td></tr>
+<tr><td>6</td><td><strong>Confusion Reigns:</strong> all units suffer −1 Position this round</td></tr>
+</table>
+</div>
+
+<div class="table-wrap">
+<table>
+<caption>Campaign Timers</caption>
+<tr><th>Timer</th><th>Size</th><th>Tracks</th></tr>
+<tr><td>War Weariness</td><td>10</td><td>Exhaustion of the war effort; when full, both sides seek peace</td></tr>
+<tr><td>Alliance Stability</td><td>8</td><td>Cohesion of the PCs' alliances; when full, alliances break</td></tr>
+<tr><td>Enemy Momentum</td><td>8</td><td>Enemy's strategic advantage; when full, the enemy scores a significant victory</td></tr>
+<tr><td>Supply Chain</td><td>10</td><td>Overall supply situation; when full, the army is starving</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2 id="ch9">Chapter 9: Commanders, Heroes, and the Friction of War</h2>
+
+<h3>9.1 The Commander's Role</h3>
+<p class="text-sm">A commander does not fight — a commander decides. Their job: set objectives, allocate forces, decide when to attack, retreat, or commit reserves, inspire the troops, and adapt to changing conditions.</p>
+
+<h3>9.2 Commander Actions</h3>
+<div class="table-wrap">
+<table>
+<tr><th>Action</th><th>Roll</th><th>Effect</th></tr>
+<tr><td>Command Roll</td><td>Presence + Tactics</td><td>Critical: all units +1 Position this round. Success: units act normally. Partial: one unit +1 Position, one −1 Position. Miss: all units −1 Position</td></tr>
+<tr><td>Rally</td><td>Presence + Command</td><td>Restore Cohesion to a routing or shaken unit</td></tr>
+<tr><td>Inspiring Speech</td><td>Presence + Performance</td><td>All units within hearing gain +1 Morale for one round (+2 on a critical)</td></tr>
+<tr><td>Tactical Assessment</td><td>Wits + Tactics</td><td>Ask the GM one question about enemy dispositions</td></tr>
+<tr><td>Decisive Intervention</td><td>Physical combat</td><td>Commander enters combat personally: +1 Morale to troops, but −2 Morale to the army if the commander is incapacitated</td></tr>
+</table>
+</div>
+<p class="text-sm">A commander may spend 1 Boon to reroll a Command roll, grant +1 Position to one unit this round, or grant +2 Morale to one unit for one round.</p>
+
+<h3>9.3 Heroes on the Battlefield</h3>
+<p class="text-sm">PCs in mass combat are heroes: they can lead units as their commander, fight as champions against enemy champions or dangerous units, perform special actions (sabotage, scouting, magical support), or otherwise change the course of the battle.</p>
+
+<div class="table-wrap">
+<table>
+<caption>Champion Actions</caption>
+<tr><th>Action</th><th>Roll</th><th>Effect</th></tr>
+<tr><td>Duel</td><td>Standard combat</td><td>Engage an enemy commander or champion; the outcome affects morale on both sides</td></tr>
+<tr><td>Sabotage</td><td>Stealth, Craft, etc.</td><td>Enemy loses a Resource, suffers a Morale penalty, or loses a key unit</td></tr>
+<tr><td>Scout</td><td>Wits + Lore (or appropriate)</td><td>+1 Position on the next Command roll</td></tr>
+<tr><td>Magic</td><td>Appropriate skill</td><td>Area attacks, buffs, debuffs, communication</td></tr>
+</table>
+</div>
+
+<p class="text-sm">On a heroic success, a hero may choose one: Rally (restore 2 Cohesion to a friendly unit), Demoralize (−1 Morale to an enemy unit), Breakthrough (open a gap in the enemy line), or Heroic Inspiration (all allies gain +1 Position for one round).</p>
+
+<h3>9.4 The Friction of War</h3>
+<p class="text-sm">War is chaotic — plans fail, heroes fall, opportunities are missed. When the GM spends SB or a unit fails an action, roll on the Friction Table.</p>
+<div class="table-wrap">
+<table>
+<caption>Friction Table (d6)</caption>
+<tr><th>d6</th><th>Friction Event</th></tr>
+<tr><td>1</td><td>Miscommunication: orders are misunderstood; the unit acts differently than commanded</td></tr>
+<tr><td>2</td><td>Delay: a unit is late to arrive; lose 1 Cohesion (waiting is exhausting)</td></tr>
+<tr><td>3</td><td>Accident: friendly fire or a collapsed bridge costs the unit 1 Cohesion</td></tr>
+<tr><td>4</td><td>Rumor: a rumor of defeat spreads; all units suffer −1 Morale until the commander rallies them</td></tr>
+<tr><td>5</td><td>Equipment Failure: a unit loses its advantage (archers run out of arrows, a ladder breaks)</td></tr>
+<tr><td>6</td><td>Commander Down: the unit's commander is incapacitated; unit acts at −1 Position until replaced</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2 id="ch10">Chapter 10: Siege Warfare</h2>
+
+<h3>10.1 The Siege Framework</h3>
+<p class="text-sm">A siege is a sustained operation to take a fortified position: <strong>Investment</strong> (surrounding the fortification), <strong>Bombardment</strong> (destroying walls and defenses), <strong>Assault</strong> (attacking the walls), <strong>Breach</strong> (breaking through), and <strong>Occupation</strong> (taking the fortification).</p>
+
+<h3>10.2 Siege Timers</h3>
+<div class="table-wrap">
+<table>
+<tr><th>Timer</th><th>Tracks</th></tr>
+<tr><td>Siege Timer [10]</td><td>Overall siege progress. Advances on significant besieger actions; retreats on successful defender counter-actions. When full, the siege resolves in the attacker's favor.</td></tr>
+<tr><td>Defender Timer [10]</td><td>Defenders' resilience. Advances with casualties, dropping morale, or low supply; retreats when defenders rally or receive relief. When full, the defenders surrender.</td></tr>
+<tr><td>Supply Timer [8]</td><td>Food and water. Advances each day of siege, faster with a large garrison or scarce supply. When full, the defenders begin to starve.</td></tr>
+<tr><td>Breach Timer [6]</td><td>Progress toward a breach. Advances with mining or bombardment; retreats when defenders repair damage. When full, a breach opens and assaults gain +2 Effect.</td></tr>
+</table>
+</div>
+
+<h3>10.3 Siege Actions</h3>
+<div class="table-wrap">
+<table>
+<caption>Attacker Actions</caption>
+<tr><th>Action</th><th>Roll</th><th>Success</th><th>Partial</th><th>Miss</th></tr>
+<tr><td>Bombard</td><td>Artillery + Resources</td><td>Damage walls; defender casualties; advance Siege Timer</td><td>Damage walls; limited casualties</td><td>Limited damage; Resources lost; no advance</td></tr>
+<tr><td>Assault</td><td>Melee + Cap</td><td>Foothold gained; Siege Timer +2</td><td>Foothold gained; lose a unit</td><td>Repulsed; lose a unit</td></tr>
+<tr><td>Mine</td><td>Craft + Tactics</td><td>Breach created; advance Siege Timer</td><td>Tunnel collapses; lose a Resource</td><td>Tunnel discovered; counter-mined</td></tr>
+<tr><td>Negotiate</td><td>Presence + Sway</td><td>Defenders consider terms; lower Defender Timer</td><td>Terms considered but not accepted</td><td>Terms rejected; defender morale rises</td></tr>
+<tr><td>Relieve</td><td>Melee + Tactics</td><td>Relief force arrives; siege broken</td><td>Relief delayed; both sides lose a unit</td><td>Relief force defeated; siege continues</td></tr>
+</table>
+</div>
+
+<div class="table-wrap">
+<table>
+<caption>Defender Actions</caption>
+<tr><th>Action</th><th>Roll</th><th>Success</th><th>Partial</th><th>Miss</th></tr>
+<tr><td>Repair</td><td>Craft + Resources</td><td>Walls repaired; Siege Timer retreats</td><td>Partial repair; limited effect</td><td>No repair; Resources lost</td></tr>
+<tr><td>Sortie</td><td>Melee + Cap</td><td>Casualties inflicted; siege slowed</td><td>Casualties inflicted; lose a unit</td><td>Repulsed; lose a unit</td></tr>
+<tr><td>Counter-Mine</td><td>Wits + Tactics</td><td>Enemy mine destroyed</td><td>Mine detected but not destroyed</td><td>Mine collapses your own walls</td></tr>
+<tr><td>Rally</td><td>Presence + Command</td><td>Morale restored; Defender Timer retreats</td><td>Partial restoration</td><td>Morale falls further</td></tr>
+</table>
+</div>
+
+<h3>10.4 Starvation and Surrender</h3>
+<p class="text-sm">When the Supply Timer fills, the defenders begin to starve: −1 Cohesion per day, −1 to all rolls (physical, mental, and magical), and a rising chance of surrender.</p>
+<p class="text-sm"><strong>Surrender triggers</strong> when the Supply Timer hits 0, the Siege Timer hits 10, the Defender Timer hits 0, or the defending commander is killed. <strong>Negotiated surrender</strong> lets defenders leave with honor or be absorbed into the attacker's forces; <strong>unconditional surrender</strong> leaves defenders to be imprisoned, enslaved, or killed at the victor's discretion.</p>
+
+<hr>
+
+<h2 id="part4">Part IV: The War Beyond the Battle</h2>
+
+<h3 id="ch11">Chapter 11: Logistics — The Sinews of War</h3>
+<p class="text-sm">Logistics is the art of moving, feeding, and supplying an army — the least glamorous aspect of war, and arguably the most important. Three tracks, each a Timer [10]: <strong>Food</strong> (rations, water, animal feed; advances each day, retreats when resupplied), <strong>Arms</strong> (weapons, ammunition, armor; advances when lost or used, retreats when resupplied), and <strong>Materials</strong> (tents, tools, siege equipment, magical supplies; advances when consumed, retreats when replaced).</p>
+
+<div class="table-wrap">
+<table>
+<caption>Supply Sources</caption>
+<tr><th>Source</th><th>Roll</th><th>Success</th><th>Partial</th><th>Miss</th></tr>
+<tr><td>Local Foraging</td><td>Lore + Cap</td><td>Gain 1 Food</td><td>Gain 1 Food but lose 1 Cohesion (annoying the locals)</td><td>Gain nothing; may provoke local opposition</td></tr>
+<tr><td>Supply Lines</td><td>Command + Logistics</td><td>Supplies arrive; all tracks retreat</td><td>Supplies arrive damaged; retreat one track</td><td>Supplies delayed; tracks advance</td></tr>
+<tr><td>Requisition (raiding)</td><td>Melee + Cap</td><td>Gain 2 Food/Arms/Materials</td><td>Gain 1 Food; lose a unit</td><td>Gain nothing; lose a unit</td></tr>
+</table>
+</div>
+
+<div class="table-wrap">
+<table>
+<caption>Logistics Effects</caption>
+<tr><th>Track Level</th><th>Effect</th></tr>
+<tr><td>0–2</td><td>Fully supplied; no penalty</td></tr>
+<tr><td>3–5</td><td>Short rations; −1 Cohesion per day</td></tr>
+<tr><td>6–8</td><td>Low supplies; −2 Cohesion per day; −1 to all physical rolls</td></tr>
+<tr><td>9–10</td><td>Emergency — marching, fighting, or digging may require a Cohesion check</td></tr>
+</table>
+</div>
+<p class="text-sm">For every 2 levels a Logistics track sits above 3, the army suffers an additional −1 Morale.</p>
+
+<h3 id="ch12">Chapter 12: Morale, Cohesion, and the Human Element</h3>
+<div class="table-wrap">
+<table>
+<caption>Morale Factors</caption>
+<tr><th>Factor</th><th>Effect</th></tr>
+<tr><td>Victory</td><td>+1 per significant victory</td></tr>
+<tr><td>Defeat</td><td>−1 per significant defeat</td></tr>
+<tr><td>Supply</td><td>+1 (well-supplied) to −2 (starving)</td></tr>
+<tr><td>Command</td><td>+1 (good) to −2 (bad)</td></tr>
+<tr><td>Pay</td><td>+1 (paid) to −2 (unpaid)</td></tr>
+<tr><td>Cause</td><td>+1 (believed in) to −1 (disbelieved)</td></tr>
+<tr><td>Elite Unit</td><td>+1 (permanent)</td></tr>
+<tr><td>Green Unit</td><td>−1 (permanent)</td></tr>
+</table>
+</div>
+<p class="text-sm">A unit with Morale 3 or lower must make a Morale check when ordered to advance or when facing a significant threat; failure causes it to hesitate or retreat.</p>
+
+<p class="text-sm"><strong>Cohesion</strong> represents a unit's discipline and unity. At 5–6, it's battle-ready with no penalty; at 3–4, shaken (−1 to all rolls); at 1–2, brittle (−2 to all rolls, must check Morale when attacked); at 0, broken and routing. Cohesion is restored by Rally (1–2), Rest (1 per day), Victory (1), or improved Supplies (1).</p>
+
+<blockquote>"I have seen a man fight through a wound that would have killed a lesser man. I have seen a man break when a leaf brushed his shoulder. There is no logic in the human heart. Only stories."</blockquote>
+
+<div class="table-wrap">
+<table>
+<caption>Soldier Stories (d10) — roll to discover something about the soldiers in a unit</caption>
+<tr><th>d10</th><th>Story</th></tr>
+<tr><td>1</td><td>The Reluctant Soldier — joined to protect their family; fights with desperate courage</td></tr>
+<tr><td>2</td><td>The Veteran — seen too much; cynical, unbreakable, loyal to their friends</td></tr>
+<tr><td>3</td><td>The Dreamer — believes in a cause; fights with idealism</td></tr>
+<tr><td>4</td><td>The Refugee — lost everything to war; fights for a new home</td></tr>
+<tr><td>5</td><td>The Conscript — forced into service; fights because they have to</td></tr>
+<tr><td>6</td><td>The Mercenary — fights for coin; professional, but not loyal</td></tr>
+<tr><td>7</td><td>The Zealot — believes their cause is divine; fights with fanaticism</td></tr>
+<tr><td>8</td><td>The Coward — afraid; may flee, or may surprise everyone with courage</td></tr>
+<tr><td>9</td><td>The Hero — has the potential to be a legend; the one the songs will be sung about</td></tr>
+<tr><td>10</td><td>The Ghost — already died in spirit; fights because they have nothing left to lose</td></tr>
+</table>
+</div>
+
+<h3 id="ch13">Chapter 13: Campaign Warfare — War as a Series of Battles</h3>
+<p class="text-sm">A campaign is a series of battles, maneuvers, and strategic decisions with a narrative arc: <strong>Opening Moves</strong> (strategy, logistics, initial engagements), <strong>Maneuver</strong> (flanking, feints, jockeying for position), <strong>Climax</strong> (the major battle that decides the campaign), and <strong>Resolution</strong> (pursuit, negotiation, or continuation).</p>
+
+<div class="table-wrap">
+<table>
+<caption>Campaign Turn Sequence</caption>
+<tr><th>Phase</th><th>What Happens</th></tr>
+<tr><td>Planning</td><td>Decide strategic objectives and movement of forces</td></tr>
+<tr><td>Movement</td><td>Move armies; resolve marches</td></tr>
+<tr><td>Combat</td><td>Resolve battles and sieges</td></tr>
+<tr><td>Logistics</td><td>Manage supplies, recruitment, and replacements</td></tr>
+<tr><td>End</td><td>Update status; determine new objectives</td></tr>
+</table>
+</div>
+
+<p class="text-sm">PCs make campaign-level decisions in four categories — Strategic ("Where do we march? Who do we ally with?"), Tactical ("How do we use our forces? Where do we strike?"), Logistical ("Where do we get supplies?"), and Political ("What do we promise our allies? What do we demand of our enemies?"). Success grants an advantage in the next battle, keeps alliances holding, and keeps supplies flowing; partial success is mixed; failure brings disadvantage, fraying alliances, and cut supplies.</p>
+
+<div class="table-wrap">
+<table>
+<caption>Campaign Timers</caption>
+<tr><th>Timer</th><th>Tracks</th></tr>
+<tr><td>War Weariness [10]</td><td>Exhaustion of the war effort. Advances with each major battle; retreats on victory. When full, both sides seek peace or collapse.</td></tr>
+<tr><td>Alliance Stability [8]</td><td>Cohesion of the PCs' alliances. Advances when promises are broken or key battles are lost; retreats when alliances are reinforced. When full, alliances break.</td></tr>
+<tr><td>Enemy Momentum [8]</td><td>Enemy's strategic advantage. Advances on enemy victories or PC strategic failures; retreats on PC victories. When full, the enemy achieves a significant victory.</td></tr>
+<tr><td>Supply Chain [10]</td><td>Overall supply situation. Advances when supply lines are cut or resources scarce; retreats when supplies are secured. When full, the army is starving and near collapse.</td></tr>
+</table>
+</div>
+
+<blockquote>"A war is not won by a single battle. It is won by a thousand decisions — each one small, each one hard, each one made by a person who does not know if they are making the right choice."</blockquote>
+
+<h3 id="ch14">Chapter 14: Aftermath — Victory, Defeat, and the Scars of War</h3>
+<p class="text-sm">Victory is not free. Even winning a war leaves scars: casualties (the dead, the wounded, the traumatized), spent resources, exhausted morale, new political enemies, and a scarred land, people, and army. Mechanically: units lose Cohesion and need time to replace losses; supplies and money must be found; the army and the country need time to recover; relationships with allies and enemies may shift.</p>
+<p class="text-sm">Defeat is worse — heavier casualties, resources lost or captured, morale severely damaged, allies who may abandon you, and enemies who press their advantage. Its scars run deeper and may never fully heal.</p>
+
+<div class="grid-3">
+    <div class="card panel-red">
+        <div class="card-title">Land Scars</div>
+        <p class="text-sm mt-1">Ruined cities and villages, burned farms and famine, poisoned or trench-scarred earth, and land permanently marked by magical use.</p>
+    </div>
+    <div class="card panel-purple">
+        <div class="card-title">People Scars</div>
+        <p class="text-sm mt-1">Trauma among soldiers and civilians, grief for family and homes lost, displacement of refugees, and rising anger and hatred.</p>
+    </div>
+    <div class="card panel-mist">
+        <div class="card-title">Soldier Scars</div>
+        <p class="text-sm mt-1">Physical wounds that may not fully heal, psychological wounds that may never heal, permanent change, and disconnection from civilian life.</p>
+    </div>
+</div>
+
+<p class="text-sm mt-1"><strong>Returning Home:</strong> after a campaign, each soldier makes a Spirit + Resolve roll. Success: unchanged. Partial: gains a permanent Condition. Miss: gains a serious Condition or must leave the campaign. PCs may likewise gain a Condition ("War-Weary," "Haunted," "Hardened") and a Boon ("Combat Veteran," "Network of Contacts," "Heroic Reputation").</p>
+
+<div class="table-wrap">
+<table>
+<caption>Scar Mechanics (Optional)</caption>
+<tr><th>Scar</th><th>Mechanical Effect</th></tr>
+<tr><td>War-Weary</td><td>−1 on Spirit rolls to resist fear; +1 on Endurance rolls (used to hardship)</td></tr>
+<tr><td>Haunted</td><td>−1 on Wits rolls after a failed rest (nightmares); +1 on Insight rolls (hypervigilance)</td></tr>
+<tr><td>Hardened</td><td>−1 on social rolls requiring empathy; +1 on Command rolls</td></tr>
+<tr><td>Bonded Survivors</td><td>+1 when fighting alongside a specific unit or character; −1 when they are threatened</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2 id="appendix-a">Appendix A: Quick Reference Tables</h2>
+<p class="text-sm text-muted">These tables restate the core rolls above in a single place for the table.</p>
+
+<div class="table-wrap">
+<table>
+<caption>A.1 Command Roll Outcomes</caption>
+<tr><th>Outcome</th><th>Effect</th></tr>
+<tr><td>Critical Success</td><td>All units gain +1 Position; commander gains 1 Boon</td></tr>
+<tr><td>Success</td><td>Units act normally; one unit may act at +1 Position</td></tr>
+<tr><td>Partial</td><td>One unit at +1 Position, one at −1 Position</td></tr>
+<tr><td>Miss</td><td>All units at −1 Position; commander may spend 1 Boon to negate</td></tr>
+</table>
+</div>
+
+<p class="text-sm"><strong>A.2 Morale Check:</strong> Cap + Command + Morale Bonuses − Penalties. Success: unit holds. Partial: shaken (−1 Position next turn). Miss: unit routs.</p>
+
+<div class="table-wrap">
+<table>
+<caption>A.3 Unit Harm</caption>
+<tr><th>Cap</th><th>Harm Levels</th></tr>
+<tr><td>1</td><td>2</td></tr>
+<tr><td>2</td><td>3</td></tr>
+<tr><td>3</td><td>4</td></tr>
+<tr><td>4</td><td>5</td></tr>
+<tr><td>5</td><td>6</td></tr>
+</table>
+</div>
+
+<div class="table-wrap">
+<table>
+<caption>A.4 Morale Modifiers</caption>
+<tr><th>Factor</th><th>Effect</th></tr>
+<tr><td>Victory</td><td>+1</td></tr>
+<tr><td>Defeat</td><td>−1</td></tr>
+<tr><td>Supply</td><td>+1 to −2</td></tr>
+<tr><td>Command</td><td>+1 to −2</td></tr>
+<tr><td>Pay</td><td>+1 to −2</td></tr>
+<tr><td>Cause</td><td>+1 to −1</td></tr>
+<tr><td>Elite Unit</td><td>+1</td></tr>
+<tr><td>Green Unit</td><td>−1</td></tr>
+</table>
+</div>
+
+<div class="table-wrap">
+<table>
+<caption>A.5 Logistics Tracks (effect at 6+)</caption>
+<tr><th>Track</th><th>Effect</th></tr>
+<tr><td>Food</td><td>−1 Cohesion/day</td></tr>
+<tr><td>Arms</td><td>−1 to all attack rolls</td></tr>
+<tr><td>Materials</td><td>−1 to all siege/magic rolls</td></tr>
+</table>
+</div>
+
+<div class="table-wrap">
+<table>
+<caption>A.6 Terrain Quick Reference</caption>
+<tr><th>Terrain</th><th>Movement</th><th>Cover</th><th>Vision</th><th>Combat</th></tr>
+<tr><td>Open Field</td><td>Normal</td><td>None</td><td>Good</td><td>Normal</td></tr>
+<tr><td>Hill</td><td>1.5× up</td><td>Partial</td><td>Varies</td><td>+1 Position</td></tr>
+<tr><td>Forest</td><td>0.5×</td><td>Good</td><td>Poor</td><td>Ambush</td></tr>
+<tr><td>Marsh</td><td>0.25×</td><td>None</td><td>Poor</td><td>−1 Position</td></tr>
+<tr><td>Urban</td><td>0.5×</td><td>Good</td><td>Limited</td><td>+1 Defense</td></tr>
+<tr><td>Water</td><td>0.5×</td><td>None</td><td>Poor</td><td>Vulnerable</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2 id="appendix-b">Appendix B: Scenario Generator</h2>
+
+<div class="table-wrap">
+<table>
+<caption>B.1 Battle Generator (d12)</caption>
+<tr><th>d12</th><th>Battle Type</th><th>Description</th></tr>
+<tr><td>1</td><td>Field Battle</td><td>Two armies meet on open ground</td></tr>
+<tr><td>2</td><td>Raid</td><td>A quick strike against a vulnerable target</td></tr>
+<tr><td>3</td><td>Ambush</td><td>An attack from concealment</td></tr>
+<tr><td>4</td><td>Siege</td><td>Attack or defense of a fortified position</td></tr>
+<tr><td>5</td><td>River Crossing</td><td>An attempt to cross a river under fire</td></tr>
+<tr><td>6</td><td>Night Battle</td><td>A battle fought in darkness</td></tr>
+<tr><td>7</td><td>Fog Battle</td><td>A battle fought in fog or mist</td></tr>
+<tr><td>8</td><td>Rearguard Action</td><td>A delaying action to allow retreat</td></tr>
+<tr><td>9</td><td>Pursuit</td><td>A chase after a defeated enemy</td></tr>
+<tr><td>10</td><td>Breakthrough</td><td>An attempt to break through enemy lines</td></tr>
+<tr><td>11</td><td>Relief</td><td>An attempt to break a siege</td></tr>
+<tr><td>12</td><td>Naval Battle</td><td>A battle fought on water</td></tr>
+</table>
+</div>
+
+<div class="table-wrap">
+<table>
+<caption>B.2 Battle Objective Generator (d10)</caption>
+<tr><th>d10</th><th>Objective</th><th>Description</th></tr>
+<tr><td>1</td><td>Destroy the Enemy</td><td>Annihilate the opposing force</td></tr>
+<tr><td>2</td><td>Hold the Line</td><td>Stop the enemy advance</td></tr>
+<tr><td>3</td><td>Capture a Key Objective</td><td>Take a hill, bridge, or fortification</td></tr>
+<tr><td>4</td><td>Protect a Person</td><td>Rescue or defend a VIP</td></tr>
+<tr><td>5</td><td>Gain Intelligence</td><td>Capture prisoners or documents</td></tr>
+<tr><td>6</td><td>Buy Time</td><td>Delay the enemy to allow others to escape</td></tr>
+<tr><td>7</td><td>Break Through</td><td>Open a route to friendly forces</td></tr>
+<tr><td>8</td><td>Destroy Supplies</td><td>Raid enemy supply lines</td></tr>
+<tr><td>9</td><td>Show of Force</td><td>Demonstrate strength to intimidate</td></tr>
+<tr><td>10</td><td>Revenge</td><td>Settle a score; prove a point</td></tr>
+</table>
+</div>
+
+<div class="table-wrap">
+<table>
+<caption>B.3 Battle Twist Generator (d10)</caption>
+<tr><th>d10</th><th>Twist</th><th>Description</th></tr>
+<tr><td>1</td><td>Reinforcements</td><td>One side receives unexpected reinforcements</td></tr>
+<tr><td>2</td><td>Weather</td><td>Weather changes dramatically</td></tr>
+<tr><td>3</td><td>Commander Down</td><td>A key commander is incapacitated or killed</td></tr>
+<tr><td>4</td><td>Betrayal</td><td>A unit switches sides</td></tr>
+<tr><td>5</td><td>Supply Issue</td><td>A supply line is cut or destroyed</td></tr>
+<tr><td>6</td><td>Heroism</td><td>A hero emerges to change the course of battle</td></tr>
+<tr><td>7</td><td>Panic</td><td>A unit routs unexpectedly</td></tr>
+<tr><td>8</td><td>Terrain</td><td>Terrain changes (a bridge collapses, a fire starts)</td></tr>
+<tr><td>9</td><td>Message</td><td>A message arrives that changes the strategic situation</td></tr>
+<tr><td>10</td><td>Omen</td><td>A divine or magical sign appears</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2 id="appendix-c">Appendix C: Unit Templates</h2>
+<p class="text-sm text-muted">Ready-to-drop unit stat blocks. Replace [Region] with the raising nation, city, or lord.</p>
+
+<div class="table-wrap">
+<table>
+<caption>C.1 Infantry Units</caption>
+<tr><th>Unit</th><th>Type</th><th>Cap</th><th>Scale</th><th>Speed</th><th>Tags</th></tr>
+<tr><td>[Region] Levy</td><td>Light Infantry</td><td>1</td><td>II (Company, 50–100)</td><td>Standard</td><td>Green</td></tr>
+<tr><td>[Region] Infantry</td><td>Medium Infantry</td><td>2</td><td>II (Company, 50–100)</td><td>Standard</td><td>None</td></tr>
+<tr><td>[Region] Heavy Infantry</td><td>Heavy Infantry</td><td>3</td><td>II (Company, 50–100)</td><td>Slow</td><td>Shields, Armor</td></tr>
+</table>
+</div>
+
+<div class="table-wrap">
+<table>
+<caption>C.2 Cavalry Units</caption>
+<tr><th>Unit</th><th>Type</th><th>Cap</th><th>Scale</th><th>Speed</th><th>Tags</th></tr>
+<tr><td>[Region] Light Cavalry</td><td>Light Cavalry</td><td>2</td><td>II (Squadron, 30–50)</td><td>Fast</td><td>Skirmish</td></tr>
+<tr><td>[Region] Heavy Cavalry</td><td>Heavy Cavalry</td><td>3</td><td>II (Squadron, 30–50)</td><td>Fast</td><td>Armor, Charge</td></tr>
+</table>
+</div>
+
+<div class="table-wrap">
+<table>
+<caption>C.3 Skirmisher Units</caption>
+<tr><th>Unit</th><th>Type</th><th>Cap</th><th>Scale</th><th>Speed</th><th>Tags</th></tr>
+<tr><td>[Region] Archers</td><td>Archers</td><td>2</td><td>II (Company, 50–100)</td><td>Standard</td><td>Ranged</td></tr>
+<tr><td>[Region] Crossbowmen</td><td>Crossbowmen</td><td>3</td><td>II (Company, 50–100)</td><td>Slow</td><td>Ranged, Armor-Piercing</td></tr>
+</table>
+</div>
+
+<div class="table-wrap">
+<table>
+<caption>C.4 Special Units</caption>
+<tr><th>Unit</th><th>Type</th><th>Cap</th><th>Scale</th><th>Speed</th><th>Tags</th></tr>
+<tr><td>[Region] Engineers</td><td>Engineers</td><td>2</td><td>I (Squad, 10–20)</td><td>Slow</td><td>Siege</td></tr>
+<tr><td>[Region] Artillery</td><td>Artillery</td><td>2</td><td>I (Squad, 10–20)</td><td>Very Slow</td><td>Siege, Area</td></tr>
+</table>
+</div>
+<p class="text-sm text-muted">All templates share Tracks: Cohesion [6], Exposure [6], Resources [6].</p>
+
+<hr>
+
+<h2 id="appendix-d">Appendix D: War Campaign Generator</h2>
+
+<div class="table-wrap">
+<table>
+<caption>D.1 Campaign Structure Generator (d10)</caption>
+<tr><th>d10</th><th>Campaign Type</th><th>Description</th></tr>
+<tr><td>1</td><td>Border War</td><td>Small-scale conflict over a border dispute</td></tr>
+<tr><td>2</td><td>Civil War</td><td>Internal conflict between factions</td></tr>
+<tr><td>3</td><td>Invasion</td><td>One nation invades another</td></tr>
+<tr><td>4</td><td>Defensive War</td><td>A nation fights to defend itself</td></tr>
+<tr><td>5</td><td>Holy War</td><td>A conflict driven by religious fervor</td></tr>
+<tr><td>6</td><td>War of Succession</td><td>Conflict over who rules</td></tr>
+<tr><td>7</td><td>War of Independence</td><td>A region fights to break away</td></tr>
+<tr><td>8</td><td>Proxy War</td><td>Two larger powers fight by proxy</td></tr>
+<tr><td>9</td><td>Total War</td><td>An existential conflict</td></tr>
+<tr><td>10</td><td>War of Conquest</td><td>One nation aims to conquer another</td></tr>
+</table>
+</div>
+
+<div class="table-wrap">
+<table>
+<caption>D.2 Campaign Phase Generator (d6)</caption>
+<tr><th>d6</th><th>Phase</th><th>What Happens</th></tr>
+<tr><td>1</td><td>Opening Moves</td><td>Initial engagements; both sides test each other</td></tr>
+<tr><td>2</td><td>Maneuver</td><td>Armies move to gain advantage</td></tr>
+<tr><td>3</td><td>Climax</td><td>A decisive battle is fought</td></tr>
+<tr><td>4</td><td>Stalemate</td><td>Neither side can gain advantage</td></tr>
+<tr><td>5</td><td>Pursuit</td><td>One side pursues a defeated enemy</td></tr>
+<tr><td>6</td><td>Negotiation</td><td>Both sides seek a diplomatic solution</td></tr>
+</table>
+</div>
+
+<div class="table-wrap">
+<table>
+<caption>D.3 Campaign Twist Generator (d10)</caption>
+<tr><th>d10</th><th>Twist</th><th>Description</th></tr>
+<tr><td>1</td><td>Third Party</td><td>A new faction enters the war</td></tr>
+<tr><td>2</td><td>Betrayal</td><td>An ally betrays the PCs</td></tr>
+<tr><td>3</td><td>Unexpected Alliance</td><td>Former enemies become allies</td></tr>
+<tr><td>4</td><td>Plague</td><td>An outbreak affects the armies</td></tr>
+<tr><td>5</td><td>Miracle</td><td>A divine or magical event turns the tide</td></tr>
+<tr><td>6</td><td>Supply Crisis</td><td>A major supply line is cut</td></tr>
+<tr><td>7</td><td>Mutiny</td><td>A unit rebels against its commanders</td></tr>
+<tr><td>8</td><td>Dynastic Crisis</td><td>A succession crisis disrupts one side</td></tr>
+<tr><td>9</td><td>Peace Offer</td><td>The enemy offers terms</td></tr>
+<tr><td>10</td><td>Daring Raid</td><td>A raid achieves an unexpected outcome</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2 id="campaign-seeds">Campaign Seeds for The Art of War</h2>
+<p class="text-sm">The following campaign seeds are original constructs built from Fate's Edge's strategic systems, intended for use with the mass combat, logistics, and command rules above. Map their geography — rivers, mountain passes, fortified cities — onto your own campaign world.</p>
+
+<h3>The Siege of the White City</h3>
+<p class="text-sm">For three years, a holy crusade has swept the southern deserts, burning temples and breaking old covenants. Now its armies — a coalition of heavy infantry, fanatical pilgrims, and mercenary companies — have surrounded the White City, the last bastion of the desert lords. The wells are failing, the walls are cracked, and the defenders are outnumbered ten to one. But the crusade's commander is a war-weary veteran, not a fanatic, and the city's defender is a poet-prince who knows victory is impossible but surrender is worse. The siege is a war of brinkmanship: raids, counter-raids, parleys, and the slow calculus of starvation. Both sides are waiting for the other to break — or for a miracle.</p>
+
+<div class="panel panel-orange">
+    <strong>Factions &amp; Actors</strong>
+    <p class="text-sm mt-1"><strong>The Crusader Host</strong> — a polyglot siege army bound by pay and plunder, with the finest siege engines in the known world. <em>Goal:</em> take the city and open the southern trade routes. <em>Tension:</em> unpaid mercenaries, blood-hungry pilgrims, and veterans counseling patience.</p>
+    <p class="text-sm mt-1"><strong>The White City Garrison</strong> — desert cavalry, exiled veteran guards, and city militia: outnumbered, undersupplied, and running out of hope, but they know the desert and their walls. <em>Goal:</em> hold out until winter rains strangle the besiegers' supply lines, or until eastern relief arrives. <em>Tension:</em> some want an honorable surrender; others would rather die fighting.</p>
+    <p class="text-sm mt-1"><strong>The Neutral Merchants</strong> — spice traders and financiers keeping cordial relations with both camps. <em>Goal:</em> broker a truce, preserve their warehouses, and become the indispensable intermediaries of any peace.</p>
+    <p class="text-sm mt-1"><strong>The Secret Cult</strong> — a shadowy sect that believes the siege is a divine test, and that only the sacrifice of the city's prince can save it. <em>Goal:</em> deliver the prince to their patron, willingly or not, and break the siege through supernatural means.</p>
+</div>
+
+<div class="table-wrap">
+<table>
+<caption>Strategic Timers</caption>
+<tr><th>Timer</th><th>Tracks</th></tr>
+<tr><td>Siege Intensity [8]</td><td>Pressure of the Crusaders' operations. Rises with each successful assault, breach, or captured wall; falls on a Crusader reverse, a cut convoy, or an extended truce. At 4, the outer walls are compromised (defenders −1 Position on defense); at 8, the inner city is breached.</td></tr>
+<tr><td>Defender Morale [6]</td><td>The garrison's will to continue. Rises when a raid is repelled, relief is spotted, or a victory is won; falls when food runs short, an officer dies, or a spy is uncovered. At 0, the garrison may mutiny or surrender; at 6, it fights with desperate valor (+1 Position on defense).</td></tr>
+<tr><td>Relief Column [6]</td><td>The approach of an eastern relief force. Rises each day the defenders hold; falls if the Crusaders intercept and destroy the column. At 6, the relief force arrives and the siege becomes a two-army battle.</td></tr>
+</table>
+</div>
+
+<p class="text-sm"><strong>Campaign Arcs:</strong></p>
+<ol class="text-sm">
+    <li><strong>The Investment</strong> — the Crusaders complete the encirclement and cut water and supply lines; the defenders mount desperate sorties for water. Key decision: fortify the inner city (lose 2 segments of Siege Intensity, gain +1 defender Morale, but the outer city is sacked) or hold the outer walls (Siege Intensity +2 this round, but a successful defense staggers Crusader morale).</li>
+    <li><strong>The Parley</strong> — commander and prince meet under truce to negotiate terms of surrender, should it come to that. Key decision: generous terms (Presence + Sway vs. a DV set by the commander's internal pressures; success buys a ceasefire and time for relief, failure hardens Crusader resolve) or a defiant stance (+2 Defender Morale but +1 Siege Intensity; the commander now commits to total victory).</li>
+    <li><strong>The Breach</strong> — bombardment collapses a section of the inner wall. Key decision: fight in the streets (Mass Combat roll at −2 Position; success forces the Crusaders back and buys time, failure and the city falls) or accept the inevitable (the prince surrenders personally to spare the city sack, at the cost of his own standing).</li>
+    <li><strong>The Intervention (optional twist)</strong> — an agent of the secret cult attempts to abduct the prince for sacrifice. The party must protect him, or weigh whether the cult's "salvation" is worth the price.</li>
+</ol>
+<p class="text-sm"><strong>Potential Endings:</strong> the <em>Honorable Surrender</em> (the city is spared, the prince exiled as a wandering poet); the <em>Last Stand</em> (the city falls but the Crusader army is gutted, the prince's death a rallying cry, the trade routes closed for a generation); the <em>Dark Gambit</em> (the sacrifice breaks the siege but leaves the city cursed under a new shadow); or the <em>Stalemate</em> (the Crusaders withdraw for winter, a fragile peace born of exhaustion holding for a decade — until it doesn't).</p>
+
+<h3>The King of the Mountain</h3>
+<p class="text-sm">An aging mountain king, last of his line, has gathered stone-warriors, human mercenaries, and loyal lowland allies to hold a vital pass against a tide of eastern confederates pouring off the high steppe. It's a brutal war of attrition, decided by engineering, terrain, and will — but the invaders are no mindless horde. They are a sophisticated, oath-bound coalition with their own strategic genius and their own reasons to fight.</p>
+
+<div class="panel panel-blue">
+    <strong>Factions &amp; Actors</strong>
+    <p class="text-sm mt-1"><strong>The Mountain Kingdom</strong> — the defenders, reinforced by hired stoneworker mercenaries and allied lowland levies. <em>Goal:</em> hold the pass until winter snow forces the invaders back, at maximal cost to the enemy.</p>
+    <p class="text-sm mt-1"><strong>The Great Khanate</strong> — a vast nomadic confederation, led by a warlord whose strategic genius matches his mastery of logistics and rapid maneuver; a coalition of clan-lords bound by oath and the promise of plunder, with siege engineers equal to any in the mountain kingdom. <em>Goal:</em> break the pass and secure winter grazing lands for clans pushed east by drought — to settle, not merely raid.</p>
+    <p class="text-sm mt-1"><strong>The Neutral Duchies</strong> — border lords terrified of the Khanate but too cynical to commit. <em>Goal:</em> wait to see which way the wind blows.</p>
+</div>
+
+<div class="table-wrap">
+<table>
+<caption>Strategic Timers</caption>
+<tr><th>Timer</th><th>Tracks</th></tr>
+<tr><td>Pass Integrity [8]</td><td>Condition of the fortifications. Rises when a siege or assault is repelled; falls when a wall is breached, a gate burned, or a siege engine gains a foothold. At 4, a sector is lost (−1 Position on defense there); at 8, the defenders fall back to a secondary line.</td></tr>
+<tr><td>Khanate Cohesion [6]</td><td>The invaders' internal unity. Rises with battles won and plunder fairly shared; falls when a clan feels slighted or supply runs short. At 0, the Khanate fractures into feuding warbands; at 6, it fights with +1 Position on all rolls.</td></tr>
+<tr><td>Alliance Cohesion [6]</td><td>Loyalty of the defenders' lowland allies and mercenaries. Rises on decisive victories or held ground; falls on major losses, unpaid contracts, or abandoned allies. At 0, a key ally defects, potentially opening a flank.</td></tr>
+</table>
+</div>
+
+<p class="text-sm"><strong>Campaign Arcs:</strong></p>
+<ol class="text-sm">
+    <li><strong>The First Wave</strong> — light horse-archers and conscripts probe the defense. Key decision: commit elite units (risk irreplaceable troops for +2 Position on defense) or use mercenaries as a sacrificial screen (preserve veterans, but risk a morale penalty if the screen breaks).</li>
+    <li><strong>The Siege of the Gate</strong> — siege towers, rams, and sappers batter the main gate. Key decision: hold the gate (+1 Position on defense, slows the siege timer, but a prolonged siege drains supplies) or sortie to burn the siege engines (Wits + Tactics; success destroys an engine and advances Pass Integrity by 2, failure invites a devastating counter-charge).</li>
+    <li><strong>The Winter March</strong> — unable to break the pass directly, the Khanate finds a narrow goat-track that could let them flank the defense. Key decision: abandon the pass for a delaying action in the rear (Tactics roll to set an ambush; success gives Dominant Position and may halt the flank) or trust the track's treachery and hold the pass (no roll, but risk being caught between two attacks if the legend proves false).</li>
+</ol>
+<p class="text-sm"><strong>Potential Endings:</strong> <em>Victory</em> (the pass holds, the Khanate's coalition breaks, the king's name becomes a byword for defiance); <em>Broken Alliance</em> (the pass holds but the lowland allies feel betrayed by tactics that favored the stone-warriors, and the kingdom's friendships shatter even as it survives); or <em>The Mountain Falls</em> (the flank succeeds, the kingdom is overrun — but the victors demand tribute and open trade rather than raze the land, crowning their warlord as a new kind of king).</p>
+
+<h3>The Iron Compact</h3>
+<p class="text-sm">A generation of drought and overpopulation has pushed the eastern steppe clans westward. A visionary khatun has forged a fragile coalition of clan-lords, promising not plunder but land — fertile valleys abandoned by a lowland empire grown soft and complacent. Her army is a migration, not merely a raid, and the campaign is a war of movement and negotiation, where supply lines and the consent of the conquered matter as much as steel.</p>
+
+<div class="panel panel-green">
+    <strong>Factions &amp; Actors</strong>
+    <p class="text-sm mt-1"><strong>The Iron Compact</strong> — herdsmen, warriors, shamans, and families bound by personal oath to the khatun; strength in mobility and adaptability. <em>Goal:</em> secure new grazing land and integrate with the local population rather than displace it.</p>
+    <p class="text-sm mt-1"><strong>The Decadent Kingdom</strong> — a once-great river kingdom riven by court faction, its army professional but unmotivated, its fortifications neglected. <em>Goal:</em> protect the heartland, though its leaders are divided on fighting, negotiating, or fleeing.</p>
+    <p class="text-sm mt-1"><strong>The Frontier Lords</strong> — pragmatic border nobility who know the crown won't save them. <em>Goal:</em> cut a deal that preserves their lands under new suzerainty.</p>
+    <p class="text-sm mt-1"><strong>The Gold Cults</strong> — merchant guild-masters who see the advance as a chance to break the kingdom's trade monopolies. <em>Goal:</em> fund the khatun for favorable trading rights and a place in the new order.</p>
+</div>
+
+<div class="table-wrap">
+<table>
+<caption>Strategic Timers</caption>
+<tr><th>Timer</th><th>Tracks</th></tr>
+<tr><td>Compact Unity [8]</td><td>Loyalty of the clans to the khatun's vision. Rises with conquest, fair plunder, and battle victory; falls when a clan feels slighted or supply runs short. At 4, a powerful clan may break away; at 8, the Compact is unstoppable (+1 Position on all rolls).</td></tr>
+<tr><td>Kingdom Resolve [6]</td><td>The lowland kingdom's will to resist. Rises when a city holds or a noble rallies the court; falls when a city falls or the court descends into paralysis. At 0, leadership collapses; at 6, +1 Position on defense.</td></tr>
+<tr><td>Frontier Loyalty [6]</td><td>Allegiance of the border lords. Rises when the kingdom sends aid; falls when aid fails to arrive or the Compact offers better terms. At 0, the frontier lords swear to the khatun, opening the path to the heartland.</td></tr>
+</table>
+</div>
+
+<p class="text-sm"><strong>Campaign Arcs:</strong></p>
+<ol class="text-sm">
+    <li><strong>The Crossing of the Steppe</strong> — the migration begins. Key decision: move fast and light (leaving a rearguard vulnerable, +1 Speed) or safe and steady (protecting families at the cost of speed, +1 Cohesion).</li>
+    <li><strong>The Siege of the Border Fortresses</strong> — the Compact must take the frontier strongholds. Key decision: starve them out (Logistics roll; success secures the forts without costly assault) or send envoys with generous terms (Presence + Sway; success wins the lords' allegiance and +2 Position for the next phase).</li>
+    <li><strong>The Battle of the Ford</strong> — the kingdom's main army arrives to fight. Key decision: feign a retreat to draw the heavy infantry into a trap (Deception roll; success gives Dominant Position, failure turns the feint into a real rout) or commit the elite riders to a decisive charge on the enemy center (Tactics roll; success shatters the kingdom's army, failure costs the Compact's elite dearly).</li>
+</ol>
+<p class="text-sm"><strong>Potential Endings:</strong> <em>The New Kingdom</em> (a hybrid steppe-settler state, the khatun its first queen); <em>The Compromise</em> (a semi-autonomous frontier territory under nominal tribute); or <em>The Fracture</em> (a jealous clan-lord's rebellion scatters the Compact before the conquest is complete).</p>
+
+<h3>The Peacock Throne's Shadow</h3>
+<p class="text-sm">In the heart of the Dhaharan basin, an ancient throne of millennia-old legitimacy stands empty. The monarch died without a clear heir, and three rival claimants — each backed by a different power bloc — tear the kingdom apart. This is a multi-front political war fought for hearts and minds as much as fields and forts, where propaganda, oaths, and secret pacts shift like tides.</p>
+
+<div class="panel panel-purple">
+    <strong>Factions &amp; Actors</strong>
+    <p class="text-sm mt-1"><strong>Claimant A, the True Heir</strong> — the old king's eldest son, backed by conservative nobility and a priestly order guarding the ancient rites. <em>Goal:</em> claim the throne by right of blood and restore the old order.</p>
+    <p class="text-sm mt-1"><strong>Claimant B, the Reformer</strong> — a charismatic younger prince, supported by river-port merchant guilds and a sect of religious renewal. <em>Goal:</em> claim the throne by the will of the people and open an era of trade and tolerance.</p>
+    <p class="text-sm mt-1"><strong>Claimant C, the Foreign Puppet</strong> — a prince installed by a rival foreign power hoping to turn an old enemy into a client state. <em>Goal:</em> make the kingdom a vassal, securing tribute and military access.</p>
+</div>
+
+<div class="table-wrap">
+<table>
+<caption>Strategic Timers</caption>
+<tr><th>Timer</th><th>Tracks</th></tr>
+<tr><td>Kingdom Stability [8]</td><td>General peace and social cohesion. Rises when atrocities are avoided and markets stay open; falls when a city is sacked or troops requisition food brutally. At 0, the kingdom collapses into anarchy; at 8, it unifies under a strong ruler (+1 Position on all rolls).</td></tr>
+<tr><td>Foreign Intervention [6]</td><td>Outside powers' involvement. Rises when a patron sends overt military support; falls when interest wanes. At 6, the war becomes a proxy conflict and both sides suffer −1 Position from divided loyalties and uncertain supply.</td></tr>
+<tr><td>Peasant Revolt [6]</td><td>Anger of the common people. Rises with seized grain, forced levies, and scorched earth; falls when a claimant addresses grievances. At 6, the peasants rise against all claimants, imposing −2 Position on every military unit as loyalty evaporates.</td></tr>
+</table>
+</div>
+
+<p class="text-sm"><strong>Campaign Arcs:</strong></p>
+<ol class="text-sm">
+    <li><strong>The First Blood</strong> — a claimant is assassinated or nearly poisoned, and the kingdom erupts into shifting alliances and street-corner skirmishes. Key decision: which claimant do the PCs support, and can they survive the opening weeks of fluid loyalty?</li>
+    <li><strong>The Battle of the Three Armies</strong> — all three claimants meet on one field outside the capital. Key decision: join the fight on one side, or attempt a three-way parley (Presence + Sway vs. a DV that rises with each claimant's suspicion; success buys a cease-fire and a shot at power-sharing).</li>
+    <li><strong>The Siege of the Capital</strong> — the two victors besiege the last claimant in the ancient capital. Key decision on the defeated claimant's fate: <em>Justice</em> (Wits + Law; a trial that may create a martyr), <em>Exile</em> (removes the danger, but a possible future rebel remains at large), or a <em>Puppet Regime</em> (Presence + Sway to maintain the façade; stable control but risk of future insurgency).</li>
+</ol>
+<p class="text-sm"><strong>Potential Endings:</strong> the <em>True Heir's Victory</em> (stable but ossified, resistant to change); the <em>Reformer's Victory</em> (dynamic and open, but ancient traditions lost); the <em>Puppet's Victory</em> (wealthy and at peace, but not its own master); or the <em>Peasant's Victory</em> (a fragile new Republic, free of monarchs but weak and fractious).</p>
+
+<h3 id="optional-twists">Optional Twists (Applicable to Any Seed)</h3>
+<ul class="text-sm">
+    <li><strong>The Treacherous Ally:</strong> a trusted lord, mercenary captain, or guildmaster is secretly in the enemy's pay, and their betrayal lands at the worst possible moment.</li>
+    <li><strong>The Divine Intervention:</strong> a patron spirit, elemental force, or forgotten power manifests at a critical juncture. Those who perform the proper rites may gain a boon (+1 Position, a free reroll, temporary immunity to Morale checks); those who ignore the sign suffer a penalty.</li>
+    <li><strong>The Forgotten Enemy:</strong> a dormant threat — a slumbering horror, a spreading plague, a stirring rival power — awakens mid-war, forcing both sides to choose between uniting against the new peril or risking annihilation.</li>
+</ul>
+
+<hr>
+
+<h2 id="epilogue">Epilogue — The General's Final Counsel</h2>
+<blockquote>
+    "I have given you the tools. I have given you the principles. I have given you the warning that war is a fire that burns those who touch it — and those who only stand near it. What you do with these tools, these principles, this knowledge, is your choice. But remember: war is not a game. It is a tragedy. If you must play it, play it well — and try to leave something worth saving behind."
+</blockquote>
+<blockquote>
+    "The road is long. The war is hard. The scars will remain. But if you fight for something worth fighting for — something that can survive the war and grow after it — then the scars will be a testimony to what you built, not a monument to what you burned."
+</blockquote>
+<blockquote>
+    "Go now. The campaign awaits."
+</blockquote>
+<p class="text-sm text-muted">— General Marcus Valerius, Eastern Marches Command, Ecktoria</p>
+
+<footer>
+    <em>Fate's Edge Proprietary Content — &copy; 2024 Nicholas A. Gasper. All rights reserved.</em>
+</footer>
+
+</body>
+</html>

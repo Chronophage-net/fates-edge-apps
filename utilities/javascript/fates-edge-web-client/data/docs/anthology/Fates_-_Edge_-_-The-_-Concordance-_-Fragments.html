@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Concordance Fragments — Tales from the Kon'reh Sourcebook</title>
+<style>
+:root {
+    --bg1: #0a0e13;
+    --bg2: #11161d;
+    --bg3: #171e27;
+    --bg4: #1f2733;
+    --text: #dde3e8;
+    --text2: #a3adb8;
+    --text3: #69737e;
+    --brass: #c9a24b;
+    --brass-hover: #e0bd68;
+    --border: #29323e;
+    --teal: #3c8079;
+    --gold: #c9a24b;
+    --ink: #4d6a8a;
+    --red: #8a4a3f;
+    --green: #4f7a63;
+    --blue: #3d6a8a;
+    --purple: #6a5c82;
+    --radius: 8px;
+    --font: 'Georgia', 'Iowan Old Style', 'Palatino Linotype', serif;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+    background: var(--bg1);
+    background-image: radial-gradient(circle at 50% 0%, #131a22 0%, #0a0e13 60%);
+    color: var(--text);
+    font-family: var(--font);
+    padding: 1.5rem;
+    max-width: 980px;
+    margin: 0 auto;
+    line-height: 1.7;
+}
+h1, h2, h3, h4 { color: var(--gold); margin: 0.6rem 0 0.4rem; font-weight: 600; letter-spacing: 0.01em; }
+h1 { font-size: 2rem; border-bottom: 2px solid var(--gold); padding-bottom: 0.4rem; }
+.subtitle { color: var(--text2); font-style: italic; margin-bottom: 0.8rem; font-size: 1rem; }
+h2 { font-size: 1.5rem; border-bottom: 1px solid var(--border); padding-bottom: 0.25rem; margin-top: 2.5rem; color: var(--teal); }
+h3 { font-size: 1.2rem; margin-top: 1.6rem; color: var(--brass-hover); }
+a { color: var(--gold); text-decoration: none; }
+a:hover { color: var(--brass-hover); }
+p { margin: 0.6rem 0; color: var(--text); }
+.byline { color: var(--text3); font-style: italic; font-size: 0.88rem; margin: -0.1rem 0 0.6rem; padding-left: 0.7rem; border-left: 2px solid var(--border); }
+.closing { color: var(--text2); font-style: italic; border-left: 3px solid var(--gold); padding-left: 0.8rem; margin: 0.8rem 0; font-size: 0.92rem; }
+.panel {
+    background: var(--bg2);
+    border-radius: var(--radius);
+    padding: 0.8rem 1rem;
+    border: 1px solid var(--border);
+    margin: 0.7rem 0;
+}
+.panel-gold { border-left: 4px solid var(--gold); }
+.panel-teal { border-left: 4px solid var(--teal); }
+.panel-blue { border-left: 4px solid var(--blue); }
+.panel-green { border-left: 4px solid var(--green); }
+.panel-purple { border-left: 4px solid var(--purple); }
+.panel-red { border-left: 4px solid var(--red); }
+.badge {
+    display: inline-block;
+    padding: 0.05rem 0.55rem;
+    border-radius: 12px;
+    font-size: 0.68rem;
+    font-weight: 600;
+    margin: 0.1rem 0.2rem 0.1rem 0;
+}
+.badge-gold { background: var(--gold); color: #1a1408; }
+.badge-teal { background: var(--teal); color: #06110f; }
+.badge-blue { background: var(--blue); color: #fff; }
+.badge-purple { background: var(--purple); color: #fff; }
+.badge-green { background: var(--green); color: #fff; }
+.badge-gray { background: var(--bg4); color: var(--text3); }
+.text-muted { color: var(--text3); }
+.text-sm { font-size: 0.88rem; }
+hr { border: none; border-top: 1px solid var(--border); margin: 1.4rem 0; }
+.toc { background: var(--bg3); border-radius: var(--radius); padding: 0.8rem 1.1rem; border: 1px solid var(--border); columns: 2; column-gap: 1.6rem; }
+.toc-title { column-span: all; }
+.toc h3 { margin-top: 0; color: var(--gold); font-size: 1.05rem; }
+.toc-section { margin: 0.7rem 0 0.3rem; color: var(--brass-hover); font-weight: 600; font-size: 0.95rem; break-inside: avoid; }
+.toc a { color: var(--text2); display: block; padding: 0.08rem 0; font-size: 0.85rem; break-inside: avoid; }
+.toc a:hover { color: var(--brass-hover); }
+@media (max-width: 650px) { .toc { columns: 1; } }
+blockquote {
+    border-left: 3px solid var(--gold);
+    padding-left: 1rem;
+    margin: 0.6rem 0;
+    color: var(--text2);
+    font-style: italic;
+}
+.frame {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 0.9rem 1.1rem;
+    margin: 0.8rem 0;
+}
+.sep {
+    text-align: center;
+    color: var(--text3);
+    letter-spacing: 0.4em;
+    margin: 1.6rem 0;
+    font-size: 0.9rem;
+}
+table { border-collapse: collapse; width: 100%; margin: 0.8rem 0; font-size: 0.88rem; }
+th, td { border: 1px solid var(--border); padding: 0.4rem 0.6rem; text-align: left; }
+th { background: var(--bg3); color: var(--brass-hover); }
+td { background: var(--bg2); color: var(--text2); }
+footer {
+    font-size: 0.75rem;
+    color: var(--text3);
+    text-align: center;
+    padding: 1.4rem 0 0.5rem;
+    border-top: 1px solid var(--border);
+    margin-top: 2.5rem;
+}
+</style>
+</head>
+<body>
+
+<h1>🛣️ The Concordance Fragments</h1>
+<p class="subtitle">Tales from the Kon'reh Sourcebook</p>
+<p class="text-sm text-muted" style="margin-bottom:1rem;">
+    <span class="badge badge-gold">Anthology</span>
+    <span class="badge badge-teal">9 Tales</span>
+    <span class="badge badge-purple">Roads, Rule &amp; Memory</span>
+    <span class="badge badge-gray">Author: Nicholas A. Gasper</span>
+</p>
+
+<div class="frame">
+<p>Kon'reh is a board game — played in Ykrul lock-camps and Vhasian balconies, in Ashaani palace courtyards and Aeler ledger-houses, wherever two people sit down across a diamond of stone and lane and decide, for an hour, that the roads between them can be counted and priced and won. Its sourcebook is, by page count, almost entirely rules: openings, timers, heuristics, the patient arithmetic of who may seed a Sanctum and when a Blue is Rooted. Most of that belongs on a table, not in a reading chair.</p>
+<p>But scattered through the sourcebook's opening chapter — and in a handful of stranger corners further in — the rules keep giving way to something else: a caravan-scribe's travelogue of how nine cultures play the same game differently and what that says about how they rule; a queen's walking audit of her own army, conducted with two lanterns and a ledger instead of a sword; a vizier's private memorandum on the veil and the knife; a slave-scribe's testimony, written in stolen wax, about the warlord he is forced to serve; a street-corner dialogue in which a stranger dismantles a master's certainty in front of his own students; and, at the very edges of the book, an archivist's growing dread that the game his empire claims to have invented was never theirs to claim at all. Each piece is nominally about Kon'reh. None of them, in the end, is really about the game.</p>
+<p>What follows are those pieces, lightly cleared of their rules-manual furniture — the footnoted glosses, the stray mechanical asides, the typesetting wounds of a long manuscript — and left otherwise as written. Read together, they are a set of small arguments about what a shared board reveals: that a culture's approach to roads is its approach to power, that mercy and cruelty both have an arithmetic, and that even an empire's proudest export may turn out to be a road that ran through it long before it arrived.</p>
+</div>
+
+<div class="toc" id="toc">
+    <div class="toc-title"><h3>📖 Contents</h3></div>
+
+    <div class="toc-section">I. The Diwān of Roads</div>
+    <a href="#diwan-prologue">The Diwān of Roads and Boards</a>
+
+    <div class="toc-section">II. Rulers and Roads</div>
+    <a href="#widows-judgment">Grain and Spear: The Widow's Judgment</a>
+    <a href="#viziers-counsel">The Veil and the Knife: A Vizier's Private Counsel</a>
+
+    <div class="toc-section">III. Teachers and Emissaries</div>
+    <a href="#yard-dialog">The Yard-Dialog</a>
+    <a href="#embassy-dispatch">Embassy Dispatch: The Ykrul–Dhaharan Parley</a>
+
+    <div class="toc-section">IV. Letters, Testimonies &amp; Confessions</div>
+    <a href="#brother-mavron">Testimony — Brother Mavron</a>
+    <a href="#rekedim-letter">Letter: Rekedim to Duke Braedon Fenwood</a>
+    <a href="#fragment-79">Fragment 79 — On the Proliferation of the Imperial Game</a>
+    <a href="#postscript-fragment-79">Postscript — Fragment 79: The Dock Addendum, and a Duke's Confession</a>
+</div>
+
+<hr>
+
+<h2 id="section-1">I. The Diwān of Roads</h2>
+<p class="text-sm text-muted">The sourcebook opens not with rules but with a voice: a caravan-scribe and innkeeper who has spent a lifetime watching the same game played nine different ways, and who reads in each style a whole culture's theory of power.</p>
+
+<h3 id="diwan-prologue">The Diwān of Roads and Boards</h3>
+<p class="byline">Attributed to Safiya al-Fhara, caravan-scribe and innkeeper of the Nine Lanterns Way-House — the opening frame of the Kon'reh sourcebook's collected writings.</p>
+<p>They call the long road many names. In the north wind it is Kon'reh; in the delta tongue, a market slang; among the Kuvani it is <em>reshima kah mharga</em> — the Way of Silk — where bells and hooves make a single script upon the dust. I am Fhara, daughter of inns and ink, and I have kept more ledgers than winters: way-house tallies, oaths poured over cairns, and a little book of boards that turns everywhere to the same quiet geometry.</p>
+<p>In the Ykrul lock-camps the ford-wardens taught me a mercy that counts: close a road and spare a village. They braid their hair with routes and keep their promises like water kept in stone. The Ecktorian surveyors draw lines taut as harp-strings; when their hammer falls once, the world decides to be square. The Vhasian balconies polish the helm for the crowd while the true cut lands in an alley without lamps. Viterran hinges close with a soft verdict; the gate says "enough" and even horses bow. Aeler factors weigh a step like coin and bankrupt a road before they bleed for it. The Vilikari bazaars clap a tempo, and by the third beat the lane you needed is already for sale. Thepyrgosi brush sand until only one path remains; their victories are read aloud like proofs. Ubral mists keep a weather of patience, and when it lifts you learn you were four from drowning since yesterday. Silkstrand torches flare for theater while harvest happens just beyond the light. Dhaharan guilds make courtesies that spend like silver; their tolls are promises kept tomorrow. Oshiiran marshals count grain before steel and wake the road by lamp-light. The Ashaani palaces prefer the veil to the knife, but keep the knife oiled for memory. In Kahfagia the harbour-law is written with lanterns on water; jurisdiction moves like tide, and only fools defy it. And in the Lethai groves a pond holds its face until the moon moves — when it breaks once, everything is already over.</p>
+<p>I have seen drovers humble dukes and a prince offer gold to keep a sanctum empty. If the road has taught me anything, it is this: the world remembers routes, not rulers. Count the ways forward, not the men before you. The rest is boast and weather.</p>
+<p class="closing">Set at the Nine Lanterns Way-House on the reshima kah mharga, the 29th night of Shahr al-Hirr (Heat-Moon), Year 212 of the Seven Wells.</p>
+
+<h2 id="section-2">II. Rulers and Roads</h2>
+<p class="text-sm text-muted">Two accounts of power exercised as accounting — one a queen's audit conducted in the open, lantern in hand; the other a vizier's private counsel on the arts best practiced out of sight.</p>
+
+<h3 id="widows-judgment">Grain and Spear: The Widow's Judgment</h3>
+<p class="byline">A sworn field account by Ledger-Scribe Mesi ben Afya, taken three winters after the Long Sorrow — from the Oshiira chapter of the Kon'reh sourcebook. The "Widow's Judgment" is the queen's walking audit of a campaign line: part tribunal, part catechism of logistics, where promotions and punishments are given in the same breath as rations.</p>
+<p>We struck the market-square at third bell, when the heat had not yet lifted the smell of millet. The queen came with no drum, only a clerk's tablet and two lanterns on a pole. She set one lamp to the east arch and one to the west and asked the Marshal, in a voice for counting, "Name me two exits and the price for each."</p>
+<p>He gestured to men and steel. She shook her head. "Lanterns, not laurels." We hung a ribbon where a herald should stand and chalked a mark where a picket would seal the last stone before the gate. The queen said, "A road that feeds you is already a wall," and the square obeyed. Traders shifted their baskets to our side of the ledge without a word.</p>
+<p>A caravan captain, fat on private purchase, tried to push through. The queen took one pace — no flourish — and placed her hand upon his axle. "Inspection," she said. The cart was counted as army property, its oxen watered, its owner fined in salt and forgiven in public. The rumor spread quicker than the decree.</p>
+<p>By dusk the Marshal begged leave to hold the square as a throne. "Three councils only," the queen replied, pointing to the lamps. "Touch the middle once, then name your way out. Linger, and you will write your own encirclement." We broke camp with the second lamp still warm.</p>
+<p>On the fourth day we reached a quay with room for one more hull. The far port lay idle across the strait. "Plant a storehouse," the Marshal urged. The queen pressed her palm over the ledger and did not write. "Not on the first breath from home," she said. "Routes must be named before promises are posted." At dawn she returned, set the seal, and stood still while we tallied — patient a whole breath, as if she herself had to wait on the promise she'd just made real.</p>
+<p>The only time I saw her hurry was at a choke where two hills made a mouth. Bandits had cut a line of carts across the gap. The queen raised the white writ, and the line opened as if the paper were a blade. She lowered the writ and did not move again that watch. "Spend a cut to open a lane," she told the Marshal, "a leap to pass a choke — never both in one hour unless you can afford to stand still."</p>
+<p>We took no city by storm that season. We closed prices instead of gates. Villages that feared our lances learned to love our scales; the road itself came over to our side. Five dawns decided every question, as her ledger promised. On the last morning she walked the line — wells kept, bridges whole, stores sealed — and said only, "Count water before bodies."</p>
+<p>I have seen generals win squares and lose roads. The Widow wins roads and the squares fall in behind them like obedient mules. If there is a secret to her judgment, it is this: the empire moves because its grain moves, and the enemy stops when his does not. Grain and spear, in that order.</p>
+
+<h3 id="viziers-counsel">The Veil and the Knife: A Vizier's Private Counsel</h3>
+<p class="byline">A suppressed memorandum attributed to Vizier Setheru, circulated in copy among court clerks after the First Restoration — from the Ashaani chapter of the Kon'reh sourcebook. It strips the liturgy from rule and replaces it with mechanics: appearances, timing, and cost.</p>
+<p>Majesty, they will anoint you with hymns of Balance and Ever-Order. Keep them for festivals. In chambers where edicts are born, the tongue is plainer. There we speak of the Veil and the Knife.</p>
+<p>On the Sovereign's Two Hands. Your person bears two instruments. The first is the Open Palm: the public correction, the gift that is also a tax. The second is the Hidden Blade: the unseen reach that steps over what is loud to touch what is true. Spend both hands in one breath and you show the stagecraft; the mask slips, the court sees a man sweating. When that happens, you must stand very still until the illusion mends.</p>
+<p>On Raising a Wonder. To call a loyalist from a far circuit is a marvel in the eyes of the provinces. But even marvels need quiet streets. Do it when the doubters have spent their voice or are far from the square. Perform it while a skeptic stands armed before you, and you invite a sermon at your expense. And never promise a wonder the first day you leave the palace; routes must be named before banners appear.</p>
+<p>On the Middle Stones. The procession ground is for crossings, not thrones. Touch it, be seen, and name the way you will leave. Linger a third audience and the crowd begins to count your breaths for you; a sovereign who overstays the dais is negotiating with his own statue. When you descend, do not return too quickly. Let absence do its work.</p>
+<p>On Unthinkables. If the mask is struck from your face — yes, it happens — you have five breaths to reassert the story. Plant your standard on the rebel's very altar; the city will remember which god stood there last. It will cost you blood of your own — better a trusted courier than a province. Failing boldness, return to a loyal circuit and accept that its fountain will never again pour wonders for you. Failing prudence, go home and rebuild the calendar; eternity is long, and your memory must be longer.</p>
+<p class="closing">"Rule is not love. Rule is accounting. Make obedience cheaper than defiance and dress the arithmetic in silk. Offer them the Veil of order; keep the Knife for when silk tears. The world is a board of permitted roads. Those who forget that are moved. Those who remember, move others."</p>
+
+<h2 id="section-3">III. Teachers and Emissaries</h2>
+<p class="text-sm text-muted">A public humbling in a dust-scarred yard, and a private one narrowly avoided at a parley table — two accounts of people who understand, better than the men across from them, what is actually being counted.</p>
+
+<h3 id="yard-dialog">The Yard-Dialog</h3>
+<p class="byline">Recounted by Kyrus, a student of the Lyceum — an account of the stranger the artisans called the Cartwright, and of the match he was goaded into playing against Ionius the Kantós-Master, before an audience of brick-workers, sailors, and Ionius's own trailing students.</p>
+<p>I went down to the yard with Menex, wishing to see a certain man called the Cartwright — a name the Thepyrgosi give to a wagon-maker, and which had become, for this stranger, a sobriquet for a proof-builder; for though he made no carts, he was said to set weights upon men's thoughts until they bowed or broke. We found him not in the porch of the Masters, but among brick-workers and sailors, by the dust-scarred boards. He was sitting in silence. Around him stood youths and two or three graybeards who smiled as if at a dare.</p>
+<p><strong>Menex.</strong> Is that him, Kyrus? He looks more like a clerk than a champion.</p>
+<p><strong>Kyrus.</strong> Hush; for here came Ionius the Kantós-Master, he of the perfect mirrors, trailed by students with clean tablets. He greeted us with the cold courtesy of a winter sun and turned to the Cartwright.</p>
+<p><strong>Ionius.</strong> You are the one who troubles boys with riddles. Will you play a match and let us be done with fable?</p>
+<p><strong>The Cartwright.</strong> I will ask a question; if you answer, the match will answer itself.</p>
+<p><strong>Ionius.</strong> Always a question. Very well — set the stones.</p>
+<p><em>I. On Form and Time</em></p>
+<p><strong>Ionius.</strong> <em>(opening neatly)</em> The form is good: twin heralds advanced; your mirror is obliged.</p>
+<p><strong>The Cartwright.</strong> You speak of form as a statue speaks of stone. Tell me, Ionius, which wins — form or time?</p>
+<p><strong>Ionius.</strong> Without form, there is no time worth counting.</p>
+<p><strong>The Cartwright.</strong> Then answer this: if two men walk with equal stride, but one has already begun, who arrives first?</p>
+<p><strong>Ionius.</strong> The one who began — if they walk the same road.</p>
+<p><strong>The Cartwright.</strong> And the board has roads. So when you say "mirror me," you ask me to be late by your measure. Will you let me choose another clock?</p>
+<p><strong>Ionius.</strong> <em>(smiling)</em> Words. Move.</p>
+<p>They play three quiet moves; the shapes are near twins. The Cartwright slides a piece one step homeward into a square the Masters teach us to despise.</p>
+<p><strong>Menex.</strong> <em>(whispering)</em> He mis-stepped!</p>
+<p><strong>Kyrus.</strong> <em>(uneasy)</em> Or asked a question.</p>
+<p><strong>Ionius.</strong> <em>(chiding)</em> You deform your net.</p>
+<p><strong>The Cartwright.</strong> I deform your expectation. Tell me, does your doctrine forbid me this square?</p>
+<p><strong>Ionius.</strong> It is a weak square.</p>
+<p><strong>The Cartwright.</strong> Then let us see whether weakness is a square or a time.</p>
+<p><em>II. The Lantern and the Wheel</em></p>
+<p>Ionius strides his champion to the center; there is a dignified pause. The Cartwright touches and leaves at once, taking on a small exile.</p>
+<p><strong>Ionius.</strong> See, boys, how he flees the center. The lantern is leverage; he throws away the light.</p>
+<p><strong>The Cartwright.</strong> I accept night to keep the clock. Tell me, Ionius: your champion in the center — how many turns may it dwell?</p>
+<p><strong>Ionius.</strong> Three. That is law.</p>
+<p><strong>The Cartwright.</strong> And after it leaves, how long is it denied return?</p>
+<p><strong>Ionius.</strong> Two. That too is law.</p>
+<p><strong>The Cartwright.</strong> Then laws are timers with numbers on them. My law now is other: I have served my exile already. You have not. Who is nearer the second entrance — the one who played statue, or the one who played wheel?</p>
+<p><strong>Ionius.</strong> You make a boast of cowardice.</p>
+<p><strong>The Cartwright.</strong> No; I make a count of breath. Tell me, if a man holds the dais, yet the hourglass runs, who holds whom?</p>
+<p><em>III. On Mirrors</em></p>
+<p><strong>Ionius.</strong> <em>(tightening)</em> Very well; I will teach with play. <em>(He mirrors again, building a fence.)</em></p>
+<p><strong>The Cartwright.</strong> You speak often of "the mirror." But tell me — when is a mirror a trap?</p>
+<p><strong>Ionius.</strong> When a fool stares into it too long.</p>
+<p><strong>The Cartwright.</strong> And when a wise man holds it before another man's eyes, is it a trap for the holder or the gazer?</p>
+<p><strong>Ionius.</strong> <em>(irritated)</em> For the gazer.</p>
+<p><strong>The Cartwright.</strong> Then take care: you have held it long. While you admired the likeness, I counted. Your center-stays are two. Mine are none. When your third ends, you must go where you have not planned; when my exile ends, I may enter where you have planned I would not.</p>
+<p><strong>Ionius.</strong> <em>(to his students)</em> Note how the sophist calls rules "clocks" and thinks that renaming them is winning.</p>
+<p><strong>The Cartwright.</strong> I rename nothing. I only read aloud what your hand has written.</p>
+<p><em>IV. The Heresy Stated</em></p>
+<p><strong>Menex.</strong> <em>(bold now)</em> Stranger, say plainly: what is your doctrine?</p>
+<p><strong>The Cartwright.</strong> A heresy, Menex, and therefore true in part. <em>(He smiles.)</em> Break the mirror; win the clock. Do not ask: is my shape correct? Ask: which of his timers does this move press? The law is not a throne; it is a metronome. Do you dance to it, or make him stumble?</p>
+<p><strong>Ionius.</strong> And when he does not stumble?</p>
+<p><strong>The Cartwright.</strong> Then you chose the wrong clock.</p>
+<p><strong>Ionius.</strong> <em>(coldly)</em> You corrupt boys with talk of timers and refuse to teach form.</p>
+<p><strong>The Cartwright.</strong> I teach them to see that form without time is a statue in the road.</p>
+<p><em>V. The Net That Isn't There</em></p>
+<p>The Cartwright slides a stone not to block, but to look like a block; the true seal will be one file over. Ionius burns a turn to "reopen" a lane that was never closed.</p>
+<p><strong>Kyrus.</strong> <em>(aside)</em> He spends their care as if it were coin.</p>
+<p><strong>Menex.</strong> And the board? It looks… unchanged.</p>
+<p><strong>The Cartwright.</strong> <em>(hearing us)</em> Good. The better the lie, the less it moves.</p>
+<p><strong>Ionius.</strong> <em>(sensing danger)</em> What do you intend?</p>
+<p><strong>The Cartwright.</strong> Nothing new. You have told a story; I have offered two endings. You will choose the wrong one, because the right one requires you to stop being yourself for a move.</p>
+<p><strong>Ionius.</strong> <em>(flushes, plays to "punish" the apparent stopper)</em></p>
+<p><strong>The Cartwright.</strong> <em>(quietly)</em> There.</p>
+<p>A small capture, a quiet reinforcement — timed when the punish was already spent — and a seal two moves ahead. A murmur runs around the yard. Ionius's champion is later taken; the race to answer for it begins already short.</p>
+<p><em>VI. The Five Breaths</em></p>
+<p><strong>Ionius.</strong> <em>(grim)</em> You have my champion. I will plant in five.</p>
+<p><strong>The Cartwright.</strong> Will you? Name your two shortest lanes aloud, as soldiers name the gates they will hold.</p>
+<p><strong>Ionius.</strong> <em>(hesitates)</em> The western… and — <em>(he looks; the way is salted with stones already waiting, the fork prepared unseen)</em></p>
+<p><strong>The Cartwright.</strong> The lanes you count are roads I priced while you kept the lantern. This is my heresy: the board is not a picture; it is a schedule.</p>
+<p><strong>Ionius.</strong> <em>(angry)</em> You play against the spirit!</p>
+<p><strong>The Cartwright.</strong> I play against the hour.</p>
+<p>Ionius fails the fifth breath by one step. There is no triumph — only the sound of men exhaling.</p>
+<p><em>VII. The Indictment Foretold</em></p>
+<p><strong>Ionius.</strong> <em>(to the crowd)</em> You see what comes of learning in alleys. He unteaches reverence. He calls law a metronome, center a lantern, courtesy a ledger. If the city is to be sound, such men must drink the bitter tea.</p>
+<p><strong>The Cartwright.</strong> <em>(gently)</em> If the city is to be sound, such men must be asked better questions.</p>
+<p><strong>Kyrus.</strong> <em>(stepping forward)</em> Master — I mean, sir — what should we keep, if we break the mirror?</p>
+<p><strong>The Cartwright.</strong> Keep the counts. Keep mercy for men, and severity for clocks. Enter the center to cast shadows, not to pose. Move when the story has two exits for you and none for him. Spend a stroke to change the chapter, not the applause. And when they ask your school, say only: I win by making time uneven.</p>
+<p><strong>Ionius.</strong> <em>(turning away)</em> Remember, boys: there are courts for those who corrupt the young with cleverness.</p>
+<p><strong>The Cartwright.</strong> <em>(to us)</em> If they summon me, I will go. If they offer tea, I will drink. Timers run everywhere, even in halls.</p>
+<p><strong>Menex.</strong> And what shall we call your doctrine?</p>
+<p><strong>The Cartwright.</strong> Call it nothing. But if you must, call it the Wheel.</p>
+<p><strong>Kyrus.</strong> Why?</p>
+<p><strong>The Cartwright.</strong> Because it moves.</p>
+<p>He gathers the stones without pride and leaves them on the board as if to say: the question remains. We stood a while in the dust, and the Masters' lads pretended not to be thinking. I went home with a stone in my pocket and a metronome in my ear.</p>
+
+<h3 id="embassy-dispatch">Embassy Dispatch: The Ykrul–Dhaharan Parley</h3>
+<p class="byline">Preserved in a translator's hand among Duke Fenwood's papers — from the Kon'reh sourcebook. A near-catastrophe at a diplomatic table, averted by someone who understands the game being played is not the one on the board.</p>
+<p>He unveiled an "original" board… nine by nine: river-lapis set in walnut, its ninth ranks titled for saints. Our Warlord — an <em>aveth</em>, in the Ykrul way, one who stands untwinned, owing title to no dyad — stepped forward, touched the outer file as if to bless, and spat upon the ninth. Gasps; hands half-raised to hilts.</p>
+<p>I bowed and spoke in both tongues: "Not insult… warding. Salt upon a false ninth to keep the game clean." Then I set down our board: eight by eight, horse-leather stretched on a travel frame, corners fire-marked, lanes scored by knife. The Warlord placed a blue stone with a rider's thud. I softened their words for peace: "Count breaths, not baubles. Play on Eight, or do not play."</p>
+<p>The envoy's smile wavered. It was a severe misstep — to arrive with a ninth is to revise at the temple door. Tonight I will unknot what he tied: we'll send him off with the leather as a gift, call the spittle sanctification, and offer a teaching game at Eight. If I succeed, tomorrow we will speak of grain and river-rights instead of saints and squares. If I fail, the parley will end at the board before it ever reaches the table.</p>
+<p class="closing">A later marginal hand, believed to be Duke Fenwood's own, adds only this: scribes keep writing "neutral" for <em>aveth</em>, which misses the saddle entirely. It is not a lack but a stance — untwinned. The Ykrul count by eights and by pairs; an aveth stands on a single wind, owing title to none of the dyads. If the common tongue must have one word, let it be "untwinned," and be done.</p>
+
+<h2 id="section-4">IV. Letters, Testimonies &amp; Confessions</h2>
+<p class="text-sm text-muted">A slave-scribe's forced record of a warlord's exact cruelty; a sergeant's letter home about the lesson that made his doctrine; and, closing the sourcebook itself, an archivist's dawning suspicion — and the duke who compiled his fear into a book he was afraid to publish.</p>
+
+<h3 id="brother-mavron">Testimony — Brother Mavron, Scribe of the River-House at St. Valerius</h3>
+<p class="byline">Lifted from a worm-eaten ledger board recovered on Silkstrand's south quay after the spring flood, attributed to a bookman in forced service to the Acasian warlord Rothari during the Ten Winters — from the Kon'reh sourcebook.</p>
+<p>I was taken from the river-house on a wet Feast of Lanterns and told I would "write law where law will march." They put me in a leather cart with the salt and the scales and made me follow Rothari's banner as if it were an altar.</p>
+<p>He has no letters; he has measures. He cannot read a psalm, but he can count a day's forage by the angle of a mule's ribs, and fix a tithe by the sound a poor man makes when he swallows stale bread. When I set down his sayings, I find no mercy, only arithmetic. At the first bridge he asked me, "What is a span worth?" I began to answer in timber and labor. He waved me off and had three debtors hanged where the tollman could see them. "Now the span is worth this much," he said, "because men prefer to live." He bade me write: <em>Let the bridge that pays stand; let the bridge that will not, swim.</em></p>
+<p>In a hamlet of reed-cutters he ordered their well salted, then sent two skins of water to each house "so they do not die too quickly to learn." I protested that this was needless. He smiled and counted aloud to five on his fingers, one for each day before the river rose. "Deny the empty mile," he said, "and you do not have to fight it."</p>
+<p>He plays the roads as gamblers play the game. He never holds the center; he uses it to make the edges worse. He will park a squad where all can see them, then move one file aside in the night so that the only safe path is through his price. When I warned that the steppe folk would hate him, he laughed: "Hate pays when it must pass."</p>
+<p>Prisoners he counts by use. If they have hands that lift, he marks them for mills; if they have sons who can run, he marks them for ransom; if they have nothing but grievances, he marks them for the river. He does not rant. He does not gloat. He asks what the thing is for. If I say "justice," he says, "For whom."</p>
+<p>Once, after a skirmish at the saffron ferry, he found a boy hiding with a slate scratched into a diamond and four colored pebbles. The boy called it Canray. Rothari took the blue stone, put it on the center of the slate, and said, "If you stay there three breaths, you will drown on the fourth." Then he put the stone on the corner and said, "If you plant here, a village dies." He gave the slate back and told the boy to leave before dusk. "Learn the corners first," he said, "then the water."</p>
+<p>He asks me every evening what I have written. I read him his own words and hope they sound shameful when spoken. They never do. He nods as if I were tallying sacks of barley and says, "Good. Tomorrow we salt one less well and burn one more stack." I am to make a fair copy for his captains, with marks where a ferry can be raised in half a day. He calls these fire-laws. I call them grief.</p>
+<p>I pray for a learned prince to unmake him. I pray for snow to smother the roads. I pray for the sea to reach up and drag the bridges down. I pray, most of all, that my hand fails, for I see that ink is a torch in such service, and every clean line I draw is a path he will walk.</p>
+<p class="closing">If I do not live to scrape this wax clean, let whoever reads know: he is not mad. He is not ignorant. He is exact. And it is the exactness that kills.</p>
+
+<h3 id="rekedim-letter">Letter: Rekedim to Duke Braedon Fenwood</h3>
+<p class="byline">From the Black Banners quartermaster's awning, late thaw — Sgt. Rekedim Many-Scars of the Red Bill Cadre, writing to Duke Fenwood — from the Kon'reh sourcebook.</p>
+<p>To His Grace, Duke Braedon Fenwood, from Sgt. Rekedim Many-Scars of the Red Bill Cadre (Black Banners):</p>
+<p>You asked for the first movement that made my doctrine. I remember a canvas awning, oat-sacks for a table, and the supply sergeant's knuckles white with chalk. "Camp is a board," he told me. "Count roads, not bread."</p>
+<p>I led a stone to brush the center and he grunted approval. "That is a cut. Now do not chase. Fork the far mouth, two exits, both priced." I did as told and the lane tightened like a throat. My hand went to the champion. He caught my wrist. "Not yet. Rent the middle, do not buy it. If they take your champion, plant your banner at their home and rebuild behind their tolls while they are still paying for the first mistake."</p>
+<p>We played three breaths more. A seam closed and the gate said "enough." I did not smile. I counted — three in and two out — and only moved when the math said now. The sergeant nodded at the overlap where our lines met. "That is a weld. Win with welded routes."</p>
+<p>I carried that lesson forward. My fights since have been tariffs more than charges: weld first, float the rebuild, make them pay to leave and pay to return. The rest is patience and proper pricing.</p>
+<p class="closing">If you must give it a name in your Corpus, let it be the sergeant's in my ear that day: fork first; tax later. Your servant in clear roads, Rekedim.</p>
+
+<h3 id="fragment-79">Fragment 79 — On the Proliferation of the Imperial Game in Foreign Parts</h3>
+<p class="byline">Marginalia in the hand of Aqyl of Thepyrgos, recovered from a folio used as binder's waste — a pastedown leaf glued inside an Aeler ledger, bearing an Ecktorian customs docket and the Office of Customs' knotted ribbon still fixed to the fold — from the Kon'reh sourcebook.</p>
+<p>…which led me to the cargo manifests of the Sea-Scribe, out of Silkstrand. Among the bolts of cyan silk and casks of violet ink were listed three crates of "game-boxes, pieces of carved jet and pearl, with board." The bill of lading, certified by a harbor-master in that den of scoundrels, named not a noble house nor an academy, but a Vilikari factor in the Western Marches.</p>
+<p>A Vilikari. A peddler-king. In possession of the Imperial Game.</p>
+<p>The indignity of it curdled my stomach. I assumed trade — some bauble for a savage chieftain aping his betters. Then came the report from a lieutenant at Kharax: a prisoner's testimony that the Ykrul captains wager upon something they call Kon'reh. He described the diamond board. The blue stone. The orange.</p>
+<p>Coincidence, I thought. A barbarian imitation.</p>
+<p>But the pieces fell into place. Dhaharan caravan guards with polished camel-bone sets in the serai; Aeler factors settling disputes not with dice but with a quiet game on slate in their under-vaults, which they call K'thra. The terms differ; the habits rhyme.</p>
+<p>I confronted Magistrate Bollus. I showed him the manifests; the testimony. "Sir," I said, "there is a leakage. Our imperial art is being… vulgarized."</p>
+<p>He did not look up. "It is good for trade," he said. "They pay well for boxes. Tithes accrue. File as cultural exports."</p>
+<p>He did not understand. Exports are wine, silk, law. This is different. These are not imitations. The rules — so far as these fragments allow — are the same. The zones of control. The sanctums. The reforge.</p>
+<p>The rules are the same.</p>
+<p>This cannot be recent diffusion. The Ykrul host has its own terms, strategies, masters. Such depth does not bloom in a season; it roots over centuries.</p>
+<p>A terrible, treasonous thought seized me: What if we did not perfect it? What if we only codified one channel of a river far older — and far wider — than the Empire? If the Imperial Game is not solely ours, then what is? Our law? Our language? Our very identity?</p>
+<p class="closing">I shall cease. It is not safe. I will file the manifests and burn the lieutenant's report. The Empire must stand upon firm ground, not on the shifting sands of a thousand foreign boards…</p>
+
+<h3 id="postscript-fragment-79">Postscript — Fragment 79: The Dock Addendum, and a Duke's Confession</h3>
+<p class="byline">Aqyl's continued account, followed by the private confession of Duke Braedon Fenwood, compiler of the Concordance — the closing pages of the Kon'reh sourcebook.</p>
+<p>I pressed Magistrate Bollus again. This time he did look up. "Everyone along the quay knows," he said. "They play. Nothing a clerk can seal." He made a small circle with his pen. "Skins. Felt. Mats. Dust."</p>
+<p>The dockmasters speak of thin rawhide, smoke-cured and rolled tight in thong-tubes; of felted wool; of reed-mats scored with a tally-stick and flipped end-over-end to make a diamond. I have heard of squares scratched into yard-dust, wetted and re-scribed each watch. As for stones: river bone, pressed loam, salted dough baked in sun, lake-wrack knotted with gut. When the watch turns, the field is gone. Mats rot; hides scrape clean; dough breaks and is fed to dogs. There is nothing to seize, nothing to list.</p>
+<p>Bollus admitted what the quaymen already say softly: the Harbor Prefect's guidance is not written, yet remembered exactly — do not put it in a report. Boxes that pay duty are the only boards the ledger admits. The Ykrul, no fools, sell our houses jet and pearl, and play their own game on skin and silt.</p>
+<p>Thus the middens yield our boxes and keep their silence. The foreigners' practice travels lighter than wood and will outlast it, being written in hands and habits rather than cedar and brass. If this is so, our Game is not merely exported; it is everywhere, and everywhere perishable.</p>
+<p class="sep">⁂</p>
+<p><strong>A Duke's Conundrum &amp; Confession.</strong></p>
+<p>This Concordance was never meant for polite shelves. I set it down six years before any respectable Corpus, in the margins of other men's ledgers, between alarms, after games I did not deserve to win. I have long suspected the Ykrul as the riverhead of the Game; any factor on the marches knows it by other names. What shocks is not that foreigners play, but that a noble should gather their proofs and bind them together.</p>
+<p>Aqyl's scraps unsettle me; the dockwoman's fragment more so. If the Game is older than our names for it, then every certainty I parade is presumption. Here is my confession: I am not brave. I hesitate because I know what our houses prefer — an orderly lineage, with Ecktoria at its center, not a skein of roads converging from steppe and sea. I can feel the temptation to dress all this into a cleaner book — a Corpus fit for drawing rooms, with its edges sanded and its provenance politely mislaid.</p>
+<p>Shall I lock these pages under my seal? Consign them to the river? Slip one copy to a discreet printer and deny it later with a steady eye? Each act is a move; each silence, a move also. The Aeler would say the ledger is truth. The Ykrul would laugh and say the field is truth. I stand between the two, ink on my fingers, ash on my tongue.</p>
+<p class="closing">Until I choose, this remains a private map of public roads. If you are reading it, then I have either found my courage — or lost control of my valet. — Braedon Fenwood, Tarlington, Year 856 A.R.</p>
+
+<hr>
+
+<div class="frame">
+<h2 style="margin-top:0;">Colophon</h2>
+<p>The nine pieces gathered here are drawn from the Kon'reh: The Concordance manuscript, by Nicholas A. Gasper — a sourcebook otherwise devoted almost entirely to the rules, timers, and strategy heuristics of a board game played across the Fate's Edge setting's cultures. These are the passages where the rules step aside and the setting's own people speak: a caravan-scribe's frame narrative, a queen's field audit, a vizier's private memorandum, a public dialogue between a stranger and a master, a translator's near-miss at a diplomatic table, a slave-scribe's testimony, a sergeant's letter home, and an archivist's confession — closed by the duke who compiled the whole troubling manuscript and could not quite decide whether to publish it.</p>
+<p>Each piece has had a light editorial pass run over it: in-line rules-mechanics footnotes and parenthetical glosses have been removed where they interrupted the narrative without serving it, stray typesetting artifacts from the source manuscript have been mended, and nothing else has been added, rewritten, or softened. These are presented here as standalone fiction, drawn from a book about a game, in service of the stories that book could not help but also tell.</p>
+</div>
+
+<footer>
+Fate's Edge Proprietary Content — (c) 2024 Nicholas A. Gasper. All rights reserved.
+</footer>
+
+</body>
+</html>

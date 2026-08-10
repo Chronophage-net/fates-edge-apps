@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fate's Edge GM Guide — Chapter 6: Running Scenarios</title>
+<style>
+    :root {
+        --bg1: #0d0d1a;
+        --bg2: #1a1a2e;
+        --bg3: #252540;
+        --bg4: #2f2f4a;
+        --text: #e8e8f0;
+        --text2: #b8b8c8;
+        --text3: #8888a0;
+        --gold: #c9a84c;
+        --gold-hover: #d4b85c;
+        --border: #333355;
+        --red: #c0392b;
+        --green: #27ae60;
+        --blue: #2980b9;
+        --purple: #8e44ad;
+        --orange: #e67e22;
+        --radius: 8px;
+        --font: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+        background: var(--bg1);
+        color: var(--text);
+        font-family: var(--font);
+        padding: 1.5rem;
+        max-width: 1100px;
+        margin: 0 auto;
+        line-height: 1.6;
+    }
+    h1, h2, h3, h4, h5 { color: var(--gold); margin: 1rem 0 0.4rem; }
+    h1 { font-size: 1.9rem; border-bottom: 2px solid var(--gold); padding-bottom: 0.4rem; margin-top: 0; }
+    h2 { font-size: 1.4rem; border-bottom: 1px solid var(--border); padding-bottom: 0.2rem; margin-top: 1.6rem; }
+    h3 { font-size: 1.15rem; margin-top: 1.1rem; }
+    h4 { font-size: 1rem; color: var(--text); margin-top: 0.8rem; }
+    h5 { font-size: 0.9rem; color: var(--gold-hover); }
+    p { margin: 0.5rem 0; }
+    p.subtitle { color: var(--text2); font-style: italic; margin-top: -0.2rem; margin-bottom: 1rem; }
+    a { color: var(--gold); text-decoration: none; }
+    a:hover { color: var(--gold-hover); text-decoration: underline; }
+    ul, ol { margin: 0.4rem 0 0.6rem 1.4rem; }
+    li { margin: 0.2rem 0; }
+    dl { margin: 0.5rem 0; }
+    dt { font-weight: 600; color: var(--gold-hover); margin-top: 0.5rem; }
+    dd { margin-left: 1.2rem; color: var(--text2); }
+    .panel {
+        background: var(--bg2);
+        border-radius: var(--radius);
+        padding: 0.7rem 1rem;
+        border: 1px solid var(--border);
+        margin: 0.8rem 0;
+    }
+    .panel-title { color: var(--gold); font-weight: 700; margin-bottom: 0.4rem; display: block; }
+    .panel-gold { border-left: 4px solid var(--gold); }
+    .panel-red { border-left: 4px solid var(--red); }
+    .panel-blue { border-left: 4px solid var(--blue); }
+    .panel-green { border-left: 4px solid var(--green); }
+    .panel-purple { border-left: 4px solid var(--purple); }
+    .panel-orange { border-left: 4px solid var(--orange); }
+    .badge {
+        display: inline-block;
+        padding: 0.05rem 0.5rem;
+        border-radius: 12px;
+        font-size: 0.7rem;
+        font-weight: 600;
+        background: var(--bg4);
+        color: var(--text3);
+        border: 1px solid var(--border);
+    }
+    .badge-gold { background: var(--gold); color: #1a1400; border-color: var(--gold); }
+    .text-muted { color: var(--text3); }
+    .text-sm { font-size: 0.9rem; }
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; margin: 0.7rem 0; }
+    th, td { padding: 0.45rem 0.65rem; border: 1px solid var(--border); text-align: left; vertical-align: top; }
+    th { background: var(--bg4); color: var(--gold); font-weight: 600; }
+    tr:nth-child(even) { background: var(--bg2); }
+    blockquote {
+        font-style: italic;
+        border-left: 4px solid var(--gold);
+        padding: 0.5rem 1rem;
+        margin: 0.7rem 0;
+        background: var(--bg2);
+        border-radius: var(--radius);
+        color: var(--text2);
+    }
+    code { background: var(--bg4); padding: 0.1rem 0.3rem; border-radius: 4px; font-size: 0.85rem; color: var(--gold); }
+    hr { border: none; border-top: 1px solid var(--border); margin: 1.2rem 0; }
+    .toc { background: var(--bg3); border-radius: var(--radius); padding: 0.6rem 1rem; border: 1px solid var(--border); margin: 0.8rem 0 1.2rem; }
+    .toc-title { color: var(--gold); font-weight: 600; display: block; margin-bottom: 0.3rem; }
+    .toc a { color: var(--text2); display: block; padding: 0.08rem 0; font-size: 0.85rem; }
+    .toc a:hover { color: var(--gold); }
+    footer { margin-top: 2rem; padding-top: 1rem; border-top: 2px solid var(--gold); text-align: center; color: var(--text3); font-size: 0.8rem; }
+</style>
+</head>
+<body>
+
+<h1>Chapter 6: Running Scenarios</h1>
+<p class="subtitle">Fate's Edge GM Guide — Chapter 6</p>
+
+<p>A scenario is a self-contained unit of play with a clear stake, meaningful choices, and visible pressure. Your goal as GM is not to control the outcome, but to <strong>shape the pressure</strong> so that player decisions create memorable consequences. This chapter distills Fate's Edge into actionable GM techniques for facilitating scenarios — from preparation to execution — using the system's core tools: Story Beats, timers, and player agency.</p>
+
+<h2 id="mindset">GM Mindset: Co-Creating Drama</h2>
+<p>Before rolling dice, internalize these principles. They transform rule enforcement into collaborative storytelling.</p>
+
+<div class="panel panel-purple">
+<span class="panel-title">GM Core Principles</span>
+<ul>
+<li><strong>Narrative primacy:</strong> Mechanics serve the story. When in doubt, choose what creates the most dramatic consequence or interesting choice.</li>
+<li><strong>Pressure over punishment:</strong> Use Story Beats to escalate tension (e.g., "The ritual advances") not to penalize players ("You lose 2 HP").</li>
+<li><strong>Fail forward:</strong> Every roll changes the situation. A Miss isn't "nothing happens" — it's "the alarm sounds and guards converge."</li>
+<li><strong>Player agency first:</strong> Offer costs, timers, or complications instead of saying "no." ("You can try, but it will take time — tick the Ritual Timer +1.")</li>
+<li><strong>Your preparation is invisible magic:</strong> Between-session work turns random encounters into meaningful episodes. Players never see the strings — only the music.</li>
+<li><strong>Patrons are resonances, not entities:</strong> The Traveler does not <em>decide</em> to guide you. It <em>is</em> guidance. When players invoke a Patron, they are <em>attuning</em> to a frequency, not <em>petitioning</em> a being. Frame intrusions as echoes, not demands.</li>
+</ul>
+</div>
+
+<h2 id="prep">Preparing a Scenario: The 15-Minute GM Sprint</h2>
+<p>Effective scenario prep focuses on <strong>pressure points</strong>, not plots. Do this before each session:</p>
+<ol>
+<li><strong>Identify the stake:</strong> What is the players' <em>immediate</em> goal? Write it as a question: "Can they get the Sunstone in time?"</li>
+<li><strong>Set 1–3 visible timers:</strong> Use the Timer System (see "The Timer System" below) to track progress/opposition. Label them clearly: <em>Ritual Completion [6]</em>, <em>Guard Patrols [4]</em>.</li>
+<li><strong>Prepare 2–3 flexible situations:</strong> Not scripts, but pressure cookers with clear stakes and timers. Example:
+<ul>
+<li><em>Situation:</em> "The Sunstone is on a pedestal in the collapsing chamber. The ceiling cracks ominously."</li>
+<li><em>Timer:</em> <em>Chamber Collapse [8]</em> (ticks on Partial/Miss inside chamber)</li>
+<li><em>Stakes:</em> Succeed = get Sunstone; Fail = take Harm 1 + timer advances.</li>
+</ul>
+</li>
+<li><strong>Seed player hooks:</strong> Review Bonds/Complications. Ask: "How does this situation threaten what they care about?"</li>
+<li><strong>Check complication debt:</strong> Note unresolved Complications from last session — they add +1 SB to the first scene.</li>
+</ol>
+
+<div class="panel panel-blue">
+<span class="panel-title">Scenario Prep Checklist</span>
+<ul>
+<li>Stake phrased as a yes/no question</li>
+<li>1–3 visible timers named and sized (4/6/8/10)</li>
+<li>2–3 flexible situations (stake + timer)</li>
+<li>At least one player hook per PC</li>
+<li>Complication debt noted (adds SB to Scene 1)</li>
+</ul>
+</div>
+
+<h2 id="zero-prep">Zero-Prep Scene Generation</h2>
+<p>Sometimes you have no prep. Sometimes the players go somewhere you never expected. When that happens, generate a scene at the table using three draws from a standard deck:</p>
+<ol>
+<li><strong>Draw a Spade (Place):</strong> This is where the scene starts. Describe the immediate environment. (e.g., "A crumbling watchtower on a hill overlooking a cursed bridge.")</li>
+<li><strong>Draw a Heart (Actor):</strong> This is the immediate obstacle or NPC. Give them one emotion and one desire. (e.g., "A tired guard who wants to go home to his family.")</li>
+<li><strong>Draw a Club (Pressure):</strong> This is what goes wrong right now, or what is already pressing on the scene. (e.g., "A blight is spreading through the ground, corrupting everything it touches.")</li>
+<li><strong>Set a Timer:</strong> Use the highest rank from your three draws to set the scene's primary pressure (4, 6, or 8 segments). <span class="text-muted">(Rank 2–5 = 4 segments; 6–10 = 6 segments; J/Q/K = 8 segments; Ace = 10 segments.)</span></li>
+</ol>
+
+<div class="panel panel-green">
+<span class="panel-title">The Synthesis Question</span>
+<p>Ask one question to connect the three draws:</p>
+<p><strong>"How does the Pressure (Club) make the Actor (Heart)'s life harder?"</strong></p>
+<p>The answer is your scene's opening hook. Write one sentence.</p>
+</div>
+
+<p><strong>Example:</strong></p>
+<ul>
+<li>Draw Spade (Ruined Watchtower), Heart (Sad Guard), Club (Blight).</li>
+<li>Synthesis: <em>"How does the blight make the guard's life harder?"</em></li>
+<li>Answer: <em>"His wife was taken by the blight-spirits. He guards the tower hoping to find a cure, but he is losing hope."</em></li>
+<li><strong>Result:</strong> A concrete, actionable scene with an NPC, a location, and a timer (the blight's advance), generated in 30 seconds.</li>
+</ul>
+
+<p>If you have more time, draw a Diamond (Leverage) to add a reward or hidden opportunity to the scene.</p>
+
+<h2 id="loop">Running the Scene: The 90-Second Loop</h2>
+<p>Every meaningful player action follows this GM procedure. <em>Internalize this loop — it's your engine.</em></p>
+<ol>
+<li><strong>Declare intent and approach:</strong> "What do you want to do, and how?" (Player states Attribute+Skill)</li>
+<li><strong>Set Position and DV:</strong>
+<ul>
+<li><strong>Position:</strong> Dominant (advantage), Controlled (normal), Desperate (high risk). Default: Controlled.</li>
+<li><strong>DV:</strong> 2 (routine) to 5+ (extreme). Default: 3 (pressured). <em>Never inflate DV to "challenge" — use Position instead.</em></li>
+</ul>
+
+<div class="panel panel-gold">
+<span class="panel-title">Flexible Dice Pools</span>
+<p><strong>Let the fiction guide the dice pool.</strong> If a player describes a physical action (looming, threatening with a weapon), use a physical Attribute (Body + Melee). If they describe a social action (persuading, lying), use a social Attribute (Presence + Sway). The skill list is a vocabulary, not a cage.</p>
+<div class="table-wrap"><table>
+<tr><th>Action</th><th>Default Pool</th><th>Creative Alternative</th></tr>
+<tr><td>Intimidation (physical)</td><td>Presence + Command</td><td>Body + Melee</td></tr>
+<tr><td>Intimidation (verbal)</td><td>Presence + Command</td><td>Presence + Deception</td></tr>
+<tr><td>Lying</td><td>Presence + Deception</td><td>Wits + Deception</td></tr>
+<tr><td>Research</td><td>Wits + Investigation</td><td>Spirit + Lore</td></tr>
+<tr><td>Persuasion</td><td>Presence + Sway</td><td>Wits + Sway</td></tr>
+</table></div>
+<p><strong>GM Guidance:</strong></p>
+<ul>
+<li><em>Ask "How?"</em> — The player must describe how they use that Attribute and Skill together.</li>
+<li><em>Maintain Position</em> — A creative pair does not automatically improve Position or reduce DV.</li>
+<li><em>Consistency</em> — If you allow Spirit + Craft for visionary work, allow it again in similar circumstances.</li>
+<li><em>No Double Dipping</em> — The player cannot swap both Attribute and Skill to max out a single stat.</li>
+</ul>
+</div>
+Announce: "Controlled, DV 3. On a Miss, the guard hears you."
+</li>
+<li><strong>Roll and count:</strong> Pool = Attribute+Skill d10s. Successes: 6–9 = 1, 10 = 2. Count 1s for Story Beats (SB).</li>
+<li><strong>Apply Outcome Matrix:</strong>
+<ul>
+<li>Successes ≥ DV, SB=0: Clean Success — intent achieved, no complication.</li>
+<li>Successes ≥ DV, SB&gt;0: Success with SB — intent achieved; GM spends SB.</li>
+<li>0 &lt; Successes &lt; DV: Partial — progress; player gains 1 Boon.</li>
+<li>Successes = 0: Miss — no progress; player gains 2 Boons; GM spends SB.</li>
+</ul>
+<p><em>Remember: A Partial moves the story forward. A Miss always escalates.</em></p>
+</li>
+<li><strong>Spend Story Beats:</strong> Use the SB Spend Menu (see "Story Beats Spend Menu" below) to introduce complications that <em>change the situation</em>. Tie spends to visible outcomes: "I spend 2 SB — the alarm blares and two guards rush in (tick Guard Patrols +2)."</li>
+<li><strong>Describe the new situation:</strong> End with one sentence stating the new fiction: "The chamber shudders as dust rains from the ceiling — Ritual Completion is now at 5 of 6."</li>
+</ol>
+
+<div class="panel panel-green">
+<span class="panel-title">Between-Session Checklist</span>
+<ol>
+<li><strong>Update timers:</strong> Tick faction, travel, or campaign timers based on last session's outcomes.</li>
+<li><strong>Check complication debt:</strong> Note unresolved player Complications; they add +1 SB to the next session's first scene.</li>
+<li><strong>Prepare 2–3 flexible situations:</strong> Not scripts, but situations with a clear stake and a timer.</li>
+<li><strong>Review player goals:</strong> Look at Bonds, Patron obligations, and personal arcs. Seed at least one hook per player.</li>
+<li><strong>Refresh your memory:</strong> Re-read the session summary from last time (ask a player to recap if you didn't write one).</li>
+</ol>
+</div>
+
+<h2 id="techniques">Key GM Techniques</h2>
+<p>These are the levers you pull to shape pressure. Practice them until they're instinctive.</p>
+
+<h3 id="timers">The Timer System</h3>
+<p>Timers are your single most useful GM tool. Use them for:</p>
+<ul>
+<li><strong>Threats:</strong> <em>Reinforcements Arrive [4]</em>, <em>Ritual Completes [6]</em></li>
+<li><strong>Opportunities:</strong> <em>Alliance Forming [6]</em>, <em>Weakness Discovered [4]</em></li>
+<li><strong>Extended Challenges:</strong> <em>Escape to the Docks [6]</em>, <em>Research the Relic [4]</em></li>
+<li><strong>Travel:</strong> <em>Journey to the Pass [8]</em></li>
+<li><strong>Social:</strong> <em>The Duke's Patience [4]</em>, <em>Rumor Spreads [6]</em></li>
+</ul>
+
+<h4>When to Tick a Timer</h4>
+<ul>
+<li>On a Miss or Partial — even if the player otherwise succeeds.</li>
+<li>When the GM spends Story Beats (1 SB = 1 tick typically).</li>
+<li>When the fiction demands it (e.g., "While you argue, the fire spreads").</li>
+<li>At the end of a session (for long-term timers like <em>Cult Influence</em>).</li>
+</ul>
+
+<h4>Timer Size Guidelines</h4>
+<div class="table-wrap"><table>
+<tr><th>Segments</th><th>Typical Use</th></tr>
+<tr><td>2–3</td><td>Quick challenge, one-scene tension</td></tr>
+<tr><td>4</td><td>Short-term tension (a patrol arrives, a door breaks)</td></tr>
+<tr><td>6</td><td>Standard scene timer (a ritual completes, a rival escapes)</td></tr>
+<tr><td>8</td><td>Multi-scene or session timer (a faction consolidates power)</td></tr>
+<tr><td>10+</td><td>Campaign timer (a war, a prophecy, a curse)</td></tr>
+</table></div>
+
+<h4>The Three-Timer Guideline</h4>
+<p>Maintain at most <strong>three active timers</strong> in a scene. More creates cognitive overload and dilutes tension. Name them and tick them <em>aloud</em> where players can see.</p>
+<ol>
+<li><strong>Situation Timer:</strong> Tracks progress toward the scene's immediate goal (e.g., <em>Chamber Collapse [8]</em>, <em>Persuade the Duke [6]</em>).</li>
+<li><strong>Counter-Clock:</strong> Tracks opposition pressure (e.g., <em>Guard Patrols [4]</em>, <em>Ritual Completion [6]</em>).</li>
+<li><strong>Campaign Timer:</strong> Tracks long-term front pressure (e.g., <em>Cult Influence [6]</em>, <em>Sun's Fading [10]</em>).</li>
+</ol>
+<p>Merge redundant timers (e.g., two "guard arrival" timers become one). Retire timers that resolve naturally.</p>
+
+<h4>Progress Timers (For Extended Challenges)</h4>
+<p>Instead of "3 successes before 2 failures" (which feels arbitrary and often ends too quickly), use a <strong>Progress Timer</strong>:</p>
+<div class="panel panel-blue">
+<span class="panel-title">Progress Timers</span>
+<ul>
+<li>Set a timer of 4–6 segments.</li>
+<li><strong>Clean Success:</strong> Tick 2 segments.</li>
+<li><strong>Partial:</strong> Tick 1 segment; player gains Boon.</li>
+<li><strong>Miss:</strong> Tick 0 segments; GM gains 2 SB.</li>
+<li><strong>GM spends 1 SB:</strong> Tick 1 segment.</li>
+</ul>
+<p><strong>Example:</strong> <em>"You need to escape the auction house. I'm starting a Progress Timer: Escape to the Docks [6]. Every time you make progress, I'll tick it. Clean Success: 2 segments. Partial: 1 segment. Miss: no segments, and I get SB to complicate things. When the timer fills, you're out — but every complication along the way matters."</em></p>
+<p><strong>Why this works:</strong></p>
+<ul>
+<li>Players see <em>visible progress</em> toward their goal.</li>
+<li>Even a Miss advances the timer if the GM spends SB, keeping momentum.</li>
+<li>The challenge feels like a <em>process</em>, not a single pass/fail moment.</li>
+<li>Clean Successes feel genuinely rewarding.</li>
+</ul>
+</div>
+
+<h3 id="sb-menu">Story Beats Spend Menu</h3>
+<p>Spend SB to introduce complications that <em>escalate pressure or reveal truth</em>. Match SB cost to narrative impact — never spend more than needed.</p>
+<div class="table-wrap"><table>
+<tr><th>SB Cost</th><th>Effect</th></tr>
+<tr><td>1</td><td>Minor pressure: Noise, distraction, tick a 4–6 segment timer +1, worsen Position by one step.<br><em>Example:</em> "Your foot scrapes a loose stone — the guard looks up (tick Guard Alert +1)."</td></tr>
+<tr><td>2</td><td>Moderate setback: Alarm raised, lose cover/advantage, lesser foe appears, split the party briefly.<br><em>Example:</em> "The guard calls for backup — two more arrive (new timer: Reinforcements [6])."</td></tr>
+<tr><td>3+</td><td>Serious trouble: Reinforcements arrive, key gear breaks, major twist shifts the scene, authority arrives, environment changes dramatically.<br><em>Example:</em> "The chamber ceiling groans — a 10-ton block begins to fall (Chamber Collapse now at 7 of 8)."</td></tr>
+</table></div>
+<p><em>Pro tip:</em> One strong beat (e.g., 3 SB for reinforcements) creates more drama than three weak beats (1+1+1 SB for noise). Be generous — unused SB is wasted momentum.</p>
+
+<h3 id="creativity">Handling Player Creativity</h3>
+<p>When players propose unexpected solutions:</p>
+<ul>
+<li><strong>Say "Yes, but" not "no":</strong> Offer a cost, timer, or complication. ("You can try to bribe the guard — but it will take time. Make a Persuade roll, and on a Miss, the guard alerts his captain.")</li>
+<li><strong>Use Setup/Assist actions:</strong> Let non-specialists contribute meaningfully. ("You can't pick the lock, but you can hold the torch steady — grant +1 die to the rogue's roll.")</li>
+<li><strong>Embrace the unexpected:</strong> If they bypass your planned encounter, let it work — but escalate pressure elsewhere. ("You trick the guards into leaving their post… but the ritual chamber's seals begin to weaken. Tick Ritual Completion +1.")</li>
+<li><strong>Fail forward aggressively:</strong> A Miss on their creative solution shouldn't stop the story — it should change direction. ("You fail to convince the guard… but in your panic, you notice a loose stone in the wall — a possible escape route.")</li>
+</ul>
+
+<h3 id="deck">Using the Deck of Consequences</h3>
+<p>The Deck of Consequences is your primary tool for generating answers when you have nothing prepped. Use it for:</p>
+<ul>
+<li>NPC motivations and secrets ("What does this guard really want?" — draw a Heart)</li>
+<li>Environmental twists ("What happens when the ritual backfires?" — draw a Club)</li>
+<li>Divination and prophecy ("What does the future-scrying spell show?" — draw 1–3 cards)</li>
+<li>Quick scene generation (Spade/Heart/Club — see Zero-Prep Scene Generation above)</li>
+</ul>
+
+<div class="panel panel-gold">
+<span class="panel-title">Suit Interpretation for Plot Generation</span>
+<p>The suit tells you the <em>nature</em> of the answer:</p>
+<ul>
+<li><strong>Hearts:</strong> The answer involves a <em>relationship, loyalty, or emotion</em>. Who is connected? What bond is at stake?</li>
+<li><strong>Spades:</strong> The answer involves a <em>physical obstacle, harm, or action</em>. What breaks? Who gets hurt? What collapses?</li>
+<li><strong>Clubs:</strong> The answer involves a <em>resource, debt, or cost</em>. What is owed? What runs out? What must be sacrificed?</li>
+<li><strong>Diamonds:</strong> The answer involves a <em>secret, hidden truth, or opportunity</em>. What is hidden? What door opens? What truth is revealed?</li>
+</ul>
+<p>The rank tells you the <em>severity</em> (Ace=legendary, 2-5=minor, 6-10=significant, J/Q/K=major).</p>
+</div>
+
+<div class="panel panel-blue">
+<span class="panel-title">Interpretation Procedure</span>
+<p>When you draw a card for a plot question:</p>
+<ol>
+<li><strong>State the literal card:</strong> (e.g., "King of Hearts" = <em>Betrayal</em>).</li>
+<li><strong>Ask: "Who or what is betraying whom?"</strong>
+<ul>
+<li>If the card answers an NPC motivation, they are betraying an oath, a trust, or a relationship.</li>
+<li>If the card answers an environmental question, it is a physical betrayal (a structural collapse, a ward failing).</li>
+</ul>
+</li>
+<li><strong>Link it to a Timer:</strong> How does this answer advance or tick an existing Timer? (e.g., "The guard betrays his post to save his wife, which means the Ritual Completion timer advances because no one is watching the door.")</li>
+</ol>
+</div>
+
+<div class="panel panel-green">
+<span class="panel-title">The Three-Card Synthesis Rule</span>
+<p>For a complex question (e.g., "What does the future-scrying spell show?"), draw <strong>three cards</strong>. <em>Force them into one sentence.</em></p>
+<p><strong>Example:</strong></p>
+<ul>
+<li>Draws: <strong>9 of Hearts</strong> (Betrayal), <strong>5 of Clubs</strong> (Debt called), <strong>Ace of Spades</strong> (Scene-shifting harm).</li>
+<li>Synthesis: <em>"You see the watchtower collapsing… but in the vision, Captain Voss is holding a child, not a sword. He is trying to pay a debt he owes to the blight by offering the child."</em></li>
+</ul>
+<p><strong>The Golden Rule:</strong> If a card makes zero sense after 10 seconds of thought, <strong>discard it and draw again.</strong> The deck is a tool, not a tyrant.</p>
+</div>
+
+<div class="panel panel-orange">
+<span class="panel-title">When to Stop Drawing</span>
+<ul>
+<li><strong>One draw per scene is usually enough.</strong> Draw a single <strong>Club</strong> to determine the primary complication, then run the rest using dice and SB tables.</li>
+<li><strong>Stop drawing after 3 cards in a single scene.</strong> If you've drawn three cards and the scene still isn't clear, <em>stop drawing</em>. Make a ruling that serves the story.</li>
+<li><strong>Never draw to resolve a player's creative solution.</strong> If a player says "I want to climb the wall," just set DV 3 and roll.</li>
+</ul>
+</div>
+
+<h3 id="genre-filter">Filter Through Genre</h3>
+<p>When the generator gives you a prompt, interpret it through the lens of the region's subgenre (see Chapter 14). This keeps random draws <em>thematically consistent</em>.</p>
+<div class="table-wrap"><table>
+<tr><th>Region</th><th>Subgenre</th><th>"Betrayal" becomes…</th></tr>
+<tr><td>Ecktoria</td><td>Political Intrigue</td><td>A sealed document, a broken contract, a flipped vote.</td></tr>
+<tr><td>Mistlands</td><td>Folk Horror</td><td>A broken ward, a bell that doesn't ring, a spirit that crosses the levee.</td></tr>
+<tr><td>Vhasia</td><td>Courtly Romance</td><td>A broken oath of chivalry, a knight who unbuckles their gorget.</td></tr>
+<tr><td>Acasia</td><td>Mercenary Realism</td><td>A free company switching sides mid-battle, a contract voided.</td></tr>
+<tr><td>Ykrul</td><td>Nomadic Epic</td><td>A hostage string cut, a treaty term re-read, a violation of hospitality.</td></tr>
+<tr><td>Thepyrgos</td><td>Academic Mystery</td><td>A false citation, a contested proof, a student's hidden ambition.</td></tr>
+</table></div>
+
+<h3 id="env-maneuvers">Advisory: Environmental &amp; Positioning Maneuvers</h3>
+<p>The core rules already contain the building blocks for environmental tactics. What follows is <em>advisory</em> — a quick-reference lens that translates creative player descriptions into mechanical terms. Use it when you need to speed up a ruling, not when you want to restrict imagination.</p>
+<div class="table-wrap"><table>
+<tr><th>Maneuver</th><th>Mechanical Effect</th><th>Suggested Position Dial</th><th>Advisory Note &amp; Existing Rule Tie-In</th></tr>
+<tr><td><strong>High Ground</strong></td><td>+1 die to ranged attacks; or +1 Position on defense vs. melee.</td><td><strong>Controlled</strong> (if prepared) or <strong>Desperate</strong> (if scrambling).</td><td>Don't let players "farm" high ground — fiction first. (Ties into <em>Position &amp; Effect</em>.)</td></tr>
+<tr><td><strong>Cover (Partial / Total)</strong></td><td><strong>Partial:</strong> +1 Armor vs. ranged. <strong>Total:</strong> Cannot be targeted directly.</td><td><strong>Controlled</strong> (behind a wall) or <strong>Dominant</strong> (fortified).</td><td>Use existing Armor Conversion math. A thin curtain is partial; a stone pillar is total.</td></tr>
+<tr><td><strong>Chokepoint (Doorway / Bridge)</strong></td><td>Limits engagement to 1v1 (or 2v1). Blocker gets +1 Position to Defend.</td><td><strong>Dominant</strong> for defender; <strong>Desperate</strong> for side pushing through.</td><td>Enemies <em>will</em> try to flank or use ranged AOE.</td></tr>
+<tr><td><strong>Shove (Push)</strong></td><td>Opposed <strong>Body + Athletics</strong>. Push target <strong>one range band</strong>.</td><td><strong>Controlled</strong> (flat ground) or <strong>Desperate</strong> (near a ledge).</td><td><em>Core Rule.</em> Great for environmental hazards.</td></tr>
+<tr><td><strong>Grapple (Restrain)</strong></td><td>Opposed <strong>Body + Melee</strong> vs. <strong>Body + Athletics</strong>. Target suffers −1 die.</td><td><strong>Controlled</strong> (if initiated) or <strong>Desperate</strong> (if outmatched).</td><td><em>Core Rule.</em> Excellent for locking down casters.</td></tr>
+<tr><td><strong>Sidestep Strike</strong></td><td>Move <strong>one range band</strong> as part of melee attack.</td><td><strong>Position worsens by one step</strong>.</td><td><em>Core Rule.</em> High-risk, high-reward.</td></tr>
+<tr><td><strong>Charge / Skirmish</strong></td><td>Move <strong>two bands</strong> + attack. <strong>Costs 1 Fatigue</strong>; next defense <strong>Desperate</strong>.</td><td><strong>Desperate</strong> (for defense penalty).</td><td><em>Core Rule.</em> Pairs with <em>Effortless Charge</em> / <em>Relentless</em>.</td></tr>
+<tr><td><strong>Suppress (Ranged)</strong></td><td>Spend extra ammunition. Foes act at <strong>−1 die</strong> or <strong>Limited Effect</strong>.</td><td><strong>Controlled</strong> (if you have the drop) or <strong>Desperate</strong> (if they're charging).</td><td>Great for crowd control.</td></tr>
+<tr><td><strong>Overwatch (Ranged)</strong></td><td>Ready an action to shoot a specific trigger.</td><td><strong>Controlled</strong> (prepared) or <strong>Dominant</strong> (if unseen).</td><td>Requires a clear trigger.</td></tr>
+<tr><td><strong>Flank (Coordinate)</strong></td><td>Attack an enemy already engaged. Gain <strong>+1 die</strong> (or ignore 1 Armor).</td><td><strong>Dominant</strong> (if unseen) or <strong>Controlled</strong> (if noticed).</td><td>Rewards teamwork.</td></tr>
+<tr><td><strong>Improvised Environmental Hazard</strong></td><td>GM sets <strong>DV 3–4</strong> for skill check. <strong>Success:</strong> Harm 2 (area) or Condition.</td><td><strong>Desperate</strong> (for triggering action).</td><td><em>"Selling the Action"</em> applies here. Drop DV by 1 for vivid description.</td></tr>
+</table></div>
+
+<h3 id="adversaries">Building and Running Adversaries</h3>
+<p>An adversary is not a block of numbers. It is a <em>question</em> the players must answer. A ghoul asks: <em>"What are you willing to eat?"</em> A vampire asks: <em>"What are you willing to lose?"</em> An Oath-Keeper asks: <em>"What do you owe?"</em></p>
+
+<h4>The Minimal Stat Block</h4>
+<div class="panel">
+<span class="panel-title">The Adversary Minimum</span>
+<ol>
+<li><strong>Name &amp; Nature:</strong> What is it, and what system of the story does it represent?</li>
+<li><strong>Stats:</strong> Body, Wits, Spirit, Presence, and a Key Skill or two.</li>
+<li><strong>Harm &amp; Fatigue:</strong> How much punishment can it take?</li>
+<li><strong>One Thing That Makes It Interesting:</strong> A trait, a timer, or a twist that demands a choice.</li>
+</ol>
+</div>
+
+<h4>Threat Level Scaling</h4>
+<p>Use <strong>Threat Level (TL)</strong> to scale an adversary up or down without rebuilding it.</p>
+<div class="table-wrap"><table>
+<tr><th>Threat Level</th><th>Typical Use</th><th>Base Harm</th><th>Base Fatigue</th><th>Attribute Bonus</th></tr>
+<tr><td>0</td><td>Non-combat, flavor</td><td>1–2</td><td>1</td><td>-1</td></tr>
+<tr><td>1</td><td>Standard minion</td><td>3</td><td>2</td><td>0</td></tr>
+<tr><td>2</td><td>Elite, lieutenant</td><td>4–5</td><td>3</td><td>+1</td></tr>
+<tr><td>3</td><td>Mini-boss</td><td>6–7</td><td>4</td><td>+2</td></tr>
+<tr><td>4+</td><td>Major boss</td><td>8+</td><td>5+</td><td>+3</td></tr>
+</table></div>
+
+<h4>Fast Adversary Generation</h4>
+<p>Roll 1d6 on each table below to generate a Spark.</p>
+<div class="panel panel-blue">
+<span class="panel-title">Random Adversary Generator</span>
+<ol>
+<li><strong>Type (d6):</strong> 1=Mortal, 2=Unquiet Dead, 3=Cursed, 4=Beast, 5=Fae/Threshold, 6=Dungeon/Living Infrastructure.</li>
+<li><strong>Descriptor (d6):</strong> 1=Patient, 2=Hungry, 3=Clever, 4=Ancient, 5=Bound, 6=Echo.</li>
+<li><strong>Motivation (d6):</strong> 1=Protects a threshold, 2=Hungers for memory, 3=Seeks a witness, 4=Obeys a patron, 5=Collects debts, 6=Wants to be left alone.</li>
+<li><strong>Weakness (d6):</strong> 1=Silver, 2=Fire/Sunlight, 3=A correct count, 4=A true name, 5=A memory offered freely, 6=Fresh water.</li>
+<li><strong>Timer Size (d6):</strong> 1-2=4, 3-4=6, 5=8, 6=10 segments.</li>
+</ol>
+</div>
+<p><strong>Worked Example:</strong> Roll 3, 2, 5, 4, 1 → <strong>Type:</strong> Cursed; <strong>Descriptor:</strong> Hungry; <strong>Motivation:</strong> Collects debts; <strong>Weakness:</strong> A true name; <strong>Timer:</strong> 4 segments. Result: A starving ghoul that once was a toll-keeper. It demands payment from anyone who crosses its bridge. Its true name is carved on the underside of the keystone.</p>
+
+<h4>Adversary Moves: SB-Powered Enemy Actions</h4>
+<p>Instead of rolling for enemies, the GM spends SB to activate adversary moves.</p>
+<div class="table-wrap"><table>
+<tr><th>Move</th><th>SB Cost</th><th>Effect</th></tr>
+<tr><td><strong>Strike</strong></td><td>1</td><td>Deal Harm 1 to one target.</td></tr>
+<tr><td><strong>Heavy Strike</strong></td><td>2</td><td>Deal Harm 2 to one target.</td></tr>
+<tr><td><strong>Shove</strong></td><td>1</td><td>Push target 1 range band or knock prone.</td></tr>
+<tr><td><strong>Grapple</strong></td><td>1</td><td>Target Restrained until break free (DV 3).</td></tr>
+<tr><td><strong>Flurry</strong></td><td>2</td><td>Deal Harm 1 to two targets, or Harm 2 + Shove.</td></tr>
+<tr><td><strong>Press</strong></td><td>1</td><td>Worsen target's Position by one step.</td></tr>
+<tr><td><strong>Disarm</strong></td><td>2</td><td>Target drops one held item.</td></tr>
+<tr><td><strong>Trip</strong></td><td>1</td><td>Target is Prone.</td></tr>
+<tr><td><strong>Brace</strong></td><td>1</td><td>Enemy gains +1 Armor until their next turn.</td></tr>
+<tr><td><strong>Taunt</strong></td><td>1</td><td>Target tests Resolve (DV 3) or attacks this enemy.</td></tr>
+<tr><td><strong>Withdraw</strong></td><td>1</td><td>Enemy moves one range band away.</td></tr>
+<tr><td><strong>Devastating Blow</strong></td><td>3</td><td>Deal Harm 3 to one target.</td></tr>
+<tr><td><strong>Area Attack</strong></td><td>3</td><td>Deal Harm 1 to all targets in a zone.</td></tr>
+<tr><td><strong>Call for Aid</strong></td><td>3</td><td>1d4 reinforcements arrive in 1–2 rounds.</td></tr>
+</table></div>
+
+<h4>Quick Adversary Cards</h4>
+<p>Print these cards and keep them behind the GM screen.</p>
+<div class="table-wrap"><table>
+<tr><th>Bandit Captain (TL 2)</th><th>Ghostly Anchor (TL 3)</th></tr>
+<tr><td>Body 3, Melee 2, Harm 4.<br><em>Rabble Rouser</em> — Rally 1d4 bandits.<br><em>Cowardly</em> — Flees if outnumbered.</td><td>Spirit 4, Lore 2, Harm 3.<br><em>Unfinished Business</em> — Cannot be harmed until anchor addressed.<br><em>Bargain</em> — May offer a deal.</td></tr>
+<tr><th>Slasher (TL 3)</th><th>Oath-Keeper (TL —)</th></tr>
+<tr><td>Body 4, Melee 3, Harm 5.<br><em>Regeneration</em> — Ignores first 2 Harm/scene.<br><em>Hunger Timer [6]</em> — When full, frenzy.</td><td>Cannot be fought.<br><em>Demand</em> — One story, memory, or confession.<br><em>Weakness</em> — Pay the original debt.</td></tr>
+<tr><th>Thorn Courtier (TL 3)</th><th>Salt Prince Enforcer (TL 2)</th></tr>
+<tr><td>Presence 4, Sway 3, Harm 3.<br><em>Courteous Snare</em> — Gift accepted = debt owed.<br><em>Iron Offense</em> — Brandishing iron gives GM 2 SB.</td><td>Body 3, Melee 2, Harm 4.<br><em>Debt Marker</em> — Knows where you sleep.<br><em>Brine Curse</em> — Test Resolve or gain Salt-Tongue.</td></tr>
+</table></div>
+
+<h4>Timers as Adversary Structure</h4>
+<p>A timer is not a countdown. It is a promise. Use timers to make adversaries feel inevitable without being unfair.</p>
+<div class="table-wrap"><table>
+<tr><th>Timer Type</th><th>Name</th><th>Effect</th></tr>
+<tr><td>Arrival</td><td>Patrol Arrives [6]</td><td>Ticks on noise/failed Stealth. When full, 1d4 guards arrive.</td></tr>
+<tr><td>Doom</td><td>Collapse [8]</td><td>Ticks on failed Body+Athletics. When full, ceiling falls (Harm 2).</td></tr>
+<tr><td>Enrage</td><td>Bloodlust [6]</td><td>Ticks each time boss takes Harm. When full, boss gains +1 die to attacks, −1 to defense.</td></tr>
+<tr><td>Debt</td><td>Debt to the Hollow [4]</td><td>Ticks on broken promises or lies. When full, an Oath-Keeper appears.</td></tr>
+<tr><td>Witness</td><td>Crowd Turns [6]</td><td>Ticks on failed social rolls. When full, bystanders become hostile.</td></tr>
+</table></div>
+
+<h3 id="visible-pressure">Visible Pressure: Making Timers Matter</h3>
+<p>Timers only create tension if players <em>see and understand</em> them.</p>
+<ul>
+<li><strong>Name timers descriptively:</strong> <em>"Ritual Completion"</em> not <em>"Timer 3"</em>.</li>
+<li><strong>Tick them aloud:</strong> "The cult's chant grows louder — Ritual Completion advances to 4 of 6."</li>
+<li><strong>Link timer advances to fiction:</strong> "As the timer hits 5, the air smells of ozone and sulfur — the demon's presence warps reality nearby."</li>
+<li><strong>Place trackers centrally:</strong> Use physical tokens where all players see them. Update them <em>during</em> play.</li>
+</ul>
+
+<h2 id="pitfalls">Common Pitfalls and Fixes</h2>
+<p>Even experienced GMs fall into these traps. Recognize and correct them instantly.</p>
+<div class="panel panel-red">
+<span class="panel-title">Pitfall Fixes</span>
+<ul>
+<li><strong>Pitfall:</strong> "I'm hoarding SB for a big climax." <br><strong>Fix:</strong> Spend SB early and often. Unused SB is wasted momentum.</li>
+<li><strong>Pitfall:</strong> "The players are stuck — they keep failing the same roll." <br><strong>Fix:</strong> Ask: "What is your <em>goal</em>?" Then name the simplest obstacle.</li>
+<li><strong>Pitfall:</strong> "I don't know the rule for X." <br><strong>Fix:</strong> Make a ruling that keeps the story moving. Default: DV 3, Controlled Position.</li>
+<li><strong>Pitfall:</strong> "My prep went unused — the players went off-track." <br><strong>Fix:</strong> Your prep was about <em>pressure</em>, not specific scenes. If they ignored the ambush, the timer still advances.</li>
+<li><strong>Pitfall:</strong> "I feel like I'm arguing with players about rules." <br><strong>Fix:</strong> You are co-creators, not adversaries. When rules conflict with fiction, <em>always</em> side with fiction.</li>
+<li><strong>Pitfall:</strong> "I defaulted to Presence + Command for intimidation, but the player described a physical action." <br><strong>Fix:</strong> Let the fiction guide the dice pool. If a player describes looming, threatening with a weapon, or physical presence, use Body + Melee or Body + Athletics.</li>
+<li><strong>Pitfall:</strong> "The skill challenge felt rushed — 3 successes before 2 failures was over in 4 rolls." <br><strong>Fix:</strong> Use a Progress Timer instead. Set a 4–6 segment timer. Tick 2 on Clean Success, 1 on Partial, 0 on Miss. Spend SB to tick the timer.</li>
+<li><strong>Pitfall:</strong> "I keep forgetting to use the Ninth Taboo for atmosphere." <br><strong>Fix:</strong> Use it as <em>texture</em>, not mechanic. When players break a custom, describe the uncanny result — a bell that rings without being struck, a shadow that moves independently. Give them a chance to make amends. The Ninth is a boundary, not a punishment.</li>
+</ul>
+</div>
+
+<h2 id="rookie">Rookie GM Comfort Dials</h2>
+<p>If you're new to Fate's Edge, start here to build confidence.</p>
+<div class="panel panel-orange">
+<span class="panel-title">Rookie GM Settings</span>
+<ul>
+<li><strong>Soft SB:</strong> For first 2 sessions, cap SB spend per roll at 1–2 (unless it's a set-piece moment).</li>
+<li><strong>Visible Timers:</strong> Put <em>all</em> active timers on the table. Name them aloud. Tick them visibly.</li>
+<li><strong>Tag Cards:</strong> Print one-liners for frequent tags and hand them out when relevant.</li>
+<li><strong>One Move, One Sentence:</strong> After every ruling, end with one sentence stating the new situation.</li>
+<li><strong>Default to DV 3:</strong> Don't overthink difficulty. DV 3 works for almost everything.</li>
+<li><strong>Let the fiction guide pools:</strong> If a player describes a physical intimidation, let them roll Body + Melee. The skill list is a vocabulary, not a cage.</li>
+</ul>
+</div>
+
+<div class="panel panel-gold">
+<span class="panel-title">What to Do When You Forget</span>
+<ul>
+<li><strong>Forgot to set a timer?</strong> Add it now. "Actually, there's a timer I should have mentioned: Guard Patrol [4]. It's at 2 of 4."</li>
+<li><strong>Forgot to spend SB?</strong> Spend them immediately. "I just remembered I have 2 SB banked. The guard's backup arrives."</li>
+<li><strong>Forgot to use a complication?</strong> Introduce it now. "As you're celebrating, you notice something: the floor is cracked."</li>
+<li><strong>Forgot to let a player use a creative dice pool?</strong> Let them roll it now. "Actually, that should have been Body + Melee for intimidation. Roll that instead."</li>
+<li><strong>Forgot to tick a timer?</strong> Tick it now. "I should have ticked this earlier. The timer is now at 4 of 6."</li>
+</ul>
+</div>
+
+<h2 id="scenario-types">Scenario Types: Adapting the Loop</h2>
+<p>Apply the 90-Second Loop to these common scenario frames:</p>
+
+<h3>Social Encounters</h3>
+<ul>
+<li><strong>Clean Success:</strong> +2 segments to Persuasion Timer</li>
+<li><strong>Partial:</strong> +1 segment; GM may spend SB for complication ("They agree — but you'll owe a favor")</li>
+<li><strong>Miss:</strong> No progress; GM ticks Opposition Timer</li>
+<li><em>GM Tip:</em> Spend SB to reveal hidden motives or escalate stakes.</li>
+</ul>
+
+<h3>Travel Legs</h3>
+<p>Frame each leg as a scenario with roles:</p>
+<ul>
+<li><strong>Guide:</strong> Wits+Lore to tick Travel Timer +1 (success) or backwards (failure)</li>
+<li><strong>Scout:</strong> Wits+Stealth to avoid surprise on first encounter</li>
+<li><strong>Quartermaster:</strong> Wits+Craft to manage Supply</li>
+<li><strong>Watch:</strong> Presence+Notice for +1 Position on first ambush defense roll</li>
+<li><em>GM Tip:</em> On failed role, spend SB to introduce immediate encounter.</li>
+</ul>
+
+<h3>Extended Challenges (Progress Timers)</h3>
+<ul>
+<li>Set a Progress Timer [4–6].</li>
+<li>Each <strong>Clean Success</strong> ticks 2 segments.</li>
+<li>Each <strong>Partial</strong> ticks 1 segment (player gains Boon).</li>
+<li>Each <strong>Miss</strong> ticks 0 segments (GM gains 2 SB).</li>
+<li>GM may spend 1 SB to tick 1 segment.</li>
+<li>When the timer fills, the challenge is complete — with whatever complications have accumulated.</li>
+</ul>
+
+<h2 id="ending">Ending the Scenario: Leave Hooks, Not Loose Ends</h2>
+<p>Close scenarios to create momentum for the next:</p>
+<ol>
+<li><strong>Resolve the immediate stake:</strong> State clearly whether they achieved their goal (yes/no/partial).</li>
+<li><strong>Advance relevant timers:</strong> Especially Campaign and Faction timers based on outcomes.</li>
+<li><strong>Seed 1–2 hooks for next session:</strong>
+<ul>
+<li>"The rival captain escaped — but she dropped this bloodstained sigil."</li>
+<li>"The ritual failed… but the cult's leader whispers your true name as she flees."</li>
+</ul>
+</li>
+<li><strong>Explicitly note complication debt:</strong> "Your Complication remains unresolved — it will add +1 SB to your first action next session."</li>
+<li><strong>Ask one reflective question:</strong> "What did you learn about your character tonight?"</li>
+</ol>
+
+<h2 id="sacred-trust">The GM's Sacred Trust</h2>
+<p>Between sessions:</p>
+<ul>
+<li>Update timers based on scene outcomes</li>
+<li>Check complication debt (unresolved = +1 SB next scene)</li>
+<li>Prepare flexible situations (stake + timer, not scripts)</li>
+<li>Review player sheets for hooks</li>
+<li>Refresh your memory on last session's events</li>
+</ul>
+<p>This invisible preparation transforms dice rolls into consequence-rich stories. Let the pressure shape the story. Let the dice sing. And never forget: you are playing the game too.</p>
+
+<h2 id="generator-workflow">Quick Reference: Generator Workflow</h2>
+<div class="panel">
+<span class="panel-title">The Generator Workflow</span>
+<ol>
+<li><strong>Starting from nothing?</strong> Draw Spade + Heart + Club. Ask: "How does the Pressure make the Actor's life harder?" Set Timer (rank = 4/6/8).</li>
+<li><strong>Need an NPC's motivation?</strong> Draw a Heart. Suit = nature; Rank = severity. State the literal card, then ask "Who or what is _____ whom?"</li>
+<li><strong>Need a twist?</strong> Draw a Club. Ask: "What just went wrong?" Link to an active Timer.</li>
+<li><strong>Need a reward?</strong> Draw a Diamond. Ask: "What hidden opportunity is here?"</li>
+<li><strong>Need a prophecy?</strong> Draw 3 cards. Force them into one sentence.</li>
+<li><strong>When to stop:</strong> After 3 draws in a single scene, stop. Rely on the dice and Outcome Matrix.</li>
+<li><strong>Filter through genre:</strong> Interpret every draw through the region's subgenre.</li>
+</ol>
+</div>
+
+<h3>Progress Timer Quick Reference</h3>
+<div class="table-wrap"><table>
+<tr><th>Roll Result</th><th>Progress Timer Effect</th></tr>
+<tr><td>Clean Success</td><td>Tick 2 segments</td></tr>
+<tr><td>Partial</td><td>Tick 1 segment; player gains Boon</td></tr>
+<tr><td>Miss</td><td>Tick 0 segments; GM gains 2 SB</td></tr>
+<tr><td>GM spends 1 SB</td><td>Tick 1 segment</td></tr>
+</table></div>
+
+<h3>Flexible Dice Pool Quick Reference</h3>
+<div class="table-wrap"><table>
+<tr><th>Action</th><th>Default Pool</th><th>Creative Alternative</th></tr>
+<tr><td>Intimidation (physical)</td><td>Presence + Command</td><td>Body + Melee</td></tr>
+<tr><td>Intimidation (verbal)</td><td>Presence + Command</td><td>Presence + Deception</td></tr>
+<tr><td>Lying</td><td>Presence + Deception</td><td>Wits + Deception</td></tr>
+<tr><td>Research</td><td>Wits + Investigation</td><td>Spirit + Lore</td></tr>
+<tr><td>Persuasion</td><td>Presence + Sway</td><td>Wits + Sway</td></tr>
+</table></div>
+
+<h3>SB Budget Guidelines</h3>
+<div class="table-wrap"><table>
+<tr><th>Encounter Difficulty</th><th>SB Available per Scene</th><th>Recommended Moves</th></tr>
+<tr><td>Trivial</td><td>1–2 SB</td><td>1–2 basic moves, mostly defensive.</td></tr>
+<tr><td>Standard</td><td>3–4 SB</td><td>Mix of basic and specialized moves.</td></tr>
+<tr><td>Challenging</td><td>5–6 SB</td><td>2–3 moves per round; use advanced actions.</td></tr>
+<tr><td>Deadly</td><td>7+ SB</td><td>Frequent advanced moves; multiple enemies acting.</td></tr>
+<tr><td>Boss</td><td>10+ SB</td><td>Use Lair Actions, call for aid, final stands.</td></tr>
+</table></div>
+
+<h3>Morale &amp; Surrender Quick Reference</h3>
+<p><strong>Morale Timers:</strong></p>
+<ul>
+<li><em>Courage [4]</em> — Enemy routs when full.</li>
+<li><em>Bloodlust [6]</em> — Enemy gains +1 die to attacks, −1 to defense when full.</li>
+<li><em>Desperation [6]</em> — Enemy makes a final stand when full.</li>
+<li><em>Retreat [4]</em> — Enemy flees immediately when full.</li>
+</ul>
+<p><strong>Surrender Conditions:</strong></p>
+<ul>
+<li>Outnumbered 2:1 — 0 SB to accept surrender.</li>
+<li>Leader Defeated — 0 SB to accept surrender.</li>
+<li>Morale Timer Fills — 0 SB; enemies rout or surrender.</li>
+<li>Offer Honorable Terms — 1 SB; enemy becomes contact.</li>
+<li>Desperate Bargain — 1 SB; enemy offers information in exchange for release.</li>
+</ul>
+
+<footer>Fate's Edge Proprietary Content — (c) 2024 Nicholas A. Gasper. All rights reserved.</footer>
+
+</body>
+</html>

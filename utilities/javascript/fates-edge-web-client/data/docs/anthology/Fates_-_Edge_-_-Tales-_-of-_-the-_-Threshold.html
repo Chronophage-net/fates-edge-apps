@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tales of the Threshold — A Fate's Edge Anthology</title>
+<style>
+:root {
+    --bg1: #130e0a;
+    --bg2: #1d150f;
+    --bg3: #261c14;
+    --bg4: #33251a;
+    --text: #ead9c2;
+    --text2: #c3ab88;
+    --text3: #8d795f;
+    --amber: #c9902f;
+    --amber-hover: #dba43f;
+    --border: #3d2d1e;
+    --red: #7c2a2f;
+    --green: #5f7a3f;
+    --blue: #3f6d74;
+    --purple: #6a3f5c;
+    --orange: #a8622a;
+    --parchment: #d9bd7c;
+    --radius: 8px;
+    --font: 'Georgia', 'Iowan Old Style', 'Palatino Linotype', serif;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+    background: var(--bg1);
+    background-image: radial-gradient(circle at 50% 0%, #201812 0%, #130e0a 60%);
+    color: var(--text);
+    font-family: var(--font);
+    padding: 1.5rem;
+    max-width: 980px;
+    margin: 0 auto;
+    line-height: 1.7;
+}
+h1, h2, h3, h4 { color: var(--amber); margin: 0.6rem 0 0.4rem; font-weight: 600; letter-spacing: 0.01em; }
+h1 { font-size: 2rem; border-bottom: 2px solid var(--amber); padding-bottom: 0.4rem; }
+h2 { font-size: 1.5rem; border-bottom: 1px solid var(--border); padding-bottom: 0.25rem; margin-top: 2.5rem; }
+h3 { font-size: 1.2rem; margin-top: 1.6rem; color: var(--parchment); }
+a { color: var(--amber); text-decoration: none; }
+p { margin: 0.6rem 0; color: var(--text); }
+.byline { color: var(--text3); font-style: italic; font-size: 0.88rem; margin: -0.1rem 0 0.6rem; }
+.closing { color: var(--text2); font-style: italic; border-left: 3px solid var(--amber); padding-left: 0.8rem; margin: 0.8rem 0; font-size: 0.92rem; }
+.panel {
+    background: var(--bg2);
+    border-radius: var(--radius);
+    padding: 0.8rem 1rem;
+    border: 1px solid var(--border);
+    margin: 0.7rem 0;
+}
+.panel-amber { border-left: 4px solid var(--amber); }
+.panel-red { border-left: 4px solid var(--red); }
+.panel-blue { border-left: 4px solid var(--blue); }
+.panel-green { border-left: 4px solid var(--green); }
+.panel-purple { border-left: 4px solid var(--purple); }
+.panel-orange { border-left: 4px solid var(--orange); }
+.badge {
+    display: inline-block;
+    padding: 0.05rem 0.55rem;
+    border-radius: 12px;
+    font-size: 0.68rem;
+    font-weight: 600;
+    margin: 0.1rem 0.2rem 0.1rem 0;
+}
+.badge-amber { background: var(--amber); color: #1c1305; }
+.badge-red { background: var(--red); color: #fff; }
+.badge-green { background: var(--green); color: #fff; }
+.badge-blue { background: var(--blue); color: #fff; }
+.badge-purple { background: var(--purple); color: #fff; }
+.badge-orange { background: var(--orange); color: #fff; }
+.badge-gray { background: var(--bg4); color: var(--text3); }
+.text-muted { color: var(--text3); }
+.text-sm { font-size: 0.88rem; }
+hr { border: none; border-top: 1px solid var(--border); margin: 1.4rem 0; }
+.toc { background: var(--bg3); border-radius: var(--radius); padding: 0.8rem 1.1rem; border: 1px solid var(--border); }
+.toc h3 { margin-top: 0; color: var(--amber); font-size: 1.05rem; }
+.toc-section { margin: 0.7rem 0 0.3rem; color: var(--parchment); font-weight: 600; font-size: 0.95rem; }
+.toc a { color: var(--text2); display: block; padding: 0.08rem 0; font-size: 0.85rem; }
+.toc a:hover { color: var(--amber); }
+blockquote {
+    border-left: 3px solid var(--amber);
+    padding-left: 1rem;
+    margin: 0.6rem 0;
+    color: var(--text2);
+    font-style: italic;
+}
+.frame {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 0.9rem 1.1rem;
+    margin: 0.8rem 0;
+}
+.sep {
+    text-align: center;
+    color: var(--text3);
+    letter-spacing: 0.4em;
+    margin: 1.6rem 0;
+    font-size: 0.9rem;
+}
+footer {
+    font-size: 0.75rem;
+    color: var(--text3);
+    text-align: center;
+    padding: 1.4rem 0 0.5rem;
+    border-top: 1px solid var(--border);
+    margin-top: 2.5rem;
+}
+</style>
+</head>
+<body>
+
+<h1>🕯️ Tales of the Threshold</h1>
+<p class="text-sm text-muted" style="margin-bottom:1rem;">
+    <span class="badge badge-amber">Anthology</span>
+    <span class="badge badge-blue">21 Tales</span>
+    <span class="badge badge-purple">Flavor &amp; Session Openers</span>
+    <span class="badge badge-gray">Author: Nicholas A. Gasper</span>
+</p>
+
+<div class="frame">
+<p>Across Fate's Edge, from the frost-locked fjords of the Linn coast to the monsoon docks of Dhahara, storytellers carry more than news between towns — they carry the tales that towns tell about themselves. This collection gathers the strongest of those tales: campfire stories, tavern gossip, midwife's warnings, and courtroom dramas, drawn from the oral traditions of a dozen peoples and set down, with a light hand, by a Tulkani storyteller who walked those roads and paid her debts in stories rather than silver.</p>
+<p>These are not adventure modules. They are the world talking to itself — the stories a fisherman tells his children, the warning a hedge-witch gives a traveler, the joke a beggar king makes at a noble's expense. Some are ghost stories. Some are love stories. A few are neither, and simply describe what it costs to be poor, or northern, or owned, or forgotten.</p>
+<p>Game Masters can use these tales as flavor reads between scenes, as campfire interludes when the party makes camp, as hooks for adventures that grow out of a "mere" story, or as session openers that set a region's tone before the dice ever touch the table. Read one aloud, or hand the book to a player and let them read it to the table in character as the party's own storyteller.</p>
+</div>
+
+<div class="toc" id="toc">
+    <h3>📖 Contents</h3>
+
+    <div class="toc-section">I. Hearth and Kin</div>
+    <a href="#hearth-that-would-not-die">The Hearth That Would Not Die</a>
+    <a href="#the-foxs-wedding">The Fox's Wedding</a>
+    <a href="#the-price-of-a-squab">The Price of a Squab</a>
+
+    <div class="toc-section">II. Ice and Iron</div>
+    <a href="#the-draugrs-silver">The Draugr's Silver</a>
+    <a href="#the-shield-that-forgot">The Shield That Forgot</a>
+    <a href="#the-ship-that-sailed-over-land">The Ship That Sailed Over Land</a>
+
+    <div class="toc-section">III. The Uncanny and the Dead</div>
+    <a href="#the-thing-that-knocks-four-times">The Thing That Knocks Four Times</a>
+    <a href="#the-hand-under-the-bed">The Hand Under the Bed</a>
+    <a href="#the-road-that-eats-names">The Road That Eats Names</a>
+
+    <div class="toc-section">IV. Roads and Crossings</div>
+    <a href="#the-djinns-three-questions">The Djinn's Three Questions</a>
+    <a href="#the-freedmans-seal">The Freedman's Seal</a>
+    <a href="#the-bridge-of-one-hundred-hands">The Bridge of One Hundred Hands</a>
+    <a href="#the-couriers-road">The Courier's Road</a>
+
+    <div class="toc-section">V. Debts and the Uncounted</div>
+    <a href="#the-king-of-the-gutter">The King of the Gutter</a>
+    <a href="#the-moneylenders-map">The Moneylender's Map</a>
+    <a href="#the-smell-of-thyme">The Smell of Thyme</a>
+    <a href="#the-second-hearth">The Second Hearth</a>
+    <a href="#the-minister-who-left-no-gift">The Minister Who Left No Gift</a>
+
+    <div class="toc-section">VI. Oaths and Verdicts</div>
+    <a href="#the-weight-of-the-armor">The Weight of the Armor</a>
+    <a href="#the-justicars-judgment">The Justicar's Judgment</a>
+    <a href="#the-judge-of-the-western-gate">The Judge of the Western Gate</a>
+</div>
+
+<hr>
+
+<h2 id="section-1">I. Hearth and Kin</h2>
+<p class="text-sm text-muted">Stories of warmth, promise-keeping, and the small rituals that hold a household — or a whole village — together.</p>
+
+<h3 id="hearth-that-would-not-die">The Hearth That Would Not Die</h3>
+<p class="byline">A Linn tale, told at the end of winter by a jarl whose fire had burned low.</p>
+<p>The Linn believe a hearth is not a place. It is a witness. It sees every oath sworn before it, hears every promise made in its light, and when the people forget, the hearth remembers for them.</p>
+<p>A longhouse burned once — not in a raid, but in a lightning strike. The jarl's family escaped, the thralls escaped, the animals escaped. But the hearthstone at the center of the hall did not burn. It sat in the ashes, still warm to the touch.</p>
+<p>"Build a new longhouse," the jarl said. "Use the same hearth."</p>
+<p>The builders did. They set the stone in the center of the new hall and lit a fire over it. The fire was cold — it gave off light but no heat.</p>
+<p>"What is wrong?" the jarl asked.</p>
+<p>A rune-witch came and laid her palm on the stone. "The hearth remembers the oaths that were sworn before it," she said. "But those oaths died in the fire with the old hall. It is waiting for new ones."</p>
+<p>The jarl gathered his family around the stone. They swore new oaths — to protect the land, to feed the hungry, to remember the dead. The fire warmed. The hearth accepted them.</p>
+<p>Now, every year on the anniversary of the burning, that family gathers around the stone and swears the oaths again. If they ever forget, the hearth will go cold — and the longhouse will burn a second time.</p>
+<p class="closing">"A hearth is a promise. A promise is a fire. A fire is a story. Tell it often enough, and the stone will never go cold."</p>
+
+<h3 id="the-foxs-wedding">The Fox's Wedding</h3>
+<p class="byline">Told at a crossroads shrine by a fox-spirit who spoke in riddles and smelled of rain.</p>
+<p>Foxes hold their weddings in the rain. You can see them if you are lost in a forest when the sun shines and the rain falls at once: a procession of lanterns and paper umbrellas, small figures dressed in silk. They do not invite mortals. They do not forbid them either — but anyone who watches must leave a gift.</p>
+<p>A woodcutter once saw such a wedding in a clearing and hid behind a cedar to watch. The bride was a white fox with nine tails; the groom a red fox with a silver bell at his throat. They exchanged vows in a language that sounded like wind moving through bamboo.</p>
+<p>When the ceremony ended, the bride turned and looked straight at him. "You have seen us," she said. "Now you must give us a gift."</p>
+<p>He had nothing but his axe, so he gave her that.</p>
+<p>She laughed. "An axe is for cutting. What do you wish to cut from your life?"</p>
+<p>He thought a long moment. "My regrets," he said.</p>
+<p>She took the axe. "Then they are cut."</p>
+<p>He went home. The people he had wronged had forgotten their anger. His name was clean, and he carried no grudge and bore none for forty years. When he died, the foxes came to his funeral and laid the axe upon his chest.</p>
+<p>"The regrets are gone," the bride said. "But the axe remembers. Do not borrow from us again."</p>
+<p class="closing">"A gift to a fox is a promise you cannot take back. Give only what you truly wish to lose."</p>
+
+<h3 id="the-price-of-a-squab">The Price of a Squab</h3>
+<p class="byline">A market tale from the Dye District, told by a bird-seller with a soft heart.</p>
+<p>Finch sold pigeons in the market, and he knew every bird by name, color, and call. One day a wealthy man came to his stall. "I want a pigeon," he said.</p>
+<p>"Which one?"</p>
+<p>"The one you love most."</p>
+<p>Finch looked over his birds. He knew which he loved best — a scruffy thing with a broken wing, too old to sell and too ugly to eat, kept only for company.</p>
+<p>"I will not sell that one," he said.</p>
+<p>"I will pay double."</p>
+<p>"No."</p>
+<p>"Triple."</p>
+<p>"No."</p>
+<p>The rich man laughed. "You are a fool. A bird is a bird."</p>
+<p>Finch met his eyes. "A bird is a bird. A heart is a heart. And I will not sell mine."</p>
+<p>The man left. Finch kept the bird until it died a year later, and he wept for it honestly. The next day, a young woman came to his stall. "I hear you are the one who would not sell his heart," she said. "I need someone like that."</p>
+<p>They married within the year. Pigeon feathers were woven into her wedding veil.</p>
+<p class="closing">"The poor cannot afford to buy much of anything. So they treasure fiercely what little they hold — because it is the one thing that cannot be taken by force of coin."</p>
+
+<h2 id="section-2">II. Ice and Iron</h2>
+<p class="text-sm text-muted">Sagas from the Linn coast, the Mistland, and the Direwood — oaths, memory, and the price the frost collects.</p>
+
+<h3 id="the-draugrs-silver">The Draugr's Silver</h3>
+<p class="byline">Told by a one-eyed ship's captain, whittling a new peg leg by firelight.</p>
+<p>The Linn say a draugr is not a ghost. A ghost is a memory. A draugr is a choice — the choice to stay when the door stands open, to hold on when the hand should release.</p>
+<p>A jarl named Hakon died in his bed, not in battle. His wife washed his body and set a silver coin on each of his eyes. "The ferryman's toll," she said. "May he cross the dark water in peace."</p>
+<p>Three nights later, Hakon sat up. His eyes were gone, eaten by the silver, leaving two holes that dripped seawater. He walked to the longhouse door — and walked through it rather than opening it. His wife found him at dawn, standing in the sheepfold, counting the animals.</p>
+<p>"These are mine," he said. "I never paid for them. I will not leave until the tally is settled."</p>
+<p>She was afraid, but she was also Linn. She led a ewe to the slaughtering stone. "Take one," she said. "The tally is paid."</p>
+<p>He bit its throat and the blood steamed in the cold. He walked back to his bed and lay still. But the next night he sat up again, the sheep's blood still on his teeth.</p>
+<p>"You took the ewe," his wife said. "The tally is paid."</p>
+<p>"I took the ewe," he answered. "But the ewe was not mine to take. It belonged to the flock. The flock belongs to the land. The land belongs to the ancestors. You never asked them."</p>
+<p>A rune-witch was sent for. She burned a lock of her hair and read the patterns in a bowl of ale. "Your husband was an oath-breaker," she said. "Not of silver — of honor. He borrowed glory from his ancestors and never paid it back. The draugr is the price."</p>
+<p>"How do I pay it?"</p>
+<p>"You cannot. He must pay it himself, in a battle he cannot win."</p>
+<p>The wife armed her husband's corpse and led him to the edge of the Direwood. "A draugr-lord lives here," she told him. "Destroy it, or be destroyed."</p>
+<p>He walked into the wood and did not come back. Three days later she found what was left of him, propped against a stone, sword broken and shield splintered — but the silver coins were back on his eyes, and his mouth was closed.</p>
+<p>"He fought," the rune-witch said. "He lost. The tally is paid."</p>
+<p>They buried him under a cairn. Walk the edge of the Direwood at midnight even now, and you can hear a sword breaking, over and over, and a voice saying: "That was the battle I could not win. Now I rest."</p>
+<p class="closing">"A draugr is not a punishment. It is a reminder. Settle your oaths before the door closes. The dead have long memories and sharp teeth."</p>
+
+<h3 id="the-shield-that-forgot">The Shield That Forgot</h3>
+<p class="byline">Told by an old jarl who had never lost a battle he did not fight.</p>
+<p>A Linn warrior named Astrid carried a shield painted with the story of her life — the birth of her first child, the death of her mother, the night she killed a bear with a fishing knife. Every scar and every oath was on that shield. It was her memory. Without it, she could not remember who she was.</p>
+<p>In a raid on a trading post, she lost the shield in a river. It was gone before she could dive after it, carried off downstream. She searched for three days and never found it.</p>
+<p>She returned home. Her husband asked, "What is your name?" She could not answer. Her children asked, "Who are you?" She opened her mouth and nothing came out.</p>
+<p>A rune-witch examined her. "Your name was never in your head," the witch said. "It was in the shield. The shield is gone, and the name with it."</p>
+<p>"Can you make me a new shield?"</p>
+<p>"I can. But the memories on it will be different ones. You will become a different person."</p>
+<p>Astrid thought of her mother's face, which she could no longer picture, and her daughter's first steps, which she could recall only as a feeling of warmth, no image attached. "I do not want to be different," she said.</p>
+<p>"Then find the shield."</p>
+<p>She walked the river for a year — through the Mistland, where the fog erases names, to the edge of the Valewood, where the trees whisper secrets. She never found the shield. But she found a smooth black stone, warm in her hand, carved with a single rune: the aurochs, strength, the wild.</p>
+<p>When she picked it up, her name came back to her — not all of it, only the first syllable, but it was enough. She carved the stone into a pendant and wore it at her throat. "The shield is gone," she told the rune-witch. "This is my new memory. It is not as large. But it is true."</p>
+<p>The witch nodded. "That is the way of the Linn. We do not remember everything. We remember what matters."</p>
+<p class="closing">"A shield is a story. A stone is a syllable. A name is an oath you owe to the people who speak it. Lose it, and you become a stranger to yourself."</p>
+
+<h3 id="the-ship-that-sailed-over-land">The Ship That Sailed Over Land</h3>
+<p class="byline">Told by a shipwright who had built twelve longships and lost eleven of them.</p>
+<p>The Linn say a ship is not a thing. It is an oath. Every plank is a promise; every nail is a small prayer. And when the ship grows old, the oath comes due.</p>
+<p>The longship <em>Fjord-Wyrm</em> had sailed for forty years — raiders to distant shores, traders to far ports, and one jarl to his own funeral pyre. Now its wood was gray and its nails rusted through. It could no longer float.</p>
+<p>The jarl's son wanted to burn it. "It is old. It is useless. Let it join its ancestors."</p>
+<p>The shipwright shook his head. "A ship that has carried so many oaths cannot be burned. It must be paid."</p>
+<p>"How does one pay a ship?"</p>
+<p>"You sail it. One last time."</p>
+<p>"It cannot float."</p>
+<p>"Then sail it over land."</p>
+<p>The shipwright built a sled, set the ship upon it, and hitched twelve oxen to the prow. "Sail this to the Direwood," he told the son. "The trees will take it and turn it into soil. The soil will grow new trees. The new trees will become new ships. The oath will be fulfilled."</p>
+<p>The son was doubtful, but he had sworn to honor his father's memory, so he sailed the old ship over land — through fields, over hills, across frozen rivers — until they reached the wood's edge. There they left it. The oxen were turned loose. The sled was burned.</p>
+<p>The next spring, a new longship was built from Direwood timber. It sailed for sixty years and never lost a battle.</p>
+<p class="closing">"A ship is a promise. A forest is a mill. Put the promise in the mill, and it becomes something new. Burn it, and the promise becomes ash — and ash does not float."</p>
+
+<h2 id="section-3">III. The Uncanny and the Dead</h2>
+<p class="text-sm text-muted">Fireside horrors, told to children who pressed for one more story and elders who knew when to stop.</p>
+
+<h3 id="the-thing-that-knocks-four-times">The Thing That Knocks Four Times</h3>
+<p class="byline">Told by a grave-robber who had dug up three kings and one child, and would not look at the door.</p>
+<p>There is a rule in the port towns: three knocks is a guest. Four knocks is something else.</p>
+<p>A sailor named Jan came home late from the docks one foggy night. He knocked on his own door — one, two, three. A pause. Then a fourth knock.</p>
+<p>He should not have opened it. He opened it.</p>
+<p>His wife stood in the doorway. Her face was his wife's face, her dress was his wife's dress, but her eyes were the color of the sea at midnight, and her mouth stayed closed, and she did not blink.</p>
+<p>"Come in," Jan said, because he did not know what else to say.</p>
+<p>She walked past him without removing her coat and sat in the corner, silent. "Where have you been?" he asked.</p>
+<p>The thing tilted its head. Its neck made a sound like dry wood snapping. "I have been where the tide goes when it leaves the shore," it said. "In the space between your last breath and your next. In the place of unfinished things."</p>
+<p>Jan did not sleep that night, watching it watch him. At dawn, his real wife came through the door with fish from the market. She saw the thing in the corner and screamed. It rose, walked to the threshold, knocked four times on the frame, and left.</p>
+<p>"What was that?" his wife asked.</p>
+<p>"I do not know," Jan said.</p>
+<p>That night it returned. Four knocks. He did not open the door. It knocked again, and began to whisper: "Let me in. I am still your wife. I have only been gone a little while."</p>
+<p>He pressed his palm to the cold wood and endured the whispering until dawn. On the third night, he opened the door — his real wife stood there, weeping, saying she had been locked out for three days. He held her.</p>
+<p>At midnight, he heard knocking from the bedroom. Four times. He opened the door and found the thing sitting on his bed, wearing his wife's skin. His real wife was gone.</p>
+<p>It smiled. "You let me in. Now I am here to stay."</p>
+<p>It lived with him for ten years. It cooked his meals and mended his clothes, and spoke only to whisper his name when he was alone. When he died, it walked out of the house and knocked on the neighbor's door. Four times.</p>
+<p class="closing">"Three knocks is a guest. Four is an invitation. Do not answer the fourth. It does not need to knock twice."</p>
+
+<h3 id="the-hand-under-the-bed">The Hand Under the Bed</h3>
+<p class="byline">Told by a child who had spent one night alone in the Direwood and came back changed.</p>
+<p>A boy named Tomas was afraid of the hand under his bed. Every night he felt it brush his ankle; every morning he looked, and nothing was there.</p>
+<p>His mother told him it was his imagination. His father told him there was nothing under the bed. The village priest told him something different: "That which listens does not hide under beds. It hides in the space between the floor and the ground. That space is very small. But it can fit anywhere."</p>
+<p>That night Tomas lay still and felt the hand again — cold, with too many fingers. He whispered, "What do you want?"</p>
+<p>The hand stopped moving. A voice came from beneath the bed, the voice of a child who had been dead a hundred years. "I want you to look."</p>
+<p>He looked. The hand was attached to an arm, the arm to a body folded into the space beneath the bed like a letter folded into an envelope. The body had no face. Where the face should have been, there was a second hand.</p>
+<p>Tomas screamed. His parents ran in and looked under the bed and found nothing. But Tomas had seen — and seeing meant it had seen him back.</p>
+<p>For the rest of his life he felt the hand under his bed, even in houses he had never slept in before, even on a mat with no bed at all. It was always there, waiting, brushing his ankle.</p>
+<p>One night he finally reached down and touched it. It pulled him under the bed. He folded himself into that space, smaller and smaller, until he fit.</p>
+<p>His body was found the next morning, tucked beneath the bed like a folded letter. His face was gone. In its place was a second hand.</p>
+<p class="closing">"Do not look. Do not touch. The hand is patient. It will wait until you are small enough to fit."</p>
+
+<h3 id="the-road-that-eats-names">The Road That Eats Names</h3>
+<p class="byline">Told by a woman who survived three days on that road and came back without a shadow.</p>
+<p>There is a road that appears on no map. It runs between the Direwood and the Mistland and has neither beginning nor end. Those who know of it call it the Name-Eater.</p>
+<p>A traveler named Mira took the road by accident, trying to reach the coast through fog. The ground beneath her feet changed from dirt to something smooth and gray, like stone worn by water. She walked an hour. The fog cleared and she was somewhere she did not recognize — silver trees, a sky the color of a bruise.</p>
+<p>A figure stood in the road, faceless but for a mouth. It opened. "Give me your name."</p>
+<p>She refused and tried to walk around it. The road curved, and the figure was there again. "Give me your name."</p>
+<p>She ran. It did not follow, but the road began to whisper names — people she had known, people she had forgotten, people who had died before she was born. "Give me your name. Everyone else has. You are the last."</p>
+<p>She looked down and saw the road littered with coins, shoes, hairpins, teeth — each one, the figure said, a name that someone had given up and become. She picked up a tooth from the road and put it in her mouth and bit down.</p>
+<p>The figure screamed. "That is not your name. That is the name of a dead man. You cannot give what is not yours."</p>
+<p>She walked past it and kept walking for three days. When she emerged, she stood in a village she had never seen, and when the people asked her name, she opened her mouth and no sound came out.</p>
+<p>She had never given her own name. But she had carried a stolen one in her mouth, and whatever governs such debts considered theft as good as payment. She lived the rest of her life nameless — pointing, writing, never remembered from one day to the next, a stranger even to herself.</p>
+<p class="closing">"The road does not need your consent. It only needs you to hold a name that is not yours. Do not pick up teeth from the road. Do not answer when it whispers."</p>
+
+<h2 id="section-4">IV. Roads and Crossings</h2>
+<p class="text-sm text-muted">Bridges, mountain passes, and thresholds — the tolls the world charges for passage, and what travelers pay them in.</p>
+
+<h3 id="the-djinns-three-questions">The Djinn's Three Questions</h3>
+<p class="byline">Told by a Hyaar goatherd who had not spoken to another soul in ten years — until offered a pinch of salt.</p>
+<p>The Hyaar say the djinn live in the spaces between mountains — not the peaks, not the valleys, but the shadow a rock casts at noon.</p>
+<p>A young woman named Zara got lost in the high passes. She was not afraid; she had grown up in those mountains. But the fog came down thick and gray, and she could not see her own hand.</p>
+<p>A voice spoke from the mist. "You are in my house. You carry a question you have not asked."</p>
+<p>Zara knew the rule: djinn ask three questions, and you must answer truly or be kept. She waited.</p>
+<p>"First question," said the voice. "What is the name of the wind that carries the snow?"</p>
+<p>"The north wind," she said.</p>
+<p>"Wrong. The snow carries itself. The wind only watches. One answer left."</p>
+<p>She understood then that it did not want facts. It wanted truths that cost something.</p>
+<p>"Second question. Who died so that you could be born?"</p>
+<p>She thought of her mother, who had died in childbirth. "My mother," she said.</p>
+<p>"Correct. Now the third. What are you willing to leave behind to find your way home?"</p>
+<p>She thought of her father, old and alone; of the goats and copper pot that were her dowry; of her own name, which she had never liked. "My fear," she said.</p>
+<p>The fog parted. The path lay clear. The djinn was gone.</p>
+<p>She walked home unafraid of the mountains from then on. But sometimes, on the high passes, she felt something watching her still — not with malice, but with curiosity. It had never heard that answer before.</p>
+<p class="closing">"The djinn do not want your gold. They want your certainty. Give them doubt instead, and they will let you pass."</p>
+
+<h3 id="the-freedmans-seal">The Freedman's Seal</h3>
+<p class="byline">Told by an old dock-worker who bore a scar on his wrist where a collar had once been burned free.</p>
+<p>Many coastal families carry a story about the collar, from a time when their people could be bought and sold. A young man named Elias once bought his own freedom from a foreign master, paying it in silver and promises. The master gave him a brass seal stamped: <em>Freed by law</em>. "This is your proof," he said. "Lose it, and you are a slave again."</p>
+<p>Elias wore the seal on a cord and became a merchant, then a shipowner, then an employer of other freedmen. One night a storm sank his ship. He swam to shore. The seal was gone.</p>
+<p>He searched the beach for three days and found nothing. He went to his former master. "I need a new seal."</p>
+<p>The master laughed. "You are not a freedman without it. You are a slave who ran. The law says I may take you back."</p>
+<p>Elias did not run. He knelt. "Then take me. But let me say goodbye to my wife first."</p>
+<p>The master allowed it. Elias went home and told his wife, "Gather the crew. Tell them I am a slave again."</p>
+<p>"You are not a slave," she said. "You are who you are. The law does not define you. The sea does." She cut a length of rope from the anchor line and tied it around his neck. "This is your new seal. Not brass — memory. Every knot is a witness's name. When you have enough of them, the law will follow."</p>
+<p>He returned to the master. "I have no seal. But I have a rope with nine knots. Each is a witness. The law cannot enslave a man with nine witnesses."</p>
+<p>The master studied the rope, studied Elias, and said at last, "The law can do many things. But I am tired of this argument. Go. Keep your rope."</p>
+<p>Elias became a legend on that coast. To this day, freedmen tie ropes with nine knots — one for each of the original witnesses — and wear them beneath their shirts. The law does not ask to see them. The law is wary of what the knots remember.</p>
+<p class="closing">"A seal is a promise. A memory is a witness. The law fears the witness more than the promise."</p>
+
+<h3 id="the-bridge-of-one-hundred-hands">The Bridge of One Hundred Hands</h3>
+<p class="byline">Told by a bell-tender who lived beneath a bridge and never learned to swim.</p>
+<p>The bridge was built in the old style: wooden planks, rope railings, a single bronze bell at the midpoint. The bell rang when the bridge was safe. It stayed silent when the bridge was hungry.</p>
+<p>A merchant named Lin crossed at dusk. The bell did not ring. She waited, and it still did not ring, so she crossed anyway.</p>
+<p>Halfway across, a hand rose from the water — moss and bone — and gripped her ankle. "You did not wait for the bell," it said. "Now you must pay a toll."</p>
+<p>She had no coin, so she offered her bracelet. The hand refused it. "Not a trinket. A hand. I have ninety-nine beneath this bridge. I need one more to reach the other side."</p>
+<p>She looked down and saw them in the water, reaching, grasping, and saw the far bank only a few steps away. She knelt. "I will give you my hand. But first, let me write a letter to my daughter."</p>
+<p>The hand released her. She wrote the letter, tucked it in her sleeve, and held out her hand.</p>
+<p>The bridge bell rang.</p>
+<p>The hand withdrew. The others released their grip. The water stilled. She crossed, never learning why the bell had changed its mind — but she left a new bell at the shrine on the far bank, small and made of clay, with a single crack in it.</p>
+<p class="closing">"A bridge without a bell is a mouth without teeth. It can still bite. Cross only when the bell rings — or when you have nothing left to lose."</p>
+
+<h3 id="the-couriers-road">The Courier's Road</h3>
+<p class="byline">Told by an old caravan woman who had walked from the Crimson Basin to the Inland Sea and back.</p>
+<p>A young courier named Dastan was tasked with carrying a sealed message between two rival courts. The seal was brass and wax. He was not to open it, whatever happened.</p>
+<p>He walked forty days. On the forty-first, a merchant offered him a fortune to see the seal. He refused. "Then walk with me," the merchant said. "I will carry your pack." Dastan agreed, and they walked ten days together before the merchant asked again — and was refused again. "Then let me carry your water," the merchant offered, and carried it for another ten days before asking a third time.</p>
+<p>"Then let me carry your burden," the merchant said at last. "Whatever weight you carry, I will take it."</p>
+<p>Dastan stopped walking. "I carry nothing."</p>
+<p>"Everyone carries something," the merchant said. "The road. The water. The ground beneath your feet, which you have only borrowed. You have been borrowing the world's patience for sixty days. Let me help."</p>
+<p>Dastan looked at the road ahead and thought of his mother, who had died while he walked; of the message he would never read; of the fortune he had already turned down. "No," he said. "The weight is mine."</p>
+<p>He walked on alone. The merchant did not follow.</p>
+<p>When he reached his destination, forty days late, the offer inside the seal had already expired — it had been a treaty of peace, and the moment for it had passed. The court that received it was furious. "You have brought us nothing but a dead promise," its ruler said.</p>
+<p>Dastan knelt. "I have brought you forty days of walking. Forty days of refusing what was not mine to take."</p>
+<p>The ruler studied him. "What is your name?"</p>
+<p>"Dastan, son of no one."</p>
+<p>"Then you are the son of this court now. Rise. The treaty has expired, but a promise kept is worth more than a treaty signed. We will write a new one."</p>
+<p>Dastan became that court's messenger and never carried a sealed letter again. He carried only his own word — and it was enough.</p>
+<p class="closing">"A borrowed road is not a stolen one. Walk it clean, and the road remembers you kindly. Walk it greedy, and it will eat you."</p>
+
+<h2 id="section-5">V. Debts and the Uncounted</h2>
+<p class="text-sm text-muted">Tales of the poor, the indentured, and the guilty — the ledgers that never balance, and the people who keep them anyway.</p>
+
+<h3 id="the-king-of-the-gutter">The King of the Gutter</h3>
+<p class="byline">Told by an old beggar who had sat on the same corner for forty years and outlasted five mayors, three plagues, and one very confused demon.</p>
+<p>In every city there is a king who sits on no throne. He rules the alleys and doorways, the places the law does not go. No one knows his true name. Some say he was a noble who gambled away his fortune; others say he never left the streets to begin with. He wears a coat patched from a hundred fabrics and carries a staff cut from a broken oar.</p>
+<p>He does not beg. He collects. Every beggar in the city pays him a tithe — a coin, a crust, a piece of gossip — and in return he protects them. If one is beaten, he knows who did it. If one dies, he knows where they are buried. If one disappears, he knows where to look, or that they will not be found.</p>
+<p>The watch tolerates him because he keeps the beggars from rioting. The wealthy tolerate him because he keeps them from stealing. The beggars tolerate him because he is the only one who remembers their names.</p>
+<p>A young thief once asked him, "Why do you do this? You could be rich. You could leave."</p>
+<p>He laughed. "Leave? This is my kingdom. A king does not abandon his people. Besides — the dark walks these streets at night. Someone has to remind it that the poor are still here."</p>
+<p class="closing">"The poor forge their own hierarchies, often more organized than the wealthy imagine. They simply have no ledger to write them in."</p>
+
+<h3 id="the-moneylenders-map">The Moneylender's Map</h3>
+<p class="byline">Told by an old man who sat by the beggar king's court, his hands trembling from a secret twenty years carried.</p>
+<p>Jorn was the son of a moneylender who lived in the shadow of a count's manor. The count was a man of polished manners and cruel appetites, and he rode his horse through the market each morning, scattering beggars before him. Jorn's younger sister loved to chase the horse's shadow, laughing, darting between the stalls — until one fog-bound dawn the horse reared and trampled her beneath its hooves. The count did not stop. He tipped his hat and rode on.</p>
+<p>Jorn was sixteen and watched his sister's blood soak into the cobbles. Grief curdled into rage. That night, drunk on cheap ale, he slipped into the count's manor through a servant's door, found him slumped over his wine, and drove a dagger into his throat.</p>
+<p>Inside the count's purse he found a singed scrap of vellum — a crude map marked with a red cross beside a stand of ancient oaks beyond the city walls, promising treasure buried where the roots met a stone shaped like a sleeping wolf.</p>
+<p>Jorn hid the map for years, fearing the noose if the murder were ever traced to him. He swept stables, hauled waste, mended nets, and saved every copper. At twenty-four, he finally dug beneath the oaks and found a chest of tarnished gold, jeweled goblets, and a single flawless diamond the size of a pigeon's egg.</p>
+<p>The wealth did not free him. Every coin felt like a stone on his chest. He funded an orphanage, paid a widow's medicine, gave bread anonymously to beggars — and every time he gave, more silver seemed to find its way back into his pockets, as though the giving itself summoned more.</p>
+<p>Twenty years after the murder, gaunt and gray-bearded, he stood before the beggar king's court and pressed a pouch of silver into the lap of a ragged old man shivering beneath a bakery vent. "Take this," Jorn said. "Let it buy you warmth, food, a bed."</p>
+<p>The beggar looked up, winked, and shoved the pouch back. "Keep it, old man. Some debts don't like being paid in coin — they'd rather be paid in kindness, and you've been trying to buy your way around that for twenty years." He rose and shuffled off into the fog.</p>
+<p>Jorn's foot struck something on the cobbles. He bent and found a diamond, identical to the one from the treasure chest, warm to the touch, humming faintly as though it remembered the hand that first lifted it. A low, amused sound seemed to rise from the very stones around him.</p>
+<p>He closed his fist around the stone and walked deeper into the alleys — not toward the counting-houses, not toward the mansions, but into the streets where the poor still told their own stories, and where the only wealth that mattered was the memory of his sister's laugh.</p>
+<p class="closing">"When a man tries to buy his forgiveness with riches, he is only laughed at and handed his coin back — sometimes as a diamond, sometimes as a memory. True atonement is never bought. It is remembered."</p>
+
+<h3 id="the-smell-of-thyme">The Smell of Thyme</h3>
+<p class="byline">A tale of the Chain-Lanterns and the Hearth-Menders, told in the villages that still remember the burnings.</p>
+<p>The smell of thyme is the last clear thing Quinn remembers — crushed between her mother's fingers, sharp and green in the morning light. <em>Thyme for courage,</em> her mother had whispered, pressing a sprig into her palm. <em>Thyme for memory.</em></p>
+<p>Then the torches crested the hill.</p>
+<p>Quinn is twelve, small-boned and sharp-eyed, with a mage's mark like a bruise behind one ear she has never learned to name. She can hear the death-scream of wheat when fire draws near — a useless gift until the wheat screams <em>now</em>, and that means the Chain-Lanterns are close.</p>
+<p>They move like butchers: five hooded figures, a leader with a wax-sealed writ, no knock, only the splinter of a kicked-in door while her mother calmly keeps cutting bread. <em>Where is the girl?</em> Her mother says nothing. She is good at nothing — the first gift a village witch gives her daughter is the trick of becoming furniture, of vanishing into the grain of a chair while the world outside comes apart.</p>
+<p>Quinn is already in the root cellar, behind drying sage and mugwort, counting breaths — eight, never nine, because nine belongs to the dark that waits between heartbeats. Through the floorboards she sees the glint of a Lantern's bell. One ring for accusation, three for burning. She has heard it in nightmares since she was six. Now it is real.</p>
+<p>The village witch, old Mira, isn't surprised — she has expected the Lanterns since a neighbor's boy swore he heard Quinn talking to a frost-blackened apple tree, and swore the tree answered. She finds Quinn as the first thatch catches and presses three things into her hands: a stick of chalk, a knot of scarlet thread, and a name that is not her own. <em>You are not Quinn anymore. You are Thyme. And you will run.</em></p>
+<p>The Lanterns drag Mira into the square, where the smoke of burning thyme hangs thick and sweet. They do not burn her yet — they want the girl's true name first. Mira stares into the smoke and smiles, brittle as old bark. <em>She is already gone. And you will not remember her face.</em></p>
+<p>It is no single spell — it is a curse forty years in the weaving, spun from every bowl of soup given to the feverish, every whispered "I'm here" at a deathbed, every child she caught as it slipped into the world. All of it, one thread, pulled taut now. The Lantern leader knows Mira's face. He knows the mother's face. But the daughter's slips from his memory like water through cupped hands, even as he writes it down.</p>
+<p>Quinn runs through the burning orchard, the smoke masking her scent, and finds the first of a chain of safe houses: a charcoal-burner's widow who owes an old debt to a hidden network of hearth-witches called the Hearth-Menders. The widow gives her bread, salt, boots stuffed with moss — and asks for one thing in return. <em>Braid my hair.</em> Quinn's hands shake, but she does it. <em>Now you are not just a girl running,</em> the widow says. <em>You are someone who gave something. That is harder to forget.</em></p>
+<p>She is passed from hand to hand — a longhouse kitchen deep in the pines, where the Hearth-Menders sort beans and trade fragments of news in low voices, believing secrecy is just another kind of debt. An old woman there, Mother Hemlock, sets a bowl of thyme soup before her. <em>You can hear plants,</em> Hemlock says — not a question. <em>That is not a curse. It is a witness. The wheat screamed because it was afraid. You heard it. Now you must carry that. That is the work.</em></p>
+<p>The road leads at last to a gray river with no bridge, where a ferrywoman in a red-hooded cowl waits beside a silent child who counts pebbles into the water and never blinks. The ferrywoman trades Quinn a thread of grey wool, dipped in the river until it runs red, for passage — and for something else, unnamed, that costs Quinn the sound of her own mother's name. She tries to speak it and finds only an empty space where the word used to live.</p>
+<p>"You've paid," the ferrywoman says.</p>
+<p>"I didn't say it."</p>
+<p>"You forgot how to. That's the coin."</p>
+<p>On the far shore is a silk-weaver's cottage, where a woman who does not speak for three days finally asks Quinn's name. "Quinn," she says. "No," the weaver answers. "That name is ash. Choose another." Quinn looks at the thyme cooling in her soup bowl. "Thyme," she says. "My name is Thyme."</p>
+<p>The weaver ties a strip of deep-red silk around her wrist — a witness cord, meant to remember the truth of her even when she forgets it herself.</p>
+<p>Thyme grows up in that valley. She learns to weave silk fine enough to hold light like water, and to tie cords that remember what the mind tries to lose. She never sees her mother again, and never learns that Old Mira's last curse worked — that the report filed against her named a girl with the wrong hair and no name at all, and that the case was closed within the year.</p>
+<p>She keeps the red thread on her wrist. When she is old enough, she joins the Hearth-Menders — not for revenge, but because someone has to stir the pot, and the soup is always free. The second bowl costs you a story.</p>
+<p class="closing">"The root that feeds is the root that binds. Carrying is heavier than running. But it is also, somehow, the thing that lets you stop."</p>
+
+<h3 id="the-second-hearth">The Second Hearth</h3>
+<p class="byline">A tale of two rival healers, told in villages where the hedge-witch and the wandering sister eventually learn to share a kettle.</p>
+<p>Thornwood is a village of sixty souls, a mill, a ford, and a hearth-witch named Faye, who for thirty years has mended bones, settled disputes, and kept the dark from the door in exchange for nothing more than soup and a place by the fire. The villagers do not thank her. That is fine. Thanking was never why she did it.</p>
+<p>Then the crown appoints a new lord to the manor — a man with a hunting hawk, a young wife, a sickly infant, and no patience for hedgerows. His carriage founders in the ford; his escort tramples the miller's bean field; he does not apologize. Faye dislikes him at once.</p>
+<p>It is his wetnurse who unsettles her more. A tall, efficient woman named Bryn, dressed in the plain gray robes of an order Faye knows only by rumor — women who tend the dying and the newly born and speak of "the Cord" as though it were owed something. Bryn's eyes flick toward the door whenever she thinks no one is watching, as if waiting for permission she has not yet been given.</p>
+<p>The two women begin a quiet war. Bryn reorganizes Faye's herb stores "for efficiency," pausing over the mugwort as if wondering whether the old ways still hold power. Faye "airs out" Bryn's witness cords by hiding them. Bryn salts the well water, just enough to cloud Faye's readings. Faye ties a red thread over the kitchen door, a working that makes the room too warm for anyone dressed in the order's gray. Neither says a word about it to the other.</p>
+<p>The first crack in the war comes over a fence. The lord's hunting hawk kills a widow's goat, and he offers a single insulting coin in payment. The widow goes to Faye, furious. Faye cannot curse a lord — the Chain-Lanterns would come for a noble's mysterious death — so she needs another way. She finds Bryn already at the broken fence that night, running her fingers over the splintered wood.</p>
+<p>"You're not going to curse him," Bryn says. "Too risky."</p>
+<p>"No. But he needs to understand the debt."</p>
+<p>Bryn produces a length of red thread — a witness cord, the kind that records grievances — and together, in the dark, they tie it around the lord's carriage axle. Not a curse. A record. Every turn of the wheel will whisper the widow's name in his ear while he sleeps. He will not know why he dreams of goats for a week. In the morning, a purse of silver appears at the widow's door, with no explanation attached.</p>
+<p>Neither woman speaks of it, but when Faye returns to her cottage, she finds the kettle already warm. Bryn has been there.</p>
+<p>"You didn't have to help," Faye says, the next time they meet.</p>
+<p>"The goat was not your debt alone."</p>
+<p>It is the first thread that binds them. More follow: a midnight fever in the lord's sickly infant, tended by both women working side by side without a word between them until dawn, when the fever finally breaks; a missing child found unharmed by a standing stone, led home by each woman holding one of her hands; a midwinter feast the two of them are not invited to, where they cook soup for the villagers who were forgotten and quietly agree that neither of them is quite so useless, or so sentimental, as the other believed.</p>
+<p>By spring, the lord is recalled to court and leaves without his wife or child. His lady, to everyone's surprise, asks Faye to teach her herbcraft, on the condition that Bryn teach her something of the order's ways in return. The three women begin eating together once a week — not as friends, exactly, but as people who have seen enough of the world to stop pretending they need to do everything alone.</p>
+<p>One evening, Faye finds a red thread tied between a chair leg and the soup pot's handle. She did not tie it. Bryn did not tie it either. Neither of them cuts it down.</p>
+<p class="closing">"Some debts are not paid in coin or courage, but in the quiet insistence of showing up, again and again, for the people who cannot show up for themselves."</p>
+
+<h3 id="the-minister-who-left-no-gift">The Minister Who Left No Gift</h3>
+<p class="byline">Told along the Brass Coast, where the forest is said to watch every child born to power.</p>
+<p>A girl named Nia was born in a trade post at the edge of the Brass Coast, her father a dock-master, her mother lost to fever before Nia could speak. The forest people of that valley had no quarrel with the child, but they kept an old treaty with the wood itself: guard the innocent, whoever their parents were.</p>
+<p>So a sentinel watched her, and she never once saw its face — only its signs. A feather on the windowsill. A stone that had not been there the night before. A knot tied into a rope that had been straight an hour earlier.</p>
+<p>When Nia was five, she found a polished river stone on her pillow and kept it under her tongue until her father made her spit it out. When she was ten, she left her first gift in return — a button from her coat, set on the doorstep. By morning it was gone, replaced with a single leaf folded into the shape of a bird. She asked the sentinel who it was; the answer came only as a pattern of pebbles on the path, a question mark that was also a spiral.</p>
+<p>She grew. Her gifts grew stranger, and so did its answers — a feather that could write on its own for an hour, a thimble that never lost its thread, a dried flower that smelled of rain in dry country.</p>
+<p>In time Nia became a minister in the colonial administration, not because she sought it, but because she was good at the work — she spoke three languages, could find the hidden clause in any contract, could tell a farmer his land was needed for a new road without flinching. She told herself she was helping. She moved families to better plots. She negotiated water rights. She shaved a fraction off a grain tariff and believed it saved lives. She did not see the families who disappeared. She did not see who was taken to work the coast in chains.</p>
+<p>Her gifts to the sentinel stopped. She had nothing left to give that would not be a bribe.</p>
+<p>It waited a month. A year. Two years. Then one night she woke to find an unfamiliar white cloth folded on her desk, tight as a fist, a single red thread running through its hem.</p>
+<p>"I have nothing to give," she whispered.</p>
+<p>A voice answered from the shadow of the curtain — the first she had ever heard from it. "You have your blood. That is not nothing."</p>
+<p>"My blood is not from here. You know that."</p>
+<p>"Home is not a matter of blood. You have lived in this valley thirty years. The trees know your step. The well knows your cup. The only thing that does not know you anymore is your own record."</p>
+<p>She was silent.</p>
+<p>"Why do you attack your home?" it asked.</p>
+<p>"I am not attacking. I am administering. There is a difference."</p>
+<p>"Is there? The surveyors who came last week drew a line through the grove where my mother is buried. They did not ask. They measured. That, too, is a kind of attack."</p>
+<p>She had signed that survey herself, telling herself it was for the road, which would bring wages, which would feed families. She had never asked about the grove.</p>
+<p>"I have no choice," she said at last.</p>
+<p>"You have the same choice you have always had," the sentinel answered. "You can give a gift. Or you can take one."</p>
+<p>It left her sitting at her desk until dawn. She did not cry. She wrote her resignation and did not send it. She folded the white cloth into her pocket. Three days later she disappeared. Her seal, her records, her desk were all found untouched. She was not.</p>
+<p>Some say the forest took her in. Others say she drowned in the monsoon river. A very few, quietly, say she became the next sentinel, watching the next child of empire, waiting to ask the same question.</p>
+<p class="closing">"A gift given is a thread. A gift taken is a cut. The forest does not judge anyone who comes to it. It only remembers."</p>
+
+<h2 id="section-6">VI. Oaths and Verdicts</h2>
+<p class="text-sm text-muted">Where law and mercy meet — knights who unbuckle their armor, judges who weigh the unweighable, and the loopholes truth slips through.</p>
+
+<h3 id="the-weight-of-the-armor">The Weight of the Armor</h3>
+<p class="byline">A tale of the last siege of Corvane, sung by a Vhasian cantor who once carried water for the wounded as a boy.</p>
+<p>The wind over the burning orchards carried ash and the sour smell of scorched fruit. Sir Corin rode through the haze, his mail still caked with the mud of a battle three days gone, the weight of twenty years of service pressing on his shoulders like a second skin. He found a boy of twelve kneeling over a dead cook, small fingers working a tarnished ring from the corpse's thumb.</p>
+<p>The boy hummed a lullaby, uneven as dough under a novice's hands, and looked up as the ring slipped free.</p>
+<p>"Stand," Corin said, his voice hoarse.</p>
+<p>The boy obeyed, trembling. The cook's flour-stained apron lay beside the body — a man who, by all accounts, had fed a starving garrison until the end.</p>
+<p>"I should hang you," Corin said, and meant it. He had hanged looters before, men who broke the last law left standing in a fractured province.</p>
+<p>Instead of begging, the boy began to sing an old ballad — the one that would later be known simply as his own, wherever he carried it:</p>
+<blockquote>
+"Forget-me-not," the proud knight said,<br>
+armed and armored for war.<br>
+His lady kissed him through her tears,<br>
+fearing to see him no more.<br><br>
+Down by the river where the purple flowers grow,<br>
+he held her close and whispered his love,<br>
+but armed and armored, he felt not her touch —<br>
+the silk of her delicate glove.<br><br>
+She wept. He rose, as if to leave,<br>
+but turned for the flowers instead.<br>
+Overreaching, he tumbled down,<br>
+and as he sank, he said, "Forget-me-not."
+</blockquote>
+<p>Corin listened, and the weight of his armor became suddenly apparent to him — not the steel, but the habit of keeping the world at arm's length. He realized he could no longer picture his own wife's eyes, only the shape of her letters read by lantern-light.</p>
+<p>"Who taught you that?" he asked, the edge gone from his voice.</p>
+<p>"The cook," the boy said, nodding at the corpse. "He was kind. He taught me to knead bread, and he taught me the song. He said it was about the weight of things we choose to carry."</p>
+<p>Corin loosened the twine around the boy's wrist — enough to let the blood flow, not enough to free him. "Walk," he said. "And sing if you must. The road ahead is long, and the armor only grows heavier."</p>
+<p>They reached the besieged city of Corvane within the week. Its lower town was a labyrinth of smoke and stone, its air tasting of iron and burnt honey. In the ruined courthouse, Corin read aloud a writ declaring all law in the city forfeit until a legitimate lord could restore it. The boy's shoulders slumped at the sound of it — the last pretense of justice, dissolving.</p>
+<p>Corin cut the twine from the boy's wrist for good and pulled off his own gauntlet. "Stay," he said. "Help me hold the walls. Help me remember what the armor is for." The boy ran to the well without hesitation and carried water to a wounded militiaman on the parapet, and something in Corin loosened as he watched — the first crack in a code he had worn like a second skin for twenty years.</p>
+<p>The siege wore on for a week. On its seventh night, as the lower streets burned, the boy found an infant abandoned beneath a heap of blankets in a collapsing alley and gathered it into his arms just as a flaming roof-beam gave way above them. Corin threw himself into its path, taking the blow across his own back, and the impact snapped his helm loose and sent it rolling into the ash. For the first time in years his face was bare beneath the hellish firelight, and in that unguarded instant an understanding passed between the boy and the knight that needed no words: they would not survive this together, but they had shared the same sorrow, the same fragile humanity beneath the steel.</p>
+<p>He carried the child to the one sanctuary still standing and did not live to see the dawn.</p>
+<p>When the southern gate finally fell, Corin's body was carried out on a makeshift stretcher before the conquering lady of the besieging army, who looked down at it with cold arithmetic in her eyes. "A ransom would have solved this," she said. "We could have taken a price and avoided the extra loss."</p>
+<p>The boy knelt beside the stretcher and sang the lament that would become known as the <em>Planctus Armatus</em> — the song for the armor-bound — his voice raw and trembling over the wreckage of the square, until even the soldiers who had come to loot lowered their weapons and stood still to listen. As the final note fell, the roof of the last standing chapel gave way behind them in a rain of embers, and the wind seemed to carry the old refrain along with the ash: <em>forget-me-not</em>.</p>
+<p class="closing">"The strongest fortifications cannot withstand the hunger of fire. But a song, once sung over the right grave, outlives the siege that made it necessary."</p>
+
+<h3 id="the-justicars-judgment">The Justicar's Judgment</h3>
+<p class="byline">A tale of a Viterran hedge-court, told by a clerk who sharpened the quills for the trial.</p>
+<p>The evening mist clung to the hedge-court like a shy lover, curling around low stone benches and half-finished cups of small beer. The court had been summoned to hear the case of Baron Aldric of the Scar — a man the presiding Justicar, Elodie, remembered as a laughing young knight whose sword had once sung as he rode, and who had since abandoned a queen's mother mid-battle, switched sides twice, and sworn fealty back again when it suited him.</p>
+<p>Elodie entered in a cloak of deep violet trimmed in crimson, a scar of old white bone running down one cheek — a souvenir of a siege where she had shielded a comrade from falling stone. She had once been squire to a knight who fought beside Aldric in his youth, and who had filled her childhood with stories of the baron's brilliance before falling in battle himself. She had sworn, afterward, to carry that memory of honor into the law.</p>
+<p>"Let the record note," she said, lifting her gavel, "that this court is convened to hear the charges laid against Baron Aldric, whose oath to the crown has been called into question. The law shall be our guide, even when its reach feels insufficient."</p>
+<p>The clerk read the charges: treason by repeated oath-breaking; unlawful levy upon the peasants of his own land; assault upon a servant, resulting in the loss of her hand; and refusal to ransom his own firstborn son from captivity. The first three fell within the court's reach. The fourth, Elodie ruled, belonged to a grayer country of custom and conscience, and would be heard as testimony rather than statute.</p>
+<p>A woman named Bryn was called first — once wetnurse to the baron's late first wife, her left hand ended now in a rough brass hook, forged from a farmer's rasp. She told the court that she had left the baron's service after his wife's death and been accused, days later, of stealing a locket his wife had given her on her deathbed. He had taken her hand for it and laughed as he did, calling it a trifle. His counsel objected that the baron held rights of pit and gallows on his own land, and Elodie, after consulting the ancient <em>Codex of Precedents</em>, ruled the testimony admissible only as character evidence — the loss of the hand itself lay beyond the court's reach.</p>
+<p>A chapel-keeper testified to the burning of his church and the twelve souls lost inside it on the baron's order, in pursuit of rebels who were never found. A widowed miller's wife testified to a "protection" levy that had taken half her family's harvest while her husband sickened from hunger in an empty barn.</p>
+<p>Then came the fourth charge. Years before, the baron's eldest son, Roran, had been captured in battle at seventeen. The customary ransom was three hundred silver marks, discounted to two hundred fifty if paid within the week. The baron's own words were read into the record, sworn by the enemy herald who had carried them: <em>I have more sons and can make further. The boy was weak. Let them keep him.</em></p>
+<p>Roran, now a gray-faced man of thirty-seven with a silvered gauntlet on one hand, rose from the gallery. A hedge-knight with no name to speak of had paid his ransom out of his own purse, died of fever the following winter, and left Roran his sword. Roran never returned to his father. He fought in distant wars, won a queen's own pennon at a siege that made his name, and had not spoken his father's name aloud in seventeen years.</p>
+<p>"Father," he said now, quietly, "do you know what I remember most? Not the cell. Not the chains. The moment I heard you say it. I was hiding behind the herald's tent. I heard you laugh."</p>
+<p>Elodie deliberated three hours before returning to the bench. She found the baron guilty of treason and stripped him of every land, title, and pension he held. On the matter of the ransom, she invoked a clause unused in two centuries — the Right of Acknowledgment, which let a child who had never been ransomed, visited, or named in a will demand that a parent speak one truth aloud, under witness, or be declared unfit for any lawful burial.</p>
+<p>The baron scoffed. "A truth? I have spoken a thousand. A man must cut what he cannot carry. Sons are arrows — you loose them and you do not weep. That is my truth."</p>
+<p>"No," Roran said. "Your truth is that you were afraid. Not of the men who held me. Of me. I was stronger than you at seventeen, and you saw it, and you could not bear to owe me anything, because you have never owed anyone in your life. I am not asking you to love me. I am asking you to say it, once. Say: <em>I was afraid.</em>"</p>
+<p>The mask the baron had worn his whole life — the shrug, the smile, the armor of not caring — cracked at last. "You killed my wife," he said first, bitterly, absurdly. "You wear her face." Roran only waited. And then, so quietly the clerks leaned forward to catch it: "I was afraid."</p>
+<p>"Of what?" Elodie asked.</p>
+<p>"Of him. Of what he would become. He would have been better than me. And I could not stand to watch it happen."</p>
+<p>Roran turned and walked away without another word, his silvered gauntlet clicking softly against the stone. Elodie lifted her gavel. "The Right of Acknowledgment is satisfied. The court is adjourned. Former Baron Aldric, you are free to go — but I would leave before winter, if I were you."</p>
+<p>He was found dead in a ditch three winters later, unclaimed, his body circled in salt by whoever found him first — he had, by then, outlived his own right to burial. Roran took service in the royal household and never once accepted a ransom for a captive of his own, telling one lord who offered him five hundred marks to pay it instead to the widow of the hedge-knight who had once bought his freedom. "I had a father, once," he said. "That was expensive enough."</p>
+<p class="closing">"The Right of Acknowledgment may be invoked by any child who was not ransomed, not visited, not named in a will. The truth, once spoken, is payment in full. No further interest shall accrue."</p>
+
+<h3 id="the-judge-of-the-western-gate">The Judge of the Western Gate</h3>
+<p class="byline">Told by a merchant who had crossed the western passes three times, a scar on his lip where a legal seal had once bitten him.</p>
+<p>Far west, where the river runs thin, a faith of contracts rather than sermons built courts of pale stone. Its followers did not preach. They judged.</p>
+<p>A farmer named Zara owed a debt to one of their templars — silver she had taken to buy a plow that broke before the harvest came in. The templar arrived at her door. "You carry one hundred silver pieces of debt."</p>
+<p>"I have no silver," she said. "I have a goat."</p>
+<p>"A goat is worth five silver."</p>
+<p>"Then take twenty goats. I have three."</p>
+<p>The templar considered this. "The Covenant allows for substitution, but the value must be equal. A goat is not equal to silver."</p>
+<p>"Then take my name," Zara said.</p>
+<p>He frowned. "Your name has no value."</p>
+<p>"It has value to me. And to my children. And to this land. Take my name, and the debt is settled."</p>
+<p>He could not take it — the Covenant had no clause for names, only coin and goods. He left empty-handed, and Zara told her neighbors what had happened. Soon half the district was offering names instead of silver, and the templars, bound by their own law, found themselves unable to collect a single one of them. Their tidy system of weights and debts began, quietly, to collapse.</p>
+<p>It is said the faith's founder appeared to a templar in a dream. "You have found a gap," he said. "I will close it." But by the time the Covenant was amended, Zara had already died of old age, her debt still uncollected — and the templars, in a fit of contrition or superstition, built a small shrine in her memory. They still argue, among themselves, about whether she won.</p>
+<p class="closing">"The law is a wall. A name is a door. The wall has no door in it — but a wall cannot close what it never saw coming."</p>
+
+<hr>
+
+<div class="frame">
+<h2 style="margin-top:0;">Colophon</h2>
+<p>These tales are adapted from the broader story-cycle material told across Fate's Edge's regions — the frost sagas of the Linn coast, the horror-nights of the Direwood, the crossroads tales of the southern trade roads, the folk stories of the Uncounted, and the framing narratives buried inside two larger sourcebooks. Each has been given a light editorial pass: typos and continuity snags mended, purple prose trimmed, real-world echoes filed off, and the game-mechanical trappings set aside so the stories can stand on their own as what they always were underneath — things told around a fire, to pass a debt on to the next listener.</p>
+<p>Nothing here is canon law for your table. Read it, adapt it, argue with it, or hand it to a player and let them tell it in character. That is what these stories are for.</p>
+</div>
+
+<footer>
+Fate's Edge Proprietary Content — (c) 2024 Nicholas A. Gasper. All rights reserved.
+</footer>
+
+</body>
+</html>

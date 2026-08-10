@@ -1,0 +1,1229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Campaigns — Fate's Edge GM Toolkit</title>
+    <style>
+        :root {
+            --bg1: #08080c;
+            --bg2: #131318;
+            --bg3: #1c1c24;
+            --bg4: #262630;
+            --text: #e4e2e6;
+            --text2: #ada8b4;
+            --text3: #7c7684;
+            --gold: #4a9088;
+            --gold-hover: #5cabab;
+            --border: #33303c;
+            --red: #8e2a2a;
+            --green: #3d7a52;
+            --blue: #3c6e8f;
+            --purple: #5f3f7a;
+            --orange: #a8622a;
+            --brass: #9c7a3c;
+            --mist: #4f6b73;
+            --radius: 8px;
+            --font: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            background: var(--bg1);
+            background-image: radial-gradient(circle at 50% 0%, #14141c 0%, #08080c 60%);
+            color: var(--text);
+            font-family: var(--font);
+            padding: 1.5rem;
+            max-width: 1100px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+        h1, h2, h3, h4, h5 { color: var(--gold); margin: 0.5rem 0 0.3rem; }
+        h1 { font-size: 1.8rem; border-bottom: 2px solid var(--gold); padding-bottom: 0.3rem; }
+        h2 { font-size: 1.4rem; border-bottom: 1px solid var(--border); padding-bottom: 0.2rem; margin-top: 1.6rem; }
+        h3 { font-size: 1.1rem; margin-top: 1rem; }
+        h4 { font-size: 0.95rem; color: var(--text); }
+        a { color: var(--gold); text-decoration: none; }
+        p { margin: 0.35rem 0; }
+        ul, ol { margin: 0.3rem 0 0.5rem 1.3rem; }
+        li { margin: 0.15rem 0; }
+        table { border-collapse: collapse; width: 100%; margin: 0.5rem 0 0.8rem; font-size: 0.85rem; }
+        th, td { border: 1px solid var(--border); padding: 0.4rem 0.55rem; text-align: left; vertical-align: top; }
+        th { background: var(--bg3); color: var(--gold); }
+        tr:nth-child(even) td { background: rgba(255,255,255,0.02); }
+        .panel {
+            background: var(--bg2);
+            border-radius: var(--radius);
+            padding: 0.6rem 0.8rem;
+            border: 1px solid var(--border);
+            margin: 0.5rem 0;
+        }
+        .panel-gold { border-left: 4px solid var(--gold); }
+        .panel-red { border-left: 4px solid var(--red); }
+        .panel-blue { border-left: 4px solid var(--blue); }
+        .panel-green { border-left: 4px solid var(--green); }
+        .panel-purple { border-left: 4px solid var(--purple); }
+        .panel-orange { border-left: 4px solid var(--orange); }
+        .panel-mist { border-left: 4px solid var(--mist); }
+        .panel h3, .panel h4 { margin-top: 0; }
+        .badge {
+            display: inline-block;
+            padding: 0.05rem 0.5rem;
+            border-radius: 12px;
+            font-size: 0.65rem;
+            font-weight: 600;
+        }
+        .badge-gold { background: var(--gold); color: #06110f; }
+        .badge-red { background: var(--red); color: #fff; }
+        .badge-green { background: var(--green); color: #fff; }
+        .badge-blue { background: var(--blue); color: #fff; }
+        .badge-purple { background: var(--purple); color: #fff; }
+        .badge-orange { background: var(--orange); color: #fff; }
+        .badge-mist { background: var(--mist); color: #fff; }
+        .badge-gray { background: var(--bg4); color: var(--text3); }
+        .flex { display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center; }
+        .text-muted { color: var(--text3); }
+        .text-gold { color: var(--gold); }
+        .text-sm { font-size: 0.85rem; }
+        .text-xs { font-size: 0.7rem; }
+        .mt-1 { margin-top: 0.5rem; }
+        .mb-1 { margin-bottom: 0.5rem; }
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; }
+        .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.5rem; }
+        @media (max-width: 700px) { .grid-2, .grid-3 { grid-template-columns: 1fr; } }
+        hr { border: none; border-top: 1px solid var(--border); margin: 1rem 0; }
+        .toc { background: var(--bg3); border-radius: var(--radius); padding: 0.7rem 1rem; border: 1px solid var(--border); columns: 2; column-gap: 1.5rem; }
+        .toc a { color: var(--text2); display: block; padding: 0.12rem 0; font-size: 0.83rem; break-inside: avoid; }
+        .toc a:hover { color: var(--gold); }
+        @media (max-width: 700px) { .toc { columns: 1; } }
+        blockquote {
+            border-left: 3px solid var(--gold);
+            padding-left: 1rem;
+            margin: 0.5rem 0;
+            color: var(--text2);
+            font-style: italic;
+        }
+        .widget-card {
+            background: var(--bg3);
+            border-radius: var(--radius);
+            padding: 0.5rem 0.7rem;
+            margin: 0.3rem 0;
+            border-left: 3px solid var(--gold);
+            font-size: 0.8rem;
+        }
+        .widget-card .wname { font-weight: 600; color: var(--gold); font-size: 0.9rem; }
+        .field-list { margin: 0.3rem 0 0.5rem 1.2rem; font-size: 0.82rem; color: var(--text2); }
+        .field-list li strong { color: var(--text); }
+        .meta-tag {
+            display: inline-block;
+            padding: 0.05rem 0.4rem;
+            border-radius: 6px;
+            background: var(--bg4);
+            border: 1px solid var(--border);
+            font-size: 0.6rem;
+            color: var(--text3);
+        }
+        details summary { cursor: pointer; color: var(--gold); font-weight: 600; }
+        details summary:hover { color: var(--gold-hover); }
+    </style>
+</head>
+<body>
+
+<h1>🧭 Advanced Campaigns</h1>
+<p style="color:var(--text2);margin-bottom:0.5rem;">
+    <span class="badge badge-gold">GM Toolkit</span>
+    <span class="badge badge-blue">Campaign Management</span>
+    <span class="badge badge-purple">Long-Form Play</span>
+    <span class="badge badge-gray">Author: Nicholas A. Gasper</span>
+</p>
+
+<div class="panel panel-gold">
+    <strong>What This Toolkit Adds</strong>
+    <p class="text-sm mt-1">This expansion extends the core Fate's Edge campaign-generation rules with tools for running long, evolving campaigns: deeper Crown Spread development, a Session Zero builder, faction and threat ecosystems, a Momentum Dial for pacing, a Player Agency Points economy, regional and legacy generators, and a full GM cognitive-load kit for low-prep and emergency play. Reach for these tools once your table has finished its first arc and wants the world to keep growing — during Session Zero, between arcs, at campaign scale transitions, or any time you need a fast, low-prep way to keep a session moving. Everything here is modular: use what serves your table and skip the rest.</p>
+</div>
+
+<div class="toc">
+    <strong style="color:var(--gold);grid-column:1/-1;display:block;margin-bottom:0.3rem;">📑 Table of Contents</strong>
+    <a href="#intro">Introduction: Evolving Your Campaign</a>
+    <a href="#advanced-campaign-generation">Advanced Campaign Generation</a>
+    <a href="#session-zero">Session Zero Campaign Builder</a>
+    <a href="#threat-management">Advanced Threat Management</a>
+    <a href="#momentum-tracker">Campaign Momentum Tracker</a>
+    <a href="#player-integration">Advanced Player Integration</a>
+    <a href="#gm-techniques">Advanced GM Techniques</a>
+    <a href="#mechanical-integration">Advanced Mechanical Integration</a>
+    <a href="#campaign-specific-tools">Campaign-Specific Tools</a>
+    <a href="#storytelling-techniques">Advanced Storytelling Techniques</a>
+    <a href="#quick-reference-appendix">Appendix: Quick Reference Tools</a>
+    <a href="#agency-points">Player Agency Points</a>
+    <a href="#regional-customization-workshop">Regional Customization Workshop</a>
+    <a href="#legacy-creation-workshop">Legacy Creation Workshop</a>
+    <a href="#cross-system-synergies">Cross-System Synergies</a>
+    <a href="#campaign-scale-management">Campaign Scale Management</a>
+    <a href="#player-handouts">Player Handouts Package</a>
+    <a href="#improv-decks">Improvisation Deck System</a>
+    <a href="#extended-dashboard">Extended Campaign Dashboard</a>
+    <a href="#quick-build-templates">Quick-Build GM Templates</a>
+    <a href="#emergency-toolkit">GM Emergency Toolkit</a>
+    <a href="#gm-reference-sheet">One-Page GM Reference Sheet</a>
+    <a href="#scene-engines">Scene Engines</a>
+    <a href="#environmental-generators">Environmental Generators</a>
+    <a href="#npc-faction-lifecycle">NPC &amp; Faction Lifecycle</a>
+    <a href="#mystery-framework">Mystery-Building Framework</a>
+    <a href="#travel-expedition">Travel &amp; Expedition Framework</a>
+    <a href="#risk-reward-matrix">Risk/Reward Matrix</a>
+    <a href="#drift-correction">Campaign Drift Correction</a>
+    <a href="#downtime-engine">Downtime Engine</a>
+    <a href="#region-transitions">Region Transitions</a>
+    <a href="#five-minute-reset">The Five-Minute Reset</a>
+    <a href="#rule-131">The 1-3-1 Improvisation Rule</a>
+    <a href="#gm-hud">Single-Glance GM HUD</a>
+    <a href="#three-slot-memory">The Three-Slot Memory System</a>
+    <a href="#low-prep-blueprint">Low-Prep Session Blueprint</a>
+    <a href="#decision-throttling">Decision Throttling</a>
+    <a href="#emotional-load">Emotional Load Reduction</a>
+    <a href="#systemic-shortcuts">Systemic Shortcuts</a>
+    <a href="#pacing-autopilot">Pacing Autopilot</a>
+    <a href="#single-card-prep">Single-Card Session Prep</a>
+    <a href="#gm-checkin">GM Check-In Questions</a>
+    <a href="#conclusion">Conclusion: Continuous Campaign Evolution</a>
+</div>
+
+<hr>
+
+<!-- ===== INTRO ===== -->
+<h2 id="intro">Introduction: Evolving Your Campaign</h2>
+
+<h3>Beyond the Basics</h3>
+<p class="text-sm">Once a table has a few sessions under its belt, GMs often want more depth and tighter mechanical integration than the core campaign-generation tools provide. This expansion builds on the Crown Spread and core campaign structure with tools for evolving your story world over the long term.</p>
+
+<h3>Core Philosophy Reminder</h3>
+<p class="text-sm">Fate's Edge prioritizes collaborative storytelling over mechanical complexity. Every tool in this expansion should enhance — never replace — narrative-first play, player agency, and meaningful consequences.</p>
+
+<hr>
+
+<!-- ===== ADVANCED CAMPAIGN GENERATION ===== -->
+<h2 id="advanced-campaign-generation">Advanced Campaign Generation</h2>
+
+<h3>Evolving the Crown Spread</h3>
+<p class="text-sm">The Crown Spread is an excellent seed, but campaigns need room to grow beyond their initial draw.</p>
+
+<div class="panel panel-blue">
+    <strong>Seasonal Evolution Framework</strong>
+    <p class="text-sm mt-1"><strong>Winter (Establishment):</strong> Root themes take hold; initial conflicts emerge.<br>
+    <strong>Spring (Growth):</strong> New elements sprout; alliances form; complications multiply.<br>
+    <strong>Summer (Climax):</strong> Peak conflicts, major revelations, critical choices.<br>
+    <strong>Autumn (Harvest):</strong> Consequences manifest, legacies are established, new seeds are planted.</p>
+</div>
+
+<h4>Expanding Drawn Elements</h4>
+<p class="text-sm">When a Crown card's theme becomes central to your campaign:</p>
+<ol class="text-sm">
+    <li><strong>Deepen the Concept</strong> — add layers to the initial interpretation.</li>
+    <li><strong>Introduce Variations</strong> — create related but distinct elements.</li>
+    <li><strong>Connect to Other Elements</strong> — tie it to other Crown aspects.</li>
+    <li><strong>Evolve the Stakes</strong> — raise the personal and cosmic implications.</li>
+</ol>
+
+<h4>Example: A Pirate Queen's Evolution</h4>
+<table>
+<tr><th>Season</th><th>Development</th><th>New Complications</th></tr>
+<tr><td>Winter</td><td>Mysterious pirate captain with an amber-hulled ship</td><td>Rival captains, mysterious cargo</td></tr>
+<tr><td>Spring</td><td>Revealed as the last heir of a drowned maritime line</td><td>Family curse, ancient bloodline duties</td></tr>
+<tr><td>Summer</td><td>Attempts to harness deep-current power</td><td>Moral conflict, player opposition</td></tr>
+<tr><td>Autumn</td><td>Defeated, but offers a redemption arc</td><td>Future alliance possibility, changed motivations</td></tr>
+</table>
+
+<h3>Dynamic Campaign Timers</h3>
+<h4>Timer Evolution System</h4>
+<p class="text-sm">Campaign timers should evolve as player actions change the world:</p>
+<ol class="text-sm">
+    <li><strong>Introduction</strong> (0–2 segments): the threat becomes known.</li>
+    <li><strong>Escalation</strong> (3–4 segments): the threat gains momentum.</li>
+    <li><strong>Crisis</strong> (5–6 segments): immediate danger to players or campaign.</li>
+    <li><strong>Resolution</strong> (7+ segments): confrontation or transformation.</li>
+</ol>
+
+<h4>Creating New Timers</h4>
+<p class="text-sm">When existing timers resolve or become less relevant: identify emerging themes from recent sessions, consider player actions that created new tensions, look for unresolved consequences from major choices, and evaluate faction shifts and new power dynamics.</p>
+
+<h4>Timer Interactions</h4>
+<table>
+<tr><th>Type</th><th>Effect</th></tr>
+<tr><td><strong>Supporting Timers</strong></td><td>One timer's progress helps another (Plague Spread → Resource Scarcity).</td></tr>
+<tr><td><strong>Opposing Timers</strong></td><td>One timer's progress hinders another (Public Support ↓ as Crime Rate ↑).</td></tr>
+<tr><td><strong>Cascade Timers</strong></td><td>One timer's resolution triggers another (War Ends → Reconstruction Begins).</td></tr>
+<tr><td><strong>Hidden Timers</strong></td><td>Progress tied to player ignorance (an Ancient Awakening while players focus elsewhere).</td></tr>
+</table>
+
+<hr>
+
+<!-- ===== SESSION ZERO ===== -->
+<h2 id="session-zero">Session Zero Campaign Builder</h2>
+<p class="text-sm">Session Zero establishes a campaign's creative DNA. This procedure provides structured steps for aligning tone, themes, factions, and player intentions, merging character goals with the Crown Spread into a shared, coherent campaign vision. The full builder fits on a single sheet and runs in 45–75 minutes.</p>
+
+<div class="panel panel-gold">
+    <strong>A Strong Session Zero Ensures</strong>
+    <ul class="text-sm mt-1">
+        <li>Every character enters the world with meaningful motivations.</li>
+        <li>The GM presents multiple, viable campaign seeds.</li>
+        <li>Factions, threats, and relationships have clear starting points.</li>
+        <li>The table agrees on tone, themes, limits, and expectations.</li>
+    </ul>
+</div>
+
+<h3>Step 1: Character Intentions</h3>
+<p class="text-sm">Before discussing the world, define who the characters <em>want to be</em> within it. Each player completes:</p>
+<ol class="text-sm">
+    <li><strong>Primary Goal</strong> — a concrete objective for the first arc ("Track down the masked courier," "Clear my family name," "Unlock a forbidden ritual").</li>
+    <li><strong>Secondary Goal</strong> — a long-term or thematic desire (redemption, revenge, discovery, belonging).</li>
+    <li><strong>Connection</strong> — one explicit tie to another PC (debt, partnership, rivalry, obligation).</li>
+    <li><strong>Personal Stake</strong> — one thing they don't want to lose.</li>
+</ol>
+<table>
+<tr><th>Player</th><th>Primary Goal</th><th>Secondary Goal</th><th>Connection</th></tr>
+<tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+</table>
+<p class="text-xs text-muted">This worksheet feeds into the Campaign Dashboard (see Extended Campaign Dashboard, below).</p>
+
+<h3>Step 2: GM Campaign Seeds</h3>
+<p class="text-sm">The GM presents 3–5 seeds shaped around the setting and the group's interests. Each seed should include a clear conflict ("The Choir is building a new temple across the river"), a moving faction ("The Amber Consortium is pressuring local merchants"), a point of instability ("The King's Inquisitors have arrived unannounced"), and a thematic hook (mystery, tragedy, revolution, cosmic horror). Players vote on which seeds resonate most, then blend or refine as needed.</p>
+
+<h3>Step 3: Collaborative Crown Spread</h3>
+<p class="text-sm">Once a seed is chosen, the group performs a shared Crown Spread — the foundational pillars of the campaign.</p>
+<ol class="text-sm">
+    <li>Draw the standard 5-card Crown Spread.</li>
+    <li>For each card, ask: <strong>"How does this intersect with at least one PC's goal?"</strong></li>
+    <li>Rewrite each card's interpretation so it ties to a PC or faction.</li>
+    <li>Pick 1–2 cards to elevate as <strong>Core Campaign Anchors</strong>.</li>
+</ol>
+<div class="panel panel-purple">
+    <strong>Anchor Examples</strong>
+    <ul class="text-sm mt-1">
+        <li><strong>Suit of Chains (Reversed):</strong> A faction is secretly collapsing from within.</li>
+        <li><strong>Suit of Masks:</strong> A PC's hidden identity becomes central to the plot.</li>
+        <li><strong>The Crown of Lanterns:</strong> Something long-lost is awakening in the dark.</li>
+    </ul>
+</div>
+
+<h3>Step 4: Faction and Relationship Mapping</h3>
+<p class="text-sm">With characters and Crown Anchors defined, establish the world's starting state. For each major faction, mark its attitude toward the PCs:</p>
+<p class="text-sm text-gold"><strong>−3 Hostile · −2 Wary · −1 Suspicious · 0 Neutral · +1 Helpful · +2 Allied · +3 Invested</strong></p>
+<p class="text-sm">Prompt the table: Which factions care about the PCs right now? Which have reasons to oppose or manipulate them? Which stand to benefit from the Crown Anchors?</p>
+<table>
+<tr><th>Faction</th><th>Attitude</th><th>Current Agenda</th><th>Where They Touch PCs</th></tr>
+<tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+</table>
+
+<h3>Step 5: Tone, Themes, and Ethos Alignment</h3>
+<p class="text-sm">The GM presents 8–12 themes; players each choose 2–3 that excite them — redemption and cost, masks and identity, cycles, power and corruption, faith vs. uncertainty, fractured legacy, broken oaths, ancient return, and so on. Then ask the table: Should the campaign be more <strong>emotional</strong> or <strong>tactical</strong>? Are we comfortable with <strong>moral ambiguity</strong>, or should stakes be clearer? Should failure be <strong>painful</strong> or <strong>graceful</strong>? How much <strong>mystery</strong>, <strong>politics</strong>, or <strong>myth</strong> do we want? Use the answers to set the campaign's initial Themes.</p>
+
+<h3>Step 6: Safety, Structure, and Expectations</h3>
+<p class="text-sm">Close Session Zero with clear agreements on <strong>safety tools</strong> (lines and veils; an X-Card or Script Change tool; how to pause or reframe intense scenes) and <strong>structural agreements</strong> (expected session length and arc pacing, how often downtime occurs, whether story beats accumulate across scenes or reset, and expected spotlight rotation).</p>
+
+<h3>Outputs of Session Zero</h3>
+<p class="text-sm">By the end of the builder, you should have a Campaign Vision Statement (1–3 sentences), a list of Crown Anchors, player Primary and Secondary Goals, a Faction Map with starting attitudes, a Theme Set, established safety agreements, and seeds for the first Campaign Timers — formalized into the Campaign Dashboard and referenced at the start of each arc.</p>
+
+<div class="widget-card">
+    <div class="wname">📋 Dashboard Widget — Session Zero Summary</div>
+    <div class="text-xs text-muted mt-1">A one-page quick-reference capturing: Campaign Vision Statement · Crown Anchors (2–3 key cards) · Player Intentions Snapshot (primary/secondary goals, key connections) · Campaign Themes (3–5) · Starting Faction Attitudes table · Safety &amp; Structure Agreements (lines/veils, tools, playstyle, session length).</div>
+    <div class="text-xs mt-1"><em>Tip: keep this widget beside the Momentum Dial — together they shape session tone and campaign direction.</em></div>
+</div>
+
+<hr>
+
+<!-- ===== THREAT MANAGEMENT ===== -->
+<h2 id="threat-management">Advanced Threat Management</h2>
+
+<h3>Threat Ecosystem Design</h3>
+<p class="text-sm">Create interconnected threats that respond to player actions.</p>
+<table>
+<tr><th>Category</th><th>Characteristics</th><th>Player Response</th></tr>
+<tr><td>Personal</td><td>Directly targets PCs/friends</td><td>Immediate, emotional response</td></tr>
+<tr><td>Social</td><td>Affects communities/organizations</td><td>Strategic, diplomatic approach</td></tr>
+<tr><td>Cosmic</td><td>Universal/supernatural scope</td><td>Mythic, philosophical engagement</td></tr>
+</table>
+
+<h4>Threat Evolution Matrix</h4>
+<table>
+<tr><th>Response ↓ / Trend →</th><th>Ignore</th><th>Oppose</th><th>Negotiate</th><th>Join</th></tr>
+<tr><td><strong>Weakens</strong></td><td>Grows stronger</td><td>Splits/retreats</td><td>Seeks allies</td><td>Absorbs influence</td></tr>
+<tr><td><strong>Strengthens</strong></td><td>Spreads corruption</td><td>Escalates conflict</td><td>Offers better deal</td><td>Demands loyalty</td></tr>
+<tr><td><strong>Transforms</strong></td><td>Changes nature</td><td>Reveals true form</td><td>Shows hidden agenda</td><td>Offers power</td></tr>
+</table>
+
+<h3>Faction Dynamics System</h3>
+<p class="text-sm">Track faction attitudes on a −3 to +3 scale:</p>
+<table>
+<tr><th>Value</th><th>Attitude</th><th>Description</th></tr>
+<tr><td>−3</td><td>Enemy</td><td>Actively working against player interests</td></tr>
+<tr><td>−2</td><td>Hostile</td><td>Will cause trouble when possible</td></tr>
+<tr><td>−1</td><td>Unfriendly</td><td>Suspicious and unhelpful</td></tr>
+<tr><td>0</td><td>Neutral</td><td>Indifferent to player actions</td></tr>
+<tr><td>+1</td><td>Friendly</td><td>Helpful when convenient</td></tr>
+<tr><td>+2</td><td>Supportive</td><td>Actively assists player goals</td></tr>
+<tr><td>+3</td><td>Ally</td><td>Will sacrifice for player interests</td></tr>
+</table>
+
+<h4>Faction Timers</h4>
+<p class="text-sm">Each major faction can track: <strong>Influence</strong> (0–6, power and reach in the region), <strong>Stability</strong> (0–6, internal cohesion and resources), <strong>Agenda Progress</strong> (0–8, advancement toward faction goals), and <strong>Player Relations</strong> (−3 to +3).</p>
+
+<hr>
+
+<!-- ===== MOMENTUM TRACKER ===== -->
+<h2 id="momentum-tracker">Campaign Momentum Tracker</h2>
+<p class="text-sm">Long-running campaigns naturally rise and fall in energy. The Momentum Tracker gives you a simple, shared dial for that energy, helping you pace sessions, frame stakes, and decide when to push harder or ease off.</p>
+
+<h3>The Momentum Dial</h3>
+<p class="text-sm text-gold" style="text-align:center;"><strong>−3 ⟶ −2 ⟶ −1 ⟶ 0 ⟶ +1 ⟶ +2 ⟶ +3</strong></p>
+<table>
+<tr><th>Level</th><th>Name</th><th>Feel</th></tr>
+<tr><td>−3</td><td>Stalled</td><td>The story feels stuck, players are reactive, threats advance unchecked.</td></tr>
+<tr><td>−2</td><td>Lagging</td><td>Progress is slow, stakes feel fuzzy, goals are unclear or too distant.</td></tr>
+<tr><td>−1</td><td>Drifting</td><td>Some motion, but no clear direction or urgency.</td></tr>
+<tr><td>0</td><td>Balanced</td><td>Healthy rhythm of action, reflection, and downtime.</td></tr>
+<tr><td>+1</td><td>Rising</td><td>Players are driving events, timers are moving, stakes feel alive.</td></tr>
+<tr><td>+2</td><td>Surging</td><td>Big swings, hard choices, multiple timers near crisis.</td></tr>
+<tr><td>+3</td><td>Overtimered</td><td>Everything is on fire. Climax-level intensity in nearly every scene.</td></tr>
+</table>
+<p class="text-sm">Keep the dial on a small index card or a corner of your Campaign Dashboard. Adjust it only when something <em>meaningful</em> happens — this is a coarse-grain tool, not a per-roll modifier.</p>
+
+<h3>Momentum Triggers</h3>
+<p class="text-sm">Use these as prompts, not rigid rules. When in doubt, adjust by +1 or −1, then wait a session to see if it holds.</p>
+
+<div class="grid-2">
+    <div class="panel panel-green">
+        <strong>Triggers That Raise Momentum</strong>
+        <ul class="text-sm mt-1">
+            <li><strong>Decisive Victories:</strong> resolving a major timer, defeating a key threat, securing a powerful asset.</li>
+            <li><strong>Major Revelations:</strong> secrets exposed, hidden agendas revealed, myths confirmed.</li>
+            <li><strong>Bold Player Agency:</strong> ambitious plans that reshape the situation.</li>
+            <li><strong>Emotional Breakthroughs:</strong> significant character moments, reconciliations, betrayals, confessions.</li>
+        </ul>
+    </div>
+    <div class="panel panel-red">
+        <strong>Triggers That Lower Momentum</strong>
+        <ul class="text-sm mt-1">
+            <li><strong>Downtime and Recovery:</strong> long stretches of training, healing, or quiet scenes.</li>
+            <li><strong>Plateaus:</strong> sessions where timers barely move and stakes don't escalate.</li>
+            <li><strong>Loss of Direction:</strong> players circling the same options, unsure what to do.</li>
+            <li><strong>Resolution Without New Hooks:</strong> a major conflict ends without seeding the next arc.</li>
+        </ul>
+    </div>
+</div>
+<p class="text-sm">Each session, ask: <em>"Did something happen that would make the world feel more unstable, intense, or in motion?"</em> If yes, nudge Momentum up by +1 (reserve +2 for tectonic shifts — end of an arc, a city in flames, a Crown suit fully claimed). Ask the inverse — <em>"Does the campaign feel like it's catching its breath, or wandering?"</em> — and nudge down by −1 if so (−2 marks a deliberate season break or time skip).</p>
+
+<h3>Mechanical Effects of Momentum</h3>
+<p class="text-sm">Momentum should be felt, not just tracked. Treat these as default guidelines and adjust to your table's tolerance for swingy outcomes.</p>
+<table>
+<tr><th>Dial</th><th>GM Guidance</th><th>Mechanical Nudges</th></tr>
+<tr><td>−3</td><td>Soft framing, lots of safety nets</td><td>Lower DV by 1 for routine actions; timers advance only on Desperate failures.</td></tr>
+<tr><td>−2</td><td>Comfortable, reflective</td><td>Default to Controlled/Standard; only high-risk moves start at Controlled.</td></tr>
+<tr><td>−1</td><td>Slight drag</td><td>Occasionally increase DV by 1 when the world should resist change.</td></tr>
+<tr><td>0</td><td>Baseline</td><td>Use normal DV and Position/Effect per core rules.</td></tr>
+<tr><td>+1</td><td>Tense, alive</td><td>Default to Controlled/Standard; occasional free increased Effect on bold plays.</td></tr>
+<tr><td>+2</td><td>Edge-of-seat</td><td>Raise DV by 1 for high-stakes actions; timers advance on Mixed results as well as failures.</td></tr>
+<tr><td>+3</td><td>White-knuckle</td><td>Start most major moves at Desperate; consider double timer ticks on catastrophic failures.</td></tr>
+</table>
+<p class="text-sm">You can also let players feel Momentum directly: at <strong>+2 or +3</strong>, offer an occasional bonus Story Beat when they lean into risks that match campaign themes; at <strong>−2 or −3</strong>, allow occasional automatic success on low-stakes, non-dramatic tasks to avoid bogging down.</p>
+
+<h4>NPC Reactions and Faction Behavior</h4>
+<p class="text-sm">At <strong>High Momentum (+2 to +3)</strong>: factions take bolder moves, NPCs are more likely to escalate or push for decisive outcomes, and new threats emerge quickly from unresolved problems. At <strong>Low Momentum (−2 to −3)</strong>: factions consolidate, dig in, or scheme quietly; NPCs stall, negotiate, or ask for more information; threats smolder rather than explode, giving players room to regroup.</p>
+
+<h3>Using Momentum in Prep and Review</h3>
+<p class="text-sm">At the end of each session, quickly answer: <strong>What changed in the world?</strong> (timers, factions, big events) <strong>What changed in the characters?</strong> (arcs, relationships, corruption, assets) <strong>Did the table feel hyped, tired, or mixed?</strong> Lean toward acceleration and excitement → raise Momentum by +1. Lean toward fatigue or drift → reduce by −1. Feels right → leave it.</p>
+
+<table>
+<tr><th>Dial Range</th><th>Suggested Session Opening</th></tr>
+<tr><td>−3 to −2</td><td>Start in a safe space: downtime scenes, slice-of-life, small mysteries.</td></tr>
+<tr><td>−1 to +1</td><td>Start in motion: travel interrupted, faction messenger arrives, a small but urgent problem.</td></tr>
+<tr><td>+2 to +3</td><td>Start mid-crisis: alarms blaring, attack underway, ritual already in progress.</td></tr>
+</table>
+<p class="text-sm">When Momentum sits at an extreme for more than 2–3 sessions, treat it as a signal to <strong>conclude an arc</strong> (if high) or <strong>inject a bold new hook</strong> (if low).</p>
+
+<h3>Player-Facing Momentum</h3>
+<p class="text-sm">Optionally, put Momentum in front of the players: include a small Momentum Track on the Campaign Dashboard handout, open sessions with a line like "We're at Momentum +2; things are hot right now," and invite players to call out moments they think should shift Momentum up or down. This reinforces that <em>their choices</em>, not GM whim, drive the campaign's temperature.</p>
+<p class="text-sm">If also using Player Agency Points (below): when Momentum rises due to a clearly player-driven change, award Agency Points to the driving character(s); when Momentum falls because players chose rest, reflection, or repair, allow discounted or expanded downtime options.</p>
+
+<h3>Momentum and Campaign Phases</h3>
+<p class="text-sm">Combine the dial with the Seasonal Evolution Framework: <strong>Winter</strong> aims for −1 to +1 (too high rushes past grounding; too low never gets started). <strong>Spring</strong> floats 0 to +2 with occasional spikes. <strong>Summer</strong> lives at +2 to +3 until the arc resolves. <strong>Autumn</strong> drifts back toward 0 or −1 as consequences settle and new seeds are planted. Treat these as ranges to deliberately aim for — a lever for shifting the story into a new phase.</p>
+
+<div class="widget-card">
+    <div class="wname">📋 Dashboard Widget — Momentum Dial</div>
+    <div class="text-xs text-muted mt-1"><strong>Low (−3 to −2):</strong> slow pace, introspection, safe moves, fewer crises. <strong>Balanced (−1 to +1):</strong> default rhythm, normal DV and timer motion. <strong>High (+2 to +3):</strong> fast pace, aggressive threats, Desperate framing.</div>
+    <div class="text-xs mt-1"><strong>GM Prompts:</strong> "Did the world heat up or cool down this session?" Shift Momentum by ±1 after major developments only. High Momentum → escalate timers; Low Momentum → ease difficulty.</div>
+    <div class="text-xs mt-1"><strong>Pressure:</strong> Upward (+) = victories, revelations, bold plans, emotional shifts. Keep (0) = mixed outcomes, lateral movement, stable stakes. Downward (−) = downtime, drift, unclear goals, quiet arcs.</div>
+</div>
+
+<hr>
+
+<!-- ===== PLAYER INTEGRATION ===== -->
+<h2 id="player-integration">Advanced Player Integration</h2>
+
+<h3>Character Arc Management</h3>
+<p class="text-sm">Help players develop meaningful character growth through four stages: <strong>Establishment</strong> (define current state and potential conflicts), <strong>Development</strong> (create opportunities for growth and choice), <strong>Crisis</strong> (present challenges that test core beliefs), and <strong>Resolution</strong> (allow meaningful transformation based on choices).</p>
+<p class="text-sm">Create mechanical hooks for development: moral dilemmas that challenge core values, relationships that create new obligations or conflicts, discoveries that change a character's understanding of the world, and consequences that force adaptation or growth.</p>
+
+<h3>Legacy System</h3>
+<p class="text-sm">Document major campaign impacts: <strong>Personal Legacies</strong> (how individual characters changed the world), <strong>Faction Changes</strong> (how major organizations were affected), <strong>World State</strong> (permanent alterations to the setting), and <strong>Relationship Networks</strong> (new connections and severed ties).</p>
+<p class="text-sm">Provide mechanical benefits for campaign completion: starting assets for new campaigns, reputation bonuses with relevant factions, special knowledge or contacts, and unique character options or backgrounds.</p>
+
+<hr>
+
+<!-- ===== GM TECHNIQUES ===== -->
+<h2 id="gm-techniques">Advanced GM Techniques</h2>
+
+<h3>Reactive Preparation</h3>
+<p class="text-sm">Prepare for player creativity without scripting outcomes. Build flexible frameworks rather than fixed scenes:</p>
+<table>
+<tr><th>Template</th><th>Includes</th></tr>
+<tr><td>Social Encounter</td><td>Key NPCs, potential conflicts, information stakes</td></tr>
+<tr><td>Exploration Challenge</td><td>Environmental hazards, discovery rewards, time pressure</td></tr>
+<tr><td>Combat Scenario</td><td>Opponent capabilities, tactical elements, victory conditions</td></tr>
+<tr><td>Mystery Investigation</td><td>Clues, red herrings, revelation triggers</td></tr>
+</table>
+
+<h4>Improvisation Framework</h4>
+<p class="text-sm">When players surprise you: identify core elements (what must remain true for story coherence?), assess player investment (what aspects do players care about?), find narrative hooks (how can new elements connect to existing story?), apply mechanical logic (what rules support this development?), and maintain momentum (how do you keep the story moving forward?).</p>
+
+<h3>Campaign Pacing</h3>
+<table>
+<tr><th>Energy</th><th>Duration</th><th>Focus</th></tr>
+<tr><td>High Energy</td><td>2–3 sessions</td><td>Major conflicts, climactic scenes, critical choices</td></tr>
+<tr><td>Moderate Energy</td><td>3–4 sessions</td><td>Character development, investigation, relationship building</td></tr>
+<tr><td>Low Energy</td><td>1–2 sessions</td><td>Downtime, recovery, preparation, world exploration</td></tr>
+</table>
+
+<h4>Arc Structure Guidance</h4>
+<p class="text-sm">Multi-session story arcs benefit from clear structure: <strong>Introduction</strong> (1–2 sessions, establish stakes and hook players), <strong>Development</strong> (2–4 sessions, complications multiply, alliances form), <strong>Climax</strong> (1–2 sessions, major confrontation, critical choices), and <strong>Resolution</strong> (1 session, consequences, new status quo).</p>
+
+<hr>
+
+<!-- ===== MECHANICAL INTEGRATION ===== -->
+<h2 id="mechanical-integration">Advanced Mechanical Integration</h2>
+
+<h3>Corruption System Evolution</h3>
+<table>
+<tr><th>Tier</th><th>Corruption Expression</th></tr>
+<tr><td>Tier I–II</td><td>Surface-level changes, minor abilities, social consequences</td></tr>
+<tr><td>Tier III–IV</td><td>Fundamental transformations, significant powers, world impact</td></tr>
+<tr><td>Tier V+</td><td>Mythic alterations, reality-bending abilities, cosmic significance</td></tr>
+</table>
+<p class="text-sm">Connect corruption to character themes: <strong>Power Corruption</strong> (strength gained at cost of morality), <strong>Knowledge Corruption</strong> (wisdom gained through forbidden understanding), <strong>Survival Corruption</strong> (endurance through dark adaptation), <strong>Love Corruption</strong> (connection maintained through dangerous bonds).</p>
+
+<h3>Asset and Follower Management</h3>
+<p class="text-sm">Organize holdings into a portfolio: <strong>Economic</strong> (trade routes, businesses, investments), <strong>Political</strong> (titles, contacts, influence networks), <strong>Military</strong> (retainers, fortifications, strategic positions), and <strong>Intelligence</strong> (informants, research facilities, magical resources).</p>
+<p class="text-sm">Let significant holdings evolve: <strong>Establishment</strong> (basic functionality, limited scope) → <strong>Development</strong> (expanded capabilities, regional influence) → <strong>Mastery</strong> (major impact, strategic significance) → <strong>Legacy</strong> (permanent change to the campaign world).</p>
+
+<hr>
+
+<!-- ===== CAMPAIGN-SPECIFIC TOOLS ===== -->
+<h2 id="campaign-specific-tools">Campaign-Specific Tools</h2>
+
+<h3>Custom Background Creation</h3>
+<p class="text-sm">Create setting-specific character origins: <strong>Origin Story</strong> (where and how the character was raised/formed), <strong>Core Skills</strong> (two skills naturally supported by background), <strong>Key Relationships</strong> (one ally and one rival with ongoing significance), <strong>Cultural Elements</strong> (unique customs, languages, or traditions), <strong>Obligations</strong> (what the character owes to their background), and <strong>Privileges</strong> (what the character can expect from their background).</p>
+<p class="text-sm">Connect backgrounds to campaign themes: identify background elements that relate to current threats, create opportunities for background knowledge to provide advantages, develop complications that arise from background obligations, and allow backgrounds to evolve based on player choices.</p>
+
+<h3>Regional Customization</h3>
+<p class="text-sm">Adapt core systems to different cultural contexts:</p>
+<table>
+<tr><th>Culture</th><th>Emphasis</th></tr>
+<tr><td>Aeler (Stone-Born)</td><td>Engineering, contracts, and infrastructure</td></tr>
+<tr><td>Lethai (Wood Elves)</td><td>Nature, seasonal cycles, and root-law</td></tr>
+<tr><td>Ykrul (Steppe Folk)</td><td>Mobility, honor, and spatial reasoning</td></tr>
+<tr><td>Kahfagia (Sea Folk)</td><td>Navigation, weather, and maritime law</td></tr>
+</table>
+<p class="text-sm">Modify threats to fit different environments: <strong>Desert</strong> (heat, sandstorms, water scarcity, nomad conflicts), <strong>Mountains</strong> (avalanches, altitude, isolation, territorial disputes), <strong>Forest</strong> (predators, labyrinthine trails, spirits, resource competition), <strong>Urban</strong> (politics, crime, overcrowding, infrastructure failure).</p>
+
+<hr>
+
+<!-- ===== STORYTELLING TECHNIQUES ===== -->
+<h2 id="storytelling-techniques">Advanced Storytelling Techniques</h2>
+
+<h3>Thematic Consistency</h3>
+<p class="text-sm">Create immersive environments through sensory detail: <strong>Visual</strong> (lighting, colors, architectural styles, movement patterns), <strong>Auditory</strong> (ambient sounds, speech patterns, musical traditions), <strong>Olfactory</strong> (scents, cooking aromas, industrial odors, natural fragrances), <strong>Tactile</strong> (textures, temperatures, weather effects, material qualities).</p>
+<p class="text-sm">Establish consistent social behaviors: greeting customs and social hierarchies, conflict resolution methods and legal systems, economic practices and trade relationships, and religious beliefs and spiritual practices.</p>
+
+<h3>Moral Complexity Framework</h3>
+<p class="text-sm">Effective moral choices require: <strong>Clear Stakes</strong> (what is gained or lost by each choice?), <strong>Genuine Conflict</strong> (why isn't there an obviously right answer?), <strong>Personal Investment</strong> (how does this affect the characters directly?), and <strong>Lasting Consequences</strong> (what changes based on the decision?).</p>
+<table>
+<tr><th>Consequence Type</th><th>Description</th></tr>
+<tr><td>Immediate</td><td>Resolves within the session (character fates, instant reactions)</td></tr>
+<tr><td>Ongoing</td><td>Affects future sessions/campaign (reputation, political fallout)</td></tr>
+<tr><td>Character</td><td>Personal growth or trauma, relationship changes</td></tr>
+<tr><td>World</td><td>The setting is permanently changed (a city's fate, a faction's influence)</td></tr>
+</table>
+
+<hr>
+
+<!-- ===== APPENDIX: QUICK REFERENCE ===== -->
+<h2 id="quick-reference-appendix">Appendix: Quick Reference Tools</h2>
+
+<div class="grid-2">
+    <div class="panel panel-gold">
+        <strong>Campaign Evolution Checklist</strong>
+        <ul class="text-sm mt-1">
+            <li>Review current campaign timers and their interactions.</li>
+            <li>Identify emerging themes and player interests.</li>
+            <li>Plan seasonal developments for major elements.</li>
+            <li>Create new threats that respond to player actions.</li>
+            <li>Develop faction relationship changes.</li>
+            <li>Prepare character arc advancement opportunities.</li>
+        </ul>
+    </div>
+    <div class="panel panel-blue">
+        <strong>Session Preparation Template</strong>
+        <ul class="text-sm mt-1">
+            <li>Review previous session outcomes and consequences.</li>
+            <li>Advance relevant campaign timers.</li>
+            <li>Prepare 2–3 potential scenes with flexible elements.</li>
+            <li>Identify player agency moments for each character.</li>
+            <li>Prepare Story Beat spend options for various outcomes.</li>
+            <li>Note connections to campaign themes and threats.</li>
+        </ul>
+    </div>
+</div>
+
+<h4>Threat Development Matrix</h4>
+<table>
+<tr><th>Threat Type</th><th>Player Response</th><th>Evolution</th><th>New Complications</th></tr>
+<tr><td>Personal</td><td>Ignore</td><td>Grows stronger</td><td>Spreads to allies</td></tr>
+<tr><td>Social</td><td>Oppose</td><td>Splits/retreats</td><td>Seeks new allies</td></tr>
+<tr><td>Cosmic</td><td>Negotiate</td><td>Shows hidden agenda</td><td>Offers better deal</td></tr>
+</table>
+
+<p class="text-sm"><strong>Character Arc Milestones:</strong> Establishment (define current state and potential conflicts) → Development (create opportunities for growth and choice) → Crisis (present challenges that test core beliefs) → Resolution (allow meaningful transformation based on choices).</p>
+<p class="text-sm"><strong>Campaign Pacing Guide:</strong> High Energy (2–3 sessions) major conflicts and climactic scenes · Moderate Energy (3–4 sessions) character development and investigation · Low Energy (1–2 sessions) downtime, recovery, preparation.</p>
+
+<hr>
+
+<!-- ===== AGENCY POINTS ===== -->
+<h2 id="agency-points">Player Agency Points</h2>
+<p class="text-sm">Player Agency Points (PAP) represent the table's commitment to collaborative storytelling. They reward players for shaping the campaign through bold choices, thematic play, and actions with long-term consequences. Unlike Story Beats (SB), which operate at the scene level, Agency Points operate at the <em>campaign</em> level — shared by the table but earned individually, fostering cooperation while still highlighting player choice.</p>
+
+<h3>Purpose</h3>
+<p class="text-sm">The PAP system provides a structured way for players to influence campaign-level elements, a reward loop for thematic, character-driven decisions, a safety valve for stalled sessions or unclear narrative direction, and a player-facing counterpart to the GM-facing Momentum Dial.</p>
+
+<h3>Earning Agency Points</h3>
+<p class="text-sm">Award points sparingly — 1–2 per session is typical, 3 is a cap.</p>
+<table>
+<tr><th>Category</th><th>Award 1 PAP When a Player…</th></tr>
+<tr><td>Major Narrative Decisions</td><td>Makes a choice that meaningfully alters the campaign's direction; pushes a moral, political, or personal conflict forward; accepts meaningful consequences to advance the story.</td></tr>
+<tr><td>Thematic Alignment</td><td>Explicitly engages an established campaign theme — acting in accordance with it, leaning into a related flaw or complication, or sacrificing advantage for thematic payoff.</td></tr>
+<tr><td>Crown Resonance</td><td>Directly invokes or complicates a Crown Anchor — its symbol, omen, faction, or implied meaning — or escalates/transforms a Crown-related situation.</td></tr>
+<tr><td>Bold Player Agency</td><td>Proposes an ambitious plan with campaign-altering stakes, initiates faction-level change or negotiation, or confronts a major NPC in a way that changes the board.</td></tr>
+</table>
+
+<h3>Spending Agency Points</h3>
+<table>
+<tr><th>Spend</th><th>Cost</th><th>Effect</th></tr>
+<tr><td>Modify a Timer Outcome</td><td>1 PAP</td><td>After a timer advances from failure or faction action: reduce its advancement by 1 tick, or move advancement to a different related timer (GM discretion).</td></tr>
+<tr><td>Influence a Crown Spread Draw</td><td>1–2 PAP</td><td>1 PAP: GM reveals one additional card before selection. 2 PAP: replace a drawn card with one from the top three of the deck. Does not guarantee safety — only shifts emphasis or theme.</td></tr>
+<tr><td>Introduce a Campaign Element</td><td>2 PAP</td><td>Add a new NPC, faction splinter, minor location, rumor, omen, or thread that fits established themes. GM retains veto power if it breaks tone or contradicts lore.</td></tr>
+<tr><td>Trigger a Flashback Arc</td><td>3 PAP</td><td>Start a multi-session or condensed flashback revealing character history, introducing lore tied to Crown Anchors, or re-contextualizing an ongoing conflict.</td></tr>
+<tr><td>Stabilize a Campaign Thread</td><td>1 PAP</td><td>Freeze or preserve an at-risk element in the fiction; mark it on the Dashboard as "Active Thread."</td></tr>
+</table>
+
+<div class="panel panel-red">
+    <strong>Limits and Safeguards</strong>
+    <ul class="text-sm mt-1">
+        <li>PAP cannot alter <strong>immediate</strong> scene outcomes — that's SB territory.</li>
+        <li>PAP cannot erase consequences — only reshape their long-term trajectory.</li>
+        <li>Players may not spend more than 3 PAP in a single session.</li>
+        <li>The GM may pause PAP spending during climactic or lore-critical scenes.</li>
+    </ul>
+</div>
+
+<h3>Integration with the Momentum Dial</h3>
+<p class="text-sm">Agency Points and Momentum mirror each other: at <strong>High Momentum (+2 to +3)</strong>, PAP cost for introducing chaos is reduced by 1. At <strong>Low Momentum (−2 to −3)</strong>, PAP cost for stabilizing or slowing down is reduced by 1. At 0 Momentum, no discounts apply — creating a push-pull economy where table desire and campaign rhythm influence each other.</p>
+
+<h3>Tracking Agency Points</h3>
+<p class="text-sm text-gold" style="text-align:center;"><strong>Agency Pool: ___ / Max 6</strong></p>
+<p class="text-sm">Players record individual contributions in a shared Player / Earned / Notes table.</p>
+
+<div class="widget-card">
+    <div class="wname">📋 Dashboard Widget — Agency Controls</div>
+    <div class="text-xs text-muted mt-1"><strong>Current PAP: ___ (Max 6)</strong></div>
+    <div class="text-xs mt-1"><strong>Earn When:</strong> big choices reshape the campaign · you engage core themes · you hit Crown Anchors · you propose bold plans.</div>
+    <div class="text-xs mt-1"><strong>Spend To:</strong> adjust a timer (1) · influence a Crown draw (1–2) · add a new campaign element (2) · trigger a flashback arc (3) · preserve a fading thread (1).</div>
+    <div class="text-xs mt-1"><em>Tip: use PAP to steer long-term narrative arcs, not individual rolls.</em></div>
+</div>
+
+<hr>
+
+<!-- ===== REGIONAL CUSTOMIZATION WORKSHOP ===== -->
+<h2 id="regional-customization-workshop">Regional Customization Workshop</h2>
+<p class="text-sm">Regions in Fate's Edge are more than maps — they are narrative engines. This workshop provides a structured procedure for designing unique regions with distinct culture, mechanics, and threat profiles: settings that shape play while remaining easy to run and flexible enough to adapt mid-campaign.</p>
+
+<h3>Regional Creation Procedure</h3>
+<ol class="text-sm">
+    <li>Define the Region's Identity Frame</li>
+    <li>Establish Cultural Pillars</li>
+    <li>Map Environmental Pressures</li>
+    <li>Create Local Threat Templates</li>
+    <li>Generate Regional Background Elements</li>
+    <li>Connect the Region to Campaign Themes and Timers</li>
+</ol>
+<p class="text-sm">Each step can be completed in minutes, but together they create a rich, living region.</p>
+
+<h3>Step 1: Identity Frame</h3>
+<p class="text-sm">Choose 1–2 options that define the region's core narrative role:</p>
+<table>
+<tr><th>Frame</th><th>Description</th></tr>
+<tr><td>Frontier</td><td>Untamed borders, new settlements, danger at the edges.</td></tr>
+<tr><td>Sanctuary</td><td>A place of healing, tradition, or spiritual refuge.</td></tr>
+<tr><td>Engine</td><td>A region that powers the world — trade hub, port, forge-city.</td></tr>
+<tr><td>Cauldron</td><td>Political, religious, or social tension ready to erupt.</td></tr>
+<tr><td>Relic</td><td>Built atop ruins, myths, or the long shadow of forgotten empires.</td></tr>
+<tr><td>Threshold</td><td>A region where two realities, cultures, or factions collide.</td></tr>
+</table>
+
+<h3>Step 2: Cultural Pillars</h3>
+<p class="text-sm">Define 3–5 elements that shape how people live and use them to influence NPC behavior, faction structures, and local beliefs. Choose or invent from: <strong>Values</strong> (honor, lineage, rebellion, knowledge, secrecy, hospitality), <strong>Institutions</strong> (guilds, temples, caravans, warbands, conclaves), <strong>Practices</strong> (rites, feasts, duels, pilgrimages, crafts, festivals), <strong>Tensions</strong> (class divides, magical taboos, ancient feuds, forbidden love).</p>
+<table>
+<tr><th>Pillar</th><th>Description</th><th>Mechanical Impact</th></tr>
+<tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+</table>
+
+<h3>Step 3: Environmental Pressures</h3>
+<p class="text-sm">Choose the dominant environmental pressures and translate them into mechanical nudges: <strong>Desert</strong> (heat, water scarcity, sandstorms, nomadic routes), <strong>Forest</strong> (predators, tangled paths, old-growth spirits, illusions), <strong>Mountains</strong> (avalanches, altitude sickness, sheer cliffs), <strong>Swamp</strong> (rot, disease, sinking paths, hidden fauna), <strong>Urban</strong> (corruption, crime, overcrowding, infrastructure failure), <strong>Coastal</strong> (storms, tides, piracy, sea spirits).</p>
+<p class="text-sm">Apply simple, narrative-first effects: <strong>Position Shifts</strong> (start certain actions at Controlled or Desperate), <strong>DV Adjustments</strong> (raise/lower DV for region-specific hazards), <strong>Emotional Tone</strong> (fearful forests, defiant mountains, suspicious ports), <strong>Timer Pressure</strong> (fast timers during storms, slow timers during festival seasons).</p>
+
+<h3>Step 4: Local Threat Templates</h3>
+<p class="text-sm">Create 2–3 reusable templates for threats unique to the region.</p>
+<table>
+<tr><th>Threat Type</th><th>Example</th><th>Timer / Move</th></tr>
+<tr><td>Environmental Hazard</td><td>Shifting dunes, echoing forest spirits</td><td>4-segment hazard timer</td></tr>
+<tr><td>Social Instability</td><td>Labor revolt, cult infiltration</td><td>Advance Faction Instability by 1</td></tr>
+<tr><td>Supernatural Pressure</td><td>Rift echoes, undead memory storms</td><td>6-segment threat timer</td></tr>
+</table>
+<p class="text-sm">Threats act through <strong>Pressures</strong> (reduce resources, escalate conflict, demand choices), <strong>Flares</strong> (sudden, dramatic events that disrupt stability), and <strong>Omens</strong> (warnings tied to Crown suits or local myths).</p>
+
+<h3>Step 5: Regional Background Generator</h3>
+<p class="text-sm">Ground PCs in the region with backgrounds that carry cultural and environmental hooks. Each includes: <strong>Origin</strong> (village, caravan, guild, monastery, ship, enclave), <strong>Core Skills</strong> (2 skills reflecting upbringing), <strong>Connections</strong> (one ally, one rival), <strong>Custom</strong> (a unique practice, rite, or taboo of the region), <strong>Obligation</strong> (something owed to the region — debt, vow, loyalty), and <strong>Privilege</strong> (a benefit from cultural membership).</p>
+
+<h3>Step 6: Integrate with Themes and Timers</h3>
+<p class="text-sm">Tie the region to the campaign's Crown Anchors, themes, and timer systems: connect at least one Crown Anchor to the region, create 1–2 Regional Timers, identify which factions' Influence or Stability rely on the region, and determine how the region's culture and pressures interact with Momentum.</p>
+
+<div class="widget-card">
+    <div class="wname">📋 Dashboard Widget — Region Snapshot</div>
+    <div class="text-xs text-muted mt-1">Identity Frame · Cultural Pillars (3) · Environmental Pressures · Local Threats (2) · Background Hooks (Origin, Obligation, Privilege) · Regional Timers.</div>
+</div>
+
+<hr>
+
+<!-- ===== LEGACY CREATION WORKSHOP ===== -->
+<h2 id="legacy-creation-workshop">Legacy Creation Workshop</h2>
+<p class="text-sm">The end of a campaign is not a closing door — it's the moment the world crystallizes into memory and becomes the foundation for future stories. This workshop provides a structured approach to evaluate the campaign's impact, finalize irreversible changes, and carry forward consequences into new arcs or new generations.</p>
+
+<div class="panel panel-gold">
+    <strong>Purpose</strong>
+    <p class="text-sm mt-1">Helps the table understand how the world has been permanently altered, identify what the characters leave behind, produce a "handoff document" for future campaigns, translate narrative accomplishments into mechanical legacy, and seed new arcs with thematic resonance and clarity.</p>
+</div>
+
+<h3>Workshop Overview</h3>
+<ol class="text-sm">
+    <li>Legacy Assessment</li>
+    <li>World Resolution State</li>
+    <li>Character Epilogue Pathways</li>
+    <li>Continuity Bridges</li>
+    <li>Legacy Starting Packages</li>
+    <li>Archive and World State Documents</li>
+</ol>
+
+<h3>Step 1: Legacy Assessment</h3>
+<p class="text-sm"><strong>Crown Anchor Resolution</strong> — for each major Anchor: did its prophecy/theme complete, transform, or remain unfinished? Did it resolve peacefully, violently, or ambiguously?</p>
+<p class="text-sm"><strong>Campaign Themes (Resonance)</strong> — evaluate how each theme (redemption, corruption, love, tragedy, destiny, revolution, etc.) played out: <strong>Resolved</strong> (closed arcs), <strong>Echoed</strong> (lingering influence), or <strong>Fractured</strong> (unresolved or inverted).</p>
+<p class="text-sm"><strong>Momentum Arc</strong> — summarize the campaign's overall Momentum flow across early-game (tone-setting), mid-game (escalation), and endgame (climax). This becomes part of the world's historical "feel."</p>
+
+<h3>Step 2: World Resolution State</h3>
+<p class="text-sm">For each major faction, record: Influence (0–6), Stability (0–6), Agenda Outcome (completed, thwarted, redirected), NPC leadership changes, and alliances or dissolutions. For each region, record major political or supernatural changes, environmental shifts, technological or magical advancements, and emerging new threats or mysteries.</p>
+<p class="text-sm">Mark each major campaign timer as <strong>Fulfilled</strong> (its crisis manifested), <strong>Averted</strong> (the crisis was prevented), or <strong>Transformed</strong> (the crisis changed shape).</p>
+
+<h3>Step 3: Character Epilogue Pathways</h3>
+<table>
+<tr><th>Path</th><th>Description</th></tr>
+<tr><td>Quiet Ending</td><td>The character retires into peace: a sanctuary location, a lasting bond with an NPC or faction, a personal tradition that influences future generations.</td></tr>
+<tr><td>Continuing the Fight</td><td>The character remains active and influential: gains a faction rank or title, establishes a new organization or order.</td></tr>
+<tr><td>Ascension or Transformation</td><td>For mythic or high-tier endings: becomes a legend or guardian spirit, alters reality in localized ways, leaves a relic or omen behind.</td></tr>
+<tr><td>Tragic Resolution</td><td>The character may die, sacrifice themselves, or fall: leaves major unresolved threads, generates a new threat or mystery, creates a new Crown-adjacent artifact or ritual.</td></tr>
+</table>
+
+<h3>Step 4: Continuity Bridges</h3>
+<p class="text-sm">Bridges link the completed campaign to the next one: <strong>NPC Bridge</strong> (a mentor, rival, or descendant returns), <strong>Faction Bridge</strong> (a faction agenda continues or mutates), <strong>Mythic Bridge</strong> (a relic or prophecy carries forward), <strong>Geographic Bridge</strong> (return to the same region, now changed), <strong>Temporal Bridge</strong> (the campaign jumps forward in time).</p>
+<p class="text-sm">For each major element in the previous campaign, choose one treatment: <strong>Echo</strong> (subtle reminder), <strong>Return</strong> (direct continuation), <strong>Reversal</strong> (former allies become threats), or <strong>Ascendance</strong> (element grows in cosmic importance).</p>
+
+<h3>Step 5: Legacy Starting Packages</h3>
+<p class="text-sm">A new campaign may begin with specific advantages or disadvantages based on the previous one. <strong>Boons (choose 1–2):</strong> regional stability or prosperity, reputation bonus with a legacy faction, easier access to certain skills or talents, legacy artifacts with narrative power. <strong>Burdens (choose 1):</strong> a returning threat, a fractured faction structure, a long shadow from a Crown Anchor, cultural trauma or forbidden knowledge.</p>
+<p class="text-sm">Starting mechanical benefits: +1 to a faction relationship of choice; unlock 1 Background Variant tied to the completed campaign; access to 1 Legacy Talent (GM approval).</p>
+
+<h3>Step 6: Archive and World State Documents</h3>
+<p class="text-sm">Compile a permanent record: final Momentum summary, Crown Anchor resolution notes, faction outcomes and new leadership, regional maps with updated statuses, major NPC fates, and legacy timers or unresolved echoes. These documents form the opening chapter of the next campaign's guide.</p>
+
+<div class="widget-card">
+    <div class="wname">📋 Dashboard Widget — Legacy Snapshot</div>
+    <div class="text-xs text-muted mt-1">Crown Outcomes · Faction State · Major NPC Fates · Regional Changes (2) · Legacy Boons · Legacy Burdens · Continuity Bridges (2).</div>
+</div>
+
+<hr>
+
+<!-- ===== CROSS-SYSTEM SYNERGIES ===== -->
+<h2 id="cross-system-synergies">Cross-System Synergies</h2>
+<p class="text-sm">Advanced campaigns rely on consistent integration across systems. This section formalizes the interactions between Assets, Political Intrigue, Patrons, Followers, Faction Turns, and the Momentum/Agency economies.</p>
+
+<h3>Assets and Campaign Momentum</h3>
+<p class="text-sm">Assets grow or degrade when Momentum shifts by 2 or more, a faction advances or loses Stability, a regional threat reaches Escalation or Crisis, or players spend 2 Agency Points on Asset Development.</p>
+<p class="text-sm">Each Asset at Level 2+ grants +1 Position once per session when narratively justified. Political Assets can influence Faction Turns, modifying Influence by ±1. Cultural or mystical Assets can reinforce or distort Campaign Themes.</p>
+
+<h3>Political Intrigue Synergies</h3>
+<p class="text-sm">Political Intrigue gains mechanical teeth through Momentum (shifts public sentiment), Agency Points (negotiate, blackmail, or expose truths), Faction Attitudes (political DV modifiers), and Regional Pressures (spark intrigue events).</p>
+<table>
+<tr><th>Instigator</th><th>Pressure</th><th>Effect</th></tr>
+<tr><td>Faction</td><td>Stability Drop</td><td>Intrigue Timers +1</td></tr>
+<tr><td>Region</td><td>Economic Shock</td><td>NPC Attitudes Shift</td></tr>
+<tr><td>Player</td><td>Agenda Push</td><td>Momentum +1 or −1</td></tr>
+</table>
+
+<h3>Patron Synergy Framework</h3>
+<p class="text-sm">Patrons react to campaign dynamics: if Momentum is negative, they demand sacrifice or obedience; if Faction Stability drops, they offer dangerous bargains; if Themes resonate strongly, they bless or twist outcomes. When players align with Patron doctrine or fate, they gain 1 Agency Point, shift Position by +1, or unlock a short-term Talent-like ability (GM discretion).</p>
+
+<h3>Follower Synergies</h3>
+<p class="text-sm">Followers gain or lose reliability based on region stability, campaign Momentum, faction attitudes, and player moral decisions.</p>
+<table>
+<tr><th>Morale</th><th>Effect</th></tr>
+<tr><td>−2</td><td>Desertion risk; unreliable.</td></tr>
+<tr><td>−1</td><td>Fearful but present.</td></tr>
+<tr><td>0</td><td>Neutral.</td></tr>
+<tr><td>+1</td><td>Loyal; +1 Position when aiding.</td></tr>
+<tr><td>+2</td><td>Devoted; performs selfless acts.</td></tr>
+</table>
+
+<hr>
+
+<!-- ===== CAMPAIGN SCALE MANAGEMENT ===== -->
+<h2 id="campaign-scale-management">Campaign Scale Management</h2>
+<p class="text-sm">Fate's Edge supports stories ranging from quiet, intimate journeys to world-spanning sagas and generational legacies. These tools scale the campaign without changing core mechanics.</p>
+
+<table>
+<tr><th>Scale</th><th>Focus</th><th>Mechanical Emphasis</th></tr>
+<tr><td><span class="badge badge-blue">0 Intimate</span></td><td>Relationships, trauma, recovery, community</td><td>Character Arc Triggers; localized timers (4-segment max); social Position shifts matter more than DV; minimal/indirect faction dynamics.</td></tr>
+<tr><td><span class="badge badge-green">1 Regional</span></td><td>Politics, travel, culture, medium-sized threats</td><td>Faction Turns; Regional Pressure tables; Momentum directly affects cities/regions; 6-segment timers dominate.</td></tr>
+<tr><td><span class="badge badge-orange">2 World</span></td><td>Kingdoms, magical orders, international conflict</td><td>Momentum shifts trigger world events; multiple Faction Turns per arc; Crown Anchors evolve or fracture; long-form 8-segment timers.</td></tr>
+<tr><td><span class="badge badge-purple">3 Generational</span></td><td>The long arc of legacy, bloodlines, myths</td><td>Legacy Packages; World State Documents; Continuity Bridges; Generational Talent Unlocks (GM option).</td></tr>
+</table>
+
+<h3>Scale Transition Triggers</h3>
+<p class="text-sm">Player goals exceed the current scale; factions unify, fracture, or ascend; themes reach resonance 3+; the Agency Point economy becomes too influential; a Crown Anchor shifts type (Suit → Mythic). The GM should announce scale shifts to align table expectations.</p>
+
+<hr>
+
+<!-- ===== PLAYER HANDOUTS ===== -->
+<h2 id="player-handouts">Player Handouts Package</h2>
+<p class="text-sm">Player-facing handouts ensure clarity, agency, and long-term campaign investment. These templates can be printed or inserted into digital character sheets.</p>
+
+<div class="grid-2">
+    <div class="widget-card">
+        <div class="wname">Campaign Vision Sheet</div>
+        <ul class="field-list"><li><strong>Campaign Themes</strong> (2 lines)</li><li><strong>Crown Anchors in Play</strong></li><li><strong>Desired Tone and Mood</strong></li><li><strong>My Character's Personal Goals</strong></li></ul>
+    </div>
+    <div class="widget-card">
+        <div class="wname">Character Arc Worksheet</div>
+        <ul class="field-list"><li><strong>Starting State</strong></li><li><strong>Core Wound / Drive</strong></li><li><strong>Arc Triggers I Want to Explore</strong> (2)</li><li><strong>Potential Crisis Points</strong> (2)</li><li><strong>Desired Resolution</strong></li></ul>
+    </div>
+    <div class="widget-card">
+        <div class="wname">Faction Relationship Guide</div>
+        <ul class="field-list"><li><strong>Major Factions</strong> (name + attitude)</li><li><strong>Where I Stand With Them</strong></li><li><strong>How They Might Help or Harm Me</strong> (2)</li></ul>
+    </div>
+    <div class="widget-card">
+        <div class="wname">Legacy Planning Sheet</div>
+        <ul class="field-list"><li><strong>Long-Term Goals</strong></li><li><strong>NPCs or Factions I Want to Influence</strong></li><li><strong>What I Want My Mark on the World to Be</strong></li><li><strong>Possible Legacy Boons or Burdens</strong> (2)</li></ul>
+    </div>
+</div>
+
+<hr>
+
+<!-- ===== IMPROV DECKS ===== -->
+<h2 id="improv-decks">Improvisation Deck System</h2>
+<p class="text-sm">Improvisation Decks are draw-based tools that inject uncertainty, texture, and thematic reinforcement without prep. Print them physically, shuffle digitally, or use random-table draws.</p>
+
+<h3>Complication Generator Deck</h3>
+<p class="text-sm">Each card adds a twist when a partial success or player pause occurs: <strong>Escalation</strong> (threat advances, a timer ticks), <strong>Reversal</strong> (an ally becomes a complicating factor), <strong>Reveal</strong> (hidden information surfaces prematurely), <strong>Strain</strong> (characters mark 1 Fatigue or lose Position), <strong>Ill Omen</strong> (Crown-related symbolism alters mood or destiny).</p>
+<table>
+<tr><th>1d6</th><th>Result</th></tr>
+<tr><td>1</td><td>A threat evolves into something unexpected.</td></tr>
+<tr><td>2</td><td>An NPC reacts emotionally or erratically.</td></tr>
+<tr><td>3</td><td>A timer advances (GM chooses which).</td></tr>
+<tr><td>4</td><td>A resource becomes limited, lost, or stolen.</td></tr>
+<tr><td>5</td><td>A Crown symbol appears in an uncanny moment.</td></tr>
+<tr><td>6</td><td>The environment shifts or becomes hazardous.</td></tr>
+</table>
+
+<h3>NPC Reaction Deck</h3>
+<p class="text-sm">NPCs respond dynamically in advanced campaigns, especially during Political Intrigue or Faction Turns: <span class="badge badge-gray">Curiosity</span> <span class="badge badge-gray">Caution</span> <span class="badge badge-gray">Defiance</span> <span class="badge badge-gray">Opportunism</span> <span class="badge badge-gray">Admiration</span> <span class="badge badge-gray">Fear</span></p>
+
+<h3>Theme Reinforcement Deck</h3>
+<p class="text-sm">Keeps a campaign's themes visually and emotionally present: <strong>Redemption</strong> (a symbol of forgiveness appears), <strong>Decay</strong> (a structure collapses or reveals rot), <strong>Destiny</strong> (a prophecy shard manifests), <strong>Love</strong> (an old bond resurfaces in a new context).</p>
+
+<h3>Player Motivation Prompts</h3>
+<p class="text-sm">Use when pacing drags or players lose direction: a friend is in danger and an urgent call arrives; a faction seeks the PCs for an opportunity; a rumor surfaces tying directly to a PC's Arc; a relic connected to a Crown Anchor surfaces; a moral crossroads presents itself.</p>
+
+<hr>
+
+<!-- ===== EXTENDED DASHBOARD ===== -->
+<h2 id="extended-dashboard">Extended Campaign Dashboard</h2>
+<p class="text-sm">Supplements the Momentum and Session Zero widgets with deeper tracking tools.</p>
+
+<h3>Timer Matrix</h3>
+<table>
+<tr><th>Timer Name</th><th>Category</th><th>Segments</th><th>Interaction</th></tr>
+<tr><td>&nbsp;</td><td>Threat</td><td>6</td><td>Advances with Faction Instability</td></tr>
+<tr><td>&nbsp;</td><td>Social</td><td>4</td><td>Opposes "Rising Support" timer</td></tr>
+<tr><td>&nbsp;</td><td>Mythic</td><td>8</td><td>Cascades into Regional Event</td></tr>
+</table>
+
+<h3>Threat Board</h3>
+<p class="text-sm">Each threat tracks: Name, Category (Personal / Social / Cosmic), Current Timer State, Recent Mutation, and Next Move.</p>
+
+<h3>Momentum Flowchart</h3>
+<blockquote>
+Momentum +1 → Faction goodwill, lower DV, allies appear<br>
+Momentum +2 → Regional stability, access to rare resources<br>
+Momentum −1 → Timers accelerate, NPCs cautious or fearful<br>
+Momentum −2 → Regional panic, Patron demands, world-scale echoes
+</blockquote>
+
+<hr>
+
+<!-- ===== QUICK-BUILD TEMPLATES ===== -->
+<h2 id="quick-build-templates">Quick-Build GM Templates</h2>
+<p class="text-sm">These templates allow rapid creation of scenes, NPCs, threats, factions, or regions.</p>
+
+<table>
+<tr><th>Scene Template</th><th>Field</th></tr>
+<tr><td rowspan="5"></td><td>Goal</td></tr>
+<tr><td>Conflict Source</td></tr>
+<tr><td>Complication Likelihood (Low / Medium / High)</td></tr>
+<tr><td>Emotional Tone</td></tr>
+<tr><td>Timer Impact</td></tr>
+</table>
+
+<table>
+<tr><th>Faction Template</th><th>Field</th></tr>
+<tr><td rowspan="5"></td><td>Doctrine</td></tr>
+<tr><td>Leader</td></tr>
+<tr><td>Influence / Stability</td></tr>
+<tr><td>Active Agenda</td></tr>
+<tr><td>PC Relationship</td></tr>
+</table>
+
+<h3>Conflict Triad Template</h3>
+<p class="text-sm">Define any conflict using: <strong>Pressure</strong> (what "pushes" the PCs?), <strong>Temptation</strong> (what "pulls" them off-center?), and <strong>Cost</strong> (what must be risked to resolve it?).</p>
+
+<hr>
+
+<!-- ===== EMERGENCY TOOLKIT ===== -->
+<h2 id="emergency-toolkit">GM Emergency Toolkit</h2>
+<p class="text-sm">The core improvisation engine for when players surprise you.</p>
+
+<div class="panel panel-red">
+    <strong>Emergency Procedure</strong>
+    <ol class="text-sm mt-1">
+        <li>Identify the scene's <strong>anchor</strong> (motivation, NPC, tension).</li>
+        <li>Draw from the Complication Deck or use the 1d6 table.</li>
+        <li>Advance 1 timer or shift Momentum by 1.</li>
+        <li>Connect the new branch to a Crown Theme or Regional Pressure.</li>
+        <li>Resume play with a single dramatic question.</li>
+    </ol>
+</div>
+
+<h3>Dramatic Question Examples</h3>
+<p class="text-sm">"What are you willing to sacrifice for this?" · "Who do you trust right now?" · "What truth are you avoiding?" · "What could go terribly wrong here?"</p>
+
+<hr>
+
+<!-- ===== GM REFERENCE SHEET ===== -->
+<h2 id="gm-reference-sheet">One-Page GM Reference Sheet</h2>
+
+<div class="widget-card">
+    <div class="wname">GM Quick Reference</div>
+    <div class="text-xs mt-1"><strong>When in doubt:</strong> push Crown Themes forward · shift Momentum by +1 or −1 · advance a meaningful timer · offer a moral crossroads.</div>
+    <div class="text-xs mt-1"><strong>Scene Anchor (choose 1):</strong> Person (NPC desire) · Place (environment pressure) · Problem (threat or mystery).</div>
+    <div class="text-xs mt-1"><strong>Player Agency Hooks:</strong> offer 2 bad choices and 1 risky hope · reveal a truth tied to their Arc · give them control over a detail.</div>
+    <div class="text-xs mt-1"><strong>If pacing stalls:</strong> draw a Complication · introduce a Faction offer or demand · trigger a Regional Pressure (weather, omen, political shock) · let a Patron intervene subtly.</div>
+    <div class="text-xs mt-1"><strong>If overwhelmed:</strong> reduce the scene to 1 question · close a timer early · ask a player to contribute world detail · take a 2-minute reset break.</div>
+</div>
+
+<hr>
+
+<!-- ===== SCENE ENGINES ===== -->
+<h2 id="scene-engines">Scene Engines</h2>
+<p class="text-sm">Reusable templates that ensure scenes have direction, tension, and meaningful stakes — use them to build sessions on the fly or stabilize improvised play.</p>
+
+<h3>Three-Vector Scene Engine</h3>
+<p class="text-sm">Every strong scene has: <strong>A Core Desire</strong> (what someone wants), <strong>A Pressure</strong> (what makes it difficult), and <strong>A Consequence</strong> (what happens if nothing changes).</p>
+
+<h3>Scene Turn Loop</h3>
+<p class="text-sm">Each scene follows a rhythm: player declaration → GM establishes Position and DV → roll and resolve via the Outcome Matrix → advance one of Momentum, a Timer, an NPC Attitude, or a Crown Theme.</p>
+
+<hr>
+
+<!-- ===== ENVIRONMENTAL GENERATORS ===== -->
+<h2 id="environmental-generators">Environmental Generators</h2>
+<p class="text-sm">Use these for expeditions, hexcrawls, travel arcs, or environment-heavy campaigns.</p>
+<p class="text-sm"><strong>Environmental Pressure Types:</strong> <span class="badge badge-orange">Elemental</span> heat, cold, storms, earthquakes, tides — <span class="badge badge-green">Ecological</span> predators, scarcity, disease, migration patterns — <span class="badge badge-purple">Mystical</span> cursed zones, ley surges, prophetic echoes — <span class="badge badge-blue">Civilized</span> borders, taxes, conflicts, infrastructure decay.</p>
+
+<h3>Environmental Event Table (2d6)</h3>
+<table>
+<tr><th>Roll</th><th>Event</th></tr>
+<tr><td>2</td><td>A major environmental disaster reshapes terrain or stakes.</td></tr>
+<tr><td>3</td><td>A faction exploits the environment for gain.</td></tr>
+<tr><td>4</td><td>Harsh conditions force Fatigue or resource loss.</td></tr>
+<tr><td>5</td><td>A strange omen tied to a Crown appears.</td></tr>
+<tr><td>6</td><td>The environment mirrors a Character Arc theme.</td></tr>
+<tr><td>7</td><td>Routine travel — no event; Momentum drifts toward 0.</td></tr>
+<tr><td>8</td><td>Discovery of shelter, blessing, or safe route.</td></tr>
+<tr><td>9</td><td>A natural phenomenon complicates a current Timer.</td></tr>
+<tr><td>10</td><td>A creature or entity interacts with party motives.</td></tr>
+<tr><td>11</td><td>A resource or opportunity appears.</td></tr>
+<tr><td>12</td><td>A surreal or mythic event alters destiny.</td></tr>
+</table>
+
+<hr>
+
+<!-- ===== NPC & FACTION LIFECYCLE ===== -->
+<h2 id="npc-faction-lifecycle">NPC &amp; Faction Lifecycle</h2>
+<p class="text-sm">NPCs and factions evolve through predictable phases; use this to guide narrative arcs.</p>
+
+<div class="grid-2">
+    <div class="panel panel-blue">
+        <strong>NPC Arc Stages</strong>
+        <ol class="text-sm mt-1"><li>Introduction (identity, desire)</li><li>Development (conflict or alliance)</li><li>Tension (pressure or betrayal)</li><li>Transformation (growth or fall)</li><li>Resolution (lasting impact)</li></ol>
+    </div>
+    <div class="panel panel-purple">
+        <strong>Faction Lifecycle</strong>
+        <ol class="text-sm mt-1"><li>Emergence (new agenda)</li><li>Influence (expansion)</li><li>Crisis (internal or external)</li><li>Resolution (reform, triumph, or collapse)</li><li>Legacy (effect on the campaign world)</li></ol>
+    </div>
+</div>
+
+<h3>NPC Drift Mechanic</h3>
+<p class="text-sm">Between arcs, roll 1d6:</p>
+<table>
+<tr><th>1d6</th><th>Result</th></tr>
+<tr><td>1</td><td>Drifts away; becomes inaccessible.</td></tr>
+<tr><td>2</td><td>Suffers a setback; attitude worsens.</td></tr>
+<tr><td>3</td><td>No change.</td></tr>
+<tr><td>4</td><td>Gains new influence or goal.</td></tr>
+<tr><td>5</td><td>Strengthens ties to the PCs.</td></tr>
+<tr><td>6</td><td>Becomes key to the next arc.</td></tr>
+</table>
+
+<hr>
+
+<!-- ===== MYSTERY FRAMEWORK ===== -->
+<h2 id="mystery-framework">Mystery-Building Framework</h2>
+<p class="text-sm">Mysteries in Fate's Edge should focus on tension, discovery, and moral crossroads — not puzzle solving. This framework keeps mysteries flexible and reactive.</p>
+
+<h3>The Three Truths</h3>
+<p class="text-sm">Every mystery has a <strong>Surface Truth</strong> (what NPCs believe), a <strong>Hidden Truth</strong> (what's actually happening), and a <strong>Human Truth</strong> (why it matters emotionally).</p>
+
+<h3>Clue Types</h3>
+<p class="text-sm"><strong>Material Clue</strong> (object, mark, or physical evidence), <strong>Testimonial Clue</strong> (memories, diaries, interviews), <strong>Mythic Clue</strong> (dreams, omens, prophecies).</p>
+
+<h3>Mystery Failure Modes</h3>
+<p class="text-sm">If players stall: reveal the next clue as a discovery, advance a threat timer, or shift Momentum by −1.</p>
+
+<hr>
+
+<!-- ===== TRAVEL & EXPEDITION ===== -->
+<h2 id="travel-expedition">Travel &amp; Expedition Framework</h2>
+<p class="text-sm">Long journeys are structured through: <strong>Trail Events</strong> (Environmental Table), <strong>Travel Timers</strong> (progress, danger, resources), <strong>Rest Scenes</strong> (Character Arcs, NPC bonds), and <strong>Landmark Encounters</strong> (themes or factions).</p>
+
+<h3>Expedition Timer Types</h3>
+<p class="text-sm"><span class="badge badge-green">Progress Timer</span> to reach destination — <span class="badge badge-red">Danger Timer</span> environment, creatures — <span class="badge badge-orange">Resource Timer</span> food, water, gear — <span class="badge badge-blue">Discovery Timer</span> secrets, sites, lore.</p>
+
+<hr>
+
+<!-- ===== RISK/REWARD MATRIX ===== -->
+<h2 id="risk-reward-matrix">Risk/Reward Matrix</h2>
+<p class="text-sm">Use this to quickly evaluate outcomes of bold moves.</p>
+<table>
+<tr><th>Risk Level</th><th>Reward Potential</th><th>GM Guidance</th></tr>
+<tr><td>Low</td><td>Low</td><td>Keep stakes grounded.</td></tr>
+<tr><td>Low</td><td>High</td><td>Add a hidden drawback or future timer.</td></tr>
+<tr><td>High</td><td>Low</td><td>Make moral or emotional consequences key.</td></tr>
+<tr><td>High</td><td>High</td><td>Tie the outcome to Crown Anchors or Themes.</td></tr>
+</table>
+
+<hr>
+
+<!-- ===== DRIFT CORRECTION ===== -->
+<h2 id="drift-correction">Campaign Drift Correction</h2>
+<p class="text-sm">When a campaign loses focus:</p>
+<div class="grid-2">
+    <div class="panel panel-red">
+        <strong>1. Identify Drift Source</strong>
+        <ul class="text-sm mt-1"><li>Too many timers</li><li>Themes diluted</li><li>Faction complexity overwhelming</li><li>Players unclear on stakes</li></ul>
+    </div>
+    <div class="panel panel-green">
+        <strong>2. Apply a Correction</strong>
+        <ul class="text-sm mt-1"><li>Retire 1–2 timers.</li><li>Re-anchor to 2 Crown Themes.</li><li>Clarify the stakes of the next 2 sessions.</li><li>Shift Momentum by +1 to encourage a hopeful tone.</li></ul>
+    </div>
+</div>
+
+<hr>
+
+<!-- ===== DOWNTIME ENGINE ===== -->
+<h2 id="downtime-engine">Downtime Engine</h2>
+<p class="text-sm">Downtime stabilizes pacing and amplifies character agency. Each PC chooses 1–2 downtime actions: Recover (clear Fatigue), Advance a Project Timer, Faction Work (raise influence), Personal Arc Action (choose a trigger), or Asset Development (level or maintain).</p>
+
+<h3>Downtime Consequences (1d6)</h3>
+<table>
+<tr><th>Roll</th><th>Result</th></tr>
+<tr><td>1</td><td>A faction suffers instability.</td></tr>
+<tr><td>2</td><td>A regional pressure intensifies.</td></tr>
+<tr><td>3</td><td>An NPC drifts or changes attitude.</td></tr>
+<tr><td>4</td><td>Momentum shifts toward 0.</td></tr>
+<tr><td>5</td><td>A clue or opportunity emerges.</td></tr>
+<tr><td>6</td><td>A Crown-aligned omen appears.</td></tr>
+</table>
+
+<hr>
+
+<!-- ===== REGION TRANSITIONS ===== -->
+<h2 id="region-transitions">Region Transitions</h2>
+<p class="text-sm">When moving between regions, determine: what Crown Themes carry over, which factions have influence in both regions, what environmental pressures shift, whether Momentum changes due to local sentiment, and which PC arcs gain or lose relevance.</p>
+
+<h3>Transition Event Table (1d6)</h3>
+<table>
+<tr><th>Roll</th><th>Event</th></tr>
+<tr><td>1</td><td>A faction from Region A sabotages the move.</td></tr>
+<tr><td>2</td><td>The journey reveals a new clue or contact.</td></tr>
+<tr><td>3</td><td>Environmental disaster interrupts progress.</td></tr>
+<tr><td>4</td><td>NPCs from Region A send urgent news.</td></tr>
+<tr><td>5</td><td>Region B greets the PCs with hostility.</td></tr>
+<tr><td>6</td><td>A Crown omen marks the transition as destiny.</td></tr>
+</table>
+
+<hr>
+
+<div class="panel panel-mist">
+    <strong>Appendix: GM Cognitive Load Management Tools</strong>
+    <p class="text-sm mt-1">Running a long-form campaign asks the GM to track narrative, mechanics, emotion, pacing, and player expectations simultaneously. The following tools reduce cognitive load, prevent overwhelm, support neurodivergent or fatigued GMs, and stabilize game flow during high-intensity sessions. They are low-prep, fast-access, mechanically light, emotionally grounding, and compatible with Momentum, Agency Points, Faction Turns, and Themes.</p>
+</div>
+
+<!-- ===== FIVE-MINUTE RESET ===== -->
+<h2 id="five-minute-reset">The Five-Minute Reset</h2>
+<p class="text-sm">A short, structured intervention when the GM feels overwhelmed or loses thread coherence.</p>
+<ol class="text-sm">
+    <li><strong>Pause the table</strong> (water break, stretch break).</li>
+    <li><strong>Write one sentence</strong> describing the current scene's intention.</li>
+    <li><strong>Select one anchor</strong>: Person (NPC motivation), Place (environment pressure), or Problem (threat).</li>
+    <li><strong>Choose one forward motion tool</strong>: advance a timer, shift Momentum by ±1, introduce a Crown omen, or trigger a character's Arc.</li>
+    <li><strong>Return with a single question:</strong> "What do you do next?"</li>
+</ol>
+<p class="text-xs text-muted">Why it works: it collapses hundreds of unseen details into one actionable step.</p>
+
+<hr>
+
+<!-- ===== 1-3-1 RULE ===== -->
+<h2 id="rule-131">The 1-3-1 Improvisation Rule</h2>
+<p class="text-sm">A cognitive simplification for reactive GMing. When you need to improvise: describe <strong>1 strong detail</strong> (visual, emotional, or sensory), offer <strong>3 actionable paths</strong> (choices, reactions, opportunities), and define <strong>1 consequence</strong> if nothing is done. This keeps scenes dynamic without requiring full prep.</p>
+
+<hr>
+
+<!-- ===== GM HUD ===== -->
+<h2 id="gm-hud">Single-Glance GM HUD</h2>
+<p class="text-sm">A 4-panel dashboard designed to be read in one glance, even during cognitive fatigue.</p>
+<table>
+<tr><th>Panel</th><th>Content</th></tr>
+<tr><td><strong>Now</strong></td><td>Current scene anchor + 1 tension</td></tr>
+<tr><td><strong>Near</strong></td><td>Next likely complication or shift</td></tr>
+<tr><td><strong>Fear</strong></td><td>What the threats want right now</td></tr>
+<tr><td><strong>Hope</strong></td><td>What the PCs deeply want in this moment</td></tr>
+</table>
+<p class="text-xs text-muted">Use it as a bookmark, GM screen insert, or sticky note.</p>
+
+<hr>
+
+<!-- ===== THREE-SLOT MEMORY ===== -->
+<h2 id="three-slot-memory">The Three-Slot Memory System</h2>
+<p class="text-sm">A GM should only intentionally track <strong>three things at a time</strong>. Everything else is optional: <strong>Primary Threat</strong> (the thing pressing on the PCs), <strong>Primary Relationship</strong> (the most important NPC/PC bond), and <strong>Primary Mystery</strong> (the unanswered question). Anything that doesn't fit into these three slots becomes background texture.</p>
+
+<hr>
+
+<!-- ===== LOW-PREP BLUEPRINT ===== -->
+<h2 id="low-prep-blueprint">Low-Prep Session Blueprint</h2>
+<p class="text-sm">If the GM has no time, no energy, or no prep, this blueprint builds a full session in minutes: <strong>One Location</strong> (street, ruin, tavern, shrine), <strong>One NPC</strong> (desire + flaw), <strong>One Threat</strong> (4–6 segment timer), <strong>One Crown Touch</strong> (symbol, omen, echo), and <strong>One Character Spotlight</strong> (an Arc trigger for someone at the table). Run it with the 1-3-1 rule for improvised scenes.</p>
+
+<hr>
+
+<!-- ===== DECISION THROTTLING ===== -->
+<h2 id="decision-throttling">Decision Throttling</h2>
+<p class="text-sm">A tool for reducing branching paths when players ask open-ended questions. Always reduce choices to <strong>two concrete options</strong> (A or B) plus <strong>one unknown option</strong> (C: "Try something bold or unexpected"). This keeps the GM's cognitive load stable while maintaining player agency.</p>
+
+<hr>
+
+<!-- ===== EMOTIONAL LOAD REDUCTION ===== -->
+<h2 id="emotional-load">Emotional Load Reduction</h2>
+<p class="text-sm">Long campaigns can become emotionally intense for GMs. Use these tools to protect bandwidth.</p>
+<p class="text-sm"><strong>NPC Emotion Budget:</strong> at any given time, only 1 NPC may be highly emotional; 1–2 may be moderately emotional; all others should be calm, neutral, or procedural. This keeps roleplay sustainable.</p>
+<p class="text-sm"><strong>Conflict Frequency Cap:</strong> limit intense emotional conflict scenes to 1 per session for small groups, or 1 per 2 sessions for larger groups.</p>
+
+<hr>
+
+<!-- ===== SYSTEMIC SHORTCUTS ===== -->
+<h2 id="systemic-shortcuts">Systemic Shortcuts</h2>
+<p class="text-sm">Tools for reducing multi-step mechanical processes into one-step equivalents.</p>
+<p class="text-sm"><strong>Shortcut 1 — Faction Turn Condensed:</strong> instead of a full turn, roll 1d6 per faction — 1–2 Stability drops, 3–4 no major change, 5–6 Influence grows.</p>
+<p class="text-sm"><strong>Shortcut 2 — Timer Compression:</strong> when overloaded, combine two small timers into one bigger timer, or resolve a timer early using the highest-tension outcome.</p>
+<p class="text-sm"><strong>Shortcut 3 — NPC Memory Compression:</strong> if tracking many NPCs, reduce their state to a single phrase ("wants peace," "seeking revenge," etc.).</p>
+
+<hr>
+
+<!-- ===== PACING AUTOPILOT ===== -->
+<h2 id="pacing-autopilot">Pacing Autopilot</h2>
+<p class="text-sm">When the GM is tired, choose one autopilot mode and let everything in the session flow from that choice:</p>
+<table>
+<tr><th>Mode</th><th>Effect</th></tr>
+<tr><td>Conflict Mode</td><td>Threats advance; timers tick twice as fast.</td></tr>
+<tr><td>Discovery Mode</td><td>Clues appear; lore reveals; mysteries open.</td></tr>
+<tr><td>Connection Mode</td><td>NPCs interact; arcs develop; relationships evolve.</td></tr>
+<tr><td>Recovery Mode</td><td>Healing, downtime, perspective shifts.</td></tr>
+</table>
+
+<hr>
+
+<!-- ===== SINGLE-CARD PREP ===== -->
+<h2 id="single-card-prep">Single-Card Session Prep</h2>
+<p class="text-sm">Prep an entire session on a single index card — ideal for low-energy days.</p>
+<div class="widget-card">
+    <div class="wname">One-Card Session</div>
+    <ul class="field-list"><li><strong>Scene Anchor:</strong> ___</li><li><strong>Threat Timer:</strong> ___</li><li><strong>NPC:</strong> ___</li><li><strong>Theme Touch:</strong> ___</li><li><strong>Character Spotlight:</strong> ___</li></ul>
+</div>
+
+<hr>
+
+<!-- ===== GM CHECK-IN ===== -->
+<h2 id="gm-checkin">GM Check-In Questions</h2>
+<p class="text-sm">Ask these privately before or after each session: What do I want to feel in this session? What do I need from the players emotionally? What can I simplify today? What is one thing I can drop without harm? What is one thing that excites me?</p>
+
+<hr>
+
+<!-- ===== CONCLUSION ===== -->
+<h2 id="conclusion">Conclusion: Continuous Campaign Evolution</h2>
+<p class="text-sm">The most successful Fate's Edge campaigns are living stories that grow and change with player involvement. These advanced tools provide frameworks for that evolution while maintaining the core principles that make the system special.</p>
+<p class="text-sm">These tools are meant to support your storytelling, not constrain it. Use what works for your table, adapt what needs adapting, and discard what doesn't serve your game. The goal is always collaborative storytelling, where every player's choices matter and every consequence feels earned.</p>
+<p class="text-sm">A campaign that grows from a single local adventure into a world-spanning epic shows how these tools support that kind of growth. Whether you're running a single session or a year-long campaign, these techniques will help you create engaging, player-driven stories that your table will remember for years to come.</p>
+
+<hr>
+
+<div style="font-size:0.75rem;color:var(--text3);text-align:center;padding:1rem 0;">
+    <em>Fate's Edge Proprietary Content — (c) 2024 Nicholas A. Gasper. All rights reserved.</em>
+</div>
+
+</body>
+</html>

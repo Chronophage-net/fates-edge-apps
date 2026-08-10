@@ -1,0 +1,121 @@
+/* ============================================================
+   HORROR — gothic/cosmic reskin (v1.0.0)
+   ============================================================
+   Paired with pack.json's `theme.variables` (color-token pass). Everything
+   here is the second layer theme-manager.js supports: changes CSS
+   variables alone can't express (typography, vignette, decorative touches).
+
+   Loaded via a <link> that theme-manager.js only attaches while
+   data-theme="horror" is active — every selector below is still scoped
+   with the `html[data-theme="horror"]` prefix anyway, so this file is
+   safe to read standalone and know exactly what it touches.
+
+   Companion to the Modern Noir theme (data/themes/modern-noir/) — built
+   the same way, deliberately different palette and mood: candlelight and
+   blood instead of neon, a vignette instead of a glow, serif instead of
+   monospace.
+   ============================================================ */
+
+/* Slightly irregular corners — just enough rounding to avoid looking
+   digital, not enough to feel soft. */
+html[data-theme="horror"] .panel,
+html[data-theme="horror"] .modal,
+html[data-theme="horror"] .modal-content,
+html[data-theme="horror"] .editor-screen,
+html[data-theme="horror"] .btn,
+html[data-theme="horror"] input,
+html[data-theme="horror"] select,
+html[data-theme="horror"] textarea {
+    border-radius: var(--radius);
+}
+
+/* Serif display face for headings — a printed-grimoire feel instead of a
+   terminal readout. Body copy stays in the default sans for legibility
+   across long investigation/lore text. */
+html[data-theme="horror"] h1,
+html[data-theme="horror"] h2,
+html[data-theme="horror"] h3,
+html[data-theme="horror"] .brand-name,
+html[data-theme="horror"] .nav-group-title {
+    font-family: 'Georgia', 'Times New Roman', serif;
+    letter-spacing: 0.01em;
+}
+
+html[data-theme="horror"] .brand-name {
+    text-transform: none;
+    font-style: italic;
+    letter-spacing: 0.02em;
+    text-shadow: 0 0 10px var(--gold-glow-strong);
+}
+
+/* Heavy, deep shadow instead of a neon edge-glow on elevated surfaces —
+   candlelit rather than backlit. */
+html[data-theme="horror"] .modal,
+html[data-theme="horror"] .modal-content,
+html[data-theme="horror"] .editor-screen {
+    box-shadow: var(--shadow-elevated), 0 0 0 1px var(--border), var(--shadow-glow);
+}
+
+/* Blood-red gradient underline instead of the noir cyan/blue pair. */
+html[data-theme="horror"] .modal h2::after {
+    background: linear-gradient(90deg, var(--gold), var(--red));
+}
+
+/* Vignette on the sidebar — darkness pressing in from the edges, the
+   candlelit-room equivalent of the noir sidebar's scanlines. */
+html[data-theme="horror"] .sidebar {
+    background:
+        radial-gradient(ellipse at center, transparent 40%, rgba(0, 0, 0, 0.45) 100%),
+        linear-gradient(180deg, var(--bg-sidebar) 0%, var(--bg) 100%);
+}
+
+/* A slow, subtle flicker on the sidebar border — candlelight, not neon.
+   Respect reduced-motion preferences. */
+@media (prefers-reduced-motion: no-preference) {
+    html[data-theme="horror"] .sidebar {
+        animation: horror-flicker 6s ease-in-out infinite;
+    }
+}
+@keyframes horror-flicker {
+    0%, 100% { border-color: var(--border); }
+    45% { border-color: var(--border); }
+    47% { border-color: var(--border-strong); }
+    49% { border-color: var(--border-light); }
+    52% { border-color: var(--border); }
+}
+
+/* --------------------------------------------------------------
+   VTT grid/token treatment — mirrors the Modern Noir theme's first
+   pass, retinted for horror (dim, bloodied rather than neon-cyan).
+   -------------------------------------------------------------- */
+html[data-theme="horror"] .vtt-grid,
+html[data-theme="horror"] .whiteboard-grid,
+html[data-theme="horror"] .combat-grid {
+    background-color: var(--bg2);
+    background-image:
+        linear-gradient(var(--border-light) 1px, transparent 1px),
+        linear-gradient(90deg, var(--border-light) 1px, transparent 1px);
+}
+
+html[data-theme="horror"] .token,
+html[data-theme="horror"] .vtt-token,
+html[data-theme="horror"] .map-marker {
+    box-shadow: 0 0 5px 1px var(--token-color, var(--gold-glow-strong));
+    border-color: var(--token-color, var(--gold));
+}
+
+html[data-theme="horror"] .token.is-selected,
+html[data-theme="horror"] .vtt-token.is-selected {
+    box-shadow: 0 0 9px 3px var(--token-color, var(--gold-glow-strong));
+}
+
+/* --------------------------------------------------------------
+   Iconography — same spot-fix approach as Modern Noir: desaturate
+   and retint the emoji icons most likely to clash (dice, scroll,
+   flame reads fine as-is for horror, so it's excluded).
+   -------------------------------------------------------------- */
+html[data-theme="horror"] .icon-dice,
+html[data-theme="horror"] .icon-scroll,
+html[data-theme="horror"] .brand-icon {
+    filter: grayscale(1) sepia(1) hue-rotate(-40deg) saturate(3) brightness(0.85);
+}
