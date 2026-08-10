@@ -3,6 +3,11 @@ All notable changes to this project will be documented here.
 
 Format loosely follows [Keep a Changelog](https://keepachangelog.com/), versions follow [Semantic Versioning](https://semver.org/).
 
+## [4.6.3] - 2026-08-10
+
+### Other
+- Added two expansions and an adventure. Plugged one security hole. TODO: HTML Parsing issues
+
 ## [4.6.2] - 2026-08-10
 
 ### Other
