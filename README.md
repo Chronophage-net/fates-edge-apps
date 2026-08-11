@@ -414,7 +414,7 @@ All source code in this repository is licensed under the **MIT License**. See [L
 ### SRD & Essentials (CC BY-NC-SA 4.0)
 Licensed under **CC BY-NC-SA 4.0**. See [LICENSE.srd](LICENSE.srd).
 
-### Proprietary Content (All Rights Reserved — Freely Distributed)
+### Copyright (All Rights Reserved — Freely Distributed)
 © **Nicholas A. Gasper**, All Rights Reserved, distributed for free as part of this toolkit: setting lore, original characters/NPCs, faction descriptions, proprietary magic systems (Runekeeper, Invoker, Cantor, Summoner, Witch, Monk, etc.), artwork/maps, original prose, the Deck of Consequences and Crown Spread systems, the Travel Framework and regional generators, and the Kon'reh board game.
 
 **You may use this content for personal, non-commercial purposes.** For commercial use, contact **support@fates-edge.com**.
@@ -424,7 +424,7 @@ Licensed under **CC BY-NC-SA 4.0**. See [LICENSE.srd](LICENSE.srd).
 | Source Code | MIT | ✅ Yes |
 | SRD Content | CC BY-NC-SA 4.0 | ❌ No |
 | Essentials Guide | CC BY-NC-SA 4.0 | ❌ No |
-| Proprietary Content | All Rights Reserved | ❌ No (permission required) |
+| Copyright | All Rights Reserved | ❌ No (permission required) |
 
 ---
 

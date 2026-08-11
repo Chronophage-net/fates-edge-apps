@@ -16,7 +16,7 @@ Each category is licensed separately, as described below.
 
 ## SOFTWARE SOURCE CODE (MIT License)
 
-Copyright (c) 2024 Nicholas A. Gasper
+Copyright (c) 2024 - 2026 Nicholas A. Gasper
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the “Software”), to deal
@@ -41,19 +41,19 @@ SOFTWARE.
 ## GAME CONTENT
 
 All files and data that define the world, rules, characters, and setting of
-Fate’s Edge are **Proprietary Content**, unless explicitly marked as part of
+Fate’s Edge are **Copyright**, unless explicitly marked as part of
 the System Reference Document (SRD).
 
-### Proprietary Content – All Rights Reserved
+### Copyright – All Rights Reserved
 
-© 2024 Nicholas A. Gasper. All rights reserved.
+© 2024 - 2026 Nicholas A. Gasper. Used with permission, All rights reserved.
 
 All proprietary names, characters, factions, patrons, and setting elements are used with the
 permission of the author — Nicholas A. Gasper, who is the sole rights holder of this material and
 grants himself and this project that permission. Third parties do not have this permission and
 must request it separately (see below).
 
-The Proprietary Content includes, but is not limited to:
+The Copyright includes, but is not limited to:
 
 - Setting lore (Acasia, Aeler, Vhasia, the Curse, etc.)
 - Original characters, NPCs, and named figures
@@ -66,7 +66,7 @@ The Proprietary Content includes, but is not limited to:
 - Any data files (*.json, *.yaml, *.md, etc.) not specifically designated as SRD
 
 **Permitted use** – You are granted a non‑exclusive, non‑transferable,
-revocable license to use the Proprietary Content solely for personal,
+revocable license to use the Copyright solely for personal,
 non‑commercial play of Fate’s Edge, and only in conjunction with an instance
 of this software (the Virtual Tabletop application). This permission does
 **not** extend to:

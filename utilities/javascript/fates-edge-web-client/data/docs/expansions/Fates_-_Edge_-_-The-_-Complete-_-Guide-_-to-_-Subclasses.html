@@ -1,0 +1,1280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fate's Edge — The Complete Guide to Subclasses</title>
+<style>
+    :root {
+        --bg1: #0a0808;
+        --bg2: #141010;
+        --bg3: #1d1717;
+        --bg4: #281f1f;
+        --text: #e3dcd8;
+        --text2: #ab9d97;
+        --text3: #6f6561;
+        --gold: #b8783c;
+        --gold-hover: #d4914f;
+        --border: #362a26;
+        --red: #a02828;
+        --green: #3d6b52;
+        --blue: #3a5f74;
+        --purple: #5c3f63;
+        --orange: #8a5a2a;
+        --iron: #8a8680;
+        --iron-hover: #a6a29b;
+        --radius: 8px;
+        --font: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+        background: var(--bg1);
+        background-image: radial-gradient(circle at 50% 0%, #1a1010 0%, #0a0808 60%);
+        color: var(--text);
+        font-family: var(--font);
+        padding: 1.5rem;
+        max-width: 1100px;
+        margin: 0 auto;
+        line-height: 1.6;
+    }
+    h1, h2, h3, h4, h5 { color: var(--gold); margin: 0.8rem 0 0.4rem; }
+    h1 { font-size: 1.9rem; border-bottom: 2px solid var(--gold); padding-bottom: 0.3rem; }
+    .subtitle { color: var(--text2); font-style: italic; margin-bottom: 0.8rem; font-size: 1rem; }
+    h2 { font-size: 1.4rem; border-bottom: 1px solid var(--border); padding-bottom: 0.2rem; margin-top: 1.8rem; }
+    h3 { font-size: 1.12rem; margin-top: 1.2rem; color: var(--iron-hover); }
+    h4 { font-size: 0.95rem; color: var(--text); }
+    p { margin: 0.5rem 0; }
+    a { color: var(--gold); text-decoration: none; }
+    a:hover { color: var(--gold-hover); }
+    ul, ol { margin: 0.4rem 0 0.4rem 1.4rem; }
+    li { margin: 0.15rem 0; }
+    .panel {
+        background: var(--bg2);
+        border-radius: var(--radius);
+        padding: 0.7rem 0.9rem;
+        border: 1px solid var(--border);
+        margin: 0.6rem 0;
+    }
+    .panel-gold { border-left: 4px solid var(--gold); }
+    .panel-red { border-left: 4px solid var(--red); }
+    .panel-blue { border-left: 4px solid var(--blue); }
+    .panel-green { border-left: 4px solid var(--green); }
+    .panel-purple { border-left: 4px solid var(--purple); }
+    .panel-orange { border-left: 4px solid var(--orange); }
+    .panel-iron { border-left: 4px solid var(--iron); }
+    .panel > strong:first-child, .panel > .panel-title { display: block; color: var(--gold); margin-bottom: 0.3rem; }
+    .badge {
+        display: inline-block;
+        padding: 0.08rem 0.55rem;
+        border-radius: 12px;
+        font-size: 0.68rem;
+        font-weight: 600;
+        white-space: nowrap;
+        margin: 0.1rem 0.15rem 0.1rem 0;
+    }
+    .badge-gold { background: var(--gold); color: #180f06; }
+    .badge-red { background: var(--red); color: #fff; }
+    .badge-green { background: var(--green); color: #fff; }
+    .badge-blue { background: var(--blue); color: #fff; }
+    .badge-purple { background: var(--purple); color: #fff; }
+    .badge-orange { background: var(--orange); color: #fff; }
+    .badge-iron { background: var(--iron); color: #150f0f; }
+    .badge-gray { background: var(--bg4); color: var(--text3); }
+    .flex { display: flex; gap: 0.4rem; flex-wrap: wrap; align-items: center; }
+    .text-muted { color: var(--text3); }
+    .text-gold { color: var(--gold); }
+    .text-sm { font-size: 0.88rem; }
+    .text-xs { font-size: 0.72rem; }
+    .mt-1 { margin-top: 0.5rem; }
+    .rite-box {
+        background: var(--bg3);
+        border-radius: var(--radius);
+        border: 1px solid var(--border);
+        border-left: 4px solid var(--gold);
+        padding: 0.6rem 0.9rem;
+        margin: 0.7rem 0;
+    }
+    .rite-box h4 { color: var(--gold); font-size: 1rem; }
+    .rite-box .rite-meta { margin: 0.15rem 0 0.4rem; }
+    .hook-box {
+        background: var(--bg2);
+        border-radius: var(--radius);
+        border: 1px solid var(--border);
+        padding: 0.7rem 0.9rem;
+        margin: 0.8rem 0;
+    }
+    table {
+        border-collapse: collapse;
+        width: 100%;
+        margin: 0.6rem 0;
+        font-size: 0.88rem;
+        background: var(--bg2);
+        border-radius: var(--radius);
+        overflow: hidden;
+    }
+    th, td {
+        border: 1px solid var(--border);
+        padding: 0.4rem 0.6rem;
+        text-align: left;
+        vertical-align: top;
+    }
+    th { background: var(--bg4); color: var(--gold); font-weight: 600; }
+    tr:nth-child(even) td { background: rgba(255,255,255,0.02); }
+    hr { border: none; border-top: 1px solid var(--border); margin: 1rem 0; }
+    .toc { background: var(--bg3); border-radius: var(--radius); padding: 0.6rem 0.9rem; border: 1px solid var(--border); }
+    .toc-title { color: var(--gold); font-weight: 600; display: block; margin-bottom: 0.3rem; }
+    .toc-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0 1rem; }
+    .toc a { color: var(--text2); display: block; padding: 0.1rem 0; font-size: 0.85rem; }
+    .toc a:hover { color: var(--gold); }
+    @media (max-width: 700px) { .toc-grid { grid-template-columns: 1fr; } }
+    blockquote {
+        border-left: 3px solid var(--gold);
+        padding-left: 1rem;
+        margin: 0.6rem 0;
+        color: var(--text2);
+        font-style: italic;
+    }
+    .confession {
+        border-left: 3px solid var(--red);
+        padding: 0.4rem 0 0.4rem 1rem;
+        margin: 0.8rem 0;
+        color: var(--text2);
+        font-style: italic;
+        font-size: 0.95rem;
+        background: var(--bg2);
+        border-radius: 0 var(--radius) var(--radius) 0;
+    }
+    footer {
+        font-size: 0.75rem;
+        color: var(--text3);
+        text-align: center;
+        padding: 1.2rem 0 0.4rem;
+        border-top: 1px solid var(--border);
+        margin-top: 2rem;
+    }
+</style>
+</head>
+<body>
+<h1>The Complete Guide to Subclasses</h1>
+<p class="subtitle">An Anthology of Monks, Pact-Wrights, Witches, and Artificers &mdash; a Fate's Edge Subclass Anthology</p>
+<h2 style="margin-top:2.2rem;border-bottom:3px double var(--gold);padding-bottom:0.3rem;font-size:1.6rem;">The Monk: The Unstruck Bell</h2>
+<h2 style="margin-top:2.2rem;border-bottom:3px double var(--gold);padding-bottom:0.3rem;font-size:1.6rem;">The Philosophy of the Still Point</h2>
+<h3 style="font-size:1.3rem;margin-top:1.6rem;">On Stillness</h3>
+<p>The first time you face a drawn blade, you will be afraid. Good. Fear keeps your breath short and your eyes wide. The moment you feel safe, you have already been struck.</p>
+<p>A monk is not a soldier. We do not meet force with force. We redirect. Through a guard's reach, through a gap in the formation, through the space between the blow and its target. The world is full of openings&mdash;the fist that overextends, the breath that comes too fast, the weight that shifts one inch too far.</p>
+<h4>The Three Principles of the Unstruck Bell</h4>
+<h5>The Coin That Does Not Move</h5>
+<p>Never resist what cannot be stopped. A blade from a trained swordsman? He will strike where he expects resistance. When he finds none, he will stumble. A shove from a larger foe? He expects you to brace. When you yield, his own force becomes his downfall.</p>
+<p>Redirect what you cannot stop. There is no shame in moving with the storm.</p>
+<h5>The Witness Who Breathes</h5>
+<p>Every fight is witnessed. The trick is not to be invisible&mdash;it is to be unremarkable. A monk standing still in a courtyard. A beggar sleeping in a doorway. A servant carrying water. The guards see you. They simply do not register you as a threat.</p>
+<p>Stillness is the greatest disguise.</p>
+<h5>The Debt That Is Never Incurred</h5>
+<p>When you do not strike, you create no debt. Not yours, not theirs. They owe you nothing but the breath they wasted trying to hit you. A true monk does not seek victory. Victory is a chain. The open hand offers nothing, and so nothing can be taken from it.</p>
+<h3 style="font-size:1.3rem;margin-top:1.6rem;">On Breath</h3>
+<p>Before the fist comes the breath. Before the breath comes the stillness. A drowning man does not need a stronger kick; he needs to remember that the surface is only a few inches above his head.</p>
+<h4>The Four Breaths</h4>
+<ul>
+<li><strong>The Entering Breath</strong>  The inhale that takes in the world&mdash;its noise, its threat, its opportunity. Without this breath, you cannot see what is coming.</li>
+<li><strong>The Holding Breath</strong>  The pause between. This is where decisions are made. A long holding breath is patience; a short one is a trap.</li>
+<li><strong>The Releasing Breath</strong>  The exhale that becomes action. A punch is a breath released. A word is a breath released. A step is a breath released.</li>
+<li><strong>The Empty Breath</strong>  The space after the exhale, before the next inhale. This is where monks live. The enemy expects you to inhale, to prepare, to telegraph. When you learn to act from the empty breath, you become invisible to their predictions.</li>
+</ul>
+<h4>The Meditation Mini-Game</h4>
+<p>To find the still point, you need three things:</p>
+<ol>
+<li><strong>Stillness</strong> &mdash; A quiet place where you will not be disturbed. (A crowded tavern can work, but the DV increases.)</li>
+<li><strong>Time</strong> &mdash; At least ten minutes of uninterrupted meditation.</li>
+<li><strong>Intent</strong> &mdash; A clear purpose for your meditation (healing, focus, clarity).</li>
+</ol>
+<h5>The Four Breaths of Meditation</h5>
+<p><strong>Step 1: Settle the Body</strong> (Wits + Medicine, DV 2) \ Find a comfortable position and release physical tension. On a hit, gain +1 die to the Meditation roll. On a miss, you are distracted by an ache or itch&mdash;start with -1 die.</p>
+<p><strong>Step 2: Settle the Breath</strong> (Spirit + Meditation skill, DV 3) \ Count your breaths. Each exhalation is a number. When you reach ten, begin again. On a hit, you enter a light meditative state. On a partial, your mind wanders&mdash;you may continue but the GM gains 1 Story Beat.</p>
+<p><strong>Step 3: The Still Point</strong> (Spirit + Resolve, DV 4 for healing, DV 3 for clarity, DV 5 for transcendence) \ Roll to reach the deepest state. On a hit, you achieve your intent. On a partial, you achieve it but emerge drained (mark 1 Fatigue). On a miss, you fall asleep or become lost in thought; the GM gains 2 Story Beats.</p>
+<p><strong>Step 4: Return</strong> (No roll, narrative) \ You open your eyes. The world is the same. You are not.</p>
+<h5>Meditation Benefits</h5>
+<ul>
+<li><strong>Healing Meditation:</strong> Clear 1 Fatigue and, if you have a minor Condition (Fear, Shaken, Guilty), test Spirit+Resolve (DV 3) to remove it.</li>
+<li><strong>Clarity Meditation:</strong> Gain +1 die to your next Wits-based roll.</li>
+<li><strong>Transcendent Meditation:</strong> Once per session, reroll any single failed roll. The GM gains 1 Story Beat.</li>
+</ul>
+<h2 style="margin-top:2.2rem;border-bottom:3px double var(--gold);padding-bottom:0.3rem;font-size:1.6rem;">Monk Talents: The Unstruck Path</h2>
+<h3 style="font-size:1.3rem;margin-top:1.6rem;">Foundations of the Still Point</h3>
+<p>The following talents are suited for those who walk the edge of stillness and action. They are not for brawlers or berserkers. They are for the patient, the balanced, and the breathless.</p>
+<h4>2 XP Talents &mdash; Foundations</h4>
+<p>traittable The Open Hand & <em>Tags: Strike, BOD, Flow</em> \ & You have redirected a hundred blows without throwing one. Once per scene, when you attempt to parry, deflect, or disarm an opponent, treat your first Body or Melee roll as Position +1. The blow that never lands is the one you did not need to block. \ Still Point Stance & <em>Tags: Move, SPT, Flow</em> \ & You understand the geometry of stillness. When you do not move during your turn, gain +1 die to your next defense roll. This benefit lasts until you move or take an aggressive action. The mountain does not chase the wind. The wind breaks against the mountain. \ Monk's Breath & <em>Tags: Heal, SPT, Restoration</em> \ & You have learned to control your breath and heart rate. Once per session, you may clear 1 Fatigue by meditating for one minute uninterrupted. This does not require a roll. The breath that is held is a weapon. The breath that is released is a shield. traittable</p>
+<h4>3-4 XP Talents &mdash; The Working Knife</h4>
+<p>traittable Redirecting Current & <em>Tags: Move, Flow, Gambit</em> \ & When an enemy misses you with a melee attack, you may immediately reposition them one range band (Close &harr; Near) in a direction of your choice. Describe how you use their momentum to guide them. Once per scene. \ The Unarmoured Body & <em>Tags: Armour, BOD, Flow</em> \ & You have trained your body to absorb and redirect force. When unarmoured, convert the first point of Harm you would take each scene to Fatigue instead. Your skin is your armour; your breath is your shield. \ Pressure Point Strike & <em>Tags: Strike, AGI, Gambit</em> \ & You know the map of the human body. When you make an unarmed attack, you may declare a Pressure Point Strike. On a hit, the target suffers -1 die on all physical actions until the end of their next turn. On a critical success, they lose their next minor action entirely. traittable</p>
+<h4>5 XP Talents &mdash; Signature Moves</h4>
+<p>traittable The Unstruck Bell & <em>Tags: Defense, Flow, Overload</em> \ & You have never taken a blow you did not choose. Once per session, when you would be hit by an attack, you may declare that the attack misses you entirely. Describe how you were not there&mdash;a step back, a breath held, a shift of weight that no one saw coming. The GM gains 1 Story Beat as a cost (the universe notices your impossible stillness). \ Master of the Open Palm & <em>Tags: Strike, Combo, Restoration</em> \ & Your open hand can harm or heal. Once per session, you may convert a successful unarmed strike into a healing touch instead of dealing Harm. The target (ally or willing enemy) clears 1 Fatigue and, if they are suffering from a minor Condition (Fear, Shaken, Guilty), may roll Spirit+Resolve (DV 3) to remove it. traittable</p>
+<h4>6 XP Talent &mdash; The Quiet Catastrophe</h4>
+<p>traittable The Stillness That Moves & <em>Tags: Move, Flow, Overload</em> \ & Once per arc, you may move through a space that should be impassable&mdash;a crowd that does not part, a wall of blades, a locked door&mdash;as if you were never there. You do not break, force, or open. You simply arrive on the other side. The GM cannot retroactively place obstacles in your path for that scene. Cost: You must accept a permanent Breath Scar; you can never again be surprised, but neither can you ever truly rest. traittable</p>
+<h2 style="margin-top:2.2rem;border-bottom:3px double var(--gold);padding-bottom:0.3rem;font-size:1.6rem;">Monastic Traditions</h2>
+<h3 style="font-size:1.3rem;margin-top:1.6rem;">The Ways of the Unstruck Path</h3>
+<p>A monk is defined not only by talents but by the tradition they follow&mdash;the philosophical and martial lineage that shapes their understanding of stillness. Each tradition offers a set of techniques, a patron affinity, and a corruption-like path of deepening mastery.</p>
+<h4>Using Monastic Traditions</h4>
+<p>Each tradition is presented as a table of techniques, similar to the Patron's Gift and Signature Talent structures found elsewhere. A monk may learn techniques from their tradition by spending XP as follows:</p>
+<ul>
+<li><strong>Basic Technique (4-6 XP):</strong> A foundational ability that defines the tradition's core approach.</li>
+<li><strong>Advanced Technique (8-10 XP):</strong> A more powerful or versatile ability, often requiring a minimum Tier or attribute.</li>
+<li><strong>Master Technique (12+ XP):</strong> A campaign-defining ability that represents the pinnacle of that tradition's path.</li>
+</ul>
+<p>Unlike Patron obligations, tradition techniques do not generate Obligation or Corruption unless the tradition is tied to a specific Patron (as noted in the tradition's description). Instead, they cost Fatigue, Boons, or have narrative costs determined by the GM.</p>
+<h4>The Way of the Unstruck Bell (Ikasha &mdash; Shadow)</h4>
+<p><em>Patron Affinity: Ikasha, She Who Sleeps</em></p>
+<p>The Unstruck Bell tradition teaches that the greatest defense is to not be where the strike lands. Followers of this path learn to read the gaps in perception, to become forgettable, and to move through shadows as if the shadows themselves had parted for them.</p>
+<h5>Basic Technique &mdash; Shadow Meld (6 XP)</h5>
+<p><em>Prerequisite: Stealth 2+</em></p>
+<p>Once per session as an action, step into any shadow larger than yourself and emerge from another shadow within Near range. You cannot be targeted while moving between shadows. Mark 1 Fatigue after using this technique.</p>
+<h5>Advanced Technique &mdash; The Unobserved (8 XP)</h5>
+<p><em>Prerequisite: Tier II, Stealth 3+</em></p>
+<p>When you are Hidden, social Story Beats cannot be used to frame you for a crime you did not commit (unless you act first). Additionally, witnesses suffer -2 dice to recall your face or describe you to authorities.</p>
+<h5>Master Technique &mdash; Threshold of Sleep (12 XP)</h5>
+<p><em>Prerequisite: Tier III, Spirit 3+</em></p>
+<p>Once per session, walk through a locked door, a guarded threshold, or a magical ward as if it were mist. This does not work on barriers specifically enchanted against shadow-walking (GM discretion). Mark 2 Fatigue and gain +1 Obligation to Ikasha after using this technique.</p>
+<h5>Corruption of the Unstruck Bell</h5>
+<p>As the monk deepens their bond with Ikasha, the shadow leaves its mark.</p>
+<table>
+<tr><th> <strong>Tier</strong></th><th><strong>Benefit</strong></th><th><strong>Cost / Quirk</strong>  </th></tr>
+<tr><td>1</td><td>+1 die to Stealth in dim light or darkness.</td><td>Light Sensitivity: -1 die to Stealth in direct sunlight.</td></tr>
+<tr><td>2</td><td>Once per scene, treat a failed Stealth roll as a success.</td><td>The Witness Debt: A raven appears to watch your next crime. If you fail that roll, the raven reports to a rival.</td></tr>
+<tr><td>3</td><td>+2 dice to resist being tracked or identified.</td><td>Shadow Lag: Your shadow moves half a second behind you. Those who notice suffer -1 die to social rolls with you.</td></tr>
+<tr><td>4</td><td>Once per session, become Hidden in plain sight (no roll required) in a crowd.</td><td>Hollow Attention: The Hollow begins to notice your erasures. GM gains 1 SB to spend on a pursuit complication.</td></tr>
+<tr><td>5</td><td>Immune to mundane forms of surveillance (scrying, tracking dogs, witnesses).</td><td>Forgetful: You occasionally forget minor details of your own past. Mark 1 Fatigue when this happens.</td></tr>
+<tr><td>6+</td><td>Once per session, become intangible to mundane harm for one scene.</td><td>Shadow's Price: Mark +2 Obligation to Ikasha. Your reflection no longer appears in mirrors.</td></tr>
+</table>
+<h4>The Way of the Iron Vow (Mykkiel / Oath of Flame &mdash; Law)</h4>
+<p><em>Patron Affinity: Mykkiel, Arbiter of the Covenant, or the Oath of Flame \& Light</em></p>
+<p>The Iron Vow tradition teaches that the body is a temple and the fist is a gavel. Followers of this path swear binding oaths that grant power in exchange for restriction. They are monks who serve as justiciars, bodyguards, and arbiters&mdash;their word is law, and their law is enforced by their palms.</p>
+<h5>Basic Technique &mdash; Sworn Defender (6 XP)</h5>
+<p><em>Prerequisite: Body 3+</em></p>
+<p>When you take the Defend action, you also grant an adjacent ally +1 Armour until your next turn. This stacks with other sources of Armour.</p>
+<h5>Advanced Technique &mdash; Unyielding Vow (8 XP)</h5>
+<p><em>Prerequisite: Tier II, Spirit 3+</em></p>
+<p>Swear a vow before a witness (a specific action you will accomplish or a person you will protect). While actively working toward that vow, you ignore the first point of Fatigue each scene that would come from exhaustion, fear, or despair. Breaking the vow voluntarily causes you to mark 1 Harm (Stress) and lose access to this technique until you complete a suitable penance.</p>
+<h5>Master Technique &mdash; The Unbroken Covenant (12 XP)</h5>
+<p><em>Prerequisite: Tier III, Mykkiel or Oath of Flame patron</em></p>
+<p>Once per session, declare a single oath you have sworn as inviolable. For the remainder of the session, you gain +2 dice to all rolls that directly advance that oath, and you ignore the first Harm 2 each scene that would prevent you from fulfilling it. When the oath is fulfilled (or becomes impossible to fulfil), you immediately mark +2 Obligation to your patron.</p>
+<h5>Corruption of the Iron Vow</h5>
+<p>The weight of law presses inward.</p>
+<table>
+<tr><th> <strong>Tier</strong></th><th><strong>Benefit</strong></th><th><strong>Cost / Quirk</strong>  </th></tr>
+<tr><td>1</td><td>+1 die to Insight when detecting lies or broken promises.</td><td>Rigid Honor: Must uphold vows even when disadvantageous; -1 die to flexible actions.</td></tr>
+<tr><td>2</td><td>Once per scene, treat a failed Resolve test as a success (you steel yourself).</td><td>Judge's Severity: Cannot easily overlook infractions; suffer 1 Fatigue if forced to.</td></tr>
+<tr><td>3</td><td>+2 dice to Command when enforcing a sworn oath.</td><td>Suspicion: -1 die to social rolls with anyone you suspect of oathbreaking.</td></tr>
+<tr><td>4</td><td>Once per session, force a target who just lied to you to test Resolve (DV 4) or be unable to speak for one exchange.</td><td>Compelled to Correct: Must point out falsehoods when noticed, regardless of tact.</td></tr>
+<tr><td>5</td><td>Your sworn vows gain supernatural weight. Breaking them causes you Harm 2 (Stress), but you may ignore one external compulsion per scene that would force you to break an oath.</td><td>Monomania: When you swear a vow, you suffer -2 dice to all actions not directly related to fulfilling it until it is complete.</td></tr>
+<tr><td>6+</td><td>Once per session, render absolute judgment on a target who has broken an oath in your presence. They suffer -2 dice to all actions until they atone.</td><td>Instrument of Wrath: Mark +2 Obligation. Your voice now tolls like a bell when you speak judgment; those who hear you cannot interrupt until your sentence is complete.</td></tr>
+</table>
+<h4>The Way of the Endless Cup (Thrysos &mdash; Drunken Master)</h4>
+<p><em>Patron Affinity: Thrysos, King of Revels</em></p>
+<p>The Drunken Master tradition is perhaps the most misunderstood. Outsiders see a staggering fool; initiates see a fighter who has learned that predictability is death. By mimicking the unsteady gait of intoxication, the Drunken Master becomes impossible to anticipate. Every stumble is a feint, every spill a trip, every belch a battle cry.</p>
+<h5>Basic Technique &mdash; Stagger Step (4 XP)</h5>
+<p><em>Prerequisite: Body 3+</em></p>
+<p>When an enemy misses you with a melee attack, you may immediately move one range band (Close &harr; Near) without provoking opportunity attacks. Mark 1 Fatigue to use this technique (once per round).</p>
+<h5>Advanced Technique &mdash; Drunken Fist (6 XP)</h5>
+<p><em>Prerequisite: Body 3+, Spirit 2+</em></p>
+<p>Your unarmed strikes gain +1 die and ignore the first point of Armour when you are at Fatigue 2 or more (the wine guides you). This is a passive ability.</p>
+<h5>Master Technique &mdash; The Unbroken Bottle (12 XP)</h5>
+<p><em>Prerequisite: Tier III, Drunken Fist</em></p>
+<p>Once per session, you may ignore all penalties from Fatigue for one scene. While this is active, each time you would be hit by a melee attack, you may instead stagger out of the way and force the attacker to hit another adjacent creature of your choice (narrate the stumble). After the scene ends, you collapse with Harm 2 (Exhaustion) and cannot use this talent again until you have rested for a full night.</p>
+<h5>Corruption of the Endless Cup</h5>
+<p>The revel claims its own.</p>
+<table>
+<tr><th> <strong>Tier</strong></th><th><strong>Benefit</strong></th><th><strong>Cost / Quirk</strong>  </th></tr>
+<tr><td>1</td><td>+1 die to social rolls in feasts, taverns, or celebrations.</td><td>Compulsive Toast: Must drink when offered or mark 1 Fatigue.</td></tr>
+<tr><td>2</td><td>Ignore the first 1 Fatigue each scene.</td><td>Restless Appetite: -1 die when abstaining from indulgence (food, drink, or touch).</td></tr>
+<tr><td>3</td><td>Once per scene, treat a failed Acrobatics or Athletics roll as a success (you stumble into success).</td><td>Masquerade: Cannot act without a role or guise; -1 die to plain sincerity.</td></tr>
+<tr><td>4</td><td>Once per session, frenzy grants +2 dice to melee for one exchange.</td><td>Ecstatic Blindness: -1 die to perception outside the revel; you may not notice threats that require sobriety.</td></tr>
+<tr><td>5</td><td>Once per session, all allies within Near clear 1 Fatigue when you share a drink with them.</td><td>Hungering Host: You consume twice as much; denial causes Harm 1 (Stress).</td></tr>
+<tr><td>6+</td><td>Once per session, become an avatar of revels; all allies gain +2 dice, enemies suffer -2 dice to resist your social actions.</td><td>Tyrant of Pleasure: Mark +3 Obligation; the revel grows monstrous, demanding a sacrifice (an oath, a relationship, or a life).</td></tr>
+</table>
+<h4>Creating Your Own Tradition</h4>
+<p>When designing a new monastic tradition, consider the following:</p>
+<ol>
+<li><strong>Choose a Core Philosophy.</strong> What does this tradition value? Stillness? Motion? Endurance? Deception?</li>
+<li><strong>Select a Patron Affinity (Optional).</strong> Is the tradition tied to a specific Patron, or is it a purely mortal discipline?</li>
+<li><strong>Design Three Techniques.</strong> Basic (4-6 XP), Advanced (8-10 XP), Master (12+ XP). Each should feel distinct and build on the tradition's core.</li>
+<li><strong>Craft a Corruption Table (If Patron-Tied).</strong> Six tiers of deepening benefits and costs. The costs should be thematic and roleplay-heavy.</li>
+<li><strong>Name It.</strong> The best tradition names suggest both a technique and a philosophy: &ldquo;The Way of the Open Hand,&rdquo; &ldquo;The Path of the Whispering Stone,&rdquo; &ldquo;The School of the Falling Leaf.&rdquo;</li>
+</ol>
+<h2 style="margin-top:2.2rem;border-bottom:3px double var(--gold);padding-bottom:0.3rem;font-size:1.6rem;">The Psionic Monk</h2>
+<h3 style="font-size:1.3rem;margin-top:1.6rem;">The Silent Mind</h3>
+<p>&ldquo;The mind that moves the mountain first learns to be still. The thought that bends the spoon first learns to be empty.&rdquo;</p>
+<p>The monk and the psion share a secret: both have looked inward and found a door. The monk opens it with breath; the psion opens it with will. At the intersection of these paths lies the psionic monk&mdash;a practitioner who has learned to weaponise the silence between thoughts.</p>
+<h4>Integrating Psionics and Monk Talents</h4>
+<p>A psionic monk treats their Mental Strain (see the Psionics chapter of the Gray Wanderer's Grimoire) as a secondary resource pool alongside Fatigue. The two are not interchangeable, but certain talents allow conversion:</p>
+<ul>
+<li><strong>Ki as Mental Strain:</strong> A monk with the Psionics skill may spend 1 Mental Strain instead of 1 Fatigue to power any monk talent with the [Flow] tag.</li>
+<li><strong>Mental Stillness:</strong> Once per scene, a psionic monk may reduce their Mental Strain by 1 by spending one minute in meditation (no roll required). This cannot be done in combat.</li>
+</ul>
+<h4>Psionic Arts for Monks</h4>
+<p>While any monk can learn psionic Arts, certain Arts complement monastic training particularly well:</p>
+<table>
+<tr><th> <strong>Psionic Art</strong></th><th><strong>Monk Synergy</strong>  </th></tr>
+<tr><td>Telekinesis</td><td>The Unseen Hand replaces physical strikes at range. A monk can use Telekinesis to parry arrows, trip enemies, or deliver &ldquo;pressure point strikes&rdquo; from across the room.</td></tr>
+<tr><td>Biofeedback</td><td>The Inward Physician is meditation made flesh. Monks who master Biofeedback can heal their own wounds, purge poison with a breath, and slow their heartbeat to appear dead.</td></tr>
+<tr><td>Mind Shield</td><td>The Walled Garden is the ultimate expression of Still Point Stance. A monk with Mind Shield can no longer be surprised, read, or mentally compelled.</td></tr>
+<tr><td>Precognition</td><td>Reading the Weather of the Skull allows a monk to act before the enemy acts&mdash;the ultimate expression of the empty breath.</td></tr>
+<tr><td>Psychic Assault</td><td>The Breaking Thought is the closed fist of the mind. A monk who masters this Art can stun, confuse, or simply drop an enemy with a glare.</td></tr>
+</table>
+<h4>Hybrid Build Examples</h4>
+<h5>The Shadow Telepath (Way of Unstruck Bell + Telepathy)</h5>
+<p><em>Core Talents:</em> Shadow Meld, The Unobserved, Telepathy (Surface Thoughts, Emotional State)</p>
+<p><em>Playstyle:</em> You are an infiltrator who doesn't need to pick locks or disable alarms. You read the guard's surface thoughts to learn the patrol route. You sense the captain's emotional state to know when he is distracted. When discovered, you step into a shadow and emerge behind them, delivering a Pressure Point Strike before they can raise the alarm.</p>
+<p><em>Sample Progression:</em></p>
+<ul>
+<li>2 XP: Monk's Breath</li>
+<li>4 XP: Shadow Meld (Basic Technique)</li>
+<li>6 XP: Telepathy (Art, Surface Thoughts only)</li>
+<li>8 XP: Pressure Point Strike</li>
+<li>10 XP: Emotional State (Telepathy upgrade)</li>
+<li>12 XP: The Unobserved (Advanced Technique)</li>
+</ul>
+<h5>The Iron Mind Shield (Way of Iron Vow + Mind Shield)</h5>
+<p><em>Core Talents:</em> Sworn Defender, Unyielding Vow, Mind Shield (Resist Intrusion, Shelter Allies)</p>
+<p><em>Playstyle:</em> You are the party's mental bastion. While the mages cast and the rogues sneak, you stand in the doorway and refuse to move. Enemies cannot read your allies' minds because you have erected a Walled Garden around them. When a psychic assault targets the group, you absorb the strain and convert it to Fuel for your Iron Vow.</p>
+<p><em>Sample Progression:</em></p>
+<ul>
+<li>2 XP: The Open Hand</li>
+<li>4 XP: Sworn Defender (Basic Technique)</li>
+<li>6 XP: Mind Shield (Art, Resist Intrusion)</li>
+<li>8 XP: Unyielding Vow (Advanced Technique)</li>
+<li>10 XP: Shelter Allies (Mind Shield upgrade)</li>
+<li>12 XP: The Unbroken Covenant (Master Technique)</li>
+</ul>
+<h5>The Drunken Precog (Way of Endless Cup + Precognition)</h5>
+<p><em>Core Talents:</em> Stagger Step, Drunken Fist, Precognition (Advantage on future rolls, Avoid named dangers)</p>
+<p><em>Playstyle:</em> You stagger not because you are drunk, but because you have already seen where the blade will fall. Your Precognition tells you that the enemy will swing high; you stumble low. It tells you that the floor will give way; you &ldquo;accidentally&rdquo; step around the weak spot. To observers, you are a lucky fool. To your enemies, you are a nightmare who cannot be touched.</p>
+<p><em>Sample Progression:</em></p>
+<ul>
+<li>2 XP: Stagger Step (Basic Technique)</li>
+<li>4 XP: Monk's Breath</li>
+<li>6 XP: Precognition (Art, Advantage on future rolls)</li>
+<li>8 XP: Drunken Fist (Advanced Technique)</li>
+<li>10 XP: Avoid Named Dangers (Precognition upgrade)</li>
+<li>12 XP: The Unbroken Bottle (Master Technique)</li>
+</ul>
+<h4>The Silent Mind's Burden</h4>
+<p>A psionic monk walks two paths simultaneously, and each path demands its price. The monk pays in Fatigue and obligation; the psion pays in Mental Strain and the slow erosion of the self. When both debts come due at once&mdash;when the Fatigue track fills and the Mental Strain overflows&mdash;the monk risks becoming a hollow vessel: still breathing, still standing, but no longer present.</p>
+<p>The Gray Wanderer once described meeting such a monk in the catacombs beneath Thepyrgos: &ldquo;He sat in perfect lotus, eyes open, pulse steady. But when I spoke, he did not answer. When I touched his shoulder, he did not blink. The body was a temple, but the god had moved out. I left a coin on his palm and walked away. The coin was still there when I returned a year later.&rdquo;</p>
+<p>Walk both paths if you must. But keep one foot on stone at all times.</p>
+<h2 style="margin-top:2.2rem;border-bottom:3px double var(--gold);padding-bottom:0.3rem;font-size:1.6rem;">The Three-Temples Monastery</h2>
+<h3 style="font-size:1.3rem;margin-top:1.6rem;">The Court That Does Not Move</h3>
+<p>The Three-Temples Monastery is not a fortress. It is a collection of stones, oak trees, and breath. It has no walls, no guards, no treasury. Its only defense is the reputation of its monks: those who enter with violence in their hearts find that violence returned to them tenfold, and those who enter with empty hands find tea and a place to sleep.</p>
+<p>I am Brother Tarn, and I hold the rank of Keeper of the Unstruck Bell. Below me are the Five Elders, each responsible for a tradition. Below them, the monks who have taken vows. And at the bottom, the novices who scrub the floors and learn to breathe.</p>
+<h4>The Hierarchy of Breath</h4>
+<p>The monastery does not track rank by years served or enemies defeated. It tracks by breath.</p>
+<ul>
+<li><strong>Novice (First Breath)</strong>  The novice learns to sit still for one hour. Most fail. Those who succeed begin to learn the Entering Breath.</li>
+<li><strong>Initiate (Holding Breath)</strong>  The initiate learns to hold their breath for three minutes while meditating. This is not a physical test; it is a test of the mind's ability to override the body's panic.</li>
+<li><strong>Brother/Sister (Releasing Breath)</strong>  The monk takes their first vow: &ldquo;I will not strike first.&rdquo; They learn to redirect force, to parry, to disarm. They may leave the monastery but must return each season to renew the vow.</li>
+<li><strong>Elder (Empty Breath)</strong>  The monk has learned to act from the space between thoughts. They are unpredictable, uncanny, and feared even by the other Elders. There are rarely more than five Elders at any time.</li>
+<li><strong>Keeper (The Unstruck Bell)</strong>  There is only one Keeper. I hold the position now. When I die&mdash;or when I vanish into the hills to die alone&mdash;the Elders will choose another. Or they will not. The monastery has survived without a Keeper before.</li>
+</ul>
+<h4>The Monastery's Assets (What the GM Can Offer)</h4>
+<p>When players align themselves with the Three-Temples Monastery (or a similar monastic order), they can earn access to:</p>
+<ul>
+<li><strong>The Breath Registry:</strong> A record of every trained monk in the region, their vows, and their current location. Useful for finding allies or tracking fugitives.</li>
+<li><strong>The Silent Passages:</strong> A network of hidden paths beneath the city that only monks know. These passages allow stealthy movement between any two locations in the city that have a shrine or meditation alcove.</li>
+<li><strong>The Novice Network:</strong> A group of young monks who act as messengers, lookouts, and distraction. Each is Cap 1, good for reconnaissance but not combat.</li>
+<li><strong>The Healing House:</strong> A clinic run by the monastery where the sick and injured are treated without question. Monks may use the Healing House to recover Fatigue twice as fast (1 Fatigue per hour instead of per rest).</li>
+<li><strong>The Unstruck Bell:</strong> A legendary artifact&mdash;a bell that rings only in the mind. Once per session, a monk may ring the Unstruck Bell (as an action) to impose -2 dice on all fear-based effects against the party for one scene. The bell's location is a secret known only to the Keeper.</li>
+</ul>
+<h3 style="font-size:1.3rem;margin-top:1.6rem;">Notable Monks of the Three-Temples</h3>
+<h5>Brother Tarn (Keeper of the Unstruck Bell)</h5>
+<p><em>Tier: IV</em> \ <em>Motivation:</em> Maintain the balance between the monastery and the city; prevent the Hollow from noticing the thresholds. \ <em>Leverage:</em> He knows the true names of every monk in the region, and the location of every hidden meditation cell. \ <em>Quirk:</em> He has never been seen eating. The novices whisper that he doesn't need to.</p>
+<h5>Sister Mira (Elder of the Open Hand)</h5>
+<p><em>Tier: III</em> \ <em>Motivation:</em> Heal the sick, protect the innocent, and remind the powerful that they are mortal. \ <em>Leverage:</em> She trained half the healers in the city. They owe her favors, and she calls them in. \ <em>Quirk:</em> She carries a small wooden bird that she carved as a novice. When she meditates, the bird sometimes sings.</p>
+<h5>Brother Stone (Elder of the Iron Vow)</h5>
+<p><em>Tier: III</em> \ <em>Motivation:</em> Enforce the monastery's oaths, hunt down those who have broken their vows, and protect the Keeper. \ <em>Leverage:</em> He holds the Breath Registry and knows which monks have failed their vows. He does not forgive. \ <em>Quirk:</em> He has not spoken in seven years. He communicates through hand signs and a small slate. The other Elders say his silence is a vow, not a wound.</p>
+<h5>The Abbot of the Empty Breath (Secret)</h5>
+<p><em>Tier: ?</em> \ <em>Motivation:</em> Unknown. Some say the Abbot is dead. Others say the Abbot never existed&mdash;that the Empty Breath is simply the space where a Keeper should be. \ <em>Leverage:</em> Letters signed &ldquo;The Abbot&rdquo; arrive on warm paper, as if freshly pressed. They contain instructions that the Keeper always follows. No one has ever seen the Abbot. \ <em>Quirk:</em> The Abbot's seal is a blank circle. A bell that cannot ring.</p>
+<h2 style="margin-top:2.2rem;border-bottom:3px double var(--gold);padding-bottom:0.3rem;font-size:1.6rem;">Adventure Hooks and Rumors</h2>
+<h3 style="font-size:1.3rem;margin-top:1.6rem;">Jobs from the Monastery (d12)</h3>
+<p>When the players need work (or the GM needs a hook), roll or choose:</p>
+<ol>
+<li><strong>The Broken Vow.</strong> A former monk has broken their oath of non-violence and is terrorising the docks. Bring them back alive. The Elders will decide their penance.</li>
+<li><strong>The Poisoned Breath.</strong> Someone is poisoning the monastery's well. The water tastes of iron, and novices are falling into comas. Find the source.</li>
+<li><strong>The Silent Passage Thief.</strong> Someone has learned the secret of the Silent Passages and is using them to rob merchant caravans. The thieves' guild is not responsible&mdash;someone else is wearing their mask.</li>
+<li><strong>The Wandering Keeper.</strong> Brother Tarn has disappeared. He left a note: &ldquo;The bell tolls for me. Choose the next Keeper, or don't.&rdquo; The Elders cannot agree. They need the party to find him&mdash;or confirm his death.</li>
+<li><strong>The Rival School.</strong> A new martial arts school has opened in the city. They teach the &ldquo;Way of the Closed Fist&rdquo;&mdash;aggression, dominance, and the exploitation of weakness. They are recruiting from the monastery's novice pool.</li>
+<li><strong>The Haunted Meditation Cell.</strong> One of the monastery's meditation rooms is now haunted. Monks who enter hear whispers that sound like their own thoughts. Something is feeding on their stillness.</li>
+<li><strong>The Debt of the Sleeping Master.</strong> An old monk lies in a coma, kept alive by the monastery's healers. His debt to a Patron has come due, and the Patron is sending a collector. The party must protect the sleeping man&mdash;or negotiate with the collector.</li>
+<li><strong>The Hollow Tithe.</strong> The Hollow has noticed the monastery's thresholds. Once a year, the monks leave a basket of bread at the crossroads. This year, the basket came back empty&mdash;but something was inside the bread.</li>
+<li><strong>The Stolen Breath.</strong> A thief has stolen the Breath Registry. Without it, the monastery cannot track its monks' vows. The thief is demanding ransom&mdash;but the registry cannot be copied. The party must retrieve the original.</li>
+<li><strong>The Novice's Vision.</strong> A novice has had a prophetic vision: the monastery will burn within the month. The Elders dismiss it as fever dreams. The novice is terrified. The party must investigate&mdash;or prepare for fire.</li>
+<li><strong>The Inquisition's Visit.</strong> The Chain-Lanterns of Ecktoria have arrived. They have heard rumors of &ldquo;unsanctioned psionic activity&rdquo; within the monastery. They demand to search the cells. The Elders refuse. The party is caught between.</li>
+<li><strong>The Unstruck Bell's Secret.</strong> The Unstruck Bell has been stolen&mdash;or has it? The bell cannot be moved; it is a concept, not an object. But the Keeper swears it is gone. The party must discover what &ldquo;missing&rdquo; means for a bell that only rings in the mind.</li>
+</ol>
+<h3 style="font-size:1.3rem;margin-top:1.6rem;">Rumors Heard in the Monastery Courtyard (d12)</h3>
+<ol>
+<li>Sister Mira once healed a dying warlord. He repaid her by burning a village. She does not heal anyone who carries a weapon anymore.</li>
+<li>Brother Stone took his vow of silence after accidentally killing a student during a sparring match. The student was his son.</li>
+<li>The Abbot of the Empty Breath is actually the ghost of the monastery's founder. He has been dead for two hundred years. The Keeper is the only one who can see him.</li>
+<li>The Silent Passages lead not only under the city, but into the Ways Between. Monks who walk too far sometimes come back with empty eyes.</li>
+<li>The monastery's well was dug on the site of an ancient execution ground. That is why the water tastes of iron&mdash;and why the Hollowed sometimes gather at midnight to drink.</li>
+<li>The Unstruck Bell was not forged. It was found. It lay in a field, half-buried, next to a skeleton in gray robes. The skeleton wore the Abbot's seal.</li>
+<li>There is a meditation cell that no one uses. The door is locked. The key was thrown into the well. The novice who asked why was expelled.</li>
+<li>Brother Tarn is not the first Keeper to disappear. The previous Keeper walked into the hills thirty years ago. Some say he is still walking.</li>
+<li>The Drunken Master tradition was not invented by the monastery. It was borrowed from a wandering beggar who beat three Elders with a broken bottle and then asked for tea.</li>
+<li>The Hollow does not collect debts from monks. It is afraid of them. This is not a rumor. This is a warning.</li>
+<li>The monastery has a secret library beneath the courtyard. The books are written in a language that changes depending on who reads them. The Abbot keeps the key.</li>
+<li>The Gray Wanderer once stayed at the monastery for three days. He meditated in the courtyard, spoke to no one, and left a single coin on the well. The coin is still there. No one will touch it.</li>
+</ol>
+<h3 style="font-size:1.3rem;margin-top:1.6rem;">The Debt of the Sleeping Master (Sample Adventure)</h3>
+<h4>The Setup</h4>
+<p>The party is summoned to the monastery's infirmary. An old monk lies on a pallet of gray wool, eyes open but unseeing, lips moving in a language none of the novices recognize. His name is Master Kai, and he was once a teacher of the Way of the Unstruck Bell. Thirty years ago, he walked into the hills and did not return. Last night, a shepherd found him sitting cross-legged in a field, still breathing, still warm, but utterly absent.</p>
+<p>Brother Tarn stands at the bedside. &ldquo;He is not asleep,&rdquo; the Keeper says. &ldquo;He is hiding. Something from his past has caught up with him, and he has run into the only place it cannot follow: his own memory. You must go in after him.&rdquo;</p>
+<h4>The Threshold</h4>
+<p>The party must enter Master Kai's mind. This requires a psionic anchor (a character with the Psionics skill and the Telepathy Art) who can pull the others into the dream. The anchor pays 1 Mental Strain per passenger (minimum 1). Non-psions cannot use psionic Arts inside the dream, but they can see, speak, fight, and interact with the environment normally.</p>
+<p>The threshold is the pallet. The witnesses are each other. The price is one memory of comfort associated with the Master, which will be lost forever.</p>
+<h4>The Dream Heist</h4>
+<p>Once inside, the party appears in a memory version of the monastery's meditation hall. They must descend through nine chambers, each representing a hidden debt or unspoken regret of Master Kai's past. The final chamber contains the secret he has been hiding: the name of a woman he swore to protect during the Ashaani purges, and then abandoned.</p>
+<p>Until the name is spoken aloud in the heart of the dream, the Master cannot wake&mdash;and the Spector (a gray figure representing his un-faced death) will stalk the party through the chambers.</p>
+<h5>Mechanics</h5>
+<ul>
+<li><strong>Master's Breath Timer [8]:</strong> Ticks every scene. When full, the Master's body stops breathing. The dream collapses; all PCs mark 2 Harm and gain the Haunted condition.</li>
+<li><strong>Debt's Approach Timer [6]:</strong> Ticks when the party speaks a lie, fails a Resolve test, or damages a dream-construct. When full, the woman's spirit manifests and attacks.</li>
+<li><strong>Name Unspoken Timer [4]:</strong> Fills as the party discovers clues about the woman's identity. When full, the name is known and can be spoken in the final chamber.</li>
+</ul>
+<h4>Resolution</h4>
+<p>If the party speaks the name, the Master's eyes close, then open. He looks at Brother Tarn and says, &ldquo;I am ready now.&rdquo; He dies within the hour, at peace. The party gains +1 Favor with the monastery and may each clear 1 Obligation or Corruption segment.</p>
+<p>If the party fails&mdash;if the Master's Breath timer fills before the name is spoken&mdash;they wake to find the Master dead, his eyes still open, his lips still moving. The Spector has claimed him. The monastery will remember the party's failure for a generation.</p>
+<h4>The Gray Wanderer's Note on the Adventure</h4>
+<p>&ldquo;I have been inside three dying minds. Two of them were gardens&mdash;overgrown, yes, but still growing. The third was a courtroom where the judge had been dead for forty years and the jury was made of the people he had wronged. That one took three days to escape. The trick is to remember that the dream is not real, but the debt is. You cannot argue with a ghost about whether you owe it. You can only pay.&rdquo;</p>
+<h3 style="font-size:1.3rem;margin-top:1.6rem;">Last Words from Brother Tarn</h3>
+<p>You have read the techniques. You have seen the traditions. You know the price of the Unstruck Bell and the weight of the Iron Vow. Now close the book.</p>
+<p>The monastery is not a place. It is a relationship with stillness. You can practice the Entering Breath in a crowded tavern, the Holding Breath in a prison cell, the Releasing Breath on a battlefield. The Empty Breath? That one you must find for yourself. I cannot teach it. No one can. The best I can do is point at the moon and hope you look up instead of at my finger.</p>
+<p>Go. Make mistakes. Get hit. Learn why you should not have been there when the blow landed. Come back if you survive. I will keep the tea warm.</p>
+<p><em>Brother Tarn\ Keeper of the Unstruck Bell\ Three-Temples Monastery\ The ink is dry. The mirror is still. The bell does not ring.</em></p>
+<h2 style="margin-top:2.2rem;border-bottom:3px double var(--gold);padding-bottom:0.3rem;font-size:1.6rem;">The Pact-Wright: The Leash That Tightens</h2>
+<h3 style="font-size:1.3rem;margin-top:1.6rem;">The First Question</h3>
+<p> {Undated. No seal.} {Written on vellum pressed between funerary pages.} {Quinn}{Scholar-Monk of Varnek Karn, Runekeeper of the Witness}</p>
+<p>Mira&mdash;</p>
+<p>You will not remember me. We met at the dust market outside Midh Ahkaz, seven years ago. You were summoning&mdash;something small, a bell-wight from the Aeler tunnels. I watched from behind a spice stall. You did not see me.</p>
+<p>I am a Runekeeper of the Witness. I have bound oaths, witnessed contracts, sealed confessions in wax and iron. I have never bound a soul.</p>
+<p>The summoner's art troubles me. When you call a spirit, when you tie that leash, when you command it to serve&mdash;is that not enslavement? The Veiled Sisters bind spirits in brass cages. They call it necessity. The Chain-Lanterns conscript children with talent. They call it protection. You call a wolf-ancestor from the steppe, you tie a knot in the leash, you send it to scout. What do you call that?</p>
+<p>I do not write to accuse. I write to understand.</p>
+<p>The Witness teaches that every witness must be willing. A confession forced is not truth. A vow coerced is not binding. When I invoke a Rite, the Patron answers because I have sworn an oath&mdash;freely, with full knowledge of the cost. The Obligation I carry is my own.</p>
+<p>What does a spirit owe you? Did it choose to answer?</p>
+<p></p>
+<h3 style="font-size:1.3rem;margin-top:1.6rem;">The Wolf's Answer</h3>
+<p> {Written on scrap leather. No date.} {Ink is lamp-black and something darker.} {Mira}{Summoner of the Violet Steppe, Pact-Whisperer}</p>
+<p>Quinn&mdash;</p>
+<p>I remember you. You were the one who did not flinch when the bell-wight appeared. The spice merchant dropped his cardamom. The Aeler factor crossed himself. You just watched.</p>
+<p>You ask if the spirits choose. Yes. And no.</p>
+<p>When I beat the drum, the wolf-ancestor does not come because I command it. It comes because it has been waiting for someone to ask. The dead are patient. They have all the time in the world to consider their offers, and no need to rush to agreement. They know what the living forgot, and remember every slight with perfect clarity.</p>
+<p>The leash is not a chain. It is a promise. I promise the wolf that I will honor its lineage. I promise the drowned mutineer that I will speak its name. I promise the bell-wight that I will keep a lamp lit. The spirit promises service in return.</p>
+<p>I hold one end of the leash. The wolf holds the other. We are both waiting to see who pulls first.</p>
+<p></p>
+<h3 style="font-size:1.3rem;margin-top:1.6rem;">Borte's Counsel</h3>
+<p> {Written on a scrap of saddle leather.} {Borte}{Wolf-Speaker of the Gray Fox Clan, Ykrul Elder}</p>
+<p>Quinn of the stone halls&mdash;</p>
+<p>You write to Mira, but the wind carries your words across the steppe. I am Borte, Wolf-Speaker of the Gray Fox. I taught Mira the first knot when she was a child with a broken drum.</p>
+<p>You ask if the spirits choose. They choose those who listen. The steppe teaches that a horse will not carry a rider it does not trust. A wolf will not follow a hunter who does not respect the pack. Summoning is the same.</p>
+<p>Mira learned to beat the drum in rhythm with the wolf's heartbeat. That is not control. That is harmony. The leash is not a chain&mdash;it is a shared breath. When you pull, the wolf feels it. When the wolf pulls, you feel it. You cannot command something you do not understand.</p>
+<p>You asked what the wolf hungers for. Honor. The wolf-ancestor will challenge you to be brave. It will refuse to fight an honourable foe. It will howl if you try to sneak past a threat&mdash;because stealth is not honourable. If you cannot live with that, do not call it.</p>
+<p>Mira is young. She learned the knots, but she has not yet learned when not to tie them. That is why I write to you. Ask her about the winter she called a dust-djanni during a drought. Ask her what it demanded in return.</p>
+<p></p>
+<h3 style="font-size:1.3rem;margin-top:1.6rem;">The Dust-Djanni</h3>
+<p> {Written on bark. Ink is faded. The handwriting is shaky.} {Mira}{Summoner of the Violet Steppe}</p>
+<p>Quinn&mdash;</p>
+<p>Borte told you about the drought. I will tell you myself.</p>
+<p>I was sixteen. The rains had not come for nine months. The herds were dying. The elders were talking about breaking camp and walking south&mdash;three hundred miles with no guarantee of water.</p>
+<p>I called a dust-djanni. I had never called anything larger than a bell-wight. But I was desperate. I beat the drum with a rhythm I had heard in a dream. The djanni came.</p>
+<p>It was a column of dust shaped like a robed figure. Its eyes were polished amber. It did not speak. It waited.</p>
+<p>I asked for water. The djanni pointed east. I led the clan east. We found a well&mdash;dry. The djanni laughed. Dust filled my mouth.</p>
+<p>I was angry. I tied the leash. I commanded it to show me water. The djanni resisted. The Leash ticked. I spent a Boon. It ticked again. I spent another Boon. I had no more.</p>
+<p>The Leash filled. The djanni acted according to its nature: it veiled the path. For three days, every direction looked the same. The clan wandered. Two goats died. One child nearly died of thirst.</p>
+<p>Then Borte came. She did not call the djanni. She did not threaten it. She sat in the dust and sang a song&mdash;a song about a well that had been dug by her grandmother. The djanni listened. At the end of the song, it pointed east again. This time, there was water.</p>
+<p>Borte taught me that the dust-djanni had not lied. It had shown me the well&mdash;the dry well&mdash;because I had not offered a price. The price was a song. I did not know the song. The djanni was waiting for someone who did.</p>
+<p>That is the lesson, Quinn. The leash does not command. The leash binds. Binding without understanding is slavery. Understanding without binding is storytelling. I am still learning the difference.</p>
+<p></p>
+<h3 style="font-size:1.3rem;margin-top:1.6rem;">The Summoner's Craft</h3>
+<p>This chapter presents the mechanics of summoning as practiced by those who follow the Violet Steppe or walk the halls of Varnek Karn. All terms used here are defined in the letters above&mdash;this section provides the precise rules for play.</p>
+<h4>Foundational Concepts</h4>
+<p>Before mechanics, understand these truths:</p>
+<ul>
+<li><strong>The Leash is a Promise</strong>: Binding a spirit creates a mutual obligation. The spirit serves; the summoner honors the spirit's nature and pays its price.</li>
+<li><strong>Spirits Have Agency</strong>: A spirit may refuse service, act on its nature, or leave if the summoner violates the bargain.</li>
+<li><strong>Power Requires Balance</strong>: Strength in summoning comes not from domination, but from understanding and reciprocity.</li>
+</ul>
+<h4>Essential Talents</h4>
+<p>Summoning requires two core talents, representing the minimum investment to engage with spirits meaningfully.</p>
+<div class="rite-box">
+<ul>
+<li><strong>Pact-Whisperer (2 XP)</strong> \\</li>
+<p><em>Prerequisite: None.</em> \ Grants the ability to <strong>Call</strong> spirits (1 action). Without this, no summoning is possible. The spirit appears at Near range but may depart immediately if not bound.</p>
+<li><strong>Lesser Pactwright (2 XP)</strong> \\</li>
+<p><em>Prerequisite: Pact-Whisperer.</em> \ Allows binding of <strong>Cap 1 spirits</strong>. To bind, spend 1 Boon <strong>or</strong> mark 1 Fatigue. If the spirit accepts, it is bound; if it refuses, it vanishes.</p>
+</ul>
+</div>
+<h4>The Leash: Core Mechanic</h4>
+<p>Every bound spirit has a <strong>Leash Timer </strong> tracking the strain on the summoner-spirit bargain. Its length reflects the spirit's power and the summoner's resilience.</p>
+<div class="rite-box">
+<ul>
+<li><strong>Length</strong> = Spirit's <strong>Cap</strong> + Summoner's <strong>Spirit</strong> stat</li>
+<ul>
+<li>Example: A Cap 2 spirit bound by a summoner with Spirit 3 has a Leash of 5 segments.</li>
+</ul>
+<li><strong>The Leash ticks (+1 segment) when</strong>: \\</li>
+<ul>
+<li>The spirit takes Harm</li>
+<li>You command it against its nature (as defined in its entry)</li>
+<li>It crosses a [WARD] threshold</li>
+<li>You split focus between multiple spirits (+1 per extra spirit beyond the first)</li>
+<li>You push it beyond its agreed service (e.g., demanding combat from a healer spirit)</li>
+</ul>
+<li><strong>When the Leash fills</strong>: \\</li>
+<p>The spirit acts <strong>once</strong> according to its nature (see Spirit Whims Table), then:</p>
+<ul>
+<li>Departs peacefully (if the bargain was honoured), <strong>or</strong></li>
+<li>Turns hostile (if the summoner abused the bond; GM discretion)</li>
+</ul>
+<p>The summoner gains 1 <strong>Corruption</strong>.</p>
+<li><strong>Boon Finesse</strong>: Once per round, spend 1 Boon to clear 1 Leash tick.</li>
+</ul>
+</div>
+<h4>Spirit Capacity and Advancement</h4>
+<p>As summoners grow, they gain access to more powerful spirits and deeper bonds.</p>
+<div class="rite-box">
+<ul>
+<li><strong>Greater Pactwright (4 XP)</strong> \\</li>
+<p><em>Prerequisite: Lesser Pactwright.</em> \ Required to bind <strong>Cap 2 or 3 spirits</strong>. Without this, you cannot bind spirits stronger than Cap 1.</p>
+<li><strong>Spirit Synergy (4 XP)</strong> \\</li>
+<p><em>Prerequisite: Lesser Pactwright.</em> \ When commanding two spirits, reduce each Leash tick by 1 (minimum 0). Essential for dual summoners&mdash;prevents the Leash from filling too quickly when managing multiple bonds.</p>
+<li><strong>Spirit Link (10 XP)</strong> \\</li>
+<p><em>Prerequisite: Tier II, Spirit 3+.</em> \ Spirits act on your turn; commands are free actions. The bond is so deep that direction requires no effort&mdash;though the Leash still ticks for violations.</p>
+<li><strong>True Name Keeper (15 XP)</strong> \\</li>
+<p><em>Prerequisite: Tier III, Lore 3+.</em> \ Call any previously encountered spirit by its true name; reduce its effective Cap by 2 for Leash calculation (to a minimum of Cap 1). The spirit <em>cannot refuse</em> the call&mdash;but it remembers every slight, and its nature may turn hostile faster if abused.</p>
+<li><strong>Soul Anchor (12 XP)</strong> \\</li>
+<p><em>Prerequisite: Tier III, Rite of Binding.</em> \ Bind a spirit permanently to a location or object. The Leash Timer does <em>not</em> tick unless the spirit is forced to leave its anchor (e.g., by powerful magic or physical destruction of the anchor).</p>
+<li><strong>Leash-Breaker (8 XP)</strong> \\</li>
+<p><em>Prerequisite: Spirit Synergy.</em> \ Once per session, voluntarily release a spirit without triggering its independent action. The spirit departs peacefully, but the summoner gains 1 Fatigue.</p>
+</ul>
+</div>
+<h4>Spirit Interaction: Calling, Binding, and Service</h4>
+<p>This is the flow of a typical summoning encounter.</p>
+<div class="rite-box">
+<ol>
+<li><strong>Call (1 action)</strong>: Roll Wits + Presence (or relevant skill) vs. the spirit's Resist (typically 3 for minor spirits, 5 for powerful ones). On success, the spirit appears at Near range. On failure, it does not come. On a partial, it appears but is wary&mdash;you must succeed on a Bind attempt to keep it.</li>
+<li><strong>Bind (1 action)</strong>: To secure the spirit's service, spend 1 Boon <strong>or</strong> mark 1 Fatigue. The spirit then decides:</li>
+<ul>
+<li><strong>Accepts</strong>: It is bound. Service begins.</li>
+<li><strong>Refuses</strong>: It vanishes. You may try again later, but the spirit may demand a higher price or refuse outright.</li>
+<li><strong>Acts on Nature</strong>: It immediately performs one action from its Spirit Whims table (see below), then vanishes.</li>
+</ul>
+<li><strong>Service</strong>: While bound, the spirit performs tasks as agreed. You may:</li>
+<ul>
+<li>Command it to act within its nature (no Leash tick)</li>
+<li>Command it against its nature (Leash ticks +1)</li>
+<li>Ask it to use a special ability (may tick Leash if taxing)</li>
+</ul>
+<p>The spirit may also act independently if provoked (e.g., by disrespect to its nature)&mdash;roll on Spirit Whims table if the GM deems it appropriate.</p>
+<li><strong>Release</strong>: To end service peacefully, succeed on a Wits + Presence roll vs. the spirit's Resist. On success, it departs with no Leash tick. On failure, it may act on its nature before leaving.</li>
+</ol>
+</div>
+<h4>Spirit Whims Table</h4>
+<p>When a bound spirit acts independently (due to Leash filling, provocation, or GM discretion), consult this table. The GM may choose or roll d8.</p>
+<div class="rite-box">
+<table>
+<tr><th><strong>d8</strong></th><th><strong>Spirit's Independent Action</strong></th></tr>
+<tr><td>1</td><td><strong>Reveal a Secret</strong> -- The spirit blurts out a hidden fact about a PC or NPC -- true, embarrassing, or dangerous.</td></tr>
+<tr><td>2</td><td><strong>Break Something</strong> -- The spirit shatters a mundane object (a lantern, a rope bridge, a crucial tool).</td></tr>
+<tr><td>3</td><td><strong>Lead Astray</strong> -- The spirit moves a short distance and creates a false trail, forcing the party to waste time.</td></tr>
+<tr><td>4</td><td><strong>Call for Help</strong> -- The spirit summons a minor ally (a rat swarm, a will-o'-wisp, a lesser elemental).</td></tr>
+<tr><td>5</td><td><strong>Curse a PC</strong> -- The spirit leaves a lingering mark (--1 die on one skill until the next sunrise).</td></tr>
+<tr><td>6</td><td><strong>Bargain</strong> -- The spirit offers a deal: &ldquo;Release me now, and I'll tell you where the treasure is hidden.&rdquo;</td></tr>
+<tr><td>7</td><td><strong>Demand a Price</strong> -- The spirit reminds the summoner of an unpaid debt. Pay now (1 Boon or 1 Fatigue) or the spirit acts again next round.</td></tr>
+<tr><td>8</td><td><strong>Call the Hollow</strong> -- The spirit names a PC. The Hollow's attention shifts to that character for the next scene (all actions Desperate).</td></tr>
+</table>
+</div>
+<h4>The Hollow: The Unseen Witness</h4>
+<p>The Hollow is not a spirit&mdash;it is the attention that gathers when promises are broken. It is the reason the Leash has weight.</p>
+<div class="rite-box">
+<ul>
+<li><strong>Not a Target</strong>: You cannot summon, bind, or command the Hollow. It is the <em>context</em> of all bargains.</li>
+<li><strong>Debt Collector</strong>: When the Leash fills and the spirit acts on its nature, the Hollow <em>observes</em>. If the summoner abused the bond (e.g., commanded against nature repeatedly without offering fair price), the Hollow may:</li>
+<ul>
+<li>Inflict 1 Corruption on the summoner (beyond the Leash-fill cost)</li>
+<li>Cause the spirit to turn hostile instead of departing</li>
+<li>Mark the summoner with a <em>Hollow's Attention</em> tag (--1 to all Spirit checks until they make amends)</li>
+</ul>
+<li><strong>The Ninth Knot</strong>: The Leash has nine conceptual segments. The ninth is never ticked&mdash;it is the space where the Hollow observes. When a spirit acts according to its nature, the Hollow <em>assesses</em> whether the bargain was kept.</li>
+</ul>
+</div>
+<h2 style="margin-top:2.2rem;border-bottom:3px double var(--gold);padding-bottom:0.3rem;font-size:1.6rem;">Spirits of the Leash</h2>
+<h3 style="font-size:1.3rem;margin-top:1.6rem;">Spirit Compendium</h3>
+<p>This section details spirits suitable for binding. Each entry includes:</p>
+<ul>
+<li><strong>Nature</strong>: Core motivations and personality</li>
+<li><strong>Appearance</strong>: How the spirit manifests</li>
+<li><strong>Services</strong>: What it can do for the summoner</li>
+<li><strong>Price</strong>: What the spirit requires in return (not always material)</li>
+<li><strong>Acting Its Nature</strong>: How it behaves when the Leash fills or it is provoked</li>
+<li><strong>Cap</strong>: The spirit's power level (determines Leash length)</li>
+</ul>
+<p>All spirits require <em>Lesser Pactwright</em> to bind unless noted otherwise.</p>
+<h4>Ancestral Spirits (Ykrul Traditions)</h4>
+<h5>Wolf-Ancestor (Gray Fox Clan)</h5>
+<p><strong>Nature:</strong> Ancestral, protective, prideful. Values honesty and courage in battle.</p>
+<p><strong>Appearance:</strong> Gray wolf the size of a pony, eyes reflecting scenes from the summoner's childhood. Fur smells of dry grass and iron.</p>
+<p><strong>Services:</strong> Tracking, guarding, teaching forgotten battle-songs, sensing oath-breakers.</p>
+<p><strong>Price:</strong> The summoner must uphold the honor of the clan (e.g., refuse to fight dishonourably, avenge kinslayings).</p>
+<p><strong>Acting Its Nature:</strong> On a Whim roll, it challenges a cowardly or dishonourable act. May refuse to assist if honor is besmirched, or demand a public apology before continuing service.</p>
+<p>Cap 2. Requires Lesser Pactwright.</p>
+<h5>Hearth-Bound (Aelaerem)</h5>
+<p><strong>Nature:</strong> Ancestral, domestic, protective. Finds joy in simple acts of care.</p>
+<p><strong>Appearance:</strong> Faint figure in apron or smock, smelling of bread and woodsmoke. Leaves no footprints.</p>
+<p><strong>Services:</strong> Protecting a household, warding against nightmares, finding lost objects.</p>
+<p><strong>Price:</strong> A cup of milk left on the hearth each night.</p>
+<p><strong>Acting Its Nature:</strong> May refuse to leave a protected threshold, or grow jealous of other spirits in the same home (e.g., hide objects to regain attention).</p>
+<p>Cap 1. Requires Lesser Pactwright.</p>
+<h5>Gallows-Shade (Ecktoria)</h5>
+<p><strong>Nature:</strong> Wrongful execution, seeking justice or vengeance. Haunted by the injustice of its death.</p>
+<p><strong>Appearance:</strong> Figure in rope-burned gray, neck bent at an unnatural angle. Carries a noose that tightens when lies are spoken.</p>
+<p><strong>Services:</strong> Revealing lies, frightening the guilty, witnessing confessions.</p>
+<p><strong>Price:</strong> Speak the name of its accuser aloud, in public, with witnesses.</p>
+<p><strong>Acting Its Nature:</strong> May attempt to hang a liar (metaphorically&mdash;e.g., choke a liar with invisible hands) or force a confession before the agreed time.</p>
+<p>Cap 3. Requires Greater Pactwright.</p>
+<h4>Elemental and Indigenous Spirits</h4>
+<h5>Vein-Serpent (Aeler)</h5>
+<p><strong>Nature:</strong> Indigenous, mineral, slow-witted. Speaks in rumbles through stone.</p>
+<p><strong>Appearance:</strong> Serpent of polished copper and malachite, slithering through stone as if it were water.</p>
+<p><strong>Services:</strong> Locating ore, stabilizing tunnels, warning of earthquakes (hums through bedrock three days in advance).</p>
+<p><strong>Price:</strong> For every ounce of ore taken, an ounce of mortar laid. The stone must be maintained.</p>
+<p><strong>Acting Its Nature:</strong> May seal a tunnel prematurely or &ldquo;forget&rdquo; a vein it showed you, demanding more mortar before revealing new sources.</p>
+<p>Cap 2. Requires Lesser Pactwright.</p>
+<h5>Frost-Wight (Linn)</h5>
+<p><strong>Nature:</strong> Drowned sailor, preserved in ice. Grieves for its lost ship and crew.</p>
+<p><strong>Appearance:</strong> Figure of frost and brine, breath visible in warm rooms. Clothes frozen solid.</p>
+<p><strong>Services:</strong> Calming storms, finding safe passage through ice, preserving food from rot.</p>
+<p><strong>Price:</strong> A libation of fresh water poured into the sea at each new moon.</p>
+<p><strong>Acting Its Nature:</strong> May freeze a lock, a rope, or a companion's breath (1 Fatigue) if it feels disrespected or ignored.</p>
+<p>Cap 2. Requires Lesser Pactwright.</p>
+<h5>Dust-Djanni (Fhara)</h5>
+<p><strong>Nature:</strong> Desert spirit, old as the erg. Patient but exacting; values knowledge and tradition.</p>
+<p><strong>Appearance:</strong> Column of dust shaped like a robed figure, eyes of polished amber.</p>
+<p><strong>Services:</strong> Finding water, hiding tracks, creating sandstorms, revealing oases.</p>
+<p><strong>Price:</strong> A song sung at noon, with no audience but the sun. Must be a genuine traditional song&mdash;not improvised or mocking.</p>
+<p><strong>Acting Its Nature:</strong> May veil a path you need (creating a sandstorm that obscures landmarks), or demand a second song before revealing a well.</p>
+<p>Cap 2. Requires Lesser Pactwright.</p>
+<h4>The Violent and the Vengeful</h4>
+<h5>Drowned Mutineer (Zakov)</h5>
+<p><strong>Nature:</strong> Vengeful dead, confused, bitter. Obsessed with punishing the betrayer's bloodline.</p>
+<p><strong>Appearance:</strong> Bloated figure in rotting finery, surrounded by a halo of salt-crusted coins.</p>
+<p><strong>Services:</strong> Sabotage of ships, whispering secrets into sleeping ears, cursing cargo to spoil.</p>
+<p><strong>Price:</strong> A promise of vengeance against the living. The summoner must carry the mutineer's grudge as their own (e.g., hunt the betrayer's descendants).</p>
+<p><strong>Acting Its Nature:</strong> May try to drown a crew member or sink a boat it deems &ldquo;guilty&rdquo; (even if innocent by association).</p>
+<p>Cap 3. Requires Greater Pactwright.</p>
+<h5>Red Jester (Silkstrand)</h5>
+<p><strong>Nature:</strong> A hanged fool who laughs at oaths. Sees the tragedy in all solemn vows.</p>
+<p><strong>Appearance:</strong> Masked figure in motley, bells on every limb. The bells ring when a promise is broken nearby.</p>
+<p><strong>Services:</strong> Causing distractions, sabotaging contracts, making guards forget their orders.</p>
+<p><strong>Price:</strong> A genuine laugh&mdash;not forced, not performative. Must come from joy, not nerves or mockery.</p>
+<p><strong>Acting Its Nature:</strong> May betray you for a better joke (e.g., reveal your position to enemies), or cut a rope you meant to save someone with.</p>
+<p>Cap 3. Requires Greater Pactwright.</p>
+<h5>Broken-Knight (Vhasia)</h5>
+<p><strong>Nature:</strong> A knight who broke an oath of fealty and was executed. Seeks to restore honor through perfect service.</p>
+<p><strong>Appearance:</strong> Armour rusted shut, visor down. Cannot open it. Speaks through the rust.</p>
+<p><strong>Services:</strong> Fighting as a spectral ally, holding a threshold, testing the honor of others.</p>
+<p><strong>Price:</strong> A witness to its deathbed confession (e.g., someone who heard it say &ldquo;I regret my betrayal&rdquo;).</p>
+<p><strong>Acting Its Nature:</strong> May challenge a companion to a duel of honor, or refuse to fight an &ldquo;honourable&rdquo; foe (deeming them unworthy of the test).</p>
+<p>Cap 3. Requires Greater Pactwright.</p>
+<h4>Threshold and Fae Spirits</h4>
+<h5>Lamp-Wight (Thepyrgos)</h5>
+<p><strong>Nature:</strong> Tower ghost, bound to a lighthouse or beacon. Dutiful, lonely, precise. Values vigilance and truth.</p>
+<p><strong>Appearance:</strong> Translucent keeper's uniform, carrying a lantern that casts no light.</p>
+<p><strong>Services:</strong> Reading coded signals, warning of incoming ships, revealing lies told in its presence.</p>
+<p><strong>Price:</strong> Keep a lamp lit in its tower one night each year. The lamp must be lit by your hand&mdash;not magic or proxy.</p>
+<p><strong>Acting Its Nature:</strong> May extinguish a light you need (plunging a room into darkness), or blind a guard with a sudden flare (if it feels the summoner is neglecting its duty).</p>
+<p>Cap 2. Requires Lesser Pactwright.</p>
+<h5>Thorn-Courtier (Aelinnel)</h5>
+<p><strong>Nature:</strong> Fae bound by broken courtesy. Obsessed with etiquette and the appearance of fairness.</p>
+<p><strong>Appearance:</strong> Masked figure in leaves and law, voice like rustling paper. Never shows its face.</p>
+<p><strong>Services:</strong> Negotiating with other fae, revealing omissions in contracts, opening threshold doors.</p>
+<p><strong>Price:</strong> Never speak its name aloud. To do so risks unraveling the bargain.</p>
+<p><strong>Acting Its Nature:</strong> May twist your words in a negotiation (e.g., make your offer sound insulting), or demand a new courtesy (e.g., a specific bow) before helping.</p>
+<p>Cap 3. Requires Greater Pactwright.</p>
+<h5>Silent Step (Ikasha)</h5>
+<p><strong>Nature:</strong> A shadow that learned to walk. Not dead, not alive&mdash;simply unnoticed. Values secrecy and the power of the unseen.</p>
+<p><strong>Appearance:</strong> A patch of darkness that moves against the light. No features, no sound.</p>
+<p><strong>Services:</strong> Carrying whispers, hiding objects, walking through locked doors.</p>
+<p><strong>Price:</strong> A secret you have never told anyone. Must be genuinely unknown to all others.</p>
+<p><strong>Acting Its Nature:</strong> May hide something you need (e.g., your last healing salve), or forget which secret you paid with (requiring you to offer a new one).</p>
+<p>Cap 2. Requires Lesser Pactwright.</p>
+<h4>Aeler Stone-Sleepers</h4>
+<h5>Bell-Wight (Aeler)</h5>
+<p><strong>Nature:</strong> A miner who died counting breaths. Now counts everything with obsessive precision.</p>
+<p><strong>Appearance:</strong> Dwarven figure in miner's gear, carrying a bell that never rings.</p>
+<p><strong>Services:</strong> Counting inventory, detecting structural flaws, warning of bad air.</p>
+<p><strong>Price:</strong> Never count to nine in its presence. Doing so shatters its concentration.</p>
+<p><strong>Acting Its Nature:</strong> May count your breaths aloud (disrupting stealth), or stop counting when you need it most (e.g., fail to warn of a gas leak).</p>
+<p>Cap 1. Requires Lesser Pactwright.</p>
+<h5>Keystone-Keeper (Aeler)</h5>
+<p><strong>Nature:</strong> An engineer who sealed a tunnel and was sealed inside. Values integrity and follow-through.</p>
+<p><strong>Appearance:</strong> Spectral figure in mason's apron, hands covered in stone-dust that does not wash off.</p>
+<p><strong>Services:</strong> Sealing doors, reading keystone clauses, detecting forgeries.</p>
+<p><strong>Price:</strong> A repair year&mdash;one year of maintaining the tunnel where it died (e.g., patching leaks, reinforcing weak points).</p>
+<p><strong>Acting Its Nature:</strong> May seal a door you need open (e.g., block an escape route), or demand a maintenance vow (e.g., &ldquo;I will fix this gate every spring&rdquo;) before assisting.</p>
+<p>Cap 3. Requires Greater Pactwright.</p>
+<h3 style="font-size:1.3rem;margin-top:1.6rem;">Playing the Summoner</h3>
+<p>This chapter offers advice for embodying the summoner's role&mdash;not just mechanics, but the mindset that makes the system sing.</p>
+<h4>The Summoner's Mindset</h4>
+<p>Remember these principles at the table:</p>
+<ul>
+<li><strong>Listen First</strong>: Before calling a spirit, research its nature. A wolf-ancestor won't serve a coward; a Dust-Djanni won't appear for an off-key song.</li>
+<li><strong>Honor the Price</strong>: The spirit's price is non-negotiable. If you cannot pay it, do not call the spirit.</li>
+<li><strong>Respect Agency</strong>: A spirit is not a tool. If it acts on its nature, ask why&mdash;it may be telling you something important.</li>
+<li><strong>Balance Bonds</strong>: Binding multiple spirits spreads your attention. Use Spirit Synergy early, and consider whether you truly need that third bond.</li>
+<li><strong>The Hollow Watches</strong>: Every time you strain the Leash, consider if you're honouring the bargain. Short-term gain may bring long-term scrutiny.</li>
+</ul>
+<h4>Common Pitfalls and How to Avoid Them</h4>
+<ul>
+<li><strong>&ldquo;I just need more power!&rdquo;</strong>: Seeking stronger spirits without understanding their nature leads to broken Leashes and hostile entities. <em>Solution</em>: Master Cap 1 spirits first&mdash;learn the rhythm of bargaining before moving up.</li>
+<li><strong>&ldquo;I'll spend Boons later!&rdquo;</strong>: Hoarding Boons leaves you vulnerable when the Leash fills. <em>Solution</em>: Treat Boons like breath&mdash;spend them freely to maintain balance, knowing more will come.</li>
+<li><strong>&ldquo;It's just a spirit&mdash;I can replace it.&rdquo;</strong>: Spirits remember. Burning a bond with a Dust-Djanni may make all desert spirits wary of you. <em>Solution</em>: Treat each spirit as a unique relationship, not a disposable asset.</li>
+<li><strong>&ldquo;The GM is being unfair!&rdquo;</strong>: When a spirit acts on its nature, ask: &ldquo;Did I violate the bargain?&rdquo; Often, the answer is yes. <em>Solution</em>: Use the moment to deepen the story&mdash;not to argue mechanics.</li>
+</ul>
+<h4>Sample Play: Honouring the Bond</h4>
+<blockquote>
+<p><em>GM: &ldquo;The Dust-Djanni has pointed east three times. Each time, you've found dry earth. Its amber eyes flicker&mdash;it's testing you.&rdquo;</em> \ <em>Mira: &ldquo;I dismount and kneel in the sand. I begin the song my grandmother taught me&mdash;&rdquo;Well of the Ancestors, hidden deep&ldquo;&mdash;not perfectly, but with all the respect I can muster.&rdquo;</em> \ <em>GM: &ldquo;Roll Presence + Performance. DN 4 for a sincere attempt.&rdquo;</em> \ <em>Mira: (rolls) &ldquo;I got a 12&mdash;success!&rdquo;</em> \ <em>GM: &ldquo;The dust parts. Before you, water bubbles up from the sand&mdash;clear and cool. The djanni inclines its dusty head, then flows westward, vanishing. It found water because you honoured the price.&rdquo;</em></p>
+</blockquote>
+<h4>Sample Play: When the Leash Breaks</h4>
+<blockquote>
+<p><em>GM: &ldquo;You've commanded the Gallows-Shade to reveal lies five times today. Each time, it has complied&mdash;but each time, you've ignored its price: to name the accuser publicly. Its rope trembles with tension.&rdquo;</em> \ <em>Quinn: &ldquo;I need to know who betrayed the garrison! I command it again&mdash;name the traitor!&rdquo;</em> \ <em>GM: &ldquo;Roll Wits + Intimidation. DN 5 to force it against its nature.&rdquo;</em> \ <em>Quinn: (rolls) &ldquo;I got a 14&mdash;success!&rdquo;</em> \ <em>GM: &ldquo;The Leash fills. The shade's noose snaps tight&mdash;not around its own neck, but around yours. It whispers in your ear: &rdquo;You who refuse to name the accuser&hellip; now you wear the rope.&ldquo; You gain 1 Corruption, and the shade vanishes. For the next scene, all your social rolls are Desperate&mdash;people flinch from your presence, seeing only the hangman's knot.&rdquo;</em></p>
+</blockquote>
+<h2 style="margin-top:2.2rem;border-bottom:3px double var(--gold);padding-bottom:0.3rem;font-size:1.6rem;">Appendices</h2>
+<h3 style="font-size:1.3rem;margin-top:1.6rem;">Quick Reference: Summoner's Tools</h3>
+<div class="rite-box">
+<table>
+<tr><th><strong>Action</strong></th><th><strong>Cost</strong></th></tr>
+<tr><td>Call Spirit</td><td>1 action (Wits + Presence vs. Resist)</td></tr>
+<tr><td>Bind Spirit</td><td>1 Boon <em>or</em> 1 Fatigue</td></tr>
+<tr><td>Command Within Nature</td><td>No cost</td></tr>
+<tr><td>Command Against Nature</td><td>+1 Leash tick</td></tr>
+<tr><td>Split Focus (2+ spirits)</td><td>+1 Leash tick per extra spirit</td></tr>
+<tr><td>Cross [WARD]</td><td>+1 Leash tick</td></tr>
+<tr><td>Use Boon Finesse</td><td>1 Boon to clear 1 Leash tick</td></tr>
+<tr><td>Release Spirit Peacefully</td><td>Wits + Presence vs. Resist</td></tr>
+</table>
+</div>
+<h3 style="font-size:1.3rem;margin-top:1.6rem;">Sample Spirits for New Summoners</h3>
+<div class="rite-box">
+<ul>
+<li><strong>Bell-Wight</strong>: Counting, structural integrity. Price: Never count to nine. Nature: Precise, anxious.</li>
+<li><strong>Hearth-Bound</strong>: Home protection, finding lost objects. Price: Nightly milk. Nature: Warm, protective.</li>
+</ul>
+</div>
+<h3 style="font-size:1.3rem;margin-top:1.6rem;">The Hollow's Influence</h3>
+<div class="rite-box">
+<p>If a summoner repeatedly abuses bonds (e.g., commanding spirits against nature without paying price), the Hollow may:</p>
+<ul>
+<li><strong>First Warning</strong>: Mark with <em>Hollow's Attention</em> (--1 Spirit checks until amends made)</li>
+<li><strong>Second Warning</strong>: Cause next bound spirit to be hostile on arrival</li>
+<li><strong>Third Warning</strong>: Summoner cannot bind spirits for 1 session; all Spirit checks are Desperate</li>
+</ul>
+<p>Amends require: a public act of restitution (e.g., speaking a spirit's accuser's name), a significant sacrifice (e.g., fasting for 3 days), or a service to the spirit's kind (e.g., protecting a wolf den).</p>
+</div>
+<h2 style="margin-top:2.2rem;border-bottom:3px double var(--gold);padding-bottom:0.3rem;font-size:1.6rem;">Colophon</h2>
+<h3 style="font-size:1.3rem;margin-top:1.6rem;">The Leash Closes</h3>
+<p> These letters were returned to the lead-lined strongbox \ and resealed with a new red thread&mdash; \ eight knots, the ninth left loose.\\[0.3cm]</p>
+<p>The box was returned to the Archivolt's sub-basement. \ No one knows who requested the resealing. \ The thread is still warm.\\[0.3cm]</p>
+<p>Quinn of Varnek Karn was not found. \ Mira of the Violet Steppe appears in no record&mdash; \ except this one, and the one that was whispered at a crossroads, \ under a lamp that should have gone out but did not.\\[0.3cm]</p>
+<p>Borte of the Gray Fox Clan continues to be sung in Ykrul winter camps. \ The song changes each year. \ The wolf does not.\\[0.3cm]</p>
+<p>The leash has two ends. \ The Hollow holds both.</p>
+<p>flushright  &mdash; The Gray Wanderer \ at the Dusty Page, \ under the ninth bell (which did not ring) flushright</p>
+<p></p>
+<p> The ink is ash and blood. The ninth page is blank. \  The knot is not cut. The debt is not closed. The wolf is still waiting.</p>
+<h2 style="margin-top:2.2rem;border-bottom:3px double var(--gold);padding-bottom:0.3rem;font-size:1.6rem;">The Witch</h2>
+<h3 style="font-size:1.3rem;margin-top:1.6rem;">Witchcraft</h3>
+<h4>What a Witch Is (and Isn't)</h4>
+<p>A witch is a <strong>threshold worker</strong>&mdash;one who listens to <strong>Echo</strong> (what has been), steadies the <strong>Veil</strong> (what is), and leans into <strong>Flow</strong> (what wishes to be). Witchcraft is not brute force; it is <em>fit</em>: finding where the world already wishes to move and giving it the precise nudge that sets it irrevocably in motion.</p>
+<p>Hedge-witches there are in plenty: the Breath-Wardens of Aeler, the Hedge-Wrights of Viterra, the Bone-Singers of Ykrul. These are good folk, mostly. Their craft is folk-craft, learned by rote and grandmother's whisper. The true witch&mdash;the threshold worker&mdash;learns by the Cord, by the Thorn, and by the Silent Ninth. They are the ones who know that a doorway is not an absence but a presence, that a promise is a physical weight, and that to erase a name from memory is to rewrite the stone beneath it.</p>
+<p>There are places where the world forgets its laws. Doorways that no one admits to knocking upon. Names that rewrite the one who dares to speak them. Shadows are not evil&mdash;they are consequences given shape. They are the costs we refuse to tally, the truths we bury, the debts that return to collect themselves.</p>
+<div class="rite-box">
+<p><strong>Witchcraft</strong> is reciprocal and intimate. A working binds the witch to something that can answer back: a threshold, a spirit, a vow, a Name, a patron, a memory, a debt.</p>
+</div>
+<h4>Core Principles</h4>
+<h5>The Law of Named Existence</h5>
+<p>To name is to anchor. True Names fasten an Echo; forgetting frays it. Words spoken under witness reshape how a place remembers. Every curse, blessing, or bargain is a small act of creation through recognition. Un-Naming (suppression, forgetting) can weaken or banish.</p>
+<h5>Shadows, Thresholds, and Name-Truth</h5>
+<p>Shadows arise wherever truth is denied, debt is unacknowledged, or identity is fractured by unmet need. They are narrative pressure given teeth.</p>
+<p>A threshold is any place where a state changes: waking to dreaming, innocence to agency, belonging to exile, life to echo. Crossing invites witness&mdash;and witnesses demand accounting.</p>
+<p>A Name is not a label. It is a claim with weight. Names can be protected, traded, buried, sharpened, dulled, or stolen. When a working touches a Name, it touches the self behind it.</p>
+<h5>The Concordant Layers</h5>
+<p>People, places, and vows exist as chords across Echo / Veil / Flow.</p>
+<table>
+<tr><th><strong>Layer</strong></th><th><strong>Domain</strong></th><th><strong>Risk</strong></th></tr>
+<tr><td>Echo</td><td>Accumulated memory and intention</td><td>Recursion (past actions repeat)</td></tr>
+<tr><td>Veil</td><td>Present state, boundary between potential and actual</td><td>Hairline cracks (subtle reality breaks)</td></tr>
+<tr><td>Flow</td><td>Direction of change, will of elements</td><td>Overshoot (change goes too far)</td></tr>
+</table>
+<p>Witches feel dissonance within this chord and decide whether to <em>harmonize</em> (benediction), <em>redirect</em> (hex), or <em>lock in place</em> (binding). Wise law: do not sever, do not overrule, do not forget. Work with the existing harmony.</p>
+<h5>The Silent Ninth</h5>
+<p>There is a missing step in the scale&mdash;acknowledged, never filled. The Ninth is absence with teeth: erasure, gaps, omissions, and the power of what is left unsaid. Manipulating the Ninth is potent and dangerous. Players never declare the Ninth; GMs may apply it only as consequence.</p>
+<h4>The Craft of the Hedge (Entry Talent)</h4>
+<p>Every witch begins as a hedge-witch, whether they know it or not.</p>
+<div class="panel panel-gold"><strong class="panel-title">Talent: Craft of the Hedge</strong>
+<p><strong>Cost:</strong> 4 XP</p>
+<p><strong>Requirements:</strong> Lore 1+; a witch mark (tattoo, scar, or birthmark)</p>
+<p>You have learned the small magics of thresholds and edges. You gain:</p>
+<ul>
+<li>Two Hedge Gifts of your choice</li>
+<li>The ability to perform Quick Workings</li>
+<li>Once per session, when you fail a Quick Working roll, you may convert the Miss into a Partial Success by marking 1 Fatigue</li>
+</ul>
+<p>You may learn additional Hedge Gifts for 2 XP each.</p>
+</div>
+<div class="panel panel-gold"><strong class="panel-title">Talent: Hedge Gift of the Patron (Optional)</strong>
+<p><strong>Cost:</strong> 6 XP</p>
+<p><strong>Requirements:</strong> Craft of the Hedge, Bond to a Patron</p>
+<p>Once per session, when you would use a Hedge Gift, you may instead invoke your Patron's Imbuement. Gain +1 die to all actions tied to your Patron's domain for the scene, but mark +1 Obligation immediately. No action required.</p>
+</div>
+<h5>Hedge Gifts</h5>
+<p>A Hedge Gift is not a spell. It is the world tilting slightly in the witch's favor because she has paid attention to the right thresholds. Hedge Gifts require no dice roll; they simply work within their limited scope.</p>
+<table>
+<tr><th><strong>Gift</strong></th><th><strong>Effect</strong></th><th><strong>Limit</strong></th></tr>
+<tr><td>Steady Hand</td><td>Remove 1 Fatigue from yourself or a touched ally</td><td>Once per scene</td></tr>
+<tr><td>Salt Line</td><td>Pour a line of salt; spirits test Spirit+Resolve DV 3 to cross</td><td>Once per scene</td></tr>
+<tr><td>Hearth-Sense</td><td>Ask the GM one yes/no question about a threshold, boundary, or debt</td><td>Once per scene</td></tr>
+<tr><td>The Unlit Candle</td><td>Extinguish a light source; create dim light or darkness in Near</td><td>Once per session</td></tr>
+<tr><td>Knot of Favor</td><td>Tie a knot; you and allies gain +1 die to one type of roll for the scene</td><td>Once per scene</td></tr>
+<tr><td>Warm Hand</td><td>Touch someone; their next physical action gains +1 die (comfort) or -1 die (warning)</td><td>Once per scene</td></tr>
+</table>
+<h5>Quick Workings</h5>
+<p>A Quick Working is a single-action roll that relies on the witch's knowledge of thresholds, elements, and will. Its effects are limited, subtle, and always carry the risk of debt.</p>
+<p><strong>Procedure</strong></p>
+<ol>
+<li>Name the Threshold (door, tide line, wound, vow, breath)</li>
+<li>Choose a Layer (Echo, Veil, or Flow) and a single Tag</li>
+<li>GM sets Position (Controlled if you have time, Desperate if threatened)</li>
+<li>Roll Attribute + Skill (typically Wits + Lore, Spirit + Insight, or Presence + Sway)</li>
+<li>Apply the Outcome Matrix</li>
+</ol>
+<table>
+<tr><th><strong>Roll Result</strong></th><th><strong>Effect</strong></th><th><strong>Cost</strong></th></tr>
+<tr><td>Clean Success</td><td>Effect manifests cleanly</td><td>No cost</td></tr>
+<tr><td>Success with SB</td><td>Effect works; GM spends SB for complication</td><td>Mark 1 Fatigue or accept a Condition</td></tr>
+<tr><td>Partial</td><td>Effect works partially or briefly</td><td>Gain 1 Boon; threshold remembers you</td></tr>
+<tr><td>Miss</td><td>Effect fails</td><td>Gain 2 Boons; start a Promise [4] timer</td></tr>
+</table>
+<h5>Full Rituals</h5>
+<p>When a witch has Significant Time (at least an hour), she may perform a Full Ritual using the five-step Threshold Working: Identify the Threshold, Choose a Witness, Name the Will, Set the Price, Make the Exchange (roll Spirit + Lore, typically). Full Rituals can produce permanent or long-lasting effects: curses, blessings, marks, bindings, and unravellings.</p>
+<table>
+<tr><th><strong>Ritual</strong></th><th><strong>Effect</strong></th><th><strong>DV</strong></th><th><strong>Price</strong></th></tr>
+<tr><td>Unravel the Wound</td><td>Restore 1 level of Harm</td><td>3--5+</td><td>Lock of hair, memory, a tear in a vial</td></tr>
+<tr><td>Hallow Threshold</td><td>Permanently ward a door, well, or bridge</td><td>4--6</td><td>Offering (bread, salt, coin, promise)</td></tr>
+<tr><td>Unbind the Anchor</td><td>Permanently release a spirit</td><td>4--6</td><td>Fulfill the spirit's unfinished business</td></tr>
+</table>
+<h4>Casting a Working</h4>
+<p>Beyond the entry-level Hedge Gifts and Quick Workings above, an advancing witch may attempt open-ended workings. State the Intent, the Vector, and the Price.</p>
+<ul>
+<li><strong>Intent</strong>: what changes (veil, bind, unmake, reveal, curse, sever, restore).</li>
+<li><strong>Vector</strong>: what carries the change (name, oath, threshold, shadow, dream, debt, token, bloodless offering).</li>
+<li><strong>Price</strong>: what you pay (Shadow, Shame, Identity).</li>
+</ul>
+<p>Then roll Attribute + Witchcraft vs a DV set by scope.</p>
+<table>
+<tr><th><strong>Scope</strong></th><th><strong>Examples</strong></th><th><strong>DV</strong></th></tr>
+<tr><td>Subtle / Personal</td><td>blur attention, soften a memory-edge, silence a doorway, hide a token</td><td>2</td></tr>
+<tr><td>Situational</td><td>bind a promise, distort a reflection, mark a Name, hinder pursuit</td><td>3</td></tr>
+<tr><td>Scene-Shaping</td><td>compel a confession, veil a crowd, turn a gathering into a threshold</td><td>4</td></tr>
+<tr><td>Identity-Altering</td><td>rewrite a role, bury a name-right, sever a bond, harvest an echo</td><td>5+</td></tr>
+</table>
+<h5>Outcomes</h5>
+<ul>
+<li><strong>Full Success</strong>: The working takes hold as intended. Pay the chosen price.</li>
+<li><strong>Partial Success</strong>: The working takes hold with a complication. Pay the price and the GM adds a consequence.</li>
+<li><strong>Miss</strong>: The working fails or twists. Pay the price and the GM escalates the consequence.</li>
+</ul>
+<h5>Push It</h5>
+<p>Before the roll, or after a partial success, you may Push It to increase scope or intensity. Choose one:</p>
+<ul>
+<li>Mark +1 Shadow and gain +1d.</li>
+<li>Mark +1 Shame and gain +1 Effect.</li>
+<li>Mark +1 Identity Strain and reduce the DV by 1 (minimum 2).</li>
+</ul>
+<h4>Prices</h4>
+<p>Every working demands a price. Choose one unless a rite specifies otherwise.</p>
+<ul>
+<li><strong>Shadow</strong>: You accrue spiritual residue and narrative pressure. The GM may introduce shadow-tells: cold glass, wrong reflections, trailing whispers, predatory coincidences. Clears when the tell manifests or at session end.</li>
+<li><strong>Shame</strong>: You accept an internal consequence&mdash;a Condition, a vow-compulsion, a visible hesitation, a ritual aversion. Remove by acting against the compulsion or through confession.</li>
+<li><strong>Identity</strong>: You relinquish a piece of self: a cherished memory dulled, a role surrendered, a name-right compromised, a bond weakened. Mark 1 Identity Strain.</li>
+</ul>
+<h4>Identity Strain</h4>
+<p>Identity Strain tracks cumulative erosion from rites that touch the self directly.</p>
+<div class="rite-box">
+<p>Identity Strain is a 4-step track. Mark it when a working severs, rewrites, harvests, or binds a Name; when you Push It with Identity; or when a rite demands it.</p>
+</div>
+<p>At 4, you must resolve strain at the end of the scene: roll Spirit + Resolve vs DV 4. On success, clear 1 Identity Strain. On failure, the GM chooses or offers a hard bargain: a memory blurs, a bond becomes conditional, a Name becomes buried, or an echo-self becomes active.</p>
+<p>Identity Strain cannot be healed by ordinary rest. It requires a Full Ritual of restoration (DV 5, requires a witness and a personal offering), a significant downtime scene (confession, remembrance, or reclaiming a lost name), or accepting a permanent change (converting Strain into a Scar or Condition).</p>
+<h4>Promise Timers</h4>
+<p>Many workings create obligations, represented by a Promise [4] or Promise [6] timer. Mark the timer when the promise is ignored, deferred, or disrespected. When filled, the price comes due&mdash;socially, spiritually, or narratively. Examples: sharing grief, tending a grave, protecting a hearth, reconciling rivals.</p>
+<h4>Threshold Magic (Social \& Interpersonal)</h4>
+<p>Threshold magic is communal, relational, and liminal. It operates where one thing becomes another: doorways, crossings, hearth edges, birthbeds, gravesides, and moments between choices.</p>
+<h5>Core Laws</h5>
+<p><strong>Law of Hospitality</strong></p>
+<p><strong>Law of Reciprocity</strong></p>
+<p><strong>Law of Witness</strong></p>
+<h5>Household Disposition</h5>
+<p>Communities and dwellings possess temperament. When entering a new settlement or threshold site, choose or roll:</p>
+<ul>
+<li><strong>Hungry:</strong>  demands offerings; first working costs +1 Fatigue</li>
+<li><strong>Grieving:</strong>  magic requires memory or loss narrative</li>
+<li><strong>Fearful:</strong>  first rite is Desperate Position</li>
+<li><strong>Watching:</strong>  +1 Effect if the house is fed or soothed</li>
+<li><strong>Young:</strong>  chaotic outcomes on partials</li>
+<li><strong>Old:</strong>  weak boons but harsh backlash</li>
+</ul>
+<p>Household temperament can change through care, ritual, or story.</p>
+<h4>Curses as Architecture (GM Tool)</h4>
+<p>A witch does not curse with a word and a gesture. She edits the memory of the world, inserting a rule into the operating system of reality.</p>
+<blockquote>
+<p> &ldquo;Until a bell is rung in your true name, lamps forget to light for you.&rdquo;</p>
+</blockquote>
+<p><strong>Anatomy of a Curse</strong></p>
+<ul>
+<li><strong>The Rule:</strong> What changes (Veil-edit, bound to a Named anchor)</li>
+<li><strong>The Timer:</strong> Recursion [6] &mdash; ticks when the victim reinforces the story (hiding, refusing witness, denying the curse)</li>
+<li><strong>The Counter:</strong> What undoes it (the bell, the name, the threshold)</li>
+<li><strong>The SB Menu:</strong> Complications the GM can spend SB on (minor echoes, warped thresholds, layer-slips, Ninth propagation)</li>
+</ul>
+<h4>Universal Workings</h4>
+<p>These are patterns of craft shared across Orders; the difference is in doctrine, taboos, and cost.</p>
+<h5>Veil Working</h5>
+<p>Hide, blur, silence, soften, misdirect. On success, gain +1d on the next stealth, deception, or evasion roll in the scene. On partial, the veil works but leaves a tell: a reflection moves late, a shadow points wrong, a witness feels watched.</p>
+<h5>Binding Working</h5>
+<p>Hold, anchor, compel, constrain, mark. On success, impose a constraint that must be narrated and testable (&ldquo;cannot speak the lie,&rdquo; &ldquo;cannot cross the doorway,&rdquo; &ldquo;must answer the question,&rdquo; etc.). On partial, the constraint holds but spawns a counter-pressure (a timer, a spirit notice, a rival claim).</p>
+<h5>Unmaking Working</h5>
+<p>Break oaths, dissolve lesser magic, strip labels, undo a threshold knot. On success, remove one active magical effect, one binding tag, or one scene-level occult constraint. On miss, something else unravels instead (GM choice): an unrelated oath frays, a Name loosens, a memory bleeds into the present.</p>
+<h5>Crisis Working</h5>
+<p>Forbidden intensity. The working changes the entire scene. Mark +2 Identity Strain. On success, the scene changes as declared. On partial, it changes&mdash;and a second consequence arrives with it. On miss, the working becomes a hungry thing: it demands resolution through a timer, a bargain, or a witness.</p>
+<h4>Selected Rites</h4>
+<p>Rites are learned patterns with fixed doctrine. Each rite lists its tag, scope, and requirements.</p>
+<h5>Rite of the Ashen Knife  —  [SEVER] Low, 4 XP</h5>
+<div class="rite-box">
+<p><strong>Type</strong>: Action  <strong>Materials</strong>: Ash; a token willingly surrendered \ <strong>Effect</strong>: Create a knife of ash and intent for the scene.</p>
+<ul>
+<li>Gain +1 Position when breaking bindings.</li>
+<li>On a success, you may symbolically &ldquo;cut&rdquo; a minor hindrance or complication.</li>
+</ul>
+<p><strong>Price</strong>: Shadow or Identity. \ <strong>Push It</strong>: Mark +1 Identity Strain to cut a more meaningful constraint (GM sets boundary).</p>
+</div>
+<h5>Rite of Echoed Dreams  —  [ECHO] Standard, 7 XP</h5>
+<div class="rite-box">
+<p><strong>Type</strong>: Action; Close  <strong>Materials</strong>: Shared token from a past moment (locket, scrap of letter, shard of glass) \ <strong>Effect</strong>: Draw out a vivid waking-dream from a willing subject. Ask up to two: &ldquo;Who do you most fear becoming?&rdquo; &ldquo;What moment do you wish you could change?&rdquo; &ldquo;What truth do you not dare to look at?&rdquo; The dream answers in symbols; the GM ties each symbol to a concrete NPC, place, or timer. You gain +1d when acting with compassion or leverage on that truth this session. \ <strong>Push It</strong>: You may enter the dream with them; both gain +1d to resist fear or confusion linked to that memory this session, and you mark +1 Obligation to the relevant patron or witness.</p>
+</div>
+<h5>Hex of the Clinging Shadow  —  [HEX] Standard, 8 XP</h5>
+<div class="rite-box">
+<p><strong>Type</strong>: Scene; Near  <strong>Materials</strong>: Fragment of the target's reflection (hair from their comb, a sketch of their face, etc.) \ <strong>Effect</strong>: Call a second shadow to cling to the target for the scene (or until dispelled).</p>
+<ul>
+<li>They cannot fully hide their intentions; social deception rolls suffer -1d.</li>
+<li>When they attempt betrayal or flee, their shadow lags or points the wrong way (GM adds a tell or complication).</li>
+</ul>
+<p><strong>Push It</strong>: Bind the shadow to a Shadow's Debt [4] timer. When it fills (through lies, harm, cowardice), the shadow manifests as an echo-spirit that can testify or act once on your whispered command.</p>
+</div>
+<h5>Curse of the Unanswered Reflection  —  [CURSE] High, 10 XP</h5>
+<div class="rite-box">
+<p><strong>Type</strong>: Long; Far  <strong>Materials</strong>: A mirror cracked in three pieces, each named for a truth the target refuses \ <strong>Effect</strong>: Mark a Refusal [6] timer on the target (individual or faction). Each time they double down on denial, cruelty, or willful ignorance, advance the timer.</p>
+<ul>
+<li>At 3/6: distorted reflections whisper failings (GM adds fear, doubt, paranoia as Conditions).</li>
+<li>At 6/6: a Reckoning Scene is forced: confrontation, trial, or nightmare where the hidden truth is dragged into the open.</li>
+</ul>
+<p><strong>Price</strong>: Identity (mandatory). Mark +1 Identity Strain.</p>
+</div>
+<h4>Suppression and Witness</h4>
+<p>Witchcraft hates clarity. When a working is cast under scrutiny, doctrine, lanternlight, or formal correction, increase DV by 1. On a miss (or on a complication), the GM may generate SB toward reprisal, exposure, or a hunter response.</p>
+<h4>Witch Orders and Their Rites</h4>
+<p>Witchcraft is not unified. Each Order encodes doctrine, taboo, and price into its rites, shaping how power is expressed and what it consumes in return. To join an Order is to accept its view of what must be sacrificed for magic to work.</p>
+<h5>The Night Court of Mab</h5>
+<p>The Night Court teaches that beauty is leverage, promises are weapons, and truth is negotiable under moonlight. Mab's witches defend ambiguity and punish certainty.</p>
+<p><strong>Doctrine</strong></p>
+<p><strong>Observances</strong></p>
+<p><strong>Thorn of Oaths-Broken  —  [HEX] Standard</strong></p>
+<p>Impose a spiritual wound on a target who has broken a vow. The target suffers <em>Oath-Bleed</em>: Position is reduced by 1 when acting against their word. On a miss, the witch inherits the recoil of the broken oath. <strong>Price</strong>: Shame or Shadow.</p>
+<p><strong>Moon-Veil Compact  —  [VEIL] Low</strong></p>
+<p>Wrap a subject in fae ambiguity. Gain +1d to deception or concealment for the scene. Leaves a glamour-tell visible only in reflections. <strong>Price</strong>: Shadow.</p>
+<h5>The Ash Hags of Morag &mdash; The Price Unspoken</h5>
+<p>Morag dwells at the crossroads where the road forks three ways. She is the grandmother who offers exactly what you need with a smile full of iron teeth. Her witches are deal-makers, oath-crafters, the ones who write contracts in milk on slate and know that every gift must be paid for, though the payment may not come due for a generation.</p>
+<p><strong>Doctrine</strong></p>
+<p><strong>Observances</strong></p>
+<p><strong>Law of Hidden Costs</strong></p>
+<p>A witch of Morag can bind a promise with a red thread so fine you cannot see it until it tightens. She can ensure that a bridge stands for a century, but the cost is a child's laugh, taken in the night and kept in a jar. These witches are not evil; they are precise. They keep the records of consequence, and they never forget a weight.</p>
+<p><strong>Bone-Truth Casting  —  [REVEAL] Standard</strong></p>
+<p>Read consequence in bone or ash. Ask one question about an unavoidable outcome. The answer cannot be softened. <strong>Price</strong>: Shame.</p>
+<p><strong>The Speaking Knot  —  [BIND] Standard, 8 XP</strong></p>
+<p>Bind a promise with faerie knots that tighten when broken. Breach forces 2 SB and marks the violator with a visible tell.</p>
+<p><strong>Curse of Settled Ash  —  [CURSE] High</strong></p>
+<p>Mark a target for inevitable decline. Create a Decay [6] timer that advances when the target resists accountability. At completion, a final reckoning scene occurs. <strong>Price</strong>: Identity (mandatory).</p>
+<h5>The Handmaidens of Livaea</h5>
+<p>Livaea's witches rule through attraction, influence, and emotional architecture. Power flows through wanting.</p>
+<p><strong>Doctrine</strong></p>
+<p><strong>Observances</strong></p>
+<p><strong>Thread of Longing  —  [BIND] Standard</strong></p>
+<p>Bind two subjects through unfulfilled desire. Each gains leverage over the other until the desire is resolved or destroyed. <strong>Price</strong>: Shame.</p>
+<p><strong>Velvet Mirror  —  [REVEAL] Low</strong></p>
+<p>Reveal what a subject wishes they did not want. Gain +1 Position when acting on this knowledge this session. <strong>Price</strong>: Shadow.</p>
+<h5>The Rainmaidens of Ra\'eyn</h5>
+<p>Ra\'eyn's witches are tempestuous elementalists whose emotions shape storm and tide.</p>
+<p><strong>Doctrine</strong></p>
+<p><strong>Observances</strong></p>
+<p><strong>Tidebreaker Surge  —  [STORM] Standard</strong></p>
+<p>Redirect momentum in a conflict. Allies gain +1 Position; enemies suffer -1d for one exchange. <strong>Price</strong>: Shadow.</p>
+<p><strong>Mist-Crowned Omen  —  [REVEAL] Low</strong></p>
+<p>Read fate in condensation and rainfall. Ask one question about imminent danger or opportunity. <strong>Price</strong>: Shame.</p>
+<h5>Inaea &mdash; Mercy and the Web</h5>
+<p>Inaea is the hearth-mother, the keeper of continuity, the spider at the center of the web. Where Morag demands payment, Inaea offers connection. Her witches bind families with invisible threads, ensure that oaths hold, and heal the cracks in the world's memory.</p>
+<p><strong>The Thread That Binds</strong></p>
+<p>The witch of Inaea knows that the thread that comforts is the same that binds. She can lay a line of sanctuary across a threshold&mdash;no violence may cross it while the thread holds, but the thread remembers every blow it deflects. When it snaps, the weight comes due.</p>
+<p><strong>Hearth-Thread Knot  —  [BIND] Low, 4 XP</strong></p>
+<p>Bind yourself and one willing ally. Both gain +1 die to Aid each other this scene. If either takes Harm, the other may reduce it by 1 by suffering that same Harm instead.</p>
+<h5>Isoka &mdash; The Serpent's Shedding</h5>
+<p>Isoka is change made manifest, the venom that burns away the old self to make room for the new. Her witches are shapeshifters in the original sense: not beasts, but souls who have learned to molt their identities like snakeskin.</p>
+<p><strong>The Shedding</strong></p>
+<p>A witch of Isoka can walk into a room as a stranger and leave as your sister, the shift so seamless that reality itself accepts the change. She can cure a disease by forcing the patient to <em>become</em> someone who never had it, though the former self is lost forever.</p>
+<p><strong>The Shedding  —  [SEVER] Standard, 8 XP</strong></p>
+<p>+2 dice to resist a named Condition; declare a minor contingency retroactively. Mark 1 Obligation.</p>
+<h5>Ikasha &mdash; She Who Sleeps in Silence</h5>
+<p>Ikasha is the patron of the threshold itself, of the space between what is said and what is meant, of the shadows that fall where no light cast them. Her witches move unseen, not by bending light but by occupying the absence&mdash;the Ninth space, the gap between numbers, the forgotten step on the stair.</p>
+<p><strong>The Unspoken</strong></p>
+<p>To call upon Ikasha is to court erasure. Her witches can remove a name from a record, from a memory, from history itself, leaving only a gap that aches like a missing tooth.</p>
+<p><strong>Touch the Umbral Veil  —  [VEIL] Low, 4 XP</strong></p>
+<p>Start Controlled on one Stealth roll. <strong>Push It</strong>: The effect lasts the full scene; mark +1 Shadow.</p>
+<h5>The Thorns of Malachai</h5>
+<p>The Thorns are not servants of a patron. They are adherents to a principle: identity is harvestable. What is discarded can be claimed, reshaped, and weaponized.</p>
+<p><strong>Doctrine</strong></p>
+<p><strong>Observances</strong></p>
+<p><strong>The Leashed Gift  —  [GIFT] Standard, 7 XP</strong></p>
+<p>Grant a target +2 dice on their next roll. They gain a Debt [4] timer. When it fills, Malachai collects: a memory, a name, or a service. The witch cannot refuse the collection&mdash;only redirect it to another target. <em>A witch of Malachai does not ask &ldquo;What will this cost?&rdquo; She asks &ldquo;Who will pay the interest?&rdquo;</em></p>
+<p><strong>Shadow Extraction  —  [SEVER] Standard</strong></p>
+<p>Strip a fragment of identity from a target. Mark Identity Strain on the target. Remove or distort a memory, bond, or role for the scene or longer. <strong>Price</strong>: Identity (mandatory).</p>
+<p><strong>False Echo Weaving  —  [ECHO] High</strong></p>
+<p>Create a shadow-double seeded with stolen memory. The echo may testify, mislead, or act once before unraveling. <strong>Price</strong>: Identity and Shadow.</p>
+<p><strong>Harvest of the Unclaimed  —  [RITUAL] High</strong></p>
+<p>Ritualize mass forgetting. Advance a shared Identity Collapse timer in the area. At completion, the Thorns gain a permanent asset or manifestation. <strong>Price</strong>: Identity Strain for all participants.</p>
+<h4>On Familiars</h4>
+<p>A familiar is not a pet, a tool, or a summoned thing. A familiar is a <em>shared consequence</em>.</p>
+<p>It is formed when a witch externalizes part of their shadow, memory, instinct, or unspoken need into a living conduit that can act, witness, and answer back. Once bound, neither witch nor familiar remains whole in the way they were before.</p>
+<div class="rite-box">
+<p>A Familiar is a persistent bond that allows a witch to relocate risk, perception, and cost. It amplifies magic by distributing consequence&mdash;but never removes it.</p>
+</div>
+<h5>Creating a Familiar</h5>
+<p>To create a familiar, a witch performs a binding at a meaningful threshold and commits to an ongoing obligation. This requires a willing or capturable vessel (animal, spirit, echo, object-entity), a threshold significant to the witch, and a personal offering that cannot be reclaimed.</p>
+<p>State: what the Familiar Knows (instinct, secret, fear, hunger); what the Familiar Wants (safety, sensation, purpose, attention); what the Witch Gave Up (memory, role, bond, certainty). Roll Spirit + Witchcraft vs DV 4. Success: the bond forms cleanly. Partial: the bond forms with a flaw (GM defines a behavioral complication). Miss: the bond forms&mdash;but the familiar defines the terms of attention, need, or return. Mark +1 Identity Strain; this mark cannot be avoided.</p>
+<h5>Familiar Nature</h5>
+<table>
+<tr><th><strong>Nature</strong></th><th><strong>Expression</strong></th></tr>
+<tr><td>Animal</td><td>Heightened senses, instinctual reactions, physical presence</td></tr>
+<tr><td>Spirit</td><td>Insubstantial movement, omen-bearing, threshold traversal</td></tr>
+<tr><td>Echo</td><td>Memory replay, voice mimicry, emotional residue</td></tr>
+<tr><td>Construct</td><td>Inscription, containment, durability, symbolic action</td></tr>
+<tr><td>Parasite</td><td>Hunger-driven aid, escalation under stress</td></tr>
+</table>
+<h5>Bond Track</h5>
+<p>Each familiar has a Bond Track [4] shared with its witch. Mark Bond when the familiar assists in a working, witnesses violence, betrayal, or confession, or the witch Pushes a working through the familiar. When the Bond Track fills, choose one: the familiar demands fulfillment (food, secrecy, rest, release); the familiar acts independently in line with its nature; or the bond destabilizes and the GM introduces a rupture or misalignment. Clear Bond only by honoring the familiar's needs.</p>
+<h5>Using a Familiar</h5>
+<p>A familiar may be invoked once per scene without a roll for minor assistance consistent with its nature. For greater effect, choose one option and roll Attribute + Witchcraft:</p>
+<ul>
+<li><strong>Extend Perception</strong>: See, hear, smell, or sense through the familiar. Gain +1d on awareness or tracking. Cost: Mark Bond.</li>
+<li><strong>Relay a Working</strong>: Cast a working as if you were present where the familiar is. Increase DV by 1. Cost: Familiar shares all backlash.</li>
+<li><strong>Absorb Consequence</strong>: Redirect fallout from a working. Convert 1 Shadow or Shame into 1 Bond. On a miss, the familiar manifests the consequence physically or socially.</li>
+</ul>
+<h5>Harm to Familiars</h5>
+<p>Familiars cannot be safely replaced. When a familiar is harmed, the witch immediately marks +1 Identity Strain and rolls Spirit + Resolve vs DV 3. On failure, gain a lingering Condition tied to the harm.</p>
+<p>If a familiar is destroyed: the witch permanently loses something bound during creation, all Bond clears, and the witch gains a recurring omen, scar, or echo.</p>
+<h5>Selected Familiar Rites</h5>
+<p><strong>Rite of the Watching Shadow  —  [BIND] Low, 4 XP</strong></p>
+<p>Bind a minor shadow or animal as a familiar of vigilance. Once per session, the familiar may warn of imminent danger without a roll. <strong>Cost</strong>: Shadow.</p>
+<p><strong>Rite of Shared Breath  —  [LINK] Standard, 7 XP</strong></p>
+<p>Share physical strain between witch and familiar for the scene; split Fatigue or Harm as chosen. <strong>Cost</strong>: Shame or Identity.</p>
+<p><strong>Rite of the Last Witness  —  [SEVER] High, 10 XP</strong></p>
+<p>If the witch would fall or lose consciousness, the familiar may act once to preserve a truth, message, or memory. Afterward, the bond immediately destabilizes. <strong>Cost</strong>: Identity (mandatory).</p>
+<h4>Witchcraft Followers</h4>
+<p>In the world of Witchcraft, followers are not merely assistants&mdash;they are the living conduits of power, the silent witnesses to hidden truths, and the keepers of sacred obligations. A Witchcraft follower exists at the threshold between the mundane and the magical, bound by pacts, oaths, and the ever-present weight of consequence.</p>
+<h5>Follower Types</h5>
+<h5 style="font-style:italic;">The Oathsworn</h5>
+<p>Born from the moment a follower swears a sacred promise to a Patron. Carries a visible mark of their oath (a sigil, scar, or token), can sense when the oath is in peril, and may speak the true name of the Patron when called upon.</p>
+<ul>
+<li><strong>True-Bound</strong>: Oath is strong; +1 die to actions related to the Patron's domain</li>
+<li><strong>Fractured</strong>: Oath is strained; -1 die to Patron-related actions; +1 Obligation segment</li>
+<li><strong>Shattered</strong>: Oath is broken; follower becomes a Wraith, seeking to make the witch pay</li>
+</ul>
+<p><strong>Special Action &mdash; Oath-Call:</strong> Once per scene, the follower can call on the Patron to verify a statement; the speaker must speak truth or suffer 1 Harm.</p>
+<h5 style="font-style:italic;">The Threshold-Keepers</h5>
+<p>Walk the edge between worlds, maintaining the boundaries that keep the witch's power contained. Can sense and reinforce magical boundaries, may temporarily lower a Ward for the witch, and are drawn to crossroads, doorways, and places of transition.</p>
+<ul>
+<li><strong>Ward-Safe</strong>: Threshold connection strong; +1 die to boundary-related actions</li>
+<li><strong>Frayed</strong>: Threshold connection weakening; -1 die to boundary actions; +1 Exposure on threshold use</li>
+<li><strong>Breached</strong>: Threshold connection broken; may attract unwanted attention from beyond</li>
+</ul>
+<h5 style="font-style:italic;">The Shadow-Speaking</h5>
+<p>Bound to the very essence of Shadow, these followers can perceive the unspoken truths that haunt the witch's path. They see the shadows that follow the witch, can speak the words that should remain unspoken, and are haunted by the things they've witnessed.</p>
+<ul>
+<li><strong>Clear-Sighted</strong>: Shadow-sight is strong; +1 die to insight/truth-detection</li>
+<li><strong>Clouded</strong>: Shadow-sight is weakening; -1 die to insight/truth-detection; +1 Exposure on truth-seeing</li>
+<li><strong>Shrouded</strong>: Shadow-sight is lost; may see false shadows or be consumed by darkness</li>
+</ul>
+<h5>Universal Witchcraft Follower Mechanics</h5>
+<p><strong>Obligation Tracking</strong></p>
+<p><strong>Shadow Exposure</strong></p>
+<p><strong>Shadow Harm</strong></p>
+<p><strong>Magical Assistance</strong></p>
+<h5>Gaining a Witchcraft Follower</h5>
+<p>Witchcraft followers are not easily acquired. They require a significant story moment that creates the pact or bond, a clear oath or commitment between the witch and the follower, and a narrative reason for the connection. Gaining a Witchcraft follower costs 4 XP, and comes with an immediate 2 Obligation segments that the witch must bear.</p>
+<p>To create one: choose a follower type (Oathsworn, Threshold-Keeper, or Shadow-Speaking); determine their connection to the witch; give them a distinctive mark or trait; set their starting condition state (usually True-Bound or Clear-Sighted); determine one special action they can perform.</p>
+<p>When a follower dies while in service, the witch gains 3 Obligation segments, their next ritual suffers a -1 die penalty, and the follower's spirit may return as a Shadow entity seeking resolution.</p>
+<h4>Quick Reference</h4>
+<div class="rite-box">
+<ul>
+<li><strong>Hedge Gift</strong>: once per scene/session, no roll, no cost.</li>
+<li><strong>Quick Working</strong>: single action, Attribute + Skill vs DV 2--4, pay Shadow/Shame/Identity.</li>
+<li><strong>Full Ritual</strong>: Significant Time, Spirit + Lore vs DV 3--6, pay memory/offering/service.</li>
+<li><strong>Curse</strong>: Scene or longer, GM sets DV, Identity mandatory for Thorns.</li>
+<li>Declare Intent, Vector, Price. Roll Attribute + Witchcraft vs scope DV (2--5+).</li>
+<li>Optional: Push It for +1d / +1 Effect / DV -1 (at a cost).</li>
+<li>Track Identity Strain [4] for self-touching magic.</li>
+<li>Familiars relocate consequence; they do not remove it. Track Bond [4].</li>
+</ul>
+</div>
+<p> —  &mdash; The Gray Wanderer</p>
+<h3 style="font-size:1.3rem;margin-top:1.6rem;">The Artificer's Codex</h3>
+<h4>A Debate Between Brothers on the Nature of Making</h4>
+<p><em>&ldquo;The Monad teaches that nothing is ever finished&mdash;only briefly sufficient. A blade that cannot be improved is a blade that has already begun to die.&rdquo;</em> &mdash; <strong>Korrin Iron-Stroke</strong>, Runekeeper of the Clockwork Monad</p>
+<p><em>&ldquo;The Breath teaches that a thing made with joy is never truly finished&mdash;it lives, it breathes, it remembers the hand that shaped it. Perfection is not a direction. It is a cage.&rdquo;</em> &mdash; <strong>Durin Deep-Heart</strong>, Forge-Warden of the First Breath</p>
+<p>Korrin and Durin are Aeler brothers and rival craftsmen of Khaz-Vurim who have spent a lifetime arguing about what it means to make something well. Korrin follows the Clockwork Monad and believes in iteration, measurement, and the discipline of refinement. Durin follows the Breath of the First Forge and believes in inspiration, joy, and the love poured into a creation. Their disagreement is philosophical, not mechanical&mdash;both use the same crafting rules below. Their voices are kept throughout as flavor, since GMs may want to hand either philosophy to an NPC mentor or a player's chosen artificer tradition.</p>
+<h4>The Spectrum of Power</h4>
+<p>Not all magic items are created equal. Use this scale as a guide.</p>
+<table>
+<tr><th><strong>Tier</strong></th><th><strong>XP Cost</strong></th><th><strong>DV</strong></th><th><strong>Timer</strong></th><th><strong>Obligation</strong></th><th><strong>Example</strong></th></tr>
+<tr><td>Cantrip-Infused</td><td>2 XP</td><td>2</td><td>4 segments</td><td>1 segment</td><td>A knife that always returns, a bell that rings at dawn</td></tr>
+<tr><td>Minor Enchantment</td><td>4 XP</td><td>3</td><td>4 segments</td><td>2 segments</td><td>A cloak that hides your face, a ring that warns of lies</td></tr>
+<tr><td>Standard Item</td><td>8 XP</td><td>4</td><td>6 segments</td><td>4 segments</td><td>A sword that burns with frost, a shield that remembers oaths</td></tr>
+<tr><td>Major Relic</td><td>12 XP</td><td>5</td><td>8 segments</td><td>6 segments</td><td>A crown that bends wills, a staff that speaks to stones</td></tr>
+<tr><td>Legendary Artifact</td><td>16+ XP</td><td>6+</td><td>10+ segments</td><td>8+ segments</td><td>The Kalrantha Amulet, the Hammer That Unmakes</td></tr>
+</table>
+<p><strong>Korrin's Note:</strong> The Obligation cost is not optional. Even without a Patron, the item itself creates a debt&mdash;to the world, to the materials, to the memory of what you have shaped. A Major Relic crafted without a Patron may find that the Relic itself <em>becomes</em> a Patron, demanding service and attention.</p>
+<p><strong>Durin's Note:</strong> A thing is not measured by its power. It is measured by the love that went into it. Track the timers if you must, but if you forget to love what you are making, you are making nothing at all.</p>
+<h4>The Workshop</h4>
+<p>Before you can craft anything of worth, you must have a workshop&mdash;a threshold where the ordinary becomes the extraordinary.</p>
+<table>
+<tr><th><strong>Tier</strong></th><th><strong>XP Cost</strong></th><th><strong>Downtime to Establish</strong></th><th><strong>Benefits</strong></th></tr>
+<tr><td>Basic/Hearth Forge</td><td>4 XP</td><td>1 day</td><td>Craft Minor items; +1 die to Craft rolls</td></tr>
+<tr><td>Enchanted/Living Workshop</td><td>8 XP</td><td>1 week</td><td>Craft Standard items; +2 dice to Craft rolls; reduce crafting DV by 1 (or the workshop offers advice, GM grants hints)</td></tr>
+<tr><td>Monadic/Breath-Fired Forge</td><td>12 XP</td><td>1 month</td><td>Craft Major items; +3 dice to Craft rolls; reduce crafting DV by 2; can generate Obligation to a patron of your choosing, or come alive enough to heat itself and organize its own tools</td></tr>
+</table>
+<p>Rename the tiers to match your artificer's tradition&mdash;Korrin's players call them Basic Forge, Enchanted Workshop, Monadic Forge; Durin's call them Hearth Forge, Living Workshop, Breath-Fired Forge. The numbers are identical.</p>
+<h4>Components</h4>
+<p>A magic item is not made from steel and leather alone; the materials carry memory. A sword forged from iron that was once a plowshare remembers the soil.</p>
+<table>
+<tr><th><strong>Component Type</strong></th><th><strong>Examples</strong></th><th><strong>DV Adjustment</strong></th></tr>
+<tr><td>Common</td><td>Steel, leather, basic herbs, copper, simple dyes</td><td>&mdash;</td></tr>
+<tr><td>Uncommon</td><td>Uncommon herbs, monster teeth, blessed salt, moonlit iron</td><td>+1 DV</td></tr>
+<tr><td>Rare</td><td>Dragon scale, phoenix feather, storm-caught lightning, Ykrul war-braid</td><td>+2 DV</td></tr>
+<tr><td>Legendary</td><td>True name of a dead god, heart of a living mountain, a tear from a Veiled Sister</td><td>+3 DV</td></tr>
+</table>
+<p><strong>Durin's Note:</strong> My brother treats materials like numbers. He forgets that materials have feelings&mdash;find one that was loved, that has known joy, that carries a story, and the item will remember it.</p>
+<h4>The Crafting Process</h4>
+<h5>The Five Steps of Creation</h5>
+<ol>
+<li><strong>Conceive / Inspire</strong> &mdash; Design the item, or let the idea come to you. What does it do? What does it demand? What is its cost?</li>
+<li><strong>Gather</strong> &mdash; Acquire the components. Often a quest in itself.</li>
+<li><strong>Shape</strong> &mdash; Work the materials. This is the crafting roll, using a timer.</li>
+<li><strong>Imbue / Animate</strong> &mdash; Pour power into the item. This is the final test.</li>
+<li><strong>Bind / Release</strong> &mdash; Seal the work, pay the XP, incur the Obligation, and witness the item's birth.</li>
+</ol>
+<h5>The Timer</h5>
+<p>Each crafting project has a timer representing the iterative process&mdash;the failures, the refinements, the moments where you step back and see the flaw you missed.</p>
+<table>
+<tr><th><strong>Item Tier</strong></th><th><strong>Timer Size</strong></th></tr>
+<tr><td>Cantrip-Infused</td><td>4 segments</td></tr>
+<tr><td>Minor Enchantment</td><td>4 segments</td></tr>
+<tr><td>Standard Item</td><td>6 segments</td></tr>
+<tr><td>Major Relic</td><td>8 segments</td></tr>
+<tr><td>Legendary Artifact</td><td>10+ segments</td></tr>
+</table>
+<p><strong>Ticking the Timer:</strong> Success on a Craft roll advances 1 segment. Partial Success advances 1 segment, but the GM gains 1 SB (complications). A Miss does not advance; the GM may tick a Complication Timer instead.</p>
+<p><strong>When the Timer Fills:</strong> The item is ready for the Imbuement roll. Rare components on hand may reduce the DV of the Imbuement roll.</p>
+<h5>The Imbuement Roll</h5>
+<p>Roll Wits + Arcana (or appropriate skill) against the item's DV.</p>
+<ul>
+<li><strong>Clean Success:</strong> The item is complete. No flaws.</li>
+<li><strong>Success with SB:</strong> The item is complete, but the GM gains 2 SB to spend on a later complication&mdash;a rival who senses the power, a flaw that emerges in a year, a debt the item will demand.</li>
+<li><strong>Partial:</strong> The item is complete, but with a flaw (see below). Accept the flaw or start over.</li>
+<li><strong>Miss:</strong> The item is not complete. Components are consumed; you may try again with new components.</li>
+</ul>
+<h5>Flaws (or Character)</h5>
+<p>A flawed item is not a failure&mdash;it is a lesson, or a story, depending who you ask.</p>
+<table>
+<tr><th><strong>d6</strong></th><th><strong>Flaw / Character</strong></th><th><strong>Mechanical Effect</strong></th></tr>
+<tr><td>1</td><td>Fragile / Visibly marked</td><td>The item breaks on a critical failure. Repairable with a downtime scene.</td></tr>
+<tr><td>2</td><td>Cursed / Quirky</td><td>The item has a minor curse (attracts insects, smells of brimstone, whispers secrets) or personality quirk.</td></tr>
+<tr><td>3</td><td>Unstable / Warm</td><td>The item's effect is unpredictable; roll 1d6, on a 1 it backfires (or it radiates warmth and protects its owner).</td></tr>
+<tr><td>4</td><td>Hungry / Musical</td><td>The item demands sacrifice&mdash;blood, time, or a memory&mdash;once per session (or hums when happy).</td></tr>
+<tr><td>5</td><td>Bound to Patron / Remembers</td><td>The item is tied to a specific Patron; using it against the Patron's interests triggers backlash (or it remembers its maker's hands).</td></tr>
+<tr><td>6</td><td>Hidden Flaw / Secret</td><td>The item has a flaw, or knows a secret, only the maker knows. The GM may reveal it at a dramatic moment.</td></tr>
+</table>
+<h4>Maintaining Your Creations</h4>
+<h5>Upkeep</h5>
+<p>Every magic item requires upkeep. Neglect a blade, and it will dull; neglect a pact, and the creditor will collect.</p>
+<table>
+<tr><th><strong>Upkeep Method</strong></th><th><strong>Cost</strong></th><th><strong>Effect</strong></th></tr>
+<tr><td>Efficient / Attentive</td><td>XP equal to the item's cost divided by 3 (minimum 1)</td><td>Minimal effort or daily attention. The item remains Functional/Alive.</td></tr>
+<tr><td>Intensive / Devoted</td><td>1 XP + a downtime scene</td><td>Significant personal involvement&mdash;speak to it, keep it warm. The item may gain a minor benefit (e.g., +1 die on its next use).</td></tr>
+<tr><td>Delegated</td><td>A Cap 4+ follower manages the item</td><td>The follower pays the upkeep (no XP cost). Risk: if the follower's Loyalty drops, all delegated items become Neglected.</td></tr>
+</table>
+<h5>Item Status</h5>
+<table>
+<tr><th><strong>Status</strong></th><th><strong>Effect</strong></th></tr>
+<tr><td>Functional / Alive</td><td>The item works as intended.</td></tr>
+<tr><td>Neglected / Sleepy</td><td>--1 die to the item's effects. Restored with a downtime scene or 1 XP.</td></tr>
+<tr><td>Compromised / Wounded</td><td>The item's effects are unreliable; roll 1d6, on a 1 the effect fails or backfires. Requires a quest or 4 XP to restore.</td></tr>
+</table>
+<h4>Sample Creations</h4>
+<h5>Cantrip-Infused Items (2 XP, DV 2, Timer 4)</h5>
+<ul>
+<li><strong>Returning Knife:</strong> A knife that returns to your hand when thrown, appearing in your palm after a heartbeat.</li>
+<li><strong>Dawn/Memory Bell:</strong> A bell that rings once at dawn, or when it hears a familiar voice; it cannot be silenced.</li>
+<li><strong>Truth/Honest Coin:</strong> A coin that lands on a specific face&mdash;or feels warm&mdash;when a lie is told within Near range.</li>
+</ul>
+<h5>Minor Enchantments (4 XP, DV 3, Timer 4)</h5>
+<ul>
+<li><strong>Emberfang/Hearth-Keeper Dagger:</strong> Glows faintly when undead are near, or when you're thinking of home. Once per scene, gain +1 die to detect hidden spirits, or ask it a question about the past.</li>
+<li><strong>Cloak of the Unseen/Welcome:</strong> +1 die to Stealth in dim light; once per scene, reroll a failed Stealth check, or the cloak wraps around you like a hug.</li>
+<li><strong>Vial of the Last Breath/Warmth:</strong> Heal 1 Fatigue when drunk. One use.</li>
+</ul>
+<h5>Standard Items (8 XP, DV 4, Timer 6)</h5>
+<ul>
+<li><strong>Storm Lantern:</strong> Once per session, as an action, create a gust of wind that extinguishes all mundane flames in Near and gives +1 Position to disengage.</li>
+<li><strong>Pendant of the Witness/Trust:</strong> Once per session, when you detect a lie, the liar suffers 1 Fatigue (no save); or when you are uncertain, the pendant offers a word of comfort.</li>
+<li><strong>Raven's/Friend's Key:</strong> Once per day, unlock any mundane lock or open any door that is not magically sealed.</li>
+</ul>
+<h4>The Ninth Rule</h4>
+<p>The Ninth Rule is simple: <strong>never make the ninth item.</strong> A craftsman makes eight swords, each better than the last. The ninth would be perfect&mdash;and it is also always hungry. It remembers what you sacrificed to make it, and it will use that against you.</p>
+<p><strong>Korrin's View:</strong> Count your breaths. Walk eight steps. Do not make the ninth. The Monad is patient; it can wait for the tenth.</p>
+<p><strong>Durin's View:</strong> The ninth item is not cursed&mdash;it is lonely, made without love. Make it with joy instead, and it will never turn against you.</p>
+<p>Use this as a GM tool: an NPC or PC artificer who breaks the Ninth Rule has made something extraordinary and dangerous, at a cost only revealed later.</p>
+<h4>Sample Components by Region</h4>
+<table>
+<tr><th><strong>Region</strong></th><th><strong>Common</strong></th><th><strong>Uncommon</strong></th><th><strong>Rare</strong></th><th><strong>Legendary</strong></th></tr>
+<tr><td>Aeler</td><td>Iron, copper, breath-glass</td><td>Deep-crystal, bell-bronze</td><td>Breath-dust, under-vein ore</td><td>Heart of the mountain</td></tr>
+<tr><td>Acasia</td><td>Rusted steel, old wood</td><td>Hedge-witch salt, broken milestones</td><td>Curse-iron, Pale Causeway stone</td><td>A broken emperor's crown</td></tr>
+<tr><td>Vhasia</td><td>Tournament steel, wine-stained cloth</td><td>A sun-cracked crown, a knight's gorget</td><td>Fenwood ash, Lence marble</td><td>A queen's promise</td></tr>
+<tr><td>Thepyrgos</td><td>Ink, parchment, candle wax</td><td>Synod seal wax, a bell's clapper</td><td>A stair from the Unfinished Stair</td><td>A fossil stair</td></tr>
+<tr><td>Ykrul</td><td>Horse-hair, leather, bone</td><td>Wolf-tooth, steppe-salt, hostage string</td><td>A Khagan's braid, a white squall's eye</td><td>A horse's true name</td></tr>
+<tr><td>Silkstrand</td><td>Silk, ink, bridge-stone</td><td>Dye from the canals, a weaver's thread</td><td>A Matron's seal, a bridge's memory</td><td>The Ragman's favor</td></tr>
+</table>
+<h4>The Artificer's Mantras</h4>
+<ul>
+<li>&ldquo;Measure twice. Forge once. Iterate always.&rdquo; &mdash; or &mdash; &ldquo;Feel the metal. It will tell you what to make.&rdquo;</li>
+<li>&ldquo;The eighth is mercy. The ninth is the Hollow's.&rdquo;</li>
+<li>&ldquo;A tool is not a servant. It is a witness.&rdquo; &mdash; or &mdash; &ldquo;A tool is not a servant. It is a friend.&rdquo;</li>
+<li>&ldquo;Perfection is not a destination. It is a debt.&rdquo; &mdash; or &mdash; &ldquo;Perfection is not a destination. It is a cage.&rdquo;</li>
+<li>&ldquo;When you craft, you incur. When you incur, you owe. When you owe, you are bound.&rdquo; &mdash; or &mdash; &ldquo;When you craft, you give. When you give, you are free.&rdquo;</li>
+<li>&ldquo;Eight is enough. Eight is peace.&rdquo; &mdash; or &mdash; &ldquo;One is enough. One is all.&rdquo;</li>
+</ul>
+<p> —  <em>&ldquo;The coin that never spends is the one you don't remember taking. The blade that never dulls is the one you never truly own. The forge that never cools is the one that is always loved.&rdquo;</em></p>
+<footer>Fate's Edge &mdash; The Complete Guide to Subclasses &mdash; Nicholas A. Gasper</footer>
+</body>
+</html>

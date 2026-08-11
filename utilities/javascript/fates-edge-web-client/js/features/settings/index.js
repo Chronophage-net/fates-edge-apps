@@ -72,7 +72,7 @@ const LICENSE_TEXT = `
 ║                                                              ║
 ╠══════════════════════════════════════════════════════════════╣
 ║                                                              ║
-║  Fate's Edge is © Nicholas A. Gasper. All Rights Reserved.   ║
+║  Fate's Edge is © Nicholas A. Gasper. Used with permission, All rights reserved.   ║
 ║                                                              ║
 ║  ── Dual License ──                                          ║
 ║                                                              ║
@@ -104,7 +104,7 @@ const LICENSE_TEXT = `
 ║                                                              ║
 ║  ── Permissions ──                                           ║
 ║                                                              ║
-║  For permissions regarding proprietary content, contact:    ║
+║  For permissions regarding Copyright, contact:    ║
 ║  support@fates-edge.com                                     ║
 ║                                                              ║
 ║                                                              ║
@@ -119,7 +119,7 @@ const LICENSE_SUMMARY = `
 FATE'S EDGE — LICENSE SUMMARY
 =============================
 
-📜 Fate's Edge is © Nicholas A. Gasper. All Rights Reserved.
+📜 Fate's Edge is © Nicholas A. Gasper. Used with permission, All rights reserved.
 
 📖 The SRD and Essentials guide are licensed under 
    CC BY-NC-SA 4.0 (Creative Commons Attribution-NonCommercial-ShareAlike 4.0)
@@ -843,7 +843,7 @@ export function render(el) {
                     <h3>📜 License & Copyright</h3>
                 </div>
                 <div class="license-box">
-                    <p><strong>Fate's Edge</strong> is © Nicholas A. Gasper. <strong>All Rights Reserved.</strong></p>
+                    <p><strong>Fate's Edge</strong> is © Nicholas A. Gasper. <strong>Used with permission, All rights reserved.</strong></p>
                     <p>The <strong>SRD</strong> and <strong>Essentials</strong> guide are licensed under CC BY-NC-SA 4.0.</p>
                     <p>All other content — setting lore, original characters, proprietary magic systems, artwork, etc. — is <strong>All Rights Reserved</strong>.</p>
                     <p><strong>Code:</strong> MIT License</p>

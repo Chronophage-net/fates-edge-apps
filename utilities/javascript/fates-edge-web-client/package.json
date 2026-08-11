@@ -23,7 +23,7 @@
     "vite": "^8.2.0"
   },
   "license": "MIT",
-  "_license": "Code: MIT. Game content (including /data/docs, /data/patrons, /data/adventures, etc.): CC BY-NC-SA 4.0 (SRD-marked) / All Rights Reserved (proprietary). © 2024 Nicholas A. Gasper.",
+  "_license": "Code: MIT. Game content (including /data/docs, /data/patrons, /data/adventures, etc.): CC BY-NC-SA 4.0 (SRD-marked) / All Rights Reserved (proprietary). © 2024 - 2026 Nicholas A. Gasper.",
   "author": "Nicholas A. Gasper",
   "allowScripts": {
     "fsevents@2.3.3": true,

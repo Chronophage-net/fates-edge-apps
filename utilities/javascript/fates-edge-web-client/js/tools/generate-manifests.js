@@ -179,7 +179,7 @@ function generateDocsManifest(docsPath) {
     documents: documents,
     total_count: documents.length,
     active_count: documents.filter(d => d.active !== false).length,
-    _license: "Fate's Edge Proprietary Content – © 2024 Nicholas A. Gasper. All rights reserved."
+    _license: "Fate's Edge Copyright – © 2024 - 2026 Nicholas A. Gasper. Used with permission, All rights reserved."
   };
 }
 

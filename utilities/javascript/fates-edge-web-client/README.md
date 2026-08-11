@@ -166,7 +166,7 @@ You are free to use, modify, and distribute the code for any purpose, provided y
 - **SRD (System Reference Document)** – The core mechanics, as published in the *Essentials* guide, are licensed under **CC BY‑NC‑SA 4.0**. You may share and adapt them for non‑commercial purposes, with attribution.
 - **All Other Content** – This includes setting lore, original characters, faction descriptions, proprietary magic systems (e.g., Runekeeper, Invoker, Cantor), artwork, maps, adventures, and narrative text. These are **All Rights Reserved** and the intellectual property of Nicholas A. Gasper.
 
-For permissions regarding proprietary content, contact: **support@fates-edge.com**
+For permissions regarding Copyright, contact: **support@fates-edge.com**
 
 ---
 

@@ -6,8 +6,8 @@ clean_and_license.py — Strip invalid extras from JSON files and add license.
 import json, os, sys
 
 LICENSE = (
-    "Fate's Edge Proprietary Content – "
-    "© 2024 Nicholas A. Gasper. All rights reserved."
+    "Fate's Edge Copyright – "
+    "© 2024 - 2026 Nicholas A. Gasper. Used with permission, All rights reserved."
 )
 
 def fix_file(filepath):

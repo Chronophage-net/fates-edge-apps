@@ -1077,7 +1077,7 @@ if (window.DEBUG) {
 
 **SRD** content licensed under CC BY-NC-SA 4.0.
 
-**All other content** is All Rights Reserved.
+**All other content** is Used with permission, All rights reserved.
 
 ---
 

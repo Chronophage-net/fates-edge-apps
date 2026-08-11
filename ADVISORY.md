@@ -22,11 +22,11 @@ It’s under **Creative Commons BY‑NC‑SA 4.0**, which means you can:
 
 ## What’s protected?
 
-### 3. Everything else – the *Proprietary Content*
+### 3. Everything else – the *Copyright*
 This is the heart of the game: the world of Acasia, the Curse, all the
 characters, factions, spells, maps, art, and any data file not explicitly
 labelled as SRD.  
-**All Rights Reserved.**
+**Used with permission, All rights reserved.**
 
 **You may:**
 - Use this content to play Fate’s Edge for free, either on the live server
