@@ -2651,47 +2651,65 @@ function closeModal() {
   if (existing) existing.remove();
 }
 
+function launchModal() {
+  closeModal();
+  const api = openKonrehModal(null);
+  currentModalAPI = api;
+  setTimeout(() => {
+    const el = document.getElementById('konreh-modal');
+    if (el) currentModal = el;
+  }, 50);
+}
+
 export default {
   /**
    * Called by the router when the user navigates to #kon-reh.
-   * Opens the modal (or re‑opens if closed).
+   *
+   * Renders an actual in‑tab landing panel (title, blurb, rules, Play
+   * button) instead of just popping a full‑screen modal with nothing
+   * behind it. That way, if the player closes the modal's ✕ while still
+   * on this tab, they land back on a real panel — not a blank page with
+   * no way to get the game back short of switching tabs and returning.
    */
   render(container) {
-    // Ignore container – the game is a full‑screen overlay.
-    // But we do need to clean up any previous modal.
-    closeModal();
+    if (!container) return;
 
-    // Open the modal (no network config = local play)
-    const api = openKonrehModal(null);
-    currentModalAPI = api;
+    container.innerHTML = `
+      <div class="panel" style="max-width:720px;margin:0 auto;text-align:center;padding:2rem 1.5rem;">
+        <h2 style="color:var(--gold);letter-spacing:0.02em;margin-bottom:0.1rem;">🌀 Kon'reh</h2>
+        <p style="color:var(--text2);margin-top:0;">A game of Apex, Sanctum, and Reforge</p>
+        <button id="konreh-play-btn" class="btn btn-gold" style="margin-top:0.75rem;padding:0.6rem 1.6rem;font-weight:600;">▶ Play Kon'reh</button>
+        <p style="color:var(--text3);font-size:0.75rem;margin-top:0.6rem;">Local hot‑seat, vs‑computer Schools, or challenge a connected player from the Whiteboard's 🌀 Kon'reh toggle.</p>
+      </div>
+      <div class="panel" id="konreh-rules-panel" style="max-width:720px;margin:1rem auto 0;padding:1.25rem 1.5rem;text-align:left;font-size:0.85rem;line-height:1.5;">
+        <h3 style="color:var(--gold);margin-top:0;">How to Play</h3>
+        ${getRulesText()}
+      </div>
+    `;
 
-    // The modal is created asynchronously; grab its element after a tick.
-    setTimeout(() => {
-      const el = document.getElementById('konreh-modal');
-      if (el) currentModal = el;
-    }, 50);
+    const playBtn = container.querySelector('#konreh-play-btn');
+    playBtn?.addEventListener('click', () => launchModal());
   },
 
   /**
-   * Called when the route becomes active – ensure the modal is open.
+   * Called when the route becomes active. The landing panel is already
+   * in the DOM from render(); nothing to re‑launch automatically.
    */
-  onActivate() {
-    if (!currentModal || !document.getElementById('konreh-modal')) {
-      this.render();
-    }
-  },
+  onActivate() {},
 
   /**
-   * Called when the route is deactivated – close the modal.
+   * Called when the route is deactivated – close the modal if the player
+   * left it open, so it doesn't linger over other tabs.
    */
   onDeactivate() {
     closeModal();
   },
 
   /**
-   * Refresh – just re‑render.
+   * Refresh – just re‑render the landing panel.
    */
   refresh() {
-    this.render();
+    const container = document.getElementById('tab-kon-reh');
+    if (container) this.render(container);
   }
 };
