@@ -3,6 +3,13 @@ All notable changes to this project will be documented here.
 
 Format loosely follows [Keep a Changelog](https://keepachangelog.com/), versions follow [Semantic Versioning](https://semver.org/).
 
+## [4.7.1] - 2026-08-11
+
+### Other
+- Updated copyright language
+- Updated mods and bots to stop html injections, finished desktop client
+- Updated konreh doc and package manager
+
 ## [4.7.0] - 2026-08-10
 
 Security hardening pass (XSS fixes, auth rate limiting, input length limits) and multi-character 'Remote enabled' control (up to 6 characters per client)
