@@ -83,6 +83,20 @@ utilities/vtt_mods_bots/fates-edge-discord-bot/node_modules/
 *.sqlite
 *.sqlite3
 
+# Python desktop tool: same class of mistake as campaigns.db above, just
+# not caught yet. preferences.json's save_preferences() writes the raw
+# server API key entered in the GUI straight to this file in plaintext
+# (see Fates_Edge.py's load_preferences() docstring) -- previously
+# tracked in git with placeholder content, meaning a routine `git add -A`
+# after actually using the tool would have committed a live key. The
+# player/gm files are the same idea for campaign data (a live user's
+# character sheet/GM notes, not sample content worth diffing in source
+# control). Untracked via `git rm --cached`; the files still exist
+# on disk and the app recreates them with defaults if missing.
+utilities/python/fates_edge_tool/preferences.json
+utilities/python/fates_edge_tool/fate_edge_player.json
+utilities/python/fates_edge_tool/fate_edge_gm.json
+
 #misc
 
 output.txt

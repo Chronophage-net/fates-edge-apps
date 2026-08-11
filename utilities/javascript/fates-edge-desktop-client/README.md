@@ -20,10 +20,13 @@ Download the latest release from the GitHub Releases page.
 ### From Source
 ```bash
 # Clone the repository
-git clone <your-repo>
-cd ttrpg/utilities/fates-edge-client
+git clone https://github.com/Chronophage-net/fates-edge-apps.git
+cd fates-edge-apps/utilities/javascript/fates-edge-desktop-client
 
-# Install dependencies
+# Build the web client this app bundles as its UI (one directory up)
+cd ../fates-edge-web-client && npm install && npm run build && cd -
+
+# Install desktop-client dependencies
 npm install
 
 # Build for your platform
@@ -32,12 +35,19 @@ npm run build
 
 ### Development
 ```bash
-# Run in development mode
+# Run in development mode (copies the web client build into renderer/
+# automatically via the predev script -- rebuild the web client first
+# with `npm run build` in ../fates-edge-web-client if you've changed it)
 npm run dev
 
 # Run in production mode
 npm start
 ```
+
+Both `npm start` and `npm run dev` copy `../fates-edge-web-client/dist`
+into this package's `renderer/` folder before launching (see
+`scripts/copy-renderer.js`). If that dist folder doesn't exist yet, build
+the web client first: `cd ../fates-edge-web-client && npm run build`.
 
 ## Usage
 
@@ -58,10 +68,15 @@ npm start
 
 ## Configuration
 
-Settings are stored in:
-- **Windows:** `%APPDATA%/fates-edge/config.json`
-- **macOS:** `~/Library/Application Support/fates-edge/config.json`
-- **Linux:** `~/.config/fates-edge/config.json`
+Settings are stored via `electron-store` (as `settings.json`, alongside a
+separate `localdata.json` for saved VTT state) under Electron's standard
+per-OS userData directory for this app (productName `FatesEdge`):
+- **Windows:** `%APPDATA%/FatesEdge/settings.json`
+- **macOS:** `~/Library/Application Support/FatesEdge/settings.json`
+- **Linux:** `~/.config/FatesEdge/settings.json`
+
+Backups (`create-backup`) and named sessions (`save-session`) are written
+as JSON files under `backups/` and `sessions/` in that same directory.
 
 ## Building
 

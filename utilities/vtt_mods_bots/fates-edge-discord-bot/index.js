@@ -121,7 +121,18 @@ function startWebhookServer() {
     app.use(express.json());
 
     const port = process.env.WEBHOOK_PORT || 3001;
-    const secret = process.env.WEBHOOK_SECRET || 'fates-edge-webhook';
+    const secret = process.env.WEBHOOK_SECRET;
+
+    // Fail closed rather than falling back to a hardcoded default -- this
+    // repo (and its default secret) are public, so a silent fallback here
+    // would mean anyone who's read the source knows the "secret" for any
+    // deployment that enabled WEBHOOK_PORT without also setting
+    // WEBHOOK_SECRET (an easy thing to miss; .env.example ships both as
+    // separate lines).
+    if (!secret) {
+        logger.error('❌ WEBHOOK_PORT is set but WEBHOOK_SECRET is not -- refusing to start the webhook server with no auth secret. Set WEBHOOK_SECRET in .env.');
+        return;
+    }
 
     // Webhook endpoint for external services
     app.post('/webhook', (req, res) => {

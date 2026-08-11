@@ -554,7 +554,7 @@ function handleSyncState(data) {
 function handleChatMessage(data) {
     log('💬 ' + data.sender + ': ' + data.text);
     if (CONFIG.syncChat) {
-        sendToChat('[Fate\'s Edge] ' + data.sender + ': ' + data.text);
+        sendToChat('[Fate\'s Edge] ' + escapeChatText(data.sender) + ': ' + escapeChatText(data.text));
     }
 }
 
@@ -565,7 +565,7 @@ function handleRollResult(data) {
         if (data.rolls && data.rolls.length > 0) {
             resultText = data.rolls.join(' + ') + ' = ' + data.total;
         }
-        sendToChat('🎲 ' + data.sender + ' rolled **' + data.expr + '**: ' + resultText);
+        sendToChat('🎲 ' + escapeChatText(data.sender) + ' rolled **' + escapeChatText(data.expr) + '**: ' + escapeChatText(resultText));
     }
 }
 
@@ -574,7 +574,7 @@ function handlePlayerJoined(data) {
         updateClients(data.clients);
         var name = data.clientName || 'Unknown';
         log('👤 ' + name + ' joined');
-        sendToChat('👤 ' + name + ' has joined the Fate\'s Edge session.');
+        sendToChat('👤 ' + escapeChatText(name) + ' has joined the Fate\'s Edge session.');
     }
 }
 
@@ -591,7 +591,7 @@ function handlePlayerLeft(data) {
     }
     var name = data.clientName || 'Unknown';
     log('👤 ' + name + ' left');
-    sendToChat('👤 ' + name + ' has left the Fate\'s Edge session.');
+    sendToChat('👤 ' + escapeChatText(name) + ' has left the Fate\'s Edge session.');
     updateGMUI();
 }
 
@@ -707,7 +707,7 @@ function handleAdventureLog(data) {
         var author = last.author || 'GM';
         var message = last.message || last.text || last.type;
         log('📝 Adventure log: ' + message);
-        sendToChat('📝 **' + author + ':** ' + message);
+        sendToChat('📝 **' + escapeChatText(author) + ':** ' + escapeChatText(message));
     }
 }
 
@@ -1151,11 +1151,11 @@ function handleGmRoleUpdate(data) {
     }
     updateGMUI();
     var name = clients[targetId] ? clients[targetId].name : targetId;
-    sendToChat('👑 ' + name + ' is now ' + role.toUpperCase() + '.');
+    sendToChat('👑 ' + escapeChatText(name) + ' is now ' + role.toUpperCase() + '.');
 }
 
 function handleServerAnnouncement(data) {
-    sendToChat('📢 ' + data.message);
+    sendToChat('📢 ' + escapeChatText(data.message));
 }
 
 // ============================================================
@@ -1452,6 +1452,22 @@ function getPlayerName() {
         // Ignore
     }
     return 'Roll20 GM';
+}
+
+// Roll20's sendChat() renders a subset of HTML in the chat pane and treats
+// messages starting with "!" as API commands (or "/" as built-in slash
+// commands) even when called from a script, not just when typed by a user.
+// Several call sites below interpolate text that originates on the other
+// side of the WebSocket connection (chat text, sender/client names, dice
+// expressions, adventure-log entries) -- i.e. it isn't something this
+// script controls. Escaping it before it reaches sendChat() prevents a
+// malicious/compromised peer from injecting HTML into the GM's chat pane
+// or smuggling a leading "!"/"/" into a rendered message.
+function escapeChatText(value) {
+    return String(value === undefined || value === null ? '' : value)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
 }
 
 function sendToChat(message, type) {

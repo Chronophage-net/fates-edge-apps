@@ -8,14 +8,21 @@
   "private": true,
   "repository": {
     "type": "git",
-    "url": "https://github.com/fates-edge-apps/fates-edge-apps.git"
+    "url": "https://github.com/Chronophage-net/fates-edge-apps.git"
   },
   "scripts": {
+    "copy-renderer": "node scripts/copy-renderer.js",
+    "prestart": "npm run copy-renderer",
     "start": "electron .",
+    "predev": "npm run copy-renderer",
     "dev": "electron . --dev",
+    "prebuild": "npm run copy-renderer",
     "build": "node scripts/build.js",
+    "prebuild:mac": "npm run copy-renderer",
     "build:mac": "electron-builder --mac --universal",
+    "prebuild:win": "npm run copy-renderer",
     "build:win": "electron-builder --win",
+    "prebuild:linux": "npm run copy-renderer",
     "build:linux": "electron-builder --linux",
     "build:all": "npm run build && npm run build:mac && npm run build:win && npm run build:linux",
     "postinstall": "electron-builder install-app-deps"
@@ -46,6 +53,8 @@
       "electron.js",
       "preload.js",
       "package.json",
+      "fe_icon.png",
+      "renderer/**/*",
       "!node_modules/.bin",
       "!**/*.map"
     ],
@@ -101,8 +110,10 @@
     },
     "publish": {
       "provider": "github",
+      "owner": "Chronophage-net",
+      "repo": "fates-edge-apps",
       "releaseType": "release"
     }
   },
-  "_license": "Fate's Edge Proprietary Content – © 2024 Nicholas A. Gasper. All rights reserved."
+  "_license": "MIT (code only -- see LICENSE.code in the fates-edge-apps repo root). This package contains no bundled Proprietary Content or SRD data of its own (the renderer/ it packages is copied from fates-edge-web-client's build output at build time, not committed here), so the Proprietary Content notice this field previously carried didn't apply to it; matches the top-level \"license\": \"MIT\" field above."
 }

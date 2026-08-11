@@ -26,7 +26,11 @@ function loadConfig() {
         },
         webhook: {
             port: parseInt(process.env.WEBHOOK_PORT) || 3001,
-            secret: process.env.WEBHOOK_SECRET || 'fates-edge-webhook'
+            // No hardcoded fallback -- this repo (and any fallback string
+            // baked into it) is public, so a silent default here would be
+            // a known secret. See index.js's startWebhookServer(), which
+            // refuses to start rather than falling back too.
+            secret: process.env.WEBHOOK_SECRET || null
         }
     };
 

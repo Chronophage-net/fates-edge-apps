@@ -6,6 +6,19 @@
 import { FatesEdgeBridge } from './bridge.js';
 import { registerSettings } from './settings.js';
 
+// The GM panel's Dialog content is built as an HTML string and rendered
+// via jQuery, same as bridge.js's ChatMessage content -- so display names
+// that arrive over the WebSocket (requesterName, client name) need the
+// same escaping before being interpolated in, or a malicious peer could
+// inject HTML into the panel every connected client/GM sees.
+function escapeHtml(value) {
+    return String(value === undefined || value === null ? '' : value)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+}
+
 // ============================================================
 // Module Registration
 // ============================================================
@@ -167,7 +180,7 @@ function buildGmPanelContent(state) {
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px solid #444;">
                 <div>
                     <span style="font-weight: bold; color: #d4af37;">Current GM:</span>
-                    <span id="gm-display" style="margin-left: 8px;">${gmName}</span>
+                    <span id="gm-display" style="margin-left: 8px;">${escapeHtml(gmName)}</span>
                 </div>
                 <div>
                     <span id="gm-role-badge" style="
@@ -211,7 +224,7 @@ function buildGmPanelContent(state) {
                 <div id="gm-requests-list" style="margin-top: 5px;">
                     ${pending.map(r => `
                         <div style="display: flex; justify-content: space-between; align-items: center; padding: 4px 0; border-bottom: 1px solid #333;">
-                            <span>${r.requesterName}</span>
+                            <span>${escapeHtml(r.requesterName)}</span>
                             ${isGM ? `
                                 <div>
                                     <button class="gm-approve" data-target="${r.requesterId}" style="
@@ -247,7 +260,7 @@ function buildGmPanelContent(state) {
                         const role = c.role || 'player';
                         const isGM = c.id === state.gmId ? '👑 ' : '';
                         const isSelf = c.id === state.clientId ? ' (you)' : '';
-                        return `<div style="padding: 2px 0;">${isGM}${name}${isSelf} — <span style="color: #aaa;">${role}</span></div>`;
+                        return `<div style="padding: 2px 0;">${isGM}${escapeHtml(name)}${isSelf} — <span style="color: #aaa;">${escapeHtml(role)}</span></div>`;
                     }).join('')}
                 </div>
             </div>

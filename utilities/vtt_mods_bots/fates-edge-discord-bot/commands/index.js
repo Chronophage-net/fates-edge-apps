@@ -5,6 +5,7 @@
 
 module.exports = {
     vtt: require('./vtt'),
+    vttdeck: require('./vttdeck'),
     dice: require('./dice'),
     chat: require('./chat'),
     character: require('./character'),

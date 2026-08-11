@@ -5,6 +5,22 @@
  *           Whiteboard, Grid Combat, and Adventure Engine.
  */
 
+// ChatMessage.content is rendered as raw HTML to every connected client
+// (and ui.notifications strings get inserted the same way), so any text
+// here that originated on the other side of the WebSocket -- chat text,
+// sender/client display names, dice expressions, roll reasons, server
+// announcements -- needs escaping before it's interpolated into a
+// template string. Without this, a malicious or compromised peer on the
+// shared FE server could inject arbitrary HTML into every Foundry user's
+// chat log, not just their own.
+function escapeHtml(value) {
+    return String(value === undefined || value === null ? '' : value)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+}
+
 export const FatesEdgeBridge = {
     ws: null,
     connected: false,
@@ -473,7 +489,7 @@ export const FatesEdgeBridge = {
         const isSystem = data.sender === 'System';
         const chatData = {
             user: game.user,
-            content: `<b>${isSystem ? '📢' : '[Fate\'s Edge]'} ${data.sender}:</b> ${data.text}`,
+            content: `<b>${isSystem ? '📢' : '[Fate\'s Edge]'} ${escapeHtml(data.sender)}:</b> ${escapeHtml(data.text)}`,
             whisper: []
         };
         ChatMessage.create(chatData);
@@ -488,7 +504,7 @@ export const FatesEdgeBridge = {
         }
         const chatData = {
             user: game.user,
-            content: `<b>[Fate's Edge] ${data.sender} rolled:</b><br>🎲 ${data.expr || 'Dice Roll'}<br><b>Result:</b> ${resultText}${data.reason ? `<br><i>${data.reason}</i>` : ''}`,
+            content: `<b>[Fate's Edge] ${escapeHtml(data.sender)} rolled:</b><br>🎲 ${escapeHtml(data.expr || 'Dice Roll')}<br><b>Result:</b> ${escapeHtml(resultText)}${data.reason ? `<br><i>${escapeHtml(data.reason)}</i>` : ''}`,
             whisper: []
         };
         ChatMessage.create(chatData);
@@ -501,7 +517,7 @@ export const FatesEdgeBridge = {
         if (data.clients) {
             this._updateClients(data.clients);
         }
-        ui.notifications.info(`👤 Fate's Edge: ${name} joined the room`);
+        ui.notifications.info(`👤 Fate's Edge: ${escapeHtml(name)} joined the room`);
         this._updateGmUI();
         Hooks.call('fates-edge-player-joined', data);
     },
@@ -519,7 +535,7 @@ export const FatesEdgeBridge = {
         if (data.clients) {
             this._updateClients(data.clients);
         }
-        ui.notifications.info(`👤 Fate's Edge: ${name} left the room`);
+        ui.notifications.info(`👤 Fate's Edge: ${escapeHtml(name)} left the room`);
         this._updateGmUI();
         Hooks.call('fates-edge-player-left', data);
     },
@@ -809,15 +825,15 @@ export const FatesEdgeBridge = {
             this._updateGmFromClients();
         }
         this._updateGmUI();
-        ui.notifications.info(`👑 ${this.clients.get(clientId)?.name || clientId} is now ${role.toUpperCase()}.`);
+        ui.notifications.info(`👑 ${escapeHtml(this.clients.get(clientId)?.name || clientId)} is now ${role.toUpperCase()}.`);
         Hooks.call('fates-edge-gm-role-update', data);
     },
     
     _handleServerAnnouncement(data) {
-        ui.notifications.info(`📢 Fate's Edge: ${data.message}`);
+        ui.notifications.info(`📢 Fate's Edge: ${escapeHtml(data.message)}`);
         ChatMessage.create({
             user: game.user,
-            content: `<b>📢 ${data.message}</b>`,
+            content: `<b>📢 ${escapeHtml(data.message)}</b>`,
             whisper: []
         });
         Hooks.call('fates-edge-server-announcement', data);

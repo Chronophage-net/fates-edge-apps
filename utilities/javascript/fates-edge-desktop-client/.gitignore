@@ -5,6 +5,10 @@ yarn.lock
 # Build output
 dist/
 release/
+
+# Copied from fates-edge-web-client/dist at build time by
+# scripts/copy-renderer.js -- not source, shouldn't be committed.
+renderer/
 *.dmg
 *.exe
 *.AppImage

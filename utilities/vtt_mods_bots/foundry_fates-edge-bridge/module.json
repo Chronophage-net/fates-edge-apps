@@ -99,5 +99,5 @@
       "protocolVersion": 2
     }
   },
-  "_license": "Fate's Edge Proprietary Content – © 2024 Nicholas A. Gasper. All rights reserved."
+  "_license": "MIT (code only -- see LICENSE.code in the fates-edge-apps repo root). This module contains no bundled Proprietary Content or SRD data, so the Proprietary Content notice this field previously carried didn't apply to it; matches this module's own README, which has always said MIT."
 }
