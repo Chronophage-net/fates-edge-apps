@@ -109,13 +109,16 @@ export function validatePack(manifest) {
     
     // Type validation
     //
-    // NEW: 'theme' added — a pack whose only real payload is a re-skin (a
-    // Modern Noir cyberpunk reskin being the motivating case; see
-    // data/themes/modern-noir/ for the starter scaffold). It's just sugar
-    // for "hybrid pack with no modules/documents required, but a theme
-    // block instead" — the manifest.theme validation below applies to ANY
-    // pack type, so an existing 'module' or 'hybrid' pack can carry a theme
-    // alongside its routes/data too without needing type: 'theme'.
+    // NEW: 'theme' added — a pack whose only real payload is a re-skin.
+    // The two shipping examples (Modern Noir cyberpunk, Horror
+    // gothic/cosmic) are actually 'hybrid' packs — a theme plus a
+    // faction, a region, and a doc — built and distributed from the docs
+    // repo: fates-edge-docs/ttrpg/reference/expansions/{modern-noir,horror}-module/web-client/*.pack.zip.
+    // 'theme' itself is just sugar for "hybrid pack with no
+    // modules/documents required, but a theme block instead" — the
+    // manifest.theme validation below applies to ANY pack type, so an
+    // existing 'module' or 'hybrid' pack can carry a theme alongside its
+    // routes/data too without needing type: 'theme'.
     if (!['module', 'document', 'hybrid', 'theme'].includes(manifest.type)) {
         errors.push('Pack type must be "module", "document", "hybrid", or "theme"');
     }

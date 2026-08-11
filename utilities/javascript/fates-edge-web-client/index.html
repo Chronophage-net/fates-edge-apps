@@ -80,6 +80,11 @@
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/fuse.js@7.0.0" defer></script>
     <script src="https://cdn.socket.io/4.7.2/socket.io.min.js" defer></script>
+    <!-- JSZip: used as a bare `JSZip` global by core/pack-manager.js's
+         installPack() (JSZip.loadAsync(...)) to read .pack.zip files
+         selected via Settings -> Pack Management. Was referenced there
+         but never actually loaded anywhere -- "JSZip is not defined". -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js" defer></script>
 </head>
 <body>
 

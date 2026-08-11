@@ -50,11 +50,14 @@ import {
 } from '../../core/pack-manager.js';
 import {
     getThemes,
+    getTheme,
     setTheme as applyTheme,
-    getCurrentPreference
+    getCurrentPreference,
+    getResolvedThemeId
 } from '../../core/theme-manager.js';
 
 let container = null;
+let themeChangeListenerAttached = false;
 
 // ============================================================
 // LICENSE & COPYRIGHT NOTICE
@@ -397,7 +400,49 @@ export function render(el) {
                     border: 1px solid var(--border);
                 }
                 .license-box p { margin: 0.3rem 0; }
+                .bundled-packs-hint {
+                    background: var(--bg3);
+                    padding: 0.7rem 0.9rem;
+                    border-radius: var(--radius);
+                    border: 1px solid var(--border);
+                    border-left: 3px solid var(--gold);
+                }
+                .bundled-packs-hint code {
+                    background: var(--bg4);
+                    padding: 0.05rem 0.3rem;
+                    border-radius: 4px;
+                    font-size: 0.75rem;
+                    color: var(--text2);
+                    word-break: break-all;
+                }
                 .theme-btn.active { border-color: var(--gold); background: var(--bg4); }
+                .theme-status-badge {
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 0.35rem;
+                    padding: 0.3rem 0.6rem;
+                    border-radius: var(--radius);
+                    background: var(--bg3);
+                    border: 1px solid var(--border);
+                    font-size: 0.85rem;
+                }
+                .theme-status-badge .dot {
+                    width: 8px;
+                    height: 8px;
+                    border-radius: 50%;
+                    background: var(--green);
+                    display: inline-block;
+                }
+                .theme-status-badge .source-tag {
+                    font-size: 0.65rem;
+                    color: var(--text3);
+                    text-transform: uppercase;
+                    letter-spacing: 0.03em;
+                    background: var(--bg4);
+                    padding: 0.05rem 0.4rem;
+                    border-radius: 8px;
+                    margin-left: 0.2rem;
+                }
             </style>
 
             <header class="settings-header">
@@ -424,7 +469,17 @@ export function render(el) {
                     <span class="badge pack-count">${installedPacks.length} installed</span>
                 </div>
                 <p class="text-muted small">Install custom packs to extend the toolkit with new modules, documents, and data.</p>
-                
+
+                <div class="bundled-packs-hint mt-1">
+                    <strong style="color:var(--gold);">📚 Bundled theme packs</strong>
+                    <p class="text-sm" style="margin:0.3rem 0;">Two ready-to-install theme packs ship in the <strong>docs repo</strong> (fates-edge-docs), not this one — each bundles a full reskin (colors, borders, glow/vignette treatment) plus a matching faction, region, and quick-reference doc:</p>
+                    <ul class="text-sm" style="margin:0.2rem 0 0.3rem 1.2rem;">
+                        <li><strong>🌆 Modern Noir</strong> — <code>ttrpg/reference/expansions/modern-noir-module/web-client/modern-noir-module.pack.zip</code></li>
+                        <li><strong>🕯️ Horror</strong> — <code>ttrpg/reference/expansions/horror-module/web-client/horror-module.pack.zip</code></li>
+                    </ul>
+                    <p class="text-xs text-muted" style="margin:0;">Grab the .zip from that repo and install it below. Once installed, the theme shows up in Theme &amp; Appearance further down this page.</p>
+                </div>
+
                 <div class="form-row">
                     <div class="field" style="flex:3;">
                         <label>Install Pack</label>
@@ -769,9 +824,14 @@ export function render(el) {
             <div class="panel settings-panel">
                 <div class="panel-header">
                     <h3>🎨 Theme & Appearance</h3>
+                    <span class="badge" id="theme-count-badge">${getThemes().length} installed</span>
                 </div>
+                <p class="text-muted small">Pick from any built-in theme, or a theme registered by an installed pack (see Pack Management above). "Auto" follows your system's light/dark preference.</p>
                 <div class="flex" style="gap:0.5rem;flex-wrap:wrap;" id="theme-picker">
                     ${renderThemeButtons()}
+                </div>
+                <div id="theme-status-line" class="mt-1">
+                    ${renderThemeStatusLine()}
                 </div>
             </div>
             
@@ -1445,6 +1505,17 @@ export function attachEvents() {
     document.querySelectorAll('.theme-btn').forEach(btn => {
         btn.addEventListener('click', () => setTheme(btn.dataset.theme));
     });
+    // Keep the status line accurate even when the theme changes from
+    // outside this panel's own buttons — a pack finishing install
+    // (registerTheme() re-applies live, see theme-manager.js) or the OS
+    // light/dark preference flipping while "Auto" is selected both fire
+    // 'theme-changed' without going through setTheme() above. Attached
+    // once (not per-render) since this panel's own re-renders replace the
+    // DOM nodes but never remove this document-level listener.
+    if (!themeChangeListenerAttached) {
+        themeChangeListenerAttached = true;
+        document.addEventListener('theme-changed', refreshThemeStatus);
+    }
     
     // License
     document.getElementById('settings-license-btn')?.addEventListener('click', openLicenseModal);
@@ -1849,11 +1920,58 @@ function renderThemeButtons() {
     return buttons.join('');
 }
 
+/** Built-in themes (dark/light) ship with theme-manager itself; anything
+ *  else currently registered got there via an installed pack's pack.json
+ *  `theme` block (see pack-manager.js's installPack()/reregisterPackTheme()).
+ *  Cross-referencing installed packs here lets the status line say *which*
+ *  pack a non-built-in theme came from, rather than just "not built-in". */
+function getThemeSource(themeId) {
+    if (themeId === 'dark' || themeId === 'light') {
+        return { label: 'Built-in', pack: null };
+    }
+    const pack = getInstalledPacks().find(p => p.theme && p.theme.id === themeId);
+    return pack
+        ? { label: 'From Pack', pack }
+        : { label: 'Registered', pack: null };
+}
+
+function renderThemeStatusLine() {
+    const preference = getCurrentPreference();
+    const isAuto = preference === 'auto';
+    const resolvedId = getResolvedThemeId();
+    const resolvedTheme = getTheme(resolvedId);
+    const source = getThemeSource(resolvedId);
+
+    const label = resolvedTheme ? `${resolvedTheme.icon || '🎨'} ${escHtml(resolvedTheme.label)}` : escHtml(resolvedId);
+    const prefNote = isAuto
+        ? ` <span class="text-muted small">(Auto — matches your system's ${resolvedId === 'dark' ? 'dark' : 'light'} preference)</span>`
+        : '';
+    const sourceNote = source.pack
+        ? `<span class="source-tag" title="Registered by this pack">${escHtml(source.pack.name)} v${escHtml(source.pack.version)}</span>`
+        : `<span class="source-tag">${escHtml(source.label)}</span>`;
+
+    return `
+        <span class="theme-status-badge">
+            <span class="dot"></span>
+            Active: <strong>${label}</strong>${prefNote}
+            ${sourceNote}
+        </span>
+    `;
+}
+
+function refreshThemeStatus() {
+    const badge = document.getElementById('theme-count-badge');
+    if (badge) badge.textContent = `${getThemes().length} installed`;
+    const statusLine = document.getElementById('theme-status-line');
+    if (statusLine) statusLine.innerHTML = renderThemeStatusLine();
+}
+
 function setTheme(mode) {
     applyTheme(mode);
     document.querySelectorAll('.theme-btn').forEach(btn => {
         btn.classList.toggle('active', btn.dataset.theme === mode);
     });
+    refreshThemeStatus();
 }
 
 // ============================================================
