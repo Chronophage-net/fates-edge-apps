@@ -10,7 +10,7 @@ const path = require('path');
 const room = require('./room.js');
 const deck = require('./deck.js');
 const logger = require('./logger.js').createLogger(process.env.LOG_LEVEL || 'INFO');
-const { buildSafeDict, clampCount, isSafeModuleId, clampString, MAX_NAME_LENGTH, sanitizeCharacterSelection } = require('./security.js');
+const { buildSafeDict, clampCount, isSafeModuleId, clampString, MAX_NAME_LENGTH, sanitizeCharacterSelection, isGmLike } = require('./security.js');
 const adventure = require('./adventure.js');
 const auth = require('./auth.js');
 const turn = require('./turn.js');
@@ -155,6 +155,35 @@ function setupWSS(wss, appConfig) {
                         room.handleGmApproval(currentRoom, clientId, data.targetId);
                         break;
 
+                    // ─── v4.8: Role management (Co-GM / Player / Spectator) ─
+                    case 'role_change_request': {
+                        const respond = (payload) => ws.send(JSON.stringify({ type: 'role_change_response', requestId: data.requestId, ...payload }));
+                        const { targetId, role, persist } = data || {};
+                        if (!targetId || !role) { respond({ ok: false, error: 'Missing targetId or role' }); break; }
+                        if (!auth.isValidRole(role) || role === 'gm') { respond({ ok: false, error: 'Invalid role' }); break; }
+                        respond(room.handleRoleChangeRequest(currentRoom, clientId, targetId, role, !!persist));
+                        break;
+                    }
+
+                    // ─── v4.8: Character registration (claim/release) ───────
+                    case 'claim-character': {
+                        const respond = (payload) => ws.send(JSON.stringify({ type: 'claim-character-response', requestId: data.requestId, ...payload }));
+                        const clientEntry = currentRoom.clients.get(clientId);
+                        if (!clientEntry) { respond({ ok: false, error: 'Client not found' }); break; }
+                        const { characterId, character } = data || {};
+                        if (!characterId || !character) { respond({ ok: false, error: 'Missing characterId or character' }); break; }
+                        respond(room.claimCharacter(currentRoom, clientEntry, characterId, character));
+                        break;
+                    }
+
+                    case 'release-character': {
+                        const respond = (payload) => ws.send(JSON.stringify({ type: 'release-character-response', requestId: data.requestId, ...payload }));
+                        const clientEntry = currentRoom.clients.get(clientId);
+                        if (!clientEntry) { respond({ ok: false, error: 'Client not found' }); break; }
+                        respond(room.releaseCharacter(currentRoom, clientEntry));
+                        break;
+                    }
+
                     case 'deck-draw':
                         handleDeckDraw(ws, currentRoom, data);
                         break;
@@ -193,28 +222,28 @@ function setupWSS(wss, appConfig) {
                         break;
 
                     case 'kick_client':
-                        if (ws.clientData.role === 'gm') {
+                        if (isGmLike(ws.clientData.role)) {
                             room.kickClient(currentRoom, data.targetId, data.reason || 'Kicked');
                             room.broadcastToRoom(roomKey, 'presence', { clients: room.getClientsList(currentRoom) }, ws.clientId);
                         }
                         break;
 
                     case 'ban_client':
-                        if (ws.clientData.role === 'gm') {
+                        if (isGmLike(ws.clientData.role)) {
                             room.banClient(currentRoom, data.targetId, data.reason || 'Banned');
                             room.broadcastToRoom(roomKey, 'presence', { clients: room.getClientsList(currentRoom) }, ws.clientId);
                         }
                         break;
 
                     case 'unban_client':
-                        if (ws.clientData.role === 'gm') {
+                        if (isGmLike(ws.clientData.role)) {
                             room.unbanClient(currentRoom, data.targetId);
                             ws.send(JSON.stringify({ type: 'unban_client_ack', targetId: data.targetId }));
                         }
                         break;
 
                     case 'set_room_password':
-                        if (ws.clientData.role === 'gm') {
+                        if (isGmLike(ws.clientData.role)) {
                             handleSetRoomPassword(ws, currentRoom, data);
                         }
                         break;
@@ -643,7 +672,17 @@ async function handleHandshake(ws, roomState, data) {
         }
     }
 
-    let assignedRole = data.role || 'player';
+    // v4.8: same role-validation rules as socketio-handlers.js's join-room
+    // -- self-declared 'co-gm' is never trusted unless it's already saved
+    // on this account's membership row (a grant made via
+    // room.handleRoleChangeRequest with persist:true).
+    let assignedRole = auth.isValidRole(data.role) ? data.role : 'player';
+    if (assignedRole === 'co-gm' && membership?.role !== 'co-gm') {
+        assignedRole = 'player';
+    }
+    if (assignedRole !== 'gm' && membership?.role === 'co-gm') {
+        assignedRole = 'co-gm';
+    }
     const existingGm = room.getExistingGm(roomState);
     if (assignedRole === 'gm' && existingGm) {
         assignedRole = 'player';
@@ -662,6 +701,25 @@ async function handleHandshake(ws, roomState, data) {
         storage.upsertMembership(roomState.code, authUser.userId, {}).catch(e =>
             logger.warn('Failed to upsert room membership', { error: e.message })
         );
+    }
+
+    // v4.8: re-resolve a previously-claimed character on rejoin -- see
+    // socketio-handlers.js's join-room handler for the same logic.
+    if (authUser && hasAccountSupport() && typeof storage.getCharacterClaim === 'function') {
+        try {
+            const claim = await storage.getCharacterClaim(roomState.code, authUser.userId);
+            if (claim) {
+                if (!roomState.characterClaims) roomState.characterClaims = Object.create(null);
+                const existingChar = Object.values(roomState.characters || {}).find(c => c.ownerId === authUser.userId);
+                if (existingChar) {
+                    roomState.characterClaims[authUser.userId] = room.normalizeCharKey(existingChar.name);
+                    ws.clientData.selectedCharacter = existingChar.name;
+                    ws.clientData.selectedCharacters = [existingChar.name];
+                }
+            }
+        } catch (e) {
+            logger.warn('Failed to resolve character claim on join', { error: e.message });
+        }
     }
 
     const clientsList = room.getClientsList(roomState);

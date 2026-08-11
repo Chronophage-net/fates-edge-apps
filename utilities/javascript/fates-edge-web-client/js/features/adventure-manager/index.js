@@ -70,7 +70,7 @@ import { isConnectedToServer, sendEvent } from '../../core/websocket.js';
 import { loadBestiaryData, getCreatureDescription } from '../encounters/bestiary.js';
 import { OBJECTIVE_TYPES, DEFAULT_OBJECTIVE_TYPE, getObjectiveType } from '../../core/objective-types.js';
 // ─── Role check ──────────────────────────────────────────────
-import { getMyStoredRole } from '../../core/feature-toggles.js';
+import { getMyStoredRole, isGmLikeRole } from '../../core/feature-toggles.js';
 import { openInlineScreen, closeInlineScreen, inlineScreenShell } from '../../components/InlineScreen.js';
 
 // ============================================================
@@ -94,7 +94,7 @@ let isDestroyed = false;
 
 function isGM() {
     if (!isConnectedToServer()) return true; // solo/local – allow all
-    return getMyStoredRole() === 'gm';
+    return isGmLikeRole(getMyStoredRole());
 }
 
 // ============================================================

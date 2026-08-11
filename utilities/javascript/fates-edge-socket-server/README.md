@@ -1,4 +1,4 @@
-# Fate's Edge Socket Server v4.7.1 — Real-Time VTT & Campaign Sharing
+# Fate's Edge Socket Server v4.8.0 — Real-Time VTT & Campaign Sharing
 
 **Fate's Edge** is a narrative‑first TTRPG system. This is the real‑time backend for the web toolkit: a WebSocket/Socket.io server that syncs campaign state live across your group, plus a short‑code **campaign sharing** endpoint for loading/saving full toolkit state without a persistent connection.
 
@@ -13,6 +13,7 @@ Earlier documentation for this server described it as a minimal REST endpoint fo
 - **Real‑time sync** — chat, dice rolls, character updates, timers, and scene changes broadcast to every connected client, over both a Socket.io transport and a raw `ws` transport (`server/socketio-handlers.js`, `server/ws-handlers.js`).
 - **Account authentication** — `server/auth.js` provides real user accounts: `POST /api/auth/register` and `POST /api/auth/login` hash passwords with bcrypt and issue JWT session tokens, layered alongside the existing per-request API-key authentication used for service-to-service calls.
 - **GM election & rooms** — `server/room.js` handles requesting, approving, and transferring GM status per room/campaign code.
+- **Roles & character registration (v4.8)** — beyond the single GM seat above, `server/room.js` now supports GM-granted Co-GM promotions (session-only or saved), a read-only Spectator role, and a claim/release bridge that binds a player's saved character (their account library) to a room's live roster. See `DESIGN.md`'s "Roles & Character Registration (v4.8)" section for the full model.
 - **Shared Deck of Consequences** — `server/deck.js` draws cards from a region's deck and broadcasts the result to everyone in the room, using the same region data (`data/regions/`) as the web client.
 - **Campaign persistence** — `server/storage.js` writes each campaign to its own JSON file under `server/campaigns/`, indexed in `campaigns.db`.
 - **Security & config** — `server/security.js` and `server/config.js` handle basic request validation and environment-driven configuration.

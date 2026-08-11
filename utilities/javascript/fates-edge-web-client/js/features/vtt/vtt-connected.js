@@ -1302,6 +1302,31 @@ function setupWebSocketSync() {
     onWSEvent('gm_role_update', gmRoleHandler);
     wsListeners.set('gm_role_update', gmRoleHandler);
 
+    // v4.8: Co-GM / Player / Spectator changes -- distinct from
+    // 'gm_role_update' above, which stays dedicated to the single GM seat.
+    // Reuses the same 'gmRoleUpdate' DOM CustomEvent name (feature-toggles.js
+    // and anything else already listening for it just cares "my role
+    // changed to X", not which server event triggered it) so no other
+    // listener needs to know this is a second source.
+    const roleUpdateHandler = (data) => {
+        if (isDestroyed) return;
+        const { targetId, role, persist } = data;
+        const myId = getSocketId();
+        if (targetId && clientsMap.has(targetId)) {
+            clientsMap.get(targetId).role = role;
+        }
+        if (targetId === myId) {
+            gmState.myRole = role;
+            document.dispatchEvent(new CustomEvent('gmRoleUpdate', { detail: { role } }));
+            const roleLabel = { 'co-gm': 'Co-GM', player: 'Player', spectator: 'Spectator' }[role] || role;
+            showToast(`Your role is now: ${roleLabel}${role === 'co-gm' ? (persist ? ' (saved)' : ' (this session only)') : ''}`, 'success');
+        }
+        updateGMUI();
+        renderLocalPresence();
+    };
+    onWSEvent('role_update', roleUpdateHandler);
+    wsListeners.set('role_update', roleUpdateHandler);
+
     const announcementHandler = (data) => {
         if (isDestroyed) return;
         showToast(data.message, 'info');

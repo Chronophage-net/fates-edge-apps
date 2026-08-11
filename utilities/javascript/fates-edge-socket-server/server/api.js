@@ -321,6 +321,80 @@ function createApiRouter(appConfig) {
         }
     });
 
+    // ─── v4.8: Character registration -- the bridge between the account
+    // character library above and a room's live roster (room.characters),
+    // flagged as a "planned follow-up" in this file's docs block for a
+    // while. Binds one library character to `(room, account)`; at most one
+    // live claim per account per room -- claiming again just replaces it.
+    //
+    // This is a plain JWT-authed REST route (not gated on a live socket
+    // connection), so a player can claim a character before ever opening
+    // a room connection; socketio-handlers.js / ws-handlers.js re-resolve
+    // the claim automatically against the live room on join/rejoin.
+    router.post('/api/rooms/:code/claim-character', requireAccountSupport, auth.requireAuth, async (req, res) => {
+        try {
+            const roomCode = req.params.code.toUpperCase();
+            const { characterId } = req.body || {};
+            if (!characterId) return res.status(400).json({ error: 'characterId is required' });
+
+            const banned = await storage.isMemberBanned(roomCode, req.user.userId);
+            if (banned) return res.status(403).json({ error: 'You are banned from this room' });
+
+            const libraryChar = await storage.getCharacterById(req.user.userId, characterId);
+            if (!libraryChar) return res.status(404).json({ error: 'Character not found in your library' });
+
+            await storage.setCharacterClaim(roomCode, req.user.userId, characterId);
+
+            // Also apply immediately to the room's LIVE roster, if that
+            // room happens to exist in memory right now (a GM-hosted room
+            // with connected clients). If it doesn't yet, the claim row
+            // alone is enough -- join-room/handshake resolves it later.
+            let liveRoom = null;
+            try { liveRoom = room.getRoom(roomCode); } catch (e) { liveRoom = null; }
+            if (liveRoom) {
+                const snapshot = { name: libraryChar.name, ...(libraryChar.data || {}) };
+                const char = room.updateCharacter(liveRoom, libraryChar.name, { ...snapshot, ownerId: req.user.userId });
+                if (!liveRoom.characterClaims) liveRoom.characterClaims = Object.create(null);
+                liveRoom.characterClaims[req.user.userId] = room.normalizeCharKey(libraryChar.name);
+                room.broadcastToRoom(roomCode, 'character_claimed', { userId: req.user.userId, characterId, name: libraryChar.name });
+                room.broadcastToRoom(roomCode, 'state-updated', { characters: room.getCharacters(liveRoom), timestamp: Date.now() });
+            }
+
+            res.json({ success: true, roomCode, characterId, name: libraryChar.name });
+        } catch (err) {
+            res.status(500).json({ error: err.message });
+        }
+    });
+
+    router.delete('/api/rooms/:code/claim-character', requireAccountSupport, auth.requireAuth, async (req, res) => {
+        try {
+            const roomCode = req.params.code.toUpperCase();
+            const existing = await storage.getCharacterClaim(roomCode, req.user.userId);
+            await storage.deleteCharacterClaim(roomCode, req.user.userId);
+
+            let liveRoom = null;
+            try { liveRoom = room.getRoom(roomCode); } catch (e) { liveRoom = null; }
+            if (liveRoom && liveRoom.characterClaims) {
+                delete liveRoom.characterClaims[req.user.userId];
+                room.broadcastToRoom(roomCode, 'character_released', { userId: req.user.userId });
+            }
+
+            res.json({ success: true, roomCode, wasClaimed: !!existing });
+        } catch (err) {
+            res.status(500).json({ error: err.message });
+        }
+    });
+
+    router.get('/api/rooms/:code/claim-character', requireAccountSupport, auth.requireAuth, async (req, res) => {
+        try {
+            const roomCode = req.params.code.toUpperCase();
+            const claim = await storage.getCharacterClaim(roomCode, req.user.userId);
+            res.json({ claim: claim || null });
+        } catch (err) {
+            res.status(500).json({ error: err.message });
+        }
+    });
+
     // ─── Deck endpoints (unchanged) ────────────────────────────────
     router.get('/api/rooms/:code/deck', authenticate, (req, res) => {
         try {
@@ -1485,7 +1559,20 @@ function createApiRouter(appConfig) {
                     create: 'POST /api/account/characters - Save a new character ({ name, data }); 409 once 5 are already saved',
                     update: 'PUT /api/account/characters/:id - Update a saved character ({ name?, data? })',
                     remove: 'DELETE /api/account/characters/:id - Delete a saved character',
-                    note: 'This is an account-owned character LIBRARY, separate from a room\'s live character roster (GET /api/rooms/:code/characters below). There is no bridge yet between the two -- attaching a saved character to a room\'s live state on join is a planned follow-up, not implemented here.'
+                    note: 'This is an account-owned character LIBRARY, separate from a room\'s live character roster (GET /api/rooms/:code/characters below). See characterRegistration below for the bridge between the two.'
+                },
+                // v4.8: roles + character registration.
+                roomRoles: {
+                    values: "gm | co-gm | player | spectator. Exactly one 'gm' per room (unchanged); any number of 'co-gm's. Co-GM has every GM permission except transferring/revoking the GM seat, promoting/demoting another Co-GM, or deleting/resetting the room.",
+                    change: "Socket event role_change_request { targetId, role: 'co-gm'|'player'|'spectator', persist? } - GM-only. persist:false (default) grants Co-GM for the current connection only; persist:true saves it to the account's room membership so it survives reconnects. Demotions always save.",
+                    seat: 'The GM seat itself still uses the existing request_gm / approve_gm socket events, not role_change_request.',
+                    broadcast: 'role_update { targetId, role, byId, persist } is broadcast to the room on every change.'
+                },
+                characterRegistration: {
+                    claim: 'POST /api/rooms/:code/claim-character { characterId } - Bind one of your saved library characters (see accountCharacters above) to this room as your live, controlled character. Replaces any existing claim for you in this room. Requires Bearer token + account support.',
+                    release: 'DELETE /api/rooms/:code/claim-character - Release your claim in this room (the character stays in your library).',
+                    get: 'GET /api/rooms/:code/claim-character - Get your current claim (if any) for this room.',
+                    note: 'One live claim per (room, account). A claimed character\'s room roster entry is tagged with ownerId so a Player can only be considered the controller of their own claimed character. Also available as socket events claim-character / release-character while connected; either path keeps the persisted claim row and the live room roster in sync. On rejoin, a previously-saved claim auto-resolves against the room\'s live roster.'
                 },
                 deck: {
                     get: 'GET /api/rooms/:code/deck - Get current deck state',

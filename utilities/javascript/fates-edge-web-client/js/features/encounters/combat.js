@@ -16,7 +16,7 @@ import { escHtml } from '../../core/utils.js';
 import { loadBestiaryData, getCreatureDescription } from './bestiary.js';
 import { isConnectedToServer, sendEvent } from '../../core/websocket.js';
 import { logToSession, addVTTEvent } from '../gm-tools/index.js';
-import { getMyStoredRole } from '../../core/feature-toggles.js';
+import { getMyStoredRole, isGmLikeRole } from '../../core/feature-toggles.js';
 import { getObjectiveType, resolveObjectiveType, isCombatType, DEFAULT_OBJECTIVE_TYPE } from '../../core/objective-types.js';
 
 // NOTE: combatant.type ('player'|'adversary') is the *role* field, pre-existing
@@ -33,7 +33,7 @@ import { getObjectiveType, resolveObjectiveType, isCombatType, DEFAULT_OBJECTIVE
  * play has no GM/player distinction, so it's always allowed there).
  */
 function canSetRange() {
-    return !isConnectedToServer() || getMyStoredRole() === 'gm';
+    return !isConnectedToServer() || isGmLikeRole(getMyStoredRole());
 }
 
 let modal = null;

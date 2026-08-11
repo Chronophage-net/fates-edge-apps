@@ -240,6 +240,30 @@ class VTTClient extends EventEmitter {
                 this.emit('gmRoleUpdate', message);
                 break;
 
+            // v4.8: Co-GM / Player / Spectator changes. Distinct from
+            // 'gm_role_update' above, which is only ever fired for the
+            // single GM seat itself (see server/room.js's
+            // handleGmRequest/handleGmApproval vs. the newer
+            // handleRoleChangeRequest). `message.targetId` here (not
+            // `clientId`) is who the role change applies to.
+            case 'role_update': {
+                if (message.targetId === this.clientId) {
+                    this.myRole = message.role;
+                }
+                const target = this.clients.get(message.targetId);
+                if (target) target.role = message.role;
+                this.emit('roleUpdate', message);
+                break;
+            }
+
+            case 'character_claimed':
+                this.emit('characterClaimed', message);
+                break;
+
+            case 'character_released':
+                this.emit('characterReleased', message);
+                break;
+
             case 'server_announcement':
                 this.emit('serverAnnouncement', message);
                 break;
@@ -472,6 +496,33 @@ class VTTClient extends EventEmitter {
             return;
         }
         this.send('approve_gm', { targetId });
+    }
+
+    // ─── v4.8: Roles (Co-GM / Player / Spectator) ────────────────
+    // GM and Co-GM should be treated the same for "has GM powers"
+    // purposes -- mirrors server/security.js's isGmLike().
+    isGmLike(role = this.myRole) {
+        return role === 'gm' || role === 'co-gm';
+    }
+
+    /** GM-only server-side (a Co-GM sender is rejected by the server) --
+     *  `role` is 'co-gm' | 'player' | 'spectator'; `persist` mirrors the
+     *  server's session-only vs. saved distinction for Co-GM grants. */
+    changeRole(targetId, role, persist = false) {
+        if (!targetId || !role) {
+            logger.warn('changeRole called without targetId or role');
+            return;
+        }
+        this.send('role_change_request', { targetId, role, persist });
+    }
+
+    // ─── v4.8: Character registration (claim/release) ───────────
+    claimCharacter(characterId, character) {
+        this.send('claim-character', { characterId, character });
+    }
+
+    releaseCharacter() {
+        this.send('release-character', {});
     }
 
     // ─── Ban / Kick ──────────────────────────────────────────────

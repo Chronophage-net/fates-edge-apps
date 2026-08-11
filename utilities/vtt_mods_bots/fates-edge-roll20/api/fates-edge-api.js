@@ -392,6 +392,19 @@ function handleMessage(data) {
             handleGmRoleUpdate(data);
             break;
 
+        // v4.8: Co-GM / Player / Spectator changes -- distinct from
+        // 'gm_role_update' above, which stays dedicated to the single GM
+        // seat. See server/room.js's handleRoleChangeRequest.
+        case 'role_update':
+            handleRoleUpdate(data);
+            break;
+
+        case 'character_claimed':
+        case 'character_released':
+            // No Roll20-side state to update yet (this script doesn't
+            // track claims locally) -- just surfaced to chat for now.
+            break;
+
         case 'server_announcement':
             handleServerAnnouncement(data);
             break;
@@ -1154,6 +1167,25 @@ function handleGmRoleUpdate(data) {
     sendToChat('👑 ' + escapeChatText(name) + ' is now ' + role.toUpperCase() + '.');
 }
 
+// v4.8: Co-GM / Player / Spectator role update -- `data.targetId` (not
+// `clientId`) is who the change applies to.
+function handleRoleUpdate(data) {
+    var targetId = data.targetId;
+    var role = data.role;
+    var persist = data.persist;
+    if (targetId === clientId) {
+        myRole = role;
+    }
+    if (clients[targetId]) {
+        clients[targetId].role = role;
+    }
+    updateGMUI();
+    var name = clients[targetId] ? clients[targetId].name : targetId;
+    var roleLabels = { 'co-gm': 'Co-GM', player: 'Player', spectator: 'Spectator' };
+    var persistNote = role === 'co-gm' ? (persist ? ' (saved)' : ' (this session only)') : '';
+    sendToChat('🎭 ' + escapeChatText(name) + ' is now ' + (roleLabels[role] || role) + persistNote + '.');
+}
+
 function handleServerAnnouncement(data) {
     sendToChat('📢 ' + escapeChatText(data.message));
 }
@@ -1409,6 +1441,42 @@ function approveGM(targetId) {
     pendingRequests = pendingRequests.filter(function(r) { return r.requesterId !== targetId; });
     updateGMUI();
     sendToChat('✅ Approved GM for ' + targetId);
+}
+
+// ============================================================
+// v4.8: Role (Co-GM / Player / Spectator) + Character Registration
+// Public Methods
+// ============================================================
+
+// GM-only server-side (a Co-GM sender is rejected by the server) --
+// `role` is 'co-gm' | 'player' | 'spectator'; `persist` mirrors the
+// server's session-only vs. saved distinction for Co-GM grants.
+function changeRole(targetId, role, persist) {
+    if (!connected) {
+        log('Not connected - cannot change role', 'error');
+        return false;
+    }
+    if (myRole !== 'gm') {
+        sendToChat('❌ Only the current GM can change roles.');
+        return false;
+    }
+    sendMessage({ type: 'role_change_request', targetId: targetId, role: role, persist: !!persist });
+    return true;
+}
+
+function claimCharacter(characterId, character) {
+    if (!connected) {
+        log('Not connected - cannot claim character', 'error');
+        return false;
+    }
+    sendMessage({ type: 'claim-character', characterId: characterId, character: character });
+    return true;
+}
+
+function releaseCharacter() {
+    if (!connected) return false;
+    sendMessage({ type: 'release-character' });
+    return true;
 }
 
 function rejectGM(targetId) {
@@ -1803,6 +1871,54 @@ function registerCommands() {
                             sendToChat('👥 **Clients**\n' + clientList);
                         } else {
                             sendToChat('GM Commands:\n!fates-edge gm request        - Request to become GM\n!fates-edge gm approve <name> - Approve a pending GM request (GM only)\n!fates-edge gm reject <name>  - Reject a pending GM request (GM only)\n!fates-edge gm status         - Show current GM and pending requests\n!fates-edge gm list           - List all clients with roles');
+                        }
+                        break;
+
+                    // ─── v4.8: Role Commands (Co-GM / Player / Spectator) ────
+                    // Separate from 'gm' above, which stays dedicated to the
+                    // single GM seat -- promoting/demoting anyone else goes
+                    // through here instead.
+                    case 'role':
+                        var roleSub = args[2] || '';
+                        var roleParams = args.slice(3);
+
+                        if (roleSub === 'set') {
+                            var roleTarget = roleParams[0];
+                            var roleValue = roleParams[1];
+                            var rolePersist = roleParams[2] === 'save';
+                            if (!roleTarget || !roleValue) {
+                                sendToChat('Usage: !fates-edge role set <player> <co-gm|player|spectator> [save]');
+                                break;
+                            }
+                            var rTarget = null;
+                            for (var rid in clients) {
+                                if (clients.hasOwnProperty(rid)) {
+                                    var rc = clients[rid];
+                                    if (rc.id === roleTarget || rc.name.toLowerCase() === roleTarget.toLowerCase()) {
+                                        rTarget = rc;
+                                        break;
+                                    }
+                                }
+                            }
+                            if (!rTarget) {
+                                sendToChat('❌ Client "' + roleTarget + '" not found. Use !fates-edge role list to see clients.');
+                                break;
+                            }
+                            if (changeRole(rTarget.id, roleValue, rolePersist)) {
+                                sendToChat('🎭 Requested: ' + rTarget.name + ' → ' + roleValue + (rolePersist ? ' (saved)' : ''));
+                            }
+                        } else if (roleSub === 'list') {
+                            var roleList = '';
+                            for (var lid in clients) {
+                                if (clients.hasOwnProperty(lid)) {
+                                    var lc = clients[lid];
+                                    var lIsSelf = lc.id === clientId ? ' (you)' : '';
+                                    roleList += lc.name + lIsSelf + ' — ' + lc.role + '\n';
+                                }
+                            }
+                            sendToChat('🎭 **Roles**\n' + roleList);
+                        } else {
+                            sendToChat('Role Commands:\n!fates-edge role set <player> <co-gm|player|spectator> [save] - Change a client\'s role (GM only; "save" persists a Co-GM grant across reconnects)\n!fates-edge role list - List all clients with roles');
                         }
                         break;
 

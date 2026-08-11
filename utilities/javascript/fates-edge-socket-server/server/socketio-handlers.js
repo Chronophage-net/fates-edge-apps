@@ -8,7 +8,7 @@ const deck = require('./deck.js');
 const logger = require('./logger.js').createLogger(process.env.LOG_LEVEL || 'INFO');
 const fs = require('fs');
 const path = require('path');
-const { buildSafeDict, isSafeModuleId, clampCount, clampString, MAX_NAME_LENGTH, sanitizeCharacterSelection } = require('./security.js');
+const { buildSafeDict, isSafeModuleId, clampCount, clampString, MAX_NAME_LENGTH, sanitizeCharacterSelection, isGmLike } = require('./security.js');
 const adventure = require('./adventure.js');
 const auth = require('./auth.js');
 const turn = require('./turn.js');
@@ -154,8 +154,23 @@ function setupSocketIO(io, appConfig) {
                 }
             }
 
-            // GM conflict
-            let assignedRole = playerRole;
+            // GM conflict + role validation.
+            //
+            // NEW (v4.8): a client's self-declared `playerRole` is only
+            // trusted for 'gm'/'player'/'spectator' -- 'co-gm' can ONLY be
+            // reached by inheriting a previously-saved grant from
+            // `membership.role` (set via room.handleRoleChangeRequest with
+            // persist:true). Without this, any client could just claim
+            // `role: 'co-gm'` on join and get full GM powers unchecked.
+            let assignedRole = auth.isValidRole(playerRole) ? playerRole : 'player';
+            if (assignedRole === 'co-gm' && membership?.role !== 'co-gm') {
+                assignedRole = 'player';
+            }
+            // A returning member with a saved Co-GM grant gets it back
+            // automatically, even if their client didn't ask for it.
+            if (assignedRole !== 'gm' && membership?.role === 'co-gm') {
+                assignedRole = 'co-gm';
+            }
             const existingGm = room.getExistingGm(currentRoom);
             if (assignedRole === 'gm' && existingGm) {
                 assignedRole = 'player';
@@ -181,6 +196,28 @@ function setupSocketIO(io, appConfig) {
                 storage.upsertMembership(roomKey, authUser.userId, {}).catch(e =>
                     logger.warn('Failed to upsert room membership', { error: e.message })
                 );
+            }
+
+            // v4.8: re-resolve a previously-claimed character on rejoin,
+            // so a returning player doesn't have to re-pick it every time.
+            // Best-effort -- a missing/renamed character or a fresh room
+            // (whose in-memory roster doesn't have this claim's character
+            // yet) just leaves the player unclaimed, same as a first join.
+            if (authUser && hasAccountSupport() && typeof storage.getCharacterClaim === 'function') {
+                try {
+                    const claim = await storage.getCharacterClaim(roomKey, authUser.userId);
+                    if (claim) {
+                        if (!currentRoom.characterClaims) currentRoom.characterClaims = Object.create(null);
+                        const existingChar = Object.values(currentRoom.characters || {}).find(c => c.ownerId === authUser.userId);
+                        if (existingChar) {
+                            currentRoom.characterClaims[authUser.userId] = room.normalizeCharKey(existingChar.name);
+                            socket.clientData.selectedCharacter = existingChar.name;
+                            socket.clientData.selectedCharacters = [existingChar.name];
+                        }
+                    }
+                } catch (e) {
+                    logger.warn('Failed to resolve character claim on join', { error: e.message });
+                }
             }
 
             const clientsList = room.getClientsList(currentRoom);
@@ -257,6 +294,51 @@ function setupSocketIO(io, appConfig) {
             const targetId = data?.targetId;
             if (!targetId) return;
             room.handleGmApproval(r, socket.id, targetId);
+        });
+
+        // ─── v4.8: Role management (Co-GM / Player / Spectator) ─────
+        // GM-only (enforced inside room.handleRoleChangeRequest via
+        // canManageGmSeat()) -- promotes/demotes anyone except the GM
+        // seat itself, which stays on request_gm/approve_gm above.
+        socket.on('role_change_request', (data, callback) => {
+            const cb = typeof callback === 'function' ? callback : () => {};
+            if (!socket.room) return cb({ ok: false, error: 'Not in a room' });
+            const r = room.rooms.get(socket.room);
+            if (!r) return cb({ ok: false, error: 'Room not found' });
+            const { targetId, role, persist } = data || {};
+            if (!targetId || !role) return cb({ ok: false, error: 'Missing targetId or role' });
+            if (!auth.isValidRole(role) || role === 'gm') return cb({ ok: false, error: 'Invalid role' });
+            const result = room.handleRoleChangeRequest(r, socket.id, targetId, role, !!persist);
+            cb(result);
+        });
+
+        // ─── v4.8: Character registration (claim/release) ───────────
+        // Binds an account-owned character (from GET /api/account/characters)
+        // to this room's live roster for the calling account. Requires the
+        // socket to have joined with a valid account token (socket.clientData.
+        // userId) -- see join-room below, which sets this from auth.verifyTokenOptional.
+        socket.on('claim-character', (data, callback) => {
+            const cb = typeof callback === 'function' ? callback : () => {};
+            if (!socket.room) return cb({ ok: false, error: 'Not in a room' });
+            const r = room.rooms.get(socket.room);
+            if (!r) return cb({ ok: false, error: 'Room not found' });
+            const clientEntry = r.clients.get(socket.id);
+            if (!clientEntry) return cb({ ok: false, error: 'Client not found' });
+            const { characterId, character } = data || {};
+            if (!characterId || !character) return cb({ ok: false, error: 'Missing characterId or character' });
+            const result = room.claimCharacter(r, clientEntry, characterId, character);
+            cb(result);
+        });
+
+        socket.on('release-character', (data, callback) => {
+            const cb = typeof callback === 'function' ? callback : () => {};
+            if (!socket.room) return cb({ ok: false, error: 'Not in a room' });
+            const r = room.rooms.get(socket.room);
+            if (!r) return cb({ ok: false, error: 'Room not found' });
+            const clientEntry = r.clients.get(socket.id);
+            if (!clientEntry) return cb({ ok: false, error: 'Client not found' });
+            const result = room.releaseCharacter(r, clientEntry);
+            cb(result);
         });
 
         // ─── Deck operations ────────────────────────────────────────
@@ -685,7 +767,7 @@ function setupSocketIO(io, appConfig) {
         // client-facing way for a GM to add/change/clear it mid-session,
         // mirroring the REST admin route POST /api/rooms/:code/password.
         socket.on('set_room_password', async (data) => {
-            if (!socket.room || socket.clientData.role !== 'gm') return;
+            if (!socket.room || !isGmLike(socket.clientData.role)) return;
             const r = room.rooms.get(socket.room);
             if (!r) return;
             const password = data && data.password;
@@ -701,7 +783,7 @@ function setupSocketIO(io, appConfig) {
 
         // ─── Ban/Kick ───────────────────────────────────────────────
         socket.on('kick_client', (data) => {
-            if (!socket.room || socket.clientData.role !== 'gm') return;
+            if (!socket.room || !isGmLike(socket.clientData.role)) return;
             const r = room.rooms.get(socket.room);
             if (!r) return;
             room.kickClient(r, data.targetId, data.reason || 'Kicked by GM');
@@ -709,7 +791,7 @@ function setupSocketIO(io, appConfig) {
         });
 
         socket.on('ban_client', (data) => {
-            if (!socket.room || socket.clientData.role !== 'gm') return;
+            if (!socket.room || !isGmLike(socket.clientData.role)) return;
             const r = room.rooms.get(socket.room);
             if (!r) return;
             room.banClient(r, data.targetId, data.reason || 'Banned by GM');
@@ -717,7 +799,7 @@ function setupSocketIO(io, appConfig) {
         });
 
         socket.on('unban_client', (data) => {
-            if (!socket.room || socket.clientData.role !== 'gm') return;
+            if (!socket.room || !isGmLike(socket.clientData.role)) return;
             const r = room.rooms.get(socket.room);
             if (!r) return;
             room.unbanClient(r, data.targetId);

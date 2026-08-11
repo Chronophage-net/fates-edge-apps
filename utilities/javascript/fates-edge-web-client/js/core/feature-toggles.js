@@ -76,6 +76,20 @@ export function getMyStoredRole() {
     return localStorage.getItem(ROLE_KEY) || 'player';
 }
 
+// ─── v4.8: Co-GM / Spectator ──────────────────────────────────────────
+// Co-GM gets every GM-gated feature a GM gets (server-side permission
+// checks are the real enforcement; this is just UI visibility). A
+// Spectator gets none of them AND is additionally read-only everywhere
+// else -- see isReadOnlyRole() below, used by feature modules' own
+// write-action gating (buttons, forms, etc.), not just sidebar visibility.
+export function isGmLikeRole(role = getMyStoredRole()) {
+    return role === 'gm' || role === 'co-gm';
+}
+
+export function isReadOnlyRole(role = getMyStoredRole()) {
+    return role === 'spectator';
+}
+
 function setMyStoredRole(role) {
     if (!role || role === getMyStoredRole()) return;
     localStorage.setItem(ROLE_KEY, role);
@@ -138,10 +152,10 @@ export function getFeatureAccess(featureId) {
 
     const role = getMyStoredRole();
 
-    if (ROLE_LOCKED_FEATURES.includes(featureId) && role !== 'gm') {
+    if (ROLE_LOCKED_FEATURES.includes(featureId) && !isGmLikeRole(role)) {
         return { accessible: false, reason: 'gm-only' };
     }
-    if (role === 'gm' && getDisabledSet().has(featureId)) {
+    if (isGmLikeRole(role) && getDisabledSet().has(featureId)) {
         return { accessible: false, reason: 'gm-hidden' };
     }
     return { accessible: true, reason: null };
@@ -212,6 +226,8 @@ export default {
     TOGGLEABLE_FEATURES,
     ROLE_LOCKED_FEATURES,
     getMyStoredRole,
+    isGmLikeRole,
+    isReadOnlyRole,
     getFeatureAccess,
     isFeatureVisible,
     getFeatureLockMessage,

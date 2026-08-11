@@ -21,7 +21,7 @@ import {
 import { openTracker } from './combat.js';
 import { getObjectiveType, DEFAULT_OBJECTIVE_TYPE } from '../../core/objective-types.js';
 // ─── Role check ──────────────────────────────────────────────
-import { getMyStoredRole } from '../../core/feature-toggles.js';
+import { getMyStoredRole, isGmLikeRole } from '../../core/feature-toggles.js';
 import { isConnectedToServer } from '../../core/websocket.js'
 let container = null;
 let bestiaryData = [];
@@ -102,7 +102,7 @@ const QUICK_TIMERS = [
 
 function isGM() {
     if (!isConnectedToServer()) return true; // solo/local – allow all
-    return getMyStoredRole() === 'gm';
+    return isGmLikeRole(getMyStoredRole());
 }
 
 // ============================================================

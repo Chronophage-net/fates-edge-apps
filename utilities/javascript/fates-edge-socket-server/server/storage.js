@@ -165,6 +165,26 @@ async function initSqlite() {
     `);
     await run(`CREATE INDEX IF NOT EXISTS idx_characters_user ON characters (user_id)`);
 
+    // v4.8: roles + character registration.
+    // `room_memberships.role` predates the gm/co-gm/player/spectator enum
+    // and defaulted to 'member', a value that was never actually a real
+    // role -- back-fill it to 'player' so every existing row lands in the
+    // new enum instead of silently falling into neither bucket.
+    await run(`UPDATE room_memberships SET role = 'player' WHERE role = 'member' OR role IS NULL`);
+
+    // One claimed character per (room, user) -- the bridge between the
+    // account-owned character LIBRARY (`characters` above) and a room's
+    // live character roster (room.characters in room.js).
+    await run(`
+        CREATE TABLE IF NOT EXISTS room_character_claims (
+            room_code TEXT NOT NULL,
+            user_id TEXT NOT NULL,
+            character_id TEXT NOT NULL,
+            claimed_at INTEGER,
+            PRIMARY KEY (room_code, user_id)
+        )
+    `);
+
     return {
         async save(roomCode, campaignCode, data) {
             const now = Date.now();
@@ -350,6 +370,31 @@ async function initSqlite() {
             return true; // sqlite3's run() doesn't reliably expose affected rows via promisify; existence was already checked by callers via getCharacterById
         },
 
+        // ─── Character claims (room live roster <-> account library) ──
+        async setCharacterClaim(roomCode, userId, characterId) {
+            const now = Date.now();
+            await run(
+                `INSERT OR REPLACE INTO room_character_claims (room_code, user_id, character_id, claimed_at)
+                 VALUES (?, ?, ?, ?)`,
+                [roomCode, userId, characterId, now]
+            );
+            return { roomCode, userId, characterId, claimedAt: now };
+        },
+
+        async getCharacterClaim(roomCode, userId) {
+            return (await get('SELECT * FROM room_character_claims WHERE room_code = ? AND user_id = ?', [roomCode, userId])) || null;
+        },
+
+        async deleteCharacterClaim(roomCode, userId) {
+            await run('DELETE FROM room_character_claims WHERE room_code = ? AND user_id = ?', [roomCode, userId]);
+            return true;
+        },
+
+        async getClaimsForRoom(roomCode) {
+            const rows = await all('SELECT * FROM room_character_claims WHERE room_code = ?', [roomCode]);
+            return rows.map(r => ({ roomCode: r.room_code, userId: r.user_id, characterId: r.character_id, claimedAt: r.claimed_at }));
+        },
+
         close() {
             return new Promise((resolve, reject) => {
                 _db.close((err) => {
@@ -436,6 +481,18 @@ async function initPostgres() {
             )
         `);
         await client.query(`CREATE INDEX IF NOT EXISTS idx_characters_user ON characters (user_id)`);
+
+        // v4.8: roles + character registration -- see SQLite driver comment.
+        await client.query(`UPDATE room_memberships SET role = 'player' WHERE role = 'member' OR role IS NULL`);
+        await client.query(`
+            CREATE TABLE IF NOT EXISTS room_character_claims (
+                room_code TEXT NOT NULL,
+                user_id TEXT NOT NULL,
+                character_id TEXT NOT NULL,
+                claimed_at BIGINT,
+                PRIMARY KEY (room_code, user_id)
+            )
+        `);
     } finally {
         client.release();
     }
@@ -625,6 +682,35 @@ async function initPostgres() {
             return res.rowCount > 0;
         },
 
+        // ─── Character claims (room live roster <-> account library) ──
+        async setCharacterClaim(roomCode, userId, characterId) {
+            const now = Date.now();
+            await pool.query(
+                `INSERT INTO room_character_claims (room_code, user_id, character_id, claimed_at)
+                 VALUES ($1, $2, $3, $4)
+                 ON CONFLICT (room_code, user_id) DO UPDATE SET
+                     character_id = EXCLUDED.character_id,
+                     claimed_at = EXCLUDED.claimed_at`,
+                [roomCode, userId, characterId, now]
+            );
+            return { roomCode, userId, characterId, claimedAt: now };
+        },
+
+        async getCharacterClaim(roomCode, userId) {
+            const res = await pool.query('SELECT * FROM room_character_claims WHERE room_code = $1 AND user_id = $2', [roomCode, userId]);
+            return res.rows[0] || null;
+        },
+
+        async deleteCharacterClaim(roomCode, userId) {
+            await pool.query('DELETE FROM room_character_claims WHERE room_code = $1 AND user_id = $2', [roomCode, userId]);
+            return true;
+        },
+
+        async getClaimsForRoom(roomCode) {
+            const res = await pool.query('SELECT * FROM room_character_claims WHERE room_code = $1', [roomCode]);
+            return res.rows.map(r => ({ roomCode: r.room_code, userId: r.user_id, characterId: r.character_id, claimedAt: Number(r.claimed_at) }));
+        },
+
         close() {
             return pool.end();
         }
@@ -706,6 +792,18 @@ async function initMysql() {
                 created_at BIGINT,
                 updated_at BIGINT,
                 INDEX idx_characters_user (user_id)
+            )
+        `);
+
+        // v4.8: roles + character registration -- see SQLite driver comment.
+        await conn.query(`UPDATE room_memberships SET role = 'player' WHERE role = 'member' OR role IS NULL`);
+        await conn.query(`
+            CREATE TABLE IF NOT EXISTS room_character_claims (
+                room_code VARCHAR(64) NOT NULL,
+                user_id VARCHAR(36) NOT NULL,
+                character_id VARCHAR(36) NOT NULL,
+                claimed_at BIGINT,
+                PRIMARY KEY (room_code, user_id)
             )
         `);
     } finally {
@@ -905,6 +1003,33 @@ async function initMysql() {
             return result.affectedRows > 0;
         },
 
+        // ─── Character claims (room live roster <-> account library) ──
+        async setCharacterClaim(roomCode, userId, characterId) {
+            const now = Date.now();
+            await pool.query(
+                `INSERT INTO room_character_claims (room_code, user_id, character_id, claimed_at)
+                 VALUES (?, ?, ?, ?)
+                 ON DUPLICATE KEY UPDATE character_id = VALUES(character_id), claimed_at = VALUES(claimed_at)`,
+                [roomCode, userId, characterId, now]
+            );
+            return { roomCode, userId, characterId, claimedAt: now };
+        },
+
+        async getCharacterClaim(roomCode, userId) {
+            const [rows] = await pool.query('SELECT * FROM room_character_claims WHERE room_code = ? AND user_id = ?', [roomCode, userId]);
+            return rows[0] || null;
+        },
+
+        async deleteCharacterClaim(roomCode, userId) {
+            await pool.query('DELETE FROM room_character_claims WHERE room_code = ? AND user_id = ?', [roomCode, userId]);
+            return true;
+        },
+
+        async getClaimsForRoom(roomCode) {
+            const [rows] = await pool.query('SELECT * FROM room_character_claims WHERE room_code = ?', [roomCode]);
+            return rows.map(r => ({ roomCode: r.room_code, userId: r.user_id, characterId: r.character_id, claimedAt: Number(r.claimed_at) }));
+        },
+
         close() {
             return pool.end();
         }
@@ -1040,6 +1165,27 @@ async function deleteCharacter(userId, characterId) {
     return d.deleteCharacter(userId, characterId);
 }
 
+// ─── v4.8: character claims (room live roster <-> account library) ──
+async function setCharacterClaim(roomCode, userId, characterId) {
+    const d = await init();
+    return d.setCharacterClaim(roomCode, userId, characterId);
+}
+
+async function getCharacterClaim(roomCode, userId) {
+    const d = await init();
+    return d.getCharacterClaim(roomCode, userId);
+}
+
+async function deleteCharacterClaim(roomCode, userId) {
+    const d = await init();
+    return d.deleteCharacterClaim(roomCode, userId);
+}
+
+async function getClaimsForRoom(roomCode) {
+    const d = await init();
+    return d.getClaimsForRoom(roomCode);
+}
+
 module.exports = {
     saveCampaign,
     loadCampaign,
@@ -1065,4 +1211,9 @@ module.exports = {
     createCharacter,
     updateCharacterById,
     deleteCharacter,
+    // v4.8: character claims
+    setCharacterClaim,
+    getCharacterClaim,
+    deleteCharacterClaim,
+    getClaimsForRoom,
 };

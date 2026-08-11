@@ -459,7 +459,7 @@ socket.emit('roll-dice', { roll: '3d6+2', reason: 'Damage' });
 ### Authorization
 - Room owner permissions (delete, clear chat)
 - Master key permissions (API key management, analytics)
-- User role-based access (player, observer)
+- User role-based access: `gm` | `co-gm` | `player` | `spectator` (see "Roles & Character Registration (v4.8)" below)
 
 ### Data Validation
 - Input sanitization and validation
@@ -476,6 +476,76 @@ socket.emit('roll-dice', { roll: '3d6+2', reason: 'Damage' });
 - Content Security Policy
 - HSTS (in production)
 - XSS protection
+
+---
+
+## Roles & Character Registration (v4.8)
+
+### Room roles
+
+Every connected client has exactly one role, stored on `client.role` (in-memory,
+per connection) and mirrored to `room_memberships.role` (persistent, per
+account) when the client is authenticated:
+
+| Role | Notes |
+|---|---|
+| `gm` | Room owner. Exactly one per room. Assigned via the existing `request_gm`/`approve_gm` socket events -- unchanged by this feature. |
+| `co-gm` | Every GM permission (deck control, character edits, kick/ban, room password) except transferring/revoking the GM seat, promoting/demoting another Co-GM, or deleting/resetting the room. Multiple Co-GMs are allowed per room, uncapped. Only the GM can grant/revoke it. |
+| `player` | Default role. Controls exactly one *claimed* character (see below); can edit only that character. |
+| `spectator` | Fully read-only, public state only -- no character control, no writes, no GM-only/secret data. |
+
+Role changes (other than the GM seat itself) go through the socket event
+`role_change_request { targetId, role, persist }`, handled by
+`room.handleRoleChangeRequest()`:
+- Only a strict `role === 'gm'` sender is authorized (`security.canManageGmSeat()`)
+  -- a Co-GM cannot promote or demote anyone.
+- `persist: false` (the default) flips `client.role` for the current connection
+  only; nothing is written to storage, so it reverts to whatever's on file
+  the next time that user joins. Good for "run tonight's fight scene."
+- `persist: true` also calls the existing `_persistRole()` helper (the same
+  one `handleGmApproval()` already used for the GM seat), writing through to
+  `room_memberships.role` so the grant survives reconnects.
+- Demotions always persist, regardless of how the promotion was made, so a
+  saved Co-GM can be fully revoked, not just silenced for one session.
+- The server broadcasts `role_update { targetId, role, byId, persist }` to
+  the room on every change.
+
+Anywhere the codebase used to gate an action on `client.role === 'gm'`
+(kick/ban/room-password, most GM-tools actions) now uses
+`security.isGmLike(role)` instead, so Co-GM gets the same access. The three
+seat-management actions (GM handoff, Co-GM promotion/demotion, room
+delete/reset) stay on the strict `=== 'gm'` check via `canManageGmSeat()`.
+
+A client's self-declared role on join is only trusted for
+`gm`/`player`/`spectator` -- `co-gm` is never accepted from the client
+itself. It's only restored automatically when the account's persisted
+`room_memberships.role` already says `co-gm` (i.e., a previously *saved*
+grant), so nobody can just claim Co-GM by asking for it at join time.
+
+### Character registration (claim/release)
+
+Bridges the account-owned character *library* (`GET/POST/PUT/DELETE
+/api/account/characters`, capped at `storage.MAX_CHARACTERS_PER_USER`) to a
+room's live character roster (`room.characters`), via a new
+`room_character_claims` table: one row per `(room_code, user_id)`, enforcing
+one live claim per player per room.
+
+- `POST /api/rooms/:code/claim-character { characterId }` (JWT-authed) --
+  binds a saved character to this room, applying immediately to the live
+  roster if the room happens to be active, and always persisting the claim
+  row regardless. Claiming again replaces the previous claim.
+- `DELETE /api/rooms/:code/claim-character` -- releases it (the character
+  stays in the account library).
+- `GET /api/rooms/:code/claim-character` -- reads back the current claim.
+- Equivalent socket events `claim-character` / `release-character` do the
+  same thing for an already-connected client.
+- On join/rejoin (both Socket.IO and plain WebSocket transports), a
+  previously-saved claim auto-resolves against the room's live roster, so a
+  returning player doesn't have to re-pick their character every session.
+- The claimed character's roster record gets an `ownerId` field. A Player
+  may only write to a character where `room.characterClaims[userId] ===
+  normalizeCharKey(name)` (checked via `room.canEditCharacter()`); GM/Co-GM
+  bypass this check; a Spectator never passes it.
 
 ---
 

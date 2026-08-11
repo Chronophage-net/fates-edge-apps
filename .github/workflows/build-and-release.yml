@@ -308,13 +308,31 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: npm
-          cache-dependency-path: utilities/javascript/fates-edge-desktop-client/package-lock.json
+          cache-dependency-path: |
+            utilities/javascript/fates-edge-desktop-client/package-lock.json
+            utilities/javascript/fates-edge-web-client/package-lock.json
 
       - name: Install Linux build dependencies
         if: matrix.platform == 'linux'
         run: |
           sudo apt-get update
           sudo apt-get install -y rpm
+
+      # ─── Web Client (renderer source) ──────────────────────────
+      # The desktop client's prebuild:* step (copy-renderer.js) copies
+      # ../fates-edge-web-client/dist into renderer/ and fails loudly if
+      # that dist/ doesn't exist yet. build-desktop runs on its own
+      # matrix of runners/checkouts, separate from build-components (which
+      # does build the web client) -- so without this step, dist/ is
+      # simply never produced here and every desktop platform build fails
+      # at prebuild:${{ matrix.platform }} before electron-builder even runs.
+      - name: Build Web Client (for renderer)
+        working-directory: utilities/javascript/fates-edge-web-client
+        shell: bash
+        run: |
+          npm ci
+          npm run build
+          ls -la dist/
 
       - name: Install dependencies
         working-directory: utilities/javascript/fates-edge-desktop-client

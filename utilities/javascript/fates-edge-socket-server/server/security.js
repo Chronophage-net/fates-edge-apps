@@ -197,6 +197,32 @@ function createRateLimiter({ windowMs = 15 * 60 * 1000, max = 10, message = 'Too
     return middleware;
 }
 
+// ─── v4.8: roles ────────────────────────────────────────────────────
+// A room has exactly one 'gm' (unchanged invariant) plus zero or more
+// 'co-gm's. Co-GM has every GM permission EXCEPT seat management: it
+// cannot transfer/revoke the GM seat, promote/demote another Co-GM, or
+// delete/reset the room. Those three stay gated on a strict `=== 'gm'`
+// check at the call site (see room.js's handleGmApproval /
+// handleRoleChangeRequest) -- everything else that used to check
+// `role === 'gm'` should switch to isGmLike(role) below.
+const GM_LIKE_ROLES = new Set(['gm', 'co-gm']);
+
+function isGmLike(role) {
+    return GM_LIKE_ROLES.has(role);
+}
+
+/** Only the room's GM (not a Co-GM) may promote/demote Co-GMs, transfer
+ *  the GM seat, or delete/reset the room. */
+function canManageGmSeat(role) {
+    return role === 'gm';
+}
+
+/** Spectators are read-only everywhere: no character control, no deck/
+ *  adventure actions, no secret/GM-only data. */
+function isSpectator(role) {
+    return role === 'spectator';
+}
+
 module.exports = {
     UNSAFE_KEYS,
     safeAssign,
@@ -212,5 +238,9 @@ module.exports = {
     isValidLength,
     clampString,
     MAX_CONTROLLED_CHARACTERS,
+    GM_LIKE_ROLES,
+    isGmLike,
+    canManageGmSeat,
+    isSpectator,
     sanitizeCharacterSelection,
 };

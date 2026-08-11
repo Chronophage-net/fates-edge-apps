@@ -109,6 +109,11 @@ const eventHandlers = {
     'presence': [],
     'gm_vote_request': [],
     'gm_role_update': [],
+    // v4.8: Co-GM / Player / Spectator changes -- distinct from
+    // 'gm_role_update' above, which stays dedicated to the single GM seat.
+    'role_update': [],
+    'character_claimed': [],
+    'character_released': [],
     'server_announcement': [],
 
     // Whiteboard sync events
@@ -485,6 +490,18 @@ function handleWebSocketMessage(data) {
 
         case 'gm_role_update':
             triggerEvent('gm_role_update', data);
+            break;
+
+        case 'role_update':
+            triggerEvent('role_update', data);
+            break;
+
+        case 'character_claimed':
+            triggerEvent('character_claimed', data);
+            break;
+
+        case 'character_released':
+            triggerEvent('character_released', data);
             break;
 
         case 'server_announcement':
@@ -982,6 +999,18 @@ function setupSocketIOListeners() {
 
     socket.on('gm_role_update', (data) => {
         triggerEvent('gm_role_update', data);
+    });
+
+    socket.on('role_update', (data) => {
+        triggerEvent('role_update', data);
+    });
+
+    socket.on('character_claimed', (data) => {
+        triggerEvent('character_claimed', data);
+    });
+
+    socket.on('character_released', (data) => {
+        triggerEvent('character_released', data);
     });
 
     socket.on('server_announcement', (data) => {

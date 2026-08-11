@@ -106,6 +106,17 @@ function isValidPassword(password) {
     return typeof password === 'string' && password.length >= 8 && password.length <= 256;
 }
 
+// ─── v4.8: room roles ───────────────────────────────────────────────
+// gm/co-gm/player/spectator. 'member' is intentionally NOT in this set --
+// it was room_memberships.role's old default before this enum existed,
+// and storage.js's init() back-fills any lingering 'member' rows to
+// 'player' on startup, so callers should never see or accept it again.
+const VALID_ROLES = new Set(['gm', 'co-gm', 'player', 'spectator']);
+
+function isValidRole(role) {
+    return typeof role === 'string' && VALID_ROLES.has(role);
+}
+
 module.exports = {
     hashPassword,
     verifyPassword,
@@ -115,4 +126,6 @@ module.exports = {
     requireAuth,
     isValidUsername,
     isValidPassword,
+    VALID_ROLES,
+    isValidRole,
 };

@@ -11,7 +11,7 @@ import { createTimerWidget } from '../../components/TimerWidget.js';
 import { escHtml, safeParseInt, generateId } from '../../core/utils.js';
 import { showToast } from '../../components/Toast.js';
 // ─── Role check ──────────────────────────────────────────────
-import { getMyStoredRole } from '../../core/feature-toggles.js';
+import { getMyStoredRole, isGmLikeRole } from '../../core/feature-toggles.js';
 import { isConnectedToServer } from '../../core/websocket.js';
 
 let container = null;
@@ -160,7 +160,7 @@ function closeModal() {
 // ─── Helper to check if current user is GM ──────────────────────────
 function isGM() {
     if (!isConnectedToServer()) return true; // solo/local – allow all
-    return getMyStoredRole() === 'gm';
+    return isGmLikeRole(getMyStoredRole());
 }
 
 // ─── Render ────────────────────────────────────────────────────────────

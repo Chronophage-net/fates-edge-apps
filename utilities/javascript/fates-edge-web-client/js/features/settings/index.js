@@ -661,7 +661,9 @@ export function render(el) {
                     <select id="sync-user-role" style="height: 38px;">
                         <option value="player" ${localStorage.getItem('fates-edge-client-role') === 'player' ? 'selected' : ''}>👤 Player</option>
                         <option value="gm" ${localStorage.getItem('fates-edge-client-role') === 'gm' ? 'selected' : ''}>🎯 GM</option>
+                        <option value="spectator" ${localStorage.getItem('fates-edge-client-role') === 'spectator' ? 'selected' : ''}>👁️ Spectator</option>
                     </select>
+                    <p class="text-muted small" style="font-size:0.7rem;margin:0.2rem 0 0;">Co-GM isn't self-selectable here — it's granted by the room's GM after you join.</p>
                 </div>
  
                 <!-- Avatar Preview -->

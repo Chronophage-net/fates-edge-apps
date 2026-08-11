@@ -1,6 +1,6 @@
 {
   "name": "fates-edge-discord-bot",
-  "version": "4.7.1",
+  "version": "4.8.0",
   "description": "Discord bot for Fate's Edge VTT integration",
   "main": "index.js",
   "scripts": {

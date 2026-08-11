@@ -128,6 +128,45 @@ module.exports = {
                         .setName('list')
                         .setDescription('List all connected clients and their roles')
                 )
+        )
+        // v4.8: Co-GM / Player / Spectator management. Separate from the
+        // 'gm' group above, which stays dedicated to the single GM seat
+        // (request/approve/status/list) -- promoting/demoting anyone else
+        // goes through this group instead.
+        .addSubcommandGroup(subcommandGroup =>
+            subcommandGroup
+                .setName('role')
+                .setDescription('Co-GM / Player / Spectator role management (GM only, except "list")')
+                .addSubcommand(subcommand =>
+                    subcommand
+                        .setName('set')
+                        .setDescription('Set a client\'s role (GM only)')
+                        .addStringOption(option =>
+                            option.setName('player')
+                                .setDescription('Name or ID of the client')
+                                .setRequired(true)
+                        )
+                        .addStringOption(option =>
+                            option.setName('role')
+                                .setDescription('Role to assign')
+                                .setRequired(true)
+                                .addChoices(
+                                    { name: 'Co-GM', value: 'co-gm' },
+                                    { name: 'Player', value: 'player' },
+                                    { name: 'Spectator', value: 'spectator' }
+                                )
+                        )
+                        .addBooleanOption(option =>
+                            option.setName('save')
+                                .setDescription('Save this grant so it survives reconnects (Co-GM only; default: session-only)')
+                                .setRequired(false)
+                        )
+                )
+                .addSubcommand(subcommand =>
+                    subcommand
+                        .setName('list')
+                        .setDescription('List all connected clients and their roles')
+                )
         ),
 
     async execute(interaction, client) {
@@ -138,6 +177,12 @@ module.exports = {
         // Handle GM subcommands
         if (subcommandGroup === 'gm') {
             await handleGMSubcommand(interaction, vtt, subcommand);
+            return;
+        }
+
+        // v4.8: Co-GM / Player / Spectator subcommands
+        if (subcommandGroup === 'role') {
+            await handleRoleSubcommand(interaction, vtt, subcommand);
             return;
         }
 
@@ -262,6 +307,71 @@ async function handleGMSubcommand(interaction, vtt, subcommand) {
 
         default:
             return interaction.editReply('❌ Unknown GM subcommand.');
+    }
+}
+
+// ============================================================
+// v4.8: Role Subcommand Handlers (Co-GM / Player / Spectator)
+// ============================================================
+
+async function handleRoleSubcommand(interaction, vtt, subcommand) {
+    await interaction.deferReply({ ephemeral: true });
+
+    if (!vtt.connected) {
+        return interaction.editReply('❌ Not connected to VTT server');
+    }
+
+    switch (subcommand) {
+        case 'set': {
+            const playerInput = interaction.options.getString('player');
+            const role = interaction.options.getString('role');
+            const save = interaction.options.getBoolean('save') || false;
+
+            const clientEntry = Array.from(vtt.clients.entries()).find(([id, c]) =>
+                id === playerInput || c.name?.toLowerCase() === playerInput.toLowerCase() || c.data?.name?.toLowerCase() === playerInput.toLowerCase()
+            );
+            if (!clientEntry) {
+                return interaction.editReply(`❌ Could not find client "${playerInput}" in the room. Use \`/vtt role list\` to see available clients.`);
+            }
+            const [targetId, targetClient] = clientEntry;
+            const targetName = targetClient.name || targetClient.data?.name || targetId;
+
+            // The server rejects this if the caller isn't the GM
+            // (see room.js's handleRoleChangeRequest/canManageGmSeat), but
+            // fail fast here too so the bot doesn't wait on a round trip
+            // just to relay the same "only the GM can do this" message.
+            if (!vtt.myRole || vtt.myRole !== 'gm') {
+                return interaction.editReply('❌ Only the GM can change roles. (A Co-GM cannot promote/demote another Co-GM.)');
+            }
+
+            vtt.changeRole(targetId, role, save);
+            const roleLabel = { 'co-gm': 'Co-GM', player: 'Player', spectator: 'Spectator' }[role] || role;
+            const persistNote = role === 'co-gm' ? (save ? ' (saved -- survives reconnects)' : ' (this session only)') : '';
+            return interaction.editReply(`🎭 Requested: ${targetName} → **${roleLabel}**${persistNote}.`);
+        }
+
+        case 'list': {
+            if (vtt.clients.size === 0) {
+                return interaction.editReply('No clients in room.');
+            }
+            const roleLabels = { gm: '👑 GM', 'co-gm': '🎭 Co-GM', player: '🧑 Player', spectator: '👁️ Spectator' };
+            const clientList = Array.from(vtt.clients.values()).map(c => {
+                const name = c.name || c.data?.name || c.id;
+                const isSelf = c.id === vtt.clientId ? ' (you)' : '';
+                const label = roleLabels[c.role] || c.role || 'player';
+                return `**${name}**${isSelf} — ${label}`;
+            }).join('\n');
+            const embed = new EmbedBuilder()
+                .setColor(0x43b581)
+                .setTitle(`🎭 Roles in ${vtt.roomCode}`)
+                .setDescription(clientList)
+                .setFooter({ text: `Total: ${vtt.clients.size} clients` })
+                .setTimestamp();
+            return interaction.editReply({ embeds: [embed] });
+        }
+
+        default:
+            return interaction.editReply('❌ Unknown role subcommand.');
     }
 }
 
@@ -568,7 +678,11 @@ async function handleInfo(interaction, vtt) {
         .setColor(0xd4af37)
         .addFields(
             { name: '📊 Stats', value: `Clients: ${clients.length}\nDeck Cards Remaining: ${vtt.deck?.remaining ?? vtt.deck?.cards?.length ?? '?'}`, inline: true },
-            { name: '👥 Clients', value: clients.length ? clients.map(c => `- ${c.name}${c.role === 'gm' ? ' (GM)' : ''}`).join('\n') : 'No clients', inline: true }
+            { name: '👥 Clients', value: clients.length ? clients.map(c => {
+                // v4.8: label all four roles, not just GM.
+                const roleTag = { gm: ' (GM)', 'co-gm': ' (Co-GM)', spectator: ' (Spectator)' }[c.role] || '';
+                return `- ${c.name}${roleTag}`;
+            }).join('\n') : 'No clients', inline: true }
         )
         .setTimestamp();
 

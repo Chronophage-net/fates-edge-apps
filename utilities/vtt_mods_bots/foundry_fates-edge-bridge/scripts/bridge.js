@@ -318,6 +318,18 @@ export const FatesEdgeBridge = {
             case 'gm_role_update':
                 this._handleGmRoleUpdate(data);
                 break;
+            // v4.8: Co-GM / Player / Spectator changes. Distinct from
+            // 'gm_role_update' above, which stays dedicated to the single
+            // GM seat -- see server/room.js's handleRoleChangeRequest.
+            case 'role_update':
+                this._handleRoleUpdate(data);
+                break;
+            case 'character_claimed':
+                Hooks.call('fates-edge-character-claimed', data);
+                break;
+            case 'character_released':
+                Hooks.call('fates-edge-character-released', data);
+                break;
             case 'server_announcement':
                 this._handleServerAnnouncement(data);
                 break;
@@ -829,6 +841,24 @@ export const FatesEdgeBridge = {
         Hooks.call('fates-edge-gm-role-update', data);
     },
     
+    // v4.8: Co-GM / Player / Spectator role update -- `data.targetId` (not
+    // `clientId`) is who the change applies to.
+    _handleRoleUpdate(data) {
+        const { targetId, role, persist } = data;
+        if (targetId === this.clientId) {
+            this.myRole = role;
+        }
+        const target = this.clients.get(targetId);
+        if (target) {
+            target.role = role;
+        }
+        this._updateGmUI();
+        const roleLabels = { 'co-gm': 'Co-GM', player: 'Player', spectator: 'Spectator' };
+        const persistNote = role === 'co-gm' ? (persist ? ' (saved)' : ' (this session only)') : '';
+        ui.notifications.info(`🎭 ${escapeHtml(this.clients.get(targetId)?.name || targetId)} is now ${roleLabels[role] || role}${persistNote}.`);
+        Hooks.call('fates-edge-role-update', data);
+    },
+
     _handleServerAnnouncement(data) {
         ui.notifications.info(`📢 Fate's Edge: ${escapeHtml(data.message)}`);
         ChatMessage.create({
@@ -932,7 +962,34 @@ export const FatesEdgeBridge = {
         this._updateGmUI();
         return this._send('approve_gm', { targetId });
     },
-    
+
+    // ─── v4.8: Roles (Co-GM / Player / Spectator) ────────────────
+    // Mirrors server/security.js's isGmLike() -- Co-GM should be treated
+    // the same as GM for "has GM powers" UI/permission checks.
+    isGmLike(role = this.myRole) {
+        return role === 'gm' || role === 'co-gm';
+    },
+
+    /** GM-only server-side. `role` is 'co-gm' | 'player' | 'spectator';
+     *  `persist` mirrors the server's session-only vs. saved Co-GM grant. */
+    changeRole(targetId, role, persist = false) {
+        if (this.myRole !== 'gm') {
+            ui.notifications.warn('⚠️ Only the current GM can change roles.');
+            return false;
+        }
+        return this._send('role_change_request', { targetId, role, persist });
+    },
+
+    // ─── v4.8: Character registration (claim/release) ───────────
+    claimCharacter(characterId, character) {
+        return this._send('claim-character', { characterId, character });
+    },
+
+    releaseCharacter() {
+        return this._send('release-character', {});
+    },
+
+
     // ─── Adventure Engine send methods ─────────────────────────
     
     sendAdventureLoad(moduleId) {

@@ -4,7 +4,7 @@
  */
 
 const WebSocket = require('ws');
-const { safeAssign, buildSafeDict, UNSAFE_KEYS, MAX_NAME_LENGTH } = require('./security.js');
+const { safeAssign, buildSafeDict, UNSAFE_KEYS, MAX_NAME_LENGTH, isGmLike, canManageGmSeat, isSpectator } = require('./security.js');
 
 // Optional -- room.js stays usable with zero DB configured; these calls
 // are always best-effort (fire-and-forget, errors logged not thrown) and
@@ -16,6 +16,16 @@ function _hasAccountSupport() { return !!(_storage && typeof _storage.setMemberR
 function _persistRole(roomObj, client, role) {
     if (client && client.userId && _hasAccountSupport()) {
         _storage.setMemberRole(roomObj.code, client.userId, role).catch(() => {});
+    }
+}
+function _persistCharacterClaim(roomObj, userId, characterId) {
+    if (userId && characterId && _hasAccountSupport() && typeof _storage.setCharacterClaim === 'function') {
+        _storage.setCharacterClaim(roomObj.code, userId, characterId).catch(() => {});
+    }
+}
+function _persistCharacterRelease(roomObj, userId) {
+    if (userId && _hasAccountSupport() && typeof _storage.deleteCharacterClaim === 'function') {
+        _storage.deleteCharacterClaim(roomObj.code, userId).catch(() => {});
     }
 }
 
@@ -370,6 +380,124 @@ function handleGmApproval(room, approverId, targetId) {
     }
 }
 
+// ---------- v4.8: Role Management (Co-GM / Player / Spectator) ----------
+//
+// Generalizes the GM-only "promote/demote" gesture beyond the single GM
+// seat above. Only the room's GM may call this (checked with
+// canManageGmSeat(), a strict `=== 'gm'` check -- a Co-GM cannot promote
+// another Co-GM, matching the "GM controls Co-GM" decision). The target
+// role must be one of 'co-gm' | 'player' | 'spectator'; transferring the
+// GM seat itself still goes through handleGmApproval() above, not here.
+//
+// `persist`: when promoting to Co-GM, the GM chooses whether the grant is
+// session-only (in-memory `client.role` flip, reverts to whatever's on
+// file next time this user joins) or saved (also written to
+// room_memberships via _persistRole, so it survives reconnects until
+// explicitly demoted). Demotions always persist, so a saved Co-GM can be
+// fully revoked, not just silenced for the current connection.
+const ASSIGNABLE_ROLES = new Set(['co-gm', 'player', 'spectator']);
+
+function handleRoleChangeRequest(room, senderId, targetId, role, persist = false) {
+    const sender = room.clients.get(senderId);
+    const target = room.clients.get(targetId);
+    if (!sender || !target) return { ok: false, error: 'Client not found' };
+    if (!canManageGmSeat(sender.role)) return { ok: false, error: 'Only the GM can change roles' };
+    if (!ASSIGNABLE_ROLES.has(role)) return { ok: false, error: `Cannot assign role "${role}" this way` };
+    if (target.role === 'gm') return { ok: false, error: 'Use GM handoff to change the GM seat' };
+
+    const previousRole = target.role;
+    target.role = role;
+    room.clients.set(targetId, target);
+
+    // Demotions (anything moving OFF co-gm) always write through, even if
+    // the original promotion was session-only -- a standing grant must be
+    // fully revocable, not just suppressed for one connection.
+    const shouldPersist = persist || previousRole === 'co-gm';
+    if (shouldPersist) _persistRole(room, target, role);
+
+    const clientsList = getClientsList(room);
+    broadcastToRoom(room.code, 'presence', { clients: clientsList });
+    broadcastToRoom(room.code, 'role_update', { targetId, role, byId: senderId, persist: shouldPersist });
+
+    const roleLabel = { 'co-gm': 'Co-GM', player: 'Player', spectator: 'Spectator' }[role] || role;
+    broadcastToRoom(room.code, 'server_announcement', {
+        message: `🎭 ${target.name} is now a ${roleLabel}${role === 'co-gm' && !shouldPersist ? ' for this session' : ''}.`,
+        timestamp: Date.now()
+    });
+
+    const send = (client, payload) => {
+        if (client.type === 'socket.io' && client.socket) client.socket.emit('role_update', payload);
+        else if (client.type === 'ws' && client.ws && client.ws.readyState === WebSocket.OPEN) client.ws.send(JSON.stringify({ type: 'role_update', ...payload }));
+    };
+    send(target, { targetId, role, persist: shouldPersist });
+
+    return { ok: true, role, persist: shouldPersist };
+}
+
+// ---------- v4.8: Character Registration (claim/release) ----------
+//
+// Binds one row of the account-owned character library to a room
+// membership: `(room.code, userId) -> characterId`. Enforced as at most
+// one live claim per (room, user) -- claiming a new character replaces
+// any existing claim for that user in this room. The claimed character's
+// live roster record is tagged with `ownerId` so write-permission checks
+// (Player may only edit their OWN character) have something to key off;
+// see socketio-handlers.js / ws-handlers.js's character-update handling.
+function claimCharacter(room, client, characterId, characterSnapshot) {
+    if (!client || !client.userId) return { ok: false, error: 'Account required to claim a character' };
+    if (!characterSnapshot || typeof characterSnapshot.name !== 'string') {
+        return { ok: false, error: 'Invalid character data' };
+    }
+
+    // Release any previous claim by this user in this room first (one
+    // live character per player per room).
+    releaseCharacter(room, client, { silent: true });
+
+    const char = updateCharacter(room, characterSnapshot.name, { ...characterSnapshot, ownerId: client.userId });
+    if (!char) return { ok: false, error: 'Could not register character' };
+
+    if (!room.characterClaims) room.characterClaims = Object.create(null);
+    room.characterClaims[client.userId] = normalizeCharKey(char.name);
+
+    client.selectedCharacter = char.name;
+    client.selectedCharacters = [char.name];
+    room.clients.set(client.id, client);
+
+    _persistCharacterClaim(room, client.userId, characterId);
+
+    broadcastToRoom(room.code, 'presence', { clients: getClientsList(room) });
+    broadcastToRoom(room.code, 'character_claimed', { userId: client.userId, characterId, name: char.name });
+
+    return { ok: true, character: char };
+}
+
+function releaseCharacter(room, client, { silent = false } = {}) {
+    if (!client || !client.userId) return { ok: false, error: 'Account required' };
+    if (!room.characterClaims || !room.characterClaims[client.userId]) {
+        return { ok: true, released: false };
+    }
+    const name = room.characterClaims[client.userId];
+    delete room.characterClaims[client.userId];
+    _persistCharacterRelease(room, client.userId);
+
+    if (!silent) {
+        broadcastToRoom(room.code, 'presence', { clients: getClientsList(room) });
+        broadcastToRoom(room.code, 'character_released', { userId: client.userId, name });
+    }
+    return { ok: true, released: true, name };
+}
+
+/** True if `client` is allowed to write to character `name` -- GM/Co-GM
+ *  always can; a Player only if they hold the claim on that exact
+ *  character; anyone else (including an unclaimed Player) cannot. */
+function canEditCharacter(room, client, name) {
+    if (!client) return false;
+    if (isGmLike(client.role)) return true;
+    if (isSpectator(client.role)) return false;
+    if (!client.userId || !room.characterClaims) return false;
+    return room.characterClaims[client.userId] === normalizeCharKey(name);
+}
+
 // ---------- Broadcast ----------
 let io = null;
 function setIo(ioInstance) { io = ioInstance; }
@@ -417,6 +545,8 @@ function createRoom(roomCode) {
         created: Date.now(),
         whiteboard: createDefaultWhiteboard(),
         characters: Object.create(null),
+        // v4.8: userId -> normalized character key, one claim per user.
+        characterClaims: Object.create(null),
         banned: new Set(),
         password: null,
         data: {}
@@ -482,6 +612,10 @@ module.exports = {
     setMemberBannedByUserId,
     handleGmRequest,
     handleGmApproval,
+    handleRoleChangeRequest,
+    claimCharacter,
+    releaseCharacter,
+    canEditCharacter,
     setIo,
     broadcastToRoom,
     createRoom,

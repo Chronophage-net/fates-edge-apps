@@ -76,6 +76,27 @@ module.exports = {
             });
         });
 
+        // 2b. v4.8: Co-GM / Player / Spectator role update. Distinct from
+        // 'gmRoleUpdate' above (the single GM seat) -- see websocket.js's
+        // 'role_update' case for why these are separate events.
+        vtt.on('roleUpdate', (data) => {
+            const channel = getLogChannel();
+            if (!channel) return;
+            const { targetId, role, persist } = data;
+            const target = vtt.clients.get(targetId);
+            const name = target ? (target.name || target.data?.name || targetId) : targetId;
+            const roleColors = { 'co-gm': 0xf0a500, player: 0x43b581, spectator: 0x7289da };
+            const roleLabels = { 'co-gm': 'Co-GM', player: 'Player', spectator: 'Spectator' };
+            channel.send({
+                embeds: [{
+                    color: roleColors[role] ?? 0x43b581,
+                    title: '🎭 Role Update',
+                    description: `${name} is now **${roleLabels[role] || role}**${role === 'co-gm' ? (persist ? ' (saved)' : ' (this session only)') : ''}.`,
+                    timestamp: new Date().toISOString()
+                }]
+            });
+        });
+
         // 3. Server announcements (e.g., "GM has left", "new GM promoted")
         vtt.on('serverAnnouncement', (data) => {
             const channel = getLogChannel();
