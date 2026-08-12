@@ -1,0 +1,1039 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Toll & Veil – The Roadside Card Game</title>
+  <style>
+    /* --- Global Reset & Theme --- */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      background: #1a1a2e;
+      color: #e0d8d0;
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      padding: 1.5rem;
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+    h1 {
+      color: #c9a84c;
+      border-bottom: 2px solid #c9a84c;
+      padding-bottom: 0.3rem;
+      margin-bottom: 1rem;
+    }
+    .game-status {
+      background: #252540;
+      border-radius: 8px;
+      padding: 0.6rem 1rem;
+      margin-bottom: 0.8rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem 2rem;
+      border: 1px solid #3a3a5a;
+    }
+    .status-item {
+      font-size: 0.9rem;
+      color: #b8b8c8;
+    }
+    .status-item strong {
+      color: #c9a84c;
+    }
+    .table-area {
+      background: #1f1f3a;
+      border-radius: 12px;
+      padding: 1rem;
+      margin-bottom: 1rem;
+      min-height: 120px;
+      border: 1px solid #3a3a5a;
+    }
+    .trick-cards {
+      display: flex;
+      gap: 0.8rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .trick-card {
+      background: #2f2f4a;
+      border-radius: 6px;
+      padding: 0.4rem 0.8rem;
+      border: 1px solid #5a5a7a;
+      font-size: 1.2rem;
+      font-weight: 600;
+      min-width: 50px;
+      text-align: center;
+    }
+    .trick-card .player-name {
+      font-size: 0.6rem;
+      display: block;
+      color: #8888a0;
+    }
+    .player-area {
+      background: #1a1a2e;
+      border-radius: 8px;
+      padding: 0.6rem;
+      margin-bottom: 0.6rem;
+      border: 1px solid #2f2f4a;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.3rem 1rem;
+    }
+    .player-name-tag {
+      font-weight: 600;
+      min-width: 80px;
+      color: #c9a84c;
+    }
+    .player-name-tag .score {
+      font-weight: 400;
+      color: #8888a0;
+      font-size: 0.8rem;
+      margin-left: 0.4rem;
+    }
+    .hand-cards {
+      display: flex;
+      gap: 0.3rem;
+      flex-wrap: wrap;
+      flex: 1;
+    }
+    .card-btn {
+      background: #2f2f4a;
+      border: 1px solid #5a5a7a;
+      border-radius: 4px;
+      padding: 0.3rem 0.6rem;
+      color: #e0d8d0;
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.15s;
+      font-size: 0.9rem;
+      min-width: 40px;
+    }
+    .card-btn:hover:not(:disabled) {
+      background: #3f3f6a;
+      border-color: #c9a84c;
+    }
+    .card-btn:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+    .card-btn.selected {
+      border-color: #c9a84c;
+      box-shadow: 0 0 8px #c9a84c;
+    }
+    .card-btn .markers {
+      font-size: 0.6rem;
+      display: block;
+      color: #8888a0;
+    }
+    .marker-badge {
+      display: inline-block;
+      background: #2f2f4a;
+      border-radius: 12px;
+      padding: 0.1rem 0.6rem;
+      font-size: 0.7rem;
+      border: 1px solid #5a5a7a;
+      cursor: pointer;
+      transition: 0.1s;
+      margin-right: 0.2rem;
+    }
+    .marker-badge.active {
+      border-color: #c9a84c;
+      background: #3f3f5a;
+    }
+    .marker-badge.used {
+      opacity: 0.3;
+      cursor: not-allowed;
+    }
+    .btn-group {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      margin: 0.3rem 0;
+    }
+    .btn {
+      background: #2f2f4a;
+      border: 1px solid #5a5a7a;
+      border-radius: 6px;
+      padding: 0.4rem 0.9rem;
+      color: #e0d8d0;
+      cursor: pointer;
+      font-weight: 600;
+      transition: 0.15s;
+      font-size: 0.9rem;
+    }
+    .btn:hover:not(:disabled) {
+      background: #3f3f6a;
+      border-color: #c9a84c;
+    }
+    .btn:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+    .btn-primary {
+      background: #c9a84c;
+      color: #1a1a2e;
+      border-color: #c9a84c;
+    }
+    .btn-primary:hover:not(:disabled) {
+      background: #d4b85c;
+    }
+    .btn-danger {
+      background: #8a3a3a;
+      border-color: #8a3a3a;
+    }
+    .btn-danger:hover:not(:disabled) {
+      background: #aa4a4a;
+    }
+    .log-area {
+      background: #0d0d1a;
+      border-radius: 6px;
+      padding: 0.4rem 0.8rem;
+      max-height: 100px;
+      overflow-y: auto;
+      font-size: 0.8rem;
+      color: #8888a0;
+      border: 1px solid #2f2f4a;
+      margin-top: 0.5rem;
+      white-space: pre-wrap;
+      font-family: monospace;
+    }
+    .message {
+      color: #c9a84c;
+    }
+    .error {
+      color: #d97a7a;
+    }
+    .winner {
+      color: #7ad97a;
+    }
+    .flex-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    @media (max-width: 600px) {
+      .player-area {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      .hand-cards {
+        justify-content: center;
+      }
+      .game-status {
+        flex-direction: column;
+        gap: 0.3rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<h1>🃏 Toll & Veil</h1>
+
+<div id="game-status" class="game-status">
+  <span class="status-item"><strong>Trump:</strong> <span id="trump-display">—</span></span>
+  <span class="status-item"><strong>Trick:</strong> <span id="trick-num">0</span> / 10</span>
+  <span class="status-item"><strong>Phase:</strong> <span id="phase-display">Waiting</span></span>
+  <span class="status-item"><strong>Lead:</strong> <span id="lead-display">—</span></span>
+</div>
+
+<div id="table-area" class="table-area">
+  <div id="trick-cards" class="trick-cards">
+    <span style="color:#8888a0;">Cards will appear here</span>
+  </div>
+</div>
+
+<div id="players-container"></div>
+
+<div class="btn-group" id="action-area">
+  <button class="btn btn-primary" id="btn-bid">Bid</button>
+  <button class="btn" id="btn-pass">Pass</button>
+</div>
+
+<div id="log-area" class="log-area"></div>
+
+<script>
+// ============================================================
+// TOLL & VEIL – Full Implementation
+// ============================================================
+
+// ---------- Configuration ----------
+const NUM_PLAYERS = 3;      // 3–5
+const WINNING_SCORE = 15;   // 15 (short) or 25 (long)
+const SHOW_AI_LOGS = true;
+
+// ---------- Card & Deck ----------
+const SUITS = ['♣', '♠', '♡', '♢'];
+const RANK_NAMES = ['2','3','4','5','6','7','8','9','10','J','Q','K','A'];
+const RANK_VALUES = { '2':2,'3':3,'4':4,'5':5,'6':6,'7':7,'8':8,'9':9,'10':10,'J':11,'Q':12,'K':13,'A':14 };
+
+function createDeck() {
+  const deck = [];
+  for (const suit of SUITS) {
+    for (const rank of RANK_NAMES) {
+      deck.push({ suit, rank, value: RANK_VALUES[rank] });
+    }
+  }
+  return deck;
+}
+
+function shuffle(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+function cardDisplay(card) {
+  return `${card.rank}${card.suit}`;
+}
+
+// ---------- Game State ----------
+class Game {
+  constructor(numPlayers) {
+    this.numPlayers = Math.min(Math.max(numPlayers, 3), 5);
+    this.players = [];
+    this.deck = [];
+    this.trump = null;          // suit char
+    this.trumpBroken = false;   // has trump been played yet this hand?
+    this.currentTrick = [];     // array of { playerIndex, card, markersUsed: {cut, leap} }
+    this.leadSuit = null;
+    this.trickNumber = 0;
+    this.trickWinner = null;    // playerIndex
+    this.bids = [];            // array of { playerIndex, bid }
+    this.currentPlayerIndex = 0;
+    this.phase = 'bidding';    // 'bidding', 'playing', 'trick_done', 'scoring', 'game_over'
+    this.roundOver = false;
+    this.scores = new Array(this.numPlayers).fill(0);
+    this.hands = [];
+    this.tricksWon = [];
+    this.crossWon = [];        // which players won trick 5 and not 6
+    this.rooted = [];          // boolean per player (if they used both markers)
+    this.markerUsed = [];      // per player: { cut: false, leap: false }
+    this.cutActive = [];       // per player: boolean for current trick
+    this.leapActive = [];      // per player: boolean for current trick
+    this.dealerIndex = 0;
+    this.log = [];
+    this.gameWinner = null;
+    // For UI
+    this.onUpdate = null;      // callback to refresh UI
+  }
+
+  init() {
+    this.deck = shuffle(createDeck());
+    this.deal();
+    this.bids = [];
+    this.tricksWon = new Array(this.numPlayers).fill(0);
+    this.crossWon = new Array(this.numPlayers).fill(false);
+    this.rooted = new Array(this.numPlayers).fill(false);
+    this.markerUsed = this.players.map(() => ({ cut: false, leap: false }));
+    this.cutActive = new Array(this.numPlayers).fill(false);
+    this.leapActive = new Array(this.numPlayers).fill(false);
+    this.currentTrick = [];
+    this.trickNumber = 0;
+    this.trickWinner = null;
+    this.leadSuit = null;
+    this.trump = null;
+    this.trumpBroken = false;
+    this.roundOver = false;
+    this.phase = 'bidding';
+    this.currentPlayerIndex = this.dealerIndex % this.numPlayers;
+    // Determine trump from top of deck after dealing.
+    const topCard = this.deck.pop();
+    this.trump = topCard.suit;
+    this.deck.push(topCard); // put back (we don't remove)
+    // Decide trump type (for display only)
+    const isRed = (this.trump === '♡' || this.trump === '♢');
+    // If red => Toll (trump is ♢? Actually the rule: red flip declares Toll – trump is ♢. But we already have the trump suit from the card.
+    // We'll keep the actual trump suit.
+    this.logMessage(`Trump: ${this.trump} (${isRed ? 'Toll' : 'Veil'})`);
+    // Start with bidding
+    this.phase = 'bidding';
+    this.currentPlayerIndex = (this.dealerIndex + 1) % this.numPlayers;
+    this.updateUI();
+  }
+
+  deal() {
+    // Deal 10 cards to each player
+    this.hands = new Array(this.numPlayers).fill(null).map(() => []);
+    for (let i = 0; i < 10 * this.numPlayers; i++) {
+      const card = this.deck.pop();
+      if (!card) break;
+      this.hands[i % this.numPlayers].push(card);
+    }
+  }
+
+  // ---------- Bidding ----------
+  startBidding() {
+    this.phase = 'bidding';
+    this.bids = [];
+    this.currentPlayerIndex = (this.dealerIndex + 1) % this.numPlayers;
+    this.updateUI();
+  }
+
+  makeBid(playerIndex, bid) {
+    if (this.phase !== 'bidding') return false;
+    if (playerIndex !== this.currentPlayerIndex) return false;
+    if (bid < 0 || bid > 5) return false;
+    // Check if this player already bid
+    if (this.bids.some(b => b.playerIndex === playerIndex)) return false;
+    // If last bidder (dealer), check sum not exactly 10
+    const allBidders = this.bids.map(b => b.playerIndex);
+    const isDealer = playerIndex === this.dealerIndex;
+    const remaining = this.numPlayers - this.bids.length - 1;
+    if (isDealer) {
+      const sum = this.bids.reduce((s, b) => s + b.bid, 0) + bid;
+      if (sum === 10) {
+        this.logMessage(`Dealer bid would make sum=10, invalid.`, 'error');
+        return false;
+      }
+      // Also, if it's the last bid, sum can be 10? Actually rule: dealer's bid must not make sum equal exactly 10. So allow if sum != 10.
+    }
+    this.bids.push({ playerIndex, bid });
+    this.logMessage(`Player ${playerIndex+1} bids ${bid}`);
+    // Move to next player
+    let next = (this.currentPlayerIndex + 1) % this.numPlayers;
+    // Skip players who already bid
+    while (this.bids.some(b => b.playerIndex === next)) {
+      next = (next + 1) % this.numPlayers;
+    }
+    this.currentPlayerIndex = next;
+    // If all have bid, start playing
+    if (this.bids.length === this.numPlayers) {
+      this.phase = 'playing';
+      this.currentPlayerIndex = (this.dealerIndex + 1) % this.numPlayers;
+      this.trickNumber = 1;
+      this.currentTrick = [];
+      this.leadSuit = null;
+      this.trumpBroken = false;
+      // Reset markers for new hand
+      this.markerUsed = this.players.map(() => ({ cut: false, leap: false }));
+      this.cutActive = new Array(this.numPlayers).fill(false);
+      this.leapActive = new Array(this.numPlayers).fill(false);
+      this.rooted = new Array(this.numPlayers).fill(false);
+      this.tricksWon.fill(0);
+      this.crossWon.fill(false);
+      this.logMessage('Bidding complete. Starting play.');
+      this.updateUI();
+    } else {
+      this.updateUI();
+    }
+    return true;
+  }
+
+  // ---------- Playing ----------
+  playCard(playerIndex, cardIndex, useCut = false, useLeap = false) {
+    if (this.phase !== 'playing') return false;
+    if (playerIndex !== this.currentPlayerIndex) return false;
+    if (this.roundOver) return false;
+    const hand = this.hands[playerIndex];
+    if (cardIndex < 0 || cardIndex >= hand.length) return false;
+    const card = hand[cardIndex];
+    // Check markers availability
+    const markers = this.markerUsed[playerIndex];
+    if (useCut && markers.cut) return false;
+    if (useLeap && markers.leap) return false;
+    // Check if we have to follow suit
+    if (this.leadSuit !== null) {
+      const hasSuit = hand.some(c => c.suit === this.leadSuit);
+      if (hasSuit) {
+        // Must follow suit
+        if (card.suit !== this.leadSuit) {
+          this.logMessage(`Must follow suit (${this.leadSuit})`, 'error');
+          return false;
+        }
+      } else {
+        // Void in lead suit – can play any, but if using Leap, we can play trump even if not broken
+        if (useLeap) {
+          // Leap allows playing trump even if trump not broken
+          if (card.suit !== this.trump) {
+            // They can still play any card, but Leap is only useful if they play trump.
+            // We'll allow it, but they'll waste the marker.
+          }
+        }
+      }
+    }
+    // If using Cut, ensure not Ace (cannot boost Ace)
+    if (useCut && card.value === 14) {
+      this.logMessage('Cannot use Cut on an Ace.', 'error');
+      return false;
+    }
+    // Remove card from hand
+    hand.splice(cardIndex, 1);
+    // Record play
+    const played = { playerIndex, card, cut: useCut, leap: useLeap };
+    this.currentTrick.push(played);
+    // Update markers
+    if (useCut) markers.cut = true;
+    if (useLeap) markers.leap = true;
+    // Set lead suit if first card
+    if (this.leadSuit === null) {
+      this.leadSuit = card.suit;
+    }
+    // Check if trump was played
+    if (card.suit === this.trump) {
+      this.trumpBroken = true;
+    }
+    // Log
+    const cutStr = useCut ? ' ✂️' : '';
+    const leapStr = useLeap ? ' 🦘' : '';
+    this.logMessage(`P${playerIndex+1} plays ${cardDisplay(card)}${cutStr}${leapStr}`);
+
+    // Move to next player
+    this.currentPlayerIndex = (this.currentPlayerIndex + 1) % this.numPlayers;
+    // Check if all have played
+    if (this.currentTrick.length === this.numPlayers) {
+      // Resolve trick
+      this.resolveTrick();
+    } else {
+      // Skip players who are out of cards (should not happen mid-trick)
+      // But if a player has no cards, they are out, but they shouldn't be playing.
+      this.updateUI();
+    }
+    return true;
+  }
+
+  resolveTrick() {
+    // Determine winner
+    let winnerIdx = -1;
+    let winningCard = null;
+    let highestValue = -1;
+    // Determine trump suit (we already have this.trump)
+    for (const play of this.currentTrick) {
+      let value = play.card.value;
+      // Apply Cut bonus if used
+      if (play.cut) {
+        value += 1;
+        // Cap at 14 (Ace cannot be boosted, but we already prevented)
+      }
+      // Determine if this card is trump
+      const isTrump = (play.card.suit === this.trump);
+      // The lead suit is the suit of the first card
+      const isLead = (play.card.suit === this.leadSuit);
+      // A card wins if:
+      // - It is trump and (no previous trump or higher trump)
+      // - Or it is of the lead suit and (no trump present and higher lead suit)
+      // Or previous winner was lower.
+      let currentBest = (winnerIdx === -1) ? null : this.currentTrick.find(p => p.playerIndex === winnerIdx);
+      const bestIsTrump = currentBest && (currentBest.card.suit === this.trump);
+      const thisIsTrump = isTrump;
+      const thisValue = value;
+      const bestValue = currentBest ? (currentBest.cut ? currentBest.card.value + 1 : currentBest.card.value) : -1;
+      // Determine if this card beats the current best
+      let beats = false;
+      if (thisIsTrump && !bestIsTrump) {
+        beats = true;
+      } else if (thisIsTrump && bestIsTrump) {
+        beats = (thisValue > bestValue);
+      } else if (!thisIsTrump && !bestIsTrump) {
+        // Both not trump; must match lead suit
+        const thisIsLead = (play.card.suit === this.leadSuit);
+        const bestIsLead = currentBest && (currentBest.card.suit === this.leadSuit);
+        if (thisIsLead && !bestIsLead) {
+          beats = true;
+        } else if (thisIsLead && bestIsLead) {
+          beats = (thisValue > bestValue);
+        }
+        // else neither lead => cannot beat
+      }
+      if (beats) {
+        winnerIdx = play.playerIndex;
+        winningCard = play.card;
+        highestValue = thisValue;
+      }
+    }
+    if (winnerIdx === -1) {
+      // Should not happen; fallback to first player
+      winnerIdx = this.currentTrick[0].playerIndex;
+    }
+    // Mark winner of this trick
+    this.tricksWon[winnerIdx]++;
+    this.trickWinner = winnerIdx;
+    // Check cross rule: trick 5 and 6
+    if (this.trickNumber === 5) {
+      // Remember who won trick 5
+      this.crossWon[winnerIdx] = true;
+    }
+    if (this.trickNumber === 6) {
+      // If the same player won trick 5 and 6, they forfeit the Cross point
+      if (this.crossWon[winnerIdx]) {
+        // They won both, so they lose the Cross point (we'll handle in scoring)
+        this.crossWon[winnerIdx] = false; // will be reset later
+        this.logMessage(`Player ${winnerIdx+1} won trick 5 and 6, forfeits Cross.`, 'warning');
+      } else {
+        // The winner of trick 6 gets the Cross? Actually rule: Cross is for winning trick 5 and not trick 6.
+        // So if someone else wins trick 6, they don't get Cross; only trick 5 winner gets Cross if they don't also win trick 6.
+        // So we leave crossWon as true for trick 5 winner if they didn't win trick 6.
+        // But we need to track that they did NOT win trick 6.
+        // We'll set a flag per player to indicate they won trick 5; at scoring we'll check if they also won trick 6.
+        // We'll store the trick 5 winner and trick 6 winner separately.
+        this._trick5Winner = this.trickWinner; // but we overwrite with trick 6 winner later.
+        // Let's store in a separate property: we'll save the trick 5 winner index.
+        // We'll store it in a temp variable; we'll do that at trick 5 resolution.
+        // Let's refactor: we'll store a property `trick5Winner` and `trick6Winner`.
+        // We'll do that now.
+      }
+    }
+    // Record trick 5/6 info for scoring
+    if (this.trickNumber === 5) {
+      this._trick5Winner = winnerIdx;
+      this._trick5Won = true;
+    }
+    if (this.trickNumber === 6) {
+      this._trick6Winner = winnerIdx;
+      this._trick6Won = true;
+    }
+    // Add to log
+    const winnerName = `P${winnerIdx+1}`;
+    this.logMessage(`Trick ${this.trickNumber} won by ${winnerName}`);
+    // Advance to next trick
+    this.trickNumber++;
+    this.currentTrick = [];
+    this.leadSuit = null;
+    // If all tricks are played (10), end round
+    if (this.trickNumber > 10) {
+      this.endRound();
+      return;
+    }
+    // The winner of the trick leads the next
+    this.currentPlayerIndex = winnerIdx;
+    // Check for rootedness: if player used both markers in this hand, and they just won the lead for the first time after using second marker, they must pass the lead.
+    const markers = this.markerUsed[winnerIdx];
+    if (markers.cut && markers.leap && !this.rooted[winnerIdx]) {
+      // This is the first time they win the lead after using both markers
+      this.rooted[winnerIdx] = true;
+      // They must pass the lead: skip their lead and move to next player
+      this.logMessage(`Player ${winnerIdx+1} is Rooted (used both markers). Passing lead.`, 'warning');
+      this.currentPlayerIndex = (this.currentPlayerIndex + 1) % this.numPlayers;
+      // If next player is also rooted? Not defined; assume only one pass.
+    }
+    // Skip any player who has no cards (should not happen)
+    this.updateUI();
+  }
+
+  endRound() {
+    // Calculate scores for this hand
+    const handScores = new Array(this.numPlayers).fill(0);
+    for (let i = 0; i < this.numPlayers; i++) {
+      const bidObj = this.bids.find(b => b.playerIndex === i);
+      const bid = bidObj ? bidObj.bid : 0;
+      const tricks = this.tricksWon[i];
+      let score = 0;
+      if (tricks >= bid) {
+        // meet or exceed
+        score += 2; // base
+        score += (tricks - bid); // overtricks +1 each
+      } else {
+        // miss: negative difference
+        score -= (bid - tricks);
+      }
+      // Cross bonus: if they won trick 5 and NOT trick 6
+      // We need to know if they won trick 5 and if they won trick 6.
+      // We stored _trick5Winner and _trick6Winner.
+      const wonTrick5 = (this._trick5Winner === i);
+      const wonTrick6 = (this._trick6Winner === i);
+      if (wonTrick5 && !wonTrick6) {
+        score += 1;
+      }
+      // Perfect Veil: bid 0 and took 0 tricks -> +3
+      if (bid === 0 && tricks === 0) {
+        score += 3;
+      }
+      handScores[i] = score;
+      this.scores[i] += score;
+    }
+    // Log scores
+    let scoreMsg = 'Hand scores: ';
+    for (let i = 0; i < this.numPlayers; i++) {
+      scoreMsg += `P${i+1}: ${handScores[i]} (total ${this.scores[i]}) `;
+    }
+    this.logMessage(scoreMsg);
+    // Check for game winner
+    for (let i = 0; i < this.numPlayers; i++) {
+      if (this.scores[i] >= WINNING_SCORE) {
+        this.gameWinner = i;
+        this.phase = 'game_over';
+        this.logMessage(`🏆 Player ${i+1} wins the game with ${this.scores[i]} points!`, 'winner');
+        this.updateUI();
+        return;
+      }
+    }
+    // New hand: rotate dealer
+    this.dealerIndex = (this.dealerIndex + 1) % this.numPlayers;
+    // Reset for next hand
+    this.init();
+  }
+
+  // ---------- Logging ----------
+  logMessage(msg, type = 'info') {
+    const entry = { msg, type };
+    this.log.push(entry);
+    if (this.onUpdate) this.onUpdate();
+  }
+
+  // ---------- UI Update ----------
+  updateUI() {
+    if (this.onUpdate) this.onUpdate();
+  }
+
+  // ---------- AI ----------
+  aiTurn() {
+    if (this.phase === 'bidding') {
+      // Simple AI: bid random 0-5, but avoid making sum 10 if dealer
+      const isDealer = this.currentPlayerIndex === this.dealerIndex;
+      let bid;
+      const sum = this.bids.reduce((s, b) => s + b.bid, 0);
+      const remaining = this.numPlayers - this.bids.length;
+      // If dealer, avoid sum=10
+      if (isDealer) {
+        // Try bids 0-5 except the one that makes sum=10
+        const candidates = [0,1,2,3,4,5].filter(b => (sum + b) !== 10);
+        if (candidates.length === 0) {
+          // If all make sum=10 (impossible since sum<=5*3=15), just pick 0
+          bid = 0;
+        } else {
+          bid = candidates[Math.floor(Math.random() * candidates.length)];
+        }
+      } else {
+        // random 0-5
+        bid = Math.floor(Math.random() * 6);
+      }
+      this.makeBid(this.currentPlayerIndex, bid);
+      // If still bidding and it's AI turn, continue
+      if (this.phase === 'bidding') {
+        // Might be AI again if all players are AI (but we have one human)
+        // We'll check after a short delay
+        setTimeout(() => this.aiTurn(), 200);
+      }
+      return;
+    }
+
+    if (this.phase === 'playing') {
+      const hand = this.hands[this.currentPlayerIndex];
+      if (!hand || hand.length === 0) {
+        // Should not happen
+        this.currentPlayerIndex = (this.currentPlayerIndex + 1) % this.numPlayers;
+        setTimeout(() => this.aiTurn(), 200);
+        return;
+      }
+      // Determine legal plays
+      let legalCards = [];
+      if (this.leadSuit !== null) {
+        const hasSuit = hand.some(c => c.suit === this.leadSuit);
+        if (hasSuit) {
+          legalCards = hand.map((c, i) => ({ card: c, index: i, suit: c.suit === this.leadSuit }));
+        } else {
+          // Void: can play any
+          legalCards = hand.map((c, i) => ({ card: c, index: i }));
+        }
+      } else {
+        legalCards = hand.map((c, i) => ({ card: c, index: i }));
+      }
+      // Simple AI: pick a card. If we have a trump, play highest trump; else highest of lead suit; else highest.
+      let selected = legalCards[0];
+      // Try to find highest trump if we have any
+      const trumpCards = legalCards.filter(l => l.card.suit === this.trump);
+      if (trumpCards.length > 0) {
+        // Sort by value descending
+        trumpCards.sort((a,b) => b.card.value - a.card.value);
+        selected = trumpCards[0];
+      } else {
+        // If we can follow suit, pick highest in that suit
+        if (this.leadSuit !== null) {
+          const suitCards = legalCards.filter(l => l.card.suit === this.leadSuit);
+          if (suitCards.length > 0) {
+            suitCards.sort((a,b) => b.card.value - a.card.value);
+            selected = suitCards[0];
+          } else {
+            // void, pick highest
+            legalCards.sort((a,b) => b.card.value - a.card.value);
+            selected = legalCards[0];
+          }
+        } else {
+          legalCards.sort((a,b) => b.card.value - a.card.value);
+          selected = legalCards[0];
+        }
+      }
+      // Marker usage: if we have Cut and we can win, use it? Simple: if this card is not Ace and we are trying to win, use Cut.
+      const markers = this.markerUsed[this.currentPlayerIndex];
+      let useCut = false;
+      let useLeap = false;
+      // If we are void and we can play trump with Leap, and we have Leap, use it
+      if (!markers.leap && this.leadSuit !== null) {
+        const hasLead = hand.some(c => c.suit === this.leadSuit);
+        if (!hasLead && selected.card.suit === this.trump) {
+          // We are void and we can play trump, use Leap
+          useLeap = true;
+        }
+      }
+      // If we have Cut and we are trying to win, and card is not Ace
+      if (!markers.cut && selected.card.value !== 14) {
+        // Only use Cut if we think this card could win with +1
+        // Simple: if we have no trump and we are playing a high card
+        if (selected.card.value >= 10) {
+          useCut = true;
+        }
+      }
+      // If using Leap and also Cut, that's fine.
+      // Play the card
+      this.playCard(this.currentPlayerIndex, selected.index, useCut, useLeap);
+      // After playing, if phase is still playing and it's AI turn, continue
+      if (this.phase === 'playing') {
+        setTimeout(() => this.aiTurn(), 300);
+      }
+    }
+  }
+}
+
+// ---------- UI Controller ----------
+let game = null;
+let selectedCardIndex = null;
+let selectedCut = false;
+let selectedLeap = false;
+
+function initGame() {
+  game = new Game(NUM_PLAYERS);
+  game.onUpdate = render;
+  game.init();
+  // If first player is AI, start AI turn
+  if (game.currentPlayerIndex !== 0) {
+    setTimeout(() => game.aiTurn(), 500);
+  }
+  render();
+}
+
+function render() {
+  // Update status
+  document.getElementById('trump-display').textContent = game.trump || '—';
+  document.getElementById('trick-num').textContent = game.trickNumber;
+  const phaseLabels = {
+    'bidding': 'Bidding',
+    'playing': 'Playing',
+    'trick_done': 'Trick Done',
+    'scoring': 'Scoring',
+    'game_over': 'Game Over'
+  };
+  document.getElementById('phase-display').textContent = phaseLabels[game.phase] || game.phase;
+  document.getElementById('lead-display').textContent = game.leadSuit || '—';
+
+  // Table area: show current trick
+  const trickContainer = document.getElementById('trick-cards');
+  if (game.currentTrick && game.currentTrick.length > 0) {
+    let html = '';
+    for (const play of game.currentTrick) {
+      const card = play.card;
+      const cutMark = play.cut ? ' ✂️' : '';
+      const leapMark = play.leap ? ' 🦘' : '';
+      html += `<div class="trick-card">${cardDisplay(card)}${cutMark}${leapMark}<span class="player-name">P${play.playerIndex+1}</span></div>`;
+    }
+    trickContainer.innerHTML = html;
+  } else {
+    trickContainer.innerHTML = '<span style="color:#8888a0;">Waiting for cards...</span>';
+  }
+
+  // Players area
+  const container = document.getElementById('players-container');
+  let html = '';
+  for (let i = 0; i < game.numPlayers; i++) {
+    const isCurrent = (i === game.currentPlayerIndex);
+    const hand = game.hands[i] || [];
+    const score = game.scores[i];
+    const bidObj = game.bids.find(b => b.playerIndex === i);
+    const bid = bidObj ? bidObj.bid : '—';
+    const tricks = game.tricksWon ? game.tricksWon[i] : 0;
+    const markers = game.markerUsed ? game.markerUsed[i] : { cut: false, leap: false };
+    const rooted = game.rooted ? game.rooted[i] : false;
+    const isHuman = (i === 0);
+    const isAI = !isHuman;
+
+    html += `<div class="player-area" style="border-color: ${isCurrent ? '#c9a84c' : '#2f2f4a'};">
+      <div class="player-name-tag">
+        ${isHuman ? '🧑 You' : `🤖 AI ${i}`}
+        <span class="score">Score: ${score}</span>
+        ${bid !== '—' ? ` | Bid: ${bid}` : ''}
+        ${tricks > 0 ? ` | Tricks: ${tricks}` : ''}
+        ${rooted ? ' | 🪨 Rooted' : ''}
+      </div>
+      <div class="hand-cards">
+        ${hand.map((card, idx) => {
+          const isSelected = (isHuman && selectedCardIndex === idx);
+          let cardClass = 'card-btn';
+          if (isSelected) cardClass += ' selected';
+          if (!isHuman || game.phase !== 'playing' || isCurrent === false) {
+            cardClass += ' disabled';
+          }
+          let markersHtml = '';
+          if (isHuman && isCurrent && game.phase === 'playing') {
+            const cutUsed = markers.cut;
+            const leapUsed = markers.leap;
+            markersHtml = `<span class="markers">
+              <span class="marker-badge ${cutUsed ? 'used' : (selectedCut ? 'active' : '')}" data-player="${i}" data-marker="cut">✂️</span>
+              <span class="marker-badge ${leapUsed ? 'used' : (selectedLeap ? 'active' : '')}" data-player="${i}" data-marker="leap">🦘</span>
+            </span>`;
+          }
+          return `<button class="${cardClass}" data-player="${i}" data-cardidx="${idx}" ${(!isHuman || game.phase !== 'playing' || !isCurrent) ? 'disabled' : ''}>
+            ${cardDisplay(card)} ${markersHtml}
+          </button>`;
+        }).join('')}
+      </div>
+    </div>`;
+  }
+  container.innerHTML = html;
+
+  // Attach click events for cards and markers
+  container.querySelectorAll('.card-btn:not([disabled])').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      const playerIdx = parseInt(btn.dataset.player);
+      const cardIdx = parseInt(btn.dataset.cardidx);
+      if (playerIdx !== 0) return; // only human can click
+      if (game.phase !== 'playing') return;
+      if (game.currentPlayerIndex !== 0) return;
+      // Toggle selection
+      if (selectedCardIndex === cardIdx) {
+        selectedCardIndex = null;
+      } else {
+        selectedCardIndex = cardIdx;
+      }
+      // Update UI to reflect selection
+      render();
+    });
+  });
+
+  container.querySelectorAll('.marker-badge:not(.used)').forEach(el => {
+    el.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const playerIdx = parseInt(el.dataset.player);
+      const marker = el.dataset.marker;
+      if (playerIdx !== 0) return;
+      if (game.phase !== 'playing') return;
+      if (game.currentPlayerIndex !== 0) return;
+      const markers = game.markerUsed[0];
+      if (marker === 'cut') {
+        if (markers.cut) return;
+        selectedCut = !selectedCut;
+      } else if (marker === 'leap') {
+        if (markers.leap) return;
+        selectedLeap = !selectedLeap;
+      }
+      render();
+    });
+  });
+
+  // Action buttons
+  const actionArea = document.getElementById('action-area');
+  if (game.phase === 'bidding') {
+    actionArea.innerHTML = `
+      <div class="flex-row">
+        <span>Your bid (0-5):</span>
+        ${[0,1,2,3,4,5].map(b => `<button class="btn btn-primary" data-bid="${b}">${b}</button>`).join('')}
+      </div>
+    `;
+    actionArea.querySelectorAll('button[data-bid]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const bid = parseInt(btn.dataset.bid);
+        if (game.phase !== 'bidding') return;
+        if (game.currentPlayerIndex !== 0) return;
+        game.makeBid(0, bid);
+        // If after bidding it's AI turn, start AI
+        if (game.phase === 'bidding') {
+          setTimeout(() => game.aiTurn(), 300);
+        }
+        render();
+      });
+    });
+  } else if (game.phase === 'playing') {
+    const isMyTurn = (game.currentPlayerIndex === 0);
+    actionArea.innerHTML = `
+      <div class="flex-row">
+        ${isMyTurn ? `<button class="btn btn-primary" id="btn-play">Play Selected</button>` : `<span>Waiting for AI...</span>`}
+      </div>
+    `;
+    if (isMyTurn) {
+      const playBtn = document.getElementById('btn-play');
+      if (playBtn) {
+        playBtn.addEventListener('click', () => {
+          if (selectedCardIndex === null) {
+            alert('Select a card first.');
+            return;
+          }
+          // Check markers
+          const useCut = selectedCut;
+          const useLeap = selectedLeap;
+          // Check if markers available
+          const markers = game.markerUsed[0];
+          if (useCut && markers.cut) {
+            alert('Cut already used this hand.');
+            return;
+          }
+          if (useLeap && markers.leap) {
+            alert('Leap already used this hand.');
+            return;
+          }
+          // Check if we must follow suit
+          const hand = game.hands[0];
+          const card = hand[selectedCardIndex];
+          if (game.leadSuit !== null) {
+            const hasSuit = hand.some(c => c.suit === game.leadSuit);
+            if (hasSuit && card.suit !== game.leadSuit) {
+              alert(`You must play a ${game.leadSuit}.`);
+              return;
+            }
+          }
+          // Check Cut on Ace
+          if (useCut && card.value === 14) {
+            alert('Cannot use Cut on an Ace.');
+            return;
+          }
+          // Play
+          game.playCard(0, selectedCardIndex, useCut, useLeap);
+          selectedCardIndex = null;
+          selectedCut = false;
+          selectedLeap = false;
+          // If game still in playing and it's AI turn, start AI
+          if (game.phase === 'playing') {
+            setTimeout(() => game.aiTurn(), 300);
+          }
+          render();
+        });
+      }
+    } else {
+      // AI is playing; we just display a message
+      // The AI will trigger automatically via setTimeout after play.
+    }
+  } else if (game.phase === 'game_over') {
+    const winner = game.gameWinner;
+    actionArea.innerHTML = `
+      <div class="flex-row">
+        <span class="winner">🏆 Player ${winner+1} wins the game!</span>
+        <button class="btn btn-primary" id="btn-new-game">New Game</button>
+      </div>
+    `;
+    document.getElementById('btn-new-game')?.addEventListener('click', () => {
+      game = null;
+      initGame();
+    });
+  } else {
+    actionArea.innerHTML = '';
+  }
+
+  // Update log
+  const logEl = document.getElementById('log-area');
+  const logMessages = game.log.slice(-20).map(entry => {
+    const cls = entry.type === 'error' ? 'error' : entry.type === 'winner' ? 'winner' : '';
+    return `<div class="${cls}">${entry.msg}</div>`;
+  }).join('');
+  logEl.innerHTML = logMessages;
+  logEl.scrollTop = logEl.scrollHeight;
+}
+
+// Start game
+window.onload = initGame;
+</script>
+
+</body>
+</html>

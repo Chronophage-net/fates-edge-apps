@@ -3,6 +3,14 @@
 //  ("Corpus Canré Scholiatum" / Kon'reh Core Rules §1–9)
 // ============================================================
 //
+// This route also hosts TOLL & VEIL, a second, unrelated mini-game
+// (a 3-5 player trick-taking card game) — see the "ROUTER INTEGRATION"
+// section near the bottom of this file for the landing panel that
+// offers both, and ./toll-and-veil.js / ./toll-and-veil-connected.js /
+// ./toll-veil-vtt-bridge.js for its implementation. It lives under
+// this same #kon-reh route rather than a route of its own so players
+// have one obvious place to look for "mini-games."
+//
 // Board: 8x8 grid, logical (x,y) both in [0,7].
 //   Player 1 Home Apex = (0,0)   Player 2 Home Apex = (7,7)
 //   Sanctums            = (0,7) and (7,0)
@@ -2661,6 +2669,30 @@ function launchModal() {
   }, 50);
 }
 
+// ---- Toll & Veil launch (lazy-imported: this file shouldn't pay for
+// the second game's code until someone actually clicks it) ----
+async function launchTollVeil() {
+  try {
+    const { openTollVeilModal } = await import('./toll-and-veil.js');
+    openTollVeilModal({});
+  } catch (err) {
+    console.error('[Toll & Veil] Failed to open:', err);
+    alert(`Toll & Veil failed to open: ${err.message}\n(See browser console for details.)`);
+  }
+}
+
+function getTollVeilRulesText() {
+  return `
+    <p><b>Goal:</b> bid how many of this hand's 10 tricks you'll take, then try to take exactly that many (or more). First to the target score wins the game.</p>
+    <p><b>Setup:</b> 3-5 seats, a standard 52-card deck, 10 tricks dealt to each seat. The top card of what's left over sets <b>trump</b> for the hand — red trump (♡/♢) is called "Toll," black trump (♣/♠) is called "Veil."</p>
+    <p><b>Bidding:</b> starting left of the dealer, each seat bids 0-5 tricks. The last bidder (the dealer) can't bid a number that would make everyone's bids add up to exactly 10 — someone is always guaranteed to miss.</p>
+    <p><b>Trump-breaking:</b> like Spades, you can't <i>lead</i> a trick with trump, or play trump when void of the lead suit, until trump has been "broken" (played because someone couldn't follow suit) — unless your whole hand is trump, or you spend Leap.</p>
+    <p><b>Markers (once per hand each):</b> <b>Cut</b> ✂️ adds +1 to a played card's value (never on an Ace). <b>Leap</b> 🦘 lets you bypass the trump-breaking rule for one card. Spend both in the same hand and you're <b>Rooted</b> — the next trick you win, you must immediately pass the lead.</p>
+    <p><b>Scoring a hand:</b> meet or beat your bid: 2 points + 1 per trick over. Miss your bid: -1 per trick short. Win trick 5 but not trick 6: +1 (the "Cross"). Bid 0 and take exactly 0 tricks: +3 (a "Perfect Veil").</p>
+    <p><b>Stakes (multiplayer tables only, host's choice):</b> <b>Points only</b> (default) — just the scoreboard. <b>XP wager</b> — opt-in, capped by the host; losers transfer the capped amount of XP to the winner. <b>String</b> — losers owe the winner a narrative debt (a favor, a secret, a story) instead of anything mechanical — the table gets a story out of it, not just a number.</p>
+  `;
+}
+
 export default {
   /**
    * Called by the router when the user navigates to #kon-reh.
@@ -2681,14 +2713,26 @@ export default {
         <button id="konreh-play-btn" class="btn btn-gold" style="margin-top:0.75rem;padding:0.6rem 1.6rem;font-weight:600;">▶ Play Kon'reh</button>
         <p style="color:var(--text3);font-size:0.75rem;margin-top:0.6rem;">Local hot‑seat, vs‑computer Schools, or challenge a connected player from the Whiteboard's 🌀 Kon'reh toggle.</p>
       </div>
+      <div class="panel" style="max-width:720px;margin:1rem auto 0;text-align:center;padding:2rem 1.5rem;">
+        <h2 style="color:var(--gold);letter-spacing:0.02em;margin-bottom:0.1rem;">🃏 Toll &amp; Veil</h2>
+        <p style="color:var(--text2);margin-top:0;">A 3-5 player trick-taking card game of bids, trump, and nerve</p>
+        <button id="tollveil-play-btn" class="btn btn-gold" style="margin-top:0.75rem;padding:0.6rem 1.6rem;font-weight:600;">▶ Play Toll &amp; Veil</button>
+        <p style="color:var(--text3);font-size:0.75rem;margin-top:0.6rem;">Pass &amp; play, solo vs AI, or host a table for the group from the Whiteboard's 🃏 Toll &amp; Veil toggle — points-only by default, with optional capped-XP or narrative "String" stakes.</p>
+      </div>
       <div class="panel" id="konreh-rules-panel" style="max-width:720px;margin:1rem auto 0;padding:1.25rem 1.5rem;text-align:left;font-size:0.85rem;line-height:1.5;">
-        <h3 style="color:var(--gold);margin-top:0;">How to Play</h3>
+        <h3 style="color:var(--gold);margin-top:0;">Kon'reh — How to Play</h3>
         ${getRulesText()}
+      </div>
+      <div class="panel" id="tollveil-rules-panel" style="max-width:720px;margin:1rem auto 2rem;padding:1.25rem 1.5rem;text-align:left;font-size:0.85rem;line-height:1.5;">
+        <h3 style="color:var(--gold);margin-top:0;">Toll &amp; Veil — How to Play</h3>
+        ${getTollVeilRulesText()}
       </div>
     `;
 
     const playBtn = container.querySelector('#konreh-play-btn');
     playBtn?.addEventListener('click', () => launchModal());
+    const tvPlayBtn = container.querySelector('#tollveil-play-btn');
+    tvPlayBtn?.addEventListener('click', () => launchTollVeil());
   },
 
   /**
@@ -2698,11 +2742,13 @@ export default {
   onActivate() {},
 
   /**
-   * Called when the route is deactivated – close the modal if the player
-   * left it open, so it doesn't linger over other tabs.
+   * Called when the route is deactivated – close whichever modal the
+   * player left open (Kon'reh or Toll & Veil), so it doesn't linger
+   * over other tabs.
    */
   onDeactivate() {
     closeModal();
+    import('./toll-and-veil.js').then(m => m.closeTollVeilModal()).catch(() => {});
   },
 
   /**

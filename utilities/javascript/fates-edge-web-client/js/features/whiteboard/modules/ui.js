@@ -23,11 +23,14 @@ import { isConnectedToServer, sendMessage } from '../../../core/websocket.js';
 import { onVoiceClientsChanged } from '../../vtt/voice.js';
 import { openKonrehModal } from '../../kon-reh/index.js';
 import { initKonrehVttBridge, challengeToKonreh } from '../../kon-reh/vtt-bridge.js';
+import { openTollVeilModal } from '../../kon-reh/toll-and-veil.js';
+import { initTollVeilVttBridge, openTollVeilTable } from '../../kon-reh/toll-veil-vtt-bridge.js';
 
 // Wire the Kon'reh <-> VTT bridge's incoming-event listener once, at
 // module load, so a challenge can arrive even before the Whiteboard
 // panel itself has been opened this session.
 initKonrehVttBridge();
+initTollVeilVttBridge();
 import { logRecordingEvent } from '../../../core/media.js';
 import { activeLayerId } from './layers.js';
 import { getCharacters as getCoreCharacters } from '../../../core/state.js';
@@ -409,6 +412,8 @@ export function render(el) {
                             <button class="btn btn-sm btn-secondary" id="whiteboard-import-tracker" style="${isGridCombatActive() && !isKonrehActive() ? '' : 'display:none;'}">🔗 Import Tracker</button>
                             <button class="btn btn-sm ${isKonrehActive() ? 'btn-gold' : 'btn-secondary'}" id="whiteboard-konreh">🌀 Kon'reh</button>
                             <button class="btn btn-sm btn-secondary" id="whiteboard-konreh-challenge" title="Challenge another connected player to a real-time Kon'reh match" style="${isConnectedToServer() ? '' : 'display:none;'}">🌐 Challenge Player</button>
+                            <button class="btn btn-sm btn-secondary" id="whiteboard-tollveil">🃏 Toll &amp; Veil</button>
+                            <button class="btn btn-sm btn-secondary" id="whiteboard-tollveil-host" title="Host a Toll &amp; Veil table for the group over the existing VTT connection" style="${isConnectedToServer() ? '' : 'display:none;'}">🌐 Host Table</button>
                             <span id="whiteboard-tracker-link-status" class="text-muted text-sm"></span>
                         </div>
                     </div>
@@ -623,6 +628,33 @@ export function attachEvents() {
             postToVTTChat(`🌀🌐 ${name} is challenging the table to a real-time game of Kon'reh! Anyone else can accept from the banner that just appeared.`);
         } else {
             showToast("Can't start a challenge right now (not connected, or already in a match).", 'error');
+        }
+    });
+
+    // ── Toll & Veil ──
+    document.getElementById('whiteboard-tollveil')?.addEventListener('click', () => {
+        openTollVeilModal({});
+        postToVTTChat(`🃏 ${getWhiteboardSenderName()} opened Toll & Veil on the Whiteboard.`);
+    });
+    // Host a real multi-seat table over the existing VTT connection —
+    // see js/features/kon-reh/toll-veil-vtt-bridge.js for the lobby protocol.
+    document.getElementById('whiteboard-tollveil-host')?.addEventListener('click', () => {
+        const name = getWhiteboardSenderName();
+        const seatsInput = window.prompt('How many seats (3-5)?', '4');
+        const numSeats = Math.min(5, Math.max(3, parseInt(seatsInput, 10) || 3));
+        const stakeChoice = (window.prompt('Stakes — type "points" (default), "xp", or "string":', 'points') || 'points').trim().toLowerCase();
+        let stakeConfig = { mode: 'points' };
+        if (stakeChoice === 'xp') {
+            const capInput = window.prompt('XP wager cap per player:', '2');
+            stakeConfig = { mode: 'xp', xpCap: Math.max(1, parseInt(capInput, 10) || 1) };
+        } else if (stakeChoice === 'string') {
+            stakeConfig = { mode: 'string' };
+        }
+        const started = openTollVeilTable({ hostName: name, numSeats, stakeConfig });
+        if (started) {
+            showToast('Toll & Veil table opened — waiting for players to join.', 'info');
+        } else {
+            showToast("Can't host a table right now (not connected, or already hosting/in one).", 'error');
         }
     });
 
