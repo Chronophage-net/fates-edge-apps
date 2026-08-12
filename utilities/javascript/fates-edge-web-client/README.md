@@ -71,11 +71,24 @@ This client is part of the larger [Fate's Edge Applications](https://github.com/
 
 ## 🚀 Quick Start
 
-### For Players & GMs
+**→ See [INSTALL.md](INSTALL.md) for the full setup guide** — solo/local
+use, hosting it for your table (Docker), pointing it at your own Socket
+Server, updates, and troubleshooting.
+
+### For Players & GMs (solo, no install)
 1. **Clone or download** this repository.
 2. Open `index.html` in a modern browser (Chrome, Firefox, Edge, or Safari).
 3. Set a password (optional) – click the lock icon in the sidebar.
 4. Start creating characters, rolling dice, and building your campaign!
+
+### Hosting it for your table
+```bash
+cd fates-edge-apps/utilities/javascript/fates-edge-web-client
+docker compose up -d
+```
+Then open `http://localhost:8080`. See [INSTALL.md](INSTALL.md) for
+pointing it at your self-hosted [Socket Server](../fates-edge-socket-server/INSTALL.md)
+— that step's easy to miss.
 
 ### For Developers
 ```bash

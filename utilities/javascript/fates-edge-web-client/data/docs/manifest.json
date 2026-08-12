@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "generated": "2026-08-11T17:13:58.884Z",
+  "generated": "2026-08-12T00:55:58.342Z",
   "documents": [
     {
       "id": "systems_reference_document",
@@ -29,6 +29,16 @@
       "path": "/data/docs/expansions/",
       "category": "expansions",
       "categoryLabel": "📦 Expansions",
+      "core": false,
+      "active": true
+    },
+    {
+      "id": "annotated_play_session",
+      "title": "Annotated   Play   Session",
+      "file": "Fates_-_Edge_-_-Annotated_-_Play_-_Session.html",
+      "path": "/data/docs/resources/",
+      "category": "resources",
+      "categoryLabel": "📚 Resources",
       "core": false,
       "active": true
     },
@@ -893,7 +903,7 @@
       "active": true
     }
   ],
-  "total_count": 89,
-  "active_count": 89,
+  "total_count": 90,
+  "active_count": 90,
   "_license": "Fate's Edge Copyright – © 2024 - 2026 Nicholas A. Gasper. Used with permission, All rights reserved."
 }

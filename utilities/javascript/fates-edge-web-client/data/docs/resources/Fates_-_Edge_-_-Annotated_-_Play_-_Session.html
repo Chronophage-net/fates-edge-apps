@@ -1,0 +1,707 @@
+<!-- ============ Fates_-_Edge_-_-Annotated_-_Play_-_Session.html ============ -->
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta charset="utf-8"/>
+<meta content="Fate's Edge companion doc" name="generator"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Fate's Edge — Annotated Play Session</title>
+<style>
+    :root {
+        --bg1: #0d0d1a;
+        --bg2: #1a1a2e;
+        --bg3: #252540;
+        --bg4: #2f2f4a;
+        --text: #e8e8f0;
+        --text2: #b8b8c8;
+        --text3: #8888a0;
+        --gold: #c9a84c;
+        --gold-hover: #d4b85c;
+        --border: #333355;
+        --red: #c0392b;
+        --green: #27ae60;
+        --blue: #2980b9;
+        --purple: #8e44ad;
+        --orange: #e67e22;
+        --radius: 8px;
+        --font: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+        background: var(--bg1);
+        color: var(--text);
+        font-family: var(--font);
+        padding: 1.5rem;
+        max-width: 1100px;
+        margin: 0 auto;
+        line-height: 1.6;
+    }
+    h1, h2, h3, h4, h5 { color: var(--gold); margin: 0.5rem 0 0.3rem; }
+    h1 { font-size: 1.8rem; border-bottom: 2px solid var(--gold); padding-bottom: 0.3rem; }
+    h2 { font-size: 1.4rem; border-bottom: 1px solid var(--border); padding-bottom: 0.2rem; margin-top: 1.4rem; }
+    h3 { font-size: 1.15rem; margin-top: 1rem; }
+    h4 { font-size: 0.95rem; color: var(--text); }
+    a { color: var(--gold); text-decoration: none; }
+    a:hover { color: var(--gold-hover); text-decoration: underline; }
+    p { margin: 0.5rem 0; }
+    ul, ol { margin: 0.4rem 0 0.4rem 1.4rem; }
+    li { margin: 0.15rem 0; }
+    .panel {
+        background: var(--bg2);
+        border-radius: var(--radius);
+        padding: 0.6rem 0.9rem;
+        border: 1px solid var(--border);
+        margin: 0.6rem 0;
+    }
+    .panel-gold { border-left: 4px solid var(--gold); }
+    .panel-red { border-left: 4px solid var(--red); }
+    .panel-blue { border-left: 4px solid var(--blue); }
+    .panel-green { border-left: 4px solid var(--green); }
+    .panel-purple { border-left: 4px solid var(--purple); }
+    .panel-orange { border-left: 4px solid var(--orange); }
+    .badge {
+        display: inline-block;
+        padding: 0.05rem 0.5rem;
+        border-radius: 12px;
+        font-size: 0.65rem;
+        font-weight: 600;
+        background: var(--bg4);
+        color: var(--text3);
+        border: 1px solid var(--border);
+        margin: 0 0.15rem;
+    }
+    .badge-gold { background: var(--gold); color: #1a1400; border-color: var(--gold); }
+    .badge-red { background: var(--red); color: #fff; border-color: var(--red); }
+    .badge-green { background: var(--green); color: #fff; border-color: var(--green); }
+    .badge-blue { background: var(--blue); color: #fff; border-color: var(--blue); }
+    .badge-purple { background: var(--purple); color: #fff; border-color: var(--purple); }
+    .badge-orange { background: var(--orange); color: #fff; border-color: var(--orange); }
+    .text-muted { color: var(--text3); }
+    .text-gold { color: var(--gold); }
+    .text-sm { font-size: 0.85rem; }
+    .text-xs { font-size: 0.7rem; }
+    .mt-1 { margin-top: 0.5rem; }
+    .mb-1 { margin-bottom: 0.5rem; }
+    .flex { display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0.7rem; }
+    .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.6rem; }
+    @media (max-width: 700px) { .grid-2, .grid-4 { grid-template-columns: 1fr; } }
+    .toc {
+        background: var(--bg3);
+        border-radius: var(--radius);
+        padding: 0.6rem 0.9rem;
+        border: 1px solid var(--border);
+        margin: 0.6rem 0;
+    }
+    .toc summary { cursor: pointer; color: var(--gold); font-weight: 600; }
+    .toc summary:hover { color: var(--gold-hover); }
+    .toc a { color: var(--text2); display: block; padding: 0.12rem 0; font-size: 0.85rem; }
+    .toc a:hover { color: var(--gold); }
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; margin: 0.5rem 0; }
+    th, td { padding: 0.4rem 0.6rem; border: 1px solid var(--border); text-align: left; }
+    th { background: var(--bg4); color: var(--gold); font-weight: 600; }
+    tr:nth-child(even) { background: var(--bg2); }
+    blockquote {
+        font-style: italic;
+        border-left: 4px solid var(--gold);
+        padding: 0.5rem 1rem;
+        margin: 0.5rem 0;
+        background: var(--bg2);
+        border-radius: var(--radius);
+        color: var(--text2);
+    }
+    blockquote .attribution { display: block; font-style: normal; color: var(--text3); font-size: 0.85rem; margin-top: 0.3rem; }
+    code { background: var(--bg4); padding: 0.1rem 0.3rem; border-radius: 4px; font-size: 0.85rem; color: var(--gold); }
+    pre { background: var(--bg3); padding: 0.5rem; border-radius: var(--radius); overflow-x: auto; border: 1px solid var(--border); }
+    hr { border: none; border-top: 1px solid var(--border); margin: 1.2rem 0; }
+    .titlepage { text-align: center; margin: 1rem 0 0.5rem; }
+    .titlepage h1 { font-size: 2.3rem; border-bottom: none; margin-bottom: 0.1rem; }
+    .titlepage h2 { font-size: 1.4rem; font-weight: normal; border-bottom: none; margin-top: 0; color: var(--text2); }
+    .warningbox { background: var(--bg3); border-left: 4px solid var(--red); padding: 0.5rem 1rem; margin: 0.5rem 0; border-radius: var(--radius); }
+    .tipbox { background: var(--bg3); border-left: 4px solid var(--gold); padding: 0.5rem 1rem; margin: 0.5rem 0; border-radius: var(--radius); }
+    .back-to-top { position: fixed; bottom: 1rem; right: 1rem; background: var(--bg3); padding: 0.5rem 0.8rem; border-radius: 50%; border: 1px solid var(--gold); color: var(--gold); text-decoration: none; font-size: 1.2rem; box-shadow: 0 2px 8px rgba(0,0,0,0.5); z-index: 100; }
+
+    /* ─── Doc-specific: transcript + annotation styling ─── */
+    .scene-banner {
+        background: linear-gradient(135deg, var(--bg3), var(--bg2));
+        border: 1px solid var(--gold);
+        border-radius: var(--radius);
+        padding: 0.7rem 1rem;
+        margin: 1.4rem 0 0.8rem;
+    }
+    .scene-banner h2 { border-bottom: none; margin: 0; }
+    .scene-banner .sub { color: var(--text3); font-size: 0.85rem; margin-top: 0.15rem; }
+
+    .transcript { margin: 0.4rem 0; }
+    .line { padding: 0.35rem 0.6rem; margin: 0.25rem 0; border-radius: 6px; }
+    .gm { background: rgba(201,168,76,0.08); border-left: 3px solid var(--gold); }
+    .gm .speaker { color: var(--gold); }
+    .speaker { font-weight: 700; margin-right: 0.4rem; }
+    .p-mateo .speaker { color: #6fb1e0; }
+    .p-lyra .speaker { color: #e07f9a; }
+    .p-sera .speaker { color: #8fd19e; }
+    .p-khor .speaker { color: #c98fe0; }
+    .line-mateo { border-left: 3px solid #6fb1e0; background: rgba(111,177,224,0.06); }
+    .line-lyra { border-left: 3px solid #e07f9a; background: rgba(224,127,154,0.06); }
+    .line-sera { border-left: 3px solid #8fd19e; background: rgba(143,209,158,0.06); }
+    .line-khor { border-left: 3px solid #c98fe0; background: rgba(201,143,224,0.06); }
+    .oo { color: var(--text3); font-style: italic; font-size: 0.85rem; }
+
+    .roll {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        background: var(--bg4);
+        border: 1px solid var(--gold);
+        border-radius: 6px;
+        padding: 0.15rem 0.55rem;
+        font-family: 'Consolas', monospace;
+        font-size: 0.85rem;
+        color: var(--text);
+        margin: 0.15rem 0.2rem 0.15rem 0;
+    }
+    .die { display: inline-block; min-width: 1.2em; text-align: center; padding: 0 0.15em; border-radius: 4px; }
+    .die-success { background: var(--green); color: #06210f; font-weight: 700; }
+    .die-sb { background: var(--red); color: #fff; font-weight: 700; }
+    .die-blank { background: var(--bg3); color: var(--text3); }
+
+    .annotation {
+        background: var(--bg3);
+        border: 1px dashed var(--border);
+        border-left: 4px solid var(--blue);
+        border-radius: var(--radius);
+        padding: 0.5rem 0.9rem;
+        margin: 0.35rem 0 0.9rem 1.2rem;
+        font-size: 0.85rem;
+        color: var(--text2);
+    }
+    .annotation .tag { color: var(--blue); font-weight: 700; text-transform: uppercase; font-size: 0.7rem; letter-spacing: 0.03em; display: block; margin-bottom: 0.15rem; }
+    .annotation.gmside { border-left-color: var(--gold); }
+    .annotation.gmside .tag { color: var(--gold); }
+    .annotation.playerside { border-left-color: var(--green); }
+    .annotation.playerside .tag { color: var(--green); }
+    .annotation.rule { border-left-color: var(--purple); }
+    .annotation.rule .tag { color: var(--purple); }
+
+    .persona-card {
+        background: var(--bg2);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 0.7rem 0.9rem;
+    }
+    .persona-card h4 { margin-top: 0; }
+    .persona-card .role { color: var(--text3); font-size: 0.8rem; margin-bottom: 0.3rem; }
+    .persona-card .attitude { font-size: 0.85rem; }
+
+    .tracker {
+        display: inline-flex;
+        gap: 0.15rem;
+        vertical-align: middle;
+    }
+    .tracker .box { width: 0.85em; height: 0.85em; border: 1px solid var(--text3); border-radius: 2px; display: inline-block; }
+    .tracker .box.filled { background: var(--red); border-color: var(--red); }
+    .tracker .box.filled-gold { background: var(--gold); border-color: var(--gold); }
+    .tracker .box.filled-purple { background: var(--purple); border-color: var(--purple); }
+</style>
+</head>
+<body>
+
+<div class="titlepage">
+<h1>🎲 Fate's Edge</h1>
+<h2>An Annotated Play Session</h2>
+<p class="text-muted text-sm">Four players, one GM, and every core system in action — with rules callouts and GM/Player Guide advice inline.</p>
+</div>
+
+<details class="toc">
+<summary>📑 Table of Contents</summary>
+<a href="#how-to-use">How to Use This Document</a>
+<a href="#cast">The Table: GM and Four Players</a>
+<a href="#scene1">Scene 1 — The Approach (Position, DV, the Outcome Matrix)</a>
+<a href="#scene2">Scene 2 — Over the Wall (Selling the Action, Harm &amp; Armor Conversion)</a>
+<a href="#scene3">Scene 3 — The Rite at the Threshold (Obligation, Summoning, the Leash)</a>
+<a href="#scene4">Scene 4 — The Steward's Study (Assist/Setup, Critical 10s, Deck of Consequences)</a>
+<a href="#scene5">Scene 5 — The Reliquary (Combat: Position, Sidestep Strike, Fail Forward)</a>
+<a href="#wrap">Session Wrap-Up (Boon Carryover, XP, Debrief)</a>
+<a href="#gm-takeaways">GM Takeaways — Running a Mixed Table</a>
+<a href="#player-takeaways">Player Takeaways — Four Ways to Play</a>
+<a href="#cheatsheet">Quick-Reference Cheat Sheet</a>
+</details>
+
+<h2 id="how-to-use">📖 How to Use This Document</h2>
+<div class="panel panel-gold">
+<p>This is a <strong>simulated, fully-annotated session</strong> of Fate's Edge — not a transcript of real play, but a realistic one, built to walk a new GM or player through how the rules actually feel at the table. Every mechanical beat in the fiction below is followed by a small <span class="text-gold">annotation box</span> that names the rule in play and points back to the guide that covers it.</p>
+<p class="text-sm text-muted">Three annotation colors do three different jobs: <span class="badge badge-gold">GM Guide</span> boxes explain a GM-facing procedure or judgment call, <span class="badge badge-green">Player Guide</span> boxes explain a player-facing procedure, and <span class="badge badge-purple">Rule</span> boxes are quick reminders of the underlying mechanic. None of this is required reading before a real session — read the transcript for the story, and lean on the annotations only where you want the "why."</p>
+</div>
+
+<h2 id="cast">🎭 The Table: GM and Four Players</h2>
+<p>The party is investigating <strong>Castellan Voss's tower</strong> in Silkstrand, where a stolen <em>Symbol</em> — a minor relic tied to a terrestrial patron — is rumored to be locked in the steward's reliquary. This session picks up mid-campaign; everyone already knows their gear and their debts.</p>
+
+<div class="grid-2 mt-1">
+
+<div class="persona-card">
+<h4>🛡️ Mateo — <span class="text-muted">The Guardian</span></h4>
+<div class="role">Body 4, Melee 3, Heavy Armor. Player: <strong>Priya</strong></div>
+<div class="attitude">Priya is a <strong>tactical planner</strong>. She tracks her own Fatigue track and armor conversion table on a note card before session even starts, asks clarifying questions about range bands before she moves, and wants to know the DV before she commits to an approach. She is having fun optimizing — this is her fun.</div>
+</div>
+
+<div class="persona-card">
+<h4>🗡️ Lyra — <span class="text-muted">The Rogue</span></h4>
+<div class="role">Wits 3, Stealth 2, light blade. Player: <strong>Devon</strong></div>
+<div class="attitude">Devon is a <strong>"rule of cool" improviser</strong>. He rarely asks what the DV is before describing something bold, spends Boons the moment he gets them, and treats a Miss as a plot twist to build on rather than a setback. He's the table's chaos engine — in a good way.</div>
+</div>
+
+<div class="persona-card">
+<h4>🎻 Sera — <span class="text-muted">The Bard</span></h4>
+<div class="role">Presence 3, Sway 2, first campaign. Player: <strong>Naomi</strong></div>
+<div class="attitude">Naomi is <strong>new to tabletop RPGs</strong> and a little quiet at a table of louder personalities. She second-guesses her own ideas out loud ("is that even allowed?") and needs the GM to actively invite her into scenes rather than wait for her to jump in.</div>
+</div>
+
+<div class="persona-card">
+<h4>🐦‍⬛ Khor — <span class="text-muted">The Summoner</span></h4>
+<div class="role">Spirit 3, Presence 2, Pact-Whisperer. Player: <strong>Ollie</strong></div>
+<div class="attitude">Ollie is an <strong>experienced player who wants the spotlight</strong>. He's not a bad table citizen, but he'll happily narrate three actions in a row if no one stops him, and he's the type to treat his Patron's Obligation as a resource to min-max rather than a story hook — until the GM makes the debt personal.</div>
+</div>
+
+</div>
+
+<div class="panel panel-blue mt-1">
+<p><strong>GM:</strong> Referred to below simply as <strong>GM</strong>. Running the table is <strong>Jess</strong>, a second-time GM who is deliberately using this scenario to practice spotlight balance across very different play styles — see the <a href="#gm-takeaways">GM Takeaways</a> section at the end for what she's doing on purpose.</p>
+</div>
+
+<div class="scene-banner">
+<h2 id="scene1">Scene 1 — The Approach</h2>
+<div class="sub">Demonstrates: the 90-second play loop, Position &amp; DV, dice reading, the Outcome Matrix, Boons</div>
+</div>
+
+<div class="transcript">
+
+<div class="line gm"><span class="speaker">GM:</span> The service alley behind Castellan Voss's tower is quiet — one lantern, one guard rotation, and a drainpipe running up to a shuttered window on the second floor. "What do you do?"</div>
+
+<div class="annotation gmside"><span class="tag">GM Guide — Core Loop, Step 1</span>Setting the stage and asking "what do you do?" is the whole first step of the <strong>90-Second Play Loop</strong>. The GM doesn't pre-decide the approach — she waits for the players to declare intent first.</div>
+
+<div class="line line-lyra p-lyra"><span class="speaker">Lyra (Devon):</span> I'm already climbing the drainpipe before anyone finishes talking. Wits and Stealth, right? I want to be at that window before the guard turns back.</div>
+
+<div class="line gm"><span class="speaker">GM:</span> Sure — declare it and I'll set the scene. Climbing an unguarded drainpipe in the dark, with a guard on rotation twenty feet away: this is Controlled Position, and I'll call it DV 3 — pressured, but nothing's actively opposing you yet.</div>
+
+<div class="annotation rule"><span class="tag">Rule — Difficulty Value (DV)</span>DV 3 is the explicit <strong>default</strong> in the Player's Guide: "pressured, mild opposition." The GM doesn't inflate it just because it's a heist — a DV should reflect real stakes, not vibes.</div>
+
+<div class="line line-lyra p-lyra"><span class="speaker">Lyra (Devon):</span> Rolling Wits 3 + Stealth 2, five dice. <span class="roll">🎲 <span class="die die-success">6</span><span class="die die-blank">4</span><span class="die die-sb">1</span><span class="die die-success">8</span><span class="die die-blank">3</span></span> Two Successes, one Story Beat.</div>
+
+<div class="annotation rule"><span class="tag">Rule — Reading the Dice</span>Each die showing <strong>6 or higher is a Success</strong>; each <strong>1 generates a Story Beat (SB)</strong> for the GM to spend. Two Successes against a DV of 3 is not enough to clear the bar outright.</div>
+
+<div class="line gm"><span class="speaker">GM:</span> Two Successes against DV 3 — that's a <strong>Partial</strong>. You make it up the pipe and reach the window ledge, but you're not clean about it. And that 1 you rolled — I'm spending it now: as you get your fingers on the shutter, it groans, loud. The guard below pauses mid-step.</div>
+
+<div class="annotation gmside"><span class="tag">GM Guide — Outcome Matrix + Spending SB</span>0 &lt; Successes &lt; DV is a <strong>Partial</strong>: progress, but the situation stays unresolved, and Lyra gains 1 Boon. The GM spends the 1 SB immediately rather than banking it — the guide's advice is "spend SB early: one strong complication is better than three weak ones."</div>
+
+<div class="line line-lyra p-lyra"><span class="speaker">Lyra (Devon):</span> (grinning) Perfect, love it. I freeze on the ledge like a gargoyle. Mark 1 Boon.</div>
+
+<div class="annotation playerside"><span class="tag">Player Guide — Boons</span>Partial success grants <strong>1 Boon</strong> (max 5 held, trimmed to 2 at scene end). Devon tracks this on his own sheet the moment it happens — no waiting for the GM to remind him, exactly what the Player Guide means by "you are the primary manager of your character's mechanical state."</div>
+
+<div class="line gm"><span class="speaker">GM:</span> The guard listens for a three-count, shrugs, and keeps walking. You're in — but you used up your quiet option; nobody else is climbing that pipe without noise now. Mateo, Sera, Khor — you're still down in the alley. What's the plan?</div>
+
+<div class="line line-mateo p-mateo"><span class="speaker">Mateo (Priya):</span> Before we commit — how far is the side door from our position, and is it locked or guarded?</div>
+
+<div class="line gm"><span class="speaker">GM:</span> Near range, unguarded, definitely locked.</div>
+
+<div class="annotation gmside"><span class="tag">GM Guide — Answering Prep Questions</span>Priya's habit of asking for concrete distances and states before committing is exactly the kind of table input the GM should just answer plainly — it costs nothing and lets a tactical player do what they enjoy.</div>
+
+<div class="line line-mateo p-mateo"><span class="speaker">Mateo (Priya):</span> Okay. I'll stand watch on the alley mouth while someone deals with the door — Body 4, I can handle it if the guard comes back early.</div>
+
+<div class="line line-sera p-sera"><span class="speaker">Sera (Naomi):</span> (quietly) I guess... I could try to pick the lock? I don't actually have Subterfuge though. Is that bad?</div>
+
+<div class="line gm"><span class="speaker">GM:</span> It's not bad at all — you'd roll Wits + whatever's closest, probably at reduced dice, or you find another way in. What's Sera's read on that door — does she know locks, or is she working on instinct?</div>
+
+<div class="annotation gmside"><span class="tag">GM Guide — Inviting Quiet Players</span>Rather than let Naomi's hesitation pass by, the GM asks a leading question — the guide's advice is explicit: <em>"Ask leading questions... gentle prompts help shy players find their moment."</em> This isn't a rules mechanic, it's table facilitation, and it matters as much as any dice rule.</div>
+
+<div class="line line-sera p-sera"><span class="speaker">Sera (Naomi):</span> Oh — okay. Um, instinct, I think? She grew up on the docks, she's picked a few crates open before. Not a real thief, but her hands know things.</div>
+
+<div class="line gm"><span class="speaker">GM:</span> I like that a lot. Roll Wits + your general Subterfuge (0), so it's a small pool, but let's see what the docks taught her.</div>
+
+</div>
+
+<div class="transcript">
+
+<div class="line line-sera p-sera"><span class="speaker">Sera (Naomi):</span> Two dice, then. <span class="roll">🎲 <span class="die die-blank">2</span><span class="die die-blank">5</span></span> ...zero Successes. That's bad, right?</div>
+
+<div class="line gm"><span class="speaker">GM:</span> It's a <strong>Miss</strong> — but a Miss is never "nothing happens." Here's what I'm thinking: your pick snaps clean off in the lock. That's loud enough that the door across the alley creaks open — a second guard, off-duty, sticking his head out to see what the noise was. You gain 2 Boons. What do you do?</div>
+
+<div class="annotation gmside"><span class="tag">GM Guide — Fail Forward</span>A Miss always escalates rather than stalling the scene — here, a new NPC obstacle appears instead of the door just staying locked. Sera's Player Guide payout is explicit too: <strong>2 Boons on a Miss</strong>, more than a Partial, because the story took a harder swing.</div>
+
+<div class="line line-sera p-sera"><span class="speaker">Sera (Naomi):</span> Oh! Um — I stand up straight and just... talk to him? Like I'm supposed to be there. "Sorry, dropped my key, give me a second."</div>
+
+<div class="line gm"><span class="speaker">GM:</span> I love that. That's an actual new roll — Presence + Sway, Controlled, DV 3, since he's suspicious but not alarmed yet.</div>
+
+<div class="line line-sera p-sera"><span class="speaker">Sera (Naomi):</span> Five dice! <span class="roll">🎲 <span class="die die-success">9</span><span class="die die-success">7</span><span class="die die-blank">4</span><span class="die die-blank">3</span><span class="die die-blank">2</span></span> Two Successes, no SB.</div>
+
+<div class="line gm"><span class="speaker">GM:</span> Clean Success. He grunts, says something about the night watch getting lazy, and shuts the door. You're back to working the lock — and this time you've got 2 Boons banked. Want to spend one to improve Position before you try again?</div>
+
+<div class="line line-sera p-sera"><span class="speaker">Sera (Naomi):</span> Yes! Actually yes, let's do that.</div>
+
+<div class="annotation playerside"><span class="tag">Player Guide — Spending Boons, "The Math of Fun"</span>The GM offers the option rather than assuming Naomi knows it's available — a small but real teaching moment. The guide is blunt about this design intent: <em>"Hoarding Boons for XP conversion leads to less engagement and lower fun scores... spend Boons freely, they are not XP tokens."</em> Naomi taking the offer, out loud, for the first time this session, is exactly the payoff that advice is aiming for.</div>
+
+</div>
+
+<div class="scene-banner">
+<h2 id="scene2">Scene 2 — Over the Wall</h2>
+<div class="sub">Demonstrates: Selling the Action, Position modifiers, Harm &amp; Fatigue, armor conversion (player-calculated), the "roller-coaster" effect</div>
+</div>
+
+<div class="transcript">
+
+<div class="line gm"><span class="speaker">GM:</span> The lock gives. Inside, a narrow servant's stair — and at the top, one of Voss's house guard, alerted by all that noise at the door, coming down fast. Mateo, you're closest.</div>
+
+<div class="line line-mateo p-mateo"><span class="speaker">Mateo (Priya):</span> I plant myself at the base of the stairs, shield up. He's got the height, so that's probably Controlled for me, or worse?</div>
+
+<div class="line gm"><span class="speaker">GM:</span> Good instinct — Controlled, since the stairwell's narrow enough that his height advantage doesn't fully land.</div>
+
+<div class="line line-mateo p-mateo"><span class="speaker">Mateo (Priya):</span> Before I roll — can I say something? Mateo doesn't fight for coin. His little brother is still indentured to a house like this one. Every guard he puts down is one step closer to getting him out. I set my feet at the bottom of those stairs like it's the only ground in the world worth holding.</div>
+
+<div class="line gm"><span class="speaker">GM:</span> That's a stake, not just flavor — I'm improving your Position by one step. You're Dominant for this roll.</div>
+
+<div class="annotation gmside"><span class="tag">GM Guide — Selling the Action</span>This is the <strong>character-driven description</strong> tier: a stated stake and a bond tied to the roll, not just adjectives. The guide's rule of thumb: <em>"One heartfelt sentence counts more than a paragraph of adjectives"</em> — and the payout is a full Position step, same as a tactical description would earn. Naomi watching this happen is part of why the GM chose to demonstrate it on Mateo's turn instead of quietly explaining it out of character.</div>
+
+<div class="line line-mateo p-mateo"><span class="speaker">Mateo (Priya):</span> Body 4 + Melee 3, seven dice, Dominant so I re-roll a failure. <span class="roll">🎲 <span class="die die-success">6</span><span class="die die-success">7</span><span class="die die-blank">3</span><span class="die die-blank">5</span><span class="die die-blank">2</span><span class="die die-sb">1</span><span class="die die-success">10</span></span> Re-rolling one of the blanks... <span class="roll">🎲 → <span class="die die-success">8</span></span> Successes: the 6, 7, the 10 counts as two, and the re-rolled 8. That's five, plus one SB.</div>
+
+<div class="annotation rule"><span class="tag">Rule — Position &amp; Critical 10s</span><strong>Dominant</strong> lets you re-roll one failed die. A <strong>10</strong> always counts as two Successes and is never re-rolled by any effect, Position included — Priya already knew this and didn't try.</div>
+
+<div class="line gm"><span class="speaker">GM:</span> Five Successes against DV 3 with a 10 in the mix — Clean Success, and I'm using the critical benefit. Your shield takes his first strike and turns his own momentum against him: he stumbles down the last two steps, off-balance, and lands hard in front of you. He's on the ground, Desperate for his own follow-up.</div>
+
+<div class="line line-mateo p-mateo"><span class="speaker">Mateo (Priya):</span> I'll take that. What about the 1 I rolled?</div>
+
+<div class="line gm"><span class="speaker">GM:</span> I'm banking it — one SB isn't worth a complication on a roll this clean. I'll spend it later.</div>
+
+<div class="annotation gmside"><span class="tag">GM Guide — Choosing Not to Spend</span>The GM isn't obligated to spend every SB the instant it's rolled — sometimes the better call is to save a single SB for a moment that needs it more.</div>
+
+</div>
+
+<div class="transcript">
+
+<div class="line gm"><span class="speaker">GM:</span> A second guard comes around the landing above and puts a crossbow bolt into you before you can react. Mateo — you take Harm 2.</div>
+
+<div class="annotation gmside"><span class="tag">GM Guide — Stating Harm</span>The GM states the raw Harm value and stops there. She does <strong>not</strong> calculate the armor conversion for Mateo — that's explicitly the player's job in Fate's Edge, freeing the GM to keep narrating instead of doing math for four characters.</div>
+
+<div class="line line-mateo p-mateo"><span class="speaker">Mateo (Priya):</span> I'm in Heavy Armor. Let me check the table... Harm 2 in Heavy converts fully: Harm 0 remaining, Fatigue 1 gained.</div>
+
+<div class="annotation playerside"><span class="tag">Player Guide — Armor Conversion (Player-Calculated)</span>Priya consults the <strong>Armor Conversion Table</strong> herself: Heavy Armor has Step 3, meaning Harm up to 3 converts fully to Fatigue. Harm 2 ≤ Step 3, so it all becomes Fatigue, at "Step − 1" efficiency (2 Fatigue per full step) — here that nets exactly 1 Fatigue, matching the table's Harm-2-row for Heavy. She reports the result back to the table rather than waiting for the GM to tell her.</div>
+
+<div class="line line-mateo p-mateo"><span class="speaker">Mateo (Priya):</span> No Harm to apply, so Fatigue doesn't clear — I just add 1 Fatigue. That puts me at Fatigue 1 of 4. The bolt catches my pauldron and the shock runs down my arm, but the plate holds.</div>
+
+<div class="annotation rule"><span class="tag">Rule — Apply Order</span>The procedure is always <strong>Harm first (clears Fatigue), then add Fatigue</strong>. Here there's no Harm to apply, so nothing clears — Priya still narrates the moment rather than treating it as pure bookkeeping.</div>
+
+<div class="line gm"><span class="speaker">GM:</span> Nice. The downed guard below you is scrambling for his sword — one more exchange before he's out of it.</div>
+
+<div class="line line-mateo p-mateo"><span class="speaker">Mateo (Priya):</span> I finish him. Same roll, Controlled since he's on the ground and I'm not — Body 4 + Melee 3.</div>
+
+<div class="line line-mateo p-mateo"><span class="speaker">Mateo (Priya):</span> <span class="roll">🎲 <span class="die die-blank">4</span><span class="die die-blank">3</span><span class="die die-success">6</span><span class="die die-blank">5</span><span class="die die-sb">1</span><span class="die die-blank">2</span><span class="die die-sb">1</span></span> One Success, two SB. That's a Partial against DV 3.</div>
+
+<div class="line gm"><span class="speaker">GM:</span> Partial — you drive him back but he's not down, and he gets one desperate cut in on his way past your guard. Take Harm 1. I'm also spending one of those SB: he shouts for the alarm bell as he breaks off.</div>
+
+<div class="annotation gmside"><span class="tag">GM Guide — SB Spend Tiers</span>One SB for a shout that raises the alarm is a textbook <strong>1-SB minor complication</strong> per the guide's spend table. The GM banks the second SB rather than stacking two complications on one Partial — restraint keeps a single roll from snowballing into an unfair pile-on.</div>
+
+<div class="line line-mateo p-mateo"><span class="speaker">Mateo (Priya):</span> Harm 1 in Heavy — full conversion again, Fatigue 1 gained. I'm at Fatigue 2 of 4 now. Wait — this is where it gets interesting: I also earned a Boon from that Partial.</div>
+
+<div class="line gm"><span class="speaker">GM:</span> Right, mark it. And the alarm bell means the whole tower's about to know you're here. Lyra, you're already inside — what do you see from that window?</div>
+
+</div>
+
+<div class="tipbox mt-1">
+<p><strong>Zooming out on Fatigue:</strong> if Mateo takes one more solid hit before he gets a chance to rest, his Fatigue track (equal to his Body, 4) will fill. When it does, the Player Guide's rule is automatic and immediate: <strong>increase Harm by 1 step and clear all Fatigue</strong> — the "roller-coaster effect," where a wound that should feel like the last straw instead clears his head. Priya already knows this is coming and isn't worried about it; she's using Fatigue as a resource to spend, not hoarding it out of fear.</p>
+</div>
+
+<div class="scene-banner">
+<h2 id="scene3">Scene 3 — The Rite at the Threshold</h2>
+<div class="sub">Demonstrates: Obligation Capacity and overflow, summoning, the Leash, Boon Finesse, and redirecting a spotlight-heavy player</div>
+</div>
+
+<div class="transcript">
+
+<div class="line line-khor p-khor"><span class="speaker">Khor (Ollie):</span> While they're dealing with the alarm, I'm not waiting around. I call my patron's Rite to ward the stairwell door shut behind us, and then I'm summoning the wisp to scout the upper floor, and then I want to try reading the wards on the reliquary door myself before anyone else gets there —</div>
+
+<div class="line gm"><span class="speaker">GM:</span> Let's take those one at a time — actually, let's take just the first one right now, because it's going to cost you something interesting. Invoking that Rite: what's your current Obligation?</div>
+
+<div class="annotation gmside"><span class="tag">GM Guide — Spotlight Management</span>Rather than let Ollie chain three declared actions with no pushback, the GM slows the pace down to one action, resolved fully, before the next. This isn't a punishment — it's the same "pass the spotlight" discipline the Core Loop calls for, applied gently so Ollie doesn't just get a full scene to himself while three other players wait.</div>
+
+<div class="line line-khor p-khor"><span class="speaker">Khor (Ollie):</span> I'm at 3 segments already — one on my Patron, one from a Symbol I cracked last session, one more from a favor I haven't paid back yet. My capacity is Spirit 3 + Presence 2 = 5. This Rite is +1, so I'll be at 4. Still fine.</div>
+
+<div class="annotation playerside"><span class="tag">Player Guide — Obligation Capacity</span>Capacity = Spirit + Presence. Ollie tracks his own Obligation segments across every Patron and Symbol he owes, exactly as the guide expects: <em>"Declare thresholds... keep it visible."</em> He's not hiding from the math — he's using it, which is part of why the GM is about to lean on it narratively instead of mechanically.</div>
+
+<div class="line gm"><span class="speaker">GM:</span> Mark it. The ward goes up clean — the door won't budge from the other side. But here's the thing: this Rite belongs to the same Patron as the favor you haven't paid back. As the ward settles, you feel it — not a punishment, just... attention. She's watching how you spend what you owe her.</div>
+
+<div class="annotation gmside"><span class="tag">GM Guide — Obligation as Story Engine</span>The guide is explicit that Obligation is "not a punishment, it's a promise of future story," and that the GM's job is to <strong>frame Patron intrusions as story hooks</strong>. Jess isn't triggering a mechanical penalty here (Khor is still under capacity) — she's making the debt feel personal and present, which is the real payoff of the system for a player who might otherwise just treat it as a number.</div>
+
+<div class="line line-khor p-khor"><span class="speaker">Khor (Ollie):</span> ...huh. Okay, that actually lands. Fine — the wisp next. I want eyes on the upper floor before we move.</div>
+
+<div class="line gm"><span class="speaker">GM:</span> Summon it — one action, one Boon or Fatigue to Bind it. Its Leash is your Cap plus its own segments; let's say Leash 4 for a minor spirit like this.</div>
+
+<div class="line line-khor p-khor"><span class="speaker">Khor (Ollie):</span> I'll pay the Boon rather than Fatigue, I want to stay sharp for whatever's up there. It slips out through the gap under the door — small, quick, curious little thing made of dust and lamplight.</div>
+
+<div class="line gm"><span class="speaker">GM:</span> It comes back a moment later — there are two more guards up there, and one of them is already moving toward the stairs. As it slips back under the door to report, it brushes against the iron doorframe. Tick the Leash.</div>
+
+<div class="annotation gmside"><span class="tag">GM Guide — Ticking the Leash</span>The guide lists exactly this trigger: <em>"tick the Leash whenever the spirit... crosses a [WARD]"</em> — here, an iron threshold counts. The GM watches for these triggers actively; it's her job to notice, not the player's job to ask for it.</div>
+
+<div class="line line-khor p-khor"><span class="speaker">Khor (Ollie):</span> That's Leash 1 of 4. I don't want it slipping loose yet — I'll spend a Boon to clear that tick. Boon Finesse, once per round, right?</div>
+
+<div class="line gm"><span class="speaker">GM:</span> Right, that works — clear it. But you're down to your last Boon now.</div>
+
+<div class="annotation playerside"><span class="tag">Player Guide — Boon Finesse</span><strong>Once per round, spend 1 Boon to clear 1 Leash tick before it fills.</strong> Ollie is treating his Boon economy as a real tradeoff rather than an infinite resource — spending his last one to keep the spirit calm rather than saving it "just in case," which is exactly the spend-don't-hoard instinct the Boon economy is designed to reward.</div>
+
+</div>
+
+<div class="scene-banner">
+<h2 id="scene4">Scene 4 — The Steward's Study</h2>
+<div class="sub">Demonstrates: Setup and Assist (teamwork actions), Critical 10 benefits, and the Deck of Consequences for on-the-fly answers</div>
+</div>
+
+<div class="transcript">
+
+<div class="line gm"><span class="speaker">GM:</span> You reach the steward's study before the guards catch up — locked writing desk, and behind it, a portrait that's just slightly off-center on the wall. Someone wants you to think there's a safe behind it. Who's on the desk?</div>
+
+<div class="line line-lyra p-lyra"><span class="speaker">Lyra (Devon):</span> Me, obviously. Wits + Subterfuge, and I want it open before the guards are on us.</div>
+
+<div class="line line-sera p-sera"><span class="speaker">Sera (Naomi):</span> Can I help somehow? I don't have any lockpicking, but... I could watch the door and warn her the second I hear boots on the stairs, so she's not rushing blind?</div>
+
+<div class="line gm"><span class="speaker">GM:</span> That's a great use of Setup — roll Wits + Insight, or honestly just Presence if you're listening for footsteps rather than reading anything. Success gives Lyra +1 Position on this roll.</div>
+
+<div class="annotation gmside"><span class="tag">Player Guide — Setup (Teamwork)</span><strong>Setup</strong> lets a non-specialist contribute meaningfully with their own roll rather than just describing help for free — the GM Guide's advice on player creativity is almost word for word here: <em>"Let non-specialists contribute meaningfully... you can't pick the lock, but you can hold the torch steady."</em> Naomi gets a real mechanical stake in the scene without needing a lockpicking skill of her own.</div>
+
+<div class="line line-sera p-sera"><span class="speaker">Sera (Naomi):</span> Presence 3, two dice since I don't really have the skill. <span class="roll">🎲 <span class="die die-success">8</span><span class="die die-blank">4</span></span> One Success — that clears DV 2 for just listening at a door, right?</div>
+
+<div class="line gm"><span class="speaker">GM:</span> Right, that's a clean pass. You catch the rhythm of the patrol below — you'll have real warning. Lyra, you're Dominant on this roll now.</div>
+
+<div class="line line-lyra p-lyra"><span class="speaker">Lyra (Devon):</span> Six dice, Dominant so I re-roll a failure. <span class="roll">🎲 <span class="die die-success">10</span><span class="die die-success">7</span><span class="die die-blank">4</span><span class="die die-blank">3</span><span class="die die-sb">1</span><span class="die die-blank">5</span></span> re-rolling one blank... <span class="roll">🎲 → <span class="die die-success">9</span></span> that's the 10 (two), the 7, the 9 — five Successes, one SB, DV was 3.</div>
+
+<div class="annotation rule"><span class="tag">Rule — Critical 10s</span>One 10 in a successful roll grants a benefit from the critical table. A single 10 is a <strong>Strong Success</strong>: improve Position by one step on the next action this scene, or a minor advantage at GM discretion.</div>
+
+<div class="line gm"><span class="speaker">GM:</span> Clean success with a critical on top. The desk clicks open — and because of that 10, I'll give you the minor advantage: tucked under the false bottom is a second item you weren't looking for. A sealed letter, Voss's own hand, addressed to someone outside the city.</div>
+
+<div class="line line-lyra p-lyra"><span class="speaker">Lyra (Devon):</span> Oh, I'm reading that immediately. What does it say?</div>
+
+<div class="line gm"><span class="speaker">GM:</span> Let's find out together. (draws from the Deck of Consequences) King of Hearts.</div>
+
+<div class="annotation gmside"><span class="tag">GM Guide — Deck of Consequences (Plot Generation)</span>The GM has nothing prepped for "what's in the letter," so she reaches for the deck rather than stalling. <strong>Hearts</strong> mean the answer is about a relationship, loyalty, or emotion. A face card (King) signals major severity. Per the interpretation procedure: state the literal card ("King of Hearts = Betrayal"), then ask who is betraying whom.</div>
+
+<div class="line gm"><span class="speaker">GM:</span> King of Hearts is Betrayal. So — who's betraying whom? I think Voss isn't loyal to the Cantor faction everyone assumes he serves. This letter is addressed to a rival house, offering to hand over the Symbol you're all here to steal, in exchange for asylum. He was planning to run before you ever showed up.</div>
+
+<div class="annotation gmside"><span class="tag">GM Guide — Linking the Draw to a Timer</span>The procedure's third step is linking the answer to an existing timer or stake. Jess ties this straight back to the session's core tension — the Symbol's location and ownership — rather than treating the draw as a disconnected fun fact.</div>
+
+<div class="line line-mateo p-mateo"><span class="speaker">Mateo (Priya):</span> So the Symbol might not even be where we think it is.</div>
+
+<div class="line gm"><span class="speaker">GM:</span> That's a very reasonable worry to have right now.</div>
+
+</div>
+
+<div class="scene-banner">
+<h2 id="scene5">Scene 5 — The Reliquary</h2>
+<div class="sub">Demonstrates: Sidestep Strike, opportunity attacks, worsening Position, Fatigue overflow (the "roller-coaster" effect), and a Miss that changes the story instead of stopping it</div>
+</div>
+
+<div class="transcript">
+
+<div class="line gm"><span class="speaker">GM:</span> The reliquary door is open — someone got here first. Two of Voss's remaining guards are already inside, and they've heard you coming. This is a fight. Roll for what you're doing.</div>
+
+<div class="line line-mateo p-mateo"><span class="speaker">Mateo (Priya):</span> I'm at Fatigue 2 already. If I take one more solid hit, I roll into Harm — I know that, and I'm fine with it. I move to Close range and attack the nearer guard.</div>
+
+<div class="line gm"><span class="speaker">GM:</span> Controlled, DV 3, same as before.</div>
+
+<div class="line line-mateo p-mateo"><span class="speaker">Mateo (Priya):</span> <span class="roll">🎲 <span class="die die-blank">3</span><span class="die die-blank">5</span><span class="die die-blank">4</span><span class="die die-blank">2</span><span class="die die-blank">4</span><span class="die die-sb">1</span><span class="die die-blank">5</span></span> ...zero Successes. Miss, and one SB for you.</div>
+
+<div class="line gm"><span class="speaker">GM:</span> A clean Miss isn't "nothing happens" — his counter lands hard while your swing goes wide. Take Harm 3.</div>
+
+<div class="annotation gmside"><span class="tag">GM Guide — Fail Forward in Combat</span>Even a whiffed attack roll produces a consequence rather than just "you miss, next turn" — here, that consequence is the enemy's counterattack landing.</div>
+
+<div class="line line-mateo p-mateo"><span class="speaker">Mateo (Priya):</span> Heavy Armor, Harm 3 — that's exactly my Step, so full conversion: Harm 0 remaining, Fatigue 2 gained. I add that to my current Fatigue 2... that's Fatigue 4. My track is Body 4. That's overflow.</div>
+
+<div class="annotation playerside"><span class="tag">Player Guide — Fatigue Overflow</span>Overflow triggers when Fatigue reaches or exceeds Body, not only when it exceeds it — Priya catches this correctly (Fatigue 4 = Body 4 counts). The rule: <strong>increase Harm by 1 step, then clear all Fatigue.</strong></div>
+
+<div class="line line-mateo p-mateo"><span class="speaker">Mateo (Priya):</span> So: Harm goes up by 1 — I've taken enough scattered hits tonight that this pushes me to Harm 1 overall — and my Fatigue clears completely, back to 0. Which is honestly great timing.</div>
+
+<div class="line gm"><span class="speaker">GM:</span> Tell me what that looks like.</div>
+
+<div class="line line-mateo p-mateo"><span class="speaker">Mateo (Priya):</span> The hit that should have dropped me instead snaps something loose — the ache in my shoulder just... goes quiet. Everything gets very clear. I'm not tired anymore. I'm just angry now.</div>
+
+<div class="annotation rule"><span class="tag">Rule — The Roller-Coaster Effect</span>This is the exact dynamic the Player Guide names: <em>"a character near collapse who takes a wound and suddenly finds a second wind."</em> Mechanically Mateo is now at Harm 1 (−1 die on related actions) but Fatigue 0 — objectively worse off in the long run, but narratively primed for a big moment right now. Priya narrating the shift is what makes the swing land at the table, not just on the sheet.</div>
+
+<div class="line line-lyra p-lyra"><span class="speaker">Lyra (Devon):</span> While they're focused on him, I want to close in on the second guard from Near range. Sidestep Strike into Close — I know that worsens my Position, but my knife wants Close range for the bonus.</div>
+
+<div class="annotation playerside"><span class="tag">Player Guide — Sidestep Strike</span>Moving one range band as part of a melee attack, without spending your Move action, always worsens Position by one step — Devon takes the tradeoff deliberately because the light blade's Close-range bonus (+2 dice) outweighs the cost for him.</div>
+
+<div class="line gm"><span class="speaker">GM:</span> Controlled becomes Desperate, then. Roll it.</div>
+
+<div class="line line-lyra p-lyra"><span class="speaker">Lyra (Devon):</span> Wits 3 + Stealth... no wait, this is Melee, I don't have that trained. Let me use Body instead as an ambush strike — Body 2 + Unarmed 1, three dice, plus the +2d Close bonus from the blade, five dice, Desperate so I re-roll a success if I get one.</div>
+
+<div class="line line-lyra p-lyra"><span class="speaker">Lyra (Devon):</span> <span class="roll">🎲 <span class="die die-success">6</span><span class="die die-success">7</span><span class="die die-blank">4</span><span class="die die-blank">2</span><span class="die die-sb">1</span></span> two Successes before the re-roll — Desperate re-rolls one success, so I have to re-roll the 6... <span class="roll">🎲 → <span class="die die-blank">3</span></span> that drops to one Success, one SB.</div>
+
+<div class="annotation rule"><span class="tag">Rule — Desperate Re-rolls a Success</span>Where Dominant lets you re-roll a failure, <strong>Desperate forces a re-roll of one success</strong> — it can genuinely make things worse, which is why the guide frames Desperate as "you act under duress," not just "harder."</div>
+
+<div class="line gm"><span class="speaker">GM:</span> One Success against DV 3 — Partial. Your knife catches him but doesn't drop him, and because you left Near range to close in, he gets a free swing as you pass — that's an opportunity attack, Controlled Position for him, no action cost.</div>
+
+<div class="annotation gmside"><span class="tag">GM Guide — Opportunity Attacks</span>The GM correctly applies the rule: closing to Close via Sidestep Strike still triggers an opportunity attack unless the attacker also used Disengage, which Devon didn't. This is a real cost, not a gotcha — it's the same tradeoff the Player Guide warns about openly.</div>
+
+<div class="line line-lyra p-lyra"><span class="speaker">Lyra (Devon):</span> Worth it. Mark my Boon from the Partial. Even if he hits me, that's a great scene either way.</div>
+
+<div class="annotation playerside"><span class="tag">Player Guide — "Fail Forward, Fun Either Way"</span>This is Devon's whole approach to the game distilled into one line: he isn't trying to avoid bad outcomes, he's trying to generate interesting ones. The guide explicitly validates this instinct: <em>"Don't fear Story Beats — they are fuel for drama, not punishment."</em></div>
+
+</div>
+
+<div class="transcript">
+
+<div class="line line-khor p-khor"><span class="speaker">Khor (Ollie):</span> My wisp's still out — I send it to distract the second guard, get his eyes off Lyra. Quick command, doesn't cost me my own action.</div>
+
+<div class="annotation playerside"><span class="tag">Player Guide — Quick Commands</span>Simple orders like "attack nearest, hold, distract" don't cost the summoner's action — only complex commands do. Ollie uses this correctly to help a teammate without giving up his own turn.</div>
+
+<div class="line gm"><span class="speaker">GM:</span> It darts across his vision, and he flinches — but doing that out here, away from the warded stair, means it's exposed. Tick the Leash again. That's Leash 3 of 4 now, and you're out of Boons to clear it.</div>
+
+<div class="line line-khor p-khor"><span class="speaker">Khor (Ollie):</span> I don't have a Boon, but I do have Fatigue to spare — can I substitute?</div>
+
+<div class="line gm"><span class="speaker">GM:</span> No — Boon Finesse is specifically a Boon spend, that substitution rule is for other Boon-cost effects, not this one. You're at Leash 3. One more tick and it acts on its own.</div>
+
+<div class="annotation gmside"><span class="tag">GM Guide — Knowing the Boundaries</span>The GM catches an easy mistake before it becomes a house rule by accident: the Fatigue-for-Boon substitution applies broadly, but Boon Finesse for Leash-clearing is its own specific mechanic. A good GM knows where a general rule stops and a specific one takes over.</div>
+
+<div class="line line-mateo p-mateo"><span class="speaker">Mateo (Priya):</span> I finish my guard — same roll as before, Controlled, and this time I'm not holding back.</div>
+
+<div class="line line-mateo p-mateo"><span class="speaker">Mateo (Priya):</span> <span class="roll">🎲 <span class="die die-success">7</span><span class="die die-success">6</span><span class="die die-success">9</span><span class="die die-blank">4</span><span class="die die-blank">3</span><span class="die die-blank">5</span></span> Three Successes, no SB. Clean Success.</div>
+
+<div class="line gm"><span class="speaker">GM:</span> He goes down. That's one guard left, and he's rattled — Lyra's Partial already cut him, your wisp's still buzzing around his head, Khor. What's the last move?</div>
+
+<div class="line line-sera p-sera"><span class="speaker">Sera (Naomi):</span> Can I try something? I've been listening at the door this whole scene — I step in and just... tell him it's over. Not a threat. Just true. "Voss already ran. There's nothing left here worth dying for."</div>
+
+<div class="line gm"><span class="speaker">GM:</span> That's a full scene turn, not a combat action — and it's exactly the kind of thing that deserves a real roll. Presence + Sway, Controlled, DV 3. If you land it, he stands down instead of this becoming one more body on the floor.</div>
+
+<div class="annotation gmside"><span class="tag">GM Guide — Golden Rule</span>Rather than force a mechanically "correct" combat resolution, the GM leans on the guide's Golden Rule: <em>"make the choice that serves the story."</em> Ending the fight through Sera's words instead of one more attack roll is more interesting than grinding out the last guard's Harm track.</div>
+
+<div class="line line-sera p-sera"><span class="speaker">Sera (Naomi):</span> Five dice. <span class="roll">🎲 <span class="die die-success">6</span><span class="die die-success">10</span><span class="die die-blank">4</span><span class="die die-sb">1</span><span class="die die-blank">3</span></span> the 10 is two Successes, plus the 6 — three Successes, one SB. Against DV 3, that's Clean Success with a critical.</div>
+
+<div class="line gm"><span class="speaker">GM:</span> He lowers his sword. Just like that, it's over. The critical benefit is yours to choose — improve Position, a minor advantage, or something else entirely?</div>
+
+<div class="line line-sera p-sera"><span class="speaker">Sera (Naomi):</span> Can he... tell us where Voss actually went? Like, an actual advantage, not just combat stuff?</div>
+
+<div class="line gm"><span class="speaker">GM:</span> Absolutely — that's exactly the kind of minor advantage a 10 is for. He tells you Voss left an hour ago, headed for the river gate, and he's not alone.</div>
+
+<div class="annotation playerside"><span class="tag">Player Guide — Critical 10 Benefits Aren't Just Combat</span>Naomi asking whether a critical benefit can be narrative information rather than a mechanical bonus is exactly the right instinct — the guide's critical table explicitly allows "a minor advantage (GM's discretion)," and information is one of the most valuable advantages a scene can offer.</div>
+
+</div>
+
+<hr/>
+
+<div class="panel panel-orange">
+<h3>End of Session, Mid-Scene</h3>
+<p>The table calls it here — Voss is fleeing toward the river gate, the letter raises a bigger question than the heist answered, and everyone's mechanical state carries cleanly into next week. That cliffhanger is deliberate: the GM Guide's advice on scene pacing favors ending on a hook, not a resolution, whenever the group's energy is still high.</p>
+</div>
+
+<div class="scene-banner">
+<h2 id="wrap">Session Wrap-Up</h2>
+<div class="sub">Demonstrates: Boon carryover at scene end, XP conversion during downtime, and a short debrief</div>
+</div>
+
+<div class="table-wrap">
+<table>
+<tr><th>Character</th><th>Boons held</th><th>After carryover trim (max 2)</th><th>Fatigue</th><th>Harm</th><th>Obligation</th></tr>
+<tr><td>Mateo</td><td>2</td><td>2 (no loss)</td><td>0</td><td>1</td><td>—</td></tr>
+<tr><td>Lyra</td><td>3</td><td>2 (1 lost)</td><td>0</td><td>0</td><td>—</td></tr>
+<tr><td>Sera</td><td>3</td><td>2 (1 lost)</td><td>0</td><td>0</td><td>—</td></tr>
+<tr><td>Khor</td><td>0</td><td>0</td><td>1</td><td>0</td><td>4 of 5 capacity</td></tr>
+</table>
+</div>
+
+<div class="annotation rule mt-1"><span class="tag">Rule — Boon Carryover</span>At the end of each scene, Boons above <strong>2</strong> are lost. Lyra and Sera both banked extra Boons during the session and now trim down — a small, real cost for not spending them mid-scene, exactly the incentive structure the "Math of Fun" advice is built around.</div>
+
+<div class="transcript mt-1">
+
+<div class="line gm"><span class="speaker">GM:</span> Before we close out — anyone want to spend Boons on XP during downtime? Two Boons buys one XP, max two XP this session.</div>
+
+<div class="line line-sera p-sera"><span class="speaker">Sera (Naomi):</span> I'll do that, actually. Both of mine.</div>
+
+<div class="line line-lyra p-lyra"><span class="speaker">Lyra (Devon):</span> Nah, I'll keep mine loaded for next session. I want to open hot.</div>
+
+<div class="annotation playerside"><span class="tag">Player Guide — Boon-to-XP Conversion</span>Both choices are correct play. The conversion rate (2 Boons = 1 XP, capped at 2 XP/session) is deliberately a trickle — the guide is explicit that "the real reward is agency," not XP, so neither hoarding nor converting is the "wrong" answer.</div>
+
+<div class="line gm"><span class="speaker">GM:</span> Great session. Naomi, that closing scene was fantastic — I want to flag that for everyone: that's exactly the kind of moment the game is built to hand you once you're comfortable enough to reach for it.</div>
+
+<div class="line line-sera p-sera"><span class="speaker">Sera (Naomi):</span> I was really nervous to do that! But it felt right.</div>
+
+<div class="line line-khor p-khor"><span class="speaker">Khor (Ollie):</span> Honestly, that Obligation thing hitting different than I expected. I usually just track the number. That was the first time it actually felt like someone was watching.</div>
+
+</div>
+
+<div class="scene-banner">
+<h2 id="gm-takeaways">🎬 GM Takeaways — Running a Mixed Table</h2>
+<div class="sub">What Jess did on purpose, session by session</div>
+</div>
+
+<div class="table-wrap">
+<table>
+<tr><th>Player</th><th>What the GM watched for</th><th>Technique used</th></tr>
+<tr><td><strong>Priya (Mateo)</strong></td><td>Wants concrete info before committing; enjoys the math.</td><td>Answered range/state questions plainly and fast; never pretended the conversion math was secret. Let her narrate her own mechanical decisions instead of narrating for her.</td></tr>
+<tr><td><strong>Devon (Lyra)</strong></td><td>Leans into bold declarations before knowing the odds; treats Misses as opportunities.</td><td>Set clear DVs and Positions <em>after</em> his declaration rather than gatekeeping the idea itself; always escalated on a Miss instead of just narrating failure, matching his appetite for consequences.</td></tr>
+<tr><td><strong>Naomi (Sera)</strong></td><td>Quiet, self-doubting, new to the hobby.</td><td>Used leading questions ("what's Sera's read on that door?") instead of waiting for her to volunteer; explicitly named the Setup/Assist option so she had a mechanical way to contribute without a relevant skill; called out her closing scene by name afterward as encouragement.</td></tr>
+<tr><td><strong>Ollie (Khor)</strong></td><td>Stacks up multiple declared actions; treats Obligation as a spreadsheet number.</td><td>Slowed the pace to one resolved action at a time without shutting him down; made his Obligation debt narratively present (a Patron's attention) rather than just ticking a box, so the system's intended weight actually landed.</td></tr>
+</table>
+</div>
+
+<div class="panel panel-gold mt-1">
+<p><strong>The common thread:</strong> none of this required house rules or hard conversations mid-session. Every adjustment came from techniques already in the GM Guide — inviting quiet players, selling the action, fail-forward Misses, spending SB early, and framing Obligation as story fuel. Running a mixed table is less about managing personalities and more about using the tools the system already gives you, aimed at the player who needs them in the moment.</p>
+</div>
+
+<h2 id="player-takeaways">🎲 Player Takeaways — Four Ways to Play</h2>
+
+<div class="grid-2">
+
+<div class="persona-card">
+<h4>If you're a planner like Priya</h4>
+<p class="text-sm">The system rewards knowing your own numbers cold — your armor conversion, your Fatigue track, your Position ladder. Ask the GM for concrete facts before you commit; that's not slowing the table down, it's using the tools you're given. Just watch the clock: the 90-second loop assumes you'll act once you have the facts, not deliberate indefinitely.</p>
+</div>
+
+<div class="persona-card">
+<h4>If you're an improviser like Devon</h4>
+<p class="text-sm">You're already playing the game the way Story Beats and the Boon economy are built for — a Miss is a gift to the story, not a loss. Keep spending Boons; the game is explicit that hoarding them for XP is the weaker play, mechanically and dramatically. Just be aware that a bold physical move (like Sidestep Strike) has a real cost attached, not just a cool factor — read the fine print once, then enjoy paying it.</p>
+</div>
+
+<div class="persona-card">
+<h4>If you're new and quiet like Naomi</h4>
+<p class="text-sm">You don't need a trained skill to matter in a scene — Setup and Assist exist specifically so anyone can contribute with whatever they've got. If you're not sure an idea is "allowed," say it anyway; the worst case is a small dice pool, not a no. And when the GM asks you a leading question, that's not a test — it's an invitation.</p>
+</div>
+
+<div class="persona-card">
+<h4>If you're an experienced spotlight-seeker like Ollie</h4>
+<p class="text-sm">The system has plenty of room for ambition — Patrons, Symbols, and summoned spirits reward a player willing to juggle multiple debts and risks. But Obligation and the Leash aren't just resource management; they're the GM's built-in hooks into your character specifically. The more you let those debts become personal instead of purely tactical, the more the table gets to see your character's actual story, not just your build.</p>
+</div>
+
+</div>
+
+<h2 id="cheatsheet">📋 Quick-Reference Cheat Sheet</h2>
+<p class="text-sm text-muted">Everything demonstrated above, in one place. Full detail lives in the Player's Guide (Core Mechanics) and GM Guide (Core Procedures, Managing Resources, Running Scenarios).</p>
+
+<div class="table-wrap">
+<table>
+<tr><th>System</th><th>Rule</th></tr>
+<tr><td>Dice Pool</td><td>Attribute + Skill, roll d10s. 6+ = Success, 1 = Story Beat (SB).</td></tr>
+<tr><td>Difficulty Value (DV)</td><td>2 routine · <strong>3 default (pressured)</strong> · 4 difficult · 5 extreme · 6+ mythic.</td></tr>
+<tr><td>Outcome Matrix</td><td>Clean Success (S≥DV) · Success w/ SB (S≥DV, SB&gt;0) · Partial (0&lt;S&lt;DV, +1 Boon) · Miss (S=0, +2 Boons, always escalates).</td></tr>
+<tr><td>Critical 10s</td><td>Each 10 = 2 Successes. On a successful roll, 1 ten = strong benefit; more tens = bigger benefit. Never re-rolled.</td></tr>
+<tr><td>Position</td><td>Dominant (re-roll a failure) · Controlled (no re-roll) · Desperate (re-roll a success). 1 Boon improves one step before rolling; 2 SB worsens one step after.</td></tr>
+<tr><td>Boons</td><td>Max 5 held, trimmed to 2 at scene end. Spend to re-roll, activate an Asset, improve Position, or convert 2→1 XP (max 2 XP/session, downtime only).</td></tr>
+<tr><td>Story Beats (SB)</td><td>1 = minor complication · 2 = moderate setback · 3 = serious trouble · 4+ = major turn. Spend early rather than stacking.</td></tr>
+<tr><td>Selling the Action</td><td>Tactical description → improve Position one step. Character-driven stakes/bonds/fears → improve Position <em>and</em> bank 1 SB (or upgrade Effect).</td></tr>
+<tr><td>Fatigue</td><td>Track = Body. Each point worsens Position (or −1 die if already Desperate). Fills → +1 Harm, clear all Fatigue (overflow).</td></tr>
+<tr><td>Harm &amp; Armor Conversion</td><td>GM states raw Harm; player converts via their armor's table, then applies Harm first (clears Fatigue) before adding Fatigue. Minimum 1 Fatigue per hit.</td></tr>
+<tr><td>Sidestep Strike</td><td>Move one range band as part of a melee attack (no separate Move used); worsens Position by one step; may provoke an opportunity attack.</td></tr>
+<tr><td>Opportunity Attacks</td><td>Leaving an enemy's Close range without Disengaging provokes one free Controlled attack.</td></tr>
+<tr><td>Setup / Assist</td><td>Setup: a roll that grants an ally +1 Position or better Effect. Assist: spend 1 Boon for +1 die to an ally's roll (max +3 dice from all sources).</td></tr>
+<tr><td>Obligation</td><td>Capacity = Spirit + Presence. Exceeding it: +1 Fatigue per segment over. Double capacity: clear Fatigue, +1 Harm, trigger a Patron Intrusion.</td></tr>
+<tr><td>Summoning &amp; the Leash</td><td>Leash = summoner's Cap + spirit's segments. Ticks on Harm, acting against nature, split focus, or crossing a ward. 1 Boon (Boon Finesse, once/round) clears 1 tick. Full Leash → spirit acts once on its own, then departs or turns hostile.</td></tr>
+<tr><td>Deck of Consequences</td><td>Draw for answers you haven't prepped. Suit = nature (Hearts: relationship, Spades: harm/obstacle, Clubs: cost/debt, Diamonds: secret/opportunity). Rank = severity. Link the answer to an existing stake or timer.</td></tr>
+</table>
+</div>
+
+<div class="warningbox mt-1">
+<p><strong>None of this is a rules dump to memorize before session one.</strong> The GM Guide's own advice to new GMs applies here too: you only really need the Core Loop, DV 3/Controlled as your defaults, the Outcome Matrix, and "spend SB early." Everything else in this cheat sheet is what you'll pick up naturally within your first two or three sessions, exactly the way this table did.</p>
+</div>
+
+<hr/>
+<p class="text-center text-muted text-xs" style="text-align:center;">Fate's Edge — Annotated Play Session · A companion resource for GMs and players learning the system together.</p>
+
+<a class="back-to-top" href="#" title="Back to top">↑</a>
+
+</body>
+</html>

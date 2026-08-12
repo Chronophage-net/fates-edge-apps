@@ -14,8 +14,10 @@ version: '3.8'
 #
 # Quick start:
 #   1. cp .env.example .env
-#   2. Fill in TURN_SECRET (any long random string) and TURN_PUBLIC_HOST
-#      (a DNS name or public IP your players can reach).
+#   2. Fill in TURN_SECRET (any long random string) and TURN_URLS
+#      (turn:<a DNS name or public IP your players can reach>:3478) --
+#      plus TURN_PUBLIC_IP below if this host's public IP differs from
+#      the one Docker sees locally (common on cloud VMs).
 #   3. docker-compose up
 #
 # Voice chat works with ZERO TURN configuration too (STUN-only, via
@@ -43,6 +45,15 @@ services:
       - API_KEY=${API_KEY:-}
       - CORS_ORIGIN=${CORS_ORIGIN:-*}
       - LOG_LEVEL=${LOG_LEVEL:-INFO}
+      # FIX: campaign data (server/storage.js) is a SQLite database, NOT
+      # per-campaign JSON files -- it defaults to ./campaigns.db, which
+      # resolves to /app/campaigns.db inside the container. Nothing was
+      # mounting that path, so every `docker compose down` (or even just
+      # recreating the container) silently deleted every saved campaign,
+      # room password, and account. Pointed it at a file inside the
+      # already-host-mounted ./data volume below instead, so it survives
+      # container recreation like everything else here does.
+      - DATABASE_URL=/app/data/campaigns.db
       # TURN credential minting -- must match the coturn service below.
       - TURN_SECRET=${TURN_SECRET:-}
       - TURN_REALM=${TURN_REALM:-fates-edge}

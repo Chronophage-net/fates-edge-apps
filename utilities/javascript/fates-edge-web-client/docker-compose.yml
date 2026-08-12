@@ -1,5 +1,26 @@
 version: '3.8'
 
+# ---------------------------------------------------------------
+# Fate's Edge Web Client — hosted deployment
+#
+# FIX: this used to set API_URL/BUILD_DIR env vars and mount
+# ./build:/usr/share/nginx/html/build and ./config:/usr/share/nginx/html/config
+# from the host. Nothing in this app or nginx.conf actually reads
+# API_URL/BUILD_DIR (grep the whole repo — they're unused), and this
+# project builds with Vite into `dist/`, not a `build/` folder, so
+# those mounts just silently created two empty, unused directories on
+# the host. Likely leftover from an earlier, pre-Vite version of the
+# client. Removed — the Dockerfile's multi-stage build already bakes
+# the compiled `dist/` output straight into the nginx image, so no
+# host mount is needed to serve it at all.
+#
+# The web client always talks to your socket server over the network
+# (its URL is entered in the client's own Settings screen, or set as
+# a default at build time) — this container just serves the compiled
+# single-page app; it is NOT a reverse proxy in front of the socket
+# server.
+# ---------------------------------------------------------------
+
 services:
   client:
     build:
@@ -8,23 +29,20 @@ services:
     image: fates-edge-client:latest
     container_name: fates-edge-client
     ports:
-      - "8080:80"
-    environment:
-      - NODE_ENV=production
-      - API_URL=/api
-      - BUILD_DIR=/usr/share/nginx/html/build
-    volumes:
-      # Mount local build directory for development
-      - ./build:/usr/share/nginx/html/build:ro
-      # Mount local config
-      - ./config:/usr/share/nginx/html/config:ro
+      - "${PORT:-8080}:80"
     restart: unless-stopped
+    # FIX: was `curl -f ...` — the nginx:alpine base image doesn't ship
+    # curl, so this healthcheck failed 100% of the time with "curl: not
+    # found" and the container was permanently reported unhealthy even
+    # while serving fine (compose's healthcheck here overrides the
+    # Dockerfile's own, correct `wget`-based HEALTHCHECK). Alpine ships
+    # busybox wget by default, matching the Dockerfile.
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost/health"]
+      test: ["CMD", "wget", "-qO-", "http://localhost/health"]
       interval: 30s
       timeout: 10s
       retries: 3
-      start_period: 40s
+      start_period: 15s
     networks:
       - fates-edge-network
 
