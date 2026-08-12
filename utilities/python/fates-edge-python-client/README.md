@@ -6,9 +6,7 @@ card meanings, Crown Spread), and syncing with a Fate's Edge socket
 server over REST and WebSocket.
 
 As of v5.0.0 this is a proper installable package (`fates_edge_client/`),
-not a single script you copy around. See `PYTHON_CLIENT_REDESIGN_PLAN.md`
-in the repo root for the full rationale if you're curious what changed
-and why.
+not a single script you copy around.
 
 ---
 
@@ -31,9 +29,7 @@ pip install -e ".[dev]"
 
 This installs a `fates-edge` command on your `PATH`, backed by the
 `fates_edge_client` package. `pyproject.toml` is the single source of
-packaging truth -- if you see a `setup.py` in this directory, it's an
-inert leftover (the sandbox this redesign was built in couldn't delete
-it); it will refuse to run and tells you to delete it.
+packaging truth.
 
 If you'd rather not install the package at all, `pip install -r
 requirements.txt` followed by `python -m fates_edge_client --help` from

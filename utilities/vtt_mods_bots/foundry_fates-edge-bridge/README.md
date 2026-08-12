@@ -2,7 +2,7 @@
 
 <p align="center">
   <img src="https://img.shields.io/badge/Foundry-VTT-orange" alt="Foundry VTT"/>
-  <img src="https://img.shields.io/badge/version-4.10.0-blue" alt="Version"/>
+  <img src="https://img.shields.io/badge/version-4.11.0-blue" alt="Version"/>
   <img src="https://img.shields.io/badge/license-MIT-green" alt="License"/>
   <img src="https://img.shields.io/badge/status-stable-brightgreen" alt="Status"/>
 </p>
@@ -36,20 +36,20 @@
 
 ## 🚀 Installation
 
-### Method 1: Install from Manifest URL
+This module lives inside the `fates-edge-apps` monorepo rather than as its
+own standalone repo, so it's installed by copying the folder in rather than
+a Foundry manifest URL:
 
-1. In Foundry VTT, go to **Add‑on Modules** → **Install Module**.
-2. Paste this manifest URL:
+1. Clone or download `fates-edge-apps`:
+   ```bash
+   git clone https://github.com/Chronophage-net/fates-edge-apps.git
    ```
-   https://github.com/fates-edge/foundry-bridge/releases/latest/download/module.json
-   ```
-3. Click **Install**.
-
-### Method 2: Manual Installation
-
-1. Download the latest release from the [releases page](https://github.com/fates-edge/foundry-bridge/releases).
-2. Extract the zip file into your Foundry `Data/modules/` directory.
-3. The folder structure should be: `Data/modules/fates-edge-bridge/`.
+2. Copy `fates-edge-apps/utilities/vtt_mods_bots/foundry_fates-edge-bridge/`
+   into your Foundry `Data/modules/` directory, renaming it to
+   `fates-edge-bridge`. The folder structure should end up as
+   `Data/modules/fates-edge-bridge/`.
+3. Restart Foundry (or reload) and enable **Fate's Edge Bridge** under
+   **Add‑on Modules** in your world.
 
 ---
 
@@ -206,14 +206,12 @@ All of the above are also available as `FatesEdgeBridge.<methodName>(...)` direc
 
 ## 🔄 Updating
 
-### From Manifest
-1. In Foundry VTT, go to **Add‑on Modules**.
-2. Click **Check for Updates**.
-3. Click **Update** next to Fate's Edge Bridge.
+```bash
+cd fates-edge-apps && git pull
+```
 
-### Manual Update
-1. Download the latest release.
-2. Extract to `Data/modules/fates-edge-bridge/`, overwriting existing files.
+Then re-copy `utilities/vtt_mods_bots/foundry_fates-edge-bridge/` over
+`Data/modules/fates-edge-bridge/`, overwriting existing files.
 
 ---
 
@@ -229,7 +227,8 @@ All of the above are also available as `FatesEdgeBridge.<methodName>(...)` direc
 
 ## 📄 License
 
-This project is licensed under the MIT License – see the [LICENSE](LICENSE) file for details.
+This project is licensed under the MIT License – see the monorepo root's
+[LICENSE.code](../../../LICENSE.code) for details.
 
 ---
 
@@ -253,16 +252,14 @@ This project is licensed under the MIT License – see the [LICENSE](LICENSE) fi
 
 ## 📚 Documentation
 
-- [Fate's Edge Server](https://github.com/fates-edge/fates-edge-server)
-- [API Documentation](https://fates-edge.com/api/data/docs)
+- [Fate's Edge Server](../../javascript/fates-edge-socket-server/README.md)
 - [Foundry VTT Wiki](https://foundryvtt.wiki)
 
 ---
 
 ## 💬 Support
 
-- **Discord**: [Join our Discord](https://discord.gg/fates-edge)
-- **Issues**: [GitHub Issues](https://github.com/fates-edge/foundry-bridge/issues)
+- **Issues**: [GitHub Issues](https://github.com/Chronophage-net/fates-edge-apps/issues)
 - **Email**: support@fates-edge.com
 
 ---

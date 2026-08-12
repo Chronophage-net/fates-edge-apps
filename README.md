@@ -1,6 +1,6 @@
 [![Build Apps and Packages](https://github.com/Chronophage-net/fates-edge-apps/actions/workflows/build-apps-and-packages.yml/badge.svg)](https://github.com/Chronophage-net/fates-edge-apps/actions/workflows/build-apps-and-packages.yml)
 
-# Fate's Edge Toolkit v4.10.0 – Complete VTT Ecosystem
+# Fate's Edge Toolkit v4.11.0 – Complete VTT Ecosystem
 
 > A modular, self-contained toolkit for running Fate's Edge TTRPG campaigns, with real‑time collaboration, VTT integrations, Game Master management, and a full in-browser magic/monastic-path system.
 
@@ -10,7 +10,7 @@
 [![Node.js](https://img.shields.io/badge/Node.js-24.x-green.svg)](https://nodejs.org/)
 [![Foundry VTT](https://img.shields.io/badge/Foundry-VTT-orange)](https://foundryvtt.com/)
 [![Discord](https://img.shields.io/badge/Discord-Bot-5865F2)](https://discord.com/)
-[![Version](https://img.shields.io/badge/version-4.10.0-blue)](https://github.com/nicholasagaspar/fates-edge-apps)
+[![Version](https://img.shields.io/badge/version-4.11.0-blue)](https://github.com/Chronophage-net/fates-edge-apps)
 
 ---
 
@@ -203,7 +203,6 @@ Each individual app also still has its own standalone `Dockerfile`/`docker-compo
 
 ```
 fates-edge-apps/
-├── ADVISORY.md
 ├── API.md
 ├── docker-compose.yml             # whole-ecosystem compose: client + server + optional coturn/bots (see Quick Start)
 ├── .env.example
@@ -372,10 +371,10 @@ data/
 
 ### Foundry VTT Bridge
 
-Install the module from the manifest URL:
-```
-https://github.com/fates-edge/foundry-bridge/releases/latest/download/module.json
-```
+Lives inside this monorepo rather than as its own standalone module release — copy
+`utilities/vtt_mods_bots/foundry_fates-edge-bridge/` into your Foundry `Data/modules/`
+directory (renamed to `fates-edge-bridge`) and enable it. See that folder's own
+[README](utilities/vtt_mods_bots/foundry_fates-edge-bridge/README.md) for the full install steps.
 
 **Features:** GM election & promotion panel, Deck of Consequences & Crown Spread, module management, region support, real‑time chat/dice/character/timer/scene sync.
 
@@ -420,10 +419,11 @@ cd utilities/python/fates-edge-python-client && pip install -e . && fates-edge-c
 
 **Also since then (through v4.8.3):** a second original card game, **Toll & Veil**, shipped with the same three play modes as Kon'reh (pass-and-play, solo vs. AI, host-authoritative real-time table) plus an opt-in stakes system and its own in-app guide. Co-GM roles were added and propagated across the Discord bot, AI GM bot, Foundry bridge, and Roll20 integration, which closes out the "VTT/bot audit" item that used to sit in this section. A security sweep of the new multiplayer path fixed stored XSS in lobby/challenge banners, closed a sender-identity spoofing hole in the socket server's generic event relay, and stopped forged stake-transfer messages from bypassing agreed caps.
 
+**Also shipped (v4.9.0):** optional Redis-backed horizontal scaling for the socket server (opt-in via `REDIS_URL`; single-instance/no-dependency behavior unchanged by default) — see [`SCALING.md`](utilities/javascript/fates-edge-socket-server/SCALING.md). This closes out the "horizontal server scaling" item that used to sit in this section.
+
 Features that have been discussed or partially scaffolded but are **not yet implemented** in this build:
 
 - **Session Playback / Export** — replaying or exporting a recorded/logged session as HTML/Markdown/plain text (beyond the SRT manifest voice/logging already produces).
-- **Horizontal server scaling** — the socket server is a single Node.js process with in-memory room state today; running more than one instance behind a load balancer would need a shared broadcast/state layer (e.g. Redis) that doesn't exist yet. Fine for a single-server deployment, which is the only configuration currently supported.
 
 If you were looking for the voice-chat/logging line from an earlier README revision: it was documented ahead of implementation at the time and pulled back to this roadmap section — it has since actually shipped, per the note above.
 
@@ -455,6 +455,9 @@ Licensed under **CC BY-NC-SA 4.0**. See [LICENSE.srd](LICENSE.srd).
 
 ## 🤝 Contributing
 
+Found a security issue? See [SECURITY.md](SECURITY.md) for how to report it
+privately rather than filing a public issue.
+
 1. **Fork the repository** and create your branch from `main`
 2. **Follow the code style** — use existing patterns
 3. **Add tests** for new functionality when possible
@@ -475,7 +478,7 @@ Licensed under **CC BY-NC-SA 4.0**. See [LICENSE.srd](LICENSE.srd).
 
 ## 📧 Contact
 
-- **Issues**: [GitHub Issues](https://github.com/nicholasagaspar/fates-edge-apps/issues)
+- **Issues**: [GitHub Issues](https://github.com/Chronophage-net/fates-edge-apps/issues)
 - **Email**: support@fates-edge.com
 - **Website**: [fates-edge.com](https://fates-edge.com)
 

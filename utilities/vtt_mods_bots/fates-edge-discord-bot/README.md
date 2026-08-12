@@ -1,9 +1,8 @@
-```markdown
 # Fate's Edge Discord Bot
 
 <p align="center">
   <img src="https://img.shields.io/badge/Discord-Bot-blue" alt="Discord Bot"/>
-  <img src="https://img.shields.io/badge/version-2.0.0-orange" alt="Version"/>
+  <img src="https://img.shields.io/badge/version-4.10.0-orange" alt="Version"/>
   <img src="https://img.shields.io/badge/license-MIT-green" alt="License"/>
   <img src="https://img.shields.io/badge/node-18+-brightgreen" alt="Node.js"/>
 </p>
@@ -42,9 +41,12 @@
 
 ### 1. Clone & Install
 
+This bot lives inside the `fates-edge-apps` monorepo, alongside the web
+client and socket server:
+
 ```bash
-git clone https://github.com/fates-edge/discord-bot.git
-cd discord-bot
+git clone https://github.com/Chronophage-net/fates-edge-apps.git
+cd fates-edge-apps/utilities/vtt_mods_bots/fates-edge-discord-bot
 npm install
 ```
 
@@ -361,7 +363,7 @@ pm2 restart fates-edge-bot  # If using PM2
 
 ## 📄 License
 
-MIT License – see [LICENSE](LICENSE) for details.
+MIT License – see the monorepo root's [LICENSE.code](../../../LICENSE.code) for details.
 
 ---
 
@@ -377,8 +379,7 @@ MIT License – see [LICENSE](LICENSE) for details.
 
 ## 💬 Support
 
-- **Discord**: [Join our Discord](https://discord.gg/fates-edge)
-- **Issues**: [GitHub Issues](https://github.com/fates-edge/discord-bot/issues)
+- **Issues**: [GitHub Issues](https://github.com/Chronophage-net/fates-edge-apps/issues)
 - **Email**: support@fates-edge.com
 
 ---
@@ -437,4 +438,3 @@ module.exports = {
 <p align="center">
   <sub>Made with ❤️ by Nick Gasper</sub>
 </p>
-```

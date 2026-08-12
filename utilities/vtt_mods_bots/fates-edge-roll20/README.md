@@ -30,7 +30,7 @@
 ## 📋 Requirements
 
 - Roll20 Game with **Pro subscription** (API access required).
-- Fate's Edge WebSocket Server running and accessible (see [server documentation](https://github.com/fates-edge/fates-edge-server)).
+- Fate's Edge WebSocket Server running and accessible (see [server documentation](../../javascript/fates-edge-socket-server/README.md)).
 - (Optional) Custom character sheet for Fate's Edge (provided).
 
 ---
@@ -249,20 +249,21 @@ You can create Roll20 macros that use these commands. For a complete reference, 
 
 ## 📄 License
 
-MIT License – see [LICENSE](LICENSE) for details.
+MIT License – see the monorepo root's [LICENSE.code](../../../LICENSE.code) for details.
 
 ---
 
 ## 🤝 Contributing
 
-Contributions are welcome! Please see our [Contributing Guidelines](https://github.com/fates-edge/fates-edge/blob/main/CONTRIBUTING.md).
+Contributions are welcome! This module lives inside the `fates-edge-apps`
+monorepo — fork it, make your changes under
+`utilities/vtt_mods_bots/fates-edge-roll20/`, and open a pull request.
 
 ---
 
 ## 💬 Support
 
-- **Discord**: [Join our Discord](https://discord.gg/fates-edge)
-- **Issues**: [GitHub Issues](https://github.com/fates-edge/fates-edge/issues)
+- **Issues**: [GitHub Issues](https://github.com/Chronophage-net/fates-edge-apps/issues)
 - **Email**: support@fates-edge.com
 
 ---
