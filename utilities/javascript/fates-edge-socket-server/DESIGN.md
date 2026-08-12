@@ -1,6 +1,8 @@
 # Fate's Edge VTT - Design Documentation
 
-> **Status (Toolkit v4.4.1):** Account authentication (register/login, JWT-backed sessions, bcrypt password hashing) described below is implemented in `server/auth.js` / `server/api.js`, and now has real unit-level test coverage (`tests/auth.test.js`, `tests/deck.test.js`, `tests/adventure.test.js` — see the root README's "What's New"). The AI GM bot referenced in earlier revisions of the wider ecosystem has been removed; this server's design is otherwise unchanged.
+> **Status (Toolkit v4.4.1):** Account authentication (register/login, JWT-backed sessions, bcrypt password hashing) described below is implemented in `server/auth.js` / `server/api.js`, and now has real unit-level test coverage (`tests/auth.test.js`, `tests/deck.test.js`, `tests/adventure.test.js` — see the root README's "What's New"). The AI GM bot referenced in earlier revisions of the wider ecosystem has been removed from this monorepo; it lives on as its own separate repository (`fates-edge-ai-gm-bot`).
+>
+> **Correction (v4.8.3):** Several items below describe a larger/older aspirational feature set than what's actually installed and running. Concretely: **Redis is not a dependency of this project and is never used** (there's no `redis`/`ioredis` package in `package.json`, and no caching layer reads `REDIS_URL`/`ENABLE_CACHING`) — persistence is `server/storage.js`, which defaults to SQLite (`campaigns.db`) and optionally supports PostgreSQL or MySQL (`DATABASE_TYPE`/`DATABASE_URL`); ephemeral room/session state is plain in-memory `Map`s. The default port is **10000**, not 3000 (see `server/config.js`). This project's license is **MIT** (see root `package.json`/`LICENSE.code`), not the "proprietary and confidential" line at the bottom of this document. The `redis`/`ioredis`, `agenda`, `nodemailer`, `handlebars`, and `multer` entries under Optional Dependencies below aren't in `package.json` either — the real dependency list is `bcryptjs`, `cors`, `dotenv`, `express`, `jsonwebtoken`, `socket.io`, `sqlite3`, `ws`, with `mysql2`/`pg` as the only optional dependencies.
 
 ## System Architecture
 
@@ -11,10 +13,9 @@ Fate's Edge is a real-time Virtual Tabletop (VTT) server built with Node.js, Exp
 
 **Backend:**
 - Node.js with Express.js
-- Socket.IO for WebSocket communication
-- Redis for caching (optional)
-- Winston for logging
-- JSON file-based persistence
+- Socket.IO (and a plain `ws` transport) for WebSocket communication
+- SQLite by default, PostgreSQL or MySQL optionally (`server/storage.js`) — no Redis anywhere in this codebase
+- JSON file-based persistence (`server-data.json`) for room snapshots
 
 **Security:**
 - API Key authentication (header or query param)
@@ -25,12 +26,12 @@ Fate's Edge is a real-time Virtual Tabletop (VTT) server built with Node.js, Exp
 - Session management with memory store
 
 **Database:**
-- In-memory storage with periodic JSON serialization
-- Redis for caching (configurable)
+- In-memory storage (rooms, sessions) with periodic JSON serialization for room snapshots
+- `server/storage.js`: SQLite by default (`campaigns.db`), optionally PostgreSQL or MySQL — for campaign persistence, accounts, and character claims
 
 ### Ports & Endpoints
 
-- **Web Server:** Port 3000 (configurable via PORT env var)
+- **Web Server:** Port 10000 (configurable via PORT env var)
 - **WebSocket:** Same port as web server (Socket.IO multiplexing)
 
 ---
@@ -274,7 +275,7 @@ Fate's Edge is a real-time Virtual Tabletop (VTT) server built with Node.js, Exp
 | `ENABLE_UPLOAD` | Enable PDF upload | `false` |
 | `ENABLE_RATE_LIMITING` | Enable rate limiting | `true` |
 | `ENABLE_LOGGING` | Enable logging | `true` |
-| `ENABLE_CACHING` | Enable Redis caching | `false` |
+| `ENABLE_CACHING` | Not implemented — no caching layer exists | n/a |
 | `ENABLE_SESSIONS` | Enable user sessions | `false` |
 | `ENABLE_EMAIL` | Enable email features | `false` |
 | `ENABLE_SCHEDULING` | Enable scheduling | `false` |
@@ -282,7 +283,8 @@ Fate's Edge is a real-time Virtual Tabletop (VTT) server built with Node.js, Exp
 | `RATE_LIMIT_WINDOW` | Rate limit window (ms) | `900000` |
 | `RATE_LIMIT_MAX` | Max requests per window | `100` |
 | `AUTH_RATE_LIMIT_MAX` | Auth requests per window | `5` |
-| `REDIS_URL` | Redis connection URL | `redis://localhost:6379` |
+| `DATABASE_TYPE` | `sqlite` (default), `postgres`, or `mysql` (`server/storage.js`) | `sqlite` |
+| `DATABASE_URL` | SQLite file path, or a Postgres/MySQL connection string | `./campaigns.db` |
 | `SALT_ROUNDS` | bcrypt salt rounds | `10` |
 | `MAX_CONCURRENT_CONVERSIONS` | Max concurrent conversions | `2` |
 | `UPLOAD_FILE_SIZE_LIMIT` | Max upload size (bytes) | `20971520` |
@@ -313,6 +315,11 @@ Fate's Edge is a real-time Virtual Tabletop (VTT) server built with Node.js, Exp
 - **Sessions:** Map of session IDs to session data
 - **API Keys:** Map of keys to key metadata
 
+### Database Storage (`server/storage.js`)
+- SQLite by default (`campaigns.db`), or PostgreSQL/MySQL via `DATABASE_TYPE`
+- Accounts, room passwords/memberships, manual campaign-share snapshots, a separate no-pruning autosave table, and character claims — see the module's own header comment for the full table list and why autosave and manual-share snapshots deliberately don't share a retention budget
+- No Redis involved at any layer
+
 ---
 
 ## Features
@@ -342,9 +349,8 @@ Fate's Edge is a real-time Virtual Tabletop (VTT) server built with Node.js, Exp
 - Supports pdf2htmlEX and pdftohtml
 - File size limit: 20 MB (configurable)
 
-### Caching (Optional)
-- Redis-based caching for GET endpoints
-- Configurable TTL per endpoint
+### Caching
+- Not implemented — there's no Redis or other caching layer in this codebase; the "cached Ns" notes on the API endpoint tables above describe an aspirational design, not current behavior
 
 ### Rate Limiting
 - IP-based rate limiting
@@ -551,31 +557,23 @@ one live claim per player per room.
 
 ## Dependencies
 
-### Core Dependencies
-- Express.js - Web framework
-- Socket.IO - WebSocket server
-- Winston - Logging
-- Compression - Response compression
-- CORS - Cross-origin resource sharing
-- Helmet - Security headers
+Reflects the actual `package.json` as of v4.8.3 — sections above describing Winston, Helmet, express-session, rate-limit/slow-down, Redis, agenda, nodemailer, handlebars, or multer are aspirational and do not correspond to installed packages.
 
-### Security Dependencies
-- bcrypt - Password hashing
+### Dependencies
+- Express.js - Web framework
+- Socket.IO - WebSocket server (`ws` also used directly for the plain-WebSocket transport)
+- CORS - Cross-origin resource sharing
+- bcryptjs - Password hashing
 - jsonwebtoken - JWT implementation
-- express-session - Session management
-- validator - Input validation
-- rate-limit - Rate limiting
-- slow-down - Request throttling
+- dotenv - Environment variable loading
+- sqlite3 - Default database driver
 
 ### Optional Dependencies
-- redis / ioredis - Redis client
-- agenda - Job scheduling
-- nodemailer - Email sending
-- handlebars - Email templates
-- multer - File uploads
+- mysql2 - MySQL database driver (`DATABASE_TYPE=mysql`)
+- pg - PostgreSQL database driver (`DATABASE_TYPE=postgres`)
 
 ---
 
 ## License
 
-This software is proprietary and confidential. Unauthorized copying, distribution, or use of this software is strictly prohibited.
+MIT (code) — see the repo root's `LICENSE.code` and `package.json`. Game content bundled alongside the code (SRD/proprietary setting material) has its own separate licensing; see the root README's License section.
