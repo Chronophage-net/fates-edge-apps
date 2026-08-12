@@ -530,6 +530,22 @@ function setupWSS(wss, appConfig) {
 
                     // ─── Generic event with nested type ───────────────────
                     case 'event':
+                        // SECURITY FIX: `data.socketId` up to this point is
+                        // whatever the SENDING client put in its own message
+                        // body (js/core/websocket.js's sendEvent() sets it
+                        // from the client's own getSocketId(), but nothing
+                        // stops a modified/malicious client from emitting a
+                        // raw WS frame with any socketId string it wants).
+                        // Every feature built on this generic relay (Kon'reh's
+                        // challenge/move protocol, Toll & Veil's host/guest
+                        // protocol) trusts data.socketId as "who actually sent
+                        // this" for turn-order and seat-ownership checks, so
+                        // an unstamped passthrough let any client impersonate
+                        // any other connected player. Overwrite it with the
+                        // connection's own server-assigned clientId — the one
+                        // piece of identity a client cannot fake — before
+                        // this ever reaches another client.
+                        data.socketId = ws.clientId;
                         // Check for presence update (sent via sendEvent)
                         if (data && data.type === 'presence') {
                             if (data.name) {

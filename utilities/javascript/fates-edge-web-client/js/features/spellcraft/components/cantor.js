@@ -691,8 +691,23 @@ export async function renderCantor(el) {
 
     el.innerHTML = html;
 
-    // Render the rites grouped by patron with expandable sections
-    const ritesContainer = document.getElementById('cantor-rites-container');
+    // Render the rites grouped by patron with expandable sections.
+    //
+    // BUG FIX: this used to look the container up via
+    // `document.getElementById('cantor-rites-container')` — but `el` here
+    // is the detached `wrapper` div spellcraft/index.js's
+    // renderActiveTabContent() builds render output into (it only appends
+    // `wrapper` to the live `#spellcraft-content` AFTER this whole async
+    // function returns). `document.getElementById()` only finds elements
+    // that are actually attached to the document, so on every first
+    // render it silently found nothing and the Songs list stayed empty —
+    // 100% reproducible, not a timing/race issue. It only ever looked
+    // "fixed" after clicking Refresh, because cantorRefresh() re-queries
+    // `.cantor-container` from the *live* DOM (the first render's result,
+    // already appended by then) and re-renders through that already-
+    // attached element instead. Querying *within* `el` itself works
+    // whether or not `el` has been attached to the document yet.
+    const ritesContainer = el.querySelector('#cantor-rites-container');
     if (ritesContainer) {
         renderCantorRitesGrouped(ritesContainer, rites, char);
     }

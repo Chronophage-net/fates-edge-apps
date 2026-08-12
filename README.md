@@ -1,6 +1,6 @@
 [![Build Apps and Packages](https://github.com/Chronophage-net/fates-edge-apps/actions/workflows/build-apps-and-packages.yml/badge.svg)](https://github.com/Chronophage-net/fates-edge-apps/actions/workflows/build-apps-and-packages.yml)
 
-# Fate's Edge Toolkit v4.8.2 – Complete VTT Ecosystem
+# Fate's Edge Toolkit v4.8.3 – Complete VTT Ecosystem
 
 > A modular, self-contained toolkit for running Fate's Edge TTRPG campaigns, with real‑time collaboration, VTT integrations, Game Master management, and a full in-browser magic/monastic-path system.
 
@@ -10,14 +10,14 @@
 [![Node.js](https://img.shields.io/badge/Node.js-24.x-green.svg)](https://nodejs.org/)
 [![Foundry VTT](https://img.shields.io/badge/Foundry-VTT-orange)](https://foundryvtt.com/)
 [![Discord](https://img.shields.io/badge/Discord-Bot-5865F2)](https://discord.com/)
-[![Version](https://img.shields.io/badge/version-4.8.2-blue)](https://github.com/nicholasagaspar/fates-edge-apps)
+[![Version](https://img.shields.io/badge/version-4.8.3-blue)](https://github.com/nicholasagaspar/fates-edge-apps)
 
 ---
 
 ## 📖 Table of Contents
 
 - [Overview](#-overview)
-- [What's New in v4.6.0](#-whats-new-in-v460)
+- [What's New in v4.8.3](#-whats-new-in-v483)
 - [Features](#-features)
 - [Quick Start](#-quick-start)
 - [Architecture](#-architecture)
@@ -39,6 +39,15 @@
 The toolkit includes **real‑time VTT features** via a WebSocket/Socket.io server, a **campaign sharing server** with GM election and shared Deck of Consequences draws, **integrations** for Foundry VTT, Discord, Roll20, and Avrae, and a growing set of **standalone in-browser mini-tools** (including an original strategy board game, Kon'reh).
 
 ---
+
+## 🆕 What's New in v4.8.3
+
+- **🃏 Toll & Veil** — A second original card game (alongside Kon'reh), playable pass-and-play, solo vs. AI, or as a host-authoritative real-time table over the VTT's event relay, with an opt-in stakes system (Points by default, a capped XP wager, or a narrative "String" debt tied to the patron Lucky Jack). Ships with its own in-app "Definitive Guide" doc.
+- **🔒 Security sweep of the new multiplayer path** — Fixed a stored-XSS class of bug (unescaped network-supplied display names rendered into lobby/challenge banners for both Kon'reh and Toll & Veil), a sender-identity spoofing hole in the socket server's generic `event` relay (the server now stamps the true, connection-verified `socketId` instead of trusting whatever a client claimed), and a forged-stake-message bug that let a malicious peer apply arbitrary XP/String transfers outside the agreed cap or game state. Also added input sanitization for network-supplied lobby data (seat counts, stake config, display names), and the AI GM bot's status dashboard no longer binds to all network interfaces by default (loopback-only unless explicitly opted into via `STATUS_HOST`).
+- **🐛 Trust cards no longer silently vanish** — `loadRemoteFactions()` could leave `assets`/`followers`/`trusts` empty once real faction files loaded, orphaning already-rendered default cards (e.g. "The Silk Coin") and producing a "Trust not found" error on click.
+- **🐛 Cantor's Songs list now renders on first load** — was querying the live document for an element that only existed inside a not-yet-attached wrapper, so it silently found nothing until a manual refresh forced a re-render into the attached DOM.
+- Prior cycle (v4.6.0–v4.8.2, condensed): diverse encounter objective-type clocks instead of hardcoded Harm/Heal (Obstruction, Skill Challenge, Trap/Ward, Lockpick, Heist, Social, Custom); phase-aware Kon'reh AI; symbol-management and patron/cantor discovery fixes; a full talent catalog overhaul (10 → 55 JSON-per-talent entries with tagging/category filters); a Modern Noir theme and a themeable UI engine; multi-character "Remote enabled" support (up to 6 characters per client); a broader security hardening pass (auth rate limiting, input length limits); Co-GM roles propagated through the mods/bots; socket-server persistence and Dockerfile fixes; and Toll & Veil's initial engine/UI landing.
+- **🧪 100/100 web-client tests, 59/59 socket-server tests, 146/146 ai-gm-bot tests passing** as of v4.6.0; not re-run end-to-end for every point release since — see each repo's own test suite for current counts.
 
 ## 🆕 What's New in v4.6.0
 
@@ -395,10 +404,12 @@ cd utilities/python/fates-edge-python-client && pip install -e . && fates-edge-c
 
 **Shipped since the last update:** Voice chat (WebRTC, `js/features/vtt/voice.js` + `js/components/VoiceChat.js`) and session recording/logging (screen + mic capture with an auto-generated SRT subtitle manifest for video editors, `js/core/media.js`, surfaced in GM Tools) are both implemented and wired end-to-end, including short-lived TURN credentials (see `docker-compose.yml`'s `turn` profile) so voice chat traverses symmetric NAT / restrictive firewalls, not just STUN-friendly networks. A single root `docker-compose.yml` now also brings up the whole ecosystem (client + server + optional bots) in one command — see [Quick Start](#-quick-start). Licensing is also now spelled out in plain language per-category (code/SRD/proprietary) in [COMMUNITY_USE_POLICY.md](COMMUNITY_USE_POLICY.md), and the `LICENSE.code`/`LICENSE.srd`/`LICENSE.proprietary` files the badges above link to actually exist now. A **System Status** page (sidebar → System → 🩺 Status, `js/features/system-status/`) now shows real-time server connection, voice chat + TURN availability, active recording, sync/offline-queue state, who's in the room, and browser feature support, all auto-refreshing. The installable-adventure **module system** (`/api/modules`, push/cleanup) has been fixed end-to-end (it was pointed at a directory that never existed) and is documented in [MODULES.md](utilities/javascript/fates-edge-socket-server/MODULES.md); the custom-content **data schema** is documented in [DATA_SCHEMA.md](utilities/javascript/fates-edge-web-client/DATA_SCHEMA.md).
 
+**Also since then (through v4.8.3):** a second original card game, **Toll & Veil**, shipped with the same three play modes as Kon'reh (pass-and-play, solo vs. AI, host-authoritative real-time table) plus an opt-in stakes system and its own in-app guide. Co-GM roles were added and propagated across the Discord bot, AI GM bot, Foundry bridge, and Roll20 integration, which closes out the "VTT/bot audit" item that used to sit in this section. A security sweep of the new multiplayer path fixed stored XSS in lobby/challenge banners, closed a sender-identity spoofing hole in the socket server's generic event relay, and stopped forged stake-transfer messages from bypassing agreed caps.
+
 Features that have been discussed or partially scaffolded but are **not yet implemented** in this build:
 
 - **Session Playback / Export** — replaying or exporting a recorded/logged session as HTML/Markdown/plain text (beyond the SRT manifest voice/logging already produces).
-- **VTT/bot audit for new server APIs** — the Discord bot, AI GM bot, Foundry bridge, Roll20 integration, terminal client, and Python clients haven't yet been individually reviewed for whether they should adopt the new TURN-credentials endpoint or the fixed module-push API.
+- **Horizontal server scaling** — the socket server is a single Node.js process with in-memory room state today; running more than one instance behind a load balancer would need a shared broadcast/state layer (e.g. Redis) that doesn't exist yet. Fine for a single-server deployment, which is the only configuration currently supported.
 
 If you were looking for the voice-chat/logging line from an earlier README revision: it was documented ahead of implementation at the time and pulled back to this roadmap section — it has since actually shipped, per the note above.
 
@@ -463,7 +474,35 @@ Licensed under **CC BY-NC-SA 4.0**. See [LICENSE.srd](LICENSE.srd).
 
 ## 📋 Version History
 
-### v4.5.1 (Current)
+### v4.8.3 (Current)
+- **Added** Toll & Veil, a second original card game (host-authoritative real-time multiplayer over the VTT relay, opt-in Points/XP/String stakes, in-app guide)
+- **Fixed** Security sweep of the Toll & Veil multiplayer path: stored XSS in lobby/challenge banners, sender-identity spoofing in the socket server's `event` relay, forged stake-transfer messages, missing input sanitization on network-supplied lobby data
+- **Fixed** Trust cards (e.g. "The Silk Coin") silently orphaned when real faction files loaded, producing "Trust not found"
+- **Fixed** Cantor's Songs list required a manual refresh on every first load
+- **Changed** AI GM bot's status dashboard binds to `127.0.0.1` by default instead of all interfaces (`STATUS_HOST` to opt into LAN exposure)
+
+### v4.8.2
+- Toll & Veil engine/UI landed and working end-to-end
+
+### v4.8.1
+- Socket server persistence/Dockerfile fixes, web client compose cleanup, INSTALL guides for server/client/bot
+
+### v4.7.1
+- Copyright language updates; mods/bots hardened against HTML injection; Kon'reh doc and package-manager updates; desktop client finished
+
+### v4.7.0
+- Security hardening pass (XSS fixes, auth rate limiting, input length limits); multi-character "Remote enabled" control (up to 6 characters per client)
+
+### v4.6.1–v4.6.3
+- Talent catalog overhaul (10 → 55 JSON-per-talent entries, tagging + category filters, starter/XP-appropriate recommendations); Modern Noir theme and a themeable UI engine; adventure/patron data syncs; one security fix (HTML parsing follow-up noted as still open at the time)
+
+### v4.6.0
+- **Added** Diverse encounter objective-type clocks (Obstruction, Skill Challenge, Trap/Ward, Lockpick, Heist, Social, Custom) instead of hardcoded Harm/Heal
+- **Added** Phase-aware Kon'reh AI (opening/midgame/endgame recognition, Sanctum Seed tempo, Reforge-race search depth)
+- **Fixed** Patrons/Cantor requiring a manual refresh, root-caused to a 1-hour discovery cache never bypassed on forced reload
+- **Fixed** Redundant auto-symbol injection in the character editor/wizard that could silently corrupt `char.symbols` on save
+
+### v4.5.1
 - **Added** "Jump to the Action" one-click flow in the welcome overlay: pre-gen character + starter adventure + a link to the Essentials doc
 - **Added** `data/pre-gens.json` with three pre-gen characters themed to *The Lantern at Dusk*
 - **Fixed** The old Quick Start button's pre-gen loading step had silently failed forever — `data/pre-gens.json` never existed

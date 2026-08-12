@@ -32,6 +32,7 @@
 
 import { sendEvent, onEvent, getSocketId, isConnectedToServer } from '../../core/websocket.js';
 import { openKonrehModalConnected } from './kon-reh-connected.js';
+import { escHtml } from '../../core/utils.js';
 
 const NS = 'konreh';
 
@@ -79,7 +80,7 @@ function showChallengeBanner(fromName, onAccept, onDecline) {
         font-size: 13px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
     `;
     el.innerHTML = `
-        <span>🌀 <b>${fromName}</b> is challenging you to Kon'reh!</span>
+        <span>🌀 <b>${escHtml(fromName)}</b> is challenging you to Kon'reh!</span>
         <button id="konreh-accept-btn" style="background:#d4af37;color:#1a1400;border:none;border-radius:6px;padding:6px 12px;font-weight:600;cursor:pointer;">Accept</button>
         <button id="konreh-decline-btn" style="background:#2a2b38;color:#e8e6df;border:1px solid #3a3b4a;border-radius:6px;padding:6px 12px;cursor:pointer;">Decline</button>
     `;

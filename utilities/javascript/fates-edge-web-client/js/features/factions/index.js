@@ -400,6 +400,23 @@ async function loadRemoteFactions() {
             state.factions = factions;
             state.dataLoaded = true;
             state.usingFallback = false;
+            // BUG FIX: assets/followers/trusts have no remote-loading path of
+            // their own (only `factions` are ever discovered/fetched above) —
+            // this branch used to leave them as whatever state.assets/
+            // followers/trusts already were (the module's initial empty
+            // arrays, on a first-ever load), which then got persisted to
+            // localStorage as [] a few lines below. Any trust/asset/follower
+            // card already painted on screen from an earlier synchronous
+            // render (e.g. the default fallback list) went stale: still
+            // visible in the DOM, but no longer present in `state.trusts`,
+            // so clicking it looked up an id state.trusts.find() could never
+            // match and surfaced a false "not found" toast. Since there's no
+            // remote source for these three, seed them from the same
+            // defaults the fallback path uses whenever they're not already
+            // populated (don't clobber real user-created ones).
+            if (state.assets.length === 0) state.assets = [...DEFAULT_ASSETS];
+            if (state.followers.length === 0) state.followers = [...DEFAULT_FOLLOWERS];
+            if (state.trusts.length === 0) state.trusts = [...DEFAULT_TRUSTS];
         }
 
         // Save to global state

@@ -210,14 +210,24 @@ export function createTollVeilHost(transport, options = {}) {
         }
         if (!msg || typeof msg !== 'object' || !msg.t) return;
 
+        // SECURITY: identify the sender from `fromSocketId` — the bridge
+        // layer's verified, server-stamped socket id (see
+        // toll-veil-vtt-bridge.js's default relay case) — never from
+        // `fromId`, which is just whatever the sending client's own
+        // createTollVeilGuest() self-reported and is trivially forgeable.
+        // Fall back to the legacy `fromId` field only for non-networked
+        // callers (e.g. tests) that construct messages directly without a
+        // bridge in between.
+        const senderId = msg.fromSocketId !== undefined ? msg.fromSocketId : msg.fromId;
+
         switch (msg.t) {
             case 'bid': {
-                if (msg.seat == null || seatIds[msg.seat] !== msg.fromId) return; // seat ownership check
+                if (msg.seat == null || seatIds[msg.seat] !== senderId) return; // seat ownership check
                 engine.makeBid(msg.seat, msg.bid);
                 break;
             }
             case 'play': {
-                if (msg.seat == null || seatIds[msg.seat] !== msg.fromId) return;
+                if (msg.seat == null || seatIds[msg.seat] !== senderId) return;
                 engine.playCard(msg.seat, msg.id, { cut: !!msg.cut, leap: !!msg.leap });
                 break;
             }
@@ -267,10 +277,11 @@ export function createTollVeilHost(transport, options = {}) {
  * @param {number} options.mySeat
  * @param {string} options.myId - this client's opaque transport id (matches what the host was told at join time).
  * @param {Object} [options.stakeConfig]
+ * @param {string} [options.hostSocketId] - the verified socket id of the host this guest actually joined; used to reject spoofed stake messages.
  * @returns {Object} { receive, controller, destroy }
  */
 export function createTollVeilGuest(transport, options = {}) {
-    const { mySeat, myId, stakeConfig = { mode: 'points' } } = options;
+    const { mySeat, myId, stakeConfig = { mode: 'points' }, hostSocketId = null } = options;
 
     let publicState = null;
     let myHand = [];
@@ -299,6 +310,24 @@ export function createTollVeilGuest(transport, options = {}) {
             myHand = msg.hand;
             fire();
         } else if (msg.t === 'stake-transfer' || msg.t === 'stake-string') {
+            // SECURITY: a stake message mutates a real character's XP (or
+            // records a narrative debt), so it's worth more scrutiny than
+            // ordinary game traffic before ever calling applyStakeEvent().
+            // A malicious/compromised host — or anyone spoofing its id
+            // before the relay-side fix — could otherwise fire an arbitrary
+            // stake-transfer at any time, for any amount, completely
+            // detached from a real game ever concluding. Reject unless all
+            // of the following hold:
+            const senderId = msg.fromSocketId !== undefined ? msg.fromSocketId : msg.socketId;
+            if (hostSocketId && senderId !== hostSocketId) return;               // ...it actually came from the host we joined,
+            if (!publicState || publicState.phase !== 'game_over') return;       // ...we've independently observed the game actually ending,
+            if (msg.t === 'stake-transfer') {
+                if (stakeConfig.mode !== 'xp') return;                           // ...this table was actually wagering XP,
+                const cap = Math.max(0, stakeConfig.xpCap || 0);
+                if (!(msg.amount > 0) || msg.amount > cap) return;               // ...and the amount is within the cap we agreed to.
+            } else if (msg.t === 'stake-string') {
+                if (stakeConfig.mode !== 'string') return;
+            }
             applyStakeEvent(msg, mySeat);
         }
     }

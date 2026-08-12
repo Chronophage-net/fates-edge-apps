@@ -24,6 +24,7 @@
 import { sendEvent, onEvent, getSocketId, isConnectedToServer } from '../../core/websocket.js';
 import { createTollVeilHost, createTollVeilGuest } from './toll-and-veil-connected.js';
 import { openTollVeilModal, closeTollVeilModal } from './toll-and-veil.js';
+import { escHtml } from '../../core/utils.js';
 
 const NS = 'tollveil';
 
@@ -58,6 +59,44 @@ function removeLobbyBanner() {
     if (lobbyBanner) { lobbyBanner.remove(); lobbyBanner = null; }
 }
 
+// SECURITY FIX: normalizes an incoming, network-supplied stakeConfig into
+// one of the three known shapes, instead of trusting whatever an attacker
+// broadcasts in a 'table-open' event. Without this, a malicious 'table-open'
+// could set stakeConfig.mode to an arbitrary string (rendered directly into
+// the lobby banner's label lookup — harmless there since it's a plain
+// object-key miss, but every downstream consumer of stakeConfig.mode
+// branches on it with `===` checks, so an unrecognized value should
+// deterministically fall back to the safe 'points' default rather than
+// propagate an unvalidated shape through the host/guest controllers).
+function sanitizeStakeConfig(raw) {
+    const mode = ['points', 'xp', 'string'].includes(raw?.mode) ? raw.mode : 'points';
+    const xpCapNum = Number(raw?.xpCap);
+    const xpCap = mode === 'xp' ? Math.min(50, Math.max(1, Number.isFinite(xpCapNum) ? Math.floor(xpCapNum) : 1)) : undefined;
+    return xpCap !== undefined ? { mode, xpCap } : { mode };
+}
+
+// SECURITY FIX: clamps a network-supplied seat count into the engine's
+// actual supported range, rather than trusting an attacker's 'table-open'
+// numSeats verbatim (which otherwise flows straight into
+// createTollVeilHost()/TollVeilEngine's seat-count math on whoever accepts
+// the table).
+function sanitizeNumSeats(raw) {
+    const n = Number(raw);
+    if (!Number.isFinite(n)) return 3;
+    return Math.min(5, Math.max(3, Math.floor(n)));
+}
+
+// SECURITY FIX: a display name arriving over the network (table-open's
+// hostName, table-join's name) is later escaped before it's ever put into
+// innerHTML (see renderLobbyBanner()), but it's still worth capping length
+// here so a hostile client can't blow up the banner/roster UI with a
+// multi-megabyte string.
+function sanitizeDisplayName(raw, fallback) {
+    const s = typeof raw === 'string' ? raw.trim() : '';
+    if (!s) return fallback;
+    return s.slice(0, 60);
+}
+
 function teardownMatch() {
     if (activeHost) { try { activeHost.destroy(); } catch (e) { /* ignore */ } }
     if (activeGuest) { try { activeGuest.destroy(); } catch (e) { /* ignore */ } }
@@ -74,7 +113,12 @@ function renderLobbyBanner() {
     const iAmHost = lobbyState.hostSocketId === getSocketId();
     const seatEntries = Object.entries(lobbyState.seats);
     const iAmSeated = seatEntries.some(([, info]) => info.socketId === getSocketId());
-    const seatsLabel = seatEntries.map(([seat, info]) => `Seat ${parseInt(seat, 10) + 1}: ${info.name}`).join(' · ') || 'No one seated yet';
+    // SECURITY FIX: hostName and each seat's display name arrive over the
+    // network (an attacker-controlled 'table-open'/'table-join' event can
+    // put literally anything in these fields, including HTML/script) and
+    // used to be interpolated straight into innerHTML below — a stored XSS
+    // reachable by anyone in the same VTT room. Escape before display.
+    const seatsLabel = seatEntries.map(([seat, info]) => `Seat ${parseInt(seat, 10) + 1}: ${escHtml(info.name)}`).join(' · ') || 'No one seated yet';
     const stakeLabel = { points: 'Points only', xp: `XP wager (cap ${lobbyState.stakeConfig.xpCap ?? '?'})`, string: 'String debts' }[lobbyState.stakeConfig.mode] || 'Points only';
 
     const el = document.createElement('div');
@@ -87,7 +131,7 @@ function renderLobbyBanner() {
         font-size: 13px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); max-width: 420px;
     `;
     el.innerHTML = `
-        <div><b>${lobbyState.hostName || 'A player'}</b> is hosting Toll &amp; Veil (${lobbyState.numSeats} seats · ${stakeLabel})</div>
+        <div><b>${escHtml(lobbyState.hostName || 'A player')}</b> is hosting Toll &amp; Veil (${lobbyState.numSeats} seats · ${stakeLabel})</div>
         <div style="color:#9a9aa8; font-size:12px;">${seatsLabel}</div>
         <div style="display:flex; gap:8px;">
             ${iAmHost ? '<button id="tv-lobby-start" style="background:#d4af37;color:#1a1400;border:none;border-radius:6px;padding:6px 12px;font-weight:600;cursor:pointer;">Start Game</button>' : ''}
@@ -158,8 +202,12 @@ export function initTollVeilVttBridge() {
                 if (data.socketId === getSocketId()) return;
                 if (tableActive || lobbyState) return; // already in/hosting something
                 lobbyState = {
-                    hosting: false, numSeats: data.numSeats, stakeConfig: data.stakeConfig,
-                    hostSocketId: data.socketId, hostName: data.hostName, seats: data.seats || {},
+                    hosting: false,
+                    numSeats: sanitizeNumSeats(data.numSeats),
+                    stakeConfig: sanitizeStakeConfig(data.stakeConfig),
+                    hostSocketId: data.socketId,
+                    hostName: sanitizeDisplayName(data.hostName, 'A player'),
+                    seats: data.seats || {},
                 };
                 renderLobbyBanner();
                 return;
@@ -172,7 +220,7 @@ export function initTollVeilVttBridge() {
                 return;
             }
             case 'table-join': {
-                assignSeat(data.socketId, data.name || 'Player');
+                assignSeat(data.socketId, sanitizeDisplayName(data.name, 'Player'));
                 return;
             }
             case 'table-roster': {
@@ -189,14 +237,35 @@ export function initTollVeilVttBridge() {
                 if (!mySeatEntry) return; // wasn't seated — table starts without us
                 tableActive = true;
                 const mySeat = parseInt(mySeatEntry[0], 10);
-                activeGuest = createTollVeilGuest(transport(), { mySeat, myId: getSocketId(), stakeConfig: data.stakeConfig });
+                activeGuest = createTollVeilGuest(transport(), {
+                    mySeat,
+                    myId: getSocketId(),
+                    stakeConfig: sanitizeStakeConfig(data.stakeConfig),
+                    // SECURITY: the host we actually joined, per the server-
+                    // stamped socketId on this table-start broadcast (not
+                    // anything the message payload itself might claim) — the
+                    // guest controller uses this to refuse stake-transfer/
+                    // stake-string messages that don't actually come from
+                    // this table's real host. See createTollVeilGuest().
+                    hostSocketId: data.socketId,
+                });
                 openTollVeilModal({ controller: activeGuest.controller });
                 return;
             }
             default: {
                 // Real game protocol traffic (public/hand/bid/play/sync-request/stake-*).
                 if (data.socketId === getSocketId()) return;
-                const msg = { t: data.sub, ...(data.payload || {}) };
+                // SECURITY FIX: `data.payload.fromId` (if present) is
+                // whatever the SENDING client's own createTollVeilGuest()
+                // put there — self-reported, not verified. `data.socketId`,
+                // by contrast, is now stamped by the socket server itself
+                // (see ws-handlers.js/socketio-handlers.js's matching fix)
+                // and can't be forged by the sender. Pass it through as
+                // `fromSocketId` and have the host controller's seat-
+                // ownership check use *that*, not the self-reported field —
+                // otherwise any guest could claim any seat by simply setting
+                // `fromId` in their own outgoing message to someone else's id.
+                const msg = { t: data.sub, ...(data.payload || {}), fromSocketId: data.socketId };
                 if (activeHost) activeHost.receive(msg);
                 else if (activeGuest) activeGuest.receive(msg);
                 return;
@@ -216,8 +285,12 @@ export function initTollVeilVttBridge() {
  * @returns {boolean} false if not connected or already in/hosting a table.
  */
 export function openTollVeilTable(options = {}) {
-    const { hostName = 'A player', numSeats = 3, hostPlays = true, stakeConfig = { mode: 'points' } } = options;
+    const { hostName: rawHostName = 'A player', numSeats: rawNumSeats = 3, hostPlays = true, stakeConfig: rawStakeConfig = { mode: 'points' } } = options;
     if (!isConnectedToServer() || tableActive || lobbyState) return false;
+
+    const hostName = sanitizeDisplayName(rawHostName, 'A player');
+    const numSeats = sanitizeNumSeats(rawNumSeats);
+    const stakeConfig = sanitizeStakeConfig(rawStakeConfig);
 
     lobbyState = { hosting: true, numSeats, stakeConfig, hostSocketId: getSocketId(), hostName, seats: {} };
     if (hostPlays) lobbyState.seats[0] = { socketId: getSocketId(), name: hostName };

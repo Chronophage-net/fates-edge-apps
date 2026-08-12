@@ -2,10 +2,12 @@
 
 **Version:** 3.0
 **Date:** 2026-07-13
-**Status:** Implemented (see `js/core/sync/`); toolkit is now at v4.4.1
+**Status:** Implemented (see `js/core/sync/`); toolkit is now at v4.8.3
 **Author:** Nicholas A. Gasper
 
-> **Note (v4.4.1):** The real-time sync design below shipped and is unchanged in shape. Since this document was written, the toolkit has added account authentication against the campaign server (register/login/JWT, see the socket server's `DESIGN.md`), a redone Python client, VTT bridge/mod updates, and a real test suite (`tests/unit/`, `tests/integration/` — see the root README's "What's New"). The previously-planned AI GM bot companion project has been removed from the ecosystem.
+> **Note (v4.8.3):** The real-time sync design below shipped and is unchanged in shape. Since this document was written, the toolkit has added account authentication against the campaign server (register/login/JWT, see the socket server's `DESIGN.md`), a redone Python client, VTT bridge/mod updates, a real test suite (`tests/unit/`, `tests/integration/` — see the root README's "What's New"), a second real-time card game (Toll & Veil, host-authoritative over the same event relay this document describes), and a security-hardening pass on that multiplayer path. The previously-planned AI GM bot companion project was removed from *this* monorepo; it lives on as its own separate repository (`fates-edge-ai-gm-bot`) and is no longer part of this toolkit's own integrations.
+>
+> **Correction (v4.8.3):** Section 5 below describes Redis as the server's state store. That was never actually built — the shipped server (`fates-edge-socket-server`) keeps room/operation state in an in-memory `Map` per process (see `server/room.js`) and persists snapshots to SQLite by default (optionally PostgreSQL or MySQL, see `server/storage.js`). There is no Redis dependency anywhere in this codebase. The Redis-based multi-server scaling design in Sections 5.3 and 9 was never implemented and remains a hypothetical option for a future horizontally-scaled deployment, not a description of what runs today.
 
 ---
 
@@ -121,8 +123,8 @@ The system will leverage WebSockets for bidirectional communication, implement c
 │  ┌────────────────────────────────────────────────────────────┐    │
 │  │                     Data Layer                             │    │
 │  │  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐    │    │
-│  │  │  Redis/      │  │  Operation   │  │  Conflict    │    │    │
-│  │  │  Memory Store│  │  Log (OT)   │  │  Resolution  │    │    │
+│  │  │  In-Memory   │  │  Operation   │  │  Conflict    │    │    │
+│  │  │  Store       │  │  Log (OT)   │  │  Resolution  │    │    │
 │  │  └──────────────┘  └──────────────┘  └──────────────┘    │    │
 │  └────────────────────────────────────────────────────────────┘    │
 └─────────────────────────────────────────────────────────────────────┘
@@ -363,8 +365,8 @@ class ReconnectionManager {
 | **Runtime** | Node.js 20+ | Lightweight, WebSocket native |
 | **WS Library** | `ws` | Fast, battle-tested WebSocket implementation |
 | **HTTP Server** | Express.js | REST API for manual sync fallback |
-| **State Store** | Redis | In-memory store with persistence; fast operation log |
-| **Persistence** | SQLite / PostgreSQL | Full state snapshots for recovery |
+| **State Store** | In-memory `Map` (per process) | Room/operation state lives in the server process; see `server/room.js` |
+| **Persistence** | SQLite (default) / PostgreSQL / MySQL | Full state snapshots for recovery; see `server/storage.js` |
 
 ### 5.2 Server Components
 
@@ -503,25 +505,28 @@ class ConflictResolver {
 }
 ```
 
-### 5.3 Redis Data Model
+### 5.3 In-Memory Data Model (as shipped)
+
+Not Redis — this is a plain in-process `Map`/`Set` structure, scoped to a single server instance (see `server/room.js`). The key shapes below are conceptually the same ones the original Redis design sketched, just held in memory instead of an external store:
 
 ```javascript
-// Campaign state
-campaign:{code}:state → { /* full state JSON */ }
+// Campaign/room state
+rooms.get(code) → { /* full state, clients, characters, etc. */ }
 
-// Operation log (sorted set by timestamp)
-campaign:{code}:operations → [operation1, operation2, ...]
+// Operation log (array, per room)
+rooms.get(code).operations → [operation1, operation2, ...]
 
 // Client presence
-campaign:{code}:clients → Set of clientIds
+rooms.get(code).clients → Map<clientId, { ws, metadata, lastSeen }>
 
 // Client metadata
-client:{id}:metadata → { name, role, lastSeen }
-client:{id}:campaign → campaignCode
+connections.get(clientId) → { name, role, lastSeen }
 
 // Version vectors per client
-client:{id}:version → { /* version vector */ }
+connections.get(clientId).version → { /* version vector */ }
 ```
+
+Durable snapshots (survives a restart) go through `server/storage.js` to SQLite/PostgreSQL/MySQL — not to the in-memory structures above.
 
 ### 5.4 Server REST API (Fallback)
 
@@ -1185,7 +1190,7 @@ export function createConnectionStatus() {
 |------|-------------|----------|
 | Server setup | Node.js + Express + ws library | Critical |
 | Connection manager | Client tracking, rooms, handshakes | Critical |
-| Operation log | Store operations in Redis | Critical |
+| Operation log | Store operations in-process (per room) | Critical |
 | Basic sync | Full-state sync on connect | High |
 
 ### Phase 2: Operation Sync (Week 3-4)
@@ -1229,7 +1234,28 @@ export function createConnectionStatus() {
 
 ## 9. Deployment Architecture
 
-### 9.1 Production Setup
+### 9.1 Production Setup — as actually shipped (single instance)
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                         Internet                            │
+└─────────────────────────────────────────────────────────────┘
+                              │
+                   ┌──────────▼──────────┐
+                   │      Server         │
+                   │     (Node.js)       │
+                   │  in-memory room     │
+                   │      state          │
+                   └──────────┬──────────┘
+                              │
+                   ┌──────────▼──────────┐
+                   │  SQLite (default) / │
+                   │  PostgreSQL / MySQL │
+                   │  (State Snapshots)  │
+                   └─────────────────────┘
+```
+
+The multi-server/load-balanced layout originally sketched here (below) was never built and isn't supported by the current codebase — there's no shared broadcast layer, so a second server instance would run its own disconnected set of rooms. Documented as a possible future direction only:
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
@@ -1251,7 +1277,10 @@ export function createConnectionStatus() {
               └───────────────┼───────────────┘
                               │
                    ┌──────────▼──────────┐
-                   │     Redis Cluster   │
+                   │  Shared pub/sub —   │
+                   │  NOT implemented    │
+                   │  (would need e.g.   │
+                   │      Redis)         │
                    └──────────┬──────────┘
                               │
                    ┌──────────▼──────────┐
@@ -1264,23 +1293,24 @@ export function createConnectionStatus() {
 
 | Aspect | Strategy |
 |--------|----------|
-| **Connections** | Horizontal scaling with sticky sessions |
-| **State** | Redis for ephemeral state, PostgreSQL for persistence |
-| **Broadcast** | Redis Pub/Sub for cross-server messages |
+| **Connections** | Single instance today; horizontal scaling with sticky sessions is a future option, not implemented |
+| **State** | In-memory per-process today; SQLite/PostgreSQL/MySQL for persistence |
+| **Broadcast** | In-process `broadcastToRoom` today; a shared pub/sub layer (e.g. Redis) would be required before running more than one instance |
 | **Offline Queue** | Client-side IndexedDB |
 | **Rate Limiting** | Per-IP and per-campaign limits |
 
 ### 9.3 Environment Variables
 
+Reflects the variables `server/config.js` and `server/storage.js` actually read (see that project's own README/INSTALL for the full list):
+
 ```bash
 # Server
 NODE_ENV=production
-PORT=3000
-WS_PORT=3001
+PORT=10000
 
-# Database
-REDIS_URL=redis://localhost:6379
-POSTGRES_URL=postgres://user:pass@localhost:5432/fatesedge
+# Database (server/storage.js) — no Redis; SQLite is the default
+DATABASE_TYPE=sqlite            # or 'postgres' / 'mysql'
+DATABASE_URL=./campaigns.db     # or a postgres://... / mysql://... connection string
 
 # Security
 JWT_SECRET=your_jwt_secret
@@ -1310,7 +1340,7 @@ CAMPAIGN_EXPIRY_DAYS=30
 | Concern | Solution |
 |---------|----------|
 | **In Transit** | WSS (WebSocket Secure) |
-| **At Rest** | Redis/PostgreSQL with encryption at rest |
+| **At Rest** | SQLite/PostgreSQL/MySQL with encryption at rest |
 | **Validation** | Server-side schema validation of all operations |
 | **Rate Limiting** | Prevent flooding/DDOS |
 
@@ -1352,7 +1382,7 @@ function validateOperation(op) {
 | **Connections** | Active connections, connection rate, disconnections |
 | **Operations** | Operation rate, latency, conflict rate |
 | **Users** | Active campaigns, users per campaign |
-| **Performance** | Memory usage, CPU, Redis latency |
+| **Performance** | Memory usage, CPU, database query latency |
 | **Errors** | Rejection rate, timeout rate, exception rate |
 
 ### 12.2 Logging Schema
@@ -1469,14 +1499,15 @@ const MIGRATIONS = [
 1. ✅ Review and approve this design document
 2. ✅ Set up development server with WebSocket support
 3. ✅ Implement Phase 1 (Foundation)
-4. 🔜 Schedule weekly progress reviews
+4. ✅ Implement Phases 2–5 (Operation Sync, Offline Support, UI & UX, Polish & Production) — see the root README's Version History for the shipped feature-by-feature breakdown
 
 ### Future Enhancements
-1. **Voice/Video integration** - WebRTC for live sessions
-2. **Whiteboard** - Shared drawing/mapping canvas
-3. **PDF Export** - Collaborative PDF generation
-4. **Version History** - Time-travel through campaign state
-5. **Mobile Companion App** - iOS/Android native app
+1. ✅ **Voice/Video integration** — shipped (WebRTC voice chat + TURN NAT traversal, v4.5.0)
+2. ✅ **Whiteboard** — shipped (shared drawing/mapping canvas, VTT router integration)
+3. **PDF Export** - Collaborative PDF generation — not yet implemented
+4. **Version History** - Time-travel through campaign state — not yet implemented
+5. **Mobile Companion App** - iOS/Android native app — not yet implemented
+6. **Horizontal server scaling** — not yet implemented; see Section 9 for what would actually be required (a shared pub/sub layer, currently absent)
 
 ---
 
@@ -1485,7 +1516,6 @@ const MIGRATIONS = [
 ### Documentation
 - [WebSocket Protocol](https://datatracker.ietf.org/doc/html/rfc6455)
 - [Operational Transformation](https://en.wikipedia.org/wiki/Operational_transformation)
-- [Redis Pub/Sub](https://redis.io/data/docs/manual/pubsub/)
 - [IndexedDB API](https://developer.mozilla.org/en-US/data/docs/Web/API/IndexedDB_API)
 
 ### Similar Tools
@@ -1630,10 +1660,8 @@ cd fates-edge-toolkit
 # Install dependencies
 npm install
 
-# Start Redis (using Docker)
-docker run -d -p 6379:6379 redis
-
-# Start PostgreSQL (using Docker)
+# No external database needed by default — SQLite is used out of the box.
+# Only if you want PostgreSQL/MySQL instead (server/storage.js, DATABASE_TYPE):
 docker run -d -p 5432:5432 -e POSTGRES_PASSWORD=password postgres
 
 # Run server
@@ -1654,10 +1682,9 @@ npm run test:load
 ```bash
 # .env file
 NODE_ENV=development
-PORT=3000
-WS_PORT=3001
-REDIS_URL=redis://localhost:6379
-POSTGRES_URL=postgres://postgres:password@localhost:5432/fatesedge
+PORT=10000
+DATABASE_TYPE=sqlite
+DATABASE_URL=./campaigns.db
 JWT_SECRET=dev_secret_key
 CORS_ORIGIN=http://localhost:5173
 ```

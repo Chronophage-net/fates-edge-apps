@@ -3,6 +3,13 @@ All notable changes to this project will be documented here.
 
 Format loosely follows [Keep a Changelog](https://keepachangelog.com/), versions follow [Semantic Versioning](https://semver.org/).
 
+## [4.8.3] - 2026-08-12
+
+Security hardening: server-verified sender identity for the VTT event relay, XSS fixes in Kon'reh/Toll & Veil banners, Toll & Veil stake-message validation, Trust/Cantor bug fixes.
+
+### Other
+- Added Toll and Veil guide and document categoy.
+
 ## [4.8.2] - 2026-08-12
 
 ### Other

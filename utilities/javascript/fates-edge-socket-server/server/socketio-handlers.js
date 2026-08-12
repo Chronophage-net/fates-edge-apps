@@ -756,7 +756,19 @@ function setupSocketIO(io, appConfig) {
                 if (!socket.room) return socket.emit('error', { message: 'Not in a room' });
                 room.broadcastToRoom(socket.room, eventName, {
                     ...data,
-                    clientName: socket.clientData?.name || 'Player'
+                    clientName: socket.clientData?.name || 'Player',
+                    // SECURITY FIX: for the generic 'event' relay specifically
+                    // (js/core/websocket.js's sendEvent(), used by Kon'reh's
+                    // and Toll & Veil's connected-mode bridges), `data.socketId`
+                    // was whatever the sending client's own message claimed —
+                    // trivially spoofable by any client emitting a raw
+                    // socket.io 'event' with a forged socketId, letting it
+                    // impersonate another player for turn-order/seat-ownership
+                    // checks those features key off this field for. Stamp the
+                    // connection's real, server-assigned socket.id here,
+                    // overwriting any client-supplied value. See ws-handlers.js's
+                    // matching fix for the plain-WS transport.
+                    ...(eventName === 'event' ? { socketId: socket.id } : {}),
                 }, socket.id);
             });
         });
