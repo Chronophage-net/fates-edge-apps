@@ -3,6 +3,17 @@ All notable changes to this project will be documented here.
 
 Format loosely follows [Keep a Changelog](https://keepachangelog.com/), versions follow [Semantic Versioning](https://semver.org/).
 
+## [4.9.0] - 2026-08-12
+
+Optional Redis-backed horizontal scaling for the socket server; documentation overhaul separating implemented reality from roadmap across the socket-server and web-client design docs (new SCALING.md, ROLES.md, ROADMAP.md for the socket server).
+
+### Added
+- optional Redis-backed horizontal scaling
+
+### Docs
+- rewrite web-client TODO.md as an archived status record
+- correct socket-server DESIGN.md (remove Redis/aspirational claims)
+
 ## [4.8.3] - 2026-08-12
 
 Security hardening: server-verified sender identity for the VTT event relay, XSS fixes in Kon'reh/Toll & Veil banners, Toll & Veil stake-message validation, Trust/Cantor bug fixes.

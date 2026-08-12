@@ -1,4 +1,4 @@
-# Fate's Edge Socket Server v4.8.3 — Real-Time VTT & Campaign Sharing
+# Fate's Edge Socket Server v4.9.0 — Real-Time VTT & Campaign Sharing
 
 **Fate's Edge** is a narrative‑first TTRPG system. This is the real‑time backend for the web toolkit: a WebSocket/Socket.io server that syncs campaign state live across your group, plus a short‑code **campaign sharing** endpoint for loading/saving full toolkit state without a persistent connection.
 
@@ -128,12 +128,13 @@ fates-edge-socket-server/
 │   ├── auth.js                  # account registration/login (bcrypt + JWT)
 │   ├── config.js                 # env/config.json loader
 │   ├── deck.js                   # Deck of Consequences logic
-│   ├── index.js                  # (legacy duplicate of server.js — server.js is the real entrypoint)
+│   ├── index.js                  # the actual server implementation (Express + Socket.io + ws + scaling wiring)
 │   ├── logger.js
 │   ├── module-manifest-utils.js  # shared manifest-deriving logic (API install path + generate-manifest.js)
 │   ├── room.js                   # GM election / room state / broadcastToRoom
+│   ├── scaling.js                # optional Redis-backed horizontal scaling — see SCALING.md
 │   ├── security.js
-│   ├── server.js                 # actual entrypoint (via server-start.js)
+│   ├── server.js                 # one-line re-export of index.js (kept only so server-start.js's require path still works)
 │   ├── socketio-handlers.js      # Socket.io transport
 │   ├── storage.js
 │   ├── turn.js                   # short-lived TURN credential minting (see TURN docs above)

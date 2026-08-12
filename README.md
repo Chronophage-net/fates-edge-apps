@@ -1,6 +1,6 @@
 [![Build Apps and Packages](https://github.com/Chronophage-net/fates-edge-apps/actions/workflows/build-apps-and-packages.yml/badge.svg)](https://github.com/Chronophage-net/fates-edge-apps/actions/workflows/build-apps-and-packages.yml)
 
-# Fate's Edge Toolkit v4.8.3 – Complete VTT Ecosystem
+# Fate's Edge Toolkit v4.9.0 – Complete VTT Ecosystem
 
 > A modular, self-contained toolkit for running Fate's Edge TTRPG campaigns, with real‑time collaboration, VTT integrations, Game Master management, and a full in-browser magic/monastic-path system.
 
@@ -10,14 +10,14 @@
 [![Node.js](https://img.shields.io/badge/Node.js-24.x-green.svg)](https://nodejs.org/)
 [![Foundry VTT](https://img.shields.io/badge/Foundry-VTT-orange)](https://foundryvtt.com/)
 [![Discord](https://img.shields.io/badge/Discord-Bot-5865F2)](https://discord.com/)
-[![Version](https://img.shields.io/badge/version-4.8.3-blue)](https://github.com/nicholasagaspar/fates-edge-apps)
+[![Version](https://img.shields.io/badge/version-4.9.0-blue)](https://github.com/nicholasagaspar/fates-edge-apps)
 
 ---
 
 ## 📖 Table of Contents
 
 - [Overview](#-overview)
-- [What's New in v4.8.3](#-whats-new-in-v483)
+- [What's New in v4.9.0](#-whats-new-in-v490)
 - [Features](#-features)
 - [Quick Start](#-quick-start)
 - [Architecture](#-architecture)
@@ -39,6 +39,12 @@
 The toolkit includes **real‑time VTT features** via a WebSocket/Socket.io server, a **campaign sharing server** with GM election and shared Deck of Consequences draws, **integrations** for Foundry VTT, Discord, Roll20, and Avrae, and a growing set of **standalone in-browser mini-tools** (including an original strategy board game, Kon'reh).
 
 ---
+
+## 🆕 What's New in v4.9.0
+
+- **📈 Optional Redis-backed horizontal scaling for the socket server** — off by default (single instance, zero external dependency, unchanged behavior for the common case). Opt in via `REDIS_URL` to run more than one server instance behind a load balancer with sticky sessions: Socket.IO clients scale transparently via the official `@socket.io/redis-adapter`, and a small custom pub/sub relay covers the plain-`ws` transport, which isn't part of Socket.IO's room system. See [`fates-edge-socket-server/SCALING.md`](utilities/javascript/fates-edge-socket-server/SCALING.md).
+- **📚 Documentation overhaul — separating what's implemented from what's aspirational.** The socket server's `DESIGN.md` had drifted badly from the real code over time (describing Redis caching, PDF conversion, email, and job scheduling that were never built, alongside real routes/events that were never listed). Rewritten against the actual code, with three new companion docs: [`SCALING.md`](utilities/javascript/fates-edge-socket-server/SCALING.md) (the new scaling feature, in full), [`ROLES.md`](utilities/javascript/fates-edge-socket-server/ROLES.md) (the role/permission model, promoted out with diagrams), and [`ROADMAP.md`](utilities/javascript/fates-edge-socket-server/ROADMAP.md) (only genuinely planned work — everything else was deleted, not parked). The web client's own `DESIGN.md` no longer duplicates server architecture/deployment content that isn't its job to maintain; it points at the server's docs instead.
+- **🔧 Small fixes surfaced along the way** — `fates-edge-socket-server`'s `package.json` had a broken `main` field (pointed at a file that doesn't exist) and a full copy-pasted duplicate server entrypoint (`server/server.js` vs `server/index.js`) that had to be kept in sync by hand; the duplicate is now a one-line re-export.
 
 ## 🆕 What's New in v4.8.3
 
@@ -474,7 +480,14 @@ Licensed under **CC BY-NC-SA 4.0**. See [LICENSE.srd](LICENSE.srd).
 
 ## 📋 Version History
 
-### v4.8.3 (Current)
+### v4.9.0 (Current)
+- **Added** Optional Redis-backed horizontal scaling for the socket server (`REDIS_URL`, off by default) — see `SCALING.md`
+- **Added** `ROLES.md` and `ROADMAP.md` for the socket server
+- **Changed** Rewrote the socket server's `DESIGN.md` against the actual code; removed aspirational Redis-caching/PDF-conversion/email/scheduling content that was never implemented
+- **Changed** Web client's `DESIGN.md` no longer duplicates server architecture/deployment content — points at the server's own docs
+- **Fixed** Socket server `package.json`'s broken `main` field; de-duplicated `server/server.js` (was a full copy of `server/index.js`)
+
+### v4.8.3
 - **Added** Toll & Veil, a second original card game (host-authoritative real-time multiplayer over the VTT relay, opt-in Points/XP/String stakes, in-app guide)
 - **Fixed** Security sweep of the Toll & Veil multiplayer path: stored XSS in lobby/challenge banners, sender-identity spoofing in the socket server's `event` relay, forged stake-transfer messages, missing input sanitization on network-supplied lobby data
 - **Fixed** Trust cards (e.g. "The Silk Coin") silently orphaned when real faction files loaded, producing "Trust not found"
