@@ -1,6 +1,6 @@
 [![Build Apps and Packages](https://github.com/Chronophage-net/fates-edge-apps/actions/workflows/build-apps-and-packages.yml/badge.svg)](https://github.com/Chronophage-net/fates-edge-apps/actions/workflows/build-apps-and-packages.yml)
 
-# Fate's Edge Toolkit v4.9.0 – Complete VTT Ecosystem
+# Fate's Edge Toolkit v4.10.0 – Complete VTT Ecosystem
 
 > A modular, self-contained toolkit for running Fate's Edge TTRPG campaigns, with real‑time collaboration, VTT integrations, Game Master management, and a full in-browser magic/monastic-path system.
 
@@ -10,14 +10,14 @@
 [![Node.js](https://img.shields.io/badge/Node.js-24.x-green.svg)](https://nodejs.org/)
 [![Foundry VTT](https://img.shields.io/badge/Foundry-VTT-orange)](https://foundryvtt.com/)
 [![Discord](https://img.shields.io/badge/Discord-Bot-5865F2)](https://discord.com/)
-[![Version](https://img.shields.io/badge/version-4.9.0-blue)](https://github.com/nicholasagaspar/fates-edge-apps)
+[![Version](https://img.shields.io/badge/version-4.10.0-blue)](https://github.com/nicholasagaspar/fates-edge-apps)
 
 ---
 
 ## 📖 Table of Contents
 
 - [Overview](#-overview)
-- [What's New in v4.9.0](#-whats-new-in-v490)
+- [What's New in v4.10.0](#-whats-new-in-v4100)
 - [Features](#-features)
 - [Quick Start](#-quick-start)
 - [Architecture](#-architecture)
@@ -39,6 +39,13 @@
 The toolkit includes **real‑time VTT features** via a WebSocket/Socket.io server, a **campaign sharing server** with GM election and shared Deck of Consequences draws, **integrations** for Foundry VTT, Discord, Roll20, and Avrae, and a growing set of **standalone in-browser mini-tools** (including an original strategy board game, Kon'reh).
 
 ---
+
+## 🆕 What's New in v4.10.0
+
+- **🔍 Optional Elasticsearch search backend for the web client** — `js/features/search/index.js` already supported an optional self-hosted Solr backend (undocumented until now); it now supports Elasticsearch too (`window.__ES_URL`, `window.__ES_API_KEY`), with `window.__SEARCH_BACKEND` to force a specific one if both are configured. Still zero-config by default — the built-in local Fuse.js index needs nothing external. See the web client's own README's new "Search Backend Configuration" section.
+- **🩺 System Status now shows the active search backend** — which of Solr/Elasticsearch/local index is actually connected, and how many entries are indexed.
+- **🧪 12 new tests** covering the Elasticsearch integration and Solr/Elasticsearch backend-selection logic (138/138 web-client tests passing), plus a `sessionStorage` shim added to the test harness (was missing entirely — the search feature couldn't be unit tested at all before this).
+- **🔧 Small reliability fix while touching this code** — the Solr/Elasticsearch config used to be read once at module import time, meaning `window.__SOLR_URL` had to be set before this module was ever imported by anything (including indirectly) or it would silently never take effect. Now read live on every use.
 
 ## 🆕 What's New in v4.9.0
 
@@ -100,6 +107,7 @@ The toolkit includes **real‑time VTT features** via a WebSocket/Socket.io serv
 - **⚔️ Encounter Builder** — Design and run encounters with an integrated bestiary and combat tracker
 - **📚 Wiki** — Reference rules, patrons, regions, and more, with an in-app editor
 - **📄 Document Viewer** — Browse and search SRD, Essentials, and GM Screen content
+- **🔍 Search Everything** — Full-text search across Wiki/documents/patrons/factions/regions; zero-config local index by default, with optional pluggable Solr or Elasticsearch backends for larger deployments — see the web client's own README for setup
 - **🗺️ Travel Planner** — Plan overland routes and travel time across regions
 
 ### Campaign Management
@@ -480,7 +488,15 @@ Licensed under **CC BY-NC-SA 4.0**. See [LICENSE.srd](LICENSE.srd).
 
 ## 📋 Version History
 
-### v4.9.0 (Current)
+### v4.10.0 (Current)
+- **Added** Optional Elasticsearch search backend for the web client (`window.__ES_URL`/`__ES_API_KEY`), alongside the pre-existing (now documented) Solr option
+- **Added** `window.__SEARCH_BACKEND` to force Solr or Elasticsearch when both are configured
+- **Added** Search backend status to the System Status page
+- **Added** 12 new tests for the search feature; added a `sessionStorage` test-harness shim
+- **Fixed** Solr/Elasticsearch config is now read live instead of cached at module-import time
+- **Changed** Documented the search feature's backend options in the web client's README (previously undocumented)
+
+### v4.9.0
 - **Added** Optional Redis-backed horizontal scaling for the socket server (`REDIS_URL`, off by default) — see `SCALING.md`
 - **Added** `ROLES.md` and `ROADMAP.md` for the socket server
 - **Changed** Rewrote the socket server's `DESIGN.md` against the actual code; removed aspirational Redis-caching/PDF-conversion/email/scheduling content that was never implemented

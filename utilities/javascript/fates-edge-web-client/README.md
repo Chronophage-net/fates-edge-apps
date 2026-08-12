@@ -40,6 +40,7 @@ This client is part of the larger [Fate's Edge Applications](https://github.com/
 - **Patrons Module** – Cosmic and terrestrial patrons with rites, gifts, and corruption mechanics.
 - **Faction Manager** – Track faction standing, agendas, assets, and followers.
 - **Bestiary** – Creature reference with stats, descriptions, and SB moves.
+- **Search Everything** (`js/features/search/`) – Full-text search across the Wiki, documents, patrons, factions, and regions. Works with zero setup (a local Fuse.js index, auto-built from `/data/` on first use) — optionally point it at a self-hosted **Solr** or **Elasticsearch** index instead for a shared, pre-built search backend. See [Search Backend Configuration](#-search-backend-configuration-optional) below.
 
 ### 🌐 Connected Play
 - **WebSocket Support** – Real‑time multiplayer with Socket.io or plain WebSocket modes.
@@ -163,6 +164,34 @@ wss://fates-edge-ws.onrender.com  # Production default
 POST /api/rooms/:roomCode/characters/update
 { "updates": { "Character Name": { "harm": 0, "fatigue": 0, "boons": 3, ... } } }
 ```
+
+---
+
+## 🔍 Search Backend Configuration (optional)
+
+`js/features/search/index.js` works out of the box with **no configuration at all** — it builds a local search index from `/data/` on first use (Fuse.js, cached in `sessionStorage`) and needs nothing external. This is the right choice for the common case (a single GM's browser, or a small self-hosted table).
+
+If you're deploying this client at scale and want a shared, pre-built search index instead (faster, and searchable the same way for every visitor without each browser rebuilding its own), point it at a self-hosted **Solr** or **Elasticsearch** instance by setting one of these globals in a small inline `<script>` before this app's own scripts load (e.g. added to `index.html`, or via whatever templating your deployment uses):
+
+```html
+<script>
+  // Solr — url should be the collection's /select endpoint
+  window.__SOLR_URL = 'https://solr.example.com/solr/fatesedge/select';
+
+  // Elasticsearch — url is the index base, no trailing slash / no /_search
+  window.__ES_URL = 'https://es.example.com/fatesedge';
+  window.__ES_API_KEY = 'base64-id:secret';  // optional, sent as `Authorization: ApiKey ...`
+
+  // Only needed if you've configured BOTH and want to force one:
+  window.__SEARCH_BACKEND = 'elasticsearch'; // or 'solr'
+</script>
+```
+
+If both are configured with no explicit `__SEARCH_BACKEND`, Solr is tried first, falling back to Elasticsearch, then to the local Fuse.js index if neither responds. Whichever one actually connects is shown on the **System Status** page (sidebar → System → 🩺 Status).
+
+**Security note:** queries go straight from the browser to whichever URL you configure — there's no server-side proxy in this client. That means the endpoint needs either open CORS or the embedded API key above; don't point either at an endpoint you wouldn't want a site visitor querying directly from their own browser's devtools.
+
+Neither backend is required, installed, or run by anything in this repo — "configuring" one just means pointing this client at search infrastructure you already run yourself.
 
 ---
 

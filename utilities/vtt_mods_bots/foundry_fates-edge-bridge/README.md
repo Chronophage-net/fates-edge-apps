@@ -2,7 +2,7 @@
 
 <p align="center">
   <img src="https://img.shields.io/badge/Foundry-VTT-orange" alt="Foundry VTT"/>
-  <img src="https://img.shields.io/badge/version-4.9.0-blue" alt="Version"/>
+  <img src="https://img.shields.io/badge/version-4.10.0-blue" alt="Version"/>
   <img src="https://img.shields.io/badge/license-MIT-green" alt="License"/>
   <img src="https://img.shields.io/badge/status-stable-brightgreen" alt="Status"/>
 </p>

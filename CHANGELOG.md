@@ -3,6 +3,12 @@ All notable changes to this project will be documented here.
 
 Format loosely follows [Keep a Changelog](https://keepachangelog.com/), versions follow [Semantic Versioning](https://semver.org/).
 
+## [4.10.0] - 2026-08-12
+
+Optional Elasticsearch search backend for the web client (alongside the existing, now-documented Solr option), with System Status integration and new test coverage.
+
+_No commits since the last tag — manual version bump._
+
 ## [4.9.0] - 2026-08-12
 
 Optional Redis-backed horizontal scaling for the socket server; documentation overhaul separating implemented reality from roadmap across the socket-server and web-client design docs (new SCALING.md, ROLES.md, ROADMAP.md for the socket server).

@@ -140,6 +140,13 @@ export function installDomShim() {
         globalThis.localStorage = createMemoryStorage();
     }
 
+    // Separate instance from localStorage -- same shape, different store,
+    // matching real browser semantics. Needed by js/features/search/index.js
+    // (its Fuse.js index cache) and any other module that uses sessionStorage.
+    if (typeof globalThis.sessionStorage === 'undefined') {
+        globalThis.sessionStorage = createMemoryStorage();
+    }
+
     if (typeof globalThis.window === 'undefined') {
         globalThis.window = {
             location: {
@@ -148,6 +155,7 @@ export function installDomShim() {
                 href: 'http://localhost/'
             },
             localStorage: globalThis.localStorage,
+            sessionStorage: globalThis.sessionStorage,
             addEventListener() {},
             removeEventListener() {},
             DOMPurify: undefined

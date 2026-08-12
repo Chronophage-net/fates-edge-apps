@@ -1,4 +1,4 @@
-# Fate's Edge Socket Server v4.9.0 — Real-Time VTT & Campaign Sharing
+# Fate's Edge Socket Server v4.10.0 — Real-Time VTT & Campaign Sharing
 
 **Fate's Edge** is a narrative‑first TTRPG system. This is the real‑time backend for the web toolkit: a WebSocket/Socket.io server that syncs campaign state live across your group, plus a short‑code **campaign sharing** endpoint for loading/saving full toolkit state without a persistent connection.
 

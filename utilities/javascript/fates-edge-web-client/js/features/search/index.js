@@ -1,10 +1,28 @@
 /**
  * Search feature – Search everything (rules, documents, wiki, etc.)
- * ✅ Supports Solr backend (configurable via window.__SOLR_URL or env)
+ * ✅ Supports Solr backend (configurable via window.__SOLR_URL)
+ * ✅ Supports Elasticsearch backend (configurable via window.__ES_URL)
  * ✅ Falls back to local Fuse.js index
  * ✅ Auto‑generates index from /data/ static files if missing
  * ✅ Uses sessionStorage cache for generated index
  * ✅ Debug logging to help diagnose issues
+ *
+ * Both server backends are opt-in and mutually exclusive at query time —
+ * this is a client-side toolkit with no build-time server config, so
+ * "configured" just means `window.__SOLR_URL`/`window.__ES_URL` was set
+ * (e.g. by whoever deploys this build, in a small inline <script> before
+ * this module loads). Neither backend is set up or required by default;
+ * the zero-config path is the local Fuse.js index, which needs nothing
+ * external at all. If both are set, Solr wins (matches this feature's
+ * original behavior) unless window.__SEARCH_BACKEND explicitly picks
+ * one ('solr' | 'elasticsearch').
+ *
+ * Security note (applies to both backends, not new here): queries go
+ * straight from the browser to the configured URL via fetch(). That
+ * means the endpoint needs either open CORS or a client-embedded
+ * credential (window.__ES_API_KEY below) — there's no server-side proxy
+ * in this toolkit. Don't point either at an endpoint you wouldn't want
+ * a curious visitor hitting directly with browser devtools open.
  */
 
 import { escHtml, buildDocumentUrl, getBaseUrl } from '../../core/utils.js';
@@ -14,6 +32,7 @@ let fuse = null;
 let searchIndex = [];
 let isInitialized = false;
 let isLoading = false;
+let activeBackend = null; // 'solr' | 'elasticsearch' | 'fuse' | null (not yet loaded)
 
 // Default fallback when everything else fails
 const FALLBACK_ENTRIES = [
@@ -23,9 +42,23 @@ const FALLBACK_ENTRIES = [
 ];
 
 // ------------------------------------------------------------------
-// 1. CONFIGURATION – Solr URL (set via global or env)
+// 1. CONFIGURATION – backend URLs (read live from window, not cached at
+// import time -- these used to be top-level consts, which meant whoever
+// set window.__SOLR_URL had to do so before this module was ever
+// imported by anything, including indirectly. Reading them fresh on
+// every call also makes them reconfigurable at runtime, e.g. from a
+// Settings panel, without a page reload.)
 // ------------------------------------------------------------------
-const SOLR_URL = window.__SOLR_URL || null;
+function getSolrUrl() { return window.__SOLR_URL || null; }
+// Base URL for one Elasticsearch index, e.g. "https://es.example.com/fatesedge"
+// (no trailing slash, no /_search suffix -- that's appended per-request below).
+function getEsUrl() { return window.__ES_URL || null; }
+// Optional -- sent as `Authorization: ApiKey <value>` if set. Elasticsearch's
+// own API key format (base64 "id:secret") is expected here, not a raw secret.
+function getEsApiKey() { return window.__ES_API_KEY || null; }
+// 'solr' | 'elasticsearch' | undefined (auto: Solr wins if both configured,
+// for backward compatibility with existing __SOLR_URL-only deployments).
+function getBackendPreference() { return window.__SEARCH_BACKEND || null; }
 
 // ------------------------------------------------------------------
 // 2. RENDER
@@ -57,24 +90,44 @@ export function init(el) { return render(el); }
 // ------------------------------------------------------------------
 // 3. INDEX LOADING
 // ------------------------------------------------------------------
-async function loadSearchIndex() {
+export async function loadSearchIndex() {
     if (isLoading) return;
     isLoading = true;
     updateStatus('Loading search index…', 'info');
 
-    // 3a. Try Solr first (if configured)
-    if (SOLR_URL) {
-        const solrOk = await checkSolr();
-        if (solrOk) {
-            updateStatus('✅ Connected to Solr.', 'success');
-            isInitialized = true;
-            isLoading = false;
-            return;
+    // 3a. Try a configured server backend first (Solr and/or Elasticsearch).
+    // Explicit window.__SEARCH_BACKEND wins; otherwise Solr wins if both are
+    // configured (matches this feature's original Solr-only behavior).
+    const backendPref = getBackendPreference();
+    const tryOrder = backendPref === 'elasticsearch' ? ['elasticsearch', 'solr']
+        : backendPref === 'solr' ? ['solr', 'elasticsearch']
+        : ['solr', 'elasticsearch'];
+
+    for (const backend of tryOrder) {
+        if (backend === 'solr' && getSolrUrl()) {
+            if (await checkSolr()) {
+                activeBackend = 'solr';
+                updateStatus('✅ Connected to Solr.', 'success');
+                isInitialized = true;
+                isLoading = false;
+                return;
+            }
+            updateStatus('⚠️ Solr unavailable, trying next option…', 'warning');
         }
-        updateStatus('⚠️ Solr unavailable, falling back to local index.', 'warning');
+        if (backend === 'elasticsearch' && getEsUrl()) {
+            if (await checkElasticsearch()) {
+                activeBackend = 'elasticsearch';
+                updateStatus('✅ Connected to Elasticsearch.', 'success');
+                isInitialized = true;
+                isLoading = false;
+                return;
+            }
+            updateStatus('⚠️ Elasticsearch unavailable, trying next option…', 'warning');
+        }
     }
 
     // 3b. Load Fuse.js
+    activeBackend = 'fuse';
     const FuseLib = await loadFuseLibrary();
     if (!FuseLib) {
         updateStatus('⚠️ Failed to load search library. Using fallback.', 'warning');
@@ -138,16 +191,16 @@ function updateStatus(msg, type = 'info') {
 // ------------------------------------------------------------------
 // 4. SOLR SUPPORT
 // ------------------------------------------------------------------
-async function checkSolr() {
+export async function checkSolr() {
     try {
-        const res = await fetch(`${SOLR_URL}?q=*:*&rows=0&wt=json`, { cache: 'no-cache' });
+        const res = await fetch(`${getSolrUrl()}?q=*:*&rows=0&wt=json`, { cache: 'no-cache' });
         return res.ok;
     } catch {
         return false;
     }
 }
 
-async function solrSearch(query) {
+export async function solrSearch(query) {
     const params = new URLSearchParams({
         q: query,
         rows: 50,
@@ -155,19 +208,89 @@ async function solrSearch(query) {
         fl: 'title,content,url,type,category,score',
     });
     try {
-        const res = await fetch(`${SOLR_URL}?${params}`, { cache: 'no-cache' });
+        const res = await fetch(`${getSolrUrl()}?${params}`, { cache: 'no-cache' });
         if (!res.ok) throw new Error('Solr query failed');
         const data = await res.json();
+        // Normalized against the top hit in this response, so `score` is
+        // always a 0-100 "% match" like renderResults() expects (matches
+        // how the Fuse.js path and the Elasticsearch path both score).
+        const maxScore = data.response?.maxScore || 0;
         return (data.response?.docs || []).map(doc => ({
             title: doc.title || 'Untitled',
             content: doc.content || '',
             url: doc.url || '#',
             type: doc.type || 'document',
             category: doc.category || '',
-            score: 1 - (doc.score ? doc.score / 100 : 0),
+            score: maxScore > 0 && doc.score ? Math.round((doc.score / maxScore) * 100) : 100,
         }));
     } catch (err) {
         console.error('Solr search error:', err);
+        return null;
+    }
+}
+
+// ------------------------------------------------------------------
+// 4b. ELASTICSEARCH SUPPORT
+// ------------------------------------------------------------------
+function esHeaders() {
+    const headers = { 'Content-Type': 'application/json' };
+    const apiKey = getEsApiKey();
+    if (apiKey) headers['Authorization'] = `ApiKey ${apiKey}`;
+    return headers;
+}
+
+export async function checkElasticsearch() {
+    try {
+        const res = await fetch(`${getEsUrl()}/_search`, {
+            method: 'POST',
+            headers: esHeaders(),
+            body: JSON.stringify({ size: 0, query: { match_all: {} } }),
+            cache: 'no-cache',
+        });
+        return res.ok;
+    } catch {
+        return false;
+    }
+}
+
+export async function elasticsearchSearch(query) {
+    try {
+        const res = await fetch(`${getEsUrl()}/_search`, {
+            method: 'POST',
+            headers: esHeaders(),
+            body: JSON.stringify({
+                size: 50,
+                query: {
+                    multi_match: {
+                        query,
+                        fields: ['title^3', 'content', 'category^2'],
+                        fuzziness: 'AUTO',
+                    },
+                },
+            }),
+            cache: 'no-cache',
+        });
+        if (!res.ok) throw new Error(`Elasticsearch query failed (${res.status})`);
+        const data = await res.json();
+        const hits = data.hits?.hits || [];
+        // Elasticsearch relevance scores aren't bounded 0-1 like Solr's can
+        // be treated as -- normalize against this response's own top hit,
+        // same approach as the Solr path above, so both read the same way
+        // in the results list ("N% match").
+        const maxScore = data.hits?.max_score || 0;
+        return hits.map(hit => {
+            const src = hit._source || {};
+            return {
+                title: src.title || 'Untitled',
+                content: src.content || '',
+                url: src.url || '#',
+                type: src.type || 'document',
+                category: src.category || '',
+                score: maxScore > 0 ? Math.round((hit._score / maxScore) * 100) : 100,
+            };
+        });
+    } catch (err) {
+        console.error('Elasticsearch search error:', err);
         return null;
     }
 }
@@ -388,11 +511,18 @@ export async function performSearch(query) {
         return;
     }
 
-    // Try Solr first if connected
-    if (SOLR_URL && isInitialized) {
+    // Query whichever server backend connected during loadSearchIndex(), if any.
+    if (isInitialized && activeBackend === 'solr') {
         const solrResults = await solrSearch(query);
         if (solrResults && solrResults.length > 0) {
             renderResults(solrResults, query);
+            return;
+        }
+    }
+    if (isInitialized && activeBackend === 'elasticsearch') {
+        const esResults = await elasticsearchSearch(query);
+        if (esResults && esResults.length > 0) {
+            renderResults(esResults, query);
             return;
         }
     }
@@ -500,17 +630,26 @@ export function search(query) {
 }
 
 export function reloadIndex() {
-    fuse = null; searchIndex = []; isInitialized = false; isLoading = false;
+    fuse = null; searchIndex = []; isInitialized = false; isLoading = false; activeBackend = null;
     sessionStorage.removeItem('searchIndex');
     loadSearchIndex();
 }
 
 export function getSearchStatus() {
-    return { isInitialized, indexCount: searchIndex.length, fuseAvailable: fuse !== null, baseUrl: getBaseUrl(), isLoading };
+    return {
+        isInitialized,
+        indexCount: searchIndex.length,
+        fuseAvailable: fuse !== null,
+        baseUrl: getBaseUrl(),
+        isLoading,
+        backend: activeBackend, // 'solr' | 'elasticsearch' | 'fuse' | null
+        solrConfigured: !!getSolrUrl(),
+        elasticsearchConfigured: !!getEsUrl(),
+    };
 }
 
 export function destroy() {
-    container = null; fuse = null; searchIndex = []; isInitialized = false; isLoading = false;
+    container = null; fuse = null; searchIndex = []; isInitialized = false; isLoading = false; activeBackend = null;
 }
 
 export default {

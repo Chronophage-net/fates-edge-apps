@@ -4,8 +4,8 @@
  * the real-time server, voice chat (+ TURN availability), session
  * recording, the sync/offline-queue layer, who's in the room (with a
  * best-effort "looks like a bot" flag for the AI GM bot / Discord
- * bridge), and a few browser feature checks the rest of the toolkit
- * depends on.
+ * bridge), the search backend (Solr/Elasticsearch/local Fuse.js), and a
+ * few browser feature checks the rest of the toolkit depends on.
  *
  * Deliberately read-only / best-effort throughout: every check here
  * degrades to "unknown"/"unavailable" rather than throwing, since the
@@ -24,6 +24,7 @@ import {
 import { fetchTurnIceServers } from '../../core/turn.js';
 import { getRecordingStatus } from '../../core/media.js';
 import { getSyncManager } from '../../core/sync/index.js';
+import { getSearchStatus } from '../search/index.js';
 
 const REFRESH_INTERVAL_MS = 5000;
 let refreshTimer = null;
@@ -122,6 +123,19 @@ async function collectRoomClients() {
     }
 }
 
+// Best-effort: search/index.js's own state only exists once its render()
+// or loadSearchIndex() has actually run at least once (e.g. the user has
+// visited the Search tab this session) -- before that, getSearchStatus()
+// still returns a valid shape (backend: null, indexCount: 0), which reads
+// correctly here as "not loaded yet", not an error.
+function collectSearchStatus() {
+    try {
+        return getSearchStatus();
+    } catch (e) {
+        return { isInitialized: false, backend: null, indexCount: 0, solrConfigured: false, elasticsearchConfigured: false, error: e.message };
+    }
+}
+
 function collectBrowserCapabilities() {
     return {
         webrtc: typeof RTCPeerConnection !== 'undefined',
@@ -151,6 +165,7 @@ async function buildStatusHtml() {
     ]);
     const recording = collectRecordingStatus();
     const sync = collectSyncStatus();
+    const searchStatus = collectSearchStatus();
     const caps = collectBrowserCapabilities();
 
     const clientRows = clients.length
@@ -207,6 +222,21 @@ async function buildStatusHtml() {
                 <div class="panel">
                     <h4>👥 Connected Clients ${server.connected ? badge(String(clients.length), 'blue') : ''}</h4>
                     ${clientRows}
+                </div>
+
+                <div class="panel">
+                    <h4>${statusDot(searchStatus.isInitialized, 'Search index')} Search</h4>
+                    <div class="status-row"><span>Backend</span>${badge(
+                        searchStatus.backend === 'solr' ? 'Solr' :
+                        searchStatus.backend === 'elasticsearch' ? 'Elasticsearch' :
+                        searchStatus.backend === 'fuse' ? 'Local (Fuse.js)' : 'Not loaded yet',
+                        searchStatus.backend === 'solr' || searchStatus.backend === 'elasticsearch' ? 'green' : 'blue'
+                    )}</div>
+                    <div class="status-row"><span>Indexed entries</span>${badge(String(searchStatus.indexCount ?? 0), 'blue')}</div>
+                    ${(searchStatus.solrConfigured || searchStatus.elasticsearchConfigured) ? `
+                        <div class="status-row"><span>Solr configured</span>${badge(searchStatus.solrConfigured ? 'Yes' : 'No', searchStatus.solrConfigured ? 'green' : 'blue')}</div>
+                        <div class="status-row"><span>Elasticsearch configured</span>${badge(searchStatus.elasticsearchConfigured ? 'Yes' : 'No', searchStatus.elasticsearchConfigured ? 'green' : 'blue')}</div>
+                    ` : `<p class="text-muted small">No external search backend configured — using the built-in local index.</p>`}
                 </div>
 
                 <div class="panel">
