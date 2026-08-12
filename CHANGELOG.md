@@ -3,6 +3,11 @@ All notable changes to this project will be documented here.
 
 Format loosely follows [Keep a Changelog](https://keepachangelog.com/), versions follow [Semantic Versioning](https://semver.org/).
 
+## [4.8.2] - 2026-08-12
+
+### Other
+- Got Toll and Veil working
+
 ## [4.8.1] - 2026-08-12
 
 Socket server persistence/Dockerfile fixes, web client compose cleanup, INSTALL guides for server/client/bot
