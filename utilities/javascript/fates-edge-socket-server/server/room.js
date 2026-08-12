@@ -502,6 +502,25 @@ function canEditCharacter(room, client, name) {
 let io = null;
 function setIo(ioInstance) { io = ioInstance; }
 
+// Optional multi-instance relay hook (server/scaling.js). Absent by
+// default -- single-instance behavior is completely unchanged when this
+// is null (the common case; see SCALING.md).
+let scaling = null;
+function setScaling(scalingApi) { scaling = scalingApi && scalingApi.enabled ? scalingApi : null; }
+
+function deliverToLocalWsClients(roomCode, event, payload, senderId = null) {
+    const roomKey = roomCode.toUpperCase();
+    const room = rooms.get(roomKey);
+    if (!room) return; // this instance isn't holding any clients for this room -- fine
+    const message = JSON.stringify({ type: event, ...payload });
+    for (const [, client] of room.clients) {
+        if (client.type === 'ws' && client.ws && client.ws.readyState === WebSocket.OPEN) {
+            if (senderId && client.id === senderId) continue;
+            client.ws.send(message);
+        }
+    }
+}
+
 function broadcastToRoom(roomCode, event, data, senderId = null) {
     const roomKey = roomCode.toUpperCase();
     const room = rooms.get(roomKey);
@@ -512,16 +531,21 @@ function broadcastToRoom(roomCode, event, data, senderId = null) {
         payload.clientId = senderId;
     }
 
+    // Socket.IO clients: local delivery today; transparently reaches
+    // every instance's Socket.IO clients too when server/scaling.js has
+    // attached the Redis adapter (io.adapter(...)) -- no extra call
+    // needed here either way.
     if (io) {
         io.to(roomKey).emit(event, payload);
     }
 
-    const message = JSON.stringify({ type: event, ...payload });
-    for (const [, client] of room.clients) {
-        if (client.type === 'ws' && client.ws && client.ws.readyState === WebSocket.OPEN) {
-            if (senderId && client.id === senderId) continue;
-            client.ws.send(message);
-        }
+    // Plain-ws clients connected to THIS instance.
+    deliverToLocalWsClients(roomKey, event, payload, senderId);
+
+    // Plain-ws clients connected to OTHER instances, only when Redis
+    // scaling is enabled (see server/scaling.js).
+    if (scaling) {
+        scaling.publish(roomKey, event, payload, senderId);
     }
 }
 
@@ -598,6 +622,8 @@ module.exports = {
     getRoom,
     getRoomStats,
     getExistingGm,
+    setScaling,
+    deliverToLocalWsClients,
     getClientsList,
     getCharacters,
     getCharacter,

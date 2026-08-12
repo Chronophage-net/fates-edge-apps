@@ -2,7 +2,7 @@
   "name": "fates-edge-socket-server",
   "version": "4.8.3",
   "description": "Fate's Edge WebSocket + HTTP server with campaign storage, deck, and character management",
-  "main": "server.js",
+  "main": "server-start.js",
   "type": "commonjs",
   "scripts": {
     "start": "node server-start.js",
@@ -22,7 +22,9 @@
   },
   "optionalDependencies": {
     "mysql2": "^3.11.0",
-    "pg": "^8.13.0"
+    "pg": "^8.13.0",
+    "ioredis": "^5.4.1",
+    "@socket.io/redis-adapter": "^8.3.0"
   },
   "devDependencies": {
     "nodemon": "^3.1.0"

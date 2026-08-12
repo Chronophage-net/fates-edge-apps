@@ -5,9 +5,9 @@
 **Status:** Implemented (see `js/core/sync/`); toolkit is now at v4.8.3
 **Author:** Nicholas A. Gasper
 
-> **Note (v4.8.3):** The real-time sync design below shipped and is unchanged in shape. Since this document was written, the toolkit has added account authentication against the campaign server (register/login/JWT, see the socket server's `DESIGN.md`), a redone Python client, VTT bridge/mod updates, a real test suite (`tests/unit/`, `tests/integration/` — see the root README's "What's New"), a second real-time card game (Toll & Veil, host-authoritative over the same event relay this document describes), and a security-hardening pass on that multiplayer path. The previously-planned AI GM bot companion project was removed from *this* monorepo; it lives on as its own separate repository (`fates-edge-ai-gm-bot`) and is no longer part of this toolkit's own integrations.
+> **Note (v4.8.3):** The real-time sync design below shipped and is unchanged in shape. Since this document was written, the toolkit has added account authentication against the campaign server (register/login/JWT, see the socket server's own docs), a redone Python client, VTT bridge/mod updates, a real test suite (`tests/unit/`, `tests/integration/` — see the root README's "What's New"), a second real-time card game (Toll & Veil, host-authoritative over the same event relay this document describes), and a security-hardening pass on that multiplayer path. The previously-planned AI GM bot companion project was removed from *this* monorepo; it lives on as its own separate repository (`fates-edge-ai-gm-bot`) and is no longer part of this toolkit's own integrations.
 >
-> **Correction (v4.8.3):** Section 5 below describes Redis as the server's state store. That was never actually built — the shipped server (`fates-edge-socket-server`) keeps room/operation state in an in-memory `Map` per process (see `server/room.js`) and persists snapshots to SQLite by default (optionally PostgreSQL or MySQL, see `server/storage.js`). There is no Redis dependency anywhere in this codebase. The Redis-based multi-server scaling design in Sections 5.3 and 9 was never implemented and remains a hypothetical option for a future horizontally-scaled deployment, not a description of what runs today.
+> **Correction (v4.8.3):** This document used to contain a full copy of the server's architecture, REST API, and deployment/scaling design (old Sections 5 and 9) that drifted out of sync with what actually shipped — most notably describing Redis as the server's state store, which was never built. Server architecture, deployment, and scaling are the server repo's job to document, not this client's; Sections 5 and 9 below now just point at [`fates-edge-socket-server`](../fates-edge-socket-server/)'s own `DESIGN.md`, `ROLES.md`, and `SCALING.md`, which are checked against the real code. Everything in *this* document from Section 6 onward (client-side sync protocol, UI, testing) still describes this client and remains accurate to what shipped.
 
 ---
 
@@ -358,188 +358,9 @@ class ReconnectionManager {
 
 ## 5. Server Architecture
 
-### 5.1 Technology Stack
+Server-side architecture, technology stack, and REST/WebSocket API surface live in the server's own repo, not here — this document previously duplicated an early draft of that design that drifted out of sync with what actually shipped (an aspirational Redis state store that was never built, a REST API that doesn't match the real routes, etc.).
 
-| Layer | Technology | Rationale |
-|-------|------------|-----------|
-| **Runtime** | Node.js 20+ | Lightweight, WebSocket native |
-| **WS Library** | `ws` | Fast, battle-tested WebSocket implementation |
-| **HTTP Server** | Express.js | REST API for manual sync fallback |
-| **State Store** | In-memory `Map` (per process) | Room/operation state lives in the server process; see `server/room.js` |
-| **Persistence** | SQLite (default) / PostgreSQL / MySQL | Full state snapshots for recovery; see `server/storage.js` |
-
-### 5.2 Server Components
-
-#### 5.2.1 Connection Manager
-
-```javascript
-class ConnectionManager {
-  constructor() {
-    this.connections = new Map(); // clientId -> { ws, metadata, lastSeen }
-    this.campaigns = new Map();   // campaignCode -> Set<clientId>
-    this.userRoles = new Map();   // clientId -> role
-  }
-  
-  addConnection(clientId, ws, campaignCode, metadata) {
-    this.connections.set(clientId, { ws, metadata, lastSeen: Date.now() });
-    if (!this.campaigns.has(campaignCode)) {
-      this.campaigns.set(campaignCode, new Set());
-    }
-    this.campaigns.get(campaignCode).add(clientId);
-    this.userRoles.set(clientId, metadata.role || 'player');
-  }
-  
-  getCampaignClients(campaignCode) {
-    const clientIds = this.campaigns.get(campaignCode) || new Set();
-    return Array.from(clientIds).map(id => ({
-      id,
-      metadata: this.connections.get(id)?.metadata,
-      online: this.connections.has(id)
-    }));
-  }
-}
-```
-
-#### 5.2.2 Operation Processor
-
-```javascript
-class OperationProcessor {
-  constructor(store, conflictResolver) {
-    this.store = store;
-    this.conflictResolver = conflictResolver;
-    this.operationLog = [];
-  }
-  
-  async processOperation(operation, clientId) {
-    // 1. Validate operation format
-    if (!this.validateOperation(operation)) {
-      return this.errorResponse('INVALID_OPERATION');
-    }
-    
-    // 2. Check version dependencies
-    if (!this.conflictResolver.checkDependencies(operation)) {
-      return this.errorResponse('DEPENDENCY_ERROR');
-    }
-    
-    // 3. Apply to state with conflict resolution
-    const result = await this.conflictResolver.resolve(operation, this.store);
-    
-    // 4. Log operation
-    this.operationLog.push({
-      ...operation,
-      serverTimestamp: Date.now(),
-      applied: true
-    });
-    
-    // 5. Broadcast to other clients
-    this.broadcastToCampaign(operation.campaignCode, operation, clientId);
-    
-    // 6. Return ACK
-    return { success: true, operationId: operation.id };
-  }
-}
-```
-
-#### 5.2.3 Conflict Resolver
-
-```javascript
-class ConflictResolver {
-  constructor() {
-    this.resolutionStrategies = {
-      add_character: this.mergeCharacterAdd.bind(this),
-      update_character: this.mergeCharacterUpdate.bind(this),
-      tick_timer: this.mergeTimerTick.bind(this),
-      // ...
-    };
-  }
-  
-  checkDependencies(operation) {
-    // Check that all dependencies exist in log
-    return operation.dependencies.every(depId => 
-      this.operationLog.some(log => log.id === depId)
-    );
-  }
-  
-  async resolve(operation, store) {
-    const strategy = this.resolutionStrategies[operation.type];
-    if (!strategy) {
-      return this.defaultMerge(operation, store);
-    }
-    return await strategy(operation, store);
-  }
-  
-  mergeCharacterAdd(operation, store) {
-    // Check if character already exists (conflict)
-    const existing = store.characters.find(c => c.id === operation.value.id);
-    if (existing) {
-      // Return a suggestion with a conflict warning
-      return {
-        accepted: false,
-        conflict: true,
-        message: 'Character already exists',
-        suggestion: existing,
-        operation: operation
-      };
-    }
-    return { accepted: true, operation };
-  }
-  
-  mergeCharacterUpdate(operation, store) {
-    const existing = store.characters.find(c => c.id === operation.path[0]);
-    if (!existing) {
-      return { accepted: false, conflict: false, message: 'Character not found' };
-    }
-    
-    // Field-level merge
-    Object.keys(operation.value).forEach(field => {
-      if (field === 'skills') {
-        // Deep merge skills object
-        existing.skills = { ...existing.skills, ...operation.value.skills };
-      } else {
-        existing[field] = operation.value[field];
-      }
-    });
-    
-    return { accepted: true, operation, result: existing };
-  }
-}
-```
-
-### 5.3 In-Memory Data Model (as shipped)
-
-Not Redis — this is a plain in-process `Map`/`Set` structure, scoped to a single server instance (see `server/room.js`). The key shapes below are conceptually the same ones the original Redis design sketched, just held in memory instead of an external store:
-
-```javascript
-// Campaign/room state
-rooms.get(code) → { /* full state, clients, characters, etc. */ }
-
-// Operation log (array, per room)
-rooms.get(code).operations → [operation1, operation2, ...]
-
-// Client presence
-rooms.get(code).clients → Map<clientId, { ws, metadata, lastSeen }>
-
-// Client metadata
-connections.get(clientId) → { name, role, lastSeen }
-
-// Version vectors per client
-connections.get(clientId).version → { /* version vector */ }
-```
-
-Durable snapshots (survives a restart) go through `server/storage.js` to SQLite/PostgreSQL/MySQL — not to the in-memory structures above.
-
-### 5.4 Server REST API (Fallback)
-
-| Endpoint | Method | Description |
-|----------|--------|-------------|
-| `/campaigns` | POST | Create/sync campaign via HTTP |
-| `/campaigns/:code` | GET | Get full campaign state |
-| `/campaigns/:code` | DELETE | Delete campaign |
-| `/campaigns/:code/operations` | GET | Get operation log since version |
-| `/campaigns/:code/check` | GET | Check if campaign exists |
-| `/health` | GET | Server health check |
-
----
+**See [`fates-edge-socket-server/DESIGN.md`](../fates-edge-socket-server/DESIGN.md)** for the real, current server architecture, and [`ROLES.md`](../fates-edge-socket-server/ROLES.md) for the role/permission model referenced by §7.2 below.
 
 ## 6. Client Integration
 
@@ -1164,11 +985,7 @@ export function createConnectionStatus() {
 
 ### 7.2 User Roles and Permissions
 
-| Role | Can Create/Edit | Can Delete | Can Kick | Can Change Settings |
-|------|-----------------|------------|----------|---------------------|
-| **GM** | ✅ Everything | ✅ Everything | ✅ Yes | ✅ Yes |
-| **Player** | ✅ Own characters | ✅ Own characters | ❌ No | ❌ No |
-| **Observer** | ❌ Read only | ❌ No | ❌ No | ❌ No |
+The role model (`gm`/`co-gm`/`player`/`spectator`) is server-enforced and documented once, in the server's own [ROLES.md](../fates-edge-socket-server/ROLES.md) (with diagrams) — this section used to keep a second, out-of-date copy (a 3-role table missing Co-GM entirely and calling Spectator "Observer"). The client's job is just to reflect whatever role the server assigns a connection and gate UI affordances accordingly; it isn't the source of truth for what each role can do.
 
 ### 7.3 Real-Time Feedback
 
@@ -1232,97 +1049,11 @@ export function createConnectionStatus() {
 
 ---
 
-## 9. Deployment Architecture
+## 9. Deployment & Scaling
 
-### 9.1 Production Setup — as actually shipped (single instance)
+Deployment and horizontal scaling are properties of the **server**, not this web client (a static SPA served from any static host / CDN, with no deployment topology of its own). This section used to duplicate — and drift out of sync with — the server's own deployment design. It's been removed in favor of a single pointer:
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│                         Internet                            │
-└─────────────────────────────────────────────────────────────┘
-                              │
-                   ┌──────────▼──────────┐
-                   │      Server         │
-                   │     (Node.js)       │
-                   │  in-memory room     │
-                   │      state          │
-                   └──────────┬──────────┘
-                              │
-                   ┌──────────▼──────────┐
-                   │  SQLite (default) / │
-                   │  PostgreSQL / MySQL │
-                   │  (State Snapshots)  │
-                   └─────────────────────┘
-```
-
-The multi-server/load-balanced layout originally sketched here (below) was never built and isn't supported by the current codebase — there's no shared broadcast layer, so a second server instance would run its own disconnected set of rooms. Documented as a possible future direction only:
-
-```
-┌─────────────────────────────────────────────────────────────┐
-│                         Internet                            │
-└─────────────────────────────────────────────────────────────┘
-                              │
-                   ┌──────────▼──────────┐
-                   │   Load Balancer     │
-                   │  (nginx/HAProxy)   │
-                   └──────────┬──────────┘
-                              │
-              ┌───────────────┼───────────────┐
-              │               │               │
-       ┌──────▼──────┐ ┌──────▼──────┐ ┌──────▼──────┐
-       │  Server 1   │ │  Server 2   │ │  Server 3   │
-       │  (Node.js)  │ │  (Node.js)  │ │  (Node.js)  │
-       └──────┬──────┘ └──────┬──────┘ └──────┬──────┘
-              │               │               │
-              └───────────────┼───────────────┘
-                              │
-                   ┌──────────▼──────────┐
-                   │  Shared pub/sub —   │
-                   │  NOT implemented    │
-                   │  (would need e.g.   │
-                   │      Redis)         │
-                   └──────────┬──────────┘
-                              │
-                   ┌──────────▼──────────┐
-                   │    PostgreSQL       │
-                   │   (State Snapshots) │
-                   └─────────────────────┘
-```
-
-### 9.2 Scaling Considerations
-
-| Aspect | Strategy |
-|--------|----------|
-| **Connections** | Single instance today; horizontal scaling with sticky sessions is a future option, not implemented |
-| **State** | In-memory per-process today; SQLite/PostgreSQL/MySQL for persistence |
-| **Broadcast** | In-process `broadcastToRoom` today; a shared pub/sub layer (e.g. Redis) would be required before running more than one instance |
-| **Offline Queue** | Client-side IndexedDB |
-| **Rate Limiting** | Per-IP and per-campaign limits |
-
-### 9.3 Environment Variables
-
-Reflects the variables `server/config.js` and `server/storage.js` actually read (see that project's own README/INSTALL for the full list):
-
-```bash
-# Server
-NODE_ENV=production
-PORT=10000
-
-# Database (server/storage.js) — no Redis; SQLite is the default
-DATABASE_TYPE=sqlite            # or 'postgres' / 'mysql'
-DATABASE_URL=./campaigns.db     # or a postgres://... / mysql://... connection string
-
-# Security
-JWT_SECRET=your_jwt_secret
-CORS_ORIGIN=https://yourdomain.com
-
-# Campaign Settings
-MAX_CLIENTS_PER_CAMPAIGN=10
-MAX_STATE_SIZE_MB=5
-CAMPAIGN_EXPIRY_DAYS=30
-```
-
----
+**See the socket server's own [SCALING.md](../fates-edge-socket-server/SCALING.md)** for the real, implemented (opt-in, off-by-default) Redis-backed multi-instance approach, and its [INSTALL.md](../fates-edge-socket-server/INSTALL.md) for single-instance deployment (the default, and the only thing most self-hosted tables need).
 
 ## 10. Security Considerations
 
@@ -1650,44 +1381,18 @@ Server → All Clients: { operation }
 
 ## 20. Appendix C: Development Setup
 
-### Local Development
+Server setup (database choice, Docker, environment variables) is server territory — see [`fates-edge-socket-server/INSTALL.md`](../fates-edge-socket-server/INSTALL.md), which is the maintained instructions for that half of local dev. This client's own setup:
 
 ```bash
-# Clone repository
-git clone https://github.com/yourusername/fates-edge-toolkit.git
-cd fates-edge-toolkit
+# From the monorepo root
+cd utilities/javascript/fates-edge-web-client
 
-# Install dependencies
 npm install
-
-# No external database needed by default — SQLite is used out of the box.
-# Only if you want PostgreSQL/MySQL instead (server/storage.js, DATABASE_TYPE):
-docker run -d -p 5432:5432 -e POSTGRES_PASSWORD=password postgres
-
-# Run server
-npm run server
-
-# Run client (Vite)
-npm run dev
-
-# Run tests
-npm test
-
-# Run load tests
-npm run test:load
+npm run dev      # Vite dev server
+npm test          # this client's own test suite
 ```
 
-### Environment Setup
-
-```bash
-# .env file
-NODE_ENV=development
-PORT=10000
-DATABASE_TYPE=sqlite
-DATABASE_URL=./campaigns.db
-JWT_SECRET=dev_secret_key
-CORS_ORIGIN=http://localhost:5173
-```
+Point it at a running socket server (local or remote) via whatever connection settings the app's Settings panel exposes at runtime — there's no build-time server URL to configure.
 
 ---
 

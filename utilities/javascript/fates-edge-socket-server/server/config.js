@@ -18,6 +18,13 @@ function loadConfig() {
         statsInterval: parseInt(process.env.STATS_INTERVAL, 10) || 30000,
         apiKey: process.env.API_KEY || null,
 
+        // ─── Optional Redis-backed horizontal scaling ──────────────
+        // Unset by default -- this server runs as a single in-memory
+        // instance with no external dependency. Set REDIS_URL to run
+        // more than one instance behind a load balancer with sticky
+        // sessions; see server/scaling.js and SCALING.md.
+        redisUrl: process.env.REDIS_URL || null,
+
         // ─── TURN (coturn) credential minting ──────────────────────
         // Shared with the coturn `static-auth-secret` setting (see
         // docker-compose.yml). When set, /api/turn-credentials and the

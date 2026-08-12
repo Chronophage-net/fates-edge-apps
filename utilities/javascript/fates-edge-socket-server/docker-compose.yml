@@ -39,6 +39,12 @@ services:
     environment:
       - NODE_ENV=production
       - PORT=${PORT:-10000}
+      # Optional -- unset by default (single-instance, no external
+      # dependency). Set only if you're running the `scaling` profile
+      # below (or your own Redis) and actually running more than one
+      # server instance behind a load balancer with sticky sessions.
+      # See SCALING.md. A single instance ignores this entirely.
+      - REDIS_URL=${REDIS_URL:-}
       # Optional -- if unset, the server generates and logs a random one
       # at startup (see `docker-compose logs server`); set it explicitly
       # so it survives container restarts.
@@ -120,6 +126,26 @@ services:
         fi
         exec turnserver $$ARGS
 
+  # Optional, only needed if you're actually running MULTIPLE `server`
+  # instances behind a load balancer (see SCALING.md). A single
+  # instance (the default in this compose file -- `server` is one
+  # service, one container) has no use for this at all; don't start it
+  # unless you're also running docker-compose with multiple server
+  # replicas/instances and a load balancer in front of them.
+  #
+  #   docker compose --profile scaling up -d
+  #
+  # and set REDIS_URL=redis://redis:6379 in your .env once this is up.
+  redis:
+    profiles: ["scaling"]
+    image: redis:7-alpine
+    container_name: fates-edge-redis
+    restart: unless-stopped
+    volumes:
+      - redis-data:/data
+    networks:
+      - fates-edge-network
+
 networks:
   fates-edge-network:
     driver: bridge
@@ -127,3 +153,4 @@ networks:
 volumes:
   server-logs:
   server-modules:
+  redis-data:

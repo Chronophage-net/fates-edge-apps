@@ -19,6 +19,7 @@ const room = require('./room.js');
 const api = require('./api.js');
 const wsHandlers = require('./ws-handlers.js');
 const ioHandlers = require('./socketio-handlers.js');
+const scaling = require('./scaling.js');
 
 // ---------- Express ----------
 const app = express();
@@ -53,6 +54,11 @@ const io = socketIo(server, {
 room.setIo(io);                // enable room.broadcastToRoom for Socket.io
 ioHandlers.setupSocketIO(io, config);
 
+// ---------- Optional Redis-backed horizontal scaling ----------
+// No-op unless REDIS_URL is set; see server/scaling.js and SCALING.md.
+const scalingApi = scaling.initScaling(io, config, logger, room.deliverToLocalWsClients);
+room.setScaling(scalingApi);
+
 // ---------- Plain WebSocket ----------
 const wss = new WebSocket.Server({ server, path: '/' });
 wsHandlers.setupWSS(wss, config);
@@ -69,6 +75,8 @@ function gracefulShutdown(signal) {
     shuttingDown = true;
     logger.info(`🛑 Received ${signal}. Shutting down...`);
     console.log(`\n🛑 Shutting down Fate's Edge server...`);
+
+    if (scalingApi && scalingApi.close) scalingApi.close();
 
     server.close((err) => {
         if (err) {

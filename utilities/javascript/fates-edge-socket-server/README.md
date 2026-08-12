@@ -13,7 +13,8 @@ Earlier documentation for this server described it as a minimal REST endpoint fo
 - **Real‑time sync** — chat, dice rolls, character updates, timers, and scene changes broadcast to every connected client, over both a Socket.io transport and a raw `ws` transport (`server/socketio-handlers.js`, `server/ws-handlers.js`).
 - **Account authentication** — `server/auth.js` provides real user accounts: `POST /api/auth/register` and `POST /api/auth/login` hash passwords with bcrypt and issue JWT session tokens, layered alongside the existing per-request API-key authentication used for service-to-service calls.
 - **GM election & rooms** — `server/room.js` handles requesting, approving, and transferring GM status per room/campaign code.
-- **Roles & character registration (v4.8)** — beyond the single GM seat above, `server/room.js` now supports GM-granted Co-GM promotions (session-only or saved), a read-only Spectator role, and a claim/release bridge that binds a player's saved character (their account library) to a room's live roster. See `DESIGN.md`'s "Roles & Character Registration (v4.8)" section for the full model.
+- **Roles & character registration (v4.8)** — beyond the single GM seat above, `server/room.js` now supports GM-granted Co-GM promotions (session-only or saved), a read-only Spectator role, and a claim/release bridge that binds a player's saved character (their account library) to a room's live roster. See [ROLES.md](ROLES.md) for the full model, including diagrams.
+- **Optional horizontal scaling** — off by default (single instance, no external dependency); an opt-in Redis pub/sub relay lets you run more than one instance behind a load balancer. See [SCALING.md](SCALING.md).
 - **Shared Deck of Consequences** — `server/deck.js` draws cards from a region's deck and broadcasts the result to everyone in the room, using the same region data (`data/regions/`) as the web client.
 - **Campaign persistence** — `server/storage.js` stores campaigns, rooms, accounts, and characters in a database: SQLite by default (`campaigns.db`, see [INSTALL.md](INSTALL.md#backing-up-your-campaigns-your-world-save) for backup notes), or Postgres/MySQL via `DATABASE_TYPE`/`DATABASE_URL`.
 - **Security & config** — `server/security.js` and `server/config.js` handle basic request validation and environment-driven configuration.
@@ -108,6 +109,9 @@ fates-edge-socket-server/
 │   ├── patrons/the_traveler.json
 │   └── regions/acasia.json
 ├── DESIGN.md
+├── ROLES.md                    # role/permission model, promoted out of DESIGN.md (with diagrams)
+├── SCALING.md                  # optional Redis-backed multi-instance deployment
+├── ROADMAP.md                  # genuinely planned, not-yet-built work (server-specific)
 ├── docker-compose.yml          # server + coturn (see "Docker Compose" above)
 ├── Dockerfile
 ├── fates-edge-cli.py           # Python CLI test client
