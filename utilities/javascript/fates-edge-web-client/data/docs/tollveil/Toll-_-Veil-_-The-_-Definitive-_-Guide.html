@@ -1,0 +1,386 @@
+<!-- ============ Toll & Veil -_- The-_-Definitive-_-Guide.html ============ -->
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta charset="utf-8"/>
+<meta content="Claude" name="generator"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Toll & Veil: The Definitive Guide</title>
+<style>
+    :root {
+        --bg1: #0d0d1a;
+        --bg2: #1a1a2e;
+        --bg3: #252540;
+        --bg4: #2f2f4a;
+        --text: #e8e8f0;
+        --text2: #b8b8c8;
+        --text3: #8888a0;
+        --gold: #c9a84c;
+        --gold-hover: #d4b85c;
+        --border: #333355;
+        --red: #c0392b;
+        --green: #27ae60;
+        --blue: #2980b9;
+        --purple: #8e44ad;
+        --orange: #e67e22;
+        --radius: 8px;
+        --font: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+        background: var(--bg1);
+        color: var(--text);
+        font-family: var(--font);
+        padding: 1.5rem;
+        max-width: 1100px;
+        margin: 0 auto;
+        line-height: 1.6;
+    }
+    h1, h2, h3, h4, h5 { color: var(--gold); margin: 0.5rem 0 0.3rem; }
+    h1 { font-size: 1.8rem; border-bottom: 2px solid var(--gold); padding-bottom: 0.3rem; }
+    h2 { font-size: 1.4rem; border-bottom: 1px solid var(--border); padding-bottom: 0.2rem; margin-top: 1.2rem; }
+    h3 { font-size: 1.1rem; margin-top: 0.8rem; }
+    h4 { font-size: 0.95rem; color: var(--text); }
+    a { color: var(--gold); text-decoration: none; }
+    a:hover { color: var(--gold-hover); text-decoration: underline; }
+    .panel {
+        background: var(--bg2);
+        border-radius: var(--radius);
+        padding: 0.6rem 0.8rem;
+        border: 1px solid var(--border);
+        margin: 0.5rem 0;
+    }
+    .panel-gold { border-left: 4px solid var(--gold); }
+    .panel-red { border-left: 4px solid var(--red); }
+    .panel-blue { border-left: 4px solid var(--blue); }
+    .panel-green { border-left: 4px solid var(--green); }
+    .panel-purple { border-left: 4px solid var(--purple); }
+    .panel-orange { border-left: 4px solid var(--orange); }
+    .badge {
+        display: inline-block;
+        padding: 0.05rem 0.5rem;
+        border-radius: 12px;
+        font-size: 0.65rem;
+        font-weight: 600;
+        background: var(--bg4);
+        color: var(--text3);
+        border: 1px solid var(--border);
+    }
+    .badge-gold { background: var(--gold); color: #1a1400; border-color: var(--gold); }
+    .badge-red { background: var(--red); color: #fff; border-color: var(--red); }
+    .badge-green { background: var(--green); color: #fff; border-color: var(--green); }
+    .badge-blue { background: var(--blue); color: #fff; border-color: var(--blue); }
+    .badge-purple { background: var(--purple); color: #fff; border-color: var(--purple); }
+    .badge-orange { background: var(--orange); color: #fff; border-color: var(--orange); }
+    .badge-gray { background: var(--bg4); color: var(--text3); border-color: var(--text3); }
+    .text-muted { color: var(--text3); }
+    .text-gold { color: var(--gold); }
+    .text-sm { font-size: 0.85rem; }
+    .text-xs { font-size: 0.7rem; }
+    .mt-1 { margin-top: 0.5rem; }
+    .mb-1 { margin-bottom: 0.5rem; }
+    .flex { display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; }
+    @media (max-width: 600px) { .grid-2 { grid-template-columns: 1fr; } }
+    .toc {
+        background: var(--bg3);
+        border-radius: var(--radius);
+        padding: 0.5rem 0.8rem;
+        border: 1px solid var(--border);
+        margin: 0.5rem 0;
+    }
+    .toc summary { cursor: pointer; color: var(--gold); font-weight: 600; }
+    .toc summary:hover { color: var(--gold-hover); }
+    .toc a { color: var(--text2); display: block; padding: 0.1rem 0; font-size: 0.85rem; }
+    .toc a:hover { color: var(--gold); }
+    .toc .toc-h3 { padding-left: 1rem; }
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; margin: 0.5rem 0; }
+    th, td { padding: 0.4rem 0.6rem; border: 1px solid var(--border); text-align: left; }
+    th { background: var(--bg4); color: var(--gold); font-weight: 600; }
+    tr:nth-child(even) { background: var(--bg2); }
+    blockquote {
+        font-style: italic;
+        border-left: 4px solid var(--gold);
+        padding: 0.5rem 1rem;
+        margin: 0.5rem 0;
+        background: var(--bg2);
+        border-radius: var(--radius);
+        color: var(--text2);
+    }
+    blockquote .attribution { display: block; font-style: normal; color: var(--text3); font-size: 0.85rem; margin-top: 0.3rem; }
+    code { background: var(--bg4); padding: 0.1rem 0.3rem; border-radius: 4px; font-size: 0.85rem; color: var(--gold); }
+    pre { background: var(--bg3); padding: 0.5rem; border-radius: var(--radius); overflow-x: auto; border: 1px solid var(--border); }
+    pre.game-log { font-size: 0.85rem; color: var(--text2); }
+    hr { border: none; border-top: 1px solid var(--border); margin: 1rem 0; }
+    .titlepage { text-align: center; margin: 1rem 0 0.5rem; }
+    .titlepage h1 { font-size: 2.5rem; border-bottom: none; margin-bottom: 0.1rem; }
+    .titlepage h2 { font-size: 1.8rem; font-weight: normal; border-bottom: none; margin-top: 0; }
+    .copyright-page { text-align: center; margin: 1rem 0; padding: 1rem 0; border-top: 2px solid var(--gold); border-bottom: 2px solid var(--gold); }
+    .copyright-page h1 { border-bottom: none; }
+    .warningbox { background: var(--bg3); border-left: 4px solid var(--red); padding: 0.5rem 1rem; margin: 0.5rem 0; border-radius: var(--radius); }
+    .tipbox { background: var(--bg3); border-left: 4px solid var(--gold); padding: 0.5rem 1rem; margin: 0.5rem 0; border-radius: var(--radius); }
+    .back-to-top { position: fixed; bottom: 1rem; right: 1rem; background: var(--bg3); padding: 0.5rem 0.8rem; border-radius: 50%; border: 1px solid var(--gold); color: var(--gold); text-decoration: none; font-size: 1.2rem; box-shadow: 0 2px 8px rgba(0,0,0,0.5); z-index: 100; }
+    .back-to-top:hover { background: var(--gold); color: var(--bg1); }
+    .highlight { background: var(--bg4); border-left: 3px solid var(--gold); padding-left: 0.5rem; }
+</style>
+</head>
+<body>
+<a href="#" class="back-to-top">&#8679;</a>
+<div id="main-content">
+
+<!-- ==================== TITLE PAGE ==================== -->
+<div class="titlepage">
+    <h1>Toll &amp; Veil</h1>
+    <h2>The Definitive Guide</h2>
+    <p>As Told (and Occasionally Embellished) Over the Table</p>
+    <p class="author" style="color:var(--text2);">Ten tricks, two markers, and whatever you're willing to put on the table</p>
+    <p class="date text-muted">Fate's Edge Toolkit Edition</p>
+</div>
+
+<!-- ==================== COPYRIGHT / SOURCES PAGE ==================== -->
+<div class="copyright-page">
+    <h1>Toll &amp; Veil: The Definitive Guide</h1>
+    <p>Copyright &copy; Nicholas A. Gasper</p>
+    <hr style="width: 60%; margin: 1em auto; border-color: var(--gold);"/>
+    <p style="max-width:700px;margin:0.5em auto;font-size:0.9rem;line-height:1.5;color:var(--text2);">
+    Unlike its stately cousin Kon'reh, Toll &amp; Veil never had a rulebook committed to vellum by a duke with a grudge and too much free time. It got passed hand to hand across roadside tables, caravan stops, and back rooms &mdash; which means every regional "house rule" thinks it's the real rule, and every regular has a story about the one hand that changed everything. This guide writes down what actually holds up at the table: the real rules first, then the stories that come with them. Take the stories with the grain of salt they were served with.
+    </p>
+    <hr style="width: 50%; margin: 1em auto; border-color: var(--gold);"/>
+    <p><em>"Bid what you can make. Cut what you must. And never, ever try to sweeten an Ace."</em><br/>
+    &mdash; table wisdom, origin disputed, repeated everywhere</p>
+</div>
+
+<!-- ==================== TABLE OF CONTENTS ==================== -->
+<details class="toc" open="">
+<summary>Table of Contents</summary>
+<a href="#foreword">Foreword</a>
+<a href="#core-rules">Core Rules</a>
+<a class="toc-h3" href="#objective">&ndash; Objective</a>
+<a class="toc-h3" href="#setup">&ndash; Setup &amp; the Deal</a>
+<a class="toc-h3" href="#bidding">&ndash; Bidding (and Screwing the Dealer)</a>
+<a class="toc-h3" href="#trump-breaking">&ndash; Trump &amp; Trump-Breaking</a>
+<a class="toc-h3" href="#markers">&ndash; The Two Markers: Cut &amp; Leap</a>
+<a class="toc-h3" href="#rooted">&ndash; Rooted</a>
+<a class="toc-h3" href="#trick-resolution">&ndash; Playing a Trick</a>
+<a class="toc-h3" href="#scoring">&ndash; Scoring a Hand</a>
+<a href="#quick-reference">Quick Reference</a>
+<a href="#the-wager">The Wager &mdash; What You Play For</a>
+<a href="#table-etiquette">Table Etiquette</a>
+<a href="#playing-digitally">Playing Toll &amp; Veil on the Fate's Edge Toolkit</a>
+<a href="#smokey-table">Tales from the Smokey Table</a>
+<a class="toc-h3" href="#story-perfect-veil">&ndash; The Perfect Veil at Two Bells</a>
+<a class="toc-h3" href="#story-ace">&ndash; The Dealer Who Tried to Cut an Ace</a>
+<a class="toc-h3" href="#story-empty-chair">&ndash; Lucky Jack's Empty Chair</a>
+<a class="toc-h3" href="#story-string">&ndash; The String That Took Nine Years to Collect</a>
+<a href="#glossary">Glossary</a>
+</details>
+
+<!-- ==================== FOREWORD ==================== -->
+<section class="level2" id="foreword">
+<h2>Foreword</h2>
+<p>Toll &amp; Veil is a trick-taking game for three to five players, played with a standard deck, and it rewards exactly one skill above all others: knowing your own hand well enough to say a number out loud and mean it. You bid how many of the hand's ten tricks you'll take. You try to hit that number &mdash; not beat it by miles, not miss it by one. Trump breaks like it does in every honest trick-taking game. Two markers, spent once a hand, let you cheat the rules a little &mdash; sharpen a card, or jump the trump-breaking rule &mdash; and spending both makes you Rooted, which the table will absolutely make fun of you for.</p>
+<p>It's a smaller game than Kon'reh, and it knows it. Nobody's writing a dissertation on Toll &amp; Veil doctrine. What it has instead is table talk: the bid that shouldn't have worked, the Ace someone swore they could sharpen if you just let them try, and the debts that get paid in stories instead of coin. This guide covers the real rules first &mdash; the part the app enforces to the letter &mdash; and closes with a few of those stories, because a card game without any is just arithmetic with extra steps.</p>
+</section>
+
+<!-- ==================== CORE RULES ==================== -->
+<section class="level2" id="core-rules">
+<h2>Core Rules</h2>
+
+<section class="level3" id="objective">
+<h3>Objective</h3>
+<p>Each hand, every seat bids how many of that hand's <strong>10 tricks</strong> they'll take, <strong>0 to 5</strong>. Hit your bid (meet or beat it) and you score; miss it &mdash; short or, yes, over is fine but under isn't &mdash; and you lose points. Hands keep dealing until someone reaches the table's <strong>target score</strong> (15 by default), at which point they win the game and everyone argues about the hand three rounds back that decided it.</p>
+</section>
+
+<section class="level3" id="setup">
+<h3>Setup &amp; the Deal</h3>
+<p><strong>3 to 5 seats</strong>, one standard 52-card deck, no jokers. Deal all 10 tricks' worth of cards to every seat round-robin (so 30, 40, or 50 cards go out depending on the table size &mdash; the rest stays in the stub, unseen, for the whole hand). The top card of that leftover stub is turned to set <strong>trump</strong> for the hand: red suits (&hearts; &diams;) play as <strong>Toll</strong>, black suits (&clubs; &spades;) play as <strong>Veil</strong> &mdash; which is where the game gets its name, and also why regulars will occasionally toast "to the Toll" or grumble "cursed Veil hand" depending how the cards fell.</p>
+</section>
+
+<section class="level3" id="bidding">
+<h3>Bidding (and Screwing the Dealer)</h3>
+<p>Starting left of the dealer, each seat bids a number 0&ndash;5 in turn. One rule keeps everyone honest: the <strong>last bidder</strong> (always the dealer, since bidding wraps all the way around back to them) <strong>cannot</strong> bid a number that would make every bid at the table add up to exactly 10. Someone, by design, is always going to miss. This is the rule regulars call "screwing the dealer," usually while looking directly at the dealer.</p>
+<div class="tipbox">If you're the dealer and the table's bids already sum to 9, you cannot bid 1. You can bid literally anything else &mdash; including a bid you know is wrong for your hand &mdash; but not that one number.</div>
+</section>
+
+<section class="level3" id="trump-breaking">
+<h3>Trump &amp; Trump-Breaking</h3>
+<p>Standard trick-taking manners apply: you must follow the suit that was led if you can. Trump plays the way it does in every honest game of this family &mdash; you can't <strong>lead</strong> a trick with a trump card, and you can't play trump when you're void of the lead suit either, <em>until trump has been broken</em> (played by someone who genuinely couldn't follow suit). Two exceptions: your whole hand is trump (nothing else to play, so the rule can't bind you), or you spend a <strong>Leap</strong> marker (below) to jump the rule for one card.</p>
+</section>
+
+<section class="level3" id="markers">
+<h3>The Two Markers: Cut &amp; Leap</h3>
+<p>Every seat gets exactly one <strong>Cut</strong> and one <strong>Leap</strong> per hand &mdash; spend-once, no refills until the next deal.</p>
+<div class="grid-2">
+<div class="panel panel-gold">
+<h4>&#9986;&#65039; Cut</h4>
+<p class="text-sm">Play it alongside any card (except an Ace &mdash; see below) to add <strong>+1</strong> to that card's effective value for the purposes of winning the trick. A well-timed Cut turns a losing card into a winning one.</p>
+</div>
+<div class="panel panel-blue">
+<h4>&#129394; Leap</h4>
+<p class="text-sm">Play it alongside a card to bypass the trump-breaking rule for that one card &mdash; lead trump before it's broken, or play trump while void of the lead suit before it's broken.</p>
+</div>
+</div>
+<div class="warningbox"><strong>You cannot Cut an Ace.</strong> This has been tried. It has never once worked, and the table will tell you so, loudly, every time.</div>
+</section>
+
+<section class="level3" id="rooted">
+<h3>Rooted</h3>
+<p>Spend <em>both</em> markers in the same hand and the next trick you win, you're <strong>Rooted</strong>: you must immediately pass the lead to the next seat instead of leading it yourself. It only bites once per hand &mdash; the first trick you win after spending both markers &mdash; not every trick after. Regulars treat getting Rooted as a badge of having played aggressively, not a punishment, though they'll still needle you about it.</p>
+</section>
+
+<section class="level3" id="trick-resolution">
+<h3>Playing a Trick</h3>
+<p>Highest card of the suit led wins the trick, unless someone played trump &mdash; then highest trump wins, regardless of what was led. Cut adds +1 to whichever card it's attached to when comparing. Whoever wins a trick leads the next one (subject to Rooted, above). Winning <strong>trick 5</strong> but <em>not</em> trick 6 earns a small bonus at the end of the hand &mdash; win both, and you get nothing extra for it, which is the game's quiet way of telling you not to get greedy in the middle of the hand.</p>
+</section>
+
+<section class="level3" id="scoring">
+<h3>Scoring a Hand</h3>
+<div class="table-wrap">
+<table>
+<thead><tr><th>Result</th><th>Score</th></tr></thead>
+<tbody>
+<tr><td>Met or beat your bid</td><td><strong>2 points</strong>, plus <strong>+1 per trick over</strong> your bid</td></tr>
+<tr><td>Missed your bid (took fewer tricks than bid)</td><td><strong>&minus;1 per trick short</strong></td></tr>
+<tr><td>Won trick 5 but not trick 6 (the <strong>Cross</strong>)</td><td><strong>+1</strong></td></tr>
+<tr><td>Bid 0 and took exactly 0 tricks (a <strong>Perfect Veil</strong>)</td><td><strong>+3</strong>, on top of the base 2</td></tr>
+</tbody>
+</table>
+</div>
+<p class="text-sm text-muted">A Perfect Veil (bid nothing, take nothing) is the one time "missing" your bid upward isn't possible and undershooting isn't a penalty &mdash; you can't take fewer than zero tricks, so a bid of 0 is either a clean hit worth 2+3=5, or, if you're forced to take even one trick, a miss like any other.</p>
+</section>
+</section>
+
+<!-- ==================== QUICK REFERENCE ==================== -->
+<section class="level2" id="quick-reference">
+<h2>Quick Reference</h2>
+<div class="grid-2">
+<div class="panel panel-blue">
+<h4>Table</h4>
+<p class="text-sm">3&ndash;5 seats &middot; 52-card deck, no jokers &middot; 10 tricks a hand &middot; bids 0&ndash;5</p>
+</div>
+<div class="panel panel-purple">
+<h4>Trump</h4>
+<p class="text-sm">Top card of the stub after the deal. Red (&hearts;&diams;) = <strong>Toll</strong>. Black (&clubs;&spades;) = <strong>Veil</strong>.</p>
+</div>
+<div class="panel panel-gold">
+<h4>Markers (once a hand)</h4>
+<p class="text-sm">&#9986;&#65039; Cut: +1 value, never on an Ace. &#129394; Leap: bypass trump-breaking once. Both spent = Rooted on your next trick won.</p>
+</div>
+<div class="panel panel-green">
+<h4>Bidding</h4>
+<p class="text-sm">Last bidder can't make the table's bids sum to exactly 10.</p>
+</div>
+</div>
+</section>
+
+<!-- ==================== THE WAGER ==================== -->
+<section class="level2" id="the-wager">
+<h2>The Wager &mdash; What You Play For</h2>
+<p>By default, Toll &amp; Veil plays for nothing but the scoreboard, and that's plenty for most tables. But if a host wants more skin in the game, they can turn on a stake for the whole table before the first hand is dealt &mdash; and only the host can, since somebody responsible has to set the cap.</p>
+<div class="grid-2">
+<div class="panel panel-blue">
+<h4>&#128202; Points Only <span class="badge badge-gray">default</span></h4>
+<p class="text-sm">Just the scoreboard. Bragging rights, nothing more, nothing less.</p>
+</div>
+<div class="panel panel-orange">
+<h4>&#127775; XP Wager <span class="badge badge-gold">opt-in, capped</span></h4>
+<p class="text-sm">The host sets a hard cap before dealing. At the end of the game, everyone who isn't the winner transfers that capped amount of XP to whoever won. Nobody can be wagered into debt beyond the cap &mdash; the house sets the limit, and the house means it.</p>
+</div>
+</div>
+<div class="panel panel-gold">
+<h4>&#129525; String <span class="badge badge-gold">opt-in, narrative</span></h4>
+<p class="text-sm">Nothing mechanical changes hands. Instead, whoever loses the game owes the winner a <strong>String</strong> &mdash; a narrative debt, drawn at random from the table's own pool: a story about why you needed that XP, a favor with no questions asked, a secret about your character the winner now holds. It isn't a rule so much as a promise the table makes itself keep. Ask anyone who follows Lucky Jack about the difference between a debt paid in coin and a debt paid in story &mdash; they'll tell you the second kind is the one that actually gets remembered. His own circle plays exactly this way: a coin in the pot, a story for the telling, and the best tale of the night wins it. Toll &amp; Veil's String stake is that same game, just dressed up with cards instead of confessions.</p>
+</div>
+<div class="tipbox">Whichever stake mode is on, it applies to the <strong>game</strong> (first to the target score), not to individual hands &mdash; nobody's settling up ten times an evening.</div>
+</section>
+
+<!-- ==================== TABLE ETIQUETTE ==================== -->
+<section class="level2" id="table-etiquette">
+<h2>Table Etiquette (recommended)</h2>
+<div class="tipbox">
+Announce your Cut and Leap out loud when you play them &mdash; "Cutting the Queen," "Leaping the trump" &mdash; so nobody has to squint at the table to work out why a 9 just beat a King. If a String is owed, tell the story before the next hand is dealt; a String left unpaid at the end of the night has a way of turning into two.
+</div>
+<p><em>Bid your hand, not your pride. The table remembers a clean Perfect Veil a lot longer than it remembers a brave 5 that came up two short.</em></p>
+</section>
+
+<!-- ==================== PLAYING DIGITALLY ==================== -->
+<section class="level2" id="playing-digitally">
+<h2>Playing Toll &amp; Veil on the Fate's Edge Toolkit</h2>
+<p>Every rule above is implemented in the Toolkit's own board, reachable from the <strong>Whiteboard</strong> panel's <span class="badge badge-gold">&#127183; Toll &amp; Veil</span> button, or from its own landing panel alongside Kon'reh.</p>
+<div class="grid-2">
+<div class="panel panel-blue">
+<h4>&#128101; Pass &amp; Play</h4>
+<p class="text-sm">Local hot-seat &mdash; everyone shares the one device, hand to hand, same as a table would.</p>
+</div>
+<div class="panel panel-purple">
+<h4>&#129302; Solo vs AI</h4>
+<p class="text-sm">Fill the rest of the seats with computer players and practice your bidding nerve on your own time.</p>
+</div>
+</div>
+<div class="panel panel-gold">
+<h4>&#127760; Host Table <span class="badge badge-gold">NEW</span></h4>
+<p class="text-sm">From the Whiteboard toolbar, host a real 3&ndash;5 seat table for the group over your existing VTT connection &mdash; pick a seat count and, if you like, a stake mode (Points, XP, or String). Other connected players see a banner and can join a seat; whatever's left unclaimed when you start gets filled by AI. One person runs the real game and deals everyone else in, the same way a physical table has one deck and one dealer.</p>
+</div>
+</section>
+
+<!-- ==================== TALES FROM THE SMOKEY TABLE ==================== -->
+<section class="level2" id="smokey-table">
+<h2>Tales from the Smokey Table</h2>
+<p>None of what follows is rules text. It's the kind of thing you hear leaning over a table between hands, told slightly differently every time by whoever's telling it. Take it as intended: plausible, mostly, and worth repeating anyway.</p>
+
+<section class="level3" id="story-perfect-veil">
+<h3>The Perfect Veil at Two Bells</h3>
+<blockquote>
+<p>The story goes that a courier &mdash; nobody remembers her name, everybody remembers she was three days behind schedule and in no mood &mdash; sat down at a roadside table already sour on her luck, looked at eight cards that couldn't take a trick if the rest of the table folded, and bid <strong>zero</strong>. The dealer laughed. The dealer kept laughing until trick four, when it became clear the courier wasn't just avoiding tricks, she was <em>routing around them</em> &mdash; ducking under trump, dumping her worst card the instant she had any excuse to, once passing on a trick so hard the whole table swore they heard her wince. Ten tricks later she'd taken exactly none of them. Five points, clean, and she was back on the road before the second bell. The lesson regulars still repeat isn't "bid zero" &mdash; it's that a bid of zero, played with total conviction, is scarier to sit across from than a bid of five ever was.</p>
+</blockquote>
+</section>
+
+<section class="level3" id="story-ace">
+<h3>The Dealer Who Tried to Cut an Ace</h3>
+<blockquote>
+<p>Every table has one regular who insists the rule against Cutting an Ace is a suggestion, not a law, and every table has watched that regular try it anyway. The version worth repeating involves a dealer &mdash; a good one, by most accounts, sharp enough to count the stub by feel &mdash; who set his Cut marker down next to the Ace of Toll with the calm of a man certain the universe would make an exception for him personally. It did not. The marker sat there doing nothing, the Ace stayed exactly as strong as an Ace already was, and the table has never let him forget it. If you take one thing from this story, it's not about the rule &mdash; everyone already knows the rule. It's that the surest way to lose a hand of table respect is to announce, loudly and in advance, that you're about to try something everyone already knows doesn't work.</p>
+</blockquote>
+</section>
+
+<section class="level3" id="story-empty-chair">
+<h3>Lucky Jack's Empty Chair</h3>
+<blockquote>
+<p>Some tables &mdash; not all, and never the same table twice by most tellings &mdash; leave a sixth chair out even when only five will play, a coat draped over the back of it like someone just stepped away. The claim is that the chair belongs to nobody in particular and everybody a little, and that on a slow night, if you deal it a hand anyway just to see, it comes up bidding exactly what it can make, and taking exactly what it bid, hand after hand, until somebody finally gets curious enough to lift the coat and check who's sitting there. Nobody is, of course. There never is. But the regulars who set the chair out will tell you, with a perfectly straight face, that Lucky Jack doesn't need to be dealt in to have a stake in how the cards fall &mdash; he collects on luck whether or not he's holding any himself. Whether you believe that or not, most tables that keep the tradition report their String debts get paid off faster than tables that don't. Make of that what you will; nobody's proven a thing either way, and everybody involved seems to prefer it that way.</p>
+</blockquote>
+</section>
+
+<section class="level3" id="story-string">
+<h3>The String That Took Nine Years to Collect</h3>
+<blockquote>
+<p>A String doesn't come with a due date, which is either the most generous part of the wager or the cruelest, depending which end of it you're on. The one worth telling involves two old friends, a losing hand of Toll &amp; Veil at a wedding, and a String owed that read, roughly, "one favor, no questions asked." Nine years passed. No favor was called. The two friends drifted, moved towns, mostly lost touch &mdash; until one showed up on the other's doorstep at an unreasonable hour needing exactly one thing done, no explanation offered, none asked for. It got done. Neither of them ever discussed what the favor actually was, and neither needed to &mdash; that was rather the point of owing it in the first place. The moral the table draws from it isn't subtle: play the String stake only with people you'd actually want showing up on your doorstep nine years from now.</p>
+</blockquote>
+</section>
+</section>
+
+<!-- ==================== GLOSSARY ==================== -->
+<section class="level2" id="glossary">
+<h2>Glossary</h2>
+<div class="table-wrap">
+<table>
+<thead><tr><th>Term</th><th>Definition</th></tr></thead>
+<tbody>
+<tr><td><strong>Toll</strong></td><td>The name for a hand where trump is a red suit (&hearts; or &diams;).</td></tr>
+<tr><td><strong>Veil</strong></td><td>The name for a hand where trump is a black suit (&clubs; or &spades;).</td></tr>
+<tr><td><strong>Screw the Dealer</strong></td><td>The rule forbidding the last bidder from making the table's bids sum to exactly 10.</td></tr>
+<tr><td><strong>Trump-Breaking</strong></td><td>Trump can't be led, or played by a void hand, until someone has played it because they had no choice &mdash; unless the whole hand is trump, or Leap is spent.</td></tr>
+<tr><td><strong>Cut</strong></td><td>Once-per-hand marker: +1 effective value to a played card. Never legal on an Ace.</td></tr>
+<tr><td><strong>Leap</strong></td><td>Once-per-hand marker: bypass the trump-breaking rule for one card.</td></tr>
+<tr><td><strong>Rooted</strong></td><td>After both markers are spent, the next trick you win, you must pass the lead instead of taking it yourself. Fires once per hand.</td></tr>
+<tr><td><strong>The Cross</strong></td><td>The bonus (+1) for winning trick 5 but not trick 6 in the same hand.</td></tr>
+<tr><td><strong>Perfect Veil</strong></td><td>Bidding 0 and taking exactly 0 tricks: +3, on top of the base 2 for hitting the bid.</td></tr>
+<tr><td><strong>The Wager</strong></td><td>A table's chosen stake for the game: Points (default), XP (capped, opt-in), or String (narrative debt, opt-in).</td></tr>
+<tr><td><strong>String</strong></td><td>A narrative debt owed by the game's loser(s) to its winner under the String stake &mdash; a favor, a story, a secret, at the table's discretion.</td></tr>
+</tbody>
+</table>
+</div>
+</section>
+
+</div>
+</body>
+</html>

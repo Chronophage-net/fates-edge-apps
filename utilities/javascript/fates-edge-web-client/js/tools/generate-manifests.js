@@ -38,6 +38,7 @@ const CATEGORY_MAP = {
   'travel': { id: 'travel', label: '🗺️ Travel', path: '/data/docs/travel/' },
   'design': { id: 'design', label: '🎨 Design', path: '/data/docs/design/' },
   'konreh': { id: 'konreh', label: '♟️ Kon\'reh', path: '/data/docs/konreh/' },
+  'tollveil': { id: 'tollveil', label: '🃏 Toll & Veil', path: '/data/docs/tollveil/' },
   'uploaded': { id: 'uploaded', label: '📤 Uploaded', path: '/data/docs/uploaded/' },
 };
 

@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "generated": "2026-08-12T02:01:36.880Z",
+  "generated": "2026-08-12T02:22:25.970Z",
   "documents": [
     {
       "id": "systems_reference_document",
@@ -873,6 +873,16 @@
       "active": true
     },
     {
+      "id": "toll_veil_the_definitive_guide",
+      "title": "Toll   Veil   The   Definitive   Guide",
+      "file": "Toll-_-Veil-_-The-_-Definitive-_-Guide.html",
+      "path": "/data/docs/tollveil/",
+      "category": "tollveil",
+      "categoryLabel": "🃏 Toll & Veil",
+      "core": false,
+      "active": true
+    },
+    {
       "id": "way_of_warrior",
       "title": "Way   Of   Warrior",
       "file": "Fates_-_Edge_-_-Way-_-of-_-Warrior.html",
@@ -903,7 +913,7 @@
       "active": true
     }
   ],
-  "total_count": 90,
-  "active_count": 90,
+  "total_count": 91,
+  "active_count": 91,
   "_license": "Fate's Edge Copyright – © 2024 - 2026 Nicholas A. Gasper. Used with permission, All rights reserved."
 }
