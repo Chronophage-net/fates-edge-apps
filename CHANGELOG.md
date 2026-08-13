@@ -3,6 +3,14 @@ All notable changes to this project will be documented here.
 
 Format loosely follows [Keep a Changelog](https://keepachangelog.com/), versions follow [Semantic Versioning](https://semver.org/).
 
+## [4.11.1] - 2026-08-13
+
+### Other
+- Updated sync/broadcast looks, module browser, and characters uploading their patron(s) obligation
+- Updated to add funding buttons
+- Updated email address to support@fates-edge.com all around.
+- Updated package-lock.json files
+
 ## [4.11.0] - 2026-08-12
 
 Documentation pass across the ecosystem ahead of the AI GM bot going public: fixed broken/fictional cross-repo links (wrong GitHub org, non-existent releases pages) in the Discord bot, Roll20, and Foundry bridge READMEs; corrected a Discord bot README that rendered entirely as a single code block; rewrote root SECURITY.md (was still the unfilled GitHub template); fixed a stale root README roadmap section contradicting the already-shipped Redis scaling feature; consolidated Kon'reh's rules doc out of the wrong feature folder (was duplicated and out of sync with itself); removed/redirected several stale docs (ADVISORY.md superseded by COMMUNITY_USE_POLICY.md, two mislabeled patron_update.md scratch files). Also fixed a real test hang: socket-server's scaling.test.js assumed the optional Redis deps were never installed in test environments, which stopped being true once they shipped as real optionalDependencies -- the resulting live (if unreachable) Redis client kept the process alive forever. Rewritten to match reality and close its connections.
