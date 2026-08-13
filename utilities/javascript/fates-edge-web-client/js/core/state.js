@@ -129,6 +129,11 @@ const DEFAULT_STATE = {
 
 let state = { ...DEFAULT_STATE };
 let saveCallbacks = [];
+// Fired specifically on local character add/update/delete — narrower than
+// onSave() (which fires on every saveState(), for any kind of state
+// change) so consumers that only care about pushing character edits to
+// the server (see websocket sync) aren't woken up on unrelated saves.
+let characterChangeCallbacks = [];
 const STORAGE_KEY = 'fates-edge-state';
 let pendingConflicts = [];
 
@@ -787,6 +792,7 @@ export function addCharacter(character) {
     character._syncVersion = Date.now();
     state.characters = [...(state.characters || []), character];
     saveState();
+    triggerCharacterChangeEvent('add', character);
     return character;
 }
 
@@ -794,23 +800,25 @@ export function updateCharacter(id, updates) {
     const characters = state.characters || [];
     const index = characters.findIndex(c => c.id === id);
     if (index === -1) return null;
-    
+
     const existing = characters[index];
-    const updated = { 
-        ...existing, 
-        ...updates, 
+    const updated = {
+        ...existing,
+        ...updates,
         updatedAt: new Date().toISOString(),
         _syncVersion: Date.now()
     };
     ensureCharacterDefaults(updated);
     state.characters = [...characters.slice(0, index), updated, ...characters.slice(index + 1)];
     saveState();
+    triggerCharacterChangeEvent('update', updated);
     return updated;
 }
 
 export function deleteCharacter(id) {
     state.characters = (state.characters || []).filter(c => c.id !== id);
     saveState();
+    triggerCharacterChangeEvent('delete', { id });
     return true;
 }
 
@@ -1374,6 +1382,40 @@ export function offSave(callback) {
     }
 }
 
+// ============================================================
+// CHARACTER CHANGE EVENTS
+// ============================================================
+//
+// Narrow, character-specific counterpart to onSave() above. Used to push
+// local character edits (from the sheet editor, wizard, roller, etc. —
+// anything that calls addCharacter/updateCharacter/deleteCharacter) out
+// to the server so the AI GM bot's view of the party stays current
+// between its own periodic aggressive-sync polls. See
+// features/vtt/vtt-connected.js's pushCharactersToServer() subscriber.
+
+export function onCharacterChange(callback) {
+    if (typeof callback === 'function') {
+        characterChangeCallbacks.push(callback);
+    }
+}
+
+export function offCharacterChange(callback) {
+    const index = characterChangeCallbacks.indexOf(callback);
+    if (index > -1) {
+        characterChangeCallbacks.splice(index, 1);
+    }
+}
+
+function triggerCharacterChangeEvent(action, character) {
+    characterChangeCallbacks.forEach(cb => {
+        try {
+            cb(action, character);
+        } catch (e) {
+            console.warn('Character change callback error:', e);
+        }
+    });
+}
+
 function triggerSaveEvent(status) {
     saveCallbacks.forEach(cb => {
         try { 
@@ -1493,4 +1535,6 @@ export default {
     clearAllData,
     onSave,
     offSave,
+    onCharacterChange,
+    offCharacterChange,
 };

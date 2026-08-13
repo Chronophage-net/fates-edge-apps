@@ -31,14 +31,15 @@ import { checkPasswordGate, hashPassword } from '../../core/password.js';
 import { escHtml, formatDate } from '../../core/utils.js';
 import { showToast } from '../../components/Toast.js';
 import { getUserAvatar } from '../../core/gravatar.js';
-import { 
-    connectWebSocket, 
-    disconnectWebSocket, 
-    isWSConnected, 
-    getWSStatus, 
+import {
+    connectWebSocket,
+    disconnectWebSocket,
+    isWSConnected,
+    getWSStatus,
     testWSConnection,
     sendWSMessage,
-    onWSEvent
+    onWSEvent,
+    isConnectedToServer
 } from '../../core/websocket.js';
 import {
     installPack,
@@ -55,9 +56,104 @@ import {
     getCurrentPreference,
     getResolvedThemeId
 } from '../../core/theme-manager.js';
+import { getMyStoredRole, isGmLikeRole } from '../../core/feature-toggles.js';
+import {
+    loadAdventureManifest,
+    loadAdventureFromFile
+} from '../adventure-manager/index.js';
 
 let container = null;
 let themeChangeListenerAttached = false;
+
+// ============================================================
+// ADVENTURE MODULE LIBRARY (Settings/Admin one-click install)
+// ============================================================
+//
+// browseAdventureLibrary() (adventure-manager/index.js) already lists
+// and installs from the local /data/adventures/ folder, but only from
+// inside the Adventures panel itself, as a modal takeover -- there was
+// no admin-facing entry point, and no lightweight metadata preview
+// (title/tier/author/description) without either opening that modal or
+// hand-placing a .json file. This section reuses the same underlying
+// pieces (loadAdventureManifest(), loadAdventureFromFile()) from
+// Settings, with a read-only metadata fetch for the card list so
+// browsing doesn't itself install anything -- only clicking "Install"
+// does.
+//
+// Must match adventure-manager/index.js's own ADVENTURES_DATA_PATH --
+// not exported from there, so kept in sync here manually.
+const ADVENTURE_LIBRARY_PATH = '/data/adventures/';
+
+let adventureLibraryEntries = null; // null = not yet loaded this session
+let adventureLibraryLoading = false;
+let adventureLibraryError = null;
+
+function isGMForLibrary() {
+    if (!isConnectedToServer()) return true; // solo/local -- allow all
+    return isGmLikeRole(getMyStoredRole());
+}
+
+// Read-only metadata fetch -- does NOT call loadAdventureFromFile(), so
+// merely opening/refreshing this panel never installs anything.
+async function fetchAdventurePreview(id) {
+    const candidates = [`${ADVENTURE_LIBRARY_PATH}${id}.json`, `.${ADVENTURE_LIBRARY_PATH}${id}.json`];
+    for (const url of candidates) {
+        try {
+            const response = await fetch(url);
+            if (!response.ok) continue;
+            const data = await response.json();
+            return {
+                id,
+                title: data.title || id,
+                tier: data.tierRange || data.tier || '',
+                author: data.author || '',
+                description: data.description || data.notes || '',
+                sessions: data.sessions || ''
+            };
+        } catch (e) { /* try next candidate */ }
+    }
+    return { id, title: id, tier: '', author: '', description: '(Could not load metadata)', sessions: '' };
+}
+
+async function loadAdventureLibrary() {
+    adventureLibraryLoading = true;
+    adventureLibraryError = null;
+    render(container);
+    try {
+        const ids = await loadAdventureManifest();
+        if (ids === null) {
+            adventureLibraryError = `Couldn't reach manifest.json under ${ADVENTURE_LIBRARY_PATH}.`;
+            adventureLibraryEntries = [];
+        } else {
+            adventureLibraryEntries = await Promise.all(ids.map(fetchAdventurePreview));
+        }
+    } catch (e) {
+        adventureLibraryError = e.message || String(e);
+        adventureLibraryEntries = [];
+    } finally {
+        adventureLibraryLoading = false;
+        render(container);
+    }
+}
+
+async function handleAdventureInstall(id, btn) {
+    if (!isGMForLibrary()) {
+        showToast('Only the GM can install adventure modules.', 'error');
+        return;
+    }
+    if (btn) { btn.disabled = true; btn.textContent = '⏳ Installing…'; }
+    try {
+        const installed = await loadAdventureFromFile(id);
+        if (installed) {
+            showToast(`📚 Installed "${installed.title}" into your adventure library.`, 'success');
+        } else {
+            showToast(`Failed to install "${id}" — check the console for details.`, 'error');
+        }
+    } catch (e) {
+        showToast(`Failed to install "${id}": ${e.message || e}`, 'error');
+    }
+    render(container);
+}
 
 // ============================================================
 // LICENSE & COPYRIGHT NOTICE
@@ -170,7 +266,8 @@ export function render(el) {
     
     const installedPacks = getInstalledPacks();
     const packDocuments = getDocuments();
-    
+    const installedAdventureIds = new Set((state.adventures || []).map(a => a.id));
+
     container.innerHTML = `
         <div class="settings-layout">
             <style>
@@ -529,7 +626,49 @@ export function render(el) {
                     </div>
                 </div>
             </div>
-            
+
+            <!-- ============================================================
+                 ADVENTURE MODULE LIBRARY (one-click install)
+                 ============================================================ -->
+            <div class="panel settings-panel" id="adventure-library-panel">
+                <div class="panel-header">
+                    <h3>🗺️ Adventure Module Library</h3>
+                    <span class="badge">${installedAdventureIds.size} installed</span>
+                </div>
+                <p class="text-muted small">Browse adventure modules bundled in the local <code>${ADVENTURE_LIBRARY_PATH}</code> folder and install them into your library in one click — no manual JSON placement or modal needed.</p>
+
+                <div class="flex">
+                    <button class="btn btn-gold" id="adventure-library-browse-btn">📚 ${adventureLibraryEntries === null ? 'Browse Library' : 'Refresh List'}</button>
+                </div>
+
+                ${adventureLibraryError ? `<div class="mt-1" style="color:var(--red);">⚠️ ${escHtml(adventureLibraryError)}</div>` : ''}
+
+                <div class="mt-1" id="adventure-library-list">
+                    ${adventureLibraryLoading ? '<div class="text-muted small">⏳ Loading module list…</div>' : ''}
+                    ${!adventureLibraryLoading && adventureLibraryEntries === null ? '<div class="text-muted small">Click "Browse Library" to see available modules.</div>' : ''}
+                    ${!adventureLibraryLoading && adventureLibraryEntries !== null && adventureLibraryEntries.length === 0 && !adventureLibraryError ? '<div class="text-muted small">No modules found.</div>' : ''}
+                    ${!adventureLibraryLoading && adventureLibraryEntries ? adventureLibraryEntries.map(entry => {
+                        const already = installedAdventureIds.has(entry.id);
+                        return `
+                            <div class="pack-item" style="align-items:flex-start;">
+                                <div class="pack-info" style="flex:1;">
+                                    <span class="pack-name">${escHtml(entry.title)}</span>
+                                    ${entry.tier ? `<span class="pack-type">Tier ${escHtml(entry.tier)}</span>` : ''}
+                                    ${entry.sessions ? `<span class="pack-type">${escHtml(entry.sessions)} sessions</span>` : ''}
+                                    <div class="pack-meta">${entry.author ? `by ${escHtml(entry.author)}` : ''}</div>
+                                    <div class="text-sm text-muted" style="margin-top:0.2rem;max-width:520px;">${escHtml(entry.description)}</div>
+                                </div>
+                                <div class="flex" style="flex-shrink:0;">
+                                    <button class="btn btn-xs ${already ? 'btn-secondary' : 'btn-gold'} adventure-install-btn" data-id="${escHtml(entry.id)}" ${already ? 'disabled' : ''}>
+                                        ${already ? '✅ Installed' : '⬇️ Install'}
+                                    </button>
+                                </div>
+                            </div>
+                        `;
+                    }).join('') : ''}
+                </div>
+            </div>
+
             <!-- ============================================================
                  WEBSOCKET SETTINGS
                  ============================================================ -->
@@ -1435,6 +1574,14 @@ export function attachEvents() {
     // Pack management
     document.getElementById('pack-install-btn')?.addEventListener('click', handlePackInstall);
     document.getElementById('pack-refresh-btn')?.addEventListener('click', refreshPackList);
+
+    // Adventure module library
+    document.getElementById('adventure-library-browse-btn')?.addEventListener('click', () => {
+        loadAdventureLibrary();
+    });
+    document.querySelectorAll('.adventure-install-btn').forEach(btn => {
+        btn.addEventListener('click', () => handleAdventureInstall(btn.dataset.id, btn));
+    });
     document.getElementById('pack-file-input')?.addEventListener('change', (e) => {
         const feedback = document.getElementById('pack-install-feedback');
         if (e.target.files && e.target.files.length > 0) {

@@ -127,6 +127,13 @@ const eventHandlers = {
     'character-select': [],
     'adventure-timer': [],
     'adventure-log': [],
+    // Server-authoritative reply to an 'adventure-timer' tick (see
+    // server/adventure.js tickTimer()) — the canonical post-tick state,
+    // broadcast to EVERY client in the room (including whoever sent the
+    // tick), so every client's timer display converges on the same
+    // numbers regardless of who drove the change. See adventure-manager/
+    // index.js's applyRemoteTimerTick().
+    'timer-ticked': [],
     'handshake_ack': [],
     
 };
@@ -544,6 +551,10 @@ function handleWebSocketMessage(data) {
 
         case 'adventure-log':
             triggerEvent('adventure-log', data);
+            break;
+
+        case 'timer-ticked':
+            triggerEvent('timer-ticked', data);
             break;
 
         case 'handshake_ack':
@@ -1030,7 +1041,17 @@ function setupSocketIOListeners() {
     socket.on('sync-request', (data) => {
         triggerEvent('sync-request', data);
     });
-    
+
+    // ============================================================
+    // ADVENTURE ENGINE (Socket.io) — mirrors the plain-WebSocket
+    // handling above so the adventure timer sync loop works on both
+    // transports. See server/socketio-handlers.js's 'adventure-timer'
+    // handler for the server side.
+    // ============================================================
+    socket.on('timer-ticked', (data) => {
+        triggerEvent('timer-ticked', data);
+    });
+
     // Other events
     socket.on('event', (data) => {
         triggerEvent('event', data);

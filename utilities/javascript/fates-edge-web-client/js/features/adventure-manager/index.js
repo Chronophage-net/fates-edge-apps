@@ -66,7 +66,7 @@ import { getState, saveState } from '../../core/state.js';
 import { showToast } from '../../components/Toast.js';
 import { escHtml, safeParseInt } from '../../core/utils.js';
 import { logToSession, addVTTEvent } from '../gm-tools/index.js';
-import { isConnectedToServer, sendEvent } from '../../core/websocket.js';
+import { isConnectedToServer, sendEvent, onWSEvent } from '../../core/websocket.js';
 import { loadBestiaryData, getCreatureDescription } from '../encounters/bestiary.js';
 import { OBJECTIVE_TYPES, DEFAULT_OBJECTIVE_TYPE, getObjectiveType } from '../../core/objective-types.js';
 // ─── Role check ──────────────────────────────────────────────
@@ -136,6 +136,84 @@ function broadcastTimerTick(timerName, scope, ref, amount) {
         sendEvent({ type: 'adventure-timer', scope, ref, name: timerName, amount });
     } catch (e) { /* ignore */ }
 }
+
+// ============================================================
+// TIMER SYNC LOOP — apply the server's canonical result
+// ============================================================
+//
+// broadcastTimerTick() above only *notifies* the server; it doesn't wait
+// for or apply a reply. The server (server/adventure.js tickTimer(), via
+// the 'adventure-timer' WS handler in ws-handlers.js/socketio-handlers.js)
+// recomputes the tick on its own authoritative copy and broadcasts the
+// result back to EVERY client in the room — including whoever sent the
+// original tick — as a 'timer-ticked' message. Until now nothing on the
+// client listened for that reply, so:
+//   - other clients never saw the GM's timer ticks reflected locally
+//   - the sending client relied entirely on its own optimistic update,
+//     which could silently drift from the server's copy (e.g. two GMs/
+//     an AI agent ticking the same timer around the same time)
+// This closes the loop: every client (sender included) reconciles its
+// local timer state to the server's answer.
+function applyRemoteTimerTick(payload) {
+    const ticked = payload && payload.tickedTimer;
+    if (!ticked || !ticked.name) return;
+
+    const adventure = getActiveAdventure();
+    if (!adventure) return;
+
+    const scope = ticked.scope === 'campaign' ? 'campaign' : 'scene';
+    let timer = null;
+
+    if (scope === 'campaign') {
+        timer = (adventure.campaignTimers || []).find(t => t.name === ticked.name);
+    } else {
+        const act = adventure.acts?.[adventure.currentAct];
+        const scene = act?.scenes?.[adventure.currentScene];
+        timer = (scene?.timers || []).find(t => t.name === ticked.name);
+    }
+    if (!timer) return; // Not an adventure we have loaded locally — nothing to reconcile.
+
+    const previous = timer.current || 0;
+    const next = Math.max(0, Math.min(ticked.segments ?? timer.segments, ticked.current));
+    if (next === previous) {
+        // Either the echo of our own already-applied optimistic tick, or
+        // a no-op tick (e.g. already at 0/max) — nothing new to show.
+        return;
+    }
+    timer.current = next;
+    saveAdventuresToState();
+
+    // Keep the GM Tools global timer mirror (state.timers, via
+    // adventure.timerIds — see advanceTimer()) in sync for campaign
+    // timers, same as a locally-driven tick would.
+    if (scope === 'campaign') {
+        const timerIndex = (adventure.campaignTimers || []).indexOf(timer);
+        const globalId = adventure.timerIds?.[timerIndex];
+        if (globalId) {
+            const state = getState();
+            const globalTimer = state.timers.find(t => t.id === globalId);
+            if (globalTimer) {
+                globalTimer.current = next;
+                saveState();
+            }
+        }
+    }
+
+    if (ticked.full && previous < timer.segments) {
+        showToast(`⏱️ ${scope === 'campaign' ? 'Adventure' : 'Scene'} Timer "${timer.name}" completed!`, 'warning');
+        logAdventureEvent(`⏱️ ${scope === 'campaign' ? 'Adventure' : 'Scene'} Timer "${timer.name}" completed (${adventure.title})`, 'warning', 'adventure_timer_completed', {
+            adventureId: adventure.id, timerName: timer.name
+        });
+    }
+
+    renderView();
+}
+
+// Registered once at module load (this module is a singleton ES import,
+// not re-instantiated per activation) so remote timer ticks are applied
+// even when the Adventures panel isn't the currently active/visible
+// feature — the underlying adventure data still needs to stay correct.
+onWSEvent('timer-ticked', applyRemoteTimerTick);
 
 // ============================================================
 // TIMER TRIGGER EXECUTION (NEW)

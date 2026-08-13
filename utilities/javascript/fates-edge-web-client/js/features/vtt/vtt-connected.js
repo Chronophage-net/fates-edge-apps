@@ -19,7 +19,7 @@
  */
 
 import { vttStore, MAX_CONTROLLED_CHARACTERS } from '../../core/vtt-store.js';
-import { getState, clearChatHistory, getCharacter, addVTTEvent, addSessionLogEntry, getCharacters, ensureCharacterDefaults, getStableClientId } from '../../core/state.js';
+import { getState, clearChatHistory, getCharacter, addVTTEvent, addSessionLogEntry, getCharacters, ensureCharacterDefaults, getStableClientId, onCharacterChange } from '../../core/state.js';
 import { performRoll } from '../../core/dice.js';
 import { collectEquipmentModifiers } from '../../core/talent-effects.js';
 import { RANGE_BAND_OPTIONS, RANGE_BAND_LABEL_MAP } from '../characters/roller.js';
@@ -825,6 +825,11 @@ async function pushCharactersToServer() {
                 skills: c.skills || {},
                 avatar: c.avatar || null,
                 playerName: playerName,
+                // NEW: previously dropped on the floor here, so the server
+                // (and anything reading server character data, like the AI
+                // GM Session Panel's per-Patron Obligation breakdown) never
+                // knew which Patron a character's Obligation was owed to.
+                patron: c.patron || null,
             };
             updates[c.name] = entry;
         }
@@ -881,6 +886,38 @@ async function pushCharactersToServer() {
         }
     }
 }
+
+// ============================================================
+// CHARACTER PUSH ON LOCAL EDIT — the other half of the sync loop
+// ============================================================
+//
+// Until now pushCharactersToServer() only ran on initial connect/
+// reconnect (see setupWebSocketSync()/the 'connected' handler below).
+// Editing a character sheet mid-session (features/characters/editor.js,
+// wizard.js, roller.js — anything that calls core/state.js's
+// updateCharacter()) never reached the server again after that first
+// push, so the AI GM bot only ever saw a player's *starting* sheet until
+// its own periodic aggressive sync (SYNC_INTERVAL_MS, ai-gm-bot.js)
+// happened to catch up. Subscribing here — debounced, so a burst of
+// field edits collapses into one push — closes that gap without
+// spamming the server on every keystroke.
+//
+// Registered once at module load (this module is a singleton ES import)
+// so edits are pushed even if the VTT panel itself isn't the currently
+// active/visible feature.
+let characterPushDebounceTimer = null;
+const CHARACTER_PUSH_DEBOUNCE_MS = 1500;
+
+function scheduleCharacterPush() {
+    if (!isConnectedToServer() || isDestroyed) return;
+    if (characterPushDebounceTimer) clearTimeout(characterPushDebounceTimer);
+    characterPushDebounceTimer = setTimeout(() => {
+        characterPushDebounceTimer = null;
+        pushCharactersToServer().catch(() => {});
+    }, CHARACTER_PUSH_DEBOUNCE_MS);
+}
+
+onCharacterChange(() => scheduleCharacterPush());
 
 // ============================================================
 // CHARACTER RECEIVE HELPERS
