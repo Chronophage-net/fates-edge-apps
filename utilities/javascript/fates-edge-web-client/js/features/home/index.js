@@ -169,7 +169,7 @@ function buildHTML() {
               <p>“Keep It Stupid — minimal but not fragile. Build from user needs, set a feature limit, layer by layer.”</p>
             </blockquote>
             <p class="about-contact">
-              📧 <a href="mailto:nick.gasper@gmail.com">nick.gasper@gmail.com</a> · 
+              📧 <a href="mailto:support@fates-edge.com">support@fates-edge.com</a> · 
               ☕ <a href="https://venmo.com/chronophage" target="_blank" rel="noopener noreferrer">Venmo: chronophage</a> · 
               🐦 <a href="https://twitter.com/chronophage" target="_blank" rel="noopener noreferrer">@chronophage</a> (everywhere)
             </p>

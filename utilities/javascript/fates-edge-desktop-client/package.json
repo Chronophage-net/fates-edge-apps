@@ -85,7 +85,7 @@
       ],
       "icon": "build/icon.png",
       "category": "Game",
-      "maintainer": "Fate's Edge <nick.gasper@gmail.com>"
+      "maintainer": "Fate's Edge <support@fates-edge.com>"
     },
     "nsis": {
       "oneClick": false,
