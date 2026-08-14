@@ -2,6 +2,17 @@
 
 All notable changes to the Fate's Edge Web Client are logged here. This file starts at 4.2 — earlier versions (up through 4.1.2a) predate this convention and aren't reconstructed retroactively.
 
+## [4.11.1] - 2026-08-13
+
+### Adventure Manager — timer sync loop closed end-to-end
+- `advanceTimer()`/`advanceSceneTimer()` already broadcast an `adventure-timer` WS message on every local tick (`broadcastTimerTick()`), and the server already recomputed it authoritatively and broadcast the result back to the whole room as `timer-ticked` — but nothing on the client ever listened for `timer-ticked`, so other clients (and the sender itself, on drift) never converged on the server's canonical number. `core/websocket.js` now registers and dispatches `timer-ticked` on both the plain-WebSocket and Socket.io transports; `adventure-manager/index.js`'s new `applyRemoteTimerTick()` matches the ticked timer by name/scope against the currently loaded adventure and reconciles `.current`, the GM Tools global timer mirror, and re-renders — idempotently, so the tick's own echo back to the sender is a safe no-op.
+
+### Settings — one-click Adventure Module install
+- New "Adventure Module Library" panel in Settings: lists modules bundled in the local `/data/adventures/` folder with a read-only metadata preview (title, tier, sessions, author, description — fetched without installing anything), and installs any of them into your local library with one click. Reuses `adventure-manager/index.js`'s existing `loadAdventureManifest()`/`loadAdventureFromFile()` rather than duplicating install logic; previously this browse+install flow only existed as a modal inside the Adventures panel itself, with no admin-facing entry point.
+
+### Character sync — now bidirectional
+- Character sheet edits (editor, wizard, roller — anything that calls `core/state.js`'s `addCharacter()`/`updateCharacter()`/`deleteCharacter()`) now push to the server automatically via a new debounced subscriber in `vtt-connected.js`, instead of only syncing once at initial connect/reconnect. Backed by a new narrow `onCharacterChange()`/`offCharacterChange()` hook in `core/state.js` (deliberately separate from the existing, much noisier `onSave()`, which fires on every kind of state save). `pushCharactersToServer()`'s payload also now includes each character's `patron`, previously silently dropped before it reached the server — nothing downstream (including the AI GM's per-Patron Obligation view) could see which Patron a character's Obligation was owed to until now.
+
 ## [4.6.0] - 2026-08-07
 
 ### Encounters — objective types for non-combat clocks

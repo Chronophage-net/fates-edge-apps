@@ -4,6 +4,8 @@ A **module** is an installable adventure package the server can store and push l
 
 This is distinct from the **Adventure Engine** (`server/adventure.js`), which is the authoritative synced state machine for whichever adventure is currently loaded in a room (its acts/scenes/timers/encounters). A module is how you *get* an adventure onto a room's Adventure Engine (or into a player's local Adventure Manager) in the first place.
 
+It's also distinct from the web client's **Settings → Adventure Module Library** panel (`js/features/settings/index.js`, since v4.11.1) — that one browses and one-click-installs adventures bundled statically in the client's own `data/adventures/` folder (see `adventure-manager/index.js`'s `loadAdventureManifest()`/`loadAdventureFromFile()`), entirely client-side, no server involved at all. This page's "module" push/pull system is for server-hosted adventures a GM distributes live to everyone in a room; the Settings library is for adventures already bundled with the client itself.
+
 ---
 
 ## 1. Anatomy of a module

@@ -292,7 +292,12 @@ List all full character objects in a room.
 Get one full character object.
 
 **`POST /api/rooms/:code/characters/update`** — `{ updates: { "Character Name": { ...fields } } }`
-Bulk update full character objects. Broadcasts `state-updated`.
+Bulk update full character objects. Broadcasts `state-updated`. The web client calls this both on
+connect/reconnect and, debounced, on every local character edit — see `core/state.js`'s
+`onCharacterChange()` — so this is a live sync path, not a one-shot import. `fields` typically
+includes `attributes`, `harm`, `fatigue`, `obligation`, `boons`, `leash`, `corruption`, `skills`,
+`avatar`, `playerName`, and `patron` (which Patron a character's Obligation is owed to — passed
+through as an arbitrary field, no server-side validation against the patron content data).
 
 **`POST /api/rooms/:code/characters/:name/(harm|fatigue|obligation|boons|leash|corruption)`** — `{ delta }`
 Adjust a single numeric field by a signed delta (clamped at 0). Prefer these over the bulk endpoint for simple counter bumps — they avoid a read-modify-write race. Broadcasts `character-update`.

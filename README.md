@@ -40,6 +40,12 @@ The toolkit includes **real‑time VTT features** via a WebSocket/Socket.io serv
 
 ---
 
+## 🆕 What's New in v4.11.1
+
+- **⏱️ Adventure Timer Sync Loop closed end-to-end** — the server already recomputed every timer tick authoritatively and broadcast the canonical result (`timer-ticked`) to the whole room, but no client ever listened for that broadcast, so a tick from one client (or an AI GM) never visibly updated anyone else's timer display. `core/websocket.js` now handles `timer-ticked` on both transports, and `adventure-manager/index.js` reconciles the local timer to match — idempotently, so the sender's own echo is a safe no-op.
+- **📚 One-click Adventure Module install from Settings** — a new "Adventure Module Library" panel lists modules from the local adventure folder with metadata (title, tier, author, description) and installs any of them with one click, no modal or manual JSON placement required. Reuses the existing manifest/install functions rather than duplicating logic.
+- **🔄 Character sync is now bidirectional** — local character edits (sheet editor, wizard, roller) push to the server automatically, debounced, instead of only at initial connect. Character payloads also now include `patron`, previously dropped before it ever reached the server — the AI GM bot's status dashboard (see the bot repo's own changelog) uses this for a per-Patron Obligation breakdown.
+
 ## 🆕 What's New in v4.10.0
 
 - **🔍 Optional Elasticsearch search backend for the web client** — `js/features/search/index.js` already supported an optional self-hosted Solr backend (undocumented until now); it now supports Elasticsearch too (`window.__ES_URL`, `window.__ES_API_KEY`), with `window.__SEARCH_BACKEND` to force a specific one if both are configured. Still zero-config by default — the built-in local Fuse.js index needs nothing external. See the web client's own README's new "Search Backend Configuration" section.
@@ -421,6 +427,8 @@ cd utilities/python/fates-edge-python-client && pip install -e . && fates-edge-c
 
 **Also shipped (v4.9.0):** optional Redis-backed horizontal scaling for the socket server (opt-in via `REDIS_URL`; single-instance/no-dependency behavior unchanged by default) — see [`SCALING.md`](utilities/javascript/fates-edge-socket-server/SCALING.md). This closes out the "horizontal server scaling" item that used to sit in this section.
 
+**Also shipped (v4.11.1):** the Adventure Timer Sync Loop now closes end-to-end (a tick from any client/AI GM updates every connected client's timer display, not just the sender's own optimistic local state); one-click Adventure Module install from Settings (metadata preview + install, no manual JSON placement); and character sync is now bidirectional (local edits push automatically instead of only at connect), with `patron` now included so the AI GM bot's status dashboard can show Obligation totals grouped by Patron.
+
 Features that have been discussed or partially scaffolded but are **not yet implemented** in this build:
 
 - **Session Playback / Export** — replaying or exporting a recorded/logged session as HTML/Markdown/plain text (beyond the SRT manifest voice/logging already produces).
@@ -491,7 +499,18 @@ privately rather than filing a public issue.
 
 ## 📋 Version History
 
-### v4.10.0 (Current)
+### v4.11.1 (Current)
+- **Added** Adventure Timer Sync Loop closed end-to-end — `timer-ticked` broadcasts are now consumed on both WS transports and reconciled into local adventure/timer state (previously fired, but nothing listened)
+- **Added** One-click Adventure Module install from Settings (metadata preview + install; no manual JSON placement)
+- **Added** Bidirectional character sync — local edits push to the server automatically (debounced), not just at connect
+- **Added** `patron` field to the character sync payload, enabling per-Patron Obligation totals downstream (see the AI GM bot's status dashboard)
+- **Docs** README/CHANGELOG/API/DESIGN pass across the web client and socket server covering all of the above
+
+### v4.11.0
+- **Changed** Documentation pass across the ecosystem ahead of the AI GM bot going public: fixed broken/fictional cross-repo links in the Discord bot, Roll20, and Foundry bridge READMEs; rewrote root `SECURITY.md`; fixed a stale roadmap section; consolidated Kon'reh's rules doc
+- **Fixed** `scaling.test.js` could hang indefinitely once Redis shipped as a real optional dependency (assumed it was never installed in test environments)
+
+### v4.10.0
 - **Added** Optional Elasticsearch search backend for the web client (`window.__ES_URL`/`__ES_API_KEY`), alongside the pre-existing (now documented) Solr option
 - **Added** `window.__SEARCH_BACKEND` to force Solr or Elasticsearch when both are configured
 - **Added** Search backend status to the System Status page

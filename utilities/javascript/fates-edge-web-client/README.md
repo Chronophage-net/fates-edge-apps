@@ -28,7 +28,8 @@ This client is part of the larger [Fate's Edge Applications](https://github.com/
 - **Character Editor** – Full management with XP tracking, skills, and inventory.
 
 ### 🎭 Game Management
-- **Adventure Manager** – Load, create, and track campaigns with acts, scenes, timers, and progress.
+- **Adventure Manager** – Load, create, and track campaigns with acts, scenes, timers, and progress. Timer ticks sync live to every connected client, GM or AI-driven.
+- **Adventure Module Library (Settings)** – Browse modules bundled in the local adventure library with metadata (title, tier, author, description) and install any of them with one click, right from Settings.
 - **Crown Spread Integration** – Generate complete adventures from card readings.
 - **Whiteboard** – Collaborative drawing, notes, tactical planning with layers, grid combat, and Fog of War.
 - **Kanban Board** – Campaign progress tracking with custom columns and clocks.
@@ -162,8 +163,21 @@ wss://fates-edge-ws.onrender.com  # Production default
 ### API Endpoint for Character Sync
 ```
 POST /api/rooms/:roomCode/characters/update
-{ "updates": { "Character Name": { "harm": 0, "fatigue": 0, "boons": 3, ... } } }
+{ "updates": { "Character Name": { "harm": 0, "fatigue": 0, "boons": 3, "patron": "...", ... } } }
 ```
+
+Character sync is bidirectional and automatic: the client pushes on connect/reconnect *and* on
+every local character edit (debounced ~1.5s so a burst of field changes collapses into one push
+— see `core/state.js`'s `onCharacterChange()` and `vtt-connected.js`'s `pushCharactersToServer()`
+subscriber), and the server broadcasts `state-updated` back to the room (including to any
+connected AI GM bot) on every update. `patron` is included in the pushed payload so anything
+reading server-side character data — like the AI GM bot's per-Patron Obligation breakdown — can
+see which Patron a character's Obligation is owed to.
+
+Adventure timers follow the same round-trip: a client tick (`advanceTimer()`/
+`advanceSceneTimer()`) is sent to the server, which recomputes it authoritatively and broadcasts
+the canonical result (`timer-ticked`) back to every client in the room, so timer displays stay in
+sync regardless of who — player, GM, or an AI agent — drove the change.
 
 ---
 

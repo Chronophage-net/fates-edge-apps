@@ -5,6 +5,13 @@ Format loosely follows [Keep a Changelog](https://keepachangelog.com/), versions
 
 ## [4.11.1] - 2026-08-13
 
+Adventure Timer Sync Loop closed end-to-end, one-click Adventure Module install from Settings, and character edits now push to the server live instead of only at connect — see the "Added" section below. Docs across the web-client and socket-server updated to match.
+
+### Added
+- **Adventure Timer Sync Loop**: the server already ticked timers authoritatively and broadcast the result (`timer-ticked`) on every `[scene|campaign]` timer tick, but no client listened for that broadcast — other clients (and the sender, on drift) never saw the canonical result. `core/websocket.js` now handles `timer-ticked` on both transports, and `adventure-manager/index.js`'s new `applyRemoteTimerTick()` reconciles the local timer to match.
+- **Adventure Module Library (Settings)**: a new "Adventure Module Library" panel in Settings lists modules from the local `/data/adventures/` folder with metadata (title, tier, author, description) and installs with one click, reusing `loadAdventureManifest()`/`loadAdventureFromFile()` — no more modal-only browsing or manual JSON placement.
+- **Bidirectional character sync**: local character edits (sheet editor, wizard, roller — anything going through `core/state.js`'s `updateCharacter()`) now push to the server via a new debounced `onCharacterChange` hook, instead of only syncing once at initial connect. Character updates also now include `patron`, previously dropped on the floor before it ever reached the server.
+
 ### Other
 - Updated sync/broadcast looks, module browser, and characters uploading their patron(s) obligation
 - Updated to add funding buttons
