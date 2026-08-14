@@ -254,13 +254,38 @@ function buildGmPanelContent(state) {
             </div>
             <div id="gm-clients-list" style="margin-top: 15px; border-top: 1px solid #444; padding-top: 10px;">
                 <span style="font-weight: bold; color: #8ac49a;">👥 Clients (${state.clients.size}):</span>
-                <div style="margin-top: 5px; max-height: 150px; overflow-y: auto; font-size: 0.9em;">
+                <div style="margin-top: 5px; max-height: 200px; overflow-y: auto; font-size: 0.9em;">
                     ${Array.from(state.clients.values()).map(c => {
                         const name = c.name || c.data?.name || c.id;
                         const role = c.role || 'player';
-                        const isGM = c.id === state.gmId ? '👑 ' : '';
+                        const isRowGM = c.id === state.gmId ? '👑 ' : '';
                         const isSelf = c.id === state.clientId ? ' (you)' : '';
-                        return `<div style="padding: 2px 0;">${isGM}${escapeHtml(name)}${isSelf} — <span style="color: #aaa;">${escapeHtml(role)}</span></div>`;
+                        // NEW: role-change controls (Co-GM / Assistant GM /
+                        // Player / Spectator), same as the Roll20
+                        // integration's `!fates-edge role set` chat command
+                        // and Discord bot's `/vttadmin role` -- only shown
+                        // to the current GM, and never for the GM's own row
+                        // (reassigning the GM seat itself goes through the
+                        // separate Resign/Request GM flow above, not this).
+                        const canAssign = isGM && role !== 'gm';
+                        const roleControl = canAssign ? `
+                            <span style="display: inline-flex; align-items: center; gap: 4px;">
+                                <select class="gm-role-select" data-target="${c.id}" data-current="${escapeHtml(role)}" style="font-size: 0.85em; padding: 1px 3px;">
+                                    <option value="co-gm" ${role === 'co-gm' ? 'selected' : ''}>Co-GM</option>
+                                    <option value="assistant-gm" ${role === 'assistant-gm' ? 'selected' : ''}>Assistant GM</option>
+                                    <option value="player" ${role === 'player' ? 'selected' : ''}>Player</option>
+                                    <option value="spectator" ${role === 'spectator' ? 'selected' : ''}>Spectator</option>
+                                </select>
+                                <label style="font-size: 0.75em; color: #888; cursor: pointer;" title="Persist this grant across reconnects (demotions always persist)">
+                                    <input type="checkbox" class="gm-role-persist" data-target="${c.id}" style="vertical-align: middle;"> save
+                                </label>
+                                <button class="gm-role-apply" data-target="${c.id}" style="
+                                    background: #4a90d9; border: none; color: white;
+                                    padding: 1px 8px; border-radius: 3px; cursor: pointer; font-size: 0.85em;
+                                ">Set</button>
+                            </span>
+                        ` : `<span style="color: #aaa;">${escapeHtml(role)}</span>`;
+                        return `<div style="display: flex; justify-content: space-between; align-items: center; padding: 3px 0;"><span>${isRowGM}${escapeHtml(name)}${isSelf}</span>${roleControl}</div>`;
                     }).join('')}
                 </div>
             </div>
@@ -308,6 +333,26 @@ function attachGmPanelEvents(html) {
             FatesEdgeBridge._updateGmUI(); // triggers hook
             ui.notifications.info(`Rejected request from ${targetId}`);
         }
+    });
+
+    // NEW: role-change "Set" button -- reads the paired <select>/checkbox
+    // for the same data-target and sends role_change_request over the
+    // bridge's live connection (see bridge.js's changeRole()). The server
+    // has final say (GM-only, server-side canManageGmSeat() check); this
+    // button just fires the request and leans on the dialog's own refresh
+    // (triggered by the room's role_update broadcast) to reflect the
+    // result -- no optimistic local state change here.
+    html.find('.gm-role-apply').on('click', function() {
+        const targetId = $(this).data('target');
+        const row = $(this).closest('span');
+        const select = row.find('.gm-role-select');
+        const persistBox = row.find('.gm-role-persist');
+        const role = select.val();
+        const persist = persistBox.is(':checked');
+        if (!targetId || !role) return;
+        const roleLabels = { 'co-gm': 'Co-GM', 'assistant-gm': 'Assistant GM', player: 'Player', spectator: 'Spectator' };
+        FatesEdgeBridge.changeRole(targetId, role, persist);
+        ui.notifications.info(`Requested: role → ${roleLabels[role] || role}${persist ? ' (saved)' : ''}.`);
     });
 }
 

@@ -853,8 +853,8 @@ export const FatesEdgeBridge = {
             target.role = role;
         }
         this._updateGmUI();
-        const roleLabels = { 'co-gm': 'Co-GM', player: 'Player', spectator: 'Spectator' };
-        const persistNote = role === 'co-gm' ? (persist ? ' (saved)' : ' (this session only)') : '';
+        const roleLabels = { 'co-gm': 'Co-GM', 'assistant-gm': 'Assistant GM', player: 'Player', spectator: 'Spectator' };
+        const persistNote = (role === 'co-gm' || role === 'assistant-gm') ? (persist ? ' (saved)' : ' (this session only)') : '';
         ui.notifications.info(`🎭 ${escapeHtml(this.clients.get(targetId)?.name || targetId)} is now ${roleLabels[role] || role}${persistNote}.`);
         Hooks.call('fates-edge-role-update', data);
     },

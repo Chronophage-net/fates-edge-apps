@@ -171,6 +171,66 @@ describe('room.js handleRoleChangeRequest()', () => {
     });
 });
 
+// ─── room.js setClientRole() -- the API-key admin path ──────────────────
+// Same mutation core as handleRoleChangeRequest above (both funnel through
+// _applyRoleChange), but with no sender/canManageGmSeat() check -- this is
+// what POST /api/rooms/:code/clients/:clientId/role calls, trusted by
+// api.js's shared API_KEY `authenticate` middleware alone, matching how
+// room.kickClient()/banClient() are never sender-checked either.
+describe('room.js setClientRole() (API-key admin path)', () => {
+    let r;
+    beforeEach(() => {
+        r = room.createRoom('APIRL' + Math.floor(Math.random() * 1e6).toString(36).toUpperCase().padEnd(3, 'X').slice(0, 5));
+    });
+
+    test('assigns a role with no sender/GM present at all', () => {
+        const bot = makeClient('bot-1', 'player', { name: 'AI_GM' });
+        r.clients.set(bot.id, bot);
+
+        const result = room.setClientRole(r, bot.id, 'assistant-gm', false);
+        assert.equal(result.ok, true);
+        assert.equal(r.clients.get(bot.id).role, 'assistant-gm');
+    });
+
+    test('rejects an unknown target client', () => {
+        const result = room.setClientRole(r, 'nobody-here', 'co-gm', false);
+        assert.equal(result.ok, false);
+        assert.match(result.error, /not found/i);
+    });
+
+    test('rejects an unassignable role, same validation as the socket path', () => {
+        const p = makeClient('p-1', 'player');
+        r.clients.set(p.id, p);
+
+        const result = room.setClientRole(r, p.id, 'gm', false);
+        assert.equal(result.ok, false);
+    });
+
+    test('cannot reassign the GM seat through this path either', () => {
+        const gm = makeClient('gm-1', 'gm');
+        r.clients.set(gm.id, gm);
+
+        const result = room.setClientRole(r, gm.id, 'player', false);
+        assert.equal(result.ok, false);
+    });
+
+    test('demoting a saved assistant-gm grant still always persists', () => {
+        const bot = makeClient('bot-1', 'assistant-gm', { name: 'AI_GM' });
+        r.clients.set(bot.id, bot);
+
+        const result = room.setClientRole(r, bot.id, 'player', false);
+        assert.equal(result.ok, true);
+        assert.equal(result.persist, true);
+    });
+
+    // NOTE: the 'api' vs. client-id distinction in role_update's `byId`
+    // field (see _applyRoleChange in room.js) is exercised at the
+    // broadcastToRoom call site, which room.js invokes internally rather
+    // than through its exports -- not spyable from a plain unit test
+    // without a live socket, so it's left to the api.js route comment/docs
+    // as the contract rather than asserted here.
+});
+
 describe('room.js character claim/release + canEditCharacter()', () => {
     let r;
     beforeEach(() => {

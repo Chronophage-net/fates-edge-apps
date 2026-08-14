@@ -1181,8 +1181,8 @@ function handleRoleUpdate(data) {
     }
     updateGMUI();
     var name = clients[targetId] ? clients[targetId].name : targetId;
-    var roleLabels = { 'co-gm': 'Co-GM', player: 'Player', spectator: 'Spectator' };
-    var persistNote = role === 'co-gm' ? (persist ? ' (saved)' : ' (this session only)') : '';
+    var roleLabels = { 'co-gm': 'Co-GM', 'assistant-gm': 'Assistant GM', player: 'Player', spectator: 'Spectator' };
+    var persistNote = (role === 'co-gm' || role === 'assistant-gm') ? (persist ? ' (saved)' : ' (this session only)') : '';
     sendToChat('🎭 ' + escapeChatText(name) + ' is now ' + (roleLabels[role] || role) + persistNote + '.');
 }
 
@@ -1887,7 +1887,7 @@ function registerCommands() {
                             var roleValue = roleParams[1];
                             var rolePersist = roleParams[2] === 'save';
                             if (!roleTarget || !roleValue) {
-                                sendToChat('Usage: !fates-edge role set <player> <co-gm|player|spectator> [save]');
+                                sendToChat('Usage: !fates-edge role set <player> <co-gm|assistant-gm|player|spectator> [save]');
                                 break;
                             }
                             var rTarget = null;
@@ -1918,7 +1918,7 @@ function registerCommands() {
                             }
                             sendToChat('🎭 **Roles**\n' + roleList);
                         } else {
-                            sendToChat('Role Commands:\n!fates-edge role set <player> <co-gm|player|spectator> [save] - Change a client\'s role (GM only; "save" persists a Co-GM grant across reconnects)\n!fates-edge role list - List all clients with roles');
+                            sendToChat('Role Commands:\n!fates-edge role set <player> <co-gm|assistant-gm|player|spectator> [save] - Change a client\'s role (GM only; "save" persists a Co-GM/Assistant GM grant across reconnects). "assistant-gm" is typically assigned to the AI GM Bot\'s own client.\n!fates-edge role list - List all clients with roles');
                         }
                         break;
 

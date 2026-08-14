@@ -111,6 +111,37 @@ module.exports = {
                         .setRequired(true)
                 )
         )
+        // ── NEW: Role assignment (Co-GM / Assistant GM / Player / Spectator) ──
+        // Uses the bot's own live WS connection (client.vtt.changeRole(),
+        // same underlying room.js path as the web client and Roll20
+        // integration), matching how /vttadmin kick and ban above already
+        // work over the socket rather than the REST API -- see
+        // websocket.js's changeRole() for the wire message this sends.
+        .addSubcommand(sub =>
+            sub.setName('role')
+                .setDescription('Change a player\'s role (Co-GM / Assistant GM / Player / Spectator)')
+                .addStringOption(opt =>
+                    opt.setName('target')
+                        .setDescription('Player name or client ID')
+                        .setRequired(true)
+                )
+                .addStringOption(opt =>
+                    opt.setName('role')
+                        .setDescription('Role to assign')
+                        .setRequired(true)
+                        .addChoices(
+                            { name: 'Co-GM', value: 'co-gm' },
+                            { name: 'Assistant GM (typically the AI GM Bot)', value: 'assistant-gm' },
+                            { name: 'Player', value: 'player' },
+                            { name: 'Spectator', value: 'spectator' }
+                        )
+                )
+                .addBooleanOption(opt =>
+                    opt.setName('save')
+                        .setDescription('Persist the grant across reconnects (default: session-only; demotions always persist)')
+                        .setRequired(false)
+                )
+        )
         // ── NEW: Characters ──
         .addSubcommand(sub =>
             sub.setName('characters')
@@ -263,6 +294,7 @@ module.exports = {
                 case 'kick':        return handleKick(interaction, client);
                 case 'ban':         return handleBan(interaction, client);
                 case 'unban':       return handleUnban(interaction, client);
+                case 'role':        return handleRole(interaction, client);
                 case 'characters':  return handleCharacters(interaction, client);
                 case 'grid':        return handleGrid(interaction, client);
                 case 'token':       return handleToken(interaction, client);
@@ -485,6 +517,34 @@ async function handleUnban(interaction, client) {
     const clientId = interaction.options.getString('client-id');
     client.vtt.send('unban_client', { targetId: clientId });
     await interaction.editReply(`✅ Unbanned \`${clientId}\`.`);
+}
+
+// NEW: role assignment. `changeRole()` (utils/websocket.js) sends
+// role_change_request over the bot's own live connection -- the server
+// rejects it server-side unless THIS bot's own connection currently holds
+// the room's GM seat (see fates-edge-apps' room.js handleRoleChangeRequest
+// / ROLES.md), so there's no separate permission check needed here beyond
+// that. Discord's own /vttadmin permission gate (Administrator-only,
+// see the command's setDefaultMemberPermissions above) is what actually
+// controls who in the Discord server can run this at all.
+async function handleRole(interaction, client) {
+    if (!client.vtt.connected) {
+        return interaction.editReply('❌ Not connected to VTT server.');
+    }
+    const target = interaction.options.getString('target');
+    const role = interaction.options.getString('role');
+    const persist = interaction.options.getBoolean('save') || false;
+    let clientId;
+    try {
+        clientId = await resolveTarget(client, target);
+    } catch (e) {
+        return interaction.editReply(`❌ ${e.message}`);
+    }
+    const roleLabels = { 'co-gm': 'Co-GM', 'assistant-gm': 'Assistant GM', player: 'Player', spectator: 'Spectator' };
+    const label = roleLabels[role] || role;
+    client.vtt.changeRole(clientId, role, persist);
+    const persistNote = (role === 'co-gm' || role === 'assistant-gm') ? (persist ? ' (saved)' : ' (this session only)') : '';
+    await interaction.editReply(`🎭 Requested: \`${clientId}\` → **${label}**${persistNote}. The VTT server has the final say -- watch for a follow-up "server_announcement" in the room if this doesn't seem to take.`);
 }
 
 // ─── NEW: Characters ──────────────────────────────────────

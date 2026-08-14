@@ -3,6 +3,19 @@ All notable changes to this project will be documented here.
 
 Format loosely follows [Keep a Changelog](https://keepachangelog.com/), versions follow [Semantic Versioning](https://semver.org/).
 
+## [4.13.0] - 2026-08-14
+
+Adds a REST equivalent of role assignment (`POST /api/rooms/:code/clients/:clientId/role`), and wires up the actual role-assignment UI/commands that were missing across the ecosystem — previously only the Roll20 integration had a working `!fates-edge role set` command; the Discord bot and Foundry bridge both had the underlying `changeRole()` plumbing already but no command/UI ever called it, and the web client still has no picker at all (unchanged this release).
+
+### Added
+- **`POST /api/rooms/:code/clients/:clientId/role`** (socket-server, `server/api.js`): API-key-admin equivalent of the socket-only `role_change_request` event, for integrations that don't hold a live GM connection (the Discord bot's admin commands are otherwise entirely REST-based). Calls a new `room.setClientRole()`, which shares its mutate/persist/broadcast core (`_applyRoleChange()`) with the existing socket path but has no sender/GM-seat check — the API key itself is the authorization, exactly like the neighboring kick/ban routes. `byId` in the resulting `role_update` broadcast is `'api'` rather than a client id.
+- **Discord bot**: new `/vttadmin role <target> <role> [save]` slash command (Co-GM / Assistant GM / Player / Spectator), using the bot's existing live-socket `changeRole()` method — the same transport `/vttadmin kick`/`ban` already use, not the new REST route.
+- **Foundry bridge**: the GM Management panel's client list now has a role dropdown + persist checkbox + "Set" button on every non-GM row, visible only to the current GM.
+- **Roll20 integration**: `!fates-edge role set`/`role list` usage text now documents `assistant-gm` as an accepted value (the underlying command already forwarded any string to the server unvalidated, so this was a docs-only gap).
+
+### Fixed
+- Role-label maps (`Co-GM`/`Assistant GM`/`Player`/`Spectator`) updated in the Discord bot, Foundry bridge, and Roll20 integration's `role_update` handlers — previously fell through to the raw `'assistant-gm'` string.
+
 ## [4.12.0] - 2026-08-14
 
 Adds `'assistant-gm'` as a fourth assignable room role (alongside GM/Co-GM/Player/Spectator), so a GM can hand the AI GM Bot a middle tier between full narrative control and doing nothing — see the `fates-edge-ai-gm-bot` repo's v4.10.0 changelog for what the bot does with it. This repo's changes are entirely about legalizing and labeling the role; the bot-side behavior lives in that repo.

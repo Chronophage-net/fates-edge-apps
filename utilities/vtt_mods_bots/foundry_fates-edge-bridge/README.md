@@ -111,7 +111,7 @@ Click the **GM** button in the status bar to open the panel. This panel displays
 - **Current GM** name and your role badge (`You are GM` or `Player`).
 - **Request GM** button (if you are a player) or **Resign GM** button (if you are the GM – note: resigning requires approving a pending request or using the `/vtt gm approve` command in Discord).
 - **Pending Requests** list (visible only to the current GM) with **Approve** / **Reject** buttons.
-- **Clients List** showing all connected clients and their roles (e.g., `GM`, `Player`).
+- **Clients List** showing all connected clients and their roles (e.g., `GM`, `Player`). If you're the GM, every non-GM row also has a role dropdown (Co-GM / Assistant GM / Player / Spectator), a "save" checkbox to persist the grant across reconnects, and a **Set** button. "Assistant GM" is typically assigned to the AI GM Bot's own client — see the `fates-edge-ai-gm-bot` repo's README ("Assistant GM Mode") for what changes once it holds that role. The server has final say (GM-only, checked against your own connection), same as everything else in this panel.
 
 ### Sending Actions from Foundry
 

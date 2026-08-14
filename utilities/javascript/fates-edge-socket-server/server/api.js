@@ -607,6 +607,36 @@ function createApiRouter(appConfig) {
         }
     });
 
+    // ─── Role assignment (Co-GM / Assistant GM / Player / Spectator) ───
+    // NEW: the socket-only `role_change_request` event (see room.js's
+    // handleRoleChangeRequest and ROLES.md) required an in-room GM
+    // connection to act as the sender. That left every REST-only
+    // integration (the Discord bot's admin commands are entirely
+    // apiRequest()-based) with no way to promote/demote anyone at all,
+    // even though the Roll20 integration and Foundry bridge already had
+    // (or could easily add) the same capability over their own socket
+    // connections. This route uses room.setClientRole() -- same mutation,
+    // broadcasts, and persist semantics as the socket path, but trusted
+    // by the API key alone (no sender/GM check), exactly like the
+    // kick/ban routes just above never check a sender's role either.
+    router.post('/api/rooms/:code/clients/:clientId/role', authenticate, (req, res) => {
+        try {
+            const r = room.getRoom(req.params.code);
+            const targetId = req.params.clientId;
+            if (!r.clients.has(targetId)) {
+                return res.status(404).json({ error: 'Client not found in room' });
+            }
+            const { role, persist } = req.body || {};
+            const result = room.setClientRole(r, targetId, role, !!persist);
+            if (!result.ok) {
+                return res.status(400).json({ error: result.error });
+            }
+            res.json({ success: true, targetId, role: result.role, persist: result.persist });
+        } catch (err) {
+            res.status(404).json({ error: err.message });
+        }
+    });
+
     // ─── Ban/unban by persistent account (userId), not live client id ──
     // NEW: the routes above ban whoever currently holds a given
     // socket/ws id, which resets the moment that id disconnects. These
@@ -1564,9 +1594,10 @@ function createApiRouter(appConfig) {
                 // v4.8: roles + character registration.
                 roomRoles: {
                     values: "gm | co-gm | assistant-gm | player | spectator. Exactly one 'gm' per room (unchanged); any number of 'co-gm's. Co-GM has every GM permission except transferring/revoking the GM seat, promoting/demoting another Co-GM, or deleting/resetting the room. 'assistant-gm' carries no special server-side permissions beyond 'player' -- it exists so a GM can hand it to the AI GM Bot's own client, which changes its own in-process behavior when it sees itself holding that role (see fates-edge-ai-gm-bot's README).",
-                    change: "Socket event role_change_request { targetId, role: 'co-gm'|'assistant-gm'|'player'|'spectator', persist? } - GM-only. persist:false (default) grants Co-GM/Assistant GM for the current connection only; persist:true saves it to the account's room membership so it survives reconnects. Demotions always save.",
-                    seat: 'The GM seat itself still uses the existing request_gm / approve_gm socket events, not role_change_request.',
-                    broadcast: 'role_update { targetId, role, byId, persist } is broadcast to the room on every change.'
+                    change: "Socket event role_change_request { targetId, role: 'co-gm'|'assistant-gm'|'player'|'spectator', persist? } - GM-only (checked against the sender's own in-room connection). persist:false (default) grants Co-GM/Assistant GM for the current connection only; persist:true saves it to the account's room membership so it survives reconnects. Demotions always save.",
+                    changeViaApi: "POST /api/rooms/:code/clients/:clientId/role { role, persist? } - API-key admin equivalent of role_change_request, for integrations that don't hold a live GM connection (e.g. the Discord bot, which is REST-only for admin actions). Trusted by the API key alone, same as the kick/ban routes above -- there is no GM-seat check here because the API key already implies more authority than any in-room GM.",
+                    seat: 'The GM seat itself still uses the existing request_gm / approve_gm socket events, not role_change_request or the REST route above.',
+                    broadcast: "role_update { targetId, role, byId, persist } is broadcast to the room on every change -- byId is the requesting client's id for the socket path, or the literal string 'api' for the REST path."
                 },
                 characterRegistration: {
                     claim: 'POST /api/rooms/:code/claim-character { characterId } - Bind one of your saved library characters (see accountCharacters above) to this room as your live, controlled character. Replaces any existing claim for you in this room. Requires Bearer token + account support.',

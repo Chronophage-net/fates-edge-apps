@@ -231,6 +231,13 @@ docker-compose --profile discord-bot up
 | `/vttadmin broadcast <message>` | Broadcast message to all VTT clients | `/vttadmin broadcast "Break time!"` |
 | `/vttadmin sync` | Force sync all state | `/vttadmin sync` |
 | `/vttadmin stats` | Show bot statistics | `/vttadmin stats` |
+| `/vttadmin players` | List players currently in the VTT room | `/vttadmin players` |
+| `/vttadmin kick <target> [reason]` | Kick a player from the VTT room | `/vttadmin kick "Levi" "AFK too long"` |
+| `/vttadmin ban <target> [reason]` | Ban a player from the VTT room | `/vttadmin ban "Levi"` |
+| `/vttadmin unban <client-id>` | Unban a client by id | `/vttadmin unban ws-abc123` |
+| `/vttadmin role <target> <role> [save]` | Change a player's role — Co-GM, Assistant GM, Player, or Spectator (server enforces GM-only; `save` persists a Co-GM/Assistant GM grant across reconnects, demotions always persist) | `/vttadmin role "AI_GM" assistant-gm save:True` |
+
+`target` in the commands above accepts either a player's display name or their raw client id (`ws-...`/socket.io id). `role` assigns `assistant-gm` to the AI GM Bot's own client the same way you'd promote a human to Co-GM — see the `fates-edge-ai-gm-bot` repo's README ("Assistant GM Mode" section) for what changes once it holds that role.
 
 ---
 

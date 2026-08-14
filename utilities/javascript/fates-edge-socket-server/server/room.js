@@ -408,14 +408,14 @@ function handleGmApproval(room, approverId, targetId) {
 // fully revoked, not just silenced for the current connection.
 const ASSIGNABLE_ROLES = new Set(['co-gm', 'assistant-gm', 'player', 'spectator']);
 
-function handleRoleChangeRequest(room, senderId, targetId, role, persist = false) {
-    const sender = room.clients.get(senderId);
-    const target = room.clients.get(targetId);
-    if (!sender || !target) return { ok: false, error: 'Client not found' };
-    if (!canManageGmSeat(sender.role)) return { ok: false, error: 'Only the GM can change roles' };
-    if (!ASSIGNABLE_ROLES.has(role)) return { ok: false, error: `Cannot assign role "${role}" this way` };
-    if (target.role === 'gm') return { ok: false, error: 'Use GM handoff to change the GM seat' };
-
+// Shared mutation core for both role-change entry points below: the
+// GM-only socket flow (handleRoleChangeRequest, sender must hold the GM
+// seat on THIS connection) and the system/API-key flow (setClientRole,
+// trusted the same unconditional way api.js's kick/ban routes already
+// trust the API key -- no per-connection sender to check). Both already
+// validated target/role/GM-seat-carve-out before calling this; this
+// function only does the actual mutate-persist-broadcast.
+function _applyRoleChange(room, target, targetId, role, persist, byId) {
     const previousRole = target.role;
     target.role = role;
     room.clients.set(targetId, target);
@@ -429,11 +429,12 @@ function handleRoleChangeRequest(room, senderId, targetId, role, persist = false
 
     const clientsList = getClientsList(room);
     broadcastToRoom(room.code, 'presence', { clients: clientsList });
-    broadcastToRoom(room.code, 'role_update', { targetId, role, byId: senderId, persist: shouldPersist });
+    broadcastToRoom(room.code, 'role_update', { targetId, role, byId, persist: shouldPersist });
 
     const roleLabel = { 'co-gm': 'Co-GM', 'assistant-gm': 'Assistant GM', player: 'Player', spectator: 'Spectator' }[role] || role;
+    const isPromotedRole = role === 'co-gm' || role === 'assistant-gm';
     broadcastToRoom(room.code, 'server_announcement', {
-        message: `🎭 ${target.name} is now a ${roleLabel}${role === 'co-gm' && !shouldPersist ? ' for this session' : ''}.`,
+        message: `🎭 ${target.name} is now a ${roleLabel}${isPromotedRole && !shouldPersist ? ' for this session' : ''}.`,
         timestamp: Date.now()
     });
 
@@ -444,6 +445,35 @@ function handleRoleChangeRequest(room, senderId, targetId, role, persist = false
     send(target, { targetId, role, persist: shouldPersist });
 
     return { ok: true, role, persist: shouldPersist };
+}
+
+function handleRoleChangeRequest(room, senderId, targetId, role, persist = false) {
+    const sender = room.clients.get(senderId);
+    const target = room.clients.get(targetId);
+    if (!sender || !target) return { ok: false, error: 'Client not found' };
+    if (!canManageGmSeat(sender.role)) return { ok: false, error: 'Only the GM can change roles' };
+    if (!ASSIGNABLE_ROLES.has(role)) return { ok: false, error: `Cannot assign role "${role}" this way` };
+    if (target.role === 'gm') return { ok: false, error: 'Use GM handoff to change the GM seat' };
+
+    return _applyRoleChange(room, target, targetId, role, persist, senderId);
+}
+
+// System/API-key entry point -- same mutation as handleRoleChangeRequest
+// above, but for callers that aren't a connected client at all (the REST
+// API, gated by api.js's shared API_KEY `authenticate` middleware). No
+// canManageGmSeat() sender check here, deliberately: the API key itself IS
+// the authorization, exactly like api.js's existing kick/ban routes
+// (room.kickClient/banClient) never check a sender's role either -- an
+// admin with the API key already has strictly more authority than any
+// in-room GM. `byId` in the broadcast is 'api' rather than a client id, so
+// clients can tell a role change came from outside the room.
+function setClientRole(room, targetId, role, persist = false) {
+    const target = room.clients.get(targetId);
+    if (!target) return { ok: false, error: 'Client not found' };
+    if (!ASSIGNABLE_ROLES.has(role)) return { ok: false, error: `Cannot assign role "${role}" this way` };
+    if (target.role === 'gm') return { ok: false, error: 'Use GM handoff to change the GM seat' };
+
+    return _applyRoleChange(room, target, targetId, role, persist, 'api');
 }
 
 // ---------- v4.8: Character Registration (claim/release) ----------
@@ -651,6 +681,8 @@ module.exports = {
     handleGmRequest,
     handleGmApproval,
     handleRoleChangeRequest,
+    setClientRole,
+    ASSIGNABLE_ROLES,
     claimCharacter,
     releaseCharacter,
     canEditCharacter,
