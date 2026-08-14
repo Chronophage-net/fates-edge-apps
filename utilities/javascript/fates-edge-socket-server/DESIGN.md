@@ -86,7 +86,7 @@ There is no `maxClients`, `owner`, or `settings` field on the real room object �
 - **API key** — `X-API-Key` header or `?apiKey` query param, required on most `/api/*` routes (`authenticate` middleware in `api.js`). Auto-generated and logged once at startup if `API_KEY` isn't set (see `server/config.js`).
 - **JWT accounts** — `server/auth.js` issues a JWT on register/login; `auth.requireAuth` gates account-specific routes (`/api/account/characters`, claim-character, `/api/auth/me`). No server-side session store — the token itself is the session.
 - **Room roles** — `gm` / `co-gm` / `player` / `spectator`, promoted out to their own document: **[ROLES.md](ROLES.md)**.
-- **Rate limiting** — a small hand-rolled in-memory fixed-window limiter (`server/security.js`'s `createRateLimiter`), applied only to `/api/auth/login` and `/api/auth/register` to slow credential stuffing. There is no general per-request/per-IP API rate limiting middleware, no Helmet.js security headers, and no CSP/HSTS configuration in this codebase, despite an earlier draft describing all three as implemented.
+- **Rate limiting** — a small hand-rolled in-memory fixed-window limiter (`server/security.js`'s `createRateLimiter`, no `express-rate-limit` dependency), applied three ways: (1) tight per-route limiters on `/api/auth/login` and `/api/auth/register` to slow credential stuffing, (2) a broad, generous general limiter (`router.use(...)` in `api.js`, right after the health-check routes so uptime probes are never throttled) covering every other `/api/*` route, and (3) a per-CONNECTION message-rate gate on both WebSocket transports (`security.js`'s `createConnectionMessageLimiter`, wired via `socket.use()` for Socket.IO and inline in the message switch for plain-ws) to stop a single already-connected client from flooding the server. All three are configurable (`API_RATE_LIMIT_WINDOW_MS`/`API_RATE_LIMIT_MAX`, `WS_MESSAGE_RATE_WINDOW_MS`/`WS_MESSAGE_RATE_MAX`) and independently disable-able by setting their `_MAX` to `0`. There is still no Helmet.js security headers or CSP/HSTS configuration in this codebase, despite an earlier draft describing them as implemented.
 
 ## 6. Configuration Reference
 
@@ -106,6 +106,10 @@ The real, currently-read environment variables. See [INSTALL.md](INSTALL.md) for
 | `HEALTH_ENDPOINT` | Extra health-check path (`/healthz`/`/api/healthz` always exist too) | `/api/health` |
 | `STATS_INTERVAL` | Server stats log interval (ms) | `30000` |
 | `TURN_SECRET` / `TURN_REALM` / `TURN_URLS` / `TURN_CREDENTIAL_TTL` | coturn credential minting (voice chat NAT traversal) — see `server/turn.js` | unset = endpoint returns 404 |
+| `API_RATE_LIMIT_WINDOW_MS` / `API_RATE_LIMIT_MAX` | General per-IP REST API rate limit (§5) | `60000` / `300` (`_MAX=0` disables) |
+| `WS_MESSAGE_RATE_WINDOW_MS` / `WS_MESSAGE_RATE_MAX` | Per-connection WebSocket message rate limit (§5) | `10000` / `120` (`_MAX=0` disables) |
+| `MAX_CLIENTS_PER_ROOM` | Reject new joins once a room holds this many clients | `0` = unlimited |
+| `CLUSTER_WORKERS` | Fork this many worker processes (or `auto` = one per CPU core) — see [SCALING.md](SCALING.md) | `0` = single process |
 | `REDIS_URL` | Optional multi-instance scaling — see [SCALING.md](SCALING.md) | unset = disabled |
 
 **Not real** (described in an earlier draft, not read anywhere in `server/*.js`): `SESSION_SECRET`, `ENABLE_UPLOAD`, `ENABLE_CACHING`, `ENABLE_SESSIONS`, `ENABLE_EMAIL`, `ENABLE_SCHEDULING`, `AUTO_CREATE_ROOMS`, `RATE_LIMIT_WINDOW`/`RATE_LIMIT_MAX`, `SALT_ROUNDS`, `MAX_CONCURRENT_CONVERSIONS`, `UPLOAD_FILE_SIZE_LIMIT`, `BLOCKED_WORDS`.

@@ -10,7 +10,7 @@ const path = require('path');
 const room = require('./room.js');
 const deck = require('./deck.js');
 const logger = require('./logger.js').createLogger(process.env.LOG_LEVEL || 'INFO');
-const { buildSafeDict, clampCount, isSafeModuleId, clampString, MAX_NAME_LENGTH, sanitizeCharacterSelection, isGmLike } = require('./security.js');
+const { buildSafeDict, clampCount, isSafeModuleId, clampString, MAX_NAME_LENGTH, sanitizeCharacterSelection, isGmLike, createConnectionMessageLimiter } = require('./security.js');
 const adventure = require('./adventure.js');
 const auth = require('./auth.js');
 const turn = require('./turn.js');
@@ -33,6 +33,15 @@ let wssConfig = {};
 
 function setupWSS(wss, appConfig) {
     wssConfig = appConfig || {};
+
+    // See socketio-handlers.js's identical note. One stateless limiter
+    // factory shared across all connections; each connection gets its own
+    // state object (ws._rateLimitState below), so connections never share
+    // or contend over a counter.
+    const checkMessageRate = wssConfig.wsMessageRateMax > 0
+        ? createConnectionMessageLimiter({ windowMs: wssConfig.wsMessageRateWindowMs, max: wssConfig.wsMessageRateMax })
+        : null;
+
     wss.on('connection', (ws, req) => {
         const url = new URL(req.url, `http://${req.headers.host}`);
         let roomCode = url.searchParams.get('room');
@@ -66,20 +75,37 @@ function setupWSS(wss, appConfig) {
             return;
         }
 
+        // NEW: per-room client cap (MAX_CLIENTS_PER_ROOM, 0/unset =
+        // unlimited, unchanged default behavior) -- see config.js and
+        // socketio-handlers.js's identical check on the Socket.IO side.
+        // This transport joins the room at connection time (no separate
+        // join-room message), so this is the only place to check it.
+        if (wssConfig.maxClientsPerRoom > 0 && currentRoom.clients.size >= wssConfig.maxClientsPerRoom) {
+            logger.warn('🚫 Rejected connection: room full', { room: roomKey, cap: wssConfig.maxClientsPerRoom });
+            ws.send(JSON.stringify({ type: 'error', message: 'This room is full.', code: 'ROOM_FULL' }));
+            ws.close(4003, 'Room full');
+            return;
+        }
+
         ws.clientId = clientId;
         ws.room = roomKey;
-        ws.clientData = { 
-            id: clientId, 
-            name: 'Player', 
-            role: 'player', 
+        ws.clientData = {
+            id: clientId,
+            name: 'Player',
+            role: 'player',
             email: '',
             selectedCharacter: '',  // 👈 NEW
-            type: 'ws', 
-            ws 
+            type: 'ws',
+            ws
         };
         currentRoom.clients.set(clientId, ws.clientData);
         socketStats.wsConnections++;
         socketStats.totalConnections++;
+
+        // Per-connection message-rate state (see checkMessageRate above) --
+        // hung directly off this connection's ws object so it's garbage-
+        // collected with it, same lifetime as ws.clientData.
+        const rateLimitState = {};
 
         // ─── Heartbeat (ping/pong) ──────────────────────────────────
         let pingInterval = null;
@@ -133,6 +159,21 @@ function setupWSS(wss, appConfig) {
         // ─── Message handler ──────────────────────────────────────────
         ws.on('message', (message) => {
             try {
+                // NEW: rate-limit gate, checked before dispatching to any
+                // case below -- covers all ~50 message types through this
+                // one switch statement. Matches socketio-handlers.js's
+                // socket.use() gate in spirit (drop the message, don't
+                // disconnect the client) but implemented inline here since
+                // this transport has no equivalent inbound-middleware hook.
+                if (checkMessageRate && !checkMessageRate(rateLimitState)) {
+                    ws.send(JSON.stringify({
+                        type: 'error',
+                        message: 'You are sending messages too quickly. Please slow down.',
+                        code: 'RATE_LIMITED'
+                    }));
+                    return;
+                }
+
                 const data = JSON.parse(message);
                 const messageType = data.type || 'unknown';
                 const currentRoom = room.rooms.get(roomKey);

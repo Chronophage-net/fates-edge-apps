@@ -134,6 +134,29 @@ function createApiRouter(appConfig) {
         });
     });
 
+    // ─── General API rate limiting ─────────────────────────────────────
+    // NEW: previously only /api/auth/login and /api/auth/register were
+    // rate-limited (see below); the rest of the API had no per-IP request
+    // cap at all (see ROADMAP.md's former "General API rate limiting" item
+    // and DESIGN.md §5). This is deliberately placed AFTER the health-check
+    // routes above (so uptime monitors / load balancer health probes are
+    // never throttled -- they've already been handled and responded to by
+    // the time a request would reach this middleware) and BEFORE every
+    // other route (so everything else, including TURN credentials and the
+    // room list below, is covered). It stacks with -- doesn't replace --
+    // the tighter auth-specific limiters further down: this one is a
+    // broad, generous ceiling meant to blunt scripted abuse, not to get in
+    // the way of normal interactive use. Set API_RATE_LIMIT_MAX=0 to
+    // disable it entirely (e.g. if a deployment already rate-limits at a
+    // reverse proxy/CDN layer and doesn't want it done twice).
+    if (config.apiRateLimitMax > 0) {
+        router.use(createRateLimiter({
+            windowMs: config.apiRateLimitWindowMs,
+            max: config.apiRateLimitMax,
+            message: 'Too many requests. Please slow down.'
+        }));
+    }
+
     // ─── TURN credentials ─────────────────────────────────────────────
     // Deliberately NOT behind `authenticate` (the admin API key). Any
     // player's browser needs this to establish voice chat, same trust

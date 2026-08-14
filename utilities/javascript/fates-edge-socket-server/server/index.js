@@ -20,6 +20,28 @@ const api = require('./api.js');
 const wsHandlers = require('./ws-handlers.js');
 const ioHandlers = require('./socketio-handlers.js');
 const scaling = require('./scaling.js');
+const clusterMod = require('./cluster.js');
+
+// ---------- Optional Node `cluster`-based multi-core scaling ----------
+// No-op unless CLUSTER_WORKERS is set; see server/cluster.js and
+// SCALING.md's "Multi-core scaling (single machine)" section. When
+// active, the PRIMARY process's entire job is routing (sticky sessions +
+// forking/respawning workers) -- it never builds the Express app,
+// Socket.IO server, or plain-ws server below at all; only the workers do.
+// A bare `return` here is safe -- CommonJS modules are wrapped in a
+// function, so a top-level return just stops this module's execution
+// without touching whatever `require('./index.js')` from server-start.js
+// does with the (empty, in this branch) module.exports.
+if (clusterMod.shouldUseCluster(config) && require('cluster').isPrimary) {
+    const startedAsPrimary = clusterMod.runPrimary(config, logger);
+    if (startedAsPrimary) {
+        module.exports = {};
+        return;
+    }
+    // else: optional clustering dependencies weren't installed (already
+    // logged by runPrimary) -- fall through and run as an ordinary
+    // single process below instead of leaving the deployment dark.
+}
 
 // ---------- Express ----------
 const app = express();
@@ -54,10 +76,27 @@ const io = socketIo(server, {
 room.setIo(io);                // enable room.broadcastToRoom for Socket.io
 ioHandlers.setupSocketIO(io, config);
 
+// ---------- Optional Node `cluster` worker wiring ----------
+// No-op unless this process is actually a cluster worker (see above --
+// only true when CLUSTER_WORKERS was set and the optional dependencies
+// resolved). Must run BEFORE scaling.initScaling() below so that when
+// BOTH REDIS_URL and CLUSTER_WORKERS are configured, Redis's adapter
+// (attached next) is the one that ends up wired to `io` -- it's a
+// superset of the cluster adapter's job (works across every configured
+// instance, not just this machine's workers).
+clusterMod.attachWorkerAdapter(io, config, logger);
+
 // ---------- Optional Redis-backed horizontal scaling ----------
 // No-op unless REDIS_URL is set; see server/scaling.js and SCALING.md.
 const scalingApi = scaling.initScaling(io, config, logger, room.deliverToLocalWsClients);
-room.setScaling(scalingApi);
+// Redis, if configured, takes priority for the plain-ws relay too (see
+// cluster.js's initClusterWsRelay doc) -- it already covers every
+// worker on this machine, so there's nothing left for the cluster IPC
+// relay to do.
+const effectiveScalingApi = scalingApi.enabled
+    ? scalingApi
+    : clusterMod.initClusterWsRelay(config, logger, room.deliverToLocalWsClients);
+room.setScaling(effectiveScalingApi);
 
 // ---------- Plain WebSocket ----------
 const wss = new WebSocket.Server({ server, path: '/' });
@@ -76,7 +115,7 @@ function gracefulShutdown(signal) {
     logger.info(`🛑 Received ${signal}. Shutting down...`);
     console.log(`\n🛑 Shutting down Fate's Edge server...`);
 
-    if (scalingApi && scalingApi.close) scalingApi.close();
+    if (effectiveScalingApi && effectiveScalingApi.close) effectiveScalingApi.close();
 
     server.close((err) => {
         if (err) {
@@ -104,6 +143,16 @@ process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
 process.on('SIGINT', () => gracefulShutdown('SIGINT'));
 
 // ---------- Start server with port retry ----------
+// NEW: a cluster WORKER must never call server.listen() -- it never binds
+// the real port at all. @socket.io/sticky's setupWorker() (already wired
+// above via clusterMod.attachWorkerAdapter) injects connections routed
+// from the primary directly into `server`'s 'connection' event instead;
+// an actual listen() here would just fight the primary for the same port
+// (confirmed with a real two-worker smoke test during development -- see
+// SCALING.md). require('cluster').isWorker is automatically true in a
+// forked worker process with zero extra wiring needed.
+const isClusterWorker = require('cluster').isWorker;
+
 const MAX_PORT_RETRIES = 5;
 let currentPort = config.port;
 
@@ -146,7 +195,12 @@ function startServer(port, retriesLeft) {
     });
 }
 
-startServer(currentPort, MAX_PORT_RETRIES);
+if (isClusterWorker) {
+    logger.info('🧵 Cluster worker ready -- routed via primary, not listening directly', { pid: process.pid });
+    console.log(`🧵 Cluster worker ${process.pid} ready (routed via primary process, port ${config.port})`);
+} else {
+    startServer(currentPort, MAX_PORT_RETRIES);
+}
 
 // ---------- Stats logging ----------
 setInterval(() => {

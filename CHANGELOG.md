@@ -3,6 +3,22 @@ All notable changes to this project will be documented here.
 
 Format loosely follows [Keep a Changelog](https://keepachangelog.com/), versions follow [Semantic Versioning](https://semver.org/).
 
+## [4.14.0] - 2026-08-14
+
+Addresses three abuse-hardening/scaling gaps flagged from a review of the socket-server's `DESIGN.md`: no general API rate limiting, no way to use more than one CPU core on a single machine, and no cap on how many clients a single room can hold.
+
+### Added
+- **General API rate limiting** (`fates-edge-socket-server`): a broad, generous per-IP limiter (`API_RATE_LIMIT_WINDOW_MS`/`API_RATE_LIMIT_MAX`, default 300 req/min) now covers the whole REST API, not just `/api/auth/login`/`/api/auth/register` — mounted via `router.use(...)` right after the health-check routes so uptime probes/load-balancer health checks are never throttled. Reuses the existing hand-rolled `security.js` limiter (no new dependency) rather than adding `express-rate-limit`.
+- **Per-connection WebSocket message rate limiting**: a second limiter (`WS_MESSAGE_RATE_WINDOW_MS`/`WS_MESSAGE_RATE_MAX`, default 120 msgs/10s) caps inbound messages/events per CONNECTION on both transports — `socket.use()` inbound middleware for Socket.IO (covers all ~40 event types through one gate), an inline check before the message switch for plain-ws. A rate-limited message is dropped with a warning, not a disconnect. Both new limiters can be disabled independently by setting their `_MAX` to `0`.
+- **Per-room client cap** (`MAX_CLIENTS_PER_ROOM`, default `0` = unlimited): rejects new joins once a room already holds this many clients, checked at join time on both transports.
+- **Node `cluster`-based multi-core scaling** (`CLUSTER_WORKERS`, integer > 1 or `auto` for one worker per CPU core): a simpler alternative to `REDIS_URL`-based horizontal scaling for the specific case of using more of one machine's CPU cores, with no external dependency. Uses the official `@socket.io/sticky` (session-affine routing — required, since Socket.IO's polling transport makes multiple sequential requests per connection that must all land on the same worker) and `@socket.io/cluster-adapter` (cross-worker Socket.IO broadcast relay), plus a small custom cluster-IPC relay for plain-ws clients mirroring `scaling.js`'s Redis pub/sub relay in shape. Combines with `REDIS_URL` (Redis takes priority for both adapters when both are configured — it's a superset, covering every worker on top of every machine). **Verified with a real two-worker smoke test during development**: two Socket.IO clients confirmed landing on different worker PIDs via least-connection balancing, with a broadcast from one reaching the other through the cluster adapter, plus a live HTTP round-trip (health check + REST API call) through the primary → worker routing path.
+
+### Docs
+- `fates-edge-socket-server/DESIGN.md` §5 and its config table updated for all three new features; `SCALING.md` restructured into "Multi-core scaling (single machine)" and "Horizontal scaling (multiple machines, Redis)" sections; `ROADMAP.md`'s "General API rate limiting" open item closed out; `env-example.md` documents the new variables.
+
+### Tests
+- New `tests/security.test.js` (unit coverage for both rate limiters — previously untested even for the pre-existing login/register limiter), `tests/cluster.test.js` (config-gating + graceful-fallback, mirroring `scaling.test.js`'s pattern), and `tests/room-cap-and-rate-limit-wiring.test.js` (source-level guards confirming both transports actually wire the new checks in, matching the existing `get-clients.test.js` precedent for this style of coverage). Full socket-server suite: 114/114 passing.
+
 ## [4.13.1] - 2026-08-14
 
 Closes the last gap from 4.13.0: the web client now has its own in-app role picker, so a GM doesn't have to leave the browser and reach for Discord/Foundry/Roll20 to promote or demote a party member.

@@ -1,6 +1,6 @@
 [![Build Apps and Packages](https://github.com/Chronophage-net/fates-edge-apps/actions/workflows/build-apps-and-packages.yml/badge.svg)](https://github.com/Chronophage-net/fates-edge-apps/actions/workflows/build-apps-and-packages.yml)
 
-# Fate's Edge Toolkit v4.13.1 – Complete VTT Ecosystem
+# Fate's Edge Toolkit v4.14.0 – Complete VTT Ecosystem
 
 > A modular, self-contained toolkit for running Fate's Edge TTRPG campaigns, with real‑time collaboration, VTT integrations, Game Master management, and a full in-browser magic/monastic-path system.
 
@@ -10,14 +10,14 @@
 [![Node.js](https://img.shields.io/badge/Node.js-24.x-green.svg)](https://nodejs.org/)
 [![Foundry VTT](https://img.shields.io/badge/Foundry-VTT-orange)](https://foundryvtt.com/)
 [![Discord](https://img.shields.io/badge/Discord-Bot-5865F2)](https://discord.com/)
-[![Version](https://img.shields.io/badge/version-4.13.1-blue)](https://github.com/Chronophage-net/fates-edge-apps)
+[![Version](https://img.shields.io/badge/version-4.14.0-blue)](https://github.com/Chronophage-net/fates-edge-apps)
 
 ---
 
 ## 📖 Table of Contents
 
 - [Overview](#-overview)
-- [What's New in v4.13.1](#-whats-new-in-v4131)
+- [What's New in v4.14.0](#-whats-new-in-v4140)
 - [Features](#-features)
 - [Quick Start](#-quick-start)
 - [Architecture](#-architecture)
@@ -39,6 +39,13 @@
 The toolkit includes **real‑time VTT features** via a WebSocket/Socket.io server, a **campaign sharing server** with GM election and shared Deck of Consequences draws, **integrations** for Foundry VTT, Discord, Roll20, and Avrae, and a growing set of **standalone in-browser mini-tools** (including an original strategy board game, Kon'reh).
 
 ---
+
+## 🆕 What's New in v4.14.0
+
+- **🛡️ Abuse-hardening & scaling pass on the socket server**, addressing three gaps flagged from a review of `DESIGN.md`:
+  - **General API rate limiting** — a broad per-IP limiter now covers the whole REST API (previously only login/register were rate-limited), plus a new per-CONNECTION WebSocket message-rate limiter on both transports. Both configurable, both independently disable-able, no new dependency (extends the existing hand-rolled limiter rather than adding `express-rate-limit`).
+  - **Per-room client cap** (`MAX_CLIENTS_PER_ROOM`) — rejects new joins once a room already holds a configured number of clients. Off (unlimited) by default.
+  - **Node `cluster`-based multi-core scaling** (`CLUSTER_WORKERS`) — a simpler alternative to Redis-based horizontal scaling for using more of one machine's CPU cores, with no external dependency. Uses the official `@socket.io/sticky` + `@socket.io/cluster-adapter` packages and combines with the existing `REDIS_URL` scaling for multi-machine deployments. See `fates-edge-socket-server/SCALING.md`'s new "Multi-core scaling" section — verified with a real two-worker smoke test during development, not just pattern-matched from documentation.
 
 ## 🆕 What's New in v4.13.1
 
@@ -510,7 +517,14 @@ privately rather than filing a public issue.
 
 ## 📋 Version History
 
-### v4.13.1 (Current)
+### v4.14.0 (Current)
+- **Added** General per-IP API rate limiting across the whole REST API (`API_RATE_LIMIT_WINDOW_MS`/`API_RATE_LIMIT_MAX`), previously only on login/register
+- **Added** Per-connection WebSocket message rate limiting on both transports (`WS_MESSAGE_RATE_WINDOW_MS`/`WS_MESSAGE_RATE_MAX`)
+- **Added** Per-room client cap (`MAX_CLIENTS_PER_ROOM`, default unlimited)
+- **Added** Node `cluster`-based multi-core scaling (`CLUSTER_WORKERS`), combinable with `REDIS_URL`
+- **Docs** `DESIGN.md`/`SCALING.md`/`ROADMAP.md`/`env-example.md` updated for all three; `tests/security.test.js`/`tests/cluster.test.js`/`tests/room-cap-and-rate-limit-wiring.test.js` added
+
+### v4.13.1
 - **Added** Web client role picker — the "Party Members" presence list now has an in-app role `<select>` + persist checkbox + "Set" button, GM-only, gated on the viewer's live presence role
 - **Docs** `ROLES.md`'s code-location table updated
 

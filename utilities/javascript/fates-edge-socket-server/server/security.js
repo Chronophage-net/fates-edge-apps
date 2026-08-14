@@ -197,6 +197,36 @@ function createRateLimiter({ windowMs = 15 * 60 * 1000, max = 10, message = 'Too
     return middleware;
 }
 
+/**
+ * Minimal per-CONNECTION fixed-window message-rate limiter, for the two
+ * WebSocket transports (plain-ws and Socket.IO). Unlike createRateLimiter()
+ * above (which is keyed by IP and shared across a whole route), this one
+ * is keyed by nothing at all -- the caller supplies a small state object
+ * scoped to a single live connection (e.g. `ws.clientData._rl` or a
+ * per-socket object set in the 'connection' handler) and this just reads/
+ * mutates it. That means there's no Map to grow unbounded or sweep: the
+ * state object is naturally garbage-collected the moment the connection
+ * closes, same lifetime as everything else already hung off that object.
+ *
+ * Guards against a single connection flooding the server with messages
+ * (deck draws, chat, whiteboard updates, etc.) -- a different threat than
+ * the HTTP API's per-IP limiter above, since a single already-connected
+ * socket can fire many messages per second with no new TCP/HTTP request
+ * for each one.
+ */
+function createConnectionMessageLimiter({ windowMs = 10 * 1000, max = 120 } = {}) {
+    return function checkMessageRate(state) {
+        if (!state) return true; // defensive -- caller forgot to pass state, don't break the connection over it
+        const now = Date.now();
+        if (!state.resetAt || state.resetAt <= now) {
+            state.count = 0;
+            state.resetAt = now + windowMs;
+        }
+        state.count += 1;
+        return state.count <= max;
+    };
+}
+
 // ─── v4.8: roles ────────────────────────────────────────────────────
 // A room has exactly one 'gm' (unchanged invariant) plus zero or more
 // 'co-gm's. Co-GM has every GM permission EXCEPT seat management: it
@@ -238,6 +268,7 @@ module.exports = {
     sanitizeRegionName,
     clampCount,
     createRateLimiter,
+    createConnectionMessageLimiter,
     MAX_NAME_LENGTH,
     MAX_TEXT_LENGTH,
     isValidLength,

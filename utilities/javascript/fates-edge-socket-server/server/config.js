@@ -18,6 +18,59 @@ function loadConfig() {
         statsInterval: parseInt(process.env.STATS_INTERVAL, 10) || 30000,
         apiKey: process.env.API_KEY || null,
 
+        // ─── General API rate limiting ──────────────────────────────
+        // Separate from (and stacked on top of) the tighter, route-specific
+        // limiters already applied to /api/auth/login and /api/auth/register
+        // (see api.js). This one is a broad, generous per-IP cap applied to
+        // the REST API as a whole -- meant to blunt scripted abuse/scraping,
+        // not to constrain normal interactive use (a GM's client alone can
+        // easily fire a dozen requests in a burst while loading a room).
+        // Set API_RATE_LIMIT_MAX=0 to disable it entirely.
+        apiRateLimitWindowMs: parseInt(process.env.API_RATE_LIMIT_WINDOW_MS, 10) || 60 * 1000,
+        apiRateLimitMax: process.env.API_RATE_LIMIT_MAX !== undefined
+            ? parseInt(process.env.API_RATE_LIMIT_MAX, 10)
+            : 300,
+
+        // ─── WebSocket message rate limiting ────────────────────────
+        // Per-CONNECTION (not per-IP) cap on inbound messages/events across
+        // both transports (plain-ws and Socket.IO) -- see security.js's
+        // createConnectionMessageLimiter(). Guards against a single
+        // connection flooding the server (deck draws, chat, whiteboard
+        // updates, etc.) after it's already past the HTTP-level limiter
+        // above, which only covers the initial handshake request.
+        // Set WS_MESSAGE_RATE_MAX=0 to disable it entirely.
+        wsMessageRateWindowMs: parseInt(process.env.WS_MESSAGE_RATE_WINDOW_MS, 10) || 10 * 1000,
+        wsMessageRateMax: process.env.WS_MESSAGE_RATE_MAX !== undefined
+            ? parseInt(process.env.WS_MESSAGE_RATE_MAX, 10)
+            : 120,
+
+        // ─── Per-room client cap ─────────────────────────────────────
+        // 0 (default) = unlimited, unchanged behavior. A very large public
+        // room is a niche case, but an unbounded one is also an easy denial-
+        // of-service vector (one room accepting connections forever, each
+        // one cheap individually but unbounded in aggregate). Applies at
+        // join time on both transports; existing clients already in a room
+        // are never evicted if this is lowered at runtime.
+        maxClientsPerRoom: parseInt(process.env.MAX_CLIENTS_PER_ROOM, 10) || 0,
+
+        // ─── Optional Node `cluster`-based multi-core scaling ────────
+        // Unset/1 by default -- this server runs as a single process, same
+        // as always. Set CLUSTER_WORKERS to an integer > 1 (or "auto" to
+        // use one worker per CPU core) to fork multiple worker processes
+        // sharing one listening port, using @socket.io/sticky for session-
+        // affine routing and @socket.io/cluster-adapter for cross-worker
+        // Socket.IO broadcast. See server/cluster.js and SCALING.md's
+        // "Multi-core scaling (single machine)" section -- this is a
+        // DIFFERENT axis of scaling than REDIS_URL above (more CPU cores on
+        // ONE machine, vs. more machines); the two can be combined.
+        clusterWorkers: (() => {
+            const raw = (process.env.CLUSTER_WORKERS || '').trim();
+            if (!raw) return 0;
+            if (raw.toLowerCase() === 'auto') return require('os').cpus().length;
+            const n = parseInt(raw, 10);
+            return Number.isFinite(n) && n > 0 ? n : 0;
+        })(),
+
         // ─── Optional Redis-backed horizontal scaling ──────────────
         // Unset by default -- this server runs as a single in-memory
         // instance with no external dependency. Set REDIS_URL to run

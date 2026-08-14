@@ -8,7 +8,7 @@ const deck = require('./deck.js');
 const logger = require('./logger.js').createLogger(process.env.LOG_LEVEL || 'INFO');
 const fs = require('fs');
 const path = require('path');
-const { buildSafeDict, isSafeModuleId, clampCount, clampString, MAX_NAME_LENGTH, sanitizeCharacterSelection, isGmLike } = require('./security.js');
+const { buildSafeDict, isSafeModuleId, clampCount, clampString, MAX_NAME_LENGTH, sanitizeCharacterSelection, isGmLike, createConnectionMessageLimiter } = require('./security.js');
 const adventure = require('./adventure.js');
 const auth = require('./auth.js');
 const turn = require('./turn.js');
@@ -25,6 +25,18 @@ let ioConfig = {};
 
 function setupSocketIO(io, appConfig) {
     ioConfig = appConfig || {};
+
+    // ─── Per-connection message rate limiting ──────────────────────────
+    // NEW: see security.js's createConnectionMessageLimiter() and
+    // config.js's WS_MESSAGE_RATE_WINDOW_MS/WS_MESSAGE_RATE_MAX. One
+    // limiter FACTORY shared across all connections (it's stateless --
+    // just closes over the configured window/max); each connection gets
+    // its own state object below, so connections never share or contend
+    // over a counter. Set WS_MESSAGE_RATE_MAX=0 to disable.
+    const checkMessageRate = ioConfig.wsMessageRateMax > 0
+        ? createConnectionMessageLimiter({ windowMs: ioConfig.wsMessageRateWindowMs, max: ioConfig.wsMessageRateMax })
+        : null;
+
     io.on('connection', (socket) => {
         socketStats.socketIOConnections++;
         socketStats.totalConnections++;
@@ -39,6 +51,36 @@ function setupSocketIO(io, appConfig) {
             type: 'socket.io',
             socket: socket
         };
+
+        // ─── Rate-limit gate ────────────────────────────────────────────
+        // socket.use() is inbound middleware: it runs for EVERY event this
+        // socket receives, before whichever socket.on(...) handler below
+        // would otherwise fire, so this single gate covers all ~40 event
+        // types without touching each handler individually. Calling
+        // next(err) (rather than next()) makes Socket.IO skip dispatching
+        // to the matching handler and instead emit a local 'error' event
+        // on this socket -- it does NOT disconnect the client, matching
+        // the HTTP API's 429-without-connection-drop behavior, so a
+        // legitimate client that briefly bursts past the cap just has
+        // that one message dropped, not its whole session.
+        if (checkMessageRate) {
+            const rateState = {};
+            socket.use((packet, next) => {
+                if (!checkMessageRate(rateState)) {
+                    return next(new Error('rate_limited'));
+                }
+                next();
+            });
+            socket.on('error', (err) => {
+                if (err && err.message === 'rate_limited') {
+                    socket.emit('server_announcement', {
+                        message: 'You are sending messages too quickly. Please slow down.',
+                        level: 'warning',
+                        timestamp: Date.now()
+                    });
+                }
+            });
+        }
 
         // ─── Join Room ──────────────────────────────────────────────
         // NEW: `authToken` is optional -- a client with no account (or an
@@ -122,6 +164,21 @@ function setupSocketIO(io, appConfig) {
             // Ban check (ephemeral, by socket id -- unaffected by accounts)
             if (room.isBanned(currentRoom, socket.id)) {
                 socket.emit('error', { message: 'You are banned from this room.' });
+                socket.disconnect(true);
+                return;
+            }
+
+            // NEW: per-room client cap (MAX_CLIENTS_PER_ROOM, 0/unset =
+            // unlimited, unchanged default behavior). Checked before the
+            // password check below so a full room rejects immediately
+            // rather than doing a bcrypt compare first. This client's OWN
+            // previous connection (if any, handled by the "leave previous
+            // room" block above) has already been removed from whichever
+            // room it was in, so a client re-joining the SAME room via a
+            // fresh reconnect isn't double-counted against a stale entry
+            // from itself -- only genuinely distinct connections count.
+            if (ioConfig.maxClientsPerRoom > 0 && currentRoom.clients.size >= ioConfig.maxClientsPerRoom) {
+                socket.emit('error', { message: 'This room is full.', code: 'ROOM_FULL' });
                 socket.disconnect(true);
                 return;
             }

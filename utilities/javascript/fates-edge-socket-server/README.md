@@ -1,4 +1,4 @@
-# Fate's Edge Socket Server v4.11.1 — Real-Time VTT & Campaign Sharing
+# Fate's Edge Socket Server v4.12.0 — Real-Time VTT & Campaign Sharing
 
 **Fate's Edge** is a narrative‑first TTRPG system. This is the real‑time backend for the web toolkit: a WebSocket/Socket.io server that syncs campaign state live across your group, plus a short‑code **campaign sharing** endpoint for loading/saving full toolkit state without a persistent connection.
 
@@ -14,7 +14,8 @@ Earlier documentation for this server described it as a minimal REST endpoint fo
 - **Account authentication** — `server/auth.js` provides real user accounts: `POST /api/auth/register` and `POST /api/auth/login` hash passwords with bcrypt and issue JWT session tokens, layered alongside the existing per-request API-key authentication used for service-to-service calls.
 - **GM election & rooms** — `server/room.js` handles requesting, approving, and transferring GM status per room/campaign code.
 - **Roles & character registration (v4.8)** — beyond the single GM seat above, `server/room.js` now supports GM-granted Co-GM promotions (session-only or saved), a read-only Spectator role, and a claim/release bridge that binds a player's saved character (their account library) to a room's live roster. See [ROLES.md](ROLES.md) for the full model, including diagrams.
-- **Optional horizontal scaling** — off by default (single instance, no external dependency); an opt-in Redis pub/sub relay lets you run more than one instance behind a load balancer. See [SCALING.md](SCALING.md).
+- **Optional scaling, two axes** — off by default (single process, no external dependency). Use more of one machine's CPU cores with `CLUSTER_WORKERS` (Node `cluster` + sticky sessions, no Redis needed), or run more than one machine behind a load balancer with `REDIS_URL` (a pub/sub relay). The two combine. See [SCALING.md](SCALING.md).
+- **Rate limiting & per-room client caps** — a general per-IP limit across the whole REST API, a per-connection message-rate limit on both WebSocket transports, and an optional per-room client cap (`MAX_CLIENTS_PER_ROOM`). All configurable, all off/generous by default. See [DESIGN.md](DESIGN.md) §5.
 - **Shared Deck of Consequences** — `server/deck.js` draws cards from a region's deck and broadcasts the result to everyone in the room, using the same region data (`data/regions/`) as the web client.
 - **Campaign persistence** — `server/storage.js` stores campaigns, rooms, accounts, and characters in a database: SQLite by default (`campaigns.db`, see [INSTALL.md](INSTALL.md#backing-up-your-campaigns-your-world-save) for backup notes), or Postgres/MySQL via `DATABASE_TYPE`/`DATABASE_URL`.
 - **Security & config** — `server/security.js` and `server/config.js` handle basic request validation and environment-driven configuration.
@@ -110,7 +111,7 @@ fates-edge-socket-server/
 │   └── regions/acasia.json
 ├── DESIGN.md
 ├── ROLES.md                    # role/permission model, promoted out of DESIGN.md (with diagrams)
-├── SCALING.md                  # optional Redis-backed multi-instance deployment
+├── SCALING.md                  # optional multi-core (cluster) and multi-instance (Redis) deployment
 ├── ROADMAP.md                  # genuinely planned, not-yet-built work (server-specific)
 ├── docker-compose.yml          # server + coturn (see "Docker Compose" above)
 ├── Dockerfile
@@ -126,6 +127,7 @@ fates-edge-socket-server/
 │   ├── adventure.js             # Adventure Engine state machine (acts/scenes/timers/encounters)
 │   ├── api.js                   # REST endpoints — see "REST API" below
 │   ├── auth.js                  # account registration/login (bcrypt + JWT)
+│   ├── cluster.js                # optional Node `cluster`-based multi-core scaling — see SCALING.md
 │   ├── config.js                 # env/config.json loader
 │   ├── deck.js                   # Deck of Consequences logic
 │   ├── index.js                  # the actual server implementation (Express + Socket.io + ws + scaling wiring)
@@ -133,7 +135,7 @@ fates-edge-socket-server/
 │   ├── module-manifest-utils.js  # shared manifest-deriving logic (API install path + generate-manifest.js)
 │   ├── room.js                   # GM election / room state / broadcastToRoom
 │   ├── scaling.js                # optional Redis-backed horizontal scaling — see SCALING.md
-│   ├── security.js
+│   ├── security.js               # input validation + rate limiters (HTTP per-IP and per-connection WS message)
 │   ├── server.js                 # one-line re-export of index.js (kept only so server-start.js's require path still works)
 │   ├── socketio-handlers.js      # Socket.io transport
 │   ├── storage.js
@@ -188,6 +190,11 @@ Environment variables (see `env-example.md` for the full list, `.env.example` fo
 | `DATABASE_TYPE` / `DATABASE_URL` | `sqlite` / `./campaigns.db` | Where campaigns, rooms, accounts, and characters are persisted. |
 | `HEALTH_ENDPOINT` | `/api/health` | The fuller JSON health/stats route — `/healthz` and `/api/healthz` (plain `OK`) are always available regardless of this. |
 | `TURN_SECRET`, `TURN_REALM`, `TURN_URLS`, `TURN_CREDENTIAL_TTL` | unset | TURN credential minting — see `/api/turn-credentials` above and this server's own `docker-compose.yml` `coturn` service. |
+| `API_RATE_LIMIT_WINDOW_MS` / `API_RATE_LIMIT_MAX` | `60000` / `300` | General per-IP REST API rate limit (`_MAX=0` disables). |
+| `WS_MESSAGE_RATE_WINDOW_MS` / `WS_MESSAGE_RATE_MAX` | `10000` / `120` | Per-connection WebSocket message rate limit, both transports (`_MAX=0` disables). |
+| `MAX_CLIENTS_PER_ROOM` | `0` (unlimited) | Reject new joins once a room already holds this many clients. |
+| `CLUSTER_WORKERS` | `0` (single process) | Fork this many worker processes (or `auto` = one per CPU core) — see [SCALING.md](SCALING.md). |
+| `REDIS_URL` | unset | Optional multi-instance scaling — see [SCALING.md](SCALING.md). |
 
 `campaigns.db` (or your configured `DATABASE_URL`) and `modules/` are created automatically at runtime as needed. For Docker, `docker-compose.yml` already mounts `./data` (with `DATABASE_URL` pointed inside it), plus named volumes for `/app/logs` and `/app/modules`, so all of this persists across container restarts out of the box — see [INSTALL.md](INSTALL.md#backing-up-your-campaigns-your-world-save).
 
