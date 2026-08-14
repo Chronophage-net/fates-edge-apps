@@ -11,7 +11,7 @@ of sharing one schema with `main()`.
 import argparse
 
 from ..config import BASE_START_XP, DEFAULT_SERVER_URL, __version__
-from .commands import account, characters, config, deck, modules, roll, server, timers, websocket
+from .commands import account, characters, config, data, deck, modules, roll, server, timers, websocket
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -111,6 +111,12 @@ def build_parser() -> argparse.ArgumentParser:
     ws_parser.add_argument('--code', required=True, help='Room code')
     ws_parser.add_argument('--api-key', help='API key')
     ws_parser.set_defaults(func=websocket.run)
+
+    # Data (region lore fetch -- see data_fetch.py; not bundled, opt-in,
+    # not MIT-licensed like the rest of this package)
+    data_parser = subparsers.add_parser('data', help='Fetch optional region lore data')
+    data_parser.add_argument('--fetch', action='store_true', help='Download region lore data for deck --draw/--crown')
+    data_parser.set_defaults(func=data.run)
 
     # Configuration
     config_parser = subparsers.add_parser('config', help='Configuration management')

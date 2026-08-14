@@ -96,9 +96,20 @@ fates-edge deck --shuffle
 ```
 
 Region flavor text is loaded from the same region JSON the socket server
-ships (bundled into the package), so `--draw`/`--crown` actually reflect
-the `--region` you pass -- earlier versions of this client silently fell
-back to a generic placeholder line regardless of region.
+ships, so `--draw`/`--crown` actually reflect the `--region` you pass --
+earlier versions of this client silently fell back to a generic
+placeholder line regardless of region. As of v5.1.0 that data is no longer
+bundled into the installed package (it's Fate's Edge Copyright content,
+licensed separately from this MIT client's own code -- see
+[LICENSE.proprietary](../../../LICENSE.proprietary)), so fetch it once,
+opt-in, before relying on region-specific meanings:
+
+```bash
+fates-edge data --fetch
+```
+
+Without it, `--draw`/`--crown` still work, just with the generic
+placeholder line instead of region-specific flavor text.
 
 ### 🌐 Server (REST)
 
@@ -195,6 +206,7 @@ or pull request for improvements.
 
 ## 📜 License
 
-Same as the main repository -- dual license (SRD under CC BY-NC-SA, all
-other content All Rights Reserved). See the root `LICENSE.md` for
-details.
+This package's own source code is MIT (see the `license` field in
+`pyproject.toml`). The optional Fate's Edge region lore it can fetch via
+`fates-edge data --fetch` is not: SRD material is CC BY-NC-SA, everything
+else is All Rights Reserved. See the root `LICENSE.md` for details.

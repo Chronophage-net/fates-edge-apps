@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "fates-edge-client"
-version = "5.0.0"
+version = "5.1.0"
 description = "Python client for the Fate's Edge socket server (characters, timers, dice, Deck of Consequences, campaign sync)"
 readme = "README.md"
 requires-python = ">=3.9"
@@ -50,10 +50,16 @@ fates-edge = "fates_edge_client.__main__:main"
 [tool.setuptools.packages.find]
 include = ["fates_edge_client*"]
 
-# Bundle the region flavor-text data (deck.py's region-data loader reads
-# these at runtime) into the installed wheel/sdist.
-[tool.setuptools.package-data]
-fates_edge_client = ["data/regions/*.json"]
+# As of v5.1.0, region flavor-text data (data/regions/*.json) is
+# deliberately NOT declared as package-data and so is NOT bundled into the
+# built wheel/sdist. That data is Fate's Edge Copyright content (personal,
+# non-commercial use only -- see LICENSE.proprietary), not MIT like this
+# package's own metadata/classifiers above -- bundling it made every
+# install claim to be 100% MIT when it wasn't. It's fetched separately and
+# opt-in instead: see data_fetch.py / `fates-edge data --fetch`. The files
+# remain in this source tree (see MANIFEST.in) purely so a source checkout
+# / editable install (e.g. running this package's own test suite) has
+# real data to exercise deck.py's region-data loader against.
 
 [tool.black]
 line-length = 100

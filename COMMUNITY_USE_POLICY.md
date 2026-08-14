@@ -9,7 +9,7 @@ license file wins.
 If your question is about the **tabletop game itself** — publishing an
 adventure, running a paid actual-play, translating the SRD, using a named
 NPC in your homebrew — that's covered in more depth by
-[fates-edge-docs' third-party-policy.md](https://github.com/Chronophage-net/fates-edge-docs/blob/main/third-party-policy.md).
+[fates-edge-docs' third-party-policy.md](https://github.com/Chronophage-net/fate-edge-docs/blob/main/third-party-policy.md).
 This document focuses on the **toolkit** (this repo, and its sibling
 `fates-edge-*` repos): the code, and the data files it ships with.
 
@@ -57,7 +57,7 @@ The [existing proprietary-content grant](LICENSE.proprietary) covers *personal, 
 Default to Copyright (All Rights Reserved, personal-use-only) unless the file or its containing manifest explicitly says SRD. When in doubt, ask — **support@fates-edge.com**.
 
 **Where do I request commercial permission or report a violation?**
-**support@fates-edge.com** for either. See [fates-edge-docs' third-party-policy.md](https://github.com/Chronophage-net/fates-edge-docs/blob/main/third-party-policy.md) for what a permission request should include and expected response time.
+**support@fates-edge.com** for either. See [fates-edge-docs' third-party-policy.md](https://github.com/Chronophage-net/fate-edge-docs/blob/main/third-party-policy.md) for what a permission request should include and expected response time.
 
 ---
 

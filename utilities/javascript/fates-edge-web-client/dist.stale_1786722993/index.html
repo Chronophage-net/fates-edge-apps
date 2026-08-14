@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Fate's Edge Toolkit v4.11.1 - A modular TTRPG companion." />
+    <meta name="theme-color" content="#0f1117" />
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%E2%9A%94%EF%B8%8F%3C/text%3E%3C/svg%3E" />
+    <script src="https://cdn.jsdelivr.net/npm/dompurify@3.2.4/dist/purify.min.js"></script>
+
+    <title>Fate's Edge Toolkit v4.11.1</title>
+
+    <!-- Preconnect for CDN performance -->
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com" />
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" />
+
+
+    <!-- NEW: grayed-out styling for sidebar items the current client can't
+         access (GM-only features for a non-GM, or a GM's own hidden
+         toggle). See js/core/feature-toggles.js and js/app.js's
+         setupFeatureAccess() for the logic that applies this class.
+         Values match the existing .nav-item:disabled rule in app.css
+         (opacity 0.4, var(--text3)) for visual consistency — this is a
+         separate class rather than reusing :disabled because the item
+         must stay clickable (a truly disabled button can't fire a click
+         event, so there'd be no way to show a notification toast). -->
+    <style>
+        .sidebar-nav .nav-item.nav-item-locked {
+            opacity: 0.4;
+            color: var(--text3);
+            cursor: not-allowed;
+            background: transparent;
+            border-left-color: transparent;
+        }
+        .sidebar-nav .nav-item.nav-item-locked:hover {
+            background: transparent;
+            border-left-color: transparent;
+            transform: none;
+            color: var(--text3);
+        }
+        .sidebar-nav .nav-item.nav-item-locked .nav-icon {
+            filter: grayscale(1);
+        }
+        .sidebar-nav .nav-item.nav-item-locked .nav-label::after {
+            content: ' 🔒';
+            font-size: 0.75em;
+        }
+    </style>
+
+    <!-- Seed loading script -->
+    <script>
+        (function() {
+            if (window.__RANDOM_SEED) return;
+            try {
+                const stored = localStorage.getItem('fates-edge-seed');
+                if (stored) { window.__RANDOM_SEED = stored; return; }
+            } catch (e) {}
+            
+            fetch('.seed/random-seed.json')
+                .then(r => r.json())
+                .then(data => {
+                    if (data && data.seed) {
+                        window.__RANDOM_SEED = data.seed;
+                        try { localStorage.setItem('fates-edge-seed', data.seed); } catch (e) {}
+                    }
+                })
+                .catch(() => fetch('data/seed.json')
+                    .then(r => r.json())
+                    .then(data => { if (data && data.seed) window.__RANDOM_SEED = data.seed; })
+                    .catch(() => {})
+                );
+        })();
+    </script>
+    <script src="seed.js" defer></script>
+
+    <!-- Third-party libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/fuse.js@7.0.0" defer></script>
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js" defer></script>
+    <!-- JSZip: used as a bare `JSZip` global by core/pack-manager.js's
+         installPack() (JSZip.loadAsync(...)) to read .pack.zip files
+         selected via Settings -> Pack Management. Was referenced there
+         but never actually loaded anywhere -- "JSZip is not defined". -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js" defer></script>
+  <script type="module" crossorigin src="/assets/main.hiOZSyFC.js"></script>
+  <link rel="modulepreload" crossorigin href="/assets/rolldown-runtime.BQ-_32WO.js">
+  <link rel="modulepreload" crossorigin href="/assets/utils.lBShoim5.js">
+  <link rel="modulepreload" crossorigin href="/assets/state.42sFgcOQ.js">
+  <link rel="modulepreload" crossorigin href="/assets/Toast.DDAtBIAw.js">
+  <link rel="modulepreload" crossorigin href="/assets/sync.i5xh8ufD.js">
+  <link rel="modulepreload" crossorigin href="/assets/preload-helper.BATLnrmA.js">
+  <link rel="modulepreload" crossorigin href="/assets/websocket.Dmklt06W.js">
+  <link rel="stylesheet" crossorigin href="/assets/main.DcCFXHiG.css">
+</head>
+<body>
+
+    <!-- ===== PASSWORD OVERLAY ===== -->
+    <div class="password-overlay" id="passwordOverlay" role="dialog" aria-modal="true" aria-label="Password gate">
+        <div class="gate-box">
+            <div class="gate-icon">⚔️</div>
+            <div class="gate-title">Fate's Edge</div>
+            <div class="gate-sub">Enter the playtester password to continue</div>
+            <div class="gate-error" id="gateError"></div>
+            <input type="password" class="gate-input" id="gateInput" placeholder="Enter password…" autocomplete="current-password" />
+            <button class="gate-btn" id="gateBtn">Unlock</button>
+            <div class="gate-foot">— playtester access only —</div>
+        </div>
+    </div>
+
+    <!-- ===== LOCAL LOCK OVERLAY =====
+         A manually-triggered, client-side-only screen lock — distinct
+         from the playtester password overlay above. See
+         js/core/local-lock.js for the full design rationale. Locking
+         doesn't disconnect or lose any state; it just blocks the screen
+         until the local lock password (or an emergency reset code from
+         data/lock-reset.json) is entered. Reuses the same .gate-* classes
+         as the password overlay above for visual consistency. -->
+    <div class="password-overlay" id="localLockOverlay" role="dialog" aria-modal="true" aria-label="Screen locked">
+        <div class="gate-box">
+            <div class="gate-icon">🔒</div>
+            <div class="gate-title">Screen Locked</div>
+            <div class="gate-sub">Enter your local lock password to continue.</div>
+            <div class="gate-error" id="localLockError"></div>
+            <input type="password" class="gate-input" id="localLockInput" placeholder="Enter password…" autocomplete="off" />
+            <button class="gate-btn" id="localLockBtn">Unlock</button>
+            <div class="gate-foot">
+                <a href="#" id="localLockForgotLink" style="color:inherit;text-decoration:underline;cursor:pointer;">Forgot password? Emergency reset</a>
+            </div>
+            <div id="localLockResetSection" style="display:none;margin-top:0.6rem;">
+                <div class="gate-sub" style="font-size:0.8rem;">Enter the emergency reset code (see data/lock-reset.json on the server).</div>
+                <input type="text" class="gate-input" id="localLockResetInput" placeholder="Reset code…" autocomplete="off" />
+                <button class="gate-btn" id="localLockResetBtn">Reset &amp; Unlock</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== APP SHELL ===== -->
+    <!-- id="app-content" added here deliberately: ~17 inline wizard/editor
+         modules (characters/wizard.js, characters/editor.js,
+         encounters/editor.js, wiki/editor.js, vtt/editor.js, timers,
+         adventure-manager, docs upload, spellcraft tour, whiteboard
+         onboarding, etc.) all do
+           `document.getElementById('app-content') || document.body`
+         to find a container whose direct children they can hide while
+         they take over the screen, then restore (`ch.style.display = ''`)
+         on close. That id never existed anywhere in this file, so EVERY
+         one of them was silently falling back to `document.body` — which
+         sweeps up ALL of its direct children, including the floating
+         #xcard-toggle button, the #xcard-overlay safety-tool overlay, and
+         the dynamically-created #media-recording-overlay HUD. Restoring
+         `style.display = ''` on close clears each one's inline
+         `display:none`, and since neither has a stylesheet rule hiding it
+         by default, they'd pop up full-screen/visible the moment any of
+         those wizards/editors closed — reported as "exiting some features
+         causes the Veils/Lines and Recording overlays to appear, not
+         dismissable." Giving the actual app shell this id makes all of
+         those call sites resolve correctly and stop reaching document.body
+         at all. (module-loader.js's `this.container` lookup was hitting
+         this exact same missing-id fallback too — see its constructor.) -->
+    <div class="app-shell" id="app-content">
+        <!-- ===== SIDEBAR ===== -->
+        <aside class="sidebar" id="sidebar" role="navigation" aria-label="Main Navigation">
+            <div class="sidebar-brand">
+                <span class="brand-icon">⚔️</span>
+                <div class="brand-text">
+                    <span class="brand-name">Fate's Edge</span>
+                    <span class="brand-version">v4.11.1</span>
+                </div>
+            </div>
+            
+            <nav class="sidebar-nav" id="sidebarNav" aria-label="Module Navigation">
+                <div class="nav-group">
+                    <span class="nav-group-title">Core</span>
+                    <button class="nav-item active" data-tab="home" title="Home" role="tab" aria-selected="true">
+                        <span class="nav-icon">📜</span> <span class="nav-label">Home</span>
+                    </button>
+                    <button class="nav-item" data-tab="dashboard" title="Dashboard" role="tab" aria-selected="false">
+                        <span class="nav-icon">📊</span> <span class="nav-label">Dashboard</span>
+                    </button>
+                    <button class="nav-item" data-tab="characters" title="Characters" role="tab" aria-selected="false">
+                        <span class="nav-icon">👤</span> <span class="nav-label">Characters</span>
+                    </button>
+                    <button class="nav-item" data-tab="dice" title="Dice Roller" role="tab" aria-selected="false">
+                        <span class="nav-icon">🎲</span> <span class="nav-label">Dice</span>
+                    </button>
+                </div>
+
+                <div class="nav-group">
+                    <span class="nav-group-title">World</span>
+                    <button class="nav-item" data-tab="encounters" title="Encounters" role="tab" aria-selected="false">
+                        <span class="nav-icon">⚔️</span> <span class="nav-label">Encounters</span>
+                    </button>
+                    <button class="nav-item" data-tab="factions" title="Factions & Assets" role="tab" aria-selected="false">
+                        <span class="nav-icon">🏛️</span> <span class="nav-label">Factions</span>
+                    </button>
+                    <button class="nav-item" data-tab="wiki" title="Wiki" role="tab" aria-selected="false">
+                        <span class="nav-icon">📖</span> <span class="nav-label">Wiki</span>
+                    </button>
+                    <button class="nav-item" data-tab="patrons" title="Patrons" role="tab" aria-selected="false">
+                        <span class="nav-icon">👁️</span> <span class="nav-label">Patrons</span>
+                    </button>
+                    <!-- Spellcraft -->
+                    <button class="nav-item" data-tab="spellcraft" title="Spellcraft & Magic" role="tab" aria-selected="false">
+                        <span class="nav-icon">🧙</span> <span class="nav-label">Spellcraft</span>
+                    </button>
+                    <button class="nav-item" data-tab="crafting" title="Crafting" role="tab" aria-selected="false">
+                        <span class="nav-icon">🔨</span> <span class="nav-label">Crafting</span>
+                    </button>
+                </div>
+
+                <div class="nav-group">
+                    <span class="nav-group-title">Table</span>
+                    <button class="nav-item" data-tab="vtt" title="Virtual Tabletop" role="tab" aria-selected="false">
+                        <span class="nav-icon">💬</span> <span class="nav-label">VTT</span>
+                    </button>
+                    <button class="nav-item" data-tab="gm-tools" title="GM Tools" role="tab" id="nav-gm-tools" aria-selected="false">
+                        <span class="nav-icon">🎯</span> <span class="nav-label">GM Tools</span>
+                    </button>
+                    <button class="nav-item" data-tab="timers" title="Timers" role="tab" aria-selected="false">
+                        <span class="nav-icon">⏱️</span> <span class="nav-label">Timers</span>
+                    </button>
+                    <button class="nav-item" data-tab="decks" title="Decks" role="tab" aria-selected="false">
+                        <span class="nav-icon">🃏</span> <span class="nav-label">Decks</span>
+                    </button>
+                    <button class="nav-item" data-tab="whiteboard" title="Whiteboard" role="tab" aria-selected="false">
+                        <span class="nav-icon">✏️</span> <span class="nav-label">Whiteboard</span>
+                    </button>
+                    <button class="nav-item" data-tab="adventure-manager" title="Adventure Manager" role="tab" id="nav-adventure-manager" aria-selected="false">
+                        <span class="nav-icon">🤺</span> <span class="nav-label">Adventure Manager</span>
+                    </button>
+                    <button class="nav-item" data-tab="kon-reh" title="Kon'reh Strategy Game" role="tab" aria-selected="false">
+                        <span class="nav-icon">⚪</span> <span class="nav-label">Kon'reh</span>
+                    </button>
+                </div>
+
+                <div class="nav-group">
+                    <span class="nav-group-title">System</span>
+                    <button class="nav-item" data-tab="search" title="Search" role="tab" aria-selected="false">
+                        <span class="nav-icon">🔍</span> <span class="nav-label">Search</span>
+                    </button>
+                    <button class="nav-item" data-tab="docs" title="Documentation" role="tab" aria-selected="false">
+                        <span class="nav-icon">📄</span> <span class="nav-label">Docs</span>
+                    </button>
+                    <button class="nav-item" data-tab="settings" title="Settings" role="tab" aria-selected="false">
+                        <span class="nav-icon">⚙️</span> <span class="nav-label">Settings</span>
+                    </button>
+                    <button class="nav-item" data-tab="system-status" title="System Status" role="tab" aria-selected="false">
+                        <span class="nav-icon">🩺</span> <span class="nav-label">Status</span>
+                    </button>
+                </div>
+            </nav>
+            
+            <div class="sidebar-footer">
+                <div class="footer-status">
+                    <span class="status-dot" id="save-status"></span>
+                    <span class="status-label">Saved</span>
+                </div>
+                <div class="footer-actions">
+                    <button class="footer-btn" id="exportBtn" title="Export JSON" aria-label="Export Data">⬇</button>
+                    <button class="footer-btn" id="importBtn" title="Import JSON" aria-label="Import Data">⬆</button>
+                    <input type="file" id="importFile" accept=".json" class="hidden" />
+                    <button class="footer-btn" id="theme-toggle" title="Toggle theme" aria-label="Toggle Theme">🌙</button>
+                    <button class="footer-btn" id="lockAppBtn" title="Lock screen" aria-label="Lock Screen">🔒</button>
+                </div>
+            </div>
+        </aside>
+
+        <!-- ===== MAIN CONTENT ===== -->
+        <main class="main-content">
+            <!-- Core tabs -->
+            <div id="tab-home" class="tab-content active" role="tabpanel"></div>
+            <div id="tab-dashboard" class="tab-content" role="tabpanel"></div>
+            <div id="tab-characters" class="tab-content" role="tabpanel"></div>
+            <div id="tab-dice" class="tab-content" role="tabpanel"></div>
+            
+            <!-- World tabs -->
+            <div id="tab-encounters" class="tab-content" role="tabpanel"></div>
+            <div id="tab-factions" class="tab-content" role="tabpanel"></div>
+            <div id="tab-wiki" class="tab-content" role="tabpanel"></div>
+            <div id="tab-patrons" class="tab-content" role="tabpanel"></div>
+            <div id="tab-spellcraft" class="tab-content" role="tabpanel"></div>
+            
+            <!-- Table tabs -->
+            <div id="tab-vtt" class="tab-content" role="tabpanel"></div>
+            <div id="tab-gm-tools" class="tab-content" role="tabpanel"></div>
+            <div id="tab-timers" class="tab-content" role="tabpanel"></div>
+            <div id="tab-decks" class="tab-content" role="tabpanel"></div>
+            <div id="tab-whiteboard" class="tab-content" role="tabpanel"></div>
+            <!-- 👇 NEW: kon'reh content container -->
+            <div id="tab-kon-reh" class="tab-content" role="tabpanel"></div>
+            
+            <!-- System tabs -->
+            <div id="tab-search" class="tab-content" role="tabpanel"></div>
+            <div id="tab-docs" class="tab-content" role="tabpanel"></div>
+            <div id="tab-settings" class="tab-content" role="tabpanel"></div>
+            <div id="tab-system-status" class="tab-content" role="tabpanel"></div>
+            
+            <!-- Legacy/hidden tabs (redirected) -->
+            <div id="tab-consequences" class="tab-content" style="display:none;"></div>
+            <div id="tab-regional" class="tab-content" style="display:none;"></div>
+            <div id="tab-builder" class="tab-content" style="display:none;"></div>
+            <div id="tab-roller" class="tab-content" style="display:none;"></div>
+            <div id="tab-scene-tools" class="tab-content" style="display:none;"></div>
+        </main>
+    </div>
+
+    <!-- ===== MODALS ===== -->
+    <div class="modal-overlay" id="charModal" role="dialog" aria-modal="true">
+        <div class="modal">
+            <button class="modal-close" id="charModalClose" aria-label="Close">&times;</button>
+            <h2 id="char-modal-title">Character Editor</h2>
+            <div id="char-editor-content"></div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="timerModal" role="dialog" aria-modal="true">
+        <div class="modal">
+            <button class="modal-close" id="timerModalClose" aria-label="Close">&times;</button>
+            <h2 id="timer-modal-title">Timer Editor</h2>
+            <div id="timer-editor-content"></div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="wikiModal" role="dialog" aria-modal="true">
+        <div class="modal">
+            <button class="modal-close" id="wikiModalClose" aria-label="Close">&times;</button>
+            <h2 id="wiki-modal-title">Wiki Entry</h2>
+            <div id="wiki-editor-content"></div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="talentModal" role="dialog" aria-modal="true">
+        <div class="modal">
+            <button class="modal-close" id="talentModalClose" aria-label="Close">&times;</button>
+            <h2 id="talent-modal-title">Talent Editor</h2>
+            <div id="talent-editor-content"></div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="wizardModal" role="dialog" aria-modal="true">
+        <div class="modal" style="max-width:800px;">
+            <button class="modal-close" id="wizardModalClose" aria-label="Close">&times;</button>
+            <h2 id="wizard-title">Character Wizard</h2>
+            <div id="wizard-steps"></div>
+            <div class="flex mt-1" id="wizard-nav">
+                <button class="btn" id="wizard-back">← Back</button>
+                <button class="btn btn-gold" id="wizard-next">Next →</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="encounterModal" role="dialog" aria-modal="true">
+        <div class="modal" style="max-width:900px;">
+            <button class="modal-close" id="encounterModalClose" aria-label="Close">&times;</button>
+            <h2 id="encounter-modal-title">Encounter Editor</h2>
+            <div id="encounter-editor-content"></div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="npcModal" role="dialog" aria-modal="true">
+        <div class="modal" style="max-width:700px;">
+            <button class="modal-close" id="npcModalClose" aria-label="Close">&times;</button>
+            <h2 id="npc-modal-title">NPC Editor</h2>
+            <div id="npc-editor-content"></div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="combatModal" role="dialog" aria-modal="true">
+        <div class="modal" style="max-width:800px;">
+            <button class="modal-close" id="combatModalClose" aria-label="Close">&times;</button>
+            <h2 id="combat-modal-title">Combat Tracker</h2>
+            <div id="combat-editor-content"></div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="factionModal" role="dialog" aria-modal="true">
+        <div class="modal" style="max-width:700px;">
+            <button class="modal-close" id="factionModalClose" aria-label="Close">&times;</button>
+            <h2 id="faction-modal-title">Faction Editor</h2>
+            <div id="faction-editor-content"></div>
+        </div>
+    </div>
+    
+    <div class="modal-overlay" id="licenseModal" role="dialog" aria-modal="true">
+        <div class="modal">
+            <button class="modal-close" id="licenseModalClose" aria-label="Close">&times;</button>
+            <h2>📜 License Notice</h2>
+            <div class="license-box" id="licenseContent"></div>
+        </div>
+    </div>
+
+    <!-- ===== TOAST CONTAINER ===== -->
+    <div id="toast-container" role="status" aria-live="polite"></div>
+
+    <!-- ===== X‑CARD FLOATING BUTTON & OVERLAY ===== -->
+    <!-- Floating button (bottom‑right) -->
+    <button id="xcard-toggle" class="xcard-floating-btn" title="X-Card (Ctrl+Shift+X)" aria-label="Toggle X-Card overlay">
+        🛑
+    </button>
+
+    <!-- X-Card overlay (full‑screen pause) -->
+    <div id="xcard-overlay" class="xcard-overlay" style="display:none;" role="dialog" aria-modal="true" aria-label="X-Card Pause">
+        <div class="xcard-content">
+            <div class="xcard-icon">🛑</div>
+            <h1 class="xcard-title">PAUSED</h1>
+            <p class="xcard-message" style="font-size:0.9rem;">X‑Card has been called. Pause the scene and check in with your group.</p>
+            <p style="font-size:0.8rem;color:var(--text3);margin-top:0.2rem;">The X‑Card is a safety tool: any player can call it at any time to stop a scene that is making them uncomfortable. No questions asked.</p>
+            <button class="xcard-resume-btn" id="xcard-resume">Resume Game</button>
+            <div class="xcard-shortcut-hint">Press <kbd>Ctrl+Shift+X</kbd> to close</div>
+        </div>
+    </div>
+
+    <!-- Role-based feature access is now handled by js/core/feature-toggles.js
+         (self-mirrors current role from 'gmRoleUpdate'/'presenceUpdate' —
+         see that file for why neither vtt-connected.js nor
+         core/sync/presence.js need to be edited or import it) and
+         js/app.js's setupFeatureAccess() (grays out locked sidebar items
+         and shows a toast on click, rather than disabling them outright —
+         a disabled button can't fire a click event, so it couldn't show a
+         notification). The logic that used to live here as an inline
+         <script> — gating only #nav-gm-tools via btn.disabled — has been
+         consolidated into those two files. window.__vttClientId is kept
+         here since feature-toggles.js's presenceUpdate listener reads it. -->
+    <script>
+        window.__vttClientId = null;
+    </script>
+
+    <!-- ===== APPLICATION ENTRY ===== -->
+</body>
+</html>

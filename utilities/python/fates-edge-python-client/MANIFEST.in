@@ -1,0 +1,10 @@
+include README.md
+
+# fates_edge_client/data/regions/*.json is Fate's Edge Copyright content,
+# not MIT like the rest of this package -- explicitly excluded from the
+# sdist so it can't end up in a built distribution even if a future
+# packaging change re-adds an include_package_data-style default. It stays
+# in the source tree for tests/dev use; end users get it via
+# `fates-edge data --fetch` instead. See pyproject.toml's
+# [tool.setuptools.packages.find] comment and data_fetch.py.
+prune fates_edge_client/data

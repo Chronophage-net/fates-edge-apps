@@ -6,13 +6,14 @@ across the old single-file script (e.g. the default server URL was
 hardcoded independently in ~7 different argparse subparsers).
 """
 
+import os
 from pathlib import Path
 
 # ----------------------------------------------------------------------
 # Package metadata
 # ----------------------------------------------------------------------
 
-__version__ = "5.0.0"
+__version__ = "5.1.0"
 
 # ----------------------------------------------------------------------
 # Server defaults
@@ -98,9 +99,36 @@ DEFAULT_TWISTS = [
     "A moment of clarity reveals a hidden truth.",
 ]
 
-# Bundled copy of the region flavor-text data (utilities/javascript/
-# fates-edge-socket-server/data/regions/*.json) so `deck --draw` works
-# fully offline, the same way characters/timers/rolls already do. See
+# Region flavor-text data (utilities/javascript/fates-edge-socket-server/
+# data/regions/*.json) so `deck --draw` can use region-specific card
+# meanings offline, the same way characters/timers/rolls already do. See
 # deck.py's region-data loader for the transform that turns these files
 # into suit/rank -> meaning lookups.
-REGION_DATA_DIR = Path(__file__).parent / "data" / "regions"
+#
+# This data is Fate's Edge Copyright content (personal, non-commercial use
+# only -- see LICENSE.proprietary), NOT MIT like the rest of this package,
+# so as of v5.1.0 it is no longer bundled into the built wheel/sdist (see
+# pyproject.toml's package-data comment). Resolution order:
+#   1. FATES_EDGE_REGION_DATA_DIR env var, if set.
+#   2. fates_edge_client/data/regions/, if it exists (present in a source
+#      checkout / editable install, e.g. for running this repo's tests --
+#      absent in a `pip install fates-edge-client` from PyPI).
+#   3. ~/.fates-edge/data/regions/ -- populated by `fates-edge data --fetch`
+#      (see data_fetch.py), which downloads it separately from GitHub and
+#      says so before it does.
+# If none of these have a given region's file, load_region_data() below
+# falls back to generic, non-region-specific card meanings -- it never
+# errors just because the data isn't there.
+
+
+def _default_region_data_dir() -> Path:
+    override = os.environ.get("FATES_EDGE_REGION_DATA_DIR")
+    if override:
+        return Path(override)
+    bundled = Path(__file__).parent / "data" / "regions"
+    if bundled.exists():
+        return bundled
+    return Path.home() / ".fates-edge" / "data" / "regions"
+
+
+REGION_DATA_DIR = _default_region_data_dir()

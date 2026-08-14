@@ -58,26 +58,31 @@ The Copyright includes, but is not limited to:
 - Setting lore (Acasia, Aeler, Vhasia, the Curse, etc.)
 - Original characters, NPCs, and named figures
 - Faction descriptions and campaign‑specific content
-- Proprietary magic systems (Runekeeper, Invoker, Cantor, etc.)
+- Proprietary magic systems as published (Runekeeper, Invoker, Cantor, Witch, Summoner, Monk, etc.)
 - Artwork, maps, and graphical elements
 - Original prose, framing devices, and narrative text
 - The Deck of Consequences and Crown Spread systems
 - The Travel Framework and regional generators
+- The Kon'reh board game
 - Any data files (*.json, *.yaml, *.md, etc.) not specifically designated as SRD
 
 **Permitted use** – You are granted a non‑exclusive, non‑transferable,
 revocable license to use the Copyright solely for personal,
 non‑commercial play of Fate’s Edge, and only in conjunction with an instance
-of this software (the Virtual Tabletop application). This permission does
-**not** extend to:
+of this software (the Virtual Tabletop application, or a fork of it). This
+permission does **not** extend to:
 
 - Commercial use (e.g., paid games, subscription services, merchandise)
 - Redistribution of the content outside of this software
-- Creation of derivative works (fan games, adaptations, novels, etc.)
-- Incorporation into other software, websites, or tools
+- Creation of derivative works (fan games, adaptations, novels, etc.) for commercial release
+- Incorporation into other commercial software, websites, or tools
 
-For any other use, you must obtain explicit written permission from the
-copyright holder.
+Free/non-commercial fan content (adventures, actual play, fan art, house
+rules set in the Amaranthine, etc.) is welcome without asking first — see
+[fate-edge-docs' third-party-policy.md](https://github.com/Chronophage-net/fate-edge-docs/blob/main/third-party-policy.md)
+for the full creator-facing policy and FAQ.
+
+For any commercial use, contact **support@fates-edge.com**.
 
 ### System Reference Document (SRD) – CC BY‑NC‑SA 4.0
 
@@ -89,14 +94,19 @@ To view a copy of this license, visit
 https://creativecommons.org/licenses/by-nc-sa/4.0/
 
 The SRD includes:
-- Core mechanical systems (dice pools, Boons, Story Beats)
+- Core mechanical systems (dice pools, Position/Effect, Boons, Story Beats)
 - General game terminology and resolution procedures
 - The *Essentials Guide* (when marked as SRD)
-- Any file explicitly tagged as “SRD”
+- Any file explicitly tagged as “SRD” (including `data/docs/` content marked as such)
 
 You are free to share and adapt the SRD for non‑commercial purposes, provided
-you give appropriate credit, indicate if changes were made, and distribute
-your contributions under the same license.
+you:
+- Give appropriate credit to Nicholas A. Gasper
+- Indicate if changes were made
+- Distribute your contributions under this same license (CC BY‑NC‑SA 4.0)
+
+For the fuller creator-facing FAQ on publishing/streaming/selling SRD-based
+work, see [fate-edge-docs' third-party-policy.md](https://github.com/Chronophage-net/fate-edge-docs/blob/main/third-party-policy.md).
 
 ---
 

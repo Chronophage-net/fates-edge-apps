@@ -88,6 +88,7 @@ stops you from using both against the same room.
 
 ## License
 
-Same as the main repository -- dual license (SRD under CC BY-NC-SA, all
-other content All Rights Reserved). See the root `LICENSE.md` for
-details.
+Same as the main repository -- this tool's own source code (`Fates_Edge.py`)
+is MIT. The bundled Fate's Edge game data/content it reads is not: SRD
+material is CC BY-NC-SA, everything else is All Rights Reserved. See the
+root `LICENSE.md` for details.
