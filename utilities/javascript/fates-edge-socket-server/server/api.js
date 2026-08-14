@@ -1563,8 +1563,8 @@ function createApiRouter(appConfig) {
                 },
                 // v4.8: roles + character registration.
                 roomRoles: {
-                    values: "gm | co-gm | player | spectator. Exactly one 'gm' per room (unchanged); any number of 'co-gm's. Co-GM has every GM permission except transferring/revoking the GM seat, promoting/demoting another Co-GM, or deleting/resetting the room.",
-                    change: "Socket event role_change_request { targetId, role: 'co-gm'|'player'|'spectator', persist? } - GM-only. persist:false (default) grants Co-GM for the current connection only; persist:true saves it to the account's room membership so it survives reconnects. Demotions always save.",
+                    values: "gm | co-gm | assistant-gm | player | spectator. Exactly one 'gm' per room (unchanged); any number of 'co-gm's. Co-GM has every GM permission except transferring/revoking the GM seat, promoting/demoting another Co-GM, or deleting/resetting the room. 'assistant-gm' carries no special server-side permissions beyond 'player' -- it exists so a GM can hand it to the AI GM Bot's own client, which changes its own in-process behavior when it sees itself holding that role (see fates-edge-ai-gm-bot's README).",
+                    change: "Socket event role_change_request { targetId, role: 'co-gm'|'assistant-gm'|'player'|'spectator', persist? } - GM-only. persist:false (default) grants Co-GM/Assistant GM for the current connection only; persist:true saves it to the account's room membership so it survives reconnects. Demotions always save.",
                     seat: 'The GM seat itself still uses the existing request_gm / approve_gm socket events, not role_change_request.',
                     broadcast: 'role_update { targetId, role, byId, persist } is broadcast to the room on every change.'
                 },

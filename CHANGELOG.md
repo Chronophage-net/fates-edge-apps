@@ -3,6 +3,18 @@ All notable changes to this project will be documented here.
 
 Format loosely follows [Keep a Changelog](https://keepachangelog.com/), versions follow [Semantic Versioning](https://semver.org/).
 
+## [4.12.0] - 2026-08-14
+
+Adds `'assistant-gm'` as a fourth assignable room role (alongside GM/Co-GM/Player/Spectator), so a GM can hand the AI GM Bot a middle tier between full narrative control and doing nothing — see the `fates-edge-ai-gm-bot` repo's v4.10.0 changelog for what the bot does with it. This repo's changes are entirely about legalizing and labeling the role; the bot-side behavior lives in that repo.
+
+### Added
+- **`assistant-gm` room role**: added to `server/room.js`'s `ASSIGNABLE_ROLES` (assignable via the existing `role_change_request` socket event, same GM-only promote/demote flow as Co-GM) and to `server/auth.js`'s `VALID_ROLES` (so a persisted grant can be re-claimed directly at handshake on reconnect, matching Co-GM). Demotions off `assistant-gm` always persist, same as Co-GM.
+- Deliberately **not** added to `security.js`'s `GM_LIKE_ROLES` — `assistant-gm` carries no elevated server-side permissions (character-edit rights, GM-only data, etc. all stay gated the same as `player`). Its only effect is on the AI GM Bot's own in-process narration behavior.
+- Role-label maps updated in the web client (`vtt-connected.js`) and `API.md`/`server/api.js`'s inline docs.
+
+### Docs
+- `API.md`, socket-server `server/api.js` inline docs, and the web client's role-change toast all updated to mention the new role.
+
 ## [4.11.1] - 2026-08-13
 
 Adventure Timer Sync Loop closed end-to-end, one-click Adventure Module install from Settings, and character edits now push to the server live instead of only at connect — see the "Added" section below. Docs across the web-client and socket-server updated to match.

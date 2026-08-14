@@ -205,6 +205,11 @@ function createRateLimiter({ windowMs = 15 * 60 * 1000, max = 10, message = 'Too
 // check at the call site (see room.js's handleGmApproval /
 // handleRoleChangeRequest) -- everything else that used to check
 // `role === 'gm'` should switch to isGmLike(role) below.
+// 'assistant-gm' (v4.12) is deliberately NOT included here -- it's a
+// role for the AI GM Bot's own client that grants no elevated server-side
+// permissions at all (character-edit rights, GM-only data, etc. all stay
+// gated the same as 'player'). Its actual effect is entirely on the bot's
+// own in-process narration behavior; see fates-edge-ai-gm-bot's README.
 const GM_LIKE_ROLES = new Set(['gm', 'co-gm']);
 
 function isGmLike(role) {

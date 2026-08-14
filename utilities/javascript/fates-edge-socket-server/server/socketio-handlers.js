@@ -156,20 +156,27 @@ function setupSocketIO(io, appConfig) {
 
             // GM conflict + role validation.
             //
-            // NEW (v4.8): a client's self-declared `playerRole` is only
-            // trusted for 'gm'/'player'/'spectator' -- 'co-gm' can ONLY be
-            // reached by inheriting a previously-saved grant from
+            // NEW (v4.8, extended v4.12 for assistant-gm): a client's
+            // self-declared `playerRole` is only trusted for
+            // 'gm'/'player'/'spectator' -- 'co-gm' and 'assistant-gm' can
+            // ONLY be reached by inheriting a previously-saved grant from
             // `membership.role` (set via room.handleRoleChangeRequest with
             // persist:true). Without this, any client could just claim
-            // `role: 'co-gm'` on join and get full GM powers unchecked.
+            // `role: 'co-gm'` (or, since v4.12, `role: 'assistant-gm'`) on
+            // join and get that role unchecked -- for assistant-gm that
+            // wouldn't grant elevated server permissions (see security.js's
+            // GM_LIKE_ROLES), but it WOULD let any client masquerade as the
+            // AI GM Bot's own recognized seat, which is still not something
+            // a self-declaration alone should be able to do.
+            const PROMOTED_ONLY_ROLES = new Set(['co-gm', 'assistant-gm']);
             let assignedRole = auth.isValidRole(playerRole) ? playerRole : 'player';
-            if (assignedRole === 'co-gm' && membership?.role !== 'co-gm') {
+            if (PROMOTED_ONLY_ROLES.has(assignedRole) && membership?.role !== assignedRole) {
                 assignedRole = 'player';
             }
-            // A returning member with a saved Co-GM grant gets it back
-            // automatically, even if their client didn't ask for it.
-            if (assignedRole !== 'gm' && membership?.role === 'co-gm') {
-                assignedRole = 'co-gm';
+            // A returning member with a saved Co-GM/Assistant GM grant gets
+            // it back automatically, even if their client didn't ask for it.
+            if (assignedRole !== 'gm' && PROMOTED_ONLY_ROLES.has(membership?.role)) {
+                assignedRole = membership.role;
             }
             const existingGm = room.getExistingGm(currentRoom);
             if (assignedRole === 'gm' && existingGm) {

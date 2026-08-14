@@ -688,16 +688,18 @@ async function handleHandshake(ws, roomState, data) {
         }
     }
 
-    // v4.8: same role-validation rules as socketio-handlers.js's join-room
-    // -- self-declared 'co-gm' is never trusted unless it's already saved
-    // on this account's membership row (a grant made via
-    // room.handleRoleChangeRequest with persist:true).
+    // v4.8 (extended v4.12 for assistant-gm): same role-validation rules as
+    // socketio-handlers.js's join-room -- self-declared 'co-gm' or
+    // 'assistant-gm' is never trusted unless it's already saved on this
+    // account's membership row (a grant made via room.handleRoleChangeRequest
+    // with persist:true).
+    const PROMOTED_ONLY_ROLES = new Set(['co-gm', 'assistant-gm']);
     let assignedRole = auth.isValidRole(data.role) ? data.role : 'player';
-    if (assignedRole === 'co-gm' && membership?.role !== 'co-gm') {
+    if (PROMOTED_ONLY_ROLES.has(assignedRole) && membership?.role !== assignedRole) {
         assignedRole = 'player';
     }
-    if (assignedRole !== 'gm' && membership?.role === 'co-gm') {
-        assignedRole = 'co-gm';
+    if (assignedRole !== 'gm' && PROMOTED_ONLY_ROLES.has(membership?.role)) {
+        assignedRole = membership.role;
     }
     const existingGm = room.getExistingGm(roomState);
     if (assignedRole === 'gm' && existingGm) {

@@ -19,9 +19,10 @@ const security = require('../server/security.js');
 const room = require('../server/room.js');
 
 describe('security.js role helpers', () => {
-    test('isGmLike() is true for gm and co-gm only', () => {
+    test('isGmLike() is true for gm and co-gm only -- assistant-gm grants no elevated permissions', () => {
         assert.equal(security.isGmLike('gm'), true);
         assert.equal(security.isGmLike('co-gm'), true);
+        assert.equal(security.isGmLike('assistant-gm'), false);
         assert.equal(security.isGmLike('player'), false);
         assert.equal(security.isGmLike('spectator'), false);
         assert.equal(security.isGmLike(undefined), false);
@@ -30,6 +31,7 @@ describe('security.js role helpers', () => {
     test('canManageGmSeat() is true only for the strict gm role', () => {
         assert.equal(security.canManageGmSeat('gm'), true);
         assert.equal(security.canManageGmSeat('co-gm'), false);
+        assert.equal(security.canManageGmSeat('assistant-gm'), false);
         assert.equal(security.canManageGmSeat('player'), false);
     });
 
@@ -41,9 +43,10 @@ describe('security.js role helpers', () => {
 });
 
 describe('auth.js isValidRole()', () => {
-    test('accepts exactly the four-role enum', () => {
+    test('accepts exactly the five-role enum', () => {
         assert.equal(auth.isValidRole('gm'), true);
         assert.equal(auth.isValidRole('co-gm'), true);
+        assert.equal(auth.isValidRole('assistant-gm'), true);
         assert.equal(auth.isValidRole('player'), true);
         assert.equal(auth.isValidRole('spectator'), true);
     });
@@ -130,6 +133,29 @@ describe('room.js handleRoleChangeRequest()', () => {
 
         const result = room.handleRoleChangeRequest(r, gm.id, p.id, 'gm', false);
         assert.equal(result.ok, false);
+    });
+
+    test('the GM can promote the AI GM Bot\'s own client to assistant-gm', () => {
+        const gm = makeClient('gm-1', 'gm');
+        const bot = makeClient('bot-1', 'player', { name: 'AI_GM' });
+        r.clients.set(gm.id, gm);
+        r.clients.set(bot.id, bot);
+
+        const result = room.handleRoleChangeRequest(r, gm.id, bot.id, 'assistant-gm', false);
+        assert.equal(result.ok, true);
+        assert.equal(r.clients.get(bot.id).role, 'assistant-gm');
+    });
+
+    test('demoting a saved assistant-gm back to Player always persists, same as Co-GM', () => {
+        const gm = makeClient('gm-1', 'gm');
+        const bot = makeClient('bot-1', 'assistant-gm', { name: 'AI_GM', userId: 'bot-user-1' });
+        r.clients.set(gm.id, gm);
+        r.clients.set(bot.id, bot);
+
+        const result = room.handleRoleChangeRequest(r, gm.id, bot.id, 'player', false);
+        assert.equal(result.ok, true);
+        assert.equal(result.persist, true); // demotion off assistant-gm always writes through
+        assert.equal(r.clients.get(bot.id).role, 'player');
     });
 
     test('demoting a saved Co-GM back to Player always persists (even though promotion path is separately tested for persist:true elsewhere)', () => {

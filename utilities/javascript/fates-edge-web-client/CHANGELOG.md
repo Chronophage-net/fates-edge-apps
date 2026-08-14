@@ -2,6 +2,11 @@
 
 All notable changes to the Fate's Edge Web Client are logged here. This file starts at 4.2 — earlier versions (up through 4.1.2a) predate this convention and aren't reconstructed retroactively.
 
+## [4.12.0] - 2026-08-14
+
+### Role labels — new "Assistant GM" role
+- `vtt-connected.js`'s `role_update` toast now recognizes the server's new `assistant-gm` role (see the socket-server's v4.12 changelog) and labels it "Assistant GM" instead of falling through to the raw role string. No other client-side UI changes — there's still no in-client role-assignment picker for any of Co-GM/Assistant GM/Spectator; promotion happens via the existing `role_change_request` socket event (see the socket-server's `ROLES.md` and `API.md`), same as it always has for Co-GM.
+
 ## [4.11.1] - 2026-08-13
 
 ### Adventure Manager — timer sync loop closed end-to-end

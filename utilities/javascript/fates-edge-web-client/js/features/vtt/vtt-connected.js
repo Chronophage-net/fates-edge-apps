@@ -1355,8 +1355,8 @@ function setupWebSocketSync() {
         if (targetId === myId) {
             gmState.myRole = role;
             document.dispatchEvent(new CustomEvent('gmRoleUpdate', { detail: { role } }));
-            const roleLabel = { 'co-gm': 'Co-GM', player: 'Player', spectator: 'Spectator' }[role] || role;
-            showToast(`Your role is now: ${roleLabel}${role === 'co-gm' ? (persist ? ' (saved)' : ' (this session only)') : ''}`, 'success');
+            const roleLabel = { 'co-gm': 'Co-GM', 'assistant-gm': 'Assistant GM', player: 'Player', spectator: 'Spectator' }[role] || role;
+            showToast(`Your role is now: ${roleLabel}${(role === 'co-gm' || role === 'assistant-gm') ? (persist ? ' (saved)' : ' (this session only)') : ''}`, 'success');
         }
         updateGMUI();
         renderLocalPresence();

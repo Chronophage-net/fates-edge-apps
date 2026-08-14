@@ -107,11 +107,16 @@ function isValidPassword(password) {
 }
 
 // ─── v4.8: room roles ───────────────────────────────────────────────
-// gm/co-gm/player/spectator. 'member' is intentionally NOT in this set --
-// it was room_memberships.role's old default before this enum existed,
-// and storage.js's init() back-fills any lingering 'member' rows to
-// 'player' on startup, so callers should never see or accept it again.
-const VALID_ROLES = new Set(['gm', 'co-gm', 'player', 'spectator']);
+// gm/co-gm/assistant-gm/player/spectator. 'member' is intentionally NOT in
+// this set -- it was room_memberships.role's old default before this enum
+// existed, and storage.js's init() back-fills any lingering 'member' rows
+// to 'player' on startup, so callers should never see or accept it again.
+//
+// 'assistant-gm' (v4.12) is included here for the same reason 'co-gm' is:
+// a persisted grant (see room.js's handleRoleChangeRequest() persist
+// path) needs to be re-claimable directly at handshake on reconnect, not
+// just assignable via the in-room role_change_request promote flow.
+const VALID_ROLES = new Set(['gm', 'co-gm', 'assistant-gm', 'player', 'spectator']);
 
 function isValidRole(role) {
     return typeof role === 'string' && VALID_ROLES.has(role);

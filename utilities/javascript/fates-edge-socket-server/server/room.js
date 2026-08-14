@@ -381,13 +381,24 @@ function handleGmApproval(room, approverId, targetId) {
 }
 
 // ---------- v4.8: Role Management (Co-GM / Player / Spectator) ----------
+// ---------- v4.12: 'assistant-gm' added as a fourth assignable role -----
 //
 // Generalizes the GM-only "promote/demote" gesture beyond the single GM
 // seat above. Only the room's GM may call this (checked with
 // canManageGmSeat(), a strict `=== 'gm'` check -- a Co-GM cannot promote
 // another Co-GM, matching the "GM controls Co-GM" decision). The target
-// role must be one of 'co-gm' | 'player' | 'spectator'; transferring the
-// GM seat itself still goes through handleGmApproval() above, not here.
+// role must be one of 'co-gm' | 'assistant-gm' | 'player' | 'spectator';
+// transferring the GM seat itself still goes through handleGmApproval()
+// above, not here.
+//
+// 'assistant-gm' is how a GM hands the AI GM Bot a middle tier between
+// full narrative control and doing nothing: the bot keeps running
+// mechanics (rolls, resource math, timers) but holds narrative-authority
+// decisions (new facts, new NPCs, scene advancement) for the GM to
+// approve. See fates-edge-ai-gm-bot's modules/assistant-suggestions.js and
+// README "Assistant GM Mode" for what the bot does with this role once
+// assigned -- this server only needs to know it's a legal, non-GM role to
+// hand out the same way Co-GM is.
 //
 // `persist`: when promoting to Co-GM, the GM chooses whether the grant is
 // session-only (in-memory `client.role` flip, reverts to whatever's on
@@ -395,7 +406,7 @@ function handleGmApproval(room, approverId, targetId) {
 // room_memberships via _persistRole, so it survives reconnects until
 // explicitly demoted). Demotions always persist, so a saved Co-GM can be
 // fully revoked, not just silenced for the current connection.
-const ASSIGNABLE_ROLES = new Set(['co-gm', 'player', 'spectator']);
+const ASSIGNABLE_ROLES = new Set(['co-gm', 'assistant-gm', 'player', 'spectator']);
 
 function handleRoleChangeRequest(room, senderId, targetId, role, persist = false) {
     const sender = room.clients.get(senderId);
@@ -409,17 +420,18 @@ function handleRoleChangeRequest(room, senderId, targetId, role, persist = false
     target.role = role;
     room.clients.set(targetId, target);
 
-    // Demotions (anything moving OFF co-gm) always write through, even if
-    // the original promotion was session-only -- a standing grant must be
-    // fully revocable, not just suppressed for one connection.
-    const shouldPersist = persist || previousRole === 'co-gm';
+    // Demotions (anything moving OFF co-gm or assistant-gm) always write
+    // through, even if the original promotion was session-only -- a
+    // standing grant must be fully revocable, not just suppressed for one
+    // connection.
+    const shouldPersist = persist || previousRole === 'co-gm' || previousRole === 'assistant-gm';
     if (shouldPersist) _persistRole(room, target, role);
 
     const clientsList = getClientsList(room);
     broadcastToRoom(room.code, 'presence', { clients: clientsList });
     broadcastToRoom(room.code, 'role_update', { targetId, role, byId: senderId, persist: shouldPersist });
 
-    const roleLabel = { 'co-gm': 'Co-GM', player: 'Player', spectator: 'Spectator' }[role] || role;
+    const roleLabel = { 'co-gm': 'Co-GM', 'assistant-gm': 'Assistant GM', player: 'Player', spectator: 'Spectator' }[role] || role;
     broadcastToRoom(room.code, 'server_announcement', {
         message: `🎭 ${target.name} is now a ${roleLabel}${role === 'co-gm' && !shouldPersist ? ' for this session' : ''}.`,
         timestamp: Date.now()

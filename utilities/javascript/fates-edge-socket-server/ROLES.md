@@ -4,7 +4,7 @@
 
 ---
 
-## 1. The four roles
+## 1. The five roles
 
 Every connected client has exactly one role at a time, held on `client.role` (in-memory, per connection) and mirrored to `room_memberships.role` (persistent, per account) once the client is authenticated.
 
@@ -12,42 +12,46 @@ Every connected client has exactly one role at a time, held on `client.role` (in
 flowchart TD
     GM["👑 gm\n(exactly one per room)"]
     COGM["🛡️ co-gm\n(0 or more, uncapped)"]
+    ASSIST["🤝 assistant-gm\n(0 or more, uncapped -- typically\nthe AI GM Bot's own client)"]
     PLAYER["🎭 player\n(default role)"]
     SPEC["👁️ spectator\n(read-only)"]
 
     GM -- "grants / revokes" --> COGM
+    GM -- "grants / revokes" --> ASSIST
     GM -- "role_change_request" --> PLAYER
     GM -- "role_change_request" --> SPEC
     COGM -. "cannot promote/demote anyone" .-> PLAYER
 
     classDef gm fill:#d4af37,stroke:#7a5c00,color:#1a1400,font-weight:bold;
     classDef cogm fill:#8a6fd6,stroke:#4a2f9e,color:#fff;
+    classDef assist fill:#2f9e6f,stroke:#155c3f,color:#fff;
     classDef player fill:#3a6fb0,stroke:#1a3a66,color:#fff;
     classDef spec fill:#555,stroke:#222,color:#fff;
     class GM gm;
     class COGM cogm;
+    class ASSIST assist;
     class PLAYER player;
     class SPEC spec;
 ```
 
-Only the GM seat itself is capped at exactly one; the diagram's downward arrows are permission *grants*, not a strict reporting hierarchy — a Co-GM's permissions are a subset of the GM's, not a link in an approval chain.
+Only the GM seat itself is capped at exactly one; the diagram's downward arrows are permission *grants*, not a strict reporting hierarchy — a Co-GM's permissions are a subset of the GM's, not a link in an approval chain. `assistant-gm` (v4.12) is a sibling of Co-GM in the granting mechanism (same GM-only `role_change_request` flow, same session-vs-persisted choice) but carries **none** of Co-GM's elevated permissions — see the matrix below. It exists purely as a recognizable seat the AI GM Bot's own client can hold; see `fates-edge-ai-gm-bot`'s README "Assistant GM Mode" for what the bot does once it's assigned.
 
 ## 2. Permission matrix
 
-| Action | GM | Co-GM | Player | Spectator |
-|---|:---:|:---:|:---:|:---:|
-| Deck control (draw/shuffle/history) | ✅ | ✅ | ❌ | ❌ |
-| Edit any character | ✅ | ✅ | Own claimed character only | ❌ |
-| Kick / ban / unban a client | ✅ | ✅ | ❌ | ❌ |
-| Set/clear room password | ✅ | ✅ | ❌ | ❌ |
-| GM-only / secret adventure state | ✅ | ✅ | ❌ | ❌ |
-| Promote/demote a Co-GM | ✅ | ❌ | ❌ | ❌ |
-| Transfer/revoke the GM seat | ✅ | ❌ | ❌ | ❌ |
-| Delete / reset the room | ✅ | ❌ | ❌ | ❌ |
-| View public room/adventure state | ✅ | ✅ | ✅ | ✅ |
-| Claim / release a character | n/a (doesn't need one) | n/a | ✅ | ❌ |
+| Action | GM | Co-GM | Assistant GM | Player | Spectator |
+|---|:---:|:---:|:---:|:---:|:---:|
+| Deck control (draw/shuffle/history) | ✅ | ✅ | ❌ | ❌ | ❌ |
+| Edit any character | ✅ | ✅ | ❌ | Own claimed character only | ❌ |
+| Kick / ban / unban a client | ✅ | ✅ | ❌ | ❌ | ❌ |
+| Set/clear room password | ✅ | ✅ | ❌ | ❌ | ❌ |
+| GM-only / secret adventure state | ✅ | ✅ | ❌ | ❌ | ❌ |
+| Promote/demote a Co-GM or Assistant GM | ✅ | ❌ | ❌ | ❌ | ❌ |
+| Transfer/revoke the GM seat | ✅ | ❌ | ❌ | ❌ | ❌ |
+| Delete / reset the room | ✅ | ❌ | ❌ | ❌ | ❌ |
+| View public room/adventure state | ✅ | ✅ | ✅ | ✅ | ✅ |
+| Claim / release a character | n/a (doesn't need one) | n/a | n/a | ✅ | ❌ |
 
-The three seat-management rows (promote/demote Co-GM, transfer GM, delete/reset room) are gated by a strict `role === 'gm'` check (`security.canManageGmSeat()`) — everything else a GM can do, a Co-GM can also do, via `security.isGmLike(role)`.
+The three seat-management rows (promote/demote Co-GM/Assistant GM, transfer GM, delete/reset room) are gated by a strict `role === 'gm'` check (`security.canManageGmSeat()`) — everything else a GM can do, a Co-GM can also do, via `security.isGmLike(role)`. `assistant-gm` is deliberately **not** in `isGmLike()`'s set — server-side it's permission-equivalent to `player`, full stop. Whatever it means for a client holding this role to act as a GM's assistant is entirely up to that client's own logic (in practice, the AI GM Bot).
 
 ## 3. How a role actually changes
 
@@ -75,7 +79,7 @@ Notes:
 - `persist: false` (the default) only flips the live connection's role — it reverts to whatever's on file the next time that user joins. Good for "run tonight's fight scene" without a permanent grant.
 - `persist: true` writes through to `room_memberships.role`, so the grant survives reconnects.
 - **Demotions always persist**, regardless of how the promotion was made — a saved Co-GM can be fully revoked, not just silenced for one session.
-- A client's self-declared role on join is only trusted for `gm`/`player`/`spectator` — **`co-gm` is never accepted from the client itself.** It's only restored automatically when the account's persisted `room_memberships.role` already says `co-gm` (i.e. a previously *saved* grant), so nobody can claim Co-GM by simply asking for it at join time.
+- A client's self-declared role on join is only trusted for `gm`/`player`/`spectator` — **neither `co-gm` nor `assistant-gm` is ever accepted from the client itself.** Each is only restored automatically when the account's persisted `room_memberships.role` already says the same value (i.e. a previously *saved* grant), so nobody can claim Co-GM or Assistant GM by simply asking for it at join time — including a client just claiming to be the AI GM Bot.
 
 ## 4. Character claim/release
 
