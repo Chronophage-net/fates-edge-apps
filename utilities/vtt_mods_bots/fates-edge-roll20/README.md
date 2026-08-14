@@ -159,6 +159,8 @@ Roll20 page changes are also synced automatically when `FATES_EDGE_SYNC_SCENES` 
 | `!fates-edge gm reject <player>` | Reject a pending GM request (GM only). |
 | `!fates-edge gm status` | Show current GM and pending requests. |
 | `!fates-edge gm list` | List all connected clients with their roles. |
+| `!fates-edge role set <player> <co-gm\|assistant-gm\|player\|spectator> [save]` | Change a client's role (GM only; `save` persists a Co-GM/Assistant GM grant across reconnects — demotions always persist). `assistant-gm` is typically assigned to the AI GM Bot's own client — see the `fates-edge-ai-gm-bot` repo's README ("Assistant GM Mode") for what changes once it holds that role. |
+| `!fates-edge role list` | List all clients with their roles. |
 
 #### GM Command Examples
 

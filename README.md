@@ -1,6 +1,6 @@
 [![Build Apps and Packages](https://github.com/Chronophage-net/fates-edge-apps/actions/workflows/build-apps-and-packages.yml/badge.svg)](https://github.com/Chronophage-net/fates-edge-apps/actions/workflows/build-apps-and-packages.yml)
 
-# Fate's Edge Toolkit v4.11.1 – Complete VTT Ecosystem
+# Fate's Edge Toolkit v4.13.1 – Complete VTT Ecosystem
 
 > A modular, self-contained toolkit for running Fate's Edge TTRPG campaigns, with real‑time collaboration, VTT integrations, Game Master management, and a full in-browser magic/monastic-path system.
 
@@ -10,14 +10,14 @@
 [![Node.js](https://img.shields.io/badge/Node.js-24.x-green.svg)](https://nodejs.org/)
 [![Foundry VTT](https://img.shields.io/badge/Foundry-VTT-orange)](https://foundryvtt.com/)
 [![Discord](https://img.shields.io/badge/Discord-Bot-5865F2)](https://discord.com/)
-[![Version](https://img.shields.io/badge/version-4.11.1-blue)](https://github.com/Chronophage-net/fates-edge-apps)
+[![Version](https://img.shields.io/badge/version-4.13.1-blue)](https://github.com/Chronophage-net/fates-edge-apps)
 
 ---
 
 ## 📖 Table of Contents
 
 - [Overview](#-overview)
-- [What's New in v4.10.0](#-whats-new-in-v4100)
+- [What's New in v4.13.1](#-whats-new-in-v4131)
 - [Features](#-features)
 - [Quick Start](#-quick-start)
 - [Architecture](#-architecture)
@@ -39,6 +39,17 @@
 The toolkit includes **real‑time VTT features** via a WebSocket/Socket.io server, a **campaign sharing server** with GM election and shared Deck of Consequences draws, **integrations** for Foundry VTT, Discord, Roll20, and Avrae, and a growing set of **standalone in-browser mini-tools** (including an original strategy board game, Kon'reh).
 
 ---
+
+## 🆕 What's New in v4.13.1
+
+- **🎭 Role assignment, closed end-to-end across the whole ecosystem.** Previously only the Roll20 integration had a working "assign a role" command — the Discord bot and Foundry bridge both had the underlying live-socket `changeRole()` plumbing already wired up, but nothing ever called it, and the web client had no picker at all. Now every surface can promote/demote a client:
+  - **`assistant-gm` room role** (v4.12.0) — a fourth assignable role alongside GM/Co-GM/Player/Spectator, giving a GM a middle tier to hand the AI GM Bot: full mechanics, held narrative authority. See the `fates-edge-ai-gm-bot` repo's "Assistant GM Mode" for what the bot does with it. Deliberately carries no elevated server permissions of its own.
+  - **`POST /api/rooms/:code/clients/:clientId/role`** (v4.13.0) — a REST equivalent of the socket-only `role_change_request` event, for integrations (like the Discord bot's admin commands) that are otherwise entirely REST-based rather than holding a live GM socket connection.
+  - **Discord bot**: new `/vttadmin role <target> <role> [save]` slash command.
+  - **Foundry bridge**: the GM Management panel's client list now has a role dropdown + persist checkbox + "Set" button on every non-GM row.
+  - **Roll20**: `!fates-edge role set`/`role list` now documented and accept `assistant-gm`.
+  - **Web client**: the "Party Members" presence list now has its own in-app role picker — no more needing to leave the browser and reach for Discord/Foundry/Roll20 just to promote or demote someone.
+- **📚 Docs pass across every integration** covering the above — `ROLES.md`'s code-location table, and the Discord bot / Foundry bridge / Roll20 READMEs.
 
 ## 🆕 What's New in v4.11.1
 
@@ -499,7 +510,21 @@ privately rather than filing a public issue.
 
 ## 📋 Version History
 
-### v4.11.1 (Current)
+### v4.13.1 (Current)
+- **Added** Web client role picker — the "Party Members" presence list now has an in-app role `<select>` + persist checkbox + "Set" button, GM-only, gated on the viewer's live presence role
+- **Docs** `ROLES.md`'s code-location table updated
+
+### v4.13.0
+- **Added** `POST /api/rooms/:code/clients/:clientId/role` — REST equivalent of the socket-only `role_change_request` event, API-key-authorized
+- **Added** Discord bot `/vttadmin role <target> <role> [save]` slash command
+- **Added** Foundry bridge GM Management panel role dropdown + persist checkbox + "Set" button
+- **Fixed** Roll20 `!fates-edge role set`/`role list` usage text and role-label maps across Discord/Foundry/Roll20 now document/handle `assistant-gm`
+
+### v4.12.0
+- **Added** `assistant-gm` as a fourth assignable room role (alongside GM/Co-GM/Player/Spectator), so a GM can hand the AI GM Bot a middle tier between full narrative control and doing nothing
+- **Changed** Deliberately not added to `GM_LIKE_ROLES` — carries no elevated server-side permissions of its own
+
+### v4.11.1
 - **Added** Adventure Timer Sync Loop closed end-to-end — `timer-ticked` broadcasts are now consumed on both WS transports and reconciled into local adventure/timer state (previously fired, but nothing listened)
 - **Added** One-click Adventure Module install from Settings (metadata preview + install; no manual JSON placement)
 - **Added** Bidirectional character sync — local edits push to the server automatically (debounced), not just at connect
