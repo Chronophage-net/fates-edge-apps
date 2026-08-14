@@ -1663,6 +1663,36 @@ export function sendVoiceStatus(data) {
     }
 }
 
+/**
+ * Change another client's role -- Co-GM / Assistant GM / Player /
+ * Spectator (see the socket-server's ROLES.md and room.js's
+ * handleRoleChangeRequest()). GM-only server-side: the server checks
+ * THIS connection's own role, not anything passed here, so a non-GM
+ * caller just gets rejected -- no client-side permission check needed
+ * before calling this.
+ *
+ * `persist`: false (default) grants the role for the target's current
+ * connection only; true saves it to their account so it survives
+ * reconnects. Demotions (anything moving OFF co-gm/assistant-gm) always
+ * persist server-side regardless of what's passed here.
+ *
+ * Fire-and-forget over both transports, matching kick/ban's existing
+ * pattern in this file (see sendWS/sendWSMessage calls above) -- the
+ * actual result arrives as a 'role_update' broadcast to the whole room
+ * (see vtt-connected.js's roleUpdateHandler), not a direct response to
+ * this call.
+ */
+export function changeRole(targetId, role, persist = false) {
+    if (!targetId || !role) return false;
+    if (connectionMode === 'socketio') {
+        if (!socket || !socket.connected) return false;
+        socket.emit('role_change_request', { targetId, role, persist });
+        return true;
+    } else {
+        return sendWSMessage({ type: 'role_change_request', targetId, role, persist });
+    }
+}
+
 // ============================================================
 // INITIALIZATION
 // ============================================================

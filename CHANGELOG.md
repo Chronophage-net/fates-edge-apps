@@ -3,6 +3,14 @@ All notable changes to this project will be documented here.
 
 Format loosely follows [Keep a Changelog](https://keepachangelog.com/), versions follow [Semantic Versioning](https://semver.org/).
 
+## [4.13.1] - 2026-08-14
+
+Closes the last gap from 4.13.0: the web client now has its own in-app role picker, so a GM doesn't have to leave the browser and reach for Discord/Foundry/Roll20 to promote or demote a party member.
+
+### Added
+- **Web client role picker** (`js/features/vtt/vtt-core.js`'s `renderLocalPresence()`): every non-self, non-GM row in the "Party Members" presence list now shows a role `<select>` (Co-GM / Assistant GM / Player / Spectator) + a "save" persist checkbox + a "Set" button, visible only when the viewing client's own **live presence role** is `gm` — deliberately not gated on the broader `isGmLikeRole()` UI-visibility helper (which also treats Co-GM as GM-like), since the server's `role_change_request` handler enforces changes with a strict `role === 'gm'` check (`canManageGmSeat()`) and would reject a Co-GM's attempt anyway.
+- New `changeRole(targetId, role, persist)` export in `core/websocket.js`: dual-transport (Socket.IO / raw WebSocket), fire-and-forget, matching the existing kick/ban call pattern in that file. The result arrives asynchronously as a `role_update` broadcast (already handled by `vtt-connected.js`'s `roleUpdateHandler`, unchanged) rather than a direct response.
+
 ## [4.13.0] - 2026-08-14
 
 Adds a REST equivalent of role assignment (`POST /api/rooms/:code/clients/:clientId/role`), and wires up the actual role-assignment UI/commands that were missing across the ecosystem — previously only the Roll20 integration had a working `!fates-edge role set` command; the Discord bot and Foundry bridge both had the underlying `changeRole()` plumbing already but no command/UI ever called it, and the web client still has no picker at all (unchanged this release).

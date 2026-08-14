@@ -19,7 +19,7 @@
 
 import { vttStore, MAX_CONTROLLED_CHARACTERS } from '../../core/vtt-store.js';
 import { escHtml, getStorage, setStorage, setHtml, createElement, sanitizeHtml } from '../../core/utils.js';
-import { isConnectedToServer, getRoomCode, getSocketId, getConnectionMode } from '../../core/websocket.js';
+import { isConnectedToServer, getRoomCode, getSocketId, getConnectionMode, changeRole } from '../../core/websocket.js';
 import { getOutcomeColor, getOutcomeLabel, getOutcomeClass } from '../../core/dice.js';
 import { showToast } from '../../components/Toast.js';
 
@@ -911,15 +911,45 @@ export function renderLocalPresence() {
         }
 
         const myId = socketId;
+        // NEW: role-assignment picker. Gated on the LIVE presence role for
+        // this connection, not localStorage's isGmLikeRole() -- the server
+        // enforces role changes with a strict `=== 'gm'` check
+        // (canManageGmSeat(), see room.js/ROLES.md), Co-GM cannot promote
+        // anyone, so the picker must match that exactly rather than the
+        // broader "GM-like" UI-visibility helper used elsewhere.
+        const myPresence = presence.find(p => p.id === myId);
+        const iAmGm = myPresence?.role === 'gm';
+        const ROLE_LABELS = { 'co-gm': 'Co-GM', 'assistant-gm': 'Assistant GM', player: 'Player', spectator: 'Spectator', gm: 'GM' };
         let membersHtml = '';
         for (const p of presence) {
             const isSelf = p.id === myId;
             const isOnline = p.online !== false;
             const playerName = p.name || 'Unknown';
+            const role = p.role || 'player';
 
-            const roleBadge = p.role === 'gm'
+            const roleBadge = role === 'gm'
                 ? `<span style="font-size:0.55rem;background:var(--gold);color:#1a1400;padding:0.05rem 0.4rem;border-radius:8px;font-weight:600;">GM</span>`
-                : `<span style="font-size:0.55rem;background:var(--bg4);color:var(--text3);padding:0.05rem 0.4rem;border-radius:8px;">Player</span>`;
+                : `<span style="font-size:0.55rem;background:var(--bg4);color:var(--text3);padding:0.05rem 0.4rem;border-radius:8px;" title="${escHtml(ROLE_LABELS[role] || role)}">${escHtml(ROLE_LABELS[role] || role)}</span>`;
+
+            // Role-assignment control -- visible to the GM only, never on
+            // the GM's own row (the GM seat itself changes via Resign/
+            // Request GM, not this picker; see room.js's
+            // handleRoleChangeRequest which rejects target.role === 'gm'
+            // through this path regardless).
+            const roleControlHtml = (iAmGm && !isSelf && role !== 'gm') ? `
+                <span class="vtt-role-control" style="display:inline-flex;align-items:center;gap:0.25rem;" data-client-id="${p.id}">
+                    <select class="vtt-role-select" data-client-id="${p.id}" title="Assign a role" style="font-size:0.7rem;padding:0.05rem 0.2rem;background:var(--bg3);border:1px solid var(--border);border-radius:4px;color:var(--text);">
+                        <option value="co-gm" ${role === 'co-gm' ? 'selected' : ''}>Co-GM</option>
+                        <option value="assistant-gm" ${role === 'assistant-gm' ? 'selected' : ''}>Assistant GM</option>
+                        <option value="player" ${role === 'player' ? 'selected' : ''}>Player</option>
+                        <option value="spectator" ${role === 'spectator' ? 'selected' : ''}>Spectator</option>
+                    </select>
+                    <label style="display:flex;align-items:center;gap:0.1rem;font-size:0.6rem;color:var(--text3);white-space:nowrap;cursor:pointer;" title="Persist this grant across reconnects (demotions always persist)">
+                        <input type="checkbox" class="vtt-role-persist" data-client-id="${p.id}" style="margin:0;" /> save
+                    </label>
+                    <button class="btn btn-xs btn-primary vtt-role-apply" data-client-id="${p.id}" style="font-size:0.65rem;padding:0.05rem 0.4rem;">Set</button>
+                </span>
+            ` : '';
 
             const avatarUrl = showAvatars
                 ? p.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(playerName)}&size=32&background=2c3e50&color=fff`
@@ -969,11 +999,12 @@ export function renderLocalPresence() {
             }
 
             membersHtml += `
-                <div class="presence-item" style="display:flex;align-items:center;gap:0.6rem;padding:0.25rem 0;border-bottom:1px solid var(--border);${isSelf ? 'background:var(--bg4);border-radius:6px;padding:0.25rem 0.6rem;' : ''}">
+                <div class="presence-item" style="display:flex;flex-wrap:wrap;align-items:center;gap:0.6rem;padding:0.25rem 0;border-bottom:1px solid var(--border);${isSelf ? 'background:var(--bg4);border-radius:6px;padding:0.25rem 0.6rem;' : ''}">
                     <span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:${isOnline ? 'var(--green)' : 'var(--text3)'};flex-shrink:0;" title="${isOnline ? 'Online' : 'Offline'}"></span>
                     ${showAvatars ? `<img src="${avatarUrl}" alt="${escHtml(playerName)}" style="width:28px;height:28px;border-radius:50%;object-fit:cover;flex-shrink:0;" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2232%22 height=%2232%22 viewBox=%220 0 32 32%22%3E%3Crect fill=%22%232c3e50%22 width=%2232%22 height=%2232%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22 dy=%22.35em%22 fill=%22%23fff%22 font-family=%22Arial%22 font-size=%2214%22%3E${encodeURIComponent(playerName.charAt(0))}%3C/text%3E%3C/svg%3E'" />` : ''}
                     <span style="font-weight:${isSelf ? '600' : '400'};font-size:0.9rem;white-space:nowrap;">${escHtml(playerName)}${isSelf ? ' (you)' : ''}</span>
                     ${roleBadge}
+                    ${roleControlHtml}
                     <span style="flex:1;text-align:right;display:flex;justify-content:flex-end;align-items:center;gap:0.4rem;font-size:0.85rem;">
                         <span style="color:var(--text3);">Character:</span>
                         ${charDisplayHtml}
@@ -1003,6 +1034,10 @@ export function renderLocalPresence() {
         presenceList.querySelectorAll('.vtt-remote-toggle').forEach(toggle => {
             toggle.removeEventListener('change', handleRemoteToggle);
             toggle.addEventListener('change', handleRemoteToggle);
+        });
+        presenceList.querySelectorAll('.vtt-role-apply').forEach(btn => {
+            btn.removeEventListener('click', handleRoleApply);
+            btn.addEventListener('click', handleRoleApply);
         });
     }
 
@@ -1056,6 +1091,40 @@ function handleRemoteToggle(e) {
     // away instead of waiting for the next unrelated presence update.
     const presence = vttStore.state.presence || [];
     vttStore.updatePresence([...presence]);
+}
+
+// "Set" button next to a party member's role picker (GM only, see the
+// roleControlHtml block in renderPresence() above). Reads the paired
+// <select>/checkbox for the same data-client-id and sends a
+// role_change_request over the live connection. No optimistic local
+// state update -- the server has final say (GM-only, checked against
+// THIS connection's own live role, not anything sent here), and the
+// resulting 'role_update' broadcast (see vtt-connected.js's
+// roleUpdateHandler) is what actually updates presence and re-renders
+// this list, whether the change came from here, from another VTT
+// integration (Discord/Foundry/Roll20), or from the REST admin API.
+function handleRoleApply(e) {
+    const btn = e.currentTarget;
+    const clientId = btn.dataset.clientId;
+    if (!clientId) return;
+    const control = btn.closest('.vtt-role-control');
+    if (!control) return;
+    const select = control.querySelector('.vtt-role-select');
+    const persistBox = control.querySelector('.vtt-role-persist');
+    const role = select?.value;
+    const persist = !!persistBox?.checked;
+    if (!role) return;
+    if (!isConnectedToServer()) {
+        showToast('Not connected to server.', 'error');
+        return;
+    }
+    const ROLE_LABELS = { 'co-gm': 'Co-GM', 'assistant-gm': 'Assistant GM', player: 'Player', spectator: 'Spectator' };
+    const ok = changeRole(clientId, role, persist);
+    if (ok) {
+        showToast(`Requested: role → ${ROLE_LABELS[role] || role}${persist ? ' (saved)' : ''}.`, 'info');
+    } else {
+        showToast('Failed to send role change -- check your connection.', 'error');
+    }
 }
 
 // ============================================================

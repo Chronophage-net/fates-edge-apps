@@ -110,6 +110,7 @@ flowchart LR
 |---|---|---|
 | Role storage & broadcast | `server/room.js` | `handleRoleChangeRequest` (socket), `setClientRole` (REST/API-key), `_applyRoleChange` (shared core), `_persistRole` |
 | Role assignment via REST | `server/api.js` | `POST /api/rooms/:code/clients/:clientId/role` |
+| Role assignment in web client | `fates-edge-web-client/js/features/vtt/vtt-core.js`, `js/core/websocket.js` | `renderLocalPresence()` (picker UI, GM-only), `changeRole()` (sends `role_change_request`) |
 | GM seat request/approve | `server/room.js` | `handleGmRequest`, `handleGmApproval` |
 | Permission checks | `server/security.js` | `isGmLike`, `canManageGmSeat`, `isSpectator` |
 | Character edit authorization | `server/room.js` | `canEditCharacter` |
